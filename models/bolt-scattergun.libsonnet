@@ -1,34 +1,47 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
-// The bolt carbine's scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, twin fat
-// bores one over the other instead of the barrel, no magazine, and a pump slide under the barrels. About 0.78 m long.
-// The muzzle is at +x. Built by tools/model (tools/build_models.sh) into assets/own/skelly/bolt_scattergun.glb.
+// The bolt carbine's trench scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, a long
+// slim barrel with a perforated heat shield and a magazine tube beneath it, and a ribbed brass pump handle hung
+// below the tube on a neck, clear of the barrel. About 1.3 m long. The muzzle is at +x. Built by tools/model
+// (tools/build_models.sh) into assets/own/skelly/bolt_scattergun.glb.
+// Hand-guard point (the off hand's hold on the pump handle), in this model's metres: [0.47, 0.13, 0].
 
 local w = 0.06;  // half the receiver's width
-local hiY = 0.295;  // the upper bore's axis
-local loY = 0.215;  // the lower bore's axis
-local muzzleX = 0.46;
+local barrelY = 0.29;  // the barrel's axis
+local tubeY = 0.215;  // the magazine tube's axis
+local muzzleX = 0.98;
+local pumpX0 = 0.36;
+local pumpX1 = 0.58;
 [
   h.compound('bolt_scattergun', 12.5, [
     // Receiver, a tall block with a top ridge and a painted band.
     box('receiver', 'body', [-0.18, 0.14, -w], [0.11, 0.34, w]),
     box('ridge', 'body', [-0.16, 0.34, -0.04], [0.11, 0.36, 0.04]),
     box('receiver-band', 'accent', [-0.04, 0.14, -w - 0.003], [0.0, 0.34, w + 0.003]),
-    // The breech block the barrels are bolted into, wider than the receiver.
-    box('breech', 'trim', [0.11, 0.15, -0.07], [0.15, 0.345, 0.07]),
-    // Twin wide bores with dark mouths, a rib along the top and two clamps.
-    box('barrel-up', 'metal', [0.15, hiY - 0.04, -0.04], [muzzleX, hiY + 0.04, 0.04]),
-    box('barrel-low', 'metal', [0.15, loY - 0.04, -0.04], [muzzleX, loY + 0.04, 0.04]),
-    box('bore-up', 'vent', [muzzleX, hiY - 0.026, -0.026], [muzzleX + 0.002, hiY + 0.026, 0.026]),
-    box('bore-low', 'vent', [muzzleX, loY - 0.026, -0.026], [muzzleX + 0.002, loY + 0.026, 0.026]),
-    box('rib', 'trim', [0.15, hiY + 0.04, -0.012], [muzzleX, hiY + 0.048, 0.012]),
-    box('clamp-a', 'trim', [0.33, loY - 0.045, -0.05], [0.36, hiY + 0.045, 0.05]),
-    box('clamp-b', 'trim', [0.43, loY - 0.045, -0.05], [0.455, hiY + 0.045, 0.05]),
-    // The pump slide under the barrels, with three grooves.
-    box('pump', 'grip', [0.16, 0.095, -0.052], [0.32, 0.176, 0.052]),
-    box('groove', 'vent', [0.22, 0.1, -0.054], [0.23, 0.17, 0.054]),
-    box('groove-b', 'vent', [0.26, 0.1, -0.054], [0.27, 0.17, 0.054]),
+    // The breech block the barrel and tube are bolted into.
+    box('breech', 'trim', [0.11, 0.17, -0.06], [0.15, 0.335, 0.06]),
+    // One long slim barrel with a dark mouth and a rib, and a magazine tube beneath it ending in a brass cap.
+    box('barrel', 'metal', [0.15, barrelY - 0.03, -0.03], [muzzleX, barrelY + 0.03, 0.03]),
+    box('bore', 'vent', [muzzleX, barrelY - 0.02, -0.02], [muzzleX + 0.002, barrelY + 0.02, 0.02]),
+    box('rib', 'trim', [0.15, barrelY + 0.03, -0.01], [muzzleX, barrelY + 0.037, 0.01]),
+    box('tube', 'metal', [0.15, tubeY - 0.022, -0.022], [0.80, tubeY + 0.022, 0.022]),
+    box('tube-cap', 'trim', [0.80, tubeY - 0.028, -0.028], [0.83, tubeY + 0.028, 0.028]),
+    box('clamp', 'trim', [0.84, tubeY - 0.03, -0.035], [0.865, barrelY + 0.035, 0.035]),
+    box('front-post', 'metal', [0.94, barrelY + 0.037, -0.006], [0.955, barrelY + 0.075, 0.006]),
+    // A perforated heat shield over the rear of the barrel: a slab with dark holes down both sides.
+    box('shield', 'body', [0.20, barrelY + 0.03, -0.045], [0.62, barrelY + 0.058, 0.045]),
+  ] + [
+    box('hole-%d' % i, 'vent', [0.23 + i * 0.065, barrelY + 0.036, -0.047], [0.26 + i * 0.065, barrelY + 0.052, 0.047])
+    for i in [0, 1, 2, 3, 4, 5]
+  ] + [
+    // The pump handle: a deep ribbed oxblood sleeve under the tube, on a neck that leaves a gap between them.
+    box('pump-neck', 'metal', [0.43, tubeY - 0.055, -0.016], [0.51, tubeY - 0.022, 0.016]),
+    box('pump', 'trim', [pumpX0, 0.07, -0.05], [pumpX1, tubeY - 0.055, 0.05]),
+  ] + [
+    box('rib-%d' % i, 'vent', [pumpX0 + 0.012 + i * 0.03, 0.074, -0.052], [pumpX0 + 0.026 + i * 0.03, tubeY - 0.059, 0.052])
+    for i in [0, 1, 2, 3, 4, 5]
+  ] + [
     // Pistol grip, trigger guard and trigger.
     h.prism('grip', 'grip', 'z', [[-0.13, 0.15], [-0.07, 0.15], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
     box('guard', 'metal', [-0.075, 0.105, -0.008], [0.005, 0.117, 0.008]),
