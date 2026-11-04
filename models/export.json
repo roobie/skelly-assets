@@ -11,6 +11,17 @@
     "legguard_trooper_worn_thigh",
     "legguard_trooper_worn_shin",
     "boots_trooper_worn_shaft",
-    "boots_trooper_worn_foot"
+    "boots_trooper_worn_foot",
+    "helmet_heavy",
+    "armor_heavy_worn_body",
+    "armor_heavy_worn_upper",
+    "armor_heavy_worn_fore",
+    "gloves_heavy_worn_palm",
+    "gloves_heavy_worn_fingers",
+    "gloves_heavy_worn_thumb",
+    "legguard_heavy_worn_thigh",
+    "legguard_heavy_worn_shin",
+    "boots_heavy_worn_shaft",
+    "boots_heavy_worn_foot"
   ]
 }

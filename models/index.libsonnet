@@ -2,3 +2,4 @@
 // that tools/model/build.mjs installs into assets/own/skelly (the rest, such as ground models, are built only on request).
 (import 'bolt-carbine.libsonnet')
 + (import 'trooper.libsonnet')
++ (import 'heavy-blue.libsonnet')
