@@ -1,6 +1,8 @@
 {
   "ids": [
     "bolt_carbine",
+    "bolt_scattergun",
+    "bolt_plasma_caster",
     "helmet_trooper",
     "armor_trooper_worn_body",
     "armor_trooper_worn_upper",

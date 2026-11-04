@@ -1,5 +1,7 @@
 // Every model source: each file is a list of rows. A row exports under its own id; models/export.json names the ones
 // that tools/model/build.mjs installs into assets/own/skelly (the rest, such as ground models, are built only on request).
 (import 'bolt-carbine.libsonnet')
++ (import 'bolt-scattergun.libsonnet')
++ (import 'bolt-plasma-caster.libsonnet')
 + (import 'trooper.libsonnet')
 + (import 'heavy-blue.libsonnet')
