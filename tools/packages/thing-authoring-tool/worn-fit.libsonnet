@@ -29,6 +29,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 
 {
   layers: layers,
+  oct: oct,
 
   // A jacket, shirt or coat: a body shell over the bust and, unless `sleeves` is 'none', upper and fore sleeves.
   // `slots` names the ground row's finish slots the shells reuse: `body`, `trim` and `fastener`.
