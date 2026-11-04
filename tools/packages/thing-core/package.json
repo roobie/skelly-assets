@@ -1,0 +1,16 @@
+{
+  "name": "@skelly/thing-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema.ts",
+    "./materials": "./src/materials.ts",
+    "./mass": "./src/mass.ts",
+    "./single-part": "./src/singlePart.ts"
+  },
+  "dependencies": {
+    "@skelly/engine": "*",
+    "valibot": "^1.5.0"
+  }
+}
