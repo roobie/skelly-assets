@@ -1,0 +1,29 @@
+{
+  "ids": [
+    "bolt_carbine",
+    "bolt_scattergun",
+    "bolt_plasma_caster",
+    "helmet_trooper",
+    "armor_trooper_worn_body",
+    "armor_trooper_worn_upper",
+    "armor_trooper_worn_fore",
+    "gloves_trooper_worn_palm",
+    "gloves_trooper_worn_fingers",
+    "gloves_trooper_worn_thumb",
+    "legguard_trooper_worn_thigh",
+    "legguard_trooper_worn_shin",
+    "boots_trooper_worn_shaft",
+    "boots_trooper_worn_foot",
+    "helmet_heavy",
+    "armor_heavy_worn_body",
+    "armor_heavy_worn_upper",
+    "armor_heavy_worn_fore",
+    "gloves_heavy_worn_palm",
+    "gloves_heavy_worn_fingers",
+    "gloves_heavy_worn_thumb",
+    "legguard_heavy_worn_thigh",
+    "legguard_heavy_worn_shin",
+    "boots_heavy_worn_shaft",
+    "boots_heavy_worn_foot"
+  ]
+}
