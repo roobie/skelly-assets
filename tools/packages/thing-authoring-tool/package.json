@@ -1,0 +1,16 @@
+{
+  "name": "@skelly/thing-authoring-tool",
+  "version": "0.0.0",
+  "private": true,
+  "license": "EUPL-1.2",
+  "type": "module",
+  "exports": {
+    "./exports.ts": "./src/exports.ts"
+  },
+  "dependencies": {
+    "@skelly/engine": "*",
+    "@skelly/thing-core": "*",
+    "@skelly/thing-export": "*",
+    "valibot": "^1.5.0"
+  }
+}

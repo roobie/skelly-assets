@@ -1,0 +1,15 @@
+{
+  "name": "@skelly/thing-export",
+  "version": "0.0.0",
+  "private": true,
+  "license": "EUPL-1.2",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@skelly/engine": "*",
+    "@skelly/thing-core": "*",
+    "valibot": "^1.5.0"
+  }
+}

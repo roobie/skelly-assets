@@ -1,0 +1,16 @@
+{
+  "ids": [
+    "bolt_carbine",
+    "helmet_trooper",
+    "armor_trooper_worn_body",
+    "armor_trooper_worn_upper",
+    "armor_trooper_worn_fore",
+    "gloves_trooper_worn_palm",
+    "gloves_trooper_worn_fingers",
+    "gloves_trooper_worn_thumb",
+    "legguard_trooper_worn_thigh",
+    "legguard_trooper_worn_shin",
+    "boots_trooper_worn_shaft",
+    "boots_trooper_worn_foot"
+  ]
+}
