@@ -1,5 +1,5 @@
 {
-  "_doc": "Rows of the mob export (tools/model/mobs.mjs, run by tools/build_mobs.sh): each builds <glb> and <clips> from a mobgen template. lod_divisor: the LOD voxel is the template's 0.5 m block over this, 0 keeps mobgen's full detail. Defaults apply to every row; a row may override any of them.",
+  "_doc": "Rows of the mob export (tools/model/mobs.mjs, run by tools/build_mobs.sh): each builds <glb> and <clips> from a mobgen template. lod_divisor: the LOD voxel is the template's 0.5 m block over this, 0 keeps mobgen's full detail. Defaults apply to every row; a row may override any of them. A row narrows the template to its sprite: `brief` (what was read from the sprite, for the next person), `params` (the template's param ranges it overrides: a number, {min,max} or {choices}), `materials` (the palette sampled from the sprite: name -> {color, emissive}; a name here no longer follows the template's hue params) and `parts` (signature features: a shape on a bone at its head/tail/mid, metres from there, mirrored to the other side's bone; see PartSpec in tools/model/packages/mobgen/src/core/template.ts). Judge a row with tools/mob_sheet.sh.",
   "defaults": {
     "seed": 7,
     "lod_divisor": 10,
@@ -9,6 +9,69 @@
     "idle": "slack"
   },
   "mobs": [
-    { "id": "shambler", "template": "shambler", "seed": 7, "lod_divisor": 10, "glb": "shambler.glb", "clips": "shambler_clips.json" }
+    {
+      "id": "shambler",
+      "template": "shambler",
+      "seed": 7,
+      "lod_divisor": 10,
+      "glb": "shambler.glb",
+      "clips": "shambler_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/undead/ghoul.png, seen from the front. Silhouette: a hunched, wide-stanced ghoul, broad shoulders, small dark head sunk between them, long arms hanging out and bent with huge splayed clawed hands (as big as the head), a thin torso with a torn open red Y on the chest, thick legs apart in a lurch. Palette (sampled): skin grey-green #5a6c5a / light #7a907a, shadow and legs near-black grey #383838, hands and chest dark red-brown #4a1818 / #783828, eyes yellow #ffff00 glowing in a dark face. Signature: glowing yellow eyes, big dark-red clawed hands, red torn chest. Motion: a lurching stagger with the arms out and ready to grab.",
+      "params": {
+        "height": { "min": 1.62, "max": 1.72 },
+        "girth": { "min": 0.82, "max": 0.92 },
+        "shoulderWidth": { "min": 1.5, "max": 1.6 },
+        "hipWidth": { "min": 1.2, "max": 1.3 },
+        "headScale": { "min": 1.5, "max": 1.6 },
+        "armLength": { "min": 1.3, "max": 1.4 },
+        "legLength": { "min": 1.05, "max": 1.1 },
+        "hunch": { "min": 8, "max": 12 },
+        "kneeBend": { "min": 18, "max": 22 },
+        "headTilt": { "choices": [-12, -8] },
+        "jawOpen": { "choices": [0.4, 0.6] },
+        "earSize": 0,
+        "sleeveLength": 0,
+        "pantsLength": { "min": 0.75, "max": 0.85 },
+        "shirtTear": { "min": 0.15, "max": 0.25 },
+        "pantsTear": { "min": 0.1, "max": 0.2 },
+        "hairCover": 0,
+        "woundCount": 0,
+        "armSwing": { "min": 14, "max": 18 },
+        "armRaise": { "choices": [40, 50] },
+        "limp": { "min": 0.2, "max": 0.35 },
+        "strideFactor": { "min": 0.85, "max": 0.95 },
+        "pelvisSway": { "min": 5, "max": 6 },
+        "spineTwist": { "min": 4, "max": 5 },
+        "headLoll": { "min": 4, "max": 7 },
+        "jawChatter": { "min": 0, "max": 4 }
+      },
+      "materials": {
+        "skin": { "color": "#7a907a" },
+        "shirt": { "color": "#6a806a" },
+        "pants": { "color": "#505050" },
+        "shoe": { "color": "#2b2e2b" },
+        "bruise": { "color": "#607460" },
+        "mouth": { "color": "#1c1010" },
+        "eye": { "color": "#ffee10", "emissive": 1.0 },
+        "gore": { "color": "#7a2820" },
+        "flesh": { "color": "#8a3828" },
+        "shade": { "color": "#2b2e2b" }
+      },
+      "parts": [
+        { "bone": "hand.L", "mirror": true, "material": "flesh", "shape": { "kind": "ellipsoid", "center": [-0.02, -0.08, -0.02], "radii": [0.11, 0.14, 0.08] } },
+        { "bone": "hand.L", "mirror": true, "op": "paint", "onto": ["skin", "shirt"], "material": "flesh", "shape": { "kind": "capsule", "a": [0.0, 0.2, 0.0], "b": [-0.02, -0.02, 0.0], "ra": 0.09, "rb": 0.1 } },
+        { "bone": "hand.L", "mirror": true, "material": "flesh", "shape": { "kind": "capsule", "a": [-0.07, -0.12, -0.03], "b": [-0.11, -0.27, -0.04], "ra": 0.03, "rb": 0.012 } },
+        { "bone": "hand.L", "mirror": true, "material": "flesh", "shape": { "kind": "capsule", "a": [-0.02, -0.15, -0.04], "b": [-0.03, -0.31, -0.05], "ra": 0.03, "rb": 0.012 } },
+        { "bone": "hand.L", "mirror": true, "material": "flesh", "shape": { "kind": "capsule", "a": [0.03, -0.12, -0.03], "b": [0.05, -0.26, -0.04], "ra": 0.03, "rb": 0.012 } },
+        { "bone": "chest", "at": "mid", "op": "paint", "onto": ["skin", "shirt"], "material": "flesh", "shape": { "kind": "capsule", "a": [0.0, 0.0, -0.14], "b": [0.0, -0.22, -0.14], "ra": 0.04, "rb": 0.04 } },
+        { "bone": "chest", "at": "mid", "mirror": false, "op": "paint", "onto": ["skin", "shirt"], "material": "flesh", "shape": { "kind": "capsule", "a": [0.0, 0.0, -0.14], "b": [-0.1, 0.1, -0.13], "ra": 0.035, "rb": 0.035 } },
+        { "bone": "chest", "at": "mid", "op": "paint", "onto": ["skin", "shirt"], "material": "flesh", "shape": { "kind": "capsule", "a": [0.0, 0.0, -0.14], "b": [0.1, 0.1, -0.13], "ra": 0.035, "rb": 0.035 } },
+        { "bone": "chest", "at": "mid", "material": "skin", "shape": { "kind": "ellipsoid", "center": [0.0, 0.06, 0.07], "radii": [0.14, 0.09, 0.09] } },
+        { "bone": "upperArm.L", "mirror": true, "material": "skin", "shape": { "kind": "ellipsoid", "center": [0.0, 0.0, 0.0], "radii": [0.075, 0.075, 0.075] } },
+        { "bone": "head", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "shade", "shape": { "kind": "ellipsoid", "center": [0.0, 0.0, -0.14], "radii": [0.085, 0.08, 0.06] } },
+        { "bone": "head", "at": "mid", "mirror": false, "material": "eye", "shape": { "kind": "box", "center": [-0.07, 0.03, -0.2], "half": [0.025, 0.025, 0.04], "round": 0.004 } },
+        { "bone": "head", "at": "mid", "material": "eye", "shape": { "kind": "box", "center": [0.07, 0.03, -0.2], "half": [0.025, 0.025, 0.04], "round": 0.004 } }
+      ]
+    }
   ]
 }
