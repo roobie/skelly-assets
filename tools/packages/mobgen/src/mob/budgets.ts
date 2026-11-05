@@ -22,12 +22,13 @@ const parameterCenter = (spec: ParamSpec | undefined, name: string): number => {
 // These plans share height/head scaling; keeping it outside core lets other anatomies choose their own.
 export const heightHeadBudgets = (genome: Genome, template: Template): Budgets => {
   const ratio = template.voxelSize / genome.voxelSize;
+  const basis = template.budgetParams ?? template.params;
   const { height, headScale } = genome.params;
   if (height === undefined || headScale === undefined) {
     throw new Error(`genome "${genome.template}" is missing height or headScale`);
   }
-  const heightRatio = height / parameterCenter(template.params.height, 'height');
-  const headScaleRatio = headScale / parameterCenter(template.params.headScale, 'headScale');
+  const heightRatio = height / parameterCenter(basis.height, 'height');
+  const headScaleRatio = headScale / parameterCenter(basis.headScale, 'headScale');
   const volumeScale = ratio ** 3 * heightRatio ** 3;
   const headVolumeScale = volumeScale * headScaleRatio ** 3;
   const surfaceScale = ratio ** 2 * heightRatio ** 2;

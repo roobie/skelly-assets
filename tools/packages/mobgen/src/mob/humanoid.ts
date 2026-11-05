@@ -28,6 +28,7 @@ import { pick, type Rng, range } from '../core/random.ts';
 import { type Genome, type Template, templateByName, type Wound } from '../core/template.ts';
 import { voxelize } from '../core/voxelize.ts';
 import { heightHeadBudgets } from './budgets.ts';
+import { partFeatures } from './parts.ts';
 import { resolveMaterials } from './materials.ts';
 
 const SIDES = ['L', 'R'] as const;
@@ -796,12 +797,14 @@ export const buildHumanoid = (genome: Genome): Body => {
   const layout = jointLayout(p);
   const bones = buildBones(layout);
   const face = buildFaceLayout(layout, p, genome.voxelSize);
+  const template = templateByName(genome.template);
   const features = [
     ...buildFlesh(layout, p, face),
     ...buildClothes(layout, p, face),
     ...buildWounds(bones, layout, p, genome.wounds),
+    ...partFeatures(template.parts ?? [], bones),
   ];
-  return { bones, features, materials: resolveMaterials(templateByName(genome.template), p) };
+  return { bones, features, materials: resolveMaterials(template, p) };
 };
 
 const LOWER_CRAWLER_BONE = /^(shin|foot)\./;
