@@ -2,17 +2,17 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
 // The bolt carbine's trench scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, a long
-// slim barrel with a perforated heat shield and a magazine tube beneath it, and a ribbed brass pump handle hung
-// below the tube on a neck, clear of the barrel. About 1.3 m long. The muzzle is at +x. Built by tools/model
+// slim barrel with a perforated heat shield and a magazine tube beneath it, and a short ribbed brass pump handle
+// wrapped close round the tube. About 1.3 m long. The muzzle is at +x. Built by tools/model
 // (tools/build_models.sh) into assets/own/skelly/bolt_scattergun.glb.
-// Hand-guard point (the off hand's hold on the pump handle), in this model's metres: [0.47, 0.13, 0].
+// Hand-guard point (the off hand's hold on the pump handle), in this model's metres: [0.4725, 0.215, 0].
 
 local w = 0.06;  // half the receiver's width
 local barrelY = 0.29;  // the barrel's axis
 local tubeY = 0.215;  // the magazine tube's axis
 local muzzleX = 0.98;
-local pumpX0 = 0.36;
-local pumpX1 = 0.58;
+local pumpX0 = 0.40;
+local pumpX1 = 0.545;
 [
   h.compound('bolt_scattergun', 12.5, [
     // Receiver, a tall block with a top ridge and a painted band.
@@ -35,12 +35,11 @@ local pumpX1 = 0.58;
     box('hole-%d' % i, 'vent', [0.23 + i * 0.065, barrelY + 0.036, -0.047], [0.26 + i * 0.065, barrelY + 0.052, 0.047])
     for i in [0, 1, 2, 3, 4, 5]
   ] + [
-    // The pump handle: a deep ribbed oxblood sleeve under the tube, on a neck that leaves a gap between them.
-    box('pump-neck', 'metal', [0.43, tubeY - 0.055, -0.016], [0.51, tubeY - 0.022, 0.016]),
-    box('pump', 'trim', [pumpX0, 0.07, -0.05], [pumpX1, tubeY - 0.055, 0.05]),
+    // The pump handle: a slim brass fore-end sleeve wrapped close round the magazine tube, with four dark grip ribs.
+    box('pump', 'trim', [pumpX0, tubeY - 0.036, -0.036], [pumpX1, tubeY + 0.036, 0.036]),
   ] + [
-    box('rib-%d' % i, 'vent', [pumpX0 + 0.012 + i * 0.03, 0.074, -0.052], [pumpX0 + 0.026 + i * 0.03, tubeY - 0.059, 0.052])
-    for i in [0, 1, 2, 3, 4, 5]
+    box('rib-%d' % i, 'vent', [pumpX0 + 0.015 + i * 0.032, tubeY - 0.033, -0.038], [pumpX0 + 0.027 + i * 0.032, tubeY + 0.033, 0.038])
+    for i in [0, 1, 2, 3]
   ] + [
     // Pistol grip, trigger guard and trigger.
     h.prism('grip', 'grip', 'z', [[-0.13, 0.15], [-0.07, 0.15], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
