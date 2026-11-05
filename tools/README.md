@@ -15,6 +15,20 @@ bust, arm and leg measures). Trimmed to what these models need: no viewer, rende
 or other families. This copy is the source of truth; nothing syncs with skelly. The `@skelly/` package names are kept
 as copied.
 
+The package `mobgen` was copied from the same commit later (`src/core` and `src/mob`; no viewer, cli, tests, docs, crowd
+renderer, look-at or ragdoll). It has no npm dependencies. Its generated `*.json` beside the `.jsonnet` files are not kept:
+they compile into `.build/` on every run, like the other Jsonnet. It needs no further change to the licence record (the
+repo's EUPL-1.2 `LICENSE` here covers it; the shambler's manifest rows carry the attribution).
+
+## Mobs
+
+`tools/build_mobs.sh [--out dir] [mobId ...]` runs `mobs.mjs`, which builds a GLB and a clips JSON per row of
+`../../models/mobs.json` (template, seed, lod divisor, walk and attack frames, output names) into `assets/own/skelly`.
+A second mob is one more row; its template module must be among the imports at the top of `mobs.mjs` (the humanoid,
+acid, amalgam, dog and skeleton templates are). The walk, attack and idle poses used are the humanoid ones, so the
+non-humanoid templates (dog, acid) will need their own pose functions in `mobs.mjs` first. `sources.mjs` is the Jsonnet
+compile step shared with `build.mjs`.
+
 ## Layout
 
 - `models/*.libsonnet` (repo root): model sources, listed in `models/index.libsonnet`; `models/export.json` names the

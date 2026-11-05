@@ -1,0 +1,14 @@
+{
+  "_doc": "Rows of the mob export (tools/model/mobs.mjs, run by tools/build_mobs.sh): each builds <glb> and <clips> from a mobgen template. lod_divisor: the LOD voxel is the template's 0.5 m block over this, 0 keeps mobgen's full detail. Defaults apply to every row; a row may override any of them.",
+  "defaults": {
+    "seed": 7,
+    "lod_divisor": 10,
+    "walk_speed": 1.4,
+    "walk_frames": 24,
+    "attack_frames": 24,
+    "idle": "slack"
+  },
+  "mobs": [
+    { "id": "shambler", "template": "shambler", "seed": 7, "lod_divisor": 10, "glb": "shambler.glb", "clips": "shambler_clips.json" }
+  ]
+}

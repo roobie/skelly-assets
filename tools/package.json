@@ -10,6 +10,7 @@
     "packages/engine",
     "packages/thing-core",
     "packages/thing-export",
+    "packages/mobgen",
     "packages/thing-authoring-tool"
   ],
   "scripts": {

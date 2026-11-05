@@ -4,13 +4,11 @@
 // sources. GLBs are written flat into --out, by default assets/own/skelly, where the game loads them. Needs node
 // (26 or later, which runs the TypeScript directly) and `npm ci` in tools/model.
 // Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { registerHooks } from 'node:module';
-import { dirname, join, relative, resolve } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { compileJsonnetFile } from './jsonnet/index.mjs';
+import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '../..');
@@ -22,34 +20,7 @@ const ids = positionals.length > 0 ? positionals : JSON.parse(readFileSync(join(
 const out = resolve(values.out);
 mkdirSync(out, { recursive: true });
 
-// The Jsonnet sources compile to .build (ignored; the JSON they make is never tracked) and the imports of those JSON
-// files are pointed there.
-const scratch = join(here, '.build');
-const jsonnetFiles = (directory) =>
-  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      return entry.name === 'node_modules' ? [] : jsonnetFiles(path);
-    }
-    return entry.name.endsWith('.jsonnet') ? [path] : [];
-  });
-for (const source of jsonnetFiles(join(here, 'packages'))) {
-  const target = join(scratch, relative(here, source).replace(/\.jsonnet$/, '.json'));
-  mkdirSync(dirname(target), { recursive: true });
-  writeFileSync(target, compileJsonnetFile(relative(here, source)));
-}
-registerHooks({
-  resolve(specifier, context, next) {
-    if (specifier.startsWith('.') && specifier.endsWith('.json') && context.parentURL?.startsWith('file:')) {
-      const wanted = fileURLToPath(new URL(specifier, context.parentURL));
-      const compiled = join(scratch, relative(here, wanted));
-      if (existsSync(compiled)) {
-        return { url: pathToFileURL(compiled).href, format: 'json', importAttributes: context.importAttributes, shortCircuit: true };
-      }
-    }
-    return next(specifier, context);
-  },
-});
+installJsonnetSources();
 
 let failed = false;
 try {
