@@ -35,6 +35,17 @@
     "legguard_plate_worn_thigh",
     "legguard_plate_worn_shin",
     "sabaton_plate_worn_shaft",
-    "sabaton_plate_worn_foot"
+    "sabaton_plate_worn_foot",
+    "helmet_power",
+    "armor_power_worn_body",
+    "armor_power_worn_upper",
+    "armor_power_worn_fore",
+    "gloves_power_worn_palm",
+    "gloves_power_worn_fingers",
+    "gloves_power_worn_thumb",
+    "legguard_power_worn_thigh",
+    "legguard_power_worn_shin",
+    "boots_power_worn_shaft",
+    "boots_power_worn_foot"
   ]
 }
