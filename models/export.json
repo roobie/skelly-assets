@@ -24,6 +24,17 @@
     "legguard_heavy_worn_thigh",
     "legguard_heavy_worn_shin",
     "boots_heavy_worn_shaft",
-    "boots_heavy_worn_foot"
+    "boots_heavy_worn_foot",
+    "helmet_plate_armet",
+    "armor_plate_worn_body",
+    "armor_plate_worn_upper",
+    "armor_plate_worn_fore",
+    "gauntlet_plate_worn_palm",
+    "gauntlet_plate_worn_fingers",
+    "gauntlet_plate_worn_thumb",
+    "legguard_plate_worn_thigh",
+    "legguard_plate_worn_shin",
+    "sabaton_plate_worn_shaft",
+    "sabaton_plate_worn_foot"
   ]
 }
