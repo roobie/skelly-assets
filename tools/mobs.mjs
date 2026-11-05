@@ -33,8 +33,8 @@ mkdirSync(out, { recursive: true });
 
 installJsonnetSources();
 const src = (p) => `./packages/mobgen/src/${p}`;
-const { generateValid, realizeLod } = await import(src('core/generate.ts'));
-const { consumableTemplate } = await import(src('core/template.ts'));
+const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
+const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
 await import(src('mob/templates.ts')); // importing a template module registers it
 await import(src('mob/acidTemplate.ts'));
 await import(src('mob/amalgamTemplate.ts'));
@@ -49,15 +49,31 @@ const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
 const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2]; // skelly's viewer/scene.ts SHADE_FACTORS: the shade of a face as a brightness
 const round = (x) => Math.round(x * 1e5) / 1e5;
 
+const hex = (c) => (typeof c === 'string' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255) : c);
+
+// The row's template with the row's own narrowed param ranges (`params`), palette (`materials`: name -> {color: "#rrggbb" | [r, g, b], emissive})
+// and signature `parts` laid over it; registered under the row's id, so rows of one template do not meet.
+function deriveTemplate(base, row) {
+  const materials = { ...base.materials };
+  for (const [name, m] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...m, color: hex(m.color) };
+  const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
+  const derived = { ...base, name: `mob:${row.id}`, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
+  registerTemplate(derived);
+  return derived;
+}
+
 function exportMob(row) {
   const { id, seed, walk_speed: WALK_SPEED, walk_frames: WALK_FRAMES, attack_frames: ATTACK_FRAMES } = row;
   const divisor = row.lod_divisor; // the LOD voxel is the template's 0.5 m block over this; 0 keeps the full detail
-  const template = consumableTemplate(row.template);
+  const template = deriveTemplate(consumableTemplate(row.template), row);
   const found = generateValid(template, seed, { maxAttempts: 1 });
-  if (!found) throw new Error(`seed ${seed} does not make a valid ${row.template}`);
+  if (!found) {
+    const issues = realize(generate(template, seed)).report.issues;
+    throw new Error(`seed ${seed} does not make a valid ${row.template}: ${issues.map((i) => JSON.stringify(i)).join('; ')}`);
+  }
   const realized = divisor > 0 ? realizeLod(found, 0.5 / divisor).realized : found.realized;
   const genome = found.genome; // the LOD keeps the genome's body, so the walk is posed from the full-detail one
-  if (!realized.report.ok) console.error('warning: the realized body does not pass its own report');
+  if (!realized.report.ok) console.error(`warning: the realized body does not pass its own report: ${realized.report.issues.map((i) => i.message).join('; ')}`);
   const { bones } = realized.body;
 
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.

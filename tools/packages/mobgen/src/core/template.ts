@@ -18,6 +18,27 @@ type SupportBones = readonly string[] | 'ground-contacts';
  * never be spawned or exported; a missing status means ready. */
 type TemplateStatus = 'ready' | 'comparison-only';
 
+type Triple = readonly [number, number, number];
+
+/** A shape of a PartSpec: positions in metres from the part's anchor on its bone (rest-world axes: x sideways, y up, -z forward). */
+export type PartShape =
+  | { readonly kind: 'ellipsoid'; readonly center: Triple; readonly radii: Triple }
+  | { readonly kind: 'box'; readonly center: Triple; readonly half: Triple; readonly round?: number }
+  | { readonly kind: 'capsule'; readonly a: Triple; readonly b: Triple; readonly ra: number; readonly rb: number };
+
+/** A feature a mob row adds to a template's body (see mob/parts.ts): a shape on a bone, at the bone's `head`, `tail` or `mid` point.
+ * `mirror` repeats it on the other side's bone (a `.L` bone for a `.R`) with x negated, so a pair is written once. */
+export interface PartSpec {
+  readonly bone: string;
+  readonly at?: 'head' | 'tail' | 'mid';
+  readonly op?: 'add' | 'paint' | 'carve';
+  readonly material: string;
+  readonly shape: PartShape;
+  readonly mirror?: boolean;
+  readonly blend?: number;
+  readonly onto?: readonly string[];
+}
+
 export interface Template {
   readonly name: string;
   readonly description: string;
@@ -31,6 +52,11 @@ export interface Template {
   readonly materialHsl?: Readonly<Record<string, readonly [number | string, number | string, number | string]>>;
   readonly params: Readonly<Record<string, ParamSpec>>;
   readonly budgets: Budgets;
+  /** The params the budgets' nominal sizes were measured at, when the template's own `params` are narrowed from another's (a mob row over its template):
+   * budgets scale with how far a genome strays from these. Omitted means `params`. */
+  readonly budgetParams?: Readonly<Record<string, ParamSpec>>;
+  /** Features beyond the body plan's own, from a mob's row in models/mobs.json: a signature part on a bone, a patch of colour. */
+  readonly parts?: readonly PartSpec[];
   /** Fixed support-bone ids, or the generated voxels' actual ground contacts. */
   readonly supportBones: SupportBones;
   /** The shared-rig attack clip this template's content selects (mob/attack.ts, ATTACK_CLIPS owns the
