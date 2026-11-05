@@ -38,6 +38,7 @@ local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n
   'cloth-seat': material(hex(3816770)),
   'steel-grey': material([0.541, 0.573, 0.592]) + { finish: { metallic: 0.55, roughness: 0.65 } },
   'paint-charcoal': material([0.216, 0.239, 0.255]),
+  'steel-plate': material([0.4, 0.42, 0.45]) + { finish: { metallic: 0.5, roughness: 0.5 } },
   'paint-armour-blue': self['paint-oxblood'] + { colour: hex(1325726) },
   'paint-armour-navy': self['paint-oxblood'] + { colour: hex(922928) },
   'paint-armour-sky': self['paint-oxblood'] + { colour: hex(9220844) },
