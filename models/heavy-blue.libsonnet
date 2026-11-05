@@ -46,12 +46,15 @@ local bodyAdd = [
 
 // Upper arm: a round pauldron turned about the shoulder, its rim and two lames under it, a fat arm guard.
 local uw = arm.upperWidth + 2 * g, ud = arm.upperDepth + 2 * g;
+// The pauldron pieces are scaled together about the shoulder joint by `pauldronScale` (1.25: a quarter bigger).
+local pauldronScale = 1.25;
+local ps = pauldronScale;
 local upperAdd = [
-  round(h.dome('pauldron', 'plate', 0.19, 0.12, 0.028, 'y', [0, -0.03, 0])),
-  round(h.disc('pauldron-rim', 'insignia', 0.198, -0.05, -0.025)),
-  round(h.disc('pauldron-lame-1', 'plate', 0.17, -0.09, -0.045)),
-  round(h.disc('pauldron-lame-2', 'trim', 0.14, -0.125, -0.085)),
-  h.box('comb', 'trim', [-0.012, 0.08, -0.12], [0.012, 0.108, 0.12]),
+  round(h.dome('pauldron', 'plate', 0.19 * ps, 0.12 * ps, 0.028 * ps, 'y', [0, -0.03 * ps, 0])),
+  round(h.disc('pauldron-rim', 'insignia', 0.198 * ps, -0.05 * ps, -0.025 * ps)),
+  round(h.disc('pauldron-lame-1', 'plate', 0.17 * ps, -0.09 * ps, -0.045 * ps)),
+  round(h.disc('pauldron-lame-2', 'trim', 0.14 * ps, -0.125 * ps, -0.085 * ps)),
+  h.box('comb', 'trim', [-0.012 * ps, 0.08 * ps, -0.12 * ps], [0.012 * ps, 0.108 * ps, 0.12 * ps]),
   oct('rerebrace', 'plate', -arm.upperLength - arm.seamOverlap, -0.14, uw + 0.05, ud + 0.05, 0.03),
 ];
 
@@ -139,7 +142,7 @@ local shaftGuard(row) =
 
 local forArmour = {
   body: function(r) remake(r, starts(['chest', 'slab', 'chevron', 'rivet', 'belt', 'buckle']), bodyAdd),
-  upper: function(r) remake(r, starts(['pauldron', 'comb', 'rerebrace']), upperAdd, 0.01),
+  upper: function(r) remake(r, starts(['pauldron', 'comb', 'rerebrace']), upperAdd, 0.012),  // a coarser voxel grain (a multiple of 0.002) as the pauldron grew, so the triangle count holds
   fore: function(r) remake(r, starts(['couter', 'vambrace']), foreAdd),
   palm: function(r) remake(r, starts([]), palmAdd),
   thigh: function(r) remake(r, starts(['cuisse', 'strap']), thighAdd),
