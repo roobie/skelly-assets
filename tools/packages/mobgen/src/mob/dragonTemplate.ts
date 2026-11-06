@@ -1,5 +1,5 @@
 // The dragon template: a winged biped reared on its hind legs (mob/dragon.ts holds the plan and its poses); this module only names the template, its
-// palette and sampled ranges. It is the base of the dragon rows of models/mobs.json (tools/model/mobs.mjs poses a `dragon` body plan with dragon.ts's own
+// palette and sampled ranges. It is the base of the dragon rows of models/mobs.json (tools/mobs.mjs poses a `dragon` body plan with dragon.ts's own
 // functions) and stays outside mob/templates.ts's TEMPLATES list, so Deadvox's enumerations never see it; the mob export opts in explicitly.
 // A row narrows every param to its sprite and brings its palette; the values here are the plan's plainest case.
 

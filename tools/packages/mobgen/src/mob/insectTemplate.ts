@@ -1,7 +1,7 @@
 // The insect template: a giant cockroach-like crawler. Its body plan and poses (walk, lunge, idle) live in mob/insect.ts; this module only names
 // the template, its palette and its sampled ranges.
 //
-// It is the base of the insect rows of models/mobs.json (tools/model/mobs.mjs poses an `insect` body plan with insect.ts's own functions), so it is
+// It is the base of the insect rows of models/mobs.json (tools/mobs.mjs poses an `insect` body plan with insect.ts's own functions), so it is
 // ready for consumers. Like the dog it stays outside mob/templates.ts's TEMPLATES list, so Deadvox's enumerations never see it; the mob export opts in.
 
 import { registerTemplate, type Template } from '../core/template.ts';

@@ -1,8 +1,8 @@
 // Builds the repo's models from their sources in models/ into GLB files.
-// Usage: node tools/model/build.mjs [--out dir] [rowId ...]
+// Usage: node tools/build.mjs [--out dir] [rowId ...]
 // With no row ids it builds every id listed in models/export.json; with ids it builds those rows, any row in the
-// sources. GLBs are written flat into --out, by default assets/own/skelly, where the game loads them. Needs node
-// (26 or later, which runs the TypeScript directly) and `npm ci` in tools/model.
+// sources. GLBs are written flat into --out, by default built/, where games load them. Needs node
+// (26 or later, which runs the TypeScript directly) and `npm ci` in tools.
 // Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -11,10 +11,10 @@ import { parseArgs } from 'node:util';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
-const repo = resolve(here, '../..');
+const repo = resolve(here, '..');
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { out: { type: 'string', default: join(repo, 'assets/own/skelly') } },
+  options: { out: { type: 'string', default: join(repo, 'built') } },
 });
 const ids = positionals.length > 0 ? positionals : JSON.parse(readFileSync(join(repo, 'models/export.json'), 'utf8')).ids;
 const out = resolve(values.out);

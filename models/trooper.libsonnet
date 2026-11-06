@@ -1,5 +1,5 @@
-// The trooper armour set: fitted worn shells (template and measures in tools/model) with a ground model each, in an
-// olive field livery. Built by tools/model into assets/own/skelly/*_worn_*.glb and helmet_trooper.glb.
+// The trooper armour set: fitted worn shells (template and measures in tools/packages) with a ground model each, in an
+// olive field livery. Built by tools/build_models.sh into built/*_worn_*.glb and helmet_trooper.glb.
 local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 // Olive paint over parkerized fittings, brass rivets and a yellow chevron and edging.
