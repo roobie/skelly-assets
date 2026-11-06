@@ -57,7 +57,11 @@ function deriveTemplate(base, row) {
   const materials = { ...base.materials };
   for (const [name, m] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...m, color: hex(m.color) };
   const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
-  const derived = { ...base, name: `mob:${row.id}`, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
+  // `budget_headroom` widens the template's voxel budgets (totals and groups) by that factor at the top: signature parts add voxels the plain body plan does not.
+  const room = row.budget_headroom ?? 1;
+  const widen = (r) => ({ ...r, max: Math.ceil(r.max * room) });
+  const budgets = { ...base.budgets, totalVoxels: widen(base.budgets.totalVoxels), groups: Object.fromEntries(Object.entries(base.budgets.groups).map(([k, g]) => [k, widen(g)])) };
+  const derived = { ...base, budgets, name: `mob:${row.id}`, attackClip: row.attack_clip ?? base.attackClip, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
   registerTemplate(derived);
   return derived;
 }
