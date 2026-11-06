@@ -6,7 +6,7 @@
 
 import { registerTemplate, type Template } from '../core/template.ts';
 // Importing insect.ts registers the 'insect' body plan (its registerBodyPlan call).
-import { INSECT_FEET } from './insect.ts';
+import { INSECT_ANT_DEFAULTS, INSECT_FEET } from './insect.ts';
 
 const material = (color: readonly [number, number, number], emissive = 0) => ({ color, emissive }) as const;
 
@@ -35,6 +35,7 @@ export const insectTemplate: Template = {
     legSpread: { min: 0.9, max: 1.1 },
     legThickness: { min: 0.95, max: 1.1 },
     mandibleOpen: { choices: [0, 4, 8] },
+    ...INSECT_ANT_DEFAULTS, // the ant-like departures (insect.ts), off here
   },
   supportBones: INSECT_FEET,
   budgets: {
