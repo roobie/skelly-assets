@@ -99,8 +99,8 @@ const SHAPE = {
     fanBone: 1, // the finger tip that ends the fan's bone
     armRadii: [0.09, 0.06] as const,
     sparRadii: [0.045, 0.03] as const,
-    membrane: 0.045, // half thickness of the membrane
-    arcSpacing: 1.6, // spacing of the membrane's arcs, as a multiple of its half thickness
+    membrane: 0.03, // half thickness of the membrane
+    arcSpacing: 2.4, // spacing of the membrane's arcs, as a multiple of its half thickness
   },
   /** The tail's joints from the hips back and down, and the radius at each. The end rests on the ground. */
   tail: [
@@ -115,12 +115,12 @@ const SHAPE = {
   ],
   /** The ribbed belly down the front: from the throat to the hips, with the stripe's half width at each height. */
   belly: {
-    top: 3.15,
+    top: 3.2,
     bottom: 1.4,
-    ribSpacing: 0.18,
-    ribHalf: 0.095, // half thickness of a rib along the body
-    depth: 0.2, // how deep into the body the stripe paints
-    width: [[3.15, 0.1], [2.7, 0.16], [2.2, 0.24], [1.7, 0.2], [1.4, 0.15]] as readonly (readonly [number, number])[],
+    ribSpacing: 0.24,
+    ribHalf: 0.125, // half thickness of a rib along the body
+    depth: 0.34, // how deep into the body the stripe paints
+    width: [[3.2, 0.24], [2.7, 0.34], [2.2, 0.5], [1.7, 0.44], [1.3, 0.3]] as readonly (readonly [number, number])[],
   },
   blend: 0.03, // smooth-min radius of the body's parts, as a fraction of the height
   speckleScale: 0.14, // m per noise cell of the spots and flecks
