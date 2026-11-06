@@ -1081,6 +1081,21 @@
           "mirror": true
         }
       ]
+    },
+    {
+      "id": "skitter",
+      "template": "insect",
+      "seed": 7,
+      "lod_divisor": 0,
+      "glb": "skitter.glb",
+      "clips": "skitter_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/giant_cockroach_new.png, three-quarter view. Silhouette: a giant cockroach, low and broad, a glossy oval brown carapace with a lighter tan sheen on top, a small dark head with red eyes in front, two very long thin orange feelers sweeping forward and up, six thin dark-brown legs splayed out to the sides. Palette (sampled): carapace amber #c88a20 / #b07818, shadow brown #5d3500 / #492703, sheen #e8b030, feelers orange #ffb835, head and legs near-black brown #2e0d00, eyes red. Signature: the long orange feelers and the glossy shell. Motion: a fast alternating-tripod scuttle, a quick rear-up and bite.",
+      "params": {
+        "height": {"min": 0.17, "max": 0.18},
+        "mandibleOpen": 0,
+        "antennaLength": {"min": 1.25, "max": 1.3}
+      },
+      "materials": {}
     }
   ]
 }
