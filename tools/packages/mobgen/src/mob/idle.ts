@@ -4,7 +4,7 @@
 // +x tips back, upperArm's x is the *net* angle from vertical (attack.ts's own upperArmLocalFromNet).
 //
 // Two layers, both pure functions of (actor, stance[, time]):
-//   idleBasePose(actor, stance)        — static: genome-scaled stance + legs bent via 2-bone IK, re-grounded.
+//   idleBasePose(actor, stance)        — static: genome-scaled stance + feet apart and staggered, weight on one leg (pelvis rolled, shifted), via 2-bone IK, re-grounded.
 //                                         Cacheable per (variant, stance) — doesn't depend on time.
 //   applyIdleMotion(base, stance, ...) — the time-varying top layer (breathing/sway/head/claw), composed
 //                                         onto a (possibly cached) base. Cheap: no IK, no re-grounding —
@@ -12,7 +12,20 @@
 //   idlePose(actor, stance, time)      — the two composed, for a caller that doesn't need to cache the base.
 
 import type { Bone } from '../core/body.ts';
-import { clamp, IDENTITY_M, type Mat3, mulMM, rotX, rotY, rotZ, type Vec3 } from '../core/math.ts';
+import {
+  add,
+  clamp,
+  IDENTITY_M,
+  type Mat3,
+  mulMM,
+  mulMV,
+  rotX,
+  rotY,
+  rotZ,
+  sub,
+  transpose,
+  type Vec3,
+} from '../core/math.ts';
 import type { Pose } from '../core/pose.ts';
 import { eulerToMat3, scaleForGenome, upperArmLocalFromNet } from './attack.ts';
 import {
@@ -38,6 +51,22 @@ interface StanceData {
   /** Additional hip-to-ankle shortening (metres, before the genome's own kneeBend scaling) — see
    * solveIdleLeg. */
   readonly crouchM: number;
+  /** The rest stance of the legs, all as fractions of the leg's own length so one set of numbers suits every
+   * humanoid mob (a gorehorn's long legs and a bogling's short ones alike). */
+  readonly legs: LegStance;
+}
+
+interface LegStance {
+  /** How far each foot sits outside its own hip, beyond straight under it. */
+  readonly spread: number;
+  /** One foot this far forward of the standing rest, the other as far back. */
+  readonly stagger: number;
+  /** The pelvis moves sideways this far, over the loaded (weight-bearing) foot. */
+  readonly loadShift: number;
+  /** The pelvis rolls this far (degrees), the unloaded hip dropping: that knee bends more, the loaded one less. */
+  readonly pelvisTiltDeg: number;
+  /** The share of the pelvis tilt the spine takes back out, so the shoulders stay nearer level. */
+  readonly spineCounter: number;
 }
 
 // How much extra the aggravated stance's arms reach beyond the chase walk's own steady arm height, so a
@@ -60,6 +89,7 @@ const STANCES: Readonly<Record<IdleStance, StanceData>> = {
     },
     upperArmZDeg: 8,
     crouchM: 0.02,
+    legs: { spread: 0.12, stagger: 0.07, loadShift: 0.05, pelvisTiltDeg: 4, spineCounter: 0.7 },
   },
   // Chase/attack rest: torso hunched forward but the head tips back up toward the target (a net "still
   // watching you" gaze despite the hunch), jaw open, arms raised forward — matching the chase walk's own
@@ -77,6 +107,7 @@ const STANCES: Readonly<Record<IdleStance, StanceData>> = {
     },
     upperArmZDeg: -10, // outward, reaching toward the target rather than hugging the body
     crouchM: 0.05,
+    legs: { spread: 0.16, stagger: 0.09, loadShift: 0.04, pelvisTiltDeg: 3, spineCounter: 0.7 },
   },
 };
 
@@ -87,57 +118,52 @@ const STANCES: Readonly<Record<IdleStance, StanceData>> = {
 const upperArmNetXDegFor = (stance: IdleStance, params: HumanoidParams): number =>
   stance === 'aggravated' ? params.armRaise + AGGRAVATED_REACH_EXTRA_DEG : 10;
 
-/** Rest-pose (straight-line, not summed-segment) hip-to-ankle distance in the sagittal (Y-Z) plane — the
- * rig's own kneeBend genome param already bends the rest leg a little (humanoid.ts's jointLayout), so this
- * is shorter than l1+l2 by however much that baked-in bend already is. */
-const restHipToAnkleSagittal = (thigh: Bone, shin: Bone): { distance: number; z: number } => {
-  const [, , z] = shin.tail;
-  return { distance: Math.hypot(thigh.head[1] - shin.tail[1], thigh.head[2] - z), z };
-};
-
 /**
- * Bends one leg's knee by `crouchM` (shortening the hip-to-ankle reach by that much) while keeping the
- * ankle at its exact rest Z (and, since solveTwoBone only solves the sagittal Y-Z plane, its rest X too —
- * the leg never abducts here) — "feet stay flat at their rest xz." Reuses gait.ts's own two-bone solve
- * (solveTwoBone) and rest-angle-to-local-delta conversion (restAngleDeg), the same pieces
- * legAndFootRotations uses for the walk cycle's own knee bend, just without that function's pelvis-roll/
- * yaw/abduction machinery — an idle stance's pelvis never rotates, so the foot-levelling correction
- * collapses to a single rotX (these are all pure X-axis rotations here, which compose additively).
- *
- * This rig's own thigh/shin rest vectors already lean inward (hip wider than ankle — same "nativeX" gait.ts's
- * own legAndFootRotations accounts for): rotX never touches X, so l1/l2 (each segment's full 3D length,
- * from legGeometryFor) overstate how much *sagittal* (Y-Z) reach is actually available — solveTwoBone
- * itself only models the Y-Z plane. Each segment's own fixed X offset is subtracted out (Pythagoras) before
- * calling it, or the solved angles place the knee off by exactly that segment's own native X (verified
- * numerically against a hand-built target: without this, the ankle lands right but the *knee* — and so
- * the whole shin — ends up rotated a few cm off).
+ * Poses one leg of the idle stance: the foot stays flat on the ground at its own target (sideways: `footDx`
+ * off its hip; fore-aft: `zOffset` off the rest), the hip wherever the pelvis tilt and `rootX` put it.
+ * The same solve as gait.ts's legAndFootRotations (hip abduction rotZ outside the sagittal two-bone bend rotX,
+ * the pelvis roll cancelled at the thigh, the foot undoing the whole chain to stay level), for a standing foot
+ * instead of a walking one, so a walk blended down into this stance interpolates between like things.
  */
+interface IdleLegInput {
+  readonly pelvisR: Mat3;
+  readonly tiltDeg: number;
+  readonly pivot: Vec3;
+  readonly rootX: number;
+  readonly footDx: number; // ankle's world x relative to its own hip's rest x
+  readonly zOffset: number;
+  readonly crouchM: number;
+}
+
 const solveIdleLeg = (
   byId: ReadonlyMap<string, Bone>,
   geom: LegGeometry,
   side: Side,
-  crouchM: number,
-): { readonly thighDelta: number; readonly shinDelta: number; readonly footR: Mat3 } => {
+  input: IdleLegInput,
+): { readonly thighR: Mat3; readonly shinR: Mat3; readonly footR: Mat3 } => {
   const thigh = byId.get(`thigh.${side}`)!;
   const shin = byId.get(`shin.${side}`)!;
-  const { distance: restD, z } = restHipToAnkleSagittal(thigh, shin);
-  const dz = thigh.head[2] - z;
-  const nativeXThigh = thigh.tail[0] - thigh.head[0];
-  const nativeXShin = shin.tail[0] - shin.head[0];
-  const l1 = Math.sqrt(Math.max(geom.l1 * geom.l1 - nativeXThigh * nativeXThigh, 0));
-  const l2 = Math.sqrt(Math.max(geom.l2 * geom.l2 - nativeXShin * nativeXShin, 0));
-  const targetD = clamp(restD - crouchM, Math.abs(dz) + 0.01, l1 + l2 - 0.001);
-  const dy = Math.sqrt(Math.max(targetD * targetD - dz * dz, 0));
-  const target: Vec3 = [thigh.head[0], thigh.head[1] - dy, z];
-  const { a1: thighAbs, a2: shinAbs } = solveTwoBone(thigh.head, target, l1, l2);
-  const thighDelta = thighAbs - restAngleDeg(thigh);
-  const shinDelta = shinAbs - restAngleDeg(shin) - thighDelta;
-  return { thighDelta, shinDelta, footR: rotX(-(thighDelta + shinDelta)) };
+  const hipShift = sub(add(input.pivot, mulMV(input.pelvisR, sub(thigh.head, input.pivot))), thigh.head);
+  const worldY = shin.tail[1] + input.crouchM; // the root is lowered afterwards by groundOffset
+  const vx = input.footDx - hipShift[0] - input.rootX;
+  const vy = worldY - hipShift[1] - thigh.head[1];
+  const nativeX = shin.tail[0] - thigh.head[0];
+  const reach = geom.l1 + geom.l2 - 0.002;
+  const yPrime = -Math.min(Math.sqrt(Math.max(vx * vx + vy * vy - nativeX * nativeX, 0)), reach);
+  const abductionDeg = ((Math.atan2(vy, vx) - Math.atan2(yPrime, nativeX)) * 180) / Math.PI;
+  const lz = shin.tail[2] + input.zOffset;
+  const { a1, a2 } = solveTwoBone(thigh.head, [thigh.head[0], thigh.head[1] + yPrime, lz], geom.l1, geom.l2);
+  const thighDelta = a1 - restAngleDeg(thigh);
+  const shinDelta = a2 - restAngleDeg(shin) - thighDelta;
+  const thighR = mulMM(rotZ(abductionDeg - input.tiltDeg), rotX(thighDelta));
+  const shinR = rotX(shinDelta);
+  const footR = transpose(mulMM(mulMM(input.pelvisR, thighR), shinR));
+  return { thighR, shinR, footR };
 };
 
 const SIDES: readonly Side[] = ['L', 'R'];
 
-/** The static half of an idle stance: genome-scaled torso/head/jaw/arms, knees bent via solveIdleLeg (feet
+/** The static half of an idle stance: genome-scaled torso/head/jaw/arms, a spread, staggered, weight-shifted leg stance via solveIdleLeg (feet
  * planted, re-grounded exactly as walkPose re-grounds its own pose). No time argument — cacheable per
  * (variant, stance) by a caller that poses many actors sharing one body (e.g. deadvox's crowd renderer). */
 export const idleBasePose = (actor: WalkActor, stance: IdleStance): Pose => {
@@ -164,15 +190,36 @@ export const idleBasePose = (actor: WalkActor, stance: IdleStance): Pose => {
 
   const byId = new Map(bones.map((b) => [b.id, b] as const));
   const kneeBendScale = 0.5 + clamp(params.kneeBend / 15, 0, 1); // a little genome flavour, never to 0
+  const pelvis = byId.get('pelvis')!;
+  const stand = data.legs;
+  const geoms = { L: legGeometryFor(bones, extents, 'L'), R: legGeometryFor(bones, extents, 'R') };
+  const legLen = (geoms.L.legLen + geoms.R.legLen) / 2;
+  // One leg carries the weight (which one: the actor's own seed), the other foot is the forward one.
+  const loaded: Side = Math.floor(actor.seed) % 2 === 0 ? 'L' : 'R';
+  const outward = (side: Side): number => Math.sign(byId.get(`thigh.${side}`)!.head[0]) || (side === 'L' ? -1 : 1);
+  const loadedSign = outward(loaded);
+  // Pelvis roll raising the loaded hip (rotZ lifts +x), the spine taking part of it back out.
+  const tiltDeg = loadedSign * stand.pelvisTiltDeg;
+  const pelvisR = rotZ(tiltDeg);
+  rotations.pelvis = pelvisR;
+  rotations.spine = mulMM(rotZ(-tiltDeg * stand.spineCounter), rotations.spine ?? IDENTITY_M);
+  const rootX = loadedSign * stand.loadShift * legLen;
   for (const side of SIDES) {
-    const geom = legGeometryFor(bones, extents, side);
-    const { thighDelta, shinDelta, footR } = solveIdleLeg(byId, geom, side, data.crouchM * kneeBendScale);
-    rotations[`thigh.${side}`] = rotX(thighDelta);
-    rotations[`shin.${side}`] = rotX(shinDelta);
+    const { thighR, shinR, footR } = solveIdleLeg(byId, geoms[side], side, {
+      pelvisR,
+      tiltDeg,
+      pivot: pelvis.head,
+      rootX,
+      footDx: outward(side) * stand.spread * legLen,
+      zOffset: (side === loaded ? -1 : 1) * stand.stagger * legLen,
+      crouchM: data.crouchM * kneeBendScale,
+    });
+    rotations[`thigh.${side}`] = thighR;
+    rotations[`shin.${side}`] = shinR;
     rotations[`foot.${side}`] = footR;
   }
 
-  const root: Vec3 = [0, groundOffset(bones, extents, rotations, GROUND_SMOOTHING), 0];
+  const root: Vec3 = [rootX, groundOffset(bones, extents, rotations, GROUND_SMOOTHING), 0];
   return { root, rotations };
 };
 

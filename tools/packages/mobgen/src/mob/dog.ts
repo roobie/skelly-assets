@@ -470,6 +470,22 @@ export interface DogStance {
   readonly severed?: ReadonlySet<string> | undefined;
 }
 
+/** How the standing dog places its legs, degrees at the shoulder/hip: every leg splays outward (rotZ) so the paws
+ * stand wider than the body's own rest columns, and the legs stagger fore-aft (rotX) with one fore and its
+ * diagonal hind leg forward, the other pair back. */
+export const DOG_REST_STANCE = {
+  splayDeg: { fore: 10, hind: 11 },
+  staggerDeg: { fore: 9, hind: 10 },
+} as const;
+
+/** Which way each leg's stagger goes (+1 forward): the fore-left and hind-right legs reach, their partners stand back. */
+const REST_FORWARD: Readonly<Record<string, number>> = {
+  'foreUpper.L': 1,
+  'foreUpper.R': -1,
+  'hindUpper.L': -1,
+  'hindUpper.R': 1,
+};
+
 /** The rest stance: a low, uneven four-paw stand, head hanging. Regrounded against the surviving bones so
  * the paws define the contact and nothing else dips below them. */
 export const dogPose = (realized: Realized, stance: DogStance = {}): Pose => {
@@ -482,13 +498,22 @@ export const dogPose = (realized: Realized, stance: DogStance = {}): Pose => {
     neck: rotX(4),
     head: rotX(6 + headTilt * 0.5),
     jaw: rotX(4 + limpScale * 4 - (stance.jawOpen ?? 0) * 30),
-    'foreUpper.L': rotX(3 + 4 * limpScale),
-    'foreUpper.R': rotX(-2),
-    'hindUpper.L': rotX(-4 - 5 * limpScale),
-    'hindUpper.R': rotX(2),
     'foreLower.L': rotX(-6 * limpScale),
     'hindLower.L': rotX(8 * limpScale),
   };
+  // The limping diagonal's own extra swing sits on top of the stagger.
+  const limpSwing: Readonly<Record<string, number>> = {
+    'foreUpper.L': 4 * limpScale,
+    'hindUpper.L': -5 * limpScale,
+  };
+  for (const leg of LEGS) {
+    const part = leg.front ? 'fore' : 'hind';
+    const swingDeg = REST_FORWARD[leg.key]! * DOG_REST_STANCE.staggerDeg[part] + (limpSwing[leg.key] ?? 0);
+    const splayDeg = sideSign(leg.side) * DOG_REST_STANCE.splayDeg[part];
+    rotations[leg.key] = mulMM(rotZ(splayDeg), rotX(swingDeg));
+    // The paw undoes the leg's own swing and splay, so the sole stays level however the leg stands.
+    rotations[leg.paw] = mulMM(rotX(-swingDeg), rotZ(-splayDeg));
+  }
   return groundDogPose(realized, { root: [0, 0, 0], rotations }, stance.severed);
 };
 
