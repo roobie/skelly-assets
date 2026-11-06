@@ -2743,6 +2743,12 @@
         "glow2": {
           "color": "#c0ffd0",
           "emissive": 1.9
+        },
+        "fold_hi": {
+          "color": "#cfa3f0"
+        },
+        "fold_lo": {
+          "color": "#341c48"
         }
       },
       "parts": [
@@ -2757,7 +2763,23 @@
         {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "ellipsoid", "center": [0, -0.22, -0.02], "radii": [0.07, 0.035, 0.07]}},
         {"bone": "hand.L", "at": "mid", "material": "glow", "shape": {"kind": "ellipsoid", "center": [0, -0.32, -0.02], "radii": [0.13, 0.12, 0.13]}},
         {"bone": "hand.L", "at": "mid", "material": "glow2", "shape": {"kind": "ellipsoid", "center": [0, -0.32, -0.02], "radii": [0.05, 0.13, 0.05]}},
-        {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "ellipsoid", "center": [0, -0.43, -0.02], "radii": [0.05, 0.03, 0.05]}}
+        {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "ellipsoid", "center": [0, -0.43, -0.02], "radii": [0.05, 0.03, 0.05]}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.090, -0.05, -0.13], "b": [-0.20, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.036, -0.05, -0.13], "b": [-0.08, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.036, -0.05, -0.13], "b": [0.08, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.090, -0.05, -0.13], "b": [0.20, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.063, -0.05, -0.13], "b": [-0.14, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.000, -0.05, -0.13], "b": [0.00, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.063, -0.05, -0.13], "b": [0.14, -0.6, -0.20], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.090, -0.05, 0.19], "b": [-0.20, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.036, -0.05, 0.19], "b": [-0.08, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.036, -0.05, 0.19], "b": [0.08, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_lo", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.090, -0.05, 0.19], "b": [0.20, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [-0.063, -0.05, 0.19], "b": [-0.14, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.000, -0.05, 0.19], "b": [0.00, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud", "shroud2"], "shape": {"kind": "capsule", "a": [0.063, -0.05, 0.19], "b": [0.14, -0.6, 0.34], "ra": 0.035, "rb": 0.055}},
+        {"bone": "head", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud"], "shape": {"kind": "ellipsoid", "center": [0, 0.0, -0.1], "radii": [0.13, 0.17, 0.11]}},
+        {"bone": "chest", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud"], "shape": {"kind": "ellipsoid", "center": [0, 0.2, 0.02], "radii": [0.26, 0.035, 0.18]}}
       ]
     }
   ]
