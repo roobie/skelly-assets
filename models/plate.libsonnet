@@ -1,7 +1,7 @@
 // The medieval plate set: a bright steel harness in the fitted worn frames of the trooper and heavy looks. A breastplate
 // over a plackart with a keel, three fauld lames and tassets, a lamed gorget, rounded pauldrons with stepped lames,
 // rerebraces, couters with a wing, vambraces, steel gauntlets, cuisses, poleyns, greaves, pointed sabatons and an armet
-// with a pointed visor. Worn shells only. Built by tools/model into assets/own/skelly/*_plate_*.glb.
+// with a pointed visor. Worn shells only. Built by tools/build_models.sh into built/*_plate_*.glb.
 local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';

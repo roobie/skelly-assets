@@ -4,8 +4,8 @@ local box = h.box;
 // The bolt carbine's plasma caster: the carbine's grip, guard, trigger and butt kept, a deeper receiver, a glowing coil
 // core ringed with collars and ending in a blunt flared emitter with a glowing lens instead of the rifled barrel, and an
 // energy cell with glowing windows instead of the magazine. Slot `glow` is the model's own light: crystal-glow-blue is
-// a stand-in colour, the game decides what colour the glow is. About 0.82 m long. The muzzle is at +x. Built by tools/model
-// (tools/build_models.sh) into assets/own/skelly/bolt_plasma_caster.glb.
+// a stand-in colour, the game decides what colour the glow is. About 0.82 m long. The muzzle is at +x. Built
+// by tools/build_models.sh into built/bolt_plasma_caster.glb.
 
 local w = 0.07;  // half the receiver's width
 local coreY = 0.25;

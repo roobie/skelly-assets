@@ -1,5 +1,5 @@
 // The floater template: a legless hovering body (mob/floater.ts holds the plan and its poses); this module only names the template and its sampled
-// ranges. It is the base of the floating rows of models/mobs.json (tools/model/mobs.mjs poses a `floater` body plan with floater.ts's own
+// ranges. It is the base of the floating rows of models/mobs.json (tools/mobs.mjs poses a `floater` body plan with floater.ts's own
 // functions) and stays outside mob/templates.ts's TEMPLATES list, so Deadvox's enumerations never see it; the mob export opts in explicitly.
 // A row narrows every param to its sprite; the values here are the flame figure's, the plan's plainest case.
 

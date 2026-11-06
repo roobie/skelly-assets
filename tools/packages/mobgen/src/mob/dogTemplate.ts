@@ -1,7 +1,7 @@
 // The dog shambler template: an infected quadruped. Its body plan and poses (walk, pounce, idle, flinch) live in
 // mob/dog.ts; this module only names the template and its sampled ranges.
 //
-// It is the base of the quadruped rows of models/mobs.json (tools/model/mobs.mjs poses a `dog` body plan with dog.ts's
+// It is the base of the quadruped rows of models/mobs.json (tools/mobs.mjs poses a `dog` body plan with dog.ts's
 // own functions), so it is ready for consumers. It stays outside mob/templates.ts's TEMPLATES list, so Deadvox's
 // enumerations never see it; the mob export and the viewer opt in explicitly, the same way the amalgam boss does.
 

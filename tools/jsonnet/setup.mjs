@@ -58,7 +58,7 @@ export function installJsonnetArchive(archive, expectedHash, targetDirectory) {
   verifyArchiveHash(archive, expectedHash);
 
   const executableName = process.platform === 'win32' ? 'jsonnet.exe' : 'jsonnet';
-  const temporaryDirectory = mkdtempSync(join(tmpdir(), 'arpg1-jsonnet-install-'));
+  const temporaryDirectory = mkdtempSync(join(tmpdir(), 'skelly-assets-jsonnet-install-'));
   const archivePath = join(temporaryDirectory, 'go-jsonnet.tar.gz');
   const extractedDirectory = join(temporaryDirectory, 'unpacked');
   try {

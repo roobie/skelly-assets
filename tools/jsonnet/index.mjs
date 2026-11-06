@@ -30,7 +30,7 @@ function jsonnetExecutable() {
 export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
   const absoluteSource = resolve(repositoryRoot, sourcePath);
   // go-jsonnet searches library paths right to left, so the overlay comes last.
-  const libraries = ['-J', repositoryRoot, '-J', resolve(repositoryRoot, '../..'), ...(overlay ? ['-J', overlay] : [])];
+  const libraries = ['-J', repositoryRoot, '-J', resolve(repositoryRoot, '..'), ...(overlay ? ['-J', overlay] : [])];
   try {
     return execFileSync(jsonnetExecutable(), [...libraries, absoluteSource], {
       cwd: repositoryRoot,

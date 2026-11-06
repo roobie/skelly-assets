@@ -1,7 +1,7 @@
 // The heavy blue armour set: the trooper's fitted worn shells in a cobalt livery, with over-the-top pieces added per
 // slot: huge round pauldrons, a broad chest plate over a dark belt, bulky cuisses, greaves and vambraces, oversized
-// gauntlets and a chunky helm. Worn shells only (no ground models). Built by tools/model into
-// assets/own/skelly/*_heavy_*.glb.
+// gauntlets and a chunky helm. Worn shells only (no ground models). Built by tools/build_models.sh into
+// built/*_heavy_*.glb.
 local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';

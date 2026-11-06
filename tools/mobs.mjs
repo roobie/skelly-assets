@@ -1,7 +1,7 @@
 // Exports the 3D mobs of the --mobs-3d layer: for each row of models/mobs.json a merged vertex-coloured mesh (a GLB) and the
-// mob's walk, attack and idle clips as per-bone matrix frames (JSON). Usage: node tools/model/mobs.mjs [--out dir] [mobId ...]
+// mob's walk, attack and idle clips as per-bone matrix frames (JSON). Usage: node tools/mobs.mjs [--out dir] [mobId ...]
 // (tools/build_mobs.sh is the usual way in). With no ids it builds every row; the files go flat into --out, by default
-// assets/own/skelly. Needs node 26 or later and `npm ci` in tools/model. Adapted from skelly's mobgen export of the shambler
+// built/. Needs node 26 or later and `npm ci` in tools. Adapted from skelly's mobgen export of the shambler
 // (see README.md beside this file); mobgen itself is the copy in packages/mobgen.
 //
 // The mesh: every bone's greedy-meshed voxel faces in rest-world metres, facing +z (the way the avatar models face), the bone
@@ -15,10 +15,10 @@ import { parseArgs } from 'node:util';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
-const repo = resolve(here, '../..');
+const repo = resolve(here, '..');
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { out: { type: 'string', default: join(repo, 'assets/own/skelly') } },
+  options: { out: { type: 'string', default: join(repo, 'built') } },
 });
 const sheet = JSON.parse(readFileSync(join(repo, 'models/mobs.json'), 'utf8'));
 const rows = sheet.mobs.map((row) => ({ ...sheet.defaults, ...row }));
@@ -241,7 +241,7 @@ function exportMob(row) {
     }
   }
   const json = {
-    asset: { version: '2.0', generator: 'tools/model/mobs.mjs' },
+    asset: { version: '2.0', generator: 'skelly-assets tools/mobs.mjs' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [{ mesh: 0, name: id }],
