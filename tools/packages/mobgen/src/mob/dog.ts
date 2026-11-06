@@ -464,6 +464,8 @@ const PAW_BONES = LEGS.map((leg) => leg.paw);
 export interface DogStance {
   readonly limp?: number;
   readonly headTilt?: number;
+  /** 0..1, how far the jaw hangs open at rest (the genome's jawOpen); the carved mouth shows through it. */
+  readonly jawOpen?: number;
   /** Bones hidden by accumulated cuts; grounding ignores them so a severed limb is not an invisible support. */
   readonly severed?: ReadonlySet<string> | undefined;
 }
@@ -479,7 +481,7 @@ export const dogPose = (realized: Realized, stance: DogStance = {}): Pose => {
     spine: rotX(-2),
     neck: rotX(4),
     head: rotX(6 + headTilt * 0.5),
-    jaw: rotX(4 + limpScale * 4),
+    jaw: rotX(4 + limpScale * 4 - (stance.jawOpen ?? 0) * 30),
     'foreUpper.L': rotX(3 + 4 * limpScale),
     'foreUpper.R': rotX(-2),
     'hindUpper.L': rotX(-4 - 5 * limpScale),
