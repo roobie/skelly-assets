@@ -49,9 +49,32 @@ const INSECT_PARAM_ORDER = [
   'legSpread',
   'legThickness',
   'mandibleOpen',
+  'thoraxLength',
+  'thoraxRaise',
+  'abdomenSize',
+  'abdomenDrop',
+  'waist',
+  'hindLegsOnThorax',
 ] as const;
 
 type InsectParams = Readonly<Record<(typeof INSECT_PARAM_ORDER)[number], number>>;
+
+/** The params past the cockroach's: how an ant-like body departs from it. Each defaults (insectTemplate.ts) to the cockroach's own value, so the rows that
+ * leave them out are unchanged. `thoraxLength` scales the pronotum's length about its centre; `thoraxRaise` lifts the thorax's flesh, head, feelers, jaws and the
+ * legs that hang from the thorax by that many `height`s; `abdomenSize` scales the wing cases' width and thickness and `abdomenDrop` lowers them; `waist` moves
+ * the abdomen back by that many `height`s and joins it with a narrow stalk; `hindLegsOnThorax` (0 or 1) hangs the hind pair from the thorax's back instead of
+ * the abdomen, at the back of the pronotum. */
+export const INSECT_ANT_DEFAULTS = {
+  thoraxLength: 1,
+  thoraxRaise: 0,
+  abdomenSize: 1,
+  abdomenDrop: 0,
+  waist: 0,
+  hindLegsOnThorax: 0,
+} as const;
+
+/** The waist's stalk: its radius (times `height`) and how far it reaches into the thorax and the abdomen. */
+const WAIST_STALK = { radius: 0.2, overlap: 0.15 } as const;
 
 /** Everything is metres only after multiplying by the `height` param; z is negative forward. */
 export const INSECT_LAYOUT = {
@@ -115,14 +138,23 @@ interface InsectLayout {
 
 const v = (h: number, x: number, y: number, z: number): Vec3 => [x * h, y * h, z * h];
 
+const hangsFromThorax = (leg: LegBones, p: InsectParams): boolean => leg.parent === 'thorax' || (leg.pair === 'H' && p.hindLegsOnThorax > 0);
+const legParent = (leg: LegBones, p: InsectParams): string => (hangsFromThorax(leg, p) ? 'thorax' : leg.parent);
+/** The pronotum's back end z (times `height`). */
+const pronotumBack = (p: InsectParams): number => INSECT_LAYOUT.pronotum.z + INSECT_LAYOUT.pronotum.halfLength * p.thoraxLength;
+/** A pair's hip z (times `height`): the hind pair follows the abdomen's length, or the thorax's back end when it hangs from there. */
+const legHipZ = (pair: (typeof LEG_PAIRS)[number], p: InsectParams): number =>
+  pair.key !== 'H' ? pair.hipZ : p.hindLegsOnThorax > 0 ? pronotumBack(p) - 0.15 : pair.hipZ * p.bodyLength;
+
 const buildBones = (p: InsectParams): Body['bones'] => {
   const L = INSECT_LAYOUT;
   const h = p.height;
   const bl = p.bodyLength;
+  const up = p.thoraxRaise;
   const bones: Body['bones'][number][] = [
     { id: 'thorax', parent: null, head: v(h, 0, L.shellY, L.thorax.headZ), tail: v(h, 0, L.shellY, L.thorax.tailZ) },
-    { id: 'abdomen', parent: 'thorax', head: v(h, 0, L.shellY, L.abdomen.headZ), tail: v(h, 0, L.shellY, L.abdomen.tailZ * bl) },
-    { id: 'head', parent: 'thorax', head: v(h, 0, L.head.headY, L.head.headZ), tail: v(h, 0, L.head.tailY, L.head.tailZ) },
+    { id: 'abdomen', parent: 'thorax', head: v(h, 0, L.shellY, L.abdomen.headZ), tail: v(h, 0, L.shellY, L.abdomen.tailZ * bl + p.waist) },
+    { id: 'head', parent: 'thorax', head: v(h, 0, L.head.headY + up, L.head.headZ), tail: v(h, 0, L.head.tailY + up, L.head.tailZ) },
   ];
   for (const side of SIDES) {
     const sign = sideSign(side);
@@ -130,11 +162,11 @@ const buildBones = (p: InsectParams): Body['bones'] => {
     bones.push({
       id: `mandible.${side}`,
       parent: 'head',
-      head: v(h, sign * m.hingeX, m.hingeY, m.hingeZ),
-      tail: v(h, sign * m.tipX, m.tipY, m.tipZ),
+      head: v(h, sign * m.hingeX, m.hingeY + up, m.hingeZ),
+      tail: v(h, sign * m.tipX, m.tipY + up, m.tipZ),
     });
     const a = L.antenna;
-    const base = v(h, sign * a.baseX, a.baseY, a.baseZ);
+    const base = v(h, sign * a.baseX, a.baseY + up, a.baseZ);
     const mid = add(base, v(h * p.antennaLength, sign * a.midOffset[0], a.midOffset[1], a.midOffset[2]));
     const tip = add(mid, v(h * p.antennaLength, sign * a.tipOffset[0], a.tipOffset[1], a.tipOffset[2]));
     bones.push(
@@ -148,12 +180,14 @@ const buildBones = (p: InsectParams): Body['bones'] => {
     const g = L.legs;
     const spread = p.legSpread;
     const out = (x: number): number => g.hipX + (x - g.hipX) * spread;
-    const hip = v(h, sign * g.hipX, g.hipY, pair.hipZ * (pair.key === 'H' ? bl : 1));
-    const knee = v(h, sign * out(g.kneeX), g.kneeY, pair.hipZ * (pair.key === 'H' ? bl : 1) + pair.kneeDz);
-    const ankle = v(h, sign * out(g.ankleX), g.ankleY, pair.hipZ * (pair.key === 'H' ? bl : 1) + pair.ankleDz);
-    const toe = v(h, sign * out(g.toeX), g.toeRadius, pair.hipZ * (pair.key === 'H' ? bl : 1) + pair.ankleDz + g.toeDz);
+    const lift = hangsFromThorax(leg, p) ? up : 0;
+    const hipZ = legHipZ(pair, p);
+    const hip = v(h, sign * g.hipX, g.hipY + lift, hipZ);
+    const knee = v(h, sign * out(g.kneeX), g.kneeY + lift, hipZ + pair.kneeDz);
+    const ankle = v(h, sign * out(g.ankleX), g.ankleY, hipZ + pair.ankleDz);
+    const toe = v(h, sign * out(g.toeX), g.toeRadius, hipZ + pair.ankleDz + g.toeDz);
     bones.push(
-      { id: leg.femur, parent: leg.parent, head: hip, tail: knee },
+      { id: leg.femur, parent: legParent(leg, p), head: hip, tail: knee },
       { id: leg.tibia, parent: leg.femur, head: knee, tail: ankle },
       { id: leg.tarsus, parent: leg.tibia, head: ankle, tail: toe },
     );
@@ -194,10 +228,16 @@ const buildFlesh = (layout: InsectLayout): Feature[] => {
   const hs = p.headScale;
   const half = L.shellHalfWidth * g;
   const features: Feature[] = [
-    ellipsoid('thorax', v(h, 0, L.shellY, L.pronotum.z), v(h, half * L.pronotum.halfWidthRatio, L.shellHalfThickness, L.pronotum.halfLength), 'shell'),
-    ellipsoid('abdomen', v(h, 0, L.shellY + 0.02, L.wings.z * bl), v(h, half, L.shellHalfThickness, L.wings.halfLength * bl), 'shell'),
-    ellipsoid('head', v(h, 0, L.head.centreY, L.head.centreZ), v(h, L.head.radii[0] * hs, L.head.radii[1] * hs, L.head.radii[2] * hs), 'head'),
+    ellipsoid('thorax', v(h, 0, L.shellY + p.thoraxRaise, L.pronotum.z), v(h, half * L.pronotum.halfWidthRatio, L.shellHalfThickness, L.pronotum.halfLength * p.thoraxLength), 'shell'),
+    ellipsoid('abdomen', v(h, 0, L.shellY + 0.02 - p.abdomenDrop, L.wings.z * bl + p.waist), v(h, half * p.abdomenSize, L.shellHalfThickness * p.abdomenSize, L.wings.halfLength * bl), 'shell'),
+    ellipsoid('head', v(h, 0, L.head.centreY + p.thoraxRaise, L.head.centreZ), v(h, L.head.radii[0] * hs, L.head.radii[1] * hs, L.head.radii[2] * hs), 'head'),
   ];
+  if (p.waist > 0) {
+    // The stalk between the thorax's back and the abdomen's front, so the abdomen hangs from a narrow waist.
+    const S = WAIST_STALK;
+    const front = L.wings.z * bl + p.waist - L.wings.halfLength * bl;
+    features.push(capsule('abdomen', v(h, 0, L.shellY + p.thoraxRaise, pronotumBack(p) - S.overlap), v(h, 0, L.shellY - p.abdomenDrop, front + S.overlap), S.radius * h, S.radius * h, 'dark'));
+  }
   for (const side of SIDES) {
     const sign = sideSign(side);
     const m = L.mandible;
@@ -213,7 +253,7 @@ const buildFlesh = (layout: InsectLayout): Feature[] => {
     features.push({
       bone: 'head',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, sign * L.eye.x * hs, L.eye.y, L.eye.z), radii: [L.eye.radius * h * hs, L.eye.radius * h * hs, L.eye.radius * h * hs] },
+      shape: { kind: 'ellipsoid', center: v(h, sign * L.eye.x * hs, L.eye.y + p.thoraxRaise, L.eye.z), radii: [L.eye.radius * h * hs, L.eye.radius * h * hs, L.eye.radius * h * hs] },
       material: 'eye',
     });
   }
@@ -238,25 +278,27 @@ const buildMarkings = (layout: InsectLayout): Feature[] => {
   const { h, p } = layout;
   const half = L.shellHalfWidth * p.girth;
   const topY = L.shellY + L.shellHalfThickness;
+  const abdomenTopY = L.shellY + L.shellHalfThickness * p.abdomenSize - p.abdomenDrop;
+  const wingsZ = L.wings.z * p.bodyLength + p.waist;
   return [
     {
       bone: 'abdomen',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, 0, topY + 0.12, L.wings.z * p.bodyLength), radii: v(h, half * 0.62, 0.3, L.wings.halfLength * p.bodyLength * 0.75) },
+      shape: { kind: 'ellipsoid', center: v(h, 0, abdomenTopY + 0.12, wingsZ), radii: v(h, half * p.abdomenSize * 0.62, 0.3, L.wings.halfLength * p.bodyLength * 0.75) },
       material: 'sheen',
       onto: ['shell'],
     },
     {
       bone: 'abdomen',
       op: 'paint',
-      shape: { kind: 'box', center: v(h, 0, topY, L.wings.z * p.bodyLength), half: v(h, 0.045, 0.3, L.wings.halfLength * p.bodyLength), round: 0 },
+      shape: { kind: 'box', center: v(h, 0, abdomenTopY, wingsZ), half: v(h, 0.045, 0.3, L.wings.halfLength * p.bodyLength), round: 0 },
       material: 'dark',
       onto: ['shell', 'sheen'],
     },
     {
       bone: 'thorax',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, 0, topY + 0.1, L.pronotum.z), radii: v(h, half * 0.5, 0.28, L.pronotum.halfLength * 0.7) },
+      shape: { kind: 'ellipsoid', center: v(h, 0, topY + p.thoraxRaise + 0.1, L.pronotum.z), radii: v(h, half * 0.5, 0.28, L.pronotum.halfLength * p.thoraxLength * 0.7) },
       material: 'sheen',
       onto: ['shell'],
     },
