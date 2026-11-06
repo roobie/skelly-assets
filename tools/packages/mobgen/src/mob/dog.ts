@@ -573,7 +573,7 @@ const wrapPi = (angle: number): number => {
  * arc, so a planted paw's sole stays on the ground across the whole stance half rather than rising to
  * the midpoint of a single-link sweep. The knee takes the branch matching the rest bend, and the
  * ankle's horizontal position is still exact, so a planted paw cannot creep forward or back. */
-const stanceLegAngles = (
+export const stanceLegAngles = (
   u: readonly [number, number],
   v: readonly [number, number],
   targetY: number,

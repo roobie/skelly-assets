@@ -1383,6 +1383,154 @@
         }
       },
       "parts": []
+    },
+    {
+      "id": "tempest_sovereign",
+      "template": "dragon",
+      "lod_divisor": 5,
+      "glb": "tempest_sovereign.glb",
+      "clips": "tempest_sovereign_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/dragons/storm_dragon_new.png, front on. Silhouette: a deep royal-blue dragon reared up on its hind legs, a long S-curved neck, a horned head with yellow eyes and white horns, a golden-yellow ribbed belly running down the front of neck and torso, pale-tan membrane wings spread up behind, clawed forelimbs with white talons, a thick tail. Palette (sampled): body blue #2c3fd6, dark blue mottling #1a2a9c, belly gold #e0a416, rib #a87408, wing tan #cdb868, eyes yellow #ffe030. Signature: the golden belly ribs, the tan wings, the reared stance. Motion: a heavy stomp with tail sway and wing beat; a lunging bite with a claw swipe; idle is one frame (rest pose). Glows: the eyes and sparse cyan flecks over the body (vertex alpha) for a storm.",
+      "params": {
+        "height": 3.5,
+        "headScale": 1,
+        "bulk": 1,
+        "wingSpan": 1,
+        "hornLength": 1,
+        "strideRatio": 0.6,
+        "liftRatio": 0.12,
+        "bob": 0.05,
+        "sway": 7,
+        "neckSway": 4,
+        "wingFlap": 8,
+        "armSwing": 8,
+        "lean": 3,
+        "spots": 0.28,
+        "spark": 0.12
+      },
+      "materials": {
+        "body": {
+          "color": "#2c3fd6",
+          "emissive": 0
+        },
+        "spot": {
+          "color": "#1c2aa0",
+          "emissive": 0
+        },
+        "spark": {
+          "color": "#8fe0ff",
+          "emissive": 1.4
+        },
+        "belly": {
+          "color": "#e8aa18",
+          "emissive": 0
+        },
+        "rib": {
+          "color": "#b07a0c",
+          "emissive": 0
+        },
+        "wing": {
+          "color": "#d0b868",
+          "emissive": 0
+        },
+        "wingBone": {
+          "color": "#1c2aa0",
+          "emissive": 0
+        },
+        "horn": {
+          "color": "#f2eed8",
+          "emissive": 0
+        },
+        "eye": {
+          "color": "#ffe830",
+          "emissive": 1.6
+        }
+      },
+      "budgets": {
+        "totalVoxels": {
+          "min": 10,
+          "max": 200000
+        },
+        "totalTriangles": {
+          "min": 100,
+          "max": 60000
+        }
+      },
+      "parts": []
+    },
+    {
+      "id": "mire_mother",
+      "template": "dragon",
+      "lod_divisor": 5,
+      "glb": "mire_mother.glb",
+      "clips": "mire_mother_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/dragons/swamp_dragon_new.png, front on. The storm dragon's build in mottled olive swamp green with darker spots, a pale yellow-green ribbed belly, red membrane wings, glowing green eyes, white horns and talons. Palette (sampled): body olive #6a7a22, dark spots #34501a, belly #c8d070, rib #98a448, wing red #c82018, eyes green #60ff40. Signature: the red wings against the green body, the pale ribbed belly. Motion: as the tempest sovereign, a bit slower and heavier. Glows: the eyes, and a few murky green flecks.",
+      "params": {
+        "height": 3.5,
+        "headScale": 1,
+        "bulk": 1.08,
+        "wingSpan": 1,
+        "hornLength": 1,
+        "strideRatio": 0.55,
+        "liftRatio": 0.12,
+        "bob": 0.05,
+        "sway": 6,
+        "neckSway": 3,
+        "wingFlap": 8,
+        "armSwing": 8,
+        "lean": 3,
+        "spots": 0.4,
+        "spark": 0.07
+      },
+      "materials": {
+        "body": {
+          "color": "#72822a",
+          "emissive": 0
+        },
+        "spot": {
+          "color": "#3a5818",
+          "emissive": 0
+        },
+        "spark": {
+          "color": "#7aff70",
+          "emissive": 1.0
+        },
+        "belly": {
+          "color": "#d2d878",
+          "emissive": 0
+        },
+        "rib": {
+          "color": "#a0ac4a",
+          "emissive": 0
+        },
+        "wing": {
+          "color": "#d02820",
+          "emissive": 0
+        },
+        "wingBone": {
+          "color": "#7c1810",
+          "emissive": 0
+        },
+        "horn": {
+          "color": "#f4f0e0",
+          "emissive": 0
+        },
+        "eye": {
+          "color": "#60ff40",
+          "emissive": 1.6
+        }
+      },
+      "budgets": {
+        "totalVoxels": {
+          "min": 10,
+          "max": 200000
+        },
+        "totalTriangles": {
+          "min": 100,
+          "max": 60000
+        }
+      },
+      "parts": []
     }
   ]
 }

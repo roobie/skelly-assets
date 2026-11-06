@@ -41,6 +41,7 @@ await import(src('mob/amalgamTemplate.ts'));
 await import(src('mob/dogTemplate.ts'));
 await import(src('mob/insectTemplate.ts'));
 await import(src('mob/floaterTemplate.ts'));
+await import(src('mob/dragonTemplate.ts'));
 await import(src('mob/skeletonTemplate.ts'));
 const { materialOf, shadeOf } = await import(src('core/voxelize.ts'));
 const { allocateBoneTransforms, boneTransformsInto, indexBonesByParent } = await import(src('core/pose.ts'));
@@ -48,6 +49,7 @@ const { advanceClock, createGaitCache, legGeometryFor, footRestExtents, walkPose
 const { idleBasePose } = await import(src('mob/idle.ts'));
 const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
 const { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } = await import(src('mob/floater.ts'));
+const { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } = await import(src('mob/dragon.ts'));
 const { DOG_POUNCE, dogAttackPose, dogGaitPose, dogIdlePose, dogStrideLength } = await import(src('mob/dog.ts'));
 const { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } = await import(src('mob/insect.ts'));
 
@@ -90,7 +92,7 @@ function exportMob(row) {
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
   const feet = bones.filter((b) => /^(foot|forePaw|hindPaw|tarsus[FMH])\./.test(b.id));
   const toe = feet.reduce((s, b) => s + (b.tail[2] - b.head[2]), 0);
-  const FLIP = template.bodyPlan === 'floater' || toe < 0; // a floater has no feet to read the facing from: it is built facing -z, as the convention says
+  const FLIP = template.bodyPlan === 'floater' || template.bodyPlan === 'dragon' || toe < 0; // a floater and a dragon are built facing -z, as the convention says (neither has feet among the bones read above)
   const fp = (p) => (FLIP ? [-p[0], p[1], -p[2]] : p);
 
   // ---- the mesh ----
@@ -174,6 +176,13 @@ function exportMob(row) {
     walkAt = (i) => floaterDriftPose(realized, p, i / WALK_FRAMES);
     clip = FLOATER_CAST;
     attackAt = (time) => floaterCastPose(realized, p, time);
+  } else if (template.bodyPlan === 'dragon') {
+    const p = genome.params;
+    idle = dragonIdlePose(realized, p);
+    cycleM = dragonStrideLength(realized, p);
+    walkAt = (i) => dragonStompPose(realized, p, i / WALK_FRAMES);
+    clip = DRAGON_LUNGE;
+    attackAt = (time) => dragonAttackPose(realized, p, time);
   } else {
     const walkActor = {
       bones,
