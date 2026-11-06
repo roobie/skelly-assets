@@ -12,4 +12,6 @@ shared between the owner's games (arpg1, and possibly skelly/deadvox and others)
 Games consume this repo as a git submodule and load from `built/`. Engine-specific sidecar files (Godot's `*.import`)
 are ignored here; each game makes its own.
 
-Licence: EUPL-1.2 (`LICENSE`), by BR.
+Licence, by BR: the models and built output (`models/`, `built/`) are CC BY-NC-SA 4.0, so they are free for
+non-commercial use and commercial use needs a separate licence from the author; the pipelines (`tools/`) are EUPL-1.2.
+See `LICENSE` and `REUSE.toml`.

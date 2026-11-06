@@ -1,0 +1,11 @@
+version = 1
+
+[[annotations]]
+path = ["models/**", "built/**"]
+SPDX-FileCopyrightText = "Björn Roberg"
+SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
+
+[[annotations]]
+path = ["tools/**", "README.md", "LICENSE", "REUSE.toml", ".gitignore"]
+SPDX-FileCopyrightText = "Björn Roberg"
+SPDX-License-Identifier = "EUPL-1.2"
