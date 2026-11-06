@@ -2632,6 +2632,133 @@
         }
       },
       "parts": []
+    },
+    {
+      "id": "mourner",
+      "template": "runner",
+      "seed": 7,
+      "lod_divisor": 8,
+      "budget_headroom": 3.0,
+      "budgets": {
+        "totalTriangles": {
+          "min": 300,
+          "max": 12000
+        }
+      },
+      "glb": "mourner.glb",
+      "clips": "mourner_clips.json",
+      "attack_clip": "swipe",
+      "idle": "slack",
+      "brief": "Owner-chosen design, not the flayed_ghost sprite. A veiled widow: a tall, thin, hunched figure in a long hooded shroud of muted violet that hides the legs and drags at the hem, no face, only a dark opening in the hood, one arm held out with a censer glowing green (the colour of its mend skill). A ranged entropy caster that keeps its distance and heals. Palette: shroud #9060b0 / #6e4690 (mob colour 0.75,0.5,0.85), void #0c0610, iron #5c5c68, censer glow #50f080 emissive.",
+      "params": {
+        "height": 2.15,
+        "girth": 0.6,
+        "shoulderWidth": 0.85,
+        "hipWidth": 0.8,
+        "headScale": 1.0,
+        "armLength": 1.15,
+        "legLength": 1.0,
+        "hunch": 16,
+        "kneeBend": 4,
+        "headTilt": 8,
+        "jawOpen": 0,
+        "earSize": 0,
+        "noseLength": 0.01,
+        "sleeveLength": 1.0,
+        "pantsLength": 1.0,
+        "shirtTear": 0,
+        "pantsTear": 0,
+        "hairCover": 0,
+        "woundCount": 0,
+        "armSwing": {
+          "min": 3,
+          "max": 5
+        },
+        "armRaise": {
+          "choices": [
+            58,
+            62
+          ]
+        },
+        "limp": 0,
+        "strideFactor": {
+          "min": 0.8,
+          "max": 0.85
+        },
+        "pelvisSway": {
+          "min": 1,
+          "max": 2
+        },
+        "spineTwist": {
+          "min": 1,
+          "max": 2
+        },
+        "headLoll": {
+          "min": 2,
+          "max": 3
+        },
+        "jawChatter": 0
+      },
+      "materials": {
+        "skin": {
+          "color": "#b08ac4"
+        },
+        "shirt": {
+          "color": "#8a5aa8"
+        },
+        "pants": {
+          "color": "#7a4c98"
+        },
+        "shoe": {
+          "color": "#6a4488"
+        },
+        "bruise": {
+          "color": "#8a5aa8"
+        },
+        "mouth": {
+          "color": "#0c0610"
+        },
+        "eye": {
+          "color": "#0c0610"
+        },
+        "hair": {
+          "color": "#6a4488"
+        },
+        "shroud": {
+          "color": "#9060b0"
+        },
+        "shroud2": {
+          "color": "#6e4690"
+        },
+        "void": {
+          "color": "#0c0610"
+        },
+        "iron": {
+          "color": "#5c5c68"
+        },
+        "glow": {
+          "color": "#50f080",
+          "emissive": 1.6
+        },
+        "glow2": {
+          "color": "#c0ffd0",
+          "emissive": 1.9
+        }
+      },
+      "parts": [
+        {"bone": "head", "at": "mid", "material": "shroud", "shape": {"kind": "ellipsoid", "center": [0, 0.04, 0.03], "radii": [0.14, 0.2, 0.15]}},
+        {"bone": "head", "at": "mid", "material": "void", "shape": {"kind": "ellipsoid", "center": [0, 0.0, -0.1], "radii": [0.095, 0.13, 0.08]}},
+        {"bone": "head", "at": "mid", "material": "shroud", "shape": {"kind": "capsule", "a": [0, 0.12, 0.05], "b": [0, 0.3, -0.08], "ra": 0.1, "rb": 0.03}},
+        {"bone": "chest", "at": "mid", "material": "shroud", "shape": {"kind": "ellipsoid", "center": [0, 0.12, 0.02], "radii": [0.24, 0.1, 0.16]}},
+        {"bone": "pelvis", "at": "mid", "material": "shroud", "shape": {"kind": "capsule", "a": [0, 0.1, 0.02], "b": [0, -0.63, 0.06], "ra": 0.15, "rb": 0.27}},
+        {"bone": "pelvis", "at": "mid", "material": "shroud2", "shape": {"kind": "capsule", "a": [0, -0.45, 0.08], "b": [0, -0.62, 0.08], "ra": 0.22, "rb": 0.27}},
+        {"bone": "pelvis", "at": "mid", "material": "shroud2", "shape": {"kind": "ellipsoid", "center": [0, -0.61, 0.14], "radii": [0.2, 0.06, 0.2]}},
+        {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "capsule", "a": [0, -0.02, -0.02], "b": [0, -0.2, -0.02], "ra": 0.012, "rb": 0.012}},
+        {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "ellipsoid", "center": [0, -0.22, -0.02], "radii": [0.07, 0.035, 0.07]}},
+        {"bone": "hand.L", "at": "mid", "material": "glow", "shape": {"kind": "ellipsoid", "center": [0, -0.32, -0.02], "radii": [0.13, 0.12, 0.13]}},
+        {"bone": "hand.L", "at": "mid", "material": "glow2", "shape": {"kind": "ellipsoid", "center": [0, -0.32, -0.02], "radii": [0.05, 0.13, 0.05]}},
+        {"bone": "hand.L", "at": "mid", "material": "iron", "shape": {"kind": "ellipsoid", "center": [0, -0.43, -0.02], "radii": [0.05, 0.03, 0.05]}}
+      ]
     }
   ]
 }
