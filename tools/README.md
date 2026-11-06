@@ -17,7 +17,7 @@ as copied.
 
 The package `mobgen` was copied from the same commit later (`src/core` and `src/mob`; no viewer, cli, tests, docs, crowd
 renderer, look-at or ragdoll). It has no npm dependencies. Its generated `*.json` beside the `.jsonnet` files are not kept:
-they compile into `.build/` on every run, like the other Jsonnet. The repo's EUPL-1.2 `LICENSE` covers it.
+they compile into `.build/` on every run, like the other Jsonnet. Like the rest of `tools/`, it is EUPL-1.2 (`../LICENSE`).
 
 ## Mobs
 
