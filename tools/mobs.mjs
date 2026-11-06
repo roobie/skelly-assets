@@ -53,12 +53,12 @@ const round = (x) => Math.round(x * 1e5) / 1e5;
 const hex = (c) => (typeof c === 'string' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255) : c);
 
 // The row's template with the row's own narrowed param ranges (`params`), palette (`materials`: name -> {color: "#rrggbb" | [r, g, b], emissive})
-// and signature `parts` laid over it; registered under the row's id, so rows of one template do not meet.
+// signature `parts` laid over it and `budgets` (the template's validity budgets, overridden where a row's parts add bulk); registered under the row's id, so rows of one template do not meet.
 function deriveTemplate(base, row) {
   const materials = { ...base.materials };
   for (const [name, m] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...m, color: hex(m.color) };
   const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
-  const derived = { ...base, name: `mob:${row.id}`, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
+  const derived = { ...base, name: `mob:${row.id}`, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, budgets: { ...base.budgets, ...row.budgets }, parts: row.parts ?? [] };
   registerTemplate(derived);
   return derived;
 }
@@ -144,7 +144,7 @@ function exportMob(row) {
   let clip;
   let attackAt;
   if (template.bodyPlan === 'dog') {
-    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt };
+    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
     idle = dogIdlePose(realized, stance);
     cycleM = dogStrideLength(realized, stance);
     walkAt = (i) => dogGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);

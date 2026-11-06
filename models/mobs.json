@@ -77,47 +77,706 @@
       "id": "rimewalker",
       "template": "dog",
       "seed": 7,
-      "lod_divisor": 8,
+      "lod_divisor": 7,
       "glb": "rimewalker.glb",
       "clips": "rimewalker_clips.json",
+      "budgets": {"totalVoxels": {"min": 400, "max": 3200}, "totalTriangles": {"min": 400, "max": 12000}},
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/ice_beast.png, side-on. Silhouette: a hulking, hunched four-legged frost beast, low and wide, huge shoulders and forelimbs with the head sunk low at the front, thick bent legs, a jagged white ice crest down the back. Palette (sampled): steel blue #3f6497 / #386287, mid ice #67a6c0, pale cyan highlights #a7ffff, white rime #f9f9fb, shadow teal #004d4d (lifted here for the layer's light). Signature: white ice crest and spikes along the spine, cyan claws, glowing eyes. Motion: a heavy prowling trot, a pounce with the jaws open.",
       "params": {
-        "height": { "min": 0.84, "max": 0.88 },
-        "girth": { "min": 1.9, "max": 2.0 },
-        "headScale": { "min": 1.2, "max": 1.3 },
-        "neckLength": { "min": 0.75, "max": 0.85 },
-        "tailLength": { "min": 0.7, "max": 0.8 },
-        "headTilt": { "choices": [-8, -4] },
-        "jawOpen": 0,
+        "height": {
+          "min": 0.58,
+          "max": 0.6
+        },
+        "girth": {"min": 2.5, "max": 2.6},
+        "headScale": {
+          "min": 1.8,
+          "max": 1.9
+        },
+        "neckLength": {
+          "min": 0.7,
+          "max": 0.75
+        },
+        "tailLength": {
+          "min": 0.6,
+          "max": 0.7
+        },
+        "headTilt": {
+          "choices": [
+            -44,
+            -40
+          ]
+        },
+        "jawOpen": 1,
         "woundCount": 0,
         "limp": 0
       },
       "materials": {
-        "skin": { "color": "#8ad8ff" },
-        "bruise": { "color": "#4f86d8" },
-        "shirt": { "color": "#8ad8ff" },
-        "pants": { "color": "#8ad8ff" },
-        "mouth": { "color": "#05474b" },
-        "eye": { "color": "#b8ffff", "emissive": 1.0 },
-        "rime": { "color": "#ffffff" },
-        "crystal": { "color": "#d8ffff", "emissive": 0.8 },
-        "deep": { "color": "#0f7f88" }
+        "skin": {
+          "color": "#b8e8ff"
+        },
+        "bruise": {
+          "color": "#4a84ee"
+        },
+        "shirt": {
+          "color": "#b8e8ff"
+        },
+        "pants": {
+          "color": "#b8e8ff"
+        },
+        "mouth": {
+          "color": "#0f6f7c"
+        },
+        "eye": {
+          "color": "#b8ffff",
+          "emissive": 1.0
+        },
+        "rime": {
+          "color": "#ffffff"
+        },
+        "crystal": {
+          "color": "#d8ffff",
+          "emissive": 0.7
+        },
+        "deep": {
+          "color": "#0f7f88"
+        }
       },
       "parts": [
-        { "bone": "spine", "at": "head", "material": "skin", "shape": { "kind": "ellipsoid", "center": [0.0, -0.02, 0.0], "radii": [0.2, 0.2, 0.2] } },
-        { "bone": "foreUpper.L", "mirror": true, "at": "mid", "material": "skin", "shape": { "kind": "capsule", "a": [0.0, 0.14, 0.0], "b": [0.0, -0.1, 0.0], "ra": 0.13, "rb": 0.09 } },
-        { "bone": "foreLower.L", "mirror": true, "at": "mid", "material": "skin", "shape": { "kind": "capsule", "a": [0.0, 0.1, 0.0], "b": [0.0, -0.1, 0.0], "ra": 0.08, "rb": 0.07 } },
-        { "bone": "hindUpper.L", "mirror": true, "at": "mid", "material": "skin", "shape": { "kind": "capsule", "a": [0.0, 0.14, 0.0], "b": [0.0, -0.1, 0.0], "ra": 0.12, "rb": 0.08 } },
-        { "bone": "hindLower.L", "mirror": true, "at": "mid", "material": "skin", "shape": { "kind": "capsule", "a": [0.0, 0.1, 0.0], "b": [0.0, -0.1, 0.0], "ra": 0.07, "rb": 0.06 } },
-        { "bone": "forePaw.L", "mirror": true, "at": "mid", "material": "skin", "shape": { "kind": "ellipsoid", "center": [0.0, 0.0, -0.04], "radii": [0.08, 0.05, 0.12] } },
-        { "bone": "spine", "at": "mid", "material": "rime", "shape": { "kind": "ellipsoid", "center": [0.0, 0.1, 0.0], "radii": [0.12, 0.08, 0.3] } },
-        { "bone": "spine", "at": "head", "material": "crystal", "shape": { "kind": "capsule", "a": [0.0, 0.1, 0.02], "b": [0.0, 0.5, 0.1], "ra": 0.09, "rb": 0.02 } },
-        { "bone": "spine", "at": "mid", "material": "crystal", "shape": { "kind": "capsule", "a": [0.0, 0.14, 0.0], "b": [0.0, 0.56, 0.06], "ra": 0.1, "rb": 0.02 } },
-        { "bone": "pelvis", "at": "mid", "material": "crystal", "shape": { "kind": "capsule", "a": [0.0, 0.06, 0.0], "b": [0.0, 0.46, 0.06], "ra": 0.08, "rb": 0.02 } },
-        { "bone": "head", "at": "mid", "material": "rime", "shape": { "kind": "ellipsoid", "center": [0.0, 0.08, 0.04], "radii": [0.07, 0.05, 0.1] } },
-        { "bone": "forePaw.L", "mirror": true, "at": "tail", "material": "crystal", "shape": { "kind": "capsule", "a": [0.04, 0.02, 0.02], "b": [0.04, 0.0, -0.12], "ra": 0.022, "rb": 0.014 } },
-        { "bone": "forePaw.L", "mirror": true, "at": "tail", "material": "crystal", "shape": { "kind": "capsule", "a": [-0.04, 0.02, 0.02], "b": [-0.04, 0.0, -0.12], "ra": 0.022, "rb": 0.014 } },
-        { "bone": "tail", "at": "tail", "material": "crystal", "shape": { "kind": "capsule", "a": [0.0, 0.0, -0.1], "b": [0.0, 0.08, 0.1], "ra": 0.05, "rb": 0.014 } }
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "skin",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              0.02,
+              -0.02
+            ],
+            "radii": [
+              0.24,
+              0.22,
+              0.22
+            ]
+          }
+        },
+        {
+          "bone": "foreUpper.L",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              0
+            ],
+            "b": [
+              0,
+              -0.08,
+              0
+            ],
+            "ra": 0.11,
+            "rb": 0.08
+          },
+          "mirror": true
+        },
+        {
+          "bone": "foreLower.L",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.08,
+              0
+            ],
+            "b": [
+              0,
+              -0.08,
+              0
+            ],
+            "ra": 0.075,
+            "rb": 0.065
+          },
+          "mirror": true
+        },
+        {
+          "bone": "forePaw.L",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              0,
+              -0.04
+            ],
+            "radii": [
+              0.09,
+              0.05,
+              0.12
+            ]
+          },
+          "mirror": true
+        },
+        {
+          "bone": "hindUpper.L",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              0
+            ],
+            "b": [
+              0,
+              -0.08,
+              0
+            ],
+            "ra": 0.1,
+            "rb": 0.07
+          },
+          "mirror": true
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              -0.02,
+              -0.06
+            ],
+            "radii": [
+              0.17,
+              0.14,
+              0.18
+            ]
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              -0.05,
+              -0.2
+            ],
+            "radii": [
+              0.12,
+              0.09,
+              0.15
+            ]
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              0.09,
+              -0.02
+            ],
+            "radii": [
+              0.12,
+              0.05,
+              0.12
+            ]
+          }
+        },
+        {
+          "bone": "jaw",
+          "at": "mid",
+          "material": "skin",
+          "shape": {
+            "kind": "ellipsoid",
+            "center": [
+              0,
+              0,
+              -0.04
+            ],
+            "radii": [
+              0.1,
+              0.05,
+              0.12
+            ]
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              -0.07,
+              -0.1,
+              -0.26
+            ],
+            "b": [
+              -0.07,
+              -0.2,
+              -0.27
+            ],
+            "ra": 0.022,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "jaw",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              -0.07,
+              0.03,
+              -0.1
+            ],
+            "b": [
+              -0.07,
+              0.12,
+              -0.11
+            ],
+            "ra": 0.02,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              -0.025,
+              -0.1,
+              -0.26
+            ],
+            "b": [
+              -0.025,
+              -0.2,
+              -0.27
+            ],
+            "ra": 0.022,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "jaw",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              -0.025,
+              0.03,
+              -0.1
+            ],
+            "b": [
+              -0.025,
+              0.12,
+              -0.11
+            ],
+            "ra": 0.02,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.025,
+              -0.1,
+              -0.26
+            ],
+            "b": [
+              0.025,
+              -0.2,
+              -0.27
+            ],
+            "ra": 0.022,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "jaw",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.025,
+              0.03,
+              -0.1
+            ],
+            "b": [
+              0.025,
+              0.12,
+              -0.11
+            ],
+            "ra": 0.02,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "head",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.07,
+              -0.1,
+              -0.26
+            ],
+            "b": [
+              0.07,
+              -0.2,
+              -0.27
+            ],
+            "ra": 0.022,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "jaw",
+          "at": "mid",
+          "material": "rime",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.07,
+              0.03,
+              -0.1
+            ],
+            "b": [
+              0.07,
+              0.12,
+              -0.11
+            ],
+            "ra": 0.02,
+            "rb": 0.008
+          }
+        },
+        {
+          "bone": "pelvis",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              0
+            ],
+            "b": [
+              0,
+              0.2242778776255135,
+              0.03
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "pelvis",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.06
+            ],
+            "b": [
+              0,
+              0.24265375351775711,
+              -0.03
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "pelvis",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.12
+            ],
+            "b": [
+              0,
+              0.23219730999288477,
+              -0.09
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              0
+            ],
+            "b": [
+              0,
+              0.24623520231577167,
+              0.03
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.06
+            ],
+            "b": [
+              0,
+              0.24754321824648326,
+              -0.03
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.12
+            ],
+            "b": [
+              0,
+              0.2139317315543888,
+              -0.09
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.18
+            ],
+            "b": [
+              0,
+              0.21079007949329245,
+              -0.15
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.24
+            ],
+            "b": [
+              0,
+              0.26024814492578763,
+              -0.21
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "spine",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.1,
+              -0.3
+            ],
+            "b": [
+              0,
+              0.22556124085968046,
+              -0.27
+            ],
+            "ra": 0.035,
+            "rb": 0.014
+          }
+        },
+        {
+          "bone": "neck",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.08,
+              0.0
+            ],
+            "b": [
+              0,
+              0.18,
+              0.02
+            ],
+            "ra": 0.03,
+            "rb": 0.013
+          }
+        },
+        {
+          "bone": "neck",
+          "at": "head",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0.08,
+              -0.05
+            ],
+            "b": [
+              0,
+              0.18,
+              -0.030000000000000002
+            ],
+            "ra": 0.03,
+            "rb": 0.013
+          }
+        },
+        {
+          "bone": "tail",
+          "at": "tail",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0,
+              0,
+              -0.1
+            ],
+            "b": [
+              0,
+              0.07,
+              0.08
+            ],
+            "ra": 0.045,
+            "rb": 0.016
+          }
+        },
+        {
+          "bone": "forePaw.L",
+          "at": "tail",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              -0.05,
+              0.02,
+              0.0
+            ],
+            "b": [
+              -0.05,
+              -0.01,
+              -0.17
+            ],
+            "ra": 0.026,
+            "rb": 0.012
+          },
+          "mirror": true
+        },
+        {
+          "bone": "forePaw.L",
+          "at": "tail",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.0,
+              0.02,
+              0.0
+            ],
+            "b": [
+              0.0,
+              -0.01,
+              -0.17
+            ],
+            "ra": 0.026,
+            "rb": 0.012
+          },
+          "mirror": true
+        },
+        {
+          "bone": "forePaw.L",
+          "at": "tail",
+          "material": "crystal",
+          "shape": {
+            "kind": "capsule",
+            "a": [
+              0.05,
+              0.02,
+              0.0
+            ],
+            "b": [
+              0.05,
+              -0.01,
+              -0.17
+            ],
+            "ra": 0.026,
+            "rb": 0.012
+          },
+          "mirror": true
+        }
       ]
     }
   ]
