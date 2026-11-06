@@ -1253,6 +1253,51 @@
       "materials": {}
     },
     {
+      "id": "brood_queen",
+      "template": "insect",
+      "seed": 7,
+      "lod_divisor": 0,
+      "glb": "brood_queen.glb",
+      "clips": "brood_queen_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/queen_ant_new.png, three-quarter view. Silhouette: a queen ant. A huge swollen glossy pink egg-sac abdomen low at the back, a narrow waist, a reddish-brown segmented thorax raised well above it, a head with two long bent feelers, six long thin rust-red legs splayed wide. Palette (sampled): abdomen pink #f0a090 over salmon #d45133, thorax and head red-brown #a43a21 / #74291a, outlines near-black red #470e03, legs and feelers rust #c64629. Signature: the enormous abdomen on a thin waist and the raised front body, unlike the skitter's flat oval. Motion: the insect plan's tripod scuttle, rear-up and bite. Built with the insect plan's ant params (thoraxLength, thoraxRaise, abdomenSize, abdomenDrop, waist, hindLegsOnThorax); the abdomen's pink is painted by the row's parts.",
+      "params": {
+        "height": 0.22,
+        "bodyLength": 1.2,
+        "girth": 0.6,
+        "headScale": 1.1,
+        "antennaLength": 1.5,
+        "legSpread": 1.3,
+        "legThickness": 0.8,
+        "mandibleOpen": 0,
+        "thoraxLength": 1.6,
+        "thoraxRaise": 0.7,
+        "abdomenSize": 2.0,
+        "abdomenDrop": 0.05,
+        "waist": 1.2,
+        "hindLegsOnThorax": 1
+      },
+      "materials": {
+        "shell": {"color": "#a43a21"},
+        "sheen": {"color": "#c8512c"},
+        "dark": {"color": "#5a1a0c"},
+        "head": {"color": "#8a2f19"},
+        "eye": {"color": "#ffb0a0", "emissive": 0.5},
+        "antenna": {"color": "#c64629"},
+        "leg": {"color": "#c64629"},
+        "bone": {"color": "#c64629"},
+        "belly": {"color": "#ff5a74"},
+        "belly_hi": {"color": "#ff9a88"},
+        "belly_dk": {"color": "#e03a58"}
+      },
+      "parts": [
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["shell", "sheen"], "material": "belly", "shape": {"kind": "ellipsoid", "center": [0, -0.03, 0.56], "radii": [0.34, 0.18, 0.46]}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["belly"], "material": "belly_hi", "shape": {"kind": "ellipsoid", "center": [0.03, 0.04, 0.5], "radii": [0.14, 0.1, 0.24]}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["belly"], "material": "belly_dk", "shape": {"kind": "box", "center": [0, 0, 0.3], "half": [0.4, 0.2, 0.012], "round": 0}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["belly"], "material": "belly_dk", "shape": {"kind": "box", "center": [0, 0, 0.52], "half": [0.4, 0.2, 0.012], "round": 0}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["belly"], "material": "belly_dk", "shape": {"kind": "box", "center": [0, 0, 0.74], "half": [0.4, 0.2, 0.012], "round": 0}}
+      ]
+    },
+    {
       "id": "cinderling",
       "template": "floater",
       "seed": 7,
