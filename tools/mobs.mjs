@@ -45,6 +45,7 @@ const { allocateBoneTransforms, boneTransformsInto, indexBonesByParent } = await
 const { advanceClock, createGaitCache, legGeometryFor, footRestExtents, walkPose, stepLengthMeters } = await import(src('mob/gait.ts'));
 const { idleBasePose } = await import(src('mob/idle.ts'));
 const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
+const { DOG_POUNCE, dogAttackPose, dogGaitPose, dogIdlePose, dogStrideLength } = await import(src('mob/dog.ts'));
 
 const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2]; // skelly's viewer/scene.ts SHADE_FACTORS: the shade of a face as a brightness
 const round = (x) => Math.round(x * 1e5) / 1e5;
@@ -52,15 +53,16 @@ const round = (x) => Math.round(x * 1e5) / 1e5;
 const hex = (c) => (typeof c === 'string' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255) : c);
 
 // The row's template with the row's own narrowed param ranges (`params`), palette (`materials`: name -> {color: "#rrggbb" | [r, g, b], emissive})
-// and signature `parts` laid over it; registered under the row's id, so rows of one template do not meet.
+// signature `parts` laid over it and `budgets` (the template's validity budgets, overridden where a row's parts add bulk); registered under the row's id, so rows of one template do not meet.
 function deriveTemplate(base, row) {
   const materials = { ...base.materials };
   for (const [name, m] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...m, color: hex(m.color) };
   const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
-  // `budget_headroom` widens the template's voxel budgets (totals and groups) by that factor at the top: signature parts add voxels the plain body plan does not.
+  // A row's `budgets` replaces template budget entries (a body reshaped past the template's own); `budget_headroom` then widens the totals and groups by that factor at the top, for signature parts the plain body plan does not have.
+  const own = { ...base.budgets, ...row.budgets };
   const room = row.budget_headroom ?? 1;
   const widen = (r) => ({ ...r, max: Math.ceil(r.max * room) });
-  const budgets = { ...base.budgets, totalVoxels: widen(base.budgets.totalVoxels), groups: Object.fromEntries(Object.entries(base.budgets.groups).map(([k, g]) => [k, widen(g)])) };
+  const budgets = { ...own, totalVoxels: widen(own.totalVoxels), groups: Object.fromEntries(Object.entries(own.groups).map(([k, g]) => [k, widen(g)])) };
   const derived = { ...base, budgets, name: `mob:${row.id}`, attackClip: row.attack_clip ?? base.attackClip, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
   registerTemplate(derived);
   return derived;
@@ -81,7 +83,7 @@ function exportMob(row) {
   const { bones } = realized.body;
 
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
-  const feet = bones.filter((b) => b.id.startsWith('foot.'));
+  const feet = bones.filter((b) => /^(foot|forePaw|hindPaw)\./.test(b.id));
   const toe = feet.reduce((s, b) => s + (b.tail[2] - b.head[2]), 0);
   const FLIP = toe < 0;
   const fp = (p) => (FLIP ? [-p[0], p[1], -p[2]] : p);
@@ -124,14 +126,6 @@ function exportMob(row) {
   // ---- the clips ----
   const parentIndex = indexBonesByParent(bones);
   const scratch = allocateBoneTransforms(bones.length);
-  const walkActor = {
-    bones,
-    extents: footRestExtents(bones, realized.voxels),
-    params: genome.params,
-    seed: genome.seed,
-    cache: createGaitCache(),
-  };
-  const geomL = legGeometryFor(bones, walkActor.extents, 'L');
   // One pose to one frame: for every bone the rotation and translation, with the half turn about y folded in (M r M, M t, M = diag(-1,1,-1)).
   const frame = (pose) => {
     boneTransformsInto(bones, pose, parentIndex, scratch);
@@ -147,21 +141,46 @@ function exportMob(row) {
     }
     return result;
   };
-  const basis = { params: walkActor.params, geomL, speed: WALK_SPEED, seed: walkActor.seed, cache: walkActor.cache };
-  const idle = idleBasePose(walkActor, row.idle);
-  // Two steps (one cycle) from step 2 on, so the first step's start-up style is past; sampled by distance as the game plays it.
-  const cycleM = stepLengthMeters(basis, 2) + stepLengthMeters(basis, 3);
-  let clock = { stepIndex: 2, progress: 0 };
+  // What a body plan poses with: its idle stance, the walk by distance over one cycle, the attack by time. The humanoids' are mob/gait.ts, idle.ts and
+  // attack.ts's; the four-legged dog plan's are its own in mob/dog.ts.
+  let idle;
+  let cycleM;
+  let walkAt;
+  let clip;
+  let attackAt;
+  if (template.bodyPlan === 'dog') {
+    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
+    idle = dogIdlePose(realized, stance);
+    cycleM = dogStrideLength(realized, stance);
+    walkAt = (i) => dogGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
+    clip = DOG_POUNCE;
+    attackAt = (time) => dogAttackPose(realized, idle, time);
+  } else {
+    const walkActor = {
+      bones,
+      extents: footRestExtents(bones, realized.voxels),
+      params: genome.params,
+      seed: genome.seed,
+      cache: createGaitCache(),
+    };
+    const geomL = legGeometryFor(bones, walkActor.extents, 'L');
+    const basis = { params: walkActor.params, geomL, speed: WALK_SPEED, seed: walkActor.seed, cache: walkActor.cache };
+    idle = idleBasePose(walkActor, row.idle);
+    // Two steps (one cycle) from step 2 on, so the first step's start-up style is past; sampled by distance as the game plays it.
+    cycleM = stepLengthMeters(basis, 2) + stepLengthMeters(basis, 3);
+    let clock = { stepIndex: 2, progress: 0 };
+    walkAt = () => {
+      const pose = walkPose(walkActor, clock, WALK_SPEED, { idle });
+      clock = advanceClock(clock, cycleM / WALK_FRAMES, basis);
+      return pose;
+    };
+    clip = attackClipFor(template);
+    attackAt = (time) => attackPose(walkActor, clip, time, idle);
+  }
   const walk = [];
-  for (let i = 0; i < WALK_FRAMES; i++) {
-    walk.push(frame(walkPose(walkActor, clock, WALK_SPEED, { idle })));
-    clock = advanceClock(clock, cycleM / WALK_FRAMES, basis);
-  }
-  const clip = attackClipFor(template);
+  for (let i = 0; i < WALK_FRAMES; i++) walk.push(frame(walkAt(i)));
   const attack = [];
-  for (let i = 0; i < ATTACK_FRAMES; i++) {
-    attack.push(frame(attackPose(walkActor, clip, (clip.duration * i) / (ATTACK_FRAMES - 1), idle)));
-  }
+  for (let i = 0; i < ATTACK_FRAMES; i++) attack.push(frame(attackAt((clip.duration * i) / (ATTACK_FRAMES - 1))));
   const clips = {
     _doc: 'Per-bone rigid matrices (r0..r8 row-major then t0..t2, metres, y up, facing +z) taking a rest-world point to its posed place; built by tools/build_mobs.sh from models/mobs.json.',
     seed,
