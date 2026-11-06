@@ -30,6 +30,7 @@ import { type Genome, type Template, templateByName, type Wound } from '../core/
 import { posedVoxelSurfaceBoundsForBones } from '../core/voxelBounds.ts';
 import { heightHeadBudgets } from './budgets.ts';
 import { resolveMaterials } from './materials.ts';
+import { partFeatures } from './parts.ts';
 import { HIT_FLINCH } from './reactions.ts';
 
 const SIDES = ['L', 'R'] as const;
@@ -421,8 +422,14 @@ const buildDog = (genome: Genome): Body => {
   const p = genome.params as DogParams;
   const layout = dogLayout(p);
   const bones = buildBones(layout);
-  const features = [...buildFlesh(layout, p), ...buildFace(layout, p), ...buildWounds(bones, layout, genome.wounds)];
-  return { bones, features, materials: resolveMaterials(templateByName(genome.template), p) };
+  const template = templateByName(genome.template);
+  const features = [
+    ...buildFlesh(layout, p),
+    ...buildFace(layout, p),
+    ...buildWounds(bones, layout, genome.wounds),
+    ...partFeatures(template.parts ?? [], bones), // a mob row's signature parts (models/mobs.json), after the body so they paint over it
+  ];
+  return { bones, features, materials: resolveMaterials(template, p) };
 };
 
 const sampleDog: BodyPlanDef['sample'] = (rng: Rng, template: Template) => {
@@ -727,3 +734,65 @@ export const dogHitPose = (realized: Realized, base: Pose, time: number, options
 
 /** Exported for tests: the paw bones that bear the ground contact. */
 export const dogPawBones: readonly string[] = PAW_BONES;
+
+// ---- Idle and attack ----
+
+/** The standing idle: the rest stance without the infected limp, so a row that is no cripple stands square. */
+export const dogIdlePose = (realized: Realized, stance: DogStance = {}): Pose => dogPose(realized, { ...stance, limp: 0 });
+
+/** One key of the pounce: time in seconds, bone rotations about X in degrees (positive swings a leg forward and lifts the nose), the body's
+ * advance along its facing in metres (the dog faces -Z, so forward is negative Z there), and the key's name for readers. */
+interface PounceKey {
+  readonly t: number;
+  readonly rotations: Readonly<Record<string, number>>;
+  readonly lunge: number;
+}
+
+/** A pounce and bite: the dog rears back on its haunches and opens its jaw, springs forward with the forelegs reaching and the head driven down onto
+ * the target (the blow lands at `hitTime`), snaps the jaw shut and settles back. Leg and body keys are mirrored where a side is not named. */
+export const DOG_POUNCE = {
+  name: 'pounce',
+  duration: 0.9,
+  hitTime: 0.45,
+  keys: [
+    { t: 0, rotations: {}, lunge: 0 },
+    {
+      t: 0.28,
+      rotations: { pelvis: -8, spine: 10, neck: 12, head: 10, jaw: -30, 'foreUpper.L': -22, 'foreUpper.R': -22, 'foreLower.L': 10, 'foreLower.R': 10, 'hindUpper.L': 14, 'hindUpper.R': 14 },
+      lunge: 0.08,
+    },
+    {
+      t: 0.45,
+      rotations: { pelvis: 6, spine: -12, neck: -22, head: -20, jaw: -42, 'foreUpper.L': 38, 'foreUpper.R': 30, 'foreLower.L': -12, 'foreLower.R': -12, 'hindUpper.L': -16, 'hindUpper.R': -16 },
+      lunge: -0.26,
+    },
+    {
+      t: 0.55,
+      rotations: { pelvis: 4, spine: -10, neck: -18, head: -14, jaw: 4, 'foreUpper.L': 30, 'foreUpper.R': 34, 'foreLower.L': -8, 'foreLower.R': -8, 'hindUpper.L': -10, 'hindUpper.R': -10 },
+      lunge: -0.22,
+    },
+    { t: 0.9, rotations: {}, lunge: 0 },
+  ] as readonly PounceKey[],
+} as const;
+
+/** The pounce at `time` over `base` (the idle or walk pose), eased between its keys and re-grounded on the surviving paws. */
+export const dogAttackPose = (realized: Realized, base: Pose, time: number, options: { readonly severed?: ReadonlySet<string> } = {}): Pose => {
+  const { keys, duration } = DOG_POUNCE;
+  const t = Math.max(0, Math.min(duration, time));
+  let hi = keys.findIndex((key) => key.t >= t);
+  if (hi < 0) {
+    hi = keys.length - 1;
+  }
+  const lo = Math.max(0, hi - 1);
+  const span = keys[hi]!.t - keys[lo]!.t;
+  const u = span > 0 ? smoothstep((t - keys[lo]!.t) / span) : 1;
+  const rotations: Record<string, Mat3> = { ...base.rotations };
+  const bones = new Set([...Object.keys(keys[lo]!.rotations), ...Object.keys(keys[hi]!.rotations)]);
+  for (const bone of bones) {
+    const a = keys[lo]!.rotations[bone] ?? 0;
+    const b = keys[hi]!.rotations[bone] ?? 0;
+    rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, rotX(a + (b - a) * u));
+  }
+  const lunge = keys[lo]!.lunge + (keys[hi]!.lunge - keys[lo]!.lunge) * u;
+  return groundDogPose(realized, { root: [base.root[0], base.root[1], base.root[2] + lunge], rotations }, options.severed);
+};
