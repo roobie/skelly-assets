@@ -1251,6 +1251,138 @@
         "antennaLength": {"min": 1.25, "max": 1.3}
       },
       "materials": {}
+    },
+    {
+      "id": "cinderling",
+      "template": "floater",
+      "seed": 7,
+      "lod_divisor": 10,
+      "glb": "cinderling.glb",
+      "clips": "cinderling_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/nonliving/fire_elemental_new.png, front on. Silhouette: a small head with two dark eye slits on a torso of flame, two thin flame arms flung out and down, the body tapering into one long curling flame tail instead of legs, ragged flame tongues licking up from the head and shoulders. Palette (sampled): yellow-white core #fff08a, yellow #ffd21a, orange #ff9a10, red edges #e0300a. Signature: the long curling tail, the dark eye slits, the bright core. Motion: hovers; the tail sways in a travelling wave; a cast thrusts the arms forward. Glows: every material carries emission (vertex alpha) so it reads as a light source.",
+      "params": {
+        "height": 1.6,
+        "headScale": 0.075,
+        "hover": 0.35,
+        "coreWidth": 0.09,
+        "coreHeight": 0.12,
+        "coreDepth": 0.07,
+        "tailLength": 0.5,
+        "tailSegments": 8,
+        "tailRadius": 0.075,
+        "tailTipRadius": 0.025,
+        "armLength": 0.32,
+        "armRadius": 0.035,
+        "armDrop": 15,
+        "armBend": 30,
+        "tongueCount": 4,
+        "tongueLength": 0.16,
+        "tongueRadius": 0.03,
+        "tongueElevMin": 50,
+        "tongueElevMax": 85,
+        "speckle": 0.1,
+        "tailCurl": 60,
+        "sway": 9,
+        "flicker": 10,
+        "bob": 0.04,
+        "lean": 8,
+        "driftCycle": 2.2
+      },
+      "materials": {
+        "body": {
+          "color": "#ff9a10",
+          "emissive": 1.0
+        },
+        "hot": {
+          "color": "#fff08a",
+          "emissive": 1.6
+        },
+        "edge": {
+          "color": "#e8340a",
+          "emissive": 0.8
+        },
+        "eye": {
+          "color": "#1a0808",
+          "emissive": 0
+        }
+      },
+      "budgets": {
+        "totalVoxels": {
+          "min": 10,
+          "max": 40000
+        },
+        "totalTriangles": {
+          "min": 100,
+          "max": 60000
+        }
+      },
+      "parts": []
+    },
+    {
+      "id": "stormwisp",
+      "template": "floater",
+      "seed": 7,
+      "lod_divisor": 7,
+      "glb": "stormwisp.glb",
+      "clips": "stormwisp_clips.json",
+      "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/nonliving/orb_of_electricity.png. Silhouette: a roughly spherical crackling orb with ragged edges, no limbs. Palette (sampled): bright pink-white core #ffd8ff, hot pink #f060ff, violet #9a40f0, dark purple edges #5a20d0. Signature: the brighter core and the jagged spikes of lightning all round. Motion: hovers; the spikes jitter; a cast flares and lunges. Glows: every material carries emission (vertex alpha) so it reads as a light source.",
+      "params": {
+        "height": 1.25,
+        "headScale": 0,
+        "hover": 0.45,
+        "coreWidth": 0.3,
+        "coreHeight": 0.3,
+        "coreDepth": 0.3,
+        "tailLength": 0,
+        "tailSegments": 0,
+        "tailRadius": 0.05,
+        "tailTipRadius": 0.02,
+        "armLength": 0,
+        "armRadius": 0.02,
+        "armDrop": 0,
+        "armBend": 0,
+        "tongueCount": 12,
+        "tongueLength": 0.14,
+        "tongueRadius": 0.05,
+        "tongueElevMin": -60,
+        "tongueElevMax": 90,
+        "speckle": 0.12,
+        "tailCurl": 0,
+        "sway": 0,
+        "flicker": 14,
+        "bob": 0.05,
+        "lean": 6,
+        "driftCycle": 1.6
+      },
+      "materials": {
+        "body": {
+          "color": "#e060ff",
+          "emissive": 1.1
+        },
+        "hot": {
+          "color": "#ffd8ff",
+          "emissive": 1.8
+        },
+        "edge": {
+          "color": "#6a2ae0",
+          "emissive": 0.9
+        },
+        "eye": {
+          "color": "#ffffff",
+          "emissive": 1.0
+        }
+      },
+      "budgets": {
+        "totalVoxels": {
+          "min": 10,
+          "max": 40000
+        },
+        "totalTriangles": {
+          "min": 100,
+          "max": 60000
+        }
+      },
+      "parts": []
     }
   ]
 }

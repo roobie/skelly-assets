@@ -40,12 +40,14 @@ await import(src('mob/acidTemplate.ts'));
 await import(src('mob/amalgamTemplate.ts'));
 await import(src('mob/dogTemplate.ts'));
 await import(src('mob/insectTemplate.ts'));
+await import(src('mob/floaterTemplate.ts'));
 await import(src('mob/skeletonTemplate.ts'));
 const { materialOf, shadeOf } = await import(src('core/voxelize.ts'));
 const { allocateBoneTransforms, boneTransformsInto, indexBonesByParent } = await import(src('core/pose.ts'));
 const { advanceClock, createGaitCache, legGeometryFor, footRestExtents, walkPose, stepLengthMeters } = await import(src('mob/gait.ts'));
 const { idleBasePose } = await import(src('mob/idle.ts'));
 const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
+const { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } = await import(src('mob/floater.ts'));
 const { DOG_POUNCE, dogAttackPose, dogGaitPose, dogIdlePose, dogStrideLength } = await import(src('mob/dog.ts'));
 const { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } = await import(src('mob/insect.ts'));
 
@@ -88,7 +90,7 @@ function exportMob(row) {
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
   const feet = bones.filter((b) => /^(foot|forePaw|hindPaw|tarsus[FMH])\./.test(b.id));
   const toe = feet.reduce((s, b) => s + (b.tail[2] - b.head[2]), 0);
-  const FLIP = toe < 0;
+  const FLIP = template.bodyPlan === 'floater' || toe < 0; // a floater has no feet to read the facing from: it is built facing -z, as the convention says
   const fp = (p) => (FLIP ? [-p[0], p[1], -p[2]] : p);
 
   // ---- the mesh ----
@@ -165,6 +167,13 @@ function exportMob(row) {
     walkAt = (i) => insectGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
     clip = INSECT_LUNGE;
     attackAt = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
+  } else if (template.bodyPlan === 'floater') {
+    const p = genome.params;
+    idle = floaterIdlePose(realized, p);
+    cycleM = p.driftCycle;
+    walkAt = (i) => floaterDriftPose(realized, p, i / WALK_FRAMES);
+    clip = FLOATER_CAST;
+    attackAt = (time) => floaterCastPose(realized, p, time);
   } else {
     const walkActor = {
       bones,
