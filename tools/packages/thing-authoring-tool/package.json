@@ -4,13 +4,29 @@
   "private": true,
   "license": "EUPL-1.2",
   "type": "module",
-  "exports": {
-    "./exports.ts": "./src/exports.ts"
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "pretypecheck": "node ../../sources.mjs && node test/compile-fixtures.mjs",
+    "pretest": "node ../../sources.mjs && node test/compile-fixtures.mjs",
+    "prebuild": "node ../../sources.mjs",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "export:recipes": "node src/cli/export.ts"
   },
   "dependencies": {
     "@skelly/construct": "*",
     "@skelly/thing-core": "*",
     "@skelly/thing-export": "*",
+    "@skelly/tool-ui": "*",
+    "three": "^0.186.0",
     "valibot": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/three": "^0.186.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1"
   }
 }

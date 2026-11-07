@@ -4,6 +4,7 @@ import { meshBones } from './packages/mobgen/src/core/mesh.ts';
 import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
 import { crowdEmission } from './packages/mobgen/src/mob/crowd.ts';
 import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
+import { outputPath } from './layout.mjs';
 import { actorBody } from './actorBody.mjs';
 import { figureFor } from './actorFigure.mjs';
 import { acidClips, fusedClips, humanoidClips } from './actorClips.mjs';
@@ -81,7 +82,7 @@ export function bakeActor(row, template, generated, out) {
   const meshes = fused ? meshBones(generated.realized.voxels, body.bones.length, { perCell: true }) : generated.realized.meshes;
   const outputs = [[row.body, JSON.stringify(body)], [row.clips, JSON.stringify(clips)], [row.glb, actorGlb({ ...row, fused }, generated.realized, meshes)]];
   for (const [file, bytes] of outputs) {
-    const path = join(out, file);
+    const path = join(out, outputPath(row.pack, file));
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, bytes);
   }

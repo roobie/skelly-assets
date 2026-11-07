@@ -1,0 +1,8 @@
+{
+  "_doc": "The clip representation each mob pack bakes, read by tools/layout.mjs, readPackFormats: matrices (per-bone rigid matrices, tools/mobs.mjs, exportMob) or pose (tools/actorBake.mjs, bakeActor). A row of models/mobs.json takes its pack's representation; a row's own format must agree with it. The bestiary keeps matrices until its rows move to pose, when this file goes.",
+  "packs": {
+    "skelly.bestiary": "matrices",
+    "skelly.deadvox.actors": "pose",
+    "skelly.body": "pose"
+  }
+}
