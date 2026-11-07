@@ -46,7 +46,7 @@ convention or incidental list. See `src/mob/quadruped.ts`, `src/mob/quadrupedTem
 
 The quadruped trot is distance-driven to avoid foot jumps when speed changes. Joint flex and torso motion
 must be solved around ground targets rather than layered onto planted legs. Its impaired diagonal retains
-relative shortening so stride does not erase the limp. See `src/mob/quadruped.ts`, `QUADRUPED_TROT` and
+relative shortening so stride does not erase the limp. See `src/mob/quadruped.ts`, `DOG_TROT` and
 `quadrupedGaitPose`.
 
 The skeleton uses the humanoid rig, but its thin geometry snaps to voxel rows and columns to avoid vanishing.
