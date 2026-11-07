@@ -116,6 +116,7 @@ const ItemSchema = strictObject({
 const CatalogueSchema = strictObject({
   units: strictObject({ metresPerUnit: positive, grid: positive, bevel: pipe(number(), finite(), minValue(0)) }),
   facets: pipe(positive, integer(), minValue(3)),
+  turnedSides: optional(pipe(positive, integer(), minValue(3))),
   defaultMaterial: material,
   items: pipe(
     array(ItemSchema),
@@ -186,11 +187,18 @@ const builders = {
   flashlight,
   candle,
 } satisfies Record<string, (params: Readonly<Record<string, string>>) => readonly Solid[]>;
-const buildPart = (part: ToolPart, params = part.params): PartDef => {
+const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
     throw new Error(`Unknown thing family ${part.family}`);
   }
-  const solids = builders[part.family as keyof typeof builders](params);
+  // Compound consumes per-piece null opt-outs itself; other families emit ordinary revolved solids.
+  const solids = part.family === 'compound'
+    ? compound(params, turnedSides)
+    : builders[part.family as keyof typeof builders](params).map((solid): Solid =>
+      solid.kind === 'revolved' && solid.sides === undefined && turnedSides !== undefined
+        ? { ...solid, sides: turnedSides }
+        : solid,
+    );
   for (const solid of solids) {
     if (!(solid.slot && Object.hasOwn(part.finish, solid.slot))) {
       throw new Error(`Missing finish for ${part.id}/${solid.id}`);
@@ -202,7 +210,7 @@ export const loadCatalogue = (value: unknown = content) => {
   const data = parse(CatalogueSchema, value);
   for (const item of data.items) {
     for (const part of item.parts) {
-      buildPart(part);
+      buildPart(part, part.params, data.turnedSides);
     }
   }
   return data;
@@ -237,7 +245,7 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
   let domain: Domain;
   let masses: Readonly<Record<string, number>>;
   if (item.parts.length === 1) {
-    const wrapped = singlePart({ id: first.id, part: buildPart(first), massKg: first.massKg, units: catalogue.units });
+    const wrapped = singlePart({ id: first.id, part: buildPart(first, first.params, catalogue.turnedSides), massKg: first.massKg, units: catalogue.units });
     assembly = {
       ...wrapped.assembly,
       name: item.id,
@@ -254,7 +262,7 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
           params: Object.fromEntries(
             Object.entries(part.params).map(([key, value]) => [key, { values: [value], default: value }]),
           ),
-          build: (params: Readonly<Record<string, string>>) => ({ ...buildPart(part, params), family: part.id }),
+          build: (params: Readonly<Record<string, string>>) => ({ ...buildPart(part, params, catalogue.turnedSides), family: part.id }),
         },
       ]),
     );

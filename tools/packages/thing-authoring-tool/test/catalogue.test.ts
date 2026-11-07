@@ -56,6 +56,29 @@ it('keeps per-part ports when two parts use the same family builder', () => {
     expect(built.report.resolved.defs.get(part.id)?.ports).toEqual(part.ports);
   }
 });
+it('applies the catalogue turned count to non-compound families', () => {
+  expect(catalogue.turnedSides).toBeDefined();
+  const item = loadCatalogue(fixture()).items[0]!;
+  const built = buildItem(item);
+  for (const part of item.parts) {
+    for (const solid of built.report.resolved.defs.get(part.id)!.solids) {
+      if (solid.kind === 'revolved') expect(solid.sides).toBe(catalogue.turnedSides);
+    }
+  }
+});
+
+it('keeps compound round opt-outs through catalogue assembly building', () => {
+  const input = fixture();
+  const piece = { id: 'fixture', slot: 'body', kind: 'turned', axis: 'y', profile: [[0, 0], [0, 0.03], [0.02, 0.03], [0.02, 0]] };
+  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: {
+    pieces: JSON.stringify([piece, { ...piece, id: 'round', sides: null }]),
+  } };
+  const item = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [] }] }).items[0]!;
+  const solids = buildItem(item).report.resolved.defs.get(part.id)!.solids;
+  expect(solids.find(({ id }) => id === piece.id)).toMatchObject({ sides: catalogue.turnedSides });
+  expect(solids.find(({ id }) => id === 'round')).not.toHaveProperty('sides');
+});
+
 it('exports a grip following the held solid through resizing and assembly placement', () => {
   const input = fixture();
   const datum = {

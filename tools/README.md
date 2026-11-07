@@ -37,7 +37,8 @@ The shared vehicle schema factories in thing-core originate in that commit's dea
 `packages/thing-authoring-tool` is reconciled from skelly commit
 `aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2), retaining the compound and worn-fit helpers and selected
 catalogue rows from `56b9b69a6c1c965a31f4fbb66270e2ed0421cdc9`. The retained armour's `oct` exposure and authored
-piece side counts are kept; omitted side counts have no code default. Container masses live in tool-owned content
+piece side counts are kept; omitted side counts inherit the catalogue's content default, never a code number.
+Compound pieces can opt into round geometry with `sides: null`; see the root README's Layout rule. Container masses live in tool-owned content
 rather than importing game inventory. The viewer, fixture exporter and tests are tool-owned. This repository is the
 source of truth; nothing syncs back to skelly. The `@skelly/` package names are kept.
 

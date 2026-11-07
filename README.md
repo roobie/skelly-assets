@@ -21,6 +21,12 @@ A model either product uses has one source row, one builder and one output in th
 bundle every pack. This serves one shared asset database and pipeline for a vast library of models and rigs,
 so deadvox and arpg1 can use the same models homogeneously. Keep no hand copy beside a producer.
 
+Turned pieces share the catalogue's eight-flat default (`turnedSides` in TAT's `items.jsonnet`) so both
+products render the whole shared library alike. Authored counts override it; a compound piece's `sides: null`
+opts into round geometry without a side count. The same eight-flat rule governs `baseball_bat`, `machete`,
+`hammer`, `kitchen_knife`, `sledgehammer`, `stick` and `torch`, not a separate round look for those tool rows.
+The catalogue's `facets` controls mesh tessellation for round geometry, not the default look.
+
 The move is staged: the existing flat roster remains until the pack-layout step, and per-pack thing recipes
 currently export only into temporary roots. The worn family fits the shared player body, not generated mobs.
 Open gaps and their closing triggers:
