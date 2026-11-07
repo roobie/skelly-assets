@@ -16,6 +16,13 @@ sha256-checked) into `jsonnet/bin/`, ignored by git.
 (EUPL-1.2). Its `vite.config.ts` imports this folder's `testPool.ts`, which the copy places one level up from the
 package exactly where the import looks for it.
 
+`packages/gun-authoring-tool` is copied with tests from skelly commit
+`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2). Its generated Jsonnet twins are not tracked;
+its registry-based export tests use thing-core's parameterised firearm schema instead. The firearm schema
+closure in `packages/thing-core/src/firearmModelSchema.ts` comes from that commit's deadvox model schema;
+callers supply temporal primitives so game-owned brands need not enter the tool pipeline. The skelly-only
+refresh command is omitted.
+
 `packages/vehicle-authoring-tool` is copied with its editor/schema tests from skelly commit
 `aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2), with schema-only validation.
 Its `blueprints/*.json` authoring inputs are the blueprint rows from that commit's
