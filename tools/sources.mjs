@@ -12,7 +12,8 @@ const jsonnetFiles = (directory) =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      return entry.name === 'node_modules' ? [] : jsonnetFiles(path);
+      // Negative test fixtures are compiled by their tests, never as pipeline inputs.
+      return entry.name === 'node_modules' || entry.name === 'test' ? [] : jsonnetFiles(path);
     }
     return entry.name.endsWith('.jsonnet') ? [path] : [];
   });
