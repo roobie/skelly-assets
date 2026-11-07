@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { meshBones } from '../packages/mobgen/src/core/mesh.ts';
-import { worldPosition } from '../packages/mobgen/src/core/voxelize.ts';
+import { installJsonnetSources } from '../sources.mjs';
+
+installJsonnetSources();
+const { meshBones } = await import('../packages/mobgen/src/core/mesh.ts');
+const { worldPosition } = await import('../packages/mobgen/src/core/voxelize.ts');
 
 // Exercise the on-disk row boundary while sharing the existing live-pose assertions.
 async function bakeFixture(model, options = {}) {
@@ -139,8 +142,6 @@ const massAgreement = (actual, reference) => {
 };
 
 test('the emitted body reproduces the generator\'s mass laws', async () => {
-  const { installJsonnetSources } = await import('../sources.mjs');
-  installJsonnetSources();
   const { bodyGeometry } = await import('../actorBody.mjs');
   const { voxelMassProperties, voxelBounds, partMassProperties } = await import('../actorMass.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');

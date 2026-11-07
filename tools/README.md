@@ -32,7 +32,7 @@ as copied.
 `packages/mobgen` is reconciled from skelly commit `aee7ab265525f55247b88d9482e7109af44eaf42`,
 retaining the assets-specific signature parts, budgets, idle stance and additional body plans. The viewer,
 CLI, tests and docs come from that commit. Ragdoll physics remains game-owned, not part of this pipeline.
-Jsonnet sources compile into `.build/` on every build. Like the rest of `tools/`, mobgen is EUPL-1.2 (`../LICENSE`).
+Package Jsonnet sources compile into git-ignored `.json` twins beside their sources before builds, tests and typechecks (where those scripts exist). Test fixtures are compiled by their tests, not by this step. Like the rest of `tools/`, mobgen is EUPL-1.2 (`../LICENSE`).
 
 ## Mobs
 
@@ -46,5 +46,5 @@ A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`
 - `../models/*.libsonnet`: model sources, listed in `models/index.libsonnet`; `models/export.json` names the
   rows `build.mjs` installs by default.
 - `packages/thing-authoring-tool/items.jsonnet` and `exports/deadvox.jsonnet`: the catalogue and recipe made from those
-  sources. Their Jsonnet compiles into `.build/` (ignored) on every build.
+  sources. Their Jsonnet compiles into ignored twins beside the sources on every build.
 - `.gdignore` keeps Godot from scanning this folder.
