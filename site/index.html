@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>skelly-assets</title>
+  <meta name="description" content="Procedurally built voxel game models: creatures, worn gear, guns and items. CC BY-NC-SA 4.0.">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="top">
+    <div class="title">
+      <h1>skelly-assets</h1>
+      <p>Voxel game models built from source: creatures, worn gear, guns and everyday items.
+        Pick one to turn it around, play its clips and download it.</p>
+    </div>
+    <a class="repo" href="https://github.com/roobie/skelly-assets">Source on GitHub</a>
+  </header>
+
+  <nav class="controls" aria-label="Filter models">
+    <input id="search" type="search" placeholder="Search models" aria-label="Search models" autocomplete="off">
+    <div id="shelves" class="chips" role="group" aria-label="Category"></div>
+    <span id="count" class="count" aria-live="polite"></span>
+  </nav>
+
+  <main id="grid" class="grid"></main>
+
+  <dialog id="viewer" aria-labelledby="v-name">
+    <div class="viewer">
+      <div class="stage">
+        <canvas id="v-canvas"></canvas>
+        <div id="v-clips" class="clips" role="group" aria-label="Clip"></div>
+        <p class="hint">Drag to turn, scroll to zoom</p>
+      </div>
+      <aside class="info">
+        <button id="v-close" class="close" aria-label="Close">×</button>
+        <p id="v-category" class="eyebrow"></p>
+        <h2 id="v-name"></h2>
+        <code id="v-id"></code>
+        <dl id="v-facts" class="facts"></dl>
+        <h3>Materials</h3>
+        <ul id="v-materials" class="materials"></ul>
+        <div class="actions">
+          <a id="v-download" class="button" download>Download .glb</a>
+          <button id="v-prev" class="button ghost" aria-label="Previous model">←</button>
+          <button id="v-next" class="button ghost" aria-label="Next model">→</button>
+        </div>
+      </aside>
+    </div>
+  </dialog>
+
+  <footer class="foot">
+    <p>Models and built output © Björn Roberg, licensed
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>:
+      free for non-commercial use with attribution, adaptations under the same licence.
+      For commercial use, contact the author. The build tools and this page are
+      <a href="https://github.com/roobie/skelly-assets/blob/main/LICENSES/EUPL-1.2.txt">EUPL-1.2</a>.</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
