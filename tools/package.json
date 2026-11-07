@@ -11,7 +11,8 @@
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
-    "packages/thing-authoring-tool"
+    "packages/thing-authoring-tool",
+    "packages/tool-ui"
   ],
   "scripts": {
     "build": "node build.mjs"
