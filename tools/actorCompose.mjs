@@ -1,5 +1,24 @@
 // Assets-side twin of the generator-free actor clip reader.
-import { quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
+import { applyPoint, quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
+import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
+
+/** Simulation ground geometry comes only from the serialized body, never the GLB. */
+export function groundFit(body, pose, boneIds) {
+  const transforms = boneTransforms(body.bones, pose);
+  const half = body.voxelSize / 2;
+  const byBone = new Map();
+  const bones = new Map(body.bones.map((bone) => [bone.id, bone]));
+  for (const id of boneIds) {
+    const transform = transforms.get(id);
+    const centers = bones.get(id)?.hull;
+    if (!(transform && centers)) continue;
+    const verticalHalfExtent = half * (Math.abs(transform.r[3]) + Math.abs(transform.r[4]) + Math.abs(transform.r[5]));
+    let lowest = Infinity;
+    for (const center of centers) lowest = Math.min(lowest, applyPoint(transform, center)[1] - verticalHalfExtent);
+    byBone.set(id, lowest);
+  }
+  return { lowest: Math.min(...byBone.values()), byBone };
+}
 
 export const decodeFrame = (frame) => ({
   root: [...frame.root],
