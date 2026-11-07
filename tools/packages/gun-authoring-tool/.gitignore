@@ -1,3 +1,5 @@
+node_modules/
+dist/
 /cartridges/12-gauge-00-buck.json
 /cartridges/308-winchester.json
 /cartridges/357-magnum.json
