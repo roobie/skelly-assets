@@ -127,7 +127,7 @@ export const crawlPose = (realized: Realized): Pose => {
   return pose;
 };
 
-const GROUND_CONTACT_BONES = [
+export const GROUND_CONTACT_BONES = [
   'pelvis',
   'spine',
   'chest',
