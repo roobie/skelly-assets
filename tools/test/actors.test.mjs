@@ -74,6 +74,43 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
   assert(sawBoundary);
 });
 
+test('the emitted hull reproduces the generator ground fit after a JSON round trip', async () => {
+  const { groundFit } = await import('../actorCompose.mjs');
+  const { hullCentersByBone, posedVoxelSurfaceBounds, posedVoxelSurfaceBoundsForBones } = await import('../packages/mobgen/src/core/voxelBounds.ts');
+  const { rotX, rotZ, mulMM } = await import('../packages/mobgen/src/core/math.ts');
+  const voxels = cellFixture();
+  const bones = [
+    { id: 'root', parent: null, head: [0, 0, 0], tail: [0, 1, 0] },
+    { id: 'chest', parent: 'root', head: [0, 1, 0], tail: [0, 2, 0] },
+    { id: 'empty', parent: 'chest', head: [0, 2, 0], tail: [0, 3, 0] },
+  ];
+  const realized = { body: { bones }, voxels };
+  const hull = hullCentersByBone(realized);
+  const body = JSON.parse(JSON.stringify({ voxelSize: voxels.size, bones: bones.map((b) => ({ ...b, hull: hull.get(b.id) })) }));
+  assert(hull.size > 0);
+  for (const rotations of [{}, { root: rotZ(29), chest: mulMM(rotX(47), rotZ(-31)) }]) {
+    const pose = { root: [0.3, -0.7, 0.2], rotations };
+    const expected = posedVoxelSurfaceBounds(realized, pose);
+    assert.deepEqual(groundFit(body, pose, bones.map((b) => b.id)), expected);
+    assert.deepEqual(groundFit(body, pose, ['chest']).byBone, posedVoxelSurfaceBoundsForBones(realized, pose, ['chest']));
+    // Independent all-cell sweep protects the projected half-height, not just the mapping.
+    const { boneTransforms } = await import('../packages/mobgen/src/core/pose.ts');
+    const { applyPoint } = await import('../packages/mobgen/src/core/math.ts');
+    const transforms = boneTransforms(bones, pose);
+    let lowest = Infinity;
+    for (let cell = 0; cell < voxels.owner.length; cell++) {
+      if (!voxels.owner[cell]) continue;
+      const center = worldPosition(voxels, cell % 3, Math.floor(cell / 3), 0);
+      const transform = transforms.get(bones[voxels.owner[cell] - 1].id);
+      for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) {
+        const corner = center.map((v, a) => v + [x, y, z][a] * voxels.size / 2);
+        lowest = Math.min(lowest, applyPoint(transform, corner)[1]);
+      }
+    }
+    assert(Math.abs(expected.lowest - lowest) < 1e-12);
+  }
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],
