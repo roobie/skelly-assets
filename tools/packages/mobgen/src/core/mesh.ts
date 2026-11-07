@@ -15,6 +15,8 @@ export interface BoneMesh {
    * empty space. Dismemberment's gore effect uses this: a face whose neighbour bone is severed, on a bone
    * that isn't, is a fresh cut and gets tinted (see packages/mobgen/src/mob/crowd.ts's fragment shader patch). */
   readonly neighbourBone: Int32Array;
+  /** Present only for per-cell meshing; each quad belongs to one grid cell. */
+  readonly cellIndex?: Uint32Array;
   readonly indices: Uint32Array;
   readonly triangles: number;
 }
@@ -32,10 +34,11 @@ interface Builder {
   normals: number[];
   colors: number[];
   neighbourBone: number[];
+  cellIndex: number[];
   indices: number[];
 }
 
-const newBuilder = (): Builder => ({ positions: [], normals: [], colors: [], neighbourBone: [], indices: [] });
+const newBuilder = (): Builder => ({ positions: [], normals: [], colors: [], neighbourBone: [], cellIndex: [], indices: [] });
 
 interface Quad {
   readonly corners: readonly [Point, Point, Point, Point];
@@ -45,6 +48,7 @@ interface Quad {
   readonly color: number;
   /** -1 for a face exposed to empty space — see BoneMesh.neighbourBone. */
   readonly neighbourBone: number;
+  readonly cellIndex: number;
 }
 
 const emitQuad = (b: Builder, quad: Quad): void => {
@@ -54,6 +58,7 @@ const emitQuad = (b: Builder, quad: Quad): void => {
     b.normals.push(quad.normal[0], quad.normal[1], quad.normal[2]);
     b.colors.push(quad.color);
     b.neighbourBone.push(quad.neighbourBone);
+    b.cellIndex.push(quad.cellIndex);
   }
   const tris = quad.reversed ? [0, 2, 1, 0, 3, 2] : [0, 1, 2, 0, 2, 3];
   for (const t of tris) {
@@ -115,7 +120,7 @@ const markVisited = (visited: Uint8Array, dimU: number, rect: Rect): void => {
 /** Greedy rectangle merge over a 2D mask of encoded merge keys (0 = not exposed; see encodeMaskValue) —
  * `emit` gets the raw key back, un-decremented, so a caller packing more than just colour into it (the
  * neighbour bone, so a cut's edge never merges across differently-owned neighbours) can decode it itself. */
-const greedyMerge = (dimU: number, dimV: number, mask: Int32Array, emit: (rect: Rect, value: number) => void): void => {
+const greedyMerge = (dimU: number, dimV: number, mask: Int32Array, perCell: boolean, emit: (rect: Rect, value: number) => void): void => {
   const g: Mask2D = { mask, visited: new Uint8Array(dimU * dimV), dimU, dimV };
   for (let v = 0; v < dimV; v++) {
     for (let u = 0; u < dimU; ) {
@@ -125,8 +130,10 @@ const greedyMerge = (dimU: number, dimV: number, mask: Int32Array, emit: (rect: 
         continue;
       }
       const value = mask[idx]!;
-      const su = runWidth(g, { u, v }, value);
-      const sv = runHeight(g, { u, v, su }, value);
+      // A cell's grid index is unique in this slice: including it in the merge
+      // key is equivalent to never extending the rectangle past that cell.
+      const su = perCell ? 1 : runWidth(g, { u, v }, value);
+      const sv = perCell ? 1 : runHeight(g, { u, v, su }, value);
       const rect: Rect = { u0: u, v0: v, su, sv };
       markVisited(g.visited, dimU, rect);
       emit(rect, value);
@@ -219,6 +226,7 @@ interface AxisPass {
   readonly bounds: Bounds;
   readonly positive: boolean;
   readonly neighbourSlots: number;
+  readonly perCell: boolean;
 }
 
 /** Exposure mask for one X-slice: encodeMaskValue(colour, neighbourSlot) where this bone owns the cell and
@@ -251,7 +259,7 @@ const meshX = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
   const dimV = bounds.kMax - bounds.kMin + 1;
   for (let i = bounds.iMin; i <= bounds.iMax; i++) {
     const mask = maskX(voxels, pass, i, dimU);
-    greedyMerge(dimU, dimV, mask, (rect, value) => {
+    greedyMerge(dimU, dimV, mask, pass.perCell, (rect, value) => {
       const j0 = rect.u0 + bounds.jMin;
       const k0 = rect.v0 + bounds.kMin;
       const x = edgeX(voxels, positive ? i + 1 : i);
@@ -263,7 +271,8 @@ const meshX = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [positive ? 1 : -1, 0, 0], reversed: !positive, color, neighbourBone });
+      emitQuad(b, { corners, normal: [positive ? 1 : -1, 0, 0], reversed: !positive, color, neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i, j0, k0) });
     });
   }
 };
@@ -297,7 +306,7 @@ const meshY = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
   const dimV = bounds.iMax - bounds.iMin + 1;
   for (let j = bounds.jMin; j <= bounds.jMax; j++) {
     const mask = maskY(voxels, pass, j, dimU);
-    greedyMerge(dimU, dimV, mask, (rect, value) => {
+    greedyMerge(dimU, dimV, mask, pass.perCell, (rect, value) => {
       const k0 = rect.u0 + bounds.kMin;
       const i0 = rect.v0 + bounds.iMin;
       const y = edgeY(voxels, positive ? j + 1 : j);
@@ -309,7 +318,8 @@ const meshY = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [0, positive ? 1 : -1, 0], reversed: !positive, color, neighbourBone });
+      emitQuad(b, { corners, normal: [0, positive ? 1 : -1, 0], reversed: !positive, color, neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i0, j, k0) });
     });
   }
 };
@@ -343,7 +353,7 @@ const meshZ = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
   const dimV = bounds.jMax - bounds.jMin + 1;
   for (let k = bounds.kMin; k <= bounds.kMax; k++) {
     const mask = maskZ(voxels, pass, k, dimU);
-    greedyMerge(dimU, dimV, mask, (rect, value) => {
+    greedyMerge(dimU, dimV, mask, pass.perCell, (rect, value) => {
       const i0 = rect.u0 + bounds.iMin;
       const j0 = rect.v0 + bounds.jMin;
       const z = edgeZ(voxels, positive ? k + 1 : k);
@@ -355,15 +365,16 @@ const meshZ = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [0, 0, positive ? 1 : -1], reversed: !positive, color, neighbourBone });
+      emitQuad(b, { corners, normal: [0, 0, positive ? 1 : -1], reversed: !positive, color, neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i0, j0, k) });
     });
   }
 };
 
-const meshOneBone = (voxels: Voxels, boneIndex: number, bounds: Bounds, neighbourSlots: number): BoneMesh => {
+const meshOneBone = (voxels: Voxels, boneIndex: number, bounds: Bounds, neighbourSlots: number, perCell: boolean): BoneMesh => {
   const b = newBuilder();
   for (const positive of [true, false]) {
-    const pass: AxisPass = { boneIndex, bounds, positive, neighbourSlots };
+    const pass: AxisPass = { boneIndex, bounds, positive, neighbourSlots, perCell };
     meshX(voxels, pass, b);
     meshY(voxels, pass, b);
     meshZ(voxels, pass, b);
@@ -373,20 +384,21 @@ const meshOneBone = (voxels: Voxels, boneIndex: number, bounds: Bounds, neighbou
     normals: new Float32Array(b.normals),
     colors: new Uint8Array(b.colors),
     neighbourBone: new Int32Array(b.neighbourBone),
+    ...(perCell ? { cellIndex: new Uint32Array(b.cellIndex) } : {}),
     indices: new Uint32Array(b.indices),
     triangles: b.indices.length / 3,
   };
 };
 
 /** Meshes every bone that owns at least one voxel; bones with none are left out. */
-export const meshBones = (voxels: Voxels, boneCount: number): Map<number, BoneMesh> => {
+export const meshBones = (voxels: Voxels, boneCount: number, options: { readonly perCell?: boolean } = {}): Map<number, BoneMesh> => {
   const bounds = boneBounds(voxels, boneCount);
   const neighbourSlots = boneCount + 1; // 0 = empty, else ownerBoneIndex + 1 — see encodeMaskValue
   const out = new Map<number, BoneMesh>();
   for (let boneIndex = 0; boneIndex < boneCount; boneIndex++) {
     const bb = bounds[boneIndex];
     if (bb) {
-      out.set(boneIndex, meshOneBone(voxels, boneIndex, bb, neighbourSlots));
+      out.set(boneIndex, meshOneBone(voxels, boneIndex, bb, neighbourSlots, options.perCell ?? false));
     }
   }
   return out;
