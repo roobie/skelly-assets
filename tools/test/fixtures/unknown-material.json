@@ -1,0 +1,14 @@
+{
+  "recipe": [{"id":"invalid_material_fixture","kind":"item","source":"invalid_material_fixture","voxel":{"grain":0.01},"options":{"mass":"parts"}}],
+  "item": {
+    "id":"invalid_material_fixture",
+    "exportMass":"parts",
+    "parts":[{
+      "id":"body","family":"compound","massKg":1,
+      "params":{"pieces":"[{\"id\":\"surface\",\"slot\":\"surface\",\"kind\":\"box\",\"min\":[0,0,0],\"max\":[0.1,0.1,0.1]}]"},
+      "finish":{"surface":"no-such-material"},
+      "ports":[]
+    }],
+    "connections":[]
+  }
+}
