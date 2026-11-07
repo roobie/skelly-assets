@@ -24,7 +24,13 @@ const UnitVectorSchema = pipe(
   ModelPointSchema,
   check((point) => Math.abs(Math.hypot(...point) - 1) <= 1e-6, 'must be a unit vector'),
 );
-const Id = pipe(string(), regex(/^[a-z0-9_]+$/, 'must be lowercase letters, digits and _'));
+const ID_PATTERN = /^[a-z0-9_]+$/;
+const CALIBRE_ID_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
+export const Id = pipe(string(), regex(ID_PATTERN, 'must be lowercase letters, digits and _'));
+export const Name = pipe(string(), nonEmpty('must not be empty'));
+export const CalibreId = pipe(string(), regex(CALIBRE_ID_PATTERN, 'must be a cartridge-data id'));
+
+export { firearmModelSchema, type FirearmPrimitives } from './firearmModelSchema.ts';
 
 export const ModelBoxSchema = pipe(
   strictObject({ min: ModelPointSchema, max: ModelPointSchema }),
