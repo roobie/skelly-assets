@@ -13,6 +13,7 @@
     "packages/mobgen",
     "packages/thing-authoring-tool",
     "packages/tool-ui",
+    "packages/gun-authoring-tool",
     "packages/vehicle-authoring-tool"
   ],
   "scripts": {
@@ -20,5 +21,8 @@
   },
   "dependencies": {
     "three": "^0.186.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14"
   }
 }
