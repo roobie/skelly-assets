@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "workspaces": [
-    "packages/engine",
+    "packages/construct",
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
