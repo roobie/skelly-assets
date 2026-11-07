@@ -44,7 +44,7 @@ const includeOwnedVoxel = (
   voxelCentersByBone.set(bone, centers);
   const bounds = limits.get(bone);
   if (!bounds) {
-    limits.set(bone, { min: center, max: [...center] });
+    limits.set(bone, { min: [...center], max: [...center] });
     return;
   }
   for (let axis = 0; axis < 3; axis++) {

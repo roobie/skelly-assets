@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node ../../sources.mjs",
     "build": "tsc && vite build",
+    "pretypecheck": "node ../../sources.mjs",
     "typecheck": "tsc && tsc -p tsconfig.core.json",
+    "pretest": "node ../../sources.mjs",
     "test": "vitest run",
     "test:sweeps": "MOBGEN_SWEEPS=1 vitest run",
     "generate": "node src/cli/generate.ts",
