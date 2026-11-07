@@ -16,7 +16,7 @@ const glbJson = (bytes) => {
 
 test('every material a recipe resolves is defined', () => {
   const ids = JSON.parse(readFileSync(new URL('../../models/export.json', import.meta.url))).ids;
-  const recipe = loadThingRecipe();
+  const recipe = loadThingRecipe(JSON.parse(readFileSync(new URL('../packages/thing-authoring-tool/exports/deadvox.json', import.meta.url))));
   assert.ok(ids.length > 0);
   assert.deepEqual(MATERIALS, compiled);
   for (const id of ids) {
