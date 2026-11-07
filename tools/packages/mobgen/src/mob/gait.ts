@@ -501,6 +501,7 @@ const STEP_REACH_FRAC = 0.85;
  * params/seed and the current speed/left-leg geometry. Grouped since they always travel together and
  * individually would put both functions over useMaxParams. */
 export interface GaitBasis {
+  readonly planPeriodSteps?: number | undefined;
   readonly params: HumanoidParams;
   readonly geomL: LegGeometry;
   readonly speed: number;
@@ -511,6 +512,14 @@ export interface GaitBasis {
   readonly cache?: GaitCache | undefined;
 }
 
+const planIndex = (index: number, period: number | undefined): number => {
+  if (period === undefined) return index;
+  if (!Number.isInteger(period) || period <= 0 || period % 2 !== 0) {
+    throw new Error('planPeriodSteps must be a positive even integer');
+  }
+  return ((index % period) + period) % period;
+};
+
 /** This step's own length in metres (half the base full-cycle stride, times this step's jittered/style
  * multiplier, reach-capped — see STEP_REACH_FRAC) — shared by advanceClock and legAndFootRotations so both
  * agree on how far the body travels during step k. Uses the left leg as a shared reference (matches
@@ -519,7 +528,7 @@ export const stepLengthMeters = (basis: GaitBasis, stepIndex: number): number =>
   const { params, geomL, speed, seed, cache } = basis;
   const raw =
     (strideLength(params, geomL, speed, cache) / 2) *
-    stepPlanFor(seed, stepIndex, params, cache && stepPlansOf(cache, seed)).lengthMul;
+    stepPlanFor(seed, planIndex(stepIndex, basis.planPeriodSteps), params, cache && stepPlansOf(cache, seed)).lengthMul;
   return Math.min(raw, 2 * STEP_REACH_FRAC * geomL.legLen);
 };
 
@@ -571,6 +580,7 @@ const sagittalTarget = (
 };
 
 interface GaitContext {
+  readonly planPeriodSteps: number | undefined;
   readonly bones: ReadonlyMap<string, Bone>;
   readonly extents: ReadonlyMap<string, Extent>;
   readonly params: HumanoidParams;
@@ -705,8 +715,8 @@ const legAndFootRotations = (ctx: GaitContext): LegResult => {
 
   const legFor = (side: Side): LegBones => (side === 'L' ? legL : legR);
   const limpOf = (side: Side): number => (side === 'R' ? 1 - clamp(params.limp, 0, 1) : 1);
-  const plan = (i: number): StepPlan => stepPlanFor(seed, i, params, stepPlansOf(cache, seed));
-  const basis: GaitBasis = { params, geomL: legL, speed, seed, cache };
+  const plan = (i: number): StepPlan => stepPlanFor(seed, planIndex(i, ctx.planPeriodSteps), params, stepPlansOf(cache, seed));
+  const basis: GaitBasis = { params, geomL: legL, speed, seed, cache, planPeriodSteps: ctx.planPeriodSteps };
   const lenAt = (i: number): number => stepLengthMeters(basis, i);
   const geomFor = (side: Side, rollMul: number): FootGeometry => {
     const leg = legFor(side);
@@ -1013,6 +1023,8 @@ export const groundOffset = (
 export const GROUND_SMOOTHING = 0.006;
 
 export interface WalkActor {
+  /** Bake-only loop closure; an actor cache belongs to one fixed period. */
+  readonly planPeriodSteps?: number;
   readonly bones: readonly Bone[];
   readonly extents: ReadonlyMap<string, Extent>;
   readonly params: HumanoidParams;
@@ -1090,7 +1102,7 @@ export const walkPose = (
   const leanStyle = blendStepScalar(
     k,
     progress,
-    (i) => stepPlanFor(seed, i, params, stepPlansOf(cache, seed)).leanExtraDeg,
+    (i) => stepPlanFor(seed, planIndex(i, actor.planPeriodSteps), params, stepPlansOf(cache, seed)).leanExtraDeg,
   );
   const leanDeg = chaseBlend(speed) * clamp(params.hunch / 25, 0, 1) * 8 + leanStyle;
   const pelvisRollDeg = params.pelvisSway * Math.sin(TAU * p * 2) + leanDeg;
@@ -1112,6 +1124,7 @@ export const walkPose = (
   // existed — see legAndFootRotations' own comment on why that composition is unaffected by it.
   const pelvisR = mulMM(mulMM(rotX(pelvisRollDeg), rotZ(pelvisZRollDeg)), rotY(yawDeg));
   const legCtx: GaitContext = {
+    planPeriodSteps: actor.planPeriodSteps,
     bones: byId,
     extents,
     params,
