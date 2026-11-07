@@ -61,14 +61,26 @@ A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`
   roster pack id to the rows `build.mjs` installs by default, at `built/<packId>/assets/models/<id>.glb`.
 - `../models/recipes/<packId>.jsonnet`: source-backed per-pack export recipes, compiled into ignored JSON twins by
   `sources.mjs`. Source-backed discovery avoids stale generated recipes; see `recipes.mjs`, `readRecipes`.
+  A recipe file is one array of rows; each row's `kind` picks its tool. The gun tool owns `design`, `cartridge`,
+  `attachment`, `magazine` and `part` (`packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`), the
+  thing tool owns `item` (`packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`). The gun roster sits in
+  `../models/recipes/skelly.firearms.jsonnet`, which joins the mod's item rows with
+  `packages/gun-authoring-tool/exports/deadvox.jsonnet`; gun rows' `source` paths are relative to this folder.
+- `build.mjs`, `exportRecipes`, is the one recipe driver: it splits each recipe file by owning tool before any
+  loader runs, refuses a kind no tool owns and an id two tools would both export, and writes each tool's outputs
+  under `<out>/<packId>/`: gun rows as `gungen/<id>.model.json` and `assets/models/<id>.glb`, no index; item rows
+  as `things/<id>.model.json`, `things/index.json` and `assets/models/<id>.glb`. The production entry (`build.mjs`
+  with no row ids) runs the roster, then the gun tool over every recipe file into `built/`; see
+  `PRODUCTION_RECIPE_TOOLS`.
   `layout.mjs` keeps logical paths inside their owning pack; both builders, `check-built.mjs` and the showcase
   find pack paths through it. `../models/pack-formats.json` names each mob pack's clip representation, read by
   `layout.mjs`, `readPackFormats`.
 - `packages/thing-authoring-tool/items.jsonnet`: the catalogue, including retained roster content and the ported
   catalogue-only sources. `exports/deadvox.jsonnet` selects the retained roster for `build.mjs`.
-- `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: exports thing recipes into
-  `<output root>/<packId>/things/` and `<output root>/<packId>/assets/models/`. Run with Node from `tools/`.
-  This step is exercised into temporary roots; production still writes only the retained roster.
+- `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: runs the driver's thing tool
+  over the recipe files into `<output root>/<packId>/things/` and `<output root>/<packId>/assets/models/`. Run
+  with Node from `tools/`. This step is exercised into temporary roots; the production entry does not run it, so
+  no `things/` output lands in `built/`.
 - Catalogue-only ported sources have no recipe until their placement is settled. No output for them lands here.
 - `.gdignore` keeps Godot from scanning this folder.
 
