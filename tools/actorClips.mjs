@@ -1,5 +1,5 @@
 import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
-import { acidIdlePose } from './packages/mobgen/src/mob/acidPoses.ts';
+import { acidDeathPose, acidIdlePose } from './packages/mobgen/src/mob/acidPoses.ts';
 import { clamp, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
 import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, walkPose } from './packages/mobgen/src/mob/gait.ts';
@@ -39,8 +39,12 @@ export function acidClips(figure, row) {
     kind: 'jointDelta', cursor, speedWeight: false, sideScalesZ: name === 'hit', footSoleHold: false, ...metadata,
     frames: Array.from({ length: row.attack_frames }, (_, i) => ({ angles: weighted(tuning[name], weight(i / (row.attack_frames - 1))) })),
   });
+  // Canonical baked fall: absolute, endpoint-inclusive, from idle frame zero; the last frame is the settled fold.
+  const rest = acidIdlePose(figure.realized, 0);
+  const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, duration: tuning.deathDuration, frames: row.attack_frames });
   return { standing: {
     idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
+    death: { forward: death(1), backward: death(-1) },
     walk: {
       kind: 'jointDelta', cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
       frames: Array.from({ length: row.walk_frames }, (_, i) => {
