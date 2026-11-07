@@ -73,3 +73,54 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
   }
   assert(sawBoundary);
 });
+
+// Hand-authored motion, independent of generated geometry and content tuning.
+const motionFixture = (t) => ({
+  root: [t, 2 * t, -t],
+  rotations: { chest: [Math.cos(t), -Math.sin(t), 0, Math.sin(t), Math.cos(t), 0, 0, 0, 1] },
+});
+
+test('finite pose sampling stores both endpoints and holds the last frame', async () => {
+  const { poseClip } = await import('../actorClips.mjs');
+  const { sampleClip } = await import('../actorCompose.mjs');
+  const clip = poseClip(motionFixture, { loop: false, duration: 2, frames: 3 });
+  assert.equal(clip.kind, 'pose');
+  assert.equal(clip.loop, false);
+  assert.deepEqual(clip.frames.map((f) => f.root), [0, 1, 2].map((t) => motionFixture(t).root));
+  assert.strictEqual(sampleClip(clip, 2), clip.frames.at(-1));
+  assert.strictEqual(sampleClip(clip, 4), clip.frames.at(-1));
+  assert.strictEqual(sampleClip(clip, -1), clip.frames[0]);
+  assert.strictEqual(sampleClip(clip, 1), clip.frames[1]);
+  assert.deepEqual(sampleClip(clip, 1.5).root, motionFixture(1.5).root);
+});
+
+test('loop sampling returns stored frames and interpolates the last interval toward frame zero', async () => {
+  const { poseClip } = await import('../actorClips.mjs');
+  const { sampleClip } = await import('../actorCompose.mjs');
+  const clip = poseClip(motionFixture, { loop: true, period: 2, frames: 4 });
+  assert.deepEqual(clip.frames.map((f) => f.root), [0, 0.5, 1, 1.5].map((t) => motionFixture(t).root));
+  assert.strictEqual(sampleClip(clip, 1), clip.frames[0]);
+  assert.strictEqual(sampleClip(clip, -0.25), clip.frames[3]);
+  assert.strictEqual(sampleClip(clip, 0.5), clip.frames[2]);
+  assert.deepEqual(sampleClip(clip, 0.875).root, [0.75, 1.5, -0.75]);
+  const single = poseClip(motionFixture, { loop: false, duration: 2, frames: 1 });
+  assert.strictEqual(sampleClip(single, 100), single.frames[0]);
+});
+
+test('pose interpolation uses shortest-arc spherical quaternion interpolation and decoding preserves root translation', async () => {
+  const { sampleClip, decodeFrame } = await import('../actorCompose.mjs');
+  const { slerpQuat, quatToMat3 } = await import('../packages/mobgen/src/core/math.ts');
+  const a = [0, 0, 0, 1];
+  const b = [0, 0, -Math.sin(1.2), -Math.cos(1.2)];
+  const clip = { kind: 'pose', loop: false, duration: 1, frames: [
+    { root: [0, 0, 0], rotations: { chest: a } },
+    { root: [2, 4, -2], rotations: { chest: b } },
+  ] };
+  const sample = sampleClip(clip, 0.3);
+  assert.deepEqual(sample.rotations.chest, slerpQuat(a, b, 0.3));
+  assert.deepEqual(decodeFrame(sample), { root: sample.root, rotations: { chest: quatToMat3(sample.rotations.chest) } });
+  const { boneTransforms } = await import('../packages/mobgen/src/core/pose.ts');
+  const bones = [{ id: 'chest', parent: null, head: [0, 0, 0], tail: [0, 1, 0] }];
+  const posed = boneTransforms(bones, decodeFrame(sample)).get('chest');
+  assert.deepEqual(posed.t, sample.root);
+});
