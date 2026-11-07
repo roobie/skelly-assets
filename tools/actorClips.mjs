@@ -61,6 +61,10 @@ export function acidClips(figure, row) {
   } };
 }
 
+export function fusedClips(figure) {
+  return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
+}
+
 /** Both locomotion sets use the same figure, including injured crawling on a standing rig. */
 export function humanoidPoseClips(figure, row) {
   if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0)) throw new RangeError('walkCycles must be a positive integer');
