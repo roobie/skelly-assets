@@ -50,17 +50,20 @@ Package Jsonnet sources compile into git-ignored `.json` twins beside their sour
 ## Mobs
 
 `tools/build_mobs.sh [--out dir] [mobId ...]` runs `mobs.mjs`, which builds a GLB and a clips JSON per row of
-`../models/mobs.json` (template, seed, lod divisor, walk and attack frames, output names) into `built/`.
+`../models/mobs.json` (template, seed, lod divisor, walk and attack frames, output names) into `built/<pack>/`,
+the row's `pack`.
 A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and
 `exportMob`. `sources.mjs` is the Jsonnet compile step shared with `build.mjs`.
 
 ## Layout
 
-- `../models/*.libsonnet`: model sources, listed in `models/index.libsonnet`; `models/export.json` names the
-  rows `build.mjs` installs by default.
+- `../models/*.libsonnet`: model sources, listed in `models/index.libsonnet`; `models/export.json` maps each
+  roster pack id to the rows `build.mjs` installs by default, at `built/<packId>/assets/models/<id>.glb`.
 - `../models/recipes/<packId>.jsonnet`: source-backed per-pack export recipes, compiled into ignored JSON twins by
   `sources.mjs`. Source-backed discovery avoids stale generated recipes; see `recipes.mjs`, `readRecipes`.
-  `layout.mjs` keeps logical paths inside their owning pack.
+  `layout.mjs` keeps logical paths inside their owning pack; both builders, `check-built.mjs` and the showcase
+  find pack paths through it. `../models/pack-formats.json` names each mob pack's clip representation, read by
+  `layout.mjs`, `readPackFormats`.
 - `packages/thing-authoring-tool/items.jsonnet`: the catalogue, including retained roster content and the ported
   catalogue-only sources. `exports/deadvox.jsonnet` selects the retained roster for `build.mjs`.
 - `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: exports thing recipes into
