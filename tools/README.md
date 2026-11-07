@@ -8,8 +8,11 @@ sha256-checked) into `jsonnet/bin/`, ignored by git.
 
 ## Origin
 
+`packages/construct` is copied with tests from skelly commit
+`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2).
+
 Copied into arpg1 from the owner's skelly repo at commit 56b9b69a6 (EUPL-1.2, same owner): `tools/model-look.mjs` (as
-`build.mjs`), `tools/jsonnet`, and the packages `engine`, `thing-core`, `thing-export` and `thing-authoring-tool`
+`build.mjs`), `tools/jsonnet`, and the packages `thing-core`, `thing-export` and `thing-authoring-tool`
 (`src/catalogue.ts`, `exports.ts`, `skin.ts`, the `compound` family, `compound.libsonnet`, `worn-fit.libsonnet` and the
 bust, arm and leg measures). Trimmed to what these models need: no viewer, renders, reference checks, catalogue batches
 or other families. Split out of arpg1 into this repo with its history; this is the source of truth, and nothing syncs with skelly. The `@skelly/` package names are kept
