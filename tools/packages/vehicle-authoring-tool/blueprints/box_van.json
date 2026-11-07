@@ -1,0 +1,84 @@
+{
+  "fittings": [
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "box_floor",
+      "part": "box_van_floor",
+      "supportedBy": []
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "box_front",
+      "part": "box_van_front",
+      "supportedBy": [
+        "box_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "box_roof",
+      "part": "box_van_roof",
+      "supportedBy": [
+        "box_front",
+        "box_side_near",
+        "box_side_far"
+      ]
+    },
+    {
+      "at": [
+        -0.9,
+        1,
+        0
+      ],
+      "cargo": [
+        42,
+        20,
+        20
+      ],
+      "id": "box_cargo",
+      "part": "cargo_space",
+      "supportedBy": [
+        "box_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "box_side_near",
+      "part": "box_van_side",
+      "supportedBy": [
+        "box_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "box_side_far",
+      "mirror": true,
+      "part": "box_van_side",
+      "supportedBy": [
+        "box_floor"
+      ]
+    }
+  ],
+  "id": "box_van",
+  "name": "Box van"
+}
