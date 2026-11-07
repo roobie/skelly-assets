@@ -6,6 +6,7 @@ import {
   minLength,
   nonEmpty,
   number,
+  nullable,
   optional,
   parse,
   picklist,
@@ -39,7 +40,7 @@ const Piece = variant('kind', [
     axis,
     origin: optional(point3),
     profile: pipe(array(point2), minLength(3)),
-    sides: optional(number()),
+    sides: optional(nullable(number())),
   }),
 ]);
 const Pieces = pipe(
@@ -54,7 +55,7 @@ const Pieces = pipe(
  * Convex pieces welded into one part, each with its own slot: a pressing or casting that no single
  * primitive describes. Each piece keeps its own collision box, so the part's collision follows its shape.
  */
-export const compound = (params: Readonly<Record<string, string>>): Solid[] =>
+export const compound = (params: Readonly<Record<string, string>>, defaultSides?: number): Solid[] =>
   parse(strictObject({ pieces: Pieces }), params).pieces.map((piece): Solid => {
     if (piece.kind === 'box') {
       if (!piece.min.every((low, i) => low < piece.max[i]!)) {
@@ -87,13 +88,14 @@ export const compound = (params: Readonly<Record<string, string>>): Solid[] =>
     if (piece.profile.some(([, radius]) => radius < 0)) {
       throw new Error(`Compound turned piece ${piece.id} needs nonnegative radii`);
     }
+    const sides = piece.sides === undefined ? defaultSides : piece.sides;
     return {
       id: piece.id,
       kind: 'revolved',
       axis: piece.axis,
       profile: piece.profile,
       ...(piece.origin ? { origin: piece.origin } : {}),
-      ...(piece.sides === undefined ? {} : { sides: piece.sides }),
+      ...(sides == null ? {} : { sides }),
       slot: piece.slot,
     };
   });

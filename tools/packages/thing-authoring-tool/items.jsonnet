@@ -4,6 +4,7 @@ local atom(id, family, massKg, dimensions, finish, exportMass) = { id: id, expor
 {
   units: { metresPerUnit: 1, grid: 0.001, bevel: 0 },
   facets: 48,
+  turnedSides: 8,
   defaultMaterial: 'paint-charcoal',
   items: (import 'catalogue/index.libsonnet') + (import 'models/index.libsonnet') + (import 'packages.libsonnet') + (import 'cans.libsonnet').items + (import 'materials.libsonnet') + (import 'food-medical.libsonnet') + (import 'lights.libsonnet') + (import 'shamblerParts.libsonnet') + (import 'vehicle-parts.libsonnet') + (import 'clothing-bags.libsonnet') + (import 'equipment.libsonnet') + (import 'jacks.libsonnet') +(import 'handhelds.libsonnet') + (import 'hand-tools.libsonnet') + (import 'avatar.libsonnet') + (import 'head-gear.libsonnet') + (import 'clothing-worn.libsonnet') + (import 'worn-carry.libsonnet') + [
     atom('electrical_tape', 'ring', 0.030, { outerRadius: 0.04, innerRadius: 0.012, coreRadius: 0.016, height: 0.021 }, { body: 'paint-terracotta', core: 'paperboard-tan' }, exportMass='parts'),
