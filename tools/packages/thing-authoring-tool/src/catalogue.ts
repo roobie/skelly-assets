@@ -28,7 +28,30 @@ import {
   string,
 } from 'valibot';
 import content from '../items.json' with { type: 'json' };
+import { avatarArm, avatarLeg } from './families/avatarLimbs.ts';
+import { bearTrap } from './families/bearTrap.ts';
+import { block } from './families/block.ts';
+import { head, limb, torso } from './families/body.ts';
+import { bust } from './families/bust.ts';
+import { bag, boots, cap } from './families/carried.ts';
+import { coil } from './families/coil.ts';
 import { compound } from './families/compound.ts';
+import { blowtorch, headlamp, pliers, portableRadio, repairKit, webbingSling } from './families/equipment.ts';
+import { drinkCup, foodPortion, stemmedFruit, woundRoll } from './families/food-medical.ts';
+import { fuse } from './families/fuse.ts';
+import { foldedGarment } from './families/garment.ts';
+import { grenade } from './families/grenade.ts';
+import { compass, keycard, key as keyFamily, lighter, matchbox } from './families/handheld.ts';
+import { handOpener } from './families/handOpener.ts';
+import { bottleJack, engineHoist, scissorJack } from './families/jacks.ts';
+import { arm, base, chimney, reservoir, shade } from './families/lamp.ts';
+import { candle, flashlight, torch } from './families/lights.ts';
+import { cutStock, foldedSheet, turnedStock } from './families/materials.ts';
+import { bat, crowbar, hammer, knife, sledgehammer, steelPipe, wrench } from './families/melee.ts';
+import { openTin } from './families/openTin.ts';
+import { carton, vessel } from './families/package.ts';
+import { ring } from './families/ring.ts';
+import { spool } from './families/spool.ts';
 import { SkinSchema } from './skin.ts';
 
 const positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
@@ -104,7 +127,64 @@ export type ToolItem = InferOutput<typeof ItemSchema>;
 type ToolPart = ToolItem['parts'][number];
 type ToolDatum = NonNullable<ToolItem['handling']>;
 const builders = {
+  block,
+  ring,
+  spool,
+  coil,
   compound,
+  fuse,
+  crowbar,
+  hammer,
+  sledgehammer,
+  bat,
+  knife,
+  wrench,
+  steelPipe,
+  compass,
+  lighter,
+  matchbox,
+  key: keyFamily,
+  keycard,
+  cylinder: base,
+  arm,
+  shade,
+  reservoir,
+  chimney,
+  carton,
+  vessel,
+  'folded-garment': foldedGarment,
+  bag,
+  boots,
+  cap,
+  limb,
+  torso,
+  head,
+  bust,
+  avatarArm,
+  avatarLeg,
+  openTin,
+  handOpener,
+  grenade,
+  bearTrap,
+  cutStock,
+  foldedSheet,
+  turnedStock,
+  foodPortion,
+  drinkCup,
+  stemmedFruit,
+  woundRoll,
+  blowtorch,
+  headlamp,
+  pliers,
+  portableRadio,
+  repairKit,
+  webbingSling,
+  scissorJack,
+  bottleJack,
+  engineHoist,
+  torch,
+  flashlight,
+  candle,
 } satisfies Record<string, (params: Readonly<Record<string, string>>) => readonly Solid[]>;
 const buildPart = (part: ToolPart, params = part.params): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
