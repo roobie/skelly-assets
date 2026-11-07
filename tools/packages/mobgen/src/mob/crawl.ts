@@ -2,6 +2,7 @@
 // forward and leg stumps trailing. crawlGaitPose layers alternating arm reach, plant and pull onto it.
 
 import type { Realized } from '../core/generate.ts';
+import { eulerToMat3 } from './attack.ts';
 import { applyPoint, IDENTITY_M, type Mat3, mulMM, rotX, rotZ, smoothstep, transpose } from '../core/math.ts';
 import { boneTransforms, type Pose } from '../core/pose.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../core/voxelBounds.ts';
@@ -192,22 +193,32 @@ export const crawlGaitPose = (realized: Realized, phase: number, speed: number):
   return groundCrawlPose(realized, { ...base, rotations });
 };
 
+export const CRAWL_HIT_PEAK_FRACTION = 0.2;
+
+/** Base-independent recoil values for the overlay bake. */
+export const crawlHitAngles = (time: number, side = 1) => {
+  const progress = time / HIT_FLINCH.duration;
+  const intensity = !(time > 0) || time >= HIT_FLINCH.duration ? 0
+    : progress < CRAWL_HIT_PEAK_FRACTION ? smoothstep(progress / CRAWL_HIT_PEAK_FRACTION)
+      : 1 - smoothstep((progress - CRAWL_HIT_PEAK_FRACTION) / (1 - CRAWL_HIT_PEAK_FRACTION));
+  return {
+    spine: [-2 * intensity, 0, 0] as const,
+    chest: [-3 * intensity, 0, 0] as const,
+    neck: [2 * intensity, 0, 0] as const,
+    head: [6 * intensity, 0, 0] as const,
+    'upperArm.L': [0, 0, -2 * intensity * side] as const,
+    'upperArm.R': [0, 0, 2 * intensity * side] as const,
+  };
+};
+
 /** A short brace/recoil layered over the current crawl pose and re-grounded against its support bones. */
 export const crawlHitPose = (realized: Realized, base: Pose, time: number, side = 0): Pose => {
   if (!(time > 0) || time >= HIT_FLINCH.duration) {
     return base;
   }
-  const progress = time / HIT_FLINCH.duration;
-  const intensity = progress < 0.2 ? smoothstep(progress / 0.2) : 1 - smoothstep((progress - 0.2) / 0.8);
   const rotations: Record<string, Mat3> = { ...base.rotations };
-  const addRotation = (bone: string, delta: Mat3): void => {
-    rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, delta);
-  };
-  addRotation('spine', rotX(-2 * intensity));
-  addRotation('chest', rotX(-3 * intensity));
-  addRotation('neck', rotX(2 * intensity));
-  addRotation('head', rotX(6 * intensity));
-  addRotation('upperArm.L', rotZ(-2 * intensity * side));
-  addRotation('upperArm.R', rotZ(2 * intensity * side));
+  for (const [bone, angles] of Object.entries(crawlHitAngles(time, side))) {
+    rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, eulerToMat3(angles));
+  }
   return groundCrawlPose(realized, { ...base, rotations });
 };
