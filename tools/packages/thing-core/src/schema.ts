@@ -1,6 +1,9 @@
 import {
   array,
+  type BaseSchema,
+  type BaseIssue,
   check,
+  literal,
   finite,
   type InferOutput,
   maxValue,
@@ -24,7 +27,48 @@ const UnitVectorSchema = pipe(
   ModelPointSchema,
   check((point) => Math.abs(Math.hypot(...point) - 1) <= 1e-6, 'must be a unit vector'),
 );
-const Id = pipe(string(), regex(/^[a-z0-9_]+$/, 'must be lowercase letters, digits and _'));
+export const Id = pipe(string(), regex(/^[a-z0-9_]+$/, 'must be lowercase letters, digits and _'));
+export const Name = pipe(string(), nonEmpty('must not be empty'));
+
+/** Consumer primitives preserve their output types, including runtime brands. */
+export interface VehiclePrimitives {
+  readonly id: BaseSchema<string, string, BaseIssue<unknown>>;
+  readonly name: BaseSchema<string, string, BaseIssue<unknown>>;
+  readonly positiveSimSeconds: BaseSchema<unknown, number, BaseIssue<unknown>>;
+  readonly qualityLevel: BaseSchema<unknown, number, BaseIssue<unknown>>;
+  readonly cells: BaseSchema<unknown, number, BaseIssue<unknown>>;
+}
+
+export const vehicleServiceFields = <const P extends VehiclePrimitives>(primitives: P) => {
+  const id: P['id'] = primitives.id;
+  const duration: P['positiveSimSeconds'] = primitives.positiveSimSeconds;
+  const quality: P['qualityLevel'] = primitives.qualityLevel;
+  return { mount: id, durationSimSeconds: duration, qualities: record(id, quality) };
+};
+
+export const vehicleBlueprintSchema = <const P extends VehiclePrimitives>(primitives: P) => {
+  const id: P['id'] = primitives.id;
+  const name: P['name'] = primitives.name;
+  const cells: P['cells'] = primitives.cells;
+  const fitting = strictObject({
+    id,
+    part: id,
+    at: ModelPointSchema,
+    mirror: optional(literal(true)),
+    supportedBy: array(id),
+    cargo: optional(tuple([cells, cells, cells])),
+    service: optional(strictObject({ name, ...vehicleServiceFields(primitives) })),
+  });
+  return strictObject({
+    id,
+    name,
+    fittings: pipe(
+      array(fitting),
+      nonEmpty('needs at least one fitting'),
+      check((list) => new Set(list.map(({ id }) => id)).size === list.length, 'fitting ids must be distinct'),
+    ),
+  });
+};
 
 export const ModelBoxSchema = pipe(
   strictObject({ min: ModelPointSchema, max: ModelPointSchema }),
