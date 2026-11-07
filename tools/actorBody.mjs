@@ -70,7 +70,7 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     } : {
       attackPeak: attack.hitTime,
       attackDuration: attack.duration,
-      hitDuration: flinchClipFor(template).duration,
+      hitDuration: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
     },
   };
 }

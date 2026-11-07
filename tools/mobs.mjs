@@ -1,8 +1,7 @@
-// Exports the 3D mobs of the --mobs-3d layer: for each row of models/mobs.json a merged vertex-coloured mesh (a GLB) and the
-// mob's walk, attack and idle clips as per-bone matrix frames (JSON). Usage: node tools/mobs.mjs [--out dir] [mobId ...]
-// (tools/build_mobs.sh is the usual way in). With no ids it builds every row; the files go flat into --out, by default
-// built/. Needs node 26 or later and `npm ci` in tools. Adapted from skelly's mobgen export of the shambler
-// (see README.md beside this file); mobgen itself is the copy in packages/mobgen.
+// Usage: node tools/mobs.mjs [--out dir] [mobId ...]. With no ids it builds every models/mobs.json row.
+// exportMob is callable for fixture rows. Matrix rows retain the arpg1 facing convention; pose rows delegate
+// to actorBake.mjs without coordinate conversion so simulation geometry and render geometry share one frame.
+// Needs node 26 or later and `npm ci` in tools; tools/build_mobs.sh is the usual CLI entry.
 //
 // The mesh: every bone's greedy-meshed voxel faces in rest-world metres, facing +z (the way the avatar models face), the bone
 // index of each vertex in TEXCOORD_1.x (and the bone across each face in .y), the colour in COLOR_0 (rgb: the material colour
@@ -12,28 +11,15 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
+import { pathToFileURL } from 'node:url';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: { out: { type: 'string', default: join(repo, 'built') } },
-});
-const sheet = JSON.parse(readFileSync(join(repo, 'models/mobs.json'), 'utf8'));
-const rows = sheet.mobs.map((row) => ({ ...sheet.defaults, ...row }));
-const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
-const unknown = wanted.filter((id) => !rows.some((row) => row.id === id));
-if (unknown.length > 0) {
-  console.log(`not in models/mobs.json: ${unknown.join(' ')}`);
-  process.exit(1);
-}
-const out = resolve(values.out);
-mkdirSync(out, { recursive: true });
-
 installJsonnetSources();
 const src = (p) => `./packages/mobgen/src/${p}`;
 const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
+const { bakeActor } = await import('./actorBake.mjs');
 const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
 await import(src('mob/templates.ts')); // importing a template module registers it
 await import(src('mob/acidTemplate.ts'));
@@ -75,7 +61,8 @@ function deriveTemplate(base, row) {
   return derived;
 }
 
-function exportMob(row) {
+export function exportMob(row, out) {
+  if (row.format !== undefined && row.format !== 'matrices' && row.format !== 'pose') throw new Error(`unsupported mob format ${row.format}`);
   const { id, seed, walk_speed: WALK_SPEED, walk_frames: WALK_FRAMES, attack_frames: ATTACK_FRAMES } = row;
   const divisor = row.lod_divisor; // the LOD voxel is the template's 0.5 m block over this; 0 keeps the full detail
   const template = deriveTemplate(consumableTemplate(row.template), row);
@@ -88,6 +75,7 @@ function exportMob(row) {
   const genome = found.genome; // the LOD keeps the genome's body, so the walk is posed from the full-detail one
   if (!realized.report.ok) console.error(`warning: the realized body does not pass its own report: ${realized.report.issues.map((i) => i.message).join('; ')}`);
   const { bones } = realized.body;
+  if (row.format === 'pose') return bakeActor(row, template, { ...found, realized }, out);
 
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
   const feet = bones.filter((b) => /^(foot|forePaw|hindPaw|tarsus[FMH])\./.test(b.id));
@@ -275,13 +263,31 @@ function exportMob(row) {
   console.log(`  walk cycle ${cycleM.toFixed(2)} m in ${WALK_FRAMES} frames; attack ${clip.duration}s (hit ${clip.hitTime}s) in ${ATTACK_FRAMES} frames`);
 }
 
-let failed = false;
-for (const id of wanted) {
-  try {
-    exportMob(rows.find((row) => row.id === id));
-  } catch (error) {
-    console.log(`EXPORT FAILED ${id}: ${error.message}`);
-    failed = true;
+function main() {
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: { out: { type: 'string', default: join(repo, 'built') } },
+  });
+  const sheet = JSON.parse(readFileSync(join(repo, 'models/mobs.json'), 'utf8'));
+  const rows = sheet.mobs.map((row) => ({ ...sheet.defaults, ...row }));
+  const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
+  const unknown = wanted.filter((id) => !rows.some((row) => row.id === id));
+  if (unknown.length > 0) {
+    console.log(`not in models/mobs.json: ${unknown.join(' ')}`);
+    return 1;
   }
+  const out = resolve(values.out);
+  mkdirSync(out, { recursive: true });
+  let failed = false;
+  for (const id of wanted) {
+    try {
+      exportMob(rows.find((row) => row.id === id), out);
+    } catch (error) {
+      console.log(`EXPORT FAILED ${id}: ${error.message}`);
+      failed = true;
+    }
+  }
+  return failed ? 1 : 0;
 }
-process.exit(failed ? 1 : 0);
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) process.exitCode = main();

@@ -5,7 +5,7 @@ import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
 import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, walkPose } from './packages/mobgen/src/mob/gait.ts';
 import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
 import { crawlGaitPose, crawlHitAngles, CRAWL_HIT_PEAK_FRACTION } from './packages/mobgen/src/mob/crawl.ts';
-import { ARM_BONES, attackClipFor, attackOverlayFrame } from './packages/mobgen/src/mob/attack.ts';
+import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
 import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
 import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
 
@@ -105,8 +105,11 @@ export function humanoidClips(figure, template, row) {
     ...(flinch ? { peak: clip.keys[1].t } : { hitTime: clip.hitTime }),
     sideScalesZ: flinch, walkBlendBones: [...ARM_BONES],
     frames: Array.from({ length: row.attack_frames }, (_, i) => {
-      const frame = attackOverlayFrame(actor, clip, clip.duration * i / (row.attack_frames - 1));
-      return crawling ? { ...frame, dropMetres: 0 } : frame;
+      const time = clip.duration * i / (row.attack_frames - 1);
+      if (!crawling) return attackOverlayFrame(actor, clip, time);
+      // A crawling rig may have no lower legs; its live action never computes a standing pelvis drop.
+      const frame = attackRotations(actor, clip, time, { root: [0, 0, 0], rotations: {}, angles: {} });
+      return { angles: frame.clipAngles, walkBlendWeight: frame.armWalkWeight, dropMetres: 0 };
     }),
   });
   if (sets.standing) {
