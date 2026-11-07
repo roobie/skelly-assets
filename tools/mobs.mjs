@@ -37,8 +37,8 @@ const { generate, generateValid, realize, realizeLod } = await import(src('core/
 const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
 await import(src('mob/templates.ts')); // importing a template module registers it
 await import(src('mob/acidTemplate.ts'));
-await import(src('mob/amalgamTemplate.ts'));
-await import(src('mob/dogTemplate.ts'));
+await import(src('mob/fusedMassTemplate.ts'));
+await import(src('mob/quadrupedTemplate.ts'));
 await import(src('mob/insectTemplate.ts'));
 await import(src('mob/floaterTemplate.ts'));
 await import(src('mob/dragonTemplate.ts'));
@@ -50,7 +50,7 @@ const { idleBasePose } = await import(src('mob/idle.ts'));
 const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
 const { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } = await import(src('mob/floater.ts'));
 const { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } = await import(src('mob/dragon.ts'));
-const { DOG_POUNCE, dogAttackPose, dogGaitPose, dogIdlePose, dogStrideLength } = await import(src('mob/dog.ts'));
+const { DOG_POUNCE, dogAttackPose, quadrupedGaitPose: quadrupedGaitPose, dogIdlePose, quadrupedStrideLength: quadrupedStrideLength } = await import(src('mob/quadruped.ts'));
 const { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } = await import(src('mob/insect.ts'));
 
 const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2]; // skelly's viewer/scene.ts SHADE_FACTORS: the shade of a face as a brightness
@@ -155,11 +155,11 @@ function exportMob(row) {
   let walkAt;
   let clip;
   let attackAt;
-  if (template.bodyPlan === 'dog') {
+  if (template.bodyPlan === 'quadruped') {
     const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
     idle = dogIdlePose(realized, stance);
-    cycleM = dogStrideLength(realized, stance);
-    walkAt = (i) => dogGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
+    cycleM = quadrupedStrideLength(realized, stance);
+    walkAt = (i) => quadrupedGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
     clip = DOG_POUNCE;
     attackAt = (time) => dogAttackPose(realized, idle, time);
   } else if (template.bodyPlan === 'insect') {

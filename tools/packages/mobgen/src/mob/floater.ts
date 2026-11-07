@@ -276,7 +276,7 @@ registerBodyPlan('floater', {
   woundBones: [],
   budgets: heightHeadBudgets,
   limbBones: [],
-});
+} satisfies BodyPlanDef);
 
 // ---- Poses ----
 
@@ -413,11 +413,15 @@ export const floaterCastPose = (realized: Realized, p: FloaterParams, time: numb
   const idle = floaterIdleMotion(p);
   const tail = [num(a.tail?.[0], b.tail?.[0]) + (idle.tail?.[0] ?? 0), num(a.tail?.[1], b.tail?.[1]) + (idle.tail?.[1] ?? 0)] as const;
   const amp = num(a.flicker?.amp, b.flicker?.amp) + idle.flicker!.amp;
+  const core = mixVec(a.core, b.core, u);
+  const head = mixVec(a.head, b.head, u);
+  const arm = mixVec(a.arm, b.arm, u);
+  const forearm = mixVec(a.forearm, b.forearm, u);
   return floaterPose(realized, p, {
-    core: mixVec(a.core, b.core, u),
-    head: mixVec(a.head, b.head, u),
-    arm: mixVec(a.arm, b.arm, u),
-    forearm: mixVec(a.forearm, b.forearm, u),
+    ...(core === undefined ? {} : { core }),
+    ...(head === undefined ? {} : { head }),
+    ...(arm === undefined ? {} : { arm }),
+    ...(forearm === undefined ? {} : { forearm }),
     tail,
     flicker: { amp, phase: num(a.flicker?.phase, b.flicker?.phase) },
     rise: num(a.rise, b.rise),

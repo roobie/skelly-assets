@@ -8,7 +8,7 @@
     "./exports.ts": "./src/exports.ts"
   },
   "dependencies": {
-    "@skelly/engine": "*",
+    "@skelly/construct": "*",
     "@skelly/thing-core": "*",
     "@skelly/thing-export": "*",
     "valibot": "^1.5.0"
