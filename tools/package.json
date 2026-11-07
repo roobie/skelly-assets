@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "workspaces": [
-    "packages/engine",
+    "packages/construct",
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
@@ -15,5 +15,8 @@
   ],
   "scripts": {
     "build": "node build.mjs"
+  },
+  "dependencies": {
+    "three": "^0.186.0"
   }
 }
