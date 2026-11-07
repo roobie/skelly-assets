@@ -352,6 +352,62 @@ test('humanoid overlays reproduce action poses over live idle and walk bases at 
   assert(changedBySide);
 });
 
+test('acid clips preserve idle timing and compose joint deltas over live bases with limits and sole hold', async () => {
+  const { acidClips } = await import('../actorClips.mjs');
+  const { actorBody } = await import('../actorBody.mjs');
+  const { applyJointDelta, decodeFrame } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { acidTemplate } = await import('../packages/mobgen/src/mob/acidTemplate.ts');
+  const { acidIdlePose, acidWalkPose, acidStrideLength, acidAttackPose, acidWindupPose, acidHitPose } = await import('../packages/mobgen/src/mob/acidPoses.ts');
+  const { LOOK_AT_PROFILES } = await import('../packages/mobgen/src/mob/lookAtProfiles.ts');
+  const figure = templateFigure('acid', 1);
+  const row = { type: 'fixture.acid', model: 'acid', seed: 1, scale: 1, walkCycles: 1, walk_frames: 8, attack_frames: 9 };
+  const clips = JSON.parse(JSON.stringify(acidClips(figure, row))).standing;
+  const body = JSON.parse(JSON.stringify(actorBody(figure, acidTemplate, { ...row, lookAt: LOOK_AT_PROFILES.acid })));
+  const tuning = acidTemplate.animation;
+  assert.deepEqual(body.animation, { attackPeak: tuning.attackPeak, attackDuration: tuning.attackDuration, hitDuration: tuning.hitDuration, deathDuration: tuning.deathDuration });
+  assert(!('death' in clips));
+  assert.equal(clips.idle.period, tuning.idlePeriod);
+  assert.equal(clips.idle.loop, true);
+  const close = (actual, expected) => {
+    actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
+    const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) {
+      (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+    }
+  };
+  for (const [i, frame] of clips.idle.frames.entries()) close(decodeFrame(frame), acidIdlePose(figure.realized, tuning.idlePeriod * i / clips.idle.frames.length));
+  close(decodeFrame(clips.idle.frames[0]), acidIdlePose(figure.realized, tuning.idlePeriod));
+  for (const speed of [-0.2, 0, 0.4, 1.4]) for (let i = 0; i < clips.walk.frames.length; i++) {
+    const phase = 2 * Math.PI * i / clips.walk.frames.length;
+    const base = acidIdlePose(figure.realized, 0.37);
+    close(applyJointDelta(body, base, clips.walk, phase, { speed }), acidWalkPose(figure.realized, acidStrideLength(figure.realized) * phase / (2 * Math.PI), speed, 0.37));
+  }
+  const bases = [acidIdlePose(figure.realized, 0.37), acidWalkPose(figure.realized, 0.23, 0.7, 0.37)];
+  let sideVaries = false;
+  for (const base of bases) for (const name of ['attack', 'windup', 'hit']) {
+    const clip = clips[name];
+    assert.equal(clip.kind, 'jointDelta');
+    for (let i = 0; i < clip.frames.length; i++) for (const side of [-1, 1]) {
+      const cursor = (clip.duration ?? 1) * i / (clip.frames.length - 1);
+      const actual = applyJointDelta(body, base, clip, cursor, { side });
+      const expected = name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'windup' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side);
+      close(actual, expected);
+      if (name === 'hit') sideVaries ||= JSON.stringify(actual) !== JSON.stringify(applyJointDelta(body, base, clip, cursor, { side: -side }));
+    }
+  }
+  assert(sideVaries);
+  const { jointRotation, jointAngles, clampJointAngles } = await import('../packages/mobgen/src/core/joints.ts');
+  // A deliberately excessive delta must clamp, rather than relying on authored curves staying in range.
+  const bone = body.bones.find((b) => b.id === 'chest');
+  const angles = [1000, -1000, 1000];
+  const excessive = { kind: 'jointDelta', cursor: 'progress', frames: [{ angles: { chest: angles } }] };
+  const actual = applyJointDelta(body, { root: [0.3, 0, -0.2], rotations: {} }, excessive, 1);
+  close({ ...actual, root: [0, 0, 0] }, { root: [0, 0, 0], rotations: { chest: jointRotation(bone, clampJointAngles(bone, angles)) } });
+  assert.deepEqual([actual.root[0], actual.root[2]], [0.3, -0.2]);
+  assert(jointAngles(bone, actual.rotations.chest).every(Number.isFinite));
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],
