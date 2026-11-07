@@ -2,7 +2,14 @@
 // mass) read off the voxels the player sees rather than off the authored solids those voxels approximate.
 
 import type { PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { add, applyPoint, extrusionPoint, invert, type Transform, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  add,
+  applyPoint,
+  extrusionPoint,
+  invert,
+  type Transform,
+  type Vec3,
+} from '@skelly/construct/foundation/math.ts';
 import {
   clippedExtrudedPolygonPolyhedron,
   localSolidBounds,
