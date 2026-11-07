@@ -1,0 +1,61 @@
+name: gungen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/packages/gun-authoring-tool/**'
+      - 'tools/packages/construct/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/packages/thing-export/**'
+      - 'tools/packages/tool-ui/**'
+      - 'tools/package-lock.json'
+      - 'tools/testPool.ts'
+      - '.github/workflows/gungen.yml'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - 'tools/packages/gun-authoring-tool/**'
+      - 'tools/packages/construct/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/packages/thing-export/**'
+      - 'tools/packages/tool-ui/**'
+      - 'tools/package-lock.json'
+      - 'tools/testPool.ts'
+      - '.github/workflows/gungen.yml'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/packages/gun-authoring-tool
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../..
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('tools/package-lock.json') }}
+      - name: Install Playwright Chromium
+        timeout-minutes: 3
+        run: npx playwright install chromium
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run validate
+      - run: npm run check:designs
+      - run: npm run build
+      - name: Viewer browser tests (managed Chromium)
+        timeout-minutes: 2
+        run: npm run test:browser
