@@ -35,16 +35,19 @@ choices preserve authoring control. See `tools/packages/thing-authoring-tool/ite
 `tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`, and
 `tools/packages/thing-authoring-tool/src/catalogue.ts`, `buildPart`.
 
-The production entry builds the retained roster into flat paths under `built/`; see `tools/build.mjs`, `recipe`.
+The production entry builds the retained roster into its packs, `skelly.bolt-guns` and `skelly.armour`, at
+`built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `recipe`, and `tools/layout.mjs`, `readRoster`.
 Per-pack exports are exercised in temporary roots; see
 `tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `mkdtempSync` and `exportThingRecipes`. They
 emit into `built/` once the production entry runs the thing partition of the recipe files there, not before.
-Roster and mob outputs take pack paths once both builders write through `tools/layout.mjs`, `outputPath`.
-Hand-copied models sit flat under `built/` while `models/copied.json` lists them; `tools/check-built.mjs` holds
-each copy apart from the produced set, and a copy leaves when its producer emits. The rows of `models/mobs.json`
-that `tools/mobs.mjs`, `exportMob`, writes itself, the creature rows, keep the matrix representation
-(`*_clips.json`); a row whose `format` is `pose` bakes through `tools/actorBake.mjs`, `bakeActor`. The worn
-family fits the shared player body, not generated mobs.
+The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
+(`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
+`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. A row whose pack's format is `pose`
+bakes through `tools/actorBake.mjs`, `bakeActor`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and
+`skelly.bestiary`; its loader repoints from the former flat roster and mob paths to these pack paths. The flat
+files under `built/` are the hand copies `models/copied.json` lists, awaiting their producers;
+`tools/check-built.mjs` holds each copy apart from the produced set, and a copy leaves when its producer emits.
+The worn family fits the shared player body, not generated mobs.
 Open gaps:
 
 - `paper_sheet` and `folded_note` have no producer.
@@ -53,7 +56,7 @@ Open gaps:
 | Path | Contents |
 |---|---|
 | `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
-| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the hand-copy list in `copied.json` and the mob rows in `mobs.json` |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the hand-copy list in `copied.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
 
