@@ -45,29 +45,41 @@ describe('idleBasePose', () => {
     }
   });
 
-  it("plants both feet at their rest xz — the lowest point is within a few mm of 0, and legs don't move sideways", () => {
+  it('grounds flat, spread and staggered feet while shifting weight over the loaded leg', () => {
     for (const stance of ['slack', 'aggravated'] as const) {
-      const found = setup('humanoid');
-      const { body, extents } = found;
-      const actor = actorOf(found);
-      const pose = idleBasePose(actor, stance);
-      const transforms = boneTransforms(body.bones, pose);
-      let minY = Number.POSITIVE_INFINITY;
-      for (const [boneId, extent] of extents) {
-        const t = transforms.get(boneId)!;
-        for (const c of corners(extent)) {
-          minY = Math.min(minY, applyPoint(t, c)[1]);
+      for (const seed of [1, 2]) {
+        const found = setup('humanoid');
+        const { body, extents } = found;
+        const actor = { ...actorOf(found), seed };
+        const pose = idleBasePose(actor, stance);
+        const transforms = boneTransforms(body.bones, pose);
+        let minY = Number.POSITIVE_INFINITY;
+        for (const [boneId, extent] of extents) {
+          const t = transforms.get(boneId)!;
+          for (const c of corners(extent)) {
+            minY = Math.min(minY, applyPoint(t, c)[1]);
+          }
+        }
+        expect(minY).toBeGreaterThanOrEqual(-0.001);
+        expect(minY).toBeLessThan(0.02);
+
+        const stand = walkPose(actor, INITIAL_CLOCK, 0);
+        const loaded = seed % 2 === 0 ? 'L' : 'R';
+        const loadedHip = boneById(body.bones, `thigh.${loaded}`).head;
+        expect(pose.root[0] * loadedHip[0]).toBeGreaterThan(0);
+        for (const side of ['L', 'R'] as const) {
+          const footId = `foot.${side}`;
+          const restAnkle = worldOf(body.bones, stand, footId);
+          const idleAnkle = worldOf(body.bones, pose, footId);
+          const hip = boneById(body.bones, `thigh.${side}`).head;
+          expect((idleAnkle[0] - restAnkle[0]) * hip[0]).toBeGreaterThan(0);
+          expect((idleAnkle[2] - restAnkle[2]) * (side === loaded ? -1 : 1)).toBeGreaterThan(0);
+          const up = applyPoint({ r: transforms.get(footId)!.r, t: [0, 0, 0] }, [0, 1, 0]);
+          for (const [axis, expected] of [0, 1, 0].entries()) {
+            expect(up[axis]).toBeCloseTo(expected, 9);
+          }
         }
       }
-      expect(minY).toBeGreaterThanOrEqual(-0.001);
-      expect(minY).toBeLessThan(0.02);
-
-      // The idle stance's own knee bend must not have dragged the ankle off its rest X/Z.
-      const stand = walkPose(actor, INITIAL_CLOCK, 0); // the plain bind pose — same legs, no idle stance
-      const restAnkle = worldOf(body.bones, stand, 'foot.L');
-      const idleAnkle = worldOf(body.bones, pose, 'foot.L');
-      expect(idleAnkle[0]).toBeCloseTo(restAnkle[0], 3);
-      expect(idleAnkle[2]).toBeCloseTo(restAnkle[2], 3);
     }
   });
 });

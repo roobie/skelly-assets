@@ -5,7 +5,7 @@
 //
 // The shape is the SHAPE table below, authored in metres for a dragon REF_HEIGHT tall (the crown of its head) facing -Z (conventions.ts) and scaled by
 // the row's `height`; mobs.mjs turns the export to face +Z. Poses are rigid rotations about bone heads in rest-world axes, stacked down the chains
-// (pose.ts); the walk is by distance: each hind foot is planted on the moving ground and the ankle placed by dog.ts's two-link solve.
+// (pose.ts); the walk is by distance: each hind foot is planted on the moving ground and the ankle placed by quadruped.ts's two-link solve.
 
 import type { Body, Feature } from '../core/body.ts';
 import type { Realized } from '../core/generate.ts';
@@ -412,7 +412,7 @@ const matOf = (v: Vec3 | undefined, mirror: number): Mat3 =>
   v ? mulMM(rotZ(v[2] * mirror), mulMM(rotY(v[1] * mirror), rotX(v[0]))) : IDENTITY_M;
 
 /** A pose from a motion over the rest body. */
-const dragonPose = (realized: Realized, p: DragonParams, m: DragonMotion): Pose => {
+const dragonPose = (realized: Realized, _p: DragonParams, m: DragonMotion): Pose => {
   const c = m.ch;
   const rotations: Record<string, Mat3> = {};
   const nn = neckSegments(realized);
@@ -451,7 +451,7 @@ const dragonPose = (realized: Realized, p: DragonParams, m: DragonMotion): Pose 
 };
 
 /** The rest channels every clip starts from: wings folded up, arms hanging a little forward, the tail clear of the ground. */
-const restChannels = (): Record<string, number> => ({
+const restChannels = () => ({
   wingZ: DRAGON_MOTION.restWingFold,
   fanZ: DRAGON_MOTION.restFanFold,
   neckX: DRAGON_MOTION.restNeckDeg,
