@@ -11,7 +11,7 @@
   "mobs": [
     {
       "id": "shambler",
-      "template": "shambler",
+      "template": "humanoid",
       "seed": 7,
       "lod_divisor": 10,
       "glb": "shambler.glb",
@@ -75,7 +75,7 @@
     },
     {
       "id": "cutter",
-      "template": "shambler",
+      "template": "humanoid",
       "seed": 7,
       "lod_divisor": 10,
       "glb": "cutter.glb",
@@ -144,7 +144,7 @@
     },
     {
       "id": "hexcaller",
-      "template": "runner",
+      "template": "slim-humanoid",
       "seed": 7,
       "lod_divisor": 10,
       "budget_headroom": 1.4,
@@ -210,7 +210,7 @@
     },
     {
       "id": "gorehorn",
-      "template": "brute",
+      "template": "broad-humanoid",
       "seed": 7,
       "lod_divisor": 7,
       "budget_headroom": 3.4,
@@ -277,7 +277,7 @@
     },
     {
       "id": "bogling",
-      "template": "brute",
+      "template": "broad-humanoid",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 2.6,
@@ -1084,7 +1084,7 @@
     },
     {
       "id": "spitter",
-      "template": "runner",
+      "template": "slim-humanoid",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 1.6,
@@ -1160,7 +1160,7 @@
     },
     {
       "id": "drencher",
-      "template": "brute",
+      "template": "broad-humanoid",
       "seed": 7,
       "lod_divisor": 6,
       "budget_headroom": 4.8,
@@ -1431,7 +1431,7 @@
     },
     {
       "id": "cinder_matron",
-      "template": "brute",
+      "template": "broad-humanoid",
       "seed": 7,
       "lod_divisor": 6,
       "budget_headroom": 4.0,
@@ -1990,7 +1990,7 @@
     },
     {
       "id": "gloom_warden",
-      "template": "runner",
+      "template": "slim-humanoid",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 3.0,
@@ -2635,7 +2635,7 @@
     },
     {
       "id": "mourner",
-      "template": "runner",
+      "template": "slim-humanoid",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 3.0,
