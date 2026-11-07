@@ -1,17 +1,47 @@
 # skelly-assets
 
-Voxel and Jsonnet-sourced 3D assets (mobs, avatar bust and limbs, worn armour, guns) and the pipelines that build them,
-shared between the owner's games (arpg1, and possibly skelly/deadvox and others). Split out of arpg1 with its history.
+3D game assets and the pipelines that build them: mobs with their animation clips, worn armour and clothing,
+weapons, tools and other props. Every model is generated from source: models are Jsonnet rows and mobs are
+seeded generator rows, and a build turns both into binary glTF (`.glb`).
 
-- `models/`: the sources. `*.libsonnet` model rows (listed in `models/index.libsonnet`; `models/export.json` names the
-  rows built by default) and `mobs.json`, the mob rows (mobgen template, seed, params, palette, parts).
-- `tools/`: the pipelines (`build_models.sh`, `build_mobs.sh`), see `tools/README.md`.
-- `built/`: the built GLBs and mob clips JSON, committed so a game can use them without node. Rebuild after changing a
-  source and commit the result with it.
+The built files are committed, so you can use the assets without building anything.
 
-Games consume this repo as a git submodule and load from `built/`. Engine-specific sidecar files (Godot's `*.import`)
-are ignored here; each game makes its own.
+## Layout
 
-Licence, by BR: the models and built output (`models/`, `built/`) are CC BY-NC-SA 4.0, so they are free for
-non-commercial use and commercial use needs a separate licence from the author; the pipelines (`tools/`) are EUPL-1.2.
-See `LICENSE` and `REUSE.toml`.
+| Path | Contents |
+|---|---|
+| `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
+| `models/` | The sources: Jsonnet model rows (listed in `models/index.libsonnet`) and the mob rows in `mobs.json` |
+| `tools/` | The build pipelines; see `tools/README.md` |
+
+## Using the assets
+
+Load the `.glb` files from `built/` in any engine or tool that reads glTF 2.0. To use them in a game, add this
+repository as a git submodule and load from `built/`. Engine-specific sidecar files, such as Godot's `*.import`, are
+ignored here, so each game generates its own.
+
+## Building
+
+You need Node 26 or later.
+
+```sh
+tools/build_models.sh            # every row named in models/export.json
+tools/build_models.sh <id> ...   # only some rows
+tools/build_mobs.sh              # every mob in models/mobs.json
+```
+
+The first run installs the tools' npm dependencies and downloads a pinned, checksum-verified go-jsonnet. After
+changing a source, rebuild and commit the source and its `built/` output together. More detail is in
+`tools/README.md`.
+
+## Licence
+
+The licence depends on the path; [`REUSE.toml`](REUSE.toml) states it for each one.
+
+- **Models, their sources and the built output** (`models/`, `built/`):
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You may use, share and adapt them for
+  non-commercial purposes, with attribution to Björn Roberg, and you must share adaptations under the same licence.
+  For a commercial licence, contact the author.
+- **The pipelines** (`tools/`): [EUPL-1.2](LICENSES/EUPL-1.2.txt).
+
+The full licence texts are in [`LICENSES/`](LICENSES).
