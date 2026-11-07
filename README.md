@@ -17,37 +17,46 @@ and download any of them.
 ## Layout
 
 A model either product uses has one source row, one builder and one output in this repository at
-`built/<packId>/<logical path>`. Consumers that want it bundle its pack and read the same bytes; they need not
-bundle every pack. This serves one shared asset database and pipeline for a vast library of models and rigs,
-so deadvox and arpg1 can use the same models homogeneously. Keep no hand copy beside a producer.
+`built/<packId>/<logical path>`, where `<packId>` is the id of the content pack that declares the file: a recipe
+under `models/recipes/`, a roster pack in `models/export.json` or a mob row's `pack` in `models/mobs.json`. No
+directory under `built/` is named for a product or exists because one product reads it: a pack named for its
+reader can be read by nobody else without bundling another product's name, so a model filed there is shared in
+name only. A pack groups one coherent kind of content, so the bolt guns are `skelly.bolt-guns` beside deadvox's
+`skelly.firearms`, the armour is `skelly.armour` beside `skelly.wearables`, and the creatures are
+`skelly.bestiary`: a sci-fi bolt gun and a modern carbine are different content even if both are guns, and one id
+would mislabel both. A mob's clips are baked into one representation, which every consumer composes the same way:
+a rig baked twice is one source with two outputs, which no two consumers read alike. Consumers that want a model
+bundle its pack and read the same bytes; they need not bundle every pack. This serves one shared asset database
+and pipeline for a vast library of models and rigs, so deadvox and arpg1 can use the same models homogeneously.
+Keep no hand copy beside a producer.
 
 A shared turned-piece default keeps both products' rendering consistent across the library, while per-piece
-choices preserve authoring control. See `tools/packages/thing-authoring-tool/items.jsonnet`, `turnedSides`, and
-`tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`.
+choices preserve authoring control. See `tools/packages/thing-authoring-tool/items.jsonnet`, `turnedSides`,
+`tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`, and
+`tools/packages/thing-authoring-tool/src/catalogue.ts`, `buildPart`.
 
 The production entry builds the retained roster into its packs, `skelly.bolt-guns` and `skelly.armour`, at
 `built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `recipe`, and `tools/layout.mjs`, `readRoster`.
+Per-pack exports are exercised in temporary roots; see
+`tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `mkdtempSync` and `exportThingRecipes`. They
+emit into `built/` once the production entry runs the thing partition of the recipe files there, not before.
 The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
 (`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
-`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its
-loader repoints from the former flat roster and mob paths to these pack paths. The flat files under `built/` are
-the hand copies `models/copied.json` lists, awaiting their producers; `tools/check-built.mjs` holds each copy apart
-from the produced set. Per-pack exports are exercised in temporary roots; see
-`tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `mkdtempSync` and `exportThingRecipes`.
+`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. A row whose pack's format is `pose`
+bakes through `tools/actorBake.mjs`, `bakeActor`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and
+`skelly.bestiary`; its loader repoints from the former flat roster and mob paths to these pack paths. The flat
+files under `built/` are the hand copies `models/copied.json` lists, awaiting their producers;
+`tools/check-built.mjs` holds each copy apart from the produced set, and a copy leaves when its producer emits.
 The worn family fits the shared player body, not generated mobs.
-Open gaps and their closing triggers:
+Open gaps:
 
-- Product-named placement remains allowed by the standing arpg1 placement ruling; the naming-policy decision
-  closes this gap. No general pack naming policy is established here.
 - `paper_sheet` and `folded_note` have no producer.
-- A rig shared by both products still has two clip representations, matrices and pose; the shared-rig-format
-  decision closes this only if it chooses one representation.
 - Fitting worn garments over generated mob bodies requires its own development round.
 
 | Path | Contents |
 |---|---|
 | `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
-| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, and the mob rows in `mobs.json` |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the hand-copy list in `copied.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
 
