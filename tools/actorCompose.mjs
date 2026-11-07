@@ -1,6 +1,8 @@
 // Assets-side twin of the generator-free actor clip reader.
 import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
 import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
+import { blendArmBase, eulerToMat3 } from './packages/mobgen/src/mob/attack.ts';
+import { groundOffset, GROUND_SMOOTHING } from './packages/mobgen/src/mob/gait.ts';
 
 /** Simulation ground geometry comes only from the serialized body, never the GLB. */
 export function groundFit(body, pose, boneIds) {
@@ -18,6 +20,41 @@ export function groundFit(body, pose, boneIds) {
     byBone.set(id, lowest);
   }
   return { lowest: Math.min(...byBone.values()), byBone };
+}
+
+/** Overlay angles interpolate linearly; at stored cursors no values are rebuilt. */
+export function sampleOverlay(clip, time) {
+  const u = Math.max(0, Math.min(1, time / clip.duration)) * (clip.frames.length - 1);
+  const i = Math.floor(u);
+  const w = u - i;
+  const a = clip.frames[i];
+  if (w === 0) return a;
+  const b = clip.frames[i + 1];
+  const ids = new Set([...Object.keys(a.angles), ...Object.keys(b.angles)]);
+  return {
+    angles: Object.fromEntries([...ids].map((id) => [id, [0, 1, 2].map((axis) => {
+      const x = a.angles[id]?.[axis] ?? 0;
+      return x + ((b.angles[id]?.[axis] ?? 0) - x) * w;
+    })])),
+    walkBlendWeight: a.walkBlendWeight + (b.walkBlendWeight - a.walkBlendWeight) * w,
+    dropMetres: a.dropMetres + (b.dropMetres - a.dropMetres) * w,
+  };
+}
+
+export function applyOverlay(body, base, clip, time, side, stance) {
+  const frame = sampleOverlay(clip, time);
+  const rotations = { ...base.rotations };
+  const blendBones = new Set(clip.walkBlendBones);
+  for (const [id, [x, y, z]] of Object.entries(frame.angles)) {
+    const baseR = base.rotations[id] ?? IDENTITY_M;
+    rotations[id] = mulMM(blendBones.has(id) ? blendArmBase(baseR, frame.walkBlendWeight) : baseR,
+      eulerToMat3([x, y, z * (clip.sideScalesZ ? side : 1)]));
+  }
+  const probe = { root: [base.root[0], 0, base.root[2]], rotations };
+  const offset = stance === 'crawling'
+    ? -groundFit(body, probe, body.groundContactBones).lowest
+    : groundOffset(body.bones, new Map(Object.entries(body.extents)), rotations, GROUND_SMOOTHING);
+  return { root: [base.root[0], offset - frame.dropMetres, base.root[2]], rotations };
 }
 
 const phaseFor = (seed, salt) => {

@@ -297,6 +297,61 @@ test('serialized idle oscillators reproduce the live ordered rotation product at
   }
 });
 
+test('humanoid overlays reproduce action poses over live idle and walk bases at both sides', async () => {
+  const { humanoidClips } = await import('../actorClips.mjs');
+  const { actorBody } = await import('../actorBody.mjs');
+  const { applyOverlay } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { createGaitCache, footRestExtents, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
+  const { crawlGaitPose, groundCrawlPose, crawlHitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
+  const { attackClipFor, attackPose, attackRotations } = await import('../packages/mobgen/src/mob/attack.ts');
+  const { flinchClipFor, flinchPoseWithClip } = await import('../packages/mobgen/src/mob/reactions.ts');
+  const { LOOK_AT_PROFILES } = await import('../packages/mobgen/src/mob/lookAtProfiles.ts');
+  const figure = templateFigure('humanoid', 1);
+  const template = consumableTemplate('humanoid');
+  const row = { type: 'fixture.actor', model: 'humanoid', seed: 1, scale: 1, walkCycles: 1, walk_frames: 8, walk_speed: 0.8, attack_frames: 9 };
+  const body = JSON.parse(JSON.stringify(actorBody(figure, template, { ...row, lookAt: LOOK_AT_PROFILES.humanoid })));
+  const clips = JSON.parse(JSON.stringify(humanoidClips(figure, template, row)));
+  const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache() };
+  const attack = attackClipFor(template);
+  const flinch = flinchClipFor(template);
+  const crawlAttack = attackClipFor(consumableTemplate('legless-humanoid'));
+  const close = (a, b) => {
+    a.root.forEach((x, i) => assert(Math.abs(x - b.root[i]) <= 1e-9));
+    const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    for (const id of new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])) {
+      (b.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (a.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+    }
+  };
+  let changedBySide = false;
+  for (const [stance, bases] of Object.entries({
+    standing: [idleBasePose(actor, 'slack'), walkPose(actor, { stepIndex: 1, progress: 0.4 }, 0.8)],
+    crawling: [crawlGaitPose(figure.realized, 0, 0), crawlGaitPose(figure.realized, 1.7, 0.8)],
+  })) for (const base of bases) for (const kind of ['attack', 'flinch']) {
+    const clip = clips[stance][kind];
+    assert.equal(clip.kind, 'overlay');
+    assert(clip.frames.length > 2);
+    for (let i = 0; i < clip.frames.length; i++) {
+      const time = clip.duration * i / (clip.frames.length - 1);
+      for (const side of [-1, 1]) {
+        const actual = applyOverlay(body, base, clip, time, side, stance);
+        const expected = stance === 'standing'
+          ? kind === 'attack' ? attackPose(actor, attack, time, base) : flinchPoseWithClip(actor, time, base, { clip: flinch, side })
+          : kind === 'attack' ? groundCrawlPose(figure.realized, { ...base, rotations: attackRotations(actor, crawlAttack, time, base).rotations }) : crawlHitPose(figure.realized, base, time, side);
+        close(actual, expected);
+      }
+      if (kind === 'flinch' && i > 0 && i < clip.frames.length - 1) {
+        const left = applyOverlay(body, base, clip, time, -1, stance);
+        const right = applyOverlay(body, base, clip, time, 1, stance);
+        changedBySide ||= JSON.stringify(left.rotations) !== JSON.stringify(right.rotations);
+      }
+    }
+  }
+  assert(changedBySide);
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],
