@@ -7,13 +7,17 @@
     "node": ">=26"
   },
   "workspaces": [
-    "packages/engine",
+    "packages/construct",
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
-    "packages/thing-authoring-tool"
+    "packages/thing-authoring-tool",
+    "packages/tool-ui"
   ],
   "scripts": {
     "build": "node build.mjs"
+  },
+  "dependencies": {
+    "three": "^0.186.0"
   }
 }
