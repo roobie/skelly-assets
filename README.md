@@ -36,10 +36,13 @@ choices preserve authoring control. See `tools/packages/thing-authoring-tool/ite
 `tools/packages/thing-authoring-tool/src/catalogue.ts`, `buildPart`.
 
 The production entry builds the retained roster into its packs, `skelly.bolt-guns` and `skelly.armour`, at
-`built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `recipe`, and `tools/layout.mjs`, `readRoster`.
-Per-pack exports are exercised in temporary roots; see
-`tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `mkdtempSync` and `exportThingRecipes`. They
-emit into `built/` once the production entry runs the thing partition of the recipe files there, not before.
+`built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `buildRoster`, and `tools/layout.mjs`,
+`readRoster`. It then runs the gun partition of every recipe file, which writes deadvox's gun roster from
+`models/recipes/skelly.firearms.jsonnet` to `built/skelly.firearms/gungen/` and
+`built/skelly.firearms/assets/models/`; see `tools/build.mjs`, `exportRecipes`. The thing partition of the recipe
+files is exercised in temporary roots; see `tools/test/build.test.mjs` and
+`tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `exportThingRecipes`. It emits into `built/` once
+the production entry runs it there, not before.
 The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
 (`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
 `models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. A row whose pack's format is `pose`
