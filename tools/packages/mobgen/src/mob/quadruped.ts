@@ -74,7 +74,7 @@ const DOG_WOUNDABLE_BONES = [
 ] as const;
 
 /** A cut may take any limb subtree or the head/tail; severedBoneSet hides everything below the cut. */
-export const DOG_SEVERABLE_PARTS = [
+export const QUADRUPED_SEVERABLE_PARTS = [
   'head',
   'tail',
   'foreUpper.L',
@@ -446,7 +446,7 @@ const sampleDog: BodyPlanDef['sample'] = (rng: Rng, template: Template) => {
   return { params, wounds };
 };
 
-registerBodyPlan('dog', {
+registerBodyPlan('quadruped', {
   sample: sampleDog,
   build: (genome) => buildDog(genome),
   paramOrder: DOG_PARAM_ORDER,
@@ -461,7 +461,7 @@ registerBodyPlan('dog', {
 
 const PAW_BONES = LEGS.map((leg) => leg.paw);
 
-export interface DogStance {
+export interface QuadrupedStance {
   readonly limp?: number;
   readonly headTilt?: number;
   /** 0..1, how far the jaw hangs open at rest (the genome's jawOpen); the carved mouth shows through it. */
@@ -488,7 +488,7 @@ const REST_FORWARD: Readonly<Record<string, number>> = {
 
 /** The rest stance: a low, uneven four-paw stand, head hanging. Regrounded against the surviving bones so
  * the paws define the contact and nothing else dips below them. */
-export const dogPose = (realized: Realized, stance: DogStance = {}): Pose => {
+export const quadrupedPose = (realized: Realized, stance: QuadrupedStance = {}): Pose => {
   const limp = stance.limp ?? 0;
   const headTilt = stance.headTilt ?? 0;
   const limpScale = Math.max(0, Math.min(1, limp));
@@ -659,7 +659,7 @@ const legAnchors = (realized: Realized, base: Pose): Readonly<Record<string, Leg
 };
 
 /** Ground distance per full cycle (both diagonals), shared with the pose's stance sweep. */
-export const dogStrideLength = (realized: Realized, stance: DogStance = {}): number => {
+export const quadrupedStrideLength = (realized: Realized, stance: QuadrupedStance = {}): number => {
   const limpScale = Math.max(0, Math.min(1, stance.limp ?? 0));
   return dogStepGeometry(realized, limpScale).stepLengths.reduce((sum, step) => sum + step, 0);
 };
@@ -668,10 +668,10 @@ export const dogStrideLength = (realized: Realized, stance: DogStance = {}): num
  * has advanced, so a planted paw rides the moving ground and any speed just changes how fast distance
  * grows. The fore-left/hind-right pair reaches while fore-right/hind-left plants, then they swap; `limp`
  * shortens and droops the injured diagonal, so the walk lurches rather than trots. */
-export const dogGaitPose = (realized: Realized, distance: number, speed: number, stance: DogStance = {}): Pose => {
+export const quadrupedGaitPose = (realized: Realized, distance: number, speed: number, stance: QuadrupedStance = {}): Pose => {
   const limp = stance.limp ?? 0;
   const limpScale = Math.max(0, Math.min(1, limp));
-  const base = dogPose(realized, stance);
+  const base = quadrupedPose(realized, stance);
   if (speed <= 0 || !Number.isFinite(distance)) {
     return base;
   }
@@ -733,13 +733,13 @@ export const dogGaitPose = (realized: Realized, distance: number, speed: number,
 };
 
 /** How a flinch lands: which side it mirrors to, and the cuts whose bones must not bear its regrounding. */
-export interface DogHitOptions {
+export interface QuadrupedHitOptions {
   readonly side?: number;
   readonly severed?: ReadonlySet<string>;
 }
 
 /** A short brace/recoil layered over the current pose and re-grounded against the surviving supports. */
-export const dogHitPose = (realized: Realized, base: Pose, time: number, options: DogHitOptions = {}): Pose => {
+export const quadrupedHitPose = (realized: Realized, base: Pose, time: number, options: QuadrupedHitOptions = {}): Pose => {
   if (!(time > 0) || time >= HIT_FLINCH.duration) {
     return base;
   }
@@ -760,12 +760,12 @@ export const dogHitPose = (realized: Realized, base: Pose, time: number, options
 };
 
 /** Exported for tests: the paw bones that bear the ground contact. */
-export const dogPawBones: readonly string[] = PAW_BONES;
+export const quadrupedPawBones: readonly string[] = PAW_BONES;
 
 // ---- Idle and attack ----
 
 /** The standing idle: the rest stance without the infected limp, so a row that is no cripple stands square. */
-export const dogIdlePose = (realized: Realized, stance: DogStance = {}): Pose => dogPose(realized, { ...stance, limp: 0 });
+export const dogIdlePose = (realized: Realized, stance: QuadrupedStance = {}): Pose => quadrupedPose(realized, { ...stance, limp: 0 });
 
 /** One key of the pounce: time in seconds, bone rotations about X in degrees (positive swings a leg forward and lifts the nose), the body's
  * advance along its facing in metres (the dog faces -Z, so forward is negative Z there), and the key's name for readers. */
