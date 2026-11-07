@@ -29,7 +29,7 @@ The production entry builds the retained roster into its packs, `skelly.bolt-gun
 `built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `recipe`, and `tools/layout.mjs`, `readRoster`.
 The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
 (`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
-`tools/layout.mjs`, `packFormats`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its
+`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its
 loader repoints from the former flat roster and mob paths to these pack paths. The flat files under `built/` are
 the hand copies `models/copied.json` lists, awaiting their producers; `tools/check-built.mjs` holds each copy apart
 from the produced set. Per-pack exports are exercised in temporary roots; see

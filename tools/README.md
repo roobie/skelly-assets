@@ -62,7 +62,8 @@ A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`
 - `../models/recipes/<packId>.jsonnet`: source-backed per-pack export recipes, compiled into ignored JSON twins by
   `sources.mjs`. Source-backed discovery avoids stale generated recipes; see `recipes.mjs`, `readRecipes`.
   `layout.mjs` keeps logical paths inside their owning pack; both builders, `check-built.mjs` and the showcase
-  find pack paths through it.
+  find pack paths through it. `../models/pack-formats.json` names each mob pack's clip representation, read by
+  `layout.mjs`, `readPackFormats`.
 - `packages/thing-authoring-tool/items.jsonnet`: the catalogue, including retained roster content and the ported
   catalogue-only sources. `exports/deadvox.jsonnet` selects the retained roster for `build.mjs`.
 - `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: exports thing recipes into
