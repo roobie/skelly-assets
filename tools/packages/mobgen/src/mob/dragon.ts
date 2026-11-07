@@ -14,7 +14,7 @@ import { IDENTITY_M, lerp3, type Mat3, mulMM, rotX, rotY, rotZ, scale, sub, type
 import type { Pose } from '../core/pose.ts';
 import { type Genome, type Template, templateByName } from '../core/template.ts';
 import { heightHeadBudgets } from './budgets.ts';
-import { stanceLegAngles } from './dog.ts';
+import { stanceLegAngles } from './quadruped.ts';
 import { resolveMaterials } from './materials.ts';
 import { partFeatures } from './parts.ts';
 

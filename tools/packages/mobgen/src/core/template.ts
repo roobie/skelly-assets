@@ -43,6 +43,8 @@ export interface Template {
   readonly name: string;
   readonly description: string;
   readonly bodyPlan: BodyPlan;
+  /** Retained upper-thigh fraction for a ground-crawling humanoid. */
+  readonly legCut?: number;
   readonly voxelSize: number;
   /** Nominal total actor mass, used by template-aware part mass assignments. */
   readonly bodyMassKg: number;

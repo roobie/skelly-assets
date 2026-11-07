@@ -15,5 +15,8 @@
   ],
   "scripts": {
     "build": "node build.mjs"
+  },
+  "dependencies": {
+    "three": "^0.186.0"
   }
 }

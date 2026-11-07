@@ -19,18 +19,17 @@ bust, arm and leg measures). Trimmed to what these models need: no viewer, rende
 or other families. Split out of arpg1 into this repo with its history; this is the source of truth, and nothing syncs with skelly. The `@skelly/` package names are kept
 as copied.
 
-The package `mobgen` was copied from the same commit later (`src/core` and `src/mob`; no viewer, cli, tests, docs, crowd
-renderer, look-at or ragdoll). It has no npm dependencies. Its generated `*.json` beside the `.jsonnet` files are not kept:
-they compile into `.build/` on every run, like the other Jsonnet. Like the rest of `tools/`, it is EUPL-1.2 (`../LICENSE`).
+`packages/mobgen` is reconciled from skelly commit `aee7ab265525f55247b88d9482e7109af44eaf42`,
+retaining the assets-specific signature parts, budgets, idle stance and additional body plans. The viewer,
+CLI, tests and docs come from that commit. Ragdoll physics remains game-owned, not part of this pipeline.
+Jsonnet sources compile into `.build/` on every build. Like the rest of `tools/`, mobgen is EUPL-1.2 (`../LICENSE`).
 
 ## Mobs
 
 `tools/build_mobs.sh [--out dir] [mobId ...]` runs `mobs.mjs`, which builds a GLB and a clips JSON per row of
 `../models/mobs.json` (template, seed, lod divisor, walk and attack frames, output names) into `built/`.
-A second mob is one more row; its template module must be among the imports at the top of `mobs.mjs` (the humanoid,
-acid, amalgam, dog and skeleton templates are). The walk, attack and idle poses used are the humanoid ones, so the
-non-humanoid templates (dog, acid) will need their own pose functions in `mobs.mjs` first. `sources.mjs` is the Jsonnet
-compile step shared with `build.mjs`.
+A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and
+`exportMob`. `sources.mjs` is the Jsonnet compile step shared with `build.mjs`.
 
 ## Layout
 
