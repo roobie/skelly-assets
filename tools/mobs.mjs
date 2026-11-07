@@ -1,17 +1,20 @@
 // Usage: node tools/mobs.mjs [--out dir] [mobId ...]. With no ids it builds every models/mobs.json row.
-// exportMob is callable for fixture rows. Matrix rows retain the arpg1 facing convention; pose rows delegate
-// to actorBake.mjs without coordinate conversion so simulation geometry and render geometry share one frame.
+// exportMob is callable for fixture rows. Every output lands at --out/<row.pack>/<logical path>, tools/layout.mjs,
+// outputPath; the pack's clip representation comes from layout.mjs, mobFormat. Matrix rows retain the arpg1 facing
+// convention; pose rows delegate to actorBake.mjs without coordinate conversion so simulation geometry and render
+// geometry share one frame.
 // Needs node 26 or later and `npm ci` in tools; tools/build_mobs.sh is the usual CLI entry.
 //
 // The mesh: every bone's greedy-meshed voxel faces in rest-world metres, facing +z (the way the avatar models face), the bone
 // index of each vertex in TEXCOORD_1.x (and the bone across each face in .y), the colour in COLOR_0 (rgb: the material colour
 // times the face's shade; a: the material's own glow). The clips: for each bone a 3x4 matrix (r0..r8 row-major, then t0..t2)
 // that takes a rest-world point to its posed place, as mobgen's boneTransformsInto gives it. Skinning is rigid: one bone per vertex.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
+import { mobFormat, outputPath, readMobRows } from './layout.mjs';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
@@ -62,7 +65,12 @@ function deriveTemplate(base, row) {
 }
 
 export function exportMob(row, out) {
-  if (row.format !== undefined && row.format !== 'matrices' && row.format !== 'pose') throw new Error(`unsupported mob format ${row.format}`);
+  const format = mobFormat(row);
+  const write = (file, bytes) => {
+    const path = join(out, outputPath(row.pack, file));
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, bytes);
+  };
   const { id, seed, walk_speed: WALK_SPEED, walk_frames: WALK_FRAMES, attack_frames: ATTACK_FRAMES } = row;
   const divisor = row.lod_divisor; // the LOD voxel is the template's 0.5 m block over this; 0 keeps the full detail
   const template = deriveTemplate(consumableTemplate(row.template), row);
@@ -75,7 +83,7 @@ export function exportMob(row, out) {
   const genome = found.genome; // the LOD keeps the genome's body, so the walk is posed from the full-detail one
   if (!realized.report.ok) console.error(`warning: the realized body does not pass its own report: ${realized.report.issues.map((i) => i.message).join('; ')}`);
   const { bones } = realized.body;
-  if (row.format === 'pose') return bakeActor(row, template, { ...found, realized }, out);
+  if (format === 'pose') return bakeActor(row, template, { ...found, realized }, out);
 
   // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
   const feet = bones.filter((b) => /^(foot|forePaw|hindPaw|tarsus[FMH])\./.test(b.id));
@@ -207,7 +215,7 @@ export function exportMob(row, out) {
     attack: { frames: attack, duration: round(clip.duration), hit_time: round(clip.hitTime), loop: false },
     idle: { frames: [frame(idle)], loop: true },
   };
-  writeFileSync(join(out, row.clips), JSON.stringify(clips));
+  write(row.clips, JSON.stringify(clips));
 
   // ---- the GLB ----
   const parts = [pos, nor, col, bone, idx];
@@ -257,7 +265,7 @@ export function exportMob(row, out) {
     b.writeUInt32LE(type, 4);
     return b;
   };
-  writeFileSync(join(out, row.glb), Buffer.concat([head, chunk(js.length, 0x4e4f534a), js, chunk(binPad.length, 0x004e4942), binPad]));
+  write(row.glb, Buffer.concat([head, chunk(js.length, 0x4e4f534a), js, chunk(binPad.length, 0x004e4942), binPad]));
 
   console.log(`${id} (${row.template} seed ${seed} lod ${divisor}): ${triangles} triangles, ${nv} vertices, ${bones.length} bones, height ${(hi[1] - lo[1]).toFixed(2)} m, facing flipped ${FLIP}`);
   console.log(`  walk cycle ${cycleM.toFixed(2)} m in ${WALK_FRAMES} frames; attack ${clip.duration}s (hit ${clip.hitTime}s) in ${ATTACK_FRAMES} frames`);
@@ -268,8 +276,7 @@ function main() {
     allowPositionals: true,
     options: { out: { type: 'string', default: join(repo, 'built') } },
   });
-  const sheet = JSON.parse(readFileSync(join(repo, 'models/mobs.json'), 'utf8'));
-  const rows = sheet.mobs.map((row) => ({ ...sheet.defaults, ...row }));
+  const rows = readMobRows(repo);
   const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
   const unknown = wanted.filter((id) => !rows.some((row) => row.id === id));
   if (unknown.length > 0) {

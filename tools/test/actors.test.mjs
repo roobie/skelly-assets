@@ -9,16 +9,18 @@ const { worldPosition } = await import('../packages/mobgen/src/core/voxelize.ts'
 // Exercise the on-disk row boundary while sharing the existing live-pose assertions.
 async function bakeFixture(model, options = {}) {
   const { exportMob } = await import('../mobs.mjs');
+  const { outputPath } = await import('../layout.mjs');
   const { mkdtempSync, readFileSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+    pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
     glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
   try {
     exportMob(row, out);
-    return { body: JSON.parse(readFileSync(join(out, row.body))), clips: JSON.parse(readFileSync(join(out, row.clips))) };
+    const read = (file) => JSON.parse(readFileSync(join(out, outputPath(row.pack, file))));
+    return { body: read(row.body), clips: read(row.clips) };
   } finally { rmSync(out, { recursive: true, force: true }); }
 }
 
@@ -534,6 +536,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   const { join } = await import('node:path');
   const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
   const { exportMob } = await import('../mobs.mjs');
+  const { outputPath } = await import('../layout.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
   const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
   const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
@@ -549,12 +552,13 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+        pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
         glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
       exportMob(row, root);
-      const body = JSON.parse(readFileSync(join(root, row.body)));
-      const clips = JSON.parse(readFileSync(join(root, row.clips)));
-      const bytes = readFileSync(join(root, row.glb));
+      const at = (file) => join(root, outputPath(row.pack, file));
+      const body = JSON.parse(readFileSync(at(row.body)));
+      const clips = JSON.parse(readFileSync(at(row.clips)));
+      const bytes = readFileSync(at(row.glb));
       const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
       const node = gltf.scene.children[0];
       const geometry = node.geometry;

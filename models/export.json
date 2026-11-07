@@ -1,8 +1,10 @@
 {
-  "ids": [
+  "skelly.bolt-guns": [
     "bolt_carbine",
     "bolt_scattergun",
-    "bolt_plasma_caster",
+    "bolt_plasma_caster"
+  ],
+  "skelly.armour": [
     "helmet_trooper",
     "armor_trooper_worn_body",
     "armor_trooper_worn_upper",
