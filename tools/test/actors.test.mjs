@@ -207,6 +207,96 @@ test('point-list mass keeps the assigned product and rejects empty or invalid in
   for (const bodyMassKg of [0, -1, Infinity, NaN]) assert.throws(() => partMassProperties({ ...input, bodyMassKg }), RangeError);
 });
 
+test('actor body metadata preserves figure regions, support geometry and template action timing', async () => {
+  const { actorBody } = await import('../actorBody.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { planOf } = await import('../packages/mobgen/src/core/generate.ts');
+  const { footRestExtents } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { GROUND_CONTACT_BONES } = await import('../packages/mobgen/src/mob/crawl.ts');
+  const { burstBones } = await import('../packages/mobgen/src/mob/dismember.ts');
+  const { attackClipFor } = await import('../packages/mobgen/src/mob/attack.ts');
+  const { flinchClipFor } = await import('../packages/mobgen/src/mob/reactions.ts');
+  const { LOOK_AT_PROFILES } = await import('../packages/mobgen/src/mob/lookAtProfiles.ts');
+  const fixture = { type: 'fixture.actor', model: 'humanoid', seed: 1, scale: 1 };
+  const figure = templateFigure(fixture.model, fixture.seed);
+  const template = consumableTemplate(fixture.model);
+  const body = JSON.parse(JSON.stringify(actorBody(figure, template, { ...fixture, lookAt: LOOK_AT_PROFILES[fixture.model] })));
+  for (const [key, value] of Object.entries(fixture)) assert.equal(body[key], value);
+  assert.equal(body.bodyPlan, template.bodyPlan);
+  assert.deepEqual(body.regions, planOf(template.bodyPlan).regionBones);
+  assert.deepEqual(body.boxes, figure.boxes);
+  assert.deepEqual(body.severableParts, figure.severableParts);
+  assert.deepEqual(body.burstBones, burstBones(figure.realized.body.bones));
+  assert.deepEqual(body.extents, Object.fromEntries(footRestExtents(figure.realized.body.bones, figure.realized.voxels)));
+  assert(GROUND_CONTACT_BONES.length > 0);
+  assert.deepEqual(body.groundContactBones, GROUND_CONTACT_BONES);
+  assert.deepEqual(body.anchors, figure.realized.body.anchors ?? {});
+  assert.deepEqual(body.lookAt, LOOK_AT_PROFILES[fixture.model]);
+  const attack = attackClipFor(template);
+  assert.deepEqual(body.animation, { attackPeak: attack.hitTime, attackDuration: attack.duration, hitDuration: flinchClipFor(template).duration });
+  const heights = [...figure.realized.meshes.values()].flatMap((mesh) => Array.from(mesh.positions).filter((_, i) => i % 3 === 1));
+  assert(heights.length > 0);
+  assert.equal(body.height, Math.max(...heights) - Math.min(...heights));
+  assert.equal(body.bodyMassKg, template.bodyMassKg);
+  assert.deepEqual(body.massFractions, template.massFractions);
+  assert(body.bones.some((bone) => bone.voxels?.length));
+  assert(body.bones.every((bone) => !('mass' in bone) && !('box' in bone)));
+});
+
+test('humanoid pose clips reproduce live standing and crawling poses over a closing gait cycle', async () => {
+  const { humanoidPoseClips } = await import('../actorClips.mjs');
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { createGaitCache, footRestExtents, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
+  const { crawlGaitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
+  const figure = templateFigure('humanoid', 1);
+  const row = { walkCycles: 1, walk_frames: 8, walk_speed: 0.8 };
+  const clips = JSON.parse(JSON.stringify(humanoidPoseClips(figure, row)));
+  const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles };
+  const close = (a, b) => {
+    if (Array.isArray(a)) { assert.equal(a.length, b.length); a.forEach((x, i) => close(x, b[i])); }
+    else if (typeof a === 'object') { assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort()); for (const key of Object.keys(a)) close(a[key], b[key]); }
+    else assert(Math.abs(a - b) <= 1e-9, `${a} != ${b}`);
+  };
+  for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), idleBasePose(actor, stance));
+  assert.equal(clips.standing.walk.cycles, row.walkCycles);
+  assert.equal(clips.standing.walk.loop, true);
+  for (const [i, frame] of clips.standing.walk.frames.entries()) {
+    const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
+    const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
+    close(decodeFrame(frame), { root: pose.root, rotations: pose.rotations });
+  }
+  const end = walkPose(actor, { stepIndex: 2 * row.walkCycles, progress: 0 }, row.walk_speed);
+  close(decodeFrame(clips.standing.walk.frames[0]), { root: end.root, rotations: end.rotations });
+  close(decodeFrame(clips.crawling.idle.frames[0]), crawlGaitPose(figure.realized, 0, 0));
+  assert.equal(clips.crawling.walk.cycles, 1);
+  for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed));
+  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, legCut: 0.55 });
+  assert(!('standing' in legless));
+  assert(legless.crawling.walk.frames.length > 1);
+});
+
+test('serialized idle oscillators reproduce the live ordered rotation product at multiple times and seeds', async () => {
+  const { humanoidPoseClips } = await import('../actorClips.mjs');
+  const { applyMotion, decodeFrame } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { applyIdleMotion } = await import('../packages/mobgen/src/mob/idle.ts');
+  const clips = JSON.parse(JSON.stringify(humanoidPoseClips(templateFigure('humanoid', 1), { walkCycles: 1, walk_frames: 8, walk_speed: 0.8 })));
+  for (const idle of Object.values(clips.standing.idle)) {
+    assert(idle.motion.length > 0);
+    assert(idle.motion.every((motion) => motion.bones.length > 0));
+  }
+  for (const [stance, idle] of Object.entries(clips.standing.idle)) for (const time of [0, 0.37, 3.2]) for (const seed of [2, 17]) {
+    const base = decodeFrame(idle.base);
+    const actual = applyMotion(base, idle.motion, time, seed);
+    const expected = applyIdleMotion(base, stance, time, seed);
+    assert.deepEqual(actual.root, expected.root);
+    for (const id of Object.keys(expected.rotations)) expected.rotations[id].forEach((x, i) => assert(Math.abs(x - actual.rotations[id][i]) <= 1e-9));
+  }
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],

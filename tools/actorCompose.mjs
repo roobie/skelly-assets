@@ -1,5 +1,5 @@
 // Assets-side twin of the generator-free actor clip reader.
-import { applyPoint, quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
+import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
 import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
 
 /** Simulation ground geometry comes only from the serialized body, never the GLB. */
@@ -18,6 +18,22 @@ export function groundFit(body, pose, boneIds) {
     byBone.set(id, lowest);
   }
   return { lowest: Math.min(...byBone.values()), byBone };
+}
+
+const phaseFor = (seed, salt) => {
+  const h = Math.sin(seed * 12.9898 + salt * 78.233) * 43_758.5453;
+  return (h - Math.floor(h)) * 2 * Math.PI;
+};
+
+/** Each oscillator right-multiplies in content order; no stance or bone tuning lives here. */
+export function applyMotion(base, motion, time, seed) {
+  const rotations = { ...base.rotations };
+  const axes = { x: rotX, y: rotY, z: rotZ };
+  for (const oscillator of motion) {
+    const angle = Math.sin(2 * Math.PI * time / oscillator.period + phaseFor(seed, oscillator.salt)) * oscillator.amplitudeDeg;
+    for (const { bone, axis, scale } of oscillator.bones) rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, axes[axis](angle * scale));
+  }
+  return { root: [...base.root], rotations };
 }
 
 export const decodeFrame = (frame) => ({
