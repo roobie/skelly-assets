@@ -70,4 +70,6 @@ const exporters = {
     return () => exportItem(item, recipeAsset(row), recipeVoxel(row), { collision: options.collision === true });
   },
 };
-export const loadThingRecipe = (value: unknown) => loadRecipe(value, exporters);
+// The recipe row kinds this tool owns; a driver hands it only rows of these kinds.
+export const THING_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
+export const loadThingRecipe =(value: unknown) => loadRecipe(value, exporters);

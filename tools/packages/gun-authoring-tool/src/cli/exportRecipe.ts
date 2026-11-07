@@ -115,6 +115,9 @@ const exporters = {
   },
 } satisfies Record<string, (row: Row, root: string) => () => ModelExport<DeadvoxModelEntry>>;
 
+// The recipe row kinds this tool owns; a driver hands it only rows of these kinds.
+export const GUN_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
+
 export const loadExportRecipe = (value: unknown = content, root = ROOT): readonly RecipeExport<DeadvoxModelEntry>[] =>
   loadRecipe(
     value,
