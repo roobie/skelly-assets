@@ -285,7 +285,7 @@ const UPPER_ARM_BONES = new Set(['upperArm.L', 'upperArm.R']);
 export const upperArmLocalFromNet = (netXDeg: number, torsoPitchXDeg: number, params: HumanoidParams): number =>
   netXDeg * (1 + params.armRaise / 1000) - torsoPitchXDeg;
 
-const ARM_BONES = new Set(['upperArm.L', 'upperArm.R', 'forearm.L', 'forearm.R']);
+export const ARM_BONES = new Set(['upperArm.L', 'upperArm.R', 'forearm.L', 'forearm.R']);
 const FADE_FRACTION = 0.2; // walk arm-swing blends down/back up over this fraction of the clip, each end
 
 /** 1 outside the attack's active window (full walk arm swing), 0 in the middle (clip fully replaces it),
@@ -323,6 +323,16 @@ export const blendArmBase = (baseR: Mat3, weight: number): Mat3 => {
     (baseR[3]! - baseR[1]!) / (2 * sinAngle),
   ];
   return rotAxis(axis, (angle * 180 * weight) / Math.PI);
+};
+
+/** Base-independent action values for serialized overlays. */
+export const attackOverlayFrame = (actor: WalkActor, clip: AttackClip, time: number) => {
+  const { clipAngles, armWalkWeight } = attackRotations(actor, clip, time, { root: [0, 0, 0], rotations: {}, angles: {} });
+  return {
+    angles: clipAngles!,
+    walkBlendWeight: armWalkWeight,
+    dropMetres: samplePelvisDrop(compileClip(clip), clamp(time, 0, clip.duration)) * avgLegLen(actor),
+  };
 };
 
 const avgLegLengths = new WeakMap<WalkActor, number>();

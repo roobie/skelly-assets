@@ -13,7 +13,8 @@
     "packages/mobgen",
     "packages/thing-authoring-tool",
     "packages/tool-ui",
-    "packages/gun-authoring-tool"
+    "packages/gun-authoring-tool",
+    "packages/vehicle-authoring-tool"
   ],
   "scripts": {
     "build": "node build.mjs"

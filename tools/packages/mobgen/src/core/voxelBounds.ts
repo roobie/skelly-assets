@@ -98,6 +98,9 @@ const voxelCentersByBone = (realized: Pick<Realized, 'body' | 'voxels'>): Readon
   return centers;
 };
 
+/** Ground-fit candidates, separate from the figure's complete owned-voxel map. */
+export { voxelCentersByBone as hullCentersByBone };
+
 /** Lowest occupied voxel surface per selected owner bone, after applying a pose. */
 export const posedVoxelSurfaceBoundsForBones = (
   realized: Pick<Realized, 'body' | 'voxels'>,
