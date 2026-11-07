@@ -6,7 +6,7 @@ import { catalogue } from '../src/catalogue.ts';
 import { exportThingRecipes } from '../src/cli/export.ts';
 import { loadThingRecipe } from '../src/exports.ts';
 
-it('exports each recipe file into its pack output without writing into the source root', () => {
+it('exports each recipe file into its pack output without writing into the source root', async () => {
   const root = mkdtempSync(join(tmpdir(), 'thing-recipes-'));
   const out = mkdtempSync(join(tmpdir(), 'thing-output-'));
   try {
@@ -22,7 +22,7 @@ it('exports each recipe file into its pack output without writing into the sourc
       writeFileSync(join(root, 'models/recipes', `${packId}.json`), JSON.stringify(value));
       return loadThingRecipe(value)[0]!;
     });
-    exportThingRecipes(root, out);
+    await exportThingRecipes(root, out);
     packs.forEach((packId, index) => {
       const { modelEntry, glb } = rows[index]!.generate();
       const base = join(out, packId);
