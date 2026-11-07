@@ -21,19 +21,19 @@ A model either product uses has one source row, one builder and one output in th
 bundle every pack. This serves one shared asset database and pipeline for a vast library of models and rigs,
 so deadvox and arpg1 can use the same models homogeneously. Keep no hand copy beside a producer.
 
-Turned pieces share the catalogue's eight-flat default (`turnedSides` in TAT's `items.jsonnet`) so both
-products render the whole shared library alike. Authored counts override it; a compound piece's `sides: null`
-opts into round geometry without a side count. The same eight-flat rule governs `baseball_bat`, `machete`,
-`hammer`, `kitchen_knife`, `sledgehammer`, `stick` and `torch`, not a separate round look for those tool rows.
-The catalogue's `facets` controls mesh tessellation for round geometry, not the default look.
+A shared turned-piece default keeps both products' rendering consistent across the library, while per-piece
+choices preserve authoring control. See `tools/packages/thing-authoring-tool/items.jsonnet`, `turnedSides`, and
+`tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`.
 
-The move is staged: the existing flat roster remains until the pack-layout step, and per-pack thing recipes
-currently export only into temporary roots. The worn family fits the shared player body, not generated mobs.
+The production entry builds the retained roster; see `tools/build.mjs`, `recipe`. Per-pack exports are
+exercised in temporary roots; see `tools/packages/thing-authoring-tool/test/modRecipes.test.ts`,
+`mkdtempSync` and `exportThingRecipes`.
+The worn family fits the shared player body, not generated mobs.
 Open gaps and their closing triggers:
 
 - Product-named placement remains allowed by the standing arpg1 placement ruling; the naming-policy decision
   closes this gap. No general pack naming policy is established here.
-- `paper_sheet` and `folded_note` have no producer; they need a separate ruling when the notebook producer lands.
+- `paper_sheet` and `folded_note` have no producer.
 - A rig shared by both products still has two clip representations, matrices and pose; the shared-rig-format
   decision closes this only if it chooses one representation.
 - Fitting worn garments over generated mob bodies requires its own development round.

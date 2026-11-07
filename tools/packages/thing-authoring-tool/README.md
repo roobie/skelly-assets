@@ -10,34 +10,23 @@ read_if:
 
 ## Skinned export
 
-Weights must be evaluated in common bind space after voxel meshing so duplicated
-vertices at finish boundaries cannot acquire different deformation rules. See
-`src/skin.ts`, `authoredSkin`, and `packages/thing-export/src/glb.ts`, `writeGlb`.
+Bind-space weighting keeps duplicated finish-boundary vertices deforming together. See
+`src/skin.ts`, `authoredSkin`, and `tools/packages/thing-export/src/glb.ts`, `writeGlb`.
 
-Greedy meshing must not erase the samples needed for deformation. Exposed voxel
-faces intersecting authored blend bands retain their grain-sized tessellation;
-only tessellation changes, not the occupied cells or rest silhouette. Rigid exports
-keep greedy meshing so supporting skins does not inflate ordinary models. See
-`packages/thing-export/src/voxelize.ts`, `sliceMask`, and
-`packages/thing-export/src/skin.ts`, `preserveSkinFace`. Band extents and profiles
-belong to authoring content, not anatomy-specific exporter constants; see
-`test/fixtures/bend-strip.jsonnet` and `src/skin.ts`, `authoredSkin`.
+Meshing must preserve deformation samples without changing the rest silhouette, and skin
+support must not inflate rigid exports. Blend extents and profiles belong to content rather
+than anatomy-specific constants. See `tools/packages/thing-export/src/voxelize.ts`, `sliceMask`,
+`tools/packages/thing-export/src/skin.ts`, `preserveSkinFace`, and `src/skin.ts`, `authoredSkin`.
 
-The exporter and consumer proofs live in their owning packages so tests do not
-introduce runtime import edges between them. The consumer reads a committed model
-rather than importing its producer. For fixture regeneration, see
-`test/export-skin-fixture.ts`, `writeRecipeExports`, and
-`packages/deadvox/test/skinExport.test.ts`, `load`. Regeneration uses the same item
-export and file-writing mechanisms as production assets, while keeping fixture
-content out of the production catalogue. The fixture exporter requires an explicit output-directory argument;
-it never chooses a game checkout as its destination.
+Exporter proofs stay local so consumer tests need not import their producer.
+Fixture exports share the production writer to avoid parallel formats while keeping
+test content out of the catalogue. See `test/export-skin-fixture.ts`, `writeRecipeExports`,
+and `test/skinExport.test.ts`, `exported`.
 
-Each displayed skin owns its mutable skeleton because posing or disposing one
-figure must not change another. Immutable geometry may remain shared. Full joint
-matrices must survive nonuniform parent scale without decomposition, which can
-lose compensating shear. Bounds must follow deformed vertices rather than the rest
-geometry so posing cannot hide visible geometry through culling. See
-`packages/deadvox/src/render/models.ts`, `instantiateSkin` and `visibleBounds`.
+Consumers must isolate mutable skeletons and preserve full joint transforms and deformed
+bounds: shared pose state couples figures, decomposition can lose shear, and rest bounds
+can cull posed geometry. For the exported bind-frame contract, see
+`tools/packages/thing-export/src/skin.ts`, `ExportSkin`.
 
 ## Authoring ownership
 
@@ -70,15 +59,13 @@ what a jack may lift stays a content and runtime decision. See `src/families/jac
 `engineHoist`, and `jacks.libsonnet`.
 
 The preview draws the same construct report the exporter consumes, so visual inspection is
-not a second model implementation. See `src/main.ts` and `packages/tool-ui/src/scene.ts`,
+not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui/src/scene.ts`,
 `buildLayers`. The page is `index.html`; the deployed viewer path is `/thing-authoring-tool/`.
 
-Mod-owned recipes are the consumption boundary, not a list inferred from item relationships.
-Keeping a recipe with its item row lets ownership move without a second target list, while
-shared validation and file writing prevent parallel formats. See `src/exports.ts`,
-`loadThingRecipe`, `src/cli/export.ts`, `exportThingRecipes`, and
-`packages/thing-export/README.md`, "Recipe ownership". The root refresh command is owned by
-`tools/refresh-deadvox.mjs`.
+Pack-owned recipes make consumption explicit rather than inferring targets from item
+relationships. Shared validation and file writing prevent parallel formats. See
+`tools/recipes.mjs`, `readRecipes`, `src/exports.ts`, `loadThingRecipe`, and
+`src/cli/export.ts`, `exportThingRecipes`.
 
 Inventory atoms may retain a runtime item weight rather than exported part masses:
 a vessel containing a serving must not gain the serving's mass twice, and visual
@@ -89,7 +76,5 @@ authority. Geometry and authoring-preview physical properties do not change with
 that export choice. See `src/catalogue.ts`, `ItemSchema`, `src/exports.ts`,
 `exportItem` and `loadThingRecipe`, and `cans.libsonnet`, `shellMassKg` and `items`.
 
-The tool has no item states, so a bear trap has one model, lying open as it is set. A
-sprung look also needs deadvox's ground look to choose a model by item state, so it is
-deferred to #107's trap readability review; see `packages/deadvox/src/render/piles.ts`,
-`drawModels`.
+Trap-state presentation needs a consumer-side model selection rule as well as geometry;
+it does not belong in the geometry authoring tool. See `src/families/bearTrap.ts`, `bearTrap`.
