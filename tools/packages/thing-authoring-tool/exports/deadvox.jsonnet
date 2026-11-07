@@ -1,5 +1,6 @@
-// Every catalogue row exports under its own id, on the item voxel class unless the row names its own `voxelGrain`.
+// The retained roster is separate from per-pack recipe production.
 local voxel = import 'jsonnet/lib/voxel-grains.libsonnet';
+local roster = (import 'models/export.json').ids;
 [
   {
     id: row.id,
@@ -9,4 +10,5 @@ local voxel = import 'jsonnet/lib/voxel-grains.libsonnet';
     options: { mass: row.exportMass },
   }
   for row in (import '../items.jsonnet').items
+  if std.member(roster, row.id)
 ]

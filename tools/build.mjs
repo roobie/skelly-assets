@@ -25,7 +25,7 @@ installJsonnetSources();
 let failed = false;
 try {
   const { loadThingRecipe } = await import('./packages/thing-authoring-tool/src/exports.ts');
-  const recipe = loadThingRecipe();
+  const recipe = loadThingRecipe(JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8')));
   const missing = ids.filter((id) => !recipe.some((row) => row.id === id));
   if (missing.length > 0) {
     console.log(`not in the model sources: ${missing.join(' ')}`);
