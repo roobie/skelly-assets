@@ -1,0 +1,703 @@
+{
+  "fittings": [
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "frame_rail_near",
+      "part": "hoist_frame_rail",
+      "supportedBy": []
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "frame_rail_far",
+      "mirror": true,
+      "part": "hoist_frame_rail",
+      "supportedBy": []
+    },
+    {
+      "at": [
+        -2.875,
+        0.40625,
+        -0.4375
+      ],
+      "id": "crossmember_rear",
+      "part": "hoist_crossmember",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        -2.125,
+        0.40625,
+        -0.4375
+      ],
+      "id": "crossmember_mid",
+      "part": "hoist_crossmember",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0.8125,
+        0.40625,
+        -0.4375
+      ],
+      "id": "crossmember_gearbox",
+      "part": "hoist_crossmember",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        2.6875,
+        0.40625,
+        -0.4375
+      ],
+      "id": "crossmember_front",
+      "part": "hoist_crossmember",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "front_axle",
+      "part": "hoist_front_axle",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "rear_axle",
+      "part": "hoist_rear_axle",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "engine",
+      "part": "hoist_engine",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "gearbox",
+      "part": "hoist_gearbox",
+      "supportedBy": [
+        "engine",
+        "crossmember_gearbox"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "prop_shaft",
+      "part": "hoist_prop_shaft",
+      "supportedBy": [
+        "gearbox",
+        "rear_axle"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "fuel_tank",
+      "part": "hoist_fuel_tank",
+      "supportedBy": [
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "exhaust",
+      "part": "hoist_exhaust",
+      "supportedBy": [
+        "frame_rail_near"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "radiator",
+      "part": "hoist_radiator",
+      "supportedBy": [
+        "crossmember_front"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "cab_floor",
+      "part": "hoist_cab_floor",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "cab_back",
+      "part": "hoist_cab_back",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "front_panel",
+      "part": "hoist_front_panel",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "windscreen",
+      "part": "hoist_windscreen",
+      "supportedBy": [
+        "a_post_near",
+        "a_post_far",
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "roof",
+      "part": "hoist_roof",
+      "supportedBy": [
+        "a_post_near",
+        "a_post_far",
+        "cab_back"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "front_bumper",
+      "part": "hoist_front_bumper",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "dashboard",
+      "part": "hoist_dashboard",
+      "supportedBy": [
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        2.51,
+        1.55,
+        0.4375
+      ],
+      "id": "steering_wheel",
+      "part": "steering_wheel",
+      "supportedBy": [
+        "dashboard"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "engine_cover",
+      "part": "hoist_engine_cover",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        2.09375,
+        1.25,
+        0
+      ],
+      "id": "gear_lever",
+      "part": "gear_lever",
+      "supportedBy": [
+        "engine_cover"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "bench",
+      "part": "hoist_bench",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "deck_floor",
+      "part": "hoist_deck_floor",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "headboard",
+      "part": "hoist_headboard",
+      "supportedBy": [
+        "deck_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "rear_underrun",
+      "part": "hoist_rear_underrun",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "crane_base",
+      "part": "hoist_crane_base",
+      "supportedBy": [
+        "frame_rail_near",
+        "frame_rail_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "crane_column",
+      "part": "hoist_crane_column",
+      "supportedBy": [
+        "crane_base"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "boom_rest",
+      "part": "hoist_boom_rest",
+      "supportedBy": [
+        "deck_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "boom",
+      "part": "hoist_boom",
+      "supportedBy": [
+        "crane_column"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "boom_extension",
+      "part": "hoist_boom_extension",
+      "supportedBy": [
+        "boom",
+        "boom_rest"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "luff_ram",
+      "part": "hoist_luff_ram",
+      "supportedBy": [
+        "crane_column"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "winch",
+      "part": "hoist_winch",
+      "supportedBy": [
+        "crane_column"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "hook_block",
+      "part": "hoist_hook_block",
+      "supportedBy": [
+        "boom_extension"
+      ]
+    },
+    {
+      "at": [
+        -1.5,
+        0.375,
+        0.703125
+      ],
+      "id": "rear_wheel_near",
+      "part": "hoist_wheel",
+      "supportedBy": [
+        "rear_axle"
+      ]
+    },
+    {
+      "at": [
+        -1.5,
+        0.375,
+        -0.703125
+      ],
+      "id": "rear_wheel_far",
+      "mirror": true,
+      "part": "hoist_wheel",
+      "supportedBy": [
+        "rear_axle"
+      ]
+    },
+    {
+      "at": [
+        1.90625,
+        0.375,
+        0.703125
+      ],
+      "id": "front_wheel_near",
+      "part": "hoist_wheel",
+      "supportedBy": [
+        "front_axle"
+      ]
+    },
+    {
+      "at": [
+        1.90625,
+        0.375,
+        -0.703125
+      ],
+      "id": "front_wheel_far",
+      "mirror": true,
+      "part": "hoist_wheel",
+      "supportedBy": [
+        "front_axle"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "cab_skirt_near",
+      "part": "hoist_cab_skirt",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "cab_skirt_far",
+      "mirror": true,
+      "part": "hoist_cab_skirt",
+      "supportedBy": [
+        "cab_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "a_post_near",
+      "part": "hoist_a_post",
+      "supportedBy": [
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "a_post_far",
+      "mirror": true,
+      "part": "hoist_a_post",
+      "supportedBy": [
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "door_near",
+      "part": "hoist_door",
+      "supportedBy": [
+        "a_post_near"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "door_far",
+      "mirror": true,
+      "part": "hoist_door",
+      "supportedBy": [
+        "a_post_far"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "mudguard_near",
+      "part": "hoist_mudguard",
+      "supportedBy": [
+        "deck_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "mudguard_far",
+      "mirror": true,
+      "part": "hoist_mudguard",
+      "supportedBy": [
+        "deck_floor"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "tail_lamp_near",
+      "part": "hoist_tail_lamp",
+      "supportedBy": [
+        "rear_underrun"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "tail_lamp_far",
+      "mirror": true,
+      "part": "hoist_tail_lamp",
+      "supportedBy": [
+        "rear_underrun"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "stabiliser_near",
+      "part": "hoist_stabiliser",
+      "supportedBy": [
+        "crane_base"
+      ]
+    },
+    {
+      "at": [
+        0,
+        0,
+        0
+      ],
+      "id": "stabiliser_far",
+      "mirror": true,
+      "part": "hoist_stabiliser",
+      "supportedBy": [
+        "crane_base"
+      ]
+    },
+    {
+      "at": [
+        2.88,
+        1.125,
+        0.64
+      ],
+      "id": "headlamp_near",
+      "part": "car_headlamp",
+      "supportedBy": [
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        2.88,
+        1.125,
+        -0.64
+      ],
+      "id": "headlamp_far",
+      "mirror": true,
+      "part": "car_headlamp",
+      "supportedBy": [
+        "front_panel"
+      ]
+    },
+    {
+      "at": [
+        1.3125,
+        0.40625,
+        0.6825
+      ],
+      "id": "battery_tray",
+      "part": "pickup_battery_tray",
+      "supportedBy": [
+        "frame_rail_near"
+      ]
+    },
+    {
+      "at": [
+        1.3125,
+        0.43625,
+        0.6825
+      ],
+      "id": "battery",
+      "part": "car_battery",
+      "supportedBy": [
+        "battery_tray"
+      ]
+    }
+  ],
+  "id": "hoist",
+  "name": "Crane truck"
+}
