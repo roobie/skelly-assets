@@ -375,7 +375,6 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const body = baked.body;
   const tuning = acidTemplate.animation;
   assert.deepEqual(body.animation, { attackPeak: tuning.attackPeak, attackDuration: tuning.attackDuration, hitDuration: tuning.hitDuration, deathDuration: tuning.deathDuration });
-  assert(!('death' in clips));
   assert.equal(clips.idle.period, tuning.idlePeriod);
   assert.equal(clips.idle.loop, true);
   const close = (actual, expected) => {
@@ -415,6 +414,70 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   close({ ...actual, root: [0, 0, 0] }, { root: [0, 0, 0], rotations: { chest: jointRotation(bone, clampJointAngles(bone, angles)) } });
   assert.deepEqual([actual.root[0], actual.root[2]], [0.3, -0.2]);
   assert(jointAngles(bone, actual.rotations.chest).every(Number.isFinite));
+});
+
+test('acid death clips reproduce the generator fall over the rest frame at every endpoint-inclusive frame time', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { acidTemplate } = await import('../packages/mobgen/src/mob/acidTemplate.ts');
+  const { acidIdlePose, acidDeathPose } = await import('../packages/mobgen/src/mob/acidPoses.ts');
+  const figure = templateFigure('acid', 1);
+  const row = { attack_frames: 9 };
+  const { body, clips } = await bakeFixture('acid', row);
+  const tuning = acidTemplate.animation;
+  const rest = acidIdlePose(figure.realized, 0);
+  const close = (actual, expected) => {
+    actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
+    const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) {
+      (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+    }
+  };
+  assert(!('death' in body.animation));
+  const clip = (direction) => clips.standing.death[direction];
+  for (const [name, direction] of [['forward', 1], ['backward', -1]]) {
+    const death = clip(name);
+    assert.equal(death.kind, 'pose');
+    assert.equal(death.loop, false);
+    assert.equal(death.duration, tuning.deathDuration);
+    assert.equal(death.frames.length, row.attack_frames);
+    for (const [i, frame] of death.frames.entries()) {
+      close(decodeFrame(frame), acidDeathPose(figure.realized, rest, death.duration * i / (death.frames.length - 1), direction));
+    }
+    // Frame zero is the rest frame itself: the fall starts from idle frame zero.
+    close(decodeFrame(death.frames[0]), rest);
+  }
+  // Directions fold differently, so the two clips are not copies.
+  assert.notDeepEqual(clip('forward').frames.at(-1), clip('backward').frames.at(-1));
+});
+
+test('the death clips settle', async () => {
+  const { decodeFrame, sampleClip } = await import('../actorCompose.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { acidTemplate } = await import('../packages/mobgen/src/mob/acidTemplate.ts');
+  const { acidIdlePose, acidDeathPose } = await import('../packages/mobgen/src/mob/acidPoses.ts');
+  const figure = templateFigure('acid', 1);
+  const { clips } = await bakeFixture('acid');
+  const { deathDuration } = acidTemplate.animation;
+  const rest = acidIdlePose(figure.realized, 0);
+  for (const [name, direction] of [['forward', 1], ['backward', -1]]) {
+    const death = clips.standing.death[name];
+    assert.equal(death.duration, deathDuration);
+    assert(death.frames.length >= 2);
+    const settled = acidDeathPose(figure.realized, rest, deathDuration, direction);
+    // The settled fold is what the generator holds from deathDuration on.
+    const last = decodeFrame(death.frames.at(-1));
+    for (const expected of [settled, acidDeathPose(figure.realized, rest, 2 * deathDuration, direction)]) {
+      last.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `${name} root[${i}]`));
+      const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+      for (const id of new Set([...Object.keys(last.rotations), ...Object.keys(expected.rotations)])) {
+        (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (last.rotations[id] ?? identity)[i]) <= 1e-9, `${name} ${id}[${i}]`));
+      }
+    }
+    // Finite sampling returns the stored settled frame at and after duration.
+    assert.strictEqual(sampleClip(death, deathDuration), death.frames.at(-1));
+    assert.strictEqual(sampleClip(death, 3 * deathDuration), death.frames.at(-1));
+  }
 });
 
 test('fused body preserves manifest, sparse owners, scaled bounds and ground-origin strike geometry', async () => {
@@ -552,8 +615,10 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
         assert.equal('standing' in clips, template.legCut === undefined);
         assert.equal(clips.crawling.attack.kind, 'overlay');
       } else if (model === 'acid') {
-        assert.deepEqual(Object.keys(clips.standing).sort(), ['attack', 'hit', 'idle', 'walk', 'windup']);
+        assert.deepEqual(Object.keys(clips.standing).sort(), ['attack', 'death', 'hit', 'idle', 'walk', 'windup']);
         for (const name of ['walk', 'attack', 'windup', 'hit']) assert.equal(clips.standing[name].kind, 'jointDelta');
+        assert.deepEqual(Object.keys(clips.standing.death).sort(), ['backward', 'forward']);
+        // Canonical baked fall: the runtime holds no death parameters.
         assert(!('death' in body.animation));
       }
       if (model === 'fused-mass') {
