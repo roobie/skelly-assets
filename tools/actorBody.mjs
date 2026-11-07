@@ -36,7 +36,7 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
       maxY = Math.max(maxY, mesh.positions[i]);
     }
   }
-  const attack = attackClipFor(template);
+  const attack = template.bodyPlan === 'acid' ? undefined : attackClipFor(template);
   return {
     type, model, seed, bodyPlan: template.bodyPlan,
     ...(template.legCut === undefined ? {} : { legCut: template.legCut }),
@@ -50,7 +50,12 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
     ...(template.bodyPlan === 'humanoid' ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
     lookAt,
-    animation: {
+    animation: template.bodyPlan === 'acid' ? {
+      attackPeak: template.animation.attackPeak,
+      attackDuration: template.animation.attackDuration,
+      hitDuration: template.animation.hitDuration,
+      deathDuration: template.animation.deathDuration,
+    } : {
       attackPeak: attack.hitTime,
       attackDuration: attack.duration,
       hitDuration: flinchClipFor(template).duration,

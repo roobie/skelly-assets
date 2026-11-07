@@ -1,3 +1,6 @@
+import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
+import { acidIdlePose } from './packages/mobgen/src/mob/acidPoses.ts';
+import { clamp, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
 import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, walkPose } from './packages/mobgen/src/mob/gait.ts';
 import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
@@ -24,6 +27,38 @@ export function poseClip(at, { frames, loop, duration, period, cycles, ...metada
   if (cycles !== undefined) clip.cycles = cycles;
   clip.frames = Array.from({ length: frames }, (_, i) => poseFrame(at(frames === 1 ? 0 : span * i / (loop ? frames : frames - 1))));
   return clip;
+}
+
+/** Acid curves are serialized before live-base joint limits or speed weighting are applied. */
+export function acidClips(figure, row) {
+  const tuning = acidTemplate.animation;
+  if (!(Number.isInteger(row.walk_frames) && row.walk_frames >= 2 && Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) throw new RangeError('acid frame counts must be at least two');
+  const weighted = (values, weight) => Object.fromEntries(Object.entries(values).map(([id, angles]) => [id, angles.map((a) => a * weight)]));
+  const pulse = (t, peak, duration) => t <= 0 || t >= duration ? 0 : smoothstep(t < peak ? t / peak : (duration - t) / (duration - peak));
+  const action = (name, cursor, weight, metadata = {}) => ({
+    kind: 'jointDelta', cursor, speedWeight: false, sideScalesZ: name === 'hit', footSoleHold: false, ...metadata,
+    frames: Array.from({ length: row.attack_frames }, (_, i) => ({ angles: weighted(tuning[name], weight(i / (row.attack_frames - 1))) })),
+  });
+  return { standing: {
+    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
+    walk: {
+      kind: 'jointDelta', cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
+      frames: Array.from({ length: row.walk_frames }, (_, i) => {
+        const angles = {};
+        for (const [index, side] of ['L', 'R'].entries()) {
+          const wave = Math.sin(2 * Math.PI * i / row.walk_frames + index * Math.PI);
+          const lift = Math.max(0, wave);
+          angles[`thigh.${side}`] = [tuning.swing * lift, 0, 0];
+          angles[`shin.${side}`] = [tuning.kneeLift * lift, 0, 0];
+          angles[`arm.${side}`] = [-tuning.armSwing * wave, 0, 0];
+        }
+        return { angles };
+      }),
+    },
+    attack: action('attack', 'time', (u) => pulse(u * tuning.attackDuration, tuning.attackPeak, tuning.attackDuration), { duration: tuning.attackDuration, hitTime: tuning.attackPeak }),
+    windup: action('windup', 'progress', (u) => smoothstep(clamp(u, 0, 1))),
+    hit: action('hit', 'time', (u) => pulse(u * tuning.hitDuration, tuning.hitPeak, tuning.hitDuration), { duration: tuning.hitDuration, peak: tuning.hitPeak }),
+  } };
 }
 
 /** Both locomotion sets use the same figure, including injured crawling on a standing rig. */

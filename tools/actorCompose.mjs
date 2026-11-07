@@ -1,5 +1,7 @@
 // Assets-side twin of the generator-free actor clip reader.
 import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, quatToMat3, slerpQuat } from './packages/mobgen/src/core/math.ts';
+import { clampJointAngles, jointAngles, jointRotation } from './packages/mobgen/src/core/joints.ts';
+import { clamp, transpose } from './packages/mobgen/src/core/math.ts';
 import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
 import { blendArmBase, eulerToMat3 } from './packages/mobgen/src/mob/attack.ts';
 import { groundOffset, GROUND_SMOOTHING } from './packages/mobgen/src/mob/gait.ts';
@@ -55,6 +57,44 @@ export function applyOverlay(body, base, clip, time, side, stance) {
     ? -groundFit(body, probe, body.groundContactBones).lowest
     : groundOffset(body.bones, new Map(Object.entries(body.extents)), rotations, GROUND_SMOOTHING);
   return { root: [base.root[0], offset - frame.dropMetres, base.root[2]], rotations };
+}
+
+/** Joint deltas are weighted before clamping; sole correction follows the articulated FK. */
+export function applyJointDelta(body, base, clip, cursor, { speed = 0, side = 0 } = {}) {
+  if (clip.speedWeight && speed <= 0) return base;
+  const count = clip.frames.length;
+  const u = clip.cursor === 'gaitPhase'
+    ? (((cursor / (2 * Math.PI) % 1) + 1) % 1) * count
+    : clamp(cursor / (clip.duration ?? 1), 0, 1) * (count - 1);
+  const i = Math.floor(u);
+  const w = u - i;
+  const a = clip.frames[i].angles;
+  const b = clip.frames[(i + 1) % count].angles;
+  const rotations = { ...base.rotations };
+  const bones = new Map(body.bones.map((bone) => [bone.id, bone]));
+  const weight = clip.speedWeight ? clamp(speed, 0, 1) : 1;
+  for (const id of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    const bone = bones.get(id);
+    if (!bone) throw new Error(`missing joint delta bone ${id}`);
+    const old = jointAngles(bone, rotations[id] ?? IDENTITY_M);
+    const angles = old.map((value, axis) => {
+      const x = a[id]?.[axis] ?? 0;
+      const delta = x + ((b[id]?.[axis] ?? 0) - x) * w;
+      return value + delta * weight * (axis === 2 && clip.sideScalesZ ? clamp(side, -1, 1) : 1);
+    });
+    rotations[id] = jointRotation(bone, clampJointAngles(bone, angles));
+  }
+  if (clip.footSoleHold) {
+    const transforms = boneTransforms(body.bones, { ...base, rotations });
+    for (const id of ['foot.L', 'foot.R']) {
+      const foot = bones.get(id);
+      const correction = transpose(transforms.get(foot.parent).r);
+      rotations[id] = jointRotation(foot, clampJointAngles(foot, jointAngles(foot, correction)));
+    }
+  }
+  const pose = { root: [...base.root], rotations };
+  pose.root[1] -= groundFit(body, pose, body.bones.map((bone) => bone.id)).lowest;
+  return pose;
 }
 
 const phaseFor = (seed, salt) => {
