@@ -1,4 +1,4 @@
-// Rebuild outside the checkout and compare exactly with the tracked asset set.
+// Compare every produced byte and account for the disjoint, provenance-stamped copied set.
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -20,9 +20,23 @@ try {
     .map((entry) => `built/${relative(temporary, join(entry.parentPath, entry.name))}`).sort();
   const expected = new Set(tracked);
   const actual = new Set(fresh);
+  const rows = JSON.parse(readFileSync(join(repo, 'models/copied.json'), 'utf8'));
+  const copied = new Set();
   const differences = [];
+  for (const row of rows) {
+    if (typeof row.path !== 'string' || !row.path.startsWith('built/') ||
+        !row.source?.repository || !row.source?.commit || !row.source?.path) {
+      throw new Error(`invalid copied provenance: ${JSON.stringify(row)}`);
+    }
+    if (copied.has(row.path)) differences.push(`duplicate copied row: ${row.path}`);
+    copied.add(row.path);
+    if (!expected.has(row.path)) differences.push(`stale copied row: ${row.path}`);
+    if (actual.has(row.path)) differences.push(`produced and copied: ${row.path}`);
+  }
   for (const file of tracked) {
-    if (!actual.has(file)) differences.push(`missing: ${file}`);
+    if (!actual.has(file)) {
+      if (!copied.has(file)) differences.push(`missing: ${file}`);
+    }
     else if (!readFileSync(join(repo, file)).equals(readFileSync(join(temporary, relative('built', file))))) {
       differences.push(`changed: ${file}`);
     }
@@ -31,7 +45,7 @@ try {
   if (differences.length) {
     console.error(differences.join('\n'));
     process.exitCode = 1;
-  } else console.log(`check-built: ${tracked.length} tracked files match exactly`);
+  } else console.log(`check-built: ${fresh.length} produced files match exactly; ${copied.size} copied files accounted for`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }
