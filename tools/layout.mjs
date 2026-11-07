@@ -6,31 +6,44 @@ import { recipePackIds } from './recipes.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
-export function outputPath(packId, file) {
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(packId) || packId === '.' || packId === '..') {
+function assertPackId(packId) {
+  if (typeof packId !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(packId) || packId === '.' || packId === '..') {
     throw new Error(`Invalid pack id: ${packId}`);
   }
+}
+
+export function outputPath(packId, file) {
+  assertPackId(packId);
   if (!file || file.includes('\\') || posix.isAbsolute(file) || file.split('/').some(segment => segment === '..' || segment === '.' || segment === '')) {
     throw new Error(`Invalid logical output path: ${file}`);
   }
   return posix.join(packId, file);
 }
 
-// The clip representation each mob pack bakes. The bestiary keeps matrices until its rows move to pose.
-export const packFormats = Object.freeze({
-  'skelly.bestiary': 'matrices',
-  'skelly.deadvox.actors': 'pose',
-  'skelly.body': 'pose',
-});
+const FORMATS = ['matrices', 'pose'];
+
+// models/pack-formats.json: the clip representation each mob pack bakes (content, not code).
+export function readPackFormats(root = repo) {
+  const { packs } = JSON.parse(readFileSync(join(root, 'models/pack-formats.json'), 'utf8'));
+  if (!packs || typeof packs !== 'object' || Array.isArray(packs)) throw new Error('models/pack-formats.json: packs must map pack ids to formats');
+  for (const [packId, format] of Object.entries(packs)) {
+    assertPackId(packId);
+    if (!FORMATS.includes(format)) throw new Error(`models/pack-formats.json: ${packId} has unknown format ${format}`);
+  }
+  return Object.freeze({ ...packs });
+}
+
+let repoFormats;
+const defaultFormats = () => (repoFormats ??= readPackFormats());
 
 // A row's own `format` (fixture rows) must agree with its pack's; a row in no listed pack must name one.
-export function mobFormat(row) {
+export function mobFormat(row, packFormats = defaultFormats()) {
   const declared = Object.hasOwn(packFormats, row.pack) ? packFormats[row.pack] : undefined;
   if (row.format !== undefined && declared !== undefined && row.format !== declared) {
     throw new Error(`${row.id}: format ${row.format} disagrees with pack ${row.pack} (${declared})`);
   }
   const format = row.format ?? declared;
-  if (format !== 'matrices' && format !== 'pose') throw new Error(`${row.id}: no clip format for pack ${row.pack}`);
+  if (!FORMATS.includes(format)) throw new Error(`${row.id}: no clip format for pack ${row.pack}`);
   return format;
 }
 
@@ -68,12 +81,13 @@ export function undeclaredDirectories(paths, declared) {
 
 // The produced models under built/, by row: each GLB's path relative to built/ and, for a matrix mob row, its clips.
 export function producedModels(root = repo) {
+  const formats = readPackFormats(root);
   return [
     ...readRoster(root).map(({ id, file }) => ({ id, file, clips: null })),
     ...readMobRows(root).map((row) => ({
       id: row.id,
       file: outputPath(row.pack, row.glb),
-      clips: mobFormat(row) === 'matrices' ? outputPath(row.pack, row.clips) : null,
+      clips: mobFormat(row, formats) === 'matrices' ? outputPath(row.pack, row.clips) : null,
     })),
   ];
 }

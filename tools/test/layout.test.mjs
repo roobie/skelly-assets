@@ -4,9 +4,12 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
-import { declaredPacks, mobFormat, outputPath, packFormats, producedModels, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { declaredPacks, mobFormat, outputPath, producedModels, readMobRows, readPackFormats, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
+// Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
+const gitEnvironment = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
+const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', env: gitEnvironment() });
 const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile()).map((entry) => relative(directory, join(entry.parentPath, entry.name))).sort();
 
@@ -15,9 +18,10 @@ function fixtureRoot() {
   mkdirSync(join(root, 'models/recipes'), { recursive: true });
   writeFileSync(join(root, 'models/recipes/fixture.recipe.jsonnet'), '[]');
   writeFileSync(join(root, 'models/export.json'), JSON.stringify({ 'fixture.roster': ['fixture_gun'] }));
+  writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { 'fixture.mobs': 'matrices' } }));
   writeFileSync(join(root, 'models/mobs.json'), JSON.stringify({
     defaults: { pack: 'fixture.mobs' },
-    mobs: [{ id: 'fixture_mob', format: 'matrices', glb: 'fixture_mob.glb', clips: 'fixture_mob_clips.json' }],
+    mobs: [{ id: 'fixture_mob', glb: 'fixture_mob.glb', clips: 'fixture_mob_clips.json' }],
   }));
   return root;
 }
@@ -39,7 +43,20 @@ test('a directory under built/ that no pack declares is reported; flat files are
   assert.deepEqual(undeclaredDirectories(['built/flat.glb', 'built/fixture.a/assets/models/x.glb', 'built/fixture.b/x.glb', 'built/fixture.b/y.glb'], declared), ['built/fixture.b']);
 });
 
+test('the pack format map is content: read from models/, validated, and only known formats', () => {
+  const root = fixtureRoot();
+  try {
+    assert.deepEqual(readPackFormats(root), { 'fixture.mobs': 'matrices' });
+    writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { 'fixture.mobs': 'fixture.unknown' } }));
+    assert.throws(() => readPackFormats(root), /unknown format/);
+    writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { '../fixture': 'pose' } }));
+    assert.throws(() => readPackFormats(root), /Invalid pack id/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('a mob row bakes its pack\'s clip representation; a row cannot contradict it', () => {
+  const packFormats = readPackFormats();
+  assert.ok(Object.keys(packFormats).length > 0);
   for (const [pack, format] of Object.entries(packFormats)) {
     assert.equal(mobFormat({ id: 'fixture', pack }), format);
     assert.throws(() => mobFormat({ id: 'fixture', pack, format: format === 'pose' ? 'matrices' : 'pose' }));
@@ -66,7 +83,8 @@ test('every mob row names a pack whose clip representation is known', () => {
 });
 
 test('every directory tracked under built/ is a declared pack', () => {
-  const tracked = execFileSync('git', ['-C', repo, 'ls-files', '-z', '--', 'built'], { encoding: 'utf8' }).split('\0').filter(Boolean);
+  const tracked = git('ls-files', '-z', '--', 'built').split('\0').filter(Boolean);
+  assert.ok(tracked.some((path) => path.split('/').length > 2), 'no tracked file in a pack directory under built/');
   assert.deepEqual(undeclaredDirectories(tracked, declaredPacks()), []);
 });
 
