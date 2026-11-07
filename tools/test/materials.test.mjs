@@ -7,7 +7,7 @@ installJsonnetSources();
 const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
 const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
 const { MATERIALS, surfaceOf } = await import('../packages/thing-core/src/materials.ts');
-const compiled = JSON.parse(readFileSync(new URL('../.build/packages/thing-core/src/materials.json', import.meta.url)));
+const compiled = JSON.parse(readFileSync(new URL('../packages/thing-core/src/materials.json', import.meta.url)));
 
 const glbJson = (bytes) => {
   const buffer = Buffer.from(bytes);

@@ -4,7 +4,9 @@
   "license": "EUPL-1.2",
   "type": "module",
   "scripts": {
+    "pretypecheck": "node ../../sources.mjs",
     "typecheck": "tsc --noEmit",
+    "pretest": "node ../../sources.mjs",
     "test": "vitest run"
   },
   "dependencies": {
