@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node ../../sources.mjs",
     "build": "tsc && vite build",
+    "pretypecheck": "node ../../sources.mjs",
     "typecheck": "tsc --noEmit",
+    "pretest": "node ../../sources.mjs",
     "test": "vitest run"
   },
   "dependencies": {

@@ -12,7 +12,9 @@
     "./single-part": "./src/singlePart.ts"
   },
   "scripts": {
+    "pretypecheck": "node ../../sources.mjs",
     "typecheck": "tsc --noEmit",
+    "pretest": "node ../../sources.mjs",
     "test": "vitest run"
   },
   "dependencies": {
