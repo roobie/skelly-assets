@@ -1,3 +1,8 @@
+---
+read_if:
+  - consuming shared models or understanding asset ownership and pipeline gaps
+---
+
 # skelly-assets
 
 3D game assets and the pipelines that build them: mobs with their animation clips, worn armour and clothing,
@@ -11,10 +16,26 @@ and download any of them.
 
 ## Layout
 
+A model either product uses has one source row, one builder and one output in this repository at
+`built/<packId>/<logical path>`. Consumers that want it bundle its pack and read the same bytes; they need not
+bundle every pack. This serves one shared asset database and pipeline for a vast library of models and rigs,
+so deadvox and arpg1 can use the same models homogeneously. Keep no hand copy beside a producer.
+
+The move is staged: the existing flat roster remains until the pack-layout step, and per-pack thing recipes
+currently export only into temporary roots. The worn family fits the shared player body, not generated mobs.
+Open gaps and their closing triggers:
+
+- Product-named placement remains allowed by the standing arpg1 placement ruling; the naming-policy decision
+  closes this gap. No general pack naming policy is established here.
+- `paper_sheet` and `folded_note` have no producer; they need a separate ruling when the notebook producer lands.
+- A rig shared by both products still has two clip representations, matrices and pose; the shared-rig-format
+  decision closes this only if it chooses one representation.
+- Fitting worn garments over generated mob bodies requires its own development round.
+
 | Path | Contents |
 |---|---|
 | `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
-| `models/` | The sources: Jsonnet model rows (listed in `models/index.libsonnet`) and the mob rows in `mobs.json` |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, and the mob rows in `mobs.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
 
