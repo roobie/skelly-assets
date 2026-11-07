@@ -1,5 +1,5 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
-local owned = std.set(['hinge_set']);
+local owned = std.set(['hinge_set', 'oven_door']);
 [
   {
     id: row.id,
