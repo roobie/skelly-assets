@@ -2,7 +2,7 @@ import { MATERIALS } from '@skelly/thing-core/materials';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
 import { buildItem, catalogue, loadCatalogue } from '../src/catalogue.ts';
-import { exportItem, loadThingRecipe } from '../src/exports.ts';
+import { exportItem, loadThingRecipe, THING_KINDS } from '../src/exports.ts';
 
 const material = Object.keys(MATERIALS)[0]!;
 // Fine enough that a voxelized box stays within `toBeCloseTo` of the smooth datum it follows.
@@ -195,7 +195,7 @@ it('refuses recipe references outside the authored item set', () => {
 });
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
   const row = readRecipes()
-    .flatMap(({ value }) => loadThingRecipe(value))
+    .flatMap(({ value }) => loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind))))
     .find((candidate) => candidate.id === 'player_bust')!;
   const anchors = row.generate().modelEntry.anchors!;
   for (const joint of ['neck', 'head', 'shoulder_left', 'shoulder_right', 'hip_left', 'hip_right']) {
