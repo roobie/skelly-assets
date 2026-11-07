@@ -10,7 +10,13 @@ const root = resolve(import.meta.dirname, '../..');
 const tracked = execFileSync('git', ['-C', root, 'ls-files', '-z', '*.json'], { encoding: 'utf8' })
   .split('\0').filter(Boolean);
 
-for (const source of jsonnetFiles()) {
+const sources = jsonnetFiles();
+
+test('package discovery finds Jsonnet sources', () => {
+  assert.ok(sources.length > 0, `No Jsonnet sources discovered under ${join(root, 'tools/packages')}`);
+});
+
+for (const source of sources) {
   const twin = relative(root, source.replace(/\.jsonnet$/, '.json'));
   test(`${twin} is ignored and untracked`, () => {
     const ignored = spawnSync('git', ['-C', root, 'check-ignore', '--no-index', '--quiet', '--', twin]);
