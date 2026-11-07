@@ -111,6 +111,102 @@ test('the emitted hull reproduces the generator ground fit after a JSON round tr
   }
 });
 
+// The combined absolute/relative mass rule is deliberately separate from pose tolerance.
+const massAgreement = (actual, reference) => {
+  if (Array.isArray(reference)) {
+    assert.equal(actual.length, reference.length);
+    reference.forEach((value, i) => massAgreement(actual[i], value));
+  } else {
+    assert(Number.isFinite(actual));
+    assert(Math.abs(actual - reference) <= 1e-9 * (1 + Math.abs(reference)), `${actual} disagrees with ${reference}`);
+  }
+};
+
+test('the emitted body reproduces the generator\'s mass laws', async () => {
+  const { installJsonnetSources } = await import('../sources.mjs');
+  installJsonnetSources();
+  const { bodyGeometry } = await import('../actorBody.mjs');
+  const { voxelMassProperties, voxelBounds, partMassProperties } = await import('../actorMass.mjs');
+  const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { massProperties, voxelBounds: liveBounds } = await import('../packages/mobgen/src/core/massProperties.ts');
+  const { templatePartMassProperties } = await import('../packages/mobgen/src/core/templateMass.ts');
+  const { severableParts, severedBoneSet } = await import('../packages/mobgen/src/mob/dismember.ts');
+  const template = consumableTemplate('humanoid');
+  const figure = templateFigure(template.name, 1);
+  const { realized } = figure;
+  const { bones } = realized.body;
+  const body = JSON.parse(JSON.stringify(bodyGeometry(figure, template)));
+  const parts = severableParts(bones);
+  assert(parts.length > 0);
+  const subtrees = parts.map((part) => bones.filter((bone) => severedBoneSet(bones, [part]).has(bone.id)));
+  const selections = [bones, ...bones.filter((b) => figure.voxelCentersByBone.has(b.id)).map((b) => [b]), ...subtrees];
+  let sawHullReduction = false;
+  for (const [i, bone] of body.bones.entries()) {
+    const expected = figure.voxelCentersByBone.get(bone.id);
+    assert.deepEqual(bone.voxels, expected);
+    if (expected) {
+      assert(bone.hull.length > 0);
+      assert(bone.hull.every((p) => expected.some((q) => p.every((v, a) => v === q[a]))));
+      sawHullReduction ||= bone.hull.length < bone.voxels.length;
+    } else assert.equal(bone.hull, undefined);
+    const { voxels, hull, ...metadata } = bone;
+    const { marrowMaterial, ...source } = bones[i];
+    assert.deepEqual(metadata, source);
+    for (const absent of ['mass', 'massCenter', 'box']) assert(!Object.hasOwn(bone, absent));
+  }
+  assert(sawHullReduction, 'fixture must distinguish hull candidates from owned voxels');
+  assert.equal(body.voxelSize, realized.voxels.size);
+  const pointsFor = (selection) => body.bones.filter((b) => selection.some((s) => s.id === b.id)).flatMap((b) => b.voxels ?? []);
+  for (const selected of selections) {
+    const indices = selected.map((b) => bones.indexOf(b));
+    const points = pointsFor(selected);
+    assert(points.length > 0);
+    const actual = voxelMassProperties(points, body.voxelSize, 1000 * body.voxelSize ** 3);
+    const expected = massProperties(realized.voxels, indices, realized.voxels.size);
+    assert.equal(actual.mass, expected.mass);
+    assert.deepEqual(voxelBounds(points, body.voxelSize), liveBounds(realized.voxels, indices));
+    massAgreement(actual.center, expected.center);
+    massAgreement(actual.inertia, expected.inertia);
+  }
+  const bodyVoxelCount = pointsFor(bones).length;
+  let authored = 0;
+  let fallback = 0;
+  for (const [i, part] of parts.entries()) {
+    const points = pointsFor(subtrees[i]);
+    const actual = partMassProperties({ points, voxelSize: body.voxelSize, bodyVoxelCount, bodyMassKg: body.bodyMassKg, massFractions: body.massFractions, part });
+    const expected = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: subtrees[i].map((b) => bones.indexOf(b)), bodyBoneIndices: bones.map((_, b) => b), voxelSize: body.voxelSize, template, part });
+    if (template.massFractions?.[part] !== undefined) {
+      authored++;
+      assert.equal(actual.mass, expected.mass);
+      assert.equal(actual.fraction, expected.fraction);
+    } else {
+      fallback++;
+      massAgreement(actual.mass, expected.mass);
+      massAgreement(actual.fraction, expected.fraction);
+    }
+    massAgreement(actual.center, expected.center);
+    massAgreement(actual.inertia, expected.inertia);
+    massAgreement(voxelBounds(points, body.voxelSize, actual.center).corners, liveBounds(realized.voxels, subtrees[i].map((b) => bones.indexOf(b)), expected.center).corners);
+  }
+  assert(authored > 0 && fallback > 0);
+});
+
+test('point-list mass keeps the assigned product and rejects empty or invalid inputs', async () => {
+  const { voxelMassProperties, voxelBounds, partMassProperties } = await import('../actorMass.mjs');
+  const points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]];
+  const input = { points, voxelSize: 0.5, bodyVoxelCount: 3, bodyMassKg: 1, massFractions: { arm: 0.42 }, part: 'arm' };
+  assert.equal(partMassProperties(input).mass, 0.42);
+  assert.equal(partMassProperties(input).fraction, 0.42);
+  assert.equal(partMassProperties({ ...input, massFractions: undefined }).fraction, 1);
+  assert.throws(() => voxelMassProperties([], 1, 1), RangeError);
+  assert.throws(() => voxelBounds([], 1), RangeError);
+  for (const voxelSize of [0, -1, Infinity, NaN]) assert.throws(() => voxelMassProperties(points, voxelSize, 1), RangeError);
+  for (const voxelMass of [0, -1, Infinity, NaN]) assert.throws(() => voxelMassProperties(points, 1, voxelMass), RangeError);
+  for (const fraction of [0, -1, 1.1, Infinity, NaN]) assert.throws(() => partMassProperties({ ...input, massFractions: { arm: fraction } }), RangeError);
+  for (const bodyMassKg of [0, -1, Infinity, NaN]) assert.throws(() => partMassProperties({ ...input, bodyMassKg }), RangeError);
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],
