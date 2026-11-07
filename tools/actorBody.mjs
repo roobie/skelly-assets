@@ -3,7 +3,7 @@ import { burstBones } from './packages/mobgen/src/mob/dismember.ts';
 import { footRestExtents } from './packages/mobgen/src/mob/gait.ts';
 import { GROUND_CONTACT_BONES } from './packages/mobgen/src/mob/crawl.ts';
 import { attackClipFor } from './packages/mobgen/src/mob/attack.ts';
-import { flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
+import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
 import { hullCentersByBone } from './packages/mobgen/src/core/voxelBounds.ts';
 
 // All owned cells serve mass/reach; hull candidates serve only ground fitting.
@@ -36,21 +36,33 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
       maxY = Math.max(maxY, mesh.positions[i]);
     }
   }
-  const attack = template.bodyPlan === 'acid' ? undefined : attackClipFor(template);
+  const fused = template.bodyPlan === 'fused-mass';
+  const attack = template.bodyPlan === 'humanoid' ? attackClipFor(template) : undefined;
+  const peak = HIT_FLINCH.keys[1];
   return {
     type, model, seed, bodyPlan: template.bodyPlan,
     ...(template.legCut === undefined ? {} : { legCut: template.legCut }),
     scale, height: maxY - minY,
     ...bodyGeometry(figure, template),
     anchors: anchors ?? {},
-    regions: planOf(template.bodyPlan).regionBones,
+    regions: figure.regions ?? planOf(template.bodyPlan).regionBones,
     boxes: figure.boxes,
     severableParts: figure.severableParts,
     burstBones: burstBones(bones),
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
     ...(template.bodyPlan === 'humanoid' ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
     lookAt,
-    animation: template.bodyPlan === 'acid' ? {
+    ...(fused ? {
+      manifest: figure.manifest, bounds: figure.bounds, originOffset: figure.originOffset,
+      coreInteriorPoint: figure.coreInteriorPoint, restStrikeOrigin: figure.restStrikeOrigin,
+      cells: {
+        size: figure.realized.voxels.size, origin: figure.realized.voxels.origin, dims: figure.realized.voxels.dims,
+        filled: Array.from(figure.realized.voxels.owner).flatMap((owner, index) => owner ? [[index, owner]] : []),
+      },
+    } : {}),
+    animation: fused ? {
+      flinch: { peak: peak.t, duration: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] },
+    } : template.bodyPlan === 'acid' ? {
       attackPeak: template.animation.attackPeak,
       attackDuration: template.animation.attackDuration,
       hitDuration: template.animation.hitDuration,

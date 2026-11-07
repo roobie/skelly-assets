@@ -408,6 +408,54 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   assert(jointAngles(bone, actual.rotations.chest).every(Number.isFinite));
 });
 
+test('fused body preserves manifest, sparse owners, scaled bounds and ground-origin strike geometry', async () => {
+  const { actorBody } = await import('../actorBody.mjs');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { fusedClips } = await import('../actorClips.mjs');
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { fusedMassTemplate } = await import('../packages/mobgen/src/mob/fusedMassTemplate.ts');
+  const { fusedMassManifest } = await import('../packages/mobgen/src/mob/fusedMass.ts');
+  const { HIT_FLINCH } = await import('../packages/mobgen/src/mob/reactions.ts');
+  const { LOOK_AT_PROFILES } = await import('../packages/mobgen/src/mob/lookAtProfiles.ts');
+  const generated = generateValid(fusedMassTemplate, 1, { maxAttempts: 1 });
+  assert(generated);
+  const scale = 1.7;
+  const figure = figureFor(generated, fusedMassTemplate, scale);
+  const body = JSON.parse(JSON.stringify(actorBody(figure, fusedMassTemplate, { type: 'fixture.fused', model: 'fused-mass', seed: 1, scale, lookAt: LOOK_AT_PROFILES['fused-mass'] })));
+  const voxels = generated.realized.voxels;
+  assert.deepEqual(body.manifest, fusedMassManifest(generated.realized.body, voxels));
+  assert.deepEqual(body.regions, Object.fromEntries(body.manifest.regions.map((region) => [region.id, region.boneIds])));
+  assert.deepEqual(Object.keys(body.boxes), Object.keys(body.regions));
+  assert.deepEqual(body.cells, { size: voxels.size, origin: voxels.origin, dims: voxels.dims, filled: Array.from(voxels.owner).flatMap((owner, i) => owner ? [[i, owner]] : []) });
+  assert(body.cells.filled.length > 0);
+  for (let axis = 0; axis < 3; axis++) {
+    const values = body.bones.flatMap((bone) => bone.voxels ?? []).map((p) => p[axis]);
+    const lo = Math.min(...values) - body.voxelSize / 2;
+    const hi = Math.max(...values) + body.voxelSize / 2;
+    assert.equal(body.bounds.min[axis], lo * scale);
+    assert.equal(body.bounds.max[axis], hi * scale);
+    assert(Math.abs(body.originOffset[axis] + (axis === 1 ? lo : (lo + hi) / 2) * scale) <= 1e-9);
+    assert(Math.abs(body.restStrikeOrigin[axis] - (body.coreInteriorPoint[axis] * scale + body.originOffset[axis])) <= 1e-9);
+  }
+  for (const [region, ids] of Object.entries(body.regions)) for (const id of ids) {
+    const points = body.bones.find((bone) => bone.id === id).voxels;
+    if (!points) continue;
+    const box = body.boxes[region].find((box) => box.bone === id);
+    assert(box);
+    points.forEach((p) => p.forEach((v, a) => assert(Math.abs(v - box.center[a]) <= box.halfSize[a])));
+  }
+  const core = body.bones.find((bone) => bone.id === 'core');
+  assert(core.voxels.some((p) => p.every((v, a) => Math.abs(v - body.coreInteriorPoint[a]) < body.voxelSize / 2)));
+  const peak = HIT_FLINCH.keys[1];
+  assert.deepEqual(body.animation, { flinch: { peak: peak.t, duration: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] } });
+  assert.equal(body.bodyMassKg, fusedMassTemplate.bodyMassKg);
+  assert(!('massFractions' in body));
+  const clips = JSON.parse(JSON.stringify(fusedClips(figure)));
+  assert.deepEqual(Object.keys(clips.standing), ['idle']);
+  assert.equal(clips.standing.idle.frames.length, 1);
+  assert.deepEqual(clips.standing.idle.frames[0], { root: body.originOffset.map((v) => v / scale), rotations: {} });
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],
