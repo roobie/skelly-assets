@@ -1,2 +1,4 @@
-/items.json
-/exports/*.json
+dist/
+items.json
+exports/deadvox.json
+test/fixtures/bend-strip.json

@@ -1,3 +1,8 @@
+---
+read_if:
+  - consuming shared models or understanding asset ownership and pipeline gaps
+---
+
 # skelly-assets
 
 3D game assets and the pipelines that build them: mobs with their animation clips, worn armour and clothing,
@@ -11,10 +16,32 @@ and download any of them.
 
 ## Layout
 
+A model either product uses has one source row, one builder and one output in this repository at
+`built/<packId>/<logical path>`. Consumers that want it bundle its pack and read the same bytes; they need not
+bundle every pack. This serves one shared asset database and pipeline for a vast library of models and rigs,
+so deadvox and arpg1 can use the same models homogeneously. Keep no hand copy beside a producer.
+
+A shared turned-piece default keeps both products' rendering consistent across the library, while per-piece
+choices preserve authoring control. See `tools/packages/thing-authoring-tool/items.jsonnet`, `turnedSides`, and
+`tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`.
+
+The production entry builds the retained roster; see `tools/build.mjs`, `recipe`. Per-pack exports are
+exercised in temporary roots; see `tools/packages/thing-authoring-tool/test/modRecipes.test.ts`,
+`mkdtempSync` and `exportThingRecipes`.
+The worn family fits the shared player body, not generated mobs.
+Open gaps and their closing triggers:
+
+- Product-named placement remains allowed by the standing arpg1 placement ruling; the naming-policy decision
+  closes this gap. No general pack naming policy is established here.
+- `paper_sheet` and `folded_note` have no producer.
+- A rig shared by both products still has two clip representations, matrices and pose; the shared-rig-format
+  decision closes this only if it chooses one representation.
+- Fitting worn garments over generated mob bodies requires its own development round.
+
 | Path | Contents |
 |---|---|
 | `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
-| `models/` | The sources: Jsonnet model rows (listed in `models/index.libsonnet`) and the mob rows in `mobs.json` |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, and the mob rows in `mobs.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
 
