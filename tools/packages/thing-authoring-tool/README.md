@@ -60,7 +60,7 @@ what a jack may lift stays a content and runtime decision. See `src/families/jac
 
 The preview draws the same construct report the exporter consumes, so visual inspection is
 not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui/src/scene.ts`,
-`buildLayers`. The page is `index.html`; the deployed viewer path is `/thing-authoring-tool/`.
+`buildLayers`. The page is `index.html`.
 
 Pack-owned recipes make consumption explicit rather than inferring targets from item
 relationships. Shared validation and file writing prevent parallel formats. See
