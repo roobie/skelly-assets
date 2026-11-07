@@ -6,8 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { compileJsonnetFile } from './jsonnet/index.mjs';
 
 const here = import.meta.dirname;
-export const jsonnetFiles = (directory = join(here, 'packages')) =>
-  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+export const jsonnetFiles = (directory) => {
+  if (directory === undefined) return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(resolve(here, '../models/recipes'))];
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
       // Tests compile their own fixtures, including deliberately invalid Jsonnet.
@@ -15,6 +16,7 @@ export const jsonnetFiles = (directory = join(here, 'packages')) =>
     }
     return entry.name.endsWith('.jsonnet') ? [path] : [];
   });
+};
 
 export function installJsonnetSources() {
   for (const source of jsonnetFiles()) {

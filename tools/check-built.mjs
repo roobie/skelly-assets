@@ -1,8 +1,10 @@
-// Compare every produced byte and account for the disjoint, provenance-stamped copied set.
+// Compare every produced byte, account for the disjoint, provenance-stamped copied set and hold every directory
+// under built/ to a declared pack (tools/layout.mjs, declaredPacks).
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
+import { declaredPacks, undeclaredDirectories } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' });
@@ -42,10 +44,12 @@ try {
     }
   }
   for (const file of fresh) if (!expected.has(file)) differences.push(`unexpected: ${file}`);
+  const packs = declaredPacks(repo);
+  for (const directory of undeclaredDirectories([...tracked, ...fresh], packs)) differences.push(`undeclared directory: ${directory}`);
   if (differences.length) {
     console.error(differences.join('\n'));
     process.exitCode = 1;
-  } else console.log(`check-built: ${fresh.length} produced files match exactly; ${copied.size} copied files accounted for`);
+  } else console.log(`check-built: ${fresh.length} produced files match exactly; ${copied.size} copied files accounted for; every directory a declared pack`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

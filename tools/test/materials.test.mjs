@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { readRoster } from '../layout.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 installJsonnetSources();
@@ -15,8 +16,8 @@ const glbJson = (bytes) => {
 };
 
 test('every material a recipe resolves is defined', () => {
-  const ids = JSON.parse(readFileSync(new URL('../../models/export.json', import.meta.url))).ids;
-  const recipe = loadThingRecipe();
+  const ids = readRoster().map((row) => row.id);
+  const recipe = loadThingRecipe(JSON.parse(readFileSync(new URL('../packages/thing-authoring-tool/exports/deadvox.json', import.meta.url))));
   assert.ok(ids.length > 0);
   assert.deepEqual(MATERIALS, compiled);
   for (const id of ids) {
