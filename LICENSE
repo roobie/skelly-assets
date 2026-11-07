@@ -4,7 +4,7 @@ The models and their sources (models/) and the built output (built/) are license
 Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International licence:
 LICENSES/CC-BY-NC-SA-4.0.txt, https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-The pipelines (tools/) are licensed under the European Union Public Licence v. 1.2:
+The pipelines (tools/) and the showcase site (site/) are licensed under the European Union Public Licence v. 1.2:
 LICENSES/EUPL-1.2.txt
 
 REUSE.toml states the same per path. For commercial use of the models, contact the author.
