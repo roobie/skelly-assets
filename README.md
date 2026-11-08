@@ -54,31 +54,23 @@ see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
 ### Outputs and consumers
 
-The no-id production run of `tools/build.mjs` is the roster and recipe entry point. Under `built/<packId>/`,
-the roster supplies `assets/models/<id>.glb`; recipes supply the GLB alongside the owning tool's metadata in
-`gungen/` or `things/`, with a thing index for consumer admission. Cue the output contract rather than maintaining
-a second file list: `tools/build.mjs`, `exportRecipes` and `PRODUCTION_RECIPE_TOOLS`, and
-`tools/packages/thing-export/src/files.ts`, `writeRecipeExports`.
+The no-id production run of `tools/build.mjs` is the roster and recipe entry point: it writes each model under
+its pack, with the owning tool's metadata and, for things, an index for consumer admission. Cue the output
+contract rather than maintaining a second file list: `tools/build.mjs`, `exportRecipes` and
+`PRODUCTION_RECIPE_TOOLS`, and `tools/packages/thing-export/src/files.ts`, `writeRecipeExports`.
 
-Generated actors have a GLB plus a body and pose clips, not a second consumer-specific bake. The actor GLB's
-logical path is under `assets/models/actors/`; its body and clips are under `actors/`. See `tools/layout.mjs`,
-`readMobRows`, and `tools/actorBake.mjs`, `bakeActor`. Every consumer composes the one pose representation in
-mobgen's rest frame: roots and quaternion rotations must agree, and consumer facing conventions must not become
-a second baked rig. See `tools/actorCompose.mjs`, `decodeFrame` and `sampleClip`.
+Generated actors have a GLB plus a body and pose clips, not a second consumer-specific bake; see
+`tools/layout.mjs`, `readMobRows`, and `tools/actorBake.mjs`, `bakeActor`. Every consumer reads the body and pose
+files in the one shared representation, composed in mobgen's rest frame: roots and quaternion rotations must
+agree, and consumer facing conventions must not become a second baked rig. See `tools/actorCompose.mjs`,
+`decodeFrame` and `sampleClip`.
 
-For arpg1, the roster packs `skelly.bolt-guns` and `skelly.armour` supply weapons and fitted armour, and
-`skelly.bestiary` supplies creatures. Its other shared looks come from `skelly.body`, `skelly.wearables`,
-`skelly.melee`, `skelly.hand-tools`, `skelly.materials`, `skelly.light-sources`, `skelly.containers`,
-`skelly.structures`, `skelly.readables` and `skelly.arcana`. The arpg1 loader must use these pack paths, not
-former flat paths, and read actor body/pose files without the former matrix encoding or baked facing flip.
-These are consumer contracts, not alternate arpg1 exports.
-
-Deadvox consumes the recipe packs it bundles; a standalone model does not require a playable item or placement.
-The shared kind packs can therefore carry looks for arpg1 without inventing Deadvox gameplay. Its actor figures
-belong to `skelly.deadvox.actors`, its player figure to `skelly.body`; those are distinct from the generated
-bestiary. The `skelly.deadvox.*` packs are scoped to actor, site or scenario content, not reader-only homes;
-see the selections in `models/recipes/`. Other recipe packs serve their declared content or scenario, not an
-obligation for arpg1 to bundle them. The showcase consumes all manifest models, independent of product bundling.
+A consumer reads pack paths from the manifest and bundles the packs it needs. Which packs a product bundles is
+that product's choice, recorded in its own repository rather than copied here, so this repository never has to
+follow a product's selection. A standalone model does not require a playable item or placement, so a pack can
+carry looks one product uses without inventing gameplay for another. Packs are scoped to content, such as a kind
+of thing, an actor family, a site or a scenario, never to a reader; see the selections in `models/recipes/`. The
+showcase consumes all manifest models, independent of product bundling.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
