@@ -70,15 +70,14 @@ export function readCredits(root = repo) {
   };
 }
 
-// The manifest carries matrix mobs. Pose actors have their own body and clip contract and do not enter the model
-// manifest until their consumer pack declares them.
+// Every mob row is a model. Pose actor rows additionally produce a body file.
 export function mobManifest(rows) {
   const models = [];
   const files = [];
   for (const row of rows) {
-    if (mobFormat(row) === 'pose') continue;
     models.push({ id: row.id, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips });
     files.push(outputPath(row.pack, row.glb), outputPath(row.pack, row.clips));
+    if (mobFormat(row) === 'pose') files.push(outputPath(row.pack, row.body));
   }
   return { models, files };
 }
