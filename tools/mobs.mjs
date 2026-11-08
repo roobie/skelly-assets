@@ -12,7 +12,7 @@ const here = import.meta.dirname;
 const repo = resolve(here, '..');
 installJsonnetSources();
 const src = (path) => `./packages/mobgen/src/${path}`;
-const { generate, generateValid, realize } = await import(src('core/generate.ts'));
+const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
 const { bakeActor } = await import('./actorBake.mjs');
 const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
 await import(src('mob/templates.ts'));
@@ -47,7 +47,8 @@ export function exportMob(row, out) {
     const issues = realize(generate(template, row.seed)).report.issues;
     throw new Error(`seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`);
   }
-  return bakeActor(row, template, found, out);
+  const realized = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor).realized : found.realized;
+  return bakeActor(row, template, { ...found, realized }, out);
 }
 
 function main() {
