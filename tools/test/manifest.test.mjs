@@ -94,7 +94,10 @@ test('a mob row joins the manifest with its GLB and clips and no part nodes', ()
   assert.equal(models[0].clips, 'fixture_mob_clips.json');
   assert.ok(!Object.hasOwn(models[0], 'nodes'));
   const actors = mobManifest([{ id: 'fixture_actor', pack: 'fixture.mobs', glb: 'a.glb', clips: 'a.json', body: 'b.json', format: 'pose' }]);
-  assert.deepEqual(actors, { models: [], files: [] });
+  assert.deepEqual(actors, {
+    models: [{ id: 'fixture_actor', kind: 'mob', pack: 'fixture.mobs', path: 'a.glb', clips: 'a.json' }],
+    files: ['fixture.mobs/a.glb', 'fixture.mobs/a.json', 'fixture.mobs/b.json'],
+  });
 });
 
 test('the tree check holds the tracked set, the fresh set and the manifest to one another', () => {
