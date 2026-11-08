@@ -42,14 +42,14 @@ const idleAt = (set, body, time) => {
   if (idle.kind === 'pose') return decodeFrame(sampleClip(idle, idle.loop ? time : time * (idle.duration ?? 1)));
   return applyMotion(decodeFrame(idle.base), idle.motion, time, body.seed);
 };
-const plainClip = (clip, set, body) => {
+const plainClip = (clip, set, body, stance) => {
   if (clip.kind === 'pose') return clip;
   const frames = clip.frames.map((_, i) => {
     const normalized = clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1);
     const time = normalized * (clip.duration ?? 1);
     const base = idleAt(set, body, normalized);
     const pose = clip.kind === 'overlay'
-      ? applyOverlay(body, base, clip, time, 1, set === set.crawling ? 'crawling' : 'standing')
+      ? applyOverlay(body, base, clip, time, 1, stance)
       : applyJointDelta(body, base, clip, clip.cursor === 'gaitPhase' ? normalized * 2 * Math.PI : time, { speed: 1, side: 0 });
     return poseFrame(pose);
   });
@@ -60,9 +60,8 @@ const plainSet = (set, body, stance) => Object.fromEntries(Object.entries(set).m
     const source = clip.slack ?? clip.aggravated;
     return [name, { kind: 'pose', loop: true, period: 1, frames: Array.from({ length: 24 }, (_, i) => poseFrame(applyMotion(decodeFrame(source.base), source.motion, i / 24, body.seed))) }];
   }
-  if (!clip.kind) return [name, Object.fromEntries(Object.entries(clip).map(([key, value]) => [key, plainClip(value, set, body)]))];
-  const baseSet = stance === 'crawling' ? { ...set, crawling: set } : set;
-  return [name, plainClip(clip, baseSet, body)];
+  if (!clip.kind) return [name, Object.fromEntries(Object.entries(clip).map(([key, value]) => [key, plainClip(value, set, body, stance)]))];
+  return [name, plainClip(clip, set, body, stance)];
 }));
 const plainClips = (clips, body) => ({
   ...(clips.standing ? { standing: plainSet(clips.standing, body, 'standing') } : {}),
