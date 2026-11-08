@@ -3,9 +3,9 @@ name: mobgen
 on:
   push:
     branches: [main]
-    paths: ['tools/packages/mobgen/**', 'tools/package-lock.json', 'tools/testPool.ts', '.github/workflows/mobgen.yml', '!**/*.md']
+    paths: ['tools/packages/mobgen/**', 'tools/package.json', 'tools/package-lock.json', 'tools/sources.mjs', 'tools/jsonnet/**', 'tools/testPool.ts', 'tools/pagesAnalyticsPlugin.ts', '.github/workflows/mobgen.yml', '!**/*.md']
   pull_request:
-    paths: ['tools/packages/mobgen/**', 'tools/package-lock.json', 'tools/testPool.ts', '.github/workflows/mobgen.yml', '!**/*.md']
+    paths: ['tools/packages/mobgen/**', 'tools/package.json', 'tools/package-lock.json', 'tools/sources.mjs', 'tools/jsonnet/**', 'tools/testPool.ts', 'tools/pagesAnalyticsPlugin.ts', '.github/workflows/mobgen.yml', '!**/*.md']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}

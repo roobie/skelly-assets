@@ -6,7 +6,10 @@ on:
     paths:
       - 'tools/packages/vehicle-authoring-tool/**'
       - 'tools/packages/thing-core/**'
+      - 'tools/packages/construct/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
       - '.github/workflows/vehicle-authoring-tool.yml'
       - '!**/*.md'
@@ -14,7 +17,10 @@ on:
     paths:
       - 'tools/packages/vehicle-authoring-tool/**'
       - 'tools/packages/thing-core/**'
+      - 'tools/packages/construct/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
       - '.github/workflows/vehicle-authoring-tool.yml'
       - '!**/*.md'

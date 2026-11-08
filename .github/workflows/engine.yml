@@ -6,14 +6,20 @@ on:
     paths:
       - 'tools/packages/construct/**'
       - 'tools/packages/thing-core/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - '.github/workflows/engine.yml'
       - '!**/*.md'
   pull_request:
     paths:
       - 'tools/packages/construct/**'
       - 'tools/packages/thing-core/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - '.github/workflows/engine.yml'
       - '!**/*.md'
 
