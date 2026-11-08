@@ -1,94 +1,101 @@
 ---
 read_if:
   - building models or adding source-backed per-pack export recipes
+  - understanding package origin and the boundary between tools and game consumers
 ---
 
-# Model tool
+# Model tools
 
-Builds the GLB models whose sources are in `../models/` (rows in Jsonnet) into `../built/`.
-`tools/build_models.sh` is the one command; it installs from this folder's `package-lock.json` the first time
-(`npm ci`), then runs `build.mjs`. `build.mjs --out dir [rowId ...]` builds to another folder or only some rows.
-Node 26 or later runs the TypeScript directly. The first build downloads the pinned go-jsonnet (`jsonnet/runtime.json`,
-sha256-checked) into `jsonnet/bin/`, ignored by git. An intermittent GitHub release download outage must not fail
-every Jsonnet build; see `jsonnet/setup.mjs`, `downloadWithRetry`.
+Build and commit sources with their generated output so consumers need no authoring environment. Use
+`build_models.sh` for roster and recipe exports, and `build_mobs.sh` for generated actors. For the entry points
+and selection rules, see `build.mjs`, `main`, and `mobs.mjs`, `main`.
+
+Node 26 or later runs TypeScript directly. Install the locked dependencies with `npm ci` in `tools/`;
+`node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
+compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
+of truth; see `sources.mjs`, `installJsonnetSources`. The compiler is checksum-verified; transient release
+hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin
 
-`packages/construct`, `packages/thing-core` and `packages/thing-export` are copied with tests from skelly commit
-`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2). Thing-core retains this repository's
-`materials.jsonnet` whole, including the catalogue-breadth and arpg1 materials; `materials.json` is regenerated.
+These packages are maintained here as the shared producer, not as game-local exporters. The origin reference
+for each package is skelly commit `aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2), with the retained
+content noted below. Shared package ownership avoids parallel game-local producers.
 
-`packages/tool-ui` is copied with tests from the same skelly commit `aee7ab265525f55247b88d9482e7109af44eaf42`
-(EUPL-1.2). Its `vite.config.ts` imports this folder's `testPool.ts`, which the copy places one level up from the
-package exactly where the import looks for it.
+### construct
 
-`packages/gun-authoring-tool` is copied with tests from skelly commit
-`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2). Its generated Jsonnet twins are not tracked;
-its registry-based export tests use thing-core's parameterised firearm schema instead. The firearm schema
-closure in `packages/thing-core/src/firearmModelSchema.ts` comes from that commit's deadvox model schema;
-callers supply temporal primitives so game-owned brands need not enter the tool pipeline. The skelly-only
-refresh command is omitted.
+`packages/construct` originates at the reference commit, with its tests. Geometry mechanisms belong here rather
+than in consumer-specific builders, so shared shapes have one mesh and collision contract.
 
-`packages/vehicle-authoring-tool` is copied with its editor/schema tests from skelly commit
-`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2), with schema-only validation.
-Its `blueprints/*.json` authoring inputs are the blueprint rows from that commit's
-`packages/mods/skelly.ground-vehicles/vehicles.json`. Consumer admission tests remain skelly-owned.
-The shared vehicle schema factories in thing-core originate in that commit's deadvox schema.
+### thing-core
 
-`packages/thing-authoring-tool` is reconciled from skelly commit
-`aee7ab265525f55247b88d9482e7109af44eaf42` (EUPL-1.2), retaining the compound and worn-fit helpers and selected
-catalogue rows from `56b9b69a6c1c965a31f4fbb66270e2ed0421cdc9`. The retained armour's `oct` exposure and authored
-piece side counts are kept; omitted side counts inherit the catalogue's content default, never a code number.
-Compound pieces can opt into round geometry with `sides: null`; see the root README's Layout rule. Container masses live in tool-owned content
-rather than importing game inventory. The viewer, fixture exporter and tests are tool-owned. This repository is the
-source of truth; nothing syncs back to skelly. The `@skelly/` package names are kept.
+`packages/thing-core` originates at the reference commit. Its material source retains the assets catalogue and
+arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
+schemas keep game-owned temporal brands outside the tool pipeline.
 
-`packages/mobgen` is reconciled from skelly commit `aee7ab265525f55247b88d9482e7109af44eaf42`,
-retaining the assets-specific signature parts, budgets, idle stance and additional body plans. The viewer,
-CLI, tests and docs come from that commit. Ragdoll physics remains game-owned, not part of this pipeline.
-Package Jsonnet sources compile into git-ignored `.json` twins beside their sources before builds, tests and typechecks (where those scripts exist). Test fixtures are compiled by their tests, not by this step. Like the rest of `tools/`, mobgen is EUPL-1.2 (`../LICENSE`).
+### thing-export
 
-## Mobs
+`packages/thing-export` originates at the reference commit, with its tests. Neutral export and file writing live
+here so the authoring tools share an output contract rather than copying writers.
 
-`tools/build_mobs.sh [--out dir] [mobId ...]` runs `mobs.mjs`, which builds a GLB and a clips JSON per row of
-`../models/mobs.json` (template, seed, lod divisor, walk and attack frames, output names) into `built/<pack>/`,
-the row's `pack`.
-A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and
-`exportMob`. `sources.mjs` is the Jsonnet compile step shared with `build.mjs`.
+### tool-ui
+
+`packages/tool-ui` originates at the reference commit, with its tests. Shared editor UI is tool-owned, not a
+reason for authoring packages to depend on a game.
+
+### gun-authoring-tool
+
+`packages/gun-authoring-tool` originates at the reference commit, with its tests. Schema-based export tests
+belong here; admission into a game's content registry remains the consumer's responsibility.
+
+### vehicle-authoring-tool
+
+`packages/vehicle-authoring-tool` originates at the reference commit, including the editor/schema tests and
+blueprint authoring inputs from its ground-vehicle content. Validation here is schema-only: consumer admission
+and runtime behaviour remain game-owned.
+
+### thing-authoring-tool
+
+`packages/thing-authoring-tool` originates at the reference commit, reconciled with the compound/worn-fit helpers
+and selected catalogue content from skelly commit `56b9b69a6c1c965a31f4fbb66270e2ed0421cdc9`. The retained armour
+needs `packages/thing-authoring-tool/worn-fit.libsonnet`, `oct`. Authored side counts and the catalogue default preserve authoring
+control; see `../README.md`, "Shared turned look and fit limits". Container masses are tool-owned content so a
+model build does not import a game's item rules. The viewer, fixture exporter and tests belong to this producer.
+
+### mobgen
+
+`packages/mobgen` originates at the reference commit, reconciled with the assets-specific signature parts,
+budgets, idle stance and additional body plans. The viewer, CLI, tests and docs belong to the generator;
+ragdoll physics belongs to the consuming game, not the asset bake.
 
 ## Layout
 
-- `../models/*.libsonnet`: model sources, listed in `models/index.libsonnet`; `models/export.json` maps each
-  roster pack id to the rows `build.mjs` installs by default, at `built/<packId>/assets/models/<id>.glb`.
-- `../models/recipes/<packId>.jsonnet`: per-pack export recipes, compiled into ignored JSON twins by `sources.mjs`
-  and found from the sources, so a stale twin is never read; see `recipes.mjs`, `readRecipes`. A recipe file is
-  one array of rows; each row's `kind` picks its tool. The gun tool owns `design`, `cartridge`, `attachment`,
-  `magazine` and `part` (`packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`); the thing tool owns
-  `item` (`packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`). `../models/recipes/skelly.firearms.jsonnet`
-  joins the mod's item rows with the gun roster, `packages/gun-authoring-tool/exports/deadvox.jsonnet`; gun rows'
-  `source` paths are relative to this folder.
-- `build.mjs`, `exportRecipes`: the one recipe driver. It splits each recipe file by owning tool before any loader
-  runs, refuses a kind no tool owns and an id two tools would both export, and writes under `<out>/<packId>/`: gun
-  rows as `gungen/<id>.model.json` and `assets/models/<id>.glb`; item rows as `things/<id>.model.json`,
-  `things/index.json` and `assets/models/<id>.glb`. With no row ids, `build.mjs` builds the roster, then runs the
-  gun and thing tools over every recipe file into `built/`; see `PRODUCTION_RECIPE_TOOLS`.
-- `manifest.mjs`: `built/manifest.json`, written by `build.mjs` with no row ids. Each model has its id, kind, pack,
-  logical path, the GLB's part node names (`nodes`, from the resolved assembly) and credits (author and licence,
-  from `../REUSE.toml`, `readCredits`); each pack lists every file produced under it, the mob files of `mobs.mjs`
-  included. A mob GLB has no assembly, so its entry has `body` and `clips` and no `nodes`.
-- `check-built.mjs`: rebuilds into a temporary folder and holds `built/` to it: the fresh set equals the tracked set
-  under `built/`, byte for byte, nothing sits flat there but `manifest.json`, the manifest names exactly the fresh
-  files (`manifest.mjs`, `treeDifferences`) and every directory is a declared pack.
-- `layout.mjs`: keeps logical paths inside their owning pack; both builders and `check-built.mjs` find pack paths
-  through it. The showcase (`../site/build.mjs`) lists the models of `built/manifest.json`.
-- `packages/thing-authoring-tool/items.jsonnet`: the catalogue the roster and the recipe files' item rows select
-  from. `exports/deadvox.jsonnet` selects the roster for `build.mjs`.
-- `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: runs the driver's thing tool
-  over the recipe files into `<output root>/<packId>/things/` and `<output root>/<packId>/assets/models/`. Run
-  with Node from `tools/`.
-- The ported catalogue sources have item rows in the per-pack recipe files (for example
-  `../models/recipes/skelly.arcana.jsonnet`); the production build writes them under `built/<packId>/things/` and
-  `built/<packId>/assets/models/`.
-- `.gdignore` keeps Godot from scanning this folder.
+Choose pack ownership before choosing an exporter; the shared rule and consumer contracts are in
+`../README.md`, "Layout". A pack's recipe is `../models/recipes/<packId>.jsonnet`. Discovery follows source
+files, not stale JSON twins; see `recipes.mjs`, `readRecipes`. The common row schema is
+`packages/thing-export/src/recipe.ts`, `RowSchema`.
 
-The ownership rule and remaining shared-pipeline gaps are in the root README's Layout section.
+Keep one recipe driver so tool ownership is checked before either loader runs. See `build.mjs`,
+`partitionRecipe` and `exportRecipes`, for kind dispatch and duplicate-producer refusal; the owning boundaries
+are `packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`, and
+`packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`. Gun source paths resolve against this tools
+folder, not a game's checkout; see `build.mjs`, `loadRecipeTools`.
+
+Use the production entry for the complete roster/recipe set, not a tool-local refresh into a consumer tree.
+See `build.mjs`, `main`, `buildRoster` and `PRODUCTION_RECIPE_TOOLS`. Output paths and metadata/index writing
+are owned by `packages/thing-export/src/files.ts`, `writeRecipeExports`; pack containment is owned by
+`layout.mjs`, `outputPath`. For a thing-only recipe export into an alternate output root, see
+`packages/thing-authoring-tool/src/cli/export.ts`, `exportThingRecipes`.
+
+Generated actors are a separate source family, not another recipe partition. A mob row selects a registered
+template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and `exportMob`. The GLB, body and pose
+clips form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`. Use this
+same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
+
+Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
+`readCredits`, for model identity, actor companions and attribution. Reproducibility is enforced by
+`check-built.mjs` and `manifest.mjs`, `treeDifferences`: tracked bytes must equal fresh bytes, every file must
+be named, and every output directory must be a declared pack (`layout.mjs`, `declaredPacks`). The showcase
+reads this authority rather than maintaining its own model selection; see `../site/build.mjs`.
+
+Keep engine import caches in consumers; `.gdignore` excludes the authoring tree from Godot scanning.
