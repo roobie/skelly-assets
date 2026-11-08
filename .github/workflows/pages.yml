@@ -4,7 +4,27 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: [built/**, site/**, .github/workflows/pages.yml]
+    paths: &pages-paths
+      - 'built/**'
+      - 'site/**'
+      - 'tools/packages/construct/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/packages/thing-export/**'
+      - 'tools/packages/tool-ui/**'
+      - 'tools/packages/gun-authoring-tool/**'
+      - 'tools/packages/mobgen/**'
+      - 'tools/packages/thing-authoring-tool/**'
+      - 'tools/packages/vehicle-authoring-tool/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - 'tools/testPool.ts'
+      - 'tools/pagesAnalyticsPlugin.ts'
+      - '.github/workflows/pages.yml'
+      - '!**/*.md'
+  pull_request:
+    paths: *pages-paths
   workflow_dispatch:
 
 permissions:
@@ -23,14 +43,36 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - run: node site/build.mjs _site
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix tools
+      - name: Build mobgen viewer
+        working-directory: tools/packages/mobgen
+        run: PAGES_ANALYTICS=1 npx vite build
+      - name: Build gun-authoring-tool viewer
+        working-directory: tools/packages/gun-authoring-tool
+        run: PAGES_ANALYTICS=1 npx vite build
+      - name: Build thing-authoring-tool viewer
+        working-directory: tools/packages/thing-authoring-tool
+        run: npx vite build
+      - name: Build vehicle-authoring-tool viewer
+        working-directory: tools/packages/vehicle-authoring-tool
+        run: npx vite build
+      - name: Assemble the site
+        run: |
+          node site/build.mjs _site
+          for P in mobgen gun-authoring-tool thing-authoring-tool vehicle-authoring-tool; do
+            mkdir -p _site/$P
+            cp -r tools/packages/$P/dist/. _site/$P/
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

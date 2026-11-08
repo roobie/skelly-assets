@@ -66,7 +66,7 @@ Open gaps:
 | `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries where applicable, and matrix or pose clip files for mobs; `manifest.json` lists them all |
 | `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
-| `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
+| `site/` | The showcase page; GitHub Pages also publishes the mobgen, gun, thing and vehicle authoring viewers from `tools/packages/` |
 
 ## Using the assets
 
