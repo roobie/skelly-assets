@@ -114,7 +114,7 @@ export function buildManifest({ models, files, credit }) {
     };
   });
   return {
-    _doc: 'Every model built/ holds and every produced file under its pack, written by tools/build.mjs; paths are logical under built/<pack>/. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
+    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
   };
