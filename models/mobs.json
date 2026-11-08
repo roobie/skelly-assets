@@ -1,5 +1,5 @@
 {
-  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh). Every row bakes one pose representation: GLB, body and clips are logical paths under its pack, preserving mobgen's rest frame so consumers compose the same roots and quaternion rotations. Defaults apply to every row; a row narrows its template with params, materials, parts and budgets.",
+  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh). Every row bakes one pose representation: GLB, body and clips are logical paths under its pack, preserving mobgen's rest frame so consumers compose the same roots and quaternion rotations. Defaults apply to every row; params, materials, parts, budgets and budget_headroom narrow its template; brief records its source reading; attack_clip and idle select authored motion; walkCycles, walk_frames and attack_frames select sampling; scale is carried with the rest-frame geometry; lod_divisor reduces the 0.5 m source voxel when positive. Plans without mobgen region maps omit regions, boxes and severableParts, and plans without mobgen look profiles may omit lookAt: consumers must not require values nobody authored.",
   "defaults": {
     "seed": 7,
     "scale": 1,

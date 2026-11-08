@@ -15,7 +15,7 @@ async function bakeFixture(model, options = {}) {
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
     glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
   try {
     exportMob(row, out);
@@ -577,7 +577,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
         glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
@@ -667,6 +667,41 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
     assert(sawCharged && sawEmission);
   } finally {
     rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('creature pose clips reproduce their live posers at every stored cursor', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { dogIdlePose, dogAttackPose, quadrupedGaitPose, quadrupedStrideLength, DOG_POUNCE } = await import('../packages/mobgen/src/mob/quadruped.ts');
+  const { insectIdlePose, insectAttackPose, insectGaitPose, insectStrideLength, INSECT_LUNGE } = await import('../packages/mobgen/src/mob/insect.ts');
+  const { floaterIdlePose, floaterCastPose, floaterDriftPose, FLOATER_CAST } = await import('../packages/mobgen/src/mob/floater.ts');
+  const { dragonIdlePose, dragonAttackPose, dragonStompPose, DRAGON_LUNGE } = await import('../packages/mobgen/src/mob/dragon.ts');
+  await Promise.all(['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts'].map((file) => import(`../packages/mobgen/src/mob/${file}`)));
+  const close = (actual, expected) => {
+    actual.root.forEach((value, axis) => assert(Math.abs(value - expected.root[axis]) < 1e-12));
+    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) (actual.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]).forEach((value, axis) => assert(Math.abs(value - (expected.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1])[axis]) < 1e-12));
+  };
+  const plans = {
+    dog: (figure, row) => { const s = { limp: figure.genome.params.limp, headTilt: figure.genome.params.headTilt, jawOpen: figure.genome.params.jawOpen }; const stride = quadrupedStrideLength(figure.realized, s); return { idle: () => dogIdlePose(figure.realized, s), walk: (u) => quadrupedGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => dogAttackPose(figure.realized, dogIdlePose(figure.realized, s), t), duration: DOG_POUNCE.duration }; },
+    insect: (figure, row) => { const s = { mandibleOpen: figure.genome.params.mandibleOpen }; const stride = insectStrideLength(figure.realized); return { idle: () => insectIdlePose(figure.realized, 0.9), walk: (u) => insectGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => insectAttackPose(figure.realized, insectIdlePose(figure.realized, 0), t), duration: INSECT_LUNGE.duration }; },
+    floater: (figure) => ({ idle: () => floaterIdlePose(figure.realized, figure.genome.params), walk: (u) => floaterDriftPose(figure.realized, figure.genome.params, u), attack: (t) => floaterCastPose(figure.realized, figure.genome.params, t), duration: FLOATER_CAST.duration }),
+    dragon: (figure) => ({ idle: () => dragonIdlePose(figure.realized, figure.genome.params), walk: (u) => dragonStompPose(figure.realized, figure.genome.params, u), attack: (t) => dragonAttackPose(figure.realized, figure.genome.params, t), duration: DRAGON_LUNGE.duration }),
+  };
+  for (const model of Object.keys(plans)) {
+    const row = { walk_speed: 0.8, walk_frames: 8, attack_frames: 9 };
+    const template = consumableTemplate(model), generated = generateValid(template, 1, { maxAttempts: 1 });
+    const figure = figureFor(generated, template, 1), live = plans[model](figure, row), { body, clips } = await bakeFixture(model, row);
+    assert(!('regions' in body) && !('boxes' in body) && !('severableParts' in body));
+    if (model !== 'dog') assert(!('lookAt' in body));
+    const standing = clips.standing;
+    for (const [name, at] of Object.entries({ idle: live.idle, walk: live.walk, attack: live.attack })) for (const [i, frame] of standing[name].frames.entries()) {
+      const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
+      close(decodeFrame(frame), at(cursor));
+    }
+    if (model === 'dog') assert.throws(() => close(decodeFrame(standing.walk.frames[1]), live.walk(0)), assert.AssertionError);
   }
 });
 

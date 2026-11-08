@@ -40,15 +40,14 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
   const acid = template.bodyPlan === 'acid';
   const attack = humanoid ? attackClipFor(template) : undefined;
   const peak = HIT_FLINCH.keys[1];
+  const regions = figure.regions ?? planOf(template.bodyPlan).regionBones;
   return {
     type, model, seed, bodyPlan: template.bodyPlan,
     ...(template.legCut === undefined ? {} : { legCut: template.legCut }),
     scale, height: maxY - minY,
     ...bodyGeometry(figure, template),
     anchors: anchors ?? {},
-    regions: figure.regions ?? planOf(template.bodyPlan).regionBones,
-    boxes: figure.boxes,
-    severableParts: figure.severableParts,
+    ...(regions === undefined ? {} : { regions, boxes: figure.boxes, severableParts: figure.severableParts }),
     burstBones: burstBones(bones),
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
     ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
