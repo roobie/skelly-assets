@@ -9,7 +9,10 @@ on:
       - 'tools/packages/thing-export/**'
       - 'tools/packages/construct/**'
       - 'tools/packages/tool-ui/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
   pull_request:
@@ -19,7 +22,10 @@ on:
       - 'tools/packages/thing-export/**'
       - 'tools/packages/construct/**'
       - 'tools/packages/tool-ui/**'
+      - 'tools/package.json'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
 

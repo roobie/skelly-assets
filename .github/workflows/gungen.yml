@@ -10,9 +10,12 @@ on:
       - 'tools/packages/thing-export/**'
       - 'tools/packages/tool-ui/**'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - 'tools/testPool.ts'
       - '.github/workflows/gungen.yml'
       - '!**/*.md'
+      - 'tools/packages/gun-authoring-tool/PROJECT.md'
   pull_request:
     paths:
       - 'tools/packages/gun-authoring-tool/**'
@@ -21,9 +24,12 @@ on:
       - 'tools/packages/thing-export/**'
       - 'tools/packages/tool-ui/**'
       - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
       - 'tools/testPool.ts'
       - '.github/workflows/gungen.yml'
       - '!**/*.md'
+      - 'tools/packages/gun-authoring-tool/PROJECT.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
@@ -32,6 +38,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     defaults:
       run:
         working-directory: tools/packages/gun-authoring-tool
@@ -43,6 +50,8 @@ jobs:
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix ../..
+      - run: npm --prefix ../tool-ui run typecheck
+      - run: npm --prefix ../tool-ui test
       - name: Cache Playwright Chromium
         uses: actions/cache@v4
         with:
