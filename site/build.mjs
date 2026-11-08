@@ -58,7 +58,7 @@ const plainClip = (clip, set, body, stance) => {
 const plainSet = (set, body, stance) => Object.fromEntries(Object.entries(set).map(([name, clip]) => {
   if (name === 'idle' && !clip.kind) {
     const source = clip.slack ?? clip.aggravated;
-    return [name, { kind: 'pose', loop: true, period: 1, frames: Array.from({ length: 24 }, (_, i) => poseFrame(applyMotion(decodeFrame(source.base), source.motion, i / 24, body.seed))) }];
+    return [name, { kind: 'pose', loop: false, frames: [source.base] }];
   }
   if (!clip.kind) return [name, Object.fromEntries(Object.entries(clip).map(([key, value]) => [key, plainClip(value, set, body, stance)]))];
   return [name, plainClip(clip, set, body, stance)];

@@ -89,6 +89,12 @@ changing a source, rebuild and commit the source and its `built/` output togethe
 
 To preview the showcase locally, run `node site/build.mjs` and serve `_site/` with any static file server.
 
+### Showcase idle motion
+
+The showcase shows a humanoid idle's rest pose rather than sway. The three sway oscillators in
+`tools/packages/mobgen/src/mob/idle.ts`, `idleMotion`, only close a plain baked loop over a span too long for the
+showcase; a short loop visibly jumps at its wrap. The showcase carries no composition logic, so it uses the rest pose.
+
 ## Licence
 
 The licence depends on the path; [`REUSE.toml`](REUSE.toml) states it for each one.
