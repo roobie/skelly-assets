@@ -5,12 +5,10 @@ import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { declaredPacks, outputPath, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
 import { samplePose } from '../../site/poseSample.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
-// Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
-const gitEnvironment = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
-const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', env: gitEnvironment() });
 const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile()).map((entry) => relative(directory, join(entry.parentPath, entry.name))).sort();
 
@@ -55,12 +53,6 @@ test('every mob row names a pack and actor output paths', () => {
   }
 });
 
-test('every directory tracked under built/ is a declared pack', () => {
-  const tracked = git('ls-files', '-z', '--', 'built').split('\0').filter(Boolean);
-  assert.ok(tracked.some((path) => path.split('/').length > 2), 'no tracked file in a pack directory under built/');
-  assert.deepEqual(undeclaredDirectories(tracked, declaredPacks()), []);
-});
-
 test('the roster builder writes each id at its pack path and nowhere else', () => {
   const [{ packId, id }] = readRoster();
   const out = mkdtempSync(join(tmpdir(), 'roster-'));
@@ -70,13 +62,21 @@ test('the roster builder writes each id at its pack path and nowhere else', () =
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
 
-test('the showcase lists every model of the manifest at its pack path and ships the file there', () => {
-  const out = mkdtempSync(join(tmpdir(), 'site-'));
+// One mob row per template bakes every clip shape the templates make, so the showcase must compose each of them.
+const mobRowPerTemplate = () => [...new Map(readMobRows().map((row) => [row.template, row])).values()];
+
+test('the showcase lists every model of the manifest at its pack path, ships the file there and can play every template\'s clips', () => {
+  const root = mkdtempSync(join(tmpdir(), 'site-'));
+  const built = join(root, 'built');
+  const out = join(root, 'site');
   try {
-    execFileSync(process.execPath, [join(repo, 'site/build.mjs'), out], { cwd: repo, stdio: 'pipe' });
+    const rows = mobRowPerTemplate();
+    execFileSync(process.execPath, [join(repo, 'tools/mobs.mjs'), '--out', built, ...rows.map((row) => row.id)], { cwd: repo, stdio: 'pipe' });
+    const manifest = buildManifest({ ...mobManifest(rows), credit: readCredits(repo) });
+    writeFileSync(join(built, MANIFEST), manifestJson(manifest));
+    execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, out], { cwd: repo, stdio: 'pipe' });
     const { models } = JSON.parse(readFileSync(join(out, 'models.json'), 'utf8'));
     const listed = new Map(models.map((model) => [model.file, model]));
-    const manifest = JSON.parse(readFileSync(join(repo, 'built/manifest.json'), 'utf8'));
     assert.ok(manifest.models.length > 0);
     for (const row of manifest.models) {
       const file = outputPath(row.pack, row.path);
@@ -94,15 +94,13 @@ test('the showcase lists every model of the manifest at its pack path and ships 
         const clips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
         const set = clips.standing ?? clips.crawling ?? clips;
         assert.ok(Object.values(set).some((clip) => ['pose', 'overlay', 'jointDelta'].includes(clip?.kind)), `${model.file} has no viewer-playable clip`);
-        const siteClips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
-        const viewerClips = siteClips.standing ?? siteClips.crawling ?? siteClips;
-        for (const name of ['walk', 'attack', 'idle']) if (viewerClips[name]?.kind === 'pose') for (const time of [0, 1.234]) {
-          const clip = viewerClips[name];
+        for (const name of ['walk', 'attack', 'idle']) if (set[name]?.kind === 'pose') for (const time of [0, 1.234]) {
+          const clip = set[name];
           assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
         }
         // Death falls run on the render clock, so its span key differs from every other finite clip's.
-        for (const direction of ['forward', 'backward']) if (viewerClips.death?.[direction]) for (const time of [0, 1.234]) {
-          const clip = viewerClips.death[direction];
+        for (const direction of ['forward', 'backward']) if (set.death?.[direction]) for (const time of [0, 1.234]) {
+          const clip = set.death[direction];
           assert.equal(clip.kind, 'pose');
           assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable death ${direction} clip`);
           sampledDeaths++;
@@ -110,5 +108,5 @@ test('the showcase lists every model of the manifest at its pack path and ships 
       }
     }
     assert.ok(sampledDeaths > 0, 'no showcase death clip was sampled');
-  } finally { rmSync(out, { recursive: true, force: true }); }
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

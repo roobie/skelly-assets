@@ -1,9 +1,11 @@
-// Builds the showcase site into _site/: the page, the models from built/ and a models.json that lists them.
-// Usage: node site/build.mjs [outDir]. No dependencies; the page loads three.js from a CDN.
-// The models are the GLB models built/manifest.json names (tools/manifest.mjs), at their pack paths under built/.
+// Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them.
+// Usage: node site/build.mjs [--built dir] [outDir]; the tree defaults to built/. No dependencies; the page loads
+// three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
+// pack paths.
 import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -11,8 +13,9 @@ import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const out = resolve(root, process.argv[2] ?? '_site');
-const built = join(root, 'built');
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') } } });
+const out = resolve(root, positionals[0] ?? '_site');
+const built = resolve(values.built);
 
 // The only grouping the files themselves carry: a model with a clips file is an animated creature. Ids are names,
 // not categories, so nothing here reads meaning into them.
