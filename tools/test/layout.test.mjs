@@ -87,6 +87,12 @@ test('the showcase lists every model of the manifest at its pack path and ships 
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
       if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
       if (model.body) assert.ok(existsSync(join(out, 'built', model.body)), `${model.file} is missing its actor body`);
+      if (model.clips) {
+        assert.ok(model.body, `${model.file} has clips the viewer cannot pose`);
+        const clips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
+        const set = clips.standing ?? clips.crawling ?? clips;
+        assert.ok(Object.values(set).some((clip) => ['pose', 'overlay', 'jointDelta'].includes(clip?.kind)), `${model.file} has no viewer-playable clip`);
+      }
     }
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
