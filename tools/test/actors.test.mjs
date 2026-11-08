@@ -530,6 +530,25 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   assert.deepEqual(clips.standing.idle.frames[0], { root: body.originOffset.map((v) => v / scale), rotations: {} });
 });
 
+test('every content pose row writes its declared actor files', async () => {
+  const { mkdtempSync, existsSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { exportMob } = await import('../mobs.mjs');
+  const { outputPath, readMobRows } = await import('../layout.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'actor-content-'));
+  try {
+    const rows = readMobRows().filter((candidate) => candidate.format === 'pose');
+    assert(rows.some(() => true), 'content must declare pose actor rows');
+    for (const row of rows) {
+      exportMob(row, root);
+      for (const file of [row.glb, row.body, row.clips]) assert(existsSync(join(root, outputPath(row.pack, file))));
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, hull and cell contracts', async () => {
   const { mkdtempSync, readFileSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
