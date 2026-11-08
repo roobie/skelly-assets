@@ -1,0 +1,19 @@
+{
+	"id": "digging_stick",
+	"file": "assets/models/digging_stick.glb",
+	"parts": {
+		"digging_stick": {
+			"node": "digging_stick:compound",
+			"massKg": 1.133,
+			"centreOfMass": [
+				0.4248894987722085, -0.00010746786075400825, -0.00012855698396648841
+			]
+		}
+	},
+	"grip": {
+		"at": [0.36, -0.0019999999999999983, -0.0019999999999999983],
+		"turn": [0, 0, 0]
+	},
+	"hold": "upright",
+	"roll": 90
+}

@@ -1,0 +1,39 @@
+{
+	"id": "oil_lamp",
+	"file": "assets/models/oil_lamp.glb",
+	"parts": {
+		"base": {
+			"node": "base:base",
+			"massKg": 0.4,
+			"centreOfMass": [0, 0.005999999999999999, 0]
+		},
+		"reservoir": {
+			"node": "reservoir:reservoir",
+			"massKg": 0.12,
+			"centreOfMass": [0, 0.041999999999999996, -4.9749830044246645e-18]
+		},
+		"fuel_fill": {
+			"node": "fuel_fill:fuel_fill",
+			"massKg": 0.001,
+			"centreOfMass": [
+				-0.00001865136298421799, 0.04197608799617408, -0.000018651362984228143
+			]
+		},
+		"burner": {
+			"node": "burner:burner",
+			"massKg": 0.08,
+			"centreOfMass": [0, 0.07800000000000001, -1.9225797809721788e-17]
+		},
+		"chimney": {
+			"node": "chimney:chimney",
+			"massKg": 0.08,
+			"centreOfMass": [
+				-0.00009573057544417929, 0.13139087775125963, -0.00006125696101834556
+			]
+		}
+	},
+	"grip": { "at": [0, 0.006, 0], "turn": [0, 0, -90] },
+	"hold": "upright",
+	"roll": 0,
+	"anchors": { "flame": [0, 0.084, -2.4164820920652226e-17] }
+}

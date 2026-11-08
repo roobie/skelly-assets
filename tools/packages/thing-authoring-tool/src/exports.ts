@@ -42,6 +42,7 @@ export const exportItem = (
   }
   return {
     glb: out.glb,
+    partNodes: out.partNodes,
     modelEntry: {
       ...asset,
       ...(item.exportMass === 'parts' ? { parts } : {}),

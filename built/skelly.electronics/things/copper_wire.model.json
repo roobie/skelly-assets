@@ -1,0 +1,13 @@
+{
+	"id": "copper_wire",
+	"file": "assets/models/copper_wire.glb",
+	"parts": {
+		"copper_wire": {
+			"node": "copper_wire:spool",
+			"massKg": 0.08,
+			"centreOfMass": [
+				-0.000054519368723099014, 0.027862266857962698, -0.000054519368723099014
+			]
+		}
+	}
+}

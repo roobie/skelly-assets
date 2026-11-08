@@ -12,7 +12,12 @@ import { GUN_PALETTE } from './palette.ts';
 import { FAMILIES } from './parts.ts';
 
 export type AttachmentExportResult =
-  | { readonly ok: true; readonly glb: Uint8Array; readonly modelEntry: DeadvoxModelEntry }
+  | {
+      readonly ok: true;
+      readonly glb: Uint8Array;
+      readonly partNodes: readonly string[];
+      readonly modelEntry: DeadvoxModelEntry;
+    }
   | { readonly ok: false; readonly error: GlbExportError };
 
 /** Exports one attachment part at its mount base as a standalone loot/item model. */
@@ -60,6 +65,7 @@ export const exportAttachmentGlb = (
   return {
     ok: true,
     glb: result.glb,
+    partNodes: result.partNodes,
     modelEntry: {
       id: asset.id,
       file: asset.file as DeadvoxModelFile,

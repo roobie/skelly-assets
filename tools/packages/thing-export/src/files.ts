@@ -14,15 +14,21 @@ const formattedJson = (value: unknown, file: string): string => {
   );
 };
 export const modelEntryJson = (entry: NeutralModel): string => formattedJson(entry, `${entry.id}.model.json`);
+/** What one recipe wrote: each model's GLB path and part nodes, and every file, all relative to the base. */
+export interface WrittenRecipe {
+  readonly models: readonly { readonly id: string; readonly kind: string; readonly path: string; readonly partNodes: readonly string[] }[];
+  readonly files: readonly string[];
+}
 export const writeRecipeExports = (
   recipe: readonly RecipeExport[],
   base: string,
   directory: string,
   { index = false }: { readonly index?: boolean } = {},
-): void => {
-  const outputs = recipe.map(({ generate }) => generate());
+): WrittenRecipe => {
+  const outputs = recipe.map(({ id, kind, generate }) => ({ id, kind, ...generate() }));
   mkdirSync(resolve(base, directory), { recursive: true });
   mkdirSync(resolve(base, 'assets/models'), { recursive: true });
+  const files: string[] = [];
   if (index) {
     writeFileSync(
       resolve(base, directory, 'index.json'),
@@ -31,9 +37,15 @@ export const writeRecipeExports = (
         'index.json',
       ),
     );
+    files.push(`${directory}/index.json`);
   }
   for (const { modelEntry, glb } of outputs) {
     writeFileSync(resolve(base, directory, `${modelEntry.id}.model.json`), modelEntryJson(modelEntry));
     writeFileSync(resolve(base, modelEntry.file), glb);
+    files.push(`${directory}/${modelEntry.id}.model.json`, modelEntry.file);
   }
+  return {
+    models: outputs.map(({ id, kind, modelEntry, partNodes }) => ({ id, kind, path: modelEntry.file, partNodes })),
+    files,
+  };
 };

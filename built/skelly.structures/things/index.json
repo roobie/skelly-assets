@@ -1,0 +1,24 @@
+[
+	{
+		"id": "oven_door",
+		"file": "assets/models/oven_door.glb",
+		"parts": {
+			"oven_door": {
+				"node": "oven_door:compound",
+				"massKg": 10,
+				"centreOfMass": [0, 0.025064035703540252, 0.0011815264266372477]
+			}
+		}
+	},
+	{
+		"id": "hinge_set",
+		"file": "assets/models/hinge_set.glb",
+		"parts": {
+			"hinge_set": {
+				"node": "hinge_set:compound",
+				"massKg": 0.36,
+				"centreOfMass": [-1.1456795187715064e-18, 0.0019473684210526314, 0]
+			}
+		}
+	}
+]

@@ -10,7 +10,12 @@ import { exportGunGeometry } from '../gun/glbWriter.ts';
 import { GUN_PALETTE } from '../gun/palette.ts';
 
 export type PartExportResult =
-  | { readonly ok: true; readonly glb: Uint8Array; readonly modelEntry: DeadvoxModelEntry }
+  | {
+      readonly ok: true;
+      readonly glb: Uint8Array;
+      readonly partNodes: readonly string[];
+      readonly modelEntry: DeadvoxModelEntry;
+    }
   | { readonly ok: false; readonly error: GlbExportError };
 
 /**
@@ -56,6 +61,7 @@ export const exportPartItem = (
   return {
     ok: true,
     glb: result.glb,
+    partNodes: result.partNodes,
     modelEntry: { id: asset.id, file: asset.file as DeadvoxModelFile, gun: {}, parts },
   };
 };

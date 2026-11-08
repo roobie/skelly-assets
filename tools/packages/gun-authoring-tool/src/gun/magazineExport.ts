@@ -26,7 +26,12 @@ export interface MagazineExportInput {
 }
 
 export type MagazineExportResult =
-  | { readonly ok: true; readonly glb: Uint8Array; readonly modelEntry: DeadvoxModelEntry }
+  | {
+      readonly ok: true;
+      readonly glb: Uint8Array;
+      readonly partNodes: readonly string[];
+      readonly modelEntry: DeadvoxModelEntry;
+    }
   | { readonly ok: false; readonly error: GlbExportError };
 
 /** Exports one generated magazine as a detached model plus its full round-column metadata. */
@@ -59,6 +64,7 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
   return {
     ok: true,
     glb: output.glb,
+    partNodes: output.partNodes,
     modelEntry: {
       id: input.asset.id,
       file: input.asset.file as DeadvoxModelFile,

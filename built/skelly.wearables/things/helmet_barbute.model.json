@@ -1,0 +1,13 @@
+{
+	"id": "helmet_barbute",
+	"file": "assets/models/helmet_barbute.glb",
+	"parts": {
+		"helmet_barbute": {
+			"node": "helmet_barbute:compound",
+			"massKg": 1.175,
+			"centreOfMass": [
+				-0.00008875173741727357, 0.12826408742556197, -0.004137667206488057
+			]
+		}
+	}
+}

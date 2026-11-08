@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
-import { declaredPacks, mobFormat, outputPath, producedModels, readMobRows, readPackFormats, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { declaredPacks, mobFormat, outputPath, readMobRows, readPackFormats, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 // Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
@@ -31,10 +31,6 @@ test('every pack a recipe file, a roster pack or a mob row names is declared, an
   try {
     assert.deepEqual(declaredPacks(root), new Set(['fixture.recipe', 'fixture.roster', 'fixture.mobs']));
     assert.deepEqual(readRoster(root), [{ packId: 'fixture.roster', id: 'fixture_gun', file: 'fixture.roster/assets/models/fixture_gun.glb' }]);
-    assert.deepEqual(producedModels(root), [
-      { id: 'fixture_gun', file: 'fixture.roster/assets/models/fixture_gun.glb', clips: null },
-      { id: 'fixture_mob', file: 'fixture.mobs/fixture_mob.glb', clips: 'fixture.mobs/fixture_mob_clips.json' },
-    ]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -97,15 +93,20 @@ test('the roster builder writes each id at its pack path and nowhere else', () =
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
 
-test('the showcase lists every produced row at its layout path and ships the file there', () => {
+test('the showcase lists every model of the manifest at its pack path and ships the file there', () => {
   const out = mkdtempSync(join(tmpdir(), 'site-'));
   try {
     execFileSync(process.execPath, [join(repo, 'site/build.mjs'), out], { cwd: repo, stdio: 'pipe' });
     const { models } = JSON.parse(readFileSync(join(out, 'models.json'), 'utf8'));
     const listed = new Map(models.map((model) => [model.file, model]));
-    for (const row of producedModels()) {
-      assert.equal(listed.get(row.file)?.clips, row.clips, `${row.file} is not listed with its clips`);
+    const manifest = JSON.parse(readFileSync(join(repo, 'built/manifest.json'), 'utf8'));
+    assert.ok(manifest.models.length > 0);
+    for (const row of manifest.models) {
+      const file = outputPath(row.pack, row.path);
+      const clips = row.clips === undefined ? null : outputPath(row.pack, row.clips);
+      assert.equal(listed.get(file)?.clips, clips, `${file} is not listed with its clips`);
     }
+    assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     for (const model of models) {
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
       if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);

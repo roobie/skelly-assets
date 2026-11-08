@@ -117,7 +117,12 @@ export type GlbExportError =
   | { readonly code: 'invalid-asset-file'; readonly file: string };
 
 export type GlbExportResult =
-  | { readonly ok: true; readonly glb: Uint8Array }
+  | {
+      readonly ok: true;
+      readonly glb: Uint8Array;
+      /** The file's part node names, one per part of the resolved assembly (`partNodeName`), sorted by part id. */
+      readonly partNodes: readonly string[];
+    }
   | { readonly ok: false; readonly error: GlbExportError };
 
 /** Signature only; the writer refuses unresolved/partly placed assemblies and invalid export metadata. */
