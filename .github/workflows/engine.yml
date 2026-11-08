@@ -1,0 +1,49 @@
+name: engine
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/packages/construct/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.github/workflows/engine.yml'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - 'tools/packages/construct/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.github/workflows/engine.yml'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/packages/thing-core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../..
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run typecheck
+        working-directory: tools/packages/construct
+      - run: npm test
+        working-directory: tools/packages/construct
