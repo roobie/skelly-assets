@@ -8,5 +8,4 @@ export function exportRecipes(options: {
   root?: string;
   out?: string;
   tools: readonly RecipeToolName[];
-  sourcesReady?: boolean;
 }): Promise<string[]>;

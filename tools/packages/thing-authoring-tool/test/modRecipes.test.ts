@@ -4,7 +4,11 @@ import { join, resolve } from 'node:path';
 import { expect, it } from 'vitest';
 import { catalogue } from '../src/catalogue.ts';
 import { exportThingRecipes } from '../src/cli/export.ts';
+import { loadThingRecipe } from '../src/exports.ts';
+import { installJsonnetSources } from '../../../sources.mjs';
 import { sweepGroup } from './sweeps.ts';
+
+installJsonnetSources();
 
 it('exports one recipe file into its pack output without changing its source root', async () => {
   const root = mkdtempSync(join(tmpdir(), 'thing-recipes-'));
@@ -20,15 +24,15 @@ it('exports one recipe file into its pack output without changing its source roo
     mkdirSync(join(root, 'models/recipes'), { recursive: true });
     writeFileSync(join(root, 'models/recipes', `${packId}.jsonnet`), JSON.stringify(value));
     writeFileSync(join(root, 'models/recipes', `${packId}.json`), JSON.stringify(value));
-    const sourceRoot = readdirSync(root).sort();
+    const sourceRoot = readdirSync(root, { recursive: true }).sort();
+    const { modelEntry, glb } = loadThingRecipe(value)[0]!.generate();
     await exportThingRecipes(root, out);
 
     const base = join(out, packId);
-    const [modelEntry] = JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8'));
-    expect(modelEntry).toEqual(expect.objectContaining({ id: expect.any(String), file: expect.any(String) }));
+    expect(JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8'))).toEqual([modelEntry]);
     expect(JSON.parse(readFileSync(join(base, 'things', `${modelEntry.id}.model.json`), 'utf8'))).toEqual(modelEntry);
-    expect(readFileSync(join(base, modelEntry.file))).not.toHaveLength(0);
-    expect(readdirSync(root).sort()).toEqual(sourceRoot);
+    expect(readFileSync(join(base, modelEntry.file))).toEqual(Buffer.from(glb));
+    expect(readdirSync(root, { recursive: true }).sort()).toEqual(sourceRoot);
   } finally {
     rmSync(root, { recursive: true, force: true });
     rmSync(out, { recursive: true, force: true });
@@ -39,10 +43,11 @@ sweepGroup('complete recipe export', () => {
   it('exports every recipe file without changing its source root', async () => {
     const root = resolve(import.meta.dirname, '../../../..');
     const out = mkdtempSync(join(tmpdir(), 'thing-output-'));
-    const sourceRoot = readdirSync(root).sort();
+    const sourceRoot = readdirSync(root, { recursive: true }).sort();
     try {
-      await exportThingRecipes(root, out);
-      expect(readdirSync(root).sort()).toEqual(sourceRoot);
+      const written = await exportThingRecipes(root, out);
+      expect(written.length).toBeGreaterThan(0);
+      expect(readdirSync(root, { recursive: true }).sort()).toEqual(sourceRoot);
     } finally {
       rmSync(out, { recursive: true, force: true });
     }
