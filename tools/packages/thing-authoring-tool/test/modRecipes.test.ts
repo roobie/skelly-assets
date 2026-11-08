@@ -45,8 +45,8 @@ sweepGroup('complete recipe export', () => {
     const out = mkdtempSync(join(tmpdir(), 'thing-output-'));
     const sourceRoot = readdirSync(root, { recursive: true }).sort();
     try {
-      const written = await exportThingRecipes(root, out);
-      expect(written.length).toBeGreaterThan(0);
+      const { files } = await exportThingRecipes(root, out);
+      expect(files.length).toBeGreaterThan(0);
       expect(readdirSync(root, { recursive: true }).sort()).toEqual(sourceRoot);
     } finally {
       rmSync(out, { recursive: true, force: true });
