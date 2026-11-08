@@ -7,6 +7,7 @@ on:
     paths: &pages-paths
       - 'built/**'
       - 'site/**'
+      - 'models/**'
       - 'tools/packages/construct/**'
       - 'tools/packages/thing-core/**'
       - 'tools/packages/thing-export/**'
@@ -29,12 +30,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-${{ github.event.pull_request.number || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -75,6 +74,9 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     needs: build
+    permissions:
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
     environment:
       name: github-pages
