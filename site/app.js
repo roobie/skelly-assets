@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { samplePose } from './poseSample.mjs';
 
 const $ = (id) => document.getElementById(id);
 const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
@@ -73,23 +74,11 @@ const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const mul = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
 const quaternionMatrix = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
 
-function samplePose(clip, time) {
-  const n = clip.frames.length;
-  const u = clip.loop ? ((time % 1 + 1) % 1) * n : Math.max(0, Math.min(1, time / clip.duration)) * (n - 1);
-  const i = Math.floor(u), w = u - i, a = clip.frames[i], b = clip.frames[(i + 1) % n];
-  if (!w) return a;
-  return {
-    root: a.root.map((x, axis) => x + (b.root[axis] - x) * w),
-    rotations: Object.fromEntries([...new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])].map((id) => {
-      const qa = a.rotations[id] ?? [0, 0, 0, 1], qb = b.rotations[id] ?? [0, 0, 0, 1];
-      return [id, new THREE.Quaternion(...qa).slerp(new THREE.Quaternion(...qb), w).toArray()];
-    })),
-  };
-}
+const slerp = (a, b, w) => new THREE.Quaternion(...a).slerp(new THREE.Quaternion(...b), w).toArray();
 
 function pose(scene, body, clip, time) {
   if (!playable(clip)) return;
-  const pose = samplePose(clip, time), transforms = [], byId = new Map();
+  const pose = samplePose(clip, time, slerp), transforms = [], byId = new Map();
   for (const bone of body.bones) {
     const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
     let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
