@@ -138,8 +138,8 @@ export function humanoidPoseClips(figure, row) {
     params: figure.genome.params, seed: figure.seed,
     cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
   };
-  // The crawl cycle is 2π of gait phase. The crawl has no stride length of its own, so the bake reads one radian
-  // of phase as one metre, as its earlier time span did at one metre per second.
+  // The crawl cycle is 2π of gait phase. No row authors a crawl stride length, so this is not a measured
+  // distance: it is the cycle in radians, kept until the stride's owner is ruled.
   const crawlStrideMetres = 2 * Math.PI;
   const crawling = {
     idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
