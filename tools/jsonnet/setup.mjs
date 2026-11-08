@@ -83,6 +83,40 @@ export function installJsonnetArchive(archive, expectedHash, targetDirectory) {
   }
 }
 
+function defaultSleep(milliseconds) {
+  return new Promise((done) => setTimeout(done, milliseconds));
+}
+
+/**
+ * Download `url`, retrying on 5xx responses and network errors. A 4xx response fails at once.
+ * `delaysMs[i]` is the wait after failed attempt i; `attempts` is the total number of tries.
+ * `fetchImpl` and `sleep` are injectable so tests need no network and no wall-clock waits.
+ */
+export async function downloadWithRetry(
+  url,
+  { attempts, delaysMs, fetchImpl = fetch, sleep = defaultSleep } = PIN.download,
+) {
+  let lastFailure = 'no attempt made';
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    let retryable = true;
+    try {
+      const response = await fetchImpl(url);
+      if (response.ok) {
+        return Buffer.from(await response.arrayBuffer());
+      }
+      lastFailure = `status ${response.status} ${response.statusText}`.trim();
+      retryable = response.status >= 500;
+    } catch (error) {
+      lastFailure = `network error: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    if (!retryable || attempt === attempts) {
+      throw new Error(`go-jsonnet download failed after ${attempt} attempt(s): ${url} (last ${lastFailure})`);
+    }
+    await sleep(delaysMs[Math.min(attempt - 1, delaysMs.length - 1)] ?? 0);
+  }
+  throw new Error(`go-jsonnet download failed: ${url} (last ${lastFailure})`);
+}
+
 export async function ensureJsonnet() {
   const { platformKey, archiveName, executable } = executablePath();
   if (existingBinaryIsPinnedVersion(executable)) {
@@ -90,11 +124,7 @@ export async function ensureJsonnet() {
   }
 
   const downloadUrl = `https://github.com/google/go-jsonnet/releases/download/v${PIN.version}/${archiveName}`;
-  const response = await fetch(downloadUrl);
-  if (!response.ok) {
-    throw new Error(`go-jsonnet download failed (${response.status} ${response.statusText})`);
-  }
-  const archive = Buffer.from(await response.arrayBuffer());
+  const archive = await downloadWithRetry(downloadUrl);
   const installed = installJsonnetArchive(archive, PIN.sha256[platformKey], dirname(executable));
   process.stdout.write(`Installed pinned go-jsonnet ${PIN.version} for ${platformKey}.\n`);
   return installed;
