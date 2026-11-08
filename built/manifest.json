@@ -118,6 +118,9 @@
     },
     "skelly.body": {
       "files": [
+        "actors/player.1.body.json",
+        "actors/player.1.clips.json",
+        "assets/models/actors/player.1.glb",
         "assets/models/player_arm.glb",
         "assets/models/player_bust.glb",
         "assets/models/player_leg.glb",
@@ -149,6 +152,216 @@
     },
     "skelly.deadvox.actors": {
       "files": [
+        "actors/acid_zombie.1.body.json",
+        "actors/acid_zombie.1.clips.json",
+        "actors/acid_zombie.2.body.json",
+        "actors/acid_zombie.2.clips.json",
+        "actors/acid_zombie.3.body.json",
+        "actors/acid_zombie.3.clips.json",
+        "actors/acid_zombie.4.body.json",
+        "actors/acid_zombie.4.clips.json",
+        "actors/acid_zombie.6.body.json",
+        "actors/acid_zombie.6.clips.json",
+        "actors/acid_zombie.8.body.json",
+        "actors/acid_zombie.8.clips.json",
+        "actors/amalgam.1.body.json",
+        "actors/amalgam.1.clips.json",
+        "actors/brute_shambler.1.body.json",
+        "actors/brute_shambler.1.clips.json",
+        "actors/brute_shambler.2.body.json",
+        "actors/brute_shambler.2.clips.json",
+        "actors/brute_shambler.3.body.json",
+        "actors/brute_shambler.3.clips.json",
+        "actors/brute_shambler.4.body.json",
+        "actors/brute_shambler.4.clips.json",
+        "actors/brute_shambler.5.body.json",
+        "actors/brute_shambler.5.clips.json",
+        "actors/brute_shambler.6.body.json",
+        "actors/brute_shambler.6.clips.json",
+        "actors/brute_shambler.7.body.json",
+        "actors/brute_shambler.7.clips.json",
+        "actors/brute_shambler.8.body.json",
+        "actors/brute_shambler.8.clips.json",
+        "actors/crawler.1.body.json",
+        "actors/crawler.1.clips.json",
+        "actors/crawler.11.body.json",
+        "actors/crawler.11.clips.json",
+        "actors/crawler.2.body.json",
+        "actors/crawler.2.clips.json",
+        "actors/crawler.3.body.json",
+        "actors/crawler.3.clips.json",
+        "actors/crawler.5.body.json",
+        "actors/crawler.5.clips.json",
+        "actors/crawler.6.body.json",
+        "actors/crawler.6.clips.json",
+        "actors/crawler.7.body.json",
+        "actors/crawler.7.clips.json",
+        "actors/farmer_shambler.1.body.json",
+        "actors/farmer_shambler.1.clips.json",
+        "actors/farmer_shambler.2.body.json",
+        "actors/farmer_shambler.2.clips.json",
+        "actors/farmer_shambler.3.body.json",
+        "actors/farmer_shambler.3.clips.json",
+        "actors/farmer_shambler.4.body.json",
+        "actors/farmer_shambler.4.clips.json",
+        "actors/farmer_shambler.5.body.json",
+        "actors/farmer_shambler.5.clips.json",
+        "actors/farmer_shambler.6.body.json",
+        "actors/farmer_shambler.6.clips.json",
+        "actors/farmer_shambler.7.body.json",
+        "actors/farmer_shambler.7.clips.json",
+        "actors/farmer_shambler.8.body.json",
+        "actors/farmer_shambler.8.clips.json",
+        "actors/medic_shambler.1.body.json",
+        "actors/medic_shambler.1.clips.json",
+        "actors/medic_shambler.2.body.json",
+        "actors/medic_shambler.2.clips.json",
+        "actors/medic_shambler.3.body.json",
+        "actors/medic_shambler.3.clips.json",
+        "actors/medic_shambler.4.body.json",
+        "actors/medic_shambler.4.clips.json",
+        "actors/medic_shambler.5.body.json",
+        "actors/medic_shambler.5.clips.json",
+        "actors/medic_shambler.6.body.json",
+        "actors/medic_shambler.6.clips.json",
+        "actors/medic_shambler.7.body.json",
+        "actors/medic_shambler.7.clips.json",
+        "actors/medic_shambler.8.body.json",
+        "actors/medic_shambler.8.clips.json",
+        "actors/military_shambler.1.body.json",
+        "actors/military_shambler.1.clips.json",
+        "actors/military_shambler.2.body.json",
+        "actors/military_shambler.2.clips.json",
+        "actors/military_shambler.3.body.json",
+        "actors/military_shambler.3.clips.json",
+        "actors/military_shambler.4.body.json",
+        "actors/military_shambler.4.clips.json",
+        "actors/military_shambler.5.body.json",
+        "actors/military_shambler.5.clips.json",
+        "actors/military_shambler.6.body.json",
+        "actors/military_shambler.6.clips.json",
+        "actors/military_shambler.7.body.json",
+        "actors/military_shambler.7.clips.json",
+        "actors/military_shambler.8.body.json",
+        "actors/military_shambler.8.clips.json",
+        "actors/runner.1.body.json",
+        "actors/runner.1.clips.json",
+        "actors/runner.2.body.json",
+        "actors/runner.2.clips.json",
+        "actors/runner.3.body.json",
+        "actors/runner.3.clips.json",
+        "actors/runner.4.body.json",
+        "actors/runner.4.clips.json",
+        "actors/runner.5.body.json",
+        "actors/runner.5.clips.json",
+        "actors/runner.6.body.json",
+        "actors/runner.6.clips.json",
+        "actors/runner.7.body.json",
+        "actors/runner.7.clips.json",
+        "actors/runner.8.body.json",
+        "actors/runner.8.clips.json",
+        "actors/shambler.1.body.json",
+        "actors/shambler.1.clips.json",
+        "actors/shambler.2.body.json",
+        "actors/shambler.2.clips.json",
+        "actors/shambler.3.body.json",
+        "actors/shambler.3.clips.json",
+        "actors/shambler.4.body.json",
+        "actors/shambler.4.clips.json",
+        "actors/shambler.5.body.json",
+        "actors/shambler.5.clips.json",
+        "actors/shambler.6.body.json",
+        "actors/shambler.6.clips.json",
+        "actors/shambler.7.body.json",
+        "actors/shambler.7.clips.json",
+        "actors/shambler.8.body.json",
+        "actors/shambler.8.clips.json",
+        "actors/worker_shambler.1.body.json",
+        "actors/worker_shambler.1.clips.json",
+        "actors/worker_shambler.2.body.json",
+        "actors/worker_shambler.2.clips.json",
+        "actors/worker_shambler.3.body.json",
+        "actors/worker_shambler.3.clips.json",
+        "actors/worker_shambler.4.body.json",
+        "actors/worker_shambler.4.clips.json",
+        "actors/worker_shambler.5.body.json",
+        "actors/worker_shambler.5.clips.json",
+        "actors/worker_shambler.6.body.json",
+        "actors/worker_shambler.6.clips.json",
+        "actors/worker_shambler.7.body.json",
+        "actors/worker_shambler.7.clips.json",
+        "actors/worker_shambler.8.body.json",
+        "actors/worker_shambler.8.clips.json",
+        "assets/models/actors/acid_zombie.1.glb",
+        "assets/models/actors/acid_zombie.2.glb",
+        "assets/models/actors/acid_zombie.3.glb",
+        "assets/models/actors/acid_zombie.4.glb",
+        "assets/models/actors/acid_zombie.6.glb",
+        "assets/models/actors/acid_zombie.8.glb",
+        "assets/models/actors/amalgam.1.glb",
+        "assets/models/actors/brute_shambler.1.glb",
+        "assets/models/actors/brute_shambler.2.glb",
+        "assets/models/actors/brute_shambler.3.glb",
+        "assets/models/actors/brute_shambler.4.glb",
+        "assets/models/actors/brute_shambler.5.glb",
+        "assets/models/actors/brute_shambler.6.glb",
+        "assets/models/actors/brute_shambler.7.glb",
+        "assets/models/actors/brute_shambler.8.glb",
+        "assets/models/actors/crawler.1.glb",
+        "assets/models/actors/crawler.11.glb",
+        "assets/models/actors/crawler.2.glb",
+        "assets/models/actors/crawler.3.glb",
+        "assets/models/actors/crawler.5.glb",
+        "assets/models/actors/crawler.6.glb",
+        "assets/models/actors/crawler.7.glb",
+        "assets/models/actors/farmer_shambler.1.glb",
+        "assets/models/actors/farmer_shambler.2.glb",
+        "assets/models/actors/farmer_shambler.3.glb",
+        "assets/models/actors/farmer_shambler.4.glb",
+        "assets/models/actors/farmer_shambler.5.glb",
+        "assets/models/actors/farmer_shambler.6.glb",
+        "assets/models/actors/farmer_shambler.7.glb",
+        "assets/models/actors/farmer_shambler.8.glb",
+        "assets/models/actors/medic_shambler.1.glb",
+        "assets/models/actors/medic_shambler.2.glb",
+        "assets/models/actors/medic_shambler.3.glb",
+        "assets/models/actors/medic_shambler.4.glb",
+        "assets/models/actors/medic_shambler.5.glb",
+        "assets/models/actors/medic_shambler.6.glb",
+        "assets/models/actors/medic_shambler.7.glb",
+        "assets/models/actors/medic_shambler.8.glb",
+        "assets/models/actors/military_shambler.1.glb",
+        "assets/models/actors/military_shambler.2.glb",
+        "assets/models/actors/military_shambler.3.glb",
+        "assets/models/actors/military_shambler.4.glb",
+        "assets/models/actors/military_shambler.5.glb",
+        "assets/models/actors/military_shambler.6.glb",
+        "assets/models/actors/military_shambler.7.glb",
+        "assets/models/actors/military_shambler.8.glb",
+        "assets/models/actors/runner.1.glb",
+        "assets/models/actors/runner.2.glb",
+        "assets/models/actors/runner.3.glb",
+        "assets/models/actors/runner.4.glb",
+        "assets/models/actors/runner.5.glb",
+        "assets/models/actors/runner.6.glb",
+        "assets/models/actors/runner.7.glb",
+        "assets/models/actors/runner.8.glb",
+        "assets/models/actors/shambler.1.glb",
+        "assets/models/actors/shambler.2.glb",
+        "assets/models/actors/shambler.3.glb",
+        "assets/models/actors/shambler.4.glb",
+        "assets/models/actors/shambler.5.glb",
+        "assets/models/actors/shambler.6.glb",
+        "assets/models/actors/shambler.7.glb",
+        "assets/models/actors/shambler.8.glb",
+        "assets/models/actors/worker_shambler.1.glb",
+        "assets/models/actors/worker_shambler.2.glb",
+        "assets/models/actors/worker_shambler.3.glb",
+        "assets/models/actors/worker_shambler.4.glb",
+        "assets/models/actors/worker_shambler.5.glb",
+        "assets/models/actors/worker_shambler.6.glb",
+        "assets/models/actors/worker_shambler.7.glb",
+        "assets/models/actors/worker_shambler.8.glb",
         "assets/models/shambler_head.glb",
         "assets/models/shambler_left_arm.glb",
         "assets/models/shambler_left_leg.glb",
@@ -1775,6 +1988,17 @@
       }
     },
     {
+      "id": "player.1",
+      "kind": "mob",
+      "pack": "skelly.body",
+      "path": "assets/models/actors/player.1.glb",
+      "clips": "actors/player.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
       "id": "player_arm",
       "kind": "item",
       "pack": "skelly.body",
@@ -1914,6 +2138,688 @@
       }
     },
     {
+      "id": "acid_zombie.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.1.glb",
+      "clips": "actors/acid_zombie.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "acid_zombie.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.2.glb",
+      "clips": "actors/acid_zombie.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "acid_zombie.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.3.glb",
+      "clips": "actors/acid_zombie.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "acid_zombie.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.4.glb",
+      "clips": "actors/acid_zombie.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "acid_zombie.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.6.glb",
+      "clips": "actors/acid_zombie.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "acid_zombie.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/acid_zombie.8.glb",
+      "clips": "actors/acid_zombie.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "amalgam.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/amalgam.1.glb",
+      "clips": "actors/amalgam.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.1.glb",
+      "clips": "actors/brute_shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.2.glb",
+      "clips": "actors/brute_shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.3.glb",
+      "clips": "actors/brute_shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.4.glb",
+      "clips": "actors/brute_shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.5.glb",
+      "clips": "actors/brute_shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.6.glb",
+      "clips": "actors/brute_shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.7.glb",
+      "clips": "actors/brute_shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "brute_shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/brute_shambler.8.glb",
+      "clips": "actors/brute_shambler.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.1.glb",
+      "clips": "actors/crawler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.11",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.11.glb",
+      "clips": "actors/crawler.11.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.2.glb",
+      "clips": "actors/crawler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.3.glb",
+      "clips": "actors/crawler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.5.glb",
+      "clips": "actors/crawler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.6.glb",
+      "clips": "actors/crawler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "crawler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/crawler.7.glb",
+      "clips": "actors/crawler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.1.glb",
+      "clips": "actors/farmer_shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.2.glb",
+      "clips": "actors/farmer_shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.3.glb",
+      "clips": "actors/farmer_shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.4.glb",
+      "clips": "actors/farmer_shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.5.glb",
+      "clips": "actors/farmer_shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.6.glb",
+      "clips": "actors/farmer_shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.7.glb",
+      "clips": "actors/farmer_shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "farmer_shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/farmer_shambler.8.glb",
+      "clips": "actors/farmer_shambler.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.1.glb",
+      "clips": "actors/medic_shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.2.glb",
+      "clips": "actors/medic_shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.3.glb",
+      "clips": "actors/medic_shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.4.glb",
+      "clips": "actors/medic_shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.5.glb",
+      "clips": "actors/medic_shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.6.glb",
+      "clips": "actors/medic_shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.7.glb",
+      "clips": "actors/medic_shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "medic_shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/medic_shambler.8.glb",
+      "clips": "actors/medic_shambler.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.1.glb",
+      "clips": "actors/military_shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.2.glb",
+      "clips": "actors/military_shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.3.glb",
+      "clips": "actors/military_shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.4.glb",
+      "clips": "actors/military_shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.5.glb",
+      "clips": "actors/military_shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.6.glb",
+      "clips": "actors/military_shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.7.glb",
+      "clips": "actors/military_shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "military_shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/military_shambler.8.glb",
+      "clips": "actors/military_shambler.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.1.glb",
+      "clips": "actors/runner.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.2.glb",
+      "clips": "actors/runner.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.3.glb",
+      "clips": "actors/runner.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.4.glb",
+      "clips": "actors/runner.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.5.glb",
+      "clips": "actors/runner.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.6.glb",
+      "clips": "actors/runner.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.7.glb",
+      "clips": "actors/runner.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "runner.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/runner.8.glb",
+      "clips": "actors/runner.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.1.glb",
+      "clips": "actors/shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.2.glb",
+      "clips": "actors/shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.3.glb",
+      "clips": "actors/shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.4.glb",
+      "clips": "actors/shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.5.glb",
+      "clips": "actors/shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.6.glb",
+      "clips": "actors/shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.7.glb",
+      "clips": "actors/shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/shambler.8.glb",
+      "clips": "actors/shambler.8.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
       "id": "shambler_head",
       "kind": "item",
       "pack": "skelly.deadvox.actors",
@@ -1986,6 +2892,94 @@
       "nodes": [
         "part:torso"
       ],
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.1",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.1.glb",
+      "clips": "actors/worker_shambler.1.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.2",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.2.glb",
+      "clips": "actors/worker_shambler.2.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.3",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.3.glb",
+      "clips": "actors/worker_shambler.3.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.4",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.4.glb",
+      "clips": "actors/worker_shambler.4.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.5",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.5.glb",
+      "clips": "actors/worker_shambler.5.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.6",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.6.glb",
+      "clips": "actors/worker_shambler.6.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.7",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.7.glb",
+      "clips": "actors/worker_shambler.7.clips.json",
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "worker_shambler.8",
+      "kind": "mob",
+      "pack": "skelly.deadvox.actors",
+      "path": "assets/models/actors/worker_shambler.8.glb",
+      "clips": "actors/worker_shambler.8.clips.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"

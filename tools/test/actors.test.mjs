@@ -263,6 +263,12 @@ test('actor body metadata preserves figure regions, support geometry and templat
   assert(body.bones.every((bone) => !('mass' in bone) && !('box' in bone)));
 });
 
+test('standing walk frame count scales with walk cycles while crawling does not', async () => {
+  const { clips } = await bakeFixture('humanoid', { walkCycles: 3, walk_frames: 8 });
+  assert.equal(clips.standing.walk.frames.length, clips.standing.walk.cycles * clips.crawling.walk.frames.length);
+  assert.equal(clips.crawling.walk.frames.length, 8);
+});
+
 test('humanoid pose clips reproduce live standing and crawling poses over a closing gait cycle', async () => {
   const { humanoidPoseClips } = await import('../actorClips.mjs');
   const { decodeFrame } = await import('../actorCompose.mjs');
@@ -528,6 +534,25 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   assert.deepEqual(Object.keys(clips.standing), ['idle']);
   assert.equal(clips.standing.idle.frames.length, 1);
   assert.deepEqual(clips.standing.idle.frames[0], { root: body.originOffset.map((v) => v / scale), rotations: {} });
+});
+
+test('every content pose row writes its declared actor files', async () => {
+  const { mkdtempSync, existsSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { exportMob } = await import('../mobs.mjs');
+  const { outputPath, readMobRows } = await import('../layout.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'actor-content-'));
+  try {
+    const rows = readMobRows().filter((candidate) => candidate.format === 'pose');
+    assert(rows.some(() => true), 'content must declare pose actor rows');
+    for (const row of rows) {
+      exportMob(row, root);
+      for (const file of [row.glb, row.body, row.clips]) assert(existsSync(join(root, outputPath(row.pack, file))));
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, hull and cell contracts', async () => {

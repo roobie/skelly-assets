@@ -62,7 +62,11 @@ export const rosterFile = (packId, id) => outputPath(packId, `assets/models/${id
 // models/mobs.json's rows with the sheet's defaults applied.
 export function readMobRows(root = repo) {
   const sheet = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
-  return sheet.mobs.map((row) => ({ ...sheet.defaults, ...row }));
+  return sheet.mobs.map((row) => {
+    const id = row.id ?? `${row.type}.${row.seed}`;
+    const stem = `actors/${id}`;
+    return { ...sheet.defaults, ...row, id, glb: row.glb ?? `assets/models/${stem}.glb`, body: row.body ?? `${stem}.body.json`, clips: row.clips ?? `${stem}.clips.json` };
+  });
 }
 
 export function declaredPacks(root = repo) {
