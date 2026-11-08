@@ -1,4 +1,5 @@
 import { planOf } from './packages/mobgen/src/core/generate.ts';
+import { realizedRegionBones } from './actorFigure.mjs';
 import { burstBones } from './packages/mobgen/src/mob/dismember.ts';
 import { footRestExtents } from './packages/mobgen/src/mob/gait.ts';
 import { GROUND_CONTACT_BONES } from './packages/mobgen/src/mob/crawl.ts';
@@ -40,7 +41,8 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
   const acid = template.bodyPlan === 'acid';
   const attack = humanoid ? attackClipFor(template) : undefined;
   const peak = HIT_FLINCH.keys[1];
-  const regions = figure.regions ?? planOf(template.bodyPlan).regionBones;
+  const boneIds = new Set(bones.map((bone) => bone.id));
+  const regions = figure.regions ?? realizedRegionBones(planOf(template.bodyPlan).regionBones, boneIds);
   return {
     type, model, seed, bodyPlan: template.bodyPlan,
     ...(template.legCut === undefined ? {} : { legCut: template.legCut }),
@@ -50,7 +52,7 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     ...(regions === undefined ? {} : { regions, boxes: figure.boxes, severableParts: figure.severableParts }),
     burstBones: burstBones(bones),
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
-    ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
+    ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES.filter((id) => boneIds.has(id)) } : {}),
     ...(lookAt === undefined ? {} : { lookAt }),
     ...(fused ? {
       manifest: figure.manifest, bounds: figure.bounds, originOffset: figure.originOffset,

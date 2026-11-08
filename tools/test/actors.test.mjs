@@ -568,6 +568,36 @@ test('every content row writes its declared actor files', async () => {
   }
 });
 
+test('every baked body names only bones it realizes in its regions and ground contacts', async () => {
+  const { mkdtempSync, readFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { exportMob } = await import('../mobs.mjs');
+  const { outputPath, readMobRows } = await import('../layout.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'actor-own-bones-'));
+  try {
+    let sawRegions = false;
+    let sawGroundContacts = false;
+    for (const row of readMobRows()) {
+      exportMob(row, root);
+      const body = JSON.parse(readFileSync(join(root, outputPath(row.pack, row.body))));
+      const bones = new Set(body.bones.map((bone) => bone.id));
+      for (const [region, members] of Object.entries(body.regions ?? {})) {
+        sawRegions = true;
+        for (const bone of members) assert(bones.has(bone), `${row.id} region ${region} names absent bone ${bone}`);
+      }
+      if (body.groundContactBones !== undefined) {
+        sawGroundContacts = true;
+        for (const bone of body.groundContactBones) assert(bones.has(bone), `${row.id} ground contact names absent bone ${bone}`);
+      }
+    }
+    assert(sawRegions, 'content must exercise bodies with hit regions');
+    assert(sawGroundContacts, 'content must exercise bodies with ground-contact bones');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, hull and cell contracts', async () => {
   const { mkdtempSync, readFileSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');

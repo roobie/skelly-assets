@@ -3,6 +3,12 @@ import { worldPosition } from './packages/mobgen/src/core/voxelize.ts';
 import { regionSeverableParts } from './packages/mobgen/src/mob/dismember.ts';
 import { fusedMassManifest } from './packages/mobgen/src/mob/fusedMass.ts';
 
+/** A body exports only hit regions naming bones it realizes, so an amputated plan leaves no dangling references. */
+export const realizedRegionBones = (regionBones, boneIds) =>
+  regionBones === undefined ? undefined : Object.fromEntries(
+    Object.entries(regionBones).map(([region, ids]) => [region, ids.filter((id) => boneIds.has(id))]),
+  );
+
 /** Adapt an already-realized row, preserving the figure consumers' rest-world conventions. */
 export function figureFor(generated, template, scale) {
   const { realized, genome } = generated;
@@ -30,7 +36,7 @@ export function figureFor(generated, template, scale) {
   const manifest = fused ? fusedMassManifest(body, voxels) : undefined;
   const regions = fused
     ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds]))
-    : planOf(template.bodyPlan).regionBones;
+    : realizedRegionBones(planOf(template.bodyPlan).regionBones, new Set(body.bones.map((bone) => bone.id)));
   const margin = voxels.size / 2 + (fused ? 0 : 0.001);
   const boxes = regions === undefined ? undefined : Object.fromEntries(Object.entries(regions).map(([region, ids]) => [region, ids.flatMap((bone) => {
     const bounds = limits.get(bone);
