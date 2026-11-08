@@ -24,7 +24,7 @@ it('owns the geometry writer and caller-supplied export identity contracts', () 
     palette,
     asset: { id: 'fixture', file: 'assets/models/fixture.glb' },
   };
-  const success: GlbExportResult = { ok: true, glb: new Uint8Array() };
+  const success: GlbExportResult = { ok: true, glb: new Uint8Array(), partNodes: ['fixture:fixture'] };
   const failure: GlbExportResult = { ok: false, error: { code: 'unplaced-parts', partIds: ['fixture'] } };
   expectTypeOf<Parameters<ExportGlb>>().toEqualTypeOf<[input: GlbExportInput]>();
   expectTypeOf<ReturnType<ExportGlb>>().toEqualTypeOf<GlbExportResult>();

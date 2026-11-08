@@ -4,7 +4,6 @@ local box = h.box;
 // An oversized bolt carbine, about 0.84 m long and deep for its length: a slab receiver, an armoured barrel shroud
 // nearly as deep as the receiver, a fat barrel ending in a slotted muzzle brake, a deep box magazine of rocket bolts
 // ahead of the grip and a stubby butt. The muzzle is at +x and the side view shows its profile.
-// Built by tools/build_models.sh into built/bolt_carbine.glb.
 
 local w = 0.055;  // half the receiver's width
 local barrelY = 0.245;

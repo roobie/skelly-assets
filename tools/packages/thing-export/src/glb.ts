@@ -691,7 +691,7 @@ const writeGlb: ExportGlb = (input) => {
       : {}),
   };
 
-  return { ok: true, glb: glbFile(json, bin.bytes()) };
+  return { ok: true, glb: glbFile(json, bin.bytes()), partNodes: parts.map(({ id, family }) => partNodeName(id, family)) };
 };
 
 export const exportGlb: ExportGlb = (input) => {

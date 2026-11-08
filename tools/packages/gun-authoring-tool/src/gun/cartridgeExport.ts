@@ -17,6 +17,7 @@ import { shotshellGeometry, shotshellHullMaterial } from './shotshellGeometry.ts
 
 interface CartridgeModel {
   readonly glb: Uint8Array;
+  readonly partNodes: readonly string[];
   readonly modelEntry: DeadvoxModelEntry;
 }
 
@@ -96,6 +97,7 @@ const makeModelExport = (
     ok: true,
     model: {
       glb: result.glb,
+      partNodes: result.partNodes,
       modelEntry: {
         id: asset.id,
         file: asset.file as DeadvoxModelFile,
