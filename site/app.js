@@ -101,7 +101,7 @@ function pose(scene, body, clip, time) {
 
 function clipTime(clip, name, seconds) {
   if (clip.loop) return seconds / clip.period;
-  if (name === 'attack') return Math.min(clip.duration, seconds % (clip.duration + ATTACK_REST));
+  if (name === 'attack') return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + ATTACK_REST));
   return seconds;
 }
 

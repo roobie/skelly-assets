@@ -253,7 +253,7 @@ test('actor body metadata preserves figure regions, support geometry and templat
   assert.deepEqual(body.anchors, figure.realized.body.anchors ?? {});
   assert.deepEqual(body.lookAt, LOOK_AT_PROFILES[fixture.model]);
   const attack = attackClipFor(template);
-  assert.deepEqual(body.animation, { attackPeak: attack.hitTime, attackDuration: attack.duration, hitDuration: flinchClipFor(template).duration });
+  assert.deepEqual(body.animation, { attackPeakAtSimSeconds: attack.hitTime, attackDurationSimSeconds: attack.duration, hitDurationSimSeconds: flinchClipFor(template).duration });
   const heights = [...figure.realized.meshes.values()].flatMap((mesh) => Array.from(mesh.positions).filter((_, i) => i % 3 === 1));
   assert(heights.length > 0);
   assert.equal(body.height, Math.max(...heights) - Math.min(...heights));
@@ -354,9 +354,13 @@ test('humanoid overlays reproduce action poses over live idle and walk bases at 
   })) for (const base of bases) for (const kind of ['attack', 'flinch']) {
     const clip = clips[stance][kind];
     assert.equal(clip.kind, 'overlay');
+    // The span and strike keys name their clock, and no clock-less twin survives.
+    assert(clip.durationSimSeconds > 0);
+    assert(!('duration' in clip) && !('hitTime' in clip) && !('peak' in clip));
+    assert(typeof (kind === 'attack' ? clip.hitAtSimSeconds : clip.peakAtSimSeconds) === 'number');
     assert(clip.frames.length > 2);
     for (let i = 0; i < clip.frames.length; i++) {
-      const time = clip.duration * i / (clip.frames.length - 1);
+      const time = clip.durationSimSeconds * i / (clip.frames.length - 1);
       for (const side of [-1, 1]) {
         const actual = applyOverlay(body, base, clip, time, side, stance);
         const expected = stance === 'standing'
@@ -385,7 +389,7 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const clips = baked.clips.standing;
   const body = baked.body;
   const tuning = acidTemplate.animation;
-  assert.deepEqual(body.animation, { attackPeak: tuning.attackPeak, attackDuration: tuning.attackDuration, hitDuration: tuning.hitDuration, deathDuration: tuning.deathDuration });
+  assert.deepEqual(body.animation, { attackPeakAtSimSeconds: tuning.attackPeak, attackDurationSimSeconds: tuning.attackDuration, hitDurationSimSeconds: tuning.hitDuration, deathDurationRealSeconds: tuning.deathDuration });
   assert.equal(clips.idle.period, tuning.idlePeriod);
   assert.equal(clips.idle.loop, true);
   const close = (actual, expected) => {
@@ -404,13 +408,18 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   }
   const bases = [acidIdlePose(figure.realized, 0.37), acidWalkPose(figure.realized, 0.23, 0.7, 0.37)];
   let sideVaries = false;
-  for (const base of bases) for (const name of ['attack', 'windup', 'hit']) {
+  for (const base of bases) for (const name of ['attack', 'spitDraw', 'hit']) {
     const clip = clips[name];
     assert.equal(clip.kind, 'jointDelta');
+    if (name === 'spitDraw') assert(!('durationSimSeconds' in clip) && !('durationRealSeconds' in clip));
+    else {
+      assert.equal(clip.durationSimSeconds, name === 'attack' ? tuning.attackDuration : tuning.hitDuration);
+      assert(!('duration' in clip) && !('durationRealSeconds' in clip));
+    }
     for (let i = 0; i < clip.frames.length; i++) for (const side of [-1, 1]) {
-      const cursor = (clip.duration ?? 1) * i / (clip.frames.length - 1);
+      const cursor = (clip.durationSimSeconds ?? 1) * i / (clip.frames.length - 1);
       const actual = applyJointDelta(body, base, clip, cursor, { side });
-      const expected = name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'windup' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side);
+      const expected = name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'spitDraw' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side);
       close(actual, expected);
       if (name === 'hit') sideVaries ||= JSON.stringify(actual) !== JSON.stringify(applyJointDelta(body, base, clip, cursor, { side: -side }));
     }
@@ -450,10 +459,11 @@ test('acid death clips reproduce the generator fall over the rest frame at every
     const death = clip(name);
     assert.equal(death.kind, 'pose');
     assert.equal(death.loop, false);
-    assert.equal(death.duration, tuning.deathDuration);
+    assert.equal(death.durationRealSeconds, tuning.deathDuration);
+    assert(!('durationSimSeconds' in death));
     assert.equal(death.frames.length, row.attack_frames);
     for (const [i, frame] of death.frames.entries()) {
-      close(decodeFrame(frame), acidDeathPose(figure.realized, rest, death.duration * i / (death.frames.length - 1), direction));
+      close(decodeFrame(frame), acidDeathPose(figure.realized, rest, death.durationRealSeconds * i / (death.frames.length - 1), direction));
     }
     // Frame zero is the rest frame itself: the fall starts from idle frame zero.
     close(decodeFrame(death.frames[0]), rest);
@@ -473,7 +483,7 @@ test('the death clips settle', async () => {
   const rest = acidIdlePose(figure.realized, 0);
   for (const [name, direction] of [['forward', 1], ['backward', -1]]) {
     const death = clips.standing.death[name];
-    assert.equal(death.duration, deathDuration);
+    assert.equal(death.durationRealSeconds, deathDuration);
     assert(death.frames.length >= 2);
     const settled = acidDeathPose(figure.realized, rest, deathDuration, direction);
     // The settled fold is what the generator holds from deathDuration on.
@@ -530,7 +540,7 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   const core = body.bones.find((bone) => bone.id === 'core');
   assert(core.voxels.some((p) => p.every((v, a) => Math.abs(v - body.coreInteriorPoint[a]) < body.voxelSize / 2)));
   const peak = HIT_FLINCH.keys[1];
-  assert.deepEqual(body.animation, { flinch: { peak: peak.t, duration: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] } });
+  assert.deepEqual(body.animation, { flinch: { peakAtSimSeconds: peak.t, durationSimSeconds: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] } });
   assert.equal(body.bodyMassKg, fusedMassTemplate.bodyMassKg);
   assert(!('massFractions' in body));
   const clips = JSON.parse(JSON.stringify(fusedClips(figure)));
@@ -677,8 +687,8 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
         assert.equal('standing' in clips, template.legCut === undefined);
         assert.equal(clips.crawling.attack.kind, 'overlay');
       } else if (model === 'acid') {
-        assert.deepEqual(Object.keys(clips.standing).sort(), ['attack', 'death', 'hit', 'idle', 'walk', 'windup']);
-        for (const name of ['walk', 'attack', 'windup', 'hit']) assert.equal(clips.standing[name].kind, 'jointDelta');
+        assert.deepEqual(Object.keys(clips.standing).sort(), ['attack', 'death', 'hit', 'idle', 'spitDraw', 'walk']);
+        for (const name of ['walk', 'attack', 'spitDraw', 'hit']) assert.equal(clips.standing[name].kind, 'jointDelta');
         assert.deepEqual(Object.keys(clips.standing.death).sort(), ['backward', 'forward']);
         // Canonical baked fall: the runtime holds no death parameters.
         assert(!('death' in body.animation));
@@ -746,7 +756,7 @@ const motionFixture = (t) => ({
 test('finite pose sampling stores both endpoints and holds the last frame', async () => {
   const { poseClip } = await import('../actorClips.mjs');
   const { sampleClip } = await import('../actorCompose.mjs');
-  const clip = poseClip(motionFixture, { loop: false, duration: 2, frames: 3 });
+  const clip = poseClip(motionFixture, { loop: false, durationSimSeconds: 2, frames: 3 });
   assert.equal(clip.kind, 'pose');
   assert.equal(clip.loop, false);
   assert.deepEqual(clip.frames.map((f) => f.root), [0, 1, 2].map((t) => motionFixture(t).root));
@@ -755,6 +765,17 @@ test('finite pose sampling stores both endpoints and holds the last frame', asyn
   assert.strictEqual(sampleClip(clip, -1), clip.frames[0]);
   assert.strictEqual(sampleClip(clip, 1), clip.frames[1]);
   assert.deepEqual(sampleClip(clip, 1.5).root, motionFixture(1.5).root);
+});
+
+test('a finite clip without exactly one span key is rejected, not sampled as NaN', async () => {
+  const { sampleClip } = await import('../actorCompose.mjs');
+  const { poseClip } = await import('../actorClips.mjs');
+  const frames = [{ root: [0, 0, 0], rotations: {} }, { root: [1, 0, 0], rotations: {} }];
+  for (const clip of [{ kind: 'pose', loop: false, frames }, { kind: 'pose', loop: false, durationSimSeconds: 1, durationRealSeconds: 1, frames }]) {
+    assert.throws(() => sampleClip(clip, 0.5), RangeError);
+  }
+  // The writer leaves no way to bake such a clip by accident: a finite span must name its clock.
+  assert.throws(() => poseClip(motionFixture, { loop: false, duration: 1, frames: 2 }), TypeError);
 });
 
 test('loop sampling returns stored frames and interpolates the last interval toward frame zero', async () => {
@@ -766,7 +787,7 @@ test('loop sampling returns stored frames and interpolates the last interval tow
   assert.strictEqual(sampleClip(clip, -0.25), clip.frames[3]);
   assert.strictEqual(sampleClip(clip, 0.5), clip.frames[2]);
   assert.deepEqual(sampleClip(clip, 0.875).root, [0.75, 1.5, -0.75]);
-  const single = poseClip(motionFixture, { loop: false, duration: 2, frames: 1 });
+  const single = poseClip(motionFixture, { loop: false, durationSimSeconds: 2, frames: 1 });
   assert.strictEqual(sampleClip(single, 100), single.frames[0]);
 });
 
@@ -775,7 +796,7 @@ test('pose interpolation uses shortest-arc spherical quaternion interpolation an
   const { slerpQuat, quatToMat3 } = await import('../packages/mobgen/src/core/math.ts');
   const a = [0, 0, 0, 1];
   const b = [0, 0, -Math.sin(1.2), -Math.cos(1.2)];
-  const clip = { kind: 'pose', loop: false, duration: 1, frames: [
+  const clip = { kind: 'pose', loop: false, durationSimSeconds: 1, frames: [
     { root: [0, 0, 0], rotations: { chest: a } },
     { root: [2, 4, -2], rotations: { chest: b } },
   ] };
