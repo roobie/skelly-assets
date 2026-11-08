@@ -289,8 +289,9 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
   const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
-  const period = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
-  assert.equal(clips.standing.walk.period, period);
+  const loopMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0);
+  assert.equal(clips.standing.walk.period, undefined);
+  assert(Math.abs(clips.standing.walk.strideMetres * row.walkCycles - loopMetres) <= 1e-12, 'the walk loop spans its plan period in strides');
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
