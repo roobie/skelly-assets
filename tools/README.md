@@ -74,13 +74,12 @@ A row selects a registered template and body-plan pose mechanism; see `mobs.mjs`
 - `manifest.mjs`: `built/manifest.json`, written by `build.mjs` with no row ids. Each model has its id, kind, pack,
   logical path, the GLB's part node names (`nodes`, from the resolved assembly) and credits (author and licence,
   from `../REUSE.toml`, `readCredits`); each pack lists every file produced under it, the mob files of `mobs.mjs`
-  included. A mob GLB has no assembly, so its entry has `clips` and no `nodes`.
+  included. A mob GLB has no assembly, so its entry has `body` and `clips` and no `nodes`.
 - `check-built.mjs`: rebuilds into a temporary folder and holds `built/` to it: the fresh set equals the tracked set
   under `built/`, byte for byte, nothing sits flat there but `manifest.json`, the manifest names exactly the fresh
   files (`manifest.mjs`, `treeDifferences`) and every directory is a declared pack.
 - `layout.mjs`: keeps logical paths inside their owning pack; both builders and `check-built.mjs` find pack paths
-  through it. `../models/pack-formats.json` names each mob pack's clip representation, read by `layout.mjs`,
-  `readPackFormats`. The showcase (`../site/build.mjs`) lists the models of `built/manifest.json`.
+  through it. The showcase (`../site/build.mjs`) lists the models of `built/manifest.json`.
 - `packages/thing-authoring-tool/items.jsonnet`: the catalogue the roster and the recipe files' item rows select
   from. `exports/deadvox.jsonnet` selects the roster for `build.mjs`.
 - `packages/thing-authoring-tool/src/cli/export.ts <repository root> <output root>`: runs the driver's thing tool
