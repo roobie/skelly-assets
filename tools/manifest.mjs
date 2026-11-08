@@ -70,15 +70,14 @@ export function readCredits(root = repo) {
   };
 }
 
-// The mob rows' models and files. A mob GLB is one mesh node named by its row, with no assembly, so it has no part
-// nodes. A pose row is an actor row, which this manifest does not carry yet.
+// Every mob row is a model. Pose actor rows additionally produce a body file.
 export function mobManifest(rows) {
   const models = [];
   const files = [];
   for (const row of rows) {
-    if (mobFormat(row) !== 'matrices') throw new Error(`${row.id}: a pose row is an actor row, which the manifest does not carry`);
     models.push({ id: row.id, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips });
     files.push(outputPath(row.pack, row.glb), outputPath(row.pack, row.clips));
+    if (mobFormat(row) === 'pose') files.push(outputPath(row.pack, row.body));
   }
   return { models, files };
 }

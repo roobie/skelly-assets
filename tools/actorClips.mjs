@@ -90,7 +90,7 @@ export function humanoidPoseClips(figure, row) {
     walk: poseClip((cursor) => {
       const steps = cursor * 2 * row.walkCycles;
       return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    }, { frames: row.walk_frames, loop: true, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
+    }, { frames: row.walk_frames * row.walkCycles, loop: true, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
   };
   return { standing, crawling };
 }
