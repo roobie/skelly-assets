@@ -96,10 +96,12 @@ describe('recipe iron sight lattice', () => {
   );
 });
 
-it('voxelizes every recipe output on its row grain or detail grain', () => {
+describe('recipe output grain', () => {
   const rows = loadExportRecipe();
-  expect(rows.length).toBeGreaterThan(0);
-  for (const row of rows) {
+  it('has recipe rows to check', () => {
+    expect(rows.length).toBeGreaterThan(0);
+  });
+  it.for(rows)('voxelizes $id on its row grain or detail grain', (row) => {
     const grains = [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
     const primitives = readGlb(row.generate().glb).json.meshes.flatMap((mesh) => mesh.primitives);
     expect(primitives.length, `${row.id}: no meshes`).toBeGreaterThan(0);
@@ -108,7 +110,7 @@ it('voxelizes every recipe output on its row grain or detail grain', () => {
         (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
       );
     }
-  }
+  });
 });
 
 it('refuses a detail grain the gun grain is not a whole multiple of', () => {
