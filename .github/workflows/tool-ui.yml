@@ -12,6 +12,7 @@ on:
       - 'tools/package-lock.json'
       - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
+      - 'tools/testPool.ts'
       - '.github/workflows/tool-ui.yml'
       - '!**/*.md'
   pull_request:
@@ -24,6 +25,7 @@ on:
       - 'tools/package-lock.json'
       - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
+      - 'tools/testPool.ts'
       - '.github/workflows/tool-ui.yml'
       - '!**/*.md'
 
