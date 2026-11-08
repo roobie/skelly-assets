@@ -1,0 +1,62 @@
+name: slow-tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gungen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: tools/packages/gun-authoring-tool
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../.. --no-audit --no-fund --prefer-offline
+        timeout-minutes: 3
+      - run: node ../../sources.mjs
+      - run: npm run test:sweeps
+
+  thing-authoring-tool:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: tools/packages/thing-authoring-tool
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../.. --no-audit --no-fund --prefer-offline
+        timeout-minutes: 3
+      - run: node ../../sources.mjs
+      - run: npm run test:sweeps
+
+  mobgen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: tools/packages/mobgen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../.. --no-audit --no-fund --prefer-offline
+        timeout-minutes: 3
+      - run: node ../../sources.mjs
+      - run: npm run test:sweeps
