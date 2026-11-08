@@ -1,16 +1,10 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import { outputPath } from '../layout.mjs';
 import { buildManifest, manifestFiles, mobManifest, readCredits, treeDifferences } from '../manifest.mjs';
-
-const repo = resolve(import.meta.dirname, '../..');
-// Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
-const gitEnvironment = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
-const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', env: gitEnvironment() });
 
 const withReuse = (text, work) => {
   const root = mkdtempSync(join(tmpdir(), 'manifest-'));
@@ -93,31 +87,16 @@ test('a mob row joins the manifest with its actor files and no part nodes', () =
   assert.ok(!Object.hasOwn(models[0], 'nodes'));
 });
 
-test('the tree check holds the tracked set, the fresh set and the manifest to one another', () => {
+test('the tree check holds a fresh tree to its manifest and the declared packs', () => {
   const manifest = fixtureManifest();
-  const fresh = [...manifestFiles(manifest)].sort();
-  assert.deepEqual(treeDifferences({ tracked: fresh, fresh, manifest }), []);
-  const flat = treeDifferences({ tracked: [...fresh, 'built/flat.glb'], fresh: [...fresh, 'built/flat.glb'], manifest });
-  assert.ok(flat.some((line) => line.includes('built/flat.glb') && /flat/.test(line)), flat.join('\n'));
-  const stale = treeDifferences({ tracked: [...fresh, 'built/fixture.a/stale.glb'], fresh, manifest });
-  assert.ok(stale.some((line) => line.includes('built/fixture.a/stale.glb')), stale.join('\n'));
-  const unnamed = treeDifferences({ tracked: [...fresh, 'built/fixture.a/new.glb'], fresh: [...fresh, 'built/fixture.a/new.glb'], manifest });
-  assert.ok(unnamed.some((line) => line.includes('built/fixture.a/new.glb')), unnamed.join('\n'));
-  const lost = fresh.filter((file) => !file.endsWith('fixture_a.glb'));
-  const missing = treeDifferences({ tracked: lost, fresh: lost, manifest });
-  assert.ok(missing.some((line) => line.includes('fixture_a.glb')), missing.join('\n'));
-});
-
-test('built/ holds nothing flat but the manifest, and the manifest names every tracked file under built/', () => {
-  const tracked = git('ls-files', '-z', '--', 'built').split('\0').filter(Boolean);
-  assert.deepEqual(tracked.filter((path) => path.split('/').length === 2), ['built/manifest.json']);
-  const manifest = JSON.parse(readFileSync(join(repo, 'built/manifest.json'), 'utf8'));
-  assert.deepEqual([...manifestFiles(manifest)].sort(), [...tracked].sort());
-});
-
-test('a recipe file\'s rows reach the production build: every recipe pack has a model in the manifest', async () => {
-  const { recipePackIds } = await import('../recipes.mjs');
-  const manifest = JSON.parse(readFileSync(join(repo, 'built/manifest.json'), 'utf8'));
-  const packs = new Set(manifest.models.map((model) => model.pack));
-  for (const packId of recipePackIds(repo)) assert.ok(packs.has(packId), `${packId} has no model in built/manifest.json`);
+  const files = [...manifestFiles(manifest)].sort();
+  const declared = new Set(Object.keys(manifest.packs));
+  const differences = (tree, packs = declared) => treeDifferences({ files: tree, manifest, declared: packs });
+  assert.deepEqual(differences(files), []);
+  const reports = (lines, needle) => assert.ok(lines.some((line) => line.includes(needle)), `${needle} is not reported:\n${lines.join('\n')}`);
+  reports(differences([...files, 'built/flat.glb']), 'built/flat.glb');
+  reports(differences([...files, 'built/fixture.a/new.glb']), 'built/fixture.a/new.glb');
+  reports(differences(files.filter((file) => !file.endsWith('fixture_a.glb'))), 'fixture_a.glb');
+  reports(differences(files, new Set(['fixture.a'])), 'fixture.b');
+  reports(differences(files, new Set([...declared, 'fixture.unbuilt'])), 'fixture.unbuilt');
 });

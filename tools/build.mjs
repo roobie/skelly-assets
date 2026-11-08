@@ -2,9 +2,8 @@
 // Usage: node tools/build.mjs [--out dir] [rowId ...]
 // With no row ids it builds every id of the roster, models/export.json, every row of every recipe file in
 // models/recipes/ and built/manifest.json (tools/manifest.mjs); with ids it builds those roster-source rows, any row
-// in the sources, and no manifest. A roster id is written into --out (by default built/, where games load them) at its
-// pack's path, tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a
-// scratch folder. Needs node (26 or later, which runs the TypeScript directly) and `npm ci` in tools.
+// in the sources, and no manifest. A roster id is written into --out (by default built/) at its pack's path,
+// tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a scratch folder. Needs node (26 or later, which runs the TypeScript directly) and `npm ci` in tools.
 // Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
