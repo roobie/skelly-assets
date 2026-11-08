@@ -2,11 +2,11 @@
 // over a plackart with a keel, three fauld lames and tassets, a lamed gorget, rounded pauldrons with stepped lames,
 // rerebraces, couters with a wing, vambraces, steel gauntlets, cuisses, poleyns, greaves, pointed sabatons and an armet
 // with a pointed visor. Worn shells only.
-local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';
-local arm = import 'packages/thing-authoring-tool/arm-measures.libsonnet';
-local leg = import 'packages/thing-authoring-tool/leg-measures.libsonnet';
+local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
+local arm = import '../tools/packages/thing-authoring-tool/arm-measures.libsonnet';
+local leg = import '../tools/packages/thing-authoring-tool/leg-measures.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.over;
 

@@ -3,11 +3,11 @@
 // a power pack with glowing windows on the back. Hydraulic pistons run along the thighs, shins and forearms; the
 // shoulder plates are slanted slabs, not domes. Worn shells only. Slot `glow` is the set's own light: the game lights
 // the material (a game's glow colour, arpg1: data/art.gd POWER_GLOW).
-local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';
-local arm = import 'packages/thing-authoring-tool/arm-measures.libsonnet';
-local leg = import 'packages/thing-authoring-tool/leg-measures.libsonnet';
+local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
+local arm = import '../tools/packages/thing-authoring-tool/arm-measures.libsonnet';
+local leg = import '../tools/packages/thing-authoring-tool/leg-measures.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.cloak;
 

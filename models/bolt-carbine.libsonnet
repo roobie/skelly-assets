@@ -1,4 +1,4 @@
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
 // An oversized bolt carbine, about 0.84 m long and deep for its length: a slab receiver, an armoured barrel shroud
