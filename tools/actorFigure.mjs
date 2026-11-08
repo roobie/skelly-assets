@@ -28,14 +28,15 @@ export function figureFor(generated, template, scale) {
   }
   const fused = template.bodyPlan === 'fused-mass';
   const manifest = fused ? fusedMassManifest(body, voxels) : undefined;
-  const regions = fused ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds])) : planOf(template.bodyPlan).regionBones;
-  if (!regions) throw new Error(`body plan ${template.bodyPlan} has no actor regions`);
+  const regions = fused
+    ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds]))
+    : planOf(template.bodyPlan).regionBones;
   const margin = voxels.size / 2 + (fused ? 0 : 0.001);
-  const boxes = Object.fromEntries(Object.entries(regions).map(([region, ids]) => [region, ids.flatMap((bone) => {
+  const boxes = regions === undefined ? undefined : Object.fromEntries(Object.entries(regions).map(([region, ids]) => [region, ids.flatMap((bone) => {
     const bounds = limits.get(bone);
     return bounds ? [{ bone, center: bounds.min.map((v, a) => (v + bounds.max[a]) / 2), halfSize: bounds.min.map((v, a) => (bounds.max[a] - v) / 2 + margin) }] : [];
   })]));
-  const figure = { seed: genome.seed, genome, realized, regions, boxes, severableParts: regionSeverableParts(body.bones, regions), voxelCentersByBone };
+  const figure = { seed: genome.seed, genome, realized, ...(regions === undefined ? {} : { regions, boxes, severableParts: regionSeverableParts(body.bones, regions) }), voxelCentersByBone };
   if (!fused) return figure;
   if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError('fused scale must be positive and finite');
   const bounds = { min: total.min.map((v) => v * scale), max: total.max.map((v) => v * scale) };

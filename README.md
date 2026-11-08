@@ -43,10 +43,9 @@ its own pack: gun rows to `built/<packId>/gungen/` and `built/<packId>/assets/mo
 `PRODUCTION_RECIPE_TOOLS`. Last it writes `built/manifest.json`: every model by id, kind, pack, logical path, the
 GLB's part node names from the resolved assembly and credits from `REUSE.toml`, and every produced file under its
 pack; see `tools/manifest.mjs`, `buildManifest`.
-The creature rows of `models/mobs.json` are written under their declared packs. Bestiary rows use matrix clips
-(`*_clips.json`) while pose rows use actor clip files (`actors/<id>.clips.json`) and body files
-(`actors/<id>.body.json`); `tools/mobs.mjs`, `exportMob`, writes both forms according to
-`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. Pose rows bake through
+The creature rows of `models/mobs.json` are written under their declared packs as actor GLBs with body and pose
+clip files under `actors/`. One clip representation keeps every consumer in mobgen's rest frame, so roots and
+quaternion rotations compose consistently. `tools/mobs.mjs`, `exportMob`, bakes them through
 `tools/actorBake.mjs`, `bakeActor`, and their models and files are in the manifest.
 arpg1 reads `skelly.body`, `skelly.wearables`, `skelly.melee`, `skelly.hand-tools`, `skelly.materials`,
 `skelly.light-sources`, `skelly.containers`, `skelly.structures`, `skelly.readables`, `skelly.arcana`,
@@ -63,8 +62,8 @@ Open gaps:
 
 | Path | Contents |
 |---|---|
-| `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries where applicable, and matrix or pose clip files for mobs; `manifest.json` lists them all |
-| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
+| `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries where applicable, and body-backed pose clips for mobs; `manifest.json` lists them all |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, and the mob rows in `mobs.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page; GitHub Pages also publishes the mobgen, gun, thing and vehicle authoring viewers from `tools/packages/` |
 
@@ -89,6 +88,12 @@ changing a source, rebuild and commit the source and its `built/` output togethe
 `tools/README.md`.
 
 To preview the showcase locally, run `node site/build.mjs` and serve `_site/` with any static file server.
+
+### Showcase idle motion
+
+The showcase shows a humanoid idle's rest pose rather than sway. The three sway oscillators in
+`tools/packages/mobgen/src/mob/idle.ts`, `idleMotion`, only close a plain baked loop over a span too long for the
+showcase; a short loop visibly jumps at its wrap. The showcase carries no composition logic, so it uses the rest pose.
 
 ## Licence
 
