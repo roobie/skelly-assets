@@ -1,5 +1,5 @@
 {
-  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh): each builds from a mobgen template. pack names the content pack that declares the row's files: by default they are assets/models/actors/<id>.glb, actors/<id>.body.json, and actors/<id>.clips.json under it, written to built/<pack>/ through tools/layout.mjs, outputPath. Rows preserve the generator's rest frame, so consumers compose the same roots and quaternion rotations; scale is carried with that rest-frame geometry. Their type defaults to id and model to template. lookAt selects the mobgen look profile when one is authored; plans without a profile may omit it, so consumers must not require a value nobody authored. walkCycles is a positive integer selecting how many two-step gait cycles a standing humanoid walk contains; crawls selects whether a humanoid row bakes a crawling clip set: built data holds only what the game uses, so a row whose actor has no gait-driven crawl (the player, whose prone stance is a fixed pose) sets it false, and a crawl stride there would have no owner. crawl_stride is the metres one crawl cycle covers, baked as the crawl walk's strideMetres: a walk loop clip states its own true distance, so the crawl clip carries an authored stride like the standing walk, and the asset row is the one place crawl pace is tuned. walk_frames and attack_frames select sampling density, and attack_frames also samples an acid body's finite death clips. lod_divisor divides the template's 0.5 m source voxel when positive; 0 keeps full detail. Defaults apply to every row; a row may override any of them. A row narrows its template to the source sprite: brief records what was read for the next author; params override template parameter ranges (a number, {min,max}, or {choices}); materials are the sampled palette (name -> {color, emissive}), whose names no longer follow template hue parameters; and parts are signature shapes on a bone at its head, tail or midpoint, in metres from there and optionally mirrored. attack_clip selects a shared-rig attack instead of the template's, idle selects slack or aggravated motion, budgets replaces template budget entries for a reshaped body, and budget_headroom widens top voxel budgets when added parts need room. Plans without mobgen region maps omit regions, boxes and severableParts, so consumers do not receive invented region values.",
+  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh): each builds from a mobgen template. pack names the content pack that declares the row's files: by default they are assets/models/actors/<id>.glb, actors/<id>.body.json, and actors/<id>.clips.json under it, written to built/<pack>/ through tools/layout.mjs, outputPath. Rows preserve the generator's rest frame, so consumers compose the same roots and quaternion rotations; scale is carried with that rest-frame geometry. Their type defaults to id and model to template. lookAt selects the mobgen look profile when one is authored; plans without a profile may omit it, so consumers must not require a value nobody authored. walkCycles is a positive integer selecting how many two-step gait cycles a standing humanoid walk contains; crawls selects whether a humanoid row bakes a crawling clip set: built data holds only what a game uses, so a row no game crawls sets it false (the player, whose prone stance is a fixed pose, and the skelly.bestiary humanoids), since a crawl stride there would have no owner. crawl_stride is the metres one crawl cycle covers, baked as the crawl walk's strideMetres: a walk loop clip states its own true distance, so the crawl clip carries an authored stride like the standing walk, and the asset row is the one place crawl pace is tuned. walk_frames and attack_frames select sampling density, and attack_frames also samples an acid body's finite death clips. lod_divisor divides the template's 0.5 m source voxel when positive; 0 keeps full detail. Defaults apply to every row; a row may override any of them. A row narrows its template to the source sprite: brief records what was read for the next author; params override template parameter ranges (a number, {min,max}, or {choices}); materials are the sampled palette (name -> {color, emissive}), whose names no longer follow template hue parameters; and parts are signature shapes on a bone at its head, tail or midpoint, in metres from there and optionally mirrored. attack_clip selects a shared-rig attack instead of the template's, idle selects slack or aggravated motion, budgets replaces template budget entries for a reshaped body, and budget_headroom widens top voxel budgets when added parts need room. Plans without mobgen region maps omit regions, boxes and severableParts, so consumers do not receive invented region values.",
   "defaults": {
     "seed": 7,
     "scale": 1,
@@ -15,6 +15,7 @@
   "mobs": [
     {
       "id": "shambler",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "humanoid",
       "seed": 7,
@@ -78,6 +79,7 @@
     },
     {
       "id": "cutter",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "humanoid",
       "seed": 7,
@@ -146,6 +148,7 @@
     },
     {
       "id": "hexcaller",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "slim-humanoid",
       "seed": 7,
@@ -211,6 +214,7 @@
     },
     {
       "id": "gorehorn",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "broad-humanoid",
       "seed": 7,
@@ -277,6 +281,7 @@
     },
     {
       "id": "bogling",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "broad-humanoid",
       "seed": 7,
@@ -1082,6 +1087,7 @@
     },
     {
       "id": "spitter",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "slim-humanoid",
       "seed": 7,
@@ -1157,6 +1163,7 @@
     },
     {
       "id": "drencher",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "broad-humanoid",
       "seed": 7,
@@ -1423,6 +1430,7 @@
     },
     {
       "id": "cinder_matron",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "broad-humanoid",
       "seed": 7,
@@ -1981,6 +1989,7 @@
     },
     {
       "id": "gloom_warden",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "slim-humanoid",
       "seed": 7,
@@ -2623,6 +2632,7 @@
     },
     {
       "id": "mourner",
+      "crawls": false,
       "pack": "skelly.bestiary",
       "template": "slim-humanoid",
       "seed": 7,
