@@ -39,21 +39,21 @@ const models = manifest.models
 const poseFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
 const idleAt = (set, body, time) => {
   const idle = set.idle?.slack ?? set.idle?.aggravated ?? set.idle;
-  if (idle.kind === 'pose') return decodeFrame(sampleClip(idle, idle.loop ? time : time * (idle.duration ?? 1)));
+  if (idle.kind === 'pose') return decodeFrame(sampleClip(idle, idle.loop ? time : time * (idle.durationSimSeconds ?? 1)));
   return applyMotion(decodeFrame(idle.base), idle.motion, time, body.seed);
 };
 const plainClip = (clip, set, body, stance) => {
   if (clip.kind === 'pose') return clip;
   const frames = clip.frames.map((_, i) => {
     const normalized = clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1);
-    const time = normalized * (clip.duration ?? 1);
+    const time = normalized * (clip.durationSimSeconds ?? 1);
     const base = idleAt(set, body, normalized);
     const pose = clip.kind === 'overlay'
       ? applyOverlay(body, base, clip, time, 1, stance)
       : applyJointDelta(body, base, clip, clip.cursor === 'gaitPhase' ? normalized * 2 * Math.PI : time, { speed: 1, side: 0 });
     return poseFrame(pose);
   });
-  return { kind: 'pose', loop: Boolean(clip.loop), ...(clip.period === undefined ? {} : { period: clip.period }), ...(clip.duration === undefined ? {} : { duration: clip.duration }), ...(clip.cycles === undefined ? {} : { cycles: clip.cycles }), frames };
+  return { kind: 'pose', loop: Boolean(clip.loop), ...(clip.period === undefined ? {} : { period: clip.period }), ...(clip.durationSimSeconds === undefined ? {} : { durationSimSeconds: clip.durationSimSeconds }), ...(clip.durationRealSeconds === undefined ? {} : { durationRealSeconds: clip.durationRealSeconds }), ...(clip.cycles === undefined ? {} : { cycles: clip.cycles }), frames };
 };
 const plainSet = (set, body, stance) => Object.fromEntries(Object.entries(set).map(([name, clip]) => {
   if (name === 'idle' && !clip.kind) {

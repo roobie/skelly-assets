@@ -63,16 +63,16 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
       },
     } : {}),
     animation: fused ? {
-      flinch: { peak: peak.t, duration: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] },
+      flinch: { peakAtSimSeconds: peak.t, durationSimSeconds: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] },
     } : acid ? {
-      attackPeak: template.animation.attackPeak,
-      attackDuration: template.animation.attackDuration,
-      hitDuration: template.animation.hitDuration,
-      deathDuration: template.animation.deathDuration,
+      attackPeakAtSimSeconds: template.animation.attackPeak,
+      attackDurationSimSeconds: template.animation.attackDuration,
+      hitDurationSimSeconds: template.animation.hitDuration,
+      deathDurationRealSeconds: template.animation.deathDuration,
     } : humanoid ? {
-      attackPeak: attack.hitTime,
-      attackDuration: attack.duration,
-      hitDuration: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
+      attackPeakAtSimSeconds: attack.hitTime,
+      attackDurationSimSeconds: attack.duration,
+      hitDurationSimSeconds: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
     } : {}, 
   };
 }
