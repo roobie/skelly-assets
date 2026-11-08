@@ -20,17 +20,23 @@ export const poseFrame = (pose) => ({
 });
 
 /** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. The caller names the
- * finite span's clock, so a new clip cannot get one by accident. */
-export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, samplePeriod, cycles, ...metadata }) {
+ * finite span's clock, so a new clip cannot get one by accident. A walk loop states the distance of one stride
+ * (`strideMetres`), because travel advances it and no clock does; an idle loop states `periodSimSeconds`, because
+ * the live idle runs on the saved Sim wander clock. */
+export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, periodSimSeconds, strideMetres, samplePeriod, cycles, ...metadata }) {
   if (!Number.isInteger(frames) || frames < 1) throw new RangeError('frames must be a positive integer');
   if (typeof loop !== 'boolean') throw new TypeError('loop must be explicit');
   if (duration !== undefined) throw new TypeError('a finite span must name its clock: durationSimSeconds or durationRealSeconds');
-  const span = samplePeriod ?? period ?? durationSimSeconds ?? durationRealSeconds ?? 1;
+  if (period !== undefined) throw new TypeError('a loop period must name its clock: periodSimSeconds');
+  if (periodSimSeconds !== undefined && strideMetres !== undefined) throw new TypeError('a loop states a period or a stride, not both');
+  const span = samplePeriod ?? periodSimSeconds ?? durationSimSeconds ?? durationRealSeconds ?? 1;
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
+  if (strideMetres !== undefined && !(Number.isFinite(strideMetres) && strideMetres > 0)) throw new RangeError('strideMetres must be positive and finite');
   const clip = { kind: 'pose', loop, ...metadata };
   if (durationSimSeconds !== undefined) clip.durationSimSeconds = durationSimSeconds;
   if (durationRealSeconds !== undefined) clip.durationRealSeconds = durationRealSeconds;
-  if (period !== undefined) clip.period = period;
+  if (periodSimSeconds !== undefined) clip.periodSimSeconds = periodSimSeconds;
+  if (strideMetres !== undefined) clip.strideMetres = strideMetres;
   if (cycles !== undefined) clip.cycles = cycles;
   clip.frames = Array.from({ length: frames }, (_, i) => poseFrame(at(frames === 1 ? 0 : span * i / (loop ? frames : frames - 1))));
   return clip;
@@ -50,11 +56,11 @@ export function acidClips(figure, row) {
   const rest = acidIdlePose(figure.realized, 0);
   const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, durationRealSeconds: tuning.deathDuration, frames: row.attack_frames });
   return { standing: {
-    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
+    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, periodSimSeconds: tuning.idlePeriod, frames: row.walk_frames }),
     death: { forward: death(1), backward: death(-1) },
     walk: {
       kind: 'jointDelta', loop: true, cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
-      period: acidStrideLength(figure.realized) / row.walk_speed,
+      strideMetres: acidStrideLength(figure.realized),
       frames: Array.from({ length: row.walk_frames }, (_, i) => {
         const angles = {};
         for (const [index, side] of ['L', 'R'].entries()) {
@@ -88,62 +94,65 @@ export function creatureClips(figure, template, row) {
   let walk;
   let attack;
   let action;
-  let cycleSeconds;
+  let cycleMetres;
   if (template.bodyPlan === 'quadruped') {
     const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
     idle = () => dogIdlePose(realized, stance);
-    const cycleMetres = quadrupedStrideLength(realized, stance);
-    cycleSeconds = cycleMetres / row.walk_speed;
+    cycleMetres = quadrupedStrideLength(realized, stance);
     walk = (cursor) => quadrupedGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
     action = DOG_POUNCE;
     attack = (time) => dogAttackPose(realized, idle(), time);
   } else if (template.bodyPlan === 'insect') {
     const stance = { mandibleOpen: genome.params.mandibleOpen };
     idle = () => insectIdlePose(realized, 0.9);
-    const cycleMetres = insectStrideLength(realized);
-    cycleSeconds = cycleMetres / row.walk_speed;
+    cycleMetres = insectStrideLength(realized);
     walk = (cursor) => insectGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
     action = INSECT_LUNGE;
     attack = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
   } else if (template.bodyPlan === 'floater') {
     const params = genome.params;
     idle = () => floaterIdlePose(realized, params);
-    cycleSeconds = params.driftCycle / row.walk_speed;
+    cycleMetres = params.driftCycle;
     walk = (cursor) => floaterDriftPose(realized, params, cursor);
     action = FLOATER_CAST;
     attack = (time) => floaterCastPose(realized, params, time);
   } else if (template.bodyPlan === 'dragon') {
     const params = genome.params;
     idle = () => dragonIdlePose(realized, params);
-    cycleSeconds = dragonStrideLength(realized, params) / row.walk_speed;
+    cycleMetres = dragonStrideLength(realized, params);
     walk = (cursor) => dragonStompPose(realized, params, cursor);
     action = DRAGON_LUNGE;
     attack = (time) => dragonAttackPose(realized, params, time);
   } else throw new Error(`unsupported creature body plan ${template.bodyPlan}`);
   return { standing: {
-    idle: poseClip(idle, { loop: true, period: 1, frames: 1 }),
-    walk: poseClip(walk, { loop: true, period: cycleSeconds, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
+    idle: poseClip(idle, { loop: true, periodSimSeconds: 1, frames: 1 }),
+    walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
     attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
   } };
 }
 
-/** Both locomotion sets use the same figure, including injured crawling on a standing rig. */
+/**
+ * Both locomotion sets use the same figure, including injured crawling on a standing rig. A row's `crawls` flag
+ * selects whether it bakes a crawling set at all: built data holds only what the game uses. Its crawl walk
+ * states the row's authored `crawl_stride` as `strideMetres`, like the standing walk states its own distance.
+ */
 export function humanoidPoseClips(figure, row) {
   if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0)) throw new RangeError('walkCycles must be a positive integer');
+  if (typeof row.crawls !== 'boolean') throw new TypeError('crawls must be a boolean');
+  if (row.legCut !== undefined && !row.crawls) throw new RangeError('a legless rig only crawls');
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
     params: figure.genome.params, seed: figure.seed,
     cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
   };
-  const crawlCycleSeconds = (2 * Math.PI) / row.walk_speed;
-  const crawling = {
+  const crawling = row.crawls ? {
     idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
-    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, period: crawlCycleSeconds, samplePeriod: 1, cycles: 1 }),
-  };
+    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, strideMetres: row.crawl_stride, samplePeriod: 1, cycles: 1 }),
+  } : undefined;
   if (row.legCut !== undefined) return { crawling };
   const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
-  const standingPeriod = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
+  const standingStrideMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walkCycles;
   const standing = {
     idle: Object.fromEntries(['slack', 'aggravated'].map((stance) => [stance, {
       base: poseFrame(idleBasePose(actor, stance)), motion: idleMotion(stance),
@@ -151,9 +160,9 @@ export function humanoidPoseClips(figure, row) {
     walk: poseClip((cursor) => {
       const steps = cursor * 2 * row.walkCycles;
       return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    }, { frames: row.walk_frames * row.walkCycles, loop: true, period: standingPeriod, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
+    }, { frames: row.walk_frames * row.walkCycles, loop: true, strideMetres: standingStrideMetres, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
   };
-  return { standing, crawling };
+  return crawling ? { standing, crawling } : { standing };
 }
 
 /** Endpoint-inclusive action frames are independent of their eventual live base. */
@@ -181,6 +190,7 @@ export function humanoidClips(figure, template, row) {
     sets.standing.attack = overlay(attackClipFor(template), false, false);
     sets.standing.flinch = overlay(flinchClipFor(template), true, false);
   }
+  if (!sets.crawling) return sets;
   sets.crawling.attack = overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true);
   sets.crawling.flinch = {
     kind: 'overlay', durationSimSeconds: HIT_FLINCH.duration, peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
