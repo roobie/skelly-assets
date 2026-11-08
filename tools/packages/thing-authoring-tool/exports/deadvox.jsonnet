@@ -1,7 +1,7 @@
 // The retained roster is separate from per-pack recipe production.
-local voxel = import 'jsonnet/lib/voxel-grains.libsonnet';
+local voxel = import '../../../jsonnet/lib/voxel-grains.libsonnet';
 // models/export.json maps each roster pack id to its ids.
-local roster = std.flattenArrays(std.objectValues(import 'models/export.json'));
+local roster = std.flattenArrays(std.objectValues(import '../../../../models/export.json'));
 [
   {
     id: row.id,

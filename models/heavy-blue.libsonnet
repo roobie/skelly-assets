@@ -1,11 +1,11 @@
 // The heavy blue armour set: the trooper's fitted worn shells in a cobalt livery, with over-the-top pieces added per
 // slot: huge round pauldrons, a broad chest plate over a dark belt, bulky cuisses, greaves and vambraces, oversized
 // gauntlets and a chunky helm. Worn shells only (no ground models).
-local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';
-local arm = import 'packages/thing-authoring-tool/arm-measures.libsonnet';
-local leg = import 'packages/thing-authoring-tool/leg-measures.libsonnet';
+local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
+local arm = import '../tools/packages/thing-authoring-tool/arm-measures.libsonnet';
+local leg = import '../tools/packages/thing-authoring-tool/leg-measures.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.cloak;
 
