@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
-import { declaredPacks, mobFormat, outputPath, readMobRows, readPackFormats, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 // Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
@@ -18,7 +18,6 @@ function fixtureRoot() {
   mkdirSync(join(root, 'models/recipes'), { recursive: true });
   writeFileSync(join(root, 'models/recipes/fixture.recipe.jsonnet'), '[]');
   writeFileSync(join(root, 'models/export.json'), JSON.stringify({ 'fixture.roster': ['fixture_gun'] }));
-  writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { 'fixture.mobs': 'matrices' } }));
   writeFileSync(join(root, 'models/mobs.json'), JSON.stringify({
     defaults: { pack: 'fixture.mobs' },
     mobs: [{ id: 'fixture_mob', glb: 'fixture_mob.glb', clips: 'fixture_mob_clips.json' }],
@@ -39,28 +38,6 @@ test('a directory under built/ that no pack declares is reported; flat files are
   assert.deepEqual(undeclaredDirectories(['built/flat.glb', 'built/fixture.a/assets/models/x.glb', 'built/fixture.b/x.glb', 'built/fixture.b/y.glb'], declared), ['built/fixture.b']);
 });
 
-test('the pack format map is content: read from models/, validated, and only known formats', () => {
-  const root = fixtureRoot();
-  try {
-    assert.deepEqual(readPackFormats(root), { 'fixture.mobs': 'matrices' });
-    writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { 'fixture.mobs': 'fixture.unknown' } }));
-    assert.throws(() => readPackFormats(root), /unknown format/);
-    writeFileSync(join(root, 'models/pack-formats.json'), JSON.stringify({ packs: { '../fixture': 'pose' } }));
-    assert.throws(() => readPackFormats(root), /Invalid pack id/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test('a mob row bakes its pack\'s clip representation; a row cannot contradict it', () => {
-  const packFormats = readPackFormats();
-  assert.ok(Object.keys(packFormats).length > 0);
-  for (const [pack, format] of Object.entries(packFormats)) {
-    assert.equal(mobFormat({ id: 'fixture', pack }), format);
-    assert.throws(() => mobFormat({ id: 'fixture', pack, format: format === 'pose' ? 'matrices' : 'pose' }));
-  }
-  assert.equal(mobFormat({ id: 'fixture', pack: 'fixture.unlisted', format: 'pose' }), 'pose');
-  assert.throws(() => mobFormat({ id: 'fixture', pack: 'fixture.unlisted' }));
-});
-
 test('the roster is a map from valid pack ids to ids, each id in one pack', () => {
   const roster = readRoster();
   assert.ok(roster.length > 0);
@@ -68,13 +45,12 @@ test('the roster is a map from valid pack ids to ids, each id in one pack', () =
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('every mob row names a pack whose clip representation is known', () => {
+test('every mob row names a pack and actor output paths', () => {
   const rows = readMobRows();
   assert.ok(rows.length > 0);
   for (const row of rows) {
     assert.equal(typeof row.pack, 'string', `${row.id} has no pack`);
-    mobFormat(row);
-    outputPath(row.pack, row.glb);
+    for (const file of [row.glb, row.body, row.clips]) outputPath(row.pack, file);
   }
 });
 
@@ -111,8 +87,7 @@ test('the showcase lists every model of the manifest at its pack path and ships 
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
       if (model.clips) {
         assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
-        const clips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
-        assert.ok(model.static || Array.isArray(clips.idle?.frames), `${model.file} has clips the viewer cannot pose and is not static`);
+        assert.ok(existsSync(join(out, 'built', model.body)), `${model.file} is missing its actor body`);
       }
     }
   } finally { rmSync(out, { recursive: true, force: true }); }
