@@ -86,18 +86,11 @@ test('a model whose path is not among the produced files is refused', () => {
   }), /fixture_a/);
 });
 
-test('a mob row joins the manifest with its GLB and clips and no part nodes', () => {
-  const { models, files } = mobManifest([{ id: 'fixture_mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', clips: 'fixture_mob_clips.json', format: 'matrices' }]);
-  assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob_clips.json']);
-  assert.equal(models.length, 1);
-  assert.equal(models[0].path, 'fixture_mob.glb');
-  assert.equal(models[0].clips, 'fixture_mob_clips.json');
+test('a mob row joins the manifest with its actor files and no part nodes', () => {
+  const { models, files } = mobManifest([{ id: 'fixture_mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json' }]);
+  assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob.body.json', 'fixture.mobs/fixture_mob.clips.json']);
+  assert.deepEqual(models, [{ id: 'fixture_mob', kind: 'mob', pack: 'fixture.mobs', path: 'fixture_mob.glb', clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json' }]);
   assert.ok(!Object.hasOwn(models[0], 'nodes'));
-  const actors = mobManifest([{ id: 'fixture_actor', pack: 'fixture.mobs', glb: 'a.glb', clips: 'a.json', body: 'b.json', format: 'pose' }]);
-  assert.deepEqual(actors, {
-    models: [{ id: 'fixture_actor', kind: 'mob', pack: 'fixture.mobs', path: 'a.glb', clips: 'a.json' }],
-    files: ['fixture.mobs/a.glb', 'fixture.mobs/a.json', 'fixture.mobs/b.json'],
-  });
 });
 
 test('the tree check holds the tracked set, the fresh set and the manifest to one another', () => {

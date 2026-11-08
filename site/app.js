@@ -1,5 +1,5 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
-// controls and, for creatures, their walk, attack and idle clips from *_clips.json.
+// controls and, for creatures, their body-backed pose clips.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -25,9 +25,10 @@ const cache = new Map();
 function load(model) {
   if (!cache.has(model.id)) {
     cache.set(model.id, (async () => {
-      const [gltf, clips] = await Promise.all([
+      const [gltf, clips, body] = await Promise.all([
         loader.loadAsync(`built/${model.file}`),
         model.clips ? fetch(`built/${model.clips}`).then((r) => r.json()) : null,
+        model.body ? fetch(`built/${model.body}`).then((r) => r.json()) : null,
       ]);
       let triangles = 0;
       const materials = new Map();
@@ -41,13 +42,14 @@ function load(model) {
         }
         for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
       });
-      return { scene: gltf.scene, clips, triangles, materials: [...materials.values()] };
+      return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
     })());
   }
   return cache.get(model.id);
 }
 
-const canPose = (model, clips) => !model.static && Array.isArray(clips?.idle?.frames);
+const standingClips = (clips) => clips?.standing ?? clips;
+const canPose = (model, clips, body) => Boolean(model.body && body && standingClips(clips) && Object.values(standingClips(clips)).some((clip) => clip?.kind === 'pose'));
 
 function instance(loaded, model) {
   const scene = loaded.scene.clone(true);
@@ -64,55 +66,53 @@ function instance(loaded, model) {
   return scene;
 }
 
-// ---- rigid posing: each vertex follows one bone (TEXCOORD_1.x) by a 3x4 matrix, rows r0..r8 then t0..t2 ----
+// ---- rigid posing: each vertex follows its body bone (TEXCOORD_1.x) ----
 
-const blended = new Float32Array(12 * 64);
+const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+const mul = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
+const quaternionMatrix = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
 
-function pose(scene, frames, t) {
-  const n = frames.length;
-  const f = ((t % n) + n) % n;
-  const a = frames[Math.floor(f)];
-  const b = frames[(Math.floor(f) + 1) % n];
-  const k = f - Math.floor(f);
-  for (let i = 0; i < a.length; i++) blended[i] = a[i] + (b[i] - a[i]) * k;
+// This is actorCompose.sampleClip's pose path: loop cursors wrap, finite cursors hold their endpoint.
+function samplePose(clip, time) {
+  const n = clip.frames.length;
+  const u = clip.loop ? ((time % 1 + 1) % 1) * n : Math.max(0, Math.min(1, time / clip.duration)) * (n - 1);
+  const i = Math.floor(u), w = u - i, a = clip.frames[i], b = clip.frames[(i + 1) % n];
+  if (!w) return a;
+  const rotations = {};
+  for (const id of new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])) {
+    const q = (a.rotations[id] ?? [0, 0, 0, 1]).map((x, axis) => x + ((b.rotations[id] ?? [0, 0, 0, 1])[axis] - x) * w);
+    const length = Math.hypot(...q); rotations[id] = q.map((x) => x / length);
+  }
+  return { root: a.root.map((x, axis) => x + (b.root[axis] - x) * w), rotations };
+}
+
+function pose(scene, body, clip, time) {
+  if (clip?.kind !== 'pose') return;
+  const pose = samplePose(clip, time), transforms = [], byId = new Map();
+  for (const bone of body.bones) {
+    const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
+    let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
+    const parent = byId.get(bone.parent);
+    if (parent) { t = t.map((x, axis) => parent.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * t[c], 0) + parent.t[axis]); transforms.push({ r: mul(parent.r, r), t }); }
+    else { t = t.map((x, axis) => x + pose.root[axis]); transforms.push({ r, t }); }
+    byId.set(bone.id, transforms.at(-1));
+  }
   scene.traverse((o) => {
     if (!o.isMesh || !o.geometry.userData.rest) return;
-    const g = o.geometry;
-    const bone = g.attributes.uv1.array;
-    const rest = g.userData.rest, restN = g.userData.restNormal;
-    const pos = g.attributes.position.array, nor = g.attributes.normal.array;
-    for (let v = 0, c = pos.length / 3; v < c; v++) {
-      const m = bone[v * 2] * 12;
-      const i = v * 3;
-      const x = rest[i], y = rest[i + 1], z = rest[i + 2];
-      pos[i] = blended[m] * x + blended[m + 1] * y + blended[m + 2] * z + blended[m + 9];
-      pos[i + 1] = blended[m + 3] * x + blended[m + 4] * y + blended[m + 5] * z + blended[m + 10];
-      pos[i + 2] = blended[m + 6] * x + blended[m + 7] * y + blended[m + 8] * z + blended[m + 11];
-      const nx = restN[i], ny = restN[i + 1], nz = restN[i + 2];
-      nor[i] = blended[m] * nx + blended[m + 1] * ny + blended[m + 2] * nz;
-      nor[i + 1] = blended[m + 3] * nx + blended[m + 4] * ny + blended[m + 5] * nz;
-      nor[i + 2] = blended[m + 6] * nx + blended[m + 7] * ny + blended[m + 8] * nz;
+    const g = o.geometry, bone = g.attributes.uv1.array, rest = g.userData.rest, restN = g.userData.restNormal, pos = g.attributes.position.array, nor = g.attributes.normal.array;
+    for (let v = 0; v < pos.length / 3; v++) {
+      const m = transforms[bone[v * 2]], i = v * 3;
+      for (let axis = 0; axis < 3; axis++) { pos[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * rest[i + c], m.t[axis]); nor[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * restN[i + c], 0); }
     }
-    g.attributes.position.needsUpdate = true;
-    g.attributes.normal.needsUpdate = true;
-    g.computeBoundingSphere();
-    g.computeBoundingBox();
+    g.attributes.position.needsUpdate = g.attributes.normal.needsUpdate = true;
+    g.computeBoundingSphere(); g.computeBoundingBox();
   });
 }
 
-// The frame (fractional) of a clip at a time in seconds.
-function clipFrame(clips, name, seconds) {
-  const clip = clips[name];
-  const n = clip.frames.length;
-  if (name === 'walk') {
-    const period = Math.min(2, Math.max(0.6, clip.cycle_m / WALK_SPEED));
-    return ((seconds / period) % 1) * n;
-  }
-  if (name === 'attack') {
-    const cycle = clip.duration + ATTACK_REST;
-    return Math.min(n - 1, ((seconds % cycle) / clip.duration) * (n - 1));
-  }
-  return 0;
+function clipTime(clip, name, seconds) {
+  if (name === 'walk') return seconds / Math.min(2, Math.max(0.6, (clip.cycle_m ?? 1) / WALK_SPEED));
+  if (name === 'attack') return Math.min(clip.duration, seconds % (clip.duration + ATTACK_REST));
+  return seconds;
 }
 
 // ---- staging ----
@@ -175,7 +175,7 @@ async function drainThumbs() {
     try {
       const loaded = await load(model);
       const obj = instance(loaded, model);
-      if (canPose(model, loaded.clips)) pose(obj, loaded.clips.idle.frames, 0);
+      if (canPose(model, loaded.clips, loaded.body)) pose(obj, loaded.body, standingClips(loaded.clips).walk, 0);
       thumbStage.add(obj);
       frame(thumbCamera, obj);
       thumbRenderer.render(thumbStage, thumbCamera);
@@ -279,7 +279,8 @@ function initViewer() {
   renderer.setAnimationLoop((ms) => {
     if (!$('viewer').open) return;
     const v = viewer;
-    if (v.obj && canPose(v.model, v.loaded?.clips) && v.clip) pose(v.obj, v.loaded.clips[v.clip].frames, clipFrame(v.loaded.clips, v.clip, (ms - v.t0) / 1000));
+    const clips = standingClips(v.loaded?.clips);
+    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000));
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -324,7 +325,7 @@ async function openViewer(model) {
   viewer.obj = instance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
-  if (canPose(model, loaded.clips)) pose(viewer.obj, loaded.clips.idle.frames, 0);
+  if (canPose(model, loaded.clips, loaded.body)) pose(viewer.obj, loaded.body, standingClips(loaded.clips).walk, 0);
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
@@ -336,7 +337,7 @@ async function openViewer(model) {
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ['File', kb(model.bytes)],
   ];
-  if (canPose(model, loaded.clips)) facts.push(['Bones', loaded.clips.bones.length]);
+  if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
   $('v-facts').replaceChildren(...facts.flatMap(([k, v]) => [
     Object.assign(document.createElement('dt'), { textContent: k }),
     Object.assign(document.createElement('dd'), { textContent: v }),
@@ -354,8 +355,9 @@ async function openViewer(model) {
     : [Object.assign(document.createElement('li'), { textContent: 'Vertex colours' })];
   $('v-materials').replaceChildren(...mats);
 
-  if (canPose(model, loaded.clips)) {
-    const names = ['walk', 'attack', 'idle'].filter((n) => loaded.clips[n]);
+  if (canPose(model, loaded.clips, loaded.body)) {
+    const clips = standingClips(loaded.clips);
+    const names = ['walk', 'attack', 'idle'].filter((n) => clips[n]?.kind === 'pose');
     const pick = (name) => {
       viewer.clip = name;
       viewer.t0 = performance.now();
