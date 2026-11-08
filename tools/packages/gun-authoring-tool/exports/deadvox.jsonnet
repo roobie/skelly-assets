@@ -1,7 +1,7 @@
 // A gun and its magazine take the gun class, so a seated magazine matches the receiver's voxels; cartridges and
 // attachments are items. A cartridge or attachment may name its own grain in its definition in place of its class's.
-local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
-local attachments = (import 'packages/gun-authoring-tool/src/gun/appearance.jsonnet').attachments;
+local voxel = import '../../../jsonnet/lib/voxel-grains.libsonnet';
+local attachments = (import '../src/gun/appearance.jsonnet').attachments;
 local design(id, source) = { id: id, kind: 'design', source: 'packages/gun-authoring-tool/designs/' + source + '.json', voxel: voxel.gun };
 // A cartridge exports as its round and its case, both on the grain its definition names.
 local cartridge(name, source, definition) = [
@@ -35,7 +35,7 @@ local attachmentSources = [
 local strays = std.setDiff(std.objectFields(attachments), std.set(attachmentSources));
 assert std.length(strays) == 0 : 'attachment looks with no export row: %s' % [strays];
 // Every catalogue item exports as its loose part, on the gun class so it matches the gun it is fitted to.
-local partItems = [entry for entry in (import 'packages/gun-authoring-tool/src/gun/catalogue.jsonnet').parts if std.objectHas(entry, 'params')];
+local partItems = [entry for entry in (import '../src/gun/catalogue.jsonnet').parts if std.objectHas(entry, 'params')];
 local part(item) = { id: item.id, kind: 'part', source: item.id, voxel: voxel.gun };
 local magazine(id, source, calibre, appearanceProfile) = {
   id: id, kind: 'magazine', source: source, voxel: voxel.gun,
@@ -49,12 +49,12 @@ local magazine(id, source, calibre, appearanceProfile) = {
   design('revolver', 'archetype-revolver'),
   design('pistol_service', 'service-nine'),
 ]
-+ cartridge('5_d_56x45', '5.56x45', import 'packages/gun-authoring-tool/cartridges/5.56x45.jsonnet')
-+ cartridge('7_d_62x39', '7.62x39', import 'packages/gun-authoring-tool/cartridges/7.62x39.jsonnet')
-+ cartridge('12_h_gauge_h_00_h_buck', '12-gauge-00-buck', import 'packages/gun-authoring-tool/cartridges/12-gauge-00-buck.jsonnet')
-+ cartridge('308_h_winchester', '308-winchester', import 'packages/gun-authoring-tool/cartridges/308-winchester.jsonnet')
-+ cartridge('357_h_magnum', '357-magnum', import 'packages/gun-authoring-tool/cartridges/357-magnum.jsonnet')
-+ cartridge('9x19', '9x19', import 'packages/gun-authoring-tool/cartridges/9x19.jsonnet')
++ cartridge('5_d_56x45', '5.56x45', import '../cartridges/5.56x45.jsonnet')
++ cartridge('7_d_62x39', '7.62x39', import '../cartridges/7.62x39.jsonnet')
++ cartridge('12_h_gauge_h_00_h_buck', '12-gauge-00-buck', import '../cartridges/12-gauge-00-buck.jsonnet')
++ cartridge('308_h_winchester', '308-winchester', import '../cartridges/308-winchester.jsonnet')
++ cartridge('357_h_magnum', '357-magnum', import '../cartridges/357-magnum.jsonnet')
++ cartridge('9x19', '9x19', import '../cartridges/9x19.jsonnet')
 + [attachment(source) for source in attachmentSources]
 + [
   magazine('magazine_stanag_20', 'stanag-20', '5.56x45', 'ar'),
