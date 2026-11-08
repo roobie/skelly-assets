@@ -263,6 +263,12 @@ test('actor body metadata preserves figure regions, support geometry and templat
   assert(body.bones.every((bone) => !('mass' in bone) && !('box' in bone)));
 });
 
+test('standing walk frame count scales with walk cycles while crawling does not', async () => {
+  const { clips } = await bakeFixture('humanoid', { walkCycles: 3, walk_frames: 8 });
+  assert.equal(clips.standing.walk.frames.length, clips.standing.walk.cycles * clips.crawling.walk.frames.length);
+  assert.equal(clips.crawling.walk.frames.length, 8);
+});
+
 test('humanoid pose clips reproduce live standing and crawling poses over a closing gait cycle', async () => {
   const { humanoidPoseClips } = await import('../actorClips.mjs');
   const { decodeFrame } = await import('../actorCompose.mjs');

@@ -23,7 +23,6 @@ const models = manifest.models
     clips: clips === undefined ? null : `${pack}/${clips}`,
     static: clips !== undefined && mobFormats.get(outputPath(pack, clips)) === 'pose',
   }))
-
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
   .map(({ id, file, clips, static: isStatic }) => ({
     id,
