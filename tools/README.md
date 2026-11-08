@@ -95,7 +95,10 @@ same representation for every reader so changing a rig does not require parallel
 Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
 `readCredits`, for model identity, actor companions and attribution. Reproducibility is enforced by
 `check-built.mjs` and `manifest.mjs`, `treeDifferences`: tracked bytes must equal fresh bytes, every file must
-be named, and every output directory must be a declared pack (`layout.mjs`, `declaredPacks`). The showcase
+be named, and every output directory must be a declared pack (`layout.mjs`, `declaredPacks`). CI hands the check
+two independent builds from `build-all.mjs`, `buildAll`, and requires them byte-equal (`check-built.mjs`,
+`treeMismatches`), so a release built from a tag is known to reproduce rather than assumed to. Release archives
+are byte-reproducible for the same reason; see `pack-release.mjs`, `packRelease`. The showcase
 reads this authority rather than maintaining its own model selection; see `../site/build.mjs`.
 
 Keep engine import caches in consumers; `.gdignore` excludes the authoring tree from Godot scanning.
