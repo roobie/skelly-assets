@@ -7,7 +7,6 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const $ = (id) => document.getElementById(id);
 const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
-const WALK_SPEED = 1.2; // m/s, sets the walk cycle's period from its stride length
 const ATTACK_REST = 0.6; // s held after an attack before it plays again
 
 const nameOf = (id) => {
@@ -48,8 +47,10 @@ function load(model) {
   return cache.get(model.id);
 }
 
-const standingClips = (clips) => clips?.standing ?? clips;
-const canPose = (model, clips, body) => Boolean(model.body && body && standingClips(clips) && Object.values(standingClips(clips)).some((clip) => clip?.kind === 'pose'));
+const clipSet = (clips) => clips?.standing ?? clips?.crawling ?? clips;
+const playable = (clip) => ['pose', 'overlay', 'jointDelta'].includes(clip?.kind);
+const initialClip = (clips) => clips.walk ?? (playable(clips.idle) ? clips.idle : null);
+const canPose = (model, clips, body) => Boolean(model.body && body && clipSet(clips) && Object.values(clipSet(clips)).some(playable));
 
 function instance(loaded, model) {
   const scene = loaded.scene.clone(true);
@@ -72,23 +73,50 @@ const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const mul = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
 const quaternionMatrix = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
 
-// This is actorCompose.sampleClip's pose path: loop cursors wrap, finite cursors hold their endpoint.
+// The serialized clip schema is shared with actorCompose. This browser reader applies its three composition kinds.
 function samplePose(clip, time) {
   const n = clip.frames.length;
   const u = clip.loop ? ((time % 1 + 1) % 1) * n : Math.max(0, Math.min(1, time / clip.duration)) * (n - 1);
   const i = Math.floor(u), w = u - i, a = clip.frames[i], b = clip.frames[(i + 1) % n];
   if (!w) return a;
-  const rotations = {};
-  for (const id of new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])) {
-    const q = (a.rotations[id] ?? [0, 0, 0, 1]).map((x, axis) => x + ((b.rotations[id] ?? [0, 0, 0, 1])[axis] - x) * w);
-    const length = Math.hypot(...q); rotations[id] = q.map((x) => x / length);
-  }
-  return { root: a.root.map((x, axis) => x + (b.root[axis] - x) * w), rotations };
+  return {
+    root: a.root.map((x, axis) => x + (b.root[axis] - x) * w),
+    rotations: Object.fromEntries([...new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])].map((id) => {
+      const qa = a.rotations[id] ?? [0, 0, 0, 1], qb = b.rotations[id] ?? [0, 0, 0, 1];
+      return [id, new THREE.Quaternion(...qa).slerp(new THREE.Quaternion(...qb), w).toArray()];
+    })),
+  };
 }
 
-function pose(scene, body, clip, time) {
-  if (clip?.kind !== 'pose') return;
-  const pose = samplePose(clip, time), transforms = [], byId = new Map();
+const eulerQuaternion = ([x, y, z]) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x * Math.PI / 180, y * Math.PI / 180, z * Math.PI / 180, 'XYZ'));
+const framePose = (frame) => ({ root: [...frame.root], rotations: { ...frame.rotations } });
+function idlePose(clips, time) {
+  const idle = clips.idle?.slack ?? clips.idle?.aggravated ?? clips.idle;
+  if (idle?.kind === 'pose') return samplePose(idle, time);
+  const pose = framePose(idle.base);
+  for (const oscillator of idle.motion ?? []) for (const { bone, axis, scale } of oscillator.bones) {
+    const angle = Math.sin(2 * Math.PI * time / oscillator.period) * oscillator.amplitudeDeg * scale;
+    const q = new THREE.Quaternion(...(pose.rotations[bone] ?? [0, 0, 0, 1]));
+    pose.rotations[bone] = q.multiply(eulerQuaternion(axis === 'x' ? [angle, 0, 0] : axis === 'y' ? [0, angle, 0] : [0, 0, angle])).toArray();
+  }
+  return pose;
+}
+function composePose(clips, clip, time) {
+  if (clip.kind === 'pose') return samplePose(clip, time);
+  const base = idlePose(clips, time);
+  const n = clip.frames.length;
+  const u = clip.cursor === 'gaitPhase' ? ((time % 1 + 1) % 1) * n : Math.max(0, Math.min(1, time / clip.duration)) * (n - 1);
+  const i = Math.floor(u), w = u - i, a = clip.frames[i], b = clip.frames[(i + 1) % n] ?? a;
+  for (const id of new Set([...Object.keys(a.angles), ...Object.keys(b.angles)])) {
+    const angles = [0, 1, 2].map((axis) => (a.angles[id]?.[axis] ?? 0) + ((b.angles[id]?.[axis] ?? 0) - (a.angles[id]?.[axis] ?? 0)) * w);
+    base.rotations[id] = new THREE.Quaternion(...(base.rotations[id] ?? [0, 0, 0, 1])).multiply(eulerQuaternion(angles)).toArray();
+  }
+  return base;
+}
+
+function pose(scene, body, clips, clip, time) {
+  if (!playable(clip)) return;
+  const pose = composePose(clips, clip, time), transforms = [], byId = new Map();
   for (const bone of body.bones) {
     const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
     let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
@@ -110,7 +138,7 @@ function pose(scene, body, clip, time) {
 }
 
 function clipTime(clip, name, seconds) {
-  if (name === 'walk') return seconds / Math.min(2, Math.max(0.6, (clip.cycle_m ?? 1) / WALK_SPEED));
+  if (clip.loop) return seconds / clip.period;
   if (name === 'attack') return Math.min(clip.duration, seconds % (clip.duration + ATTACK_REST));
   return seconds;
 }
@@ -175,7 +203,10 @@ async function drainThumbs() {
     try {
       const loaded = await load(model);
       const obj = instance(loaded, model);
-      if (canPose(model, loaded.clips, loaded.body)) pose(obj, loaded.body, standingClips(loaded.clips).walk, 0);
+      if (canPose(model, loaded.clips, loaded.body)) {
+        const clips = clipSet(loaded.clips), clip = initialClip(clips);
+        pose(obj, loaded.body, clips, clip, 0);
+      }
       thumbStage.add(obj);
       frame(thumbCamera, obj);
       thumbRenderer.render(thumbStage, thumbCamera);
@@ -279,8 +310,8 @@ function initViewer() {
   renderer.setAnimationLoop((ms) => {
     if (!$('viewer').open) return;
     const v = viewer;
-    const clips = standingClips(v.loaded?.clips);
-    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000));
+    const clips = clipSet(v.loaded?.clips);
+    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000));
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -325,7 +356,10 @@ async function openViewer(model) {
   viewer.obj = instance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
-  if (canPose(model, loaded.clips, loaded.body)) pose(viewer.obj, loaded.body, standingClips(loaded.clips).walk, 0);
+  if (canPose(model, loaded.clips, loaded.body)) {
+    const clips = clipSet(loaded.clips), clip = initialClip(clips);
+    pose(viewer.obj, loaded.body, clips, clip, 0);
+  }
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
@@ -356,8 +390,8 @@ async function openViewer(model) {
   $('v-materials').replaceChildren(...mats);
 
   if (canPose(model, loaded.clips, loaded.body)) {
-    const clips = standingClips(loaded.clips);
-    const names = ['walk', 'attack', 'idle'].filter((n) => clips[n]?.kind === 'pose');
+    const clips = clipSet(loaded.clips);
+    const names = ['walk', 'attack', 'idle'].filter((n) => playable(clips[n]));
     const pick = (name) => {
       viewer.clip = name;
       viewer.t0 = performance.now();
