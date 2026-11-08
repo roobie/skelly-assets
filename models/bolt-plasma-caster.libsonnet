@@ -1,4 +1,4 @@
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
 // The bolt carbine's plasma caster: the carbine's grip, guard, trigger and butt kept, a deeper receiver, a glowing coil
