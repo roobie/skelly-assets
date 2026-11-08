@@ -273,7 +273,7 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   const { humanoidPoseClips } = await import('../actorClips.mjs');
   const { decodeFrame } = await import('../actorCompose.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
-  const { createGaitCache, footRestExtents, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { createGaitCache, footRestExtents, legGeometryFor, stepLengthMeters, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
   const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
   const { crawlGaitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
   const figure = templateFigure('humanoid', 1);
@@ -288,6 +288,9 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), idleBasePose(actor, stance));
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
+  const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
+  const period = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
+  assert.equal(clips.standing.walk.period, period);
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);

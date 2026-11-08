@@ -139,8 +139,8 @@ export function humanoidPoseClips(figure, row) {
     walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, period: crawlCycleSeconds, samplePeriod: 1, cycles: 1 }),
   };
   if (row.legCut !== undefined) return { crawling };
-  const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache };
-  const standingPeriod = (stepLengthMeters(gaitBasis, 0) + stepLengthMeters(gaitBasis, 1)) * row.walkCycles / row.walk_speed;
+  const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
+  const standingPeriod = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
   const standing = {
     idle: Object.fromEntries(['slack', 'aggravated'].map((stance) => [stance, {
       base: poseFrame(idleBasePose(actor, stance)), motion: idleMotion(stance),
