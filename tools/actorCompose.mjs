@@ -107,7 +107,7 @@ export function applyMotion(base, motion, time, seed) {
   const rotations = { ...base.rotations };
   const axes = { x: rotX, y: rotY, z: rotZ };
   for (const oscillator of motion) {
-    const angle = Math.sin(2 * Math.PI * time / oscillator.period + phaseFor(seed, oscillator.salt)) * oscillator.amplitudeDeg;
+    const angle = Math.sin(2 * Math.PI * time / oscillator.periodSimSeconds + phaseFor(seed, oscillator.salt)) * oscillator.amplitudeDeg;
     for (const { bone, axis, scale } of oscillator.bones) rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, axes[axis](angle * scale));
   }
   return { root: [...base.root], rotations };
