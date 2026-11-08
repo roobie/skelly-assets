@@ -40,8 +40,15 @@ and thing exports without giving a model two producers. The recipe schema and to
 `tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`, and
 `tools/packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`.
 
-Use the roster declaration for the separate bolt-gun and armour families, rather than selecting those models
-again in a recipe; see `tools/layout.mjs`, `readRoster`, and `tools/build.mjs`, `buildRoster`.
+A thing recipe or roster row selects a catalogue row, not a second model source. Author thing sources in
+`tools/packages/thing-authoring-tool/items.jsonnet`, `items`, including shared model files through
+`models/index.libsonnet`. The roster filters that catalogue through
+`tools/packages/thing-authoring-tool/exports/deadvox.jsonnet`, `roster`, using `models/export.json` as the
+authority for which families use the roster; see `tools/layout.mjs`, `readRoster`, and `tools/build.mjs`,
+`buildRoster`. Do not select those models again in a recipe. For guns, author the source named by the recipe
+row's `source`; file-backed sources resolve relative to `tools/`, while other gun kinds select their source
+through the owning exporter. See `tools/build.mjs`, `loadRecipeTools`, and
+`tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
@@ -69,8 +76,9 @@ These are consumer contracts, not alternate arpg1 exports.
 Deadvox consumes the recipe packs it bundles; a standalone model does not require a playable item or placement.
 The shared kind packs can therefore carry looks for arpg1 without inventing Deadvox gameplay. Its actor figures
 belong to `skelly.deadvox.actors`, its player figure to `skelly.body`; those are distinct from the generated
-bestiary. Other recipe packs serve their declared content or scenario, not an obligation for arpg1 to bundle
-them. The showcase consumes all manifest models, independent of product bundling.
+bestiary. The `skelly.deadvox.*` packs are scoped to actor, site or scenario content, not reader-only homes;
+see the selections in `models/recipes/`. Other recipe packs serve their declared content or scenario, not an
+obligation for arpg1 to bundle them. The showcase consumes all manifest models, independent of product bundling.
 
 Use `built/manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
