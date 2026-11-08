@@ -6,7 +6,7 @@ import { exportRecipes } from '../../../../build.mjs';
 export const exportThingRecipes = (
   repositoryRoot = resolve(import.meta.dirname, '../../../../..'),
   out = resolve(repositoryRoot, 'built'),
-): Promise<readonly string[]> => exportRecipes({ root: repositoryRoot, out, tools: ['thing'] });
+): ReturnType<typeof exportRecipes> => exportRecipes({ root: repositoryRoot, out, tools: ['thing'] });
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
   if (!process.argv[2] || !process.argv[3]) throw new Error('Usage: export.ts <repository root> <output root>');
