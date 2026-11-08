@@ -34,6 +34,8 @@ export type RecipeRow = InferOutput<typeof RowSchema>;
 export interface ModelExport<Model extends NeutralModel = NeutralModel> {
   readonly modelEntry: Model;
   readonly glb: Uint8Array;
+  /** The GLB's part node names from the resolved assembly; see `glb.ts`, `partNodeName`. */
+  readonly partNodes: readonly string[];
 }
 export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
   readonly id: string;
