@@ -121,6 +121,10 @@ committed to git grow its history with every rebuild, cannot be merged and can d
 pins the bytes immutably, with CI as their one producer. CI builds the tree twice and holds the builds to each
 other, so a release is known to be reproducible from its tag.
 
+Every push to main also replaces the `edge` pre-release with that commit's build, so the latest main stays
+fetchable after CI's build artifacts expire. `edge` is unpinned and moves on every push; it is never marked
+latest, and a consumer pins a `v*` release instead.
+
 ## Building
 
 You need Node 26 or later.

@@ -1,7 +1,8 @@
 name: assets
 
 # Builds the complete tree from source twice, holds the builds to each other and to the manifest, then publishes the
-# showcase from the build and, on a version tag, a release of one archive per pack.
+# showcase from the build and a release of one archive per pack: a version's on a v* tag, the rolling edge
+# pre-release on a push to main.
 on:
   push:
     branches: [main]
@@ -138,12 +139,20 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
+  # A v* tag publishes that version's release; a push to main replaces the edge pre-release with its build.
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref_type == 'tag' || github.ref == 'refs/heads/main'
     needs: [test, check]
     permissions:
       contents: write
+    # Publishing never interleaves with another for the same tag; a newer push waiting here replaces an older one.
+    concurrency:
+      group: release-${{ github.ref_type == 'tag' && github.ref_name || 'edge' }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -154,6 +163,15 @@ jobs:
           name: built-1
           path: ${{ runner.temp }}/built
       - run: node tools/pack-release.mjs "$RUNNER_TEMP/built" "$RUNNER_TEMP/release"
-      - run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/release/* --verify-tag
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Publish the version release
+        if: github.ref_type == 'tag'
+        run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/release/* --verify-tag
+      # The tag goes with the release so the new one is cut at this commit, not at a tag left behind.
+      - name: Replace the edge pre-release
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if gh release view edge >/dev/null 2>&1; then gh release delete edge --yes; fi
+          if gh api "repos/$GH_REPO/git/refs/tags/edge" >/dev/null 2>&1; then gh api -X DELETE "repos/$GH_REPO/git/refs/tags/edge"; fi
+          gh release create edge "$RUNNER_TEMP"/release/* --prerelease --latest=false --target "$GITHUB_SHA" \
+            --title "edge (main at ${GITHUB_SHA::12})" \
+            --notes "The latest build of main, at $GITHUB_SHA. It is replaced on every push to main; pin a v* release instead."
