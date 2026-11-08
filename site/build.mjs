@@ -62,7 +62,7 @@ const plainClip = (clip, set, body, stance) => {
       : applyJointDelta(body, base, clip, clip.cursor === 'gaitPhase' ? normalized * 2 * Math.PI : time, { speed: 1, side: 0 });
     return poseFrame(pose);
   });
-  return { kind: 'pose', loop: Boolean(clip.loop), ...(clip.period === undefined ? {} : { period: clip.period }), ...(clip.strideMetres === undefined ? {} : { strideMetres: clip.strideMetres }),...(clip.durationSimSeconds === undefined ? {} : { durationSimSeconds: clip.durationSimSeconds }), ...(clip.durationRealSeconds === undefined ? {} : { durationRealSeconds: clip.durationRealSeconds }), ...(clip.cycles === undefined ? {} : { cycles: clip.cycles }), frames };
+  return { kind: 'pose', loop: Boolean(clip.loop), ...(clip.periodSimSeconds === undefined ? {} : { periodSimSeconds: clip.periodSimSeconds }), ...(clip.strideMetres === undefined ? {} : { strideMetres: clip.strideMetres }),...(clip.durationSimSeconds === undefined ? {} : { durationSimSeconds: clip.durationSimSeconds }), ...(clip.durationRealSeconds === undefined ? {} : { durationRealSeconds: clip.durationRealSeconds }), ...(clip.cycles === undefined ? {} : { cycles: clip.cycles }), frames };
 };
 const plainSet = (set, body, stance) => Object.fromEntries(Object.entries(set).map(([name, clip]) => {
   if (name === 'idle' && !clip.kind) {

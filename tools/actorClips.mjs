@@ -21,19 +21,21 @@ export const poseFrame = (pose) => ({
 
 /** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. The caller names the
  * finite span's clock, so a new clip cannot get one by accident. A walk loop states the distance of one stride
- * (`strideMetres`), because travel advances it and no clock does; an idle loop keeps a time `period`. */
-export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, strideMetres, samplePeriod, cycles, ...metadata }) {
+ * (`strideMetres`), because travel advances it and no clock does; an idle loop states `periodSimSeconds`, because
+ * the live idle runs on the saved Sim wander clock. */
+export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, periodSimSeconds, strideMetres, samplePeriod, cycles, ...metadata }) {
   if (!Number.isInteger(frames) || frames < 1) throw new RangeError('frames must be a positive integer');
   if (typeof loop !== 'boolean') throw new TypeError('loop must be explicit');
   if (duration !== undefined) throw new TypeError('a finite span must name its clock: durationSimSeconds or durationRealSeconds');
-  if (period !== undefined && strideMetres !== undefined) throw new TypeError('a loop states a period or a stride, not both');
-  const span = samplePeriod ?? period ?? durationSimSeconds ?? durationRealSeconds ?? 1;
+  if (period !== undefined) throw new TypeError('a loop period must name its clock: periodSimSeconds');
+  if (periodSimSeconds !== undefined && strideMetres !== undefined) throw new TypeError('a loop states a period or a stride, not both');
+  const span = samplePeriod ?? periodSimSeconds ?? durationSimSeconds ?? durationRealSeconds ?? 1;
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
   if (strideMetres !== undefined && !(Number.isFinite(strideMetres) && strideMetres > 0)) throw new RangeError('strideMetres must be positive and finite');
   const clip = { kind: 'pose', loop, ...metadata };
   if (durationSimSeconds !== undefined) clip.durationSimSeconds = durationSimSeconds;
   if (durationRealSeconds !== undefined) clip.durationRealSeconds = durationRealSeconds;
-  if (period !== undefined) clip.period = period;
+  if (periodSimSeconds !== undefined) clip.periodSimSeconds = periodSimSeconds;
   if (strideMetres !== undefined) clip.strideMetres = strideMetres;
   if (cycles !== undefined) clip.cycles = cycles;
   clip.frames = Array.from({ length: frames }, (_, i) => poseFrame(at(frames === 1 ? 0 : span * i / (loop ? frames : frames - 1))));
@@ -54,7 +56,7 @@ export function acidClips(figure, row) {
   const rest = acidIdlePose(figure.realized, 0);
   const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, durationRealSeconds: tuning.deathDuration, frames: row.attack_frames });
   return { standing: {
-    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
+    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, periodSimSeconds: tuning.idlePeriod, frames: row.walk_frames }),
     death: { forward: death(1), backward: death(-1) },
     walk: {
       kind: 'jointDelta', loop: true, cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
@@ -123,7 +125,7 @@ export function creatureClips(figure, template, row) {
     attack = (time) => dragonAttackPose(realized, params, time);
   } else throw new Error(`unsupported creature body plan ${template.bodyPlan}`);
   return { standing: {
-    idle: poseClip(idle, { loop: true, period: 1, frames: 1 }),
+    idle: poseClip(idle, { loop: true, periodSimSeconds: 1, frames: 1 }),
     walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
     attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
   } };
