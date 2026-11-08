@@ -10,7 +10,7 @@ read_if:
 weapons, tools and other props. Every model is generated from source: models are Jsonnet rows and mobs are
 seeded generator rows, and a build turns both into binary glTF (`.glb`).
 
-The built files are committed, so you can use the assets without building anything.
+CI builds them and publishes each version as a release, so you can use the assets without building anything.
 
 **Browse them:** <https://roobie.github.io/skelly-assets/>: turn each model around, play the creatures' clips
 and download any of them.
@@ -80,11 +80,11 @@ bestiary. The `skelly.deadvox.*` packs are scoped to actor, site or scenario con
 see the selections in `models/recipes/`. Other recipe packs serve their declared content or scenario, not an
 obligation for arpg1 to bundle them. The showcase consumes all manifest models, independent of product bundling.
 
-Use `built/manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
+Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
-`tools/manifest.mjs`, `readCredits`. Nothing sits flat under `built/` except the manifest. The tracked and fresh
-produced sets must match byte for byte, so a source change and its rebuilt output belong in the same commit;
-see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDifferences`.
+`tools/manifest.mjs`, `readCredits`. Nothing sits flat beside the manifest, so every file belongs to a pack a
+consumer can choose to bundle. CI holds every build to its manifest and to the declared packs before it is
+shown or released; see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDifferences`.
 
 ### Shared turned look and fit limits
 
@@ -104,18 +104,22 @@ For pipeline ownership and authoring entry points, see `tools/README.md`.
 
 ## Using the assets
 
-Load the `.glb` files from `built/` in any engine or tool that reads glTF 2.0. To use them in a game, add this
-repository as a git submodule and load from `built/`. Engine-specific sidecar files, such as Godot's `*.import`, are
-ignored here, so each game generates its own.
+Fetch a pinned release rather than building or tracking this repository: from a `v*` release, download
+`manifest.json` and the `<packId>.tar.gz` of each pack you bundle. Each archive holds its pack's tree under
+`<packId>/`, and every manifest path is logical under its pack, so the archives unpacked side by side form the
+same tree for every consumer. Pinning a tag gives you immutable bytes that only change when you move the pin;
+fetching per pack keeps sharing a capability rather than an obligation to take the whole library.
+
+The `.glb` files load in any engine or tool that reads glTF 2.0. Engine-specific sidecar files, such as Godot's
+`*.import`, are ignored here, so each game generates its own.
 
 ## Releases
 
-Pushing a `v*` tag publishes a GitHub release with one archive per pack and `manifest.json`, so a consumer pins a
-version and fetches only the packs it bundles. CI builds every release from source; see
-`.github/workflows/assets.yml`, `release`, and `tools/pack-release.mjs`, `packRelease`. Binaries committed to git
-grow its history with every rebuild, cannot be merged and can drift from their source; a release pins the bytes
-immutably, with CI as their one producer. CI builds the tree twice and holds the builds to each other, so a
-release is known to be reproducible from its tag.
+Pushing a `v*` tag publishes the release that consumers pin (see "Using the assets"). CI builds every release from
+source; see `.github/workflows/assets.yml`, `release`, and `tools/pack-release.mjs`, `packRelease`. Binaries
+committed to git grow its history with every rebuild, cannot be merged and can drift from their source; a release
+pins the bytes immutably, with CI as their one producer. CI builds the tree twice and holds the builds to each
+other, so a release is known to be reproducible from its tag.
 
 ## Building
 
@@ -128,11 +132,12 @@ tools/build_mobs.sh              # every mob in models/mobs.json
 node tools/build-all.mjs --out <dir>   # the complete tree, as CI builds it
 ```
 
-The first run installs the tools' npm dependencies and downloads a pinned, checksum-verified go-jsonnet. After
-changing a source, rebuild and commit the source and its `built/` output together. More detail is in
-`tools/README.md`.
+The first run installs the tools' npm dependencies and downloads a pinned, checksum-verified go-jsonnet. Builds
+write to `built/`, which git ignores: commit only the source, and CI builds and checks the output. More detail is
+in `tools/README.md`.
 
-To preview the showcase locally, run `node site/build.mjs` and serve `_site/` with any static file server.
+To preview the showcase locally, build the complete tree into `built/`, run `node site/build.mjs` and serve
+`_site/` with any static file server.
 
 ### Showcase idle motion
 
