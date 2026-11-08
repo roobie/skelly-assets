@@ -26,7 +26,7 @@ export function groundFit(body, pose, boneIds) {
 
 /** Overlay angles interpolate linearly; at stored cursors no values are rebuilt. */
 export function sampleOverlay(clip, time) {
-  const u = Math.max(0, Math.min(1, time / clip.duration)) * (clip.frames.length - 1);
+  const u = Math.max(0, Math.min(1, time / clip.durationSimSeconds)) * (clip.frames.length - 1);
   const i = Math.floor(u);
   const w = u - i;
   const a = clip.frames[i];
@@ -65,7 +65,7 @@ export function applyJointDelta(body, base, clip, cursor, { speed = 0, side = 0 
   const count = clip.frames.length;
   const u = clip.cursor === 'gaitPhase'
     ? (((cursor / (2 * Math.PI) % 1) + 1) % 1) * count
-    : clamp(cursor / (clip.duration ?? 1), 0, 1) * (count - 1);
+    : clamp(cursor / (clip.durationSimSeconds ?? 1), 0, 1) * (count - 1);
   const i = Math.floor(u);
   const w = u - i;
   const a = clip.frames[i].angles;
@@ -118,6 +118,14 @@ export const decodeFrame = (frame) => ({
   rotations: Object.fromEntries(Object.entries(frame.rotations).map(([id, q]) => [id, quatToMat3(q)])),
 });
 
+/** A finite clip carries exactly one span key, named for the clock its caller samples it on; never guess. */
+export function clipSpanSeconds(clip) {
+  if ((clip.durationSimSeconds === undefined) === (clip.durationRealSeconds === undefined)) {
+    throw new RangeError('finite clip must carry exactly one of durationSimSeconds or durationRealSeconds');
+  }
+  return clip.durationSimSeconds ?? clip.durationRealSeconds;
+}
+
 /** Returns a stored frame unchanged at exact frame cursors, including finite endpoints. */
 export function sampleClip(clip, cursor) {
   const count = clip.frames.length;
@@ -125,7 +133,7 @@ export function sampleClip(clip, cursor) {
   if (count === 1) return clip.frames[0];
   const u = clip.loop
     ? (((cursor % 1) + 1) % 1) * count
-    : Math.max(0, Math.min(1, cursor / clip.duration)) * (count - 1);
+    : Math.max(0, Math.min(1, cursor / clipSpanSeconds(clip))) * (count - 1);
   const i = Math.floor(u);
   const w = u - i;
   const a = clip.frames[i];
