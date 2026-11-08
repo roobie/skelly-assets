@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { declaredPacks, outputPath, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { samplePose } from '../../site/poseSample.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 // Git run from a hook inherits GIT_DIR, GIT_WORK_TREE and kin, which override -C; drop every GIT_ binding.
@@ -92,6 +93,12 @@ test('the showcase lists every model of the manifest at its pack path and ships 
         const clips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
         const set = clips.standing ?? clips.crawling ?? clips;
         assert.ok(Object.values(set).some((clip) => ['pose', 'overlay', 'jointDelta'].includes(clip?.kind)), `${model.file} has no viewer-playable clip`);
+        const siteClips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
+        const viewerClips = siteClips.standing ?? siteClips.crawling ?? siteClips;
+        for (const name of ['walk', 'attack', 'idle']) if (viewerClips[name]?.kind === 'pose') for (const time of [0, 1.234]) {
+          const clip = viewerClips[name];
+          assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
+        }
       }
     }
   } finally { rmSync(out, { recursive: true, force: true }); }
