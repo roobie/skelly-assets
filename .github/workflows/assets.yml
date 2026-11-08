@@ -1,16 +1,23 @@
 name: assets
 
+# Builds the complete tree from source twice, holds the builds to each other, to built/ and to the manifest, then
+# publishes the showcase from the build and, on a version tag, a release of one archive per pack.
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,5 +32,130 @@ jobs:
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
-      - run: node tools/check-built.mjs
       - run: node --test tools/test/*.test.mjs
+
+  # Two independent builds, so the check can show the build is deterministic rather than assume it.
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        copy: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache go-jsonnet
+        uses: actions/cache@v4
+        with:
+          path: tools/jsonnet/bin
+          key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix tools
+      - run: node tools/build-all.mjs --out "$RUNNER_TEMP/built"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: built-${{ matrix.copy }}
+          path: ${{ runner.temp }}/built
+          if-no-files-found: error
+          retention-days: 7
+
+  check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: built-*
+          path: ${{ runner.temp }}/fresh
+      - run: node tools/check-built.mjs --fresh "$RUNNER_TEMP/fresh/built-1" --fresh "$RUNNER_TEMP/fresh/built-2"
+
+  pages:
+    needs: [test, check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache go-jsonnet
+        uses: actions/cache@v4
+        with:
+          path: tools/jsonnet/bin
+          key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix tools
+      - run: node tools/sources.mjs
+      # The showcase serves the checked build, not the committed copy, so it never shows bytes CI did not produce.
+      - run: rm -rf built
+      - uses: actions/download-artifact@v4
+        with:
+          name: built-1
+          path: built
+      - name: Build mobgen viewer
+        working-directory: tools/packages/mobgen
+        run: PAGES_ANALYTICS=1 npx vite build
+      - name: Build gun-authoring-tool viewer
+        working-directory: tools/packages/gun-authoring-tool
+        run: PAGES_ANALYTICS=1 npx vite build
+      - name: Build thing-authoring-tool viewer
+        working-directory: tools/packages/thing-authoring-tool
+        run: npx vite build
+      - name: Build vehicle-authoring-tool viewer
+        working-directory: tools/packages/vehicle-authoring-tool
+        run: npx vite build
+      - name: Assemble the site
+        run: |
+          node site/build.mjs _site
+          for P in mobgen gun-authoring-tool thing-authoring-tool vehicle-authoring-tool; do
+            mkdir -p _site/$P
+            cp -r tools/packages/$P/dist/. _site/$P/
+          done
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: pages
+    permissions:
+      pages: write
+      id-token: write
+    # One deploy at a time, and a running deploy is never cancelled.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [test, check]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - uses: actions/download-artifact@v4
+        with:
+          name: built-1
+          path: ${{ runner.temp }}/built
+      - run: node tools/pack-release.mjs "$RUNNER_TEMP/built" "$RUNNER_TEMP/release"
+      - run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/release/* --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
