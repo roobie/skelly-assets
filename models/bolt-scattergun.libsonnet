@@ -3,8 +3,7 @@ local box = h.box;
 
 // The bolt carbine's trench scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, a long
 // slim barrel with a perforated heat shield and a magazine tube beneath it, and a short ribbed brass pump handle
-// wrapped close round the tube. About 1.3 m long. The muzzle is at +x. Built
-// by tools/build_models.sh into built/bolt_scattergun.glb.
+// wrapped close round the tube. About 1.3 m long. The muzzle is at +x.
 // Hand-guard point (the off hand's hold on the pump handle), in this model's metres: [0.4725, 0.215, 0].
 
 local w = 0.06;  // half the receiver's width
