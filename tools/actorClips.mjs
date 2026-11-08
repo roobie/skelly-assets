@@ -2,7 +2,7 @@ import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
 import { acidDeathPose, acidIdlePose, acidStrideLength } from './packages/mobgen/src/mob/acidPoses.ts';
 import { clamp, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
-import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, walkPose } from './packages/mobgen/src/mob/gait.ts';
+import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, legGeometryFor, stepLengthMeters, walkPose } from './packages/mobgen/src/mob/gait.ts';
 import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
 import { crawlGaitPose, crawlHitAngles, CRAWL_HIT_PEAK_FRACTION } from './packages/mobgen/src/mob/crawl.ts';
 import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
@@ -50,7 +50,7 @@ export function acidClips(figure, row) {
     idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
     death: { forward: death(1), backward: death(-1) },
     walk: {
-      kind: 'jointDelta', cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
+      kind: 'jointDelta', loop: true, cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
       period: acidStrideLength(figure.realized) / row.walk_speed,
       frames: Array.from({ length: row.walk_frames }, (_, i) => {
         const angles = {};
@@ -133,11 +133,14 @@ export function humanoidPoseClips(figure, row) {
     params: figure.genome.params, seed: figure.seed,
     cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
   };
+  const crawlCycleSeconds = (2 * Math.PI) / row.walk_speed;
   const crawling = {
     idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
-    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, period: 1, cycles: 1 }),
+    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, period: crawlCycleSeconds, samplePeriod: 1, cycles: 1 }),
   };
   if (row.legCut !== undefined) return { crawling };
+  const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache };
+  const standingPeriod = (stepLengthMeters(gaitBasis, 0) + stepLengthMeters(gaitBasis, 1)) * row.walkCycles / row.walk_speed;
   const standing = {
     idle: Object.fromEntries(['slack', 'aggravated'].map((stance) => [stance, {
       base: poseFrame(idleBasePose(actor, stance)), motion: idleMotion(stance),
@@ -145,7 +148,7 @@ export function humanoidPoseClips(figure, row) {
     walk: poseClip((cursor) => {
       const steps = cursor * 2 * row.walkCycles;
       return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    }, { frames: row.walk_frames * row.walkCycles, loop: true, period: row.walkCycles, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
+    }, { frames: row.walk_frames * row.walkCycles, loop: true, period: standingPeriod, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
   };
   return { standing, crawling };
 }
