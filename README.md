@@ -108,6 +108,19 @@ Load the `.glb` files from `built/` in any engine or tool that reads glTF 2.0. T
 repository as a git submodule and load from `built/`. Engine-specific sidecar files, such as Godot's `*.import`, are
 ignored here, so each game generates its own.
 
+## Releases
+
+Pushing a `v*` tag publishes a GitHub release with one archive per pack and `manifest.json`, so a consumer pins a
+version and fetches only the packs it bundles. CI builds every release from source; see
+`.github/workflows/assets.yml`, `release`, and `tools/pack-release.mjs`, `packRelease`. Binaries committed to git
+grow its history with every rebuild, cannot be merged and can drift from their source; a release pins the bytes
+immutably, with CI as their one producer. CI builds the tree twice and holds the builds to each other, so a
+release is known to be reproducible from its tag.
+
+Every push to main also replaces the `edge` pre-release with that commit's build, so the latest main stays
+fetchable after CI's build artifacts expire. `edge` is unpinned and moves on every push; it is never marked
+latest, and a consumer pins a `v*` release instead.
+
 ## Building
 
 You need Node 26 or later.
@@ -116,6 +129,7 @@ You need Node 26 or later.
 tools/build_models.sh            # complete roster and recipe build
 tools/build_models.sh <id> ...   # only some rows
 tools/build_mobs.sh              # every mob in models/mobs.json
+node tools/build-all.mjs --out <dir>   # the complete tree, as CI builds it
 ```
 
 The first run installs the tools' npm dependencies and downloads a pinned, checksum-verified go-jsonnet. After
