@@ -1,6 +1,10 @@
 {
   "version": "0.22.0",
   "released": "2026-03-24",
+  "download": {
+    "attempts": 5,
+    "delaysMs": [3000, 6000, 12000, 24000]
+  },
   "sha256": {
     "darwin_amd64": "2ada40ece13e8b4e1f37c06315783110c84b496963b0b8b90809daf69df7dfc9",
     "darwin_arm64": "112534191b6e27f2ae01bb80c6ab82950fb7bf5772e2e81c5472f59a069700f5",
