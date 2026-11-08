@@ -47,10 +47,12 @@ function load(model) {
   return cache.get(model.id);
 }
 
-function instance(loaded) {
+const canPose = (model, clips) => !model.static && Array.isArray(clips?.idle?.frames);
+
+function instance(loaded, model) {
   const scene = loaded.scene.clone(true);
   // Posing writes into the geometry, so a creature needs its own copy.
-  if (loaded.clips) {
+  if (canPose(model, loaded.clips)) {
     scene.traverse((o) => {
       if (!o.isMesh) return;
       o.geometry = o.geometry.clone();
@@ -172,8 +174,8 @@ async function drainThumbs() {
     const { model, canvas } = queue.shift();
     try {
       const loaded = await load(model);
-      const obj = instance(loaded);
-      if (loaded.clips) pose(obj, loaded.clips.idle.frames, 0);
+      const obj = instance(loaded, model);
+      if (canPose(model, loaded.clips)) pose(obj, loaded.clips.idle.frames, 0);
       thumbStage.add(obj);
       frame(thumbCamera, obj);
       thumbRenderer.render(thumbStage, thumbCamera);
@@ -277,7 +279,7 @@ function initViewer() {
   renderer.setAnimationLoop((ms) => {
     if (!$('viewer').open) return;
     const v = viewer;
-    if (v.obj && v.loaded?.clips && v.clip) pose(v.obj, v.loaded.clips[v.clip].frames, clipFrame(v.loaded.clips, v.clip, (ms - v.t0) / 1000));
+    if (v.obj && canPose(v.model, v.loaded?.clips) && v.clip) pose(v.obj, v.loaded.clips[v.clip].frames, clipFrame(v.loaded.clips, v.clip, (ms - v.t0) / 1000));
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -319,10 +321,10 @@ async function openViewer(model) {
   if (viewer.model !== model) return; // a later pick overtook this load
 
   if (viewer.obj) viewer.stage.remove(viewer.obj);
-  viewer.obj = instance(loaded);
+  viewer.obj = instance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
-  if (loaded.clips) pose(viewer.obj, loaded.clips.idle.frames, 0);
+  if (canPose(model, loaded.clips)) pose(viewer.obj, loaded.clips.idle.frames, 0);
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
@@ -334,7 +336,7 @@ async function openViewer(model) {
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ['File', kb(model.bytes)],
   ];
-  if (loaded.clips) facts.push(['Bones', loaded.clips.bones.length]);
+  if (canPose(model, loaded.clips)) facts.push(['Bones', loaded.clips.bones.length]);
   $('v-facts').replaceChildren(...facts.flatMap(([k, v]) => [
     Object.assign(document.createElement('dt'), { textContent: k }),
     Object.assign(document.createElement('dd'), { textContent: v }),
@@ -352,7 +354,7 @@ async function openViewer(model) {
     : [Object.assign(document.createElement('li'), { textContent: 'Vertex colours' })];
   $('v-materials').replaceChildren(...mats);
 
-  if (loaded.clips) {
+  if (canPose(model, loaded.clips)) {
     const names = ['walk', 'attack', 'idle'].filter((n) => loaded.clips[n]);
     const pick = (name) => {
       viewer.clip = name;
