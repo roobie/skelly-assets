@@ -51,8 +51,10 @@ The creature rows of `models/mobs.json` are written under their declared packs. 
 arpg1 reads `skelly.body`, `skelly.wearables`, `skelly.melee`, `skelly.hand-tools`, `skelly.materials`,
 `skelly.light-sources`, `skelly.containers`, `skelly.structures`, `skelly.readables`, `skelly.arcana`,
 `skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its loader repoints from the former flat paths to these
-pack paths. Deadvox reads `skelly.deadvox.actors` and the player figure from `skelly.body` from S5a. Nothing sits flat under `built/` but `manifest.json`; `tools/check-built.mjs` rebuilds everything and
-holds the tracked set under `built/` equal to the fresh set, byte for byte, with the manifest naming each file.
+pack paths. `skelly.deadvox.actors` and `skelly.body` hold the Deadvox actor figures and player figure for
+Deadvox to read once its loader points at them. Nothing sits flat under `built/` but `manifest.json`;
+`tools/check-built.mjs` rebuilds everything and holds the tracked set under `built/` equal to the fresh set,
+byte for byte, with the manifest naming each file.
 The worn family fits the shared player body, not generated mobs.
 Open gaps:
 
