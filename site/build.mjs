@@ -5,6 +5,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
+import { readMobRows } from '../tools/layout.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
@@ -16,6 +17,13 @@ const built = join(root, 'built');
 // The only grouping the files themselves carry: a model with a clips file is an animated creature. Ids are names,
 // not categories, so nothing here reads meaning into them.
 const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
+// A walk clip states its stride in metres; the viewer paces it by the authored walk speed of the row that baked it.
+const walkSpeeds = new Map(readMobRows(root).map((row) => [`${row.pack}/${row.clips}`, row.walk_speed]));
+const walkSpeedOf = (clips) => {
+  const speed = walkSpeeds.get(clips);
+  if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
+  return speed;
+};
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
   .map(({ id, pack, path, clips, body }) => ({
@@ -32,6 +40,7 @@ const models = manifest.models
     category: clips ? 'Creatures' : 'Things',
     clips,
     body,
+    ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
   }));
 
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
