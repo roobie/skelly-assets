@@ -15,7 +15,7 @@ async function bakeFixture(model, options = {}) {
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
     glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
   try {
     exportMob(row, out);
@@ -273,11 +273,11 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   const { humanoidPoseClips } = await import('../actorClips.mjs');
   const { decodeFrame } = await import('../actorCompose.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
-  const { createGaitCache, footRestExtents, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { createGaitCache, footRestExtents, legGeometryFor, stepLengthMeters, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
   const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
   const { crawlGaitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
   const figure = templateFigure('humanoid', 1);
-  const row = { walkCycles: 1, walk_frames: 8, walk_speed: 0.8 };
+  const row = { walkCycles: 3, walk_frames: 8, walk_speed: 0.8 };
   const { clips } = await bakeFixture('humanoid', row);
   const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles };
   const close = (a, b) => {
@@ -288,6 +288,9 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), idleBasePose(actor, stance));
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
+  const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
+  const period = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
+  assert.equal(clips.standing.walk.period, period);
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
@@ -536,7 +539,7 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   assert.deepEqual(clips.standing.idle.frames[0], { root: body.originOffset.map((v) => v / scale), rotations: {} });
 });
 
-test('every content pose row writes its declared actor files', async () => {
+test('every content row writes its declared actor files', async () => {
   const { mkdtempSync, existsSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
@@ -544,8 +547,8 @@ test('every content pose row writes its declared actor files', async () => {
   const { outputPath, readMobRows } = await import('../layout.mjs');
   const root = mkdtempSync(join(tmpdir(), 'actor-content-'));
   try {
-    const rows = readMobRows().filter((candidate) => candidate.format === 'pose');
-    assert(rows.some(() => true), 'content must declare pose actor rows');
+    const rows = readMobRows();
+    assert(rows.some(() => true), 'content must declare actor rows');
     for (const row of rows) {
       exportMob(row, root);
       for (const file of [row.glb, row.body, row.clips]) assert(existsSync(join(root, outputPath(row.pack, file))));
@@ -577,7 +580,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        pack: 'fixture.pack', format: 'pose', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
         glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
@@ -667,6 +670,40 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
     assert(sawCharged && sawEmission);
   } finally {
     rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('creature pose clips reproduce their live posers at every stored cursor', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { dogIdlePose, dogAttackPose, quadrupedGaitPose, quadrupedStrideLength, DOG_POUNCE } = await import('../packages/mobgen/src/mob/quadruped.ts');
+  const { insectIdlePose, insectAttackPose, insectGaitPose, insectStrideLength, INSECT_LUNGE } = await import('../packages/mobgen/src/mob/insect.ts');
+  const { floaterIdlePose, floaterCastPose, floaterDriftPose, FLOATER_CAST } = await import('../packages/mobgen/src/mob/floater.ts');
+  const { dragonIdlePose, dragonAttackPose, dragonStompPose, DRAGON_LUNGE } = await import('../packages/mobgen/src/mob/dragon.ts');
+  await Promise.all(['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts'].map((file) => import(`../packages/mobgen/src/mob/${file}`)));
+  const close = (actual, expected) => {
+    actual.root.forEach((value, axis) => assert(Math.abs(value - expected.root[axis]) < 1e-12));
+    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) (actual.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]).forEach((value, axis) => assert(Math.abs(value - (expected.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1])[axis]) < 1e-12));
+  };
+  const plans = {
+    dog: (figure, row) => { const s = { limp: figure.genome.params.limp, headTilt: figure.genome.params.headTilt, jawOpen: figure.genome.params.jawOpen }; const stride = quadrupedStrideLength(figure.realized, s); return { idle: () => dogIdlePose(figure.realized, s), walk: (u) => quadrupedGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => dogAttackPose(figure.realized, dogIdlePose(figure.realized, s), t), duration: DOG_POUNCE.duration }; },
+    insect: (figure, row) => { const s = { mandibleOpen: figure.genome.params.mandibleOpen }; const stride = insectStrideLength(figure.realized); return { idle: () => insectIdlePose(figure.realized, 0.9), walk: (u) => insectGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => insectAttackPose(figure.realized, insectIdlePose(figure.realized, 0), t), duration: INSECT_LUNGE.duration }; },
+    floater: (figure) => ({ idle: () => floaterIdlePose(figure.realized, figure.genome.params), walk: (u) => floaterDriftPose(figure.realized, figure.genome.params, u), attack: (t) => floaterCastPose(figure.realized, figure.genome.params, t), duration: FLOATER_CAST.duration }),
+    dragon: (figure) => ({ idle: () => dragonIdlePose(figure.realized, figure.genome.params), walk: (u) => dragonStompPose(figure.realized, figure.genome.params, u), attack: (t) => dragonAttackPose(figure.realized, figure.genome.params, t), duration: DRAGON_LUNGE.duration }),
+  };
+  for (const model of Object.keys(plans)) {
+    const row = { walk_speed: 0.8, walk_frames: 8, attack_frames: 9 };
+    const template = consumableTemplate(model), generated = generateValid(template, 1, { maxAttempts: 1 });
+    const figure = figureFor(generated, template, 1), live = plans[model](figure, row), { body, clips } = await bakeFixture(model, row);
+    assert(!('regions' in body) && !('boxes' in body) && !('severableParts' in body));
+    if (model !== 'dog') assert(!('lookAt' in body));
+    const standing = clips.standing;
+    for (const [name, at] of Object.entries({ idle: live.idle, walk: live.walk, attack: live.attack })) for (const [i, frame] of standing[name].frames.entries()) {
+      const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
+      close(decodeFrame(frame), at(cursor));
+    }
   }
 });
 

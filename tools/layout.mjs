@@ -20,33 +20,6 @@ export function outputPath(packId, file) {
   return posix.join(packId, file);
 }
 
-const FORMATS = ['matrices', 'pose'];
-
-// models/pack-formats.json: the clip representation each mob pack bakes (content, not code).
-export function readPackFormats(root = repo) {
-  const { packs } = JSON.parse(readFileSync(join(root, 'models/pack-formats.json'), 'utf8'));
-  if (!packs || typeof packs !== 'object' || Array.isArray(packs)) throw new Error('models/pack-formats.json: packs must map pack ids to formats');
-  for (const [packId, format] of Object.entries(packs)) {
-    assertPackId(packId);
-    if (!FORMATS.includes(format)) throw new Error(`models/pack-formats.json: ${packId} has unknown format ${format}`);
-  }
-  return Object.freeze({ ...packs });
-}
-
-let repoFormats;
-const defaultFormats = () => (repoFormats ??= readPackFormats());
-
-// A row's own `format` (fixture rows) must agree with its pack's; a row in no listed pack must name one.
-export function mobFormat(row, packFormats = defaultFormats()) {
-  const declared = Object.hasOwn(packFormats, row.pack) ? packFormats[row.pack] : undefined;
-  if (row.format !== undefined && declared !== undefined && row.format !== declared) {
-    throw new Error(`${row.id}: format ${row.format} disagrees with pack ${row.pack} (${declared})`);
-  }
-  const format = row.format ?? declared;
-  if (!FORMATS.includes(format)) throw new Error(`${row.id}: no clip format for pack ${row.pack}`);
-  return format;
-}
-
 // models/export.json: pack id -> the roster ids it declares.
 export function readRoster(root = repo) {
   const packs = JSON.parse(readFileSync(join(root, 'models/export.json'), 'utf8'));

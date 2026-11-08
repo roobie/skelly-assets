@@ -1,13 +1,17 @@
 import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
-import { acidDeathPose, acidIdlePose } from './packages/mobgen/src/mob/acidPoses.ts';
+import { acidDeathPose, acidIdlePose, acidStrideLength } from './packages/mobgen/src/mob/acidPoses.ts';
 import { clamp, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
-import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, walkPose } from './packages/mobgen/src/mob/gait.ts';
+import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, legGeometryFor, stepLengthMeters, walkPose } from './packages/mobgen/src/mob/gait.ts';
 import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
 import { crawlGaitPose, crawlHitAngles, CRAWL_HIT_PEAK_FRACTION } from './packages/mobgen/src/mob/crawl.ts';
 import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
 import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
 import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
+import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from './packages/mobgen/src/mob/floater.ts';
+import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } from './packages/mobgen/src/mob/dragon.ts';
+import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
+import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
 
 /** Absolute local rotations, without a coordinate conversion or precision reduction. */
 export const poseFrame = (pose) => ({
@@ -16,10 +20,10 @@ export const poseFrame = (pose) => ({
 });
 
 /** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. */
-export function poseClip(at, { frames, loop, duration, period, cycles, ...metadata }) {
+export function poseClip(at, { frames, loop, duration, period, samplePeriod, cycles, ...metadata }) {
   if (!Number.isInteger(frames) || frames < 1) throw new RangeError('frames must be a positive integer');
   if (typeof loop !== 'boolean') throw new TypeError('loop must be explicit');
-  const span = period ?? duration ?? 1;
+  const span = samplePeriod ?? period ?? duration ?? 1;
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
   const clip = { kind: 'pose', loop, ...metadata };
   if (duration !== undefined) clip.duration = duration;
@@ -46,7 +50,8 @@ export function acidClips(figure, row) {
     idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
     death: { forward: death(1), backward: death(-1) },
     walk: {
-      kind: 'jointDelta', cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
+      kind: 'jointDelta', loop: true, cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
+      period: acidStrideLength(figure.realized) / row.walk_speed,
       frames: Array.from({ length: row.walk_frames }, (_, i) => {
         const angles = {};
         for (const [index, side] of ['L', 'R'].entries()) {
@@ -69,6 +74,56 @@ export function fusedClips(figure) {
   return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
 }
 
+/** Non-humanoid plans retain mobgen's absolute poses; no facing conversion is applied. */
+export function creatureClips(figure, template, row) {
+  const { realized, genome } = figure;
+  const frames = { walk: row.walk_frames, attack: row.attack_frames };
+  if (!(Number.isInteger(frames.walk) && frames.walk >= 2 && Number.isInteger(frames.attack) && frames.attack >= 2)) {
+    throw new RangeError('creature frame counts must be at least two');
+  }
+  let idle;
+  let walk;
+  let attack;
+  let action;
+  let cycleSeconds;
+  if (template.bodyPlan === 'quadruped') {
+    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
+    idle = () => dogIdlePose(realized, stance);
+    const cycleMetres = quadrupedStrideLength(realized, stance);
+    cycleSeconds = cycleMetres / row.walk_speed;
+    walk = (cursor) => quadrupedGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    action = DOG_POUNCE;
+    attack = (time) => dogAttackPose(realized, idle(), time);
+  } else if (template.bodyPlan === 'insect') {
+    const stance = { mandibleOpen: genome.params.mandibleOpen };
+    idle = () => insectIdlePose(realized, 0.9);
+    const cycleMetres = insectStrideLength(realized);
+    cycleSeconds = cycleMetres / row.walk_speed;
+    walk = (cursor) => insectGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    action = INSECT_LUNGE;
+    attack = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
+  } else if (template.bodyPlan === 'floater') {
+    const params = genome.params;
+    idle = () => floaterIdlePose(realized, params);
+    cycleSeconds = params.driftCycle / row.walk_speed;
+    walk = (cursor) => floaterDriftPose(realized, params, cursor);
+    action = FLOATER_CAST;
+    attack = (time) => floaterCastPose(realized, params, time);
+  } else if (template.bodyPlan === 'dragon') {
+    const params = genome.params;
+    idle = () => dragonIdlePose(realized, params);
+    cycleSeconds = dragonStrideLength(realized, params) / row.walk_speed;
+    walk = (cursor) => dragonStompPose(realized, params, cursor);
+    action = DRAGON_LUNGE;
+    attack = (time) => dragonAttackPose(realized, params, time);
+  } else throw new Error(`unsupported creature body plan ${template.bodyPlan}`);
+  return { standing: {
+    idle: poseClip(idle, { loop: true, period: 1, frames: 1 }),
+    walk: poseClip(walk, { loop: true, period: cycleSeconds, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
+    attack: poseClip(attack, { loop: false, duration: action.duration, frames: frames.attack, hitTime: action.hitTime }),
+  } };
+}
+
 /** Both locomotion sets use the same figure, including injured crawling on a standing rig. */
 export function humanoidPoseClips(figure, row) {
   if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0)) throw new RangeError('walkCycles must be a positive integer');
@@ -78,11 +133,14 @@ export function humanoidPoseClips(figure, row) {
     params: figure.genome.params, seed: figure.seed,
     cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
   };
+  const crawlCycleSeconds = (2 * Math.PI) / row.walk_speed;
   const crawling = {
     idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
-    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, cycles: 1 }),
+    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, period: crawlCycleSeconds, samplePeriod: 1, cycles: 1 }),
   };
   if (row.legCut !== undefined) return { crawling };
+  const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
+  const standingPeriod = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
   const standing = {
     idle: Object.fromEntries(['slack', 'aggravated'].map((stance) => [stance, {
       base: poseFrame(idleBasePose(actor, stance)), motion: idleMotion(stance),
@@ -90,7 +148,7 @@ export function humanoidPoseClips(figure, row) {
     walk: poseClip((cursor) => {
       const steps = cursor * 2 * row.walkCycles;
       return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    }, { frames: row.walk_frames * row.walkCycles, loop: true, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
+    }, { frames: row.walk_frames * row.walkCycles, loop: true, period: standingPeriod, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
   };
   return { standing, crawling };
 }

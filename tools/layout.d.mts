@@ -1,6 +1,4 @@
 export function outputPath(packId: string, file: string): string;
-export function readPackFormats(root?: string): Readonly<Record<string, 'matrices' | 'pose'>>;
-export function mobFormat(row: { id?: string; pack?: string; format?: string }, packFormats?: Readonly<Record<string, string>>): 'matrices' | 'pose';
 export function readRoster(root?: string): { packId: string; id: string; file: string }[];
 export function rosterFile(packId: string, id: string): string;
 export function readMobRows(root?: string): Record<string, unknown>[];
