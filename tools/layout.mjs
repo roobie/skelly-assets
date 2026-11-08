@@ -64,7 +64,7 @@ export function readMobRows(root = repo) {
   const sheet = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
   return sheet.mobs.map((row) => {
     const id = row.id ?? `${row.type}.${row.seed}`;
-    const stem = row.pathStem ?? `actors/${id}`;
+    const stem = `actors/${id}`;
     return { ...sheet.defaults, ...row, id, glb: row.glb ?? `assets/models/${stem}.glb`, body: row.body ?? `${stem}.body.json`, clips: row.clips ?? `${stem}.clips.json` };
   });
 }
