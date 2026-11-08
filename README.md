@@ -43,10 +43,9 @@ its own pack: gun rows to `built/<packId>/gungen/` and `built/<packId>/assets/mo
 `PRODUCTION_RECIPE_TOOLS`. Last it writes `built/manifest.json`: every model by id, kind, pack, logical path, the
 GLB's part node names from the resolved assembly and credits from `REUSE.toml`, and every produced file under its
 pack; see `tools/manifest.mjs`, `buildManifest`.
-The creature rows of `models/mobs.json` are written under their declared packs. Bestiary rows use matrix clips
-(`*_clips.json`) while pose rows use actor clip files (`actors/<id>.clips.json`) and body files
-(`actors/<id>.body.json`); `tools/mobs.mjs`, `exportMob`, writes both forms according to
-`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. Pose rows bake through
+The creature rows of `models/mobs.json` are written under their declared packs as actor GLBs with body and pose
+clip files under `actors/`. One clip representation keeps every consumer in mobgen's rest frame, so roots and
+quaternion rotations compose consistently. `tools/mobs.mjs`, `exportMob`, bakes them through
 `tools/actorBake.mjs`, `bakeActor`, and their models and files are in the manifest.
 arpg1 reads `skelly.body`, `skelly.wearables`, `skelly.melee`, `skelly.hand-tools`, `skelly.materials`,
 `skelly.light-sources`, `skelly.containers`, `skelly.structures`, `skelly.readables`, `skelly.arcana`,
