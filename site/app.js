@@ -99,8 +99,11 @@ function pose(scene, body, clip, time) {
   });
 }
 
-function clipTime(clip, name, seconds) {
-  if (clip.loop) return seconds / clip.period;
+// A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
+function clipTime(clip, name, seconds, walkSpeed) {
+  if (clip.loop && clip.strideMetres !== undefined) return seconds * walkSpeed / (clip.strideMetres * (clip.cycles ?? 1));
+  // The viewer has no Sim clock, so an idle loop plays its Sim seconds one to one on Real time.
+  if (clip.loop) return seconds / clip.periodSimSeconds;
   if (name === 'attack') return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + ATTACK_REST));
   return seconds;
 }
@@ -273,7 +276,7 @@ function initViewer() {
     if (!$('viewer').open) return;
     const v = viewer;
     const clips = clipSet(v.loaded?.clips);
-    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000));
+    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000, v.model.walkSpeed));
     controls.update();
     renderer.render(v.stage, camera);
   });
