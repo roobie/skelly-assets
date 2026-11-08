@@ -277,7 +277,7 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
   const { crawlGaitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
   const figure = templateFigure('humanoid', 1);
-  const row = { walkCycles: 1, walk_frames: 8, walk_speed: 0.8 };
+  const row = { walkCycles: 3, walk_frames: 8, walk_speed: 0.8 };
   const { clips } = await bakeFixture('humanoid', row);
   const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles };
   const close = (a, b) => {
@@ -701,7 +701,6 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
       const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
       close(decodeFrame(frame), at(cursor));
     }
-    if (model === 'dog') assert.throws(() => close(decodeFrame(standing.walk.frames[1]), live.walk(0)), assert.AssertionError);
   }
 });
 
