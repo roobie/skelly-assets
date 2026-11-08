@@ -8,6 +8,10 @@ import { crawlGaitPose, crawlHitAngles, CRAWL_HIT_PEAK_FRACTION } from './packag
 import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
 import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
 import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
+import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from './packages/mobgen/src/mob/floater.ts';
+import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose } from './packages/mobgen/src/mob/dragon.ts';
+import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
+import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
 
 /** Absolute local rotations, without a coordinate conversion or precision reduction. */
 export const poseFrame = (pose) => ({
@@ -67,6 +71,51 @@ export function acidClips(figure, row) {
 
 export function fusedClips(figure) {
   return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
+}
+
+/** Non-humanoid plans retain mobgen's absolute poses; no facing conversion is applied. */
+export function creatureClips(figure, template, row) {
+  const { realized, genome } = figure;
+  const frames = { walk: row.walk_frames, attack: row.attack_frames };
+  if (!(Number.isInteger(frames.walk) && frames.walk >= 2 && Number.isInteger(frames.attack) && frames.attack >= 2)) {
+    throw new RangeError('creature frame counts must be at least two');
+  }
+  let idle;
+  let walk;
+  let attack;
+  let action;
+  if (template.bodyPlan === 'quadruped') {
+    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
+    idle = () => dogIdlePose(realized, stance);
+    const cycleMetres = quadrupedStrideLength(realized, stance);
+    walk = (cursor) => quadrupedGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    action = DOG_POUNCE;
+    attack = (time) => dogAttackPose(realized, idle(), time);
+  } else if (template.bodyPlan === 'insect') {
+    const stance = { mandibleOpen: genome.params.mandibleOpen };
+    idle = () => insectIdlePose(realized, 0.9);
+    const cycleMetres = insectStrideLength(realized);
+    walk = (cursor) => insectGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    action = INSECT_LUNGE;
+    attack = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
+  } else if (template.bodyPlan === 'floater') {
+    const params = genome.params;
+    idle = () => floaterIdlePose(realized, params);
+    walk = (cursor) => floaterDriftPose(realized, params, cursor);
+    action = FLOATER_CAST;
+    attack = (time) => floaterCastPose(realized, params, time);
+  } else if (template.bodyPlan === 'dragon') {
+    const params = genome.params;
+    idle = () => dragonIdlePose(realized, params);
+    walk = (cursor) => dragonStompPose(realized, params, cursor);
+    action = DRAGON_LUNGE;
+    attack = (time) => dragonAttackPose(realized, params, time);
+  } else throw new Error(`unsupported creature body plan ${template.bodyPlan}`);
+  return { standing: {
+    idle: poseClip(idle, { loop: true, period: 1, frames: 1 }),
+    walk: poseClip(walk, { loop: true, period: 1, frames: frames.walk, cycles: 1 }),
+    attack: poseClip(attack, { loop: false, duration: action.duration, frames: frames.attack, hitTime: action.hitTime }),
+  } };
 }
 
 /** Both locomotion sets use the same figure, including injured crawling on a standing rig. */

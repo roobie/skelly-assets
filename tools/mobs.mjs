@@ -1,30 +1,21 @@
 // Usage: node tools/mobs.mjs [--out dir] [mobId ...]. With no ids it builds every models/mobs.json row.
-// exportMob is callable for fixture rows. Every output lands at --out/<row.pack>/<logical path>, tools/layout.mjs,
-// outputPath; the pack's clip representation comes from layout.mjs, mobFormat. Matrix rows retain the arpg1 facing
-// convention; pose rows delegate to actorBake.mjs without coordinate conversion so simulation geometry and render
-// geometry share one frame.
-// Needs node 26 or later and `npm ci` in tools; tools/build_mobs.sh is the usual CLI entry.
-//
-// The mesh: every bone's greedy-meshed voxel faces in rest-world metres, facing +z (the way the avatar models face), the bone
-// index of each vertex in TEXCOORD_1.x (and the bone across each face in .y), the colour in COLOR_0 (rgb: the material colour
-// times the face's shade; a: the material's own glow). The clips: for each bone a 3x4 matrix (r0..r8 row-major, then t0..t2)
-// that takes a rest-world point to its posed place, as mobgen's boneTransformsInto gives it. Skinning is rigid: one bone per vertex.
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+// Every row is baked as an actor pose: GLB, body and clips files live at their logical paths under the row's pack.
+import { mkdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
-import { mobFormat, outputPath, readMobRows } from './layout.mjs';
+import { readMobRows } from './layout.mjs';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
 installJsonnetSources();
-const src = (p) => `./packages/mobgen/src/${p}`;
-const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
+const src = (path) => `./packages/mobgen/src/${path}`;
+const { generate, generateValid, realize } = await import(src('core/generate.ts'));
 const { bakeActor } = await import('./actorBake.mjs');
 const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
-await import(src('mob/templates.ts')); // importing a template module registers it
+await import(src('mob/templates.ts'));
 await import(src('mob/acidTemplate.ts'));
 await import(src('mob/fusedMassTemplate.ts'));
 await import(src('mob/quadrupedTemplate.ts'));
@@ -32,243 +23,31 @@ await import(src('mob/insectTemplate.ts'));
 await import(src('mob/floaterTemplate.ts'));
 await import(src('mob/dragonTemplate.ts'));
 await import(src('mob/skeletonTemplate.ts'));
-const { materialOf, shadeOf } = await import(src('core/voxelize.ts'));
-const { allocateBoneTransforms, boneTransformsInto, indexBonesByParent } = await import(src('core/pose.ts'));
-const { advanceClock, createGaitCache, legGeometryFor, footRestExtents, walkPose, stepLengthMeters } = await import(src('mob/gait.ts'));
-const { idleBasePose } = await import(src('mob/idle.ts'));
-const { attackClipFor, attackPose } = await import(src('mob/attack.ts'));
-const { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } = await import(src('mob/floater.ts'));
-const { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } = await import(src('mob/dragon.ts'));
-const { DOG_POUNCE, dogAttackPose, quadrupedGaitPose: quadrupedGaitPose, dogIdlePose, quadrupedStrideLength: quadrupedStrideLength } = await import(src('mob/quadruped.ts'));
-const { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } = await import(src('mob/insect.ts'));
 
-const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2]; // skelly's viewer/scene.ts SHADE_FACTORS: the shade of a face as a brightness
-const IDLE_SNAPSHOT_S = 0.9; // the idle clip is one frame; an insect's is a moment of its feeler flicks, caught mid-twitch
-const round = (x) => Math.round(x * 1e5) / 1e5;
+const hex = (colour) => (typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour);
 
-const hex = (c) => (typeof c === 'string' ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255) : c);
-
-// The row's template with the row's own narrowed param ranges (`params`), palette (`materials`: name -> {color: "#rrggbb" | [r, g, b], emissive})
-// signature `parts` laid over it and `budgets` (the template's validity budgets, overridden where a row's parts add bulk); registered under the row's id, so rows of one template do not meet.
+// The row's template with its narrowed parameters, palette, parts and validity budgets, registered per row.
 function deriveTemplate(base, row) {
   const materials = { ...base.materials };
-  for (const [name, m] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...m, color: hex(m.color) };
+  for (const [name, material] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...material, color: hex(material.color) };
   const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
-  // A row's `budgets` replaces template budget entries (a body reshaped past the template's own); `budget_headroom` then widens the totals and groups by that factor at the top, for signature parts the plain body plan does not have.
   const own = { ...base.budgets, ...row.budgets };
   const room = row.budget_headroom ?? 1;
-  const widen = (r) => ({ ...r, max: Math.ceil(r.max * room) });
-  const budgets = { ...own, totalVoxels: widen(own.totalVoxels), groups: Object.fromEntries(Object.entries(own.groups).map(([k, g]) => [k, widen(g)])) };
+  const widen = (range) => ({ ...range, max: Math.ceil(range.max * room) });
+  const budgets = { ...own, totalVoxels: widen(own.totalVoxels), groups: Object.fromEntries(Object.entries(own.groups).map(([name, range]) => [name, widen(range)])) };
   const derived = { ...base, budgets, name: `mob:${row.id}`, attackClip: row.attack_clip ?? base.attackClip, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
   registerTemplate(derived);
   return derived;
 }
 
 export function exportMob(row, out) {
-  const format = mobFormat(row);
-  const write = (file, bytes) => {
-    const path = join(out, outputPath(row.pack, file));
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, bytes);
-  };
-  const { id, seed, walk_speed: WALK_SPEED, walk_frames: WALK_FRAMES, attack_frames: ATTACK_FRAMES } = row;
-  const divisor = row.lod_divisor; // the LOD voxel is the template's 0.5 m block over this; 0 keeps the full detail
   const template = deriveTemplate(consumableTemplate(row.template), row);
-  const found = generateValid(template, seed, { maxAttempts: 1 });
+  const found = generateValid(template, row.seed, { maxAttempts: 1 });
   if (!found) {
-    const issues = realize(generate(template, seed)).report.issues;
-    throw new Error(`seed ${seed} does not make a valid ${row.template}: ${issues.map((i) => JSON.stringify(i)).join('; ')}`);
+    const issues = realize(generate(template, row.seed)).report.issues;
+    throw new Error(`seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`);
   }
-  const realized = divisor > 0 ? realizeLod(found, 0.5 / divisor).realized : found.realized;
-  const genome = found.genome; // the LOD keeps the genome's body, so the walk is posed from the full-detail one
-  if (!realized.report.ok) console.error(`warning: the realized body does not pass its own report: ${realized.report.issues.map((i) => i.message).join('; ')}`);
-  const { bones } = realized.body;
-  if (format === 'pose') return bakeActor(row, template, { ...found, realized }, out);
-
-  // Facing: mobgen's rest pose may face -z; the avatar models face +z, so turn the whole export half a turn about y when it does.
-  const feet = bones.filter((b) => /^(foot|forePaw|hindPaw|tarsus[FMH])\./.test(b.id));
-  const toe = feet.reduce((s, b) => s + (b.tail[2] - b.head[2]), 0);
-  const FLIP = template.bodyPlan === 'floater' || template.bodyPlan === 'dragon' || toe < 0; // a floater and a dragon are built facing -z, as the convention says (neither has feet among the bones read above)
-  const fp = (p) => (FLIP ? [-p[0], p[1], -p[2]] : p);
-
-  // ---- the mesh ----
-  let nv = 0;
-  let ni = 0;
-  for (const m of realized.meshes.values()) {
-    nv += m.positions.length / 3;
-    ni += m.indices.length;
-  }
-  const pos = new Float32Array(nv * 3);
-  const nor = new Float32Array(nv * 3);
-  const col = new Float32Array(nv * 4);
-  const bone = new Float32Array(nv * 2);
-  const idx = new Uint32Array(ni);
-  let vo = 0;
-  let io = 0;
-  for (const [b, m] of realized.meshes) {
-    const n = m.positions.length / 3;
-    for (let v = 0; v < n; v++) {
-      const p = fp([m.positions[v * 3], m.positions[v * 3 + 1], m.positions[v * 3 + 2]]);
-      const q = fp([m.normals[v * 3], m.normals[v * 3 + 1], m.normals[v * 3 + 2]]);
-      pos.set(p, (vo + v) * 3);
-      nor.set(q, (vo + v) * 3);
-      const byte = m.colors[v];
-      const mat = realized.body.materials[materialOf(realized.voxels, byte)];
-      const f = SHADE_FACTORS[shadeOf(byte)] ?? 1;
-      col.set([Math.min(1, mat.color[0] * f), Math.min(1, mat.color[1] * f), Math.min(1, mat.color[2] * f), mat.emissive], (vo + v) * 4);
-      bone[(vo + v) * 2] = b;
-      bone[(vo + v) * 2 + 1] = m.neighbourBone[v]; // the bone across the face, -1 to open air: a later gore tint reads it
-    }
-    // a half turn about y reverses the handedness of nothing (it is a rotation), so the winding stays
-    for (let i = 0; i < m.indices.length; i++) idx[io + i] = m.indices[i] + vo;
-    vo += n;
-    io += m.indices.length;
-  }
-  const triangles = ni / 3;
-
-  // ---- the clips ----
-  const parentIndex = indexBonesByParent(bones);
-  const scratch = allocateBoneTransforms(bones.length);
-  // One pose to one frame: for every bone the rotation and translation, with the half turn about y folded in (M r M, M t, M = diag(-1,1,-1)).
-  const frame = (pose) => {
-    boneTransformsInto(bones, pose, parentIndex, scratch);
-    const result = [];
-    for (const t of scratch) {
-      const r = t.r.slice();
-      const p = t.t.slice();
-      if (FLIP) {
-        r[1] = -r[1]; r[3] = -r[3]; r[5] = -r[5]; r[7] = -r[7]; // the entries mixing y with x or z flip; x and z mix with each other keep
-        p[0] = -p[0]; p[2] = -p[2];
-      }
-      result.push(...r.map(round), ...p.map(round));
-    }
-    return result;
-  };
-  // What a body plan poses with: its idle stance, the walk by distance over one cycle, the attack by time. The humanoids' are mob/gait.ts, idle.ts and
-  // attack.ts's; the four-legged dog plan's are its own in mob/dog.ts.
-  let idle;
-  let cycleM;
-  let walkAt;
-  let clip;
-  let attackAt;
-  if (template.bodyPlan === 'quadruped') {
-    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
-    idle = dogIdlePose(realized, stance);
-    cycleM = quadrupedStrideLength(realized, stance);
-    walkAt = (i) => quadrupedGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
-    clip = DOG_POUNCE;
-    attackAt = (time) => dogAttackPose(realized, idle, time);
-  } else if (template.bodyPlan === 'insect') {
-    const stance = { mandibleOpen: genome.params.mandibleOpen };
-    idle = insectIdlePose(realized, IDLE_SNAPSHOT_S);
-    cycleM = insectStrideLength(realized);
-    walkAt = (i) => insectGaitPose(realized, (i * cycleM) / WALK_FRAMES, WALK_SPEED, stance);
-    clip = INSECT_LUNGE;
-    attackAt = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
-  } else if (template.bodyPlan === 'floater') {
-    const p = genome.params;
-    idle = floaterIdlePose(realized, p);
-    cycleM = p.driftCycle;
-    walkAt = (i) => floaterDriftPose(realized, p, i / WALK_FRAMES);
-    clip = FLOATER_CAST;
-    attackAt = (time) => floaterCastPose(realized, p, time);
-  } else if (template.bodyPlan === 'dragon') {
-    const p = genome.params;
-    idle = dragonIdlePose(realized, p);
-    cycleM = dragonStrideLength(realized, p);
-    walkAt = (i) => dragonStompPose(realized, p, i / WALK_FRAMES);
-    clip = DRAGON_LUNGE;
-    attackAt = (time) => dragonAttackPose(realized, p, time);
-  } else {
-    const walkActor = {
-      bones,
-      extents: footRestExtents(bones, realized.voxels),
-      params: genome.params,
-      seed: genome.seed,
-      cache: createGaitCache(),
-    };
-    const geomL = legGeometryFor(bones, walkActor.extents, 'L');
-    const basis = { params: walkActor.params, geomL, speed: WALK_SPEED, seed: walkActor.seed, cache: walkActor.cache };
-    idle = idleBasePose(walkActor, row.idle);
-    // Two steps (one cycle) from step 2 on, so the first step's start-up style is past; sampled by distance as the game plays it.
-    cycleM = stepLengthMeters(basis, 2) + stepLengthMeters(basis, 3);
-    let clock = { stepIndex: 2, progress: 0 };
-    walkAt = () => {
-      const pose = walkPose(walkActor, clock, WALK_SPEED, { idle });
-      clock = advanceClock(clock, cycleM / WALK_FRAMES, basis);
-      return pose;
-    };
-    clip = attackClipFor(template);
-    attackAt = (time) => attackPose(walkActor, clip, time, idle);
-  }
-  const walk = [];
-  for (let i = 0; i < WALK_FRAMES; i++) walk.push(frame(walkAt(i)));
-  const attack = [];
-  for (let i = 0; i < ATTACK_FRAMES; i++) attack.push(frame(attackAt((clip.duration * i) / (ATTACK_FRAMES - 1))));
-  const clips = {
-    _doc: 'Per-bone rigid matrices (r0..r8 row-major then t0..t2, metres, y up, facing +z) taking a rest-world point to its posed place; built by tools/build_mobs.sh from models/mobs.json.',
-    seed,
-    bones: bones.map((b) => b.id),
-    dispositions: bones.map((b) => b.disposition ?? 'fixed'), // 'sever' and 'burst' bones are what dismemberment cuts
-    parents: Array.from(parentIndex),
-    walk: { frames: walk, cycle_m: round(cycleM), loop: true },
-    attack: { frames: attack, duration: round(clip.duration), hit_time: round(clip.hitTime), loop: false },
-    idle: { frames: [frame(idle)], loop: true },
-  };
-  write(row.clips, JSON.stringify(clips));
-
-  // ---- the GLB ----
-  const parts = [pos, nor, col, bone, idx];
-  const bufLen = parts.reduce((s, a) => s + a.byteLength, 0);
-  const bin = Buffer.alloc(bufLen);
-  const offsets = [];
-  let off = 0;
-  for (const a of parts) {
-    offsets.push(off);
-    Buffer.from(a.buffer, a.byteOffset, a.byteLength).copy(bin, off);
-    off += a.byteLength;
-  }
-  const lo = Array(3).fill(Infinity);
-  const hi = Array(3).fill(-Infinity);
-  for (let i = 0; i < nv; i++) {
-    for (let c = 0; c < 3; c++) {
-      lo[c] = Math.min(lo[c], pos[i * 3 + c]);
-      hi[c] = Math.max(hi[c], pos[i * 3 + c]);
-    }
-  }
-  const json = {
-    asset: { version: '2.0', generator: 'skelly-assets tools/mobs.mjs' },
-    scene: 0,
-    scenes: [{ nodes: [0] }],
-    nodes: [{ mesh: 0, name: id }],
-    meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2, TEXCOORD_1: 3 }, indices: 4, mode: 4 }] }],
-    buffers: [{ byteLength: bufLen }],
-    bufferViews: parts.map((a, i) => ({ buffer: 0, byteOffset: offsets[i], byteLength: a.byteLength })),
-    accessors: [
-      { bufferView: 0, componentType: 5126, count: nv, type: 'VEC3', min: lo, max: hi },
-      { bufferView: 1, componentType: 5126, count: nv, type: 'VEC3' },
-      { bufferView: 2, componentType: 5126, count: nv, type: 'VEC4' },
-      { bufferView: 3, componentType: 5126, count: nv, type: 'VEC2' },
-      { bufferView: 4, componentType: 5125, count: ni, type: 'SCALAR' },
-    ],
-  };
-  let js = Buffer.from(JSON.stringify(json));
-  js = Buffer.concat([js, Buffer.alloc((4 - (js.length % 4)) % 4, 0x20)]);
-  const binPad = Buffer.concat([bin, Buffer.alloc((4 - (bin.length % 4)) % 4)]);
-  const head = Buffer.alloc(12);
-  head.write('glTF', 0);
-  head.writeUInt32LE(2, 4);
-  head.writeUInt32LE(12 + 8 + js.length + 8 + binPad.length, 8);
-  const chunk = (len, type) => {
-    const b = Buffer.alloc(8);
-    b.writeUInt32LE(len, 0);
-    b.writeUInt32LE(type, 4);
-    return b;
-  };
-  write(row.glb, Buffer.concat([head, chunk(js.length, 0x4e4f534a), js, chunk(binPad.length, 0x004e4942), binPad]));
-
-  console.log(`${id} (${row.template} seed ${seed} lod ${divisor}): ${triangles} triangles, ${nv} vertices, ${bones.length} bones, height ${(hi[1] - lo[1]).toFixed(2)} m, facing flipped ${FLIP}`);
-  console.log(`  walk cycle ${cycleM.toFixed(2)} m in ${WALK_FRAMES} frames; attack ${clip.duration}s (hit ${clip.hitTime}s) in ${ATTACK_FRAMES} frames`);
+  return bakeActor(row, template, found, out);
 }
 
 function main() {

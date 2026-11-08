@@ -3,7 +3,7 @@
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { mobFormat, outputPath } from './layout.mjs';
+import { outputPath } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 export const MANIFEST = 'manifest.json';
@@ -70,14 +70,13 @@ export function readCredits(root = repo) {
   };
 }
 
-// Every mob row is a model. Pose actor rows additionally produce a body file.
+// Every mob row is an actor model with a body and pose clips.
 export function mobManifest(rows) {
   const models = [];
   const files = [];
   for (const row of rows) {
-    models.push({ id: row.id, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips });
-    files.push(outputPath(row.pack, row.glb), outputPath(row.pack, row.clips));
-    if (mobFormat(row) === 'pose') files.push(outputPath(row.pack, row.body));
+    models.push({ id: row.id, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips, body: row.body });
+    files.push(outputPath(row.pack, row.glb), outputPath(row.pack, row.body), outputPath(row.pack, row.clips));
   }
   return { models, files };
 }
@@ -99,6 +98,7 @@ export function buildManifest({ models, files, credit }) {
     const file = outputPath(model.pack, model.path);
     if (!known.has(file)) throw new Error(`${model.id}: ${file} is not a produced file`);
     if (model.clips !== undefined && !known.has(outputPath(model.pack, model.clips))) throw new Error(`${model.id}: its clips are not a produced file`);
+    if (model.body !== undefined && !known.has(outputPath(model.pack, model.body))) throw new Error(`${model.id}: its body is not a produced file`);
     const key = `${model.pack}/${model.id}`;
     if (ids.has(key)) throw new Error(`${model.id}: two models of one id in ${model.pack}`);
     ids.add(key);
@@ -109,6 +109,7 @@ export function buildManifest({ models, files, credit }) {
       path: model.path,
       ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
       ...(model.clips === undefined ? {} : { clips: model.clips }),
+      ...(model.body === undefined ? {} : { body: model.body }),
       credits: credit(`built/${file}`),
     };
   });

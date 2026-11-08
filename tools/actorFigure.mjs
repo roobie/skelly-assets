@@ -28,8 +28,10 @@ export function figureFor(generated, template, scale) {
   }
   const fused = template.bodyPlan === 'fused-mass';
   const manifest = fused ? fusedMassManifest(body, voxels) : undefined;
-  const regions = fused ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds])) : planOf(template.bodyPlan).regionBones;
-  if (!regions) throw new Error(`body plan ${template.bodyPlan} has no actor regions`);
+  // Creature plans without gameplay-specific regions still serialize one complete body region.
+  const regions = fused
+    ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds]))
+    : planOf(template.bodyPlan).regionBones ?? { body: body.bones.map((bone) => bone.id) };
   const margin = voxels.size / 2 + (fused ? 0 : 0.001);
   const boxes = Object.fromEntries(Object.entries(regions).map(([region, ids]) => [region, ids.flatMap((bone) => {
     const bounds = limits.get(bone);
