@@ -5,6 +5,7 @@
     "scale": 1,
     "lod_divisor": 10,
     "walk_speed": 1.4,
+    "walkCycles": 1,
     "walk_frames": 24,
     "attack_frames": 24,
     "idle": "slack"

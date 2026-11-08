@@ -80,6 +80,23 @@
     },
     "skelly.bestiary": {
       "files": [
+        "actors/bogling.body.json",
+        "actors/brood_queen.body.json",
+        "actors/cinder_matron.body.json",
+        "actors/cinderling.body.json",
+        "actors/cutter.body.json",
+        "actors/drencher.body.json",
+        "actors/gloom_warden.body.json",
+        "actors/gorehorn.body.json",
+        "actors/hexcaller.body.json",
+        "actors/mire_mother.body.json",
+        "actors/mourner.body.json",
+        "actors/rimewalker.body.json",
+        "actors/shambler.body.json",
+        "actors/skitter.body.json",
+        "actors/spitter.body.json",
+        "actors/stormwisp.body.json",
+        "actors/tempest_sovereign.body.json",
         "bogling.glb",
         "bogling_clips.json",
         "brood_queen.glb",
@@ -1806,6 +1823,7 @@
       "pack": "skelly.bestiary",
       "path": "bogling.glb",
       "clips": "bogling_clips.json",
+      "body": "actors/bogling.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1817,6 +1835,7 @@
       "pack": "skelly.bestiary",
       "path": "brood_queen.glb",
       "clips": "brood_queen_clips.json",
+      "body": "actors/brood_queen.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1828,6 +1847,7 @@
       "pack": "skelly.bestiary",
       "path": "cinder_matron.glb",
       "clips": "cinder_matron_clips.json",
+      "body": "actors/cinder_matron.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1839,6 +1859,7 @@
       "pack": "skelly.bestiary",
       "path": "cinderling.glb",
       "clips": "cinderling_clips.json",
+      "body": "actors/cinderling.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1850,6 +1871,7 @@
       "pack": "skelly.bestiary",
       "path": "cutter.glb",
       "clips": "cutter_clips.json",
+      "body": "actors/cutter.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1861,6 +1883,7 @@
       "pack": "skelly.bestiary",
       "path": "drencher.glb",
       "clips": "drencher_clips.json",
+      "body": "actors/drencher.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1872,6 +1895,7 @@
       "pack": "skelly.bestiary",
       "path": "gloom_warden.glb",
       "clips": "gloom_warden_clips.json",
+      "body": "actors/gloom_warden.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1883,6 +1907,7 @@
       "pack": "skelly.bestiary",
       "path": "gorehorn.glb",
       "clips": "gorehorn_clips.json",
+      "body": "actors/gorehorn.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1894,6 +1919,7 @@
       "pack": "skelly.bestiary",
       "path": "hexcaller.glb",
       "clips": "hexcaller_clips.json",
+      "body": "actors/hexcaller.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1905,6 +1931,7 @@
       "pack": "skelly.bestiary",
       "path": "mire_mother.glb",
       "clips": "mire_mother_clips.json",
+      "body": "actors/mire_mother.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1916,6 +1943,7 @@
       "pack": "skelly.bestiary",
       "path": "mourner.glb",
       "clips": "mourner_clips.json",
+      "body": "actors/mourner.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1927,6 +1955,7 @@
       "pack": "skelly.bestiary",
       "path": "rimewalker.glb",
       "clips": "rimewalker_clips.json",
+      "body": "actors/rimewalker.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1938,6 +1967,7 @@
       "pack": "skelly.bestiary",
       "path": "shambler.glb",
       "clips": "shambler_clips.json",
+      "body": "actors/shambler.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1949,6 +1979,7 @@
       "pack": "skelly.bestiary",
       "path": "skitter.glb",
       "clips": "skitter_clips.json",
+      "body": "actors/skitter.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1960,6 +1991,7 @@
       "pack": "skelly.bestiary",
       "path": "spitter.glb",
       "clips": "spitter_clips.json",
+      "body": "actors/spitter.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1971,6 +2003,7 @@
       "pack": "skelly.bestiary",
       "path": "stormwisp.glb",
       "clips": "stormwisp_clips.json",
+      "body": "actors/stormwisp.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1982,6 +2015,7 @@
       "pack": "skelly.bestiary",
       "path": "tempest_sovereign.glb",
       "clips": "tempest_sovereign_clips.json",
+      "body": "actors/tempest_sovereign.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -1993,6 +2027,7 @@
       "pack": "skelly.body",
       "path": "assets/models/actors/player.1.glb",
       "clips": "actors/player.1.clips.json",
+      "body": "actors/player.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2143,6 +2178,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.1.glb",
       "clips": "actors/acid_zombie.1.clips.json",
+      "body": "actors/acid_zombie.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2154,6 +2190,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.2.glb",
       "clips": "actors/acid_zombie.2.clips.json",
+      "body": "actors/acid_zombie.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2165,6 +2202,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.3.glb",
       "clips": "actors/acid_zombie.3.clips.json",
+      "body": "actors/acid_zombie.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2176,6 +2214,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.4.glb",
       "clips": "actors/acid_zombie.4.clips.json",
+      "body": "actors/acid_zombie.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2187,6 +2226,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.6.glb",
       "clips": "actors/acid_zombie.6.clips.json",
+      "body": "actors/acid_zombie.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2198,6 +2238,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/acid_zombie.8.glb",
       "clips": "actors/acid_zombie.8.clips.json",
+      "body": "actors/acid_zombie.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2209,6 +2250,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/amalgam.1.glb",
       "clips": "actors/amalgam.1.clips.json",
+      "body": "actors/amalgam.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2220,6 +2262,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.1.glb",
       "clips": "actors/brute_shambler.1.clips.json",
+      "body": "actors/brute_shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2231,6 +2274,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.2.glb",
       "clips": "actors/brute_shambler.2.clips.json",
+      "body": "actors/brute_shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2242,6 +2286,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.3.glb",
       "clips": "actors/brute_shambler.3.clips.json",
+      "body": "actors/brute_shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2253,6 +2298,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.4.glb",
       "clips": "actors/brute_shambler.4.clips.json",
+      "body": "actors/brute_shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2264,6 +2310,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.5.glb",
       "clips": "actors/brute_shambler.5.clips.json",
+      "body": "actors/brute_shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2275,6 +2322,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.6.glb",
       "clips": "actors/brute_shambler.6.clips.json",
+      "body": "actors/brute_shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2286,6 +2334,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.7.glb",
       "clips": "actors/brute_shambler.7.clips.json",
+      "body": "actors/brute_shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2297,6 +2346,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/brute_shambler.8.glb",
       "clips": "actors/brute_shambler.8.clips.json",
+      "body": "actors/brute_shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2308,6 +2358,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.1.glb",
       "clips": "actors/crawler.1.clips.json",
+      "body": "actors/crawler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2319,6 +2370,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.11.glb",
       "clips": "actors/crawler.11.clips.json",
+      "body": "actors/crawler.11.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2330,6 +2382,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.2.glb",
       "clips": "actors/crawler.2.clips.json",
+      "body": "actors/crawler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2341,6 +2394,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.3.glb",
       "clips": "actors/crawler.3.clips.json",
+      "body": "actors/crawler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2352,6 +2406,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.5.glb",
       "clips": "actors/crawler.5.clips.json",
+      "body": "actors/crawler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2363,6 +2418,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.6.glb",
       "clips": "actors/crawler.6.clips.json",
+      "body": "actors/crawler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2374,6 +2430,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/crawler.7.glb",
       "clips": "actors/crawler.7.clips.json",
+      "body": "actors/crawler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2385,6 +2442,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.1.glb",
       "clips": "actors/farmer_shambler.1.clips.json",
+      "body": "actors/farmer_shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2396,6 +2454,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.2.glb",
       "clips": "actors/farmer_shambler.2.clips.json",
+      "body": "actors/farmer_shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2407,6 +2466,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.3.glb",
       "clips": "actors/farmer_shambler.3.clips.json",
+      "body": "actors/farmer_shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2418,6 +2478,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.4.glb",
       "clips": "actors/farmer_shambler.4.clips.json",
+      "body": "actors/farmer_shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2429,6 +2490,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.5.glb",
       "clips": "actors/farmer_shambler.5.clips.json",
+      "body": "actors/farmer_shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2440,6 +2502,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.6.glb",
       "clips": "actors/farmer_shambler.6.clips.json",
+      "body": "actors/farmer_shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2451,6 +2514,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.7.glb",
       "clips": "actors/farmer_shambler.7.clips.json",
+      "body": "actors/farmer_shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2462,6 +2526,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/farmer_shambler.8.glb",
       "clips": "actors/farmer_shambler.8.clips.json",
+      "body": "actors/farmer_shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2473,6 +2538,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.1.glb",
       "clips": "actors/medic_shambler.1.clips.json",
+      "body": "actors/medic_shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2484,6 +2550,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.2.glb",
       "clips": "actors/medic_shambler.2.clips.json",
+      "body": "actors/medic_shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2495,6 +2562,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.3.glb",
       "clips": "actors/medic_shambler.3.clips.json",
+      "body": "actors/medic_shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2506,6 +2574,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.4.glb",
       "clips": "actors/medic_shambler.4.clips.json",
+      "body": "actors/medic_shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2517,6 +2586,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.5.glb",
       "clips": "actors/medic_shambler.5.clips.json",
+      "body": "actors/medic_shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2528,6 +2598,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.6.glb",
       "clips": "actors/medic_shambler.6.clips.json",
+      "body": "actors/medic_shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2539,6 +2610,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.7.glb",
       "clips": "actors/medic_shambler.7.clips.json",
+      "body": "actors/medic_shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2550,6 +2622,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/medic_shambler.8.glb",
       "clips": "actors/medic_shambler.8.clips.json",
+      "body": "actors/medic_shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2561,6 +2634,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.1.glb",
       "clips": "actors/military_shambler.1.clips.json",
+      "body": "actors/military_shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2572,6 +2646,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.2.glb",
       "clips": "actors/military_shambler.2.clips.json",
+      "body": "actors/military_shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2583,6 +2658,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.3.glb",
       "clips": "actors/military_shambler.3.clips.json",
+      "body": "actors/military_shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2594,6 +2670,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.4.glb",
       "clips": "actors/military_shambler.4.clips.json",
+      "body": "actors/military_shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2605,6 +2682,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.5.glb",
       "clips": "actors/military_shambler.5.clips.json",
+      "body": "actors/military_shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2616,6 +2694,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.6.glb",
       "clips": "actors/military_shambler.6.clips.json",
+      "body": "actors/military_shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2627,6 +2706,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.7.glb",
       "clips": "actors/military_shambler.7.clips.json",
+      "body": "actors/military_shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2638,6 +2718,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/military_shambler.8.glb",
       "clips": "actors/military_shambler.8.clips.json",
+      "body": "actors/military_shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2649,6 +2730,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.1.glb",
       "clips": "actors/runner.1.clips.json",
+      "body": "actors/runner.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2660,6 +2742,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.2.glb",
       "clips": "actors/runner.2.clips.json",
+      "body": "actors/runner.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2671,6 +2754,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.3.glb",
       "clips": "actors/runner.3.clips.json",
+      "body": "actors/runner.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2682,6 +2766,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.4.glb",
       "clips": "actors/runner.4.clips.json",
+      "body": "actors/runner.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2693,6 +2778,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.5.glb",
       "clips": "actors/runner.5.clips.json",
+      "body": "actors/runner.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2704,6 +2790,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.6.glb",
       "clips": "actors/runner.6.clips.json",
+      "body": "actors/runner.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2715,6 +2802,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.7.glb",
       "clips": "actors/runner.7.clips.json",
+      "body": "actors/runner.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2726,6 +2814,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/runner.8.glb",
       "clips": "actors/runner.8.clips.json",
+      "body": "actors/runner.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2737,6 +2826,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.1.glb",
       "clips": "actors/shambler.1.clips.json",
+      "body": "actors/shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2748,6 +2838,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.2.glb",
       "clips": "actors/shambler.2.clips.json",
+      "body": "actors/shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2759,6 +2850,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.3.glb",
       "clips": "actors/shambler.3.clips.json",
+      "body": "actors/shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2770,6 +2862,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.4.glb",
       "clips": "actors/shambler.4.clips.json",
+      "body": "actors/shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2781,6 +2874,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.5.glb",
       "clips": "actors/shambler.5.clips.json",
+      "body": "actors/shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2792,6 +2886,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.6.glb",
       "clips": "actors/shambler.6.clips.json",
+      "body": "actors/shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2803,6 +2898,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.7.glb",
       "clips": "actors/shambler.7.clips.json",
+      "body": "actors/shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2814,6 +2910,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/shambler.8.glb",
       "clips": "actors/shambler.8.clips.json",
+      "body": "actors/shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2903,6 +3000,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.1.glb",
       "clips": "actors/worker_shambler.1.clips.json",
+      "body": "actors/worker_shambler.1.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2914,6 +3012,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.2.glb",
       "clips": "actors/worker_shambler.2.clips.json",
+      "body": "actors/worker_shambler.2.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2925,6 +3024,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.3.glb",
       "clips": "actors/worker_shambler.3.clips.json",
+      "body": "actors/worker_shambler.3.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2936,6 +3036,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.4.glb",
       "clips": "actors/worker_shambler.4.clips.json",
+      "body": "actors/worker_shambler.4.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2947,6 +3048,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.5.glb",
       "clips": "actors/worker_shambler.5.clips.json",
+      "body": "actors/worker_shambler.5.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2958,6 +3060,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.6.glb",
       "clips": "actors/worker_shambler.6.clips.json",
+      "body": "actors/worker_shambler.6.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2969,6 +3072,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.7.glb",
       "clips": "actors/worker_shambler.7.clips.json",
+      "body": "actors/worker_shambler.7.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"
@@ -2980,6 +3084,7 @@
       "pack": "skelly.deadvox.actors",
       "path": "assets/models/actors/worker_shambler.8.glb",
       "clips": "actors/worker_shambler.8.clips.json",
+      "body": "actors/worker_shambler.8.body.json",
       "credits": {
         "author": "Björn Roberg",
         "licence": "CC-BY-NC-SA-4.0"

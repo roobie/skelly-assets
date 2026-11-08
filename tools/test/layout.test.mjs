@@ -85,10 +85,8 @@ test('the showcase lists every model of the manifest at its pack path and ships 
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     for (const model of models) {
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
-      if (model.clips) {
-        assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
-        assert.ok(existsSync(join(out, 'built', model.body)), `${model.file} is missing its actor body`);
-      }
+      if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
+      if (model.body) assert.ok(existsSync(join(out, 'built', model.body)), `${model.file} is missing its actor body`);
     }
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
