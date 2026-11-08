@@ -19,14 +19,17 @@ export const poseFrame = (pose) => ({
   rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, rotation]) => [id, mat3ToQuat(rotation)])),
 });
 
-/** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. */
-export function poseClip(at, { frames, loop, duration, period, samplePeriod, cycles, ...metadata }) {
+/** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. The caller names the
+ * finite span's clock, so a new clip cannot get one by accident. */
+export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, samplePeriod, cycles, ...metadata }) {
   if (!Number.isInteger(frames) || frames < 1) throw new RangeError('frames must be a positive integer');
   if (typeof loop !== 'boolean') throw new TypeError('loop must be explicit');
-  const span = samplePeriod ?? period ?? duration ?? 1;
+  if (duration !== undefined) throw new TypeError('a finite span must name its clock: durationSimSeconds or durationRealSeconds');
+  const span = samplePeriod ?? period ?? durationSimSeconds ?? durationRealSeconds ?? 1;
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
   const clip = { kind: 'pose', loop, ...metadata };
-  if (duration !== undefined) clip.duration = duration;
+  if (durationSimSeconds !== undefined) clip.durationSimSeconds = durationSimSeconds;
+  if (durationRealSeconds !== undefined) clip.durationRealSeconds = durationRealSeconds;
   if (period !== undefined) clip.period = period;
   if (cycles !== undefined) clip.cycles = cycles;
   clip.frames = Array.from({ length: frames }, (_, i) => poseFrame(at(frames === 1 ? 0 : span * i / (loop ? frames : frames - 1))));
@@ -45,7 +48,7 @@ export function acidClips(figure, row) {
   });
   // Canonical baked fall: absolute, endpoint-inclusive, from idle frame zero; the last frame is the settled fold.
   const rest = acidIdlePose(figure.realized, 0);
-  const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, duration: tuning.deathDuration, frames: row.attack_frames });
+  const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, durationRealSeconds: tuning.deathDuration, frames: row.attack_frames });
   return { standing: {
     idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, period: tuning.idlePeriod, frames: row.walk_frames }),
     death: { forward: death(1), backward: death(-1) },
@@ -64,9 +67,9 @@ export function acidClips(figure, row) {
         return { angles };
       }),
     },
-    attack: action('attack', 'time', (u) => pulse(u * tuning.attackDuration, tuning.attackPeak, tuning.attackDuration), { duration: tuning.attackDuration, hitTime: tuning.attackPeak }),
-    windup: action('windup', 'progress', (u) => smoothstep(clamp(u, 0, 1))),
-    hit: action('hit', 'time', (u) => pulse(u * tuning.hitDuration, tuning.hitPeak, tuning.hitDuration), { duration: tuning.hitDuration, peak: tuning.hitPeak }),
+    attack: action('attack', 'time', (u) => pulse(u * tuning.attackDuration, tuning.attackPeak, tuning.attackDuration), { durationSimSeconds: tuning.attackDuration, hitAtSimSeconds: tuning.attackPeak }),
+    spitDraw: action('spitDraw', 'progress', (u) => smoothstep(clamp(u, 0, 1))),
+    hit: action('hit', 'time', (u) => pulse(u * tuning.hitDuration, tuning.hitPeak, tuning.hitDuration), { durationSimSeconds: tuning.hitDuration, peakAtSimSeconds: tuning.hitPeak }),
   } };
 }
 
@@ -120,7 +123,7 @@ export function creatureClips(figure, template, row) {
   return { standing: {
     idle: poseClip(idle, { loop: true, period: 1, frames: 1 }),
     walk: poseClip(walk, { loop: true, period: cycleSeconds, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
-    attack: poseClip(attack, { loop: false, duration: action.duration, frames: frames.attack, hitTime: action.hitTime }),
+    attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
   } };
 }
 
@@ -163,8 +166,8 @@ export function humanoidClips(figure, template, row) {
   };
   if (!(Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) throw new RangeError('attack_frames must be at least two');
   const overlay = (clip, flinch, crawling) => ({
-    kind: 'overlay', duration: clip.duration,
-    ...(flinch ? { peak: clip.keys[1].t } : { hitTime: clip.hitTime }),
+    kind: 'overlay', durationSimSeconds: clip.duration,
+    ...(flinch ? { peakAtSimSeconds: clip.keys[1].t } : { hitAtSimSeconds: clip.hitTime }),
     sideScalesZ: flinch, walkBlendBones: [...ARM_BONES],
     frames: Array.from({ length: row.attack_frames }, (_, i) => {
       const time = clip.duration * i / (row.attack_frames - 1);
@@ -180,7 +183,7 @@ export function humanoidClips(figure, template, row) {
   }
   sets.crawling.attack = overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true);
   sets.crawling.flinch = {
-    kind: 'overlay', duration: HIT_FLINCH.duration, peak: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
+    kind: 'overlay', durationSimSeconds: HIT_FLINCH.duration, peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
     sideScalesZ: true, walkBlendBones: [],
     frames: Array.from({ length: row.attack_frames }, (_, i) => ({
       angles: crawlHitAngles(HIT_FLINCH.duration * i / (row.attack_frames - 1)), walkBlendWeight: 1, dropMetres: 0,
