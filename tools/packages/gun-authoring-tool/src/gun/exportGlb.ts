@@ -157,7 +157,12 @@ interface GunModelEntryOptions extends GunExportMetadata {
 export type GunAssetIdentity = GlbAssetIdentity;
 
 export type GunExportResult =
-  | { readonly ok: true; readonly glb: Uint8Array; readonly modelEntry: GunDeadvoxModelEntry }
+  | {
+      readonly ok: true;
+      readonly glb: Uint8Array;
+      readonly partNodes: readonly string[];
+      readonly modelEntry: GunDeadvoxModelEntry;
+    }
   | {
       readonly ok: false;
       readonly error: GlbExportError | AnchorSelectionError | { readonly code: 'part-mass'; readonly message: string };

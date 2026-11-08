@@ -53,6 +53,7 @@ export type ExportFileResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly partNodes: readonly string[];
       readonly modelEntry: GunDeadvoxModelEntry;
       readonly warnings: readonly string[];
     }
@@ -168,5 +169,11 @@ export const exportFileText = (
   if (!result.ok) {
     return { ok: false, message: `export refused: ${JSON.stringify(result.error)}` };
   }
-  return { ok: true, glb: result.glb, modelEntry: result.modelEntry, warnings: read.warnings };
+  return {
+    ok: true,
+    glb: result.glb,
+    partNodes: result.partNodes,
+    modelEntry: result.modelEntry,
+    warnings: read.warnings,
+  };
 };
