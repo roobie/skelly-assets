@@ -37,19 +37,21 @@ choices preserve authoring control. See `tools/packages/thing-authoring-tool/ite
 
 The production entry builds the retained roster into its packs, `skelly.bolt-guns` and `skelly.armour`, at
 `built/<packId>/assets/models/<id>.glb`; see `tools/build.mjs`, `buildRoster`, and `tools/layout.mjs`,
-`readRoster`. It then runs the gun partition of every recipe file, which writes deadvox's gun roster from
-`models/recipes/skelly.firearms.jsonnet` to `built/skelly.firearms/gungen/` and
-`built/skelly.firearms/assets/models/`; see `tools/build.mjs`, `exportRecipes`. The thing partition of the recipe
-files is exercised in temporary roots; see `tools/test/build.test.mjs` and
-`tools/packages/thing-authoring-tool/test/modRecipes.test.ts`, `exportThingRecipes`. It emits into `built/` once
-the production entry runs it there, not before.
+`readRoster`. It then runs the gun and thing partitions of every recipe file under `models/recipes/`, each into
+its own pack: gun rows to `built/<packId>/gungen/` and `built/<packId>/assets/models/`, item rows to
+`built/<packId>/things/` and `built/<packId>/assets/models/`; see `tools/build.mjs`, `exportRecipes` and
+`PRODUCTION_RECIPE_TOOLS`. Last it writes `built/manifest.json`: every model by id, kind, pack, logical path, the
+GLB's part node names from the resolved assembly and credits from `REUSE.toml`, and every produced file under its
+pack; see `tools/manifest.mjs`, `buildManifest`.
 The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
 (`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
 `models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. A row whose pack's format is `pose`
-bakes through `tools/actorBake.mjs`, `bakeActor`. arpg1 reads `skelly.bolt-guns`, `skelly.armour` and
-`skelly.bestiary`; its loader repoints from the former flat roster and mob paths to these pack paths. The flat
-files under `built/` are the hand copies `models/copied.json` lists, awaiting their producers;
-`tools/check-built.mjs` holds each copy apart from the produced set, and a copy leaves when its producer emits.
+bakes through `tools/actorBake.mjs`, `bakeActor`; no such row is enabled, and the manifest carries none.
+arpg1 reads `skelly.body`, `skelly.wearables`, `skelly.melee`, `skelly.hand-tools`, `skelly.materials`,
+`skelly.light-sources`, `skelly.containers`, `skelly.structures`, `skelly.readables`, `skelly.arcana`,
+`skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its loader repoints from the former flat paths to these
+pack paths. Nothing sits flat under `built/` but `manifest.json`; `tools/check-built.mjs` rebuilds everything and
+holds the tracked set under `built/` equal to the fresh set, byte for byte, with the manifest naming each file.
 The worn family fits the shared player body, not generated mobs.
 Open gaps:
 
@@ -58,8 +60,8 @@ Open gaps:
 
 | Path | Contents |
 |---|---|
-| `built/` | Ready-to-use `.glb` models, and a `*_clips.json` with the animation clips for each mob |
-| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the hand-copy list in `copied.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
+| `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries, and a `*_clips.json` with the animation clips for each mob; `manifest.json` lists them all |
+| `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
 
