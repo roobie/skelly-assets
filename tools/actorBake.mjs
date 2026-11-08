@@ -7,9 +7,17 @@ import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
 import { outputPath } from './layout.mjs';
 import { actorBody } from './actorBody.mjs';
 import { figureFor } from './actorFigure.mjs';
-import { acidClips, fusedClips, humanoidClips } from './actorClips.mjs';
+import { acidClips, creatureClips, fusedClips, humanoidClips } from './actorClips.mjs';
 
-const clipEmitters = { humanoid: humanoidClips, acid: (figure, _template, row) => acidClips(figure, row), 'fused-mass': fusedClips };
+const clipEmitters = {
+  humanoid: humanoidClips,
+  acid: (figure, _template, row) => acidClips(figure, row),
+  'fused-mass': fusedClips,
+  quadruped: creatureClips,
+  insect: creatureClips,
+  floater: creatureClips,
+  dragon: creatureClips,
+};
 const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2];
 
 function actorGlb(row, realized, meshes) {

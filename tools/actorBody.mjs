@@ -26,7 +26,6 @@ export const bodyGeometry = (figure, template) => {
 /** Figure metadata stays in the generator's rest-world frame; scale is carried, not applied. */
 export function actorBody(figure, template, { type, model, seed, scale, lookAt }) {
   if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError('actor scale must be positive and finite');
-  if (!lookAt) throw new TypeError('actor lookAt profile is required');
   const { bones, anchors } = figure.realized.body;
   let minY = Infinity;
   let maxY = -Infinity;
@@ -37,7 +36,9 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     }
   }
   const fused = template.bodyPlan === 'fused-mass';
-  const attack = template.bodyPlan === 'humanoid' ? attackClipFor(template) : undefined;
+  const humanoid = template.bodyPlan === 'humanoid';
+  const acid = template.bodyPlan === 'acid';
+  const attack = humanoid ? attackClipFor(template) : undefined;
   const peak = HIT_FLINCH.keys[1];
   return {
     type, model, seed, bodyPlan: template.bodyPlan,
@@ -50,8 +51,8 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     severableParts: figure.severableParts,
     burstBones: burstBones(bones),
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
-    ...(template.bodyPlan === 'humanoid' ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
-    lookAt,
+    ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES } : {}),
+    ...(lookAt === undefined ? {} : { lookAt }),
     ...(fused ? {
       manifest: figure.manifest, bounds: figure.bounds, originOffset: figure.originOffset,
       coreInteriorPoint: figure.coreInteriorPoint, restStrikeOrigin: figure.restStrikeOrigin,
@@ -62,15 +63,15 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     } : {}),
     animation: fused ? {
       flinch: { peak: peak.t, duration: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] },
-    } : template.bodyPlan === 'acid' ? {
+    } : acid ? {
       attackPeak: template.animation.attackPeak,
       attackDuration: template.animation.attackDuration,
       hitDuration: template.animation.hitDuration,
       deathDuration: template.animation.deathDuration,
-    } : {
+    } : humanoid ? {
       attackPeak: attack.hitTime,
       attackDuration: attack.duration,
       hitDuration: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
-    },
+    } : {}, 
   };
 }

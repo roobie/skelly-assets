@@ -4,7 +4,7 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mobFormat, outputPath, readMobRows } from '../tools/layout.mjs';
+
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -14,23 +14,22 @@ const built = join(root, 'built');
 // The only grouping the files themselves carry: a model with a clips file is an animated creature. Ids are names,
 // not categories, so nothing here reads meaning into them.
 const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
-const mobFormats = new Map(readMobRows().map((row) => [outputPath(row.pack, row.clips), mobFormat(row)]));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, clips }) => ({
+  .map(({ id, pack, path, clips, body }) => ({
     id,
     file: `${pack}/${path}`,
     clips: clips === undefined ? null : `${pack}/${clips}`,
-    static: clips !== undefined && mobFormats.get(outputPath(pack, clips)) === 'pose',
+    body: body === undefined ? null : `${pack}/${body}`,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, clips, static: isStatic }) => ({
+  .map(({ id, file, clips, body }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
     category: clips ? 'Creatures' : 'Things',
     clips,
-    static: isStatic,
+    body,
   }));
 
 rmSync(out, { recursive: true, force: true });
