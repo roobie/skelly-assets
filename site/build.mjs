@@ -4,6 +4,8 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
+import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -32,10 +34,51 @@ const models = manifest.models
     body,
   }));
 
+// The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
+// dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback.
+const poseFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
+const idleAt = (set, body, time) => {
+  const idle = set.idle?.slack ?? set.idle?.aggravated ?? set.idle;
+  if (idle.kind === 'pose') return decodeFrame(sampleClip(idle, idle.loop ? time : time * (idle.duration ?? 1)));
+  return applyMotion(decodeFrame(idle.base), idle.motion, time, body.seed);
+};
+const plainClip = (clip, set, body) => {
+  if (clip.kind === 'pose') return clip;
+  const frames = clip.frames.map((_, i) => {
+    const normalized = clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1);
+    const time = normalized * (clip.duration ?? 1);
+    const base = idleAt(set, body, normalized);
+    const pose = clip.kind === 'overlay'
+      ? applyOverlay(body, base, clip, time, 1, set === set.crawling ? 'crawling' : 'standing')
+      : applyJointDelta(body, base, clip, clip.cursor === 'gaitPhase' ? normalized * 2 * Math.PI : time, { speed: 1, side: 0 });
+    return poseFrame(pose);
+  });
+  return { kind: 'pose', loop: Boolean(clip.loop), ...(clip.period === undefined ? {} : { period: clip.period }), ...(clip.duration === undefined ? {} : { duration: clip.duration }), ...(clip.cycles === undefined ? {} : { cycles: clip.cycles }), frames };
+};
+const plainSet = (set, body, stance) => Object.fromEntries(Object.entries(set).map(([name, clip]) => {
+  if (name === 'idle' && !clip.kind) {
+    const source = clip.slack ?? clip.aggravated;
+    return [name, { kind: 'pose', loop: true, period: 1, frames: Array.from({ length: 24 }, (_, i) => poseFrame(applyMotion(decodeFrame(source.base), source.motion, i / 24, body.seed))) }];
+  }
+  if (!clip.kind) return [name, Object.fromEntries(Object.entries(clip).map(([key, value]) => [key, plainClip(value, set, body)]))];
+  const baseSet = stance === 'crawling' ? { ...set, crawling: set } : set;
+  return [name, plainClip(clip, baseSet, body)];
+}));
+const plainClips = (clips, body) => ({
+  ...(clips.standing ? { standing: plainSet(clips.standing, body, 'standing') } : {}),
+  ...(clips.crawling ? { crawling: plainSet(clips.crawling, body, 'crawling') } : {}),
+  ...(!clips.standing && !clips.crawling ? plainSet(clips, body, 'standing') : {}),
+});
+
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 for (const f of ['index.html', 'app.js', 'style.css']) cpSync(join(here, f), join(out, f));
 cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });
+for (const model of models) if (model.clips && model.body) {
+  const clips = JSON.parse(readFileSync(join(built, model.clips), 'utf8'));
+  const body = JSON.parse(readFileSync(join(built, model.body), 'utf8'));
+  writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
+}
 writeFileSync(join(out, 'models.json'), JSON.stringify({ models }));
 writeFileSync(join(out, '.nojekyll'), '');
 console.log(`${models.length} models into ${out}`);
