@@ -109,7 +109,11 @@ test('the showcase lists every model of the manifest at its pack path and ships 
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     for (const model of models) {
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
-      if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
+      if (model.clips) {
+        assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
+        const clips = JSON.parse(readFileSync(join(out, 'built', model.clips), 'utf8'));
+        assert.ok(model.static || Array.isArray(clips.idle?.frames), `${model.file} has clips the viewer cannot pose and is not static`);
+      }
     }
   } finally { rmSync(out, { recursive: true, force: true }); }
 });

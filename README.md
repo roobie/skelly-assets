@@ -43,14 +43,15 @@ its own pack: gun rows to `built/<packId>/gungen/` and `built/<packId>/assets/mo
 `PRODUCTION_RECIPE_TOOLS`. Last it writes `built/manifest.json`: every model by id, kind, pack, logical path, the
 GLB's part node names from the resolved assembly and credits from `REUSE.toml`, and every produced file under its
 pack; see `tools/manifest.mjs`, `buildManifest`.
-The creature rows of `models/mobs.json` are written under `built/skelly.bestiary/`, and their clips
-(`*_clips.json`) are the matrix representation while `tools/mobs.mjs`, `exportMob`, writes them; see
-`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. A row whose pack's format is `pose`
-bakes through `tools/actorBake.mjs`, `bakeActor`; no such row is enabled, and the manifest carries none.
+The creature rows of `models/mobs.json` are written under their declared packs. Bestiary rows use matrix clips
+(`*_clips.json`) while pose rows use actor clip files (`actors/<id>.clips.json`) and body files
+(`actors/<id>.body.json`); `tools/mobs.mjs`, `exportMob`, writes both forms according to
+`models/pack-formats.json`, read by `tools/layout.mjs`, `readPackFormats`. Pose rows bake through
+`tools/actorBake.mjs`, `bakeActor`, and their models and files are in the manifest.
 arpg1 reads `skelly.body`, `skelly.wearables`, `skelly.melee`, `skelly.hand-tools`, `skelly.materials`,
 `skelly.light-sources`, `skelly.containers`, `skelly.structures`, `skelly.readables`, `skelly.arcana`,
 `skelly.bolt-guns`, `skelly.armour` and `skelly.bestiary`; its loader repoints from the former flat paths to these
-pack paths. Nothing sits flat under `built/` but `manifest.json`; `tools/check-built.mjs` rebuilds everything and
+pack paths. Deadvox reads `skelly.deadvox.actors` and the player figure from `skelly.body` from S5a. Nothing sits flat under `built/` but `manifest.json`; `tools/check-built.mjs` rebuilds everything and
 holds the tracked set under `built/` equal to the fresh set, byte for byte, with the manifest naming each file.
 The worn family fits the shared player body, not generated mobs.
 Open gaps:
@@ -60,7 +61,7 @@ Open gaps:
 
 | Path | Contents |
 |---|---|
-| `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries, and a `*_clips.json` with the animation clips for each mob; `manifest.json` lists them all |
+| `built/` | One directory per pack: ready-to-use `.glb` models, their `*.model.json` entries where applicable, and matrix or pose clip files for mobs; `manifest.json` lists them all |
 | `models/` | Jsonnet model rows, per-pack export recipes in `recipes/`, the roster in `export.json`, the mob rows in `mobs.json` and each mob pack's clip representation in `pack-formats.json` |
 | `tools/` | The build pipelines; see `tools/README.md` |
 | `site/` | The showcase page, published to GitHub Pages by `.github/workflows/pages.yml` |
