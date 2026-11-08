@@ -1,0 +1,54 @@
+[
+	{
+		"id": "cutting_board",
+		"file": "assets/models/cutting_board.glb",
+		"parts": {
+			"cutting_board": {
+				"node": "cutting_board:compound",
+				"massKg": 0.455,
+				"centreOfMass": [-0.0026758753613877273, 0.009999999999999998, 0]
+			}
+		}
+	},
+	{
+		"id": "iron_pot",
+		"file": "assets/models/iron_pot.glb",
+		"parts": {
+			"iron_pot": {
+				"node": "iron_pot:compound",
+				"massKg": 2.49,
+				"centreOfMass": [0, 0.04244897959183674, -0.00007202881152460985]
+			}
+		}
+	},
+	{
+		"id": "pan",
+		"file": "assets/models/pan.glb",
+		"parts": {
+			"pan": {
+				"node": "pan:compound",
+				"massKg": 2.427,
+				"centreOfMass": [
+					0.011667900165341312, 0.017719077238012755, 0.00021777812770647968
+				]
+			}
+		},
+		"grip": { "at": [0.196, 0.04, 0], "turn": [0, 0, 0] },
+		"hold": "upright",
+		"roll": 90
+	},
+	{
+		"id": "jerry_can",
+		"file": "assets/models/jerry_can.glb",
+		"parts": {
+			"package": {
+				"node": "package:carton",
+				"massKg": 2.5,
+				"centreOfMass": [0, 0.21406402196050647, -0.00009961923315328076]
+			}
+		},
+		"grip": { "at": [0, 0.475, 0], "turn": [0, 0, -90] },
+		"hold": "upright",
+		"roll": 0
+	}
+]

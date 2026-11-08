@@ -1,0 +1,13 @@
+{
+	"id": "helmet_galea",
+	"file": "assets/models/helmet_galea.glb",
+	"parts": {
+		"helmet_galea": {
+			"node": "helmet_galea:compound",
+			"massKg": 1.31,
+			"centreOfMass": [
+				-0.000025217577803113175, 0.1449263678334782, -0.010632719637878294
+			]
+		}
+	}
+}

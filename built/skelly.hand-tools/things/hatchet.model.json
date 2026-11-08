@@ -1,0 +1,16 @@
+{
+	"id": "hatchet",
+	"file": "assets/models/hatchet.glb",
+	"parts": {
+		"hatchet": {
+			"node": "hatchet:compound",
+			"massKg": 0.907,
+			"centreOfMass": [
+				0.2611386138613862, -0.00001100110011001099, 0.014499999999999999
+			]
+		}
+	},
+	"grip": { "at": [0.066, 0, 0], "turn": [0, 0, 0] },
+	"hold": "upright",
+	"roll": 90
+}

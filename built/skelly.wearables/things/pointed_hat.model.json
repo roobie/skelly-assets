@@ -1,0 +1,13 @@
+{
+	"id": "pointed_hat",
+	"file": "assets/models/pointed_hat.glb",
+	"parts": {
+		"pointed_hat": {
+			"node": "pointed_hat:compound",
+			"massKg": 0.04,
+			"centreOfMass": [
+				0.003962062736081458, 0.07441369683034979, -0.00001395959927738525
+			]
+		}
+	}
+}

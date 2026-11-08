@@ -1,0 +1,13 @@
+{
+	"id": "copper_circlet",
+	"file": "assets/models/copper_circlet.glb",
+	"parts": {
+		"copper_circlet": {
+			"node": "copper_circlet:compound",
+			"massKg": 0.7,
+			"centreOfMass": [
+				0.0013875846389561602, 0.013934512924430388, 0.007146987594523795
+			]
+		}
+	}
+}
