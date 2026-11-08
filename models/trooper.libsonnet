@@ -1,7 +1,7 @@
 // The trooper armour set: fitted worn shells (template and measures in tools/packages) with a ground model each, in an
 // olive field livery.
-local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 // Olive paint over parkerized fittings, brass rivets and a yellow chevron and edging.
 local livery = { plate: 'paint-olive', trim: 'steel-parkerized', strap: 'webbing-olive-dark', rivet: 'brass', insignia: 'paint-crane-yellow' };
 local gauntlet = livery + { hand: 'leather-black' };
