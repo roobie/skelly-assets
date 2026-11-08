@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { compileJsonnetFile } from './jsonnet/index.mjs';
 
 const here = import.meta.dirname;
+let sourcesInstalled = false;
 export const jsonnetFiles = (directory) => {
   if (directory === undefined) return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(resolve(here, '../models/recipes'))];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -19,9 +20,11 @@ export const jsonnetFiles = (directory) => {
 };
 
 export function installJsonnetSources() {
+  if (sourcesInstalled) return;
   for (const source of jsonnetFiles()) {
     writeFileSync(source.replace(/\.jsonnet$/, '.json'), compileJsonnetFile(relative(here, source)));
   }
+  sourcesInstalled = true;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -1,0 +1,52 @@
+name: thing-export
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/packages/thing-export/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/packages/construct/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.github/workflows/thing-export.yml'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - 'tools/packages/thing-export/**'
+      - 'tools/packages/thing-core/**'
+      - 'tools/packages/construct/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.github/workflows/thing-export.yml'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/packages/thing-export
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache go-jsonnet
+        uses: actions/cache@v4
+        with:
+          path: tools/jsonnet/bin
+          key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci --prefix ../..
+      - run: npm run typecheck
+      - run: npm test
