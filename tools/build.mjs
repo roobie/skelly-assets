@@ -24,7 +24,6 @@ const repo = resolve(here, '..');
 let loadedTools;
 const recipeTools = () => (loadedTools ??= loadRecipeTools());
 const loadRecipeTools = async () => {
-  installJsonnetSources();
   const gun = await import('./packages/gun-authoring-tool/src/cli/exportRecipe.ts');
   const thing = await import('./packages/thing-authoring-tool/src/exports.ts');
   return {
@@ -65,6 +64,7 @@ export function partitionRecipe(packId, rows, tools) {
 // Every file is partitioned (and so checked) before any output is written. Returns every model written, with its
 // pack, kind, GLB path under the pack and part node names, and every file written as <packId>/<logical path>.
 export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names }) {
+  installJsonnetSources();
   const tools = await recipeTools();
   for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
   const { writeRecipeExports } = await import('./packages/thing-export/src/files.ts');
