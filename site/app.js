@@ -9,6 +9,8 @@ import { samplePose } from './poseSample.mjs';
 const $ = (id) => document.getElementById(id);
 const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
 const ATTACK_REST = 0.6; // s held after an attack before it plays again
+// A walk loop states a stride distance, not a time, so the viewer walks every figure at one display pace.
+const SHOWCASE_WALK_METRES_PER_REAL_SECOND = 1;
 
 const nameOf = (id) => {
   const s = id.replace(/_/g, ' ');
@@ -100,6 +102,7 @@ function pose(scene, body, clip, time) {
 }
 
 function clipTime(clip, name, seconds) {
+  if (clip.loop && clip.strideMetres !== undefined) return seconds * SHOWCASE_WALK_METRES_PER_REAL_SECOND / (clip.strideMetres * (clip.cycles ?? 1));
   if (clip.loop) return seconds / clip.period;
   if (name === 'attack') return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + ATTACK_REST));
   return seconds;
