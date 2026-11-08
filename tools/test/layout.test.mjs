@@ -84,6 +84,7 @@ test('the showcase lists every model of the manifest at its pack path and ships 
       assert.equal(listed.get(file)?.clips, clips, `${file} is not listed with its clips`);
     }
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
+    let sampledDeaths = 0;
     for (const model of models) {
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
       if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
@@ -99,7 +100,15 @@ test('the showcase lists every model of the manifest at its pack path and ships 
           const clip = viewerClips[name];
           assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
         }
+        // Death falls run on the render clock, so its span key differs from every other finite clip's.
+        for (const direction of ['forward', 'backward']) if (viewerClips.death?.[direction]) for (const time of [0, 1.234]) {
+          const clip = viewerClips.death[direction];
+          assert.equal(clip.kind, 'pose');
+          assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable death ${direction} clip`);
+          sampledDeaths++;
+        }
       }
     }
+    assert.ok(sampledDeaths > 0, 'no showcase death clip was sampled');
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
