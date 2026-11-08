@@ -21,6 +21,7 @@ on:
       - 'tools/recipes.mjs'
       - 'tools/recipes.d.mts'
       - 'tools/jsonnet/**'
+      - 'models/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
   pull_request:
@@ -42,6 +43,7 @@ on:
       - 'tools/recipes.mjs'
       - 'tools/recipes.d.mts'
       - 'tools/jsonnet/**'
+      - 'models/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
 
