@@ -9,7 +9,8 @@ Builds the GLB models whose sources are in `../models/` (rows in Jsonnet) into `
 `tools/build_models.sh` is the one command; it installs from this folder's `package-lock.json` the first time
 (`npm ci`), then runs `build.mjs`. `build.mjs --out dir [rowId ...]` builds to another folder or only some rows.
 Node 26 or later runs the TypeScript directly. The first build downloads the pinned go-jsonnet (`jsonnet/runtime.json`,
-sha256-checked) into `jsonnet/bin/`, ignored by git.
+sha256-checked) into `jsonnet/bin/`, ignored by git. The download retries 5xx and network errors; the attempts and
+delays are the `download` entry in `runtime.json`.
 
 ## Origin
 
