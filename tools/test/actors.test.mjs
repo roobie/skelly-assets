@@ -15,7 +15,7 @@ async function bakeFixture(model, options = {}) {
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
     glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
   try {
     exportMob(row, out);
@@ -289,8 +289,9 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
   const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
-  const period = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0) / row.walk_speed;
-  assert.equal(clips.standing.walk.period, period);
+  const loopMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0);
+  assert.equal(clips.standing.walk.periodSimSeconds, undefined);
+  assert(Math.abs(clips.standing.walk.strideMetres * row.walkCycles - loopMetres) <= 1e-12, 'the walk loop spans its plan period in strides');
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
@@ -300,10 +301,28 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   close(decodeFrame(clips.standing.walk.frames[0]), { root: end.root, rotations: end.rotations });
   close(decodeFrame(clips.crawling.idle.frames[0]), crawlGaitPose(figure.realized, 0, 0));
   assert.equal(clips.crawling.walk.cycles, 1);
+  assert.equal(clips.crawling.walk.strideMetres, 1.2, 'the crawl walk states the row\'s authored crawl stride');
   for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed));
-  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, legCut: 0.55 });
+  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: true, crawl_stride: 0.9, legCut: 0.55 });
   assert(!('standing' in legless));
   assert(legless.crawling.walk.frames.length > 1);
+  assert.equal(legless.crawling.walk.strideMetres, 0.9);
+  assert.throws(() => humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: false, legCut: 0.55 }), RangeError);
+});
+
+test('a humanoid row that does not crawl bakes no crawling set', async () => {
+  const { clips } = await bakeFixture('humanoid', { crawls: false, crawl_stride: undefined });
+  assert.deepEqual(Object.keys(clips), ['standing']);
+  assert.equal(clips.standing.attack.kind, 'overlay');
+});
+
+test('content rows that crawl carry a valid crawl stride; the player row bakes no crawling set', async () => {
+  const { readMobRows } = await import('../layout.mjs');
+  for (const row of readMobRows().filter((r) => /humanoid$/.test(r.template) && r.crawls)) {
+    assert(Number.isFinite(row.crawl_stride) && row.crawl_stride > 0, `${row.id} crawl stride must be positive and finite`);
+  }
+  const player = readMobRows().find((r) => r.type === 'player');
+  assert.equal(player.crawls, false);
 });
 
 test('serialized idle oscillators reproduce the live ordered rotation product at multiple times and seeds', async () => {
@@ -390,7 +409,7 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const body = baked.body;
   const tuning = acidTemplate.animation;
   assert.deepEqual(body.animation, { attackPeakAtSimSeconds: tuning.attackPeak, attackDurationSimSeconds: tuning.attackDuration, hitDurationSimSeconds: tuning.hitDuration, deathDurationRealSeconds: tuning.deathDuration });
-  assert.equal(clips.idle.period, tuning.idlePeriod);
+  assert.equal(clips.idle.periodSimSeconds, tuning.idlePeriod);
   assert.equal(clips.idle.loop, true);
   const close = (actual, expected) => {
     actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
@@ -620,7 +639,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
         glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
@@ -781,7 +800,7 @@ test('a finite clip without exactly one span key is rejected, not sampled as NaN
 test('loop sampling returns stored frames and interpolates the last interval toward frame zero', async () => {
   const { poseClip } = await import('../actorClips.mjs');
   const { sampleClip } = await import('../actorCompose.mjs');
-  const clip = poseClip(motionFixture, { loop: true, period: 2, frames: 4 });
+  const clip = poseClip(motionFixture, { loop: true, periodSimSeconds: 2, frames: 4 });
   assert.deepEqual(clip.frames.map((f) => f.root), [0, 0.5, 1, 1.5].map((t) => motionFixture(t).root));
   assert.strictEqual(sampleClip(clip, 1), clip.frames[0]);
   assert.strictEqual(sampleClip(clip, -0.25), clip.frames[3]);
