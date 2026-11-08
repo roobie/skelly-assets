@@ -290,7 +290,7 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   assert.equal(clips.standing.walk.loop, true);
   const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
   const loopMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0);
-  assert.equal(clips.standing.walk.period, undefined);
+  assert.equal(clips.standing.walk.periodSimSeconds, undefined);
   assert(Math.abs(clips.standing.walk.strideMetres * row.walkCycles - loopMetres) <= 1e-12, 'the walk loop spans its plan period in strides');
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
@@ -391,7 +391,7 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const body = baked.body;
   const tuning = acidTemplate.animation;
   assert.deepEqual(body.animation, { attackPeakAtSimSeconds: tuning.attackPeak, attackDurationSimSeconds: tuning.attackDuration, hitDurationSimSeconds: tuning.hitDuration, deathDurationRealSeconds: tuning.deathDuration });
-  assert.equal(clips.idle.period, tuning.idlePeriod);
+  assert.equal(clips.idle.periodSimSeconds, tuning.idlePeriod);
   assert.equal(clips.idle.loop, true);
   const close = (actual, expected) => {
     actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
@@ -782,7 +782,7 @@ test('a finite clip without exactly one span key is rejected, not sampled as NaN
 test('loop sampling returns stored frames and interpolates the last interval toward frame zero', async () => {
   const { poseClip } = await import('../actorClips.mjs');
   const { sampleClip } = await import('../actorCompose.mjs');
-  const clip = poseClip(motionFixture, { loop: true, period: 2, frames: 4 });
+  const clip = poseClip(motionFixture, { loop: true, periodSimSeconds: 2, frames: 4 });
   assert.deepEqual(clip.frames.map((f) => f.root), [0, 0.5, 1, 1.5].map((t) => motionFixture(t).root));
   assert.strictEqual(sampleClip(clip, 1), clip.frames[0]);
   assert.strictEqual(sampleClip(clip, -0.25), clip.frames[3]);

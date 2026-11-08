@@ -102,7 +102,8 @@ function pose(scene, body, clip, time) {
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
 function clipTime(clip, name, seconds, walkSpeed) {
   if (clip.loop && clip.strideMetres !== undefined) return seconds * walkSpeed / (clip.strideMetres * (clip.cycles ?? 1));
-  if (clip.loop) return seconds / clip.period;
+  // The viewer has no Sim clock, so an idle loop plays its Sim seconds one to one on Real time.
+  if (clip.loop) return seconds / clip.periodSimSeconds;
   if (name === 'attack') return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + ATTACK_REST));
   return seconds;
 }
