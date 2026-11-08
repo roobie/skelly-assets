@@ -1,11 +1,9 @@
 // Builds the showcase site into _site/: the page, the models from built/ and a models.json that lists them.
 // Usage: node site/build.mjs [outDir]. No dependencies; the page loads three.js from a CDN.
-// Produced models are found by their rows through tools/layout.mjs, producedModels (pack paths under built/);
-// the hand-copied models still sit flat in built/.
-import { cpSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+// The models are the GLB models built/manifest.json names (tools/manifest.mjs), at their pack paths under built/.
+import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { producedModels } from '../tools/layout.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -14,11 +12,11 @@ const built = join(root, 'built');
 
 // The only grouping the files themselves carry: a model with a clips file is an animated creature. Ids are names,
 // not categories, so nothing here reads meaning into them.
-const flat = readdirSync(built, { withFileTypes: true })
-  .filter((entry) => entry.isFile() && entry.name.endsWith('.glb'))
-  .map((entry) => ({ id: entry.name.slice(0, -4), file: entry.name, clips: null }));
-const models = [...producedModels(root), ...flat]
-  .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
+const models = manifest.models
+  .filter(({ path }) => path.endsWith('.glb'))
+  .map(({ id, pack, path, clips }) => ({ id, file: `${pack}/${path}`, clips: clips === undefined ? null : `${pack}/${clips}` }))
+  .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
   .map(({ id, file, clips }) => ({
     id,
     file,

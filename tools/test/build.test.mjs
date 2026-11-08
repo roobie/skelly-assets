@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { test } from 'node:test';
 import { exportRecipes } from '../build.mjs';
 import { outputPath } from '../layout.mjs';
@@ -42,6 +42,31 @@ test('one recipe file builds its gun and item rows into one pack, each in its to
     assert.ok(!existsSync(join(base, 'gungen/index.json')));
     assert.deepEqual(JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8')).map(({ id }) => id), [item.id]);
     for (const id of [gun.id, item.id]) assert.ok(existsSync(join(base, 'assets/models', `${id}.glb`)), id);
+  });
+});
+
+const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
+  .filter((entry) => entry.isFile()).map((entry) => relative(directory, join(entry.parentPath, entry.name))).sort();
+
+// The names of a GLB's part nodes: the nodes that carry a part in their extras.
+const glbPartNodes = (bytes) => {
+  const length = bytes.readUInt32LE(12);
+  const { nodes } = JSON.parse(bytes.subarray(20, 20 + length).toString('utf8'));
+  return nodes.filter((node) => node.extras?.part !== undefined).map((node) => node.name).sort();
+};
+
+test('the driver reports every file it wrote, and each model with the part nodes its GLB carries', async () => {
+  const packId = 'fixture.mixed';
+  await withRoot(packId, [gunRow(), itemRow()], async (root, out) => {
+    const { models, files } = await exportRecipes({ root, out, tools: ['gun', 'thing'] });
+    assert.deepEqual([...files].sort(), filesUnder(out));
+    assert.ok(models.length > 0);
+    for (const model of models) {
+      assert.equal(model.pack, packId);
+      assert.ok(files.includes(outputPath(model.pack, model.path)), `${model.id} names a file the driver did not write`);
+      assert.ok(model.nodes.length > 0, `${model.id} has no part node`);
+      assert.deepEqual([...model.nodes].sort(), glbPartNodes(readFileSync(join(out, model.pack, model.path))));
+    }
   });
 });
 

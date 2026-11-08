@@ -78,16 +78,3 @@ export function undeclaredDirectories(paths, declared) {
   const directories = new Set(paths.map((path) => path.split('/')).filter((parts) => parts[0] === 'built' && parts.length > 2).map((parts) => parts[1]));
   return [...directories].filter((directory) => !declared.has(directory)).sort().map((directory) => `built/${directory}`);
 }
-
-// The produced models under built/, by row: each GLB's path relative to built/ and, for a matrix mob row, its clips.
-export function producedModels(root = repo) {
-  const formats = readPackFormats(root);
-  return [
-    ...readRoster(root).map(({ id, file }) => ({ id, file, clips: null })),
-    ...readMobRows(root).map((row) => ({
-      id: row.id,
-      file: outputPath(row.pack, row.glb),
-      clips: mobFormat(row, formats) === 'matrices' ? outputPath(row.pack, row.clips) : null,
-    })),
-  ];
-}

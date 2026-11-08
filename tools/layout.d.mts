@@ -6,4 +6,3 @@ export function rosterFile(packId: string, id: string): string;
 export function readMobRows(root?: string): Record<string, unknown>[];
 export function declaredPacks(root?: string): Set<string>;
 export function undeclaredDirectories(paths: string[], declared: Set<string>): string[];
-export function producedModels(root?: string): { id: string; file: string; clips: string | null }[];
