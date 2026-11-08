@@ -6,9 +6,10 @@ read_if:
 
 # Model tools
 
-Build and commit sources with their generated output so consumers need no authoring environment. Use
-`build_models.sh` for roster and recipe exports, and `build_mobs.sh` for generated actors. For the entry points
-and selection rules, see `build.mjs`, `main`, and `mobs.mjs`, `main`.
+Build sources into `built/` to inspect them; commit only the sources, because CI builds, checks and releases the
+output so consumers need no authoring environment. Use `build_models.sh` for roster and recipe exports, and
+`build_mobs.sh` for generated actors. For the entry points and selection rules, see `build.mjs`, `main`, and
+`mobs.mjs`, `main`.
 
 Node 26 or later runs TypeScript directly. Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
@@ -93,12 +94,12 @@ clips form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBak
 same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
 
 Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
-`readCredits`, for model identity, actor companions and attribution. Reproducibility is enforced by
-`check-built.mjs` and `manifest.mjs`, `treeDifferences`: tracked bytes must equal fresh bytes, every file must
-be named, and every output directory must be a declared pack (`layout.mjs`, `declaredPacks`). CI hands the check
-two independent builds from `build-all.mjs`, `buildAll`, and requires them byte-equal (`check-built.mjs`,
-`treeMismatches`), so a release built from a tag is known to reproduce rather than assumed to. Release archives
-are byte-reproducible for the same reason; see `pack-release.mjs`, `packRelease`. The showcase
-reads this authority rather than maintaining its own model selection; see `../site/build.mjs`.
+`readCredits`, for model identity, actor companions and attribution. `check-built.mjs` holds a fresh build to the
+manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
+declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
+requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
+rather than assumed to. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
+`packRelease`. The showcase reads this authority rather than maintaining its own model selection; see
+`../site/build.mjs`.
 
 Keep engine import caches in consumers; `.gdignore` excludes the authoring tree from Godot scanning.

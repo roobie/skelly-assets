@@ -1,9 +1,9 @@
-// built/manifest.json: every produced model by id, kind, pack, logical path, part node names and credits, and every
-// produced file under its pack. tools/build.mjs writes it; tools/check-built.mjs holds built/ to it.
+// manifest.json: every produced model by id, kind, pack, logical path, part node names and credits, and every produced
+// file under its pack. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { outputPath } from './layout.mjs';
+import { outputPath, undeclaredDirectories } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 export const MANIFEST = 'manifest.json';
@@ -114,7 +114,7 @@ export function buildManifest({ models, files, credit }) {
     };
   });
   return {
-    _doc: 'Every model built/ holds and every produced file under its pack, written by tools/build.mjs; paths are logical under built/<pack>/. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
+    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
   };
@@ -130,19 +130,18 @@ export function manifestFiles(manifest) {
   ]);
 }
 
-// The set comparison of tools/check-built.mjs: the fresh set equals the tracked set, nothing flat but the manifest,
-// and the manifest names exactly the fresh files.
-export function treeDifferences({ tracked, fresh, manifest }) {
-  const differences = [];
-  const trackedSet = new Set(tracked);
-  const freshSet = new Set(fresh);
+// How a fresh tree departs from its manifest and the declared packs (layout.mjs, declaredPacks): nothing flat but the
+// manifest, the manifest names exactly the produced files, every directory is a declared pack, and every declared pack
+// has a model, so a pack whose rows the production build skips is caught. files: the tree's files under built/.
+export function treeDifferences({ files, manifest, declared }) {
+  const produced = new Set(files);
   const named = manifestFiles(manifest);
-  for (const file of new Set([...tracked, ...fresh])) {
-    if (file.split('/').length === 2 && file !== `built/${MANIFEST}`) differences.push(`flat under built/: ${file}`);
-  }
-  for (const file of tracked) if (!freshSet.has(file)) differences.push(`tracked, not produced: ${file}`);
-  for (const file of fresh) if (!trackedSet.has(file)) differences.push(`produced, not tracked: ${file}`);
-  for (const file of fresh) if (!named.has(file)) differences.push(`produced, not in the manifest: ${file}`);
-  for (const file of named) if (!freshSet.has(file)) differences.push(`in the manifest, not produced: ${file}`);
-  return differences.sort(byText);
+  const modelled = new Set(manifest.models.map((model) => model.pack));
+  return [
+    ...files.filter((file) => file.split('/').length === 2 && file !== `built/${MANIFEST}`).map((file) => `flat under built/: ${file}`),
+    ...files.filter((file) => !named.has(file)).map((file) => `produced, not in the manifest: ${file}`),
+    ...[...named].filter((file) => !produced.has(file)).map((file) => `in the manifest, not produced: ${file}`),
+    ...undeclaredDirectories(files, declared).map((directory) => `undeclared directory: ${directory}`),
+    ...[...declared].filter((pack) => !modelled.has(pack)).map((pack) => `declared pack without a model: ${pack}`),
+  ].sort(byText);
 }

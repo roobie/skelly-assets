@@ -1,8 +1,8 @@
 name: assets
 
-# Builds the complete tree from source twice, holds the builds to each other, to built/ and to the manifest, then
-# publishes the showcase from the build and a release of one archive per pack: a version's on a v* tag, the
-# rolling edge pre-release on a push to main.
+# Builds the complete tree from source twice, holds the builds to each other and to the manifest, then publishes the
+# showcase from the build and a release of one archive per pack: a version's on a v* tag, the rolling edge
+# pre-release on a push to main.
 on:
   push:
     branches: [main]
@@ -93,8 +93,6 @@ jobs:
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
       - run: node tools/sources.mjs
-      # The showcase serves the checked build, not the committed copy, so it never shows bytes CI did not produce.
-      - run: rm -rf built
       - uses: actions/download-artifact@v4
         with:
           name: built-1
