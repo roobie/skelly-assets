@@ -89,7 +89,7 @@ export const acidAttackPose = (realized: Realized, base: Pose, time: number): Po
 
 /** Progress is supplied by the action owner; holding at one keeps the head drawn back. */
 export const acidWindupPose = (realized: Realized, base: Pose, progress: number): Pose =>
-  layer(realized, base, tuning.windup, smoothstep(clamp(progress, 0, 1)));
+  layer(realized, base, tuning.spitDraw, smoothstep(clamp(progress, 0, 1)));
 
 export const acidHitPose = (realized: Realized, base: Pose, time: number, side = 0): Pose =>
   layer(realized, base, tuning.hit, {

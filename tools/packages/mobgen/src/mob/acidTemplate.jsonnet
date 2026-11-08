@@ -119,7 +119,7 @@ local material(color, emissive=0, charged=false) =
     attackDuration: 1.1, attackPeak: 0.55,
     attack: { chest: [-10, 0, 0], skull: [-8, 0, 0], 'arm.L': [65, 0, -8], 'arm.R': [65, 0, 8], 'fore.L': [25, 0, 0], 'fore.R': [25, 0, 0] },
     windupDuration: 1.2,
-    windup: { chest: [8, 0, 0], neck: [12, 0, 0], skull: [14, 0, 0], maw: [20, 0, 0] },
+    spitDraw: { chest: [8, 0, 0], neck: [12, 0, 0], skull: [14, 0, 0], maw: [20, 0, 0] },
     hitDuration: 0.4, hitPeak: 0.09,
     hit: { chest: [9, 0, 6], neck: [8, 0, 5], skull: [12, 0, 7], maw: [10, 0, 0] },
     deathDuration: 1.4, topple: 95, droolDeathFlex: -45,
