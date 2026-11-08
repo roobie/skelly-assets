@@ -47,6 +47,7 @@ jobs:
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
+      - run: node tools/sources.mjs
       - name: Build mobgen viewer
         working-directory: tools/packages/mobgen
         run: PAGES_ANALYTICS=1 npx vite build
