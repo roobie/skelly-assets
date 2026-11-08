@@ -968,6 +968,7 @@
       "files": [
         "assets/models/baseball_bat.glb",
         "assets/models/kabar.glb",
+        "assets/models/kite_shield.glb",
         "assets/models/lame_saber.glb",
         "assets/models/long_pole.glb",
         "assets/models/machete.glb",
@@ -977,6 +978,7 @@
         "things/baseball_bat.model.json",
         "things/index.json",
         "things/kabar.model.json",
+        "things/kite_shield.model.json",
         "things/lame_saber.model.json",
         "things/long_pole.model.json",
         "things/machete.model.json",
@@ -6351,6 +6353,19 @@
       "path": "assets/models/kabar.glb",
       "nodes": [
         "kabar:knife"
+      ],
+      "credits": {
+        "author": "Björn Roberg",
+        "licence": "CC-BY-NC-SA-4.0"
+      }
+    },
+    {
+      "id": "kite_shield",
+      "kind": "item",
+      "pack": "skelly.melee",
+      "path": "assets/models/kite_shield.glb",
+      "nodes": [
+        "kite_shield:compound"
       ],
       "credits": {
         "author": "Björn Roberg",
