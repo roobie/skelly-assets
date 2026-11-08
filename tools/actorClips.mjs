@@ -131,22 +131,25 @@ export function creatureClips(figure, template, row) {
   } };
 }
 
-/** Both locomotion sets use the same figure, including injured crawling on a standing rig. */
+/**
+ * Both locomotion sets use the same figure, including injured crawling on a standing rig. A row's `crawls` flag
+ * selects whether it bakes a crawling set at all: built data holds only what the game uses. Its crawl walk
+ * states the row's authored `crawl_stride` as `strideMetres`, like the standing walk states its own distance.
+ */
 export function humanoidPoseClips(figure, row) {
   if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0)) throw new RangeError('walkCycles must be a positive integer');
+  if (typeof row.crawls !== 'boolean') throw new TypeError('crawls must be a boolean');
+  if (row.legCut !== undefined && !row.crawls) throw new RangeError('a legless rig only crawls');
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
     params: figure.genome.params, seed: figure.seed,
     cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
   };
-  // The crawl cycle is 2π of gait phase. No row authors a crawl stride length, so this is not a measured
-  // distance: it is the cycle in radians, kept until the stride's owner is ruled.
-  const crawlStrideMetres = 2 * Math.PI;
-  const crawling = {
+  const crawling = row.crawls ? {
     idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
-    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, strideMetres: crawlStrideMetres, samplePeriod: 1, cycles: 1 }),
-  };
+    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, strideMetres: row.crawl_stride, samplePeriod: 1, cycles: 1 }),
+  } : undefined;
   if (row.legCut !== undefined) return { crawling };
   const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
   const standingStrideMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walkCycles;
@@ -159,7 +162,7 @@ export function humanoidPoseClips(figure, row) {
       return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
     }, { frames: row.walk_frames * row.walkCycles, loop: true, strideMetres: standingStrideMetres, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
   };
-  return { standing, crawling };
+  return crawling ? { standing, crawling } : { standing };
 }
 
 /** Endpoint-inclusive action frames are independent of their eventual live base. */
@@ -187,6 +190,7 @@ export function humanoidClips(figure, template, row) {
     sets.standing.attack = overlay(attackClipFor(template), false, false);
     sets.standing.flinch = overlay(flinchClipFor(template), true, false);
   }
+  if (!sets.crawling) return sets;
   sets.crawling.attack = overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true);
   sets.crawling.flinch = {
     kind: 'overlay', durationSimSeconds: HIT_FLINCH.duration, peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
