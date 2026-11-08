@@ -15,7 +15,7 @@ async function bakeFixture(model, options = {}) {
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
     glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
   try {
     exportMob(row, out);
@@ -301,10 +301,30 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   close(decodeFrame(clips.standing.walk.frames[0]), { root: end.root, rotations: end.rotations });
   close(decodeFrame(clips.crawling.idle.frames[0]), crawlGaitPose(figure.realized, 0, 0));
   assert.equal(clips.crawling.walk.cycles, 1);
+  assert.equal(clips.crawling.walk.strideMetres, 1.2, 'the crawl walk states the row\'s authored crawl stride');
   for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed));
-  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, legCut: 0.55 });
+  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: true, crawl_stride: 0.9, legCut: 0.55 });
   assert(!('standing' in legless));
   assert(legless.crawling.walk.frames.length > 1);
+  assert.equal(legless.crawling.walk.strideMetres, 0.9);
+  assert.throws(() => humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: false, legCut: 0.55 }), RangeError);
+});
+
+test('a humanoid row that does not crawl bakes no crawling set', async () => {
+  const { clips } = await bakeFixture('humanoid', { crawls: false, crawl_stride: undefined });
+  assert.deepEqual(Object.keys(clips), ['standing']);
+  assert.equal(clips.standing.attack.kind, 'overlay');
+});
+
+test('content rows that crawl carry their authored crawl stride; the player row bakes no crawling set', async () => {
+  const { readMobRows } = await import('../layout.mjs');
+  const expected = { brute_shambler: 1.6, runner: 1.6, crawler: 0.9 };
+  for (const row of readMobRows().filter((r) => r.pack === 'skelly.deadvox.actors' && /humanoid$/.test(r.template))) {
+    assert.equal(row.crawls, true, `${row.id} crawls`);
+    assert.equal(row.crawl_stride, expected[row.type] ?? 1.2, `${row.id} crawl stride`);
+  }
+  const player = readMobRows().find((r) => r.type === 'player');
+  assert.equal(player.crawls, false);
 });
 
 test('serialized idle oscillators reproduce the live ordered rotation product at multiple times and seeds', async () => {
@@ -621,7 +641,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9,
+        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
         glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
