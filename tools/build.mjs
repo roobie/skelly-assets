@@ -61,8 +61,8 @@ export function partitionRecipe(packId, rows, tools) {
 
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned (and so checked) before any output is written.
-export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, sourcesReady = false }) {
-  if (!sourcesReady) installJsonnetSources();
+export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names }) {
+  installJsonnetSources();
   const tools = await recipeTools();
   for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
   const { writeRecipeExports } = await import('./packages/thing-export/src/files.ts');
@@ -118,7 +118,7 @@ async function main() {
     const { loadThingRecipe } = await import('./packages/thing-authoring-tool/src/exports.ts');
     failed = buildRoster(loadThingRecipe, ids, out, roster);
     if (positionals.length === 0) {
-      for (const file of await exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, sourcesReady: true })) console.log(`built ${file}`);
+      for (const file of await exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS })) console.log(`built ${file}`);
     }
   } catch (error) {
     // A row error arrives as a long issue dump; one line per issue with its path is what an author needs.
