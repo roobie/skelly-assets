@@ -1,6 +1,6 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
-import { exportGlb } from '@skelly/thing-export/glb.ts';
+import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts';
 import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
@@ -26,6 +26,12 @@ const checkGlow = (id: string, glow: string, glb: Uint8Array) => {
     throw new Error(`${id}: emissive material ${glow} names ${count} materials in the GLB, not one`);
   }
 };
+
+/**
+ * The finish library a vehicle site names its paint from, as the glTF material each finish gives a paintable surface
+ * of a catalogue part, so a consumer repaints a copy with what an export in that finish would carry.
+ */
+export const finishLibrary = (settings: Pick<CatalogueSettings, 'defaultMaterial'>) => paintMaterials(itemPalette(settings));
 
 export const exportItem = (
   item: ToolItem,

@@ -35,6 +35,16 @@ A finish names an entry in the finish library, the same library every model's ma
 paint by adding a library entry and the build refuses a name that has none. See `tools/placements.mjs`,
 `siteProblems`.
 
+A consumer cannot turn a finish's name into a look without the library, so the manifest carries it as `finishes` and
+the release ships it alone as `finishes.json`, as it ships the renames: the library belongs to no pack, and a consumer
+that paints at spawn should not have to read the whole manifest at run time. Each entry is the glTF material the
+exporter writes for a paintable surface in that finish, made by the same function as the models' materials, so the
+consumer swaps it in whole rather than converting colours a second way, and the two cannot drift. A paintable surface
+takes no role shade for the same reason: a shade would make the swapped material differ from what an export in that
+finish carries. See `tools/packages/thing-export/src/glb.ts`, `gltfMaterial` and `paintMaterials`, and
+`tools/packages/thing-export/src/appearance.ts`, `resolveAppearance`. The whole library ships, not only the finishes
+sites name, because a site may name any entry and a game may repaint a copy later with a finish no site uses.
+
 Rows that differ only in paint are merged into one, and the vehicles that used them borrow it with their colour moved
 onto their sites. The vehicle's own former paint stays in its spec, so the borrowing vehicle still states its colour in
 one place, and the borrowing fittings take it from there. See `models/vehicles/kit.libsonnet`, `painted`. Each retired
@@ -42,7 +52,8 @@ id goes into the rename map so a consumer can follow it; see `changes/README.md`
 
 ## Consequences
 
-A consumer reads a site's finish and applies it only to the marked materials of that copy of the part, then keeps the
-paint with the copy. Placing the same part in another colour costs a site line, not a model. Vehicles specified with
-borrowing switched off must look the same as the merged ones, and a test holds the two to that; see
-`tools/test/vehicle-paint.test.mjs`.
+A consumer reads a site's finish, looks it up in the shipped library and puts that material in place of only the marked
+materials of that copy of the part, then keeps the paint with the copy. A test holds every finish a site names to the
+shipped library and an entry to what an export in its finish carries; see `tools/test/finish-library.test.mjs`.
+Placing the same part in another colour costs a site line, not a model. Vehicles specified with borrowing switched off
+must look the same as the merged ones, and a test holds the two to that; see `tools/test/vehicle-paint.test.mjs`.

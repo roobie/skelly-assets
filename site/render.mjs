@@ -73,16 +73,14 @@ function loadVehicle(vehicle) {
 }
 
 // A site's finish paints that copy of its part, as a game spawning the vehicle would: only the materials the part marks
-// paintable take it, each keeping the shade its export gave it, and the clone's other copies keep their own paint.
+// paintable take it, and the clone's other copies keep their own paint.
 function repaint(part, paint) {
   const copies = new Map();
   const painted = (material) => {
     if (!material.userData?.paintable) return material;
     if (!copies.has(material)) {
       const copy = material.clone();
-      const [r, g, b] = paint.colour;
-      const [sr, sg, sb] = material.userData.colourMultiplier ?? [1, 1, 1];
-      copy.color.setRGB(r * sr, g * sg, b * sb, THREE.SRGBColorSpace);
+      copy.color.setRGB(...paint.linear, THREE.LinearSRGBColorSpace);
       copy.metalness = paint.metallic;
       copy.roughness = paint.roughness;
       copy.opacity = paint.opacity;

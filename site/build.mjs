@@ -13,7 +13,6 @@ import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } f
 import { readMobRows } from '../tools/layout.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
-import { MATERIALS } from '../tools/packages/thing-core/src/materials.ts';
 
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -54,10 +53,11 @@ const models = manifest.models
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
   }));
 
-// A site's finish as the browser repaints with it: the library entry's colour and surface. The page has no library.
+// A site's finish as the browser repaints with it: the manifest's material for that finish, as a game reads it.
 const paintOf = (finish) => {
-  const { colour, finish: { metallic, roughness, opacity = 1 } } = MATERIALS[finish];
-  return { colour, metallic, roughness, opacity };
+  if (!Object.hasOwn(manifest.finishes, finish)) throw new Error(`finish ${finish} is not in the manifest's finishes`);
+  const { baseColorFactor: [r, g, b, opacity], metallicFactor: metallic, roughnessFactor: roughness } = manifest.finishes[finish].pbrMetallicRoughness;
+  return { linear: [r, g, b], metallic, roughness, opacity };
 };
 
 // Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.

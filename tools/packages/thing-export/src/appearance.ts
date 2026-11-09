@@ -77,7 +77,8 @@ export const resolveAppearance = (
   const selected = selectedMaterial(palette, material);
   const base =
     selected?.colour ?? own(palette.specialColors, solidId) ?? own(palette.familyColors, role) ?? palette.fallbackColor;
-  const shade: SrgbColor = own(palette.roleShades, role) ?? [1, 1, 1];
+  // A paintable surface takes no role shade, so a repaint puts the finish's own material in its place.
+  const shade: SrgbColor = (paintable ? undefined : own(palette.roleShades, role)) ?? [1, 1, 1];
   return {
     ...(material === undefined ? {} : { material }),
     ...(slot === undefined ? {} : { slot }),

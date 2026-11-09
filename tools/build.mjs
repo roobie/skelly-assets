@@ -4,7 +4,7 @@
 // is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; --no-cache generates every model.
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
-// (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs)
+// (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs) and the finish library
 // (tools/manifest.mjs); with ids it builds only those rows, from the roster source or a recipe file, with no pack index,
 // placements or manifest, so one model builds without the rest. Each model is written into --out (by default built/)
 // at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
@@ -153,6 +153,12 @@ export function withTaxonomy(models, taxonomies) {
   return models.map((model) => ({ ...model, taxonomy: byModel.get(key(model)) }));
 }
 
+// The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems).
+const finishLibrary = async () => {
+  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
+  return (await import('./packages/thing-authoring-tool/src/exports.ts')).finishLibrary(catalogue);
+};
+
 // The roster's source rows: TAT's catalogue export, which the roster selects from.
 const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
 
@@ -263,6 +269,7 @@ async function main() {
         files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
         credit: readCredits(repo),
         renames: readRenames(repo),
+        finishes: await finishLibrary(),
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));
       console.log(`built ${MANIFEST}`);
