@@ -154,7 +154,7 @@ forcing the acid body's distinct bones through humanoid names. See
 deadvox's `BODY_PLAN`;
 deadvox's `bodyPlanModel`;
 `src/mob/humanoidFigure.ts`, `templateFigure`; and
-deadvox's `ActorRegions`.
+deadvox's `ActorBodySchema.regions`.
 
 - **Hit regions.** Each plan says which of its bones form head, torso and limbs, because
   renaming acid bones to humanoid names would hide that it is its own skeleton. The sac's
