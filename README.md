@@ -49,6 +49,14 @@ authority for which families use the roster; see `tools/layout.mjs`, `readRoster
 row's `source`; file-backed sources resolve relative to `tools/`, while other gun kinds select their source
 through the owning exporter. See `tools/build.mjs`, `loadRecipeTools`, and
 `tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
+A vehicle is authored as its own file of part rows in `models/vehicles/`, beside the kits that press its panels
+from its measures, so parallel authors each add files and none edits a shared list. A recipe selects whole
+vehicles, never single parts, so a vehicle's parts all live in one pack; road vehicles, helicopters and wrecks
+are separate packs because a product can want traffic without aircraft or ruins. A vehicle's file sets the
+taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
+import those files is generated; see `tools/vehicle-index.mjs`, `vehicleIndex`, and
+`models/recipes/skelly.ground-vehicles.jsonnet`.
+
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
