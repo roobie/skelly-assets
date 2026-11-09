@@ -6,7 +6,7 @@ import { installJsonnetSources } from '../sources.mjs';
 installJsonnetSources();
 const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
 const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
-const { MATERIALS, surfaceOf } = await import('../packages/thing-core/src/materials.ts');
+const { MATERIALS } = await import('../packages/thing-core/src/materials.ts');
 const compiled = JSON.parse(readFileSync(new URL('../packages/thing-core/src/materials.json', import.meta.url)));
 
 const glbJson = (bytes) => {
@@ -29,16 +29,13 @@ const withFixture = (finish, work) => {
   }
 };
 
-test('every surface an item exports names its material, and the material is defined', () => {
+test('every surface an item exports names the material its finish chose', () => {
   assert.deepEqual(MATERIALS, compiled);
-  const model = withFixture({ surface: catalogue.defaultMaterial }, (row) => glbJson(row.generate().glb));
+  // Not the default, so an exporter that labels a surface with its fallback cannot pass.
+  const chosen = Object.keys(MATERIALS).find((id) => id !== catalogue.defaultMaterial);
+  const model = withFixture({ surface: chosen }, (row) => glbJson(row.generate().glb));
   assert.ok(model.materials.length > 0, 'no resolved surfaces');
-  for (const material of model.materials) {
-    const selected = material.extras?.materialId;
-    assert.ok(selected, 'a surface without a material id');
-    assert.ok(Object.hasOwn(compiled, selected), `unknown material ${selected}`);
-    assert.deepEqual(surfaceOf(MATERIALS[selected].finish), surfaceOf(compiled[selected].finish));
-  }
+  for (const material of model.materials) assert.equal(material.extras?.materialId, chosen);
 });
 
 test('a fixture recipe with an undefined surface material fails appearance resolution', () => {
