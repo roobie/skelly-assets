@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { roundProfiles } from '../src/ammo/roundProfile.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { FILE_AXES } from '../src/gun/exportFrame.ts';
 import { magazineCenterline } from '../src/gun/magazineCenterline.ts';
 import { exportMagazineGlb } from '../src/gun/magazineExport.ts';
 import {
@@ -75,8 +76,10 @@ describe('generated magazine round columns', () => {
     expect(result.modelEntry.gun.calibre).toBe('7.62x39');
     expect(result.modelEntry.gun.capacity).toBe(30);
     expect(result.modelEntry.gun.rounds).toHaveLength(result.modelEntry.gun.capacity!);
-    expect(result.modelEntry.gun.rounds?.[0]?.at[2]).toBeGreaterThan(0);
-    expect(result.modelEntry.gun.rounds?.[1]?.at[2]).toBeLessThan(0);
+    // Round poses are in the file's axes, where the stagger runs along the side axis.
+    const [first, second] = result.modelEntry.gun.rounds!.map(({ at }) => at[FILE_AXES.side]);
+    expect(first).not.toBe(0);
+    expect(Math.sign(second!)).toBe(-Math.sign(first!));
   });
 
   it('keeps the STANAG 20 straight with a slanted floorplate and the 30-round shared top', () => {

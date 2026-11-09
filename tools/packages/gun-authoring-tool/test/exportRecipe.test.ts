@@ -1,3 +1,4 @@
+import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
 import { readGlb } from './glbReader.ts';
@@ -39,22 +40,37 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
   return exported!.generate();
 };
 
-it('puts every unrotated part, coarse or fine, on the fine lattice so the two grains nest', () => {
+/** A node's transform when its rotation is a whole number of quarter turns, which keep the world lattice. */
+const quarterTurned = (node: { translation?: number[]; rotation?: number[] }): Matrix4 | undefined => {
+  const turn = new Matrix4().makeRotationFromQuaternion(
+    new Quaternion(...((node.rotation ?? [0, 0, 0, 1]) as [number, number, number, number])),
+  );
+  if (turn.elements.some((entry) => Math.abs(entry - Math.round(entry)) > 1e-9)) {
+    return undefined;
+  }
+  return turn.setPosition(...((node.translation ?? [0, 0, 0]) as [number, number, number]));
+};
+
+/** Every coordinate of a primitive's vertices once its node's transform has placed them. */
+const placedCoordinates = (positions: ArrayLike<number>, transform: Matrix4): number[] =>
+  Array.from({ length: positions.length / 3 }, (_, i) =>
+    new Vector3(positions[3 * i]!, positions[3 * i + 1]!, positions[3 * i + 2]!).applyMatrix4(transform).toArray(),
+  ).flat();
+
+it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
   const { json, floats } = readGlb(designExport(voxel).glb);
   const seen = new Set<number>();
   for (const node of json.nodes) {
-    const translation = node.translation ?? [0, 0, 0];
-    if (node.mesh === undefined || node.rotation !== undefined) {
+    const transform = quarterTurned(node);
+    if (node.mesh === undefined || transform === undefined) {
       continue;
     }
     for (const primitive of json.meshes[node.mesh]!.primitives) {
       const grain = (primitive.extras as { voxelGrain: number }).voxelGrain;
       seen.add(grain);
-      const positions = floats(primitive.attributes.POSITION);
-      for (let i = 0; i < positions.length; i += 1) {
-        const world = positions[i]! + translation[i % 3]!;
+      for (const coordinate of placedCoordinates(floats(primitive.attributes.POSITION), transform)) {
         for (const step of [grain, voxel.detailGrain]) {
-          expect(Math.abs(world / step - Math.round(world / step))).toBeLessThan(1e-3);
+          expect(Math.abs(coordinate / step - Math.round(coordinate / step))).toBeLessThan(1e-3);
         }
       }
     }

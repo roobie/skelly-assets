@@ -7,6 +7,7 @@ import { ATTACHMENT_FAMILIES } from './attachmentParts.ts';
 import { attachmentInstanceForId, attachmentMetadata } from './attachments.ts';
 import { gunDomain } from './domain.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
+import { inFileFrame } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { FAMILIES } from './parts.ts';
@@ -69,7 +70,7 @@ export const exportAttachmentGlb = (
     modelEntry: {
       id: asset.id,
       file: asset.file as DeadvoxModelFile,
-      collision: modelCollision(resolved, drawnGeometry(resolved, voxel)),
+      collision: modelCollision(inFileFrame(resolved), drawnGeometry(inFileFrame(resolved), voxel)),
       gun: { attachment: metadata },
     },
   };

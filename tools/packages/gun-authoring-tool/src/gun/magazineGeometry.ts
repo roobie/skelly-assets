@@ -3,7 +3,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { MetallicCartridge } from '../ammo/cartridge.ts';
 import { type Column, layoutColumn, polylineLength } from '../ammo/magazineColumn.ts';
 import { roundProfiles } from '../ammo/roundProfile.ts';
-import { METRES_PER_UNIT } from './exportFrame.ts';
+import { METRES_PER_UNIT, toFileAxes } from './exportFrame.ts';
 import { magazineCenterline } from './magazineCenterline.ts';
 import { magazineProfileContent } from './magazineProfiles.ts';
 import { mmToU } from './units.ts';
@@ -158,7 +158,7 @@ export const magazineRoundColumn = (
 
 export interface MagazineRoundPose {
   readonly at: Vec3;
-  /** Degrees about magazine-local +z, nose-up positive. */
+  /** Degrees about the file's -x, the magazine's right, nose-up positive. */
   readonly tilt: number;
 }
 
@@ -167,14 +167,16 @@ const round6 = (value: number): number => {
   return rounded === 0 ? 0 : rounded;
 };
 
-/** Convert a generated column into the optional DeadvoxModelEntry `rounds` field. */
-/** `place` moves each round's centre, in magazine units, onto the drawn model (see `drawn.ts`). */
+/**
+ * Convert a generated column into the optional DeadvoxModelEntry `rounds` field. Each round's centre is written in the
+ * file's axes; `place` moves it, in magazine units, onto the drawn model (see `drawn.ts`).
+ */
 export const magazineRoundPoses = (
   column: Column,
   place: (point: Vec3) => Vec3 = (point) => point,
 ): readonly MagazineRoundPose[] =>
   column.rounds.map(({ position, angle, z }) => {
-    const at = place([position[0], position[1], z]);
+    const at = place(toFileAxes([position[0], position[1], z]));
     return {
       at: [round6(at[0] * METRES_PER_UNIT), round6(at[1] * METRES_PER_UNIT), round6(at[2] * METRES_PER_UNIT)],
       tilt: round6((angle * 180) / Math.PI),

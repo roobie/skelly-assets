@@ -547,7 +547,7 @@ describe('attachment parts and export metadata', () => {
       const { familyName, params, part } = attachmentBuild(id);
       const metadata = attachmentMetadata(familyName, params, gunDomain.units.metresPerUnit, part)!;
       const port = part.ports.find(({ gender, mount }) => gender === 'male' && mount === metadata.mount);
-      expect(metadata.mountFrame).toEqual(port && { normal: port.normal, up: port.up });
+      expect(metadata.mountFrame).toEqual(port && { normal: toFileAxes(port.normal), up: toFileAxes(port.up) });
       expect(gltf.issues.numErrors).toBe(0);
       expect(gltf.issues.numWarnings).toBe(0);
       expect(nodes).toContain(partNodeName(id, attachmentFamily(id)));
