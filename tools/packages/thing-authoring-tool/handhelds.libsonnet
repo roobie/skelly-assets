@@ -8,7 +8,9 @@ local atom(id, family, massKg, dimensions, finish, solid='body') = {
 };
 local key(id, massKg, bowRadius, shaftLength, metal) = atom(id, 'key', massKg, {
   bowRadius: bowRadius, shaftLength: shaftLength, shaftWidth: 0.012, thickness: 0.003, toothDepth: 0.008,
-}, { metal: metal }, 'shaft');
+}, { metal: metal }, 'shaft') + {
+  taxonomy: { category: 'keys', tags: { material: ['metal'] } },
+};
 local melee(id, family, massKg, dimensions, finish) = {
   id: id,
   exportMass: 'parts',
@@ -61,7 +63,7 @@ local held(id, solid, fraction, hold='upright', roll=90) = {
     back: 0.115, joinAt: 0.01, reach: 0.247, spine: 0.015, drop: 0.028, thickness: 0.006, handleRadius: 0.011, guardHalf: 0.016, guardDepth: 0.012,
   }, { handle: 'plastic-black', guard: 'steel-stainless', blade: 'steel-stainless' }) + held('kitchen_knife', 'handle', [0.491935483871, 0.5, 0.5], hold='forward', roll=0) + {
     anchors: { strike: datum('kitchen_knife', 'blade', [0.99625, 0.636363636364, 0.5]) },
-  },
+  } + { taxonomy: { category: 'household' } },
   melee('machete', 'knife', 0.55, {
     back: 0.274, joinAt: -0.15, reach: 0.245, spine: 0.02, drop: 0.05, thickness: 0.006, handleRadius: 0.014, guardHalf: 0.022, guardDepth: 0.014,
   }, { handle: 'wood-walnut', guard: 'steel-grey', blade: 'steel-grey' }) + held('machete', 'handle', [0.612903225806, 0.5, 0.5], hold='forward', roll=0) + {
@@ -82,7 +84,7 @@ local held(id, solid, fraction, hold='upright', roll=90) = {
   },
   melee('flashlight', 'flashlight', 0.25, {
     length: 0.2, bodyRadius: 0.022, headRadius: 0.033, headLength: 0.05, lensDepth: 0.006,
-  }, { body: 'polymer-black', lens: 'plastic-white' }),
+  }, { body: 'polymer-black', lens: 'plastic-white' }) + { taxonomy: { category: 'lighting' } },
   atom('compass', 'compass', 0.120, { radius: 0.03, height: 0.009, bezelHeight: 0.004, dialHeight: 0.001 }, { body: 'plastic-black', bezel: 'steel-grey', dial: 'paint-cream', lubber: 'plastic-white' }, 'body') + {
     display: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5], normal: [0, 1, 0], up: [0, 0, -1] },
     anchors: { needle_mount: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5] } },
@@ -104,5 +106,7 @@ local held(id, solid, fraction, hold='upright', roll=90) = {
   key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass'),
   key('shed_key', 0.010, 0.012, 0.038, 'steel-grey'),
   key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued'),
-  atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card'),
+  atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card') + {
+    taxonomy: { category: 'keys', tags: { material: ['plastic'] } },
+  },
 ]

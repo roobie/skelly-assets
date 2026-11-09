@@ -20,5 +20,5 @@ local circlet(r, ht) =
   // A circlet 170 mm across and 25 mm tall: a band of dark wood with copper bands round both edges, copper studs
   // and a pointed copper plaque at the brow.
   h.compound('copper_circlet', 0.7, circlet(0.085, 0.025), { band: 'wood-oak', trim: 'copper' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['wood', 'metal'] } } },
 ]

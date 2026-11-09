@@ -90,5 +90,5 @@ local runeEngine = [
     h.disc('dot-a', 'rune', 0.005, 0.026, 0.03, 0.049, -0.032),
     h.disc('dot-b', 'rune', 0.005, 0.026, 0.03, -0.049, 0.036),
     h.disc('dot-c', 'rune', 0.005, 0.026, 0.03, -0.052, -0.023),
-  ], { clay: 'clay-terracotta', rune: 'gem-aquamarine' }) + h.inHand('rune_clay_tablet', 'slab') + { voxelGrain: 0.002 },
+  ], { clay: 'clay-terracotta', rune: 'gem-aquamarine' }) + h.inHand('rune_clay_tablet', 'slab') + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['ceramic'] } } },
 ]

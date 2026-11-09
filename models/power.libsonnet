@@ -3,6 +3,7 @@
 // a power pack with glowing windows on the back. Hydraulic pistons run along the thighs, shins and forearms; the
 // shoulder plates are slanted slabs, not domes. Worn shells only. Slot `glow` is the set's own light: the game lights
 // the material (a game's glow colour, arpg1: data/art.gd POWER_GLOW).
+local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
@@ -154,10 +155,10 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-[
+armour.of('sci-fi', [
   local seg = std.split(r.id, '_worn_')[1];
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
   h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + { voxelGrain: 0.004 },
-]
+])

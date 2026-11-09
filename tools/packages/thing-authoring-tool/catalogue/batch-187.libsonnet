@@ -173,5 +173,5 @@ local braFlat(r, depth) =
     panel: 'latex-pale',
     hem: 'cloth-heather-grey',
     seam: 'cloth-heather-grey',
-  }) + { voxelGrain: 0.002 },
+  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { slot: ['torso'] } } },
 ]

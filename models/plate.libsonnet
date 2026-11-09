@@ -2,6 +2,7 @@
 // over a plackart with a keel, three fauld lames and tassets, a lamed gorget, rounded pauldrons with stepped lames,
 // rerebraces, couters with a wing, vambraces, steel gauntlets, cuisses, poleyns, greaves, pointed sabatons and an armet
 // with a pointed visor. Worn shells only.
+local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
@@ -153,7 +154,7 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
 local boots = fit.feet('sabaton_plate', sabaton,
                        { l: 0.35, w: 0.13, s: 0.04, toe: 0.075, instep: 0.115, top: 0.28, shaft: 0.15, laces: 0 }).rows;
 
-[
+armour.of('medieval', [
   row('armor_plate_worn_body', body),
   row('armor_plate_worn_upper', upper, 0.008),
   row('armor_plate_worn_fore', fore),
@@ -165,4 +166,4 @@ local boots = fit.feet('sabaton_plate', sabaton,
   for r in gloves + boots
 ] + [
   h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { voxelGrain: 0.006 },
-]
+])

@@ -45,11 +45,11 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     flangeHeight: 0.004, flangeInset: 0.002, windings: 6, grooveDepth: 0.002,
   }, { core: 'plastic-black', winding: 'copper' }) + { voxelGrain: 0.004 },
   // A 32 mm outer diameter compression spring of 4 mm stock, eight turns.
-  item('small_spring', 'coil', 0.020, { radius: 0.014, tubeRadius: 0.002, turns: 8, pitch: 0.005 }, { body: 'steel-grey' }) + { voxelGrain: 0.002 },
+  item('small_spring', 'coil', 0.020, { radius: 0.014, tubeRadius: 0.002, turns: 8, pitch: 0.005 }, { body: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['metal'] } } },
   // Four 75 mm brass butt hinges with steel pins, opened flat, two by two.
   compound('hinge_set', 0.360,
     hinge('a', -0.040, -0.034) + hinge('b', 0.040, -0.034) + hinge('c', -0.040, 0.034) + hinge('d', 0.040, 0.034),
-    { leaf: 'brass', knuckle: 'steel-grey' }) + { voxelGrain: 0.002 },
+    { leaf: 'brass', knuckle: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A small hardware box with three wood screws laid on its lid.
   compound('fastener_pack', 0.180, [
     box('tray', 'box', [-0.045, 0, -0.030], [0.045, 0.034, 0.030]),
@@ -57,7 +57,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     screw('screw-a', -0.016),
     screw('screw-b', 0),
     screw('screw-c', 0.016),
-  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { voxelGrain: 0.002 },
+  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['metal'] } } },
   // A pocket torch strapped to a steel plate with two tape bands.
   compound('taped_flashlight_mount', 0.120, [
     box('plate', 'plate', [-0.060, 0, -0.025], [0.065, 0.003, 0.025]),
@@ -65,11 +65,11 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     turned('lens', 'lens', 'x', [[0.125, 0], [0.125, 0.017], [0.130, 0.017], [0.130, 0]], [-0.060, 0.022, 0]),
     box('band-a', 'band', [-0.040, 0, -0.021], [-0.032, 0.041, 0.021]),
     box('band-b', 'band', [0.010, 0, -0.021], [0.018, 0.041, 0.021]),
-  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { voxelGrain: 0.004 },
+  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts' } },
   // A vertical grip: an 80 mm wood handle in a rubber sleeve under a clamp plate.
   compound('scrap_foregrip', 0.180, [
     box('plate', 'plate', [-0.025, 0.080, -0.025], [0.025, 0.086, 0.025]),
     turned('handle', 'handle', 'y', [[0, 0], [0, 0.018], [0.010, 0.022], [0.070, 0.022], [0.080, 0.018], [0.080, 0]]),
     turned('sleeve', 'sleeve', 'y', [[0.015, 0], [0.015, 0.0235], [0.065, 0.0235], [0.065, 0]]),
-  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { voxelGrain: 0.004 },
+  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts' } },
 ]

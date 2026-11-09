@@ -49,6 +49,7 @@ local muzzleX = 0.49;
     grip: 'rubber-black',
     glow: 'crystal-glow-blue',
   }) + {
+    taxonomy: { category: 'weapons', tags: { weapon: ['energy'], setting: ['sci-fi'] } },
     handling: h.gripOn('bolt_plasma_caster', 'grip'),
     voxelGrain: 0.004,
   },

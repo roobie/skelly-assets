@@ -20,5 +20,5 @@ local held(id, solid) = { handling: h.gripOn(id, solid) };
     flat('neck', 'blade', [[-0.015, 0.700], [0.015, 0.700], [0.026, 0.780], [-0.026, 0.780]], 0.022),
     flat('blade', 'blade', [[-0.026, 0.780], [0.026, 0.780], [0.024, 0.850], [-0.024, 0.850]], 0.014),
     flat('tip', 'tip', [[-0.024, 0.850], [0.024, 0.850], [0.010, 0.890], [0, 0.900], [-0.010, 0.890]], 0.010),
-  ], { shaft: 'wood-pine', bark: 'bark', blade: 'wood-pine', tip: 'coal-black' }) + held('digging_stick', 'shaft') + { voxelGrain: 0.004 },
+  ], { shaft: 'wood-pine', bark: 'bark', blade: 'wood-pine', tip: 'coal-black' }) + held('digging_stick', 'shaft') + { voxelGrain: 0.004 } + { taxonomy: { tags: { material: ['wood'], setting: ['prehistoric'] } } },
 ]
