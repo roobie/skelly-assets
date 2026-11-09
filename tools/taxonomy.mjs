@@ -49,7 +49,7 @@ export function readVocabulary(root = repo) {
 }
 
 // One model's departures from the vocabulary: malformed taxonomy, unknown category, facet or term.
-function modelProblems({ pack, id, taxonomy }, vocabulary) {
+export function modelProblems({ pack, id, taxonomy }, vocabulary) {
   const at = `${pack}/${id}`;
   const problems = [];
   const unknown = (facet, term) => problems.push({ pack, id, problem: 'unknown-term', facet, term, message: `${at}: ${facet} ${term} is not in ${VOCABULARY}` });

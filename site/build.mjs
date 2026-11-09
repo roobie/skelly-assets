@@ -52,11 +52,9 @@ const models = manifest.models
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
   }));
 
-// Each vehicle the manifest places (tools/placements.mjs), with the model at each site. A vehicle shows the tags of its
-// root part, the body every other part is placed on, because each vehicle's file tags its own rows and shared parts
-// carry none of its tags.
+// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.
 const modelsById = new Map(models.map((model) => [model.id, model]));
-const vehicles = (manifest.vehicles ?? []).map(({ id, pack, path }) => {
+const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
@@ -64,7 +62,7 @@ const vehicles = (manifest.vehicles ?? []).map(({ id, pack, path }) => {
   return {
     id,
     placements: `${pack}/${path}`,
-    tags: modelsById.get(sites[0].part).tags,
+    tags: tags ?? {},
     sites: sites.map(({ id: site, part, at, mirror }) => ({ site, model: part, at, ...(mirror ? { mirror } : {}) })),
   };
 });

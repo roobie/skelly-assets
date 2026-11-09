@@ -1,0 +1,4 @@
+{
+  "_doc": "Pack metadata by pack id. dependsOn: the packs whose models this pack refers to, which a consumer loads with it; a vehicle may place a part from another pack only through it. Read by tools/packs.mjs; the why is in docs/decisions/0001-vehicle-placements.md.",
+  "packs": {}
+}
