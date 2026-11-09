@@ -1,0 +1,6721 @@
+[
+  {
+    "id": "alexandrite_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Alexandrite and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small alexandrite set in the face of each.",
+    "notes": "Caps for six upper front teeth on an arch 44 mm across and 12 mm tall, standing on their biting edge, face on +z, a stone in the face of each cap. Slot `teeth` is new: a grill sits under any mask or bandana, so `face` does not fit. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Diamond and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small diamond set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Garnet and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small garnet set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Amethyst and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small amethyst set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Aquamarine and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small aquamarine set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Emerald and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small emerald set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Ruby and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small ruby set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Peridot and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small peridot set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Sapphire and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small sapphire set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Tourmaline and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small tourmaline set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Citrine and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small citrine set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Blue topaz and gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece, a small blue topaz set in the face of each.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gold_dental_grill",
+    "model": "dental_grill",
+    "name": "Gold dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "metal-gold",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped gold caps for the six upper front teeth, joined in one piece and polished bright.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "platinum_dental_grill",
+    "model": "dental_grill",
+    "name": "Platinum dental grill",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "steel-stainless",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0005
+    },
+    "description": "Shaped platinum caps for the six upper front teeth, joined in one piece and polished bright.",
+    "notes": "Rides on the `dental_grill` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Alexandrite and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small alexandrites.",
+    "notes": "A rigid bangle 66 mm across lying flat, ten small stones round its top face. Slot `wrist` is new: no existing slot fits a bracelet. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "copper_bracelet",
+    "model": "gem_bracelet",
+    "name": "Copper bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "gem": "copper",
+      "metal": "copper"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid copper bangle studded round its top with small raised beads.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "metal-gold",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle studded round its top with small raised beads.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "metal-silver",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle studded round its top with small raised beads.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "steel-stainless",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle studded round its top with small raised beads.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Diamond and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small clear diamonds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Garnet and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small dark red garnets.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Amethyst and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small purple amethysts.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Aquamarine and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small pale blue aquamarines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Emerald and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small green emeralds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Ruby and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small red rubies.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Peridot and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small yellow-green peridots.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Sapphire and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small deep blue sapphires.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Tourmaline and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small pink tourmalines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Citrine and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small golden citrines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Blue topaz and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small sky-blue topazes.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Opal and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small milky opals.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_gold_bracelet",
+    "model": "gem_bracelet",
+    "name": "Pearl and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid gold bangle set round its top with small pearls.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Diamond and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small clear diamonds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Garnet and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small dark red garnets.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Amethyst and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small purple amethysts.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Aquamarine and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small pale blue aquamarines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Emerald and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small green emeralds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Alexandrite and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small alexandrites.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Ruby and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small red rubies.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Peridot and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small yellow-green peridots.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Sapphire and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small deep blue sapphires.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Tourmaline and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small pink tourmalines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Citrine and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small golden citrines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Blue topaz and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small sky-blue topazes.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Opal and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small milky opals.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_silver_bracelet",
+    "model": "gem_bracelet",
+    "name": "Pearl and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid silver bangle set round its top with small pearls.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Diamond and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small clear diamonds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Garnet and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small dark red garnets.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Amethyst and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small purple amethysts.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Aquamarine and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small pale blue aquamarines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Emerald and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small green emeralds.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Alexandrite and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small alexandrites.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Ruby and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small red rubies.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Peridot and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small yellow-green peridots.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Sapphire and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small deep blue sapphires.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Tourmaline and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small pink tourmalines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Citrine and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small golden citrines.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Blue topaz and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small sky-blue topazes.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Opal and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small milky opals.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_platinum_bracelet",
+    "model": "gem_bracelet",
+    "name": "Pearl and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A rigid platinum bangle set round its top with small pearls.",
+    "notes": "Rides on the `gem_bracelet` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Alexandrite and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with an alexandrite hanging from it.",
+    "notes": "A pair of 16 mm hoops lying flat side by side, a 7 mm stone hanging from each. Slot `earlobes` is new: earrings are worn alongside ear muffs and hoods, so neither `ears` nor `hood` fits. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Diamond and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a clear diamond hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Garnet and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a dark red garnet hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Amethyst and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a purple amethyst hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Aquamarine and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a pale blue aquamarine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Emerald and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a green emerald hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Ruby and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a red ruby hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Peridot and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a yellow-green peridot hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Sapphire and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a deep blue sapphire hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Tourmaline and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a pink tourmaline hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Citrine and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a golden citrine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Blue topaz and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a sky-blue topaz hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Opal and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a milky opal hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_gold_earrings",
+    "model": "gem_earrings",
+    "name": "Pearl and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small gold hoop earrings, each with a pearl hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Diamond and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a clear diamond hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Garnet and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a dark red garnet hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Amethyst and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a purple amethyst hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Aquamarine and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a pale blue aquamarine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Emerald and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a green emerald hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Alexandrite and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with an alexandrite hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Ruby and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a red ruby hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Peridot and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a yellow-green peridot hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Sapphire and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a deep blue sapphire hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Tourmaline and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a pink tourmaline hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Citrine and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a golden citrine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Blue topaz and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a sky-blue topaz hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Opal and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a milky opal hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_silver_earrings",
+    "model": "gem_earrings",
+    "name": "Pearl and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small silver hoop earrings, each with a pearl hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Diamond and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a clear diamond hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Garnet and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a dark red garnet hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Amethyst and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a purple amethyst hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Aquamarine and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a pale blue aquamarine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Emerald and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a green emerald hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Alexandrite and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with an alexandrite hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Ruby and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a red ruby hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Peridot and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a yellow-green peridot hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Sapphire and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a deep blue sapphire hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Tourmaline and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a pink tourmaline hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Citrine and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a golden citrine hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Blue topaz and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a sky-blue topaz hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Opal and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a milky opal hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_platinum_earrings",
+    "model": "gem_earrings",
+    "name": "Pearl and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of small platinum hoop earrings, each with a pearl hanging from it.",
+    "notes": "Rides on the `gem_earrings` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Alexandrite and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with an alexandrite hanging from it in a round setting.",
+    "notes": "A 450 mm chain laid in a ring 140 mm across, an 18 mm stone pendant on a bail at its front. Slot `neck` is new: no existing slot fits a necklace. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Garnet and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a dark red garnet hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Diamond and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a clear diamond hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Amethyst and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a purple amethyst hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Aquamarine and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a pale blue aquamarine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Emerald and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a green emerald hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Ruby and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a red ruby hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Peridot and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a yellow-green peridot hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Sapphire and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a deep blue sapphire hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Tourmaline and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a pink tourmaline hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Citrine and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a golden citrine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Blue topaz and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a sky-blue topaz hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Opal and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a milky opal hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_gold_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Pearl and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain with a pearl hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Garnet and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a dark red garnet hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Diamond and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a clear diamond hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Amethyst and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a purple amethyst hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Aquamarine and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a pale blue aquamarine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Emerald and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a green emerald hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Alexandrite and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with an alexandrite hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Ruby and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a red ruby hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Peridot and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a yellow-green peridot hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Sapphire and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a deep blue sapphire hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Tourmaline and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a pink tourmaline hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Citrine and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a golden citrine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Blue topaz and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a sky-blue topaz hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Opal and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a milky opal hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_silver_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Pearl and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain with a pearl hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Garnet and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a dark red garnet hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Diamond and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a clear diamond hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Amethyst and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a purple amethyst hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Aquamarine and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a pale blue aquamarine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Emerald and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a green emerald hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Alexandrite and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with an alexandrite hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Ruby and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a red ruby hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Peridot and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a yellow-green peridot hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Sapphire and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a deep blue sapphire hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Tourmaline and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a pink tourmaline hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Citrine and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a golden citrine hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Blue topaz and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a sky-blue topaz hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Opal and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a milky opal hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_platinum_pendant_necklace",
+    "model": "gem_pendant_necklace",
+    "name": "Pearl and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain with a pearl hanging from it in a round setting.",
+    "notes": "Rides on the `gem_pendant_necklace` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Alexandrite and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with an alexandrite in a cup setting on top.",
+    "notes": "A finger ring 21 mm across and 4 mm wide standing on its edge, its stone in a cup setting on top. Slot `finger` is new: no existing slot fits a ring, and one slot means one ring is worn at a time. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_ring",
+    "model": "gem_ring",
+    "name": "Diamond ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a clear diamond in a cup setting on top.",
+    "notes": "A gold ring with one diamond; it rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "copper_ring",
+    "model": "gem_ring",
+    "name": "Copper ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "gem": "copper",
+      "metal": "copper"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain copper finger ring with a raised boss on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gold_ring",
+    "model": "gem_ring",
+    "name": "Gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "metal-gold",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain gold finger ring with a raised boss on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "platinum_ring",
+    "model": "gem_ring",
+    "name": "Platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "steel-stainless",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain platinum finger ring with a raised boss on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "silver_ring",
+    "model": "gem_ring",
+    "name": "Silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "metal-silver",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain silver finger ring with a raised boss on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The plain piece has no stone, so the stone slot takes the metal and reads as a raised boss. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Garnet and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a dark red garnet in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Amethyst and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a purple amethyst in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Aquamarine and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a pale blue aquamarine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Emerald and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a green emerald in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Ruby and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a red ruby in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Peridot and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a yellow-green peridot in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Sapphire and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a deep blue sapphire in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Tourmaline and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a pink tourmaline in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Citrine and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a golden citrine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Blue topaz and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a sky-blue topaz in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Opal and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a milky opal in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_gold_ring",
+    "model": "gem_ring",
+    "name": "Pearl and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold finger ring with a pearl in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Diamond and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a clear diamond in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Garnet and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a dark red garnet in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Amethyst and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a purple amethyst in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Aquamarine and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a pale blue aquamarine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Emerald and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a green emerald in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Alexandrite and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with an alexandrite in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Ruby and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a red ruby in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Peridot and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a yellow-green peridot in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Sapphire and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a deep blue sapphire in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Tourmaline and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a pink tourmaline in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Citrine and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a golden citrine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Blue topaz and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a sky-blue topaz in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Opal and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a milky opal in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_silver_ring",
+    "model": "gem_ring",
+    "name": "Pearl and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver finger ring with a pearl in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Diamond and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a clear diamond in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Garnet and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a dark red garnet in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Amethyst and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a purple amethyst in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Aquamarine and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a pale blue aquamarine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Emerald and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a green emerald in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Alexandrite and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with an alexandrite in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Ruby and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a red ruby in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Peridot and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a yellow-green peridot in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Sapphire and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a deep blue sapphire in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Tourmaline and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a pink tourmaline in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Citrine and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a golden citrine in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Blue topaz and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a sky-blue topaz in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Opal and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a milky opal in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_platinum_ring",
+    "model": "gem_ring",
+    "name": "Pearl and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum finger ring with a pearl in a cup setting on top.",
+    "notes": "Rides on the `gem_ring` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open middle of the piece. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Alexandrite and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with alexandrites across its face.",
+    "notes": "Standing upright, front on +z: a band 150 mm across, rising from 12 mm at the ends to a 47 mm peak, five larger stones across the front and a row of chips along the foot. Slot `head`, so it cannot be worn under a hat or helmet. The model is finished in gold with a purple stone for the alexandrite; every other metal and stone rides on it through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Garnet and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with dark red garnets across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Diamond and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with clear diamonds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Amethyst and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with purple amethysts across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Aquamarine and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with pale blue aquamarines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Emerald and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with green emeralds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Alexandrite and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with alexandrites across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Ruby and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with red rubies across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Peridot and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with yellow-green peridots across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Sapphire and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with deep blue sapphires across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Tourmaline and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with pink tourmalines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Citrine and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with golden citrines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Blue topaz and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with sky-blue topazes across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Opal and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with milky opals across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_platinum_tiara",
+    "model": "gem_tiara",
+    "name": "Pearl and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "steel-stainless"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum tiara rising to a peak at the front, set with pearls across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Platinum takes `steel-stainless`, a darker grey than silver. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Garnet and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with dark red garnets across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Diamond and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with clear diamonds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Amethyst and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with purple amethysts across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Aquamarine and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with pale blue aquamarines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Emerald and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with green emeralds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Ruby and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with red rubies across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Peridot and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with yellow-green peridots across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Sapphire and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with deep blue sapphires across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Tourmaline and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with pink tourmalines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Citrine and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with golden citrines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Blue topaz and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with sky-blue topazes across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Opal and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with milky opals across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_gold_tiara",
+    "model": "gem_tiara",
+    "name": "Pearl and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-gold"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold tiara rising to a peak at the front, set with pearls across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "garnet_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Garnet and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with dark red garnets across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "diamond_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Diamond and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-clear",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with clear diamonds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "amethyst_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Amethyst and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with purple amethysts across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "aquamarine_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Aquamarine and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with pale blue aquamarines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "emerald_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Emerald and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with green emeralds across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "alexandrite_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Alexandrite and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-purple",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with alexandrites across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Alexandrite shifts colour with the light; it takes `gem-purple`, as amethyst does. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ruby_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Ruby and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-red",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with red rubies across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "peridot_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Peridot and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "syrup-green",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with yellow-green peridots across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No yellow-green gem finish exists, so it takes the see-through `syrup-green`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sapphire_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Sapphire and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with deep blue sapphires across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tourmaline_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Tourmaline and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-pink",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with pink tourmalines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pink gem finish exists, so it takes the see-through `plastic-clear-pink`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "citrine_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Citrine and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-amber",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with golden citrines across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No yellow gem finish exists, so it takes the see-through `plastic-amber`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "blue_topaz_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Blue topaz and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "plastic-clear-blue",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with sky-blue topazes across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. No pale blue gem finish exists, so it takes the see-through `plastic-clear-blue`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "opal_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Opal and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with milky opals across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pearl_and_silver_tiara",
+    "model": "gem_tiara",
+    "name": "Pearl and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "gem": "gem-opaque",
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver tiara rising to a peak at the front, set with pearls across its face.",
+    "notes": "Rides on the `gem_tiara` model through `finishes`. Opal and pearl share `gem-opaque`. The box spans the open curve of the band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "angel_halo_headband",
+    "model": "angel_halo_headband",
+    "name": "Halo headband",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A white plastic headband with two thin wires holding a shiny gold ring above it, part of a costume.",
+    "notes": "Standing on the tips of its 150 mm band, two wires rising to a gold ring 150 mm across and 12 mm thick held 145 mm up. Slot `head`, so it cannot be worn under a hat. The box counts the air inside the band and the ring. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "angel_wings",
+    "model": "angel_wings",
+    "name": "Costume wings",
+    "category": "clothing",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.003
+    },
+    "description": "A large pair of white feathered wings on a padded base, worn on the back by two elastic shoulder loops.",
+    "notes": "Laid flat, back up: 800 mm from tip to tip and 460 mm deep, layered flight feathers and a row of coverts on each wing, a centre plate with two elastic loops. Slot `back`, as packs take it, since the wings fill the same space. Laid out, the box spans the feathers' full spread. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "deputy_badge",
+    "model": "deputy_badge",
+    "name": "Deputy badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.001
+    },
+    "description": "A six-pointed star with a ball on each point and a raised round seal, its silver plating dulled with age. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up: a 64 mm star of tarnished silver-plated brass, ball tips, a raised seal ringed with dark lettering, a pin behind. Slot `badge`, as earlier batches named it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "detective_badge",
+    "model": "detective_badge",
+    "name": "Detective badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.001
+    },
+    "description": "A gold shield in a black leather holder, with a polished rim, a blue enamel seal, a line of lettering across its crown and a number plate at its foot. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up, crown toward -z: a 60 by 70 mm gold-plated brass shield with a polished rim, clipped in a black leather holder that shows round its edge. Slot `badge`, as earlier batches named it. The box spans the whole flat shield and its holder. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "doctors_name_tag",
+    "model": "doctors_name_tag",
+    "name": "Doctor's name tag",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.003
+    },
+    "description": "A white plastic name tag with a blue band across the top and two printed lines, clipped on at the chest.",
+    "notes": "Lying face up: a 76 by 25 mm tag with a blue band, two printed lines and a clip behind. Slot `badge`, as earlier batches named it. The model keeps the tag's real size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "federal_agent_badge",
+    "model": "federal_agent_badge",
+    "name": "Federal agent badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.001
+    },
+    "description": "A gold shield topped by an eagle with spread wings, a raised seal with a standing figure holding scales at its centre and engraved lines above and below. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up, crown toward -z: a 56 by 78 mm gold-plated brass shield with an eagle on its crown, a dull brass seal with a raised figure and scales, two lines of dark lettering. Named without the agency, as the catalogue keeps real names out. Slot `badge`, as earlier batches named it. The box spans the whole flat shield. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "kids_star_badge",
+    "model": "kids_star_badge",
+    "name": "Kid's meal star badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.003
+    },
+    "description": "A yellow plastic star with a red band of print across it, given away with a children's meal. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up: a 70 mm yellow plastic star with a red band and white print, a pin behind. Named without the fast-food brand. Slot `badge`, as earlier batches named it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "marshal_badge",
+    "model": "marshal_badge",
+    "name": "Marshal badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.001
+    },
+    "description": "A bright silver five-pointed star set inside a ring engraved with lettering, a polished boss at its centre. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up: a 62 mm silver-plated brass star standing proud of a ring of the same metal, its lettering engraved between the star's points, a mirror-bright centre boss and a pin behind. Slot `badge`, as earlier batches named it. The box spans the whole flat badge. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "swat_badge",
+    "model": "swat_badge",
+    "name": "SWAT badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.001
+    },
+    "description": "A shield with a bright silver rim round a blackened field, a gold star at its crown and a silver ribbon of lettering across its lower half. A pin on the back fixes it to clothing.",
+    "notes": "Lying face up, crown toward -z: a 60 by 70 mm silver-plated brass shield with a blackened field, a gold star and a silver ribbon with black lettering, a pin behind. Slot `badge`, as earlier batches named it. The box spans the whole flat shield. The worn look is pending: no worn model is authored."
+  }
+]

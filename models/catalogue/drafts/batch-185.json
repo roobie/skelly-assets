@@ -1,0 +1,408 @@
+[
+  {
+    "id": "long_santa_dress",
+    "model": "long_santa_dress",
+    "name": "Long Christmas dress",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A floor-length red cotton dress with full sleeves, a black belt and thick white faux-fur trim at the collar, cuffs and hem. Warm, if hard to run in.",
+    "notes": "Folded on a shelf, neck at +z, 380 mm by 436 mm and 96 mm tall: red body and flat sleeves, a white faux-fur collar, cuffs and hem trim turned over the fold, and a black belt with a gold buckle, on `g.jacket`. Faux fur uses `fur-pale`. It covers the arms and legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "short_santa_dress",
+    "model": "short_santa_dress",
+    "name": "Short Christmas dress",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A short sleeveless red cotton dress trimmed with white faux fur at the neck, armholes and hem.",
+    "notes": "Folded on a shelf, neck at +z, 344 mm by 332 mm and 60 mm tall: red body with no sleeves, white faux-fur neckline, armhole and hem trim, on `g.jacket`. Faux fur uses `fur-pale`. Slot `torso`, as dresses take; it covers the legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "grass_shirt",
+    "model": "grass_shirt",
+    "name": "Grass shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.006
+    },
+    "description": "A bulky short-sleeved shirt woven by hand from dried grass, ragged at the hem. It scratches, but it is better than nothing.",
+    "notes": "Folded on a shelf, neck at +z, 360 mm by 404 mm and 104 mm tall: pale straw body and sleeves crossed by raised jute bands of weave, a jute neck binding and a ragged fringe of grass hanging past the hem, on `g.jacket`. Dried grass uses `straw-pale`. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gothic_dress",
+    "model": "gothic_dress",
+    "name": "Gothic dress",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A long black cotton dress with full sleeves, a high red collar, red cuffs and red embroidery laced down the bodice.",
+    "notes": "Folded on a shelf, neck at +z, 368 mm by 424 mm and 100 mm tall: black body and sleeves, a tall crimson stand collar, crimson cuffs and hem binding, and crimson lacing and embroidery lines down the front, on `g.jacket`. Slot `torso`, as dresses take; it covers the legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "short_gothic_dress",
+    "model": "short_gothic_dress",
+    "name": "Short gothic dress",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A short red cotton dress in a doll-like gothic cut, with black cuffs, a black bow at the chest and a black ruffled hem.",
+    "notes": "Folded on a shelf, neck at +z, 328 mm by 316 mm and 68 mm tall: red body and sleeves, black collar, cuffs, front placket and bow, and a row of black ruffle scallops along the hem, on `g.jacket`. Slot `torso`, as dresses take; it covers the legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gothic_gown",
+    "model": "gothic_gown",
+    "name": "Gothic gown",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A heavy floor-length gown of deep red and black cotton, with full black sleeves, a laced black bodice, a high collar and layers of ruffles at the hem.",
+    "notes": "Folded on a shelf, neck at +z, 424 mm by 480 mm and 164 mm tall in four folds: crimson body, black sleeves, high black collar and laced black bodice panel with red laces, red cuffs and a black ruffled hem, on `g.jacket`. Slot `torso`, as dresses take; it covers the legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sundress",
+    "model": "sundress",
+    "name": "Sundress",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A light, sleeveless cotton dress with thin shoulder straps and a tie sash, made for hot days.",
+    "notes": "Folded on a shelf, neck at +z, 308 mm by 324 mm and 44 mm tall: yellow cotton body with a cream-lined scoop neck, yellow shoulder straps, a cream sash tied in a bow at the waist and a scatter of cream dots, on `h.foldedGarment`. Slot `torso`, as dresses take; it covers the legs too, so it should block `legs`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sweater",
+    "model": "sweater",
+    "name": "Wool sweater",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A thick knitted wool sweater with cables down the front and ribbed neck, cuffs and hem.",
+    "notes": "Folded on a shelf, neck at +z, 352 mm by 348 mm and 84 mm tall: cream wool body and sleeves, a crew collar, a ribbed hem band turned over the fold, ribbed cuffs and three raised cable columns down the front, on `g.jacket`. Knit uses `cloth-cream` with raised ribs, as no knit finish exists. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sweatshirt",
+    "model": "sweatshirt",
+    "name": "Sweatshirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A thick, soft cotton pullover with a fleecy inside and ribbed neck, cuffs and waistband.",
+    "notes": "Folded on a shelf, neck at +z, 376 mm by 348 mm and 92 mm tall: heather-grey body and sleeves with charcoal ribbed collar, cuffs and waistband, and a charcoal V below the collar, on `g.jacket`. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tallit_katan",
+    "model": "tallit_katan",
+    "name": "Fringed undershirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A plain white cotton undershirt cut square, with a knotted fringe of white cords at each of its four corners, worn under everyday clothes as a religious observance.",
+    "notes": "Folded on a shelf, neck at +z, 400 mm across the spread fringes, 308 mm deep and 40 mm tall: cream body with a white-lined neck, a navy stripe near the hem and four knotted cotton cord tassels hanging over the sides at the corners, on `h.foldedGarment`. The fringes widen the box. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "work_t_shirt",
+    "model": "work_t_shirt",
+    "name": "Work t-shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "chest pocket"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0025
+    },
+    "description": "A grey t-shirt of heavy canvas cloth with a single chest pocket, made for workshop and site work.",
+    "notes": "Folded on a shelf, neck at +z, 304 mm by 304 mm and 48 mm tall: grey canvas body and sleeves, a charcoal crew collar and one chest pocket with a black pen clipped in it, on `g.jacket`. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tshirt",
+    "model": "tshirt",
+    "name": "T-shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A cotton tee with short sleeves and no print.",
+    "notes": "Folded on a shelf, neck at +z, 280 mm square and 28 mm tall: blue cotton body and sleeves with a navy crew collar, on `g.jacket`. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "crop_top",
+    "model": "crop_top",
+    "name": "Crop top",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A short-sleeved cotton t-shirt cut short above the waist.",
+    "notes": "Folded on a shelf, neck at +z, 260 mm by 184 mm and 24 mm tall: purple cotton body and sleeves, the body cut short, with a cream crew collar and hem binding, on `g.jacket`. Slot `torso`, as shirts take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "uttarasanga",
+    "model": "uttarasanga",
+    "name": "Monk's upper robe",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A large rectangle of saffron cotton pieced together from patches, wrapped over one shoulder and round the upper body by Buddhist monks, leaving the arms free.",
+    "notes": "Folded into a flat bundle, 320 mm by 240 mm and 44 mm tall: saffron cloth with raised orange seams marking the pieced panels, on `h.foldedGarment`. Slot `torso`; it covers only the torso. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "vest_leather",
+    "model": "vest_leather",
+    "name": "Leather vest",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "left pocket"
+        },
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "right pocket"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0015
+    },
+    "description": "A sleeveless vest of thick leather with a snap front and two flapped pockets. It turns scrapes and keeps the wind off the chest.",
+    "notes": "Folded once, neck at +z, 380 mm by 364 mm and 52 mm tall: chestnut leather body with a deep V neck and armholes painted black, raised edges down the V, a front placket with four steel snaps and two flapped pockets with snaps, on `g.jacket`. Slot `vest`, as the denim vest of batch 112 has it, since it goes over a shirt and covers only the torso. The worn look is pending: no worn model is authored."
+  }
+]

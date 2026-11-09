@@ -1,0 +1,502 @@
+[
+  {
+    "id": "high_carbon_steel_splint_vambraces",
+    "model": "high_carbon_steel_splint_vambraces",
+    "name": "High-carbon steel splint vambraces",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-blued",
+      "splint": "steel-blued"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.7,
+        "pierce": 0.5
+      }
+    },
+    "description": "Short canvas forearm guards with strips of high-carbon steel riveted along them, strapped on at the wrist. They fit over mail.",
+    "notes": "Laid side by side, open side down: each vambrace is a canvas shell curved across the forearm, 120 mm long and 110 mm across, with four steel splints riveted along it between bare canvas strips, leather binding at both ends and one buckled strap. The pair lies side by side with the strap tails out, 316 mm across; each vambrace is 120 mm long. Shares the mild steel pair's model with splints and rivets in `steel-blued`. Slot `arms` follows the earlier clothing batches' arm guards. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_splint_vambraces",
+    "model": "high_carbon_steel_splint_vambraces",
+    "name": "Mild steel splint vambraces",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.6,
+        "pierce": 0.4
+      }
+    },
+    "description": "Short canvas forearm guards with strips of mild steel riveted along them, strapped on at the wrist. They fit over mail.",
+    "notes": "Laid side by side, open side down: each vambrace is a canvas shell curved across the forearm, 120 mm long and 110 mm across, with four steel splints riveted along it between bare canvas strips, leather binding at both ends and one buckled strap. The pair lies side by side with the strap tails out, 316 mm across; each vambrace is 120 mm long. The model's root: splints and rivets in `steel-bright`. Slot `arms` follows the earlier clothing batches' arm guards. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_brigandine_gloves",
+    "model": "mild_steel_brigandine_gloves",
+    "name": "Mild steel brigandine gloves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.32,
+        "cut": 0.54,
+        "pierce": 0.36
+      }
+    },
+    "description": "Canvas gloves with mild steel plates riveted over the backs of the hands and the finger joints.",
+    "notes": "The model's root: plates and rivets in `steel-bright`. Laid flat side by side, backs up, fingers towards +z: canvas gloves 250 mm from cuff to fingertip with leather cuffs and a buckled wrist strap, nine riveted steel plates over the back of each hand and a small plate on each finger joint. The pair lies spread flat with the thumbs out. Slot `hands` is new: none of feet, legs, torso, vest, head, waist or back covers the hands, and no earlier clothing batch named a hand slot. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_brigandine_gloves",
+    "model": "mild_steel_brigandine_gloves",
+    "name": "Medium steel brigandine gloves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "plate": "steel-grey",
+      "rivet": "steel-grey"
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.33,
+        "cut": 0.59,
+        "pierce": 0.41
+      }
+    },
+    "description": "Canvas gloves with medium steel plates riveted over the backs of the hands and the finger joints.",
+    "notes": "Shares the mild steel pair's model with plates and rivets in `steel-grey`. Laid flat side by side, backs up, fingers towards +z: canvas gloves 250 mm from cuff to fingertip with leather cuffs and a buckled wrist strap, nine riveted steel plates over the back of each hand and a small plate on each finger joint. The pair lies spread flat with the thumbs out. Slot `hands` is new: none of feet, legs, torso, vest, head, waist or back covers the hands, and no earlier clothing batch named a hand slot. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_elbow_guards",
+    "model": "mild_steel_elbow_guards",
+    "name": "Mild steel elbow guards",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "elbows",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.21,
+        "cut": 0.36,
+        "pierce": 0.24
+      }
+    },
+    "description": "A pair of thin mild steel cups that strap over the elbows. They fit over mail.",
+    "notes": "The model's root: cop and rim in `steel-bright`. Standing dome up side by side: each guard is a thin pressed steel cop 90 mm across and 30 mm high with a rolled rim, a fan-shaped wing on the outer side and two leather straps. Slot `arms` follows the earlier batches' elbow pads and arm guards, so they cannot be worn with vambraces; one slot cannot say that both guard different parts of the arm. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_elbow_guards",
+    "model": "mild_steel_elbow_guards",
+    "name": "Medium steel elbow guards",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "cop": "steel-grey",
+      "rim": "steel-grey"
+    },
+    "wearable": {
+      "slot": "elbows",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.22,
+        "cut": 0.39,
+        "pierce": 0.27
+      }
+    },
+    "description": "A pair of thin medium steel cups that strap over the elbows. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with cop and rim in `steel-grey`. Standing dome up side by side: each guard is a thin pressed steel cop 90 mm across and 30 mm high with a rolled rim, a fan-shaped wing on the outer side and two leather straps. Slot `arms` follows the earlier batches' elbow pads and arm guards, so they cannot be worn with vambraces; one slot cannot say that both guard different parts of the arm. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_knee_guards",
+    "model": "mild_steel_knee_guards",
+    "name": "Mild steel knee guards",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "knees",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.21,
+        "cut": 0.36,
+        "pierce": 0.24
+      }
+    },
+    "description": "A pair of thin mild steel knee cups with a small plate above and below each, strapped on over the trousers. They fit over mail.",
+    "notes": "Standing dome up side by side: each guard is a 100 mm steel cop 35 mm high with a rolled rim, a curved lame above and below it, a wing on the outer side and two leather straps, 156 mm from the top lame to the bottom one. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_shoulder_guards",
+    "model": "mild_steel_shoulder_guards",
+    "name": "Mild steel shoulder guards",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "fits": [
+      "brigandine"
+    ],
+    "wearable": {
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.6,
+        "pierce": 0.4
+      }
+    },
+    "description": "A pair of shoulder guards made of four overlapping curved mild steel plates on a leather strap, made to be buckled onto a brigandine.",
+    "notes": "Lying crown up side by side: each guard is four overlapping steel lames 150 mm across on a leather strap riveted along their crowns, with a buckle tab at the strap end. The curved lames enclose air. Worn by mounting on a brigandine's shoulder points, so it `fits` `brigandine` and its `wearable` has no slot. Protection and wear follow the mild steel vambraces. The xl and xs sizes share the model."
+  },
+  {
+    "id": "mild_steel_splint_greaves",
+    "model": "mild_steel_splint_greaves",
+    "name": "Mild steel splint greaves",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.6,
+        "pierce": 0.4
+      }
+    },
+    "description": "Canvas shin guards with strips of mild steel riveted along them, buckled on below the knee and at the ankle. They fit over mail.",
+    "notes": "The model's root: splints and rivets in `steel-bright`. Laid side by side, open side down: each greave is a canvas shell curved across the shin, 340 mm from knee to ankle, 140 mm across at the calf and 100 mm at the ankle, with five steel splints riveted along it, leather binding at both ends and two buckled straps. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_splint_greaves",
+    "model": "mild_steel_splint_greaves",
+    "name": "Medium steel splint greaves",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-grey",
+      "splint": "steel-grey"
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.37,
+        "cut": 0.65,
+        "pierce": 0.45
+      }
+    },
+    "description": "Canvas shin guards with strips of medium steel riveted along them, buckled on below the knee and at the ankle. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with splints and rivets in `steel-grey`. Laid side by side, open side down: each greave is a canvas shell curved across the shin, 340 mm from knee to ankle, 140 mm across at the calf and 100 mm at the ankle, with five steel splints riveted along it, leather binding at both ends and two buckled straps. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hardened_steel_splint_leg_guards",
+    "model": "hardened_steel_splint_leg_guards",
+    "name": "Hardened steel splint leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "cop": "steel-parkerized",
+      "rim": "steel-parkerized",
+      "rivet": "steel-parkerized",
+      "splint": "steel-parkerized"
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.42,
+        "cut": 0.75,
+        "pierce": 0.55
+      }
+    },
+    "description": "Full-length canvas leg guards with strips of hardened steel riveted along the thighs and shins and a steel cup over each knee. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with splints, rivets and knee cops in `steel-parkerized`. Laid side by side, open side down: each guard is 780 mm from hip to ankle, a splinted canvas thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section, each section with two buckled straps. The pair lies spread at full length. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "high_carbon_steel_splint_leg_guards",
+    "model": "hardened_steel_splint_leg_guards",
+    "name": "High-carbon steel splint leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "cop": "steel-blued",
+      "rim": "steel-blued",
+      "rivet": "steel-blued",
+      "splint": "steel-blued"
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.7,
+        "pierce": 0.5
+      }
+    },
+    "description": "Full-length canvas leg guards with strips of high-carbon steel, stiffer and harder than the common kind riveted along the thighs and shins and a steel cup over each knee. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with splints, rivets and knee cops in `steel-blued`. Laid side by side, open side down: each guard is 780 mm from hip to ankle, a splinted canvas thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section, each section with two buckled straps. The pair lies spread at full length. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_splint_leg_guards",
+    "model": "hardened_steel_splint_leg_guards",
+    "name": "Mild steel splint leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.6,
+        "pierce": 0.4
+      }
+    },
+    "description": "Full-length canvas leg guards with strips of mild steel riveted along the thighs and shins and a steel cup over each knee. They fit over mail.",
+    "notes": "The model's root: splints, rivets and knee cops in `steel-bright`. Laid side by side, open side down: each guard is 780 mm from hip to ankle, a splinted canvas thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section, each section with two buckled straps. The pair lies spread at full length. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_splint_leg_guards",
+    "model": "hardened_steel_splint_leg_guards",
+    "name": "Medium steel splint leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "cop": "steel-grey",
+      "rim": "steel-grey",
+      "rivet": "steel-grey",
+      "splint": "steel-grey"
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.37,
+        "cut": 0.65,
+        "pierce": 0.45
+      }
+    },
+    "description": "Full-length canvas leg guards with strips of medium-carbon steel, harder than mild steel riveted along the thighs and shins and a steel cup over each knee. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with splints, rivets and knee cops in `steel-grey`. Laid side by side, open side down: each guard is 780 mm from hip to ankle, a splinted canvas thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section, each section with two buckled straps. The pair lies spread at full length. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_splint_leg_guards",
+    "model": "hardened_steel_splint_leg_guards",
+    "name": "Tempered steel splint leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "cop": "steel-heat-tint",
+      "rim": "steel-heat-tint",
+      "rivet": "steel-heat-tint",
+      "splint": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0006,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.44,
+        "cut": 0.78,
+        "pierce": 0.58
+      }
+    },
+    "description": "Full-length canvas leg guards with strips of tempered steel, hard without being brittle riveted along the thighs and shins and a steel cup over each knee. They fit over mail.",
+    "notes": "Shares the mild steel pair's model with splints, rivets and knee cops in `steel-heat-tint`. Laid side by side, open side down: each guard is 780 mm from hip to ankle, a splinted canvas thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section, each section with two buckled straps. The pair lies spread at full length. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  }
+]

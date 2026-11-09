@@ -1,0 +1,827 @@
+[
+  {
+    "id": "barbute",
+    "model": "barbute",
+    "name": "Barbute",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.45,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A close steel helmet that reaches down to the neck, with a Y-shaped opening for the eyes, nose and mouth.",
+    "notes": "Standing upright, front on +z: a steel skull 290 mm tall, 210 mm across and 250 mm front to back, a low keel over the crown, a Y opening and a row of liner rivets. Medium steel in `steel-grey`; the leather lining is inside and not modelled. Openings are drawn flush in a dark finish so they read from the side-on iso view. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl and xs sizes share the model. Protection is a guess for plate steel. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "high_carbon_steel_light_close_helm_visor_up",
+    "model": "high_carbon_steel_light_close_helm_visor_up",
+    "name": "High steel close helm (visor raised)",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0006,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.5,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A rounded high steel helmet with a jutting chin guard and a pointed visor, raised to leave the face open.",
+    "notes": "Standing upright, front on +z: a blued steel skull 310 mm tall and 280 mm front to back with a keel, a bevor jutting over the chin, a short flare at the neck, and the pointed visor swung up over the brow on a pivot each side, with two eye slits. High steel in `steel-blued`. This is the raised state; lowering the visor waits on Deadvox item states, and the lowered helm is its own item. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl size shares the model. Protection is a guess for hardened plate. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sparring_headgear",
+    "model": "sparring_headgear",
+    "name": "Sparring headgear",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.25,
+        "cut": 0.1,
+        "pierce": 0.05
+      }
+    },
+    "description": "Padded red leather headgear for sparring, open at the face, with a brow roll, a chin bar and pads over the ears.",
+    "notes": "Standing upright, front on +z: a padded red hood 230 mm tall with a wide face opening, black brow roll and chin bar, a ringed black ear pad each side and laces up the back. The model keeps the soft hood's worn shape. It covers the mouth too. It is soft padding with no rails or clips, so it is not a `helmet` host. Protection is a guess for foam padding: mostly blunt. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "combat_helmet",
+    "model": "combat_helmet",
+    "name": "Combat helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.55,
+        "cut": 0.7,
+        "pierce": 0.65
+      }
+    },
+    "description": "A tan composite combat helmet cut high at the brow, with an accessory rail along each side, a night-vision mount at the front and a chinstrap.",
+    "notes": "Standing on its rim, front on +z: a tan shell 290 mm front to back and 170 mm tall, black side rails, a black night-vision shroud at the front and a coyote chinstrap lying out in front with its cup. The front low rim shows the dark liner. The model is the helmet's outside, standing, so a closed shape fills its box several times over. Protection is a guess for an aramid shell. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "flak_helmet",
+    "model": "flak_helmet",
+    "name": "Flak helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.15,
+        "blunt": 0.5,
+        "cut": 0.6,
+        "pierce": 0.45
+      }
+    },
+    "description": "A round olive steel helmet with a flared, rolled rim and a leather chinstrap.",
+    "notes": "Standing on its rim, front on +z: an olive drab steel pot 260 mm across, 280 mm front to back and 170 mm tall with a flared rolled rim, its leather chinstrap lying out in front with a brass buckle. The model is the helmet's outside, standing, so a closed shape fills its box several times over. Protection is a guess for a hardened steel pot. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "eagle_helmet",
+    "model": "eagle_helmet",
+    "name": "Eagle helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A carved wooden helmet shaped like an eagle's head. The face looks out through the open beak, and a fan of green and red plumes rises at the back.",
+    "notes": "Standing upright, front on +z: a dark wooden head 270 mm tall, 360 mm to the plume tips and 440 mm from plumes to beak, with cream feather bands round the head, a yellow hooked upper beak over the brow and a lower beak under the chin, an eye on each side and five plumes rising at the back. The cotton lining is inside and not modelled. The plumes and beak reach well out from the head. It covers the mouth too. Protection is a guess for hardwood. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "batting_helmet",
+    "model": "batting_helmet",
+    "name": "Batting helmet",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.45,
+        "cut": 0.3,
+        "pierce": 0.15
+      }
+    },
+    "description": "A glossy blue plastic helmet with an ear flap on each side, a short peak and vent holes in the crown.",
+    "notes": "Standing on its ear flaps, front on +z: a blue shell 210 mm across, 290 mm front to back with its peak and 210 mm tall, open at the face, an ear flap with an ear hole down each side and four vent holes in the crown. The model is the helmet's outside, standing, so a closed shape fills its box several times over. Protection is a guess for a plastic shell over foam. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "bike_helmet",
+    "model": "bike_helmet",
+    "name": "Bike helmet",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.2,
+        "pierce": 0.1
+      }
+    },
+    "description": "A light vented red bicycle helmet over a white foam liner, with a short visor and a chin strap.",
+    "notes": "Standing on its rim, front on +z: a long red shell 210 mm across, 260 mm front to back and 150 mm tall over a white foam band, four dark vent channels front to back, a short visor and black straps lying out in front to a buckle. The model is the helmet's outside, standing, so a closed shape fills its box several times over. Protection is a guess for foam under a thin shell: blunt above all. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "bronze_helmet",
+    "model": "bronze_helmet",
+    "name": "Bronze helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.8,
+        "pierce": 0.5
+      }
+    },
+    "description": "A closed bronze helmet in one piece, with a single slit for the eyes, a row of breathing holes and a keel over the crown.",
+    "notes": "Standing upright, front on +z: one bronze shell 290 mm tall and 260 mm front to back reaching to the neck, with a thickened rim, an eye slit, four breathing holes below it and a keel. It differs from the Corinthian helm in having no nose guard and no gap between the cheeks. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl and xs sizes share the model. Protection is a guess for cast bronze. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "chitin_helmet",
+    "model": "chitin_helmet",
+    "name": "Chitin helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.5,
+        "blunt": 0.4,
+        "cut": 0.7,
+        "pierce": 0.55
+      }
+    },
+    "description": "A full helmet made of overlapping plates of insect shell, with two eye holes and a slotted grille over the mouth.",
+    "notes": "Standing upright, front on +z: a brown shell 290 mm tall and 260 mm front to back of overlapping insect plates with raised red-brown seams, a ridge over the crown, two eye holes and a four-slot mouth grille. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl and xs sizes share the model. Protection is a guess; chitin is given good acid resistance. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "light_chitin_helmet",
+    "model": "light_chitin_helmet",
+    "name": "Light chitin helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.45,
+        "blunt": 0.35,
+        "cut": 0.65,
+        "pierce": 0.5
+      }
+    },
+    "description": "A helmet of overlapping insect-shell plates, open at the face from brow to chin so it breathes.",
+    "notes": "Standing upright, front on +z: the chitin helmet's shell with the face left open from brow to chin, raised seams and a ridge over the crown. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl and xs sizes share the model. Protection is a guess, a little under the full chitin helmet. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "conical_helm",
+    "model": "conical_helm",
+    "name": "Conical helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.8,
+        "pierce": 0.55
+      }
+    },
+    "description": "A tall iron helmet rising to a point over a fur brim, with a skirt of laced iron plates guarding the back and sides of the neck.",
+    "notes": "Standing on its neck guard, front on +z: an iron cone 340 mm tall rising to a spike and leather knop, a fur brim 236 mm across with tufts, and a skirt of iron lames round the back and sides laced in leather. Iron in `steel-grey`. The cone and neck skirt enclose a head's worth of air. The xl and xs sizes share the model. Protection is a guess for iron plate. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "corinthian_helm",
+    "model": "corinthian_helm",
+    "name": "Corinthian helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.55
+      }
+    },
+    "description": "An ancient bronze helmet in one piece reaching to the neck, with almond eye holes either side of a nose guard and a narrow gap down to the chin.",
+    "notes": "Standing upright, front on +z: one bronze shell 285 mm tall and 285 mm front to back, flaring at the nape, with a brow ridge, almond eye holes either side of a nose guard and a narrow gap between the cheek guards. It has no crest. The model is the helmet's outside, standing, so a closed shape fills its box several times over. The xl and xs sizes share the model. Protection is a guess for bronze plate. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "football_helmet",
+    "model": "football_helmet",
+    "name": "Football helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.6,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "A heavy glossy red helmet with a white centre stripe, a barred face mask and a smoked visor across the eyes.",
+    "notes": "Standing on its rim, front on +z: a red shell 240 mm across, 290 mm front to back with its mask and 235 mm tall, a white stripe over the crown, an ear hole each side, a smoked visor across the eye opening and a grey face mask of three bars and three posts. Tiles draw the visor opaque; it stays see-through in the game. The model is the helmet's outside, standing, so a closed shape fills its box several times over. Protection is a guess for a polycarbonate shell over padding. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "galea",
+    "model": "galea",
+    "name": "Galea",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.8,
+        "pierce": 0.5
+      }
+    },
+    "description": "An iron Roman helmet with a broad neck guard, a brow reinforce, a hinged cheek guard each side and a crest knob on top.",
+    "notes": "Standing on its cheek guards, front on +z: an iron bowl 240 mm across with a brow reinforce, a broad neck guard sloping out 330 mm long overall, a cheek guard hanging each side with brass bosses and hinges, and a brass crest knob. Leather ties and lining are not modelled. The bowl, neck guard and cheek guards spread round air. It covers the mouth too through its cheek guards. The xl and xs sizes share the model. Protection is a guess for iron plate. It is a helmet host with four `helmet` points for add-ons such as visors, goggles, ear muffs and mail curtains: left side and right side at the temples, rear at the nape, and the front mount above the brow where goggles go. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  }
+]

@@ -1,0 +1,189 @@
+[
+  {
+    "id": "pale_assassins_bloom",
+    "model": "pale_assassins_bloom",
+    "name": "Pale assassin's bloom",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A slim white flower rolled tight around a pinch of yellow pollen. The pollen kills, quickly and painfully; keep it away from your face.",
+    "notes": "75 mm long and 14 mm across on a short green stem, lying along x: three stepped petal tiers read as petals rolled one over the next, with the yellow pollen standing proud of the open tip. cloth-bright-white for the petals, since cloth-cream reads grey. A thin stem and bloom enclose air. Its poison use needs a recipe or an effect, not a tool quality. A white petal finish would suit it better than cloth."
+  },
+  {
+    "id": "bitterleaf_bundle",
+    "model": "bitterleaf_bundle",
+    "name": "Bitterleaf bundle",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small bundle of dark leaves and pale, bitter roots tied with twine. Harmless, but too tough to swallow whole.",
+    "notes": "110 mm long, lying along x: five dark purple leaves fanned at one end, four stalks under a jute tie, and four pale roots splayed at the other end. plant-purple carries the dark leaves and bark-birch the pale roots. A 2 g bundle this long is mostly air, so the drawn size is kept."
+  },
+  {
+    "id": "spiral_rose",
+    "model": "spiral_rose",
+    "name": "Spiral rose",
+    "category": "food",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A flower whose petals wind inward in a perfect spiral, each ring a smaller copy of the one outside it, around a faintly glowing violet heart. Edible.",
+    "notes": "A head 94 mm across and 30 mm high lying face up on a stub of stem: forty kite-shaped petals set at the golden angle, shrinking and climbing toward the centre in three shades (petal-pink, plastic-pink, lycra-red) around a crystal-glow-violet heart. An open flower head is mostly air between petals. The variants ride here as the brief asks, but they do not look like this flower: moonflowers, golden reed stalks, a wood barnacle, a dragon's-nail, a tuber, a fern flower, a mushroom chunk, a sojourner's flower and a whiskflower each want their own row in a later batch."
+  },
+  {
+    "id": "crimson_metal_ingot",
+    "model": "crimson_metal_ingot",
+    "name": "Crimson metal ingot",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A heavy ingot of a deep red metal, stamped with a maker's rune, ready for the forge.",
+    "notes": "120 by 70 by 30 mm, drawn as six layers narrowing to the top with a raised rune on the top face; the three ingots in this batch share the shape through a local helper and each carry their own mass. metal-crimson for the red metal and rust-red for the rune. Smithing it needs recipes, not a tool quality."
+  },
+  {
+    "id": "pale_silver_ingot",
+    "model": "pale_silver_ingot",
+    "name": "Pale silver ingot",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "An ingot of a bright silvery metal, startlingly light for its size, stamped with a maker's rune.",
+    "notes": "Same 120 by 70 by 30 mm stepped shape as the crimson ingot. mithril for the pale blue-silver metal and mirror-silver for the rune. Smithing it needs recipes, not a tool quality."
+  },
+  {
+    "id": "orichalcum_ingot",
+    "model": "orichalcum_ingot",
+    "name": "Red-gold ingot",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A heavy ingot of a warm red-gold metal that shrugs off corrosion, stamped with a maker's rune.",
+    "notes": "Same 120 by 70 by 30 mm stepped shape as the other ingots, in the orichalcum finish with a bronze rune. Smithing it needs recipes, not a tool quality."
+  },
+  {
+    "id": "black_chitin_cauldron",
+    "model": "black_chitin_cauldron",
+    "name": "Black chitin cauldron",
+    "category": "tool",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "alchemy": 1,
+        "cooking": 3,
+        "mutagen_brewing": 2
+      }
+    },
+    "description": "A round-bellied cauldron grown from black spider shell, on three clawed feet. Its dull body seems to swallow light, and whatever simmers in it comes out cleaner of poison.",
+    "notes": "360 mm high and 360 mm across the belly on three clawed feet, with a flared lip, two ring handles at the shoulders and three glossy chitin bands over a void-black body, so it reads as dark shell that drinks light. cooking 3 is the pot level; its container quality is left to a container block. Drawing poison out of its contents needs a recipe or an effect. Almost all black in the tiles, as it is meant to be."
+  },
+  {
+    "id": "orichalcum_cauldron",
+    "model": "orichalcum_cauldron",
+    "name": "Red-gold alchemist's pot",
+    "category": "tool",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "alchemy": 2,
+        "cooking": 3,
+        "mutagen_brewing": 1
+      }
+    },
+    "description": "A tall lidded stockpot of red-gold metal with a band of pale blue runes round its middle. Alchemy that eats through steel leaves it unmarked.",
+    "notes": "300 mm across and 300 mm high under a domed lid with a knob, bronze bracket handles each side, and twelve crystal-glow-blue rune plates between two raised bands. It uses cooking 3, the same quality names as the chitin cauldron."
+  }
+]

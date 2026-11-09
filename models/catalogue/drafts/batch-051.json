@@ -1,0 +1,369 @@
+[
+  {
+    "id": "lever_shear",
+    "model": "lever_shear",
+    "name": "Lever shear",
+    "category": "misc",
+    "size": [
+      6,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "beverly_shear",
+      "qualities": {
+        "metal_shearing": 1
+      }
+    },
+    "description": "A cast-iron bench shear with a long lever. Cuts sheet steel in straight lines or curves.",
+    "notes": "A bench-mounted machine rather than a carried item; the size is only a placeholder. Modelled with the lever raised: a 300 by 240 mm foot plate, a 200 mm blade pair and a 0.9 m lever, 0.97 m tall. metal_shearing is a new quality name; no existing one covers cutting sheet metal. The box is mostly air round the raised lever."
+  },
+  {
+    "id": "brazier",
+    "model": "brazier",
+    "name": "Brazier",
+    "category": "tool",
+    "size": [
+      6,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A steel fire bowl on three legs. Keeps a fire off the ground and away from anything that would catch.",
+    "notes": "550 mm across the bowl, 440 mm to the rim, with a bar grate and a loop handle each side. cooking covers both cooking and boiling. The box counts the open bowl and the space between the legs. The longest side includes the handles outside the 550 mm bowl."
+  },
+  {
+    "id": "folding_chair",
+    "model": "folding_chair",
+    "name": "Folding chair",
+    "category": "misc",
+    "size": [
+      4,
+      9
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A grey plastic seat and back on a steel tube frame. Folds flat to carry.",
+    "notes": "Folded and standing: 420 mm wide, 890 mm tall and 80 mm deep, the seat folded up against the front legs. The box counts the gaps in the open frame. Deploying it into a seat needs a placed-furniture state the drafts leave to the integration."
+  },
+  {
+    "id": "churn",
+    "model": "churn",
+    "name": "Butter churn",
+    "category": "misc",
+    "size": [
+      6,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "butter_churn",
+      "qualities": {
+        "churning": 1
+      }
+    },
+    "description": "An oak barrel churn in a wooden stand, turned by a treadle and crank. Holds about ten litres of cream.",
+    "notes": "A 340 mm barrel 240 mm across in a stand 460 mm tall and 610 mm long with the crank. churning is a new quality name. A machine that stands where it is used, so the size is only a placeholder. The box counts the open stand."
+  },
+  {
+    "id": "cot",
+    "model": "cot",
+    "name": "Folding cot",
+    "category": "misc",
+    "size": [
+      10,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "An army camp bed folded for carrying: olive canvas between aluminium rails, legs folded under and strapped.",
+    "notes": "Folded: 1 m long, 240 mm wide and 140 mm tall, with two webbing straps. Deploying it into a bed needs a placed-furniture state the drafts leave to the integration."
+  },
+  {
+    "id": "deck_chair",
+    "model": "deck_chair",
+    "name": "Deck chair",
+    "category": "misc",
+    "size": [
+      12,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A wooden deck chair folded flat, with a blue and white striped canvas sling.",
+    "notes": "Folded flat: three nested beech frames 1.2 m long and 600 mm wide, 90 mm thick. Deploying it into a seat needs a placed-furniture state the drafts leave to the integration."
+  },
+  {
+    "id": "fiber_mat",
+    "model": "fiber_mat",
+    "name": "Grass mat",
+    "category": "tool",
+    "size": [
+      9,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "work_surface": 1
+      }
+    },
+    "description": "A mat woven from dry grass and fibre, rolled up and tied. Spread out, it keeps meat off the dirt while butchering.",
+    "notes": "Rolled: 900 mm long and 100 mm across, tied with two jute cords. work_surface is 1, as for every surface. The roll is kept at 100 mm so it reads at a glance."
+  },
+  {
+    "id": "leather_tarp",
+    "model": "leather_tarp",
+    "name": "Leather tarp",
+    "category": "tool",
+    "size": [
+      7,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "work_surface": 1
+      }
+    },
+    "description": "A large sheet of leather, rolled up and tied. Blood will not soak into it, which makes it a clean butchering surface.",
+    "notes": "Rolled: 700 mm long and 100 mm across, with the loose edge showing and two rawhide ties. work_surface is 1, as for every surface. The roll is kept at 100 mm so it reads at a glance."
+  },
+  {
+    "id": "manual_tire_changer",
+    "model": "manual_tire_changer",
+    "name": "Manual tyre changer",
+    "category": "misc",
+    "size": [
+      10,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "manual_tire_changer",
+      "qualities": {
+        "tire_changing": 1
+      }
+    },
+    "description": "A floor-bolted stand for taking tyres off rims and putting them back on, with a bead breaker lever and a foot pump.",
+    "notes": "Three feet 1 m across, a wheel table 360 mm across on a 0.75 m post, a bead-breaker lever on a side post, a mounting bar and a foot pump. tire_changing is a new quality name. A machine that stays where it stands, so the size is only a placeholder. The box is mostly air round an open frame. The longest side is the mounting bar swung out over the bead breaker."
+  },
+  {
+    "id": "metal_butcher_rack",
+    "model": "metal_butcher_rack",
+    "name": "Butchering rack",
+    "category": "tool",
+    "size": [
+      6,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "butchering": 1
+      }
+    },
+    "description": "A folding steel frame for hanging a carcass off the ground, packed as three legs and a crossbar with hooks.",
+    "notes": "Folded: three 600 mm galvanised legs and a crossbar strapped together, three S-hooks and a short chain. butchering follows earlier drafts. Deployed, it would become a placed rack; that state is left to the integration."
+  },
+  {
+    "id": "metal_smoking_rack",
+    "model": "metal_smoking_rack",
+    "name": "Smoking rack",
+    "category": "tool",
+    "size": [
+      9,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "smoking": 1
+      }
+    },
+    "description": "A folding steel rack of wire shelves for smoking meat and fish over a fire, packed flat with its legs on top.",
+    "notes": "Folded: three wire shelves 900 by 400 mm stacked 70 mm deep, four legs and a hanger on top, two straps round it. smoking is a new quality name. Deployed, it would become a placed rack; that state is left to the integration."
+  },
+  {
+    "id": "portable_stove",
+    "model": "portable_stove",
+    "name": "Folding camp stove",
+    "category": "tool",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A steel wood stove that folds into a flat case, with a carry handle and a short chimney clipped to its side.",
+    "notes": "Folded: 320 by 210 mm and 45 mm thick, slotted grate panel on top, hinge knuckles at the front, chimney pipe clipped on. Stainless steel is the usual build. cooking and boiling follow the brazier and the stock pot; it gives them once set up, which the drafts leave to the integration."
+  },
+  {
+    "id": "screw_press_tool",
+    "model": "screw_press_tool",
+    "name": "Screw press",
+    "category": "misc",
+    "size": [
+      12,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "screw_press",
+      "qualities": {
+        "pressing": 1
+      }
+    },
+    "description": "A big oak frame press with a wooden screw and capstan bar. Squeezes oil from seed paste and juice from fruit.",
+    "notes": "1.2 m wide, 1.74 m tall, with a slatted basket in a drip tray and a 1.6 m capstan bar. pressing follows the hydraulic press. A machine that stays where it is built, so the size is only a placeholder. The box is mostly air inside an open frame."
+  },
+  {
+    "id": "folding_camp_table",
+    "model": "folding_camp_table",
+    "name": "Folding camp table",
+    "category": "misc",
+    "size": [
+      9,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A steel camp table folded into a flat slab, with a carry handle and two latches on the front edge.",
+    "notes": "Folded: 900 by 540 mm and 40 mm thick, slatted top, folded legs underneath. Deploying it into a table needs a placed-furniture state the drafts leave to the integration."
+  },
+  {
+    "id": "water_mill",
+    "model": "water_mill",
+    "name": "Water mill",
+    "category": "misc",
+    "size": [
+      13,
+      13
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "water_mill",
+      "qualities": {
+        "milling": 3
+      }
+    },
+    "description": "A paddle wheel on an oak axle turning a pair of millstones in a plank housing. Grinds grain into flour.",
+    "notes": "A wheel 1.24 m across and 260 mm wide, millstones 500 mm across under a grain hopper, 1.3 m by 1.25 m by 1.05 m overall. milling is a new quality name. A structure built where it stands, so the size is only a placeholder. The box is mostly air round the open wheel."
+  }
+]

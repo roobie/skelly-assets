@@ -1,0 +1,359 @@
+[
+  {
+    "id": "swag_bag",
+    "model": "swag_bag",
+    "name": "Swag bag",
+    "category": "bag",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            4,
+            4
+          ],
+          "handlingSimSeconds": 1.2
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A plain canvas sack with a cord tie at the neck, big enough to stuff with loot and sling over one shoulder.",
+    "notes": "A stuffed canvas sack 380 mm tall, its neck gathered with a cotton cord above a short tuft. The model shows it stuffed, the shape a player recognises. It is slung over one shoulder and no hand or arm slot holds a bag, so it takes back. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "trapper_pack",
+    "model": "trapper_pack",
+    "name": "Trapper pack",
+    "category": "bag",
+    "size": [
+      4,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            5,
+            6
+          ],
+          "handlingSimSeconds": 1.6,
+          "name": "sack"
+        },
+        {
+          "grid": [
+            4,
+            2
+          ],
+          "handlingSimSeconds": 1.2,
+          "name": "shelf"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.0015
+    },
+    "description": "A wooden pack frame with a load shelf at its foot and a waxed canvas sack drawn shut with a cord, carried on leather shoulder straps.",
+    "notes": "An L-shaped pine frame 620 mm tall with three cross slats and a 220 mm shelf, a bundle of olive canvas with its top rolled down over the front, lashed to the frame with two rawhide cords, and tan leather straps on the back. The frame's open bounding box is large. The shelf carries the bundle. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "travelpack",
+    "model": "travelpack",
+    "name": "Daypack",
+    "category": "bag",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            4,
+            5
+          ],
+          "handlingSimSeconds": 1.4,
+          "name": "main"
+        },
+        {
+          "grid": [
+            3,
+            2
+          ],
+          "handlingSimSeconds": 1,
+          "name": "front"
+        },
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "left side"
+        },
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "right side"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A light nylon daypack with a zipped main compartment, a front pocket and mesh bottle pockets on the sides.",
+    "notes": "A red nylon pack 290 by 440 by 170 mm with a rounded top, a zipped front pocket, black mesh side pockets, a grab loop and padded straps. The tile draws the mesh opaque. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wicker_backpack",
+    "model": "wicker_backpack",
+    "name": "Wicker backpack",
+    "category": "bag",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            4,
+            4
+          ],
+          "handlingSimSeconds": 1.6
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.003
+    },
+    "description": "A woven straw basket with a lid, worn on the back by two leather straps.",
+    "notes": "A flared straw basket 360 mm tall with jute rings every 60 mm, a domed lid with a loop and tan leather straps on its back. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "large_gym_bag",
+    "model": "large_gym_bag",
+    "name": "Large gym bag",
+    "category": "bag",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            6,
+            4
+          ],
+          "handlingSimSeconds": 1.4,
+          "name": "main"
+        },
+        {
+          "grid": [
+            2,
+            2
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "end"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A large lycra duffel with a zipped top, carry handles and a pocket in one end.",
+    "notes": "A lycra duffel lying on its side with black end panels, a zip along its top, two webbing handles meeting in a wrapped grip and a zipped end pocket. The model is the bag standing full at its real size. Carried slung over a shoulder, so it takes the back slot like the other bags. Red, 560 mm long. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gym_bag",
+    "model": "gym_bag",
+    "name": "Gym bag",
+    "category": "bag",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            5,
+            3
+          ],
+          "handlingSimSeconds": 1.2,
+          "name": "main"
+        },
+        {
+          "grid": [
+            2,
+            2
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "end"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A lycra duffel with a zipped top, carry handles and a pocket in one end.",
+    "notes": "A lycra duffel lying on its side with black end panels, a zip along its top, two webbing handles meeting in a wrapped grip and a zipped end pocket. The model is the bag standing full at its real size. Carried slung over a shoulder, so it takes the back slot like the other bags. Navy, 480 mm long. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "small_gym_bag",
+    "model": "small_gym_bag",
+    "name": "Small gym bag",
+    "category": "bag",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            4,
+            3
+          ],
+          "handlingSimSeconds": 1.2,
+          "name": "main"
+        },
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "end"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A small lycra duffel with a zipped top, carry handles and a pocket in one end.",
+    "notes": "A lycra duffel lying on its side with black end panels, a zip along its top, two webbing handles meeting in a wrapped grip and a zipped end pocket. The model is the bag standing full at its real size. Carried slung over a shoulder, so it takes the back slot like the other bags. Charcoal, 420 mm long; named small so it reads apart from the medium gym bag. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "extra_large_gym_bag",
+    "model": "extra_large_gym_bag",
+    "name": "Big gym bag",
+    "category": "bag",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            7,
+            4
+          ],
+          "handlingSimSeconds": 1.5,
+          "name": "main"
+        },
+        {
+          "grid": [
+            2,
+            2
+          ],
+          "handlingSimSeconds": 0.8,
+          "name": "end"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "back",
+      "wearPerDamage": 0.002
+    },
+    "description": "A roomy lycra duffel with a zipped top, carry handles and a pocket in one end.",
+    "notes": "A lycra duffel lying on its side with black end panels, a zip along its top, two webbing handles meeting in a wrapped grip and a zipped end pocket. The model is the bag standing full at its real size. Carried slung over a shoulder, so it takes the back slot like the other bags. Blue, 640 mm long. The light gym bag variant shares this model; its draft should take its own mass and a smaller grid when variants are applied. The worn look is pending: no worn model is authored."
+  }
+]

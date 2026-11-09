@@ -1,0 +1,196 @@
+[
+  {
+    "id": "clip_on_tie",
+    "model": "clip_on_tie",
+    "name": "Clip-on tie",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A blue tie with silver diagonal stripes and a knot sewn in place. A steel clip behind the knot hooks it onto a shirt collar.",
+    "notes": "Laid flat, 464 mm long and 84 mm across the blade: blue cloth (`cloth-blue`), silver stripes (`cloth-shimmer`), a steel clip at the -z end. Slot `neck`, as necklaces and collars take: no tie slot exists, and `collar` is for collar bars and tie clips worn with a tie. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "necktie",
+    "model": "necktie",
+    "name": "Necktie",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A green tie with slanting gold stripes, rolled up tight with the pointed end of the blade lying out.",
+    "notes": "Rolled as stored, 146 mm by 156 mm with the tip out and 80 mm tall: four turns rising from the narrow end at the centre to the wide blade outside, with the pointed end unrolled to lie flat on the floor. `cloth-green` with slanting `brass-dull` stripes round the outer turn and across the tip, so the roll reads as a tie rather than a can. Slot `neck`, as for the clip-on tie. The bounding box includes the roll's hollow centre and the tip lying out beside it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "skinny_tie",
+    "model": "skinny_tie",
+    "name": "Skinny tie",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A narrow tie checked black and white, folded in half.",
+    "notes": "Folded in half and laid flat, 706 mm long: the 50 mm blade and the 30 mm tail side by side, joined at the fold, `cloth-black` patterned with raised `cloth-bright-white` squares. Slot `neck`, as for the clip-on tie. The box spans the gap between blade and tail. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "vampire_fangs",
+    "model": "vampire_fangs",
+    "name": "Plastic vampire fangs",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "teeth",
+      "wearPerDamage": 0.0008
+    },
+    "description": "A cheap costume set of white plastic teeth on a pink gum, with two long pointed fangs. It fits over the wearer's own teeth.",
+    "notes": "Lying gum down, 54 mm across and 26 mm tall: a pink plastic horseshoe (`plastic-pink`) carrying twelve teeth and two long canines in ivory (`bone`), so they read as teeth rather than metal. Slot `teeth`, as grills take. The model is the fangs alone, as a player would carry them. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wedding_veil",
+    "model": "wedding_veil",
+    "name": "Wedding veil",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "face",
+      "wearPerDamage": 0.0015
+    },
+    "description": "A long veil of fine white net with a scalloped lace edge, gathered on a silver comb set with small pearls. Worn down, it covers the face.",
+    "notes": "Laid loosely folded, 280 mm by 200 mm and 16 mm tall: a thin sheet of `mesh-white` net widening from the comb at -z to the hem at +z, with seven soft folds fanning down it, a scalloped `lace-white` edge along the hem and a silver comb with nine pearls gathering the top. The tile draws the white as light grey. Slot `face`, as veils over the face take; the comb holds it in the hair, which one slot cannot express. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "knit_cowl",
+    "model": "knit_cowl",
+    "name": "Knit cowl",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "face",
+      "wearPerDamage": 0.001
+    },
+    "description": "A chunky ribbed loop of oatmeal wool, worn round the neck and pulled up over the mouth and nose.",
+    "notes": "Lying flat as a loop, 288 mm across and 60 mm tall: a `jute` tube with 32 raised `cloth-cream` ribs round it. Slot `face`: it covers the mouth, as a bandana over the face does; it also sits on the neck, which one slot cannot express. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "grass_keffiyeh",
+    "model": "grass_keffiyeh",
+    "name": "Grass keffiyeh",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "hood",
+      "wearPerDamage": 0.002
+    },
+    "description": "A square of woven dry grass worn draped over the head and held down by a ring of twisted cord.",
+    "notes": "Folded square, 304 mm by 336 mm with its fringe and 36 mm tall: four folds of `straw-wicker` with a crisscross of `plant-dried` strands, a ragged fringe along +z and a doubled `jute` cord ring on top. Slot `hood`, as headscarves take. Hand-made, so no shop tier above Tier1; usage `Residential` is the nearest of the loot tags. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "headscarf",
+    "model": "headscarf",
+    "name": "Fringed headscarf",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "hood",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A loose crimson cotton scarf with a cream border and a short fringe, worn over the head and wound round the neck.",
+    "notes": "Folded square, 240 mm across and 23 mm tall: three folds of `cloth-crimson`, a cream border (`cloth-cream`) round the top and a fringe along +z. Named apart from the navy hijab draft, also called Headscarf. Slot `hood`, as headscarves take. The worn look is pending: no worn model is authored."
+  }
+]

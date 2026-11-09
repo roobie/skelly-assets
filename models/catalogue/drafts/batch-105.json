@@ -1,0 +1,261 @@
+[
+  {
+    "id": "small_cotton_socks",
+    "model": "small_cotton_socks",
+    "name": "Small cotton socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.004
+    },
+    "description": "A pair of small white cotton socks, sized for a child or very small feet.",
+    "notes": "Laid flat as a pair, one across the other, each 150 mm from cuff to heel and 170 mm from heel to toe, white with grey heel and toe. The model's box is both socks laid out flat. Slot `socks` is the one batch 103 named for socks, worn under shoes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "small_wool_socks",
+    "model": "small_wool_socks",
+    "name": "Small wool socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.003
+    },
+    "description": "A pair of small, thick grey wool socks, sized for a child or very small feet. Warm even when damp.",
+    "notes": "Laid flat as a pair, one across the other, each 150 mm from cuff to heel and 170 mm from heel to toe, grey knit with a lighter cuff and brown heel and toe. The model's box is both socks laid out flat. Slot `socks` is the one batch 103 named for socks, worn under shoes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hardened_splint_arm_guards",
+    "model": "hardened_splint_arm_guards",
+    "name": "Hardened splint arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-hardened",
+      "splint": "steel-hardened"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.42,
+        "cut": 0.75,
+        "pierce": 0.55
+      }
+    },
+    "description": "Canvas forearm guards lined with strips of quenched, hardened steel. Hard to dent, though a heavy blow can crack a splint.",
+    "notes": "Laid side by side, open side down: each guard is a canvas shell curved across the arm, 300 mm from elbow to wrist, with five steel splints riveted along it, leather binding at both ends and two buckled leather straps. The pair lies side by side, 372 mm across; each guard is 300 mm long. Shares the mild steel guards' model with splints and rivets in `steel-hardened`. Slot `arms` follows the earlier clothing batches' arm guards. Size variants share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "high_carbon_splint_arm_guards",
+    "model": "hardened_splint_arm_guards",
+    "name": "High-carbon splint arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-blued",
+      "splint": "steel-blued"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.7,
+        "pierce": 0.5
+      }
+    },
+    "description": "Canvas forearm guards lined with strips of high-carbon steel, stiffer and harder than the common kind.",
+    "notes": "Laid side by side, open side down: each guard is a canvas shell curved across the arm, 300 mm from elbow to wrist, with five steel splints riveted along it, leather binding at both ends and two buckled leather straps. The pair lies side by side, 372 mm across; each guard is 300 mm long. Shares the mild steel guards' model with splints and rivets in `steel-blued`. Slot `arms` follows the earlier clothing batches' arm guards. Size variants share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "splint_arm_guards",
+    "model": "hardened_splint_arm_guards",
+    "name": "Splint arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.6,
+        "pierce": 0.4
+      }
+    },
+    "description": "Canvas forearm guards with strips of mild steel riveted along them, strapped on over the sleeves. They also fit over mail.",
+    "notes": "Laid side by side, open side down: each guard is a canvas shell curved across the arm, 300 mm from elbow to wrist, with five steel splints riveted along it, leather binding at both ends and two buckled leather straps. The pair lies side by side, 372 mm across; each guard is 300 mm long. The model's root: splints and rivets in `steel-bright`. Slot `arms` follows the earlier clothing batches' arm guards. Size variants share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_carbon_splint_arm_guards",
+    "model": "hardened_splint_arm_guards",
+    "name": "Medium-carbon splint arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-grey",
+      "splint": "steel-grey"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.38,
+        "cut": 0.65,
+        "pierce": 0.45
+      }
+    },
+    "description": "Canvas forearm guards with strips of medium-carbon steel riveted along them. Tougher than plain mild steel.",
+    "notes": "Laid side by side, open side down: each guard is a canvas shell curved across the arm, 300 mm from elbow to wrist, with five steel splints riveted along it, leather binding at both ends and two buckled leather straps. The pair lies side by side, 372 mm across; each guard is 300 mm long. Shares the mild steel guards' model with splints and rivets in `steel-grey`. Slot `arms` follows the earlier clothing batches' arm guards. Size variants share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_splint_arm_guards",
+    "model": "hardened_splint_arm_guards",
+    "name": "Tempered splint arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "rivet": "steel-heat-tint",
+      "splint": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0006,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.45,
+        "cut": 0.8,
+        "pierce": 0.6
+      }
+    },
+    "description": "Canvas forearm guards lined with strips of tempered steel, hard on the face and slow to crack. The best of their kind.",
+    "notes": "Laid side by side, open side down: each guard is a canvas shell curved across the arm, 300 mm from elbow to wrist, with five steel splints riveted along it, leather binding at both ends and two buckled leather straps. The pair lies side by side, 372 mm across; each guard is 300 mm long. Shares the mild steel guards' model with splints and rivets in `steel-heat-tint` for the tempered steel. Slot `arms` follows the earlier clothing batches' arm guards. Size variants share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hardened_steel_brigandine",
+    "model": "hardened_steel_brigandine",
+    "name": "Hardened brigandine",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.15,
+        "blunt": 0.45,
+        "cut": 0.8,
+        "pierce": 0.6
+      }
+    },
+    "description": "A heavy canvas vest with plates of hardened steel riveted inside it, closed down the front with buckled straps. It goes on over mail.",
+    "notes": "Laid flat, front up, neck towards -z: canvas front halves over the back panel, rows of dark rivet heads in `steel-parkerized` over the hidden plates, a leather-bound hem, three buckled straps closing the front and two straps each side. Slot `vest`, as the plate carriers take, since it is worn over a shirt or mail. Attach points: left and right shoulder are the laced points on the riveted canvas shoulder strap of each front half, beside the neck opening, where shoulder guards mount. Size variants share the model. The worn look is pending: no worn model is authored."
+  }
+]

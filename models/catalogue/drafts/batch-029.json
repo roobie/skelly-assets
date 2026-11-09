@@ -1,0 +1,479 @@
+[
+  {
+    "id": "butter_knife",
+    "model": "butter_knife",
+    "name": "Butter knife",
+    "category": "misc",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A blunt table knife with a rounded tip, for spreading.",
+    "notes": "A stainless table knife 210 mm long lying flat, held by its handle. The plastic knife rides here as the brief has variants do; the vegetable peeler has a different head and would suit its own model if it gains a peeling use."
+  },
+  {
+    "id": "pan",
+    "model": "pan",
+    "name": "Cast-iron skillet",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2,
+        "hammering": 1
+      }
+    },
+    "description": "A heavy cast-iron frying pan with a long handle and a lug on the far side.",
+    "notes": "A skillet 270 mm across with a 140 mm handle and a helper lug, iron-cast with a coal-black hanging hole. It keeps a hammering quality for its weight; a melee profile is left for weapon tuning. The steel, copper and aluminium pans have their own drafts sharing this model."
+  },
+  {
+    "id": "steel_frying_pan",
+    "model": "pan",
+    "name": "Steel frying pan",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "iron": "steel-stainless"
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A light stainless frying pan with a long handle.",
+    "notes": "Shares the pan model, recoloured. The shared model's mass does not suit it; set its mass when the drafts are applied. Too light to bring hammering."
+  },
+  {
+    "id": "copper_frying_pan",
+    "model": "pan",
+    "name": "Copper frying pan",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "iron": "copper"
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A copper frying pan with a long handle.",
+    "notes": "Shares the pan model, recoloured. The shared model's mass does not suit it; set its mass when the drafts are applied."
+  },
+  {
+    "id": "aluminium_frying_pan",
+    "model": "pan",
+    "name": "Aluminium frying pan",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "iron": "alu-bare"
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A thin aluminium frying pan with a long handle.",
+    "notes": "Shares the pan model, recoloured. The shared model's mass does not suit it; set its mass when the drafts are applied."
+  },
+  {
+    "id": "pizza_cutter",
+    "model": "pizza_cutter",
+    "name": "Pizza cutter",
+    "category": "misc",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A steel cutting wheel on a plastic handle.",
+    "notes": "A wheel 100 mm across on a fork and a plastic-red handle, 230 mm long, lying flat. A rolling wheel makes a poor cutting tool, so it brings no quality."
+  },
+  {
+    "id": "childs_plastic_bowl",
+    "model": "childs_plastic_bowl",
+    "name": "Child's bowl",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small bright plastic bowl made for a child.",
+    "notes": "A bowl 120 mm across and 48 mm tall, plastic-orange with a plastic-white non-slip ring. The box counts the open bowl."
+  },
+  {
+    "id": "plastic_plate",
+    "model": "plastic_plate",
+    "name": "Plastic plate",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tough plastic dinner plate.",
+    "notes": "A plate 256 mm across with a sloping rim, plastic-blue. The box counts the air over a flat plate; stacked plates take little room."
+  },
+  {
+    "id": "plastic_straw",
+    "model": "plastic_straw",
+    "name": "Drinking straw",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A bendable plastic drinking straw.",
+    "notes": "A red straw 6 mm across and 200 mm long with a ribbed elbow and its short end bent up. The box counts the bend."
+  },
+  {
+    "id": "pot",
+    "model": "pot",
+    "name": "Cooking pot",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A steel stock pot with two handles and a lid.",
+    "notes": "A pot 190 mm across and 130 mm deep with riveted loop handles and a domed lid with a plastic-black knob, steel-stainless. The aluminium pot has its own draft on this model."
+  },
+  {
+    "id": "aluminium_pot",
+    "model": "pot",
+    "name": "Aluminium pot",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "steel": "alu-bare"
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A light aluminium pot with two handles and a lid.",
+    "notes": "Shares the pot model, recoloured. The shared model's mass does not suit it; set its mass when the drafts are applied."
+  },
+  {
+    "id": "canning_pot",
+    "model": "canning_pot",
+    "name": "Canning pot",
+    "category": "tool",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A 20 litre enamelled pot with a lid and a wire rack for jars.",
+    "notes": "A canner 360 mm across and 260 mm tall, paint-drum-blue for dark enamel (no speckled enamel finish exists), with plastic-black handles and knob and steel-galvanised rack handles resting on the rim. Its size is a placeholder for a thing too big to carry far. The pressure cooker and clay pot oven ride here as the brief has variants do, though a locking lid and a heavy clay pot would each read better on their own model. The clay canning pot has its own draft on this model."
+  },
+  {
+    "id": "clay_canning_pot",
+    "model": "canning_pot",
+    "name": "Clay canning pot",
+    "category": "tool",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "enamel": "clay-terracotta",
+      "rack": "clay-terracotta",
+      "trim": "clay-terracotta"
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A large fired-clay pot with a lid, big enough to boil jars in.",
+    "notes": "Shares the canning_pot model, recoloured clay-terracotta. A crafted pot would lack the wire rack and moulded handles; the shared model's mass does not suit it, so set its mass when the drafts are applied."
+  },
+  {
+    "id": "copper_pot",
+    "model": "copper_pot",
+    "name": "Copper pot",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A tin-lined copper pot with brass handles and a lid.",
+    "notes": "A pot 180 mm across and 140 mm deep: copper shell, steel-grey tin lining inside, brass handles and lid knob."
+  },
+  {
+    "id": "makeshift_pot",
+    "model": "makeshift_pot",
+    "name": "Hammered steel pot",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A rough pot beaten out of a sheet of steel.",
+    "notes": "Crafted, so it has no loot economy. A lopsided shell 200 mm across its crimped rim with hammer marks and a wire bail, drawn with 8 mm walls. The box counts the bail."
+  },
+  {
+    "id": "makeshift_copper_pot",
+    "model": "makeshift_copper_pot",
+    "name": "Hammered copper pot",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A rough pot beaten out of copper sheet.",
+    "notes": "Crafted, so it has no loot economy. The hammered pot drawn in copper with verdigris hammer marks and thinner walls; it is its own row rather than a recolour because its walls differ. The box counts the bail."
+  },
+  {
+    "id": "rolling_pin",
+    "model": "rolling_pin",
+    "name": "Rolling pin",
+    "category": "tool",
+    "size": [
+      1,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "rolling": 1
+      }
+    },
+    "description": "A turned hardwood rolling pin with a handle at each end. Heavy enough to swing.",
+    "notes": "A wood-birch pin 460 mm long with a 300 mm barrel 64 mm across, held by one handle. It would make a blunt club; a melee profile is left for weapon tuning."
+  },
+  {
+    "id": "sippy_cup",
+    "model": "sippy_cup",
+    "name": "Sippy cup",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A child's plastic cup with two grips and a spill-proof spouted lid.",
+    "notes": "A cup 70 mm across and 112 mm tall to the spout, plastic-blue with a plastic-white lid, spout to the front. The box counts the cup and grips."
+  },
+  {
+    "id": "splatter_guard",
+    "model": "splatter_guard",
+    "name": "Splatter screen",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "sieving": 2
+      }
+    },
+    "description": "A round of fine steel mesh on a long handle, laid over a pan to stop spitting fat.",
+    "notes": "A screen 290 mm across, 450 mm long with its handle, lying flat: a grid of steel-stainless wires at 12 mm pitch standing for the fine mesh, which no steel mesh finish shows, in a rolled rim with a plastic-black grip. sieving is a new quality name for sieve and strain uses. The box adds the handle's sweep."
+  },
+  {
+    "id": "spoon",
+    "model": "spoon",
+    "name": "Spoon",
+    "category": "misc",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A stainless dessert spoon.",
+    "notes": "A spoon 190 mm long lying on its back, steel-stainless with a steel-mirror well. The plastic spoons ride here as the brief has variants do. The ladle, whisk, garlic press, spatula, ice cream scoop and grater are distinct utensils; each would read better on its own model if it gains a use of its own."
+  }
+]

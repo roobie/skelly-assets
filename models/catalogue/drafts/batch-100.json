@@ -1,0 +1,400 @@
+[
+  {
+    "id": "denim_boots",
+    "model": "denim_boots",
+    "name": "Denim boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.002
+    },
+    "description": "Mid-calf boots with denim uppers on a rubber sole, a leather band round the top and a zip up the inner side.",
+    "notes": "A standing pair, 280 mm long and 230 mm tall, toes to +z: denim feet and shafts, a black rubber sole with a short heel, a brown leather top band and a seam band at the ankle; the steel zips face each other on the inner sides. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "faux_fur_boots",
+    "model": "faux_fur_boots",
+    "name": "Faux fur boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.002
+    },
+    "description": "Tall soft boots of shaggy synthetic fur on a thick sole, the top turned out in a deep cuff and tied at the ankle with bobbled cords.",
+    "notes": "A standing pair, 300 mm long and 280 mm tall: khaki cloth feet on a grey sole, grey shaggy shafts with a white fur cuff, khaki cords and bobbles at the ankle front. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "fur_boots",
+    "model": "fur_boots",
+    "name": "Fur boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0012
+    },
+    "description": "Brown leather boots lined with fur, the lining turned down over the top in a thick cuff and the shaft bound with two rawhide thongs.",
+    "notes": "A standing pair, 300 mm long and 270 mm tall: brown leather on a black rubber sole, a fur cuff and fur showing at the opening, two pale rawhide thongs round the shaft. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hiking_boots",
+    "model": "hiking_boots",
+    "name": "Hiking boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0012
+    },
+    "description": "Light leather boots laced to above the ankle, with a padded collar and a rubber rand wrapped round the toe of a deep sole.",
+    "notes": "A standing pair, 290 mm long and 170 mm tall: brown leather uppers, a khaki padded collar and tongue, red laces, a charcoal rand over the toe and a thick black sole. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "leather_armour_boots",
+    "model": "leather_armour_boots",
+    "name": "Leather armour boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.15,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "Thick black leather boots with a hardened leather cap over the toe and a plate down the shin, buckled on with three straps.",
+    "notes": "A standing pair, 290 mm long and 250 mm tall: black leather, brown hardened leather toe caps and ridged shin plates, three rawhide straps with steel buckles on the outer side. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "armoured_boots",
+    "model": "armoured_boots",
+    "name": "Armoured boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Heavy boots of plate steel: a greave closed round the shin and overlapping lames stepping down over the instep to the toe, strapped and buckled at the front.",
+    "notes": "A standing pair, 300 mm long and 270 mm tall: steel greaves with a ridge down the front and a rim at the ankle, seven lames alternating bright and dull steel over each foot, a leather strap and padded top rim, rivets at the sides. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "scrap_boots",
+    "model": "scrap_boots",
+    "name": "Scrap boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.5,
+        "pierce": 0.3
+      }
+    },
+    "description": "Cloth wrapped round the foot and shin and bound with rag strips, with rusty metal scraps lashed over the toe, the shin and the ankle.",
+    "notes": "A standing pair, 290 mm long and 200 mm tall: pale rag uppers bound with five darker rag bands, a rusty plate over the toe and another tied over the shin with a bolt, a grey steel patch over each outer ankle, on a black rubber sole. Usage is empty because survivors make them rather than finding them. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "steel_toe_boots",
+    "model": "steel_toe_boots",
+    "name": "Steel-toe boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "Laced tan leather work boots on a thick sole, with a steel cap inside the toe under a darker leather cover.",
+    "notes": "A standing pair, 290 mm long and 180 mm tall: tan nubuck uppers and tongue, a brown leather toe cap swollen over the steel, a brown padded collar, black laces and a thick charcoal sole. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "western_boots",
+    "model": "western_boots",
+    "name": "Western boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 1.2,
+          "name": "boot shaft"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0012
+    },
+    "description": "Tall stiff leather boots with a pointed toe and a stacked heel, the shafts stitched in chevrons. Each shaft has room to hide something small.",
+    "notes": "A standing pair, 300 mm long and 320 mm tall: narrow pointed brown feet on a walnut-coloured leather sole with a 30 mm heel, black shafts with three cream stitched chevrons down the front, and a brown pull tab either side of the top. The pocket is the space inside one shaft, sized for a small pistol. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "winter_boots",
+    "model": "winter_boots",
+    "name": "Winter boots",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0015
+    },
+    "description": "Insulated boots with a rubber shell over the foot, a laced nylon shaft and a thick wool lining rolled over the top.",
+    "notes": "A standing pair, 310 mm long and 260 mm tall: a black rubber shell over the foot on a thick charcoal sole, khaki shafts with black laces, a grey wool collar and lining. The xl and xs sizes share the model. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_mail_chausses",
+    "model": "hardened_mail_chausses",
+    "name": "Hardened mail chausses",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.12,
+        "cut": 0.85,
+        "pierce": 0.4
+      }
+    },
+    "description": "Mail booties of hardened steel rings that cover the foot and tie at the top of the leg.",
+    "notes": "Laid flat as a pair, each a mail leg 120 mm across with its foot turned out to the side, 300 mm from the leather tie to the heel; the hardened steel mail is ridged with rows of rings. Mail slumps flat on the floor rather than standing. The model lays the mail out so it reads as two booties. Usage is empty because they are smithed rather than found. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sabaton",
+    "model": "hardened_sabaton",
+    "name": "Hardened sabaton",
+    "category": "clothing",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.85,
+        "pierce": 0.55
+      }
+    },
+    "description": "A shell of jointed hardened steel lames that straps over a shoe to cover the top of one foot.",
+    "notes": "One sabaton, 280 mm long and 100 mm tall: seven lames alternating hardened and grey steel step down from the ankle to a rounded toe; it is open behind with a dark hollow, held by a leather strap under the arch and a buckled strap round the heel. A sabaton covers one foot, so a player wears two. Slot feet like the other footwear; a sabaton sits on the outer layer over a shoe, which the feet slot cannot yet express. The heel strap loop stands out behind and the box takes in its air. Usage is empty because they are smithed. The xl size shares the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sheet_sabatons",
+    "model": "hardened_sheet_sabatons",
+    "name": "Hardened sheet sabatons",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.8,
+        "pierce": 0.5
+      }
+    },
+    "description": "A pair of crude foot guards bent from hardened sheet steel and riveted together, strapped over shoes.",
+    "notes": "A standing pair, 300 mm long and 95 mm tall: three thick plates over the front of each foot, alternating hardened and blackened steel, steel rivets at the sides, open behind, with leather straps under the arch and round the heel. They sit on the outer layer over a shoe, which the feet slot cannot yet express. The heel strap loops stand out behind and the box takes in their air. Usage is empty because they are made rather than found. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "rusty_mail_chausses",
+    "model": "rusty_mail_chausses",
+    "name": "Rusty mail chausses",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.1,
+        "cut": 0.7,
+        "pierce": 0.3
+      }
+    },
+    "description": "Mail booties of rusting steel rings with a leather sole patch under each foot, tied at the top of the leg.",
+    "notes": "Laid flat as a pair, each a mail leg 120 mm across with its foot turned out to the side, 300 mm from the leather tie to the heel; dull mail ridged with rust-coloured rows, a brown leather sole patch over each foot. The model lays the mail out so it reads as two booties. Usage is empty because they are made rather than found. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  }
+]

@@ -1,0 +1,250 @@
+[
+  {
+    "id": "field_power_pack",
+    "model": "field_power_pack",
+    "name": "Field power pack",
+    "category": "tool",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A rugged olive box with a carry handle, a row of power sockets and a small status screen. It runs powered gear from its own batteries, and runs through them fast.",
+    "notes": "200 by 100 by 125 mm with rubber corner guards and a 35 mm handle on top. On and off states share this model, and the switched state and the battery drain are left to the power framework. The box is larger because the handle and corner guards stand proud of the body. It also serves for the switched-off state."
+  },
+  {
+    "id": "usb_drive",
+    "model": "usb_drive",
+    "name": "Thumb drive",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small plastic thumb drive with a metal plug. It holds files, if anything is left to read them.",
+    "notes": "50 mm long, 18 mm wide and 8 mm thick, with a lanyard loop at the back. The box is larger because the plug is narrower than the body. What data it holds is left to a data framework."
+  },
+  {
+    "id": "usb_drive_older",
+    "model": "usb_drive",
+    "name": "Old thumb drive",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "body": "plastic-grey"
+    },
+    "description": "A scuffed grey thumb drive from a few years back. It probably still works.",
+    "notes": "Variant of the thumb drive; same model with a grey body."
+  },
+  {
+    "id": "wand_massager",
+    "model": "vibrator",
+    "name": "Wand massager",
+    "category": "misc",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A battery wand with a soft rounded head that hums against sore muscles. Using it helps you unwind, and it eats batteries quickly.",
+    "notes": "198 mm long: a 34 mm handle with a switch and a 46 mm head. Relaxing on use and battery drain are left to the tool framework."
+  },
+  {
+    "id": "crude_picklock",
+    "model": "crude_picklock",
+    "name": "Improvised lockpick",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "lockpicking": 2
+      }
+    },
+    "description": "A pick and a tension wrench cut from scrap strip, the pick's grip wrapped in tape. They are brittle, but in skilled hands they open locks quietly.",
+    "notes": "110 mm pick and 70 mm L-shaped wrench lying side by side; the two loose pieces fill little of their box. `lockpicking` follows the scale batch 194's skeleton key set at 3 for its top level: the locksmith kit 3, this 2 and the rudimentary pick 1. Breaking on use is left to the tool framework."
+  },
+  {
+    "id": "emergency_lockpick",
+    "model": "emergency_lockpick",
+    "name": "Rudimentary lockpick",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "lockpicking": 1
+      }
+    },
+    "description": "Two bent lengths of thin wire: a pick and an L-shaped tension wrench. Barely good enough to open a lock, but better than nothing.",
+    "notes": "80 mm pick with a looped back and a kinked tip, and a 60 mm wrench with a 12 mm leg. Wire is 2 mm, the finest grain, so it draws thicker than real wire."
+  },
+  {
+    "id": "heavy_crowbar",
+    "model": "heavy_crowbar",
+    "name": "Heavy pry bar",
+    "category": "tool",
+    "size": [
+      1,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1,
+        "prying": 3
+      }
+    },
+    "description": "A 1.5 m bar of solid steel, pointed at one end and forged to a hardened chisel at the other. It levers up almost anything, and it is heavy to carry.",
+    "notes": "1.52 m of 26 mm round bar. Qualities mirror the crowbar's. A melee weapon block is left for weapon tuning; it should be slower and harder-hitting than the crowbar."
+  },
+  {
+    "id": "ice_axe",
+    "model": "ice_axe",
+    "name": "Ice axe",
+    "category": "tool",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 2,
+        "prying": 1
+      }
+    },
+    "description": "A climber's axe: an alloy shaft with a rubber grip and a spike, and a steel head with a curved pick on one side and a small hammer on the other.",
+    "notes": "500 mm long, the head 240 mm across, lying flat. The T-shape fills little of its box. Only hammering and prying are given, as Deadvox has no fine hammering quality name yet. A melee weapon block is left for weapon tuning."
+  },
+  {
+    "id": "ny_hook",
+    "model": "ice_axe",
+    "name": "Forcible entry hook",
+    "category": "tool",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "grip": "steel-grey",
+      "head": "steel-grey",
+      "shaft": "steel-grey"
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 2,
+        "prying": 2
+      }
+    },
+    "description": "A firefighter's solid steel bar with a hooked pick at its head, made for tearing open doors, walls and ceilings.",
+    "notes": "Variant of the ice axe that rides on its model in plain steel, as the brief's variant rule asks. The real tool is about a metre of solid steel, far longer and heavier than the ice axe, so it should get its own model and size when variants may diverge."
+  },
+  {
+    "id": "lockpick_set",
+    "model": "lockpick_set",
+    "name": "Locksmith kit",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Police"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "lockpicking": 3
+      }
+    },
+    "description": "A zip wallet of steel picks and tension wrenches with moulded grips. With some skill it opens locks quickly and quietly.",
+    "notes": "Drawn open, 170 by 110 mm: seven hook, rake and diamond picks under an elastic band on one side, four wrenches and a pin gauge on the other. `lockpicking` 3 is the top level batch 194 set."
+  }
+]

@@ -1,0 +1,313 @@
+[
+  {
+    "id": "cotton_sheet",
+    "model": "cotton_sheet",
+    "name": "Cotton sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of plain cotton cloth, folded flat. Enough to sew a shirt sleeve or tear into bandages, though it wastes most of the cloth.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Cream cloth with a hemmed band. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show. Deadvox's rag is the smaller scrap; cutting a sheet into rags has no recipe field until the drafts are applied."
+  },
+  {
+    "id": "denim_sheet",
+    "model": "denim_sheet",
+    "name": "Denim sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of heavy blue denim, folded flat, with a pale woven edge. Tough enough for work trousers.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Blue denim with a cream selvedge."
+  },
+  {
+    "id": "patchwork_denim_sheet",
+    "model": "patchwork_denim_sheet",
+    "name": "Patchwork denim sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sheet stitched together from mismatched denim scraps. It sews up like plain denim but takes longer to work.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. The top shows a three by three grid of patches in dark, faded and navy denim with pale seams, so it reads apart from the plain sheet."
+  },
+  {
+    "id": "faux_fur_sheet",
+    "model": "faux_fur_sheet",
+    "name": "Faux fur sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of thick synthetic fur on a woven backing, folded once. Warm lining for a coat or hood.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 160 mm square pad, shaggy tufts over a cream backing. fur-pale is the only faux fur finish, so a brighter variant needs a coloured pile finish. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "felt_sheet",
+    "model": "felt_sheet",
+    "name": "Felt sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of grey pressed wool felt, folded flat. Soft, warm and easy to cut without fraying.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "patchwork_fur_sheet",
+    "model": "patchwork_fur_sheet",
+    "name": "Patchwork fur sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Scraps of fur pelt sewn together into one sheet, hair side out. Use it whole or cut it up for warm clothing.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 160 mm square pad on a rawhide backing, patches of brown, pale and red-brown fur with raised tufts and seams between them. No plain fur sheet is in this batch."
+  },
+  {
+    "id": "aramid_sheet",
+    "model": "aramid_sheet",
+    "name": "Aramid sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A length of loose-woven aramid fibre cloth, folded flat. It resists cuts and stabs, but the weave is too open to stop a bullet.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Gold aramid with weave ridges across the top. Named for the fibre rather than the brand. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "ballistic_aramid_panel",
+    "model": "ballistic_aramid_panel",
+    "name": "Ballistic aramid panel",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A stiff panel of tightly woven aramid layers bonded together and stitched round the edge. It slips into body armour to stop bullets; a damaged panel has to be replaced, not patched.",
+    "notes": "Drawn as a rigid panel 250 by 300 mm and 11 mm thick, cut corners, layer lines round its edges, black border stitching and a white label. No tool quality is given. Size 2 by 2 follows its 300 mm side. Named for the fibre rather than the brand."
+  },
+  {
+    "id": "leather_sheet",
+    "model": "leather_sheet",
+    "name": "Leather sheet",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sheet of brown tanned leather rolled up and tied with thongs. Cut it into straps, patches or armour pieces.",
+    "notes": "Drawn as a 300 by 600 mm sheet rolled into a 300 mm roll 44 mm across, tied near each end. Rolled rather than folded so it reads apart from the folded cloth sheets and from the tanned hide. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "stretch_fabric_sheet",
+    "model": "stretch_fabric_sheet",
+    "name": "Stretch fabric sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of shiny synthetic stretch fabric, folded flat. It makes close-fitting clothing that moves with the body.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Blue stretch fabric. Named for the fabric rather than the brand. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "neoprene_sheet",
+    "model": "neoprene_sheet",
+    "name": "Neoprene sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of thin black synthetic rubber, folded flat, faced with blue nylon on one side. It keeps out water and holds warmth when wet.",
+    "notes": "Drawn as a 300 by 600 mm sheet of 1 mm neoprene folded to a 150 mm square pad, the blue nylon facing showing at its open edge. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "fire_resistant_fabric_sheet",
+    "model": "fire_resistant_fabric_sheet",
+    "name": "Fire-resistant fabric sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A length of tan fire-resistant synthetic cloth, folded flat. It chars rather than melting or burning, for heat-proof clothing.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Tan turnout cloth with a hem. Named for what it does rather than the brand. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "nylon_sheet",
+    "model": "nylon_sheet",
+    "name": "Synthetic fabric sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of thin, slick synthetic fabric, folded flat. Light and quick to dry.",
+    "notes": "Drawn as a 300 by 600 mm sheet folded to a 150 mm square pad. Red nylon. The patchwork variant shares this model: it differs in being sewn from scraps, which the plain folded pad does not show."
+  },
+  {
+    "id": "cotton_strap",
+    "model": "cotton_strap",
+    "name": "Fabric strap",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A long strip of cotton webbing with a steel slide buckle, for a bag's shoulder strap. Its ends are folded back ready to sew on.",
+    "notes": "Drawn as a 1070 by 38 mm strap laid out in a flat loop 520 mm long, a steel slide buckle on one run and the sewn-back ends overlapping on the other. The loop's box is far larger than the strap itself; a coiled strap would be more compact but would hide the buckle."
+  },
+  {
+    "id": "tanned_hide",
+    "model": "tanned_hide",
+    "name": "Tanned hide",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A whole animal skin, tanned soft, with the shape of its legs, neck and tail still in it. Cut it into leather or use it as it is.",
+    "notes": "Drawn as a hide 370 by 500 mm laid out flat, hair side tan over a pale flesh rim. Laid flat, its outline is what tells it from the leather sheet. The drum skin variant rides on this model by the brief's rule, but it is a thin rawhide disc; it wants its own model and mass when variants can have them."
+  }
+]

@@ -1,0 +1,212 @@
+[
+  {
+    "id": "broom",
+    "model": "broom",
+    "name": "Broom",
+    "category": "tool",
+    "size": [
+      1,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A long wooden handle with a stitched straw head.",
+    "notes": "Lies along x with the straw head flat in the xz plane, as flat-headed tools do. The box is the long thin handle's bounding box, not a fault."
+  },
+  {
+    "id": "down_mattress",
+    "model": "down_mattress",
+    "name": "Down mattress",
+    "category": "misc",
+    "size": [
+      8,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A single mattress filled with down, quilted in soft channels.",
+    "notes": "Too big for a pack; the size is a placeholder until oversized carried items have a rule. Material source for cloth and stuffing."
+  },
+  {
+    "id": "mattress",
+    "model": "mattress",
+    "name": "Mattress",
+    "category": "misc",
+    "size": [
+      8,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A single sprung mattress in striped ticking.",
+    "notes": "Too big for a pack; the size is a placeholder until oversized carried items have a rule. No plaid or ticking print exists, so the stripes are raised strips. Steel springs inside are not modelled; salvage yields them."
+  },
+  {
+    "id": "remote_control_car_wheels",
+    "model": "remote_control_car_wheels",
+    "name": "RC car wheels",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Four small treaded wheels from a toy buggy.",
+    "notes": "One item is the set of four, laid two by two."
+  },
+  {
+    "id": "rubber_tire_chunk",
+    "model": "rubber_tire_chunk",
+    "name": "Thick rubber chunk",
+    "category": "material",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thick slab cut from a tyre tread."
+  },
+  {
+    "id": "rubber_tire_strip",
+    "model": "rubber_tire_strip",
+    "name": "Rubber tyre strip",
+    "category": "material",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A long strip cut from a tyre, curled into a coil.",
+    "notes": "The box counts the open middle of the coil."
+  },
+  {
+    "id": "sharp_rock",
+    "model": "sharp_rock",
+    "name": "Sharp rock",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1
+      }
+    },
+    "description": "A fist-sized stone with one rough knapped edge.",
+    "notes": "Spawns outdoors more than in buildings; the usage tags are the nearest fit until wilderness loot has a tag."
+  },
+  {
+    "id": "grenade_launcher_stock",
+    "model": "grenade_launcher_stock",
+    "name": "Grenade launcher stock",
+    "category": "attachments",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A collapsible stock that lets an underbarrel grenade launcher fire on its own.",
+    "notes": "Modelled closed. The box counts the open frame between the twin rods. Fitting it to a launcher needs a gun-part rule that does not exist yet."
+  },
+  {
+    "id": "wasp_stinger",
+    "model": "wasp_stinger",
+    "name": "Giant wasp stinger",
+    "category": "material",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A barbed black stinger as long as a hand, torn from a giant wasp.",
+    "notes": "A harvest from a giant wasp. It holds by the brown sheath; give it a weak pierce melee block if stingers become improvised weapons."
+  },
+  {
+    "id": "paraffin_wax",
+    "model": "paraffin_wax",
+    "name": "Paraffin wax",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A broken block of white candle wax.",
+    "notes": "No translucent white wax finish exists; wax-ivory is opaque."
+  }
+]

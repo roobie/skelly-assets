@@ -1,0 +1,190 @@
+[
+  {
+    "id": "heavy_duty_fridge",
+    "model": "heavy_duty_fridge",
+    "name": "Commercial fridge",
+    "category": "misc",
+    "size": [
+      6,
+      10
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "heavy_duty_fridge",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A tall stainless reach-in fridge on casters, with the compressor on top. Keeps food cold. Needs mains power.",
+    "notes": "The model is 2.15 m tall and includes the casters and compressor housing. Usage is empty because no kitchen, shop or restaurant usage tag exists. refrigeration follows batch 3's quality name. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "minifridge",
+    "model": "minifridge",
+    "name": "Minifridge",
+    "category": "misc",
+    "size": [
+      4,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "minifridge",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A small cube fridge with one door. Keeps food and drinks cold. Needs mains power.",
+    "notes": "The variants share this model, but only minifreezer fits it. The food truck fridge and freezer and the chest freezer would read as toys at this size, and the two chest freezers want a lid on top rather than a front door. The heavy-duty freezer variant matches heavy_duty_fridge in size and would fit that model better. Freezer variants would bring freezing rather than refrigeration. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "acetaminophen",
+    "model": "acetaminophen",
+    "name": "Bottle of acetaminophen",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Eases mild pain and brings down a fever. Heals nothing.",
+    "notes": "Red cap and yellow label set it apart from the aspirin bottle. Its analgesic block is left for the refactor, as it should sit with aspirin in the otc group."
+  },
+  {
+    "id": "prescription_stimulant",
+    "model": "prescription_stimulant",
+    "name": "Vial of prescription stimulants",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Wards off sleep and dulls hunger. Habit-forming.",
+    "notes": "The id avoids the brand name. fuel-amber is the nearest finish to amber vial plastic. Wakefulness and addiction have no content fields yet."
+  },
+  {
+    "id": "antifungal",
+    "model": "antifungal",
+    "name": "Carton of antifungal tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Treats fungal infections.",
+    "notes": "Drawn as a carton rather than a bottle so it differs from the other tablets on the ground. Deadvox has no fungal infection to treat yet."
+  },
+  {
+    "id": "antihistamine",
+    "model": "antihistamine",
+    "name": "Blister card of antihistamines",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Eases allergic reactions. Can cause drowsiness.",
+    "notes": "The tablets are boxes because round bubbles break into crosses at the 2 mm grain; plastic-clear-red stands in for pink tablets under clear plastic."
+  },
+  {
+    "id": "antiparasitic",
+    "model": "antiparasitic",
+    "name": "Tub of wormer tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Clears worms and other parasites. Made for livestock.",
+    "notes": "Residential stands in for farm and feed-store loot, for which no usage tag exists."
+  },
+  {
+    "id": "antiseptic_powder",
+    "model": "antiseptic_powder",
+    "name": "Shaker of antiseptic powder",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Dusted on a wound to keep it clean.",
+    "notes": "Not skipped as loose powder: the player finds it in a sifter canister, so the canister is the item. Whether it disinfects like the existing antiseptic bottle is for the refactor."
+  }
+]

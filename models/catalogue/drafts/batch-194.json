@@ -1,0 +1,201 @@
+[
+  {
+    "id": "rune_stitched_satchel",
+    "model": "rune_stitched_satchel",
+    "name": "Rune-stitched satchel",
+    "category": "bag",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            7,
+            6
+          ],
+          "handlingSimSeconds": 3,
+          "name": "main"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "sling",
+      "wearPerDamage": 0.002
+    },
+    "description": "A heavy chestnut leather satchel on a long shoulder strap. A ring of violet runes glows on its flap, and it holds far more than its size allows.",
+    "notes": "300 mm wide, 240 mm tall and 100 mm deep, its shoulder strap running down from brass side rings and lying coiled flat on the ground behind it. The larger two variants share this model with bigger pockets. The pocket is larger than the satchel's outside to stand in for the bag's extra room; lightening its load and the longer reach for an item are left to the magic framework. Worn across the body, so it takes `sling`."
+  },
+  {
+    "id": "rune_iron_preservation_chest",
+    "model": "rune_iron_preservation_chest",
+    "name": "Rune-bound iron chest",
+    "category": "bag",
+    "size": [
+      8,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            10,
+            8
+          ],
+          "handlingSimSeconds": 2.5,
+          "name": "main"
+        }
+      ]
+    },
+    "description": "A squat iron chest banded in blackened steel, so heavy it takes two to lift. Violet runes glow round its front and lid, and food kept inside stays fresh far longer.",
+    "notes": "600 mm wide, 400 mm tall and 420 mm deep, 660 mm across its side handles. Carried in both hands by its side handles, so it has no wearable; it may suit furniture better once the furniture framework takes containers. The slowed spoilage is left to the food and magic frameworks."
+  },
+  {
+    "id": "carved_beetle_ball",
+    "model": "carved_beetle_ball",
+    "name": "Carved beetle ball",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A heavy ball of dark-grained wood, carved with two bands and a stag beetle with raised jaws on each side. Held to the ear, it seems to chitter softly.",
+    "notes": "124 mm across, beetles standing about 4 mm proud. The small variant shares this model; the model is the large ball. The relief's movement and sound are left to the magic framework."
+  },
+  {
+    "id": "leaf_wrapped_resin_rune",
+    "model": "leaf_wrapped_resin_rune",
+    "name": "Leaf-wrapped resin rune",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A sticky lump of amber resin with a branching rune pressed into it, wrapped in a green leaf folded over at both ends.",
+    "notes": "70 mm long with its leaf, 48 mm wide and 18 mm tall; the resin disc is 34 mm across. The model is the wrapped rune, and what using it does is left to the magic framework. Drawn as misc until a category for runes exists."
+  },
+  {
+    "id": "gold_skeleton_key",
+    "model": "gold_skeleton_key",
+    "name": "Gold skeleton key",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "stack": 5,
+    "tool": {
+      "qualities": {
+        "lockpicking": 3
+      }
+    },
+    "description": "A small gold key with a blue crystal set in its ring bow and a plain two-toothed bit. Turned in any lock, it opens it.",
+    "notes": "64 mm long, 30 mm across the bow and bit. The box is the flat key's outline. The item is one key in a stack of five. `lockpicking` is a new quality name, taking the top level. Being used up on opening is left to the tool framework."
+  },
+  {
+    "id": "everburning_torch",
+    "model": "everburning_torch",
+    "name": "Everburning torch",
+    "category": "light",
+    "size": [
+      1,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "description": "A torch of carved oak bound with brass, the brass cup at its head holding a steady flame that needs no fuel and never goes out.",
+    "notes": "510 mm long, 72 mm across the cup at its head. The model shows the torch lit, with a `flame` anchor at its head like the plain torch; lighting and dousing it on command is left to the light and magic frameworks."
+  },
+  {
+    "id": "silver_weapon_token",
+    "model": "silver_weapon_token",
+    "name": "Silver sword token",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "description": "A large silver coin with a raised rim, a sword struck on its face and a single word on its back. Speak the word and the coin becomes the sword.",
+    "notes": "40 mm across and 4 mm thick at its relief. The other tokens share this model; at 2 mm grain their struck pictures would all read as the same small mark, so each keeps the sword relief and is told apart by name. Turning into its weapon is left to the magic framework."
+  },
+  {
+    "id": "crystal_socket_wand",
+    "model": "crystal_socket_wand",
+    "name": "Crystal-socket wand",
+    "category": "tool",
+    "size": [
+      1,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "mana_focus": 1
+      }
+    },
+    "description": "A slender walnut wand with a ringed grip, tapering to a fine tip. A pale blue crystal sits in a brass socket at its base.",
+    "notes": "378 mm long, 24 mm across the socket. Every wand looks the same, so all share this model; the spell each casts and its charges are left to the magic framework. `mana_focus` reuses the quality earlier fantasy drafts declare."
+  }
+]

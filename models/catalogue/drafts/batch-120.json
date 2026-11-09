@@ -1,0 +1,455 @@
+[
+  {
+    "id": "nylon_coif",
+    "model": "nylon_coif",
+    "name": "Nylon coif",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "hood",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A close padded hood of layered nylon that covers the head, neck and forehead and spreads over the shoulders. Worn under a helmet as a cushion, it still turns a glancing blow on its own.",
+    "notes": "Standing upright as on a shelf, 330 mm across the shoulder curtain and 310 mm tall: a padded ranger-green nylon hood over the crown, the face opening at +z drawn as a dark patch with a bound rim, quilted rings round the flared curtain and a buttoned chin strap. The model stands as a hollow hood round a head-sized space. Slot `head`: the coif is padding worn under a helmet, which one head slot cannot express; it needs a layer under the helmet once Deadvox has one. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored. Slot hood: worn under a helmet, which takes head."
+  },
+  {
+    "id": "wool_coif",
+    "model": "wool_coif",
+    "name": "Wool coif",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "hood",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A close padded hood of quilted wool that covers the head, neck and forehead and spreads over the shoulders. Warm, and made to sit under a helmet, though it softens a blow without one.",
+    "notes": "Standing upright as on a shelf, 330 mm across the shoulder curtain and 310 mm tall: a padded grey wool hood over the crown, the face opening at +z drawn as a dark patch with a bound rim, quilted rings round the flared curtain and a buttoned chin strap. The model stands as a hollow hood round a head-sized space. Slot `head`: the coif is padding worn under a helmet, which one head slot cannot express; it needs a layer under the helmet once Deadvox has one. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. Shares the nylon coif's builder as its own row; finishes are `wool-grey` with `cloth-charcoal` binding and quilting. The xl and xs sizes share the model. The worn look is pending: no worn model is authored. Slot hood: worn under a helmet, which takes head."
+  },
+  {
+    "id": "nylon_aketon",
+    "model": "nylon_aketon",
+    "name": "Nylon aketon",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "A thick quilted jacket of many layers of nylon, made to be worn under mail or plate. Light for its bulk, and it stops a fair amount on its own.",
+    "notes": "Folded flat on a shelf, 360 mm by 320 mm and 60 mm tall, collar at the +z end: quilted channels running collar to hem, a stand collar, black buttons down the front, and quilted sleeves folded in along both sides with bound cuffs. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; it covers the arms as well. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "nylon_aketon_vest",
+    "model": "nylon_aketon_vest",
+    "name": "Nylon aketon vest",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "A sleeveless quilted vest of layered nylon, made to pad the body under heavier armour. Light, and it blunts a blow on its own.",
+    "notes": "Folded flat on a shelf, 340 mm by 320 mm and 55 mm tall, collar at the +z end: quilted channels running collar to hem, a stand collar, black buttons down the front, and bound armholes at both shoulders. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it: it is a padding garment worn under armour, not a load vest, so it does not take `vest`. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "canvas_arming_pants",
+    "model": "canvas_arming_pants",
+    "name": "Canvas arming pants",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "legs",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.45,
+        "pierce": 0.3
+      }
+    },
+    "description": "Heavy trousers quilted from many layers of canvas, worn under leg armour and laced to the jacket at the waist. Stiff, but they take a lot of punishment.",
+    "notes": "Folded in a long bundle, 260 mm by 420 mm and 45 mm tall: the legs laid one on the other with quilted channels along their length, an inseam line, a fly, bound cuffs, and four lacing points at the waistband hanging over the front edge for tying the pants to the aketon above. Canvas body with brown quilting, binding and leather lacing points. Quilted padding folded loosely stands tall. Slot `legs`, as the jeans have it. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "nylon_arming_pants",
+    "model": "nylon_arming_pants",
+    "name": "Nylon arming pants",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "legs",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "Quilted trousers of layered nylon, worn under leg armour and laced to the jacket at the waist. Lighter than the canvas kind.",
+    "notes": "Folded in a long bundle, 260 mm by 420 mm and 45 mm tall: the legs laid one on the other with quilted channels along their length, an inseam line, a fly, bound cuffs, and four lacing points at the waistband hanging over the front edge for tying the pants to the aketon above. Ranger-green nylon with black quilting, binding and lacing points; its own row on the pants builder. Quilted padding folded loosely stands tall. Slot `legs`, as the jeans have it. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wool_arming_pants",
+    "model": "wool_arming_pants",
+    "name": "Wool arming pants",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "legs",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "Warm quilted trousers of layered wool, worn under leg armour and laced to the jacket at the waist.",
+    "notes": "Folded in a long bundle, 260 mm by 420 mm and 45 mm tall: the legs laid one on the other with quilted channels along their length, an inseam line, a fly, bound cuffs, and four lacing points at the waistband hanging over the front edge for tying the pants to the aketon above. Grey wool with charcoal quilting and binding and leather lacing points; its own row on the pants builder. Quilted padding folded loosely stands tall. Slot `legs`, as the jeans have it. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wool_aketon",
+    "model": "wool_aketon",
+    "name": "Wool aketon",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A thick quilted jacket of layered wool, made to be worn under mail or plate. Warm and heavy, and it stops a fair amount on its own.",
+    "notes": "Folded flat on a shelf, 360 mm by 320 mm and 65 mm tall, collar at the +z end: quilted channels running collar to hem, a stand collar, wooden buttons down the front, and quilted sleeves folded in along both sides with bound cuffs. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; it covers the arms as well. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wool_aketon_vest",
+    "model": "wool_aketon_vest",
+    "name": "Wool aketon vest",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A sleeveless quilted vest of layered wool, made to pad the body under heavier armour. Warm, and it softens a blow on its own.",
+    "notes": "Folded flat on a shelf, 340 mm by 320 mm and 60 mm tall, collar at the +z end: quilted channels running collar to hem, a stand collar, wooden buttons down the front, and bound armholes at both shoulders. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it: it is a padding garment worn under armour, not a load vest, so it does not take `vest`. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "gambeson",
+    "model": "gambeson",
+    "name": "Padded gambeson",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0018,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.4,
+        "pierce": 0.25
+      }
+    },
+    "description": "A long quilted greatcoat of cotton stuffed with rags and scrap padding, worn as armour by itself. Old or cheaply copied, but still thick enough to take a beating.",
+    "notes": "Folded flat on a shelf, 420 mm by 380 mm and 90 mm tall in four layers, collar at the +z end: quilted channels running collar to hem, a stand collar, thick quilted sleeves folded in along both sides, a front closed with tied laces, and the long quilted skirt folded back up over the hem end. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; the long skirt covers the arms and legs too. It is meant as the outer layer: too thick to wear a cuirass or mail over. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. Cotton reads as `cloth-cream` with khaki quilting and binding. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "canvas_gambeson",
+    "model": "canvas_gambeson",
+    "name": "Canvas gambeson",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.45,
+        "cut": 0.55,
+        "pierce": 0.35
+      }
+    },
+    "description": "A long greatcoat quilted from some thirty layers of canvas, worn as armour by itself. Heavy and very warm, it shrugs off most cuts and blows, and its skirt guards the legs.",
+    "notes": "Folded flat on a shelf, 420 mm by 380 mm and 90 mm tall in four layers, collar at the +z end: quilted channels running collar to hem, a stand collar, thick quilted sleeves folded in along both sides, a front closed with tied laces, and the long quilted skirt folded back up over the hem end. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; the long skirt covers the arms and legs too. It is meant as the outer layer: too thick to wear a cuirass or mail over. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "thin_sleeved_canvas_gambeson",
+    "model": "thin_sleeved_canvas_gambeson",
+    "name": "Thin-sleeved canvas gambeson",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.45,
+        "cut": 0.55,
+        "pierce": 0.35
+      }
+    },
+    "description": "A long canvas greatcoat quilted thick through the body and skirt, with lighter sleeves so the arms move freely. Worn as armour by itself.",
+    "notes": "Folded flat on a shelf, 420 mm by 380 mm and 85 mm tall in four layers, collar at the +z end: quilted channels running collar to hem, a stand collar, narrow quilted sleeves folded in along both sides, a front closed with tied laces, and the long quilted skirt folded back up over the hem end. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; the long skirt covers the arms and legs too. It is meant as the outer layer: too thick to wear a cuirass or mail over. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The thinner sleeves are the narrower, flatter strips along the sides. The sleeves are thinner than the body, but the item keeps one protection value because Deadvox gives a wearable one. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "canvas_gambeson_vest",
+    "model": "canvas_gambeson_vest",
+    "name": "Sleeveless canvas gambeson",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.45,
+        "cut": 0.55,
+        "pierce": 0.35
+      }
+    },
+    "description": "A long sleeveless surcoat quilted from many layers of canvas, worn as armour by itself. The arms are bare, but the body and legs are well covered.",
+    "notes": "Folded flat on a shelf, 400 mm by 380 mm and 80 mm tall in four layers, collar at the +z end: quilted channels running collar to hem, a stand collar, bound armholes at both shoulders, a front closed with tied laces, and the long quilted skirt folded back up over the hem end. Quilted padding folded loosely stands tall. Slot `torso`, as the jackets have it; its skirt covers the legs too. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "canvas_arming_mittens",
+    "model": "canvas_arming_mittens",
+    "name": "Canvas arming mittens",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.4,
+        "cut": 0.5,
+        "pierce": 0.3
+      }
+    },
+    "description": "Thick quilted canvas mitts with long cuffs, worn instead of armoured gloves. Too clumsy for fine work and very warm, but they protect the hands well.",
+    "notes": "Laid flat side by side, backs up, fingers towards +z: each mitt 285 mm from cuff to fingertip, quilted along the back, with a flared gauntlet cuff bound at its edge and a band at the wrist. Canvas with brown quilting and binding. The pair lies spread flat with the thumbs out. Slot `hands`, as batch 108's brigandine gloves named it. Encumbrance stays high: thick mitts leave the fingers little to do but grip a weapon. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "nylon_arming_mittens",
+    "model": "nylon_arming_mittens",
+    "name": "Nylon arming mittens",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.45,
+        "pierce": 0.3
+      }
+    },
+    "description": "Thick quilted nylon mitts with long cuffs, worn instead of armoured gloves. Lighter than canvas, but just as clumsy for anything but gripping a weapon.",
+    "notes": "Laid flat side by side, backs up, fingers towards +z: each mitt 285 mm from cuff to fingertip, quilted along the back, with a flared gauntlet cuff bound at its edge and a band at the wrist. Ranger-green nylon with black quilting and binding; its own row on the mitten builder. The pair lies spread flat with the thumbs out. Slot `hands`, as batch 108's brigandine gloves named it. Encumbrance stays high: thick mitts leave the fingers little to do but grip a weapon. Protection values are a judgement for layered padding: strong against blunt blows, fair against cuts, weak against points. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "id": "carpet_armguards",
+    "model": "carpet_armguards",
+    "name": "Carpet arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.2,
+        "cut": 0.3,
+        "pierce": 0.2
+      }
+    },
+    "description": "Squares of carpet rolled round the forearms and upper arms and held on with duct tape.",
+    "notes": "Per arm a forearm piece and a wider upper-arm piece of muted red pile carpet, each curled crown up into an open half-roll with its jute backing inside and its tail lying open on the floor, two strips of tape over the curl. The model's box is the pair laid out side by side. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "carpet_bracers",
+    "model": "carpet_bracers",
+    "name": "Carpet bracers",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.2,
+        "cut": 0.3,
+        "pierce": 0.2
+      }
+    },
+    "description": "Squares of carpet rolled round the forearms and held on with duct tape.",
+    "notes": "Per arm one piece of muted red pile carpet curled crown up into an open half-roll with its jute backing inside and its tail lying open on the floor, two strips of tape over the curl. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_arm_guards",
+    "model": "hardened_steel_arm_guards",
+    "name": "Hardened steel arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Hardened sheet steel plates for the forearms and upper arms, joined by a domed elbow cop and strapped on with leather.",
+    "notes": "Per arm a forearm and an upper-arm plate lying crown up, a riveted elbow cop between them, two leather straps and buckles on each plate. Hardened steel uses steel-grey; a heat-tinted finish would set it apart from plain sheet steel. The model's box is the pair laid out side by side. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_bracers",
+    "model": "hardened_steel_bracers",
+    "name": "Hardened steel bracers",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Hardened sheet steel plates curled to the forearms, with a rolled wrist edge and two leather straps each.",
+    "notes": "Per arm one forearm plate lying crown up with a rolled edge and two leather straps and buckles. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_elbow_guards",
+    "model": "hardened_steel_elbow_guards",
+    "name": "Hardened steel elbow guards",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.5,
+        "cut": 0.7,
+        "pierce": 0.5
+      }
+    },
+    "description": "Domed cops of hardened sheet steel that cover the elbows, each on a leather strap.",
+    "notes": "Per elbow a domed cop with a riveted side wing and a leather strap laid out each way, so the pair is 500 mm tip to tip. The straps laid out make the box much larger than the packed pair. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_pauldrons",
+    "model": "hardened_steel_pauldrons",
+    "name": "Hardened steel pauldrons",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.45,
+        "cut": 0.8,
+        "pierce": 0.6
+      }
+    },
+    "description": "Shoulder guards of hardened sheet steel: a curved cap and overlapping plates that run down the upper arm.",
+    "notes": "Per shoulder a cap with a rolled rim and four overlapping lames stepping down the arm, lying crown up, with a leather strap over the cap. Each pauldron is drawn 260 mm long, laid side by side 430 mm across. The model's box is the pair laid out side by side. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_mail_sleeves",
+    "model": "chainmail_sleeves",
+    "name": "Hardened steel mail sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.85,
+        "pierce": 0.4
+      }
+    },
+    "description": "A pair of mail sleeves of hardened steel rings, strapped together at the shoulders. They leave the hands free for gloves.",
+    "notes": "Laid flat side by side as two sleeves of mail, ridged where the rows of rings lie, joined at the shoulders by a strap. The model lays the mail out so it reads as sleeves. The four mail sleeves share this model; the mild, high and rusted ones recolour its mail slot. The xl and xs sizes share the model. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "rusty_mail_sleeves",
+    "model": "chainmail_sleeves",
+    "name": "Rusty mail sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "mail": "scrap-rusted"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.1,
+        "cut": 0.65,
+        "pierce": 0.3
+      }
+    },
+    "description": "A pair of rusted mail sleeves strapped together at the shoulders. They leave the hands free for gloves.",
+    "notes": "Laid flat side by side as two sleeves of mail, ridged where the rows of rings lie, joined at the shoulders by a strap. The model lays the mail out so it reads as sleeves. Shares the hardened mail sleeves' model with its mail in rusted scrap. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "padded_cloth_sleeves",
+    "model": "padded_cloth_sleeves",
+    "name": "Padded cloth sleeves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.25,
+        "cut": 0.2,
+        "pierce": 0.1
+      }
+    },
+    "description": "Thick cotton shirt sleeves cut free of the shirt and stuffed with stitched-in rag padding.",
+    "notes": "Laid flat side by side, tapering from shoulder to cuff, with rows of rag padding stitched across and laces at the shoulder ends. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "elbow_pads",
+    "model": "elbow_pads",
+    "name": "Elbow pads",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Police",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.3,
+        "cut": 0.1,
+        "pierce": 0.05
+      }
+    },
+    "description": "A pair of fabric sleeves with hard plastic caps over the elbows.",
+    "notes": "Each a short charcoal fabric sleeve with black bound hems and a grey moulded cap with a raised boss, lying on its side; the sleeve is charcoal rather than black so the hems read apart. The model keeps their round. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "gambeson_sleeve",
+    "model": "gambeson_sleeve",
+    "name": "Gambeson sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.4,
+        "cut": 0.45,
+        "pierce": 0.3
+      }
+    },
+    "description": "A pair of heavily quilted cloth sleeves that lace onto a gambeson.",
+    "notes": "Each sleeve padded thick enough to keep its round, quilted in rings, with a bound cuff and two laces at the shoulder. The xl and xs sizes share the model. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "high_carbon_steel_mail_sleeves",
+    "model": "chainmail_sleeves",
+    "name": "High-carbon steel mail sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "mail": "steel-galvanised"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.85,
+        "pierce": 0.4
+      }
+    },
+    "description": "A pair of mail sleeves of high-carbon steel rings, strapped together at the shoulders. They leave the hands free for gloves.",
+    "notes": "Laid flat side by side as two sleeves of mail, ridged where the rows of rings lie, joined at the shoulders by a strap. The model lays the mail out so it reads as sleeves. Shares the hardened mail sleeves' model with its mail in galvanised-look bright steel to set it apart. The xl and xs sizes share the model. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "improvised_tyre_arm_guards",
+    "model": "improvised_tyre_arm_guards",
+    "name": "Tyre arm guards",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.35,
+        "cut": 0.4,
+        "pierce": 0.3
+      }
+    },
+    "description": "Curved chunks of tyre tread held round the forearms and upper arms with duct tape.",
+    "notes": "Per arm a forearm and an upper-arm chunk of tyre lying crown up, tread blocks along the top, each wound twice with duct tape. The model's box is the pair laid out side by side. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "aramid_gambeson_sleeves",
+    "model": "gambeson_sleeve",
+    "name": "Aramid gambeson sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Police"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "binding": "cloth-black",
+      "lace": "webbing-black",
+      "quilt": "cloth-khaki"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.4,
+        "cut": 0.65,
+        "pierce": 0.55
+      }
+    },
+    "description": "A pair of quilted aramid sleeves faced with strips of soft body armour, laced to tie onto a gambeson.",
+    "notes": "Shares the gambeson sleeves' model, recoloured to aramid and dark armour binding. Aramid uses cloth-khaki; a golden aramid finish would read truer. The xl and xs sizes share the model. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "mild_steel_mail_sleeves",
+    "model": "chainmail_sleeves",
+    "name": "Mild steel mail sleeves",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "mail": "steel"
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.8,
+        "pierce": 0.35
+      }
+    },
+    "description": "A pair of mail sleeves of mild steel rings, strapped together at the shoulders. They leave the hands free for gloves.",
+    "notes": "Laid flat side by side as two sleeves of mail, ridged where the rows of rings lie, joined at the shoulders by a strap. The model lays the mail out so it reads as sleeves. Shares the hardened mail sleeves' model with its mail in darker plain steel. The xl and xs sizes share the model. Slot arms is new: no earlier slot covers the forearms and upper arms, and every arm piece in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  }
+]

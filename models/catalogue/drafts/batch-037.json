@@ -1,0 +1,434 @@
+[
+  {
+    "id": "mercury",
+    "model": "mercury",
+    "name": "Bottle of mercury",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A small glass bottle holding a heavy pool of liquid metal under a black screw cap.",
+    "notes": "Modelled as the bottle a player picks up, 32 mm across and 62 mm tall, holding 30 mL of mercury in mirror-silver under glass-clear; the whole bottle is one item, as liquids are, so the 0.45 kg mass is 405 g of metal plus the bottle. The tile draws the glass opaque, so the metal shows only in game."
+  },
+  {
+    "id": "glass_sheet",
+    "model": "glass_sheet",
+    "name": "Sheet of glass",
+    "category": "material",
+    "size": [
+      10,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A large sheet of plain window glass. It breaks easily.",
+    "notes": "1220 by 915 mm and 2.4 mm thick, lying flat, with syrup-green edge bands for glass's green edge and a paper sticker. It sets a 4 mm grain, so the sheet draws one voxel thick; that is the box/volume excess. Size follows the 1220 mm side and is too big for any bag; it is meant to be carried by hand, which needs a carried-item rule the schema does not have yet."
+  },
+  {
+    "id": "reinforced_glass_pane",
+    "model": "reinforced_glass_pane",
+    "name": "Pane of bullet-resistant glass",
+    "category": "material",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A thick square of laminated glass in a steel frame, made to stop bullets.",
+    "notes": "305 mm square and 57 mm thick: glass-clear with three plastic-frosted interlayers, in a steel-grey channel frame whose lips cover 12 mm of each face."
+  },
+  {
+    "id": "reinforced_glass_sheet",
+    "model": "reinforced_glass_sheet",
+    "name": "Sheet of bullet-resistant glass",
+    "category": "material",
+    "size": [
+      10,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A large sheet of laminated bullet-resistant glass edged in steel.",
+    "notes": "1220 by 915 mm and 19 mm thick; a sheet that size two inches thick would weigh about three times as much. Steel-grey edge strip, two plastic-frosted interlayers and a yellow rating stripe along the front. Size as for the plain sheet: carried by hand."
+  },
+  {
+    "id": "tempered_glass_sheet",
+    "model": "tempered_glass_sheet",
+    "name": "Sheet of tempered glass",
+    "category": "material",
+    "size": [
+      10,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A large sheet of tempered safety glass, with the maker's mark etched in one corner. It shatters into small blunt pieces.",
+    "notes": "1220 by 965 mm and 6 mm thick; syrup-green edge bands and a plastic-frosted etched mark. The 4 mm grain draws it 8 mm thick, which enlarges the box. Size as for the plain sheet: carried by hand."
+  },
+  {
+    "id": "red_paint",
+    "model": "red_paint",
+    "name": "Can of red paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A gallon can of red paint with a wire handle.",
+    "notes": "A gallon can 168 mm across and 192 mm tall with rolled rims, a pressed lid, a wire bail with a plastic grip, a label band in the paint's colour and a run of paint from the rim. The whole can is one item, as liquids are, so the mass includes about 0.4 kg of can. The box is enlarged by the bail. Each colour is its own draft on this model with a finishes map for the paint slot."
+  },
+  {
+    "id": "can_of_blue_paint",
+    "model": "red_paint",
+    "name": "Can of blue paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "paint-drum-blue"
+    },
+    "description": "A gallon can of blue paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to paint-drum-blue."
+  },
+  {
+    "id": "can_of_white_paint",
+    "model": "red_paint",
+    "name": "Can of white paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "paint-white"
+    },
+    "description": "A gallon can of white paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to paint-white."
+  },
+  {
+    "id": "can_of_green_paint",
+    "model": "red_paint",
+    "name": "Can of green paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "paint-green"
+    },
+    "description": "A gallon can of green paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to paint-green."
+  },
+  {
+    "id": "can_of_purple_paint",
+    "model": "red_paint",
+    "name": "Can of purple paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "cloth-purple"
+    },
+    "description": "A gallon can of purple paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to cloth-purple. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_yellow_paint",
+    "model": "red_paint",
+    "name": "Can of yellow paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "paint-crane-yellow"
+    },
+    "description": "A gallon can of yellow paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to paint-crane-yellow."
+  },
+  {
+    "id": "can_of_black_paint",
+    "model": "red_paint",
+    "name": "Can of black paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "lacquer-black"
+    },
+    "description": "A gallon can of black paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to lacquer-black. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_orange_paint",
+    "model": "red_paint",
+    "name": "Can of orange paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "plastic-orange"
+    },
+    "description": "A gallon can of orange paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to plastic-orange. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_pink_paint",
+    "model": "red_paint",
+    "name": "Can of pink paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "plastic-pink"
+    },
+    "description": "A gallon can of pink paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to plastic-pink. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_grey_paint",
+    "model": "red_paint",
+    "name": "Can of grey paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "canvas-grey"
+    },
+    "description": "A gallon can of grey paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to canvas-grey. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_brown_paint",
+    "model": "red_paint",
+    "name": "Can of brown paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "cloth-brown"
+    },
+    "description": "A gallon can of brown paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to cloth-brown. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "can_of_cyan_paint",
+    "model": "red_paint",
+    "name": "Can of cyan paint",
+    "category": "supplies",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "paint": "gem-aquamarine"
+    },
+    "description": "A gallon can of cyan paint with a wire handle.",
+    "notes": "Rides on red_paint's model with the paint slot recoloured to gem-aquamarine. No paint finish in that colour exists, so it borrows the nearest solid colour."
+  },
+  {
+    "id": "peephole",
+    "model": "peephole",
+    "name": "Door viewer",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A brass door viewer: a short barrel with a wide lens at one end and a screw-in eyepiece at the other.",
+    "notes": "14 mm across and 48 mm long, lying on its side: brass-polished barrel and lens flange, a brass-dull slotted eyepiece sleeve, glass-clear lenses. The model keeps the real size of a door viewer."
+  },
+  {
+    "id": "screen_mesh",
+    "model": "screen_mesh",
+    "name": "Roll of insect screen",
+    "category": "material",
+    "size": [
+      3,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A roll of fine mesh for screening out insects, wound on a card core.",
+    "notes": "300 mm wide and 66 mm across, wound on a paperboard core with a strip of tape, its loose end lying 70 mm out in front; mesh-black with plastic-charcoal winding lines on the ends. The loose end enlarges the box. Drawn as a roll."
+  }
+]

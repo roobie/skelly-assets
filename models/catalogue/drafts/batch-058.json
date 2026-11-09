@@ -1,0 +1,223 @@
+[
+  {
+    "id": "boxcutter",
+    "model": "boxcutter",
+    "name": "Box cutter",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 2,
+        "opening": 1
+      }
+    },
+    "description": "A plastic box cutter with a snap-off blade that slides out of its nose. Opens cartons and cuts cloth, but makes a poor weapon.",
+    "notes": "No butchering quality: the blade is too short to dress a carcass. The slider and grip pad stand proud of the body and enlarge the box."
+  },
+  {
+    "id": "copper_knife",
+    "model": "copper_knife",
+    "name": "Copper knife",
+    "category": "tool",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "butchering": 2,
+        "cutting": 2
+      }
+    },
+    "description": "A leaf-shaped blade hammered from copper on a round copper grip. Soft and quick to dull, but it cuts.",
+    "notes": "A crafted item, so it has no loot economy. butchering is a new quality name; the levels are a first guess against the stone knife and pocket knife. The raised centre rib is drawn in bronze so the hammered ridge shows against the copper."
+  },
+  {
+    "id": "honey_scraper",
+    "model": "honey_scraper",
+    "name": "Uncapping knife",
+    "category": "tool",
+    "size": [
+      1,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "butchering": 1,
+        "cutting": 1
+      }
+    },
+    "description": "A beekeeper's knife with a long, flat, double-edged blade for slicing the wax caps off honeycomb. Clumsy, but it will cut.",
+    "notes": "The handle is drawn in wood with a brass ferrule, as uncapping knives are made. The box is large because of the bounding box of a flat 45 mm blade. A melee profile can follow the kitchen knife's when the drafts are applied."
+  },
+  {
+    "id": "pocket_knife",
+    "model": "pocket_knife",
+    "name": "Pocket knife",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "butchering": 2,
+        "cutting": 2,
+        "opening": 1
+      }
+    },
+    "description": "A small folding knife with red plastic scales and a single clip-point blade. Fits in any pocket and is sharp enough for most small jobs.",
+    "notes": "Drawn opened so it reads as a knife, so the box is larger than the closed knife. 115 mm open is a typical small pocket knife. Deadvox has no folded state, so a closed model would need its own state."
+  },
+  {
+    "id": "primitive_knife",
+    "model": "primitive_knife",
+    "name": "Stone knife",
+    "category": "tool",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "butchering": 2,
+        "cutting": 2
+      }
+    },
+    "description": "A knapped stone blade set into a split wooden handle and bound with hide. Crude, but it holds an edge.",
+    "notes": "A crafted item, so it has no loot economy. The hide lashing is drawn in skin-rawhide. Lighter flake scars on the blade mark it as knapped."
+  },
+  {
+    "id": "stone_chopper",
+    "model": "stone_chopper",
+    "name": "Stone chopper",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 2
+      }
+    },
+    "description": "A fist-sized river stone with flakes knocked off one side to leave a rough cutting edge. The crudest blade there is.",
+    "notes": "A crafted item, so it has no loot economy. It has no butchering quality, as it is worse than bare hands for dressing a carcass. The fresh flaked edge is drawn lighter than the weathered cortex."
+  },
+  {
+    "id": "brush_axe",
+    "model": "brush_axe",
+    "name": "Bill",
+    "category": "tool",
+    "size": [
+      1,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "chopping": 1,
+        "cutting": 1,
+        "grass_cutting": 1
+      }
+    },
+    "description": "A hooked steel blade with a back spur, socketed onto a long wooden shaft. Made for clearing hedges and brush; just as good at keeping something at arm's length.",
+    "notes": "Drawn as a hedging bill, a shorter hooked blade on a long shaft, which suits a landscaping tool. chopping and grass_cutting are new quality names. The box is large because of the bounding box of a long shaft. The size is a guess for a 1.5 m polearm. A two-handed melee profile can follow when the drafts are applied."
+  },
+  {
+    "id": "bronze_bill",
+    "model": "brush_axe",
+    "name": "Bronze bill",
+    "category": "tool",
+    "size": [
+      1,
+      12
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "finishes": {
+      "blade": "bronze",
+      "socket": "bronze"
+    },
+    "tool": {
+      "qualities": {
+        "chopping": 1,
+        "cutting": 1,
+        "grass_cutting": 1
+      }
+    },
+    "description": "A hooked bronze blade with a back spur, socketed onto a long wooden shaft. Heavier than steel and softer at the edge.",
+    "notes": "Rides on the bill's model with a bronze head. A crafted item, so it has no loot economy."
+  },
+  {
+    "id": "digging_stick",
+    "model": "digging_stick",
+    "name": "Digging stick",
+    "category": "tool",
+    "size": [
+      1,
+      8
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "digging": 1
+      }
+    },
+    "description": "A stout stick with one end carved into a flat blade and hardened in the fire. Loosens soil for shallow holes, but no more.",
+    "notes": "A crafted item, so it has no loot economy. digging is a new quality name. The blackened tip shows the fire hardening; a bark knot partway up marks it as a cut branch."
+  }
+]

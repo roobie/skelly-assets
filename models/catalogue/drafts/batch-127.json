@@ -1,0 +1,434 @@
+[
+  {
+    "id": "wool_beret",
+    "model": "wool_beret",
+    "name": "Wool beret",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A soft round cap of maroon wool on a leather-bound headband.",
+    "notes": "Lying crown up: a full crown 250 mm across and 50 mm high with a short stalk at the centre and a black leather band at the rim. The beret is modelled full, as it keeps its shape on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "bowler_hat",
+    "model": "bowler_hat",
+    "name": "Bowler hat",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.002
+    },
+    "description": "A hard round hat of black felt with a narrow brim curled up at the edge and a ribbon band.",
+    "notes": "Standing on its brim: a domed crown 170 mm across and 135 mm tall, a satin band and a brim 280 mm across curled up at the edge. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "chaplet",
+    "model": "chaplet",
+    "name": "Chaplet",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.01
+    },
+    "description": "A ring of dried stems woven with leaves and small flowers, worn on the head.",
+    "notes": "Lying flat: a ring of twisted stems 220 mm across and 24 mm thick, set with twenty leaves and five dried flowers. The leaves use `leaf-green` so they read apart from the stems; a dried-leaf finish would suit them better. The wreath is an open ring. Slot `head`, as Deadvox's riot helmet has it. Wear per damage is high because dried stems snap. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "cowboy_hat",
+    "model": "cowboy_hat",
+    "name": "Cowboy hat",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0015
+    },
+    "description": "A leather hat with a tall creased crown and a wide brim rolled up at the edges.",
+    "notes": "Standing on its brim: a crown 175 mm across and 150 mm tall, creased down the middle of the top, a black band with a silver concho at the front, and a brim 380 mm across rolled up all round. The brim rolls up evenly; a turned brim cannot lift only at the sides. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "drinking_hat",
+    "model": "drinking_hat",
+    "name": "Drinking hat",
+    "category": "clothing",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.004
+    },
+    "description": "A cotton headband with a strap over the top and a small plastic bottle wired at each side. A rubber hose runs from each bottle to a mouthpiece at the chin.",
+    "notes": "Standing upright, face on +z: a cotton band 200 mm across with a strap over the top, two blue plastic bottles of about 400 ml held at the sides by steel wire and a cord tie, and a black hose from each cap running forward and down to a shared mouthpiece in front of the chin. The mass is for the empty hat. The bottles hold liquid, but the draft has no `container`: Deadvox's liquid containers are not wearables, and a worn container that spills when packed needs a rule the game lacks. The band is an open ring and the bottles stand clear of it. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "eboshi",
+    "model": "eboshi",
+    "name": "Eboshi",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A tall black lacquered cap that narrows towards the top, its tip folded forward. A white cord ties it under the chin.",
+    "notes": "Standing upright, front on +z: a cap 180 mm across and 255 mm tall tapering to a narrow top with its tip folded forward, a white cord round the rim and its ends hanging at the sides. The cap is round; a real one is narrower from side to side. The finish is `leather-patent` for the shiny lacquer over the cotton. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "boonie_hat",
+    "model": "boonie_hat",
+    "name": "Boonie hat",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A soft olive cotton hat with a round crown and a wide stitched brim. A band of loops round the crown holds foliage.",
+    "notes": "Standing on its brim: a soft crown 180 mm across, a band of eight loops round it, a brass vent eyelet each side and a drooping brim 316 mm across with two rows of stitching. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "chefs_toque",
+    "model": "chefs_toque",
+    "name": "Toque",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A tall white chef's hat, pleated all round and puffed out at the top.",
+    "notes": "Standing upright: an off-white band 190 mm across and 50 mm deep under a pleated white body that rises to 240 mm and puffs out to 220 mm across at the top. The toque is modelled standing tall. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "cotton_hat",
+    "model": "cotton_hat",
+    "name": "Cotton hat",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A snug knitted cotton hat with a ribbed cuff turned up at the brow.",
+    "notes": "Standing upright: a rounded red crown 170 mm across and 180 mm tall over a ribbed cuff 50 mm deep. The hat is modelled holding its shape. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "faux_fur_hat",
+    "model": "faux_fur_hat",
+    "name": "Faux fur hat",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "fur": "fur-pale",
+      "top": "cloth-black"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A deep round hat of pale synthetic pile with a black cloth top.",
+    "notes": "Rides on the fur hat's model `fur_hat` with pale pile and a black top: it differs from the fur hat only in colour. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "patrol_cap",
+    "model": "patrol_cap",
+    "name": "Patrol cap",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A round army cap with a flat top and a short stiff bill.",
+    "notes": "Standing on its bill, front on +z: a straight-sided crown 190 mm across and 95 mm tall with a flat top and a seam round its edge, and a bill reaching 165 mm forward. The finish is plain `cloth-ucp`: no camouflage print exists. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "fur_hat",
+    "model": "faux_fur_hat",
+    "name": "Fur hat",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0025
+    },
+    "description": "A deep round hat of brown pelt with a red cloth top. Very warm.",
+    "notes": "Standing upright: a drum of tufted brown pelt 220 mm across and 140 mm tall with a red velvet top set in. The hat is modelled holding its shape. Slot `head`, as Deadvox's riot helmet has it. The faux fur hat rides on this model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "golf_cap",
+    "model": "golf_cap",
+    "name": "Golf cap",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A flat brown cloth cap that slopes forward over a short bill and snaps down to it.",
+    "notes": "Standing upright, front on +z: a wedge of cloth 176 mm across and 70 mm tall at the back, sloping forward over a stiff bill 240 mm from back to tip, with a snap at the front. The finish is plain `cloth-brown`: no tweed exists. The hat is modelled standing open on a shelf. Slot `head`, as Deadvox's riot helmet has it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hard_hat",
+    "model": "hard_hat",
+    "name": "Hard hat",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front",
+        "name": "front",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "left_side",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right_side",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.5,
+        "cut": 0.45,
+        "pierce": 0.25
+      }
+    },
+    "description": "A yellow plastic safety helmet with a ridged crown and a short peak.",
+    "notes": "Standing on its rim, peak on +z: a domed shell 200 mm across and 135 mm tall with a raised ridge front to back and a lower rib either side, a narrow rim and a peak; 280 mm long overall. Slot `head`, as Deadvox's riot helmet has it. Protection is a guess for a plastic shell over a suspension. Attach points: front is the brow above the peak, where goggles mount; left side and right side are the accessory slots in the rim either side, beside the lower ribs, where ear muffs and face shields clip in; rear is the back of the rim, where nape guards and counterweight pouches hang. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "summer_hard_hat",
+    "model": "summer_hard_hat",
+    "name": "Summer hard hat",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front",
+        "name": "front",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "left_side",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right_side",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "rear",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.5,
+        "cut": 0.45,
+        "pierce": 0.25
+      }
+    },
+    "description": "A white plastic safety helmet with a cloth sun shade buttoned round the back and sides of the rim.",
+    "notes": "Rests on its shade, peak on +z: the hard hat's shell in white with a khaki shade buttoned to the rim at five points and spread on the floor round the back and sides, 380 mm across. The shade lies spread out rather than folded up. Slot `head`, as Deadvox's riot helmet has it. Protection matches the hard hat. Attach points: front is the brow above the peak, where goggles mount; left side and right side are the accessory slots in the rim either side, under the shade's buttons, where ear muffs and face shields clip in; rear is the back of the rim under the shade, where nape guards and counterweight pouches hang. The worn look is pending: no worn model is authored."
+  }
+]

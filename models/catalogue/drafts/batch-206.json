@@ -1,0 +1,255 @@
+[
+  {
+    "id": "flame_ward_belt",
+    "model": "flame_ward_belt",
+    "name": "Flame ward belt",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.002
+    },
+    "description": "A grey web belt with a heavy black box at the buckle. A crossed-out flame on the lid glows violet, and the air around you feels cooler.",
+    "notes": "Own model for the switched-on state: the crystal in the flame glows (`crystal-glow-violet`). A web belt 1.1 m long and 38 mm wide, laid flat in a U, outside up: the buckle run along +z and the tip run along -z, joined by the bend at +x, with a steel emitter box 90 by 64 mm on the buckle run at the right front, beside the buckle. The belt lies spread out, so its box is mostly air. A belt is the waist host: the box fills the right front, so four belt points take pouches: the left front on the buckle run's free end, the left hip on the tip run, the right hip past the box and the back at the bend. A belt takes the waist slot. The model shows the crystal set in the lid's emblem. The field it projects is a powered effect with no content field yet, so the draft carries no `protects`. It is worn, so the draft files it as clothing. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "flame_ward_belt_cracked",
+    "model": "flame_ward_belt_cracked",
+    "name": "Cracked flame ward belt",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.002
+    },
+    "description": "A grey web belt with a heavy black box at the buckle, a crossed-out flame on its lid. A corner of the box is broken off, a crack runs across the lid and it rattles when you shake it.",
+    "notes": "Own model for the broken state: a corner of the box is knocked off, its broken faces bright bare steel, a wide black crack runs from it across the lid and emblem and down the far side, and the crystal is dark (`gem-purple`). A web belt 1.1 m long and 38 mm wide, laid flat in a U, outside up: the buckle run along +z and the tip run along -z, joined by the bend at +x, with a steel emitter box 90 by 64 mm on the buckle run at the right front, beside the buckle. The belt lies spread out, so its box is mostly air. A belt is the waist host: the box fills the right front, so four belt points take pouches: the left front on the buckle run's free end, the left hip on the tip run, the right hip past the box and the back at the bend. A belt takes the waist slot. The model shows the crystal set in the lid's emblem. The field it projects is a powered effect with no content field yet, so the draft carries no `protects`. It is worn, so the draft files it as clothing. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "shield_belt",
+    "model": "shield_belt",
+    "name": "Shield belt",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.002
+    },
+    "description": "A grey web belt with a heavy black box at the buckle. A crystal set in the shield on its lid glows blue, and the air in front of you shimmers.",
+    "notes": "Own model for the switched-on state: the crystal in the shield glows (`crystal-glow-blue`). A web belt 1.1 m long and 38 mm wide, laid flat in a U, outside up: the buckle run along +z and the tip run along -z, joined by the bend at +x, with a steel emitter box 90 by 64 mm on the buckle run at the right front, beside the buckle. The belt lies spread out, so its box is mostly air. A belt is the waist host: the box fills the right front, so four belt points take pouches: the left front on the buckle run's free end, the left hip on the tip run, the right hip past the box and the back at the bend. A belt takes the waist slot. The model shows the crystal set in the lid's emblem. The field it projects is a powered effect with no content field yet, so the draft carries no `protects`. It is worn, so the draft files it as clothing. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "shield_belt_cracked",
+    "model": "shield_belt_cracked",
+    "name": "Cracked shield belt",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.002
+    },
+    "description": "A grey web belt with a heavy black box at the buckle, a shield on its lid. A corner of the box is broken off, a crack runs across the lid and it rattles when you shake it.",
+    "notes": "Own model for the broken state: a corner of the box is knocked off, its broken faces bright bare steel, a wide black crack runs from it across the lid and emblem and down the far side, and the crystal is dark (`gem-blue`). A web belt 1.1 m long and 38 mm wide, laid flat in a U, outside up: the buckle run along +z and the tip run along -z, joined by the bend at +x, with a steel emitter box 90 by 64 mm on the buckle run at the right front, beside the buckle. The belt lies spread out, so its box is mostly air. A belt is the waist host: the box fills the right front, so four belt points take pouches: the left front on the buckle run's free end, the left hip on the tip run, the right hip past the box and the back at the bend. A belt takes the waist slot. The model shows the crystal set in the lid's emblem. The field it projects is a powered effect with no content field yet, so the draft carries no `protects`. It is worn, so the draft files it as clothing. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "crystal_sight_glasses",
+    "model": "crystal_sight_glasses",
+    "name": "Crystal sight glasses",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "eyes",
+      "wearPerDamage": 0.002
+    },
+    "description": "Thick black glasses with a pod on one arm. A violet crystal hums in the pod, and a pale blue display glows in one lens.",
+    "notes": "Square-lensed glasses 150 mm across, standing on their lower rims with the temples folded behind, front on +z. Own model for the switched-on state: the display strip in the right lens and the crystal in the pod on the right temple glow. The glasses fill little of their box. The model shows a glowing crystal in the temple pod. What the glasses let the wearer see has no content field yet. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "crystal_wrist_computer",
+    "model": "crystal_wrist_computer",
+    "name": "Crystal wrist computer",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "timekeeping": 1
+      }
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.002
+    },
+    "description": "A slim green slate on a black wrist strap, its face a pane of blue crystal. It still keeps time, stores notes and tracks your heartbeat, though there is nothing left for it to talk to.",
+    "notes": "A 48 by 34 mm slate in a jade-green housing with a crystal face, lying face up on its plastic strap laid open 210 mm long. It is worn on one wrist like a watch, so it takes `wrist`, as the diver's watch does, and sidedness has no content field. `timekeeping` reuses the watches' quality; its notes, health and camera functions have no content field yet. The worn look is pending: no worn model is authored."
+  }
+]

@@ -1,0 +1,201 @@
+[
+  {
+    "id": "armchair",
+    "model": "armchair",
+    "name": "Armchair",
+    "category": "misc",
+    "size": [
+      8,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.5,
+      "sleep": true
+    },
+    "description": "A deep upholstered armchair with padded rolled arms, loose cushions and short wooden feet.",
+    "notes": "rest mirrors the furniture chair and sofa in furniture.jsonnet: sleeping in it is allowed, but poorly. It is a carry-it-across-the-room item, not a pocket one; dragging furniture has no content field yet. No upholstery finish exists: cloth-shirt-faded stands in for a worn reddish-brown fabric."
+  },
+  {
+    "id": "barstool",
+    "model": "barstool",
+    "name": "Bar stool",
+    "category": "misc",
+    "size": [
+      4,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.25
+    },
+    "description": "A tall stool with a padded round leather seat on a steel column, a foot ring and a heavy round base.",
+    "notes": "An open stool fills little of its bounding box. No sleep: a stool rules it out."
+  },
+  {
+    "id": "beanbag",
+    "model": "beanbag",
+    "name": "Bean bag",
+    "category": "misc",
+    "size": [
+      8,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.5,
+      "sleep": true
+    },
+    "description": "A big slumped nylon sack of foam beads, pressed into a seat with a high back.",
+    "notes": "Drawn sat-in, low in front and bunched at the back, so it reads as a seat. No nylon finish exists: cloth-navy draws the sack and plastic-charcoal the seam and carry loop."
+  },
+  {
+    "id": "plywood_chair",
+    "model": "plywood_chair",
+    "name": "Plywood chair",
+    "category": "misc",
+    "size": [
+      4,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.5
+    },
+    "description": "A stacking chair with a plywood seat and backrest on a round steel tube frame.",
+    "notes": "Drawn as a school or canteen chair. An open frame chair fills little of its bounding box. wood-birch draws the plywood."
+  },
+  {
+    "id": "wooden_chair",
+    "model": "wooden_chair",
+    "name": "Wooden chair",
+    "category": "misc",
+    "size": [
+      4,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 1
+    },
+    "description": "A plain wooden chair with a solid seat, low stretchers and a spindle back.",
+    "notes": "rest matches the furniture chair. The black and white chairs differ only in paint, so they share this model, drawn in stained oak; a painted finish per variant has no model field yet. An open frame chair fills little of its bounding box."
+  },
+  {
+    "id": "log_stool",
+    "model": "log_stool",
+    "name": "Log stool",
+    "category": "misc",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.25
+    },
+    "description": "A short round of tree trunk in rough bark, its top sawn flat and smoothed.",
+    "notes": "Made from a log, so it also has crafting origins. Drawn 300 mm across and 420 mm tall. No bark finish exists: wood-walnut draws the bark, wood-pine the sawn face and wood-oak its heart and growth ring."
+  },
+  {
+    "id": "wooden_stool",
+    "model": "wooden_stool",
+    "name": "Wooden stool",
+    "category": "misc",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "rest": {
+      "quality": 0.25
+    },
+    "description": "A small square wooden stool on four legs joined by stretchers.",
+    "notes": "rest is below the chair's because it has no back. Made from planks, so it also has crafting origins."
+  },
+  {
+    "id": "aluminium_foot_locker",
+    "model": "aluminium_foot_locker",
+    "name": "Aluminium foot locker",
+    "category": "bag",
+    "size": [
+      6,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            6,
+            3
+          ],
+          "handlingSimSeconds": 1
+        }
+      ]
+    },
+    "description": "A ribbed aluminium trunk with steel corner caps, a folding handle at each end and a small lock on its front hasp.",
+    "notes": "Drawn shut and empty. The steel foot locker shares this model: same shape, drawn in aluminium until a variant can carry its own finish. Locking the lid has no content field yet. The pocket grid is a placeholder."
+  }
+]

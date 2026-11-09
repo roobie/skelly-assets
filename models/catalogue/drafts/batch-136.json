@@ -1,0 +1,1353 @@
+[
+  {
+    "id": "tank_crew_helmet",
+    "model": "tank_crew_helmet",
+    "name": "Tank crew helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.35,
+        "cut": 0.15,
+        "pierce": 0.05
+      }
+    },
+    "description": "An old-pattern padded canvas cap for tank crews, with thick rolls over the crown to soften knocks against hatches and hull. Earpieces are sewn into the flaps, and a headset lead with a plug trails from the back.",
+    "notes": "Standing on its ear flaps, front on +z: an olive canvas cap 190 mm across with three dark olive padded rolls front to back over the crown, a padded brow roll round the front and sides, ear flaps with earpieces, a chin strap with a buckle, and the headset lead running back along the floor to its plug, 356 mm long overall with the lead. The lead lies out behind and a soft cap encloses a head-sized box. Slot `head`. Protection is a guess for padding with no hard shell. The headset is not wired to any radio feature. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_heavy_close_helm",
+    "model": "mild_steel_heavy_close_helm",
+    "name": "Mild steel heavy close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.7,
+        "cut": 0.9,
+        "pierce": 0.75
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Standing on its gorget, front on +z, 336 mm tall and 240 mm across: a round skull with a comb front to back, 3 flared gorget plates at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side, and a riveted reinforcing plate over the bevor. The visor is down with its pointed ridge and the sight slit along its upper edge. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by weight. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_heavy_close_helm_visor_up",
+    "model": "mild_steel_heavy_close_helm_visor_up",
+    "name": "Mild steel heavy close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.59,
+        "cut": 0.77,
+        "pierce": 0.64
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Standing on its gorget, front on +z, 336 mm tall and 240 mm across: a round skull with a comb front to back, 3 flared gorget plates at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side, and a riveted reinforcing plate over the bevor. The visor is swung up over the brow and the dark padded lining shows through the face opening. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. The raised visor is a visible state, so it has its own model; Deadvox could later fold the pair into one item with a visor toggle, as its night-vision goggles switch with `wornSwitch`. Protection is a guess and is cut by 15% with the face open, because the eyes and mouth lose cover. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_heavy_close_helm",
+    "model": "mild_steel_heavy_close_helm",
+    "name": "Medium steel heavy close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.75,
+        "cut": 0.95,
+        "pierce": 0.8
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares the mild steel model `mild_steel_heavy_close_helm` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by weight. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_heavy_close_helm_visor_up",
+    "model": "mild_steel_heavy_close_helm_visor_up",
+    "name": "Medium steel heavy close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.64,
+        "cut": 0.81,
+        "pierce": 0.68
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares the mild steel model `mild_steel_heavy_close_helm_visor_up` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model; Deadvox could later fold the pair into one item with a visor toggle, as its night-vision goggles switch with `wornSwitch`. Protection is a guess and is cut by 15% with the face open, because the eyes and mouth lose cover. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_close_helm",
+    "model": "mild_steel_close_helm",
+    "name": "Mild steel close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.6,
+        "cut": 0.85,
+        "pierce": 0.65
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Standing on its gorget, front on +z, 316 mm tall and 240 mm across: a round skull with a comb front to back, 2 flared gorget plates at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side. The visor is down with its pointed ridge and the sight slit along its upper edge. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by weight. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_close_helm_visor_up",
+    "model": "mild_steel_close_helm_visor_up",
+    "name": "Mild steel close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.51,
+        "cut": 0.72,
+        "pierce": 0.55
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Standing on its gorget, front on +z, 316 mm tall and 240 mm across: a round skull with a comb front to back, 2 flared gorget plates at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side. The visor is swung up over the brow and the dark padded lining shows through the face opening. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. The raised visor is a visible state, so it has its own model; Deadvox could later fold the pair into one item with a visor toggle, as its night-vision goggles switch with `wornSwitch`. Protection is a guess and is cut by 15% with the face open, because the eyes and mouth lose cover. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_close_helm",
+    "model": "mild_steel_close_helm",
+    "name": "Medium steel close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.65,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares the mild steel model `mild_steel_close_helm` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by weight. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_close_helm_visor_up",
+    "model": "mild_steel_close_helm_visor_up",
+    "name": "Medium steel close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.55,
+        "cut": 0.77,
+        "pierce": 0.59
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares the mild steel model `mild_steel_close_helm_visor_up` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model; Deadvox could later fold the pair into one item with a visor toggle, as its night-vision goggles switch with `wornSwitch`. Protection is a guess and is cut by 15% with the face open, because the eyes and mouth lose cover. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_light_close_helm",
+    "model": "mild_steel_light_close_helm",
+    "name": "Mild steel light close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.5,
+        "cut": 0.8,
+        "pierce": 0.55
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Standing on its gorget, front on +z, 300 mm tall and 240 mm across: a round skull with a comb front to back, 1 flared gorget plate at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side. The visor is down with its pointed ridge and the sight slit along its upper edge. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by weight. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_light_close_helm_visor_up",
+    "model": "mild_steel_light_close_helm_visor_up",
+    "name": "Mild steel light close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.42,
+        "cut": 0.68,
+        "pierce": 0.47
+      }
+    },
+    "description": "A mild steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Standing on its gorget, front on +z, 300 mm tall and 240 mm across: a round skull with a comb front to back, 1 flared gorget plate at the foot, a chin plate under a bevor with a centre ridge and five breaths on the right cheek, visor pivots with brass bosses either side. The visor is swung up over the brow and the dark padded lining shows through the face opening. Mild steel in `steel-bright`. A helmet is a hollow shell, so the box round the head it encloses is mostly air. The raised visor is a visible state, so it has its own model; Deadvox could later fold the pair into one item with a visor toggle, as its night-vision goggles switch with `wornSwitch`. Protection is a guess and is cut by 15% with the face open, because the eyes and mouth lose cover. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_nasal_helm",
+    "model": "mild_steel_nasal_helm",
+    "name": "Mild steel nasal helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.45,
+        "cut": 0.7,
+        "pierce": 0.45
+      }
+    },
+    "description": "A pointed round helmet of mild steel with banded crown, a leather lining and a bar that runs down over the nose. A modern copy of an early medieval design: it leaves the eyes clear and still turns a blow aimed at the face.",
+    "notes": "Resting on its nasal bar, front on +z, 232 mm across and 240 mm tall: a pointed round skull 165 mm high in `steel-bright` with two crossing bands over the crown and a brow band in `steel-grey` so they read, eight rivets round the brow, a brown leather lining showing below the rim, a nasal bar reaching to the floor, a knob at the crown, and leather chin straps with a buckle tucked up inside the rim. A helmet is a hollow shell, so the box round the head it encloses is mostly air. Slot `head`; it also covers the mouth through the nasal bar, which the head slot is taken to include. Protection is a guess. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_nasal_helm",
+    "model": "mild_steel_nasal_helm",
+    "name": "Medium steel nasal helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "band": "steel-bright",
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.5,
+        "cut": 0.75,
+        "pierce": 0.5
+      }
+    },
+    "description": "A pointed round helmet of medium steel with banded crown, a leather lining and a bar that runs down over the nose. A modern copy of an early medieval design: it leaves the eyes clear and still turns a blow aimed at the face.",
+    "notes": "Shares the mild steel model `mild_steel_nasal_helm` with the skull in `steel-grey`, the medium grade, and the bands in `steel-bright` so they still read against it; it differs only in colour. No row of its own, so the look step left this colouring unverified. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mild_steel_turban_helmet",
+    "model": "mild_steel_turban_helmet",
+    "name": "Mild steel turban helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.5,
+        "cut": 0.75,
+        "pierce": 0.5
+      }
+    },
+    "description": "A tall, bulbous fluted helmet of mild steel rising to a spike, with hinged ear guards and a nasal bar that slides up and down in a bracket. A modern copy of an old design from the Middle East.",
+    "notes": "Resting on its ear guards, front on +z, 240 mm across and 352 mm tall with the spike: a broad bowl fluted round its sides narrowing to a collar and a short spike, a raised brow band, broad ear guards hanging from brass hinge rivets each side to the floor, each a plate carrying the bowl's curve down and in over the cheek, and a sliding nasal bar in a bracket at the front with a knob at the top and a leaf-shaped foot. The fluting is vertical; spiral fluting needs a twisted piece the compound family lacks. A helmet is a hollow shell, so the box round the head it encloses is mostly air. Slot `head`; it also covers the mouth through the nasal bar, which the head slot is taken to include. Protection is a guess. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_turban_helmet",
+    "model": "mild_steel_turban_helmet",
+    "name": "Medium steel turban helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "band": "steel-grey",
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.55,
+        "cut": 0.8,
+        "pierce": 0.55
+      }
+    },
+    "description": "A tall, bulbous fluted helmet of medium steel rising to a spike, with hinged ear guards and a nasal bar that slides up and down in a bracket. A modern copy of an old design from the Middle East.",
+    "notes": "Shares the mild steel model `mild_steel_turban_helmet` with the steel in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_light_close_helm",
+    "model": "mild_steel_light_close_helm",
+    "name": "Medium steel light close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.55,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_light_close_helm` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by steel and weight, above the mild steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "medium_steel_light_close_helm_visor_up",
+    "model": "mild_steel_light_close_helm_visor_up",
+    "name": "Medium steel light close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-grey"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0009,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.47,
+        "cut": 0.72,
+        "pierce": 0.51
+      }
+    },
+    "description": "A medium steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_light_close_helm_visor_up` with the plates in `steel-grey`, the medium grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model, as batch 136's mild steel helms do. Protection is cut by 15% with the face open, because the eyes and mouth lose cover. Protection is a guess for a full steel helm graded by steel and weight, above the mild steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_heavy_close_helm",
+    "model": "mild_steel_heavy_close_helm",
+    "name": "Tempered steel heavy close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.8,
+        "cut": 0.95,
+        "pierce": 0.85
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_heavy_close_helm` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_heavy_close_helm_visor_up",
+    "model": "mild_steel_heavy_close_helm_visor_up",
+    "name": "Tempered steel heavy close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.68,
+        "cut": 0.81,
+        "pierce": 0.72
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and the tallest comb, three gorget plates and a riveted plate over the chin. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_heavy_close_helm_visor_up` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model, as batch 136's mild steel helms do. Protection is cut by 15% with the face open, because the eyes and mouth lose cover. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_close_helm",
+    "model": "mild_steel_close_helm",
+    "name": "Tempered steel close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.7,
+        "cut": 0.92,
+        "pierce": 0.75
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_close_helm` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_close_helm_visor_up",
+    "model": "mild_steel_close_helm_visor_up",
+    "name": "Tempered steel close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.59,
+        "cut": 0.78,
+        "pierce": 0.64
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and a comb and two gorget plates. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_close_helm_visor_up` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model, as batch 136's mild steel helms do. Protection is cut by 15% with the face open, because the eyes and mouth lose cover. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_light_close_helm",
+    "model": "mild_steel_light_close_helm",
+    "name": "Tempered steel light close helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.6,
+        "cut": 0.9,
+        "pierce": 0.65
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. With the visor down you look out through a narrow slit and breathe through the slots on the right cheek.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_light_close_helm` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the eyes and mouth, which the head slot is taken to include. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_light_close_helm_visor_up",
+    "model": "mild_steel_light_close_helm_visor_up",
+    "name": "Tempered steel light close helm, visor up",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.09,
+        "blunt": 0.51,
+        "cut": 0.77,
+        "pierce": 0.55
+      }
+    },
+    "description": "A tempered steel helm that closes round the whole head, with a pivoting visor over a chin guard and a low comb and one gorget plate. The visor is swung up, so you can see and breathe freely, but the face is open.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_light_close_helm_visor_up` with the plates in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. The raised visor is a visible state, so it has its own model, as batch 136's mild steel helms do. Protection is cut by 15% with the face open, because the eyes and mouth lose cover. Protection is a guess for a full steel helm graded by steel and weight, above the medium steel helm of the same pattern. The xl size shares the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim; no front mount, because the visor covers the face and nothing that rides there could be used with it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_nasal_helm",
+    "model": "mild_steel_nasal_helm",
+    "name": "Tempered steel nasal helm",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.55,
+        "cut": 0.8,
+        "pierce": 0.55
+      }
+    },
+    "description": "A pointed round helmet of tempered steel with banded crown, a leather lining and a bar that runs down over the nose. A modern copy of an early medieval design: it leaves the eyes clear and still turns a blow aimed at the face.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_nasal_helm` with the skull in `steel-heat-tint`, the tempered grade; the bands keep the model's `steel-grey` so they still read against it. It differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the mouth through the nasal bar. Protection is a guess graded above the medium steel nasal helm. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tempered_steel_turban_helmet",
+    "model": "mild_steel_turban_helmet",
+    "name": "Tempered steel turban helmet",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left",
+        "name": "left side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "right",
+        "name": "right side",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "rear",
+        "name": "back",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      },
+      {
+        "id": "front",
+        "name": "front mount",
+        "reachSimSeconds": 0.5,
+        "standard": "helmet"
+      }
+    ],
+    "finishes": {
+      "band": "steel-heat-tint",
+      "plate": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.6,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A tall, bulbous fluted helmet of tempered steel rising to a spike, with hinged ear guards and a nasal bar that slides up and down in a bracket. A modern copy of an old design from the Middle East.",
+    "notes": "Shares batch 136's mild steel model `mild_steel_turban_helmet` with the steel in `steel-heat-tint`, the tempered grade; it differs only in colour. No row of its own, so the look step left this colouring unverified. Slot `head`; it also covers the mouth through the nasal bar. Protection is a guess graded above the medium steel turban helmet. The xl and xs sizes share the model. Host for helmet add-ons: `helmet` points at the left side, right side and back of the rim, and a front mount above the brow for goggles. The worn look is pending: no worn model is authored."
+  }
+]

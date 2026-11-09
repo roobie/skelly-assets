@@ -1,0 +1,440 @@
+[
+  {
+    "id": "aquarium_medium",
+    "model": "aquarium_medium",
+    "name": "Aquarium (50 gallon)",
+    "category": "misc",
+    "size": [
+      9,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A 50 gallon glass tank in a black plastic frame. Holds water, or small animals kept as pets or food.",
+    "notes": "plastic-black trim frames glass-clear panes; the tiles draw the glass opaque, but it stays see-through in the game. Holding water or live animals has no content field yet, and the size is a placeholder for a thing too big to carry far. The 30 and 100 gallon tanks ride here; the two drying variants ride on aquarium_medium_drying, whose look fits them."
+  },
+  {
+    "id": "aquarium_medium_drying",
+    "model": "aquarium_medium_drying",
+    "name": "Aquarium (50 gallon, curing)",
+    "category": "misc",
+    "size": [
+      9,
+      5
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "description": "A freshly glued 50 gallon glass tank, its corners taped while the silicone cures. Not watertight until it sets.",
+    "notes": "A crafting intermediate, so it has no loot economy. Deadvox models have no item states, so the curing tank gets its own model: bare glass with no frame, white silicone beads in every corner and masking tape on the corners, so it reads apart from the finished tank. It cannot hold water until it cures, and curing over time into aquarium_medium has no content field yet. The 30 and 100 gallon drying tanks ride here, moved from aquarium_medium's variants."
+  },
+  {
+    "id": "canvas_sack",
+    "model": "canvas_sack",
+    "name": "Canvas sack",
+    "category": "bag",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            5,
+            5
+          ],
+          "handlingSimSeconds": 0.8
+        }
+      ]
+    },
+    "description": "A large, sturdy canvas sack with a cord to tie its neck.",
+    "notes": "Drawn standing slumped and tied, the shape a player recognises; the item size is the folded sack. The pocket grid is a placeholder. The garbage, nylon, dry and body bags ride here, though the body bag and punching bag sack would read better with models of their own."
+  },
+  {
+    "id": "plastic_bag",
+    "model": "plastic_bag",
+    "name": "Plastic bag",
+    "category": "bag",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            3
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A thin plastic carrier bag with two handles. Tears if overloaded.",
+    "notes": "Drawn standing open with its handles; the item size is the folded bag. The pocket grid is a placeholder and tearing has no content field yet. Wallets, IV and saline bags, a blister pack and paper sacks ride on this model for now, but the wallets and saline kits deserve models of their own."
+  },
+  {
+    "id": "plastic_bottle",
+    "model": "plastic_bottle",
+    "name": "Plastic bottle (500 ml)",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An empty 500 ml plastic bottle with a screw cap. Watertight.",
+    "notes": "The empty bottle. plastic-clear-blue draws the bottle; it stays see-through in the game. Liquid storage has no content field yet. Glass bottles, jugs, a thermos and lab glassware ride on this model for now, though the thermos, beaker, flask and test tubes would read better with their own."
+  },
+  {
+    "id": "pill_bottle",
+    "model": "pill_bottle",
+    "name": "Pill bottle",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.3
+        }
+      ]
+    },
+    "description": "An empty amber pharmacy bottle with a white child-proof cap.",
+    "notes": "The empty bottle. It is larger than batch 9's sedative vial and has a wide ribbed cap, so the empty container reads apart from the medicines drawn in their bottles. plastic-amber draws the bottle; it stays see-through in the game. The container follows the existing ammo can's fields; the pocket grid is a placeholder."
+  },
+  {
+    "id": "flattened_large_box",
+    "model": "flattened_large_box",
+    "name": "Flattened large cardboard box",
+    "category": "misc",
+    "size": [
+      15,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A flattened cardboard box. Folds up into a large box.",
+    "notes": "Drawn knocked down flat with its flaps, fold creases and glue tab, so it reads apart from the built box. Folding it up into the box has no content field yet. The size is a placeholder at the flat sheet's footprint."
+  },
+  {
+    "id": "flattened_medium_box",
+    "model": "flattened_medium_box",
+    "name": "Flattened cardboard box",
+    "category": "misc",
+    "size": [
+      8,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A flattened cardboard box. Folds up into a medium box.",
+    "notes": "Drawn knocked down flat with its flaps, fold creases and glue tab, so it reads apart from the built box. Folding it up into the box has no content field yet. The size is a placeholder at the flat sheet's footprint."
+  },
+  {
+    "id": "flattened_oversize_box",
+    "model": "flattened_oversize_box",
+    "name": "Flattened oversize cardboard box",
+    "category": "misc",
+    "size": [
+      22,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A flattened cardboard box. Folds up into a long box for long things.",
+    "notes": "Drawn knocked down flat with its flaps, fold creases and glue tab, so it reads apart from the built box. Folding it up into the box has no content field yet. The size is a placeholder at the flat sheet's footprint."
+  },
+  {
+    "id": "handgun_case",
+    "model": "handgun_case",
+    "name": "Handgun case",
+    "category": "bag",
+    "size": [
+      5,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Police",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            4,
+            3
+          ],
+          "handlingSimSeconds": 0.8
+        }
+      ]
+    },
+    "description": "A black hard plastic case with a foam-lined interior and two latches. Holds a handgun and its accessories.",
+    "notes": "The empty case. The container follows the existing ammo can's fields; the pocket grid is a placeholder, and restricting it to handguns has no content field yet."
+  },
+  {
+    "id": "small_box",
+    "model": "small_box",
+    "name": "Small cardboard box",
+    "category": "bag",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A small cardboard box taped shut across its top. Folds flat when empty.",
+    "notes": "The empty box. Packing tape uses paperboard-brown on paperboard-tan board. Folding flat into flattened_small_box has no content field yet. The container follows the existing ammo can's fields; the pocket grid is a placeholder. Cartons, cigarette packs, survival kits and even a chemistry set and spinning wheel ride on this model for now, but the chemistry sets, spinwheel and egg carton deserve models of their own."
+  },
+  {
+    "id": "flattened_small_box",
+    "model": "flattened_small_box",
+    "name": "Flattened small cardboard box",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A flattened cardboard box. Folds up into a small box.",
+    "notes": "Drawn knocked down flat with its flaps, fold creases and glue tab, so it reads apart from the built box. Folding it up into the box has no content field yet. The tiles show the same build as the larger flattened boxes at a finer grain."
+  },
+  {
+    "id": "small_metal_box",
+    "model": "small_metal_box",
+    "name": "Small metal box",
+    "category": "bag",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A small steel box with a hinged lid, a folding handle and a hasp for a padlock.",
+    "notes": "The empty box. The container follows the existing ammo can's fields; the pocket grid is a placeholder. The ammo cans and crates ride here, though the existing ammo_can model may suit the ammo cans better."
+  },
+  {
+    "id": "small_wooden_box",
+    "model": "small_wooden_box",
+    "name": "Small wooden box",
+    "category": "bag",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A small walnut box with brass hinges, a brass clasp and a pale inlaid lid.",
+    "notes": "The empty box, drawn as a keepsake box. The container follows the existing ammo can's fields; the pocket grid is a placeholder. The larger wooden boxes and the ammunition crate ride here, though they would read better as plain crates."
+  },
+  {
+    "id": "snack_box",
+    "model": "snack_box",
+    "name": "Snack box",
+    "category": "bag",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.3
+        }
+      ]
+    },
+    "description": "A small printed cardboard box for snacks, with a tuck flap lid.",
+    "notes": "The empty box. The container follows the existing ammo can's fields; the pocket grid is a placeholder."
+  },
+  {
+    "id": "shopping_bag",
+    "model": "plastic_bag",
+    "name": "Shopping bag",
+    "category": "bag",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            3
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A thin plastic carrier bag with two loop handles, for bringing shopping home.",
+    "notes": "Rides on batch 010's `plastic_bag` model, the same two-handled carrier bag standing open; no row of its own. It is carried in the hand, not worn, so it has no wearable block; Deadvox has no carried-bag slot."
+  }
+]

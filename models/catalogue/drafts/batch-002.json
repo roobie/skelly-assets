@@ -1,0 +1,170 @@
+[
+  {
+    "id": "planer",
+    "model": "planer",
+    "name": "Thickness planer",
+    "category": "misc",
+    "size": [
+      5,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "planer",
+      "qualities": {
+        "planing": 2
+      }
+    },
+    "description": "A floor planer that shaves boards flat to an even thickness. Needs power.",
+    "notes": "A placed workshop machine; the size is only a placeholder. Modelled with its infeed and outfeed tables out. The tables and the throat under the head leave open space in its box."
+  },
+  {
+    "id": "router_table",
+    "model": "router_table",
+    "name": "Router table",
+    "category": "misc",
+    "size": [
+      6,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "router_table",
+      "qualities": {
+        "routing": 1
+      }
+    },
+    "description": "A heavy table with a router set under its top and a fence along the bit. Cuts grooves and edge profiles in wood. Needs power.",
+    "notes": "The top is cast iron on a steel cabinet, as the machine is heavy. A placed workshop machine; the size is only a placeholder. The top overhangs the cabinet, so its box is largely empty. routing is a new quality name."
+  },
+  {
+    "id": "standing_floodlight",
+    "model": "standing_floodlight",
+    "name": "Floodlight stand",
+    "category": "misc",
+    "size": [
+      3,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A bright work light on a tall folding stand. Lights a wide area. Needs mains power.",
+    "notes": "The model stands with its legs spread 0.94 m, so its box is mostly air. The directed variant aims the same head and shares this model. It gives light rather than a crafting quality, so it drafts none; how a placed mains light lights the world is left to the refactor."
+  },
+  {
+    "id": "standing_lamp",
+    "model": "standing_lamp",
+    "name": "Floor lamp",
+    "category": "misc",
+    "size": [
+      2,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tall lamp with a cloth shade on a weighted base. Needs mains power.",
+    "notes": "The 0.44 m shade and 0.28 m base make the bounding box mostly air. It gives light rather than a crafting quality, so it drafts none."
+  },
+  {
+    "id": "stationary_water_purifier",
+    "model": "stationary_water_purifier",
+    "name": "Water purifier",
+    "category": "misc",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "stationary_water_purifier",
+      "qualities": {
+        "water_purification": 2
+      }
+    },
+    "description": "A mains-powered unit with three filter bowls and an ultraviolet lamp. Makes dirty water safe to drink.",
+    "notes": "Modelled as a wall or bench unit that stays where it is plugged in, so it drafts a workstation. water_purification is a new quality name; level 2 leaves room for a hand-held purifier at 1. Drawn as a white-painted cabinet with stainless fittings."
+  },
+  {
+    "id": "tablesaw",
+    "model": "tablesaw",
+    "name": "Table saw",
+    "category": "misc",
+    "size": [
+      6,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "tablesaw",
+      "qualities": {
+        "sawing": 3
+      }
+    },
+    "description": "A cabinet saw with its blade rising through a cast-iron top and a rip fence along it. Makes straight cuts in board and sheet. Needs power.",
+    "notes": "A placed workshop machine; the size is only a placeholder. The wings and fence rail overhang the cabinet, so its box is largely empty."
+  },
+  {
+    "id": "wall_light",
+    "model": "wall_light",
+    "name": "Wall light",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A round bulkhead light with a guard over its dome. Mounts on a wall and runs off mains power.",
+    "notes": "A bulkhead light 0.2 m across and about 9 cm deep. Modelled as it hangs on a wall, back plate at -z, standing on its rim. It gives light rather than a crafting quality, so it drafts none."
+  }
+]

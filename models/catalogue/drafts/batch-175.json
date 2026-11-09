@@ -1,0 +1,168 @@
+[
+  {
+    "id": "touring_suit",
+    "model": "touring_suit",
+    "name": "Leather riding suit",
+    "category": "clothing",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.7,
+          "name": "chest pocket"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "blunt": 0.25,
+        "cut": 0.4,
+        "pierce": 0.1
+      }
+    },
+    "description": "A one-piece suit of thick black leather made for racing motorcycles, zipped from crotch to collar, with hard pads sewn in over the shoulders, elbows and knees. Stiff and heavy, but it takes a slide across tarmac.",
+    "notes": "Folded to 440 mm by 460 mm and 70 mm tall, legs folded up over the lower half: black leather with a white yoke, red stripes down the sleeves and legs, a dark zip with a steel pull and a stand collar, charcoal pads over the shoulders, elbows and knees, and ribbed stretch panels above the knees. It covers the torso, arms and legs: slot `torso` is the nearest existing slot; it should also block the arms and legs slots once a slot can cover more than one region. Protection is a judgement for heavy leather with hard pads. The inside chest pocket is a judgement. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "bikini_bottom",
+    "model": "bikini_bottom",
+    "name": "Bikini bottoms",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "briefs",
+      "wearPerDamage": 0.004
+    },
+    "description": "Blue stretch-fabric swimming briefs that tie at each hip. They dry fast and cover very little.",
+    "notes": "Laid flat, 360 mm across with its ties and 160 mm long: a blue front panel narrowing to the crotch under a waistband, and a white tie knotted in a bow at each hip with its ends trailing. Slot `briefs` is new: no existing slot sits under trousers, and `legs` would stop trousers being worn over it; the matching top takes the new slot `bra`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "thong_bikini_bottoms",
+    "model": "thong_bikini_bottoms",
+    "name": "Thong bikini bottoms",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "briefs",
+      "wearPerDamage": 0.005
+    },
+    "description": "Red swimming briefs cut down to a small triangle of stretch fabric on a string waistband, with a string at the back.",
+    "notes": "Laid flat, 300 mm across the waist string and 136 mm long: a small red front panel narrowing to the crotch string, on a thin string waistband. Slot `briefs` is new, as for `bikini_bottom`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "bikini_top",
+    "model": "bikini_top",
+    "name": "Bikini top",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "bra",
+      "wearPerDamage": 0.004
+    },
+    "description": "A blue swimming top of two lightly padded triangle cups on ties round the neck and back.",
+    "notes": "Laid flat, 500 mm across its band strings and 250 mm tall with its neck strings: two padded blue triangle cups with a centre seam, a white hem, a tied centre bow, and white band and neck strings lying loose. The loose strings spread its box well past the cloth's own volume. Slot `bra` is new: no existing slot sits under a shirt, and `torso` would stop a shirt being worn over it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "small_bikini_top",
+    "model": "small_bikini_top",
+    "name": "Small bikini top",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "bra",
+      "wearPerDamage": 0.005
+    },
+    "description": "A red swimming top cut down to two small triangles on thin strings. More for the sun than for the water.",
+    "notes": "Laid flat, 424 mm across its strings and 214 mm tall: two small red triangle cups with darker centre seams on thin red band and neck strings. The loose strings spread its box well past the cloth's own volume. Slot `bra` is new, as for `bikini_top`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "modular_full_face_diving_mask",
+    "model": "modular_full_face_diving_mask",
+    "name": "Full-face diving mask",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "face",
+      "wearPerDamage": 0.002
+    },
+    "description": "A diving mask with one clear visor over the whole face, sealed by a rubber skirt and held on by a four-strap harness. A port on the chin takes a hose from an air tank or a breathing cartridge.",
+    "notes": "Standing on its chin, 200 mm across and 230 mm tall: a clear domed visor in an oval charcoal face-port frame over a black rubber skirt, an adapter port with an orange cap on the chin, an orange purge valve below it, and orange buckles where the black straps leave the frame. The four-strap spider harness drops down the skirt and lies slack on the floor behind, meeting at a back pad, out to 280 mm. The tiles draw the visor opaque; it stays see-through in the game. The harness lying on the floor spreads its box. It covers the eyes and mouth: slot `face`, and it should also block the `eyes` slot. Breathing from a tank or cartridge needs a connection standard for the chin port, proposed in the batch report rather than used here; until then it is a mask with no air supply. The worn look is pending: no worn model is authored."
+  }
+]
