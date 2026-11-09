@@ -1,7 +1,7 @@
 // Compile package Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
 // Call before importing package code, or run this module directly to refresh the twins.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileJsonnetFiles } from './jsonnet/index.mjs';
@@ -44,15 +44,22 @@ const inputsDigest = (root, sources) => {
 
 // The compile takes most of a minute and every package pre-script runs it, so unchanged inputs reuse the twins. The
 // digest covers every importable file under `root` rather than tracing imports, so no import can leave a twin stale.
+// Test files run in parallel processes that each refresh the twins, so a reader must never see a half-written file.
+const replaceFile = (path, contents) => {
+  const partial = `${path}.${process.pid}.partial`;
+  writeFileSync(partial, contents);
+  renameSync(partial, path);
+};
+
 export function refreshJsonnetTwins(sources, { root, stamp }) {
   const digest = inputsDigest(root, sources);
   const current = existsSync(stamp) && readFileSync(stamp, 'utf8') === digest;
   if (current && sources.every((source) => existsSync(twinOf(source)))) return;
   rmSync(stamp, { force: true });
   const twins = compileJsonnetFiles(sources);
-  for (const [at, source] of sources.entries()) writeFileSync(twinOf(source), twins[at]);
+  for (const [at, source] of sources.entries()) replaceFile(twinOf(source), twins[at]);
   mkdirSync(dirname(stamp), { recursive: true });
-  writeFileSync(stamp, digest);
+  replaceFile(stamp, digest);
 }
 
 export function installJsonnetSources() {
