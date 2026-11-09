@@ -2780,6 +2780,13 @@
         {"bone": "chest", "at": "mid", "op": "paint", "material": "fold_hi", "onto": ["shroud"], "shape": {"kind": "ellipsoid", "center": [0, 0.2, 0.02], "radii": [0.26, 0.035, 0.18]}}
       ]
     },
+    {
+      "id": "leaper",
+      "pack": "skelly.bestiary",
+      "template": "leaper",
+      "lod_divisor": 0,
+      "walk_speed": 0.58
+    },
     {"type":"shambler","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4},
     {"type":"shambler","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4},
     {"type":"shambler","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4},

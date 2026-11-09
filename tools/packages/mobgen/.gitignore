@@ -1,4 +1,4 @@
 node_modules/
 dist/
 .shots/
-/src/mob/*.json
+/src/mob/**/*.json

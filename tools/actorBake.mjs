@@ -7,7 +7,7 @@ import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
 import { outputPath } from './layout.mjs';
 import { actorBody } from './actorBody.mjs';
 import { figureFor } from './actorFigure.mjs';
-import { acidClips, creatureClips, fusedClips, humanoidClips } from './actorClips.mjs';
+import { acidClips, creatureClips, fusedClips, humanoidClips, leaperClips } from './actorClips.mjs';
 
 const clipEmitters = {
   humanoid: humanoidClips,
@@ -17,6 +17,7 @@ const clipEmitters = {
   insect: creatureClips,
   floater: creatureClips,
   dragon: creatureClips,
+  leaper: leaperClips,
 };
 const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2];
 

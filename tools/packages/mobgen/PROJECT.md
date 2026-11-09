@@ -34,6 +34,11 @@ Game-owned ragdoll physics is intentionally absent from the pipeline viewer. A s
 create approval drift; inspect physical falls in the game instead. The acid body's procedural death animation
 remains an authoring preview. See `src/viewer/main.ts`, `applyDeathFrame`, and `test/boundaries.test.ts`.
 
+Ragdoll groups are different: which bones fall together and how far each joint may swing describe the body,
+so they change with its anatomy and stay with the model, and the game's solver reads them. The game has no
+generic rule for a new anatomy, so a plan the humanoid rules don't fit carries its own. See
+`src/mob/leaper/ragdoll.jsonnet` and `test/leaper.test.ts`.
+
 ## Body plans and readiness
 
 Body plans name anatomy. A leg-cut humanoid keeps the same rig and borrows crawl posing rather than becoming
@@ -56,6 +61,15 @@ It declares no flesh marrow and uses an explicit step width rather than girth-de
 The fused body should read as one grotesque fusion. Complete humanoid members remain severable subtrees
 beneath a non-severable core; arbitrary member orientation means there is no single humanoid gaze target.
 See `src/mob/fusedMass.ts`, `fusedMassManifest`, and `src/viewer/main.ts`, `applyLiveFrame`.
+
+The leaper is an ambush predator built around folded hind springs, so it is its own plan rather than a
+posed humanoid or quadruped. Its rest pose is the coiled crouch it spends its life in, so validation judges
+that body; every other stance is a clip on the same rig. Its joints must hold together through deep folds,
+which a rigid-voxel bend cracks open, so seams are checked after posing. Losing a hind spring changes which
+gait the body can still perform instead of distorting the healthy one. It stays standalone from the other
+plans so its tuning cannot move them. See `src/mob/leaper/plan.ts`, `LEAPER_TEMPLATE`;
+`src/mob/leaper/seams.ts`, `jointCracks`; `src/mob/leaper/motion.ts`, `locomotionFor`; and
+`test/boundaries.test.ts`.
 
 Population-quality assertions belong in explicit sweeps because they measure distributions rather than an
 individual body's contract. See `test/sweeps.ts`, `sweepGroup`, and `src/cli/stats.ts`.
