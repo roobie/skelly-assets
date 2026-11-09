@@ -1,4 +1,5 @@
-// Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them.
+// Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
+// their category and tags, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [outDir]; the tree defaults to built/. No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
@@ -8,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readMobRows } from '../tools/layout.mjs';
+import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
@@ -17,8 +19,6 @@ const { values, positionals } = parseArgs({ allowPositionals: true, options: { b
 const out = resolve(root, positionals[0] ?? '_site');
 const built = resolve(values.built);
 
-// The only grouping the files themselves carry: a model with a clips file is an animated creature. Ids are names,
-// not categories, so nothing here reads meaning into them.
 const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
 // A walk clip states its stride in metres; the viewer paces it by the authored walk speed of the row that baked it.
 const walkSpeeds = new Map(readMobRows(root).map((row) => [`${row.pack}/${row.clips}`, row.walk_speed]));
@@ -29,18 +29,21 @@ const walkSpeedOf = (clips) => {
 };
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, clips, body }) => ({
+  .map(({ id, pack, path, category, tags, clips, body }) => ({
     id,
+    category: category ?? null,
+    tags: tags ?? {},
     file: `${pack}/${path}`,
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, clips, body }) => ({
+  .map(({ id, file, category, tags, clips, body }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
-    category: clips ? 'Creatures' : 'Things',
+    category,
+    tags,
     clips,
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
@@ -90,6 +93,7 @@ for (const model of models) if (model.clips && model.body) {
   const body = JSON.parse(readFileSync(join(built, model.body), 'utf8'));
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
-writeFileSync(join(out, 'models.json'), JSON.stringify({ models }));
+const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models }));
 writeFileSync(join(out, '.nojekyll'), '');
 console.log(`${models.length} models into ${out}`);

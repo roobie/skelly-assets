@@ -201,20 +201,58 @@ const seen = new IntersectionObserver((entries) => {
 
 let models = [];
 let shown = [];
-let shelf = 'All';
+let taxonomy = { categories: {}, facets: {} };
+// Vocabulary terms are kebab-case, so these capitalised shelf keys never collide with a category.
+const ALL = 'All';
+const UNCATEGORISED = 'Uncategorised';
+let shelf = ALL;
+const picked = new Map(); // facet -> the term its filter requires
+
+const labelOf = (term) => term[0].toUpperCase() + term.slice(1).replaceAll('-', ' ');
+const shelfOf = (model) => model.category ?? UNCATEGORISED;
+const shelfLabel = (key) => (key === ALL || key === UNCATEGORISED ? key : labelOf(key));
 
 function renderShelves() {
-  const counts = new Map([['All', models.length]]);
-  for (const m of models) counts.set(m.category, (counts.get(m.category) ?? 0) + 1);
-  const names = ['All', ...[...counts.keys()].filter((n) => n !== 'All').sort()];
+  const counts = new Map([[ALL, models.length]]);
+  for (const m of models) counts.set(shelfOf(m), (counts.get(shelfOf(m)) ?? 0) + 1);
+  const categories = [...counts.keys()].filter((key) => key !== ALL && key !== UNCATEGORISED).sort();
+  const names = [ALL, ...categories, ...(counts.has(UNCATEGORISED) ? [UNCATEGORISED] : [])];
   $('shelves').replaceChildren(...names.map((name) => {
     const b = document.createElement('button');
     b.className = 'chip';
     b.type = 'button';
+    b.title = taxonomy.categories[name] ?? '';
     b.setAttribute('aria-pressed', String(name === shelf));
-    b.append(name, Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
+    b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
     b.onclick = () => { shelf = name; renderShelves(); applyFilter(); };
     return b;
+  }));
+}
+
+// One select per facet that any model uses, listing the terms in use.
+function renderFacets() {
+  const used = new Map();
+  for (const m of models) {
+    for (const [facet, terms] of Object.entries(m.tags)) {
+      const counts = used.get(facet) ?? new Map();
+      for (const term of terms) counts.set(term, (counts.get(term) ?? 0) + 1);
+      used.set(facet, counts);
+    }
+  }
+  $('facets').replaceChildren(...[...used.keys()].sort().map((facet) => {
+    const select = document.createElement('select');
+    select.className = 'facet';
+    select.title = taxonomy.facets[facet]?.meaning ?? '';
+    select.setAttribute('aria-label', labelOf(facet));
+    const option = (value, text, title = '') => Object.assign(document.createElement('option'), { value, textContent: text, title });
+    select.append(option('', `Any ${facet}`), ...[...used.get(facet)].sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([term, n]) => option(term, `${labelOf(term)} (${n})`, taxonomy.facets[facet]?.terms[term] ?? '')));
+    select.onchange = () => {
+      if (select.value) picked.set(facet, select.value);
+      else picked.delete(facet);
+      applyFilter();
+    };
+    return select;
   }));
 }
 
@@ -233,7 +271,7 @@ function makeCard(model) {
   label.className = 'label';
   label.innerHTML = '<div class="name"></div><div class="meta"></div>';
   label.querySelector('.name').textContent = nameOf(model.id);
-  label.querySelector('.meta').textContent = `${model.category} · ${kb(model.bytes)}`;
+  label.querySelector('.meta').textContent = `${shelfLabel(shelfOf(model))} · ${kb(model.bytes)}`;
   card.append(canvas, label);
   card.onclick = () => openViewer(model);
   if (thumbRenderer) seen.observe(canvas);
@@ -243,8 +281,12 @@ function makeCard(model) {
 const cards = new Map();
 
 function applyFilter() {
-  const q = $('search').value.trim().toLowerCase().replace(/\s+/g, '_');
-  shown = models.filter((m) => (shelf === 'All' || m.category === shelf) && (!q || m.id.includes(q)));
+  const q = $('search').value.trim().toLowerCase();
+  const id = q.replace(/\s+/g, '_');
+  const term = q.replace(/[\s_]+/g, '-');
+  const matches = (m) => !q || m.id.includes(id) || Object.values(m.tags).flat().some((t) => t.includes(term));
+  const tagged = (m) => [...picked].every(([facet, t]) => m.tags[facet]?.includes(t));
+  shown = models.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
   $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
   $('count').textContent = `${shown.length} of ${models.length} models`;
 }
@@ -305,7 +347,7 @@ async function openViewer(model) {
   if (!$('viewer').open) $('viewer').showModal();
   history.replaceState(null, '', `#${model.id}`);
 
-  $('v-category').textContent = model.category;
+  $('v-category').textContent = shelfLabel(shelfOf(model));
   $('v-name').textContent = nameOf(model.id);
   $('v-id').textContent = model.file;
   $('v-download').href = `built/${model.file}`;
@@ -332,6 +374,7 @@ async function openViewer(model) {
 
   const size = box.getSize(new THREE.Vector3());
   const facts = [
+    ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ['File', kb(model.bytes)],
@@ -388,9 +431,10 @@ async function main() {
     note.textContent = `The 3D previews need WebGL, which this browser did not provide (${err.message}). The models are still listed and can be downloaded from the repository.`;
     $('grid').before(note);
   }
-  models = (await fetch('models.json').then((r) => r.json())).models;
+  ({ taxonomy, models } = await fetch('models.json').then((r) => r.json()));
   for (const m of models) cards.set(m.id, makeCard(m));
   renderShelves();
+  renderFacets();
   applyFilter();
   $('search').addEventListener('input', applyFilter);
   const fromHash = models.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
