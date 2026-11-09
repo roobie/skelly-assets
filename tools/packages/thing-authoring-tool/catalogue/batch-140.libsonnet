@@ -171,5 +171,6 @@ local mailCoif(id, mass) = hood(id, mass, {
       for y in [0.065 + 0.01 * i]
     ],
     fin: { cloth: 'felt-grey', stitch: 'cloth-black', trim: 'cloth-black', face: 'screen-black' },
-  }),
+  })
+  + { taxonomy: { category: 'clothing', tags: { slot: ['head', 'face'], material: ['fabric'] } } },
 ]

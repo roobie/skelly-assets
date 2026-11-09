@@ -72,5 +72,5 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
              + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.12, 0.09, 0.016) + brimStar('star-i', -0.12, 0.1, 0.016)
              + brimStar('star-j', -0.1, -0.12, 0.016),
              { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['fabric'], setting: ['fantasy'] } } },
 ]
