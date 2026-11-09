@@ -13,6 +13,5 @@ taxonomy.inherit({ category: 'weapons' }, [
     voxel: voxel.of(if std.setMember(row.id, gunGrained) then voxel.gun else voxel.item, row),
     options: { mass: row.exportMass },
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, owned)
+  for row in catalogue.rows(owned)
 ])

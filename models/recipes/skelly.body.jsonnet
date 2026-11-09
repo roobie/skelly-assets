@@ -10,6 +10,5 @@ local owned = std.setUnion(std.set(['player_bust', 'player_arm', 'player_leg']),
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, owned)
+  for row in catalogue.rows(owned)
 ]

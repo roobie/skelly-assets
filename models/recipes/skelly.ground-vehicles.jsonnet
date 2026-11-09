@@ -3,10 +3,11 @@
 local fleet = import 'models/vehicles/index.libsonnet';
 local vehicles = ['crew_pickup', 'saloon', 'shared', 'taxi'];
 // Vehicle parts carry baked collision because a fitting places it on the vehicle.
-local vehicleParts = std.set([part.id for part in (import 'models/vehicle-parts.libsonnet') + std.flattenArrays([fleet[vehicle] for vehicle in vehicles])]);
+local vehicleParts = { [id]: true for id in std.set([part.id for part in (import 'models/vehicle-parts.libsonnet') + std.flattenArrays([fleet[vehicle] for vehicle in vehicles])]) };
 local jacks = std.set(['bottle_jack', 'engine_hoist', 'scissor_jack']);
 // Loose spare parts from the catalogue: belts, filters and plugs a player carries, not fitted to a vehicle.
-local spares = (import 'models/catalogue/packs.libsonnet').ids('skelly.ground-vehicles');
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local spares = catalogue.ids('skelly.ground-vehicles');
 // A vehicle part takes the vehicle class, so it matches the vehicle it sits on; a jack is an ordinary item.
 // A catalogue row may name its own grain in place of its class's.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
@@ -16,10 +17,9 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
     id: row.id,
     kind: 'item',
     source: row.id,
-    voxel: voxel.of(if std.setMember(row.id, vehicleParts) then voxel.vehicle else voxel.item, row),
+    voxel: voxel.of(if std.objectHas(vehicleParts, row.id) then voxel.vehicle else voxel.item, row),
     options: { mass: row.exportMass }
-             + (if std.setMember(row.id, vehicleParts) then { collision: true } else {}),
+             + (if std.objectHas(vehicleParts, row.id) then { collision: true } else {}),
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, vehicleParts) || std.setMember(row.id, jacks) || std.setMember(row.id, spares)
+  for row in catalogue.rows(std.objectFields(vehicleParts) + jacks + spares)
 ]
