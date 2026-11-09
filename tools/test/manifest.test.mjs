@@ -80,6 +80,25 @@ test('a model whose path is not among the produced files is refused', () => {
   }), /fixture_a/);
 });
 
+const withRenames = (renames) => buildManifest({
+  models: [{ id: 'fixture_a', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [] }],
+  files: ['fixture.a/assets/models/fixture_a.glb'],
+  credit,
+  renames,
+});
+
+test('the manifest carries each retired id with the current id that replaces it', () => {
+  assert.deepEqual(withRenames({ fixture_old: 'fixture_a' }).renames, { fixture_old: 'fixture_a' });
+});
+
+test('a retired id that names a current model is refused, so no lookup is ambiguous', () => {
+  assert.throws(() => withRenames({ fixture_a: 'fixture_a' }), /fixture_a is retired/);
+});
+
+test('a rename to an id the build does not hold is refused, so one lookup always lands on a model', () => {
+  assert.throws(() => withRenames({ fixture_old: 'fixture_gone' }), /fixture_gone/);
+});
+
 test('a mob row joins the manifest with its actor files and no part nodes', () => {
   const { models, files } = mobManifest([{ id: 'fixture_mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json' }]);
   assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob.body.json', 'fixture.mobs/fixture_mob.clips.json']);

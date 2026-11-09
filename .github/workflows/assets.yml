@@ -232,15 +232,21 @@ jobs:
           name: built-1
           path: ${{ runner.temp }}/built
       - run: node tools/pack-release.mjs "$RUNNER_TEMP/built" "$RUNNER_TEMP/release"
+      # The body is the tag's CHANGELOG.md section, written at release prep; see changes/README.md, "A release".
       - name: Publish the version release
         if: github.ref_type == 'tag'
-        run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/release/* --verify-tag
+        run: |
+          node tools/changelog.mjs notes "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/release/* --verify-tag --notes-file "$RUNNER_TEMP/notes.md"
       # The tag goes with the release so the new one is cut at this commit, not at a tag left behind.
       - name: Replace the edge pre-release
         if: github.ref == 'refs/heads/main'
         run: |
           if gh release view edge >/dev/null 2>&1; then gh release delete edge --yes; fi
           if gh api "repos/$GH_REPO/git/refs/tags/edge" >/dev/null 2>&1; then gh api -X DELETE "repos/$GH_REPO/git/refs/tags/edge"; fi
+          notes="$RUNNER_TEMP/notes.md"
+          echo "The latest build of main, at $GITHUB_SHA. It is replaced on every push to main; pin a v* release instead." > "$notes"
+          pending=$(node tools/changelog.mjs unreleased)
+          if [ -n "$pending" ]; then printf '\n## Unreleased\n\n%s\n' "$pending" >> "$notes"; fi
           gh release create edge "$RUNNER_TEMP"/release/* --prerelease --latest=false --target "$GITHUB_SHA" \
-            --title "edge (main at ${GITHUB_SHA::12})" \
-            --notes "The latest build of main, at $GITHUB_SHA. It is replaced on every push to main; pin a v* release instead."
+            --title "edge (main at ${GITHUB_SHA::12})" --notes-file "$notes"

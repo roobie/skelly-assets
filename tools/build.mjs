@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
 import { modelTaxonomies } from './check-taxonomy.mjs';
-import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from './manifest.mjs';
+import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
@@ -245,6 +245,7 @@ async function main() {
         dependsOn,
         files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
         credit: readCredits(repo),
+        renames: readRenames(repo),
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));
       console.log(`built ${MANIFEST}`);

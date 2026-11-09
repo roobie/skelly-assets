@@ -1,0 +1,27 @@
+name: changes
+
+# Every PR adds a change note unless it carries the no-changelog label; see changes/README.md. Labelling re-runs the
+# check, so adding or removing the label takes effect without a push.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      # The PR's merge commit and its first parent, the base it merges into.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: ./.github/actions/node
+      - run: node tools/changelog.mjs check
+      - if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-changelog') }}
+        run: node tools/changelog.mjs require-note HEAD^1
