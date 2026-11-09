@@ -29,6 +29,9 @@ local cab = {
 };
 local tailOf(s) = s.rear + 0.08;
 local noseOf(s) = s.front - 0.08;
+// The rear edge of the A pillar at height y, and the height where it crosses x.
+local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
+local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
 local rows(id, s) = {
   local isBox = std.objectHas(s, 'box'),
   local b = s + (if isBox then s.box else {}),
@@ -40,9 +43,8 @@ local rows(id, s) = {
   local bumperTop = 0.6,
   local hood(x) = s.waist - (x - s.aPost) * s.hoodFall,
   local roofFront = s.aPost - s.aLean,
-  // The rear edge of the A pillar at height y, and the height where it crosses x.
-  local pillarAt(y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist),
-  local pillarY(x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean,
+  local pillarAt(y) = pillarAtOf(s, y),
+  local pillarY(x) = pillarYOf(s, x),
   local pillarTop = if rise then s.cabRoof else s.canton,
   local bandFinishes = { ['band' + i]: s.bands[i].finish for i in std.range(0, std.length(s.bands) - 1) },
   local finish = bandFinishes + {
@@ -297,6 +299,8 @@ local rows(id, s) = {
   rows: rows,
   tail: tailOf,
   nose: noseOf,
+  pillarAt: pillarAtOf,
+  pillarY: pillarYOf,
   // Deadvox's items for `rows`, built with Deadvox's vehicle kit as `kit`.
   items(kit, id, name, s):
     local pile = kit.pileSize;
