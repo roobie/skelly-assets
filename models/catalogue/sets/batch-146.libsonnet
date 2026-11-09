@@ -70,7 +70,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
   // A film radiation badge lying face up, 40 mm by 58 mm and 10 mm thick: a white plastic holder with a steel clip
   // over its top edge, an amber window over the film strip with three filter squares, and a yellow warning label
   // with a black trefoil below.
-  h.compound('rad_badge', 0.017, [
+  h.compound('radiation_badge', 0.017, [
     box('body', 'body', [-0.02, 0, -0.026], [0.02, 0.008, 0.029]),
     box('clip', 'clip', [-0.008, 0, -0.03], [0.008, 0.01, -0.024]),
     box('window', 'window', [-0.015, 0.008, -0.019], [0.015, 0.009, 0.006]),
@@ -88,7 +88,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
 
   // A gold engagement ring standing upright, 21 mm across and 27 mm tall: a slim band with a raised gold setting on
   // top holding a large diamond ringed by six small ones.
-  h.compound('ring_engagement', 0.012,
+  h.compound('engagement_ring', 0.012,
              band('band', 0.0085, bandR, -0.0015, 0.0015, 24, plain('metal'))
              + [
                h.disc('setting', 'metal', 0.0055, 0.019, 0.022),
@@ -104,7 +104,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
 
   // A silver promise ring standing upright, 21 mm across and 6 mm wide: a flat band with a line of engraved script
   // running all the way round its middle, shown as one continuous darkened groove.
-  h.compound('ring_purity', 0.0052,
+  h.compound('promise_ring', 0.0052,
              band('band', 0.009, bandR, -0.003, -0.001, 24, plain('metal'))
              + band('band-back', 0.009, bandR, 0.001, 0.003, 24, plain('metal'))
              + band('script', 0.009, bandR, -0.001, 0.001, 24, plain('script')),
@@ -113,7 +113,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
 
   // A signet ring standing upright, 21 mm across and 25 mm tall: a gold band rising to a flat oval table on top, set
   // with a silver face whose stamped crest has worn faint.
-  h.compound('ring_signet', 0.023,
+  h.compound('signet_ring', 0.023,
              band('band', 0.0085, bandR, -0.002, 0.002, 24, plain('gold'))
              + [
                flat('table', 'gold', oval(0.0075, 0.0065), 0.018, 0.022),
@@ -126,7 +126,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
 
   // A gold wedding ring standing upright, 21 mm across and 4 mm wide: a plain unbroken band with one small diamond
   // set flush into its top.
-  h.compound('ring_wedding', 0.0091,
+  h.compound('wedding_ring', 0.0091,
              band('band', 0.0085, bandR, -0.002, 0.002, 24, plain('metal'))
              + [box('stone', 'stone', [-0.0012, 0.0192, -0.0012], [0.0012, 0.021, 0.0012])],
              { metal: 'metal-gold', stone: 'gem-clear' })

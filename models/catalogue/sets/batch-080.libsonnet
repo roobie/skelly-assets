@@ -111,15 +111,15 @@ local chainsaw(engine) =
   + { handling: h.gripOn('bow_saw', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // An 18 inch petrol chainsaw 0.82 m long standing on its base: orange powerhead, black handles and a 0.48 m bar.
-  h.compound('chainsaw_off', 7.6, chainsaw(true), {
+  h.compound('chainsaw', 7.6, chainsaw(true), {
     body: 'plastic-orange', cover: 'plastic-orange', handle: 'plastic-black', grip: 'rubber-black', guard: 'plastic-black',
     bar: 'steel-bright', chain: 'steel-parkerized', sprocket: 'plastic-charcoal', starter: 'plastic-black', battery: 'plastic-black',
-  }) + { handling: h.gripOn('chainsaw_off', 'rear-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { handling: h.gripOn('chainsaw', 'rear-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless 165 mm circular saw 0.44 m long standing on its shoe: the blade on +z under its upper guard with the
   // lower guard below the shoe, the motor on -z, a closed top handle and the battery at the back.
   local r = 0.083, cx = 0.09, cy = 0.098, bz = 0.035;
-  h.compound('circsaw_off', 3, [
+  h.compound('cordless_circular_saw', 3, [
     box('shoe', 'shoe', [-0.12, 0.012, -0.075], [0.24, 0.018, 0.060]),
     ring('blade', 'blade', 'z', 0.010, r, 0.0024, [cx, cy, bz - 0.0012]),
     ring('arbor', 'guard', 'z', 0, 0.020, 0.024, [cx, cy, bz - 0.006]),
@@ -141,7 +141,7 @@ local chainsaw(engine) =
     ], {
     shoe: 'alu-bare', blade: 'steel-bright', guard: 'alu-bare', lower: 'plastic-red', body: 'plastic-yellow',
     grip: 'rubber-black', handle: 'plastic-black', battery: 'plastic-black',
-  }) + { handling: h.gripOn('circsaw_off', 'handle-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { handling: h.gripOn('cordless_circular_saw', 'handle-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 350 mm hatchet with a cast copper wedge through a split haft, lashed above and below with rawhide.
   h.compound('copper_ax', 0.72, haft(0.35, 0.012) + [
@@ -153,10 +153,10 @@ local chainsaw(engine) =
   + { handling: h.gripOn('copper_ax', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // An 18 inch battery chainsaw 0.82 m long: green body, battery pack in the top and no starter.
-  h.compound('elec_chainsaw_off', 6.7, chainsaw(false), {
+  h.compound('battery_chainsaw', 6.7, chainsaw(false), {
     body: 'plastic-green', cover: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', guard: 'plastic-black',
     bar: 'steel-bright', chain: 'steel-parkerized', sprocket: 'plastic-black', starter: 'plastic-black', battery: 'plastic-charcoal',
-  }) + { handling: h.gripOn('elec_chainsaw_off', 'rear-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { handling: h.gripOn('battery_chainsaw', 'rear-grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A ground stone axe head 150 mm long, 75 mm across the edge and 34 mm thick, lying flat with its edge on +z.
   h.compound('hand_axe', 0.9, celt('celt', 0, -0.07, 0.08, 0.045, 0.075, 0.017), { stone: 'stone-grey' })

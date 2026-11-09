@@ -60,7 +60,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
 [
   // Long red dress with white faux-fur trim, folded, 360 mm by 420 mm and 80 mm tall.
   local w = 0.36, d = 0.42, ht = 0.08;
-  h.compound('santa_dress_long', 2,
+  h.compound('long_santa_dress', 2,
              g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: 0, collar: { r: 0.065, wd: 0.03, ht: 0.016, gap: 25 }, sleeves: { kind: 'flat', w: 0.08, t: 0.006 }, belt: { z: 0.02, w: 0.04, knot: false } })
              + hemTrim('hem', 'fur', w, d, ht, 0.05, 0.01)
              + cuffs('cuff', 'fur', w, d, ht, 0.08, 0.045, 0.01)
@@ -70,7 +70,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
 
   // Short sleeveless red dress with white faux-fur trim, folded, 320 mm by 320 mm and 50 mm tall.
   local w = 0.32, d = 0.32, ht = 0.05;
-  h.compound('santa_dress_short', 0.81,
+  h.compound('short_santa_dress', 0.81,
              g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: 0, collar: { r: 0.06, wd: 0.026, ht: 0.012, gap: 40 } })
              + hemTrim('hem', 'fur', w, d, ht, 0.045, 0.01)
              + [
@@ -82,7 +82,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
 
   // Bulky short-sleeved shirt woven from dried grass, folded, 360 mm by 360 mm and 90 mm tall, a ragged fringe at the hem.
   local w = 0.36, d = 0.36, ht = 0.09;
-  h.compound('shirt_straw', 0.91,
+  h.compound('grass_shirt', 0.91,
              g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: 0, collar: { r: 0.065, wd: 0.02, ht: 0.01, gap: 30 }, sleeves: { kind: 'flat', w: 0.1, t: 0.01 } })
              + [
                box('weave-%d-%d' % [i, k], 'weave', [x0, y, z], [x1, y + 0.005, z + 0.012])
@@ -104,7 +104,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
   // Long black dress with full sleeves, a high red collar, red cuffs and red embroidery laced down the front, folded,
   // 360 mm by 420 mm and 70 mm tall.
   local w = 0.36, d = 0.42, ht = 0.07;
-  h.compound('sinister_dress', 1,
+  h.compound('gothic_dress', 1,
              g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: 0, collar: { r: 0.06, wd: 0.022, ht: 0.03, gap: 20 }, sleeves: { kind: 'flat', w: 0.08, t: 0.006 } })
              + cuffs('cuff', 'trim', w, d, ht, 0.08, 0.04)
              + lacing('lace', 'trim', d / 2 - 0.16, 5, 0.035, 0.03, ht)
@@ -119,7 +119,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
   // Short red dress in a doll-like gothic cut: black ruffled hem, black cuffs and a black bow at the chest, folded,
   // 320 mm by 300 mm and 55 mm tall.
   local w = 0.32, d = 0.3, ht = 0.055;
-  h.compound('sinister_dress_short', 0.88,
+  h.compound('short_gothic_dress', 0.88,
              g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: 0, collar: { r: 0.055, wd: 0.022, ht: 0.012, gap: 30 }, sleeves: { kind: 'flat', w: 0.075, t: 0.006 } })
              + cuffs('cuff', 'trim', w, d, ht, 0.075, 0.03)
              + ruffle('ruffle', 'trim', w, d, ht, 0.016, 10)
@@ -131,7 +131,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
   // Heavy red gown with black sleeves, a black laced bodice, a high collar and a ruffled hem, folded, 420 mm by 460 mm
   // and 130 mm tall.
   local w = 0.42, d = 0.46, ht = 0.13;
-  h.compound('sinister_gown', 3.8,
+  h.compound('gothic_gown', 3.8,
              g.jacket({ w: w, d: d, ht: ht, folds: 4, front: 'none', buttons: 0, collar: { r: 0.065, wd: 0.025, ht: 0.035, gap: 20 }, sleeves: { kind: 'flat', w: 0.095, t: 0.008 } })
              + [g.flat('bodice', 'trim', [[-0.09, d / 2 - 0.16], [0.09, d / 2 - 0.16], [0.06, d / 2 - 0.33], [0, d / 2 - 0.36], [-0.06, d / 2 - 0.33]], ht, 0.004)]
              + lacing('lace', 'lace', d / 2 - 0.175, 5, 0.03, 0.03, ht + 0.004)
@@ -208,7 +208,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
 
   // Grey canvas work t-shirt with one chest pocket, folded, 300 mm by 300 mm and 35 mm tall.
   local w = 0.3, d = 0.3, ht = 0.035;
-  h.compound('technician_shirt_gray', 0.3,
+  h.compound('work_t_shirt', 0.3,
              g.jacket({ w: w, d: d, ht: ht, folds: 2, front: 'none', buttons: 0, collar: { r: 0.055, wd: 0.015, ht: 0.006, gap: 0 }, sleeves: { kind: 'flat', w: 0.07, t: 0.005 }, pockets: [{ x: -0.065, z: -0.04, w: 0.07, d: 0.08, flap: 0, single: true }] })
              + [box('pocket-pen', 'pen', [-0.085, ht + 0.004, -0.01], [-0.077, ht + 0.012, 0.02])],
              { cloth: 'canvas-grey', sleeve: 'canvas-grey', collar: 'cloth-charcoal', pocket: 'canvas-grey', pen: 'plastic-matte-black' })
@@ -223,7 +223,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
 
   // Purple cotton crop top, the body cut short, folded, 260 mm by 180 mm and 20 mm tall.
   local w = 0.26, d = 0.18, ht = 0.02;
-  h.compound('tshirt_cropped', 0.12,
+  h.compound('crop_top', 0.12,
              g.jacket({ w: w, d: d, ht: ht, folds: 2, neck: 0.075, front: 'none', buttons: 0, collar: { r: 0.05, wd: 0.012, ht: 0.004, gap: 0 }, sleeves: { kind: 'flat', w: 0.06, t: 0.004 } })
              + [box('hem', 'collar', [-w / 2 + 0.06, ht, -d / 2 + 0.004], [w / 2 - 0.06, ht + 0.003, -d / 2 + 0.016])],
              { cloth: 'cloth-purple', sleeve: 'cloth-purple', collar: 'cloth-cream' })

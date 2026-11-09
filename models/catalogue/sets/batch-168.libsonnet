@@ -173,7 +173,7 @@ local bodysuit =
 [
   // A small gym bag, 340 mm long and 180 mm by 180 mm across: a little polyester duffel with an end-to-end zip,
   // two webbing carry handles and a shoulder strap.
-  h.compound('duffelbag_gym_xxs', 0.55, duffel({ len: 0.34, ht: 0.18, dp: 0.18, bandX: 0.07, pocket: { w: 0.16, ht: 0.08 } }), {
+  h.compound('tiny_gym_bag', 0.55, duffel({ len: 0.34, ht: 0.18, dp: 0.18, bandX: 0.07, pocket: { w: 0.16, ht: 0.08 } }), {
     body: 'cloth-blue',
     end: 'nylon-black',
     zip: 'plastic-matte-black',
@@ -184,7 +184,7 @@ local bodysuit =
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
 
   // A large polyester duffel 700 mm long and 340 mm by 340 mm across, with a zipped front pocket.
-  h.compound('duffelbag_l_poly', 1.4, duffel({ len: 0.7, ht: 0.34, dp: 0.34, bandX: 0.13, pocket: { w: 0.3, ht: 0.14 } }), {
+  h.compound('large_duffel_bag', 1.4, duffel({ len: 0.7, ht: 0.34, dp: 0.34, bandX: 0.13, pocket: { w: 0.3, ht: 0.14 } }), {
     body: 'cloth-navy',
     end: 'cloth-charcoal',
     zip: 'plastic-matte-black',
@@ -195,7 +195,7 @@ local bodysuit =
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
 
   // A big nylon duffel 900 mm long and 400 mm by 400 mm across, the plain kit-bag sort.
-  h.compound('duffelbag_xl_nylon', 1.5, duffel({ len: 0.9, ht: 0.4, dp: 0.4, bandX: 0.16 }), {
+  h.compound('extra_large_duffel_bag', 1.5, duffel({ len: 0.9, ht: 0.4, dp: 0.4, bandX: 0.16 }), {
     body: 'nylon-ranger-green',
     end: 'webbing-olive-dark',
     zip: 'plastic-matte-black',
@@ -205,7 +205,7 @@ local bodysuit =
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
 
   // A child's backpack 240 mm wide, 300 mm tall and 110 mm deep, with a zipped front pocket and two shoulder straps.
-  h.compound('backpack_small', 0.35, backpack({}), {
+  h.compound('small_backpack', 0.35, backpack({}), {
     body: 'nylon-red',
     pocket: 'cloth-yellow',
     zip: 'plastic-matte-black',
@@ -215,7 +215,7 @@ local bodysuit =
 
   // A full-body stretch suit folded to 300 mm by 280 mm and 30 mm tall: a mock neck, a front zip, sleeves folded
   // along the sides, black side stripes and the foot ends folded up over the hem.
-  h.compound('bodysuit_lycra', 0.44, bodysuit, {
+  h.compound('stretch_bodysuit', 0.44, bodysuit, {
     cloth: 'cloth-purple',
     collar: 'cloth-purple',
     front: 'plastic-matte-black',

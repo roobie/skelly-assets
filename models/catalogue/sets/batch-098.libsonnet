@@ -109,23 +109,23 @@ local suspenders(t, ends) =
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // A broad black gi belt 60 mm wide, tied the same way with tails 240 mm long.
-  h.compound('obi_gi', 0.11, tiedBelt(0.15, 0.06, 0.24), { cloth: 'cloth-black' })
+  h.compound('gi_belt', 0.11, tiedBelt(0.15, 0.06, 0.24), { cloth: 'cloth-black' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // Y-back cloth suspenders 35 mm wide, lying flat 460 mm across and 760 mm long, with metal clips at the three ends,
   // slides on the front straps and a leather patch where the straps meet.
-  h.compound('suspenders_cloth', 0.21, suspenders(0.003, clip),
+  h.compound('suspenders', 0.21, suspenders(0.003, clip),
              { strap: 'cloth-black', patch: 'leather-black', slide: 'metal-silver', fitting: 'metal-silver' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // The same Y-back suspenders in brown leather with split button tabs at the ends and brass slides.
-  h.compound('suspenders_leather', 0.15, suspenders(0.004, tab),
+  h.compound('leather_suspenders', 0.15, suspenders(0.004, tab),
              { strap: 'leather-brown', patch: 'leather-brown', slide: 'brass', fitting: 'leather-black' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso'] } } },
 
   // The leather suspenders with a pistol holster 190 mm long sewn to the left front strap at the stomach, its muzzle
   // pointing down and inward.
-  h.compound('suspenders_holster', 0.32, suspenders(0.004, tab) + [
+  h.compound('holster_suspenders', 0.32, suspenders(0.004, tab) + [
     h.prism('holster', 'holster', 'y', [[0.1, -0.16], [0.13, -0.05], [0.29, -0.02], [0.29, -0.11], [0.2, -0.17]], 0.004, 0.034),
     box('holster-strap', 'fitting', [-0.12, 0.034, 0.12], [-0.03, 0.037, 0.14]),
     h.disc('holster-stud', 'slide', 0.005, 0.037, 0.039, -0.04, 0.13),

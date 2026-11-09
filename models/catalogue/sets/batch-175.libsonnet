@@ -143,7 +143,7 @@ local bra(cw, ch, ties) =
 
   // Lycra thong bottoms laid flat, 300 mm across the waist string and 130 mm long: a small triangle front narrowing to
   // a string at the crotch, on a thin string waistband.
-  h.compound('bikini_bottom_short', 0.0081, briefs(0.12, 0.012, 0.11, 0.008, false, 0)
+  h.compound('thong_bikini_bottoms', 0.0081, briefs(0.12, 0.012, 0.11, 0.008, false, 0)
                                            + [box('waist-string', 'tie', [-0.15, 0, -0.06], [0.15, 0.003, -0.054])]
                                            + cord('back-string', 'tie', [[0, 0.054], [0, 0.075]], 0), { cloth: 'cloth-red', band: 'cloth-red', tie: 'cloth-red' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
@@ -155,7 +155,7 @@ local bra(cw, ch, ties) =
 
   // A small lycra bikini top laid flat, 300 mm across its strings: two small triangle cups 80 mm across on thin
   // strings.
-  h.compound('bikini_top_short', 0.011, bra(0.08, 0.08, false), { cloth: 'cloth-red', seam: 'cloth-crimson', tie: 'cloth-red' })
+  h.compound('small_bikini_top', 0.011, bra(0.08, 0.08, false), { cloth: 'cloth-red', seam: 'cloth-crimson', tie: 'cloth-red' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A full-face diving mask standing on its chin, 200 mm across and 230 mm tall: a clear domed visor over the whole
@@ -164,7 +164,7 @@ local bra(cw, ch, ties) =
   // floor behind.
   local cy = 0.115, a = 0.1, bb = 0.11, zf = 0.0;
   local strapY = 0.0;
-  h.compound('divemask_full_modular', 0.59,
+  h.compound('modular_full_face_diving_mask', 0.59,
              // Rubber skirt flaring back from the frame, then the hard face-port frame round the visor.
              maskRing('skirt', 'seal', oval(a - 0.016, bb - 0.016, 3, 28, cy), oval(a, bb, 3, 28, cy), zf - 0.07, zf - 0.02)
              + maskRing('frame', 'frame', oval(a - 0.016, bb - 0.016, 3, 28, cy), oval(a - 0.006, bb - 0.006, 3, 28, cy), zf - 0.02, zf)

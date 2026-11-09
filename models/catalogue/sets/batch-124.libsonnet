@@ -209,81 +209,81 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // A pair of steel gauntlets laid flat side by side, backs up, each 290 mm from cuff to fingertip and 100 mm across
   // the knuckles: leather gloves with a crowned plate over the back of the hand, two knuckle lames, three lames down
   // each finger, a lame on the thumb and a flared steel cuff. The xl and xs sizes share this model.
-  h.compound('gloves_plate', 1.8, pair(gauntlet, 0.075),
+  h.compound('steel_gauntlets', 1.8, pair(gauntlet, 0.075),
              { glove: 'leather-brown', cuff: 'leather-brown', plate: 'steel-grey', rivet: 'steel-bright' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of yellow rubber kitchen gloves laid flat, each 360 mm from the rolled lip of its long cuff to the
   // fingertips, with grip ridges across the fingertips.
-  h.compound('gloves_rubber', 0.08, pair(rubberGlove, 0.078), { glove: 'plastic-yellow', cuff: 'plastic-yellow', lip: 'plastic-yellow' })
+  h.compound('rubber_gloves', 0.08, pair(rubberGlove, 0.078), { glove: 'plastic-yellow', cuff: 'plastic-yellow', lip: 'plastic-yellow' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin black costume gloves laid flat, each 230 mm from cuff to fingertip, with the hand's bones printed
   // in white on the back.
-  h.compound('gloves_skeleton', 0.04, pair(skeletonGlove), { glove: 'cloth-black', cuff: 'cloth-black', print: 'cloth-bright-white' })
+  h.compound('skeleton_gloves', 0.04, pair(skeletonGlove), { glove: 'cloth-black', cuff: 'cloth-black', print: 'cloth-bright-white' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of tan duty gloves laid flat, each 230 mm from cuff to fingertip: aramid fabric backs, a black moulded
   // knuckle shell, padded finger joints and a grey hook-and-loop wrist strap with a black pull tab.
-  h.compound('gloves_tactical', 0.15, pair(tacticalGlove),
+  h.compound('duty_gloves', 0.15, pair(tacticalGlove),
              { glove: 'nylon-coyote', cuff: 'nylon-coyote', shell: 'plastic-matte-black', pad: 'plastic-charcoal', strap: 'hook-loop-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of white cotton dress gloves laid flat, each 230 mm from cuff to fingertip, with three stitch lines down the
   // back and a snap at the wrist.
-  h.compound('gloves_white', 0.068, pair(whiteGlove), { glove: 'cloth-bright-white', cuff: 'cloth-bright-white', stitch: 'cloth-white', snap: 'metal-silver' })
+  h.compound('white_cotton_gloves', 0.068, pair(whiteGlove), { glove: 'cloth-bright-white', cuff: 'cloth-bright-white', stitch: 'cloth-white', snap: 'metal-silver' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of padded winter gloves laid flat, each 260 mm from cuff to fingertip and 30 mm thick, quilted across the
   // back in navy with a long gathered charcoal knit cuff.
-  h.compound('gloves_winter', 0.19, pair(winterGlove, 0.074), { glove: 'cloth-navy', cuff: 'cloth-charcoal', quilt: 'cloth-navy' })
+  h.compound('winter_gloves', 0.19, pair(winterGlove, 0.074), { glove: 'cloth-navy', cuff: 'cloth-charcoal', quilt: 'cloth-navy' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of grey knitted wool gloves laid flat, each 250 mm from cuff to fingertip with a 70 mm dark ribbed cuff. The xl
   // and xs sizes share this model.
-  h.compound('gloves_wool', 0.1, pair(woolGlove(1)), { glove: 'wool-grey', cuff: 'wool-grey', rib: 'cloth-charcoal' })
+  h.compound('wool_gloves', 0.1, pair(woolGlove(1)), { glove: 'wool-grey', cuff: 'wool-grey', rib: 'cloth-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of grey fingerless wool gloves laid flat, each 200 mm from cuff to the open finger ends, with a ribbed cuff
   // and a ribbed band round each finger end. The xl and xs sizes share this model.
-  h.compound('gloves_wool_fingerless', 0.088, pair(woolGlove(0.4)), { glove: 'wool-grey', cuff: 'wool-grey', rib: 'cloth-charcoal' })
+  h.compound('fingerless_wool_gloves', 0.088, pair(woolGlove(0.4)), { glove: 'wool-grey', cuff: 'wool-grey', rib: 'cloth-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of work gloves laid flat, each 260 mm from cuff to fingertip: cream canvas backs, tan leather fingers,
   // thumb, knuckle strip and heel strip, and a stiff khaki safety cuff bound in leather.
-  h.compound('gloves_work', 0.2, pair(workGlove, 0.075),
+  h.compound('work_gloves', 0.2, pair(workGlove, 0.075),
              { glove: 'cloth-cream', cuff: 'cloth-khaki', leather: 'leather-tan', binding: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of red cotton hand wraps rolled up, each roll 50 mm wide and 45 mm across, a 120 mm tail unrolled and
   // ending in a thumb loop.
-  h.compound('gloves_wraps', 0.1, wrapPair(0.022, 0.05, 0.12, 0.003), { wrap: 'cloth-red', end: 'cloth-crimson', loop: 'cloth-red' })
+  h.compound('cotton_hand_wraps', 0.1, wrapPair(0.022, 0.05, 0.12, 0.003), { wrap: 'cloth-red', end: 'cloth-crimson', loop: 'cloth-red' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['hands'] } } },
 
   // A pair of fur hand wraps rolled up and tied with a rawhide thong, each roll 70 mm wide and 70 mm across, with a
   // 120 mm tail of pelt and a thumb loop of hide.
-  h.compound('gloves_wraps_fur', 0.25, wrapPair(0.035, 0.07, 0.12, 0.01, true), { wrap: 'fur-brown', end: 'skin-rawhide', loop: 'skin-rawhide', tie: 'skin-rawhide' })
+  h.compound('fur_hand_wraps', 0.25, wrapPair(0.035, 0.07, 0.12, 0.01, true), { wrap: 'fur-brown', end: 'skin-rawhide', loop: 'skin-rawhide', tie: 'skin-rawhide' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['hands'] } } },
 
   // A pair of leather hand wraps rolled up and tied with a thong, each roll 50 mm wide and 55 mm across, with a 120 mm
   // tail and a thumb loop.
-  h.compound('gloves_wraps_leather', 0.11, wrapPair(0.0275, 0.05, 0.12, 0.004, true), { wrap: 'leather-brown', end: 'leather-chestnut', loop: 'leather-brown', tie: 'leather-black' })
+  h.compound('leather_hand_wraps', 0.11, wrapPair(0.0275, 0.05, 0.12, 0.004, true), { wrap: 'leather-brown', end: 'leather-chestnut', loop: 'leather-brown', tie: 'leather-black' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['hands'] } } },
 
   // A pair of grey wool hand wraps rolled up, each roll 50 mm wide and 45 mm across, with a 120 mm tail and a thumb
   // loop.
-  h.compound('gloves_wraps_wool', 0.12, wrapPair(0.022, 0.05, 0.12, 0.004), { wrap: 'wool-grey', end: 'felt-grey', loop: 'wool-grey' })
+  h.compound('wool_hand_wraps', 0.12, wrapPair(0.022, 0.05, 0.12, 0.004), { wrap: 'wool-grey', end: 'felt-grey', loop: 'wool-grey' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['hands'] } } },
 
   // A pair of steel mail gloves laid flat, each 240 mm from cuff to fingertip, rows of rings across the back and down
   // the fingers and a leather band at the wrist. The xl and xs sizes share this model.
-  h.compound('hc_chainmail_hands', 1.5, pair(mailGlove, 0.074), { glove: 'steel-mail', cuff: 'steel-mail', ring: 'steel-mail', band: 'leather-brown' })
+  h.compound('high_carbon_steel_mail_gloves', 1.5, pair(mailGlove, 0.074), { glove: 'steel-mail', cuff: 'steel-mail', ring: 'steel-mail', band: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of steel demi-gauntlets laid flat, each 260 mm from cuff to fingertip: leather gloves with mail fingers and
   // thumb, a crowned blued plate over the back of the hand, a plate round the wrist and four rivets. The xl size
   // shares this model.
-  h.compound('hc_demi_gaunt', 1.5, pair(demiGauntlet, 0.074),
+  h.compound('high_carbon_steel_demi_gauntlets', 1.5, pair(demiGauntlet, 0.074),
              { glove: 'leather-brown', cuff: 'leather-brown', mail: 'steel-mail', plate: 'steel-blued', rivet: 'steel-bright' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['hands'] } } },
 ]

@@ -63,7 +63,7 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A small zip bag 90 mm by 70 mm of six cotton balls damp with antiseptic.
-  h.compound('disincotton_ball', 0.0084, [
+  h.compound('antiseptic_cotton_balls', 0.0084, [
     h.box('bag', 'bag', [-0.045, 0, -0.035], [0.045, 0.001, 0.035]),
     h.box('zip', 'zip', [-0.045, 0, -0.035], [0.045, 0.004, -0.03]),
   ] + [
@@ -73,7 +73,7 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['fabric'] } } },
   // A cotton rag folded twice to 140 mm by 100 mm, a damp antiseptic stain spreading over its top.
-  h.compound('disinrag', 0.065,
+  h.compound('antiseptic_rag', 0.065,
     h.foldedGarment(0.14, 0.10, 0.02, 2) + [
       h.prism('stain', 'stain', 'y', [[-0.03, -0.04], [-0.035, 0.01], [0.0, 0.045], [0.03, 0.03], [0.035, -0.02], [0.005, -0.045]], 0.0195, 0.0205),
     ], { cloth: 'cloth-rag', stain: 'cloth-saffron' }) + {
@@ -89,13 +89,13 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 25 mm wide spray bottle 82 mm tall to the top of its pump, its nozzle to the front.
-  h.compound('liq_bandage_spray', 0.025, [
+  h.compound('liquid_bandage_spray', 0.025, [
     h.turned('bottle', 'bottle', 'y', [[0, 0], [0, 0.0125], [0.055, 0.0125], [0.06, 0.008], [0.064, 0.008], [0.064, 0]]),
     h.turned('label', 'label', 'y', [[0, 0], [0, 0.013], [0.032, 0.013], [0.032, 0]], [0, 0.012, 0]),
     h.disc('collar', 'pump', 0.009, 0.062, 0.07),
     h.disc('actuator', 'actuator', 0.0065, 0.07, 0.082),
     h.box('nozzle', 'actuator', [-0.002, 0.075, 0.005], [0.002, 0.079, 0.009]),
-  ], { bottle: 'plastic-white', label: 'plastic-blue', pump: 'plastic-white', actuator: 'plastic-grey' }) + h.inHand('liq_bandage_spray', 'bottle') + {
+  ], { bottle: 'plastic-white', label: 'plastic-blue', pump: 'plastic-white', actuator: 'plastic-grey' }) + h.inHand('liquid_bandage_spray', 'bottle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A sterile gauze pad sealed in a 110 mm by 100 mm paper sachet, the pad showing through a film window.
@@ -136,7 +136,7 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // Trauma shears 145 mm long lying flat: plastic finger loops, angled steel blades with a blunt flat tip.
-  h.compound('scissors_medical', 0.039, [
+  h.compound('trauma_shears', 0.039, [
     h.turned('loop-a', 'handle', 'y', [[0, 0.008], [0, 0.013], [0.006, 0.013], [0.006, 0.008], [0, 0.008]], [-0.045, 0, 0.016]),
     h.turned('loop-b', 'handle', 'y', [[0, 0.009], [0, 0.016], [0.006, 0.016], [0.006, 0.009], [0, 0.009]], [-0.044, 0, -0.019]),
     h.prism('arm-a', 'handle', 'y', [[0.006, -0.034], [0.012, -0.034], [0.005, 0.004], [-0.001, 0.004]], 0, 0.006),
@@ -146,11 +146,11 @@ local gasFinishes = {
     h.disc('tip', 'blade', 0.006, 0.002, 0.004, 0.087, -0.023),
     h.disc('pivot', 'pivot', 0.004, 0.001, 0.008, 0.002, 0),
   ], { handle: 'plastic-blue', blade: 'steel-stainless', pivot: 'steel-grey' }) + {
-    handling: h.gripOn('scissors_medical', 'loop-a'),
+    handling: h.gripOn('trauma_shears', 'loop-a'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A small 80 mm oxygen cylinder 0.17 m tall with a folding regulator and mask, 0.22 m overall.
-  h.compound('smoxygen_tank', 0.56, gasKit(0.04, 0.17, 0.75), gasFinishes) + {
+  h.compound('small_oxygen_tank', 0.56, gasKit(0.04, 0.17, 0.75), gasFinishes) + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // An empty 3 ml syringe, 105 mm long with its plunger drawn back and needle capped.
@@ -174,7 +174,7 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A blood draw kit on a 130 mm by 80 mm backing card: a needle holder, a stoppered sample tube and a winged needle.
-  h.compound('vacutainer', 0.018, [
+  h.compound('blood_draw_kit', 0.018, [
     h.box('card', 'card', [-0.065, 0, -0.04], [0.065, 0.002, 0.04]),
     h.box('print', 'print', [-0.065, 0.002, -0.04], [-0.05, 0.0025, 0.04]),
     h.turned('holder', 'holder', 'x', [[0, 0], [0, 0.009], [0.04, 0.009], [0.044, 0.004], [0.048, 0.004], [0.048, 0]], [-0.04, 0.011, -0.02]),
@@ -188,7 +188,7 @@ local gasFinishes = {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
   // A dosimeter badge sealed in an 80 mm by 60 mm foil pouch with a yellow warning label.
-  h.compound('wrapped_rad_badge', 0.014, h.sachet(0.08, 0.06, 0.008) + [
+  h.compound('sealed_radiation_badge', 0.014, h.sachet(0.08, 0.06, 0.008) + [
     h.box('label', 'label', [-0.022, 0.0075, -0.02], [0.022, 0.0085, 0.02]),
     h.disc('hub', 'symbol', 0.0025, 0.0085, 0.0095),
   ] + [

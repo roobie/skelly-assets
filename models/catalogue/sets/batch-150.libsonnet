@@ -269,32 +269,32 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
   // A pair of mild steel mail leggings laid flat side by side, outside up, each 860 mm from hip to ankle, 240 mm
   // across at the thigh and 130 mm at the ankle, with a leather band and two tie points at the top and a strap under
   // the instep. The high steel pair shares this model with darker rings.
-  h.compound('lc_chainmail_legs', 6.3, mailLeg('l-', -0.14, -0.43, 0.43, 0.24, 0.13) + mailLeg('r-', 0.14, -0.43, 0.43, 0.24, 0.13), { mail: 'steel-mail', strap: 'leather-brown' })
+  h.compound('high_carbon_steel_mail_leggings', 6.3, mailLeg('l-', -0.14, -0.43, 0.43, 0.24, 0.13) + mailLeg('r-', 0.14, -0.43, 0.43, 0.24, 0.13), { mail: 'steel-mail', strap: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of mild steel mail half-leggings laid flat side by side, back up, each 820 mm from hip to ankle, 260 mm
   // across at the thigh and 150 mm at the ankle: the mail wraps the front and sides and closes down the back of the
   // leg with a leather lace in a zigzag. The high steel pair shares this model with darker rings.
-  h.compound('lc_chainmail_half_legs', 4.9, halfMailLeg('l-', -0.15, -0.41, 0.41, 0.26, 0.15) + halfMailLeg('r-', 0.15, -0.41, 0.41, 0.26, 0.15), { mail: 'steel-mail', strap: 'leather-brown', lace: 'leather-tan', gap: 'cloth-charcoal' })
+  h.compound('high_carbon_steel_mail_half_leggings', 4.9, halfMailLeg('l-', -0.15, -0.41, 0.41, 0.26, 0.15) + halfMailLeg('r-', 0.15, -0.41, 0.41, 0.26, 0.15), { mail: 'steel-mail', strap: 'leather-brown', lace: 'leather-tan', gap: 'cloth-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of improvised tyre leg guards laid side by side, open side down, each 670 mm from thigh to ankle: three
   // thick curved chunks of tyre, tread up, 170 mm across at the thigh, butted end to end and bound in grey tape.
-  h.compound('improvised_legguard_tire', 2.9, tyreGuard('l-', -0.11) + tyreGuard('r-', 0.11), { tyre: 'rubber-black', tread: 'rubber-black', tape: 'tape-grey' })
+  h.compound('improvised_tyre_leg_guards', 2.9, tyreGuard('l-', -0.11) + tyreGuard('r-', 0.11), { tyre: 'rubber-black', tread: 'rubber-black', tape: 'tape-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['legs'] } } },
 
   // Armoured jeans folded on a shelf, 300 mm by 400 mm and 50 mm tall: blue denim with a hard plastic cup over each
   // knee and riveted mild steel sheets over the thighs and shins. The hardened pair shares this model.
-  armouredJeans('jeans_mod', 1.5, 'steel-bright') + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  armouredJeans('armoured_jeans', 1.5, 'steel-bright') + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
   // A pair of bronze greaves laid side by side, open side down, each 400 mm from knee to ankle, 150 mm across at the
   // calf and 90 mm at the ankle: a sculpted shell with a rib down the shin over a leather lining stitched along both
   // sides. The iron pair shares this model with its own metal finish.
-  h.compound('legguard_bronze', 3, greave('l-', -0.1, 0, 0.4, 0.12, 0.15, 0.09, 0.07) + greave('r-', 0.1, 0, 0.4, 0.12, 0.15, 0.09, 0.07), { shell: 'bronze', rib: 'bronze', lining: 'leather-brown', stitch: 'leather-tan' })
+  h.compound('bronze_greaves', 3, greave('l-', -0.1, 0, 0.4, 0.12, 0.15, 0.09, 0.07) + greave('r-', 0.1, 0, 0.4, 0.12, 0.15, 0.09, 0.07), { shell: 'bronze', rib: 'bronze', lining: 'leather-brown', stitch: 'leather-tan' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['ancient'] } } },
 
   // A pair of hard leg guards laid side by side, open side down, each 520 mm from knee to ankle: a moulded white
   // shin shell on a black neoprene backing, a domed knee cup above it and two hook-and-loop straps.
-  h.compound('legguard_hard', 1.1, std.flattenArrays([
+  h.compound('hard_leg_guards', 1.1, std.flattenArrays([
     local o = greaveOutline(0.34, 0.12, 0.14, 0.09);
     greave(p, cx, 0.07, 0.34, 0.12, 0.14, 0.09, 0.07)
     + cop(p + 'knee-', cx, -0.17, 0.065, 0.04)
@@ -307,7 +307,7 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
 
   // A pair of leather leg guards laid side by side, open side down, each 420 mm from knee to ankle and 160 mm across
   // at the calf: a moulded shell of thick leather, stitched round its edge, with three buckled straps.
-  h.compound('legguard_larmor', 1.2, std.flattenArrays([
+  h.compound('leather_leg_guards', 1.2, std.flattenArrays([
     local o = greaveOutline(0.42, 0.13, 0.16, 0.1);
     greave(p, cx, 0, 0.42, 0.13, 0.16, 0.1, 0.075)
     + std.flattenArrays([strap(p, 'strap-%d' % k, o, 0.011, 0.003, 0.075, cx, 0, [-0.15, 0, 0.15][k], [0.065, 0.075, 0.06][k]) for k in [0, 1, 2]])
@@ -318,7 +318,7 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
 
   // A pair of steel leg harnesses laid side by side, open side down, each 740 mm from hip to ankle: a curved thigh
   // plate, a domed knee cop with a side wing and a calf-shaped greave, each plate with two buckled leather straps.
-  h.compound('legguard_lightplate', 5.1, std.flattenArrays([
+  h.compound('steel_leg_harness', 5.1, std.flattenArrays([
     local thigh = [[-0.1, -0.13], [0.1, -0.13], [0.075, 0.13], [-0.075, 0.13]];
     local shin = greaveOutline(0.36, 0.11, 0.14, 0.09);
     shell(p + 'thigh-', 'shell', thigh, 0, 0.003, 0.09, cx, -0.3)
@@ -336,6 +336,6 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
   // A pair of bronze laminar leggings laid side by side, open side down, each 780 mm from thigh to shin: twelve
   // curved lames, 220 mm across at the thigh and 130 mm at the shin, each overlapping the one below and riveted to
   // leather straps behind, a domed cop over the knee and two ties at the top.
-  h.compound('leggings_thessalonian', 6.1, laminarLeg('l-', -0.125, 13, -0.4, 0.06, 0.22, 0.13, 0.1) + laminarLeg('r-', 0.125, 13, -0.4, 0.06, 0.22, 0.13, 0.1), { lame: 'bronze', rim: 'brass-polished', rivet: 'brass-polished', cop: 'bronze', strap: 'leather-brown' })
+  h.compound('bronze_laminar_leggings', 6.1, laminarLeg('l-', -0.125, 13, -0.4, 0.06, 0.22, 0.13, 0.1) + laminarLeg('r-', 0.125, 13, -0.4, 0.06, 0.22, 0.13, 0.1), { lame: 'bronze', rim: 'brass-polished', rivet: 'brass-polished', cop: 'bronze', strap: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['ancient'] } } },
 ]

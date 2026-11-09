@@ -110,14 +110,14 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
   + h.inHand('wicker_backpack', 'lid-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plant'], slot: ['back'] } } },
 
   // A lycra gym duffel 560 mm long and 280 mm across.
-  gym('duffelbag_gym_l', 0.6, 0.56, 0.14, 'nylon-red') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('large_gym_bag', 0.6, 0.56, 0.14, 'nylon-red') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A lycra gym duffel 480 mm long and 240 mm across.
-  gym('duffelbag_gym_m', 0.59, 0.48, 0.12, 'cloth-navy') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('gym_bag', 0.59, 0.48, 0.12, 'cloth-navy') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A lycra gym duffel 420 mm long and 210 mm across.
-  gym('duffelbag_gym_s', 0.46, 0.42, 0.105, 'cloth-charcoal') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('small_gym_bag', 0.46, 0.42, 0.105, 'cloth-charcoal') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A lycra gym duffel 640 mm long and 320 mm across.
-  gym('duffelbag_gym_xl', 0.75, 0.64, 0.16, 'cloth-blue') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('extra_large_gym_bag', 0.75, 0.64, 0.16, 'cloth-blue') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

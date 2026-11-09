@@ -10,10 +10,10 @@ local post(id, massKg, length, side, c, wood, extras=[], extraFinish={}) =
   ] + extras, { body: wood, end: 'wood-birch' } + extraFinish);
 [
   // A 3.05 m round pole 40 mm across, darkened with oil soaking into it.
-  h.compound('soaking_long_pole', 2.6, [
+  h.compound('oil_soaked_long_pole', 2.6, [
     h.rod('pole', 'pole', 0.020, -1.525, 1.525, 0.020),
   ], { pole: 'wood-walnut' }) + {
-    handling: h.gripOn('soaking_long_pole', 'pole'),
+    handling: h.gripOn('oil_soaked_long_pole', 'pole'),
   } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 610 x 200 x 25 mm air-dried billet for an instrument top, ends sealed with wax against checking, a grade mark pencilled on.
   h.compound('tonewood', 1.5, [
@@ -50,7 +50,7 @@ local post(id, massKg, length, side, c, wood, extras=[], extraFinish={}) =
   // A 4 x 4 post, 89 mm square and 1.22 m long.
   post('wooden_post', 4.8, 1.220, 0.089, 0.003, 'wood-pine') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 4 x 4 post, 89 mm square and 2.44 m long.
-  post('wooden_post_long', 9.6, 2.440, 0.089, 0.003, 'wood-pine') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  post('long_wooden_post', 9.6, 2.440, 0.089, 0.003, 'wood-pine') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 4 x 4 post, 89 mm square and 0.61 m long.
-  post('wooden_post_short', 2.4, 0.610, 0.089, 0.003, 'wood-pine') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  post('short_wooden_post', 2.4, 0.610, 0.089, 0.003, 'wood-pine') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
 ]

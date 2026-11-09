@@ -113,14 +113,14 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
 
   // A hand-held road flare, 30 cm long and 28 mm across: a red paper tube with a plastic cap over the striker at +x
   // and a plastic grip plug at the other end.
-  h.compound('handflare', 0.12, [
+  h.compound('road_flare', 0.12, [
     torchBody('plug', 'plug', [[0, 0.012], [0.03, 0.012], [0.03, 0.0145], [0.036, 0.0145]]),
     torchBody('tube', 'tube', [[0.036, 0.014], [0.27, 0.014]]),
     torchBody('band', 'label', [[0.12, 0.0143], [0.18, 0.0143]]),
     torchBody('cap', 'cap', [[0.262, 0.0155], [0.3, 0.0155]]),
     torchBody('striker', 'striker', [[0.3, 0.012], [0.302, 0.012]]),
   ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + {
-    handling: h.gripOn('handflare', 'plug'),
+    handling: h.gripOn('road_flare', 'plug'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['paper', 'plastic'], setting: ['modern'] } } },
 
@@ -142,7 +142,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
   ], { body: 'plastic-orange', switch: 'rubber-black', bezel: 'plastic-black', lens: 'crystal-glow-white', grip: 'rubber-black', clip: 'steel-grey' }) + h.inHand('heavy_flashlight', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // Eight metres of LED strip wound on a 9 cm reel with an open spoked front, the loose end hanging off with its plug.
-  h.compound('lightstrip', 0.15, [
+  h.compound('led_strip', 0.15, [
     turned('rim-front', 'reel', 'z', [[0, 0.041], [0, 0.045], [0.0015, 0.045], [0.0015, 0.041], [0, 0.041]], [0, 0.045, 0.005]),
     box('spoke-v', 'reel', [-0.003, 0.004, 0.005], [0.003, 0.086, 0.0065]),
     box('spoke-h', 'reel', [-0.041, 0.042, 0.005], [0.041, 0.048, 0.0065]),
@@ -158,7 +158,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('tail-led-a', 'led', [0.05, 0.0012, -0.002], [0.054, 0.0025, 0.002]),
     box('tail-led-b', 'led', [0.064, 0.0012, -0.002], [0.068, 0.0025, 0.002]),
     box('tail-plug', 'plug', [0.075, 0.0, -0.006], [0.088, 0.006, 0.006]),
-  ], { reel: 'plastic-black', strip: 'plastic-gloss-white', led: 'plastic-yellow', plug: 'plastic-black' }) + h.inHand('lightstrip', 'coil') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { reel: 'plastic-black', strip: 'plastic-gloss-white', led: 'plastic-yellow', plug: 'plastic-black' }) + h.inHand('led_strip', 'coil') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A nine-branched candleholder for Hanukkah, 18 cm across and 18 cm tall: eight cups on four nested half-round
   // arms facing +z, and a raised ninth cup on the centre stem.
@@ -177,7 +177,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
 
   // A wheel-thrown clay oil lamp, 14 cm long: a round closed bowl 9 cm across with a sunken top and fill hole, a
   // nozzle to +z for the wick and a tab handle at the back.
-  h.compound('oil_lamp_clay', 0.14, [
+  h.compound('clay_oil_lamp', 0.14, [
     turned('foot', 'clay', 'y', [[0, 0], [0, 0.028], [0.005, 0.028], [0.005, 0]]),
     turned('bowl', 'clay', 'y', [[0.005, 0], [0.005, 0.034], [0.012, 0.044], [0.024, 0.045], [0.032, 0.04], [0.034, 0.032], [0.034, 0]]),
     turned('discus', 'clay-dark', 'y', [[0, 0], [0, 0.026], [0.002, 0.026], [0.002, 0]], [0, 0.032, 0]),
@@ -187,11 +187,11 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     disc('wick', 'wick', 0.0025, 0.031, 0.035, 0, 0.074),
     box('handle', 'clay', [-0.004, 0.012, -0.058], [0.004, 0.044, -0.04]),
     box('handle-top', 'clay', [-0.004, 0.036, -0.052], [0.004, 0.048, -0.034]),
-  ], { clay: 'clay-terracotta', 'clay-dark': 'brick-buff', hole: 'coal-black', wick: 'cloth-charred' }) + h.inHand('oil_lamp_clay', 'bowl') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['ceramic'], setting: ['ancient'] } } },
+  ], { clay: 'clay-terracotta', 'clay-dark': 'brick-buff', hole: 'coal-black', wick: 'cloth-charred' }) + h.inHand('clay_oil_lamp', 'bowl') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['ceramic'], setting: ['ancient'] } } },
 
   // An old brass acetylene lamp, 15 cm tall: a gas chamber below a water tank with its drip valve on top, a polished
   // reflector facing +z round the burner tip, and a hanging hook at the back.
-  h.compound('oxylamp', 0.53, [
+  h.compound('acetylene_lamp', 0.53, [
     turned('chamber', 'brass', 'y', [[0, 0], [0, 0.034], [0.004, 0.036], [0.066, 0.036], [0.07, 0.033], [0.07, 0]]),
     turned('joint', 'band', 'y', [[0.07, 0], [0.07, 0.038], [0.078, 0.038], [0.078, 0]]),
     turned('tank', 'brass', 'y', [[0.078, 0], [0.078, 0.034], [0.118, 0.034], [0.126, 0.022], [0.128, 0]]),
@@ -203,7 +203,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('hook-back', 'band', [-0.003, 0.06, -0.044], [0.003, 0.15, -0.04]),
     box('hook-top', 'band', [-0.003, 0.146, -0.04], [0.003, 0.15, -0.02]),
     box('hook-tip', 'band', [-0.003, 0.136, -0.024], [0.003, 0.15, -0.02]),
-  ], { brass: 'brass', band: 'brass-dull', reflector: 'brass-polished', mirror: 'mirror-silver' }) + h.inHand('oxylamp', 'chamber') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
+  ], { brass: 'brass', band: 'brass-dull', reflector: 'brass-polished', mirror: 'mirror-silver' }) + h.inHand('acetylene_lamp', 'chamber') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
 
   // A clip-on book light, 13 cm long: a spring clip, a gooseneck arching over to +x and a small LED head facing down.
   h.compound('reading_light', 0.05, [

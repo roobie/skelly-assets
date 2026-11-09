@@ -77,7 +77,7 @@ local spool(n, x, z, y0) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'] } } },
   // A standing frame loom 0.68 m wide and 0.82 m tall on two 0.30 m feet: pine posts and beams, a warp of cotton
   // threads, a heddle rod across them and a hand's breadth of striped cloth woven at the bottom.
-  h.compound('loom_frame', 3.5, [
+  h.compound('frame_loom', 3.5, [
     h.box('foot-l', 'frame', [-0.335, 0, -0.150], [-0.265, 0.030, 0.150]),
     h.box('foot-r', 'frame', [0.265, 0, -0.150], [0.335, 0.030, 0.150]),
     h.box('post-l', 'frame', [-0.325, 0.030, -0.020], [-0.275, 0.820, 0.020]),
@@ -96,22 +96,22 @@ local spool(n, x, z, y0) = [
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'fabric'] } } },
   // A bone needle 110 mm long and 7 mm thick, filed to a point, with a wide flat head and a drilled eye.
-  h.compound('needle_bone', 0.004, needle('needle', 0.100, 0.0035, 0.008, 0.002, 0.003), { needle: 'bone' }) + h.inHand('needle_bone', 'shaft') + {
+  h.compound('bone_needle', 0.004, needle('needle', 0.100, 0.0035, 0.008, 0.002, 0.003), { needle: 'bone' }) + h.inHand('bone_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['prehistoric'] } } },
   // A curved steel suture-style needle: a half circle 50 mm across, 3 mm thick, with a pointed tip and an eye end.
-  h.compound('needle_curved', 0.0068, h.crescent('arc', 'needle', 0.0235, 0.0265, -90, 90, 12, 0, 0.003) + [
+  h.compound('curved_needle', 0.0068, h.crescent('arc', 'needle', 0.0235, 0.0265, -90, 90, 12, 0, 0.003) + [
     h.prism('point', 'needle', 'y', [[0.0, -0.0270], [0.0, -0.0230], [-0.009, -0.0250]], 0, 0.003),
     h.box('eye', 'needle', [0.0225, 0, -0.006], [0.0285, 0.003, 0.0]),
-  ], { needle: 'steel-stainless' }) + h.inHand('needle_curved', 'arc-6') + {
+  ], { needle: 'steel-stainless' }) + h.inHand('curved_needle', 'arc-6') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A heavy steel darning needle 100 mm long and 3.6 mm thick with a long eye.
-  h.compound('needle_steel', 0.0054, needle('needle', 0.092, 0.0018, 0.008, 0.002, 0.002), { needle: 'steel-stainless' }) + h.inHand('needle_steel', 'shaft') + {
+  h.compound('steel_needle', 0.0054, needle('needle', 0.092, 0.0018, 0.008, 0.002, 0.002), { needle: 'steel-stainless' }) + h.inHand('steel_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A whittled wooden needle 120 mm long and 7 mm thick, with a narrow carved eye in a flat head.
-  h.compound('needle_wood', 0.0014, needle('needle', 0.108, 0.0035, 0.010, 0.002, 0.003), { needle: 'wood-pine' }) + h.inHand('needle_wood', 'shaft') + {
+  h.compound('wooden_needle', 0.0014, needle('needle', 0.108, 0.0035, 0.010, 0.002, 0.003), { needle: 'wood-pine' }) + h.inHand('wooden_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A flat wooden shed stick 550 mm long, 50 mm wide and 10 mm thick, its ends tapered to blunt points.

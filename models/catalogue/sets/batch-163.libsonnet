@@ -73,7 +73,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A joke backpack 750 mm wide, 1.15 m tall and 400 mm deep, a daypack blown up to nearly a person's height, with
   // oversized zip pulls and side pockets.
-  h.compound('backpack_giant', 1.9, pack({ w: 0.75, ht: 1.15, d: 0.4, side: 0.08, cinch: [] }) + [
+  h.compound('giant_novelty_backpack', 1.9, pack({ w: 0.75, ht: 1.15, d: 0.4, side: 0.08, cinch: [] }) + [
     box('giant-pull', 'trim', [-0.2, 0.44, 0.272], [-0.16, 0.54, 0.29]),
   ], {
     body: 'cloth-yellow',
@@ -86,7 +86,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A hunting pack 380 mm wide, 720 mm tall and 260 mm deep with a top lid, side pockets, side compression straps,
   // a padded hip belt and two lashing straps under the base for a bedroll or game bag.
-  h.compound('backpack_hunting', 1.7, pack({ w: 0.38, ht: 0.72, d: 0.26, round: false, lid: 0.16, side: 0.06, hip: true, cinch: [0.3, 0.48] }) + [
+  h.compound('hunting_pack', 1.7, pack({ w: 0.38, ht: 0.72, d: 0.26, round: false, lid: 0.16, side: 0.06, hip: true, cinch: [0.3, 0.48] }) + [
     box('lash-%d' % i, 'trim', [x - 0.0125, 0, 0.13], [x + 0.0125, 0.06, 0.2])
     for i in [0, 1]
     for x in [[-0.12, 0.12][i]]
@@ -101,7 +101,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A large squared tactical pack 360 mm wide, 600 mm tall and 250 mm deep, its front pocket under four rows of
   // attachment webbing, with compression straps and a hip belt.
-  h.compound('backpack_tactical_large', 2.3, pack({ w: 0.36, ht: 0.6, d: 0.25, round: false, ph: 0.3, pd: 0.06, pals: 4, hip: true, cinch: [0.2, 0.42] }), {
+  h.compound('large_tactical_backpack', 2.3, pack({ w: 0.36, ht: 0.6, d: 0.25, round: false, ph: 0.3, pd: 0.06, pals: 4, hip: true, cinch: [0.2, 0.42] }), {
     body: 'cloth-olive-drab',
     pocket: 'cloth-olive-drab',
     back: 'webbing-olive-dark',
@@ -112,7 +112,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A high-volume leather rucksack 420 mm wide, 820 mm tall and 300 mm deep with a deep lid, side pockets, three
   // rows of compression straps and a hip belt.
-  h.compound('bigback', 6.7, pack({ w: 0.42, ht: 0.82, d: 0.3, round: false, lid: 0.2, side: 0.07, hip: true, cinch: [0.34, 0.5, 0.66] }), {
+  h.compound('high_volume_rucksack', 6.7, pack({ w: 0.42, ht: 0.82, d: 0.3, round: false, lid: 0.2, side: 0.07, hip: true, cinch: [0.34, 0.5, 0.66] }), {
     body: 'leather-brown',
     pocket: 'leather-chestnut',
     back: 'leather-black',
@@ -134,7 +134,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // An armband pouch laid flat: a canvas pouch 120 mm by 90 mm and 35 mm deep with a flap, on a webbing strap
   // 400 mm long and 40 mm wide with a plastic side-release buckle.
-  h.compound('armrig', 0.1, [
+  h.compound('armband_pouch', 0.1, [
     box('band', 'band', [-0.2, 0, -0.02], [0.17, 0.003, 0.02]),
     box('buckle-a', 'buckle', [0.17, 0, -0.024], [0.19, 0.008, 0.024]),
     box('buckle-b', 'buckle', [0.19, 0.001, -0.016], [0.2, 0.006, 0.016]),
@@ -147,7 +147,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // An L-shaped pack frame 500 mm wide and 1 m tall of squared timber with a load shelf 320 mm deep at its foot,
   // three cross rails, two leather load straps across its face and leather shoulder straps behind.
-  h.compound('bigframe_pack', 5.5, [
+  h.compound('large_frame_pack', 5.5, [
     box('upright-%d' % i, 'frame', [x - 0.022, 0, -0.022], [x + 0.022, 1.0, 0.022])
     for i in [0, 1]
     for x in [[-0.23, 0.23][i]]
@@ -181,7 +181,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A trapper's pack 460 mm wide, 820 mm tall and 340 mm deep: waxed canvas stretched round a pole frame whose
   // corner posts stand proud, gathered at the top by a drawstring, with canvas shoulder straps behind.
-  h.compound('bigtrapper_pack', 3.5, [
+  h.compound('large_trapper_pack', 3.5, [
     box('body', 'cloth', [-0.22, 0.03, -0.16], [0.22, 0.72, 0.16]),
     h.prism('shoulder-in', 'cloth', 'x', [[0.72, -0.16], [0.72, 0.16], [0.8, 0.1], [0.8, -0.1]], -0.22, 0.22),
     h.prism('gather', 'cloth', 'z', [[-0.22, 0.72], [0.22, 0.72], [0.12, 0.8], [-0.12, 0.8]], -0.1, 0.1),
@@ -235,7 +235,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
 
   // A wooden box 320 mm wide, 380 mm tall and 200 mm deep made into a pack: plank sides with corner battens, a
   // hinged lid with a hasp, and two rope loops tied to its back for shoulder straps.
-  h.compound('boxpack', 3.5, [
+  h.compound('box_backpack', 3.5, [
     box('box', 'wood', [-0.16, 0, -0.1], [0.16, 0.37, 0.1]),
     box('lid', 'wood', [-0.165, 0.37, -0.105], [0.165, 0.39, 0.105]),
     box('hasp', 'iron', [-0.015, 0.33, 0.1], [0.015, 0.385, 0.104]),

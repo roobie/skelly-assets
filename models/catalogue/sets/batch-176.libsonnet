@@ -161,7 +161,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   // Full-face diving mask standing on its chin, front on +z: 190 mm tall, 170 mm across and 110 mm deep, a domed clear
   // visor in a coloured frame and a black rubber skirt, an empty regulator port at the mouth and a four-strap harness
   // behind.
-  h.compound('divemask_full_scuba_notready', 0.6,
+  h.compound('full_face_diving_mask_without_regulator', 0.6,
              ovalRing('skirt', 'skirt', oval(0.068, 0.078, 3, 24, 0.095), oval(0.085, 0.095, 3, 24, 0.095), -0.06, -0.02)
              + ovalRing('frame', 'frame', oval(0.068, 0.078, 3, 24, 0.095), oval(0.078, 0.088, 3, 24, 0.095), -0.02, 0.0)
              + [
@@ -185,7 +185,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
 
   // Swim goggles standing on their cups, front on +z: two 40 mm cups on a nose bridge, 120 mm across, the silicone
   // strap looped behind.
-  h.compound('goggles_swim', 0.03, g.eyewear({ kind: 'goggles', rIn: 0.015, rOut: 0.02, depth: 0.016, gap: 0.014, strapW: 0.008 }),
+  h.compound('swim_goggles', 0.03, g.eyewear({ kind: 'goggles', rIn: 0.015, rOut: 0.02, depth: 0.016, gap: 0.014, strapW: 0.008 }),
              { cup: 'plastic-clear-blue', rim: 'rubber-black', lens: 'lens-smoke', bridge: 'rubber-black', strap: 'plastic-blue' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'rubber'], slot: ['face'], setting: ['modern'] } } },
 
@@ -201,11 +201,11 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['modern'] } } },
 
   // The same suit with copper bonding braids down every limb and a grounding lead ending in a clip.
-  h.compound('shark_suit_faraday', 10, sharkSuit(true), { mail: 'steel-mail', row: 'steel-mail-dark', collar: 'cloth-black', braid: 'copper', clip: 'steel-bright' })
+  h.compound('faraday_shark_suit', 10, sharkSuit(true), { mail: 'steel-mail', row: 'steel-mail-dark', collar: 'cloth-black', braid: 'copper', clip: 'steel-bright' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['modern'] } } },
 
   // Black racing briefs laid flat, 300 mm across the waist and 150 mm deep.
-  h.compound('speedo', 0.052, briefs([[0.075, 0.15], [0.05, 0.145], [0.025, 0.115], [0.0, 0.08], [-0.03, 0.05], [-0.075, 0.038]]),
+  h.compound('racing_briefs', 0.052, briefs([[0.075, 0.15], [0.05, 0.145], [0.025, 0.115], [0.0, 0.08], [-0.03, 0.05], [-0.075, 0.038]]),
              { cloth: 'lycra-black', band: 'lycra-black', cord: 'cord-cotton' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
@@ -269,7 +269,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Thick neoprene dive boots standing as a pair, each 290 mm long and 190 mm tall, on hard rubber soles with a side zip.
-  h.compound('wetsuit_booties_thick', 1.2,
+  h.compound('thick_wetsuit_booties', 1.2,
              f.pair(diveBoot, 0.03, function(p, cx)
                local s = if p == 'l-' then 1 else -1;
                [

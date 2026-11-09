@@ -66,7 +66,7 @@ local frets(n, nut, scale, half, y) = [
   // a skin, two arms spreading up from it to a crossbar, and six strings fanning from a tailpiece on the skin up to
   // the crossbar. Standing upright, face on +z.
   local bowlY = 0.19;
-  h.compound('krar_golden', 18, [
+  h.compound('golden_krar', 18, [
     turned('bowl', 'bowl', 'z', [[-0.11, 0], [-0.11, 0.06], [-0.08, 0.13], [-0.04, 0.17], [0, 0.18], [0, 0]], [0, bowlY, 0]),
     turned('skin', 'skin', 'z', [[0, 0], [0, 0.172], [0.005, 0.172], [0.005, 0]], [0, bowlY, 0]),
     flatZ('arm-left', 'frame', strip([-0.11, bowlY + 0.08], [-0.33, 0.95], 0.04), -0.06, -0.02),
@@ -159,7 +159,7 @@ local frets(n, nut, scale, half, y) = [
   // Corded electric animal shears, 330 mm long and 70 mm across the head: a moulded motor body with a rubber grip
   // band and a slide switch, a head housing carrying a toothed comb under a cutter plate held by a tension nut, and a
   // short length of cord to a plug.
-  h.compound('elec_shears', 0.87, [
+  h.compound('electric_shears', 0.87, [
     turned('body', 'body', 'x', [[0, 0], [0, 0.014], [0.02, 0.026], [0.15, 0.03], [0.2, 0.033], [0.23, 0.03], [0.23, 0]], [-0.14, 0.035, 0]),
     rodAt('grip', 'grip', 0.0305, -0.08, 0.02, 0.035, 0),
     box('switch', 'switch', [0.03, 0.064, -0.008], [0.055, 0.07, 0.008]),
@@ -176,5 +176,5 @@ local frets(n, nut, scale, half, y) = [
     box('tooth-%d' % i, 'blade', [0.16, 0.012, -0.038 + i * 0.0084], [0.18, 0.016, -0.034 + i * 0.0084])
     for i in std.range(0, 9)
   ], { body: 'plastic-blue', grip: 'rubber-black', switch: 'plastic-white', blade: 'steel-grey', cutter: 'steel-bright', plug: 'plastic-black' })
-  + { handling: h.gripOn('elec_shears', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + { handling: h.gripOn('electric_shears', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 ]

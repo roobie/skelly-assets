@@ -142,7 +142,7 @@ local mirrorArmor(id, mass, style) =
   // A denim jacket folded flat, 420 mm by 340 mm and 80 mm tall, with mild steel plates riveted over the chest, the
   // belly and the sleeves: two plates each side of the button placket and a long plate down each flat sleeve.
   local w = 0.42, d = 0.34, ht = 0.08, st = ht + 0.006;
-  h.compound('jacket_jean_mod', 2.4, jacketBase(w, d, ht, 'placket', 4)
+  h.compound('plated_denim_jacket', 2.4, jacketBase(w, d, ht, 'placket', 4)
                                       + plate('chest-l', -0.12, -0.03, -0.06, 0.02, ht)
                                       + plate('chest-r', 0.03, 0.12, -0.06, 0.02, ht)
                                       + plate('belly-l', -0.12, -0.03, -0.155, -0.075, ht)
@@ -159,7 +159,7 @@ local mirrorArmor(id, mass, style) =
   local hexPlate(id, cx, cz2, rx, rz, y) = [
     flat(id, 'plate', [[cx - rx, cz2], [cx - rx * 0.5, cz2 - rz], [cx + rx * 0.5, cz2 - rz], [cx + rx, cz2], [cx + rx * 0.5, cz2 + rz], [cx - rx * 0.5, cz2 + rz]], y, 0.005),
   ] + rivets(id + '-bolt', 'rivet', [[cx - rx * 0.6, cz2], [cx + rx * 0.6, cz2], [cx, cz2 - rz * 0.7], [cx, cz2 + rz * 0.7]], y + 0.005, 0.005, 0.004);
-  h.compound('jacket_leather_mod', 10, jacketBase(w, d, ht, 'none', [])
+  h.compound('plated_motorcycle_jacket', 10, jacketBase(w, d, ht, 'none', [])
                                         + [
                                           flat('lapel-l', 'front', [[-0.04, cz - 0.05], [-0.12, cz - 0.03], [-0.06, cz - 0.14]], ht, 0.008),
                                           flat('lapel-r', 'front', [[0.04, cz - 0.05], [0.12, cz - 0.03], [0.06, cz - 0.14]], ht, 0.008),
@@ -187,7 +187,7 @@ local mirrorArmor(id, mass, style) =
       for k in [0, 1]
       for z in [cz - rl / 2 + 0.008 + i * 0.02 + (if k == 0 then 0 else 0.008)]
     ];
-  h.compound('jacket_leather_tire', 9.2, jacketBase(w, d, ht, 'placket', [])
+  h.compound('tyre_plated_motorcycle_jacket', 9.2, jacketBase(w, d, ht, 'placket', [])
                                          + tread('chest-l', -0.075, -0.03, 0.09, 0.11, ht)
                                          + tread('chest-r', 0.075, -0.03, 0.09, 0.11, ht)
                                          + tread('belly', 0, -0.135, 0.2, 0.06, ht + 0.005)
@@ -202,7 +202,7 @@ local mirrorArmor(id, mass, style) =
   // down the front with four curved ribs off each side, knuckle bones over the shoulders and a long bone down each
   // flat sleeve, all scored with dark carving.
   local w = 0.42, d = 0.34, ht = 0.08, st = ht + 0.006, sx = w / 2 - 0.0425, by = ht + 0.002;
-  h.compound('jacket_leather_bone', 9, jacketBase(w, d, ht, 'none', [])
+  h.compound('carved_bone_jacket', 9, jacketBase(w, d, ht, 'none', [])
                                          + [
                                            taper('sternum', 'bone', [0, 0.02], [0, -0.13], 0.03, 0.018, ht, 0.008),
                                          ]
@@ -235,7 +235,7 @@ local mirrorArmor(id, mass, style) =
   // to shoulder over a slightly wider back panel, 24 mm thick together, with hook-and-loop shoulder tabs, a white
   // label on the chest and elastic side straps hanging loose with hook-and-loop ends.
   local o = { w: 0.46, l: 0.56, t: 0.012, neckW: 0.085, neckD: 0.07, armIn: 0.06, armD: 0.17 };
-  h.compound('kevlar', 1.3, [
+  h.compound('concealable_ballistic_vest', 1.3, [
     q { start: q.start + 0.012, end: q.end + 0.012 }
     for q in flatTop(o)
   ] + [
@@ -263,7 +263,7 @@ local mirrorArmor(id, mass, style) =
   // 560 mm long, a groin flap tapering down from the hem, a white binding round the neck and the body-wire clip at
   // the hip.
   local o = { w: 0.4, l: 0.56, t: 0.006, neckW: 0.07, neckD: 0.06, armIn: 0.055, armD: 0.17 };
-  h.compound('lame_foil', 0.32, flatTop(o) + [
+  h.compound('foil_fencing_vest', 0.32, flatTop(o) + [
     flat('flap', 'cloth', [[-0.11, -0.28], [0.11, -0.28], [0.06, -0.4], [-0.06, -0.4]], 0, 0.006),
     box('neck-binding', 'binding', [-0.07, 0.0, 0.214], [0.07, 0.008, 0.226]),
     box('neck-binding-l', 'binding', [-0.082, 0.0, 0.22], [-0.07, 0.008, 0.28]),
@@ -277,7 +277,7 @@ local mirrorArmor(id, mass, style) =
   // straight at the waist, its sleeves laid out to the sides, 560 mm long, with a stand collar, white cuffs and the
   // body-wire clip at the hip.
   local o = { w: 0.4, l: 0.48, t: 0.006, neckW: 0.07, neckD: 0.06, sleeves: { l: 0.56, w0: 0.15, w1: 0.09, ang: 35 } };
-  h.compound('lame_saber', 0.45, flatTop(o) + [
+  h.compound('sabre_fencing_jacket', 0.45, flatTop(o) + [
     box('collar', 'binding', [-0.08, 0.0, 0.176], [0.08, 0.012, 0.19]),
     box('collar-l', 'binding', [-0.092, 0.0, 0.18], [-0.07, 0.012, 0.24]),
     box('collar-r', 'binding', [0.07, 0.0, 0.18], [0.092, 0.012, 0.24]),
@@ -316,22 +316,22 @@ local mirrorArmor(id, mass, style) =
   // Mild steel mirror armour laid out as a set, 500 mm across and 550 mm long: front and back panels 220 by 270 mm,
   // side panels 180 by 200 mm, each a leather backing with crude square plates riveted on in a grid, the front and
   // back with a domed round mirror 136 mm across in the middle.
-  mirrorArmor('lc_mirror_armor', 5.7, 'squares') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
+  mirrorArmor('mild_steel_mirror_armour', 5.7, 'squares') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
 
   // Medium steel mirror armour laid out as a set, 500 mm across and 550 mm long: the same four leather panels with
   // rectangular plates riveted on in rows, the front and back with a domed round mirror in the middle.
-  mirrorArmor('mc_mirror_armor', 5.9, 'bars') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
+  mirrorArmor('medium_steel_mirror_armour', 5.9, 'bars') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
 
   // High steel mirror armour laid out as a set, 500 mm across and 550 mm long: four leather panels, each faced with one
   // well-formed blued plate inside a polished bead, the front and back with a polished domed mirror in the middle.
-  mirrorArmor('hc_mirror_armor', 7.5, 'framed') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
+  mirrorArmor('high_carbon_steel_mirror_armour', 7.5, 'framed') + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'] } } },
 
   // A sleeveless mail vest lying flat, front up, 440 mm across and 600 mm long, 8 mm thick, ridged across where its
   // rows of rings lie, with leather straps over the shoulders and a buckled strap round the waist to spread the
   // weight, and a leather binding at the neck.
   local o = { w: 0.44, l: 0.6, t: 0.008, neckW: 0.08, neckD: 0.065, armIn: 0.06, armD: 0.18 };
   local top = 0.3 - 0.065;
-  h.compound('lc_chainmail_vest', 4.4, flatTop(o) + [
+  h.compound('mild_steel_mail_vest', 4.4, flatTop(o) + [
     local z = -0.296 + i * 0.016, half = if z < top - 0.18 then 0.216 else 0.156;
     box('ring-row-%d' % i, 'rings', [-half, 0.008, z], [half, 0.012, z + 0.006])
     for i in std.range(0, std.floor((top - 0.01 + 0.296) / 0.016))

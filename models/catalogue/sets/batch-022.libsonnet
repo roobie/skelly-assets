@@ -18,7 +18,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
 
   // A black builder's tub 140 mm across and 95 mm tall holding about a litre of mixed mortar, its top heaped and
   // rough. Lime and adobe mortar share it, recoloured.
-  h.compound('mortar_build', 1.7, [
+  h.compound('adobe_mortar', 1.7, [
     turned('tub', 'tub', 'y', [[0, 0], [0, 0.06], [0.09, 0.068], [0.095, 0.072], [0.095, 0.066], [0.004, 0.057], [0.004, 0]]),
     turned('fill', 'mortar', 'y', [[0, 0], [0, 0.054], [0.078, 0.062], [0.08, 0.05], [0.082, 0]], [0, 0.004, 0]),
     h.ball('lump-a', 'mortar', 0.022, -0.02, 0.084, 0.01, 0.5),
@@ -29,7 +29,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
 
   // A micro motor 25 mm across and 50 mm long with its shaft, lying along x: a steel can with flats top and bottom,
   // a white plastic end cap with two solder tabs and a bearing boss at the shaft end.
-  h.compound('motor_micro', 0.052, [
+  h.compound('micro_motor', 0.052, [
     h.rod('can', 'can', 0.0125, -0.016, 0.014, 0.0125),
     h.rod('cap', 'cap', 0.0115, 0.014, 0.02, 0.0125),
     h.rod('boss', 'can', 0.004, -0.019, -0.016, 0.0125),
@@ -71,7 +71,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
 
   // A packed cargo parachute about 900 by 420 by 380 mm: an olive nylon pack tray closed by four side flaps, bound
   // with dark webbing ties, a coiled static line and steel connector links on top and a white data card on the front.
-  h.compound('parachute_mil', 55, [
+  h.compound('cargo_parachute', 55, [
     box('pack', 'nylon', [-0.45, 0.01, -0.21], [0.45, 0.37, 0.21]),
     box('tray', 'tray', [-0.455, 0, -0.215], [0.455, 0.06, 0.215]),
     box('flap-l', 'flap', [-0.46, 0.06, -0.2], [-0.44, 0.34, 0.2]),
@@ -134,7 +134,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
 
   // A piezo igniter 70 mm long lying along x: a black plastic body with a red push button at -x, an aluminium sleeve
   // with a lock nut, and a bare electrode wire bent at the tip.
-  h.compound('pilot_light', 0.0053, [
+  h.compound('piezo_igniter', 0.0053, [
     h.rod('button', 'button', 0.005, -0.03, -0.022, 0.007),
     h.rod('body', 'body', 0.007, -0.022, 0.008, 0.007),
     h.rod('sleeve', 'sleeve', 0.0035, 0.008, 0.03, 0.007),
@@ -146,7 +146,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
 
   // A twisted-wire bore brush 350 mm long lying along x: a steel finger loop at -x, a long twisted shaft and a cotton
   // brush head 100 mm long with a rounded tip.
-  h.compound('pipe_cleaner', 0.043, [
+  h.compound('bore_brush', 0.043, [
     wireLoop('loop', 'wire', 0.02, 0.004, 0.006) + { origin: [-0.16, 0.006, 0] },
     h.rod('shaft', 'wire', 0.002, -0.141, 0.06, 0.009),
   ] + [
@@ -156,11 +156,11 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     h.rod('brush', 'cotton', 0.009, 0.06, 0.16, 0.009),
     turned('tip', 'cotton', 'x', [[0, 0], [0, 0.009], [0.006, 0.007], [0.01, 0]], [0.16, 0.009, 0]),
   ], { wire: 'steel-galvanised', cotton: 'cloth-bright-white' })
-  + { voxelGrain: 0.004, handling: h.gripOn('pipe_cleaner', 'shaft') } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'fabric'] } } },
+  + { voxelGrain: 0.004, handling: h.gripOn('bore_brush', 'shaft') } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'fabric'] } } },
 
   // A cheap plastic plant pot 180 mm across at the rim and 150 mm tall, tapering to 130 mm at the base, with a
   // rolled rim and a foot ring.
-  h.compound('plastic_pot_flower', 0.11, [
+  h.compound('plastic_flower_pot', 0.11, [
     turned('pot', 'pot', 'y', [
       [0, 0], [0, 0.062], [0.006, 0.065], [0.14, 0.086], [0.15, 0.09], [0.15, 0.086], [0.136, 0.082], [0.006, 0.061],
       [0.006, 0],

@@ -93,7 +93,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
 
   // A necklace of animal teeth lying flat, 200 mm across: a leather thong loop with nine pointed teeth strung along
   // its front, the longest in the middle.
-  h.compound('necklace_teeth', 0.017, [
+  h.compound('teeth_necklace', 0.017, [
     ringY('thong', 'thong', 0.083, 0.087, 0, 0.003),
   ] + [
     local a = -60 + 15 * i;

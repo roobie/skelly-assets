@@ -304,47 +304,47 @@ local furArmour() =
 [
   // A suit of hardened steel plate laid out flat, 1200 mm from the neck to the ankle and 800 mm across: a breastplate
   // with a 4 mm wall, three fauld lames and a mail skirt, pauldrons, arm and leg harness with mail at the joints.
-  h.compound('armor_ch_plate', 28, plateSuit({}), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
+  h.compound('hardened_steel_plate_armour', 28, plateSuit({}), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
   // The light suit: a 2 mm breastplate, two lames, smaller pauldrons.
-  h.compound('armor_ch_lightplate', 15, plateSuit({ thick: 0.008, lames: 2, pauldron: 0.07 }), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
+  h.compound('hardened_steel_light_plate_armour', 15, plateSuit({ thick: 0.008, lames: 2, pauldron: 0.07 }), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The heavy suit: a 6 mm breastplate with a plackart riveted over its lower half, four lames, broad pauldrons.
-  h.compound('armor_ch_heavyplate', 21, plateSuit({ thick: 0.016, lames: 4, plackart: true, pauldron: 0.1 }), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
+  h.compound('hardened_steel_heavy_plate_armour', 21, plateSuit({ thick: 0.016, lames: 4, plackart: true, pauldron: 0.1 }), { plate: 'steel-hardened', ridge: 'steel-hardened', mail: 'steel-mail-dark', strap: 'leather-black', rivet: 'steel-bright', rust: 'rust-red' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Old Gothic-style plate laid out flat, 1200 mm long: fluted breastplate and lames, rust patches and frayed straps.
-  h.compound('armor_junk_lightplate', 20, plateSuit({ thick: 0.008, lames: 3, flutes: true, rust: true, pauldron: 0.08 }), { plate: 'iron-dull', ridge: 'steel-bright', mail: 'rust-red', strap: 'leather-tan', rivet: 'steel-bright', rust: 'rust-red' })
+  h.compound('rusted_plate_armour', 20, plateSuit({ thick: 0.008, lames: 3, flutes: true, rust: true, pauldron: 0.08 }), { plate: 'iron-dull', ridge: 'steel-bright', mail: 'rust-red', strap: 'leather-tan', rivet: 'steel-bright', rust: 'rust-red' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Case-hardened sheet metal armour laid out flat, 1200 mm from neck to ankle: a shallow chest sheet with locker
   // louvres over a back sheet, hip sheets, and arm and leg guards bent from flat stock and strapped on.
-  h.compound('armor_ch_metal_sheets', 25, sheetSuit({}), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
+  h.compound('hardened_sheet_metal_armour', 25, sheetSuit({}), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The same with a second chest sheet riveted over the first.
-  h.compound('armor_ch_metal_sheets_heavy', 28, sheetSuit({ heavy: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
+  h.compound('heavy_hardened_sheet_metal_armour', 28, sheetSuit({ heavy: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Sheet metal armour joined with mail at the shoulders, elbows and knees, with a mail skirt.
-  h.compound('armor_ch_metal_sheets_chain', 27, sheetSuit({ chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
+  h.compound('hardened_scrap_plate_armour', 27, sheetSuit({ chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The mail-joined suit with the doubled chest sheet.
-  h.compound('armor_ch_metal_sheets_chain_heavy', 30, sheetSuit({ heavy: true, chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
+  h.compound('heavy_hardened_scrap_plate_armour', 30, sheetSuit({ heavy: true, chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Boiled leather armour laid out flat, 1200 mm from neck to ankle: a moulded cuirass, shoulder flaps, a strip skirt,
   // and laced arm, thigh and shin guards.
-  h.compound('armor_blarmor', 6, leatherSuit(), { leather: 'leather-chestnut', edge: 'leather-oxblood', lace: 'leather-tan', strip: 'leather-chestnut' })
+  h.compound('boiled_leather_armour', 6, leatherSuit(), { leather: 'leather-chestnut', edge: 'leather-oxblood', lace: 'leather-tan', strip: 'leather-chestnut' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Chitin armour laid out flat, 1000 mm from neck to ankle: a segmented shell cuirass and ringed leg guards.
-  h.compound('armor_chitin', 4, chitinSuit(), { shell: 'chitin-brown', keel: 'chitin-brown', lace: 'skin-rawhide' })
+  h.compound('chitin_armour', 4, chitinSuit(), { shell: 'chitin-brown', keel: 'chitin-brown', lace: 'skin-rawhide' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['bone'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Fur body armour folded on a shelf, 300 mm by 280 mm and 120 mm tall.
-  h.compound('armor_farmor', 3, furArmour(), { cloth: 'fur-brown', collar: 'fur-brown', sleeve: 'fur-brown', stitch: 'skin-rawhide', cuff: 'skin-rawhide', front: 'skin-rawhide', button: 'skin-rawhide', tuft: 'fur-brown', tie: 'skin-rawhide' })
+  h.compound('fur_armour', 3, furArmour(), { cloth: 'fur-brown', collar: 'fur-brown', sleeve: 'fur-brown', stitch: 'skin-rawhide', cuff: 'skin-rawhide', front: 'skin-rawhide', button: 'skin-rawhide', tuft: 'fur-brown', tie: 'skin-rawhide' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso', 'arms'], state: ['folded'] } } },
 ]

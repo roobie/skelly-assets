@@ -81,7 +81,7 @@ local patchwork(w, d, ht, nx, nz, border) =
 [
   // A light nylon jacket folded to 300 mm by 240 mm and 36 mm high: the hood rolled into the collar at the back,
   // a black zip running from the collar down the middle and over the front edge, and an elastic hem band.
-  h.compound('jacket_windbreaker', 0.3, folded(0.3, 0.24, 0.036, 3) + [
+  h.compound('windbreaker', 0.3, folded(0.3, 0.24, 0.036, 3) + [
     h.turned('hood-roll', 'hood', 'x', [[0, 0], [0, 0.014], [0.2, 0.014], [0.2, 0]], [-0.1, 0.036 + 0.01, -0.09]),
     box('zip', 'zip', [-0.004, 0.036, -0.075], [0.004, 0.039, 0.122]),
     box('zip-drop', 'zip', [-0.004, 0.004, 0.12], [0.004, 0.039, 0.123]),
@@ -184,7 +184,7 @@ local patchwork(w, d, ht, nx, nz, border) =
   // A heavy black leather riding jacket folded to 360 mm by 280 mm and 80 mm high in three folds: wide lapels
   // studded down at the collar, a steel zip running slant from the left shoulder to the right hip, a belt with a
   // steel buckle across the waist, and epaulettes at the shoulders.
-  h.compound('jacket_motorcycle', 2.4, folded(0.36, 0.28, 0.08, 3)
+  h.compound('motorcycle_jacket', 2.4, folded(0.36, 0.28, 0.08, 3)
     + collar('collar', 'leather', 0.28, 0.08, 0.04, 0.022, 0.008)
     + [
       strip('lapel-l', 'leather', [-0.05, -0.08], [-0.13, 0.0], 0.08, 0.05, 0.006),
@@ -248,7 +248,7 @@ local patchwork(w, d, ht, nx, nz, border) =
 
   // A dark ankle-length robe folded to 340 mm by 270 mm and 55 mm high, its hood lying folded on top and a broad
   // leather belt with a brass buckle wrapped round the bundle.
-  h.compound('plaguedoctor_robe', 1.3, folded(0.34, 0.27, 0.055, 4) + hood(0.34, 0.27, 0.055)
+  h.compound('plague_doctor_robe', 1.3, folded(0.34, 0.27, 0.055, 4) + hood(0.34, 0.27, 0.055)
     + wrap('belt', 'belt', 0.34, 0.055, 0.1, 0.035, 0.006)
     + [box('buckle', 'buckle', [0.05, 0.061, 0.08], [0.09, 0.066, 0.12])], {
     cloth: 'cloth-black',
@@ -279,7 +279,7 @@ local patchwork(w, d, ht, nx, nz, border) =
 
   // A long hooded robe of deep blue folded to 330 mm by 260 mm and 45 mm high: the hood on top lined in shimmering
   // cloth, gold stars and a crescent moon scattered over the folds, and a gold cord tied round the bundle.
-  h.compound('robe_wizard', 0.97, folded(0.33, 0.26, 0.045, 3) + hood(0.33, 0.26, 0.045)
+  h.compound('wizard_robe', 0.97, folded(0.33, 0.26, 0.045, 3) + hood(0.33, 0.26, 0.045)
     + wrap('cord', 'gold', 0.33, 0.045, 0.1, 0.008, 0.005)
     + h.crescent('moon', 'gold', 0.016, 0.028, 200, 340, 6, 0.045, 0.048, 0.12, 0.06)
     + std.flattenArrays([

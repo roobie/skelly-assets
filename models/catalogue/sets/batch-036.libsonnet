@@ -162,7 +162,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
   // A screw-top glass jar 70 mm across and 95 mm tall, filled with clear mineral oil over grey lumps of a
   // reactive metal, with a black lid and a yellow hazard label.
   local lumps = [[-0.012, 0.012, 0.008], [0.014, 0.011, -0.006], [0, 0.01, -0.016], [-0.004, 0.026, 0.004], [0.012, 0.03, 0.012]];
-  h.compound('chem_potassium', 0.24, [
+  h.compound('potassium', 0.24, [
     turned('jar', 'glass', 'y', [[0, 0], [0, 0.035], [0.08, 0.035], [0.08, 0.031], [0.004, 0.031], [0.004, 0], [0, 0]]),
     disc('oil', 'oil', 0.031, 0.004, 0.068),
     disc('lid', 'lid', 0.036, 0.08, 0.095),
@@ -171,5 +171,5 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     h.ball('lump-%d' % i, 'metal', 0.008, lumps[i][0], 0.004 + lumps[i][1], lumps[i][2], 0.7)
     for i in std.range(0, std.length(lumps) - 1)
   ], { glass: 'glass-clear', oil: 'jelly-pale', lid: 'plastic-black', label: 'plastic-yellow', metal: 'iron-dull' })
-  + h.inHand('chem_potassium', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['modern'] } } },
+  + h.inHand('potassium', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['modern'] } } },
 ]

@@ -51,7 +51,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A heavy V-belt, 2 m round, lying on its side as a loop 640 mm across: 22 mm wide at the back face tapering to
   // 13 mm at the inner edge, 14 mm deep, with a white printed size code on the back face.
-  h.compound('drivebelt', 0.52, [
+  h.compound('drive_belt', 0.52, [
     turned('belt', 'belt', 'y', [[0.0045, 0.306], [0.0175, 0.306], [0.022, 0.32], [0, 0.32], [0.0045, 0.306]], [0, 0, 0]),
   ] + [
     box('print-%d' % i, 'print', [-0.07 + i * 0.03, 0.007, 0.319], [-0.05 + i * 0.03, 0.015, 0.322])
@@ -61,7 +61,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A belt cobbled from leather strapping, laid out as a loop 860 mm long, 45 mm wide and 7 mm thick, its joint
   // overlapped and bound with cotton cord, with a second cord-bound patch on the other run.
-  h.compound('drivebelt_makeshift', 0.64, h.strapLoop('belt', 'leather', 0.6, 0.13, 0.045, 0.007) + [
+  h.compound('makeshift_drive_belt', 0.64, h.strapLoop('belt', 'leather', 0.6, 0.13, 0.045, 0.007) + [
     box('splice', 'leather-dark', [-0.08, 0.007, 0.105], [0.06, 0.013, 0.155]),
   ] + [
     box('bind-%d' % i, 'cord', [x - 0.006, -0.001, 0.101], [x + 0.006, 0.016, 0.159])
@@ -78,7 +78,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A panel engine air filter, 240 by 170 mm and 40 mm deep: a black plastic frame round off-white pleated paper,
   // with a soft sealing lip round its bottom edge.
-  h.compound('filter_air', 0.54, [
+  h.compound('air_filter', 0.54, [
     box('lip', 'lip', [-0.124, 0, -0.089], [0.124, 0.008, 0.089]),
     box('frame-front', 'frame', [-0.12, 0.008, 0.075], [0.12, 0.04, 0.085]),
     box('frame-back', 'frame', [-0.12, 0.008, -0.085], [0.12, 0.04, -0.075]),
@@ -93,7 +93,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A cut-down plastic bottle, 110 mm across and 190 mm long, lying on its side: its neck taped onto a stub of hose
   // and its open end stuffed with wadded paper that bulges out past the rim.
-  h.compound('filter_air_makeshift', 0.12, [
+  h.compound('makeshift_air_filter', 0.12, [
     turned('bottle', 'bottle', 'x', [[0, 0.049], [0, 0.055], [0.12, 0.055], [0.15, 0.04], [0.165, 0.016], [0.165, 0.012], [0.16, 0.012], [0.145, 0.035], [0.117, 0.049], [0, 0.049]], [-0.09, 0.055, 0]),
     cyl('fill', 'paper', 'x', 0.048, -0.075, 0.06, [0, 0.055, 0]),
     turned('neck', 'bottle', 'x', [[0, 0.012], [0, 0.016], [0.02, 0.016], [0.02, 0.012], [0, 0.012]], [0.075, 0.055, 0]),
@@ -110,7 +110,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   // A spin-on oil filter, 100 mm across and 150 mm long, lying on its side with its base plate to the front: a
   // blue-painted steel can with a domed end and printed band, a rolled seam, a rubber gasket ring, a threaded centre
   // hole and a ring of six inlet holes.
-  h.compound('filter_liquid', 1.1, [
+  h.compound('oil_filter', 1.1, [
     turned('can', 'can', 'z', [[0, 0], [0.004, 0.03], [0.012, 0.044], [0.024, 0.05], [0.14, 0.05], [0.14, 0]], [0, 0.05, -0.075]),
     ring('band', 'band', 'z', 0.049, 0.0505, -0.02, 0.03, [0, 0.05, 0]),
     ring('seam', 'seam', 'z', 0.04, 0.0505, 0.065, 0.072, [0, 0.05, 0]),
@@ -126,7 +126,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A food tin, 85 mm across and 110 mm tall, turned into a filter: a soldered-on lid with two copper hose nipples,
   // its sides bound with grey tape and a twist of wire.
-  h.compound('filter_liquid_makeshift', 0.12, [
+  h.compound('makeshift_oil_filter', 0.12, [
     turned('can', 'can', 'y', [[0, 0], [0, 0.04], [0.004, 0.0425], [0.008, 0.04], [0.102, 0.04], [0.106, 0.0425], [0.11, 0.04], [0.11, 0]], [0, 0, 0]),
     ring('solder', 'solder', 'y', 0.036, 0.042, 0.11, 0.114, [0, 0, 0]),
     ring('tape', 'tape', 'y', 0.04, 0.0425, 0.035, 0.075, [0, 0, 0]),
@@ -187,7 +187,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   // A twin-cylinder industrial compressor pump, 420 mm wide and 420 mm tall: a red cast-iron crankcase on feet, two
   // finned cast-iron cylinders with alloy heads joined by a copper discharge pipe, an intake filter on each head and
   // a spoked flywheel pulley 300 mm across on the front.
-  h.compound('hd_compressor', 41, [
+  h.compound('industrial_compressor', 41, [
     box('foot-left', 'iron', [-0.15, 0, -0.12], [-0.11, 0.04, 0.12]),
     box('foot-right', 'iron', [0.11, 0, -0.12], [0.15, 0.04, 0.12]),
     box('crankcase', 'case', [-0.15, 0.04, -0.1], [0.15, 0.24, 0.1]),
@@ -213,7 +213,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A 400 mm length of heavy-wall steel pipe, 48 mm across with an 11 mm wall, threaded at both ends: one end open
   // to show the thick wall, the other under a red plastic thread cap, with a yellow pressure-rating stripe.
-  h.compound('hd_pipe', 4.2, [
+  h.compound('heavy_duty_pipe', 4.2, [
     tube('pipe', 'pipe', 0.013, 0.024, -0.2, 0.2, 0.0245, 0),
     tube('thread-left', 'thread', 0.013, 0.0243, -0.2, -0.17, 0.0245, 0),
     tube('thread-right', 'thread', 0.013, 0.0243, 0.17, 0.2, 0.0245, 0),
@@ -224,7 +224,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A loose set of heavy forged steel pipe fittings for 48 mm pipe, spread over about 330 by 230 mm: a 90-degree
   // elbow, a tee, a domed end cap, a coupling and a weld-neck flange with four bolt holes.
-  h.compound('hd_pipe_fittings', 3.5, [
+  h.compound('heavy_duty_pipe_fittings', 3.5, [
     tube('elbow-x', 'forged', 0.012, 0.024, -0.15, -0.09, 0.024, -0.07),
     turned('elbow-z', 'forged', 'z', [[0, 0.012], [0, 0.024], [0.06, 0.024], [0.06, 0.012], [0, 0.012]], [-0.15, 0.024, -0.07]),
     h.ball('elbow-knee', 'forged', 0.025, -0.15, 0.024, -0.07),
@@ -242,7 +242,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
 
   // A flanged gate valve, 270 mm long and 330 mm tall: a short heavy-wall pipe body with a bolted flange at each end,
   // a swollen gate chamber, a bonnet, a rising stem and a red spoked handwheel 150 mm across.
-  h.compound('hd_valve', 7.9, [
+  h.compound('heavy_duty_valve', 7.9, [
     tube('body', 'body', 0.016, 0.03, -0.12, 0.12, 0.07, 0),
     ring('flange-left', 'body', 'x', 0.016, 0.07, -0.135, -0.115, [0, 0.07, 0]),
     ring('flange-right', 'body', 'x', 0.016, 0.07, 0.115, 0.135, [0, 0.07, 0]),

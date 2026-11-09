@@ -37,7 +37,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
 
   // A gold pocket watch lying face up, 50 mm across the case and 12 mm thick, with a white dial, black hour marks
   // and hands, and the winding crown and bow at 12 o'clock on +z.
-  h.compound('pocketwatch', 0.073, [
+  h.compound('pocket_watch', 0.073, [
     turned('case', 'case', 'y', [[0, 0], [0, 0.022], [0.003, 0.025], [0.009, 0.025], [0.011, 0.023], [0.011, 0]]),
     turned('bezel', 'case', 'y', [[0.011, 0.019], [0.011, 0.023], [0.013, 0.022], [0.013, 0.019], [0.011, 0.019]]),
     disc('dial', 'dial', 0.0195, 0.01, 0.012),
@@ -52,7 +52,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     for i in std.range(0, 11)
   ] + h.crescent('bow', 'case', 0.006, 0.008, 0, 360, 12, 0.004, 0.007, 0, 0.0405), {
     case: 'metal-gold', dial: 'enamel-white', hand: 'plastic-matte-black',
-  }) + h.inHand('pocketwatch', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + h.inHand('pocket_watch', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A glazed porcelain urn 30 cm tall and 20 cm across the belly: a turned foot, a round body with a gold band, a
   // narrow neck and a domed lid with a knob.
@@ -122,7 +122,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
 
   // A child's beach bucket 16 cm across the rim and 13 cm tall with a thin plastic carry handle, a toy spade and a
   // toy rake standing in it, their heads above the rim.
-  h.compound('sandbox_kit', 0.2, [
+  h.compound('toy_bucket_and_spade', 0.2, [
     turned('bucket', 'bucket', 'y', [[0, 0], [0, 0.065], [0.13, 0.08], [0.13, 0.074], [0.004, 0.061], [0.004, 0]]),
     turned('rim', 'bucket', 'y', [[0.122, 0.079], [0.122, 0.084], [0.132, 0.084], [0.132, 0.079], [0.122, 0.079]]),
     turned('stripe', 'stripe', 'y', [[0.05, 0.0705], [0.05, 0.0735], [0.065, 0.0755], [0.065, 0.0725], [0.05, 0.0705]]),
@@ -138,11 +138,11 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
   ] + [
     box('tine-%d' % i, 'rake', [0.002 + i * 0.0115, 0.188, 0.016], [0.0065 + i * 0.0115, 0.208, 0.022])
     for i in std.range(0, 4)
-  ] + arc('handle', 'handle', 0, 0.117, 0.081, 0.085, 0, 180, 16, 0.004), { bucket: 'plastic-red', stripe: 'plastic-white', spade: 'plastic-yellow', rake: 'plastic-blue', handle: 'plastic-white' }) + h.inHand('sandbox_kit', 'bucket') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ] + arc('handle', 'handle', 0, 0.117, 0.081, 0.085, 0, 180, 16, 0.004), { bucket: 'plastic-red', stripe: 'plastic-white', spade: 'plastic-yellow', rake: 'plastic-blue', handle: 'plastic-white' }) + h.inHand('toy_bucket_and_spade', 'bucket') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A letter-size printout folded in three, 21.6 by 9.3 cm, with a row of printed digits and lines of text on the
   // top panel and the folded edge showing at +z.
-  h.compound('sarcophagus_access_code', 0.005, [
+  h.compound('access_code_printout', 0.005, [
     box('sheet', 'paper', [-0.108, 0, -0.0465], [0.108, 0.002, 0.0465]),
     box('flap', 'paper', [-0.107, 0.002, -0.046], [0.107, 0.004, 0.0455]),
     box('fold', 'paper', [-0.108, 0, 0.0455], [0.108, 0.004, 0.0475]),
@@ -221,19 +221,19 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
 
   // A stick of charcoal 10 cm long and 12 mm across, sharpened to a point at +x, its back half wrapped in a twist of
   // rag to keep the fingers clean.
-  h.compound('survival_marker', 0.0052, [
+  h.compound('charcoal_stick', 0.0052, [
     alongX('stick', 'charcoal', [[-0.05, 0.005], [-0.048, 0.006], [0.025, 0.006], [0.046, 0.0015], [0.05, 0.0008]]),
     alongX('wrap', 'rag', [[-0.046, 0.0075], [-0.002, 0.0075]]),
     alongX('tie', 'tie', [[-0.034, 0.0085], [-0.03, 0.0085]]),
     alongX('tie-b', 'tie', [[-0.012, 0.0085], [-0.008, 0.0085]]),
   ], { charcoal: 'coal-black', rag: 'cloth-rag', tie: 'cord-cotton' }) + {
-    handling: h.gripOn('survival_marker', 'wrap'),
+    handling: h.gripOn('charcoal_stick', 'wrap'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
 
   // A homemade draw-tube telescope pulled out to 38 cm: three nested plastic tubes bound with tape at each joint,
   // an eyepiece at -x and the objective lens at +x.
-  h.compound('survivor_scope', 0.15, [
+  h.compound('homemade_telescope', 0.15, [
     alongX('eyepiece', 'cap', [[-0.19, 0.012], [-0.175, 0.013], [-0.165, 0.015]]),
     alongX('tube-inner', 'tube-a', [[-0.165, 0.015], [-0.05, 0.015]]),
     alongX('tape-inner', 'tape', [[-0.055, 0.0175], [-0.035, 0.0175]]),
@@ -244,13 +244,13 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('lens', 'lens', [[0.186, 0.018], [0.19, 0.018]]),
     alongX('eye-lens', 'lens', [[-0.192, 0.008], [-0.19, 0.008]]),
   ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + {
-    handling: h.gripOn('survivor_scope', 'tube-outer'),
+    handling: h.gripOn('homemade_telescope', 'tube-outer'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A pocket tear gas canister 9 cm tall and 34 mm across: a black body with a label band, a red flip-top
   // actuator with its nozzle facing +z and a key ring at the back.
-  h.compound('teargas_sprayer', 0.06, [
+  h.compound('tear_gas_spray', 0.06, [
     standing('base', 'body', [[0, 0.015], [0.004, 0.017]]),
     standing('body', 'body', [[0.004, 0.017], [0.064, 0.017], [0.068, 0.014]]),
     standing('label', 'label', [[0.02, 0.0175], [0.052, 0.0175]]),
@@ -259,15 +259,15 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('guard', 'actuator', [-0.008, 0.074, -0.016], [0.008, 0.09, -0.012]),
     turned('nozzle', 'nozzle', 'z', [[0, 0], [0, 0.003], [0.003, 0.003], [0.003, 0]], [0, 0.082, 0.0115]),
     box('thumb', 'nozzle', [-0.006, 0.09, -0.006], [0.006, 0.092, 0.006]),
-  ] + h.crescent('ring', 'ring', 0.007, 0.009, 0, 360, 12, 0.076, 0.078, 0, -0.026), { body: 'plastic-black', label: 'paint-police-blue', actuator: 'plastic-red', nozzle: 'plastic-black', ring: 'steel-stainless' }) + h.inHand('teargas_sprayer', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ] + h.crescent('ring', 'ring', 0.007, 0.009, 0, 360, 12, 0.076, 0.078, 0, -0.026), { body: 'plastic-black', label: 'paint-police-blue', actuator: 'plastic-red', nozzle: 'plastic-black', ring: 'steel-stainless' }) + h.inHand('tear_gas_spray', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A small whistle 6 cm long cast from a dark, faintly blue alloy in sharp, uneven angles: a skewed mouthpiece
   // at -x, a body made of a twisted wedge and a crooked fin, a black window through the body and a loop at +x.
-  h.compound('tindalos_whistle', 0.04, [
+  h.compound('angular_whistle', 0.04, [
     h.prism('mouth', 'metal', 'x', [[0.002, -0.004], [0.008, -0.006], [0.011, 0.003], [0.004, 0.005]], -0.03, -0.012),
     h.prism('body', 'metal', 'x', [[0, -0.009], [0.012, -0.012], [0.019, 0.004], [0.007, 0.011], [-0.002, 0.004]], -0.012, 0.02),
     h.prism('tip', 'metal', 'x', [[0.003, -0.006], [0.013, -0.008], [0.009, 0.005]], 0.02, 0.03),
     h.prism('fin', 'metal', 'z', [[-0.006, 0.012], [0.014, 0.016], [0.026, 0.028], [0.006, 0.022]], -0.002, 0.002),
     h.prism('window', 'window', 'x', [[0.008, 0.003], [0.014, 0.004], [0.01, 0.009]], -0.006, 0.006),
-  ] + h.crescent('loop', 'metal', 0.003, 0.0045, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + h.inHand('tindalos_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ] + h.crescent('loop', 'metal', 0.003, 0.0045, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + h.inHand('angular_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

@@ -140,7 +140,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
   // A light plate carrier lying flat, front up: a front panel 280 mm wide and 340 mm long over a slightly larger
   // back panel, joined by shoulder straps at the top, with webbed cummerbund wings 120 mm long either side and a
   // small flapped pouch sewn low on the front.
-  h.compound('light_plate_carrier_pouch', 0.6, [
+  h.compound('light_plate_carrier_with_pouch', 0.6, [
     box('back', 'cloth', [-0.15, 0, -0.18], [0.15, 0.02, 0.17]),
     box('front', 'cloth', [-0.14, 0.02, -0.16], [0.14, 0.045, 0.17]),
     box('shoulder-left', 'cloth', [-0.12, 0.02, -0.21], [-0.07, 0.04, -0.16]),
@@ -203,7 +203,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
 
   // A bomb-suit chest plate 360 mm wide and 460 mm long, 18 mm thick and gently curved, its edge showing its layers:
   // Kevlar, foam, polyethylene and a thin steel face, each a little smaller than the one under it.
-  h.compound('eod_plate', 4.5,
+  h.compound('bomb_suit_chest_plate', 4.5,
     plate('kevlar', 'kevlar', eod, 0, 0.004, 0.7, 12)
     + plate('foam', 'foam', scaled(eod, 0.96), 0.004, 0.006, 0.7, 12, curveHalf=0.18)
     + plate('poly', 'poly', scaled(eod, 0.92), 0.01, 0.004, 0.7, 12, curveHalf=0.18)
@@ -217,13 +217,13 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
 
   // A ceramic front plate 250 mm by 320 mm and 22 mm thick, curved across, with shooter's cuts at its top corners,
   // a white polyethylene backing and a label on the strike face.
-  h.compound('esapi_plate', 2.8, ceramicPlate(esapi, 10) + [
+  h.compound('ceramic_front_plate', 2.8, ceramicPlate(esapi, 10) + [
     onFace('label', 'label', esapi, 0, 0.022, 0.5, [-0.05, -0.08], [0.05, -0.08], 0.02),
   ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'] } } },
 
   // A ceramic side plate 150 mm by 200 mm and 22 mm thick with clipped corners and a label on the strike face.
-  h.compound('esbi_plate', 1.1, ceramicPlate(esbi, 6) + [
+  h.compound('ceramic_side_plate', 1.1, ceramicPlate(esbi, 6) + [
     onFace('label', 'label', esbi, 0, 0.022, 0.5, [-0.035, -0.05], [0.035, -0.05], 0.016),
   ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'] } } },

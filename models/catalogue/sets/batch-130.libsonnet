@@ -133,7 +133,7 @@ local oval(a, b, p, n, cx, cy) = [
 [
   // Helmet ear muffs as they come off the hard hat: two padded cups 80 mm across on sprung steel arms, swung
   // down into the working position, each arm ending in a flat clip that slides into the helmet's side slot.
-  h.compound('attachable_ear_muffs_on', 0.2, std.flattenArrays([
+  h.compound('helmet_ear_muffs_lowered', 0.2, std.flattenArrays([
     [
       h.turned('cup-%d' % (s + 1), 'cup', 'y', [[0, 0], [0, 0.038], [0.018, 0.038], [0.03, 0.03], [0.036, 0.018], [0.038, 0]], [s * 0.05, 0.012, 0]),
       h.turned('cushion-%d' % (s + 1), 'cushion', 'y', [[0, 0], [0, 0.041], [0.006, 0.043], [0.012, 0.041], [0.012, 0]], [s * 0.05, 0, 0]),
@@ -176,15 +176,15 @@ local oval(a, b, p, n, cx, cy) = [
   // A hardened steel mail aventail laid out flat, 640 mm across: a broad curtain of dark rings that hangs from a
   // helmet's rim over the face, neck and shoulders, its inner edge sewn to a leather band pierced for lacing and
   // its open back tied with thongs.
-  mailCurtain('ch_chainmail_aventail', 2.4, 0.1, 0.3, 8) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
+  mailCurtain('hardened_steel_mail_aventail', 2.4, 0.1, 0.3, 8) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
 
   // A hardened steel partial aventail laid out flat, 400 mm across: a narrower ring of mail on the same laced
   // leather band, reaching only the face and neck.
-  mailCurtain('ch_chainmail_face', 0.83, 0.1, 0.19, 4) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  mailCurtain('hardened_steel_mail_half_aventail', 0.83, 0.1, 0.19, 4) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A hardened steel half mask for a cap helmet, 190 mm across and 135 mm tall at the nose: a dark grey jaw plate
   // with a nose ridge, breathing slots, hinged hooks at the top corners and gold bands inlaid along its edges.
-  faceMask('ch_steel_facemask', 1.2, 'inlay', { plate: 'steel-hardened', ridge: 'steel-hardened', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'metal-gold' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('gilded_steel_half_mask', 1.2, 'inlay', { plate: 'steel-hardened', ridge: 'steel-hardened', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'metal-gold' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A helmet counterweight pouch, 100 mm wide, 70 mm tall and 30 mm deep: a small black nylon pouch with a flap,
   // a hook-and-loop panel on the back that presses onto the rear of a helmet, and a press stud.
@@ -198,7 +198,7 @@ local oval(a, b, p, n, cx, cy) = [
   // A thermal night-vision binocular switched on, 130 mm wide, 75 mm tall and 110 mm long: a dark housing with
   // two dark objectives at the front, eyepieces glowing green at the back, a battery cap on the side and a swing
   // arm over the top ending in the dovetail shoe that locks into a helmet mount.
-  h.compound('enhanced_nvg_on', 0.91, [
+  h.compound('powered_thermal_night_vision_goggles', 0.91, [
     sbox('housing', 'housing', [-0.05, 0.012, -0.035], [0.05, 0.062, 0.035]),
     sbox('bridge-top', 'housing', [-0.02, 0.062, -0.03], [0.02, 0.072, 0.03]),
   ] + std.flattenArrays([
@@ -228,15 +228,15 @@ local oval(a, b, p, n, cx, cy) = [
 
   // A bomb-disposal blast visor standing on its lower edge, 330 mm round the curve and 200 mm tall: a thick clear
   // shield in a moulded black rim, on a heavy brow bracket with arms to the helmet's rail clips.
-  faceShield('face_shield_eod', 1.1, 0.12, 78, 0.2, 0.01, true, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'steel-parkerized', rim: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  faceShield('blast_visor', 1.1, 0.12, 78, 0.2, 0.01, true, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'steel-parkerized', rim: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A high steel half mask for a cap helmet, 190 mm across and 135 mm tall at the nose: a grey jaw plate with a
   // nose ridge, breathing slots and hinged hooks, and a raised steel moustache curling up across its face.
-  faceMask('hc_steel_facemask', 1.2, 'tache', { plate: 'steel-blued', ridge: 'steel-blued', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'steel-bright' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('moustached_steel_half_mask', 1.2, 'tache', { plate: 'steel-blued', ridge: 'steel-blued', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'steel-bright' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A vision-correcting lens frame for a full-face gas mask, 100 mm across and 40 mm tall: two prescription lenses
   // in a thin black rim joined at the bridge, with a sprung post that clips behind the mask's visor.
-  h.compound('insert_vision_correction', 0.015, std.flattenArrays([
+  h.compound('mask_lens_insert', 0.015, std.flattenArrays([
     local inner = oval(0.019, 0.014, 2.6, 24, s * 0.026, 0.018);
     local outer = oval(0.022, 0.017, 2.6, 24, s * 0.026, 0.018);
     [h.prism('lens-%d' % (s + 1), 'lens', 'z', inner, 0.001, 0.003)]
@@ -256,7 +256,7 @@ local oval(a, b, p, n, cx, cy) = [
   // that hangs from the back of a helmet over the neck, bound at its edges with gold aramid tape and a hook-and-loop
   // strip along the top edge.
   local cz = 0.18;
-  h.compound('kevlar_nape_protector', 0.041, h.crescent('curtain', 'cloth', 0.13, 0.25, 128, 232, 12, 0, 0.004, 0, cz)
+  h.compound('aramid_nape_guard', 0.041, h.crescent('curtain', 'cloth', 0.13, 0.25, 128, 232, 12, 0, 0.004, 0, cz)
                                             + h.crescent('hem', 'binding', 0.24, 0.255, 128, 232, 12, 0, 0.006, 0, cz)
                                             + h.crescent('strip', 'strip', 0.125, 0.15, 130, 230, 12, 0, 0.007, 0, cz)
                                             + std.flattenArrays([

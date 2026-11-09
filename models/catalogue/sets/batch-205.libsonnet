@@ -19,7 +19,7 @@ local lump(id, slot, w, ht, x, y, z) = [
 [
   // A desk focusing rig 250 mm tall: a round steel foot and a three-pronged claw holding a milky white crystal cluster
   // 50 mm across, with a dozen loose crystal splinters hanging in the air round its top.
-  h.compound('telepathic_focusing_tool', 3.5, [
+  h.compound('milky_crystal_focus', 3.5, [
     h.disc('foot', 'steel', 0.07, 0, 0.014),
     h.disc('foot-step', 'steel', 0.05, 0.014, 0.024),
     h.disc('stem', 'steel', 0.016, 0.024, 0.06),
@@ -47,11 +47,11 @@ local lump(id, slot, w, ht, x, y, z) = [
     steel: 'steel-grey',
     crystal: 'pearl',
     shard: 'gem-clear',
-  }) + h.inHand('telepathic_focusing_tool', 'foot') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  }) + h.inHand('milky_crystal_focus', 'foot') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A household flashlight 140 mm long, lying on its side with its head at +x: a plastic tail cap and grip, an
   // aluminium body with a glass window showing a blue crystal rod inside, a flared aluminium head and a crystal lens.
-  h.compound('pyrokinetic_flashlight', 0.17, [
+  h.compound('crystal_cell_flashlight', 0.17, [
     h.rod('tail', 'plastic', 0.014, -0.07, -0.058, 0.02),
     h.rod('grip', 'plastic', 0.0135, -0.058, -0.02, 0.02),
     h.rod('body', 'alu', 0.0125, -0.02, 0.026, 0.02),
@@ -74,11 +74,11 @@ local lump(id, slot, w, ht, x, y, z) = [
     crystal: 'crystal-glow-blue',
     glass: 'glass-clear',
     switch: 'rubber-black',
-  }) + h.inHand('pyrokinetic_flashlight', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  }) + h.inHand('crystal_cell_flashlight', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A camp lantern 110 mm across and 170 mm tall to its handle: a plastic base, an aluminium canister with its domed lid
   // shut on a hinge at the back, a thin line of blue light leaking under the lid, and a wire bail handle.
-  h.compound('pyrokinetic_lamp', 0.5, [
+  h.compound('crystal_lantern', 0.5, [
     h.disc('base', 'plastic', 0.055, 0, 0.024),
     h.disc('foot', 'rubber', 0.05, -0.0, 0.004),
     h.disc('can', 'alu', 0.05, 0.024, 0.122),
@@ -104,12 +104,12 @@ local lump(id, slot, w, ht, x, y, z) = [
     rib: 'steel-grey',
     crystal: 'crystal-glow-blue',
     steel: 'steel-grey',
-  }) + h.inHand('pyrokinetic_lamp', 'can') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
+  }) + h.inHand('crystal_lantern', 'can') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
 
   // A standing floor lamp 1.7 m tall: a weighted steel base 300 mm across, a steel pole with a white plastic collar
   // and a cone shade 400 mm across, a blue crystal rod hanging in its socket under the shade, and a power cord running
   // off the base to a loose plug.
-  h.compound('standing_pyrokinetic_lamp', 6, [
+  h.compound('crystal_floor_lamp', 6, [
     h.turned('base', 'steel', 'y', [[0, 0], [0, 0.15], [0.012, 0.15], [0.03, 0.08], [0.03, 0]], [0, 0, 0]),
     h.disc('foot-pad', 'rubber', 0.145, -0.0, 0.004),
     h.disc('pole', 'steel', 0.011, 0.03, 1.52),
@@ -135,7 +135,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     cord: 'plastic-matte-black',
     plug: 'plastic-white',
     prong: 'brass-polished',
-  }) + h.inHand('standing_pyrokinetic_lamp', 'pole') + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
+  }) + h.inHand('crystal_floor_lamp', 'pole') + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
 
   // A lump of something like black glass 70 mm across, three swollen lobes run together with an oily sheen and
   // violet flecks sunk in its skin.

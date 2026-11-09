@@ -73,20 +73,20 @@ local cartridgeStrap(len, sw, t, n, cr, loopW) =
 [
   // An oversized handmade armour vest lying flat, front up: a front panel 560 mm wide and 620 mm long sewn from
   // salvaged aramid panels in nylon, six rows of PALS webbing across it, cummerbund wings 160 mm wide with webbing.
-  h.compound('xl_ballistic_vest', 4.3, xlVest(false), {
+  h.compound('patchwork_aramid_vest', 4.3, xlVest(false), {
     cloth: 'nylon-coyote', patch: 'cloth-olive-drab', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black',
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // The same oversized vest with ten home-made mild steel plates sewn into pockets: four on the front, four on the
   // back and one on each wing, a steel edge showing at each pocket's mouth.
-  h.compound('xl_ballistic_vest_lc', 10, xlVest(true), {
+  h.compound('patchwork_aramid_vest_with_steel_plates', 10, xlVest(true), {
     cloth: 'nylon-coyote', patch: 'cloth-olive-drab', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black',
     pocket: 'cloth-olive-drab', plate: 'steel-grey',
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // An embroidered leather bandolier 1.3 m round, folded in half to 640 mm by 100 mm, with 28 empty loops for
   // pistol cartridges 9 mm across down its upper run and a stitched band of embroidery along the other.
-  h.compound('bandolier_pistol', 0.27, cartridgeStrap(0.64, 0.045, 0.005, 28, 0.0048, 0.024) + [
+  h.compound('pistol_bandolier', 0.27, cartridgeStrap(0.64, 0.045, 0.005, 28, 0.0048, 0.024) + [
     box('stitch-%d' % k, if k % 2 == 0 then 'stitch' else 'stitch-b', [-0.25 + k * 0.04, 0.005, -0.039], [-0.25 + k * 0.04 + 0.024, 0.007, -0.015])
     for k in std.range(0, 12)
   ], { strap: 'leather-brown', loop: 'skin-rawhide', buckle: 'brass-polished', stitch: 'cloth-red', 'stitch-b': 'metal-gold' })
@@ -94,19 +94,19 @@ local cartridgeStrap(len, sw, t, n, cr, loopW) =
 
   // A plain leather bandolier 1.3 m round, folded in half to 640 mm by 110 mm, with 16 empty loops for
   // rifle cartridges 12 mm across down its upper run.
-  h.compound('bandolier_rifle', 0.27, cartridgeStrap(0.64, 0.05, 0.005, 16, 0.006, 0.036),
+  h.compound('rifle_bandolier', 0.27, cartridgeStrap(0.64, 0.05, 0.005, 16, 0.006, 0.036),
     { strap: 'leather-brown', loop: 'skin-rawhide', buckle: 'brass-polished' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A leather cartridge belt 1.1 m long, folded in half to 560 mm by 120 mm, with 20 empty loops for
   // shotgun shells 20 mm across down its upper run.
-  h.compound('bandolier_shotgun', 0.4, cartridgeStrap(0.56, 0.055, 0.005, 20, 0.0102, 0.04),
+  h.compound('shotgun_shell_belt', 0.4, cartridgeStrap(0.56, 0.055, 0.005, 20, 0.0102, 0.04),
     { strap: 'leather-brown', loop: 'skin-rawhide', buckle: 'brass-polished' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A canvas wrist band 240 mm long and 55 mm wide laid flat, five loops for rifle cartridges 12 mm across sewn
   // across its middle, a hook and loop patch on top at one end and one underneath at the other.
-  h.compound('bandolier_wrist', 0.015, [
+  h.compound('wrist_cartridge_band', 0.015, [
     box('band', 'band', [-0.12, 0, -0.0275], [0.12, 0.003, 0.0275]),
     box('hook', 'hook', [0.08, 0.003, -0.024], [0.115, 0.005, 0.024]),
     box('fuzz', 'hook', [-0.115, -0.002, -0.024], [-0.08, 0, 0.024]),
@@ -119,7 +119,7 @@ local cartridgeStrap(len, sw, t, n, cr, loopW) =
 
   // A cotton bandolier laid flat: four magazine pockets 80 mm wide, 190 mm long and 28 mm thick sewn in a row, each
   // under a flap with a press stud, and its sling strap 30 mm wide laid out in a loop from both ends to a buckle.
-  h.compound('cheap_ammo_pouch', 0.063, [
+  h.compound('cloth_magazine_bandolier', 0.063, [
     box('panel', 'cloth', [-0.175, 0, -0.1], [0.175, 0.004, 0.1]),
   ] + std.flattenArrays([
     local x = -0.1305 + k * 0.087;

@@ -249,7 +249,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
 
   // A pair of leather hiking sandals, each 280 mm long and 100 mm wide, on 26 mm treaded rubber soles, with straps
   // over the toes, instep and ankle, a buckle on the ankle strap and a heel strap.
-  h.compound('leathersandals', 0.9, pairOf(0.1, 0.03, sandal), {
+  h.compound('leather_sandals', 0.9, pairOf(0.1, 0.03, sandal), {
     sole: 'rubber-black',
     footbed: 'leather-brown',
     strap: 'leather-brown',
@@ -268,7 +268,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
 
   // A pair of soft leather moccasins, each 270 mm long and 95 mm wide, with a gathered U-shaped panel over the toes, a
   // fur cuff and a lace tie round the ankle.
-  shoePair('mocassins', 0.5, { l: 0.27, w: 0.095, s: 0.005, heel: 0.002, toe: 0.038, instep: 0.06, top: 0.09, shaft: 0.12, laces: 0 }, 0.02, {
+  shoePair('moccasins', 0.5, { l: 0.27, w: 0.095, s: 0.005, heel: 0.002, toe: 0.038, instep: 0.06, top: 0.09, shaft: 0.12, laces: 0 }, 0.02, {
     upper: 'leather-brown',
     toe: 'leather-brown',
     sole: 'leather-brown',
@@ -284,7 +284,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
 
   // A pair of black leather motorcycle police boots, each 290 mm long, 100 mm wide and 420 mm tall, on thick lugged
   // soles, with a buckled strap over the instep and another round the top of the calf.
-  shoePair('motor_police_boots', 2.5, knee + { s: 0.028 }, 0.03, {
+  shoePair('motorcycle_police_boots', 2.5, knee + { s: 0.028 }, 0.03, {
     upper: 'leather-black',
     toe: 'leather-black',
     sole: 'rubber-black',

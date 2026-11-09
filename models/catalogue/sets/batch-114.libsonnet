@@ -62,7 +62,7 @@ local hakama(id, mass) =
   // A black hooded robe folded flat, 340 mm by 280 mm and 50 mm tall in four layers: the long pointed hood laid
   // over the top with its crown draped down the front, and a pale cord belt tied round the bundle.
   local w = 0.34, d = 0.28, ht = 0.05;
-  h.compound('grim_reaper_robe_faceless', 0.8, h.foldedGarment(w, d, ht, 4)
+  h.compound('hooded_black_robe', 0.8, h.foldedGarment(w, d, ht, 4)
                                                  + hood('hood', 'hood', w, d, ht, 0.24, 0.24)
                                                  + [
                                                    strip('hood-seam', 'seam', [0, d / 2], [0, d / 2 - 0.22], ht + 0.012, 0.006, 0.002),
@@ -121,7 +121,7 @@ local hakama(id, mass) =
   // An olive field jacket folded flat, 380 mm by 340 mm and 70 mm tall: a tall stand collar that hides a rolled hood,
   // a storm flap with snaps down the front, four flapped patch pockets and buttoned epaulettes.
   local w = 0.38, d = 0.34, ht = 0.07, cz = d / 2 - 0.09;
-  h.compound('jacket_army', 2.2, h.foldedGarment(w, d, ht, 3)
+  h.compound('field_jacket', 2.2, h.foldedGarment(w, d, ht, 3)
                                  + collar('collar', 'cloth', 0.07, 0.028, ht, 0.022, cz)
                                  + [box('placket', 'flap', [-0.016, ht, -d / 2], [0.016, ht + 0.005, cz - 0.07])]
                                  + buttons('snap', 'snap', 0, [cz - 0.1, cz - 0.15, cz - 0.2, cz - 0.24], ht + 0.005, 0.006)
@@ -143,7 +143,7 @@ local hakama(id, mass) =
   // A grey-green combat blouse folded flat, 360 mm by 320 mm and 50 mm tall: a mandarin collar, a zip under a flap,
   // two breast pockets with angled flaps, and grey hook-and-loop panels above them and between them for patches.
   local w = 0.36, d = 0.32, ht = 0.05, cz = d / 2 - 0.085;
-  h.compound('jacket_army_modern', 1, h.foldedGarment(w, d, ht, 3)
+  h.compound('combat_blouse', 1, h.foldedGarment(w, d, ht, 3)
                                          + collar('collar', 'cloth', 0.065, 0.02, ht, 0.026, cz, 25)
                                          + [box('placket', 'cloth', [-0.014, ht, -d / 2], [0.014, ht + 0.004, cz - 0.065])]
                                          + std.flattenArrays([
@@ -168,7 +168,7 @@ local hakama(id, mass) =
   // A white double-breasted chef's jacket folded flat, 360 mm by 320 mm and 50 mm tall: a stand collar, the front
   // panel crossing over to one side, and two columns of black knot buttons.
   local w = 0.36, d = 0.32, ht = 0.05, cz = d / 2 - 0.085;
-  h.compound('jacket_chef', 1.4, h.foldedGarment(w, d, ht, 3)
+  h.compound('chefs_jacket', 1.4, h.foldedGarment(w, d, ht, 3)
                                   + collar('collar', 'cloth', 0.065, 0.02, ht, 0.026, cz, 30)
                                   + [
                                     flat('panel', 'cloth', [[-0.07, cz - 0.06], [0.04, cz - 0.03], [w / 2 - 0.01, cz - 0.03], [w / 2 - 0.01, -d / 2], [-0.07, -d / 2]], ht, 0.004),
@@ -182,7 +182,7 @@ local hakama(id, mass) =
   // A thin orange emergency windbreaker folded small, 340 mm by 300 mm and 35 mm tall: the hood rolled into the
   // collar, a dark zip down the front, slanted pocket zips, and a yellow reflective band round the chest and sleeves.
   local w = 0.34, d = 0.3, ht = 0.035;
-  h.compound('jacket_evac', 0.6, h.foldedGarment(w, d, ht, 2) + [
+  h.compound('emergency_jacket', 0.6, h.foldedGarment(w, d, ht, 2) + [
     h.turned('hood-roll', 'cloth', 'x', [[0, 0], [0, 0.016], [0.24, 0.016], [0.24, 0]], [-0.12, ht + 0.014, d / 2 - 0.03]),
     box('zip', 'zip', [-0.004, ht, -d / 2], [0.004, ht + 0.003, d / 2 - 0.05]),
     strip('pocket-zip-l', 'zip', [-0.13, -0.12], [-0.08, -0.05], ht, 0.006, 0.003),
@@ -193,7 +193,7 @@ local hakama(id, mass) =
   // A red flannel jacket folded flat, 360 mm by 320 mm and 70 mm tall, checked with dark stripes: a brown corduroy
   // collar, a button front and two flapped chest pockets.
   local w = 0.36, d = 0.32, ht = 0.07, cz = d / 2 - 0.09;
-  h.compound('jacket_flannel', 0.8, h.foldedGarment(w, d, ht, 3) + [
+  h.compound('flannel_jacket', 0.8, h.foldedGarment(w, d, ht, 3) + [
     box('check-z-%d' % i, 'check', [x - 0.007, ht, -d / 2], [x + 0.007, ht + 0.002, d / 2 + 0.002])
     for i in std.range(0, 5)
     for x in [-0.15 + i * 0.06]
@@ -216,7 +216,7 @@ local hakama(id, mass) =
   // A denim jacket folded flat, 360 mm by 320 mm and 60 mm tall: a pointed collar, a yoke seam, two chest pockets
   // with pointed flaps, a buttoned waistband and brass buttons down the front.
   local w = 0.36, d = 0.32, ht = 0.06, cz = d / 2 - 0.085;
-  h.compound('jacket_jean', 1, h.foldedGarment(w, d, ht, 3)
+  h.compound('denim_jacket', 1, h.foldedGarment(w, d, ht, 3)
                                  + collar('collar', 'cloth', 0.065, 0.03, ht, 0.008, cz, 40)
                                  + [
                                    flat('collar-point-l', 'cloth', [[-0.035, cz - 0.05], [-0.075, cz - 0.04], [-0.04, cz - 0.1]], ht, 0.008),
@@ -245,7 +245,7 @@ local hakama(id, mass) =
   // A black leather motorcycle jacket folded flat, 360 mm by 300 mm and 70 mm tall: wide lapels with snap studs, a
   // silver zip running off-centre down the front, slanted zip pockets and a buckled belt across the hem.
   local w = 0.36, d = 0.3, ht = 0.07, cz = d / 2 - 0.08;
-  h.compound('jacket_leather', 2.2, h.foldedGarment(w, d, ht, 3)
+  h.compound('leather_jacket', 2.2, h.foldedGarment(w, d, ht, 3)
                                      + collar('collar', 'cloth', 0.06, 0.025, ht, 0.01, cz, 40)
                                      + [
                                        flat('lapel-l', 'cloth', [[-0.04, cz - 0.04], [-0.13, cz - 0.03], [-0.06, cz - 0.15]], ht, 0.008),
@@ -265,7 +265,7 @@ local hakama(id, mass) =
   // A thin khaki cotton jacket folded flat, 340 mm by 300 mm and 40 mm tall: the hood laid on top with its crown
   // draped over the front edge and two pale drawcords, a zip down the front and two pocket welts.
   local w = 0.34, d = 0.3, ht = 0.04;
-  h.compound('jacket_light', 0.5, h.foldedGarment(w, d, ht, 3)
+  h.compound('light_jacket', 0.5, h.foldedGarment(w, d, ht, 3)
                                     + hood('hood', 'cloth', w, d, ht, 0.22, 0.18, 0.01)
                                     + [
                                       box('zip', 'zip', [-0.004, ht, -d / 2], [0.004, ht + 0.003, d / 2 - 0.18]),
@@ -280,7 +280,7 @@ local hakama(id, mass) =
   // A black wrap-over jacket folded flat, 320 mm by 280 mm and 30 mm tall: the collar band crossing the chest, a
   // dark indigo sash tied round it, and a pair of cloth gauntlets with thumb loops laid on top.
   local w = 0.32, d = 0.28, ht = 0.03;
-  h.compound('jacket_ninja', 0.5, h.foldedGarment(w, d, ht, 2) + [
+  h.compound('black_wrap_jacket', 0.5, h.foldedGarment(w, d, ht, 2) + [
     strip('collar-a', 'cloth', [-0.08, d / 2], [0.1, -0.03], ht, 0.03),
     strip('collar-b', 'cloth', [0.08, d / 2], [0.02, 0.06], ht + 0.004, 0.03),
   ] + bandX('sash', 'sash', -0.06, 0.05, w, ht, 0.004) + [
@@ -299,7 +299,7 @@ local hakama(id, mass) =
   // A red wool varsity jacket folded flat, 380 mm by 320 mm and 70 mm tall: white leather sleeves folded round the
   // sides, a striped knit collar and hem, a row of silver snaps and a cream felt letter on the chest.
   local w = 0.38, d = 0.32, ht = 0.07, cz = d / 2 - 0.085;
-  h.compound('jacket_varsity', 1.5, h.foldedGarment(w, d, ht, 3) + [
+  h.compound('varsity_jacket', 1.5, h.foldedGarment(w, d, ht, 3) + [
     box('sleeve-l', 'sleeve', [-w / 2 - 0.003, 0, -d / 2 + 0.01], [-w / 2 + 0.06, ht + 0.004, d / 2]),
     box('sleeve-r', 'sleeve', [w / 2 - 0.06, 0, -d / 2 + 0.01], [w / 2 + 0.003, ht + 0.004, d / 2]),
     box('hem', 'cloth', [-w / 2 + 0.06, ht, -d / 2], [w / 2 - 0.06, ht + 0.006, -d / 2 + 0.04]),

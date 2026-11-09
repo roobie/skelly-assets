@@ -79,7 +79,7 @@ local forkPieces(t) = [
 
   // A stainless mesh colander 220 mm across the rim and 108 mm tall on a foot ring, with a handle at each side;
   // 280 mm over the handles.
-  h.compound('colander_steel', 0.4, [
+  h.compound('steel_colander', 0.4, [
     turned('mesh', 'mesh', 'y', [[0, 0], [0, 0.055], [0.03, 0.08], [0.06, 0.098], [0.09, 0.106], [0.09, 0.102], [0.06, 0.094], [0.03, 0.076], [0.004, 0.052], [0.004, 0]], [0, 0.014, 0]),
     ring('foot', 'steel', 'y', 0.05, 0.057, 0.016, [0, 0, 0]),
     ring('rim', 'steel', 'y', 0.1, 0.112, 0.008, [0, 0.1, 0]),

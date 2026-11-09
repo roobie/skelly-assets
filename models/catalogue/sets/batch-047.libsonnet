@@ -64,7 +64,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
 
   // A heavy tow cable: 9 m of 12 mm steel wire rope in a black plastic jacket, coiled 440 mm across, with a crimped
   // steel sleeve and a forged hook on each end lying on top of the coil.
-  h.compound('hd_tow_cable', 5.9, coil('loop', 'cable', 7, 0.2, 0.006) + [
+  h.compound('heavy_duty_tow_cable', 5.9, coil('loop', 'cable', 7, 0.2, 0.006) + [
     wrap('wrap', 'cable', -0.216, 0.022, 0.028, 0.04),
     h.tube('sleeve-l', 'sleeve', 0, 0.009, -0.12, -0.08, 0.03, 0.2),
     h.tube('sleeve-r', 'sleeve', 0, 0.009, 0.08, 0.12, 0.03, 0.2),
@@ -85,7 +85,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
 
   // An empty collapsible water bottle for 500 ml, lying flat: a clear blue soft body 210 mm long and 100 mm wide with
   // rounded corners, tapering shoulders, a screw cap on its neck and a hanging tab with a hole at the base.
-  h.compound('bottle_folding', 0.027, [
+  h.compound('collapsible_bottle', 0.027, [
     h.prism('body', 'body', 'y', [
       [-0.05, -0.07], [-0.044, -0.088], [-0.03, -0.096], [0.03, -0.096], [0.044, -0.088], [0.05, -0.07],
       [0.05, 0.06], [0.016, 0.098], [-0.016, 0.098], [-0.05, 0.06],
@@ -100,7 +100,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
 
   // A brushed stainless steel water bottle for 750 ml, 73 mm across and 260 mm tall with a rounded shoulder, a
   // black screw cap and a carry loop on top.
-  h.compound('bottle_metal', 0.35, [
+  h.compound('steel_water_bottle', 0.35, [
     turned('body', 'steel', 'y', [
       [0, 0], [0, 0.034], [0.003, 0.0365], [0.19, 0.0365], [0.205, 0.033], [0.218, 0.024], [0.226, 0.02],
       [0.232, 0.02], [0.232, 0],

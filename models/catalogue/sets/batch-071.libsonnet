@@ -20,7 +20,7 @@ local gauge(id, x, y, z) = [
     h.box('tab', 'rim', [0.255, 0.4, -0.02], [0.3, 0.428, 0.02]),
   ], { cone: 'steel-galvanised', rim: 'steel-grey', strainer: 'mesh-black' }) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A blue tarpaulin rolled to 0.9 m by 0.13 m and tied with cord, four 1.2 m poles bound alongside it.
-  h.compound('tarp_raincatcher', 6.4, [
+  h.compound('rain_catcher_kit', 6.4, [
     h.rod('roll', 'tarp', 0.062, -0.45, 0.45, 0.062),
     h.box('edge', 'edge', [-0.45, 0.06, 0.058], [0.45, 0.1, 0.064]),
   ] + [
@@ -39,7 +39,7 @@ local gauge(id, x, y, z) = [
   ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'fabric'] } } },
   // A small triple-beam balance 0.32 m long: a cast base, a 140 mm pan on the left, three graduated beams with
   // brass riders running right to a pointer and zero mark.
-  h.compound('balance_small', 2, [
+  h.compound('triple_beam_balance', 2, [
     h.prism('base', 'base', 'y', [[-0.05, -0.16], [0.05, -0.16], [0.05, 0.16], [-0.05, 0.16]], 0, 0.02),
     h.box('pillar', 'base', [-0.055, 0.02, -0.012], [-0.03, 0.075, 0.012]),
     h.box('stand', 'base', [0.15, 0.02, -0.012], [0.17, 0.06, 0.012]),
@@ -79,7 +79,7 @@ local gauge(id, x, y, z) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A sealed steel canister 60 mm across and 100 mm tall: a bolted lid, a hazard band with black chevrons and a
   // narrow sight glass showing something green inside.
-  h.compound('canister_goo', 0.36, [
+  h.compound('sealed_hazard_canister', 0.36, [
     h.turned('body', 'body', 'y', [[0, 0], [0, 0.028], [0.003, 0.03], [0.088, 0.03], [0.088, 0]]),
     h.turned('lid', 'lid', 'y', [[0, 0], [0, 0.032], [0.006, 0.032], [0.008, 0.026], [0.012, 0.012], [0.016, 0.01], [0.016, 0]], [0, 0.088, 0]),
     h.turned('band', 'band', 'y', [[0, 0], [0, 0.0305], [0.024, 0.0305], [0.024, 0]], [0, 0.05, 0]),
@@ -212,7 +212,7 @@ local gauge(id, x, y, z) = [
   // An aluminium field case 0.44 m by 0.32 m and 0.14 m deep opened with its lid up behind, its foam holding a small
   // digital balance, a spectrophotometer, a melting point block, a pH meter and probe, a cuvette rack and a stack
   // of chromatography paper.
-  h.compound('analytical_set_basic', 7, [
+  h.compound('field_chemistry_kit', 7, [
     h.box('floor', 'case', [-0.22, 0, -0.16], [0.22, 0.01, 0.16]),
     h.box('wall-front', 'case', [-0.22, 0, 0.15], [0.22, 0.12, 0.16]),
     h.box('wall-back', 'case', [-0.22, 0, -0.16], [0.22, 0.12, -0.15]),

@@ -89,9 +89,9 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
 
   // A single two-tone capsule, 26 mm long and 11 mm across, lying along z, one half apple-red and the
   // other white.
-  h.compound('panacea', 0.0012, h.capsule(0.026, 0.0055)('capsule', 0, 0, 0),
+  h.compound('red_capsule', 0.0012, h.capsule(0.026, 0.0055)('capsule', 0, 0, 0),
              { 'capsule-a': 'plastic-clear-red', 'capsule-b': 'plastic-white' })
-  + inHand('panacea', 'capsule-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: {  } } },
+  + inHand('red_capsule', 'capsule-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: {  } } },
 
   // A carton of sleeping tablets, 45 mm wide, 85 mm tall and 18 mm deep, standing, dark blue with a white
   // band and a yellow moon on the face.
@@ -111,11 +111,11 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
   ], { glass: 'glass-clear', pills: 'paperboard-brown', cork: 'cork', tape: 'tape-grey' }) + inHand('poppy_painkiller', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] } } },
 
   // A round steel pill tin, 50 mm across and 16 mm tall, its lid labelled with a paper disc.
-  h.compound('poppy_sleep', 0.021, [
+  h.compound('poppy_sleeping_tablets', 0.021, [
     disc('body', 'body', 0.024, 0, 0.011),
     disc('lid', 'lid', 0.0245, 0.009, 0.016),
     disc('label', 'label', 0.016, 0.016, 0.017),
-  ], { body: 'steel-grey', lid: 'steel-stainless', label: 'paper-white' }) + inHand('poppy_sleep', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'] } } },
+  ], { body: 'steel-grey', lid: 'steel-stainless', label: 'paper-white' }) + inHand('poppy_sleeping_tablets', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'] } } },
 
   // A reused 250 ml glass medicine bottle of dark homemade syrup, 60 mm across and 160 mm tall,
   // stoppered with a cork and labelled with a strip of tape. The body shows the syrup, as through glass.

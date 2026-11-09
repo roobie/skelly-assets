@@ -78,7 +78,7 @@ local poundRunes =
   // A pair of fist guards laid flat, backs up, fingers to +z, 230 mm from cuff to knuckle bar and 100 mm across: thick
   // fingerless leather wraps, a curved steel plate riveted over each back, a heavy steel bar across the knuckles and a
   // glowing violet flame mark on each plate.
-  h.compound('flaming_fist', 1.2,
+  h.compound('flame_marked_fist_guards', 1.2,
              g.glovePair(fistGuard, 0.07, fistExtra),
              { glove: 'leather-tan', cuff: 'leather-tan', trim: 'leather-oxblood', steel: 'steel-grey', rivet: 'steel-bright', flame: 'crystal-glow-violet' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['leather', 'metal'], setting: ['fantasy'], weapon: ['blunt'] } } },
@@ -86,7 +86,7 @@ local poundRunes =
   // A single right-hand steel gauntlet laid flat, back up, fingers to +z, 300 mm from cuff to fingertip and 140 mm
   // across its flared cuff: a domed plate over the back, steel fingers and thumb, a knuckle ridge, a riveted steel
   // cuff, and glowing blue rune marks on the plate and cuff.
-  h.compound('gauntlet_pounding', 0.8,
+  h.compound('rune_carved_steel_gauntlet', 0.8,
              g.glove('r-', 0, 1, pound) + poundRunes,
              { glove: 'leather-black', cuff: 'steel-bright', trim: 'leather-black', steel: 'steel-bright', rivet: 'steel-grey', rune: 'crystal-glow-blue' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal', 'leather'], setting: ['fantasy'], weapon: ['blunt'] } } },

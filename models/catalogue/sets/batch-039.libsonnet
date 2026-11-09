@@ -75,7 +75,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
 
   // A giant insect's stinger 150 mm long, a barbed dark shaft 14 mm thick at the root, still joined by a
   // short neck to a lumpy, flattened sac of pale flesh.
-  h.compound('bee_sting', 0.038, [
+  h.compound('bee_stinger', 0.038, [
     h.ball('sac-a', 'flesh', 0.016, -0.056, 0.016, 0, 0.6),
     h.ball('sac-b', 'flesh', 0.011, -0.064, 0.02, 0.009, 0.7),
     h.ball('sac-c', 'flesh', 0.011, -0.051, 0.014, -0.010, 0.6),
@@ -89,5 +89,5 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
   ] + [
     turned('root', 'root', 'x', [[0, 0], [0, 0.011], [0.008, 0.01], [0.008, 0]], [-0.032, 0.022, 0]),
   ], { flesh: 'flesh-membrane', chitin: 'chitin-black', root: 'chitin-brown' })
-  + { handling: h.gripOn('bee_sting', 'shaft'), voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
+  + { handling: h.gripOn('bee_stinger', 'shaft'), voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
 ]

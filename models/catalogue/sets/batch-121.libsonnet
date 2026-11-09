@@ -128,13 +128,13 @@ local faceOval(prefix, slot, a, b, lift) =
 [
   // A pair of wool arming mittens laid flat side by side, backs up, each 310 mm from cuff to fingertip and 130 mm
   // across: a thick channel-quilted mitt and thumb with a deep bound cuff.
-  h.compound('gambeson_gloves_wool', 0.9, mitten('l-', -0.08, -1) + mitten('r-', 0.08, 1),
+  h.compound('wool_arming_mittens', 0.9, mitten('l-', -0.08, -1) + mitten('r-', 0.08, 1),
              { cloth: 'wool-grey', quilt: 'wool-grey', binding: 'leather-brown', stitch: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A padded cotton coif standing upright, 300 mm tall and 290 mm across its shoulder cape: a hood quilted in
   // vertical channels round the head, a wide oval face opening bound in brown, and a bound hem round the cape.
-  h.compound('gambeson_hood', 0.51, [
+  h.compound('padded_coif', 0.51, [
     h.turned('hood', 'cloth', 'y', [[0, 0], [0, 0.145], [0.018, 0.142], [0.05, 0.118], [0.08, 0.092], [0.1, 0.094], [0.16, 0.1], [0.21, 0.097], [0.245, 0.084], [0.272, 0.06], [0.292, 0.03], [0.3, 0]]),
     h.turned('hem', 'binding', 'y', [[0, 0], [0, 0.149], [0.014, 0.146], [0.014, 0]]),
     h.turned('neck-seam', 'stitch', 'y', [[0, 0], [0, 0.097], [0.006, 0.097], [0.006, 0]], [0, 0.085, 0]),
@@ -149,15 +149,15 @@ local faceOval(prefix, slot, a, b, lift) =
 
   // A long nylon gambeson folded in four, 420 mm by 380 mm and 100 mm tall: dense channel quilting, a stand collar,
   // toggles down the front and thick quilted sleeves folded along both sides. The wool coat shares this model.
-  coat('gambeson_nylon', 3.5, 0.034, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', sleeve: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('nylon_gambeson', 3.5, 0.034, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', sleeve: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // The same long nylon gambeson with thin sleeves, folded to 420 mm by 380 mm and 100 mm tall: the sleeves fold to
   // slim rolls along the sides. The thin-sleeved wool coat shares this model.
-  coat('gambeson_nylon_thinsleeved', 3.2, 0.018, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', sleeve: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('thin_sleeved_nylon_gambeson', 3.2, 0.018, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', sleeve: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless nylon gambeson folded in four, 400 mm by 360 mm and 90 mm tall: channel quilting, a stand collar,
   // toggles down the front and bound armholes at both shoulders. The sleeveless wool coat shares this model.
-  surcoat('gambeson_nylon_vest', 2.5, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull', hole: 'cloth-charcoal' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  surcoat('nylon_gambeson_vest', 2.5, { cloth: 'nylon-coyote', quilt: 'nylon-coyote', stitch: 'webbing-black', binding: 'webbing-black', toggle: 'brass-dull', hole: 'cloth-charcoal' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A crude padded cotton gambeson vest folded in four, 400 mm by 360 mm and 100 mm tall: stuffed thick and quilted in
   // a coarse diamond lattice, a plain bound neck, bound armholes and a leather thong laced across the front opening.
@@ -187,7 +187,7 @@ local faceOval(prefix, slot, a, b, lift) =
   // Padded cotton arming trousers folded lengthwise in three, 280 mm by 420 mm and 60 mm tall: channel quilting down
   // the leg, a bound waistband with a drawstring tied at the front, a fly seam and a bound hem.
   local w = 0.28, d = 0.42, ht = 0.06;
-  h.compound('gambeson_pants', 1.4, trousers(w, d, ht, 3, 0.03, 0.008) + [
+  h.compound('padded_arming_trousers', 1.4, trousers(w, d, ht, 3, 0.03, 0.008) + [
     strip('cord-a', 'cord', [0.0, d / 2 - 0.025], [-0.03, d / 2 - 0.12], ht + 0.012, 0.009, 0.005),
     strip('cord-b', 'cord', [0.0, d / 2 - 0.025], [0.025, d / 2 - 0.11], ht + 0.012, 0.009, 0.005),
     box('cord-knot', 'cord', [-0.008, ht + 0.012, d / 2 - 0.033], [0.008, ht + 0.02, d / 2 - 0.017]),
@@ -198,7 +198,7 @@ local faceOval(prefix, slot, a, b, lift) =
   // down the leg, a padded knee panel, a leather-bound waistband with pairs of lacing points to tie them to a
   // gambeson, and a leather-bound hem. The nylon and wool trousers share this model.
   local w = 0.32, d = 0.44, ht = 0.11;
-  h.compound('gambeson_pants_canvas', 3.2, trousers(w, d, ht, 4, 0.04, 0.012) + [
+  h.compound('canvas_arming_trousers', 3.2, trousers(w, d, ht, 4, 0.04, 0.012) + [
     flat('knee', 'quilt', [[-0.1, -0.02], [-0.07, -0.06], [0.07, -0.06], [0.1, -0.02], [0.1, 0.04], [0.07, 0.08], [-0.07, 0.08], [-0.1, 0.04]], ht + 0.004, 0.012),
     strip('knee-stitch-a', 'stitch', [-0.085, -0.045], [0.085, 0.065], ht + 0.016, 0.005, 0.002),
     strip('knee-stitch-b', 'stitch', [0.085, -0.045], [-0.085, 0.065], ht + 0.016, 0.005, 0.002),

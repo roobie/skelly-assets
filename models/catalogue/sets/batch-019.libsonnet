@@ -107,7 +107,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // An 8 inch (204 mm) circular saw blade, 2 mm plate with a 16 mm arbor hole and 24 hooked teeth.
-  h.compound('circsaw_blade', 0.44, [
+  h.compound('circular_saw_blade', 0.44, [
     washer('plate', 'plate', 0.008, 0.092, 0.002, 0, 0, 0),
     washer('collar', 'collar', 0.008, 0.025, 0.002, 0, 0.002, 0),
   ] + [tooth(i, 24) for i in std.range(0, 23)], { plate: 'steel-stainless', collar: 'steel-blued', tooth: 'steel-grey' })
@@ -121,7 +121,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['ceramic'] } } },
 
   // A terracotta flower pot 155 mm tall and 176 mm across its rolled rim, with a 120 mm base.
-  h.compound('clay_pot_flower', 0.85, [
+  h.compound('clay_flower_pot', 0.85, [
     turned('pot', 'clay', 'y', [
       [0, 0], [0, 0.060], [0.125, 0.080], [0.125, 0.088], [0.155, 0.088], [0.155, 0.078], [0.012, 0.052], [0.012, 0],
     ]),
@@ -172,7 +172,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'] } } },
   // A refrigeration condensing unit on a 400 by 260 mm base: a domed compressor, a fan in its shroud and a finned
   // coil with copper tubes, about 300 mm tall. The two copper lines rise from the compressor and pass over the fan.
-  h.compound('condensor_coil', 13, [
+  h.compound('condensing_unit', 13, [
     box('base', 'base', [-0.200, 0, -0.130], [0.200, 0.008, 0.130]),
     turned('compressor', 'compressor', 'y', [[0, 0], [0, 0.070], [0.150, 0.070], [0.180, 0.058], [0.198, 0.035], [0.204, 0]], [-0.110, 0.008, 0]),
     disc('terminal', 'cover', 0.022, 0.090, 0.120, -0.110, 0.072) + { axis: 'z', origin: [-0.110, 0.110, 0.060], profile: [[0, 0], [0, 0.022], [0.020, 0.022], [0.020, 0]] },
@@ -198,7 +198,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cottonwood seed tuft, a loose white puff about 80 mm across with its small brown seed showing.
-  h.compound('cottonwood_tree_boll', 0.0011, [
+  h.compound('cottonwood_fluff', 0.0011, [
     ball('puff-main', 'fluff', 0.024, 0, 0.024, 0),
     ball('puff-a', 'fluff', 0.017, 0.026, 0.017, 0.008),
     ball('puff-b', 'fluff', 0.015, -0.024, 0.015, -0.010),

@@ -49,10 +49,10 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A light wooden pallet 1.22 m by 0.48 m with fifteen sun-dried adobe bricks, each 220 by 140 by 80 mm, in three rows.
-  adobePallet('adobe_pallet_done', 64, 'brick-buff') + { taxonomy: { category: 'materials', tags: { material: ['stone', 'wood'] } } },
+  adobePallet('pallet_of_dry_adobe_bricks', 64, 'brick-buff') + { taxonomy: { category: 'materials', tags: { material: ['stone', 'wood'] } } },
 
   // The same pallet with its fifteen bricks freshly moulded and still wet.
-  adobePallet('adobe_pallet_full', 79, 'clay-wet') + { taxonomy: { category: 'materials', tags: { material: ['stone', 'wood'] } } },
+  adobePallet('pallet_of_wet_adobe_bricks', 79, 'clay-wet') + { taxonomy: { category: 'materials', tags: { material: ['stone', 'wood'] } } },
 
   // A 115 mm angle grinder lying on its disc: a motor body 0.35 m long ending in a cable tail, a gear head over the
   // wheel with a half guard, and a side handle screwed into the head.
@@ -99,11 +99,11 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
   ], { body: 'paint-drum-blue', anvil: 'steel-grey', plate: 'steel-grey', screw: 'steel-bright' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // Tongue-and-groove pliers 300 mm long with 60 mm angled jaws and dipped grips.
-  h.item('big_pliers', 'pliers', 0.55, {
+  h.item('tongue_and_groove_pliers', 'pliers', 0.55, {
     kind: 'groove', length: 0.300, jawLength: 0.075, spread: 0.075,
     gripWidth: 0.018, thickness: 0.010, pivotRadius: 0.022, teeth: 6, toothDepth: 0.005,
   }, { metal: 'steel-grey', grip: 'plastic-red', dark: 'paint-charcoal' }) + {
-    handling: { part: 'big_pliers', solid: 'grip--1', fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 0 },
+    handling: { part: 'tongue_and_groove_pliers', solid: 'grip--1', fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 0 },
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -138,7 +138,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     box(s + '-strop-a', 'rope', [x - 0.047, 0.018, 0.031], [x + 0.047, 0.028, 0.035]),
     box(s + '-strop-b', 'rope', [x - 0.047, 0.018, -0.035], [x + 0.047, 0.028, -0.031]),
   ] + h.crescent(s + '-eye', 'rope', 0.012, 0.019, if d > 0 then 0 else 180, if d > 0 then 180 else 360, 6, 0.016, 0.03, x + d * 0.052, 0);
-  h.compound('block_and_tackle_wood', 0.37, woodBlock('a', -0.15, -1) + woodBlock('b', 0.15, 1) + [
+  h.compound('wooden_block_and_tackle', 0.37, woodBlock('a', -0.15, -1) + woodBlock('b', 0.15, 1) + [
     rod('fall-%d' % i, 'rope', 0.005, -0.105, 0.105, 0.022) + { origin: [-0.105, 0.022, [-0.018, 0.018][i]] }
     for i in [0, 1]
   ] + [
@@ -203,13 +203,13 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
   + { handling: h.gripOn('carding_paddles', 'a-handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'] } } },
 
   // A paint chipper: a stiff 50 mm steel blade with a bevelled edge in a ferrule on a 100 mm beech handle, 175 mm overall.
-  h.compound('chipper', 0.1, [
+  h.compound('paint_chipper', 0.1, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.011], [0.01, 0.014], [0.08, 0.013], [0.095, 0.010], [0.1, 0.010], [0.1, 0]], [-0.1, 0.014, 0]),
     rod('ferrule', 'ferrule', 0.0105, 0.0, 0.016, 0.014),
     h.prism('blade', 'blade', 'y', [[-0.007, 0.012], [0.007, 0.012], [0.025, 0.065], [-0.025, 0.065]], 0.012, 0.0145),
     h.prism('edge', 'edge', 'y', [[-0.025, 0.065], [0.025, 0.065], [0.025, 0.075], [-0.025, 0.075]], 0.0125, 0.014),
   ], { handle: 'wood-pine', ferrule: 'brass-dull', blade: 'steel-grey', edge: 'steel-bright' })
-  + { handling: h.gripOn('chipper', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  + { handling: h.gripOn('paint_chipper', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // A 100 mm C-clamp lying flat: a cast frame 150 mm tall with the screw, swivel pad and sliding tommy bar.
   h.compound('clamp', 1.2, [
@@ -239,7 +239,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
 
   // A portable electric concrete mixer standing ready to load: a 140 L drum 0.66 m across with its mouth up, held in a
   // yoke with a geared ring and tilt wheel, on a tube stand with two wheels at the back and push handles at the front.
-  h.compound('con_mix_foldable', 51, [
+  h.compound('folding_concrete_mixer', 51, [
     turned('drum', 'drum', 'y', [[0, 0], [0, 0.24], [0.12, 0.31], [0.24, 0.33], [0.36, 0.25], [0.5, 0.16], [0.5, 0]], [0, 0.46, 0]),
     disc('mouth', 'inside', 0.14, 0.96, 0.962),
     turned('ring', 'ring', 'y', [[0, 0.3], [0, 0.345], [0.04, 0.345], [0.04, 0.3], [0, 0.3]], [0, 0.68, 0]),

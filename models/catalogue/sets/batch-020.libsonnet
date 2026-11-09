@@ -55,7 +55,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
       box(id + '-leg-a', 'leg', [x - 0.0005, 0.002, z - 0.009], [x + 0.0005, 0.003, z - 0.005]),
       box(id + '-leg-b', 'leg', [x - 0.0005, 0.002, z + 0.005], [x + 0.0005, 0.003, z + 0.009]),
     ];
-  h.compound('e_scrap', 0.0029, resistor('r1', -0.008, -0.01, true) + resistor('r2', 0.012, 0.004, false) + resistor('r3', -0.01, 0.01, true) + [
+  h.compound('electronic_scrap', 0.0029, resistor('r1', -0.008, -0.01, true) + resistor('r2', 0.012, 0.004, false) + resistor('r3', -0.01, 0.01, true) + [
     disc('can', 'can', 0.004, 0, 0.012, 0.004, -0.008),
     disc('can-top', 'cantop', 0.0035, 0.012, 0.0125, 0.004, -0.008),
     box('can-stripe', 'cantop', [0.0075, 0.001, -0.0095], [0.0085, 0.011, -0.0065]),
@@ -171,7 +171,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
 
   // A portable hard drive, 118 mm by 80 mm and 18 mm thick, its long sides rounded, with a hand-written label on
   // top, a status light and a short cable coiled beside it.
-  h.compound('evacuation_records_drive', 0.21, [
+  h.compound('backup_drive', 0.21, [
     box('core', 'shell', [-0.059, 0, -0.031], [0.059, 0.018, 0.031]),
     rod('side-a', 'shell', 0.009, -0.059, 0.059, 0.009) + { origin: [-0.059, 0.009, -0.031] },
     rod('side-b', 'shell', 0.009, -0.059, 0.059, 0.009) + { origin: [-0.059, 0.009, 0.031] },

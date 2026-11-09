@@ -51,7 +51,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A thin black cotton cloak folded to 300 mm by 240 mm and 30 mm high, hood on top and narrow black ties.
-  h.compound('cloak_black', 0.6, hoodedCloak(0.3, 0.24, 0.03, 3, function(z, y) ties(0.24, 0.03, z - 0.01, 0.02)), {
+  h.compound('dark_cloak', 0.6, hoodedCloak(0.3, 0.24, 0.03, 3, function(z, y) ties(0.24, 0.03, z - 0.01, 0.02)), {
     cloth: 'cloth-black',
     hood: 'cloth-black',
     lining: 'plastic-charcoal',
@@ -61,7 +61,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
 
   // A heavy denim cloak folded to 330 mm by 270 mm and 55 mm high, hood on top, closed at the neck by two steel
   // press studs on the front.
-  h.compound('cloak_denim', 1.2, hoodedCloak(0.33, 0.27, 0.055, 4, function(z, y) [])
+  h.compound('denim_cloak', 1.2, hoodedCloak(0.33, 0.27, 0.055, 4, function(z, y) [])
     + [h.stud('stud-%d' % i, 'clasp', [-0.05, 0.05][i], 0.055 * 0.875, 0.135, 0.007) for i in [0, 1]], {
     cloth: 'cloth-denim',
     hood: 'cloth-denim',
@@ -72,7 +72,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
 
   // A fur cloak folded to 340 mm by 280 mm and 60 mm high, fur side out, with a thick ruff of paler fur round the
   // neck and a bronze chained clasp.
-  h.compound('cloak_fur', 1.1, folded(0.34, 0.28, 0.06, 3)
+  h.compound('fur_cloak', 1.1, folded(0.34, 0.28, 0.06, 3)
     + h.crescent('ruff', 'ruff', 0.05, 0.095, 95, 265, 8, 0.06, 0.085, 0, 0.01)
     + clasp(0.05, 0.06), {
     cloth: 'fur-brown',
@@ -82,7 +82,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['back'], state: ['folded'] } } },
 
   // A leather cloak folded to 330 mm by 270 mm and 50 mm high, hood on top and a brass chained clasp at the neck.
-  h.compound('cloak_leather', 3.1, hoodedCloak(0.33, 0.27, 0.05, 3, function(z, y) clasp(z + 0.005, y - 0.012)), {
+  h.compound('leather_cloak', 3.1, hoodedCloak(0.33, 0.27, 0.05, 3, function(z, y) clasp(z + 0.005, y - 0.012)), {
     cloth: 'leather-brown',
     hood: 'leather-brown',
     lining: 'suede-brown',
@@ -92,7 +92,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
 
   // A reversible hooded cloak folded to 300 mm by 250 mm and 35 mm high, black outside and red inside, the red
   // showing in the hood's opening, with a silver chained clasp. The red-side-out variant swaps the finishes.
-  h.compound('cloak_vampire', 0.8, hoodedCloak(0.3, 0.25, 0.035, 3, function(z, y) clasp(z + 0.005, y - 0.012, 0.01, 0.03)), {
+  h.compound('reversible_black_cloak', 0.8, hoodedCloak(0.3, 0.25, 0.035, 3, function(z, y) clasp(z + 0.005, y - 0.012, 0.01, 0.03)), {
     cloth: 'cloth-black',
     hood: 'cloth-black',
     lining: 'velvet-red',
@@ -101,7 +101,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['back'], state: ['folded'] } } },
 
   // A wool cloak folded to 330 mm by 270 mm and 55 mm high, hood on top, pinned at the neck by a ring brooch.
-  h.compound('cloak_wool', 1.2, hoodedCloak(0.33, 0.27, 0.055, 4, function(z, y) brooch(z + 0.01, y - 0.012)), {
+  h.compound('wool_cloak', 1.2, hoodedCloak(0.33, 0.27, 0.055, 4, function(z, y) brooch(z + 0.01, y - 0.012)), {
     cloth: 'wool-grey',
     hood: 'wool-grey',
     lining: 'felt-grey',

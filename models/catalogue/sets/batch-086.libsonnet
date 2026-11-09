@@ -79,7 +79,7 @@ local figure = [
 
   // A collectible figure 320 mm tall: a caped knight in grey armour with a sword planted point-down in front of him,
   // standing on a square black plinth.
-  h.compound('toy_figurine_large', 1.3, [
+  h.compound('collectible_knight_figure', 1.3, [
     box('plinth', 'plinth', [-0.075, 0, -0.075], [0.075, 0.03, 0.075]),
     box('plaque', 'trim', [-0.04, 0.008, 0.075], [0.04, 0.022, 0.078]),
   ] + [
@@ -96,7 +96,7 @@ local figure = [
   ], {
     plinth: 'lacquer-black', trim: 'brass-polished', boot: 'iron-dull', suit: 'steel-grey', cape: 'cloth-crimson',
     blade: 'steel-bright', skin: 'latex-pale', hair: 'leather-chestnut', eye: 'plastic-matte-black',
-  }) + h.inHand('toy_figurine_large', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + h.inHand('collectible_knight_figure', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A plastic yo-yo 64 mm across and 35 mm wide, standing on its rim, face on +z, with its string wound in the
   // gap and a tail ending in a finger loop lying beside it.

@@ -104,22 +104,22 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
 [
   // A close helm of hardened steel with its visor raised, standing on its gorget edge, 256 mm across, 280 mm front
   // to back and 348 mm tall: the visor lies up over the brow and the face shows open above the bevor.
-  closeHelm('ch_helm_close_raised', 3.5, 'steel-hardened', 'standard', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_close_helm_visor_up', 3.5, 'steel-hardened', 'standard', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A plain light close helm of hardened steel, visor down, 248 mm across, 280 mm front to back and 332 mm tall.
-  closeHelm('ch_lighthelm_close', 3.1, 'steel-hardened', 'light', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_light_close_helm', 3.1, 'steel-hardened', 'light', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // The light close helm with its visor raised, 240 mm across, 264 mm front to back and 332 mm tall.
-  closeHelm('ch_lighthelm_close_raised', 3.1, 'steel-hardened', 'light', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_light_close_helm_visor_up', 3.1, 'steel-hardened', 'light', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A close helm of high-carbon steel, visor down, 260 mm across, 296 mm front to back and 348 mm tall.
-  closeHelm('hc_helm_close', 3.6, 'steel-blued', 'standard', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_close_helm', 3.6, 'steel-blued', 'standard', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A heavy close helm of high-carbon steel, visor down: a tall comb, a brow reinforce and a second gorget lame,
   // 260 mm across, 308 mm front to back and 360 mm tall.
-  closeHelm('hc_heavyhelm_close', 4.6, 'steel-blued', 'heavy', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_heavy_close_helm', 4.6, 'steel-blued', 'heavy', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // The heavy close helm with its visor raised, 256 mm across, 292 mm front to back and 360 mm tall.
-  closeHelm('hc_heavyhelm_close_raised', 4.4, 'steel-blued', 'heavy', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_heavy_close_helm_visor_up', 4.4, 'steel-blued', 'heavy', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A conical nasal helm of hardened steel set level on its nasal bar and leather chin straps, 216 mm across and
   // 248 mm tall: a pointed bowl with a riveted rim band, crossing bands over the crown and a bar down over the nose.
-  h.compound('ch_helmet_nasal', 1.6,
+  h.compound('hardened_steel_nasal_helm', 1.6,
              [
                shell('bowl', 'steel', nasalPath, 0.003),
                ring('rim', 'steel', 0.05, 0.022, 0.098, 0.106),
@@ -136,7 +136,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
   // A fluted turban helmet of hardened steel standing on its ear guards and nasal bar, 232 mm across and 312 mm tall:
   // a tall onion-shaped bowl twisted with spiral flutes, a spike finial, a banded rim, a sliding nasal bar in a
   // bracket over the brow and a curved guard over each ear.
-  h.compound('ch_helmet_turban', 2.1,
+  h.compound('hardened_steel_turban_helmet', 2.1,
              [
                shell('bowl', 'steel', turbanPath, 0.003),
                ring('rim', 'steel', 0.07, 0.03, 0.104, 0.112),
@@ -161,7 +161,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
 
   // A crude open-faced helmet hammered from hardened sheet steel, sitting on its rim, 240 mm across and 196 mm tall:
   // a deep bowl crossed by two riveted straps, a riveted brow band and a padded cotton lining showing at the rim.
-  h.compound('ch_helmet_metal_sheets', 2.1,
+  h.compound('hardened_sheet_steel_helmet', 2.1,
              [
                shell('bowl', 'steel', sheetPath, 0.004),
                ring('band', 'steel', 0, 0.03, 0.104, 0.113),
@@ -178,7 +178,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
   // tall: a straight drum riveted at a seam, a shallow domed lid, two eye slits either side of a centre strap that
   // runs down the face as a cross, breathing holes low on the wearer's right and a cotton lining at the rim.
   local gr = 0.118, wall(prefix, y0, y1, a0, a1, n) = arcShell(prefix, 'steel', [[y0, gr], [y1, gr]], 0.006, a0, a1, n);
-  h.compound('ch_helmet_metal_sheets_full', 3.2,
+  h.compound('hardened_sheet_steel_great_helm', 3.2,
              wall('wall-low', 0, 0.09, 0, 360, 48)
              // Breathing holes low on the wearer's right, at bearings -50 to -14.
              + wall('breath-row', 0.09, 0.104, -14, 310, 40) + wall('breath-a', 0.09, 0.104, -44, -38, 1) + wall('breath-b', 0.09, 0.104, -32, -26, 1)
@@ -206,7 +206,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
   // water, a brass edge, a brass holder on the brow and a black leather front shield with a white number plate.
   local cz = -0.02, crown = [[0.03, 0.102], [0.08, 0.1], [0.12, 0.086], [0.15, 0.06], [0.168, 0.03], [0.172, 0]];
   local brimR(b) = 0.12 + 0.06 * (1 - std.cos(rad(b))) / 2, brimY(b) = 0.026 * (1 + std.cos(rad(b))) / 2;
-  h.compound('firehelmet', 1.2,
+  h.compound('firefighter_helmet', 1.2,
              [shell('crown', 'shell', crown, 0.005, [0, 0, cz])]
              + std.flattenArrays([
                local b = 15 * i, r = brimR(b + 7.5), y = brimY(b + 7.5);

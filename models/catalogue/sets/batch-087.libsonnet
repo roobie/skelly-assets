@@ -70,16 +70,16 @@ local molle(id, x0, x1, z0, rows, y) = [
   satchel('ammo_satchel', 0.18, 'cloth-canvas', 'steel-grey') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['fabric'] } } },
 
   // The same satchel in heavy leather with a brass buckle.
-  satchel('ammo_satchel_leather', 0.6, 'leather-brown', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['leather', 'fabric'] } } },
+  satchel('leather_ammo_satchel', 0.6, 'leather-brown', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['leather', 'fabric'] } } },
 
   // A webbing tab 160 mm long and 50 mm wide with a loop 60 mm across for an axe or a long tool's handle.
-  beltLoop('belt_loop_large', 0.015, 0.16, 0.05, 0.03) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('large_belt_loop', 0.015, 0.16, 0.05, 0.03) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A webbing tab 120 mm long and 40 mm wide with a loop 40 mm across for a hammer or a knife.
-  beltLoop('belt_loop_medium', 0.008, 0.12, 0.04, 0.02) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('medium_belt_loop', 0.008, 0.12, 0.04, 0.02) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A webbing tab 90 mm long and 25 mm wide with a loop 24 mm across for a screwdriver or a torch.
-  beltLoop('belt_loop_small', 0.004, 0.09, 0.025, 0.012) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('small_belt_loop', 0.004, 0.09, 0.025, 0.012) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A square nylon pouch 140 mm wide, 170 mm tall and 90 mm deep for a one-litre canteen, with a snapped flap and
   // two webbing straps on its back.
@@ -91,14 +91,14 @@ local molle(id, x0, x1, z0, rows, y) = [
 
   // A canvas pouch 90 mm wide, 200 mm tall and 45 mm deep for one rifle magazine, with a snapped flap and a harness
   // strap lying round it.
-  chestPouch('chestpouch', 0.075, 'cloth-canvas', 'cloth-khaki', 'steel-grey') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
+  chestPouch('canvas_chest_pouch', 0.075, 'cloth-canvas', 'cloth-khaki', 'steel-grey') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // The same chest pouch in thick leather with a leather harness.
-  chestPouch('chestpouch_leather', 0.5, 'leather-brown', 'leather-black', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather', 'fabric'] } } },
+  chestPouch('leather_chest_pouch', 0.5, 'leather-brown', 'leather-black', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather', 'fabric'] } } },
 
   // A canvas chest rig lying flat: four magazine pouches 70 mm wide and 160 mm long in a row 320 mm across, on a
   // back panel, with two shoulder straps crossing behind and a waist strap either side.
-  h.compound('chestrig', 0.22, [
+  h.compound('chest_rig', 0.22, [
     box('panel', 'body', [-0.17, 0, -0.1], [0.17, 0.006, 0.08]),
   ] + std.flattenArrays([
     [
@@ -146,7 +146,7 @@ local molle(id, x0, x1, z0, rows, y) = [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A round nylon bottle pouch 90 mm across and 230 mm tall with a drawcord top and a flat pocket on its front.
-  h.compound('h2o_pouch', 0.14, [
+  h.compound('bottle_pouch', 0.14, [
     h.disc('body', 'body', 0.045, 0, 0.23),
     h.disc('cuff', 'flap', 0.047, 0.2, 0.23),
     h.disc('toggle', 'stud', 0.008, 0.23, 0.245, 0.03, 0.02),

@@ -422,46 +422,46 @@ local steelFinish(steel) = { plate: steel, rim: steel, strap: 'leather-brown', b
 
 [
   // Lorica segmentata, 640 mm across the shoulder guards and 600 mm long laid flat.
-  h.compound('armor_lorica', 9, lorica(), {
+  h.compound('segmented_iron_cuirass', 9, lorica(), {
     plate: 'iron-dull', edge: 'steel-grey', fitting: 'brass-polished', strap: 'leather-brown',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['ancient'] } } },
 
   // Medium steel chestplate, 4 mm plate: 580 mm across the spaulders and 600 mm from the neck to the tassets.
-  h.compound('armor_mc_chestplate', 20, chestplate({ t: 0.004, lames: 2, spaulder: 2, tassets: true }), steelFinish('steel-grey'))
+  h.compound('medium_steel_chestplate', 20, chestplate({ t: 0.004, lames: 2, spaulder: 2, tassets: true }), steelFinish('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // Medium steel heavy chestplate, 6 mm plate with a plackart and three lames.
-  h.compound('armor_mc_heavy_chestplate', 33, chestplate({ t: 0.006, lames: 3, spaulder: 3, tassets: true, plackart: true }), steelFinish('steel-grey'))
+  h.compound('medium_steel_heavy_chestplate', 33, chestplate({ t: 0.006, lames: 3, spaulder: 3, tassets: true, plackart: true }), steelFinish('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // Medium steel light chestplate, 2 mm plate: breastplate and one lame, 400 mm across and 400 mm long.
-  h.compound('armor_mc_light_chestplate', 9, chestplate({ t: 0.003, lames: 1 }), steelFinish('steel-grey'))
+  h.compound('medium_steel_light_chestplate', 9, chestplate({ t: 0.003, lames: 1 }), steelFinish('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
-  h.compound('armor_qt_chestplate', 20, chestplate({ t: 0.004, lames: 2, spaulder: 2, tassets: true }), steelFinish('steel-heat-tint'))
+  h.compound('tempered_steel_chestplate', 20, chestplate({ t: 0.004, lames: 2, spaulder: 2, tassets: true }), steelFinish('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
-  h.compound('armor_qt_heavy_chestplate', 33, chestplate({ t: 0.006, lames: 3, spaulder: 3, tassets: true, plackart: true }), steelFinish('steel-heat-tint'))
+  h.compound('tempered_steel_heavy_chestplate', 33, chestplate({ t: 0.006, lames: 3, spaulder: 3, tassets: true, plackart: true }), steelFinish('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
-  h.compound('armor_qt_light_chestplate', 9, chestplate({ t: 0.003, lames: 1 }), steelFinish('steel-heat-tint'))
+  h.compound('tempered_steel_light_chestplate', 9, chestplate({ t: 0.003, lames: 1 }), steelFinish('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // Riot chest guard with arm and thigh guards, 640 mm across and 700 mm long laid flat.
-  h.compound('armor_riot_torso', 1.2, riotChest(), {
+  h.compound('riot_chest_guard', 1.2, riotChest(), {
     shell: 'plastic-matte-black', pad: 'plastic-charcoal', webbing: 'webbing-black', band: 'cloth-cream', strap: 'hook-loop-grey',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // Bronze scale armour, 660 mm across the shoulder flaps and 590 mm long.
-  h.compound('armor_thessalonian', 7.7, scaleArmour(), {
+  h.compound('bronze_scale_armour', 7.7, scaleArmour(), {
     backing: 'leather-brown', scale: 'bronze-polished', edge: 'bronze', strip: 'leather-chestnut', tip: 'bronze', scar: 'leather-brown',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['ancient'] } } },
 
   // Paper-block cuirass, 460 mm across and 630 mm long.
-  h.compound('bookplate', 9.2, bookPlate(), { cover: 'paper-butcher', pages: 'paper-white', tape: 'tape-silver' })
+  h.compound('book_armour', 9.2, bookPlate(), { cover: 'paper-butcher', pages: 'paper-white', tape: 'tape-silver' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['torso'] } } },
 
   // Carpet cuirass folded at the shoulders, 540 mm across and 610 mm long.
@@ -469,22 +469,22 @@ local steelFinish(steel) = { plate: steel, rim: steel, strap: 'leather-brown', b
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Hardened mail vest, 490 mm across and 630 mm long laid flat.
-  h.compound('ch_chainmail_vest', 4.5, mailVest(), { mail: 'steel-mail-dark', ring: 'steel-mail', strap: 'leather-brown', buckle: 'steel' })
+  h.compound('hardened_steel_mail_vest', 4.5, mailVest(), { mail: 'steel-mail-dark', ring: 'steel-mail', strap: 'leather-brown', buckle: 'steel' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'] } } },
 
   // Hardened sheet-metal chest guard, 460 mm across and 650 mm from the neck to the hem.
-  h.compound('ch_chestguard_metal_sheets', 12, sheetGuard({ hem: 0.35, belts: [0.05, 0.2] }), {
+  h.compound('hardened_sheet_metal_chest_guard', 12, sheetGuard({ hem: 0.35, belts: [0.05, 0.2] }), {
     sheet: 'steel-hardened', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
 
-  h.compound('ch_chestguard_metal_sheets_heavy', 33, sheetGuard({ hem: 0.35, belts: [0.05, 0.2], heavy: true }), {
+  h.compound('heavy_hardened_sheet_metal_chest_guard', 33, sheetGuard({ hem: 0.35, belts: [0.05, 0.2], heavy: true }), {
     sheet: 'steel-hardened', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
 
   // Light guard over the upper chest only, 440 mm across and 380 mm from the neck to the lower edge.
-  h.compound('ch_chestguard_metal_sheets_light', 6, sheetGuard({ hem: 0.08, belts: [0.03], half: 0.21 }), {
+  h.compound('light_hardened_sheet_metal_chest_guard', 6, sheetGuard({ hem: 0.08, belts: [0.03], half: 0.21 }), {
     sheet: 'steel-hardened', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel',
   })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },

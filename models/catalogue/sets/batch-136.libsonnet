@@ -134,21 +134,21 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // Mild steel heavy close helm, 310 mm tall: a tall comb, three gorget lames and a riveted plate over the bevor.
-  closeHelm('lc_heavyhelm_close', 4.1, 0.02, 3, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('lc_heavyhelm_close_raised', 4.1, 0.02, 3, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_heavy_close_helm', 4.1, 0.02, 3, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_heavy_close_helm_visor_up', 4.1, 0.02, 3, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // Mild steel close helm, 300 mm tall: a comb and two gorget lames.
-  closeHelm('lc_helm_close', 3.6, 0.012, 2, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('lc_helm_close_raised', 3.6, 0.012, 2, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_close_helm', 3.6, 0.012, 2, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_close_helm_visor_up', 3.6, 0.012, 2, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // Mild steel light close helm, 290 mm tall: a low comb and a single gorget lame.
-  closeHelm('lc_lighthelm_close', 3.1, 0.006, 1, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('lc_lighthelm_close_raised', 3.1, 0.006, 1, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_light_close_helm', 3.1, 0.006, 1, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_light_close_helm_visor_up', 3.1, 0.006, 1, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A mild steel nasal helm resting on its nasal bar, front on +z, 210 mm across and 235 mm tall: a pointed round
   // skull 160 mm deep with riveted bands crossing over the top, a brow band, a leather lining showing at the rim, a
   // nasal bar down the front and leather chin straps tucked up inside the rim.
   local y0 = 0.065, a = 0.1, ht = 0.165, R = (a * a + ht * ht) / (2 * ht), c = ht - R;
   local lim = 180 - std.acos(c / R) * 180 / std.pi;
-  h.compound('lc_helmet_nasal', 1.8, [
+  h.compound('mild_steel_nasal_helm', 1.8, [
     h.dome('skull', 'plate', a, ht, 0.004, 'y', [0, y0, 0], 10),
     ring('lining', 'lining', 0.09, 0.0965, y0 - 0.012, y0 + 0.02),
     ring('brow', 'band', 0.097, 0.106, y0, y0 + 0.026),
@@ -176,7 +176,7 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
   // in a bracket at the front.
   local y0 = 0.075;
   local prof = [[0, 0.104], [0.03, 0.114], [0.08, 0.118], [0.12, 0.11], [0.155, 0.088], [0.18, 0.06], [0.2, 0.034], [0.215, 0.022]];
-  h.compound('lc_helmet_turban', 2.3, [
+  h.compound('mild_steel_turban_helmet', 2.3, [
     h.turned('bowl', 'plate', 'y', [[0, 0]] + prof + [[0.225, 0.018], [0.225, 0]], [0, y0, 0]),
     h.turned('spike', 'plate', 'y', [[0, 0], [0, 0.012], [0.02, 0.008], [0.05, 0.002], [0.055, 0]], [0, y0 + 0.225, 0]),
     ring('brow', 'band', 0.103, 0.111, y0, y0 + 0.022),
