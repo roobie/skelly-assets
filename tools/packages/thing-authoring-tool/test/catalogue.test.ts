@@ -235,9 +235,9 @@ const thingRows = () =>
   );
 it('exports every authored glow as an emissive material its own GLB names exactly once', () => {
   const glowing = new Set(catalogue.items.filter(({ glow }) => glow !== undefined).map(({ id }) => id));
-  expect(glowing).toContain('road_flare');
+  expect(glowing.size).toBeGreaterThan(0);
   const rows = thingRows().filter(({ source }) => glowing.has(source));
-  expect(rows.map(({ source }) => source)).toContain('road_flare');
+  expect(new Set(rows.map(({ source }) => source))).toEqual(glowing);
   for (const row of rows) {
     const { glb, modelEntry } = row.generate();
     expect(modelEntry.emissiveMaterial, row.id).toBeDefined();
@@ -255,6 +255,24 @@ it('refuses a glow whose material the built GLB does not draw', () => {
   expect(() => exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL)).toThrow(
     'fixture: emissive material',
   );
+});
+it('refuses a glow whose colour another drawn material shares, since the GLB names both alike', () => {
+  const input = fixture();
+  const lit = Object.keys(MATERIALS).find((id) => id !== material)!;
+  const box = (slot: string, x: number) => ({ id: slot, slot, kind: 'box', min: [x, 0, 0], max: [x + 0.02, 0.02, 0.02] });
+  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], finish: { body: material, lit }, params: {
+    pieces: JSON.stringify([box('body', 0), box('lit', 0.04)]),
+  } };
+  const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] });
+  const run = () => exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  expect(run().modelEntry.emissiveMaterial).toBeDefined();
+  const colour = MATERIALS[material]!.colour;
+  MATERIALS[material]!.colour = MATERIALS[lit]!.colour;
+  try {
+    expect(run).toThrow('names 2 materials in the GLB, not one');
+  } finally {
+    MATERIALS[material]!.colour = colour;
+  }
 });
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
   const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
