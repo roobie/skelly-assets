@@ -1,7 +1,8 @@
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { applyDir, applyPoint, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import { ModelPointSchema, type NeutralModel, NeutralModelSchema } from '@skelly/thing-core/schema';
 import { singlePart } from '@skelly/thing-core/single-part';
@@ -95,6 +96,11 @@ const PartSchema = strictObject({
 const ItemSchema = strictObject({
   id: name,
   exportMass: picklist(['parts', 'inventory-atom']),
+  /**
+   * The axis the row puts its front on, or a held thing its working end, when that is not +z: a kit laid out along
+   * another axis names it once, and the build turns the model onto +z. Defaults to the family's, else +z.
+   */
+  forward: optional(picklist(FORWARDS)),
   skin: optional(SkinSchema),
   parts: pipe(
     array(PartSchema),
@@ -216,6 +222,8 @@ const builders = {
   flashlight,
   candle,
 } satisfies Record<string, (params: Readonly<Record<string, string>>, turnedSides?: number) => readonly Solid[]>;
+/** The families whose builders lay a model out with its front, or working end, off +z. */
+const FAMILY_FORWARDS: Readonly<Partial<Record<string, Forward>>> = {};
 const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
     throw new Error(`Unknown thing family ${part.family}`);
@@ -269,6 +277,8 @@ const glowMaterial = (item: ToolItem, slot: string): string => {
 /** Builds an item; with a model export's grains its datums read off the drawn voxels (see `drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
+  const forward = item.forward ?? FAMILY_FORWARDS[first.family] ?? '+z';
+  const rootPlacement = rotation(FRONT_TURNS[forward]);
   let assembly: Assembly;
   let domain: Domain;
   let masses: Readonly<Record<string, number>>;
@@ -276,6 +286,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     const wrapped = singlePart({ id: first.id, part: buildPart(first, first.params, settings.turnedSides), massKg: first.massKg, units: settings.units });
     assembly = {
       ...wrapped.assembly,
+      rootPlacement,
       name: item.id,
       parts: { [first.id]: { family: first.family, appearance: { finish: first.finish } } },
       connections: item.connections,
@@ -297,6 +308,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     assembly = {
       name: item.id,
       root: first.id,
+      rootPlacement,
       parts: Object.fromEntries(
         item.parts.map((part) => [
           part.id,
@@ -333,7 +345,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
   if (item.handling) {
     const datum = item.handling;
     handling = {
-      grip: { at: datumAt(datum), turn: datum.turn },
+      grip: { at: datumAt(datum), turn: fileGripTurn(forward, datum.turn) },
       hold: datum.hold,
       ...(datum.rest ? { rest: datum.rest } : {}),
       roll: datum.roll,

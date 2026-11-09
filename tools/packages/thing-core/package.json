@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./schema": "./src/schema.ts",
+    "./frame": "./src/frame.ts",
     "./reticle": "./src/reticle.ts",
     "./optic-aperture": "./src/opticAperture.ts",
     "./materials": "./src/materials.ts",

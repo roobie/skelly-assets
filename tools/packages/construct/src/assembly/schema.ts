@@ -184,6 +184,8 @@ export interface Assembly {
   readonly name: string;
   readonly description?: string;
   readonly root: string;
+  /** Where the root part sits in the assembly frame, so a part laid out in another frame is turned once; the identity when absent. */
+  readonly rootPlacement?: Transform;
   readonly parts: Readonly<Record<string, PartInstance>>;
   readonly connections: readonly Connection[];
   /** For fixtures: the rule ids this assembly is expected to fail. */
