@@ -1,8 +1,8 @@
 // Shared under-layer measures keep outer shells snug without burying them; straps clear the vest and its pouches.
 local carry(overJacket, suffix) =
-local bust = import 'bust-measures.libsonnet';
-local jacket = import 'jacket-measures.libsonnet';
-local bags = import 'bag-measures.libsonnet';
+local bust = import 'measures/bust.libsonnet';
+local jacket = import 'measures/jacket.libsonnet';
+local bags = import 'measures/bags.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local mirrored(id, slot, xs, ys, zs) = [
