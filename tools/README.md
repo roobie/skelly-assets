@@ -136,7 +136,7 @@ They draw through the showcase's own renderer, `../site/render.mjs`, from a buil
 showcase shows and no second renderer can drift from it. A vehicle is assembled from its built placements, the one
 source of where its parts sit; see `../docs/decisions/0001-vehicle-placements.md`. Each picture has four views over a
 ground grid, because a view fitted to its square hides scale. The views look from where the model frame puts the front, not from the
-model's proportions; see `../docs/decisions/0002-deadvox-model-frame.md`.
+model's proportions; see `../docs/decisions/0002-model-frame.md`.
 
 A sheet keeps every entry drawn into its folder, so a batch still reads whole after a few entries are redrawn. Each
 picture records a digest of the built files it was drawn from, so the gallery tells a render older than its model by

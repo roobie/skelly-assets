@@ -77,15 +77,18 @@ test('the review page loads the same three.js as the showcase', () => {
   assert.deepEqual(importMap('look.html'), importMap('index.html'));
 });
 
-// Deadvox places and attaches models with +x forward, so the review page must find a model's front there rather than
-// guess it from the model's proportions.
-test('the review page draws the front from +x, the rear from behind and the side square to forward', () => {
+// Every model file faces glTF's +z with +y up, so the review page must find a model's front there rather than guess it
+// from the model's proportions, and its right-hand profile on glTF's right, -x.
+test('the review page draws the front from +z, the rear from behind and the side from the right, square to forward', () => {
   const dot = (a, b) => a.reduce((sum, x, i) => sum + x * b[i], 0);
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const view = Object.fromEntries(REVIEW_VIEWS);
-  assert.deepEqual([FORWARD, UP, RIGHT], [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+  assert.deepEqual([FORWARD, UP], [[0, 0, 1], [0, 1, 0]]);
+  assert.deepEqual(cross(FORWARD, UP), RIGHT);
   assert.ok(dot(view['front ¾'], FORWARD) > 0);
   assert.ok(dot(view['rear ¾'], FORWARD) < 0);
   assert.equal(dot(view.side, FORWARD), 0);
+  assert.ok(dot(view.side, RIGHT) > 0);
   assert.equal(dot(view.side, UP), 0);
   assert.equal(dot(view.top, UP), 1);
 });

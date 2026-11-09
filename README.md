@@ -92,8 +92,8 @@ its pack, with the owning tool's metadata and, for things, an index for consumer
 contract rather than maintaining a second file list: `tools/build.mjs`, `exportRecipes` and
 `PRODUCTION_RECIPE_TOOLS`, and `tools/packages/thing-export/src/files.ts`, `writeRecipeExports`.
 
-Every model is authored in Deadvox's frame, so a consumer imports it without converting axes; why, and the frame, is
-in `docs/decisions/0002-deadvox-model-frame.md`.
+Every model file is written in glTF's frame, so a consumer imports it without converting axes; why, and the frame, is
+in `docs/decisions/0002-model-frame.md`.
 
 Generated actors have a GLB plus a body and pose clips, not a second consumer-specific bake; see
 `tools/layout.mjs`, `readMobRows`, and `tools/actorBake.mjs`, `bakeActor`. Every consumer reads the body and pose
