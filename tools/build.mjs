@@ -75,7 +75,7 @@ function recipeUnits(root, tools, names) {
 // its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
 // A caller exporting more than recipes passes its own pool, so every export shares the cores.
 export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool }) {
-  installJsonnetSources();
+  await installJsonnetSources();
   const tools = await recipeTools();
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
   const units = recipeUnits(root, tools, names);
@@ -159,7 +159,7 @@ export const shardUnits = (units, { index, count }) => units.filter((_, at) => a
 // is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
 // which serialises back to the same text.
 export async function fillCacheShard({ root = repo, shard, cache }) {
-  installJsonnetSources();
+  await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
   const units = [
@@ -196,9 +196,9 @@ async function main() {
   const ids = positionals.length > 0 ? positionals : [...roster.keys()];
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
-  installJsonnetSources();
+  await installJsonnetSources();
   // A taxonomy or pack dependency problem fails the production build before any model is written.
-  const taxonomies = positionals.length === 0 ? modelTaxonomies(repo) : [];
+  const taxonomies = positionals.length === 0 ? await modelTaxonomies(repo) : [];
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {

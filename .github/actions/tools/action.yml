@@ -14,8 +14,9 @@ runs:
         npm-cache: true
     - shell: bash
       run: npm ci --prefix tools
-    # One compile serves every job of a commit, and every later commit with the same Jsonnet inputs; see
-    # `tools/sources.mjs`, `refreshJsonnetTwins`.
+    # The store is content-addressed by each unit's inputs, so an exact hit serves every job of a commit and the latest
+    # store serves a later commit, which then compiles only the units it changed; see `tools/sources.mjs`,
+    # `refreshJsonnetTwins`.
     - id: twins
       shell: bash
       run: |
@@ -26,5 +27,6 @@ runs:
       with:
         path: ${{ runner.temp }}/jsonnet-twins
         key: jsonnet-twins-${{ steps.twins.outputs.digest }}
+        restore-keys: jsonnet-twins-
     - shell: bash
       run: node tools/sources.mjs

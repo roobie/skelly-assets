@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { installJsonnetSources } from '../sources.mjs';
 
-installJsonnetSources();
+await installJsonnetSources();
 const { meshBones } = await import('../packages/mobgen/src/core/mesh.ts');
 const { worldPosition } = await import('../packages/mobgen/src/core/voxelize.ts');
 
