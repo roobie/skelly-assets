@@ -1,19 +1,11 @@
-import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import process from 'node:process';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import type { RecipeExport } from './recipe.ts';
 
-const formattedJson = (value: unknown, file: string): string => {
-  const root = resolve(import.meta.dirname, '../../..');
-  return execFileSync(
-    process.execPath,
-    [resolve(root, 'node_modules/@biomejs/biome/bin/biome'), 'format', `--stdin-file-path=${file}`],
-    { cwd: root, encoding: 'utf8', input: JSON.stringify(value), maxBuffer: Number.POSITIVE_INFINITY },
-  );
-};
-export const modelEntryJson = (entry: NeutralModel): string => formattedJson(entry, `${entry.id}.model.json`);
+// Serialised in-process: a formatter subprocess per model cost more than generating most models.
+const formattedJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
+export const modelEntryJson = (entry: NeutralModel): string => formattedJson(entry);
 /** What one recipe wrote: each model's GLB path and part nodes, and every file, all relative to the base. */
 export interface WrittenRecipe {
   readonly models: readonly { readonly id: string; readonly kind: string; readonly path: string; readonly partNodes: readonly string[] }[];
@@ -32,10 +24,7 @@ export const writeRecipeExports = (
   if (index) {
     writeFileSync(
       resolve(base, directory, 'index.json'),
-      formattedJson(
-        outputs.map(({ modelEntry }) => modelEntry),
-        'index.json',
-      ),
+      formattedJson(outputs.map(({ modelEntry }) => modelEntry)),
     );
     files.push(`${directory}/index.json`);
   }
