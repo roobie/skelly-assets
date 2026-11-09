@@ -4,10 +4,11 @@
 import * as THREE from 'three';
 import { frame, isVehicle, loadEntry, makeStage, registerModels, setupRenderer, stillInstance, VIEW_DIR } from './render.mjs';
 
-const VIEWS = [
+// A side view looks across the model's longer horizontal side, so it shows a profile whichever way the model lies.
+const views = (extent) => [
   ['front ¾', VIEW_DIR],
   ['rear ¾', new THREE.Vector3(-VIEW_DIR.x, VIEW_DIR.y, -VIEW_DIR.z)],
-  ['side', new THREE.Vector3(1, 0, 0)],
+  ['side', extent.x >= extent.z ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(1, 0, 0)],
   ['top', new THREE.Vector3(0, 1, 0)],
 ];
 const BACKGROUND = '#e8e6e1';
@@ -58,7 +59,7 @@ async function look(id, size) {
   g.fillRect(0, 0, tile.width, tile.height);
   g.font = `${Math.max(11, Math.round(size / 20))}px sans-serif`;
   g.textBaseline = 'top';
-  VIEWS.forEach(([name, direction], i) => {
+  views(extent).forEach(([name, direction], i) => {
     frame(camera, obj, new THREE.Vector3(), direction);
     renderer.render(stage, camera);
     const x = (i % 2) * size;

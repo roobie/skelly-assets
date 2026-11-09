@@ -54,8 +54,8 @@ const vehicles = rows.map((row) => {
   }
 });
 
-// The sheet measures x, y, z; a vehicle faces +z, so a plate reads length (z), width (x), height (y).
-const metres = ([x, y, z]) => `${z.toFixed(2)} × ${x.toFixed(2)} × ${y.toFixed(2)} m`;
+// The sheet measures x, y, z; a plate reads length, width, height, the length being the longer horizontal side.
+const metres = ([x, y, z]) => `${Math.max(x, z).toFixed(2)} × ${Math.min(x, z).toFixed(2)} × ${y.toFixed(2)} m`;
 
 function verdict({ broken, review, reviewStale }) {
   if (broken) return '<span class="pill fault">Could not be read</span>';

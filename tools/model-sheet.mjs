@@ -38,11 +38,20 @@ const writeAtomic = (path, data) => {
 // ---- the showcase, served to the browser ----
 
 const site = join(out, 'site');
-execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, site], { stdio: ['ignore', 'ignore', 'inherit'] });
+execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, '--no-tree', site], { stdio: ['ignore', 'ignore', 'inherit'] });
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary' };
+const isFile = (path) => existsSync(path) && statSync(path).isFile();
+// The showcase built without its tree holds only the files it rewrites, such as plain clips; the rest come from the tree.
+const sitePath = (pathname) => {
+  const path = resolve(site, `.${pathname}`);
+  if (!path.startsWith(site + sep)) return undefined;
+  if (isFile(path) || !pathname.startsWith('/built/')) return path;
+  const fromTree = resolve(built, `.${pathname.slice('/built'.length)}`);
+  return fromTree.startsWith(built + sep) ? fromTree : undefined;
+};
 const server = createServer((request, response) => {
-  const path = resolve(site, `.${decodeURIComponent(new URL(request.url, 'http://look').pathname)}`);
-  if (!path.startsWith(site + sep) || !existsSync(path) || !statSync(path).isFile()) {
+  const path = sitePath(decodeURIComponent(new URL(request.url, 'http://look').pathname));
+  if (!path || !isFile(path)) {
     response.writeHead(404).end();
     return;
   }
@@ -96,7 +105,7 @@ const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
 input{font:inherit;padding:4px 8px;margin-bottom:12px;width:280px}</style>
-<p>${rows.length} models · views: front ¾ | rear ¾ / side | top · sizes x × y × z, models face +z · <input id=q placeholder="filter by id"></p><main>
+<p>${rows.length} entries · views: front ¾ | rear ¾ / side | top · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
 ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);
