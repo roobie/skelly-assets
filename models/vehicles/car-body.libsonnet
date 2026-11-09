@@ -43,7 +43,8 @@ function(id, s) {
   local bumperLow = std.get(s, 'bumperLow', 0.3) + lift,
   local bumperTop = std.get(s, 'bumperTop', 0.55) + lift,
   local tailTop = if boot then s.deck else s.waist,
-  local bumperPaint = std.get(s, 'bumperPaint', s.paint),
+  // A bumper in its own colour or in chrome takes its own slot, so a repaint of the body leaves it as authored.
+  local bumperSlot = if std.objectHas(s, 'bumperPaint') then 'bumper' else 'paint',
   local barHalf = std.get(s, 'barHalf', s.side - 0.03),
   local doorPaint = std.get(s, 'doorPaint', s.paint),
   local stripe = std.get(s, 'stripe', null),
@@ -55,7 +56,7 @@ function(id, s) {
   ],
   local sideGlass = std.get(s, 'sideGlass', 'glass-clear'),
   local paint = { paint: s.paint, trim: 'plastic-black', glass: sideGlass },
-  local bumperFinish = paint + { paint: bumperPaint },
+  local bumperFinish = paint + (if bumperSlot == 'bumper' then { bumper: s.bumperPaint } else {}),
   local doorFinish = paint + { paint: doorPaint },
   local rearPanelTop = s.rearSill,
   local floorBack = if boot then s.rear + 0.1 else s.tailWaist,
@@ -165,27 +166,27 @@ function(id, s) {
       shape.foreCorner('corner_fore', 'paint', s.frontAxle, [s.skin, s.side]),
     ], { paint: s.paint }),
     k.compound(id + '_front_bumper', 7, [
-      box('bar', 'paint', [nose - 0.05, bumperLow, -barHalf], [s.front, bumperTop, barHalf]),
+      box('bar', bumperSlot, [nose - 0.05, bumperLow, -barHalf], [s.front, bumperTop, barHalf]),
     ] + (if blankNose then [
-      box('closing', 'body', [nose - 0.02, grilleLow, -grille], [nose + 0.03, grilleTop, grille]),
+      box('closing', 'paint', [nose - 0.02, grilleLow, -grille], [nose + 0.03, grilleTop, grille]),
     ] else [
       box('grille', 'trim', [nose - 0.02, grilleLow, -grille], [nose + 0.03, grilleSplit, grille]),
     ]) + (if !blankNose && grilleSplit < grilleTop then [
-      box('closing', 'body', [nose - 0.02, grilleSplit, -grille], [nose + 0.03, grilleTop, grille]),
+      box('closing', 'paint', [nose - 0.02, grilleSplit, -grille], [nose + 0.03, grilleTop, grille]),
     ] else []) + (if accent == null then [] else [
       box('accent', 'accent', [nose + 0.03, grilleSplit - grain, -grille], [nose + 0.03 + grain, grilleSplit, grille]),
     ]) + (if std.get(s, 'grilleBars', false) then [
-      box('rail_top', 'body', [nose + 0.03, grilleTop - 0.0625, -grille], [nose + 0.06, grilleTop, grille]),
-      box('rail_foot', 'body', [nose + 0.03, grilleLow, -grille], [nose + 0.06, grilleLow + 0.0625, grille]),
+      box('rail_top', 'paint', [nose + 0.03, grilleTop - 0.0625, -grille], [nose + 0.06, grilleTop, grille]),
+      box('rail_foot', 'paint', [nose + 0.03, grilleLow, -grille], [nose + 0.06, grilleLow + 0.0625, grille]),
     ] + [
-      box('slat_' + i, 'body', [nose + 0.03, grilleLow + 0.0625, -grille + i * 0.125], [nose + 0.06, grilleTop - 0.0625, -grille + i * 0.125 + 0.0625])
+      box('slat_' + i, 'paint', [nose + 0.03, grilleLow + 0.0625, -grille + i * 0.125], [nose + 0.06, grilleTop - 0.0625, -grille + i * 0.125 + 0.0625])
       for i in std.range(0, std.floor(2 * grille / 0.125))
     ] else []) + (if bumperTop - bumperLow < 0.2 then [] else [
       box('intake', 'trim', [s.front, bumperLow + 0.04, -grille], [s.front + 0.01, bumperLow + 0.14, grille]),
-    ]), bumperFinish + { body: s.paint } + (if accent == null then {} else { accent: accent })),
+    ]), bumperFinish + (if accent == null then {} else { accent: accent })),
   ] + (if cab then [] else [
     k.compound(id + '_rear_bumper', 6, [
-      box('bar', 'paint', [s.rear - std.get(s, 'rearBarProud', 0), bumperLow, -barHalf], [s.rear + 0.13, bumperTop, barHalf]),
+      box('bar', bumperSlot, [s.rear - std.get(s, 'rearBarProud', 0), bumperLow, -barHalf], [s.rear + 0.13, bumperTop, barHalf]),
     ], bumperFinish),
     k.compound(id + '_tail_lamp', 1, [
       box('lens', 'lens', [s.rear + 0.04, 0.62 + lift, s.hatchSide], [s.rear + 0.11, s.lampTop, s.skin + 0.04]),

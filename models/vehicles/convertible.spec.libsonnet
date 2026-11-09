@@ -2,7 +2,6 @@
 (import 'coupe.spec.libsonnet') + {
   roof: 1.2, aLean: 0.42,
   open: true,
-  bumperPaint: 'paint-red',
   shellMass: 690, paint: 'paint-red',
   // Its dash is the coupe's pressing.
   borrow: { _dashboard: 'coupe_dashboard' },

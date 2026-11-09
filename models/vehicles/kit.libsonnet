@@ -1,9 +1,15 @@
 // Helpers for vehicle part rows, in the vehicle frame, frame.libsonnet.
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
+// The `paint` slot is the body colour a fitting's finish repaints, so it is the part's paintable slot wherever a piece
+// draws it with the slot's material. Trim, glass, tyres and chrome take other slots and keep their authored finish.
+local paintable(dimensions, finish) =
+  local pieces = std.get(dimensions, 'pieces', []);
+  if std.objectHas(finish, 'paint') && std.any([std.get(p, 'slot') == 'paint' && !std.objectHas(p, 'material') for p in pieces])
+  then { paintable: ['paint'] } else {};
 local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts') = {
   id: id,
   exportMass: exportMass,
-  parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
+  parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] } + paintable(dimensions, finish)],
   connections: [],
   anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
 };

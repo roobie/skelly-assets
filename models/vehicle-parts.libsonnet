@@ -1,13 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 // Vehicle parts in the vehicle frame, models/vehicles/frame.libsonnet.
-local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
-local part(id, family, massKg, dimensions, finish, anchors, exportMass) = {
-  id: id,
-  exportMass: exportMass,
-  parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
-  connections: [],
-  anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
-};
+local kit = import 'vehicles/kit.libsonnet';
+local part = kit.part;
 local tray(id, massKg, width, height, depth, exportMass) = part(id, 'block', massKg, { width: width, height: height, depth: depth }, { body: 'steel-grey' }, {
   seat: ['body', [0.5, 1, 0.5]],
 }, exportMass);
@@ -18,7 +12,7 @@ local prism(id, slot, profile, z) = { id: id, kind: 'prism', slot: slot, axis: '
 local turned(id, slot, axis, profile, origin=[0, 0, 0]) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
 local disc(radius, from, to) = [[from, 0], [from, radius], [to, radius], [to, 0], [from, 0]];
 local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, outer], [to, inner], [from, inner]];
-local compound(id, massKg, pieces, finish, anchors={}) = part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, exportMass='parts');
+local compound = kit.compound;
 // A welded shell carries both sides: each near-side piece and its reflection across the centre plane.
 local reflect(piece) = piece + { id: piece.id + '_far' } + (
   if piece.kind == 'box' then { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] }
