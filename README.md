@@ -3,6 +3,7 @@ read_if:
   - adding a model, choosing its content pack or consuming shared assets
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
+  - adding or applying the catalogue's item drafts
 ---
 
 # skelly-assets
@@ -60,6 +61,14 @@ import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
+
+The item drafts in `models/catalogue/drafts/` are Deadvox gameplay data for the catalogue models: what each
+thing is called, carries, protects and does in play. They wait here until skelly's framework refactor gives item
+content its new layout, and are applied then. Each set's drafts sit in a file named after it, so a draft is found
+beside its model. Several items may share one model when they differ only in colour, grade or size. The values
+are our own: the catalogue was drawn against another game's item data, whose share-alike licence and database
+rights would follow a copied table, so drafts keep no link to it and leave out the fields that matched it value
+for value until they are derived from our own models. See `tools/test/catalogue-drafts.test.mjs`.
 
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
