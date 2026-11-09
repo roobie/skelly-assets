@@ -12,6 +12,7 @@ local owned = std.set([
   'jacket_leather_worn_body', 'jacket_leather_worn_upper', 'jacket_leather_worn_fore',
   'gloves_leather_worn_palm', 'gloves_leather_worn_fingers', 'gloves_leather_worn_thumb',
   'boots_combat_worn_foot', 'boots_combat_worn_shaft',
+  'lame_saber', 'sun_shield',
 ]);
 [
   {
