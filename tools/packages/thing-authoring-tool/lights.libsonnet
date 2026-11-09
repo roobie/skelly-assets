@@ -11,6 +11,7 @@ local port(id, gender, pos, normal, up=[1, 0, 0]) = { id: id, mount: 'assembly-j
     }, { body: 'polymer-od-green', metal: 'steel-grey' })],
     connections: [],
     handling: { part: 'grenade', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    taxonomy: { category: 'weapons', tags: { weapon: ['explosive'], material: ['metal'], setting: ['modern'] } },
   },
   // Burn-down mass belongs to the inventory row, so these export no part masses.
   {
