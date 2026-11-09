@@ -63,6 +63,8 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   rad: rad,
   arc: arc,
   bar: bar,
+  // The x of a fork raked back from its axle at (axle, hub), `rake` m for each metre it rises.
+  forkX(axle, hub, rake): function(y) axle - (y - hub) * rake,
   compound(id, massKg, pieces, finish, anchors={}): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors),
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,

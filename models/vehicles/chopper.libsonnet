@@ -5,7 +5,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 // The raked steering axis passes through the front axle; the long reach out to it is what makes the bike a chopper.
-local forkX(y) = s.frontAxle - (y - s.frontHub) * 0.9;
+local forkX = k.forkX(s.frontAxle, s.frontHub, 0.9);
 taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('chopper_frame', 40, [
     k.bar('neck', 'frame', [forkX(1.0), 1.0], [forkX(1.12), 1.12], 0.1, [-0.05, 0.05]),

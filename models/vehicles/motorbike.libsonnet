@@ -5,7 +5,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 // The steering axis leans back 27 degrees and passes through the front axle.
-local forkX(y) = s.frontAxle - (y - s.hub) * 0.51;
+local forkX = k.forkX(s.frontAxle, s.hub, 0.51);
 local spokes = [
   local a = k.rad(i * 60);
   local c = std.cos(a);

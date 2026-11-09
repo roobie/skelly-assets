@@ -4,7 +4,7 @@ local s = import 'dirt_bike.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local forkX(y) = s.frontAxle - (y - s.frontHub) * 0.52;
+local forkX = k.forkX(s.frontAxle, s.frontHub, 0.52);
 // Blocks alternating in height round the tyre: the knobbly tread is what reads as off-road at the vehicle grain.
 local knobbly(radius) = std.flattenArrays([
   k.arc('tread_' + i, 'tyre', 0, 0, radius - 0.1, if i % 2 == 0 then radius else radius - 0.03, i * 15, (i + 1) * 15, 1, [-0.055, 0.055])

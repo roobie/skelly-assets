@@ -4,7 +4,7 @@ local s = import 'scooter.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local forkX(y) = s.frontAxle - (y - s.hub) * 0.42;
+local forkX = k.forkX(s.frontAxle, s.hub, 0.42);
 taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('scooter_frame', 26, [
     box('backbone', 'frame', [-0.3, 0.2, -0.06], [0.3, 0.26, 0.06]),
