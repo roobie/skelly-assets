@@ -35,12 +35,19 @@ jobs:
       - run: npm ci --prefix tools
       - run: node --test tools/test/*.test.mjs
 
-  # Two independent builds, so the check can show the build is deterministic rather than assume it.
+  # Two independent builds, so the check can show the build is deterministic rather than assume it. Unchanged models
+  # come from the export cache: in a PR both copies start from the latest cache, so every model the PR changes is still
+  # generated twice; on main the second copy starts empty, so a model the cache would have served stale fails the check
+  # at merge and the cache main saves holds only clean exports. A PR saves its own, so its next push starts from it. A
+  # tag builds both copies clean.
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         copy: [1, 2]
+    env:
+      CLEAN: ${{ github.ref_type == 'tag' || (github.event_name == 'push' && matrix.copy == 2) }}
+      SAVE: ${{ (github.event_name == 'pull_request' && matrix.copy == 1) || (github.ref == 'refs/heads/main' && matrix.copy == 2) }}
     steps:
       - uses: actions/checkout@v7
       - name: Cache go-jsonnet
@@ -54,7 +61,18 @@ jobs:
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
-      - run: node tools/build-all.mjs --out "$RUNNER_TEMP/built"
+      - if: env.CLEAN == 'false'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/export-cache
+          key: exports-${{ runner.os }}-${{ github.sha }}
+          restore-keys: exports-${{ runner.os }}-
+      - run: node tools/build-all.mjs --out "$RUNNER_TEMP/built" --cache "$RUNNER_TEMP/export-cache"
+      - if: env.SAVE == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/export-cache
+          key: exports-${{ runner.os }}-${{ github.sha }}
       - uses: actions/upload-artifact@v7
         with:
           name: built-${{ matrix.copy }}
