@@ -30,7 +30,9 @@ for holding as for placing keeps the turn of a model that already faces forward 
 
 A source may be laid out along another axis when its measures read that way, as a vehicle's do along its length. It
 then names that axis once, in its kit or family, and the build turns its geometry, datums and placements onto +z; see
-`tools/packages/thing-core/src/frame.ts`, `FRONT_TURNS`. A turn per model, or one on import, would let one model
+`tools/packages/thing-core/src/frame.ts`, `FRONT_TURNS`. A generator that keeps its own frame, as gungen and mobgen
+do because their authored data reads in it, turns at its export instead; see
+`tools/packages/gun-authoring-tool/src/gun/exportFrame.ts`, `FILE_FROM_GUNGEN`, and `tools/packages/mobgen/src/core/conventions.ts`, `TO_MODEL_FRAME`. A turn per model, or one on import, would let one model
 drift from its kind. A source that names no axis already faces +z, so a new kind is authored facing +z.
 
 The pages read the frame from `site/modelFrame.mjs`, `FORWARD`, so the review page draws its front and rear
