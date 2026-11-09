@@ -7,6 +7,28 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.4.1 - 2026-11-09
+
+### Breaking
+
+- Vehicle part rows that differed only in paint are merged: a taxi, a police car or a camper van now fits the shared
+  pressing, and the site that fits it names the paint in a new `finish`. Part models mark the materials that take paint,
+  as `paintable` slots in each part's `*.model.json` and `paintable` in each glTF material's extras.
+
+### Upgrading from 0.4.0
+
+- Apply `renames.json` to saved and authored part ids; the retired rows map to the shared pressing.
+- Read `finish` from each site in `vehicles/<vehicle>.placements.json` and from fittings built on them, and give that
+  copy of the part the finish library's material when the vehicle is spawned; a site without one keeps the part's own
+  materials.
+- Apply a finish only to materials marked `paintable`, never to the rest of the part, and keep the paint with the copy
+  of the part afterwards rather than with the vehicle or the model.
+
+### Changed
+
+- A build from source reuses every model whose source and generator code are unchanged, so a rebuild after an edit
+  takes seconds rather than minutes. Exported files are unchanged.
+
 ## 0.4.0 - 2026-11-09
 
 ### Breaking
