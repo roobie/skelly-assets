@@ -66,7 +66,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              + cuffs('cuff', 'fur', w, d, ht, 0.08, 0.045, 0.01)
              + [box('buckle', 'buckle', [-0.03, ht + 0.006, 0.0], [0.03, ht + 0.012, 0.04])],
              { cloth: 'cloth-red', sleeve: 'cloth-red', collar: 'fur-pale', fur: 'fur-pale', belt: 'leather-black', buckle: 'metal-gold' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Short sleeveless red dress with white faux-fur trim, folded, 320 mm by 320 mm and 50 mm tall.
   local w = 0.32, d = 0.32, ht = 0.05;
@@ -78,7 +78,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
                for s in [-1, 1]
              ],
              { cloth: 'cloth-red', collar: 'fur-pale', fur: 'fur-pale' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Bulky short-sleeved shirt woven from dried grass, folded, 360 mm by 360 mm and 90 mm tall, a ragged fringe at the hem.
   local w = 0.36, d = 0.36, ht = 0.09;
@@ -99,7 +99,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
                for x in [-w / 2 + 0.02 + i * (w - 0.04) / 13]
              ],
              { cloth: 'straw-pale', sleeve: 'straw-pale', collar: 'jute', weave: 'jute', fringe: 'straw-pale' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['torso'] } } },
 
   // Long black dress with full sleeves, a high red collar, red cuffs and red embroidery laced down the front, folded,
   // 360 mm by 420 mm and 70 mm tall.
@@ -114,7 +114,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              ]
              + hemTrim('hem', 'trim', w, d, ht, 0.02, 0.004),
              { cloth: 'cloth-black', sleeve: 'cloth-black', collar: 'cloth-crimson', trim: 'cloth-crimson' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Short red dress in a doll-like gothic cut: black ruffled hem, black cuffs and a black bow at the chest, folded,
   // 320 mm by 300 mm and 55 mm tall.
@@ -126,7 +126,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              + bow('bow', 'trim', 0, d / 2 - 0.175, ht + 0.003, 0.035)
              + [box('placket', 'trim', [-0.01, ht, -d / 2 + 0.04], [0.01, ht + 0.003, d / 2 - 0.16])],
              { cloth: 'cloth-red', sleeve: 'cloth-red', collar: 'cloth-black', trim: 'cloth-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Heavy red gown with black sleeves, a black laced bodice, a high collar and a ruffled hem, folded, 420 mm by 460 mm
   // and 130 mm tall.
@@ -138,7 +138,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              + ruffle('ruffle', 'trim', w, d, ht, 0.02, 11)
              + cuffs('cuff', 'lace', w, d, ht, 0.095, 0.04, 0.008),
              { cloth: 'cloth-crimson', sleeve: 'cloth-black', collar: 'cloth-black', trim: 'cloth-black', lace: 'cloth-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Light sleeveless yellow cotton dress with shoulder straps and a cream sash, folded, 300 mm by 320 mm and 30 mm tall.
   local w = 0.3, d = 0.32, ht = 0.03;
@@ -157,7 +157,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
                for j in std.range(0, 2)
              ],
              { cloth: 'cloth-yellow', lining: 'cloth-cream', strap: 'cloth-yellow', sash: 'cloth-cream', dot: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Cream wool sweater with cable knitting down the front and ribbed neck, cuffs and hem, folded, 340 mm by 340 mm and
   // 70 mm tall.
@@ -177,7 +177,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
                for k in std.range(0, 2)
              ]),
              { cloth: 'cloth-cream', sleeve: 'cloth-cream', collar: 'cloth-cream', rib: 'cloth-cream', cable: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Thick grey cotton sweatshirt with a ribbed neck, cuffs and waistband and a darker V at the collar, folded,
   // 360 mm by 340 mm and 80 mm tall.
@@ -188,7 +188,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              + cuffs('cuff', 'rib', w, d, ht, 0.09, 0.045)
              + [g.flat('v-insert', 'trim', [[-0.03, d / 2 - 0.168], [0.03, d / 2 - 0.168], [0, d / 2 - 0.225]], ht, 0.004)],
              { cloth: 'canvas-grey', sleeve: 'canvas-grey', collar: 'cloth-charcoal', rib: 'cloth-charcoal', trim: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // White cotton undershirt with a knotted fringe of cords at each of its four corners, folded, 280 mm by 300 mm and
   // 30 mm tall.
@@ -204,7 +204,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
                for z in [if zi == 0 then -d / 2 + 0.015 else d / 2 - 0.08]
              ]),
              { cloth: 'cloth-cream', lining: 'cloth-bright-white', stripe: 'cloth-navy', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Grey canvas work t-shirt with one chest pocket, folded, 300 mm by 300 mm and 35 mm tall.
   local w = 0.3, d = 0.3, ht = 0.035;
@@ -212,14 +212,14 @@ local tassel(prefix, slot, x, z, s, ht) = [
              g.jacket({ w: w, d: d, ht: ht, folds: 2, front: 'none', buttons: 0, collar: { r: 0.055, wd: 0.015, ht: 0.006, gap: 0 }, sleeves: { kind: 'flat', w: 0.07, t: 0.005 }, pockets: [{ x: -0.065, z: -0.04, w: 0.07, d: 0.08, flap: 0, single: true }] })
              + [box('pocket-pen', 'pen', [-0.085, ht + 0.004, -0.01], [-0.077, ht + 0.012, 0.02])],
              { cloth: 'canvas-grey', sleeve: 'canvas-grey', collar: 'cloth-charcoal', pocket: 'canvas-grey', pen: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Plain blue cotton t-shirt, folded, 280 mm by 280 mm and 25 mm tall.
   local w = 0.28, d = 0.28, ht = 0.025;
   h.compound('tshirt', 0.18,
              g.jacket({ w: w, d: d, ht: ht, folds: 2, front: 'none', buttons: 0, collar: { r: 0.05, wd: 0.012, ht: 0.004, gap: 0 }, sleeves: { kind: 'flat', w: 0.065, t: 0.004 } }),
              { cloth: 'cloth-blue', sleeve: 'cloth-blue', collar: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Purple cotton crop top, the body cut short, folded, 260 mm by 180 mm and 20 mm tall.
   local w = 0.26, d = 0.18, ht = 0.02;
@@ -227,7 +227,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              g.jacket({ w: w, d: d, ht: ht, folds: 2, neck: 0.075, front: 'none', buttons: 0, collar: { r: 0.05, wd: 0.012, ht: 0.004, gap: 0 }, sleeves: { kind: 'flat', w: 0.06, t: 0.004 } })
              + [box('hem', 'collar', [-w / 2 + 0.06, ht, -d / 2 + 0.004], [w / 2 - 0.06, ht + 0.003, -d / 2 + 0.016])],
              { cloth: 'cloth-purple', sleeve: 'cloth-purple', collar: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Saffron monk's upper robe folded into a flat bundle, 320 mm by 240 mm and 40 mm tall, its pieced panels marked by
   // raised seams.
@@ -246,7 +246,7 @@ local tassel(prefix, slot, x, z, s, ht) = [
              ]
              + [box('rib-%d' % i, 'seam', [x - 0.002, ht, -0.04], [x + 0.002, ht + 0.003, 0.04]) for i in std.range(0, 3) for x in [-w / 2 + 0.015 + (i + 0.5) * (w - 0.03) / 4]],
              { cloth: 'cloth-saffron', seam: 'cloth-orange' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Thick brown leather vest with a snap front and two flapped pockets, folded once, 380 mm by 360 mm and 40 mm tall.
   local w = 0.38, d = 0.36, ht = 0.04;
@@ -260,5 +260,5 @@ local tassel(prefix, slot, x, z, s, ht) = [
              + h.crescent('armhole-l', 'lining', 0.004, 0.05, 0, 180, 8, ht, ht + 0.002, -w / 2, d / 2 - 0.1)
              + h.crescent('armhole-r', 'lining', 0.004, 0.05, 180, 360, 8, ht, ht + 0.002, w / 2, d / 2 - 0.1),
              { cloth: 'leather-chestnut', front: 'leather-chestnut', edge: 'leather-chestnut', button: 'steel-bright', pocket: 'leather-chestnut', flap: 'leather-chestnut', lining: 'cloth-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 ]

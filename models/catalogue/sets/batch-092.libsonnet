@@ -102,7 +102,7 @@ local quiltedTube(id, l, r, z, pitch) =
 [
   // A pair of carpet arm guards: per arm a square of carpet rolled round the forearm, 200 mm long and 104 mm across,
   // and a wider one, 220 mm long and 120 mm across, round the upper arm, all held with duct tape, laid side by side.
-  h.compound('carpet_armguards', 0.7, carpetArm(-1, true) + carpetArm(1, true), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' })
+  h.compound('carpet_armguards', 0.7, carpetArm(-1, true) + carpetArm(1, true), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A pair of carpet bracers: a square of carpet rolled round each forearm, 200 mm long and 104 mm across, held with
@@ -121,7 +121,7 @@ local quiltedTube(id, l, r, z, pitch) =
       h.turned('cop-boss-%d' % s, 'plate', 'y', [[0, 0], [0, 0.03], [0.008, 0.024], [0.012, 0]], [0, 0.055, s * 0.11]),
     ]
     for s in [-1, 1]
-  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel', rivet: 'steel' })
+  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel', rivet: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['arms'] } } },
 
   // A pair of sheet steel bracers laid side by side: a forearm plate 220 mm long curled round a 50 mm radius with a
@@ -129,7 +129,7 @@ local quiltedTube(id, l, r, z, pitch) =
   h.compound('hardened_steel_bracers', 0.8, std.flattenArrays([
     platedArm('fore-%d' % s, 0.05, 75, -0.11, 0.11, s * 0.09)
     for s in [-1, 1]
-  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel' })
+  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['arms'] } } },
 
   // A pair of sheet steel elbow cops, each a dome 110 mm across and 45 mm tall with a riveted side wing and a leather
@@ -159,7 +159,7 @@ local quiltedTube(id, l, r, z, pitch) =
       box('buckle-%d' % s, 'buckle', [-0.25, 0, s * 0.12 - 0.018], [-0.238, 0.006, s * 0.12 + 0.018]),
     ]
     for s in [-1, 1]
-  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel' })
+  ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['arms'] } } },
 
   // A pair of chainmail sleeves laid flat side by side, 560 mm long, 170 mm across at the shoulder and 110 mm at the
@@ -172,7 +172,7 @@ local quiltedTube(id, l, r, z, pitch) =
   ]) + [
     box('strap', 'strap', [-0.27, 0.008, -0.13], [-0.24, 0.012, 0.13]),
     box('strap-buckle', 'buckle', [-0.272, 0.008, -0.01], [-0.238, 0.016, 0.01]),
-  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' })
+  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of padded cotton sleeves laid flat side by side, 560 mm long, 180 mm across at the shoulder and 120 mm at
@@ -180,7 +180,7 @@ local quiltedTube(id, l, r, z, pitch) =
   h.compound('padded_cloth_sleeves', 0.29, std.flattenArrays([
     quiltedSleeve('sleeve-%d' % s, 0.56, 0.18, 0.12, 0.012, s * 0.105, 0.07)
     for s in [-1, 1]
-  ]), { cloth: 'cloth-cotton', quilt: 'cloth-rag', lace: 'cloth-white' })
+  ]), { cloth: 'cloth-cotton', quilt: 'cloth-rag', lace: 'cloth-white' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A pair of elbow pads laid side by side: each a fabric sleeve 120 mm long and 100 mm across with a moulded
@@ -201,7 +201,7 @@ local quiltedTube(id, l, r, z, pitch) =
   h.compound('gambeson_sleeve', 1, std.flattenArrays([
     quiltedTube('sleeve-%d' % s, 0.58, 0.055, s * 0.07, 0.045)
     for s in [-1, 1]
-  ]), { quilt: 'cloth-canvas', binding: 'cloth-rag-shadow', lace: 'leather-brown' })
+  ]), { quilt: 'cloth-canvas', binding: 'cloth-rag-shadow', lace: 'leather-brown' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of tyre arm guards laid side by side: per arm a curved chunk of tread 200 mm long round the forearm and
@@ -222,6 +222,6 @@ local quiltedTube(id, l, r, z, pitch) =
       for p in [[[0.058, -0.21], [0.058, -0.07], [0.05, 0.025], [0.05, 0.16]][i]]
     ])
     for s in [-1, 1]
-  ]), { rubber: 'rubber-black', tape: 'tape-grey' })
+  ]), { rubber: 'rubber-black', tape: 'tape-grey' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['arms'] } } },
 ]

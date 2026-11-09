@@ -55,14 +55,14 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
   h.compound('down_mattress', 4.7,
     mattress(0.17)
     + g.quilt({ style: 'channels', along: 'z', pitch: 0.095, r: 0.022, x0: -0.92, x1: 0.92, z0: -0.43, z1: 0.43, y: 0.17 }),
-    { cover: 'cloth-cream', piping: 'cloth-heather-grey', quilt: 'cloth-cream' }) + { taxonomy: { category: 'furniture', tags: { material: ['fabric'] } } },
+    { cover: 'cloth-cream', piping: 'cloth-heather-grey', quilt: 'cloth-cream' }) + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'] } } },
   // A single sprung mattress, 1.9 m by 0.9 m and 0.18 m deep, striped ticking with tufts and side vents.
   h.compound('mattress', 18,
     mattress(0.18)
     + [h.box('stripe-%d' % i, 'stripe', [-0.94, 0.174, -0.42 + i * 0.07], [0.94, 0.176, -0.405 + i * 0.07]) for i in std.range(0, 12)]
     + [h.disc('tuft-%d-%d' % [i, j], 'tuft', 0.012, 0.174, 0.18, -0.75 + i * 0.25, -0.3 + j * 0.3) for i in std.range(0, 6) for j in std.range(0, 2)]
     + [h.disc('vent-%d' % i, 'vent', 0.008, 0.07, 0.11, s * 0.6, 0.452) for i in [0, 1] for s in [[-1, 1][i]]],
-    { cover: 'cloth-cream', piping: 'cloth-navy', stripe: 'cloth-blue', tuft: 'cloth-navy', vent: 'steel-grey' }) + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
+    { cover: 'cloth-cream', piping: 'cloth-navy', stripe: 'cloth-blue', tuft: 'cloth-navy', vent: 'steel-grey' }) + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
   // Four 72 mm RC buggy wheels lying two by two, 0.15 m square.
   h.compound('remote_control_car_wheels', 0.15,
     wheel(0, -0.038, -0.038) + wheel(1, 0.038, -0.038) + wheel(2, -0.038, 0.038) + wheel(3, 0.038, 0.038),

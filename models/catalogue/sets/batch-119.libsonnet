@@ -133,12 +133,12 @@ local coif =
 
   // A canvas aketon folded on a shelf, 380 mm by 340 mm and 70 mm tall in four layers: quilted channels down the
   // front, a stand collar, the quilted sleeves folded in along each side and toggles closing the front.
-  h.compound('canvas_aketon', 2.5, aketon(0.38, 0.34, 0.07, 4, true), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
+  h.compound('canvas_aketon', 2.5, aketon(0.38, 0.34, 0.07, 4, true), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless canvas aketon folded on a shelf, 340 mm by 320 mm and 50 mm tall: quilted channels, a stand collar,
   // armholes at the shoulders and a laced front.
-  h.compound('canvas_aketon_vest', 1.5, aketon(0.34, 0.32, 0.05, 3, false), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
+  h.compound('canvas_aketon_vest', 1.5, aketon(0.34, 0.32, 0.05, 3, false), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A pair of quilted canvas arming gloves laid flat side by side, backs up, each 230 mm from cuff to fingertip and

@@ -2,3 +2,4 @@ dist/
 items.json
 exports/deadvox.json
 test/fixtures/bend-strip.json
+test/fixtures/lying-on-back.json

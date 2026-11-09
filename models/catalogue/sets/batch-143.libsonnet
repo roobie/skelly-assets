@@ -155,7 +155,7 @@ local cartridgeNecklace(id, mass, body) =
                h.prism('spade', 'tail', 'y', [[0, 0.272], [0.03, 0.31], [0, 0.345], [-0.03, 0.31]], 0.001, 0.009),
                box('clip', 'clip', [-0.31, 0, -0.012], [-0.285, 0.024, 0.012]),
              ],
-             { tail: 'lacquer-red', tip: 'lacquer-red', clip: 'plastic-matte-black' })
+             { tail: 'lacquer-red', tip: 'lacquer-red', clip: 'plastic-matte-black' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['waist'] } } },
 
   // Diver's watch: a 42 mm steel case with a black turning bezel, lying face up on its steel link bracelet, laid
@@ -221,7 +221,7 @@ local cartridgeNecklace(id, mass, body) =
   h.compound('faux_fur_cat_tail', 0.11,
              tail(0.5, 0.024, 0.016, 40, 0.06, 0.2)
              + [box('clip', 'clip', [-0.29, 0, -0.012], [-0.262, 0.03, 0.012])],
-             { tail: 'fur-pale', tip: 'fur-brown', clip: 'plastic-matte-black' })
+             { tail: 'fur-pale', tip: 'fur-brown', clip: 'plastic-matte-black' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // Faux fur kitty collar: a fluffy band 25 mm wide laid as a ring 130 mm across, open at the back where it

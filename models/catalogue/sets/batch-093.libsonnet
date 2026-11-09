@@ -78,7 +78,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   ]) + [
     box('strap', 'strap', [-0.27, 0.008, -0.13], [-0.24, 0.012, 0.13]),
     box('strap-buckle', 'buckle', [-0.272, 0.008, -0.01], [-0.238, 0.016, 0.01]),
-  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' })
+  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of sleeves cut from a heavy cotton shirt, laid flat side by side, 560 mm long, 180 mm across at the
@@ -101,7 +101,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('cord', 'stitch', [-0.29, 0.01, -0.14], [-0.282, 0.016, 0.14]),
     box('cord-end-a', 'stitch', [-0.33, 0.0, -0.01], [-0.282, 0.005, -0.004]),
     box('cord-end-b', 'stitch', [-0.32, 0.0, 0.004], [-0.282, 0.005, 0.01]),
-  ], { cloth: 'cloth-canvas', leather: 'leather-brown', stitch: 'skin-rawhide' })
+  ], { cloth: 'cloth-canvas', leather: 'leather-brown', stitch: 'skin-rawhide' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'leather'], slot: ['arms'] } } },
 
   // A pair of light leather archery vambraces laid side by side, crown up: each a stiff curved guard 220 mm long
@@ -119,7 +119,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
       for x in [-0.085 + i * 0.07]
     ])
     for s in [-1, 1]
-  ]), { leather: 'leather-brown', edge: 'leather-black', strap: 'leather-black', buckle: 'brass' })
+  ]), { leather: 'leather-brown', edge: 'leather-black', strap: 'leather-black', buckle: 'brass' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['arms'] } } },
 
   // A plate carrier lying flat, front up: a front panel 360 mm wide and 460 mm long over the back panel, a plate

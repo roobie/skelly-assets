@@ -19,8 +19,8 @@ local atom = m.atom;
       { indices: [3, 6, 4], slot: 'fold' }, { indices: [6, 7, 4], slot: 'body' },
       { indices: [4, 7, 8], slot: 'fold' }, { indices: [4, 8, 5], slot: 'body' },
     ],
-  }, { body: 'cloth-rag', fold: 'cloth-rag-shadow' }, 'fold-4') + { taxonomy: { tags: { material: ['fabric'] } } },
-  atom('duct_tape', 'ring', 'parts', 0.150, { outerRadius: 0.05, innerRadius: 0.018, coreRadius: 0.020, height: 0.048 }, { body: 'tape-grey', core: 'paperboard-tan' }, fraction=[0.87, 0.5, 0.5]),
+  }, { body: 'cloth-rag', fold: 'cloth-rag-shadow' }, 'fold-4', turn=[0, -90, 0]) + { taxonomy: { tags: { material: ['fabric'] } } },
+  atom('duct_tape', 'ring', 'parts', 0.150, { outerRadius: 0.05, innerRadius: 0.018, coreRadius: 0.020, height: 0.048 }, { body: 'tape-grey', core: 'paperboard-tan' }, fraction=[0.87, 0.5, 0.5], turn=[0, -90, 0]),
   atom('nails', 'turnedStock', 'parts', 0.005, {
     axis: 'x', profile: [[0, 0], [0.008, 0.0017], [0.067, 0.0017], [0.067, 0.0042], [0.070, 0.0042], [0.070, 0], [0, 0]],
   }, { body: 'steel-grey' }) + {
@@ -42,7 +42,7 @@ local atom = m.atom;
       { indices: [0, 7, 8], slot: 'body' }, { indices: [0, 8, 9], slot: 'body' },
       { indices: [0, 9, 10], slot: 'fold' }, { indices: [0, 10, 1], slot: 'body' },
     ],
-  }, { body: 'scrap-rusted', fold: 'steel-grey' }, 'fold-0') + { taxonomy: { tags: { material: ['metal'] } } },
+  }, { body: 'scrap-rusted', fold: 'steel-grey' }, 'fold-0', turn=[0, -90, 0]) + { taxonomy: { tags: { material: ['metal'] } } },
   atom('stick', 'turnedStock', 'parts', 0.200, {
     axis: 'x', profile: [[0, 0], [0, 0.009], [0.025, 0.013], [0.11, 0.010], [0.125, 0.016], [0.145, 0.011], [0.27, 0.009], [0.29, 0.012], [0.31, 0.008], [0.395, 0.006], [0.4, 0], [0, 0]],
   }, { body: 'wood-walnut' }) + { taxonomy: { tags: { material: ['wood'] } } },
@@ -52,10 +52,10 @@ local atom = m.atom;
   atom('wooden_plank', 'cutStock', 'parts', 0.500, {
     axis: 'y', start: 0, end: 0.022,
     profile: [[-0.045, -0.40], [0.045, -0.395], [0.045, 0.395], [-0.04, 0.40]],
-  }, { body: 'wood-birch' }) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  }, { body: 'wood-birch' }, turn=[0, -90, 0]) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   atom('whetstone', 'cutStock', 'parts', 0.250, {
     axis: 'y', start: 0, end: 0.025,
-    profile: [[-0.075, -0.024], [0.075, -0.024], [0.075, 0.024], [-0.075, 0.024]],
+    profile: [[-0.024, -0.075], [0.024, -0.075], [0.024, 0.075], [-0.024, 0.075]],
   }, { body: 'stone-whet' }) + { taxonomy: { tags: { material: ['stone'] } } },
   atom('field_patch', 'foldedSheet', 'parts', 0.120, {
     thickness: 0.0015,
@@ -70,5 +70,5 @@ local atom = m.atom;
       { indices: [2, 3, 4], slot: 'fold' }, { indices: [3, 5, 4], slot: 'fold' },
       { indices: [4, 5, 6], slot: 'body' }, { indices: [5, 7, 6], slot: 'body' },
     ],
-  }, { body: 'steel-grey', fold: 'paint-charcoal' }, 'fold-2') + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  }, { body: 'steel-grey', fold: 'paint-charcoal' }, 'fold-2', turn=[0, -90, 0]) + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 ]

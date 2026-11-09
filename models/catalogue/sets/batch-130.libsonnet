@@ -269,5 +269,5 @@ local oval(a, b, p, n, cx, cy) = [
                                               sbox('quilt-%d' % i, 'binding', [-0.09 + 0.06 * i - 0.002, 0.004, p[1] - 0.04], [-0.09 + 0.06 * i + 0.002, 0.0055, p[1] + 0.04])
                                               for i in std.range(1, 2)
                                             ], { cloth: 'cloth-khaki', binding: 'aramid-gold', strip: 'hook-loop-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 ]

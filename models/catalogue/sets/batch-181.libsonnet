@@ -149,7 +149,7 @@ local mirrorArmor(id, mass, style) =
                                       + plate('belly-r', 0.03, 0.12, -0.155, -0.075, ht)
                                       + plate('sleeve-l', -w / 2 + 0.01, -w / 2 + 0.075, -0.13, 0.04, st)
                                       + plate('sleeve-r', w / 2 - 0.075, w / 2 - 0.01, -0.13, 0.04, st),
-             { cloth: 'cloth-denim', collar: 'cloth-denim', front: 'cloth-denim', sleeve: 'cloth-denim', button: 'brass-dull', plate: 'steel-bright', rivet: 'steel' })
+             { cloth: 'cloth-denim', collar: 'cloth-denim', front: 'cloth-denim', sleeve: 'cloth-denim', button: 'brass-dull', plate: 'steel-bright', rivet: 'steel' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A black leather motorcycle jacket folded flat, 420 mm by 340 mm and 80 mm tall: wide lapels, a zip running
@@ -172,7 +172,7 @@ local mirrorArmor(id, mass, style) =
                                         + hexPlate('shoulder-r', sx, 0.1, 0.038, 0.05, st)
                                         + hexPlate('elbow-l', -sx, -0.06, 0.038, 0.05, st)
                                         + hexPlate('elbow-r', sx, -0.06, 0.038, 0.05, st),
-             { cloth: 'leather-black', collar: 'leather-black', front: 'leather-black', sleeve: 'leather-black', zip: 'metal-silver', plate: 'steel-bright', rivet: 'steel' })
+             { cloth: 'leather-black', collar: 'leather-black', front: 'leather-black', sleeve: 'leather-black', zip: 'metal-silver', plate: 'steel-bright', rivet: 'steel' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'metal'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A brown leather motorcycle jacket folded flat, 420 mm by 340 mm and 80 mm tall, with chunks of tyre stitched on:
@@ -195,7 +195,7 @@ local mirrorArmor(id, mass, style) =
                                          + tread('shoulder-r', sx, 0.1, 0.07, 0.07, st)
                                          + tread('arm-l', -sx, -0.06, 0.07, 0.13, st)
                                          + tread('arm-r', sx, -0.06, 0.07, 0.13, st),
-             { cloth: 'leather-brown', collar: 'leather-brown', front: 'leather-brown', sleeve: 'leather-brown', button: 'brass-dull', tyre: 'rubber-tread', lug: 'rubber-offblack' })
+             { cloth: 'leather-brown', collar: 'leather-brown', front: 'leather-brown', sleeve: 'leather-brown', button: 'brass-dull', tyre: 'rubber-tread', lug: 'rubber-offblack' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'rubber'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A thick black leather jacket folded flat, 420 mm by 340 mm and 80 mm tall, covered in carved bone: a breastbone
@@ -228,7 +228,7 @@ local mirrorArmor(id, mass, style) =
                                            ]
                                            for s in [-1, 1]
                                          ]),
-             { cloth: 'leather-black', collar: 'leather-black', sleeve: 'leather-black', bone: 'bone', carving: 'plastic-charcoal' })
+             { cloth: 'leather-black', collar: 'leather-black', sleeve: 'leather-black', bone: 'bone', carving: 'plastic-charcoal' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'bone'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A light concealable ballistic vest lying flat, front up: a navy front panel 460 mm across and 560 mm from hem
@@ -256,7 +256,7 @@ local mirrorArmor(id, mass, style) =
     for z in [[-0.18, -0.06][k]]
   ] + [
     box('label', 'label', [-0.04, 0.024, 0.06], [0.04, 0.028, 0.12]),
-  ], { cloth: 'cloth-navy', back: 'cloth-navy', lining: 'cloth-charcoal', tab: 'hook-loop-grey', strap: 'cloth-charcoal', label: 'cloth-cream' })
+  ], { cloth: 'cloth-navy', back: 'cloth-navy', lining: 'cloth-charcoal', tab: 'hook-loop-grey', strap: 'cloth-charcoal', label: 'cloth-cream' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A foil fencing vest lying flat, front up: a sleeveless top of silvery woven metal cloth 400 mm across and
@@ -270,7 +270,7 @@ local mirrorArmor(id, mass, style) =
     box('neck-binding-r', 'binding', [0.07, 0.0, 0.22], [0.082, 0.008, 0.28]),
     box('clip-tab', 'binding', [0.15, 0.006, -0.27], [0.18, 0.01, -0.22]),
     box('clip', 'clip', [0.155, 0.01, -0.26], [0.175, 0.016, -0.235]),
-  ], { cloth: 'cloth-shimmer', lining: 'cloth-white', binding: 'cloth-cream', clip: 'steel-bright' })
+  ], { cloth: 'cloth-shimmer', lining: 'cloth-white', binding: 'cloth-cream', clip: 'steel-bright' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A sabre fencing jacket lying flat, front up: silvery woven metal cloth 400 mm across and 480 mm long, cut
@@ -286,7 +286,7 @@ local mirrorArmor(id, mass, style) =
   ] + [
     taper('cuff-%d' % (s + 1), 'binding', alongSleeve(o, s, 0.93), alongSleeve(o, s, 1.0), 0.094, 0.094, 0.0, 0.008)
     for s in [-1, 1]
-  ], { cloth: 'cloth-shimmer', sleeve: 'cloth-shimmer', lining: 'cloth-shimmer', binding: 'cloth-cream', clip: 'steel-bright' })
+  ], { cloth: 'cloth-shimmer', sleeve: 'cloth-shimmer', lining: 'cloth-shimmer', binding: 'cloth-cream', clip: 'steel-bright' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'] } } },
 
   // A motorcycle mesh jacket lying flat, front up: black stretch cloth 460 mm across and 560 mm long with open mesh
@@ -310,7 +310,7 @@ local mirrorArmor(id, mass, style) =
     + pad('elbow-%d' % (s + 1), alongSleeve(o, s, 0.55), 0.1, 0.1, 0.008)
     + pad('forearm-%d' % (s + 1), alongSleeve(o, s, 0.8), 0.08, 0.1, 0.008)
     for s in [-1, 1]
-  ]), { cloth: 'lycra-black', sleeve: 'lycra-black', lining: 'cloth-charcoal', mesh: 'mesh-black', zip: 'metal-silver', collar: 'lycra-black', pad: 'plastic-grey', vent: 'plastic-charcoal' })
+  ]), { cloth: 'lycra-black', sleeve: 'lycra-black', lining: 'cloth-charcoal', mesh: 'mesh-black', zip: 'metal-silver', collar: 'lycra-black', pad: 'plastic-grey', vent: 'plastic-charcoal' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['torso', 'arms'] } } },
 
   // Mild steel mirror armour laid out as a set, 500 mm across and 550 mm long: front and back panels 220 by 270 mm,
@@ -342,6 +342,6 @@ local mirrorArmor(id, mass, style) =
     box('waist-strap', 'strap', [-0.22, 0.012, -0.17], [0.22, 0.016, -0.135]),
     box('waist-buckle', 'buckle', [0.13, 0.016, -0.174], [0.165, 0.021, -0.131]),
     box('neck-binding', 'strap', [-0.08, 0.0, top - 0.012], [0.08, 0.012, top]),
-  ], { cloth: 'steel-mail', lining: 'leather-brown', rings: 'steel-mail', strap: 'leather-brown', buckle: 'brass-dull' })
+  ], { cloth: 'steel-mail', lining: 'leather-brown', rings: 'steel-mail', strap: 'leather-brown', buckle: 'brass-dull' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso'] } } },
 ]

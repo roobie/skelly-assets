@@ -224,7 +224,9 @@ const builders = {
 } satisfies Record<string, (params: Readonly<Record<string, string>>, turnedSides?: number) => readonly Solid[]>;
 /**
  * The families whose builders lay a model out with its front, or working end, off +z: tools and stock measured along
- * their length on x, and the headlamp, whose lens faces -z.
+ * their length on x, and the headlamp, whose lens faces -z. A family whose things have no front in use (sheets, tape
+ * rings, cut stock, kits, slings) is absent: its source lays the longest side along x, as the fallback in
+ * docs/decisions/0002-model-frame.md asks.
  */
 const FAMILY_FORWARDS: Readonly<Partial<Record<string, Forward>>> = {
   crowbar: '+x',
@@ -238,14 +240,9 @@ const FAMILY_FORWARDS: Readonly<Partial<Record<string, Forward>>> = {
   candle: '+x',
   flashlight: '+x',
   blowtorch: '+x',
-  webbingSling: '+x',
-  repairKit: '+x',
   pliers: '+x',
-  cutStock: '+x',
   turnedStock: '+x',
-  foldedSheet: '+x',
   handOpener: '+x',
-  ring: '+x',
   headlamp: '-z',
 };
 const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {

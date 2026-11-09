@@ -468,7 +468,7 @@ local mailBundle(o) =
                for i in [0, 1]
              ]),
              { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-cream', button: 'cloth-cream', pocket: 'cloth-cream', flap: 'cloth-cream', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal', strap: 'cloth-cream', tab: 'hook-loop-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dog-handler's bite suit folded into a thick bundle, 460 mm by 380 mm and 160 mm tall: denim outer quilted in
   // raised channels over the padding strips, a stand collar, a zipped front, the padded sleeves rolled along both
@@ -477,15 +477,15 @@ local mailBundle(o) =
              g.jacket({ w: 0.46, d: 0.38, ht: 0.16, folds: 4, front: 'placket', frontW: 0.04, frontT: 0.008, buttons: 0, collar: { r: 0.08, wd: 0.04, ht: 0.035, gap: 30 }, sleeves: { kind: 'roll', r: 0.055 } })
              + g.quilt({ style: 'channels', x0: -0.12, x1: 0.12, z0: -0.17, z1: 0.04, y: 0.16, pitch: 0.045, r: 0.014 }),
              { cloth: 'cloth-denim', collar: 'aramid-gold', front: 'cloth-denim-faded', button: 'cloth-denim-faded', sleeve: 'cloth-denim', stitch: 'cloth-denim-faded', cuff: 'aramid-gold', quilt: 'cloth-denim-faded' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A case-hardened mail hauberk folded to 380 mm by 420 mm and 60 mm tall: a long mail shirt of dark rings with
   // sleeves along its sides, a leather-bound neck and a split skirt.
   h.compound('hardened_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A case-hardened mail jumpsuit folded to 380 mm by 440 mm and 60 mm tall: sleeves along the sides and the legs
   // folded up over the body under a leather belt, with a leather-bound neck.
   h.compound('hardened_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

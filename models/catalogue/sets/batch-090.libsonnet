@@ -94,7 +94,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     + strap('strap-b-%d' % g, 'leather', 'bronze', 0.08, 0.02, 0.054, z, 0.03)
     for g in [0, 1]
     for z in [[-0.09, 0.09][g]]
-  ]), { bronze: 'brass-polished', leather: 'leather-brown' })
+  ]), { bronze: 'brass-polished', leather: 'leather-brown' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['ancient'], slot: ['arms'] } } },
 
   // A pair of cut-resistant sleeves laid flat, each 450 mm long, 70 mm wide at the wrist and 110 mm at the top,
@@ -112,7 +112,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     ]
     for g in [0, 1]
     for z in [[-0.065, 0.065][g]]
-  ]), { fabric: 'cloth-khaki', cuff: 'cloth-black' })
+  ]), { fabric: 'cloth-khaki', cuff: 'cloth-black' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // A pair of hard arm guards laid flat: neoprene sleeves 350 mm long, 80 mm wide at the wrist and 110 mm at the
@@ -127,7 +127,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     ]
     for g in [0, 1]
     for z in [[-0.07, 0.07][g]]
-  ]), { neoprene: 'neoprene-black', plate: 'plastic-grey', strap: 'plastic-matte-black' })
+  ]), { neoprene: 'neoprene-black', plate: 'plastic-grey', strap: 'plastic-matte-black' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'rubber'], setting: ['modern'], slot: ['arms'] } } },
 
   // A pair of stiff leather arm guards lying open side down, each 300 mm long, 80 mm across at the wrist and
@@ -157,13 +157,13 @@ local sheath(id, slot, x0, x1, w, y, z) =
     ]
     for g in [0, 1]
     for z in [[-0.075, 0.075][g]]
-  ]), { leather: 'leather-brown', lace: 'skin-rawhide' })
+  ]), { leather: 'leather-brown', lace: 'skin-rawhide' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['arms'] } } },
 
   // A pair of steel arm guards laid side by side, each a forearm plate, an elbow cop and an upper-arm plate in a
   // row 600 mm long, 80 to 120 mm across, held by four buckled leather straps.
   h.compound('steel_arm_guards', 2.5, fullArm('a', -0.1, 0.004) + fullArm('b', 0.1, 0.004),
-             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-grey' })
+             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-grey' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of arm guards hammered from sheet steel, each a forearm plate 220 mm long and an upper-arm plate 200 mm
@@ -177,7 +177,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     + strap('strap-d-%d' % g, 'strap', 'rivet', 0.17, 0.02, 0.066, z, 0.03)
     for g in [0, 1]
     for z in [[-0.1, 0.1][g]]
-  ]), { steel: 'steel', strap: 'leather-black', rivet: 'steel-grey' })
+  ]), { steel: 'steel', strap: 'leather-black', rivet: 'steel-grey' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['arms'] } } },
 
   // A pair of forearm bracers hammered from sheet steel, each 230 mm long, 80 mm across at the wrist and 100 mm at
@@ -188,7 +188,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     + strap('strap-b-%d' % g, 'strap', 'rivet', 0.07, 0.02, 0.054, z, 0.03)
     for g in [0, 1]
     for z in [[-0.09, 0.09][g]]
-  ]), { steel: 'steel', strap: 'leather-brown', rivet: 'steel-grey' })
+  ]), { steel: 'steel', strap: 'leather-brown', rivet: 'steel-grey' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['arms'] } } },
 
   // A pair of elbow guards, each a half-cylinder of sheet steel 120 mm long and 110 mm across, with a long strap
@@ -249,7 +249,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     + band('tie-c-%d' % g, 'string', 0.1, 0.004, 0.054, 0.003, z)
     for g in [0, 1]
     for z in [[-0.09, 0.09][g]]
-  ]), { cloth: 'cloth-rag', rust: 'scrap-rusted', galv: 'steel-galvanised', string: 'cord-olive' })
+  ]), { cloth: 'cloth-rag', rust: 'scrap-rusted', galv: 'steel-galvanised', string: 'cord-olive' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['arms'] } } },
 
   // A pair of soft neoprene sleeves laid flat, each 380 mm long, 75 mm wide at the wrist and 105 mm at the top,
@@ -263,7 +263,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     ]
     for g in [0, 1]
     for z in [[-0.065, 0.065][g]]
-  ]), { neoprene: 'neoprene-black', cuff: 'cloth-heather-grey', seam: 'felt-grey' })
+  ]), { neoprene: 'neoprene-black', cuff: 'cloth-heather-grey', seam: 'felt-grey' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], setting: ['modern'], slot: ['arms'] } } },
 
   // A pair of arm guards cut from tyre tread, each three curved chunks 100 mm long and 12 mm thick with tread
@@ -292,6 +292,6 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for k in [0, 1]
     for x0 in [[-0.078, 0.032][k]]
     for i in std.range(0, 7)
-  ]), { plate: 'steel-blued', strap: 'leather-brown', buckle: 'steel-grey', mail: 'steel-grey' })
+  ]), { plate: 'steel-blued', strap: 'leather-brown', buckle: 'steel-grey', mail: 'steel-grey' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 ]

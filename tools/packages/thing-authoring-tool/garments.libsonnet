@@ -2,7 +2,9 @@
 // quilting, gloves, hats, eyewear, mail curtains and socks. Each returns pieces for `h.compound`, as
 // footwear.libsonnet does. Usage: `local g = import 'packages/thing-authoring-tool/garments.libsonnet';` then
 // `h.compound(id, mass, g.jacket({ w: 0.38, d: 0.34, ht: 0.07 }), finish)`. Options are objects merged over the
-// builder's defaults, so a row names only what differs.
+// builder's defaults, so a row names only what differs. The lying builders put a garment's head end, its neck or
+// waist, toward +z, so a row laid on its back adds `h.headEndOnPlusZ`, which turns that end to -z as
+// docs/decisions/0002-model-frame.md asks.
 local h = import 'compound.libsonnet';
 local box = h.box;
 local rad(d) = d * std.pi / 180;

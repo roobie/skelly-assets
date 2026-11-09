@@ -1,6 +1,7 @@
 ---
 read_if:
   - authoring a model that has a front, or choosing which way a new kind of model faces
+  - deciding where the front of a chair, a tool, a garment laid flat or a thing with no front lies
   - laying out a kit or family along an axis other than its front
   - importing assets into Deadvox or another consumer, and wondering whether to convert axes
   - holding a model in the hand, or reading its grip turn, hold or rest
@@ -24,12 +25,25 @@ It is the frame of the format we ship, so a consumer imports any model, from thi
 turn. three.js's `lookAt` and the usual face-the-target code assume it, and Unity shares its up and forward, mirrored
 in x because Unity is left-handed.
 
+A model's front is where its user faces while using it. A chair faces where its sitter faces, a tool's working end
+points where its user points it, and a standing tool turns to +z the side its user faces in use. One rule decides
+every front, so a reader predicts where any model faces without looking at it, and no kind needs its own ruling.
+
+A thing that lies flat keeps its use pose, turned down onto its back. A top worn upright has its neck up; laid on its
+back the neck goes to -z, and a mattress or open sleeping bag puts its user's head end there too. Every garment laid flat
+thus faces the same way, whichever builder made it.
+
+A thing with no front in use, such as fabric, a sheet, tape, cut stock, a kit, a sling, a stool, a bin, a barrel or a
+packed roll, lies or stands on its largest flat face with its longest level side along x. Any turn that keeps that is
+correct, and a round thing is correct in any turn, so no one has to invent a front for it.
+
 A held model's working end is its front, so it lies along +z too. Its grip turn carries the file's axes onto the held
 axes, working end +z and up +y, its roll turns about that end, and an upright rest stands it on its -z end. One frame
 for holding as for placing keeps the turn of a model that already faces forward at none.
 
 A source may be laid out along another axis when its measures read that way, as a vehicle's do along its length. It
-then names that axis once, in its kit or family, and the build turns its geometry, datums and placements onto +z; see
+then names that axis once, in its kit or family, or in its row when only that row's pieces are laid out so, and the
+build turns its geometry, datums and placements onto +z; see
 `tools/packages/thing-core/src/frame.ts`, `FRONT_TURNS`. A generator that keeps its own frame, as gungen and mobgen
 do because their authored data reads in it, turns at its export instead; see
 `tools/packages/gun-authoring-tool/src/gun/exportFrame.ts`, `FILE_FROM_GUNGEN`, and `tools/packages/mobgen/src/core/conventions.ts`, `TO_MODEL_FRAME`. A turn per model, or one on import, would let one model

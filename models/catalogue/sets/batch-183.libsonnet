@@ -44,7 +44,7 @@ local apron(id, mass, finish, o={}) =
   + (if c.buckle then [
        box('buckle', 'rivet', [0.072, ht + t + 0.004, bz1 + 0.026], [0.09, ht + t + 0.008, bz1 + 0.044]),
      ] else []), finish)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A shirt folded as shops fold them: the collar standing at the +z end with its two points lying forward, a placket
 // of small buttons down the middle and the sleeves tucked behind. `pockets` are jacket pocket options.
@@ -63,7 +63,7 @@ local shirt(id, mass, finish, o={}) =
           flat('collar-point-l', 'collar', [[-0.008, cz - 0.048], [-0.05, cz - 0.02], [-0.034, cz - 0.078]], ht, 0.007),
           flat('collar-point-r', 'collar', [[0.008, cz - 0.048], [0.034, cz - 0.078], [0.05, cz - 0.02]], ht, 0.007),
         ] else []) + std.get(c, 'extra', []), finish)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A dress folded flat: a neckline scooped into the top layer at the +z end, painted dark as the inside showing, and
 // optional extras. Compound pieces only add, so the neckline is a flush crescent of the lining finish.
@@ -106,7 +106,7 @@ local dress(o) =
     h.disc('antenna-tip-l', 'wire', 0.009, ht + 0.012, ht + 0.026, -0.06, 0.062),
     h.disc('antenna-tip-r', 'wire', 0.009, ht + 0.012, ht + 0.026, 0.06, 0.062),
   ], { cloth: 'cloth-yellow', stripe: 'cloth-black', lining: 'cloth-black', trim: 'cloth-black', wing: 'mesh-white', wire: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
   // A navy wool blazer folded flat, 360 mm by 340 mm and 60 mm tall: crossed lapels, two brass buttons, flapped hip
   // pockets and a breast welt, the sleeves folded in along each side.
   h.compound('blazer', 1.1, g.jacket({
@@ -117,7 +117,7 @@ local dress(o) =
     flat('shirt', 'shirt', [[-0.062, 0.17], [0.062, 0.17], [0, -0.045]], 0.06 - 0.001, 0.002),
     flat('tie', 'tie', [[-0.01, 0.17], [0.01, 0.17], [0.016, 0.02], [0, -0.01], [-0.016, 0.02]], 0.06, 0.003),
   ], { shirt: 'cloth-bright-white', tie: 'cloth-crimson', cloth: 'cloth-navy', collar: 'cloth-navy', front: 'cloth-navy', button: 'brass-dull', pocket: 'cloth-navy', flap: 'cloth-navy', sleeve: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A strapless black patent bodysuit laid flat, 240 mm wide and 270 mm long, folded double: a corset bodice with
   // white piping along its top edge and down two boning seams, narrowing at the waist to a high-cut leg line.
@@ -132,7 +132,7 @@ local dress(o) =
     strip('leg-l', 'trim', [-0.11, -0.06], [-0.025, -0.15], 0.012, 0.004, 0.002),
     strip('leg-r', 'trim', [0.11, -0.06], [0.025, -0.15], 0.012, 0.004, 0.002),
   ], { suit: 'leather-patent', trim: 'cloth-bright-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['modern'] } } },
 
   // A pale blue long-sleeved button shirt folded as a shop folds it, 240 mm by 300 mm and 35 mm tall: collar
   // points, a placket of small white buttons.
@@ -148,7 +148,7 @@ local dress(o) =
     box('pleat-%d' % i, 'trim', [-w / 2 + 0.01 + i * 0.04, ht, -d / 2], [-w / 2 + 0.03 + i * 0.04, ht + 0.003, -0.05])
     for i in std.range(0, 5)
   ], { cloth: 'cloth-blue', lining: 'cloth-navy', trim: 'cloth-bright-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A short red cheerleader tank top folded small, 200 mm by 200 mm and 20 mm tall: white straps and neck trim, and
   // a white band across the chest where the lettering goes.
@@ -158,7 +158,7 @@ local dress(o) =
     box('strap-r', 'trim', [0.055, ht, d / 2 - 0.03], [0.075, ht + 0.003, d / 2]),
     box('chest-band', 'trim', [-w / 2, ht, -0.015], [w / 2, ht + 0.003, 0.02]),
   ], { cloth: 'cloth-red', lining: 'cloth-crimson', trim: 'cloth-bright-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A combat shirt folded flat, 280 mm by 320 mm and 40 mm tall: a thin khaki torso with a short zip under a mandarin
   // collar, olive jacket-weight sleeves folded in along each side, each with a flapped shoulder pocket, grey
@@ -182,7 +182,7 @@ local dress(o) =
     box('pen-slot', 'flap', [-w / 2 + 0.06, ht + 0.006, -0.1], [-w / 2 + 0.075, ht + 0.01, -0.04]),
     h.disc('pen-cap', 'zip', 0.004, ht + 0.01, ht + 0.016, -w / 2 + 0.0675, -0.04),
   ], { cloth: 'cloth-khaki', collar: 'cloth-khaki', front: 'cloth-khaki', button: 'cloth-khaki', sleeve: 'cloth-olive-drab', flap: 'cloth-olive-drab', patch: 'hook-loop-grey', zip: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A denim shirt folded as a shop folds it, 240 mm by 300 mm and 40 mm tall: collar points, pearl snaps down the
   // placket and two flapped chest pockets with snaps.
@@ -203,7 +203,7 @@ local dress(o) =
     strip('bow-end-l', 'sash', [-0.004, z - 0.01], [-0.02, z - 0.08], ht + 0.004, 0.014, 0.004),
     strip('bow-end-r', 'sash', [0.004, z - 0.01], [0.025, z - 0.075], ht + 0.004, 0.014, 0.004),
   ], { cloth: 'cloth-sage', lining: 'cloth-charcoal', trim: 'cloth-sage', sash: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A white pocket shirt folded as a shop folds it, 240 mm by 300 mm and 35 mm tall: collar points, a placket of
   // small buttons and one patch pocket on the left breast.
@@ -239,5 +239,5 @@ local dress(o) =
     for s in [-1, 1]
     for i in [0, 1, 2]
   ], { cloth: 'cloth-cream', bodice: 'cloth-bright-white', pearl: 'pearl', tulle: 'mesh-white', lace: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 ]

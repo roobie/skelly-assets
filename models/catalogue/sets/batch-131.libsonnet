@@ -124,7 +124,7 @@ local napeCurtain(id, mass, mesh, fin) =
                          for s in [-1, 1]
                        ]),
              fin)
-  + { voxelGrain: if mesh then 0.002 else 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: if mesh then 0.002 else 0.004 };
 
 // A lens outsert for a full-face gas mask standing on its lower edge, front on +z: a thin curved sheet shaped to the
 // mask's single eyepiece, with a clip tab at each end and at the top and bottom middle. Slots: lens, clip.

@@ -73,7 +73,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   ] + [
     box('label', 'label', [-0.04, 0.012, -0.08], [0.04, 0.0135, -0.03]),
   ], { cover: 'cloth-black', label: 'paper-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic', 'fabric'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic', 'fabric'], setting: ['modern'] } } },
 
   // About 2.4 m of 8 mm steel chain with 40 mm round links, laid flat in four runs joined at the turns.
   h.compound('chain', 3.5,

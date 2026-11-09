@@ -118,7 +118,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('post-a', 'handle', [-0.25, 0.05, -0.01], [-0.23, 0.08, 0.01]),
     box('post-b', 'handle', [0.15, 0.05, -0.01], [0.17, 0.08, 0.01]),
     h.rod('handle', 'handle', 0.012, -0.27, 0.19, 0.088),
-  ], { frame: 'paint-charcoal', window: 'glass-grey', handle: 'steel-stainless' })
+  ], { frame: 'paint-charcoal', window: 'glass-grey', handle: 'steel-stainless' }) + h.headEndOnMinusX
   + { voxelGrain: 0.006, taxonomy: { category: 'armour', tags: { weapon: ['shield'], material: ['metal', 'glass'], setting: ['medieval'] } } },
 
   // An electric stovetop lifted off its range, 600 mm wide, 520 mm deep and 45 mm tall: an enamelled steel
