@@ -116,6 +116,27 @@ export const invert = (a: Transform): Transform => {
 export const applyPoint = (a: Transform, p: Vec3): Vec3 => add(mulMV(a.r, p), a.t);
 export const applyDir = (a: Transform, d: Vec3): Vec3 => mulMV(a.r, d);
 
+const DEGREES = 180 / Math.PI;
+
+/** Rounds away numerical noise and negative zero, so angles of exact rotations come out exact. */
+const clean = (x: number): number => {
+  const r = Math.round(x * 1e6) / 1e6;
+  return r === 0 ? 0 : r;
+};
+
+/** Euler angles in degrees, in three.js 'XYZ' order (matrix = Rx * Ry * Rz), of a rotation matrix. */
+export const eulerXyzDegrees = (m: Mat3): Vec3 => {
+  const m13 = Math.min(1, Math.max(-1, m[2]));
+  const y = Math.asin(m13);
+  if (Math.abs(m13) < 0.999_999_9) {
+    return [clean(Math.atan2(-m[5], m[8]) * DEGREES), clean(y * DEGREES), clean(Math.atan2(-m[1], m[0]) * DEGREES)];
+  }
+  return [clean(Math.atan2(m[7], m[4]) * DEGREES), clean(y * DEGREES), 0];
+};
+
+/** The rotation matrix of Euler angles in degrees, in three.js 'XYZ' order: the inverse of `eulerXyzDegrees`. */
+export const fromEulerXyzDegrees = ([x, y, z]: Vec3): Mat3 => mulMM(rotX(x), mulMM(rotY(y), rotZ(z)));
+
 /** Angle in degrees between two unit vectors. */
 export const angleBetween = (a: Vec3, b: Vec3): number =>
   (Math.acos(Math.min(1, Math.max(-1, dot(a, b)))) * 180) / Math.PI;

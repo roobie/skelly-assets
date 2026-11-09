@@ -5,6 +5,7 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import {
   applyPoint,
   cross,
+  eulerXyzDegrees,
   fromColumns,
   IDENTITY,
   type Mat3,
@@ -32,7 +33,7 @@ import { ACTION_CYCLE_PROFILES } from '../src/gun/cycle.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { ejectionPoint } from '../src/gun/ejection.ts';
-import { eulerXyzDegrees, FILE_FROM_GUNGEN, gripTurn, METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
+import { FILE_FROM_GUNGEN, gripTurn, METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import { createGunModelEntry, exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { getOptic } from '../src/gun/optics.ts';

@@ -1,6 +1,6 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { applyDir, applyPoint, length, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { applyDir, applyPoint, eulerXyzDegrees, length, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ModelParts, NeutralModel } from '@skelly/thing-core/schema';
 import { type DrawnGeometry, drawnGeometry } from '@skelly/thing-export/drawn.ts';
@@ -33,7 +33,7 @@ import {
 import { boltCalibreIssue, isBoltAssembly, withBoltCalibre } from './boltCartridge.ts';
 import type { CycleMode, CycleTimeline } from './cycle.ts';
 import { gunDomain } from './domain.ts';
-import { eulerXyzDegrees, gripTurn, toFileAxes } from './exportFrame.ts';
+import { gripTurn, toFileAxes } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { internalMagazineCapacity } from './internalMagazine.ts';
 import { getOptic } from './optics.ts';

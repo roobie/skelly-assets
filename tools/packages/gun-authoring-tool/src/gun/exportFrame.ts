@@ -1,6 +1,6 @@
 // Keep firearm units and file axes in the Gungen adapter so the construct package stays domain-neutral.
 
-import { IDENTITY_M, type Mat3, mulMV, transpose, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { eulerXyzDegrees, IDENTITY_M, type Mat3, mulMV, transpose, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import unitScale from './unitScale.json' with { type: 'json' };
 
 /**
@@ -20,24 +20,6 @@ export const FILE_FROM_GUNGEN: Mat3 = IDENTITY_M;
 
 /** Applies `FILE_FROM_GUNGEN` to a point or direction. */
 export const toFileAxes = (v: Vec3, mapping: Mat3 = FILE_FROM_GUNGEN): Vec3 => mulMV(mapping, v);
-
-const DEGREES = 180 / Math.PI;
-
-/** Rounds away numerical noise and negative zero, so `turn` is exact for exact mappings. */
-const clean = (x: number): number => {
-  const r = Math.round(x * 1e6) / 1e6;
-  return r === 0 ? 0 : r;
-};
-
-/** Euler angles in degrees, in construct's order (three.js 'XYZ', matrix = Rx * Ry * Rz), of a rotation matrix. */
-export const eulerXyzDegrees = (m: Mat3): Vec3 => {
-  const m13 = Math.min(1, Math.max(-1, m[2]));
-  const y = Math.asin(m13);
-  if (Math.abs(m13) < 0.999_999_9) {
-    return [clean(Math.atan2(-m[5], m[8]) * DEGREES), clean(y * DEGREES), clean(Math.atan2(-m[1], m[0]) * DEGREES)];
-  }
-  return [clean(Math.atan2(m[7], m[4]) * DEGREES), clean(y * DEGREES), 0];
-};
 
 /**
  * Held-model `grip.turn` for a model written with `fileFromGungen`: the fixed rotation that carries the
