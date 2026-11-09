@@ -169,7 +169,7 @@ local legGuard(p, cx, s) =
 
   // A pair of mild steel shoulder guards lying crown up side by side, each four overlapping lames 150 mm across and
   // 150 mm from the strap end to the lowest lame, with a buckle tab to strap them to a brigandine's shoulders.
-  h.compound('mild_steel_shoulder_guards', 1.2, shoulderGuard('l-', -0.07, -0.085) + shoulderGuard('r-', -0.07, 0.085), { lame: 'steel-bright', rivet: 'steel-bright', strap: 'leather-brown', buckle: 'steel' })
+  h.compound('mild_steel_shoulder_guards', 1.2, shoulderGuard('l-', -0.07, -0.085) + shoulderGuard('r-', -0.07, 0.085), { lame: 'steel-bright', rivet: 'steel-bright', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['torso'] } } },
 
   // A pair of mild steel splint greaves laid side by side, open side down, each 340 mm from knee to ankle, 140 mm

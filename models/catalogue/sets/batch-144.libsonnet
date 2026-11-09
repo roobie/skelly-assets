@@ -92,7 +92,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                box('clip', 'clip', [-0.3, 0.008, -0.012], [-0.262, 0.03, 0.012]),
                box('clip-tongue', 'clip', [-0.3, 0.03, -0.01], [-0.27, 0.036, 0.01]),
              ],
-             { fur: 'fur-brown', tip: 'fur-pale', clip: 'plastic-black' })
+             { fur: 'fur-brown', tip: 'fur-pale', clip: 'plastic-black' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A costume collar laid in a ring 120 mm across: a band of white fur 25 mm wide and 20 mm thick, with a small brass

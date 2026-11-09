@@ -107,7 +107,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                for i in std.range(0, 4)
                for x in [-0.194 + i * 0.022]
              ],
-             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' })
+             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of quilted wool arming mittens laid flat, backs up, each 270 mm from cuff to fingertip: thick mitts with a
