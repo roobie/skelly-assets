@@ -117,7 +117,7 @@ export function buildManifest({ models, files, credit }) {
     };
   });
   return {
-    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in the GLB's metres; consumers draw it, the GLB has no lettering. credits: from REUSE.toml.',
+    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. credits: from REUSE.toml.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
   };
