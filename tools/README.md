@@ -16,7 +16,8 @@ Node 26 or later runs TypeScript directly. Install the locked dependencies with 
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
 of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, so a run whose
 importable inputs hash the same as the last compile reuses them rather than paying for the whole catalogue again;
-see `sources.mjs`, `refreshJsonnetTwins`. Jsonnet imports another source's `.jsonnet`, never its
+see `sources.mjs`, `refreshJsonnetTwins`. CI jobs start from fresh checkouts, so they share one compile through a
+twin store keyed by that same digest rather than each paying for it. Jsonnet imports another source's `.jsonnet`, never its
 twin, because all twins compile in one run and none exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 

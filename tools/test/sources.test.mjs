@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 
-import { jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
+import { compilerCode, jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const tracked = execFileSync('git', ['-C', root, 'ls-files', '-z', '*.json'], { encoding: 'utf8' })
@@ -60,4 +60,55 @@ test('a changed imported library recompiles the twin', () => {
     refresh();
     assert.deepEqual(JSON.parse(twin()), { value: 2 });
   });
+});
+
+// The store lives outside the inputs' root, as CI's does, so storing never changes the digest.
+const withStore = (check) => withTwinFixture((fixture) => {
+  const store = mkdtempSync(join(tmpdir(), 'sources-store-'));
+  try {
+    check({ ...fixture, store });
+  } finally {
+    rmSync(store, { recursive: true, force: true });
+  }
+});
+
+test('a fresh checkout takes the twins of a stored compile of the same inputs', () => {
+  withStore(({ root, twin, store }) => {
+    const refresh = (stamp) => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp: join(root, stamp), store });
+    refresh('compiled');
+    const [digest] = readdirSync(store);
+    writeFileSync(join(store, digest, 'source.json'), 'stored');
+    rmSync(join(root, 'source.json'));
+    refresh('fresh');
+    assert.equal(twin(), 'stored');
+  });
+});
+
+test('a store holding the twins of other inputs is not used', () => {
+  withStore(({ root, twin, store }) => {
+    const refresh = () => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp: join(root, 'stamp'), store });
+    refresh();
+    writeFileSync(join(root, 'lib', 'value.libsonnet'), '{ value: 2 }');
+    refresh();
+    assert.deepEqual(JSON.parse(twin()), { value: 2 });
+  });
+});
+
+test('a changed compiler file recompiles the twins', () => {
+  withTwinFixture(({ root }) => {
+    const compiler = join(root, 'compile.mjs');
+    writeFileSync(compiler, '// one compiler');
+    const stamp = join(root, '.build', 'stamp');
+    const refresh = () => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp, code: [compiler] });
+    refresh();
+    const before = readFileSync(stamp, 'utf8');
+    writeFileSync(compiler, '// another compiler');
+    refresh();
+    assert.notEqual(readFileSync(stamp, 'utf8'), before);
+  });
+});
+
+test('the twin digest covers this module and the compiler driver', () => {
+  const code = compilerCode().map((path) => relative(root, path));
+  for (const driver of ['tools/sources.mjs', 'tools/jsonnet/index.mjs']) assert.ok(code.includes(driver), driver);
 });

@@ -1,9 +1,12 @@
 // Compile package Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
-// Call before importing package code, or run this module directly to refresh the twins.
+// Call before importing package code, or run this module directly to refresh the twins (with --digest, to print the
+// digest of their inputs instead).
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 import { compileJsonnetFiles } from './jsonnet/index.mjs';
 
 const here = import.meta.dirname;
@@ -35,8 +38,10 @@ const importableFiles = (directory) =>
     return /\.(jsonnet|libsonnet)$/.test(entry.name) ? [path] : [];
   });
 
-const inputsDigest = (root, sources) => {
+// `code` lists the files that turn sources into twins, so a change to the compiler or to this module recompiles too.
+const inputsDigest = (root, sources, code) => {
   const hash = createHash('sha256');
+  for (const path of code) hash.update(`code\0${relative(root, path)}\0`).update(readFileSync(path));
   for (const source of sources) hash.update(`source\0${relative(root, source)}\0`);
   for (const path of importableFiles(root).sort()) hash.update(`file\0${relative(root, path)}\0`).update(readFileSync(path));
   return hash.digest('hex');
@@ -51,23 +56,54 @@ const replaceFile = (path, contents) => {
   renameSync(partial, path);
 };
 
-export function refreshJsonnetTwins(sources, { root, stamp }) {
-  const digest = inputsDigest(root, sources);
+// A store folder keeps the last compile's twins under its input digest, so a fresh checkout whose inputs hash the
+// same, such as a later CI job of one commit, takes them instead of compiling. A twin is read from the store only
+// under the digest of the current inputs, so a stale or foreign store costs a compile and never a wrong twin.
+const storedTwin = (store, digest, root, source) => join(store, digest, relative(root, twinOf(source)));
+
+export function refreshJsonnetTwins(sources, { root, stamp, store, code = [] }) {
+  const digest = inputsDigest(root, sources, code);
   const current = existsSync(stamp) && readFileSync(stamp, 'utf8') === digest;
   if (current && sources.every((source) => existsSync(twinOf(source)))) return;
   rmSync(stamp, { force: true });
-  const twins = compileJsonnetFiles(sources);
+  const stored = store !== undefined && sources.every((source) => existsSync(storedTwin(store, digest, root, source)));
+  const twins = stored
+    ? sources.map((source) => readFileSync(storedTwin(store, digest, root, source)))
+    : compileJsonnetFiles(sources);
   for (const [at, source] of sources.entries()) replaceFile(twinOf(source), twins[at]);
+  if (store !== undefined && !stored) {
+    rmSync(store, { recursive: true, force: true });
+    for (const [at, source] of sources.entries()) {
+      mkdirSync(dirname(storedTwin(store, digest, root, source)), { recursive: true });
+      writeFileSync(storedTwin(store, digest, root, source), twins[at]);
+    }
+  }
   mkdirSync(dirname(stamp), { recursive: true });
   replaceFile(stamp, digest);
 }
 
+// This module and the compiler driver beside it; the compiler binary is pinned by jsonnet/runtime.json, an input.
+export const compilerCode = () => [
+  fileURLToPath(import.meta.url),
+  ...readdirSync(join(here, 'jsonnet')).filter((name) => name.endsWith('.mjs')).sort().map((name) => join(here, 'jsonnet', name)),
+];
+
+export const jsonnetSourcesDigest = () => inputsDigest(repositoryRoot, jsonnetFiles(), compilerCode());
+
+// JSONNET_TWIN_STORE names the store folder; CI caches it under the digest that --digest prints.
 export function installJsonnetSources() {
   if (sourcesInstalled) return;
-  refreshJsonnetTwins(jsonnetFiles(), { root: repositoryRoot, stamp: join(here, '.build', 'jsonnet-sources.sha256') });
+  refreshJsonnetTwins(jsonnetFiles(), {
+    root: repositoryRoot,
+    stamp: join(here, '.build', 'jsonnet-sources.sha256'),
+    code: compilerCode(),
+    store: process.env.JSONNET_TWIN_STORE || undefined,
+  });
   sourcesInstalled = true;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  installJsonnetSources();
+  const { values } = parseArgs({ options: { digest: { type: 'boolean', default: false } } });
+  if (values.digest) console.log(jsonnetSourcesDigest());
+  else installJsonnetSources();
 }
