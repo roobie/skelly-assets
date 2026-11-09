@@ -11,6 +11,7 @@ read_if:
   - you change Gungen's test or cross-project integration policy
   - you change trigger-guard or trigger geometry, content or validation
   - you trace a gun part from a reference photo
+  - you ask for or give a look review of a gun design
   - you change the structured Deadvox export recipe or refresh boundary
   - you diagnose platform-dependent export comparisons
   - you share recipe or synchronization mechanisms between authoring tools
@@ -81,6 +82,10 @@ Two choices in the steps above are still judgement, not rules. One is where to s
 ## Testing
 
 Seed sweeps exercise generated assemblies across templates and choices that focused property tests do not cover; they run only in the manual slow-test workflow (`AGENTS.md`, "Tests"), which keeps routine feedback fast while the broad generator checks stay runnable; see `test/sweeps.ts`, `runSweeps`.
+
+## Look review
+
+A look review gives a page path for each design, with a `camera=` view (side, rear or rear-¾), served from a stable review server pinned to the reviewed commit, not from a contributor's live worktree. A fixed camera view lets reviewers compare designs side by side. A pinned server shows exactly the reviewed commit, while a live worktree can change under the reviewer. The viewer reads `camera=` as a position followed by its aim target; see `src/viewer/main.ts`, `parseCameraState`.
 
 ## Attachments and export
 

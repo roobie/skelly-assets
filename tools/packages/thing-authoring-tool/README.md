@@ -44,7 +44,7 @@ a handle or moving its part also moves the hand. Pose corrections stay authored 
 the geometry because the consumer's held frame need not match the tool's upright frame.
 See `src/catalogue.ts`, `buildItem`, and `packages.libsonnet`. Attachment datums, exported
 as named anchors, use the same solid reference for the same reason: a vehicle part's mount
-follows its geometry. See `vehicle-parts.libsonnet`.
+follows its geometry. See `models/vehicle-parts.libsonnet`.
 
 Equipment uses family-specific construction rather than a generic box so silhouettes and
 exposed working parts remain useful identification cues at play distance. Repair trays show

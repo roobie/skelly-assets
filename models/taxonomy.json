@@ -101,6 +101,8 @@
         "bus": "Buses and coaches.",
         "motorcycle": "Motorcycles, scooters and quad bikes.",
         "trailer": "Trailers and caravans, towed rather than driven.",
+        "plant": "Self-propelled work machines: tractors, excavators, forklifts, rollers, skid steers, combines, trenchers.",
+        "armoured": "Armoured fighting and patrol vehicles: APCs.",
         "helicopter": "Helicopters."
       }
     },
