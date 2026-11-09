@@ -1,4 +1,5 @@
 local b = import 'packages/thing-authoring-tool/clothing-bags.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local atom = b.atom, garment = b.garment;
 local bags = import 'measures/bags.libsonnet';
 local worn(slot, material) = { category: 'clothing', tags: { slot: slot, material: material, setting: ['modern'] } };
@@ -16,10 +17,10 @@ local bag(slot) = { category: 'containers', tags: { slot: slot, material: ['fabr
   }, folded(['legs'], ['fabric'])),
   garment('hoodie', 0.600, 'top', 'plastic-red', 'paint-charcoal', {
     width: 0.42, height: 0.06, depth: 0.34, sleeveLength: 0.16, hoodDepth: 0.13, pocketDepth: 0.025, cargoDepth: 0, legGap: 0,
-  }, folded(['torso', 'arms'], ['fabric'])),
+  }, folded(['torso', 'arms'], ['fabric'])) + h.headEndOnPlusZ,
   garment('jacket', 1.200, 'top', 'paperboard-brown', 'paint-charcoal', {
     width: 0.44, height: 0.07, depth: 0.36, sleeveLength: 0.17, hoodDepth: 0, pocketDepth: 0.03, cargoDepth: 0, legGap: 0,
-  }, folded(['torso', 'arms'], ['fabric'])),
+  }, folded(['torso', 'arms'], ['fabric'])) + h.headEndOnPlusZ,
   garment('utility_vest', 0.900, 'vest', 'polymer-od-green', 'paint-charcoal', {
     width: 0.38, height: 0.06, depth: 0.30, sleeveLength: 0, hoodDepth: 0, pocketDepth: 0.035, cargoDepth: 0, legGap: 0,
   }, folded(['torso'], ['fabric'])),

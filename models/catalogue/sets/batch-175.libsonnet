@@ -134,7 +134,7 @@ local bra(cw, ch, ties) =
     pad: 'plastic-charcoal',
     rib: 'cloth-charcoal',
     zip: 'steel-bright',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Lycra bikini bottoms laid flat, 300 mm across the waist with ties and 160 mm long: a front panel narrowing to the
   // crotch, a waistband, and a tie knotted in a bow at each hip.

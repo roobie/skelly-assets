@@ -47,7 +47,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
                          for x in [seams[i]]
                        ],
              finishes)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 [
   // A racerback sports bra laid flat, 260 mm across and 250 mm from band to the strap junction: a thin elastic
@@ -77,7 +77,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     ]
     for k in [-1, 1]
   ]), { cloth: 'cloth-heather-grey', band: 'lycra-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A cotton tank top folded, 240 mm by 280 mm and 20 mm tall: a deep scoop neck, wide-cut armholes with ribbed
   // binding and no sleeves.
@@ -87,7 +87,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
                                + armholes(w, d / 2 - 0.045, 0.04, ht, 'bind')
                                + [box('hem', 'bind', [-w / 2, ht, -d / 2 + 0.004], [w / 2, ht + 0.003, -d / 2 + 0.016])],
              { cloth: 'cloth-heather-grey', bind: 'cloth-heather-grey', hole: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A thermal undershirt folded, 280 mm by 290 mm and 22 mm tall: thin charcoal stretch knit with a black mock collar,
   // long sleeves folded in with grey ribbed cuffs, and grey flatlock seams.
@@ -110,7 +110,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     flat('heel-l', 'band', [[-0.075, -0.27], [-0.05, -0.27], [-0.05, -0.305], [-0.075, -0.3]], 0.004, 0.002),
     flat('heel-r', 'band', [[0.05, -0.27], [0.075, -0.27], [0.075, -0.3], [0.05, -0.305]], 0.004, 0.002),
   ], { cloth: 'cloth-black', panty: 'cloth-black', band: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs', 'feet'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs', 'feet'] } } },
 
   // A long-sleeved compression top folded, 280 mm by 290 mm and 22 mm tall: blue stretch knit with black panels down
   // the sides and along the sleeves, a crew collar and black cuffs.
@@ -130,7 +130,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     strip('seam-l', 'hem', [-0.07, 0.03], [-0.07, -0.11], 0.006, 0.006, 0.002),
     strip('seam-r', 'hem', [0.07, 0.03], [0.07, -0.11], 0.006, 0.006, 0.002),
   ], { cloth: 'lycra-black', band: 'cloth-heather-grey', hem: 'lycra-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A white cotton undershirt folded, 270 mm by 280 mm and 22 mm tall: a V neck, short sleeves folded out and a
   // plain hem.
@@ -140,7 +140,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
                                 + shortSleeves(w, ht, d / 2 - 0.02, 0.085)
                                 + [box('hem', 'bind', [-w / 2, ht, -d / 2 + 0.004], [w / 2, ht + 0.003, -d / 2 + 0.016])],
              { cloth: 'cloth-bright-white', sleeve: 'cloth-bright-white', bind: 'cloth-cream', hole: 'cloth-heather-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A unitard laid flat, 200 mm across and 800 mm long unstretched: a sleeveless crew-necked top running straight into
   // full-length legs, bound at the neck, armholes and ankles.
@@ -158,5 +158,5 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     strip('ankle-l', 'bind', [-0.07, -0.455], [-0.025, -0.455], 0.005, 0.01, 0.003),
     strip('ankle-r', 'bind', [0.025, -0.455], [0.07, -0.455], 0.005, 0.01, 0.003),
   ] + neck(0.045, 0.34, 0.005, 'bind', 0.008), { cloth: 'cloth-purple', bind: 'lycra-black', hole: 'void-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'] } } },
 ]

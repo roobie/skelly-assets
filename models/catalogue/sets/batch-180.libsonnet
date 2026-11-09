@@ -305,7 +305,7 @@ local patches(list, y) = [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A rusty sleeveless mail vest folded on a shelf, 380 mm by 300 mm and 60 mm tall.
-  h.compound('rusty_mail_vest', 5.6, mailVest({ rust: true }), { mail: 'steel-mail', binding: 'leather-tan', strap: 'leather-tan', buckle: 'iron-dull', rust: 'rust-red' })
+  h.compound('rusty_mail_vest', 5.6, mailVest({ rust: true }), { mail: 'steel-mail', binding: 'leather-tan', strap: 'leather-tan', buckle: 'iron-dull', rust: 'rust-red' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'], state: ['folded'] } } },
 
   // A hard plastic chest guard laid flat, 560 mm from the shoulder caps to the lowest belly plate and 580 mm across the side straps.
@@ -329,7 +329,7 @@ local patches(list, y) = [
              g.jacket({ w: 0.38, d: 0.33, ht: 0.08, folds: 4, front: 'none', buttons: [], collar: { r: 0.06, wd: 0.018, ht: 0.012, gap: 0 }, sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
              + patches([[-0.06, -0.07, 0.1, 0.09, 'patch-a'], [0.06, -0.05, 0.09, 0.1, 'patch-b'], [0.0, -0.135, 0.13, 0.04, 'patch-c'], [-0.15, 0.02, 0.06, 0.12, 'patch-b'], [0.15, -0.06, 0.06, 0.1, 'patch-a'], [0.15, 0.08, 0.06, 0.07, 'patch-c']], 0.08)
              + [box('hem-rib', 'cuff', [-0.19, 0.0, -0.18], [0.19, 0.08, -0.165])],
-             { cloth: 'wool-grey', collar: 'cloth-charcoal', sleeve: 'wool-grey', cuff: 'cloth-charcoal', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-denim', 'patch-c': 'cloth-red' })
+             { cloth: 'wool-grey', collar: 'cloth-charcoal', sleeve: 'wool-grey', cuff: 'cloth-charcoal', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-denim', 'patch-c': 'cloth-red' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A padded sleeveless shirt folded on a shelf, 360 mm by 320 mm and 60 mm tall, a patchwork of mismatched cloth.
@@ -338,7 +338,7 @@ local patches(list, y) = [
              + h.crescent('neck', 'binding', 0.065, 0.08, -180, 180, 16, 0.06, 0.066, 0, 0.07)
              + std.flattenArrays([h.crescent('armhole-' + sideName(s), 'binding', 0.05, 0.064, if s > 0 then 180 else 0, if s > 0 then 360 else 180, 10, 0.06, 0.066, s * 0.18, 0.06) for s in sides])
              + patches([[-0.08, -0.09, 0.12, 0.1, 'patch-a'], [0.06, -0.1, 0.11, 0.09, 'patch-b'], [-0.08, 0.0, 0.08, 0.06, 'patch-c'], [0.07, -0.01, 0.09, 0.08, 'patch-d'], [0.0, -0.145, 0.2, 0.025, 'patch-c']], 0.06),
-             { cloth: 'cloth-khaki', binding: 'cloth-charcoal', 'patch-a': 'cloth-blue', 'patch-b': 'cloth-red', 'patch-c': 'cloth-green', 'patch-d': 'cloth-yellow' })
+             { cloth: 'cloth-khaki', binding: 'cloth-charcoal', 'patch-a': 'cloth-blue', 'patch-b': 'cloth-red', 'patch-c': 'cloth-green', 'patch-d': 'cloth-yellow' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A plain one-piece bronze cuirass laid flat, 480 mm from neck to waist and 600 mm across its side straps.
@@ -369,7 +369,7 @@ local patches(list, y) = [
                box('crotch-strap-drop', 'cloth', [-0.035, 0.0, -0.176], [0.035, 0.066, -0.17]),
                h.disc('strap-snap', 'zip', 0.008, 0.066, 0.07, 0, -0.19),
              ],
-             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal' })
+             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Football shoulder pads laid flat, 640 mm from back panel to the arm straps and 640 mm across the epaulettes.
@@ -377,6 +377,6 @@ local patches(list, y) = [
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // A high steel sleeveless mail vest folded on a shelf, 380 mm by 300 mm and 60 mm tall.
-  h.compound('high_carbon_steel_mail_vest', 8.5, mailVest({}), { mail: 'steel-mail-dark', binding: 'leather-black', strap: 'leather-black', buckle: 'steel-bright' })
+  h.compound('high_carbon_steel_mail_vest', 8.5, mailVest({}), { mail: 'steel-mail-dark', binding: 'leather-black', strap: 'leather-black', buckle: 'steel-bright' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'], state: ['folded'] } } },
 ]

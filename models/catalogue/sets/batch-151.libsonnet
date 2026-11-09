@@ -237,7 +237,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     rivet: 'steel-grey',
     belt: 'leather-brown',
     buckle: 'steel',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
 
   // A pair of sheet-metal knee guards, each a felt-lined half-pipe 130 mm long and 130 mm across with a domed knee
   // cop, leather straps lying flat off both edges; 500 mm across the pair.
@@ -299,7 +299,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     pad: 'plastic-charcoal',
     rib: 'plastic-matte-black',
     stitch: 'cloth-orange',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Canvas trousers folded to 380 by 320 mm, 60 mm thick, with leather panels sewn over the thigh and shin.
   h.compound('leather_padded_pants', 1.2, trousers(0.38, 0.32, 0.06, 3)
@@ -312,7 +312,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     pocket: 'cloth-brown',
     pad: 'leather-brown',
     rib: 'leather-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['legs'], state: ['folded'] } } },
 
   // Bomb-disposal trousers folded to 440 by 380 mm, 140 mm thick with padding: quilted panels, a hard knee plate
   // with hook-and-loop strips, and braces laid over the top.
@@ -338,7 +338,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     hook: 'hook-loop-grey',
     brace: 'webbing-black',
     buckle: 'plastic-matte-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Lighter bomb-disposal trousers folded to 400 by 340 mm, 90 mm thick: stitched padding, a knee pad, a flapped
   // thigh pocket and hook-and-loop panels.
@@ -361,5 +361,5 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     cargo: 'nylon-coyote',
     flap: 'polymer-fde',
     hook: 'hook-loop-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 ]

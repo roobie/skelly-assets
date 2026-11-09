@@ -390,5 +390,5 @@ local mailSuit() =
   h.compound('powered_ventilated_mail_suit', 10, mailSuit(), {
     cloth: 'cloth-black', mail: 'steel-mail-dark', trim: 'cloth-black', liner: 'aramid-gold', strap: 'webbing-black', module: 'plastic-charcoal', led: 'lcd-green',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

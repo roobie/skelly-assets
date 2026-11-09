@@ -209,7 +209,7 @@ local foldedScarf(w, d, ht, folds) =
                box('bow', 'ribbon', [-0.012, 0.011, 0.034], [0.012, 0.016, 0.044]),
              ],
              { cloth: 'cloth-bright-white', frill: 'cloth-bright-white', ribbon: 'satin-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A black cotton face veil folded flat, 220 mm by 200 mm and 22 mm tall: the eye slit's bound edges showing on the
   // top fold and two long ties trailing from the back corners.

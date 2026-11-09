@@ -77,7 +77,7 @@ local suit(c) =
     for x in [if m == 0 then pk.x else -pk.x]
   ]);
 
-local folded(id, mass, pieces, finish) = h.compound(id, mass, pieces, finish) + { voxelGrain: 0.004 };
+local folded(id, mass, pieces, finish) = h.compound(id, mass, pieces, finish) + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 // Finishes for every suit slot in one cloth, with `trim` for the zip, seams and flaps.
 local cloth(f, trim) = {
   cloth: f, collar: f, sleeve: f, cuff: f, legs: f, pocket: f, hood: f, foot: f,

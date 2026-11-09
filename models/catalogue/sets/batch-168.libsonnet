@@ -223,7 +223,7 @@ local bodysuit =
     zip: 'steel-bright',
     stripe: 'nylon-black',
     foot: 'cloth-purple',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A black leather catsuit folded to 340 mm by 340 mm and 50 mm tall, a ring at the collar and zips running in
   // odd directions over it, one buckled strap round the bundle.
@@ -235,7 +235,7 @@ local bodysuit =
     zip: 'steel-bright',
     metal: 'steel-bright',
     strap: 'leather-charcoal',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A clown suit folded to 380 mm by 360 mm and 70 mm tall: half yellow, half red, polka dots, pompom buttons, a
   // white ruff collar and a big patch pocket.
@@ -249,7 +249,7 @@ local bodysuit =
     ruff: 'cloth-cream',
     ruffle: 'cloth-cream',
     dot: 'cloth-green',
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Denim bib overalls folded with the bib turned down over the legs, 380 mm by 460 mm and 55 mm tall: shoulder
   // straps with brass buckles, a bib pocket with a pen slot, side buttons and a hammer loop.
@@ -261,5 +261,5 @@ local bodysuit =
     strap: 'cloth-denim-faded',
     metal: 'brass-dull',
     pocket: 'cloth-denim-faded',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'], state: ['folded'] } } },
 ]

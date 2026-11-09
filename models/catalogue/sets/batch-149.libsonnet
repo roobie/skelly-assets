@@ -222,14 +222,14 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
     ]
     for s in [-1, 1]
   ]), { cloth: 'cloth-turnout', trim: 'cloth-turnout', band: 'reflective-yellow', patch: 'leather-black', brace: 'cloth-red', hardware: 'steel-bright' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Grey canvas work trousers folded on a shelf, 300 mm by 400 mm and 60 mm tall, a raised layer of cotton padding
   // over the top face quilted on in diamond stitching a shade lighter than the cloth.
   h.compound('padded_canvas_trousers', 1.3, trousers(0.3, 0.4, 0.06)
                                           + [box('padding', 'cloth', [-0.135, 0.06, -0.185], [0.135, 0.068, 0.135])]
                                           + g.quilt({ style: 'lattice', x0: -0.135, x1: 0.135, z0: -0.185, z1: 0.135, y: 0.068, pitch: 0.06, w: 0.004, t: 0.002, slot: 'stitch' }), { cloth: 'cloth-pants-grey', trim: 'cloth-canvas', stitch: 'felt-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // A pair of carpet greaves laid side by side: a square of carpet 300 mm long rolled into an open tube round each
   // shin, 128 mm across, its open back showing the pile and jute backing, held with two bands of duct tape.
@@ -291,7 +291,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
     box('belt-tail', 'belt', [0.24, 0.0, 0.105], [0.27, 0.004, 0.135]),
     box('buckle', 'buckle', [-0.26, 0.0, 0.095], [-0.235, 0.016, 0.145]),
   ], { plate: 'steel-hardened', rivet: 'steel-bright', belt: 'leather-brown', buckle: 'steel' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
 
   // A pair of hardened sheet steel knee guards standing dome up side by side, each a faceted cop 130 mm across and
   // 50 mm high with a wing on the outer side and a leather strap each way, 500 mm tip to tip.
@@ -314,10 +314,10 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
   // and 190 mm at the cuff, quilted lengthwise through their cut-resistant layers, with four buckled leg straps each
   // and a webbing waist belt.
   h.compound('chainsaw_chaps', 1.8, chaps({ saw: true, t: 0.012 }), { panel: 'cloth-orange', stitch: 'cloth-orange', strap: 'webbing-black', buckle: 'plastic-matte-black', belt: 'webbing-black', label: 'cloth-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A pair of black leather chaps laid flat, outside up, 820 mm long: two leg panels 270 mm across at the thigh and
   // 190 mm at the cuff, a tan-whipstitched welt and a zip down each outer edge, a buckled belt and a laced front.
   h.compound('leather_chaps', 2.3, chaps({ t: 0.006 }), { panel: 'leather-black', zip: 'steel-bright', welt: 'leather-charcoal', belt: 'leather-black', buckle: 'metal-silver', lace: 'leather-tan' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 ]
