@@ -1,14 +1,11 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
-// can be exploded to show each part apart from the others.
+// can be exploded to show each part apart from the others. What it draws, and how, is render.mjs's.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { samplePose } from './poseSample.mjs';
+import { canPose, clipSet, frame, isVehicle, loadEntry, makeStage, playable, pose, registerModels, setupRenderer, stillInstance } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
-const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
 const EXPLODE = 0.7; // how far an exploded part moves from the vehicle's centre, as a share of its own distance
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
@@ -19,207 +16,12 @@ const nameOf = (id) => {
 };
 const kb = (n) => (n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
 
-// ---- loading ----
-
-const loader = new GLTFLoader();
-const cache = new Map();
-
-// A model, its clips (or null) and facts read from the glTF. Every caller gets its own clone of the scene.
-function load(model) {
-  if (!cache.has(model.id)) {
-    cache.set(model.id, (async () => {
-      const [gltf, clips, body] = await Promise.all([
-        loader.loadAsync(`built/${model.file}`),
-        model.clips ? fetch(`built/${model.clips}`).then((r) => r.json()) : null,
-        model.body ? fetch(`built/${model.body}`).then((r) => r.json()) : null,
-      ]);
-      let triangles = 0;
-      const materials = new Map();
-      gltf.scene.traverse((o) => {
-        if (!o.isMesh) return;
-        const g = o.geometry;
-        triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
-        // A primitive with no material gets glTF's default, fully metallic; vertex-coloured mobs want a matte one.
-        if (g.attributes.color && o.material.metalness === 1 && o.material.roughness === 1 && !o.material.name) {
-          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0, roughness: 0.85 });
-        }
-        for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
-      });
-      if (model.label) gltf.scene.add(printedLabel(model.label));
-      return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
-    })());
-  }
-  return cache.get(model.id);
-}
-
-const modelsById = new Map();
-
-// A vehicle: the model of each site placed where it sits, a mirrored twin reflected across its own z = 0 plane first.
-// Its parts stay in site order, so the viewer can move each one apart.
-function loadVehicle(vehicle) {
-  if (!cache.has(vehicle.id)) {
-    cache.set(vehicle.id, (async () => {
-      const parts = await Promise.all(vehicle.sites.map((site) => load(modelsById.get(site.model))));
-      const scene = new THREE.Group();
-      const materials = new Map();
-      let triangles = 0;
-      vehicle.sites.forEach((site, i) => {
-        const part = parts[i].scene.clone(true);
-        part.name = site.site;
-        part.position.fromArray(site.at);
-        if (site.mirror) part.scale.z = -1;
-        scene.add(part);
-        triangles += parts[i].triangles;
-        for (const m of parts[i].materials) materials.set(m.name, m);
-      });
-      return { scene, clips: null, body: null, triangles, materials: [...materials.values()] };
-    })());
-  }
-  return cache.get(vehicle.id);
-}
-
-const isVehicle = (entry) => Boolean(entry.sites);
-const loadEntry = (entry) => (isVehicle(entry) ? loadVehicle(entry) : load(entry));
-
-// The manifest's label as a decal on its face: the GLB carries no lettering, so every consumer draws the text itself.
-const LABEL_PX = 512; // the texture's long side
-function printedLabel({ text, at, normal, up, size: [width, height] }) {
-  const canvas = document.createElement('canvas');
-  const scale = LABEL_PX / Math.max(width, height);
-  canvas.width = Math.max(1, Math.round(width * scale));
-  canvas.height = Math.max(1, Math.round(height * scale));
-  const g = canvas.getContext('2d');
-  const margin = Math.min(canvas.width, canvas.height) * 0.08;
-  const words = text.split(/\s+/);
-  // The largest font at which the words, wrapped to the width, fit the height.
-  let px = canvas.height;
-  let lines = [];
-  for (; px > 4; px *= 0.9) {
-    g.font = `bold ${px}px sans-serif`;
-    lines = words.reduce((rows, word) => {
-      const last = rows.at(-1);
-      if (last !== undefined && g.measureText(`${last} ${word}`).width <= canvas.width - 2 * margin) rows[rows.length - 1] = `${last} ${word}`;
-      else rows.push(word);
-      return rows;
-    }, []);
-    if (lines.every((line) => g.measureText(line).width <= canvas.width - 2 * margin) && lines.length * px * 1.15 <= canvas.height - 2 * margin) break;
-  }
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.lineJoin = 'round';
-  g.lineWidth = px * 0.18;
-  g.strokeStyle = '#fff';
-  g.fillStyle = '#111';
-  lines.forEach((line, i) => {
-    const y = canvas.height / 2 + (i - (lines.length - 1) / 2) * px * 1.15;
-    g.strokeText(line, canvas.width / 2, y);
-    g.fillText(line, canvas.width / 2, y);
-  });
-  const map = new THREE.CanvasTexture(canvas);
-  map.colorSpace = THREE.SRGBColorSpace;
-  map.anisotropy = 4;
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(width, height),
-    new THREE.MeshStandardMaterial({ map, transparent: true, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2 }),
-  );
-  const n = new THREE.Vector3(...normal), u = new THREE.Vector3(...up);
-  mesh.matrixAutoUpdate = false;
-  mesh.matrix.makeBasis(new THREE.Vector3().crossVectors(u, n), u, n).setPosition(...at);
-  return mesh;
-}
-
-const clipSet = (clips) => clips?.standing ?? clips?.crawling ?? clips;
-const playable = (clip) => clip?.kind === 'pose';
-const initialClip = (clips) => clips.idle ?? clips.walk;
-const canPose = (model, clips, body) => Boolean(model.body && body && clipSet(clips) && Object.values(clipSet(clips)).some(playable));
-
-function instance(loaded, model) {
-  const scene = loaded.scene.clone(true);
-  // Posing writes into the geometry, so a creature needs its own copy.
-  if (canPose(model, loaded.clips)) {
-    scene.traverse((o) => {
-      if (!o.isMesh) return;
-      o.geometry = o.geometry.clone();
-      const g = o.geometry;
-      g.userData.rest = g.attributes.position.array.slice();
-      g.userData.restNormal = g.attributes.normal.array.slice();
-    });
-  }
-  return scene;
-}
-
-// ---- rigid posing: each vertex follows its body bone (TEXCOORD_1.x) ----
-
-const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-const mul = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
-const quaternionMatrix = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
-
-const slerp = (a, b, w) => new THREE.Quaternion(...a).slerp(new THREE.Quaternion(...b), w).toArray();
-
-function pose(scene, body, clip, time) {
-  if (!playable(clip)) return;
-  const pose = samplePose(clip, time, slerp), transforms = [], byId = new Map();
-  for (const bone of body.bones) {
-    const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
-    let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
-    const parent = byId.get(bone.parent);
-    if (parent) { t = t.map((x, axis) => parent.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * t[c], 0) + parent.t[axis]); transforms.push({ r: mul(parent.r, r), t }); }
-    else { t = t.map((x, axis) => x + pose.root[axis]); transforms.push({ r, t }); }
-    byId.set(bone.id, transforms.at(-1));
-  }
-  scene.traverse((o) => {
-    if (!o.isMesh || !o.geometry.userData.rest) return;
-    const g = o.geometry, bone = g.attributes.uv1.array, rest = g.userData.rest, restN = g.userData.restNormal, pos = g.attributes.position.array, nor = g.attributes.normal.array;
-    for (let v = 0; v < pos.length / 3; v++) {
-      const m = transforms[bone[v * 2]], i = v * 3;
-      for (let axis = 0; axis < 3; axis++) { pos[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * rest[i + c], m.t[axis]); nor[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * restN[i + c], 0); }
-    }
-    g.attributes.position.needsUpdate = g.attributes.normal.needsUpdate = true;
-    g.computeBoundingSphere(); g.computeBoundingBox();
-  });
-}
-
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
 function clipTime(clip, seconds, walkSpeed) {
   if (clip.loop && clip.strideMetres !== undefined) return seconds * walkSpeed / (clip.strideMetres * (clip.cycles ?? 1));
   // The viewer has no Sim clock, so an idle loop plays its Sim seconds one to one on Real time.
   if (clip.loop) return seconds / clip.periodSimSeconds;
   return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + FINITE_REST));
-}
-
-// ---- staging ----
-
-function makeStage(renderer) {
-  const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.8;
-  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-  sun.position.set(2, 4, 3);
-  scene.add(sun, new THREE.HemisphereLight(0xffffff, 0x8a8070, 0.6));
-  return scene;
-}
-
-function setupRenderer(renderer) {
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.setClearColor(0x000000, 0);
-}
-
-// Point the camera at the object from the front three-quarter, or from `direction`, far enough to see all of it.
-function frame(camera, object, target = new THREE.Vector3(), direction = VIEW_DIR) {
-  const box = new THREE.Box3().setFromObject(object);
-  const sphere = box.getBoundingSphere(new THREE.Sphere());
-  const r = Math.max(sphere.radius, 0.01);
-  const dist = (r / Math.sin(THREE.MathUtils.degToRad(camera.fov) / 2)) * 1.02;
-  target.copy(sphere.center);
-  camera.position.copy(sphere.center).addScaledVector(direction, dist);
-  camera.near = dist / 100;
-  camera.far = dist * 100;
-  camera.updateProjectionMatrix();
-  camera.lookAt(target);
-  return { box, target };
 }
 
 // ---- thumbnails: one offscreen renderer, drawn into each card's 2D canvas as it scrolls into view ----
@@ -246,11 +48,7 @@ async function drainThumbs() {
     const { model, canvas } = queue.shift();
     try {
       const loaded = await loadEntry(model);
-      const obj = instance(loaded, model);
-      if (canPose(model, loaded.clips, loaded.body)) {
-        const clips = clipSet(loaded.clips), clip = initialClip(clips);
-        pose(obj, loaded.body, clip, 0);
-      }
+      const obj = stillInstance(loaded, model);
       thumbStage.add(obj);
       frame(thumbCamera, obj);
       thumbRenderer.render(thumbStage, thumbCamera);
@@ -476,16 +274,12 @@ async function openViewer(model) {
   if (viewer.model !== model) return; // a later pick overtook this load
 
   if (viewer.obj) viewer.stage.remove(viewer.obj);
-  viewer.obj = instance(loaded, model);
+  viewer.obj = stillInstance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
   viewer.parts = isVehicle(model) ? explodable(viewer.obj) : [];
   viewer.spread = 0;
   viewer.exploded = false;
-  if (canPose(model, loaded.clips, loaded.body)) {
-    const clips = clipSet(loaded.clips), clip = initialClip(clips);
-    pose(viewer.obj, loaded.body, clip, 0);
-  }
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
@@ -565,7 +359,7 @@ async function main() {
   }
   const { taxonomy: vocabulary, models, vehicles } = await fetch('models.json').then((r) => r.json());
   taxonomy = vocabulary;
-  for (const m of models) modelsById.set(m.id, m);
+  registerModels(models);
   entries = [...vehicles, ...models];
   for (const m of entries) cards.set(m.id, makeCard(m));
   renderShelves();
