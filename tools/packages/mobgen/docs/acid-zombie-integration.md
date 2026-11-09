@@ -77,8 +77,9 @@ and is a defect.
 The voxel grid's local material table must remain the shared consumer boundary: a
 compatibility shim would keep two competing material contracts. See
 `src/core/voxelize.ts`, `materialOf`; `src/viewer/scene.ts`, `vertexColors`;
-`src/cli/view.ts`, `printView`; and
-`packages/deadvox/src/render/fusedMassFlesh.ts`, `mergeBoneMeshes`. Material dependencies
+`src/cli/view.ts`, `printView`. Deadvox does not re-mesh a fused mass at runtime: it
+decodes the figure from the built body, and hides a carved cell through a per-slot cell
+mask over the baked mesh; see deadvox's `packCellMask`. Material dependencies
 must participate in generated-body identity so tuning changes cannot bypass save
 admission; see deadvox's `collectSimulationSourceGraph`.
 
