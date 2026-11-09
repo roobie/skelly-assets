@@ -79,6 +79,24 @@ it('keeps compound round opt-outs through catalogue assembly building', () => {
   expect(solids.find(({ id }) => id === 'round')).not.toHaveProperty('sides');
 });
 
+it('exports a label on its face, its text defaulting to the display name', () => {
+  const input = fixture();
+  const carton = { id: 'carton', slot: 'body', kind: 'box', min: [-0.05, 0, -0.02], max: [0.05, 0.2, 0.02] };
+  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify([carton]) } };
+  const item = { ...input.items[0], parts: [part], connections: [], label: { solid: 'carton', face: '+z' } };
+  const { label } = exportItem(
+    loadCatalogue({ ...input, items: [item] }).items[0]!,
+    { id: 'oat_flakes', file: 'assets/models/oat_flakes.glb' },
+    VOXEL,
+  ).modelEntry;
+  expect(label?.text).toBe('Oat flakes');
+  expect(label?.normal).toEqual([0, 0, 1]);
+  expect(label?.up).toEqual([0, 1, 0]);
+  expect(label?.at[2]).toBeCloseTo(0.02);
+  expect(label?.size[0]).toBeCloseTo(0.1);
+  expect(label?.size[1]).toBeCloseTo(0.2);
+});
+
 it('exports a grip following the held solid through resizing and assembly placement', () => {
   const input = fixture();
   const datum = {

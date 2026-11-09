@@ -31,7 +31,7 @@ local carton(id, massKg, picture, finish) =
     box('panel', 'panel', [-0.136, 0.012, 0.04], [0.136, 0.13, 0.044]),
     box('strip', 'strip', [-0.12, 0.15, -0.024], [0.12, 0.152, 0.024]),
     box('strip-side', 'strip', [0.15, 0.03, -0.03], [0.152, 0.12, 0.03]),
-  ] + picture, finish) + { voxelGrain: 0.004 };
+  ] + picture, finish) + h.label('strip', '+y') + { voxelGrain: 0.004 };
 [
   // A square ice-cream tub, 190 mm across the lip and 166 mm tall with its lid, white with a blue printed band
   // and a plastic carry handle standing up over the lid.
@@ -52,7 +52,7 @@ local carton(id, massKg, picture, finish) =
     lid: 'plastic-white',
     band: 'plastic-blue',
     handle: 'plastic-white',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + h.label('band-front', '+z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small steel gas cylinder, 40 mm across and 120 mm tall, with a domed shoulder, a printed band and a
   // black plastic valve head with a side outlet and a knob.

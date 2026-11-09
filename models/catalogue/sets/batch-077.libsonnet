@@ -136,7 +136,7 @@ local spool(n, x, z, y0) = [
     for i in std.range(0, 4)
   ] + [
     h.box('cut-line', 'print', [0.200, 0.0115, -0.085], [0.202, 0.0125, 0.085]),
-  ], { envelope: 'paper-butcher', label: 'paper-white', print: 'plastic-black', sheet: 'paper-white' }) + {
+  ], { envelope: 'paper-butcher', label: 'paper-white', print: 'plastic-black', sheet: 'paper-white' }) + h.label('label', '+y') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
   // A sewing case 180 mm by 110 mm and 30 mm deep, opened with its lid lying flat behind: spools of thread, a

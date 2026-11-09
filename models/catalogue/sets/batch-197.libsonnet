@@ -72,7 +72,7 @@ local plates = 8;
     box('rune-bar', 'rune', [-0.014, 0.082, 0.0355], [0.014, 0.088, 0.038]),
     box('rune-hook', 'rune', [0.008, 0.088, 0.0355], [0.014, 0.1, 0.038]),
     box('spill', 'mortar', [-0.03, 0.19, -0.008], [0.02, 0.193, 0.01]),
-  ], { paper: 'paper-butcher', band: 'cloth-crimson', rune: 'crystal-glow-blue', mortar: 'stone-grey' }) + h.inHand('fireproof_mortar', 'sack') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'], setting: ['fantasy'] } } },
+  ], { paper: 'paper-butcher', band: 'cloth-crimson', rune: 'crystal-glow-blue', mortar: 'stone-grey' }) + h.inHand('fireproof_mortar', 'sack') + h.label('band', '-z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'], setting: ['fantasy'] } } },
 
   // A loose cluster of crimped wool about 150 mm long, 90 mm wide and 70 mm high, pale and faintly shimmering, its
   // locks ending in lighter tips.

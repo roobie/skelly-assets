@@ -48,6 +48,8 @@ export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
   /** The data that, with the generator code, fixes the output; a row without it is never cached. */
   readonly inputs?: () => unknown;
 }
+/** The name a model goes by when nothing else names it; the showcase titles models by the same rule (`site/app.js`, `nameOf`). */
+export const displayName = (id: string) => id.charAt(0).toUpperCase() + id.slice(1).replaceAll('_', ' ');
 export const recipeAsset = ({ id }: Pick<RecipeRow, 'id'>) => ({ id, file: `assets/models/${id}.glb` as const });
 export const recipeOptions = (row: RecipeRow) => (row.options === undefined ? {} : row.options);
 export const recipeVoxel = ({ voxel }: RecipeRow): VoxelGrains => ({

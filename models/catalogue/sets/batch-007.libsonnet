@@ -99,7 +99,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
     box('carton', 'carton', [-0.0225, 0, -0.009], [0.0225, 0.085, 0.009]),
     box('band', 'band', [-0.023, 0.012, -0.0095], [0.023, 0.028, 0.0095]),
     turned('moon', 'moon', 'z', [[0, 0], [0, 0.009], [0.0015, 0.009], [0.0015, 0]], [0, 0.055, 0.009]),
-  ], { carton: 'paint-police-blue', band: 'paper-white', moon: 'plastic-yellow' }) + inHand('sleeping_pills', 'carton') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { carton: 'paint-police-blue', band: 'paper-white', moon: 'plastic-yellow' }) + inHand('sleeping_pills', 'carton') + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A small reused glass vial of brown homemade tablets, 20 mm across and 58 mm tall, stoppered with
   // a cork and labelled with a strip of tape.

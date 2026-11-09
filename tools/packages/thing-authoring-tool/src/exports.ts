@@ -2,7 +2,7 @@ import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts';
-import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, catalogue, palette, type ToolItem } from './catalogue.ts';
 import { authoredSkin } from './skin.ts';
@@ -13,7 +13,7 @@ export const exportItem = (
   voxel: VoxelGrains,
   { collision = false }: { readonly collision?: boolean } = {},
 ) => {
-  const { report, masses, handling, drawn, glow } = buildItem(item, voxel);
+  const { report, masses, handling, label, drawn, glow } = buildItem(item, voxel);
   const out = exportGlb({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
@@ -49,6 +49,7 @@ export const exportItem = (
       ...(item.exportMass === 'parts' ? { parts } : {}),
       ...handling,
       ...(glow ? { emissiveMaterial: glow } : {}),
+      ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
     },
     physical: assemblyProperties(parts),
   };

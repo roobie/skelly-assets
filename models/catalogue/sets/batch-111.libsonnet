@@ -193,6 +193,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     cloth: 'cloth-yellow',
     band: 'paper-white',
   })
+  + h.label('band', '+y')
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['torso'], state: ['folded'] } } },
 
   // A primitive cloak of dried grass 700 mm long laid flat: grass bundles twined into a cord collar 600 mm wide,

@@ -215,5 +215,5 @@ local flatCarton(length, width, height, thickness, crease) =
     box('panel', 'panel', [-0.032, 0.04, 0.025], [0.032, 0.096, 0.027]),
     box('band', 'band', [-0.045, 0.012, 0.025], [0.045, 0.026, 0.027]),
   ], { print: 'paint-red', flap: 'paperboard-tan', panel: 'paint-cream', band: 'plastic-yellow' })
-  + h.inHand('snack_box', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
+  + h.inHand('snack_box', 'body') + h.label('panel', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
 ]

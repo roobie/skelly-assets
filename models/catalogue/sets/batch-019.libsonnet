@@ -169,7 +169,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     turned('roll', 'roll', 'x', [[0, 0], [0, 0.010], [0.082, 0.010], [0.082, 0]], [-0.041, 0.086, 0]),
     box('band', 'print', [-0.0405, 0.028, -0.0255], [0.0405, 0.048, 0.0255]),
   ], { paper: 'cardboard-corrugated', roll: 'paperboard-tan', print: 'paint-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'] } } },
+  + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'] } } },
   // A refrigeration condensing unit on a 400 by 260 mm base: a domed compressor, a fan in its shroud and a finned
   // coil with copper tubes, about 300 mm tall. The two copper lines rise from the compressor and pass over the fan.
   h.compound('condensing_unit', 13, [

@@ -270,7 +270,7 @@ local heatPack(used) =
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A single-use chemical heat pack, 120 by 90 mm and 12 mm thick, with a pull tab to start it.
-  h.compound('heatpack', 0.06, heatPack(false), { pouch: 'plastic-white', crimp: 'plastic-white', print: 'plastic-red', tab: 'plastic-orange' }) + h.inHand('heatpack', 'pouch') + {
+  h.compound('heatpack', 0.06, heatPack(false), { pouch: 'plastic-white', crimp: 'plastic-white', print: 'plastic-red', tab: 'plastic-orange' }) + h.inHand('heatpack', 'pouch') + h.label('print', '+y') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 

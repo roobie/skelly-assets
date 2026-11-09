@@ -1,5 +1,5 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category and tags, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
+// their category, tags and printed label, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [outDir]; the tree defaults to built/. No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
@@ -29,21 +29,23 @@ const walkSpeedOf = (clips) => {
 };
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, clips, body }) => ({
+  .map(({ id, pack, path, category, tags, label, clips, body }) => ({
     id,
     category: category ?? null,
+    label: label ?? null,
     tags: tags ?? {},
     file: `${pack}/${path}`,
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, clips, body }) => ({
+  .map(({ id, file, category, tags, label, clips, body }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
     category,
     tags,
+    label,
     clips,
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),

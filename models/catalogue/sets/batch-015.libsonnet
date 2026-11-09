@@ -38,7 +38,7 @@ local fibreTube(axis, length, radius, band) =
     box('front-low', 'board', [-0.012, 0.002, 0.028], [0.012, 0.026, 0.03]),
     box('stencil', 'stencil', [-0.036, 0.008, 0.03], [0.036, 0.016, 0.032]),
   ], { board: 'paperboard-brown', stencil: 'paint-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper'], setting: ['modern'] } } },
+  + h.label('stencil', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A fibreboard container for one hand grenade, standing on end: 75 mm across its steel caps and 135 mm
   // tall, black with tape over the lid seam and a yellow band.
