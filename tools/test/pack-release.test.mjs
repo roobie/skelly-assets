@@ -3,7 +3,7 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, wr
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { packRelease } from '../pack-release.mjs';
+import { packRelease, RENAMES_ASSET } from '../pack-release.mjs';
 
 test('release archives depend only on the tree\'s names and bytes, not its file times or modes', () => {
   const root = mkdtempSync(join(tmpdir(), 'pack-release-'));
@@ -12,7 +12,7 @@ test('release archives depend only on the tree\'s names and bytes, not its file 
     mkdirSync(join(tree, 'fixture.a/assets'), { recursive: true });
     writeFileSync(join(tree, 'fixture.a/assets/one.glb'), 'one');
     writeFileSync(join(tree, 'fixture.a/two.json'), '{}');
-    writeFileSync(join(tree, 'manifest.json'), '{}');
+    writeFileSync(join(tree, 'manifest.json'), '{"renames":{}}');
     const [first] = packRelease(tree, join(root, 'first'));
     utimesSync(join(tree, 'fixture.a/assets/one.glb'), 1, 1);
     chmodSync(join(tree, 'fixture.a/two.json'), 0o600);
@@ -28,5 +28,18 @@ test('a flat file other than the manifest is refused, not left out of the releas
     writeFileSync(join(root, 'manifest.json'), '{}');
     writeFileSync(join(root, 'flat.glb'), 'x');
     assert.throws(() => packRelease(root, join(root, 'out')), /flat\.glb/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the release carries the manifest\'s renames as their own asset', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pack-release-'));
+  try {
+    const tree = join(root, 'tree');
+    mkdirSync(join(tree, 'fixture.a'), { recursive: true });
+    writeFileSync(join(tree, 'fixture.a/one.glb'), 'one');
+    const renames = { fixture_old: 'fixture_new' };
+    writeFileSync(join(tree, 'manifest.json'), JSON.stringify({ renames }));
+    packRelease(tree, join(root, 'out'));
+    assert.deepEqual(JSON.parse(readFileSync(join(root, 'out', RENAMES_ASSET), 'utf8')), renames);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

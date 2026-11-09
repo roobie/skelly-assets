@@ -1,6 +1,7 @@
 ---
 read_if:
   - adding a model, choosing its content pack or consuming shared assets
+  - renaming or merging a model id, or moving a pin past renamed ids
   - which way a model faces, or whether a consumer converts its axes
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
@@ -120,6 +121,11 @@ Use `manifest.json` as the consumer-facing file authority, not a parallel list i
 consumer can choose to bundle. CI holds every build to its manifest and to the declared packs before it is
 shown or released; see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDifferences`.
 
+Renaming or merging a released model id adds the old id to `models/renames.json`, pointing at its current id, and
+repoints any entry that named it, so a consumer's saved ids keep resolving after it moves its pin. The build refuses
+a map whose retired id names a model again or whose target is no current model; see `tools/manifest.mjs`,
+`buildManifest`.
+
 ### Printed labels
 
 A packaged item without its print reads as a blank box, so a catalogue row can name the face of a piece that
@@ -152,6 +158,10 @@ Fetch a pinned release rather than building or tracking this repository: from a 
 `<packId>/`, and every manifest path is logical under its pack, so the archives unpacked side by side form the
 same tree for every consumer. Pinning a tag gives you immutable bytes that only change when you move the pin;
 fetching per pack keeps sharing a capability rather than an obligation to take the whole library.
+
+When you move the pin, map every model id you saved through the release's `renames.json`, the manifest's `renames`.
+It holds every id any earlier release retired, renamed or merged into another model, mapped to its current id, so a
+jump over several releases is one lookup; a retired id never names a new model, so the lookup is never ambiguous.
 
 The `.glb` files load in any engine or tool that reads glTF 2.0. Engine-specific sidecar files, such as Godot's
 `*.import`, are ignored here, so each game generates its own.
