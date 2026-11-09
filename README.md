@@ -55,7 +55,9 @@ vehicles, never single parts, so a vehicle's parts all live in one pack; road ve
 are separate packs because a product can want traffic without aircraft or ruins. A vehicle's file sets the
 taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
 import those files is generated; see `tools/vehicle-index.mjs`, `vehicleIndex`, and
-`models/recipes/skelly.ground-vehicles.jsonnet`.
+`models/recipes/skelly.ground-vehicles.jsonnet`. Which part sits where on a vehicle is model data too, in the
+vehicle's placements file beside its rows, so the showcase and the games assemble it from one source; why, and what
+stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`.
 
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
@@ -83,7 +85,9 @@ follow a product's selection. A standalone model does not require a playable ite
 carry looks one product uses without inventing gameplay for another. Packs are scoped to content, such as a kind
 of thing, an actor family, a site or a scenario, never to a reader; see the selections in `models/recipes/`. The
 showcase consumes all manifest models, independent of product bundling, and shelves and filters them by the
-category and tags their manifest entries carry; see `site/build.mjs`.
+category and tags their manifest entries carry; see `site/build.mjs`. It shows each vehicle assembled from its
+placements, because a pile of loose panels does not show what the vehicle is, and can explode it to show the parts
+it is made of.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through

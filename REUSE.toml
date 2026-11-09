@@ -6,6 +6,6 @@ SPDX-FileCopyrightText = "Björn Roberg"
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
 [[annotations]]
-path = ["tools/**", "site/**", ".github/**", "README.md", "LICENSE", "REUSE.toml", ".gitignore"]
+path = ["tools/**", "site/**", "docs/**", ".github/**", "README.md", "LICENSE", "REUSE.toml", ".gitignore"]
 SPDX-FileCopyrightText = "Björn Roberg"
 SPDX-License-Identifier = "EUPL-1.2"
