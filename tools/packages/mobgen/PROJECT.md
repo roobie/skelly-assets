@@ -57,5 +57,15 @@ The fused body should read as one grotesque fusion. Complete humanoid members re
 beneath a non-severable core; arbitrary member orientation means there is no single humanoid gaze target.
 See `src/mob/fusedMass.ts`, `fusedMassManifest`, and `src/viewer/main.ts`, `applyLiveFrame`.
 
+The leaper is an ambush predator built around folded hind springs, so it is its own plan rather than a
+posed humanoid or quadruped. Its rest pose is the coiled crouch it spends its life in, so validation judges
+that body; every other stance is a clip on the same rig. Its joints must hold together through deep folds,
+which a rigid-voxel bend cracks open, so seams are checked after posing. Losing a hind spring changes which
+gait the body can still perform instead of distorting the healthy one. The game owns corpse physics and has
+no generic rule for a new anatomy, so the leaper's ragdoll groups are kept beside it as data for the game to
+adopt. It stays standalone from the other plans so its tuning cannot move them. See `src/mob/leaper/plan.ts`,
+`LEAPER_TEMPLATE`; `src/mob/leaper/seams.ts`, `jointCracks`; `src/mob/leaper/motion.ts`, `locomotionFor`;
+`src/mob/leaper/ragdoll.jsonnet`; and `test/boundaries.test.ts`.
+
 Population-quality assertions belong in explicit sweeps because they measure distributions rather than an
 individual body's contract. See `test/sweeps.ts`, `sweepGroup`, and `src/cli/stats.ts`.
