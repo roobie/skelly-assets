@@ -1,8 +1,9 @@
-// Helpers for a vehicle's placements: which part sits where on the vehicle, in the vehicle frame (x forward, y up,
-// z toward the near side). A part pressed for its vehicle is authored where it sits, so it is placed at the origin.
+// Helpers for a vehicle's placements: which part sits where on the vehicle, in the vehicle frame (frame.libsonnet). A
+// part pressed for its vehicle is authored where it sits, so it is placed at the origin.
+local frame = import 'frame.libsonnet';
 local origin = [0, 0, 0];
 local one(id, part, at=origin) = { id: id, part: part, at: at };
-// A near-side site and its far-side twin, whose part is reflected across its own z = 0 plane before it is placed.
+// A near-side site and its far-side twin, whose part is reflected across its own centre plane before it is placed.
 // `0 - z` rather than `-z` keeps a centred twin at 0, since -0 does not survive a JSON round trip.
 local pair(id, part, at=origin) = [
   one(id + '_near', part, at),
@@ -32,15 +33,18 @@ local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car
     headlamps(x, y, z, supportedBy=[]): headlamps(x, y, z),
     batteryBay(tray, at, supportedBy=[]): batteryBay(tray, at),
   },
-  // Every vehicle's placements with each variant's sites laid out from its parent's. A variant shares its parent's
-  // build, so it names its `parent` and gives `sites` as a function of the parent's sites, stating only what differs.
-  // A variant whose parent is unknown or itself a variant keeps no sites, and tools/placements.mjs reports it.
+  // Every vehicle's placements with each variant's sites laid out from its parent's, and the frame they are laid out
+  // in, which tools/placements.mjs turns them from. A variant shares its parent's build, so it names its `parent` and
+  // gives `sites` as a function of the parent's sites, stating only what differs. A variant whose parent is unknown or
+  // itself a variant keeps no sites, and tools/placements.mjs reports it.
   variants(all):: {
-    [vehicle]: local entry = all[vehicle];
+    [vehicle]: { forward: frame.forward } + (
+      local entry = all[vehicle];
       if !std.objectHas(entry, 'parent') then entry
       else if std.objectHas(all, entry.parent) && !std.objectHas(all[entry.parent], 'parent')
       then entry { sites: entry.sites(all[entry.parent].sites) }
       else { [key]: entry[key] for key in std.objectFields(entry) if key != 'sites' }
+    )
     for vehicle in std.objectFields(all)
   },
 }

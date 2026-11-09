@@ -15,7 +15,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 + std.flattenArrays(std.objectValues(import 'catalogue/sets/index.libsonnet'))
 + std.flattenArrays([set.rows for set in std.objectValues(import 'catalogue/worn.libsonnet')])
 // Each vehicle's file tags its own rows with what that vehicle is; every row of the fleet is a vehicle part.
-+ taxonomy.inherit({ category: 'vehicle-parts' }, std.flattenArrays(std.objectValues(import 'vehicles/index.libsonnet')))
++ taxonomy.inherit({ category: 'vehicle-parts' }, (import 'vehicles/frame.libsonnet').rows(std.flattenArrays(std.objectValues(import 'vehicles/index.libsonnet'))))
 + (import 'packages.libsonnet')
 + (import 'cans.libsonnet')
 + (import 'materials.libsonnet')

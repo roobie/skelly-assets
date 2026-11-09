@@ -26,25 +26,26 @@ const vanSites = [
   { id: 'door_far', part: 'fixture_door', at: [0, 0, 0], mirror: true },
 ];
 // The ambulance borrows the van's body from another pack and adds its own light bar and role.
-const ambulance = { sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
+const ambulance = { forward: '+z', sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
 const vehicleRows = { van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'], ambulance: ['fixture_light_bar'] };
 const dependsOn = { 'fixture.rescue': ['fixture.vans'] };
 const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary }).join('\n');
 
 test('sites that name built models, each once, at a point, in reachable packs, assemble without problems', () => {
-  assert.equal(problems({ van: { sites: vanSites }, ambulance }), '');
+  assert.equal(problems({ van: { forward: '+z', sites: vanSites }, ambulance }), '');
 });
 
 // Each would place nothing, the wrong model or a part nowhere, and only the showcase or a game would notice.
 test('a site that cannot be assembled from the built models is a problem', () => {
-  const broken = (site) => problems({ van: { sites: [body, site] } });
+  const broken = (site) => problems({ van: { forward: '+z', sites: [body, site] } });
   assert.match(broken({ id: 'gone', part: 'fixture_missing', at: [0, 0, 0] }), /not a built model/);
   assert.match(broken({ id: 'twice', part: 'fixture_twice', at: [0, 0, 0] }), /2 packs/);
   assert.match(broken({ ...body }), /two sites of one id/);
   assert.match(broken({ id: 'flat', part: 'fixture_door', at: [0, 0] }), /three finite numbers/);
   assert.match(broken({ id: 'far', part: 'fixture_door', at: [0, 0, 0], mirror: false }), /mirror/);
   assert.match(broken({ id: 'turned', part: 'fixture_door', at: [0, 0, 0], yaw: 1 }), /unknown keys yaw/);
-  assert.match(problems({ van: { sites: [] } }), /no sites/);
+  assert.match(problems({ van: { forward: '+z', sites: [] } }), /no sites/);
+  assert.match(problems({ van: { forward: '+y', sites: vanSites } }), /forward is not one of/);
 });
 
 // A copied part would drift from its source unseen; an undeclared reference would load without its pack.
@@ -95,6 +96,8 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
       path: 'vehicles/electric_van.placements.json',
       tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency', 'farm'] },
     });
+    const shipped = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
+    assert.deepEqual(shipped.sites.find(({ id }) => id === 'motor').at, [0, 0, 1], 'a site laid out ahead along x ships ahead along +z');
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
