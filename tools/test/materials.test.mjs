@@ -1,13 +1,15 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
-import { readRoster } from '../layout.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 installJsonnetSources();
 const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
 const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
-const { MATERIALS, surfaceOf } = await import('../packages/thing-core/src/materials.ts');
+const { MATERIALS } = await import('../packages/thing-core/src/materials.ts');
+const { exportCache } = await import('../packages/thing-export/src/cache.ts');
 const compiled = JSON.parse(readFileSync(new URL('../packages/thing-core/src/materials.json', import.meta.url)));
 
 const glbJson = (bytes) => {
@@ -15,34 +17,56 @@ const glbJson = (bytes) => {
   return JSON.parse(buffer.subarray(20, 20 + buffer.readUInt32LE(12)).toString());
 };
 
-test('every material a recipe resolves is defined', () => {
-  const ids = readRoster().map((row) => row.id);
-  const recipe = loadThingRecipe(JSON.parse(readFileSync(new URL('../packages/thing-authoring-tool/exports/deadvox.json', import.meta.url))));
-  assert.ok(ids.length > 0);
-  assert.deepEqual(MATERIALS, compiled);
-  for (const id of ids) {
-    const row = recipe.find(row => row.id === id);
-    assert.ok(row, `missing recipe ${id}`);
-    // Generation exercises the exporter's actual appearance lookup, not a string scan of recipes.
-    const model = glbJson(row.generate().glb);
-    assert.ok(model.materials.length > 0, `${id}: no resolved surfaces`);
-    for (const material of model.materials) {
-      const selected = material.extras?.materialId;
-      assert.ok(selected, `${id}: surface without a material id`);
-      assert.ok(Object.hasOwn(compiled, selected), `${id}: unknown material ${selected}`);
-      assert.deepEqual(surfaceOf(MATERIALS[selected].finish), surfaceOf(compiled[selected].finish));
-    }
+// Generation refuses an undefined material (below), so the build itself holds every model's materials; one fixture
+// item shows the exporter names each surface's material, without regenerating the catalogue.
+const withFixture = (finish, work) => {
+  const fixture = JSON.parse(readFileSync(new URL('./fixtures/unknown-material.json', import.meta.url)));
+  const item = { ...fixture.item, parts: fixture.item.parts.map((part) => ({ ...part, finish })) };
+  // Bypass catalogue admission deliberately: even an unvalidated caller must not get a fallback surface.
+  catalogue.items.push(item);
+  try {
+    const [row] = loadThingRecipe(fixture.recipe);
+    return work(row);
+  } finally {
+    catalogue.items.pop();
   }
+};
+
+// Not the default, so an exporter that labels a surface with its fallback cannot pass.
+const chosen = Object.keys(MATERIALS).find((id) => id !== catalogue.defaultMaterial);
+
+test('every surface an item exports names the material its finish chose', () => {
+  assert.deepEqual(MATERIALS, compiled);
+  const model = withFixture({ surface: chosen }, (row) => glbJson(row.generate().glb));
+  assert.ok(model.materials.length > 0, 'no resolved surfaces');
+  for (const material of model.materials) assert.equal(material.extras?.materialId, chosen);
 });
 
 test('a fixture recipe with an undefined surface material fails appearance resolution', () => {
-  const fixture = JSON.parse(readFileSync(new URL('./fixtures/unknown-material.json', import.meta.url)));
-  // Bypass catalogue admission deliberately: even an unvalidated caller must not get a fallback surface.
-  catalogue.items.push(fixture.item);
+  withFixture({ surface: 'no-such-material' }, (row) => assert.throws(() => row.generate(), /Unknown palette material no-such-material/));
+});
+
+test('editing a material an item names misses that item in the export cache', () => {
+  const folder = mkdtempSync(join(tmpdir(), 'export-cache-'));
+  const colour = MATERIALS[chosen].colour;
   try {
-    const [row] = loadThingRecipe(fixture.recipe);
-    assert.throws(() => row.generate(), /Unknown palette material no-such-material/);
+    withFixture({ surface: chosen }, (row) => {
+      let runs = 0;
+      const counted = {
+        ...row,
+        generate: () => {
+          runs += 1;
+          return row.generate();
+        },
+      };
+      const cache = exportCache(folder, 'code');
+      cache.export(counted);
+      MATERIALS[chosen].colour = colour.map((channel) => 1 - channel);
+      cache.export(counted);
+      assert.equal(runs, 2);
+    });
   } finally {
-    catalogue.items.pop();
+    MATERIALS[chosen].colour = colour;
+    rmSync(folder, { recursive: true, force: true });
   }
 });

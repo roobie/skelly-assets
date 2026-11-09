@@ -11,10 +11,14 @@ output so consumers need no authoring environment. Use `build_models.sh` for ros
 `build_mobs.sh` for generated actors. For the entry points and selection rules, see `build.mjs`, `main`, and
 `mobs.mjs`, `main`.
 
-Node 26 or later runs TypeScript directly. Install the locked dependencies with `npm ci` in `tools/`;
+The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
-of truth; see `sources.mjs`, `installJsonnetSources`. The compiler is checksum-verified; transient release
+of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, so a run whose
+importable inputs hash the same as the last compile reuses them rather than paying for the whole catalogue again;
+see `sources.mjs`, `refreshJsonnetTwins`. CI jobs start from fresh checkouts, so they share one compile through a
+twin store keyed by that same digest rather than each paying for it. Jsonnet imports another source's `.jsonnet`, never its
+twin, because all twins compile in one run and none exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin
@@ -102,7 +106,9 @@ Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildMan
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
-rather than assumed to. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
+rather than assumed to. A build given a cache folder reuses every export whose code and inputs are unchanged; see
+`packages/thing-export/src/cache.ts`, `exportCache`. A key that leaves out something an export reads would serve
+stale bytes, so a tool caches only rows that name their inputs, and an over-wide key costs only a miss. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
 `packRelease`. The showcase reads this authority rather than maintaining its own model selection; see
 `../site/build.mjs`.
 

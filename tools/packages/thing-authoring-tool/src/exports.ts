@@ -1,7 +1,8 @@
+import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts';
-import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, catalogue, palette, type ToolItem } from './catalogue.ts';
 import { authoredSkin } from './skin.ts';
@@ -12,7 +13,7 @@ export const exportItem = (
   voxel: VoxelGrains,
   { collision = false }: { readonly collision?: boolean } = {},
 ) => {
-  const { report, masses, handling, drawn, glow } = buildItem(item, voxel);
+  const { report, masses, handling, label, drawn, glow } = buildItem(item, voxel);
   const out = exportGlb({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
@@ -48,6 +49,7 @@ export const exportItem = (
       ...(item.exportMass === 'parts' ? { parts } : {}),
       ...handling,
       ...(glow ? { emissiveMaterial: glow } : {}),
+      ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
     },
     physical: assemblyProperties(parts),
   };
@@ -73,4 +75,16 @@ const exporters = {
 };
 // The recipe row kinds this tool owns; a driver hands it only rows of these kinds.
 export const THING_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
-export const loadThingRecipe =(value: unknown) => loadRecipe(value, exporters);
+const { items: _items, ...settings } = catalogue;
+/**
+ * What an item row's export reads besides code and the row: its item, the catalogue settings and the materials it may
+ * name. A material counts when its id occurs anywhere in the item's text, even inside a string parameter, since naming
+ * one too many only widens the key.
+ */
+const itemInputs = (row: RecipeRow) => {
+  const item = catalogue.items.find(({ id }) => id === row.source);
+  const text = JSON.stringify(item);
+  const named = Object.keys(MATERIALS).filter((id) => id === catalogue.defaultMaterial || text.includes(id));
+  return { item, settings, materials: named.sort().map((id) => [id, MATERIALS[id]]) };
+};
+export const loadThingRecipe = (value: unknown) => loadRecipe(value, exporters, { item: itemInputs });

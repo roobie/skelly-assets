@@ -22,6 +22,8 @@ on:
       - 'tools/recipes.d.mts'
       - 'tools/jsonnet/**'
       - 'models/**'
+      - '.node-version'
+      - '.github/actions/node/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
   pull_request:
@@ -44,6 +46,8 @@ on:
       - 'tools/recipes.d.mts'
       - 'tools/jsonnet/**'
       - 'models/**'
+      - '.node-version'
+      - '.github/actions/node/**'
       - '.github/workflows/thing-authoring-tool.yml'
       - '!**/*.md'
 
@@ -64,11 +68,9 @@ jobs:
         with:
           path: tools/jsonnet/bin
           key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/node
         with:
-          node-version: 26
-          cache: npm
-          cache-dependency-path: tools/package-lock.json
+          npm-cache: true
       - run: npm ci --prefix ../..
       - run: npm run typecheck
       - run: npm test

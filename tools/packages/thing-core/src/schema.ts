@@ -97,6 +97,17 @@ export const ModelPartSchema = strictObject({
   ),
 });
 
+/**
+ * A flat rectangle on a model's surface: its centre, the way it faces, the way its top points, and its width across
+ * and height along that top in metres.
+ */
+const surfaceEntries = {
+  at: ModelPointSchema,
+  normal: UnitVectorSchema,
+  up: UnitVectorSchema,
+  size: tuple([pipe(number(), finite(), minValue(0)), pipe(number(), finite(), minValue(0))]),
+};
+
 export const NeutralModelSchema = strictObject({
   id: Id,
   file: pipe(string(), regex(/^assets\/models\/[a-z0-9_-]+\.glb$/, 'expected "assets/models/<name>.glb"')),
@@ -115,19 +126,21 @@ export const NeutralModelSchema = strictObject({
   rest: optional(picklist(['lying', 'upright'])),
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
-  /**
-   * The screen of an item that shows something: its centre, the way it faces, the way its top points,
-   * and its width across and height along that top in metres.
-   */
+  /** The screen of an item that shows something. */
   display: optional(
     pipe(
-      strictObject({
-        at: ModelPointSchema,
-        normal: UnitVectorSchema,
-        up: UnitVectorSchema,
-        size: tuple([pipe(number(), finite(), minValue(0)), pipe(number(), finite(), minValue(0))]),
-      }),
+      strictObject(surfaceEntries),
       check(({ normal, up }) => Math.abs(dotOf(normal, up)) <= 1e-6, 'display up must be across its normal'),
+    ),
+  ),
+  /**
+   * What is printed on a packaged item and where: the consumer draws the text itself, so the GLB stays free of
+   * baked lettering and a relabel never changes the model's bytes.
+   */
+  label: optional(
+    pipe(
+      strictObject({ ...surfaceEntries, text: Name }),
+      check(({ normal, up }) => Math.abs(dotOf(normal, up)) <= 1e-6, 'label up must be across its normal'),
     ),
   ),
 });

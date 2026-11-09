@@ -1,5 +1,6 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local catalogue = import 'models/catalogue/packs.libsonnet';
 local models = std.set(['baseball_cap', 'dad_cabin_key']);
 [
   {
@@ -9,6 +10,5 @@ local models = std.set(['baseball_cap', 'dad_cabin_key']);
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, models)
+  for row in catalogue.rows(models)
 ]

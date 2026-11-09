@@ -55,6 +55,13 @@ import { ring } from './families/ring.ts';
 import { spool } from './families/spool.ts';
 import { SkinSchema } from './skin.ts';
 
+const FACES = ['+x', '-x', '+y', '-y', '+z', '-z'] as const;
+type Face = (typeof FACES)[number];
+const faceAxis = (face: Face): Vec3 => {
+  const axis = 'xyz'.indexOf(face[1]!);
+  return [0, 1, 2].map((at) => (at === axis ? (face[0] === '+' ? 1 : -1) : 0)) as unknown as Vec3;
+};
+const defaultUp: Readonly<Record<Face, Face>> = { '+x': '+y', '-x': '+y', '+z': '+y', '-z': '+y', '+y': '-z', '-y': '+z' };
 const positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
 const name = pipe(string(), nonEmpty());
 const material = pipe(
@@ -109,6 +116,23 @@ const ItemSchema = strictObject({
   anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
   /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
   display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
+  /**
+   * The face of a solid that carries the item's print, and the print's text, which defaults to the model's display
+   * name. The part defaults to the item's first, which is a compound's only one; the top defaults to +y on a side
+   * face, and to the back on the top or bottom face, so the text reads from the front.
+   */
+  label: optional(
+    pipe(
+      strictObject({
+        part: optional(name),
+        solid: name,
+        face: picklist(FACES),
+        up: optional(picklist(FACES)),
+        text: optional(name),
+      }),
+      check(({ face, up }) => up === undefined || up[1] !== face[1], 'label up must be across its face'),
+    ),
+  ),
   /** The finish slot that glows while lit; its material must be the only one that slot's finish names in the item. */
   glow: optional(name),
   /** The item's own voxel grain in metres, in place of its class grain; the export recipe resolves it. */
@@ -189,7 +213,7 @@ const builders = {
   torch,
   flashlight,
   candle,
-} satisfies Record<string, (params: Readonly<Record<string, string>>) => readonly Solid[]>;
+} satisfies Record<string, (params: Readonly<Record<string, string>>, turnedSides?: number) => readonly Solid[]>;
 const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
     throw new Error(`Unknown thing family ${part.family}`);
@@ -197,7 +221,7 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
   // Compound consumes per-piece null opt-outs itself; other families emit ordinary revolved solids.
   const solids = part.family === 'compound'
     ? compound(params, turnedSides)
-    : builders[part.family as keyof typeof builders](params).map((solid): Solid =>
+    : builders[part.family as keyof typeof builders](params, turnedSides).map((solid): Solid =>
       solid.kind === 'revolved' && solid.sides === undefined && turnedSides !== undefined
         ? { ...solid, sides: turnedSides }
         : solid,
@@ -320,11 +344,9 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
       anchors: Object.fromEntries(Object.entries(item.anchors).map(([id, datum]) => [id, datumAt(datum)])),
     };
   }
-  if (item.display) {
-    const { part, solid: solidId, normal, up } = item.display;
-    const at = datumAt(item.display);
-    const { min, max } = drawnSolid(part, solidId);
-    // The screen solid's extent along a part-frame direction.
+  // A flat rectangle on a solid, facing a part-frame direction: the solid's extent across and along its top.
+  const surfaceOn = (datum: Pick<ToolDatum, 'part' | 'solid' | 'fraction'>, normal: Vec3, up: Vec3) => {
+    const { min, max } = drawnSolid(datum.part, datum.solid);
     const extentAlong = (direction: Vec3) => {
       const unit = scale(direction, 1 / Math.hypot(...direction));
       const across = unit.reduce((sum, value, axis) => sum + Math.abs(value) * (max[axis]! - min[axis]!), 0);
@@ -335,15 +357,22 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
       up[2] * normal[0] - up[0] * normal[2],
       up[0] * normal[1] - up[1] * normal[0],
     ];
-    handling = {
-      ...handling,
-      display: {
-        at,
-        normal: directionIn(part, normal),
-        up: directionIn(part, up),
-        size: [extentAlong(side), extentAlong(up)],
-      },
+    return {
+      at: datumAt(datum),
+      normal: directionIn(datum.part, normal),
+      up: directionIn(datum.part, up),
+      size: [extentAlong(side), extentAlong(up)] as const,
     };
+  };
+  if (item.display) {
+    handling = { ...handling, display: surfaceOn(item.display, item.display.normal, item.display.up) };
   }
-  return { report, masses, handling, drawn, glow: item.glow && glowMaterial(item, item.glow) };
+  let label: ReturnType<typeof surfaceOn> | undefined;
+  if (item.label) {
+    const { part = first.id, solid, face, up = defaultUp[face] } = item.label;
+    const normal = faceAxis(face);
+    const fraction = normal.map((value) => (value + 1) / 2) as [number, number, number];
+    label = surfaceOn({ part, solid, fraction }, normal, faceAxis(up));
+  }
+  return { report, masses, handling, label, drawn, glow: item.glow && glowMaterial(item, item.glow) };
 };

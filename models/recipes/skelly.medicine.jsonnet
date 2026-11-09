@@ -1,6 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local owned = std.set(['bandage', 'antiseptic', 'antibiotics', 'painkillers', 'morphine', 'codeine']);
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local owned = std.setUnion(std.set(['bandage', 'antiseptic', 'antibiotics', 'painkillers', 'morphine', 'codeine']), catalogue.ids('skelly.medicine'));
 taxonomy.inherit({ category: 'medical' }, [
   {
     id: row.id,
@@ -9,6 +10,5 @@ taxonomy.inherit({ category: 'medical' }, [
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, owned)
+  for row in catalogue.rows(owned)
 ])

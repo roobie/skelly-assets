@@ -3,9 +3,6 @@
   "private": true,
   "license": "EUPL-1.2",
   "type": "module",
-  "engines": {
-    "node": ">=26"
-  },
   "workspaces": [
     "packages/construct",
     "packages/thing-core",

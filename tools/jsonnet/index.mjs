@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
@@ -25,14 +26,12 @@ function jsonnetExecutable() {
   return JSONNET_EXECUTABLE;
 }
 
-// An `overlay` folder is searched before the repository for root-relative imports, so a caller can swap
-// one library file without touching the tracked one.
-export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
-  const absoluteSource = resolve(repositoryRoot, sourcePath);
-  // go-jsonnet searches library paths right to left, so the overlay comes last.
-  const libraries = ['-J', repositoryRoot, '-J', resolve(repositoryRoot, '..'), ...(overlay ? ['-J', overlay] : [])];
+// go-jsonnet searches library paths right to left, so the overlay comes last.
+const libraryArgs = (repositoryRoot, overlay) => ['-J', repositoryRoot, '-J', resolve(repositoryRoot, '..'), ...(overlay ? ['-J', overlay] : [])];
+
+function runJsonnet(args, repositoryRoot, label) {
   try {
-    return execFileSync(jsonnetExecutable(), [...libraries, absoluteSource], {
+    return execFileSync(jsonnetExecutable(), args, {
       cwd: repositoryRoot,
       encoding: 'utf8',
       maxBuffer: Number.POSITIVE_INFINITY,
@@ -42,8 +41,26 @@ export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT,
       throw error;
     }
     const detail = error instanceof Error && 'stderr' in error ? String(error.stderr).trim() : String(error);
-    throw new Error(`Jsonnet compilation failed for ${relative(repositoryRoot, absoluteSource)}: ${detail}`, {
-      cause: error,
-    });
+    throw new Error(`Jsonnet compilation failed for ${label}: ${detail}`, { cause: error });
+  }
+}
+
+// An `overlay` folder is searched before the repository for root-relative imports, so a caller can swap
+// one library file without touching the tracked one.
+export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
+  const absoluteSource = resolve(repositoryRoot, sourcePath);
+  return runJsonnet([...libraryArgs(repositoryRoot, overlay), absoluteSource], repositoryRoot, relative(repositoryRoot, absoluteSource));
+}
+
+// Compiles many sources in one go-jsonnet run, each to the text compileJsonnetFile gives it. One run evaluates a file
+// the sources share, such as the item catalogue every recipe imports, once rather than once per source.
+export function compileJsonnetFiles(sourcePaths, repositoryRoot = REPOSITORY_ROOT) {
+  const out = mkdtempSync(join(tmpdir(), 'jsonnet-'));
+  try {
+    const fields = sourcePaths.map((source, at) => `"${at}": import ${JSON.stringify(resolve(repositoryRoot, source))}`);
+    runJsonnet([...libraryArgs(repositoryRoot), '-m', out, '-e', `{${fields.join(',')}}`], repositoryRoot, `${sourcePaths.length} sources`);
+    return sourcePaths.map((_, at) => readFileSync(join(out, String(at)), 'utf8'));
+  } finally {
+    rmSync(out, { recursive: true, force: true });
   }
 }

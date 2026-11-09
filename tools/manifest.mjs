@@ -1,5 +1,6 @@
-// manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names and credits, every
-// vehicle's placements file (tools/placements.mjs), and every produced file under its pack. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
+// manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names, label and credits, every
+// vehicle's placements file (tools/placements.mjs), and every produced file under its pack. tools/build.mjs writes it;
+// tools/check-built.mjs holds every fresh build to it.
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -84,9 +85,9 @@ export function mobManifest(rows) {
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-// models: { id, kind, pack, path, taxonomy?, nodes?, clips? }, paths logical under the pack; vehicles: { id, pack, path }
-// of each vehicle's placements; files: every produced file as <pack>/<logical path>; credit: a repo path ->
-// { author, licence }.
+// models: { id, kind, pack, path, taxonomy?, nodes?, label?, clips? }, paths logical under the pack; vehicles:
+// { id, pack, path } of each vehicle's placements; files: every produced file as <pack>/<logical path>; credit: a repo
+// path -> { author, licence }.
 export function buildManifest({ models, vehicles = [], files, credit }) {
   const packs = {};
   for (const file of [...new Set(files)].sort(byText)) {
@@ -111,6 +112,7 @@ export function buildManifest({ models, vehicles = [], files, credit }) {
       path: model.path,
       ...manifestTaxonomy(model.taxonomy),
       ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
+      ...(model.label === undefined ? {} : { label: model.label }),
       ...(model.clips === undefined ? {} : { clips: model.clips }),
       ...(model.body === undefined ? {} : { body: model.body }),
       credits: credit(`built/${file}`),
@@ -125,7 +127,7 @@ export function buildManifest({ models, vehicles = [], files, credit }) {
     return { id, pack, path, credits: credit(`built/${file}`) };
   });
   return {
-    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. nodes: the GLB part node names of the resolved assembly. vehicles: each vehicle\'s sites, the model id of the part at each site, its position in the vehicle frame and whether it is a mirrored far-side twin. credits: from REUSE.toml.',
+    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. vehicles: each vehicle\'s sites, the model id of the part at each site, its position in the vehicle frame and whether it is a mirrored far-side twin. credits: from REUSE.toml.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
     vehicles: vehicleEntries,

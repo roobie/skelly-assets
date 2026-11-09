@@ -37,7 +37,7 @@ local derivation(measure, clearanceUnits, snap, description, multiplier=null) =
     {
       id: 'small',
       rank: 0,
-      cartridge: import '../../cartridges/5.56x45.json',
+      cartridge: import '../../cartridges/5.56x45.jsonnet',
       receiver: {
         photo: 'https://commons.wikimedia.org/wiki/File:PEO_M4_Carbine_RAS_M68_CCO.png',
         scale: "the rifle's published overall length in https://en.wikipedia.org/wiki/M4_carbine",
