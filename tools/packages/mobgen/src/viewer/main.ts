@@ -47,6 +47,8 @@ import {
 } from '../mob/gait.ts';
 import type { HumanoidParams } from '../mob/humanoid.ts';
 import { type IdleStance, idlePose } from '../mob/idle.ts';
+import { leaperClip, leaperFrame, locomotionFor } from '../mob/leaper/motion.ts';
+import { LEAPER_TEMPLATE } from '../mob/leaper/plan.ts';
 import { LOOK_AT_REST, type LookAtState, lookAtPose } from '../mob/lookAt.ts';
 import { LOOK_AT_PROFILES, type LookAtProfile } from '../mob/lookAtProfiles.ts';
 import { QUADRUPED_SEVERABLE_PARTS, quadrupedGaitPose, quadrupedHitPose, quadrupedPose } from '../mob/quadruped.ts';
@@ -55,7 +57,13 @@ import { skeletonTemplate } from '../mob/skeletonTemplate.ts';
 import { type Actor, buildActor, buildShambler, disposeActor } from './scene.ts';
 
 // Comparison-only bodies are explicit viewer opt-ins rather than consumer entries.
-const TEMPLATES: readonly Template[] = [...VIEWER_TEMPLATES, dogTemplate, acidTemplate, skeletonTemplate];
+const TEMPLATES: readonly Template[] = [
+  ...VIEWER_TEMPLATES,
+  dogTemplate,
+  acidTemplate,
+  skeletonTemplate,
+  LEAPER_TEMPLATE,
+];
 
 /** Plans posed by the shared humanoid walk, idle, attack and death. */
 const usesHumanoidRig = (template: Template): boolean =>
@@ -81,6 +89,8 @@ const attackClipSelect = $<HTMLSelectElement>('attack-clip');
 const darkScene = $<HTMLInputElement>('dark-scene');
 const acidWindup = $<HTMLInputElement>('acid-windup');
 const acidWindupLabel = $<HTMLLabelElement>('acid-windup-label');
+const leaperPounce = $<HTMLInputElement>('leaper-pounce');
+const leaperPounceLabel = $<HTMLLabelElement>('leaper-pounce-label');
 const hitBtn = $<HTMLButtonElement>('hit-btn');
 const dieBtn = $<HTMLButtonElement>('die-btn');
 const resetBtn = $<HTMLButtonElement>('reset-btn');
@@ -169,7 +179,8 @@ new ResizeObserver(resize).observe(view);
 interface Loaded {
   readonly genome: Genome;
   readonly template: Template;
-  readonly lookAt: LookAtProfile;
+  /** Absent for a plan with no authored gaze, which then holds its clip's head. */
+  readonly lookAt: LookAtProfile | undefined;
   lookAtState: LookAtState;
   readonly realized: Realized;
   readonly actor: Actor;
@@ -396,6 +407,7 @@ const updateUrl = (): void => {
   setFlag(attackLoop, 'attack');
   setFlag(darkScene, 'dark');
   setFlag(acidWindup, 'windup');
+  setFlag(leaperPounce, 'pounce');
   if (templateClipName !== undefined && attackClipSelect.value !== templateClipName) {
     params.set('clip', attackClipSelect.value);
   }
@@ -433,7 +445,7 @@ const load = (genome: Genome, realized: Realized, realizeMs: number): void => {
   let loaded: Loaded = {
     genome,
     template,
-    lookAt: LOOK_AT_PROFILES[template.name]!,
+    lookAt: LOOK_AT_PROFILES[template.name],
     lookAtState: LOOK_AT_REST,
     realized,
     actor,
@@ -444,6 +456,9 @@ const load = (genome: Genome, realized: Realized, realizeMs: number): void => {
       .parts.filter((part) => part.severable)
       .map((part) => part.rootBone);
     severPart.replaceChildren(...parts.map((id) => new Option(id, id)));
+  } else if (template.bodyPlan === 'leaper') {
+    actor.applyPose(leaperFrame(realized, 'idle', 0).pose);
+    severPart.replaceChildren(...severableParts(realized.body.bones).map((part) => new Option(part, part)));
   } else if (template.bodyPlan === 'acid') {
     lastAcidPose = acidIdlePose(realized, idleTime);
     actor.applyPose(lastAcidPose);
@@ -480,6 +495,7 @@ const load = (genome: Genome, realized: Realized, realizeMs: number): void => {
     );
   }
   acidWindupLabel.hidden = template.bodyPlan !== 'acid';
+  leaperPounceLabel.hidden = template.bodyPlan !== 'leaper';
   syncAttackClip(template);
   walkFieldset.hidden = staticOnly;
   attackFieldset.hidden = staticOnly;
@@ -593,6 +609,10 @@ const setSpeed = (v: number): void => {
 speedInput.addEventListener('input', () => setSpeed(Number(speedInput.value)));
 walkOn.addEventListener('change', updateUrl);
 attackLoop.addEventListener('change', updateUrl);
+leaperPounce.addEventListener('change', () => {
+  attackTime = undefined;
+  updateUrl();
+});
 acidWindup.addEventListener('change', () => {
   attackTime = undefined;
   updateUrl();
@@ -678,6 +698,7 @@ setSpeed(Number(query.get('speed') ?? '0.8'));
 walkOn.checked = query.get('walk') === '1';
 attackLoop.checked = query.get('attack') === '1';
 acidWindup.checked = query.get('windup') === '1';
+leaperPounce.checked = query.get('pounce') === '1';
 darkScene.checked = query.get('dark') === '1';
 applySceneLighting();
 const clipParam = query.get('clip');
@@ -705,7 +726,7 @@ const advanceWalk = (dt: number, walking: boolean, speed: number): void => {
     groundGroup.position.z = gridZ;
     return;
   }
-  if (current.template.bodyPlan === 'quadruped' || current.template.bodyPlan === 'acid') {
+  if (['quadruped', 'acid', 'leaper'].includes(current.template.bodyPlan)) {
     gaitDistance += speed * dt;
     gridZ = (gridZ + speed * dt) % 0.5;
     groundGroup.position.z = gridZ;
@@ -754,6 +775,10 @@ const advanceHit = (dt: number): void => {
 }; // deliberately not gated on death: a fresh hit that lands mid-flinch is fine to just restart.
 
 const applyLookAt = (loaded: Loaded, pose: Pose, dt: number): void => {
+  if (!loaded.lookAt) {
+    loaded.actor.applyPose(pose);
+    return;
+  }
   loaded.actor.root.updateMatrixWorld(true);
   const target = loaded.actor.root.worldToLocal(camera.position.clone());
   const result = lookAtPose({
@@ -818,7 +843,51 @@ const applyAcidFrame = (loaded: Loaded, dt: number): void => {
   applyLookAt(loaded, lastAcidPose, dt);
 };
 
+/** A clip's own pace: its travel over its period. */
+const naturalSpeed = (name: string): number => {
+  const { travel, seconds } = leaperClip(name);
+  return (travel?.at(-1)?.[1] ?? 0) / seconds;
+};
+
+/** The leaper plays whole-body clips on its own rig: a flinch over an attack over its locomotion, the gait
+ * being whichever its remaining hind springs allow, chosen by the pace it is nearest. */
+const applyLeaperFrame = (loaded: Loaded, dt: number): void => {
+  const speed = walkOn.checked ? Number(speedInput.value) : 0;
+  advanceWalk(dt, walkOn.checked, speed);
+  const attack = leaperClip(leaperPounce.checked ? 'pounce' : 'rake');
+  advanceAttack(dt, attack.seconds);
+  const flinch = leaperClip('flinch');
+  if (hitTime !== undefined) {
+    hitTime += dt;
+    if (hitTime > flinch.seconds) {
+      hitTime = undefined;
+    }
+  }
+  const cuts = { cuts: severedCuts };
+  let shown;
+  if (hitTime !== undefined) {
+    shown = leaperFrame(loaded.realized, flinch.name, hitTime / flinch.seconds, cuts);
+  } else if (attackTime !== undefined) {
+    shown = leaperFrame(loaded.realized, attack.name, attackTime / attack.seconds, cuts);
+  } else if (speed > 0) {
+    const fast = Math.abs(speed - naturalSpeed('bound')) < Math.abs(speed - naturalSpeed('stalk'));
+    const { clip, mirrored } = locomotionFor(severedBones, fast);
+    const stride = leaperClip(clip).travel!.at(-1)![1];
+    const { pose, ...rest } = leaperFrame(loaded.realized, clip, (gaitDistance / stride) % 1, { ...cuts, mirrored });
+    // The grid carries the travel, so the gait plays in place.
+    shown = { ...rest, pose: { ...pose, root: [pose.root[0], pose.root[1], 0] as const } };
+  } else {
+    const idle = leaperClip('idle');
+    shown = leaperFrame(loaded.realized, idle.name, (idleTime / idle.seconds) % 1, cuts);
+  }
+  applyLookAt(loaded, shown.pose, dt);
+};
+
 const applyLiveFrame = (loaded: Loaded, dt: number): void => {
+  if (loaded.template.bodyPlan === 'leaper') {
+    applyLeaperFrame(loaded, dt);
+    return;
+  }
   if (loaded.template.bodyPlan === 'acid') {
     applyAcidFrame(loaded, dt);
     return;
