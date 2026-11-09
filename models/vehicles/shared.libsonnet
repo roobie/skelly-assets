@@ -283,15 +283,12 @@ local headlampRound = k.compound('headlamp_round', 2, [
   k.turned('ring', 'ring', 'x', k.disc(0.11, 0.03, 0.0625), [0, 0.165, 0]) + { sides: 12 },
   k.turned('lens', 'lens', 'x', k.disc(0.085, 0.0625, 0.094), [0, 0.165, 0]) + { sides: 12 },
 ], { bowl: 'steel-stainless', ring: 'plastic-black', lens: 'plastic-frosted' });
-// A machine's lamp on a short bracket: y = 0 is the bracket's foot, and `dir` is the way the lens faces along x, since
-// fittings don't turn.
-local workLamp(id, dir) =
-  local lens = if dir > 0 then [0.03, 0.0625] else [-0.0625, -0.03];
-  k.compound(id, 1, [
-    box('bracket', 'trim', [-0.04, 0, -0.03], [0.04, 0.05, 0.03]),
-    box('housing', 'trim', [-0.03, 0.05, -0.05], [0.03, 0.15, 0.05]),
-    box('lens', 'lens', [lens[0], 0.06, -0.04], [lens[1], 0.14, 0.04]),
-  ], { trim: 'plastic-black', lens: 'plastic-frosted' });
+// A machine's lamp on a short bracket, its lens facing forward along x: y = 0 is the bracket's foot.
+local workLamp = k.compound('work_lamp', 1, [
+  box('bracket', 'trim', [-0.04, 0, -0.03], [0.04, 0.05, 0.03]),
+  box('housing', 'trim', [-0.03, 0.05, -0.05], [0.03, 0.15, 0.05]),
+  box('lens', 'lens', [0.03, 0.06, -0.04], [0.0625, 0.14, 0.04]),
+], { trim: 'plastic-black', lens: 'plastic-frosted' });
 // A blue roof bar: y = 0 is the roof and the bar is centred on the origin.
 local lightBarBlue = k.compound('light_bar_blue', 12, [
   box('bar', 'bar', [-0.125, 0.03125, -0.72], [0.125, 0.1, 0.72]),
@@ -526,7 +523,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   headlampLarge,
   headlampMilitary,
   headlampRound,
-  workLamp('work_lamp', 1),
+  workLamp,
   lightBarBlue,
   hybridBadge,
   hybridBadgeRear,
