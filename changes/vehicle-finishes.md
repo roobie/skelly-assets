@@ -3,7 +3,7 @@ type: breaking
 ---
 Vehicle part rows that differed only in paint are merged: a taxi, a police car or a camper van now fits the shared
 pressing, and the site that fits it names the paint in a new `finish`. Part models mark the materials that take paint,
-as `paintable` slots in the manifest and `paintable` in each glTF material's extras.
+as `paintable` slots in each part's `*.model.json` and `paintable` in each glTF material's extras.
 
 Upgrade:
 - Apply `renames.json` to saved and authored part ids; the retired rows map to the shared pressing.
