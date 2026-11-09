@@ -3,7 +3,7 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileJsonnetFile } from './jsonnet/index.mjs';
+import { compileJsonnetFiles } from './jsonnet/index.mjs';
 
 const here = import.meta.dirname;
 let sourcesInstalled = false;
@@ -21,9 +21,9 @@ export const jsonnetFiles = (directory) => {
 
 export function installJsonnetSources() {
   if (sourcesInstalled) return;
-  for (const source of jsonnetFiles()) {
-    writeFileSync(source.replace(/\.jsonnet$/, '.json'), compileJsonnetFile(relative(here, source)));
-  }
+  const sources = jsonnetFiles();
+  const twins = compileJsonnetFiles(sources.map((source) => relative(here, source)));
+  for (const [at, source] of sources.entries()) writeFileSync(source.replace(/\.jsonnet$/, '.json'), twins[at]);
   sourcesInstalled = true;
 }
 

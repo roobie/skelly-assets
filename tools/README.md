@@ -14,7 +14,8 @@ output so consumers need no authoring environment. Use `build_models.sh` for ros
 Node 26 or later runs TypeScript directly. Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
-of truth; see `sources.mjs`, `installJsonnetSources`. The compiler is checksum-verified; transient release
+of truth; see `sources.mjs`, `installJsonnetSources`. Jsonnet imports another source's `.jsonnet`, never its
+twin, because all twins compile in one run and none exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin
