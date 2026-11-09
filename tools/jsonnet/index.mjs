@@ -52,6 +52,12 @@ export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT,
   return runJsonnet([...libraryArgs(repositoryRoot, overlay), absoluteSource], repositoryRoot, relative(repositoryRoot, absoluteSource));
 }
 
+// Evaluates a Jsonnet expression with the repository's library paths. Jsonnet is lazy, so an expression that keeps
+// only a few fields of a large source evaluates just those fields.
+export function evaluateJsonnet(expression, repositoryRoot = REPOSITORY_ROOT) {
+  return runJsonnet([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, expression);
+}
+
 // Compiles many sources in one go-jsonnet run, each to the text compileJsonnetFile gives it. One run evaluates a file
 // the sources share, such as the item catalogue every recipe imports, once rather than once per source.
 export function compileJsonnetFiles(sourcePaths, repositoryRoot = REPOSITORY_ROOT) {
