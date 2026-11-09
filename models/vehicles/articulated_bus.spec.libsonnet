@@ -2,8 +2,9 @@
 // one blueprint, parked straight: a fore section with the driver and a pusher rear section with the engine, each
 // open at the end that meets the bellows. Metres in the vehicle frame.
 local city = import 'city_bus.spec.libsonnet';
-local seat(x, y, sides) = { part: 'bus_seat_pair', x: x, y: y, z: 0.72, sides: sides };
-local single(x, sides) = { part: 'bus_seat_single', x: x, y: 0.36, z: 0.62, sides: sides };
+local bus = import 'bus-body.libsonnet';
+local seat = bus.seat;
+local single = bus.single;
 local portalTop = 2.6;
 local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engineDeck', 'engineHatch', 'sign'], city) + {
   paint: 'paint-white', band: 'paint-green', bumperFinish: 'paint-green',

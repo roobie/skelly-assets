@@ -1,7 +1,8 @@
 // A 7.85 m low-floor airport or hotel shuttle: 2.4 m wide, 2.8 m high, 3.65 m wheelbase, about 7 t at the kerb, with
 // two wide doors on the near side and a luggage rack over the front wheel between them. Metres in the vehicle frame.
-local seat(x, y, sides) = { part: 'bus_seat_pair', x: x, y: y, z: 0.68, sides: sides };
-local single(x, sides) = { part: 'bus_seat_single', x: x, y: 0.36, z: 0.58, sides: sides };
+local bus = import 'bus-body.libsonnet';
+local seat(x, y, sides) = bus.seat(x, y, sides, z=0.68);
+local single(x, sides) = bus.single(x, sides, z=0.58);
 {
   rear: -3.95, front: 3.9, side: 1.2, skin: 1.13, sill: 0.3,
   floor: 0.36, floorRear: 0.8, floorStep: -1.3, engineDeck: { x: -2.75, y: 1.1 },

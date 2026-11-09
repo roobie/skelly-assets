@@ -473,4 +473,10 @@ local fittings(kit, id, s) =
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))
   + kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell']);
-{ rows: rows, items: items, fittings: fittings, layout: layout }
+{
+  rows: rows, items: items, fittings: fittings, layout: layout,
+  // A seat pair's placement at (x, y), for a spec's `seats`.
+  seat(x, y, sides, z=0.72):: { part: 'bus_seat_pair', x: x, y: y, z: z, sides: sides },
+  // A single seat's placement; singles stand inboard of the front wheelhouses, where a pair would not fit.
+  single(x, sides, y=0.36, z=0.62):: { part: 'bus_seat_single', x: x, y: y, z: z, sides: sides },
+}
