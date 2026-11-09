@@ -1,9 +1,9 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import { afterEach, describe, expect, it } from 'vitest';
-import { exportCache } from '../src/cache.ts';
+import { codeFingerprint, entryStore, exportCache, pruneEntries } from '../src/cache.ts';
 import type { RecipeExport } from '../src/recipe.ts';
 
 const folders: string[] = [];
@@ -44,7 +44,10 @@ describe('the export cache', () => {
     const dir = folder();
     const first = exportCache(dir, 'code').export(countedRow({ size: 1, colour: 'red' }));
     const again = countedRow({ colour: 'red', size: 1 });
-    expect(exportCache(dir, 'code').export(again)).toEqual({ ...first, glb: Buffer.from(first.glb) });
+    const served = exportCache(dir, 'code').export(again);
+    expect(served.model).toEqual({ ...first.model, glb: Buffer.from(first.model.glb) });
+    expect(served.entry).toEqual({ key: first.entry?.key, reused: true });
+    expect(first.entry?.reused).toBe(false);
     expect(again.runs).toBe(0);
   });
 
@@ -59,11 +62,59 @@ describe('the export cache', () => {
     expect(changed.runs).toBe(1);
   });
 
-  it('always generates a row that declares no inputs', () => {
+  it('always generates a row that declares no inputs, and gives it no entry', () => {
     const cache = exportCache(folder(), 'code');
     const row = countedRow(undefined, false);
-    cache.export(row);
+    expect(cache.export(row).entry).toBeUndefined();
     cache.export(row);
     expect(row.runs).toBe(2);
+  });
+
+  it('keeps on pruning only the entries named, every file of each', () => {
+    const dir = folder();
+    const kept = exportCache(dir, 'code').export(countedRow({ size: 1 })).entry!.key;
+    exportCache(dir, 'code').export(countedRow({ size: 2 }));
+    pruneEntries(dir, new Set([kept]));
+    expect(readdirSync(dir).sort()).toEqual([`${kept}.glb`, `${kept}.json`]);
+  });
+});
+
+describe('an entry store', () => {
+  it('serves every file of an entry as the bytes it stored', () => {
+    const store = entryStore(folder(), 'code');
+    const files = { 'body.json': '{"a":1}', glb: new Uint8Array([1, 2, 3]) };
+    store.entry(['body.json', 'glb'], { id: 1 }, () => files);
+    const served = store.entry(['body.json', 'glb'], { id: 1 }, () => {
+      throw new Error('generated again');
+    });
+    expect(served.reused).toBe(true);
+    expect(served.files['body.json']).toEqual(Buffer.from(files['body.json']));
+    expect(served.files.glb).toEqual(Buffer.from(files.glb));
+  });
+});
+
+describe('the code fingerprint', () => {
+  const tree = (files: Record<string, string>) => {
+    const root = folder();
+    for (const [path, text] of Object.entries(files)) {
+      mkdirSync(join(root, path, '..'), { recursive: true });
+      writeFileSync(join(root, path), text);
+    }
+    return root;
+  };
+  const base = { 'src/a.ts': 'code', 'src/a.json': 'data', 'src/a.test.ts': 'test', 'src/test/fixture.json': 'fixture' };
+  const fingerprints = (files: Record<string, string>) => {
+    const root = tree(files);
+    return { code: codeFingerprint(root, ['src']), data: codeFingerprint(root, ['src'], ['src']) };
+  };
+
+  it.each([
+    ['source code', { 'src/a.ts': 'new code' }, { code: true, data: true }],
+    ['a data file of a data path', { 'src/a.json': 'new data' }, { code: false, data: true }],
+    ['a test', { 'src/a.test.ts': 'new test', 'src/test/fixture.json': 'new fixture' }, { code: false, data: false }],
+  ])('changes with %s as declared', (_name, edit, changes) => {
+    const before = fingerprints(base);
+    const after = fingerprints({ ...base, ...edit });
+    expect({ code: before.code !== after.code, data: before.data !== after.data }).toEqual(changes);
   });
 });
