@@ -766,6 +766,32 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
   }
 });
 
+test('leaper pose clips reproduce its live frames at every stored cursor, whole and maimed', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { leaperFrame } = await import('../packages/mobgen/src/mob/leaper/motion.ts');
+  const row = { walk_speed: 0.6, walk_frames: 8, attack_frames: 9 };
+  const template = consumableTemplate('leaper');
+  const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
+  const { clips } = await bakeFixture('leaper', row);
+  const cases = [
+    [clips.standing.walk, 'stalk', {}], [clips.standing.attack, 'rake', {}], [clips.standing.pounce, 'pounce', {}],
+    [clips.limping.walk.right, 'limp', { cuts: ['thigh.R'], mirrored: true }], [clips.dragging.walk, 'drag', { cuts: ['thigh.L', 'thigh.R'] }],
+  ];
+  for (const [clip, name, cut] of cases) for (const [i, frame] of clip.frames.entries()) {
+    const live = leaperFrame(realized, name, clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1), cut);
+    const decoded = decodeFrame(frame);
+    // Loops play in place; finite clips keep the travel that is part of the move.
+    const root = clip.loop ? [live.pose.root[0], live.pose.root[1], 0] : live.pose.root;
+    decoded.root.forEach((value, axis) => assert(Math.abs(value - root[axis]) < 1e-12, `${name} root at frame ${i}`));
+    for (const [id, rotation] of Object.entries(live.pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
+    if (name === 'pounce') assert.equal(frame.charge, live.charge);
+  }
+  assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],

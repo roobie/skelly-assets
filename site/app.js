@@ -8,7 +8,7 @@ import { samplePose } from './poseSample.mjs';
 
 const $ = (id) => document.getElementById(id);
 const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
-const ATTACK_REST = 0.6; // s held after an attack before it plays again
+const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
 
 const nameOf = (id) => {
   const s = id.replace(/_/g, ' ');
@@ -100,12 +100,11 @@ function pose(scene, body, clip, time) {
 }
 
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
-function clipTime(clip, name, seconds, walkSpeed) {
+function clipTime(clip, seconds, walkSpeed) {
   if (clip.loop && clip.strideMetres !== undefined) return seconds * walkSpeed / (clip.strideMetres * (clip.cycles ?? 1));
   // The viewer has no Sim clock, so an idle loop plays its Sim seconds one to one on Real time.
   if (clip.loop) return seconds / clip.periodSimSeconds;
-  if (name === 'attack') return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + ATTACK_REST));
-  return seconds;
+  return Math.min(clip.durationSimSeconds, seconds % (clip.durationSimSeconds + FINITE_REST));
 }
 
 // ---- staging ----
@@ -318,7 +317,7 @@ function initViewer() {
     if (!$('viewer').open) return;
     const v = viewer;
     const clips = clipSet(v.loaded?.clips);
-    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], v.clip, (ms - v.t0) / 1000, v.model.walkSpeed));
+    if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], (ms - v.t0) / 1000, v.model.walkSpeed));
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -399,7 +398,7 @@ async function openViewer(model) {
 
   if (canPose(model, loaded.clips, loaded.body)) {
     const clips = clipSet(loaded.clips);
-    const names = ['walk', 'attack', 'idle'].filter((n) => playable(clips[n]));
+    const names = ['walk', 'attack', 'pounce', 'idle'].filter((n) => playable(clips[n]));
     const pick = (name) => {
       viewer.clip = name;
       viewer.t0 = performance.now();

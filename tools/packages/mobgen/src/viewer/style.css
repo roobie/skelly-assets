@@ -131,6 +131,10 @@ fieldset {
 fieldset label {
   display: block;
 }
+/* A display rule outranks the attribute's own styling, so per-plan controls need it restated. */
+fieldset label[hidden] {
+  display: none;
+}
 legend label {
   display: inline;
 }
