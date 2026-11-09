@@ -15,11 +15,18 @@ output so consumers need no authoring environment. Use `build_models.sh` for ros
 The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
-of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, so a run whose
-importable inputs hash the same as the last compile reuses them rather than paying for the whole catalogue again;
-see `sources.mjs`, `refreshJsonnetTwins`. CI jobs start from fresh checkouts, so they share one compile through a
-twin store keyed by that same digest rather than each paying for it. Jsonnet imports another source's `.jsonnet`, never its
-twin, because all twins compile in one run and none exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
+of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the item
+catalogue is costly to compile, so a refresh recompiles only what an edit reaches; see `sources.mjs`,
+`refreshJsonnetTwins`. Each twin is keyed by its import closure, found by scanning the import literals rather than
+evaluating, so an edit invalidates exactly the twins that can see it. The catalogue and the recipes evaluate every
+row file, so each row file compiles on its own into a fragment, in parallel, and the stale twins compile in one run
+over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
+twins over it, not every row again, and one run evaluates the catalogue the recipes share once. CI jobs start from
+fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
+A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
+late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
+library. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
+exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin

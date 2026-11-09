@@ -10,7 +10,7 @@ import { outputPath } from '../layout.mjs';
 import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
-installJsonnetSources();
+await installJsonnetSources();
 const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
 const gunRows = JSON.parse(readFileSync(join(import.meta.dirname, '../packages/gun-authoring-tool/exports/deadvox.json'), 'utf8'));
 
@@ -79,6 +79,16 @@ test('the tools left out of a run write nothing', async () => {
     await exportRecipes({ root, out, tools: ['gun'] });
     assert.ok(existsSync(join(out, packId, 'gungen')));
     assert.ok(!existsSync(join(out, packId, 'things')));
+  });
+});
+
+test('an id build writes only the requested row, at its pack path, and no pack index', async () => {
+  const packId = 'fixture.mixed';
+  const item = itemRow();
+  await withRoot(packId, [gunRow(), item], async (root, out) => {
+    await exportRecipes({ root, out, tools: ['gun', 'thing'], ids: new Set([item.id]) });
+    const expected = [`things/${item.id}.model.json`, `assets/models/${item.id}.glb`].map((file) => outputPath(packId, file));
+    assert.deepEqual(filesUnder(out), expected.sort());
   });
 });
 

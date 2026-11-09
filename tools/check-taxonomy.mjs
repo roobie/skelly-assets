@@ -18,8 +18,8 @@ export const ROSTER_ROWS = 'tools/packages/thing-authoring-tool/exports/deadvox.
 
 // Every model the production build writes, from its source row: { pack, id, taxonomy }. A recipe or roster row carries
 // its taxonomy already resolved by Jsonnet; a mob row's is resolved over the sheet's defaults (layout.mjs, readMobRows).
-export function modelTaxonomies(root = repo) {
-  installJsonnetSources();
+export async function modelTaxonomies(root = repo) {
+  await installJsonnetSources();
   const rosterRows = new Map(JSON.parse(readFileSync(join(root, ROSTER_ROWS), 'utf8')).map((row) => [row.id, row]));
   return [
     ...readRoster(root).map(({ packId, id }) => ({ pack: packId, id, taxonomy: rosterRows.get(id)?.taxonomy })),
@@ -38,13 +38,13 @@ function printReport({ untagged, problems }) {
   for (const { message } of problems) console.log(`  ${message}`);
 }
 
-function main() {
+async function main() {
   const { values } = parseArgs({ options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } } });
-  const report = taxonomyReport(modelTaxonomies(repo), readVocabulary(repo));
+  const report = taxonomyReport(await modelTaxonomies(repo), readVocabulary(repo));
   const selected = { untagged: report.untagged.filter(inPacks(values.pack)), problems: report.problems.filter(inPacks(values.pack)) };
   if (values.json) console.log(JSON.stringify(selected, null, 2));
   else printReport(selected);
   return selected.problems.length > 0 ? 1 : 0;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) process.exitCode = main();
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) process.exitCode = await main();

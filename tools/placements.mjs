@@ -4,7 +4,7 @@
 // and is laid out from its sites. The why is in docs/decisions/0001-vehicle-placements.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { compileJsonnetFile } from './jsonnet/index.mjs';
+import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
 import { modelProblems } from './taxonomy.mjs';
 
@@ -21,9 +21,10 @@ export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`
 // vehicle -> { parent?, sites, tags? }, compiled from the sources.
 export const readPlacements = (root = repo) => JSON.parse(compileJsonnetFile(PLACEMENTS_SOURCE, root));
 
-// vehicle -> the ids of the rows its own file authors, from the vehicles' row index.
-export const readVehicleRows = (root = repo) => Object.fromEntries(Object.entries(JSON.parse(compileJsonnetFile(VEHICLE_ROWS_SOURCE, root)))
-  .map(([vehicle, rows]) => [vehicle, rows.map(({ id }) => id)]));
+// vehicle -> the ids of the rows its own file authors, from the vehicles' row index. Only the ids are evaluated:
+// manifesting the whole rows costs minutes and sits on the full build's path.
+export const readVehicleRows = (root = repo) =>
+  JSON.parse(evaluateJsonnet(`std.mapWithKey(function(vehicle, rows) [row.id for row in rows], import '${VEHICLE_ROWS_SOURCE}')`, root));
 
 const isPoint = (at) => Array.isArray(at) && at.length === 3 && at.every(Number.isFinite);
 const packsByModel = (models) => Map.groupBy(models, ({ id }) => id);

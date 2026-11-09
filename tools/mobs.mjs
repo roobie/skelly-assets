@@ -10,7 +10,7 @@ import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
-installJsonnetSources();
+await installJsonnetSources();
 const src = (path) => `./packages/mobgen/src/${path}`;
 const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
 const { bakeActor } = await import('./actorBake.mjs');

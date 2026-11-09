@@ -1,17 +1,18 @@
 // Compile package Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
-// Call before importing package code, or run this module directly to refresh the twins (with --digest, to print the
-// digest of their inputs instead).
+// Await installJsonnetSources before importing package code, or run this module directly to refresh the twins (with
+// --digest, to print the digest of their inputs instead).
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { availableParallelism } from 'node:os';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { compileJsonnetFiles } from './jsonnet/index.mjs';
+import { compileJsonnetFileAsync, compileJsonnetFiles, libraryPaths } from './jsonnet/index.mjs';
+import { INDEX, ROW_DIRS } from './row-index.mjs';
 
 const here = import.meta.dirname;
 const repositoryRoot = resolve(here, '..');
-const skippedDirectories = new Set(['node_modules', 'built', 'dist', '_site']);
 let sourcesInstalled = false;
 
 export const jsonnetFiles = (directory) => {
@@ -28,58 +29,151 @@ export const jsonnetFiles = (directory) => {
 
 const twinOf = (source) => source.replace(/\.jsonnet$/, '.json');
 
-const importableFiles = (directory) =>
-  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      return entry.name.startsWith('.') || skippedDirectories.has(entry.name) ? [] : importableFiles(path);
-    }
-    if (entry.name.endsWith('.json')) return existsSync(path.replace(/\.json$/, '.jsonnet')) ? [] : [path];
-    return /\.(jsonnet|libsonnet)$/.test(entry.name) ? [path] : [];
-  });
+// The compiler's library root under `root`, as the compile passes it; see jsonnet/index.mjs, libraryPaths.
+const compileRoot = (root) => join(root, 'tools');
 
-// `code` lists the files that turn sources into twins, so a change to the compiler or to this module recompiles too.
-const inputsDigest = (root, sources, code) => {
-  const hash = createHash('sha256');
-  for (const path of code) hash.update(`code\0${relative(root, path)}\0`).update(readFileSync(path));
-  for (const source of sources) hash.update(`source\0${relative(root, source)}\0`);
-  for (const path of importableFiles(root).sort()) hash.update(`file\0${relative(root, path)}\0`).update(readFileSync(path));
-  return hash.digest('hex');
+const IMPORT = /\bimport(?:str|bin)?\s*@?(['"])((?:\\.|(?!\1).)*)\1/g;
+const TEXT_BLOCK_IMPORT = /\bimport(?:str|bin)?\s*\|\|\|/;
+
+// Jsonnet import paths are literals, so a lexical scan finds every import a file can make without evaluating it. Each
+// is resolved as go-jsonnet does: beside the importer first, then through the library paths. A match the compiler
+// would never import, such as one in a comment, at most widens a closure; only a text-block path could hide one.
+const importScanner = (searchPaths) => {
+  const direct = new Map();
+  const resolveImport = (importer, path) =>
+    (isAbsolute(path) ? [path] : [join(dirname(importer), path), ...searchPaths.map((folder) => join(folder, path))])
+      .find((candidate) => existsSync(candidate));
+  const importsOf = (file) => {
+    if (!direct.has(file)) {
+      const text = /\.(jsonnet|libsonnet)$/.test(file) ? readFileSync(file, 'utf8') : '';
+      if (TEXT_BLOCK_IMPORT.test(text)) throw new Error(`${file}: an import of a text block cannot be traced; import a string literal`);
+      const found = [...text.matchAll(IMPORT)].map((match) => resolveImport(file, match[2])).filter(Boolean);
+      direct.set(file, [...new Set(found.map((path) => resolve(path)))]);
+    }
+    return direct.get(file);
+  };
+  const closure = (file) => {
+    const seen = new Set();
+    const visit = (path) => {
+      if (seen.has(path)) return;
+      seen.add(path);
+      for (const imported of importsOf(path)) visit(imported);
+    };
+    visit(resolve(file));
+    return [...seen].sort();
+  };
+  return { importsOf, closure };
 };
 
-// The compile takes most of a minute and every package pre-script runs it, so unchanged inputs reuse the twins. The
-// digest covers every importable file under `root` rather than tracing imports, so no import can leave a twin stale.
+const sha256 = () => createHash('sha256');
+
+// A unit's key covers the compiler code, the unit and the path and contents of every file in its closure. The resolved
+// path is part of it, so a new file that shadows an import changes the key as surely as an edit does.
+const unitKeys = (root, code) => {
+  const contents = new Map();
+  const contentDigest = (path) => {
+    if (!contents.has(path)) contents.set(path, sha256().update(readFileSync(path)).digest('hex'));
+    return contents.get(path);
+  };
+  const codeDigest = sha256();
+  for (const path of code) codeDigest.update(`code\0${relative(root, path)}\0${contentDigest(path)}\0`);
+  const codeKey = codeDigest.digest('hex');
+  return (closure, unit) => {
+    const hash = sha256().update(`${codeKey}\0unit\0${relative(root, unit)}\0`);
+    for (const path of closure) hash.update(`file\0${relative(root, path)}\0${contentDigest(path)}\0`);
+    return hash.digest('hex');
+  };
+};
+
+// Row files are the imports of the row indexes; each compiles on its own into a fragment, its manifested JSON.
+const unitPlan = (sources, { root, code, rowIndexes }) => {
+  const scanner = importScanner(libraryPaths(compileRoot(root)));
+  const keyOf = unitKeys(root, code);
+  const unit = (path) => {
+    const closure = scanner.closure(path);
+    return { path, closure, key: keyOf(closure, path) };
+  };
+  return {
+    rows: [...new Set(rowIndexes.flatMap((index) => scanner.importsOf(resolve(index))))].map(unit),
+    twins: sources.map(unit),
+  };
+};
+
 // Test files run in parallel processes that each refresh the twins, so a reader must never see a half-written file.
 const replaceFile = (path, contents) => {
+  mkdirSync(dirname(path), { recursive: true });
   const partial = `${path}.${process.pid}.partial`;
   writeFileSync(partial, contents);
   renameSync(partial, path);
 };
 
-// A store folder keeps the last compile's twins under its input digest, so a fresh checkout whose inputs hash the
-// same, such as a later CI job of one commit, takes them instead of compiling. A twin is read from the store only
-// under the digest of the current inputs, so a stale or foreign store costs a compile and never a wrong twin.
-const storedTwin = (store, digest, root, source) => join(store, digest, relative(root, twinOf(source)));
+// The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
+// foreign store costs a compile, never a wrong twin.
+const storeEntry = (store, kind, key) => join(store, kind, `${key}.json`);
+const STORE_ENTRY = /^[0-9a-f]{64}\.json$/;
 
-export function refreshJsonnetTwins(sources, { root, stamp, store, code = [] }) {
-  const digest = inputsDigest(root, sources, code);
-  const current = existsSync(stamp) && readFileSync(stamp, 'utf8') === digest;
-  if (current && sources.every((source) => existsSync(twinOf(source)))) return;
-  rmSync(stamp, { force: true });
-  const stored = store !== undefined && sources.every((source) => existsSync(storedTwin(store, digest, root, source)));
-  const twins = stored
-    ? sources.map((source) => readFileSync(storedTwin(store, digest, root, source)))
-    : compileJsonnetFiles(sources);
-  for (const [at, source] of sources.entries()) replaceFile(twinOf(source), twins[at]);
-  if (store !== undefined && !stored) {
-    rmSync(store, { recursive: true, force: true });
-    for (const [at, source] of sources.entries()) {
-      mkdirSync(dirname(storedTwin(store, digest, root, source)), { recursive: true });
-      writeFileSync(storedTwin(store, digest, root, source), twins[at]);
-    }
+const pruneStore = (store, kind, keys) => {
+  const current = new Set(keys.map((key) => `${key}.json`));
+  const folder = join(store, kind);
+  if (!existsSync(folder)) return;
+  for (const name of readdirSync(folder)) {
+    if (STORE_ENTRY.test(name) && !current.has(name)) rmSync(join(folder, name), { force: true });
   }
-  mkdirSync(dirname(stamp), { recursive: true });
-  replaceFile(stamp, digest);
+};
+
+const forEachConcurrently = async (items, work) => {
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) await work(items[next++]);
+  };
+  await Promise.all(Array.from({ length: Math.min(availableParallelism(), items.length) }, worker));
+};
+
+const compileFragments = (rows, { root, store }) =>
+  forEachConcurrently(rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))), async ({ path, key }) => {
+    replaceFile(storeEntry(store, 'rows', key), await compileJsonnetFileAsync(path, compileRoot(root)));
+  });
+
+// The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
+// fragments and the twins' compile skips evaluating every row file again.
+const withOverlay = (rows, { root, store }, use) => {
+  const overlay = mkdtempSync(join(store, 'overlay-'));
+  try {
+    for (const { path, key } of rows) {
+      const at = join(overlay, relative(root, path));
+      mkdirSync(dirname(at), { recursive: true });
+      symlinkSync(storeEntry(store, 'rows', key), at);
+    }
+    return use(overlay);
+  } finally {
+    rmSync(overlay, { recursive: true, force: true });
+  }
+};
+
+const readStamp = (stamp) => (existsSync(stamp) ? JSON.parse(readFileSync(stamp, 'utf8')) : {});
+
+// The stamp maps each twin to the key it was written under, so a refresh with nothing changed reads no store. Stale
+// twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once.
+export async function refreshJsonnetTwins(sources, { root, stamp, store, code = [], rowIndexes = [] }) {
+  const options = { root, store: resolve(store) };
+  const { rows, twins } = unitPlan(sources, { root, code, rowIndexes });
+  const stamped = readStamp(stamp);
+  const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
+  if (stale.length === 0) return;
+  const unstored = stale.filter(({ key }) => !existsSync(storeEntry(options.store, 'twins', key)));
+  if (unstored.length > 0) {
+    const reached = new Set(unstored.flatMap(({ closure }) => closure));
+    const needed = rows.filter(({ path }) => reached.has(path));
+    mkdirSync(options.store, { recursive: true });
+    await compileFragments(needed, options);
+    const compiled = withOverlay(needed, options, (overlay) =>
+      compileJsonnetFiles(unstored.map(({ path }) => path), compileRoot(root), { overlay }));
+    for (const [at, { key }] of unstored.entries()) replaceFile(storeEntry(options.store, 'twins', key), compiled[at]);
+  }
+  for (const { path, key } of stale) replaceFile(twinOf(path), readFileSync(storeEntry(options.store, 'twins', key)));
+  pruneStore(options.store, 'rows', rows.map(({ key }) => key));
+  pruneStore(options.store, 'twins', twins.map(({ key }) => key));
+  replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
 }
 
 // This module and the compiler driver beside it; the compiler binary is pinned by jsonnet/runtime.json, an input.
@@ -88,22 +182,31 @@ export const compilerCode = () => [
   ...readdirSync(join(here, 'jsonnet')).filter((name) => name.endsWith('.mjs')).sort().map((name) => join(here, 'jsonnet', name)),
 ];
 
-export const jsonnetSourcesDigest = () => inputsDigest(repositoryRoot, jsonnetFiles(), compilerCode());
+const installOptions = () => ({
+  root: repositoryRoot,
+  stamp: join(here, '.build', 'jsonnet-twins.json'),
+  store: process.env.JSONNET_TWIN_STORE || join(here, '.build', 'jsonnet'),
+  code: compilerCode(),
+  rowIndexes: ROW_DIRS.map((dir) => join(dir, INDEX)),
+});
+
+// Every current unit key, so an unchanged tree names exactly the store it last left.
+const jsonnetSourcesDigest = () => {
+  const { rows, twins } = unitPlan(jsonnetFiles(), installOptions());
+  const hash = sha256();
+  for (const { key } of [...rows, ...twins]) hash.update(`${key}\0`);
+  return hash.digest('hex');
+};
 
 // JSONNET_TWIN_STORE names the store folder; CI caches it under the digest that --digest prints.
-export function installJsonnetSources() {
+export async function installJsonnetSources() {
   if (sourcesInstalled) return;
-  refreshJsonnetTwins(jsonnetFiles(), {
-    root: repositoryRoot,
-    stamp: join(here, '.build', 'jsonnet-sources.sha256'),
-    code: compilerCode(),
-    store: process.env.JSONNET_TWIN_STORE || undefined,
-  });
+  await refreshJsonnetTwins(jsonnetFiles(), installOptions());
   sourcesInstalled = true;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const { values } = parseArgs({ options: { digest: { type: 'boolean', default: false } } });
   if (values.digest) console.log(jsonnetSourcesDigest());
-  else installJsonnetSources();
+  else await installJsonnetSources();
 }

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { installJsonnetSources } from '../sources.mjs';
 
-installJsonnetSources();
+await installJsonnetSources();
 const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
 const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
 const { MATERIALS } = await import('../packages/thing-core/src/materials.ts');

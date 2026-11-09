@@ -4,9 +4,11 @@
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
 // (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs)
-// (tools/manifest.mjs); with ids it builds those roster-source rows, any row
-// in the sources, and no manifest. A roster id is written into --out (by default built/) at its pack's path,
-// tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and `npm ci` in tools.
+// (tools/manifest.mjs); with ids it builds only those rows, from the roster source or a recipe file, with no pack index,
+// placements or manifest, so one model builds without the rest. Each model is written into --out (by default built/)
+// at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
+// for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
+// `npm ci` in tools.
 // Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -73,25 +75,30 @@ function recipeUnits(root, tools, names) {
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
 // its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
-// A caller exporting more than recipes passes its own pool, so every export shares the cores.
-export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool }) {
-  installJsonnetSources();
+// A caller exporting more than recipes passes its own pool, so every export shares the cores. With an `ids` set, every
+// row is still loaded, since a loader may check rows against each other, but only those rows are written, and no pack
+// index, which would misstate the pack.
+export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool, ids }) {
+  await installJsonnetSources();
   const tools = await recipeTools();
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
   const units = recipeUnits(root, tools, names);
   for (const { name, rows } of units) tools[name].load(rows);
+  const selected = ids === undefined ? units : units
+    .map((unit) => ({ ...unit, rows: unit.rows.filter((row) => ids.has(row.id)) }))
+    .filter(({ rows }) => rows.length > 0);
   const generator = pool ?? exportPool();
   let generated;
   try {
-    generated = await Promise.all(units.map(({ name, rows }) => Promise.all(rows.map((row) => generator.run({ tool: name, row })))));
+    generated = await Promise.all(selected.map(({ name, rows }) => Promise.all(rows.map((row) => generator.run({ tool: name, row })))));
   } finally {
     if (!pool) await generator.close();
   }
   const models = [];
   const files = [];
-  for (const [at, { packId, name }] of units.entries()) {
+  for (const [at, { packId, name }] of selected.entries()) {
     const tool = tools[name];
-    const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: tool.index });
+    const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: ids === undefined && tool.index });
     models.push(...written.models.map(({ id, kind, path, partNodes, label }) => ({ id, kind, pack: packId, path, nodes: partNodes, label })));
     files.push(...written.files.map((file) => outputPath(packId, file)));
   }
@@ -120,16 +127,10 @@ export function withTaxonomy(models, taxonomies) {
 // The roster's source rows: TAT's catalogue export, which the roster selects from.
 const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
 
-async function buildRoster(thing, ids, out, roster, pool) {
+async function buildRoster(thing, rows, ids, out, roster, pool) {
   let failed = false;
   const models = [];
-  const rows = rosterSource();
-  const recipe = thing.load(rows);
-  const missing = ids.filter((id) => !recipe.some((row) => row.id === id));
-  if (missing.length > 0) {
-    console.log(`not in the model sources: ${missing.join(' ')}`);
-    failed = true;
-  }
+  thing.load(rows);
   const wanted = rows.filter((row) => ids.includes(row.id));
   const results = await Promise.allSettled(wanted.map((row) => pool.run({ tool: 'thing', row })));
   for (const [at, { id }] of wanted.entries()) {
@@ -159,7 +160,7 @@ export const shardUnits = (units, { index, count }) => units.filter((_, at) => a
 // is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
 // which serialises back to the same text.
 export async function fillCacheShard({ root = repo, shard, cache }) {
-  installJsonnetSources();
+  await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
   const units = [
@@ -196,9 +197,10 @@ async function main() {
   const ids = positionals.length > 0 ? positionals : [...roster.keys()];
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
-  installJsonnetSources();
+  await installJsonnetSources();
+  const rosterRows = rosterSource();
   // A taxonomy or pack dependency problem fails the production build before any model is written.
-  const taxonomies = positionals.length === 0 ? modelTaxonomies(repo) : [];
+  const taxonomies = positionals.length === 0 ? await modelTaxonomies(repo) : [];
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
@@ -210,12 +212,19 @@ async function main() {
   const pool = exportPool(values.cache && resolve(values.cache));
   try {
     const [built, recipes] = await Promise.all([
-      buildRoster((await recipeTools()).thing, ids, out, roster, pool),
-      positionals.length === 0 ? exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool }) : undefined,
+      buildRoster((await recipeTools()).thing, rosterRows, ids, out, roster, pool),
+      exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool, ids: positionals.length > 0 ? new Set(positionals) : undefined }),
     ]);
     failed = built.failed;
-    if (recipes) {
-      for (const file of recipes.files) console.log(`built ${file}`);
+    // The full build's ids are the roster's, which only the roster source may supply.
+    const known = new Set([...rosterRows, ...(positionals.length > 0 ? recipes.models : [])].map(({ id }) => id));
+    const missing = ids.filter((id) => !known.has(id));
+    if (missing.length > 0) {
+      console.log(`not in the model sources: ${missing.join(' ')}`);
+      failed = true;
+    }
+    for (const file of recipes.files) console.log(`built ${file}`);
+    if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
       const models = withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies);
       const placed = exportPlacements({

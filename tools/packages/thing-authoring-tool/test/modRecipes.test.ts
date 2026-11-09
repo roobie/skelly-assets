@@ -8,7 +8,7 @@ import { loadThingRecipe } from '../src/exports.ts';
 import { installJsonnetSources } from '../../../sources.mjs';
 import { sweepGroup } from './sweeps.ts';
 
-installJsonnetSources();
+await installJsonnetSources();
 
 it('exports one recipe file into its pack output without changing its source root', async () => {
   const root = mkdtempSync(join(tmpdir(), 'thing-recipes-'));
