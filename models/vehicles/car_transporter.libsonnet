@@ -12,8 +12,6 @@ local postXs = [3.34, 1.0, -1.3, -3.6];
 // A sloped run of the upper deck between two points on its top surface.
 local slope(id, a, b, z) = prism(id, 'deck', [[a[0], a[1] - thick], [b[0], b[1] - thick], [b[0], b[1]], [a[0], a[1]]], z);
 local slopeTail(id, a, b, z) = prism(id, 'deck', [[b[0], b[1] - thick], [a[0], a[1] - thick], [a[0], a[1]], [b[0], b[1]]], z);
-local rise = (s.headTip[1] - s.upperTop) / (s.headTip[0] - s.upperFront);
-local fall = (s.upperTop - s.tailTip[1]) / (s.upperRear - s.tailTip[0]);
 local headAt(f) = [s.upperFront + f * (s.headTip[0] - s.upperFront), s.upperTop + f * (s.headTip[1] - s.upperTop)];
 local tailAt(f) = [s.upperRear + f * (s.tailTip[0] - s.upperRear), s.upperTop + f * (s.tailTip[1] - s.upperTop)];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', s) + [

@@ -160,7 +160,7 @@ local truckRows(id, s0) = {
   ],
 }.rows;
 
-local truckItems(kit, id, name, s) = local pile = kit.pileSize; [
+local truckItems(kit, id, name) = local pile = kit.pileSize; [
   kit.part(id + '_chassis', name + ' chassis', pile, ['structure']),
   kit.part(id + '_cab', name + ' cab', pile, ['structure', 'protection']),
   kit.part(id + '_door', name + ' door', pile, ['entry', 'glazing', 'protection']),
@@ -224,7 +224,6 @@ local truckFittings(kit, id, s0) =
   slats: slats,
   arched: arched,
   flatGuard: flatGuard,
-  truckSpec: truckSpec,
   truckRows: truckRows,
   truckItems: truckItems,
   truckFittings: truckFittings,
