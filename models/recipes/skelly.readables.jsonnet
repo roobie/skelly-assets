@@ -11,4 +11,4 @@ taxonomy.inherit({ category: 'documents' }, [
   } + taxonomy.of(row)
   for row in rows
   if row.id == 'notebook'
-])
+] + (import 'models/catalogue/packs.libsonnet').recipe('skelly.readables'))

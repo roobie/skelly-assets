@@ -1,6 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local owned = std.set(['player_bust', 'player_arm', 'player_leg']);
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local owned = std.setUnion(std.set(['player_bust', 'player_arm', 'player_leg']), catalogue.ids('skelly.body'));
 [
   {
     id: row.id,

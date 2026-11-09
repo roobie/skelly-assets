@@ -1,6 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local owned = std.set(['frag_grenade']);
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local owned = std.setUnion(std.set(['frag_grenade']), catalogue.ids('skelly.explosives'));
 [
   {
     id: row.id,
