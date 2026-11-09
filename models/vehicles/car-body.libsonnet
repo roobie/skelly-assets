@@ -221,5 +221,5 @@ function(id, s) {
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),
     ] + shape.across('glass', 'glass', [[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + s.dLean, s.roof], [s.tailWaist - 0.01 + s.dLean, s.roof]], s.hatchSide - 0.02), paint, { hinge_a: [shape.top('glass'), [1, 1, 1]], hinge_b: [shape.top('glass'), [1, 1, 0]] }),
   ]),
-  rows: rows,
+  rows: k.unborrowed(id, s, rows),
 }.rows
