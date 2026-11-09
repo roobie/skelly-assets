@@ -146,6 +146,11 @@ the two stay independent. The cost is that a model whose cache key misses an inp
 that PR's build; the merge to main catches it, because every build outside a PR has one clean copy, and nothing is
 published until the two agree.
 
+Each copy spreads its model generation over several runners and builds its tree from their merged caches, so a
+clean copy takes about as long as a cached one rather than one runner's minutes for the whole catalogue. Sharding
+the cache rather than the tree keeps every copy built by the one build entry, and a cache hit returns what its
+generation stored, so the tree is the one an unsharded build makes; see `tools/build.mjs`, `fillCacheShard`.
+
 Every push to main also replaces the `edge` pre-release with that commit's build, so the latest main stays
 fetchable after CI's build artifacts expire. `edge` is unpinned and moves on every push; it is never marked
 latest, and a consumer pins a `v*` release instead.

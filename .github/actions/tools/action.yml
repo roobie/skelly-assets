@@ -1,0 +1,32 @@
+name: Set up the tools
+description: Node, the tools' locked dependencies, the pinned go-jsonnet and the Jsonnet twins, after a checkout.
+
+runs:
+  using: composite
+  steps:
+    - name: Cache go-jsonnet
+      uses: actions/cache@v6
+      with:
+        path: tools/jsonnet/bin
+        key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 26
+        cache: npm
+        cache-dependency-path: tools/package-lock.json
+    - shell: bash
+      run: npm ci --prefix tools
+    # One compile serves every job of a commit, and every later commit with the same Jsonnet inputs; see
+    # `tools/sources.mjs`, `refreshJsonnetTwins`.
+    - id: twins
+      shell: bash
+      run: |
+        echo "JSONNET_TWIN_STORE=$RUNNER_TEMP/jsonnet-twins" >> "$GITHUB_ENV"
+        echo "digest=$(node tools/sources.mjs --digest)" >> "$GITHUB_OUTPUT"
+    - name: Cache the Jsonnet twins
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.temp }}/jsonnet-twins
+        key: jsonnet-twins-${{ steps.twins.outputs.digest }}
+    - shell: bash
+      run: node tools/sources.mjs
