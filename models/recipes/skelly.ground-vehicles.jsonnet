@@ -1,7 +1,7 @@
 // Road, farm and military vehicles that drive on the ground, with the parts they share. Helicopters and wrecks are
 // their own packs, so a product can carry a city's traffic without its aircraft or its ruins.
 local fleet = import 'models/vehicles/index.libsonnet';
-local vehicles = ['shared'];
+local vehicles = ['crew_pickup', 'saloon', 'shared', 'taxi'];
 // Vehicle parts carry baked collision because a fitting places it on the vehicle.
 local vehicleParts = std.set([part.id for part in (import 'models/vehicle-parts.libsonnet') + std.flattenArrays([fleet[vehicle] for vehicle in vehicles])]);
 local jacks = std.set(['bottle_jack', 'engine_hoist', 'scissor_jack']);
