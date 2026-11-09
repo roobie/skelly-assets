@@ -15,24 +15,17 @@ import { outputPath, readMobRows, readRoster } from './layout.mjs';
 import { modelTaxonomies } from './check-taxonomy.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from './manifest.mjs';
 import { readRecipes } from './recipes.mjs';
+import { recipeTools } from './recipeTools.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
+import { workerPool } from './workerPool.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
 
-// The tools a recipe row can belong to, each with the kinds it owns, its loader and its layout under a pack.
-// Gun rows' sources resolve against this folder, where GAT's own export resolves them.
-let loadedTools;
-const recipeTools = () => (loadedTools ??= loadRecipeTools());
-const loadRecipeTools = async () => {
-  const gun = await import('./packages/gun-authoring-tool/src/cli/exportRecipe.ts');
-  const thing = await import('./packages/thing-authoring-tool/src/exports.ts');
-  return {
-    gun: { kinds: gun.GUN_KINDS, load: (rows) => gun.loadExportRecipe(rows, here), directory: 'gungen', index: false },
-    thing: { kinds: thing.THING_KINDS, load: thing.loadThingRecipe, directory: 'things', index: true },
-  };
-};
+// Every model is generated on a worker thread; the files are written here in source order, so the tree does not
+// depend on which model finished first.
+const exportPool = () => workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
 
 // Splits one recipe file's rows by owning tool, before any loader sees them.
 export function partitionRecipe(packId, rows, tools) {
@@ -63,20 +56,30 @@ export function partitionRecipe(packId, rows, tools) {
 }
 
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
-// Every file is partitioned (and so checked) before any output is written. Returns every model written, with its
-// pack, kind, GLB path under the pack and part node names, and every file written as <packId>/<logical path>.
-export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names }) {
+// Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
+// its pack, kind, GLB path under the pack and part node names, and every file written as <packId>/<logical path>.
+// A caller exporting more than recipes passes its own pool, so every export shares the cores.
+export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool }) {
   installJsonnetSources();
   const tools = await recipeTools();
   for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
-  const { writeRecipeExports } = await import('./packages/thing-export/src/files.ts');
+  const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
   const packs = readRecipes(root).map(({ packId, value }) => ({ packId, partitions: partitionRecipe(packId, value, tools) }));
-  const loaded = packs.flatMap(({ packId, partitions }) =>
-    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, tool: tools[name], recipe: tools[name].load(partitions[name]) })));
+  const units = packs.flatMap(({ packId, partitions }) =>
+    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })));
+  for (const { name, rows } of units) tools[name].load(rows);
+  const generator = pool ?? exportPool();
+  let generated;
+  try {
+    generated = await Promise.all(units.map(({ name, rows }) => Promise.all(rows.map((row) => generator.run({ tool: name, row })))));
+  } finally {
+    if (!pool) await generator.close();
+  }
   const models = [];
   const files = [];
-  for (const { packId, tool, recipe } of loaded) {
-    const written = writeRecipeExports(recipe, resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: tool.index });
+  for (const [at, { packId, name }] of units.entries()) {
+    const tool = tools[name];
+    const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: tool.index });
     models.push(...written.models.map(({ id, kind, path, partNodes }) => ({ id, kind, pack: packId, path, nodes: partNodes })));
     files.push(...written.files.map((file) => outputPath(packId, file)));
   }
@@ -102,28 +105,32 @@ export function withTaxonomy(models, taxonomies) {
   return models.map((model) => ({ ...model, taxonomy: byModel.get(key(model)) }));
 }
 
-function buildRoster(loadThingRecipe, ids, out, roster) {
+async function buildRoster(thing, ids, out, roster, pool) {
   let failed = false;
   const models = [];
-  const recipe = loadThingRecipe(JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8')));
+  const rows = JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
+  const recipe = thing.load(rows);
   const missing = ids.filter((id) => !recipe.some((row) => row.id === id));
   if (missing.length > 0) {
     console.log(`not in the model sources: ${missing.join(' ')}`);
     failed = true;
   }
-  for (const { id, kind, generate } of recipe.filter((row) => ids.includes(row.id))) {
-    try {
-      const file = roster.get(id)?.file ?? `${id}.glb`;
-      const { glb, partNodes } = generate();
-      mkdirSync(dirname(join(out, file)), { recursive: true });
-      writeFileSync(join(out, file), glb);
-      console.log(`built ${file}`);
-      const row = roster.get(id);
-      if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes });
-    } catch (error) {
-      console.log(`EXPORT FAILED ${id}: ${error.message}`);
+  const wanted = rows.filter((row) => ids.includes(row.id));
+  const results = await Promise.allSettled(wanted.map((row) => pool.run({ tool: 'thing', row })));
+  for (const [at, { id }] of wanted.entries()) {
+    const result = results[at];
+    if (result.status === 'rejected') {
+      console.log(`EXPORT FAILED ${id}: ${result.reason.message}`);
       failed = true;
+      continue;
     }
+    const { kind, glb, partNodes } = result.value;
+    const file = roster.get(id)?.file ?? `${id}.glb`;
+    mkdirSync(dirname(join(out, file)), { recursive: true });
+    writeFileSync(join(out, file), glb);
+    console.log(`built ${file}`);
+    const row = roster.get(id);
+    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes });
   }
   return { failed, models };
 }
@@ -146,12 +153,14 @@ async function main() {
     if (problems.length > 0) process.exit(1);
   }
   let failed = false;
+  const pool = exportPool();
   try {
-    const { loadThingRecipe } = await import('./packages/thing-authoring-tool/src/exports.ts');
-    const built = buildRoster(loadThingRecipe, ids, out, roster);
+    const [built, recipes] = await Promise.all([
+      buildRoster((await recipeTools()).thing, ids, out, roster, pool),
+      positionals.length === 0 ? exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool }) : undefined,
+    ]);
     failed = built.failed;
-    if (positionals.length === 0) {
-      const recipes = await exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS });
+    if (recipes) {
       for (const file of recipes.files) console.log(`built ${file}`);
       const mobs = mobManifest(readMobRows(repo));
       const manifest = buildManifest({
@@ -171,6 +180,8 @@ async function main() {
       console.log(`ROW ERROR ${(issue.path ?? []).map((p) => p.key).join('.')}: ${issue.message} (${JSON.stringify(issue.input)})`);
     }
     failed = true;
+  } finally {
+    await pool.close();
   }
   process.exit(failed ? 1 : 0);
 }
