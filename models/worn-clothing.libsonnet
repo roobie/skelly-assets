@@ -7,7 +7,7 @@ local prism(id, slot, bottom, top, width, depth, chamfer, cx=0, cz=0) = {
     [-depth / 2, width / 2 - chamfer], [-depth / 2, -width / 2 + chamfer],
   ]],
 };
-local worn = import 'worn-taxonomy.libsonnet';
+local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 local box(id, slot, low, high) = { id: id, slot: slot, kind: 'box', min: low, max: high };
 local garment(id, pieces, finish) = {
   id: id, exportMass: 'inventory-atom',
@@ -17,7 +17,7 @@ local garment(id, pieces, finish) = {
 };
 local jacket = { cloth: 'cloth-shirt-player', trim: 'paint-charcoal', fastener: 'steel-grey' };
 local hoodie = { cloth: 'plastic-red', trim: 'paint-charcoal' };
-local measures = import 'jacket-measures.libsonnet';
+local measures = import 'measures/jacket.libsonnet';
 local jacketLevel(id) =
   local d = measures[id];
   prism(id, 'cloth', d.bottom, d.top, d.width, d.depth, d.chamfer);
