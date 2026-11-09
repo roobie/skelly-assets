@@ -1,6 +1,6 @@
-// The leaper's corpse groups for the game's ragdoll solver, which owns corpse physics and has no generic rule
-// for a new anatomy. Each group falls as one rigid body; `limits` are radians from the pose it dies in, one range
-// per joint axis, and the root group has none.
+// The leaper's corpse groups. They describe its body, so they live with the model and change with its anatomy;
+// the game's ragdoll solver reads them (`PROJECT.md`, "Design boundaries"). Each group falls as one rigid body;
+// `limits` are radians from the pose it dies in, one range per joint axis, and the root group has none.
 local hinge(bones, limits) = { bones: bones, limits: [limits, [0, 0], [0, 0]] };
 local ball(bones, flex, swing, twist) = { bones: bones, limits: [flex, twist, swing] };
 

@@ -34,6 +34,11 @@ Game-owned ragdoll physics is intentionally absent from the pipeline viewer. A s
 create approval drift; inspect physical falls in the game instead. The acid body's procedural death animation
 remains an authoring preview. See `src/viewer/main.ts`, `applyDeathFrame`, and `test/boundaries.test.ts`.
 
+Ragdoll groups are different: which bones fall together and how far each joint may swing describe the body,
+so they change with its anatomy and stay with the model, and the game's solver reads them. The game has no
+generic rule for a new anatomy, so a plan the humanoid rules don't fit carries its own. See
+`src/mob/leaper/ragdoll.jsonnet` and `test/leaper.test.ts`.
+
 ## Body plans and readiness
 
 Body plans name anatomy. A leg-cut humanoid keeps the same rig and borrows crawl posing rather than becoming
@@ -61,11 +66,10 @@ The leaper is an ambush predator built around folded hind springs, so it is its 
 posed humanoid or quadruped. Its rest pose is the coiled crouch it spends its life in, so validation judges
 that body; every other stance is a clip on the same rig. Its joints must hold together through deep folds,
 which a rigid-voxel bend cracks open, so seams are checked after posing. Losing a hind spring changes which
-gait the body can still perform instead of distorting the healthy one. The game owns corpse physics and has
-no generic rule for a new anatomy, so the leaper's ragdoll groups are kept beside it as data for the game to
-adopt. It stays standalone from the other plans so its tuning cannot move them. See `src/mob/leaper/plan.ts`,
-`LEAPER_TEMPLATE`; `src/mob/leaper/seams.ts`, `jointCracks`; `src/mob/leaper/motion.ts`, `locomotionFor`;
-`src/mob/leaper/ragdoll.jsonnet`; and `test/boundaries.test.ts`.
+gait the body can still perform instead of distorting the healthy one. It stays standalone from the other
+plans so its tuning cannot move them. See `src/mob/leaper/plan.ts`, `LEAPER_TEMPLATE`;
+`src/mob/leaper/seams.ts`, `jointCracks`; `src/mob/leaper/motion.ts`, `locomotionFor`; and
+`test/boundaries.test.ts`.
 
 Population-quality assertions belong in explicit sweeps because they measure distributions rather than an
 individual body's contract. See `test/sweeps.ts`, `sweepGroup`, and `src/cli/stats.ts`.
