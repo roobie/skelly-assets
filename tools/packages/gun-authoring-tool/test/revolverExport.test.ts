@@ -87,10 +87,7 @@ it('opens the drum clear of every frame solid on the reserved swing side', () =>
       1e-7,
     );
   }
-  const centre = applyPoint(
-    motion,
-    toGungen(metadata.cylinder.centre).map((value) => value / unit) as unknown as Vec3,
-  );
+  const centre = applyPoint(motion, toGungen(metadata.cylinder.centre).map((value) => value / unit) as unknown as Vec3);
   const swing = frame.keepOuts.find(({ id }) => id === 'cylinder-swing')!.box;
   expect(centre[2]).toBeLessThanOrEqual(swing.center[2]);
 });
