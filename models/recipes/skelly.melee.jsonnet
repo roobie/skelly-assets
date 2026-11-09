@@ -4,7 +4,8 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local gunGrained = std.set(['baseball_bat', 'kabar', 'machete', 'steel_pipe', 'lame_saber', 'sun_shield']);
 // The poles are long enough that the item grain keeps their shape; the kite and tower shields name their own grain.
 local owned = std.setUnion(std.set(['pike_pole', 'long_pole', 'kite_shield', 'tower_shield']), gunGrained);
-[
+// Every row is a weapon unless its catalogue row names another shelf.
+taxonomy.inherit({ category: 'weapons' }, [
   {
     id: row.id,
     kind: 'item',
@@ -14,4 +15,4 @@ local owned = std.setUnion(std.set(['pike_pole', 'long_pole', 'kite_shield', 'to
   } + taxonomy.of(row)
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
   if std.setMember(row.id, owned)
-]
+])
