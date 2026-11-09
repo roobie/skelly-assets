@@ -1,3 +1,4 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 // Vehicle parts in the vehicle frame: x forward, y up, z toward the near side.
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local part(id, family, massKg, dimensions, finish, anchors, exportMass) = {
@@ -465,7 +466,7 @@ local hoistHookBlock = hpart('hoist_hook_block', 15, [
 ]);
 local hoistBoomRest = hpart('hoist_boom_rest', 8, [hbox('rest', 'crane', [22, 30, 29], [26, 42, 35])]);
 
-[
+local rows = [
   part('car_battery', 'carton', 14, {
     width: 0.24, height: 0.17, depth: 0.175, lidHeight: 0.02, bandHeight: 0.06, bandInset: 0.0005,
     handleHeight: 0, handleWidth: 0.12, handleDepth: 0.04, handleWall: 0.006,
@@ -552,4 +553,21 @@ local hoistBoomRest = hpart('hoist_boom_rest', 8, [hbox('rest', 'crane', [22, 30
   hoistWinch,
   hoistHookBlock,
   hoistBoomRest,
-]
+];
+
+// Each part is tagged with the vehicle it belongs to, named by the id prefix its blueprint gives it. The loose
+// fittings (wheel, seat, battery) fit any vehicle and name no body.
+local vehicles = [
+  { prefix: 'hatchback_', tags: { 'vehicle-body': ['car'] } },
+  { prefix: 'pickup_', tags: { 'vehicle-body': ['car'] } },
+  { prefix: 'box_van_', tags: { 'vehicle-body': ['van'] } },
+  { prefix: 'hoist_', tags: { 'vehicle-body': ['truck'], 'vehicle-role': ['construction'] } },
+];
+local vehicleOf(row) = [v for v in vehicles if std.startsWith(row.id, v.prefix)];
+taxonomy.inherit({ category: 'vehicle-parts' }, [
+  row + (
+    local own = vehicleOf(row);
+    if std.length(own) > 0 then { taxonomy: { tags: own[0].tags } } else {}
+  )
+  for row in rows
+])
