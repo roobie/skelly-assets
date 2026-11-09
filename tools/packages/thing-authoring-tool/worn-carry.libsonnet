@@ -27,6 +27,9 @@ local torso = if overJacket then {
   chest: level(self.ribs.y[1], bust.chestHeight, bust.chestWidth, bust.chestDepth, bust.chestChamfer),
 };
 local shoulderTop = torso.chest.y[1];
+local grain = 0.004;
+// A sample just below the garment's outward step can fill a cell above it; end the narrow waist on a voxel face.
+local waistTop = std.floor(torso.waist.y[1] / grain) * grain;
 
 // Worn on the player body, over the jacket in the `_jacket` variants.
 local tag(category, slot, material) = {
@@ -88,7 +91,7 @@ local ring(id, slot, l, offsets, heights, sides) =
 // A vest's shell from its hem to over the shoulders. The arms hang close beside the ribs and chest, so the shell is
 // open at the flanks there; `flanks` names the waist sides that close it below them.
 local vestShell(id, slot, offsets, waistOffsets, bottom, flanks) =
-  ring(id + '_waist', slot, torso.waist, waistOffsets, [bottom, torso.waist.y[1]], SIDES.open + flanks)
+  ring(id + '_waist', slot, torso.waist, waistOffsets, [bottom, waistTop], SIDES.open + flanks)
   + ring(id + '_ribs', slot, torso.ribs, offsets, torso.ribs.y, SIDES.open)
   + ring(id + '_chest', slot, torso.chest, offsets, [torso.chest.y[0], shoulderTop + offsets[1]], SIDES.open)
   // Shoulder straps join the front and back panels over the top, clear of the collar and the deltoids.
@@ -133,7 +136,7 @@ local backpack(id, massKg, bottom) =
   {
     id: id + '_worn' + suffix,
     exportMass: 'parts',
-    voxelGrain: 0.004,
+    voxelGrain: grain,
     taxonomy: tag('containers', 'back', 'fabric'),
     parts: [
       {
@@ -153,7 +156,7 @@ local fannyPack =
   {
     id: 'fanny_pack_worn' + suffix,
     exportMass: 'parts',
-    voxelGrain: 0.004,
+    voxelGrain: grain,
     taxonomy: tag('containers', 'waist', 'fabric'),
     parts: [
       {
@@ -171,7 +174,7 @@ local fannyPack =
 local wornAtom(id, massKg, pieces, finish, taxonomy=null) = {
   id: id + suffix,
   exportMass: 'parts',
-  voxelGrain: 0.004,
+  voxelGrain: grain,
   parts: [{ id: 'shell', family: 'compound', massKg: massKg, params: params({ pieces: pieces }), finish: finish, ports: [] }],
   connections: [],
 } + (if taxonomy == null then {} else { taxonomy: taxonomy });
