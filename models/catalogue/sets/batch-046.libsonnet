@@ -12,9 +12,7 @@ local post(id, massKg, length, side, c, wood, extras=[], extraFinish={}) =
   // A 3.05 m round pole 40 mm across, darkened with oil soaking into it.
   h.compound('oil_soaked_long_pole', 2.6, [
     h.rod('pole', 'pole', 0.020, -1.525, 1.525, 0.020),
-  ], { pole: 'wood-walnut' }) + {
-    handling: h.gripOn('oil_soaked_long_pole', 'pole'),
-  } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  ], { pole: 'wood-walnut' }) + h.gripOn('oil_soaked_long_pole', 'pole') + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 610 x 200 x 25 mm air-dried billet for an instrument top, ends sealed with wax against checking, a grade mark pencilled on.
   h.compound('tonewood', 1.5, [
     h.box('billet', 'wood', [-0.300, 0, -0.100], [0.300, 0.025, 0.100]),

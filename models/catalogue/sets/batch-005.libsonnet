@@ -61,7 +61,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
   h.compound('cigar', 0.014, [
     turned('body', 'leaf', 'x', [[0, 0], [0, 0.008], [0.135, 0.009], [0.145, 0.0075], [0.15, 0.004], [0.15, 0]], [-0.075, 0.009, 0]),
     turned('band', 'band', 'x', [[0.1, 0], [0.1, 0.0098], [0.114, 0.0098], [0.114, 0]], [-0.075, 0.009, 0]),
-  ], { leaf: 'leather-brown', band: 'paint-red' }) + { handling: h.gripOn('cigar', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plant'] } } },
+  ], { leaf: 'leather-brown', band: 'paint-red' }) + h.gripOn('cigar', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plant'] } } },
 
   // A 30 g squeeze tube of anaesthetic cream, 130 mm long and 26 mm across, lying flat along x with the
   // crimped end at +x and the screw cap at -x. Round behind the cap, it keeps its full width to the crimp

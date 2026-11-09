@@ -57,13 +57,13 @@ local tray(w, d, ht, t) = [
   h.compound('corded_power_drill', 1.5, drill(false), {
     housing: 'plastic-charcoal', grip: 'rubber-black', trigger: 'plastic-red', chuck: 'steel-grey', bit: 'steel-blued',
     cord: 'plastic-black',
-  }) + { handling: h.gripOn('corded_power_drill', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + h.gripOn('corded_power_drill', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless drill driver of the same frame, its grip standing on a slide-on battery pack.
   h.compound('cordless_drill', 1.6, drill(true), {
     housing: 'plastic-orange', grip: 'plastic-black', trigger: 'plastic-black', chuck: 'steel-grey', bit: 'steel-blued',
     battery: 'plastic-charcoal',
-  }) + { handling: h.gripOn('cordless_drill', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + h.gripOn('cordless_drill', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 61 cm distaff with a hank of combed fibre tied near its head, beside a 30 cm drop spindle with a 6 cm whorl
   // and a cop of spun yarn on its shaft.
@@ -75,8 +75,7 @@ local tray(w, d, ht, t) = [
     rod('spindle', 'wood', 0.005, -0.15, 0.15, 0.03) + { origin: [-0.15, 0.03, 0.05] },
     turned('whorl', 'wood', 'x', [[0, 0], [0, 0.03], [0.012, 0.028], [0.016, 0.012], [0.016, 0]], [-0.13, 0.03, 0.05]),
     turned('cop', 'yarn', 'x', [[0, 0], [0, 0.009], [0.02, 0.018], [0.09, 0.016], [0.13, 0.007], [0.13, 0]], [-0.11, 0.03, 0.05]),
-  ], { wood: 'wood-birch', fibre: 'fleece-pale', yarn: 'knit-wool' }) + {
-    handling: h.gripOn('distaff_spindle', 'distaff'),
+  ], { wood: 'wood-birch', fibre: 'fleece-pale', yarn: 'knit-wool' }) + h.gripOn('distaff_spindle', 'distaff') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'fabric'] } } },
 
@@ -90,7 +89,7 @@ local tray(w, d, ht, t) = [
   ], {
     handle: 'steel-grey', grip: 'rubber-black', body: 'plastic-red', nose: 'steel-parkerized', bit: 'steel-hardened',
     battery: 'plastic-charcoal',
-  }) + { handling: h.gripOn('electric_jackhammer', 'grip-b'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + h.gripOn('electric_jackhammer', 'grip-b') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A tabletop fanning mill, 60 cm long, 65 cm tall and 36 cm wide: a fan drum turned by a crank on the front, a
   // hopper on top and the clean-grain chute sloping out at +x.
@@ -142,8 +141,7 @@ local tray(w, d, ht, t) = [
     h.prism('handle', 'handle', 'y', [[0.02, -0.112], [0.02, -0.142], [-0.06, -0.215], [-0.078, -0.19], [-0.01, -0.112]], 0, 0.022),
     rod('tensioner', 'nut', 0.004, 0.19, 0.205, 0.007),
     box('wing-nut', 'nut', [0.205, 0.003, -0.012], [0.211, 0.011, 0.018]),
-  ], { frame: 'paint-red', blade: 'steel-bright', handle: 'plastic-black', nut: 'steel-grey' }) + {
-    handling: h.gripOn('hacksaw', 'handle'),
+  ], { frame: 'paint-red', blade: 'steel-bright', handle: 'plastic-black', nut: 'steel-grey' }) + h.gripOn('hacksaw', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
@@ -152,8 +150,7 @@ local tray(w, d, ht, t) = [
     rod('handle', 'handle', 0.013, 0, 0.245, 0.045),
     turned('head', 'head', 'y', [[0, 0], [0, 0.016], [0.006, 0.019], [0.045, 0.014], [0.084, 0.019], [0.09, 0.016], [0.09, 0]], [0.226, 0, 0]),
     turned('wrap', 'wrap', 'x', [[0, 0], [0, 0.016], [0.02, 0.016], [0.02, 0]], [0.188, 0.045, 0]),
-  ], { handle: 'wood-birch', head: 'bronze', wrap: 'skin-rawhide' }) + {
-    handling: h.gripOn('bronze_hammer', 'handle'),
+  ], { handle: 'wood-birch', head: 'bronze', wrap: 'skin-rawhide' }) + h.gripOn('bronze_hammer', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
@@ -170,8 +167,7 @@ local tray(w, d, ht, t) = [
     turned('pinion', 'frame', 'x', [[0, 0], [0, 0.009], [0.008, 0.009], [0.008, 0]], [0.04, 0.05, 0]),
     turned('chuck', 'chuck', 'x', [[0, 0], [0, 0.012], [0.025, 0.011], [0.032, 0.007], [0.032, 0]], [0.085, 0.05, 0]),
     rod('bit', 'bit', 0.0025, 0.117, 0.14, 0.05),
-  ], { handle: 'wood-walnut', frame: 'steel-grey', wheel: 'paint-red', chuck: 'steel-bright', bit: 'steel-blued' }) + {
-    handling: h.gripOn('hand_drill', 'handle'),
+  ], { handle: 'wood-walnut', frame: 'steel-grey', wheel: 'paint-red', chuck: 'steel-bright', bit: 'steel-blued' }) + h.gripOn('hand_drill', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
@@ -206,7 +202,7 @@ local tray(w, d, ht, t) = [
   ], {
     handle: 'steel-grey', grip: 'rubber-black', body: 'steel-grey', nose: 'steel-parkerized', bit: 'steel-hardened',
     engine: 'paint-charcoal', cowl: 'paint-crane-yellow', tank: 'plastic-red', starter: 'plastic-black',
-  }) + { handling: h.gripOn('jackhammer', 'grip-b'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + h.gripOn('jackhammer', 'grip-b') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A small top-loading electric kiln, 30 cm across and 33 cm tall on a stand: a steel-banded jacket, a fire-brick
   // lid with a handle, two peephole plugs and a controller box on the front.

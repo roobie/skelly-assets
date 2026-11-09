@@ -55,7 +55,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
   ] + [
     box('tape-end-a', 'tape', [0.002, 0.0, -0.0075], [0.010, 0.014, 0.0075]),
     box('tape-end-b', 'tape', [0.050, 0.0, -0.0075], [0.058, 0.014, 0.0075]),
-  ], { grip: 'wood-pine', lead: 'steel-bright', coil: 'steel-heat-tint', tape: 'tape-grey' }) + { handling: h.gripOn('crude_firestarter', 'grip') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'] } } },
+  ], { grip: 'wood-pine', lead: 'steel-bright', coil: 'steel-heat-tint', tape: 'tape-grey' }) + h.gripOn('crude_firestarter', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'] } } },
 
   // A rechargeable arc lighter, 34 by 13 mm and 58 mm tall, its flip lid tipped back to show the two electrodes;
   // 69 mm with the lid shut.
@@ -89,7 +89,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     local z(x) = 0.040 + 0.045 * std.sin(std.pi * (x + 0.300) / 0.450);
     strip('bow-%d' % i, 'bow', [x0, z(x0)], [x1, z(x1)], 0.014, 0.093, 0.107)
     for i in std.range(0, 5)
-  ], { board: 'wood-pine', char: 'coal-black', spindle: 'wood-birch', bow: 'bark', cord: 'cord-cotton' }) + { handling: h.gripOn('bow_drill', 'bow-1') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
+  ], { board: 'wood-pine', char: 'coal-black', spindle: 'wood-birch', bow: 'bark', cord: 'cord-cotton' }) + h.gripOn('bow_drill', 'bow-1') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
 
   // A pump drill standing on its hearth board: a 500 mm shaft through a 140 mm stone flywheel, a 400 mm
   // crossbar riding on the shaft and a cord from the shaft top to each end of the bar.
@@ -104,7 +104,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     cord('cord-a', 'cord', [0, 0.495], [-0.190, 0.318], 0.003),
     cord('cord-b', 'cord', [0, 0.495], [0.190, 0.318], 0.003),
     h.disc('cap', 'bar', 0.012, 0.495, 0.505),
-  ], { board: 'wood-pine', char: 'coal-black', shaft: 'wood-birch', stone: 'stone-grey', bar: 'wood-oak', cord: 'cord-cotton' }) + { handling: h.gripOn('pump_drill', 'crossbar') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
+  ], { board: 'wood-pine', char: 'coal-black', shaft: 'wood-birch', stone: 'stone-grey', bar: 'wood-oak', cord: 'cord-cotton' }) + h.gripOn('pump_drill', 'crossbar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
 
   // A hardwood fire piston, 200 mm long: a 30 mm bore cylinder with the piston drawn a little way out by its
   // knob, and a small lidded tinder pot beside it.
@@ -115,7 +115,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     turned('knob', 'wood', 'x', [[0, 0], [0, 0.012], [0.008, 0.017], [0.034, 0.017], [0.038, 0.010], [0.038, 0]], [0.162, 0.015, 0]),
     h.disc('pot', 'pot', 0.011, 0, 0.028, 0.070, 0.036),
     h.disc('pot-lid', 'wood', 0.0115, 0.028, 0.034, 0.070, 0.036),
-  ], { wood: 'wood-walnut', ferrule: 'cord-cotton', rod: 'wood-birch', pot: 'bone' }) + { handling: h.gripOn('fire_piston', 'cylinder') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'bone'], setting: ['prehistoric'] } } },
+  ], { wood: 'wood-walnut', ferrule: 'cord-cotton', rod: 'wood-birch', pot: 'bone' }) + h.gripOn('fire_piston', 'cylinder') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'bone'], setting: ['prehistoric'] } } },
 
   // A C-shaped steel striker, 80 by 30 mm, beside a fist-sized flint knapped to a working edge.
   h.compound('flint_and_steel', 0.16, [
@@ -127,7 +127,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     prism('flint', 'flint', 'y', [[0.020, -0.030], [0.016, 0.004], [0.030, 0.026], [0.050, 0.020], [0.058, -0.004], [0.046, -0.028]], 0, 0.018),
     prism('flint-top', 'flint', 'y', [[0.026, -0.020], [0.024, 0.004], [0.034, 0.016], [0.046, 0.012], [0.050, -0.006], [0.042, -0.020]], 0.018, 0.026),
     prism('cortex', 'cortex', 'y', [[0.050, -0.020], [0.056, -0.004], [0.050, 0.012], [0.046, -0.004]], 0, 0.012),
-  ], { steel: 'steel-heat-tint', flint: 'obsidian', cortex: 'chalk-white' }) + { handling: h.gripOn('flint_and_steel', 'bar') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'stone'] } } },
+  ], { steel: 'steel-heat-tint', flint: 'obsidian', cortex: 'chalk-white' }) + h.gripOn('flint_and_steel', 'bar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'stone'] } } },
 
   // A rough ground glass lens, 56 mm across and 12 mm thick at the middle.
   h.compound('crude_lens', 0.036, [
@@ -140,7 +140,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     turned('rim', 'rim', 'y', [[0, 0.044], [0, 0.051], [0.012, 0.051], [0.012, 0.044], [0, 0.044]]),
     box('neck', 'rim', [0.049, 0.001, -0.009], [0.066, 0.011, 0.009]),
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.009], [0.010, 0.012], [0.100, 0.013], [0.112, 0.010], [0.120, 0]], [0.064, 0.006, 0]),
-  ], { glass: 'glass-clear', rim: 'plastic-black', handle: 'wood-walnut' }) + { handling: h.gripOn('magnifying_glass', 'handle') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'wood'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', rim: 'plastic-black', handle: 'wood-walnut' }) + h.gripOn('magnifying_glass', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'wood'], setting: ['modern'] } } },
 
   // A flip-top petrol lighter, 38 by 13 mm and 36 mm tall, the lid swung open on its side hinge to show the
   // windproof chimney and striker wheel.
@@ -184,7 +184,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     box('stick', 'stick', [0, 0, -0.002], [0.070, 0.004, 0.002]),
     h.rod('head', 'head', 0.0045, 0.035, 0.066, 0.002),
     turned('tip', 'tip', 'x', [[0, 0], [0, 0.0045], [0.003, 0.004], [0.006, 0]], [0.066, 0.002, 0]),
-  ], { stick: 'wood-pine', head: 'brick-buff', tip: 'paint-red' }) + { handling: h.gripOn('survival_match', 'stick') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood'], setting: ['modern'] } } },
+  ], { stick: 'wood-pine', head: 'brick-buff', tip: 'paint-red' }) + h.gripOn('survival_match', 'stick') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wood'], setting: ['modern'] } } },
 
   emberCarrier('ember_carrier', 'coal-black') + { taxonomy: { category: 'lighting', tags: { material: ['metal'], setting: ['modern'] } } },
   emberCarrier('smouldering_ember_carrier', 'glow-flame') + { taxonomy: { category: 'lighting', tags: { material: ['metal'], setting: ['modern'], state: ['opened'] } } },

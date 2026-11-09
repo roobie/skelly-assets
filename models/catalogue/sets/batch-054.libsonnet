@@ -53,8 +53,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     h.turned('band', 'band', 'x', [[0, 0], [0, 0.0175], [0.006, 0.0175], [0.006, 0]], [0.118, 0.023, 0]),
     h.turned('head', 'head', 'x', [[0, 0], [0, 0.012], [0.006, 0.019], [0.014, 0.0225], [0.024, 0.023], [0.034, 0.0215], [0.040, 0.016], [0.043, 0.008], [0.043, 0]], [0.155, 0.023, 0]),
     box('switch', 'switch', [0.075, 0.038, -0.005], [0.093, 0.0415, 0.005]),
-  ], { handle: 'plastic-gloss-white', band: 'alu-bare', head: 'plastic-pink', switch: 'plastic-charcoal' }) + {
-    handling: h.gripOn('vibrator', 'handle'),
+  ], { handle: 'plastic-gloss-white', band: 'alu-bare', head: 'plastic-pink', switch: 'plastic-charcoal' }) + h.gripOn('vibrator', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -82,8 +81,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
   h.compound('heavy_crowbar', 5.5, [
     h.turned('bar', 'bar', 'x', [[0, 0], [0, 0.004], [0.08, 0.013], [1.44, 0.013], [1.44, 0]], [0, 0.013, 0]),
     h.prism('chisel', 'tip', 'z', [[1.44, 0], [1.44, 0.026], [1.52, 0.015], [1.52, 0.011]], -0.015, 0.015),
-  ], { bar: 'steel-parkerized', tip: 'steel-bright' }) + {
-    handling: h.gripOn('heavy_crowbar', 'bar'),
+  ], { bar: 'steel-parkerized', tip: 'steel-bright' }) + h.gripOn('heavy_crowbar', 'bar') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -100,8 +98,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     flat('pick-c', 'head', [[0.47, -0.15], [0.452, -0.168], [0.46, -0.14]], 0.005, 0.015),
     box('hammer-neck', 'head', [0.475, 0.003, 0.016], [0.505, 0.017, 0.05]),
     box('hammer', 'head', [0.47, 0, 0.05], [0.51, 0.02, 0.07]),
-  ], { shaft: 'paint-police-blue', grip: 'rubber-black', head: 'steel-stainless' }) + {
-    handling: h.gripOn('ice_axe', 'grip'),
+  ], { shaft: 'paint-police-blue', grip: 'rubber-black', head: 'steel-stainless' }) + h.gripOn('ice_axe', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
 

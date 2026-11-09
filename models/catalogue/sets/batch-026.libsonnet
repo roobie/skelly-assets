@@ -32,8 +32,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     turned('stem', 'stem', 'x', [[0, 0], [0, 0.003], [0.085, 0.003], [0.085, 0]], [0.295, 0.04, 0]),
     // Tufted rows: the bristle head's outline steps in and out along the stem.
     turned('bristles', 'bristles', 'x', [[0, 0], [0, 0.03], [0.006, 0.04], [0.012, 0.036], [0.018, 0.04], [0.024, 0.036], [0.03, 0.04], [0.036, 0.036], [0.042, 0.04], [0.048, 0.036], [0.054, 0.04], [0.06, 0.036], [0.066, 0.038], [0.075, 0.028], [0.083, 0.012], [0.083, 0]], [0.3, 0.04, 0]),
-  ], { handle: 'plastic-gloss-white', stem: 'steel-stainless', bristles: 'plastic-grey' }) + {
-    handling: h.gripOn('toilet_brush', 'handle'),
+  ], { handle: 'plastic-gloss-white', stem: 'steel-stainless', bristles: 'plastic-grey' }) + h.gripOn('toilet_brush', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -46,8 +45,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     // Teeth one grain wide with two-grain gaps, so they stay apart in the iso view.
     box('tooth-%d' % i, 'steel', [0.002 + i * 0.006, 0, -0.026], [0.004 + i * 0.006, 0.002, 0.004])
     for i in std.range(0, 7)
-  ], { steel: 'steel-stainless' }) + {
-    handling: h.gripOn('lice_comb', 'handle'),
+  ], { steel: 'steel-stainless' }) + h.gripOn('lice_comb', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -56,8 +54,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     box('spine', 'comb', [-0.09, 0, 0.006], [0.09, 0.004, 0.015]),
     box('end-a', 'comb', [-0.09, 0, -0.015], [-0.086, 0.003, 0.006]),
     box('end-b', 'comb', [0.086, 0, -0.015], [0.09, 0.003, 0.006]),
-  ] + combTeeth('comb', [[-0.084, 0, 0.006], [0, 0.084, 0.004]], -0.015, 0.006, 0.003), { comb: 'plastic-black' }) + {
-    handling: h.gripOn('pocket_comb', 'spine'),
+  ] + combTeeth('comb', [[-0.084, 0, 0.006], [0, 0.084, 0.004]], -0.015, 0.006, 0.003), { comb: 'plastic-black' }) + h.gripOn('pocket_comb', 'spine') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -81,8 +78,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     box('lever', 'clamp', [0.06, 0.033, -0.006], [0.145, 0.038, 0.006]),
     box('pivot', 'clamp', [0.125, 0.026, -0.008], [0.145, 0.036, 0.008]),
     box('switch', 'switch', [0.03, 0.03, -0.004], [0.045, 0.034, 0.004]),
-  ], { cord: 'plastic-black', handle: 'plastic-black', barrel: 'ceramic-white', clamp: 'steel-stainless', switch: 'plastic-red' }) + {
-    handling: h.gripOn('curling_iron', 'handle'),
+  ], { cord: 'plastic-black', handle: 'plastic-black', barrel: 'ceramic-white', clamp: 'steel-stainless', switch: 'plastic-red' }) + h.gripOn('curling_iron', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['ceramic', 'metal'], setting: ['modern'] } } },
 
@@ -108,8 +104,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     prism('handle', 'body', 'z', [[-0.04, 0.012], [0, 0.012], [0.025, 0.15], [-0.025, 0.15]], -0.016, 0.016),
     box('switch', 'switch', [-0.004, 0.09, 0.016], [0.012, 0.12, 0.019]),
     turned('cord', 'cord', 'y', [[0, 0], [0, 0.006], [0.014, 0.006], [0.014, 0]], [-0.02, 0, 0]),
-  ], { body: 'plastic-gloss-white', nozzle: 'plastic-charcoal', grille: 'plastic-charcoal', switch: 'plastic-pink', cord: 'plastic-black' }) + {
-    handling: h.gripOn('hair_dryer', 'handle'),
+  ], { body: 'plastic-gloss-white', nozzle: 'plastic-charcoal', grille: 'plastic-charcoal', switch: 'plastic-pink', cord: 'plastic-black' }) + h.gripOn('hair_dryer', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -126,8 +121,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     ]
     for i in std.range(0, 7)
     for j in std.range(0, 5)
-  ]), { brush: 'plastic-charcoal', cushion: 'rubber-black', pin: 'plastic-white', tip: 'plastic-black' }) + {
-    handling: h.gripOn('hairbrush', 'handle'),
+  ]), { brush: 'plastic-charcoal', cushion: 'rubber-black', pin: 'plastic-white', tip: 'plastic-black' }) + h.gripOn('hairbrush', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -149,8 +143,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
       [0, 0], [0, 0.03], [0.02, 0.07], [0.04, 0.08], [0.06, 0.07], [0.08, 0.08], [0.1, 0.07], [0.12, 0.08], [0.14, 0.07], [0.16, 0.078], [0.18, 0.06], [0.19, 0.04], [0.19, 0],
     ], [0.37, 0.08, 0]),
     turned('seal', 'seal', 'x', [[0, 0], [0, 0.03], [0.025, 0.025], [0.04, 0.016], [0.04, 0]], [0.56, 0.08, 0]),
-  ], { handle: 'plastic-black', bellows: 'plastic-red', seal: 'plastic-black' }) + {
-    handling: h.gripOn('bellows_plunger', 'handle'),
+  ], { handle: 'plastic-black', bellows: 'plastic-red', seal: 'plastic-black' }) + h.gripOn('bellows_plunger', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'plastic'], setting: ['sci-fi'] } } },
 
@@ -160,8 +153,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     turned('cap', 'handle', 'x', [[0, 0], [0, 0.008], [0.005, 0.011], [0.005, 0]], [-0.005, 0.075, 0]),
     ring('cup', 'cup', [[0, 0.01], [0, 0.02], [0.02, 0.05], [0.07, 0.075], [0.09, 0.075], [0.09, 0.066], [0.068, 0.064], [0.02, 0.04], [0.008, 0.01]], [0.43, 0.075, 0]),
     turned('plug', 'cup', 'x', [[0, 0], [0, 0.012], [0.03, 0.012], [0.03, 0]], [0.42, 0.075, 0]),
-  ], { handle: 'wood-oak', cup: 'plastic-red' }) + {
-    handling: h.gripOn('toilet_plunger', 'handle'),
+  ], { handle: 'wood-oak', cup: 'plastic-red' }) + h.gripOn('toilet_plunger', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'wood'], setting: ['modern'] } } },
 
@@ -174,8 +166,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     box('blades', 'blade', [0.062, 0.006, -0.019], [0.064, 0.012, 0.019]),
     box('strip', 'strip', [0.064, 0.009, -0.019], [0.066, 0.014, 0.019]),
     box('guard', 'head', [0.064, 0.004, -0.019], [0.066, 0.008, 0.019]),
-  ], { handle: 'steel-stainless', grip: 'rubber-black', head: 'plastic-charcoal', blade: 'steel-bright', strip: 'jelly-teal' }) + {
-    handling: h.gripOn('shaving_razor', 'handle'),
+  ], { handle: 'steel-stainless', grip: 'rubber-black', head: 'plastic-charcoal', blade: 'steel-bright', strip: 'jelly-teal' }) + h.gripOn('shaving_razor', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 

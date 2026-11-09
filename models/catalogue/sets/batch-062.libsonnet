@@ -120,8 +120,7 @@ local gasFinishes = {
     h.box('guard-front', 'grip', [0.002, 0.023, -0.004], [0.006, 0.046, 0.004]),
     h.rod('vial', 'vial', 0.006, -0.02, 0.03, 0.078),
     h.turned('band', 'band', 'x', [[0, 0], [0, 0.0165], [0.006, 0.0165], [0.006, 0]], [0.03, 0.06, 0]),
-  ], { body: 'ceramic-white', nozzle: 'steel-stainless', grip: 'plastic-charcoal', vial: 'plastic-amber', band: 'paint-red' }) + {
-    handling: h.gripOn('jet_injector', 'grip'),
+  ], { body: 'ceramic-white', nozzle: 'steel-stainless', grip: 'plastic-charcoal', vial: 'plastic-amber', band: 'paint-red' }) + h.gripOn('jet_injector', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A surgical scalpel 130 mm long: a flat 90 mm steel handle with a ribbed grip and a curved 40 mm blade.
@@ -131,8 +130,7 @@ local gasFinishes = {
   ] + [
     h.box('rib-%d' % i, 'rib', [0.02 + i * 0.006, 0.0015, -0.004], [0.023 + i * 0.006, 0.0025, 0.004])
     for i in std.range(0, 5)
-  ], { handle: 'steel-stainless', rib: 'steel-grey', blade: 'steel-mirror' }) + {
-    handling: h.gripOn('scalpel', 'handle'),
+  ], { handle: 'steel-stainless', rib: 'steel-grey', blade: 'steel-mirror' }) + h.gripOn('scalpel', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // Trauma shears 145 mm long lying flat: plastic finger loops, angled steel blades with a blunt flat tip.
@@ -145,8 +143,7 @@ local gasFinishes = {
     h.prism('blade-b', 'blade', 'y', [[-0.007, 0], [0.006, 0], [-0.017, 0.084], [-0.027, 0.084]], 0.002, 0.004),
     h.disc('tip', 'blade', 0.006, 0.002, 0.004, 0.087, -0.023),
     h.disc('pivot', 'pivot', 0.004, 0.001, 0.008, 0.002, 0),
-  ], { handle: 'plastic-blue', blade: 'steel-stainless', pivot: 'steel-grey' }) + {
-    handling: h.gripOn('trauma_shears', 'loop-a'),
+  ], { handle: 'plastic-blue', blade: 'steel-stainless', pivot: 'steel-grey' }) + h.gripOn('trauma_shears', 'loop-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A small 80 mm oxygen cylinder 0.17 m tall with a folding regulator and mask, 0.22 m overall.

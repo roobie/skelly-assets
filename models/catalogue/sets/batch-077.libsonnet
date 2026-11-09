@@ -60,8 +60,7 @@ local spool(n, x, z, y0) = [
     handle: 'plastic-yellow',
     blade: 'steel-stainless',
     pivot: 'steel-grey',
-  }) + {
-    handling: h.gripOn('aramid_shears', 'loop-a'),
+  }) + h.gripOn('aramid_shears', 'loop-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // Two 360 mm wooden knitting needles, 7 mm thick, side by side with a round knob at each head.
@@ -71,8 +70,7 @@ local spool(n, x, z, y0) = [
       h.ball('knob-%d' % n, 'knob', 0.006, -0.180, 0.006, 0.020 * n - 0.030),
     ]
     for n in [1, 2]
-  ]), { needle: 'wood-birch', knob: 'wood-walnut' }) + {
-    handling: h.gripOn('knitting_needles', 'needle-1'),
+  ]), { needle: 'wood-birch', knob: 'wood-walnut' }) + h.gripOn('knitting_needles', 'needle-1') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'] } } },
   // A standing frame loom 0.68 m wide and 0.82 m tall on two 0.30 m feet: pine posts and beams, a warp of cotton
@@ -117,8 +115,7 @@ local spool(n, x, z, y0) = [
   // A flat wooden shed stick 550 mm long, 50 mm wide and 10 mm thick, its ends tapered to blunt points.
   h.compound('shed_stick', 0.18, [
     h.prism('stick', 'stick', 'y', [[0, -0.275], [0.025, -0.240], [0.025, 0.240], [0, 0.275], [-0.025, 0.240], [-0.025, -0.240]], 0, 0.010),
-  ], { stick: 'wood-oak' }) + {
-    handling: h.gripOn('shed_stick', 'stick'),
+  ], { stick: 'wood-oak' }) + h.gripOn('shed_stick', 'stick') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'] } } },
   // A kraft envelope of sewing patterns, 310 mm by 230 mm and 12 mm thick, a sheaf of printed tissue sheets

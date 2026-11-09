@@ -134,8 +134,7 @@ local ballX(id, slot, x0, r, y) = h.turned(id, slot, 'x', [[0, 0]] + [[r - r * s
     ballX('grille', 'grille', 0.128, 0.026, 0.0265),
     h.turned('socket', 'socket', 'x', [[0, 0], [0, 0.008], [0.002, 0.008], [0.002, 0]], [-0.002, 0.0265, 0]),
     box('badge', 'collar', [0.04, 0.0395, -0.004], [0.06, 0.0415, 0.004]),
-  ], { handle: 'alu-anodized-black', collar: 'steel-stainless', grille: 'steel-grey', socket: 'brass' }) + {
-    handling: h.gripOn('xlr_microphone', 'handle'),
+  ], { handle: 'alu-anodized-black', collar: 'steel-stainless', grille: 'steel-grey', socket: 'brass' }) + h.gripOn('xlr_microphone', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 

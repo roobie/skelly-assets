@@ -161,7 +161,7 @@ local pipLayout = {
   h.compound('rebar', 1.1, [
     turned('bar', 'bar', 'x', [[0, 0], [0, 0.008], [0.8, 0.008], [0.8, 0]], [-0.4, 0.008, 0]),
   ], { bar: 'scrap-rusted' })
-  + { handling: h.gripOn('rebar', 'bar'), voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  + h.gripOn('rebar', 'bar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A laboratory ring stand, 520 mm tall: a painted cast iron base 200 by 130 mm, a 12 mm steel rod standing at
   // its back and a 100 mm support ring on a clamp boss reaching out over the base.

@@ -55,7 +55,7 @@ local segment(i, n, r0, r) =
     box('battery-band', 'battery-band', [-0.140, 0.060, -0.041], [-0.020, 0.072, 0.041]),
     box('neck', 'body', [-0.080, 0.100, -0.025], [-0.060, 0.170, 0.025]),
   ], { blade: 'steel-bright', guard: 'paint-charcoal', body: 'plastic-red', trim: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', battery: 'plastic-black', 'battery-band': 'plastic-red' })
-  + { handling: h.gripOn('cordless_cut_off_saw', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('cordless_cut_off_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 125 mm segmented diamond cutting disc for an angle grinder, 2.4 mm thick: a steel core with a 22 mm bore,
   // ten dark diamond segments round its rim and a paper label ring at the centre.
@@ -81,7 +81,7 @@ local segment(i, n, r0, r) =
     box('tank', 'body', [-0.33, 0.020, -0.060], [-0.15, 0.110, 0.060]),
     disc('fuel-cap', 'cover', 0.018, 0.110, 0.125, -0.27, 0.0),
   ], { blade: 'steel-bright', guard: 'plastic-orange', body: 'plastic-orange', cover: 'plastic-white', engine: 'paint-charcoal', muffler: 'steel-grey', handle: 'plastic-black', grip: 'rubber-black' })
-  + { handling: h.gripOn('petrol_cut_off_saw', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('petrol_cut_off_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A carton of adhesive plasters 75 mm wide, 95 mm tall and 28 mm deep standing upright, a blue printed band
   // across the top, a red cross and a single plaster pictured on its front.
