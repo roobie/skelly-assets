@@ -1,3 +1,4 @@
+import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts';
@@ -73,4 +74,16 @@ const exporters = {
 };
 // The recipe row kinds this tool owns; a driver hands it only rows of these kinds.
 export const THING_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
-export const loadThingRecipe =(value: unknown) => loadRecipe(value, exporters);
+const { items: _items, ...settings } = catalogue;
+/**
+ * What an item's export reads besides code: its row, the catalogue settings and the materials it may name. A material
+ * counts when its id occurs anywhere in the item's text, even inside a string parameter, since naming one too many
+ * only widens the key.
+ */
+const itemInputs = (row: RecipeRow) => {
+  const item = catalogue.items.find(({ id }) => id === row.source);
+  const text = JSON.stringify(item);
+  const named = Object.keys(MATERIALS).filter((id) => id === catalogue.defaultMaterial || text.includes(id));
+  return { item, settings, materials: named.sort().map((id) => [id, MATERIALS[id]]) };
+};
+export const loadThingRecipe = (value: unknown) => loadRecipe(value, exporters, itemInputs);
