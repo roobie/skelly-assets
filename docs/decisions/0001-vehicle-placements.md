@@ -3,6 +3,8 @@ read_if:
   - placing a vehicle's parts, or adding a vehicle
   - consuming vehicle placements, such as Deadvox's blueprints or the showcase
   - changing what the placements file of a built vehicle holds
+  - placing a part from another pack, or declaring a pack's dependencies
+  - tagging a vehicle
 ---
 
 # 1. Vehicle placements are model data
@@ -26,12 +28,23 @@ near-side part reflected across the part's own centre plane, so one model serves
 differ. Site ids are the names Deadvox's fittings use, with `_near` and `_far` for twins, so a blueprint can attach
 its gameplay to a site by id and read the position from here instead of restating it.
 
-The build writes each vehicle's placements into the pack of its root part, its first site, and the manifest lists
-them. The body decides where a vehicle ships, so no second list selects vehicles into packs. A site may name a shared
-part from another pack; a consumer that bundles the vehicle's pack bundles that pack too.
+A vehicle's placements belong to the vehicle, so they ship in the vehicle's own pack: the pack that builds the rows
+of its own file. A body can serve vehicles in several packs, and following the body would drag every vehicle built on
+it into the body's pack; following the vehicle keeps a shared body correct. See `tools/placements.mjs`,
+`exportPlacements`.
 
-The build checks that every site names exactly one built model, at a point, once per vehicle, because it already
-holds every built model; a separate CI step would only add wall clock time. See `tools/placements.mjs`,
+A vehicle may place a part from another pack only when its pack declares a dependency on that pack in
+`models/packs.json`; parts are never copied between packs. A copy drifts from its source without anyone noticing,
+while a declared dependency fails loudly: the build refuses a reference its pack does not declare, a dependency on a
+pack that does not exist and a dependency cycle. The manifest carries each pack's dependencies, so a consumer such as
+Deadvox can refuse to load a pack without them. See `tools/packs.mjs`, `dependencyProblems`.
+
+A vehicle's tags are its body's tags with any the vehicle adds, each term once. One body serves several roles, such as
+a van that is also an ambulance, so the body's tags cannot say everything a vehicle is. The added tags are held to the
+taxonomy vocabulary like any model's.
+
+The build checks all of this, and that every site names exactly one built model, at a point, once per vehicle, because
+it already holds every built model; a separate CI step would only add wall clock time. See `tools/placements.mjs`,
 `placementProblems`.
 
 ## Consequences

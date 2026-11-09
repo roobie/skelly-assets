@@ -48,7 +48,9 @@ out are inherited. Replacing a facet, rather than adding to it, lets an override
 
 Put a tag where its fact lives. What an object is (its material, the slot it is worn in) goes on the
 catalogue row. How a pack uses it (its whole pack is weapons, every part belongs to one vehicle) goes on the
-default that wraps the rows. Jsonnet sources use `tools/jsonnet/lib/taxonomy.libsonnet`, `inherit`, and the mob
+default that wraps the rows. What a whole vehicle is beyond its body, such as an ambulance's role on a van body, goes
+on the vehicle's placements file and adds to the body's tags rather than replacing a facet, because the body's
+terms stay true of the vehicle; see `docs/decisions/0001-vehicle-placements.md`. Jsonnet sources use `tools/jsonnet/lib/taxonomy.libsonnet`, `inherit`, and the mob
 sheet uses `tools/taxonomy.mjs`, `inheritTaxonomy`. A shared case table in `tools/test/taxonomy.test.mjs` holds
 the two to the same rule.
 
