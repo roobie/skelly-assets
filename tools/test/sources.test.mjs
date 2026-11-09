@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -56,6 +56,38 @@ test('unchanged inputs reuse the existing twins without recompiling', () => {
 
 test('a changed imported library recompiles the twin', () => {
   withTwinFixture(({ root, refresh, twin }) => {
+    writeFileSync(join(root, 'lib', 'value.libsonnet'), '{ value: 2 }');
+    refresh();
+    assert.deepEqual(JSON.parse(twin()), { value: 2 });
+  });
+});
+
+// The store lives outside the inputs' root, as CI's does, so storing never changes the digest.
+const withStore = (check) => withTwinFixture((fixture) => {
+  const store = mkdtempSync(join(tmpdir(), 'sources-store-'));
+  try {
+    check({ ...fixture, store });
+  } finally {
+    rmSync(store, { recursive: true, force: true });
+  }
+});
+
+test('a fresh checkout takes the twins of a stored compile of the same inputs', () => {
+  withStore(({ root, twin, store }) => {
+    const refresh = (stamp) => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp: join(root, stamp), store });
+    refresh('compiled');
+    const [digest] = readdirSync(store);
+    writeFileSync(join(store, digest, 'source.json'), 'stored');
+    rmSync(join(root, 'source.json'));
+    refresh('fresh');
+    assert.equal(twin(), 'stored');
+  });
+});
+
+test('a store holding the twins of other inputs is not used', () => {
+  withStore(({ root, twin, store }) => {
+    const refresh = () => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp: join(root, 'stamp'), store });
+    refresh();
     writeFileSync(join(root, 'lib', 'value.libsonnet'), '{ value: 2 }');
     refresh();
     assert.deepEqual(JSON.parse(twin()), { value: 2 });
