@@ -44,5 +44,8 @@ local bag(slot) = { category: 'containers', tags: { slot: slot, material: ['fabr
   atom('baseball_cap', 'cap', 0.080, {
     width: 0.204, depth: 0.244, height: 0.08, chamfer: 0.04,
     brimDepth: 0.09, brimWidth: 0.19, brimThickness: 0.01, brimHeight: 0.014,
-  }, { body: 'plastic-blue', trim: 'paint-charcoal' }) + { voxelGrain: 0.004 },
+  }, { body: 'plastic-blue', trim: 'paint-charcoal' }) + {
+    voxelGrain: 0.004,
+    taxonomy: { category: 'clothing', tags: { slot: ['head'], fit: ['worn'], setting: ['modern'] } },
+  },
 ]
