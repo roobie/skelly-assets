@@ -8,6 +8,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 + (import 'trooper.libsonnet')
 + (import 'heavy-blue.libsonnet')
 + (import 'plate.libsonnet')
++ (import 'jerry-can.libsonnet')
 + (import 'power.libsonnet')
 + (import 'vehicle-parts.libsonnet')
 + std.flattenArrays(std.objectValues(import 'catalogue/sets/index.libsonnet'))

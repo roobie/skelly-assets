@@ -31,6 +31,5 @@ local vessel(id, massKg, radius, height, body, label, exportMass, extra={}) = pa
   carton('cartridge_box_357_h_magnum', 0.825, 0.13, 0.055, 0.10, 'paperboard-tan', 'plastic-blue', exportMass='parts') + { taxonomy: { category: 'ammunition', tags: { weapon: ['handgun'] } } },
   carton('shotshell_box', 0.840, 0.12, 0.075, 0.095, 'paperboard-brown', 'plastic-red', exportMass='parts') + { taxonomy: { category: 'ammunition', tags: { weapon: ['shotgun'] } } },
   carton('ammo_can', 1.600, 0.28, 0.17, 0.14, 'polymer-od-green', 'paperboard-tan', exportMass='parts', extra={ lidHeight: 0.012, bandHeight: 0.035, handleHeight: 0.025, handleWidth: 0.11, handleDepth: 0.018, handleWall: 0.008 }, heldSolid='handle') + { taxonomy: { category: 'ammunition' } },
-  carton('jerry_can', 2.500, 0.30, 0.40, 0.15, 'polymer-od-green', 'paint-charcoal', exportMass='parts', extra={ lidHeight: 0.025, bandHeight: 0.04, handleHeight: 0.045, handleWidth: 0.18, handleDepth: 0.025, handleWall: 0.012 }, heldSolid='handle'),
   vessel('gas_canister', 0.350, 0.045, 0.12, 'steel-grey', 'plastic-blue', exportMass='parts', extra={ shoulderHeight: 0.015, neckRadius: 0.012, neckHeight: 0.008, capRadius: 0.014, capHeight: 0.006 }),
 ]
