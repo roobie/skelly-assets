@@ -77,6 +77,8 @@ export function exportMob(row, out, store) {
   return store ? entry : undefined;
 }
 
+const reportCache = (reused, total) => console.log(`mob cache: ${reused} mob(s) reused, ${total - reused} baked`);
+
 function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -87,7 +89,8 @@ function main() {
   const store = cache && mobStore(cache);
   if (values.shard !== undefined) {
     if (store === undefined || positionals.length > 0) throw new Error('--shard fills a cache and takes no ids');
-    for (const row of shardUnits(rows, parseShard(values.shard))) store.entry(MOB_FILES, row, () => bakeMob(row));
+    const shard = shardUnits(rows, parseShard(values.shard));
+    reportCache(shard.filter((row) => store.entry(MOB_FILES, row, () => bakeMob(row)).reused).length, shard.length);
     return 0;
   }
   const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
@@ -113,7 +116,7 @@ function main() {
   }
   // Only a run over every row may prune, so the store keeps exactly what the next complete build reuses.
   if (store && positionals.length === 0 && !failed) pruneEntries(join(cache, 'mob'), used);
-  console.log(`mob cache: ${reused} mob(s) reused, ${wanted.length - reused} baked`);
+  reportCache(reused, wanted.length);
   return failed ? 1 : 0;
 }
 
