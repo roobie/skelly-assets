@@ -10,6 +10,8 @@
   'hearse': import 'hearse.libsonnet',
   'limousine': import 'limousine.libsonnet',
   'luxury_saloon': import 'luxury_saloon.libsonnet',
+  'military_ambulance': import 'military_ambulance.libsonnet',
+  'military_cargo_truck': import 'military_cargo_truck.libsonnet',
   'minivan': import 'minivan.libsonnet',
   'muscle_car': import 'muscle_car.libsonnet',
   'police_car': import 'police_car.libsonnet',
