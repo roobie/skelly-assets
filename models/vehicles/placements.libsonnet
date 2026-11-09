@@ -2,6 +2,7 @@
 {
   'ambulance': import 'ambulance.placements.libsonnet',
   'animal_control_van': import 'animal_control_van.placements.libsonnet',
+  'camper_van': import 'camper_van.placements.libsonnet',
   'city_car': import 'city_car.placements.libsonnet',
   'classic_4x4': import 'classic_4x4.placements.libsonnet',
   'convertible': import 'convertible.placements.libsonnet',
@@ -13,8 +14,10 @@
   'food_truck': import 'food_truck.placements.libsonnet',
   'hearse': import 'hearse.placements.libsonnet',
   'high_roof_van': import 'high_roof_van.placements.libsonnet',
+  'ice_cream_van': import 'ice_cream_van.placements.libsonnet',
   'limousine': import 'limousine.placements.libsonnet',
   'luxury_saloon': import 'luxury_saloon.placements.libsonnet',
+  'minibus': import 'minibus.placements.libsonnet',
   'minivan': import 'minivan.placements.libsonnet',
   'muscle_car': import 'muscle_car.placements.libsonnet',
   'panel_van': import 'panel_van.placements.libsonnet',
