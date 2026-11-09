@@ -8,7 +8,9 @@ local atom(id, family, massKg, dimensions, finish, solid='body') = {
 };
 local key(id, massKg, bowRadius, shaftLength, metal) = atom(id, 'key', massKg, {
   bowRadius: bowRadius, shaftLength: shaftLength, shaftWidth: 0.012, thickness: 0.003, toothDepth: 0.008,
-}, { metal: metal }, 'shaft');
+}, { metal: metal }, 'shaft') + {
+  taxonomy: { category: 'keys', tags: { material: ['metal'] } },
+};
 local melee(id, family, massKg, dimensions, finish) = {
   id: id,
   exportMass: 'parts',
@@ -104,5 +106,7 @@ local held(id, solid, fraction, hold='upright', roll=90) = {
   key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass'),
   key('shed_key', 0.010, 0.012, 0.038, 'steel-grey'),
   key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued'),
-  atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card'),
+  atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card') + {
+    taxonomy: { category: 'keys', tags: { material: ['plastic'] } },
+  },
 ]
