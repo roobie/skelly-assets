@@ -8,10 +8,15 @@ local pair(id, part, at=origin) = [
   one(id + '_near', part, at),
   one(id + '_far', part, [at[0], at[1], 0 - at[2]]) + { mirror: true },
 ];
+// A vehicle laid out from another's sites: `over` merges fields into a site by id, `drop` removes sites by id and
+// `add` appends sites, so a derived vehicle states only what it changes.
+local adjust(sites, over={}, drop=[], add=[]) =
+  [placed + std.get(over, placed.id, {}) for placed in sites if !std.member(drop, placed.id)] + add;
 {
   origin: origin,
   one: one,
   pair: pair,
+  adjust: adjust,
   headlamps(x, y, z): pair('headlamp', 'car_headlamp', [x, y, z]),
   batteryBay(tray, at): [one('battery_tray', tray, at), one('battery', 'car_battery', [at[0], at[1] + 0.03, at[2]])],
 }
