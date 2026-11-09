@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   chmodSync,
   copyFileSync,
@@ -7,6 +7,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  renameSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -73,9 +74,17 @@ export function installJsonnetArchive(archive, expectedHash, targetDirectory) {
     }
     mkdirSync(targetDirectory, { recursive: true });
     const executable = join(targetDirectory, executableName);
-    copyFileSync(extractedExecutable, executable);
-    if (process.platform !== 'win32') {
-      chmodSync(executable, 0o755);
+    // Parallel callers may install at once; renaming a finished file into place means no one ever
+    // sees or executes a half-written binary, and a running one keeps its old inode.
+    const staged = join(targetDirectory, `.${executableName}.${randomUUID()}.tmp`);
+    try {
+      copyFileSync(extractedExecutable, staged);
+      if (process.platform !== 'win32') {
+        chmodSync(staged, 0o755);
+      }
+      renameSync(staged, executable);
+    } finally {
+      rmSync(staged, { force: true });
     }
     return executable;
   } finally {
