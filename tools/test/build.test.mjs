@@ -4,7 +4,9 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { test } from 'node:test';
 import { exportRecipes } from '../build.mjs';
+import { compileJsonnetFile } from '../jsonnet/index.mjs';
 import { outputPath } from '../layout.mjs';
+import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 installJsonnetSources();
@@ -92,4 +94,20 @@ test('one id in both partitions of one pack fails before any output', async () =
     await assert.rejects(exportRecipes({ root, out, tools: ['gun', 'thing'] }), /two tools/);
     assert.ok(!existsSync(join(out, 'fixture.clash')));
   });
+});
+
+// A catalogue row becomes a model only through the recipe of the pack models/catalogue/packs.libsonnet assigns it, and
+// a recipe that leaves out its catalogue rows fails nothing else.
+test('every catalogue row is exported by its assigned pack', () => {
+  const scratch = mkdtempSync(join(tmpdir(), 'catalogue-packs-'));
+  try {
+    const source = join(scratch, 'packs.jsonnet');
+    writeFileSync(source, "(import 'models/catalogue/packs.libsonnet').packs\n");
+    const exported = new Set(readRecipes().flatMap(({ packId, value }) => value.map((row) => `${packId} ${row.source}`)));
+    for (const [id, packId] of Object.entries(JSON.parse(compileJsonnetFile(source)))) {
+      assert.ok(exported.has(`${packId} ${id}`), `${packId} does not export catalogue row ${id}`);
+    }
+  } finally {
+    rmSync(scratch, { recursive: true, force: true });
+  }
 });

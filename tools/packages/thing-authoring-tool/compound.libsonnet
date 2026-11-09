@@ -1,5 +1,5 @@
 // Row helpers shared by catalogue batches, so each batch file holds only its own rows.
-local params(values) = { [key]: if std.type(values[key]) == 'array' then std.manifestJson(values[key]) else std.toString(values[key]) for key in std.objectFields(values) };
+local params(values) = { [key]: if std.type(values[key]) == 'array' then std.manifestJsonMinified(values[key]) else std.toString(values[key]) for key in std.objectFields(values) };
 local item(id, family, massKg, dimensions, finish) = {
   id: id,
   exportMass: 'parts',

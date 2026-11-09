@@ -189,7 +189,7 @@ const builders = {
   torch,
   flashlight,
   candle,
-} satisfies Record<string, (params: Readonly<Record<string, string>>) => readonly Solid[]>;
+} satisfies Record<string, (params: Readonly<Record<string, string>>, turnedSides?: number) => readonly Solid[]>;
 const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
     throw new Error(`Unknown thing family ${part.family}`);
@@ -197,7 +197,7 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
   // Compound consumes per-piece null opt-outs itself; other families emit ordinary revolved solids.
   const solids = part.family === 'compound'
     ? compound(params, turnedSides)
-    : builders[part.family as keyof typeof builders](params).map((solid): Solid =>
+    : builders[part.family as keyof typeof builders](params, turnedSides).map((solid): Solid =>
       solid.kind === 'revolved' && solid.sides === undefined && turnedSides !== undefined
         ? { ...solid, sides: turnedSides }
         : solid,

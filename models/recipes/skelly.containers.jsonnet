@@ -1,6 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local owned = std.set(['jerry_can', 'cutting_board', 'iron_pot', 'pan']);
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local owned = std.setUnion(std.set(['jerry_can']), catalogue.ids('skelly.containers'));
 taxonomy.inherit({ category: 'containers' }, [
   {
     id: row.id,
