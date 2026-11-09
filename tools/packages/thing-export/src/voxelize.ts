@@ -46,8 +46,9 @@ interface Box {
 }
 
 /**
- * The box around every vertex of the sources, shifted to the lattice. A filled or met cell lies at most one cell past a
- * vertex, so two cells of margin keep the outer ring empty, and a step from any cell to its neighbour stays in the box.
+ * The box around every vertex of the sources, shifted to the lattice. A cell a source fills or meets lies at most one
+ * cell past its vertices, and a neighbour's cell matters only beside one of those, so the box holds two cells past the
+ * vertices and a ring past that which no cell fills: a step from any cell to its neighbour stays in the box.
  */
 const boxOf = (sources: readonly VoxelSource[], { grain, origin }: Lattice): Box => {
   const low = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
@@ -62,35 +63,41 @@ const boxOf = (sources: readonly VoxelSource[], { grain, origin }: Lattice): Box
   if (!Number.isFinite(low[0])) {
     return { low: [0, 0, 0], size: [0, 0, 0] };
   }
-  const [lx, ly, lz] = low.map((cell) => cell - 2) as [number, number, number];
-  return { low: [lx, ly, lz], size: [high[0]! + 3 - lx, high[1]! + 3 - ly, high[2]! + 3 - lz] };
+  const [lx, ly, lz] = low.map((cell) => cell - 3) as [number, number, number];
+  return { low: [lx, ly, lz], size: [high[0]! + 4 - lx, high[1]! + 4 - ly, high[2]! + 4 - lz] };
 };
 
-/** A cell's key, its index in the box; a cell on the box's outer ring or past it has none. */
+/** The key of a cell on the box's outer ring or past it. */
+const OUTSIDE = -1;
+
+/** A cell's key: its index in the box, or OUTSIDE. */
 const keyIn = ({ low, size }: Box, x: number, y: number, z: number): number => {
   const at = [x - low[0], y - low[1], z - low[2]];
-  if (at.some((cell, axis) => cell < 1 || cell > size[axis]! - 2)) {
-    throw new Error(`Voxel ${x},${y},${z} falls outside its sources' box`);
-  }
-  return (at[0]! * size[1] + at[1]!) * size[2] + at[2]!;
+  return at.some((cell, axis) => cell < 1 || cell > size[axis]! - 2)
+    ? OUTSIDE
+    : (at[0]! * size[1] + at[1]!) * size[2] + at[2]!;
 };
 
 const EMPTY = -1;
 
 /**
  * Voxels and their groups over a box, keyed by their index in it. Keys keep the order of the first set, as a map's
- * would, so every walk over the cells, and so the mesh, follows the order the sources filled them.
+ * would, so every walk over the cells, and so the mesh, follows the order the sources filled them. A grid that `clips`
+ * drops cells outside the box, for neighbours' cells, which matter only beside the sources'; any other grid refuses
+ * them, since its sources' box holds them all.
  */
 class Grid {
   readonly box: Box;
   /** Per cell of the box, its group or EMPTY. */
   readonly #cells: Int32Array;
   readonly #keys: number[] = [];
+  readonly #clips: boolean;
   /** The key offsets to the six neighbours, ±z, ±y, ±x. */
   readonly steps: readonly number[];
 
-  constructor(box: Box) {
+  constructor(box: Box, { clips = false } = {}) {
     this.box = box;
+    this.#clips = clips;
     const [dx, dy, dz] = box.size;
     this.#cells = new Int32Array(dx * dy * dz).fill(EMPTY);
     this.steps = [1, -1, dz, -dz, dy * dz, -dy * dz];
@@ -122,6 +129,12 @@ class Grid {
   }
 
   set(key: number, group: number): void {
+    if (key === OUTSIDE) {
+      if (this.#clips) {
+        return;
+      }
+      throw new Error("A voxel falls outside its sources' box");
+    }
     if (this.#cells[key] === EMPTY) {
       this.#keys.push(key);
     }
@@ -898,8 +911,7 @@ export const voxelize = (
 ): Voxelized => {
   checkedGrain(grain);
   const lattice = { grain, origin };
-  // Neighbours share the box, so their cells and these sources' are keyed alike.
-  const box = boxOf([...sources, ...neighbours], lattice);
+  const box = boxOf(sources, lattice);
   const grid = new Grid(box);
   const reach = new Grid(box);
   const drawn = sample(sources, lattice, box);
@@ -909,7 +921,7 @@ export const voxelize = (
       reach.set(key, group);
     }
   }
-  const anchor = new Grid(box);
+  const anchor = new Grid(box, { clips: true });
   const neighbouring = sample(neighbours, lattice, box);
   for (const index of neighbours.keys()) {
     neighbouring.fill(index, anchor);
