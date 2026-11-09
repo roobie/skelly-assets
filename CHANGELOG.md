@@ -7,6 +7,14 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.4.2 - 2026-11-09
+
+### Changed
+
+- Documentation only: the docs now point to a product's source by the product and the symbol, with no file path, and
+  the bone-to-region map and the fused-mass note are reworded to match. The assets are unchanged, so moving a pin
+  from 0.4.1 needs no step.
+
 ## 0.4.1 - 2026-11-09
 
 ### Breaking
