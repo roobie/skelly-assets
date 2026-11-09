@@ -129,9 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26
+      - uses: ./.github/actions/node
       - uses: actions/download-artifact@v8
         with:
           pattern: built-*
@@ -228,9 +226,7 @@ jobs:
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26
+      - uses: ./.github/actions/node
       - uses: actions/download-artifact@v8
         with:
           name: built-1

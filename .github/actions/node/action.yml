@@ -1,0 +1,25 @@
+name: Set up Node
+description: The Node version named in `.node-version`, from the runner's tool cache when an earlier job saved it.
+
+inputs:
+  npm-cache:
+    description: Also restore npm's download cache for the tools' lockfile.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      run: echo "node=$(cat "$GITHUB_WORKSPACE/.node-version")" >> "$GITHUB_OUTPUT"
+    # setup-node takes an exact version from the tool cache before it tries the network; see README.md, "Node".
+    - name: Cache Node
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.tool_cache }}/node/${{ steps.version.outputs.node }}
+        key: node-${{ runner.os }}-${{ runner.arch }}-${{ steps.version.outputs.node }}
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: .node-version
+        cache: ${{ inputs.npm-cache == 'true' && 'npm' || '' }}
+        cache-dependency-path: tools/package-lock.json
