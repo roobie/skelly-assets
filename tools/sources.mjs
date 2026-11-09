@@ -38,8 +38,10 @@ const importableFiles = (directory) =>
     return /\.(jsonnet|libsonnet)$/.test(entry.name) ? [path] : [];
   });
 
-const inputsDigest = (root, sources) => {
+// `code` lists the files that turn sources into twins, so a change to the compiler or to this module recompiles too.
+const inputsDigest = (root, sources, code) => {
   const hash = createHash('sha256');
+  for (const path of code) hash.update(`code\0${relative(root, path)}\0`).update(readFileSync(path));
   for (const source of sources) hash.update(`source\0${relative(root, source)}\0`);
   for (const path of importableFiles(root).sort()) hash.update(`file\0${relative(root, path)}\0`).update(readFileSync(path));
   return hash.digest('hex');
@@ -59,8 +61,8 @@ const replaceFile = (path, contents) => {
 // under the digest of the current inputs, so a stale or foreign store costs a compile and never a wrong twin.
 const storedTwin = (store, digest, root, source) => join(store, digest, relative(root, twinOf(source)));
 
-export function refreshJsonnetTwins(sources, { root, stamp, store }) {
-  const digest = inputsDigest(root, sources);
+export function refreshJsonnetTwins(sources, { root, stamp, store, code = [] }) {
+  const digest = inputsDigest(root, sources, code);
   const current = existsSync(stamp) && readFileSync(stamp, 'utf8') === digest;
   if (current && sources.every((source) => existsSync(twinOf(source)))) return;
   rmSync(stamp, { force: true });
@@ -80,7 +82,13 @@ export function refreshJsonnetTwins(sources, { root, stamp, store }) {
   replaceFile(stamp, digest);
 }
 
-export const jsonnetSourcesDigest = () => inputsDigest(repositoryRoot, jsonnetFiles());
+// This module and the compiler driver beside it; the compiler binary is pinned by jsonnet/runtime.json, an input.
+export const compilerCode = () => [
+  fileURLToPath(import.meta.url),
+  ...readdirSync(join(here, 'jsonnet')).filter((name) => name.endsWith('.mjs')).sort().map((name) => join(here, 'jsonnet', name)),
+];
+
+export const jsonnetSourcesDigest = () => inputsDigest(repositoryRoot, jsonnetFiles(), compilerCode());
 
 // JSONNET_TWIN_STORE names the store folder; CI caches it under the digest that --digest prints.
 export function installJsonnetSources() {
@@ -88,6 +96,7 @@ export function installJsonnetSources() {
   refreshJsonnetTwins(jsonnetFiles(), {
     root: repositoryRoot,
     stamp: join(here, '.build', 'jsonnet-sources.sha256'),
+    code: compilerCode(),
     store: process.env.JSONNET_TWIN_STORE || undefined,
   });
   sourcesInstalled = true;

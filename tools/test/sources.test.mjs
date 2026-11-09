@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 
-import { jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
+import { compilerCode, jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const tracked = execFileSync('git', ['-C', root, 'ls-files', '-z', '*.json'], { encoding: 'utf8' })
@@ -92,4 +92,23 @@ test('a store holding the twins of other inputs is not used', () => {
     refresh();
     assert.deepEqual(JSON.parse(twin()), { value: 2 });
   });
+});
+
+test('a changed compiler file recompiles the twins', () => {
+  withTwinFixture(({ root }) => {
+    const compiler = join(root, 'compile.mjs');
+    writeFileSync(compiler, '// one compiler');
+    const stamp = join(root, '.build', 'stamp');
+    const refresh = () => refreshJsonnetTwins([join(root, 'source.jsonnet')], { root, stamp, code: [compiler] });
+    refresh();
+    const before = readFileSync(stamp, 'utf8');
+    writeFileSync(compiler, '// another compiler');
+    refresh();
+    assert.notEqual(readFileSync(stamp, 'utf8'), before);
+  });
+});
+
+test('the twin digest covers this module and the compiler driver', () => {
+  const code = compilerCode().map((path) => relative(root, path));
+  for (const driver of ['tools/sources.mjs', 'tools/jsonnet/index.mjs']) assert.ok(code.includes(driver), driver);
 });
