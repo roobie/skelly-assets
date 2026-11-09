@@ -1,7 +1,8 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
-import { buildItem, catalogue, loadCatalogue } from '../src/catalogue.ts';
+import { buildItem, loadCatalogue } from '../src/catalogue.ts';
+import { catalogue } from '../src/content.ts';
 import { exportItem, loadThingRecipe, THING_KINDS } from '../src/exports.ts';
 
 const material = Object.keys(MATERIALS)[0]!;
@@ -49,20 +50,22 @@ const fixture = () => ({
 });
 
 it('keeps per-part ports when two parts use the same family builder', () => {
-  const item = loadCatalogue(fixture()).items[0]!;
-  const built = buildItem(item);
+  const loaded = loadCatalogue(fixture());
+  const item = loaded.items[0]!;
+  const built = buildItem(item, loaded);
   expect(built.report.issues).toEqual([]);
   for (const part of item.parts) {
     expect(built.report.resolved.defs.get(part.id)?.ports).toEqual(part.ports);
   }
 });
+const TURNED_SIDES = 12;
 it('applies the catalogue turned count to non-compound families', () => {
-  expect(catalogue.turnedSides).toBeDefined();
-  const item = loadCatalogue(fixture()).items[0]!;
-  const built = buildItem(item);
+  const loaded = loadCatalogue({ ...fixture(), turnedSides: TURNED_SIDES });
+  const item = loaded.items[0]!;
+  const built = buildItem(item, loaded);
   for (const part of item.parts) {
     for (const solid of built.report.resolved.defs.get(part.id)!.solids) {
-      if (solid.kind === 'revolved') expect(solid.sides).toBe(catalogue.turnedSides);
+      if (solid.kind === 'revolved') expect(solid.sides).toBe(TURNED_SIDES);
     }
   }
 });
@@ -73,9 +76,9 @@ it('keeps compound round opt-outs through catalogue assembly building', () => {
   const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: {
     pieces: JSON.stringify([piece, { ...piece, id: 'round', sides: null }]),
   } };
-  const item = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [] }] }).items[0]!;
-  const solids = buildItem(item).report.resolved.defs.get(part.id)!.solids;
-  expect(solids.find(({ id }) => id === piece.id)).toMatchObject({ sides: catalogue.turnedSides });
+  const loaded = loadCatalogue({ ...input, turnedSides: TURNED_SIDES, items: [{ ...input.items[0], parts: [part], connections: [] }] });
+  const solids = buildItem(loaded.items[0]!, loaded).report.resolved.defs.get(part.id)!.solids;
+  expect(solids.find(({ id }) => id === piece.id)).toMatchObject({ sides: TURNED_SIDES });
   expect(solids.find(({ id }) => id === 'round')).not.toHaveProperty('sides');
 });
 
@@ -84,8 +87,10 @@ it('exports a label on its face, its text defaulting to the display name', () =>
   const carton = { id: 'carton', slot: 'body', kind: 'box', min: [-0.05, 0, -0.02], max: [0.05, 0.2, 0.02] };
   const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify([carton]) } };
   const item = { ...input.items[0], parts: [part], connections: [], label: { solid: 'carton', face: '+z' } };
+  const loaded = loadCatalogue({ ...input, items: [item] });
   const { label } = exportItem(
-    loadCatalogue({ ...input, items: [item] }).items[0]!,
+    loaded.items[0]!,
+    loaded,
     { id: 'oat_flakes', file: 'assets/models/oat_flakes.glb' },
     VOXEL,
   ).modelEntry;
@@ -107,15 +112,15 @@ it('exports a grip following the held solid through resizing and assembly placem
     hold: 'upright',
     roll: 90,
   };
-  const exportFixture = () =>
-    exportItem(
-      loadCatalogue({
-        ...input,
-        items: [{ ...input.items[0], handling: datum }],
-      }).items[0]!,
+  const exportFixture = () => {
+    const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], handling: datum }] });
+    return exportItem(
+      loaded.items[0]!,
+      loaded,
       { id: 'fixture', file: 'assets/models/fixture.glb' },
       VOXEL,
     ).modelEntry;
+  };
   const before = exportFixture();
   expect(before.grip?.at[1]).toBeCloseTo(0.03);
   expect(before.grip?.turn).toEqual(datum.turn);
@@ -131,16 +136,19 @@ it('exports a grip following the held solid through resizing and assembly placem
 });
 it('exports datums and baked collision that follow the resized solid', () => {
   const input = fixture();
-  const exportFixture = () =>
-    exportItem(
-      loadCatalogue({
-        ...input,
-        items: [{ ...input.items[0], anchors: { top: { part: 'upper', solid: 'body', fraction: [0.5, 1, 0.5] } } }],
-      }).items[0]!,
+  const exportFixture = () => {
+    const loaded = loadCatalogue({
+      ...input,
+      items: [{ ...input.items[0], anchors: { top: { part: 'upper', solid: 'body', fraction: [0.5, 1, 0.5] } } }],
+    });
+    return exportItem(
+      loaded.items[0]!,
+      loaded,
       { id: 'fixture', file: 'assets/models/fixture.glb' },
       VOXEL,
       { collision: true },
     ).modelEntry;
+  };
   const topOf = (entry: ReturnType<typeof exportFixture>) => ({
     datum: entry.anchors?.top?.[1],
     box: entry.parts?.upper?.collision?.[0]?.max[1],
@@ -155,17 +163,21 @@ it('exports datums and baked collision that follow the resized solid', () => {
 it('refuses baked collision on an inventory atom, whose export carries no parts', () => {
   const input = fixture();
   input.items[0]!.exportMass = 'inventory-atom';
-  const item = loadCatalogue(input).items[0]!;
+  const loaded = loadCatalogue(input);
   expect(() =>
-    exportItem(item, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL, { collision: true }),
+    exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL, { collision: true }),
   ).toThrow('baked collision travels with exported parts');
 });
 it('omits runtime part masses only when inventory-atom export is authored', () => {
   const input = fixture();
   const asset = { id: 'fixture', file: 'assets/models/fixture.glb' } as const;
-  const assembly = exportItem(loadCatalogue(input).items[0]!, asset, VOXEL);
+  const exportFixture = () => {
+    const loaded = loadCatalogue(input);
+    return exportItem(loaded.items[0]!, loaded, asset, VOXEL);
+  };
+  const assembly = exportFixture();
   input.items[0]!.exportMass = 'inventory-atom';
-  const atom = exportItem(loadCatalogue(input).items[0]!, asset, VOXEL);
+  const atom = exportFixture();
   expect(assembly.modelEntry.parts).toBeDefined();
   expect(atom.modelEntry).not.toHaveProperty('parts');
   expect(atom.glb).toEqual(assembly.glb);
@@ -182,13 +194,13 @@ it('refuses recipe mass ownership that differs from the authored item', () => {
         voxel: ROW_VOXEL,
         options: { mass: item.exportMass === 'parts' ? 'inventory-atom' : 'parts' },
       },
-    ]),
+    ], catalogue),
   ).toThrow('Recipe mass ownership differs');
 });
 it('refuses a recipe row without a voxel class, so no model exports smooth', () => {
   const item = catalogue.items[0]!;
   expect(() =>
-    loadThingRecipe([{ id: 'fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }]),
+    loadThingRecipe([{ id: 'fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }], catalogue),
   ).toThrow('Expected "voxel"');
 });
 it.each([0, -1])('refuses a voxel class grain of %s', (grain) => {
@@ -196,7 +208,7 @@ it.each([0, -1])('refuses a voxel class grain of %s', (grain) => {
   expect(() =>
     loadThingRecipe([
       { id: 'fixture', kind: 'item', source: item.id, voxel: { grain }, options: { mass: item.exportMass } },
-    ]),
+    ], catalogue),
   ).toThrow('Invalid');
 });
 it('refuses unknown geometry families during catalogue loading', () => {
@@ -208,7 +220,7 @@ it('refuses recipe references outside the authored item set', () => {
   expect(() =>
     loadThingRecipe([
       { id: 'fixture', kind: 'item', source: 'fixture-unknown', voxel: ROW_VOXEL, options: { mass: 'parts' } },
-    ]),
+    ], catalogue),
   ).toThrow('Unknown tool item');
 });
 // The material names a GLB's JSON chunk declares, read independently of the writer.
@@ -219,7 +231,7 @@ const glbMaterialNames = (glb: Uint8Array): string[] => {
 };
 const thingRows = () =>
   readRecipes().flatMap(({ value }) =>
-    loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind))),
+    loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind)), catalogue),
   );
 it('exports every authored glow as an emissive material its own GLB names exactly once', () => {
   const glowing = new Set(catalogue.items.filter(({ glow }) => glow !== undefined).map(({ id }) => id));
@@ -239,9 +251,8 @@ it('refuses a glow whose material the built GLB does not draw', () => {
   const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], finish: { body: material, lit }, params: {
     pieces: JSON.stringify([body]),
   } };
-  const item = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] })
-    .items[0]!;
-  expect(() => exportItem(item, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL)).toThrow(
+  const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] });
+  expect(() => exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL)).toThrow(
     'fixture: emissive material',
   );
 });
