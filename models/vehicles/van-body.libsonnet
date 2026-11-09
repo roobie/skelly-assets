@@ -32,7 +32,36 @@ local noseOf(s) = s.front - 0.08;
 // The rear edge of the A pillar at height y, and the height where it crosses x.
 local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
 local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
-local rows(id, s) = {
+local windscreen(id, s) =
+  local pillarAt(y) = pillarAtOf(s, y);
+  local pillarY(x) = pillarYOf(s, x);
+  k.compound(id + '_windscreen', 18, [
+    // Stops inside the header: glass level with the roof blends over it as dashes.
+    local screenTop = s.cabRoof - 0.05;
+    local topLean = s.aLean * (screenTop - s.waist) / (s.cabRoof - s.waist);
+    prism('glass', 'glass', [[s.aPost - 0.07, s.waist], [s.aPost - 0.02, s.waist], [s.aPost - 0.02 - topLean, screenTop], [s.aPost - 0.07 - topLean, screenTop]], [-s.glassIn, s.glassIn]),
+  ] + k.bothSides([
+    prism('quarter', 'glass', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist]] + (if pillarY(s.cowl) > s.windowTop then [[pillarAt(s.windowTop), s.windowTop], [s.cowl, s.windowTop]] else [[s.cowl, pillarY(s.cowl)]]), [s.glassOut - 0.03, s.glassOut - 0.01]),
+  ]), { glass: 'glass-clear' });
+local dashboard(id, s) =
+  k.compound(id + '_dashboard', 25, [
+    box('lower', 'trim', [s.dash, s.floor, -s.skin + 0.03], [s.frontAxle - s.arch, s.waist - 0.18, s.skin - 0.03]),
+    box('lower_between_tubs', 'trim', [s.frontAxle - s.arch, s.floor, -s.tubIn], [s.fire - 0.05, s.waist - 0.18, s.tubIn]),
+    box('upper_over_tubs', 'trim', [s.frontAxle - s.arch, s.archTop + 0.02, -s.skin + 0.03], [s.fire - 0.05, s.waist - 0.18, s.skin - 0.03]),
+    box('top', 'trim', [s.dash - 0.2, s.waist - 0.18, -s.skin + 0.03], [s.fire - 0.05, s.waist - 0.04, s.skin - 0.03]),
+    box('column', 'trim', [s.dash - 0.27, s.waist - 0.09, s.driverZ - 0.04], [s.dash - 0.16, s.waist - 0.01, s.driverZ + 0.04]),
+  ], { trim: 'plastic-black' });
+// The windscreen and dashboard depend only on cab measures, so they are pressed once from `cab` as the `van_` rows,
+// which `panel_van` emits, and a van whose own pressing would equal them borrows them.
+local cabPressings = { _windscreen: windscreen, _dashboard: dashboard };
+local cabRows = [press('van', cab) for press in std.objectValues(cabPressings)];
+local withCab(s) = s + { borrow+: {
+  [suffix]: 'van' + suffix
+  for suffix in std.objectFields(cabPressings)
+  if cabPressings[suffix]('van', s) == cabPressings[suffix]('van', cab)
+} };
+local rows(id, s0) = {
+  local s = withCab(s0),
   local isBox = std.objectHas(s, 'box'),
   local b = s + (if isBox then s.box else {}),
   local tail = tailOf(s),
@@ -163,14 +192,7 @@ local rows(id, s) = {
   local winTop = s.windowTop,
   local rowsOut = [
     k.compound(id + '_shell', s.shellMass, cabPieces + (if isBox then [] else bodyPieces), finish),
-    k.compound(id + '_windscreen', 18, [
-      // Stops inside the header: glass level with the roof blends over it as dashes.
-      local screenTop = s.cabRoof - 0.05;
-      local topLean = s.aLean * (screenTop - s.waist) / (s.cabRoof - s.waist);
-      prism('glass', 'glass', [[s.aPost - 0.07, s.waist], [s.aPost - 0.02, s.waist], [s.aPost - 0.02 - topLean, screenTop], [s.aPost - 0.07 - topLean, screenTop]], [-s.glassIn, s.glassIn]),
-    ] + k.bothSides([
-      prism('quarter', 'glass', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist]] + (if pillarY(s.cowl) > s.windowTop then [[pillarAt(s.windowTop), s.windowTop], [s.cowl, s.windowTop]] else [[s.cowl, pillarY(s.cowl)]]), [s.glassOut - 0.03, s.glassOut - 0.01]),
-    ]), { glass: 'glass-clear' }),
+    windscreen(id, s),
     k.compound(id + '_bonnet', 20, [
       prism('skin', 'paint', [[s.aPost, hood(s.aPost) - 0.03], [nose, hood(nose) - 0.03], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-(s.side - 0.1), s.side - 0.1]),
     ], { paint: s.paint }),
@@ -196,13 +218,7 @@ local rows(id, s) = {
     k.compound(id + '_rear_bumper', 10, [
       box('bar', 'bumper', [s.rear, 0.42, -(b.side - 0.03)], [tail + 0.08, 0.6, b.side - 0.03]),
     ], { bumper: s.bumper }),
-    k.compound(id + '_dashboard', 25, [
-      box('lower', 'trim', [s.dash, s.floor, -s.skin + 0.03], [s.frontAxle - s.arch, s.waist - 0.18, s.skin - 0.03]),
-      box('lower_between_tubs', 'trim', [s.frontAxle - s.arch, s.floor, -s.tubIn], [s.fire - 0.05, s.waist - 0.18, s.tubIn]),
-      box('upper_over_tubs', 'trim', [s.frontAxle - s.arch, s.archTop + 0.02, -s.skin + 0.03], [s.fire - 0.05, s.waist - 0.18, s.skin - 0.03]),
-      box('top', 'trim', [s.dash - 0.2, s.waist - 0.18, -s.skin + 0.03], [s.fire - 0.05, s.waist - 0.04, s.skin - 0.03]),
-      box('column', 'trim', [s.dash - 0.27, s.waist - 0.09, s.driverZ - 0.04], [s.dash - 0.16, s.waist - 0.01, s.driverZ + 0.04]),
-    ], { trim: 'plastic-black' }),
+    dashboard(id, s),
     // Side doors hinge on their leading edge, with the handle near the trailing one.
     k.compound(id + '_front_door', 32, [
       box('skin', 'paint', [s.bFront, s.sill, s.skin], [s.cowl, s.waist, s.side]),
@@ -289,7 +305,7 @@ local rows(id, s) = {
       for i in std.range(0, std.length(s.bands) - 1)
     ]), finish),
   ] else []),
-  out: rowsOut,
+  out: k.unborrowed(id, s, rowsOut),
 }.out;
 {
   cab: cab,
@@ -301,24 +317,31 @@ local rows(id, s) = {
   nose: noseOf,
   pillarAt: pillarAtOf,
   pillarY: pillarYOf,
-  // Deadvox's items for `rows`, built with Deadvox's vehicle kit as `kit`.
-  items(kit, id, name, s):
-    local pile = kit.pileSize;
-    local part(suffix, label, capabilities) = kit.part(id + suffix, name + ' ' + label, pile, capabilities);
-    [
-      part('_shell', if std.objectHas(s, 'box') then 'cab shell' else 'body shell', ['structure', 'protection']),
-      part('_windscreen', 'windscreen', ['glazing']),
-      part('_bonnet', 'bonnet', ['protection']),
-      part('_front_wing', 'front wing', ['protection']),
-      part('_front_bumper', 'front bumper', ['protection']),
-      part('_rear_bumper', 'rear bumper', ['protection']),
-      part('_dashboard', 'dashboard', ['structure']),
-      part('_front_door', 'front door', ['entry', 'glazing', 'protection']),
-      part('_side_door', 'side door', ['entry', 'protection'] + (if s.slideGlass then ['glazing'] else [])),
-      part('_rear_door', if std.get(s, 'rearShutter', false) then 'rear shutter' else 'rear door', ['entry', 'protection'] + (if s.rearGlass then ['glazing'] else [])),
+  // The rows `panel_van` emits for every van whose cab pressings equal them.
+  cabRows: cabRows,
+  // Deadvox's items for `rows`, built with Deadvox's vehicle kit as `kit`; `cabItems` are those for `cabRows`.
+  items(kit, id, name, s0):
+    local s = withCab(s0);
+    local part(suffix, label, capabilities) = kit.part(id + suffix, name + ' ' + label, kit.pileSize, capabilities);
+    local parts = [
+      ['_shell', if std.objectHas(s, 'box') then 'cab shell' else 'body shell', ['structure', 'protection']],
+      ['_windscreen', 'windscreen', ['glazing']],
+      ['_bonnet', 'bonnet', ['protection']],
+      ['_front_wing', 'front wing', ['protection']],
+      ['_front_bumper', 'front bumper', ['protection']],
+      ['_rear_bumper', 'rear bumper', ['protection']],
+      ['_dashboard', 'dashboard', ['structure']],
+      ['_front_door', 'front door', ['entry', 'glazing', 'protection']],
+      ['_side_door', 'side door', ['entry', 'protection'] + (if s.slideGlass then ['glazing'] else [])],
+      ['_rear_door', if std.get(s, 'rearShutter', false) then 'rear shutter' else 'rear door', ['entry', 'protection'] + (if s.rearGlass then ['glazing'] else [])],
     ]
-    + (if std.objectHas(s, 'floorPart') then [part(s.floorPart.suffix, s.floorPart.label, s.floorPart.capabilities)] else [])
-    + (if std.objectHas(s, 'box') then [part('_box', 'box body', ['structure', 'protection'])] else []),
+    + (if std.objectHas(s, 'floorPart') then [[s.floorPart.suffix, s.floorPart.label, s.floorPart.capabilities]] else [])
+    + (if std.objectHas(s, 'box') then [['_box', 'box body', ['structure', 'protection']]] else []);
+    [part(p[0], p[1], p[2]) for p in parts if !std.objectHas(s.borrow, p[0])],
+  cabItems(kit): [
+    kit.part('van_windscreen', 'van windscreen', kit.pileSize, ['glazing']),
+    kit.part('van_dashboard', 'van dashboard', kit.pileSize, ['structure']),
+  ],
   // A battery van on `base`: the motor drives the front wheels from the engine bay and the pack spans the wheelbase
   // under the floor pan, so the prop shaft goes and an undriven axle replaces the rear one. Nothing behind the nose
   // needs cooling air, so a plain panel closes the grille.
@@ -350,7 +373,9 @@ local rows(id, s) = {
     add: [(import 'site.libsonnet').one('grille_panel', 'electric_van_grille_panel')],
   }),
   // The fittings every van shares; a sibling adds its seats behind the cab, cargo and extras.
-  fittings(kit, id, s):
+  fittings(kit, id, s0):
+    local s = withCab(s0);
+    local part(suffix) = k.partId(id, s, suffix);
     local fitting = kit.fitting;
     local pair = kit.pair;
     local on = kit.on;
@@ -365,13 +390,13 @@ local rows(id, s) = {
     // On a riser, so a van's driver sits up over the bonnet; a box's cab wall stands further forward.
     local seatX = std.get(s, 'frontSeatX', if isBox then 0.5 else 0.45);
     [
-      fitting('shell', id + '_shell', origin),
-      fitting('windscreen', id + '_windscreen', origin, ['shell']),
-      fitting('bonnet', id + '_bonnet', origin, ['shell']),
-      fitting('front_bumper', id + '_front_bumper', origin, ['shell']),
-      fitting('rear_bumper', id + '_rear_bumper', origin, ['shell']),
-      fitting('dashboard', id + '_dashboard', origin, ['shell']),
-      fitting('side_door', id + '_side_door', origin, [rearBody]),
+      fitting('shell', part('_shell'), origin),
+      fitting('windscreen', part('_windscreen'), origin, ['shell']),
+      fitting('bonnet', part('_bonnet'), origin, ['shell']),
+      fitting('front_bumper', part('_front_bumper'), origin, ['shell']),
+      fitting('rear_bumper', part('_rear_bumper'), origin, ['shell']),
+      fitting('dashboard', part('_dashboard'), origin, ['shell']),
+      fitting('side_door', part('_side_door'), origin, [rearBody]),
       fitting('engine', s.engine, [s.frontAxle + 0.13, 0.42, 0], ['shell']),
       fitting('gearbox', 'gearbox_inline', [s.frontAxle - 0.44, 0.4, 0], ['engine']),
       fitting('prop_shaft', 'prop_shaft_long', [(s.frontAxle - 0.76 + s.rearAxle) / 2, 0.34, 0], ['gearbox', 'rear_axle']),
@@ -382,11 +407,11 @@ local rows(id, s) = {
       fitting('steering_wheel', 'steering_wheel', [s.dash - 0.3, s.waist - 0.05, s.driverZ], ['dashboard']),
       fitting('gear_lever', 'gear_lever', [s.dash - 0.15, s.waist - 0.42, 0], ['dashboard']),
     ]
-    + (if isBox then [fitting('box', id + '_box', origin, ['shell'])] else [])
-    + (if std.objectHas(s, 'floorPart') then [fitting(s.floorPart.fitting, id + s.floorPart.suffix, origin, [rearBody])] else [])
-    + pair('front_wing', id + '_front_wing', origin, on(['shell']))
-    + pair('front_door', id + '_front_door', origin, on(['shell']))
-    + (if std.get(s, 'rearShutter', false) then [fitting('rear_door', id + '_rear_door', origin, [rearBody])] else pair('rear_door', id + '_rear_door', origin, on([rearBody])))
+    + (if isBox then [fitting('box', part('_box'), origin, ['shell'])] else [])
+    + (if std.objectHas(s, 'floorPart') then [fitting(s.floorPart.fitting, part(s.floorPart.suffix), origin, [rearBody])] else [])
+    + pair('front_wing', part('_front_wing'), origin, on(['shell']))
+    + pair('front_door', part('_front_door'), origin, on(['shell']))
+    + (if std.get(s, 'rearShutter', false) then [fitting('rear_door', part('_rear_door'), origin, [rearBody])] else pair('rear_door', part('_rear_door'), origin, on([rearBody])))
     + pair('tail_lamp', 'tail_lamp_tall', [tail - 0.03, 0.72, (if isBox then s.box.hatchSide else s.hatchSide) + 0.08], on([rearBody]))
     + pair('front_strut', 'front_strut', [s.frontAxle, 0.33 + lift, 0.8], on(['shell']))
     + pair('front_wheel', s.wheel, [s.frontAxle, hub, s.wheelZ], on(paired=['front_strut']))

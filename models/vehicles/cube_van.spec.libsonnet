@@ -14,4 +14,5 @@ van.cab + van.loadFloor + {
     waist: 1.6, windowTop: 2.2, doorTop: 2.6, canton: 2.9, roof: 3.0,
     windows: [],
   },
+  borrow: { _bonnet: 'panel_van_bonnet' },
 }

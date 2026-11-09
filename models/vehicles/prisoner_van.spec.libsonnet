@@ -8,4 +8,5 @@ van.cab + van.saloonFloor + {
   rearGlass: true, bulkhead: false, windowSill: 1.6,
   windows: [[-2.8, -2.45], [-2.05, -1.7], [-0.9, -0.55]],
   bands: [{ finish: 'paint-drum-blue', y: [0.88, 1.03] }],
+  borrow: { _bonnet: 'panel_van_bonnet', _front_bumper: 'cube_van_front_bumper', _rear_bumper: 'high_roof_van_rear_bumper', _floor: 'high_roof_van_load_floor' },
 }
