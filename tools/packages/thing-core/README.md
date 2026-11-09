@@ -30,13 +30,13 @@ reasons and `things/WORK.md`, "Phases" for the remaining suite work.
   schema. The envelope then names no kind of thing, nothing leaks between packs, and one
   entry can carry several packs' blocks without their names clashing. A field two packs
   both want is promoted into the envelope on purpose. The gun pack's block and the composed
-  Deadvox schema are `packages/deadvox/src/core/schema/models.ts`, `GunModelSchema` and `ModelSchema`.
+  Deadvox schema are deadvox's `GunModelSchema` and `ModelSchema`.
 - Materials share one content table so tools and the game read the same appearance and a
   mod changes it in one place. Mass is authored, not inferred from material density or a
   drawn envelope: items can mix materials and hide complex internal shapes. See
   `things/README.md`, "Rules". Baked appearance is not a second tuning source; references
   retain authored shades while resolving shared values. See `src/materials.ts`,
-  `MaterialReferenceSchema`, and `packages/deadvox/src/render/modelMaterials.ts`, `applyModelMaterials`.
+  `MaterialReferenceSchema`, and deadvox's `applyModelMaterials`.
 - Part mass choices and appearance profiles belong to the authoring domain, not to a
   material's identity. See `packages/gun-authoring-tool/src/gun/catalogue.jsonnet`, `parts`, and
   `packages/gun-authoring-tool/src/gun/appearance.jsonnet`, `profileFinishes`.
@@ -46,7 +46,7 @@ reasons and `things/WORK.md`, "Phases" for the remaining suite work.
   thing-tool rows each own an item and can share geometry without sharing a mass. See
   `src/schema.ts`, `ModelPartSchema`; `src/mass.ts`, `modelMassKg`; and
   `things/WORK.md`, "Decisions". Consumers must not count baked replaceable geometry and
-  its child item twice; see `packages/deadvox/src/core/modelMass.ts`, `modelBodyMassKg`.
+  its child item twice; see deadvox's `modelBodyMassKg`.
 - Baked collision and named anchors are neutral because any consumer that places a thing
   needs its solid extent and its attachment points, whatever kind of thing it is. A part's
   collision travels with its mass, so a consumer never pairs one export's boxes with
