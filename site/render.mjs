@@ -3,9 +3,10 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { FRONT_QUARTER } from './modelFrame.mjs';
 import { samplePose } from './poseSample.mjs';
 
-export const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
+const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
 // ---- loading ----
 
