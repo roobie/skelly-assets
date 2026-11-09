@@ -1,0 +1,308 @@
+[
+  {
+    "id": "mirror",
+    "model": "mirror",
+    "name": "Hand mirror",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A round glass mirror in a wooden frame with a handle.",
+    "notes": "Lying face up, 280 mm long with a 140 mm frame: wood-walnut frame and handle, mirror-silver glass. Signalling with sunlight or looking round corners has no content field yet, so it carries no quality."
+  },
+  {
+    "id": "tub_of_adobe_mortar",
+    "model": "adobe_mortar",
+    "name": "Tub of adobe mortar",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "mortar": "clay-wet"
+    },
+    "description": "A tub of thick, sticky mud mortar for laying clay and mud bricks.",
+    "notes": "Mixed mortar is a paste, so it is drawn in the tub a player would carry, sharing the adobe_mortar model with its fill recoloured clay-wet for brown mud. The mass includes the tub, as liquids and creams do. It drying out once mixed has no content field yet."
+  },
+  {
+    "id": "adobe_mortar",
+    "model": "adobe_mortar",
+    "name": "Tub of mortar",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A tub of mixed cement mortar for laying bricks and stone.",
+    "notes": "A black builder's tub 140 mm across holding about a litre of stone-grey mortar with a heaped top. It is mixed and ready to use, so it is drawn in the tub as a paste and the mass includes the tub. The box counts the tub around the mortar. Lime and adobe mortar share this model, recoloured. It setting once mixed has no content field yet."
+  },
+  {
+    "id": "tub_of_lime_mortar",
+    "model": "adobe_mortar",
+    "name": "Tub of lime mortar",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "mortar": "chalk-white"
+    },
+    "description": "A tub of pale lime mortar, mixed and ready for laying stone or brick.",
+    "notes": "Shares the adobe_mortar model with its fill recoloured chalk-white for the pale lime mix. The mass includes the tub."
+  },
+  {
+    "id": "micro_motor",
+    "model": "micro_motor",
+    "name": "Micro electric motor",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A tiny electric motor of the kind found in toy cars and hair trimmers.",
+    "notes": "A steel can 25 mm across and 30 mm long lying along x, with a plastic-white end cap, two brass-polished solder tabs and a short steel shaft; a steel-grey flat on top stands in for the can's flat. The shaft is 2.4 mm across, at the 2 mm grain's limit."
+  },
+  {
+    "id": "neoprene",
+    "model": "neoprene",
+    "name": "Neoprene patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small cut piece of wetsuit rubber, for patching neoprene clothing.",
+    "notes": "A patch 120 by 50 mm with one corner curling, neoprene-black with a nylon-black knit face. It is drawn 4 mm thick rather than 3 mm so the face layer holds at the 2 mm grain; the curl and that thickness enlarge the box. Repairing clothing with it has no content field yet."
+  },
+  {
+    "id": "pallet",
+    "model": "pallet",
+    "name": "Wooden pallet",
+    "category": "misc",
+    "size": [
+      10,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A heavy wooden shipping pallet of deck boards nailed across three notched runners.",
+    "notes": "A 1219 by 1016 mm pallet 140 mm tall: seven wood-pine deck boards on top and three below, nailed across three wood-oak stringers each notched twice for fork tines. Drawn at a 10 mm grain, the furniture grain, as the boards are 19 mm thick. Breaking it down for planks has no content field yet, and the size is a placeholder for a thing carried in both arms."
+  },
+  {
+    "id": "cargo_parachute",
+    "model": "cargo_parachute",
+    "name": "Cargo parachute",
+    "category": "misc",
+    "size": [
+      8,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A huge packed parachute for dropping heavy cargo from aircraft. The canopy and rigging are heavy nylon.",
+    "notes": "A packed cargo canopy about 900 by 420 by 380 mm: a cloth-olive-drab pack on a nylon-ranger-green tray, closed by side and top flaps and bound by three webbing-olive-dark ties, with a coiled static line and two steel-grey links on top and a paper-white data card on the front. It is heavy enough that only a team or a vehicle can move it. Cutting it up for nylon and cord has no content field yet; the size is a placeholder."
+  },
+  {
+    "id": "petrified_eye",
+    "model": "petrified_eye",
+    "name": "Stone eye",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A heavy stone eyeball the size of a fist, its pupil shaped like a cross. It does not look carved.",
+    "notes": "A stone-grey ball 78 mm across looking along +z, with a jade-green iris and an obsidian cross-shaped pupil. hammering 1 suits it: it is heavy enough to drive a nail. The box counts the air round a ball. Infected and the deep tiers stand in for wherever strange things are found; any power it has has no content field."
+  },
+  {
+    "id": "piano_wire",
+    "model": "piano_wire",
+    "name": "Piano wire",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A coil of thin, springy steel wire made for piano strings.",
+    "notes": "Five loose turns about 40 mm across with a twist and a loose end, steel-bright. Real piano wire is under 1 mm, but the 2 mm grain is the finest, so the wire is drawn 2 mm across; the coil's box is mostly the air inside the coil. Use as a snare or garrotte has no content field yet."
+  },
+  {
+    "id": "pillow",
+    "model": "pillow",
+    "name": "Pillow",
+    "category": "misc",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A soft bed pillow, rolled tight and tied for carrying.",
+    "notes": "Rolled 360 mm long and 180 mm across, as it is carried: a cloth-cream case with a cloth-white fill showing the roll's spiral at each end, the loose edge along the top and two cord-cotton ties. Comfort when sleeping and unrolling it to place have no content field yet. The pillowcase rides here as the brief has variants do, though as an empty folded case it would read better as its own folded-cloth row."
+  },
+  {
+    "id": "piezo_igniter",
+    "model": "piezo_igniter",
+    "name": "Piezo igniter",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A push-button spark igniter taken from a gas appliance.",
+    "notes": "70 mm long lying along x: a plastic-black body with a plastic-red push button, an alu-bare sleeve and lock nut, and a steel-bright electrode bent at the tip. The electrode is drawn 2 mm across at the grain's limit, and the box counts the air beside the thin sleeve. Making sparks to light gas has no content field yet, so it carries no fire_starting quality."
+  },
+  {
+    "id": "bore_brush",
+    "model": "bore_brush",
+    "name": "Bore brush",
+    "category": "misc",
+    "size": [
+      1,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting",
+        "Police"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A long twisted-wire brush with a cotton head, thin enough to scrub out a gun barrel or a narrow pipe.",
+    "notes": "350 mm long lying along x: a steel-galvanised finger loop at -x, a twisted shaft drawn as a rod with raised twists, and a cloth-bright-white cotton head 100 mm long; held by the shaft. Cleaning a fouled barrel has no content field yet, so it carries no quality."
+  },
+  {
+    "id": "plastic_flower_pot",
+    "model": "plastic_flower_pot",
+    "name": "Plastic plant pot",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A cheap plastic pot for growing a plant.",
+    "notes": "A tapered pot 180 mm across at the rolled rim and 150 mm tall, hollow, in paint-terracotta for the common clay-coloured plastic. The box counts the air round the taper and rim. Planting in it has no content field yet."
+  }
+]

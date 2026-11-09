@@ -1,0 +1,356 @@
+[
+  {
+    "id": "electric_carving_knife",
+    "model": "electric_carving_knife",
+    "name": "Electric carving knife",
+    "category": "tool",
+    "size": [
+      1,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A corded kitchen knife with two serrated blades that saw against each other when it runs. Needs mains power.",
+    "notes": "Modelled switched off; the running state would share this model. No tool quality: a powered cutting quality needs power handling the drafts cannot express. The cord is a short stub with its plug. The box is large because the handle is round."
+  },
+  {
+    "id": "charcoal_water_filter",
+    "model": "charcoal_water_filter",
+    "name": "Charcoal water filter",
+    "category": "tool",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A gravity filter: water poured in the top runs down through cloth, charcoal, sand and gravel and out of the tap. The charcoal wears out with use.",
+    "notes": "The layers are drawn as bands on the outside of a white frame so they read from the iso view; the reservoir is clear blue and the tile draws it opaque. No tool quality: purifying water is a use action on a container, which has no draft field yet. The box is large because it is a cylinder in its bounding box."
+  },
+  {
+    "id": "charcoal_smoker",
+    "model": "charcoal_smoker",
+    "name": "Charcoal smoker",
+    "category": "tool",
+    "size": [
+      5,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "heating": 2
+      }
+    },
+    "description": "A portable bullet smoker on three legs, with a fuel door at the front and a domed lid. Burns charcoal; coal fumes would spoil the meat.",
+    "notes": "heating is the quality name used for hotplates. 300 mm across and 600 mm tall to the lid handle, a small real smoker's size, so the shape follows the real thing. Default grain, as it is larger than a shoebox."
+  },
+  {
+    "id": "charcoal_cooker",
+    "model": "charcoal_cooker",
+    "name": "Charcoal cooker",
+    "category": "tool",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "heating": 2
+      }
+    },
+    "description": "A small steel firebox for coal or charcoal with a pot grate on top, a pilot valve to light it and a flue to carry the fumes away.",
+    "notes": "The 300 mm longest side is the flue, which rises behind the tank; the box is large because the flue stands off the tank. heating is the quality name used for hotplates."
+  },
+  {
+    "id": "clay_pot",
+    "model": "clay_pot",
+    "name": "Clay pot",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 3
+      }
+    },
+    "description": "A rough hand-built cooking pot of fired clay, open at the top, with two lugs to lift it by.",
+    "notes": "Qualities use the names other batches use. The box is large because the capacity is inside a round pot with lugs."
+  },
+  {
+    "id": "clay_teapot",
+    "model": "clay_teapot",
+    "name": "Clay teapot",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A round fired-clay teapot with a lid, a spout and a loop handle.",
+    "notes": "The spout and handle stand well out from a round body, so its bounding box is mostly air."
+  },
+  {
+    "id": "coffeemaker",
+    "model": "coffeemaker",
+    "name": "Coffeemaker",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1,
+        "heating": 1
+      }
+    },
+    "description": "A drip coffeemaker: water heats in the back tower and drips through the filter basket into a glass carafe on a warming plate. Needs power.",
+    "notes": "The carafe holds a little coffee, which shows only in game; the tile draws the glass opaque."
+  },
+  {
+    "id": "crystallizing_sugar",
+    "model": "crystallizing_sugar",
+    "name": "Crystallizing sugar",
+    "category": "food",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small glass of thick sugar syrup with a skewer pegged across the rim, crystals slowly growing on it. Takes about two weeks to set.",
+    "notes": "The model is the glass a player would pick up, so the box is far larger than the sugar alone. The crystals sit below the rim and show only in game, where the glass is see-through."
+  },
+  {
+    "id": "dehydrator",
+    "model": "dehydrator",
+    "name": "Food dehydrator",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A round electric dryer with five stacked trays over a fan and heater base, for drying food to keep. Needs power.",
+    "notes": "Trays are amber plastic so the stack reads against the white base and lid. No tool quality: drying food is a use action. The box is large because it is a cylinder in its bounding box."
+  },
+  {
+    "id": "fermenting_eggs",
+    "model": "fermenting_eggs",
+    "name": "Jar of pickling eggs",
+    "category": "food",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An open glass jar of peeled eggs in brine, still pickling. Seal it once they are done.",
+    "notes": "Left open; the sealed jar would need its own model with a lid. The whole jar is one item, so the mass includes the glass. The eggs show only through the mouth in the tile, which draws the glass opaque; the brine uses syrup-green for want of a pale pickling-brine finish."
+  },
+  {
+    "id": "hexamine_stove",
+    "model": "hexamine_stove",
+    "name": "Hexamine stove",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "heating": 1
+      }
+    },
+    "description": "A pocket-sized folding stove that burns solid fuel tablets. Opened out, its two side walls hold up a small pot.",
+    "notes": "Shown opened out with a fuel tablet on its tray, so it reads as a stove rather than a flat tin; the open box is much larger than the folded one. The vent cut-outs are painted flush. heating is the quality name used for hotplates."
+  },
+  {
+    "id": "food_processor",
+    "model": "food_processor",
+    "name": "Food processor",
+    "category": "tool",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A kitchen motor base under a clear bowl with a chopping blade and a feed tube in the lid. Slices, chops, grinds and mixes. Needs power.",
+    "notes": "No tool quality. The blade and spindle inside the bowl show only in game, as the tile draws the clear bowl opaque."
+  },
+  {
+    "id": "gasoline_cooker",
+    "model": "gasoline_cooker",
+    "name": "Petrol stove",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "heating": 2
+      }
+    },
+    "description": "A pressure stove that burns petrol: a brass tank with a hand pump, a burner on a riser and three legs carrying a pot ring.",
+    "notes": "The open pot stand and the pump and valve key standing out make the bounding box mostly air. heating is the quality name used for hotplates."
+  },
+  {
+    "id": "heatpack",
+    "model": "heatpack",
+    "name": "Heat pack",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A sealed chemical pouch that warms up once its tab is pulled. Heats food or eases a sore muscle, once.",
+    "notes": "Single use; spent, it becomes the used heat pack, which has its own model."
+  },
+  {
+    "id": "used_heat_pack",
+    "model": "used_heat_pack",
+    "name": "Used heat pack",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A spent chemical heat pack, cold and gone hard in lumps.",
+    "notes": "A distinct state of the heat pack with its own model: flatter, grey, lumpy and without its pull tab, so the two read apart on the ground."
+  }
+]

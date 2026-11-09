@@ -1,0 +1,138 @@
+[
+  {
+    "id": "noetic_scanner",
+    "model": "crystal_eye_test_scanner",
+    "name": "Crystal eye-test scanner",
+    "category": "tool",
+    "size": [
+      6,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A heavy white bench machine like an eye-test rig: two eyepieces over a chin cup, a violet crystal set in its lid beside a sight glass of green fluid, a wired headband on a hook at one side and an arm cuff at the other.",
+    "notes": "A housing 300 by 230 by 240 mm on a 340 by 350 mm base, 360 by 330 by 350 mm overall with the headband, cuff and sight glass. The eyepieces, chin rest, headband and cuff stand out round the housing. It has no qualities; its use is a psychic diagnosis action that does not exist yet. It is carried, not a workstation: at 11 kg it moves like a heavy case."
+  },
+  {
+    "id": "symbol_test_cards",
+    "model": "symbol_test_cards",
+    "name": "Deck of symbol test cards",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A deck of twenty-five white cards, each printed with one of five plain symbols: circle, cross, wavy lines, square or star. Once used to test people for the power to read minds.",
+    "notes": "A deck 88 by 63 mm and 8 mm thick, blue backs, with its top card slid aside to show a circle. The name avoids the inventor's name."
+  },
+  {
+    "id": "field_projector",
+    "model": "force_field_generator",
+    "name": "Crystal field projector",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A flat device the size of two phones stacked, dark plastic on an aluminium tray, with a toggle switch at one end, a printed label and a violet crystal seated in a socket on its face.",
+    "notes": "150 by 75 by 18 mm, 168 mm with the toggle. The label and the crystal socket sit on the same face so the crystal shows. The name describes the device. Its use, a personal shield, needs a shield effect that does not exist yet."
+  },
+  {
+    "id": "field_projector_broken",
+    "model": "broken_force_field_generator",
+    "name": "Melted crystal field projector",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A crystal field projector that has cooked from the inside: one end sags and drips, the shell is blistered brown and the toggle is bent stuck.",
+    "notes": "A distinct state, so it has its own model: the projector's shape with a sagging -x end, three drips, scorched blisters and a bent toggle. It is scrap now; salvage could give back the crystal once a recipe needs it."
+  },
+  {
+    "id": "crystal_focusing_ring",
+    "model": "crystal_focusing_ring",
+    "name": "Crystal focusing ring",
+    "category": "tool",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "mana_focus": 1
+      }
+    },
+    "description": "An upright steel ring on a round foot, with six cut blue crystal shards clamped round its rim, all pointing at an empty point in its middle where the air ripples like heat haze.",
+    "notes": "252 mm tall, a ring 184 mm across on a 140 mm foot. The ring is open, so its box is mostly air. The shimmer at the focal point is not modelled: no finish shows heat haze."
+  },
+  {
+    "id": "crystal_channeling_cluster",
+    "model": "crystal_channeling_cluster",
+    "name": "Crystal channeling cluster",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "mana_channeling": 1
+      }
+    },
+    "description": "Five violet crystal columns of different heights held upright on a steel plate in a soldered cage of straps, bands and wire. One column sits loose in its band, not quite touching the metal.",
+    "notes": "152 by 138 by 80 mm, the tallest column 140 mm with its point. The loose column stands 8 mm clear of the plate."
+  }
+]

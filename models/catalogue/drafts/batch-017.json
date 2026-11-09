@@ -1,0 +1,332 @@
+[
+  {
+    "id": "alder_bark",
+    "model": "alder_bark",
+    "name": "Alder bark",
+    "category": "material",
+    "size": [
+      3,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A curled strip of alder bark, orange on the inside where it was cut. Boiled down, it helps stop bleeding.",
+    "notes": "300 mm long, rolled into an open quill with its gap turned up and back so the grey-brown outer skin and the red-orange inner face both show; stepped long edges and torn ends so it reads peeled, not sawn. The curl encloses air. bark is the outer skin and copper the cut inner face. The hemostatic use needs a recipe, not a tool quality."
+  },
+  {
+    "id": "amplifier",
+    "model": "amplifier",
+    "name": "Amplifier board",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small circuit board that boosts a weak signal, with a chip on a finned heatsink, capacitors and a volume knob.",
+    "notes": "80 by 60 mm on a 1.6 mm green board: an amplifier chip on an aluminium heatsink, two capacitors, four resistors, a potentiometer with a knob and a blue screw terminal for the speaker wires. plastic-green stands in for solder-masked board."
+  },
+  {
+    "id": "amplifier_head",
+    "model": "amplifier_head",
+    "name": "Amplifier head",
+    "category": "misc",
+    "size": [
+      6,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A heavy guitar amplifier head with a row of knobs and a handle on top. Dead without power; good for parts.",
+    "notes": "560 mm wide, 250 mm tall and 240 mm deep, the size of a real valve amp head: a black covered cabinet with steel corner caps, a beige grille cloth, a brushed control panel with six knobs, an input jack, a power switch and a red pilot lamp, and a leather strap handle. polymer-black stands in for vinyl covering and cloth-canvas for grille cloth. Salvaging it into parts needs a disassembly once its parts exist."
+  },
+  {
+    "id": "antenna",
+    "model": "antenna",
+    "name": "Copper aerial",
+    "category": "material",
+    "size": [
+      4,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thin copper rod with a threaded brass foot, from a radio or a car.",
+    "notes": "400 mm long and 5 mm across with a brass mounting foot and a ball tip. A bare rod has almost no volume, so the drawn size is kept."
+  },
+  {
+    "id": "archery_target_box",
+    "model": "archery_target_box",
+    "name": "Box archery target",
+    "category": "misc",
+    "size": [
+      6,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A cardboard box packed tight with cloth, a target painted on its front. Arrows stop in it.",
+    "notes": "600 mm wide, 450 mm tall and 190 mm deep, standing on its long edge; taped seams, a little cloth showing at the top and five painted rings in white, black, blue, red and yellow. Setting it up to shoot at needs a placed-object or construction field the item schema does not have yet, so it has no workstation."
+  },
+  {
+    "id": "float_bladders",
+    "model": "float_bladders",
+    "name": "Float bladders",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A cluster of thin, gas-filled bladders cut from a large animal. They are lighter than they look.",
+    "notes": "Four bladders 46 to 54 mm across in a heap 110 mm long, joined by a knot of dark tissue with a dark vein round each and two torn vessels. A heap of round bladders leaves air in its box. jelly-pale draws opaque in the tiles but is see-through in the game. Usage is Infected as the nearest existing tag; revisit it when giant animals get their own loot."
+  },
+  {
+    "id": "giant_flower_bud",
+    "model": "giant_flower_bud",
+    "name": "Giant flower bud",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A large, unopened flower bud from a giant plant, deep purple. Its swollen base still holds sap.",
+    "notes": "110 mm long and 56 mm across, lying along x on a short cut stem, cupped in five green sepals at its swollen base. No finish is purple, so plastic-pink stands in for the petals; a deep purple plant finish would read better. Getting sap from it needs a recipe once the plant exists. Usage is Infected as the nearest existing tag; revisit it when giant plants exist."
+  },
+  {
+    "id": "birch_bark",
+    "model": "birch_bark",
+    "name": "Birch bark",
+    "category": "material",
+    "size": [
+      3,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tough, papery sheet of white birch bark. It sheds water and catches fire easily.",
+    "notes": "300 mm long, 120 mm across its curl and 4 mm thick, arched skin up so the white face and its dark lenticel dashes show, with a tan inner face and ragged ends. The curl encloses air. enamel-white stands in for the chalky outer bark. Fire-starting and waterproofing are recipe inputs, not tool qualities."
+  },
+  {
+    "id": "blade",
+    "model": "blade",
+    "name": "Steel blade",
+    "category": "material",
+    "size": [
+      5,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1
+      }
+    },
+    "description": "A long steel blade with a bare tang and no handle. It cuts, awkwardly.",
+    "notes": "500 mm long: a 380 mm blade 44 mm deep and 3 mm thick with a clipped point and a ground bright edge, and a 120 mm tang with two rivet holes. A flat blade has little volume, so the drawn size is kept. cutting 1 is below the knives' cutting 2, as there is no handle to hold. Fitting it to a weapon or vehicle needs recipes."
+  },
+  {
+    "id": "scythe_blade",
+    "model": "scythe_blade",
+    "name": "Scythe blade",
+    "category": "material",
+    "size": [
+      7,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1
+      }
+    },
+    "description": "A long, curved scythe blade with an upturned tang for the handle.",
+    "notes": "700 mm along its sweep, 75 mm deep at the heel tapering to the point, lying flat: a dark forged body, a raised spine rib, a honed bright edge and the upturned tang at the heel. The curve's bounding box is mostly air; the drawn size is a real scythe blade's. cutting 1 as for the loose steel blade; assembling a scythe needs a recipe."
+  },
+  {
+    "id": "body_pillow",
+    "model": "body_pillow",
+    "name": "Body pillow",
+    "category": "misc",
+    "size": [
+      6,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A long printed pillow, rolled and strapped for carrying.",
+    "notes": "620 mm long and 320 mm across, rolled with its ends showing the spiral of the printed cover, held by two navy webbing straps with steel buckles. The print is a plain pink band, with no character. Unrolling it to sleep on needs an item state and a bedding field the schema does not have yet."
+  },
+  {
+    "id": "bone_glue",
+    "model": "bone_glue",
+    "name": "Bone glue",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small jar of amber glue boiled from bones. Weak, but it holds light things together.",
+    "notes": "A cork-stoppered glass jar 50 mm across and 64 mm tall, filled with amber glue and wrapped in a paper label; as a liquid the jar is the item. glass-clear draws opaque in the look tiles but stays see-through in the game, so resin-honey glue shows."
+  },
+  {
+    "id": "bouquet",
+    "model": "bouquet",
+    "name": "Withered bouquet",
+    "category": "misc",
+    "size": [
+      5,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A bunch of flowers in a paper wrap, long since dried and brown.",
+    "notes": "470 mm long and 200 mm across the wide end, lying flat: dry stems tied with twine, a flattened brown paper wrap and drooping dried heads in faded red, cream and dusty pink with a few curled leaves. Its look is only flowers, so no vase is drawn. paint-oxblood, wax-cream and cloth-shirt-faded stand in for dried petals; a dried-petal finish would read better."
+  },
+  {
+    "id": "brick",
+    "model": "brick",
+    "name": "Brick",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A fired clay building brick. In a pinch, a hammer.",
+    "notes": "190 by 90 mm and 57 mm tall with a shallow frog in its top face. The adobe brick shares the shape; the salt lick is a larger white block, so it wants its own model once a salt finish exists."
+  },
+  {
+    "id": "bundle_branch",
+    "model": "bundle_branch",
+    "name": "Bundle of sticks",
+    "category": "material",
+    "size": [
+      13,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Ten cut branches tied together with cord for carrying.",
+    "notes": "Ten sticks 1300 mm long and 35 to 45 mm thick, packed three, four and three, with uneven ends showing pale sawn wood and two cord ties. Untying it into ten sticks is a disassembly the item framework gives once sticks exist."
+  }
+]

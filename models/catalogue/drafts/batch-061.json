@@ -1,0 +1,210 @@
+[
+  {
+    "id": "cordless_cut_off_saw",
+    "model": "cordless_cut_off_saw",
+    "name": "Cordless cut-off saw",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "sawing": 2
+      }
+    },
+    "description": "A battery-powered saw with a diamond disc for cutting concrete, brick and stone.",
+    "notes": "A 230 mm blade under a charcoal guard on a side arm, a red motor body over a black battery, a loop handle on top and a closed rear handle; 0.58 m long. The model takes a real compact cutter's size so the blade and the motor behind it fit. sawing follows the other saws in the catalogue. Switching it on, battery charge and its use as a weapon have no fields in this draft. The size is a placeholder."
+  },
+  {
+    "id": "diamond_cutting_disc",
+    "model": "diamond_cutting_disc",
+    "name": "Diamond cutting disc",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A 125 mm segmented diamond disc for an angle grinder.",
+    "notes": "Steel core with a 22 mm bore, ten dark diamond segments round the rim and a yellow label ring, 2.4 mm thick. Throwing it or fitting it to a power tool has no field in this draft."
+  },
+  {
+    "id": "petrol_cut_off_saw",
+    "model": "petrol_cut_off_saw",
+    "name": "Petrol cut-off saw",
+    "category": "tool",
+    "size": [
+      4,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "sawing": 2
+      }
+    },
+    "description": "A petrol-engined saw with a 350 mm disc for cutting concrete, brick and stone.",
+    "notes": "An orange engine cover over a charcoal crankcase, white air filter cover, pull starter on the far side, muffler at the front, fuel tank and closed rear handle behind, loop handle on top; the blade under an orange guard on a side arm. 0.84 m long. The model takes a real petrol cutter's size. sawing follows the other saws in the catalogue. Fuel, starting it and its use as a weapon have no fields in this draft. The size is a placeholder."
+  },
+  {
+    "id": "adhesive_bandages",
+    "model": "adhesive_bandages",
+    "name": "Carton of adhesive plasters",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A carton of small sticky plasters with gauze pads, for cuts and scrapes.",
+    "notes": "The model is the carton, 75 by 95 by 28 mm, white with a blue band, a red cross and a plaster pictured on the front. Treating wounds with it waits on the refactor."
+  },
+  {
+    "id": "alcohol_wipes",
+    "model": "alcohol_wipes",
+    "name": "Carton of alcohol wipes",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A carton of foil sachets, each holding a small pad soaked in alcohol, for cleaning skin and small wounds.",
+    "notes": "The model is the dispenser carton, 68 mm square and 60 mm tall, with one foil sachet standing out of the slot in its top. Disinfecting and cleaning wait on the refactor."
+  },
+  {
+    "id": "anesthetic_kit",
+    "model": "anesthetic_kit",
+    "name": "Anaesthesia kit",
+    "category": "medical",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "anesthesia": 1
+      }
+    },
+    "description": "A carrier of six amber bottles of anaesthetic agent, made for a hospital anaesthesia machine.",
+    "notes": "A white plastic carrier 200 by 135 mm with a carry bar, holding six 250 ml amber glass bottles with paper labels and yellow and blue caps; 165 mm tall. plastic-amber draws the glass; the tiles show it opaque. anesthesia is a new quality name, for surgery recipes."
+  },
+  {
+    "id": "makeshift_bandage",
+    "model": "makeshift_bandage",
+    "name": "Makeshift bandage",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A strip of torn cloth rolled up for binding a wound.",
+    "notes": "A rolled strip 45 mm wide and 26 mm across in cloth-rag, layer lines on the ends and a 30 mm loose tail. The boiled bandage looks the same and rides here; the bleached one has its own draft with a whiter cloth. Crafting it from rags and treating wounds wait on the refactor."
+  },
+  {
+    "id": "bleached_makeshift_bandage",
+    "model": "makeshift_bandage",
+    "name": "Bleached makeshift bandage",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "cloth": "cloth-cream",
+      "layer": "cloth-white"
+    },
+    "description": "A strip of cloth bleached clean and rolled up for binding a wound.",
+    "notes": "Rides on the makeshift bandage model with whiter cloth. Bleaching it is a recipe step that waits on the refactor."
+  },
+  {
+    "id": "cotton_ball",
+    "model": "cotton_ball",
+    "name": "Cotton balls",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A handful of soft balls of clean white cotton.",
+    "notes": "Five balls about 22 mm across in a small heap, in fleece-pale; the tiles draw it greyer than it reads in light. Medical fits its use as a dressing. The tampon rides here, though a slim cylinder with a string would read better on its own model. Using it as a dressing or as tinder waits on the refactor."
+  }
+]

@@ -1,0 +1,321 @@
+[
+  {
+    "id": "caffeine_gum",
+    "model": "caffeine_gum",
+    "name": "Pack of caffeine gum",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Chewing gum laced with caffeine. Wards off sleep for a while.",
+    "notes": "Military reflects issue caffeine gum in ration packs. Wakefulness has no content field yet."
+  },
+  {
+    "id": "caffeine_pills",
+    "model": "caffeine_pills",
+    "name": "Bottle of caffeine pills",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Wards off sleep for a few hours.",
+    "notes": "The black label and yellow cap set it apart from the other white tablet bottles. Wakefulness has no content field yet."
+  },
+  {
+    "id": "calcium_tablets",
+    "model": "calcium_tablets",
+    "name": "Bottle of calcium tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A calcium supplement. Does little on its own.",
+    "notes": "The bone meal variants are crafted from bone rather than bought, so a found bottle suits them less; they would keep this model until something homemade fits better."
+  },
+  {
+    "id": "cattail_jelly",
+    "model": "cattail_jelly",
+    "name": "Jar of cattail jelly",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Jelly from cattail stems. Keeps a wound clean and dulls its pain.",
+    "notes": "The player picks up the whole jar, so the item is one jar with its jelly. Made by the player rather than found, so usage is empty. wax-cream stands in for the jelly behind the glass; the tiles draw the glass opaque."
+  },
+  {
+    "id": "chewing_tobacco",
+    "model": "chewing_tobacco",
+    "name": "Tin of chewing tobacco",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Mint-flavoured tobacco to tuck in the cheek. Calms the nerves. Habit-forming.",
+    "notes": "The green lid print stands for mint. Nicotine and addiction have no content fields yet."
+  },
+  {
+    "id": "hydrogen_peroxide",
+    "model": "hydrogen_peroxide",
+    "name": "Bottle of hydrogen peroxide",
+    "category": "medical",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Mild peroxide. Cleans a wound and bleaches cloth.",
+    "notes": "The item is the bottle, as the existing antiseptic is. Whether it treats infection like antiseptic is for the refactor."
+  },
+  {
+    "id": "cigarette",
+    "model": "cigarette",
+    "name": "Pack of cigarettes",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military",
+        "Police"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Calms the nerves and dulls hunger. Habit-forming. Needs a light.",
+    "notes": "category follows the other drugs. Needing a lighter has no content field yet."
+  },
+  {
+    "id": "cigar",
+    "model": "cigar",
+    "name": "Cigar",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "stack": 5,
+    "description": "A rolled leaf of cured tobacco. Calms the nerves. Habit-forming. Needs a light.",
+    "notes": "A single cigar is what a player picks up, so the model is the cigar itself, at 2 mm grain because it is only 18 mm thick."
+  },
+  {
+    "id": "anaesthetic_cream",
+    "model": "anaesthetic_cream",
+    "name": "Tube of anaesthetic cream",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A numbing cream for wounds. Slows bleeding where it is spread.",
+    "notes": "The item id and name describe what it does. The item is the tube, not a single dose."
+  },
+  {
+    "id": "cocaine",
+    "model": "cocaine",
+    "name": "Bag of cocaine",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong stimulant. Numbs what it touches. Highly addictive.",
+    "notes": "Not skipped as loose powder: it is found in a zip bag, so the model is the bag. glass-clear stands in for clear bag plastic, which has no finish; the powder sits on the bag so it shows even where glass is drawn opaque. Residential stands in for street loot, for which no usage tag exists."
+  },
+  {
+    "id": "stimulant_cola",
+    "model": "stimulant_cola",
+    "name": "Bottle of stimulant cola",
+    "category": "medical",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A bottle of cola spiked with stimulants. Brings a rush of energy and a racing heart.",
+    "notes": "A homemade mix, so usage is empty. The item is the bottle. The body shows the dark liquid as if through clear plastic, and a tape strip marks it as homemade."
+  },
+  {
+    "id": "crack",
+    "model": "crack",
+    "name": "Vial of crack",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Smokable cocaine. A short, intense high. Extremely addictive.",
+    "notes": "Drawn as a capped vial, so it differs from the cocaine bag on the ground. The rocks inside show only in the game, where the glass is clear. Residential stands in for street loot."
+  },
+  {
+    "id": "cough_syrup",
+    "model": "cough_syrup",
+    "name": "Bottle of cough syrup",
+    "category": "medical",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Daytime cold medicine. Eases coughing, aches and a blocked nose. Does not cause drowsiness.",
+    "notes": "The id avoids the brand name. The item is the bottle. fuel-amber stands in for orange syrup through a clear bottle; the white cap is the dosing cup. Colds have no content field yet."
+  },
+  {
+    "id": "prescription_sedative",
+    "model": "prescription_sedative",
+    "name": "Vial of prescription sedatives",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong sedative. Calms panic and eases muscle spasms. Habit-forming.",
+    "notes": "The id avoids the drug's name, as prescription_stimulant does. The blue cap sets it apart from the stimulant's white one."
+  },
+  {
+    "id": "makeshift_antiseptic",
+    "model": "makeshift_antiseptic",
+    "name": "Bottle of makeshift antiseptic",
+    "category": "medical",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Strong alcohol in a corked bottle. Cleans a wound, though not as well as the real thing.",
+    "notes": "Crafted by the player, so usage is empty. The item is the reused glass bottle. wood-birch stands in for cork."
+  }
+]

@@ -1,0 +1,350 @@
+[
+  {
+    "id": "box_mod_vaporiser",
+    "model": "box_mod_vaporiser",
+    "name": "Box-mod vaporiser",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A rechargeable vaporiser: a black battery box with a small screen and a fire button, topped by a refillable tank. It needs a charged battery and nicotine liquid to work.",
+    "notes": "24 by 40 by 85 mm body standing upright with a 50 mm tank and drip tip on top, screen and buttons on +z. Battery and liquid use, and nicotine effects, need fields the content pass adds. A filter straw shares nothing with this shape, so it has its own row and draft (filter_straw)."
+  },
+  {
+    "id": "filter_straw",
+    "model": "filter_straw",
+    "name": "Filter straw",
+    "category": "tool",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "filtering": 1
+      }
+    },
+    "description": "A fat plastic straw with a filter inside. Drink straight from a stream or puddle through it and most of the dirt and germs stay behind.",
+    "notes": "Own row rather than a ride on box_mod_vaporiser: 225 mm long and 30 mm across, mouthpiece cap at +x. filtering is a new quality name for drinking from unsafe water. The model follows the real straw."
+  },
+  {
+    "id": "crackpipe",
+    "model": "crackpipe",
+    "name": "Glass bulb pipe",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thin glass tube ending in a round bulb with a hole on top, blackened inside from use.",
+    "notes": "120 mm stem 8 mm across and a 26 mm bulb at +x with a dark hole and a sooty patch inside. Glass draws opaque in the tile but stays see-through in the game."
+  },
+  {
+    "id": "glass_pipe",
+    "model": "glass_pipe",
+    "name": "Glass spoon pipe",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A hand-blown glass pipe with green swirls, a bowl on top of its fat end and a small hole on the side to cover with a thumb.",
+    "notes": "110 mm long, swelling from 10 mm at the mouth to 30 mm at the bowl end on +x, bowl hole on top and carb hole on +z. Glass draws opaque in the tile. box/volume x1.4 is the box round a tapering round body."
+  },
+  {
+    "id": "tobacco_pipe",
+    "model": "tobacco_pipe",
+    "name": "Tobacco pipe",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A carved wooden pipe with a deep bowl, charred inside, a brass ring and a black stem.",
+    "notes": "150 mm long with a 34 mm bowl 45 mm tall at +x and the stem's bit at -x. box/volume x1.56 is the box round an L shape."
+  },
+  {
+    "id": "hole_punch",
+    "model": "hole_punch",
+    "name": "Single-hole punch",
+    "category": "misc",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small desk punch on a dark base, with a bright metal lever on top. It punches one hole at a time through a few sheets of paper.",
+    "notes": "90 by 45 mm base and 44 mm tall: a charcoal base, an aluminium punch housing at +x with its paper slot as a dark line, and a bright steel lever to its grip at -x, so the lever reads apart from the base. The box spans the air under the rising lever. Taken apart it yields a short steel punch pin, steel and aluminium scrap, for the content pass."
+  },
+  {
+    "id": "pen",
+    "model": "pen",
+    "name": "Metal pen",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical",
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A heavy steel ballpoint with a gold band, a rubber grip, a clip and a push button.",
+    "notes": "130 mm long and 9.6 mm across, tip at +x. writing reuses the quality name another batch gave markers. The four coloured pens ride on this model with their own finishes."
+  },
+  {
+    "id": "black_pen",
+    "model": "pen",
+    "name": "Black pen",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical",
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "band": "plastic-black",
+      "body": "plastic-black",
+      "button": "plastic-black",
+      "clip": "plastic-black"
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A cheap plastic ballpoint that writes in black ink.",
+    "notes": "Shares the metal pen model; the finishes map makes the barrel, clip and button black plastic."
+  },
+  {
+    "id": "blue_pen",
+    "model": "pen",
+    "name": "Blue pen",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical",
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "band": "plastic-blue",
+      "body": "plastic-blue",
+      "button": "plastic-blue",
+      "clip": "plastic-blue"
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A cheap plastic ballpoint that writes in blue ink.",
+    "notes": "Shares the metal pen model; the finishes map makes the barrel, clip and button blue plastic."
+  },
+  {
+    "id": "red_pen",
+    "model": "pen",
+    "name": "Red pen",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "band": "plastic-red",
+      "body": "plastic-red",
+      "button": "plastic-red",
+      "clip": "plastic-red"
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A cheap plastic ballpoint that writes in red ink.",
+    "notes": "Shares the metal pen model; the finishes map makes the barrel, clip and button red plastic."
+  },
+  {
+    "id": "green_pen",
+    "model": "pen",
+    "name": "Green pen",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "band": "plastic-green",
+      "body": "plastic-green",
+      "button": "plastic-green",
+      "clip": "plastic-green"
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A cheap plastic ballpoint that writes in green ink.",
+    "notes": "Shares the metal pen model; the finishes map makes the barrel, clip and button green plastic."
+  },
+  {
+    "id": "scissors",
+    "model": "scissors",
+    "name": "Office scissors",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 2
+      }
+    },
+    "description": "Long steel scissors with black plastic loops. They cut cloth, plastic and cord cleanly.",
+    "notes": "180 mm long lying flat, 122 mm pointed blades opened a little toward +x. Scissors are not a butchering tool."
+  },
+  {
+    "id": "childs_scissors",
+    "model": "childs_scissors",
+    "name": "Child's scissors",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1
+      }
+    },
+    "description": "Short scissors with blunt rounded tips and red plastic loops, made for small hands. They cut paper and thin cloth, slowly.",
+    "notes": "130 mm long lying flat, 84 mm blades with blunt tips toward +x."
+  }
+]

@@ -1,0 +1,341 @@
+[
+  {
+    "id": "hard_steel_armor",
+    "model": "hard_steel_armor",
+    "name": "Hard steel plate",
+    "category": "material",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Police"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A curved plate of thick hardened steel cut to fit a bullet-resistant vest.",
+    "notes": "A plate 250 by 300 mm with shooter's cuts at the top corners, curved across its width and lying on its back, drawn 8 mm thick so the curve reads at the 4 mm grain; steel-grey with a paint-white label. The box counts the air under the curve. Fitting it into a vest has no content field yet."
+  },
+  {
+    "id": "impact_fuze",
+    "model": "impact_fuze",
+    "name": "Impact fuze",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A small mechanical fuze that sets off a stable explosive when it strikes something hard.",
+    "notes": "A turned fuze 12 mm across and 22 mm long standing on its base: brass thread, plastic-black band, steel-grey nose. It is barely bigger than the 2 mm grain can draw, so the nose steps are coarse; the box counts the air round a cone."
+  },
+  {
+    "id": "lens",
+    "model": "lens",
+    "name": "Glass lens",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "fire_starting": 1
+      }
+    },
+    "description": "A ground glass lens 3 cm across. Focuses sunlight to a hot point.",
+    "notes": "A plano-convex lens 30 mm across lying flat. fire_starting is a new quality name for lighting tinder; that it needs sunlight has no content field yet. Tiles draw glass-clear opaque."
+  },
+  {
+    "id": "small_lens",
+    "model": "small_lens",
+    "name": "Small glass lens",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A ground glass lens about the size of a fingernail.",
+    "notes": "A plano-convex lens 16 mm across lying flat, a crafting part for scopes and optics. Too small to focus enough sunlight to light tinder, so it carries no quality. Tiles draw glass-clear opaque."
+  },
+  {
+    "id": "light_bulb",
+    "model": "light_bulb",
+    "name": "Light bulb",
+    "category": "material",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A pear-shaped incandescent bulb with a screw base.",
+    "notes": "A bulb 60 mm across and 108 mm tall standing on its screw cap, alu-bare cap with plastic-black contact tip and glass-clear bulb. The filament is not drawn: it is finer than the 2 mm grain and the tiles draw the glass opaque."
+  },
+  {
+    "id": "lock",
+    "model": "lock",
+    "name": "Small padlock and key",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A brass padlock no bigger than a matchbox, the key left in its keyway.",
+    "notes": "Lying on its back: a brass body 30 mm wide, 30 mm long and 14 mm thick with rounded bottom corners, a round steel-stainless shackle towards +z and a steel-grey key in the keyway in the bottom end. Locking a door or container with it has no content field yet."
+  },
+  {
+    "id": "lotus",
+    "model": "lotus",
+    "name": "Lotus flower",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A broad pink flower picked from the surface of a pond, with a flat green seed pod at its heart.",
+    "notes": "An open bloom 150 mm across: eight flat outer petals, an inner cup rising to four pointed tips, a yellow stamen ring and a flat-topped pod, with a short leaf-green stem. plastic-pink is the nearest fresh petal colour; petal-dried reads as dried. The box counts the air round an open, spread flower."
+  },
+  {
+    "id": "makeshift_pillow",
+    "model": "makeshift_pillow",
+    "name": "Straw pillow",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A pillowcase stuffed with straw and dry plants, rolled and tied for carrying.",
+    "notes": "Drawn rolled, as it is carried: a roll 360 mm long and 200 mm across in cloth-cotton, tied twice with cord-olive, the plant-dried filling showing in the rolled ends. Unrolling it into a sleeping pillow when placed has no content field yet."
+  },
+  {
+    "id": "mild_steel_wire",
+    "model": "mild_steel_wire",
+    "name": "Steel wire",
+    "category": "material",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "tying": 1
+      }
+    },
+    "description": "A coil of thin, stiff mild steel wire.",
+    "notes": "Five loose loops about 100 mm across lying flat, held by three twists, all steel-grey. The variants are the same coil in harder steels and share the model; their steel grade has no content field yet. A 2 mm loop is thicker than real wire, the finest the grain holds."
+  },
+  {
+    "id": "large_lcd_screen",
+    "model": "large_lcd_screen",
+    "name": "Large LCD panel",
+    "category": "material",
+    "size": [
+      6,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A bare flat screen panel nearly a metre wide, with its driver board along one edge.",
+    "notes": "A 42-inch panel 960 by 570 mm and 26 mm thick lying face up: plastic-charcoal screen in a plastic-black bezel, steel-grey back and a circuit-green driver board on the lower edge. plastic-charcoal draws the screen because a see-through finish would show the back in game. The size is a placeholder for a panel that does not fit a pack."
+  },
+  {
+    "id": "household_dishwasher",
+    "model": "household_dishwasher",
+    "name": "Dishwasher",
+    "category": "misc",
+    "size": [
+      6,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "household_dishwasher",
+      "qualities": {
+        "dishwashing": 1
+      }
+    },
+    "description": "A built-in kitchen dishwasher with a stainless door. Needs power and running water.",
+    "notes": "A placed appliance rather than a carried item; the size is a placeholder. 600 mm wide, 600 mm deep and 840 mm tall: steel-stainless door with a plastic-charcoal pull and control strip, steel-grey cabinet, plastic-black kick plate, lcd-green display. dishwashing is a new quality name; power and water hookups have no content field yet. Taking it apart for scrap has no content field yet."
+  },
+  {
+    "id": "household_washing_machine",
+    "model": "household_washing_machine",
+    "name": "Washing machine",
+    "category": "misc",
+    "size": [
+      7,
+      11
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "household_washing_machine",
+      "qualities": {
+        "laundering": 2
+      }
+    },
+    "description": "A white top-loading washing machine with a control console along the back. Needs power and running water.",
+    "notes": "A placed appliance rather than a carried item; the size is a placeholder. Drawn as a top loader 690 by 700 mm and 1.1 m tall to its console; a front loader came out far smaller. enamel-white body, plastic-charcoal lid window, steel-stainless dials, lcd-green display. laundering is a new quality name; power and water hookups have no content field yet."
+  },
+  {
+    "id": "household_water_heater",
+    "model": "household_water_heater",
+    "name": "Water heater",
+    "category": "misc",
+    "size": [
+      5,
+      13
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tall insulated water tank with a thermostat and a drain cock near the floor.",
+    "notes": "A placed appliance; the size is a placeholder. A tank 500 mm across and 1.15 m tall, sized to hold about 240 litres, with copper pipe stubs and brass unions on top, a relief valve and pipe on its side, a thermostat with a red knob, a label and a brass drain cock on the front. Drawing water from the drain cock and heating it need power or gas, which have no content field yet. The box counts the air round a round tank and its fittings."
+  },
+  {
+    "id": "large_water_heater",
+    "model": "large_water_heater",
+    "name": "Large water heater",
+    "category": "misc",
+    "size": [
+      6,
+      16
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tall insulated water tank big enough for a whole household, with a thermostat and a drain cock near the floor.",
+    "notes": "The same build as household_water_heater at 600 mm across and 1.42 m tall, sized for about 400 litres; a separate row because the two differ in size, not in state. The size is a placeholder. The box counts the air round a round tank and its fittings."
+  },
+  {
+    "id": "lawnmower",
+    "model": "lawnmower",
+    "name": "Lawnmower",
+    "category": "misc",
+    "size": [
+      7,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A petrol push mower with a red steel deck. It no longer starts.",
+    "notes": "A deck 520 by 560 mm on four 180 mm wheels with an engine, side chute and a handle rising 1 m behind, front on +z. paint-red deck, plastic-black shroud and chute, alu-bare engine, plastic-yellow fuel cap. The model keeps a real mower's size. Taking it apart with a wrench for its engine, blade and wheels has no content field yet. The size is a placeholder."
+  }
+]

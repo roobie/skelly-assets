@@ -1,0 +1,328 @@
+[
+  {
+    "id": "cured_hide",
+    "model": "cured_hide",
+    "name": "Cured hide",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A scraped and cured animal hide rolled tight and tied with cord. It still needs tanning before it is leather.",
+    "notes": "Rolled 200 mm long and 28 mm across; skin-rawhide draws the outer side and beeswax the paler scraped side seen in the spiral ends. Tanning it into leather has no content field yet."
+  },
+  {
+    "id": "cured_pelt",
+    "model": "cured_pelt",
+    "name": "Cured pelt",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A cured animal skin with its fur still on, rolled fur side in and tied with cord. It still needs tanning.",
+    "notes": "Rolled 170 mm long and 60 mm across, fur-brown showing in the spiral ends and as tufts. Tanning it into fur has no content field yet."
+  },
+  {
+    "id": "denim_patch",
+    "model": "denim_patch",
+    "name": "Denim patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A hemmed square of blue denim, for mending or for sewing into larger sheets.",
+    "notes": "150 mm square with paler running stitches round the hem. The cloth is thinner than the 2 mm voxel grain, so the drawn sheet is thicker than real denim."
+  },
+  {
+    "id": "felt_patch",
+    "model": "felt_patch",
+    "name": "Felt patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A square of grey felt.",
+    "notes": "150 mm square, 2 mm thick, in felt-grey."
+  },
+  {
+    "id": "fur",
+    "model": "fur",
+    "name": "Fur patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A square of fur on its leather backing, for mending fur clothing or piecing into sheets.",
+    "notes": "150 mm square: a leather-tan back and fur-brown tufts. The faux fur variant shares this model with fur-pale on its fur slot."
+  },
+  {
+    "id": "faux_fur",
+    "model": "fur",
+    "name": "Faux fur patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "fur": "fur-pale"
+    },
+    "description": "A square of synthetic fur on a fabric backing, for mending or piecing into sheets.",
+    "notes": "Variant of the fur patch; same model with pale fur."
+  },
+  {
+    "id": "gambeson_batting",
+    "model": "gambeson_batting",
+    "name": "Gambeson batting",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A loose wad of shredded rags, dry grass and hair, used to stuff padded armour.",
+    "notes": "One lumpy mound about 65 mm across and 30 mm high mixing cloth-rag, straw-pale and fur-brown lumps, with grass stalks poking out. Stuffing a gambeson with it has no content field yet."
+  },
+  {
+    "id": "grass_yarn",
+    "model": "grass_yarn",
+    "name": "Grass yarn",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A ball of coarse yarn twisted from dry grass. Too thick to sew with, but it can be woven.",
+    "notes": "A ball 80 mm across in straw-rope with jute windings and a loose end. Weaving it into cloth has no content field yet."
+  },
+  {
+    "id": "aramid_patch",
+    "model": "aramid_patch",
+    "name": "Kevlar patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A loosely woven square of golden Kevlar, for mending cut-resistant clothing.",
+    "notes": "150 mm square in aramid-gold with raised weave threads both ways and fraying edges. The cloth is thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  },
+  {
+    "id": "leather",
+    "model": "leather",
+    "name": "Leather patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An unevenly cut square of brown leather, for mending and small leatherwork.",
+    "notes": "About 150 mm across with ragged cut edges, 2 mm thick in leather-brown."
+  },
+  {
+    "id": "fire_resistant_fabric_patch",
+    "model": "fire_resistant_fabric_patch",
+    "name": "Nomex patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A hemmed square of flame-resistant cloth.",
+    "notes": "150 mm square in knit-fr with cloth-turnout stitching; a flat woven fire-resistant cloth finish would read truer. The cloth is thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  },
+  {
+    "id": "rigid_aramid_plate",
+    "model": "rigid_aramid_plate",
+    "name": "Rigid Kevlar plate",
+    "category": "material",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A stiff panel of Kevlar layers set in resin, for mending hard armour.",
+    "notes": "300 by 250 mm and 12 mm thick with rounded corners; resin-honey lines on the edge show the layers. No epoxy-set aramid finish exists, so aramid-gold stands in. Repair use has no content field yet."
+  },
+  {
+    "id": "aramid_scraps",
+    "model": "aramid_scraps",
+    "name": "Kevlar scraps",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A few small offcuts of Kevlar cloth, worth unpicking for thread.",
+    "notes": "A heap of five aramid-gold offcuts about 45 mm across. The offcuts are thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  },
+  {
+    "id": "fire_resistant_fabric_scraps",
+    "model": "fire_resistant_fabric_scraps",
+    "name": "Nomex scraps",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A few small offcuts of flame-resistant cloth, worth unpicking for thread.",
+    "notes": "Shares the offcut heap shape with the aramid scraps, in knit-fr. The offcuts are thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  },
+  {
+    "id": "canvas_sheet",
+    "model": "canvas_sheet",
+    "name": "Canvas sheet",
+    "category": "material",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A hemmed sheet of waxed canvas, tough enough for bags and outer clothing.",
+    "notes": "610 by 305 mm laid flat in cloth-canvas with a canvas-grey hem and one corner turned back. The cloth is thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  },
+  {
+    "id": "patchwork_canvas_sheet",
+    "model": "patchwork_canvas_sheet",
+    "name": "Patchwork canvas sheet",
+    "category": "material",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A canvas sheet pieced together from six odd panels.",
+    "notes": "610 by 305 mm laid flat; panels alternate cloth-canvas, canvas-grey and cloth-khaki with cord-cotton seams. The cloth is thinner than the 2 mm voxel grain, so the drawn sheet is thicker than the real cloth."
+  }
+]

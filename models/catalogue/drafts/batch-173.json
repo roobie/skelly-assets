@@ -1,0 +1,220 @@
+[
+  {
+    "id": "hardened_steel_mail_suit",
+    "model": "hardened_steel_mail_suit",
+    "name": "Hardened steel mail suit",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.26,
+        "cut": 0.75,
+        "pierce": 0.45
+      }
+    },
+    "description": "Head-to-ankle hardened steel mail: a coif, sleeves and legs in one suit. Heavy, but little gets a blade through it. Wear something padded under it.",
+    "notes": "The model's root: mail in `steel-mail-dark`. Folded with the coif laid face up at +z: sleeves rolled down each side, the legs folded up over the front, the face opening painted dark. Folded on a shelf it is wide and its box mostly empty. Slot `vest`, the body armour slot; no slot spans the whole body, so it should also block the head, arms and legs slots once a slot can cover more than one region. It covers the head as well, so it should not stack with a separate mail coif; left to the worn-coverage rules. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "high_carbon_steel_mail_suit",
+    "model": "hardened_steel_mail_suit",
+    "name": "High-carbon steel mail suit",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.24,
+        "cut": 0.68,
+        "pierce": 0.42
+      }
+    },
+    "description": "Head-to-ankle high-carbon steel mail: a coif, sleeves and legs in one suit. Wear something padded under it.",
+    "notes": "Shares the hardened mail suit's model and its `steel-mail-dark` mail. Folded on a shelf it is wide and its box mostly empty. Slot `vest`, the body armour slot; no slot spans the whole body, so it should also block the head, arms and legs slots once a slot can cover more than one region. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "rusty_mail_suit",
+    "model": "hardened_steel_mail_suit",
+    "name": "Rusty mail suit",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "mail": "rust-red"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.12,
+        "cut": 0.55,
+        "pierce": 0.28
+      }
+    },
+    "description": "Head-to-ankle mail with a coif, rusted through in places and missing rings here and there. Heavy, stiff, and still better than skin.",
+    "notes": "Rides on the hardened mail suit's model with `rust-red` mail; missing rings do not show. Folded on a shelf it is wide and its box mostly empty. Slot `vest`, the body armour slot; no slot spans the whole body, so it should also block the head, arms and legs slots once a slot can cover more than one region. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "faraday_mail_suit",
+    "model": "faraday_mail_suit",
+    "name": "Faraday mail suit",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.22,
+        "cut": 0.72,
+        "pierce": 0.42
+      }
+    },
+    "description": "Tempered steel mail from scalp to toes, mitts and socks included, with a wire grille over the face and every part bonded into one cage. Current that strikes it runs round you instead of through you. Worn over ordinary clothes.",
+    "notes": "Its own model in `steel-heat-tint`, as the tempered mail leggings have it: the mail suit's pile with a coif face up at +z whose face opening is barred by a bright wire grille, mail mitts hanging over the front fold, mail socks on the leg ends and a braided bonding strap down the middle. Folded on a shelf it is wide and its box mostly empty. Slot `vest`, the body armour slot; no slot spans the whole body, so it should also block the head, arms and legs slots once a slot can cover more than one region. Deadvox has no electric damage kind, so the shielding goes unmodelled; propose one when shocks exist. Protection is a judgement for tempered mail, a little under hardened because the cage gaps at the face. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "cleansuit",
+    "model": "cleansuit",
+    "name": "Cleansuit",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "suit",
+      "wearPerDamage": 0.004,
+      "imperviousTo": [
+        "acid"
+      ]
+    },
+    "description": "A disposable hooded coverall of white spun plastic with elastic cuffs and booties. It keeps dust and fallout off your skin and clothes, but tears easily.",
+    "notes": "Folded with the hood face up at +z: zip flap down the front, elastic cuffs, booties folded over the front fold. `cloth-bright-white` reads pale grey in the tiles. Folded on a shelf it is wide and its box mostly empty. Slot `suit` is new: a one-piece protective coverall goes on over all other clothing and covers the whole body, so no earlier slot fits. Radiation protection has no Deadvox damage kind; it is listed impervious to acid splashes as the rubber boots are. Wears fast. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "entry_suit",
+    "model": "entry_suit",
+    "name": "Entry suit",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "suit",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.1,
+        "cut": 0.35,
+        "pierce": 0.2
+      }
+    },
+    "description": "A firefighter's silvered whole-body suit with gauntlets and a hood behind a gold-faced visor, made to walk into flames for a short while. Bring your own air.",
+    "notes": "Folded with the hood face up at +z: silvered cloth in `foil-alu`, a `foil-gold` visor in a turnout-cloth rim, a zip flap and attached gauntlets on top. Slot `suit` is new: a one-piece protective coverall goes on over all other clothing and covers the whole body, so no earlier slot fits. Heat and fire have no Deadvox damage kind; the protection is a judgement for its aramid layers. A breathing set or gas mask goes separately. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hazmat_suit",
+    "model": "hazmat_suit",
+    "name": "Hazmat suit",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "suit",
+      "wearPerDamage": 0.003,
+      "imperviousTo": [
+        "acid"
+      ]
+    },
+    "description": "A sealed yellow suit with a broad face window, gloves and boots joined on, made to keep chemicals and contaminated dust off you entirely. Tight on the move and easy to tear. Wear a gas mask inside it.",
+    "notes": "Folded with the hood face up at +z: `rubber-yellow` suit, a clear face window with a black rim, a zip flap, green gloves on top and black boots sealed to the legs standing out behind. Slot `suit` is new: a one-piece protective coverall goes on over all other clothing and covers the whole body, so no earlier slot fits. Impervious to acid, as the rubber boots are; radiation protection has no Deadvox damage kind. The worn look is pending: no worn model is authored."
+  }
+]

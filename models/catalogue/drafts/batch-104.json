@@ -1,0 +1,302 @@
+[
+  {
+    "id": "ankle_socks",
+    "model": "ankle_socks",
+    "name": "Ankle socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Short white cotton sports socks with grey heels and toes, cut below the ankle bone.",
+    "notes": "A flat pair, toes outward, each 230 mm heel to toe with a 50 mm cuff: white cotton, grey heel and toe patches and a ribbed cuff. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "bag_socks",
+    "model": "bag_socks",
+    "name": "Bag socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.01
+    },
+    "description": "Two plastic shopping bags worn over the feet and knotted at the ankle. They keep feet dry and tear easily.",
+    "notes": "Two white plastic bags laid flat, 200 mm across and 400 mm long, each with a blue printed panel and its handles knotted at the neck where it closed round the ankle. Usage is empty because they are improvised from bags. Two bags laid flat fill a wide thin box. Wear per damage is high because thin plastic splits. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "disposable_socks",
+    "model": "disposable_socks",
+    "name": "Disposable socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.004
+    },
+    "description": "Thin white socks with two red bands at the cuff, made to be worn once and thrown away.",
+    "notes": "A flat pair, toes outward, each 230 mm heel to toe with a 150 mm leg, 3 mm thick: white cotton with two red stripes round the cuff. Wear per damage is doubled against ordinary socks because they are made to be thrown away. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "wool_socks",
+    "model": "wool_socks",
+    "name": "Wool socks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Thick grey wool socks with cream heels and toes and a red band below the cuff.",
+    "notes": "A flat pair, toes outward, each 240 mm heel to toe with a 170 mm leg and 12 mm thick: grey wool, cream heel and toe patches, a red stripe below a ribbed cuff. The xl size shares the model with its own draft. A pair laid flat spreads over a wide thin box. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "stockings",
+    "model": "stockings",
+    "name": "Stockings",
+    "category": "clothing",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Long black cotton stockings that reach above the knee, with a grey band at the top.",
+    "notes": "A flat pair, toes outward, each 230 mm heel to toe with a 600 mm leg: black cotton with a grey ribbed top band and a grey stripe below it. They cover the legs as well as the feet; the socks slot cannot say that. A pair laid flat spreads over a wide thin box. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "tentacle_stockings",
+    "model": "tentacle_stockings",
+    "name": "Six-tube stockings",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Six long cotton tubes, each closed in a round tip, knitted to keep the cold off limbs far longer and thinner than legs.",
+    "notes": "Six tubes laid flat side by side, each 750 mm long and 110 mm wide at a white ribbed cuff, tapering to a round tip and ringed with five white stripes on green cotton. They fit a body with six long tentacle-like limbs in place of legs, which Deadvox does not have yet; the item is drafted so such a body can use it when one exists. Usage is empty because they are made by hand. A pair laid flat spreads over a wide thin box. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "straw_sandals",
+    "model": "straw_sandals",
+    "name": "Straw sandals",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.004
+    },
+    "description": "Flat sandals woven from straw rope, tied on with long cords threaded through loops along the sides.",
+    "notes": "A pair lying sole down, toe to +z, 240 mm long and 85 mm across: straw soles ridged across with lighter woven rows, a rope thong at the toe, two rope loops each side and one at the heel, and the long ties laid out beside each sandal. Usage is empty because they are made by hand from straw. The ties laid beside the soles widen the box. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "black_tabi",
+    "model": "tabi",
+    "name": "Black tabi",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Black cotton ankle socks with the big toe split from the others, fastened at the back of the ankle by small brass clasps.",
+    "notes": "A pair lying sole down, toe to +z, 250 mm long: black cloth with the big toe split off on each inner side, the ankle cuffs laid flat behind the heels with four brass clasps on each outer edge. The white pair shares the model with its own draft and a finishes map. Laid flat with the cuffs spread. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "white_tabi",
+    "model": "tabi",
+    "name": "White tabi",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "cloth": "cloth-white",
+      "cuff": "cloth-white"
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "White cotton ankle socks with the big toe split from the others, fastened at the back of the ankle by small brass clasps.",
+    "notes": "Shares the tabi model with the black pair; the finishes map turns its cloth white. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "thigh_high_boots",
+    "model": "thigh_high_boots",
+    "name": "Thigh-high boots",
+    "category": "clothing",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.0012
+    },
+    "description": "Black leather boots that reach past the knee on a stacked heel, zipped up the inner side.",
+    "notes": "A standing pair, 280 mm long and 660 mm tall, toes to +z: black leather on a rubber sole with a 50 mm heel, the shaft widening above a seam at the knee, a band at the top and a steel zip on each inner side. They cover the legs as well as the feet; the feet slot cannot say that. The bounding box of a standing pair takes in the air between and round the boots. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "toecaps",
+    "model": "toecaps",
+    "name": "Steel toecaps",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "feet",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.05,
+        "blunt": 0.3,
+        "cut": 0.3,
+        "pierce": 0.2
+      }
+    },
+    "description": "Rubber overshoes that cover only the front of the foot, a steel cap over the toes and a strap round the heel.",
+    "notes": "A standing pair, 290 mm long and 70 mm tall: a black rubber shell over the front 125 mm of each foot with a grey steel cap over the toes, a dark hollow at the open back, and a rubber heel strap lying slack behind with a steel buckle. Slot feet like the other footwear; they are worn over a shoe, which the feet slot cannot yet express, as with the sabatons. Protection covers the toes only and is set below steel-toe boots. The slack heel straps lengthen the box. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "wool_socks_large",
+    "model": "wool_socks",
+    "name": "Wool socks, large",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "socks",
+      "wearPerDamage": 0.002
+    },
+    "description": "Thick grey wool socks with cream heels and toes, in a large size.",
+    "notes": "Shares the wool socks' model as a size variant. Slot socks is new: socks and stockings are worn under shoes and boots, so the feet slot would stop them being worn together; every sock-like item in this batch takes it. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  }
+]

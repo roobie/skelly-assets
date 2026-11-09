@@ -1,0 +1,417 @@
+[
+  {
+    "id": "young_wildwood_weaver",
+    "model": "young_wildwood_weaver",
+    "name": "Young wildwood weaver",
+    "category": "tools",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "knitting": 1,
+        "punching": 2,
+        "sewing": 3
+      }
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.004
+    },
+    "description": "A small living creature of carved wood like a spider, with needle forelegs and bright amber eyes. It rides on the back of a hand and sews, knits and punches leather.",
+    "notes": "Standing on eight legs, head on +z: a carved oak body like a spider's with a ridged bark abdomen, a leaf sprouting from its back and a pair of pale needle forelegs. Part of a magical tailor's kit, it spins and sews thread on its own, which is why it carries crafting qualities. It rides on the back of one hand while it sews; slot `hands`, the glove slot, because no slot fits a creature perched on the hand, and sidedness has no content field. `knitting` and `punching` are its knitting and awl qualities; Deadvox has no magic or living tools yet, so feeding it to grow is pending. 60 mm long and 96 mm across its legs, with short needles and amber eyes. Grows into the grown weaver, which has its own model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "grown_wildwood_weaver",
+    "model": "grown_wildwood_weaver",
+    "name": "Grown wildwood weaver",
+    "category": "tools",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 2,
+        "knitting": 1,
+        "punching": 2,
+        "sewing": 3
+      }
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.004
+    },
+    "description": "A full-grown living creature of carved wood like a spider, with long needle forelegs, pale shearing jaws and dark, unlit eyes. It rides on the back of a hand and sews, knits, punches leather and cuts.",
+    "notes": "Standing on eight legs, head on +z: a carved oak body like a spider's with a ridged bark abdomen, a leaf sprouting from its back and a pair of pale needle forelegs. Part of a magical tailor's kit, it spins and sews thread on its own, which is why it carries crafting qualities. It rides on the back of one hand while it sews; slot `hands`, the glove slot, because no slot fits a creature perched on the hand, and sidedness has no content field. `knitting` and `punching` are its knitting and awl qualities; Deadvox has no magic or living tools yet, so feeding it to grow is pending. A distinct state of the young weaver with its own model: 75 mm long and 120 mm across its legs, longer needles, bone mandibles and onyx eyes. Its cloth-cutting quality folds into `cutting` 2. The long legs and needles spread round a small body. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "braided_steel_belt",
+    "model": "braided_steel_belt",
+    "name": "Braided steel belt",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "front_right",
+        "name": "right front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A supple belt of braided steel with a plain steel buckle and a wrapped grip at its tip. Drawn, it uncoils into a steel whip.",
+    "notes": "A belt 1.1 m long and 30 mm wide laid flat in a U, outside up, buckle run along +z, tip run along -z, bend at +x; the plaits are rows of raised chevron links, and the tip ends in a wrapped grip that becomes the whip's handle. Its turning into a whip needs an item transform and a whip item, both pending. As the waist host it takes four belt points: left and right front on the buckle run, left and right hip on the tip run, and the back at the bend. A belt takes the waist slot. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "lesser_bottomless_tool_belt",
+    "model": "lesser_bottomless_tool_belt",
+    "name": "Lesser bottomless tool belt",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            3
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "left pouch"
+        },
+        {
+          "grid": [
+            3,
+            3
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "right pouch"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.001
+    },
+    "description": "A leather work belt with two tan tool pouches, each set with a small violet stone. The pouches hold more than their size and lighten what they hold.",
+    "notes": "A 50 mm brown leather belt 1.1 m long laid flat in a U, outside up, buckle run along +z; two pouches 120 mm square hang from the buckle run on leather loops, lying on their backs: each has rounded bottom corners, a belly stepping in towards its face, a flap fastened by a stud with the stone set in it, and dark mouths either side of the flap with tool handles standing in them. The pouches are the left and right front; three belt points remain on the tip run (hips) and the bend (back). Grids are larger than the pouches to carry the magic; the weight reduction needs a container rule that does not exist yet. The pouches lie spread flat. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "greater_bottomless_tool_belt",
+    "model": "greater_bottomless_tool_belt",
+    "name": "Greater bottomless tool belt",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "hammer_loop",
+        "name": "hammer loop",
+        "reachSimSeconds": 0.4,
+        "standard": "loop_large"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            4
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "front left pouch"
+        },
+        {
+          "grid": [
+            4,
+            4
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "front right pouch"
+        },
+        {
+          "grid": [
+            3,
+            4
+          ],
+          "handlingSimSeconds": 0.7,
+          "name": "hip left pouch"
+        },
+        {
+          "grid": [
+            3,
+            4
+          ],
+          "handlingSimSeconds": 0.7,
+          "name": "hip right pouch"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.001
+    },
+    "description": "A heavy leather work belt with four tan tool pouches and a steel hammer loop, each pouch set with a violet stone. The pouches hold far more than their size and greatly lighten what they hold.",
+    "notes": "The lesser belt's build with four pouches, two hanging from each run, a hammer hanging in a steel loop at the bend, and larger stones. The hammer is part of the model, showing the loop's use; the loop takes a large tool. One belt point remains at the back. Grids are larger than the pouches to carry the magic; the weight reduction needs a container rule that does not exist yet. The pouches and hammer lie spread flat. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "rune_forged_tool_belt",
+    "model": "rune_forged_tool_belt",
+    "name": "Rune-forged tool belt",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      }
+    ],
+    "tool": {
+      "qualities": {
+        "hammering": 2,
+        "prying": 1,
+        "sawing": 2,
+        "screwing": 1,
+        "wrenching": 2
+      }
+    },
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.0008
+    },
+    "description": "A broad black leather belt faced with steel plates carved in glowing blue runes, with a blue crystal in its buckle and a hammer, spanner, screwdriver and saw in steel loops. It serves as a full set of hand tools.",
+    "notes": "A 60 mm belt 1.15 m long laid flat in a U, outside up: four rune plates on the buckle run, a spanner, screwdriver and folding saw in loops across the tip run, and a hammer in a loop at the bend. The tools are part of the model and its qualities; the axe quality is left out because a folding saw does not chop. Drawing and sheathing a weapon is pending. The tools fill the front and right hip, so two belt points remain. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "girdle_of_hidden_arms",
+    "model": "girdle_of_hidden_arms",
+    "name": "Girdle of hidden arms",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "front_left",
+        "name": "left front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "front_right",
+        "name": "right front",
+        "reachSimSeconds": 0,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_left",
+        "name": "left hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "hip_right",
+        "name": "right hip",
+        "reachSimSeconds": 0.2,
+        "standard": "belt"
+      },
+      {
+        "id": "back",
+        "name": "back",
+        "reachSimSeconds": 1,
+        "standard": "belt"
+      },
+      {
+        "id": "frog_left",
+        "name": "left weapon frog",
+        "reachSimSeconds": 0.2,
+        "standard": "loop_large"
+      },
+      {
+        "id": "frog_right",
+        "name": "right weapon frog",
+        "reachSimSeconds": 0.2,
+        "standard": "loop_large"
+      }
+    ],
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            2,
+            8
+          ],
+          "handlingSimSeconds": 0.2,
+          "name": "hidden sheath"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "waist",
+      "wearPerDamage": 0.001
+    },
+    "description": "A wide black leather girdle edged in dark red, with violet runes along it, two leather weapon hangers and a broad bronze buckle. A weapon sheathed in it vanishes and returns to hand at once.",
+    "notes": "A girdle 1.1 m long and 100 mm wide laid flat in a U, outside up, buckle run along +z: oxblood edging, carved violet runes on both runs, and two oxblood frogs hanging off the buckle run near the front. The hidden sheath is one rifle-sized pocket for whatever weapon it swallows; the quick draw needs a handling rule that does not exist yet. The two frogs are large loops; five belt points sit as on a plain belt. A wide, thin belt laid in a U with frogs spread out. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "steel_bracers",
+    "model": "steel_bracers",
+    "name": "Steel bracers",
+    "category": "clothing",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.0006,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.8,
+        "pierce": 0.6
+      }
+    },
+    "description": "A pair of curved steel forearm guards with a raised rib down each, rolled rims and a domed plate at the elbow, strapped on with two buckled leather straps apiece.",
+    "notes": "Lying side by side, convex side up, wrists towards +z: each plate 250 mm long, 120 mm across at the elbow and 95 mm at the wrist, a bright rib and rims, an elbow cop, and two brown straps with brass buckles running off the outer edge. This item carries no enchantment of its own. Slot `arms`, as earlier arm guards. The worn look is pending: no worn model is authored."
+  }
+]

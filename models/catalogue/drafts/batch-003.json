@@ -1,0 +1,202 @@
+[
+  {
+    "id": "portable_generator",
+    "model": "portable_generator",
+    "name": "Portable generator",
+    "category": "misc",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "portable_generator",
+      "qualities": {
+        "power_supply": 1
+      }
+    },
+    "description": "A small petrol generator in an open tube frame, with two outlets on its panel. Runs on gasoline.",
+    "notes": "power_supply is a new quality name. The three variants share this model as the brief asks, but the larger ones would read as toys at this size; a larger skid-mounted generator model would suit them."
+  },
+  {
+    "id": "upright_freezer",
+    "model": "upright_freezer",
+    "name": "Upright freezer",
+    "category": "misc",
+    "size": [
+      5,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "apartment_freezer",
+      "qualities": {
+        "freezing": 1
+      }
+    },
+    "description": "A waist-high household freezer with one door. Keeps food frozen. Needs mains power.",
+    "notes": "Modelled upright rather than as a chest so it differs from the display freezer; 0.6 by 0.64 by 0.93 m. freezing is a new quality name. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "household_fridge",
+    "model": "household_fridge",
+    "name": "Fridge",
+    "category": "misc",
+    "size": [
+      5,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "apartment_fridge",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A household fridge with a small freezer compartment above. Keeps food cold. Needs mains power.",
+    "notes": "refrigeration is a new quality name; the freezer compartment could also bring freezing 1 if the refactor wants it. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "display_freezer",
+    "model": "display_freezer",
+    "name": "Chest display freezer",
+    "category": "misc",
+    "size": [
+      8,
+      5
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "display_freezer",
+      "qualities": {
+        "freezing": 1
+      }
+    },
+    "description": "A long shop chest freezer with two sliding glass lids. Holds a lot of frozen food. Needs mains power.",
+    "notes": "Usage is empty because no shop or retail usage tag exists. The box is the outer cabinet, 1.86 m long. Stock is drawn inside under the glass. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "display_fridge",
+    "model": "display_fridge",
+    "name": "Deli display case",
+    "category": "misc",
+    "size": [
+      5,
+      6
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "display_fridge",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A chilled counter case with a curved glass front and three tiers of trays. Needs mains power.",
+    "notes": "The case is 0.93 m wide but 1.25 m tall, the usual counter height plus glass, because a 0.93 m cube would not show the tiers. Usage is empty because no shop or retail usage tag exists. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "glass_freezer",
+    "model": "glass_freezer",
+    "name": "Glass-door freezer",
+    "category": "misc",
+    "size": [
+      5,
+      8
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "glass_freezer",
+      "qualities": {
+        "freezing": 1
+      }
+    },
+    "description": "A tall shop freezer with a glass door and wire shelves. Needs mains power.",
+    "notes": "Shares its cabinet layout with the glass-door fridges but is white with a blue header and cartons on its shelves. Usage is empty because no shop or retail usage tag exists. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "glass_fridge",
+    "model": "glass_fridge",
+    "name": "Glass-door drinks fridge",
+    "category": "misc",
+    "size": [
+      5,
+      8
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "glass_fridge",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A tall shop fridge with a glass door, lit header and shelves of bottles. Needs mains power.",
+    "notes": "Usage is empty because no shop or retail usage tag exists. A placed appliance; the size is only a placeholder."
+  },
+  {
+    "id": "double_glass_fridge",
+    "model": "double_glass_fridge",
+    "name": "Double glass-door fridge",
+    "category": "misc",
+    "size": [
+      8,
+      8
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "glass_fridge_double",
+      "qualities": {
+        "refrigeration": 1
+      }
+    },
+    "description": "A wide shop fridge with two glass doors and shelves of bottles. Needs mains power.",
+    "notes": "1.1 by 0.7 by 2 m is a common two-door cooler. Usage is empty because no shop or retail usage tag exists. A placed appliance; the size is only a placeholder."
+  }
+]

@@ -1,0 +1,380 @@
+[
+  {
+    "id": "sealed_large_stomach",
+    "model": "sealed_large_stomach",
+    "name": "Sealed stomach water skin",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Hunting"
+      ],
+      "tiers": []
+    },
+    "description": "A large animal's stomach, cleaned, dried and tied shut at both ends. Holds about 3 litres of water.",
+    "notes": "A crafted container, so it has no loot tiers. Drawn full and tied off, the shape a player recognises. wax-cream stands in for dried gut skin and cord-olive for the ties. Holding about 3 L of liquid has no content field yet."
+  },
+  {
+    "id": "lunchbox",
+    "model": "lunchbox",
+    "name": "Lunchbox",
+    "category": "bag",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.4
+        }
+      ]
+    },
+    "description": "A blue plastic lunchbox with snap latches and a carry handle on the lid.",
+    "notes": "The pocket grid is a placeholder."
+  },
+  {
+    "id": "craft_kit_box",
+    "model": "craft_kit_box",
+    "name": "Craft kit box",
+    "category": "bag",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            3,
+            2
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A flat cardboard box for a children's building kit, its lid printed with coloured parts.",
+    "notes": "Drawn empty with its lid on. The print on the lid is coloured blocks rather than a picture. The pocket grid is a placeholder."
+  },
+  {
+    "id": "medium_propane_tank",
+    "model": "medium_propane_tank",
+    "name": "Propane tank (20 lb)",
+    "category": "tool",
+    "size": [
+      3,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A white steel barbecue cylinder with a brass valve under a guard collar. Feeds a gas burner or grill.",
+    "notes": "Holding gas charges and feeding a tool have no content field yet. The biogas tank shares the cylinder, differing only in what fills it. Drawn at a 6 mm grain so the valve and the collar openings read."
+  },
+  {
+    "id": "ration_meal_bag",
+    "model": "ration_meal_bag",
+    "name": "Ration meal bag",
+    "category": "food",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A heavy tan field ration bag, sealed at both ends. Holds a full meal in smaller pouches.",
+    "notes": "The bag is a container for the meal's pouches; which pouches it holds has no content field yet, and the pocket grid is a placeholder. polymer-fde is the nearest finish to the tan laminate. The drawn brick reads as the bag pressed flat."
+  },
+  {
+    "id": "ration_entree_pouch",
+    "model": "ration_entree_pouch",
+    "name": "Ration entrée pouch",
+    "category": "food",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A flat tan foil pouch holding a ration's main course, sealed at both ends.",
+    "notes": "The empty container that holds a ration's entrée; the food it holds has no content field yet. All five ration pouches share one shape at different sizes, each with its own printed panel colour so they read apart."
+  },
+  {
+    "id": "ration_side_pouch",
+    "model": "ration_side_pouch",
+    "name": "Ration side pouch",
+    "category": "food",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small tan foil pouch holding a ration's side dish, sealed at both ends.",
+    "notes": "The empty container for a ration's side dish; the food it holds has no content field yet. Its panel is olive so it reads apart from the entrée pouch."
+  },
+  {
+    "id": "ration_dessert_pouch",
+    "model": "ration_dessert_pouch",
+    "name": "Ration dessert pouch",
+    "category": "food",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small tan foil pouch holding a ration's dessert, sealed at both ends.",
+    "notes": "The empty container for a ration's dessert; the food it holds has no content field yet. Its panel is red."
+  },
+  {
+    "id": "ration_jam_packet",
+    "model": "ration_jam_packet",
+    "name": "Ration jam packet",
+    "category": "food",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A single-serve tan foil packet of jam from a field ration.",
+    "notes": "The empty packet for a ration's jam; the jam it holds has no content field yet. At 6 mm thick the 2 mm printed panel is as thin as the voxel grain allows. Its panel is oxblood for fruit jam."
+  },
+  {
+    "id": "ration_spread_packet",
+    "model": "ration_spread_packet",
+    "name": "Ration spread packet",
+    "category": "food",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A single-serve tan foil packet of spread from a field ration.",
+    "notes": "The empty packet for a ration's spread, the same size as the jam packet but with a brown panel so the two read apart; the spread it holds has no content field yet."
+  },
+  {
+    "id": "plastic_paint_pail",
+    "model": "plastic_paint_pail",
+    "name": "Plastic paint pail (1 gallon)",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An empty white one-gallon plastic paint pail with a press-on lid and a wire handle.",
+    "notes": "Holding about 4 L of liquid has no content field yet."
+  },
+  {
+    "id": "metal_paint_can",
+    "model": "metal_paint_can",
+    "name": "Metal paint can (1 gallon)",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "An empty one-gallon steel paint can with a pry-off lid and a wire bail. Can be set over a fire.",
+    "notes": "cooking stands for a boiling quality. Holding about 4 L of liquid has no content field yet."
+  },
+  {
+    "id": "pencil_case",
+    "model": "pencil_case",
+    "name": "Pencil case",
+    "category": "bag",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.5
+        }
+      ]
+    },
+    "description": "A soft navy fabric pouch with a zip along the top.",
+    "notes": "paint-police-blue is the nearest finish to navy cloth; a navy or coloured cotton finish would read softer. The pocket grid is a placeholder."
+  },
+  {
+    "id": "petri_dish",
+    "model": "petri_dish",
+    "name": "Petri dish",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A shallow glass dish with a loose lid, used to grow cultures in a lab.",
+    "notes": "cooking stands for a boiling quality. The tiles draw the glass opaque; it stays see-through in the game. The frosted patch on the lid is for writing on."
+  },
+  {
+    "id": "pillbox",
+    "model": "pillbox",
+    "name": "Pill organiser",
+    "category": "medical",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "rigid": true,
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A frosted plastic strip of seven compartments, one for each day, each under its own coloured lid.",
+    "notes": "The drawn strip is small because a carried volume is not a measured box. The large pillbox shares the shape at a larger size. Holding pills by day has no content field yet; the pocket grid is a placeholder."
+  }
+]

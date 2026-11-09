@@ -1,0 +1,423 @@
+[
+  {
+    "id": "corded_drill",
+    "model": "corded_power_drill",
+    "name": "Power drill",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "drilling": 2,
+        "screwing": 1
+      }
+    },
+    "description": "A mains drill driver with a bit in the chuck. It only runs plugged in.",
+    "notes": "Drilling 2 sits above the hand drill's 1; screwing is also given. Needs mains or vehicle power, left to integration. The pistol shape and the cord coiled under the grip leave much of the box empty."
+  },
+  {
+    "id": "cordless_drill",
+    "model": "cordless_drill",
+    "name": "Cordless drill",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "drilling": 2,
+        "screwing": 1
+      }
+    },
+    "description": "A battery drill driver with a bit in the chuck.",
+    "notes": "Same frame as the power drill, standing on a slide-on battery pack. The impact wrench variant rides on this model: it would bring wrenching instead of drilling, set at integration. Battery use is left to integration. The pistol shape leaves much of the box empty."
+  },
+  {
+    "id": "distaff_spindle",
+    "model": "distaff_spindle",
+    "name": "Distaff and spindle",
+    "category": "tool",
+    "size": [
+      2,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "spinning": 1
+      }
+    },
+    "description": "A long stick that holds combed fibre and a weighted spindle that twists it into yarn.",
+    "notes": "Drawn as the distaff with a hank of fibre tied on, lying beside a drop spindle with a cop of yarn. Spinning is a new quality name. Two thin rods lying apart leave most of the box empty."
+  },
+  {
+    "id": "electric_jackhammer",
+    "model": "electric_jackhammer",
+    "name": "Electric breaker",
+    "category": "tool",
+    "size": [
+      4,
+      11
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "mining": 3
+      }
+    },
+    "twoHanded": true,
+    "description": "A heavy battery demolition hammer with a T handle and a steel point. It breaks rock and concrete.",
+    "notes": "Drawn lying down with its battery pack on the motor. Rock drilling 2 marks it above hand tools; how it breaks terrain and its power draw are left to integration. Two-handed. The T handle's span leaves most of the box empty."
+  },
+  {
+    "id": "fanning_mill",
+    "model": "fanning_mill",
+    "name": "Fanning mill",
+    "category": "misc",
+    "size": [
+      8,
+      9
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "fanning_mill",
+      "qualities": {
+        "winnowing": 2
+      }
+    },
+    "description": "A wooden grain cleaner. Turning the crank blows chaff away while the grain runs down the chute.",
+    "notes": "A placed machine, so it carries a workstation rather than a tool quality, as the drill press does. Drawn as a tabletop mill on a stand with grain in the hopper; the legs and drum leave open space in the box."
+  },
+  {
+    "id": "cutoff_disc",
+    "model": "cut_off_wheel",
+    "name": "Cut-off wheel",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A thin abrasive wheel for an angle grinder. It cuts steel.",
+    "notes": "One 230 mm wheel. A spare part for an angle grinder; how a grinder takes it is left to integration."
+  },
+  {
+    "id": "grinding_disc",
+    "model": "grinding_wheel",
+    "name": "Grinding wheel",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A thick abrasive wheel with a dished centre, for an angle grinder. It grinds and shapes steel.",
+    "notes": "One 180 mm depressed-centre wheel, thicker and smaller than the cut-off wheel so the two read apart."
+  },
+  {
+    "id": "hacksaw",
+    "model": "hacksaw",
+    "name": "Hacksaw",
+    "category": "tool",
+    "size": [
+      3,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "metal_cutting": 1,
+        "sawing": 1
+      }
+    },
+    "description": "A fine-toothed blade held tight in a steel frame. It cuts metal, and wood slowly.",
+    "notes": "metal_cutting 1, the hand grade below powered cutters, and sawing 1. A 12 inch blade with its frame and pistol grip is 41 cm."
+  },
+  {
+    "id": "bronze_hammer",
+    "model": "bronze_hammer",
+    "name": "Bronze hammer",
+    "category": "tool",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A rough-cast bronze head on a wooden haft. It drives nails well enough.",
+    "notes": "Made by hand, so it is rare in the world. Hammering 1, below the steel hammer's 2. Its own row because the cast double-faced head differs from the hammer family's claw hammer. The melee block is left to integration, copying the hammer's."
+  },
+  {
+    "id": "hand_drill",
+    "model": "hand_drill",
+    "name": "Hand drill",
+    "category": "tool",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "drilling": 1
+      }
+    },
+    "description": "A crank drill: turning the wheel spins the bit. Slow and tiring, but it needs no power.",
+    "notes": "Drawn as an eggbeater drill. The makeshift hand drill rides on this model. The crown wheel and crank stand out from a thin frame, so the box is mostly air."
+  },
+  {
+    "id": "rubber_hose",
+    "model": "hose",
+    "name": "Rubber hose",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "siphoning": 1
+      }
+    },
+    "description": "A coil of flexible rubber hose. It can siphon fuel out of a tank.",
+    "notes": "Siphoning is a new quality name. A coil is mostly air, so its box is mostly empty."
+  },
+  {
+    "id": "garden_hose",
+    "model": "hose",
+    "name": "Garden hose",
+    "category": "tool",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "hose": "plastic-green"
+    },
+    "tool": {
+      "qualities": {
+        "siphoning": 1
+      }
+    },
+    "description": "A coil of green garden hose. It can siphon fuel out of a tank.",
+    "notes": "A variant of the rubber hose recoloured on the shared model. The real garden hose is heavier and longer; its own mass should be set at integration."
+  },
+  {
+    "id": "makeshift_jack",
+    "model": "makeshift_jack",
+    "name": "Makeshift jack",
+    "category": "tool",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "jacking": 1
+      }
+    },
+    "description": "A small scissor jack bent up from scrap. It lifts a car if it holds.",
+    "notes": "Made by the player, so usage is empty. Uses the scissor jack family with a rusted frame. Jacking 1 matches the scissor jack; a scrap jack should not outlift a factory one."
+  },
+  {
+    "id": "jackhammer",
+    "model": "jackhammer",
+    "name": "Petrol breaker",
+    "category": "tool",
+    "size": [
+      4,
+      11
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "mining": 3
+      }
+    },
+    "twoHanded": true,
+    "description": "A petrol demolition hammer with a T handle and a steel point. It breaks rock and concrete, loudly.",
+    "notes": "Drawn lying down with a two-stroke engine, fuel tank and pull starter at the handle end. Rock drilling 2 as the electric breaker; fuel use and terrain breaking are left to integration. Two-handed. The T handle and engine block leave most of the box empty."
+  },
+  {
+    "id": "electric_kiln",
+    "model": "kiln",
+    "name": "Electric kiln",
+    "category": "misc",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "workstation": {
+      "id": "electric_kiln",
+      "qualities": {
+        "firing": 1
+      }
+    },
+    "description": "A small top-loading kiln lined with fire brick. It fires clay and bricks on mains power.",
+    "notes": "A placed machine, so it carries a workstation. firing is the quality name for firing clay, apart from charring. Needs mains or vehicle power, left to integration. Drawn as a 30 cm hobby kiln, because a smaller one cannot fire a brick."
+  },
+  {
+    "id": "gunsmith_kit",
+    "model": "gunsmith_repair_kit",
+    "name": "Gunsmith repair kit",
+    "category": "tool",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Police",
+        "Military",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "chiseling": 1,
+        "filing": 1,
+        "hammering": 1,
+        "metal_cutting": 1,
+        "prying": 1,
+        "repairing": 2,
+        "sawing": 1,
+        "screwing": 1,
+        "wrenching": 1
+      }
+    },
+    "description": "An aluminium case of gunsmithing tools: hammer, screwdrivers, files, a wrench, a punch, a small saw and a battery rotary tool.",
+    "notes": "Drawn open with its lid standing so the tools show, as repair trays do. repairing 2 is its main job, above a general repair kit's 1; the other qualities are set at kit grade 1. Battery use per repair is left to integration. The open lid leaves much of the box empty."
+  }
+]

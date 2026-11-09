@@ -1,0 +1,340 @@
+[
+  {
+    "id": "gold_ingot",
+    "model": "gold_ingot",
+    "name": "Gold bar",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A heavy cast bar of gold, a litre of it, stamped on top. Worth little now except as metal.",
+    "notes": "Cast as stacked 4 mm layers tapering 10 mm a side, 175 by 80 mm at the base and 84 mm tall, with a raised stamp plate on top. The five one-litre bars share this shape and differ in finish and mass. The bounding box counts the air round the taper. metal-gold draws it."
+  },
+  {
+    "id": "lead_ingot",
+    "model": "lead_ingot",
+    "name": "Lead bar",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A dull grey cast bar of lead, soft enough to dent with a thumbnail.",
+    "notes": "Cast as stacked 4 mm layers tapering 10 mm a side, 175 by 80 mm at the base and 84 mm tall, with a raised stamp plate on top. The five one-litre bars share this shape and differ in finish and mass. The bounding box counts the air round the taper. lead draws it."
+  },
+  {
+    "id": "platinum_ingot",
+    "model": "platinum_ingot",
+    "name": "Platinum bar",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier4"
+      ]
+    },
+    "description": "A pale cast bar of platinum, heavier than it looks.",
+    "notes": "Cast as stacked 4 mm layers tapering 10 mm a side, 175 by 80 mm at the base and 84 mm tall, with a raised stamp plate on top. The five one-litre bars share this shape and differ in finish and mass. The bounding box counts the air round the taper. metal-platinum draws it."
+  },
+  {
+    "id": "silver_ingot",
+    "model": "silver_ingot",
+    "name": "Silver bar",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "description": "A bright cast bar of silver, a litre of it, stamped on top.",
+    "notes": "Cast as stacked 4 mm layers tapering 10 mm a side, 175 by 80 mm at the base and 84 mm tall, with a raised stamp plate on top. The five one-litre bars share this shape and differ in finish and mass. The bounding box counts the air round the taper. metal-silver draws it."
+  },
+  {
+    "id": "tin_ingot",
+    "model": "tin_ingot",
+    "name": "Tin bar",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A silvery cast bar of tin, light for its size.",
+    "notes": "Cast as stacked 4 mm layers tapering 10 mm a side, 175 by 80 mm at the base and 84 mm tall, with a raised stamp plate on top. The five one-litre bars share this shape and differ in finish and mass. The bounding box counts the air round the taper. No tin or pewter finish exists, so steel-stainless stands in; it reads close to the silver and platinum bars."
+  },
+  {
+    "id": "cast_iron_chunk",
+    "model": "cast_iron_chunk",
+    "name": "Cast iron chunk",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A broken piece of cast iron with rough edges. Heavy enough to throw, or to melt down.",
+    "notes": "Three irregular slabs stacked into a lump about 52 by 34 by 28 mm. The bounding box counts the air round the irregular outline. iron-cast draws it."
+  },
+  {
+    "id": "cast_iron_lump",
+    "model": "cast_iron_lump",
+    "name": "Cast iron lump",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A heavy, misshapen lump of cast iron broken from something larger.",
+    "notes": "Three irregular slabs stacked into a lump about 76 by 50 by 44 mm. iron-cast draws it."
+  },
+  {
+    "id": "aluminium_ingot",
+    "model": "aluminium_ingot",
+    "name": "Aluminium bar",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A small cast bar of aluminium, light and dull grey. Soft metal, but it will knock in a nail.",
+    "notes": "The gold bar's tapered casting scaled down to 80 by 35 by 34 mm, in alu-bare."
+  },
+  {
+    "id": "copper_tube",
+    "model": "copper_tube",
+    "name": "Copper tube",
+    "category": "material",
+    "size": [
+      5,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A length of thin copper water tube. Too light to fight with, but handy for stills and plumbing.",
+    "notes": "A hollow tube 600 mm long and 22 mm across with a 1.2 mm wall, held by its middle. The explosively pumped flux compression generator is a different object and is left off this model; it needs its own model in a later batch. The size is a placeholder for a thing longer than a pack is deep."
+  },
+  {
+    "id": "pipe",
+    "model": "pipe",
+    "name": "Steel pipe",
+    "category": "material",
+    "size": [
+      5,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A length of threaded steel pipe. A good club, and the start of a lot of makeshift work.",
+    "notes": "A hollow half-inch pipe 600 mm long and 21 mm across with a 2.6 mm wall and a bright threaded band at each end, held by its middle. The makeshift crowbar variant shares this model as a plain pipe; a flattened, bent end would need its own model, and it should also bring prying. The size is a placeholder."
+  },
+  {
+    "id": "metal_fan_blades",
+    "model": "metal_fan_blades",
+    "name": "Metal fan blades",
+    "category": "material",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A five-bladed steel fan taken off its motor, the kind from a big desk fan or an oven.",
+    "notes": "Five flat paddle blades 300 mm across round a domed hub with a dark shaft bore, lying face up. The blades are drawn flat: pitching them needs a twisted prism the compound family lacks. steel-galvanised draws the blades and steel-grey the hub."
+  },
+  {
+    "id": "heavy_wire_rack",
+    "model": "heavy_wire_rack",
+    "name": "Heavy wire rack",
+    "category": "material",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sturdy steel rack from an oven or a grill, good for cooking over a fire.",
+    "notes": "A 600 by 400 mm frame of 6 mm rod round eleven 4 mm cross wires on two runners, in steel-stainless. The box is only 10 mm deep. Cooking over a fire with it has no quality name in use yet."
+  },
+  {
+    "id": "hinge",
+    "model": "hinge",
+    "name": "Hinge",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A heavy steel butt hinge with screw holes in both leaves, for a door or a chest lid.",
+    "notes": "A 100 mm hinge opened flat: two 3 mm leaves either side of a 10 mm knuckle with its pin ends showing, three screw holes painted dark in each leaf. The hinge itself is about 30 ml."
+  },
+  {
+    "id": "length_of_rail",
+    "model": "length_of_rail",
+    "name": "Length of rail",
+    "category": "material",
+    "size": [
+      8,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "anvil": 2
+      }
+    },
+    "description": "A one-metre length of railway rail, smooth on top and rusty everywhere else. Far too heavy to carry far; sawn in half it makes an anvil.",
+    "notes": "A flat-bottomed rail 172 mm tall on a 150 mm foot, built from four convex pieces, with a worn bright running top and two fishplate bolt holes at one end. The box counts the air round the I-shaped section. scrap-rusted draws the rail and steel-bright the running top. The size is a placeholder for a thing too long and heavy for a pack."
+  },
+  {
+    "id": "half_length_of_rail",
+    "model": "half_length_of_rail",
+    "name": "Half length of rail",
+    "category": "material",
+    "size": [
+      4,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "anvil": 2
+      }
+    },
+    "description": "Half a metre of railway rail with a flat, smooth top. Set on a stump, it serves as a rough anvil.",
+    "notes": "The same rail section as the full length, 500 mm long. The box counts the air round the I-shaped section. The size is a placeholder."
+  }
+]

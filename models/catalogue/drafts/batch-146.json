@@ -1,0 +1,200 @@
+[
+  {
+    "id": "pearl_collar",
+    "model": "pearl_collar",
+    "name": "Pearl collar",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A close-fitting choker of three strands of round, lustrous pearls held apart by gold spacer bars.",
+    "notes": "Lying flat, 150 mm across: three strands of 6 mm pearls in `pearl`, seven gold spacer bars and a gold box clasp at the back (-z). Slot `neck`, as necklaces and collars take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "pin_badge",
+    "model": "pin_badge",
+    "name": "Button badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.002
+    },
+    "description": "A small round badge with a printed face and a steel pin on the back, made to fasten on a jacket or bag.",
+    "notes": "Lying face up, 25 mm across: a rolled steel back and pin, a printed face in an orange ring, white field and black centre. Slot `badge`, as pinned brooches take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "radiation_badge",
+    "model": "radiation_badge",
+    "name": "Radiation badge",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.002
+    },
+    "description": "A plastic clip-on badge holding a strip of film that darkens for good as it takes in radiation.",
+    "notes": "Lying face up, 40 mm by 58 mm: a white holder (`enamel-white`) with a steel clip over its top edge (-z), an amber window over the film with two aluminium and one bronze filter square, and a yellow label with a black trefoil at +z; the trefoil is coarse at the 2 mm grain. Slot `badge`, worn on the lapel. A dosimeter quality may follow once Deadvox tracks radiation dose. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "engagement_ring",
+    "model": "engagement_ring",
+    "name": "Engagement ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A slim gold band with a large diamond ringed by six smaller ones in a raised setting.",
+    "notes": "Standing upright, 21 mm across, its hole facing +z: a gold band and a raised setting holding a brilliant ringed by six small stones in `gem-clear`. The model's box spans the finger hole. Slot `finger`, as other rings take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "promise_ring",
+    "model": "promise_ring",
+    "name": "Promise ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A flat silver band with a line of script engraved all the way round its outside.",
+    "notes": "Standing upright, 21 mm across and 6 mm wide, its hole facing +z: a silver band with the engraving as one continuous darker stripe (`steel-grey`) round its middle; separate marks read as dirt at tile scale. The model's box spans the finger hole. Slot `finger`, as other rings take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "signet_ring",
+    "model": "signet_ring",
+    "name": "Signet ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A heavy gold ring with a flat oval silver face. The crest stamped into it has worn almost smooth.",
+    "notes": "Standing upright, 21 mm across, its hole facing +z: a gold band rising to an oval table with a silver face and a faint crest in `steel-grey`. The model's box spans the finger hole. Slot `finger`, as other rings take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "wedding_ring",
+    "model": "wedding_ring",
+    "name": "Wedding ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain gold band with one small diamond set flush into it.",
+    "notes": "Standing upright, 21 mm across, its hole facing +z: a plain unbroken `metal-gold` band 4 mm wide with a small `gem-clear` stone set flush on top, so it reads apart from the raised setting of `engagement_ring`. The model's box spans the finger hole. Slot `finger`, as other rings take. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "service_medal",
+    "model": "service_medal",
+    "name": "Service medal",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "badge",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A bronze cross with a gold centre and star, hung from a striped ribbon on a pin bar, awarded for military service.",
+    "notes": "Lying face up, 35 mm wide and 92 mm long: a blue, cream and red ribbon drape with a brass pin bar at its top (-z), a ring, and a bronze cross with a gold boss and brass star at +z. Slot `badge`: it pins to the chest like a brooch, unlike the neck-ribbon medals that take `neck`. The worn look is pending: no worn model is authored."
+  }
+]

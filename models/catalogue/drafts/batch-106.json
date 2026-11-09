@@ -1,0 +1,763 @@
+[
+  {
+    "id": "ch_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_with_shoulder_guards",
+    "name": "Hardened steel brigandine with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-hardened",
+      "rivet": "steel-hardened"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.92,
+        "pierce": 0.75
+      }
+    },
+    "description": "A canvas vest lined with rows of hardened steel plates riveted through the cloth, buckled shut down the front, with a guard of overlapping hardened steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-hardened`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "ch_coat_brigandine",
+    "model": "hardened_steel_brigandine_coat",
+    "name": "Hardened steel brigandine coat",
+    "category": "clothing",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-hardened"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.92,
+        "pierce": 0.75
+      }
+    },
+    "description": "A long canvas coat lined with rows of hardened steel plates riveted through the cloth from collar to mid-thigh, its skirt split at the front for walking. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads take `steel-hardened`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "ch_coat_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "name": "Hardened steel brigandine coat with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-hardened",
+      "rivet": "steel-hardened"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.92,
+        "pierce": 0.75
+      }
+    },
+    "description": "A long canvas coat lined with rows of hardened steel plates riveted through the cloth from collar to mid-thigh, with a guard of overlapping hardened steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-hardened`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hc_brigandine",
+    "model": "high_carbon_steel_brigandine",
+    "name": "High steel brigandine",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-blued"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A canvas vest lined with rows of high carbon steel plates riveted through the cloth, bound in leather and buckled shut down the front. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads take `steel-blued`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hc_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_with_shoulder_guards",
+    "name": "High steel brigandine with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-blued",
+      "rivet": "steel-blued"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A canvas vest lined with rows of high carbon steel plates riveted through the cloth, buckled shut down the front, with a guard of overlapping high carbon steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-blued`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hc_coat_brigandine",
+    "model": "hardened_steel_brigandine_coat",
+    "name": "High steel brigandine coat",
+    "category": "clothing",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-blued"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A long canvas coat lined with rows of high carbon steel plates riveted through the cloth from collar to mid-thigh, its skirt split at the front for walking. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads take `steel-blued`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hc_coat_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "name": "High steel brigandine coat with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-blued",
+      "rivet": "steel-blued"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.35,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "A long canvas coat lined with rows of high carbon steel plates riveted through the cloth from collar to mid-thigh, with a guard of overlapping high carbon steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-blued`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "high_carbon_steel_brigandine",
+    "model": "high_carbon_steel_brigandine",
+    "name": "Mild steel brigandine",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.3,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A canvas vest lined with rows of mild steel plates riveted through the cloth, bound in leather and buckled shut down the front. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: two canvas front halves quilted into bands by the plates riveted inside, rivet heads in rows, leather binding at the hem and over the shoulders, three buckled straps across the front opening; the back panel shows at the neck. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_brigandine_with_shoulder_guards",
+    "model": "hardened_steel_brigandine_with_shoulder_guards",
+    "name": "Mild steel brigandine with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.3,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A canvas vest lined with rows of mild steel plates riveted through the cloth, buckled shut down the front, with a guard of overlapping mild steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine vest with a guard of four overlapping curved lames strapped to each shoulder and spread out to the sides. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_brigandine_coat",
+    "model": "hardened_steel_brigandine_coat",
+    "name": "Mild steel brigandine coat",
+    "category": "clothing",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.3,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A long canvas coat lined with rows of mild steel plates riveted through the cloth from collar to mid-thigh, its skirt split at the front for walking. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine body carried on below a leather-bound waist into a flared skirt of riveted plate rows, split at the front. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "model": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "name": "Mild steel brigandine coat with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.3,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A long canvas coat lined with rows of mild steel plates riveted through the cloth from collar to mid-thigh, with a guard of overlapping mild steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine coat with its split skirt, and a guard of four overlapping curved lames strapped to each shoulder and spread out to the sides. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "mc_brigandine",
+    "model": "high_carbon_steel_brigandine",
+    "name": "Medium steel brigandine",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-grey"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.32,
+        "cut": 0.88,
+        "pierce": 0.65
+      }
+    },
+    "description": "A canvas vest lined with rows of medium carbon steel plates riveted through the cloth, bound in leather and buckled shut down the front. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads take `steel-grey`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "mc_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_with_shoulder_guards",
+    "name": "Medium steel brigandine with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-grey",
+      "rivet": "steel-grey"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.32,
+        "cut": 0.88,
+        "pierce": 0.65
+      }
+    },
+    "description": "A canvas vest lined with rows of medium carbon steel plates riveted through the cloth, buckled shut down the front, with a guard of overlapping medium carbon steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-grey`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "mc_coat_brigandine",
+    "model": "hardened_steel_brigandine_coat",
+    "name": "Medium steel brigandine coat",
+    "category": "clothing",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-grey"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.32,
+        "cut": 0.88,
+        "pierce": 0.65
+      }
+    },
+    "description": "A long canvas coat lined with rows of medium carbon steel plates riveted through the cloth from collar to mid-thigh, its skirt split at the front for walking. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads take `steel-grey`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "mc_coat_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "name": "Medium steel brigandine coat with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-grey",
+      "rivet": "steel-grey"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0012,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.32,
+        "cut": 0.88,
+        "pierce": 0.65
+      }
+    },
+    "description": "A long canvas coat lined with rows of medium carbon steel plates riveted through the cloth from collar to mid-thigh, with a guard of overlapping medium carbon steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Shares the mild steel model; its rivet heads and shoulder lames take `steel-grey`. Slot vest: it is worn as the outer armour layer over a shirt or mail, as the stab vest is. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "qt_brigandine",
+    "model": "high_carbon_steel_brigandine",
+    "name": "Tempered brigandine",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.37,
+        "cut": 0.93,
+        "pierce": 0.78
+      }
+    },
+    "description": "A canvas vest lined with rows of tempered steel plates riveted through the cloth, bound in leather and buckled shut down the front. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: canvas over rows of hidden plates, so the outside shows quilted bands studded with rivet heads, bound in leather and closed with three buckled straps. Rides on batch 106's mild steel model `high_carbon_steel_brigandine`; its rivet heads take `steel-heat-tint`, the run's finish for tempered steel. Slot vest: it is worn as the outer armour layer over a shirt or mail, as batch 106's brigandines are. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "qt_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_with_shoulder_guards",
+    "name": "Tempered brigandine with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-heat-tint",
+      "rivet": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.37,
+        "cut": 0.93,
+        "pierce": 0.78
+      }
+    },
+    "description": "A canvas vest lined with rows of tempered steel plates riveted through the cloth, buckled shut down the front, with a guard of overlapping tempered steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine vest with a guard of four overlapping curved lames strapped to each shoulder and spread out to the sides, 730 mm across in all. Rides on batch 106's mild steel model `hardened_steel_brigandine_with_shoulder_guards`; its rivet heads and shoulder lames take `steel-heat-tint`, the run's finish for tempered steel. Slot vest: it is worn as the outer armour layer over a shirt or mail, as batch 106's brigandines are. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "qt_coat_brigandine",
+    "model": "hardened_steel_brigandine_coat",
+    "name": "Tempered brigandine coat",
+    "category": "clothing",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "attachPoints": [
+      {
+        "id": "left_shoulder",
+        "name": "left shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      },
+      {
+        "id": "right_shoulder",
+        "name": "right shoulder",
+        "reachSimSeconds": 0.5,
+        "standard": "brigandine"
+      }
+    ],
+    "finishes": {
+      "rivet": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.37,
+        "cut": 0.93,
+        "pierce": 0.78
+      }
+    },
+    "description": "A long canvas coat lined with rows of tempered steel plates riveted through the cloth from collar to mid-thigh, its skirt split at the front for walking. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine's body carried on into a skirt split at the front, 800 mm from collar to hem, riveted plates all the way down. Rides on batch 106's mild steel model `hardened_steel_brigandine_coat`; its rivet heads take `steel-heat-tint`, the run's finish for tempered steel. Slot vest: it is worn as the outer armour layer over a shirt or mail, as batch 106's brigandines are. Attach points: left and right shoulder are the laced points on the leather strap over the top of each front half, beside the neck opening, where shoulder guards mount. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "qt_coat_brigandine_shoulders",
+    "model": "hardened_steel_brigandine_coat_with_shoulder_guards",
+    "name": "Tempered brigandine coat with shoulder guards",
+    "category": "clothing",
+    "size": [
+      5,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "guard": "steel-heat-tint",
+      "rivet": "steel-heat-tint"
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.0007,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.37,
+        "cut": 0.93,
+        "pierce": 0.78
+      }
+    },
+    "description": "A long canvas coat lined with rows of tempered steel plates riveted through the cloth from collar to mid-thigh, with a guard of overlapping tempered steel lames strapped over each shoulder. It fits over mail.",
+    "notes": "Laid flat, outside up, neck towards -z: the brigandine coat with a four-lame guard strapped to each shoulder and spread out to the sides, 730 mm across and 800 mm long because the coat lies at full length. Rides on batch 106's mild steel model `hardened_steel_brigandine_coat_with_shoulder_guards`; its rivet heads and shoulder lames take `steel-heat-tint`, the run's finish for tempered steel. Slot vest: it is worn as the outer armour layer over a shirt or mail, as batch 106's brigandines are. No attach points: its shoulder guards are built in. The xl and xs sizes share the model. The worn look is pending: no worn model is authored."
+  }
+]

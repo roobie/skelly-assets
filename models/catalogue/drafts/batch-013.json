@@ -1,0 +1,329 @@
+[
+  {
+    "id": "plastic_tub",
+    "model": "plastic_tub",
+    "name": "Plastic tub",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A square plastic tub with a snap-on lid and a carry handle. Holds about 4 litres.",
+    "notes": "A 4.5 litre ice-cream tub, 190 mm across the lip and 166 mm tall with its lid. The handle stands up over the lid, so the box is larger than the tub."
+  },
+  {
+    "id": "pressurized_canister",
+    "model": "pressurized_canister",
+    "name": "Gas canister",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small steel cylinder for compressed gas, with a plastic valve head.",
+    "notes": "120 mm tall and 40 mm across. Gas charges have no content field yet. The valve head is black plastic."
+  },
+  {
+    "id": "remote_control_car_box",
+    "model": "remote_control_car_box",
+    "name": "Toy car box",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            2
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A printed cardboard box for a remote-controlled toy car and its controller.",
+    "notes": "300 by 150 by 80 mm, standing on its long edge so the printed front faces out: a red car and a black remote on a blue panel. The yellow board is plastic-yellow, the nearest bright print finish. The pocket grid is a placeholder; its toy car contents wait on the refactor."
+  },
+  {
+    "id": "shot_glass",
+    "model": "shot_glass",
+    "name": "Shot glass",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small, thick-bottomed glass that holds one measure of spirits.",
+    "notes": "48 mm across the rim and 58 mm tall, with a 14 mm solid base. glass-clear is drawn opaque in the tiles but stays see-through in the game."
+  },
+  {
+    "id": "small_propane_tank",
+    "model": "small_propane_tank",
+    "name": "Propane cylinder (small)",
+    "category": "misc",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A small green steel cylinder of propane with a brass valve. Fuels camping stoves and torches.",
+    "notes": "300 mm tall and 116 mm across, painted plastic-green for lack of a green paint. Fuel charges and fitting it to a stove have no content field yet. The biogas tank shares the shape."
+  },
+  {
+    "id": "small_squeeze_tube",
+    "model": "small_squeeze_tube",
+    "name": "Small squeeze tube",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A tiny single-use plastic tube that holds a few millilitres. It cannot be refilled once empty.",
+    "notes": "30 mm long and 10 mm across, lying down: crimped tail, white body, short nozzle and red cap. Refusing a refill has no content field yet."
+  },
+  {
+    "id": "caulk_cartridge",
+    "model": "caulk_cartridge",
+    "name": "Caulk cartridge",
+    "category": "misc",
+    "size": [
+      3,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An empty plastic cartridge for caulk, sealant or paste, with a long cut nozzle.",
+    "notes": "A 10.1 ounce cartridge, 50 mm across and 265 mm long with its nozzle, lying down. The box counts the nozzle and the air round the tube. The 2.8 ounce tube rides here, though a hand-squeezed tube with a crimped end would read better with its own model."
+  },
+  {
+    "id": "leaflet_stand",
+    "model": "leaflet_stand",
+    "name": "Leaflet stand",
+    "category": "misc",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A clear plastic counter stand for showing leaflets.",
+    "notes": "220 mm wide, 300 mm tall and 170 mm deep: a leaning back panel on a flat base with a front pocket. One cream leaflet stands in it so the clear stand reads as a leaflet holder; plastic-clear is drawn opaque in the tiles but stays see-through in the game. The stand is mostly open space."
+  },
+  {
+    "id": "engine_kit_box",
+    "model": "engine_kit_box",
+    "name": "Science kit box",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            2
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A printed cardboard box for a children's engine-building kit.",
+    "notes": "The same 300 by 150 by 80 mm carton as remote_control_car_box, green with two children and a flywheel engine printed on a cream panel, so the two boxes read apart. Faces are paint-terracotta, the nearest skin tone. The pocket grid is a placeholder; the kit contents wait on the refactor."
+  },
+  {
+    "id": "sealed_stomach",
+    "model": "sealed_stomach",
+    "name": "Sealed stomach",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "description": "A cleaned animal stomach tied shut with cord. Holds about 1.5 litres of water.",
+    "notes": "The model is drawn swollen with water, 210 by 140 mm, the shape a player recognises; a flat empty skin would not read. wax-cream stands in for gutskin; a pale translucent gut finish would suit it better. A crafted item, so it has no loot economy. Holding water has no content field yet."
+  },
+  {
+    "id": "wooden_barrel",
+    "model": "wooden_barrel",
+    "name": "Wooden barrel",
+    "category": "misc",
+    "size": [
+      5,
+      7
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A 100 litre oak barrel bound with steel hoops, with a bung in its side.",
+    "notes": "490 mm across the bilge and 720 mm tall, which suits a 100 L barrel. wood-pine stands in for oak; a mid-brown oak finish would suit it better. The size is a placeholder for a thing too big to carry far."
+  },
+  {
+    "id": "butcher_paper",
+    "model": "butcher_paper",
+    "name": "Butcher paper",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sheet of heavy wrapping paper. Burns well.",
+    "notes": "The model is a 240 mm sheet folded once and lying loose, the shape a player recognises, and the item size is the folded sheet. paperboard-tan is the nearest brown paper. The small wrapper rides here."
+  },
+  {
+    "id": "foil_sheet",
+    "model": "foil_sheet",
+    "name": "Foil sheet",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A torn-off sheet of kitchen foil, large enough to wrap food for the fire.",
+    "notes": "The model is a 300 mm sheet lying loosely crumpled, and the item size is the sheet folded. Foil is no cooking vessel, so it has no cooking quality."
+  },
+  {
+    "id": "foil_roll",
+    "model": "foil_roll",
+    "name": "Foil roll",
+    "category": "material",
+    "size": [
+      3,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A roll of kitchen foil on a cardboard core.",
+    "notes": "300 mm long, 56 mm across, with a loose tail unrolled in front of it. The foil is stored as charges; how many sheets it holds has no content field yet."
+  },
+  {
+    "id": "extra_large_propane_tank",
+    "model": "extra_large_propane_tank",
+    "name": "Propane tank (420 lb)",
+    "category": "misc",
+    "size": [
+      6,
+      12
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A large white steel propane tank with a guard collar over a brass valve. Used to heat a house or run a vehicle.",
+    "notes": "600 mm across and 1220 mm tall, drawn upright with domed ends on a foot ring. Fuel charges and connecting it to a heater have no content field yet. The handwheel is black plastic. The biogas tank shares the shape. The size is a placeholder for a thing too heavy to carry."
+  }
+]

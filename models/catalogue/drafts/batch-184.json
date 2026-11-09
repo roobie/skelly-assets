@@ -1,0 +1,416 @@
+[
+  {
+    "id": "flotation_vest",
+    "model": "flotation_vest",
+    "name": "Life vest",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.002
+    },
+    "description": "A bright orange vest packed with foam that holds a swimmer's head above water, closed with three buckled straps. Bulky to wear, but it floats.",
+    "notes": "Laid flat, front up, 500 mm wide and 560 mm long with 60 mm thick ribbed foam panels either side of the front opening, a collar roll across the back of the neck at +z, the armholes, three black buckled straps and a reflective label. Slot `vest`, as chest rigs have it, since it goes on over a shirt. Usage adds Industrial for boat and dock stores. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "hide_float",
+    "model": "hide_float",
+    "name": "Hide float",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "vest",
+      "wearPerDamage": 0.003
+    },
+    "description": "Four animal hides blown up like bladders, tied shut at the neck and lashed to a rawhide harness. Clumsy and warm, but it keeps a body afloat.",
+    "notes": "Laid flat, front up, about 490 mm by 560 mm and 120 mm tall: four inflated hides in two rows, each tied at the neck with a spout and bound round with two leather bands onto a flat rawhide harness, with flat shoulder straps at +z and a belt with tie ends at -z. `skin-rawhide` for the hides and harness and `leather-tan` for the bands and straps. Slot `vest`, as the life vest has it. A crafted item; Hunting usage for the camps where it would be made. The look step's volume ratio comes from the hides standing inflated. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "halter_top",
+    "model": "halter_top",
+    "name": "Halter top",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A short cotton top with two cups that tie behind the neck and leave the back and shoulders bare.",
+    "notes": "Laid flat, about 260 mm wide and 350 mm long with its ties: a short yellow body, two cups rising to a knotted halter tie at +z, cream seams and ties, and a tie-back at the hem. Slot `torso`, as shirts have it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "cropped_hoodie",
+    "model": "cropped_hoodie",
+    "name": "Cropped hoodie",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            2,
+            1
+          ],
+          "handlingSimSeconds": 0.6,
+          "name": "pouch"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A warm cotton hooded sweatshirt cut short above the stomach, with a pouch pocket and drawcords at the hood.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 320 mm by 230 mm and 50 mm tall: the hood folded down over the neck, drawcords, a kangaroo pocket, the sleeves folded in along the sides with charcoal ribbed cuffs, and a ribbed hem band. Built on `g.jacket` with no front opening. Slot `torso`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "jersey",
+    "model": "jersey",
+    "name": "Sports jersey",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A light, breathable synthetic shirt in team colours, with a big number across the chest.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm by 280 mm and 30 mm tall: a white V neck, short sleeves with white bands, white side panels and a white number seven. `lycra-blue` stands in for the nylon and lycra knit. Slot `torso`. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "leotard",
+    "model": "leotard",
+    "name": "Leotard",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A skin-tight stretch garment from shoulders to hips, cut high at the legs and low at the neck. Made for the stage and the gym.",
+    "notes": "Laid flat, about 200 mm wide and 380 mm long: thin shoulder straps at +z, a scoop neck, the body narrowing to a high-cut crotch, and black binding round the neck and leg openings. `lycra-red` with `lycra-black` trim. Slot `torso`. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "long_sleeved_shirt",
+    "model": "long_sleeved_shirt",
+    "name": "Long-sleeved shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.6,
+          "name": "chest"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A plain cotton shirt with long sleeves, buttoned down the front and at the cuffs.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm square and 40 mm tall: a turned-down collar, a five-button placket, one chest pocket and the sleeves folded in along the sides with buttoned cuffs, on `g.jacket`. Green cotton (`cloth-green`) so it reads apart from the white and blue shirts. Slot `torso`. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "maid_dress",
+    "model": "maid_dress",
+    "name": "Maid's dress",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A blue costume dress with long sleeves, a white collar and cuffs, and a frilly white apron tied at the waist with a bow.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 320 mm by 400 mm and 50 mm tall: a white collar round the neck, the sleeves folded along the sides with white cuffs, and the frilled white apron laid over the skirt, its band wrapped round the bundle and tied in a bow. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The XL and XS sizes share this model. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "short_maid_dress",
+    "model": "short_maid_dress",
+    "name": "Short maid's dress",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.004
+    },
+    "description": "A short, light black costume dress with a white collar and cuffs and a frilly white apron tied with a bow.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm by 320 mm and 35 mm tall, built as the long dress but black and smaller. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The XL and XS sizes share this model. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "mummy_dress",
+    "model": "mummy_dress",
+    "name": "Mummy dress",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.005
+    },
+    "description": "A short off-white costume dress printed to look like old, torn burial wrappings. Easy to move in, and no protection at all.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm by 340 mm and 30 mm tall, with crossing wrap bands printed over it and torn wrap ends trailing off the hem. Mass 0.15 kg, as befits a cotton dress. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "dragon_dress",
+    "model": "dragon_dress",
+    "name": "Dragon dress",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A short black dress with long sleeves, red trim and a red dragon coiling up the front. Style first, but it moves well.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm by 340 mm and 40 mm tall: a red mandarin collar and wrap edge, the sleeves folded along the sides with red cuffs, a red waist seam and hem band, and a red waist tie knotted at the side with its ends hanging straight. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "sleeveless_dragon_dress",
+    "model": "sleeveless_dragon_dress",
+    "name": "Sleeveless dragon dress",
+    "category": "clothing",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A short black sleeveless dress with red trim and a red dragon coiling up the front.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. The same dress without sleeves: the armholes cut into each side edge and bound in red. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "polo_shirt",
+    "model": "polo_shirt",
+    "name": "Polo shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A short-sleeved cotton knit shirt with a soft collar and a three-button neck, a little heavier than a T-shirt.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm by 290 mm and 35 mm tall: a flat knit collar, a short three-button placket, short sleeves with ribbed bands and a small red stitched logo, in navy. Slot `torso`. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "postman_shirt",
+    "model": "postman_shirt",
+    "name": "Mail carrier's shirt",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.6,
+          "name": "left"
+        },
+        {
+          "grid": [
+            1,
+            1
+          ],
+          "handlingSimSeconds": 0.6,
+          "name": "right"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.003
+    },
+    "description": "A light blue short-sleeved work shirt with two flapped chest pockets and a postal service patch on the sleeve.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 300 mm square and 40 mm tall: a pointed collar, a five-button placket, two flapped chest pockets with snaps, short sleeves, and a navy patch on the left sleeve. `cloth-denim-faded` for the light blue. Slot `torso`. The model keeps a real folded size. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "santa_dress",
+    "model": "santa_dress",
+    "name": "Santa dress",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "torso",
+      "wearPerDamage": 0.0015
+    },
+    "description": "A red long-sleeved holiday dress trimmed with white faux fur at the collar, cuffs and hem, belted in black with a gold buckle.",
+    "notes": "Folded on a shelf, neck at the +z end and the hem folded under at -z. 320 mm by 360 mm and 60 mm tall: a rolled fur collar, the sleeves folded along the sides with fur cuffs, a fur band across the skirt near the hem, and a black belt with a gold buckle round the bundle at the waist. `fur-pale` stands in for the faux fur. Slot `torso`; it also covers the legs, so the legs slot should be blocked once the slot model allows it. The worn look is pending: no worn model is authored."
+  }
+]

@@ -1,0 +1,511 @@
+[
+  {
+    "id": "tempered_steel_leg_guards",
+    "model": "tempered_steel_leg_guards",
+    "name": "Tempered steel leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.5,
+        "cut": 0.9,
+        "pierce": 0.7
+      }
+    },
+    "description": "Quenched and tempered steel plates for the thighs and shins with domed knee cops and mail at the joints, strapped on with leather.",
+    "notes": "Per leg a thigh plate and a shin plate crown up, a domed knee cop with a side wing, mail gussets beside the knee and a mail fringe at the hip, two buckled straps per plate. Slot shins follows the full brigandine leg guards of earlier batches. The model's box is the pair laid out side by side. The large size shares this model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "riot_leg_guards",
+    "model": "riot_leg_guards",
+    "name": "Riot leg guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0.3,
+        "blunt": 0.6,
+        "cut": 0.6,
+        "pierce": 0.5
+      }
+    },
+    "description": "Moulded plastic shin shells with knee cups and hinged instep guards, padded inside and fastened with hook-and-loop straps.",
+    "notes": "Per leg a domed knee cup, a grey shin shell with a black raised ridge and dark padding along its edges, a hinged black instep guard and two black hook-and-loop straps. The instep guard stands for foot cover, and the slot stays shins. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "turnout_trousers",
+    "model": "turnout_trousers",
+    "name": "Turnout trousers",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            2,
+            2
+          ],
+          "handlingSimSeconds": 0.7,
+          "name": "left cargo"
+        },
+        {
+          "grid": [
+            2,
+            2
+          ],
+          "handlingSimSeconds": 0.7,
+          "name": "right cargo"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "legs",
+      "wearPerDamage": 0.0008,
+      "protects": {
+        "acid": 0.2,
+        "blunt": 0.2,
+        "cut": 0.4,
+        "pierce": 0.2
+      }
+    },
+    "description": "Heavy flame-resistant firefighting trousers with reflective bands, knee patches and red braces.",
+    "notes": "Folded with reflective bands at the cuff end, a bellows cargo pocket, a black knee patch and red braces laid over the top. Heat protection is pending a fire damage type, so protects lists only the existing damage kinds. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "padded_canvas_trousers",
+    "model": "padded_canvas_trousers",
+    "name": "Patch-padded canvas trousers",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "front left"
+        },
+        {
+          "grid": [
+            1,
+            2
+          ],
+          "handlingSimSeconds": 0.5,
+          "name": "front right"
+        }
+      ]
+    },
+    "wearable": {
+      "slot": "legs",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.25,
+        "pierce": 0.1
+      }
+    },
+    "description": "Tough canvas trousers with a layer of cotton padding quilted over them in diamond stitching.",
+    "notes": "Folded with the raised padding layer over the top face, quilted in diamonds with stitching a shade lighter than the cloth. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "carpet_greaves",
+    "model": "carpet_greaves",
+    "name": "Carpet greaves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.2,
+        "cut": 0.3,
+        "pierce": 0.2
+      }
+    },
+    "description": "Squares of carpet curled round the shins, open at the back, and held on with duct tape.",
+    "notes": "Per leg one open carpet roll, its open back turned up to show the pile over the jute backing, taped twice. The model's box is the pair laid out side by side. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "carpet_legguards",
+    "model": "carpet_legguards",
+    "name": "Carpet leg guards",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.003,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.2,
+        "cut": 0.3,
+        "pierce": 0.2
+      }
+    },
+    "description": "Squares of carpet curled round the shins and thighs, open at the back, and held on with duct tape.",
+    "notes": "Per leg an open shin roll and a wider open thigh roll, each taped twice, open backs turned up to show the pile over the jute backing. Slot shins follows the full leg guards of earlier batches. The model's box is the pair laid out side by side. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_mail_half_leggings",
+    "model": "hardened_steel_mail_half_leggings",
+    "name": "Hardened mail half-leggings",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "overlegs",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.85,
+        "pierce": 0.4
+      }
+    },
+    "description": "Hardened steel mail leggings that cover only the fronts and sides of the legs, laced closed up the back. They stop short of the feet, so they go on over footwear.",
+    "notes": "Laid flat, ridged in rows of rings, with leather-bound open edges and a zigzag lace each side. The model's box is the mail laid flat, running 760 mm. Slot overlegs is new: chaps and mail leggings go over trousers and under leg plates, and no earlier slot covers that layer. The large and small sizes share this model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_steel_mail_leggings",
+    "model": "hardened_steel_mail_leggings",
+    "name": "Hardened mail leggings",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "overlegs",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.15,
+        "cut": 0.85,
+        "pierce": 0.4
+      }
+    },
+    "description": "Hardened steel mail leggings held up by straps from the belt. They stop short of the toes and heels, so they go on over footwear.",
+    "notes": "Laid flat, ridged in rows of rings, with a leather garter and belt point at the top and a stirrup strap under the open instep. The model's box is the mail laid flat, running 960 mm with the belt points. Slot overlegs is new: chaps and mail leggings go over trousers and under leg plates, and no earlier slot covers that layer. The large and small sizes share this model. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "rusty_mail_leggings",
+    "model": "hardened_steel_mail_leggings",
+    "name": "Rusty mail leggings",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "mail": "rust-red"
+    },
+    "wearable": {
+      "slot": "overlegs",
+      "wearPerDamage": 0.002,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.1,
+        "cut": 0.65,
+        "pierce": 0.3
+      }
+    },
+    "description": "Mail leggings held up by straps from the belt, rusted through in places and missing rings here and there.",
+    "notes": "Rides on the hardened mail leggings' model with rust-red mail; missing rings do not show. Slot overlegs is new: chaps and mail leggings go over trousers and under leg plates, and no earlier slot covers that layer. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sheet_steel_leg_guards",
+    "model": "hardened_sheet_steel_leg_guards",
+    "name": "Hardened sheet steel leg guards",
+    "category": "clothing",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Crude guards of hardened sheet steel bent round the thighs and shins, with domed knee cops, riveted and strapped on with leather.",
+    "notes": "Per leg a thigh plate and a shin plate bent in four facets, a domed knee cop, rivets at the plate ends and two buckled straps per plate. Hardened steel uses `steel-hardened`. The model's box is the pair laid out side by side. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sheet_steel_greaves",
+    "model": "hardened_sheet_steel_greaves",
+    "name": "Hardened sheet steel greaves",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "shins",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Crude hardened sheet steel plates bent round the shins, riveted and strapped on with leather.",
+    "notes": "Per leg one shin plate bent in four facets, riveted at its ends, with two buckled straps. The model's box is the pair laid out side by side. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sheet_steel_skirt",
+    "model": "hardened_sheet_steel_skirt",
+    "name": "Hardened sheet steel skirt",
+    "category": "clothing",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "hips",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.4,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "A loose skirt of cut-down hardened steel sheets riveted to a leather belt, hanging over the hips and upper thighs.",
+    "notes": "Laid flat, outside up: five overlapping plates with rolled hems, riveted to a buckled belt. Slot hips is new: the skirt hangs from the waist over the hips and thighs, under neither a belt's waist slot nor the leg guards' shins slot. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "hardened_sheet_steel_knee_guards",
+    "model": "hardened_sheet_steel_knee_guards",
+    "name": "Hardened sheet steel knee guards",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "knees",
+      "wearPerDamage": 0.001,
+      "protects": {
+        "acid": 0.1,
+        "blunt": 0.5,
+        "cut": 0.85,
+        "pierce": 0.6
+      }
+    },
+    "description": "Faceted cops of hardened sheet steel over the kneecaps, each with a side wing and a leather strap.",
+    "notes": "Standing dome up with a riveted boss, a wing on the outer side and a strap each way. The model's box is the pair laid out side by side. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "chainsaw_chaps",
+    "model": "chainsaw_chaps",
+    "name": "Chainsaw chaps",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "overlegs",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.1,
+        "cut": 0.8,
+        "pierce": 0.3
+      }
+    },
+    "description": "Orange chaps of layered aramid that fray and clog a chainsaw's chain on contact, buckled round the backs of the legs.",
+    "notes": "Laid flat, outside up: two front panels quilted lengthwise, four buckled leg straps on each outer edge, a label patch and a webbing waist belt. The model's box is the chaps laid out. Slot overlegs is new: chaps and mail leggings go over trousers and under leg plates, and no earlier slot covers that layer. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  },
+  {
+    "id": "leather_chaps",
+    "model": "leather_chaps",
+    "name": "Leather chaps",
+    "category": "clothing",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "overlegs",
+      "wearPerDamage": 0.0015,
+      "protects": {
+        "acid": 0,
+        "blunt": 0.1,
+        "cut": 0.45,
+        "pierce": 0.2
+      }
+    },
+    "description": "Black leather chaps buckled at the waist and zipped down the outside of each leg. Tough and light, with no pockets.",
+    "notes": "Laid flat, outside up: two leg panels with a tan-whipstitched welt and a zip down each outer edge, a buckled belt and a laced front. The model's box is the chaps laid out. Slot overlegs is new: chaps and mail leggings go over trousers and under leg plates, and no earlier slot covers that layer. The worn look is pending: clothing gets inventory and ground models only until a fitted worn family exists."
+  }
+]

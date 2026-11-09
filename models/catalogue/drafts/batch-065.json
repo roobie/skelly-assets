@@ -1,0 +1,393 @@
+[
+  {
+    "id": "air_launcher",
+    "model": "air_launcher",
+    "name": "Toy air launcher",
+    "category": "misc",
+    "size": [
+      2,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A chunky plastic toy gun that fires soft darts and small objects with a puff of compressed air. Reloading it means pumping the chamber under the barrel.",
+    "notes": "Lies along x, muzzle at +x: blue barrel with an orange safety tip, yellow stock and pistol grip, pump chamber below. The model is stubby and fat-barrelled, like a break-open grenade launcher. No qualities: it is a toy, and its launching use has no content field."
+  },
+  {
+    "id": "airhorn",
+    "model": "airhorn",
+    "name": "Air horn",
+    "category": "tools",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "noise_making": 1
+      }
+    },
+    "description": "A small can of compressed gas with a plastic horn on top. Pressing the button lets out a very loud blast.",
+    "notes": "Stands upright, bell facing +z. The item is one can. The bounding box takes in the air beside the can and under the horn. noise_making reuses the talking doll's quality name for the sound."
+  },
+  {
+    "id": "wind_up_alarm_clock",
+    "model": "wind_up_alarm_clock",
+    "name": "Wind-up alarm clock",
+    "category": "tools",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "timekeeping": 1
+      }
+    },
+    "description": "A twin-bell clock wound by keys at the back. The alarm rings loud enough to wake a heavy sleeper.",
+    "notes": "Face on +z: red case on splayed feet, cream dial with black hands behind glass, steel bells and hammer on top, wing keys at the back. The tiles draw the glass opaque, hiding the dial; it is see-through in game. The bells, feet and keys stand out round the case. timekeeping reuses the watches' quality; the alarm has no content field. Disassembly is left for when yields are applied."
+  },
+  {
+    "id": "clay_urn",
+    "model": "clay_urn",
+    "name": "Clay urn",
+    "category": "container",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A lidded urn of fired clay with a dark band round the shoulder, made to hold ashes.",
+    "notes": "A turned terracotta vessel 32 cm tall with a lid and knob. The box is the round belly in a square box. A clay pot holds liquid and can be set over a fire."
+  },
+  {
+    "id": "cow_bell",
+    "model": "cow_bell",
+    "name": "Cow bell",
+    "category": "tools",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "noise_making": 1
+      }
+    },
+    "description": "A flared steel bell on a rubber strap, with a clapper hanging inside. It clanks with every step of whatever wears it.",
+    "notes": "Lies on its side with the mouth towards the viewer and the clapper resting in it, 19 cm long with its strap. The mouth is painted dark because compound pieces only add. The bell is a hollow shell and the box takes in the strap. noisemaker as the air horn."
+  },
+  {
+    "id": "crystal_urn",
+    "model": "crystal_urn",
+    "name": "Crystal urn",
+    "category": "container",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A footed urn of cut crystal with a domed lid, its sides worked with frosted floral bands. Made to hold ashes.",
+    "notes": "Footed and lidded, 30 cm tall; the cut floral pattern is frosted bands and rosettes. The tiles draw the crystal opaque; it is see-through in game. It shares no model with the clay urn because its foot and egg shape differ. Its qualities are those of the clay urn."
+  },
+  {
+    "id": "dressage_whip",
+    "model": "dressage_whip",
+    "name": "Dressage whip",
+    "category": "misc",
+    "size": [
+      1,
+      8
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A long, thin riding whip that tapers to a fine point, with a braided grip and a short lash at the tip.",
+    "notes": "Lies along x, 110 cm, tip at +x. No melee stats: it stings rather than wounds, and tuning is left for when it is applied."
+  },
+  {
+    "id": "folding_shovel",
+    "model": "folding_shovel",
+    "name": "Folding shovel",
+    "category": "tools",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1,
+        "digging": 3
+      }
+    },
+    "description": "A compact army spade that folds in half for carrying. Its blade digs, chops roots and, at a pinch, holds a pan's worth of food over a fire.",
+    "notes": "Folded for carry, 23 cm long: olive blade laid flat over the steel shaft, locking collar at the hinge (+x), rubber grip and knob at -x. Digging reuses the halligan's name and cutting the existing name. The unfolded state has no model; it would need its own if Deadvox shows it."
+  },
+  {
+    "id": "etched_skull",
+    "model": "etched_skull",
+    "name": "Etched skull",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A human skull with rings and lines scratched deep into the bone of the crown.",
+    "notes": "Face on +z, 17 cm tall with the jaw. The etchings are dotted dark rings and meridians over the crown. The round cranium and narrow face leave much of the box empty. No qualities."
+  },
+  {
+    "id": "fur_rollmat",
+    "model": "fur_rollmat",
+    "name": "Fur bedroll",
+    "category": "tools",
+    "size": [
+      1,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Sewn pelts rolled up tight and tied with two hide thongs. Unrolled on the ground, it keeps the cold out of a sleeper.",
+    "notes": "Rolled along x, 50 cm long and 13 cm across, the ends showing the hide side in rings. A pelt mat rolls fat. The unrolled state, placed as a bed, has no model; it would need one when the bed is applied."
+  },
+  {
+    "id": "glass_cutter",
+    "model": "glass_cutter",
+    "name": "Glass cutter",
+    "category": "tools",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "glass_cutting": 1
+      }
+    },
+    "description": "A pen-shaped cutter with a small steel wheel that scores glass, so a pane snaps cleanly along the line. Notches in its head help break off narrow strips.",
+    "notes": "Lies along x, 16 cm, wheel at +x. A pencil-style scoring cutter is small and light, and the model follows that. glass_cutting is a new quality name."
+  },
+  {
+    "id": "hand_pump",
+    "model": "hand_pump",
+    "name": "Hand pump",
+    "category": "tools",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "air_supply": 1
+      }
+    },
+    "description": "A small push pump with a T handle and an inflation needle that folds out of its head, for balls, tyres and air mattresses.",
+    "notes": "Lies along x, 29 cm with the handle pulled out, needle at +x. air_supply reuses the air compressor's quality name at the lowest level, for filling inflatables."
+  },
+  {
+    "id": "large_space_heater",
+    "model": "large_space_heater",
+    "name": "Large space heater",
+    "category": "tools",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A heavy electric fan heater in a steel cabinet, with two dials and a carry handle. Plugged in, it warms a whole room.",
+    "notes": "Face on +z: cream cabinet 30 by 28 by 16 cm on two feet, slotted steel grille over a dark recess, two knobs and an orange lamp, handle on top. The model keeps a plausible size for a heater. The running state is its own draft with the recess glowing. Power use and heat have no content field."
+  },
+  {
+    "id": "large_space_heater_running",
+    "model": "large_space_heater",
+    "name": "Large space heater (running)",
+    "category": "tools",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "lamp": "glow-flame",
+      "recess": "glow-flame"
+    },
+    "description": "A heavy electric fan heater blowing hot air, its elements glowing behind the grille.",
+    "notes": "Shares the large space heater's model; the glowing recess and lamp tell the running state apart."
+  },
+  {
+    "id": "leather_bellows",
+    "model": "leather_bellows",
+    "name": "Hand bellows",
+    "category": "tools",
+    "size": [
+      2,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "winnowing": 1
+      }
+    },
+    "description": "Two wooden boards joined by pleated leather, with a brass nozzle. Squeezing the handles together drives a strong blast of air into a fire.",
+    "notes": "Lies along x, 53 cm, nozzle at +x: pear-shaped oak boards, pleated leather between, handles at -x. The box is mostly the boards' outline and the gap between the handles. winnowing reuses the existing name."
+  },
+  {
+    "id": "notched_stick",
+    "model": "notched_stick",
+    "name": "Notched stick",
+    "category": "material",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thick stick with a flat face and notches cut along it, two of them blackened. It is the hearth board for a fire drill.",
+    "notes": "Lies along x, 32 cm and 5 cm thick: barked branch, shaved pale face on top, three notches, the two used ones charred. The notches are painted on because compound pieces only add. Making embers with a drill has no content field yet."
+  }
+]

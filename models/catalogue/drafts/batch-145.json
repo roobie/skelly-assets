@@ -1,0 +1,586 @@
+[
+  {
+    "id": "leather_cat_ears",
+    "model": "leather_cat_ears",
+    "name": "Cat ear headband",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A thin black headband with two pointed leather cat ears, lined in pink.",
+    "notes": "Standing on its tips, 144 mm across and 138 mm tall: a black plastic band (`plastic-matte-black`), glossy leather ears (`leather-patent`) lined in `plastic-pink`. Slot `head`, as hats take. The model's box spans the open band. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "leather_cat_tail",
+    "model": "leather_cat_tail",
+    "name": "Leather cat tail",
+    "category": "clothing",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "fits": [
+      "belt"
+    ],
+    "wearable": {
+      "wearPerDamage": 0.0012
+    },
+    "description": "A long glossy black leather tail weighted with plastic beads, with a strap loop that snaps round a belt.",
+    "notes": "Lying on the floor in a loose S, 592 mm long and 30 mm thick at the root, tapering to the tip, with a snapped strap loop at the root. Mounting gear: `fits: [\"belt\"]` and no slot, since it hangs from a belt. The model's box spans the curve of the tail. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "leather_collar",
+    "model": "leather_collar",
+    "name": "Leather collar",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A black leather collar with a steel buckle and a small bell hanging from a front ring. The bell has no clapper.",
+    "notes": "Lying flat, 130 mm across and 24 mm tall: a closed black leather band, a steel buckle at the back, a steel ring at the front and a brass bell lying beside it. The model's box spans the open band. New slot `neck`: no slot fits a necklace or collar. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "teeth_necklace",
+    "model": "teeth_necklace",
+    "name": "Teeth necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0012
+    },
+    "description": "A leather thong strung with nine pointed animal teeth, the longest in the middle.",
+    "notes": "Lying flat, 200 mm across: a tan leather thong loop with nine bone teeth along its front. Slot `neck`, as the leather collar names it. The model's box spans the open loop. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_bracelet",
+    "model": "onyx_gold_bracelet",
+    "name": "Onyx and gold bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold bangle set round its rim with six polished black onyx stones.",
+    "notes": "A gold bangle lying flat, 72 mm across, six domed onyx stones (`gem-onyx`) round its top. The model's box spans the open loop. New slot `wrist`: no slot fits a bracelet; a later sided slot pair may replace it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_cufflinks",
+    "model": "onyx_gold_cufflinks",
+    "name": "Onyx and gold cufflinks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "cuffs",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of gold cufflinks with round black onyx faces and swivel bars.",
+    "notes": "A pair lying face up side by side, each 16 mm across: swivel bar, post and gold face inset with onyx (`gem-onyx`). New slot `cuffs`: cufflinks fasten shirt cuffs and fit no existing slot. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_earring",
+    "model": "onyx_gold_earring",
+    "name": "Onyx and gold earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of gold drop earrings, each ending in a round black onyx bead.",
+    "notes": "A pair lying flat, each 30 mm long: a gold hoop, a gold cap and an onyx drop (`gem-onyx`). New slot `earlobes`: `ears` is taken by ear muffs, which can be worn over earrings. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_pendant_necklace",
+    "model": "onyx_gold_pendant_necklace",
+    "name": "Onyx and gold pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine gold chain carrying an oval gold pendant set with a domed black onyx.",
+    "notes": "A chain lying flat in a loop 140 mm across with the pendant at +z; the chain is one 2 mm ring at the finest grain. The model's box spans the open loop. New slot `neck`: no slot fits a necklace or collar. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_ring",
+    "model": "onyx_gold_ring",
+    "name": "Onyx and gold ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain gold band with a domed black onyx in a raised setting.",
+    "notes": "Standing upright, 22 mm across, its hole facing +z, the onyx (`gem-onyx`) on top. The model's box spans the finger hole. New slot `finger`: no slot fits a ring; a later sided slot pair may replace it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_gold_tiara",
+    "model": "onyx_gold_tiara",
+    "name": "Onyx and gold tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A gold half circlet rising to a row of points, set with black onyx along its front.",
+    "notes": "Standing upright, 155 mm across and 42 mm tall at the front: a half circlet whose wall rises to alternating points, a large onyx at the front and four small ones along the band. Slot `head`, as hats take, since a tiara sits where a hat would. The model's box spans the open circlet. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_bracelet",
+    "model": "onyx_gold_bracelet",
+    "name": "Onyx and platinum bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum bangle set round its rim with six polished black onyx stones.",
+    "notes": "Shares the gold piece's model with the metal in `metal-silver`, the nearest finish to platinum. Slot `wrist`, as the gold piece names it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_cufflinks",
+    "model": "onyx_gold_cufflinks",
+    "name": "Onyx and platinum cufflinks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "cuffs",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of platinum cufflinks with round black onyx faces and swivel bars.",
+    "notes": "Shares the gold piece's model with the metal in `metal-silver`, the nearest finish to platinum. Slot `cuffs`, as the gold piece names it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_earrings",
+    "model": "onyx_gold_earring",
+    "name": "Onyx and platinum earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of platinum drop earrings, each ending in a round black onyx bead.",
+    "notes": "Shares the gold piece's model with the metal in `metal-silver`, the nearest finish to platinum. Slot `earlobes`, as the gold piece names it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_pendant_necklace",
+    "model": "onyx_gold_pendant_necklace",
+    "name": "Onyx and platinum pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine platinum chain carrying an oval platinum pendant set with a domed black onyx.",
+    "notes": "Shares the gold piece's model with the metal in `metal-silver`, the nearest finish to platinum. Slot `neck`, as the gold piece names it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_ring",
+    "model": "onyx_gold_ring",
+    "name": "Onyx and platinum ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain platinum band with a domed black onyx in a raised setting.",
+    "notes": "Shares the gold piece's model with the metal in `metal-silver`, the nearest finish to platinum. Slot `finger`, as the gold piece names it. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_platinum_tiara",
+    "model": "onyx_gold_tiara",
+    "name": "Onyx and platinum tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-platinum",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A platinum half circlet rising to a row of points, set with black onyx along its front.",
+    "notes": "Rides on the `onyx_gold_tiara` model with the metal in `metal-platinum` and the stones in `gem-onyx`. Slot `head`, as the gold tiara takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_bracelet",
+    "model": "onyx_gold_bracelet",
+    "name": "Onyx and silver bracelet",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "wrist",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver bangle set round its rim with six polished black onyx stones.",
+    "notes": "Rides on the `onyx_gold_bracelet` model with the metal in `metal-silver` and the stones in `gem-onyx`. Slot `wrist`, as the gold bangle takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_cufflinks",
+    "model": "onyx_gold_cufflinks",
+    "name": "Onyx and silver cufflinks",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "cuffs",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of silver cufflinks with round black onyx faces and swivel bars.",
+    "notes": "Rides on the `onyx_gold_cufflinks` model with the metal in `metal-silver` and the stones in `gem-onyx`. Slot `cuffs`, as the gold pair takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_earrings",
+    "model": "onyx_gold_earring",
+    "name": "Onyx and silver earrings",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "earlobes",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A pair of silver drop earrings, each ending in a round black onyx bead.",
+    "notes": "Rides on the `onyx_gold_earring` model with the metal in `metal-silver` and the stones in `gem-onyx`. Slot `earlobes`, as the gold pair takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_pendant_necklace",
+    "model": "onyx_gold_pendant_necklace",
+    "name": "Onyx and silver pendant necklace",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "neck",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A fine silver chain carrying an oval silver pendant set with a domed black onyx.",
+    "notes": "Rides on the `onyx_gold_pendant_necklace` model with the metal in `metal-silver` and the stone in `gem-onyx`. Slot `neck`, as the gold necklace takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_ring",
+    "model": "onyx_gold_ring",
+    "name": "Onyx and silver ring",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "finger",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A plain silver band with a domed black onyx in a raised setting.",
+    "notes": "Rides on the `onyx_gold_ring` model with the metal in `metal-silver` and the stone in `gem-onyx`. Slot `finger`, as the gold ring takes. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "onyx_and_silver_tiara",
+    "model": "onyx_gold_tiara",
+    "name": "Onyx and silver tiara",
+    "category": "clothing",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "metal": "metal-silver",
+      "stone": "gem-onyx"
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.0005
+    },
+    "description": "A silver half circlet rising to a row of points, set with black onyx along its front.",
+    "notes": "Rides on the `onyx_gold_tiara` model with the metal in `metal-silver` and the stones in `gem-onyx`. Slot `head`, as the gold tiara takes. The worn look is pending: no worn model is authored."
+  }
+]

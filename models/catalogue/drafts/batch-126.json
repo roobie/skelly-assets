@@ -1,0 +1,149 @@
+[
+  {
+    "id": "santa_gloves",
+    "model": "santa_gloves",
+    "name": "Holiday gloves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.003
+    },
+    "description": "Bright red cotton gloves with a thick roll of white faux fur round each cuff.",
+    "notes": "Laid flat side by side, backs up, fingers towards +z: each 250 mm from fur cuff to fingertip, red cotton with a white faux-fur roll in `fur-pale`. Slot `hands`, as earlier glove batches use. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "tentacle_sleeves",
+    "model": "tentacle_sleeves",
+    "name": "Tentacle sleeves",
+    "category": "clothing",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "arms",
+      "wearPerDamage": 0.003
+    },
+    "description": "A pair of long knitted cotton sleeves that taper to a closed, rounded end, made to keep a tentacle limb warm.",
+    "notes": "Laid flat side by side, cuffs towards -z: each 740 mm long, 124 mm wide at a cream ribbed cuff and tapering to a closed, rounded tip, green with cream knitted bands. Slot `arms`, the slot arm guards take; the sleeve also covers the hands, because it closes over the tentacle's end, and no slot spans both. For a player whose arms are tentacles; the item does not need such a body to exist, only to be worth wearing. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "army_winter_gloves",
+    "model": "army_winter_gloves",
+    "name": "Army winter gloves",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "hands",
+      "wearPerDamage": 0.002
+    },
+    "description": "Thick padded olive gloves quilted across the back, with long cuffs drawn in by a cord.",
+    "notes": "Laid flat side by side, backs up, fingers towards +z: each 300 mm from cuff to fingertip and 100 mm across, olive cotton quilted in darker channels over the back and fingers, with a gauntlet cuff drawn in by a black cord and toggle. The pair lies spread flat with long gauntlet cuffs and thumbs out. Slot `hands`, as earlier glove batches use. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "ten_gallon_hat",
+    "model": "ten_gallon_hat",
+    "name": "Ten-gallon hat",
+    "category": "clothing",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.002
+    },
+    "description": "A brown wool felt hat with a tall creased crown and a wide brim that curls up at the sides. Keeps sun and rain off.",
+    "notes": "Standing on its brim: 440 mm across, 176 mm tall, brown felt in `cloth-brown` (no brown felt finish exists) with a black leather band and silver buckle, a crease down the crown's top and the brim curling up at both sides. The wide brim and hollow crown fill little of their bounding box and the crown is drawn solid. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "head_bandana",
+    "model": "head_bandana",
+    "name": "Head bandana",
+    "category": "clothing",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "hood",
+      "wearPerDamage": 0.005
+    },
+    "description": "A red cotton square printed with white dots, folded corner to corner to tie over the head.",
+    "notes": "Folded corner to corner and laid flat: a triangle 540 mm along the fold and 270 mm deep, red with a white border and dot print. Slot `hood`, the slot coifs and other head coverings worn under a helmet take, so a hat or helmet can go over it. Retying it over the mouth is left out: the tied mouth bandana is its own item and the transform waits on that item. The worn look is pending: no worn model is authored."
+  },
+  {
+    "id": "beret",
+    "model": "beret",
+    "name": "Beret",
+    "category": "clothing",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "wearable": {
+      "slot": "head",
+      "wearPerDamage": 0.003
+    },
+    "description": "A soft, flat round cap of navy cotton on a narrow leather headband.",
+    "notes": "Standing on its band: a soft round crown 270 mm across and 66 mm tall, pushed a little to one side over a black leather headband, with a short stalk on top. The crown is drawn solid and the flat round cap fills little of its square box; a real beret folds flat. The worn look is pending: no worn model is authored."
+  }
+]

@@ -1,0 +1,351 @@
+[
+  {
+    "id": "bucket",
+    "model": "bucket",
+    "name": "Steel bucket",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A galvanised steel pail with a wire bail. Holds water and can sit over a fire.",
+    "notes": "The bail stands up over the 220 mm pail, so the box is much taller than the pail itself, which is 250 mm across. cooking stands for a boiling quality. The makeshift brazier is this bucket with holes punched in it, so it rides here."
+  },
+  {
+    "id": "five_gallon_bucket",
+    "model": "five_gallon_bucket",
+    "name": "Plastic bucket (5 gallon)",
+    "category": "misc",
+    "size": [
+      4,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A large orange plastic bucket with a wire bail and grip. Holds about 19 litres.",
+    "notes": "The pail is 365 mm tall; the bail standing up over it makes the model 504 mm tall, so the box is larger than the pail. No cooking quality: it is plastic."
+  },
+  {
+    "id": "wooden_bucket",
+    "model": "wooden_bucket",
+    "name": "Wooden bucket",
+    "category": "misc",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A bucket carved from one block of hardwood, with a wooden crossbar handle. Holds about 5 litres.",
+    "notes": "260 by 350 mm with the handle. The handle stands above the open pail, so the box is larger than the pail. Mostly a crafted item, so its loot economy is thin."
+  },
+  {
+    "id": "drink_can",
+    "model": "drink_can",
+    "name": "Drink can",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "An empty 355 ml aluminium drink can with its ring-pull tab.",
+    "notes": "Tin food cans would suit the existing empty_can model (a steel tin with a paper label) better than this one, and a large catering tin or a hobo stove would each read better with a model of their own. A lid that is pulled open has no item state."
+  },
+  {
+    "id": "cardboard_roll",
+    "model": "cardboard_roll",
+    "name": "Cardboard tube",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An empty cardboard core from a roll of tape or paper.",
+    "notes": "The open tube a player sees is 42 mm across and 100 mm long. The tube is hollow and lies on its side. Category material because it is crafting stock rather than a container."
+  },
+  {
+    "id": "clay_cup",
+    "model": "clay_cup",
+    "name": "Clay cup",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A thick-walled fired clay beaker. Holds about half a litre and stands in a fire.",
+    "notes": "A plain handleless beaker in clay-terracotta, 120 mm tall. Mostly a crafted item, so its loot economy is thin."
+  },
+  {
+    "id": "condom",
+    "model": "condom",
+    "name": "Condom",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A latex condom. Stretches to hold a little water.",
+    "notes": "Modelled as the square foil wrapper with the rolled ring pressing through it, the shape a player recognises; a loose rolled ring 30 mm across would not read in the world. The ring is brass against the foil-gold wrapper so it shows. The sealed condom and the balloon ride here; a balloon would read better with its own model. Holding water has no content field yet."
+  },
+  {
+    "id": "foil_cup",
+    "model": "foil_cup",
+    "name": "Foil cup",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [],
+      "tiers": []
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A small cup folded from kitchen foil. Holds water and can be set on coals.",
+    "notes": "The open cup is 80 mm across and 55 mm tall. A crafted item, so it has no loot economy. Vertical folds and a turned-over lip mark it as folded rather than pressed."
+  },
+  {
+    "id": "plastic_cup",
+    "model": "plastic_cup",
+    "name": "Plastic cup",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thin disposable white plastic cup.",
+    "notes": "White so the yoghurt pot and the styrofoam cup can ride on it."
+  },
+  {
+    "id": "trauma_kit_pouch",
+    "model": "trauma_kit_pouch",
+    "name": "Trauma kit pouch",
+    "category": "bag",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Military",
+        "Police",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "container": {
+      "pockets": [
+        {
+          "grid": [
+            3,
+            2
+          ],
+          "handlingSimSeconds": 0.6
+        }
+      ]
+    },
+    "description": "A zipped fabric pouch for a personal trauma kit, with webbing straps to mount it on a belt or vest.",
+    "notes": "Coyote cloth-canvas body with cord-olive webbing, two red pull tabs and a red cross patch. An olive drab cloth finish would suit the military look better. The pocket grid is a placeholder, and mounting on a vest has no content field yet."
+  },
+  {
+    "id": "police_first_aid_pack",
+    "model": "police_first_aid_pack",
+    "name": "Police first aid pack",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A vacuum-sealed pack of bleeding control supplies carried by patrol officers. Open it to get the contents.",
+    "notes": "Modelled sealed: a black vacuum pouch drawn over a bandage roll, welded at both ends, with a white label and red cross. Its contents and the opening action wait on the refactor."
+  },
+  {
+    "id": "sealed_glass_jar",
+    "model": "sealed_glass_jar",
+    "name": "Glass jar (0.5 L)",
+    "category": "misc",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A half-litre glass canning jar with a screw band and a flat lid. Keeps food sealed.",
+    "notes": "The jar is hollow glass-clear; the tiles draw it opaque, but it stays see-through in the game. The 3 L jar and the cream jars ride here, though at 3 to 3.85 L they are much larger; the preserved brain would read better with contents drawn in the jar."
+  },
+  {
+    "id": "jerrycan",
+    "model": "jerrycan",
+    "name": "Plastic jerrycan",
+    "category": "misc",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A red 10 litre plastic fuel can with a carry handle and a capped spout.",
+    "notes": "The steel jerrycan (26.75 L) and the gallon can ride here; the steel can would read better with its own pressed-steel model. Holding fuel has no content field yet."
+  },
+  {
+    "id": "keg",
+    "model": "keg",
+    "name": "Aluminium keg",
+    "category": "misc",
+    "size": [
+      5,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 2
+      }
+    },
+    "description": "A reusable 50 litre aluminium beer keg with a valve in the top and hand holes in its upper rim.",
+    "notes": "400 mm across and 530 mm tall, which suits a 50 L keg. The steel keg shares the shape. The 60 L tank also fits, but the 2 L tank would read better with its own model. The size is a placeholder for a thing too big to carry far."
+  },
+  {
+    "id": "large_propane_tank",
+    "model": "large_propane_tank",
+    "name": "Propane cylinder (45 kg)",
+    "category": "misc",
+    "size": [
+      4,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A tall white steel cylinder of propane with a brass valve under a guard collar. Used for heating and cooking.",
+    "notes": "A 100 pound cylinder, 370 mm across and 1170 mm tall. Fuel charges and connecting it to a heater have no content field yet. The handwheel is black plastic. The size is a placeholder for a thing too big to carry far."
+  }
+]

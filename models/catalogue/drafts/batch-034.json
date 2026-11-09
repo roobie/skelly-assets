@@ -1,0 +1,247 @@
+[
+  {
+    "id": "storage_line",
+    "model": "storage_line",
+    "name": "Gear hanging line",
+    "category": "misc",
+    "size": [
+      5,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A length of red nylon cord with six small carabiners clipped along it, for hanging gear off a tree or a tent pole.",
+    "notes": "The cord is folded into a doubled hank 440 mm long with the six carabiners clipped along its front run. nylon-red draws the cord, steel-bright the aluminium clips (no dull aluminium finish) and plastic-charcoal the gates. Hanging items on it has no content field yet. The size is a placeholder."
+  },
+  {
+    "id": "fibrous_stalk",
+    "model": "fibrous_stalk",
+    "name": "Fibrous stalk",
+    "category": "material",
+    "size": [
+      6,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A green plant stalk, tough and stringy inside. The fibres can be stripped and twisted into cord.",
+    "notes": "A tapering stalk 550 mm long and 16 mm across at the base, with dry joints every 120 mm, two torn leaf stubs and frayed fibres at the cut end. The box counts the air round a thin stalk and its leaves. It is found growing, not in buildings, so the Residential usage is a stand-in until a wild-plant usage exists. Stripping it into cord has no recipe yet."
+  },
+  {
+    "id": "short_string",
+    "model": "short_string",
+    "name": "Short string",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "tying": 1
+      }
+    },
+    "description": "A short piece of cotton string, knotted at one end.",
+    "notes": "150 mm of 3 mm string lying in loose waves with a knot at one end, drawn cord-cotton. The longer string shares the model; its length has no content field yet, so a longer coiled model may be wanted later. The colour variants have their own drafts."
+  },
+  {
+    "id": "short_cord",
+    "model": "short_string",
+    "name": "Short cord",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "cord": "jute"
+    },
+    "tool": {
+      "qualities": {
+        "tying": 1
+      }
+    },
+    "description": "A short piece of rough twisted plant-fibre cord.",
+    "notes": "Shares the short_string model with its cord recoloured jute for brown plant fibre; 6 g. The long piece rides on this draft; its length has no content field yet."
+  },
+  {
+    "id": "short_leather_lace",
+    "model": "short_string",
+    "name": "Short leather lace",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "cord": "leather-tan"
+    },
+    "tool": {
+      "qualities": {
+        "tying": 1
+      }
+    },
+    "description": "A short strip of leather cut into a lace.",
+    "notes": "Shares the short_string model with its cord recoloured leather-tan; 6 g. The long lace rides on this draft; its length has no content field yet."
+  },
+  {
+    "id": "rubber_band",
+    "model": "short_string",
+    "name": "Rubber band",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "cord": "latex-pale"
+    },
+    "description": "A thin loop of stretchy rubber.",
+    "notes": "Shares the short_string model as a cut band with its cord recoloured latex-pale; 6 g. A closed loop would read better and would need its own row, which the variant rule does not allow in this batch."
+  },
+  {
+    "id": "laser_target_kit",
+    "model": "laser_target_kit",
+    "name": "Laser target practice kit",
+    "category": "misc",
+    "size": [
+      4,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Two toy laser pistols and two electronic targets on stands. A target shows where each shot landed.",
+    "notes": "Two orange pistols 180 mm long lie in front of two white targets 180 mm across with red rings, each on an aluminium foot with a green display under its face. The box counts the air round the standing targets and between the pieces. Practising aim with it has no content field yet. The size is a placeholder."
+  },
+  {
+    "id": "basketball",
+    "model": "basketball",
+    "name": "Basketball",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A full-size orange basketball with black seams.",
+    "notes": "A ball 239 mm across in foam-orange for matte pebbled rubber, with two great-circle seams and two rings standing in for the curved seams, in rubber-offblack. The size follows the real ball."
+  },
+  {
+    "id": "beach_volleyball",
+    "model": "beach_volleyball",
+    "name": "Beach volleyball",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A light, soft volleyball in yellow, blue and white bands.",
+    "notes": "A ball 270 mm across built from six bands round one axis, in rubber-yellow, paint-drum-blue and plastic-gloss-white; real panels run three ways, which turned bands cannot draw. The size follows the real ball."
+  },
+  {
+    "id": "bowling_ball",
+    "model": "bowling_ball",
+    "name": "Bowling ball",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A heavy, glossy red bowling ball with three finger holes.",
+    "notes": "A ball 216 mm across in lacquer-red, with three finger holes painted flush in void-black on its front, since compound pieces cannot cut. Red reads better than black, which hid the holes. Its 7.3 kg makes it a heavy improvised throwing or dropping weapon, which has no melee or thrown block in this draft."
+  },
+  {
+    "id": "football",
+    "model": "football",
+    "name": "Football",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A pointed oval ball of brown leather with white laces and a white stripe near each end.",
+    "notes": "An American football 290 mm long and 170 mm across in leather-chestnut, with cloth-cream stripes and laces. The size follows the real ball. Cutting it up for leather has no recipe yet."
+  }
+]

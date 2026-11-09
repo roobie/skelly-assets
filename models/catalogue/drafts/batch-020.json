@@ -1,0 +1,296 @@
+[
+  {
+    "id": "pet_tag",
+    "model": "pet_tag",
+    "name": "Pet tag",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A red plastic tag shaped like a bone, on a small split ring. A pet's name is printed on it.",
+    "notes": "38 by 22 mm and 2 mm thick with a white name panel and a silver split ring. The box counts the ring and the bone's notches. A per-item pet name has no content field yet."
+  },
+  {
+    "id": "down_pillow",
+    "model": "down_pillow",
+    "name": "Down pillow",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A down pillow rolled tight and held by two webbing straps.",
+    "notes": "Rolled for carrying, 400 mm long and 180 mm across; the ends show the rolled layers in cloth-white and cloth-cotton, with cloth-navy straps. Unrolling it to sleep on needs a placed-object field the item schema does not have yet, so it has no workstation. The size is a placeholder."
+  },
+  {
+    "id": "electronic_scrap",
+    "model": "electronic_scrap",
+    "name": "Electronic scrap",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A handful of resistors, capacitors and diodes pulled from circuit boards.",
+    "notes": "A loose heap about 40 by 26 mm: three banded resistors, a can capacitor, two ceramic disc capacitors and two diodes with clipped legs. The box counts the air in a loose heap. The light detector rides here as variants do, though a single photocell would read differently; give it its own model if it becomes a crafting part in its own right."
+  },
+  {
+    "id": "heating_element",
+    "model": "heating_element",
+    "name": "Heating element",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sheathed steel heating loop on a round mounting flange, from a kettle or a hot plate.",
+    "notes": "A flat loop 90 mm across on two legs, a flange 50 mm across with a hex nut, a ceramic insulator and two brass terminal pins. The box counts the open middle of the loop."
+  },
+  {
+    "id": "evaporator_coil",
+    "model": "evaporator_coil",
+    "name": "Evaporator coil",
+    "category": "material",
+    "size": [
+      5,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Copper tubing bent back and forth through a stack of thin aluminium fins, from a refrigerator or air conditioner.",
+    "notes": "500 mm long, 300 mm tall and 60 mm deep: two banks of eight tubes joined by U bends outside galvanised end plates, with 23 fins and two stub pipes. The box counts the air between fins and tubes. Copper tubes and aluminium fins are what such coils are made of, so the look follows them. The size is a placeholder."
+  },
+  {
+    "id": "desk_fan",
+    "model": "desk_fan",
+    "name": "Desk fan",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "An electric desk fan with three blades inside a wire guard, on a round base.",
+    "notes": "420 mm tall with a guard 300 mm across, facing +z. The guards are stepped domes of rings and spokes. plastic-clear-blue draws the blades. Running it needs mains power, which has no content field yet, and it brings no crafting quality. The size is a placeholder."
+  },
+  {
+    "id": "glowing_egg",
+    "model": "glowing_egg",
+    "name": "Glowing egg",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A hard, glassy egg the size of a plum. Faint light flickers among sharp shards inside it.",
+    "notes": "Laid by a giant spider: a ball 46 mm across with a short drawn-out tip, shell in see-through gem-purple over a core of lcd-green shards. The tiles draw the shell opaque, so the shards show only in the game. It does not glow: no finish emits light, and a light source on an item has no content field yet. The box counts the air around a round egg. Its source creature does not exist in Deadvox yet."
+  },
+  {
+    "id": "backup_drive",
+    "model": "backup_drive",
+    "name": "Backup drive",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A portable hard drive with a hand-written label, someone's backup of files they meant to keep.",
+    "notes": "118 by 80 by 18 mm with rounded long sides, a written label, a green status light and a short coiled cable. Reading the drive needs a computer and a readable-content field, neither of which exists yet."
+  },
+  {
+    "id": "fire_brick",
+    "model": "fire_brick",
+    "name": "Fire brick",
+    "category": "material",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A pale, light brick made to line kilns and fireplaces without cracking in the heat.",
+    "notes": "A full insulating fire brick, 230 by 114 by 64 mm, a plain block in brick-buff. hammering 1 is a hammering quality. Building a forge or kiln lining from it has no content field yet."
+  },
+  {
+    "id": "fish_bowl",
+    "model": "fish_bowl",
+    "name": "Fishbowl",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A round glass bowl of water over a bed of gravel, with a goldfish swimming in it.",
+    "notes": "260 mm across and 222 mm tall with a flared lip, about 7 L of water in plastic-clear-blue, stone-grey gravel and an orange fish. The tiles draw the glass opaque, so the fish shows only in the game. The mass includes the water, as liquids in their container do. A live fish, emptying the bowl and an empty-bowl state have no content fields yet; the empty bowl would get its own model."
+  },
+  {
+    "id": "garnet",
+    "model": "garnet",
+    "name": "Garnet",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A loose cut garnet, deep red.",
+    "notes": "A round brilliant 10 mm across lying on its table in gem-red; at the finest 2 mm grain a stone reads as a stepped red dome. It is drawn as a stone of about 1 carat, so it is more than a single voxel. Every gem shares this model, as jewellery shares one model across its gem versions; a per-variant finish (gem-purple for amethyst, gem-green for emerald and peridot, gem-blue for sapphire, aquamarine and topaz) has no field yet. Pearl, opal, malachite and onyx are cut round or as cabochons rather than faceted, so a cabochon model would suit them if a variant ever gets its own."
+  },
+  {
+    "id": "tinted_lenses",
+    "model": "tinted_lenses",
+    "name": "Tinted lenses",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A pair of dark glass lenses from sunglasses.",
+    "notes": "Two teardrop lenses 56 by 47 mm and 2 mm thick, mirrored and lying side by side, in glass-grey. The box counts the outlines and the gap between the lenses. The tiles draw the glass opaque; it stays see-through in the game."
+  },
+  {
+    "id": "accounting_records",
+    "model": "accounting_records",
+    "name": "Accounting records",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A clipped sheaf of ledger forms listing payments and purchases. Every column balances.",
+    "notes": "Letter-size forms, 216 by 279 mm and 6 mm thick, three sheets a little out of square with rows of figures and a red heading on the top sheet, held by a black binder clip. Deadvox has no trader faction, so the ledgers stand as office finds. The falsified ledger has its own draft on this model."
+  },
+  {
+    "id": "accounting_records_falsified",
+    "model": "accounting_records",
+    "name": "Falsified accounting records",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Commercial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A clipped sheaf of ledger forms listing payments and purchases. The balances do not match, and a large sum is missing.",
+    "notes": "Shares the accounting_records model: the two ledgers look the same and differ only in what reading them shows. It is a separate item rather than a variant, and its name tells the two apart."
+  }
+]

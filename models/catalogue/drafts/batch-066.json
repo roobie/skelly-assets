@@ -1,0 +1,436 @@
+[
+  {
+    "id": "permanent_marker",
+    "model": "permanent_marker",
+    "name": "Jumbo marker",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A fat permanent marker with a chisel tip. Its ink stays on wood, metal and concrete.",
+    "notes": "14 cm long and 22 mm across, chisel tip under the clipped cap at +x. writing is a new quality name for marking walls, maps and notes. box/volume x1.9 is the clip and cap ring standing off a round barrel."
+  },
+  {
+    "id": "pocket_watch",
+    "model": "pocket_watch",
+    "name": "Pocket watch",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A gold pocket watch with a winding crown and a ring for a chain. It still keeps time when wound.",
+    "notes": "50 mm case lying face up, crown and bow at 12 o'clock on +z. The crystal is left out so the dial and hands read in the tile; enamel-white dial, metal-gold case. Telling the time and taking it apart for gears and gold need fields the content pass adds."
+  },
+  {
+    "id": "porcelain_urn",
+    "model": "porcelain_urn",
+    "name": "Porcelain urn",
+    "category": "misc",
+    "size": [
+      3,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cooking": 1
+      }
+    },
+    "description": "A glazed porcelain urn with a gold band and a fitted lid, made to hold ashes. It holds water and stands heat.",
+    "notes": "30 cm tall and 20 cm across the belly, with a gold band and knob. cooking is at 1 because a thin porcelain pot is a poor one. The box is round a round body."
+  },
+  {
+    "id": "riding_crop",
+    "model": "riding_crop",
+    "name": "Riding crop",
+    "category": "misc",
+    "size": [
+      1,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A thin, springy fibreglass rod with a leather grip and a flat leather tab at the tip.",
+    "notes": "60 cm long, tapering from 12 to 5 mm, with a leather grip and knob and a 4 by 3 cm popper at +x. The model follows the shape of a thin rod. A melee block (a weak lash) is for the content pass."
+  },
+  {
+    "id": "rollmat",
+    "model": "rollmat",
+    "name": "Foam sleeping mat",
+    "category": "misc",
+    "size": [
+      2,
+      5
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A closed-cell foam mat rolled and strapped for carrying. Laid out, it keeps the cold of the ground off a sleeper.",
+    "notes": "Rolled, 55 cm long and 16 cm across with two webbing straps and the spiral of the layers drawn on each end. Unrolling it into a placed bed needs a placeable field the content pass adds. A camp chair variant is a different object (a folding chair) that cannot share a rolled mat's model; it needs its own row and is left out here."
+  },
+  {
+    "id": "safe_box",
+    "model": "safe_box",
+    "name": "Combination lockbox",
+    "category": "misc",
+    "size": [
+      3,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "hammering": 1
+      }
+    },
+    "description": "A heavy steel box with a number dial and a turn handle on the front. Whatever is inside stays there without the combination.",
+    "notes": "24 by 12 by 14 cm with the dial and handle on +z and the lid hinged at the back. hammering 1: the box is heavy enough to knock with. Holding contents behind a combination and forcing it open, ruining what is inside, need fields the content pass adds."
+  },
+  {
+    "id": "toy_bucket_and_spade",
+    "model": "toy_bucket_and_spade",
+    "name": "Toy bucket and spade",
+    "category": "misc",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "digging": 1
+      }
+    },
+    "description": "A child's plastic bucket with a toy spade and rake standing in it.",
+    "notes": "Bucket 16 cm across and 13 cm tall with a handle, spade and rake heads above the rim. The model shows the tools standing in the bucket. digging is a new quality name, at 1 because a toy spade barely digs. Taking the spade and rake out as their own items needs content the pass adds."
+  },
+  {
+    "id": "access_code_printout",
+    "model": "access_code_printout",
+    "name": "Access code printout",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A folded printout with a long string of digits on it, an access code for a sealed facility's lift.",
+    "notes": "A letter sheet folded in three, 21.6 by 9.3 cm, with a header bar, ten digit blocks and lines of text drawn as raised print. At the 2 mm grain a folded sheet reads 4 mm thick. Which door it opens is a key field the content pass adds, tied to whatever sealed site it belongs to."
+  },
+  {
+    "id": "small_space_heater",
+    "model": "small_space_heater",
+    "name": "Space heater",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A small electric heater with a grille over its heating bars. Plugged in, it warms a room by several degrees.",
+    "notes": "20 cm wide, 25 cm tall and 11 cm deep with the grille on +z, two knobs and a carry bar on top. Heating the air around it needs a heat source field the content pass adds; the running state is its own draft below."
+  },
+  {
+    "id": "space_heater_on",
+    "model": "small_space_heater",
+    "name": "Space heater (on)",
+    "category": "misc",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "element": "glow-flame",
+      "lamp": "glow-flame"
+    },
+    "description": "A small electric heater, switched on, its bars glowing orange behind the grille.",
+    "notes": "Shares the space heater's model; the glowing bars and lamp tell the running state apart."
+  },
+  {
+    "id": "spray_can",
+    "model": "spray_can",
+    "name": "Can of spray paint",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "painting": 1
+      }
+    },
+    "description": "An aerosol can of red paint with a matching cap. Enough to mark walls, doors and floors.",
+    "notes": "21 cm tall to the cap and 66 mm across, a label band round a red body. painting is a new quality name for marking with paint. The box is round a round can; the model follows the shape."
+  },
+  {
+    "id": "butane_can",
+    "model": "spray_can",
+    "name": "Butane can",
+    "category": "material",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "finishes": {
+      "body": "paint-drum-blue",
+      "cap": "plastic-white",
+      "label": "paper-white"
+    },
+    "description": "A pressurised can of butane gas for refilling lighters and small stoves.",
+    "notes": "Shares the spray can's model in blue with a white cap. Refilling lighters and torches from it needs a fuel field the content pass adds."
+  },
+  {
+    "id": "stepladder",
+    "model": "stepladder",
+    "name": "Wooden stepladder",
+    "category": "misc",
+    "size": [
+      4,
+      15
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "workstation": {
+      "id": "stepladder",
+      "qualities": {
+        "climbing": 1
+      }
+    },
+    "description": "A heavy wooden stepladder with five treads and steel spreader bars. Set down, it reaches high shelves, ceilings and low roofs.",
+    "notes": "Standing open, 1.46 m to the top cap, 50 cm wide and 86 cm deep at the feet, treads facing +z. The box counts the open A-frame. climbing is a new quality name for reaching a higher level; the workstation block is there because it is used where it stands once set down. The size is a placeholder for a thing too big for a pack. Rendered at --size 512."
+  },
+  {
+    "id": "aluminium_stepladder",
+    "model": "stepladder",
+    "name": "Aluminium stepladder",
+    "category": "misc",
+    "size": [
+      4,
+      15
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "finishes": {
+      "cap": "plastic-grey",
+      "metal": "steel-stainless",
+      "wood": "alu-bare"
+    },
+    "workstation": {
+      "id": "aluminum_stepladder",
+      "qualities": {
+        "climbing": 1
+      }
+    },
+    "description": "A light aluminium stepladder with five treads and plastic feet.",
+    "notes": "Shares the wooden stepladder's model in bare aluminium with a grey plastic top; real aluminium rails are thinner channel, which the shared model does not show."
+  },
+  {
+    "id": "charcoal_stick",
+    "model": "charcoal_stick",
+    "name": "Charcoal stick",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "writing": 1
+      }
+    },
+    "description": "A stick of charcoal sharpened to a point and wrapped in rag at the back. It writes on wood, paper and walls, and blackens the hands.",
+    "notes": "One stick 10 cm long and 12 mm across, the point at +x. A single stick this size weighs about 8 g, so the mass follows the stick, and the charges become wear. writing is the quality the jumbo marker also brings. A pencil variant is a different object (a wooden pencil) that cannot share a charcoal stick's model; it needs its own row and is left out here."
+  },
+  {
+    "id": "homemade_telescope",
+    "model": "homemade_telescope",
+    "name": "Homemade telescope",
+    "category": "tool",
+    "size": [
+      1,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "spotting": 1
+      }
+    },
+    "description": "Three plastic tubes bound with tape that slide out into a telescope. It shows distant ground clearly but is too crude to aim through.",
+    "notes": "Drawn pulled out to 38 cm: three nested tubes up to 42 mm across, tape at each joint, an eyepiece at -x and the objective at +x. Collapsed it would be about 18 cm. spotting is a new quality name for seeing further; widening the mapped area while carried needs a field the content pass adds. The lenses are glass-clear, drawn opaque in the tile."
+  },
+  {
+    "id": "tear_gas_spray",
+    "model": "tear_gas_spray",
+    "name": "Tear gas spray",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Police"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "A pocket canister of pressurised tear gas with a flip-top trigger and a key ring. Sprayed in a face, it blinds and chokes for a while.",
+    "notes": "9 cm tall and 34 mm across with the nozzle facing +z and the key ring at the back. Spraying a cone of gas needs an effect field the content pass adds; about twenty seconds of spray as charges."
+  },
+  {
+    "id": "angular_whistle",
+    "model": "angular_whistle",
+    "name": "Angular whistle",
+    "category": "misc",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "description": "A small whistle of dark, faintly blue metal, all sharp and uneven angles. Its note is too high to hear, yet something always seems to answer.",
+    "notes": "6 cm long: a skewed mouthpiece at -x, a twisted wedge body with a crooked fin, a black window and a loop at +x, in steel-blued with void-black. The name here describes the thing. Calling a hostile creature when blown is for the content pass."
+  }
+]

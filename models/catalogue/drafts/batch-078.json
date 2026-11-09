@@ -1,0 +1,387 @@
+[
+  {
+    "id": "bathroom_scale",
+    "model": "bathroom_scale",
+    "name": "Bathroom scale",
+    "category": "misc",
+    "size": [
+      4,
+      4
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A flat steel bathroom scale with a ribbed rubber tread and a spring dial under a small window. Stand on it to read your weight; it is too coarse for anything lighter than a person.",
+    "notes": "300 mm square and 50 mm tall: enamelled steel housing, rubber skirt and feet, tread with ribs, dial with a red needle under a glass lens at the front. A mechanical dial scale is about 50 mm deep. No quality: weighing in recipes means small amounts, which this cannot read."
+  },
+  {
+    "id": "brush",
+    "model": "brush",
+    "name": "Scrub brush",
+    "category": "tool",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cleaning": 1
+      }
+    },
+    "description": "A blue plastic block with a finger ridge on top and dense rows of stiff bristles underneath, for scouring floors, pots and anything else that needs elbow grease.",
+    "notes": "140 by 60 mm and 46 mm tall: an octagonal block, a ridge to grip, a bristle bed and 44 tufts. cleaning is a new quality name for hard-surface cleaning; the washing kit and the mops share it."
+  },
+  {
+    "id": "cotton_patchwork",
+    "model": "cotton_patchwork",
+    "name": "Cotton patch",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "filtering": 1
+      }
+    },
+    "description": "A square of blue cotton cloth, hemmed on two sides, for patching torn clothing or straining a liquid through.",
+    "notes": "150 mm square, drawn 2 mm thick with one corner folded back; 2 mm is the finest voxel grain. A single layer of cotton is a fraction of a millimetre thick, so it cannot be drawn true. Its sieving and straining uses carry over as filtering, a name already in use."
+  },
+  {
+    "id": "tattered_garment",
+    "model": "tattered_garment",
+    "name": "Tattered clothes",
+    "category": "material",
+    "size": [
+      3,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A wad of old clothes too torn to wear, folded into a pile with ragged sleeves and strips hanging off. Cut up, it gives cloth for patches and rags.",
+    "notes": "250 by 200 mm and 70 mm high: a folded stack of grubby cloth with a faded shirt sleeve and a strip of denim lying over the edges. A pile of rags looks nothing like a patch, so it has its own model as a distinct state."
+  },
+  {
+    "id": "dish_towel",
+    "model": "dish_towel",
+    "name": "Dish towel",
+    "category": "misc",
+    "size": [
+      2,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A cream cotton tea towel with two red stripes, folded small with a hanging loop. Good for drying dishes, wiping surfaces or wrapping something hot.",
+    "notes": "Folded to 200 by 130 mm and 16 mm thick, four layers, with stripes carried over the folded edge and a loop. No quality: drying or wiping has no recipe use yet."
+  },
+  {
+    "id": "electric_hair_trimmer",
+    "model": "electric_hair_trimmer",
+    "name": "Electric hair trimmer",
+    "category": "tool",
+    "size": [
+      1,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "grooming": 1
+      }
+    },
+    "description": "A cordless trimmer with a rubber-sided black body and a toothed steel blade on an aluminium neck. With charged batteries it cuts hair short and even.",
+    "notes": "150 mm long, 44 mm wide and 32 mm thick: tapered plastic body, rubber grip panels, sliding switch and power light on top, aluminium neck and a blade with 11 comb teeth at +x. It runs on battery charge per use. grooming is a new quality name for hair cutting and shaving, shared with the makeshift haircut kit."
+  },
+  {
+    "id": "hair_dye_kit",
+    "model": "hair_dye_kit",
+    "name": "Hair dye kit",
+    "category": "misc",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A carton holding everything for colouring hair at home: tubes of dye and developer, an applicator brush, a comb and thin plastic gloves. The front shows a face framed in rich chestnut hair.",
+    "notes": "Standing carton, 150 mm wide, 210 mm tall and 70 mm deep, front on +z: white board, pink lid and band, a portrait panel and a blank label strip. No quality: its use is cosmetic."
+  },
+  {
+    "id": "mop",
+    "model": "mop",
+    "name": "Mop",
+    "category": "tool",
+    "size": [
+      1,
+      10
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Industrial"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cleaning": 2
+      }
+    },
+    "description": "A long wooden pole with a galvanised clamp and a heavy head of cotton strings. Awkward to carry, but it soaks up a spill in a few passes.",
+    "notes": "1.3 m long lying along x: 24 mm pine pole with a hanging hole, galvanised collar and wing, and a fan of 13 yarn strands over a core. The fanned head spreads the bounding box. cleaning 2: a mop clears spills faster than a brush or sponge."
+  },
+  {
+    "id": "collapsible_mop",
+    "model": "collapsible_mop",
+    "name": "Collapsible mop",
+    "category": "tool",
+    "size": [
+      2,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cleaning": 2
+      }
+    },
+    "description": "A flat mop whose aluminium handle telescopes down to half length, with a microfibre pad on a swivel frame. Pulled out and locked, it mops a floor as well as any other.",
+    "notes": "Collapsed to 600 mm: three nested aluminium sections with blue locking collars and grip, a swivel and a 350 by 120 mm pad. Its own model as a distinct state: the folded handle and flat pad look nothing like the string mop. The pad's width spreads the bounding box."
+  },
+  {
+    "id": "razor_blade",
+    "model": "razor_blade",
+    "name": "Razor blade",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cutting": 1
+      }
+    },
+    "description": "A thin double-edged steel blade with a slotted centre, made to fit a safety razor. Sharp enough to cut hair, string or skin.",
+    "notes": "38 by 22 mm, drawn 2 mm thick because 2 mm is the finest voxel grain; the real blade is a tenth of a millimetre. Mirror-ground edges along both long sides and a dark slot painted flush in the middle. cutting 1 is the same rank as other small edges."
+  },
+  {
+    "id": "shaving_kit",
+    "model": "shaving_kit",
+    "name": "Shaving kit",
+    "category": "tool",
+    "size": [
+      1,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "grooming": 1
+      }
+    },
+    "description": "A zipped black travel case holding a razor, spare blades, a brush and a small mirror. With a bit of soap it gives a clean shave.",
+    "notes": "Closed case 210 by 100 mm and 40 mm thick, plus a 14 mm carry loop: rounded nylon body, zip all round with a steel pull, a dark patch on the lid. Each shave uses one unit of soap. grooming is the quality name, shared with the makeshift shaving kit and the hair trimmers."
+  },
+  {
+    "id": "sponge",
+    "model": "sponge",
+    "name": "Sponge",
+    "category": "tool",
+    "size": [
+      1,
+      1
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cleaning": 1
+      }
+    },
+    "description": "A soft yellow kitchen sponge with a green scouring pad on one side, for wiping down and scrubbing hard surfaces.",
+    "notes": "95 by 65 mm and 25 mm thick: foam with a scouring layer and a few pores on the front face."
+  },
+  {
+    "id": "makeshift_haircut_kit",
+    "model": "makeshift_haircut_kit",
+    "name": "Makeshift haircut kit",
+    "category": "tool",
+    "size": [
+      2,
+      3
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "grooming": 1
+      }
+    },
+    "description": "A leather roll tied with cord, holding a pair of scissors, a sharpened sliver of glass and a scrap of mirror. Crude, but enough to keep hair short and out of your eyes.",
+    "notes": "200 mm long and 70 mm across: rolled leather with a lighter flap, two cord ties, bright steel scissors laid open along the top under the ties so the kit reads as a trimmer rather than a bundle, a mirror scrap against the back and a cord-wrapped glass blade out of one end. grooming is shared with the electric trimmer."
+  },
+  {
+    "id": "makeshift_shaving_kit",
+    "model": "makeshift_shaving_kit",
+    "name": "Makeshift shaving kit",
+    "category": "tool",
+    "size": [
+      2,
+      2
+    ],
+    "economy": {
+      "usage": [
+        "Residential",
+        "Hunting"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "grooming": 1
+      }
+    },
+    "description": "A small leather wallet laid open on a straight blade knapped from glass and set in a wooden grip, a shard of mirror and a nub of soap. With soap and patience it takes the stubble off.",
+    "notes": "Laid open, 150 by 120 mm and 30 mm high: leather wallet with a stitched pocket and a strap, mirror shard, cord-bound wooden grip with a glass edge and a soap nub. Each shave uses one unit of soap. grooming is shared with the travel shaving kit."
+  },
+  {
+    "id": "washboard",
+    "model": "washboard",
+    "name": "Washboard",
+    "category": "tool",
+    "size": [
+      4,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "laundering": 1
+      }
+    },
+    "description": "A wooden washboard with a bed of round ribs between two stiles and a ledge at the top for the soap. Rub wet clothes up and down it with a cleaning agent to get them clean.",
+    "notes": "400 mm tall and 260 mm wide, front on +z: oak stiles and rails, birch ribs, pine backboard and a soap ledge. A thin board; the stiles and ledge make the box 44 mm deep. laundering is a new quality name for washing clothes; the washing kit shares it."
+  },
+  {
+    "id": "wash_kit",
+    "model": "wash_kit",
+    "name": "Washing kit",
+    "category": "tool",
+    "size": [
+      4,
+      6
+    ],
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "tool": {
+      "qualities": {
+        "cleaning": 1,
+        "laundering": 1
+      }
+    },
+    "description": "A wooden washboard with a scrub brush tied across its ribs, so the two travel together. Everything needed to scrub filthy clothing and gear clean again.",
+    "notes": "400 mm tall and 240 mm wide, front on +z: the same washboard build as the washboard, a little narrower, with a blue plastic scrub brush bound on by two cord ties. Carries laundering and cleaning, the qualities of its two parts."
+  }
+]
