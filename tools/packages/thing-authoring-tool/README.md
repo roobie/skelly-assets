@@ -3,6 +3,7 @@ read_if:
   - you author or export a non-gun item
   - you inspect the thing tool's viewer or its assembly boundary
   - you change a tool item's mass, finish or geometry
+  - you make part of an item glow or rename a glowing material
   - you investigate skin authoring or voxel deformation topology
 ---
 
@@ -78,3 +79,16 @@ that export choice. See `src/catalogue.ts`, `ItemSchema`, `src/exports.ts`,
 
 Trap-state presentation needs a consumer-side model selection rule as well as geometry;
 it does not belong in the geometry authoring tool. See `src/families/bearTrap.ts`, `bearTrap`.
+
+## Glow
+
+An item that lights names the finish slot that glows in its own row, as `glow`, and the
+export writes that slot's material as the model entry's `emissiveMaterial`: the name of the
+one glTF material it draws, its colour as `#rrggbb`. The tag says only which part glows; the
+consumer owns the glow's colour, strength, switching and cast light. It is authored with
+the asset because the asset owns its material names, so a material change and its glow tag
+change together in one row rather than in a consumer's mapping. The glow slot needs a
+material no other slot of the item uses, and the export refuses an item unless its GLB
+names that material exactly once, so the tag never points at nothing or lights a second
+part. See `src/catalogue.ts`, `glowMaterial`, `src/exports.ts`, `checkGlow`, and
+`models/catalogue/sets/batch-060.libsonnet`, `road_flare`.

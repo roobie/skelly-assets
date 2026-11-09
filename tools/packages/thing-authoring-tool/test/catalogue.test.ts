@@ -211,10 +211,42 @@ it('refuses recipe references outside the authored item set', () => {
     ]),
   ).toThrow('Unknown tool item');
 });
+// The material names a GLB's JSON chunk declares, read independently of the writer.
+const glbMaterialNames = (glb: Uint8Array): string[] => {
+  const view = new DataView(glb.buffer, glb.byteOffset, glb.byteLength);
+  const json = JSON.parse(new TextDecoder().decode(glb.subarray(20, 20 + view.getUint32(12, true))));
+  return (json.materials ?? []).map(({ name }: { name?: string }) => name);
+};
+const thingRows = () =>
+  readRecipes().flatMap(({ value }) =>
+    loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind))),
+  );
+it('exports every authored glow as an emissive material its own GLB names exactly once', () => {
+  const glowing = new Set(catalogue.items.filter(({ glow }) => glow !== undefined).map(({ id }) => id));
+  expect(glowing).toContain('road_flare');
+  const rows = thingRows().filter(({ source }) => glowing.has(source));
+  expect(rows.map(({ source }) => source)).toContain('road_flare');
+  for (const row of rows) {
+    const { glb, modelEntry } = row.generate();
+    expect(modelEntry.emissiveMaterial, row.id).toBeDefined();
+    expect(glbMaterialNames(glb).filter((name) => name === modelEntry.emissiveMaterial), row.id).toHaveLength(1);
+  }
+});
+it('refuses a glow whose material the built GLB does not draw', () => {
+  const input = fixture();
+  const lit = Object.keys(MATERIALS).find((id) => id !== material)!;
+  const body = { id: 'body', slot: 'body', kind: 'box', min: [0, 0, 0], max: [0.02, 0.02, 0.02] };
+  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], finish: { body: material, lit }, params: {
+    pieces: JSON.stringify([body]),
+  } };
+  const item = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] })
+    .items[0]!;
+  expect(() => exportItem(item, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL)).toThrow(
+    'fixture: emissive material',
+  );
+});
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
-  const row = readRecipes()
-    .flatMap(({ value }) => loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind))))
-    .find((candidate) => candidate.id === 'player_bust')!;
+  const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
   const anchors = row.generate().modelEntry.anchors!;
   for (const joint of ['neck', 'head', 'shoulder_left', 'shoulder_right', 'hip_left', 'hip_right']) {
     expect(anchors[joint], joint).toBeDefined();

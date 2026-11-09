@@ -7,6 +7,26 @@ import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, catalogue, palette, type ToolItem } from './catalogue.ts';
 import { authoredSkin } from './skin.ts';
 
+/** The material names in a GLB's JSON chunk, which follows the 12-byte header and its own 8-byte chunk header. */
+const glbMaterialNames = (glb: Uint8Array): readonly string[] => {
+  const length = new DataView(glb.buffer, glb.byteOffset, glb.byteLength).getUint32(12, true);
+  const json = JSON.parse(new TextDecoder().decode(glb.subarray(20, 20 + length))) as {
+    readonly materials?: readonly { readonly name?: string }[];
+  };
+  return (json.materials ?? []).flatMap(({ name }) => (name === undefined ? [] : [name]));
+};
+
+/**
+ * The glow the model entry tags must be one material the written GLB draws: a slot no solid draws leaves the tag
+ * naming nothing, and two materials of one colour would light both.
+ */
+const checkGlow = (id: string, glow: string, glb: Uint8Array) => {
+  const count = glbMaterialNames(glb).filter((name) => name === glow).length;
+  if (count !== 1) {
+    throw new Error(`${id}: emissive material ${glow} names ${count} materials in the GLB, not one`);
+  }
+};
+
 export const exportItem = (
   item: ToolItem,
   asset: ReturnType<typeof recipeAsset>,
@@ -26,6 +46,9 @@ export const exportItem = (
   });
   if (!out.ok) {
     throw new Error(JSON.stringify(out.error));
+  }
+  if (glow) {
+    checkGlow(item.id, glow, out.glb);
   }
   const parts = modelParts(
     report.resolved,
