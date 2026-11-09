@@ -81,5 +81,5 @@ local furHat = [
     h.turned('crown', 'knit', 'y', [[0, 0], [0, 0.085], [0.1, 0.085], [0.148, 0.066], [0.172, 0.036], [0.18, 0]]),
     ring('cuff', 'cuff', 0.084, 0.092, 0, 0.05),
   ] + ribs('rib', 'cuff', 30, 0.092, 0.0035, 0, 0.05), { knit: 'cloth-red', cuff: 'cloth-red' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['fabric'] } } },
 ]

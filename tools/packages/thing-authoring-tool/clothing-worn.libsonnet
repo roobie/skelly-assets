@@ -7,6 +7,7 @@ local prism(id, slot, bottom, top, width, depth, chamfer, cx=0, cz=0) = {
     [-depth / 2, width / 2 - chamfer], [-depth / 2, -width / 2 + chamfer],
   ]],
 };
+local worn = import 'worn-taxonomy.libsonnet';
 local box(id, slot, low, high) = { id: id, slot: slot, kind: 'box', min: low, max: high };
 local garment(id, pieces, finish) = {
   id: id, exportMass: 'inventory-atom',
@@ -26,7 +27,8 @@ local hoodieLevel(id) =
 local trousers = { cloth: 'cloth-pants-player', trim: 'paint-charcoal' };
 local rubber = { cloth: 'rubber-black', trim: 'paint-charcoal' };
 local sneaker = { cloth: 'cloth-pants-player', trim: 'rubber-black' };
-[
+local clothing(material) = { category: 'clothing', tags: { material: material, setting: ['modern'] } };
+worn.shells(clothing(['fabric']), [
   garment('worn_jacket_body', [
     jacketLevel('hem'),
     jacketLevel('waist'),
@@ -62,6 +64,7 @@ local sneaker = { cloth: 'cloth-pants-player', trim: 'rubber-black' };
     prism('leg', 'cloth', -0.325, 0.025, 0.14, 0.155, 0.02),
     prism('hem', 'trim', -0.325, -0.29, 0.145, 0.16, 0.02),
   ], trousers),
+]) + worn.shells(clothing(['rubber']), [
   garment('worn_boot_shaft', [
     prism('shaft', 'cloth', -0.33, 0.025, 0.16, 0.18, 0.02),
     prism('rim', 'trim', -0.02, 0.03, 0.17, 0.19, 0.02),
@@ -70,8 +73,9 @@ local sneaker = { cloth: 'cloth-pants-player', trim: 'rubber-black' };
     prism('upper', 'cloth', -0.075, 0.02, 0.13, 0.30, 0.02, cz=0.075),
     box('sole', 'trim', [-0.07, -0.09, -0.08], [0.07, -0.065, 0.23]),
   ], rubber),
+]) + worn.shells(clothing(['fabric', 'rubber']), [
   garment('worn_sneaker_foot', [
     prism('upper', 'cloth', -0.075, 0, 0.13, 0.30, 0.02, cz=0.075),
     box('sole', 'trim', [-0.07, -0.09, -0.08], [0.07, -0.065, 0.23]),
   ], sneaker),
-]
+])

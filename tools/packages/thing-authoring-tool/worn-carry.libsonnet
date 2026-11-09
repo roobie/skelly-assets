@@ -28,6 +28,12 @@ local torso = if overJacket then {
 };
 local shoulderTop = torso.chest.y[1];
 
+// Worn on the player body, over the jacket in the `_jacket` variants.
+local tag(category, slot, material) = {
+  category: category,
+  tags: { slot: [slot], material: [material], setting: ['modern'], fit: [if overJacket then 'over-jacket' else 'worn'] },
+};
+
 // Clearances must exceed the under-layer's exported surface, including pockets and fasteners, not just its slab.
 local fit = {
   vest: [0.012, 0.02],
@@ -128,6 +134,7 @@ local backpack(id, massKg, bottom) =
     id: id + '_worn' + suffix,
     exportMass: 'parts',
     voxelGrain: 0.004,
+    taxonomy: tag('containers', 'back', 'fabric'),
     parts: [
       {
         id: 'straps', family: 'compound', massKg: 0.1,
@@ -147,6 +154,7 @@ local fannyPack =
     id: 'fanny_pack_worn' + suffix,
     exportMass: 'parts',
     voxelGrain: 0.004,
+    taxonomy: tag('containers', 'waist', 'fabric'),
     parts: [
       {
         id: 'belt', family: 'compound', massKg: 0.05,
@@ -160,13 +168,13 @@ local fannyPack =
     connections: [{ from: 'belt.bag', to: 'bag.bag' }],
   };
 
-local wornAtom(id, massKg, pieces, finish) = {
+local wornAtom(id, massKg, pieces, finish, taxonomy=null) = {
   id: id + suffix,
   exportMass: 'parts',
   voxelGrain: 0.004,
   parts: [{ id: 'shell', family: 'compound', massKg: massKg, params: params({ pieces: pieces }), finish: finish, ports: [] }],
   connections: [],
-};
+} + (if taxonomy == null then {} else { taxonomy: taxonomy });
 
 // The sling's strap over the right deltoid: a pad across its top, a short tab over its front, and a leg down its back
 // to the slung gun's stock. Its foot meets the gun where `packages/mods/skelly.firearms/models-firearms.libsonnet`,
@@ -188,8 +196,8 @@ local sling =
   ];
 
 [
-  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'polymer-od-green', trim: 'cord-olive' }),
-  wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }),
+  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'polymer-od-green', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
+  wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }, tag('armour', 'torso', 'fabric')),
   backpack('school_backpack', 0.6, 0.15),
   backpack('hiking_backpack', 1.4, 0.06),
   fannyPack,

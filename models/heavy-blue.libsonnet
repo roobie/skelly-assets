@@ -1,6 +1,7 @@
 // The heavy blue armour set: the trooper's fitted worn shells in a cobalt livery, with over-the-top pieces added per
 // slot: huge round pauldrons, a broad chest plate over a dark belt, bulky cuisses, greaves and vambraces, oversized
 // gauntlets and a chunky helm. Worn shells only (no ground models).
+local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
@@ -148,10 +149,10 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-[
+armour.of(null, [
   local seg = std.split(r.id, '_worn_')[1];
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
   h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { voxelGrain: 0.006 },
-]
+])
