@@ -212,17 +212,17 @@ local pair(fn, gap) = fn('l-', -gap, -1) + fn('r-', gap, 1);
 [
   // A pair of mild steel mail gloves laid flat side by side, backs up, each 245 mm from cuff to fingertip and 90 mm
   // across the knuckles: the whole hand and cuff in riveted rings, the cuff bound in leather.
-  h.compound('lc_chainmail_hands', 1.8, pair(mailGlove, 0.068), { palm: 'steel-mail', finger: 'steel-mail', cuff: 'steel-mail', ring: 'steel-bright', binding: 'leather-brown' })
+  h.compound('mild_steel_mail_gloves', 1.8, pair(mailGlove, 0.068), { palm: 'steel-mail', finger: 'steel-mail', cuff: 'steel-mail', ring: 'steel-bright', binding: 'leather-brown' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of mild steel demi-gauntlets laid flat, backs up, each 260 mm from cuff to fingertip: leather gloves with
   // mail fingers, a riveted plate over the back of the hand with a knuckle ridge and a flared wrist plate.
-  h.compound('lc_demi_gaunt', 1.6, pair(demiGauntlet, 0.07), { palm: 'leather-brown', finger: 'steel-mail', cuff: 'leather-brown', ring: 'steel-bright', plate: 'steel-bright', rivet: 'brass-dull' })
+  h.compound('mild_steel_demi_gauntlets', 1.6, pair(demiGauntlet, 0.07), { palm: 'leather-brown', finger: 'steel-mail', cuff: 'leather-brown', ring: 'steel-bright', plate: 'steel-bright', rivet: 'brass-dull' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of mild steel mitten gauntlets laid flat, backs up, each 280 mm from cuff to fingertip: leather mitts with
   // mail fingers covered by four overlapping lames and a rounded tip plate, a back plate and a flared wrist plate.
-  h.compound('lc_mitten_gaunt', 2.5, pair(mittenGauntlet, 0.07), { palm: 'leather-brown', finger: 'steel-mail', cuff: 'leather-brown', ring: 'steel-bright', plate: 'steel-bright', rivet: 'brass-dull' })
+  h.compound('mild_steel_mitten_gauntlets', 2.5, pair(mittenGauntlet, 0.07), { palm: 'leather-brown', finger: 'steel-mail', cuff: 'leather-brown', ring: 'steel-bright', plate: 'steel-bright', rivet: 'brass-dull' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of white cotton evening gloves laid flat, each 570 mm from the top of the sleeve to the fingertip and 76 mm
@@ -232,7 +232,7 @@ local pair(fn, gap) = fn('l-', -gap, -1) + fn('r-', gap, 1);
 
   // A pair of improvised sheet-steel mitten gauntlets laid flat, backs up, each 280 mm from cuff to tip: padded
   // canvas mittens with a wrist, a hand and a finger plate overlapping down the back, bound on with cord.
-  h.compound('mitten_gaunt_metal_sheets', 1.5, pair(sheetGuard, 0.075), { mitt: 'cloth-khaki', cuff: 'leather-brown', plate: 'steel-galvanised', edge: 'steel-grey', cord: 'cord-cotton' })
+  h.compound('sheet_steel_mitten_gauntlets', 1.5, pair(sheetGuard, 0.075), { mitt: 'cloth-khaki', cuff: 'leather-brown', plate: 'steel-galvanised', edge: 'steel-grey', cord: 'cord-cotton' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['hands'] } } },
 
   // A pair of knitted wool mittens laid flat, each 240 mm from cuff to tip and 100 mm across: thick grey mitts with a
@@ -241,11 +241,11 @@ local pair(fn, gap) = fn('l-', -gap, -1) + fn('r-', gap, 1);
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin flame-resistant knit gloves laid flat, each 240 mm from cuff to fingertip, with ribbed knit cuffs.
-  h.compound('nomex_gloves', 0.05, pair(knitGlove, 0.066), { palm: 'knit-fr', finger: 'knit-fr', cuff: 'knit-fr', seam: 'cloth-charcoal' })
+  h.compound('flame_resistant_gloves', 0.05, pair(knitGlove, 0.066), { palm: 'knit-fr', finger: 'knit-fr', cuff: 'knit-fr', seam: 'cloth-charcoal' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of flame-resistant socks worn as mitts, laid flat, each 380 mm long and 90 mm wide, with finger holes poked
   // through the toe and a slit for the thumb.
-  h.compound('nomex_sockmitts', 0.08, pair(sockMitt, 0.06), { sock: 'knit-fr', heel: 'cloth-charcoal', hole: 'cloth-black' })
+  h.compound('flame_resistant_sock_mitts', 0.08, pair(sockMitt, 0.06), { sock: 'knit-fr', heel: 'cloth-charcoal', hole: 'cloth-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 ]

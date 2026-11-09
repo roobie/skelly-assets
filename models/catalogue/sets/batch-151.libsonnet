@@ -220,19 +220,19 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
 [
   // A pair of sheet-metal leg guards 600 mm from hip to ankle, each a hammered thigh plate and shin plate of 3 mm
   // sheet tied on with cord, laid side by side.
-  h.compound('leg_guards_sheet_metal', 2.2, sheetGuard('left', -0.09, -1, 0) + sheetGuard('right', 0.09, 1, 0.03), {
+  h.compound('sheet_metal_leg_guards', 2.2, sheetGuard('left', -0.09, -1, 0) + sheetGuard('right', 0.09, 1, 0.03), {
     plate: 'steel-bright',
     tie: 'cord-cotton',
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A pair of sheet-metal greaves 370 mm from knee to instep, laid side by side.
-  h.compound('greaves_sheet_metal', 1.6, sheetGreave('left', -0.085, -1, 0) + sheetGreave('right', 0.085, 1, 0.03), {
+  h.compound('sheet_metal_greaves', 1.6, sheetGreave('left', -0.085, -1, 0) + sheetGreave('right', 0.085, 1, 0.03), {
     plate: 'steel-bright',
     tie: 'cord-cotton',
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A skirt of four cut-down steel sheets 300 mm long hung from a leather belt 500 mm long, laid flat.
-  h.compound('skirt_sheet_metal', 2, skirt, {
+  h.compound('sheet_metal_skirt', 2, skirt, {
     plate: 'steel-bright',
     rivet: 'steel-grey',
     belt: 'leather-brown',
@@ -241,7 +241,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
 
   // A pair of sheet-metal knee guards, each a felt-lined half-pipe 130 mm long and 130 mm across with a domed knee
   // cop, leather straps lying flat off both edges; 500 mm across the pair.
-  h.compound('knee_guards_sheet_metal', 0.79, sheetKnee('left', -0.1, -1) + sheetKnee('right', 0.1, 1), {
+  h.compound('sheet_metal_knee_guards', 0.79, sheetKnee('left', -0.1, -1) + sheetKnee('right', 0.1, 1), {
     plate: 'steel-bright',
     hole: 'plastic-matte-black',
     pad: 'felt-grey',
@@ -250,13 +250,13 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
 
   // A pair of paper leg guards 470 mm long, each three curved layers of stacked paper bound with duct tape.
-  h.compound('leg_guards_paper', 0.59, paperGuard('left', -0.09, -1, 0) + paperGuard('right', 0.09, 1, 0.03), {
+  h.compound('paper_leg_guards', 0.59, paperGuard('left', -0.09, -1, 0) + paperGuard('right', 0.09, 1, 0.03), {
     paper: 'paper-white',
     tape: 'tape-grey',
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['legs'] } } },
 
   // A pair of scrap leg guards 580 mm long, mismatched pieces of sheet strung together with cord.
-  h.compound('leg_guards_scrap', 2.1, scrapGuard('left', -0.095, -1, 0) + scrapGuard('right', 0.095, 1, 0.03), {
+  h.compound('scrap_metal_leg_guards', 2.1, scrapGuard('left', -0.095, -1, 0) + scrapGuard('right', 0.095, 1, 0.03), {
     'scrap-a': 'scrap-rusted',
     'scrap-b': 'steel-galvanised',
     'scrap-c': 'steel-bright',
@@ -264,7 +264,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A pair of tyre leg guards 580 mm long, three thick chunks of tread on each strung together with cord.
-  h.compound('leg_guards_tyre', 3, tyreGuard('left', -0.1, -1, 0) + tyreGuard('right', 0.1, 1, 0.03), {
+  h.compound('tyre_leg_guards', 3, tyreGuard('left', -0.1, -1, 0) + tyreGuard('right', 0.1, 1, 0.03), {
     rubber: 'rubber-black',
     tread: 'plastic-charcoal',
     tie: 'cord-cotton',
@@ -316,7 +316,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
 
   // Bomb-disposal trousers folded to 440 by 380 mm, 140 mm thick with padding: quilted panels, a hard knee plate
   // with hook-and-loop strips, and braces laid over the top.
-  h.compound('eod_trousers', 6.9, trousers(0.44, 0.38, 0.14, 3)
+  h.compound('bomb_disposal_trousers', 6.9, trousers(0.44, 0.38, 0.14, 3)
     + g.quilt({ style: 'channels', x0: -0.2, x1: 0.2, z0: -0.17, z1: 0.1, y: 0.14, r: 0.012, pitch: 0.04 })
     + h.curvedPlate('knee', 'plate', rrect(0, 0, 0.085, 0.07, 0.03), 0.142, 0.012, 0.25, 6, 0.06, -0.06)
     + [box('hook-%d' % i, 'hook', [0.06 - 0.07, 0.165, z], [0.06 + 0.07, 0.169, z + 0.012]) for i in [0, 1] for z in [[-0.115, 0.0][i]]]
@@ -342,7 +342,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
 
   // Lighter bomb-disposal trousers folded to 400 by 340 mm, 90 mm thick: stitched padding, a knee pad, a flapped
   // thigh pocket and hook-and-loop panels.
-  h.compound('eod_trousers_light', 3.2, trousers(0.4, 0.34, 0.09, 3)
+  h.compound('light_bomb_disposal_trousers', 3.2, trousers(0.4, 0.34, 0.09, 3)
     + g.quilt({ style: 'lines', x0: -0.19, x1: 0.19, z0: -0.16, z1: 0.09, y: 0.09, pitch: 0.05 })
     + pad('knee', 0.07, -0.08, 0.06, 0.05, 0.094, 0.01, 2)
     + pad('cargo', -0.1, -0.04, 0.06, 0.07, 0.094, 0.012, 0, 'cargo')

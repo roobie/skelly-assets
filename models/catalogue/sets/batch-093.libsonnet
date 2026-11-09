@@ -70,7 +70,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
 [
   // A pair of medium steel mail sleeves laid flat side by side, 560 mm long, 170 mm across at the shoulder and
   // 110 mm at the wrist, ridged where the rows of rings lie, joined at the shoulders by a leather strap.
-  h.compound('mc_chainmail_arms', 4.5, std.flattenArrays([
+  h.compound('medium_steel_mail_sleeves', 4.5, std.flattenArrays([
     flatSleeve('sleeve-%d' % s, 'mail', 0.56, 0.17, 0.11, 0.008, s * 0.1)
     + ridges('rings-%d' % s, 'mail', 0.56, 0.17, 0.11, 0.008, s * 0.1, 0.012, 0.006, 0.004)
     + [h.prism('cuff-%d' % s, 'mail', 'y', [[s * 0.1 - 0.058, 0.25], [s * 0.1 + 0.058, 0.25], [s * 0.1 + 0.055, 0.28], [s * 0.1 - 0.055, 0.28]], 0, 0.014)]
@@ -84,7 +84,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   // A pair of sleeves cut from a heavy cotton shirt, laid flat side by side, 560 mm long, 180 mm across at the
   // shoulder and 120 mm at the cuff, each with a leather panel stitched over the upper arm and one over the forearm,
   // bare cloth left at the elbow, and a cord tying the two together at the shoulders.
-  h.compound('survivor_adhoc_leather_sleeves', 0.4, std.flattenArrays([
+  h.compound('leather_padded_sleeves', 0.4, std.flattenArrays([
     flatSleeve('sleeve-%d' % s, 'cloth', 0.56, 0.18, 0.12, 0.01, s * 0.105)
     + [
       sleevePatch('upper-%d' % s, 'leather', 0.56, 0.18, 0.12, -0.26, -0.05, 0.012, 0.01, 0.005, s * 0.105),
@@ -106,7 +106,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
 
   // A pair of light leather archery vambraces laid side by side, crown up: each a stiff curved guard 220 mm long
   // round an 45 mm radius, with a rolled edge at the wrist and three buckled straps trailing to one side.
-  h.compound('vambrace_larmor', 0.2, std.flattenArrays([
+  h.compound('leather_vambraces', 0.2, std.flattenArrays([
     arc('guard-%d' % s, 'leather', 0.045, 0.004, 70, -0.11, 0.11, s * 0.09)
     + arc('wrist-%d' % s, 'edge', 0.045, 0.007, 70, 0.1, 0.11, s * 0.09, 8, -0.045 * std.cos(70 * std.pi / 180))
     + arc('elbow-%d' % s, 'edge', 0.045, 0.007, 70, -0.11, -0.1, s * 0.09, 8, -0.045 * std.cos(70 * std.pi / 180))
@@ -125,7 +125,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   // A plate carrier lying flat, front up: a front panel 360 mm wide and 460 mm long over the back panel, a plate
   // pocket bulging under five rows of PALS webbing, padded shoulder straps over the neck opening, a drag handle on
   // the back's collar and a cummerbund wing 140 mm wide on each side carrying a side plate pocket.
-  h.compound('ballistic_vest_esapi', 2.3, carrier(0.36, 0.46, 0.14, 5, true) + [
+  h.compound('plate_carrier', 2.3, carrier(0.36, 0.46, 0.14, 5, true) + [
     strap('strap-l', -0.11, 0.46),
     strap('strap-r', 0.11, 0.46),
   ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black' })
@@ -134,7 +134,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   // A heavy plate carrier lying flat, front up: a front panel 380 mm wide and 480 mm long over the back panel, its
   // plate pocket under six rows of PALS webbing, a raised collar round the neck opening, a red quick-release tab at
   // the chest, side plate pockets on wide cummerbund wings and a lower back guard hanging out below the hem.
-  h.compound('ballistic_vest_heavy', 3, carrier(0.38, 0.48, 0.15, 6, true) + [
+  h.compound('heavy_plate_carrier', 3, carrier(0.38, 0.48, 0.15, 6, true) + [
     strap('strap-l', -0.12, 0.48),
     strap('strap-r', 0.12, 0.48),
     box('collar-back', 'pad', [-0.16, 0.0, -0.33], [0.16, 0.07, -0.29]),
@@ -150,7 +150,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   // A light plate carrier lying flat, front up: a front panel 280 mm wide and 340 mm long over the back panel, with
   // three rows of PALS webbing, thin shoulder straps, and an elastic cummerbund wing on each side with two rifle
   // magazines' worth of tall pockets.
-  h.compound('ballistic_vest_light', 1.5, carrier(0.28, 0.34, 0.12, 3, false) + [
+  h.compound('light_plate_carrier', 1.5, carrier(0.28, 0.34, 0.12, 3, false) + [
     strap('strap-l', -0.08, 0.34),
     strap('strap-r', 0.08, 0.34),
   ] + [
@@ -163,7 +163,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
 
   // The same light plate carrier, 280 mm wide and 340 mm long, with plain cummerbund wings, a radio pouch 70 mm
   // wide and 130 mm tall standing on its left shoulder strap and a small steel hook on the chest for a glow stick.
-  h.compound('ballistic_vest_light_operator', 1.5, carrier(0.28, 0.34, 0.12, 3, false) + [
+  h.compound('light_plate_carrier_with_radio_pouch', 1.5, carrier(0.28, 0.34, 0.12, 3, false) + [
     strap('strap-l', -0.08, 0.34),
     strap('strap-r', 0.08, 0.34),
     box('radio', 'pouch', [-0.115, 0.058, -0.24], [-0.045, 0.1, -0.11]),

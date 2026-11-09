@@ -49,7 +49,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A garish pink faux fur coat folded, 380 mm by 320 mm and 60 mm tall, its fluffy shawl collar rolled along the
   // back, two small patch pockets and a short cotton-lined front edge with toggles.
   local top = 0.06;
-  h.compound('coat_faux_fur', 1.4,
+  h.compound('faux_fur_coat', 1.4,
     h.foldedGarment(0.38, 0.32, top, 3)
     + [collar(0.3, -0.13, top, 0.022)]
     + pocket('pocket-l', -0.16, -0.06, 0.04, 0.13, top, 0.006)
@@ -62,7 +62,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A brown fur coat folded, 380 mm by 320 mm and 60 mm tall, its deep fur collar rolled along the back, two small
   // pockets and three dark buttons down the front.
   local top = 0.06;
-  h.compound('coat_fur', 1.5,
+  h.compound('fur_coat', 1.5,
     h.foldedGarment(0.38, 0.32, top, 3)
     + [collar(0.32, -0.13, top, 0.026)]
     + pocket('pocket-l', -0.16, -0.06, 0.04, 0.13, top, 0.006)
@@ -75,7 +75,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A gutskin parka folded thin, 300 mm by 240 mm and 30 mm tall: pale translucent strips of split gut sewn in
   // bands across the body, the hood folded down on top with a sinew-bound rim.
   local top = 0.03;
-  h.compound('coat_gut', 0.5,
+  h.compound('gutskin_parka', 0.5,
     h.foldedGarment(0.3, 0.24, top, 3)
     + ridges('seam', 'seam', -0.15, 0.15, [-0.06, -0.02, 0.02, 0.06, 0.1], top, 0.002, 0.004)
     + hood(0.2, -0.12, -0.0, top + 0.002, 0.008, 0.006),
@@ -85,7 +85,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A white lab coat folded, 340 mm by 280 mm and 30 mm tall: notched lapels either side of the buttoned front,
   // two big hip pockets and a breast pocket with a clear pocket protector holding two pens.
   local top = 0.03;
-  h.compound('coat_lab', 0.69,
+  h.compound('lab_coat', 0.69,
     h.foldedGarment(0.34, 0.28, top, 3)
     + [
       h.prism('lapel-l', 'lapel', 'y', [[-0.14, -0.1], [-0.14, -0.012], [0.0, -0.012]], top, top + 0.004),
@@ -106,7 +106,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A yellow vinyl rain coat folded, 320 mm by 260 mm and 25 mm tall: the hood folded down on top, two very large
   // flapped pockets and snap studs down the front.
   local top = 0.025;
-  h.compound('coat_rain', 0.87,
+  h.compound('raincoat', 0.87,
     h.foldedGarment(0.32, 0.26, top, 3)
     + hood(0.2, -0.13, -0.02, top, 0.01)
     + pocket('pocket-l', -0.155, -0.035, 0.0, 0.12, top, 0.004, 0.035)
@@ -118,7 +118,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A navy padded winter coat folded, 380 mm by 320 mm and 65 mm tall: quilted baffles across the body, the hood
   // folded down on top with a fur-trimmed rim, a zip down the front and two deep pockets.
   local top = 0.065;
-  h.compound('coat_winter', 2,
+  h.compound('winter_coat', 2,
     h.foldedGarment(0.38, 0.32, top, 3)
     + ridges('baffle', 'baffle', -0.19, 0.19, [0.0, 0.05, 0.1, 0.15], top, 0.006, 0.012)
     + hood(0.24, -0.15, -0.02, top, 0.014, 0.014)
@@ -144,7 +144,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A pale faux fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep shawl collar rolled along the back,
   // cotton-lined front edges and two flapped pockets with toggles.
   local top = 0.08;
-  h.compound('duster_faux_fur', 2.4,
+  h.compound('faux_fur_duster', 2.4,
     h.foldedGarment(0.42, 0.36, top, 5)
     + [collar(0.34, -0.15, top, 0.028)]
     + [box('edge', 'lining', [-0.014, top, -0.11], [0.014, top + 0.003, 0.18])]
@@ -157,7 +157,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A brown fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep fur collar rolled along the back,
   // leather-bound front edges and two flapped pockets.
   local top = 0.08;
-  h.compound('duster_fur', 2.4,
+  h.compound('fur_duster', 2.4,
     h.foldedGarment(0.42, 0.36, top, 5)
     + [collar(0.36, -0.15, top, 0.032)]
     + [box('edge', 'lining', [-0.012, top, -0.11], [0.012, top + 0.003, 0.18])]
@@ -170,7 +170,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A brown leather duster folded, 400 mm by 340 mm and 60 mm tall: the shoulder cape over the back half, a wide
   // collar rolled along the back, brass-studded front and two flapped pockets.
   local top = 0.06;
-  h.compound('duster_leather', 2.6,
+  h.compound('leather_duster', 2.6,
     h.foldedGarment(0.4, 0.34, top, 5)
     + [h.prism('cape', 'cape', 'y', [[-0.17, -0.2], [-0.17, 0.2], [-0.03, 0.2], [0.01, 0.13], [0.01, -0.13], [-0.03, -0.2]], top, top + 0.006)]
     + [collar(0.26, -0.15, top + 0.006, 0.016)]
@@ -191,7 +191,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   // A white bed sheet folded flat, 300 mm by 240 mm and 20 mm tall, the top fold showing the two eye holes cut
   // through it.
   local top = 0.02;
-  h.compound('ghost_robe_sheet', 0.6,
+  h.compound('bedsheet_ghost_costume', 0.6,
     h.foldedGarment(0.3, 0.24, top, 4)
     + [
       h.turned('eye-l', 'hole', 'y', [[0, 0], [0, 0.016], [0.001, 0.016], [0.001, 0]], [-0.045, top - 0.0008, -0.01]),

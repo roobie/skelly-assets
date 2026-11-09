@@ -37,7 +37,7 @@ local cowlRibs = 32;
 [
   // A clip-on necktie laid flat, 450 mm long and 85 mm across at the blade: a pre-tied knot with a steel clip behind
   // it, the blue blade striped diagonally in silver and cut to a point.
-  h.compound('tie_clipon', 0.045, [
+  h.compound('clip_on_tie', 0.045, [
     flat('blade', 'cloth', [[-0.02, -0.17], [0.02, -0.17], [0.0425, 0.18], [0, 0.222], [-0.0425, 0.18]], 0, 0.004),
     flat('knot', 'cloth', [[-0.023, -0.222], [0.023, -0.222], [0.017, -0.168], [-0.017, -0.168]], 0, 0.012),
     box('clip', 'clip', [-0.016, 0.004, -0.238], [0.016, 0.007, -0.205]),
@@ -55,7 +55,7 @@ local cowlRibs = 32;
   // A green silk-look necktie rolled up as it is stored, 100 mm across and 80 mm tall: the narrow end coiled at the
   // centre, the turns rising to the wide blade outside with gold stripes slanting round it, and the pointed end of the
   // blade unrolled to lie out flat on the floor.
-  h.compound('tie_necktie', 0.06, [
+  h.compound('necktie', 0.06, [
     local f = (i + 0.5) / coilN;
     h.prism('coil-%d' % i, 'cloth', 'y', [[q[1], q[0]] for q in [polar(coilR(i), coilA(i)), polar(coilR(i + 1), coilA(i + 1)), polar(coilR(i + 1) + coilT, coilA(i + 1)), polar(coilR(i) + coilT, coilA(i))]], 0, coilH0 + (coilH1 - coilH0) * f)
     for i in std.range(0, coilN - 1)
@@ -80,7 +80,7 @@ local cowlRibs = 32;
 
   // A skinny necktie folded in half and laid flat, 710 mm long: the 50 mm blade and the 30 mm tail side by side,
   // joined at the fold, black checked in white with pointed tips.
-  h.compound('tie_skinny', 0.04, [
+  h.compound('skinny_tie', 0.04, [
     flat('blade', 'cloth', [[-0.055, -0.34], [-0.005, -0.34], [-0.005, 0.32], [-0.03, 0.345], [-0.055, 0.32]], 0, 0.004),
     flat('tail', 'cloth', [[0.005, -0.34], [0.035, -0.34], [0.035, 0.29], [0.02, 0.305], [0.005, 0.29]], 0, 0.004),
     box('fold', 'cloth', [-0.055, 0, -0.362], [0.035, 0.006, -0.336]),
@@ -118,7 +118,7 @@ local cowlRibs = 32;
   // A white wedding veil laid loosely folded, 280 mm by 220 mm and 20 mm tall with its comb: a thin double layer of
   // fine net falling in soft folds from the comb, edged with scalloped lace, a silver comb studded with pearls
   // gathering it at the top.
-  h.compound('veil_wedding', 0.1, [
+  h.compound('wedding_veil', 0.1, [
     flat('net', 'cloth', [[-0.06, -0.075], [0.06, -0.075], [0.14, 0.1], [-0.14, 0.1]], 0, 0.003),
   ] + [
     // Soft folds fanning out from the comb to the hem.
@@ -141,7 +141,7 @@ local cowlRibs = 32;
 
   // A chunky knit cowl lying flat as a loop, 285 mm across and 64 mm tall: a soft oatmeal wool tube ribbed all the way
   // round.
-  h.compound('cowl_wool', 0.54, [
+  h.compound('knit_cowl', 0.54, [
     h.turned('tube', 'cloth', 'y', [
       [cowlRy + cowlRy * std.cos(rad(a)), cowlR + cowlRr * std.sin(rad(a))]
       for a in [k * 24 for k in std.range(0, 15)] + [0]

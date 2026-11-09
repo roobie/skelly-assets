@@ -93,7 +93,7 @@ local plankGuard(prefix, z, side, shift=0) =
 [
   // A pair of improvised shin guards, each a split plank 260 mm long and 80 mm wide, padded and tied on with rags and
   // string at both ends, laid side by side.
-  h.compound('two_by_shin_guards', 0.49, plankGuard('left', -0.065, -1) + plankGuard('right', 0.065, 1, 0.02), {
+  h.compound('plank_shin_guards', 0.49, plankGuard('left', -0.065, -1) + plankGuard('right', 0.065, 1, 0.02), {
     wood: 'wood-pine',
     rag: 'cloth-rag',
     string: 'cord-cotton',
@@ -101,13 +101,13 @@ local plankGuard(prefix, z, side, shift=0) =
 
   // A pair of light steel leg guards 600 mm long from hip to ankle, each a chain leg with a narrow plate down the
   // thigh and another down the shin, buckled on with leather straps, laid side by side.
-  h.compound('leg_guard_steel_light', 4.2, legPair('light'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_light_leg_guards', 4.2, legPair('light'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of steel leg guards 600 mm long: half-round cuisse and greave plates on a chain leg, a domed knee cop
   // with a side wing.
-  h.compound('leg_guard_steel', 6.9, legPair('standard'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_leg_guards', 6.9, legPair('standard'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of heavy steel leg guards 600 mm long: thicker, wider plates than the standard pair, a rolled hip edge,
   // lames above and below the knee cop and a flare over the ankle.
-  h.compound('leg_guard_steel_heavy', 9.4, legPair('heavy'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_heavy_leg_guards', 9.4, legPair('heavy'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 ]

@@ -214,7 +214,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same sneakers with the heel wheels pushed out, each a 40 mm wheel standing below the sole so the toes lift.
-  h.compound('heel_wheel_sneakers_out', 1.5, std.flattenArrays([
+  h.compound('heel_wheel_sneakers_wheels_out', 1.5, std.flattenArrays([
     local cx = s * (sneaker.w / 2 + 0.015) * 1.06, p = if s < 0 then 'l-' else 'r-';
     lift(boot(p, sneaker, cx) + instepLaces(p, sneaker, cx, 4) + [
       box(p + 'stripe', 'stripe', [cx - sneaker.w * 0.5, 0.034, -0.08], [cx + sneaker.w * 0.5, 0.044, 0.06]),

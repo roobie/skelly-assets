@@ -96,7 +96,7 @@ local potHelm(id, mass, r, ht, finishes) =
 
   // A canning pot helmet, a blue enamelled steel canner 330 mm across and 260 mm deep upside down on its rim, with a
   // strap through the side handles.
-  potHelm('pot_xlhelmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
+  potHelm('canning_pot_helmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
 
   // A stock pot great helm, an aluminium stock pot 260 mm across and 290 mm deep upside down on its rim, front on +z:
   // a T cut through the front wall for the eyes, nose and mouth with the stuffed blanket showing through it and
@@ -135,7 +135,7 @@ local potHelm(id, mass, r, ht, finishes) =
   // guard at the back of the neck, accessory rails along each side and a mount shroud over the brow.
   local cy = 0.18, R = 0.126;
   local skull(y) = std.sqrt(std.max(0, R * R - (y - cy) * (y - cy)));
-  h.compound('tac_fullhelmet', 1.9, [
+  h.compound('tactical_full_helmet', 1.9, [
     h.turned('shell', 'shell', 'y', [[0, 0], [0, 0.104], [0.04, 0.11], [0.1, 0.12], [0.14, 0.124], [cy, R]]
                                     + [[y, skull(y)] for y in [cy + 0.03, cy + 0.06, cy + 0.085, cy + 0.105, cy + 0.118, cy + 0.124]]
                                     + [[cy + R, 0]]),

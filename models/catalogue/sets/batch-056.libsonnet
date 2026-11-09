@@ -35,10 +35,10 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 2 kg CO2 extinguisher 400 mm tall: a narrow steel cylinder with a valve and a hose to a black discharge horn
   // clipped to the side.
-  h.compound('sm_extinguisher', 6.5, extinguisher(0.05, 0.3, 0.035, 0.007, [0.03, 0.15, 0.13]), {
+  h.compound('small_fire_extinguisher', 6.5, extinguisher(0.05, 0.3, 0.035, 0.007, [0.03, 0.15, 0.13]), {
     body: 'paint-red', foot: 'plastic-black', label: 'paper-white', valve: 'steel-grey', lever: 'steel-grey',
     gauge: 'plastic-white', hose: 'rubber-black', nozzle: 'plastic-black',
-  }) + h.inHand('sm_extinguisher', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + h.inHand('small_fire_extinguisher', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A thrown extinguisher 120 mm tall: an 84 mm steel ball of agent with a short neck, a capped plug with a pull ring
   // and a label band round its middle.
   h.compound('throw_extinguisher', 0.4, [
@@ -113,7 +113,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A woven trap 500 mm long lying on x: a wicker cone closed and tied at -x, 240 mm across its mouth at +x, with an
   // inner funnel in the mouth and bark hoops round it.
-  h.compound('fish_trap_basket', 0.35, [
+  h.compound('wicker_fish_trap', 0.35, [
     shell('body', 'wicker', 'x', [
       [0.01, 0], [0.01, 0.02], [0.08, 0.06], [0.14, 0.085], [0.145, 0.08], [0.2, 0.098], [0.205, 0.093], [0.26, 0.108],
       [0.265, 0.103], [0.32, 0.115], [0.325, 0.11], [0.38, 0.12], [0.385, 0.115], [0.5, 0.12], [0.5, 0.114],

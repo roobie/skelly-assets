@@ -67,7 +67,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
 
   // A tall black silk top hat sitting on its brim, 300 mm across the brim and 165 mm tall: a straight crown that
   // waists a little and flares to a flat top, a flat brim with a rolled edge, and a matt band above the brim.
-  h.compound('tophat', 0.2,
+  h.compound('top_hat', 0.2,
              [
                shell('crown', 'silk', [[0.012, 0.088], [0.06, 0.084], [0.12, 0.086], [0.16, 0.09], [0.165, 0.088], [0.165, 0]], 0.004),
                ring('brim', 'silk', 0.006, 0.006, 0.084, 0.145),
@@ -125,7 +125,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
   local sideStar(id, side, z, y, r) = local x = std.sqrt(std.pow(radiusAt(wizardPath, y), 2) - z * z);
     star(id, 'star', 'x', r, side * x - 0.005, side * x + 0.002, function(u, v) [y + v, z + u]);
   local brimStar(id, x, z, r) = star(id, 'star', 'y', r, 0.004, 0.009, function(u, v) [z + v, x + u]);
-  h.compound('wizard_hat_costume', 0.1,
+  h.compound('wizard_hat', 0.1,
              [
                shell('cone', 'cloth', wizardPath, 0.006),
                ring('brim', 'cloth', 0, 0.006, 0.098, 0.19),
@@ -154,7 +154,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
   // and wider for the side view, green-coated objective lenses at the front (+z), and the helmet mount shoe on top.
   local tube(id, x, y, r, z0, z1) = h.turned(id, 'body', 'z', [[0, 0], [0, r], [z1 - z0, r], [z1 - z0, 0]], [x, y, z0]);
   local lens(id, x, y, r, z) = h.turned(id, 'lens', 'z', [[0, 0], [0, r], [0.003, r], [0.003, 0]], [x, y, z]);
-  h.compound('panoramic_nvg', 0.63,
+  h.compound('panoramic_night_vision_goggles', 0.63,
              std.flattenArrays([
                [
                  tube('inner-%d' % i, s * 0.03, 0.021, 0.019, -0.04, 0.07),
@@ -184,7 +184,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
   // face to face on their black foam cushions' edges, each on a sprung steel wire arm that ends in a flat black clip
   // blade made to slide into a helmet's side slot.
   local cupX = 0.07, cupY = 0.044;
-  h.compound('attachable_ear_muffs', 0.16,
+  h.compound('helmet_ear_muffs', 0.16,
              std.flattenArrays([
                [
                  h.turned('cup-%d' % i, 'cup', 'x', if s < 0 then [[0, 0], [0, 0.036], [0.008, 0.042], [0.03, 0.042], [0.03, 0]] else [[0, 0], [0, 0.042], [0.022, 0.042], [0.03, 0.036], [0.03, 0]], [s * cupX - (if s < 0 then 0.03 else 0), cupY, 0]),

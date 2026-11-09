@@ -89,7 +89,7 @@ local cartons(y, hw, front) = [
   ], { frame: 'paint-charcoal', engine: 'paint-red', metal: 'alu-bare', black: 'plastic-black', alternator: 'steel-grey', outlet: 'plastic-grey', switch: 'plastic-red', tank: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An upright household freezer, 0.6 m wide, 0.64 m deep and 0.93 m tall, one door on +z.
-  h.compound('apartment_freezer', 110, feet(0.30, 0.32) + [
+  h.compound('upright_freezer', 110, feet(0.30, 0.32) + [
     box('body', 'body', [-0.30, 0.02, -0.32], [0.30, 0.928, 0.28]),
     box('grille', 'grille', [-0.28, 0.03, 0.28], [0.28, 0.10, 0.30]),
     box('seal', 'seal', [-0.295, 0.105, 0.28], [0.295, 0.92, 0.29]),
@@ -99,7 +99,7 @@ local cartons(y, hw, front) = [
   ], { body: 'paint-white', grille: 'plastic-grey', seal: 'rubber-black', handle: 'plastic-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A household fridge with the freezer above, 0.6 m wide, 0.67 m deep and 1.5 m tall, doors on +z.
-  h.compound('apartment_fridge', 58, feet(0.30, 0.335) + [
+  h.compound('household_fridge', 58, feet(0.30, 0.335) + [
     box('body', 'body', [-0.30, 0.02, -0.335], [0.30, 1.495, 0.30]),
     box('grille', 'grille', [-0.28, 0.03, 0.30], [0.28, 0.10, 0.31]),
     box('seal', 'seal', [-0.295, 0.105, 0.30], [0.295, 1.49, 0.31]),
@@ -170,6 +170,6 @@ local cartons(y, hw, front) = [
          { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A two-door drinks fridge, 1.1 m wide, 0.7 m deep and 2 m tall, bottles on its shelves.
-  cooler('glass_fridge_double', 230, 1.10, 0.70, 1.998, 2, [0.19, 0.52, 0.86, 1.20, 1.54], bottles,
+  cooler('double_glass_fridge', 230, 1.10, 0.70, 1.998, 2, [0.19, 0.52, 0.86, 1.20, 1.54], bottles,
          { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 ]

@@ -60,7 +60,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   // An induction hotplate, 290 mm wide, 350 mm deep and 60 mm tall: a grey plastic case under a black glass
   // top marked with one cooking ring, a sloped control strip along the front with a green display and
   // touch buttons, and a mains cord out the back.
-  h.compound('hotplate_induction', 2.5, [
+  h.compound('induction_hotplate', 2.5, [
     box('case', 'case', [-0.145, 0.004, -0.175], [0.145, 0.05, 0.175]),
     box('skid', 'foot', [-0.135, 0, -0.165], [0.135, 0.004, 0.165]),
     box('glass', 'glass', [-0.142, 0.05, -0.172], [0.142, 0.056, 0.11]),
@@ -254,7 +254,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   // A hand-cranked screw oil press, 200 mm long and 150 mm tall: a horizontal steel barrel on a clamp
   // bracket, a funnel hopper on top for seeds, a crank arm with a wooden knob at one end, a press-cake
   // nozzle at the other, an oil spout under the barrel and a small burner cup below it to warm the press.
-  h.compound('oil_press_manual', 1.9, [
+  h.compound('manual_oil_press', 1.9, [
     box('clamp-top', 'bracket', [-0.03, 0.04, -0.03], [0.03, 0.05, 0.03]),
     box('clamp-back', 'bracket', [-0.03, -0.0, -0.03], [0.03, 0.05, -0.02]),
     box('clamp-jaw', 'bracket', [-0.03, 0, -0.03], [0.03, 0.008, 0.02]),
@@ -284,7 +284,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   // A cast-iron pasta extruder, 100 mm across and 230 mm tall: a vertical barrel clamped to a bench by a
   // foot and thumbscrew, a shaped die plate at its mouth, and a threaded plunger driven down by a T-crank
   // through a bridge over the barrel.
-  h.compound('pastaextruder', 2, [
+  h.compound('pasta_extruder', 2, [
     turned('barrel', 'iron', 'y', [[0, 0.03], [0, 0.036], [0.12, 0.036], [0.12, 0.03], [0, 0.03]], [0, 0.04, 0]),
     disc('die', 'die', 0.034, 0.034, 0.04),
     disc('die-mark', 'die-mark', 0.016, 0.032, 0.034),
@@ -305,7 +305,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A jar of cucumbers fermenting in brine, cloth tied over the mouth.
-  fermentJar('pickles_ferment', 1.1, [
+  fermentJar('fermenting_pickles', 1.1, [
     disc('cuke-%d' % i, 'pickle', 0.011, 0.006, 0.09, [-0.022, 0, 0.022, -0.011, 0.012, 0.03][i], [-0.01, -0.024, 0.006, 0.022, 0.02, -0.02][i])
     for i in std.range(0, 5)
   ] + [
@@ -315,7 +315,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   // A soda-can alcohol stove kit, 140 mm across and 200 mm tall: a short double-walled stove cut from two
   // cans with a ring of jet holes round its top, a simmer ring with a tab handle resting on it, and the 500 ml
   // plastic fuel bottle with its cap.
-  h.compound('popcan_stove', 0.045, [
+  h.compound('soda_can_stove', 0.045, [
     turned('stove', 'can', 'y', [[0, 0], [0, 0.031], [0.004, 0.033], [0.034, 0.033], [0.038, 0.03], [0.038, 0]], [-0.045, 0, 0]),
     ring('jets', 'jets', 0.022, 0.026, 0.038, 0.002, -0.045),
     disc('well', 'well', 0.012, 0.038, 0.039, -0.045, 0),
@@ -325,7 +325,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     turned('label', 'label', 'y', [[0, 0], [0, 0.0315], [0.06, 0.0315], [0.06, 0]], [0.03, 0.05, 0]),
     disc('cap', 'cap', 0.014, 0.188, 0.205, 0.03, 0),
   ], { can: 'alu-bare', jets: 'paint-charcoal', well: 'paint-charcoal', simmer: 'alu-bare', bottle: 'plastic-clear', label: 'paper-white', cap: 'plastic-blue' })
-  + h.inHand('popcan_stove', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + h.inHand('soda_can_stove', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A single-burner propane stove, 230 mm wide, 180 mm deep and 110 mm tall: a green steel bowl on three
   // wire legs carrying a ported burner head and four pot supports, with a brass regulator and
@@ -376,7 +376,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'household', tags: { material: ['stone', 'wood'], setting: ['ancient'] } } },
 
   // A jar of shredded cabbage fermenting in its own brine under a stone weight, cloth tied over the mouth.
-  fermentJar('sauerkraut_ferment', 1.5, [
+  fermentJar('fermenting_sauerkraut', 1.5, [
     disc('kraut', 'kraut', 0.045, 0.004, 0.085),
     disc('weight', 'weight', 0.03, 0.085, 0.098),
   ], { brine: 'jelly-pale', kraut: 'straw-pale', weight: 'stone-grey' }) + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },

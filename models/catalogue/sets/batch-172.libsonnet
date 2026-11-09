@@ -222,23 +222,23 @@ local mailBundle(o) =
   // breastplate with a centre ridge over a three-lame fauld and a mail skirt, shoulder cops with two lames, arm and
   // leg plates around domed elbow and knee cops, sabaton lames and buckled leather straps. Tempered steel shows its
   // heat tint.
-  h.compound('armor_qt_plate', 25, qtSuit({}), plateFinish('steel-heat-tint'))
+  h.compound('tempered_plate_armour', 25, qtSuit({}), plateFinish('steel-heat-tint'))
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The light suit on the same layout: thin plates, small shoulder cops with one lame, no wings on the cops and
   // no sabatons, still over a mail skirt and gussets.
-  h.compound('armor_qt_lightplate', 18, qtSuit({ t: 0.003, cop: 0.075, copLames: 1, lames: 2, wings: false, feet: false }), plateFinish('steel-heat-tint'))
+  h.compound('light_tempered_plate_armour', 18, qtSuit({ t: 0.003, cop: 0.075, copLames: 1, lames: 2, wings: false, feet: false }), plateFinish('steel-heat-tint'))
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The heavy suit on the same layout: thick plates, a gorget over the neck, broad shoulder cops with three lames,
   // a four-lame fauld and winged cops.
-  h.compound('armor_qt_heavyplate', 39, qtSuit({ t: 0.006, cop: 0.105, copLames: 3, lames: 4, gorget: true }), plateFinish('steel-heat-tint'))
+  h.compound('heavy_tempered_plate_armour', 39, qtSuit({ t: 0.006, cop: 0.105, copLames: 3, lames: 4, gorget: true }), plateFinish('steel-heat-tint'))
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Plate armour over a fitted black bodysuit, laid out flat, 1.3 m from collar to toe: the tempered plate suit
   // resting on the bodysuit, which shows between the plates and at the cuffs, with ribbed vent panels down the
   // flanks and a cooling line running down each arm and leg.
-  h.compound('armor_nomad_plate', 26,
+  h.compound('ventilated_plate_armour', 26,
              underSuit('under', 0.008, 0.46, 0.15, 0.19, L.leg1 + 0.12)
              + qtSuit({ y: 0.008, mail: true })
              + [
@@ -260,7 +260,7 @@ local mailBundle(o) =
   // A leather armour suit laid out flat, 1.3 m from collar to toe: a thick leather torso, sleeves and leggings
   // with steel plates riveted where blows land, two on the chest, one on each upper arm, forearm, thigh and shin,
   // and a plate over each knee.
-  h.compound('armor_plarmor', 12,
+  h.compound('plated_leather_armour', 12,
              underSuit('leather', 0.01, 0.46, 0.15, 0.19)
              + [
                sbox('chest-plate-' + sideName(s), 'plate', [s * 0.03, 0.01, L.neck + 0.1], [s * 0.18, 0.016, L.neck + 0.3])
@@ -307,7 +307,7 @@ local mailBundle(o) =
   // A riot suit laid out flat, 1.4 m from collar to toe: black moulded plastic chest and limb shells with grey
   // padding along their edges, domed knee and elbow cups, foot guards, hook-and-loop straps, webbing rows across
   // the chest and a pale lettering band across it.
-  h.compound('armor_riot', 3,
+  h.compound('riot_armour_suit', 3,
              plateSuit({ t: 0.006, lames: 2, cop: 0.095, copLames: 1, mail: false, feet: false, ridge: false, r: 0.3 })
              + h.webbingFlat('webbing', 'strap', -0.15, 0.15, [L.neck + 0.2, L.neck + 0.245, L.neck + 0.29], h.curvedTopAt([[-0.2, 0], [0.2, 0]], 0, 0.006, 0.3, 0.15))
              + [box('band', 'band', [-0.13, h.curvedTopAt([[-0.2, 0], [0.2, 0]], 0, 0.006, 0.3, 0.13), L.neck + 0.36], [0.13, h.curvedTopAt([[-0.2, 0], [0.2, 0]], 0, 0.006, 0.3, 0) + 0.002, L.neck + 0.4])]
@@ -322,7 +322,7 @@ local mailBundle(o) =
   // A lacquered lamellar armour laid out flat, 1.3 m from collar to toe: the box cuirass of six laced rows of
   // black lames, a broad laced shoulder board either side, four laced skirt panels hanging below, cloth sleeves set
   // with small iron plates and ending in hand guards, and shin guards of iron splints.
-  h.compound('armor_samurai', 12,
+  h.compound('lacquered_lamellar_armour', 12,
              lamellar('do', 0, L.neck, 0.4, 7, 0.1, 0, 8)
              + [box('do-rim', 'gilt', [-0.2, 0.034, L.neck - 0.006], [0.2, 0.04, L.neck + 0.02])]
              + std.flattenArrays([
@@ -358,7 +358,7 @@ local mailBundle(o) =
   // A scrap-metal suit laid out flat, 1.3 m from collar to toe: cotton wraps cut to a torso, sleeves and leggings,
   // with mismatched pieces of sheet steel, some rusted and some galvanised, set askew over them and tied on with
   // string.
-  h.compound('armor_scrapsuit', 9.7,
+  h.compound('scrap_suit', 9.7,
              underSuit('cloth', 0.006, 0.44, 0.14, 0.18)
              + [
                flat('scrap-%d' % i, ['steel', 'rust', 'zinc'][i % 3], skew(p[0], p[1], p[2], p[3], p[4]), 0.006 + 0.003 * (i % 2), 0.004)
@@ -407,7 +407,7 @@ local mailBundle(o) =
 
   // A tyre-rubber suit laid out flat, 1.3 m from collar to toe: curved chunks cut from tyres, chevron tread up, over
   // the chest, back, arms and legs, strung together with string at their corners.
-  h.compound('armor_tiresuit', 10,
+  h.compound('tyre_suit', 10,
              std.flattenArrays([
                local x = p[0], z0 = p[1], z1 = p[2], w = p[3], r = p[4];
                local outline = [[-w / 2, z0], [w / 2, z0], [w / 2, z1], [-w / 2, z1]];
@@ -481,11 +481,11 @@ local mailBundle(o) =
 
   // A case-hardened mail hauberk folded to 380 mm by 420 mm and 60 mm tall: a long mail shirt of dark rings with
   // sleeves along its sides, a leather-bound neck and a split skirt.
-  h.compound('ch_chainmail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
+  h.compound('hardened_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A case-hardened mail jumpsuit folded to 380 mm by 440 mm and 60 mm tall: sleeves along the sides and the legs
   // folded up over the body under a leather belt, with a leather-bound neck.
-  h.compound('ch_chainmail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
+  h.compound('hardened_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

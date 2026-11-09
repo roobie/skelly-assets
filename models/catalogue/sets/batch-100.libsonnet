@@ -111,7 +111,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 [
   // A pair of denim boots, mid-calf, 280 mm long and 230 mm tall, the uppers of stitched denim over a rubber sole with
   // a short heel, a brown leather band round the top and a zip up the inner side.
-  h.compound('boots_denim', 1.2, pair(
+  h.compound('denim_boots', 1.2, pair(
     { l: 0.28, w: 0.1, t: 0.014, heel: 0.012, layers: 6, ankle: 0.08, top: 0.23, rx: 0.045, rz: 0.056, collar: 0.018 }, 0.03,
     function(p, cx) [
       box(p + 'zip', 'zip', [if cx < 0 then cx + 0.044 else cx - 0.048, 0.03, shaftZ({ l: 0.28, rz: 0.056 }) - 0.006], [if cx < 0 then cx + 0.048 else cx - 0.044, 0.21, shaftZ({ l: 0.28, rz: 0.056 }) + 0.006]),
@@ -122,7 +122,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of faux fur boots, 300 mm long and 280 mm tall: a soft cloth foot on a thick grey sole under a tall shaggy
   // pale shaft, its top turned out in a deep fur cuff, with a cord tie at the ankle.
-  h.compound('boots_faux_fur', 1, pair(
+  h.compound('faux_fur_boots', 1, pair(
     { l: 0.3, w: 0.115, t: 0.022, layers: 5, ankle: 0.09, top: 0.28, rx: 0.056, rz: 0.066, collar: 0.06, collarOut: 0.012 }, 0.03,
     function(p, cx) [
       band(p + 'tie', 'tie', { rx: 0.056, rz: 0.066, l: 0.3 }, cx, 0.1, 0.106, 0.003),
@@ -134,7 +134,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of fur-lined leather boots, 300 mm long and 280 mm tall: brown leather uppers on a rubber sole, the fur
   // lining turned down over the top in a thick cuff and showing at the opening, laced through two leather thongs.
-  h.compound('boots_fur', 1.3, pair(
+  h.compound('fur_boots', 1.3, pair(
     { l: 0.3, w: 0.112, t: 0.018, layers: 6, ankle: 0.09, top: 0.27, rx: 0.052, rz: 0.064, collar: 0.055, collarOut: 0.012 }, 0.03,
     function(p, cx) [
       band(p + 'thong-a', 'thong', { rx: 0.052, rz: 0.064, l: 0.3 }, cx, 0.11, 0.116),
@@ -145,7 +145,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of leather hiking boots, 290 mm long and 170 mm tall at the padded ankle collar, laced up the front on a
   // deep lugged sole whose rubber rand wraps the toe.
-  h.compound('boots_hiking', 0.81, pair(hiking, 0.03, function(p, cx)
+  h.compound('hiking_boots', 0.81, pair(hiking, 0.03, function(p, cx)
     laces(p, hiking, cx, 0.07, 0.15)
   ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'cloth-khaki', lining: 'paint-charcoal', rand: 'plastic-charcoal', tongue: 'cloth-khaki', lace: 'nylon-red' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
@@ -186,7 +186,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of scrap boots, 290 mm long and 200 mm tall: cloth wrapped round and round a foot and shin and bound with
   // rag strips, with rusty metal scraps lashed over the toe, the shin and the outer ankle.
-  h.compound('boots_scrap', 2.1, pair(scrap, 0.03, function(p, cx)
+  h.compound('scrap_boots', 2.1, pair(scrap, 0.03, function(p, cx)
     local zf = shaftZ(scrap) + scrap.rz, s = if cx < 0 then -1 else 1;
     [
       band(p + 'wrap-%d' % i, 'wrap', scrap, cx, 0.03 + i * 0.034, 0.042 + i * 0.034, 0.003)
@@ -209,7 +209,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of western boots, 300 mm long and 320 mm tall: a narrow pointed brown toe on a leather sole with a stacked
   // 30 mm heel, a tall black shaft stitched in cream chevrons, and a pull tab either side of the top.
-  h.compound('boots_western', 1.3, pair(western, 0.03, function(p, cx)
+  h.compound('western_boots', 1.3, pair(western, 0.03, function(p, cx)
     local zf = shaftZ(western) + western.rz;
     [
       box(p + 'tab-%d' % i, 'collar', [cx + s * western.rx - 0.003, western.top - 0.02, shaftZ(western) - 0.012], [cx + s * western.rx + 0.004, western.top + 0.022, shaftZ(western) + 0.012])
@@ -227,7 +227,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
 
   // A pair of winter boots, 310 mm long and 260 mm tall: a black rubber shell over the foot on a thick cleated sole,
   // a khaki nylon shaft laced up the front, and a deep grey wool lining rolled over the top.
-  h.compound('boots_winter', 2.7, pair(winter, 0.03, function(p, cx)
+  h.compound('winter_boots', 2.7, pair(winter, 0.03, function(p, cx)
     laces(p, winter, cx, 0.1, 0.22, 0.02) + [band(p + 'shell', 'shell', winter, cx, winter.t, 0.075, 0.004)]
   ), { sole: 'plastic-charcoal', upper: 'rubber-black', shaft: 'cloth-khaki', collar: 'wool-grey', lining: 'wool-grey', shell: 'rubber-black', tongue: 'cloth-khaki', lace: 'leather-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'fabric'], setting: ['modern'], slot: ['feet'] } } },

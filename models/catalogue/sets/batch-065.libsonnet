@@ -79,7 +79,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
 
   // A wind-up twin-bell alarm clock, 16 cm tall and 11 cm across the case, face on +z: a red case on two splayed
   // feet, a cream dial behind glass, steel bells on top with the hammer between them and two keys at the back.
-  h.compound('alarmclock', 0.5, [
+  h.compound('wind_up_alarm_clock', 0.5, [
     turned('case', 'case', 'z', [[0, 0], [0, 0.05], [0.004, 0.055], [0.04, 0.055], [0.044, 0.052], [0.044, 0]], [0, 0.07, -0.022]),
     turned('bezel', 'bell', 'z', [[0, 0.044], [0, 0.054], [0.006, 0.054], [0.006, 0.044], [0, 0.044]], [0, 0.07, 0.022]),
     disc('dial', 'dial', 0.046, 0, 0.001) + { axis: 'z', origin: [0, 0.07, 0.022] },
@@ -107,7 +107,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('key-a-wing', 'bell', [-0.03, 0.064, -0.038], [-0.006, 0.076, -0.034]),
     turned('key-b', 'bell', 'z', [[0, 0], [0, 0.003], [0.01, 0.003], [0.01, 0]], [0.018, 0.07, -0.032]),
     box('key-b-wing', 'bell', [0.006, 0.064, -0.038], [0.03, 0.076, -0.034]),
-  ], { case: 'paint-red', bell: 'steel-stainless', dial: 'paint-cream', glass: 'glass-clear', hands: 'plastic-black' }) + h.inHand('alarmclock', 'case') + {
+  ], { case: 'paint-red', bell: 'steel-stainless', dial: 'paint-cream', glass: 'glass-clear', hands: 'plastic-black' }) + h.inHand('wind_up_alarm_clock', 'case') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
@@ -182,7 +182,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
 
   // A folding entrenching tool folded for carry, 23 cm long: an olive spade blade folded flat against a steel shaft,
   // the locking collar at the hinge (+x) and a rubber grip on the knob end.
-  h.compound('e_tool', 0.69, [
+  h.compound('folding_shovel', 0.69, [
     rod('shaft', 'shaft', 0.013, -0.01, 0.175, 0.013),
     rod('grip', 'grip', 0.017, -0.03, 0.05, 0.013),
     turned('knob', 'grip', 'x', [[0, 0], [0, 0.02], [0.008, 0.02], [0.012, 0]], [-0.042, 0.013, 0]),
@@ -193,7 +193,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     flat('edge-b', 'edge', [[-0.01, 0.0], [0.0, 0.0], [0.026, -0.04], [0.02, -0.045]], 0.0305, 0.0315),
     box('hinge', 'collar', [0.175, 0.0, -0.012], [0.188, 0.034, 0.012]),
   ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + {
-    handling: h.gripOn('e_tool', 'grip'),
+    handling: h.gripOn('folding_shovel', 'grip'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -295,7 +295,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
 
   // Hand bellows, 52 cm long: two pear-shaped oak boards with handles at -x, pleated leather between them, and a
   // brass nozzle at +x.
-  h.compound('leather_bellow', 1.5, [
+  h.compound('leather_bellows', 1.5, [
     flat('board-low', 'wood', bellowsBoard, 0.0, 0.012),
     flat('board-high', 'wood', bellowsBoard, 0.068, 0.08),
     flat('leather', 'leather', scaledOutline(bellowsBoard, 0.93), 0.012, 0.068),
@@ -307,7 +307,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('grip-high', 'leather', [-0.27, 0.068, -0.018], [-0.25, 0.084, 0.018]),
     turned('nozzle', 'nozzle', 'x', [[0, 0], [0, 0.02], [0.03, 0.014], [0.1, 0.006], [0.1, 0]], [0.155, 0.04, 0]),
   ], { wood: 'wood-oak', leather: 'leather-brown', pleat: 'leather-chestnut', nozzle: 'brass' }) + {
-    handling: h.gripOn('leather_bellow', 'handle-high'),
+    handling: h.gripOn('leather_bellows', 'handle-high'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'wood'] } } },
 

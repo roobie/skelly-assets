@@ -83,13 +83,13 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
 [
   // A survivor-forged mild steel ESAPI plate, 300 mm long and 240 mm across with a shooter's cut, bent round a 350 mm
   // radius, its edges bound in nylon and two nylon straps buckled across it.
-  h.compound('lc_esapi_plate', 2.2, forgedEsapi, { plate: 'steel-grey', edge: 'cloth-olive-drab', buckle: 'plastic-matte-black' })
+  h.compound('mild_steel_front_plate', 2.2, forgedEsapi, { plate: 'steel-grey', edge: 'cloth-olive-drab', buckle: 'plastic-matte-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A scrap steel ESAPI plate, 300 mm long and 240 mm across, bent in three creases, its corners hacked off and its
   // edges and middle wrapped in rags.
   local w = 0.24;
-  h.compound('scrap_esapi_plate', 1.1,
+  h.compound('scrap_front_plate', 1.1,
     curvedPlate('plate', function(i) 'plate', w, 0.3, 0.004, -0.15, 0.15, 0.09, 4)
     + std.flattenArrays([
       plateBand('wrap-%d' % i, if i % 2 == 0 then 'rag' else 'rag-dark', w, 0.3, 0.004, [-0.13, -0.02, 0.07][i], [-0.13, -0.02, 0.07][i] + 0.035, 0.006, 4)
@@ -103,7 +103,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
 
   // A survivor-forged mild steel ESBI side plate: a hexagon 200 mm long and 150 mm across, 6 mm thick, on a nylon pad
   // that shows round its edge, with one nylon strap across.
-  h.compound('lc_esbi_plate', 1, [
+  h.compound('mild_steel_side_plate', 1, [
     hexPlate('pad', 'pad', 0.21, 0.16, 0, 0.005),
     hexPlate('plate', 'plate', 0.2, 0.15, 0.005, 0.011),
     box('strap', 'pad', [-0.015, 0.011, -0.082], [0.015, 0.014, 0.082]),
@@ -113,7 +113,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
 
   // A scrap steel ESBI side plate: a rusted hexagon 200 mm long, 150 mm across and 3 mm thick, rag wrapped at both
   // ends and round the middle.
-  h.compound('scrap_esbi_plate', 0.38,
+  h.compound('scrap_side_plate', 0.38,
     [hexPlate('plate', 'plate', 0.2, 0.15, 0, 0.004)]
     + [
       box('wrap-%d' % i, if i % 2 == 0 then 'rag' else 'rag-dark', [[-0.075, -0.015, 0.045][i], 0, [-0.05, -0.079, -0.05][i]], [[-0.045, 0.015, 0.075][i], 0.01, [0.05, 0.079, 0.05][i]])
@@ -141,7 +141,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
 
   // A soft armour vest laid flat, front up: a navy carrier 480 mm across and 560 mm from shoulder to hem, 30 mm thick
   // with its aramid panels, black elastic side straps and a flapped pocket on the front for a trauma or stab insert.
-  h.compound('soft_3a_vest', 1.6,
+  h.compound('soft_armour_vest', 1.6,
     flatVest(0.03) + flatPocket('insert', -0.09, 0.09, 0.02, 0.22, 0.03, 0.006, 0.035),
     { shell: 'cloth-navy', strap: 'webbing-black', tab: 'plastic-charcoal', pocket: 'cloth-navy', flap: 'webbing-black', stud: 'plastic-matte-black' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
@@ -149,7 +149,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
   // A hard armour vest laid flat, front up: an olive drab carrier 480 mm across and 560 mm from shoulder to hem,
   // 35 mm thick with its aramid panels, padded shoulders, buckled side straps and a large flapped pocket on the front
   // for a 250 mm by 300 mm hard plate; the matching back pocket is underneath.
-  h.compound('level_3_vest', 1.9,
+  h.compound('hard_armour_vest', 1.9,
     flatVest(0.035)
     + flatPocket('plate', -0.135, 0.135, -0.11, 0.23, 0.035, 0.014, 0.05)
     + [
@@ -164,7 +164,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
   // A pair of ballistic shoulder protectors laid side by side: each a padded nylon shield 200 mm long, 170 mm across
   // and 22 mm thick, a darker seam round its edge, with a webbing tab 70 mm long off its top and two press studs that
   // fix it under a vest's shoulder.
-  h.compound('iotv_shoulder_plate', 0.6, std.flattenArrays([
+  h.compound('ballistic_shoulder_protectors', 0.6, std.flattenArrays([
     local z = s * 0.095;
     [
       h.prism('pad-%d' % s, 'seam', 'y', [[z - 0.085, -0.07], [z - 0.06, -0.1], [z + 0.06, -0.1], [z + 0.085, -0.07], [z + 0.075, 0.06], [z + 0.04, 0.1], [z - 0.04, 0.1], [z - 0.075, 0.06]], 0, 0.016),
@@ -182,7 +182,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
   // folds, its tall padded neck guard standing round the collar, both quilted sleeves rolled down the sides and a
   // flapped pocket for a large plate on the chest, the seams piped in black.
   local top = 0.11, w = 0.44, d = 0.38;
-  h.compound('jacket_eod', 15,
+  h.compound('bomb_disposal_jacket', 15,
     g.jacket({
       w: w, d: d, ht: top, folds: 4, neck: 0.1,
       collar: { r: 0.085, wd: 0.04, ht: 0.065, gap: 40 },
@@ -207,7 +207,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
   // A tactical EOD jacket folded: a coyote bundle 420 mm across, 360 mm deep and 100 mm tall with a black zip down
   // the front, a low padded collar along the back and the flapped deltoid pockets of both folded sleeves on top.
   local top = 0.1;
-  h.compound('jacket_eod_light', 5,
+  h.compound('light_bomb_disposal_jacket', 5,
     h.foldedGarment(0.42, 0.36, top, 3)
     + flatPocket('deltoid-l', -0.19, -0.07, -0.1, 0.07, top, 0.014, 0.04)
     + flatPocket('deltoid-r', 0.07, 0.19, -0.1, 0.07, top, 0.014, 0.04)

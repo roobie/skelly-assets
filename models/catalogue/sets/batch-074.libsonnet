@@ -77,7 +77,7 @@ local tentBag(length, r) =
 [
   // A laboratory vortex mixer, 130 mm wide, 160 mm deep and 150 mm tall to the top of its rubber cup: a
   // weighted cast base tapering upward, a speed dial and a rocker switch on the front.
-  h.compound('vortex', 6.8, [
+  h.compound('vortex_mixer', 6.8, [
     h.prism('base', 'body', 'x', [[0, -0.08], [0, 0.08], [0.10, 0.06], [0.10, -0.055]], -0.065, 0.065),
     box('foot', 'foot', [-0.064, 0, -0.079], [0.064, 0.006, 0.079]),
     h.prism('panel', 'panel', 'x', [[0.006, 0.0786], [0.094, 0.0610], [0.094, 0.0625], [0.006, 0.0801]], -0.055, 0.055),
@@ -107,7 +107,7 @@ local tentBag(length, r) =
 
   // A weather station built into a hard briefcase, 400 mm wide, 300 mm deep and 90 mm thick closed,
   // shown open: a green monochrome screen in the lid, a keypad and gauges in the base.
-  h.compound('weather_reader', 2, [
+  h.compound('weather_station', 2, [
     box('base', 'case', [-0.2, 0, -0.15], [0.2, 0.045, 0.15]),
     box('base-rim', 'rim', [-0.201, 0.04, -0.151], [0.201, 0.047, 0.151]),
     box('deck', 'deck', [-0.19, 0.045, -0.14], [0.19, 0.047, 0.14]),

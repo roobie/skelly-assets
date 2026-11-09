@@ -43,36 +43,36 @@ local blade(a, r0, r1) =
   [[p[0] * std.cos(a) + p[1] * std.sin(a), -p[0] * std.sin(a) + p[1] * std.cos(a)] for p in pts];
 [
   // A one-litre gold bar, 175 by 80 mm at the base and 85 mm tall, sides tapering 10 mm.
-  ingot('ingot_gold', 19, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-gold') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('gold_ingot', 19, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-gold') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A one-litre lead bar, the same casting shape as the gold bar.
-  ingot('ingot_lead', 11, 0.175, 0.08, 0.084, 0.01, 0.004, 'lead') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('lead_ingot', 11, 0.175, 0.08, 0.084, 0.01, 0.004, 'lead') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A one-litre platinum bar, the same casting shape as the gold bar.
-  ingot('ingot_platinum', 19, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-platinum') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('platinum_ingot', 19, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-platinum') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A one-litre silver bar, the same casting shape as the gold bar.
-  ingot('ingot_silver', 10, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-silver') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('silver_ingot', 10, 0.175, 0.08, 0.084, 0.01, 0.004, 'metal-silver') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A one-litre tin bar, the same casting shape as the gold bar.
-  ingot('ingot_tin', 7.2, 0.175, 0.08, 0.084, 0.01, 0.004, 'steel-stainless') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('tin_ingot', 7.2, 0.175, 0.08, 0.084, 0.01, 0.004, 'steel-stainless') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A broken chunk of cast iron about 50 by 35 by 25 mm.
-  lump('chunk_cast_iron', 0.19, [
+  lump('cast_iron_chunk', 0.19, [
     [0, 0.01, [[-0.012, -0.026], [0.004, -0.022], [0.016, -0.004], [0.012, 0.022], [-0.004, 0.026], [-0.016, 0.006]]],
     [0.01, 0.02, [[-0.014, -0.02], [0.01, -0.024], [0.018, 0.008], [0.006, 0.02], [-0.012, 0.016]]],
     [0.02, 0.028, [[-0.008, -0.014], [0.008, -0.016], [0.012, 0.004], [0.002, 0.012], [-0.01, 0.006]]],
   ], 'iron-cast') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A heavy lump of cast iron about 75 by 50 by 45 mm, broken from a larger casting.
-  lump('lump_cast_iron', 0.75, [
+  lump('cast_iron_lump', 0.75, [
     [0, 0.016, [[-0.02, -0.036], [0.012, -0.034], [0.026, -0.008], [0.02, 0.03], [-0.006, 0.038], [-0.024, 0.012]]],
     [0.016, 0.032, [[-0.024, -0.03], [0.006, -0.038], [0.024, -0.016], [0.022, 0.022], [0.002, 0.036], [-0.02, 0.024]]],
     [0.032, 0.044, [[-0.016, -0.024], [0.01, -0.022], [0.016, 0.006], [0.004, 0.024], [-0.014, 0.014]]],
   ], 'iron-cast') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A small cast bar of aluminium, 80 by 35 mm at the base and 34 mm tall.
-  ingot('material_aluminium_ingot', 0.22, 0.08, 0.035, 0.034, 0.004, 0.002, 'alu-bare') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ingot('aluminium_ingot', 0.22, 0.08, 0.035, 0.034, 0.004, 0.002, 'alu-bare') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A 600 mm length of 22 mm copper water tube with a 1 mm wall.
-  pipe('cu_pipe', 0.35, 0.6, 0.011, 0.0012, 'copper', null) + {
-    handling: h.gripOn('cu_pipe', 'pipe'),
+  pipe('copper_tube', 0.35, 0.6, 0.011, 0.0012, 'copper', null) + {
+    handling: h.gripOn('copper_tube', 'pipe'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
@@ -83,7 +83,7 @@ local blade(a, r0, r1) =
   } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A five-bladed pressed-steel fan, 300 mm across, lying face up: a domed hub 60 mm across with a bore for the shaft.
-  h.compound('fanblade_metal', 0.45, [
+  h.compound('metal_fan_blades', 0.45, [
     h.prism('blade-%d' % i, 'blade', 'y', blade(i * 2 * std.pi / 5, 0.022, 0.15), 0.006, 0.008)
     for i in std.range(0, 4)
   ] + [
@@ -123,8 +123,8 @@ local blade(a, r0, r1) =
   ], { leaf: 'steel-bright', knuckle: 'steel-bright', pin: 'steel-grey', hole: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A one-metre length of heavy flat-bottomed rail, 172 mm tall on a 150 mm foot.
-  rail('railroad_track_item', 66, 1) + { voxelGrain: 0.004 } + { taxonomy: { category: 'structures', tags: { material: ['metal'], setting: ['modern'] } } },
+  rail('length_of_rail', 66, 1) + { voxelGrain: 0.004 } + { taxonomy: { category: 'structures', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A half-metre length of the same rail, sawn from a full length.
-  rail('railroad_track_item_half', 33, 0.5) + { voxelGrain: 0.004 } + { taxonomy: { category: 'structures', tags: { material: ['metal'], setting: ['modern'] } } },
+  rail('half_length_of_rail', 33, 0.5) + { voxelGrain: 0.004 } + { taxonomy: { category: 'structures', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

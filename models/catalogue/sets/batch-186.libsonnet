@@ -94,7 +94,7 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
   // pointed cuffs, a jagged hem of four long points, and a round purple drawstring pouch for small bottles sewn at the
   // hip and lying on top, its gathered neck towards the collar.
   local w = 0.32, d = 0.36, ht = 0.06, px = 0.05, pz = -0.06;
-  h.compound('witch_dress_long', 1, witchDress({ w: w, d: d, ht: ht, folds: 5, sw: 0.075, points: 4, pl: 0.045, cuffL: 0.065, neckR: 0.055 }) + [
+  h.compound('long_witch_dress', 1, witchDress({ w: w, d: d, ht: ht, folds: 5, sw: 0.075, points: 4, pl: 0.045, cuffL: 0.065, neckR: 0.055 }) + [
     h.ball('pouch', 'pouch', 0.045, px, ht + 0.02, pz, 0.45),
     turned('pouch-neck', 'pouch', 'z', [[0, 0], [0, 0.013], [0.022, 0.013], [0.032, 0.022], [0.035, 0.022], [0.035, 0]], [px, ht + 0.02, pz + 0.032]),
     turned('pouch-cord', 'cord', 'z', [[0, 0.012], [0, 0.016], [0.006, 0.016], [0.006, 0.012], [0, 0.012]], [px, ht + 0.02, pz + 0.048]),
@@ -105,7 +105,7 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
 
   // A short purple witch's dress folded small, 280 mm by 260 mm and 30 mm tall: black trim, short pointed cuffs and
   // a jagged hem of three points.
-  h.compound('witch_dress_short', 0.34, witchDress({ w: 0.28, d: 0.26, ht: 0.03, folds: 3, sw: 0.065, points: 3, pl: 0.03, cuffL: 0.04, neckR: 0.05 }),
+  h.compound('short_witch_dress', 0.34, witchDress({ w: 0.28, d: 0.26, ht: 0.03, folds: 3, sw: 0.065, points: 3, pl: 0.03, cuffL: 0.04, neckR: 0.05 }),
              { cloth: 'cloth-purple', sleeve: 'cloth-purple', hole: 'void-black', trim: 'cloth-black', point: 'cloth-purple' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['fantasy'] } } },
 

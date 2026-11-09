@@ -52,34 +52,34 @@ local zx(poly) = [[p[1], p[0]] for p in poly];
 [
   // A 300 by 600 mm sheet of plain cotton cloth folded to a pad 150 mm square and 5 mm tall, a hemmed band along
   // its open edge.
-  h.compound('sheet_cotton', 0.02, folded(0.15, 0.15, 0.005, 3) + edgeBand('hem', 0.15, 0.15, 0.005),
+  h.compound('cotton_sheet', 0.02, folded(0.15, 0.15, 0.005, 3) + edgeBand('hem', 0.15, 0.15, 0.005),
     { cloth: 'cloth-cream', hem: 'cloth-cotton' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet of blue denim folded to a pad 150 mm square and 10 mm tall, its white selvedge edge on top.
-  h.compound('sheet_denim', 0.07, folded(0.15, 0.15, 0.01, 4) + edgeBand('selvedge', 0.15, 0.15, 0.01, 0.006),
+  h.compound('denim_sheet', 0.07, folded(0.15, 0.15, 0.01, 4) + edgeBand('selvedge', 0.15, 0.15, 0.01, 0.006),
     { cloth: 'cloth-denim', selvedge: 'cloth-cream' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet sewn from mismatched denim scraps, folded to a pad 150 mm square and 10 mm tall, its top
   // face showing the patches and their seams.
-  h.compound('sheet_denim_patchwork', 0.045, folded(0.15, 0.15, 0.01, 4) + patches(0.15, 0.15, 0.01, 3, 3, ['a', 'b', 'c']),
+  h.compound('patchwork_denim_sheet', 0.045, folded(0.15, 0.15, 0.01, 4) + patches(0.15, 0.15, 0.01, 3, 3, ['a', 'b', 'c']),
     { cloth: 'cloth-denim', a: 'cloth-denim', b: 'cloth-denim-faded', c: 'cloth-navy', seam: 'cloth-cream' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet of thick faux fur folded to a pad 160 mm square and 18 mm tall: a woven backing with
   // shaggy pile tufted over its top.
-  h.compound('sheet_faux_fur', 0.1, folded(0.16, 0.16, 0.012, 2) + pile(0.16, 0.16, 0.012, 6, 0.008),
+  h.compound('faux_fur_sheet', 0.1, folded(0.16, 0.16, 0.012, 2) + pile(0.16, 0.16, 0.012, 6, 0.008),
     { cloth: 'cloth-cream', pile: 'fur-pale' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet of grey wool felt folded to a pad 150 mm square and 6 mm tall.
-  h.compound('sheet_felt', 0.024, folded(0.15, 0.15, 0.006, 3), { cloth: 'felt-grey' })
+  h.compound('felt_sheet', 0.024, folded(0.15, 0.15, 0.006, 3), { cloth: 'felt-grey' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet sewn from scraps of fur, folded to a pad 160 mm square and 18 mm tall, mismatched pelts
   // on top and stitched seams between them.
-  h.compound('sheet_fur_patchwork', 0.33,
+  h.compound('patchwork_fur_sheet', 0.33,
     folded(0.16, 0.16, 0.014, 2) + patches(0.16, 0.16, 0.014, 3, 2, ['a', 'b', 'c']) + [
       box('pile-%d' % i, ['a', 'b', 'c'][i % 3], [-0.07 + i * 0.028, 0.016, -0.06 + (i % 2) * 0.06], [-0.05 + i * 0.028, 0.019, -0.03 + (i % 2) * 0.06])
       for i in std.range(0, 4)
@@ -89,7 +89,7 @@ local zx(poly) = [[p[1], p[0]] for p in poly];
 
   // A 300 by 600 mm sheet of loose-woven aramid cloth folded to a pad 150 mm square and 6 mm tall, the weave
   // showing as ridges across its top.
-  h.compound('sheet_kevlar', 0.025, folded(0.15, 0.15, 0.006, 4) + [
+  h.compound('aramid_sheet', 0.025, folded(0.15, 0.15, 0.006, 4) + [
     box('weave-%d' % i, 'weave', [-0.075, 0.006, -0.07 + i * 0.016], [0.075, 0.007, -0.066 + i * 0.016])
     for i in std.range(0, 8)
   ], { cloth: 'aramid-gold', weave: 'aramid-gold' })
@@ -97,7 +97,7 @@ local zx(poly) = [[p[1], p[0]] for p in poly];
 
   // A rigid ballistic panel 250 by 300 mm and 11 mm thick: sixteen layers of tight-woven aramid bonded into a stack,
   // stitched round its border and with its corners cut back.
-  h.compound('sheet_kevlar_layered', 0.35, [
+  h.compound('ballistic_aramid_panel', 0.35, [
     h.prism('panel', 'layer', 'y', zx([
       [-0.125, -0.13], [-0.105, -0.15], [0.105, -0.15], [0.125, -0.13], [0.125, 0.13], [0.105, 0.15], [-0.105, 0.15], [-0.125, 0.13],
     ]), 0, 0.011),
@@ -121,32 +121,32 @@ local zx(poly) = [[p[1], p[0]] for p in poly];
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet of brown leather rolled into a 300 mm roll 44 mm across, tied near each end with a thong.
-  h.compound('sheet_leather', 0.34, rolled(0.3, 0.022, 0.0016),
+  h.compound('leather_sheet', 0.34, rolled(0.3, 0.022, 0.0016),
     { roll: 'leather-brown', edge: 'leather-chestnut', tie: 'skin-rawhide' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // A sheet of shiny stretch fabric folded to a pad 150 mm square and 8 mm tall.
-  h.compound('sheet_lycra', 0.032, folded(0.15, 0.15, 0.008, 4), { cloth: 'lycra-blue' })
+  h.compound('stretch_fabric_sheet', 0.032, folded(0.15, 0.15, 0.008, 4), { cloth: 'lycra-blue' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 300 by 600 mm sheet of 1 mm black neoprene folded to a pad 150 mm square and 8 mm tall, the blue nylon
   // facing showing along its open edge.
-  h.compound('sheet_neoprene', 0.08, folded(0.15, 0.15, 0.008, 4) + edgeBand('facing', 0.15, 0.15, 0.008, 0.012),
+  h.compound('neoprene_sheet', 0.08, folded(0.15, 0.15, 0.008, 4) + edgeBand('facing', 0.15, 0.15, 0.008, 0.012),
     { cloth: 'neoprene-black', facing: 'lycra-blue' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['rubber'] } } },
 
   // A sheet of tan flame-resistant aramid cloth folded to a pad 150 mm square and 8 mm tall, a hem along its edge.
-  h.compound('sheet_nomex', 0.032, folded(0.15, 0.15, 0.008, 4) + edgeBand('hem', 0.15, 0.15, 0.008),
+  h.compound('fire_resistant_fabric_sheet', 0.032, folded(0.15, 0.15, 0.008, 4) + edgeBand('hem', 0.15, 0.15, 0.008),
     { cloth: 'cloth-turnout', hem: 'knit-fr' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A sheet of thin red synthetic fabric folded to a pad 150 mm square and 6 mm tall.
-  h.compound('sheet_nylon', 0.015, folded(0.15, 0.15, 0.006, 4), { cloth: 'nylon-red' })
+  h.compound('nylon_sheet', 0.015, folded(0.15, 0.15, 0.006, 4), { cloth: 'nylon-red' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A cotton webbing strap 1070 mm long and 38 mm wide laid out as a flat loop 480 mm long, a steel slide buckle
   // threaded on the near run and its sewn-back ends overlapping on the far run.
-  h.compound('strap_cotton', 0.065,
+  h.compound('cotton_strap', 0.065,
     h.strapLoop('strap', 'strap', 0.38, 0.05, 0.038, 0.002) + [
       box('buckle-frame', 'buckle', [-0.024, 0, 0.026], [0.024, 0.006, 0.074]),
       box('buckle-bar', 'bar', [-0.0025, 0.006, 0.028], [0.0025, 0.008, 0.072]),

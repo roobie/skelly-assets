@@ -111,7 +111,7 @@ local thinKnife(p, x, z, y) = [
 
   // A brown leather knife sheath 180 mm long and 40 mm wide for an ankle, laid flat on its buckled ankle strap, a
   // band 250 mm round of 25 mm leather, with a snap strap over the mouth.
-  h.compound('bootsheath', 0.08, legStrap('ankle', 0.04, 0.05, 0.025)
+  h.compound('boot_sheath', 0.08, legStrap('ankle', 0.04, 0.05, 0.025)
     + sheathFlat('sheath', 0.18, 0.04, 0.016, 0.012, 0.07, -0.08, 0.0, 0.025, 0.003)
     + [
       box('snap-strap', 'strap', [-0.07, 0.015, -0.022], [-0.05, 0.019, 0.022]),
@@ -121,7 +121,7 @@ local thinKnife(p, x, z, y) = [
 
   // A birch-bark ankle sheath 180 mm long and 45 mm wide plaited from pale and dark strips, laid flat on a 25 mm
   // bark ankle strap 250 mm round tied with a toggle.
-  h.compound('bootsheath_birchbark', 0.03, h.strapLoop('ankle-band', 'strap', 0.04, 0.05, 0.025, 0.003, 0, 0, 0)
+  h.compound('birch_bark_boot_sheath', 0.03, h.strapLoop('ankle-band', 'strap', 0.04, 0.05, 0.025, 0.003, 0, 0, 0)
     + sheathFlat('sheath', 0.18, 0.045, 0.02, 0.012, 0.07, -0.08, 0.0, 0.025, 0.003)
     + weave('sheath', -0.06, 0.03, 0.045, 0.015)
     + [h.rod('toggle', 'loop', 0.005, -0.015, 0.025, 0.007) + { origin: [-0.015, 0.007, 0.06] }], bark)
@@ -129,7 +129,7 @@ local thinKnife(p, x, z, y) = [
 
   // A black leather back scabbard 1.05 m long and 60 mm wide at the mouth, laid flat with its 50 mm shoulder strap
   // looped beside it from the throat to a ring 300 mm above the chape, a buckle on the strap and a steel chape.
-  h.compound('bscabbard', 1.1, sheathFlat('scab', 1.05, 0.06, 0.032, 0.024, 0.25, -0.52, 0, 0.06)
+  h.compound('back_scabbard', 1.1, sheathFlat('scab', 1.05, 0.06, 0.032, 0.024, 0.25, -0.52, 0, 0.06)
     + [
       box('strap-mount-a', 'loop', [-0.47, -0.001, -0.033], [-0.43, 0.027, 0.033]),
       box('strap-mount-b', 'loop', [0.2, -0.001, -0.033], [0.24, 0.027, 0.033]),
@@ -143,7 +143,7 @@ local thinKnife(p, x, z, y) = [
 
   // A black elastic garter 30 mm wide and 480 mm round laid flat, a moulded black knife sheath 150 mm long sewn
   // along its near run with a press-stud strap over the handle mouth.
-  h.compound('gartersheath1', 0.06, h.strapLoop('garter', 'strap', 0.08, 0.064, 0.03, 0.003)
+  h.compound('garter_sheath', 0.06, h.strapLoop('garter', 'strap', 0.08, 0.064, 0.03, 0.003)
     + sheathFlat('sheath', 0.15, 0.032, 0.012, 0.01, 0.05, -0.06, 0.064, 0.02, 0.003)
     + [
       box('snap-strap', 'loop', [-0.05, 0.013, 0.046], [-0.035, 0.016, 0.082]),
@@ -153,7 +153,7 @@ local thinKnife(p, x, z, y) = [
 
   // A black elastic garter 30 mm wide and 480 mm round laid flat with two moulded knife sheaths 150 mm long sewn
   // side by side on its near run, each with a press-stud strap.
-  h.compound('gartersheath2', 0.09, h.strapLoop('garter', 'strap', 0.08, 0.064, 0.03, 0.003)
+  h.compound('double_garter_sheath', 0.09, h.strapLoop('garter', 'strap', 0.08, 0.064, 0.03, 0.003)
     + sheathFlat('left', 0.15, 0.032, 0.012, 0.01, 0.05, -0.08, 0.05, 0.02, 0.003)
     + sheathFlat('right', 0.15, 0.032, 0.012, 0.01, 0.05, -0.06, 0.085, 0.02, 0.003)
     + [
@@ -166,7 +166,7 @@ local thinKnife(p, x, z, y) = [
 
   // A black nylon thigh panel 200 mm tall and 150 mm wide laid flat, six narrow sleeves sewn across it with a
   // ring-ended throwing knife in each, and two 38 mm leg straps buckled to its side.
-  h.compound('leg_sheath6', 0.27, [
+  h.compound('throwing_knife_leg_sheath', 0.27, [
     box('panel', 'body', [-0.1, 0, -0.075], [0.1, 0.004, 0.075]),
     box('binding-top', 'throat', [-0.1, 0, -0.077], [0.1, 0.005, -0.071]),
     box('binding-bottom', 'throat', [-0.1, 0, 0.071], [0.1, 0.005, 0.077]),
@@ -201,7 +201,7 @@ local thinKnife(p, x, z, y) = [
 
   // A birch-bark knife sheath 250 mm long and 50 mm wide plaited from pale and dark strips, laid flat with a bark
   // belt strap 300 mm long trailing from its mouth.
-  h.compound('sheath_birchbark', 0.045, sheathFlat('sheath', 0.25, 0.05, 0.022, 0.014, 0.09, -0.11, 0, 0.03)
+  h.compound('birch_bark_sheath', 0.045, sheathFlat('sheath', 0.25, 0.05, 0.022, 0.014, 0.09, -0.11, 0, 0.03)
     + weave('sheath', -0.09, 0.05, 0.05, 0.014)
     + [
       strapFlat('strap', 'strap', [-0.1, 0.0], [-0.32, 0.07], 0.022, 0.003),
@@ -211,7 +211,7 @@ local thinKnife(p, x, z, y) = [
 
   // A brown leather spear strap laid flat: a torso band 40 mm wide and 1.1 m round, buckled, with a cup for a
   // spear's butt at one end and a loop for its shaft 400 mm along.
-  h.compound('spearsling', 0.15, h.strapLoop('band', 'strap', 0.3, 0.08, 0.04, 0.004)
+  h.compound('spear_sling', 0.15, h.strapLoop('band', 'strap', 0.3, 0.08, 0.04, 0.004)
     + buckleFrame('buckle', 0.02, 0.03, 0.05, 0.005, 0, 0.008, 0.08)
     + [
       h.tube('cup', 'body', 0.016, 0.022, -0.27, -0.21, 0.022, -0.08),

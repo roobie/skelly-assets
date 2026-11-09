@@ -9,7 +9,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
 [
   // A rugged field power pack 200 mm wide, 100 mm tall and 125 mm deep, with rubber corner guards, a carry
   // handle on top and a front panel of sockets, a status screen and a power switch.
-  h.compound('ups', 3.4, [
+  h.compound('field_power_pack', 3.4, [
     box('body', 'body', [-0.1, 0, -0.0625], [0.1, 0.1, 0.0625]),
   ] + [
     box('guard-%d-%d' % [i, j], 'guard', [sx * 0.1 - 0.012, 0, sz * 0.0625 - 0.012], [sx * 0.1 + 0.012, 0.1, sz * 0.0625 + 0.012])
@@ -89,7 +89,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
 
   // A 500 mm mountaineering axe lying flat: an oval alloy shaft with a rubber grip and a spike, and a steel head
   // with a curved pick on one side and a square hammer face on the other.
-  h.compound('iceaxe', 0.5, [
+  h.compound('ice_axe', 0.5, [
     flat('spike', 'head', [[0, 0], [0.03, -0.012], [0.03, 0.012]], 0.004, 0.016),
     box('shaft', 'shaft', [0.03, 0, -0.012], [0.47, 0.02, 0.012]),
     box('grip', 'grip', [0.035, -0.001, -0.013], [0.2, 0.021, 0.013]),
@@ -101,13 +101,13 @@ local strip(id, slot, a, b, w, t, y0=0) =
     box('hammer-neck', 'head', [0.475, 0.003, 0.016], [0.505, 0.017, 0.05]),
     box('hammer', 'head', [0.47, 0, 0.05], [0.51, 0.02, 0.07]),
   ], { shaft: 'paint-police-blue', grip: 'rubber-black', head: 'steel-stainless' }) + {
-    handling: h.gripOn('iceaxe', 'grip'),
+    handling: h.gripOn('ice_axe', 'grip'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
 
   // A locksmith's zip wallet laid open, 170 mm by 110 mm: picks in an elastic band on the right, tension wrenches
   // and a pin gauge on the left.
-  h.compound('picklocks', 0.15, [
+  h.compound('lockpick_set', 0.15, [
     box('cover-a', 'case', [-0.085, 0, -0.055], [-0.002, 0.006, 0.055]),
     box('cover-b', 'case', [0.002, 0, -0.055], [0.085, 0.006, 0.055]),
     box('spine', 'case', [-0.004, 0, -0.055], [0.004, 0.004, 0.055]),

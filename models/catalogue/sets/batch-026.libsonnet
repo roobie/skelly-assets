@@ -26,19 +26,19 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
 
   // A toilet brush 380 mm long: a 300 mm plastic handle with a hanging hole ring and a 75 mm round head of
   // bristles on a twisted steel stem with a domed tip.
-  h.compound('brush_toilet', 0.13, [
+  h.compound('toilet_brush', 0.13, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.009], [0.01, 0.012], [0.2, 0.011], [0.28, 0.008], [0.3, 0.007], [0.3, 0]], [0, 0.04, 0]),
     ring('hook', 'handle', [[0, 0.012], [0, 0.016], [0.008, 0.016], [0.008, 0.012]], [-0.008, 0.04, 0]),
     turned('stem', 'stem', 'x', [[0, 0], [0, 0.003], [0.085, 0.003], [0.085, 0]], [0.295, 0.04, 0]),
     // Tufted rows: the bristle head's outline steps in and out along the stem.
     turned('bristles', 'bristles', 'x', [[0, 0], [0, 0.03], [0.006, 0.04], [0.012, 0.036], [0.018, 0.04], [0.024, 0.036], [0.03, 0.04], [0.036, 0.036], [0.042, 0.04], [0.048, 0.036], [0.054, 0.04], [0.06, 0.036], [0.066, 0.038], [0.075, 0.028], [0.083, 0.012], [0.083, 0]], [0.3, 0.04, 0]),
   ], { handle: 'plastic-gloss-white', stem: 'steel-stainless', bristles: 'plastic-grey' }) + {
-    handling: h.gripOn('brush_toilet', 'handle'),
+    handling: h.gripOn('toilet_brush', 'handle'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A stainless lice comb 100 mm long: a 45 mm flat handle and a 55 mm head with 30 mm teeth set close.
-  h.compound('comb_lice', 0.035, [
+  h.compound('lice_comb', 0.035, [
     box('handle', 'steel', [-0.05, 0, -0.008], [-0.004, 0.002, 0.008]),
     box('spine', 'steel', [-0.004, 0, 0.004], [0.05, 0.004, 0.012]),
     box('neck', 'steel', [-0.006, 0, -0.008], [-0.002, 0.003, 0.012]),
@@ -47,22 +47,22 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     box('tooth-%d' % i, 'steel', [0.002 + i * 0.006, 0, -0.026], [0.004 + i * 0.006, 0.002, 0.004])
     for i in std.range(0, 7)
   ], { steel: 'steel-stainless' }) + {
-    handling: h.gripOn('comb_lice', 'handle'),
+    handling: h.gripOn('lice_comb', 'handle'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A plastic pocket comb 180 mm long and 30 mm deep, coarse teeth for half its length and fine for the rest.
-  h.compound('comb_pocket', 0.013, [
+  h.compound('pocket_comb', 0.013, [
     box('spine', 'comb', [-0.09, 0, 0.006], [0.09, 0.004, 0.015]),
     box('end-a', 'comb', [-0.09, 0, -0.015], [-0.086, 0.003, 0.006]),
     box('end-b', 'comb', [0.086, 0, -0.015], [0.09, 0.003, 0.006]),
   ] + combTeeth('comb', [[-0.084, 0, 0.006], [0, 0.084, 0.004]], -0.015, 0.006, 0.003), { comb: 'plastic-black' }) + {
-    handling: h.gripOn('comb_pocket', 'spine'),
+    handling: h.gripOn('pocket_comb', 'spine'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A soft foam hair roller 60 mm long and 26 mm across on a plastic core, its hinged clip lying along the top.
-  h.compound('curler_hair', 0.0057, [
+  h.compound('hair_curler', 0.0057, [
     turned('foam', 'foam', 'x', [[0, 0], [0, 0.011], [0.003, 0.013], [0.057, 0.013], [0.06, 0.011], [0.06, 0]], [-0.03, 0.013, 0]),
     turned('core', 'core', 'x', [[0, 0], [0, 0.005], [0.066, 0.005], [0.066, 0]], [-0.033, 0.013, 0]),
     box('clip', 'core', [-0.035, 0.026, -0.002], [0.028, 0.028, 0.002]),
@@ -142,7 +142,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
 
   // A bellows plunger 600 mm long: a 380 mm handle with a T grip and a 200 mm accordion bellows 160 mm across,
   // narrowing to a stepped seal ring.
-  h.compound('plunger_futuristic', 0.55, [
+  h.compound('bellows_plunger', 0.55, [
     box('grip', 'handle', [-0.02, 0.064, -0.06], [0.01, 0.096, 0.06]),
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.013], [0.38, 0.013], [0.38, 0]], [0, 0.08, 0]),
     turned('bellows', 'bellows', 'x', [
@@ -150,24 +150,24 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     ], [0.37, 0.08, 0]),
     turned('seal', 'seal', 'x', [[0, 0], [0, 0.03], [0.025, 0.025], [0.04, 0.016], [0.04, 0]], [0.56, 0.08, 0]),
   ], { handle: 'plastic-black', bellows: 'plastic-red', seal: 'plastic-black' }) + {
-    handling: h.gripOn('plunger_futuristic', 'handle'),
+    handling: h.gripOn('bellows_plunger', 'handle'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'plastic'], setting: ['sci-fi'] } } },
 
   // A toilet plunger 540 mm long: a 450 mm wooden handle and a red rubber cup 150 mm across, open at +x.
-  h.compound('plunger_toilet', 0.26, [
+  h.compound('toilet_plunger', 0.26, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.011], [0.45, 0.011], [0.45, 0]], [0, 0.075, 0]),
     turned('cap', 'handle', 'x', [[0, 0], [0, 0.008], [0.005, 0.011], [0.005, 0]], [-0.005, 0.075, 0]),
     ring('cup', 'cup', [[0, 0.01], [0, 0.02], [0.02, 0.05], [0.07, 0.075], [0.09, 0.075], [0.09, 0.066], [0.068, 0.064], [0.02, 0.04], [0.008, 0.01]], [0.43, 0.075, 0]),
     turned('plug', 'cup', 'x', [[0, 0], [0, 0.012], [0.03, 0.012], [0.03, 0]], [0.42, 0.075, 0]),
   ], { handle: 'wood-oak', cup: 'plastic-red' }) + {
-    handling: h.gripOn('plunger_toilet', 'handle'),
+    handling: h.gripOn('toilet_plunger', 'handle'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'wood'], setting: ['modern'] } } },
 
   // A weighted cartridge razor 150 mm long: a metal-cored handle with a rubber grip, a neck and a 40 mm pivoting head
   // with three blades and a lubricating strip.
-  h.compound('razor_shaving', 0.13, [
+  h.compound('shaving_razor', 0.13, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.007], [0.01, 0.009], [0.09, 0.008], [0.115, 0.006], [0.125, 0.004], [0.125, 0]], [-0.075, 0.009, 0]),
     turned('grip', 'grip', 'x', [[0, 0], [0, 0.0095], [0.05, 0.009], [0.05, 0]], [-0.055, 0.009, 0]),
     box('head', 'head', [0.05, 0.004, -0.02], [0.062, 0.014, 0.02]),
@@ -175,7 +175,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     box('strip', 'strip', [0.064, 0.009, -0.019], [0.066, 0.014, 0.019]),
     box('guard', 'head', [0.064, 0.004, -0.019], [0.066, 0.008, 0.019]),
   ], { handle: 'steel-stainless', grip: 'rubber-black', head: 'plastic-charcoal', blade: 'steel-bright', strip: 'jelly-teal' }) + {
-    handling: h.gripOn('razor_shaving', 'handle'),
+    handling: h.gripOn('shaving_razor', 'handle'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -193,7 +193,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
 
   // A dental floss dispenser 50 mm by 45 mm and 16 mm thick lying on its back: a white base, a hinged translucent lid
   // with a cutter at its top edge and a short tail of waxed thread.
-  h.compound('string_floss', 0.012, [
+  h.compound('dental_floss', 0.012, [
     prism('base', 'base', 'y', [[-0.02, -0.022], [0.02, -0.022], [0.025, -0.017], [0.025, 0.017], [0.02, 0.022], [-0.02, 0.022], [-0.025, 0.017], [-0.025, -0.017]], 0, 0.009),
     prism('lid', 'lid', 'y', [[-0.02, -0.022], [0.02, -0.022], [0.025, -0.017], [0.025, 0.017], [0.02, 0.022], [-0.02, 0.022], [-0.025, 0.017], [-0.025, -0.017]], 0.009, 0.016),
     box('cutter', 'cutter', [-0.006, 0.012, 0.021], [0.006, 0.016, 0.024]),

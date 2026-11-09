@@ -128,26 +128,26 @@ local coif =
 [
   // Open sunglasses with a black plastic frame and smoked prescription lenses, 140 mm across the front, 45 mm tall
   // and 160 mm from the lenses to the arm tips, standing on the rims with the arms hooked down behind.
-  h.compound('sunglasses_eye', 0.046, sunglasses, { frame: 'plastic-matte-black', lens: 'glass-lens-green' })
+  h.compound('prescription_sunglasses', 0.046, sunglasses, { frame: 'plastic-matte-black', lens: 'glass-lens-green' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // A canvas aketon folded on a shelf, 380 mm by 340 mm and 70 mm tall in four layers: quilted channels down the
   // front, a stand collar, the quilted sleeves folded in along each side and toggles closing the front.
-  h.compound('aketon_canvas', 2.5, aketon(0.38, 0.34, 0.07, 4, true), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
+  h.compound('canvas_aketon', 2.5, aketon(0.38, 0.34, 0.07, 4, true), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless canvas aketon folded on a shelf, 340 mm by 320 mm and 50 mm tall: quilted channels, a stand collar,
   // armholes at the shoulders and a laced front.
-  h.compound('aketon_canvas_vest', 1.5, aketon(0.34, 0.32, 0.05, 3, false), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
+  h.compound('canvas_aketon_vest', 1.5, aketon(0.34, 0.32, 0.05, 3, false), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', collar: 'cloth-khaki', toggle: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A pair of quilted canvas arming gloves laid flat side by side, backs up, each 230 mm from cuff to fingertip and
   // 90 mm across the knuckles, with quilted channels over the back of the hand and the fingers.
-  h.compound('aketon_gloves_canvas', 0.17, glove('l-', -0.065, -1) + glove('r-', 0.065, 1), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', cuff: 'cloth-khaki' })
+  h.compound('canvas_arming_gloves', 0.17, glove('l-', -0.065, -1) + glove('r-', 0.065, 1), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', cuff: 'cloth-khaki' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A canvas coif standing upright, 290 mm across the shoulder cape and 260 mm tall: a quilted round crown with an
   // oval face opening, over a neck that flares into the cape.
-  h.compound('aketon_hood_canvas', 0.4, coif, { cloth: 'cloth-canvas', quilt: 'cloth-canvas', face: 'cloth-black', binding: 'cloth-khaki' })
+  h.compound('canvas_coif', 0.4, coif, { cloth: 'cloth-canvas', quilt: 'cloth-canvas', face: 'cloth-black', binding: 'cloth-khaki' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['head'] } } },
 ]

@@ -67,7 +67,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
 
   // A pine box, 0.46 by 0.36 m and 0.3 m deep, its lid leaning back on its hinge, a charger with a meter,
   // a dial and two lamps on its top, and its red and black clip leads hung over the front rim.
-  h.compound('box_battery_charger', 7.6, [
+  h.compound('battery_charging_box', 7.6, [
     box('floor', 'box', [-0.23, 0, -0.18], [0.23, 0.018, 0.18]),
     box('front', 'box', [-0.23, 0, 0.162], [0.23, 0.30, 0.18]),
     box('back', 'box', [-0.23, 0, -0.18], [0.23, 0.30, -0.162]),
@@ -151,7 +151,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
 
   // An electric glass crucible furnace on four legs, 1 m tall: a 0.52 m drum with a lined mouth, a lid,
   // a vent and a control box on its side.
-  h.compound('glassblowers_crucible', 86, [
+  h.compound('glass_furnace', 86, [
     box('leg-a', 'frame', [-0.22, 0, -0.22], [-0.18, 0.42, -0.18]),
     box('leg-b', 'frame', [0.18, 0, -0.22], [0.22, 0.42, -0.18]),
     box('leg-c', 'frame', [-0.22, 0, 0.18], [-0.18, 0.42, 0.22]),

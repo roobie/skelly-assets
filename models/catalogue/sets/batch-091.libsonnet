@@ -88,19 +88,19 @@ local steelFinish = { plate: 'steel-stainless', chain: 'steel', strap: 'leather-
 [
   // A pair of light steel arm guards 600 mm long, each a chain sleeve from shoulder to wrist with a narrow plate over
   // the upper arm and another tapering down the forearm, buckled on with leather straps, laid side by side.
-  h.compound('arm_guard_steel_light', 3.8, steelPair('light'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
+  h.compound('mild_steel_light_arm_guards', 3.8, steelPair('light'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of steel arm guards 600 mm long, each half-round plates over the upper arm and forearm on a chain sleeve,
   // with a domed cop and a small fan over the elbow.
-  h.compound('arm_guard_steel', 5.5, steelPair('standard'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
+  h.compound('mild_steel_arm_guards', 5.5, steelPair('standard'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of heavy steel arm guards 600 mm long: thicker plates than the standard pair, a rolled edge at the
   // shoulder, two lames over the upper arm and a cuff flaring over the back of the hand.
-  h.compound('arm_guard_steel_heavy', 7.2, steelPair('heavy'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
+  h.compound('mild_steel_heavy_arm_guards', 7.2, steelPair('heavy'), steelFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of riot arm guards 400 mm long, black moulded plastic shells over a foam liner, each with a domed elbow
   // cup, a raised spine and two straps, laid side by side.
-  h.compound('arm_guard_riot', 0.44, riotGuard('left', -0.052) + riotGuard('right', 0.052, 0.03), {
+  h.compound('riot_arm_guards', 0.44, riotGuard('left', -0.052) + riotGuard('right', 0.052, 0.03), {
     shell: 'plastic-charcoal',
     trim: 'ceramic-grey',
     liner: 'felt-grey',

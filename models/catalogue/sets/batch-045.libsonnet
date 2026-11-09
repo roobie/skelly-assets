@@ -15,9 +15,9 @@ local boardFinish = { board: 'wood-pine', end: 'wood-birch', grain: 'wood-birch'
 local gripAt(id, solid, f) = h.gripOn(id, solid) + { fraction: [f, 0.5, 0.5] };
 [
   // An 8 ft 2 by 4: 2440 by 89 by 38 mm.
-  h.compound('plank_long', 4.2, board(2.44), boardFinish) + { handling: gripAt('plank_long', 'board', 0.08) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('long_plank', 4.2, board(2.44), boardFinish) + { handling: gripAt('long_plank', 'board', 0.08) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 2 ft 2 by 4: 610 by 89 by 38 mm.
-  h.compound('plank_short', 1, board(0.61), boardFinish) + { handling: gripAt('plank_short', 'board', 0.2) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('short_plank', 1, board(0.61), boardFinish) + { handling: gripAt('short_plank', 'board', 0.2) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 300 mm offcut of 2 by 4 with two half-depth notches 50 mm wide sawn across its top face, for lap joints.
   local len = 0.3, w = 0.089, t = 0.038, d = 0.019;
   h.compound('notched_plank', 0.44, [

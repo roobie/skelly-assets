@@ -39,7 +39,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
 
   // A crushproof thumb drive: a 62 mm knurled steel capsule, 17 mm across, its cap screwed on over a rubber seal, with
   // a small split ring through the tail.
-  h.compound('usb_drive_nano', 0.062, [
+  h.compound('rugged_usb_drive', 0.062, [
     turned('body', 'body', 'x', [[0, 0], [0, 0.0075], [0.004, 0.0085], [0.036, 0.0085], [0.036, 0]], [-0.030, 0.0085, 0]),
     turned('knurl-a', 'knurl', 'x', [[0, 0], [0, 0.0086], [0.004, 0.0086], [0.004, 0]], [-0.020, 0.0085, 0]),
     turned('knurl-b', 'knurl', 'x', [[0, 0], [0, 0.0086], [0.004, 0.0086], [0.004, 0]], [-0.012, 0.0085, 0]),
@@ -52,7 +52,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
   // A curled sheet of willow bark about 260 by 90 mm and 7 mm thick, grey furrowed outside up over a pale inner layer.
   local outline = [[-0.130, -0.040], [-0.090, -0.046], [0.020, -0.044], [0.125, -0.036], [0.132, 0.030], [0.060, 0.045], [-0.060, 0.044], [-0.128, 0.034]];
   local r = 0.07;
-  h.compound('willowbark', 0.097,
+  h.compound('willow_bark', 0.097,
     h.curvedPlate('inner', 'inner', [[p[1], p[0]] for p in outline], 0, 0.002, r, 6)
     + h.curvedPlate('outer', 'bark', [[p[1], p[0]] for p in outline], 0.002, 0.005, r, 6)
     + [
@@ -72,7 +72,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
   ], { wire: 'steel-bright', tie: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A short coil of barbed wire, 220 mm across: two twisted strands with four-point barbs every 50 mm or so.
-  h.compound('wire_barbed', 0.18, [
+  h.compound('barbed_wire', 0.18, [
     torus('strand-%d' % i, 'wire', 0.108 + i * 0.003, 0.0016, i * 0.006)
     for i in std.range(0, 2)
   ] + std.flattenArrays([
@@ -99,7 +99,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
 
   // A corn husk parcel of cooked rice, 140 mm long and 55 mm across, tied at both ends, split along the top where the
   // rice inside has grown white and yellow-green mould.
-  h.compound('young_koji_done', 0.2, [
+  h.compound('koji_rice_parcel', 0.2, [
     turned('husk', 'husk', 'x', [[0, 0], [0, 0.008], [0.015, 0.016], [0.035, 0.026], [0.070, 0.028], [0.105, 0.026], [0.125, 0.016], [0.140, 0.008], [0.140, 0]], [-0.070, 0.028, 0]),
     turned('tail-a', 'husk', 'x', [[0, 0], [0, 0.012], [0.018, 0.005], [0.018, 0]], [-0.088, 0.028, 0]),
     turned('tail-b', 'husk', 'x', [[0, 0], [0, 0.005], [0.018, 0.012], [0.018, 0]], [0.070, 0.028, 0]),

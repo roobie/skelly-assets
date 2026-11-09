@@ -69,7 +69,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
 
   // A digital single-lens reflex camera, a 140 by 100 by 75 mm body with a 110 mm zoom lens toward +z,
   // the hand grip on the camera's right (-x), a prism hump and hot shoe on top.
-  h.compound('camera_pro', 1.3, [
+  h.compound('professional_camera', 1.3, [
     box('body', 'body', [-0.070, 0, -0.035], [0.070, 0.080, 0.035]),
     box('grip', 'grip', [-0.070, 0, 0.035], [-0.040, 0.078, 0.055]),
     box('hump', 'body', [-0.022, 0.080, -0.032], [0.022, 0.100, 0.022]),
@@ -85,7 +85,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     turned('glass', 'glass', 'z', [[0, 0], [0, 0.028], [0.002, 0.028], [0.002, 0]], [0.004, 0.042, 0.150]),
     box('screen', 'screen', [-0.045, 0.010, -0.037], [0.035, 0.065, -0.035]),
     box('eyecup', 'grip', [-0.012, 0.072, -0.044], [0.012, 0.094, -0.032]),
-  ], { body: 'polymer-black', grip: 'rubber-black', metal: 'steel-stainless', trim: 'plastic-charcoal', lens: 'polymer-black', glass: 'glass-grey', screen: 'screen-black' }) + h.inHand('camera_pro', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  ], { body: 'polymer-black', grip: 'rubber-black', metal: 'steel-stainless', trim: 'plastic-charcoal', lens: 'polymer-black', glass: 'glass-grey', screen: 'screen-black' }) + h.inHand('professional_camera', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A candy-bar mobile phone, 110 by 48 by 16 mm, lying screen up with its earpiece toward -z: a small
   // display above a twelve-key pad and a round navigation key, a stub antenna on top.
@@ -133,7 +133,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
 
   // A hand-built port probe, 125 by 75 by 45 mm, lying face up: a rubber-bumpered box with a small display and
   // keys, a bank of plugs and sockets across its top end (-z) and down one side, and two flying leads.
-  h.compound('electrohack', 0.28, [
+  h.compound('electronic_lock_probe', 0.28, [
     box('body', 'body', [-0.035, 0, -0.060], [0.035, 0.040, 0.060]),
     box('bumper-a', 'bumper', [-0.0375, 0, -0.0625], [0.0375, 0.042, -0.054]),
     box('bumper-b', 'bumper', [-0.0375, 0, 0.054], [0.0375, 0.042, 0.0625]),

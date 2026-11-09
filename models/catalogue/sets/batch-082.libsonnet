@@ -54,10 +54,10 @@ local tray(w, d, ht, t) = [
 ];
 [
   // A corded 10 mm drill driver, 22 cm from the back of the housing to the bit tip, 20 cm tall over the grip.
-  h.compound('corded_powerdrill', 1.5, drill(false), {
+  h.compound('corded_power_drill', 1.5, drill(false), {
     housing: 'plastic-charcoal', grip: 'rubber-black', trigger: 'plastic-red', chuck: 'steel-grey', bit: 'steel-blued',
     cord: 'plastic-black',
-  }) + { handling: h.gripOn('corded_powerdrill', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { handling: h.gripOn('corded_power_drill', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless drill driver of the same frame, its grip standing on a slide-on battery pack.
   h.compound('cordless_drill', 1.6, drill(true), {
@@ -81,7 +81,7 @@ local tray(w, d, ht, t) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'fabric'] } } },
 
   // A battery-powered demolition breaker, 81 cm from the T handle to the point, its pack riding on the motor.
-  h.compound('elec_jackhammer', 31, tHandle(-0.4) + breakerFront(-0.32, 0.12, 0.08) + [
+  h.compound('electric_jackhammer', 31, tHandle(-0.4) + breakerFront(-0.32, 0.12, 0.08) + [
     box('battery', 'battery', [-0.24, 0.165, -0.06], [-0.06, 0.24, 0.06]),
     box('battery-rail', 'body', [-0.25, 0.16, -0.05], [-0.05, 0.172, 0.05]),
     box('vent-a', 'nose', [-0.2, 0.06, 0.077], [-0.04, 0.07, 0.083]),
@@ -90,7 +90,7 @@ local tray(w, d, ht, t) = [
   ], {
     handle: 'steel-grey', grip: 'rubber-black', body: 'plastic-red', nose: 'steel-parkerized', bit: 'steel-hardened',
     battery: 'plastic-charcoal',
-  }) + { handling: h.gripOn('elec_jackhammer', 'grip-b'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { handling: h.gripOn('electric_jackhammer', 'grip-b'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A tabletop fanning mill, 60 cm long, 65 cm tall and 36 cm wide: a fan drum turned by a crank on the front, a
   // hopper on top and the clean-grain chute sloping out at +x.
@@ -119,14 +119,14 @@ local tray(w, d, ht, t) = [
   ], { frame: 'wood-oak', body: 'wood-pine', chute: 'wood-birch', iron: 'iron-cast', grain: 'straw-pale' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'] } } },
 
   // A 230 mm cut-off wheel, 3 mm thick with a 22 mm bore and a printed paper label.
-  h.compound('grinder_cutoff_disc', 0.3, [
+  h.compound('cut_off_wheel', 0.3, [
     turned('disc', 'disc', 'y', [[0, 0.011], [0, 0.115], [0.003, 0.115], [0.003, 0.011], [0, 0.011]]),
     turned('label', 'label', 'y', [[0, 0.016], [0, 0.05], [0.0005, 0.05], [0.0005, 0.016], [0, 0.016]], [0, 0.003, 0]),
     turned('bore', 'ring', 'y', [[0, 0.011], [0, 0.016], [0.004, 0.016], [0.004, 0.011], [0, 0.011]]),
   ], { disc: 'plastic-charcoal', label: 'paper-white', ring: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A 180 mm depressed-centre grinding wheel, 7 mm thick, its hub dished down and labelled.
-  h.compound('grinder_metal_grinding_disc', 0.41, [
+  h.compound('grinding_wheel', 0.41, [
     turned('disc', 'disc', 'y', [[0, 0.011], [0, 0.035], [0.005, 0.045], [0.005, 0.09], [0.012, 0.09], [0.012, 0.045], [0.007, 0.035], [0.007, 0.011], [0, 0.011]]),
     turned('label', 'label', 'y', [[0, 0.016], [0, 0.033], [0.0005, 0.033], [0.0005, 0.016], [0, 0.016]], [0, 0.007, 0]),
     turned('bore', 'ring', 'y', [[0, 0.011], [0, 0.016], [0.008, 0.016], [0.008, 0.011], [0, 0.011]]),
@@ -148,12 +148,12 @@ local tray(w, d, ht, t) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A rough-cast bronze hammer head, 9 cm tall, on a 25 cm pine haft wrapped in rawhide under the head.
-  h.compound('hammer_bronze', 0.67, [
+  h.compound('bronze_hammer', 0.67, [
     rod('handle', 'handle', 0.013, 0, 0.245, 0.045),
     turned('head', 'head', 'y', [[0, 0], [0, 0.016], [0.006, 0.019], [0.045, 0.014], [0.084, 0.019], [0.09, 0.016], [0.09, 0]], [0.226, 0, 0]),
     turned('wrap', 'wrap', 'x', [[0, 0], [0, 0.016], [0.02, 0.016], [0.02, 0]], [0.188, 0.045, 0]),
   ], { handle: 'wood-birch', head: 'bronze', wrap: 'skin-rawhide' }) + {
-    handling: h.gripOn('hammer_bronze', 'handle'),
+    handling: h.gripOn('bronze_hammer', 'handle'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
@@ -186,7 +186,7 @@ local tray(w, d, ht, t) = [
 
   // A small scissor jack bent up from scrap: 16 cm base, 18 cm across its open links, rusted plate and a crude
   // threaded rod.
-  h.item('jack_makeshift', 'scissorJack', 1.1, {
+  h.item('makeshift_jack', 'scissorJack', 1.1, {
     baseLength: 0.16, baseWidth: 0.07, baseThickness: 0.006,
     halfSpan: 0.08, halfHeight: 0.035, linkWidth: 0.018, linkDepth: 0.006, linkOffset: 0.024,
     screwRadius: 0.006, crankLength: 0.02, crankRadius: 0.007,
@@ -235,7 +235,7 @@ local tray(w, d, ht, t) = [
 
   // A gunsmith's aluminium case, 36 cm by 26 cm, open with its lid standing behind: a foam tray holding a small
   // hammer, screwdrivers, a needle file, a wrench, a punch, a small hacksaw and a battery rotary tool.
-  h.compound('large_repairkit', 4, tray(0.36, 0.26, 0.09, 0.006) + [
+  h.compound('gunsmith_repair_kit', 4, tray(0.36, 0.26, 0.09, 0.006) + [
     box('lid', 'case', [-0.18, 0.09, -0.13], [0.18, 0.34, -0.118]),
     box('lid-foam', 'foam', [-0.17, 0.1, -0.118], [0.17, 0.33, -0.1]),
     box('foam', 'foam', [-0.174, 0.006, -0.124], [0.174, 0.07, 0.124]),

@@ -126,7 +126,7 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
 
   // A pair of red clown shoes, each 450 mm long and 150 mm wide, with a great rounded bulb over the toes, white
   // soles and yellow laces.
-  shoePair('clownshoes', 2, { l: 0.45, w: 0.15, s: 0.02, H: 0, back: 0.07, ball: 0.06, toe: 0.05, laces: 4 }, 0.02, {
+  shoePair('clown_shoes', 2, { l: 0.45, w: 0.15, s: 0.02, H: 0, back: 0.07, ball: 0.06, toe: 0.05, laces: 4 }, 0.02, {
     upper: 'paint-red',
     toe: 'paint-red',
     bulb: 'paint-red',
@@ -178,11 +178,11 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
 
   // A pair of upmarket flip-flops, each 270 mm long and 100 mm wide, a thick black rubber sole under a tan leather
   // footbed and wide brown leather straps.
-  flipFlops('flip_flops_exp', 0.5, 0.27, 0.1, 0.016, 0.006, 0.014, 0.022, { sole: 'rubber-black', bed: 'paperboard-tan', strap: 'leather-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
+  flipFlops('leather_flip_flops', 0.5, 0.27, 0.1, 0.016, 0.006, 0.014, 0.022, { sole: 'rubber-black', bed: 'paperboard-tan', strap: 'leather-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of armoured overboots for bomb disposal, each 340 mm long, 130 mm wide and 165 mm tall: an olive flame-
   // proof cloth shell on a thick sole, a rigid plate over the toes and instep and two hook-and-loop straps.
-  shoePair('foot_protectors_eod', 3.2, { l: 0.34, w: 0.13, s: 0.025, H: 0, back: 0.13, ball: 0.085, toe: 0.06, laces: 0 }, 0.02, {
+  shoePair('bomb_disposal_overboots', 3.2, { l: 0.34, w: 0.13, s: 0.025, H: 0, back: 0.13, ball: 0.085, toe: 0.06, laces: 0 }, 0.02, {
     upper: 'cloth-olive-drab',
     toe: 'polymer-od-green',
     sole: 'rubber-black',
@@ -202,16 +202,16 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
   footWraps('footrags', 0.079, 0.12, 0.22, 0.004, { cloth: 'cloth-rag', cord: 'cloth-rag-shadow' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of pale faux-fur pads, each 130 mm wide and 230 mm long, tied with cord, the pile in shaggy tufts.
-  footWraps('footrags_faux_fur', 0.19, 0.13, 0.23, 0.008, { cloth: 'cloth-white', fur: 'cloth-white', cord: 'cord-olive' }, true) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
+  footWraps('faux_fur_foot_wraps', 0.19, 0.13, 0.23, 0.008, { cloth: 'cloth-white', fur: 'cloth-white', cord: 'cord-olive' }, true) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of brown pelt pads, each 130 mm wide and 230 mm long, tied with rawhide thong, the fur in tufts.
-  footWraps('footrags_fur', 0.2, 0.13, 0.23, 0.008, { cloth: 'fur-brown', fur: 'fur-brown', cord: 'skin-rawhide' }, true) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
+  footWraps('fur_foot_wraps', 0.2, 0.13, 0.23, 0.008, { cloth: 'fur-brown', fur: 'fur-brown', cord: 'skin-rawhide' }, true) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
 
   // A pair of leather patches, each folded to a pad 120 mm wide and 220 mm long, tied with a leather thong.
-  footWraps('footrags_leather', 0.24, 0.12, 0.22, 0.004, { cloth: 'leather-brown', cord: 'leather-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
+  footWraps('leather_foot_wraps', 0.24, 0.12, 0.22, 0.004, { cloth: 'leather-brown', cord: 'leather-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
 
   // A pair of grey felt patches, each folded to a pad 120 mm wide and 220 mm long, tied with cord.
-  footWraps('footrags_wool', 0.098, 0.12, 0.22, 0.005, { cloth: 'felt-grey', cord: 'cord-olive' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
+  footWraps('felt_foot_wraps', 0.098, 0.12, 0.22, 0.005, { cloth: 'felt-grey', cord: 'cord-olive' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of wooden geta, each board 240 mm long, 100 mm wide and 17 mm thick on two 45 mm teeth, with a padded
   // cloth thong.

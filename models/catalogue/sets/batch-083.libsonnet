@@ -98,7 +98,7 @@ local pickArm(prefix, stations, y0, y1) = [
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A hand concrete float: a 150 by 75 mm iron blade with rounded front corners and a bent iron strap handle.
-  h.compound('metal_smoother', 0.3, [
+  h.compound('concrete_float', 0.3, [
     prism('blade', 'blade', 'y', [[-0.0375, -0.065], [0.0375, -0.065], [0.0375, 0.065], [0.03, 0.075], [-0.03, 0.075]], 0, 0.003),
     box('foot-a', 'strap', [-0.06, 0.003, -0.008], [-0.03, 0.006, 0.008]),
     box('foot-b', 'strap', [0.03, 0.003, -0.008], [0.06, 0.006, 0.008]),
@@ -106,11 +106,11 @@ local pickArm(prefix, stations, y0, y1) = [
     box('post-b', 'strap', [0.03, 0.003, -0.008], [0.036, 0.04, 0.008]),
     rod('grip', 'grip', 0.012, -0.05, 0.05, 0.048),
   ], { blade: 'iron-dull', strap: 'iron-dull', grip: 'wood-oak' })
-  + { handling: h.gripOn('metal_smoother', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { handling: h.gripOn('concrete_float', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A field repair roll laid open: a 460 by 140 mm canvas wrap holding a folding wood saw, a craft knife and a
   // square of soft cleaning cloth.
-  h.compound('misc_repairkit', 0.35, [
+  h.compound('field_repair_kit', 0.35, [
     box('roll', 'canvas', [-0.23, 0, -0.07], [0.23, 0.003, 0.07]),
     box('flap', 'canvas', [-0.23, 0, 0.07], [0.23, 0.006, 0.085]),
     box('tie-a', 'tie', [-0.24, 0.003, 0.0], [-0.20, 0.005, 0.012]),
@@ -141,7 +141,7 @@ local pickArm(prefix, stations, y0, y1) = [
 
   // A cast bronze nail puller 250 mm long: a 16 mm square bar with a curled claw at one end and a flat split claw
   // at the other, a striking boss behind the curl.
-  h.compound('nail_puller_bronze', 0.59, [
+  h.compound('bronze_nail_puller', 0.59, [
     box('bar', 'bar', [-0.10, 0.0, -0.008], [0.09, 0.016, 0.008]),
     prism('curl-a', 'bar', 'z', [[0.09, 0.0], [0.115, 0.004], [0.11, 0.02], [0.09, 0.016]], -0.008, 0.008),
     prism('curl-b', 'bar', 'z', [[0.115, 0.004], [0.125, 0.02], [0.12, 0.045], [0.11, 0.02]], -0.008, 0.008),
@@ -151,11 +151,11 @@ local pickArm(prefix, stations, y0, y1) = [
     prism('flat-b', 'claw', 'y', [[0.001, -0.10], [0.008, -0.10], [0.011, -0.125], [0.001, -0.125]], 0.0, 0.006),
     prism('notch', 'notch', 'z', [[0.104, 0.044], [0.11, 0.02], [0.113, 0.02], [0.108, 0.046]], -0.0012, 0.0012),
   ], { bar: 'bronze', boss: 'bronze-polished', claw: 'bronze', notch: 'coal-black' })
-  + { handling: h.gripOn('nail_puller_bronze', 'bar'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['ancient'] } } },
+  + { handling: h.gripOn('bronze_nail_puller', 'bar'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['ancient'] } } },
 
   // An oxy-acetylene torch: a 250 mm brass handle with red and blue valve knobs at the hose end and a cutting
   // attachment 200 mm long with its oxygen lever and a 75 degree copper nozzle, two short hose tails.
-  h.compound('oxy_torch', 0.91, [
+  h.compound('oxyacetylene_torch', 0.91, [
     rod('handle', 'handle', 0.014, -0.20, 0.03, 0.016),
     box('valve-block', 'body', [-0.22, 0.004, -0.018], [-0.20, 0.03, 0.018]),
     zrod('knob-red', 'red', 0.009, 0.018, 0.03, -0.21, 0.017),
@@ -169,7 +169,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('head', 'body', [0.22, 0.005, -0.009], [0.245, 0.03, 0.009]),
     prism('nozzle', 'nozzle', 'z', [[0.236, 0.004], [0.249, 0.006], [0.258, -0.005], [0.252, -0.009]], -0.0055, 0.0055),
   ], { handle: 'brass-polished', body: 'brass-dull', red: 'plastic-red', blue: 'plastic-blue', 'red-hose': 'rubber-black', 'blue-hose': 'rubber-black', tube: 'steel-bright', nozzle: 'copper' })
-  + { handling: h.gripOn('oxy_torch', 'handle'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { handling: h.gripOn('oxyacetylene_torch', 'handle'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 100 mm wall brush, 210 mm long: a flat beavertail wooden handle, a steel ferrule and a block of bristle.
   h.compound('paint_brush', 0.2, [

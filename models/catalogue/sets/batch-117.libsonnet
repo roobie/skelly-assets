@@ -60,14 +60,14 @@ local trench(id, mass, w, d, top, folds, finish) =
 [
   // A brown fur trench coat folded thick, 420 mm by 360 mm and 80 mm tall: wide fur lapels, double-breasted front,
   // a leather belt across the hem fold and two flapped hip pockets.
-  trench('trenchcoat_fur', 2.3, 0.42, 0.36, 0.08, 5, {
+  trench('faux_fur_trenchcoat', 2.3, 0.42, 0.36, 0.08, 5, {
     cloth: 'fur-brown', collar: 'fur-brown', lapel: 'fur-brown', lining: 'leather-brown', button: 'leather-black',
     belt: 'leather-black', buckle: 'brass-dull', pocket: 'fur-brown', flap: 'fur-brown',
   }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown leather trench coat folded, 400 mm by 340 mm and 60 mm tall: the same cut as the fur one in smooth
   // leather, with a self belt and dark buttons.
-  trench('trenchcoat_leather', 2.5, 0.4, 0.34, 0.06, 4, {
+  trench('leather_trenchcoat', 2.5, 0.4, 0.34, 0.06, 4, {
     cloth: 'leather-brown', collar: 'leather-brown', lapel: 'leather-brown', lining: 'leather-black', button: 'plastic-charcoal',
     belt: 'leather-brown', buckle: 'steel-grey', pocket: 'leather-brown', flap: 'leather-brown',
   }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
@@ -76,7 +76,7 @@ local trench(id, mass, w, d, top, folds, finish) =
   // buckled straps across the front instead of buttons, brass rivets down the edge and a brass cog pinned to the
   // left lapel.
   local top = 0.06;
-  h.compound('trenchcoat_steampunk', 2.4,
+  h.compound('brass_buckled_leather_coat', 2.4,
     h.foldedGarment(0.4, 0.34, top, 4)
     + [box('collar', 'collar', [-0.13, top, -0.17], [0.13, top + 0.02, -0.145])]
     + lapels(-0.14, -0.04, 0.15, top)
@@ -118,7 +118,7 @@ local trench(id, mass, w, d, top, folds, finish) =
   // A rag tunic folded loosely, 300 mm by 240 mm and 25 mm tall: grey-brown rag cloth with darker patches sewn on
   // crooked, a ragged hem and the string belt coiled on top.
   local top = 0.025;
-  h.compound('tunic_rag', 0.42,
+  h.compound('rag_tunic', 0.42,
     h.foldedGarment(0.3, 0.24, top, 3)
     + [
       h.prism('patch-a', 'patch', 'y', [[-0.08, -0.12], [-0.09, -0.04], [-0.02, -0.035], [-0.01, -0.11]], top, top + 0.003),
@@ -134,7 +134,7 @@ local trench(id, mass, w, d, top, folds, finish) =
   // white shirt front between them with a black bow tie, one button, and the trousers' satin side stripe showing on
   // the bottom fold.
   local top = 0.05;
-  h.compound('tux', 1.4,
+  h.compound('tuxedo', 1.4,
     h.foldedGarment(0.38, 0.32, top, 4)
     + [
       h.prism('shirt', 'shirt', 'y', [[-0.16, -0.07], [-0.16, 0.07], [0.04, 0.0]], top, top + 0.002),
@@ -155,7 +155,7 @@ local trench(id, mass, w, d, top, folds, finish) =
   // A sleeveless denim vest folded, 300 mm by 240 mm and 25 mm tall: a shirt collar along the back, two buttoned
   // flap pockets on the chest, a row of metal buttons down the front and the waistband seam across the hem.
   local top = 0.025;
-  h.compound('vest_jean', 0.45,
+  h.compound('denim_vest', 0.45,
     h.foldedGarment(0.3, 0.24, top, 3)
     + [collar(0.2, -0.11, top, 0.01)]
     + pocket('pocket-l', -0.11, -0.03, -0.07, 0.0, top, 0.003, 0.024)
@@ -192,7 +192,7 @@ local trench(id, mass, w, d, top, folds, finish) =
   // folded down on top, a zip with a storm flap, two flapped chest pockets, two flapped hip pockets and a
   // hook-and-loop patch on the left chest.
   local top = 0.05;
-  h.compound('winter_jacket_army', 1.6,
+  h.compound('army_winter_jacket', 1.6,
     h.foldedGarment(0.38, 0.32, top, 3)
     + ridges('baffle', 'baffle', -0.19, 0.19, [-0.02, 0.04, 0.1, 0.15], top, 0.005, 0.01)
     + hood(0.24, -0.16, -0.05, top, 0.012, 0.012)

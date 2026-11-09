@@ -174,12 +174,12 @@ local closeHelm(id, mass, heavy, raised) =
   // A hardened steel heavy close helm standing on its neck, front on +z, 250 mm across, 280 mm deep and 305 mm
   // tall: a combed skull, a bevor over the chin, a bulging visor with an eye slit pivoting at the temples, a riveted
   // brow reinforce and three gorget lames.
-  closeHelm('ch_heavyhelm_close', 4.2, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_heavy_close_helm', 4.2, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // The same heavy close helm with its visor swung up over the brow, the face open: 340 mm tall.
-  closeHelm('ch_heavyhelm_close_raised', 4.2, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_heavy_close_helm_visor_up', 4.2, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A hardened steel close helm standing on its neck, 250 mm across, 280 mm deep and 305 mm tall: the same combed
   // skull, bevor and visor as the heavy helm, on a single neck lame and without the brow reinforce.
-  closeHelm('ch_helm_close', 3.5, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_close_helm', 3.5, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 ]

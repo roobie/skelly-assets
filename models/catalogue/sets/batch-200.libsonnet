@@ -137,17 +137,17 @@ local bracer(p, cx, l, w0, w1) =
 [
   // An immature wildwood weaver: a living carved-wood creature like a spider 60 mm long and 80 mm across its
   // legs, with short needle forelegs and bright watching eyes.
-  h.compound('mag_immature_weaver', 0.02, weaver(1.0, 0.022, false), weaverFinish { eye: 'gem-citrine' })
+  h.compound('young_wildwood_weaver', 0.02, weaver(1.0, 0.022, false), weaverFinish { eye: 'gem-citrine' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A grown wildwood weaver: the same creature 75 mm long and 100 mm across its legs, with long needle forelegs,
   // a pair of pale blade mandibles and dark, unlit eyes.
-  h.compound('mag_adult_weaver', 0.039, weaver(1.25, 0.04, true), weaverFinish { eye: 'gem-onyx' })
+  h.compound('grown_wildwood_weaver', 0.039, weaver(1.25, 0.04, true), weaverFinish { eye: 'gem-onyx' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A braided steel belt 1.1 m long and 30 mm wide laid in a U, its plaits shown as alternating raised links, with
   // a plain steel buckle and a wrapped steel grip at its tip where it becomes a whip's handle.
-  h.compound('mbelt_iron_whip', 1.2, beltU(1.1, 0.03, 0.005, 0, 0.035, 0.042, 0.005)
+  h.compound('braided_steel_belt', 1.2, beltU(1.1, 0.03, 0.005, 0, 0.035, 0.042, 0.005)
     + std.flattenArrays([
       [
         h.prism('plait-a-%d' % i, 'plait', 'y', [[0.02 + 0.002, x0], [0.02 + 0.014, x0 + 0.012], [0.02 + 0.014, x0 + 0.018], [0.02 + 0.002, x0 + 0.006]], 0.005, 0.0065),
@@ -168,7 +168,7 @@ local bracer(p, cx, l, w0, w1) =
   // A lesser dimensional tool belt: a 50 mm brown leather work belt 1.1 m long laid in a U, with two flapped tan
   // tool pouches 120 mm square hanging from the buckle run, tools standing in their mouths, each flap set with a
   // small violet stone.
-  h.compound('mbelt_pockets_lesser', 1.5, toolBelt([
+  h.compound('lesser_bottomless_tool_belt', 1.5, toolBelt([
     { x: -0.07, w: 0.12, l: 0.12, s: 1, stone: 0.006 },
     { x: 0.08, w: 0.12, l: 0.12, s: 1, stone: 0.006 },
   ]), beltFinish)
@@ -176,7 +176,7 @@ local bracer(p, cx, l, w0, w1) =
 
   // A greater dimensional tool belt: the same work belt with four pouches, two on each run, a hammer in a steel
   // loop at the bend, and larger violet stones.
-  h.compound('mbelt_pockets_greater', 3, toolBelt([
+  h.compound('greater_bottomless_tool_belt', 3, toolBelt([
     { x: -0.11, w: 0.11, l: 0.12, s: 1, stone: 0.009 },
     { x: 0.03, w: 0.13, l: 0.13, s: 1, stone: 0.009 },
     { x: -0.06, w: 0.11, l: 0.11, s: -1, stone: 0.009 },
@@ -187,7 +187,7 @@ local bracer(p, cx, l, w0, w1) =
   // A technomancer's tool belt: a 60 mm black leather belt 1.15 m long laid in a U, faced with steel plates carved
   // with glowing blue runes, a steel buckle set with a blue crystal, and tools hanging in steel loops along both runs:
   // a hammer, an adjustable spanner, a screwdriver and a folding saw.
-  h.compound('mbelt_technomancer_toolbelt', 2, beltU(1.15, 0.06, 0.006, 4, 0.06, 0.08, 0.009)
+  h.compound('rune_forged_tool_belt', 2, beltU(1.15, 0.06, 0.006, 4, 0.06, 0.08, 0.009)
     + [
       box('plate-%d' % i, 'plate', [-0.2 + i * 0.1, 0.006, 0.024], [-0.13 + i * 0.1, 0.009, 0.076])
       for i in std.range(0, 3)
@@ -225,7 +225,7 @@ local bracer(p, cx, l, w0, w1) =
 
   // A wide fighting girdle 1.1 m long and 100 mm wide in black leather laid in a U, edged in oxblood, a band of
   // carved violet runes along both runs, two empty weapon frogs on the buckle run and a broad bronze buckle.
-  h.compound('mbelt_weaponry', 0.9, beltU(1.1, 0.1, 0.005, 3, 0.09, 0.12, 0.014, 0.03)
+  h.compound('girdle_of_hidden_arms', 0.9, beltU(1.1, 0.1, 0.005, 3, 0.09, 0.12, 0.014, 0.03)
     + [
       box('edge-a', 'edge', [-0.21, 0.005, 0.015], [0.21, 0.0065, 0.022]),
       box('edge-b', 'edge', [-0.21, 0.005, 0.108], [0.21, 0.0065, 0.115]),
@@ -248,7 +248,7 @@ local bracer(p, cx, l, w0, w1) =
   // A pair of steel bracers lying side by side, convex side up, wrists towards +z: each a curved plate 250 mm long,
   // 120 mm across at the elbow and 95 mm at the wrist, with a raised rib, rolled rims, an elbow cop and two buckled
   // leather straps.
-  h.compound('mbracer_steel_pair', 1.3, bracer('l', -0.1, 0.25, 0.12, 0.095) + bracer('r', 0.1, 0.25, 0.12, 0.095), {
+  h.compound('steel_bracers', 1.3, bracer('l', -0.1, 0.25, 0.12, 0.095) + bracer('r', 0.1, 0.25, 0.12, 0.095), {
     plate: 'steel-grey',
     rib: 'steel-bright',
     rim: 'steel-bright',

@@ -22,7 +22,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
 [
   // A cloak of thin plastic panels folded flat, 400 mm by 300 mm and 36 mm tall in three layers: rows of tiny
   // camera lenses and LEDs across the outer face, and a power lead coiled on top ending in a plug.
-  h.compound('optical_cloak', 1.4, h.foldedGarment(0.4, 0.3, 0.03, 3) + [
+  h.compound('camera_cloak', 1.4, h.foldedGarment(0.4, 0.3, 0.03, 3) + [
     h.disc('lens-%d-%d' % [i, j], 'lens', 0.005, 0.03, 0.033, -0.17 + j * 0.034, -0.12 + i * 0.04)
     for i in std.range(0, 6)
     for j in std.range(0, 10)
@@ -55,7 +55,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
 
   // A black plastic bin bag flattened out, 600 mm across and 800 mm long: a notch cut from the middle of its closed
   // end for the head, one cut from each side for the arms, and the yellow drawstring knotted at the open end.
-  h.compound('poncho_makeshift', 0.048, [
+  h.compound('bin_bag_poncho', 0.048, [
     box('bag-body', 'bag', [-0.26, 0, -0.33], [0.26, 0.004, 0.4]),
     box('bag-l-top', 'bag', [-0.3, 0, -0.4], [-0.26, 0.004, -0.22]),
     box('bag-l-low', 'bag', [-0.3, 0, -0.12], [-0.26, 0.004, 0.4]),
@@ -93,7 +93,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
 
   // A fleece blanket with sleeves folded flat, 320 mm by 260 mm and 40 mm tall in four layers, both sleeves folded
   // back across the top side by side, each ending in a ribbed cuff.
-  h.compound('snuggie', 0.64, h.foldedGarment(0.32, 0.26, 0.04, 4)
+  h.compound('sleeved_blanket', 0.64, h.foldedGarment(0.32, 0.26, 0.04, 4)
                                + sleeve('l-', -0.16, 0.13, -0.06, 0.08, 0.04, 0.016, 0.035)
                                + sleeve('r-', -0.16, 0.13, 0.04, 0.08, 0.04, 0.016, 0.035),
              { cloth: 'cloth-blue', sleeve: 'cloth-blue', cuff: 'cloth-navy' })
@@ -129,7 +129,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
   // A firefighter's turnout coat folded flat, 420 mm by 320 mm and 60 mm tall in three layers of tan shell: two
   // reflective bands with a silver centre stripe across it, a big bellows pocket with a flap, a row of steel hook
   // clasps down the storm flap, the high collar on top and one sleeve folded back ending in a black knit wristlet.
-  h.compound('bunker_coat', 2.1, h.foldedGarment(0.42, 0.32, 0.06, 3) + [
+  h.compound('turnout_coat', 2.1, h.foldedGarment(0.42, 0.32, 0.06, 3) + [
     box('band-a', 'band', [-0.21, 0.06, 0.105], [0.21, 0.062, 0.15]),
     box('band-a-silver', 'silver', [-0.21, 0.062, 0.122], [0.21, 0.0635, 0.133]),
     box('band-b', 'band', [-0.21, 0.0, 0.158], [0.21, 0.06, 0.16]),

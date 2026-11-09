@@ -166,7 +166,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
   // A pair of tempered steel leg guards laid side by side, crown up, each 600 mm from hip to ankle: a thigh plate
   // 250 mm long round an 80 mm radius, a domed knee cop 130 mm across with a side wing, a shin plate 250 mm long round
   // 65 mm, mail gussets at the knee and a mail fringe at the hip, each plate strapped twice.
-  h.compound('qt_light_leg_guard', 3.1, std.flattenArrays([
+  h.compound('tempered_steel_leg_guards', 3.1, std.flattenArrays([
     plateLeg(p, z, {})
     + [
       box(p + 'gusset-a', 'mail', [-0.06, 0, z + 0.05], [0.06, 0.008, z + 0.08]),
@@ -207,7 +207,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // Firefighter's turnout trousers folded on a shelf, 400 mm by 360 mm and 90 mm tall: tan flame-resistant shell, two
   // reflective bands at the cuff end, a bellows cargo pocket, a black knee patch, and red braces folded over the top.
-  h.compound('bunker_pants', 3.1, trousers(0.4, 0.36, 0.09) + [
+  h.compound('turnout_trousers', 3.1, trousers(0.4, 0.36, 0.09) + [
     box('band-a', 'band', [-0.2, 0.09, -0.15], [0.2, 0.093, -0.125]),
     box('band-b', 'band', [-0.2, 0.09, -0.105], [0.2, 0.093, -0.08]),
     box('pocket', 'cloth', [0.04, 0.09, -0.05], [0.17, 0.106, 0.08]),
@@ -226,7 +226,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // Grey canvas work trousers folded on a shelf, 300 mm by 400 mm and 60 mm tall, a raised layer of cotton padding
   // over the top face quilted on in diamond stitching a shade lighter than the cloth.
-  h.compound('canvas_pants_padded', 1.3, trousers(0.3, 0.4, 0.06)
+  h.compound('padded_canvas_trousers', 1.3, trousers(0.3, 0.4, 0.06)
                                           + [box('padding', 'cloth', [-0.135, 0.06, -0.185], [0.135, 0.068, 0.135])]
                                           + g.quilt({ style: 'lattice', x0: -0.135, x1: 0.135, z0: -0.185, z1: 0.135, y: 0.068, pitch: 0.06, w: 0.004, t: 0.002, slot: 'stitch' }), { cloth: 'cloth-pants-grey', trim: 'cloth-canvas', stitch: 'felt-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
@@ -247,18 +247,18 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // A pair of hardened mail half-leggings laid flat side by side, 760 mm long, 170 mm across at the thigh and 100 mm
   // at the ankle, covering the front and sides only: leather-bound open edges with a zigzag lace each side.
-  h.compound('ch_chainmail_half_legs', 4.7, mailLeg('l-', -0.12, false) + mailLeg('r-', 0.12, false), { mail: 'steel-mail-dark', strap: 'leather-brown', lace: 'leather-tan' })
+  h.compound('hardened_steel_mail_half_leggings', 4.7, mailLeg('l-', -0.12, false) + mailLeg('r-', 0.12, false), { mail: 'steel-mail-dark', strap: 'leather-brown', lace: 'leather-tan' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of hardened mail leggings laid flat side by side, 840 mm from the belt point to the instep, 210 mm across
   // at the thigh and 130 mm at the ankle, with a leather garter and belt point at the top and a stirrup strap under
   // the open instep. The rusted junk leggings share this model.
-  h.compound('ch_chainmail_legs', 6.7, mailLeg('l-', -0.13, true) + mailLeg('r-', 0.13, true), { mail: 'steel-mail-dark', strap: 'leather-brown', buckle: 'steel' })
+  h.compound('hardened_steel_mail_leggings', 6.7, mailLeg('l-', -0.13, true) + mailLeg('r-', 0.13, true), { mail: 'steel-mail-dark', strap: 'leather-brown', buckle: 'steel' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of crude hardened sheet steel leg guards laid side by side, crown up, each 600 mm from hip to ankle: a
   // thigh plate and a shin plate bent in few facets, a domed knee cop, rivets and buckled leather straps.
-  h.compound('ch_legguard_metal_sheets', 3.3, std.flattenArrays([
+  h.compound('hardened_sheet_steel_leg_guards', 3.3, std.flattenArrays([
     plateLeg(p, z, { n: 4, t: 0.004, rivets: true })
     for p in ['l-', 'r-']
     for z in [if p == 'l-' then -0.11 else 0.11]
@@ -267,7 +267,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // A pair of crude hardened sheet steel greaves laid side by side, crown up: a shin plate 320 mm long bent round a
   // 65 mm radius in four facets, riveted at the ends, with two buckled leather straps.
-  h.compound('ch_legguard_metal_sheets_greaves', 1.6, std.flattenArrays([
+  h.compound('hardened_sheet_steel_greaves', 1.6, std.flattenArrays([
     plateLeg(p, z, { n: 4, t: 0.004, thigh: false, knee: false, x0: -0.16, x1: 0.16, tr: 0.065, rivets: true })
     for p in ['l-', 'r-']
     for z in [if p == 'l-' then -0.09 else 0.09]
@@ -276,7 +276,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // A hardened sheet steel skirt laid flat, outside up: five overlapping plates 300 mm long, each 110 mm across at
   // the belt and 130 mm at the hem with a rolled hem, riveted to a leather belt 500 mm long with a buckle.
-  h.compound('ch_legguard_metal_sheets_hip', 2.6, std.flattenArrays([
+  h.compound('hardened_sheet_steel_skirt', 2.6, std.flattenArrays([
     local x = i * 0.092, y0 = 0.004 * std.abs(i);
     h.curvedPlate('plate-%d' % (i + 2), 'plate', [[-0.055, 0.14], [-0.065, -0.16], [0.065, -0.16], [0.055, 0.14]], y0, 0.003, 0.3, 3, x, -0.02)
     + [
@@ -295,7 +295,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
 
   // A pair of hardened sheet steel knee guards standing dome up side by side, each a faceted cop 130 mm across and
   // 50 mm high with a wing on the outer side and a leather strap each way, 500 mm tip to tip.
-  h.compound('ch_legguard_metal_sheets_knees', 0.71, std.flattenArrays([
+  h.compound('hardened_sheet_steel_knee_guards', 0.71, std.flattenArrays([
     [
       h.dome(p + 'cop', 'plate', 0.065, 0.05, 0.004, 'y', [x, 0, 0], 4),
       h.prism(p + 'wing', 'plate', 'y', [[-0.045, x + s * 0.05], [-0.03, x + s * 0.09], [0.03, x + s * 0.09], [0.045, x + s * 0.05]], 0, 0.004),
@@ -313,11 +313,11 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
   // A pair of orange chainsaw chaps laid flat, outside up, 820 mm long: two front panels 270 mm across at the thigh
   // and 190 mm at the cuff, quilted lengthwise through their cut-resistant layers, with four buckled leg straps each
   // and a webbing waist belt.
-  h.compound('chaps_cut_resistant', 1.8, chaps({ saw: true, t: 0.012 }), { panel: 'cloth-orange', stitch: 'cloth-orange', strap: 'webbing-black', buckle: 'plastic-matte-black', belt: 'webbing-black', label: 'cloth-white' })
+  h.compound('chainsaw_chaps', 1.8, chaps({ saw: true, t: 0.012 }), { panel: 'cloth-orange', stitch: 'cloth-orange', strap: 'webbing-black', buckle: 'plastic-matte-black', belt: 'webbing-black', label: 'cloth-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A pair of black leather chaps laid flat, outside up, 820 mm long: two leg panels 270 mm across at the thigh and
   // 190 mm at the cuff, a tan-whipstitched welt and a zip down each outer edge, a buckled belt and a laced front.
-  h.compound('chaps_leather', 2.3, chaps({ t: 0.006 }), { panel: 'leather-black', zip: 'steel-bright', welt: 'leather-charcoal', belt: 'leather-black', buckle: 'metal-silver', lace: 'leather-tan' })
+  h.compound('leather_chaps', 2.3, chaps({ t: 0.006 }), { panel: 'leather-black', zip: 'steel-bright', welt: 'leather-charcoal', belt: 'leather-black', buckle: 'metal-silver', lace: 'leather-tan' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 ]

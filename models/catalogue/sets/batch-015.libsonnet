@@ -28,7 +28,7 @@ local fibreTube(axis, length, radius, band) =
 [
   // A cardboard carton for three stripper clips of rifle rounds, 92 mm long, 60 mm deep and 42 mm tall,
   // open on top with a thumb notch cut into its front wall and a black stencil strip below it.
-  h.compound('ammo_box_army_3_clips', 0.012, [
+  h.compound('three_clip_ammunition_carton', 0.012, [
     box('floor', 'board', [-0.046, 0, -0.03], [0.046, 0.002, 0.03]),
     box('back', 'board', [-0.046, 0.002, -0.03], [0.046, 0.042, -0.028]),
     box('left', 'board', [-0.046, 0.002, -0.028], [-0.044, 0.042, 0.028]),
@@ -42,17 +42,17 @@ local fibreTube(axis, length, radius, band) =
 
   // A fibreboard container for one hand grenade, standing on end: 75 mm across its steel caps and 135 mm
   // tall, black with tape over the lid seam and a yellow band.
-  h.compound('ammunition_box_grenade', 0.14, fibreTube('y', 0.135, 0.0375, 0.05), {
+  h.compound('grenade_container', 0.14, fibreTube('y', 0.135, 0.0375, 0.05), {
     tube: 'paint-charcoal',
     cap: 'steel-grey',
     tape: 'cloth-olive-drab',
     band: 'plastic-yellow',
   })
-  + h.inHand('ammunition_box_grenade', 'tube') + { voxelGrain: 0.004 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper', 'metal'], setting: ['modern'] } } },
+  + h.inHand('grenade_container', 'tube') + { voxelGrain: 0.004 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper', 'metal'], setting: ['modern'] } } },
 
   // A fibreboard container for one 60 mm mortar round, lying down: 400 mm long and 76 mm across its steel
   // caps, black with tape over the lid seam and a yellow band.
-  h.compound('ammunition_tube_mortar', 0.22, fibreTube('x', 0.4, 0.038, 0.15), {
+  h.compound('mortar_round_container', 0.22, fibreTube('x', 0.4, 0.038, 0.15), {
     tube: 'paint-charcoal',
     cap: 'steel-grey',
     tape: 'cloth-olive-drab',
@@ -72,7 +72,7 @@ local fibreTube(axis, length, radius, band) =
     turned('mark-%d' % i, 'mark', 'x', [[0, r], [0, r + 0.002], [0.03, r + 0.002], [0.03, r], [0, r]], [0.2, cap, z]),
   ];
   [
-    h.compound('ammunition_can_carlgustav', 2.5, tube(0, zs[0]) + tube(1, zs[1]) + [
+    h.compound('recoilless_round_container', 2.5, tube(0, zs[0]) + tube(1, zs[1]) + [
       box('clamp-a', 'clamp', [-0.25, 0.002, -0.124], [-0.21, 0.126, 0.124]),
       box('clamp-b', 'clamp', [0.15, 0.002, -0.124], [0.19, 0.126, 0.124]),
       box('handle-post-a', 'handle', [-0.12, 0.118, -0.008], [-0.1, 0.15, 0.008]),
@@ -115,7 +115,7 @@ local fibreTube(axis, length, radius, band) =
 
   // A golden platter from a supercomputer's storage, lying flat: 400 mm across and 8 mm thick, with copper
   // circuit rings and radial traces on its face and a steel clamp hub round its spindle hole.
-  h.compound('melchior_platter', 2.6, [
+  h.compound('supercomputer_platter', 2.6, [
     ring('disc', 'gold', 0.024, 0.2, 0, 0.008),
     ring('hub', 'hub', 0.024, 0.05, 0.008, 0.014),
   ] + [
@@ -135,7 +135,7 @@ local fibreTube(axis, length, radius, band) =
 
   // A full-length dressing mirror, 500 mm wide and 1650 mm tall, its glass in a slim aluminium frame
   // standing on two short feet, the rear stand leg folded flat against its back.
-  h.compound('bigmirror', 13, [
+  h.compound('standing_mirror', 13, [
     box('glass', 'glass', [-0.23, 0.05, -0.006], [0.23, 1.63, 0.006]),
     box('frame-foot', 'frame', [-0.25, 0.03, -0.015], [0.25, 0.05, 0.015]),
     box('frame-head', 'frame', [-0.25, 1.63, -0.015], [0.25, 1.65, 0.015]),

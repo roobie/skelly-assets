@@ -11,7 +11,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
   // A wooden fruit and cider press 500 mm wide, 440 mm deep and 900 mm tall: a heavy plank base with a pouring lip
   // at the front, two posts and a crossbeam carrying an iron screw, and a hooped slatted basket under the pressing
   // block. It stands where it is used.
-  h.compound('screw_press', 34, [
+  h.compound('fruit_press', 34, [
     box('base', 'wood', [-0.25, 0.06, -0.22], [0.25, 0.14, 0.2]),
     box('foot-l', 'wood', [-0.25, 0, -0.22], [-0.19, 0.06, 0.2]),
     box('foot-r', 'wood', [0.19, 0, -0.22], [0.25, 0.06, 0.2]),
@@ -46,7 +46,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A shallow woven sieve 240 mm across and 45 mm deep: a coiled rim of plant strips round a tight basket-weave
   // floor.
-  h.compound('sieve_primitive', 0.11, [
+  h.compound('woven_sieve', 0.11, [
     vessel('tray', 'weave', [[0, 0.11], [0.04, 0.12]], 0.004),
     ring('rim', 'rim', 0.12, 0.004, 0.038),
     // The floor: dark gaps under a basket weave of strips 8 mm wide.
@@ -63,7 +63,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A laboratory test sieve 200 mm across and 50 mm tall: a polished stainless frame with a stepped skirt that
   // nests on the next sieve, and a fine woven mesh across its middle.
-  h.compound('sieve_steel', 0.61, [
+  h.compound('steel_sieve', 0.61, [
     vessel('frame', 'frame', [[0, 0.094], [0.012, 0.094], [0.012, 0.1], [0.05, 0.1]], 0.002),
     ring('lip', 'frame', 0.1, 0.002, 0.046),
     h.disc('mesh', 'mesh', 0.093, 0.012, 0.014),
@@ -82,7 +82,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A hand sieve twisted from stiff wire: a loop 130 mm across holding a disc of fine mesh, its two wire ends
   // twisted into a 120 mm handle with a hanging loop, 255 mm overall. Lies along x, handle to +x.
-  h.compound('sieve_steel_makeshift', 0.15, [
+  h.compound('makeshift_wire_sieve', 0.15, [
     ring('frame', 'wire', 0.065, 0.002, 0.0, -0.06, 0),
     h.disc('mesh', 'mesh', 0.064, 0.001, 0.003, -0.06, 0),
   ] + [
@@ -97,12 +97,12 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     ring('loop', 'wire', 0.012, 0.002, 0.0, 0.135, 0),
   ], { wire: 'steel-bright', mesh: 'steel-grey', strand: 'steel-stainless' }) + {
     voxelGrain: 0.002,
-    handling: h.gripOn('sieve_steel_makeshift', 'twist-5'),
+    handling: h.gripOn('makeshift_wire_sieve', 'twist-5'),
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A countertop shaved-ice maker 240 mm wide, 190 mm deep and 300 mm tall: a red housing with a clear ice hopper
   // on top under a push-down lid, a chute at the front and a clear catch tray on the base.
-  h.compound('snow_machine_home', 1.4, [
+  h.compound('shaved_ice_maker', 1.4, [
     box('plinth', 'body', [-0.12, 0, -0.095], [0.12, 0.025, 0.095]),
     box('tower', 'body', [-0.085, 0.025, -0.095], [0.085, 0.2, -0.005]),
     box('neck', 'body', [-0.05, 0.12, -0.005], [0.05, 0.2, 0.04]),
@@ -150,7 +150,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A home-made mess kit laid out together, 240 mm across: a steel billy can with a wire bail and a lid, a
   // kerosene burner with a pump, pot supports and a brass burner head, and a glass jar of fuel in front.
-  h.compound('survivor_mess_kit', 1.3, [
+  h.compound('makeshift_mess_kit', 1.3, [
     vessel('pot', 'steel', [[0, 0.07], [0.11, 0.07]], 0.002, [-0.05, 0, -0.02]),
     h.disc('lid', 'steel', 0.073, 0.11, 0.116, -0.05, -0.02),
     h.disc('lid-knob', 'black', 0.012, 0.116, 0.128, -0.05, -0.02),
@@ -213,7 +213,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A countertop vacuum sealer 350 mm long, 150 mm deep and 80 mm tall: a silver base with a black hinged lid,
   // a latch at each end, a soft-touch button strip along the front and the cutter rail on top.
-  h.compound('vac_sealer', 2.3, [
+  h.compound('vacuum_sealer', 2.3, [
     box('base', 'metal', [-0.175, 0, -0.075], [0.175, 0.045, 0.075]),
     box('lid', 'black', [-0.17, 0.045, -0.072], [0.17, 0.075, 0.05]),
     box('lid-front', 'black', [-0.17, 0.045, 0.05], [0.17, 0.065, 0.072]),
@@ -231,7 +231,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A cast aluminium stovetop waffle iron 300 mm long: a closed round mould 160 mm across and 45 mm thick with a
   // grid cast into its top, hinged at -x, and two long handles with wooden grips running to +x.
-  h.compound('waffleiron', 1.3, [
+  h.compound('waffle_iron', 1.3, [
     h.disc('lower', 'alu', 0.08, 0.0, 0.02, -0.06, 0),
     h.disc('upper', 'alu', 0.08, 0.022, 0.042, -0.06, 0),
     h.disc('seam', 'dark', 0.078, 0.02, 0.022, -0.06, 0),
@@ -251,7 +251,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
 
   // A slow sand filter in a 20 litre bucket, 300 mm across the rim and 370 mm tall: a white pail filled with sand
   // over gravel, a wire bail handle and a blue drip tap low on the front.
-  h.compound('water_filter_sand', 31, [
+  h.compound('sand_water_filter', 31, [
     vessel('bucket', 'bucket', [[0, 0.13], [0.35, 0.15], [0.37, 0.152]], 0.004),
     ring('rib-a', 'bucket', 0.149, 0.004, 0.3),
     ring('rib-b', 'bucket', 0.15, 0.004, 0.33),

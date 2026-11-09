@@ -85,7 +85,7 @@ local beltStrap(len, w, t=0.004) = [
 
   // A pair of sandals woven from cord, each sole 260 mm long and 95 mm wide, with a cord strap over the toes and a
   // heel loop.
-  h.compound('bastsandals', 0.076, std.flattenArrays([
+  h.compound('bast_sandals', 0.076, std.flattenArrays([
     [
       box(p + '-sole', 'sole', [xc - 0.0475, 0, -0.13], [xc + 0.0475, 0.008, 0.08]),
       h.disc(p + '-sole-toe', 'sole', 0.0475, 0, 0.008, xc, 0.08),
@@ -117,7 +117,7 @@ local beltStrap(len, w, t=0.004) = [
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same work boots, 190 mm tall, studded all over with small carved bones and a bone ring at each collar.
-  bootPair('boots_bone', 1.2, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.19, shaft: 0.12, laces: 4 }, 0.03, {
+  bootPair('bone_studded_boots', 1.2, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.19, shaft: 0.12, laces: 4 }, 0.03, {
     upper: 'leather-black',
     toe: 'leather-black',
     sole: 'rubber-black',
@@ -138,7 +138,7 @@ local beltStrap(len, w, t=0.004) = [
 
   // A pair of black rubber firefighter's boots, each 310 mm long, 110 mm wide and 380 mm tall, pull-on, with a
   // reflective band, a steel toe cap and pull loops at the top.
-  bootPair('boots_bunker', 2.1, { l: 0.31, w: 0.11, s: 0.025, toe: 0.065, instep: 0.09, top: 0.38, shaft: 0.14, laces: 0 }, 0.02, {
+  bootPair('turnout_boots', 2.1, { l: 0.31, w: 0.11, s: 0.025, toe: 0.065, instep: 0.09, top: 0.38, shaft: 0.14, laces: 0 }, 0.02, {
     upper: 'rubber-black',
     toe: 'steel-grey',
     sole: 'paint-oxblood',
@@ -151,7 +151,7 @@ local beltStrap(len, w, t=0.004) = [
   ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of boots 300 mm long, 105 mm wide and 220 mm tall, sheathed in overlapping bands of insect shell.
-  bootPair('boots_chitin', 1.7, { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 }, 0.03, {
+  bootPair('chitin_boots', 1.7, { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 }, 0.03, {
     upper: 'leather-black',
     toe: 'paint-oxblood',
     sole: 'paint-oxblood',
@@ -167,7 +167,7 @@ local beltStrap(len, w, t=0.004) = [
 
   // A pair of coyote-tan combat boots, each 300 mm long, 105 mm wide and 220 mm tall, with a black lugged sole, a
   // reinforced toe and heel and laces to the top.
-  bootPair('boots_combat', 1.1, { l: 0.3, w: 0.105, s: 0.026, toe: 0.06, instep: 0.085, top: 0.22, shaft: 0.12, laces: 6 }, 0.02, {
+  bootPair('combat_boots', 1.1, { l: 0.3, w: 0.105, s: 0.026, toe: 0.06, instep: 0.085, top: 0.22, shaft: 0.12, laces: 6 }, 0.02, {
     upper: 'nylon-coyote',
     toe: 'polymer-fde',
     sole: 'rubber-black',

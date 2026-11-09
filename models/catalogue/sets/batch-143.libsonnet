@@ -102,7 +102,7 @@ local cartridgeNecklace(id, mass, body) =
 
   // Intricate cufflinks: the same silver pair with a raised gold gear round each face and a small gold cog
   // overlapping the domed centre.
-  h.compound('cufflinks_intricate', 0.029,
+  h.compound('gearwork_cufflinks', 0.029,
              std.flattenArrays([
                cufflink(p[0], p[1])
                + h.crescent(p[0] + '-gear', 'gear', 0.0055, 0.0072, 0, 360, 12, 0.012, 0.0135, p[1], 0)
@@ -193,7 +193,7 @@ local cartridgeNecklace(id, mass, body) =
 
   // Ordnance-cartridge necklace: a fine gold chain laid in a ring 120 mm across with a spent 25 mm brass case
   // 75 mm long hanging from it, a red stone set in its mouth.
-  cartridgeNecklace('fancy_ordinance_cartridge_necklace', 0.075, [0.075, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  cartridgeNecklace('fancy_ordnance_cartridge_necklace', 0.075, [0.075, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
 
   // Pistol-cartridge necklace: the same chain with a spent 9 mm pistol case 19 mm long.
   cartridgeNecklace('fancy_pistol_cartridge_necklace', 0.026, [0.02, 0.005, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },

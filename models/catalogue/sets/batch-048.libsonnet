@@ -30,7 +30,7 @@ local heatPack(used) =
 [
   // An electric carving knife, 482 mm with its cord stub: a 180 mm moulded handle with a trigger and a blade
   // release button, two 200 mm serrated blades riveted together lying flat, and a short cord with its plug.
-  h.compound('carver_off', 0.43, [
+  h.compound('electric_carving_knife', 0.43, [
     h.turned('handle', 'body', 'x', [[0, 0], [0, 0.012], [0.015, 0.024], [0.06, 0.03], [0.15, 0.027], [0.18, 0.022], [0.18, 0]], [0, 0.03, 0]),
     box('trigger', 'trigger', [0.07, 0.02, 0.026], [0.11, 0.038, 0.034]),
     box('release', 'trigger', [0.135, 0.054, -0.008], [0.155, 0.06, 0.008]),
@@ -47,13 +47,13 @@ local heatPack(used) =
     box('pin-a', 'pin', [-0.106, 0.026, -0.008], [-0.1, 0.034, -0.006]),
     box('pin-b', 'pin', [-0.106, 0.026, 0.006], [-0.1, 0.034, 0.008]),
   ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + {
-    handling: h.gripOn('carver_off', 'handle'),
+    handling: h.gripOn('electric_carving_knife', 'handle'),
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A gravity water filter 300 mm tall and 130 mm across: a clear reservoir on top, a cloth pad, then charcoal,
   // sand and gravel in plain bands held by a white frame, a lid with a knob and a tap at the foot.
-  h.compound('char_purifier', 1.9, [
+  h.compound('charcoal_water_filter', 1.9, [
     h.disc('foot', 'frame', 0.066, 0, 0.02),
     ring('gravel', 'gravel', 0, 0.062, 0.02, 0.06),
     ring('sand', 'sand', 0, 0.062, 0.06, 0.1),
@@ -74,7 +74,7 @@ local heatPack(used) =
 
   // A portable bullet smoker 600 mm tall and 300 mm across: a charcoal bowl on three legs, a straight body with a
   // front fuel door and side handles, a domed lid with a vent, a dial thermometer and a top handle.
-  h.compound('char_smoker', 10, [
+  h.compound('charcoal_smoker', 10, [
     h.turned('bowl', 'body', 'y', [[0, 0], [0, 0.1], [0.04, 0.14], [0.06, 0.15], [0.06, 0]], [0, 0.1, 0]),
     ring('body', 'body', 0, 0.15, 0.16, 0.46),
     ring('band', 'trim', 0.148, 0.154, 0.455, 0.47),
@@ -195,7 +195,7 @@ local heatPack(used) =
   ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A 1 litre glass jar 132 mm tall, left open, full of brine with peeled eggs packed in it.
-  h.compound('eggs_ferment', 1.3, [
+  h.compound('fermenting_eggs', 1.3, [
     h.turned('jar', 'jar', 'y', [
       [0, 0], [0, 0.05], [0.105, 0.05], [0.115, 0.042], [0.132, 0.042],
       [0.132, 0.038], [0.112, 0.038], [0.104, 0.046], [0.004, 0.046], [0.004, 0],
@@ -206,13 +206,13 @@ local heatPack(used) =
     h.ball('egg-%d' % i, 'egg', 0.02, p[0], p[1], p[2], 1.3)
     for i in std.range(0, 5)
     for p in [[[-0.02, 0.03, 0.0], [0.02, 0.03, 0.005], [0, 0.06, -0.022], [0.0, 0.065, 0.02], [-0.015, 0.098, 0.0], [0.018, 0.1, 0.004]][i]]
-  ], { jar: 'glass-clear', thread: 'glass-clear', brine: 'syrup-green', egg: 'wax-cream' }) + h.inHand('eggs_ferment', 'jar') + {
+  ], { jar: 'glass-clear', thread: 'glass-clear', brine: 'syrup-green', egg: 'wax-cream' }) + h.inHand('fermenting_eggs', 'jar') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'food', tags: { material: ['glass'], state: ['opened'] } } },
 
   // A folding pocket stove opened out: a 100 by 75 mm base tray with a tablet of fuel on it and two side walls
   // folded up, each with an inward tab to carry a pot.
-  h.compound('esbit_stove', 0.1, [
+  h.compound('hexamine_stove', 0.1, [
     box('base', 'stove', [-0.05, 0, -0.0375], [0.05, 0.002, 0.0375]),
     box('tray', 'stove', [-0.03, 0.002, -0.022], [0.03, 0.006, 0.022]),
     box('tablet', 'fuel', [-0.016, 0.006, -0.012], [0.016, 0.018, 0.012]),
@@ -224,7 +224,7 @@ local heatPack(used) =
       box('vent-%d' % (s + 1), 'vent', [-0.018, 0.012, s * 0.0375 - 0.0022], [0.018, 0.03, s * 0.0375 + 0.0022]),
     ]
     for s in [-1, 1]
-  ]), { stove: 'alu-bare', fuel: 'chalk-white', vent: 'plastic-charcoal' }) + h.inHand('esbit_stove', 'base') + {
+  ]), { stove: 'alu-bare', fuel: 'chalk-white', vent: 'plastic-charcoal' }) + h.inHand('hexamine_stove', 'base') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
@@ -275,7 +275,7 @@ local heatPack(used) =
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // The same pack spent: flatter, gone hard in lumps, its print faded and its tab gone.
-  h.compound('heatpack_used', 0.065, heatPack(true), { pouch: 'plastic-grey', crimp: 'plastic-grey', print: 'paint-oxblood', lump: 'plastic-grey' }) + h.inHand('heatpack_used', 'pouch') + {
+  h.compound('used_heat_pack', 0.065, heatPack(true), { pouch: 'plastic-grey', crimp: 'plastic-grey', print: 'paint-oxblood', lump: 'plastic-grey' }) + h.inHand('used_heat_pack', 'pouch') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

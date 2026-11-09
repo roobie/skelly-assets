@@ -155,7 +155,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
 [
   // A leather chest wrap half rolled, 150 mm wide: a roll 90 mm across, its 280 mm loose end of stitched-on leather
   // patches, and two thong ties from the end.
-  h.compound('chestwrap_leather', 0.47, chestwrap(0.15, 0.045, 0.28, 0.006, [[-0.035, 0.0, 0.06, 0.07], [0.035, 0.08, 0.06, 0.06]]),
+  h.compound('leather_chest_wrap', 0.47, chestwrap(0.15, 0.045, 0.28, 0.006, [[-0.035, 0.0, 0.06, 0.07], [0.035, 0.08, 0.06, 0.06]]),
              { cloth: 'leather-tan', layer: 'leather-chestnut', patch: 'leather-chestnut', seam: 'cord-cotton', tie: 'skin-rawhide' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
@@ -165,15 +165,15 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // The same corset with its back lacing let out: the halves 60 mm apart over the modesty panel and long lace tails.
-  h.compound('corset_loose', 0.67, corset(0.36, [0.225, 0.18, 0.215], 0.15, 0.06, 0.16), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
+  h.compound('loosely_laced_corset', 0.67, corset(0.36, [0.225, 0.18, 0.215], 0.15, 0.06, 0.16), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
   // A leather waist corset laid flat, back up, 420 mm across the flattened hem and 240 mm tall: boned black leather
   // from under the bust to the hips, laced tight up the back and tied at the waist.
-  h.compound('corset_waist', 0.4, corset(0.24, [0.21, 0.175, 0.195], 0.11, 0.004, 0.07, 0.01), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
+  h.compound('waist_corset', 0.4, corset(0.24, [0.21, 0.175, 0.195], 0.11, 0.004, 0.07, 0.01), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // The same waist corset with its lacing let out: the halves 50 mm apart over the modesty panel and long lace tails.
-  h.compound('corset_waist_loose', 0.37, corset(0.24, [0.21, 0.175, 0.195], 0.11, 0.05, 0.14, 0.01), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
+  h.compound('loosely_laced_waist_corset', 0.37, corset(0.24, [0.21, 0.175, 0.195], 0.11, 0.05, 0.14, 0.01), { cloth: 'leather-black', bone: 'leather-charcoal', binding: 'leather-charcoal', grommet: 'steel-bright', lace: 'silk-cord-crimson', panel: 'leather-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A cotton garter belt laid flat, 320 mm across and 280 mm long with its straps: a shaped black waistband with lace
@@ -220,7 +220,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
 
   // A pair of fur leggings laid flat side by side, 400 mm across with their ties and 440 mm long: shaggy sleeves of
   // fur-on hide 160 mm across at the top narrowing to 130 mm at the ankle, each tied on with three rawhide thongs.
-  h.compound('leg_warmers_f', 0.72,
+  h.compound('fur_leggings', 0.72,
              std.flattenArrays([
                furSleeve('%s-' % n, x, 0.13, 0.16, 0.03, 0.44, [-0.17, 0.0, 0.17])
                for n in ['l', 'r']
@@ -232,7 +232,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
   // A pair of fur cuffs for hooves laid flat side by side, 440 mm across with their ties and 220 mm long: short
   // shaggy sleeves of fur-on hide that flare from 140 mm at the top to 190 mm round the hoof, tied on above the
   // fetlock with a rawhide thong.
-  h.compound('leg_warmers_xlf', 0.45,
+  h.compound('hoof_furs', 0.45,
              std.flattenArrays([
                furSleeve('%s-' % n, x, 0.19, 0.14, 0.035, 0.22, [0.07])
                for n in ['l', 'r']
@@ -262,7 +262,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
   // A cotton long underwear top folded on a shelf, 300 mm by 320 mm and 36 mm tall, neck at +z: waffle knit with a
   // ribbed crew neck, a short three-button placket and the sleeves folded down both sides to ribbed cuffs.
   local w = 0.3, d = 0.32, ht = 0.036;
-  h.compound('long_undertop', 0.3,
+  h.compound('long_underwear_top', 0.3,
              g.jacket({ w: w, d: d, ht: ht, neck: 0.075, collar: { r: 0.06, wd: 0.014, ht: 0.006, gap: 0 }, front: 'none', buttons: [], sleeves: { kind: 'flat', w: 0.07, t: 0.006 } })
              + g.quilt({ style: 'lattice', x0: -w / 2 + 0.075, x1: w / 2 - 0.075, z0: -d / 2 + 0.01, z1: d / 2 - 0.15, y: ht, pitch: 0.03, w: 0.003, t: 0.002 })
              + [box('placket', 'front', [-0.012, ht, d / 2 - 0.23], [0.012, ht + 0.004, d / 2 - 0.15])]
@@ -274,7 +274,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
   // A cotton sleeveless underwear top folded on a shelf, 280 mm by 300 mm and 30 mm tall, neck at +z: a fine-ribbed
   // grey vest with a scoop neck and narrow shoulder straps, the armholes cut in at both sides.
   local w = 0.28, d = 0.3, ht = 0.03;
-  h.compound('long_undertop_sleeveless', 0.2,
+  h.compound('sleeveless_undershirt', 0.2,
              h.foldedGarment(w, d, ht, 3)
              + h.crescent('neck', 'trim', 0.07, 0.082, 90, 270, 10, ht, ht + 0.003, 0, d / 2)
              + h.crescent('neck-hole', 'hole', 0.001, 0.07, 90, 270, 10, ht, ht + 0.001, 0, d / 2)

@@ -15,7 +15,7 @@ local seat(y, w) = [
 [
   // A folding camp toilet standing open, 33 cm square and 30 cm to the seat: four plastic legs braced front and back
   // under a square frame, a bucket hung below, a round seat ring over a dark bag mouth, and the lid standing open at the back (-z).
-  h.compound('toilet_travel', 1, seat(0.28, 0.33) + [
+  h.compound('camp_toilet', 1, seat(0.28, 0.33) + [
     box('leg-%d' % i, 'leg', [sx * 0.15 - 0.012, 0, sz * 0.13 - 0.012], [sx * 0.15 + 0.012, 0.28, sz * 0.13 + 0.012])
     for sx in [-1, 1]
     for sz in [-1, 1]
@@ -33,7 +33,7 @@ local seat(y, w) = [
 
   // The same toilet folded flat, 28 cm square and 4 cm thick: legs folded under the frame, the lid shut over the seat
   // with a carry handle at the front (+z).
-  h.compound('toilet_travel_folded', 1.2, [
+  h.compound('folded_camp_toilet', 1.2, [
     box('leg-%d' % i, 'leg', [-0.13, 0.002 + i * 0.006, -0.12 + i * 0.07], [0.13, 0.008 + i * 0.006, -0.1 + i * 0.07])
     for i in [0, 1, 2, 3]
   ] + [
@@ -64,7 +64,7 @@ local seat(y, w) = [
 
   // A flat grey stone 9 cm across and 3.5 cm thick, its faces carved with a spiral groove and its rim pierced by
   // twelve holes.
-  h.compound('vortex_stone', 0.43, [
+  h.compound('spiral_stone', 0.43, [
     turned('stone', 'stone', 'y', [[0, 0], [0, 0.036], [0.006, 0.044], [0.029, 0.044], [0.035, 0.036], [0.035, 0]]),
   ] + std.flattenArrays([
     h.crescent('spiral-%d' % i, 'groove', 0.004 + 0.0012 * i, 0.0065 + 0.0012 * i, 40 * i, 40 * i + 42, 2, 0.035, 0.0358)
@@ -73,7 +73,7 @@ local seat(y, w) = [
     local a = std.pi * i / 6;
     box('hole-%d' % i, 'groove', [0.0415 * std.sin(a) - 0.003, 0.0145, 0.0415 * std.cos(a) - 0.003], [0.0415 * std.sin(a) + 0.003, 0.0205, 0.0415 * std.cos(a) + 0.003])
     for i in std.range(0, 11)
-  ], { stone: 'stone-grey', groove: 'paint-charcoal' }) + h.inHand('vortex_stone', 'stone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { stone: 'stone-grey', groove: 'paint-charcoal' }) + h.inHand('spiral_stone', 'stone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A pocket whistle gadget 7 cm long: an orange whistle body with a mouthpiece at -x, a compass on top, a strip
   // thermometer on its front (+z), a magnifier lens at +x and a lanyard ring.
@@ -131,7 +131,7 @@ local seat(y, w) = [
 
   // A tom drum 28 cm across and 20 cm deep standing on its bottom head: a red lacquered wood shell, steel hoops
   // top and bottom, eight lugs with tension rods, and a white batter head.
-  h.compound('drum_percussion', 3, [
+  h.compound('tom_drum', 3, [
     disc('shell', 'shell', 0.13, 0.008, 0.192),
     ring('hoop-low', 'metal', 0.126, 0.137, 0, 0.012),
     ring('hoop-top', 'metal', 0.126, 0.137, 0.188, 0.2),
@@ -148,13 +148,13 @@ local seat(y, w) = [
     for i in std.range(0, 7)
   ]) + [
     box('badge', 'badge', [-0.015, 0.09, 0.129], [0.015, 0.11, 0.132]),
-  ], { shell: 'lacquer-red', metal: 'steel-stainless', head: 'cloth-cream', badge: 'brass' }) + h.inHand('drum_percussion', 'shell') + {
+  ], { shell: 'lacquer-red', metal: 'steel-stainless', head: 'cloth-cream', badge: 'brass' }) + h.inHand('tom_drum', 'shell') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A hand-made drum 28 cm across and 26 cm tall: a carved wooden shell narrowing to a foot, a rawhide head
   // tacked round the rim, and cord lacing from the head down to a cord ring round the waist.
-  h.compound('drum_percussion_primitive', 2.1, [
+  h.compound('hide_drum', 2.1, [
     turned('shell', 'shell', 'y', [[0, 0], [0, 0.1], [0.04, 0.095], [0.1, 0.11], [0.2, 0.13], [0.24, 0.135], [0.24, 0]]),
     turned('head', 'head', 'y', [[0.23, 0], [0.23, 0.138], [0.244, 0.138], [0.246, 0.13], [0.246, 0]]),
     ring('cord-ring', 'cord', 0.105, 0.115, 0.075, 0.085),
@@ -171,7 +171,7 @@ local seat(y, w) = [
       box('tack-%d' % i, 'tack', [0.139 * s - 0.003, 0.234, 0.139 * c - 0.003], [0.139 * s + 0.003, 0.24, 0.139 * c + 0.003]),
     ]
     for i in std.range(0, 11)
-  ]), { shell: 'wood-oak', head: 'skin-rawhide', cord: 'jute', tack: 'steel-grey' }) + h.inHand('drum_percussion_primitive', 'shell') + {
+  ]), { shell: 'wood-oak', head: 'skin-rawhide', cord: 'jute', tack: 'steel-grey' }) + h.inHand('hide_drum', 'shell') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 ]

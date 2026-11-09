@@ -138,7 +138,7 @@ local nylon = {
 
   // Two charcoal nylon holsters 180 mm tall with black webbing trim, the outer one riding 44 mm in front of the inner
   // one and 30 mm lower on a stitched spacer strap, each with a thumb break, and a belt loop behind the inner one.
-  h.compound('double_holster_tandem', 0.22, holster('inner', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0.08, 0, 0, 0.03)
+  h.compound('stacked_double_holster', 0.22, holster('inner', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0.08, 0, 0, 0.03)
     + holster('outer', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0, -0.018, 0.044, 0) + [
     box('spacer', 'loop', [-0.03, 0.09, 0.016], [0.012, 0.16, 0.028]),
     box('spacer-band', 'trim', [-0.031, 0.12, 0.014], [0.013, 0.13, 0.03]),

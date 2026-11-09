@@ -98,7 +98,7 @@ local dial(prefix, r, x, y, z, at) =
   // A compact three-plunger high-pressure pump, 190 mm long, 120 mm deep and 110 mm tall: a cast-iron crankcase on a
   // foot with an oil cap, a keyed drive shaft out of one side and a brass manifold across the front with three valve
   // plugs, a suction port and a smaller pressure outlet.
-  h.compound('pump_complex', 4, [
+  h.compound('high_pressure_pump', 4, [
     box('foot', 'iron', [-0.07, 0, -0.05], [0.07, 0.008, 0.035]),
     box('crankcase', 'iron', [-0.06, 0.008, -0.045], [0.06, 0.09, 0.035]),
   ] + [
@@ -174,7 +174,7 @@ local dial(prefix, r, x, y, z, at) =
   // A hand crank bent from one iron rod 16 mm across, lying flat: a shaft 200 mm long with a square drive end and a
   // fixed collar, a right-angled arm 140 mm long and a handle 110 mm long carrying a loose grip sleeve.
   local r = 0.008, y = 0.012;
-  h.compound('simple_crank', 0.81, [
+  h.compound('hand_crank', 0.81, [
     box('drive', 'iron', [-0.142, y - 0.0065, -0.0065], [-0.12, y + 0.0065, 0.0065]),
     rodX('shaft', 'iron', r, -0.12, 0.06, y, 0),
     rodX('collar', 'iron', 0.012, -0.08, -0.068, y, 0),
@@ -239,7 +239,7 @@ local dial(prefix, r, x, y, z, at) =
 
   // A refrigerant recovery machine, 380 mm wide, 230 mm deep and 330 mm tall: a steel cabinet with a carry handle
   // across the top, and on its front two dial gauges, two valve knobs, a selector knob, a switch and hose ports.
-  h.compound('recovery_pump', 29, [
+  h.compound('refrigerant_recovery_machine', 29, [
     box('cabinet', 'cabinet', [-0.19, 0.02, -0.115], [0.19, 0.29, 0.105]),
     box('panel', 'panel', [-0.18, 0.03, 0.105], [0.18, 0.28, 0.11]),
   ] + [

@@ -75,7 +75,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
 
   // A long knitted wool scarf about 2.5 m long and 220 mm wide, folded in eight into a stack 340 x 220 x 48 mm with
   // one end trailing 420 mm out along the floor, banded and fringed like the short one.
-  h.compound('scarf_long', 0.35,
+  h.compound('long_scarf', 0.35,
              foldedScarf(0.34, 0.22, 8, 0.006, 0.42, 8)
              + stripes(0.17, 0.22, 0.006, 0.42)
              + fringe(0.59, 0.22, 10),
@@ -84,7 +84,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
 
   // A fur scarf about 1.2 m long and 160 mm wide, folded in three into a soft stack 300 x 160 x 48 mm with one
   // end lying out 120 mm and two pompoms on short cords.
-  h.compound('scarf_fur', 0.3,
+  h.compound('fur_scarf', 0.3,
              foldedScarf(0.3, 0.16, 3, 0.016, 0.12, 1)
              + furEnd(0.27, 0.16, 0.016),
              fur)
@@ -92,7 +92,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
 
   // A long fur scarf about 2.2 m long and 180 mm wide, folded in six into a soft stack 340 x 180 x 96 mm with one
   // end trailing 400 mm out along the floor and two pompoms on short cords.
-  h.compound('scarf_fur_long', 0.55,
+  h.compound('long_fur_scarf', 0.55,
              foldedScarf(0.34, 0.18, 6, 0.016, 0.4, 1)
              + furEnd(0.57, 0.18, 0.016),
              fur)

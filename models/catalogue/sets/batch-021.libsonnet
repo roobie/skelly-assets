@@ -59,7 +59,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A small ground glass lens 16 mm across and 4 mm thick at the centre, lying flat.
-  h.compound('lens_small', 0.0011, [
+  h.compound('small_lens', 0.0011, [
     turned('lens', 'glass', 'y', [[0, 0], [0, 0.008], [0.001, 0.008], [0.0025, 0.006], [0.004, 0]]),
   ], { glass: 'glass-clear' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
@@ -142,7 +142,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
   // A hank of mild steel wire, loose loops about 100 mm across lying in a flat coil, held by three short twists of
   // the same wire.
   local loop(i, r, y) = turned('loop-%d' % i, 'wire', 'y', [[0, r - 0.002], [0, r], [0.002, r], [0.002, r - 0.002], [0, r - 0.002]], [0, y, 0]);
-  h.compound('lc_wire', 0.071, [
+  h.compound('mild_steel_wire', 0.071, [
     loop(i, [0.05, 0.052, 0.048, 0.051, 0.049][i], i * 0.002)
     for i in std.range(0, 4)
   ] + [
@@ -201,7 +201,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
   waterHeater('household_water_heater', 65, 0.25, 1.15) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 400 litre family-sized water heater 600 mm across and 1.6 m tall to the tops of its pipe stubs.
-  waterHeater('household_water_heater_family', 100, 0.3, 1.42) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  waterHeater('large_water_heater', 100, 0.3, 1.42) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A petrol push mower: a red steel deck 520 mm wide and 560 mm long on four 180 mm wheels, an engine with a black
   // shroud, fuel cap and starter pull on top, a side discharge chute, and a steel handle rising 1 m behind it with a

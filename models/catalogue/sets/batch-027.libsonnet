@@ -23,7 +23,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.box('perforation', 'perforation', [-0.045, 0.058, 0.057], [0.040, 0.060, 0.058]),
   ], { paper: 'paper-white', core: 'paperboard-tan', perforation: 'cloth-cream' }) + { voxelGrain: 0.002 } + h.inHand('toilet_paper', 'roll') + { taxonomy: { category: 'household', tags: { material: ['paper'], setting: ['modern'] } } },
   // A battery toothbrush, 230 mm long: a 29 mm thick handle with a power button, a slim neck and a round brush head.
-  h.compound('toothbrush_electric', 0.089, [
+  h.compound('electric_toothbrush', 0.089, [
     h.turned('body', 'body', 'x', [[0, 0], [0, 0.013], [0.006, 0.0145], [0.150, 0.0135], [0.172, 0.006], [0.172, 0]], [0, 0.0145, 0]),
     ringX('band', 'band', 0, 0.0148, 0.004, 0.016, 0.0145),
     h.box('button', 'button', [0.095, 0.026, -0.005], [0.112, 0.0302, 0.005]),
@@ -32,7 +32,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.disc('head', 'body', 0.0075, 0.010, 0.0185, 0.218, 0),
     h.disc('bristles', 'bristles', 0.0062, 0.0185, 0.029, 0.218, 0),
   ], { body: 'plastic-gloss-white', band: 'plastic-blue', button: 'plastic-blue', bristles: 'plastic-clear-blue' }) + {
-    handling: h.gripOn('toothbrush_electric', 'body'),
+    handling: h.gripOn('electric_toothbrush', 'body'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A manual toothbrush, 180 mm long: a flat handle with a rubber thumb pad, a thin neck and a tufted head.
@@ -66,12 +66,12 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     ringX('tie-b', 'rope', 0, 0.036, 0.050, 0.060, 0.036),
   ] + gatheredEnds('net', 'rope', 0.180, 0.030, 0.036), { net: 'cord-cotton', rope: 'jute' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], state: ['folded'] } } },
   // A small pewter serving bowl, 110 mm across and 45 mm deep on a low foot ring.
-  h.compound('bowl_pewter', 0.3, [
+  h.compound('pewter_bowl', 0.3, [
     h.turned('bowl', 'bowl', 'y', [[0, 0], [0, 0.030], [0.005, 0.030], [0.009, 0.040], [0.025, 0.051], [0.043, 0.055], [0.045, 0.055], [0.045, 0.052], [0.026, 0.048], [0.012, 0.037], [0.008, 0.025], [0.008, 0]]),
     ringY('rim', 'rim', 0.052, 0.0565, 0.042, 0.045),
-  ], { bowl: 'alu-bare', rim: 'steel-grey' }) + { voxelGrain: 0.002 } + h.inHand('bowl_pewter', 'bowl') + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  ], { bowl: 'alu-bare', rim: 'steel-grey' }) + { voxelGrain: 0.002 } + h.inHand('pewter_bowl', 'bowl') + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
   // A clear plastic food tub with a snap-on lid, 190 by 140 mm and 72 mm tall, a latch tab at each end.
-  h.compound('bowl_plastic', 0.1, [
+  h.compound('plastic_food_tub', 0.1, [
     h.box('base', 'tub', [-0.085, 0, -0.060], [0.085, 0.010, 0.060]),
     h.box('tub', 'tub', [-0.090, 0.010, -0.065], [0.090, 0.060, 0.065]),
     h.box('lid', 'lid', [-0.095, 0.060, -0.070], [0.095, 0.068, 0.070]),

@@ -215,7 +215,7 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
 
   // Mesh basketball shorts folded once, 360 mm by 300 mm and 30 mm tall: knee-length legs, a wide elastic
   // waistband with a white drawstring, and a white stripe down each side.
-  h.compound('b_shorts', 0.31, trousers({ w: 0.36, d: 0.3, ht: 0.03, folds: 2, crotch: 0.17, band: 0.045, fly: 'none', pockets: false, loops: false, stripes: true, drawstring: true }), shortsFin('cloth-navy', 'cloth-navy')) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('basketball_shorts', 0.31, trousers({ w: 0.36, d: 0.3, ht: 0.03, folds: 2, crotch: 0.17, band: 0.045, fly: 'none', pockets: false, loops: false, stripes: true, drawstring: true }), shortsFin('cloth-navy', 'cloth-navy')) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Cotton breeches folded at the knee, 340 mm by 400 mm and 45 mm tall: baggy legs ending in buttoned knee bands,
   // a buttoned fly, no pockets.
@@ -228,7 +228,7 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
 
   // The short cheerleader skirt laid flat: 340 mm across the waist, 440 mm across the hem and 200 mm long, one
   // white band near the hem.
-  h.compound('cheerleader_skirt_short', 0.15, skirt({ wb: 0.44, len: 0.2, pleats: 9, stripes: [0.025] }), cheer) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  h.compound('short_cheerleader_skirt', 0.15, skirt({ wb: 0.44, len: 0.2, pleats: 9, stripes: [0.025] }), cheer) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Chest waders laid flat on their back, 620 mm wide across the turned-out boots, 1.6 m from boot heel to brace
   // buckle and 100 mm tall: olive PVC legs with a gap between them, a bib with a flapped chest pocket, a wading belt,
@@ -249,21 +249,21 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
 
   // Fur short shorts folded flat, 300 mm by 200 mm and 26 mm tall: the same cut in thick pale fur with a
   // leather waistband.
-  h.compound('hot_pants_fur', 0.22, trousers({ w: 0.3, d: 0.2, ht: 0.026, folds: 2, crotch: 0.12, band: 0.03, pockets: false }),
+  h.compound('fur_hot_pants', 0.22, trousers({ w: 0.3, d: 0.2, ht: 0.026, folds: 2, crotch: 0.12, band: 0.03, pockets: false }),
              { cloth: 'fur-brown', band: 'leather-tan', seam: 'plastic-charcoal', stitch: 'leather-tan', metal: 'brass-dull' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // Black leather short shorts folded flat, 300 mm by 200 mm and 20 mm tall.
-  h.compound('hot_pants_leather', 0.35, trousers({ w: 0.3, d: 0.2, ht: 0.02, folds: 2, crotch: 0.12, band: 0.03 }),
+  h.compound('leather_hot_pants', 0.35, trousers({ w: 0.3, d: 0.2, ht: 0.02, folds: 2, crotch: 0.12, band: 0.03 }),
              { cloth: 'leather-black', band: 'leather-black', seam: 'plastic-charcoal', stitch: 'plastic-charcoal', metal: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'], state: ['folded'] } } },
 
   // Jeans folded at the knee, 380 mm by 460 mm and 50 mm tall, both knees torn open with white threads across.
-  h.compound('jeans_ripped', 0.7, trousers({ rips: true }), denim) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('ripped_jeans', 0.7, trousers({ rips: true }), denim) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Dark skinny jeans folded at the knee, 320 mm by 480 mm and 36 mm tall, front pockets only.
-  h.compound('jeans_skinny', 0.77, trousers({ w: 0.32, d: 0.48, ht: 0.036, crotch: 0.17 }), denim + { cloth: 'cloth-navy', band: 'cloth-navy' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('skinny_jeans', 0.77, trousers({ w: 0.32, d: 0.48, ht: 0.036, crotch: 0.17 }), denim + { cloth: 'cloth-navy', band: 'cloth-navy' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Heavy faded jeans folded at the knee, 390 mm by 460 mm and 58 mm tall, with brass buttons and a wide band.
-  h.compound('jeans_vintage', 0.9, trousers({ w: 0.39, ht: 0.058, band: 0.042 }), denim + { cloth: 'cloth-blue', band: 'cloth-denim' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('faded_jeans', 0.9, trousers({ w: 0.39, ht: 0.058, band: 0.042 }), denim + { cloth: 'cloth-blue', band: 'cloth-denim' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // A wool kilt folded in half, 320 mm by 360 mm and 40 mm tall: green with crossing navy and red tartan strips on
   // the apron, a fringed apron edge, knife pleats over the other half, leather buckle straps and a kilt pin.
@@ -280,7 +280,7 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
 
   // A black leather kilt folded in half, 320 mm by 360 mm and 44 mm tall: stiff pleats, a plain apron edge and
   // steel buckles.
-  h.compound('kilt_leather', 1.5, kilt({ ht: 0.044, fringe: false, pin: false }), {
+  h.compound('leather_kilt', 1.5, kilt({ ht: 0.044, fringe: false, pin: false }), {
     cloth: 'leather-black',
     pleat: 'leather-charcoal',
     band: 'leather-black',
@@ -290,7 +290,7 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
 
   // A khaki canvas utility kilt folded in half, 320 mm by 360 mm and 44 mm tall: pleats, belt loops and a
   // flapped cargo pocket on the apron.
-  h.compound('kilt_utility', 0.77, kilt({ ht: 0.044, fringe: false, pin: false, pockets: true }), {
+  h.compound('utility_kilt', 0.77, kilt({ ht: 0.044, fringe: false, pin: false, pockets: true }), {
     cloth: 'cloth-khaki',
     pleat: 'cloth-khaki',
     band: 'cloth-khaki',

@@ -112,7 +112,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of sheet steel arm guards laid side by side: per arm a forearm plate 220 mm long round a 50 mm radius, an
   // upper-arm plate 210 mm long round 60 mm, an elbow cop between them riveted to both, and leather straps.
-  h.compound('ch_armguard_metal', 2.5, std.flattenArrays([
+  h.compound('hardened_steel_arm_guards', 2.5, std.flattenArrays([
     platedArm('upper-%d' % s, 0.06, 75, -0.25, -0.04, s * 0.11)
     + platedArm('fore-%d' % s, 0.05, 75, 0.04, 0.26, s * 0.11)
     + [
@@ -126,7 +126,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of sheet steel bracers laid side by side: a forearm plate 220 mm long curled round a 50 mm radius with a
   // rolled wrist edge and two leather straps.
-  h.compound('ch_armguard_metal_sheets_bracer', 0.8, std.flattenArrays([
+  h.compound('hardened_steel_bracers', 0.8, std.flattenArrays([
     platedArm('fore-%d' % s, 0.05, 75, -0.11, 0.11, s * 0.09)
     for s in [-1, 1]
   ]), { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel' })
@@ -134,7 +134,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of sheet steel elbow cops, each a dome 110 mm across and 45 mm tall with a riveted side wing and a leather
   // strap each way, 500 mm tip to tip, laid side by side.
-  h.compound('ch_armguard_metal_sheets_elbows', 0.6, std.flattenArrays([
+  h.compound('hardened_steel_elbow_guards', 0.6, std.flattenArrays([
     cop('cop-%d' % s, s * 0.08 + 0.03, 0, 0.055, 0.045) + [
       box('strap-a-%d' % s, 'strap', [s * 0.08 + 0.015, 0, -0.25], [s * 0.08 + 0.045, 0.003, -0.05]),
       box('strap-b-%d' % s, 'strap', [s * 0.08 + 0.015, 0, 0.05], [s * 0.08 + 0.045, 0.003, 0.25]),
@@ -146,7 +146,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of sheet steel pauldrons laid side by side, crown up: per shoulder a cap 190 mm across and four
   // overlapping lames stepping down the upper arm, 260 mm long in all, with a leather strap off the crown.
-  h.compound('ch_armguard_metal_sheets_shoulders', 1.7, std.flattenArrays([
+  h.compound('hardened_steel_pauldrons', 1.7, std.flattenArrays([
     arc('cap-%d' % s, 'plate', 0.095, 0.003, 70, -0.14, -0.05, s * 0.12)
     + arc('rim-%d' % s, 'plate', 0.095, 0.008, 70, -0.14, -0.13, s * 0.12, 8, -0.095 * std.cos(70 * std.pi / 180)) + std.flattenArrays([
       arc('lame-%d-%d' % [s, i], 'plate', 0.095 - i * 0.008, 0.003, 70 - i * 3, -0.06 + i * 0.045, -0.06 + i * 0.045 + 0.055, s * 0.12, 8, -(0.095 - i * 0.008) * std.cos((70 - i * 3) * std.pi / 180) - i * 0.003)
@@ -177,7 +177,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of padded cotton sleeves laid flat side by side, 560 mm long, 180 mm across at the shoulder and 120 mm at
   // the cuff, with rag padding stitched on in rows.
-  h.compound('cloth_arms_padded', 0.29, std.flattenArrays([
+  h.compound('padded_cloth_sleeves', 0.29, std.flattenArrays([
     quiltedSleeve('sleeve-%d' % s, 0.56, 0.18, 0.12, 0.012, s * 0.105, 0.07)
     for s in [-1, 1]
   ]), { cloth: 'cloth-cotton', quilt: 'cloth-rag', lace: 'cloth-white' })
@@ -206,7 +206,7 @@ local quiltedTube(id, l, r, z, pitch) =
 
   // A pair of tyre arm guards laid side by side: per arm a curved chunk of tread 200 mm long round the forearm and
   // one 220 mm long round the upper arm, wound with duct tape.
-  h.compound('improvised_armguard_tire', 1.2, std.flattenArrays([
+  h.compound('improvised_tyre_arm_guards', 1.2, std.flattenArrays([
     arc('fore-%d' % s, 'rubber', 0.05, 0.01, 110, 0.01, 0.21, s * 0.1)
     + arc('upper-%d' % s, 'rubber', 0.058, 0.01, 110, -0.23, -0.01, s * 0.1)
     + std.flattenArrays([

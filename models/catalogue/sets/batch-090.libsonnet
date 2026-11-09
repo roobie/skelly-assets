@@ -86,7 +86,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of bronze vambraces lying open side down, each 260 mm long, 80 mm across at the wrist and 100 mm at the
   // elbow, lined with leather that shows at both ends, with two leather straps and bronze buckles.
-  h.compound('armguard_bronze', 1, std.flattenArrays([
+  h.compound('bronze_vambraces', 1, std.flattenArrays([
     taper('shell-%d' % g, 'bronze', -0.13, 0.13, 0.04, 0.05, 0.005, z)
     + taper('lining-%d' % g, 'leather', -0.136, 0.136, 0.035, 0.045, 0.005, z)
     + [box('ridge-%d' % g, 'bronze', [-0.13, 0.042, z - 0.004], [0.13, 0.05, z + 0.004])]
@@ -99,7 +99,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of cut-resistant sleeves laid flat, each 450 mm long, 70 mm wide at the wrist and 110 mm at the top,
   // with knit cuffs and a thumb loop past the wrist.
-  h.compound('armguard_cut_resistant', 0.1, std.flattenArrays([
+  h.compound('cut_resistant_arm_sleeves', 0.1, std.flattenArrays([
     [
       sleeve('sleeve-%d' % g, 'fabric', -0.21, 0.24, 0.07, 0.11, 0.008, z),
       sleeve('cuff-top-%d' % g, 'cuff', 0.21, 0.24, 0.104, 0.11, 0.01, z),
@@ -117,7 +117,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of hard arm guards laid flat: neoprene sleeves 350 mm long, 80 mm wide at the wrist and 110 mm at the
   // top, each with a moulded plastic forearm sheath and elbow cap and two hook-and-loop straps.
-  h.compound('armguard_hard', 0.28, std.flattenArrays([
+  h.compound('hard_arm_guards', 0.28, std.flattenArrays([
     [
       sleeve('sleeve-%d' % g, 'neoprene', -0.17, 0.18, 0.08, 0.11, 0.008, z),
       sheath('fore-%d' % g, 'plate', -0.15, 0.02, 0.07, 0.008, z),
@@ -132,7 +132,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of stiff leather arm guards lying open side down, each 300 mm long, 80 mm across at the wrist and
   // 110 mm at the top, split along the top and laced shut across the split with rawhide, knotted at the top end.
-  h.compound('armguard_larmor', 0.3, std.flattenArrays([
+  h.compound('leather_arm_guards', 0.3, std.flattenArrays([
     std.flattenArrays([
       local r = 0.04 + 0.015 * (k + 0.5) / 3, x0 = -0.15 + k * 0.1;
       [
@@ -162,13 +162,13 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of steel arm guards laid side by side, each a forearm plate, an elbow cop and an upper-arm plate in a
   // row 600 mm long, 80 to 120 mm across, held by four buckled leather straps.
-  h.compound('armguard_lightplate', 2.5, fullArm('a', -0.1, 0.004) + fullArm('b', 0.1, 0.004),
+  h.compound('steel_arm_guards', 2.5, fullArm('a', -0.1, 0.004) + fullArm('b', 0.1, 0.004),
              { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of arm guards hammered from sheet steel, each a forearm plate 220 mm long and an upper-arm plate 200 mm
   // long with a gap at the elbow, in a few flat facets, riveted to black leather straps.
-  h.compound('armguard_metal', 2.1, std.flattenArrays([
+  h.compound('sheet_metal_arm_guards', 2.1, std.flattenArrays([
     taper('fore-%d' % g, 'steel', -0.27, -0.05, 0.04, 0.05, 0.004, z, 2, 4)
     + taper('upper-%d' % g, 'steel', 0.01, 0.21, 0.055, 0.06, 0.004, z, 2, 4)
     + strap('strap-a-%d' % g, 'strap', 'rivet', -0.21, 0.02, 0.048, z, 0.03)
@@ -182,7 +182,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of forearm bracers hammered from sheet steel, each 230 mm long, 80 mm across at the wrist and 100 mm at
   // the elbow, in a few flat facets, with two leather straps.
-  h.compound('armguard_metal_sheets_bracer', 1, std.flattenArrays([
+  h.compound('sheet_steel_bracers', 1, std.flattenArrays([
     taper('shell-%d' % g, 'steel', -0.115, 0.115, 0.04, 0.05, 0.004, z, 2, 4)
     + strap('strap-a-%d' % g, 'strap', 'rivet', -0.07, 0.02, 0.046, z, 0.03)
     + strap('strap-b-%d' % g, 'strap', 'rivet', 0.07, 0.02, 0.054, z, 0.03)
@@ -193,7 +193,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of elbow guards, each a half-cylinder of sheet steel 120 mm long and 110 mm across, with a long strap
   // laid out each side to tie round the arm.
-  h.compound('armguard_metal_sheets_elbows', 0.54, std.flattenArrays([
+  h.compound('sheet_steel_elbow_guards', 0.54, std.flattenArrays([
     shell('shell-%d' % g, 'steel', x - 0.06, x + 0.06, 0.055, 0.003, 0, 4)
     + strap('strap-a-%d' % g, 'strap', 'rivet', x - 0.03, 0.016, 0.058, 0, 0.17)
     + strap('strap-b-%d' % g, 'strap', 'rivet', x + 0.03, 0.016, 0.058, 0, 0.17)
@@ -204,7 +204,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of sheet steel pauldrons, each a half-cylinder 170 mm front to back and 160 mm across over the
   // shoulder, a second plate riveted over its outer edge and two straps trailing from it.
-  h.compound('armguard_metal_sheets_shoulders', 1.3, std.flattenArrays([
+  h.compound('sheet_steel_pauldrons', 1.3, std.flattenArrays([
     shellZ('top-%d' % g, 'steel', -0.085, 0.085, 0.08, 0.003, x, -pi / 2, pi / 2, 5)
     + shellZ('under-%d' % g, 'steel', -0.075, 0.075, 0.083, 0.003, x, if s > 0 then 0.55 else -pi / 2, if s > 0 then pi / 2 else -0.55, 3)
     + [
@@ -223,7 +223,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of improvised arm guards, each a stack of paper sheets 240 mm long, 100 mm wide and 12 mm thick bound
   // with three bands of duct tape.
-  h.compound('armguard_paper', 0.23, std.flattenArrays([
+  h.compound('paper_arm_guards', 0.23, std.flattenArrays([
     [
       box('sheets-%d-%d' % [g, i], if i % 2 == 1 then 'paper' else 'edge', [-0.12 + (i % 3) * 0.002, i * 0.002, z - 0.05 + (i % 2) * 0.002], [0.12 - (i % 2) * 0.003, (i + 1) * 0.002, z + 0.05])
       for i in std.range(0, 5)
@@ -239,7 +239,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of scrap arm guards, each two mismatched steel scraps, 140 and 150 mm long and bent round the arm,
   // overlapping on a cotton rag lining, with a smaller patch and three string ties.
-  h.compound('armguard_scrap', 0.8, std.flattenArrays([
+  h.compound('scrap_arm_guards', 0.8, std.flattenArrays([
     taper('lining-%d' % g, 'cloth', -0.17, 0.15, 0.034, 0.04, 0.003, z, 2, 6)
     + shell('fore-%d' % g, 'rust', -0.15, -0.01, 0.043, 0.004, z, 3)
     + shell('upper-%d' % g, 'galv', -0.02, 0.13, 0.05, 0.004, z, 4)
@@ -254,7 +254,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of soft neoprene sleeves laid flat, each 380 mm long, 75 mm wide at the wrist and 105 mm at the top,
   // with a grey seam down the side and light grey bound cuffs.
-  h.compound('armguard_soft', 0.15, std.flattenArrays([
+  h.compound('neoprene_arm_sleeves', 0.15, std.flattenArrays([
     [
       sleeve('sleeve-%d' % g, 'neoprene', -0.19, 0.19, 0.075, 0.105, 0.008, z),
       sleeve('cuff-top-%d' % g, 'cuff', 0.165, 0.19, 0.101, 0.105, 0.01, z),
@@ -268,7 +268,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // A pair of arm guards cut from tyre tread, each three curved chunks 100 mm long and 12 mm thick with tread
   // blocks on the outside, strung together with cord.
-  h.compound('armguard_tire', 0.6, std.flattenArrays([
+  h.compound('tyre_arm_guards', 0.6, std.flattenArrays([
     std.flattenArrays([
       shell('chunk-%d-%d' % [g, c], 'rubber', x - 0.05, x + 0.05, 0.05, 0.012, z, 4)
       + [
@@ -287,7 +287,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
 
   // One hardened steel arm guard for one arm, a forearm plate, elbow cop and upper-arm plate in a row 600 mm long,
   // with bands of riveted mail across both elbow joints and buckled leather straps.
-  h.compound('armor_ch_armguard', 3, fullArm('arm', 0, 0.005) + std.flattenArrays([
+  h.compound('hardened_steel_arm_harness', 3, fullArm('arm', 0, 0.005) + std.flattenArrays([
     shell('mail-%d-%d' % [k, i], 'mail', x0 + i * 0.006, x0 + i * 0.006 + 0.006, 0.05 + (i % 2) * 0.003, 0.003, 0, 8, 1.3)
     for k in [0, 1]
     for x0 in [[-0.078, 0.032][k]]

@@ -17,7 +17,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
 [
   // A cotton tube quiver 600 mm long and 80 mm across, open at one end under a stiffened cuff, with a tie cord at
   // its middle and a shoulder strap lying beside it.
-  h.compound('quiver_simple_cloth', 0.12, quiverTube('quiver', 0.6, 0.04)
+  h.compound('cloth_quiver', 0.12, quiverTube('quiver', 0.6, 0.04)
     + strapAlong('strap', 'strap', 0.06, 0.52, 0.05, 0.025)
     + [h.tube('tie', 'strap', 0.04, 0.043, 0.3, 0.31, 0.04, 0)], {
     body: 'cloth-canvas',
@@ -28,7 +28,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
 
   // A cotton quiver 700 mm long and 100 mm across with a flat bag 700 mm by 110 mm strapped along its side for a
   // takedown bow's limbs, and a small accessory pouch sewn on top.
-  h.compound('quiver_takedown_bow', 0.35, quiverTube('quiver', 0.7, 0.05) + [
+  h.compound('takedown_bow_quiver', 0.35, quiverTube('quiver', 0.7, 0.05) + [
     box('bow-bag', 'bag', [0.02, 0, -0.17], [0.68, 0.04, -0.06]),
     box('bow-bag-zip', 'strap', [0.02, 0.04, -0.118], [0.68, 0.043, -0.112]),
     box('pouch', 'bag', [0.2, 0.09, -0.035], [0.32, 0.12, 0.035]),
@@ -144,7 +144,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
 
   // A light tactical vest folded in two on the floor, 420 mm by 340 mm and 60 mm deep, its front face up with three
   // rifle magazine pouches and two pistol magazine pouches, and a side buckle.
-  h.compound('tacvest', 2.1, h.foldedGarment(0.42, 0.34, 0.06, 2) + std.flattenArrays([
+  h.compound('tactical_vest', 2.1, h.foldedGarment(0.42, 0.34, 0.06, 2) + std.flattenArrays([
     [
       box('mag-%d' % i, 'pouch', [x - 0.035, 0.06, -0.06], [x + 0.035, 0.1, 0.12]),
       box('mag-flap-%d' % i, 'flap', [x - 0.037, 0.1, 0.06], [x + 0.037, 0.103, 0.123]),
@@ -186,7 +186,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
 
   // A nylon magazine pouch 240 mm wide, 190 mm tall and 90 mm deep: three tall cells side by side, each taking two
   // rifle magazines one behind the other, each under its own flap with a pull tab, and webbing on its back.
-  h.compound('triple_stacker_pouch', 0.25, std.flattenArrays([
+  h.compound('triple_magazine_pouch', 0.25, std.flattenArrays([
     [
       box('cell-%d' % i, 'body', [x - 0.036, 0, -0.04], [x + 0.036, 0.19, 0.045]),
       box('flap-top-%d' % i, 'flap', [x - 0.037, 0.19, -0.04], [x + 0.037, 0.193, 0.048]),
@@ -215,7 +215,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
 
   // An oversized home-made ballistic vest lying flat, front up: two stiff panels 600 mm wide, 520 mm long and 50 mm
   // thick, the front's padded panel quilted in rows, with wide shoulder straps and side straps hanging loose.
-  h.compound('xlkevlar', 4, [
+  h.compound('oversized_ballistic_vest', 4, [
     box('back', 'cloth', [-0.3, 0, -0.26], [0.3, 0.025, 0.26]),
     box('front', 'cloth', [-0.29, 0.025, -0.24], [0.29, 0.05, 0.26]),
     box('panel', 'panel', [-0.24, 0.05, -0.18], [0.24, 0.056, 0.22]),

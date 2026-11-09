@@ -21,12 +21,12 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   // A 26 kg anvil: 520 mm long horn to heel, 200 mm high, a 90 mm wide face.
   h.compound('anvil', 37, anvil(0.8), anvilFinish) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A small 15 kg anvil: 300 mm long and 120 mm high.
-  h.compound('anvil_crude', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  h.compound('small_anvil', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A 225 kg smithy anvil: 960 mm long and 375 mm high, a 165 mm face.
-  h.compound('anvil_heavy', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  h.compound('heavy_anvil', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A 400 mm offcut of a machine bed, 150 mm high on a 200 mm flange: torch-cut ends, a ground top face rounded off at
   // one end, two bolt bosses, and patches of the machine's old paint and rust.
-  h.compound('anvil_scavenged', 66, [
+  h.compound('scavenged_anvil', 66, [
     box('flange', 'body', [-0.2, 0, -0.1], [0.2, 0.03, 0.1]),
     box('block', 'body', [-0.2, 0.03, -0.06], [0.14, 0.15, 0.06]),
     h.turned('round', 'body', 'z', [[0, 0], [0, 0.06], [0.12, 0.06], [0.12, 0]], [0.14, 0.09, -0.06]),
@@ -43,7 +43,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   ], { body: 'steel-parkerized', face: 'steel-bright', bolt: 'iron-dull', paint: 'paint-olive', rust: 'rust-red', cut: 'steel-heat-tint' }) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A hardwood stump 300 mm high and 260 mm across, three steel plates and a square bar bolted across its sawn top.
   local r = 0.13, ht = 0.3;
-  h.compound('anvil_stump', 15, [
+  h.compound('stump_anvil', 15, [
     h.turned('stump', 'bark', 'y', [[0, 0], [0, r + 0.008], [0.04, r], [ht, r * 0.96], [ht, 0]]),
     h.disc('top', 'end', r * 0.96 - 0.008, ht, ht + 0.002),
     h.tube('ring', 'grain', 0.05, 0.054, 0, 0.002, 0, 0) + { axis: 'y', origin: [0, ht + 0.0005, 0] },
@@ -57,7 +57,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   // Bolt cutters 460 mm long: tubular arms with red grips, splaying to 70 mm apart, the compound head plates and pivot
   // bolts, and short stubby jaws closed at +x.
   local arm(id, slot, sgn, x0, x1, z0, z1, w0, w1) = h.prism(id, slot, 'y', [[sgn * z0, x0], [sgn * (z0 + w0), x0], [sgn * (z1 + w1), x1], [sgn * z1, x1]], -0.008, 0.008);
-  h.compound('boltcutters', 1.1, [
+  h.compound('bolt_cutters', 1.1, [
     arm('arm-a', 'arm', 1, 0.17, 0.33, 0.026, 0.006, 0.008, 0.008),
     arm('arm-b', 'arm', -1, 0.17, 0.33, 0.026, 0.006, 0.008, 0.008),
     arm('grip-a', 'grip', 1, 0, 0.19, 0.03, 0.024, 0.013, 0.012) + { start: -0.011, end: 0.011 },
@@ -68,7 +68,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   ] + [
     h.disc('pivot-%d' % i, 'bolt', 0.006, -0.013, 0.013, [0.325, 0.325, 0.385][i], [-0.012, 0.012, 0][i])
     for i in [0, 1, 2]
-  ], { arm: 'steel-grey', grip: 'plastic-red', head: 'steel-blued', jaw: 'steel-hardened', gap: 'coal-black', bolt: 'steel-bright' }) + { handling: h.gripOn('boltcutters', 'grip-a') } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { arm: 'steel-grey', grip: 'plastic-red', head: 'steel-blued', jaw: 'steel-hardened', gap: 'coal-black', bolt: 'steel-bright' }) + { handling: h.gripOn('bolt_cutters', 'grip-a') } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A two-part sand mould in a wooden flask 400 by 260 mm and 200 mm high: a lower drag and an upper cope, packed
   // sand showing on top with a pouring cup and a riser, alignment lugs with steel pins at the ends.
   local L = 0.2, W = 0.13, t = 0.02;
@@ -97,7 +97,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   // A tabletop charcoal forge 480 mm long: a steel pan 380 by 280 mm on four short legs, a round firepot holding
   // charcoal, and an air pipe to a hand-cranked blower at the +x end.
   local yp = 0.08;
-  h.compound('char_forge', 6, [
+  h.compound('charcoal_forge', 6, [
     box('pan-floor', 'pan', [-0.19, yp, -0.14], [0.19, yp + 0.005, 0.14]),
     box('pan-front', 'pan', [-0.19, yp, 0.135], [0.19, yp + 0.07, 0.14]),
     box('pan-back', 'pan', [-0.19, yp, -0.14], [0.19, yp + 0.12, -0.135]),
@@ -119,7 +119,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   // A drum kiln 580 mm across and 850 mm high: an open-head drum with its lid clamped on, a short chimney on the lid
   // and four air holes round the foot.
   local r = 0.29, ht = 0.85;
-  h.compound('char_kiln', 40, h.drum(r, ht, 2, false) + [
+  h.compound('charcoal_kiln', 40, h.drum(r, ht, 2, false) + [
     h.disc('lid', 'body', r + 0.006, ht, ht + 0.012),
     h.tube('chimney', 'chimney', 0.045, 0.05, 0, 0.18) + { axis: 'y', origin: [0.08, ht + 0.012, 0] },
     h.disc('flue', 'hole', 0.045, ht + 0.19, ht + 0.192, 0.08, 0),

@@ -66,7 +66,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     + [h.disc('vent-%d' % i, 'vent', 0.008, 0.07, 0.11, s * 0.6, 0.452) for i in [0, 1] for s in [[-1, 1][i]]],
     { cover: 'cloth-cream', piping: 'cloth-navy', stripe: 'cloth-blue', tuft: 'cloth-navy', vent: 'steel-grey' }) + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
   // Four 72 mm RC buggy wheels lying two by two, 0.15 m square.
-  h.compound('radio_car_wheel', 0.15,
+  h.compound('remote_control_car_wheels', 0.15,
     wheel(0, -0.038, -0.038) + wheel(1, 0.038, -0.038) + wheel(2, -0.038, 0.038) + wheel(3, 0.038, 0.038),
     { tyre: 'rubber-tread', rim: 'steel-bright', hub: 'plastic-matte-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber', 'plastic'], setting: ['modern'] } } },
   // A 250 mm piece cut from a tyre tread, 115 mm wide and 40 mm deep with its lugs.
@@ -92,7 +92,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     h.prism('flake', 'edge', 'y', [[-0.012, 0.02], [0.01, 0.022], [-0.002, 0.034]], 0.034, 0.04),
   ], { stone: 'stone-grey', edge: 'stone-whet' }) + h.inHand('sharp_rock', 'round') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['prehistoric'] } } },
   // A collapsible stock for an underbarrel grenade launcher, 0.26 m closed: a mount, twin steel rods and a butt plate.
-  h.compound('ugl_buttstock', 0.32, [
+  h.compound('grenade_launcher_stock', 0.32, [
     h.box('mount', 'body', [0, 0.005, -0.022], [0.06, 0.055, 0.022]),
     h.box('latch', 'latch', [0.02, 0.055, -0.008], [0.04, 0.062, 0.008]),
     h.turned('rod-a', 'rod', 'x', [[0, 0], [0, 0.006], [0.2, 0.006], [0.2, 0]], [0.05, 0.03, -0.014]),
@@ -103,7 +103,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
   ], { body: 'polymer-black', latch: 'steel-parkerized', rod: 'steel-parkerized', pad: 'rubber-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['plastic'], weapon: ['explosive'] } } },
   // A giant wasp's stinger, 150 mm: a lumpy, flattened venom sac on a short neck, a brown
   // sheath and a tapering black lance barbed on both edges.
-  h.compound('wasp_sting', 0.036, [
+  h.compound('wasp_stinger', 0.036, [
     h.ball('sac-a', 'flesh', 0.014, 0.012, 0.016, 0, 0.6),
     h.ball('sac-b', 'flesh', 0.010, 0.004, 0.019, 0.008, 0.7),
     h.ball('sac-c', 'flesh', 0.010, 0.017, 0.014, -0.008, 0.6),
@@ -118,11 +118,11 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     for x in [0.1 + i * 0.012]
     for r in [0.008 - (x - 0.062) * 0.003 / 0.06]
   ], { flesh: 'flesh-membrane', sheath: 'chitin-brown', lance: 'chitin-black' }) + {
-    handling: h.gripOn('wasp_sting', 'sheath'),
+    handling: h.gripOn('wasp_stinger', 'sheath'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
   // A broken block of paraffin wax about 100 by 60 by 45 mm.
-  h.compound('wax_paraffin', 0.2, [
+  h.compound('paraffin_wax', 0.2, [
     h.prism('block', 'wax', 'z', [[-0.05, 0], [0.045, 0], [0.05, 0.02], [0.032, 0.042], [-0.02, 0.046], [-0.05, 0.034]], -0.03, 0.026),
     h.prism('lump', 'wax', 'z', [[-0.04, 0.045], [0.02, 0.045], [0.0, 0.055], [-0.035, 0.052]], -0.02, 0.012),
   ], { wax: 'wax-ivory' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: {  } } },

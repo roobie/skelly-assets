@@ -15,12 +15,12 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
 [
   // A disposable cigarette-sized vape, 105 mm long and 9 mm across, lying along x with its tapered
   // mouthpiece at +x and the glowing tip at -x.
-  h.compound('ecig', 0.011, [
+  h.compound('disposable_vape', 0.011, [
     rod('body', 'body', 0.0045, -0.0505, 0.028, 0.0045),
     turned('mouth', 'mouth', 'x', [[0, 0], [0, 0.0045], [0.02, 0.004], [0.0245, 0.003], [0.0245, 0]], [0.028, 0.0045, 0]),
     rod('band', 'band', 0.0047, 0.012, 0.02, 0.0045),
     rod('tip', 'tip', 0.004, -0.0525, -0.0505, 0.0045),
-  ], { body: 'alu-anodized-black', mouth: 'plastic-black', band: 'steel-stainless', tip: 'plastic-clear-red' }) + { handling: h.gripOn('ecig', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { body: 'alu-anodized-black', mouth: 'plastic-black', band: 'steel-stainless', tip: 'plastic-clear-red' }) + { handling: h.gripOn('disposable_vape', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 15 ml squeeze bottle of eye drops, 24 mm across and 84 mm tall, with its pointed dropper cap.
   h.compound('eyedrops', 0.02, [
@@ -61,31 +61,31 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
 
   // A 1 ml glass dosing syringe of golden cannabis oil, 85 mm long with its plunger, lying along x with
   // the luer cap at +x.
-  h.compound('hi_q_distillate', 0.0065, [
+  h.compound('cannabis_oil', 0.0065, [
     rod('barrel', 'glass', 0.004, -0.025, 0.025, 0.007),
     rod('oil', 'oil', 0.0034, -0.02, 0.022, 0.007),
     box('flange', 'glass', [-0.027, 0.005, -0.008], [-0.025, 0.009, 0.008]),
     rod('rod', 'plunger', 0.002, -0.05, -0.025, 0.007),
     rod('thumb', 'plunger', 0.0055, -0.053, -0.05, 0.007),
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.0035], [0.008, 0.0025], [0.008, 0]], [0.025, 0.007, 0]),
-  ], { glass: 'glass-clear', oil: 'fuel-amber', plunger: 'plastic-black', cap: 'plastic-black' }) + { handling: h.gripOn('hi_q_distillate', 'barrel'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', oil: 'fuel-amber', plunger: 'plastic-black', cap: 'plastic-black' }) + { handling: h.gripOn('cannabis_oil', 'barrel'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A 70 mm square of parchment, opened flat, with a glassy amber slab of shatter on it and a shard
   // broken off one corner.
-  h.compound('hi_q_shatter', 0.0054, [
+  h.compound('cannabis_shatter', 0.0054, [
     box('paper', 'paper', [-0.035, 0, -0.035], [0.035, 0.002, 0.035]),
     box('slab', 'slab', [-0.022, 0.002, -0.018], [0.016, 0.004, 0.02]),
     box('slab-corner', 'slab', [0.016, 0.002, -0.018], [0.024, 0.004, 0.006]),
     box('shard', 'slab', [0.012, 0.002, 0.024], [0.022, 0.004, 0.03]),
-  ], { paper: 'paper-white', slab: 'fuel-amber' }) + inHand('hi_q_shatter', 'paper') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { paper: 'paper-white', slab: 'fuel-amber' }) + inHand('cannabis_shatter', 'paper') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A 5 ml glass concentrate jar, 38 mm across and 20 mm tall, standing open with a smear of yellow wax in
   // the bottom and its black screw lid lying beside it, 70 mm across the pair.
-  h.compound('hi_q_wax', 0.026, [
+  h.compound('cannabis_wax', 0.026, [
     turned('jar', 'glass', 'y', [[0, 0], [0, 0.019], [0.02, 0.019], [0.02, 0.016], [0.004, 0.016], [0.004, 0]], [-0.014, 0, 0]),
     turned('wax', 'wax', 'y', [[0.004, 0], [0.004, 0.016], [0.01, 0.016], [0.01, 0]], [-0.014, 0, 0]),
     turned('lid', 'lid', 'y', [[0, 0], [0, 0.0175], [0.008, 0.0175], [0.008, 0]], [0.0195, 0, 0]),
-  ], { glass: 'glass-clear', wax: 'plastic-yellow', lid: 'plastic-black' }) + inHand('hi_q_wax', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', wax: 'plastic-yellow', lid: 'plastic-black' }) + inHand('cannabis_wax', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A clear tube of sugar pellets, 18 mm across and 65 mm tall with a blue flip cap and a paper label.
   h.compound('homeopathic_pills', 0.0083, [
@@ -102,23 +102,23 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
 
   // A 20 ml glass injection vial of dark yellow iron solution, 24 mm across and 57 mm tall, with an
   // aluminium crimp seal under a red flip-off top and a paper label.
-  h.compound('inj_iron', 0.024, [
+  h.compound('injectable_iron', 0.024, [
     turned('vial', 'glass', 'y', [[0, 0], [0, 0.012], [0.042, 0.012], [0.047, 0.007], [0.05, 0.007], [0.05, 0.0055], [0.046, 0.0055], [0.041, 0.0105], [0.002, 0.0105], [0.002, 0]]),
     disc('liquid', 'liquid', 0.0098, 0.002, 0.036),
     turned('label', 'label', 'y', [[0.01, 0], [0.01, 0.0123], [0.034, 0.0123], [0.034, 0]]),
     disc('crimp', 'crimp', 0.0075, 0.047, 0.054),
     disc('flip', 'flip', 0.0065, 0.054, 0.057),
-  ], { glass: 'glass-clear', liquid: 'fuel-amber', label: 'paper-white', crimp: 'alu-bare', flip: 'plastic-red' }) + inHand('inj_iron', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', liquid: 'fuel-amber', label: 'paper-white', crimp: 'alu-bare', flip: 'plastic-red' }) + inHand('injectable_iron', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A foil blister card of fourteen round iodide tablets, 80 mm by 30 mm and lying flat, two rows of seven.
-  h.compound('iodine', 0.0057, [
+  h.compound('potassium_iodide_tablets', 0.0057, [
     box('card', 'foil', [-0.04, 0, -0.015], [0.04, 0.002, 0.015]),
     box('print', 'print', [-0.04, 0.002, -0.015], [-0.034, 0.0025, 0.015]),
   ] + [
     turned('tablet-%d-%d' % [i, j], 'tablet', 'y', [[0, 0], [0, 0.004], [0.002, 0.004], [0.004, 0.003], [0.004, 0]], [-0.026 + i * 0.01, 0.002, [-0.007, 0.007][j]])
     for i in std.range(0, 6)
     for j in std.range(0, 1)
-  ], { foil: 'alu-bare', print: 'paint-red', tablet: 'plastic-white' }) + inHand('iodine', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { foil: 'alu-bare', print: 'paint-red', tablet: 'plastic-white' }) + inHand('potassium_iodide_tablets', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cone-rolled joint, 85 mm long, 6 mm across at the card crutch at -x widening to 10 mm before the
   // twisted tip at +x.

@@ -112,7 +112,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
 
   // A pair of quilted wool arming mittens laid flat, backs up, each 270 mm from cuff to fingertip: thick mitts with a
   // long flared cuff bound at its mouth and quilted in lines along the back.
-  h.compound('gambeson_gloves_parabolan', 0.4,
+  h.compound('shimmering_wool_arming_mittens', 0.4,
              g.glovePair({ mitten: true, t: 0.026, cuff: 0.1, flare: 0.064, binding: 'trim', fingerSlot: 'glove', thumbSlot: 'glove' }, 0.08,
                          function(p, cx, s) [
                            box(p + 'quilt-%d' % i, 'quilt', [cx - 0.0025 + v, 0.026, -0.005], [cx + 0.0025 + v, 0.03, 0.15])
@@ -130,7 +130,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
   // with a fly below it and four lacing points lying over it and hanging down its edge, channels down each leg, and
   // the legs parted by a dark split from the crotch to their two bound cuffs at the near edge.
   local w = 0.26, d = 0.42, ht = 0.04, crotch = -0.02;
-  h.compound('gambeson_pants_parabolan', 1.2, h.foldedGarment(w, d, ht, 3)
+  h.compound('shimmering_wool_arming_pants', 1.2, h.foldedGarment(w, d, ht, 3)
                                                 + g.quilt({ style: 'lines', x0: -w / 2 + 0.02, x1: w / 2 - 0.02, z0: -d / 2 + 0.06, z1: d / 2 - 0.04, y: ht, pitch: 0.036, w: 0.009 })
                                                 + [
                                                   box('waistband', 'cuff', [-w / 2, ht, -d / 2 - 0.003], [w / 2, ht + 0.007, -d / 2 + 0.05]),
@@ -154,18 +154,18 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
 
   // A quilted wool greatcoat folded flat, 400 mm by 380 mm and 60 mm tall: a stand collar, a front closed with
   // tied laces, sleeves quilted in rings along both sides, and its long skirt folded back up over the hem end.
-  coat('gambeson_parabolan', 2.5, 0.4, 0.38, 0.06, 0.022, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('shimmering_wool_gambeson', 2.5, 0.4, 0.38, 0.06, 0.022, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // The same greatcoat with thin sleeves, folded the same way.
-  coat('gambeson_parabolan_thinsleeved', 2.2, 0.38, 0.38, 0.058, 0.014, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('thin_sleeved_shimmering_wool_gambeson', 2.2, 0.38, 0.38, 0.058, 0.014, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // The same long quilted coat without sleeves, its armholes bound in violet.
-  coat('gambeson_parabolan_vest', 1.9, 0.36, 0.38, 0.055, 0, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('shimmering_wool_gambeson_vest', 1.9, 0.36, 0.38, 0.055, 0, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // A loose wool blouse folded flat, 300 mm by 300 mm and 30 mm tall: a ruffled collar, a deep slit neck laced
   // across with a cord, wide sleeves folded along the sides and ruffled cuffs at the hem end.
   local w = 0.3, d = 0.3, ht = 0.03, cz = d / 2 - 0.08;
-  h.compound('parabolan_blouse', 0.71, g.jacket({ w: w, d: d, ht: ht, folds: 2, collar: { r: 0.05, wd: 0.016, ht: 0.012, gap: 25 }, front: 'none', buttons: [], sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
+  h.compound('shimmering_wool_blouse', 0.71, g.jacket({ w: w, d: d, ht: ht, folds: 2, collar: { r: 0.05, wd: 0.016, ht: 0.012, gap: 25 }, front: 'none', buttons: [], sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
                                        + [
                                          box('slit', 'opening', [-0.006, ht, cz - 0.15], [0.006, ht + 0.001, cz - 0.045]),
                                        ]
@@ -198,7 +198,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
   // Wool knee breeches folded flat, 240 mm by 340 mm and 30 mm tall: a deep waistband, a buttoned fall flap at the
   // front, the legs gathered into buttoned knee bands at the hem end, and no pockets.
   local w = 0.24, d = 0.34, ht = 0.03;
-  h.compound('parabolan_breeches', 0.45, h.foldedGarment(w, d, ht, 3)
+  h.compound('shimmering_wool_breeches', 0.45, h.foldedGarment(w, d, ht, 3)
                                           + [
                                             box('waistband', 'cuff', [-w / 2, ht, d / 2 - 0.045], [w / 2, ht + 0.005, d / 2 + 0.002]),
                                             box('fall', 'cloth', [-0.06, ht, d / 2 - 0.14], [0.06, ht + 0.004, d / 2 - 0.045]),

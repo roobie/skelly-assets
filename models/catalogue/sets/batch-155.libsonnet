@@ -126,7 +126,7 @@ local mask(id, zipped) =
 [
   // Black cotton trousers folded, 260 mm by 340 mm and 40 mm tall: no pockets, a tied waist with its ends trailing,
   // and the calf ties hanging loose off the folded hems.
-  folded('trousers_ninja', 0.49, { w: 0.26, d: 0.34, ht: 0.04, folds: 3, loops: false }, [
+  folded('ninja_trousers', 0.49, { w: 0.26, d: 0.34, ht: 0.04, folds: 3, loops: false }, [
     g.strip('calf-tie-%d' % i, 'cord', [x, 0.15], [x + 0.02, 0.24], 0.04, 0.008, 0.004)
     for i in [0, 1]
     for x in [[-0.07, 0.06][i]]
@@ -138,7 +138,7 @@ local mask(id, zipped) =
 
   // Padded army winter trousers folded thick, 290 mm by 360 mm and 90 mm tall: quilted channels across the seat,
   // belt loops, a bellows cargo pocket and padded knee panels.
-  folded('winter_pants_army', 1.3, { w: 0.29, d: 0.36, ht: 0.09, folds: 4, cargo: { x: 0.065, z: -0.03, w: 0.11, d: 0.12 }, knee: { z: 0.12, d: 0.07 } },
+  folded('army_winter_trousers', 1.3, { w: 0.29, d: 0.36, ht: 0.09, folds: 4, cargo: { x: 0.065, z: -0.03, w: 0.11, d: 0.12 }, knee: { z: 0.12, d: 0.07 } },
          g.quilt({ style: 'lines', along: 'x', x0: -0.14, x1: 0.14, z0: -0.135, z1: 0.07, y: 0.09, pitch: 0.04 }), {
     cloth: 'nylon-ranger-green',
     waistband: 'webbing-olive-dark',
@@ -153,13 +153,13 @@ local mask(id, zipped) =
   }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // White martial arts trousers folded thin, 250 mm by 330 mm and 24 mm tall: a drawcord waist and nothing else.
-  folded('zubon_gi', 0.28, { w: 0.25, d: 0.33, ht: 0.024, folds: 2, loops: false }, [],
+  folded('martial_arts_trousers', 0.28, { w: 0.25, d: 0.33, ht: 0.024, folds: 2, loops: false }, [],
          { cloth: 'cloth-bright-white', waistband: 'cloth-cream', seam: 'cloth-cream', cord: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // A knit balaclava laid flat on its back, 220 mm across the head and 320 mm from the neck hem at -z to the crown at +z: two
   // layers of knit with a soft raised top, a dark face opening ringed in rib, the ribbed neck tube with its hem turned
   // back, and a crease where the neck meets the head.
-  h.compound('balclava', 0.13, [
+  h.compound('balaclava', 0.13, [
     h.prism('back', 'knit', 'y', balaclavaHead, 0, 0.007),
     h.prism('front', 'knit', 'y', shrink(balaclavaHead, 0.92, 0.004), 0.007, 0.013),
     h.prism('neck-back', 'knit', 'y', balaclavaNeck, 0, 0.007),
@@ -196,5 +196,5 @@ local mask(id, zipped) =
   mask('bondage_mask', false) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
 
   // The same mask with its eye and mouth zips drawn shut, leaving only the nose holes.
-  mask('bondage_mask_zipped', true) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
+  mask('zipped_bondage_mask', true) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
 ]

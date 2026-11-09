@@ -219,7 +219,7 @@ local grassSkirt(w, len, n) =
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Olive cargo shorts folded once, 380 mm by 340 mm and 34 mm tall: a flapped bellows pocket on each leg.
-  h.compound('shorts_cargo', 0.4, trousers({ w: 0.38, d: 0.34, ht: 0.034, folds: 2, crotch: 0.17, cargo: true }), {
+  h.compound('cargo_shorts', 0.4, trousers({ w: 0.38, d: 0.34, ht: 0.034, folds: 2, crotch: 0.17, cargo: true }), {
     cloth: 'cloth-olive-drab',
     band: 'cloth-olive-drab',
     seam: 'plastic-charcoal',
@@ -231,7 +231,7 @@ local grassSkirt(w, len, n) =
 
   // Cut-off denim shorts folded once, 370 mm by 260 mm and 30 mm tall: orange top-stitching, a brass button and
   // white threads frayed out of the cut hems.
-  h.compound('shorts_denim', 0.41, trousers({ w: 0.37, d: 0.26, ht: 0.03, folds: 2, crotch: 0.15, fray: true }), {
+  h.compound('denim_cut_offs', 0.41, trousers({ w: 0.37, d: 0.26, ht: 0.03, folds: 2, crotch: 0.15, fray: true }), {
     cloth: 'cloth-denim',
     band: 'cloth-denim',
     seam: 'plastic-charcoal',
@@ -251,7 +251,7 @@ local grassSkirt(w, len, n) =
 
   // A costume schoolgirl skirt laid flat, 340 mm across the waist, 480 mm across the hem and 260 mm long: navy
   // knife pleats all round and two white bands near the hem.
-  h.compound('skirt_bostonchan', 0.21, skirt({ wb: 0.48, len: 0.26, pleats: 13, stripes: [0.025, 0.045] }), {
+  h.compound('pleated_costume_skirt', 0.21, skirt({ wb: 0.48, len: 0.26, pleats: 13, stripes: [0.025, 0.045] }), {
     cloth: 'cloth-navy',
     pleat: 'cloth-charcoal',
     band: 'cloth-navy',
@@ -260,7 +260,7 @@ local grassSkirt(w, len, n) =
 
   // A denim skirt laid flat, 340 mm across the waist, 420 mm across the hem and 400 mm long: an orange-stitched
   // front seam and hem, a zip fly with a brass button and a patch pocket.
-  h.compound('skirt_denim', 0.27, skirt({ wb: 0.42, len: 0.4, seam: true, fly: true, pocket: true }), {
+  h.compound('denim_skirt', 0.27, skirt({ wb: 0.42, len: 0.4, seam: true, fly: true, pocket: true }), {
     cloth: 'cloth-denim',
     band: 'cloth-denim',
     stitch: 'cloth-orange',
@@ -270,7 +270,7 @@ local grassSkirt(w, len, n) =
 
   // A grass skirt laid flat, 360 mm across the waist and 400 mm long: a twisted cord with its tie ends lying down
   // the sides and a dense, overlapping fringe of dried grass blades with a ragged hem.
-  h.compound('skirt_grass', 0.25, grassSkirt(0.36, 0.4, 55), {
+  h.compound('grass_skirt', 0.25, grassSkirt(0.36, 0.4, 55), {
     cord: 'straw-rope',
     grass: 'plant-dried',
     grass2: 'straw-wicker',
@@ -278,7 +278,7 @@ local grassSkirt(w, len, n) =
 
   // A black leather miniskirt laid flat, 320 mm across the waist, 380 mm across the hem and 220 mm long: a zip
   // fly, a centre seam and a short slit up from the hem.
-  h.compound('skirt_leather', 0.19, skirt({ wt: 0.32, wb: 0.38, len: 0.22, t: 0.008, seam: true, fly: true, slit: true }), {
+  h.compound('leather_miniskirt', 0.19, skirt({ wt: 0.32, wb: 0.38, len: 0.22, t: 0.008, seam: true, fly: true, slit: true }), {
     cloth: 'leather-black',
     band: 'leather-black',
     stitch: 'leather-charcoal',
@@ -289,7 +289,7 @@ local grassSkirt(w, len, n) =
   // An ankle-length cotton skirt, 800 mm long, folded in half at the knee and laid flat: 340 mm across the waist,
   // 520 mm across the fold and 420 mm long, soft gathers running down to the fold and the trim band of the hem
   // showing where it is folded back.
-  h.compound('skirt_long', 0.64, skirt({ wb: 0.52, len: 0.42, t: 0.024, pleats: 9, stripes: [0.03], band: 0.04 }), {
+  h.compound('long_skirt', 0.64, skirt({ wb: 0.52, len: 0.42, t: 0.024, pleats: 9, stripes: [0.03], band: 0.04 }), {
     cloth: 'cloth-brown',
     pleat: 'suede-brown',
     band: 'cloth-brown',
@@ -309,7 +309,7 @@ local grassSkirt(w, len, n) =
 
   // Grey canvas work trousers folded at the knee, 400 mm by 460 mm and 60 mm tall: double-layer knee patches, a
   // hammer loop and a rule pocket on the right leg, belt loops and a zip fly.
-  h.compound('technician_pants_gray', 1.6, trousers({ w: 0.4, ht: 0.06, knees: true, hammerLoop: true }), {
+  h.compound('work_trousers', 1.6, trousers({ w: 0.4, ht: 0.06, knees: true, hammerLoop: true }), {
     cloth: 'wool-grey',
     band: 'wool-grey',
     seam: 'plastic-charcoal',
