@@ -63,6 +63,7 @@ local barrelY = 0.245;
     grip: 'rubber-black',
     round: 'brass',
   }) + {
+    taxonomy: { category: 'weapons', tags: { weapon: ['rifle'], setting: ['sci-fi'] } },
     handling: h.gripOn('bolt_carbine', 'grip'),
     voxelGrain: 0.004,
   },
