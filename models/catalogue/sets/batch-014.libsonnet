@@ -104,7 +104,7 @@ local collapsedDrum(length, width, thick, plate) =
     turned('axle', 'axle', 'x', [[0, 0], [0, 0.015], [0.64, 0.015], [0.64, 0]], [-0.32, 0.1, 0.3]),
     turned('wheel-left', 'wheel', 'x', [[0, 0], [0, 0.1], [0.05, 0.1], [0.05, 0]], [-0.32, 0.1, 0.3]),
     turned('wheel-right', 'wheel', 'x', [[0, 0], [0, 0.1], [0.05, 0.1], [0.05, 0]], [0.27, 0.1, 0.3]),
-  ], { body: 'plastic-green', lid: 'plastic-green', grip: 'plastic-green', axle: 'steel', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-green', lid: 'plastic-green', grip: 'plastic-green', axle: 'steel', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A large round straw basket, 440 mm across the top and 400 mm tall: woven bands of two straw tones round a
   // tapered body with a thick rolled rim, and a looped handle on each side.
@@ -158,7 +158,7 @@ local collapsedDrum(length, width, thick, plate) =
     box('latch-%s' % s.id, 'latch', [s.x0, 0.1, -0.018], [s.x0 + 0.01, 0.155, 0.018])
     for s in [{ id: 'left', x0: -0.115 }, { id: 'right', x0: 0.105 }]
   ], { shell: 'plastic-grey', trim: 'plastic-black', latch: 'plastic-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A zipped garment bag lying flat, 1.3 m long with its hanger hook, 600 mm wide and 70 mm thick: a navy bag
   // with tapered shoulders, a black zip down its middle, a steel hanger hook out of the top and a clear name pocket.
