@@ -57,10 +57,10 @@ jobs:
       - name: Generate the shard
         run: |
           cache="$RUNNER_TEMP/export-cache"
-          entries() { (cd "$cache" 2>/dev/null && find . -type f | sort); }
+          mkdir -p "$cache" "$RUNNER_TEMP/generated"
+          entries() { (cd "$cache" && find . -type f | sort); }
           entries > "$RUNNER_TEMP/seeded"
           node tools/build.mjs --shard "${{ matrix.shard }}/6" --cache "$cache"
-          mkdir -p "$RUNNER_TEMP/generated"
           entries | comm -13 "$RUNNER_TEMP/seeded" - | tar -C "$cache" -cf - -T - | tar -C "$RUNNER_TEMP/generated" -xf -
       - uses: actions/upload-artifact@v7
         with:
