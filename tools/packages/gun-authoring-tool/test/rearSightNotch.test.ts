@@ -39,18 +39,19 @@ const rearSightParts = (assembly: Assembly): string[] =>
 const openWidthAtLine = (triangles: readonly Triangle[], eye: readonly number[], row: number): number => {
   let left = Number.NEGATIVE_INFINITY;
   let right = Number.POSITIVE_INFINITY;
+  // The file runs the bore along z and the side along x.
   for (const [a, b, c] of triangles) {
-    const flat = a[2] === b[2] && b[2] === c[2];
+    const flat = a[0] === b[0] && b[0] === c[0];
     const over = (axis: number, at: number) =>
       Math.min(a[axis]!, b[axis]!, c[axis]!) < at && Math.max(a[axis]!, b[axis]!, c[axis]!) > at;
-    if (!(flat && over(0, eye[0]!) && over(1, row))) {
+    if (!(flat && over(2, eye[2]!) && over(1, row))) {
       continue;
     }
-    const towardsPlusZ = (b[0]! - a[0]!) * (c[1]! - a[1]!) - (b[1]! - a[1]!) * (c[0]! - a[0]!) > 0;
-    if (towardsPlusZ && a[2]! <= eye[2]!) {
-      left = Math.max(left, a[2]!);
-    } else if (!towardsPlusZ && a[2]! >= eye[2]!) {
-      right = Math.min(right, a[2]!);
+    const towardsPlusX = (b[1]! - a[1]!) * (c[2]! - a[2]!) - (b[2]! - a[2]!) * (c[1]! - a[1]!) > 0;
+    if (towardsPlusX && a[0]! <= eye[0]!) {
+      left = Math.max(left, a[0]!);
+    } else if (!towardsPlusX && a[0]! >= eye[0]!) {
+      right = Math.min(right, a[0]!);
     }
   }
   return Number.isFinite(left) && Number.isFinite(right) ? right - left : 0;

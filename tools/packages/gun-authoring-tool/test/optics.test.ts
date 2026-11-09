@@ -28,7 +28,7 @@ import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
 import { attachmentInstanceForId, attachmentLookIssue, attachmentSlots } from '../src/gun/attachments.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { METRES_PER_UNIT } from '../src/gun/exportFrame.ts';
+import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import fixedPrism from '../src/gun/fixedPrism.json' with { type: 'json' };
 import { MOUNT_KINDS, MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_CATALOG, OPTIC_TYPE_IDS } from '../src/gun/optics.ts';
@@ -48,6 +48,10 @@ import {
 } from '../src/gun/templates.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadDesignAssembly, type MutableAssembly } from './helpers.ts';
+
+/** A point or direction in the optic's own axes, in the exported file's axes and metres, as the file draws it. */
+const inFile = ([x, y, z]: readonly number[], scale = METRES_PER_UNIT): Vector3 =>
+  new Vector3(...toFileAxes([x! * scale, y! * scale, z! * scale]));
 
 it('every catalog optic authors a valid aperture and lens-bounded reticle with a public reference', () => {
   const optics = Object.values(OPTIC_CATALOG);
@@ -272,20 +276,21 @@ describe('optic catalog', () => {
     const objective =
       Math.max(...optic.solids.filter(({ slot }) => slot === LENS_SLOT).map((solid) => localSolidBounds(solid)[1][0])) *
       METRES_PER_UNIT;
-    expect(Math.abs(nearBounds.min.x - ocular)).toBeLessThan(row.voxel.detailGrain!);
-    expect(nearBounds.max.x).toBeLessThan(objective);
+    // The file runs the optical axis along +z and the optic's side along x.
+    expect(Math.abs(nearBounds.min.z - ocular)).toBeLessThan(row.voxel.detailGrain!);
+    expect(nearBounds.max.z).toBeLessThan(objective);
     const opening = optic.ocularOpeningDiameterU * METRES_PER_UNIT;
     const axis = optic.opticalAxisY * METRES_PER_UNIT;
     expect(nearBounds.min.y).toBeLessThan(axis - opening / 2);
     expect(nearBounds.max.y).toBeGreaterThan(axis + opening / 2);
-    expect(nearBounds.min.z).toBeLessThan(-opening / 2);
-    expect(nearBounds.max.z).toBeGreaterThan(opening / 2);
+    expect(nearBounds.min.x).toBeLessThan(-opening / 2);
+    expect(nearBounds.max.x).toBeGreaterThan(opening / 2);
     scene.updateMatrixWorld(true);
-    const eye = new Vector3(optic.ocularX - optic.eyeReliefU!, optic.opticalAxisY, 0).multiplyScalar(METRES_PER_UNIT);
-    expect(new Raycaster(eye, new Vector3(1, 0, 0)).intersectObjects(near, false)).toHaveLength(0);
+    const eye = inFile([optic.ocularX - optic.eyeReliefU!, optic.opticalAxisY, 0]);
+    expect(new Raycaster(eye, inFile([1, 0, 0], 1)).intersectObjects(near, false)).toHaveLength(0);
     for (const solid of frame) {
       const [low, high] = localSolidBounds(solid);
-      const target = new Vector3(...low).add(new Vector3(...high)).multiplyScalar(METRES_PER_UNIT / 2);
+      const target = inFile(low).add(inFile(high)).multiplyScalar(1 / 2);
       expect(
         new Raycaster(eye, target.sub(eye).normalize()).intersectObjects(near, false).length,
         solid.id,
@@ -298,8 +303,8 @@ describe('optic catalog', () => {
     const expected = new Box3();
     for (const solid of hood) {
       const [low, high] = localSolidBounds(solid);
-      expected.expandByPoint(new Vector3(...low).multiplyScalar(METRES_PER_UNIT));
-      expected.expandByPoint(new Vector3(...high).multiplyScalar(METRES_PER_UNIT));
+      expected.expandByPoint(inFile(low));
+      expected.expandByPoint(inFile(high));
     }
     const actual = new Box3();
     for (const mesh of exported) {
@@ -334,13 +339,14 @@ describe('optic catalog', () => {
       }
     });
     expect(metal.length).toBeGreaterThan(0);
-    const eye = new Vector3(optic.ocularX - optic.eyeReliefU!, optic.opticalAxisY, 0).multiplyScalar(METRES_PER_UNIT);
-    const target = new Vector3(low[0], (low[1] + high[1]) / 2, 0).multiplyScalar(METRES_PER_UNIT);
+    const eye = inFile([optic.ocularX - optic.eyeReliefU!, optic.opticalAxisY, 0]);
+    const target = inFile([low[0], (low[1] + high[1]) / 2, 0]);
     // Front-side ray casting must hit the entrance; a back-facing exit cannot hide a missing opaque face.
     const [hit] = new Raycaster(eye, target.clone().sub(eye).normalize()).intersectObjects(metal, false);
     expect(hit).toBeDefined();
-    expect(hit!.point.x).toBeLessThan(high[0] * METRES_PER_UNIT);
-    expect(hit!.face!.normal.x).toBeLessThan(0);
+    // The file runs the optical axis along +z, so the eye-facing surface faces -z.
+    expect(hit!.point.z).toBeLessThan(high[0] * METRES_PER_UNIT);
+    expect(hit!.face!.normal.clone().transformDirection(hit!.object.matrixWorld).z).toBeLessThan(0);
   });
 
   it('keeps magnifying optics drawn metal clear along the optical axis between their lenses', () => {

@@ -6,6 +6,7 @@ import { modelParts } from '@skelly/thing-export/physical.ts';
 import { PART_CATALOGUE, type PartCatalogue } from '../gun/catalogue.ts';
 import { gunDomain } from '../gun/domain.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from '../gun/exportGlb.ts';
+import { inFileFrame } from '../gun/exportFrame.ts';
 import { exportGunGeometry } from '../gun/glbWriter.ts';
 import { GUN_PALETTE } from '../gun/palette.ts';
 
@@ -55,8 +56,9 @@ export const exportPartItem = (
   if (!result.ok) {
     return result;
   }
-  const parts = modelParts(resolved, (id, def) => ({ part: def, massKg: single.masses[id]!, item: item.id }), {
-    drawn: drawnGeometry(resolved, voxel),
+  const fileResolved = inFileFrame(resolved);
+  const parts = modelParts(fileResolved, (id, def) => ({ part: def, massKg: single.masses[id]!, item: item.id }), {
+    drawn: drawnGeometry(fileResolved, voxel),
   });
   return {
     ok: true,

@@ -13,6 +13,7 @@ import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { MetallicCartridge } from '../ammo/cartridge.ts';
 import { gunDomain } from './domain.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
+import { inFileFrame } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { magazineRoundColumn, magazineRoundPoses } from './magazineGeometry.ts';
 import { GUN_PALETTE } from './palette.ts';
@@ -60,7 +61,8 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
     throw new Error('resolved magazine has no part definition');
   }
   const { column } = magazineRoundColumn(def.displaySolids ?? def.solids, input.cartridge, input.params, def.solids);
-  const drawn = drawnGeometry(resolved, input.voxel);
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, input.voxel);
   return {
     ok: true,
     glb: output.glb,
@@ -68,7 +70,7 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
     modelEntry: {
       id: input.asset.id,
       file: input.asset.file as DeadvoxModelFile,
-      collision: modelCollision(resolved, drawn),
+      collision: modelCollision(fileResolved, drawn),
       gun: {
         calibre: input.cartridge.id,
         capacity: column.capacity,

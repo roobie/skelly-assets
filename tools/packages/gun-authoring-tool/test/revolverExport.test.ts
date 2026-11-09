@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
-import { applyPoint, compose, type Transform } from '@skelly/construct/foundation/math.ts';
+import { applyPoint, compose, type Transform, transpose, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { expect, it } from 'vitest';
 import { parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { FILE_FROM_GUNGEN, toFileAxes } from '../src/gun/exportFrame.ts';
 import { readGlb } from './glbReader.ts';
 import { loadFixture } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
@@ -21,6 +22,8 @@ if (!exported.ok) {
 const metadata = exported.modelEntry.gun.revolver!;
 const glb = readGlb(exported.glb);
 const resolved = resolve(loadFixture('archetype-revolver'), gunDomain);
+/** The metadata is written in the file's axes; the assembly checks read it back into gungen's. */
+const toGungen = (value: readonly number[]): Vec3 => toFileAxes(value as unknown as Vec3, transpose(FILE_FROM_GUNGEN));
 const vec = (value: readonly number[]) => new Vector3(value[0], value[1], value[2]);
 const rotation = (pivot: readonly number[], axis: readonly number[], angle: number) =>
   new Matrix4()
@@ -50,10 +53,10 @@ it('exports separate moving nodes, chamber geometry and bore-parallel axes that 
   const frame = resolved.defs.get('frame')!;
   for (let axis = 0; axis < 3; axis++) {
     const bounds = frame.solids.map(localSolidBounds);
-    expect(metadata.crane.pivot[axis]! / gunDomain.units.metresPerUnit).toBeGreaterThanOrEqual(
+    expect(toGungen(metadata.crane.pivot)[axis]! / gunDomain.units.metresPerUnit).toBeGreaterThanOrEqual(
       Math.min(...bounds.map(([min]) => min[axis]!)),
     );
-    expect(metadata.crane.pivot[axis]! / gunDomain.units.metresPerUnit).toBeLessThanOrEqual(
+    expect(toGungen(metadata.crane.pivot)[axis]! / gunDomain.units.metresPerUnit).toBeLessThanOrEqual(
       Math.max(...bounds.map(([, max]) => max[axis]!)),
     );
   }
@@ -70,8 +73,8 @@ it('opens the drum clear of every frame solid on the reserved swing side', () =>
   const { crane } = metadata;
   const motion = transform(
     rotation(
-      crane.pivot.map((value) => value / unit),
-      crane.axis,
+      toGungen(crane.pivot).map((value) => value / unit),
+      toGungen(crane.axis),
       crane.openRadians,
     ),
   );
@@ -86,7 +89,7 @@ it('opens the drum clear of every frame solid on the reserved swing side', () =>
   }
   const centre = applyPoint(
     motion,
-    metadata.cylinder.centre.map((value) => value / unit) as unknown as readonly [number, number, number],
+    toGungen(metadata.cylinder.centre).map((value) => value / unit) as unknown as Vec3,
   );
   const swing = frame.keepOuts.find(({ id }) => id === 'cylinder-swing')!.box;
   expect(centre[2]).toBeLessThanOrEqual(swing.center[2]);

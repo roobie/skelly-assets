@@ -130,11 +130,36 @@ export const loadCorpus = (
 
 export type Triangle = readonly [readonly number[], readonly number[], readonly number[]];
 
-/** The triangles a part's nodes draw, moved by their node translations into file axes. */
+/**
+ * A node's quarter-turn rotation as a row-major matrix with whole entries, so turned vertices stay exact and a face
+ * square to an axis still compares equal across its corners.
+ */
+const quarterTurnMatrix = (rotation: readonly number[] = [0, 0, 0, 1]): number[] => {
+  const [x, y, z, w] = rotation as [number, number, number, number];
+  const m = [
+    1 - 2 * (y * y + z * z),
+    2 * (x * y - z * w),
+    2 * (x * z + y * w),
+    2 * (x * y + z * w),
+    1 - 2 * (x * x + z * z),
+    2 * (y * z - x * w),
+    2 * (x * z - y * w),
+    2 * (y * z + x * w),
+    1 - 2 * (x * x + y * y),
+  ];
+  const whole = m.map((entry) => Math.round(entry) + 0);
+  if (m.some((entry, k) => Math.abs(entry - whole[k]!) > 1e-6)) {
+    throw new Error(`node rotation ${rotation.join(', ')} is not a quarter turn`);
+  }
+  return whole;
+};
+
+/** The triangles a part's nodes draw, moved by their node transforms into file axes. */
 export const partTriangles = (json: GltfJson, read: ReturnType<typeof readGlb>, partId: string): Triangle[] => {
   const triangles: Triangle[] = [];
   for (const node of json.nodes.filter(({ extras }) => extras?.part === partId)) {
     const shift = node.translation ?? [0, 0, 0];
+    const turn = quarterTurnMatrix(node.rotation);
     for (const primitive of json.meshes[node.mesh!]!.primitives) {
       const positions = read.floats(primitive.attributes.POSITION);
       const accessor = json.accessors[primitive.indices]!;
@@ -143,7 +168,13 @@ export const partTriangles = (json: GltfJson, read: ReturnType<typeof readGlb>, 
       for (let i = 0; i < indices.length; i += 3) {
         triangles.push(
           [0, 1, 2].map((k) =>
-            [0, 1, 2].map((axis) => positions[indices[i + k]! * 3 + axis]! + shift[axis]!),
+            [0, 1, 2].map(
+              (axis) =>
+                [0, 1, 2].reduce(
+                  (sum, along) => sum + turn[axis * 3 + along]! * positions[indices[i + k]! * 3 + along]!,
+                  0,
+                ) + shift[axis]!,
+            ),
           ) as unknown as Triangle,
         );
       }

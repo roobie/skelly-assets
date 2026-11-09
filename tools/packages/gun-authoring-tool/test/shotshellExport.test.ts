@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
 import type { Shotshell } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
-import { METRES_PER_UNIT } from '../src/gun/exportFrame.ts';
+import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import { shotshellGeometry, shotshellHullColor } from '../src/gun/shotshellGeometry.ts';
 import { buildAmmoMeshes } from '../src/viewer/ammoLayer.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
@@ -46,12 +46,13 @@ describe('shotshell cartridge export', () => {
         file: `assets/models/${kind}_${assetId}.glb`,
         gun: { calibre: shell.id },
       });
+      // The file runs the cartridge's axis along +z, base at the origin.
       const bounds = new Box3().setFromObject(scene);
-      expect(bounds.min.x).toBeCloseTo(0, 8);
+      expect(bounds.min.z).toBeCloseTo(0, 8);
       expect(bounds.getSize(new Vector3()).toArray()).toEqual([
+        expect.closeTo(shell.head.rimDiameter.value! / 1000, 7),
+        expect.closeTo(shell.head.rimDiameter.value! / 1000, 7),
         expect.closeTo(length / 1000, 7),
-        expect.closeTo(shell.head.rimDiameter.value! / 1000, 7),
-        expect.closeTo(shell.head.rimDiameter.value! / 1000, 7),
       ]);
       expect(report.issues.numErrors).toBe(0);
       expect(report.issues.numWarnings).toBe(0);
@@ -63,8 +64,8 @@ describe('shotshell cartridge export', () => {
   it('leaves the fired mouth open but closes the loaded roll proxy with an inset card', async () => {
     const models = exported();
     const ray = new Raycaster(
-      new Vector3(Math.max(shell.length.loaded.value!, shell.length.nominal.value!) / 1000 + 1, 0, 0),
-      new Vector3(-1, 0, 0),
+      new Vector3(0, 0, Math.max(shell.length.loaded.value!, shell.length.nominal.value!) / 1000 + 1),
+      new Vector3(0, 0, -1),
     );
     const hits: number[] = [];
     const scenes = await Promise.all([models.round, models.case].map((model) => parse(model.glb)));
@@ -72,7 +73,7 @@ describe('shotshell cartridge export', () => {
       scene.updateMatrixWorld(true);
       const [hit] = ray.intersectObject(scene, true);
       expect(hit).toBeDefined();
-      hits.push(hit!.point.x);
+      hits.push(hit!.point.z);
     }
     expect(hits[0]).toBeGreaterThan(0);
     expect(hits[0]).toBeLessThan(shell.length.loaded.value! / 1000);
@@ -118,10 +119,12 @@ describe('shotshell cartridge export', () => {
       })),
     );
     for (const { group, lengthUnits, scene } of checks) {
+      // The viewer draws in gungen's axes; the file draws the same extents in its own.
       const viewSize = new Box3().setFromObject(group).getSize(new Vector3()).multiplyScalar(METRES_PER_UNIT);
-      const exportSize = new Box3().setFromObject(scene).getSize(new Vector3());
-      expect(viewSize.distanceTo(exportSize)).toBeLessThan(1e-8);
       expect(viewSize.x).toBeCloseTo(lengthUnits * METRES_PER_UNIT, 7);
+      const viewSizeInFile = new Vector3(...toFileAxes(viewSize.toArray()).map(Math.abs));
+      const exportSize = new Box3().setFromObject(scene).getSize(new Vector3());
+      expect(viewSizeInFile.distanceTo(exportSize)).toBeLessThan(1e-8);
     }
   });
 });
