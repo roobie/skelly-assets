@@ -44,7 +44,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     box('band', 'band', [-0.0255, 0.012, -0.013], [0.0255, 0.03, 0.013]),
     turned('sign', 'sign', 'z', [[0, 0], [0, 0.011], [0.0015, 0.011], [0.0015, 0]], [0, 0.062, 0.0125]),
     turned('trefoil', 'trefoil', 'z', [[0, 0], [0, 0.004], [0.002, 0.004], [0.002, 0]], [0, 0.062, 0.0125]),
-  ], { carton: 'paint-police-blue', band: 'paper-white', sign: 'plastic-yellow', trefoil: 'plastic-black' }) + inHand('prussian_blue', 'carton') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { carton: 'paint-police-blue', band: 'paper-white', sign: 'plastic-yellow', trefoil: 'plastic-black' }) + inHand('prussian_blue', 'carton') + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A sealed single-use olive foil sachet of clotting powder, 50 mm by 70 mm and lying flat, with a white
   // printed panel, a red stripe and crimped ends.
@@ -54,7 +54,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     box('crimp-bottom', 'crimp', [-0.035, 0.002, -0.025], [-0.03, 0.004, 0.025]),
     box('panel', 'panel', [-0.022, 0.006, -0.019], [0.012, 0.007, 0.019]),
     box('stripe', 'stripe', [0.017, 0.006, -0.025], [0.023, 0.007, 0.025]),
-  ], { pouch: 'paint-olive', crimp: 'paint-olive', panel: 'paper-white', stripe: 'plastic-red' }) + inHand('hemostatic_powder', 'pouch') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { pouch: 'paint-olive', crimp: 'paint-olive', panel: 'paper-white', stripe: 'plastic-red' }) + inHand('hemostatic_powder', 'pouch') + h.label('panel', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 250 ml bag of saline for a drip, 180 mm long and 95 mm wide lying flat, with a printed label, two
   // ports at one end and a hanging tab at the other.
@@ -66,7 +66,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     rod('port-b', 'port', 0.0035, -0.092, -0.07, 0.009) + { origin: [-0.092, 0.009, 0.014] },
     rod('cap-a', 'cap', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, -0.014] },
     rod('cap-b', 'tip', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, 0.014] },
-  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + h.label('label', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A reused 250 ml trigger spray bottle of homemade deodorising wash, 55 mm across and 200 mm tall,
   // labelled with a strip of tape.
@@ -125,7 +125,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     prism('flap', 'flap', 'z', [[-0.065, 0.016], [0.02, 0.016], [0.03, 0.018], [-0.065, 0.018]], -0.045, 0.045),
     box('band', 'band', [-0.05, 0.018, -0.045], [-0.01, 0.0185, 0.045]),
     box('tuft', 'tobacco', [0.065, 0.004, -0.035], [0.069, 0.012, 0.035]),
-  ], { pouch: 'paint-charcoal', flap: 'paint-oxblood', band: 'paper-white', tobacco: 'paperboard-brown' }) + inHand('rolling_tobacco', 'pouch') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { pouch: 'paint-charcoal', flap: 'paint-oxblood', band: 'paper-white', tobacco: 'paperboard-brown' }) + inHand('rolling_tobacco', 'pouch') + h.label('band', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A pharmacy prescription vial of painkillers, 33 mm across and 70 mm tall, amber with a blue
   // child-proof cap and a white label.

@@ -106,7 +106,7 @@ local washboard(w, ht) =
     h.prism('face', 'face', 'z', [[-0.012, 0.075], [0.012, 0.075], [0.022, 0.090], [0.024, 0.120], [0.014, 0.140], [-0.014, 0.140], [-0.024, 0.120], [-0.022, 0.090]], 0.037, 0.038),
     h.box('label', 'label', [-0.050, 0.044, 0.035], [0.050, 0.054, 0.037]),
     h.box('shade', 'hair', [0.075, 0.120, -0.025], [0.076, 0.170, 0.025]),
-  ], { carton: 'paper-white', band: 'plastic-pink', hair: 'leather-chestnut', face: 'body-skin-player', label: 'paper-white' }) + {
+  ], { carton: 'paper-white', band: 'plastic-pink', hair: 'leather-chestnut', face: 'body-skin-player', label: 'paper-white' }) + h.label('band', '+z') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['paper'], setting: ['modern'] } } },
   // A string mop, 1.3 m long, lying along x: a 24 mm wooden pole with a hanging hole at the butt, a steel clamp

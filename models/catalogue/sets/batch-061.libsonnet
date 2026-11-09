@@ -93,7 +93,7 @@ local segment(i, n, r0, r) =
     box('strip', 'plaster', [-0.030, 0.018, 0.014], [0.030, 0.036, 0.015]),
     box('pad', 'pad', [-0.009, 0.020, 0.015], [0.009, 0.034, 0.0155]),
   ], { carton: 'paper-white', print: 'plastic-blue', cross: 'paint-red', plaster: 'paperboard-tan', pad: 'cloth-white' })
-  + { voxelGrain: 0.002 } + h.inHand('adhesive_bandages', 'carton') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + h.inHand('adhesive_bandages', 'carton') + h.label('band', '+z') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A dispenser carton of foil-wrapped alcohol prep pads, 68 mm square and 60 mm tall, one 30 by 65 mm sachet
   // standing out of the slot in its top.
@@ -104,7 +104,7 @@ local segment(i, n, r0, r) =
     box('sachet', 'sachet', [-0.016, 0.040, -0.0012], [0.016, 0.088, 0.0012]),
     box('sachet-stripe', 'print', [-0.0162, 0.074, -0.0014], [0.0162, 0.080, 0.0014]),
   ], { carton: 'paper-white', print: 'plastic-blue', slot: 'plastic-black', sachet: 'foil-alu' })
-  + { voxelGrain: 0.002 } + h.inHand('alcohol_wipes', 'carton') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + h.inHand('alcohol_wipes', 'carton') + h.label('band', '+z') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A white plastic carrier 200 by 135 mm holding six 250 ml amber glass bottles of anaesthetic agent with
   // colour-coded caps and paper labels, and a carry bar over the middle; 165 mm tall.

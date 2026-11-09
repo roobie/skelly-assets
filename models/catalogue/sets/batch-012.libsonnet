@@ -61,7 +61,7 @@ local bail(radius, earY, topY, wire, grip) = [
     box('part-d', 'yellow', [-0.08, 0.052, 0, ], [-0.02, 0.056, 0.04]),
     box('part-e', 'red', [0.0, 0.052, -0.01], [0.04, 0.056, 0.04]),
   ], { board: 'paperboard-tan', lid: 'paint-white', red: 'paint-red', sky: 'plastic-blue', yellow: 'plastic-yellow', green: 'plastic-green' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
+  + h.label('title', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A 20 pound barbecue propane cylinder, 305 mm across and 460 mm tall: a white steel bottle on a foot
   // ring, a guard collar round a brass valve with a black handwheel at the top.
@@ -82,32 +82,32 @@ local bail(radius, earY, topY, wire, grip) = [
   // A sealed meal ration bag lying flat, 260 mm long, 150 mm wide and 40 mm thick: a heavy tan pouch
   // with crimped seals at both ends and a dark printed panel.
   h.compound('ration_meal_bag', 0.76, ration(0.26, 0.15, 0.04, 0.14), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An entrée pouch from a meal ration lying flat, 190 mm long, 120 mm wide and 18 mm thick: a tan
   // foil-lined retort pouch with sealed ends and a dark printed panel.
   h.compound('ration_entree_pouch', 0.24, ration(0.19, 0.12, 0.018, 0.1), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A side-dish pouch from a meal ration lying flat, 150 mm long, 90 mm wide and 12 mm thick, tan with
   // sealed ends and an olive printed panel.
   h.compound('ration_side_pouch', 0.1, ration(0.15, 0.09, 0.012, 0.08), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-olive' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A dessert pouch from a meal ration lying flat, 120 mm long, 70 mm wide and 8 mm thick, tan with
   // sealed ends and a red printed panel.
   h.compound('ration_dessert_pouch', 0.05, ration(0.12, 0.07, 0.008, 0.06), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve jam packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick, tan
   // with sealed ends and a purple-red printed panel.
   h.compound('ration_jam_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-oxblood' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve spread packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick,
   // tan with sealed ends and a brown printed panel.
   h.compound('ration_spread_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paperboard-brown' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An empty one-gallon plastic paint pail, 170 mm across and 190 mm tall, 210 mm with its handle up:
   // white with a raised lid rim, a blue label band and a black plastic bail with a grip.

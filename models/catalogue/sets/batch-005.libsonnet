@@ -17,7 +17,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('wrap', 'wrap', [-0.038, 0, -0.0105], [0.032, 0.013, 0.0105]),
     box('band', 'band', [-0.012, -0.0005, -0.011], [0.008, 0.0135, 0.011]),
     box('foil', 'foil', [0.032, 0.0005, -0.01], [0.038, 0.0125, 0.01]),
-  ], { wrap: 'plastic-black', band: 'plastic-yellow', foil: 'alu-bare' }) + inHand('caffeine_gum', 'wrap') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { wrap: 'plastic-black', band: 'plastic-yellow', foil: 'alu-bare' }) + inHand('caffeine_gum', 'wrap') + h.label('band', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small bottle of caffeine tablets, 35 mm across and 70 mm tall with its cap.
   bottle('caffeine_pills', 0.034, 0.0175, 0.05, 0.013, 0.015, 0.01,
@@ -42,7 +42,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     disc('body', 'body', 0.033, 0, 0.016),
     disc('lid', 'lid', 0.034, 0.014, 0.022),
     disc('print', 'print', 0.024, 0.022, 0.024),
-  ], { body: 'plastic-black', lid: 'steel-grey', print: 'plastic-green' }) + inHand('chewing_tobacco', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-black', lid: 'steel-grey', print: 'plastic-green' }) + inHand('chewing_tobacco', 'body') + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // The brown pharmacy bottle of 3 % hydrogen peroxide, 60 mm across and 140 mm tall with its cap.
   bottle('hydrogen_peroxide', 0.3, 0.03, 0.11, 0.012, 0.0135, 0.016,
@@ -55,7 +55,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('top', 'top', [-0.028, 0.06, -0.0115], [0.028, 0.086, 0.0115]),
     box('band', 'band', [-0.028, 0.012, -0.0115], [0.028, 0.03, 0.0115]),
     box('foil', 'foil', [-0.01, 0.086, -0.006], [0.01, 0.088, 0.006]),
-  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + inHand('cigarette', 'pack') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + inHand('cigarette', 'pack') + h.label('top', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // One cigar, 150 mm long and 18 mm thick, lying along x with its rounded head at +x and a red paper band.
   h.compound('cigar', 0.014, [

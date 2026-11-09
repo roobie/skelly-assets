@@ -35,7 +35,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     for c in std.range(0, 6)
     for x in [-0.048 + c * 0.016]
     for z in [-0.009 + r * 0.018]
-  ]), { rack: 'plastic-white', box: 'plastic-clear', label: 'paper-white', band: 'plastic-blue', cuvette: 'plastic-clear', grip: 'plastic-frosted' }) + {
+  ]), { rack: 'plastic-white', box: 'plastic-clear', label: 'paper-white', band: 'plastic-blue', cuvette: 'plastic-clear', grip: 'plastic-frosted' }) + h.label('label', '+z') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A pair of electrodes, a copper plate and a steel plate 30 by 60 mm, held 20 mm apart in a black bar, with
