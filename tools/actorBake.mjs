@@ -6,6 +6,7 @@ import { crowdEmission } from './packages/mobgen/src/mob/crowd.ts';
 import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
 import { outputPath } from './layout.mjs';
 import { actorBody } from './actorBody.mjs';
+import { fileBody, fileClips, turnCellIndex, turnPointArray } from './actorFrame.mjs';
 import { figureFor } from './actorFigure.mjs';
 import { acidClips, creatureClips, fusedClips, humanoidClips, leaperClips } from './actorClips.mjs';
 
@@ -30,12 +31,13 @@ function actorGlb(row, realized, meshes) {
   const bone = new Float32Array(nv * 2);
   const emission = new Float32Array(nv * 2);
   const cell = row.fused ? new Float32Array(nv * 2) : undefined;
+  const cellIndex = turnCellIndex(realized.voxels.dims);
   const indices = new Uint32Array(ni);
   let vo = 0;
   let io = 0;
   for (const [owner, mesh] of meshes) {
-    pos.set(mesh.positions, vo * 3);
-    nor.set(mesh.normals, vo * 3);
+    pos.set(turnPointArray(mesh.positions), vo * 3);
+    nor.set(turnPointArray(mesh.normals), vo * 3);
     for (let v = 0; v < mesh.colors.length; v++) {
       const byte = mesh.colors[v];
       const material = realized.body.materials[materialOf(realized.voxels, byte)];
@@ -43,7 +45,7 @@ function actorGlb(row, realized, meshes) {
       col.set([...material.color.map((x) => Math.min(1, x * shade)), material.emissive], (vo + v) * 4);
       bone.set([owner, mesh.neighbourBone[v]], (vo + v) * 2);
       emission.set(crowdEmission(material), (vo + v) * 2);
-      if (cell) cell[(vo + v) * 2] = mesh.cellIndex[v];
+      if (cell) cell[(vo + v) * 2] = cellIndex(mesh.cellIndex[v]);
     }
     for (const index of mesh.indices) indices[io++] = index + vo;
     vo += mesh.colors.length;
@@ -78,15 +80,15 @@ function actorGlb(row, realized, meshes) {
   return Buffer.concat([header, chunk(js.length, 0x4e4f534a), js, chunk(bin.length, 0x004e4942), bin]);
 }
 
-/** Pose rows retain the generator frame, including unscaled positions and local rotations. */
+/** Every file is in the model frame (tools/actorFrame.mjs); positions stay unscaled and rotations local. */
 export function bakeActor(row, template, generated, out) {
   const emitClips = clipEmitters[template.bodyPlan];
   if (!emitClips) throw new Error(`unsupported actor body plan ${template.bodyPlan}`);
   for (const field of ['glb', 'body', 'clips']) if (typeof row[field] !== 'string' || !row[field]) throw new Error(`pose row requires ${field}`);
   const model = row.model ?? row.template;
   const figure = figureFor(generated, template, row.scale);
-  const body = actorBody(figure, template, { type: row.type ?? row.id, model, seed: row.seed, scale: row.scale, lookAt: row.lookAt ?? LOOK_AT_PROFILES[model] });
-  const clips = emitClips(figure, template, row);
+  const body = fileBody(actorBody(figure, template, { type: row.type ?? row.id, model, seed: row.seed, scale: row.scale, lookAt: row.lookAt ?? LOOK_AT_PROFILES[model] }));
+  const clips = fileClips(emitClips(figure, template, row));
   const fused = template.bodyPlan === 'fused-mass';
   const meshes = fused ? meshBones(generated.realized.voxels, body.bones.length, { perCell: true }) : generated.realized.meshes;
   const outputs = [[row.body, JSON.stringify(body)], [row.clips, JSON.stringify(clips)], [row.glb, actorGlb({ ...row, fused }, generated.realized, meshes)]];

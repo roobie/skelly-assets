@@ -5,6 +5,16 @@ import { installJsonnetSources } from '../sources.mjs';
 await installJsonnetSources();
 const { meshBones } = await import('../packages/mobgen/src/core/mesh.ts');
 const { worldPosition } = await import('../packages/mobgen/src/core/voxelize.ts');
+const { TO_MODEL_FRAME } = await import('../packages/mobgen/src/core/conventions.ts');
+const { turnPoint } = await import('../actorFrame.mjs');
+
+// The export's half turn is its own inverse, so this carries a live pose either way between mobgen's generator
+// frame and the files' model frame.
+const swapFrame = ({ root, rotations, ...rest }) => ({
+  ...rest,
+  root: turnPoint(root),
+  rotations: Object.fromEntries(Object.entries(rotations).map(([id, m]) => [id, m.map((v, i) => v * TO_MODEL_FRAME[Math.floor(i / 3)] * TO_MODEL_FRAME[i % 3])])),
+});
 
 // Exercise the on-disk row boundary while sharing the existing live-pose assertions.
 async function bakeFixture(model, options = {}) {
@@ -93,6 +103,36 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
     }
   }
   assert(sawBoundary);
+});
+
+test('baked figures face +z with their left at +x', async () => {
+  for (const model of ['humanoid', 'dog']) {
+    const { body } = await bakeFixture(model);
+    const bone = (id) => body.bones.find((b) => b.id === id);
+    assert(bone('head').tail[2] > bone('pelvis').head[2], `${model} head lies forward of its pelvis`);
+    const sides = body.bones.filter((b) => /\.[LR]$/.test(b.id));
+    assert(sides.length > 0);
+    for (const { id, head } of sides) assert(id.endsWith('.L') ? head[0] > 0 : head[0] < 0, `${model} ${id} lies on its own side`);
+  }
+  const { body } = await bakeFixture('humanoid');
+  const foot = body.bones.find((b) => b.id === 'foot.L');
+  assert(foot.tail[2] > foot.head[2], 'toes point forward');
+});
+
+test('turned cells keep each owner at the turned centre of its source cell', async () => {
+  const { fileBody, turnCellIndex } = await import('../actorFrame.mjs');
+  const voxels = cellFixture();
+  const at = (grid, cell) => worldPosition(grid, cell % grid.dims[0], Math.floor(cell / grid.dims[0]) % grid.dims[1], Math.floor(cell / (grid.dims[0] * grid.dims[1])));
+  const filled = Array.from(voxels.owner).flatMap((owner, i) => owner ? [[i, owner]] : []);
+  const { cells } = fileBody({ cells: { size: voxels.size, origin: voxels.origin, dims: voxels.dims, filled } });
+  const turned = new Map(cells.filled);
+  assert.equal(turned.size, filled.length);
+  for (const [cell, owner] of filled) {
+    const index = turnCellIndex(voxels.dims)(cell);
+    assert.equal(turned.get(index), owner);
+    const expected = turnPoint(at(voxels, cell));
+    for (const [a, v] of at(cells, index).entries()) assert(v === expected[a], `axis ${a}: ${v} != ${expected[a]}`);
+  }
 });
 
 test('the emitted hull reproduces the generator ground fit after a JSON round trip', async () => {
@@ -285,7 +325,7 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
     else if (typeof a === 'object') { assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort()); for (const key of Object.keys(a)) close(a[key], b[key]); }
     else assert(Math.abs(a - b) <= 1e-9, `${a} != ${b}`);
   };
-  for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), idleBasePose(actor, stance));
+  for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), swapFrame(idleBasePose(actor, stance)));
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
   const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
@@ -295,14 +335,14 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
     const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    close(decodeFrame(frame), { root: pose.root, rotations: pose.rotations });
+    close(decodeFrame(frame), swapFrame({ root: pose.root, rotations: pose.rotations }));
   }
   const end = walkPose(actor, { stepIndex: 2 * row.walkCycles, progress: 0 }, row.walk_speed);
-  close(decodeFrame(clips.standing.walk.frames[0]), { root: end.root, rotations: end.rotations });
-  close(decodeFrame(clips.crawling.idle.frames[0]), crawlGaitPose(figure.realized, 0, 0));
+  close(decodeFrame(clips.standing.walk.frames[0]), swapFrame({ root: end.root, rotations: end.rotations }));
+  close(decodeFrame(clips.crawling.idle.frames[0]), swapFrame(crawlGaitPose(figure.realized, 0, 0)));
   assert.equal(clips.crawling.walk.cycles, 1);
   assert.equal(clips.crawling.walk.strideMetres, 1.2, 'the crawl walk states the row\'s authored crawl stride');
-  for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed));
+  for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), swapFrame(crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed)));
   const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: true, crawl_stride: 0.9, legCut: 0.55 });
   assert(!('standing' in legless));
   assert(legless.crawling.walk.frames.length > 1);
@@ -336,7 +376,7 @@ test('serialized idle oscillators reproduce the live ordered rotation product at
   for (const [stance, idle] of Object.entries(clips.standing.idle)) for (const time of [0, 0.37, 3.2]) for (const seed of [2, 17]) {
     const base = decodeFrame(idle.base);
     const actual = applyMotion(base, idle.motion, time, seed);
-    const expected = applyIdleMotion(base, stance, time, seed);
+    const expected = swapFrame(applyIdleMotion(swapFrame(base), stance, time, seed));
     assert.deepEqual(actual.root, expected.root);
     for (const id of Object.keys(expected.rotations)) expected.rotations[id].forEach((x, i) => assert(Math.abs(x - actual.rotations[id][i]) <= 1e-9));
   }
@@ -381,15 +421,15 @@ test('humanoid overlays reproduce action poses over live idle and walk bases at 
     for (let i = 0; i < clip.frames.length; i++) {
       const time = clip.durationSimSeconds * i / (clip.frames.length - 1);
       for (const side of [-1, 1]) {
-        const actual = applyOverlay(body, base, clip, time, side, stance);
-        const expected = stance === 'standing'
+        const actual = applyOverlay(body, swapFrame(base), clip, time, side, stance);
+        const expected = swapFrame(stance === 'standing'
           ? kind === 'attack' ? attackPose(actor, attack, time, base) : flinchPoseWithClip(actor, time, base, { clip: flinch, side })
-          : kind === 'attack' ? groundCrawlPose(figure.realized, { ...base, rotations: attackRotations(actor, crawlAttack, time, base).rotations }) : crawlHitPose(figure.realized, base, time, side);
+          : kind === 'attack' ? groundCrawlPose(figure.realized, { ...base, rotations: attackRotations(actor, crawlAttack, time, base).rotations }) : crawlHitPose(figure.realized, base, time, side));
         close(actual, expected);
       }
       if (kind === 'flinch' && i > 0 && i < clip.frames.length - 1) {
-        const left = applyOverlay(body, base, clip, time, -1, stance);
-        const right = applyOverlay(body, base, clip, time, 1, stance);
+        const left = applyOverlay(body, swapFrame(base), clip, time, -1, stance);
+        const right = applyOverlay(body, swapFrame(base), clip, time, 1, stance);
         changedBySide ||= JSON.stringify(left.rotations) !== JSON.stringify(right.rotations);
       }
     }
@@ -418,12 +458,12 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
       (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
     }
   };
-  for (const [i, frame] of clips.idle.frames.entries()) close(decodeFrame(frame), acidIdlePose(figure.realized, tuning.idlePeriod * i / clips.idle.frames.length));
-  close(decodeFrame(clips.idle.frames[0]), acidIdlePose(figure.realized, tuning.idlePeriod));
+  for (const [i, frame] of clips.idle.frames.entries()) close(decodeFrame(frame), swapFrame(acidIdlePose(figure.realized, tuning.idlePeriod * i / clips.idle.frames.length)));
+  close(decodeFrame(clips.idle.frames[0]), swapFrame(acidIdlePose(figure.realized, tuning.idlePeriod)));
   for (const speed of [-0.2, 0, 0.4, 1.4]) for (let i = 0; i < clips.walk.frames.length; i++) {
     const phase = 2 * Math.PI * i / clips.walk.frames.length;
     const base = acidIdlePose(figure.realized, 0.37);
-    close(applyJointDelta(body, base, clips.walk, phase, { speed }), acidWalkPose(figure.realized, acidStrideLength(figure.realized) * phase / (2 * Math.PI), speed, 0.37));
+    close(applyJointDelta(body, swapFrame(base), clips.walk, phase, { speed }), swapFrame(acidWalkPose(figure.realized, acidStrideLength(figure.realized) * phase / (2 * Math.PI), speed, 0.37)));
   }
   const bases = [acidIdlePose(figure.realized, 0.37), acidWalkPose(figure.realized, 0.23, 0.7, 0.37)];
   let sideVaries = false;
@@ -437,10 +477,10 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
     }
     for (let i = 0; i < clip.frames.length; i++) for (const side of [-1, 1]) {
       const cursor = (clip.durationSimSeconds ?? 1) * i / (clip.frames.length - 1);
-      const actual = applyJointDelta(body, base, clip, cursor, { side });
-      const expected = name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'spitDraw' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side);
+      const actual = applyJointDelta(body, swapFrame(base), clip, cursor, { side });
+      const expected = swapFrame(name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'spitDraw' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side));
       close(actual, expected);
-      if (name === 'hit') sideVaries ||= JSON.stringify(actual) !== JSON.stringify(applyJointDelta(body, base, clip, cursor, { side: -side }));
+      if (name === 'hit') sideVaries ||= JSON.stringify(actual) !== JSON.stringify(applyJointDelta(body, swapFrame(base), clip, cursor, { side: -side }));
     }
   }
   assert(sideVaries);
@@ -482,10 +522,10 @@ test('acid death clips reproduce the generator fall over the rest frame at every
     assert(!('durationSimSeconds' in death));
     assert.equal(death.frames.length, row.attack_frames);
     for (const [i, frame] of death.frames.entries()) {
-      close(decodeFrame(frame), acidDeathPose(figure.realized, rest, death.durationRealSeconds * i / (death.frames.length - 1), direction));
+      close(decodeFrame(frame), swapFrame(acidDeathPose(figure.realized, rest, death.durationRealSeconds * i / (death.frames.length - 1), direction)));
     }
     // Frame zero is the rest frame itself: the fall starts from idle frame zero.
-    close(decodeFrame(death.frames[0]), rest);
+    close(decodeFrame(death.frames[0]), swapFrame(rest));
   }
   // Directions fold differently, so the two clips are not copies.
   assert.notDeepEqual(clip('forward').frames.at(-1), clip('backward').frames.at(-1));
@@ -507,7 +547,7 @@ test('the death clips settle', async () => {
     const settled = acidDeathPose(figure.realized, rest, deathDuration, direction);
     // The settled fold is what the generator holds from deathDuration on.
     const last = decodeFrame(death.frames.at(-1));
-    for (const expected of [settled, acidDeathPose(figure.realized, rest, 2 * deathDuration, direction)]) {
+    for (const expected of [settled, acidDeathPose(figure.realized, rest, 2 * deathDuration, direction)].map(swapFrame)) {
       last.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `${name} root[${i}]`));
       const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
       for (const id of new Set([...Object.keys(last.rotations), ...Object.keys(expected.rotations)])) {
@@ -664,10 +704,12 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
       for (const index of geometry.index.array) assert(index < pos.count);
       const template = consumableTemplate(model);
       const figure = model === 'fused-mass' ? figureFor(generateValid(template, row.seed, { maxAttempts: 1 }), template, row.scale) : templateFigure(model, row.seed);
-      assert.deepEqual(body.boxes, figure.boxes);
+      // As written to JSON, which spells a turned -0 as 0.
+      const written = (value) => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      assert.deepEqual(body.boxes, written(figure.boxes && Object.fromEntries(Object.entries(figure.boxes).map(([region, boxes]) => [region, boxes.map((box) => ({ ...box, center: turnPoint(box.center) }))]))));
       assert.deepEqual(body.severableParts, figure.severableParts);
       for (const bone of body.bones) {
-        assert.deepEqual(bone.voxels, figure.voxelCentersByBone.get(bone.id));
+        assert.deepEqual(bone.voxels, written(figure.voxelCentersByBone.get(bone.id)?.map(turnPoint)));
         if (bone.voxels) assert(bone.hull.length > 0 && bone.hull.every((p) => bone.voxels.some((v) => v.every((x, a) => x === p[a]))));
       }
       const meshes = model === 'fused-mass' ? meshBones(figure.realized.voxels, body.bones.length, { perCell: true }) : figure.realized.meshes;
@@ -677,8 +719,8 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
         assert.equal(bone.getY(vertex), mesh.neighbourBone[v]);
         assert(owner >= 0 && owner < body.bones.length);
         for (let a = 0; a < 3; a++) {
-          assert.equal(pos.array[vertex * 3 + a], mesh.positions[v * 3 + a]); // No facing conversion, even for -z rigs.
-          assert.equal(nor.array[vertex * 3 + a], mesh.normals[v * 3 + a]);
+          assert.equal(pos.array[vertex * 3 + a], mesh.positions[v * 3 + a] * TO_MODEL_FRAME[a]);
+          assert.equal(nor.array[vertex * 3 + a], mesh.normals[v * 3 + a] * TO_MODEL_FRAME[a]);
         }
         const expectedEmission = crowdEmission(figure.realized.body.materials[materialOf(figure.realized.voxels, mesh.colors[v])]);
         expectedEmission.forEach((x, a) => assert.equal(emission.array[vertex * 2 + a], Math.fround(x)));
@@ -761,7 +803,7 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
     const standing = clips.standing;
     for (const [name, at] of Object.entries({ idle: live.idle, walk: live.walk, attack: live.attack })) for (const [i, frame] of standing[name].frames.entries()) {
       const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
-      close(decodeFrame(frame), at(cursor));
+      close(decodeFrame(frame), swapFrame(at(cursor)));
     }
   }
 });
@@ -784,9 +826,9 @@ test('leaper pose clips reproduce its live frames at every stored cursor, whole 
     const live = leaperFrame(realized, name, clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1), cut);
     const decoded = decodeFrame(frame);
     // Loops play in place; finite clips keep the travel that is part of the move.
-    const root = clip.loop ? [live.pose.root[0], live.pose.root[1], 0] : live.pose.root;
-    decoded.root.forEach((value, axis) => assert(Math.abs(value - root[axis]) < 1e-12, `${name} root at frame ${i}`));
-    for (const [id, rotation] of Object.entries(live.pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
+    const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
+    decoded.root.forEach((value, axis) => assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`));
+    for (const [id, rotation] of Object.entries(pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
     if (name === 'pounce') assert.equal(frame.charge, live.charge);
   }
   assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);

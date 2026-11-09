@@ -9,7 +9,7 @@ export const realizedRegionBones = (regionBones, boneIds) =>
     Object.entries(regionBones).map(([region, ids]) => [region, ids.filter((id) => boneIds.has(id))]),
   );
 
-/** Adapt an already-realized row, preserving the figure consumers' rest-world conventions. */
+/** Adapt an already-realized row in the generator's rest-world frame, which the export turns (tools/actorFrame.mjs). */
 export function figureFor(generated, template, scale) {
   const { realized, genome } = generated;
   const { voxels, body } = realized;

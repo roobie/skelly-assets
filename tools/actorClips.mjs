@@ -14,7 +14,7 @@ import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStr
 import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
 import { leaperClip, leaperFrame } from './packages/mobgen/src/mob/leaper/motion.ts';
 
-/** Absolute local rotations, without a coordinate conversion or precision reduction. */
+/** Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs). */
 export const poseFrame = (pose) => ({
   root: [...pose.root],
   rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, rotation]) => [id, mat3ToQuat(rotation)])),
@@ -84,7 +84,7 @@ export function fusedClips(figure) {
   return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
 }
 
-/** Non-humanoid plans retain mobgen's absolute poses; no facing conversion is applied. */
+/** Non-humanoid plans bake mobgen's own absolute poses. */
 export function creatureClips(figure, template, row) {
   const { realized, genome } = figure;
   const frames = { walk: row.walk_frames, attack: row.attack_frames };

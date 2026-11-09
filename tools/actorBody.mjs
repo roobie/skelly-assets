@@ -24,7 +24,7 @@ export const bodyGeometry = (figure, template) => {
   };
 };
 
-/** Figure metadata stays in the generator's rest-world frame; scale is carried, not applied. */
+/** Figure metadata in the generator's rest-world frame, turned on export (tools/actorFrame.mjs); scale is carried, not applied. */
 export function actorBody(figure, template, { type, model, seed, scale, lookAt }) {
   if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError('actor scale must be positive and finite');
   const { bones, anchors } = figure.realized.body;
