@@ -3,7 +3,16 @@
 local fleet = import 'index.libsonnet';
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local claimed = {};
+local claimed = {
+  'skelly.aircraft': [
+    'air_ambulance',
+    'heavy_cargo_helicopter',
+    'light_helicopter',
+    'military_transport_helicopter',
+    'news_helicopter',
+    'police_helicopter',
+  ],
+};
 local others = std.flattenArrays(std.objectValues(claimed));
 {
   vehicles(pack): if pack == 'skelly.ground-vehicles'
