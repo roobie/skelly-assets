@@ -1,6 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local w = import 'burnt_out_van.spec.libsonnet';
+local w = import 'wreck-kit.libsonnet';
 local s = import 'overturned_delivery_van.spec.libsonnet';
 local box = k.box;
 local lying(pieces) = std.map(s.lie, pieces);
@@ -8,7 +8,6 @@ local finish = {
   paint: 'paint-drum-blue', band: 'paint-cream', rust: 'scrap-rusted', scrape: 'steel-grey', bright: 'steel-bright', grime: 'paint-charcoal',
   pan: 'paint-charcoal', soot: 'steel-spall-black', trim: 'plastic-black', steel: 'steel-grey', lining: 'plastic-grey',
 };
-local constant(v) = function(x) v;
 local hood(x) = s.waist - (x - 1.75) * 0.3;
 local roofFront = 0.85;
 // The roof took the first blow of the roll, so it has come down over the cab.
@@ -19,35 +18,34 @@ local archBottom(axle, x) =
 local bottom(x) = std.max(archBottom(s.rearAxle, x), archBottom(s.frontAxle, x));
 // Sound paint and a pale courier's stripe on the upper side, with rust blistering at the sills and the arches.
 local skin(seed) = function(x, y)
-  local blister = w.noise(seed, x, y);
+  local blister = w.panelNoise(seed, x, y);
   if y < 0.55 + 0.45 * (blister - 0.3) || blister > 0.79 then 'rust'
   else if blister > 0.73 then 'grime'
   else if y > 0.98 && y < 1.2 && blister > 0.24 then 'band'
   else 'paint';
 // Long scrapes along x, where the side and the roof slid down the road.
 local scraped(seed) = function(x, y)
-  local v = w.noise(seed, x * 0.15, y * 3);
-  if v > 0.68 then 'bright' else if v > 0.6 then 'scrape' else if w.noise(seed + 2, x, y) > 0.76 then 'rust' else 'paint';
+  local v = w.panelNoise(seed, x * 0.15, y * 3);
+  if v > 0.68 then 'bright' else if v > 0.6 then 'scrape' else if w.panelNoise(seed + 2, x, y) > 0.76 then 'rust' else 'paint';
 // The near corner of the nose was stove in, pushing the wing back and in.
 local crush(x) = 0.28 * std.max(0, x - 1.95);
-local grid(from, to, count) = [from + (to - from) * i / count for i in std.range(0, count)];
 local nearWall =
-  w.sheet('near_load', 'z', [s.rear, 0], bottom, function(x) roofTop(x) - 0.1, constant([s.skin, s.side]), skin(3))
-  + w.sheet('near_b', 'z', [0, 0.1], constant(s.sill), function(x) roofTop(x) - 0.1, constant([s.skin, s.side]), skin(5))
-  + w.sheet('near_header', 'z', [0.1, roofFront], function(x) roofTop(x) - 0.24, function(x) roofTop(x) - 0.1, constant([s.skin, s.side]), skin(7))
-  + w.sheet('near_sill', 'z', [0.1, 1.3], constant(s.sill), constant(s.floor), constant([s.skin, s.side]), skin(9))
-  + w.sheet('near_wing', 'z', [1.3, s.nose - 0.02], bottom, function(x) std.min(s.waist, hood(x)), function(x) [s.skin - crush(x), s.side - crush(x)], skin(11));
+  w.columnSheet('near_load', 'z', [s.rear, 0], bottom, function(x) roofTop(x) - 0.1, w.constant([s.skin, s.side]), skin(3))
+  + w.columnSheet('near_b', 'z', [0, 0.1], w.constant(s.sill), function(x) roofTop(x) - 0.1, w.constant([s.skin, s.side]), skin(5))
+  + w.columnSheet('near_header', 'z', [0.1, roofFront], function(x) roofTop(x) - 0.24, function(x) roofTop(x) - 0.1, w.constant([s.skin, s.side]), skin(7))
+  + w.columnSheet('near_sill', 'z', [0.1, 1.3], w.constant(s.sill), w.constant(s.floor), w.constant([s.skin, s.side]), skin(9))
+  + w.columnSheet('near_wing', 'z', [1.3, s.nose - 0.02], bottom, function(x) std.min(s.waist, hood(x)), function(x) [s.skin - crush(x), s.side - crush(x)], skin(11));
 local farWall =
-  w.sheet('far_load', 'z', [s.rear, 0], bottom, function(x) roofTop(x) - 0.1, constant([-s.side, -s.skin]), scraped(13))
-  + w.sheet('far_b', 'z', [0, 0.1], constant(s.sill), function(x) roofTop(x) - 0.1, constant([-s.side, -s.skin]), scraped(15))
-  + w.sheet('far_header', 'z', [0.1, roofFront], function(x) roofTop(x) - 0.24, function(x) roofTop(x) - 0.1, constant([-s.side, -s.skin]), scraped(17))
-  + w.sheet('far_sill', 'z', [0.1, 1.3], constant(s.sill), constant(s.floor), constant([-s.side, -s.skin]), scraped(19))
-  + w.sheet('far_wing', 'z', [1.3, s.nose - 0.02], bottom, function(x) std.min(s.waist, hood(x)), constant([-s.side, -s.skin]), scraped(21));
+  w.columnSheet('far_load', 'z', [s.rear, 0], bottom, function(x) roofTop(x) - 0.1, w.constant([-s.side, -s.skin]), scraped(13))
+  + w.columnSheet('far_b', 'z', [0, 0.1], w.constant(s.sill), function(x) roofTop(x) - 0.1, w.constant([-s.side, -s.skin]), scraped(15))
+  + w.columnSheet('far_header', 'z', [0.1, roofFront], function(x) roofTop(x) - 0.24, function(x) roofTop(x) - 0.1, w.constant([-s.side, -s.skin]), scraped(17))
+  + w.columnSheet('far_sill', 'z', [0.1, 1.3], w.constant(s.sill), w.constant(s.floor), w.constant([-s.side, -s.skin]), scraped(19))
+  + w.columnSheet('far_wing', 'z', [1.3, s.nose - 0.02], bottom, function(x) std.min(s.waist, hood(x)), w.constant([-s.side, -s.skin]), scraped(21));
 local noseHole(z, y) =
   local a = std.abs(z);
   (a < 0.5 && y > 0.56 && y < 0.78) || (a > 0.55 && a < 0.86 && y > 0.6 && y < 0.82);
 local inArch(x, z) = std.abs(z) > 0.72 && (std.abs(x - s.frontAxle) < s.arch || std.abs(x - s.rearAxle) < s.arch);
-local muck(seed) = function(x, z) if inArch(x, z) then null else if w.noise(seed, x, z) > 0.72 then 'rust' else 'pan';
+local muck(seed) = function(x, z) if inArch(x, z) then null else if w.panelNoise(seed, x, z) > 0.72 then 'rust' else 'pan';
 local tub(tag, axle) = [
   box(tag + '_near', 'soot', [axle - s.arch, s.sill, 0.72], [axle + s.arch, 0.84, 0.74]),
   box(tag + '_far', 'soot', [axle - s.arch, s.sill, -0.74], [axle + s.arch, 0.84, -0.72]),
@@ -76,13 +74,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   ]), finish),
   k.compound('overturned_delivery_van_shell', 760, lying(
     nearWall + farWall
-    + w.sheet('roof', 'y', [s.rear, roofFront], constant(-s.side), constant(s.side), function(x) [roofTop(x) - 0.1, roofTop(x)], scraped(23))
-    + w.sheet('pan', 'y', [s.rear, s.nose - 0.08], constant(-s.skin), constant(s.skin), constant([s.sill, s.sill + 0.08]), muck(25))
-    + w.sheet('nose', 'x', [-s.skin, s.skin - 0.18], constant(s.sill + 0.08), constant(hood(2.6)), constant([2.54, 2.6]), function(z, y) if noseHole(z, y) then null else skin(27)(z, y))
-    + w.sheet('cowl', 'x', [-s.skin, s.skin], constant(1.06), constant(s.waist + 0.02), constant([1.62, 1.75]), skin(29))
-    + w.sheet('rear_header', 'x', [-s.skin, s.skin], constant(2.04), constant(s.roof - 0.1), constant([s.rear, s.rear + 0.08]), skin(31))
-    + w.sheet('line_far', 'z', [s.rear, 0], constant(s.floor), function(x) roofTop(x) - 0.12, constant([-s.skin, -s.skin + 0.03]), function(x, y) if w.noise(33, x, y) > 0.56 then 'lining' else 'soot', 0.25)
-    + w.sheet('line_cab', 'z', [0.1, 1.5], constant(s.floor), constant(1.1), constant([-s.skin, -s.skin + 0.03]), function(x, y) 'soot', 0.5)
+    + w.columnSheet('roof', 'y', [s.rear, roofFront], w.constant(-s.side), w.constant(s.side), function(x) [roofTop(x) - 0.1, roofTop(x)], scraped(23))
+    + w.columnSheet('pan', 'y', [s.rear, s.nose - 0.08], w.constant(-s.skin), w.constant(s.skin), w.constant([s.sill, s.sill + 0.08]), muck(25))
+    + w.columnSheet('nose', 'x', [-s.skin, s.skin - 0.18], w.constant(s.sill + 0.08), w.constant(hood(2.6)), w.constant([2.54, 2.6]), function(z, y) if noseHole(z, y) then null else skin(27)(z, y))
+    + w.columnSheet('cowl', 'x', [-s.skin, s.skin], w.constant(1.06), w.constant(s.waist + 0.02), w.constant([1.62, 1.75]), skin(29))
+    + w.columnSheet('rear_header', 'x', [-s.skin, s.skin], w.constant(2.04), w.constant(s.roof - 0.1), w.constant([s.rear, s.rear + 0.08]), skin(31))
+    + w.columnSheet('line_far', 'z', [s.rear, 0], w.constant(s.floor), function(x) roofTop(x) - 0.12, w.constant([-s.skin, -s.skin + 0.03]), function(x, y) if w.panelNoise(33, x, y) > 0.56 then 'lining' else 'soot', 0.25)
+    + w.columnSheet('line_cab', 'z', [0.1, 1.5], w.constant(s.floor), w.constant(1.1), w.constant([-s.skin, -s.skin + 0.03]), function(x, y) 'soot', 0.5)
     + tub('tub_front', s.frontAxle) + tub('tub_rear', s.rearAxle)
     + [
       box('floor', 'pan', [s.rear, s.sill + 0.08, -s.skin], [1.3, s.floor, s.skin]),
@@ -103,9 +101,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   ), finish),
   k.compound('overturned_delivery_van_bonnet', 24, lying(
     // Buckled by the roll, its skin rippled across and sprung up at the crushed corner.
-    w.surface('skin', grid(1.75, 2.54, 6), grid(-0.94, 0.8, 11), function(x, z)
+    w.surface('skin', w.grid(1.75, 2.54, 6), w.grid(-0.94, 0.8, 11), function(x, z)
       hood(x) + 0.07 * std.sin(x * 14) * (x - 1.75) + (if z > 0.3 then 0.26 * (z - 0.3) * (x - 1.75) else 0), 0.05, function(x, z)
-      local v = w.noise(35, x, z);
+      local v = w.panelNoise(35, x, z);
       if v > 0.68 then 'rust' else if v > 0.6 then 'grime' else 'paint'),
   ), finish),
   k.compound('overturned_delivery_van_bumper', 16, lying([
@@ -119,21 +117,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   ]), finish),
   k.compound('overturned_delivery_van_cab_door_sprung', 34, lying(
     // Sprung on its hinges by the roll, it now stands up off the top of the wreck.
-    w.swung('panel', [0.98, 1.3], [1.72, 0.42], 0.05, constant(s.floor), constant(s.waist), function(t, y) skin(37)(t * 2, y), 8)
-    + w.swung('top_rail', [0.98, 1.3], [1.72, 0.42], 0.05, constant(1.9), constant(1.98), function(t, y) 'paint', 4)
-    + w.swung('rear_bar', [1.66, 0.49], [1.72, 0.42], 0.05, constant(s.waist), constant(1.9), function(t, y) 'paint', 1),
+    w.swung('panel', [0.98, 1.3], [1.72, 0.42], 0.05, w.constant(s.floor), w.constant(s.waist), function(t, y) skin(37)(t * 2, y), 8)
+    + w.swung('top_rail', [0.98, 1.3], [1.72, 0.42], 0.05, w.constant(1.9), w.constant(1.98), function(t, y) 'paint', 4)
+    + w.swung('rear_bar', [1.66, 0.49], [1.72, 0.42], 0.05, w.constant(s.waist), w.constant(1.9), function(t, y) 'paint', 1),
   ), finish),
   k.compound('overturned_delivery_van_cab_door', 36, lying(
-    w.sheet('panel', 'z', [0.1, 1.3], constant(s.floor), constant(s.waist), constant([-s.side, -s.skin]), scraped(39))
-    + w.sheet('bar', 'z', [0.1, 0.2], constant(s.waist), constant(1.9), constant([-s.side, -s.skin]), scraped(41)),
+    w.columnSheet('panel', 'z', [0.1, 1.3], w.constant(s.floor), w.constant(s.waist), w.constant([-s.side, -s.skin]), scraped(39))
+    + w.columnSheet('bar', 'z', [0.1, 0.2], w.constant(s.waist), w.constant(1.9), w.constant([-s.side, -s.skin]), scraped(41)),
   ), finish),
   k.compound('overturned_delivery_van_rear_door_upper', 34, lying(
     // The upper door droops open under its own weight.
-    w.swung('panel', [0.86, s.rear], [0.46, s.rear - 0.8], 0.05, constant(0.62), constant(2.04), function(t, y) skin(43)(t * 2, y), 7),
+    w.swung('panel', [0.86, s.rear], [0.46, s.rear - 0.8], 0.05, w.constant(0.62), w.constant(2.04), function(t, y) skin(43)(t * 2, y), 7),
   ), finish),
   k.compound('overturned_delivery_van_rear_door_lower', 34, lying(
     // The lower door has fallen flat open on the road.
-    w.sheet('panel', 'z', [s.rear - 0.86, s.rear], constant(0.62), constant(2.04), constant([-s.side, -s.side + 0.05]), skin(45)),
+    w.columnSheet('panel', 'z', [s.rear - 0.86, s.rear], w.constant(0.62), w.constant(2.04), w.constant([-s.side, -s.side + 0.05]), skin(45)),
   ), finish),
   k.compound('overturned_delivery_van_shelving', 40, lying([
     box('upright_rear', 'rack', [-2.2, s.floor, -0.9], [-2.16, 1.9, -0.86]),

@@ -1,22 +1,21 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local w = import 'burnt_out_bus.spec.libsonnet';
+local w = import 'wreck-kit.libsonnet';
 local s = import 'abandoned_army_truck.spec.libsonnet';
 local abs = std.abs;
-local q = w.quantise;
 local box = k.box;
 local fin = s.finish;
 local c = s.cab;
 local b = s.bonnet;
 local between(x, a, e) = x > a && x < e;
 local age(x, y, seed, lowFrom) =
-  0.34 + 0.26 * w.clamp((lowFrom - y) / 0.6, 0, 1) + (w.noise(x, y, seed) - 0.5) * 0.8
+  0.34 + 0.26 * w.clamp((lowFrom - y) / 0.6, 0, 1) + (w.patchNoise(x, y, seed) - 0.5) * 0.8
   + (w.hash(std.floor(x * 8), std.floor(y * 8), seed + 5) - 0.5) * 0.12;
 local xBar(id, slot, a, e, thick, x) =
-  { id: id, kind: 'prism', slot: slot, axis: 'x', profile: w.ccw(w.bar(a, e, thick)), start: x[0], end: x[1] };
+  { id: id, kind: 'prism', slot: slot, axis: 'x', profile: w.ccw(w.barProfile(a, e, thick)), start: x[0], end: x[1] };
 local yBar(id, slot, a, e, thick, y) =
-  { id: id, kind: 'prism', slot: slot, axis: 'y', profile: w.ccw(w.bar(a, e, thick)), start: y[0], end: y[1] };
-local zBar(id, slot, a, e, thick, z) = k.prism(id, slot, w.ccw(w.bar(a, e, thick)), z);
+  { id: id, kind: 'prism', slot: slot, axis: 'y', profile: w.ccw(w.barProfile(a, e, thick)), start: y[0], end: y[1] };
+local zBar(id, slot, a, e, thick, z) = k.prism(id, slot, w.ccw(w.barProfile(a, e, thick)), z);
 local cabWall(sign, seed, opening) = function(x, y)
   local t = age(x, y, seed, 1.5);
   local window = between(x, 0.5, 1.5) && between(y, c.waist, c.roof - 0.1);
@@ -26,7 +25,7 @@ local cabWall(sign, seed, opening) = function(x, y)
   else { slot: s.coat(t), w: [z - 0.03, z + 0.03] };
 local cabRoof(x, z) =
   local t = age(x, z + 3, 71, -9) + 0.04;
-  local dent = q(0.16 * w.smooth(1 - abs(x - 1.0) / 0.7) * w.smooth(1 - abs(z + 0.25) / 0.7), 0.03125);
+  local dent = w.quantise(0.16 * w.smooth(1 - abs(x - 1.0) / 0.7) * w.smooth(1 - abs(z + 0.25) / 0.7), 0.03125);
   if t > 0.76 then null else { slot: s.coat(t), w: [c.roof - 0.06 - dent, c.roof - dent] };
 local cabBack(z, y) =
   local t = age(z, y, 73, 1.5);
@@ -41,10 +40,10 @@ local cabFront(z, y) =
 local floorPlate(x, z) =
   local t = age(x, z, 83, 9);
   if t > 0.86 then null else { slot: if t > 0.6 then 'rustRed' else 'rust', w: [c.floor - 0.06, c.floor] };
-local bonnetTop(x) = q(w.lerp(b.high, b.nose, (x - b.back) / (b.front - b.back)), 0.03125);
+local bonnetTop(x) = w.quantise(w.lerp(b.high, b.nose, (x - b.back) / (b.front - b.back)), 0.03125);
 local bonnetRoof(x, z) =
   local t = age(x, z + 7, 89, -9);
-  local dent = q(0.08 * w.smooth(1 - abs(x - 2.5) / 0.5) * w.smooth(1 - abs(z - 0.2) / 0.3), 0.03125);
+  local dent = w.quantise(0.08 * w.smooth(1 - abs(x - 2.5) / 0.5) * w.smooth(1 - abs(z - 0.2) / 0.3), 0.03125);
   if t > 0.86 then null else { slot: s.coat(t), w: [bonnetTop(x) - 0.05 - dent, bonnetTop(x) - dent] };
 local vent(x, y) = between(y, 1.3, 1.56) && std.mod(y, 0.12) < 0.05 && between(x, 1.9, 2.95);
 local bonnetFar(x, y) =
@@ -68,7 +67,7 @@ local wingEdge(sign, seed) = function(x, y)
   if arch || t > 0.84 then null else { slot: s.coat(t), w: [z - 0.03, z + 0.03] };
 local bumper(z, y) =
   local t = age(z, y, 107, 0.9);
-  local drop = q(w.clamp((z - 0.2) / 0.9, 0, 1) * 0.16, 0.03125);
+  local drop = w.quantise(w.clamp((z - 0.2) / 0.9, 0, 1) * 0.16, 0.03125);
   if y > 1.04 - drop then null else { slot: s.coat(t), w: [s.front - 0.12, s.front] };
 local boards(sign, seed) = function(x, y)
   local t = age(x, y, seed, 1.42);
@@ -83,7 +82,7 @@ local headboard(z, y) =
   else { slot: if t > 0.58 then 'rot' else if t > 0.46 then 'wood' else s.coat(t), w: [s.bed.front - 0.05, s.bed.front] };
 local deckBoards(x, z) =
   local plank = std.floor((z + s.bed.side) / 0.16);
-  local t = 0.34 + (w.noise(x / 1.6, plank * 0.33, 127) - 0.5) * 1.1 + (w.hash(std.floor(x * 3), plank, 131) - 0.5) * 0.16;
+  local t = 0.34 + (w.patchNoise(x / 1.6, plank * 0.33, 127) - 0.5) * 1.1 + (w.hash(std.floor(x * 3), plank, 131) - 0.5) * 0.16;
   if t > 0.6 then null
   else { slot: if t > 0.36 then 'rot' else 'wood', w: [s.deck[0], s.deck[1] - (if t > 0.4 then 0.02 else 0)] };
 local stations = [s.bed.rear + 0.05 + i * (s.bed.front - s.bed.rear - 0.15) / (s.hoop.count - 1) for i in std.range(0, s.hoop.count - 1)];
@@ -108,15 +107,15 @@ local hoop(i) =
     ] else [box(id + '_top', paint, [x, h.peak - 0.03, -h.top], [x1, h.peak + 0.03, h.top])]
   );
 local tatter(sign, seed) = function(x, y)
-  local hang = std.max(0, w.noise(x / 1.1, 3.1, seed) - 0.6) * 2.4;
+  local hang = std.max(0, w.patchNoise(x / 1.1, 3.1, seed) - 0.6) * 2.4;
   local z = sign * (s.bed.side + 0.07);
-  local torn = w.noise(x * 2.2, y * 2.2, seed + 3) > 0.66;
+  local torn = w.patchNoise(x * 2.2, y * 2.2, seed + 3) > 0.66;
   if y < s.hoop.shoulder - hang || torn || hang <= 0 then null
-  else { slot: if w.noise(x, y, seed + 7) > 0.62 then 'rag' else 'canvas', w: [z - 0.012, z + 0.012] };
+  else { slot: if w.patchNoise(x, y, seed + 7) > 0.62 then 'rag' else 'canvas', w: [z - 0.012, z + 0.012] };
 local draped(x, z) =
-  local keep = w.noise(x / 1.1, z / 1.1, 149) > 0.7;
+  local keep = w.patchNoise(x / 1.1, z / 1.1, 149) > 0.7;
   if !keep || abs(z) > s.hoop.top then null
-  else { slot: if w.noise(x, z, 151) > 0.62 then 'rag' else 'canvas', w: [s.hoop.peak + 0.03, s.hoop.peak + 0.05] };
+  else { slot: if w.patchNoise(x, z, 151) > 0.62 then 'rag' else 'canvas', w: [s.hoop.peak + 0.03, s.hoop.peak + 0.05] };
 local seat(id, x, z) = [
   box(id + '_pedestal', 'rust', [x - 0.16, c.floor, z - 0.18], [x + 0.16, c.floor + 0.32, z + 0.18]),
   zBar(id + '_cushion_a', 'iron', [x - 0.22, c.floor + 0.38], [x + 0.24, c.floor + 0.36], 0.04, [z - 0.24, z - 0.2]),
