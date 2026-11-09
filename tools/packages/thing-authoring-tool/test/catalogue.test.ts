@@ -305,7 +305,9 @@ it('refuses a glow whose material the built GLB does not draw', () => {
     'fixture: emissive material',
   );
 });
-const glbJson = (glb: Uint8Array) => {
+type GltfMaterial = { extras: { paintable?: true } };
+type GltfJson = { meshes: { primitives: { material: number; extras: { slot?: string } }[] }[]; materials: GltfMaterial[] };
+const glbJson = (glb: Uint8Array): GltfJson => {
   const view = new DataView(glb.buffer, glb.byteOffset, glb.byteLength);
   return JSON.parse(new TextDecoder().decode(glb.subarray(20, 20 + view.getUint32(12, true))));
 };
@@ -322,8 +324,8 @@ it('marks only the paintable slot\'s material, even when an unmarked slot shares
   const { glb, modelEntry } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
   const json = glbJson(glb);
   const slotMaterials = (slot: string) =>
-    new Set(json.meshes.flatMap(({ primitives }: { primitives: { material: number; extras: { slot?: string } }[] }) =>
-      primitives.filter(({ extras }) => extras.slot === slot).map((primitive) => json.materials[primitive.material])));
+    new Set(json.meshes.flatMap(({ primitives }) =>
+      primitives.filter(({ extras }) => extras.slot === slot).map((primitive) => json.materials[primitive.material]!)));
   const paint = [...slotMaterials('paint')];
   const trim = [...slotMaterials('trim')];
   expect(paint.length).toBeGreaterThan(0);
