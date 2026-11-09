@@ -20,6 +20,8 @@ local claimed = {
     'burnt_out_saloon',
     'burnt_out_van',
     'crashed_hatchback',
+    'crashed_light_helicopter',
+    'crashed_military_helicopter',
     'jackknifed_lorry_cab',
     'overturned_delivery_van',
   ],

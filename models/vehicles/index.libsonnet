@@ -12,6 +12,8 @@
   'convertible': import 'convertible.libsonnet',
   'coupe': import 'coupe.libsonnet',
   'crashed_hatchback': import 'crashed_hatchback.libsonnet',
+  'crashed_light_helicopter': import 'crashed_light_helicopter.libsonnet',
+  'crashed_military_helicopter': import 'crashed_military_helicopter.libsonnet',
   'crew_pickup': import 'crew_pickup.libsonnet',
   'electric_crossover': import 'electric_crossover.libsonnet',
   'estate': import 'estate.libsonnet',

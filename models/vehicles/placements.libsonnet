@@ -12,6 +12,8 @@
   'convertible': import 'convertible.placements.libsonnet',
   'coupe': import 'coupe.placements.libsonnet',
   'crashed_hatchback': import 'crashed_hatchback.placements.libsonnet',
+  'crashed_light_helicopter': import 'crashed_light_helicopter.placements.libsonnet',
+  'crashed_military_helicopter': import 'crashed_military_helicopter.placements.libsonnet',
   'crew_pickup': import 'crew_pickup.placements.libsonnet',
   'electric_crossover': import 'electric_crossover.placements.libsonnet',
   'estate': import 'estate.placements.libsonnet',
