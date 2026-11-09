@@ -116,9 +116,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     box('pedestal', 'dark', [-0.2, 0, -0.16], [0.2, 0.4, 0.16]),
     k.prism('panel', 'dark', [[-0.12, 0.4], [0.2, 0.4], [0.1, 0.72], [-0.12, 0.7]], [-0.75, 0.75]),
   ], { dark: 'plastic-black' }),
-  k.compound('military_transport_helicopter_beacon', 1, [
-    k.turned('lens', 'lens', 'y', k.disc(0.06, 0, 0.1)) + { sides: 8 },
-  ], { lens: 'plastic-red' }),
   k.compound('military_transport_helicopter_landing_lamp', 4, [
     box('housing', 'dark', [-0.12, -0.1, -0.12], [0.12, 0.1, 0.12]),
     box('lens', 'lens', [-0.1, -0.13, -0.1], [0.1, -0.1, 0.1]),

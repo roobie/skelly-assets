@@ -24,10 +24,10 @@ local s = import 'news_helicopter.spec.libsonnet';
     one('rear_bench', 'news_helicopter_rear_bench', [-0.02, s.floor, 0]),
     one('camera_ball', 'news_helicopter_camera_ball', [2.16, 0.32, 0]),
     one('downlink_dome', 'news_helicopter_downlink_dome', [-1.05, 0.68, 0]),
-    one('beacon', 'news_helicopter_beacon', [-5.68, 2.72, 0]),
-    one('landing_lamp', 'news_helicopter_landing_lamp', [2.34, 1.0, 0]),
+    one('beacon', 'helicopter_beacon_red', [-5.68, 2.72, 0]),
+    one('landing_lamp', 'helicopter_landing_lamp', [2.34, 1.0, 0]),
   ]
   + pair('front_door', 'news_helicopter_front_door')
   + pair('rear_door', 'news_helicopter_rear_door')
-  + pair('seat', 'news_helicopter_seat', [1.0, s.floor, 0.32]),
+  + pair('seat', 'helicopter_seat', [1.0, s.floor, 0.32]),
 }

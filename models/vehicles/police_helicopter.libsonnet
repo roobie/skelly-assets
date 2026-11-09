@@ -120,7 +120,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('police_helicopter_beacon', 1, [
     turned('lens', 'lens', 'y', k.disc(0.07, 0, 0.11)) + { sides: 8 },
   ], { lens: 'plastic-blue' }),
-  k.compound('police_helicopter_landing_lamp', 1, [
+  k.compound('helicopter_landing_lamp', 1, [
     box('housing', 'dark', [-0.05, -0.06, -0.12], [0.04, 0.06, 0.12]),
     box('lens', 'lens', [0.04, -0.05, -0.1], [0.07, 0.05, 0.1]),
   ], { dark: trim, lens: 'plastic-frosted' }),
