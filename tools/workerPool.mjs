@@ -5,6 +5,13 @@ import { Worker } from 'node:worker_threads';
 
 const WORKER = new URL('./poolWorker.mjs', import.meta.url);
 
+// A task's failure as poolWorker.mjs, portable, sent it.
+const revived = ({ message, stack, issues, cause }) =>
+  Object.assign(new Error(message, cause === undefined ? undefined : { cause: revived(cause) }), {
+    stack,
+    ...(issues === undefined ? {} : { issues }),
+  });
+
 // `module` is a file URL and `name` the function it exports; tasks and results cross threads by structured clone.
 export function workerPool(module, name, size = availableParallelism()) {
   const queue = [];
@@ -19,16 +26,21 @@ export function workerPool(module, name, size = availableParallelism()) {
       const { resolve, reject } = worker.task;
       worker.task = undefined;
       if (error === undefined) resolve(value);
-      else reject(new Error(error));
+      else reject(revived(error));
       next(worker);
     });
-    // A worker that dies takes only its own task down; the pool replaces it for the rest.
-    worker.on('error', (error) => {
-      workers.delete(worker);
+    // A worker that dies, by a throw outside a task or by exiting, takes only its own task down; the pool replaces it
+    // for the rest. Without this its task would never settle and the build would wait on it forever.
+    const lost = (error) => {
+      if (!workers.delete(worker)) return;
       if (idle.includes(worker)) idle.splice(idle.indexOf(worker), 1);
       worker.task?.reject(error);
       worker.task = undefined;
       if (queue.length > 0 && !closed) next(start());
+    };
+    worker.on('error', lost);
+    worker.on('exit', (code) => {
+      if (!closed) lost(new Error(`a pool worker exited with code ${code}`));
     });
     return worker;
   };
