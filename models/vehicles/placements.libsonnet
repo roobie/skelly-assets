@@ -2,9 +2,11 @@
 {
   'ambulance': import 'ambulance.placements.libsonnet',
   'animal_control_van': import 'animal_control_van.placements.libsonnet',
+  'beach_buggy': import 'beach_buggy.placements.libsonnet',
   'camper_van': import 'camper_van.placements.libsonnet',
   'city_car': import 'city_car.placements.libsonnet',
   'classic_4x4': import 'classic_4x4.placements.libsonnet',
+  'classic_small_car': import 'classic_small_car.placements.libsonnet',
   'convertible': import 'convertible.placements.libsonnet',
   'coupe': import 'coupe.placements.libsonnet',
   'crew_pickup': import 'crew_pickup.placements.libsonnet',
@@ -12,6 +14,7 @@
   'electric_crossover': import 'electric_crossover.placements.libsonnet',
   'estate': import 'estate.placements.libsonnet',
   'food_truck': import 'food_truck.placements.libsonnet',
+  'golf_cart': import 'golf_cart.placements.libsonnet',
   'hearse': import 'hearse.placements.libsonnet',
   'high_roof_van': import 'high_roof_van.placements.libsonnet',
   'ice_cream_van': import 'ice_cream_van.placements.libsonnet',
@@ -23,6 +26,7 @@
   'panel_van': import 'panel_van.placements.libsonnet',
   'police_car': import 'police_car.placements.libsonnet',
   'prisoner_van': import 'prisoner_van.placements.libsonnet',
+  'quad_bike': import 'quad_bike.placements.libsonnet',
   'refrigerated_van': import 'refrigerated_van.placements.libsonnet',
   'riot_van': import 'riot_van.placements.libsonnet',
   'saloon': import 'saloon.placements.libsonnet',
@@ -31,4 +35,5 @@
   'step_van': import 'step_van.placements.libsonnet',
   'suv': import 'suv.placements.libsonnet',
   'taxi': import 'taxi.placements.libsonnet',
+  'utility_4x4': import 'utility_4x4.placements.libsonnet',
 }

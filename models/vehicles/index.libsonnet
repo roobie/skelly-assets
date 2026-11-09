@@ -2,9 +2,11 @@
 {
   'ambulance': import 'ambulance.libsonnet',
   'animal_control_van': import 'animal_control_van.libsonnet',
+  'beach_buggy': import 'beach_buggy.libsonnet',
   'camper_van': import 'camper_van.libsonnet',
   'city_car': import 'city_car.libsonnet',
   'classic_4x4': import 'classic_4x4.libsonnet',
+  'classic_small_car': import 'classic_small_car.libsonnet',
   'convertible': import 'convertible.libsonnet',
   'coupe': import 'coupe.libsonnet',
   'crew_pickup': import 'crew_pickup.libsonnet',
@@ -12,6 +14,7 @@
   'electric_crossover': import 'electric_crossover.libsonnet',
   'estate': import 'estate.libsonnet',
   'food_truck': import 'food_truck.libsonnet',
+  'golf_cart': import 'golf_cart.libsonnet',
   'hearse': import 'hearse.libsonnet',
   'high_roof_van': import 'high_roof_van.libsonnet',
   'ice_cream_van': import 'ice_cream_van.libsonnet',
@@ -23,6 +26,7 @@
   'panel_van': import 'panel_van.libsonnet',
   'police_car': import 'police_car.libsonnet',
   'prisoner_van': import 'prisoner_van.libsonnet',
+  'quad_bike': import 'quad_bike.libsonnet',
   'refrigerated_van': import 'refrigerated_van.libsonnet',
   'riot_van': import 'riot_van.libsonnet',
   'saloon': import 'saloon.libsonnet',
@@ -32,4 +36,5 @@
   'step_van': import 'step_van.libsonnet',
   'suv': import 'suv.libsonnet',
   'taxi': import 'taxi.libsonnet',
+  'utility_4x4': import 'utility_4x4.libsonnet',
 }
