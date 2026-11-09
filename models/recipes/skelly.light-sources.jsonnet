@@ -1,6 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
-local owned = std.set(['torch', 'candle', 'oil_lamp', 'lighter', 'matches', 'everburning_torch']);
+local catalogue = import 'models/catalogue/packs.libsonnet';
+local owned = std.setUnion(std.set(['torch', 'candle', 'oil_lamp', 'lighter', 'matches']), catalogue.ids('skelly.light-sources'));
 taxonomy.inherit({ category: 'lighting' }, [
   {
     id: row.id,

@@ -1,9 +1,9 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local catalogue = import 'models/catalogue/packs.libsonnet';
 // Hand-held items take the gun grain, so a long thin shape keeps its taper, hook and edge.
 local gunGrained = std.set(['baseball_bat', 'kabar', 'machete', 'steel_pipe']);
-// The poles are long enough that the item grain keeps their shape; the kite and tower shields name their own grain.
-local owned = std.setUnion(std.set(['pike_pole', 'long_pole', 'kite_shield', 'tower_shield']), gunGrained);
+local owned = std.setUnion(catalogue.ids('skelly.melee'), gunGrained);
 // Every row is a weapon unless its catalogue row names another shelf, as the shields do.
 taxonomy.inherit({ category: 'weapons' }, [
   {
