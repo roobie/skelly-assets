@@ -3,3 +3,4 @@ _site/
 tools/.build/
 models/recipes/*.json
 built/
+look/

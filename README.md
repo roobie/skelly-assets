@@ -1,6 +1,7 @@
 ---
 read_if:
   - adding a model, choosing its content pack or consuming shared assets
+  - which way a model faces, or whether a consumer converts its axes
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
   - adding or applying the catalogue's item drafts
@@ -88,6 +89,9 @@ The no-id production run of `tools/build.mjs` is the roster and recipe entry poi
 its pack, with the owning tool's metadata and, for things, an index for consumer admission. Cue the output
 contract rather than maintaining a second file list: `tools/build.mjs`, `exportRecipes` and
 `PRODUCTION_RECIPE_TOOLS`, and `tools/packages/thing-export/src/files.ts`, `writeRecipeExports`.
+
+Every model is authored in Deadvox's frame, so a consumer imports it without converting axes; why, and the frame, is
+in `docs/decisions/0002-deadvox-model-frame.md`.
 
 Generated actors have a GLB plus a body and pose clips, not a second consumer-specific bake; see
 `tools/layout.mjs`, `readMobRows`, and `tools/actorBake.mjs`, `bakeActor`. Every consumer reads the body and pose
