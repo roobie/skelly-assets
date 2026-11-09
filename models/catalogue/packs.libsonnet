@@ -28,15 +28,23 @@ local byCategory = {
   'weapon-parts': 'skelly.firearms',
   weapons: 'skelly.melee',
 };
-// Shields are armour, but a game hands them out with the melee weapons they are carried with.
+// Holsters, sheaths and slings are weapon parts, but they are worn, so a game dresses a body from the same pack.
+local wornIn = {
+  'weapon-parts': 'skelly.wearables',
+};
+// Shields are armour, but a game hands them out with the melee weapons they are carried with. Fuzes arm explosives,
+// not guns.
 local placed = {
   'skelly.melee': ['kite_shield', 'tower_shield'],
+  'skelly.explosives': ['delay_fuze', 'impact_fuze'],
 };
 local placedIn = { [id]: pack for pack in std.objectFields(placed) for id in placed[pack] };
 local packOf(row) =
   assert std.objectHas(row, 'taxonomy') && std.objectHas(row.taxonomy, 'category') : 'catalogue row %s has no category' % row.id;
-  assert std.objectHas(byCategory, row.taxonomy.category) : 'no pack takes category %s (row %s)' % [row.taxonomy.category, row.id];
-  std.get(placedIn, row.id, byCategory[row.taxonomy.category]);
+  local category = row.taxonomy.category;
+  assert std.objectHas(byCategory, category) : 'no pack takes category %s (row %s)' % [category, row.id];
+  local worn = std.objectHas(wornIn, category) && std.objectHas(std.get(row.taxonomy, 'tags', {}), 'slot');
+  std.get(placedIn, row.id, if worn then wornIn[category] else byCategory[category]);
 {
   // Each catalogue row's id and the pack that exports it.
   packs:: { [row.id]: packOf(row) for row in rows },
