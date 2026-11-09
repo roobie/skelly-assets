@@ -1,16 +1,20 @@
-// Usage: node tools/mobs.mjs [--out dir] [mobId ...]. With no ids it builds every models/mobs.json row.
-// Every row is baked as an actor pose: GLB, body and clips files live at their logical paths under the row's pack.
-import { mkdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+// Usage: node tools/mobs.mjs [--out dir] [--cache dir | --no-cache] [mobId ...], or node tools/mobs.mjs --shard i/n
+// [--cache dir] to only fill the cache with one shard of the mob rows. With no ids it builds every models/mobs.json row.
+// Every row is baked as an actor pose: GLB, body and clips files live at their logical paths under the row's pack. The
+// cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
+import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
-import { readMobRows } from './layout.mjs';
+import { outputPath, readMobRows } from './layout.mjs';
+import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
 await installJsonnetSources();
+const { codeFingerprint, entryStore, pruneEntries } = await import('./packages/thing-export/src/cache.ts');
 const src = (path) => `./packages/mobgen/src/${path}`;
 const { generate, generateValid, realize, realizeLod } = await import(src('core/generate.ts'));
 const { bakeActor } = await import('./actorBake.mjs');
@@ -41,7 +45,7 @@ function deriveTemplate(base, row) {
   return derived;
 }
 
-export function exportMob(row, out) {
+const bakeMob = (row) => {
   const template = deriveTemplate(consumableTemplate(row.template), row);
   const found = generateValid(template, row.seed, { maxAttempts: 1 });
   if (!found) {
@@ -49,15 +53,46 @@ export function exportMob(row, out) {
     throw new Error(`seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`);
   }
   const realized = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor).realized : found.realized;
-  return bakeActor(row, template, { ...found, realized }, out);
+  return bakeActor(row, template, { ...found, realized });
+};
+
+// A mob's files are fixed by its resolved row and the code that bakes it: mobgen with the data it imports, and the
+// actor modules here. Every module of this folder counts, since naming them one by one would miss a new one, and an
+// edit to another costs only a rebake of the mobs.
+const MOB_FILES = ['body', 'clips', 'glb'];
+export const mobStore = (cache) => {
+  const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
+  return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src']));
+};
+
+// Bakes the row, or takes its files from the store, and writes each where its row field places it; returns the store
+// entry when there is one.
+export function exportMob(row, out, store) {
+  const { files, ...entry } = store ? store.entry(MOB_FILES, row, () => bakeMob(row)) : { files: bakeMob(row) };
+  for (const role of MOB_FILES) {
+    const path = join(out, outputPath(row.pack, row[role]));
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, files[role]);
+  }
+  return store ? entry : undefined;
 }
+
+const reportCache = (reused, total) => console.log(`mob cache: ${reused} mob(s) reused, ${total - reused} baked`);
 
 function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { out: { type: 'string', default: join(repo, 'built') } },
+    options: { out: { type: 'string', default: join(repo, 'built') }, ...CACHE_OPTIONS, shard: { type: 'string' } },
   });
   const rows = readMobRows(repo);
+  const cache = cacheFolder(values);
+  const store = cache && mobStore(cache);
+  if (values.shard !== undefined) {
+    if (store === undefined || positionals.length > 0) throw new Error('--shard fills a cache and takes no ids');
+    const shard = shardUnits(rows, parseShard(values.shard));
+    reportCache(shard.filter((row) => store.entry(MOB_FILES, row, () => bakeMob(row)).reused).length, shard.length);
+    return 0;
+  }
   const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
   const unknown = wanted.filter((id) => !rows.some((row) => row.id === id));
   if (unknown.length > 0) {
@@ -67,14 +102,21 @@ function main() {
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   let failed = false;
+  const used = new Set();
+  let reused = 0;
   for (const id of wanted) {
     try {
-      exportMob(rows.find((row) => row.id === id), out);
+      const entry = exportMob(rows.find((row) => row.id === id), out, store);
+      if (entry) used.add(entry.key);
+      if (entry?.reused) reused += 1;
     } catch (error) {
       console.log(`EXPORT FAILED ${id}: ${error.message}`);
       failed = true;
     }
   }
+  // Only a run over every row may prune, so the store keeps exactly what the next complete build reuses.
+  if (store && positionals.length === 0 && !failed) pruneEntries(join(cache, 'mob'), used);
+  reportCache(reused, wanted.length);
   return failed ? 1 : 0;
 }
 

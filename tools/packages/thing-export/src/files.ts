@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { NeutralModel } from '@skelly/thing-core/schema';
-import type { ExportCache } from './cache.ts';
+import type { CachedExport, ExportCache } from './cache.ts';
 import type { ModelExport, RecipeExport } from './recipe.ts';
 
 // Serialised in-process: a formatter subprocess per model cost more than generating most models.
@@ -19,14 +19,19 @@ export interface WrittenRecipe {
   }[];
   readonly files: readonly string[];
 }
-/** One generated recipe row: plain data, so a worker thread can generate it and hand it back to be written. */
+/**
+ * One generated recipe row: plain data, so a worker thread can generate it and hand it back to be written. A cached
+ * row carries its cache entry, so the build can count what it reused and keep exactly the entries it used.
+ */
 export interface GeneratedModel extends ModelExport {
   readonly id: string;
   readonly kind: string;
+  readonly entry?: CachedExport['entry'];
 }
 export const generateModel = (row: RecipeExport, cache?: ExportCache): GeneratedModel => {
-  const { modelEntry, glb, partNodes } = cache ? cache.export(row) : row.generate();
-  return { id: row.id, kind: row.kind, modelEntry, glb, partNodes };
+  const { model, entry } = cache ? cache.export(row) : { model: row.generate() };
+  const { modelEntry, glb, partNodes } = model;
+  return { id: row.id, kind: row.kind, modelEntry, glb, partNodes, ...(entry === undefined ? {} : { entry }) };
 };
 
 /** Writes generated rows in the given order, so the files do not depend on which row finished first. */

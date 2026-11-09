@@ -50,7 +50,7 @@ function main() {
   const { values } = parseArgs({ options: { fresh: { type: 'string', multiple: true, default: [] } } });
   const temporary = values.fresh.length === 0 ? mkdtempSync(join(tmpdir(), 'skelly-assets-built-')) : undefined;
   try {
-    if (temporary) buildAll(temporary);
+    if (temporary) buildAll(temporary, { cache: undefined });
     const trees = temporary ? [temporary] : values.fresh.map((tree) => resolve(tree));
     for (const tree of trees) if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
     const differences = freshDifferences(trees);

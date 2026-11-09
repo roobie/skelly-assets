@@ -895,3 +895,24 @@ test('pose interpolation uses shortest-arc spherical quaternion interpolation an
   const posed = boneTransforms(bones, decodeFrame(sample)).get('chest');
   assert.deepEqual(posed.t, sample.root);
 });
+
+test('a mob served from the cache writes the bytes a fresh bake does, without baking again', async () => {
+  const { mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { exportMob, mobStore } = await import('../mobs.mjs');
+  const { readMobRows } = await import('../layout.mjs');
+  const { treeMismatches } = await import('../check-built.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'actor-cache-'));
+  try {
+    const [row] = readMobRows();
+    const store = mobStore(join(root, 'cache'));
+    const first = exportMob(row, join(root, 'stored'), store);
+    const again = exportMob(row, join(root, 'served'), store);
+    exportMob(row, join(root, 'fresh'));
+    assert.deepEqual([first.reused, again.reused, again.key], [false, true, first.key]);
+    assert.deepEqual(treeMismatches(join(root, 'fresh'), join(root, 'served')), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

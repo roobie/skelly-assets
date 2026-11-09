@@ -1,10 +1,7 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
 import { meshBones } from './packages/mobgen/src/core/mesh.ts';
 import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
 import { crowdEmission } from './packages/mobgen/src/mob/crowd.ts';
 import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
-import { outputPath } from './layout.mjs';
 import { actorBody } from './actorBody.mjs';
 import { fileBody, fileClips, turnCellIndex, turnPointArray } from './actorFrame.mjs';
 import { figureFor } from './actorFigure.mjs';
@@ -80,8 +77,11 @@ function actorGlb(row, realized, meshes) {
   return Buffer.concat([header, chunk(js.length, 0x4e4f534a), js, chunk(bin.length, 0x004e4942), bin]);
 }
 
-/** Every file is in the model frame (tools/actorFrame.mjs); positions stay unscaled and rotations local. */
-export function bakeActor(row, template, generated, out) {
+/**
+ * The actor's files by role, `body`, `clips` and `glb`, which the row's fields of those names place. Every file is in
+ * the model frame (tools/actorFrame.mjs); positions stay unscaled and rotations local.
+ */
+export function bakeActor(row, template, generated) {
   const emitClips = clipEmitters[template.bodyPlan];
   if (!emitClips) throw new Error(`unsupported actor body plan ${template.bodyPlan}`);
   for (const field of ['glb', 'body', 'clips']) if (typeof row[field] !== 'string' || !row[field]) throw new Error(`pose row requires ${field}`);
@@ -91,10 +91,5 @@ export function bakeActor(row, template, generated, out) {
   const clips = fileClips(emitClips(figure, template, row));
   const fused = template.bodyPlan === 'fused-mass';
   const meshes = fused ? meshBones(generated.realized.voxels, body.bones.length, { perCell: true }) : generated.realized.meshes;
-  const outputs = [[row.body, JSON.stringify(body)], [row.clips, JSON.stringify(clips)], [row.glb, actorGlb({ ...row, fused }, generated.realized, meshes)]];
-  for (const [file, bytes] of outputs) {
-    const path = join(out, outputPath(row.pack, file));
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, bytes);
-  }
+  return { body: JSON.stringify(body), clips: JSON.stringify(clips), glb: actorGlb({ ...row, fused }, generated.realized, meshes) };
 }
