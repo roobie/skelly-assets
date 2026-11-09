@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import { addedNotes, NOTES_DIR, parseNote, readNotes, release, versionSection } from '../changelog.mjs';
 
 const note = (type, body) => `---\ntype: ${type}\n---\n${body}\n`;
+const breaking = (change, upgrade) => note('breaking', `${change}\n\nUpgrade:\n${upgrade}`);
 
 function withRoot(run) {
   const root = mkdtempSync(join(tmpdir(), 'changelog-'));
@@ -29,7 +30,19 @@ test('a note is refused without a known type, with a stray field or with an empt
   assert.throws(() => parseNote('---\ntype: added\ntpye: fixed\n---\nA line.\n', 'a.md'), /unknown field "tpye"/);
   assert.throws(() => parseNote(note('added', '  '), 'a.md'), /empty body/);
   assert.throws(() => parseNote('A line.\n', 'a.md'), /front matter/);
-  assert.deepEqual(parseNote(note('fixed', 'A line.'), 'a.md'), { file: 'a.md', type: 'fixed', body: 'A line.' });
+  assert.deepEqual(parseNote(note('fixed', 'A line.'), 'a.md'), { file: 'a.md', type: 'fixed', change: 'A line.' });
+});
+
+test('a breaking note must say what a consumer does, and only a breaking note has an upgrade block', () => {
+  assert.throws(() => parseNote(note('breaking', 'Renamed a thing.'), 'a.md'), /needs an "Upgrade:" line/);
+  assert.throws(() => parseNote(breaking('Renamed a thing.', ''), 'a.md'), /needs an "Upgrade:" line/);
+  assert.throws(() => parseNote(note('added', 'A thing.\n\nUpgrade:\n- Do it.'), 'a.md'), /only a breaking note/);
+  assert.deepEqual(parseNote(breaking('Renamed a thing.', '- Rename it.'), 'a.md'), {
+    file: 'a.md',
+    type: 'breaking',
+    change: 'Renamed a thing.',
+    upgrade: '- Rename it.',
+  });
 });
 
 test('reading the notes names every invalid note, not only the first, and skips the guide', () => {
@@ -46,15 +59,17 @@ test('a release groups its notes by type, breaking first, above the newest secti
     writeNotes(root, {
       'README.md': '# guide\n',
       'a.md': note('fixed', 'Fixed a thing.'),
-      'b.md': note('breaking', 'Renamed a thing.\nRename your references.'),
+      'b.md': breaking('Renamed a thing.\nIt reads better.', '- Rename your references.\n- Rebuild.'),
       'c.md': note('added', 'Added a thing.'),
+      'd.md': breaking('Moved a thing.', 'Read it from its new path.'),
     });
     release(root, 'v0.2.0', '2000-02-02');
     const changelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8');
     assert.ok(changelog.startsWith(`${preamble}## 0.2.0 - 2000-02-02\n`));
     const groups = versionSection(changelog, '0.2.0');
-    assert.deepEqual(groups.match(/^### \w+/gm), ['### Breaking', '### Added', '### Fixed']);
-    assert.match(groups, /- Renamed a thing\.\n {2}Rename your references\./);
+    assert.deepEqual(groups.match(/^### .+/gm), ['### Breaking', '### Upgrading from 0.1.0', '### Added', '### Fixed']);
+    assert.match(groups, /### Breaking\n\n- Renamed a thing\.\n {2}It reads better\.\n- Moved a thing\.\n/);
+    assert.match(groups, /### Upgrading from 0\.1\.0\n\n- Rename your references\.\n- Rebuild\.\n- Read it from its new path\.\n/);
     assert.doesNotMatch(groups, /Old\./);
     assert.equal(versionSection(changelog, 'v0.1.0'), '### Added\n\n- Old.\n');
     assert.ok(!existsSync(join(root, NOTES_DIR, 'a.md')) && existsSync(join(root, NOTES_DIR, 'README.md')));

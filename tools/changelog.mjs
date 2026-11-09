@@ -21,7 +21,10 @@ export const TYPES = ['breaking', 'added', 'changed', 'fixed', 'removed'];
 const HEADINGS = { breaking: 'Breaking', added: 'Added', changed: 'Changed', fixed: 'Fixed', removed: 'Removed' };
 
 const FRONT_MATTER = /^---\n((?:.*\n)*?)---\n([\s\S]*)$/;
+// A breaking note's what-to-do follows this line, so the release can gather every step a consumer takes in one list.
+const UPGRADE = /^Upgrade:[ \t]*$/m;
 
+const plainVersion = (version) => version.replace(/^v/, '');
 const isNote = (name) => name.endsWith('.md') && name !== GUIDE;
 
 /** Parses one note; throws with every problem it has, named by the note's file. */
@@ -38,11 +41,22 @@ export function parseNote(text, file) {
   }
   if (!fields.type) problems.push(`missing type, one of: ${TYPES.join(', ')}`);
   else if (!TYPES.includes(fields.type)) problems.push(`unknown type "${fields.type}", one of: ${TYPES.join(', ')}`);
-  const body = match[2].trim();
-  if (!body) problems.push('empty body');
+  const [change, upgrade] = splitUpgrade(match[2]);
+  if (!change) problems.push('empty body');
+  if (fields.type === 'breaking' && !upgrade) problems.push('a breaking note needs an "Upgrade:" line followed by what a consumer must do');
+  if (fields.type !== 'breaking' && upgrade !== undefined) problems.push('only a breaking note has an "Upgrade:" block');
   if (problems.length) throw new Error(`${file}: ${problems.join('; ')}`);
-  return { file, type: fields.type, body };
+  return upgrade === undefined ? { file, type: fields.type, change } : { file, type: fields.type, change, upgrade };
 }
+
+function splitUpgrade(body) {
+  const marker = UPGRADE.exec(body);
+  if (!marker) return [body.trim(), undefined];
+  return [body.slice(0, marker.index).trim(), body.slice(marker.index + marker[0].length).trim()];
+}
+
+// A block that is already a list keeps its items; prose becomes one item.
+const listItems = (block) => (block.startsWith('- ') ? block : `- ${block.split('\n').join('\n  ')}`);
 
 /** Reads every pending note in `dir`, ordered by file name; throws listing every invalid note. */
 export function readNotes(dir) {
@@ -60,23 +74,35 @@ export function readNotes(dir) {
   return notes;
 }
 
-/** Renders notes grouped by type, breaking first, as `### <Group>` lists. */
-export function renderGroups(notes) {
-  return TYPES.filter((type) => notes.some((note) => note.type === type))
-    .map((type) => {
-      const items = notes.filter((note) => note.type === type).map((note) => `- ${note.body.split('\n').join('\n  ')}`);
-      return `### ${HEADINGS[type]}\n\n${items.join('\n')}\n`;
-    })
-    .join('\n');
+/**
+ * Renders notes grouped by type as `### <Group>` lists: breaking first, then every upgrade step since `previous`
+ * (the version a consumer moves from, if any), then the other types.
+ */
+export function renderGroups(notes, previous) {
+  const group = (heading, items) => `### ${heading}\n\n${items.join('\n')}\n`;
+  const ofType = (type) => notes.filter((note) => note.type === type);
+  const groups = [];
+  for (const type of TYPES) {
+    if (!ofType(type).length) continue;
+    groups.push(group(HEADINGS[type], ofType(type).map((note) => listItems(note.change))));
+    if (type === 'breaking') {
+      groups.push(group(previous ? `Upgrading from ${plainVersion(previous)}` : 'Upgrading', ofType(type).map((note) => listItems(note.upgrade))));
+    }
+  }
+  return groups.join('\n');
 }
 
-const plainVersion = (version) => version.replace(/^v/, '');
+/** The newest version in the changelog, the one a consumer upgrades from. */
+export function newestVersion(changelog) {
+  return /^## (\S+)/m.exec(changelog)?.[1];
+}
+
 const sectionStart = (version) => new RegExp(`^## ${plainVersion(version).replaceAll('.', '\\.')}(?= |$)`, 'm');
 
 /** Inserts the version's section above the newest one, keeping the file's front matter and preamble. */
 export function addSection(changelog, version, date, notes) {
   if (sectionStart(version).test(changelog)) throw new Error(`${CHANGELOG} already has a section for ${plainVersion(version)}`);
-  const section = `## ${plainVersion(version)} - ${date}\n\n${renderGroups(notes)}\n`;
+  const section = `## ${plainVersion(version)} - ${date}\n\n${renderGroups(notes, newestVersion(changelog))}\n`;
   const newest = changelog.search(/^## /m);
   return newest < 0 ? `${changelog.trimEnd()}\n\n${section.trimEnd()}\n` : changelog.slice(0, newest) + section + changelog.slice(newest);
 }
@@ -130,7 +156,7 @@ function main([command, arg]) {
       return;
     }
     case 'unreleased':
-      process.stdout.write(renderGroups(readNotes(notesDir)));
+      process.stdout.write(renderGroups(readNotes(notesDir), newestVersion(readFileSync(join(ROOT, CHANGELOG), 'utf8'))));
       return;
     case 'release': {
       if (!arg) throw new Error('usage: release <version>');

@@ -14,14 +14,21 @@ would. Notes generated from PR titles or commits would say how the code changed,
 ## A note
 
 Name the file `changes/<short-slug>.md`. Its front matter holds only a `type`: `breaking`, `added`, `changed`,
-`fixed` or `removed`. The body is one or two lines for a consumer: what changed for them, and for a breaking
-change, what they must do.
+`fixed` or `removed`. The body is one or two lines for a consumer: what changed for them.
+
+A breaking note also says what a consumer must do, after a line `Upgrade:`. A consumer moves its pin over one or
+more releases in a single commit, with the changes the new assets need, so each release gathers its notes' steps
+into one "Upgrading from" list rather than leaving them to be dug out of the changes. A renamed id needs no step of
+its own beyond applying the release's `renames.json`, which maps every retired id to its current one.
 
 ```md
 ---
-type: fixed
+type: breaking
 ---
-The kettle's spout no longer floats beside its body.
+The kettle's spout is a separate model, `kettle_spout`.
+
+Upgrade:
+- Place `kettle_spout` wherever you place `kettle`.
 ```
 
 A PR that changes nothing a consumer or a builder notices, such as a CI or test change, carries the
