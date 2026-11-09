@@ -34,7 +34,7 @@ local equipment(id, family, massKg, dimensions, finish, heldSolid, turn=[0, 0, 0
       strap_back_inner: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 0] },
       strap_back_outer: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 1] },
     },
-  },
+  } + { taxonomy: { category: 'lighting' } },
   equipment('weapon_sling', 'webbingSling', 0.150, {
     foldedLength: 0.290, width: 0.028, thickness: 0.003,
     buckleWidth: 0.026, buckleDepth: 0.036, buckleWall: 0.004,

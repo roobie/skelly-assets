@@ -62,5 +62,5 @@ local tray(w, d, ht, t) = [
   ], { handle: 'wood-birch', head: 'bronze', wrap: 'skin-rawhide' }) + {
     handling: h.gripOn('hammer_bronze', 'handle'),
     voxelGrain: 0.002,
-  },
+  } + { taxonomy: { tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 ]

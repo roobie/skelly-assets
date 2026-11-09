@@ -99,5 +99,5 @@ local chainsaw(engine) =
     wrap('lash-a', 0.462, 0.0185, 0.022),
     wrap('lash-b', 0.538, 0.0185, 0.018),
   ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' })
-  + { handling: h.gripOn('primitive_axe', 'grip'), voxelGrain: 0.004 },
+  + { handling: h.gripOn('primitive_axe', 'grip'), voxelGrain: 0.004 } + { taxonomy: { tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
 ]

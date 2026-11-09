@@ -31,7 +31,7 @@ local forkPieces(t) = [
     box('side-a', 'wood', [0.155, 0, -0.125], [0.185, 0.02, -0.03]),
     box('side-b', 'wood', [0.155, 0, 0.03], [0.185, 0.02, 0.125]),
   ], { wood: 'wood-birch' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood'] } } },
 
   // An enamelled cast-iron pot 210 mm across and 120 mm tall with a lug handle at each side, black outside and
   // cream enamel inside; 250 mm over the lugs.
@@ -41,5 +41,5 @@ local forkPieces(t) = [
     box('lug-a', 'iron', [-0.125, 0.09, -0.03], [-0.1, 0.106, 0.03]),
     box('lug-b', 'iron', [0.1, 0.09, -0.03], [0.125, 0.106, 0.03]),
   ], { iron: 'iron-cast', enamel: 'paint-cream' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 ]
