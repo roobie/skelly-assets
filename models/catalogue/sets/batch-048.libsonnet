@@ -46,8 +46,7 @@ local heatPack(used) =
     box('plug', 'plug', [-0.1, 0.02, -0.012], [-0.075, 0.04, 0.012]),
     box('pin-a', 'pin', [-0.106, 0.026, -0.008], [-0.1, 0.034, -0.006]),
     box('pin-b', 'pin', [-0.106, 0.026, 0.006], [-0.1, 0.034, 0.008]),
-  ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + {
-    handling: h.gripOn('electric_carving_knife', 'handle'),
+  ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + h.gripOn('electric_carving_knife', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 

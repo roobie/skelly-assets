@@ -4,7 +4,7 @@ local atom(id, family, massKg, dimensions, finish, solid='body', taxonomy=null) 
   exportMass: 'parts',
   parts: [{ id: id, family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
   connections: [],
-  handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+  handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
 } + (if taxonomy == null then {} else { taxonomy: taxonomy });
 local garment(id, massKg, style, body, trim, dimensions, taxonomy) = atom(
   id,

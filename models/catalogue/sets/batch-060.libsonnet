@@ -49,8 +49,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     torchBody('bezel', 'bezel', [[0.096, 0.013], [0.1, 0.013]]),
     turned('lens', 'lens', 'x', [[0, 0], [0, 0.01], [0.0012, 0.01], [0.0012, 0]], [0.1, 0, 0]),
     box('lanyard', 'cap', [0.001, -0.004, -0.0125], [0.008, 0.004, -0.010]),
-  ], { body: 'alu-anodized-black', grip: 'alu-bare', cap: 'plastic-black', seal: 'plastic-orange', bezel: 'alu-bare', lens: 'glass-clear' }) + {
-    handling: h.gripOn('mini_diving_flashlight', 'tube'),
+  ], { body: 'alu-anodized-black', grip: 'alu-bare', cap: 'plastic-black', seal: 'plastic-orange', bezel: 'alu-bare', lens: 'glass-clear' }) + h.gripOn('mini_diving_flashlight', 'tube') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
@@ -66,8 +65,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     turned('lens', 'lens', 'x', [[0, 0], [0, 0.02], [0.0015, 0.02], [0.0015, 0]], [0.13, 0, 0]),
     box('lug', 'cap', [0.03, -0.026, -0.006], [0.07, -0.016, 0.006]),
     box('mark', 'collar', [0.086, 0.019, -0.002], [0.09, 0.023, 0.002]),
-  ], { body: 'plastic-yellow', grip: 'rubber-black', cap: 'plastic-black', collar: 'plastic-charcoal', lens: 'glass-clear' }) + {
-    handling: h.gripOn('variable_diving_flashlight', 'barrel'),
+  ], { body: 'plastic-yellow', grip: 'rubber-black', cap: 'plastic-black', collar: 'plastic-charcoal', lens: 'glass-clear' }) + h.gripOn('variable_diving_flashlight', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
@@ -119,8 +117,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     torchBody('band', 'label', [[0.12, 0.0143], [0.18, 0.0143]]),
     torchBody('cap', 'cap', [[0.262, 0.0155], [0.3, 0.0155]]),
     torchBody('striker', 'striker', [[0.3, 0.012], [0.302, 0.012]]),
-  ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + {
-    handling: h.gripOn('road_flare', 'plug'),
+  ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + h.gripOn('road_flare', 'plug') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['paper', 'plastic'], setting: ['modern'] } } },
 

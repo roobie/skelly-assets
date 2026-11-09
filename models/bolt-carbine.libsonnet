@@ -3,7 +3,8 @@ local box = h.box;
 
 // An oversized bolt carbine, about 0.84 m long and deep for its length: a slab receiver, an armoured barrel shroud
 // nearly as deep as the receiver, a fat barrel ending in a slotted muzzle brake, a deep box magazine of rocket bolts
-// ahead of the grip and a stubby butt. The muzzle is at +x and the side view shows its profile.
+// ahead of the grip and a stubby butt. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's
+// muzzle faces +z; the side view shows its profile.
 
 local w = 0.055;  // half the receiver's width
 local barrelY = 0.245;
@@ -62,9 +63,8 @@ local barrelY = 0.245;
     vent: 'rubber-black',
     grip: 'rubber-black',
     round: 'brass',
-  }) + {
+  }) + h.gripOn('bolt_carbine', 'grip') + {
     taxonomy: { category: 'weapons', tags: { weapon: ['rifle'], setting: ['sci-fi'] } },
-    handling: h.gripOn('bolt_carbine', 'grip'),
     voxelGrain: 0.004,
   },
 ]

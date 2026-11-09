@@ -409,7 +409,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     for i in std.range(0, 4)
     for x in [-0.025 + 0.013 * i]
   ], { grip: 'plastic-matte-black', body: 'alu-bare', core: 'crystal-glow-blue', coil: 'copper', button: 'plastic-red' })
-  + { voxelGrain: 0.002 } + { handling: h.gripOn('teleporter', 'grip') } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
+  + { voxelGrain: 0.002 } + h.gripOn('teleporter', 'grip') + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
   // A belt-driven rotary vacuum pump 480 mm long, 230 mm wide and 300 mm tall on a steel base plate: an electric
   // motor with a cooling fan cover, a cast pump block with an oil sight glass and inlet port, and a belt guard

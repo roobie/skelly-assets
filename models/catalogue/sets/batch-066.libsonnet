@@ -30,8 +30,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('cap-ring', 'cap', [[0.034, 0.0124], [0.038, 0.0124]]),
     box('clip', 'cap', [0.036, 0.011, -0.003], [0.064, 0.016, 0.003]),
     box('clip-tip', 'cap', [0.012, 0.014, -0.003], [0.036, 0.016, 0.003]),
-  ], { body: 'plastic-grey', label: 'paper-white', cap: 'plastic-black' }) + {
-    handling: h.gripOn('permanent_marker', 'barrel'),
+  ], { body: 'plastic-grey', label: 'paper-white', cap: 'plastic-black' }) + h.gripOn('permanent_marker', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -72,8 +71,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('shaft', 'shaft', [[-0.166, 0.006], [0.25, 0.003], [0.262, 0.0025]]),
     alongX('keeper', 'grip', [[0.25, 0.0042], [0.262, 0.0042]]),
     box('popper', 'popper', [0.256, -0.015, -0.002], [0.3, 0.015, 0.002]),
-  ], { grip: 'leather-black', shaft: 'plastic-black', popper: 'leather-brown' }) + {
-    handling: h.gripOn('riding_crop', 'grip'),
+  ], { grip: 'leather-black', shaft: 'plastic-black', popper: 'leather-brown' }) + h.gripOn('riding_crop', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'rubber'] } } },
 
@@ -226,8 +224,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('wrap', 'rag', [[-0.046, 0.0075], [-0.002, 0.0075]]),
     alongX('tie', 'tie', [[-0.034, 0.0085], [-0.03, 0.0085]]),
     alongX('tie-b', 'tie', [[-0.012, 0.0085], [-0.008, 0.0085]]),
-  ], { charcoal: 'coal-black', rag: 'cloth-rag', tie: 'cord-cotton' }) + {
-    handling: h.gripOn('charcoal_stick', 'wrap'),
+  ], { charcoal: 'coal-black', rag: 'cloth-rag', tie: 'cord-cotton' }) + h.gripOn('charcoal_stick', 'wrap') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
 
@@ -243,8 +240,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('tape-tip', 'tape', [[0.168, 0.0235], [0.186, 0.0235]]),
     alongX('lens', 'lens', [[0.186, 0.018], [0.19, 0.018]]),
     alongX('eye-lens', 'lens', [[-0.192, 0.008], [-0.19, 0.008]]),
-  ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + {
-    handling: h.gripOn('homemade_telescope', 'tube-outer'),
+  ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + h.gripOn('homemade_telescope', 'tube-outer') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 

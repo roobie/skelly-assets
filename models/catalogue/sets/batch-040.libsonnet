@@ -50,9 +50,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     h.box('ferrule', 'ferrule', [1.0, -0.024, -0.038], [1.035, 0.024, 0.038]),
     h.box('stitch-a', 'stitch', [1.09, -0.025, -0.067], [1.1, 0.025, 0.067]),
     h.box('stitch-b', 'stitch', [1.15, -0.025, -0.084], [1.16, 0.025, 0.084]),
-  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + {
-    handling: h.gripOn('broom', 'handle'),
-  } + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] } } },
+  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + h.gripOn('broom', 'handle') + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] } } },
   // A single down-filled mattress, 1.9 m by 0.9 m and 0.18 m deep, quilted in puffed channels across its width.
   h.compound('down_mattress', 4.7,
     mattress(0.17)
@@ -117,8 +115,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     for s in [-1, 1]
     for x in [0.1 + i * 0.012]
     for r in [0.008 - (x - 0.062) * 0.003 / 0.06]
-  ], { flesh: 'flesh-membrane', sheath: 'chitin-brown', lance: 'chitin-black' }) + {
-    handling: h.gripOn('wasp_stinger', 'sheath'),
+  ], { flesh: 'flesh-membrane', sheath: 'chitin-brown', lance: 'chitin-black' }) + h.gripOn('wasp_stinger', 'sheath') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
   // A broken block of paraffin wax about 100 by 60 by 45 mm.

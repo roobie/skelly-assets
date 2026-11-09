@@ -71,14 +71,12 @@ local blade(a, r0, r1) =
   ingot('aluminium_ingot', 0.22, 0.08, 0.035, 0.034, 0.004, 0.002, 'alu-bare') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A 600 mm length of 22 mm copper water tube with a 1 mm wall.
-  pipe('copper_tube', 0.35, 0.6, 0.011, 0.0012, 'copper', null) + {
-    handling: h.gripOn('copper_tube', 'pipe'),
+  pipe('copper_tube', 0.35, 0.6, 0.011, 0.0012, 'copper', null) + h.gripOn('copper_tube', 'pipe') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A 600 mm length of half-inch steel pipe, 21 mm across with a 2.6 mm wall, threaded at both ends.
-  pipe('pipe', 0.29, 0.6, 0.0107, 0.0026, 'steel-grey', 'steel-bright') + {
-    handling: h.gripOn('pipe', 'pipe'),
+  pipe('pipe', 0.29, 0.6, 0.0107, 0.0026, 'steel-grey', 'steel-bright') + h.gripOn('pipe', 'pipe') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 

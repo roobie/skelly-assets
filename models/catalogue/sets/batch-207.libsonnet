@@ -231,7 +231,7 @@ local turn(id, slot, R, r, y) = h.turned(id, slot, 'y', [[0, R], [r, R + r], [2 
     box('neck', 'iron', [0.015, 0, -0.004], [0.026, 0.006, 0.004]),
     box('blade', 'iron', [0.02, 0, -0.008], [0.09, 0.0015, 0.008]),
     h.disc('scoop', 'iron', 0.009, 0, 0.004, -0.09, 0),
-  ], { iron: 'iron-dull' }) + { handling: h.gripOn('spatula', 'shank'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { iron: 'iron-dull' }) + h.gripOn('spatula', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A wrought iron casting ladle 580 mm long: a deep bowl 110 mm across with a pouring lip, and a long iron handle
   // ending in a turned wooden grip.
@@ -240,7 +240,7 @@ local turn(id, slot, R, r, y) = h.turned(id, slot, 'y', [[0, R], [r, R + r], [2 
     h.prism('lip', 'iron', 'y', [[-0.014, 0.05], [0.014, 0.05], [0.006, 0.068], [-0.006, 0.068]], 0.045, 0.055),
     h.rod('handle', 'iron', 0.006, -0.42, -0.05, 0.05),
     h.turned('grip', 'grip', 'x', [[0, 0], [0, 0.012], [0.005, 0.014], [0.11, 0.014], [0.12, 0.011], [0.12, 0]], [-0.53, 0.05, 0]),
-  ], { iron: 'iron-dull', grip: 'wood-walnut' }) + { handling: h.gripOn('iron_ladle', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { iron: 'iron-dull', grip: 'wood-walnut' }) + h.gripOn('iron_ladle', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A forged iron tripod 220 mm across and 190 mm tall: a flat-bar ring on three straight legs with flattened feet,
   // for standing a vessel over a fire or brazier.

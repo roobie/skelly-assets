@@ -1,8 +1,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local turned = h.turned;
-// A small thing held upright in the hand by its named solid, as the medicine bottles in food-medical.libsonnet are.
-local inHand(id, solid) = { handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 } };
+local inHand = h.inHand;
 // A medicine bottle of the vessel family: a body, a shoulder up to a neck, a cap and a paper label band.
 local bottle(id, massKg, radius, height, neckRadius, capRadius, capHeight, finish, dimensions={}, grain=0.002) = h.item(id, 'vessel', massKg, {
   radius: radius, height: height, shoulderHeight: 0.005, neckRadius: neckRadius, neckHeight: 0.005,
@@ -20,7 +19,7 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
     turned('mouth', 'mouth', 'x', [[0, 0], [0, 0.0045], [0.02, 0.004], [0.0245, 0.003], [0.0245, 0]], [0.028, 0.0045, 0]),
     rod('band', 'band', 0.0047, 0.012, 0.02, 0.0045),
     rod('tip', 'tip', 0.004, -0.0525, -0.0505, 0.0045),
-  ], { body: 'alu-anodized-black', mouth: 'plastic-black', band: 'steel-stainless', tip: 'plastic-clear-red' }) + { handling: h.gripOn('disposable_vape', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { body: 'alu-anodized-black', mouth: 'plastic-black', band: 'steel-stainless', tip: 'plastic-clear-red' }) + h.gripOn('disposable_vape', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 15 ml squeeze bottle of eye drops, 24 mm across and 84 mm tall, with its pointed dropper cap.
   h.compound('eyedrops', 0.02, [
@@ -41,14 +40,14 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
     rod('thumb', 'plunger', 0.0065, -0.073, -0.07, 0.008),
     rod('hub', 'hub', 0.0032, 0.024, 0.03, 0.008),
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.003], [0.022, 0.0025], [0.024, 0]], [0.03, 0.008, 0]),
-  ], { backing: 'paper-white', barrel: 'glass-clear', dose: 'wax-ivory', stopper: 'rubber-black', plunger: 'plastic-white', hub: 'plastic-white', cap: 'plastic-yellow' }) + { handling: h.gripOn('flu_shot', 'barrel'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
+  ], { backing: 'paper-white', barrel: 'glass-clear', dose: 'wax-ivory', stopper: 'rubber-black', plunger: 'plastic-white', hub: 'plastic-white', cap: 'plastic-yellow' }) + h.gripOn('flu_shot', 'barrel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
 
   // A hand-rolled cigarette, 70 mm long and 8 mm thick, lying along x with its twisted paper end at +x
   // and loose tobacco showing at the open end.
   h.compound('handrolled_cig', 0.0008, [
     turned('paper', 'paper', 'x', [[0, 0], [0, 0.0036], [0.058, 0.004], [0.064, 0.0025], [0.07, 0.001], [0.07, 0]], [-0.035, 0.004, 0]),
     rod('tobacco', 'tobacco', 0.003, -0.037, -0.035, 0.004),
-  ], { paper: 'paper-white', tobacco: 'leather-brown' }) + { handling: h.gripOn('handrolled_cig', 'paper'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'] } } },
+  ], { paper: 'paper-white', tobacco: 'leather-brown' }) + h.gripOn('handrolled_cig', 'paper') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'] } } },
 
   // A folded glassine stamp bag of powder, 30 mm by 45 mm and lying flat, its flap tucked over and a red
   // dealer's stamp on the face.
@@ -68,7 +67,7 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
     rod('rod', 'plunger', 0.002, -0.05, -0.025, 0.007),
     rod('thumb', 'plunger', 0.0055, -0.053, -0.05, 0.007),
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.0035], [0.008, 0.0025], [0.008, 0]], [0.025, 0.007, 0]),
-  ], { glass: 'glass-clear', oil: 'fuel-amber', plunger: 'plastic-black', cap: 'plastic-black' }) + { handling: h.gripOn('cannabis_oil', 'barrel'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', oil: 'fuel-amber', plunger: 'plastic-black', cap: 'plastic-black' }) + h.gripOn('cannabis_oil', 'barrel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A 70 mm square of parchment, opened flat, with a glassy amber slab of shatter on it and a shard
   // broken off one corner.
@@ -125,7 +124,7 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
   h.compound('joint', 0.0014, [
     turned('paper', 'paper', 'x', [[0, 0], [0, 0.003], [0.07, 0.005], [0.078, 0.0025], [0.085, 0.001], [0.085, 0]], [-0.0425, 0.005, 0]),
     rod('crutch', 'crutch', 0.0033, -0.0435, -0.03, 0.005),
-  ], { paper: 'paper-white', crutch: 'paperboard-tan' }) + { handling: h.gripOn('joint', 'paper'), voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'] } } },
+  ], { paper: 'paper-white', crutch: 'paperboard-tan' }) + h.gripOn('joint', 'paper') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'] } } },
 
   // A small zip bag, 30 mm by 40 mm and lying flat, holding a 2 by 2 square of perforated pink blotter
   // tabs, 6 mm each.

@@ -119,7 +119,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     el('director-c', 'element', 0.170, 0.135),
     el('director-d', 'element', 0.275, 0.130),
     box('clamp', 'terminal', [-0.240, y - 0.014, -0.014], [-0.200, y + 0.014, 0.014]),
-  ], { boom: 'wood-pine', element: 'copper', terminal: 'plastic-black', lead: 'plastic-black' }) + { handling: h.gripOn('directional_antenna', 'boom') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  ], { boom: 'wood-pine', element: 'copper', terminal: 'plastic-black', lead: 'plastic-black' }) + h.gripOn('directional_antenna', 'boom') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A 158 by 115 by 8 mm e-ink tablet lying screen up, the wide bezel with page buttons toward -x.
   h.compound('eink_tablet_pc', 0.16, [

@@ -40,7 +40,7 @@ local frets(n, nut, scale, half, y) = [
     box('arm-%d' % i, 'keys', [-0.063 + i * 0.029, 0.013, 0.002], [-0.057 + i * 0.029, 0.017, 0.0105])
     for i in std.range(0, 11)
   ], { body: 'metal-silver', keys: 'metal-silver', cup: 'steel-mirror', hole: 'plastic-matte-black' })
-  + { handling: h.gripOn('flute', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('flute', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A five-string kantele, 460 mm long, 150 mm across the peg end and 70 mm across the tail, 60 mm deep: a carved
   // wooden box with a pale soundboard and a round sound hole, steel strings fanning from a tail bar to a slanted row
@@ -109,7 +109,7 @@ local frets(n, nut, scale, half, y) = [
     flatY('string-%d' % i, 'string', strip([-0.229, -0.015 + i * 0.01], [0.173, -0.012 + i * 0.008], 0.002), 0.066, 0.068)
     for i in std.range(0, 3)
   ], { sides: 'wood-oak', top: 'wood-pine', hole: 'plastic-matte-black', dark: 'wood-walnut', nut: 'bone', fret: 'steel-bright', metal: 'steel-bright', button: 'plastic-white', string: 'cord-cotton' })
-  + { handling: h.gripOn('ukulele', 'neck'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'], setting: ['modern'] } } },
+  + h.gripOn('ukulele', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A full-size violin, 600 mm long: a body 355 mm long and 205 mm across with an arched top, f-holes, a bridge, a
   // black tailpiece and chin rest, a black fingerboard over the neck, a pegbox with four pegs ending in a scroll, and
@@ -143,7 +143,7 @@ local frets(n, nut, scale, half, y) = [
     flatY('string-%d' % i, 'string', strip([-0.18, -0.012 + i * 0.008], [0.186, -0.0075 + i * 0.005], 0.002), 0.058, 0.06)
     for i in std.range(0, 3)
   ], { ribs: 'wood-walnut', top: 'wood-oak', hole: 'plastic-matte-black', bridge: 'wood-pine', ebony: 'lacquer-black', string: 'steel-mirror' })
-  + { handling: h.gripOn('violin', 'neck'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  + h.gripOn('violin', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
 
   // A steel dog whistle, 60 mm long and 10 mm across: a tube with a flattened mouthpiece, a sound window, a knurled
   // tuning sleeve and a lanyard ring at the far end.
@@ -154,7 +154,7 @@ local frets(n, nut, scale, half, y) = [
     box('window', 'hole', [0.012, 0.0105, -0.002], [0.017, 0.0115, 0.002]),
     turned('ring', 'body', 'z', [[-0.001, 0.0035], [-0.001, 0.0055], [0.001, 0.0055], [0.001, 0.0035], [-0.001, 0.0035]], [-0.031, 0.006, 0]),
   ], { body: 'steel-mirror', sleeve: 'steel-grey', hole: 'plastic-matte-black' })
-  + { handling: h.gripOn('dog_whistle', 'tube'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('dog_whistle', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // Corded electric animal shears, 330 mm long and 70 mm across the head: a moulded motor body with a rubber grip
   // band and a slide switch, a head housing carrying a toothed comb under a cutter plate held by a tension nut, and a
@@ -176,5 +176,5 @@ local frets(n, nut, scale, half, y) = [
     box('tooth-%d' % i, 'blade', [0.16, 0.012, -0.038 + i * 0.0084], [0.18, 0.016, -0.034 + i * 0.0084])
     for i in std.range(0, 9)
   ], { body: 'plastic-blue', grip: 'rubber-black', switch: 'plastic-white', blade: 'steel-grey', cutter: 'steel-bright', plug: 'plastic-black' })
-  + { handling: h.gripOn('electric_shears', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + h.gripOn('electric_shears', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 ]

@@ -4,7 +4,7 @@ local package(id, family, massKg, dimensions, finish, exportMass, heldSolid='bod
   exportMass: exportMass,
   parts: [{ id: 'package', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
   connections: [],
-  handling: { part: 'package', solid: heldSolid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+  handling: { part: 'package', solid: heldSolid, fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
 };
 local carton(id, massKg, width, height, depth, body, label, exportMass, extra={}, heldSolid='body') = package(id, 'carton', massKg, {
   width: width, height: height, depth: depth, lidHeight: 0.002,

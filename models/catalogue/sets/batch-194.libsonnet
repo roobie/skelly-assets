@@ -136,7 +136,7 @@ local beetle(prefix, slot, r, side) =
     box('bit', 'gold', [0.024, 0.0, 0.0], [0.034, 0.004, 0.014]),
     box('bit-tooth', 'gold', [0.028, 0.0, 0.014], [0.03, 0.004, 0.018]),
     box('bit-tip', 'gold', [0.032, 0.0, 0.014], [0.036, 0.004, 0.018]),
-  ], { gold: 'metal-gold', crystal: 'crystal-glow-blue' }) + { handling: h.gripOn('gold_skeleton_key', 'bow') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'keys', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { gold: 'metal-gold', crystal: 'crystal-glow-blue' }) + h.gripOn('gold_skeleton_key', 'bow') + { voxelGrain: 0.002 } + { taxonomy: { category: 'keys', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // An engraved wooden torch 500 mm long lying along x: a fluted grip bound with brass, and a brass cup at the head
   // holding a flame that never goes out.
@@ -154,6 +154,8 @@ local beetle(prefix, slot, r, side) =
     h.tube('carving-%d' % i, 'carve', 0.0, 0.0175 + 0.003 * (x + 0.19) / 0.35, x, x + 0.006)
     for i in std.range(0, 6)
   ], { wood: 'wood-oak', brass: 'brass-dull', carve: 'wood-walnut', flame: 'glow-flame', core: 'cloth-yellow' }) + {
+    // Laid out along x, flame at +x, as the torch family is.
+    forward: '+x',
     handling: { part: 'everburning_torch', solid: 'shaft', fraction: [0.3, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', rest: 'upright', roll: 0 },
     anchors: { flame: { part: 'everburning_torch', solid: 'flame', fraction: [0.5, 0.5, 0.5] } },
   } + { taxonomy: { category: 'lighting', tags: { setting: ['fantasy'] } } },
@@ -180,8 +182,7 @@ local beetle(prefix, slot, r, side) =
   ] + [
     h.tube('grip-ring-%d' % i, 'carve', 0.0, 0.0105, -0.13 + 0.02 * i, -0.124 + 0.02 * i)
     for i in std.range(0, 4)
-  ], { wood: 'wood-walnut', carve: 'wood-oak', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + {
-    handling: h.gripOn('crystal_socket_wand', 'grip'),
+  ], { wood: 'wood-walnut', carve: 'wood-oak', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + h.gripOn('crystal_socket_wand', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 ]

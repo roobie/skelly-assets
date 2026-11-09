@@ -62,7 +62,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('band', 'band', [[-0.020, 0.0155], [0.000, 0.0155]]),
     alongX('mouth', 'cap', [[0.085, 0.0155], [0.100, 0.0155], [0.108, 0.010], [0.1125, 0.009]]),
   ], { body: 'plastic-blue', band: 'plastic-grey', cap: 'plastic-black' })
-  + { handling: h.gripOn('filter_straw', 'body'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.gripOn('filter_straw', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A straight glass stem 120 mm long and 8 mm across ending in a 26 mm bulb with an open hole on top.
   h.compound('crackpipe', 0.01, [
@@ -71,7 +71,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     disc('hole', 'hole', 0.004, 0.0115, 0.0132, 0.050, 0),
     disc('soot', 'soot', 0.008, -0.005, 0.005, 0.050, 0),
   ], { glass: 'glass-clear', hole: 'coal-black', soot: 'plastic-scorched' })
-  + { handling: h.gripOn('crackpipe', 'stem'), voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
+  + h.gripOn('crackpipe', 'stem') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A hand-blown spoon pipe 110 mm long: a clear glass body swelling to 32 mm at the bowl end, green swirls, a bowl
   // on top with a dark hole and a carb hole on the +z side.
@@ -95,7 +95,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('ferrule', 'band', [[-0.033, 0.0068], [-0.030, 0.0068]], 0.012),
     alongX('stem', 'stem', [[-0.098, 0.004], [-0.090, 0.0045], [-0.033, 0.0058]], 0.012),
   ], { wood: 'wood-walnut', char: 'coal-black', band: 'brass-polished', stem: 'lacquer-black' })
-  + { handling: h.gripOn('tobacco_pipe', 'shank'), voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['wood'], setting: ['modern'] } } },
+  + h.gripOn('tobacco_pipe', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A desktop single-hole punch 90 by 45 mm and 42 mm tall: a charcoal base, an aluminium punch housing at +x cut by a
   // dark paper slot, and a bright steel lever rising from its hinge to a black grip pad at -x.
@@ -123,15 +123,15 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     box('clip', 'clip', [-0.058, 0.0045, -0.0015], [-0.022, 0.0065, 0.0015]),
     box('clip-end', 'clip', [-0.024, 0.0045, -0.0018], [-0.020, 0.0072, 0.0018]),
   ], { body: 'steel-stainless', band: 'metal-gold', grip: 'rubber-black', tip: 'steel-grey', clip: 'steel-stainless', button: 'steel-stainless' })
-  + { handling: h.gripOn('pen', 'barrel'), voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('pen', 'barrel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // Office scissors 180 mm long: 115 mm pointed steel blades opened a little and black plastic finger loops.
   h.compound('scissors', 0.053, scissors(0.122, 0.016, -0.042, 0.017, 0.010, 0.0165, 0), {
     blade: 'steel-stainless', handle: 'plastic-black', pivot: 'steel-grey',
-  }) + { handling: h.gripOn('scissors', 'shank-a'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + h.gripOn('scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // Child's scissors 130 mm long: short blades with rounded tips and bright red finger loops.
   h.compound('childs_scissors', 0.04, scissors(0.084, 0.014, -0.032, 0.014, 0.008, 0.0135, 0.002), {
     blade: 'steel-grey', handle: 'plastic-red', pivot: 'steel-stainless',
-  }) + { handling: h.gripOn('childs_scissors', 'shank-a'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + h.gripOn('childs_scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

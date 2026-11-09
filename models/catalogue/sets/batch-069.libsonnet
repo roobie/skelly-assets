@@ -93,8 +93,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
 
   // Hand-forged sheep shears 310 mm long: two leaf-shaped blades sprung open by a bow of the same steel.
   h.compound('forged_shears', 0.43, sheepShears(false),
-             { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + {
-    handling: h.gripOn('forged_shears', 'handle-a'),
+             { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + h.gripOn('forged_shears', 'handle-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
@@ -161,8 +160,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
 
   // Sheep shears 310 mm long like the forged pair, with plastic sleeves over the handles.
   h.compound('shears', 0.47, sheepShears(true),
-             { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + {
-    handling: h.gripOn('shears', 'grip-a'),
+             { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + h.gripOn('shears', 'grip-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 

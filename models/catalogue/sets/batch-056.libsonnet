@@ -60,8 +60,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     prism('edge', 'edge', 'y', [[0.11, 0.765], [0.11, 0.91], [0.135, 0.925], [0.135, 0.75]], -0.005, 0.005),
     prism('pick', 'head', 'y', [[-0.03, 0.80], [-0.03, 0.88], [-0.17, 0.842], [-0.17, 0.838]], -0.01, 0.01),
     prism('pick-tip', 'edge', 'y', [[-0.15, 0.835], [-0.15, 0.845], [-0.172, 0.841], [-0.172, 0.839]], -0.006, 0.006),
-  ], { haft: 'wood-oak', head: 'paint-red', edge: 'steel-bright' }) + {
-    handling: h.gripOn('fire_ax', 'grip'),
+  ], { haft: 'wood-oak', head: 'paint-red', edge: 'steel-bright' }) + h.gripOn('fire_ax', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
   // A 760 mm forged Halligan bar lying flat, drawn at 0.9 scale from a 845 mm sketch: a 30 mm shaft with a fork at -x, and at +x an adze blade on +z and a
@@ -78,8 +77,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   ] + [
     turned('knurl-%d' % i, 'knurl', 'x', [[0, 0], [0, 0.0185], [0.012, 0.0185], [0.012, 0]], [0.1 + i * 0.03, 0, 0])
     for i in std.range(0, 5)
-  ], 0.9), { shaft: 'steel-grey', head: 'steel-grey', edge: 'steel-bright', knurl: 'steel-parkerized' }) + {
-    handling: h.gripOn('halligan', 'shaft'),
+  ], 0.9), { shaft: 'steel-grey', head: 'steel-grey', edge: 'steel-bright', knurl: 'steel-parkerized' }) + h.gripOn('halligan', 'shaft') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 1.6 m pike pole lying flat: a yellow fibreglass shaft with a rubber butt grip, and a steel head with a straight
@@ -91,9 +89,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     turned('spike', 'head', 'x', [[0, 0], [0, 0.012], [0.06, 0.002], [0.06, 0]], [1.54, 0, 0]),
     prism('hook-arm', 'head', 'y', [[0.012, 1.565], [0.064, 1.53], [0.058, 1.514], [0.012, 1.545]], -0.006, 0.006),
     prism('hook-tip', 'head', 'y', [[0.056, 1.534], [0.072, 1.525], [0.072, 1.48], [0.058, 1.494]], -0.006, 0.006),
-  ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + {
-    handling: h.gripOn('pike_pole', 'grip'),
-  } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
+  ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + h.gripOn('pike_pole', 'grip') + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
   // A two-litre bottle trap 330 mm long lying on x: the bottle's top cut off and pushed back into it neck first as
   // a funnel at +x, tied in with cord, a cord loop on top and a few drain holes.
   h.compound('fish_trap', 0.05, [

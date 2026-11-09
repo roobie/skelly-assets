@@ -16,16 +16,14 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     box('bottom', 'handle', [0.030, -0.015, -0.060], [0.100, 0.015, -0.040]),
     box('front', 'handle', [0.070, -0.015, -0.040], [0.100, 0.015, 0.040]),
     prism('blade', 'blade', 'y', [[-0.055, 0.100], [0.055, 0.100], [0.015, 0.500], [-0.015, 0.500]], -0.002, 0.002),
-  ], { handle: 'wood-walnut', blade: 'steel-grey' }) + {
-    handling: gripOn('hand_saw', 'rear'),
+  ], { handle: 'wood-walnut', blade: 'steel-grey' }) + gripOn('hand_saw', 'rear') + {
     voxelGrain: 0.004,
   },
   // A 150 mm shank with a 105 mm moulded handle, 0.255 m overall.
   compound('screwdriver', 0.160, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.010], [0.008, 0.015], [0.085, 0.016], [0.105, 0.011], [0.105, 0]]),
     turned('shaft', 'shaft', 'x', [[0.105, 0], [0.105, 0.0035], [0.250, 0.0035], [0.255, 0.002], [0.255, 0]]),
-  ], { handle: 'plastic-yellow', shaft: 'steel-blued' }) + {
-    handling: gripOn('screwdriver', 'handle'),
+  ], { handle: 'plastic-yellow', shaft: 'steel-blued' }) + gripOn('screwdriver', 'handle') + {
     voxelGrain: 0.002,
   },
   // A small reel of bare copper wire, 94 mm across the flanges and 60 mm wide.

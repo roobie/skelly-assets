@@ -26,7 +26,7 @@ local arcBlade(prefix, slot, cx, cz, r, w0, w1, a0, a1, steps, y0, y1) =
     h.prism('%s-%d' % [prefix, i], slot, 'y', [[q[1], q[0]] for q in [pt(r, i), pt(r, i + 1), pt(r - wAt(i + 1), i + 1), pt(r - wAt(i), i)]], y0, y1)
     for i in std.range(0, steps - 1)
   ];
-local gripAt(id, solid, f) = h.gripOn(id, solid) + { fraction: [f, 0.5, 0.5] };
+local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 0.5, 0.5] } };
 // A two-handled scythe lying on its side: a 1.4 m snath along x with its blade curving off the far end towards +z.
 local scythe(withNibs, w0) =
   local y = 0.018;
@@ -50,8 +50,7 @@ local scythe(withNibs, w0) =
     box('neck-a', 'neck', [0.122, 0.022, -0.005], [0.140, 0.030, 0.005]),
     box('neck-b', 'neck', [0.134, 0.006, -0.006], [0.146, 0.024, 0.006]),
   ] + dish('blade', 'blade', [[0.140, -0.034], [0.200, -0.038], [0.235, -0.018], [0.250, 0], [0.235, 0.018], [0.200, 0.038], [0.140, 0.034]], 0, 0.002, 0.012, 7),
-  { handle: 'wood-oak', neck: 'steel-grey', blade: 'steel-bright' }) + {
-    handling: gripAt('trowel', 'handle', 0.5),
+  { handle: 'wood-oak', neck: 'steel-grey', blade: 'steel-bright' }) + gripAt('trowel', 'handle', 0.5) + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
   // A draw hoe 1.4 m long: a 1.3 m ash handle, a steel socket and gooseneck, and a blade 150 mm wide by 100 mm deep
@@ -64,8 +63,7 @@ local scythe(withNibs, w0) =
     box('blade', 'metal', [1.385, 0.008, -0.075], [1.391, 0.095, 0.075]),
     box('shoulder', 'metal', [1.383, 0.08, -0.03], [1.393, 0.098, 0.03]),
     box('edge', 'edge', [1.385, 0, -0.075], [1.391, 0.008, 0.075]),
-  ], { handle: 'wood-pine', metal: 'steel-grey', edge: 'steel-bright' }) + {
-    handling: gripAt('hoe', 'handle', 0.35),
+  ], { handle: 'wood-pine', metal: 'steel-grey', edge: 'steel-bright' }) + gripAt('hoe', 'handle', 0.35) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
   // A shovel carved from one piece of hardwood, 1.2 m long: an 830 mm round handle with a knob, a flared shoulder and
@@ -75,8 +73,7 @@ local scythe(withNibs, w0) =
     rod('handle', 'wood', 0.017, 0.04, 0.86, 0.035),
     h.prism('shoulder', 'wood', 'y', [[-0.018, 0.80], [-0.095, 0.88], [0.095, 0.88], [0.018, 0.80]], 0.014, 0.034),
   ] + dish('blade', 'wood', [[0.87, -0.10], [1.12, -0.10], [1.17, -0.075], [1.20, -0.03], [1.20, 0.03], [1.17, 0.075], [1.12, 0.10], [0.87, 0.10]], 0, 0.014, 0.03, 7)
-, { wood: 'wood-oak' }) + {
-    handling: gripAt('primitive_shovel', 'handle', 0.4),
+, { wood: 'wood-oak' }) + gripAt('primitive_shovel', 'handle', 0.4) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A bow rake 1.5 m long: a 1.4 m wooden handle, a steel ferrule, two flat bows and a 380 mm head with 14 tines
@@ -91,8 +88,7 @@ local scythe(withNibs, w0) =
   ] + [
     box('tine-%d' % i, 'tine', [hx + 0.004, 0.03, -0.182 + i * 0.028], [hx + 0.011, 0.10, -0.176 + i * 0.028])
     for i in std.range(0, 13)
-  ], { handle: 'wood-pine', metal: 'paint-green', tine: 'paint-green' }) + {
-    handling: gripAt('rake', 'handle', 0.4),
+  ], { handle: 'wood-pine', metal: 'paint-green', tine: 'paint-green' }) + gripAt('rake', 'handle', 0.4) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
   // A leaf rake 1.5 m long: a 1 m wooden handle in a plastic collar and a fan of 22 flat tines spreading to 550 mm,
@@ -115,13 +111,11 @@ local scythe(withNibs, w0) =
     h.prism('brace-a', 'fan', 'y', [[-0.17, 1.27], [0, 1.24], [0, 1.25], [-0.17, 1.28]], 0.012, 0.016),
     h.prism('brace-c', 'fan', 'y', [[0, 1.24], [0.17, 1.27], [0.17, 1.28], [0, 1.25]], 0.012, 0.016),
     box('brace-b', 'fan', [1.385, 0.012, -0.235], [1.395, 0.016, 0.235]),
-  ], { handle: 'wood-pine', fan: 'plastic-green' }) + {
-    handling: gripAt('plastic_leaf_rake', 'handle', 0.4),
+  ], { handle: 'wood-pine', fan: 'plastic-green' }) + gripAt('plastic_leaf_rake', 'handle', 0.4) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'wood'], setting: ['modern'] } } },
   // A two-handled scythe: a 1.4 m wooden snath with two grips and a 700 mm curved steel blade hung off its far end.
-  h.compound('scythe', 3, scythe(true, 0.075), { snath: 'wood-oak', nib: 'wood-birch', ring: 'steel-grey', blade: 'steel-heat-tint', spine: 'steel-grey' }) + {
-    handling: gripAt('scythe', 'snath', 0.3),
+  h.compound('scythe', 3, scythe(true, 0.075), { snath: 'wood-oak', nib: 'wood-birch', ring: 'steel-grey', blade: 'steel-heat-tint', spine: 'steel-grey' }) + gripAt('scythe', 'snath', 0.3) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
   // A costume reaper's scythe of hollow plastic: a 1.4 m knotted black pole and a 700 mm moulded blade with a
@@ -134,8 +128,7 @@ local scythe(withNibs, w0) =
     h.disc('eye-a', 'eye', 0.010, 0.020, 0.022, 1.295, -0.132),
     h.disc('eye-b', 'eye', 0.010, 0.020, 0.022, 1.295, -0.100),
     h.disc('nose', 'eye', 0.005, 0.020, 0.022, 1.272, -0.116),
-  ], { snath: 'plastic-black', ring: 'plastic-black', blade: 'plastic-grey', spine: 'plastic-charcoal', skull: 'bone', eye: 'plastic-black' }) + {
-    handling: gripAt('toy_scythe', 'snath', 0.3),
+  ], { snath: 'plastic-black', ring: 'plastic-black', blade: 'plastic-grey', spine: 'plastic-charcoal', skull: 'bone', eye: 'plastic-black' }) + gripAt('toy_scythe', 'snath', 0.3) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A long-handled round-point shovel 1.4 m long: a 1.08 m wooden handle, a steel socket and a dished blade 230 mm
@@ -148,8 +141,7 @@ local scythe(withNibs, w0) =
   + [
     box('tread-a', 'metal', [1.11, 0.02, -0.118], [1.125, 0.042, -0.04]),
     box('tread-b', 'metal', [1.11, 0.02, 0.04], [1.125, 0.042, 0.118]),
-  ], { handle: 'wood-pine', metal: 'paint-charcoal' }) + {
-    handling: gripAt('shovel', 'handle', 0.45),
+  ], { handle: 'wood-pine', metal: 'paint-charcoal' }) + gripAt('shovel', 'handle', 0.45) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
   // A grass sickle 500 mm long: a 130 mm turned handle, a ferrule and a crescent blade on a 170 mm radius hooking
@@ -160,8 +152,7 @@ local scythe(withNibs, w0) =
     box('tang', 'metal', [0.145, 0.014, -0.008], [0.19, 0.020, 0.008]),
   ] + arcBlade('blade', 'blade', 0.30, -0.13, 0.17, 0.04, 0.006, -40, 165, 18, 0.014, 0.018)
   + arcBlade('spine', 'metal', 0.30, -0.13, 0.172, 0.008, 0.004, -40, 165, 18, 0.014, 0.021),
-  { handle: 'wood-oak', metal: 'steel-grey', blade: 'steel-heat-tint' }) + {
-    handling: gripAt('sickle', 'handle', 0.5),
+  { handle: 'wood-oak', metal: 'steel-grey', blade: 'steel-heat-tint' }) + gripAt('sickle', 'handle', 0.5) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
   // A stone sickle 350 mm long: a forked stick haft with a knapped crescent of stone set along its side, bound at each
@@ -171,8 +162,7 @@ local scythe(withNibs, w0) =
     h.turned('butt', 'haft', 'x', [[0, 0], [0, 0.017], [0.02, 0.017], [0.02, 0]], [0, 0.016, 0]),
     h.tube('bind-a', 'bind', 0.012, 0.018, 0.13, 0.155, 0.016, 0),
     h.tube('bind-b', 'bind', 0.012, 0.018, 0.29, 0.315, 0.016, 0),
-  ] + arcBlade('stone', 'stone', 0.235, 0.09, 0.14, 0.035, 0.035, 225, 135, 8, 0.008, 0.024), { haft: 'bark', bind: 'skin-rawhide', stone: 'stone-grey' }) + {
-    handling: gripAt('stone_sickle', 'haft', 0.2),
+  ] + arcBlade('stone', 'stone', 0.235, 0.09, 0.14, 0.035, 0.035, 225, 135, 8, 0.008, 0.024), { haft: 'bark', bind: 'skin-rawhide', stone: 'stone-grey' }) + gripAt('stone_sickle', 'haft', 0.2) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
   // A petrol hedge trimmer 1 m long: a 330 mm engine housing with a rear loop handle, a front bail and hand guard, and
@@ -204,8 +194,7 @@ local scythe(withNibs, w0) =
     ]
     for i in std.range(0, 13)
     for x in [0.49 + i * 0.034]
-  ]), { grip: 'plastic-black', trigger: 'plastic-grey', housing: 'plastic-orange', tank: 'plastic-frosted', metal: 'steel-grey', teeth: 'steel-bright' }) + {
-    handling: gripAt('hedge_trimmer', 'rear-grip', 0.5),
+  ]), { grip: 'plastic-black', trigger: 'plastic-grey', housing: 'plastic-orange', tank: 'plastic-frosted', metal: 'steel-grey', teeth: 'steel-bright' }) + gripAt('hedge_trimmer', 'rear-grip', 0.5) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 ]

@@ -222,8 +222,32 @@ const builders = {
   flashlight,
   candle,
 } satisfies Record<string, (params: Readonly<Record<string, string>>, turnedSides?: number) => readonly Solid[]>;
-/** The families whose builders lay a model out with its front, or working end, off +z. */
-const FAMILY_FORWARDS: Readonly<Partial<Record<string, Forward>>> = {};
+/**
+ * The families whose builders lay a model out with its front, or working end, off +z: tools and stock measured along
+ * their length on x, and the headlamp, whose lens faces -z.
+ */
+const FAMILY_FORWARDS: Readonly<Partial<Record<string, Forward>>> = {
+  crowbar: '+x',
+  hammer: '+x',
+  sledgehammer: '+x',
+  bat: '+x',
+  knife: '+x',
+  wrench: '+x',
+  steelPipe: '+x',
+  torch: '+x',
+  candle: '+x',
+  flashlight: '+x',
+  blowtorch: '+x',
+  webbingSling: '+x',
+  repairKit: '+x',
+  pliers: '+x',
+  cutStock: '+x',
+  turnedStock: '+x',
+  foldedSheet: '+x',
+  handOpener: '+x',
+  ring: '+x',
+  headlamp: '-z',
+};
 const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): PartDef => {
   if (!Object.hasOwn(builders, part.family)) {
     throw new Error(`Unknown thing family ${part.family}`);

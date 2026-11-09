@@ -12,12 +12,12 @@ local board(len, w=0.089, t=0.038) = [
   for g in [[[0.05, 0.62, -0.024], [0.3, 0.95, 0.008], [0.12, 0.45, 0.026], [0.55, 0.9, -0.012]][i]]
 ];
 local boardFinish = { board: 'wood-pine', end: 'wood-birch', grain: 'wood-birch' };
-local gripAt(id, solid, f) = h.gripOn(id, solid) + { fraction: [f, 0.5, 0.5] };
+local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 0.5, 0.5] } };
 [
   // An 8 ft 2 by 4: 2440 by 89 by 38 mm.
-  h.compound('long_plank', 4.2, board(2.44), boardFinish) + { handling: gripAt('long_plank', 'board', 0.08) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('long_plank', 4.2, board(2.44), boardFinish) + gripAt('long_plank', 'board', 0.08) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 2 ft 2 by 4: 610 by 89 by 38 mm.
-  h.compound('short_plank', 1, board(0.61), boardFinish) + { handling: gripAt('short_plank', 'board', 0.2) } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('short_plank', 1, board(0.61), boardFinish) + gripAt('short_plank', 'board', 0.2) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 300 mm offcut of 2 by 4 with two half-depth notches 50 mm wide sawn across its top face, for lap joints.
   local len = 0.3, w = 0.089, t = 0.038, d = 0.019;
   h.compound('notched_plank', 0.44, [
@@ -86,7 +86,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { fraction: [f, 0.5, 0.5] };
   h.compound('long_pole', 2.2, [
     h.turned('pole', 'pole', 'x', [[0, 0], [0, 0.018], [0.006, 0.02], [3.0, 0.017], [3.05, 0.015], [3.05, 0]], [0, 0.02, 0]),
     h.turned('butt', 'end', 'x', [[0, 0], [0, 0.016], [0.002, 0.016], [0.002, 0]], [-0.0015, 0.02, 0]),
-  ], { pole: 'wood-birch', end: 'wood-oak' }) + { handling: gripAt('long_pole', 'pole', 0.3) } + { taxonomy: { category: 'weapons', tags: { material: ['wood'], weapon: ['polearm'] } } },
+  ], { pole: 'wood-birch', end: 'wood-oak' }) + gripAt('long_pole', 'pole', 0.3) + { taxonomy: { category: 'weapons', tags: { material: ['wood'], weapon: ['polearm'] } } },
   // A shock-corded aluminium tent pole folded into a bundle of six 470 mm sections, 9.5 mm across, the joints
   // staggered so each section's ferrule shows, the cord peeping between the end sections.
   local r = 0.00475, len = 0.47, centres = h.hexPack(r + 0.0003, [3, 2, 1]);

@@ -14,7 +14,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('handle', 'frame', [0.08, 0.001, -0.013], [0.21, 0.011, 0.013]),
     disc('knob', 'frame', 0.015, 0.001, 0.011, 0.205, 0),
   ], { frame: 'wood-walnut', glass: 'mirror-silver' })
-  + { voxelGrain: 0.004, handling: h.gripOn('mirror', 'handle') } + { taxonomy: { category: 'household', tags: { material: ['wood', 'glass'] } } },
+  + h.gripOn('mirror', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood', 'glass'] } } },
 
   // A black builder's tub 140 mm across and 95 mm tall holding about a litre of mixed mortar, its top heaped and
   // rough. Lime and adobe mortar share it, recoloured.
@@ -156,7 +156,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     h.rod('brush', 'cotton', 0.009, 0.06, 0.16, 0.009),
     turned('tip', 'cotton', 'x', [[0, 0], [0, 0.009], [0.006, 0.007], [0.01, 0]], [0.16, 0.009, 0]),
   ], { wire: 'steel-galvanised', cotton: 'cloth-bright-white' })
-  + { voxelGrain: 0.004, handling: h.gripOn('bore_brush', 'shaft') } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'fabric'] } } },
+  + h.gripOn('bore_brush', 'shaft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'fabric'] } } },
 
   // A cheap plastic plant pot 180 mm across at the rim and 150 mm tall, tapering to 130 mm at the base, with a
   // rolled rim and a foot ring.

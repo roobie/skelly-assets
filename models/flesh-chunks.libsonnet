@@ -31,7 +31,7 @@ local chunk(id, massKg, length, width, height) =
       ports: [],
     }],
     connections: [],
-    handling: { part: 'lump', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 0 },
+    handling: { part: 'lump', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, 0], hold: 'upright', roll: 0 },
   };
 [
   chunk('flesh_chunk_small', 0.03, 0.04, 0.035, 0.022),

@@ -2,8 +2,7 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local tube = h.tube;
-// A tool lies along x and takes its grip on a named solid.
-local gripOn(id, solid) = { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 90 };
+local gripOn = h.gripOn;
 // A J hook lying flat on y from 0 to `t`, the bend centred on the origin with centre radius `r`, wire `w` wide: the
 // shank runs up +z on the +x side to an eye, the point leg up +z on the -x side with a barb turned in.
 local hook(slot, r, w, t, shank, point, eye) =
@@ -91,7 +90,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                for x in [[-0.03, 0.38][s]]
              ]),
              { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'steel-grey', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black', strap: 'hook-loop-grey' })
-  + { handling: gripOn('packed_two_piece_fishing_rod', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
+  + gripOn('packed_two_piece_fishing_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
 
   // A rough stick 900 mm long and 45 mm across at the butt, its bark on, with a cotton line tied at the tip, run
   // back along the stick and wound round it near the butt, a bent-wire hook caught in the winding.
@@ -116,7 +115,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
              + [
              ],
              { bark: 'bark', cut: 'wood-pine', line: 'cloth-cream', hook: 'steel-grey' })
-  + { handling: gripOn('stick_fishing_rod', 'stick'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
+  + gripOn('stick_fishing_rod', 'stick') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
 
   // A 2 m one-piece spinning rod: rubber butt cap, a 300 mm cork grip, a screw reel seat with a small spinning reel,
   // a cork fore grip, then a black blank tapering from 14 mm to 4 mm with six guides and a tip ring.
@@ -134,7 +133,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
              + guides('guide', [[-0.3, 0.014, 0.0064], [-0.05, 0.01, 0.0056], [0.2, 0.007, 0.0047], [0.45, 0.005, 0.0039], [0.68, 0.004, 0.003], [0.88, 0.003, 0.0024]], y)
              + spinningReel('reel', -0.62, y, 0.011),
              { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' })
-  + { handling: gripOn('spinning_rod', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  + gripOn('spinning_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A telescoping spinning rod pushed shut, 500 mm long: a rubber cap, an EVA foam grip, a screw reel seat with a small
   // spinning reel, then the butt tube with the ends of four nested sections stepping down to a tip cap.
@@ -162,7 +161,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
              ]
              + spinningReel('reel', -0.015, y, 0.0125),
              { cap: 'rubber-black', foam: 'rubber-offblack', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' })
-  + { handling: gripOn('packed_telescoping_fishing_rod', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
+  + gripOn('packed_telescoping_fishing_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
 
   // A whittled wooden hand reel, 150 mm long: a 30 mm round handle, then a spool section with a lip at each end and
   // cotton line wound between them, the end split by a notch to hold the line.
@@ -179,7 +178,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                box('line-end', 'line', [0.06, 0.029, -0.001], [0.085, 0.031, 0.001]),
              ],
              { wood: 'wood-pine', line: 'cord-cotton', shadow: 'wood-walnut' })
-  + { handling: gripOn('wooden_hand_reel', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'] } } },
+  + gripOn('wooden_hand_reel', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'] } } },
 
   // A moulded plastic hand reel, 158 mm long: a ribbed handle, a spool 70 mm across wound with green line, and an
   // open guard of two hoops and four bars round the spool with an eyelet for the line.
@@ -200,5 +199,5 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                box('eyelet-post', 'guard', [0.028, 0.08, -0.002], [0.032, 0.081, 0.002]),
              ],
              { handle: 'plastic-black', spool: 'plastic-red', line: 'plastic-green', guard: 'plastic-charcoal', eyelet: 'steel-stainless' })
-  + { handling: gripOn('plastic_hand_reel', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + gripOn('plastic_hand_reel', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]
