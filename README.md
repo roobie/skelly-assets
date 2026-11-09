@@ -163,6 +163,10 @@ When you move the pin, map every model id you saved through the release's `renam
 It holds every id any earlier release retired, renamed or merged into another model, mapped to its current id, so a
 jump over several releases is one lookup; a retired id never names a new model, so the lookup is never ambiguous.
 
+A vehicle site's `finish` names an entry of the release's `finishes.json`, the manifest's `finishes`: the glTF
+material a painted surface in that finish carries. Why the library ships and how a copy takes it is in
+`docs/decisions/0003-vehicle-paint.md`.
+
 The `.glb` files load in any engine or tool that reads glTF 2.0. Engine-specific sidecar files, such as Godot's
 `*.import`, are ignored here, so each game generates its own.
 
