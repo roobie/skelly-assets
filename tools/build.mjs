@@ -1,7 +1,8 @@
 // Builds the repo's models from their sources in models/ into GLB files.
 // Usage: node tools/build.mjs [--out dir] [rowId ...]
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
-// id of the roster, models/export.json, every row of every recipe file in models/recipes/ and built/manifest.json
+// id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
+// (tools/placements.mjs) and built/manifest.json
 // (tools/manifest.mjs); with ids it builds those roster-source rows, any row
 // in the sources, and no manifest. A roster id is written into --out (by default built/) at its pack's path,
 // tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a scratch folder. Needs node (26 or later, which runs the TypeScript directly) and `npm ci` in tools.
@@ -14,6 +15,7 @@ import { parseArgs } from 'node:util';
 import { outputPath, readMobRows, readRoster } from './layout.mjs';
 import { modelTaxonomies } from './check-taxonomy.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from './manifest.mjs';
+import { exportPlacements, readPlacements } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
@@ -154,9 +156,12 @@ async function main() {
       const recipes = await exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS });
       for (const file of recipes.files) console.log(`built ${file}`);
       const mobs = mobManifest(readMobRows(repo));
+      const placed = exportPlacements({ placements: readPlacements(repo), models: [...built.models, ...recipes.models], out });
+      for (const file of placed.files) console.log(`built ${file}`);
       const manifest = buildManifest({
         models: withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies),
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files],
+        vehicles: placed.vehicles,
+        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
         credit: readCredits(repo),
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));
