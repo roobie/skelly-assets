@@ -12,6 +12,17 @@ local claimed = {
     'news_helicopter',
     'police_helicopter',
   ],
+  'skelly.vehicle-wrecks': [
+    'abandoned_ambulance',
+    'abandoned_army_truck',
+    'abandoned_pickup',
+    'burnt_out_bus',
+    'burnt_out_saloon',
+    'burnt_out_van',
+    'crashed_hatchback',
+    'jackknifed_lorry_cab',
+    'overturned_delivery_van',
+  ],
 };
 local others = std.flattenArrays(std.objectValues(claimed));
 {
