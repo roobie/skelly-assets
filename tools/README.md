@@ -115,9 +115,15 @@ Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildMan
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
-rather than assumed to. A build given a cache folder reuses every export whose code and inputs are unchanged; see
-`packages/thing-export/src/cache.ts`, `exportCache`. A key that leaves out something an export reads would serve
-stale bytes, so a tool caches only rows that name their inputs, and an over-wide key costs only a miss. A worker exports a
+rather than assumed to. A build reuses every export whose code and inputs are unchanged, so its cost follows what
+changed rather than the size of the catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
+content an export reads, not a dependency graph, so a kit or library edit rebuilds exactly the models whose compiled
+rows it changes, and nothing has to be kept in step with the imports. A key that leaves out something an export reads
+would serve stale bytes, so a tool caches only rows that name their inputs, data its code imports whatever the row
+counts whole beside the code (`recipeTools.mjs`, `recipeTools`, and `mobs.mjs`, `mobStore`), and an over-wide key
+costs only a miss. A complete build prunes the entries it did not use, so the cache holds what the next build can
+reuse rather than an entry for every edit ever built. The determinism check builds uncached, since a check that read
+the cache could not show the cache was right. A worker exports a
 row from the task its tool hands it, the row with the slice of its sources the export reads, because loading the whole
 item catalogue in every worker costs more than most exports; see `recipeTools.mjs`, `recipeTools`, and
 `packages/thing-authoring-tool/src/exports.ts`, `thingTasks`. A thing row's slice gives it the inputs the whole
