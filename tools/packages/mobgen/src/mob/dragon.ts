@@ -4,7 +4,7 @@
 // params to its sprite and brings its palette.
 //
 // The shape is the SHAPE table below, authored in metres for a dragon REF_HEIGHT tall (the crown of its head) facing -Z (conventions.ts) and scaled by
-// the row's `height`; mobs.mjs turns the export to face +Z. Poses are rigid rotations about bone heads in rest-world axes, stacked down the chains
+// the row's `height`; the export turns it to face +Z (tools/actorFrame.mjs). Poses are rigid rotations about bone heads in rest-world axes, stacked down the chains
 // (pose.ts); the walk is by distance: each hind foot is planted on the moving ground and the ankle placed by quadruped.ts's two-link solve.
 
 import type { Body, Feature } from '../core/body.ts';

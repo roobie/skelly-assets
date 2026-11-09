@@ -293,7 +293,7 @@ export interface StressActor {
    * down (there's nothing else to dispose — geometry and material are pool-/module-owned). */
   readonly sceneObjects: readonly Object3D[];
   /**
-   * Places the actor at world (x, z) facing `yawRad` (three.js convention: yaw 0 faces -Z, matching
+   * Places the actor at world (x, z) facing `yawRad` (yaw 0 leaves it facing the generator's -Z,
    * conventions.ts) and applies `pose` (computed in the actor's own local frame, e.g. by walkPose/
    * attackPose) on top. Bones and skinned modes fold the placement in differently (see
    * buildSkinnedActor's own comment on why a SkinnedMesh can't just sit in a moved Group), but both end

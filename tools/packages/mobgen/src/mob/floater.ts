@@ -6,7 +6,7 @@
 // The rest pose touches the ground (the validity rules want a grounded body); every pose then lifts the whole body by the
 // `hover` param, so the model floats in its clips. The tail's curl, the sway, the flicker of the tongues and the cast are
 // all poses: rigid rotations about bone heads, in the parent's frame, stacked down the tail chain. Everything is
-// authored in the body's own frame facing -Z (conventions.ts); mobs.mjs turns the export to face +Z.
+// authored in the body's own frame facing -Z (conventions.ts); the export turns it to face +Z (tools/actorFrame.mjs).
 
 import type { Body, Feature } from '../core/body.ts';
 import type { Realized } from '../core/generate.ts';
