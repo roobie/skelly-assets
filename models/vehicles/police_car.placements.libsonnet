@@ -33,6 +33,6 @@ local part(suffix) = (import 'kit.libsonnet').partId('police_car', s, suffix);
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
-  + site.batteryBay('hatchback_battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
+  + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
   tags: { 'vehicle-role': ['emergency'] },
 }

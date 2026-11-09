@@ -421,5 +421,5 @@ local rows(id, s0) = {
     + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, std.min((if isBox then s.box.side else s.side) - 0.13, s.glassOut - 0.02)], on(['shell']))
     + pair('indicator', 'marker_lamp', [nose + 0.02, 0.6, 0.72], on(['front_bumper']))
     + pair('headlamp', 'headlamp_large', [nose, 0.74, 0.68], on(['front_bumper']))
-    + kit.batteryBay('hatchback_battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell']),
+    + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell']),
 }

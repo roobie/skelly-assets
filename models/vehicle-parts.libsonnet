@@ -481,7 +481,7 @@ local rows = [
     mount: ['body', [0, 0.5, 0.15]],
     beam: ['body', [1, 0.5, 0.5]],
   }, exportMass='parts'),
-  tray('hatchback_battery_tray', 1.5, 0.28, 0.02, 0.21, exportMass='parts'),
+  tray('battery_tray', 1.5, 0.28, 0.02, 0.21, exportMass='parts'),
   tray('pickup_battery_tray', 2.2, 0.32, 0.03, 0.24, exportMass='parts'),
   // One inventory cell; a fitting scales it to the cargo space's size. The space weighs next to nothing: its
   // load is its contents.
