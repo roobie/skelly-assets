@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
+import { FORWARD, REVIEW_VIEWS, RIGHT, UP } from '../../site/modelFrame.mjs';
 import { lookDigest, lookIds, mergeRows, staleIds } from '../look.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
@@ -74,4 +75,17 @@ test('a render is stale when its model changed or left the tree, never when it f
 test('the review page loads the same three.js as the showcase', () => {
   const importMap = (page) => JSON.parse(/<script type="importmap">([\s\S]*?)<\/script>/.exec(readFileSync(join(repo, 'site', page), 'utf8'))[1]);
   assert.deepEqual(importMap('look.html'), importMap('index.html'));
+});
+
+// Deadvox places and attaches models with +x forward, so the review page must find a model's front there rather than
+// guess it from the model's proportions.
+test('the review page draws the front from +x, the rear from behind and the side square to forward', () => {
+  const dot = (a, b) => a.reduce((sum, x, i) => sum + x * b[i], 0);
+  const view = Object.fromEntries(REVIEW_VIEWS);
+  assert.deepEqual([FORWARD, UP, RIGHT], [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+  assert.ok(dot(view['front ¾'], FORWARD) > 0);
+  assert.ok(dot(view['rear ¾'], FORWARD) < 0);
+  assert.equal(dot(view.side, FORWARD), 0);
+  assert.equal(dot(view.side, UP), 0);
+  assert.equal(dot(view.top, UP), 1);
 });
