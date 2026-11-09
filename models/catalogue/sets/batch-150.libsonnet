@@ -153,7 +153,7 @@ local armouredJeans(id, mass, sheet) =
     g.flat('knee-crown', 'pad', oval(cx, -0.07, 0.036, 0.024), ht + 0.01, 0.004),
   ]
   + plate('shin', -0.15, 0.05, 0.03), { cloth: 'cloth-denim', seam: 'brass-dull', patch: 'cloth-denim-faded', pad: 'plastic-charcoal', sheet: sheet, rivet: 'brass-dull', loop: 'cloth-denim' })
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A shell lying open side down on y0, curved across x with radius r, its convex [x, z] outline centred on (cx, cz).
 // `band` lays a strip across it at local z, `half` either side of the middle, strip by strip so it follows the
@@ -248,7 +248,7 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
     for i in [0, 1]
     for x in [[-0.07, 0.07][i]]
   ], { cloth: 'cloth-bright-white', trim: 'cloth-bright-white', pad: 'cloth-cream', strap: 'cloth-bright-white', buckle: 'steel', brace: 'webbing-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // A pair of knee pads laid side by side, cup up: each an oval foam pad 190 mm long and 120 mm across, curved to
   // the knee, with a moulded plastic cup 130 mm long over it and two elastic straps across, each with its tail lying

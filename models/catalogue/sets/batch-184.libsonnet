@@ -80,7 +80,7 @@ local maidDress(id, mass, w, d, ht, finishCloth) =
                        + [strip('frill-l', 'frill', [-0.112, -d / 2 + 0.035], [-0.093, waistZ - 0.012], top, 0.012, 0.006)]
                        + [strip('frill-r', 'frill', [0.112, -d / 2 + 0.035], [0.093, waistZ - 0.012], top, 0.012, 0.006)],
              { cloth: finishCloth, sleeve: finishCloth, waist: finishCloth, collar: 'cloth-bright-white', cuff: 'cloth-bright-white', apron: 'cloth-bright-white', frill: 'mesh-white', bow: 'cloth-bright-white', hole: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A short black and red dress with a mandarin collar, red trim and a red waist tie knotted at the side with its ends
 // hanging straight, sleeved or sleeveless. Slots: cloth, sleeve, collar, trim, tie, waist, hole, bind.
@@ -103,7 +103,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                          strip('tie-b', 'tie', [-0.083, waistZ - 0.012], [-0.077, waistZ - 0.1], top, 0.01, 0.004),
                        ],
              { cloth: 'cloth-black', sleeve: 'cloth-black', waist: 'cloth-red', collar: 'cloth-red', trim: 'cloth-red', tie: 'cloth-red', hole: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 [
   // A foam life vest laid flat, front up, 500 mm wide and 560 mm long with 60 mm thick panels: two front panels of
@@ -135,7 +135,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   ]) + [
     box('label', 'label', [-0.16, t - 0.006, 0.02], [-0.07, t - 0.002, 0.07]),
   ], { shell: 'cloth-safety-orange', hole: 'cloth-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black', label: 'reflective-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // A makeshift float laid flat, front up, about 360 mm by 500 mm and 120 mm tall: four inflated hides, each tied shut
   // at the neck and bound round with two leather bands, lashed in two rows onto a flat rawhide harness with flat
@@ -163,7 +163,7 @@ local ninjaDress(id, mass, ht, sleeved) =
     strip('tie-a', 'strap', [0.18, -0.22], [0.24, -0.25], 0.0, 0.016, 0.006),
     strip('tie-b', 'strap', [-0.18, -0.22], [-0.24, -0.24], 0.0, 0.016, 0.006),
   ], { skin: 'skin-rawhide', harness: 'skin-rawhide', strap: 'leather-tan', cord: 'skin-rawhide' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['prehistoric'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], setting: ['prehistoric'] } } },
 
   // A cotton halter top laid flat, about 260 mm wide and 240 mm long: a short body under two cups that rise to a
   // halter neck tie, with ties trailing from the neck and a tie-back at the hem.
@@ -183,7 +183,7 @@ local ninjaDress(id, mass, ht, sleeved) =
     strip('back-tie-a', 'trim', [-0.13, -0.11], [-0.17, -0.14], 0.0, 0.01, 0.005),
     strip('back-tie-b', 'trim', [0.13, -0.11], [0.17, -0.135], 0.0, 0.01, 0.005),
   ], { cloth: 'cloth-yellow', trim: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A cropped hoodie folded, 320 mm by 230 mm and 50 mm tall: the hood folded down over the neck, a kangaroo pocket,
   // drawcords, the sleeves folded in along the sides with ribbed cuffs, and a ribbed hem band that stops short.
@@ -198,7 +198,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                       ]
                                       + bandX('hem', 'cuff', -d / 2 + 0.012, 0.022, w, ht, 0.004),
              { cloth: 'cloth-purple', sleeve: 'cloth-purple', hood: 'cloth-purple', cuff: 'cloth-charcoal', pocket: 'cloth-purple', cord: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A sports jersey folded, 300 mm by 280 mm and 30 mm tall: a white V neck, short sleeves with white stripes at the
   // hem, white side panels and a big white number seven on the chest.
@@ -213,7 +213,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                strip('number-stem', 'trim', [-0.035, 0.03], [0.02, -0.1], ht, 0.024, 0.004),
                              ],
              { cloth: 'lycra-blue', sleeve: 'lycra-blue', trim: 'cloth-bright-white', hole: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A leotard laid flat, about 260 mm wide and 380 mm long: thin shoulder straps, a scoop neck, the body narrowing to
   // a high-cut crotch, and its leg openings bound in a contrasting trim.
@@ -228,7 +228,7 @@ local ninjaDress(id, mass, ht, sleeved) =
     strip('leg-l', 'trim', [-0.097, -0.035], [-0.027, -0.175], 0.008, 0.008, 0.003),
     strip('leg-r', 'trim', [0.097, -0.035], [0.027, -0.175], 0.008, 0.008, 0.003),
   ] + h.crescent('neck', 'trim', 0.05, 0.058, 90, 270, 8, 0.008, 0.011, 0, 0.152), { cloth: 'lycra-red', trim: 'lycra-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A long-sleeved cotton shirt folded, 300 mm by 300 mm and 40 mm tall: a turned-down collar, a buttoned placket,
   // the sleeves folded in along the sides with buttoned cuffs, and one chest pocket.
@@ -241,7 +241,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                  + g.buttons('cuff-button-l', 'button', -w / 2 + 0.033, [-d / 2 + 0.045], ht + 0.009, 0.005)
                                  + g.buttons('cuff-button-r', 'button', w / 2 - 0.033, [-d / 2 + 0.045], ht + 0.009, 0.005),
              { cloth: 'cloth-green', collar: 'cloth-green', front: 'cloth-green', sleeve: 'cloth-green', cuff: 'cloth-green', pocket: 'cloth-green', button: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A blue maid's dress folded long, 320 mm by 400 mm and 50 mm tall, with its frilled white apron, collar and cuffs.
   maidDress('maid_dress', 0.7, 0.32, 0.4, 0.05, 'cloth-blue') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
@@ -267,7 +267,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                     for i in std.range(0, 3)
                                   ],
              { cloth: 'cloth-cream', sleeve: 'cloth-cream', waist: 'cloth-rag', wrap: 'cloth-rag', hole: 'cloth-rag-shadow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A short black dress folded, 300 mm by 340 mm and 40 mm tall: sleeves folded along the sides with red cuffs, a red
   // mandarin collar and wrap edge, a red hem band and a red waist tie with straight hanging ends.
@@ -284,7 +284,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                   + shortSleeves(w, ht, d / 2 - 0.02, 0.085, 0.035, 'collar')
                                   + [box('logo', 'logo', [0.06, ht, 0.02], [0.085, ht + 0.004, 0.04])],
              { cloth: 'cloth-navy', collar: 'cloth-navy', front: 'cloth-navy', sleeve: 'cloth-navy', button: 'cloth-cream', logo: 'cloth-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A light blue work shirt folded, 300 mm by 300 mm and 40 mm tall: a pointed collar, a buttoned placket, two flapped
   // chest pockets with buttons, an embroidered patch on the left sleeve and short sleeves.
@@ -296,7 +296,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                        box('patch-eagle', 'mark', [-w / 2 - 0.02, ht + 0.01, d / 2 - 0.08], [-w / 2 - 0.005, ht + 0.012, d / 2 - 0.06]),
                                      ],
              { cloth: 'cloth-denim-faded', collar: 'cloth-denim-faded', front: 'cloth-denim-faded', sleeve: 'cloth-denim-faded', pocket: 'cloth-denim-faded', flap: 'cloth-denim-faded', button: 'cloth-cream', patch: 'cloth-navy', mark: 'cloth-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A red velvet-look party dress folded, 320 mm by 360 mm and 60 mm tall: white faux fur on the collar, the cuffs of
   // the sleeves folded at the sides and round the hem, and a black belt with a gold buckle at the waist.
@@ -312,5 +312,5 @@ local ninjaDress(id, mass, ht, sleeved) =
                                  + bandX('hem-fur', 'fur', -d / 2 + 0.075, 0.04, w, ht + 0.008, 0.012)
                                  + bandX('belt', 'belt', waistZ, 0.03, w, ht + 0.004, 0.005),
              { cloth: 'cloth-red', sleeve: 'cloth-red', waist: 'cloth-red', fur: 'fur-pale', belt: 'leather-black', buckle: 'metal-gold' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 ]

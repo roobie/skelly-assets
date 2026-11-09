@@ -223,13 +223,13 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
   h.compound('sheet_metal_leg_guards', 2.2, sheetGuard('left', -0.09, -1, 0) + sheetGuard('right', 0.09, 1, 0.03), {
     plate: 'steel-bright',
     tie: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A pair of sheet-metal greaves 370 mm from knee to instep, laid side by side.
   h.compound('sheet_metal_greaves', 1.6, sheetGreave('left', -0.085, -1, 0) + sheetGreave('right', 0.085, 1, 0.03), {
     plate: 'steel-bright',
     tie: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A skirt of four cut-down steel sheets 300 mm long hung from a leather belt 500 mm long, laid flat.
   h.compound('sheet_metal_skirt', 2, skirt, {
@@ -237,7 +237,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     rivet: 'steel-grey',
     belt: 'leather-brown',
     buckle: 'steel',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'] } } },
 
   // A pair of sheet-metal knee guards, each a felt-lined half-pipe 130 mm long and 130 mm across with a domed knee
   // cop, leather straps lying flat off both edges; 500 mm across the pair.
@@ -253,7 +253,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
   h.compound('paper_leg_guards', 0.59, paperGuard('left', -0.09, -1, 0) + paperGuard('right', 0.09, 1, 0.03), {
     paper: 'paper-white',
     tape: 'tape-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['legs'] } } },
 
   // A pair of scrap leg guards 580 mm long, mismatched pieces of sheet strung together with cord.
   h.compound('scrap_metal_leg_guards', 2.1, scrapGuard('left', -0.095, -1, 0) + scrapGuard('right', 0.095, 1, 0.03), {
@@ -261,14 +261,14 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     'scrap-b': 'steel-galvanised',
     'scrap-c': 'steel-bright',
     tie: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A pair of tyre leg guards 580 mm long, three thick chunks of tread on each strung together with cord.
   h.compound('tyre_leg_guards', 3, tyreGuard('left', -0.1, -1, 0) + tyreGuard('right', 0.1, 1, 0.03), {
     rubber: 'rubber-black',
     tread: 'plastic-charcoal',
     tie: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'fabric'], slot: ['legs'] } } },
 
   // A pair of mail leggings 780 mm from hip to ankle, laid flat side by side, with hip straps and stirrups.
   h.compound('chainmail_leggings', 6, mailLegging('left', -0.105) + mailLegging('right', 0.105), {
@@ -276,7 +276,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     ring: 'steel-mail-dark',
     strap: 'leather-brown',
     buckle: 'steel',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of mail half-leggings 740 mm long lying back up, the open backs laced across.
   h.compound('chainmail_half_leggings', 4.5, halfLegging('left', -0.085) + halfLegging('right', 0.085), {
@@ -284,7 +284,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     ring: 'steel-mail-dark',
     lace: 'cord-cotton',
     strap: 'leather-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // Motorcycle jeans folded to 380 by 320 mm, 60 mm thick, a ribbed knee pad and a hip pad sewn in, orange stitching.
   h.compound('motorcycle_jeans', 1.4, trousers(0.38, 0.32, 0.06, 3)
@@ -299,7 +299,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     pad: 'plastic-charcoal',
     rib: 'plastic-matte-black',
     stitch: 'cloth-orange',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Canvas trousers folded to 380 by 320 mm, 60 mm thick, with leather panels sewn over the thigh and shin.
   h.compound('leather_padded_pants', 1.2, trousers(0.38, 0.32, 0.06, 3)
@@ -312,7 +312,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     pocket: 'cloth-brown',
     pad: 'leather-brown',
     rib: 'leather-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['legs'], state: ['folded'] } } },
 
   // Bomb-disposal trousers folded to 440 by 380 mm, 140 mm thick with padding: quilted panels, a hard knee plate
   // with hook-and-loop strips, and braces laid over the top.
@@ -338,7 +338,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     hook: 'hook-loop-grey',
     brace: 'webbing-black',
     buckle: 'plastic-matte-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Lighter bomb-disposal trousers folded to 400 by 340 mm, 90 mm thick: stitched padding, a knee pad, a flapped
   // thigh pocket and hook-and-loop panels.
@@ -361,5 +361,5 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     cargo: 'nylon-coyote',
     flap: 'polymer-fde',
     hook: 'hook-loop-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 ]

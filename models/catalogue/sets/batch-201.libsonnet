@@ -3,9 +3,9 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local pi = std.pi;
 
-// Garments of a silvery, faintly iridescent wool, folded on a shelf with their collar or waistband at +z, and a
-// steel arm harness laid out flat. The wool's odd sheen is the `cloth-shimmer` finish, its quilting picked out in
-// violet so it reads as a cloth that changes colour with the light.
+// Garments of a silvery, faintly iridescent wool, folded on a shelf, and a steel arm harness laid out flat. The wool's
+// odd sheen is the `cloth-shimmer` finish, its quilting picked out in violet so it reads as a cloth that changes
+// colour with the light.
 
 local spread(a, b, n) = [a + (b - a) * i / (n - 1) for i in std.range(0, n - 1)];
 
@@ -82,7 +82,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                           ] + g.quilt({ style: 'lines', x0: -w / 2 + 0.02, x1: w / 2 - 0.02, z0: -d / 2, z1: -d / 2 + skirt - 0.02, y: ht + 0.012, pitch: 0.036, w: 0.009, prefix: 'skirt-quilt' })
                           else []),
              wool)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 
 [
@@ -107,7 +107,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                for i in std.range(0, 4)
                for x in [-0.194 + i * 0.022]
              ],
-             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' })
+             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' }) + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of quilted wool arming mittens laid flat, backs up, each 270 mm from cuff to fingertip: thick mitts with a
@@ -193,7 +193,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                                          for x0 in [if s < 0 then -w / 2 else w / 2 - 0.085]
                                        ]),
              wool + { opening: 'cloth-charcoal', cuff: 'cloth-shimmer', collar: 'cloth-shimmer' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // Wool knee breeches folded flat, 240 mm by 340 mm and 30 mm tall: a deep waistband, a buttoned fall flap at the
   // front, the legs gathered into buttoned knee bands at the hem end, and no pockets.
@@ -213,5 +213,5 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                                             for i in [0, 1, 2, 3]
                                             for x in [[-0.1, -0.08, 0.08, 0.1][i]]
                                           ], wool)
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['legs'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['legs'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 ]

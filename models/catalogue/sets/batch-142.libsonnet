@@ -162,7 +162,7 @@ local medal(id, mass) =
                for x in [if k == 0 then -0.011 else 0.011]
              ]),
              { wire: 'metal-silver', bead: 'wood-walnut' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood', 'metal'], slot: ['head'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood', 'metal'], slot: ['head'] } } },
 
   // A string of 60 wooden beads, 10 mm each, lying flat in a ring 210 mm across, with a larger guru bead and a red
   // cord tassel at +z so it doubles as prayer beads.
@@ -259,7 +259,7 @@ local medal(id, mass) =
                for x in [if k == 0 then -0.017 else 0.017]
              ]),
              { metal: 'copper' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
 
   // A copper hairpin 45 mm long lying flat: two slim prongs joined by a rounded bend, one prong crimped in waves so it
   // grips the hair.
@@ -305,7 +305,7 @@ local medal(id, mass) =
                h.box('clasp-tab', 'metal', [-0.003, 0, R - 0.003], [0.003, 0.0025, R + 0.001]),
              ],
              { metal: 'copper' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A bracelet of nine cowrie shells, 18 mm each, threaded slit up on a cotton cord and lying flat in a ring 80 mm
   // across, the cord's ends tied off at -z.

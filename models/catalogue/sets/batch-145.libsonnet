@@ -72,7 +72,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
              [bead('bead-%d' % i, 'tail', p.r, p.x, 0, p.z) for i in std.range(0, tailN - 1) for p in [tailAt(i)]]
              + h.strapLoop('loop', 'strap', 0.02, 0.012, 0.01, 0.004, 0, -0.29, 0)
              + [h.stud('snap', 'snap', -0.275, 0.004, 0, 0.004, 0.003)],
-             { tail: 'leather-patent', strap: 'leather-black', snap: 'metal-silver' })
+             { tail: 'leather-patent', strap: 'leather-black', snap: 'metal-silver' }) + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A black leather collar lying flat, 135 mm across and 22 mm tall: a closed band buckled at the back, a steel ring

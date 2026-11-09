@@ -345,6 +345,6 @@ local furArmour() =
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['bone'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Fur body armour folded on a shelf, 300 mm by 280 mm and 120 mm tall.
-  h.compound('fur_armour', 3, furArmour(), { cloth: 'fur-brown', collar: 'fur-brown', sleeve: 'fur-brown', stitch: 'skin-rawhide', cuff: 'skin-rawhide', front: 'skin-rawhide', button: 'skin-rawhide', tuft: 'fur-brown', tie: 'skin-rawhide' })
+  h.compound('fur_armour', 3, furArmour(), { cloth: 'fur-brown', collar: 'fur-brown', sleeve: 'fur-brown', stitch: 'skin-rawhide', cuff: 'skin-rawhide', front: 'skin-rawhide', button: 'skin-rawhide', tuft: 'fur-brown', tie: 'skin-rawhide' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso', 'arms'], state: ['folded'] } } },
 ]

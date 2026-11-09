@@ -174,7 +174,7 @@ local mask(id, zipped) =
   ] + [
     g.strip('neck-rib-%d' % i, 'rib', [-0.08, -0.112 + 0.01 * i], [0.08, -0.112 + 0.01 * i], 0.013, 0.003, 0.001)
     for i in std.range(0, 3)
-  ], { knit: 'cloth-olive-drab', rib: 'webbing-olive-dark', face: 'screen-black' })
+  ], { knit: 'cloth-olive-drab', rib: 'webbing-olive-dark', face: 'screen-black' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A cotton bandana folded corner to corner twice and laid flat, 390 mm along the folded edge at +z and 195 mm
@@ -188,7 +188,7 @@ local mask(id, zipped) =
     h.disc('motif-%d' % i, 'print', 0.007, 0.006, 0.007, m[0], m[1])
     for i in std.range(0, 5)
     for m in [[[-0.09, 0.06], [0, 0.06], [0.09, 0.06], [-0.045, 0.015], [0.045, 0.015], [0, -0.03]][i]]
-  ], { cloth: 'cloth-red', print: 'cloth-cream' })
+  ], { cloth: 'cloth-red', print: 'cloth-cream' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A black leather mask standing upright, 200 mm across and 270 mm tall: zipped eye slits and mouth gaping open at

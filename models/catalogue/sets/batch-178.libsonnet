@@ -223,7 +223,7 @@ local leatherCuirass() =
                ]
                for s in sides
              ]),
-             { cloth: 'cloth-cream', lining: 'cloth-khaki', quilt: 'cloth-khaki', binding: 'leather-tan' })
+             { cloth: 'cloth-cream', lining: 'cloth-khaki', quilt: 'cloth-khaki', binding: 'leather-tan' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'leather'], slot: ['torso'] } } },
 
   // A 4 mm mild steel chestplate laid flat, 460 mm from neck to waist and 600 mm with its fauld: breast over back,

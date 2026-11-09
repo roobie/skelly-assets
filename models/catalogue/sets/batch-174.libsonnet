@@ -126,22 +126,22 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
   // mail shirt with sleeves, the legs folded up over the body under a leather belt, and the attached coif standing
   // at the neck with its face opening forward.
   h.compound('mild_steel_mail_suit', 16, mailBundle({ d: 0.46, legs: true, coif: true }), mailFinish('steel-mail'))
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 
   // A medium steel mail hauberk folded to 380 mm by 420 mm and 60 mm tall: a long mail shirt with sleeves along
   // its sides, a leather-bound neck and a split skirt.
   h.compound('mild_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), mailFinish('steel-mail-dark'))
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A medium steel mail jumpsuit folded to 380 mm by 440 mm and 60 mm tall: sleeves along the sides and the legs
   // folded up over the body under a leather belt, with a leather-bound neck.
   h.compound('mild_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), mailFinish('steel-mail-dark'))
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A sleeveless medium steel mail jumpsuit folded to 380 mm by 420 mm and 60 mm tall: leather-bound armholes at
   // the shoulders and the legs folded up over the body under a leather belt.
   h.compound('mild_steel_sleeveless_mail_jumpsuit', 13, mailBundle({ d: 0.42, sleeves: false, armholes: true, legs: true }), mailFinish('steel-mail-dark'))
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'legs'], state: ['folded'] } } },
   // A sage-green flight suit folded to 360 mm by 420 mm and 50 mm tall, legs folded up: a zipped front, a flat
   // collar, flapped chest pockets with a name tape over one, a flag patch and a
   // pen pocket on the left sleeve, a round unit patch on the right, and flapped thigh pockets.
@@ -166,7 +166,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     patch: 'cloth-yellow',
     flag: 'cloth-crimson',
     flagb: 'cloth-navy',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A thin flame-resistant knit body suit folded to 300 mm by 320 mm and 30 mm tall, legs folded up: a mock neck, a
   // light front zip, sleeves along the sides and ribbed cuffs at the wrists and ankles.
@@ -185,7 +185,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     leg: 'knit-fr',
     zip: 'steel-bright',
     rib: 'webbing-olive-dark',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dress uniform folded on a shelf: a navy jacket 380 mm by 360 mm on folded trousers 320 mm by 420 mm, 90 mm
   // tall in all. Gold buttons, shoulder boards with rank bars, rows of ribbons and two medals over the left breast,
@@ -222,7 +222,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     ribbon0: 'cloth-crimson',
     ribbon1: 'cloth-blue',
     ribbon2: 'cloth-green',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A sealed environmental suit folded to 460 mm by 440 mm and 80 mm tall, legs folded up, with its attached boots
   // standing on the bundle and its attached gloves lying on the sleeves: brown cloth with blue shoulders, a ring neck
@@ -256,7 +256,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     lining: 'cloth-charcoal',
     glove: 'vinyl-black',
     cuff: 'cloth-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
 
   // The same sealed suit worn down: its top half rolled to the waist and the sleeves knotted round it, folded to
   // 420 mm by 380 mm and 70 mm tall with the roll across the back, the knotted sleeves and their gloves hanging over
@@ -302,5 +302,5 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     shirt: 'cloth-cream',
     tie: 'cloth-crimson',
     square: 'cloth-cream',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

@@ -73,7 +73,7 @@ local sleevelessDuster(id, mass, w, d, ht, folds, cape, finish) =
                        + pocket('pocket-l', 'pocket', 'flap', -w / 2 + 0.075, -0.07, 0.11, 0.1, ht)
                        + pocket('pocket-r', 'pocket', 'flap', w / 2 - 0.075, -0.07, 0.11, 0.1, ht),
              finish)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A trench coat folded long: wide lapels, a gun flap over the right shoulder, epaulettes, two columns of buttons,
 // slanted flapped pockets and the belt buckled round the bundle. Sleeveless ones show their armholes; a sleeved one
@@ -101,7 +101,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                          flat('pocket-flap-r', 'flap', [[0.15, -0.09], [0.09, -0.12], [0.08, -0.105], [0.14, -0.075]], ht, 0.006),
                        ],
              finish)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 [
   // A red Santa jacket folded, 380 mm by 320 mm and 70 mm tall: white faux fur on the collar, down the front and
@@ -126,7 +126,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                     box('pocket-fur-r', 'fur', [0.058, ht + 0.004, 0.06], [0.142, ht + 0.01, 0.075]),
                                   ],
              { cloth: 'cloth-red', sleeve: 'cloth-red', fur: 'fur-pale', belt: 'leather-black', buckle: 'metal-gold' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A short sleeveless red jacket folded, 320 mm by 260 mm and 45 mm tall: white faux fur round the collar, the
   // armholes, down the front and along the hem, closed with three white pompom buttons.
@@ -144,7 +144,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                           for z in [0.06 - i * 0.055]
                                         ],
              { cloth: 'cloth-red', fur: 'fur-pale', hole: 'cloth-crimson' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A red insulated ski jacket folded thick, 380 mm by 320 mm and 75 mm tall: quilted baffles, a black yoke over the
   // shoulders, the red hood folded down on top, a zip up the front and zipped chest and hip pockets.
@@ -166,7 +166,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                     strip('pocket-zip-r', 'zip', [0.15, -0.135], [0.09, -0.075], ht + 0.005, 0.006, 0.004),
                                   ],
              { cloth: 'nylon-red', yoke: 'cloth-black', trim: 'plastic-charcoal', zip: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless canvas duster folded long, 380 mm by 320 mm and 55 mm tall in five layers: a short shoulder cape
   // between the armholes, a stand collar, three leather buttons and two flapped hip pockets.
@@ -222,7 +222,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                          box('hem', 'bind', [-w / 2, ht, -d / 2 + 0.02], [w / 2, ht + 0.002, -d / 2 + 0.026]),
                                        ],
              { cloth: 'cloth-cotton', bind: 'cloth-brown', hole: 'cloth-brown', lace: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A grey-green tactical jacket folded, 360 mm by 300 mm and 45 mm tall: a high mandarin collar, a zip under a
   // snapped storm flap, slanted zipped chest pockets, hook-and-loop panels on the folded sleeves, an ID plate and
@@ -248,7 +248,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                  + buttons('cargo-snap-l', 'snap', -0.075, [-0.075], ht + 0.008, 0.005)
                                  + buttons('cargo-snap-r', 'snap', 0.075, [-0.075], ht + 0.008, 0.005),
              { cloth: 'cloth-ucp', sleeve: 'cloth-ucp', flap: 'cloth-ucp', loop: 'hook-loop-grey', zip: 'plastic-matte-black', snap: 'plastic-matte-black', plate: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A white cotton thawb folded long, 360 mm by 340 mm and 50 mm tall in four layers: a narrow stand collar, a short
   // buttoned placket, a breast pocket, and the wide sleeves folded in along the sides.
@@ -264,7 +264,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                            + pocket('breast', 'cloth', null, -0.06, cz - 0.11, 0.06, 0.06, ht)
                            + [box('breast-seam', 'seam', [-0.09, ht + 0.004, cz - 0.082], [-0.03, ht + 0.005, cz - 0.08])],
              { cloth: 'cloth-cream', sleeve: 'cloth-cream', seam: 'cloth-white', button: 'cloth-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A khaki canvas trench coat folded, 380 mm by 340 mm and 60 mm tall: the sleeves folded in along the sides with
   // strapped cuffs, wide lapels, a gun flap, an epaulette, double-breasted buttons and the belt buckled round it.

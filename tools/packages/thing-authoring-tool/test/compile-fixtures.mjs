@@ -1,4 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { compileJsonnetFile } from '../../../jsonnet/index.mjs';
-const source = new URL('./fixtures/bend-strip.jsonnet', import.meta.url);
-writeFileSync(new URL('./fixtures/bend-strip.json', import.meta.url), compileJsonnetFile(source.pathname));
+for (const name of ['bend-strip', 'lying-on-back']) {
+  const source = new URL(`./fixtures/${name}.jsonnet`, import.meta.url);
+  writeFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), compileJsonnetFile(source.pathname));
+}

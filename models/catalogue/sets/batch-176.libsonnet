@@ -180,7 +180,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
 
   // One-piece swimsuit laid flat, 500 mm from crotch to shoulders and 300 mm across the hips, printed with a striped
   // flag and starred canton, its shoulder straps folded down over the front.
-  h.compound('flag_swimsuit', 0.24, swimsuit(), { cloth: 'lycra-red', strap: 'lycra-red', band: 'lycra-black', lining: 'cloth-crimson', stripe: 'cloth-bright-white', canton: 'cloth-navy', star: 'cloth-bright-white' })
+  h.compound('flag_swimsuit', 0.24, swimsuit(), { cloth: 'lycra-red', strap: 'lycra-red', band: 'lycra-black', lining: 'cloth-crimson', stripe: 'cloth-bright-white', canton: 'cloth-navy', star: 'cloth-bright-white' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Swim goggles standing on their cups, front on +z: two 40 mm cups on a nose bridge, 120 mm across, the silicone
@@ -193,7 +193,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   h.compound('rashguard', 0.38,
              g.jacket({ w: 0.3, d: 0.3, ht: 0.04, front: 'none', buttons: 0, collar: { r: 0.055, wd: 0.016, ht: 0.01, gap: 30 }, sleeves: { kind: 'flat', w: 0.07, t: 0.005 } })
              + [box('panel', 'panel', [-0.08, 0.04, -0.06], [0.08, 0.043, 0.0])],
-             { cloth: 'lycra-black', collar: 'lycra-blue', sleeve: 'lycra-blue', panel: 'lycra-blue' })
+             { cloth: 'lycra-black', collar: 'lycra-blue', sleeve: 'lycra-blue', panel: 'lycra-blue' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Mail shark suit laid out flat, 1.8 m from hood to toes and 950 mm across the arms.
@@ -206,12 +206,12 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
 
   // Black racing briefs laid flat, 300 mm across the waist and 150 mm deep.
   h.compound('racing_briefs', 0.052, briefs([[0.075, 0.15], [0.05, 0.145], [0.025, 0.115], [0.0, 0.08], [-0.03, 0.05], [-0.075, 0.038]]),
-             { cloth: 'lycra-black', band: 'lycra-black', cord: 'cord-cotton' })
+             { cloth: 'lycra-black', band: 'lycra-black', cord: 'cord-cotton' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Blue swim briefs laid flat, 320 mm across the waist and 170 mm deep, fuller at the sides, with contrast panels.
   h.compound('swim_briefs', 0.07, briefs([[0.085, 0.16], [0.05, 0.158], [0.02, 0.13], [-0.01, 0.09], [-0.045, 0.055], [-0.085, 0.042]], true),
-             { cloth: 'lycra-blue', band: 'cloth-navy', cord: 'cord-cotton', panel: 'cloth-navy' })
+             { cloth: 'lycra-blue', band: 'cloth-navy', cord: 'cord-cotton', panel: 'cloth-navy' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Swim cap standing on its rim, 190 mm across and 120 mm tall, with a rolled edge.
@@ -239,7 +239,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                g.strip('cord-l', 'cord', [-0.01, 0.12], [-0.03, 0.04], 0.05, 0.006, 0.005),
                g.strip('cord-r', 'cord', [0.01, 0.12], [0.035, 0.045], 0.05, 0.006, 0.005),
              ],
-             { cloth: 'cloth-green', band: 'cloth-navy', liner: 'mesh-white', seam: 'cloth-navy', stripe: 'cloth-cream', cord: 'cord-cotton' })
+             { cloth: 'cloth-green', band: 'cloth-navy', liner: 'mesh-white', seam: 'cloth-navy', stripe: 'cloth-cream', cord: 'cord-cotton' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Full wetsuit folded on a shelf, 380 mm by 320 mm and 100 mm tall: black neoprene with blue side panels and collar,
@@ -259,7 +259,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                box('yoke-seam', 'seam', [-0.107, 0.1, 0.1], [-0.07, 0.103, 0.108]),
                box('yoke-seam-r', 'seam', [0.07, 0.1, 0.1], [0.107, 0.103, 0.108]),
              ],
-             { cloth: 'neoprene-black', collar: 'cloth-blue', front: 'canvas-grey', sleeve: 'neoprene-black', panel: 'cloth-blue', pad: 'canvas-grey', leash: 'cloth-blue', seam: 'canvas-grey' })
+             { cloth: 'neoprene-black', collar: 'cloth-blue', front: 'canvas-grey', sleeve: 'neoprene-black', panel: 'cloth-blue', pad: 'canvas-grey', leash: 'cloth-blue', seam: 'canvas-grey' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Neoprene split-toe dive socks lying flat side by side, both pointing the same way, each 250 mm heel to toe and

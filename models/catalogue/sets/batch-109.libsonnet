@@ -170,7 +170,7 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
   // gloves with a curved steel plate over the back of the hand, two plates down each finger and the thumb, and a
   // buckled cuff strap.
   h.compound('hardened_brigandine_gloves', 0.52, glove('l-', -0.1, 1) + glove('r-', 0.1, -1), { canvas: 'cloth-canvas' } + steelFinishes('steel-heat-tint'))
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['hands'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of tempered steel elbow guards laid side by side, convex side up, each 150 mm from top to foot: a domed cup
   // over the elbow, a curved lame above and below, a round wing on the outer side and two buckled leather straps.

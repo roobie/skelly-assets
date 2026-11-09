@@ -204,7 +204,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
                for x in [[-0.12, -0.05, 0.05, 0.12][i]]
              ]),
              { cloth: 'cloth-black', lace: 'mesh-black', strap: 'cloth-black', clip: 'steel-bright', trim: 'petal-pink' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'], setting: ['modern'] } } },
 
   // A pair of knit cotton leg warmers laid flat side by side, 280 mm across and 420 mm long: slouchy tubes 110 mm
   // across with ribbed cuffs at both ends and two stripes round each.
@@ -227,7 +227,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
                for x in [if n == 'l' then -0.1 else 0.1]
              ]),
              { fur: 'fur-brown', tuft: 'fur-brown', tie: 'skin-rawhide' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 
   // A pair of fur cuffs for hooves laid flat side by side, 440 mm across with their ties and 220 mm long: short
   // shaggy sleeves of fur-on hide that flare from 140 mm at the top to 190 mm round the hoof, tied on above the
@@ -239,7 +239,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
                for x in [if n == 'l' then -0.13 else 0.13]
              ]),
              { fur: 'fur-pale', tuft: 'fur-pale', tie: 'skin-rawhide' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 
   // Cotton long underwear bottoms folded on a shelf, 280 mm by 300 mm and 36 mm tall, waistband at +z: waffle knit
   // with a covered elastic waistband, a fly seam down the front and the ribbed ankle cuffs folded up over the top.
@@ -257,7 +257,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
                for s in [-1, 1]
              ]),
              { cloth: 'cloth-cream', quilt: 'knit-wool', band: 'cloth-cream', seam: 'knit-wool', cuff: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A cotton long underwear top folded on a shelf, 300 mm by 320 mm and 36 mm tall, neck at +z: waffle knit with a
   // ribbed crew neck, a short three-button placket and the sleeves folded down both sides to ribbed cuffs.
@@ -269,7 +269,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
              + [h.disc('button-%d' % i, 'button', 0.005, ht + 0.004, ht + 0.007, 0, d / 2 - 0.165 - i * 0.025) for i in [0, 1, 2]]
              + [sbox('cuff-%d' % (s + 1), 'cuff', [s * w / 2, ht + 0.006, -d / 2 + 0.03], [s * (w / 2 - 0.07), ht + 0.01, -d / 2 + 0.07]) for s in [-1, 1]],
              { cloth: 'cloth-cream', collar: 'knit-wool', sleeve: 'cloth-cream', quilt: 'knit-wool', front: 'knit-wool', button: 'pearl', cuff: 'knit-wool' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A cotton sleeveless underwear top folded on a shelf, 280 mm by 300 mm and 30 mm tall, neck at +z: a fine-ribbed
   // grey vest with a scoop neck and narrow shoulder straps, the armholes cut in at both sides.
@@ -284,7 +284,7 @@ local furSleeve(p, x, w0, w1, t, l, ties) =
              ])
              + [box('rib-%d' % i, 'rib', [x - 0.0015, ht, -d / 2 + 0.01], [x + 0.0015, ht + 0.002, d / 2 - 0.16]) for i in std.range(0, 11) for x in [-0.077 + i * 0.014]],
              { cloth: 'cloth-heather-grey', trim: 'cloth-cream', hole: 'cloth-charcoal', rib: 'felt-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Cotton panties laid flat, 300 mm across the waist and 200 mm long, waist at -z: a full front panel narrowing to the
   // crotch, an elastic waistband, picot trim round the leg openings and a small bow at the front.

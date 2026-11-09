@@ -72,7 +72,7 @@ local coat(id, mass, w, d, ht, sleeves, long, closure, fin) =
                           ] + quiltZ('skirt-quilt', spread(-w / 2 + 0.035, w / 2 - 0.035, 9), -d / 2, -d / 2 + skirt - 0.02, ht + 0.016)
                           else []),
              fin)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // Quilted arming pants folded in a long bundle: the legs laid one on the other, channels running their length,
 // a waistband at the +z end with lacing points hanging over the front edge, and bound cuffs at the -z end.
@@ -95,7 +95,7 @@ local pants(id, mass, fin) =
                          for x in [spread(-0.09, 0.09, 4)[i]]
                        ]),
              fin)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A coif standing upright as on a shelf: a padded hood over the crown with a flared curtain resting on the
 // shoulders, the face opening at +z bound with a rolled rim, quilted in rings, and a chin strap.

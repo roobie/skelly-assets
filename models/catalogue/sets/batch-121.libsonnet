@@ -56,7 +56,7 @@ local coat(id, mass, sr, fin) =
                        + buttons('toggle', 'toggle', 0, [cz - 0.085, cz - 0.15, cz - 0.215, cz - 0.28], ht + 0.01, 0.008)
                        + sleeve('sleeve-l-', -w / 2 + sr + 0.004, sr, -d / 2 + 0.01, d / 2 - 0.04, ht)
                        + sleeve('sleeve-r-', w / 2 - sr - 0.004, sr, -d / 2 + 0.01, d / 2 - 0.04, ht), fin)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // A sleeveless gambeson folded in four: channel quilting, a stand collar, a toggled front and bound armholes cut
 // into both sides at the shoulders. Slots: cloth, quilt, stitch, binding, toggle, hole.
@@ -73,7 +73,7 @@ local surcoat(id, mass, fin) =
                        + h.crescent('armhole-r', 'binding', ar, ar + 0.014, -180, 0, 8, ht, ht + 0.012, w / 2, az)
                        + h.crescent('hole-l', 'hole', 0.002, ar, 0, 180, 8, ht, ht + 0.004, -w / 2, az)
                        + h.crescent('hole-r', 'hole', 0.002, ar, -180, 0, 8, ht, ht + 0.004, w / 2, az), fin)
-  + { voxelGrain: 0.004 };
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 };
 
 // Quilted trousers folded lengthwise and in layers: channel quilting down the leg, a waistband at the +z end with a
 // drawstring or lacing points, and a bound hem at the -z end. Slots: cloth, quilt, binding, cord.
@@ -182,7 +182,7 @@ local faceOval(prefix, slot, a, b, lift) =
     strip('lace-end-a', 'lace', [-0.022, cz - 0.28], [-0.05, -d / 2 + 0.008], ht + 0.006, 0.006, 0.003),
     strip('lace-end-b', 'lace', [0.022, cz - 0.28], [0.03, -d / 2 + 0.008], ht + 0.006, 0.006, 0.003),
   ], { cloth: 'cloth-cream', stitch: 'cloth-khaki', binding: 'cloth-brown', hole: 'cloth-charcoal', lace: 'leather-tan' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // Padded cotton arming trousers folded lengthwise in three, 280 mm by 420 mm and 60 mm tall: channel quilting down
   // the leg, a bound waistband with a drawstring tied at the front, a fly seam and a bound hem.
@@ -192,7 +192,7 @@ local faceOval(prefix, slot, a, b, lift) =
     strip('cord-b', 'cord', [0.0, d / 2 - 0.025], [0.025, d / 2 - 0.11], ht + 0.012, 0.009, 0.005),
     box('cord-knot', 'cord', [-0.008, ht + 0.012, d / 2 - 0.033], [0.008, ht + 0.02, d / 2 - 0.017]),
   ], { cloth: 'cloth-cream', quilt: 'cloth-cream', binding: 'cloth-khaki', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
 
   // Heavy canvas arming trousers folded lengthwise in four, 320 mm by 440 mm and 110 mm tall: thick channel quilting
   // down the leg, a padded knee panel, a leather-bound waistband with pairs of lacing points to tie them to a
@@ -210,5 +210,5 @@ local faceOval(prefix, slot, a, b, lift) =
     for i in std.range(0, 3)
     for x in [-0.12 + i * 0.08]
   ]), { cloth: 'cloth-canvas', quilt: 'cloth-canvas', binding: 'leather-brown', stitch: 'leather-brown', point: 'leather-tan' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
 ]
