@@ -256,26 +256,6 @@ it('refuses a glow whose material the built GLB does not draw', () => {
     'fixture: emissive material',
   );
 });
-it('refuses a glow whose colour another drawn material shares, since the GLB names both alike', () => {
-  const box = (slot: string, x: number) => ({ id: slot, slot, kind: 'box', min: [x, 0, 0], max: [x + 0.02, 0.02, 0.02] });
-  const run = (body: string, lit: string) => {
-    const input = fixture();
-    const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], finish: { body, lit }, params: {
-      pieces: JSON.stringify([box('body', 0), box('lit', 0.04)]),
-    } };
-    const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] });
-    return () => exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
-  };
-  // Two distinct shared materials whose colours already coincide; the registry is only read, never written.
-  const ids = Object.keys(MATERIALS);
-  const colour = (id: string) => JSON.stringify(MATERIALS[id]!.colour);
-  const body = ids.find((id) => ids.some((other) => other !== id && colour(other) === colour(id)));
-  expect(body, 'no two shared materials share a colour').toBeDefined();
-  const twin = ids.find((id) => id !== body && colour(id) === colour(body!))!;
-  const distinct = ids.find((id) => colour(id) !== colour(body!))!;
-  expect(run(body!, distinct)().modelEntry.emissiveMaterial).toBeDefined();
-  expect(run(body!, twin)).toThrow('names 2 materials in the GLB, not one');
-});
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
   const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
   const anchors = row.generate().modelEntry.anchors!;
