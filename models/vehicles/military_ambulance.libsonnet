@@ -60,4 +60,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('wall_tie_aft', 'frame', [-3.04, 2.84, 0.5], [-3.0, 2.88, 1.16]),
     box('wall_tie_fore', 'frame', [-1.0, 2.84, 0.5], [-0.96, 2.88, 1.16]),
   ], finish),
-] + m.truckRows('military_ambulance', s))
+])
