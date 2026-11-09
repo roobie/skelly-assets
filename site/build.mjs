@@ -1,5 +1,6 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category and tags, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
+// their category and tags, the vehicles the tree places with the model at each of their sites, and the vocabulary's
+// meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [outDir]; the tree defaults to built/. No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
@@ -49,6 +50,23 @@ const models = manifest.models
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
   }));
 
+// Each vehicle the manifest places (tools/placements.mjs), with the model at each site. A vehicle shows the tags of its
+// root part, the body every other part is placed on, because each vehicle's file tags its own rows and shared parts
+// carry none of its tags.
+const modelsById = new Map(models.map((model) => [model.id, model]));
+const vehicles = (manifest.vehicles ?? []).map(({ id, pack, path }) => {
+  if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
+  const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
+  const missing = sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
+  if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
+  return {
+    id,
+    placements: `${pack}/${path}`,
+    tags: modelsById.get(sites[0].part).tags,
+    sites: sites.map(({ id: site, part, at, mirror }) => ({ site, model: part, at, ...(mirror ? { mirror } : {}) })),
+  };
+});
+
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
 // dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback.
 const poseFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
@@ -94,6 +112,6 @@ for (const model of models) if (model.clips && model.body) {
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models }));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models, vehicles }));
 writeFileSync(join(out, '.nojekyll'), '');
-console.log(`${models.length} models into ${out}`);
+console.log(`${models.length} models and ${vehicles.length} vehicles into ${out}`);
