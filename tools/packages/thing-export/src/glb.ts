@@ -22,7 +22,7 @@ import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display
 import { boundsOfPoints } from '@skelly/construct/shapes/geometry.ts';
 import { displayBevel, meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
-import { invalidPaletteFinish, resolveAppearance } from './appearance.ts';
+import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
 import type {
   ExportGlb,
   ExportPortMetadata,
@@ -235,6 +235,44 @@ const portMetadata = (partId: string, port: PortDef, placed: Transform): ExportP
 
 type Json = Record<string, unknown>;
 
+/** The glTF material the writer gives a surface of this appearance. */
+export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
+  const opacity = finish.opacity ?? 1;
+  return {
+    name: hex(srgb),
+    pbrMetallicRoughness: {
+      baseColorFactor: [...srgb.map(srgbToLinear), opacity],
+      metallicFactor: finish.metallic,
+      roughnessFactor: finish.roughness,
+    },
+    ...(opacity < 1 ? { alphaMode: 'BLEND' } : {}),
+    ...(material === undefined
+      ? {}
+      : { extras: { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) } }),
+  };
+};
+
+const PAINT_SLOT = 'paint';
+
+/**
+ * Every palette material as the glTF material a paintable surface finished in it is written with, so a host that
+ * repaints a surface swaps in exactly what an export in that finish would carry.
+ */
+export const paintMaterials = (palette: Palette): Record<string, Json> =>
+  Object.fromEntries(
+    Object.keys(palette.materials ?? {})
+      .sort()
+      .map((id) => [
+        id,
+        gltfMaterial(
+          resolveAppearance(palette, PAINT_SLOT, '', {
+            context: { finish: { [PAINT_SLOT]: id }, paintable: [PAINT_SLOT] },
+            overrides: { partSlot: PAINT_SLOT },
+          }),
+        ),
+      ]),
+  );
+
 /** Everything the writer needs from one part, once it has passed validation. */
 interface PartExport {
   readonly id: string;
@@ -349,26 +387,13 @@ const writeGlb: ExportGlb = (input) => {
   const materialIndex = new Map<string, number>();
   const materialFor = (appearance: ReturnType<typeof resolveAppearance>): number => {
     const { color: srgb, material, shade, finish, paintable } = appearance;
-    const linear = srgb.map(srgbToLinear);
     // A paintable material never merges with an unmarked one of the same look, so a repaint reaches only its own.
-    const key = JSON.stringify([material, shade, linear, finish, paintable]);
+    const key = JSON.stringify([material, shade, srgb.map(srgbToLinear), finish, paintable]);
     let index = materialIndex.get(key);
     if (index === undefined) {
       index = materials.length;
       materialIndex.set(key, index);
-      const opacity = finish.opacity ?? 1;
-      materials.push({
-        name: hex(srgb),
-        pbrMetallicRoughness: {
-          baseColorFactor: [...linear, opacity],
-          metallicFactor: finish.metallic,
-          roughnessFactor: finish.roughness,
-        },
-        ...(opacity < 1 ? { alphaMode: 'BLEND' } : {}),
-        ...(material === undefined
-          ? {}
-          : { extras: { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) } }),
-      });
+      materials.push(gltfMaterial(appearance));
     }
     return index;
   };
