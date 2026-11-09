@@ -67,7 +67,8 @@ const contextual = <T>(row: RecipeRow, work: () => T): T => {
 export const loadRecipe = <Model extends NeutralModel>(
   value: unknown,
   exporters: Readonly<Record<string, (row: RecipeRow) => () => ModelExport<Model>>>,
-  inputsOf?: (row: RecipeRow) => unknown,
+  /** Per kind, what a row's export reads besides code; rows of a kind not named here are never cached. */
+  inputsOf: Readonly<Record<string, (row: RecipeRow) => unknown>> = {},
 ): readonly RecipeExport<Model>[] =>
   parse(RecipeSchema, value).map((row) =>
     contextual(row, () => {
@@ -81,7 +82,7 @@ export const loadRecipe = <Model extends NeutralModel>(
         source: row.source,
         voxel: recipeVoxel(row),
         generate: () => contextual(row, generate),
-        ...(inputsOf ? { inputs: () => ({ row, data: inputsOf(row) }) } : {}),
+        ...(Object.hasOwn(inputsOf, row.kind) ? { inputs: () => ({ row, data: inputsOf[row.kind]!(row) }) } : {}),
       };
     }),
   );

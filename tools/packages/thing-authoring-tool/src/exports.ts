@@ -76,9 +76,9 @@ const exporters = {
 export const THING_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
 const { items: _items, ...settings } = catalogue;
 /**
- * What an item's export reads besides code: its row, the catalogue settings and the materials it may name. A material
- * counts when its id occurs anywhere in the item's text, even inside a string parameter, since naming one too many
- * only widens the key.
+ * What an item row's export reads besides code and the row: its item, the catalogue settings and the materials it may
+ * name. A material counts when its id occurs anywhere in the item's text, even inside a string parameter, since naming
+ * one too many only widens the key.
  */
 const itemInputs = (row: RecipeRow) => {
   const item = catalogue.items.find(({ id }) => id === row.source);
@@ -86,4 +86,4 @@ const itemInputs = (row: RecipeRow) => {
   const named = Object.keys(MATERIALS).filter((id) => id === catalogue.defaultMaterial || text.includes(id));
   return { item, settings, materials: named.sort().map((id) => [id, MATERIALS[id]]) };
 };
-export const loadThingRecipe = (value: unknown) => loadRecipe(value, exporters, itemInputs);
+export const loadThingRecipe = (value: unknown) => loadRecipe(value, exporters, { item: itemInputs });
