@@ -305,6 +305,38 @@ it('refuses a glow whose material the built GLB does not draw', () => {
     'fixture: emissive material',
   );
 });
+const glbJson = (glb: Uint8Array) => {
+  const view = new DataView(glb.buffer, glb.byteOffset, glb.byteLength);
+  return JSON.parse(new TextDecoder().decode(glb.subarray(20, 20 + view.getUint32(12, true))));
+};
+const paintFixture = () => {
+  const input = fixture();
+  const box = (slot: string, x: number) => ({ id: slot, slot, kind: 'box', min: [x, 0, 0], max: [x + 0.02, 0.02, 0.02] });
+  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: {
+    pieces: JSON.stringify([box('paint', 0), box('trim', 0.02)]),
+  }, finish: { paint: material, trim: material }, paintable: ['paint'] };
+  return { ...input, items: [{ ...input.items[0], parts: [part], connections: [] }] };
+};
+it('marks only the paintable slot\'s material, even when an unmarked slot shares its look', () => {
+  const loaded = loadCatalogue(paintFixture());
+  const { glb, modelEntry } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  const json = glbJson(glb);
+  const slotMaterials = (slot: string) =>
+    new Set(json.meshes.flatMap(({ primitives }: { primitives: { material: number; extras: { slot?: string } }[] }) =>
+      primitives.filter(({ extras }) => extras.slot === slot).map((primitive) => json.materials[primitive.material])));
+  const paint = [...slotMaterials('paint')];
+  const trim = [...slotMaterials('trim')];
+  expect(paint.length).toBeGreaterThan(0);
+  expect(trim.length).toBeGreaterThan(0);
+  expect(paint.every(({ extras }) => extras.paintable === true)).toBe(true);
+  expect(trim.some(({ extras }) => extras.paintable)).toBe(false);
+  expect(modelEntry.paintable).toEqual(['paint']);
+});
+it('refuses a paintable slot that colours no solid', () => {
+  const input = paintFixture();
+  const part = { ...input.items[0]!.parts[0]!, paintable: ['glass'], finish: { paint: material, trim: material, glass: material } };
+  expect(() => loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part] }] })).toThrow('paintable slot glass');
+});
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
   const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
   const anchors = row.generate().modelEntry.anchors!;

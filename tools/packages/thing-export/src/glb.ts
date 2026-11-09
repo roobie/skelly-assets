@@ -245,7 +245,7 @@ interface PartExport {
 }
 
 const sameAppearance = (a: ReturnType<typeof resolveAppearance>, b: ReturnType<typeof resolveAppearance>): boolean =>
-  a.material === b.material && a.slot === b.slot && a.color.every((channel, index) => channel === b.color[index]);
+  a.material === b.material && a.slot === b.slot && a.paintable === b.paintable && a.color.every((channel, index) => channel === b.color[index]);
 
 /** Splits a merge group whose solids differ in finish or piece, because one primitive carries one of each. */
 const splitMixed = (
@@ -348,9 +348,10 @@ const writeGlb: ExportGlb = (input) => {
   const materials: Json[] = [];
   const materialIndex = new Map<string, number>();
   const materialFor = (appearance: ReturnType<typeof resolveAppearance>): number => {
-    const { color: srgb, material, shade, finish } = appearance;
+    const { color: srgb, material, shade, finish, paintable } = appearance;
     const linear = srgb.map(srgbToLinear);
-    const key = JSON.stringify([material, shade, linear, finish]);
+    // A paintable material never merges with an unmarked one of the same look, so a repaint reaches only its own.
+    const key = JSON.stringify([material, shade, linear, finish, paintable]);
     let index = materialIndex.get(key);
     if (index === undefined) {
       index = materials.length;
@@ -364,7 +365,9 @@ const writeGlb: ExportGlb = (input) => {
           roughnessFactor: finish.roughness,
         },
         ...(opacity < 1 ? { alphaMode: 'BLEND' } : {}),
-        ...(material === undefined ? {} : { extras: { materialId: material, colourMultiplier: shade } }),
+        ...(material === undefined
+          ? {}
+          : { extras: { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) } }),
       });
     }
     return index;

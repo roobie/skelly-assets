@@ -91,6 +91,17 @@ const PartSchema = strictObject({
   params: record(name, string()),
   massKg: positive,
   finish: record(name, material),
+  /**
+   * The finish slots a vehicle fitting's finish repaints on this part's copy. Glass, tyres and chrome are never
+   * listed, so a repaint leaves them as authored.
+   */
+  paintable: optional(
+    pipe(
+      array(name),
+      nonEmpty(),
+      check((slots) => new Set(slots).size === slots.length, 'duplicate paintable slot'),
+    ),
+  ),
   ports: array(PortSchema),
 });
 const ItemSchema = strictObject({
@@ -262,6 +273,11 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
       throw new Error(`Missing finish for ${part.id}/${solid.id}`);
     }
   }
+  for (const slot of part.paintable ?? []) {
+    if (!solids.some((solid) => solid.slot === slot && solid.material === undefined)) {
+      throw new Error(`${part.id}: paintable slot ${slot} colours no solid`);
+    }
+  }
   return { family: part.family, solids, ports: part.ports, axes: [], keepOuts: [] };
 };
 export const loadCatalogue = (value: unknown): Catalogue => {
@@ -295,6 +311,11 @@ const glowMaterial = (item: ToolItem, slot: string): string => {
   return hex(MATERIALS[id]!.colour);
 };
 
+const partAppearance = ({ finish, paintable }: ToolPart) => ({ finish, ...(paintable ? { paintable } : {}) });
+
+/** The finish slots any part of the item lets a host repaint, in authored order. */
+const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.parts.flatMap(({ paintable = [] }) => paintable))];
+
 /** Builds an item; with a model export's grains its datums read off the drawn voxels (see `drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
@@ -309,7 +330,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
       ...wrapped.assembly,
       rootPlacement,
       name: item.id,
-      parts: { [first.id]: { family: first.family, appearance: { finish: first.finish } } },
+      parts: { [first.id]: { family: first.family, appearance: partAppearance(first) } },
       connections: item.connections,
     };
     ({ domain, masses } = wrapped);
@@ -333,7 +354,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
       parts: Object.fromEntries(
         item.parts.map((part) => [
           part.id,
-          { family: part.id, params: part.params, appearance: { finish: part.finish } },
+          { family: part.id, params: part.params, appearance: partAppearance(part) },
         ]),
       ),
       connections: item.connections,
@@ -408,5 +429,13 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     const fraction = normal.map((value) => (value + 1) / 2) as [number, number, number];
     label = surfaceOn({ part, solid, fraction }, normal, faceAxis(up));
   }
-  return { report, masses, handling, label, drawn, glow: item.glow && glowMaterial(item, item.glow) };
+  return {
+    report,
+    masses,
+    handling,
+    label,
+    drawn,
+    glow: item.glow && glowMaterial(item, item.glow),
+    paintable: paintableSlots(item),
+  };
 };

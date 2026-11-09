@@ -158,6 +158,8 @@ export interface PrefabReference {
 export interface PartAppearance {
   /** Per-instance finish by material slot, independent of the host assembly's finish. */
   readonly finish?: Readonly<Record<string, string>>;
+  /** Finish slots that take a paint the host sets on this copy; every other slot keeps its authored material. */
+  readonly paintable?: readonly string[];
 }
 
 export interface PartInstance {
