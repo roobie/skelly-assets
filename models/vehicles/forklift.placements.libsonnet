@@ -26,6 +26,6 @@ local s = import 'forklift.spec.libsonnet';
   + site.pair('steer_wheel', 'wheel_165_70r13', [s.rearAxle, s.rearHub, s.rearZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.26, 0.82, 0.44])
   + site.pair('work_lamp', 'work_lamp', [0.69, 1.72, 0.42])
-  + site.batteryBay('hatchback_battery_tray', [-0.4, 0.64, 0.46]),
+  + site.batteryBay('battery_tray', [-0.4, 0.64, 0.46]),
   tags: { 'vehicle-role': ['construction'] },
 }

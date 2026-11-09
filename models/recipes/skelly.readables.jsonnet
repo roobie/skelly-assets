@@ -1,6 +1,6 @@
 local voxel = import 'jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'jsonnet/lib/taxonomy.libsonnet';
-local rows = import 'packages/thing-authoring-tool/readables.libsonnet';
+local rows = import 'models/notebook.libsonnet';
 taxonomy.inherit({ category: 'documents' }, [
   {
     id: row.id,

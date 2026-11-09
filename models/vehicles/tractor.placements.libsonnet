@@ -29,6 +29,6 @@ local s = import 'tractor.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.98, 1.1, 0.9])
   + site.pair('mirror', 'door_mirror', [s.cabFront - 0.02, 2.2, s.cabSide])
   + site.headlamps(s.nose - 0.02, 1.2, 0.3)
-  + site.batteryBay('hatchback_battery_tray', [0.22, 1.1, 0]),
+  + site.batteryBay('battery_tray', [0.22, 1.1, 0]),
   tags: { 'vehicle-role': ['farm'] },
 }

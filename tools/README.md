@@ -72,8 +72,9 @@ and runtime behaviour remain game-owned.
 `packages/thing-authoring-tool` originates at the reference commit, reconciled with the compound/worn-fit helpers
 and selected catalogue content from skelly commit `56b9b69a6c1c965a31f4fbb66270e2ed0421cdc9`. The retained armour
 needs `packages/thing-authoring-tool/worn-fit.libsonnet`, `oct`. Authored side counts and the catalogue default preserve authoring
-control; see `../README.md`, "Shared turned look and fit limits". Container masses are tool-owned content so a
-model build does not import a game's item rules. The viewer, fixture exporter and tests belong to this producer.
+control; see `../README.md`, "Shared turned look and fit limits". Container masses are copied into
+`models/measures/container-masses.libsonnet` so a model build does not import a game's item rules. The viewer,
+fixture exporter and tests belong to this producer.
 
 ### mobgen
 

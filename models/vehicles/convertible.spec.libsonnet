@@ -4,4 +4,6 @@
   open: true,
   bumperPaint: 'paint-red',
   shellMass: 690, paint: 'paint-red',
+  // Its dash is the coupe's pressing.
+  borrow: { _dashboard: 'coupe_dashboard' },
 }

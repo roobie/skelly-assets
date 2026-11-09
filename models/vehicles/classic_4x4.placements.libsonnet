@@ -33,5 +33,5 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('front_seat', 'front_seat', [-0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
-  + site.batteryBay('hatchback_battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
+  + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
 }

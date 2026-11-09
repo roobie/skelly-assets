@@ -1,12 +1,4 @@
-local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
-local part(id, family, massKg, dimensions, finish, grip, exportMass) = {
-  id: id,
-  exportMass: exportMass,
-  taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
-  parts: [{ id: 'part', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
-  connections: [],
-  handling: { part: 'part', solid: grip.solid, fraction: grip.fraction, turn: [0, 0, 0], hold: grip.hold, roll: 0 },
-};
+local part = (import 'packages/thing-authoring-tool/shambler-parts.libsonnet').part;
 local skin = 'body-skin-sickly';
 local limbFinish(cloth, end) = { skin: skin, cloth: cloth, end: end, gore: 'body-gore', bone: 'body-bone' };
 local arm(id) = part(id, 'limb', 2.5, {

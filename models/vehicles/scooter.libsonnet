@@ -1,19 +1,17 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'scooter.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local tube = (import 'machine-kit.libsonnet').bar;
-local forkX(y) = s.frontAxle - (y - s.hub) * 0.42;
+local forkX = k.forkX(s.frontAxle, s.hub, 0.42);
 taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('scooter_frame', 26, [
     box('backbone', 'frame', [-0.3, 0.2, -0.06], [0.3, 0.26, 0.06]),
     box('stand_cross', 'frame', [-0.24, 0.2, -0.13], [-0.14, 0.26, 0.13]),
-    tube('down', 'frame', [forkX(0.62), 0.62], [0.27, 0.24], 0.07, [-0.032, 0.032]),
-    tube('head', 'frame', [forkX(0.62), 0.62], [forkX(0.92), 0.92], 0.07, [-0.032, 0.032]),
-    tube('rise', 'frame', [-0.27, 0.23], [-0.2, 0.62], 0.07, [-0.06, 0.06]),
+    k.bar('down', 'frame', [forkX(0.62), 0.62], [0.27, 0.24], 0.07, [-0.032, 0.032]),
+    k.bar('head', 'frame', [forkX(0.62), 0.62], [forkX(0.92), 0.92], 0.07, [-0.032, 0.032]),
+    k.bar('rise', 'frame', [-0.27, 0.23], [-0.2, 0.62], 0.07, [-0.06, 0.06]),
     box('top_rail', 'frame', [-0.8, 0.59, -0.06], [-0.2, 0.65, 0.06]),
   ], { frame: 'paint-charcoal' }),
   // The whole rear cowl lifts off as one pressing.
@@ -51,18 +49,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     k.turned('tip', 'dark', 'x', k.disc(0.03, -0.85, -0.82), [0, 0.2, 0.15]),
   ], { chrome: 'steel-bright', dark: 'plastic-black' }),
   k.compound('scooter_fork', 6, [
-    tube('stem', 'frame', [forkX(0.52), 0.52], [forkX(0.97), 0.97], 0.05, [-0.03, 0.03]),
+    k.bar('stem', 'frame', [forkX(0.52), 0.52], [forkX(0.97), 0.97], 0.05, [-0.03, 0.03]),
     box('crown', 'frame', [forkX(0.51) - 0.05, 0.5, -0.125], [forkX(0.51) + 0.05, 0.54, 0.125]),
     k.turned('axle', 'frame', 'z', k.disc(0.03, -0.125, 0.125), [s.frontAxle, s.hub, 0]),
   ] + bothSides([
-    tube('leg', 'frame', [s.frontAxle, s.hub], [forkX(0.52), 0.52], 0.06, [0.094, 0.125]),
+    k.bar('leg', 'frame', [s.frontAxle, s.hub], [forkX(0.52), 0.52], 0.06, [0.094, 0.125]),
   ]), { frame: 'paint-charcoal' }),
   k.compound('scooter_wheel', 7, [
     k.turned('tyre', 'tyre', 'z', [[-0.055, 0.14], [-0.055, 0.2], [-0.04, s.tyre], [0.04, s.tyre], [0.055, 0.2], [0.055, 0.14], [-0.055, 0.14]]) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.disc(0.14, -0.04, 0.04)) + { sides: 24 },
     k.turned('hub', 'hub', 'z', k.disc(0.05, -0.06, 0.06)) + { sides: 12 },
   ], { tyre: 'rubber-black', rim: 'steel-grey', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] }),
-  k.compound('scooter_front_mudguard', 1.5, h.arcBand('guard', 'paint', s.frontAxle, s.hub, 0.235, 0.285, 25, 165, 10, [-0.085, 0.085]), { paint: s.paint }),
+  k.compound('scooter_front_mudguard', 1.5, k.arc('guard', 'paint', s.frontAxle, s.hub, 0.235, 0.285, 25, 165, 10, [-0.085, 0.085]), { paint: s.paint }),
   k.compound('scooter_handlebar', 3, [
     box('headset', 'paint', [0.22, 0.94, -0.1], [0.4, 1.07, 0.1]),
     box('bar', 'chrome', [0.26, 1.0, -0.26], [0.32, 1.04, 0.26]),

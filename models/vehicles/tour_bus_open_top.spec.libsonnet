@@ -15,6 +15,11 @@ dd {
   rearHoles: [dd.rearHoles[0]],
   paint: 'paint-green', accent: 'paint-cream', bumperFinish: 'paint-charcoal',
   shellMass: 7420,
+  // The lower deck's glass, doors, dash and sign press identical to the double decker's.
+  borrow: {
+    _side_window: 'double_decker_side_window', _door_fwd: 'double_decker_door_fwd', _door_aft: 'double_decker_door_aft',
+    _dashboard: 'double_decker_dashboard', _destination_sign: 'double_decker_destination_sign',
+  },
   rail: { top: 3.78, post: 1.3, posts: 8 },
   // The rake lands the glass's foot on the bulwark's front cap.
   deflector: { x: deflectorX, top: 3.92, rake: dd.front - lean - 0.06 - deflectorX },

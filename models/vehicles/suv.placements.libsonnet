@@ -37,5 +37,5 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
-  + site.batteryBay('hatchback_battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
+  + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
 }

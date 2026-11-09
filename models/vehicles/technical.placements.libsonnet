@@ -38,6 +38,6 @@ local wheel = 'wheel_235_75r15';
   + pair('mirror', 'door_mirror', [0.62, s.waist + 0.12, s.skin])
   + pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 1.0, 0.76])
   + pair('headlamp', 'car_headlamp', [s.nose + 0.05, 0.78, 0.62])
-  + site.batteryBay('hatchback_battery_tray', [2.0, 0.76, 0.42]),
+  + site.batteryBay('battery_tray', [2.0, 0.76, 0.42]),
   tags: { 'vehicle-role': ['military'] },
 }

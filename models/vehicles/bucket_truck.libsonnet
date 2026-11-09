@@ -43,7 +43,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck',
     box('saddle', 'frame', [s.cradleX - 0.1, s.boomY - 0.2, -0.26], [s.cradleX + 0.1, s.boomY - 0.15, 0.26]),
   ] + k.bothSides([
     box('lug', 'frame', [s.cradleX - 0.1, s.boomY - 0.15, 0.16], [s.cradleX + 0.1, s.boomY + 0.04, 0.26]),
-    m.bar('leg', 'frame', [s.cradleX + 0.02, s.deckTop], [s.cradleX, s.boomY - 0.2], 0.1, [0.16, 0.26]),
+    k.bar('leg', 'frame', [s.cradleX + 0.02, s.deckTop], [s.cradleX, s.boomY - 0.2], 0.1, [0.16, 0.26]),
   ]), finish),
   k.compound('bucket_truck_knuckle', 95, [
     box('elbow', 'frame', [s.knuckleX, s.boomY - 0.17, -0.18], [s.knuckleX + 0.34, s.boomTopY + 0.14, 0.18]),

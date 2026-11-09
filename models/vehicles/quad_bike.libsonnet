@@ -5,7 +5,6 @@ local s = import 'quad_bike.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 local tube = 0.05;
 local fender(axle) = [
   box('fender_top', 'paint', [axle - 0.25, 0.62, 0.2], [axle + 0.25, 0.72, 0.56]),
@@ -27,20 +26,20 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('cross_mid', 'steel', [-0.32, 0.24, -0.15], [-0.26, 0.74, 0.15]),
     box('rear_cross', 'steel', [-0.82, 0.74, -0.2], [-0.76, 0.78, 0.2]),
   ] + bothSides([
-    bar('lower_rail', 'steel', [-0.42, 0.26], [0.56, 0.26], tube, [0.1, 0.15]),
-    bar('front_rise', 'steel', [0.54, 0.26], [0.44, 0.84], tube, [0.1, 0.15]),
-    bar('top_rail', 'steel', [0.46, 0.84], [-0.3, 0.745], tube, [0.1, 0.15]),
-    bar('seat_rail', 'steel', [-0.3, 0.745], [-0.8, 0.77], tube, [0.1, 0.15]),
-    bar('seat_stay', 'steel', [-0.42, 0.26], [-0.7, 0.76], tube, [0.1, 0.15]),
-    bar('rack_prop', 'steel', [0.48, 0.66], [0.6, 0.82], 0.04, [0.1, 0.14]),
-    bar('footrest_arm', 'steel', [0.1, 0.25], [0.1, 0.295], 0.04, [0.15, 0.24]),
+    k.bar('lower_rail', 'steel', [-0.42, 0.26], [0.56, 0.26], tube, [0.1, 0.15]),
+    k.bar('front_rise', 'steel', [0.54, 0.26], [0.44, 0.84], tube, [0.1, 0.15]),
+    k.bar('top_rail', 'steel', [0.46, 0.84], [-0.3, 0.745], tube, [0.1, 0.15]),
+    k.bar('seat_rail', 'steel', [-0.3, 0.745], [-0.8, 0.77], tube, [0.1, 0.15]),
+    k.bar('seat_stay', 'steel', [-0.42, 0.26], [-0.7, 0.76], tube, [0.1, 0.15]),
+    k.bar('rack_prop', 'steel', [0.48, 0.66], [0.6, 0.82], 0.04, [0.1, 0.14]),
+    k.bar('footrest_arm', 'steel', [0.1, 0.25], [0.1, 0.295], 0.04, [0.15, 0.24]),
   ]), { steel: 'steel-spall-black' }),
   k.compound('quad_bike_front_arm', 9, [
     box('upper', 'steel', [s.frontAxle - 0.04, 0.32, 0.12], [s.frontAxle + 0.04, 0.36, s.wheelZ - 0.08]),
     box('lower', 'steel', [s.frontAxle - 0.05, 0.22, 0.12], [s.frontAxle + 0.05, 0.26, s.wheelZ - 0.08]),
     box('inner', 'steel', [0.54, 0.22, 0.1], [s.frontAxle + 0.05, 0.36, 0.14]),
     box('knuckle', 'steel', [s.frontAxle - 0.04, 0.22, s.wheelZ - 0.1], [s.frontAxle + 0.04, 0.38, s.wheelZ - 0.05]),
-    bar('shock', 'spring', [s.frontAxle, 0.34], [0.46, 0.74], 0.05, [0.2, 0.25]),
+    k.bar('shock', 'spring', [s.frontAxle, 0.34], [0.46, 0.74], 0.05, [0.2, 0.25]),
     box('shock_mount', 'steel', [0.42, 0.7, 0.14], [0.5, 0.74, 0.25]),
   ], { steel: 'steel-spall-black', spring: 'paint-red' }),
   k.compound('quad_bike_swing_arm', 24, [
@@ -48,9 +47,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('diff', 'cast', [s.rearAxle - 0.11, s.hub - 0.1, -0.11], [s.rearAxle + 0.11, s.hub + 0.1, 0.11]),
     box('shock_mount', 'steel', [-0.5, 0.56, -0.06], [-0.44, 0.76, 0.06]),
   ] + bothSides([
-    bar('arm', 'steel', [-0.34, 0.27], [s.rearAxle, s.hub], 0.07, [0.08, 0.14]),
+    k.bar('arm', 'steel', [-0.34, 0.27], [s.rearAxle, s.hub], 0.07, [0.08, 0.14]),
   ]) + [
-    bar('shock', 'spring', [s.rearAxle + 0.05, s.hub + 0.08], [-0.47, 0.6], 0.06, [-0.03, 0.03]),
+    k.bar('shock', 'spring', [s.rearAxle + 0.05, s.hub + 0.08], [-0.47, 0.6], 0.06, [-0.03, 0.03]),
   ], { steel: 'steel-spall-black', cast: 'iron-cast', spring: 'paint-red' }),
   k.compound('quad_bike_front_fenders', 7, [
     box('nose', 'paint', [0.46, 0.68, -0.26], [0.92, 0.82, 0.26]),
@@ -80,12 +79,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('head', 'cast', [-0.09, 0.7, -0.1], [0.13, 0.76, 0.1]),
   ], { cast: 'iron-cast', alu: 'alu-bare' }),
   k.compound('quad_bike_exhaust', 4, [
-    bar('downpipe', 'steel', [0.1, 0.62], [-0.4, 0.46], 0.05, [0.18, 0.23]),
-    bar('midpipe', 'steel', [-0.38, 0.46], [-0.66, 0.5], 0.05, [0.18, 0.23]),
-    bar('silencer', 'steel', [-0.62, 0.49], [-0.96, 0.51], 0.09, [0.17, 0.26]),
+    k.bar('downpipe', 'steel', [0.1, 0.62], [-0.4, 0.46], 0.05, [0.18, 0.23]),
+    k.bar('midpipe', 'steel', [-0.38, 0.46], [-0.66, 0.5], 0.05, [0.18, 0.23]),
+    k.bar('silencer', 'steel', [-0.62, 0.49], [-0.96, 0.51], 0.09, [0.17, 0.26]),
   ], { steel: 'steel-spall-black' }),
   k.compound('quad_bike_handlebar', 3, [
-    bar('column', 'steel', [0.42, 0.84], [0.26, 1.2], 0.04, [-0.02, 0.02]),
+    k.bar('column', 'steel', [0.42, 0.84], [0.26, 1.2], 0.04, [-0.02, 0.02]),
     box('bar', 'steel', [0.22, 1.18, -0.36], [0.28, 1.22, 0.36]),
     box('grip_near', 'grip', [0.21, 1.17, 0.26], [0.29, 1.23, 0.38]),
     box('grip_far', 'grip', [0.21, 1.17, -0.38], [0.29, 1.23, -0.26]),

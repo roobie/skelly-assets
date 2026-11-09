@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -12,7 +11,7 @@ local aft(y) = s.archX - reach(y);
 local roofSlice(id, low, high, half) = prism(id, 'paint', [[aft(low), low], [fore(low), low], [fore(high), high], [aft(high), high]], [-half, half]);
 local top = s.windowTop;
 local paint = { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' };
-local wing(id, x, from, to) = m.arc(id, 'paint', x, s.hub, 0.31, 0.35, from, to, 9, [0.56, s.side]);
+local wing(id, x, from, to) = k.arc(id, 'paint', x, s.hub, 0.31, 0.35, from, to, 9, [0.56, s.side]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('classic_small_car_shell', s.shellMass, [
     box('floor_pan', 'pan', [-1.3, 0.2, -s.body], [0.95, s.floor, s.body]),

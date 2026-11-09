@@ -1,8 +1,8 @@
 // A 12 m low-floor rear-engined city bus: 2.55 m wide, 3 m high, 5.9 m wheelbase, about 11.5 t at the kerb.
 // Metres in the vehicle frame.
-local seat(x, y, sides) = { part: 'bus_seat_pair', x: x, y: y, z: 0.72, sides: sides };
-// Singles stand inboard of the front wheelhouses, where a pair would not fit.
-local single(x, sides) = { part: 'bus_seat_single', x: x, y: 0.36, z: 0.62, sides: sides };
+local bus = import 'bus-body.libsonnet';
+local seat = bus.seat;
+local single = bus.single;
 {
   rear: -6, front: 6, side: 1.275, skin: 1.2, sill: 0.3,
   floor: 0.36, floorRear: 0.82, floorStep: -1.4, engineDeck: { x: -4.25, y: 1.28 },

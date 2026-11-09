@@ -4,9 +4,9 @@
 local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
-local bust = import '../tools/packages/thing-authoring-tool/bust-measures.libsonnet';
-local arm = import '../tools/packages/thing-authoring-tool/arm-measures.libsonnet';
-local leg = import '../tools/packages/thing-authoring-tool/leg-measures.libsonnet';
+local bust = import 'measures/bust.libsonnet';
+local arm = import 'measures/arm.libsonnet';
+local leg = import 'measures/leg.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.cloak;
 

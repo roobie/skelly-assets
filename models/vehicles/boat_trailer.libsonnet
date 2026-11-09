@@ -6,10 +6,9 @@ local box = k.box;
 local bothSides = k.bothSides;
 // Plan outline of the hull at half beam `b`, near side from transom to stem, as [z, x] stations.
 local stations(b, bow) = [[b * 0.85, s.transom], [b, -0.2], [b * 0.72, bow - 0.65], [0.04, bow]];
-local yPrism(id, slot, y, profile) = { id: id, kind: 'prism', slot: slot, axis: 'y', start: y[0], end: y[1], profile: profile };
 local solidLayer(id, slot, y, b, bow) =
   local near = stations(b, bow);
-  yPrism(id, slot, y, [[-near[0][0], near[0][1]]] + near + [[-0.04, bow], [-near[2][0], near[2][1]], [-near[1][0], near[1][1]]]);
+  k.yPrism(id, slot, [[-near[0][0], near[0][1]]] + near + [[-0.04, bow], [-near[2][0], near[2][1]], [-near[1][0], near[1][1]]], y);
 // A prism must be convex, so a hollow layer is one trapezoid per station pair on each side.
 local wallLayer(id, slot, y, b, bow, t=0.05) =
   local near = stations(b, bow);
@@ -17,8 +16,8 @@ local wallLayer(id, slot, y, b, bow, t=0.05) =
     local a = near[i];
     local c = near[i + 1];
     [
-      yPrism(id + '_near_' + i, slot, y, [[a[0], a[1]], [c[0], c[1]], [std.max(c[0] - t, 0), c[1]], [a[0] - t, a[1]]]),
-      yPrism(id + '_far_' + i, slot, y, [[-a[0] + t, a[1]], [-std.max(c[0] - t, 0), c[1]], [-c[0], c[1]], [-a[0], a[1]]]),
+      k.yPrism(id + '_near_' + i, slot, [[a[0], a[1]], [c[0], c[1]], [std.max(c[0] - t, 0), c[1]], [a[0] - t, a[1]]], y),
+      k.yPrism(id + '_far_' + i, slot, [[-a[0] + t, a[1]], [-std.max(c[0] - t, 0), c[1]], [-c[0], c[1]], [-a[0], a[1]]], y),
     ]
     for i in std.range(0, 2)
   ]);
@@ -54,7 +53,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('transom', 'hull', [s.transom, 0.68, -0.58], [s.transom + 0.06, 1.1, 0.58]),
     box('thwart_rear', 'wood', [-0.95, 0.96, -0.57], [-0.75, 1.0, 0.57]),
     box('thwart_mid', 'wood', [0.25, 0.96, -0.5], [0.45, 1.0, 0.5]),
-    yPrism('foredeck', 'wood', [1.08, 1.12], [[-0.45, 0.95], [0.45, 0.95], [0.03, 1.5], [-0.03, 1.5]]),
+    k.yPrism('foredeck', 'wood', [[-0.45, 0.95], [0.45, 0.95], [0.03, 1.5], [-0.03, 1.5]], [1.08, 1.12]),
   ]
   // The stripe wall lies exactly under side_mid, which covers its top, and white lining stands behind it, so no blue shows inside the hull.
   + wallLayer('side_low', 'stripe', [0.74, 0.86], 0.66, 1.5)

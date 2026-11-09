@@ -27,6 +27,6 @@ local s = import 'excavator.spec.libsonnet';
   ]
   + site.pair('track', 'excavator_track', [0, 0, s.trackZ])
   + site.pair('boom_ram', 'excavator_boom_ram')
-  + site.batteryBay('hatchback_battery_tray', [-0.05, s.deck, 0.7]),
+  + site.batteryBay('battery_tray', [-0.05, s.deck, 0.7]),
   tags: { 'vehicle-role': ['construction'] },
 }

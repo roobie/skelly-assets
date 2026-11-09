@@ -25,6 +25,6 @@ local s = import 'trencher.spec.libsonnet';
   + site.pair('step', 'trencher_step')
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.03, 1.32, 0.56])
   + site.headlamps(s.hoodFront + 0.02, 1.34, 0.42)
-  + site.batteryBay('hatchback_battery_tray', [0.2, s.deck, 0.3]),
+  + site.batteryBay('battery_tray', [0.2, s.deck, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
 }

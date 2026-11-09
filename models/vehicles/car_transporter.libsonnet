@@ -1,7 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local s = import 'car_transporter.spec.libsonnet';
@@ -13,8 +12,6 @@ local postXs = [3.34, 1.0, -1.3, -3.6];
 // A sloped run of the upper deck between two points on its top surface.
 local slope(id, a, b, z) = prism(id, 'deck', [[a[0], a[1] - thick], [b[0], b[1] - thick], [b[0], b[1]], [a[0], a[1]]], z);
 local slopeTail(id, a, b, z) = prism(id, 'deck', [[b[0], b[1] - thick], [a[0], a[1] - thick], [a[0], a[1]], [b[0], b[1]]], z);
-local rise = (s.headTip[1] - s.upperTop) / (s.headTip[0] - s.upperFront);
-local fall = (s.upperTop - s.tailTip[1]) / (s.upperRear - s.tailTip[0]);
 local headAt(f) = [s.upperFront + f * (s.headTip[0] - s.upperFront), s.upperTop + f * (s.headTip[1] - s.upperTop)];
 local tailAt(f) = [s.upperRear + f * (s.tailTip[0] - s.upperRear), s.upperTop + f * (s.tailTip[1] - s.upperTop)];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', s) + [
@@ -40,7 +37,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporte
     box('bar_' + f, 'frame', [headAt(f / 10)[0] - 0.05, headAt(f / 10)[1] - 0.09, -0.5], [headAt(f / 10)[0] + 0.05, headAt(f / 10)[1] - 0.01, 0.5])
     for f in [3, 6]
   ] + k.bothSides([
-    m.bar('strut', 'frame', [3.4, s.upperBottom], [headAt(0.65)[0], headAt(0.65)[1] - thick], 0.06, [s.postIn, s.deckSide]),
+    k.bar('strut', 'frame', [3.4, s.upperBottom], [headAt(0.65)[0], headAt(0.65)[1] - thick], 0.06, [s.postIn, s.deckSide]),
   ]), finish),
   k.compound('car_transporter_tail_slope', 130, [
     slopeTail('track_near', [s.upperRear, s.upperTop], s.tailTip, [trackIn, s.deckSide]),
@@ -55,9 +52,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporte
     for i in std.range(0, std.length(postXs) - 1)
   ]) + [
     box('tail_post', 'paint', [-5.28, s.lowerBottom, s.postIn], [-5.14, tailAt(0.68)[1] - thick + 0.03, s.postOut]),
-    m.bar('ram', 'steel', [-2.5, s.lowerTop], [-1.36, s.upperBottom], 0.1, [s.postIn + 0.02, s.postOut - 0.02]),
-    m.bar('tail_brace', 'frame', [-4.9, s.lowerTop], [-3.66, s.upperBottom], 0.09, [s.postIn + 0.02, s.postOut - 0.02]),
-    m.bar('front_brace', 'frame', [3.28, s.lowerTop], [1.06, s.upperBottom], 0.07, [s.postIn + 0.02, s.postOut - 0.02]),
+    k.bar('ram', 'steel', [-2.5, s.lowerTop], [-1.36, s.upperBottom], 0.1, [s.postIn + 0.02, s.postOut - 0.02]),
+    k.bar('tail_brace', 'frame', [-4.9, s.lowerTop], [-3.66, s.upperBottom], 0.09, [s.postIn + 0.02, s.postOut - 0.02]),
+    k.bar('front_brace', 'frame', [3.28, s.lowerTop], [1.06, s.upperBottom], 0.07, [s.postIn + 0.02, s.postOut - 0.02]),
     box('top_rail', 'paint', [s.upperRear, s.upperTop, s.deckSide - 0.03], [s.upperFront, s.upperTop + 0.1, s.deckSide + 0.03]),
     box('rail_stand_a', 'paint', [-4.28, s.upperBottom, s.deckSide], [-4.16, s.upperTop + 0.1, s.postOut]),
     box('rail_stand_b', 'paint', [3.38, s.upperBottom, s.deckSide], [3.5, s.upperTop + 0.1, s.postOut]),

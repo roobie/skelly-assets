@@ -3,7 +3,6 @@ local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'military_cargo_truck.spec.libsonnet';
 local box = k.box;
-local prism = k.prism;
 local bothSides = k.bothSides;
 local finish = { paint: 'paint-olive', frame: 'steel-parkerized', floor: 'wood-oak', dark: 'steel-spall-black', canvas: 'cloth-olive-drab', strap: 'webbing-olive-dark', rope: 'cord-olive' };
 local stakes = [s.bedRear + 0.05 + i * (s.bedFront - s.bedRear - 0.15) / 6 for i in std.range(0, 6)];
@@ -14,7 +13,7 @@ local outer = s.bedSide + 0.04;
 local SHOULDER = [[peak - 0.03, 0.8], [peak + 0.03, 0.8], [shoulder + 0.05, outer], [shoulder, outer]];
 local CORNER = [[shoulder, 0.8], [peak, 0.8], [shoulder, outer]];
 local HOOP_SHOULDER = [[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows('military_cargo_truck', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [
     box('floor', 'floor', [s.bedRear, s.deckBottom, -s.bedSide], [s.bedFront, s.deckTop, s.bedSide]),
   ], finish),
@@ -41,9 +40,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows('military_
     box('rear_roll', 'canvas', [s.bedRear - 0.06, shoulder - 0.14, -0.6], [s.bedRear + 0.04, shoulder, 0.6]),
     box('rear_top', 'canvas', [s.bedRear - 0.01, shoulder, -0.8], [s.bedRear + 0.02, peak, 0.8]),
   ] + bothSides([
-    m.xPrism('shoulder', 'canvas', SHOULDER, [s.bedRear, s.bedFront]),
-    m.xPrism('front_corner', 'canvas', CORNER, [s.bedFront - 0.03, s.bedFront]),
-    m.xPrism('rear_corner', 'canvas', CORNER, [s.bedRear - 0.01, s.bedRear + 0.02]),
+    k.xPrism('shoulder', 'canvas', SHOULDER, [s.bedRear, s.bedFront]),
+    k.xPrism('front_corner', 'canvas', CORNER, [s.bedFront - 0.03, s.bedFront]),
+    k.xPrism('rear_corner', 'canvas', CORNER, [s.bedRear - 0.01, s.bedRear + 0.02]),
     box('side', 'canvas', [s.bedRear, rail - 0.1, s.bedSide + 0.01], [s.bedFront, shoulder, s.bedSide + 0.04]),
     box('rear_flap', 'canvas', [s.bedRear - 0.02, rail - 0.05, 0.62], [s.bedRear + 0.03, shoulder, s.bedSide + 0.04]),
     box('tie', 'rope', [s.bedRear - 0.03, 2.22, 0.6], [s.bedRear + 0.03, 2.26, s.bedSide + 0.05]),
@@ -51,7 +50,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows('military_
     box('hoop_' + i, 'strap', [stakes[i] + 0.0, rail - 0.1, s.bedSide + 0.04], [stakes[i] + 0.05, shoulder + 0.08, s.bedSide + 0.05])
     for i in std.range(0, 6)
   ] + [
-    m.xPrism('hoop_shoulder_' + i, 'strap', HOOP_SHOULDER, [stakes[i], stakes[i] + 0.05])
+    k.xPrism('hoop_shoulder_' + i, 'strap', HOOP_SHOULDER, [stakes[i], stakes[i] + 0.05])
     for i in std.range(0, 6)
   ]) + [
     box('hoop_roof_' + i, 'strap', [stakes[i], peak + 0.03, -0.8], [stakes[i] + 0.05, peak + 0.04, 0.8])

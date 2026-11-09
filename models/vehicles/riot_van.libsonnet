@@ -17,8 +17,8 @@ local grid(tag, x, y, z) = [
 ];
 local nearOut = [s.glassOut - 0.01, s.side + 0.015];
 local farOut = [-s.side - 0.015, -s.glassOut + 0.01];
-local pillarAt(y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
-local pillarY(x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
+local pillarAt(y) = van.pillarAt(s, y);
+local pillarY(x) = van.pillarY(s, x);
 local doorGrilleFront = 1.08;
 local doorGlassFront = s.cowl - 0.04;
 local doorRails = steps(s.waist + 0.02, s.windowTop - 0.05, 4);

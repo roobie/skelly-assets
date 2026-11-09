@@ -4,9 +4,8 @@ local h = import 'helicopter-kit.libsonnet';
 local s = import 'police_helicopter.spec.libsonnet';
 local box = k.box;
 local turned = k.turned;
-local dome = [-90, 90];
 local trim = 'paint-charcoal';
-local skin(id, slot, x, arc, sides=16) = h.shell(id, slot, s.body, thick=0.0625, x=x, arc=arc, sides=sides);
+local skin(id, slot, x, arc, sides=16) = h.skin(id, slot, s.body, x, arc, sides);
 local core = [
   station + { top: station.top - 0.05, bottom: station.bottom + 0.05, half: std.max(station.half - 0.05, 0.03) }
   for station in s.body
@@ -26,24 +25,7 @@ local chequer(id, x) =
     for i in std.range(0, blocks - 1)
   ]);
 local keel(id, x) = skin(id, 'paint', x, [s.bandLow, 360 - s.bandLow], 16);
-local hingeRib(id, x) =
-  local low = h.point(s.body, x, 88);
-  local high = h.point(s.body, x, s.roofArc + 4);
-  box(id, 'frame', [x - 0.03, low[0], high[1] - 0.06], [x + 0.03, high[0], high[1]]);
-local door(id, massKg, rear, front) =
-  local pane = [rear + 0.035, front - 0.035];
-  k.compound(id, massKg,
-             h.shell('pane', 'glass', s.body, x=pane, arc=[s.roofArc, 90])
-             + h.shell('sill', 'frame', s.body, x=pane, arc=[82, 90], sides=48)
-             + h.shell('head', 'frame', s.body, x=pane, arc=[s.roofArc, s.roofArc + 5], sides=120)
-             + [hingeRib('hinge_rib', front - 0.065)],
-             { glass: 'glass-clear', frame: s.paint },
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] });
-local bow(id, x) = h.shell(id, 'paint', s.body, x=[x - 0.035, x + 0.035], arc=dome, step=0.07);
-local proudCowl = [station + { half: station.half + 0.035, top: station.top + 0.035 } for station in s.cowl];
-local boomAt(x) =
-  local u = (s.boom.root.x - x) / (s.boom.root.x - s.boom.tip.x);
-  { x: x, y: s.boom.root.y + u * (s.boom.tip.y - s.boom.root.y), r: s.boom.root.r + u * (s.boom.tip.r - s.boom.root.r) };
+local proudCowl = h.proud(s.cowl, 0.035);
 taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('police_helicopter_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.doorRear, s.noseCap], arc=[90, 270])
@@ -53,7 +35,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + skin('top_far', 'paint', [s.doorRear, s.nose - 0.02], [360 - s.bandTop, 270], 120),
              { paint: s.paint, band: s.band, floor: trim }),
   k.compound('police_helicopter_rear_fairing', 40,
-             h.shell('top', 'paint', s.body, thick=0.0625, x=[s.checkEnd, s.doorRear], arc=dome)
+             h.shell('top', 'paint', s.body, thick=0.0625, x=[s.checkEnd, s.doorRear], arc=h.dome)
              + chequer('check', [s.checkEnd, s.doorRear])
              + keel('keel', [s.checkEnd, s.doorRear])
              + skin('top_near', 'paint', [s.checkEnd, s.doorRear], [90, s.bandTop], 120)
@@ -63,20 +45,20 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + h.loft('tail_end', 'paint', s.body, x=[s.tail, s.tail + 0.05], step=0.05),
              { paint: s.paint, band: s.band, floor: trim }),
   k.compound('police_helicopter_nose_cap', 8,
-             h.loft('cap', 'paint', s.body, x=[s.noseCap, s.nose], arc=dome, step=0.04),
+             h.loft('cap', 'paint', s.body, x=[s.noseCap, s.nose], arc=h.dome, step=0.04),
              { paint: s.paint }),
   k.compound('police_helicopter_windscreen', 22,
-             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=dome)
+             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=h.dome)
              + h.shell('post', 'frame', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=[-4, 4], sides=48),
              { glass: 'glass-clear', frame: s.paint }),
   k.compound('police_helicopter_roof', 45,
              h.shell('roof', 'paint', s.body, x=[s.doorRear, s.doorFront + 0.035], arc=[-s.roofArc, s.roofArc])
-             + bow('front_bow', s.doorFront)
-             + bow('mid_bow', s.doorMid)
-             + bow('rear_bow', s.doorRear + 0.035),
+             + h.bow('front_bow', s.body, s.doorFront)
+             + h.bow('mid_bow', s.body, s.doorMid)
+             + h.bow('rear_bow', s.body, s.doorRear + 0.035),
              { paint: s.paint }),
-  door('police_helicopter_front_door', 18, s.doorMid, s.doorFront),
-  door('police_helicopter_rear_door', 18, s.doorRear, s.doorMid),
+  h.door('police_helicopter_front_door', 18, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint),
+  h.door('police_helicopter_rear_door', 18, s.body, s.doorRear, s.doorMid, s.roofArc, s.paint),
   k.compound('police_helicopter_engine_cowl', 30,
              h.loft('cowl', 'paint', s.cowl)
              + h.shell('intake_near', 'dark', proudCowl, thick=0.05, x=[-1.0, -0.6], arc=[45, 100], sides=24)
@@ -87,9 +69,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              ],
              { paint: s.paint, dark: trim }),
   k.compound('police_helicopter_tail_boom', 45,
-             h.boom('boom_fore', 'paint', s.boom.root, boomAt(s.boom.band[0]))
-             + h.boom('boom_band', 'band', boomAt(s.boom.band[0]), boomAt(s.boom.band[1]))
-             + h.boom('boom_aft', 'paint', boomAt(s.boom.band[1]), s.boom.tip)
+             h.boom('boom_fore', 'paint', s.boom.root, h.boomAt(s.boom, s.boom.band[0]))
+             + h.boom('boom_band', 'band', h.boomAt(s.boom, s.boom.band[0]), h.boomAt(s.boom, s.boom.band[1]))
+             + h.boom('boom_aft', 'paint', h.boomAt(s.boom, s.boom.band[1]), s.boom.tip)
              + [box('gearbox', 'dark', [s.tailRotor.x - 0.1, s.tailRotor.y - 0.08, -0.08], [s.tailRotor.x + 0.1, s.tailRotor.y + 0.08, 0.08])],
              { paint: s.paint, band: s.band, dark: trim }),
   k.compound('police_helicopter_tail_surfaces', 10, [
@@ -138,7 +120,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('police_helicopter_beacon', 1, [
     turned('lens', 'lens', 'y', k.disc(0.07, 0, 0.11)) + { sides: 8 },
   ], { lens: 'plastic-blue' }),
-  k.compound('police_helicopter_landing_lamp', 1, [
+  k.compound('helicopter_landing_lamp', 1, [
     box('housing', 'dark', [-0.05, -0.06, -0.12], [0.04, 0.06, 0.12]),
     box('lens', 'lens', [0.04, -0.05, -0.1], [0.07, 0.05, 0.1]),
   ], { dark: trim, lens: 'plastic-frosted' }),

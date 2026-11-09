@@ -1,19 +1,16 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'motorbike.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local rad(degrees) = degrees * std.pi / 180;
-local tube = (import 'machine-kit.libsonnet').bar;
 // The steering axis leans back 27 degrees and passes through the front axle.
-local forkX(y) = s.frontAxle - (y - s.hub) * 0.51;
+local forkX = k.forkX(s.frontAxle, s.hub, 0.51);
 local spokes = [
-  local a = rad(i * 60);
+  local a = k.rad(i * 60);
   local c = std.cos(a);
   local n = std.sin(a);
-  tube('spoke_' + i, 'spoke', [0.06 * c, 0.06 * n], [0.21 * c, 0.21 * n], 0.05, [-0.032, 0.032])
+  k.bar('spoke_' + i, 'spoke', [0.06 * c, 0.06 * n], [0.21 * c, 0.21 * n], 0.05, [-0.032, 0.032])
   for i in std.range(0, 5)
 ];
 local fin(y, half) = prism('fin_' + y, if half > 0.08 then 'alloy' else 'dark', [
@@ -21,10 +18,10 @@ local fin(y, half) = prism('fin_' + y, if half > 0.08 then 'alloy' else 'dark', 
 ], [-half, half]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('motorbike_frame', 24, [
-    tube('head', 'frame', [forkX(0.74), 0.74], [forkX(0.96), 0.96], 0.075, [-0.032, 0.032]),
-    tube('spine', 'frame', [-0.22, 0.61], [0.3125, 0.86], 0.075, [-0.032, 0.032]),
-    tube('down', 'frame', [0.2125, 0.31], [0.297, 0.84], 0.075, [-0.032, 0.032]),
-    tube('seat_post', 'frame', [-0.3, 0.41], [-0.2, 0.64], 0.075, [-0.032, 0.032]),
+    k.bar('head', 'frame', [forkX(0.74), 0.74], [forkX(0.96), 0.96], 0.075, [-0.032, 0.032]),
+    k.bar('spine', 'frame', [-0.22, 0.61], [0.3125, 0.86], 0.075, [-0.032, 0.032]),
+    k.bar('down', 'frame', [0.2125, 0.31], [0.297, 0.84], 0.075, [-0.032, 0.032]),
+    k.bar('seat_post', 'frame', [-0.3, 0.41], [-0.2, 0.64], 0.075, [-0.032, 0.032]),
     box('cradle', 'frame', [-0.34, 0.41, -0.125], [-0.25, 0.47, 0.125]),
     box('rear_cross', 'frame', [-0.84, 0.625, -0.094], [-0.78, 0.69, 0.094]),
     box('seat_cross', 'frame', [-0.25, 0.625, -0.094], [-0.19, 0.69, 0.094]),
@@ -37,19 +34,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('lower_yoke', 'alloy', [0.31, 0.75, -0.094], [0.375, 0.78, 0.094]),
     k.turned('axle', 'alloy', 'z', k.disc(0.025, -0.094, 0.094), [s.frontAxle, s.hub, 0]),
   ] + bothSides([
-    tube('stanchion', 'chrome', [forkX(0.3), 0.3], [forkX(0.97), 0.97], 0.05, [0.0625, 0.094]),
-    tube('slider', 'alloy', [forkX(0.26), 0.26], [forkX(0.55), 0.55], 0.075, [0.0625, 0.094]),
+    k.bar('stanchion', 'chrome', [forkX(0.3), 0.3], [forkX(0.97), 0.97], 0.05, [0.0625, 0.094]),
+    k.bar('slider', 'alloy', [forkX(0.26), 0.26], [forkX(0.55), 0.55], 0.075, [0.0625, 0.094]),
   ]), { alloy: 'alu-bare', chrome: 'steel-bright' }),
   k.compound('motorbike_swingarm', 4, [
     box('pivot_tube', 'frame', [-0.31, 0.31, -0.0625], [-0.25, 0.375, 0.0625]),
     k.turned('axle', 'frame', 'z', k.disc(0.025, -0.094, 0.094), [s.rearAxle, s.hub, 0]),
     box('chain_guard', 'guard', [-0.56, 0.27, -0.125], [-0.31, 0.375, -0.094]),
   ] + bothSides([
-    tube('arm', 'frame', [s.rearAxle - 0.03, s.hub], [-0.266, 0.344], 0.05, [0.0625, 0.094]),
+    k.bar('arm', 'frame', [s.rearAxle - 0.03, s.hub], [-0.266, 0.344], 0.05, [0.0625, 0.094]),
   ]), { frame: 'paint-charcoal', guard: 'plastic-black' }),
   k.compound('motorbike_shock', 1.5, [
-    tube('rod', 'chrome', [-0.553, 0.31], [-0.647, 0.656], 0.05, [0.094, 0.156]),
-    tube('spring', 'spring', [-0.575, 0.406], [-0.628, 0.594], 0.08, [0.094, 0.156]),
+    k.bar('rod', 'chrome', [-0.553, 0.31], [-0.647, 0.656], 0.05, [0.094, 0.156]),
+    k.bar('spring', 'spring', [-0.575, 0.406], [-0.628, 0.594], 0.08, [0.094, 0.156]),
   ], { chrome: 'steel-bright', spring: 'paint-charcoal' }),
   k.compound('motorbike_wheel', 9, [
     k.turned('tyre', 'tyre', 'z', [[-0.04, 0.235], [-0.04, 0.28], [-0.03, s.tyre], [0.03, s.tyre], [0.04, 0.28], [0.04, 0.235], [-0.04, 0.235]]) + { sides: 24 },
@@ -89,8 +86,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('leg', 'frame', [-0.34, 0.03, 0.09], [-0.28, 0.27, 0.125]),
     box('foot', 'frame', [-0.41, 0, 0.0625], [-0.25, 0.03, 0.156]),
   ]), { frame: 'paint-charcoal' }),
-  k.compound('motorbike_front_mudguard', 1, h.arcBand('guard', 'chrome', s.frontAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
-  k.compound('motorbike_rear_mudguard', 1.5, h.arcBand('guard', 'chrome', s.rearAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
+  k.compound('motorbike_front_mudguard', 1, k.arc('guard', 'chrome', s.frontAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
+  k.compound('motorbike_rear_mudguard', 1.5, k.arc('guard', 'chrome', s.rearAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
   k.compound('motorbike_headlamp', 1.5, [
     k.turned('shell', 'chrome', 'x', k.disc(0.094, 0.33, 0.47), [0, 0.86, 0]) + { sides: 16 },
     k.turned('lens', 'lens', 'x', k.disc(0.08, 0.47, 0.5), [0, 0.86, 0]) + { sides: 16 },

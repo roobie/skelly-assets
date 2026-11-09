@@ -16,9 +16,9 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 // stand whose pole rises behind the legs into the small of the back. Front on +z. Each part mates at the joint the
 // player's figure poses it about, so the figure matches the player's. `doll` is a part held against the waist, its
 // back on the belly, with the forearms bent forward and in under it; `masses` gives the stand's and the doll's mass.
-local bust = import 'packages/thing-authoring-tool/bust-measures.libsonnet';
-local arm = import 'packages/thing-authoring-tool/arm-measures.libsonnet';
-local leg = import 'packages/thing-authoring-tool/leg-measures.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 local plastic = 'plastic-gloss-white';
 local socket(id, pos, normal=[0, -1, 0], up=[0, 0, 1]) = { id: id, mount: 'assembly-joint', gender: 'female', pos: pos, normal: normal, up: up, required: true };
 local pin(id, normal=[0, 1, 0], up=[0, 0, 1], pos=[0, 0, 0]) = { id: id, mount: 'assembly-joint', gender: 'male', pos: pos, normal: normal, up: up, required: true };

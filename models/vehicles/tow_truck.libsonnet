@@ -35,21 +35,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('saddle', 'yellow', [s.pivot[0] - 0.42, s.deckTop, -0.36], [s.pivot[0] + 0.42, s.deckTop + 0.14, 0.36]),
     m.axleDisc('pin', 'steel', s.pivot[0], s.pivot[1], 0.07, [-0.3, 0.3], 12),
   ] + k.bothSides([
-    m.bar('cheek', 'yellow', [s.pivot[0] + 0.3, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.3, [0.19, 0.26], 0.2),
-    m.bar('cheek_aft', 'yellow', [s.pivot[0] - 0.36, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.2, [0.19, 0.26], 0.14),
+    k.bar('cheek', 'yellow', [s.pivot[0] + 0.3, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.3, [0.19, 0.26], 0.2),
+    k.bar('cheek_aft', 'yellow', [s.pivot[0] - 0.36, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.2, [0.19, 0.26], 0.14),
   ]), finish),
   k.compound('tow_truck_boom', 420, [
-    m.bar('box', 'yellow', s.pivot, s.stageEnd, 0.4, [-0.17, 0.17], 0.32),
-    m.bar('collar', 'frame', [s.stageEnd[0] + 0.1, s.stageEnd[1] - 0.04], s.stageEnd, 0.36, [-0.19, 0.19]),
+    k.bar('box', 'yellow', s.pivot, s.stageEnd, 0.4, [-0.17, 0.17], 0.32),
+    k.bar('collar', 'frame', [s.stageEnd[0] + 0.1, s.stageEnd[1] - 0.04], s.stageEnd, 0.36, [-0.19, 0.19]),
   ], finish),
   k.compound('tow_truck_boom_stage', 130, [
-    m.bar('stage', 'steel', s.stageEnd, s.tip, 0.22, [-0.11, 0.11]),
+    k.bar('stage', 'steel', s.stageEnd, s.tip, 0.22, [-0.11, 0.11]),
     m.axleDisc('sheave', 'frame', s.tip[0] - 0.02, s.tip[1], 0.15, [-0.13, 0.13], 12),
     box('work_lamp', 'white', [s.tip[0] + 0.1, s.tip[1] + 0.1, -0.09], [s.tip[0] + 0.2, s.tip[1] + 0.19, 0.09]),
   ], finish),
   k.compound('tow_truck_boom_ram', 70, [
-    m.bar('sleeve', 'frame', [-0.75, s.deckTop], [-1.08, 1.86], 0.16, [-0.08, 0.08]),
-    m.bar('rod', 'steel', [-1.08, 1.86], [-1.3, 2.46], 0.09, [-0.045, 0.045]),
+    k.bar('sleeve', 'frame', [-0.75, s.deckTop], [-1.08, 1.86], 0.16, [-0.08, 0.08]),
+    k.bar('rod', 'steel', [-1.08, 1.86], [-1.3, 2.46], 0.09, [-0.045, 0.045]),
   ], finish),
   k.compound('tow_truck_winch', 95, [
     m.axleDisc('drum', 'dark', 0.9, s.deckTop + 0.3, 0.22, [-0.36, 0.36], 16),
@@ -58,8 +58,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('stand', 'yellow', [0.72, s.deckTop, 0.36], [1.08, s.deckTop + 0.42, 0.42]),
   ]), finish),
   k.compound('tow_truck_line', 25, [
-    m.bar('run_up', 'chain', [0.9, s.deckTop + 0.54], [s.pivot[0], s.pivot[1] + 0.24], 0.05, [-0.03, 0.03]),
-    m.bar('run_out', 'chain', [s.pivot[0], s.pivot[1] + 0.24], [s.tip[0] - 0.02, s.tip[1] + 0.15], 0.05, [-0.03, 0.03]),
+    k.bar('run_up', 'chain', [0.9, s.deckTop + 0.54], [s.pivot[0], s.pivot[1] + 0.24], 0.05, [-0.03, 0.03]),
+    k.bar('run_out', 'chain', [s.pivot[0], s.pivot[1] + 0.24], [s.tip[0] - 0.02, s.tip[1] + 0.15], 0.05, [-0.03, 0.03]),
   ], finish),
   k.compound('tow_truck_sling', 65, [
     box('fall', 'chain', [s.slingX - 0.03, 1.46, -0.03], [s.slingX + 0.03, s.tip[1], 0.03]),

@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'tractor.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -29,8 +28,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('vent_a', 'trim', [0.5, 1.3, s.bonnetSide], [1.5, 1.34, s.bonnetSide + 0.01]),
     box('vent_b', 'trim', [0.5, 1.38, s.bonnetSide], [1.5, 1.42, s.bonnetSide + 0.01]),
   ]), { paint: s.paint, trim: 'paint-charcoal' }),
-  k.compound('tractor_fender', 22, h.arcBand('arc', 'paint', s.rearAxle, s.rearHub, s.fenderInner, s.fenderOuter, 22, 168, 9, [s.cabSide, s.rearZ + 0.26])
-    + h.arcBand('lip', 'paint', s.rearAxle, s.rearHub, s.fenderInner - 0.12, s.fenderOuter, 22, 168, 9, [s.rearZ + 0.26, s.rearZ + 0.3]),
+  k.compound('tractor_fender', 22, k.arc('arc', 'paint', s.rearAxle, s.rearHub, s.fenderInner, s.fenderOuter, 22, 168, 9, [s.cabSide, s.rearZ + 0.26])
+    + k.arc('lip', 'paint', s.rearAxle, s.rearHub, s.fenderInner - 0.12, s.fenderOuter, 22, 168, 9, [s.rearZ + 0.26, s.rearZ + 0.3]),
     { paint: s.paint }),
   k.compound('tractor_cab', 300, [
     box('floor', 'floor', [s.cabRear, s.deck, -s.cabSide], [s.cabFront, s.deck + 0.05, s.cabSide]),

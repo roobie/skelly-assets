@@ -4,9 +4,6 @@
 // keel (180) and on round the far side (270), so [-90, 90] is the part above the waist and [90, 270] the part below.
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
-local rad(degrees) = degrees * std.pi / 180;
-local xPrism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
-local yPrism(id, slot, profile, y) = { id: id, kind: 'prism', slot: slot, axis: 'y', profile: profile, start: y[0], end: y[1] };
 
 local turn(o, a, b) = (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
 local unwound(chain, p) =
@@ -58,8 +55,8 @@ local sectionOf(sorted, x) =
 
 local signedPower(v, power) = (if v < 0 then -1 else 1) * std.pow(std.abs(v), power);
 local outlinePoint(section, degrees, square) =
-  local c = signedPower(std.cos(rad(degrees)), 2 / square);
-  local s = signedPower(std.sin(rad(degrees)), 2 / square);
+  local c = signedPower(std.cos(k.rad(degrees)), 2 / square);
+  local s = signedPower(std.sin(k.rad(degrees)), 2 / square);
   [section.waist + c * (if c >= 0 then section.top - section.waist else section.waist - section.bottom), section.half * s];
 local outline(section, arc, sides, square) =
   local n = std.max(1, std.ceil(sides * (arc[1] - arc[0]) / 360 - 1e-9));
@@ -75,7 +72,7 @@ local loft(id, slot, stations, x=null, arc=[-180, 180], step=0.0625, sides=16, s
   std.prune([
     local slice = slices(spanOf(sorted, x), step)[i];
     local profile = solidProfile(outline(sectionOf(sorted, (slice[0] + slice[1]) / 2), arc, sides, square));
-    if profile == null then null else xPrism(id + '_' + i, slot, profile, slice)
+    if profile == null then null else k.xPrism(id + '_' + i, slot, profile, slice)
     for i in std.range(0, std.length(slices(spanOf(sorted, x), step)) - 1)
   ]);
 
@@ -102,12 +99,17 @@ local shell(id, slot, stations, thick=0.075, x=null, arc=[-180, 180], step=0.062
     local within = outline(inner, arc, sides, square);
     [
       local profile = solidProfile([outer[j], outer[j + 1], within[j + 1], within[j]]);
-      if profile == null then null else xPrism(id + '_' + i + '_' + j, slot, profile, slice)
+      if profile == null then null else k.xPrism(id + '_' + i + '_' + j, slot, profile, slice)
       for j in std.range(0, std.length(outer) - 2)
     ]
     for i in std.range(0, std.length(all) - 1)
   ]));
 
+local point(stations, x, degrees, square=2.4) = outlinePoint(sectionOf(ordered(stations), x), degrees, square);
+local hingeRib(id, stations, x, high, low, slot='frame', depth=0.06, square=2.4) =
+  local bottom = point(stations, x, low, square);
+  local top = point(stations, x, high, square);
+  k.box(id, slot, [x - 0.03, bottom[0], top[1] - depth], [x + 0.03, top[0], top[1]]);
 local lerp(a, b, t) = a + (b - a) * t;
 // A quad in plan, from `a` to `b`, each (x, z); a y prism's profile is (z, x).
 local planQuad(a, b, halfA, halfB) =
@@ -126,7 +128,7 @@ local planQuad(a, b, halfA, halfB) =
 local steel = 'paint-charcoal';
 
 // A tube, a welded leg from a skid or wheel up under the belly, and its reflection across the centre plane.
-local leg(id, slot, x, low, high, thick) = xPrism(id, slot, hull([
+local leg(id, slot, x, low, high, thick) = k.xPrism(id, slot, hull([
   [low[0], low[1] - thick / 2],
   [low[0], low[1] + thick / 2],
   [high[0], high[1] - thick / 2],
@@ -149,13 +151,37 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
 ]);
 
 {
-  section(stations, x): sectionOf(ordered(stations), x),
   // The (y, z) of a section's outline at an arc angle, for placing a rib or a hinge on the skin.
-  point(stations, x, degrees, square=2.4): outlinePoint(sectionOf(ordered(stations), x), degrees, square),
+  point: point,
+  dome:: [-90, 90],
+  // Stations grown by `by` at the crown and sides, so a cowl or rail laid on them never shares a surface with the
+  // skin beneath.
+  proud(stations, by):: [station + { half: station.half + by, top: station.top + by } for station in stations],
   // A solid body lofted through the stations in thin slices along x; `x` and `arc` cut out a span of it.
   loft: loft,
   // The same body as a hollow wall `thick` deep, so a cabin can show its seats through glazing.
   shell: shell,
+  // The outer skin, thin enough that a cabin's glazing shows the seats behind it.
+  skin(id, slot, stations, x, arc, sides):: shell(id, slot, stations, thick=0.0625, x=x, arc=arc, sides=sides),
+  // A canopy frame's bow over the crown at `x`.
+  bow(id, stations, x):: shell(id, 'paint', stations, x=[x - 0.035, x + 0.035], arc=[-90, 90], step=0.07),
+  // A rib standing on the skin at `x` from arc `high` down to `low`, carrying a door's hinges.
+  hingeRib: hingeRib,
+  // A door glazed between `rear` and `front` from the roof line at `roofArc` down to the waist, hinged on its leading
+  // edge.
+  door(id, massKg, stations, rear, front, roofArc, paint)::
+    local pane = [rear + 0.035, front - 0.035];
+    k.compound(id, massKg,
+               shell('pane', 'glass', stations, x=pane, arc=[roofArc, 90])
+               + shell('sill', 'frame', stations, x=pane, arc=[82, 90], sides=48)
+               + shell('head', 'frame', stations, x=pane, arc=[roofArc, roofArc + 5], sides=120)
+               + [hingeRib('hinge_rib', stations, front - 0.065, roofArc + 4, 88)],
+               { glass: 'glass-clear', frame: paint },
+               { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }),
+  // The { x, y, r } of a straight boom from `boom.root` to `boom.tip` at `x`, where a band of paint meets it.
+  boomAt(boom, x)::
+    local u = (boom.root.x - x) / (boom.root.x - boom.tip.x);
+    { x: x, y: boom.root.y + u * (boom.tip.y - boom.root.y), r: boom.root.r + u * (boom.tip.r - boom.root.r) },
   // A straight tapered tube from `root` to `tip`, each { x, y, r }, rising or falling as they say.
   boom(id, slot, root, tip, step=0.125, sides=12)::
     loft(id, slot, [
@@ -171,7 +197,7 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
     local root = hub * 0.8;
     local run = (radius - root) / segments;
     local bladePieces(b) =
-      local angle = rad(phase + 360 * b / blades);
+      local angle = k.rad(phase + 360 * b / blades);
       local c = std.cos(angle);
       local sn = std.sin(angle);
       local at(r, off) = [r * sn + off * c, r * c - off * sn];
@@ -179,7 +205,7 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
         local r0 = root + i * run;
         local r1 = r0 + run;
         local half = (if i == 0 then chord * 0.3 else chord / 2);
-        yPrism('blade_' + b + '_' + i, if i == segments - 1 then 'tip' else 'blade',
+        k.yPrism('blade_' + b + '_' + i, if i == segments - 1 then 'tip' else 'blade',
                hull([at(r0, -half), at(r0, half), at(r1, -half), at(r1, half)]),
                [lift(r1) - thick, lift(r0)])
         for i in std.range(0, segments - 1)
@@ -192,14 +218,14 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
   // so fit it on the near side of the boom's end.
   tailRotor(id, massKg, radius, blades=2, chord=0.11, thick=0.05, shaft=0.14, phase=30, blade='paint-charcoal', tip='paint-crane-yellow', head='steel-grey')::
     local reach(b, r) =
-      local angle = rad(phase + 360 * b / blades);
+      local angle = k.rad(phase + 360 * b / blades);
       [r * std.cos(angle), r * std.sin(angle)];
     k.compound(id, massKg, [
       k.turned('hub', 'head', 'z', k.disc(0.05, -shaft, 0.04)) + { sides: 8 },
     ] + std.flattenArrays([
       [
-        m.bar('blade_' + b, 'blade', reach(b, 0.02), reach(b, radius * 0.82), chord, [-thick / 2, thick / 2]),
-        m.bar('tip_' + b, 'tip', reach(b, radius * 0.82), reach(b, radius), chord, [-thick / 2, thick / 2]),
+        k.bar('blade_' + b, 'blade', reach(b, 0.02), reach(b, radius * 0.82), chord, [-thick / 2, thick / 2]),
+        k.bar('tip_' + b, 'tip', reach(b, radius * 0.82), reach(b, radius), chord, [-thick / 2, thick / 2]),
       ]
       for b in std.range(0, blades - 1)
     ]), { blade: blade, tip: tip, head: head }),
@@ -222,8 +248,8 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
       for i in std.range(0, std.length(cross) - 1)
     ]) + k.bothSides([
       k.turned('skid', 'tube', 'x', k.disc(tube, x[0], x[1]), [0, tube, z]) + { sides: 8 },
-      m.bar('nose', 'tube', [x[1] - tube / 2, tube], [x[1] + sweep, tube + sweep * 0.7], 2 * tube, [z - tube, z + tube]),
-      m.bar('heel', 'tube', [x[0] + tube / 2, tube], [x[0] - sweep * 0.3, tube + sweep * 0.2], 2 * tube, [z - tube, z + tube]),
+      k.bar('nose', 'tube', [x[1] - tube / 2, tube], [x[1] + sweep, tube + sweep * 0.7], 2 * tube, [z - tube, z + tube]),
+      k.bar('heel', 'tube', [x[0] + tube / 2, tube], [x[0] - sweep * 0.3, tube + sweep * 0.2], 2 * tube, [z - tube, z + tube]),
     ]), { tube: finish }),
   // Struts for a wheel under the nose, with a fork around it. Fit a `m.wheel` of `radius` and `width` at [x, radius, 0].
   noseGear(id, massKg, x, radius, width, top, finish=steel)::
@@ -236,17 +262,14 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
     k.compound(id, massKg, [
       k.box('crown', 'frame', [x - 0.07, crown - 0.04, -inside - 0.04], [x + 0.07, crown + 0.04, inside + 0.04]),
       m.axleDisc('axle', 'frame', x, radius, 0.035, [-inside - 0.04, inside + 0.04], 8),
-      m.bar('strut', 'frame', [x, crown], [x + rake, top], 0.14, [-0.07, 0.07]),
-      m.bar('brace', 'frame', [x + 0.03, crown + 0.02], [brace.x, brace.y], 0.09, [-0.05, 0.05]),
+      k.bar('strut', 'frame', [x, crown], [x + rake, top], 0.14, [-0.07, 0.07]),
+      k.bar('brace', 'frame', [x + 0.03, crown + 0.02], [brace.x, brace.y], 0.09, [-0.05, 0.05]),
     ] + k.bothSides([
       k.box('fork', 'frame', [x - 0.04, radius - 0.03, inside], [x + 0.04, crown, inside + 0.04]),
     ]), { frame: finish }),
   // Struts splayed out from the belly at half width `root` to a wheel on each side. Fit a wheel at [x, radius, z].
   mainGear(id, massKg, x, radius, width, z, top, root=0.25, finish=steel)::
     k.compound(id, massKg, mainLegs(x, radius, width, z, top, root), { frame: finish }),
-  // Both of the above welded into one part, as a three-wheel undercarriage.
-  threeWheelGear(id, massKg, noseX, mainX, radius, width, z, top, root=0.25, finish=steel)::
-    k.compound(id, massKg, noseLeg(noseX, radius, width, top) + mainLegs(mainX, radius, width, z, top, root), { frame: finish }),
   planQuad: planQuad,
   // A strip of plate through (x, y, z) points, stepped so it stays a stack of flat slabs, as a bent blade or tube is.
   ribbon(id, slot, points, width, thick=0.08, step=0.2, endWidth=null)::
@@ -260,7 +283,7 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
         local y0 = lerp(p[1], q[1], t0);
         local y1 = lerp(p[1], q[1], t1);
         local last = i == std.length(points) - 2 && j == n - 1;
-        yPrism(id + '_' + i + '_' + j, slot,
+        k.yPrism(id + '_' + i + '_' + j, slot,
                planQuad([lerp(p[0], q[0], t0), lerp(p[2], q[2], t0)], [lerp(p[0], q[0], t1), lerp(p[2], q[2], t1)],
                         width / 2, if last && endWidth != null then endWidth / 2 else width / 2),
                [std.min(y0, y1) - thick, std.max(y0, y1)])

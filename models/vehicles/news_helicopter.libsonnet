@@ -4,7 +4,6 @@ local h = import 'helicopter-kit.libsonnet';
 local s = import 'news_helicopter.spec.libsonnet';
 local box = k.box;
 local turned = k.turned;
-local dome = [-90, 90];
 local trim = 'paint-charcoal';
 local lower(id, x) =
   h.shell(id + '_band_near', 'band', s.body, thick=0.0625, x=x, arc=[90, s.bandArc], sides=48)
@@ -14,47 +13,33 @@ local core = [
   station + { top: station.top - 0.05, bottom: station.bottom + 0.05, half: std.max(station.half - 0.05, 0.03) }
   for station in s.body
 ];
-local hingeRib(id, x) =
-  local low = h.point(s.body, x, 88);
-  local high = h.point(s.body, x, s.roofArc + 4);
-  box(id, 'frame', [x - 0.03, low[0], high[1] - 0.06], [x + 0.03, high[0], high[1]]);
-local door(id, massKg, rear, front) =
-  local pane = [rear + 0.035, front - 0.035];
-  k.compound(id, massKg,
-             h.shell('pane', 'glass', s.body, x=pane, arc=[s.roofArc, 90])
-             + h.shell('sill', 'frame', s.body, x=pane, arc=[82, 90], sides=48)
-             + h.shell('head', 'frame', s.body, x=pane, arc=[s.roofArc, s.roofArc + 5], sides=120)
-             + [hingeRib('hinge_rib', front - 0.065)],
-             { glass: 'glass-clear', frame: s.paint },
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] });
-local bow(id, x) = h.shell(id, 'paint', s.body, x=[x - 0.035, x + 0.035], arc=dome, step=0.07);
-local proudCowl = [station + { half: station.half + 0.035, top: station.top + 0.035 } for station in s.cowl];
+local proudCowl = h.proud(s.cowl, 0.035);
 taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.doorRear, s.noseCap], arc=[90, 270])
              + lower('skin', [s.doorRear, s.nose - 0.02]),
              { paint: s.paint, band: s.band, floor: trim }),
   k.compound('news_helicopter_rear_fairing', 25,
-             h.shell('top', 'paint', s.body, thick=0.0625, x=[s.tail, s.doorRear], arc=dome)
+             h.shell('top', 'paint', s.body, thick=0.0625, x=[s.tail, s.doorRear], arc=h.dome)
              + lower('skin', [s.tail, s.doorRear])
              + h.loft('bulkhead', 'floor', s.body, x=[s.doorRear - 0.05, s.doorRear], step=0.05)
              + h.loft('tail_end', 'paint', s.body, x=[s.tail, s.tail + 0.05], step=0.05),
              { paint: s.paint, band: s.band, floor: trim }),
   k.compound('news_helicopter_nose_cap', 6,
-             h.loft('cap', 'paint', s.body, x=[s.noseCap, s.nose], arc=dome, step=0.04),
+             h.loft('cap', 'paint', s.body, x=[s.noseCap, s.nose], arc=h.dome, step=0.04),
              { paint: s.paint }),
   k.compound('news_helicopter_windscreen', 15,
-             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=dome)
+             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=h.dome)
              + h.shell('post', 'frame', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=[-4, 4], sides=48),
              { glass: 'glass-clear', frame: s.paint }),
   k.compound('news_helicopter_roof', 30,
              h.shell('roof', 'paint', s.body, x=[s.doorRear, s.doorFront + 0.035], arc=[-s.roofArc, s.roofArc])
-             + bow('front_bow', s.doorFront)
-             + bow('mid_bow', s.doorMid)
-             + bow('rear_bow', s.doorRear + 0.035),
+             + h.bow('front_bow', s.body, s.doorFront)
+             + h.bow('mid_bow', s.body, s.doorMid)
+             + h.bow('rear_bow', s.body, s.doorRear + 0.035),
              { paint: s.paint }),
-  door('news_helicopter_front_door', 15, s.doorMid, s.doorFront),
-  door('news_helicopter_rear_door', 14, s.doorRear, s.doorMid),
+  h.door('news_helicopter_front_door', 15, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint),
+  h.door('news_helicopter_rear_door', 14, s.body, s.doorRear, s.doorMid, s.roofArc, s.paint),
   k.compound('news_helicopter_engine_cowl', 22,
              h.loft('cowl', 'paint', s.cowl)
              + h.shell('intake_near', 'dark', proudCowl, thick=0.05, x=[-0.8, -0.42], arc=[50, 110], sides=24)
@@ -89,11 +74,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     { x: 0.95, top: 0.62, root: 0.44 },
     { x: -0.35, top: 0.66, root: 0.42 },
   ]),
-  k.compound('news_helicopter_seat', 7, [
-    box('pan', 'dark', [-0.24, 0, -0.23], [0.22, 0.08, 0.23]),
-    box('cushion', 'seat', [-0.24, 0.08, -0.23], [0.22, 0.18, 0.23]),
-    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.23, 0.23]),
-  ], { dark: trim, seat: 'cloth-seat' }),
   k.compound('news_helicopter_rear_bench', 12, [
     box('pan', 'dark', [-0.24, 0, -0.56], [0.22, 0.08, 0.56]),
     box('cushion', 'seat', [-0.24, 0.08, -0.56], [0.22, 0.18, 0.56]),
@@ -112,11 +92,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_downlink_dome', 3, [
     turned('dome', 'dome', 'y', [[-0.14, 0], [-0.14, 0.12], [-0.06, 0.2], [0.14, 0.2], [0.14, 0], [-0.14, 0]]) + { sides: 16 },
   ], { dome: 'paint-white' }),
-  k.compound('news_helicopter_beacon', 1, [
-    turned('lens', 'lens', 'y', k.disc(0.06, 0, 0.1)) + { sides: 8 },
-  ], { lens: 'plastic-red' }),
-  k.compound('news_helicopter_landing_lamp', 1, [
-    box('housing', 'dark', [-0.05, -0.06, -0.12], [0.04, 0.06, 0.12]),
-    box('lens', 'lens', [0.04, -0.05, -0.1], [0.07, 0.05, 0.1]),
-  ], { dark: trim, lens: 'plastic-frosted' }),
 ])

@@ -3,9 +3,9 @@
 // `rows`, the worn models for the export, and `figureModels`, the matching Deadvox entries, so the segment, frame and
 // coverage contract has one source.
 local h = import 'compound.libsonnet';
-local bust = import 'bust-measures.libsonnet';
-local arm = import 'arm-measures.libsonnet';
-local leg = import 'leg-measures.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 
 // How far each layer stands off the skin. An outer layer clears every inner one on the same segment.
 local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };

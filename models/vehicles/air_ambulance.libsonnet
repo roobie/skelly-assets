@@ -4,24 +4,15 @@ local h = import 'helicopter-kit.libsonnet';
 local s = import 'air_ambulance.spec.libsonnet';
 local box = k.box;
 local turned = k.turned;
-local dome = [-90, 90];
 local trim = 'paint-charcoal';
-local skin(id, slot, x, arc, sides=120) = h.shell(id, slot, s.body, thick=0.0625, x=x, arc=arc, sides=sides);
+local skin(id, slot, x, arc, sides=120) = h.skin(id, slot, s.body, x, arc, sides);
 local flanks(id, slot, x, arc) = skin(id + '_near', slot, x, arc) + skin(id + '_far', slot, x, [360 - arc[1], 360 - arc[0]]);
 local core = [
   station + { top: station.top - 0.05, bottom: station.bottom + 0.05, half: std.max(station.half - 0.05, 0.03) }
   for station in s.body
 ];
-local hingeRib(id, stations, x, from, to) =
-  local low = h.point(stations, x, to);
-  local high = h.point(stations, x, from);
-  box(id, 'frame', [x - 0.03, low[0], high[1] - 0.06], [x + 0.03, high[0], high[1]]);
 local hinges = { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] };
-local bow(id, x) = h.shell(id, 'paint', s.body, x=[x - 0.035, x + 0.035], arc=dome, step=0.07);
-local proudCowl = [station + { half: station.half + 0.035, top: station.top + 0.035 } for station in s.cowl];
-local boomAt(x) =
-  local u = (s.boom.root.x - x) / (s.boom.root.x - s.boom.tip.x);
-  { x: x, y: s.boom.root.y + u * (s.boom.tip.y - s.boom.root.y), r: s.boom.root.r + u * (s.boom.tip.r - s.boom.root.r) };
+local proudCowl = h.proud(s.cowl, 0.035);
 // A green cross on a white field in the lower band behind the sliding door, below the rear window. Skin tiles follow the
 // curved flank, so the field and the plus are laid edge to edge instead of stacked.
 local cross = { field: [-1.8125, -1.1875], bar: [-1.6875, -1.3125], post: [-1.5625, -1.4375], barArc: [79, 83.5], postArc: [74, 88] };
@@ -52,17 +43,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     box('deck', 'mat', [s.floorRear, s.floor - 0.0625, -0.72], [s.floorFront, s.floor, 0.72]),
   ], { mat: 'rubber-black' }),
   k.compound('air_ambulance_nose_cap', 9,
-             h.loft('cap', 'accent', s.body, x=[s.noseCap, s.nose], arc=dome, step=0.04),
+             h.loft('cap', 'accent', s.body, x=[s.noseCap, s.nose], arc=h.dome, step=0.04),
              { accent: s.accent }),
   k.compound('air_ambulance_windscreen', 28,
-             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=dome)
+             h.shell('screen', 'glass', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=h.dome)
              + h.shell('post', 'frame', s.body, x=[s.doorFront + 0.035, s.noseCap], arc=[-4, 4], sides=48),
              { glass: 'glass-clear', frame: s.paint }),
   k.compound('air_ambulance_roof', 70,
              skin('roof', 'paint', [s.doorRear, s.doorFront + 0.035], [-s.roofArc, s.roofArc], 32)
-             + bow('front_bow', s.doorFront)
-             + bow('mid_bow', s.doorMid)
-             + bow('rear_bow', s.doorRear),
+             + h.bow('front_bow', s.body, s.doorFront)
+             + h.bow('mid_bow', s.body, s.doorMid)
+             + h.bow('rear_bow', s.body, s.doorRear),
              { paint: s.paint }),
   k.compound('air_ambulance_cabin_rear', 90,
              skin('roof', 'paint', [s.tail, s.doorRear - 0.035], [-48, 48], 32)
@@ -80,7 +71,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              skin('pane', 'glass', [s.doorMid + 0.035, s.doorFront - 0.035], [s.roofArc + 5, 72], 48)
              + skin('sill', 'accent', [s.doorMid + 0.035, s.doorFront - 0.035], [72, 90])
              + skin('head', 'frame', [s.doorMid + 0.035, s.doorFront - 0.035], [s.roofArc, s.roofArc + 5])
-             + [hingeRib('hinge_rib', s.body, s.doorFront - 0.065, s.roofArc + 4, 88)],
+             + [h.hingeRib('hinge_rib', s.body, s.doorFront - 0.065, s.roofArc + 4, 88)],
              { glass: 'glass-clear', frame: s.paint, accent: s.accent },
              hinges),
   k.compound('air_ambulance_sliding_door', 38,
@@ -91,7 +82,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + skin('mid', 'paint', [s.doorRear + 0.035, s.doorMid - 0.035], [62, 72])
              + skin('lower', 'accent', [s.doorRear + 0.035, s.doorMid - 0.035], [72, 90])
              + [
-               hingeRib('hinge_rib', s.body, s.doorMid - 0.065, s.roofArc + 4, 88),
+               h.hingeRib('hinge_rib', s.body, s.doorMid - 0.065, s.roofArc + 4, 88),
                box('handle', 'dark', [s.doorMid - 0.3, 1.34, 0.86], [s.doorMid - 0.14, 1.38, 0.92]),
              ],
              { glass: 'glass-clear', paint: s.paint, frame: s.paint, accent: s.accent, dark: trim },
@@ -106,7 +97,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                box('band', 'accent', [-2.27, 0.84, 0.03], [-2.25, 1.02, 0.42]),
                box('window', 'tint', [-2.27, 1.2, 0.1], [-2.25, 1.58, 0.46]),
                box('handle', 'dark', [-2.28, 1.1, 0.04], [-2.25, 1.14, 0.18]),
-               hingeRib('hinge_rib', s.clamshell, s.tail - 0.03, 40, 140),
+               h.hingeRib('hinge_rib', s.clamshell, s.tail - 0.03, 40, 140),
              ],
              { paint: s.paint, accent: s.accent, tint: 'glass-grey', dark: trim, frame: s.paint },
              hinges),
@@ -122,9 +113,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              ]),
              { paint: s.paint, dark: trim }),
   k.compound('air_ambulance_tail_boom', 62,
-             h.boom('boom_fore', 'paint', s.boom.root, boomAt(s.boom.band[0]))
-             + h.boom('boom_band', 'accent', boomAt(s.boom.band[0]), boomAt(s.boom.band[1]))
-             + h.boom('boom_aft', 'paint', boomAt(s.boom.band[1]), s.boom.tip)
+             h.boom('boom_fore', 'paint', s.boom.root, h.boomAt(s.boom, s.boom.band[0]))
+             + h.boom('boom_band', 'accent', h.boomAt(s.boom, s.boom.band[0]), h.boomAt(s.boom, s.boom.band[1]))
+             + h.boom('boom_aft', 'paint', h.boomAt(s.boom, s.boom.band[1]), s.boom.tip)
              + [box('gearbox', 'dark', [s.tailRotor.x - 0.1, s.tailRotor.y - 0.09, -0.09], [s.tailRotor.x + 0.1, s.tailRotor.y + 0.09, 0.09])],
              { paint: s.paint, accent: s.accent, dark: trim }),
   k.compound('air_ambulance_tail_surfaces', 14, [
