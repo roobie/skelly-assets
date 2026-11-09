@@ -13,7 +13,7 @@ local axleDisc(id, slot, x, y, radius, z, sides=24) =
   wheel(id, massKg, width, rim, outer, lugs=0, lug=0.025, hub='steel-grey')::
     local body = outer - (if lugs > 0 then lug else 0);
     k.compound(id, massKg, [
-      k.turned('tyre', 'tyre', 'z', [[-width / 2, rim], [-width / 2, body - width * 0.08], [-width * 0.42, body], [width * 0.42, body], [width / 2, body - width * 0.08], [width / 2, rim], [-width / 2, rim]]) + { sides: 24 },
+      k.turned('tyre', 'tyre', 'z', k.tyreProfile(width, rim, body, 0.08)) + { sides: 24 },
       k.turned('rim', 'rim', 'z', k.disc(rim, -width * 0.36, width * 0.36)) + { sides: 24 },
       k.turned('cap', 'cap', 'z', k.disc(rim * 0.4, width * 0.3, width * 0.42)) + { sides: 12 },
     ] + (if lugs > 0 then std.flattenArrays([

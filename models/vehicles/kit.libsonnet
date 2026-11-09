@@ -15,6 +15,8 @@ local yPrism(id, slot, profile, y) = { id: id, kind: 'prism', slot: slot, axis: 
 local turned(id, slot, axis, profile, origin=[0, 0, 0]) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
 local disc(radius, from, to) = [[from, 0], [from, radius], [to, radius], [to, 0], [from, 0]];
 local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, outer], [to, inner], [from, inner]];
+// A tyre's turned section, its shoulders rounded off by `taper` of its width.
+local tyreProfile(width, rim, outer, taper) = [[-width / 2, rim], [-width / 2, outer - width * taper], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * taper], [width / 2, rim], [-width / 2, rim]];
 local rad(degrees) = degrees * std.pi / 180;
 // Convex trapezoids around a centre, since a prism must be convex. Angles run counter-clockwise from +x.
 local arc(id, slot, cx, cy, inner, outer, from, to, steps, z) = [
@@ -57,6 +59,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   turned: turned,
   disc: disc,
   annulus: annulus,
+  tyreProfile: tyreProfile,
   rad: rad,
   arc: arc,
   bar: bar,
