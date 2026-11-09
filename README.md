@@ -43,9 +43,11 @@ and thing exports without giving a model two producers. The recipe schema and to
 `tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`, and
 `tools/packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`.
 
-A thing recipe or roster row selects a catalogue row, not a second model source. Author thing sources in
-`tools/packages/thing-authoring-tool/items.jsonnet`, `items`, including shared model files through
-`models/index.libsonnet`. The roster filters that catalogue through
+A thing recipe or roster row selects a catalogue row, not a second model source. Author thing sources in the
+model files that `models/index.libsonnet` lists; `tools/packages/thing-authoring-tool/items.jsonnet` joins them to
+the shared settings for the thing tool. Rows and every value an author tunes, such as masses, measures and finishes,
+live under `models/` because that tree carries the content licence (`REUSE.toml`); `tools/` keeps only the builder
+functions, which are code. The roster filters that catalogue through
 `tools/packages/thing-authoring-tool/exports/deadvox.jsonnet`, `roster`, using `models/export.json` as the
 authority for which families use the roster; see `tools/layout.mjs`, `readRoster`, and `tools/build.mjs`,
 `buildRoster`. Do not select those models again in a recipe. For guns, author the source named by the recipe
@@ -127,7 +129,7 @@ Turned pieces inherit the catalogue's shared faceted default so both products re
 Authored numeric side counts override it; a compound piece can explicitly choose round with `sides: null`.
 A large side count is still a polygon, not the round mechanism. Keep the default in content, not a tool-code
 number, so authors retain control without forking the builder. See
-`tools/packages/thing-authoring-tool/items.jsonnet`, `turnedSides`,
+`models/item-settings.libsonnet`, `turnedSides`,
 `tools/packages/thing-authoring-tool/src/catalogue.ts`, `buildPart`, and
 `tools/packages/thing-authoring-tool/src/families/compound.ts`, `compound`.
 
