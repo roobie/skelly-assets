@@ -15,6 +15,7 @@ export interface WrittenRecipe {
     readonly path: string;
     readonly partNodes: readonly string[];
     readonly label?: NeutralModel['label'];
+    readonly paintable?: NeutralModel['paintable'];
   }[];
   readonly files: readonly string[];
 }
@@ -57,6 +58,7 @@ export const writeModelExports = (
       path: modelEntry.file,
       partNodes,
       ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
+      ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
     })),
     files,
   };

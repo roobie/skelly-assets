@@ -1,10 +1,12 @@
 // Vehicle placements: the part at each site of a vehicle, where it sits in the model frame and whether it is a
 // mirrored far-side twin, and the tags the vehicle adds to its body's. Sources are
 // models/vehicles/<vehicle>.placements.libsonnet, built from models/vehicles/site.libsonnet; a variant names its parent
-// and is laid out from its sites. The why is in docs/decisions/0001-vehicle-placements.md.
+// and is laid out from its sites. A site's finish is the paint its copy of the part starts with. The why is in
+// docs/decisions/0001-vehicle-placements.md and docs/decisions/0003-vehicle-paint.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
+import { MATERIALS } from './packages/thing-core/src/materials.ts';
 import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
 import { modelProblems } from './taxonomy.mjs';
@@ -15,7 +17,7 @@ const repo = resolve(import.meta.dirname, '..');
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
 const VEHICLE_KEYS = new Set(['forward', 'parent', 'sites', 'tags']);
-const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror']);
+const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
 
@@ -63,7 +65,14 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
     else seen.add(site.id);
     if (!isPoint(site?.at)) problems.push(`${where}: at is not three finite numbers`);
     if (site?.mirror !== undefined && site.mirror !== true) problems.push(`${where}: mirror is true or absent`);
-    const packs = (byModel.get(site?.part) ?? []).map((model) => model.pack);
+    const placed = byModel.get(site?.part) ?? [];
+    if (site?.finish !== undefined) {
+      if (!Object.hasOwn(MATERIALS, site.finish)) problems.push(`${where}: finish ${site.finish} is not in the finish library`);
+      if (placed.length > 0 && !placed.some(({ paintable }) => paintable?.length > 0)) {
+        problems.push(`${where}: ${site.part} has no paintable slot for finish ${site.finish}`);
+      }
+    }
+    const packs = placed.map((model) => model.pack);
     if (packs.length === 0) problems.push(`${where}: ${site?.part} is not a built model`);
     if (packs.length > 1) problems.push(`${where}: ${site.part} is built in ${packs.length} packs, ${packs.join(' ')}`);
     if (packs.length === 1 && pack !== undefined && !reachable.has(packs[0])) {
@@ -75,7 +84,7 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
 
 // Why the vehicles could not be assembled from the built models, as messages. placements: vehicle -> { parent?, sites,
 // tags? };
-// models: the built models, { id, pack }; vehicleRows: vehicle -> its own row ids; dependsOn: pack -> the packs it
+// models: the built models, { id, pack, paintable? }; vehicleRows: vehicle -> its own row ids; dependsOn: pack -> the packs it
 // depends on; vocabulary: tools/taxonomy.mjs, readVocabulary. A part is named by its model id alone, so the id must
 // name one model, in the vehicle's pack or one it declares a dependency on.
 export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary }) {
