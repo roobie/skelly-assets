@@ -108,7 +108,7 @@ local dummy(id, massKg, armour) =
 
   // A block of pressed soybean and wheat dough, 140 mm by 90 mm and 40 mm tall, grown over with pale mould
   // that has started to turn yellow-green in patches.
-  h.compound('soy_wheat_dough_done', 0.45, [
+  h.compound('mouldy_soy_wheat_cake', 0.45, [
     box('block', 'dough', [-0.07, 0, -0.045], [0.07, 0.034, 0.045]),
     box('crown', 'mould', [-0.066, 0.034, -0.041], [0.066, 0.038, 0.041]),
     h.ball('lump-a', 'mould', 0.018, -0.035, 0.038, -0.015, 0.4),
@@ -261,7 +261,7 @@ local dummy(id, massKg, armour) =
 
   // A bunch of five raw tobacco leaves, each about 250 mm long and 100 mm wide, fanned out from their stalks,
   // which are tied together with string.
-  h.compound('tobacco_raw', 0.13, std.flattenArrays([
+  h.compound('raw_tobacco', 0.13, std.flattenArrays([
     local a = [52, 72, 92, 112, 132][i];
     [
       leaf('leaf-%d' % i, 'leaf', a, -0.11, 0, 0.25 - (i % 2) * 0.03, 0.1, 0.002 + [0, 2, 4, 1, 3][i] * 0.002, 0.004 + [0, 2, 4, 1, 3][i] * 0.002),
@@ -276,9 +276,9 @@ local dummy(id, massKg, armour) =
 
   // A home-made armoured training dummy 1.75 m tall: the wooden dummy below with scrap steel bolted over its
   // chest, belly, shoulders, forearms and shins, and a dented steel bucket for a helmet.
-  dummy('training_dummy_heavy', 64, true) + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'] } } },
+  dummy('armoured_training_dummy', 64, true) + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'] } } },
 
   // A home-made wooden training dummy 1.75 m tall on crossed feet: a post for legs, a plank torso, a round
   // head and forearms held forward, with silver tape marking where to strike.
-  dummy('training_dummy_light', 47, false) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  dummy('light_training_dummy', 47, false) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
 ]

@@ -78,7 +78,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['modern'] } } },
   // A plain glass tube 100 mm long and 12 mm across, open at both ends, lying along x.
-  h.compound('glass_tube_small', 0.005, [
+  h.compound('small_glass_tube', 0.005, [
     h.tube('tube', 'glass', 0.0035, 0.006, -0.05, 0.05, 0.006),
   ], { glass: 'glass-clear' }) + {
     voxelGrain: 0.002,
@@ -117,7 +117,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A round card box of filter paper discs 125 mm across: the base 22 mm deep filled with white discs, the lid
   // lying beside it with a coloured grade band round its rim.
-  h.compound('filter_paper_qualitative', 0.15, [
+  h.compound('coarse_filter_paper', 0.15, [
     h.turned('box', 'box', 'y', [[0, 0], [0, 0.0625], [0.022, 0.0625], [0.022, 0.0605], [0.002, 0.0605], [0.002, 0]], [-0.066, 0, 0]),
     h.disc('papers', 'paper', 0.058, 0.002, 0.019, -0.066, 0),
     h.disc('lid', 'box', 0.064, 0, 0.012, 0.066, 0),
@@ -184,7 +184,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
   // A tabletop Stirling engine 220 by 120 mm and 150 mm tall on a steel base: a horizontal glass displacer
   // cylinder over a spirit burner, a brass power cylinder beside it, and a spoked flywheel 110 mm across.
-  h.compound('engineering_engine_kit', 3.5, [
+  h.compound('stirling_engine_kit', 3.5, [
     h.box('base', 'base', [-0.11, 0, -0.06], [0.11, 0.015, 0.06]),
     h.box('pillar-a', 'frame', [-0.09, 0.015, -0.006], [-0.08, 0.075, 0.006]),
     h.box('pillar-b', 'frame', [-0.005, 0.015, -0.006], [0.005, 0.075, 0.006]),
@@ -218,7 +218,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   } + { taxonomy: { category: 'recreation', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
   // A STEM building case 240 by 150 mm and 50 mm deep, open with its lid hinged up behind: six compartments of
   // gears, perforated beams, hydraulic syringes with tubing, wheels, connector pegs and a stack of blueprints.
-  h.compound('engineering_makerspace_kit', 0.6, [
+  h.compound('makerspace_kit', 0.6, [
     h.box('floor', 'case', [-0.12, 0, -0.075], [0.12, 0.006, 0.075]),
     h.box('wall-front', 'case', [-0.12, 0, 0.071], [0.12, 0.05, 0.075]),
     h.box('wall-back', 'case', [-0.12, 0, -0.075], [0.12, 0.05, -0.071]),
@@ -294,7 +294,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   // A grey storage tub 280 by 190 mm and 80 mm tall with an orange-latched lid, and on it a small two-wheeled
   // robot built from the kit, facing +z: a white controller brick with a screen, two wheels, orange frame
   // beams, a rear caster and a pair of ultrasonic eyes on the front.
-  h.compound('engineering_robotics_kit', 2, [
+  h.compound('robotics_kit', 2, [
     h.box('tub', 'tub', [-0.14, 0, -0.095], [0.14, 0.07, 0.095]),
     h.box('tub-lid', 'tub-lid', [-0.144, 0.07, -0.099], [0.144, 0.08, 0.099]),
     h.box('latch-a', 'latch', [-0.144, 0.055, -0.03], [-0.14, 0.08, 0.03]),
@@ -338,7 +338,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   // A makeshift water electrolyser 1 m tall: a bolted steel tank 600 by 360 mm and 400 mm deep on an angle-iron
   // stand, red and black terminals on its lid, a filler cap, and two clear bubbler columns on risers that
   // separate the hydrogen and oxygen streams into their outlet hoses.
-  h.compound('electrolyzer_makeshift', 89, [
+  h.compound('makeshift_electrolyser', 89, [
     h.box('tank', 'tank', [-0.3, 0.1, -0.18], [0.3, 0.5, 0.18]),
     h.box('lid', 'lid', [-0.31, 0.5, -0.19], [0.31, 0.52, 0.19]),
     h.box('seam', 'lid', [-0.302, 0.3, -0.182], [0.302, 0.31, 0.182]),

@@ -44,7 +44,7 @@ local buckle(id, slot, x, z, w, d, y) = [
   // Rail segments follow the shell round at rail height.
   local ry = 0.066, rr = rAt(ry), zs = [-0.06, -0.02, 0.02, 0.06];
   local xAt(z) = std.sqrt(rr * rr - z * z);
-  h.compound('tac_helmet', 0.95,
+  h.compound('tactical_helmet', 0.95,
              [
                h.dome('shell', 'shell', a, ht, 0.008, 'y', [0, y0, 0], 10),
                h.turned('edge', 'trim', 'y', [[0, a - 0.009], [0, a + 0.003], [y0 + 0.004, a + 0.003], [y0 + 0.004, a - 0.009], [0, a - 0.009]]),
@@ -129,7 +129,7 @@ local buckle(id, slot, x, z, w, d, y) = [
   // A white elastic belly band lying in a closed ring, 1.1 m round and 100 mm wide, with a pistol pocket 200 mm
   // long and a spare magazine pocket sewn on its outside, and a hook-and-loop tab where it fastens.
   local r = 0.11, w = 0.1, t = 0.004;
-  h.compound('bbholster', 0.18,
+  h.compound('belly_band_holster', 0.18,
              h.strapLoop('band', 'band', 0.2, r, w, t)
              + holster('pocket', [-0.13, r - 0.036], [1, 0], [0, 1], 0.18, 0.026, t, 0.95)
              + [
@@ -143,7 +143,7 @@ local buckle(id, slot, x, z, w, d, y) = [
   // A tan elastic thigh band lying in a closed ring, 700 mm round and 90 mm wide, with a small pistol pocket 130 mm
   // long, a slim magazine sleeve and a knife-sized slip pocket sewn round its outside, and a hook-and-loop tab.
   local r = 0.08, w = 0.09, t = 0.004;
-  h.compound('bholster', 0.12,
+  h.compound('thigh_concealment_band', 0.12,
              h.strapLoop('band', 'band', 0.1, r, w, t)
              + holster('pocket', [-0.1, r - 0.03], [1, 0], [0, 1], 0.13, 0.022, t, 0.8)
              + [
@@ -157,7 +157,7 @@ local buckle(id, slot, x, z, w, d, y) = [
   // A leather ankle holster lying on its side as a short open cuff, 330 mm round and 70 mm wide, lined with dark fleece
   // that shows at both edges, with a small pistol holster 120 mm long and a thumb-break strap riding on top of it.
   local r = 0.0525, w = 0.07, t = 0.006;
-  h.compound('bootstrap', 0.2,
+  h.compound('ankle_holster', 0.2,
              [
                h.tube('lining', 'lining', r - t - 0.004, r - t + 0.001, -w / 2 - 0.004, w / 2 + 0.004, r, 0),
                h.tube('band', 'band', r - t, r, -w / 2, w / 2, r, 0),

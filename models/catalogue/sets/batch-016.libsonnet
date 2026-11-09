@@ -59,7 +59,7 @@ local legs(slot, x, z, side, top) = [
 
   // A stacking school chair, 420 mm wide, 480 mm deep and 800 mm tall: a moulded plywood seat and backrest on a
   // round steel tube frame, with side rails under the seat and rubber caps on the feet.
-  h.compound('chair_plywood', 4.1, [
+  h.compound('plywood_chair', 4.1, [
     disc('leg-%s' % c.id, 'frame', 0.011, 0.012, c.top, c.x, c.z)
     for c in [{ id: 'fl', x: -0.2, z: -0.2, top: 0.43 }, { id: 'fr', x: 0.2, z: -0.2, top: 0.43 }, { id: 'bl', x: -0.2, z: 0.2, top: 0.8 }, { id: 'br', x: 0.2, z: 0.2, top: 0.8 }]
   ] + [
@@ -77,7 +77,7 @@ local legs(slot, x, z, side, top) = [
 
   // A plain wooden kitchen chair, 440 mm wide, 460 mm deep and 950 mm tall: a solid seat on four square legs with
   // low stretchers, back legs running up into a backrest with a broad top rail, a lower rail and three spindles.
-  h.compound('chair_wood', 7.1, legs('wood', 0.19, 0.19, 0.036, 0.45) + [
+  h.compound('wooden_chair', 7.1, legs('wood', 0.19, 0.19, 0.036, 0.45) + [
     box('back-leg-left', 'wood', [-0.208, 0.45, 0.172], [-0.172, 0.95, 0.208]),
     box('back-leg-right', 'wood', [0.172, 0.45, 0.172], [0.208, 0.95, 0.208]),
     box('seat', 'seat', [-0.22, 0.43, -0.235], [0.22, 0.46, 0.225]),
@@ -99,7 +99,7 @@ local legs(slot, x, z, side, top) = [
 
   // A log stool, 300 mm across and 420 mm tall: a short round of trunk in rough bark, its top sawn flat and
   // smoothed, showing pale wood and a darker heart.
-  h.compound('stool_log', 19, [
+  h.compound('log_stool', 19, [
     turned('bark', 'bark', 'y', [[0, 0], [0, 0.155], [0.05, 0.15], [0.15, 0.153], [0.26, 0.148], [0.36, 0.152], [0.414, 0.15], [0.414, 0]]),
     disc('face', 'face', 0.138, 0.414, 0.42),
     disc('heart', 'heart', 0.04, 0.42, 0.421),
@@ -109,7 +109,7 @@ local legs(slot, x, z, side, top) = [
 
   // A small four-legged wooden stool, 320 mm square and 450 mm tall: a square seat over a shallow apron, on
   // four square legs joined by round stretchers.
-  h.compound('stool_wood', 2.3, legs('wood', 0.13, 0.13, 0.03, 0.43) + [
+  h.compound('wooden_stool', 2.3, legs('wood', 0.13, 0.13, 0.03, 0.43) + [
     box('seat', 'seat', [-0.16, 0.43, -0.16], [0.16, 0.45, 0.16]),
   ] + [
     box('apron-%s' % a.id, 'wood', a.min, a.max)
@@ -129,7 +129,7 @@ local legs(slot, x, z, side, top) = [
 
   // An aluminium foot locker, 690 mm long, 360 mm deep and 300 mm tall: a ribbed aluminium box under a lid, with
   // steel corner caps, a folding handle at each end, two catches and a small locking hasp at the front.
-  h.compound('foot_locker_aluminum', 7, [
+  h.compound('aluminium_foot_locker', 7, [
     box('body', 'shell', [-0.34, 0.005, -0.175], [0.34, 0.235, 0.175]),
     box('runner-a', 'trim', [-0.32, 0, -0.15], [0.32, 0.005, -0.12]),
     box('runner-b', 'trim', [-0.32, 0, 0.12], [0.32, 0.005, 0.15]),

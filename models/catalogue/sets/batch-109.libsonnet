@@ -150,35 +150,35 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
   // A pair of medium steel knee guards laid side by side, convex side up, each 200 mm from top to foot and 190 mm
   // across the wing: a domed cup over the knee, a curved lame above and below, a round wing on the outer side and two
   // buckled leather straps. The tempered pair shares this model with its own steel finish.
-  h.compound('mc_knee_guards', 1.5, cop('l-', -0.125, 1, -1) + cop('r-', 0.125, 1, 1), steelFinishes('steel-grey'))
+  h.compound('hardened_knee_guards', 1.5, cop('l-', -0.125, 1, -1) + cop('r-', 0.125, 1, 1), steelFinishes('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['legs'] } } },
 
   // A pair of medium steel shoulder guards laid side by side, convex side up, each 200 mm from collar to arm and
   // 160 mm across: a cap plate and three overlapping lames riveted to an arched leather backing, with two leather
   // lacing points at the collar.
   // The tempered pair shares this model with its own steel finish.
-  h.compound('mc_shoulder_guards', 1.4, spaulder('l-', -0.1) + spaulder('r-', 0.1), steelFinishes('steel-grey'))
+  h.compound('hardened_shoulder_guards', 1.4, spaulder('l-', -0.1) + spaulder('r-', 0.1), steelFinishes('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['torso'] } } },
 
   // A pair of medium steel splint vambraces laid side by side, open side down, each 280 mm from elbow to wrist and
   // 140 mm across at the elbow: canvas shells with five riveted steel splints, leather binding and two buckled straps.
   // The tempered pair shares this model with its own splint finish.
-  h.compound('mc_vambrace_brigandine', 1.7, splintGuard('l-', -0.08, 0.28, 0.14, 0.105, 5, 0.08, [-0.065, 0.065]) + splintGuard('r-', 0.08, 0.28, 0.14, 0.105, 5, 0.08, [-0.065, 0.065]), splintFinishes('steel-grey'))
+  h.compound('hardened_splint_vambraces', 1.7, splintGuard('l-', -0.08, 0.28, 0.14, 0.105, 5, 0.08, [-0.065, 0.065]) + splintGuard('r-', 0.08, 0.28, 0.14, 0.105, 5, 0.08, [-0.065, 0.065]), splintFinishes('steel-grey'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of tempered steel brigandine gloves laid side by side, back up, each 240 mm from cuff to fingertip: canvas
   // gloves with a curved steel plate over the back of the hand, two plates down each finger and the thumb, and a
   // buckled cuff strap.
-  h.compound('qt_brigandine_hands', 0.52, glove('l-', -0.1, 1) + glove('r-', 0.1, -1), { canvas: 'cloth-canvas' } + steelFinishes('steel-heat-tint'))
+  h.compound('hardened_brigandine_gloves', 0.52, glove('l-', -0.1, 1) + glove('r-', 0.1, -1), { canvas: 'cloth-canvas' } + steelFinishes('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of tempered steel elbow guards laid side by side, convex side up, each 150 mm from top to foot: a domed cup
   // over the elbow, a curved lame above and below, a round wing on the outer side and two buckled leather straps.
-  h.compound('qt_elbow_guards', 0.8, cop('l-', -0.095, 0.75, -1) + cop('r-', 0.095, 0.75, 1), steelFinishes('steel-heat-tint'))
+  h.compound('hardened_elbow_guards', 0.8, cop('l-', -0.095, 0.75, -1) + cop('r-', 0.095, 0.75, 1), steelFinishes('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of tempered steel splint greaves laid side by side, open side down, each 380 mm from knee to ankle and
   // 160 mm across at the calf: canvas shells with six riveted steel splints, leather binding and three buckled straps.
-  h.compound('qt_greaves_brigandine', 2.5, splintGuard('l-', -0.095, 0.38, 0.16, 0.115, 6, 0.09, [-0.13, 0, 0.13]) + splintGuard('r-', 0.095, 0.38, 0.16, 0.115, 6, 0.09, [-0.13, 0, 0.13]), splintFinishes('steel-heat-tint'))
+  h.compound('hardened_splint_greaves', 2.5, splintGuard('l-', -0.095, 0.38, 0.16, 0.115, 6, 0.09, [-0.13, 0, 0.13]) + splintGuard('r-', 0.095, 0.38, 0.16, 0.115, 6, 0.09, [-0.13, 0, 0.13]), splintFinishes('steel-heat-tint'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['legs'] } } },
 ]

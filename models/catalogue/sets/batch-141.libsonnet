@@ -171,7 +171,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
 
   // A six-pointed deputy's star 64 mm across, ball-tipped, with a raised round seal and a ring of lettering, lying
   // face up; a pin runs across the back.
-  h.compound('badge_deputy', 0.032, [
+  h.compound('deputy_badge', 0.032, [
     ] + star('star', 'metal', 6, 0.030, 0.015, 0.002, 0.004) + [
     disc('seal', 'metal', 0.011, 0.004, 0.006),
     washer('lettering', 'ink', 0.0115, 0.0135, 0.001, 0, 0.004, 0),
@@ -186,7 +186,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
   // A detective's gold shield 60 mm wide and 70 mm tall lying face up, its crown toward -z, clipped in a black leather
   // holder that shows round its edge: a polished rim, a blue enamel seal, a lettered panel above and a number plate
   // below, a pin across the back.
-  h.compound('badge_detective', 0.1, [
+  h.compound('detective_badge', 0.1, [
     ] + fan('holder', 'leather', shield(1.18), 0.002, 0.004, [0, 0])
     + fan('rim', 'rim', shield(1), 0.004, 0.006, [0, 0])
     + fan('shield', 'metal', shield(0.88), 0.006, 0.007, [0, 0]) + [
@@ -201,7 +201,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
 
   // A plastic name tag 76 by 25 mm lying face up: a blue band over a white face with two lines of print, a clip
   // behind.
-  h.compound('badge_doctor', 0.01, [
+  h.compound('doctors_name_tag', 0.01, [
     box('tag', 'face', [-0.038, 0.002, -0.0125], [0.038, 0.004, 0.0125]),
     box('band', 'band', [-0.038, 0.004, -0.0125], [0.038, 0.005, -0.005]),
     box('clip', 'clip', [-0.010, 0, -0.010], [0.010, 0.002, 0.008]),
@@ -211,7 +211,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
 
   // A federal agent's gold shield 56 by 70 mm lying face up, an eagle with spread wings on its crown toward -z and
   // a raised seal with a standing figure in its centre, a pin across the back.
-  h.compound('badge_federal', 0.07, [
+  h.compound('federal_agent_badge', 0.07, [
     ] + fan('shield', 'metal', shield(0.92), 0.002, 0.004, [0, 0]) + [
   ] + fan('eagle', 'metal', [
       [0, -0.044], [0.005, -0.040], [0.022, -0.046], [0.018, -0.036], [0.006, -0.032], [-0.006, -0.032], [-0.018, -0.036],
@@ -227,7 +227,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A plastic star badge 70 mm across lying face up, five points, a red band of print across it, a pin behind.
-  h.compound('badge_kids_star', 0.0061, [
+  h.compound('kids_star_badge', 0.0061, [
     ] + star('star', 'star', 5, 0.035, 0.015, 0.002, 0.005) + [
     box('band', 'band', [-0.020, 0.005, -0.004], [0.020, 0.006, 0.006]),
     box('pin', 'pin', [-0.012, 0, -0.001], [0.012, 0.002, 0.001]),
@@ -237,7 +237,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
 
   // A marshal's five-pointed star inside a ring, 62 mm across, all bright silver, lying face up with a pin behind:
   // the star stands proud of the ring, and fine engraved letters run round the ring.
-  h.compound('badge_marshal', 0.06, [
+  h.compound('marshal_badge', 0.06, [
     washer('ring', 'metal', 0.024, 0.031, 0.002, 0, 0.002, 0),
     ] + star('star', 'metal', 5, 0.025, 0.011, 0.002, 0.008) + [
     disc('seal', 'seal', 0.008, 0.008, 0.010),
@@ -252,7 +252,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
 
   // A tactical team's shield 60 by 70 mm lying face up, crown toward -z: a bright silver rim round a blackened
   // field, a gold star at its crown and a silver ribbon of lettering across its lower half, a pin across the back.
-  h.compound('badge_swat', 0.085, [
+  h.compound('swat_badge', 0.085, [
     ] + fan('rim', 'metal', shield(1), 0.002, 0.004, [0, 0])
     + fan('field', 'field', shield(0.84), 0.004, 0.005, [0, 0])
     + fan('emblem', 'emblem', [

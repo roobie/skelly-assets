@@ -66,7 +66,7 @@ local toothLump(p, x, z, k) = [
 
   // A nailboard 65 cm long and 25 cm wide: three pine boards on two battens, with a grid of nails driven up
   // through it so 4 cm of each point stands clear.
-  h.compound('board_trap', 2, [
+  h.compound('nailboard', 2, [
     box('batten-a', 'batten', [-0.29, 0, -0.125], [-0.24, 0.02, 0.125]),
     box('batten-b', 'batten', [0.24, 0, -0.125], [0.29, 0.02, 0.125]),
   ] + [
@@ -80,7 +80,7 @@ local toothLump(p, x, z, k) = [
 
   // A tin can 75 mm across and 110 mm tall bound with black tape, a nail through its lid for a striker, and a
   // pull string tied to the pin and coiled at its foot.
-  h.compound('boobytrap', 0.65, [
+  h.compound('booby_trap', 0.65, [
     disc('can', 'can', 0.0375, 0, 0.11),
     turned('tape', 'tape', 'y', [[0.03, 0], [0.03, 0.0385], [0.075, 0.0385], [0.075, 0]]),
     disc('lid', 'lid', 0.034, 0.11, 0.114),
@@ -91,11 +91,11 @@ local toothLump(p, x, z, k) = [
     box('string-top', 'cord', [-0.0135, 0.145, 0.006], [-0.0105, 0.148, 0.042]),
     coil('string-coil', 'cord', 0.035, 0.003, 0.03, 0.07),
   ], { can: 'steel-galvanised', tape: 'plastic-black', lid: 'steel-grey', nail: 'steel-bright', cord: 'cord-cotton' })
-  + h.inHand('boobytrap', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap', 'explosive'] } } },
+  + h.inHand('booby_trap', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap', 'explosive'] } } },
 
   // A roll of bubble wrap 20 cm wide and 40 mm across, its loose end unrolled 9 cm towards +z to show the
   // bubbles.
-  h.compound('bubblewrap', 0.021, [
+  h.compound('bubble_wrap', 0.021, [
     h.tube('roll', 'film', 0.008, 0.02, -0.1, 0.1, 0.02, 0),
     box('sheet', 'film', [-0.1, 0, 0], [0.1, 0.002, 0.11]),
   ] + [
@@ -105,7 +105,7 @@ local toothLump(p, x, z, k) = [
   ] + [
     turned('roll-bubble' + i, 'bubble', 'x', [[0, 0], [0, 0.0215], [0.007, 0.0215], [0.007, 0]], [-0.095 + i * 0.012, 0.02, 0])
     for i in std.range(0, 15)
-  ], { film: 'plastic-clear', bubble: 'plastic-frosted' }) + h.inHand('bubblewrap', 'roll') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { film: 'plastic-clear', bubble: 'plastic-frosted' }) + h.inHand('bubble_wrap', 'roll') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A loose handful of five iron caltrops, each about 35 mm across, scattered over a 10 cm patch with one
   // point of each standing up.
@@ -118,20 +118,20 @@ local toothLump(p, x, z, k) = [
   ]), { iron: 'iron-dull' }) + h.inHand('caltrops', 'c1-up') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap'] } } },
 
   // A handful of four glass caltrops: lumps of glue about 5 cm across with broken glass set in them edge out.
-  h.compound('caltrops_glass', 0.04, std.flattenArrays([
+  h.compound('glass_caltrops', 0.04, std.flattenArrays([
     glassLump('g1', 0, 0, 1),
     glassLump('g2', 0.05, 0.03, 0.9),
     glassLump('g3', -0.045, 0.035, 0.95),
     glassLump('g4', 0.01, -0.05, 0.9),
-  ]), { glue: 'resin-honey', shard: 'glass-clear' }) + h.inHand('caltrops_glass', 'g1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['glass'], weapon: ['trap'] } } },
+  ]), { glue: 'resin-honey', shard: 'glass-clear' }) + h.inHand('glass_caltrops', 'g1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['glass'], weapon: ['trap'] } } },
 
   // A handful of four tooth caltrops: lumps of glue about 5 cm across bristling with long pointed teeth.
-  h.compound('caltrops_teeth', 0.03, std.flattenArrays([
+  h.compound('tooth_caltrops', 0.03, std.flattenArrays([
     toothLump('t1', 0, 0, 1),
     toothLump('t2', 0.05, 0.03, 0.9),
     toothLump('t3', -0.045, 0.035, 0.95),
     toothLump('t4', 0.01, -0.05, 0.9),
-  ]), { glue: 'resin-honey', tooth: 'bone' }) + h.inHand('caltrops_teeth', 't1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['bone'], weapon: ['trap'] } } },
+  ]), { glue: 'resin-honey', tooth: 'bone' }) + h.inHand('tooth_caltrops', 't1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['bone'], weapon: ['trap'] } } },
 
   // A pistol crossbow 55 cm long with a 50 cm prod, lashed to a short board, a bolt on the rail and a cord
   // tied to the trigger running back to a tripwire coil. The bow points to +z.

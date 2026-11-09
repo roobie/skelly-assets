@@ -131,7 +131,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
   // A short sleeveless red jacket folded, 320 mm by 260 mm and 45 mm tall: white faux fur round the collar, the
   // armholes, down the front and along the hem, closed with three white pompom buttons.
   local w = 0.32, d = 0.26, ht = 0.045;
-  h.compound('santa_jacket_short', 0.93, h.foldedGarment(w, d, ht, 3)
+  h.compound('short_santa_jacket', 0.93, h.foldedGarment(w, d, ht, 3)
                                         + armholes(w, d / 2 - 0.09, 0.05, ht, 'fur', 0.018)
                                         + [
                                           h.turned('collar', 'fur', 'x', [[0, 0], [0, 0.018], [0.16, 0.018], [0.16, 0]], [-0.08, ht + 0.008, d / 2 - 0.025]),
@@ -175,17 +175,17 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
 
   // A sleeveless pale faux fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep rolled collar, cotton
   // binding round the armholes and down the front, toggle buttons and two flapped pockets.
-  sleevelessDuster('sleeveless_duster_faux_fur', 2.3, 0.42, 0.36, 0.08, 5, false,
+  sleevelessDuster('sleeveless_faux_fur_duster', 2.3, 0.42, 0.36, 0.08, 5, false,
                    { cloth: 'fur-pale', collar: 'fur-pale', edge: 'cloth-khaki', button: 'leather-brown', hole: 'cloth-khaki', bind: 'cloth-khaki', pocket: 'fur-pale', flap: 'fur-pale' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless brown fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep rolled collar, black leather
   // binding round the armholes and down the front, and two flapped pockets.
-  sleevelessDuster('sleeveless_duster_fur', 2.4, 0.42, 0.36, 0.08, 5, false,
+  sleevelessDuster('sleeveless_fur_duster', 2.4, 0.42, 0.36, 0.08, 5, false,
                    { cloth: 'fur-brown', collar: 'fur-brown', edge: 'leather-black', button: 'leather-black', hole: 'leather-black', bind: 'leather-black', pocket: 'fur-brown', flap: 'fur-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless brown leather duster folded long, 400 mm by 340 mm and 55 mm tall: the shoulder cape between the
   // armholes, a stand collar, brass buttons and two flapped pockets.
-  sleevelessDuster('sleeveless_duster_leather', 2.3, 0.4, 0.34, 0.055, 5, true,
+  sleevelessDuster('sleeveless_leather_duster', 2.3, 0.4, 0.34, 0.055, 5, true,
                    { cloth: 'leather-brown', cape: 'leather-brown', collar: 'leather-brown', edge: 'leather-brown', button: 'brass-dull', hole: 'leather-black', bind: 'leather-black', pocket: 'leather-brown', flap: 'leather-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless khaki canvas trench coat folded, 360 mm by 320 mm and 50 mm tall: wide lapels, an epaulette, double-breasted buttons, slanted pocket flaps and the belt buckled round it.
@@ -194,15 +194,15 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
 
   // A sleeveless pale faux fur trench coat folded thick, 380 mm by 320 mm and 70 mm tall, cut and belted as the
   // canvas one with a tan belt and dark buttons.
-  trench('sleeveless_trenchcoat_faux_fur', 1.7, 0.38, 0.32, 0.07, 4, false,
+  trench('sleeveless_faux_fur_trenchcoat', 1.7, 0.38, 0.32, 0.07, 4, false,
          { cloth: 'fur-pale', lapel: 'fur-pale', button: 'leather-brown', belt: 'leather-tan', buckle: 'brass-dull', flap: 'fur-pale', hole: 'cloth-khaki', bind: 'cloth-khaki' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless brown fur trench coat folded thick, 380 mm by 320 mm and 70 mm tall, with a black leather belt.
-  trench('sleeveless_trenchcoat_fur', 1.7, 0.38, 0.32, 0.07, 4, false,
+  trench('sleeveless_fur_trenchcoat', 1.7, 0.38, 0.32, 0.07, 4, false,
          { cloth: 'fur-brown', lapel: 'fur-brown', button: 'leather-black', belt: 'leather-black', buckle: 'metal-silver', flap: 'fur-brown', hole: 'leather-black', bind: 'leather-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless black leather trench coat folded, 360 mm by 320 mm and 50 mm tall, with silver buckle and buttons.
-  trench('sleeveless_trenchcoat_leather', 1.8, 0.36, 0.32, 0.05, 4, false,
+  trench('sleeveless_leather_trenchcoat', 1.8, 0.36, 0.32, 0.05, 4, false,
          { cloth: 'leather-black', lapel: 'leather-black', button: 'metal-silver', belt: 'leather-black', buckle: 'metal-silver', flap: 'leather-black', hole: 'plastic-charcoal', bind: 'plastic-charcoal' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless cotton tunic folded thin, 300 mm by 260 mm and 20 mm tall: a laced slit at the neck, bound
@@ -228,7 +228,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
   // snapped storm flap, slanted zipped chest pockets, hook-and-loop panels on the folded sleeves, an ID plate and
   // flapped cargo pockets low on both sides.
   local w = 0.36, d = 0.3, ht = 0.045, cz = d / 2 - 0.08;
-  h.compound('tacjacket', 1.3, h.foldedGarment(w, d, ht, 3)
+  h.compound('tactical_jacket', 1.3, h.foldedGarment(w, d, ht, 3)
                                  + sleeves(w, d, ht, 0.07, 'loop', 0.025, 0.008)
                                  + collar('collar', 'cloth', 0.06, 0.024, ht, 0.022, cz, 22)
                                  + [

@@ -35,7 +35,7 @@ local carton(id, massKg, picture, finish) =
 [
   // A square ice-cream tub, 190 mm across the lip and 166 mm tall with its lid, white with a blue printed band
   // and a plastic carry handle standing up over the lid.
-  h.compound('plastic_bucket', 0.31, [
+  h.compound('plastic_tub', 0.31, [
     box('foot', 'tub', [-0.082, 0, -0.082], [0.082, 0.012, 0.082]),
     box('tub', 'tub', [-0.088, 0.012, -0.088], [0.088, 0.14, 0.088]),
     box('lip', 'tub', [-0.095, 0.14, -0.095], [0.095, 0.15, 0.095]),
@@ -67,7 +67,7 @@ local carton(id, massKg, picture, finish) =
 
   // A toy radio-controlled car carton, 300 by 150 by 80 mm, with a red car on a blue printed panel and a
   // little black remote control with its aerial printed beside it.
-  carton('rc_car_box', 0.6, [
+  carton('remote_control_car_box', 0.6, [
     box('car-body', 'car', [-0.11, 0.04, 0.044], [0.05, 0.072, 0.048]),
     box('car-cabin', 'car', [-0.07, 0.072, 0.044], [0.02, 0.1, 0.048]),
     box('car-window', 'window', [-0.062, 0.076, 0.048], [0.012, 0.094, 0.052]),
@@ -113,7 +113,7 @@ local carton(id, massKg, picture, finish) =
 
   // A 10.1 ounce caulk cartridge lying down, 50 mm across and 265 mm long: a white tube with a blue printed
   // label, a tapered shoulder and a long cut nozzle, the black follower plate showing at the open back.
-  h.compound('squeeze_tube', 0.42, [
+  h.compound('caulk_cartridge', 0.42, [
     rod('tube', 'tube', 0.025, -0.105, 0.1, 0.025),
     rod('label', 'label', 0.0265, -0.07, 0.07, 0.025),
     rod('follower', 'follower', 0.021, -0.107, -0.103, 0.025),
@@ -124,7 +124,7 @@ local carton(id, massKg, picture, finish) =
 
   // A clear acrylic leaflet stand, 220 mm wide, 300 mm tall and 140 mm deep: a leaning back panel on a flat
   // base with a front pocket, one cream leaflet still standing in it.
-  h.compound('stand_flyer', 0.6, [
+  h.compound('leaflet_stand', 0.6, [
     box('base', 'acrylic', [-0.11, 0, -0.07], [0.11, 0.006, 0.07]),
     h.prism('back', 'acrylic', 'x', [[0.006, -0.056], [0.006, -0.06], [0.3, -0.1], [0.3, -0.096]], -0.11, 0.11),
     h.prism('front', 'acrylic', 'x', [[0.006, 0.024], [0.006, 0.02], [0.13, 0.002], [0.13, 0.006]], -0.11, 0.11),
@@ -136,7 +136,7 @@ local carton(id, massKg, picture, finish) =
 
   // A science kit carton, 300 by 150 by 80 mm, with two children and a spoked flywheel engine printed on a
   // cream panel.
-  carton('stirling_kit_box', 0.5, [
+  carton('engine_kit_box', 0.5, [
     face('head-a', 'skin', 0.012, -0.1, 0.098, 0.044),
     box('body-a', 'shirt-a', [-0.114, 0.036, 0.044], [-0.086, 0.084, 0.048]),
     box('arm-a', 'shirt-a', [-0.086, 0.064, 0.044], [-0.05, 0.072, 0.048]),
@@ -153,7 +153,7 @@ local carton(id, massKg, picture, finish) =
 
   // A cleaned animal stomach lying on its side, 210 mm long and 140 mm across, swollen with water, its neck
   // gathered and tied off with a cord whose ends hang loose.
-  h.compound('stomach_sealed', 1.7, [
+  h.compound('sealed_stomach', 1.7, [
     turned('stomach', 'gut', 'x', [[0, 0], [0, 0.035], [0.02, 0.058], [0.06, 0.07], [0.11, 0.066], [0.15, 0.046], [0.17, 0.022], [0.18, 0.012], [0.18, 0]], [-0.11, 0.07, 0]),
     turned('tie', 'cord', 'x', [[0, 0], [0, 0.015], [0.008, 0.015], [0.008, 0]], [0.066, 0.07, 0]),
     turned('tuft', 'gut', 'x', [[0, 0], [0, 0.011], [0.014, 0.02], [0.026, 0.016], [0.026, 0]], [0.074, 0.07, 0]),
@@ -184,7 +184,7 @@ local carton(id, massKg, picture, finish) =
 )
 + [
   // A sheet of butcher paper, 240 mm square, folded once in half and lying loose with its top half lifted.
-  h.compound('wrapper', 0.0048, [
+  h.compound('butcher_paper', 0.0048, [
     box('sheet', 'paper', [-0.12, 0, -0.06], [0.12, 0.002, 0.06]),
     h.prism('flap', 'paper', 'x', [[0.002, -0.06], [0.004, -0.06], [0.024, 0.056], [0.022, 0.056]], -0.12, 0.12),
     rod('fold', 'paper', 0.003, -0.12, 0.12, 0.003) + { origin: [-0.12, 0.003, -0.06] },
@@ -192,7 +192,7 @@ local carton(id, massKg, picture, finish) =
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A torn-off sheet of kitchen foil, 300 mm square, lying loosely crumpled with crinkle ridges across it.
-  h.compound('wrapper_foil', 0.004, [
+  h.compound('foil_sheet', 0.004, [
     box('sheet', 'foil', [-0.15, 0, -0.15], [0.15, 0.002, 0.15]),
   ] + [
     h.prism('crease-x-%d' % i, 'foil', 'x', [[0.002, z - 0.012], [0.002, z + 0.012], [0.008, z]], -0.15, 0.15)
@@ -209,7 +209,7 @@ local carton(id, massKg, picture, finish) =
 
   // A roll of kitchen foil lying down, 300 mm long and 56 mm across, its cardboard core showing at both ends
   // and a loose tail of foil unrolled across the floor in front of it.
-  h.compound('wrapper_foil_roll', 0.36, [
+  h.compound('foil_roll', 0.36, [
     turned('core', 'core', 'x', [[0, 0.016], [0, 0.02], [0.3, 0.02], [0.3, 0.016], [0, 0.016]], [-0.15, 0.028, 0]),
     turned('foil', 'foil', 'x', [[0, 0.02], [0, 0.028], [0.29, 0.028], [0.29, 0.02], [0, 0.02]], [-0.145, 0.028, 0]),
     box('tail', 'foil', [-0.145, 0, 0], [0.145, 0.002, 0.08]),
@@ -218,7 +218,7 @@ local carton(id, massKg, picture, finish) =
 
   // A 420 pound propane cylinder standing upright, 600 mm across and 1220 mm tall: a white steel shell with
   // domed ends on a foot ring, a collar with two hand holes guarding a brass valve and a black handwheel.
-  h.compound('xl_propane_tank', 160, [
+  h.compound('extra_large_propane_tank', 160, [
     turned('shell', 'paint', 'y', [[0.08, 0]] + [
       local t = std.pi / 2 * i / 6;
       [0.2 - 0.12 * std.cos(t), 0.3 * std.sin(t)]

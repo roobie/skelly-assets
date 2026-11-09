@@ -44,7 +44,7 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
   // A bench eye-test machine 360 mm wide, 290 mm tall and 350 mm deep: a white steel housing on a base, two eyepieces
   // and a forehead rest on its front with a chin cup below, a violet crystal window and a sight glass of green fluid on
   // top, a wired headband hanging from a hook on its left side and an arm cuff hanging on its right.
-  h.compound('psi_noetic_resonance_detector', 12, [
+  h.compound('crystal_eye_test_scanner', 12, [
     box('base', 'frame', [-0.17, 0, -0.15], [0.17, 0.03, 0.2]),
     box('housing', 'housing', [-0.15, 0.03, -0.13], [0.15, 0.26, 0.11]),
     box('face', 'panel', [-0.12, 0.17, 0.11], [0.12, 0.235, 0.118]),
@@ -94,11 +94,11 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     wire: 'rubber-black',
     cuff: 'cloth-navy',
     strap: 'hook-loop-grey',
-  }) + h.inHand('psi_noetic_resonance_detector', 'housing') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
+  }) + h.inHand('crystal_eye_test_scanner', 'housing') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
   // A deck of 25 test cards, 88 by 63 mm and 8 mm thick, squared up, with its top card slid a little aside to show a
   // ringed circle printed on its face.
-  h.compound('cards_zener', 0.039, [
+  h.compound('symbol_test_cards', 0.039, [
     box('deck', 'card', [-0.044, 0, -0.0315], [0.044, 0.006, 0.0315]),
     box('edge-a', 'edge', [-0.0442, 0.002, -0.0317], [0.0442, 0.0026, 0.0317]),
     box('back', 'back', [-0.042, 0.006, -0.0295], [0.042, 0.0064, 0.0295]),
@@ -107,17 +107,17 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     box('corner-a', 'symbol', [-0.032, 0.0084, 0.02], [-0.026, 0.009, 0.026]),
     box('corner-b', 'symbol', [0.042, 0.0084, -0.031], [0.048, 0.009, -0.025]),
   ], { card: 'paper-white', edge: 'paper-white', back: 'cloth-blue', symbol: 'plastic-matte-black' })
-  + h.inHand('cards_zener', 'deck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
+  + h.inHand('symbol_test_cards', 'deck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
 
   h.compound('force_field_generator', 0.29, fieldDevice(false), deviceFinishes)
   + h.inHand('force_field_generator', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
-  h.compound('force_field_generator_broken', 0.29, fieldDevice(true), deviceFinishes)
-  + h.inHand('force_field_generator_broken', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'], state: ['broken'] } } },
+  h.compound('broken_force_field_generator', 0.29, fieldDevice(true), deviceFinishes)
+  + h.inHand('broken_force_field_generator', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'], state: ['broken'] } } },
 
   // A crystal focusing rig 250 mm tall: a round steel foot and post carrying an upright ring 180 mm across, facing +z,
   // with six cut blue crystal shards clamped round it, all pointing at an empty focal point in the middle.
-  h.compound('matrix_aligning_tool', 2.8, [
+  h.compound('crystal_focusing_ring', 2.8, [
     h.disc('foot', 'steel', 0.07, 0, 0.012),
     h.disc('foot-step', 'steel', 0.05, 0.012, 0.02),
     box('post', 'steel', [-0.008, 0.02, -0.008], [0.008, 0.072, 0.008]),
@@ -130,11 +130,11 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     box('clamp-%d' % i, 'clamp', [0.088 * std.cos(a) - 0.007, 0.158 + 0.088 * std.sin(a) - 0.007, -0.012], [0.088 * std.cos(a) + 0.007, 0.158 + 0.088 * std.sin(a) + 0.007, 0.012])
     for i in std.range(0, 5)
   ], { steel: 'steel-grey', crystal: 'crystal-glow-blue', clamp: 'brass-dull' })
-  + h.inHand('matrix_aligning_tool', 'post') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  + h.inHand('crystal_focusing_ring', 'post') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A cluster of five violet crystal columns 150 mm wide on a steel plate, held in a soldered cage of steel straps and
   // bands with copper-coloured wire run between them; one column stands loose in its band, clear of the plate.
-  h.compound('matrix_channeling_tool', 1.4, [
+  h.compound('crystal_channeling_cluster', 1.4, [
     box('plate', 'steel', [-0.075, 0, -0.04], [0.075, 0.008, 0.04]),
     box('upright-l', 'steel', [-0.072, 0.008, -0.004], [-0.064, 0.07, 0.004]),
     box('upright-r', 'steel', [0.064, 0.008, -0.004], [0.072, 0.07, 0.004]),
@@ -155,5 +155,5 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     box('solder-a', 'solder', [-0.034, 0.048, -0.004], [-0.028, 0.056, 0.004]),
     box('solder-b', 'solder', [0.024, 0.048, -0.004], [0.03, 0.056, 0.004]),
   ], { steel: 'steel-grey', crystal: 'crystal-glow-violet', band: 'steel-bright', wire: 'bronze', solder: 'metal-silver' })
-  + h.inHand('matrix_channeling_tool', 'plate') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  + h.inHand('crystal_channeling_cluster', 'plate') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 ]

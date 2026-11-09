@@ -111,13 +111,13 @@ local coverall(o) =
 [
   // A hardened steel mail suit folded on a shelf, 400 mm by 340 mm and 90 mm tall: sleeves, folded-up legs and a mail
   // coif 180 mm across laid face up at the neck. The high-carbon and rusted suits share this model.
-  h.compound('ch_chainmail_suit', 18, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true }) + face(0.09, 0.08, false), { mail: 'steel-mail-dark', binding: 'leather-brown', opening: 'cloth-black' })
+  h.compound('hardened_steel_mail_suit', 18, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true }) + face(0.09, 0.08, false), { mail: 'steel-mail-dark', binding: 'leather-brown', opening: 'cloth-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 
   // A tempered steel mail suit folded on a shelf, 400 mm by 340 mm and 90 mm tall, made as one conductive cage: a coif
   // with a wire grille over the face, mail mitts hanging over the front fold, mail socks on the legs and a bright
   // braided bonding strap down the middle joining the parts.
-  h.compound('chainmail_suit_faraday', 25, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true, mitts: true, socks: true, braid: true }) + face(0.09, 0.08, true), { mail: 'steel-heat-tint', binding: 'leather-brown', opening: 'cloth-black', cage: 'steel-bright', braid: 'bronze-polished' })
+  h.compound('faraday_mail_suit', 25, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true, mitts: true, socks: true, braid: true }) + face(0.09, 0.08, true), { mail: 'steel-heat-tint', binding: 'leather-brown', opening: 'cloth-black', cage: 'steel-bright', braid: 'bronze-polished' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs', 'head', 'hands', 'feet'], state: ['folded'] } } },
 
   // A disposable white cleansuit folded on a shelf, 380 mm by 320 mm and 70 mm tall: a hooded coverall of spun plastic

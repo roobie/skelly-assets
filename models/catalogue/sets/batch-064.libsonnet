@@ -84,18 +84,18 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
 
   // A handled hot cut: a 25 by 40 mm chisel head 150 mm tall on a 300 mm hickory handle, struck on its top and
   // set edge-down on hot stock.
-  h.compound('hotcut', 1, [
+  h.compound('hot_cut', 1, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.011], [0.29, 0.013], [0.29, 0]]),
     box('head', 'head', [0.290, -0.065, -0.020], [0.315, 0.050, 0.020]),
     box('face', 'face', [0.287, 0.050, -0.022], [0.318, 0.060, 0.022]),
     prism('edge', 'edge', 'z', [[0.290, -0.065], [0.315, -0.065], [0.3035, -0.095], [0.3015, -0.095]], -0.020, 0.020),
   ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + {
-    handling: h.gripOn('hotcut', 'handle'),
+    handling: h.gripOn('hot_cut', 'handle'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A sheet of riveted mail 250 mm square laid flat, its rows of rings standing proud and its far edge rolled up.
-  h.compound('lc_link_sheet', 0.95, [
+  h.compound('mild_steel_mail_sheet', 0.95, [
     box('sheet', 'mail', [-0.125, 0, -0.125], [0.125, 0.004, 0.11]),
     turned('roll', 'mail', 'x', [[0, 0], [0, 0.012], [0.25, 0.012], [0.25, 0]], [-0.125, 0.012, 0.113]),
   ] + [
@@ -107,11 +107,11 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
   ], { mail: 'steel-mail', rings: 'steel-mail-dark' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A palm-sized patch of leather, 90 by 60 mm, with a handful of sand pressed into its rough side.
-  h.compound('leather_filing', 0.036, [
+  h.compound('sandleather', 0.036, [
     box('leather', 'leather', [-0.045, 0, -0.030], [0.045, 0.004, 0.030]),
     box('sand', 'sand', [-0.040, 0.004, -0.025], [0.038, 0.006, 0.026]),
     h.ball('heap', 'sand', 0.014, 0.010, 0.006, 0.004, 0.25),
-  ], { leather: 'leather-tan', sand: 'brick-buff' }) + h.inHand('leather_filing', 'leather') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather', 'stone'] } } },
+  ], { leather: 'leather-tan', sand: 'brick-buff' }) + h.inHand('sandleather', 'leather') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather', 'stone'] } } },
 
   // Flatjaw blacksmith's tongs 440 mm long, lying open on their side: two flat jaws 100 mm long, a riveted boss and
   // round reins spreading to 60 mm apart at the ends.
@@ -163,7 +163,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
 
   // A two-handled metal scraper like a small drawknife: a 260 mm hardened blade 30 mm wide with a honed front
   // edge, cranked at each end into a 110 mm turned wooden handle pointing back towards the user.
-  h.compound('scraper_steel', 0.51, [
+  h.compound('steel_scraper', 0.51, [
     box('blade', 'blade', [-0.13, 0.012, 0], [0.13, 0.016, 0.030]),
     box('edge', 'edge', [-0.13, 0.012, 0.030], [0.13, 0.015, 0.034]),
     box('tang-a', 'blade', [-0.150, 0.010, -0.020], [-0.130, 0.018, 0.012]),
@@ -173,12 +173,12 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     turned('handle-a', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [-0.140, 0.014, -0.142]),
     turned('handle-b', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [0.140, 0.014, -0.142]),
   ], { blade: 'steel-blued', edge: 'steel-bright', ferrule: 'brass-dull', handle: 'wood-walnut' }) + {
-    handling: h.gripOn('scraper_steel', 'handle-a'),
+    handling: h.gripOn('steel_scraper', 'handle-a'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // A flat slab of natural stone, about 300 by 200 mm and 70 mm thick, with rough sides and a ground, smooth top.
-  h.compound('stone_polishing', 11, [
+  h.compound('polishing_stone', 11, [
     prism('slab', 'stone', 'y', [[-0.08, -0.14], [-0.10, -0.08], [-0.095, 0.10], [-0.06, 0.15], [0.07, 0.145], [0.10, 0.09], [0.095, -0.11], [0.05, -0.15]], 0, 0.06),
     prism('top', 'face', 'y', [[-0.07, -0.12], [-0.085, -0.07], [-0.08, 0.09], [-0.05, 0.13], [0.06, 0.125], [0.085, 0.08], [0.08, -0.10], [0.04, -0.13]], 0.06, 0.07),
     h.ball('lump-a', 'stone', 0.045, -0.11, 0.03, 0.04, 0.7),

@@ -28,7 +28,7 @@ local held(id, solid) = { handling: h.gripOn(id, solid) };
     flat('spine', 'spine', [[-0.004, 0.025], [0.004, 0.025], [0.004, 0.280], [-0.004, 0.280]], 0.005),
   ], { handle: 'wood-walnut', ferrule: 'brass', blade: 'steel-stainless', spine: 'steel-grey' }) + held('honey_scraper', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
   // A small folding knife opened out: a 65 mm handle 16 mm wide with a 50 mm clip-point blade, 115 mm overall.
-  h.compound('pockknife', 0.039, [
+  h.compound('pocket_knife', 0.039, [
     h.box('scales', 'scales', [-0.065, -0.0045, -0.008], [-0.006, 0.0045, 0.008]),
     h.box('bolster-a', 'bolster', [-0.072, -0.0045, -0.008], [-0.065, 0.0045, 0.008]),
     h.box('bolster-b', 'bolster', [-0.006, -0.0045, -0.008], [0.004, 0.0045, 0.008]),
@@ -36,7 +36,7 @@ local held(id, solid) = { handling: h.gripOn(id, solid) };
     h.disc('pivot', 'pivot', 0.003, -0.0055, 0.0055, -0.001, 0.002),
     flat('tang', 'blade', [[-0.004, 0.002], [0.007, 0.002], [0.007, 0.012], [-0.006, 0.012]], 0.002),
     flat('blade', 'blade', [[-0.006, 0.012], [0.007, 0.012], [0.007, 0.035], [0.002, 0.050], [-0.002, 0.051], [-0.006, 0.040]], 0.002),
-  ], { scales: 'plastic-red', bolster: 'steel-stainless', shield: 'steel-stainless', pivot: 'steel-grey', blade: 'steel-stainless' }) + held('pockknife', 'scales') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { scales: 'plastic-red', bolster: 'steel-stainless', shield: 'steel-stainless', pivot: 'steel-grey', blade: 'steel-stainless' }) + held('pocket_knife', 'scales') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // A knapped flint blade 140 mm long, 40 mm wide, set 20 mm into a 130 mm split wood handle and lashed with hide.
   h.compound('primitive_knife', 0.19, [
     h.turned('handle', 'handle', 'x', [[0, 0], [0, 0.013], [0.010, 0.017], [0.120, 0.016], [0.130, 0.015], [0.130, 0]], [-0.130, 0, 0]),

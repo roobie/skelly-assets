@@ -60,7 +60,7 @@ local collapsedDrum(length, width, thick, plate) =
 [
   // A plastic laundry basket, 600 mm long, 420 mm wide and 270 mm tall: a blue tub with a solid foot band,
   // slotted vented walls, and a rolled rim with a hand hole in each end.
-  h.compound('basket_laundry', 0.96, [
+  h.compound('laundry_basket', 0.96, [
     box('floor', 'wall', [-0.29, 0, -0.2], [0.29, 0.012, 0.2]),
   ] + band('foot', 'wall', 0.6, 0.42, 0, 0.06, 0.006)
   + slats(0.6, 0.42, 0.06, 0.2, 0.018, 0.006)
@@ -90,7 +90,7 @@ local collapsedDrum(length, width, thick, plate) =
 
   // A two-wheeled kerbside bin, 580 mm wide, 740 mm deep and 1140 mm tall: a green tapered body on a pair of
   // black wheels at the back, a hinged green lid with a front lip, and a moulded grip bar behind the lid.
-  h.compound('trashcan_large', 16, [
+  h.compound('large_trashcan', 16, [
     h.prism('body', 'body', 'x', [[0.04, -0.27], [0.04, 0.29], [1.06, 0.34], [1.06, -0.34]], -0.28, 0.28),
     box('rib-left', 'body', [-0.295, 0.2, -0.3], [-0.28, 1.04, 0.32]),
     box('rib-right', 'body', [0.28, 0.2, -0.3], [0.295, 1.04, 0.32]),
@@ -128,19 +128,19 @@ local collapsedDrum(length, width, thick, plate) =
   // A US-style 55 gallon collapsible water drum emptied and pressed flat, 1.1 m long over its towing rings, 500 mm
   // wide and 140 mm tall at the valve: a beige rubber body tapering into gathered collars round flat steel end
   // fittings, a water valve on one end, towing rings and side D-rings, and a dark stencilled panel on top.
-  h.compound('collapsible_drum_water', 21, collapsedDrum(0.85, 0.5, 0.06, 0.11),
+  h.compound('collapsible_water_drum', 21, collapsedDrum(0.85, 0.5, 0.06, 0.11),
              { rubber: 'polymer-fde', plate: 'steel-grey', valve: 'brass', ring: 'steel', stencil: 'paint-charcoal' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] } } },
 
   // A 500 gallon collapsible fuel drum emptied and pressed flat, 2.5 m long over its towing rings, 1.1 m wide and
   // 260 mm tall at the valve: a black rubber body tapering into gathered collars round flat steel end fittings, a
   // fuel valve on one end, towing rings and side D-rings, and a yellow stencilled panel on top.
-  h.compound('collapsible_drum_fuel', 170, collapsedDrum(1.95, 1.1, 0.1, 0.24),
+  h.compound('collapsible_fuel_drum', 170, collapsedDrum(1.95, 1.1, 0.1, 0.24),
              { rubber: 'rubber-black', plate: 'steel-grey', valve: 'steel', ring: 'steel', stencil: 'paint-crane-yellow' }) + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] } } },
 
   // A rugged plastic lab box, 220 mm long, 170 mm deep and 180 mm tall: a grey case under a ribbed lid held by
   // two yellow snap latches at the front and one at each end, with hinges at the back and a folding handle on top.
-  h.compound('box_small_plastic', 0.93, [
+  h.compound('small_plastic_case', 0.93, [
     box('case', 'shell', [-0.105, 0, -0.08], [0.105, 0.13, 0.08]),
     box('foot', 'shell', [-0.1, -0.004, -0.075], [0.1, 0, 0.075]),
     box('seam', 'trim', [-0.107, 0.13, -0.082], [0.107, 0.136, 0.082]),
@@ -162,7 +162,7 @@ local collapsedDrum(length, width, thick, plate) =
 
   // A zipped garment bag lying flat, 1.3 m long with its hanger hook, 600 mm wide and 70 mm thick: a navy bag
   // with tapered shoulders, a black zip down its middle, a steel hanger hook out of the top and a clear name pocket.
-  h.compound('outfit_storage', 0.78, [
+  h.compound('garment_bag', 0.78, [
     box('bag', 'bag', [-0.62, 0, -0.3], [0.5, 0.06, 0.3]),
     h.prism('shoulders', 'bag', 'x', [[0, -0.3], [0, 0.3], [0.06, 0.3], [0.06, -0.3]], 0.5, 0.52),
     h.prism('shoulder-taper-a', 'bag', 'x', [[0, -0.24], [0, 0.24], [0.055, 0.24], [0.055, -0.24]], 0.52, 0.56),

@@ -83,16 +83,16 @@ local finishes(shoulders) = { cloth: 'cloth-canvas', rivet: 'steel-bright', leat
   // A mild steel brigandine laid flat, outside up: a canvas vest 450 mm across and 500 mm from collar to hem, rows of
   // plates riveted inside it so the outside shows quilted bands studded with rivet heads, leather-bound, and closed
   // down the front with three buckled straps.
-  h.compound('lc_brigandine', 4.7, brigandine(false, false), finishes(false)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
+  h.compound('high_carbon_steel_brigandine', 4.7, brigandine(false, false), finishes(false)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
 
   // The same brigandine vest with a guard of four overlapping curved steel lames, 150 mm front to back, strapped to
   // each shoulder and spread out to the sides, 730 mm across in all.
-  h.compound('lc_brigandine_shoulders', 5.5, brigandine(false, true), finishes(true)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
+  h.compound('hardened_steel_brigandine_with_shoulder_guards', 5.5, brigandine(false, true), finishes(true)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
 
   // A mild steel brigandine coat laid flat: the vest's body, 450 mm across, carried on into a skirt split at the
   // front and flaring to 550 mm at the hem, 800 mm from collar to hem, riveted plates all the way down.
-  h.compound('lc_coat_brigandine', 7.3, brigandine(true, false), finishes(false)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
+  h.compound('hardened_steel_brigandine_coat', 7.3, brigandine(true, false), finishes(false)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
 
   // The brigandine coat with a four-lame steel guard strapped to each shoulder, 730 mm across and 800 mm long.
-  h.compound('lc_coat_brigandine_shoulders', 8, brigandine(true, true), finishes(true)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
+  h.compound('hardened_steel_brigandine_coat_with_shoulder_guards', 8, brigandine(true, true), finishes(true)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
 ]

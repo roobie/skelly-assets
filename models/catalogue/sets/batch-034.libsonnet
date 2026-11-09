@@ -31,7 +31,7 @@ local carabiner(prefix, cx, cz, y) =
 
   // A fibrous plant stalk about 550 mm long and 16 mm across at the base, green, jointed every 120 mm, with
   // two torn leaf stubs and frayed fibres at the cut end.
-  h.compound('stick_fiber', 0.04, [
+  h.compound('fibrous_stalk', 0.04, [
     turned('stalk', 'stalk', 'x', [[0, 0], [0, 0.008], [0.55, 0.005], [0.55, 0]], [-0.275, 0.008, 0]),
   ] + [
     turned('node-%d' % i, 'node', 'x', [[0, 0], [0, 0.0085 - i * 0.0007], [0.006, 0.0085 - i * 0.0007], [0.006, 0]], [-0.2 + i * 0.12, 0.008, 0])
@@ -47,7 +47,7 @@ local carabiner(prefix, cx, cz, y) =
 
   // A short piece of cotton string 150 mm long and 3 mm across, lying in loose waves with a knot at one end.
   local pts = [[-0.072 + i * 0.016, 0.012 * std.sin(i * 1.1)] for i in std.range(0, 9)];
-  h.compound('string_6', 0.00074, [
+  h.compound('short_string', 0.00074, [
     strip('run-%d' % i, 'cord', pts[i], pts[i + 1], 0.003, 0, 0.003)
     for i in std.range(0, 8)
   ] + [
@@ -57,7 +57,7 @@ local carabiner(prefix, cx, cz, y) =
 
   // A laser target practice kit: two toy laser pistols 180 mm long lying in front of two round electronic
   // targets 180 mm across on folding stands, each target with a hit display under its face.
-  h.compound('aim_game', 1, std.flattenArrays([
+  h.compound('laser_target_kit', 1, std.flattenArrays([
     [
       box('gun-%d-body' % i, 'gun', [x - 0.09, 0, 0.06], [x + 0.07, 0.028, 0.095]),
       box('gun-%d-barrel' % i, 'gun', [x + 0.07, 0.006, 0.07], [x + 0.095, 0.022, 0.09]),

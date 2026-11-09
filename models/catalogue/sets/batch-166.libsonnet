@@ -69,7 +69,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
 
   // A makeshift rag pouch: a sack of sewn scraps 190 mm across and 230 mm tall, drawn shut with a cord under a
   // frilled mouth, with mismatched patches and a cloth shoulder strap lying in a loop behind it.
-  h.compound('ragpouch', 0.15, [
+  h.compound('rag_pouch', 0.15, [
     h.turned('sack', 'cloth', 'y', [[0, 0], [0, 0.07], [0.02, 0.09], [0.12, 0.095], [0.165, 0.06], [0.185, 0.026], [0.195, 0.026], [0.21, 0.04], [0.225, 0.05], [0.228, 0]]),
     h.turned('draw', 'cord', 'y', [[0, 0], [0, 0.03], [0.012, 0.03], [0.012, 0]], [0, 0.183, 0]),
     box('tie-a', 'cord', [0.0, 0.14, 0.024], [0.006, 0.19, 0.03]),
@@ -84,28 +84,28 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
 
   // A padded canvas rifle case 1.12 m long, 280 mm wide at the butt and 70 mm thick, with one accessory pocket, a
   // carry handle and a shoulder strap.
-  rifleCase('rifle_case_soft', 0.56, 1.12, 0.28, 0.06, [-0.3], true, {
+  rifleCase('soft_rifle_case', 0.56, 1.12, 0.28, 0.06, [-0.3], true, {
     case: 'cloth-olive-drab', trim: 'webbing-olive-dark', pocket: 'cloth-olive-drab', strap: 'webbing-black', metal: 'plastic-matte-black',
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A padded canvas case for two rifles, 1.16 m long, 340 mm wide and 100 mm thick, with three accessory pockets
   // in a row and a shoulder strap.
-  rifleCase('rifle_case_soft_2', 0.7, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
+  rifleCase('soft_double_rifle_case', 0.7, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
     case: 'cloth-khaki', trim: 'webbing-black', pocket: 'cloth-khaki', strap: 'webbing-black', metal: 'plastic-matte-black',
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A leather rifle case 1.12 m long, 280 mm wide and 70 mm thick, with one pocket, a handle and a strap.
-  rifleCase('rifle_case_soft_leather', 1.6, 1.12, 0.28, 0.06, [-0.3], true, {
+  rifleCase('leather_rifle_case', 1.6, 1.12, 0.28, 0.06, [-0.3], true, {
     case: 'leather-tan', trim: 'leather-chestnut', pocket: 'leather-tan', strap: 'leather-chestnut', metal: 'brass-dull',
   }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // A leather case for two rifles, 1.16 m long, 340 mm wide and 100 mm thick, with three pockets and a strap.
-  rifleCase('rifle_case_soft_leather_2', 2.1, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
+  rifleCase('leather_double_rifle_case', 2.1, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
     case: 'leather-chestnut', trim: 'leather-black', pocket: 'leather-chestnut', strap: 'leather-black', metal: 'brass-dull',
   }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // An extra-long leather rifle case 1.34 m long, 280 mm wide and 70 mm thick, for long-barrelled rifles.
-  rifleCase('rifle_case_xl_soft_leather', 1.7, 1.34, 0.28, 0.06, [-0.4], true, {
+  rifleCase('long_leather_rifle_case', 1.7, 1.34, 0.28, 0.06, [-0.4], true, {
     case: 'leather-oxblood', trim: 'leather-black', pocket: 'leather-oxblood', strap: 'leather-black', metal: 'brass-dull',
   }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
@@ -153,7 +153,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
 
   // A slim running pack 240 mm wide, 420 mm tall and 80 mm deep, rounded at the top, with a stretch mesh pocket,
   // reflective strips and a crossing bungee on the front, and wide vest straps behind joined by a chest strap.
-  h.compound('runner_bag', 0.43, [
+  h.compound('running_pack', 0.43, [
     h.prism('body', 'body', 'z', [[-0.12, 0], [0.12, 0], [0.12, 0.32], [0.09, 0.39], [0.04, 0.42], [-0.04, 0.42], [-0.09, 0.39], [-0.12, 0.32]], -0.04, 0.04),
     h.prism('mesh', 'mesh', 'z', [[-0.1, 0.02], [0.1, 0.02], [0.1, 0.2], [-0.1, 0.2]], 0.04, 0.055),
     box('mesh-hem', 'trim', [-0.1, 0.195, 0.04], [0.1, 0.205, 0.058]),
@@ -171,7 +171,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
 
   // A single-strap sling pack: a teardrop 240 mm wide, 420 mm tall and 120 mm deep, a zipped front pocket and a
   // padded strap arching from its top to its lower corner behind.
-  h.compound('slingpack', 0.4, [
+  h.compound('sling_pack', 0.4, [
     h.prism('body', 'body', 'z', [[-0.1, 0], [0.1, 0], [0.12, 0.06], [0.11, 0.2], [0.07, 0.33], [0.02, 0.4], [-0.02, 0.4], [-0.06, 0.34], [-0.1, 0.2], [-0.12, 0.06]], -0.06, 0.06),
     h.prism('pocket', 'pocket', 'z', [[-0.085, 0.03], [0.085, 0.03], [0.095, 0.08], [0.085, 0.2], [-0.085, 0.2], [-0.095, 0.08]], 0.06, 0.085),
     box('pocket-zip', 'trim', [-0.08, 0.195, 0.06], [0.08, 0.203, 0.088]),
@@ -199,7 +199,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
   // A large hard-shell suitcase 500 mm wide, 800 mm tall with its wheels and 300 mm deep, front on +z: ribbed
   // shells meeting at a zipped seam, four spinner wheels, a retracted pull handle and carry handles on top and
   // side.
-  h.compound('suitcase_l', 4.6, [
+  h.compound('large_suitcase', 4.6, [
     box('shell-front', 'shell', [-0.25, 0.04, 0.005], [0.25, 0.78, 0.15]),
     box('shell-back', 'shell', [-0.25, 0.04, -0.15], [0.25, 0.78, -0.005]),
     box('seam', 'trim', [-0.253, 0.037, -0.006], [0.253, 0.783, 0.006]),
@@ -228,7 +228,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
 
   // A soft fabric suitcase 400 mm wide, 600 mm tall with its wheels and 220 mm deep, front on +z: a zipped front
   // pocket, piped edges, two wheels and feet, a retracted pull handle and a top carry handle.
-  h.compound('suitcase_m', 1.6, [
+  h.compound('suitcase', 1.6, [
     box('body', 'body', [-0.2, 0.03, -0.11], [0.2, 0.58, 0.11]),
     box('pocket', 'body', [-0.17, 0.08, 0.11], [0.17, 0.5, 0.14]),
     box('pocket-zip-top', 'trim', [-0.17, 0.495, 0.11], [0.17, 0.505, 0.143]),

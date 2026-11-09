@@ -194,7 +194,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
   // A hot-rodded noise emitter, 300 mm long, 230 mm tall and 150 mm deep: a steel frame holding a flared horn
   // speaker on the front, three amplifier boards stacked on standoffs behind it, each with a finned heat sink,
   // and a bundle of red and black wires to a knob and switch panel on top.
-  h.compound('noise_emitter_super', 5, [
+  h.compound('super_noise_emitter', 5, [
     box('base', 'frame', [-0.15, 0, -0.075], [0.15, 0.008, 0.075]),
     box('post-fl', 'frame', [-0.15, 0.008, 0.06], [-0.138, 0.2, 0.075]),
     box('post-fr', 'frame', [0.138, 0.008, 0.06], [0.15, 0.2, 0.075]),
@@ -225,7 +225,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
   // A strange field recorder, 180 mm long, 150 mm tall and 120 mm deep: a white base with a small blank screen
   // and a red print button on the front, a thermal printer slot on top with a curl of paper coming out, and a
   // microphone on a stalk under a clear glass dome.
-  h.compound('nre_recorder', 1, [
+  h.compound('field_recorder', 1, [
     box('base', 'base', [-0.09, 0, -0.06], [0.09, 0.07, 0.06]),
     box('screen-bezel', 'bezel', [0.01, 0.025, 0.06], [0.075, 0.06, 0.062]),
     box('screen', 'screen', [0.014, 0.029, 0.061], [0.071, 0.056, 0.063]),

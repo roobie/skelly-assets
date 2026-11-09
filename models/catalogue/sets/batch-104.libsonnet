@@ -104,24 +104,24 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
 [
   // A pair of white cotton ankle socks laid flat, 230 mm from heel to toe with a 50 mm cuff above the heel, a grey
   // heel and toe and a ribbed band at the top.
-  h.compound('socks_ankle', 0.045, sockPair(0.08, 0.05, 0.23, 0.005, 0.02),
+  h.compound('ankle_socks', 0.045, sockPair(0.08, 0.05, 0.23, 0.005, 0.02),
     { sock: 'cloth-white', heel: 'felt-grey', toe: 'felt-grey', cuff: 'cloth-cotton', stripe: 'felt-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of plastic shopping bags flattened out, each 200 mm across and 400 mm long with its handles knotted where
   // it closed round the ankle.
-  h.compound('socks_bag', 0.012, bagSock('l-', -0.12) + bagSock('r-', 0.12),
+  h.compound('bag_socks', 0.012, bagSock('l-', -0.12) + bagSock('r-', 0.12),
     { bag: 'plastic-white', knot: 'plastic-frosted', print: 'plastic-blue' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['feet'] } } },
 
   // A pair of thin white crew socks laid flat, 230 mm heel to toe with a 150 mm leg, two red stripes round the cuff.
-  h.compound('socks_bowling', 0.039, sockPair(0.08, 0.15, 0.23, 0.003, 0.03, [0.034, 0.05]),
+  h.compound('disposable_socks', 0.039, sockPair(0.08, 0.15, 0.23, 0.003, 0.03, [0.034, 0.05]),
     { sock: 'cloth-white', heel: 'cloth-white', toe: 'cloth-white', cuff: 'cloth-white', stripe: 'cloth-red' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of thick grey wool crew socks laid flat, 240 mm heel to toe with a 170 mm leg, a cream heel and toe and a
   // red stripe below a ribbed cuff.
-  h.compound('socks_wool', 0.15, sockPair(0.09, 0.17, 0.24, 0.012, 0.035, [0.045]),
+  h.compound('wool_socks', 0.15, sockPair(0.09, 0.17, 0.24, 0.012, 0.035, [0.045]),
     { sock: 'wool-grey', heel: 'paint-cream', toe: 'paint-cream', cuff: 'wool-grey', stripe: 'cloth-red' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 

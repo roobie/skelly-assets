@@ -155,11 +155,11 @@ local mailCoif(id, mass) = hood(id, mass, {
   // A mild steel mail coif standing upright, 330 mm across the shoulder curtain and 310 mm tall: a close hood of
   // riveted rings over the crown, its mail mantle slumped onto the shoulders, with a face opening at +z. Rings show as
   // short dark links, each row staggered against the next.
-  mailCoif('lc_chainmail_hood', 3.3) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  mailCoif('mild_steel_mail_coif', 3.3) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A dark grey cotton hood standing upright, 240 mm across and 310 mm tall: a snug hood that also covers the mouth,
   // leaving only an eye slit, with black wrapped folds across the lower face.
-  hood('hood_ninja', 0.13, {
+  hood('ninja_hood', 0.13, {
     prof: snugProfile,
     face: { y: 0.205, w: 0.06, hh: 0.013 },
     mantle: { side: 0.06, fb: 0.04, hemSide: 0.045, back: 0.015, folds: 6, fold: 0.01 },
@@ -179,7 +179,7 @@ local mailCoif(id, mass) = hood(id, mass, {
 
   // A flame-resistant knit hood standing upright, 370 mm across its bib and 310 mm tall: a snug hood with a bound
   // face opening and a long bib that tucks under a collar, ribbed where it gathers at the neck.
-  hood('nomex_hood', 0.16, {
+  hood('flame_resistant_hood', 0.16, {
     prof: bibProfile,
     face: { y: 0.19, w: 0.07, hh: 0.065 },
     mantle: { side: 0.055, fb: 0.08, hemSide: 0.06, back: 0.02, folds: 5, fold: 0.01 },
@@ -189,7 +189,7 @@ local mailCoif(id, mass) = hood(id, mass, {
 
   // A yellow vinyl rain hood standing upright, 340 mm across and 325 mm tall: a loose hood with a stiffened peak over
   // the face, a seam up the back and a drawstring with toggles at the chin.
-  hood('hood_rain', 0.15, {
+  hood('rain_hood', 0.15, {
     prof: looseProfile,
     face: looseFace,
     mantle: looseMantle,
@@ -201,7 +201,7 @@ local mailCoif(id, mass) = hood(id, mass, {
 
   // A gutskin hood standing upright, 340 mm across and 325 mm tall: a loose hood sewn from translucent strips of gut,
   // the strip seams running round it, a sinew drawstring knotted at the chin.
-  hood('hood_gut', 0.12, {
+  hood('gutskin_hood', 0.12, {
     prof: looseProfile,
     face: looseFace,
     mantle: looseMantle + { wob: 0.01 },

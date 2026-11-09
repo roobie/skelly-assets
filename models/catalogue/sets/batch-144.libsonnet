@@ -137,14 +137,14 @@ local flower(prefix, slot, x, z, y0=0.002) =
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
 
   // A captive-bead lip ring lying flat, 14 mm across: a hoop of 2 mm wire with a 4 mm bead held in its opening.
-  h.compound('gold_lip_ring_loop', 0.0025,
+  h.compound('gold_lip_ring', 0.0025,
              h.crescent('hoop', 'ring', 0.005, 0.007, 20, 340, 18, 0, 0.002)
              + [ball('bead', 'ring', 0.0025, 0, 0.002, 0.0065)],
              { ring: 'metal-gold' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
 
   // A lip stud standing on its back, 12 mm tall: a flat 6 mm disc back, a short post and a 6 mm ball screwed on top.
-  h.compound('gold_lip_ring_stud', 0.003,
+  h.compound('gold_lip_stud', 0.003,
              [
                h.disc('back', 'stud', 0.0035, 0, 0.002, 0.001, 0.001),
                h.disc('post', 'stud', 0.001, 0.002, 0.006, 0.001, 0.001),
@@ -154,14 +154,14 @@ local flower(prefix, slot, x, z, y0=0.002) =
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
 
   // A seamless nose hoop lying flat, 11 mm across, of fine wire with a narrow gap where it opens to go in.
-  h.compound('gold_nose_ring_loop', 0.0005,
+  h.compound('gold_nose_ring', 0.0005,
              h.crescent('hoop', 'ring', 0.0035, 0.0055, 15, 345, 16, 0, 0.002),
              { ring: 'metal-gold' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
 
   // A nose stud standing on its bent end, 12 mm tall: a 6 mm domed head on top of a short post that bends into an L
   // at its foot.
-  h.compound('gold_nose_ring_stud', 0.0005,
+  h.compound('gold_nose_stud', 0.0005,
              [
                h.disc('head', 'stud', 0.0028, 0.008, 0.01, 0.001, 0.001),
                h.disc('head-crown', 'stud', 0.001, 0.01, 0.0115, 0.001, 0.001),

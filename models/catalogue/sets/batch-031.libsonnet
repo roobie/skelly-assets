@@ -111,7 +111,7 @@ local ballX(id, slot, x0, r, y) = h.turned(id, slot, 'x', [[0, 0]] + [[r - r * s
   // A telescoping boom microphone stand in black-painted aluminium, shown closed: a tripod base 0.7 m across, a mast
   // 1 m tall with a clutch at the joint, and a boom 0.8 m long tilted up and forward with a counterweight at the
   // back and a mic clip on its thread at the front (+z).
-  h.compound('mic_stand', 1.6,
+  h.compound('microphone_stand', 1.6,
     leg('leg-l', -60, 0.015, 0.35, 0.26, 0.016)
     + leg('leg-r', 60, 0.015, 0.35, 0.26, 0.016)
     + leg('leg-b', 180, 0.015, 0.35, 0.26, 0.016)

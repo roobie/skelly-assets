@@ -74,24 +74,24 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
 [
   // A pair of children's cotton socks laid flat, one across the other, each 150 mm from cuff to heel and 170 mm
   // from heel to toe.
-  h.compound('xssocks', 0.033, sockPair(0.15, 0.17, 0.064, 0.004), { sock: 'cloth-white', cuff: 'cloth-white', heel: 'felt-grey' })
+  h.compound('small_cotton_socks', 0.033, sockPair(0.15, 0.17, 0.064, 0.004), { sock: 'cloth-white', cuff: 'cloth-white', heel: 'felt-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of children's wool socks laid flat, thicker than the cotton pair, 150 mm from cuff to heel and 170 mm from
   // heel to toe.
-  h.compound('xssocks_wool', 0.051, sockPair(0.15, 0.17, 0.068, 0.006), { sock: 'wool-grey', cuff: 'felt-grey', heel: 'cloth-brown' })
+  h.compound('small_wool_socks', 0.051, sockPair(0.15, 0.17, 0.068, 0.006), { sock: 'wool-grey', cuff: 'felt-grey', heel: 'cloth-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of mild steel splint arm guards laid side by side, open side down, each 300 mm from elbow to wrist and
   // 150 mm across at the elbow: canvas shells with five riveted steel splints, leather binding and two buckled straps.
   // The other steels share this model with their own splint finish.
-  h.compound('armguard_lc_brigandine', 1.9, splintGuards, splintFinishes('steel-bright'))
+  h.compound('hardened_splint_arm_guards', 1.9, splintGuards, splintFinishes('steel-bright'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A hardened steel brigandine laid flat, front up, 600 mm from the shoulder to the hem and 460 mm across: a canvas
   // vest with rows of dark rivet heads holding the plates inside, opening down the front and closed with three
   // buckled straps, with side straps at the waist.
-  h.compound('armor_ch_brigandine', 4.1, std.flattenArrays([
+  h.compound('hardened_steel_brigandine', 4.1, std.flattenArrays([
     vestHalf('back-' + side + '-', 'canvas', s, 0, 0, 0.012, 0.004) + vestHalf('front-' + side + '-', 'canvas', s, 0.004, 0.012, 0.028) + vestRivets(side + '-', s, 0.028)
     + [
       sbox(side + '-hem', 'edge', [s * 0.004, 0.028, 0.266], [s * 0.23, 0.031, 0.28]),

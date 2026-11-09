@@ -68,7 +68,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A long zipped nylon kit bag 600 by 130 mm and 35 mm thick, sized for barrels and tools, with a carry strap
   // stitched along its top, a zip round three sides and a pale stencilled panel.
-  h.compound('robofac_gun_kit', 0.3, [
+  h.compound('rifle_maintenance_kit', 0.3, [
     box('bag', 'bag', [-0.3, 0, -0.065], [0.3, 0.032, 0.065]),
     box('edge-front', 'zip', [-0.296, 0.024, 0.06], [0.296, 0.03, 0.068]),
     box('edge-left', 'zip', [-0.304, 0.024, -0.062], [-0.296, 0.03, 0.068]),
@@ -83,7 +83,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A cast bronze wood saw 0.5 m overall: a 380 mm blade tapering from 90 to 35 mm deep, toothed along its edge,
   // with an open wooden grip riveted on.
-  h.compound('saw_bronze', 0.5, [
+  h.compound('bronze_saw', 0.5, [
     box('grip-a', 'grip', [0, 0.0, -0.025], [0.12, 0.006, 0.02]),
     box('grip-b', 'grip', [0, 0.01, -0.025], [0.12, 0.016, 0.02]),
     box('grip-butt', 'grip', [0, 0.006, -0.03], [0.025, 0.01, 0.025]),
@@ -96,7 +96,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     prism('tooth-%d' % i, 'blade', 'y', [[z, x], [z, x + 0.012], [z - 0.006, x + 0.006]], 0.006, 0.01)
     for i in std.range(0, 18)
   ], { grip: 'wood-oak', blade: 'bronze', rivet: 'bronze-polished' })
-  + { handling: h.gripOn('saw_bronze', 'grip-a'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
+  + { handling: h.gripOn('bronze_saw', 'grip-a'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
   // A moulded screwdriver case 280 by 90 mm opened flat on its hinge: six drivers from 140 to 250 mm in the tray,
   // the empty lid behind.
@@ -121,7 +121,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A hard case 320 by 220 mm, opened with its lid standing behind: a foam tray holding a hammer, a file, a mini
   // hacksaw, a punch and a screwdriver, and a battery pack driving the powered bits.
-  h.compound('small_repairkit', 2.5, [
+  h.compound('firearm_repair_kit', 2.5, [
     box('base', 'case', [-0.16, 0, -0.11], [0.16, 0.06, 0.11]),
     box('foam', 'foam', [-0.152, 0.06, -0.102], [0.152, 0.064, 0.102]),
     box('lid', 'case', [-0.16, 0.04, -0.13], [0.16, 0.26, -0.11]),
@@ -205,7 +205,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A steel toolbox 420 by 180 mm and 200 mm tall to the lid's ridge: a box body, a hip-roofed lid with a folding
   // handle, two snap latches and a hasp on the front.
-  h.compound('toolbox_empty', 5.3, [
+  h.compound('toolbox', 5.3, [
     box('body', 'body', [-0.21, 0, -0.09], [0.21, 0.14, 0.09]),
     box('lid-skirt', 'body', [-0.212, 0.14, -0.092], [0.212, 0.165, 0.092]),
     prism('lid-roof', 'body', 'x', [[0.165, -0.092], [0.165, 0.092], [0.195, 0.04], [0.195, -0.04]], -0.212, 0.212),
@@ -222,7 +222,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A tabletop vacuum former 350 mm wide: a base with a perforated platen, a clamp frame riding two columns, a
   // heater hood on top and a pump hose at the back.
-  h.compound('vac_mold', 8, [
+  h.compound('vacuum_former', 8, [
     box('base', 'base', [-0.175, 0, -0.12], [0.175, 0.07, 0.12]),
     box('platen', 'platen', [-0.11, 0.07, -0.09], [0.11, 0.076, 0.09]),
     box('switch', 'switch', [0.13, 0.03, 0.12], [0.155, 0.05, 0.126]),
@@ -284,7 +284,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
 
   // A makeshift arc welder on a 380 by 260 mm plank: two salvaged transformers with copper windings wired in
   // series, a taped mains cord, and leads to a wooden-handled electrode holder and a spring clamp.
-  h.compound('welder_crude', 16, [
+  h.compound('makeshift_arc_welder', 16, [
     box('plank', 'plank', [-0.19, 0, -0.13], [0.19, 0.02, 0.13]),
   ] + std.flattenArrays([
     local x = [-0.09, 0.07][k];

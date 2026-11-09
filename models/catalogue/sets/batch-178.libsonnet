@@ -209,7 +209,7 @@ local leatherCuirass() =
   // showing the inside, and its neck, armholes and hem bound in leather.
   local av = { w: 0.48, l: 0.6, t: 0.04, neckW: 0.08, neckD: 0.08, armIn: 0.08, armD: 0.19 };
   local avTop = av.l / 2 - av.neckD, avArm = av.w / 2 - av.armIn;
-  h.compound('armor_aztec', 4,
+  h.compound('quilted_cotton_armour', 4,
              g.flatTop(av)
              + g.quilt({ style: 'lattice', pitch: 0.06, w: 0.008, x0: -avArm + 0.01, x1: avArm - 0.01, z0: -av.l / 2 + 0.03, z1: avTop - 0.01, y: av.t })
              + [
@@ -228,30 +228,30 @@ local leatherCuirass() =
 
   // A 4 mm mild steel chestplate laid flat, 460 mm from neck to waist and 600 mm with its fauld: breast over back,
   // two fauld lames for the hips and a guard laid beside each shoulder.
-  h.compound('armor_lc_chestplate', 22, chestplate({}), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
+  h.compound('mild_steel_chestplate', 22, chestplate({}), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // The 2 mm light chestplate: a thinner breast, one fauld lame and smaller shoulder guards.
-  h.compound('armor_lc_light_chestplate', 16, chestplate({ t: 0.005, lames: 1, spaulder: 0.06 }), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
+  h.compound('mild_steel_light_chestplate', 16, chestplate({ t: 0.005, lames: 1, spaulder: 0.06 }), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // The 6 mm heavy chestplate: a thick breast with a plackart riveted over the belly, three lames, broad guards.
-  h.compound('armor_lc_heavy_chestplate', 35, chestplate({ t: 0.012, lames: 3, plackart: true, spaulder: 0.085 }), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
+  h.compound('mild_steel_heavy_chestplate', 35, chestplate({ t: 0.012, lames: 3, plackart: true, spaulder: 0.085 }), { plate: 'steel-bright', back: 'steel-bright', ridge: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', buckle: 'brass-dull' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A bronze bell cuirass laid flat, 500 mm from neck to the flared hem and 440 mm across it.
-  h.compound('armor_cuirass', 6, bellCuirass(), { plate: 'bronze-polished', back: 'bronze', rim: 'bronze-polished', line: 'bronze', pin: 'bronze', tie: 'leather-tan' })
+  h.compound('bronze_bell_cuirass', 6, bellCuirass(), { plate: 'bronze-polished', back: 'bronze', rim: 'bronze-polished', line: 'bronze', pin: 'bronze', tie: 'leather-tan' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['ancient'] } } },
 
   // A leather lamellar cuirass laid flat, 560 mm from neck to hem and 680 mm across its shoulder guards.
-  h.compound('armor_lamellar', 4, lamellarCuirass(false), { lame: 'leather-chestnut', lace: 'leather-tan', edge: 'leather-oxblood' })
+  h.compound('leather_lamellar_cuirass', 4, lamellarCuirass(false), { lame: 'leather-chestnut', lace: 'leather-tan', edge: 'leather-oxblood' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A mild steel lamellar cuirass laid flat, 760 mm from neck to the hem of its thigh panels.
-  h.compound('armor_lamellar_lc', 12, lamellarCuirass(true), { lame: 'steel-bright', lace: 'leather-oxblood', edge: 'leather-black' })
+  h.compound('mild_steel_lamellar_cuirass', 12, lamellarCuirass(true), { lame: 'steel-bright', lace: 'leather-oxblood', edge: 'leather-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A moulded leather cuirass laid flat, 460 mm from neck to waist and 660 mm across its shoulder guards.
-  h.compound('armor_larmor_chest', 2.6, leatherCuirass(), { leather: 'leather-chestnut', back: 'leather-chestnut', edge: 'leather-black', lace: 'leather-tan' })
+  h.compound('leather_cuirass', 2.6, leatherCuirass(), { leather: 'leather-chestnut', back: 'leather-chestnut', edge: 'leather-black', lace: 'leather-tan' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso'], setting: ['medieval'] } } },
 ]

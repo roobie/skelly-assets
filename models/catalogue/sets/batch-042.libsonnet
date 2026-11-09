@@ -38,7 +38,7 @@ local lobe(id, slot, outline, y0, y1, cx=0, cz=0, lean=[0, 0]) =
              { stone: 'stone-grey', grain: 'stone-whet' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
 
   // A big lumpy rock about 300 by 230 mm and 180 mm high.
-  h.compound('rock_large', 20,
+  h.compound('large_rock', 20,
              lobe('body', 'stone', [[-0.15, -0.05], [-0.09, -0.11], [0.04, -0.115], [0.145, -0.04], [0.14, 0.06], [0.06, 0.115], [-0.07, 0.11], [-0.14, 0.05]], 0, 0.15, 0, 0, [0.02, -0.015])
              + lobe('lump', 'stone', [[-0.07, -0.06], [0.04, -0.07], [0.09, 0.0], [0.04, 0.07], [-0.06, 0.06], [-0.09, 0.0]], 0.06, 0.18, -0.04, 0.02, [0.01, 0.01])
              + lobe('spur', 'grain', [[-0.05, -0.04], [0.04, -0.05], [0.07, 0.0], [0.03, 0.05], [-0.05, 0.04]], 0.01, 0.1, 0.1, 0.05, [-0.01, 0.0]),

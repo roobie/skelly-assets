@@ -139,16 +139,16 @@ local leatherSections = [
 
 [
   // A cotton fencing underarm protector laid flat, 400 mm from shoulder to waist and 600 mm from tie to sleeve hem.
-  h.compound('plastron_cotton', 0.18, underarmGuard(), { cloth: 'cloth-bright-white', quilt: 'cloth-cream', binding: 'cloth-cream', strap: 'cloth-cream' })
+  h.compound('fencing_underarm_protector', 0.18, underarmGuard(), { cloth: 'cloth-bright-white', quilt: 'cloth-cream', binding: 'cloth-cream', strap: 'cloth-cream' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A plastic fencing chest protector laid flat, 260 mm tall and 300 mm across, straps reaching 540 mm across.
-  h.compound('plastron_plastic', 0.34, cupGuard(), { shell: 'enamel-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+  h.compound('plastic_chest_protector', 0.34, cupGuard(), { shell: 'enamel-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A thick cotton shirt folded on a shelf, 380 mm by 330 mm and 80 mm tall, leather sections sewn over the chest,
   // the shoulders and the folded sleeves, but not over the elbows.
-  h.compound('survivor_adhoc_leather_shirt', 1.2,
+  h.compound('leather_padded_shirt', 1.2,
              g.jacket({ w: 0.38, d: 0.33, ht: 0.08, folds: 4, front: 'none', buttons: [], collar: { r: 0.06, wd: 0.016, ht: 0.01, gap: 0 }, sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
              + patches(leatherSections, 0.08)
              + patches([[-0.1475, -0.08, 0.075, 0.1, 'leather-b'], [0.1475, -0.08, 0.075, 0.1, 'leather-a'], [-0.1475, 0.09, 0.075, 0.09, 'leather-a'], [0.1475, 0.09, 0.075, 0.09, 'leather-b']], 0.088, 'sleeve-patch'),
@@ -156,19 +156,19 @@ local leatherSections = [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['torso'] } } },
 
   // The same shirt with its sleeves cut off, folded on a shelf, 360 mm by 320 mm and 70 mm tall.
-  h.compound('survivor_adhoc_leather_torso', 0.89,
+  h.compound('leather_padded_sleeveless_shirt', 0.89,
              sleeveless(0.36, 0.32, 0.07) + patches(leatherSections, 0.07)
              + patches([[-0.13, -0.06, 0.07, 0.12, 'leather-b'], [0.13, -0.06, 0.07, 0.12, 'leather-a']], 0.07, 'side-patch'),
              { cloth: 'cloth-khaki', binding: 'cloth-khaki', 'leather-a': 'leather-chestnut', 'leather-b': 'leather-tan', stitch: 'cord-cotton' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['torso'] } } },
 
   // A tyre plate laid flat, 550 mm from the shoulder chunks to the hem and 600 mm across the side tapes.
-  h.compound('tireplate', 2.3, tirePlate(), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', tape: 'tape-silver' })
+  h.compound('tyre_plate', 2.3, tirePlate(), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', tape: 'tape-silver' })
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'fabric'], slot: ['torso'] } } },
 
   // A denim vest folded on a shelf, 340 mm by 280 mm and 40 mm tall, steel plates riveted over both chest panels and
   // the belly, metal buttons down the front between them.
-  h.compound('vest_jean_mod', 1.5,
+  h.compound('armoured_denim_vest', 1.5,
              sleeveless(0.34, 0.28, 0.04)
              + [box('placket', 'seam', [-0.009, 0.04, -0.14], [0.009, 0.042, 0.05])]
              + g.buttons('button', 'button', 0, [-0.11, -0.07, -0.03, 0.01], 0.042, 0.006)
@@ -178,7 +178,7 @@ local leatherSections = [
 
   // A thick leather vest folded on a shelf, 360 mm by 300 mm and 45 mm tall, steel plates riveted in two columns down
   // the front either side of its laced opening.
-  h.compound('vest_leather_mod', 3,
+  h.compound('armoured_leather_vest', 3,
              sleeveless(0.36, 0.3, 0.045)
              + plates([[s * 0.07, -0.1 + i * 0.07, 0.095, 0.06] for s in sides for i in [0, 1, 2]], 0.045)
              + [g.strip('lace-%d' % i, 'lace', [-0.018, -0.13 + i * 0.04], [0.018, -0.11 + i * 0.04], 0.045, 0.005, 0.003) for i in [0, 1, 2, 3]],

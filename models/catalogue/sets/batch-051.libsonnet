@@ -62,7 +62,7 @@ local hangHook(id, x, y, z, r, foot) =
 [
   // A bench-mounted lever shear for sheet metal: a cast frame on a 300 by 240 mm foot plate, a 200 mm blade pair and a
   // 0.9 m lever raised to cut, about 0.95 m along the lever.
-  h.compound('beverly_shear', 39, [
+  h.compound('lever_shear', 39, [
     box('foot', 'frame', [-0.15, 0, -0.12], [0.15, 0.02, 0.12]),
   ] + [
     disc('bolt-%d' % i, 'bolt', 0.009, 0.02, 0.026, [-0.12, 0.12][i % 2], [-0.09, 0.09][std.floor(i / 2)])
@@ -105,7 +105,7 @@ local hangHook(id, x, y, z, r, foot) =
 
   // A folding chair folded flat and standing on its feet: 450 mm wide, 880 mm tall and 70 mm deep, a grey moulded
   // seat and back on a tubular steel frame, the seat folded up against the front legs.
-  h.compound('chair_folding', 5.1, [
+  h.compound('folding_chair', 5.1, [
     rod('upright-l', 'frame', 0.011, 0, 0.88, 0) + { axis: 'y', origin: [-0.2, 0, 0], profile: [[0, 0], [0, 0.011], [0.88, 0.011], [0.88, 0]] },
     rod('upright-r', 'frame', 0.011, 0, 0.88, 0) + { axis: 'y', origin: [0.2, 0, 0], profile: [[0, 0], [0, 0.011], [0.88, 0.011], [0.88, 0]] },
     rod('top-rail', 'frame', 0.011, -0.2, 0.2, 0.875),
@@ -355,7 +355,7 @@ local hangHook(id, x, y, z, r, foot) =
 
   // A steel camp table folded into a flat slab 900 by 500 mm and 35 mm thick: a slatted top, the folded leg frames
   // showing along the sides, two latches and a carry handle at the front.
-  h.compound('tourist_table', 9, [
+  h.compound('folding_camp_table', 9, [
     box('top', 'top', [-0.45, 0.012, -0.25], [0.45, 0.035, 0.25]),
   ] + [
     box('groove-%d' % i, 'groove', [-0.44, 0.035, z - 0.002], [0.44, 0.0355, z + 0.002])

@@ -54,7 +54,7 @@ local probe(id, slot, x, z0, y=0.006) = [
 
   // A stereo dissecting microscope 330 mm tall: a flat base 200 mm by 240 mm with a round white stage plate, a
   // steel pillar at the back, a focus block with knobs, and a wide head with two eyepieces angled toward the user.
-  h.compound('microscope_dissecting', 4, [
+  h.compound('dissecting_microscope', 4, [
     box('base', 'base', [-0.1, 0, -0.13], [0.1, 0.035, 0.11]),
     disc('plate', 'plate', 0.05, 0.035, 0.039, 0, 0.03),
     box('clip-a', 'clip', [-0.06, 0.039, 0.0], [-0.03, 0.042, 0.008]),
@@ -150,7 +150,7 @@ local probe(id, slot, x, z0, y=0.006) = [
   // A melting point apparatus 200 mm square and 150 mm tall: a steel hot plate base with a display and keys on its
   // front, and a dark heating housing on it with three capillary slots in the top and a round magnifier viewport
   // facing the user under a lamp hood.
-  h.compound('melting_point', 3, [
+  h.compound('melting_point_apparatus', 3, [
     box('base', 'case', [-0.1, 0, -0.1], [0.1, 0.035, 0.1]),
     box('plate', 'plate', [-0.09, 0.035, -0.09], [0.09, 0.039, 0.09]),
     box('display', 'lcd', [-0.08, 0.01, 0.1], [-0.02, 0.026, 0.103]),
@@ -255,7 +255,7 @@ local probe(id, slot, x, z0, y=0.006) = [
 
   // A low open cardboard tray, 120 mm by 80 mm with 25 mm walls, holding a jumble of ring stand clamps: a support
   // ring lying flat, a three-prong clamp with its boss head, a spare boss head and a wing nut, one jaw taped up.
-  h.compound('stand_ring_clamps', 0.18, [
+  h.compound('ring_stand_clamps', 0.18, [
     box('floor', 'inside', [-0.06, 0, -0.04], [0.06, 0.003, 0.04]),
     box('wall-front', 'box', [-0.06, 0, 0.037], [0.06, 0.025, 0.04]),
     box('wall-back', 'box', [-0.06, 0, -0.04], [0.06, 0.025, -0.037]),
@@ -328,7 +328,7 @@ local probe(id, slot, x, z0, y=0.006) = [
   // A rotary evaporator 700 mm wide and 600 mm tall: a heated water bath on a grey base, a motor head on a tall
   // tower that tilts a round flask into the bath, a coiled glass condenser standing above, and a receiving flask.
   local tower = -0.22, flaskC = [0.0, 0.14, 0.0];
-  h.compound('rotovap', 10, [
+  h.compound('rotary_evaporator', 10, [
     box('base', 'body', [-0.3, 0, -0.18], [0.35, 0.05, 0.18]),
     box('bath-panel', 'panel', [0.06, 0.02, 0.18], [0.3, 0.045, 0.182]),
     box('bath-display', 'lcd', [0.09, 0.026, 0.182], [0.16, 0.04, 0.184]),
@@ -370,7 +370,7 @@ local probe(id, slot, x, z0, y=0.006) = [
 
   // A teleport pad 300 mm square and 30 mm thick: an aluminium plate with a raised ring of emitter coils round a
   // glowing core, a solar cell panel in one corner and a tread grid across the stepping face.
-  h.compound('telepad', 2.9, h.scaled([
+  h.compound('teleport_pad', 2.9, h.scaled([
     box('plate', 'plate', [-0.2, 0, -0.2], [0.2, 0.012, 0.2]),
     box('rim-a', 'rim', [-0.2, 0.012, -0.2], [0.2, 0.018, -0.19]),
     box('rim-b', 'rim', [-0.2, 0.012, 0.19], [0.2, 0.018, 0.2]),
@@ -414,7 +414,7 @@ local probe(id, slot, x, z0, y=0.006) = [
   // A belt-driven rotary vacuum pump 480 mm long, 230 mm wide and 300 mm tall on a steel base plate: an electric
   // motor with a cooling fan cover, a cast pump block with an oil sight glass and inlet port, and a belt guard
   // over the pulleys at the back.
-  h.compound('vac_pump', 45, [
+  h.compound('vacuum_pump', 45, [
     box('base', 'base', [-0.24, 0, -0.115], [0.24, 0.015, 0.115]),
     // Motor along x on the left.
     rod('motor', 'motor', 0.075, -0.22, -0.02, 0.1) + { origin: [-0.22, 0.1, 0.03] },

@@ -134,7 +134,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
   patches('bundle_nylon', 0.071, 0.1, 0.08, 6, 0.004, ['cloth-navy', 'cloth-olive-drab', 'plastic-charcoal', 'nylon-red']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A hundred felt patches in a stack 140 mm by 110 mm and 60 mm tall, tied once each way.
-  patches('bundle_wool', 0.29, 0.14, 0.11, 10, 0.006, ['cloth-pants-grey', 'cloth-canvas']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  patches('bundle_felt', 0.29, 0.14, 0.11, 10, 0.006, ['cloth-pants-grey', 'cloth-canvas']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A brass candlestick, 280 mm tall: a stepped round foot 110 mm across, a turned stem with three knops, a wide
   // drip pan and a deep socket for the candle.
@@ -149,7 +149,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
 
   // An empty steel canister, 58 mm across and 110 mm tall, open at the top: olive paint outside, bare steel inside
   // and on the rolled rims, with a yellow band near the top.
-  h.compound('canister_empty', 0.071, [
+  h.compound('empty_canister', 0.071, [
     turned('can', 'steel', 'y', [[0, 0], [0, 0.0275], [0.11, 0.0275], [0.11, 0.0235], [0.002, 0.0235], [0.002, 0]]),
     turned('paint', 'paint', 'y', [[0, 0.0275], [0, 0.029], [0.094, 0.029], [0.094, 0.0275], [0, 0.0275]], [0, 0.006, 0]),
     turned('band', 'band', 'y', [[0, 0.0275], [0, 0.0292], [0.008, 0.0292], [0.008, 0.0275], [0, 0.0275]], [0, 0.08, 0]),

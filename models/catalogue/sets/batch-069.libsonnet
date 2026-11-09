@@ -168,7 +168,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
 
   // The portable radio below with its tuning knob pulled off and a bodged board, a copper coil, an aluminium
   // plate and loose wires taped to its back, some wires led over the top to the front.
-  h.compound('balthazar_radio', 1, radio(false) + [
+  h.compound('modified_radio', 1, radio(false) + [
     box('plate', 'plate', [-0.075, 0.012, -0.030], [0.060, 0.100, -0.025]),
     box('board', 'board', [-0.065, 0.028, -0.034], [0.000, 0.088, -0.030]),
     box('chip-a', 'chip', [-0.055, 0.040, -0.038], [-0.035, 0.052, -0.034]),
@@ -185,14 +185,14 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], radioFinish + {
     plate: 'alu-bare', board: 'circuit-green', chip: 'plastic-black', coil: 'copper', tape: 'tape-grey',
     'wire-red': 'plastic-red', 'wire-yellow': 'plastic-yellow',
-  }) + h.inHand('balthazar_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + h.inHand('modified_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A portable transistor radio 190 mm wide, 115 mm tall and 50 mm deep with a carry handle.
   h.compound('radio', 0.51, radio(true), radioFinish) + h.inHand('radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A remote-controlled toy truck 310 mm long and 190 mm wide over its fat tyres, front on +z, with a red
   // shell, dark windows, bumpers and a whip antenna at the back.
-  h.compound('radio_car', 1.2, [
+  h.compound('remote_control_car', 1.2, [
     box('chassis', 'chassis', [-0.05, 0.024, -0.13], [0.05, 0.040, 0.13]),
     box('body', 'shell', [-0.07, 0.040, -0.14], [0.07, 0.074, 0.14]),
     h.prism('cabin', 'window', 'x', [[0.074, -0.075], [0.074, 0.065], [0.110, 0.030], [0.110, -0.055]], -0.056, 0.056),

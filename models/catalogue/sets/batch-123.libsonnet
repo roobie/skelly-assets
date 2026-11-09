@@ -139,49 +139,49 @@ local medicalOpts = { t: 0.006, ct: 0.006, w: 0.084, fw: 0.017, fl: 1.08, cuff: 
 [
   // A pair of plain cotton gloves laid flat side by side, backs up, each 210 mm from cuff to fingertip and 90 mm across
   // the knuckles, with a short hemmed cuff.
-  h.compound('gloves_light', 0.081, pair(lightOpts), { hand: 'cloth-cream', cuff: 'cloth-cream', hem: 'cloth-cream' })
+  h.compound('cotton_gloves', 0.081, pair(lightOpts), { hand: 'cloth-cream', cuff: 'cloth-cream', hem: 'cloth-cream' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin black leather dress gloves laid flat, backs up, each 220 mm from cuff to fingertip, with three
   // raised points stitched down the back of the hand.
-  h.compound('gloves_leather', 0.19, pair(leatherOpts, extra=points('stitch', leatherOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'cloth-charcoal', stitch: 'cloth-charcoal' })
+  h.compound('leather_gloves', 0.19, pair(leatherOpts, extra=points('stitch', leatherOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'cloth-charcoal', stitch: 'cloth-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin black leather golfing gloves laid flat, backs up, each 190 mm from wrist to fingertip, with a short
   // wrist and a strap across the back of the wrist closing on a tab with a press stud.
-  h.compound('gloves_golf', 0.15, pair(golfOpts, extra=wristTab(golfOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'leather-black', tab: 'leather-white', stud: 'metal-silver' })
+  h.compound('golf_gloves', 0.15, pair(golfOpts, extra=wristTab(golfOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'leather-black', tab: 'leather-white', stud: 'metal-silver' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of brown leather fingerless gloves laid flat, backs up, each 160 mm long, the fingers cut off past the
   // first joint and hemmed.
-  h.compound('gloves_fingerless', 0.16, pair(fingerlessOpts), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black' })
+  h.compound('fingerless_leather_gloves', 0.16, pair(fingerlessOpts), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['hands'] } } },
 
   // The same fingerless gloves with three steel slats riveted across the back of each hand, 160 mm long.
-  h.compound('gloves_fingerless_mod', 0.52, pair(fingerlessOpts, extra=guards(fingerlessOpts)), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black', guard: 'steel-grey', rivet: 'steel-bright' })
+  h.compound('armoured_fingerless_gloves', 0.52, pair(fingerlessOpts, extra=guards(fingerlessOpts)), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black', guard: 'steel-grey', rivet: 'steel-bright' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'metal'], slot: ['hands'] } } },
 
   // A pair of glossy black vinyl gloves laid flat, backs up, each 250 mm from cuff to fingertip, with a hooked black
   // steel claw 30 mm long fixed by a ring to each fingertip and thumb.
-  h.compound('gloves_claws', 0.15, pair(clawOpts, extra=claws(clawOpts)), { hand: 'leather-patent', cuff: 'leather-patent', hem: 'leather-patent', claw: 'steel-parkerized' })
+  h.compound('claw_gloves', 0.15, pair(clawOpts, extra=claws(clawOpts)), { hand: 'leather-patent', cuff: 'leather-patent', hem: 'leather-patent', claw: 'steel-parkerized' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'metal'], slot: ['hands'] } } },
 
   // A pair of knitted aramid cut-resistant gloves laid flat, backs up, each 230 mm from cuff to fingertip, with a ribbed
   // knit cuff and an overlocked orange edge.
-  h.compound('gloves_cut_resistant', 0.08, pair(cutOpts, extra=ribs(cutOpts, 4)), { hand: 'aramid-gold', cuff: 'aramid-gold', hem: 'cloth-orange' })
+  h.compound('cut_resistant_gloves', 0.08, pair(cutOpts, extra=ribs(cutOpts, 4)), { hand: 'aramid-gold', cuff: 'aramid-gold', hem: 'cloth-orange' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of olive overhand protectors laid flat side by side, outside up: padded shields 210 mm long and 110 mm wide
   // shaped to the back of the hand and closed fingers, with flex seams, an elastic finger loop and a wrist strap.
-  h.compound('gloves_eod', 0.12, overhand('l-', -0.075, 1) + overhand('r-', 0.075, -1), { pad: 'nylon-ranger-green', seam: 'webbing-olive-dark', strap: 'webbing-black', tab: 'hook-loop-grey' })
+  h.compound('blast_protection_gloves', 0.12, overhand('l-', -0.075, 1) + overhand('r-', 0.075, -1), { pad: 'nylon-ranger-green', seam: 'webbing-olive-dark', strap: 'webbing-black', tab: 'hook-loop-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thick fur gloves laid flat, backs up, each 300 mm from the cuff to the fingertips and 100 mm across the
   // knuckles, with a wide flared gauntlet cuff and a deep fur ruff round its opening.
-  h.compound('gloves_fur', 0.35, pair(furOpts, 0.115), { hand: 'fur-brown', cuff: 'fur-brown', hem: 'fur-brown' })
+  h.compound('fur_gloves', 0.35, pair(furOpts, 0.115), { hand: 'fur-brown', cuff: 'fur-brown', hem: 'fur-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['hands'] } } },
 
   // A pair of thin latex examination gloves laid flat, backs up, each 260 mm from the rolled cuff to the fingertips.
-  h.compound('gloves_medical', 0.012, pair(medicalOpts), { hand: 'plastic-frosted', cuff: 'plastic-frosted', hem: 'plastic-frosted' })
+  h.compound('examination_gloves', 0.012, pair(medicalOpts), { hand: 'plastic-frosted', cuff: 'plastic-frosted', hem: 'plastic-frosted' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
 ]

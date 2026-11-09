@@ -49,12 +49,12 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
 ], { metal: metal, mark: mark, wire: 'steel-grey' }) + { voxelGrain: 0.004 };
 [
   // A table knife 210 mm long lying flat: a 95 mm flat handle and a blunt, round-tipped blade 22 mm wide.
-  h.compound('knife_butter', 0.093, [
+  h.compound('butter_knife', 0.093, [
     h.prism('handle', 'steel', 'y', [[-0.0075, 0], [0.0075, 0], [0.0085, 0.07], [0.006, 0.095], [-0.006, 0.095], [-0.0085, 0.07]], 0, 0.005),
     h.prism('bolster', 'steel', 'y', [[-0.006, 0.095], [0.006, 0.095], [0.0045, 0.105], [-0.0045, 0.105]], 0.001, 0.004),
     h.prism('blade', 'steel', 'y', [[-0.0045, 0.105], [0.0045, 0.105], [0.011, 0.125], [0.011, 0.196], [0.007, 0.206], [0, 0.21], [-0.007, 0.204], [-0.011, 0.19], [-0.011, 0.125]], 0.001, 0.003),
   ], { steel: 'steel-stainless' }) + {
-    handling: h.gripOn('knife_butter', 'handle'),
+    handling: h.gripOn('butter_knife', 'handle'),
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -82,7 +82,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A child's bowl 120 mm across and 45 mm deep in bright plastic, with a non-slip ring under its foot.
-  h.compound('plastic_bowl_kids', 0.065, [
+  h.compound('childs_plastic_bowl', 0.065, [
     turned('bowl', 'bowl', 'y', [[0, 0], [0, 0.04], [0.012, 0.05], [0.03, 0.057], [0.045, 0.06], [0.045, 0.054], [0.03, 0.052], [0.014, 0.045], [0.006, 0.036], [0.006, 0]], [0, 0.002, 0]),
     turned('foot', 'foot', 'y', [[0, 0.03], [0, 0.04], [0.002, 0.04], [0.002, 0.03], [0, 0.03]]),
   ], { bowl: 'plastic-orange', foot: 'plastic-white' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
@@ -111,7 +111,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
 
   // A 20 litre enamelled canner 360 mm across and 260 mm tall with a lid, two side handles and a wire jar rack whose
   // handles rest on the rim.
-  h.compound('pot_canning', 4.9, [
+  h.compound('canning_pot', 4.9, [
     potShell('pot', 'enamel', 0.18, 0.26, 0.006, 0.004, 0.02),
   ] + loopHandle('handle-a', 'trim', 1, 0.18, 0.21, 0.04, 0.07, 0.01) + loopHandle('handle-b', 'trim', -1, 0.18, 0.21, 0.04, 0.07, 0.01)
   + lid('lid', 'enamel', 'trim', 0.18, 0.26, 0.04, 0.02) + [
@@ -122,17 +122,17 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
   ], { enamel: 'paint-drum-blue', trim: 'plastic-black', rack: 'steel-galvanised' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A tin-lined copper pot 180 mm across and 140 mm deep with two cast brass handles and a copper lid.
-  h.compound('pot_copper', 2.4, [
+  h.compound('copper_pot', 2.4, [
     potShell('pot', 'copper', 0.09, 0.14, 0.004),
     turned('lining', 'tin', 'y', [[0.004, 0], [0.004, 0.084], [0.138, 0.084], [0.138, 0.08], [0.008, 0.08], [0.008, 0]]),
   ] + loopHandle('handle-a', 'brass', 1, 0.09, 0.11, 0.025, 0.035, 0.008) + loopHandle('handle-b', 'brass', -1, 0.09, 0.11, 0.025, 0.035, 0.008)
   + lid('lid', 'copper', 'brass', 0.09, 0.14, 0.018, 0.012), { copper: 'copper', tin: 'steel-grey', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A pot hammered from a heavy steel sheet, 200 mm across the crimped rim and 75 mm deep, with a wire bail.
-  makeshiftPot('pot_makeshift', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  makeshiftPot('makeshift_pot', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // The same pot hammered from copper sheet.
-  makeshiftPot('pot_makeshift_copper', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  makeshiftPot('makeshift_copper_pot', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A hardwood rolling pin 460 mm long: a 300 mm barrel 64 mm across and a turned handle at each end.
   h.compound('rolling_pin', 0.7, [

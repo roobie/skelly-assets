@@ -78,7 +78,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A home-made concrete float: a 610 by 120 mm pine board 22 mm thick with a rounded oak grip on two blocks.
-  h.compound('wood_smoother', 1.1, [
+  h.compound('wooden_float', 1.1, [
     box('board', 'board', [0, 0, -0.06], [0.61, 0.022, 0.06]),
     box('bevel-a', 'board', [-0.01, 0.002, -0.055], [0, 0.016, 0.055]),
     box('bevel-b', 'board', [0.61, 0.002, -0.055], [0.62, 0.016, 0.055]),
@@ -88,11 +88,11 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     box('nail-a', 'nail', [0.185, 0.0, -0.004], [0.195, 0.023, 0.004]),
     box('nail-b', 'nail', [0.415, 0.0, -0.004], [0.425, 0.023, 0.004]),
   ], { board: 'wood-pine', block: 'wood-pine', grip: 'wood-oak', nail: 'steel-grey' })
-  + { handling: h.gripOn('wood_smoother', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'] } } },
+  + { handling: h.gripOn('wooden_float', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'] } } },
 
   // A 48 inch pipe wrench 1.2 m long lying flat: a red I-beam handle, a cast frame at +x with a knurled adjusting nut,
   // a toothed heel jaw and a hook jaw on a shank across the frame, opening 120 mm toward +x.
-  h.compound('wrench_48', 21, [
+  h.compound('giant_pipe_wrench', 21, [
     box('handle-web', 'handle', [0.02, 0.012, -0.022], [0.95, 0.038, 0.022]),
     box('flange-a', 'handle', [0.0, 0, -0.03], [0.95, 0.05, -0.018]),
     box('flange-b', 'handle', [0.0, 0, 0.018], [0.95, 0.05, 0.03]),
@@ -111,16 +111,16 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     box('hook-tooth-%d' % i, 'jaw', [1.065 + i * 0.02, 0.008, 0.114], [1.075 + i * 0.02, 0.048, 0.12])
     for i in std.range(0, 6)
   ], { handle: 'paint-red', hole: 'void-black', frame: 'iron-dull', jaw: 'steel-grey', nut: 'steel-parkerized' })
-  + { handling: h.gripOn('wrench_48', 'handle-web'), voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { handling: h.gripOn('giant_pipe_wrench', 'handle-web'), voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An 18 inch adjustable spanner, 460 mm long, jaws opening to about 60 mm.
-  adjustable('wrench_large', 2.2, 0.46) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  adjustable('large_adjustable_wrench', 2.2, 0.46) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 6 inch adjustable spanner, 150 mm long, jaws opening to about 20 mm.
-  adjustable('wrench_small', 0.075, 0.15) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  adjustable('small_adjustable_wrench', 0.075, 0.15) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A craft knife 100 mm long: a ribbed 9 mm handle, a tapered collet and a pointed angled blade.
-  h.compound('xacto', 0.0096, [
+  h.compound('craft_knife', 0.0096, [
     turned('handle', 'handle', 'x', [[0, 0], [0, 0.004], [0.004, 0.0045], [0.072, 0.0045], [0.072, 0]]),
   ] + [
     turned('rib-%d' % i, 'rib', 'x', [[0, 0], [0, 0.0052], [0.003, 0.0052], [0.003, 0]], [0.012 + i * 0.008, 0, 0])
@@ -129,7 +129,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     turned('collet', 'collet', 'x', [[0, 0], [0, 0.0055], [0.008, 0.0055], [0.016, 0.003], [0.016, 0]], [0.072, 0, 0]),
     h.prism('blade', 'blade', 'z', [[0.084, -0.002], [0.101, -0.0045], [0.088, 0.003], [0.084, 0.003]], -0.001, 0.001),
   ], { handle: 'plastic-charcoal', rib: 'alu-bare', collet: 'alu-bare', blade: 'steel-mirror' })
-  + { handling: h.gripOn('xacto', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { handling: h.gripOn('craft_knife', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A three-lobed fidget spinner about 95 mm across and 11 mm thick lying flat: a bearing in the middle under round caps
   // and a steel weight ring in each lobe.

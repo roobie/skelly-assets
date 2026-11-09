@@ -184,7 +184,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
   // A golden crown standing upright, 190 mm across and 95 mm tall: a 40 mm band between raised rims, with eight
   // small flowering trees rising from it, their canopies set with red blossoms, and a red stone in the band between
   // each pair of trees.
-  h.compound('crown_golden', 1.9,
+  h.compound('golden_crown', 1.9,
              circlet(0.095, 0.04)
              + std.flattenArrays([tree('tree-%d-' % i, 0.095, 0.04, 45 * i) for i in std.range(0, 7)])
              + [
@@ -198,7 +198,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
   // A heavy golden crown standing upright, 200 mm across and 115 mm tall: a 45 mm band between raised rims, set
   // round with red, blue and green stones, and eight tall stepped points each tipped with a gold ball.
   local survivorStones = ['red', 'blue', 'green'];
-  h.compound('crown_golden_survivor', 1.8,
+  h.compound('jewelled_gold_crown', 1.8,
              circlet(0.1, 0.045, 0.005)
              + std.flattenArrays([
                h.crescent('point-%d-%d' % [i, k], 'gold', 0.095, 0.1, i * 45 - 14 + 13 * k / 8, i * 45 + 14 - 13 * k / 8, 2, 0.044 + 0.0075 * k, 0.044 + 0.0075 * (k + 1))
@@ -255,7 +255,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
 
   // A black bow tie lying flat, 130 mm across the bow and 60 mm tall: two pleated wings either side of a wrapped
   // knot, its neckband laid out in a loop behind with a sliding adjuster.
-  h.compound('tie_bow', 0.02,
+  h.compound('bow_tie', 0.02,
              [
                flat('wing-%s' % s, 'bow', [[k * 0.009, -0.011], [k * 0.058, -0.029], [k * 0.065, 0], [k * 0.058, 0.029], [k * 0.009, 0.011]], 0.002, 0.01)
                for s in ['l', 'r']
@@ -274,7 +274,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
   // A fur-lined sleeping bag laid out flat and open, 2 m long and 800 mm across the shoulders: a quilted olive shell
   // tapering to the foot, a rounded hood, and the top corner turned back to show the fur lining. A zip runs down the
   // right side.
-  h.compound('sleeping_bag_fur', 2.2,
+  h.compound('fur_lined_sleeping_bag', 2.2,
              [
                flat('body', 'shell', [[-0.4, -0.85], [0.4, -0.85], [0.28, 1.0], [-0.28, 1.0]], 0, 0.05),
                flat('hood', 'shell', [onCircle(0.4, 90 + 180 * i / 12, 0, -0.85) for i in std.range(0, 12)], 0, 0.06),
@@ -292,13 +292,13 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
 
   // The fur-lined sleeping bag rolled tight, 450 mm long and 260 mm across, the fur showing in rings on its ends,
   // two black compression straps round it and a carry strap over the top.
-  h.compound('sleeping_bag_fur_roll', 3, bedRoll(0.45, 0.13, 5),
+  h.compound('rolled_fur_lined_sleeping_bag', 3, bedRoll(0.45, 0.13, 5),
              { shell: 'cloth-olive-drab', lining: 'fur-pale', strap: 'webbing-black', buckle: 'plastic-matte-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A plain sleeping bag rolled tight, 400 mm long and 200 mm across, a navy shell wound round a grey flannel lining,
   // with two black compression straps and a carry strap.
-  h.compound('sleeping_bag_roll', 1.1, bedRoll(0.4, 0.1, 4),
+  h.compound('rolled_sleeping_bag', 1.1, bedRoll(0.4, 0.1, 4),
              { shell: 'cloth-navy', lining: 'wool-grey', strap: 'webbing-black', buckle: 'plastic-matte-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
 

@@ -69,7 +69,7 @@ local cordNecklace(id, mass, body) =
   // A large dress watch lying face up with its bracelet opened out, 220 mm end to end: a 44 mm gold case with a
   // silver bezel studded with gold hour marks, a silver dial with gold hands and a gold crown on +x, on a gold
   // bracelet whose raised centre links are silver.
-  h.compound('sf_watch', 0.2,
+  h.compound('dress_watch', 0.2,
              [
                h.disc('case', 'case', 0.022, 0, 0.01),
                ring('bezel', 'bezel', 0.0165, 0.0222, 0.01, 0.0135),
@@ -121,7 +121,7 @@ local cordNecklace(id, mass, body) =
 
   // A costume bunny tail: a fluffy white pom-pom 80 mm across sitting on its flat back, a cluster of soft balls round
   // a core, with a black clip on the back for a belt or waistband.
-  h.compound('tail_bunny_playboy', 0.018,
+  h.compound('bunny_tail', 0.018,
              [
                box('clip', 'clip', [-0.012, 0, -0.022], [0.012, 0.006, 0.022]),
                ball('core', 'fur', 0.034, 0, 0, 0.004),
@@ -141,7 +141,7 @@ local cordNecklace(id, mass, body) =
 
   // A silver tie clip 55 mm long and 6 mm wide lying flat: a polished front bar with an engraved band near one end,
   // folded back on itself into a spring blade beneath.
-  h.compound('tieclip', 0.0084,
+  h.compound('tie_clip', 0.0084,
              [
                box('blade', 'silver', [-0.0255, 0, -0.0025], [0.026, 0.001, 0.0025]),
                h.tube('fold', 'silver', 0, 0.00175, -0.0025, 0.0025, 0, 0) + { axis: 'z', origin: [0.0265, 0.00175, -0.0025] },

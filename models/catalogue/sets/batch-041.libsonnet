@@ -59,7 +59,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
   ], { seat: 'plastic-matte-black', flap: 'rubber-gum' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A 152 mm square of stretch fabric lying loose, rippled where it was cut from a garment.
-  sheetRow('lycra_patch', 0.0047, 0.152, 0.152, [
+  sheetRow('stretch_fabric_patch', 0.0047, 0.152, 0.152, [
     [0.001, 0.003, 0.001, 0.004, 0.001],
     [0.004, 0.001, 0.006, 0.002, 0.003],
     [0.001, 0.007, 0.012, 0.006, 0.001],
@@ -102,7 +102,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
   ], { cloth: 'plastic-frosted', tail: 'plastic-frosted' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A square cut from a black bin bag, about 300 by 240 mm, lying crumpled.
-  sheetRow('plastic_sheet_small', 0.01, 0.3, 0.24, [
+  sheetRow('small_plastic_sheet', 0.01, 0.3, 0.24, [
     [0.002, 0.006, 0.002, 0.008, 0.003],
     [0.008, 0.02, 0.012, 0.024, 0.006],
     [0.003, 0.014, 0.032, 0.016, 0.002],
@@ -126,7 +126,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
   ], { sheet: 'plastic-clear', film: 'plastic-frosted' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A melted and cooled blob of off-white thermoplastic, 64 mm across, with a smaller lobe run off one side.
-  h.compound('thermo_resin_chunk', 0.042, [
+  h.compound('thermoplastic_resin_chunk', 0.042, [
     h.turned('blob', 'body', 'y', [[0, 0], [0, 0.026], [0.006, 0.028], [0.013, 0.025], [0.019, 0.018], [0.022, 0.009], [0.023, 0]]),
     h.turned('lobe', 'body', 'y', [[0, 0], [0, 0.012], [0.005, 0.012], [0.009, 0.008], [0.011, 0]], [0.026, 0, 0.01]),
     h.turned('drip', 'body', 'y', [[0, 0], [0, 0.006], [0.003, 0.006], [0.005, 0]], [-0.024, 0, -0.018]),

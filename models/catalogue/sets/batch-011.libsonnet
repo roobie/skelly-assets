@@ -39,7 +39,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A 5 gallon orange plastic bucket, 300 mm across the rim and 365 mm tall, its upper wall ringed with
   // stiffening ribs, a wire bail with a black plastic grip standing up over it.
-  h.compound('bucket_5gal', 0.99, [
+  h.compound('five_gallon_bucket', 0.99, [
     turned('pail', 'plastic', 'y', [[0, 0], [0, 0.128], [0.008, 0.13], [0.365, 0.15], [0.365, 0.146], [0.01, 0.126], [0.01, 0]]),
     ring('rim', 'plastic', 0.144, 0.158, 0.35, 0.365),
     ring('rib-a', 'plastic', 0.144, 0.156, 0.315, 0.323),
@@ -56,7 +56,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A bucket carved from one hardwood log section, 260 mm across and 240 mm tall, its thick wall left
   // rough, with two ears rising from the rim and a carved crossbar handle between them.
-  h.compound('bucket_wood', 2.1, [
+  h.compound('wooden_bucket', 2.1, [
     turned('pail', 'wood', 'y', [[0, 0], [0, 0.12], [0.24, 0.13], [0.24, 0.105], [0.035, 0.097], [0.035, 0]]),
     box('ear-left', 'handle', [-0.13, 0.22, -0.025], [-0.1, 0.35, 0.025]),
     box('ear-right', 'handle', [0.1, 0.22, -0.025], [0.13, 0.35, 0.025]),
@@ -65,12 +65,12 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A 355 ml aluminium drink can, 66 mm across and 122 mm tall, necked at the top, with a printed band
   // and a ring-pull tab on its lid.
-  h.compound('can_drink', 0.37, [
+  h.compound('drink_can', 0.37, [
     turned('can', 'can', 'y', [[0, 0], [0, 0.026], [0.006, 0.033], [0.106, 0.033], [0.116, 0.027], [0.12, 0.027], [0.12, 0]]),
     ring('lip', 'can', 0.024, 0.0275, 0.119, 0.122),
     turned('band', 'print', 'y', [[0, 0], [0, 0.0334], [0.07, 0.0334], [0.07, 0]], [0, 0.025, 0]),
     box('tab', 'tab', [-0.012, 0.12, -0.005], [0.006, 0.122, 0.005]),
-  ], { can: 'alu-bare', print: 'paint-red', tab: 'steel-stainless' }) + h.inHand('can_drink', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { can: 'alu-bare', print: 'paint-red', tab: 'steel-stainless' }) + h.inHand('drink_can', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An empty cardboard core, 42 mm across and 100 mm long, lying on its side.
   h.compound('cardboard_roll', 0.001, [
@@ -98,27 +98,27 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A cup folded from kitchen foil, about 80 mm across and 55 mm tall, its wall creased in vertical
   // folds and its lip turned over.
-  h.compound('cup_foil', 0.003, [
+  h.compound('foil_cup', 0.003, [
     turned('cup', 'foil', 'y', [[0, 0], [0, 0.028], [0.005, 0.031], [0.05, 0.037], [0.05, 0.035], [0.006, 0.029], [0.002, 0]]),
     ring('lip', 'foil', 0.034, 0.04, 0.049, 0.055),
   ] + [
     local t = 2 * std.pi * i / 7, r = 0.037;
     box('fold-%d' % i, 'foil', [r * std.cos(t) - 0.004, 0.004 + 0.004 * (i % 3), r * std.sin(t) - 0.004], [r * std.cos(t) + 0.004, 0.05, r * std.sin(t) + 0.004])
     for i in std.range(0, 6)
-  ], { foil: 'alu-bare' }) + h.inHand('cup_foil', 'cup') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { foil: 'alu-bare' }) + h.inHand('foil_cup', 'cup') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A thin vacuum-formed white cup, 80 mm across the rim and 95 mm tall, tapering to its base, with a
   // rolled rim and a stacking step near the foot.
-  h.compound('cup_plastic', 0.0029, [
+  h.compound('plastic_cup', 0.0029, [
     turned('cup', 'plastic', 'y', [[0, 0], [0, 0.028], [0.095, 0.039], [0.095, 0.037], [0.002, 0.026], [0.002, 0]]),
     ring('rim', 'plastic', 0.037, 0.041, 0.092, 0.096),
     ring('step', 'plastic', 0.029, 0.0315, 0.016, 0.02),
-  ], { plastic: 'plastic-white' }) + h.inHand('cup_plastic', 'cup') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { plastic: 'plastic-white' }) + h.inHand('plastic_cup', 'cup') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A coyote-brown fabric trauma kit pouch, 180 mm wide, 130 mm tall and 80 mm deep: a clamshell zipped
   // round its edge with two red pull tabs, a white patch with a red cross on the front and webbing straps
   // on the back.
-  h.compound('ifak_pouch', 0.45, [
+  h.compound('trauma_kit_pouch', 0.45, [
     h.prism('pouch', 'cloth', 'z', [[-0.08, 0], [0.08, 0], [0.09, 0.012], [0.09, 0.118], [0.08, 0.13], [-0.08, 0.13], [-0.09, 0.118], [-0.09, 0.012]], -0.04, 0.04),
     h.prism('zip', 'zip', 'z', [[-0.08, 0.004], [0.08, 0.004], [0.092, 0.014], [0.092, 0.118], [0.08, 0.132], [-0.08, 0.132], [-0.092, 0.118], [-0.092, 0.014]], -0.003, 0.003),
     box('pull-left', 'pull', [-0.05, 0.13, -0.004], [-0.04, 0.148, 0.004]),
@@ -133,7 +133,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A vacuum-sealed police first aid pack lying flat, 110 mm by 75 mm and 10 mm thick: a black pouch
   // drawn tight over a bandage roll, with welded ends and a white label carrying a red cross.
-  h.compound('ipok', 0.031, h.sachet(0.11, 0.075, 0.008) + [
+  h.compound('police_first_aid_pack', 0.031, h.sachet(0.11, 0.075, 0.008) + [
     rod('roll', 'pouch', 0.006, -0.04, 0.03, 0.006),
     box('label', 'label', [-0.03, 0.008, -0.032], [0.03, 0.009, 0.0]),
     box('cross-a', 'cross', [-0.012, 0.009, -0.02], [0.012, 0.0095, -0.012]),
@@ -143,14 +143,14 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A half-litre glass canning jar, 84 mm across and 127 mm tall, with a threaded neck under a steel
   // screw band and a gold flat lid.
-  h.compound('jar_glass_sealed', 0.42, [
+  h.compound('sealed_glass_jar', 0.42, [
     turned('jar', 'glass', 'y', [[0, 0], [0, 0.038], [0.004, 0.042], [0.092, 0.042], [0.104, 0.036], [0.112, 0.034], [0.112, 0.031], [0.104, 0.032], [0.092, 0.039], [0.006, 0.039], [0.006, 0]]),
     ring('thread', 'glass', 0.031, 0.0355, 0.104, 0.108),
     ring('band', 'band', 0.031, 0.0375, 0.109, 0.125),
     disc('lid', 'lid', 0.031, 0.121, 0.124),
     ring('band-top', 'band', 0.026, 0.0375, 0.124, 0.127),
   ], { glass: 'glass-clear', band: 'steel-grey', lid: 'foil-gold' })
-  + h.inHand('jar_glass_sealed', 'jar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
+  + h.inHand('sealed_glass_jar', 'jar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A red 10 litre plastic fuel can, 250 mm long, 160 mm deep and 330 mm tall: a sloped shoulder with a
   // capped spout, a carry handle moulded over the top and raised panels on both flanks.

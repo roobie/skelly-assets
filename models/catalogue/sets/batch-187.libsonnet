@@ -153,7 +153,7 @@ local braFlat(r, depth) =
 [
   // A cotton rag belly wrap half rolled, 180 mm wide: a roll 70 mm across and a 260 mm loose end of mismatched rag
   // strips with two tie ends.
-  h.compound('bellywrap', 0.12, wrap(0.18, 0.035, 0.26, 0.004, [[-0.04, 0.02, 0.07, 0.06], [0.05, 0.08, 0.06, 0.05]]), {
+  h.compound('rag_belly_wrap', 0.12, wrap(0.18, 0.035, 0.26, 0.004, [[-0.04, 0.02, 0.07, 0.06], [0.05, 0.08, 0.06, 0.05]]), {
     cloth: 'canvas-grey',
     layer: 'cloth-cream',
     patch: 'cloth-khaki',
@@ -163,7 +163,7 @@ local braFlat(r, depth) =
 
   // A fur belly wrap half rolled, 200 mm wide: a thick roll 110 mm across of brown pelts, a 260 mm loose end with
   // ragged pelt edges, and rawhide ties.
-  h.compound('bellywrap_fur', 0.4, wrap(0.2, 0.055, 0.26, 0.014, [[0.0, 0.05, 0.12, 0.08]], false, true), {
+  h.compound('fur_belly_wrap', 0.4, wrap(0.2, 0.055, 0.26, 0.014, [[0.0, 0.05, 0.12, 0.08]], false, true), {
     cloth: 'fur-brown',
     layer: 'skin-rawhide',
     patch: 'fur-pale',
@@ -173,7 +173,7 @@ local braFlat(r, depth) =
 
   // A leather belly wrap half rolled, 190 mm wide: a roll 90 mm across and a 260 mm loose end of stitched-on
   // leather patches, with thong ties.
-  h.compound('bellywrap_leather', 0.59, wrap(0.19, 0.045, 0.26, 0.006, [[-0.045, -0.01, 0.07, 0.07], [0.045, 0.05, 0.07, 0.07], [-0.03, 0.09, 0.08, 0.05]], true), {
+  h.compound('leather_belly_wrap', 0.59, wrap(0.19, 0.045, 0.26, 0.006, [[-0.045, -0.01, 0.07, 0.07], [0.045, 0.05, 0.07, 0.07], [-0.03, 0.09, 0.08, 0.05]], true), {
     cloth: 'leather-tan',
     layer: 'leather-chestnut',
     patch: 'leather-chestnut',
@@ -183,7 +183,7 @@ local braFlat(r, depth) =
 
   // A felted wool belly wrap half rolled, 180 mm wide: a roll 80 mm across and a 260 mm loose end of grey felt with
   // brown felt patches stitched on.
-  h.compound('bellywrap_wool', 0.16, wrap(0.18, 0.04, 0.26, 0.006, [[-0.04, 0.0, 0.07, 0.06], [0.04, 0.07, 0.06, 0.06]], true), {
+  h.compound('wool_belly_wrap', 0.16, wrap(0.18, 0.04, 0.26, 0.006, [[-0.04, 0.0, 0.07, 0.06], [0.04, 0.07, 0.06, 0.06]], true), {
     cloth: 'felt-grey',
     layer: 'wool-grey',
     patch: 'felt-brown',
@@ -193,7 +193,7 @@ local braFlat(r, depth) =
 
   // A cotton rag chest wrap half rolled, 140 mm wide: a roll 70 mm across and a 280 mm loose end of pale rag strips
   // with a darker patch and two tie ends.
-  h.compound('chestwrap', 0.092, wrap(0.14, 0.035, 0.28, 0.004, [[0.02, 0.04, 0.06, 0.05]]), {
+  h.compound('rag_chest_wrap', 0.092, wrap(0.14, 0.035, 0.28, 0.004, [[0.02, 0.04, 0.06, 0.05]]), {
     cloth: 'cloth-cream',
     layer: 'canvas-grey',
     patch: 'canvas-grey',
@@ -203,7 +203,7 @@ local braFlat(r, depth) =
 
   // A fur chest wrap half rolled, 160 mm wide: a roll 90 mm across of pale pelt, a 260 mm loose end with ragged
   // edges and a darker patch, and rawhide ties.
-  h.compound('chestwrap_fur', 0.22, wrap(0.16, 0.045, 0.26, 0.01, [[0.0, 0.05, 0.08, 0.07]], false, true), {
+  h.compound('fur_chest_wrap', 0.22, wrap(0.16, 0.045, 0.26, 0.01, [[0.0, 0.05, 0.08, 0.07]], false, true), {
     cloth: 'fur-pale',
     layer: 'skin-rawhide',
     patch: 'fur-brown',
@@ -213,7 +213,7 @@ local braFlat(r, depth) =
 
   // A fur bikini top laid flat, 450 mm across its thongs: two rounded triangle cups of brown pelt 130 mm across on a
   // rawhide backing, laced across the centre, with thongs round the back and neck.
-  h.compound('bikini_top_fur', 0.1, hideTop(0.13, 0.12, 0.008, false), {
+  h.compound('fur_bikini_top', 0.1, hideTop(0.13, 0.12, 0.008, false), {
     cup: 'fur-brown',
     backing: 'skin-rawhide',
     lace: 'skin-rawhide',
@@ -222,7 +222,7 @@ local braFlat(r, depth) =
 
   // A leather bikini top laid flat, 450 mm across its thongs: two rounded triangle cups of tan leather 130 mm across
   // with stitched edges, laced across the centre, with thongs round the back and neck.
-  h.compound('bikini_top_leather', 0.08, hideTop(0.13, 0.12, 0.003, true), {
+  h.compound('leather_bikini_top', 0.08, hideTop(0.13, 0.12, 0.003, true), {
     cup: 'leather-tan',
     backing: 'leather-chestnut',
     lace: 'leather-chestnut',
@@ -232,7 +232,7 @@ local braFlat(r, depth) =
   // A chest binder laid flat, neck at -z, 300 mm across and 360 mm long with its straps: a short stretch tank
   // ending above the waist, wide shoulder straps, a doubled compression panel across the front with its seams
   // showing, and a hem band.
-  h.compound('binder_top', 0.13, [
+  h.compound('chest_binder', 0.13, [
     flat('body', 'cloth', [[-0.12, -0.08], [0.12, -0.08], [0.15, -0.02], [0.15, 0.13], [-0.15, 0.13], [-0.15, -0.02]], 0, 0.003),
     box('panel', 'panel', [-0.13, 0.003, -0.05], [0.13, 0.005, 0.1]),
     box('hem', 'hem', [-0.15, 0.003, 0.11], [0.15, 0.005, 0.13]),

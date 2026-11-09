@@ -18,7 +18,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
 [
   // A steel-cased radio receiver module, 90 by 55 mm and 28 mm tall, with a short wire aerial and two leads
   // ending in clips, for wiring a radio trigger into a device.
-  h.compound('radio_mod', 0.17, [
+  h.compound('radio_trigger_module', 0.17, [
     box('case', 'case', [-0.045, 0, -0.0275], [0.045, 0.026, 0.0275]),
     box('lid', 'lid', [-0.043, 0.026, -0.0255], [0.043, 0.028, 0.0255]),
     box('label', 'label', [-0.022, 0.028, -0.014], [0.018, 0.03, 0.014]),
@@ -37,11 +37,11 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
   ], {
     case: 'steel-grey', lid: 'steel-bright', label: 'plastic-white', screw: 'steel-blued', led: 'plastic-red',
     terminal: 'circuit-green', base: 'plastic-black', aerial: 'steel-bright', 'lead-red': 'plastic-red', 'lead-black': 'plastic-black',
-  }) + h.inHand('radio_mod', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + h.inHand('radio_trigger_module', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A toy car's handheld radio transmitter, 160 by 110 mm and 40 mm thick, face up: one steering stick on the left,
   // four coloured buttons on the right, a power switch and a telescopic aerial, half drawn out, behind.
-  h.compound('radiocontrol', 0.34, [
+  h.compound('hobby_radio_transmitter', 0.34, [
     box('body', 'body', [-0.08, 0, -0.055], [0.08, 0.04, 0.055]),
     box('face', 'face', [-0.075, 0.04, -0.05], [0.075, 0.042, 0.05]),
     box('grip-left', 'body', [-0.08, -0.012, 0.02], [-0.05, 0, 0.055]),
@@ -63,11 +63,11 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     body: 'plastic-black', face: 'plastic-charcoal', gimbal: 'plastic-grey', stick: 'steel-bright', knob: 'rubber-black',
     'button-red': 'plastic-red', 'button-yellow': 'plastic-yellow', 'button-green': 'plastic-green', 'button-blue': 'plastic-blue',
     switch: 'steel-grey', label: 'plastic-white', base: 'plastic-black', aerial: 'steel-bright',
-  }) + h.inHand('radiocontrol', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + h.inHand('hobby_radio_transmitter', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A rugged handheld controller for a real vehicle, 200 by 130 mm and 50 mm thick, face up: a screen, two rows of
   // toggle switches, a drive stick, yellow corner bumpers and a stubby rubber aerial out of the back.
-  h.compound('remotevehcontrol', 0.79, [
+  h.compound('vehicle_remote_control', 0.79, [
     box('body', 'body', [-0.1, 0, -0.065], [0.1, 0.045, 0.065]),
     box('face', 'face', [-0.094, 0.045, -0.059], [0.094, 0.047, 0.059]),
   ] + [
@@ -94,7 +94,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
   ], {
     body: 'plastic-grey', face: 'plastic-charcoal', bumper: 'plastic-hivis', bezel: 'plastic-black', screen: 'screen-black',
     lever: 'steel-bright', knob: 'rubber-black', label: 'plastic-white', led: 'plastic-green', aerial: 'rubber-black',
-  }) + h.inHand('remotevehcontrol', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  }) + h.inHand('vehicle_remote_control', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A handheld two-way radio standing upright, 58 mm wide, 35 mm deep and 125 mm tall without its 85 mm rubber
   // aerial, front on +z: a speaker grille and small display on the front, a channel knob on top, a push-to-talk

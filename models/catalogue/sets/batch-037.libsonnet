@@ -79,7 +79,7 @@ local sheet(l, w, t, e, face, edge) = [
   // A gallon can of paint, 168 mm across and 192 mm tall: a steel can with rolled rims, a pressed lid, a wire bail
   // with a plastic grip, a wide label band in the paint's colour and a run of paint down the front from the rim.
   local r = 0.084, ht = 0.192;
-  h.compound('paint_red', 4.6, [
+  h.compound('red_paint', 4.6, [
     disc('body', 'can', r - 0.002, 0.004, ht - 0.004),
     turned('chime-bottom', 'can', 'y', [[0, 0], [0, r], [0.004, r], [0.004, 0]]),
     turned('chime-top', 'can', 'y', [[0, 0.07], [0, r], [0.006, r], [0.006, 0.07], [0, 0.07]], [0, ht - 0.006, 0]),

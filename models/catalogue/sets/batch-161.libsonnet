@@ -58,13 +58,13 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
 [
   // A long knitted wool scarf folded in a stack, 270 mm by 180 mm and 52 mm tall (about 2.4 m by 280 mm
   // unfolded): navy with two cream stripes across the top fold and a fringe hanging from the front edge.
-  h.compound('scarf_wool_long', 0.35, scarf(0.27, 0.18, 0.048, 4, 9, [-0.08, 0.08], 18),
+  h.compound('long_wool_scarf', 0.35, scarf(0.27, 0.18, 0.048, 4, 9, [-0.08, 0.08], 18),
              { cloth: 'cloth-navy', rib: 'cloth-navy', stripe: 'cloth-cream', fringe: 'cloth-navy' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A plain wool scarf folded in a stack, 200 mm by 140 mm and 38 mm tall (about 1.5 m by 200 mm unfolded): grey
   // knit with darker rib lines and a short fringe.
-  h.compound('scarf_wool', 0.14, scarf(0.2, 0.14, 0.034, 3, 7, [], 13),
+  h.compound('wool_scarf', 0.14, scarf(0.2, 0.14, 0.034, 3, 7, [], 13),
              { cloth: 'wool-grey', rib: 'plastic-charcoal', stripe: 'wool-grey', fringe: 'wool-grey' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
@@ -99,7 +99,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
   // A mercenary throat guard standing on its edge, 176 mm across and 112 mm tall: a ballistic collar 14 mm thick in a
   // coyote nylon cover, open at the back with hook-and-loop tabs, its throat flap dropping 52 mm at the front; the
   // black nylon guard sewn inside shows above the collar's top edge.
-  h.compound('throat_guard_ballistic', 0.3,
+  h.compound('ballistic_throat_guard', 0.3,
              wall('collar', 'cover', 0.072, 0.086, -145, 145, 29, function(a) if std.abs(a) < 55 then 0.052 * std.abs(a) / 55 else 0.052, 0.1)
              + wall('inner', 'inner', 0.064, 0.072, -150, 150, 30, function(a) 0.05, 0.112)
              + wall('seam-top', 'seam', 0.071, 0.087, -145, 145, 29, function(a) 0.096, 0.1)
@@ -112,7 +112,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
   // A fencing gorget standing on its lower edge, 290 mm across and 170 mm tall: a stiff collar of rubber under black
   // nylon, open at the back, flaring at the front into a broad bib sloping smoothly down over the collarbones and upper chest, with short
   // flaps over the sides of the nape and red binding round every edge.
-  h.compound('gorget_fencing', 0.26,
+  h.compound('fencing_gorget', 0.26,
              wall('collar', 'cover', 0.064, 0.076, -160, 160, 32, function(a) 0.1, 0.17)
              + std.flattenArrays([
                // Fine steps, finer than the voxel grain, so the bib reads as one smooth slope from the collar.

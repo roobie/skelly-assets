@@ -28,7 +28,7 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
   }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A clear acrylic tumbler 110 mm tall, 80 mm across the mouth and 64 mm at its thick base.
-  h.compound('tumbler_plastic', 0.058, [
+  h.compound('plastic_tumbler', 0.058, [
     turned('cup', 'cup', 'y', [[0, 0], [0, 0.032], [0.110, 0.040], [0.110, 0.037], [0.012, 0.030], [0.012, 0]]),
   ], { cup: 'plastic-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 

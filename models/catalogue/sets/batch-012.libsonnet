@@ -22,7 +22,7 @@ local bail(radius, earY, topY, wire, grip) = [
 [
   // A large animal's stomach cleaned and dried into a water skin, about 260 mm long and 160 mm across,
   // lying on its side with both openings twisted shut and tied off with cord.
-  h.compound('large_stomach_sealed', 3, [
+  h.compound('sealed_large_stomach', 3, [
     turned('stomach', 'skin', 'x', [[0, 0], [0, 0.02], [0.02, 0.05], [0.06, 0.075], [0.13, 0.08], [0.19, 0.07], [0.23, 0.045], [0.25, 0.018], [0.25, 0]], [-0.125, 0.078, 0]),
     turned('neck-a', 'skin', 'x', [[0, 0], [0, 0.014], [0.03, 0.01], [0.04, 0.016], [0.04, 0]], [-0.165, 0.09, 0]),
     turned('neck-b', 'skin', 'x', [[0, 0], [0, 0.016], [0.01, 0.01], [0.035, 0.014], [0.035, 0]], [0.12, 0.085, 0]),
@@ -50,7 +50,7 @@ local bail(radius, earY, topY, wire, grip) = [
 
   // A children's craft kit box lying flat, 320 mm long, 230 mm wide and 50 mm deep: a white printed lid
   // over a tan tray, the lid carrying a picture of coloured building parts and a red title band.
-  h.compound('maker_kit_box', 0.27, [
+  h.compound('craft_kit_box', 0.27, [
     box('tray', 'board', [-0.156, 0, -0.111], [0.156, 0.044, 0.111]),
     box('lid', 'lid', [-0.16, 0.012, -0.115], [0.16, 0.05, 0.115]),
     box('title', 'red', [-0.15, 0.05, 0.07], [0.15, 0.052, 0.105]),
@@ -81,37 +81,37 @@ local bail(radius, earY, topY, wire, grip) = [
 
   // A sealed meal ration bag lying flat, 260 mm long, 150 mm wide and 40 mm thick: a heavy tan pouch
   // with crimped seals at both ends and a dark printed panel.
-  h.compound('mre_package', 0.76, ration(0.26, 0.15, 0.04, 0.14), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
+  h.compound('ration_meal_bag', 0.76, ration(0.26, 0.15, 0.04, 0.14), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An entrée pouch from a meal ration lying flat, 190 mm long, 120 mm wide and 18 mm thick: a tan
   // foil-lined retort pouch with sealed ends and a dark printed panel.
-  h.compound('mre_bag', 0.24, ration(0.19, 0.12, 0.018, 0.1), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
+  h.compound('ration_entree_pouch', 0.24, ration(0.19, 0.12, 0.018, 0.1), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A side-dish pouch from a meal ration lying flat, 150 mm long, 90 mm wide and 12 mm thick, tan with
   // sealed ends and an olive printed panel.
-  h.compound('mre_bag_small', 0.1, ration(0.15, 0.09, 0.012, 0.08), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-olive' })
+  h.compound('ration_side_pouch', 0.1, ration(0.15, 0.09, 0.012, 0.08), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-olive' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A dessert pouch from a meal ration lying flat, 120 mm long, 70 mm wide and 8 mm thick, tan with
   // sealed ends and a red printed panel.
-  h.compound('mre_bag_dessert', 0.05, ration(0.12, 0.07, 0.008, 0.06), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-red' })
+  h.compound('ration_dessert_pouch', 0.05, ration(0.12, 0.07, 0.008, 0.06), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-red' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve jam packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick, tan
   // with sealed ends and a purple-red printed panel.
-  h.compound('mre_bag_jam', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-oxblood' })
+  h.compound('ration_jam_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-oxblood' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve spread packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick,
   // tan with sealed ends and a brown printed panel.
-  h.compound('mre_bag_spread', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paperboard-brown' })
+  h.compound('ration_spread_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paperboard-brown' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An empty one-gallon plastic paint pail, 170 mm across and 190 mm tall, 210 mm with its handle up:
   // white with a raised lid rim, a blue label band and a black plastic bail with a grip.
-  h.compound('paint_can_plastic', 0.2, [
+  h.compound('plastic_paint_pail', 0.2, [
     turned('pail', 'pail', 'y', [[0, 0], [0, 0.078], [0.17, 0.085], [0.17, 0]]),
     turned('rim', 'pail', 'y', [[0, 0], [0, 0.088], [0.016, 0.088], [0.016, 0]], [0, 0.17, 0]),
     turned('label', 'label', 'y', [[0, 0], [0, 0.082], [0.09, 0.086], [0.09, 0]], [0, 0.04, 0]),
@@ -120,7 +120,7 @@ local bail(radius, earY, topY, wire, grip) = [
 
   // An empty one-gallon steel paint can, 168 mm across and 190 mm tall, 210 mm with its handle up: bare
   // steel with rolled rims, a paper label band, and a wire bail with a wooden grip.
-  h.compound('paint_can_steel', 0.46, [
+  h.compound('metal_paint_can', 0.46, [
     turned('can', 'steel', 'y', [[0, 0], [0, 0.082], [0.19, 0.082], [0.19, 0]]),
     turned('chime-foot', 'steel', 'y', [[0, 0], [0, 0.085], [0.008, 0.085], [0.008, 0]]),
     turned('chime-top', 'steel', 'y', [[0, 0], [0, 0.085], [0.01, 0.085], [0.01, 0]], [0, 0.18, 0]),

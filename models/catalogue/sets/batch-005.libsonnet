@@ -92,12 +92,12 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
 
   // A 250 ml plastic soda bottle of dark homemade cola, 54 mm across and 150 mm tall, with a strip of
   // tape for a label. The body shows the liquid, as through clear plastic.
-  h.compound('methacola', 0.22, [
+  h.compound('stimulant_cola', 0.22, [
     disc('liquid', 'liquid', 0.027, 0, 0.1),
     turned('shoulder', 'plastic', 'y', [[0.1, 0], [0.1, 0.027], [0.122, 0.011], [0.136, 0.011], [0.136, 0]]),
     disc('cap', 'cap', 0.0125, 0.136, 0.15),
     turned('tape', 'tape', 'y', [[0.035, 0], [0.035, 0.0275], [0.065, 0.0275], [0.065, 0]]),
-  ], { liquid: 'paint-oxblood', plastic: 'glass-clear', cap: 'plastic-red', tape: 'tape-grey' }) + inHand('methacola', 'liquid') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'] } } },
+  ], { liquid: 'paint-oxblood', plastic: 'glass-clear', cap: 'plastic-red', tape: 'tape-grey' }) + inHand('stimulant_cola', 'liquid') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'] } } },
 
   // A tiny glass vial of crack, 12 mm across and 32 mm tall, with a coloured push cap.
   h.compound('crack', 0.0059, [

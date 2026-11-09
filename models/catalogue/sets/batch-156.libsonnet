@@ -132,7 +132,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   // whole face, a raised brow ridge over two smoked eye ports, a nose ridge, grilled breathing slots at the mouth and
   // a webbing harness running back from the sides.
   local r = 0.095, cz = -r, span = 76, c = 0.125, b = 0.125;
-  h.compound('mask_bal', 0.25, faceShell(r, span, c, b, 2.4, 0.006, 24)
+  h.compound('ballistic_face_mask', 0.25, faceShell(r, span, c, b, 2.4, 0.006, 24)
                                 + wrapBand('rim', 'trim', r + 0.002, 0.008, -span, span, 24, cz, function(a) ovalLow(a, span + 6, c, b, 2.4), function(a) ovalLow(a, span + 6, c, b, 2.4) + 0.008)
                                 + wrapBand('brow', 'trim', r + 0.008, 0.01, -48, 48, 12, cz, function(a) 0.178 - 0.008 * sq(a / 48), function(a) 0.192 - 0.008 * sq(a / 48))
                                 + patch('eye-l', 'lens', r, cz, -44, -10, 0.14, 0.172, 4)
@@ -150,7 +150,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   // A white cotton dust mask standing on its lower edge, 160 mm across and 105 mm tall: a pleated cloth cup over the
   // mouth and nose, a soft metal strip across the bridge of the nose and two elastic straps looping back.
   local r = 0.072, cz = -r, span = 66;
-  h.compound('mask_dust', 0.008, faceShell(r, span, 0.052, 0.052, 2.2, 0.004, 20)
+  h.compound('dust_mask', 0.008, faceShell(r, span, 0.052, 0.052, 2.2, 0.004, 20)
                                  + std.flattenArrays([
                                    wrapBand('pleat-%d' % i, 'cloth', r + 0.003, 0.004, -span + 10, span - 10, 16, cz, function(a) y, function(a) y + 0.005)
                                    for i in std.range(0, 2)
@@ -164,7 +164,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   // A white goalie's mask standing on its chin, 200 mm across and 250 mm tall: a moulded plastic shell with two eye
   // holes, a ridge down the nose, rows of breathing holes over the cheeks and mouth, and three elastic straps.
   local r = 0.095, cz = -r, span = 74, c = 0.125, b = 0.125;
-  h.compound('mask_hockey', 0.2, faceShell(r, span, c, b, 2.2, 0.005, 24)
+  h.compound('goalie_mask', 0.2, faceShell(r, span, c, b, 2.2, 0.005, 24)
                                    + patch('eye-l', 'hole', r, cz, -42, -12, 0.145, 0.172, 4)
                                    + patch('eye-r', 'hole', r, cz, 12, 42, 0.145, 0.172, 4)
                                    + wrapBand('nose', 'ridge', r + 0.006, 0.01, -5, 5, 2, cz, function(a) 0.075, function(a) 0.205)
@@ -194,7 +194,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
     [0.06, 0.13, 0.04, 0.026, 0.085, 0.07],
     [0.13, 0.19, 0.026, 0.004, 0.07, 0.045],
   ];
-  h.compound('mask_plague', 0.35, faceShell(r, span, 0.12, 0.11, 2.6, 0.005, 24)
+  h.compound('plague_mask', 0.35, faceShell(r, span, 0.12, 0.11, 2.6, 0.005, 24)
                                   + [
                                     h.turned('beak-%d' % i, 'leather', 'z', [[0, 0], [0, beak[i][2]], [beak[i][1] - beak[i][0], beak[i][3]], [beak[i][1] - beak[i][0], 0]], [0, beak[i][4], beak[i][0]])
                                     for i in std.range(0, 2)
@@ -219,7 +219,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   // A cotton T-shirt knotted into a mask, laid flat, 300 mm across and 440 mm long: the shirt's body creased where
   // it was pulled over the head, its ribbed neck band stretched into a wide eye opening, and its two sleeves pulled
   // round and tied in a knot behind.
-  h.compound('mask_rioter', 0.22, [
+  h.compound('tied_shirt_mask', 0.22, [
     flat('body', 'cloth', [[-0.15, -0.09], [0.15, -0.09], [0.15, 0.2], [-0.15, 0.2]], 0, 0.012),
     flat('shoulder-l', 'cloth', [[-0.15, -0.09], [-0.06, -0.12], [-0.06, -0.09]], 0, 0.012),
     flat('shoulder-r', 'cloth', [[0.06, -0.12], [0.15, -0.09], [0.06, -0.09]], 0, 0.012),
@@ -242,7 +242,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   // A white plastic skull mask standing on its chin, 180 mm across and 240 mm tall: a thin moulded shell shaped as a
   // grinning skull, with deep black eye sockets, a nose hole, a row of teeth and an elastic cord behind.
   local r = 0.09, cz = -r, span = 74, c = 0.12, b = 0.12;
-  h.compound('mask_skull', 0.098, faceShell(r, span, c, b, 2.0, 0.003, 24)
+  h.compound('skull_mask', 0.098, faceShell(r, span, c, b, 2.0, 0.003, 24)
                                  + patch('eye-l', 'hole', r, cz, -42, -10, 0.13, 0.172, 4)
                                  + patch('eye-r', 'hole', r, cz, 10, 42, 0.13, 0.172, 4)
                                  + triangle('nose', 'hole', function(y) r, cz, 0, 8, 0.088, 0.118, 3)

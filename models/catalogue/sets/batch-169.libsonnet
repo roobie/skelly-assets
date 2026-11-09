@@ -162,7 +162,7 @@ local fur = layout({
   folded('jumpsuit', 1.1, suit(layout({ pockets: chestPockets })), orange) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // The same jumpsuit without pockets.
-  folded('jumpsuit_pocketless', 1.1, suit(layout({})), orange) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('pocketless_jumpsuit', 1.1, suit(layout({})), orange) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A white jumpsuit printed with red stripes and a blue starred corner on the chest, folded as the jumpsuit.
   folded('flag_jumpsuit', 1.1, suit(flag)
@@ -179,10 +179,10 @@ local fur = layout({
          cloth('cloth-bright-white', 'cloth-red') + { stripe: 'cloth-red', canton: 'cloth-navy', star: 'cloth-bright-white', button: 'cloth-bright-white' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A black long-sleeved jumpsuit printed with bones, its skull-printed hood unzipped and folded back over the collar.
-  folded('jumpsuit_skeleton', 1.2, suit(skeleton { hood: { w: 0.15, l: 0.1 } }) + legBones(skeleton) + chestBones(skeleton, 3), skeletonFinish) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('skeleton_jumpsuit', 1.2, suit(skeleton { hood: { w: 0.15, l: 0.1 } }) + legBones(skeleton) + chestBones(skeleton, 3), skeletonFinish) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // The same jumpsuit with its hood zipped up and laid face up over the chest, showing the skull.
-  folded('jumpsuit_skeleton_zipped', 1.2, suit(skeleton) + legBones(skeleton) + chestBones(skeleton, 3)
+  folded('zipped_skeleton_jumpsuit', 1.2, suit(skeleton) + legBones(skeleton) + chestBones(skeleton, 3)
                                            + hoodUp(skeleton, 0.16, 0.2, -0.035, skeleton.ht + 0.018, true), skeletonFinish) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // An off-white jumpsuit printed with crossing bandage wraps, a few loose ends trailing off the sides.
@@ -209,10 +209,10 @@ local fur = layout({
 
   // Navy canvas work coveralls folded, 360 mm by 320 mm and about 90 mm tall: zip front, flapped chest pockets with
   // press studs, flapped thigh pockets on the folded legs.
-  folded('technician_coveralls', 1.1, suit(coverall), cloth('cloth-navy', 'cloth-charcoal') + { button: 'steel-grey' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('work_coveralls', 1.1, suit(coverall), cloth('cloth-navy', 'cloth-charcoal') + { button: 'steel-grey' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Brown duck coveralls with a quilted lining, folded thicker, a pale fleece collar and double knees.
-  folded('technician_coveralls_h', 2, suit(heavy)
+  folded('insulated_work_coveralls', 2, suit(heavy)
                                           + [
                                             box('knee-%d' % (s + 1), 'knee', [s * heavy.legX - 0.05, heavy.legTop, heavy.legZ1 - heavy.legs.cuff - 0.05], [s * heavy.legX + 0.05, heavy.legTop + 0.004, heavy.legZ1 - heavy.legs.cuff - 0.004])
                                             for s in [-1, 1]
@@ -231,7 +231,7 @@ local fur = layout({
 
   // A thick knitted wool onesie folded, 360 mm by 320 mm and about 110 mm tall: a hood folded back, footed legs and
   // pale zigzag pattern bands across the chest, sleeves and legs.
-  folded('wool_suit', 1.5, suit(wool)
+  folded('wool_onesie', 1.5, suit(wool)
                              + zigzag('band-leg-a', 'band', -wool.w / 2 + 0.03, wool.w / 2 - 0.03, -0.12, 0.008, 10, wool.legTop)
                              + zigzag('band-leg-b', 'band', -wool.w / 2 + 0.03, wool.w / 2 - 0.03, -0.075, 0.008, 10, wool.legTop)
                              + zigzag('band-chest', 'band', -0.1, 0.1, wool.chest[0] + 0.02, 0.008, 6, wool.ht + 0.003)
@@ -240,7 +240,7 @@ local fur = layout({
 
   // A red wool onesie folded as the thick onesie, its hood carrying two black horns and a pointed tail lying across
   // the folded legs.
-  folded('wool_suit_devil', 1.5, suit(wool)
+  folded('devil_onesie', 1.5, suit(wool)
                                    + [
                                      h.turned('horn-%d' % (s + 1), 'horn', 'y', [[0, 0], [0, 0.014], [0.02, 0.009], [0.036, 0.003], [0.04, 0]], [s * 0.04, wool.ht + 0.012, wool.d / 2 - 0.035])
                                      for s in [-1, 1]

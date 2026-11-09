@@ -47,7 +47,7 @@ local segment(i, n, r0, r) =
   // front on a side arm, a round motor body with the battery under it, a loop handle over the top and a closed
   // rear handle with its trigger.
   local r = 0.115, cx = 0.215, cy = 0.122;
-  h.compound('electric_masonrysaw_off', 4.2, cutoffBlade(r, cx, cy) + rearHandle(-0.245, -0.07, 0.165) + loopHandle(0.0, 0.245, -0.060, 0.050, 0.150) + [
+  h.compound('cordless_cut_off_saw', 4.2, cutoffBlade(r, cx, cy) + rearHandle(-0.245, -0.07, 0.165) + loopHandle(0.0, 0.245, -0.060, 0.050, 0.150) + [
     box('arm', 'body', [0.05, cy - 0.022, -0.050], [cx, cy + 0.022, -0.016]),
     turned('motor', 'body', 'x', [[0, 0], [0, 0.055], [0.010, 0.068], [0.150, 0.068], [0.170, 0.052], [0.170, 0]], [-0.110, 0.140, -0.010]),
     box('vents', 'trim', [-0.060, 0.135, 0.050], [0.010, 0.150, 0.060]),
@@ -55,11 +55,11 @@ local segment(i, n, r0, r) =
     box('battery-band', 'battery-band', [-0.140, 0.060, -0.041], [-0.020, 0.072, 0.041]),
     box('neck', 'body', [-0.080, 0.100, -0.025], [-0.060, 0.170, 0.025]),
   ], { blade: 'steel-bright', guard: 'paint-charcoal', body: 'plastic-red', trim: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', battery: 'plastic-black', 'battery-band': 'plastic-red' })
-  + { handling: h.gripOn('electric_masonrysaw_off', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { handling: h.gripOn('cordless_cut_off_saw', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 125 mm segmented diamond cutting disc for an angle grinder, 2.4 mm thick: a steel core with a 22 mm bore,
   // ten dark diamond segments round its rim and a paper label ring at the centre.
-  h.compound('grinder_blade', 0.14, [
+  h.compound('diamond_cutting_disc', 0.14, [
     ring('core', 'core', 'y', 0.011, 0.0575, 0.0018, [0, 0.0003, 0]),
     ring('label', 'label', 'y', 0.011, 0.030, 0.0004, [0, 0.0021, 0]),
   ] + std.flattenArrays([segment(i, 10, 0.055, 0.0625) for i in std.range(0, 9)]),
@@ -70,7 +70,7 @@ local segment(i, n, r0, r) =
   // engine under a cover with the starter on its far side, a fuel tank and closed rear handle behind, a loop handle
   // over the top and a muffler at the front.
   local r = 0.175, cx = 0.330, cy = 0.182;
-  h.compound('masonrysaw_off', 7.3, cutoffBlade(r, cx, cy) + rearHandle(-0.33, -0.15, 0.215) + loopHandle(0.04, 0.340, -0.085, 0.075, 0.200) + [
+  h.compound('petrol_cut_off_saw', 7.3, cutoffBlade(r, cx, cy) + rearHandle(-0.33, -0.15, 0.215) + loopHandle(0.04, 0.340, -0.085, 0.075, 0.200) + [
     box('arm', 'body', [0.10, cy - 0.030, -0.065], [cx, cy + 0.030, -0.020]),
     box('crankcase', 'engine', [-0.15, 0.020, -0.080], [0.13, 0.130, 0.070]),
     box('cover', 'body', [-0.12, 0.130, -0.070], [0.11, 0.270, 0.060]),
@@ -81,7 +81,7 @@ local segment(i, n, r0, r) =
     box('tank', 'body', [-0.33, 0.020, -0.060], [-0.15, 0.110, 0.060]),
     disc('fuel-cap', 'cover', 0.018, 0.110, 0.125, -0.27, 0.0),
   ], { blade: 'steel-bright', guard: 'plastic-orange', body: 'plastic-orange', cover: 'plastic-white', engine: 'paint-charcoal', muffler: 'steel-grey', handle: 'plastic-black', grip: 'rubber-black' })
-  + { handling: h.gripOn('masonrysaw_off', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { handling: h.gripOn('petrol_cut_off_saw', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A carton of adhesive plasters 75 mm wide, 95 mm tall and 28 mm deep standing upright, a blue printed band
   // across the top, a red cross and a single plaster pictured on its front.
@@ -126,7 +126,7 @@ local segment(i, n, r0, r) =
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A strip of torn cloth rolled into a bandage 45 mm wide and 26 mm across, its loose end trailing 30 mm.
-  h.compound('bandages_makeshift', 0.0083, [
+  h.compound('makeshift_bandage', 0.0083, [
     turned('roll', 'cloth', 'x', [[0, 0], [0, 0.012], [0.045, 0.0125], [0.045, 0]], [-0.0225, 0.013, 0]),
     ring('layer-a', 'layer', 'x', 0.004, 0.005, 0.0005, [-0.023, 0.013, 0]),
     ring('layer-b', 'layer', 'x', 0.008, 0.009, 0.0005, [-0.023, 0.013, 0]),

@@ -181,7 +181,7 @@ local medal(id, mass) =
   // the tie ends trailing at -z and a few knick-knacks threaded on: wooden letter cubes, a green bead and an orange
   // bead.
   local R = 0.03;
-  h.compound('bracelet_friendship', 0.003,
+  h.compound('friendship_bracelet', 0.003,
              std.flattenArrays([
                h.crescent('band-%d' % i, ['thread-a', 'thread-b', 'thread-c'][i % 3], R - 0.003, R + 0.003, 15 + 330 * i / 24, 15 + 330 * (i + 1) / 24, 1, 0, 0.003)
                for i in std.range(0, 23)
@@ -208,7 +208,7 @@ local medal(id, mass) =
   // A pair of black bunny ears on a headband, standing on the band's ends, front on +z: a black velvet band 150 mm
   // across and two upright ears 150 mm tall, splayed a little, with pink inner faces.
   local ax = 0.07, ay = 0.085, top = ay + 0.006;
-  h.compound('bunny_ears_black', 0.026,
+  h.compound('black_bunny_ears', 0.026,
              archXY('band', 'band', ax, ay, 0.006, 0, 180, 18, -0.006, 0.006)
              + std.flattenArrays([
                [
@@ -223,7 +223,7 @@ local medal(id, mass) =
   // A detached shirt collar standing on its lower edge, 130 mm across and 40 mm tall, front on +z: a white band with
   // its wing tips folded down at the front, a gold stud at the back and a black bow tie 95 mm wide at the throat.
   local R = 0.065, ht = 0.04;
-  h.compound('collar_playboy', 0.02,
+  h.compound('bow_tie_collar', 0.02,
              [
                h.turned('band', 'collar', 'y', [[0, R - 0.002], [0, R], [ht, R], [ht, R - 0.002], [0, R - 0.002]]),
                h.prism('wing-left', 'collar', 'z', [[-0.003, ht], [-0.02, ht], [-0.012, ht - 0.016]], R - 0.004, R + 0.002),
@@ -238,7 +238,7 @@ local medal(id, mass) =
 
   // A silver collar bar 55 mm long lying on the floor: a slim rod with a ball at each end, one of them screwing off
   // so the bar passes through the collar's eyelets.
-  h.compound('collarpin', 0.0064,
+  h.compound('collar_bar', 0.0064,
              [
                h.rod('bar', 'metal', 0.0015, -0.024, 0.024, 0.003),
                ball('end-left', 'metal', 0.0035, -0.0255, 0, -0.0005),

@@ -175,7 +175,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
   // A pair of hardened steel mail gloves laid flat side by side, backs up, each 270 mm from cuff to fingertip and
   // 95 mm across the knuckles: riveted rings closing every finger, ridged where the rows lie, and a leather thong
   // round each flared cuff. The rusted junk pair shares this model.
-  h.compound('ch_chainmail_hands', 1.2, pair(chainOpts, function(p, cx, s)
+  h.compound('hardened_steel_mail_gloves', 1.2, pair(chainOpts, function(p, cx, s)
     ringRows(p, cx, s, chainOpts, 'mail', 0.012)
     + [sbox(p + 'thong', 'thong', [cx - 0.057, 0, -0.045], [cx + 0.057, 0.024, -0.037])], 0.075), { mail: 'steel-hardened', thong: 'leather-brown' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['hands'] } } },
@@ -183,7 +183,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
   // A pair of hardened steel demi-gauntlets laid flat side by side, backs up, 230 mm from cuff to fingertip: leather
   // gloves with mail fingers and thumb, a curved plate riveted over the back of the hand, a lame over the knuckles
   // and a flared steel cuff over the wrist.
-  h.compound('ch_demi_gaunt', 1.5, pair(demiOpts, function(p, cx, s)
+  h.compound('hardened_steel_demi_gauntlets', 1.5, pair(demiOpts, function(p, cx, s)
     backPlate(p, cx, demiOpts, 0.004, 0.08)
     + h.curvedPlate(p + 'knuckle', 'plate', [[-0.042, 0.078], [0.042, 0.078], [0.042, 0.1], [-0.042, 0.1]], 0.024, 0.003, 0.09, 6, cx)
     + cuffPlate(p, cx, -0.095, 0.004, 0.052, 0.058)
@@ -193,7 +193,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
   // A pair of hardened steel mitten gauntlets laid flat side by side, backs up, 260 mm from cuff to fingertip:
   // leather mittens with a mail thumb, a riveted plate over the back of the hand, four overlapping lames and a tip
   // plate over the fingers, and a flared steel cuff.
-  h.compound('ch_mitten_gaunt', 2, pair(mittenOpts, function(p, cx, s)
+  h.compound('hardened_steel_mitten_gauntlets', 2, pair(mittenOpts, function(p, cx, s)
     backPlate(p, cx, mittenOpts, 0.004, 0.09)
     + std.flattenArrays([shift(lameAcross(p + 'lame-%d' % k, 'plate', 0.045, 0.044, 0.098 + k * 0.02, 0.124 + k * 0.02, 0.023 + 0.001 * (3 - k)), cx) for k in std.range(0, 3)])
     + shift(lameAcross(p + 'tip', 'plate', 0.035, 0.03, 0.176, 0.194, 0.02), cx)
@@ -203,7 +203,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
   // A pair of crude sheet metal mitten gauntlets laid flat side by side, backs up, 280 mm from cuff to tip: rag
   // mittens under one bent steel sheet each over the back and fingers, a second sheet over the knuckles, a sheet on
   // the thumb, and a rolled sheet cuff bound with wire.
-  h.compound('ch_mitten_gaunt_metal_sheets', 1.6, pair(sheetOpts, function(p, cx, s)
+  h.compound('hardened_sheet_steel_gauntlets', 1.6, pair(sheetOpts, function(p, cx, s)
     shift(h.curvedPlate(p + 'sheet', 'sheet', [[-0.05, -0.005], [0.048, 0.0], [0.05, 0.12], [0.04, 0.19], [-0.038, 0.188], [-0.05, 0.115]], 0.023, 0.003, 0.1, 6), cx)
     + shift(lameAcross(p + 'knuckle', 'sheet', 0.052, 0.05, 0.085, 0.125, 0.027, 0.1), cx)
     + [
@@ -228,17 +228,17 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
 
   // A right-hand fencing gauntlet laid flat, back up, 230 mm from cuff to fingertip: a suede glove with a padded
   // back, a wrist strap and a wide cotton gauntlet cuff 130 mm long.
-  h.compound('gauntlet_fencing', 0.19, fencing(1), { suede: 'suede-brown', pad: 'suede-brown', cotton: 'cloth-bright-white', strap: 'leather-white' })
+  h.compound('fencing_gauntlet', 0.19, fencing(1), { suede: 'suede-brown', pad: 'suede-brown', cotton: 'cloth-bright-white', strap: 'leather-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // The left-hand fencing gauntlet, the mirror of the right.
-  h.compound('gauntlet_fencing_l', 0.19, fencing(-1), { suede: 'suede-brown', pad: 'suede-brown', cotton: 'cloth-bright-white', strap: 'leather-white' })
+  h.compound('left_hand_fencing_gauntlet', 0.19, fencing(-1), { suede: 'suede-brown', pad: 'suede-brown', cotton: 'cloth-bright-white', strap: 'leather-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of chitin gauntlets laid flat side by side, backs up, 250 mm from cuff to fingertip: dark leather gloves
   // under a domed shell over the back of the hand with a ridge down its middle, three shell segments down each
   // finger and two on the thumb, and a shell bracer over the wrist laced with sinew.
-  h.compound('gauntlets_chitin', 0.56, pair(chitinOpts, function(p, cx, s)
+  h.compound('chitin_gauntlets', 0.56, pair(chitinOpts, function(p, cx, s)
     local x(v) = cx + s * v;
     shift(h.curvedPlate(p + 'back', 'shell', [[-0.044, 0.0], [0.044, 0.0], [0.046, 0.06], [0.03, 0.098], [-0.03, 0.098], [-0.046, 0.06]], 0.024, 0.004, 0.08, 6), cx)
     + [sbox(p + 'ridge', 'shell', [cx - 0.004, 0.034, 0.008], [cx + 0.004, 0.04, 0.09])]
@@ -261,7 +261,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
 
   // A pair of heavy fingerless leather gloves laid flat side by side, backs up, 200 mm from cuff to finger stubs:
   // thick leather with a padded back panel and knuckle roll, and a flared cuff with a buckled strap.
-  h.compound('gauntlets_larmor', 0.47, pair(larmorOpts, function(p, cx, s)
+  h.compound('leather_armour_gauntlets', 0.47, pair(larmorOpts, function(p, cx, s)
     local x(v) = cx + s * v;
     [
       sbox(p + 'pad', 'pad', [cx - 0.04, 0.026, 0.008], [cx + 0.04, 0.032, 0.084]),
@@ -273,7 +273,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
 
   // A single white cotton glove for the right hand laid flat, back up, 220 mm from cuff to fingertip, its back,
   // fingers and cuff studded with rows of rhinestones.
-  h.compound('glove_jackson', 0.053, glove('', 0, 1, jacksonOpts) + [
+  h.compound('rhinestone_glove', 0.053, glove('', 0, 1, jacksonOpts) + [
     sbox('stone-back-%d-%d' % [i, j], 'stone', [-0.034 + i * 0.0135, 0.018, 0.006 + j * 0.0125], [-0.031 + i * 0.0135, 0.02, 0.009 + j * 0.0125])
     for i in std.range(0, 5)
     for j in std.range(0, 6)
@@ -294,7 +294,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
   // A pair of fingerless airsoft gloves laid flat side by side, backs up, 160 mm from cuff to finger stubs: tan
   // leather with a moulded plastic guard over the knuckles, a second over the back of the hand, a small guard on
   // each finger stub and a hook-and-loop wrist strap.
-  h.compound('gloves_airsoft', 0.26, pair(airsoftOpts, function(p, cx, s)
+  h.compound('airsoft_gloves', 0.26, pair(airsoftOpts, function(p, cx, s)
     local x(v) = cx + s * v;
     shift(lameAcross(p + 'knuckle', 'guard', 0.045, 0.043, 0.07, 0.102, 0.022, 0.07), cx)
     + shift(lameAcross(p + 'back', 'guard', 0.034, 0.038, 0.02, 0.062, 0.022, 0.07), cx)
@@ -311,6 +311,6 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
 
   // A pair of thin plastic bags worn as gloves, laid flat side by side, each 170 mm wide and 330 mm long, closed at
   // the fingers and gathered at the wrist under a band of tape.
-  h.compound('gloves_bag', 0.012, bagGlove('l-', -0.095) + bagGlove('r-', 0.095), { bag: 'plastic-bag', tape: 'tape-grey' })
+  h.compound('bag_gloves', 0.012, bagGlove('l-', -0.095) + bagGlove('r-', 0.095), { bag: 'plastic-bag', tape: 'tape-grey' })
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['hands'] } } },
 ]

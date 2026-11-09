@@ -120,7 +120,7 @@ local alderParts =
 
   // A sheet of birch bark, 300 mm long and 120 mm across its curl, about 4 mm thick: a chalky white outer
   // skin crossed by dark horizontal lenticels, and a tan inner face.
-  h.compound('birchbark', 0.074, barkStrip(0.3, 0.12, 0.004, 0.022, 8, tears) + [
+  h.compound('birch_bark', 0.074, barkStrip(0.3, 0.12, 0.004, 0.022, 8, tears) + [
     box('lenticel-%d-%d' % [i, j], 'mark', [-0.13 + 0.04 * i + 0.012 * (j % 2), 0.0248 - 0.0006 * std.abs(j - 1), -0.016 + 0.014 * j], [-0.112 + 0.04 * i + 0.012 * (j % 2) - 0.004 * (i % 2), 0.0264, -0.0145 + 0.014 * j])
     for i in std.range(0, 6)
     for j in std.range(0, 2)
@@ -156,7 +156,7 @@ local alderParts =
     for i in std.range(0, n - 1)
   ];
   [
-    h.compound('blade_scythe', 1.1, band('spine', 'spine', 0, 0.16, 0, 0.007)
+    h.compound('scythe_blade', 1.1, band('spine', 'spine', 0, 0.16, 0, 0.007)
       + band('body', 'blade', 0.16, 0.82, 0, 0.003)
       + band('edge', 'edge', 0.82, 1, 0.0005, 0.0022)
       + [
@@ -266,7 +266,7 @@ local alderParts =
 
   // A body pillow rolled up for carrying, 620 mm long and 320 mm across, lying along x: the printed cover
   // rolled round itself so its ends show the spiral, held by two navy webbing straps with steel buckles.
-  h.compound('bodypillow', 1.7, [
+  h.compound('body_pillow', 1.7, [
     turned('roll', 'cover', 'x', [[0, 0], [0, 0.152], [0.01, 0.16], [0.6, 0.16], [0.61, 0.152], [0.61, 0]], [-0.305, 0.16, 0]),
   ] + [
     turned('spiral-%d-%d' % [e, k], 'print', 'x', [[0, 0.03 + 0.04 * k], [0, 0.044 + 0.04 * k], [0.003, 0.044 + 0.04 * k], [0.003, 0.03 + 0.04 * k], [0, 0.03 + 0.04 * k]], [[-0.307, 0.304][e], 0.16, 0])
@@ -325,7 +325,7 @@ local alderParts =
   local bladders = [[-0.03, 0.025, -0.012, 0.025], [0.022, 0.024, -0.02, 0.024], [0.0, 0.023, 0.03, 0.023], [-0.004, 0.058, 0.0, 0.027]];
   local ball(id, slot, x, y, z, r) = turned(id, slot, 'y', [[0, 0], [0, r * 0.6], [r * 0.3, r * 0.92], [r, r], [r * 1.7, r * 0.92], [r * 2, r * 0.5], [r * 2, 0]], [x, y - r, z]);
   [
-    h.compound('ballast', 0.28, [
+    h.compound('float_bladders', 0.28, [
       ball('bladder-%d' % i, 'bladder', b[0], b[1], b[2], b[3])
       for i in std.range(0, std.length(bladders) - 1)
       for b in [bladders[i]]
@@ -345,7 +345,7 @@ local alderParts =
 + [
   // A large unopened flower bud from a giant plant, lying along x: a pointed deep pink-purple bud 110 mm
   // long and 56 mm across, cupped in five green sepals at its swollen base, on a short cut stem.
-  h.compound('biollante_bud', 0.12, [
+  h.compound('giant_flower_bud', 0.12, [
     turned('bud', 'petal', 'x', [[0, 0], [0, 0.022], [0.02, 0.028], [0.05, 0.026], [0.08, 0.016], [0.1, 0.006], [0.11, 0]], [-0.04, 0.028, 0]),
     turned('base', 'sepal', 'x', [[0, 0], [0, 0.008], [0.012, 0.02], [0.02, 0.024], [0.02, 0]], [-0.06, 0.028, 0]),
     h.rod('stem', 'stem', 0.005, -0.1, -0.06, 0.028),

@@ -141,7 +141,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   // at the neck and bound round with two leather bands, lashed in two rows onto a flat rawhide harness with flat
   // shoulder straps and a tie belt.
   local skins = [[-0.1, -0.12], [0.1, -0.12], [-0.1, 0.1], [0.1, 0.1]];
-  h.compound('flotation_vest_makeshift', 0.8, [
+  h.compound('hide_float', 0.8, [
     box('harness', 'harness', [-0.18, 0.0, -0.24], [0.18, 0.004, 0.2]),
   ] + [
     h.turned('skin-%d' % i, 'skin', 'z', [[0, 0], [0.015, 0.035], [0.05, 0.055], [0.12, 0.058], [0.17, 0.045], [0.19, 0.02], [0.195, 0]], [skins[i][0], 0.058, skins[i][1] - 0.1])
@@ -188,7 +188,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   // A cropped hoodie folded, 320 mm by 230 mm and 50 mm tall: the hood folded down over the neck, a kangaroo pocket,
   // drawcords, the sleeves folded in along the sides with ribbed cuffs, and a ribbed hem band that stops short.
   local w = 0.32, d = 0.23, ht = 0.05;
-  h.compound('hoodie_cropped', 0.62, g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: [], collar: null, neck: 0.06, sleeves: { kind: 'flat', w: 0.07, t: 0.007 }, hood: { w: 0.18, l: 0.1, t: 0.012 } })
+  h.compound('cropped_hoodie', 0.62, g.jacket({ w: w, d: d, ht: ht, front: 'none', buttons: [], collar: null, neck: 0.06, sleeves: { kind: 'flat', w: 0.07, t: 0.007 }, hood: { w: 0.18, l: 0.1, t: 0.012 } })
                                       + [
                                         box('cuff-l', 'cuff', [-w / 2 - 0.002, ht, -d / 2 + 0.03], [-w / 2 + 0.072, ht + 0.011, -d / 2 + 0.05]),
                                         box('cuff-r', 'cuff', [w / 2 - 0.072, ht, -d / 2 + 0.03], [w / 2 + 0.002, ht + 0.011, -d / 2 + 0.05]),
@@ -233,7 +233,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   // A long-sleeved cotton shirt folded, 300 mm by 300 mm and 40 mm tall: a turned-down collar, a buttoned placket,
   // the sleeves folded in along the sides with buttoned cuffs, and one chest pocket.
   local w = 0.3, d = 0.3, ht = 0.04;
-  h.compound('longshirt', 0.3, g.jacket({ w: w, d: d, ht: ht, neck: 0.06, collar: { r: 0.045, wd: 0.022, ht: 0.01, gap: 40 }, frontW: 0.026, buttons: 5, buttonR: 0.005, sleeves: { kind: 'flat', w: 0.065, t: 0.006 }, pockets: [{ x: -0.07, z: 0.0, w: 0.07, d: 0.075, flap: 0, single: true }] })
+  h.compound('long_sleeved_shirt', 0.3, g.jacket({ w: w, d: d, ht: ht, neck: 0.06, collar: { r: 0.045, wd: 0.022, ht: 0.01, gap: 40 }, frontW: 0.026, buttons: 5, buttonR: 0.005, sleeves: { kind: 'flat', w: 0.065, t: 0.006 }, pockets: [{ x: -0.07, z: 0.0, w: 0.07, d: 0.075, flap: 0, single: true }] })
                                  + [
                                    box('cuff-l', 'cuff', [-w / 2 - 0.002, ht, -d / 2 + 0.03], [-w / 2 + 0.067, ht + 0.009, -d / 2 + 0.06]),
                                    box('cuff-r', 'cuff', [w / 2 - 0.067, ht, -d / 2 + 0.03], [w / 2 + 0.002, ht + 0.009, -d / 2 + 0.06]),
@@ -247,7 +247,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   maidDress('maid_dress', 0.7, 0.32, 0.4, 0.05, 'cloth-blue') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // The short black version, folded smaller: 300 mm by 320 mm and 35 mm tall.
-  maidDress('maid_dress_short', 0.45, 0.3, 0.32, 0.035, 'cloth-black') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  maidDress('short_maid_dress', 0.45, 0.3, 0.32, 0.035, 'cloth-black') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A short off-white costume dress folded, 300 mm by 340 mm and 30 mm tall, printed with crossing bandage wraps and
   // with torn wrap ends hanging off the hem.
@@ -271,10 +271,10 @@ local ninjaDress(id, mass, ht, sleeved) =
 
   // A short black dress folded, 300 mm by 340 mm and 40 mm tall: sleeves folded along the sides with red cuffs, a red
   // mandarin collar and wrap edge, a red hem band and a red waist tie with straight hanging ends.
-  ninjaDress('ninja_dress', 0.63, 0.04, true) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  ninjaDress('dragon_dress', 0.63, 0.04, true) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // The sleeveless cut of the same dress, its armholes bound in red.
-  ninjaDress('ninja_dress_sleeveless', 0.59, 0.04, false) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  ninjaDress('sleeveless_dragon_dress', 0.59, 0.04, false) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A cotton polo shirt folded, 300 mm by 290 mm and 35 mm tall: a flat knit collar, a three-button placket, short
   // sleeves with ribbed bands and a small embroidered logo.

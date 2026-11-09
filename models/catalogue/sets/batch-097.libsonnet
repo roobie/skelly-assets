@@ -45,14 +45,14 @@ local bandolier(id, massKg, l, s, w, n, r, pitch) = h.compound(id, massKg, [
 [
   // A cotton pouch 150 mm wide, 130 mm tall and 80 mm deep that holds a coiled belt of 200 rifle rounds for a light
   // machine gun.
-  beltPouch('cheap_ammo_pouch_belt223', 0.059, 0.15, 0.13, 0.08) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
+  beltPouch('machine_gun_belt_pouch', 0.059, 0.15, 0.13, 0.08) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // The same cotton pouch made larger, 190 mm wide, 150 mm tall and 95 mm deep, for a belt of 100 heavier rounds.
-  beltPouch('cheap_ammo_pouch_belt308', 0.094, 0.19, 0.15, 0.095) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
+  beltPouch('heavy_machine_gun_belt_pouch', 0.094, 0.19, 0.15, 0.095) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A leather cartridge box 180 mm wide, 110 mm tall and 55 mm deep with a deep flap over its whole front, a round
   // brass plate on the flap, a closing tab with a stud below it and two belt loops on its back.
-  h.compound('flintlock_pouch', 0.35, h.pouch(0.18, 0.11, 0.055, 0.1, 2) + [
+  h.compound('cartridge_box', 0.35, h.pouch(0.18, 0.11, 0.055, 0.1, 2) + [
     h.turned('plate', 'plate', 'z', [[0, 0], [0, 0.022], [0.003, 0.022], [0.003, 0]], [0, 0.065, 0.0305]),
     box('tab', 'strap', [-0.008, 0, 0.0305], [0.008, 0.022, 0.0335]),
     h.stud('stud', 'plate', 0, 0.009, 0.0335, 0.005),
@@ -78,7 +78,7 @@ local bandolier(id, massKg, l, s, w, n, r, pitch) = h.compound(id, massKg, [
 
   // A nylon pouch 330 mm wide, 170 mm tall and 85 mm deep: four round cells on a shared back panel, each taking one
   // hand grenade under a buckled lid, with two straps on its back.
-  h.compound('grenadebandolier', 0.25, [
+  h.compound('four_grenade_pouch', 0.25, [
     box('panel', 'strap', [-0.165, 0.01, -0.045], [0.165, 0.16, -0.04]),
   ] + h.webbing('back-strap', 'strap', -0.165, 0.165, [0.03, 0.11], -0.05, 0.005) + std.flattenArrays([
     [
@@ -101,8 +101,8 @@ local bandolier(id, massKg, l, s, w, n, r, pitch) = h.compound(id, massKg, [
 
   // A leather bandolier about 1.2 m round, lying flat as a loop 560 mm long, its 65 mm strap carrying eight loops for
   // 40 mm grenade cartridges.
-  bandolier('torso_bandolier_grenade', 0.4, 0.44, 0.2, 0.065, 8, 0.021, 0.05) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
+  bandolier('grenade_bandolier', 0.4, 0.44, 0.2, 0.065, 8, 0.021, 0.05) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A leather bandolier about 1.3 m round, lying flat as a loop 640 mm long, its 50 mm strap carrying 18 shell loops.
-  bandolier('torso_bandolier_shotgun', 0.28, 0.52, 0.2, 0.05, 18, 0.0105, 0.027) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
+  bandolier('shotgun_shell_bandolier', 0.28, 0.52, 0.2, 0.05, 18, 0.0105, 0.027) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['torso'] } } },
 ]

@@ -117,7 +117,7 @@ local rucksack(id, massKg, o) =
 
   // A canvas drop-leg bag 200 mm wide, 250 mm tall and 90 mm deep with a buckled flap, a zipped front pocket, a
   // hanger strap rising to a belt loop, and two thigh straps lying slack in loops on the floor behind it.
-  h.compound('leg_bag', 0.21, pouchAt('bag', 0, -0.045, 0.2, 0.25, 0.09, 0.09) + [
+  h.compound('drop_leg_bag', 0.21, pouchAt('bag', 0, -0.045, 0.2, 0.25, 0.09, 0.09) + [
     box('pocket', 'pocket', [-0.08, 0.03, 0.045], [0.08, 0.13, 0.065]),
     box('zip', 'zip', [-0.07, 0.115, 0.065], [0.07, 0.121, 0.067]),
     box('zip-pull', 'zip', [0.055, 0.1, 0.065], [0.063, 0.121, 0.069]),
@@ -132,7 +132,7 @@ local rucksack(id, massKg, o) =
 
   // A small canvas purse 150 mm wide, 110 mm tall and 35 mm deep with a zipped top and a slip pocket on its front,
   // on two buckled leg straps lying slack in loops on the floor behind it.
-  h.compound('leg_small_bag', 0.18, [
+  h.compound('small_leg_purse', 0.18, [
     box('body', 'body', [-0.075, 0, -0.0175], [0.075, 0.11, 0.0175]),
     box('zip', 'zip', [-0.073, 0.11, -0.003], [0.073, 0.114, 0.003]),
     box('zip-pull', 'zip', [0.05, 0.1, 0.0175], [0.058, 0.114, 0.021]),
@@ -143,7 +143,7 @@ local rucksack(id, massKg, o) =
 
   // A nylon drop-leg pouch 140 mm wide, 180 mm tall and 60 mm deep with a hook-and-loop flap, two rows of webbing
   // on its front, a hanger strap to the belt and two buckled thigh straps lying slack in loops on the floor behind it.
-  h.compound('legrig', 0.13, pouchAt('pouch', 0, -0.03, 0.14, 0.18, 0.06, 0.06) + [
+  h.compound('drop_leg_pouch', 0.13, pouchAt('pouch', 0, -0.03, 0.14, 0.18, 0.06, 0.06) + [
     box('flap-tab', 'tab', [-0.03, 0.125, 0.033], [0.03, 0.14, 0.036]),
   ] + pals('front-pals', 'strap', -0.057, 0.057, 0.03, 2, 0.03) + [
     box('hanger', 'strap', [-0.02, 0.15, -0.035], [0.02, 0.32, -0.031]),
@@ -154,7 +154,7 @@ local rucksack(id, massKg, o) =
 
   // A pair of zipped nylon dive pouches, each 110 mm wide, 160 mm tall and 50 mm deep with blue piping, each on a black
   // neoprene thigh band lying slack in a loop on the floor behind it.
-  h.compound('legrig_wetsuit', 0.49, std.flattenArrays([
+  h.compound('diving_thigh_pouches', 0.49, std.flattenArrays([
     [
       box('pouch-%d' % i, 'body', [x - 0.055, 0, -0.025], [x + 0.055, 0.16, 0.025]),
       box('piping-%d' % i, 'trim', [x - 0.057, 0.15, -0.027], [x + 0.057, 0.162, 0.027]),
@@ -170,7 +170,7 @@ local rucksack(id, massKg, o) =
   // A canvas longarm bag lying on its side, 1.1 m long and 260 mm across, zipped along its top and round one end,
   // with leather end caps, two wrap-round carry handles and a shoulder strap laid out in front of it.
   local len = 1.1, r = 0.13;
-  h.compound('long_duffelbag', 1, [
+  h.compound('longarm_bag', 1, [
     h.rod('body', 'body', r, -len / 2 + 0.02, len / 2 - 0.02, r),
     h.rod('cap-l', 'trim', r - 0.008, -len / 2, -len / 2 + 0.02, r),
     h.rod('cap-r', 'trim', r - 0.008, len / 2 - 0.02, len / 2, r),
@@ -221,7 +221,7 @@ local rucksack(id, massKg, o) =
 
   // A bed sheet knotted into a bundle 350 mm long and 210 mm across, its twisted ends knotted on top and
   // the long twisted loop that goes over the shoulder lying flat round it.
-  h.compound('makeshift_sling', 0.75, [
+  h.compound('bedsheet_sling_bag', 0.75, [
     turned('bundle', 'body', 'x', [[0, 0], [0, 0.03], [0.04, 0.08], [0.1, 0.105], [0.25, 0.105], [0.31, 0.08], [0.35, 0.03], [0.35, 0]], [-0.175, 0.105, 0]),
     box('fold-a', 'fold', [-0.12, 0.14, 0.05], [0.1, 0.15, 0.085]),
     box('fold-b', 'fold', [-0.06, 0.07, 0.09], [0.14, 0.08, 0.105]),
@@ -234,7 +234,7 @@ local rucksack(id, massKg, o) =
 
   // A nylon messenger bag 380 mm wide, 290 mm tall and 110 mm deep under a full flap held by two buckled straps,
   // with a padded shoulder strap lying in a U on the floor behind it.
-  h.compound('mbag', 0.38, [
+  h.compound('messenger_bag', 0.38, [
     box('body', 'body', [-0.19, 0, -0.055], [0.19, 0.29, 0.055]),
     box('flap-top', 'flap', [-0.193, 0.29, -0.058], [0.193, 0.294, 0.059]),
     box('flap-front', 'flap', [-0.193, 0.06, 0.055], [0.193, 0.294, 0.059]),
@@ -261,21 +261,21 @@ local rucksack(id, massKg, o) =
 
   // A large MOLLE rucksack 380 mm wide, 600 mm tall and 280 mm deep with a lid, webbing on its front and sides, a
   // pouch on each side, padded shoulder straps and a hip belt.
-  rucksack('molle_large_rucksack', 1.3, {
+  rucksack('large_military_rucksack', 1.3, {
     w: 0.38, ht: 0.6, d: 0.28, lid: 0.08, rows: 9, front: false, side: true, belt: true,
     cloth: 'cloth-olive-drab', trim: 'webbing-olive-dark', webbing: 'webbing-olive-dark',
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A medium MOLLE rucksack 340 mm wide, 500 mm tall and 230 mm deep with a lid, webbing on its front and sides, a
   // flapped front pouch and padded shoulder straps.
-  rucksack('molle_medium_rucksack', 1, {
+  rucksack('medium_military_rucksack', 1, {
     w: 0.34, ht: 0.5, d: 0.23, lid: 0.07, rows: 8, front: true, side: false, belt: false,
     cloth: 'nylon-coyote', trim: 'cloth-khaki', webbing: 'cloth-khaki',
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A MOLLE assault pack 300 mm wide, 440 mm tall and 200 mm deep with a lid, webbing on its front and sides, a
   // flapped front pouch and padded shoulder straps.
-  rucksack('molle_pack', 0.75, {
+  rucksack('military_assault_pack', 0.75, {
     w: 0.3, ht: 0.44, d: 0.2, lid: 0.05, rows: 7, front: true, side: false, belt: false,
     cloth: 'nylon-ranger-green', trim: 'webbing-olive-dark', webbing: 'webbing-olive-dark',
   }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
@@ -316,7 +316,7 @@ local rucksack(id, massKg, o) =
 
   // A nylon pet carrier backpack 330 mm wide, 420 mm tall and 270 mm deep with a clear domed window on its front
   // ringed by air holes, mesh vents on both sides, a top handle and padded shoulder straps.
-  h.compound('petpack', 0.77, [
+  h.compound('pet_carrier_backpack', 0.77, [
     box('body', 'body', [-0.165, 0, -0.135], [0.165, 0.42, 0.135]),
     box('base', 'trim', [-0.168, 0, -0.138], [0.168, 0.025, 0.138]),
     box('rim-top', 'trim', [-0.168, 0.41, -0.138], [0.168, 0.425, 0.138]),

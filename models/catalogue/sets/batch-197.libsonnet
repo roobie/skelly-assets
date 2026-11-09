@@ -17,7 +17,7 @@ local plates = 8;
 [
   // A squat round forge 300 mm across and 230 mm tall: a cast cement bowl clad in eight plates of black spider shell,
   // with a fire grate and a bed of coals inside, an air pipe out of its right side and two carry handles.
-  h.compound('demon_forge', 11, [
+  h.compound('spider_shell_forge', 11, [
     h.turned('bowl', 'cement', 'y', [[0, 0], [0, 0.125], [0.2, 0.125], [0.2, 0.095], [0.05, 0.085], [0.05, 0]], [0, 0.03, 0]),
     h.turned('rim', 'shell', 'y', [[0, 0.092], [0, 0.142], [0.014, 0.142], [0.014, 0.092], [0, 0.092]], [0, 0.23, 0]),
     h.turned('base', 'shell', 'y', [[0, 0], [0, 0.135], [0.03, 0.14], [0.03, 0]], [0, 0, 0]),
@@ -58,7 +58,7 @@ local plates = 8;
     coal: 'plastic-charcoal',
     ember: 'glow-flame',
     rune: 'crystal-glow-blue',
-  }) + { handling: h.gripOn('demon_forge', 'handle-front-grip') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
+  }) + { handling: h.gripOn('spider_shell_forge', 'handle-front-grip') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
 
   // A stiff paper sack 110 mm wide, 70 mm deep and 190 mm tall, its top rolled down twice over about a litre of grey
   // mortar, with a red band round its middle printed with a pale blue rune.
@@ -76,7 +76,7 @@ local plates = 8;
 
   // A loose cluster of crimped wool about 150 mm long, 90 mm wide and 70 mm high, pale and faintly shimmering, its
   // locks ending in lighter tips.
-  h.compound('parabolan_wool_staple', 0.01, [
+  h.compound('shimmerwool_tuft', 0.01, [
     ball('tuft-%d' % i, 'wool', t[3], t[0], t[1], t[2], 0.8)
     for i in std.range(0, 7)
     for t in [[[-0.045, 0.03, 0.0, 0.03], [-0.005, 0.034, 0.008, 0.034], [0.04, 0.03, -0.005, 0.03], [0.02, 0.05, 0.02, 0.022], [-0.03, 0.05, -0.02, 0.022], [0.06, 0.022, 0.02, 0.02], [-0.06, 0.022, 0.025, 0.018], [0.0, 0.026, -0.03, 0.022]][i]]
@@ -84,5 +84,5 @@ local plates = 8;
     ball('tip-%d' % i, 'tip', 0.013, t[0], t[1], t[2], 0.8)
     for i in std.range(0, 5)
     for t in [[[-0.075, 0.03, -0.005], [0.072, 0.028, 0.0], [0.03, 0.068, 0.012], [-0.025, 0.07, -0.01], [0.005, 0.02, 0.045], [-0.05, 0.016, 0.042]][i]]
-  ], { wool: 'fur-pale', tip: 'feather-white' }) + h.inHand('parabolan_wool_staple', 'tuft-1') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['fantasy'] } } },
+  ], { wool: 'fur-pale', tip: 'feather-white' }) + h.inHand('shimmerwool_tuft', 'tuft-1') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['fantasy'] } } },
 ]

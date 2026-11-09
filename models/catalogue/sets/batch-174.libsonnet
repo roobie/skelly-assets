@@ -125,27 +125,27 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
   // A full suit of mild steel mail folded to 380 mm by 460 mm and 60 mm tall, about 160 mm with its coif: a long
   // mail shirt with sleeves, the legs folded up over the body under a leather belt, and the attached coif standing
   // at the neck with its face opening forward.
-  h.compound('lc_chainmail_suit', 16, mailBundle({ d: 0.46, legs: true, coif: true }), mailFinish('steel-mail'))
+  h.compound('mild_steel_mail_suit', 16, mailBundle({ d: 0.46, legs: true, coif: true }), mailFinish('steel-mail'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 
   // A medium steel mail hauberk folded to 380 mm by 420 mm and 60 mm tall: a long mail shirt with sleeves along
   // its sides, a leather-bound neck and a split skirt.
-  h.compound('mc_chainmail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), mailFinish('steel-mail-dark'))
+  h.compound('mild_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), mailFinish('steel-mail-dark'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A medium steel mail jumpsuit folded to 380 mm by 440 mm and 60 mm tall: sleeves along the sides and the legs
   // folded up over the body under a leather belt, with a leather-bound neck.
-  h.compound('mc_chainmail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), mailFinish('steel-mail-dark'))
+  h.compound('mild_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), mailFinish('steel-mail-dark'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A sleeveless medium steel mail jumpsuit folded to 380 mm by 420 mm and 60 mm tall: leather-bound armholes at
   // the shoulders and the legs folded up over the body under a leather belt.
-  h.compound('mc_chainmail_sjumpsuit', 13, mailBundle({ d: 0.42, sleeves: false, armholes: true, legs: true }), mailFinish('steel-mail-dark'))
+  h.compound('mild_steel_sleeveless_mail_jumpsuit', 13, mailBundle({ d: 0.42, sleeves: false, armholes: true, legs: true }), mailFinish('steel-mail-dark'))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'legs'], state: ['folded'] } } },
   // A sage-green flight suit folded to 360 mm by 420 mm and 50 mm tall, legs folded up: a zipped front, a flat
   // collar, flapped chest pockets with a name tape over one, a flag patch and a
   // pen pocket on the left sleeve, a round unit patch on the right, and flapped thigh pockets.
-  h.compound('mil_flight_suit', 0.94, coverall({})
+  h.compound('flight_suit', 0.94, coverall({})
     + [
       box('name-tape', 'tape', [-0.125, 0.054, 0.115], [-0.035, 0.057, 0.132]),
       h.disc('unit-patch', 'patch', 0.024, 0.056, 0.062, 0.14, 0.08),
@@ -170,7 +170,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
 
   // A thin flame-resistant knit body suit folded to 300 mm by 320 mm and 30 mm tall, legs folded up: a mock neck, a
   // light front zip, sleeves along the sides and ribbed cuffs at the wrists and ankles.
-  h.compound('nomex_suit', 0.41, coverall({ w: 0.3, d: 0.32, ht: 0.03, legT: 0.006, sleeveW: 0.065, collar: { r: 0.042, wd: 0.014, ht: 0.018, gap: 14 }, pockets: [], legPockets: false })
+  h.compound('flame_resistant_undersuit', 0.41, coverall({ w: 0.3, d: 0.32, ht: 0.03, legT: 0.006, sleeveW: 0.065, collar: { r: 0.042, wd: 0.014, ht: 0.018, gap: 14 }, pockets: [], legPockets: false })
     + [
       box('cuff-%d' % (s + 1), 'rib', [s * 0.15 - (if s < 0 then 0 else 0.065), 0.03, -0.13], [s * 0.15 + (if s < 0 then 0.065 else 0), 0.039, -0.1])
       for s in [-1, 1]
@@ -227,7 +227,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
   // A sealed environmental suit folded to 460 mm by 440 mm and 80 mm tall, legs folded up, with its attached boots
   // standing on the bundle and its attached gloves lying on the sleeves: brown cloth with blue shoulders, a ring neck
   // seal, a storm-flapped zip, a white seal on each upper arm and a flapped chest pocket.
-  h.compound('robofac_enviro_suit', 3.9, coverall({ w: 0.46, d: 0.44, ht: 0.08, legT: 0.01, sleeveW: 0.095, collar: { r: 0.06, wd: 0.026, ht: 0.03, gap: 0 }, pockets: [{ x: 0.1, z: 0.03, w: 0.09, d: 0.08, flap: 0.03, single: true }], legPockets: false })
+  h.compound('sealed_environment_suit', 3.9, coverall({ w: 0.46, d: 0.44, ht: 0.08, legT: 0.01, sleeveW: 0.095, collar: { r: 0.06, wd: 0.026, ht: 0.03, gap: 0 }, pockets: [{ x: 0.1, z: 0.03, w: 0.09, d: 0.08, flap: 0.03, single: true }], legPockets: false })
     + [
       box('yoke', 'yoke', [-0.23, 0.08, 0.13], [0.23, 0.083, 0.22]),
       box('storm-flap', 'yoke', [-0.022, 0.08, -0.02], [0.022, 0.085, 0.07]),
@@ -261,7 +261,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
   // The same sealed suit worn down: its top half rolled to the waist and the sleeves knotted round it, folded to
   // 420 mm by 380 mm and 70 mm tall with the roll across the back, the knotted sleeves and their gloves hanging over
   // the front edge, and the boots standing on the bundle.
-  h.compound('robofac_enviro_suit_casual', 3.3, [p + { slot: 'leg' } for p in h.foldedGarment(0.42, 0.38, 0.07, 3)]
+  h.compound('open_sealed_environment_suit', 3.3, [p + { slot: 'leg' } for p in h.foldedGarment(0.42, 0.38, 0.07, 3)]
     + [
       h.turned('roll', 'yoke', 'x', [[0, 0], [0, 0.04], [0.42, 0.04], [0.42, 0]], [-0.21, 0.11, -0.15]),
       box('roll-seal-l', 'seal', [-0.2, 0.1, -0.11], [-0.15, 0.13, -0.106]),

@@ -74,7 +74,7 @@ local hide(id) = h.compound(id, 0.25, [
 
   // A shaped violin case 800 mm long, 250 mm across the wide end and 120 mm tall, lying flat with its lid closed,
   // a metal-edged seam round it, a side handle and two latches facing +z.
-  h.compound('case_violin', 1.5, [
+  h.compound('violin_case', 1.5, [
     h.prism('wide', 'shell', 'y', [[-0.09, -0.4], [0.09, -0.4], [0.125, -0.36], [0.125, -0.06], [0.105, -0.02], [-0.105, -0.02], [-0.125, -0.06], [-0.125, -0.36]], 0, 0.12),
     h.prism('narrow', 'shell', 'y', [[-0.105, -0.02], [0.105, -0.02], [0.065, 0.38], [0.04, 0.4], [-0.04, 0.4], [-0.065, 0.38]], 0, 0.12),
     h.prism('seam-wide', 'seam', 'y', [[-0.093, -0.404], [0.093, -0.404], [0.129, -0.362], [0.129, -0.06], [0.109, -0.02], [-0.109, -0.02], [-0.129, -0.06], [-0.129, -0.362]], 0.068, 0.076),
@@ -156,7 +156,7 @@ local hide(id) = h.compound(id, 0.25, [
 
   // A roll-top dry duffel 650 mm long and 300 mm across lying along x, closed at -x and rolled flat at +x, with two
   // carry handles over the top, lashing cord across it and shoulder straps down its back.
-  h.compound('dry_duffelbag', 1.3, [
+  h.compound('dry_duffel_bag', 1.3, [
     lying('body', 'body', 0.15, -0.32, 0.26),
     h.turned('taper', 'body', 'x', [[0, 0], [0, 0.15], [0.05, 0.08], [0.05, 0]], [0.26, 0.15, 0]),
     h.turned('cap', 'end', 'x', [[0, 0], [0, 0.152], [0.015, 0.152], [0.015, 0]], [-0.335, 0.15, 0]),
@@ -174,7 +174,7 @@ local hide(id) = h.compound(id, 0.25, [
 
   // A canvas duffel 600 mm long and 300 mm across lying along x, zipped along the top, with darker end panels, two
   // carry handles over the top and a shoulder strap lying in front of it.
-  h.compound('duffelbag', 0.69, [
+  h.compound('duffel_bag', 0.69, [
     lying('body', 'body', 0.15, -0.28, 0.28),
     lying('end-left', 'end', 0.153, -0.3, -0.28),
     lying('end-right', 'end', 0.153, 0.28, 0.3),
@@ -247,7 +247,7 @@ local hide(id) = h.compound(id, 0.25, [
 
   // A hard black briefcase 544 mm wide, 370 mm tall and 110 mm deep standing on its feet, front +z, with a bright
   // seam round it, two latches and a handle with a trigger tucked under it, and a port in its right end.
-  h.compound('hk_briefcase', 3.4, [
+  h.compound('gun_briefcase', 3.4, [
     box('shell', 'shell', [-0.272, 0.01, -0.055], [0.272, 0.37, 0.055]),
     box('seam', 'seam', [-0.275, 0.008, -0.004], [0.275, 0.373, 0.004]),
     box('rib-front', 'shell', [-0.24, 0.04, 0.055], [0.24, 0.33, 0.059]),
@@ -263,7 +263,7 @@ local hide(id) = h.compound(id, 0.25, [
 
   // A plastic jerrycan 350 mm wide, 470 mm tall and 165 mm deep standing front +z, with three handles across the
   // top, a capped spout at one corner, an X pressed into each face and canvas shoulder straps on its back.
-  h.compound('jerrypack', 1.4, [
+  h.compound('jerrycan_backpack', 1.4, [
     h.prism('body', 'body', 'z', [[-0.175, 0], [0.175, 0], [0.175, 0.44], [0.155, 0.46], [-0.155, 0.46], [-0.175, 0.44]], -0.0825, 0.0825),
     h.prism('x-a', 'body', 'z', [[-0.14, 0.04], [-0.11, 0.04], [0.14, 0.4], [0.11, 0.4]], 0.0825, 0.09),
     h.prism('x-b', 'body', 'z', [[0.11, 0.04], [0.14, 0.04], [-0.11, 0.4], [-0.14, 0.4]], 0.0825, 0.09),
