@@ -1,7 +1,8 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
 // their category, tags and printed label, the vehicles the tree places with the model at each of their sites, and the
 // vocabulary's meanings for the page's labels (models/taxonomy.json).
-// Usage: node site/build.mjs [--built dir] [outDir]; the tree defaults to built/. No dependencies; the page loads
+// Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
+// tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
 import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -16,7 +17,7 @@ import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') } } });
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false } } });
 const out = resolve(root, positionals[0] ?? '_site');
 const built = resolve(values.built);
 
@@ -104,11 +105,12 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'poseSample.mjs', 'style.css']) cpSync(join(here, f), join(out, f));
-cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });
+for (const f of ['index.html', 'app.js', 'render.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs']) cpSync(join(here, f), join(out, f));
+if (!values['no-tree']) cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });
 for (const model of models) if (model.clips && model.body) {
   const clips = JSON.parse(readFileSync(join(built, model.clips), 'utf8'));
   const body = JSON.parse(readFileSync(join(built, model.body), 'utf8'));
+  mkdirSync(dirname(join(out, 'built', model.clips)), { recursive: true });
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));

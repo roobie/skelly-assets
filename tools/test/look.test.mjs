@@ -1,0 +1,77 @@
+import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { test } from 'node:test';
+import { lookDigest, lookIds, mergeRows, staleIds } from '../look.mjs';
+
+const repo = resolve(import.meta.dirname, '../..');
+const manifest = {
+  models: [
+    { id: 'fixture_body', pack: 'fixture.vans', path: 'models/fixture_body.glb' },
+    { id: 'fixture_door', pack: 'fixture.vans', path: 'models/fixture_door.glb' },
+    { id: 'fixture_notes', pack: 'fixture.vans', path: 'models/fixture_notes.json' },
+  ],
+  vehicles: [{ id: 'fixture_van', pack: 'fixture.vans', path: 'vehicles/fixture_van.placements.json' }],
+};
+
+function builtTree() {
+  const built = mkdtempSync(join(tmpdir(), 'look-'));
+  mkdirSync(join(built, 'fixture.vans/models'), { recursive: true });
+  mkdirSync(join(built, 'fixture.vans/vehicles'), { recursive: true });
+  writeFileSync(join(built, 'fixture.vans/models/fixture_body.glb'), 'body');
+  writeFileSync(join(built, 'fixture.vans/models/fixture_door.glb'), 'door');
+  const sites = [{ id: 'body', part: 'fixture_body', at: [0, 0, 0] }, { id: 'door_far', part: 'fixture_door', at: [1, 0, 0], mirror: true }];
+  writeFileSync(join(built, 'fixture.vans/vehicles/fixture_van.placements.json'), JSON.stringify({ sites }));
+  return built;
+}
+
+test('a look draws what it is asked, every vehicle with --vehicles, and every drawable entry when asked nothing', () => {
+  assert.deepEqual(lookIds(manifest, { ids: ['fixture_door'] }), ['fixture_door']);
+  assert.deepEqual(lookIds(manifest, { ids: ['fixture_door'], vehicles: true }), ['fixture_door', 'fixture_van']);
+  assert.deepEqual(lookIds(manifest), ['fixture_body', 'fixture_door', 'fixture_van']);
+  assert.throws(() => lookIds(manifest, { ids: ['fixture_notes'] }), /fixture_notes/);
+});
+
+test('a vehicle picture changes digest when any part it places is rebuilt, and has none once a part is gone', () => {
+  const built = builtTree();
+  try {
+    const before = lookDigest(built, manifest, 'fixture_van');
+    const body = lookDigest(built, manifest, 'fixture_body');
+    writeFileSync(join(built, 'fixture.vans/models/fixture_door.glb'), 'door, rebuilt');
+    assert.notEqual(lookDigest(built, manifest, 'fixture_van'), before);
+    assert.equal(lookDigest(built, manifest, 'fixture_body'), body);
+    rmSync(join(built, 'fixture.vans/models/fixture_door.glb'));
+    assert.equal(lookDigest(built, manifest, 'fixture_van'), undefined);
+  } finally {
+    rmSync(built, { recursive: true, force: true });
+  }
+});
+
+test('a printed label steers the picture, so relabelling a model changes its digest', () => {
+  const built = builtTree();
+  try {
+    const labelled = structuredClone(manifest);
+    labelled.models[0].label = { text: 'Fixture' };
+    assert.notEqual(lookDigest(built, labelled, 'fixture_body'), lookDigest(built, manifest, 'fixture_body'));
+  } finally {
+    rmSync(built, { recursive: true, force: true });
+  }
+});
+
+test('a redrawn row replaces its earlier one, the rest of the batch stays and a removed entry leaves', () => {
+  const previous = [{ id: 'a', digest: 'old' }, { id: 'b', digest: 'b' }, { id: 'gone', digest: 'x' }];
+  assert.deepEqual(mergeRows(previous, [{ id: 'a', digest: 'new' }], new Set(['a', 'b'])), [{ id: 'a', digest: 'new' }, { id: 'b', digest: 'b' }]);
+});
+
+test('a render is stale when its model changed or left the tree, never when it failed to draw', () => {
+  const rows = [{ id: 'same', digest: '1' }, { id: 'changed', digest: '1' }, { id: 'gone', digest: '1' }, { id: 'failed', error: 'no' }];
+  const now = { same: '1', changed: '2', failed: '1' };
+  assert.deepEqual(staleIds(rows, (id) => now[id]), ['changed', 'gone']);
+});
+
+// The review page must draw with the very three.js the showcase draws with, or a review would judge another renderer.
+test('the review page loads the same three.js as the showcase', () => {
+  const importMap = (page) => JSON.parse(/<script type="importmap">([\s\S]*?)<\/script>/.exec(readFileSync(join(repo, 'site', page), 'utf8'))[1]);
+  assert.deepEqual(importMap('look.html'), importMap('index.html'));
+});
