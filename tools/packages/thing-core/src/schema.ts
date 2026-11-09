@@ -120,10 +120,16 @@ export const NeutralModelSchema = strictObject({
   /** Drawn collision for atomic models, whose mass belongs to the item rather than body parts. */
   collision: optional(pipe(array(ModelBoxSchema), nonEmpty('baked collision needs a box'))),
   emissiveMaterial: optional(pipe(string(), nonEmpty('must not be empty'))),
+  /**
+   * Where the hand holds the model, and the XYZ Euler turn in degrees that carries the file's axes onto the held axes,
+   * working end +z and up +y, so a model that faces its working end forward needs none.
+   */
   grip: optional(strictObject({ at: ModelPointSchema, turn: optional(ModelPointSchema) })),
+  /** How the held axes sit in the hand: forward points the working end ahead, upright raises it. */
   hold: optional(picklist(['forward', 'upright'])),
-  /** How the model rests on the ground: upright stands it on its −x end, the axis an upright hold raises. */
+  /** How the model rests on the ground: upright stands it on its −z end, the axis an upright hold raises. */
   rest: optional(picklist(['lying', 'upright'])),
+  /** Degrees about +z, the working end, applied to the model before its grip turn. */
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
   /** The screen of an item that shows something. */
