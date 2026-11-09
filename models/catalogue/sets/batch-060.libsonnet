@@ -110,7 +110,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
   }) + h.inHand('propane_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A hand-held road flare, 30 cm long and 28 mm across: a red paper tube with a plastic cap over the striker at +x
-  // and a plastic grip plug at the other end.
+  // and a plastic grip plug at the other end. The striker is the +x tip, the end that burns, and the only slot that glows.
   h.compound('road_flare', 0.12, [
     torchBody('plug', 'plug', [[0, 0.012], [0.03, 0.012], [0.03, 0.0145], [0.036, 0.0145]]),
     torchBody('tube', 'tube', [[0.036, 0.014], [0.27, 0.014]]),
@@ -118,6 +118,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     torchBody('cap', 'cap', [[0.262, 0.0155], [0.3, 0.0155]]),
     torchBody('striker', 'striker', [[0.3, 0.012], [0.302, 0.012]]),
   ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + h.gripOn('road_flare', 'plug') + {
+    glow: 'striker',
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['paper', 'plastic'], setting: ['modern'] } } },
 
