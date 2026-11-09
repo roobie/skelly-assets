@@ -132,11 +132,8 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     // The thermometer port and its dial, facing the front.
     h.turned('port', 'brass', 'z', [[0, 0], [0, 0.012], [0.03, 0.012], [0.03, 0]], [-0.15, 0.5, 0.04]),
     h.turned('dial', 'dial', 'z', [[0, 0], [0, 0.022], [0.008, 0.022], [0.008, 0]], [-0.15, 0.5, 0.07]),
-    // The lyne arm, stepping down from the helmet to the worm tub.
-  ] + [
-    h.turned('arm-%d' % i, 'copper', 'x', [[0, 0], [0, 0.016], [0.036, 0.016], [0.036, 0]], [-0.1 + i * 0.034, 0.52 - i * 0.022, 0])
-    for i in std.range(0, 7)
-  ] + [
+    // The lyne arm: one pipe rising out of the helmet and running down into the worm tub.
+  ] + h.pipe('arm', 'copper', [[-0.14, 0.5], [-0.08, 0.56], [0.1, 0.46], [0.14, 0.41], [0.14, 0.32]], 0.016) + [
     vessel('tub', 'tub', [[0, 0.11], [0.36, 0.11]], 0.004, [0.2, 0, 0]),
     ring('tub-hoop-a', 'brass', 0.11, 0.004, 0.06, 0.2, 0),
     ring('tub-hoop-b', 'brass', 0.11, 0.004, 0.3, 0.2, 0),
@@ -186,11 +183,8 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.turned('body', 'steel', 'y', [[0, 0], [0, 0.05], [0.01, 0.058], [0.05, 0.06], [0.085, 0.052], [0.1, 0.04], [0.1, 0]]),
     h.disc('lid', 'steel', 0.04, 0.1, 0.108),
     h.turned('knob', 'black', 'y', [[0, 0], [0, 0.006], [0.008, 0.01], [0.016, 0.008], [0.017, 0]], [0, 0.108, 0]),
-  ] + [
-    // The spout, rising in steps from the belly.
-    h.turned('spout-%d' % i, 'steel', 'x', [[0, 0], [0, 0.011 - i * 0.0007], [0.01, 0.0105 - i * 0.0007], [0.01, 0]], [0.05 + i * 0.0055, 0.03 + i * 0.0065, 0])
-    for i in std.range(0, 9)
-  ] + [
+    // The spout, one tapering pipe rising from the belly.
+  ] + h.pipe('spout', 'steel', [[0.048, 0.018], [0.112, 0.09]], [0.011, 0.0047]) + [
     // The loop handle at the back, with a black grip.
     box('handle-top', 'steel', [-0.075, 0.084, -0.006], [-0.045, 0.092, 0.006]),
     box('handle-low', 'steel', [-0.075, 0.03, -0.006], [-0.05, 0.038, 0.006]),

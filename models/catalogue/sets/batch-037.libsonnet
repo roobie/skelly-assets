@@ -12,17 +12,6 @@ local sheet(l, w, t, e, face, edge) = [
   box('edge-left', edge, [-l / 2, 0, -w / 2 + e], [-l / 2 + e, t, w / 2 - e]),
   box('edge-right', edge, [l / 2 - e, 0, -w / 2 + e], [l / 2, t, w / 2 - e]),
 ];
-// An arc of wire in the x-y plane at z, centred at (0, cy), radius r, from angle a0 to a1 (0 is +x), as convex quads.
-local arc(prefix, slot, r, t, cy, a0, a1, n, z) = [
-  local b0 = a0 + (a1 - a0) * k / n, b1 = a0 + (a1 - a0) * (k + 1) / n;
-  h.prism('%s-%d' % [prefix, k], slot, 'z', [
-    [(r - t) * std.cos(b0), cy + (r - t) * std.sin(b0)],
-    [(r + t) * std.cos(b0), cy + (r + t) * std.sin(b0)],
-    [(r + t) * std.cos(b1), cy + (r + t) * std.sin(b1)],
-    [(r - t) * std.cos(b1), cy + (r - t) * std.sin(b1)],
-  ], z - t, z + t)
-  for k in std.range(0, n - 1)
-];
 [
   // A small glass bottle of mercury, 32 mm across and 62 mm tall with a black screw cap: 30 mL of the metal
   // fills its lower part, under a white warning label.
@@ -102,8 +91,8 @@ local arc(prefix, slot, r, t, cy, a0, a1, n, z) = [
     box('drip-top', 'paint', [0.03, ht - 0.002, 0.06], [0.05, ht + 0.001, r]),
     box('ear-left', 'can', [-r - 0.004, 0.15, -0.008], [-r + 0.002, 0.166, 0.008]),
     box('ear-right', 'can', [r - 0.002, 0.15, -0.008], [r + 0.004, 0.166, 0.008]),
-  ] + arc('bail', 'bail', r + 0.002, 0.0015, 0.158, 0, std.pi, 12, 0) + [
-    rod('grip', 'grip', 0.007, -0.03, 0.03, 0.158 + r + 0.002),
+  ] + h.bend('bail', 'bail', [[-r - 0.003, 0.158], [-r - 0.003, 0.198], [-0.04, 0.244], [0.04, 0.244], [r + 0.003, 0.198], [r + 0.003, 0.158]], 0.004, -0.002, 0.002) + [
+    rod('grip', 'grip', 0.007, -0.03, 0.03, 0.244),
   ], { can: 'steel-stainless', lid: 'steel-grey', paint: 'paint-red', panel: 'paper-white', bail: 'steel-bright', grip: 'plastic-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
