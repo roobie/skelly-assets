@@ -104,7 +104,7 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
     cord('cord-a', 'cord', [0, 0.495], [-0.190, 0.318], 0.003),
     cord('cord-b', 'cord', [0, 0.495], [0.190, 0.318], 0.003),
     h.disc('cap', 'bar', 0.012, 0.495, 0.505),
-  ], { board: 'wood-pine', char: 'coal-black', shaft: 'wood-birch', stone: 'stone-grey', bar: 'wood-oak', cord: 'cord-cotton' }) + h.gripOn('pump_drill', 'crossbar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
+  ], { board: 'wood-pine', char: 'coal-black', shaft: 'wood-birch', stone: 'stone-grey', bar: 'wood-oak', cord: 'cord-cotton' }) + h.gripStanding('pump_drill', 'crossbar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
 
   // A hardwood fire piston, 200 mm long: a 30 mm bore cylinder with the piston drawn a little way out by its
   // knob, and a small lidded tinder pot beside it.

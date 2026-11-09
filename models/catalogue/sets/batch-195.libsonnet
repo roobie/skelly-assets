@@ -72,7 +72,7 @@ local planet(prefix, slot, len, a, y, r) =
     band: 'brass-dull',
     head: 'cloth-charred',
     flame: 'glow-flame',
-  }) + h.gripOn('everburning_wall_sconce', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
+  }) + h.gripStanding('everburning_wall_sconce', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 
   // A parabolan felt patch: a small square of iridescent felt 50 by 40 mm and 3 mm thick, with a frayed corner.
   h.compound('iridescent_felt_patch', 0.003, [
@@ -149,7 +149,7 @@ local planet(prefix, slot, len, a, y, r) =
     strand('branch-d', 'wood', [0.0, 0.48], [0.19, 0.62], 0.024, -0.215, -0.195),
     box('knot-back', 'bark', [-0.035, 0.65, -0.235], [0.035, 0.72, -0.19]),
     box('knot-post', 'bark', [-0.235, 0.7, -0.24], [-0.19, 0.75, -0.2]),
-  ], { wood: 'wood-oak', bark: 'bark' }) + h.gripOn('gnarled_grown_chair', 'crest-l') + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'], setting: ['fantasy'] } } },
+  ], { wood: 'wood-oak', bark: 'bark' }) + h.gripStanding('gnarled_grown_chair', 'crest-l') + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A homemade standing candelabra 1.5 m tall: a heavy oak post on a crossed foot, with two crossed arms near the top
   // holding four carved wooden torches round a fifth in the middle, each burning. The arms span 800 mm.
@@ -179,7 +179,7 @@ local planet(prefix, slot, len, a, y, r) =
     band: 'brass-dull',
     head: 'cloth-charred',
     flame: 'glow-flame',
-  }) + h.gripOn('everburning_torch_candelabra', 'post') + { voxelGrain: 0.01 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
+  }) + h.gripStanding('everburning_torch_candelabra', 'post') + { voxelGrain: 0.01 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 
   // A tabletop orrery 800 mm across its longest arm: a turned walnut plinth 360 mm across and 80 mm tall with a brass
   // gear plate and a side crank, a steel column 450 mm tall carrying a brass sun on top, and six planets on arms of

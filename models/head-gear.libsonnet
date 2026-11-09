@@ -126,7 +126,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       ports: [],
     }],
     connections: [],
-    handling: { part: 'helmet', solid: 'dome', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    handling: { part: 'helmet', solid: 'dome', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
   },
   {
     id: 'night_vision_goggles',
@@ -141,7 +141,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       ports: [],
     }],
     connections: [],
-    handling: { part: 'goggles', solid: 'bridge', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    handling: { part: 'goggles', solid: 'bridge', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     anchors: {
       eye_left: goggleAnchor('tube_left', [0.5, 0.5, 0]),
       eye_right: goggleAnchor('tube_right', [0.5, 0.5, 0]),

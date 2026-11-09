@@ -204,5 +204,5 @@ local runeEngine = [
     h.disc('pipe-right-rim', 'metal', 0.011, 0.122, 0.128, 0.024, 0.008),
     h.turned('gem-rim', 'band', 'z', [[0, 0.012], [0, 0.017], [0.006, 0.017], [0.006, 0.012], [0, 0.012]], [0, 0.074, 0.036]),
     h.turned('gem', 'crystal', 'z', [[0, 0], [0, 0.012], [0.008, 0.009], [0.011, 0]], [0, 0.074, 0.036]),
-  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + h.gripOn('golem_heart', 'point') + { voxelGrain: 0.004 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + h.gripStanding('golem_heart', 'point') + { voxelGrain: 0.004 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

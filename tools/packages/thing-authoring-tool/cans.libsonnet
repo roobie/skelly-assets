@@ -1,5 +1,5 @@
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
-local atom(id, family, massKg, dimensions, finish, solid, exportMass, turn=[0, 0, -90], roll=0) = {
+local atom(id, family, massKg, dimensions, finish, solid, exportMass, turn=[0, -90, -90], roll=0) = {
   id: id,
   exportMass: exportMass,
   parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],

@@ -9,7 +9,7 @@ local part = l.part, port = l.port;
       leverWidth: 0.014, leverThickness: 0.002, leverGap: 0.0015, leverEndDegrees: 115, ringRadius: 0.011, ringTube: 0.0013,
     }, { body: 'polymer-od-green', metal: 'steel-grey' })],
     connections: [],
-    handling: { part: 'grenade', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    handling: { part: 'grenade', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     taxonomy: { category: 'weapons', tags: { weapon: ['explosive'], material: ['metal'], setting: ['modern'] } },
   },
   // Burn-down mass belongs to the inventory row, so these export no part masses.
@@ -43,7 +43,7 @@ local part = l.part, port = l.port;
       part('chimney', 'chimney', 0.080, { lowerRadius: 0.026, upperRadius: 0.020, height: 0.100, wall: 0.002 }, { glass: 'glass-clear' }, [port('burner', 'male', [0, 0, 0], [0, -1, 0])]),
     ],
     connections: [{ from: 'base.reservoir', to: 'reservoir.base' }, { from: 'reservoir.fuel', to: 'fuel_fill.reservoir' }, { from: 'reservoir.burner', to: 'burner.reservoir' }, { from: 'burner.chimney', to: 'chimney.burner' }],
-    handling: { part: 'base', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    handling: { part: 'base', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     anchors: { flame: { part: 'burner', solid: 'body', fraction: [0.5, 1, 0.5] } },
     voxelGrain: 0.002,
   },
