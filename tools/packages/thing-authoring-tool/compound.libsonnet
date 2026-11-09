@@ -20,6 +20,33 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
     local area = std.sum([profile[i][0] * profile[(i + 1) % n][1] - profile[(i + 1) % n][0] * profile[i][1] for i in std.range(0, n - 1)]);
     { id: id, slot: slot, kind: 'prism', axis: axis, profile: if area > 0 then profile else std.reverse(profile), start: start, end: end },
   rod: rod,
+  // A bar bent along a polyline of [x, y] points, lying from z0 to z1, `w` wide or one width per point for a taper.
+  // Prisms must be convex, so each straight run is its own prism; the runs are mitred at every bend so neighbours
+  // share their joint face and the bar reads as one piece, not a chain of offset blocks.
+  bend(prefix, slot, pts, w, z0, z1):
+    local n = std.length(pts);
+    local half(i) = (if std.isArray(w) then w[i] else w) / 2;
+    local normal(i) =
+      local dx = pts[i + 1][0] - pts[i][0], dy = pts[i + 1][1] - pts[i][1], len = std.sqrt(dx * dx + dy * dy);
+      [-dy / len, dx / len];
+    local offset(i) =
+      local a = normal(std.max(0, i - 1)), b = normal(std.min(n - 2, i));
+      local sx = a[0] + b[0], sy = a[1] + b[1], sl = std.sqrt(sx * sx + sy * sy);
+      local mx = sx / sl, my = sy / sl, k = half(i) / (mx * a[0] + my * a[1]);
+      [mx * k, my * k];
+    local side(i, s) = local o = offset(i); [pts[i][0] + s * o[0], pts[i][1] + s * o[1]];
+    [
+      $.prism('%s-%d' % [prefix, i], slot, 'z', [side(i, 1), side(i, -1), side(i + 1, -1), side(i + 1, 1)], z0, z1)
+      for i in std.range(0, n - 2)
+    ],
+  // A round pipe or wire of radius `r` (or one radius per point) bent along a polyline of [x, y] points at depth z:
+  // two crossed bends whose eight edges sit on the circle, the nearest a z-extruded bend comes to a round section.
+  pipe(prefix, slot, pts, r, z=0):
+    local rs = if std.isArray(r) then r else [r for p in pts];
+    local depth = std.sum(rs) / std.length(rs);
+    local c = std.cos(std.pi / 8), s = std.sin(std.pi / 8);
+    $.bend(prefix + '-wide', slot, pts, [2 * c * q for q in rs], z - s * depth, z + s * depth)
+    + $.bend(prefix + '-deep', slot, pts, [2 * s * q for q in rs], z - c * depth, z + c * depth),
   // A syringe lying along x with its needle cap at +x, for a vaccine, an oil dose or a drawn injection. `dose` is the
   // filled share of the barrel. Slots: barrel, dose, stopper, plunger, hub, cap.
   syringe(length, radius, dose=0.8, capLength=null):
