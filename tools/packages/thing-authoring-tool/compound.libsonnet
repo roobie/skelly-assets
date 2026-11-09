@@ -383,4 +383,6 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
   inHand(id, solid): { handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 } },
   // A held tool lies along x and takes its grip on a named solid.
   gripOn(id, solid): { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 90 },
+  // The print on a packaged item's named solid and face; with no text it prints the model's display name.
+  label(solid, face, text=null, up=null): { label: { solid: solid, face: face } + (if text == null then {} else { text: text }) + (if up == null then {} else { up: up }) },
 }

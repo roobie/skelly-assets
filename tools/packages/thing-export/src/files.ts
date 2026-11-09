@@ -7,9 +7,15 @@ import type { ModelExport, RecipeExport } from './recipe.ts';
 // Serialised in-process: a formatter subprocess per model cost more than generating most models.
 const formattedJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 export const modelEntryJson = (entry: NeutralModel): string => formattedJson(entry);
-/** What one recipe wrote: each model's GLB path and part nodes, and every file, all relative to the base. */
+/** What one recipe wrote: each model's GLB path, part nodes and label, and every file, all relative to the base. */
 export interface WrittenRecipe {
-  readonly models: readonly { readonly id: string; readonly kind: string; readonly path: string; readonly partNodes: readonly string[] }[];
+  readonly models: readonly {
+    readonly id: string;
+    readonly kind: string;
+    readonly path: string;
+    readonly partNodes: readonly string[];
+    readonly label?: NeutralModel['label'];
+  }[];
   readonly files: readonly string[];
 }
 /** One generated recipe row: plain data, so a worker thread can generate it and hand it back to be written. */
@@ -45,7 +51,13 @@ export const writeModelExports = (
     files.push(`${directory}/${modelEntry.id}.model.json`, modelEntry.file);
   }
   return {
-    models: outputs.map(({ id, kind, modelEntry, partNodes }) => ({ id, kind, path: modelEntry.file, partNodes })),
+    models: outputs.map(({ id, kind, modelEntry, partNodes }) => ({
+      id,
+      kind,
+      path: modelEntry.file,
+      partNodes,
+      ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
+    })),
     files,
   };
 };

@@ -60,7 +60,7 @@ export function partitionRecipe(packId, rows, tools) {
 
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
-// its pack, kind, GLB path under the pack and part node names, and every file written as <packId>/<logical path>.
+// its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
 // A caller exporting more than recipes passes its own pool, so every export shares the cores.
 export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool }) {
   installJsonnetSources();
@@ -83,7 +83,7 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   for (const [at, { packId, name }] of units.entries()) {
     const tool = tools[name];
     const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: tool.index });
-    models.push(...written.models.map(({ id, kind, path, partNodes }) => ({ id, kind, pack: packId, path, nodes: partNodes })));
+    models.push(...written.models.map(({ id, kind, path, partNodes, label }) => ({ id, kind, pack: packId, path, nodes: partNodes, label })));
     files.push(...written.files.map((file) => outputPath(packId, file)));
   }
   return { models, files };
@@ -127,13 +127,13 @@ async function buildRoster(thing, ids, out, roster, pool) {
       failed = true;
       continue;
     }
-    const { kind, glb, partNodes } = result.value;
+    const { kind, glb, partNodes, modelEntry } = result.value;
     const file = roster.get(id)?.file ?? `${id}.glb`;
     mkdirSync(dirname(join(out, file)), { recursive: true });
     writeFileSync(join(out, file), glb);
     console.log(`built ${file}`);
     const row = roster.get(id);
-    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes });
+    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label });
   }
   return { failed, models };
 }
