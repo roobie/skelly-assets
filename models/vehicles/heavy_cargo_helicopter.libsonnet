@@ -4,7 +4,6 @@ local h = import 'helicopter-kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'heavy_cargo_helicopter.spec.libsonnet';
 local box = k.box;
-local dome = [-90, 90];
 local square = 3.5;
 local finishes = { paint: s.paint, dark: s.trim, glass: 'glass-clear' };
 local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=0.0875, x=x, arc=arc, step=step, sides=sides, square=square);
@@ -16,10 +15,6 @@ local paneArc = s.doorPane;
 local paneX = s.doorPaneX;
 local e = s.engine;
 local sp = s.sponson;
-local hingeRib(id, x, high, low=86) =
-  local bottom = h.point(s.body, x, low, square);
-  local top = h.point(s.body, x, high, square);
-  box(id, 'dark', [x - 0.03, bottom[0], top[1] - 0.05], [x + 0.03, top[0], top[1]]);
 local podSlice(id, x, outer) = {
   id: id,
   kind: 'prism',
@@ -51,21 +46,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + cabinWall('side_far', [-90, -20])
              + cabinWall('roof', [-20, 20], sides=48)
              + wall('door_roof', 'paint', door, [-s.doorArc, s.doorArc], step=0.19)
-             + wall('cockpit_wall', 'paint', [door[1], s.windscreen[0]], dome, step=0.14)
+             + wall('cockpit_wall', 'paint', [door[1], s.windscreen[0]], h.dome, step=0.14)
              + wall('screen_post', 'paint', s.windscreen, [-3, 3], sides=120)
              + wall('screen_sill_near', 'paint', s.windscreen, [s.screenArc, 90])
              + wall('screen_sill_far', 'paint', s.windscreen, [-90, -s.screenArc])
-             + h.loft('nose_top', 'paint', s.body, x=[s.windscreen[1], s.nose], arc=dome, sides=32, square=square),
+             + h.loft('nose_top', 'paint', s.body, x=[s.windscreen[1], s.nose], arc=h.dome, sides=32, square=square),
              finishes),
   k.compound('heavy_cargo_helicopter_tail_section', 700,
-             wall('wall', 'paint', [s.tail, s.floorRear], dome, step=0.09)
+             wall('wall', 'paint', [s.tail, s.floorRear], h.dome, step=0.09)
              + h.loft('lintel', 'paint', [
                { x: s.tail + 0.08, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
                { x: s.tail, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
-             ], arc=dome, step=0.08, sides=32, square=square),
+             ], arc=h.dome, step=0.08, sides=32, square=square),
              finishes),
   k.compound('heavy_cargo_helicopter_cockpit_bulkhead', 70,
-             h.loft('plate', 'dark', s.body, x=[s.floorFront - 0.12, s.floorFront - 0.04], arc=dome, step=0.08, sides=32, square=square),
+             h.loft('plate', 'dark', s.body, x=[s.floorFront - 0.12, s.floorFront - 0.04], arc=h.dome, step=0.08, sides=32, square=square),
              finishes),
   k.compound('heavy_cargo_helicopter_ramp', 280, [
     k.prism('deck', 'dark', [[s.rampTip, 0], [s.rampTip + 0.1, 0], [s.floorRear, s.floorTop - 0.09], [s.floorRear, s.floorTop]], [-1.45, 1.45]),
@@ -84,7 +79,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('fore', 'paint', [paneX[1], door[1]], paneArc, step=0.15)
              + wall('aft', 'paint', [door[0], paneX[0]], paneArc, step=0.15)
              + wall('edge', 'dark', [door[1] - 0.04, door[1]], [s.doorArc, 90], step=0.04)
-             + [hingeRib('hinge_rib', door[0] + 0.03, 66)],
+             + [h.hingeRib('hinge_rib', s.body, door[0] + 0.03, 66, 86, slot='dark', depth=0.05, square=square)],
              finishes,
              { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }),
   k.compound('heavy_cargo_helicopter_cabin_windows', 12,
@@ -104,7 +99,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                { x: 6.25, top: 4.35, bottom: 3.3, half: 0.62, waist: 3.45 },
                { x: 5.3, top: 4.55, bottom: 3.3, half: 0.68, waist: 3.45 },
                { x: 4.4, top: 3.95, bottom: 3.3, half: 0.3, waist: 3.45 },
-             ], arc=dome, step=0.09),
+             ], arc=h.dome, step=0.09),
              finishes),
   k.compound('heavy_cargo_helicopter_rear_pylon', 520,
              h.loft('fairing', 'paint', [
@@ -112,7 +107,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                { x: -5.0, top: 5.0, bottom: 3.5, half: 0.56, waist: 3.6 },
                { x: -6.9, top: 5.3, bottom: 3.5, half: 0.58, waist: 3.6 },
                { x: -7.95, top: 4.4, bottom: 3.5, half: 0.3, waist: 3.6 },
-             ], arc=dome, step=0.09)
+             ], arc=h.dome, step=0.09)
              + k.bothSides([
                k.turned('nacelle', 'paint', 'x', k.annulus(e.radius + 0.01, e.radius + 0.08, e.x - e.length / 2, e.x + e.length / 2), [0, e.y, e.z]) + { sides: 16 },
                box('nacelle_foot', 'paint', [e.x - 0.8, 3.55, 0.5], [e.x + 0.8, 3.92, e.z]),

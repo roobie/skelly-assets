@@ -105,6 +105,11 @@ local shell(id, slot, stations, thick=0.075, x=null, arc=[-180, 180], step=0.062
     for i in std.range(0, std.length(all) - 1)
   ]));
 
+local point(stations, x, degrees, square=2.4) = outlinePoint(sectionOf(ordered(stations), x), degrees, square);
+local hingeRib(id, stations, x, high, low, slot='frame', depth=0.06, square=2.4) =
+  local bottom = point(stations, x, low, square);
+  local top = point(stations, x, high, square);
+  k.box(id, slot, [x - 0.03, bottom[0], top[1] - depth], [x + 0.03, top[0], top[1]]);
 local lerp(a, b, t) = a + (b - a) * t;
 // A quad in plan, from `a` to `b`, each (x, z); a y prism's profile is (z, x).
 local planQuad(a, b, halfA, halfB) =
@@ -146,13 +151,37 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
 ]);
 
 {
-  section(stations, x): sectionOf(ordered(stations), x),
   // The (y, z) of a section's outline at an arc angle, for placing a rib or a hinge on the skin.
-  point(stations, x, degrees, square=2.4): outlinePoint(sectionOf(ordered(stations), x), degrees, square),
+  point: point,
+  dome:: [-90, 90],
+  // Stations grown by `by` at the crown and sides, so a cowl or rail laid on them never shares a surface with the
+  // skin beneath.
+  proud(stations, by):: [station + { half: station.half + by, top: station.top + by } for station in stations],
   // A solid body lofted through the stations in thin slices along x; `x` and `arc` cut out a span of it.
   loft: loft,
   // The same body as a hollow wall `thick` deep, so a cabin can show its seats through glazing.
   shell: shell,
+  // The outer skin, thin enough that a cabin's glazing shows the seats behind it.
+  skin(id, slot, stations, x, arc, sides):: shell(id, slot, stations, thick=0.0625, x=x, arc=arc, sides=sides),
+  // A canopy frame's bow over the crown at `x`.
+  bow(id, stations, x):: shell(id, 'paint', stations, x=[x - 0.035, x + 0.035], arc=[-90, 90], step=0.07),
+  // A rib standing on the skin at `x` from arc `high` down to `low`, carrying a door's hinges.
+  hingeRib: hingeRib,
+  // A door glazed between `rear` and `front` from the roof line at `roofArc` down to the waist, hinged on its leading
+  // edge.
+  door(id, massKg, stations, rear, front, roofArc, paint)::
+    local pane = [rear + 0.035, front - 0.035];
+    k.compound(id, massKg,
+               shell('pane', 'glass', stations, x=pane, arc=[roofArc, 90])
+               + shell('sill', 'frame', stations, x=pane, arc=[82, 90], sides=48)
+               + shell('head', 'frame', stations, x=pane, arc=[roofArc, roofArc + 5], sides=120)
+               + [hingeRib('hinge_rib', stations, front - 0.065, roofArc + 4, 88)],
+               { glass: 'glass-clear', frame: paint },
+               { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }),
+  // The { x, y, r } of a straight boom from `boom.root` to `boom.tip` at `x`, where a band of paint meets it.
+  boomAt(boom, x)::
+    local u = (boom.root.x - x) / (boom.root.x - boom.tip.x);
+    { x: x, y: boom.root.y + u * (boom.tip.y - boom.root.y), r: boom.root.r + u * (boom.tip.r - boom.root.r) },
   // A straight tapered tube from `root` to `tip`, each { x, y, r }, rising or falling as they say.
   boom(id, slot, root, tip, step=0.125, sides=12)::
     loft(id, slot, [
@@ -241,9 +270,6 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
   // Struts splayed out from the belly at half width `root` to a wheel on each side. Fit a wheel at [x, radius, z].
   mainGear(id, massKg, x, radius, width, z, top, root=0.25, finish=steel)::
     k.compound(id, massKg, mainLegs(x, radius, width, z, top, root), { frame: finish }),
-  // Both of the above welded into one part, as a three-wheel undercarriage.
-  threeWheelGear(id, massKg, noseX, mainX, radius, width, z, top, root=0.25, finish=steel)::
-    k.compound(id, massKg, noseLeg(noseX, radius, width, top) + mainLegs(mainX, radius, width, z, top, root), { frame: finish }),
   planQuad: planQuad,
   // A strip of plate through (x, y, z) points, stepped so it stays a stack of flat slabs, as a bent blade or tube is.
   ribbon(id, slot, points, width, thick=0.08, step=0.2, endWidth=null)::

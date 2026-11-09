@@ -3,7 +3,6 @@ local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local s = import 'crashed_light_helicopter.spec.libsonnet';
 local box = k.box;
-local dome = [-90, 90];
 local trim = 'paint-charcoal';
 // Stands proud of the skin, so a fold shows as a dark line over the paint beneath it.
 local proud = [station + { half: station.half + 0.04, top: station.top + 0.04, bottom: station.bottom } for station in s.body];
@@ -41,12 +40,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              // Only the far and rear panes are left; the front of the bubble went with the nose.
              h.shell('far', 'glass', s.body, x=[s.doorRear, s.doorFront], arc=[270, 345])
              + h.shell('far_shard', 'glass', s.body, x=[s.doorFront, 1.28], arc=[280, 320])
-             + h.shell('rear', 'glass', s.body, x=[s.bulkhead, s.doorRear], arc=dome)
+             + h.shell('rear', 'glass', s.body, x=[s.bulkhead, s.doorRear], arc=h.dome)
              + h.shell('near_shard', 'glass', s.body, x=[s.doorRear, 0.6], arc=[20, 62]),
              { glass: 'glass-clear' }),
   k.compound('crashed_light_helicopter_canopy_frame', 6,
-             h.shell('front_bow', 'frame', s.body, x=[s.doorFront - 0.04, s.doorFront + 0.04], arc=dome, step=0.08)
-             + h.shell('rear_bow', 'frame', s.body, x=[s.doorRear - 0.04, s.doorRear + 0.04], arc=dome, step=0.08)
+             h.shell('front_bow', 'frame', s.body, x=[s.doorFront - 0.04, s.doorFront + 0.04], arc=h.dome, step=0.08)
+             + h.shell('rear_bow', 'frame', s.body, x=[s.doorRear - 0.04, s.doorRear + 0.04], arc=h.dome, step=0.08)
              + h.shell('spine', 'frame', s.body, x=[s.bulkhead, 1.28], arc=[-5, 5], sides=32)
              + h.shell('rail_near', 'frame', s.body, x=[s.doorRear, s.doorFront], arc=[s.doorArc - 3, s.doorArc + 3], sides=120)
              + h.shell('rail_far', 'frame', s.body, x=[s.doorRear, s.doorFront], arc=[360 - s.doorArc - 3, 360 - s.doorArc + 3], sides=120),
