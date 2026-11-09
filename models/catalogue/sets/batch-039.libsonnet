@@ -71,7 +71,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     box('shank-%d' % i, 'steel', [-0.13 + i * 0.03, 0.03 - w, -w], [-0.1 + i * 0.03, 0.03 + w, w])
     for i in std.range(0, 8)
   ], { steel: 'scrap-rusted', hole: 'void-black' })
-  + { handling: h.gripOn('spike', 'shank-2'), voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  + h.gripOn('spike', 'shank-2') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A giant insect's stinger 150 mm long, a barbed dark shaft 14 mm thick at the root, still joined by a
   // short neck to a lumpy, flattened sac of pale flesh.
@@ -89,5 +89,5 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
   ] + [
     turned('root', 'root', 'x', [[0, 0], [0, 0.011], [0.008, 0.01], [0.008, 0]], [-0.032, 0.022, 0]),
   ], { flesh: 'flesh-membrane', chitin: 'chitin-black', root: 'chitin-brown' })
-  + { handling: h.gripOn('bee_stinger', 'shaft'), voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
+  + h.gripOn('bee_stinger', 'shaft') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
 ]

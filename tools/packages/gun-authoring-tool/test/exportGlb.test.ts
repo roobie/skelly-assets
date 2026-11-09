@@ -5,6 +5,7 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import {
   applyPoint,
   cross,
+  eulerXyzDegrees,
   fromColumns,
   IDENTITY,
   type Mat3,
@@ -15,6 +16,7 @@ import {
   rotY,
   rotZ,
   sub,
+  transpose,
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
 import { displayItems as selectDisplayItems } from '@skelly/construct/shapes/display.ts';
@@ -32,7 +34,7 @@ import { ACTION_CYCLE_PROFILES } from '../src/gun/cycle.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { ejectionPoint } from '../src/gun/ejection.ts';
-import { eulerXyzDegrees, FILE_FROM_GUNGEN, gripTurn, METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
+import { FILE_FROM_GUNGEN, gripTurn, inFileFrame, METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import { createGunModelEntry, exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { getOptic } from '../src/gun/optics.ts';
@@ -41,7 +43,7 @@ import { FAMILIES } from '../src/gun/parts.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { type ReadGlb, readGlb } from './glbReader.ts';
-import { expectWatertightMesh, loadCorpus, variant } from './helpers.ts';
+import { expectWatertightMesh, loadCorpus, partTriangles, variant } from './helpers.ts';
 import { sweepGroup } from './sweeps.ts';
 
 const design = (name: string): Assembly => {
@@ -63,6 +65,9 @@ const exported = (assembly: Assembly, asset: GlbAssetIdentity = ASSET, variantNa
   }
   return { ...result, read: readGlb(result.glb), resolved: resolve(assembly, gunDomain) };
 };
+
+/** A point or direction read from the file, back in gungen's axes. */
+const toGungenAxes = (v: Vec3): Vec3 => mulMV(transpose(FILE_FROM_GUNGEN), v);
 
 type ExportedGun = ReturnType<typeof exported>;
 // These read-only groups share one identical AR export; determinism keeps independent exports below.
@@ -103,7 +108,7 @@ const actionExportFacts = (name: string) => {
   });
   // The adapter paints fitted attachments in their item finish; the bytes in question are the action metadata's.
   const core = exportGlb({
-    resolved: withAttachmentInstanceAppearances(out.resolved),
+    resolved: inFileFrame(withAttachmentInstanceAppearances(out.resolved)),
     palette: GUN_PALETTE,
     appearance: { appearanceProfile: 'ar' },
     asset: ASSET,
@@ -160,13 +165,14 @@ const expectSightLineClear = (out: ExportedGun, label: string): void => {
   if (!sight) {
     throw new Error(`${label}: export has no sight metadata`);
   }
-  const endpoint = sight.eye.map((value) => value / S) as unknown as Vec3;
+  const endpoint = toGungenAxes(sight.eye.map((value) => value / S) as unknown as Vec3);
+  const direction = toGungenAxes(sight.direction as unknown as Vec3);
   const targetId = sightTargetPartId(out, endpoint, label);
   const eyeRelief = sight.eyeReliefMetres / S;
   const eyePoint: Vec3 = [
-    endpoint[0] - sight.direction[0] * eyeRelief,
-    endpoint[1] - sight.direction[1] * eyeRelief,
-    endpoint[2] - sight.direction[2] * eyeRelief,
+    endpoint[0] - direction[0] * eyeRelief,
+    endpoint[1] - direction[1] * eyeRelief,
+    endpoint[2] - direction[2] * eyeRelief,
   ];
   const center: Vec3 = [
     (eyePoint[0] + endpoint[0]) / 2,
@@ -205,7 +211,7 @@ const glbIndices = (glb: ReadGlb, accessorIndex: number): Uint32Array => {
 
 /**
  * The highest upward face the file draws for `partId` over the x range and across `z`, below `under`, in gun units.
- * The writer turns no gun axis for these parts, so file and gun coordinates differ only by the unit.
+ * The file's corners are read back into gungen's axes; the turn only permutes them, so a level face stays exactly level.
  */
 const drawnUpTop = (
   glb: ReadGlb,
@@ -213,30 +219,22 @@ const drawnUpTop = (
   { x: [x0, x1], z, under }: { readonly x: readonly [number, number]; readonly z: number; readonly under: number },
 ): number => {
   let top = Number.NEGATIVE_INFINITY;
-  for (const node of glb.json.nodes.filter(({ extras }) => extras?.part === partId)) {
-    const shift = node.translation ?? [0, 0, 0];
-    for (const primitive of glb.json.meshes[node.mesh!]!.primitives) {
-      const positions = glb.floats(primitive.attributes.POSITION);
-      const indices = glbIndices(glb, primitive.indices!);
-      const point = (index: number) => [0, 1, 2].map((axis) => (positions[index * 3 + axis]! + shift[axis]!) / S);
-      for (let i = 0; i + 2 < indices.length; i += 3) {
-        const [a, b, c] = [0, 1, 2].map((k) => point(indices[i + k]!)) as [number[], number[], number[]];
-        const xs = [a[0]!, b[0]!, c[0]!];
-        const zs = [a[2]!, b[2]!, c[2]!];
-        const upward = (b[2]! - a[2]!) * (c[0]! - a[0]!) - (b[0]! - a[0]!) * (c[2]! - a[2]!) > 0;
-        if (
-          upward &&
-          a[1] === b[1] &&
-          b[1] === c[1] &&
-          a[1]! < under &&
-          Math.min(...xs) < x1 &&
-          Math.max(...xs) > x0 &&
-          Math.min(...zs) <= z &&
-          Math.max(...zs) >= z
-        ) {
-          top = Math.max(top, a[1]!);
-        }
-      }
+  for (const triangle of partTriangles(glb.json, glb, partId)) {
+    const [a, b, c] = triangle.map((corner) => toGungenAxes(corner.map((value) => value / S) as unknown as Vec3));
+    const xs = [a![0], b![0], c![0]];
+    const zs = [a![2], b![2], c![2]];
+    const upward = (b![2] - a![2]) * (c![0] - a![0]) - (b![0] - a![0]) * (c![2] - a![2]) > 0;
+    if (
+      upward &&
+      a![1] === b![1] &&
+      b![1] === c![1] &&
+      a![1] < under &&
+      Math.min(...xs) < x1 &&
+      Math.max(...xs) > x0 &&
+      Math.min(...zs) <= z &&
+      Math.max(...zs) >= z
+    ) {
+      top = Math.max(top, a![1]);
     }
   }
   if (!Number.isFinite(top)) {
@@ -320,27 +318,35 @@ describe('glb export: axes and units', () => {
     expect(METRES_PER_UNIT).toBe(gunDomain.units.metresPerUnit);
   });
 
-  it('maps gungen forward and up onto deadvox held +x and +y with a zero turn', () => {
-    expect(toFileAxes([1, 0, 0])).toEqual([1, 0, 0]);
+  it('turns gungen forward onto the file front +z and keeps up on +y, so the held grip needs no turn', () => {
+    expect(toFileAxes([1, 0, 0])).toEqual([0, 0, 1]);
     expect(toFileAxes([0, 1, 0])).toEqual([0, 1, 0]);
-    expect(FILE_FROM_GUNGEN).toEqual([1, 0, 0, 0, 1, 0, 0, 0, 1]);
     expect(gripTurn()).toEqual([0, 0, 0]);
   });
 
-  it('derives the turn that undoes a file mapping, matching deadvox for a Z-up file', () => {
-    // A Z-up file (deadvox's existing firearms): gungen up (+Y) is file +Z, gungen right (+Z) is file -Y.
-    const zUp: Mat3 = [1, 0, 0, 0, 0, -1, 0, 1, 0];
-    expect(gripTurn(zUp)).toEqual([-90, 0, 0]);
+  it('writes the gun facing the file front: muzzle ahead of the grip along +z, sight up along +y', () => {
+    const { anchors, grip, gun } = arBaseline.modelEntry;
+    const ahead = sub(anchors!.muzzle!, grip.at);
+    expect(ahead[2]).toBeGreaterThan(0);
+    expect(Math.abs(ahead[0])).toBeLessThan(ahead[2] / 10);
+    near(gun.muzzleDirection!, [0, 0, 1]);
+    near(gun.sight!.up, [0, 1, 0]);
   });
 
   it('round-trips the Euler extraction in deadvox XYZ order', () => {
     const m = mulMM(mulMM(rotX(30), rotY(-40)), rotZ(70));
     near(eulerXyzDegrees(m), [30, -40, 70]);
-    // Turning a Z-up file by the derived turn puts its up axis on +Y and its forward on +X.
-    const turn = gripTurn([1, 0, 0, 0, 0, -1, 0, 1, 0]);
-    const t = mulMM(mulMM(rotX(turn[0]), rotY(turn[1])), rotZ(turn[2]));
-    near(mulMV(t, [0, 0, 1]), [0, 1, 0]);
-    near(mulMV(t, [1, 0, 0]), [1, 0, 0]);
+  });
+
+  it('derives a grip turn that carries any file mapping onto the held axes', () => {
+    // A Z-up file: gungen up (+Y) is file +Z and gungen right (+Z) is file -Y.
+    const zUp: Mat3 = [1, 0, 0, 0, 0, -1, 0, 1, 0];
+    for (const mapping of [FILE_FROM_GUNGEN, zUp]) {
+      const turn = gripTurn(mapping);
+      const held = mulMM(mulMM(mulMM(rotX(turn[0]), rotY(turn[1])), rotZ(turn[2])), mapping);
+      near(mulMV(held, [1, 0, 0]), [0, 0, 1]);
+      near(mulMV(held, [0, 1, 0]), [0, 1, 0]);
+    }
   });
 });
 
@@ -401,7 +407,7 @@ describe('glb export: nodes', () => {
     for (const child of root.children!) {
       const node = json.nodes[child]!;
       const id = node.extras?.part as string;
-      const placed = ar.resolved.placed.get(id)!;
+      const placed = inFileFrame(ar.resolved).placed.get(id)!;
       const probe: Vec3 = [1.5, -2.25, 0.75];
       const viaNode = rotateByQuaternion(node.rotation ?? [0, 0, 0, 1], [probe[0] * S, probe[1] * S, probe[2] * S]);
       const world = viaNode.map((x, i) => x + (node.translation?.[i] ?? 0));
@@ -431,8 +437,8 @@ describe('glb export: port metadata', () => {
     expect(meta.size).toBe(port.size);
     const t = ar.resolved.placed.get('barrel')!;
     const frame = meta.frame as { position: number[]; normal: number[]; up: number[] };
-    near(frame.normal, mulMV(t.r, port.normal));
-    near(frame.up, mulMV(t.r, port.up));
+    near(frame.normal, toFileAxes(mulMV(t.r, port.normal)));
+    near(frame.up, toFileAxes(mulMV(t.r, port.up)));
   });
 
   it('exports a slotted rail once per port, with one count/pitch record', () => {
@@ -453,7 +459,7 @@ describe('glb export: port metadata', () => {
       const t = ar.resolved.placed.get(id)!;
       for (const port of def.ports) {
         const node = ar.read.json.nodes.find((n) => n.name === `${id}.${port.id}`)!;
-        near(portExtras(node).frame.position, applyPoint(t, port.pos));
+        near(portExtras(node).frame.position, toFileAxes(applyPoint(t, port.pos)));
       }
     }
   });
@@ -731,12 +737,13 @@ describe('glb export: deadvox model entry', () => {
       eyeToBead[2] / sightLength,
     ];
     const scale = out.resolved.domain.units.metresPerUnit;
-    const exportedEye: Vec3 = out.modelEntry.gun.sight.eye.map((value) => value / scale) as unknown as Vec3;
+    const exportedEye = toGungenAxes(out.modelEntry.gun.sight.eye.map((value) => value / scale) as unknown as Vec3);
     const exportedDirection = out.modelEntry.gun.sight.direction;
+    const backDirection = toGungenAxes(exportedDirection as unknown as Vec3);
     const exportedEyePoint: Vec3 = [
-      exportedEye[0] - exportedDirection[0] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
-      exportedEye[1] - exportedDirection[1] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
-      exportedEye[2] - exportedDirection[2] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
+      exportedEye[0] - backDirection[0] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
+      exportedEye[1] - backDirection[1] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
+      exportedEye[2] - backDirection[2] * (out.modelEntry.gun.sight.eyeReliefMetres / scale),
     ];
     expect(eyePoint[1]).toBeGreaterThan(receiverTop[1]);
     expect(eyePoint[0]).toBeLessThan(beadTop[0]);
@@ -763,7 +770,8 @@ describe('glb export: deadvox model entry', () => {
         throw new Error('compact SMG needs its drum and post in the exported sight data');
       }
       expect(sight.kind).toBe('iron');
-      const eye = sight.eye.map((value) => value / S) as unknown as Vec3;
+      const eye = toGungenAxes(sight.eye.map((value) => value / S) as unknown as Vec3);
+      const direction = toGungenAxes(sight.direction as unknown as Vec3);
       const [receiverId] = Object.entries(out.resolved.assembly.parts).find(([, part]) => part.family === 'receiver')!;
       const receiverAxis = out.resolved.defs.get(receiverId)!.axes.find(({ kind }) => kind === 'sight')!;
       const authoredEye = applyPoint(out.resolved.placed.get(receiverId)!, receiverAxis.origin);
@@ -771,8 +779,8 @@ describe('glb export: deadvox model entry', () => {
       near([eye[0], eye[2]], [authoredEye[0], authoredEye[2]]);
       const { barrelAt, hood, postTip } = compactSmgFrontSight(out, grains !== undefined);
       const along = (x: number): Vec3 => {
-        const t = (x - eye[0]) / sight.direction[0];
-        return [x, eye[1] + sight.direction[1] * t, eye[2] + sight.direction[2] * t];
+        const t = (x - eye[0]) / direction[0];
+        return [x, eye[1] + direction[1] * t, eye[2] + direction[2] * t];
       };
       near(along(postTip[0]).slice(1), postTip.slice(1), grains ? 3 : 6);
 
@@ -861,13 +869,13 @@ describe('glb export: deadvox model entry', () => {
     for (const [name, frame] of Object.entries(expected)) {
       near(
         out.modelEntry.anchors![name]!,
-        frame.position.map((x) => x * S),
+        toFileAxes(frame.position).map((x) => x * S),
         6,
       );
     }
     near(
       out.modelEntry.anchors!.ejection!,
-      ejectionPoint(out.resolved)!.map((x) => x * S),
+      toFileAxes(ejectionPoint(out.resolved)!).map((x) => x * S),
       6,
     );
   });

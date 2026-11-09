@@ -55,7 +55,7 @@ local flask(fill) = [
     edge: 'hide-dragon-black',
     tie: 'cord-cotton',
     scale: 'scale-dragon',
-  }) + { handling: h.gripOn('black_dragon_hide', 'roll') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'], setting: ['fantasy'] } } },
+  }) + h.gripOn('black_dragon_hide', 'roll') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'], setting: ['fantasy'] } } },
 
   // The same black hide 500 mm long and 100 mm across, still raw and crusted with tanning salt, bound tight with
   // three twine ties while it cures.
@@ -69,7 +69,7 @@ local flask(fill) = [
     tie: 'jute',
     scale: 'scale-dragon',
     crust: 'salt-white',
-  }) + { handling: h.gripOn('curing_black_dragon_hide', 'roll') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'], setting: ['fantasy'] } } },
+  }) + h.gripOn('curing_black_dragon_hide', 'roll') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'], setting: ['fantasy'] } } },
 
   // One dragon scale 110 mm long, 90 mm wide and 8 mm thick, curved across its width, glossy black with a raised
   // dark green keel down its middle.
@@ -93,7 +93,7 @@ local flask(fill) = [
   ] + [
     h.tube('ribbon', 'ribbon', 0.024, 0.027, 0.04, 0.052, 0.025, 0),
     h.disc('wax', 'wax', 0.011, 0.048, 0.054, 0.046, 0.0),
-  ], { paper: 'paper-butcher', wood: 'wood-walnut', rune: 'crystal-glow-violet', ribbon: 'cloth-crimson', wax: 'lacquer-red' }) + { handling: h.gripOn('glowing_rune_scroll', 'roll') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['paper', 'wood'], setting: ['fantasy'] } } },
+  ], { paper: 'paper-butcher', wood: 'wood-walnut', rune: 'crystal-glow-violet', ribbon: 'cloth-crimson', wax: 'lacquer-red' }) + h.gripOn('glowing_rune_scroll', 'roll') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['paper', 'wood'], setting: ['fantasy'] } } },
 
   // A round-bellied glass flask 122 mm tall and 80 mm across, corked and sealed, about two thirds full of a glowing
   // blue liquid.
@@ -113,7 +113,7 @@ local flask(fill) = [
     for i in std.range(0, 5)
   ] + [
     box('rune-bar', 'rune', [-0.042, 0.0195, -0.0012], [0.052, 0.0215, 0.0012]),
-  ], { bone: 'bone', bore: 'flesh-membrane', plug: 'plant-purple', rune: 'lacquer-red' }) + { handling: h.gripOn('bone_syringe', 'shaft') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { bone: 'bone', bore: 'flesh-membrane', plug: 'plant-purple', rune: 'lacquer-red' }) + h.gripOn('bone_syringe', 'shaft') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A steel syringe 200 mm long from thumb ring to capped needle, its barrel 18 mm across and banded with a carved
   // red rune, a brass plunger and finger flange.
@@ -123,7 +123,7 @@ local flask(fill) = [
   ] + [
     box('glyph-%d' % i, 'rune', [-0.016 + 0.03 * i, 0.0215, -0.003], [-0.008 + 0.03 * i, 0.0235, 0.003])
     for i in [0, 1]
-  ], { barrel: 'steel-stainless', dose: 'syrup-green', stopper: 'rubber-black', plunger: 'brass-polished', hub: 'brass-polished', cap: 'steel-stainless', rune: 'lacquer-red' }) + { handling: h.gripOn('rune_banded_steel_syringe', 'barrel') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { barrel: 'steel-stainless', dose: 'syrup-green', stopper: 'rubber-black', plunger: 'brass-polished', hub: 'brass-polished', cap: 'steel-stainless', rune: 'lacquer-red' }) + h.gripOn('rune_banded_steel_syringe', 'barrel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A thick pale candle 90 mm tall and 60 mm across, unlit, its black wick standing in a cupped top, a band of
   // glowing blue runes cut into its front and wax runs down one side.

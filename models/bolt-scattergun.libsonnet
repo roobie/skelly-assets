@@ -3,8 +3,9 @@ local box = h.box;
 
 // The bolt carbine's trench scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, a long
 // slim barrel with a perforated heat shield and a magazine tube beneath it, and a short ribbed brass pump handle
-// wrapped close round the tube. About 1.3 m long. The muzzle is at +x.
-// Hand-guard point (the off hand's hold on the pump handle), in this model's metres: [0.4725, 0.215, 0].
+// wrapped close round the tube. About 1.3 m long. Laid out with the muzzle at +x, the axis
+// `gripOn` names, so the built model's muzzle faces +z.
+// Hand-guard point (the off hand's hold on the pump handle), in this layout's metres: [0.4725, 0.215, 0].
 
 local w = 0.06;  // half the receiver's width
 local barrelY = 0.29;  // the barrel's axis
@@ -60,9 +61,8 @@ local pumpX1 = 0.545;
     vent: 'rubber-black',
     grip: 'rubber-black',
     round: 'brass',
-  }) + {
+  }) + h.gripOn('bolt_scattergun', 'grip') + {
     taxonomy: { category: 'weapons', tags: { weapon: ['shotgun'], setting: ['sci-fi'] } },
-    handling: h.gripOn('bolt_scattergun', 'grip'),
     voxelGrain: 0.004,
   },
 ]

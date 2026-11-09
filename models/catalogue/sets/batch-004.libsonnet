@@ -3,8 +3,7 @@ local box = h.box;
 local turned = h.turned;
 // A short rod standing on y from `y0`, `height` tall.
 local post(id, slot, x, y0, z, radius, height) = turned(id, slot, 'y', [[0, 0], [0, radius], [height, radius], [height, 0]], [x, y0, z]);
-// A small thing held upright in the hand by its named solid, as the medicine bottles in food-medical.libsonnet are.
-local inHand(id, solid) = { handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 } };
+local inHand = h.inHand;
 // A medicine bottle of the vessel family: a body, a shoulder up to a neck, a cap and a paper label band.
 local bottle(id, massKg, radius, height, neckRadius, capRadius, capHeight, finish, dimensions={}) = h.item(id, 'vessel', massKg, {
   radius: radius, height: height, shoulderHeight: 0.005, neckRadius: neckRadius, neckHeight: 0.005,

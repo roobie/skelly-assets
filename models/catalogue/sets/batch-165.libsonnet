@@ -312,7 +312,7 @@ local rucksack(id, massKg, o) =
     box('drawcord-r', 'cord', [0.064, 0, -l / 2 - 0.08], [0.07, 0.006, -l / 2]),
     box('cord-lock', 'cord', [-0.075, 0, -l / 2 - 0.1], [0.075, 0.01, -l / 2 - 0.08]),
   ], { net: 'cord-cotton', strap: 'cloth-cream', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004, handling: { part: 'net_backpack', solid: 'hem', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 } } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  + h.inHand('net_backpack', 'hem') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
 
   // A nylon pet carrier backpack 330 mm wide, 420 mm tall and 270 mm deep with a clear domed window on its front
   // ringed by air holes, mesh vents on both sides, a top handle and padded shoulder straps.

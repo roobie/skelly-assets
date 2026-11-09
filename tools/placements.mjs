@@ -1,9 +1,10 @@
-// Vehicle placements: the part at each site of a vehicle, where it sits in the vehicle frame and whether it is a
+// Vehicle placements: the part at each site of a vehicle, where it sits in the model frame and whether it is a
 // mirrored far-side twin, and the tags the vehicle adds to its body's. Sources are
 // models/vehicles/<vehicle>.placements.libsonnet, built from models/vehicles/site.libsonnet; a variant names its parent
 // and is laid out from its sites. The why is in docs/decisions/0001-vehicle-placements.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
 import { modelProblems } from './taxonomy.mjs';
@@ -13,7 +14,7 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['parent', 'sites', 'tags']);
+const VEHICLE_KEYS = new Set(['forward', 'parent', 'sites', 'tags']);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
@@ -83,6 +84,7 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
   for (const [vehicle, entry] of Object.entries(placements)) {
     const unknown = Object.keys(entry ?? {}).filter((key) => !VEHICLE_KEYS.has(key));
     if (unknown.length > 0) problems.push(`${vehicle}: unknown keys ${unknown.join(' ')}`);
+    if (!FORWARDS.includes(entry?.forward)) problems.push(`${vehicle}: forward is not one of ${FORWARDS.join(' ')}`);
     if (entry?.parent !== undefined) {
       const parentProblem = parentProblems(vehicle, entry.parent, placements, vehicleRows);
       problems.push(...parentProblem);
@@ -115,7 +117,8 @@ export function exportPlacements({ placements, models, vehicleRows, dependsOn, v
   const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary });
   if (problems.length > 0) throw new Error(`vehicle placements:\n  ${problems.join('\n  ')}`);
   const byModel = packsByModel(models);
-  const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { parent, sites, tags }]) => {
+  const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { forward, parent, sites: laid, tags }]) => {
+    const sites = laid.map((site) => ({ ...site, at: toModelFrame(forward, site.at) }));
     const { pack } = vehiclePack(vehicle, placements, vehicleRows, byModel);
     const path = placementsPath(vehicle);
     const file = join(out, outputPath(pack, path));

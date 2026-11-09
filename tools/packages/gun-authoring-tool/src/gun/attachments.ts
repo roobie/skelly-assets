@@ -5,6 +5,7 @@ import { MATERIALS } from '@skelly/thing-core/materials';
 import type { OpticAperture } from '@skelly/thing-core/optic-aperture';
 import type { Reticle } from '@skelly/thing-core/reticle';
 import appearanceContent from './appearance.json' with { type: 'json' };
+import { toFileAxes } from './exportFrame.ts';
 import { MOUNT_STANDARDS, type MountKind } from './mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_TYPE_IDS, opticRailContactSolids } from './optics.ts';
 import { ironEyeDistanceRangeMetres } from './sightView.ts';
@@ -28,7 +29,7 @@ interface AttachmentProperties {
 
 interface AttachmentSightMetadata {
   readonly kind: 'optic' | 'iron';
-  /** Ocular point relative to the attachment node, in metres. */
+  /** Ocular point in the attachment model file's axes, in metres. */
   readonly eye: Vec3;
   readonly direction: Vec3;
   readonly up: Vec3;
@@ -43,10 +44,13 @@ export interface AttachmentMetadata {
   readonly id: string;
   readonly kind: AttachmentKind;
   readonly mount: MountKind;
-  /** Local connector frame of the standalone attachment model; its normal opposes the firearm slot normal. */
+  /**
+   * Connector frame in the standalone attachment model file's axes; its normal opposes the firearm slot normal. The
+   * metadata's frames are all in those axes, so a consumer fits the attachment's file as it is written.
+   */
   readonly mountFrame: { readonly normal: Vec3; readonly up: Vec3 };
   readonly properties: AttachmentProperties;
-  /** Local sight frame for runtime fitting; the host gun transform is applied by Deadvox. */
+  /** Sight frame in the attachment model file's axes; Deadvox applies the fitted attachment's place on the host. */
   readonly sight?: AttachmentSightMetadata;
 }
 
@@ -397,7 +401,14 @@ export const attachmentMetadata = (
   if (!port) {
     throw new Error(`Attachment ${metadata.id} has no male ${metadata.mount} connector`);
   }
-  return { ...metadata, mountFrame: { normal: port.normal, up: port.up } };
+  const { sight } = metadata;
+  return {
+    ...metadata,
+    ...(sight
+      ? { sight: { ...sight, eye: toFileAxes(sight.eye), direction: toFileAxes(sight.direction), up: toFileAxes(sight.up) } }
+      : {}),
+    mountFrame: { normal: toFileAxes(port.normal), up: toFileAxes(port.up) },
+  };
 };
 
 export const withAttachmentInstanceAppearances = (resolved: Resolved): Resolved => {

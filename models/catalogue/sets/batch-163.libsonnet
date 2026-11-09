@@ -215,7 +215,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     h.prism('ear-b', 'cloth', 'z', [[0.36, 0.24], [0.39, 0.22], [0.44, 0.27], [0.42, 0.29]], -0.015, 0.015),
     h.prism('stick', 'stick', 'z', [[-0.6, 0], [-0.6, 0.024], [0.45, 0.255], [0.45, 0.231]], -0.012, 0.012),
   ], { cloth: 'cloth-red', stick: 'wood-oak' })
-  + { handling: h.gripOn('bindle', 'stick') } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'] } } },
+  + h.gripOn('bindle', 'stick') + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'] } } },
 
   // A leather book strap laid flat: two straps 25 mm wide crossed under a stiff leather carrying handle 120 mm long,
   // one buckled into a loop 300 mm long and 160 mm across, the other into a loop 200 mm long and 120 mm across.
@@ -281,5 +281,5 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     for i in [0, 1]
     for x in [[-0.18, 0.18][i]]
   ], { shell: 'plastic-charcoal', seam: 'steel-grey', handle: 'plastic-black', metal: 'metal-silver' })
-  + { handling: h.gripOn('briefcase', 'handle-grip') } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.gripOn('briefcase', 'handle-grip') + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

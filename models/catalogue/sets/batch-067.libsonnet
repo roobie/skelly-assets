@@ -57,8 +57,7 @@ local seat(y, w) = [
       alongX('strap', 'strap', [[0.0, 0.0345], [0.03, 0.0345]], 0.035),
       box('strap-tab', 'strap', [0.0, 0.065, -0.01], [0.045, 0.07, 0.01]),
       alongX('ferrule', 'shaft', [[0.45, 0.005], [0.53, 0.0025], [0.545, 0.001]], 0.035),
-    ], { handle: 'wood-walnut', shaft: 'alu-bare', canopy: 'nylon-black', strap: 'cloth-charcoal' }) + {
-    handling: h.gripOn('umbrella', 'grip'),
+    ], { handle: 'wood-walnut', shaft: 'alu-bare', canopy: 'nylon-black', strap: 'cloth-charcoal' }) + h.gripOn('umbrella', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'fabric'], setting: ['modern'] } } },
 
@@ -124,8 +123,7 @@ local seat(y, w) = [
   ] + [
     box('fret-%d' % i, 'metal', [0.5 - 0.6 * (1 - std.pow(2, -i / 12)), 0.074, -0.016], [0.502 - 0.6 * (1 - std.pow(2, -i / 12)), 0.076, 0.016])
     for i in std.range(1, 17)
-  ], 0.75), { wood: 'wood-walnut', metal: 'steel-stainless', head: 'cloth-cream', bridge: 'wood-birch', board: 'lacquer-black' }) + {
-    handling: h.gripOn('banjo', 'neck'),
+  ], 0.75), { wood: 'wood-walnut', metal: 'steel-stainless', head: 'cloth-cream', bridge: 'wood-birch', board: 'lacquer-black' }) + h.gripOn('banjo', 'neck') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 

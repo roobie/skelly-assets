@@ -82,7 +82,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     box('gum-tag', 'gum', [0.0, 0.0, -0.012], [0.022, 0.012, 0.014]),
   ] + spike('groove', 'venom', 0.13, 0.95, 0.03, 0.0, 0.006, 0.002, 8, 2.9) + [
     ball('drop', 'venom', 0.004, 0.03 + 0.13 * std.sin(1.1), 0.13 * (1 - std.cos(1.1)) + 0.005, 0.0),
-  ], { fang: 'gem-onyx', gum: 'flesh-membrane', venom: 'syrup-green' }) + { handling: h.gripOn('black_spider_fang', 'gum') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { fang: 'gem-onyx', gum: 'flesh-membrane', venom: 'syrup-green' }) + h.gripOn('black_spider_fang', 'gum') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A straight branch 1.3 m long and 50 mm thick in its bark, ringed with carved rune bands that glow pale blue.
   h.compound('rune_carved_branch', 1.2, [
@@ -96,7 +96,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     box('glyph-%d' % i, 'rune', [-0.36 + 0.3 * i, 0.03, 0.022], [-0.33 + 0.3 * i, 0.036, 0.028])
     for i in [0, 1, 2]
-  ], { bark: 'bark', heart: 'wood-pine', rune: 'gem-aquamarine' }) + { handling: h.gripOn('rune_carved_branch', 'branch') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'], setting: ['fantasy'] } } },
+  ], { bark: 'bark', heart: 'wood-pine', rune: 'gem-aquamarine' }) + h.gripOn('rune_carved_branch', 'branch') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A corked glass vial 64 mm tall and 26 mm across, two thirds full of a pale green powder that glows.
   h.compound('glow_dust', 0.035, [
@@ -130,7 +130,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     h.turned('lobe-large', 'pale', 'x', [[0, 0], [0, 0.02], [0.02, 0.045], [0.05, 0.052], [0.08, 0.04], [0.088, 0.03], [0.088, 0]], [-0.085, 0.05, 0]),
     h.turned('waist', 'quartz', 'x', [[0, 0], [0, 0.031], [0.012, 0.031], [0.012, 0]], [0.0, 0.05, 0]),
     h.turned('lobe-small', 'dark', 'x', [[0, 0], [0, 0.028], [0.02, 0.04], [0.045, 0.038], [0.065, 0.022], [0.07, 0]], [0.01, 0.05, 0]),
-  ], { pale: 'brick-buff', quartz: 'gem-opaque', dark: 'stone-whet' }) + { handling: h.gripOn('twin_lobed_gizzard_stone', 'lobe-large') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { pale: 'brick-buff', quartz: 'gem-opaque', dark: 'stone-whet' }) + h.gripOn('twin_lobed_gizzard_stone', 'lobe-large') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A segmented feeding tube 300 mm long, tapering from 14 mm across at its fleshy root to a needle point.
   h.compound('bloodsucker_proboscis', 0.03, [
@@ -139,7 +139,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     h.tube('band-%d' % i, 'band', 0.002, 0.0075 - 0.0012 * i, 0.04 + 0.045 * i, 0.046 + 0.045 * i, 0.018, 0)
     for i in [0, 1, 2, 3]
-  ], { flesh: 'flesh-membrane', shell: 'chitin-brown', band: 'bone' }) + { handling: h.gripOn('bloodsucker_proboscis', 'tube') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { flesh: 'flesh-membrane', shell: 'chitin-brown', band: 'bone' }) + h.gripOn('bloodsucker_proboscis', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A curved fragment of stone eggshell 125 mm long, 90 mm wide and 6 mm thick, broken to sharp edges and speckled.
   h.compound('stone_eggshell_shard', 0.14, h.curvedPlate('shell', 'shell', shellOutline, 0, 0.006, 0.08, 20) + [

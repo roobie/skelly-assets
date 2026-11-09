@@ -1,3 +1,4 @@
+import { fromEulerXyzDegrees, mulMV, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
@@ -133,6 +134,44 @@ it('exports a grip following the held solid through resizing and assembly placem
   expect(after.grip?.at[1]).toBeCloseTo(0.08);
   datum.solid = 'missing';
   expect(exportFixture).toThrow('missing datum geometry');
+});
+it('turns a tool laid out along its named axis so its working end faces +z, and its grip turn onto the held axes', () => {
+  const input = fixture();
+  // A shaft with a head at its working end, laid out along `along` with that end on the positive side and gripped with
+  // a quarter twist about it, which the held axes keep about their working end.
+  const tool = (along: 0 | 2, twist: number[], forward?: '+x') => {
+    const span = (from: number, to: number, half: number) => ({
+      min: [-half, -half, -half].map((value, axis) => (axis === along ? from : value)),
+      max: [half, half, half].map((value, axis) => (axis === along ? to : value)),
+    });
+    const pieces = [
+      { id: 'shaft', slot: 'body', kind: 'box', ...span(0, 0.25, 0.01) },
+      { id: 'head', slot: 'body', kind: 'box', ...span(0.25, 0.3, 0.03) },
+    ];
+    const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify(pieces) } };
+    const item = {
+      ...input.items[0],
+      ...(forward ? { forward } : {}),
+      parts: [part],
+      connections: [],
+      handling: { part: part.id, solid: 'shaft', fraction: [0.5, 0.5, 0.5], turn: twist, hold: 'upright', roll: 0 },
+      anchors: { tip: { part: part.id, solid: 'head', fraction: [1, 0.5, 0.5].map((_, axis) => (axis === along ? 1 : 0.5)) } },
+    };
+    const loaded = loadCatalogue({ ...input, items: [item] });
+    return buildItem(loaded.items[0]!, loaded).handling;
+  };
+  const held = (handling: ReturnType<typeof tool>, v: Vec3) => mulMV(fromEulerXyzDegrees(handling.grip!.turn!), v);
+  const towardTip = (handling: ReturnType<typeof tool>) => normalize(sub(handling.anchors!.tip!, handling.grip!.at));
+  const alongX = tool(0, [90, 0, 0], '+x');
+  const alongZ = tool(2, [0, 0, 90]);
+  for (const handling of [alongX, alongZ]) {
+    // The working end faces +z in the file and on the held axes, and the twist turns the tool's top the same way.
+    expect(towardTip(handling).map(Math.round)).toEqual([0, 0, 1]);
+    expect(held(handling, towardTip(handling)).map(Math.round)).toEqual([0, 0, 1]);
+    expect(held(handling, [0, 1, 0]).map(Math.round)).toEqual([-1, 0, 0]);
+  }
+  // A tool laid out along +z already keeps its authored turn.
+  expect(alongZ.grip?.turn).toEqual([0, 0, 90]);
 });
 it('exports datums and baked collision that follow the resized solid', () => {
   const input = fixture();

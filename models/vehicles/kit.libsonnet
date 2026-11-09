@@ -1,4 +1,4 @@
-// Helpers for vehicle part rows, in the vehicle frame: x forward, y up, z toward the near side.
+// Helpers for vehicle part rows, in the vehicle frame, frame.libsonnet.
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts') = {
   id: id,

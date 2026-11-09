@@ -23,7 +23,7 @@ local cross(side) =
     h.box('cap-lever', 'cap', [-0.150, 0.468, 0.010], [-0.086, 0.477, 0.030]),
   ] + cross('front') + cross('back') + handle('handle-a', -0.040) + handle('handle-b', 0.040) + handle('handle-c', 0.120),
   { body: 'polymer-od-green', seam: 'polymer-od-green', handle: 'polymer-od-green', spout: 'steel-grey', cap: 'paint-charcoal' }) + {
-    handling: { part: 'jerry_can', solid: 'handle-b', fraction: [0.5, 0.5, 0.5], turn: [0, 0, -90], hold: 'upright', roll: 0 },
+    handling: { part: 'jerry_can', solid: 'handle-b', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     voxelGrain: 0.004,
   },
 ]

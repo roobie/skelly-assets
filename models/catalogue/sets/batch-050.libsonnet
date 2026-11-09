@@ -95,9 +95,8 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     for i in std.range(0, 9)
   ] + [
     ring('loop', 'wire', 0.012, 0.002, 0.0, 0.135, 0),
-  ], { wire: 'steel-bright', mesh: 'steel-grey', strand: 'steel-stainless' }) + {
+  ], { wire: 'steel-bright', mesh: 'steel-grey', strand: 'steel-stainless' }) + h.gripOn('makeshift_wire_sieve', 'twist-5') + {
     voxelGrain: 0.002,
-    handling: h.gripOn('makeshift_wire_sieve', 'twist-5'),
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A countertop shaved-ice maker 240 mm wide, 190 mm deep and 300 mm tall: a red housing with a clear ice hopper

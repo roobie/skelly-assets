@@ -5,6 +5,6 @@ local part(id, family, massKg, dimensions, finish, grip, exportMass) = {
   taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
   parts: [{ id: 'part', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
   connections: [],
-  handling: { part: 'part', solid: grip.solid, fraction: grip.fraction, turn: [0, 0, 0], hold: grip.hold, roll: 0 },
+  handling: { part: 'part', solid: grip.solid, fraction: grip.fraction, turn: [0, -90, 0], hold: grip.hold, roll: 0 },
 };
 { part: part }

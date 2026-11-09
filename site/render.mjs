@@ -47,7 +47,7 @@ function load(model) {
   return cache.get(model.id);
 }
 
-// A vehicle: the model of each site placed where it sits, a mirrored twin reflected across its own z = 0 plane first.
+// A vehicle: the model of each site placed where it sits, a mirrored twin reflected across its own x = 0 plane first.
 // Its parts stay in site order, so the viewer can move each one apart.
 function loadVehicle(vehicle) {
   if (!cache.has(vehicle.id)) {
@@ -60,7 +60,7 @@ function loadVehicle(vehicle) {
         const part = parts[i].scene.clone(true);
         part.name = site.site;
         part.position.fromArray(site.at);
-        if (site.mirror) part.scale.z = -1;
+        if (site.mirror) part.scale.x = -1;
         scene.add(part);
         triangles += parts[i].triangles;
         for (const m of parts[i].materials) materials.set(m.name, m);

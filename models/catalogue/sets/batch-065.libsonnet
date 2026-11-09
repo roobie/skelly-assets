@@ -57,8 +57,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('hinge', 'metal', [0.075, -0.004, -0.026], [0.09, 0.012, 0.026]),
     box('sight-front', 'trim', [0.31, 0.06, -0.003], [0.32, 0.072, 0.003]),
     box('sight-rear', 'trim', [0.08, 0.06, -0.008], [0.09, 0.074, 0.008]),
-  ], { stock: 'plastic-yellow', body: 'plastic-blue', muzzle: 'plastic-orange', trim: 'plastic-black', metal: 'steel' }) + {
-    handling: h.gripOn('air_launcher', 'grip'),
+  ], { stock: 'plastic-yellow', body: 'plastic-blue', muzzle: 'plastic-orange', trim: 'plastic-black', metal: 'steel' }) + h.gripOn('air_launcher', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -175,8 +174,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
   ] + [
     rod('braid-%d' % i, 'cap', 0.009, 0.03 + 0.024 * i, 0.034 + 0.024 * i, 0)
     for i in std.range(0, 5)
-  ], { cap: 'rubber-black', grip: 'leather-black', shaft: 'lacquer-black', lash: 'nylon-black' }) + {
-    handling: h.gripOn('dressage_whip', 'grip'),
+  ], { cap: 'rubber-black', grip: 'leather-black', shaft: 'lacquer-black', lash: 'nylon-black' }) + h.gripOn('dressage_whip', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'rubber'] } } },
 
@@ -192,8 +190,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     flat('edge-a', 'edge', [[-0.01, 0.0], [0.02, 0.045], [0.026, 0.04], [0.0, 0.0]], 0.0305, 0.0315),
     flat('edge-b', 'edge', [[-0.01, 0.0], [0.0, 0.0], [0.026, -0.04], [0.02, -0.045]], 0.0305, 0.0315),
     box('hinge', 'collar', [0.175, 0.0, -0.012], [0.188, 0.034, 0.012]),
-  ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + {
-    handling: h.gripOn('folding_shovel', 'grip'),
+  ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + h.gripOn('folding_shovel', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -248,8 +245,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('notch-a', 'mark', [0.14, -0.0072, -0.0026], [0.143, -0.003, 0.0026]),
     box('notch-b', 'mark', [0.146, -0.0072, -0.0026], [0.149, -0.003, 0.0026]),
     turned('wheel', 'wheel', 'z', [[0, 0], [0, 0.0035], [0.002, 0.0035], [0.002, 0]], [0.157, -0.004, -0.001]),
-  ], { handle: 'alu-bare', band: 'rubber-black', head: 'brass', mark: 'coal-black', wheel: 'steel-bright' }) + {
-    handling: h.gripOn('glass_cutter', 'handle'),
+  ], { handle: 'alu-bare', band: 'rubber-black', head: 'brass', mark: 'coal-black', wheel: 'steel-bright' }) + h.gripOn('glass_cutter', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -264,8 +260,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     turned('nozzle', 'plastic', 'x', [[0, 0], [0, 0.009], [0.012, 0.005], [0.012, 0]], [0.21, 0, 0]),
     rod('needle', 'needle', 0.0015, 0.222, 0.242, 0.0),
     box('clip', 'plastic', [0.06, 0.011, -0.004], [0.12, 0.015, 0.004]),
-  ], { barrel: 'alu-bare', plastic: 'plastic-black', shaft: 'steel-bright', needle: 'steel-stainless' }) + {
-    handling: h.gripOn('hand_pump', 'barrel'),
+  ], { barrel: 'alu-bare', plastic: 'plastic-black', shaft: 'steel-bright', needle: 'steel-stainless' }) + h.gripOn('hand_pump', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -306,8 +301,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('grip-low', 'leather', [-0.27, -0.004, -0.018], [-0.25, 0.012, 0.018]),
     box('grip-high', 'leather', [-0.27, 0.068, -0.018], [-0.25, 0.084, 0.018]),
     turned('nozzle', 'nozzle', 'x', [[0, 0], [0, 0.02], [0.03, 0.014], [0.1, 0.006], [0.1, 0]], [0.155, 0.04, 0]),
-  ], { wood: 'wood-oak', leather: 'leather-brown', pleat: 'leather-chestnut', nozzle: 'brass' }) + {
-    handling: h.gripOn('leather_bellows', 'handle-high'),
+  ], { wood: 'wood-oak', leather: 'leather-brown', pleat: 'leather-chestnut', nozzle: 'brass' }) + h.gripOn('leather_bellows', 'handle-high') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'wood'] } } },
 

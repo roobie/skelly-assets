@@ -10,6 +10,7 @@ import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
 import { parseAttachmentFit, previewFittedAttachments } from '../src/gun/attachmentPreview.ts';
 import { attachmentMetadata, attachmentMountSlot, withAttachmentInstanceAppearances } from '../src/gun/attachments.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { inFileFrame } from '../src/gun/exportFrame.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { buildLayers } from '../src/viewer/scene.ts';
 import { readGlb } from './glbReader.ts';
@@ -231,7 +232,8 @@ describe('viewer attachment previews', () => {
       throw new Error(preview.message);
     }
     const partId = 'fit-preview-0';
-    const transform = preview.report.resolved.placed.get(partId);
+    // The file is written in its own axes, so the fitted node carries the preview's placement turned into them.
+    const transform = inFileFrame(preview.report.resolved).placed.get(partId);
     if (!transform) {
       throw new Error('Preview suppressor was not placed');
     }

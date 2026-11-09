@@ -68,7 +68,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   ] + [
     h.disc('pivot-%d' % i, 'bolt', 0.006, -0.013, 0.013, [0.325, 0.325, 0.385][i], [-0.012, 0.012, 0][i])
     for i in [0, 1, 2]
-  ], { arm: 'steel-grey', grip: 'plastic-red', head: 'steel-blued', jaw: 'steel-hardened', gap: 'coal-black', bolt: 'steel-bright' }) + { handling: h.gripOn('bolt_cutters', 'grip-a') } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { arm: 'steel-grey', grip: 'plastic-red', head: 'steel-blued', jaw: 'steel-hardened', gap: 'coal-black', bolt: 'steel-bright' }) + h.gripOn('bolt_cutters', 'grip-a') + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A two-part sand mould in a wooden flask 400 by 260 mm and 200 mm high: a lower drag and an upper cope, packed
   // sand showing on top with a pouring cup and a riser, alignment lugs with steel pins at the ends.
   local L = 0.2, W = 0.13, t = 0.02;
@@ -134,7 +134,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     h.turned('shank', 'shank', 'x', [[0, 0], [0, 0.0095], [0.15, 0.0095], [0.15, 0]], [0.012, 0.0105, 0]),
     h.prism('wedge', 'shank', 'z', [[0.162, 0.001], [0.19, 0.0085], [0.19, 0.0125], [0.162, 0.02]], -0.0085, 0.0085),
     h.prism('edge', 'edge', 'z', [[0.19, 0.0085], [0.2, 0.01], [0.2, 0.011], [0.19, 0.0125]], -0.0085, 0.0085),
-  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + { voxelGrain: 0.002, handling: h.gripOn('chisel', 'shank') } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + h.gripOn('chisel', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A crucible like a stout tumbler, 165 mm high and 135 mm across the rim, thick-walled, with a pouring lip and a
   // little dross on the floor.
   h.compound('crucible', 1, [

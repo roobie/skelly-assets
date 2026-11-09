@@ -31,8 +31,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.rod('neck', 'body', 0.0045, 0.170, 0.214, 0.0145),
     h.disc('head', 'body', 0.0075, 0.010, 0.0185, 0.218, 0),
     h.disc('bristles', 'bristles', 0.0062, 0.0185, 0.029, 0.218, 0),
-  ], { body: 'plastic-gloss-white', band: 'plastic-blue', button: 'plastic-blue', bristles: 'plastic-clear-blue' }) + {
-    handling: h.gripOn('electric_toothbrush', 'body'),
+  ], { body: 'plastic-gloss-white', band: 'plastic-blue', button: 'plastic-blue', bristles: 'plastic-clear-blue' }) + h.gripOn('electric_toothbrush', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A manual toothbrush, 180 mm long: a flat handle with a rubber thumb pad, a thin neck and a tufted head.
@@ -44,8 +43,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.box('head', 'handle', [0.150, 0.002, -0.0055], [0.180, 0.007, 0.0055]),
     h.box('bristles', 'bristles', [0.153, 0.007, -0.0048], [0.178, 0.018, 0.0048]),
     h.box('bristles-tip', 'tip', [0.153, 0.018, -0.0048], [0.162, 0.020, 0.0048]),
-  ], { handle: 'plastic-blue', grip: 'rubber-white', bristles: 'plastic-gloss-white', tip: 'plastic-clear-blue' }) + {
-    handling: h.gripOn('toothbrush', 'handle'),
+  ], { handle: 'plastic-blue', grip: 'rubber-white', bristles: 'plastic-gloss-white', tip: 'plastic-clear-blue' }) + h.gripOn('toothbrush', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A cotton canvas hammock rolled for carrying: a 320 mm roll 90 mm across, tied twice, gathered at each end into a rope loop.

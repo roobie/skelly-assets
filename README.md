@@ -92,14 +92,15 @@ its pack, with the owning tool's metadata and, for things, an index for consumer
 contract rather than maintaining a second file list: `tools/build.mjs`, `exportRecipes` and
 `PRODUCTION_RECIPE_TOOLS`, and `tools/packages/thing-export/src/files.ts`, `writeRecipeExports`.
 
-Every model is authored in Deadvox's frame, so a consumer imports it without converting axes; why, and the frame, is
-in `docs/decisions/0002-deadvox-model-frame.md`.
+Every model file is written in glTF's frame, so a consumer imports it without converting axes; why, and the frame, is
+in `docs/decisions/0002-model-frame.md`.
 
 Generated actors have a GLB plus a body and pose clips, not a second consumer-specific bake; see
 `tools/layout.mjs`, `readMobRows`, and `tools/actorBake.mjs`, `bakeActor`. Every consumer reads the body and pose
-files in the one shared representation, composed in mobgen's rest frame: roots and quaternion rotations must
-agree, and consumer facing conventions must not become a second baked rig. See `tools/actorCompose.mjs`,
-`decodeFrame` and `sampleClip`.
+files in the one shared representation, in the model frame: roots and quaternion rotations must agree, and consumer
+facing conventions must not become a second baked rig. Mobgen authors figures facing -z and the export turns every
+baked value once, so its authored signs stay as they read; see `tools/actorFrame.mjs`, `fileBody` and `fileClips`.
+Consumers compose with `tools/actorCompose.mjs`, `decodeFrame` and `sampleClip`.
 
 A consumer reads pack paths from the manifest and bundles the packs it needs, with the packs each of them depends
 on, so a pack that refers to another's models never loads without them; see `models/packs.json`. Which packs a product bundles is

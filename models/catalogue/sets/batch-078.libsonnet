@@ -45,8 +45,7 @@ local washboard(w, ht) =
     h.box('tuft-%d-%d' % [i, j], 'bristle', [-0.060 + i * 0.012, 0, -0.025 + j * 0.0125], [-0.052 + i * 0.012, 0.010, -0.017 + j * 0.0125])
     for i in std.range(0, 10)
     for j in std.range(0, 3)
-  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + {
-    handling: h.gripOn('brush', 'ridge'),
+  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + h.gripOn('brush', 'ridge') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 150 mm square of blue cotton cloth for patching, hemmed on two sides with one corner turned back.
@@ -92,8 +91,7 @@ local washboard(w, ht) =
   ] + [
     h.box('switch', 'switch', [-0.010, 0.028, -0.005], [0.010, 0.032, 0.005]),
     h.box('lamp', 'lamp', [-0.030, 0.026, -0.002], [-0.026, 0.030, 0.002]),
-  ], { body: 'plastic-black', grip: 'rubber-black', neck: 'alu-bare', blade: 'steel-stainless', switch: 'plastic-charcoal', lamp: 'plastic-green' }) + {
-    handling: h.gripOn('electric_hair_trimmer', 'body'),
+  ], { body: 'plastic-black', grip: 'rubber-black', neck: 'alu-bare', blade: 'steel-stainless', switch: 'plastic-charcoal', lamp: 'plastic-green' }) + h.gripOn('electric_hair_trimmer', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
   // A home hair colouring kit in its carton, 210 mm tall, 150 mm wide and 70 mm deep, front on +z: a white box with a
@@ -122,8 +120,7 @@ local washboard(w, ht) =
     for i in std.range(0, 12)
   ] + [
     h.box('yarn-core', 'yarn', [0.390, 0.0, -0.030], [0.460, 0.026, 0.030]),
-  ], { pole: 'wood-pine', hole: 'plastic-charcoal', collar: 'steel-galvanised', yarn: 'cord-cotton' }) + {
-    handling: h.gripOn('mop', 'pole'),
+  ], { pole: 'wood-pine', hole: 'plastic-charcoal', collar: 'steel-galvanised', yarn: 'cord-cotton' }) + h.gripOn('mop', 'pole') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['wood', 'fabric'], setting: ['modern'] } } },
   // A collapsible flat mop folded for storage, 600 mm long: three nested aluminium tube sections with locking collars,
@@ -138,8 +135,7 @@ local washboard(w, ht) =
     h.box('swivel', 'grip', [0.226, 0.026, -0.010], [0.250, 0.060, 0.010]),
     h.box('frame', 'frame', [0.180, 0.016, -0.175], [0.300, 0.026, 0.175]),
     h.box('pad', 'pad', [0.176, 0, -0.178], [0.304, 0.016, 0.178]),
-  ], { grip: 'plastic-blue', tube: 'alu-bare', frame: 'plastic-grey', pad: 'cloth-cream' }) + {
-    handling: h.gripOn('collapsible_mop', 'grip'),
+  ], { grip: 'plastic-blue', tube: 'alu-bare', frame: 'plastic-grey', pad: 'cloth-cream' }) + h.gripOn('collapsible_mop', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'], state: ['folded'] } } },
   // One double-edged safety razor blade, 38 by 22 mm and drawn 2 mm thick (the finest grain): bright ground edges
@@ -165,8 +161,7 @@ local washboard(w, ht) =
     h.box('loop-b', 'loop', [-0.120, 0.024, -0.012], [-0.106, 0.028, 0.012]),
     h.box('loop-c', 'loop', [-0.124, 0.012, -0.012], [-0.120, 0.028, 0.012]),
     h.box('patch', 'patch', [-0.030, 0.040, -0.020], [0.030, 0.041, 0.020]),
-  ], { case: 'nylon-black', zip: 'plastic-charcoal', pull: 'steel-grey', loop: 'webbing-black', patch: 'cloth-charcoal' }) + {
-    handling: h.gripOn('shaving_kit', 'case'),
+  ], { case: 'nylon-black', zip: 'plastic-charcoal', pull: 'steel-grey', loop: 'webbing-black', patch: 'cloth-charcoal' }) + h.gripOn('shaving_kit', 'case') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'] } } },
   // A kitchen sponge, 95 by 65 mm and 25 mm thick: yellow foam with a green scouring pad bonded to the top.
@@ -197,8 +192,7 @@ local washboard(w, ht) =
     h.turned('loop-b-ring', 'steel', 'y', [[0, 0.007], [0, 0.012], [0.004, 0.012], [0.004, 0.007], [0, 0.007]], [-0.056, 0.069, -0.010]),
     h.prism('shard', 'glass', 'y', [[-0.008, 0.070], [0.012, 0.070], [0.0, 0.100]], 0.020, 0.024),
     h.box('shard-wrap', 'cord', [0.070, 0.018, -0.010], [0.080, 0.026, 0.014]),
-  ], { leather: 'leather-brown', flap: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', steel: 'steel-bright', pivot: 'steel-grey', glass: 'glass-clear' }) + {
-    handling: h.gripOn('makeshift_haircut_kit', 'roll'),
+  ], { leather: 'leather-brown', flap: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', steel: 'steel-bright', pivot: 'steel-grey', glass: 'glass-clear' }) + h.gripOn('makeshift_haircut_kit', 'roll') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['leather', 'metal'] } } },
   // A makeshift shaving kit laid open, 150 by 120 mm: a leather wallet holding a straight blade knapped from glass in a

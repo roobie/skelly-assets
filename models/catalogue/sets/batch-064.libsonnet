@@ -14,8 +14,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
   h.compound('drift', 0.93, [
     turned('body', 'body', 'x', [[0, 0], [0, 0.014], [0.006, 0.016], [0.150, 0.016], [0.225, 0.006], [0.235, 0]]),
     turned('head', 'head', 'x', [[0, 0], [0, 0.019], [0.006, 0.018], [0.010, 0.016], [0.010, 0]], [-0.004, 0, 0]),
-  ], { body: 'steel-hardened', head: 'steel-heat-tint' }) + {
-    handling: h.gripOn('drift', 'body'),
+  ], { body: 'steel-hardened', head: 'steel-heat-tint' }) + h.gripOn('drift', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
@@ -89,8 +88,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     box('head', 'head', [0.290, -0.065, -0.020], [0.315, 0.050, 0.020]),
     box('face', 'face', [0.287, 0.050, -0.022], [0.318, 0.060, 0.022]),
     prism('edge', 'edge', 'z', [[0.290, -0.065], [0.315, -0.065], [0.3035, -0.095], [0.3015, -0.095]], -0.020, 0.020),
-  ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + {
-    handling: h.gripOn('hot_cut', 'handle'),
+  ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + h.gripOn('hot_cut', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
@@ -122,8 +120,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     h.disc('rivet', 'rivet', 0.007, 0.018, 0.021, 0.115, 0),
     bar('rein-a', 'rein', 0.125, 0.006, 0.44, 0.030, 0.011, 0.005, 0.015),
     bar('rein-b', 'rein', 0.125, -0.006, 0.44, -0.030, 0.011, 0.005, 0.015),
-  ], { jaw: 'steel-blued', boss: 'steel-blued', rivet: 'steel-bright', rein: 'steel-grey' }) + {
-    handling: h.gripOn('metalworking_tongs', 'rein-a'),
+  ], { jaw: 'steel-blued', boss: 'steel-blued', rivet: 'steel-bright', rein: 'steel-grey' }) + h.gripOn('metalworking_tongs', 'rein-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
@@ -172,8 +169,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     turned('ferrule-b', 'ferrule', 'z', [[0, 0], [0, 0.012], [0.012, 0.012], [0.012, 0]], [0.140, 0.014, -0.032]),
     turned('handle-a', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [-0.140, 0.014, -0.142]),
     turned('handle-b', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [0.140, 0.014, -0.142]),
-  ], { blade: 'steel-blued', edge: 'steel-bright', ferrule: 'brass-dull', handle: 'wood-walnut' }) + {
-    handling: h.gripOn('steel_scraper', 'handle-a'),
+  ], { blade: 'steel-blued', edge: 'steel-bright', ferrule: 'brass-dull', handle: 'wood-walnut' }) + h.gripOn('steel_scraper', 'handle-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
@@ -220,8 +216,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     box('tooth-%s-%d' % [s, i], 'arm', [0.262 + 0.012 * i, 0.002, if s == 'a' then 0.022 else -0.026], [0.268 + 0.012 * i, 0.026, if s == 'a' then 0.026 else -0.022])
     for s in ['a', 'b']
     for i in std.range(0, 2)
-  ], { arm: 'steel-stainless', grip: 'rubber-black' }) + {
-    handling: h.gripOn('tongs', 'arm-a'),
+  ], { arm: 'steel-stainless', grip: 'rubber-black' }) + h.gripOn('tongs', 'arm-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

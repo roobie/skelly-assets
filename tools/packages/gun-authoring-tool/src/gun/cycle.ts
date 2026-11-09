@@ -20,7 +20,7 @@ export interface ActionCycleProfile {
   readonly rpm: number;
   readonly holdOpenOnEmpty: boolean;
   readonly ejectAt: number;
-  /** Unit vector in the model frame; +Z is right, +X is muzzleward. */
+  /** Unit vector in gungen's frame, +Z right and +X muzzleward; the export turns it into the file's axes. */
   readonly ejectDirection: Vec3;
   readonly rearwardSpeedMetresPerSecond: number;
   readonly dwellSeconds: number;
@@ -494,5 +494,5 @@ export const sweepMovingPart = (resolved: Resolved, partId: string, limit: numbe
   };
 };
 
-/** The profile direction is already expressed in the model frame required by the export contract. */
+/** The profile direction is authored in gungen's frame, as the cycle's `ejectDirection` is. */
 export const ejectionDirection = (action: GunAction): Vec3 => unit(ACTION_CYCLE_PROFILES[action].ejectDirection);

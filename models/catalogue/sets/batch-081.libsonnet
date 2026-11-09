@@ -72,7 +72,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
   + [
     zrod('side-handle', 'grip', 0.013, 0.032, 0.13, 0.105, 0.05),
   ], { body: 'plastic-charcoal', grip: 'plastic-matte-black', switch: 'plastic-red', head: 'alu-bare', wheel: 'ceramic-grey', guard: 'steel-bright' })
-  + { handling: h.gripOn('angle_grinder', 'body'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('angle_grinder', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 100 mm bench vice, 427 mm from the anvil flat to the screw handle: a cast body on a swivel base, a fixed jaw
   // with an anvil flat behind it, a sliding jaw, the screw and its tommy bar, front on +z.
@@ -187,7 +187,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     box('wedge-edge', 'edge', [0.835, 0.012, -0.214], [0.895, 0.032, -0.208]),
     box('wedge-handle-tip', 'handle', [0.9, 0.012, -0.012], [0.91, 0.032, 0.012]),
   ], { handle: 'wood-walnut', head: 'bronze-polished', edge: 'brass-polished' })
-  + { handling: h.gripOn('bronze_pickaxe', 'handle'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
+  + h.gripOn('bronze_pickaxe', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
   // A pair of hand carders 265 mm long laid side by side, teeth up: ash paddles 150 by 100 mm with turned handles,
   // each faced with a leather card cloth set with rows of fine wire teeth.
   local paddle(s, z) = [
@@ -200,7 +200,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
   ];
   h.compound('carding_paddles', 0.54, paddle('a', -0.056) + paddle('b', 0.056),
     { handle: 'wood-birch', board: 'wood-birch', cloth: 'leather-tan', teeth: 'steel-bright' })
-  + { handling: h.gripOn('carding_paddles', 'a-handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'] } } },
+  + h.gripOn('carding_paddles', 'a-handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'] } } },
 
   // A paint chipper: a stiff 50 mm steel blade with a bevelled edge in a ferrule on a 100 mm beech handle, 175 mm overall.
   h.compound('paint_chipper', 0.1, [
@@ -209,7 +209,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     h.prism('blade', 'blade', 'y', [[-0.007, 0.012], [0.007, 0.012], [0.025, 0.065], [-0.025, 0.065]], 0.012, 0.0145),
     h.prism('edge', 'edge', 'y', [[-0.025, 0.065], [0.025, 0.065], [0.025, 0.075], [-0.025, 0.075]], 0.0125, 0.014),
   ], { handle: 'wood-pine', ferrule: 'brass-dull', blade: 'steel-grey', edge: 'steel-bright' })
-  + { handling: h.gripOn('paint_chipper', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  + h.gripOn('paint_chipper', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // A 100 mm C-clamp lying flat: a cast frame 150 mm tall with the screw, swivel pad and sliding tommy bar.
   h.compound('clamp', 1.2, [
@@ -235,7 +235,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     h.prism('claw', 'bar', 'z', [[0.226, 0.046], [0.241, 0.04], [0.23, 0.06], [0.212, 0.064]], -0.011, 0.011),
     box('split', 'slot', [0.212, 0.054, -0.0015], [0.236, 0.066, 0.0015]),
   ], { bar: 'steel-parkerized', slot: 'coal-black' })
-  + { handling: h.gripOn('claw_bar', 'shank'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  + h.gripOn('claw_bar', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A portable electric concrete mixer standing ready to load: a 140 L drum 0.66 m across with its mouth up, held in a
   // yoke with a geared ring and tilt wheel, on a tube stand with two wheels at the back and push handles at the front.

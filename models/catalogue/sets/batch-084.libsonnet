@@ -26,7 +26,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('lash-over', 'lashing', [0.226, 0.066, -0.016], [0.296, 0.07, 0.016]),
     box('lash-under', 'lashing', [0.226, 0.0, -0.016], [0.296, 0.004, 0.016]),
   ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' })
-  + { handling: h.gripOn('primitive_hammer', 'haft'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
+  + h.gripOn('primitive_hammer', 'haft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
 
   // A hand propane torch 0.42 m long: a brass cylinder fitting and control valve, a moulded grip, a steel burner tube
   // and a flared burner nozzle.
@@ -41,7 +41,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     turned('nozzle', 'nozzle', 'x', [[0, 0], [0, 0.009], [0.04, 0.016], [0.05, 0.016], [0.05, 0]], [0.37, 0.02, 0]),
     rod('nozzle-mouth', 'mouth', 0.011, 0.418, 0.421, 0.02),
   ], { brass: 'brass', knob: 'plastic-red', grip: 'plastic-yellow', tube: 'steel-stainless', nozzle: 'steel-heat-tint', mouth: 'coal-black' })
-  + { handling: h.gripOn('propane_torch', 'grip'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('propane_torch', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cordless reciprocating saw 0.45 m long with its blade: a motor body on a D handle over the battery pack, a
   // rubber nose with the pivoting shoe, and a 150 mm blade, teeth down.
@@ -64,7 +64,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('tooth-%d' % i, 'blade', [0.262 + i * 0.012, 0.083, -0.002], [0.268 + i * 0.012, 0.088, 0.002])
     for i in std.range(0, 10)
   ], { body: 'plastic-red', grip: 'rubber-black', battery: 'plastic-charcoal', trigger: 'plastic-matte-black', shoe: 'steel-bright', blade: 'steel-grey' })
-  + { handling: h.gripOn('reciprocating_saw', 'handle-top'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('reciprocating_saw', 'handle-top') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A long zipped nylon kit bag 600 by 130 mm and 35 mm thick, sized for barrels and tools, with a carry strap
   // stitched along its top, a zip round three sides and a pale stencilled panel.
@@ -96,7 +96,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     prism('tooth-%d' % i, 'blade', 'y', [[z, x], [z, x + 0.012], [z - 0.006, x + 0.006]], 0.006, 0.01)
     for i in std.range(0, 18)
   ], { grip: 'wood-oak', blade: 'bronze', rivet: 'bronze-polished' })
-  + { handling: h.gripOn('bronze_saw', 'grip-a'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
+  + h.gripOn('bronze_saw', 'grip-a') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
   // A moulded screwdriver case 280 by 90 mm opened flat on its hinge: six drivers from 140 to 250 mm in the tray,
   // the empty lid behind.
@@ -164,7 +164,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     rod('rib-%d' % i, 'handle', 0.0115, 0.04 + i * 0.008, 0.044 + i * 0.008, 0.012)
     for i in std.range(0, 3)
   ], { cord: 'rubber-black', handle: 'plastic-blue', grip: 'rubber-black', barrel: 'steel-stainless', tip: 'copper' })
-  + { handling: h.gripOn('soldering_iron', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('soldering_iron', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A die stock 400 mm across its handles holding a 38 mm round die, and a T tap wrench 180 mm across with a tap,
   // laid side by side.
@@ -201,7 +201,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     disc('pivot', 'pivot', 0.009, 0.0, 0.013, 0.163, 0),
     box('spring', 'spring', [0.126, 0.003, -0.02], [0.131, 0.007, 0.02]),
   ], { jaw: 'steel-grey', arm: 'steel-grey', grip: 'plastic-yellow', pivot: 'steel-bright', spring: 'steel-blued' })
-  + { handling: h.gripOn('tin_snips', 'grip-lower'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('tin_snips', 'grip-lower') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A steel toolbox 420 by 180 mm and 200 mm tall to the lid's ridge: a box body, a hip-roofed lid with a folding
   // handle, two snap latches and a hasp on the front.

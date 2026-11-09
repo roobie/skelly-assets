@@ -6,7 +6,7 @@ import { keepOutBetweenParts, solidOverlapBetweenParts } from '@skelly/construct
 import type { Assembly, Domain, PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import type { Issue } from '@skelly/construct/foundation/issue.ts';
-import { applyPoint } from '@skelly/construct/foundation/math.ts';
+import { applyPoint, eulerXyzDegrees } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { partNodeName } from '@skelly/thing-export/glb.ts';
 import validator from 'gltf-validator';
@@ -24,7 +24,7 @@ import {
 } from '../src/gun/attachments.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { eulerXyzDegrees, toFileAxes } from '../src/gun/exportFrame.ts';
+import { toFileAxes } from '../src/gun/exportFrame.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
 import { OPTIC_CATALOG, opticRailContactSolids } from '../src/gun/optics.ts';
@@ -547,7 +547,7 @@ describe('attachment parts and export metadata', () => {
       const { familyName, params, part } = attachmentBuild(id);
       const metadata = attachmentMetadata(familyName, params, gunDomain.units.metresPerUnit, part)!;
       const port = part.ports.find(({ gender, mount }) => gender === 'male' && mount === metadata.mount);
-      expect(metadata.mountFrame).toEqual(port && { normal: port.normal, up: port.up });
+      expect(metadata.mountFrame).toEqual(port && { normal: toFileAxes(port.normal), up: toFileAxes(port.up) });
       expect(gltf.issues.numErrors).toBe(0);
       expect(gltf.issues.numWarnings).toBe(0);
       expect(nodes).toContain(partNodeName(id, attachmentFamily(id)));

@@ -53,8 +53,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     h.prism('handle', 'steel', 'y', [[-0.0075, 0], [0.0075, 0], [0.0085, 0.07], [0.006, 0.095], [-0.006, 0.095], [-0.0085, 0.07]], 0, 0.005),
     h.prism('bolster', 'steel', 'y', [[-0.006, 0.095], [0.006, 0.095], [0.0045, 0.105], [-0.0045, 0.105]], 0.001, 0.004),
     h.prism('blade', 'steel', 'y', [[-0.0045, 0.105], [0.0045, 0.105], [0.011, 0.125], [0.011, 0.196], [0.007, 0.206], [0, 0.21], [-0.007, 0.204], [-0.011, 0.19], [-0.011, 0.125]], 0.001, 0.003),
-  ], { steel: 'steel-stainless' }) + {
-    handling: h.gripOn('butter_knife', 'handle'),
+  ], { steel: 'steel-stainless' }) + h.gripOn('butter_knife', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -65,8 +64,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     h.prism('handle', 'iron', 'y', [[-0.015, 0.125], [0.015, 0.125], [0.012, 0.26], [0, 0.27], [-0.012, 0.26]], 0.034, 0.046),
     disc('hole', 'hole', 0.006, 0.0455, 0.047, 0.245, 0),
     h.prism('lug', 'iron', 'y', [[-0.03, -0.125], [-0.022, -0.16], [0.022, -0.16], [0.03, -0.125]], 0.04, 0.048),
-  ], { iron: 'iron-cast', hole: 'coal-black' }) + {
-    handling: h.gripOn('pan', 'handle'),
+  ], { iron: 'iron-cast', hole: 'coal-black' }) + h.gripOn('pan', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
@@ -76,8 +74,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     h.prism('fork', 'steel', 'y', [[-0.006, 0.128], [0.006, 0.128], [0.004, 0.18], [-0.004, 0.18]], 0.008, 0.012),
     disc('wheel', 'steel', 0.05, 0.004, 0.006, 0.18, 0),
     disc('hub', 'steel', 0.01, 0.002, 0.014, 0.18, 0),
-  ], { handle: 'plastic-red', steel: 'steel-stainless' }) + {
-    handling: h.gripOn('pizza_cutter', 'handle'),
+  ], { handle: 'plastic-red', steel: 'steel-stainless' }) + h.gripOn('pizza_cutter', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
@@ -139,8 +136,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     turned('barrel', 'wood', 'x', [[0, 0], [0, 0.028], [0.006, 0.032], [0.294, 0.032], [0.3, 0.028], [0.3, 0]], [-0.15, 0.032, 0]),
     turned('handle-a', 'wood', 'x', [[0, 0], [0, 0.014], [0.012, 0.017], [0.05, 0.016], [0.07, 0.012], [0.08, 0.008], [0.08, 0]], [-0.23, 0.032, 0]),
     turned('handle-b', 'wood', 'x', [[0, 0], [0, 0.008], [0.01, 0.012], [0.03, 0.016], [0.068, 0.017], [0.08, 0.014], [0.08, 0]], [0.15, 0.032, 0]),
-  ], { wood: 'wood-birch' }) + {
-    handling: h.gripOn('rolling_pin', 'handle-a'),
+  ], { wood: 'wood-birch' }) + h.gripOn('rolling_pin', 'handle-a') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['wood'] } } },
 
@@ -170,8 +166,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     box('cross-b', 'steel', [-0.002, 0, -r], [0.002, 0.002, r]),
     h.prism('shank', 'steel', 'y', [[-0.005, r - 0.002], [0.005, r - 0.002], [0.005, r + 0.06], [-0.005, r + 0.06]], 0, 0.004),
     turned('grip', 'grip', 'x', [[0, 0], [0, 0.009], [0.08, 0.011], [0.1, 0.008], [0.105, 0], [0, 0]], [r + 0.05, 0.008, 0]),
-  ], { mesh: 'steel-stainless', steel: 'steel-stainless', grip: 'plastic-black' }) + {
-    handling: h.gripOn('splatter_guard', 'grip'),
+  ], { mesh: 'steel-stainless', steel: 'steel-stainless', grip: 'plastic-black' }) + h.gripOn('splatter_guard', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -184,8 +179,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     h.prism('bowl-base', 'steel', 'y', oval(0.016, 0.01, 0.168), 0, 0.002),
     h.prism('bowl', 'steel', 'y', oval(0.022, 0.0165, 0.168), 0.002, 0.004),
     h.prism('bowl-well', 'well', 'y', oval(0.017, 0.012, 0.168), 0.004, 0.0042),
-  ], { steel: 'steel-stainless', well: 'steel-mirror' }) + {
-    handling: h.gripOn('spoon', 'handle'),
+  ], { steel: 'steel-stainless', well: 'steel-mirror' }) + h.gripOn('spoon', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

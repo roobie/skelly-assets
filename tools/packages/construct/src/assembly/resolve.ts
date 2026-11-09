@@ -399,7 +399,7 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
   if (!(assembly.root in assembly.parts)) {
     structure(`Root "${assembly.root}" is not one of the parts.`);
   } else if (defs.has(assembly.root)) {
-    placed.set(assembly.root, IDENTITY);
+    placed.set(assembly.root, assembly.rootPlacement ?? IDENTITY);
     let progress = true;
     while (progress) {
       progress = false;

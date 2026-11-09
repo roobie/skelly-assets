@@ -21,10 +21,11 @@ positions would drift from the first.
 
 Placements belong to the models, beside the rows they place: each vehicle has a placements file in
 `models/vehicles/`, written with `models/vehicles/site.libsonnet`. A site names the part model at it, its position in
-the vehicle frame, and whether it is a mirrored far-side twin. Gameplay stays in the game: supports, service, cargo
+the vehicle, and whether it is a mirrored far-side twin. Gameplay stays in the game: supports, service, cargo
 spaces and item names are not placements.
 
-Sites carry no rotation, because every part is authored in the vehicle frame's orientation. A far-side twin is its
+Sites carry no rotation, because every part is authored in its vehicle's orientation, and the build turns a
+vehicle's sites by the same turn as its parts; see `docs/decisions/0002-model-frame.md`. A far-side twin is its
 near-side part reflected across the part's own centre plane, so one model serves both sides and the two can never
 differ. Site ids are the names Deadvox's fittings use, with `_near` and `_far` for twins, so a blueprint can attach
 its gameplay to a site by id and read the position from here instead of restating it.

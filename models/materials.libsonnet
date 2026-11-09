@@ -5,7 +5,7 @@ local atom = m.atom;
     radius: 0.007, height: 0.046, shoulderHeight: 0.0005, neckRadius: 0.003,
     neckHeight: 0.001, capRadius: 0.003, capHeight: 0.002,
     rimHeight: 0.001, bandHeight: 0.034, bandInset: 0.00015,
-  }, { body: 'steel-grey', label: 'paint-charcoal', cap: 'steel-stainless' }, turn=[0, 0, -90]),
+  }, { body: 'steel-grey', label: 'paint-charcoal', cap: 'steel-stainless' }, turn=[0, -90, -90]),
   atom('rag', 'foldedSheet', 'parts', 0.050, {
     thickness: 0.002,
     vertices: [

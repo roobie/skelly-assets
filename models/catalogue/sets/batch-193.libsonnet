@@ -91,7 +91,7 @@ local runeEngine = [
     strand('rune-arm-left', 'rune', [-0.003, 0.03], [-0.016, 0.018], 0.005, 0.038, 0.048),
     strand('rune-arm-right', 'rune', [0.003, 0.03], [0.016, 0.018], 0.005, 0.038, 0.048),
     box('rune-foot', 'rune', [-0.012, 0.012, 0.04], [0.012, 0.016, 0.046]),
-  ], { iron: 'iron-cast', trim: 'brass-dull', wick: 'cord-cotton', rune: 'crystal-glow-blue' }) + { handling: h.gripOn('twin_spout_rune_lamp', 'handle-back') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { iron: 'iron-cast', trim: 'brass-dull', wick: 'cord-cotton', rune: 'crystal-glow-blue' }) + h.gripOn('twin_spout_rune_lamp', 'handle-back') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A square frame of wooden sticks 150 mm on a side and 14 mm deep, strung corner to corner with taut cord that
   // holds a rune-marked pebble in the middle; a bowed stick across the top keeps the strings under tension.
@@ -173,7 +173,7 @@ local runeEngine = [
     copper: 'copper',
     dark: 'plastic-matte-black',
     cable: 'rubber-black',
-  }) + { handling: h.gripOn('rune_engine_case', 'handle-grip') } + { voxelGrain: 0.008 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  }) + h.gripOn('rune_engine_case', 'handle-grip') + { voxelGrain: 0.008 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A rough stone egg 200 mm long and 150 mm across, lying on its side, knobbled and speckled like a field rock, with
   // a thin warm seam where the shell will split.
@@ -189,7 +189,7 @@ local runeEngine = [
     strand('seam-a', 'seam', [-0.04, 0.148], [0.0, 0.142], 0.004, -0.004, 0.004),
     strand('seam-b', 'seam', [0.0, 0.142], [0.03, 0.15], 0.004, -0.004, 0.004),
     strand('seam-c', 'seam', [0.03, 0.15], [0.06, 0.136], 0.004, -0.004, 0.004),
-  ], { stone: 'stone-grey', dark: 'stone-whet', seam: 'resin-honey' }) + { handling: h.gripOn('rock_egg', 'shell') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { stone: 'stone-grey', dark: 'stone-whet', seam: 'resin-honey' }) + h.gripOn('rock_egg', 'shell') + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A heart of golden metal 130 mm tall, 110 mm across its two upper lobes and 80 mm deep, with two short pipe stubs
   // on top, a dark seam band round it and a violet crystal set in its front.
@@ -204,5 +204,5 @@ local runeEngine = [
     h.disc('pipe-right-rim', 'metal', 0.011, 0.122, 0.128, 0.024, 0.008),
     h.turned('gem-rim', 'band', 'z', [[0, 0.012], [0, 0.017], [0.006, 0.017], [0.006, 0.012], [0, 0.012]], [0, 0.074, 0.036]),
     h.turned('gem', 'crystal', 'z', [[0, 0], [0, 0.012], [0.008, 0.009], [0.011, 0]], [0, 0.074, 0.036]),
-  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + { handling: h.gripOn('golem_heart', 'point') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + h.gripStanding('golem_heart', 'point') + { voxelGrain: 0.004 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

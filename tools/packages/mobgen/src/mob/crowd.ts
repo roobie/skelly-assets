@@ -110,7 +110,7 @@ export const isSeveredInMask = (
   return (((mask >>> 0) >>> bit) & 1) === 1;
 };
 
-/** A crowd placement: yaw about Y (radians, three.js/conventions.ts convention: yaw 0 faces -Z) plus a
+/** A crowd placement: yaw about Y (radians; yaw 0 leaves the figure facing the generator's -Z, conventions.ts) plus a
  * translation — the same thing mobgen's 'bones' stress mode hands its wrapping Group and its 'skinned'
  * mode composes onto its root bone, just applied to every bone here instead of one Group/root. `y` is an
  * ADDITIONAL offset on top of whatever Y the pose itself already has (walkPose's own groundOffset puts

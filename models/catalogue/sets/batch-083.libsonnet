@@ -31,7 +31,7 @@ local pickArm(prefix, stations, y0, y1) = [
     zrod('socket', 'socket', 0.0145, 0.10, 0.145, 0.175, 0.0145),
     zrod('socket-mouth', 'mouth', 0.011, 0.145, 0.1455, 0.175, 0.0145),
   ], { bar: 'steel-grey', socket: 'steel-bright', mouth: 'plastic-matte-black' })
-  + { handling: h.gripOn('lug_wrench', 'lever'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('lug_wrench', 'lever') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A crude hammer: a 0.30 m sapling haft 28 mm thick with a 100 mm steel offcut lashed across its head end with wire.
   h.compound('makeshift_hammer', 1.1, [
@@ -43,7 +43,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('wrap-x', 'lashing', [0.098, 0.034, -0.016], [0.138, 0.038, -0.010]),
     box('wrap-y', 'lashing', [0.098, 0.034, 0.010], [0.138, 0.038, 0.016]),
   ], { haft: 'bark', head: 'iron-dull', face: 'steel-bright', lashing: 'steel-galvanised' })
-  + { handling: h.gripOn('makeshift_hammer', 'haft'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  + h.gripOn('makeshift_hammer', 'haft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // A stitched leather hose about 1.5 m long and 18 mm thick, coiled flat in three loops 0.23 m across, its two ends
   // laid out with a hard leather collar on each.
@@ -106,7 +106,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('post-b', 'strap', [0.03, 0.003, -0.008], [0.036, 0.04, 0.008]),
     rod('grip', 'grip', 0.012, -0.05, 0.05, 0.048),
   ], { blade: 'iron-dull', strap: 'iron-dull', grip: 'wood-oak' })
-  + { handling: h.gripOn('concrete_float', 'grip'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('concrete_float', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A field repair roll laid open: a 460 by 140 mm canvas wrap holding a folding wood saw, a craft knife and a
   // square of soft cleaning cloth.
@@ -137,7 +137,7 @@ local pickArm(prefix, stations, y0, y1) = [
     prism('tools-a', 'tools', 'y', [[0.009, -0.015], [0.014, -0.015], [0.026, -0.083], [0.021, -0.083]], 0.016, 0.0175),
     prism('tools-b', 'tools', 'y', [[-0.014, -0.015], [-0.009, -0.015], [-0.021, -0.083], [-0.026, -0.083]], 0.016, 0.0175),
   ], { jaw: 'steel-bright', pivot: 'steel-grey', handle: 'steel-grey', tools: 'steel-blued' })
-  + { handling: h.gripOn('multitool', 'handle-a'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('multitool', 'handle-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cast bronze nail puller 250 mm long: a 16 mm square bar with a curled claw at one end and a flat split claw
   // at the other, a striking boss behind the curl.
@@ -151,7 +151,7 @@ local pickArm(prefix, stations, y0, y1) = [
     prism('flat-b', 'claw', 'y', [[0.001, -0.10], [0.008, -0.10], [0.011, -0.125], [0.001, -0.125]], 0.0, 0.006),
     prism('notch', 'notch', 'z', [[0.104, 0.044], [0.11, 0.02], [0.113, 0.02], [0.108, 0.046]], -0.0012, 0.0012),
   ], { bar: 'bronze', boss: 'bronze-polished', claw: 'bronze', notch: 'coal-black' })
-  + { handling: h.gripOn('bronze_nail_puller', 'bar'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['ancient'] } } },
+  + h.gripOn('bronze_nail_puller', 'bar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['ancient'] } } },
 
   // An oxy-acetylene torch: a 250 mm brass handle with red and blue valve knobs at the hose end and a cutting
   // attachment 200 mm long with its oxygen lever and a 75 degree copper nozzle, two short hose tails.
@@ -169,7 +169,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('head', 'body', [0.22, 0.005, -0.009], [0.245, 0.03, 0.009]),
     prism('nozzle', 'nozzle', 'z', [[0.236, 0.004], [0.249, 0.006], [0.258, -0.005], [0.252, -0.009]], -0.0055, 0.0055),
   ], { handle: 'brass-polished', body: 'brass-dull', red: 'plastic-red', blue: 'plastic-blue', 'red-hose': 'rubber-black', 'blue-hose': 'rubber-black', tube: 'steel-bright', nozzle: 'copper' })
-  + { handling: h.gripOn('oxyacetylene_torch', 'handle'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('oxyacetylene_torch', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 100 mm wall brush, 210 mm long: a flat beavertail wooden handle, a steel ferrule and a block of bristle.
   h.compound('paint_brush', 0.2, [
@@ -179,7 +179,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('bristle', 'bristle', [0.005, 0.004, -0.05], [0.07, 0.020, 0.05]),
     box('tip', 'bristle', [0.07, 0.007, -0.049], [0.10, 0.017, 0.049]),
   ], { handle: 'wood-birch', hole: 'coal-black', ferrule: 'steel-galvanised', bristle: 'horsehair-black' })
-  + { handling: h.gripOn('paint_brush', 'handle'), voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('paint_brush', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'plastic'], setting: ['modern'] } } },
 
   // A 5 lb pick: a 0.91 m hickory haft swelling toward the head, and a 0.6 m curved steel head with a point on one
   // side and a chisel blade on the other.
@@ -190,7 +190,7 @@ local pickArm(prefix, stations, y0, y1) = [
   + pickArm('chisel', [[-0.02, 0.435, 0.03], [-0.12, 0.43, 0.022], [-0.20, 0.418, 0.018], [-0.30, 0.395, 0.017]], 0.014, 0.038) + [
     box('wedge', 'wedge', [0.425, 0.05, -0.012], [0.445, 0.052, 0.012]),
   ], { haft: 'wood-oak', eye: 'steel-grey', head: 'steel-grey', wedge: 'steel-bright' })
-  + { handling: h.gripOn('pickaxe', 'haft'), voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  + h.gripOn('pickaxe', 'haft') + { voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // A hand pin reamer 130 mm long: a plain 45 mm steel handle with faint knurl rings and an 85 mm fluted taper from
   // 8 mm to 3 mm.
@@ -205,7 +205,7 @@ local pickArm(prefix, stations, y0, y1) = [
       for i in std.range(0, 7)
     ]) + [[0.085, 0.0012], [0.085, 0]], [-0.02, 0.009, 0]),
   ], { handle: 'steel-grey', knurl: 'steel-galvanised', reamer: 'steel-bright' })
-  + { handling: h.gripOn('pin_reamer', 'handle'), voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('pin_reamer', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A pair of 170 mm slip-joint pliers with ridged jaws and red dipped grips.
   h.item('pliers', 'pliers', 0.2, {

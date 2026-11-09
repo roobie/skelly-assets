@@ -1,8 +1,8 @@
-// The model frame every asset is authored in, and the directions the pages look from in it. Plain arrays, so the
-// rule holds without three.js; see docs/decisions/0002-deadvox-model-frame.md.
-export const FORWARD = [1, 0, 0];
+// The model frame every asset file is written in, glTF's, and the directions the pages look from in it. Plain arrays,
+// so the rule holds without three.js; see docs/decisions/0002-model-frame.md.
+export const FORWARD = [0, 0, 1];
 export const UP = [0, 1, 0];
-export const RIGHT = [0, 0, 1];
+export const RIGHT = [-1, 0, 0];
 
 const unit = (v) => {
   const length = Math.hypot(...v);

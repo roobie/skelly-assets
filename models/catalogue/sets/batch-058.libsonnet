@@ -1,7 +1,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 // A flat piece lying in the xz plane, `t` thick about y = `y`; its outline is [z, x] and must be convex.
 local flat(id, slot, outline, t, y=0) = h.prism(id, slot, 'y', outline, y - t / 2, y + t / 2);
-local held(id, solid) = { handling: h.gripOn(id, solid) };
+local held(id, solid) = h.gripOn(id, solid);
 [
   // A snap-off box cutter, 120 mm with its 9 mm blade run out, 18 mm wide and 11 mm thick.
   h.compound('boxcutter', 0.016, [
