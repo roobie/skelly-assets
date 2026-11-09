@@ -193,6 +193,8 @@ local sling =
   backpack('school_backpack', 0.6, 0.15),
   backpack('hiking_backpack', 1.4, 0.06),
   fannyPack,
-  wornAtom('weapon_sling_worn', 0.15, sling, { strap: 'cord-olive', trim: 'steel-grey' }),
+  wornAtom('weapon_sling_worn', 0.15, sling, { strap: 'cord-olive', trim: 'steel-grey' }) + {
+    taxonomy: { category: 'weapon-parts', tags: { slot: ['back'], fit: [if overJacket then 'over-jacket' else 'worn'] } },
+  },
 ];
 carry(false, '') + carry(true, '_jacket')

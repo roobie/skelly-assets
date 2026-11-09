@@ -18,4 +18,5 @@ local items = [
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
   if std.setMember(row.id, owned)
 ];
-items + (import 'packages/gun-authoring-tool/exports/deadvox.jsonnet')
+// The whole pack is modern firearms; each row names its own shelf and weapon class.
+taxonomy.inherit({ tags: { setting: ['modern'] } }, items + (import 'packages/gun-authoring-tool/exports/deadvox.jsonnet'))

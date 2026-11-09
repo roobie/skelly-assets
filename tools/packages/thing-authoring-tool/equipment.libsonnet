@@ -39,7 +39,7 @@ local equipment(id, family, massKg, dimensions, finish, heldSolid, turn=[0, 0, 0
     foldedLength: 0.290, width: 0.028, thickness: 0.003,
     buckleWidth: 0.026, buckleDepth: 0.036, buckleWall: 0.004,
     clipWidth: 0.020, clipLength: 0.026, clipWall: 0.004,
-  }, { strap: 'cord-olive', metal: 'steel-grey' }, 'webbing-1', fraction=[0.1, 0.5, 0.5]),
+  }, { strap: 'cord-olive', metal: 'steel-grey' }, 'webbing-1', fraction=[0.1, 0.5, 0.5]) + { taxonomy: { category: 'weapon-parts' } },
   equipment('repair_kit', 'repairKit', 1.250, {
     kind: 'patches', width: 0.200, depth: 0.130, height: 0.035, wall: 0.003,
     rollRadius: 0.029, rollHeight: 0.032, patchWidth: 0.080, patchDepth: 0.090,
