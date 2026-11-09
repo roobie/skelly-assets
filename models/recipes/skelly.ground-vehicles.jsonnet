@@ -5,6 +5,8 @@ local vehicles = ['crew_pickup', 'saloon', 'shared', 'taxi'];
 // Vehicle parts carry baked collision because a fitting places it on the vehicle.
 local vehicleParts = std.set([part.id for part in (import 'models/vehicle-parts.libsonnet') + std.flattenArrays([fleet[vehicle] for vehicle in vehicles])]);
 local jacks = std.set(['bottle_jack', 'engine_hoist', 'scissor_jack']);
+// Loose spare parts from the catalogue: belts, filters and plugs a player carries, not fitted to a vehicle.
+local spares = (import 'models/catalogue/packs.libsonnet').ids('skelly.ground-vehicles');
 // A vehicle part takes the vehicle class, so it matches the vehicle it sits on; a jack is an ordinary item.
 // A catalogue row may name its own grain in place of its class's.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
@@ -19,5 +21,5 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
              + (if std.setMember(row.id, vehicleParts) then { collision: true } else {}),
   } + taxonomy.of(row)
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, vehicleParts) || std.setMember(row.id, jacks)
+  if std.setMember(row.id, vehicleParts) || std.setMember(row.id, jacks) || std.setMember(row.id, spares)
 ]
