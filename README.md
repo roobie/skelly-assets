@@ -52,6 +52,10 @@ through the owning exporter. See `tools/build.mjs`, `loadRecipeTools`, and
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
+Every model also needs a category and may carry facet tags, from the vocabulary in `models/taxonomy.json`.
+The build refuses a model without them in a strict pack. Why, and how to request a term, is in
+`models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
+
 ### Outputs and consumers
 
 The no-id production run of `tools/build.mjs` is the roster and recipe entry point: it writes each model under
@@ -70,7 +74,8 @@ that product's choice, recorded in its own repository rather than copied here, s
 follow a product's selection. A standalone model does not require a playable item or placement, so a pack can
 carry looks one product uses without inventing gameplay for another. Packs are scoped to content, such as a kind
 of thing, an actor family, a site or a scenario, never to a reader; see the selections in `models/recipes/`. The
-showcase consumes all manifest models, independent of product bundling.
+showcase consumes all manifest models, independent of product bundling, and shelves and filters them by the
+category and tags their manifest entries carry; see `site/build.mjs`.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through

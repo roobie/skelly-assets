@@ -24,6 +24,8 @@ const RowSchema = strictObject({
   source: pipe(string(), nonEmpty()),
   voxel: strictObject({ grain, detailGrain: optional(grain) }),
   options: optional(unknown()),
+  // The model's shelf and facet tags; the repository build holds them to its vocabulary, so export only carries them.
+  taxonomy: optional(unknown()),
 });
 const RecipeSchema = pipe(
   array(RowSchema),

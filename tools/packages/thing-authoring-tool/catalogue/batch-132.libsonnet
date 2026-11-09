@@ -129,5 +129,5 @@ local closeHelm(id, mass, heavy, raised) =
                for a in [45 + 90 * i]
              ],
              { brim: 'plastic-white', hem: 'plastic-matte-black', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['plastic'], setting: ['modern'] } } },
 ]

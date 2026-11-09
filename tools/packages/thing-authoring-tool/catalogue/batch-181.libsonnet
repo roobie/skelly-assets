@@ -148,5 +148,5 @@ local mirrorArmor(id, mass, style) =
     taper('cuff-%d' % (s + 1), 'binding', alongSleeve(o, s, 0.93), alongSleeve(o, s, 1.0), 0.094, 0.094, 0.0, 0.008)
     for s in [-1, 1]
   ], { cloth: 'cloth-shimmer', sleeve: 'cloth-shimmer', lining: 'cloth-shimmer', binding: 'cloth-cream', clip: 'steel-bright' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['modern'] } } },
 ]

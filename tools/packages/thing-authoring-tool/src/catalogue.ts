@@ -26,6 +26,7 @@ import {
   regex,
   strictObject,
   string,
+  unknown,
 } from 'valibot';
 import content from '../items.json' with { type: 'json' };
 import { avatarArm, avatarLeg } from './families/avatarLimbs.ts';
@@ -112,6 +113,8 @@ const ItemSchema = strictObject({
   glow: optional(name),
   /** The item's own voxel grain in metres, in place of its class grain; the export recipe resolves it. */
   voxelGrain: optional(positive),
+  /** The model's shelf and facet tags; the repository build holds them to its vocabulary, so this tool only carries them. */
+  taxonomy: optional(unknown()),
 });
 const CatalogueSchema = strictObject({
   units: strictObject({ metresPerUnit: positive, grid: positive, bevel: pipe(number(), finite(), minValue(0)) }),
