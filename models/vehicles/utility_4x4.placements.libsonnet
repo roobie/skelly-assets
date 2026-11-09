@@ -34,4 +34,5 @@ local wheel = 'utility_4x4_wheel';
   + site.pair('headlamp', 'headlamp_large', [s.nose - 0.02, 0.8, 0.8])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.92, 0.9])
   + site.batteryBay('hatchback_battery_tray', [1.9, 0.92, 0.42]),
+  tags: { 'vehicle-body': ['armoured'] },
 }
