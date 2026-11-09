@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 // PROJECT.md cues code as a backticked `src/...ts` path, a comma and a backticked symbol
 // (`AGENTS.md`, "Zero drift"), not by line number, so a cue only goes stale when the
-// symbol is renamed or removed. deadvox cues (`packages/deadvox/src/...`) point at
+// symbol is renamed or removed. deadvox cues (deadvox's `symbol`, no path) point at
 // another package and are not checked here.
 
 const root = new URL('../', import.meta.url);

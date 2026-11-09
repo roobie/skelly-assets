@@ -13,13 +13,13 @@ Gungen owns attachment compatibility because only the firearm domain can certify
 
 A candidate is certified as it will sit on that host: its own set params win, then the values it inherits from the host's base port, then its defaults, the order construct resolves a fitted part in. A part built standalone is a different part from the one fitted, so judging that build can deny a fit the gun ships with or certify one that cannot sit. See `src/gun/attachmentCompatibility.ts`, `hostedCandidate`, and `packages/construct/src/assembly/resolve.ts`, `resolveParams`.
 
-Pair checks are sufficient because each single already passes validation, and overlap and keep-out are the relations between two placed parts. A group conflicts only when at least one pair conflicts, so a separate triple certificate would duplicate the same geometry question. For optics, rail support follows the mount feet rather than the full visual envelope; body clearance remains a separate fit relation. See `src/gun/attachments.ts`, `railSpanNotches`, `src/gun/rules.ts`, `opticMountFitForPart`, and `packages/deadvox/src/core/firearmFitting.ts`, `railFootprint`.
+Pair checks are sufficient because each single already passes validation, and overlap and keep-out are the relations between two placed parts. A group conflicts only when at least one pair conflicts, so a separate triple certificate would duplicate the same geometry question. For optics, rail support follows the mount feet rather than the full visual envelope; body clearance remains a separate fit relation. See `src/gun/attachments.ts`, `railSpanNotches`, `src/gun/rules.ts`, `opticMountFitForPart`, and deadvox's `railFootprint`.
 
 Attachments are atoms, so their item weight remains authoritative across host-specific
 mount presentation and shared visual models. A gun body sums its authored part masses;
 replaceable geometry belongs to the fitted item instead of competing with its weight.
 See `src/gun/physical.ts`, `gunModelParts`; `src/gun/catalogue.jsonnet`, `parts`; and
-`packages/deadvox/src/core/items.ts`, `typeWeightGrams`. Geometric centres are estimates,
+deadvox's `typeWeightGrams`. Geometric centres are estimates,
 not a source of mass; see `packages/thing-export/src/physical.ts`, `partProperties`.
 
 ## Looks

@@ -80,8 +80,7 @@ compatibility shim would keep two competing material contracts. See
 `src/cli/view.ts`, `printView`; and
 `packages/deadvox/src/render/fusedMassFlesh.ts`, `mergeBoneMeshes`. Material dependencies
 must participate in generated-body identity so tuning changes cannot bypass save
-admission; see `packages/deadvox/tools/simulationFingerprint.ts`,
-`collectSimulationSourceGraph`.
+admission; see deadvox's `collectSimulationSourceGraph`.
 
 ### Other mobs' outputs that can change
 
@@ -151,10 +150,10 @@ Tuning stays in content rather than test literals. Its release-freeze triggers b
 Actor identity must not determine its skeleton. Deadvox resolves a selected body plan
 at the mobgen boundary, keeping each plan's region ownership authoritative rather than
 forcing the acid body's distinct bones through humanoid names. See
-`packages/deadvox/src/core/schema/actors.ts`, `BODY_PLAN`;
-`packages/deadvox/src/core/actorModels.ts`, `bodyPlanModel`;
+deadvox's `BODY_PLAN`;
+deadvox's `bodyPlanModel`;
 `src/mob/humanoidFigure.ts`, `templateFigure`; and
-`packages/deadvox/src/core/actorRegions.ts`.
+deadvox's `ActorRegions`.
 
 - **Hit regions.** Each plan says which of its bones form head, torso and limbs, because
   renaming acid bones to humanoid names would hide that it is its own skeleton. The sac's
@@ -162,16 +161,16 @@ forcing the acid body's distinct bones through humanoid names. See
   `src/core/generate.ts`, `BodyPlanDef`, and `src/mob/acid.ts`, `buildAcid`.
 - **Severing.** Severable subtrees come from the bone disposition, so no skeleton's names
   are listed in the cut logic. See `src/mob/dismember.ts`, `regionSeverableParts`. The crowd
-  gore mask sizes itself from the widest body (`packages/deadvox/src/render/mobActors.ts`
+  gore mask sizes itself from the widest body (deadvox
   passes the bone count to `crowdTextureLayout`), so the acid bone count needs no encoding
   change. A severed acid part follows its creature kind's authored drop policy,
-  independently of bone names. See `packages/deadvox/src/core/schema/actors.ts`,
-  `ActorSchema.severedItems`, and `packages/deadvox/src/game/session.ts`, `createSession`.
+  independently of bone names. See deadvox's
+  `ActorSchema.severedItems` and `createSession`.
 - **Death burst.** On death the sac's voxels are removed without leaving a severed item and
   without any simulation consequence, so presentation reads death and the sac stays out of
   saves and fingerprints. Keeping it a disposition rather than a Deadvox special case lets a
   later tier attach an effect by data. See `src/mob/dismember.ts`, `burstBones`, and
-  `packages/deadvox/src/render/mobActors.ts`, `onBurst`.
+  deadvox's `onBurst`.
 - **Poses and gait.** The hunched rig needs its own motion rather than humanoid bone aliases.
   Joint-frame clamping keeps layered actions inside the body's articulated limits; the
   death topple is whole-actor motion at the root, not a hips articulation. Ground fitting
@@ -184,12 +183,12 @@ forcing the acid body's distinct bones through humanoid names. See
   for the simulation's head turn as well as the presentation gaze, because hit boxes and the
   spit anchor read the simulation pose. See `src/mob/lookAt.ts`, `lookAtPose`,
   `src/mob/lookAtProfiles.ts`, `LOOK_AT_PROFILES`, and
-  `packages/deadvox/src/core/actorPose.ts`, `clampedJointRotation`.
+  deadvox's `clampedJointRotation`.
   The mouth anchor belongs to the skull's face opening rather than the hanging jaw or its
   drool, so spit line of sight follows the head through wind-up and gaze. See
   `src/core/body.ts`, `BodyAnchor`, and `src/mob/acid.ts`, `buildAcid`. The spit leaves from
   that anchor posed at the end of the wind-up, so the release is a function of simulation
-  state alone; see `packages/deadvox/src/core/actorPose.ts`, `posedMouth`.
+  state alone; see deadvox's `posedMouth`.
 - **Materials and glow.** Deadvox reads colour and glow from the body's material table. That
   keeps the glow a content value instead of a Deadvox list of glowing material names. How
   it renders is in "Glow render path" below. The wind-up brightening is per-actor state
@@ -202,9 +201,9 @@ forcing the acid body's distinct bones through humanoid names. See
 
 The sac and eyes use an emissive material: they give off their own light, and the wind-up
 raises the sac's emission. The glow also lights the surroundings by borrowing slots from the
-renderer's existing point-light pool (`packages/deadvox/src/render/lightPool.ts`, `LightPool`), which
+renderer's existing point-light pool (deadvox's `LightPool`), which
 item lights also use. The nearest glowing actors take the slots item lights leave free, and
-their light casts no shadows. See `packages/deadvox/src/render/lightPool.ts`, `acidGlows`.
+their light casts no shadows. See deadvox's `acidGlows`.
 
 Emission is chosen over a colour change because a recoloured sac is still shaded by the
 scene's lighting, so it darkens with its surroundings instead of reading as a light source.
@@ -260,7 +259,7 @@ before it lands.
 4. **Deadvox consumption and effects.** The glow, drips and death splash ship with the body
    so the mob reaches players complete, and stay presentation so they never touch the
    simulation or saves. See "What Deadvox needs" and
-   `packages/deadvox/src/render/acidEffects.ts`, `AcidEffects`.
+   deadvox's `AcidEffects`.
 
 The far level of detail follows as its own item, cross-mob, with an owner the lead routes.
 

@@ -126,6 +126,12 @@ repoints any entry that named it, so a consumer's saved ids keep resolving after
 a map whose retired id names a model again or whose target is no current model; see `tools/manifest.mjs`,
 `buildManifest`.
 
+A cue into a product's source names the product and the symbol, with no path: deadvox's `typeWeightGrams`, not a
+path to the file that holds it. A reader of this repository alone cannot resolve a path into skelly, and skelly moves
+files, so a path cue goes false while a symbol cue survives the move. The cues name skelly symbols as they stand on
+the skelly revision that pins this release. Nothing checks them, so a renamed symbol goes stale without a failure. A
+path cue may come back if this repository gains a cue check over a skelly checkout.
+
 ### Printed labels
 
 A packaged item without its print reads as a blank box, so a catalogue row can name the face of a piece that
