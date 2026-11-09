@@ -4,6 +4,7 @@ read_if:
   - you inspect the thing tool's viewer or its assembly boundary
   - you change a tool item's mass, finish or geometry
   - you make part of an item glow or rename a glowing material
+  - you mark which of a part's finish slots take paint
   - you investigate skin authoring or voxel deformation topology
 ---
 
@@ -92,3 +93,14 @@ material no other slot of the item uses, and the export refuses an item unless i
 names that material exactly once, so the tag never points at nothing or lights a second
 part. See `src/catalogue.ts`, `glowMaterial`, `src/exports.ts`, `checkGlow`, and
 `models/catalogue/sets/batch-060.libsonnet`, `road_flare`.
+
+## Paint
+
+A part names the finish slots that take a consumer's paint, as `paintable`, and the export
+marks the glTF materials those slots draw. The mark sits on the material rather than on a
+name a consumer must recognise, so renaming a material never loses its paint. A paintable
+slot keeps a material of its own even where an unmarked slot shares its look, so painting
+the body never recolours trim drawn in the same colour. The build refuses a paintable slot
+that colours no solid, because its paint would land nowhere. Why a vehicle site seeds the
+paint is in `docs/decisions/0003-vehicle-paint.md`. See `src/catalogue.ts`, `buildPart`, and
+`tools/packages/thing-export/src/appearance.ts`, `resolveAppearance`.
