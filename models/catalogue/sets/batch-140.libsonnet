@@ -155,7 +155,7 @@ local mailCoif(id, mass) = hood(id, mass, {
   // A mild steel mail coif standing upright, 330 mm across the shoulder curtain and 310 mm tall: a close hood of
   // riveted rings over the crown, its mail mantle slumped onto the shoulders, with a face opening at +z. Rings show as
   // short dark links, each row staggered against the next.
-  mailCoif('lc_chainmail_hood', 3.3),
+  mailCoif('lc_chainmail_hood', 3.3) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A dark grey cotton hood standing upright, 240 mm across and 310 mm tall: a snug hood that also covers the mouth,
   // leaving only an eye slit, with black wrapped folds across the lower face.
@@ -185,7 +185,7 @@ local mailCoif(id, mass) = hood(id, mass, {
     mantle: { side: 0.055, fb: 0.08, hemSide: 0.06, back: 0.02, folds: 5, fold: 0.01 },
     rows: spread(0.104, 0.12, 3),
     fin: { cloth: 'knit-fr', stitch: 'knit-fr', trim: 'cloth-charcoal', face: 'cloth-black' },
-  }),
+  }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A yellow vinyl rain hood standing upright, 340 mm across and 325 mm tall: a loose hood with a stiffened peak over
   // the face, a seam up the back and a drawstring with toggles at the chin.
@@ -197,7 +197,7 @@ local mailCoif(id, mass) = hood(id, mass, {
                 + h.crescent('peak', 'trim', rAt(looseProfile, 0.26) - 0.012, rAt(looseProfile, 0.26) + 0.045, -55, 55, 8, 0.255, 0.261)
                 + drawstring(sf, 0.112, 0.07, 'cord', 0.008, 'toggle'),
     fin: { cloth: 'vinyl-yellow', stitch: 'vinyl-yellow', trim: 'rubber-yellow', face: 'cloth-black', cord: 'plastic-matte-black', toggle: 'plastic-matte-black' },
-  }),
+  }) + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A gutskin hood standing upright, 340 mm across and 325 mm tall: a loose hood sewn from translucent strips of gut,
   // the strip seams running round it, a sinew drawstring knotted at the chin.
@@ -208,7 +208,7 @@ local mailCoif(id, mass) = hood(id, mass, {
     rows: spread(0.03, 0.29, 9),
     extras(sf): backSeam(sf, 0.04, 0.3, 'stitch') + drawstring(sf, 0.112, 0.07, 'cord', 0.007, 'cord'),
     fin: { cloth: 'gut-translucent', stitch: 'skin-rawhide', trim: 'skin-rawhide', face: 'cloth-black', cord: 'skin-rawhide' },
-  }),
+  }) + { taxonomy: { category: 'clothing', tags: { material: ['flesh'], slot: ['head'] } } },
 
   // A beekeeper's hat and veil standing upright, 440 mm across the brim and 400 mm tall: a white cotton hat with a
   // wide stiffened brim, a black mesh veil hanging from it in a tube, a cotton skirt at its foot to tuck into a
@@ -226,5 +226,5 @@ local mailCoif(id, mass) = hood(id, mass, {
     box('tie-l', 'tie', [-0.05, 0.0, 0.188], [-0.044, 0.07, 0.202]),
     box('tie-r', 'tie', [0.044, 0.0, 0.188], [0.05, 0.07, 0.202]),
   ], { hat: 'cloth-bright-white', cloth: 'cloth-bright-white', trim: 'cloth-cream', veil: 'mesh-black', tie: 'cloth-cream' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head', 'face'] } } },
 ]

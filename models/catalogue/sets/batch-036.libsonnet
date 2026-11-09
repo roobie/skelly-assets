@@ -19,7 +19,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('front', 'front', [-0.33, -0.01, 0.21], [0.33, 0.11, 0.222]),
     box('pull', 'pull', [-0.2, 0.09, 0.222], [0.2, 0.1, 0.234]),
   ], { tray: 'steel-grey', floor: 'iron-dull', front: 'paint-charcoal', pull: 'steel-stainless' })
-  + { voxelGrain: 0.006 },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // The bare steel body of an electric oven, 600 mm wide, 690 mm tall and 600 mm deep, door, controls and
   // drawer gone: a white shell round a dark enamelled cavity with rack ridges, an empty control bay above and
@@ -53,7 +53,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     turned('wire-%d' % i, ['wire-red', 'wire-blue', 'wire-red'][i], 'y', [[0, 0], [0, 0.004], [0.1 - i * 0.02, 0.004], [0.1 - i * 0.02, 0]], [-0.1 + i * 0.08, 0.572 + i * 0.02, 0.27])
     for i in [0, 1, 2]
   ], { foot: 'rubber-black', shell: 'paint-white', liner: 'paint-charcoal', bay: 'steel-galvanised', ridge: 'paint-charcoal', 'wire-red': 'plastic-red', 'wire-blue': 'plastic-blue' })
-  + { voxelGrain: 0.006 },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An oven's control strip pulled from the cabinet, 650 mm long, 120 mm tall and 25 mm deep: a steel
   // backing under a dark glass fascia with a small green display, four knobs, a circuit board behind and cut
@@ -71,7 +71,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     wire('wire-b', 'wire-blue', 0, 0.06, -0.035, 0),
     wire('wire-c', 'wire-yellow', 0.08, 0.05, -0.025, 0),
   ], { steel: 'steel-grey', fascia: 'glass-grey', display: 'lcd-green', board: 'circuit-green', knob: 'plastic-black', 'wire-red': 'plastic-red', 'wire-blue': 'plastic-blue', 'wire-yellow': 'plastic-yellow' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // An electric oven's door, 660 mm wide, 480 mm tall and 50 mm thick, laid face up with its top edge toward
   // +z: an enamelled steel frame round a smoked double-glass window, a bar handle on two posts near the top
@@ -86,7 +86,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('hinge-a', 'hinge', [-0.29, 0.012, -0.32], [-0.27, 0.03, -0.2]),
     box('hinge-b', 'hinge', [0.27, 0.012, -0.32], [0.29, 0.03, -0.2]),
   ], { frame: 'paint-charcoal', window: 'glass-grey', handle: 'steel-stainless', hinge: 'steel-grey' })
-  + { voxelGrain: 0.006 },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A tower shield cut from the oven door: every piece, finish and grain of the door, kept as its own row so the
   // shield can be tuned toward a shield's look without changing the door.
@@ -146,7 +146,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     wire('wire-%d' % i, ['wire-red', 'wire-blue'][i % 2], -0.2 + i * 0.13, 0.02, -0.32 + (i % 2) * 0.02, -0.26)
     for i in std.range(0, 3)
   ], { top: 'enamel-white', bowl: 'steel-stainless', hole: 'paint-charcoal', block: 'ceramic-white', 'wire-red': 'plastic-red', 'wire-blue': 'plastic-blue' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 250 ml squeeze bottle of hair dye, 56 mm across and 165 mm tall to the tip of its pointed applicator
   // nozzle, with a dark label and a wide colour swatch band that names the shade.
@@ -157,7 +157,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     turned('label', 'label', 'y', [[0, 0], [0, 0.0285], [0.075, 0.0285], [0.075, 0]], [0, 0.02, 0]),
     turned('swatch', 'swatch', 'y', [[0, 0], [0, 0.029], [0.03, 0.029], [0.03, 0]], [0, 0.04, 0]),
   ], { bottle: 'plastic-white', tip: 'plastic-black', label: 'plastic-charcoal', swatch: 'cloth-brown' })
-  + h.inHand('hair_dye', 'bottle') + { voxelGrain: 0.004 },
+  + h.inHand('hair_dye', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A screw-top glass jar 70 mm across and 95 mm tall, filled with clear mineral oil over grey lumps of a
   // reactive metal, with a black lid and a yellow hazard label.
@@ -171,5 +171,5 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     h.ball('lump-%d' % i, 'metal', 0.008, lumps[i][0], 0.004 + lumps[i][1], lumps[i][2], 0.7)
     for i in std.range(0, std.length(lumps) - 1)
   ], { glass: 'glass-clear', oil: 'jelly-pale', lid: 'plastic-black', label: 'plastic-yellow', metal: 'iron-dull' })
-  + h.inHand('chem_potassium', 'jar') + { voxelGrain: 0.002 },
+  + h.inHand('chem_potassium', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['modern'] } } },
 ]

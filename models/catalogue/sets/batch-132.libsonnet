@@ -114,7 +114,7 @@ local closeHelm(id, mass, heavy, raised) =
 [
   // A clear shield visor standing on its lower edge, 260 mm round the curve and 120 mm tall: a thin, short visor on
   // a black brow strip whose ends clip into the slots at each side of a hard hat.
-  visorShield('shield_visor', 0.11, 0.11, 68, 0.12, 0.002, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }),
+  visorShield('shield_visor', 0.11, 0.11, 68, 0.12, 0.002, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A hard hat sun shield lying flat, 540 mm across and 530 mm from front to back: a wide white plastic brim with a
   // raised collar round an opening that slips over a hard hat's rim, a deep flap at the back for the neck, and four
@@ -169,17 +169,17 @@ local closeHelm(id, mass, heavy, raised) =
                sbox('chin-cup', 'strap', [-0.07, 0, 0.045], [0.07, 0.003, 0.065]),
              ],
              { shell: 'polymer-fde', fitting: 'plastic-matte-black', strap: 'webbing-black', patch: 'hook-loop-grey' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A hardened steel heavy close helm standing on its neck, front on +z, 250 mm across, 280 mm deep and 305 mm
   // tall: a combed skull, a bevor over the chin, a bulging visor with an eye slit pivoting at the temples, a riveted
   // brow reinforce and three gorget lames.
-  closeHelm('ch_heavyhelm_close', 4.2, true, false),
+  closeHelm('ch_heavyhelm_close', 4.2, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // The same heavy close helm with its visor swung up over the brow, the face open: 340 mm tall.
-  closeHelm('ch_heavyhelm_close_raised', 4.2, true, true),
+  closeHelm('ch_heavyhelm_close_raised', 4.2, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A hardened steel close helm standing on its neck, 250 mm across, 280 mm deep and 305 mm tall: the same combed
   // skull, bevor and visor as the heavy helm, on a single neck lame and without the brow reinforce.
-  closeHelm('ch_helm_close', 3.5, false, false),
+  closeHelm('ch_helm_close', 3.5, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 ]

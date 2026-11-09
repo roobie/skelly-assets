@@ -224,7 +224,7 @@ local galea = {
              + [h.rod('pivot', 'rivet', 0.01, -0.108, 0.108, 0.198)]
              + rivetRow('rivet', 'rivet', 0.098, 0.124, 0.006, 0.11, [-120, -60, 60, 120]),
              { shell: 'steel-blued', visor: 'steel-blued', inside: 'cloth-black', rivet: 'steel-bright' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // Sparring headgear standing upright, front on +z, 230 mm tall: a padded leather hood with a wide face opening, a
   // chin bar, a brow roll, a ringed ear pad each side and laces up the back.
@@ -242,7 +242,7 @@ local galea = {
              + [box('lace-%d' % i, 'trim', [-0.02, 0.05 + i * 0.022, -0.124], [0.02, 0.056 + i * 0.022, -0.114]) for i in std.range(0, 4)]
              + [box('lace-gap', 'inside', [-0.004, 0.05, -0.122], [0.004, 0.15, -0.115])],
              { pad: 'leather-red', trim: 'vinyl-black', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['modern'], slot: ['head'] } } },
 
   // A combat helmet standing on its rim, front on +z, 290 mm front to back and 175 mm tall: a tan composite shell cut
   // high at the brow, an accessory rail along each side, a night-vision shroud at the front, and a chinstrap with a
@@ -262,7 +262,7 @@ local galea = {
                box('shroud-plate', 'rail', [-0.012, 0.094, 0.13], [0.012, 0.112, 0.134]),
              ],
              { shell: 'polymer-fde', inside: 'cloth-black', rail: 'polymer-black', strap: 'nylon-coyote' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A steel flak helmet standing on its rim, front on +z, 280 mm front to back and 175 mm tall: a round pot with a
   // flared, rolled rim and a leather chinstrap lying out in front with its buckle.
@@ -275,7 +275,7 @@ local galea = {
              ])
              + [box('strap-front', 'strap', [-0.034, 0, 0.15], [0.034, 0.003, 0.17]), box('buckle', 'buckle', [-0.014, 0, 0.146], [0.006, 0.006, 0.174])],
              { shell: 'paint-olive', strap: 'leather-brown', buckle: 'brass-dull' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['modern'], slot: ['head'] } } },
 
   // An eagle helmet standing upright, front on +z, 270 mm tall and 360 mm long: a carved wooden head whose open beak is
   // the face opening, the hooked upper beak jutting over the brow and the lower beak under the chin, an eye on each
@@ -305,7 +305,7 @@ local galea = {
                for i in std.range(0, 4)
              ],
              { shell: 'wood-walnut', band: 'paint-cream', inside: 'cloth-black', beak: 'paint-crane-yellow', eye: 'paint-white', plume: 'cloth-green', 'plume-b': 'cloth-red' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['wood'], slot: ['head'] } } },
 
   // A batting helmet standing on its ear flaps, front on +z, 255 mm front to back and 210 mm tall: a glossy shell over
   // a padded liner, an ear flap down each side with its ear hole, a short peak and vent holes in the crown.
@@ -322,7 +322,7 @@ local galea = {
                for v in [[[-0.03, 0.04], [0.03, 0.04], [-0.04, -0.05], [0.04, -0.05]][i]]
              ],
              { shell: 'plastic-blue', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A bike helmet standing on its rim, front on +z, 260 mm front to back and 155 mm tall: a long rounded shell with
   // four dark vent channels front to back, a white foam band round the rim, a short visor and straps lying out to a buckle.
@@ -336,7 +336,7 @@ local galea = {
              ])
              + [box('buckle', 'buckle', [-0.02, 0, 0.145], [0.02, 0.008, 0.162])],
              { shell: 'plastic-red', inside: 'plastic-black', foam: 'plastic-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A closed bronze helmet standing upright, front on +z, 280 mm tall and 255 mm front to back: one rounded shell to
   // the neck with a thickened rim, a single eye slit, a row of breathing holes and a keel over the crown.
@@ -354,7 +354,7 @@ local galea = {
              + slab('seam-brow', 'seam', ell(0.111, 0.132, 0), 0.172, 0.18)
              + [keel('keel', 'seam', 0.126, 0, 0.17, 0.11, 0.008, 0.012)],
              { shell: 'chitin-brown', seam: 'leather-chestnut', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['bone'], slot: ['head'] } } },
 
   // A light chitin helmet standing upright, front on +z, 280 mm tall: the chitin shell with the face left open from
   // brow to chin, raised seams and a ridge over the crown.
@@ -364,7 +364,7 @@ local galea = {
              + slab('seam-brow', 'seam', ell(0.111, 0.132, 0), 0.172, 0.18)
              + [keel('keel', 'seam', 0.126, 0, 0.17, 0.11, 0.008, 0.012)],
              { shell: 'chitin-brown', seam: 'leather-chestnut', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['bone'], slot: ['head'] } } },
 
   // A conical helm standing on its neck guard, front on +z, 340 mm tall and 236 mm across: a tall iron cone rising to a
   // spike over a fur brim, with a skirt of laced iron lames round the back and sides.
@@ -406,7 +406,7 @@ local galea = {
              + [h.disc('post-%d' % i, 'mask', 0.0045, 0.025, 0.105, 0.134 * std.sin(rad(a)), 0.134 * std.cos(rad(a))) for i in [0, 1, 2] for a in [[-40, 0, 40][i]]]
              + [box('visor', 'visor', [-0.074, 0.112, 0.088], [0.074, 0.16, 0.094])],
              { shell: 'plastic-red', stripe: 'plastic-white', inside: 'cloth-black', mask: 'plastic-grey', visor: 'lens-smoke' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head', 'face'] } } },
 
   // A galea standing on its cheek guards, front on +z, 250 mm tall and 330 mm long: an iron bowl with a brow
   // reinforce, a broad neck guard sloping out at the back, a hinged cheek guard hanging each side with brass bosses

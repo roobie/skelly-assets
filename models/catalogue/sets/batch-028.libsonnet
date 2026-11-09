@@ -28,14 +28,14 @@ local forkPieces(t) = [
     turned('body', 'bowl', 'y', [[0, 0], [0, 0.032], [0.006, 0.034], [0.012, 0.045], [0.03, 0.058], [0.052, 0.0635], [0.052, 0.0595], [0.03, 0.053], [0.014, 0.041], [0.009, 0]]),
     turned('band', 'band', 'y', [[0.052, 0.0595], [0.052, 0.0635], [0.06, 0.065], [0.06, 0.061], [0.052, 0.0595]]),
   ], { bowl: 'ceramic-white', band: 'paint-police-blue' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], setting: ['modern'] } } },
 
   // A teacup 90 mm across the rim and 60 mm tall on a narrow foot, with a loop handle; 115 mm over the handle.
   h.compound('ceramic_cup', 0.14, [
     turned('body', 'cup', 'y', [[0, 0], [0, 0.022], [0.004, 0.024], [0.01, 0.032], [0.03, 0.042], [0.06, 0.045], [0.06, 0.042], [0.03, 0.039], [0.012, 0.028], [0.007, 0]]),
     loop('handle', 'cup', 0.0575, 0.036, 0.009, 0.0165, 0.007),
   ], { cup: 'ceramic-white' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], setting: ['modern'] } } },
 
   // A straight coffee mug 84 mm across and 95 mm tall with a loop handle, 122 mm over the handle; glazed red outside,
   // white inside.
@@ -44,13 +44,13 @@ local forkPieces(t) = [
     disc('floor', 'inside', 0.038, 0.008, 0.01),
     loop('handle', 'glaze', 0.059, 0.05, 0.013, 0.021, 0.01),
   ], { glaze: 'paint-oxblood', inside: 'ceramic-white' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], setting: ['modern'] } } },
 
   // A dinner plate 260 mm across and 22 mm high: a flat well and a wide sloping rim on a low foot.
   h.compound('ceramic_plate', 0.35, [
     turned('body', 'plate', 'y', [[0, 0], [0, 0.06], [0.004, 0.064], [0.006, 0.085], [0.016, 0.122], [0.022, 0.13], [0.022, 0.126], [0.017, 0.118], [0.011, 0.085], [0.009, 0]]),
   ], { plate: 'ceramic-white' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], setting: ['modern'] } } },
 
   // A pair of wooden chopsticks 230 mm long lying side by side, tapering from 7 mm to 4 mm, lacquered at the thick end.
   h.compound('chopsticks', 0.0077, std.flattenArrays([
@@ -61,7 +61,7 @@ local forkPieces(t) = [
     for s in ['a', 'b']
     for z in [if s == 'a' then -0.006 else 0.006]
   ]), { grip: 'lacquer-red', stick: 'wood-birch' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['wood'] } } },
 
   // A glass drip-coffee carafe 150 mm across and 180 mm tall: a bulging glass body, a black plastic collar and lid,
   // and a looped handle on its +x side, 200 mm over the handle.
@@ -75,7 +75,7 @@ local forkPieces(t) = [
     box('handle-grip', 'plastic', [0.088, 0.05, -0.009], [0.102, 0.165, 0.009]),
     box('handle-foot', 'plastic', [0.073, 0.045, -0.008], [0.1, 0.058, 0.008]),
   ], { glass: 'glass-clear', plastic: 'plastic-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
 
   // A stainless mesh colander 220 mm across the rim and 108 mm tall on a foot ring, with a handle at each side;
   // 280 mm over the handles.
@@ -90,7 +90,7 @@ local forkPieces(t) = [
     ]
     for i in [0, 1]
   ]), { mesh: 'mesh-black', steel: 'steel-stainless' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A wooden chopping board 410 by 250 mm and 20 mm thick lying flat, with a hanging slot at its +x end.
   h.compound('cutting_board', 1.4, [
@@ -116,23 +116,23 @@ local forkPieces(t) = [
     disc('leg-%d' % i, 'iron', 0.012, 0, 0.032, 0.09 * std.sin(2 * std.pi * i / 3), 0.09 * std.cos(2 * std.pi * i / 3))
     for i in [0, 1, 2]
   ] + bail('bail', 'wire', 0.134, 0.1, 0.008, 36), { iron: 'iron-cast', wire: 'steel-grey' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A stainless table fork 210 mm long lying flat.
   h.compound('fork', 0.079, forkPieces(0.003), { fork: 'steel-stainless' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A tall drinking glass 80 mm across the rim and 160 mm tall, tapering to a thick base.
   h.compound('glass', 0.34, [
     turned('glass', 'glass', 'y', [[0, 0], [0, 0.034], [0.16, 0.04], [0.16, 0.037], [0.012, 0.031], [0.012, 0]]),
   ], { glass: 'glass-clear' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A glass dessert bowl 130 mm across and 65 mm deep on a flat foot.
   h.compound('glass_bowl', 0.29, [
     turned('glass', 'glass', 'y', [[0, 0], [0, 0.035], [0.012, 0.045], [0.035, 0.06], [0.065, 0.065], [0.065, 0.061], [0.035, 0.056], [0.016, 0.042], [0.008, 0.03], [0.008, 0]]),
   ], { glass: 'glass-clear' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A big steel stockpot made into a stovetop oven: 220 mm across and 150 mm deep, sooted at the base, with a bed of
   // pebbles and a wire trivet inside and its lid pushed aside to show them; 250 mm over the side handles.
@@ -151,7 +151,7 @@ local forkPieces(t) = [
     h.ball('pebble-%d' % i, 'stone', 0.012, 0.06 * std.cos(i * 1.3) * (1 - (i % 3) * 0.3), 0.022, 0.06 * std.sin(i * 1.3) * (1 - (i % 3) * 0.3), 0.7)
     for i in std.range(0, 11)
   ], { steel: 'steel-grey', soot: 'coal-black', wire: 'steel-bright', knob: 'plastic-black', stone: 'stone-grey' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // An enamelled cast-iron pot 210 mm across and 120 mm tall with a lug handle at each side, black outside and
   // cream enamel inside; 250 mm over the lugs.
@@ -174,5 +174,5 @@ local forkPieces(t) = [
     box('post-b', 'steel', [0.034, 0.12, -0.006], [0.042, 0.2, 0.006]),
     box('grip', 'grip', [-0.045, 0.195, -0.01], [0.045, 0.212, 0.01]),
   ], { steel: 'steel-stainless', grip: 'plastic-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

@@ -32,13 +32,13 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   h.compound('extinguisher', 14, extinguisher(0.085, 0.38, 0.04, 0.009, [0.016, 0.15, 0.09]), {
     body: 'paint-red', foot: 'plastic-black', label: 'paper-white', valve: 'brass', lever: 'steel-grey',
     gauge: 'plastic-white', hose: 'rubber-black', nozzle: 'plastic-black',
-  }) + { voxelGrain: 0.004 },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 2 kg CO2 extinguisher 400 mm tall: a narrow steel cylinder with a valve and a hose to a black discharge horn
   // clipped to the side.
   h.compound('sm_extinguisher', 6.5, extinguisher(0.05, 0.3, 0.035, 0.007, [0.03, 0.15, 0.13]), {
     body: 'paint-red', foot: 'plastic-black', label: 'paper-white', valve: 'steel-grey', lever: 'steel-grey',
     gauge: 'plastic-white', hose: 'rubber-black', nozzle: 'plastic-black',
-  }) + h.inHand('sm_extinguisher', 'body') + { voxelGrain: 0.004 },
+  }) + h.inHand('sm_extinguisher', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A thrown extinguisher 120 mm tall: an 84 mm steel ball of agent with a short neck, a capped plug with a pull ring
   // and a label band round its middle.
   h.compound('throw_extinguisher', 0.4, [
@@ -49,7 +49,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     shell('ring', 'ring', 'z', [[-0.002, 0.008], [-0.002, 0.013], [0.002, 0.013], [0.002, 0.008]], [0, 0.118, 0]),
   ], { body: 'paint-red', label: 'paper-white', cap: 'plastic-black', ring: 'steel-grey' }) + h.inHand('throw_extinguisher', 'ball') + {
     voxelGrain: 0.002,
-  },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 900 mm pickhead fire axe lying flat: a hickory haft and a red forged head, a 140 mm cutting blade on +z and a
   // 170 mm pick on -z.
   h.compound('fire_ax', 5, [
@@ -63,7 +63,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   ], { haft: 'wood-oak', head: 'paint-red', edge: 'steel-bright' }) + {
     handling: h.gripOn('fire_ax', 'grip'),
     voxelGrain: 0.004,
-  },
+  } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
   // A 760 mm forged Halligan bar lying flat, drawn at 0.9 scale from a 845 mm sketch: a 30 mm shaft with a fork at -x, and at +x an adze blade on +z and a
   // tapered pike on -z.
   h.compound('halligan', 5.4, h.scaled([
@@ -81,7 +81,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   ], 0.9), { shaft: 'steel-grey', head: 'steel-grey', edge: 'steel-bright', knurl: 'steel-parkerized' }) + {
     handling: h.gripOn('halligan', 'shaft'),
     voxelGrain: 0.004,
-  },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 1.6 m pike pole lying flat: a yellow fibreglass shaft with a rubber butt grip, and a steel head with a straight
   // spike and a hook curving back on +z.
   h.compound('pike_pole', 2, [
@@ -93,7 +93,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     prism('hook-tip', 'head', 'y', [[0.056, 1.534], [0.072, 1.525], [0.072, 1.48], [0.058, 1.494]], -0.006, 0.006),
   ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + {
     handling: h.gripOn('pike_pole', 'grip'),
-  } + { taxonomy: { tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
+  } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
   // A two-litre bottle trap 330 mm long lying on x: the bottle's top cut off and pushed back into it neck first as
   // a funnel at +x, tied in with cord, a cord loop on top and a few drain holes.
   h.compound('fish_trap', 0.05, [
@@ -110,7 +110,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     for i in std.range(0, 2)
   ], { bottle: 'plastic-clear', funnel: 'plastic-clear-blue', cord: 'cord-cotton', hole: 'plastic-charcoal' }) + {
     voxelGrain: 0.004,
-  },
+  } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A woven trap 500 mm long lying on x: a wicker cone closed and tied at -x, 240 mm across its mouth at +x, with an
   // inner funnel in the mouth and bark hoops round it.
   h.compound('fish_trap_basket', 0.35, [
@@ -129,5 +129,5 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     shell('rim', 'hoop', 'x', [[0, 0.112], [0, 0.126], [0.014, 0.126], [0.014, 0.112]], [0.488, 0, 0]),
   ], { wicker: 'straw-wicker', reed: 'plant-dried', hoop: 'bark', tie: 'straw-rope' }) + {
     voxelGrain: 0.004,
-  },
+  } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
 ]

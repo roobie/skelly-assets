@@ -91,7 +91,7 @@ local runeEngine = [
     strand('rune-arm-left', 'rune', [-0.003, 0.03], [-0.016, 0.018], 0.005, 0.038, 0.048),
     strand('rune-arm-right', 'rune', [0.003, 0.03], [0.016, 0.018], 0.005, 0.038, 0.048),
     box('rune-foot', 'rune', [-0.012, 0.012, 0.04], [0.012, 0.016, 0.046]),
-  ], { iron: 'iron-cast', trim: 'brass-dull', wick: 'cord-cotton', rune: 'crystal-glow-blue' }) + { handling: h.gripOn('twin_spout_rune_lamp', 'handle-back') } + { voxelGrain: 0.002 },
+  ], { iron: 'iron-cast', trim: 'brass-dull', wick: 'cord-cotton', rune: 'crystal-glow-blue' }) + { handling: h.gripOn('twin_spout_rune_lamp', 'handle-back') } + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A square frame of wooden sticks 150 mm on a side and 14 mm deep, strung corner to corner with taut cord that
   // holds a rune-marked pebble in the middle; a bowed stick across the top keeps the strings under tension.
@@ -116,7 +116,7 @@ local runeEngine = [
     ball('pebble', 'stone', 0.016, 0, 0.074, 0, 0.85),
     box('rune-stem', 'rune', [-0.002, 0.064, 0.012], [0.002, 0.086, 0.016]),
     box('rune-bar', 'rune', [-0.008, 0.074, 0.012], [0.008, 0.078, 0.016]),
-  ], { wood: 'wood-birch', cord: 'cord-cotton', stone: 'stone-grey', rune: 'crystal-glow-violet' }) + h.inHand('strung_rune_frame', 'stick-low') + { voxelGrain: 0.002 },
+  ], { wood: 'wood-birch', cord: 'cord-cotton', stone: 'stone-grey', rune: 'crystal-glow-violet' }) + h.inHand('strung_rune_frame', 'stick-low') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'fabric'], setting: ['fantasy'] } } },
 
   // A round brass clockwork case 104 mm across and 50 mm deep on two feet, glazed on its front over a train of gears
   // and a caged rune crystal, with a wind-up key standing from its top.
@@ -139,7 +139,7 @@ local runeEngine = [
     box('key-bow', 'brass', [-0.016, 0.122, -0.003], [0.016, 0.136, 0.003]),
     box('foot-left', 'brass', [-0.04, 0.0, -0.016], [-0.026, 0.01, 0.016]),
     box('foot-right', 'brass', [0.026, 0.0, -0.016], [0.04, 0.01, 0.016]),
-  ], { brass: 'brass-polished', glass: 'glass-clear', gear: 'brass-dull', steel: 'steel-bright', rune: 'crystal-glow-violet' }) + h.inHand('clockwork_rune_case', 'rim') + { voxelGrain: 0.002 },
+  ], { brass: 'brass-polished', glass: 'glass-clear', gear: 'brass-dull', steel: 'steel-bright', rune: 'crystal-glow-violet' }) + h.inHand('clockwork_rune_case', 'rim') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal', 'glass'], setting: ['fantasy'] } } },
 
   // A fired clay tablet 160 mm long, 110 mm wide and 26 mm thick, lying flat, with a raised border and a rune of
   // circuit-like lines glazed into its face.
@@ -160,7 +160,7 @@ local runeEngine = [
     h.disc('dot-a', 'rune', 0.005, 0.026, 0.03, 0.049, -0.032),
     h.disc('dot-b', 'rune', 0.005, 0.026, 0.03, -0.049, 0.036),
     h.disc('dot-c', 'rune', 0.005, 0.026, 0.03, -0.052, -0.023),
-  ], { clay: 'clay-terracotta', rune: 'gem-aquamarine' }) + h.inHand('rune_clay_tablet', 'slab') + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['ceramic'] } } },
+  ], { clay: 'clay-terracotta', rune: 'gem-aquamarine' }) + h.inHand('rune_clay_tablet', 'slab') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['ceramic'] } } },
 
   // A rune-inscribed steel engine case 400 mm wide, 320 mm tall to its coil caps and 200 mm deep, with its rune
   // pebble dim behind the porthole while it is switched off.
@@ -173,7 +173,7 @@ local runeEngine = [
     copper: 'copper',
     dark: 'plastic-matte-black',
     cable: 'rubber-black',
-  }) + { handling: h.gripOn('rune_engine_case', 'handle-grip') } + { voxelGrain: 0.008 },
+  }) + { handling: h.gripOn('rune_engine_case', 'handle-grip') } + { voxelGrain: 0.008 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A rough stone egg 200 mm long and 150 mm across, lying on its side, knobbled and speckled like a field rock, with
   // a thin warm seam where the shell will split.
@@ -189,7 +189,7 @@ local runeEngine = [
     strand('seam-a', 'seam', [-0.04, 0.148], [0.0, 0.142], 0.004, -0.004, 0.004),
     strand('seam-b', 'seam', [0.0, 0.142], [0.03, 0.15], 0.004, -0.004, 0.004),
     strand('seam-c', 'seam', [0.03, 0.15], [0.06, 0.136], 0.004, -0.004, 0.004),
-  ], { stone: 'stone-grey', dark: 'stone-whet', seam: 'resin-honey' }) + { handling: h.gripOn('rock_egg', 'shell') } + { voxelGrain: 0.004 },
+  ], { stone: 'stone-grey', dark: 'stone-whet', seam: 'resin-honey' }) + { handling: h.gripOn('rock_egg', 'shell') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A heart of golden metal 130 mm tall, 110 mm across its two upper lobes and 80 mm deep, with two short pipe stubs
   // on top, a dark seam band round it and a violet crystal set in its front.
@@ -204,5 +204,5 @@ local runeEngine = [
     h.disc('pipe-right-rim', 'metal', 0.011, 0.122, 0.128, 0.024, 0.008),
     h.turned('gem-rim', 'band', 'z', [[0, 0.012], [0, 0.017], [0.006, 0.017], [0.006, 0.012], [0, 0.012]], [0, 0.074, 0.036]),
     h.turned('gem', 'crystal', 'z', [[0, 0], [0, 0.012], [0.008, 0.009], [0.011, 0]], [0, 0.074, 0.036]),
-  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + { handling: h.gripOn('golem_heart', 'point') } + { voxelGrain: 0.004 },
+  ], { metal: 'bronze-polished', band: 'steel-blued', crystal: 'crystal-glow-violet' }) + { handling: h.gripOn('golem_heart', 'point') } + { voxelGrain: 0.004 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

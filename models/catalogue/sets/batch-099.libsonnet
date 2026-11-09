@@ -68,7 +68,7 @@ local beltStrap(len, w, t=0.004) = [
     for i in [0, 1, 2]
     for x in [[0.35, 0.4, 0.45][i]]
   ], { strap: 'leather-brown', pouch: 'leather-brown', pocket: 'leather-black', buckle: 'steel-grey', handle: 'plastic-yellow' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A 2-inch nylon webbing belt 1.1 m long and 50 mm wide laid flat, its outer face sewn into a row of attachment
   // channels, with a steel quick-release buckle at one end.
@@ -81,7 +81,7 @@ local beltStrap(len, w, t=0.004) = [
     box('buckle-gate', 'buckle', [0.595, 0.014, -0.02], [0.61, 0.018, 0.02]),
     box('keeper', 'webbing', [-0.53, 0.004, -0.026], [-0.515, 0.009, 0.026]),
   ], { strap: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'steel-parkerized' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A pair of sandals woven from cord, each sole 260 mm long and 95 mm wide, with a cord strap over the toes and a
   // heel loop.
@@ -105,7 +105,7 @@ local beltStrap(len, w, t=0.004) = [
     for p in ['left', 'right']
     for xc in [if p == 'left' then -0.055 else 0.055]
   ]), { sole: 'straw-wicker', weave: 'plant-dried', strap: 'cord-olive' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant', 'fabric'], slot: ['feet'] } } },
 
   // A pair of brown leather work boots, each 300 mm long, 105 mm wide and 170 mm tall, laced to the top.
   bootPair('boots', 1, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.17, shaft: 0.12, laces: 4 }, 0.02, {
@@ -114,7 +114,7 @@ local beltStrap(len, w, t=0.004) = [
     sole: 'rubber-black',
     collar: 'paperboard-brown',
     laces: 'paperboard-tan',
-  }) + { voxelGrain: 0.004 },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same work boots, 190 mm tall, studded all over with small carved bones and a bone ring at each collar.
   bootPair('boots_bone', 1.2, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.19, shaft: 0.12, laces: 4 }, 0.03, {
@@ -134,7 +134,7 @@ local beltStrap(len, w, t=0.004) = [
     for i in std.range(0, 3)
   ] + [
     box(p + '-bone-heel', 'bone', [xc - 0.03, 0.04, -0.158], [xc + 0.03, 0.05, -0.15]),
-  ]) + { voxelGrain: 0.004 },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'bone'], slot: ['feet'] } } },
 
   // A pair of black rubber firefighter's boots, each 310 mm long, 110 mm wide and 380 mm tall, pull-on, with a
   // reflective band, a steel toe cap and pull loops at the top.
@@ -148,7 +148,7 @@ local beltStrap(len, w, t=0.004) = [
     box(p + '-band', 'band', [xc - 0.0546, 0.2, -0.159], [xc + 0.0546, 0.225, -0.011]),
     box(p + '-loop-l', 'collar', [xc - 0.0546, 0.36, -0.1], [xc - 0.05, 0.41, -0.07]),
     box(p + '-loop-r', 'collar', [xc + 0.05, 0.36, -0.1], [xc + 0.0546, 0.41, -0.07]),
-  ]) + { voxelGrain: 0.004 },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of boots 300 mm long, 105 mm wide and 220 mm tall, sheathed in overlapping bands of insect shell.
   bootPair('boots_chitin', 1.7, { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 }, 0.03, {
@@ -163,7 +163,7 @@ local beltStrap(len, w, t=0.004) = [
   ] + [
     h.prism(p + '-shin', 'shell', 'x', [[0.1, -0.02], [0.215, -0.02], [0.215, -0.008], [0.12, 0.0]], xc - 0.035, xc + 0.035),
     h.prism(p + '-vamp-plate', 'shell', 'x', [[0.108, -0.02], [0.12, -0.02], [0.1, 0.085], [0.088, 0.085]], xc - 0.05, xc + 0.05),
-  ]) + { voxelGrain: 0.004 },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['bone'], slot: ['feet'] } } },
 
   // A pair of coyote-tan combat boots, each 300 mm long, 105 mm wide and 220 mm tall, with a black lugged sole, a
   // reinforced toe and heel and laces to the top.
@@ -175,5 +175,5 @@ local beltStrap(len, w, t=0.004) = [
     laces: 'webbing-black',
   }, function(p, xc) [
     box(p + '-heel-cup', 'collar', [xc - 0.0525, 0.026, -0.152], [xc + 0.0525, 0.07, -0.12]),
-  ]) + { voxelGrain: 0.004 },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 ]

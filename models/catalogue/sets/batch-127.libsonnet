@@ -82,7 +82,7 @@ local furHat = [
     ring('band', 'band', 0.084, 0.093, 0, 0.009),
     h.disc('stalk', 'wool', 0.005, 0.048, 0.062),
   ], { wool: 'cloth-crimson', band: 'leather-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A bowler hat standing on its brim, 280 mm across and 135 mm tall: a hard round crown, a ribbon band and a narrow
   // brim curled up at the edge.
@@ -91,7 +91,7 @@ local furHat = [
     h.turned('brim', 'felt', 'y', [[0, 0.08], [0, 0.128], [0.008, 0.138], [0.02, 0.142], [0.022, 0.136], [0.012, 0.128], [0.006, 0.08], [0, 0.08]]),
     ring('band', 'band', 0.084, 0.0895, 0.006, 0.032),
   ], { felt: 'cloth-charcoal', band: 'satin-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A chaplet lying flat, 220 mm across: a ring of twisted dried stems 24 mm thick, set with leaves and a few dried
   // flowers.
@@ -104,7 +104,7 @@ local furHat = [
     h.disc('flower-%d' % i, 'flower', 0.009, 0.02, 0.028, 0.098 * std.sin(2 * std.pi * (i + 0.25) / 5), 0.098 * std.cos(2 * std.pi * (i + 0.25) / 5))
     for i in std.range(0, 4)
   ], { stem: 'plant-dried', leaf: 'leaf-green', flower: 'petal-dried' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['head'] } } },
 
   // A leather cowboy hat standing on its brim, 380 mm across and 150 mm tall: a tall crown creased down the middle of
   // the top, a band with a silver concho at the front, and a wide brim rolled up at the edge.
@@ -114,7 +114,7 @@ local furHat = [
     ring('band', 'band', 0.084, 0.0895, 0.022, 0.042),
     h.turned('concho', 'concho', 'z', [[0, 0], [0, 0.012], [0.003, 0.01], [0.005, 0]], [0, 0.032, 0.088]),
   ], { leather: 'leather-chestnut', band: 'leather-black', concho: 'metal-silver' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['head'] } } },
 
   // A drinking hat standing upright, face on +z, 330 mm across: a cotton headband with a strap over the top, a small
   // plastic bottle wired upright at each side and a hose from each bottle running down the front to a mouthpiece.
@@ -138,7 +138,7 @@ local furHat = [
     h.rod('hose-join', 'hose', 0.005, -0.135, 0.135, 0.012) + { origin: [-0.135, 0.012, 0.12] },
     h.disc('mouthpiece', 'cap', 0.009, 0.004, 0.03, 0, 0.12),
   ], { band: 'cloth-khaki', bottle: 'plastic-clear-blue', cap: 'plastic-white', wire: 'steel-bright', cord: 'cord-cotton', hose: 'rubber-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A lacquered eboshi standing upright, front on +z, 255 mm tall and 180 mm across: a tall cap tapering to a narrow
   // top whose tip folds forward, with a cord to tie it under the chin.
@@ -150,7 +150,7 @@ local furHat = [
     box('cord-l', 'cord', [-0.094, 0, -0.004], [-0.088, 0.03, 0.004]),
     box('cord-r', 'cord', [0.088, 0, -0.004], [0.094, 0.03, 0.004]),
   ], { lacquer: 'leather-patent', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['medieval'], slot: ['head'] } } },
 
   // A boonie hat standing on its brim, 320 mm across and 110 mm tall: a soft round crown with a loop band for
   // foliage and a vent eyelet each side, and a stitched brim drooping all round.
@@ -165,7 +165,7 @@ local furHat = [
     box('loop-%d' % i, 'band', [0.092 * std.sin(2 * std.pi * i / 8) - 0.006, 0.036, 0.092 * std.cos(2 * std.pi * i / 8) - 0.006], [0.092 * std.sin(2 * std.pi * i / 8) + 0.006, 0.064, 0.092 * std.cos(2 * std.pi * i / 8) + 0.006])
     for i in std.range(0, 7)
   ], { cloth: 'cloth-olive-drab', stitch: 'webbing-olive-dark', band: 'webbing-olive-dark', eyelet: 'brass-dull' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A chef's toque standing upright, 240 mm tall: a plain band 50 mm deep under a tall pleated body that puffs out
   // at the top.
@@ -173,7 +173,7 @@ local furHat = [
     ring('band', 'band', 0.08, 0.096, 0, 0.05),
     h.turned('body', 'cloth', 'y', [[0, 0], [0, 0.094], [0.12, 0.104], [0.165, 0.11], [0.18, 0.106], [0.19, 0.08], [0.192, 0]], [0, 0.048, 0]),
   ] + ribs('pleat', 'cloth', 18, 0.1, 0.007, 0.05, 0.2), { band: 'cloth-cream', cloth: 'cloth-bright-white' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A snug cotton knit hat standing upright, 180 mm tall: a rounded crown over a ribbed cuff turned up at the brow.
   h.compound('hat_cotton', 0.08, [
@@ -185,7 +185,7 @@ local furHat = [
   // A fur hat standing upright, 220 mm across and 140 mm tall: a deep round drum of tufted pelt with a cloth top
   // set in.
   h.compound('hat_fur', 0.46, furHat, { fur: 'fur-brown', top: 'velvet-red' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['head'] } } },
 
   // A patrol cap standing on its bill, front on +z, 260 mm long and 95 mm tall: a straight-sided crown with a flat
   // top and a stiff short bill.
@@ -194,7 +194,7 @@ local furHat = [
     bill('bill', 'cloth', 0.09, 0.165, 0.088, 0, 0.007),
     ring('seam', 'seam', 0.096, 0.098, 0.088, 0.094),
   ], { cloth: 'cloth-ucp', seam: 'webbing-olive-dark' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A flat golf cap standing upright, front on +z, 240 mm long and 70 mm tall: a wedge of cloth, highest at the back,
   // that slopes forward over a short stiff bill and is held down to it by a snap.
@@ -206,12 +206,12 @@ local furHat = [
   ] + [
     h.turned('snap', 'snap', 'y', [[0, 0], [0, 0.007], [0.004, 0.006], [0.006, 0]], [0, 0.035, 0.11]),
   ], { cloth: 'cloth-brown', snap: 'leather-brown' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A hard hat standing on its rim, peak on +z, 280 mm long and 135 mm tall: a domed shell with a raised ridge and a
   // rib either side, a narrow rim and a short peak.
   h.compound('hat_hard', 0.33, hardHat(0), { shell: 'plastic-yellow' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // The hard hat with a cloth sun shade, 380 mm across: the shade buttons to the rim and lies spread on the floor
   // round the back and sides, where it hangs over the neck and ears when worn.
@@ -222,5 +222,5 @@ local furHat = [
       for i in std.range(0, 4)
       for a in [[90, 135, 180, 225, 270][i]]
     ], { shell: 'plastic-white', shade: 'cloth-khaki', button: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['head'] } } },
 ]

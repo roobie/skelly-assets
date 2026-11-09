@@ -63,7 +63,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
              + [ring('plait-%d' % i, 'plait', [0.026, 0.02, 0.012][i] - 0.002, 0.005, [0.125, 0.15, 0.178][i], [0.125, 0.15, 0.178][i] + 0.006) for i in [0, 1, 2]]
              + [box('bow', 'band', [0.07, 0.03, 0.06], [0.09, 0.05, 0.08])],
              { straw: 'straw-wicker', plait: 'straw-wicker', band: 'cloth-brown' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['head'] } } },
 
   // A tall black silk top hat sitting on its brim, 300 mm across the brim and 165 mm tall: a straight crown that
   // waists a little and flares to a flat top, a flat brim with a rolled edge, and a matt band above the brim.
@@ -75,7 +75,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                ring('band', 'band', 0.012, 0.032, 0.085, 0.091),
              ],
              { silk: 'satin-black', band: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // An oiled black leather three-cornered hat sitting on its brim, 360 mm across and 136 mm tall: a
   // round crown inside a brim turned up into three walls, one corner to the front, gold braid along the wall tops and
@@ -104,7 +104,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                h.disc('button', 'braid', 0.008, low * 0.4 + 0.03, low * 0.4 + 0.038, ck[0], ck[1]),
              ],
              { leather: 'leather-black', braid: 'metal-gold', cockade: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['head'] } } },
 
   // A plain cotton turban as it is set down already wound, 230 mm across and 144 mm tall: a rounded wound crown
   // with folds of cloth crossing in a V over the forehead (+z) and climbing round the sides to the back.
@@ -116,7 +116,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                for k in [0, 1]
              ]),
              { cloth: 'cloth-cream', wrap: 'cloth-white' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A blue costume wizard hat standing on its brim, 380 mm across and 336 mm tall: a tall cone on a wide floppy
   // brim, a gold band round its foot and gold stars stitched over the cone and brim.
@@ -147,7 +147,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                h.disc('stem-knot', 'silk', 0.008, 0.05, 0.056),
              ],
              { silk: 'cloth-crimson' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // Panoramic night-vision goggles as they come off a helmet, 178 mm across, 132 mm deep and 92 mm tall: four
   // image tubes on one housing, the inner pair with rubber eyecups at the back (-z) and the outer pair set back
@@ -178,7 +178,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                box('plug', 'trim', [0.024, 0.062, -0.03], [0.04, 0.074, -0.012]),
              ],
              { body: 'plastic-matte-black', trim: 'plastic-charcoal', rubber: 'rubber-black', lens: 'glass-lens-green', mount: 'alu-anodized-black' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A pair of helmet ear muffs as they come off a hard hat, 200 mm across and 140 mm tall: two yellow cups standing
   // face to face on their black foam cushions' edges, each on a sprung steel wire arm that ends in a flat black clip
@@ -199,5 +199,5 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
                for s in [if i == 0 then -1 else 1]
              ]),
              { cup: 'plastic-yellow', cushion: 'vinyl-black', wire: 'steel-grey', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 ]
