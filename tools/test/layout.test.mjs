@@ -57,7 +57,7 @@ test('the roster builder writes each id at its pack path and nowhere else', () =
   const [{ packId, id }] = readRoster();
   const out = mkdtempSync(join(tmpdir(), 'roster-'));
   try {
-    execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--out', out, id], { cwd: repo, stdio: 'pipe' });
+    execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', out, id], { cwd: repo, stdio: 'pipe' });
     assert.deepEqual(filesUnder(out), [rosterFile(packId, id)]);
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
@@ -71,7 +71,7 @@ test('the showcase lists every model of the manifest at its pack path, ships the
   const out = join(root, 'site');
   try {
     const rows = mobRowPerTemplate();
-    execFileSync(process.execPath, [join(repo, 'tools/mobs.mjs'), '--out', built, ...rows.map((row) => row.id)], { cwd: repo, stdio: 'pipe' });
+    execFileSync(process.execPath, [join(repo, 'tools/mobs.mjs'), '--no-cache', '--out', built, ...rows.map((row) => row.id)], { cwd: repo, stdio: 'pipe' });
     const manifest = buildManifest({ ...mobManifest(rows), credit: readCredits(repo) });
     writeFileSync(join(built, MANIFEST), manifestJson(manifest));
     execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, out], { cwd: repo, stdio: 'pipe' });

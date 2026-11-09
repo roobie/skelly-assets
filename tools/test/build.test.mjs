@@ -171,3 +171,28 @@ test('a gun row is reused from the cache until the file it names changes', async
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+// The cache would otherwise keep an entry for every edit ever built.
+test('a complete build keeps exactly the cache entries it used, and a rebuild reuses every one', async () => {
+  const items = catalogue.items.filter((entry) => entry.exportMass === 'inventory-atom').slice(0, 2);
+  const rowOf = (item) => ({ id: `${item.id}_kept`, kind: 'item', source: item.id, voxel: { grain: 0.01 }, options: { mass: item.exportMass } });
+  const build = async (root, out, cache) => {
+    const pool = exportPool(cache);
+    try {
+      await exportRecipes({ root, out, tools: ['gun', 'thing'], pool });
+      await pool.prune();
+      return pool.usage();
+    } finally {
+      await pool.close();
+    }
+  };
+  await withRoot('fixture.kept', [gunRow(), ...items.map(rowOf)], async (root, out) => {
+    const cache = join(out, '.cache');
+    await build(root, join(out, 'first'), cache);
+    const recipe = JSON.stringify([gunRow(), rowOf(items[0])]);
+    for (const extension of ['jsonnet', 'json']) writeFileSync(join(root, 'models/recipes', `fixture.kept.${extension}`), recipe);
+    await build(root, join(out, 'second'), cache);
+    assert.equal(cacheEntries(cache), 4, 'the gun row and the one item row left, a GLB and a JSON file each');
+    assert.deepEqual(await build(root, join(out, 'third'), cache), { reused: 2, generated: 0 });
+  });
+});

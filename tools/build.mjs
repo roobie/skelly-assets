@@ -1,6 +1,7 @@
 // Builds the repo's models from their sources in models/ into GLB files.
-// Usage: node tools/build.mjs [--out dir] [--cache dir] [rowId ...], or node tools/build.mjs --shard i/n --cache dir
-// to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard).
+// Usage: node tools/build.mjs [--out dir] [--cache dir | --no-cache] [rowId ...], or node tools/build.mjs --shard i/n
+// [--cache dir] to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard). The cache
+// is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; --no-cache generates every model.
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
 // (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs)
@@ -22,6 +23,7 @@ import { readDependencies } from './packs.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
+import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -30,11 +32,36 @@ const here = import.meta.dirname;
 const repo = resolve(here, '..');
 
 // Every model is generated on a worker thread; the files are written here in source order, so the tree does not
-// depend on which model finished first. With a cache folder, unchanged models come from it (recipeTools.mjs, generateRow).
+// depend on which model finished first. With a cache folder, unchanged models come from it (recipeTools.mjs, generateRow),
+// and the pool records each tool's entries it used, so a complete build can report and keep exactly those.
 export const exportPool = (cache) => {
   const pool = workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
-  return { run: (task) => pool.run({ ...task, cache }), close: () => pool.close() };
+  const used = new Map();
+  const counts = { reused: 0, generated: 0 };
+  return {
+    run: async (task) => {
+      const generated = await pool.run({ ...task, cache });
+      if (generated.entry === undefined) counts.generated += 1;
+      else {
+        counts[generated.entry.reused ? 'reused' : 'generated'] += 1;
+        used.set(task.tool, (used.get(task.tool) ?? new Set()).add(generated.entry.key));
+      }
+      return generated;
+    },
+    close: () => pool.close(),
+    // How many models this pool took from the cache and how many it generated.
+    usage: () => ({ ...counts }),
+    // Every entry of a tool's cache but those this pool used goes; only a build that ran every row may prune.
+    prune: async () => {
+      const { pruneEntries } = await import('./packages/thing-export/src/cache.ts');
+      for (const [name, tool] of Object.entries(await recipeTools())) {
+        if (tool.code !== undefined) pruneEntries(join(cache, name), used.get(name) ?? new Set());
+      }
+    },
+  };
 };
+
+const cacheReport = ({ reused, generated }) => `export cache: ${reused} model(s) reused, ${generated} generated`;
 
 // Splits one recipe file's rows by owning tool, before any loader sees them.
 export function partitionRecipe(packId, rows, tools) {
@@ -153,10 +180,6 @@ async function buildRoster(thing, rows, ids, out, roster, pool) {
   return { failed, models };
 }
 
-// Shard `index` of `count` takes every count-th unit, so each shard's share interleaves all packs and the shards stay
-// balanced however unevenly rows are spread over packs.
-export const shardUnits = (units, { index, count }) => units.filter((_, at) => at % count === index - 1);
-
 // Generates one shard of the production build's cacheable rows into the cache and writes no tree. CI spreads a clean
 // build's generation over runners this way, then builds the tree from their merged caches, where every cacheable row
 // is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
@@ -173,27 +196,21 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   const pool = exportPool(cache);
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
+    console.log(cacheReport(pool.usage()));
   } finally {
     await pool.close();
   }
 }
 
-const parseShard = (text) => {
-  const [index, count] = text.split('/').map(Number);
-  if (!(Number.isInteger(index) && Number.isInteger(count) && index >= 1 && index <= count)) {
-    throw new Error(`--shard takes <index>/<count>, 1 <= index <= count: ${text}`);
-  }
-  return { index, count };
-};
-
 async function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { out: { type: 'string', default: join(repo, 'built') }, cache: { type: 'string' }, shard: { type: 'string' } },
+    options: { out: { type: 'string', default: join(repo, 'built') }, ...CACHE_OPTIONS, shard: { type: 'string' } },
   });
+  const cache = cacheFolder(values);
   if (values.shard !== undefined) {
-    if (values.cache === undefined || positionals.length > 0) throw new Error('--shard fills a --cache and takes no ids');
-    await fillCacheShard({ shard: parseShard(values.shard), cache: resolve(values.cache) });
+    if (cache === undefined || positionals.length > 0) throw new Error('--shard fills a cache and takes no ids');
+    await fillCacheShard({ shard: parseShard(values.shard), cache });
     return;
   }
   const roster = new Map(readRoster().map((row) => [row.id, row]));
@@ -212,7 +229,7 @@ async function main() {
     if (problems.length > 0) process.exit(1);
   }
   let failed = false;
-  const pool = exportPool(values.cache && resolve(values.cache));
+  const pool = exportPool(cache);
   try {
     const [built, recipes] = await Promise.all([
       buildRoster((await recipeTools()).thing, rosterRows, ids, out, roster, pool),
@@ -248,7 +265,9 @@ async function main() {
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));
       console.log(`built ${MANIFEST}`);
+      if (cache !== undefined && !failed) await pool.prune();
     }
+    console.log(cacheReport(pool.usage()));
   } catch (error) {
     // A row error arrives as a long issue dump; one line per issue with its path is what an author needs.
     if (!error.issues) {
