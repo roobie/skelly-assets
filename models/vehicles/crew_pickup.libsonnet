@@ -4,7 +4,7 @@ local box = k.box;
 local s = import 'crew_pickup.spec.libsonnet';
 local shape = (import 'car-shape.libsonnet')(s);
 local finish = { paint: s.paint, trim: 'plastic-black' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet')('crew_pickup', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('crew_pickup', s) + [
   k.compound('crew_pickup_frame', 260, k.bothSides([
     box('rail', 'steel', [s.bedRear + 0.05, 0.42, 0.42], [s.frontAxle + 0.5, 0.58, 0.5]),
     box('tall_rear', 'steel', [s.bedRear + 0.1, 0.58, 0.44], [s.bedFront, s.bedFloorTop - 0.06, 0.48]),

@@ -5,7 +5,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local s = import 'sports_car.spec.libsonnet';
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet')('sports_car', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('sports_car', s) + [
   m.wheel('sports_car_wheel', 24, 0.245, 0.23, s.hubHeight),
   k.compound('sports_car_bucket_seat', 12, [
     box('base', 'frame', [-0.22, 0, -0.22], [0.22, 0.05, 0.22]),

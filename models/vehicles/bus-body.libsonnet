@@ -43,7 +43,7 @@ local layout(s) = {
   doorHeight: s.decks[0].top - s.doorSill,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
 };
-local rows(id, s) = {
+local pressings(id, s) = {
   local g = layout(s),
   local face = g.face,
   local xf = g.xf,
@@ -348,7 +348,7 @@ local rows(id, s) = {
         box('beside_well', 'floor', [well.x[0], y - 0.1, well.z], [well.x[1], y, s.skin]),
       ], finish),
     ],
-  rows: k.unborrowed(id, s, [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
+  pressings: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
     k.compound(id + '_dashboard', 40, [
       box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - 0.14, dashTop(s), -0.28]),
@@ -365,8 +365,9 @@ local rows(id, s) = {
            box('upper_lip', 'trim', [face, y[1] - 0.04, -s.sign.z], [face + 0.05, y[1], s.sign.z]),
            box('panel', 'lit', [face, y[0] + 0.04, -s.sign.z + 0.06], [face + 0.07, y[1] - 0.04, s.sign.z - 0.06]),
          ], { trim: 'plastic-black', lit: 'plastic-orange' }),
-       ] else [])),
-}.rows;
+       ] else []),
+}.pressings;
+local rows(id, s) = k.unborrowed(id, s, pressings(id, s));
 local items(kit, id, name, s) =
   local panel(suffix, label, capabilities) = [suffix, label, capabilities];
   local g = layout(s);
@@ -392,7 +393,7 @@ local items(kit, id, name, s) =
   + (if has(s, 'engineHatch') then [panel('_rear_panel', 'engine hatch', ['protection'])] else [])
   + (if has(s, 'sign') then [panel('_destination_sign', 'destination sign', ['light'])] else []);
   [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in panels if !k.borrows(s, p[0])];
-local fittings(kit, id, s) =
+local laid(kit, id, s) =
   local fitting = kit.fitting;
   local pair = kit.pair;
   local on = kit.on;
@@ -475,6 +476,7 @@ local fittings(kit, id, s) =
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))
   + kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell']);
+local fittings(kit, id, s) = k.painted(id, s, pressings(id, s), laid(kit, id, s));
 {
   rows: rows, items: items, fittings: fittings, layout: layout,
   // A seat pair's placement at (x, y), for a spec's `seats`.

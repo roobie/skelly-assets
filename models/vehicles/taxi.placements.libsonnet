@@ -1,9 +1,11 @@
 // The saloon's sites with the taxi's repainted panels, and the taxi's own sign and band.
 local site = import 'site.libsonnet';
 local s = import 'taxi.spec.libsonnet';
-local retag(part) = if std.startsWith(part, 'saloon_') then (import 'kit.libsonnet').partId('taxi', s, part[6:]) else part;
+local k = import 'kit.libsonnet';
+local retag(part) = if std.startsWith(part, 'saloon_') then k.partId('taxi', s, part[6:]) else part;
+local retagged = [placed + { part: retag(placed.part) } for placed in (import 'saloon.placements.libsonnet').sites];
 {
-  sites: [placed + { part: retag(placed.part) } for placed in (import 'saloon.placements.libsonnet').sites] + [
+  sites: k.painted('taxi', s, (import 'car-body.libsonnet').pressings('taxi', s), retagged) + [
     site.one('roof_sign', 'taxi_roof_sign'),
     site.one('side_band', 'taxi_side_band'),
   ],

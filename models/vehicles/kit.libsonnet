@@ -84,4 +84,20 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   unborrowed(id, s, rows):
     local borrowed = [id + suffix for suffix in std.objectFields(std.get(s, 'borrow', {}))];
     [row for row in rows if !std.member(borrowed, row.id)],
+  // A borrowed pressing may differ from the lender's row in its paint, so each fitting of the lender's row carries the
+  // paint of the vehicle's own pressing as its finish. `pressings` are the kit's rows before `unborrowed`.
+  painted(id, s, pressings, fittings):
+    local borrow = std.get(s, 'borrow', {});
+    local own = { [row.id]: row.parts[0] for row in pressings };
+    local paintOf(suffix) =
+      local body = own[id + suffix];
+      local paints = std.set([body.finish[slot] for slot in std.get(body, 'paintable', [])]);
+      assert std.length(paints) <= 1 : id + suffix + ' paints its slots in ' + std.join(' ', paints) + ', not one finish';
+      paints;
+    local finish = {
+      [borrow[suffix]]: paintOf(suffix)[0]
+      for suffix in std.objectFields(borrow)
+      if std.objectHas(own, id + suffix) && std.length(paintOf(suffix)) == 1
+    };
+    [fitting + (if std.objectHas(finish, fitting.part) then { finish: finish[fitting.part] } else {}) for fitting in fittings],
 }

@@ -9,7 +9,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local carShape = import 'car-shape.libsonnet';
-function(id, s) {
+local pressings(id, s) = {
   local shape = carShape(s),
   local lean = shape.tumble,
   local grain = shape.grain,
@@ -222,5 +222,10 @@ function(id, s) {
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),
     ] + shape.across('glass', 'glass', [[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + s.dLean, s.roof], [s.tailWaist - 0.01 + s.dLean, s.roof]], s.hatchSide - 0.02), paint, { hinge_a: [shape.top('glass'), [1, 1, 1]], hinge_b: [shape.top('glass'), [1, 1, 0]] }),
   ]),
-  rows: k.unborrowed(id, s, rows),
-}.rows
+  pressings: rows,
+}.pressings;
+// `pressings` are every panel the spec presses; `rows` leave out those the car borrows.
+{
+  pressings: pressings,
+  rows(id, s): k.unborrowed(id, s, pressings(id, s)),
+}

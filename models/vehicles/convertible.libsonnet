@@ -7,7 +7,7 @@ local hoodBack = s.deckFront + 0.02;
 local hoodFront = -0.98;
 local lampOut = s.skin + 0.04;
 // The body's plain red lens matches this paint, so this lamp stands on a bright surround with an amber indicator.
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'convertible_tail_lamp', (import 'car-body.libsonnet')('convertible', s)) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'convertible_tail_lamp', (import 'car-body.libsonnet').rows('convertible', s)) + [
   k.compound('convertible_tail_lamp', 1, [
     box('lens', 'lens', [s.rear + 0.01, 0.71875, s.hatchSide + 0.03], [s.rear + 0.11, s.lampTop - 0.03, lampOut - 0.03]),
     box('indicator', 'indicator', [s.rear + 0.01, 0.65, s.hatchSide + 0.03], [s.rear + 0.11, 0.71875, lampOut - 0.03]),

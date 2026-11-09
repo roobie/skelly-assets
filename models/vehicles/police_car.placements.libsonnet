@@ -1,8 +1,9 @@
 local site = import 'site.libsonnet';
 local s = import 'police_car.spec.libsonnet';
-local part(suffix) = (import 'kit.libsonnet').partId('police_car', s, suffix);
+local k = import 'kit.libsonnet';
+local part(suffix) = k.partId('police_car', s, suffix);
 {
-  sites: [
+  sites: k.painted('police_car', s, (import 'car-body.libsonnet').pressings('police_car', s), [
     site.one('shell', part('_shell')),
     site.one('windscreen', part('_windscreen')),
     site.one('boot_lid', part('_boot_lid')),
@@ -33,6 +34,6 @@ local part(suffix) = (import 'kit.libsonnet').partId('police_car', s, suffix);
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
-  + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
+  + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44])),
   tags: { 'vehicle-role': ['emergency'] },
 }
