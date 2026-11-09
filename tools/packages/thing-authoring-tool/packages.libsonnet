@@ -22,7 +22,7 @@ local vessel(id, massKg, radius, height, body, label, exportMass, extra={}) = pa
   carton('crackers', 0.250, 0.14, 0.20, 0.055, 'paperboard-tan', 'paint-terracotta', exportMass='parts'),
   carton('chocolate_bar', 0.100, 0.15, 0.012, 0.07, 'paperboard-brown', 'paperboard-tan', exportMass='parts', extra={ lidHeight: 0.0005 }),
   vessel('soda_can', 0.360, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }),
-  vessel('empty_soda_can', 0.015, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }),
+  vessel('empty_soda_can', 0.015, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }) + { taxonomy: { tags: { state: ['empty'] } } },
   vessel('water_bottle', 1.050, 0.043, 0.20, 'glass-grey', 'plastic-blue', exportMass='parts', extra={ shoulderHeight: 0.025, neckRadius: 0.014, neckHeight: 0.015, capRadius: 0.016, capHeight: 0.012 }),
   carton('juice_carton', 1.050, 0.075, 0.19, 0.075, 'paperboard-tan', 'plastic-green', exportMass='parts', extra={ lidHeight: 0.015 }),
   carton('cartridge_box_308_h_winchester', 0.520, 0.15, 0.08, 0.035, 'paperboard-brown', 'paperboard-tan', exportMass='parts') + { taxonomy: { category: 'ammunition', tags: { weapon: ['rifle'] } } },

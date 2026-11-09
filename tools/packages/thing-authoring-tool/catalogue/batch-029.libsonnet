@@ -59,5 +59,5 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
   ], { iron: 'iron-cast', hole: 'coal-black' }) + {
     handling: h.gripOn('pan', 'handle'),
     voxelGrain: 0.004,
-  },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 ]

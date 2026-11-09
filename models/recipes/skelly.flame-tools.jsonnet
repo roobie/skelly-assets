@@ -1,7 +1,7 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local owned = std.set(['blowtorch']);
-[
+taxonomy.inherit({ category: 'tools' }, [
   {
     id: row.id,
     kind: 'item',
@@ -11,4 +11,4 @@ local owned = std.set(['blowtorch']);
   } + taxonomy.of(row)
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
   if std.setMember(row.id, owned)
-]
+])

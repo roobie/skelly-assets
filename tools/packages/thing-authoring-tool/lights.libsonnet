@@ -58,5 +58,5 @@ local port(id, gender, pos, normal, up=[1, 0, 0]) = { id: id, mount: 'assembly-j
       part('shade', 'shade', 0.150, { bottomRadius: 0.05, topRadius: 0.025, height: 0.04, wall: 0.003 }, { body: 'paint-terracotta' }, [port('arm', 'male', [0, 0, 0], [0, -1, 0])]),
     ],
     connections: [{ from: 'base.arm', to: 'arm.base' }, { from: 'arm.shade', to: 'shade.arm' }],
-  },
+  } + { taxonomy: { category: 'lighting', tags: { state: ['broken'] } } },
 ]
