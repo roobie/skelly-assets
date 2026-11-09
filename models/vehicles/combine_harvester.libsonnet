@@ -5,7 +5,6 @@ local s = import 'combine_harvester.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 local door = s.cabRear + 0.55;
 local bats = 6;
 local polar(r, degrees) = [s.reel[0] + r * std.cos(degrees * std.pi / 180), s.reel[1] + r * std.sin(degrees * std.pi / 180)];
@@ -85,10 +84,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('cradle_post', 'dark', [-2.06, s.shoulder + 0.06, -1.0], [-2.0, 3.0, -0.9]),
   ], { tube: 'paint-white', dark: 'paint-charcoal' }),
   k.compound('combine_harvester_feeder', 640, [
-    bar('housing', 'paint', [s.bodyFront, 1.68], [s.headerRear + 0.06, 0.8], 0.82, [-0.58, 0.58], 0.74),
+    k.bar('housing', 'paint', [s.bodyFront, 1.68], [s.headerRear + 0.06, 0.8], 0.82, [-0.58, 0.58], 0.74),
   ] + bothSides([
-    bar('lift_ram', 'dark', [s.bodyFront + 0.12, 0.74], [2.2, 0.84], 0.1, [0.5, 0.6]),
-    bar('lift_rod', 'bright', [2.16, 0.84], [2.56, 0.98], 0.05, [0.52, 0.58]),
+    k.bar('lift_ram', 'dark', [s.bodyFront + 0.12, 0.74], [2.2, 0.84], 0.1, [0.5, 0.6]),
+    k.bar('lift_rod', 'bright', [2.16, 0.84], [2.56, 0.98], 0.05, [0.52, 0.58]),
   ]), { paint: s.paint, dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('combine_harvester_header', 1900, [
     box('floor', 'paint', [s.headerRear, 0.2, -s.headerHalf], [s.headerFront, 0.3, s.headerHalf]),
@@ -107,7 +106,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ] + bothSides([
     prism('end_plate', 'paint', [[s.headerRear, 0.18], [s.headerFront + 0.06, 0.18], [s.headerFront + 0.4, 0.26], [s.headerRear + 0.62, s.wallTop], [s.headerRear, s.wallTop]], [s.headerHalf - 0.04, s.headerHalf]),
     prism('divider', 'yellow', [[s.headerFront, 0.18], [s.headerFront + 0.42, 0.22], [s.headerFront, 0.56]], [s.headerHalf - 0.1, s.headerHalf + 0.03]),
-    bar('reel_arm', 'dark', [s.headerRear + 0.1, s.wallTop], [s.reel[0], s.reel[1]], 0.1, [s.headerHalf - 0.1, s.headerHalf - 0.04]),
+    k.bar('reel_arm', 'dark', [s.headerRear + 0.1, s.wallTop], [s.reel[0], s.reel[1]], 0.1, [s.headerHalf - 0.1, s.headerHalf - 0.04]),
   ]), { paint: s.paint, yellow: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal' }),
   k.compound('combine_harvester_reel', 180, [
     m.axleDisc('shaft', 'dark', s.reel[0], s.reel[1], 0.05, [-s.headerHalf + 0.1, s.headerHalf - 0.1], 12),
@@ -116,9 +115,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     local tip = polar(s.reelRadius, angle);
     [
       box('bat_' + i, 'yellow', [tip[0] - 0.06, tip[1] - 0.06, -s.headerHalf + 0.12], [tip[0] + 0.06, tip[1] + 0.06, s.headerHalf - 0.12]),
-      bar('spider_near_' + i, 'dark', s.reel, tip, 0.04, [s.headerHalf * 0.72, s.headerHalf * 0.72 + 0.04]),
-      bar('spider_mid_' + i, 'dark', s.reel, tip, 0.04, [-0.02, 0.02]),
-      bar('spider_far_' + i, 'dark', s.reel, tip, 0.04, [-s.headerHalf * 0.72 - 0.04, -s.headerHalf * 0.72]),
+      k.bar('spider_near_' + i, 'dark', s.reel, tip, 0.04, [s.headerHalf * 0.72, s.headerHalf * 0.72 + 0.04]),
+      k.bar('spider_mid_' + i, 'dark', s.reel, tip, 0.04, [-0.02, 0.02]),
+      k.bar('spider_far_' + i, 'dark', s.reel, tip, 0.04, [-s.headerHalf * 0.72 - 0.04, -s.headerHalf * 0.72]),
     ]
     for i in std.range(0, bats - 1)
   ]), { yellow: 'paint-white', dark: 'paint-charcoal' }),

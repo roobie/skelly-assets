@@ -5,7 +5,6 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 // A prism along x has the (y, z) profile.
-local xPrism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
 local paint = { paint: s.paint };
 local axle(id, massKg, finish) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, -0.06, -1.02], [0.06, 0.06, 1.02]),
@@ -17,14 +16,14 @@ local axle(id, massKg, finish) = k.compound(id, massKg, [
 local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1.32 + i * 0.16, 2.46, 1.08]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 4500, [
-    xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
+    k.xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
     box('deck', 'floor', [s.rear, s.floor, -0.88], [2.81, s.floor + 0.02, 0.88]),
   ] + bothSides([
     box('lower_wall', 'paint', [s.rear, s.floor, 0.88], [2.81, s.shelf, s.wall]),
   ]), paint + { floor: 'steel-grey' }),
   k.compound('apc_hull_side', 1700, [
     box('shelf', 'paint', [s.rear, s.shelf, 0.88], [2.5, s.shelf + 0.06, s.side]),
-    xPrism('wall', 'paint', [[s.shelf, 1.25], [s.roof, 1.18], [s.roof, s.sideTop], [s.shelf, s.side]], [s.rear, 2.5]),
+    k.xPrism('wall', 'paint', [[s.shelf, 1.25], [s.roof, 1.18], [s.roof, s.sideTop], [s.shelf, s.side]], [s.rear, 2.5]),
     prism('cheek', 'paint', [[2.5, 1.19], [3.2, 1.19], [3.2, 1.77], [2.56, 2.41], [2.5, 2.41]], [1.25, s.side]),
   ], paint),
   k.compound('apc_hull_nose', 1200, [

@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local s = import 'hearse.spec.libsonnet';
@@ -56,7 +55,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
       box('landau_foot', 'bright', [landauX(0) - 0.04, landauY(0) - 0.04, landauOut(landauY(0))], [landauX(0) + 0.04, landauY(0) + 0.04, landauOut(landauY(0)) + 0.025]),
       box('landau_head', 'bright', [landauX(1) - 0.04, landauY(1) - 0.04, landauOut(landauY(1))], [landauX(1) + 0.04, landauY(1) + 0.04, landauOut(landauY(1)) + 0.025]),
     ] + [
-      m.bar('landau_' + i, 'bright', [landauX(i / landauSteps), landauY(i / landauSteps)], [landauX((i + 1) / landauSteps), landauY((i + 1) / landauSteps)], 0.0625, [landauOut(landauY(i / landauSteps)), landauOut(landauY(i / landauSteps)) + 0.025])
+      k.bar('landau_' + i, 'bright', [landauX(i / landauSteps), landauY(i / landauSteps)], [landauX((i + 1) / landauSteps), landauY((i + 1) / landauSteps)], 0.0625, [landauOut(landauY(i / landauSteps)), landauOut(landauY(i / landauSteps)) + 0.025])
       for i in std.range(0, landauSteps - 1)
     ]
   ), { cover: 'vinyl-black', bright: 'steel-bright' }),

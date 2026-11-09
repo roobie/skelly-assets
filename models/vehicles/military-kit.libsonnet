@@ -6,7 +6,6 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 // A prism along x has the (y, z) profile.
-local xPrism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
 local slats(id, slot, from, to, count, make) = [
   local at = from + (to - from) * i / (count - 1);
   make(id + '_' + i, slot, at)
@@ -161,7 +160,7 @@ local truckRows(id, s0) = {
   ],
 }.rows;
 
-local truckItems(kit, id, name, s) = local pile = kit.pileSize; [
+local truckItems(kit, id, name) = local pile = kit.pileSize; [
   kit.part(id + '_chassis', name + ' chassis', pile, ['structure']),
   kit.part(id + '_cab', name + ' cab', pile, ['structure', 'protection']),
   kit.part(id + '_door', name + ' door', pile, ['entry', 'glazing', 'protection']),
@@ -222,11 +221,9 @@ local truckFittings(kit, id, s0) =
   + pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.01, s.railBottom - 0.2, s.bedSide - 0.36], on(['rear_bumper']));
 
 {
-  xPrism: xPrism,
   slats: slats,
   arched: arched,
   flatGuard: flatGuard,
-  truckSpec: truckSpec,
   truckRows: truckRows,
   truckItems: truckItems,
   truckFittings: truckFittings,

@@ -1,7 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local s = import 'street_sweeper.spec.libsonnet';
@@ -45,7 +44,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper
     box('band', 'band', [s.bodyRear + 0.3, 1.9, s.bodySide], [s.hopperFront, 2.14, s.bodySide + 0.032]),
     box('rib_a', 'steel', [-2.2, s.bodyLow, s.bodySide], [-2.12, 1.9, s.bodySide + 0.032]),
     box('rib_b', 'steel', [-1.2, s.bodyLow, s.bodySide], [-1.12, 1.9, s.bodySide + 0.032]),
-    m.bar('tip_ram', 'hinge', [-0.72, 1.02], [-1.5, 1.86], 0.09, [s.bodySide + 0.02, s.bodySide + 0.07]),
+    k.bar('tip_ram', 'hinge', [-0.72, 1.02], [-1.5, 1.86], 0.09, [s.bodySide + 0.02, s.bodySide + 0.07]),
   ]), finish),
   k.compound('street_sweeper_rear_door', 110, [
     k.turned('door', 'paint', 'x', k.disc(doorR - 0.06, s.bodyRear - 0.08, s.bodyRear), [0, doorY, 0]) + { sides: 20 },

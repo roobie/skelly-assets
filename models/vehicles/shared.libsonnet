@@ -3,7 +3,7 @@
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local box = k.box;
-local tyreProfile(width, rim, outer) = [[-width / 2, rim], [-width / 2, outer - width * 0.1], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * 0.1], [width / 2, rim], [-width / 2, rim]];
+local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
 local roundSides = 24;
 local wheel(id, massKg, width, rim, outer, sides=roundSides) = k.compound(id, massKg, [

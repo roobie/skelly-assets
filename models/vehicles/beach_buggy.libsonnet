@@ -4,7 +4,6 @@ local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 local s = import 'beach_buggy.spec.libsonnet';
 local tubeZ = [0.42, 0.47];
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
@@ -17,9 +16,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('engine_cross', 'tube', [-0.82, 0.3, -0.47], [-0.76, 0.36, 0.47]),
   ] + bothSides([
     box('lower_rail', 'tube', [s.rear, 0.3, tubeZ[0]], [0.82, 0.36, tubeZ[1]]),
-    bar('upper_rail', 'tube', [-0.56, s.tubTop], [s.rear + 0.03, 0.6], 0.05, tubeZ),
+    k.bar('upper_rail', 'tube', [-0.56, s.tubTop], [s.rear + 0.03, 0.6], 0.05, tubeZ),
     box('tail_post', 'tube', [s.rear, 0.36, tubeZ[0]], [s.rear + 0.05, 0.6, tubeZ[1]]),
-    bar('rear_stay', 'tube', [-0.8, 0.36], [-1.1, 0.6], 0.05, tubeZ),
+    k.bar('rear_stay', 'tube', [-0.8, 0.36], [-1.1, 0.6], 0.05, tubeZ),
   ]), { tube: 'steel-spall-black' }),
   k.compound('beach_buggy_tub', s.shellMass * 0.4, [
     box('floor_pan', 'paint', [-0.58, 0.22, -s.tub], [0.82, s.floor, s.tub]),
@@ -29,20 +28,20 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('side_rear', 'paint', [-0.58, 0.22, s.tub - 0.04], [-0.3, s.tubTop, s.tub]),
     box('side_dip', 'paint', [-0.3, 0.22, s.tub - 0.04], [0.3, s.tubTop - 0.1, s.tub]),
     prism('side_front', 'paint', [[0.3, 0.22], [0.82, 0.22], [0.82, 0.8], [0.5, 0.68], [0.3, s.tubTop - 0.1]], [s.tub - 0.04, s.tub]),
-  ] + m.arc('fender', 'paint', s.frontAxle, s.frontHub, 0.31, 0.35, 6, 174, 9, [0.46, 0.78])
+  ] + k.arc('fender', 'paint', s.frontAxle, s.frontHub, 0.31, 0.35, 6, 174, 9, [0.46, 0.78])
   ), { paint: s.paint }),
   k.compound('beach_buggy_roll_bar', 28, [
     box('top_bar', 'tube', [s.hoopX - 0.09, s.hoopTop - 0.06, -s.hoopZ - 0.03], [s.hoopX - 0.03, s.hoopTop, s.hoopZ + 0.03]),
     box('harness_bar', 'tube', [s.hoopX - 0.06, 0.92, -s.hoopZ], [s.hoopX, 0.97, s.hoopZ]),
   ] + bothSides([
-    bar('hoop', 'tube', [s.hoopX, 0.58], [s.hoopX - 0.06, s.hoopTop - 0.03], 0.06, [s.hoopZ - 0.03, s.hoopZ + 0.03]),
-    bar('brace', 'tube', [s.hoopX - 0.06, s.hoopTop - 0.05], [s.rear + 0.05, 0.6], 0.05, tubeZ),
+    k.bar('hoop', 'tube', [s.hoopX, 0.58], [s.hoopX - 0.06, s.hoopTop - 0.03], 0.06, [s.hoopZ - 0.03, s.hoopZ + 0.03]),
+    k.bar('brace', 'tube', [s.hoopX - 0.06, s.hoopTop - 0.05], [s.rear + 0.05, 0.6], 0.05, tubeZ),
   ]), { tube: 'paint-charcoal' }),
   k.compound('beach_buggy_windscreen', 7, [
-    bar('glass', 'glass', [0.66, 0.8], [0.5, 1.12], 0.03, [-0.42, 0.42]),
+    k.bar('glass', 'glass', [0.66, 0.8], [0.5, 1.12], 0.03, [-0.42, 0.42]),
     box('header', 'frame', [0.46, 1.12, -0.46], [0.54, 1.15, 0.46]),
   ] + bothSides([
-    bar('post', 'frame', [0.66, 0.74], [0.5, 1.14], 0.04, [0.42, 0.46]),
+    k.bar('post', 'frame', [0.66, 0.74], [0.5, 1.14], 0.04, [0.42, 0.46]),
   ]), { glass: 'glass-clear', frame: 'steel-grey' }),
   k.compound('beach_buggy_dashboard', 6, [
     box('panel', 'trim', [0.54, 0.6, -0.5], [0.8, 0.78, 0.5]),
@@ -51,14 +50,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('beach_buggy_front_axle', 18, [
     box('beam', 'steel', [s.frontAxle - 0.04, s.frontHub - 0.04, -s.frontWheelZ + 0.05], [s.frontAxle + 0.04, s.frontHub + 0.04, s.frontWheelZ - 0.05]),
   ] + bothSides([
-    bar('radius_arm', 'steel', [0.8, 0.27], [s.frontAxle, s.frontHub], 0.05, [0.4, 0.45]),
-    bar('shock', 'spring', [s.frontAxle, s.frontHub + 0.04], [s.frontAxle - 0.1, 0.54], 0.05, [0.5, 0.55]),
+    k.bar('radius_arm', 'steel', [0.8, 0.27], [s.frontAxle, s.frontHub], 0.05, [0.4, 0.45]),
+    k.bar('shock', 'spring', [s.frontAxle, s.frontHub + 0.04], [s.frontAxle - 0.1, 0.54], 0.05, [0.5, 0.55]),
   ]), { steel: 'steel-grey', spring: 'paint-red' }),
   k.compound('beach_buggy_rear_axle', 34, [
     box('beam', 'steel', [s.rearAxle - 0.04, s.rearHub - 0.04, -s.rearWheelZ + 0.1], [s.rearAxle + 0.04, s.rearHub + 0.04, s.rearWheelZ - 0.1]),
   ] + bothSides([
-    bar('swing_arm', 'steel', [-0.76, 0.33], [s.rearAxle, s.rearHub], 0.06, tubeZ),
-    bar('shock', 'spring', [s.rearAxle - 0.02, s.rearHub + 0.04], [-1.1, 0.6], 0.05, [0.47, 0.52]),
+    k.bar('swing_arm', 'steel', [-0.76, 0.33], [s.rearAxle, s.rearHub], 0.06, tubeZ),
+    k.bar('shock', 'spring', [s.rearAxle - 0.02, s.rearHub + 0.04], [-1.1, 0.6], 0.05, [0.47, 0.52]),
   ]), { steel: 'steel-grey', spring: 'paint-red' }),
   m.step('beach_buggy_step', 5, [-0.35, 0.32], 0.28, [s.tub, s.tub + 0.14], 'steel-grey'),
   k.compound('beach_buggy_exhaust', 8, [

@@ -1,7 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local s = t.spec(import 'mobile_crane.spec.libsonnet');
 local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', hard: 'steel-hardened', dark: 'plastic-black', glass: 'glass-clear', reflect: 'reflective-yellow', red: 'plastic-red', weight: 'iron-cast', rope: 'steel-galvanised', white: 'paint-white' };
@@ -44,8 +43,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     box('platform', 'paint', [s.turretRear, s.ringTop, -s.turretSide], [s.turretFront, s.turretTop, s.turretSide]),
   ] + k.bothSides([
     box('foot_plate', 'frame', [-3.94, s.turretTop, 0.36], [-3.16, s.turretTop + 0.1, 0.52]),
-    m.bar('cheek_rear', 'paint', [-3.86, s.turretTop + 0.1], [-3.6, y + 0.14], 0.3, [0.36, 0.5]),
-    m.bar('cheek_front', 'paint', [-3.24, s.turretTop + 0.1], [-3.6, y + 0.14], 0.3, [0.36, 0.5]),
+    k.bar('cheek_rear', 'paint', [-3.86, s.turretTop + 0.1], [-3.6, y + 0.14], 0.3, [0.36, 0.5]),
+    k.bar('cheek_front', 'paint', [-3.24, s.turretTop + 0.1], [-3.6, y + 0.14], 0.3, [0.36, 0.5]),
     k.turned('pin', 'steel', 'z', k.disc(0.13, 0.36, 0.54), [s.boomButt + 0.14, y, 0]) + { sides: 12 },
   ]), finish),
   k.compound('mobile_crane_counterweight', 8000, [
@@ -111,8 +110,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
   ], finish),
   k.compound('mobile_crane_derrick_ram', 500, [
     box('foot', 'frame', [-2.2, s.turretTop, -0.2], [-1.8, s.turretTop + 0.12, 0.2]),
-    m.bar('barrel', 'frame', [-2.0, s.turretTop + 0.08], [-1.15, 2.42], 0.26, [-0.14, 0.14]),
-    m.bar('rod', 'hard', [-1.15, 2.42], [-0.42, y - 0.31], 0.14, [-0.08, 0.08]),
+    k.bar('barrel', 'frame', [-2.0, s.turretTop + 0.08], [-1.15, 2.42], 0.26, [-0.14, 0.14]),
+    k.bar('rod', 'hard', [-1.15, 2.42], [-0.42, y - 0.31], 0.14, [-0.08, 0.08]),
     box('boom_lug', 'frame', [-0.58, y - 0.37, -0.14], [-0.26, y - 0.31, 0.14]),
   ], finish),
   k.compound('mobile_crane_boom_rest', 200, [
@@ -121,7 +120,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     box('saddle_far', 'dark', [s.restX - 0.1, y - 0.22, -0.34], [s.restX + 0.1, y, -0.25]),
   ] + k.bothSides([
     box('post', 'paint', [s.restX - 0.07, s.deckTop, 0.42], [s.restX + 0.07, y - 0.24, 0.52]),
-    m.bar('brace', 'frame', [3.2, s.deckTop], [s.restX - 0.05, 2.6], 0.07, [0.44, 0.5]),
+    k.bar('brace', 'frame', [3.2, s.deckTop], [s.restX - 0.05, 2.6], 0.07, [0.44, 0.5]),
   ]), finish),
   k.compound('mobile_crane_hook_block', 300, [
     box('rope_a', 'rope', [6.22, 1.72, 0.03], [6.27, y - 0.2, 0.08]),

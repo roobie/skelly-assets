@@ -1,8 +1,8 @@
 // A two-deck city bus of 10.5 m: 2.55 m wide, 4.3 m high, 4.95 m wheelbase, about 12.5 t at the kerb, rear-engined
 // with a low lower deck. Stairs climb rearward along the far side behind the driver. Metres in the vehicle frame.
-local seat(x, y, sides) = { part: 'bus_seat_pair', x: x, y: y, z: 0.72, sides: sides };
-// Singles stand inboard of the front wheelhouse, where a pair would not fit.
-local single(x, sides) = { part: 'bus_seat_single', x: x, y: 0.38, z: 0.62, sides: sides };
+local bus = import 'bus-body.libsonnet';
+local seat = bus.seat;
+local single(x, sides) = bus.single(x, sides, y=0.38);
 local upper = 2.45;
 {
   rear: -5.25, front: 5.25, side: 1.275, skin: 1.2, sill: 0.3,

@@ -5,7 +5,6 @@ local s = import 'trencher.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 local along(t) = [s.chainTop[0] + (s.chainTip[0] - s.chainTop[0]) * t, s.chainTop[1] + (s.chainTip[1] - s.chainTop[1]) * t];
 local dirX = (s.chainTip[0] - s.chainTop[0]) / std.sqrt(std.pow(s.chainTip[0] - s.chainTop[0], 2) + std.pow(s.chainTip[1] - s.chainTop[1], 2));
 local dirY = (s.chainTip[1] - s.chainTop[1]) / std.sqrt(std.pow(s.chainTip[0] - s.chainTop[0], 2) + std.pow(s.chainTip[1] - s.chainTop[1], 2));
@@ -16,8 +15,8 @@ local tooth(i) =
   local under = [p[0] + dirY * chainOffset, p[1] - dirX * chainOffset];
   local over = [p[0] - dirY * chainOffset, p[1] + dirX * chainOffset];
   [
-    bar('tooth_under_' + i, 'tooth', under, [under[0] + dirY * 0.12, under[1] - dirX * 0.12], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
-    bar('tooth_over_' + i, 'tooth', over, [over[0] - dirY * 0.1, over[1] + dirX * 0.1], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
+    k.bar('tooth_under_' + i, 'tooth', under, [under[0] + dirY * 0.12, under[1] - dirX * 0.12], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
+    k.bar('tooth_over_' + i, 'tooth', over, [over[0] - dirY * 0.1, over[1] + dirX * 0.1], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
   ];
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('trencher_chassis', s.shellMass, [
@@ -56,9 +55,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('post_front', 'dark', [s.hoodBack - 0.06, s.deck + 0.03, s.side - 0.1], [s.hoodBack, s.canopy - 0.06, s.side - 0.04]),
   ]), { paint: s.paint, dark: 'paint-charcoal' }),
   k.compound('trencher_digging_boom', 620, [
-    bar('beam', 'paint', s.chainTop, s.chainTip, 0.3, [-s.chainZ, s.chainZ], 0.22),
-    bar('chain_over', 'chain', [s.chainTop[0] + -dirY * chainOffset, s.chainTop[1] + dirX * chainOffset], [s.chainTip[0] + -dirY * chainOffset, s.chainTip[1] + dirX * chainOffset], 0.07, [-s.chainZ - 0.03, s.chainZ + 0.03]),
-    bar('chain_under', 'chain', [s.chainTop[0] + dirY * chainOffset, s.chainTop[1] - dirX * chainOffset], [s.chainTip[0] + dirY * chainOffset, s.chainTip[1] - dirX * chainOffset], 0.07, [-s.chainZ - 0.03, s.chainZ + 0.03]),
+    k.bar('beam', 'paint', s.chainTop, s.chainTip, 0.3, [-s.chainZ, s.chainZ], 0.22),
+    k.bar('chain_over', 'chain', [s.chainTop[0] + -dirY * chainOffset, s.chainTop[1] + dirX * chainOffset], [s.chainTip[0] + -dirY * chainOffset, s.chainTip[1] + dirX * chainOffset], 0.07, [-s.chainZ - 0.03, s.chainZ + 0.03]),
+    k.bar('chain_under', 'chain', [s.chainTop[0] + dirY * chainOffset, s.chainTop[1] - dirX * chainOffset], [s.chainTip[0] + dirY * chainOffset, s.chainTip[1] - dirX * chainOffset], 0.07, [-s.chainZ - 0.03, s.chainZ + 0.03]),
     m.axleDisc('nose_wheel', 'chain', s.chainTip[0], s.chainTip[1], 0.19, [-s.chainZ - 0.03, s.chainZ + 0.03], 16),
     m.axleDisc('head_sprocket', 'chain', s.chainTop[0], s.chainTop[1], 0.24, [-s.chainZ - 0.03, s.chainZ + 0.03], 16),
     m.axleDisc('head_boss', 'paint', s.chainTop[0], s.chainTop[1], 0.12, [-0.26, 0.26], 12),
@@ -80,9 +79,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     for i in std.range(0, 5)
   ]), { paint: s.paint, dark: 'paint-charcoal', flight: 'steel-grey' }),
   k.compound('trencher_lift_ram', 30, [
-    bar('barrel', 'dark', [-1.1, 1.72], [-1.75, 1.74], 0.1, [0.18, 0.28]),
-    bar('rod', 'bright', [-1.7, 1.74], [-2.1, 1.3], 0.05, [0.2, 0.26]),
-    bar('clevis', 'dark', [-2.12, 1.32], [-2.02, 1.2], 0.08, [0.06, 0.28]),
+    k.bar('barrel', 'dark', [-1.1, 1.72], [-1.75, 1.74], 0.1, [0.18, 0.28]),
+    k.bar('rod', 'bright', [-1.7, 1.74], [-2.1, 1.3], 0.05, [0.2, 0.26]),
+    k.bar('clevis', 'dark', [-2.12, 1.32], [-2.02, 1.2], 0.08, [0.06, 0.28]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('trencher_backfill_blade', 110, [
     prism('blade', 'paint', [[1.62, 0.04], [1.72, 0.04], [1.82, 0.6], [1.74, 0.6]], [-0.84, 0.84]),

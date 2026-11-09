@@ -5,7 +5,6 @@ local s = import 'skid_steer.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('skid_steer_frame', s.shellMass, [
     box('floor', 'steel', [s.cageRear, 0.4, -0.36], [s.cageFront, s.floor, 0.36]),
@@ -56,31 +55,31 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('grille_c', 'bar', [-1.29, 0.9, -0.36], [-1.28, 0.94, 0.36]),
   ], { trim: 'paint-charcoal', bar: 'plastic-black' }),
   k.compound('skid_steer_lift_arms', 260, [
-    bar('brace', 'paint', [0.7, 1.22], [0.78, 1.32], 0.12, [-0.62, 0.62]),
+    k.bar('brace', 'paint', [0.7, 1.22], [0.78, 1.32], 0.12, [-0.62, 0.62]),
   ] + bothSides([
-    bar('beam_rear', 'paint', [-0.82, 1.74], [0.45, 1.58], 0.2, [0.5, 0.645], 0.17),
-    bar('beam_drop', 'paint', [0.45, 1.58], [1.1, 0.8], 0.17, [0.5, 0.645], 0.13),
+    k.bar('beam_rear', 'paint', [-0.82, 1.74], [0.45, 1.58], 0.2, [0.5, 0.645], 0.17),
+    k.bar('beam_drop', 'paint', [0.45, 1.58], [1.1, 0.8], 0.17, [0.5, 0.645], 0.13),
     m.axleDisc('elbow', 'paint', 0.45, 1.58, 0.085, [0.5, 0.645], 12),
     m.axleDisc('pivot', 'pin', -0.82, 1.74, 0.07, [0.46, 0.66], 12),
     m.axleDisc('tip_pin', 'pin', 1.1, 0.8, 0.06, [0.46, 0.66], 12),
   ]), { paint: s.paint, pin: 'steel-stainless' }),
   k.compound('skid_steer_bucket', 190, [
-    bar('floor', 'shell', [1.14, 0.08], [2.0, 0.05], 0.06, [-0.86, 0.86]),
-    bar('back', 'shell', [1.14, 0.06], [1.14, 0.74], 0.06, [-0.86, 0.86]),
-    bar('top', 'shell', [1.13, 0.72], [1.52, 0.82], 0.06, [-0.86, 0.86]),
+    k.bar('floor', 'shell', [1.14, 0.08], [2.0, 0.05], 0.06, [-0.86, 0.86]),
+    k.bar('back', 'shell', [1.14, 0.06], [1.14, 0.74], 0.06, [-0.86, 0.86]),
+    k.bar('top', 'shell', [1.13, 0.72], [1.52, 0.82], 0.06, [-0.86, 0.86]),
     box('edge', 'edge', [1.92, 0.03, -0.86], [2.04, 0.07, 0.86]),
     box('mount', 'edge', [1.08, 0.2, -0.58], [1.14, 0.9, 0.58]),
   ] + bothSides([
     prism('side', 'shell', [[1.11, 0.03], [2.04, 0.03], [1.52, 0.84], [1.11, 0.76]], [0.82, 0.86]),
   ]), { shell: 'paint-charcoal', edge: 'steel-grey' }),
   k.compound('skid_steer_lift_ram', 40, [
-    bar('barrel', 'dark', [-0.86, 0.9], [-0.3, 1.28], 0.11, [0.62, 0.71]),
-    bar('rod', 'bright', [-0.32, 1.26], [0.06, 1.56], 0.05, [0.64, 0.69]),
+    k.bar('barrel', 'dark', [-0.86, 0.9], [-0.3, 1.28], 0.11, [0.62, 0.71]),
+    k.bar('rod', 'bright', [-0.32, 1.26], [0.06, 1.56], 0.05, [0.64, 0.69]),
     box('lug', 'dark', [-0.02, 1.5, 0.6], [0.1, 1.62, 0.7]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('skid_steer_tilt_ram', 22, [
-    bar('barrel', 'dark', [0.74, 1.28], [1.0, 1.0], 0.1, [0.14, 0.24]),
-    bar('rod', 'bright', [0.98, 1.02], [1.12, 0.82], 0.05, [0.165, 0.215]),
+    k.bar('barrel', 'dark', [0.74, 1.28], [1.0, 1.0], 0.1, [0.14, 0.24]),
+    k.bar('rod', 'bright', [0.98, 1.02], [1.12, 0.82], 0.05, [0.165, 0.215]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('skid_steer_exhaust', 4, [
     k.turned('pipe', 'steel', 'y', k.disc(0.035, 0, 0.3)) + { sides: 12 },

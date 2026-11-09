@@ -5,7 +5,6 @@
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
-local axisX(id, slot, profile, from, to) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: from, end: to };
 // What is left of [lo, hi] once the cuts are taken out.
 local spans(lo, hi, cuts) =
   local clipped = [[std.max(lo, c[0]), std.min(hi, c[1])] for c in cuts if c[1] > lo && c[0] < hi];
@@ -222,14 +221,14 @@ local rows(id, s) = {
   ]),
   local shell = k.compound(id + '_shell', s.shellMass, floorPieces + steps + wheelhouses + rearBands + rearSides + frontBands + rails + wraps + lampSurround + (if std.get(s, 'openTop', false) then [] else [
     box('ceiling', 'headliner', [s.rear, s.roofBase - 0.03, -s.side], [crownRoof, s.roofBase, s.side]),
-    axisX('roof', 'paint', [
+    k.xPrism('roof', 'paint', [
       [s.roofBase, -s.side],
       [s.roofBase + (s.roof - s.roofBase) * 0.55, -s.side + 0.1],
       [s.roof, -s.side + 0.5],
       [s.roof, s.side - 0.5],
       [s.roofBase + (s.roof - s.roofBase) * 0.55, s.side - 0.1],
       [s.roofBase, s.side],
-    ], s.rear, crownRoof),
+    ], [s.rear, crownRoof]),
   ]) + (if g.bonneted then [
          box('cowl_wall', 'paint', [face - 0.08, s.sill, -s.skin], [face, screens[0][0], s.skin]),
        ] else [])
@@ -474,4 +473,10 @@ local fittings(kit, id, s) =
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))
   + kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell']);
-{ rows: rows, items: items, fittings: fittings, layout: layout }
+{
+  rows: rows, items: items, fittings: fittings, layout: layout,
+  // A seat pair's placement at (x, y), for a spec's `seats`.
+  seat(x, y, sides, z=0.72):: { part: 'bus_seat_pair', x: x, y: y, z: z, sides: sides },
+  // A single seat's placement; singles stand inboard of the front wheelhouses, where a pair would not fit.
+  single(x, sides, y=0.36, z=0.62):: { part: 'bus_seat_single', x: x, y: y, z: z, sides: sides },
+}

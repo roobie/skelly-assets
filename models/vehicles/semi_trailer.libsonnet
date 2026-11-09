@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'semi_trailer.spec.libsonnet';
 local box = k.box;
 local bothSides = k.bothSides;
@@ -82,7 +81,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   ], { frame: s.frame }),
   k.compound('semi_trailer_mudguard', 18,
     std.flattenArrays([
-      h.arcBand('arc_' + i, 'frame', s.axles[i], s.hub, 0.55, 0.58, 12, 168, 8, [s.wheelZ - 0.18, s.wheelZ + 0.2])
+      k.arc('arc_' + i, 'frame', s.axles[i], s.hub, 0.55, 0.58, 12, 168, 8, [s.wheelZ - 0.18, s.wheelZ + 0.2])
       + [box('strut_' + i, 'frame', [s.axles[i] - 0.05, s.hub + 0.56, s.wheelZ - 0.12], [s.axles[i] + 0.05, s.frameHigh, s.wheelZ + 0.1])]
       for i in axleIds
     ]), { frame: s.frame }),

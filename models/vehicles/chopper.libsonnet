@@ -1,41 +1,38 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'chopper.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local rad(degrees) = degrees * std.pi / 180;
-local tube = (import 'machine-kit.libsonnet').bar;
 // The raked steering axis passes through the front axle; the long reach out to it is what makes the bike a chopper.
-local forkX(y) = s.frontAxle - (y - s.frontHub) * 0.9;
+local forkX = k.forkX(s.frontAxle, s.frontHub, 0.9);
 taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('chopper_frame', 40, [
-    tube('neck', 'frame', [forkX(1.0), 1.0], [forkX(1.12), 1.12], 0.1, [-0.05, 0.05]),
-    tube('backbone', 'frame', [-0.3, 0.78], [0.47, 1.02], 0.07, [-0.032, 0.032]),
-    tube('down', 'frame', [0.47, 1.0], [0.33, 0.26], 0.07, [-0.032, 0.032]),
-    tube('seat_post', 'frame', [-0.3, 0.26], [-0.3, 0.8], 0.07, [-0.032, 0.032]),
+    k.bar('neck', 'frame', [forkX(1.0), 1.0], [forkX(1.12), 1.12], 0.1, [-0.05, 0.05]),
+    k.bar('backbone', 'frame', [-0.3, 0.78], [0.47, 1.02], 0.07, [-0.032, 0.032]),
+    k.bar('down', 'frame', [0.47, 1.0], [0.33, 0.26], 0.07, [-0.032, 0.032]),
+    k.bar('seat_post', 'frame', [-0.3, 0.26], [-0.3, 0.8], 0.07, [-0.032, 0.032]),
     box('front_cross', 'frame', [0.3, 0.23, -0.125], [0.37, 0.29, 0.125]),
     box('rear_cross', 'frame', [-0.34, 0.26, -0.125], [-0.26, 0.32, 0.125]),
     box('saddle_cross', 'frame', [-0.34, 0.7, -0.125], [-0.28, 0.76, 0.125]),
   ] + bothSides([
-    tube('lower_rail', 'frame', [s.rearAxle, s.rearHub], [0.35, 0.26], 0.06, [0.095, 0.125]),
-    tube('upper_rail', 'frame', [s.rearAxle, s.rearHub + 0.03], [-0.3, 0.74], 0.05, [0.095, 0.125]),
+    k.bar('lower_rail', 'frame', [s.rearAxle, s.rearHub], [0.35, 0.26], 0.06, [0.095, 0.125]),
+    k.bar('upper_rail', 'frame', [s.rearAxle, s.rearHub + 0.03], [-0.3, 0.74], 0.05, [0.095, 0.125]),
   ]), { frame: 'steel-bright' }),
   k.compound('chopper_fork', 9, [
     box('top_yoke', 'chrome', [forkX(1.12) - 0.06, 1.12, -0.085], [forkX(1.12) + 0.06, 1.15, 0.085]),
     box('lower_yoke', 'chrome', [forkX(1.0) - 0.06, 0.97, -0.085], [forkX(1.0) + 0.06, 1.0, 0.085]),
     k.turned('axle', 'chrome', 'z', k.disc(0.025, -0.085, 0.085), [s.frontAxle, s.frontHub, 0]),
   ] + bothSides([
-    tube('leg', 'chrome', [s.frontAxle, s.frontHub], [forkX(1.15), 1.15], 0.05, [0.05, 0.085]),
+    k.bar('leg', 'chrome', [s.frontAxle, s.frontHub], [forkX(1.15), 1.15], 0.05, [0.05, 0.085]),
   ]), { chrome: 'steel-bright' }),
   k.compound('chopper_front_wheel', 10, [
     k.turned('tyre', 'tyre', 'z', [[-0.035, 0.3], [-0.035, 0.34], [-0.025, s.frontHub], [0.025, s.frontHub], [0.035, 0.34], [0.035, 0.3], [-0.035, 0.3]]) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.annulus(0.27, 0.3, -0.03, 0.03)) + { sides: 24 },
     k.turned('hub', 'rim', 'z', k.disc(0.06, -0.05, 0.05)) + { sides: 12 },
   ] + [
-    local a = rad(i * 60 + 15);
-    tube('spoke_' + i, 'rim', [0.05 * std.cos(a), 0.05 * std.sin(a)], [0.28 * std.cos(a), 0.28 * std.sin(a)], 0.04, [-0.025, 0.025])
+    local a = k.rad(i * 60 + 15);
+    k.bar('spoke_' + i, 'rim', [0.05 * std.cos(a), 0.05 * std.sin(a)], [0.28 * std.cos(a), 0.28 * std.sin(a)], 0.04, [-0.025, 0.025])
     for i in std.range(0, 5)
   ], { tyre: 'rubber-black', rim: 'steel-bright' }, { hub: ['hub', [0.5, 0.5, 0.5]] }),
   k.compound('chopper_rear_wheel', 16, [
@@ -48,19 +45,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('crankcase', 'alloy', [-0.2, 0.26, -0.1], [0.24, 0.52, 0.1]),
     box('primary_cover', 'alloy', [-0.26, 0.28, -0.16], [0.12, 0.48, -0.1]),
     k.turned('timing_cover', 'chrome', 'z', k.disc(0.09, 0.1, 0.13), [0.02, 0.39, 0]) + { sides: 12 },
-    tube('front_barrel', 'barrel', [0.08, 0.5], [0.24, 0.8], 0.15, [-0.07, 0.07]),
-    tube('front_head', 'alloy', [0.24, 0.78], [0.28, 0.87], 0.18, [-0.08, 0.08]),
-    tube('rear_barrel', 'barrel', [-0.02, 0.5], [-0.15, 0.72], 0.15, [-0.07, 0.07]),
-    tube('rear_head', 'alloy', [-0.14, 0.7], [-0.18, 0.77], 0.18, [-0.08, 0.08]),
+    k.bar('front_barrel', 'barrel', [0.08, 0.5], [0.24, 0.8], 0.15, [-0.07, 0.07]),
+    k.bar('front_head', 'alloy', [0.24, 0.78], [0.28, 0.87], 0.18, [-0.08, 0.08]),
+    k.bar('rear_barrel', 'barrel', [-0.02, 0.5], [-0.15, 0.72], 0.15, [-0.07, 0.07]),
+    k.bar('rear_head', 'alloy', [-0.14, 0.7], [-0.18, 0.77], 0.18, [-0.08, 0.08]),
   ], { alloy: 'alu-bare', chrome: 'steel-bright', barrel: 'paint-charcoal' }),
   k.compound('chopper_exhaust', 7, [
-    tube('front_header', 'chrome', [0.3, 0.8], [0.22, 0.44], 0.06, [0.07, 0.15]),
-    tube('front_pipe', 'chrome', [0.25, 0.44], [-1.12, 0.42], 0.06, [0.14, 0.2]),
-    tube('rear_header', 'chrome', [-0.2, 0.72], [-0.12, 0.32], 0.06, [0.07, 0.15]),
-    tube('rear_pipe', 'chrome', [-0.09, 0.31], [-1.12, 0.29], 0.06, [0.14, 0.2]),
+    k.bar('front_header', 'chrome', [0.3, 0.8], [0.22, 0.44], 0.06, [0.07, 0.15]),
+    k.bar('front_pipe', 'chrome', [0.25, 0.44], [-1.12, 0.42], 0.06, [0.14, 0.2]),
+    k.bar('rear_header', 'chrome', [-0.2, 0.72], [-0.12, 0.32], 0.06, [0.07, 0.15]),
+    k.bar('rear_pipe', 'chrome', [-0.09, 0.31], [-1.12, 0.29], 0.06, [0.14, 0.2]),
   ], { chrome: 'steel-bright' }),
-  k.compound('chopper_rear_fender', 3, h.arcBand('guard', 'paint', s.rearAxle, s.rearHub, 0.36, 0.39, 20, 170, 10, [-0.09, 0.09]), { paint: s.paint }),
-  k.compound('chopper_front_fender', 1, h.arcBand('guard', 'chrome', s.frontAxle, s.frontHub, 0.385, 0.41, 40, 140, 6, [-0.05, 0.05]), { chrome: 'steel-bright' }),
+  k.compound('chopper_rear_fender', 3, k.arc('guard', 'paint', s.rearAxle, s.rearHub, 0.36, 0.39, 20, 170, 10, [-0.09, 0.09]), { paint: s.paint }),
+  k.compound('chopper_front_fender', 1, k.arc('guard', 'chrome', s.frontAxle, s.frontHub, 0.385, 0.41, 40, 140, 6, [-0.05, 0.05]), { chrome: 'steel-bright' }),
   k.compound('chopper_tank', 5, [
     prism('tank', 'paint', [[0.04, 0.92], [0.34, 0.99], [0.38, 1.04], [0.34, 1.1], [0.14, 1.1], [0.04, 1.0]], [-0.085, 0.085]),
     box('cap', 'chrome', [0.2, 1.1, -0.03], [0.26, 1.125, 0.03]),

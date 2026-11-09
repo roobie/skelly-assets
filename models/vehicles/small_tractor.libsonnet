@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local h = import 'trailer-frame.libsonnet';
 local s = import 'small_tractor.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -31,8 +30,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ]), { paint: s.paint, trim: 'paint-charcoal' }),
   // Its plate closes the gap down to the transmission, so the arc rests on something.
   k.compound('small_tractor_fender', 14,
-    h.arcBand('arc', 'paint', s.rearAxle, s.rearHub, s.fenderInner, s.fenderOuter, 22, 168, 9, [s.fenderZ, s.rearZ + 0.16])
-    + h.arcBand('plate', 'paint', s.rearAxle, s.rearHub, 0.2, s.fenderInner, 22, 168, 9, [s.fenderZ, s.fenderZ + 0.02])
+    k.arc('arc', 'paint', s.rearAxle, s.rearHub, s.fenderInner, s.fenderOuter, 22, 168, 9, [s.fenderZ, s.rearZ + 0.16])
+    + k.arc('plate', 'paint', s.rearAxle, s.rearHub, 0.2, s.fenderInner, 22, 168, 9, [s.fenderZ, s.fenderZ + 0.02])
     + [box('bracket', 'trim', [s.rearAxle - 0.2, 0.8, 0.24], [s.rearAxle + 0.4, s.deck, s.fenderZ])],
     { paint: s.paint, trim: 'paint-charcoal' }),
   // The footboard is the way aboard an open tractor: it folds up about its inner edge for transport.
