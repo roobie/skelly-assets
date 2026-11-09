@@ -6,7 +6,7 @@ local box = k.box;
 local bothSides = k.bothSides;
 local finish = { white: 'paint-white', cross: 'paint-green', paint: 'paint-olive', frame: 'steel-parkerized', floor: 'steel-grey', dark: 'steel-spall-black', frost: 'plastic-frosted', mattress: 'canvas-grey', trim: 'paint-charcoal' };
 local back = s.bedRear;
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   // Stops inside the walls, which run down past it.
   k.compound('military_ambulance_box_floor', s.boxFloorMass, [
     box('floor', 'floor', [back + 0.05, s.deckBottom, -s.boxSide + 0.04], [s.bedFront, s.deckTop, s.boxSide - 0.04]),
