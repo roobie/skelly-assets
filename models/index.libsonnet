@@ -7,3 +7,4 @@
 + (import 'heavy-blue.libsonnet')
 + (import 'plate.libsonnet')
 + (import 'power.libsonnet')
++ (import 'vehicle-parts.libsonnet')
