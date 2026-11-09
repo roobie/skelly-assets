@@ -1,7 +1,8 @@
 // Builds the repo's models from their sources in models/ into GLB files.
 // Usage: node tools/build.mjs [--out dir] [rowId ...]
-// With no row ids it builds every id of the roster, models/export.json, every row of every recipe file in
-// models/recipes/ and built/manifest.json (tools/manifest.mjs); with ids it builds those roster-source rows, any row
+// With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
+// id of the roster, models/export.json, every row of every recipe file in models/recipes/ and built/manifest.json
+// (tools/manifest.mjs); with ids it builds those roster-source rows, any row
 // in the sources, and no manifest. A roster id is written into --out (by default built/) at its pack's path,
 // tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a scratch folder. Needs node (26 or later, which runs the TypeScript directly) and `npm ci` in tools.
 // Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
@@ -11,9 +12,11 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { outputPath, readMobRows, readRoster } from './layout.mjs';
+import { modelTaxonomies } from './check-taxonomy.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from './manifest.mjs';
 import { readRecipes } from './recipes.mjs';
 import { installJsonnetSources } from './sources.mjs';
+import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
@@ -84,6 +87,21 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
 // manifest over them and the mob rows (tools/mobs.mjs writes the mob files themselves).
 const PRODUCTION_RECIPE_TOOLS = ['gun', 'thing'];
 
+// Each model's taxonomy from its source row, keyed by pack and id; the models built and the models whose sources were
+// read must be the same set, so no model reaches the manifest without its taxonomy having been checked.
+export function withTaxonomy(models, taxonomies) {
+  const key = ({ pack, id }) => `${pack}/${id}`;
+  const byModel = new Map(taxonomies.map((entry) => [key(entry), entry.taxonomy]));
+  const built = new Set(models.map(key));
+  const unread = models.map(key).filter((model) => !byModel.has(model));
+  const unbuilt = [...byModel.keys()].filter((model) => !built.has(model));
+  if (unread.length > 0 || unbuilt.length > 0) {
+    throw new Error(`taxonomy sources and built models differ: built without a source row ${unread.join(' ') || '(none)'}; `
+      + `source row not built ${unbuilt.join(' ') || '(none)'}`);
+  }
+  return models.map((model) => ({ ...model, taxonomy: byModel.get(key(model)) }));
+}
+
 function buildRoster(loadThingRecipe, ids, out, roster) {
   let failed = false;
   const models = [];
@@ -120,6 +138,13 @@ async function main() {
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   installJsonnetSources();
+  // A taxonomy problem fails the production build before any model is written.
+  const taxonomies = positionals.length === 0 ? modelTaxonomies(repo) : [];
+  if (positionals.length === 0) {
+    const { problems } = taxonomyReport(taxonomies, readVocabulary(repo));
+    for (const { message } of problems) console.log(`TAXONOMY ${message}`);
+    if (problems.length > 0) process.exit(1);
+  }
   let failed = false;
   try {
     const { loadThingRecipe } = await import('./packages/thing-authoring-tool/src/exports.ts');
@@ -130,7 +155,7 @@ async function main() {
       for (const file of recipes.files) console.log(`built ${file}`);
       const mobs = mobManifest(readMobRows(repo));
       const manifest = buildManifest({
-        models: [...built.models, ...recipes.models, ...mobs.models],
+        models: withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies),
         files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files],
         credit: readCredits(repo),
       });

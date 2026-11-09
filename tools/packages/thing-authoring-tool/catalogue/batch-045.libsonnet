@@ -18,5 +18,8 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { fraction: [f, 0.5, 0.5] };
   h.compound('long_pole', 2.25, [
     h.turned('pole', 'pole', 'x', [[0, 0], [0, 0.018], [0.006, 0.02], [3.0, 0.017], [3.05, 0.015], [3.05, 0]], [0, 0.02, 0]),
     h.turned('butt', 'end', 'x', [[0, 0], [0, 0.016], [0.002, 0.016], [0.002, 0]], [-0.0015, 0.02, 0]),
-  ], { pole: 'wood-birch', end: 'wood-oak' }) + { handling: gripAt('long_pole', 'pole', 0.3) },
+  ], { pole: 'wood-birch', end: 'wood-oak' }) + {
+    handling: gripAt('long_pole', 'pole', 0.3),
+    taxonomy: { tags: { weapon: ['polearm'], material: ['wood'] } },
+  },
 ]

@@ -64,7 +64,7 @@ local beetle(prefix, slot, r, side) =
   ], { wood: 'wood-oak', brass: 'brass-dull', carve: 'wood-walnut', flame: 'glow-flame', core: 'cloth-yellow' }) + {
     handling: { part: 'everburning_torch', solid: 'shaft', fraction: [0.3, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', rest: 'upright', roll: 0 },
     anchors: { flame: { part: 'everburning_torch', solid: 'flame', fraction: [0.5, 0.5, 0.5] } },
-  },
+  } + { taxonomy: { tags: { setting: ['fantasy'] } } },
 
   // A slender wooden wand 380 mm long lying along x, tapering from a carved grip to a fine tip, with a brass socket
   // at its base holding a mana crystal.

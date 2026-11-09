@@ -61,6 +61,7 @@ local pumpX1 = 0.545;
     grip: 'rubber-black',
     round: 'brass',
   }) + {
+    taxonomy: { category: 'weapons', tags: { weapon: ['shotgun'], setting: ['sci-fi'] } },
     handling: h.gripOn('bolt_scattergun', 'grip'),
     voxelGrain: 0.004,
   },

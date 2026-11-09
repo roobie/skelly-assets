@@ -116,6 +116,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
   {
     id: 'riot_helmet',
     exportMass: 'parts',
+    taxonomy: { category: 'armour', tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
     parts: [{
       id: 'helmet',
       family: 'compound',
@@ -157,5 +158,5 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       strap_back_inner: goggleAnchor('strap_6', [0.5, 0.5, 1]),
       strap_back_outer: goggleAnchor('strap_6', [0.5, 0.5, 0]),
     },
-  },
+  } + { taxonomy: { tags: { slot: ['face'] } } },
 ]

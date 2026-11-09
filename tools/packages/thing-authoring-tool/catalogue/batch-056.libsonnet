@@ -38,5 +38,6 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     prism('hook-tip', 'head', 'y', [[0.056, 1.534], [0.072, 1.525], [0.072, 1.48], [0.058, 1.494]], -0.006, 0.006),
   ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + {
     handling: h.gripOn('pike_pole', 'grip'),
+    taxonomy: { tags: { weapon: ['polearm'], material: ['plastic', 'metal'], setting: ['modern'] } },
   },
 ]

@@ -209,7 +209,7 @@ local galea = {
              + [keel('keel', 'shell', 0.122, -0.004, 0.175, 0.115, 0.006, 0.006)]
              + rivetRow('rivet', 'rivet', 0.1, 0.122, -0.004, 0.16, [-150, -120, -90, -60, 60, 90, 120, 150, 180]),
              { shell: 'steel-grey', inside: 'cloth-black', rivet: 'steel-bright' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['medieval'] } } },
 
   // A closed bronze helmet standing upright, front on +z, 280 mm tall and 255 mm front to back: one rounded shell to
   // the neck with a thickened rim, a single eye slit, a row of breathing holes and a keel over the crown.
@@ -217,7 +217,7 @@ local galea = {
              shell('shell', bronzeHelm.ys, bronzeHelm.f, bronzeHelm.cuts)
              + [keel('keel', 'shell', 0.122, -0.004, 0.17, 0.11, 0.014, 0.01)],
              { shell: 'bronze', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
 
   // A conical helm standing on its neck guard, front on +z, 340 mm tall and 236 mm across: a tall iron cone rising to a
   // spike over a fur brim, with a skirt of laced iron lames round the back and sides.
@@ -235,7 +235,7 @@ local galea = {
     h.disc('tuft-%d' % i, 'fur', 0.008, 0.086, 0.13, 0.115 * std.sin(2 * std.pi * i / 22), 0.115 * std.cos(2 * std.pi * i / 22))
     for i in std.range(0, 21)
   ], { iron: 'steel-grey', trim: 'leather-brown', fur: 'fur-brown' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['medieval'] } } },
 
   // A Corinthian helm standing upright, front on +z, 285 mm tall and 280 mm front to back: one bronze shell to the
   // neck, flaring at the nape, with almond eye holes either side of a nose guard and a narrow gap between the cheek
@@ -245,7 +245,7 @@ local galea = {
              + slab('nape', 'shell', clip(ell(0.112, 0.15, -0.004), 0, 1, -0.04), 0, 0.03)
              + slab('brow', 'shell', clip(ell(0.106, 0.134, -0.004), 0, -1, -0.02), 0.172, 0.182),
              { shell: 'bronze', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
 
   // A galea standing on its cheek guards, front on +z, 250 mm tall and 330 mm long: an iron bowl with a brow
   // reinforce, a broad neck guard sloping out at the back, a hinged cheek guard hanging each side with brass bosses
@@ -267,5 +267,5 @@ local galea = {
                box('crest-holder', 'trim', [-0.006, 0.255, -0.03], [0.006, 0.27, 0.02]),
              ],
              { shell: 'steel-grey', trim: 'brass-dull' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
 ]

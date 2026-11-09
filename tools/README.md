@@ -93,6 +93,10 @@ template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and `exp
 clips form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`. Use this
 same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
 
+The taxonomy is checked before anything is built, from the source rows rather than from the export tools, so
+one report covers the roster, the recipes and the mob sheet alike, and the export tools only carry the field. See
+`check-taxonomy.mjs`, `modelTaxonomies`, and `build.mjs`, `withTaxonomy`; the why is in `../models/TAXONOMY.md`.
+
 Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
 `readCredits`, for model identity, actor companions and attribution. `check-built.mjs` holds a fresh build to the
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no

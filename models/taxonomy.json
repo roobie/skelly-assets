@@ -1,0 +1,132 @@
+{
+  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, and any tags, terms grouped by facet. Every term carries its one-line meaning. Why it is semi-closed, and how a term is requested and added, is in models/TAXONOMY.md.",
+  "categories": {
+    "ammunition": "Cartridges, rounds, shells, spent cases and the boxes and cans made to hold them.",
+    "arcana": "Magical and occult objects: wands, rune tablets, charms, ritual gear.",
+    "armour": "Protective wear and shields: helmets, armoured vests, plate, powered armour.",
+    "body-parts": "Bodies and pieces of them that are not animated actors: the player's body parts, severed limbs, remains.",
+    "clothing": "Garments, headwear, footwear and gloves worn for cover, warmth or style rather than protection.",
+    "containers": "Things made to hold other things: cans, bottles, boxes, crates, bags, backpacks, fuel cans.",
+    "creatures": "Animated generated actors with a body and pose clips: creatures, the undead, the player.",
+    "documents": "Written and printed matter: notebooks, books, notes, letters, maps, signs to read.",
+    "electrical": "Powered devices and their components: radios, batteries, wire, fuses, appliances, gadgets.",
+    "food": "Food and drink, fresh or packaged, sealed, opened or emptied.",
+    "furniture": "Furnishings: seats, tables, beds, mattresses, shelves, cabinets, lockers.",
+    "household": "Domestic utensils and small household objects: kitchenware, cleaning gear, decor.",
+    "keys": "Keys, keycards and other tokens that open a lock or a door.",
+    "lighting": "Light sources and fire starters: torches, lamps, candles, flashlights, lighters, matches.",
+    "machinery": "Workshop and industrial machines and engines: compressors, presses, stationary saws, furnaces, generators.",
+    "materials": "Raw and crafting materials and loose hardware: planks, sticks, nails, tape, cord, wax, scrap, hinges.",
+    "medical": "Medicine and first aid: drugs, bandages, antiseptics, medical instruments.",
+    "nature": "Natural objects as found: rocks, plants, logs, shells, bones lying loose.",
+    "recreation": "Toys, games, sports gear and musical instruments.",
+    "structures": "Building elements and fixtures: walls, doors, windows, fences, barriers, signs on posts.",
+    "tools": "Hand and power tools carried to do work: hammers, saws, axes, pliers, jacks, repair kits.",
+    "vehicle-parts": "Parts and fittings of vehicles: shells, panels, doors, glass, wheels, axles, engines, seats, lamps.",
+    "weapon-parts": "Pieces of weapons and their accessories: magazines, receivers, barrels, stocks, sights, suppressors, slings, mounts.",
+    "weapons": "Whole weapons: firearms, melee weapons, explosives and traps."
+  },
+  "facets": {
+    "fit": {
+      "meaning": "How a worn model is shaped: as worn on the shared player body rather than lying loose. A loose model has no fit.",
+      "terms": {
+        "worn": "Shaped to sit on the shared player body.",
+        "over-jacket": "Shaped to sit over a jacket on the shared player body, a second layer."
+      }
+    },
+    "material": {
+      "meaning": "The one or two materials the model mostly reads as, not every material in it.",
+      "terms": {
+        "bone": "Bone, horn or antler.",
+        "ceramic": "Fired clay, porcelain, terracotta.",
+        "fabric": "Woven or knitted cloth, felt, rope and cord.",
+        "flesh": "Skin, muscle and organs.",
+        "glass": "Glass and crystal.",
+        "leather": "Leather and hide.",
+        "metal": "Any metal: steel, iron, bronze, copper, aluminium, gold.",
+        "paper": "Paper, card and cardboard.",
+        "plant": "Unworked plant matter: leaves, straw, bark, reed, fibre.",
+        "plastic": "Plastics and synthetic polymers.",
+        "rubber": "Rubber and soft elastomers.",
+        "stone": "Stone, concrete and mineral.",
+        "wood": "Wood, worked or rough."
+      }
+    },
+    "setting": {
+      "meaning": "The era or genre a model belongs to. Untagged reads as no particular setting.",
+      "terms": {
+        "prehistoric": "Stone-age making: knapped stone, digging sticks, lashed hafts.",
+        "ancient": "Classical and bronze-age antiquity: bronze arms, Greek and Roman gear.",
+        "medieval": "The middle ages and other pre-gunpowder feudal settings: plate, mail, kite shields.",
+        "modern": "The present day, from roughly the twentieth century: the everyday world.",
+        "sci-fi": "Future technology: powered armour, energy weapons, starship gear.",
+        "fantasy": "Magic and myth: wands, enchanted gear, wizard dress."
+      }
+    },
+    "slot": {
+      "meaning": "Where on the body the model is worn; a worn set's pieces each name the part they cover.",
+      "terms": {
+        "head": "On the head: hats, helmets, hoods, circlets.",
+        "face": "Over the face or eyes: masks, goggles, visors.",
+        "neck": "Round the neck: scarves, collars, necklaces.",
+        "torso": "On the trunk: shirts, jackets, vests, body armour.",
+        "arms": "On the upper or lower arms: sleeves, bracers.",
+        "hands": "On the hands: gloves, gauntlets.",
+        "waist": "At the waist or hips: belts, waist packs.",
+        "legs": "On the hips and legs: trousers, leg guards.",
+        "feet": "On the feet: shoes, boots and their shafts.",
+        "back": "On the back or slung over a shoulder: backpacks, slings, quivers."
+      }
+    },
+    "state": {
+      "meaning": "A condition a model shows that sets it apart from the plain, whole object.",
+      "terms": {
+        "abandoned": "Left to decay: weathered, rusted, flat tyres, broken glass.",
+        "burnt": "Burnt out by fire.",
+        "crashed": "Damaged by a crash or collision but still whole: crumpled, jackknifed.",
+        "overturned": "On its side or roof.",
+        "wrecked": "A total wreck, beyond repair: stripped, torn apart or burnt to the frame, not just damaged.",
+        "broken": "Broken or dead and no longer working.",
+        "opened": "Opened, its contents exposed.",
+        "empty": "Emptied of its contents.",
+        "folded": "Folded flat or packed down."
+      }
+    },
+    "vehicle-body": {
+      "meaning": "The body or airframe type of the vehicle a model is or belongs to.",
+      "terms": {
+        "car": "Cars: hatchbacks, saloons, estates, coupés, SUVs and 4x4s.",
+        "van": "Vans and minibuses.",
+        "truck": "Lorries and trucks with a cab: box, flatbed, tipper, tanker, tractor units.",
+        "bus": "Buses and coaches.",
+        "motorcycle": "Motorcycles, scooters and quad bikes.",
+        "trailer": "Trailers and caravans, towed rather than driven.",
+        "helicopter": "Helicopters."
+      }
+    },
+    "vehicle-role": {
+      "meaning": "The service or work the vehicle a model is or belongs to is built for, whatever its body.",
+      "terms": {
+        "emergency": "Ambulance, fire, police and rescue service.",
+        "military": "Military service.",
+        "farm": "Farm work: tractors, harvesters, livestock trailers.",
+        "construction": "Construction and heavy plant: excavators, cranes, rollers, forklifts."
+      }
+    },
+    "weapon": {
+      "meaning": "The weapon class a model is or serves, so a class finds its weapons, parts and ammunition together.",
+      "terms": {
+        "handgun": "Pistols and revolvers.",
+        "rifle": "Rifles and carbines.",
+        "shotgun": "Shotguns and scatterguns.",
+        "energy": "Weapons that fire energy or plasma rather than solid rounds.",
+        "blade": "Edged weapons that cut or stab: knives, swords, machetes.",
+        "blunt": "Weapons that strike: bats, clubs, maces, pipes.",
+        "polearm": "Weapons on a long shaft: spears, poles, halberds.",
+        "shield": "Shields carried to block blows.",
+        "explosive": "Grenades, charges and other explosives.",
+        "trap": "Traps set to catch or wound."
+      }
+    }
+  }
+}

@@ -35,7 +35,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('hinge-a', 'hinge', [-0.29, 0.012, -0.32], [-0.27, 0.03, -0.2]),
     box('hinge-b', 'hinge', [0.27, 0.012, -0.32], [0.29, 0.03, -0.2]),
   ], { frame: 'paint-charcoal', window: 'glass-grey', handle: 'steel-stainless', hinge: 'steel-grey' })
-  + { voxelGrain: 0.006 },
+  + { voxelGrain: 0.006, taxonomy: { category: 'armour', tags: { weapon: ['shield'], material: ['metal', 'glass'] } } },
 
   // A kite shield made from the oven door: the same slab, face and back in the same frame, finish and size, its lower
   // end (+x, the end that hangs down when the figure braces it) chamfered off to a point, the hinges dropped and the
@@ -54,5 +54,5 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('post-b', 'handle', [0.15, 0.05, -0.01], [0.17, 0.08, 0.01]),
     h.rod('handle', 'handle', 0.012, -0.27, 0.19, 0.088),
   ], { frame: 'paint-charcoal', window: 'glass-grey', handle: 'steel-stainless' })
-  + { voxelGrain: 0.006 },
+  + { voxelGrain: 0.006, taxonomy: { category: 'armour', tags: { weapon: ['shield'], material: ['metal', 'glass'], setting: ['medieval'] } } },
 ]

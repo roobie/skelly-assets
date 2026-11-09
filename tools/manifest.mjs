@@ -1,9 +1,10 @@
-// manifest.json: every produced model by id, kind, pack, logical path, part node names and credits, and every produced
-// file under its pack. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
+// manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names and credits, and every
+// produced file under its pack. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { outputPath, undeclaredDirectories } from './layout.mjs';
+import { manifestTaxonomy } from './taxonomy.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 export const MANIFEST = 'manifest.json';
@@ -83,7 +84,7 @@ export function mobManifest(rows) {
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-// models: { id, kind, pack, path, nodes?, clips? }, paths logical under the pack; files: every produced file as
+// models: { id, kind, pack, path, taxonomy?, nodes?, clips? }, paths logical under the pack; files: every produced file as
 // <pack>/<logical path>; credit: a repo path -> { author, licence }.
 export function buildManifest({ models, files, credit }) {
   const packs = {};
@@ -107,6 +108,7 @@ export function buildManifest({ models, files, credit }) {
       kind: model.kind,
       pack: model.pack,
       path: model.path,
+      ...manifestTaxonomy(model.taxonomy),
       ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
       ...(model.clips === undefined ? {} : { clips: model.clips }),
       ...(model.body === undefined ? {} : { body: model.body }),
@@ -114,7 +116,7 @@ export function buildManifest({ models, files, credit }) {
     };
   });
   return {
-    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
+    _doc: 'Every model the built tree holds and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. nodes: the GLB part node names of the resolved assembly. credits: from REUSE.toml.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
   };

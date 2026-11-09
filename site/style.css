@@ -65,6 +65,11 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
 .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
 .chip span { color: var(--muted); margin-left: 4px; }
 .chip[aria-pressed="true"] span { color: inherit; opacity: 0.7; }
+.facets { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.facet {
+  max-width: 100%; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: 13px; padding: 6px 10px; cursor: pointer;
+}
 .count { margin-left: auto; color: var(--muted); font-size: 13px; }
 
 .grid {

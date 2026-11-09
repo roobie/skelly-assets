@@ -74,7 +74,7 @@ local foldedScarf(w, d, ht, folds) =
   ] + ribs('emb', 'emb', 0.086, 0.09, 24, 5, 0.022, 0.044, 0)
     + h.crescent('top-ring', 'emb', 0.045, 0.05, 0, 360, 16, 0.09, 0.093),
     { cloth: 'cloth-cream', emb: 'cloth-yellow' })
-  + { voxelGrain: 0.004 },
+  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['fabric'] } } },
 
   // A black cotton pointed hat resting on its brim, 400 mm across and 360 mm tall: a broad flat brim and a tall cone
   // whose tip leans over, a purple band with a brass buckle round its base.
@@ -87,5 +87,6 @@ local foldedScarf(w, d, ht, folds) =
     ring('band', 'band', 0.0, 0.094, 0.012, 0.04),
     box('buckle', 'buckle', [-0.018, 0.016, 0.088], [0.018, 0.038, 0.097]),
     box('buckle-hole', 'band', [-0.011, 0.022, 0.094], [0.011, 0.032, 0.098]),
-  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' }),
+  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' })
+  + { taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['fabric'], setting: ['fantasy'] } } },
 ]
