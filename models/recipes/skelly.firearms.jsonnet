@@ -16,8 +16,7 @@ local items = [
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
   } + taxonomy.of(row)
-  for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
-  if std.setMember(row.id, owned)
+  for row in catalogue.rows(owned)
 ];
 // The whole pack is modern firearms; each row names its own shelf and weapon class.
 taxonomy.inherit({ tags: { setting: ['modern'] } }, items + (import 'packages/gun-authoring-tool/exports/deadvox.jsonnet'))
