@@ -3,6 +3,7 @@ read_if:
   - adding a model, choosing its content pack or consuming shared assets
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
+  - bumping the Node version, or why CI and builds pin one exact version
 ---
 
 # skelly-assets
@@ -157,7 +158,7 @@ latest, and a consumer pins a `v*` release instead.
 
 ## Building
 
-You need Node 26 or later.
+You need the Node version named in `.node-version`; see "Node".
 
 ```sh
 tools/build_models.sh            # complete roster and recipe build
@@ -172,6 +173,16 @@ in `tools/README.md`.
 
 To preview the showcase locally, build the complete tree into `built/`, run `node site/build.mjs` and serve
 `_site/` with any static file server.
+
+### Node
+
+Every build, local and in CI, runs the one exact Node version in `.node-version`, so a bump is one edit there.
+An export's cache key includes the Node version (see `tools/packages/thing-export/src/cache.ts`,
+`codeFingerprint`), because different Node can produce different bytes; under a floating major every patch release
+would therefore regenerate both of main's copies from scratch, while a pinned version invalidates the cache only
+when it is bumped. A floating major also makes every CI job download Node from GitHub's release hosting, whose
+failures and retries can cost a job over a minute; an exact version is restored from the runner's tool cache
+instead. See `.github/actions/node/action.yml`, `Cache Node`.
 
 ### Showcase idle motion
 

@@ -13,6 +13,8 @@ on:
       - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
       - 'tools/testPool.ts'
+      - '.node-version'
+      - '.github/actions/node/**'
       - '.github/workflows/tool-ui.yml'
       - '!**/*.md'
   pull_request:
@@ -26,6 +28,8 @@ on:
       - 'tools/sources.mjs'
       - 'tools/jsonnet/**'
       - 'tools/testPool.ts'
+      - '.node-version'
+      - '.github/actions/node/**'
       - '.github/workflows/tool-ui.yml'
       - '!**/*.md'
 
@@ -46,11 +50,9 @@ jobs:
         with:
           path: tools/jsonnet/bin
           key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/node
         with:
-          node-version: 26
-          cache: npm
-          cache-dependency-path: tools/package-lock.json
+          npm-cache: true
       - run: npm ci --prefix ../..
       - run: npm run typecheck
       - run: npm test
