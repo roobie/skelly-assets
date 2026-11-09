@@ -195,10 +195,10 @@ async function main() {
   }
   const roster = new Map(readRoster().map((row) => [row.id, row]));
   const ids = positionals.length > 0 ? positionals : [...roster.keys()];
-  const rosterRows = rosterSource();
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   await installJsonnetSources();
+  const rosterRows = rosterSource();
   // A taxonomy or pack dependency problem fails the production build before any model is written.
   const taxonomies = positionals.length === 0 ? await modelTaxonomies(repo) : [];
   const vocabulary = readVocabulary(repo);
@@ -216,7 +216,8 @@ async function main() {
       exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool, ids: positionals.length > 0 ? new Set(positionals) : undefined }),
     ]);
     failed = built.failed;
-    const known = new Set([...rosterRows, ...recipes.models].map(({ id }) => id));
+    // The full build's ids are the roster's, which only the roster source may supply.
+    const known = new Set([...rosterRows, ...(positionals.length > 0 ? recipes.models : [])].map(({ id }) => id));
     const missing = ids.filter((id) => !known.has(id));
     if (missing.length > 0) {
       console.log(`not in the model sources: ${missing.join(' ')}`);
