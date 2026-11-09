@@ -392,6 +392,7 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
   // the waist of trousers or a skirt; a mattress's is where its user's head goes.
   headEndOnPlusZ: { forward: '-z' },
   headEndOnMinusX: { forward: '+x' },
+  headEndOnPlusX: { forward: '-x' },
   // The print on a packaged item's named solid and face; with no text it prints the model's display name.
   label(solid, face, text=null, up=null): { label: { solid: solid, face: face } + (if text == null then {} else { text: text }) + (if up == null then {} else { up: up }) },
 }

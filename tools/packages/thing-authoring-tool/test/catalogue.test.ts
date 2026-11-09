@@ -5,6 +5,7 @@ import { readRecipes } from '../../../recipes.mjs';
 import { buildItem, loadCatalogue } from '../src/catalogue.ts';
 import { catalogue } from '../src/content.ts';
 import { exportItem, loadThingRecipe, THING_KINDS } from '../src/exports.ts';
+import lyingOnBack from './fixtures/lying-on-back.json' with { type: 'json' };
 
 const material = Object.keys(MATERIALS)[0]!;
 // Fine enough that a voxelized box stays within `toBeCloseTo` of the smooth datum it follows.
@@ -172,6 +173,15 @@ it('turns a tool laid out along its named axis so its working end faces +z, and 
   }
   // A tool laid out along +z already keeps its authored turn.
   expect(alongZ.grip?.turn).toEqual([0, 0, 90]);
+});
+it('turns the head end of a thing lying on its back to -z, its length along z', () => {
+  const loaded = loadCatalogue(lyingOnBack);
+  for (const item of loaded.items) {
+    const { head, foot } = buildItem(item, loaded).handling.anchors!;
+    const fromFoot = sub(head!, foot!);
+    expect(fromFoot[2], item.id).toBeLessThan(0);
+    expect(Math.abs(fromFoot[2]), item.id).toBeGreaterThan(Math.abs(fromFoot[0]));
+  }
 });
 it('exports datums and baked collision that follow the resized solid', () => {
   const input = fixture();
