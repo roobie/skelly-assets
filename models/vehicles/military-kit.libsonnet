@@ -1,5 +1,6 @@
 // Pressings the military family shares. `truckRows`, `truckItems` and `truckFittings` press one high-clearance
-// bonneted six-wheeled chassis per vehicle id, so its cargo and box bodies differ only by what stands on the deck.
+// bonneted six-wheeled chassis, the `military_truck_` rows that `military_cargo_truck` emits, so its cargo and box
+// bodies differ only by what stands on the deck and each new body adds no chassis rows.
 // The item and fitting builders take a game's vehicle kit as an argument, so this folder imports no game content.
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -48,7 +49,8 @@ local truckDefaults = {
 };
 local truckSpec(s) = truckDefaults + s;
 
-local truckRows(id, s0) = {
+local id = 'military_truck';
+local truckRows(s0) = {
   local s = truckSpec(s0),
   local finish = { paint: s.paint, trim: 'paint-charcoal', glass: 'glass-clear', dark: 'steel-spall-black', frame: s.frame, liner: 'cloth-olive-drab', spring: 'steel-grey' },
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2,
@@ -160,7 +162,7 @@ local truckRows(id, s0) = {
   ],
 }.rows;
 
-local truckItems(kit, id, name) = local pile = kit.pileSize; [
+local truckItems(kit) = local pile = kit.pileSize; local name = 'military truck'; [
   kit.part(id + '_chassis', name + ' chassis', pile, ['structure']),
   kit.part(id + '_cab', name + ' cab', pile, ['structure', 'protection']),
   kit.part(id + '_door', name + ' door', pile, ['entry', 'glazing', 'protection']),
@@ -175,7 +177,7 @@ local truckItems(kit, id, name) = local pile = kit.pileSize; [
   kit.part(id + '_fuel_tank', name + ' fuel tank', [9, 5], ['fuel']),
 ];
 
-local truckFittings(kit, id, s0) =
+local truckFittings(kit, s0) =
   local s = truckSpec(s0);
   local fitting = kit.fitting;
   local pair = kit.pair;

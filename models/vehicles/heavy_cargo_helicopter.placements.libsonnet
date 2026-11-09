@@ -24,7 +24,7 @@ local id = 'heavy_cargo_helicopter';
     one('front_gear', id + '_front_gear'),
     one('rear_gear', id + '_rear_gear'),
     one('console', id + '_console', [6.75, s.floorTop, 0]),
-    one('beacon', id + '_beacon', [-6.0, 5.1, 0.3]),
+    one('beacon', 'helicopter_beacon_red', [-6.0, 5.1, 0.3]),
     one('landing_lamp', id + '_landing_lamp', [6.4, 0.53, 0]),
   ]
   + pair('crew_door', id + '_crew_door')

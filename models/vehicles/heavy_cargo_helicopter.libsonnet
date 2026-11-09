@@ -136,7 +136,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('heavy_cargo_helicopter_cockpit_floor', 90, [
     box('deck', 'dark', [s.floorFront, s.floorBase, -1.4], [6.85, s.floorTop, 1.4]),
   ], { dark: s.trim }),
-  k.compound('heavy_cargo_helicopter_beacon', 1, [
+  k.compound('helicopter_beacon_red', 1, [
     k.turned('lens', 'lens', 'y', k.disc(0.06, 0, 0.1)) + { sides: 8 },
   ], { lens: 'plastic-red' }),
   k.compound('heavy_cargo_helicopter_landing_lamp', 5, [

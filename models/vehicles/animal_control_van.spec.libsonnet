@@ -14,4 +14,5 @@ van.cab + van.loadFloor + {
     windows: [],
     columns: [-2.8, -2.14, -1.48], width: 0.62, cageIn: 0.2, cageHeight: 0.68,
   },
+  borrow: { _bonnet: 'panel_van_bonnet' },
 }

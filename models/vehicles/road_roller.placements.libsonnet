@@ -24,6 +24,6 @@ local s = import 'road_roller.spec.libsonnet';
   + site.pair('step', 'road_roller_step')
   + site.pair('tail_lamp', 'tail_lamp_small', [-2.02, 1.42, 0.5])
   + site.headlamps(2.02, 1.4, 0.46)
-  + site.batteryBay('hatchback_battery_tray', [-1.08, 1.28, 0.42]),
+  + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
 }

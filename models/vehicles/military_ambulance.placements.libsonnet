@@ -3,7 +3,7 @@ local m = import 'military-kit.libsonnet';
 local s = import 'military_ambulance.spec.libsonnet';
 local id = 'military_ambulance';
 {
-  sites: m.truckFittings(site.kit, id, s) + [
+  sites: m.truckFittings(site.kit, s) + [
     site.one('box_floor', id + '_box_floor'),
     site.one('box', id + '_box'),
     site.one('rear_step', id + '_rear_step'),

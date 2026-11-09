@@ -504,7 +504,7 @@
         0.42
       ],
       "id": "battery_tray",
-      "part": "hatchback_battery_tray",
+      "part": "battery_tray",
       "supportedBy": [
         "shell"
       ]

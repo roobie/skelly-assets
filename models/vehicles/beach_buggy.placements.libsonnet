@@ -22,5 +22,5 @@ local s = import 'beach_buggy.spec.libsonnet';
   + site.pair('rear_wheel', 'beach_buggy_rear_wheel', [s.rearAxle, s.rearHub, s.rearWheelZ])
   + site.pair('headlamp', 'beach_buggy_headlamp')
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.45, 0.44])
-  + site.batteryBay('hatchback_battery_tray', [-0.72, 0.3, 0.2]),
+  + site.batteryBay('battery_tray', [-0.72, 0.3, 0.2]),
 }

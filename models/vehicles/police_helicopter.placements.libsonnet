@@ -25,7 +25,7 @@ local s = import 'police_helicopter.spec.libsonnet';
     one('searchlight', 'police_helicopter_searchlight', [1.45, 0.3, 0.52]),
     one('tail_beacon', 'police_helicopter_beacon', [-6.35, 2.95, 0]),
     one('cowl_beacon', 'police_helicopter_beacon', [-1.5, 2.72, 0]),
-    one('landing_lamp', 'police_helicopter_landing_lamp', [2.44, 1.0, 0]),
+    one('landing_lamp', 'helicopter_landing_lamp', [2.44, 1.0, 0]),
   ]
   + pair('front_door', 'police_helicopter_front_door')
   + pair('rear_door', 'police_helicopter_rear_door')

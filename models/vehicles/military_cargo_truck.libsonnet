@@ -13,7 +13,7 @@ local outer = s.bedSide + 0.04;
 local SHOULDER = [[peak - 0.03, 0.8], [peak + 0.03, 0.8], [shoulder + 0.05, outer], [shoulder, outer]];
 local CORNER = [[shoulder, 0.8], [peak, 0.8], [shoulder, outer]];
 local HOOP_SHOULDER = [[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows('military_cargo_truck', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [
     box('floor', 'floor', [s.bedRear, s.deckBottom, -s.bedSide], [s.bedFront, s.deckTop, s.bedSide]),
   ], finish),

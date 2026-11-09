@@ -24,6 +24,6 @@ local s = import 'skid_steer.spec.libsonnet';
   + site.pair('control', 'gear_lever', [0.34, s.floor + 0.34, 0.33])
   + site.pair('work_lamp', 'work_lamp', [s.cageFront + 0.04, s.roof + 0.05, 0.34])
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.26, 1.06, 0.38])
-  + site.batteryBay('hatchback_battery_tray', [-0.55, 0.5, 0.3]),
+  + site.batteryBay('battery_tray', [-0.55, 0.5, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
 }

@@ -35,6 +35,6 @@ local s = import 'army_jeep.spec.libsonnet';
   + pair('mirror', 'door_mirror', [s.cowl - 0.03, s.bonnetBack + 0.18, 0.62])
   + pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.76, 0.5])
   + pair('headlamp', 'headlamp_military', [s.nose + 0.06, 0.595, 0.27])
-  + site.batteryBay('hatchback_battery_tray', [0.72, 0.72, -0.3]),
+  + site.batteryBay('battery_tray', [0.72, 0.72, -0.3]),
   tags: { 'vehicle-role': ['military'] },
 }

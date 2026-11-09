@@ -74,11 +74,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     { x: 0.95, top: 0.62, root: 0.44 },
     { x: -0.35, top: 0.66, root: 0.42 },
   ]),
-  k.compound('news_helicopter_seat', 7, [
-    box('pan', 'dark', [-0.24, 0, -0.23], [0.22, 0.08, 0.23]),
-    box('cushion', 'seat', [-0.24, 0.08, -0.23], [0.22, 0.18, 0.23]),
-    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.23, 0.23]),
-  ], { dark: trim, seat: 'cloth-seat' }),
   k.compound('news_helicopter_rear_bench', 12, [
     box('pan', 'dark', [-0.24, 0, -0.56], [0.22, 0.08, 0.56]),
     box('cushion', 'seat', [-0.24, 0.08, -0.56], [0.22, 0.18, 0.56]),
@@ -97,11 +92,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_downlink_dome', 3, [
     turned('dome', 'dome', 'y', [[-0.14, 0], [-0.14, 0.12], [-0.06, 0.2], [0.14, 0.2], [0.14, 0], [-0.14, 0]]) + { sides: 16 },
   ], { dome: 'paint-white' }),
-  k.compound('news_helicopter_beacon', 1, [
-    turned('lens', 'lens', 'y', k.disc(0.06, 0, 0.1)) + { sides: 8 },
-  ], { lens: 'plastic-red' }),
-  k.compound('news_helicopter_landing_lamp', 1, [
-    box('housing', 'dark', [-0.05, -0.06, -0.12], [0.04, 0.06, 0.12]),
-    box('lens', 'lens', [0.04, -0.05, -0.1], [0.07, 0.05, 0.1]),
-  ], { dark: trim, lens: 'plastic-frosted' }),
 ])

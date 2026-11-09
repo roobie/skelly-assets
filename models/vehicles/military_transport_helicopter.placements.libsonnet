@@ -21,7 +21,7 @@ local id = 'military_transport_helicopter';
     one('tail_gear', id + '_tail_gear'),
     one('tail_wheel', id + '_tail_wheel', [s.tailGear.x, s.tailGear.radius, 0]),
     one('console', id + '_console', [3.85, s.floor, 0]),
-    one('beacon', id + '_beacon', [-9.12, 4.38, 0]),
+    one('beacon', 'helicopter_beacon_red', [-9.12, 4.38, 0]),
     one('landing_lamp', id + '_landing_lamp', [5.0, 0.86, 0]),
   ]
   + pair('turbine', id + '_turbine', [s.engine.x, s.engine.y, s.engine.z])

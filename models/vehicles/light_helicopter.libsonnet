@@ -66,7 +66,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     { x: 1.0, top: 0.54, root: 0.4 },
     { x: -0.45, top: 0.68, root: 0.34 },
   ]),
-  k.compound('light_helicopter_seat', 7, [
+  k.compound('helicopter_seat', 7, [
     box('pan', 'dark', [-0.24, 0, -0.23], [0.22, 0.08, 0.23]),
     box('cushion', 'seat', [-0.24, 0.08, -0.23], [0.22, 0.18, 0.23]),
     k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.23, 0.23]),

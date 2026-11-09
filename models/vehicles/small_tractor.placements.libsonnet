@@ -25,6 +25,6 @@ local s = import 'small_tractor.spec.libsonnet';
   // On the dark roll bar, because the fender is as red as the lens.
   + site.pair('tail_lamp', 'tail_lamp_small', [s.barX - 0.07, 1.3, s.barZ])
   + site.headlamps(s.nose, 0.98, 0.2)
-  + site.batteryBay('hatchback_battery_tray', [0.2, 0.92, 0]),
+  + site.batteryBay('battery_tray', [0.2, 0.92, 0]),
   tags: { 'vehicle-role': ['farm'] },
 }

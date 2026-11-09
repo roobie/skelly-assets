@@ -348,7 +348,7 @@ local rows(id, s) = {
         box('beside_well', 'floor', [well.x[0], y - 0.1, well.z], [well.x[1], y, s.skin]),
       ], finish),
     ],
-  rows: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
+  rows: k.unborrowed(id, s, [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
     k.compound(id + '_dashboard', 40, [
       box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - 0.14, dashTop(s), -0.28]),
@@ -365,12 +365,12 @@ local rows(id, s) = {
            box('upper_lip', 'trim', [face, y[1] - 0.04, -s.sign.z], [face + 0.05, y[1], s.sign.z]),
            box('panel', 'lit', [face, y[0] + 0.04, -s.sign.z + 0.06], [face + 0.07, y[1] - 0.04, s.sign.z - 0.06]),
          ], { trim: 'plastic-black', lit: 'plastic-orange' }),
-       ] else []),
+       ] else [])),
 }.rows;
 local items(kit, id, name, s) =
-  local panel(suffix, label, capabilities) = kit.part(id + suffix, name + ' ' + label, kit.pileSize, capabilities);
+  local panel(suffix, label, capabilities) = [suffix, label, capabilities];
   local g = layout(s);
-  [
+  local panels = [
     panel('_shell', 'body shell', ['structure', 'protection']),
     panel('_windscreen', 'windscreen', ['glazing']),
     panel('_side_window', 'side window', ['glazing']),
@@ -391,11 +391,13 @@ local items(kit, id, name, s) =
   + (if rearGlazed(s) then [panel('_rear_window', 'rear window', ['glazing'])] else [])
   + (if has(s, 'engineHatch') then [panel('_rear_panel', 'engine hatch', ['protection'])] else [])
   + (if has(s, 'sign') then [panel('_destination_sign', 'destination sign', ['light'])] else []);
+  [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in panels if !k.borrows(s, p[0])];
 local fittings(kit, id, s) =
   local fitting = kit.fitting;
   local pair = kit.pair;
   local on = kit.on;
   local origin = kit.origin;
+  local part(suffix) = k.partId(id, s, suffix);
   local g = layout(s);
   local p = s.power;
   local deckPanes = std.flattenArrays([
@@ -403,7 +405,7 @@ local fittings(kit, id, s) =
     local panes = g.panes(deck);
     local doorBays = if i == 0 then [door.bay for door in s.doors] else [];
     std.flattenArrays([
-      local twin = pair('pane_' + i + '_' + j, id + g.windowSuffix(i), [(panes[j][0] + panes[j][1]) / 2, deck.waist, s.side - 0.04], on(['shell']));
+      local twin = pair('pane_' + i + '_' + j, part(g.windowSuffix(i)), [(panes[j][0] + panes[j][1]) / 2, deck.waist, s.side - 0.04], on(['shell']));
       if std.member(doorBays, j) then [twin[1]] else twin
       for j in std.range(0, deck.bays - 1)
     ])
@@ -414,9 +416,9 @@ local fittings(kit, id, s) =
     local way = g.doorways[d];
     local w = g.leafWidth;
     if std.get(s, 'doorLeaves', 2) == 2 then [
-      fitting('door_fwd_' + d, id + '_door_fwd', [way[1] - w / 2, s.doorSill, doorZ], ['shell']),
-      fitting('door_aft_' + d, id + '_door_aft', [way[0] + w / 2, s.doorSill, doorZ], ['shell']),
-    ] else [fitting('door_' + d, id + '_door', [way[1] - w / 2, s.doorSill, doorZ], ['shell'])]
+      fitting('door_fwd_' + d, part('_door_fwd'), [way[1] - w / 2, s.doorSill, doorZ], ['shell']),
+      fitting('door_aft_' + d, part('_door_aft'), [way[0] + w / 2, s.doorSill, doorZ], ['shell']),
+    ] else [fitting('door_' + d, part('_door'), [way[1] - w / 2, s.doorSill, doorZ], ['shell'])]
     for d in std.range(0, std.length(g.doorways) - 1)
   ]);
   local seats = std.flattenArrays([
@@ -432,13 +434,13 @@ local fittings(kit, id, s) =
   local d = s.driver;
   local driverBase = if plinthed(s) then 'driver_plinth' else 'shell';
   // The shell leads: it is the body a vehicle's placements take their tags from.
-  [fitting('shell', id + '_shell', origin)]
+  [fitting('shell', part('_shell'), origin)]
   + (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
   + [
-    fitting('windscreen', id + '_windscreen', origin, ['shell']),
-    fitting('rear_bumper', id + '_rear_bumper', origin, ['shell']),
-    fitting('front_bumper', id + '_front_bumper', origin, ['shell']),
-    fitting('dashboard', id + '_dashboard', origin, ['shell']),
+    fitting('windscreen', part('_windscreen'), origin, ['shell']),
+    fitting('rear_bumper', part('_rear_bumper'), origin, ['shell']),
+    fitting('front_bumper', part('_front_bumper'), origin, ['shell']),
+    fitting('dashboard', part('_dashboard'), origin, ['shell']),
     fitting('driver_seat', 'front_seat', [d.x, d.y, -d.z], [driverBase]),
     // Rises from inside the dash to the top of the wheel's hub.
     fitting('steering_column', 'steering_column', [d.x + 0.5, d.y + 0.4, -d.z], ['dashboard']),
@@ -455,14 +457,14 @@ local fittings(kit, id, s) =
   ]
   + [fitting('prop_shaft_' + i, p.shafts[i].part, p.shafts[i].at, ['gearbox', 'rear_axle']) for i in std.range(0, std.length(p.shafts) - 1)]
   + (if g.bonneted then [
-       fitting('bonnet', id + '_bonnet', origin, ['shell']),
-       fitting('grille', id + '_grille', origin, ['shell']),
-     ] + pair('front_wing', id + '_front_wing', origin, on(['shell']))
-     else [fitting('front_panel', id + '_front_panel', origin, ['shell'])])
-  + (if rearGlazed(s) then [fitting('rear_window', id + '_rear_window', origin, ['shell'])] else [])
-  + (if has(s, 'engineHatch') then [fitting('rear_panel', id + '_rear_panel', origin, ['shell'])] else [])
-  + (if has(s, 'sign') then [fitting('destination_sign', id + '_destination_sign', origin, ['shell'])] else [])
-  + (if std.length(s.decks) > 1 then [fitting('upper_floor', id + '_upper_floor', origin, ['shell'])] else [])
+       fitting('bonnet', part('_bonnet'), origin, ['shell']),
+       fitting('grille', part('_grille'), origin, ['shell']),
+     ] + pair('front_wing', part('_front_wing'), origin, on(['shell']))
+     else [fitting('front_panel', part('_front_panel'), origin, ['shell'])])
+  + (if rearGlazed(s) then [fitting('rear_window', part('_rear_window'), origin, ['shell'])] else [])
+  + (if has(s, 'engineHatch') then [fitting('rear_panel', part('_rear_panel'), origin, ['shell'])] else [])
+  + (if has(s, 'sign') then [fitting('destination_sign', part('_destination_sign'), origin, ['shell'])] else [])
+  + (if std.length(s.decks) > 1 then [fitting('upper_floor', part('_upper_floor'), origin, ['shell'])] else [])
   + deckPanes
   + doors
   + seats
