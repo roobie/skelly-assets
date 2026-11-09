@@ -147,7 +147,7 @@ that PR's build; the merge to main catches it, because every build outside a PR 
 published until the two agree.
 
 Each copy spreads its model generation over several runners and builds its tree from their merged caches, so a
-clean copy takes about as long as a cached one rather than one runner's minutes for the whole catalogue. Sharding
+clean copy no longer waits on one runner generating the whole catalogue. Sharding
 the cache rather than the tree keeps every copy built by the one build entry, and a cache hit returns what its
 generation stored, so the tree is the one an unsharded build makes; see `tools/build.mjs`, `fillCacheShard`.
 
