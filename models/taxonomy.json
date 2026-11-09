@@ -112,7 +112,8 @@
         "emergency": "Ambulance, fire, police and rescue service.",
         "military": "Military service.",
         "farm": "Farm work: tractors, harvesters, livestock trailers.",
-        "construction": "Construction and heavy plant: excavators, cranes, rollers, forklifts."
+        "construction": "Construction and heavy plant: excavators, cranes, rollers, forklifts.",
+        "utility": "Municipal and utility service: street cleaning, refuse collection, recovery, line work, animal control."
       }
     },
     "weapon": {
