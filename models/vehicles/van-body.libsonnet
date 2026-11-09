@@ -334,23 +334,28 @@ local rows(id, s) = {
     k.compound('electric_van_grille_panel', 3, [
       box('panel', 'panel', [nose + 0.04, 0.64, -0.5], [nose + 0.04 + grain, 0.94, 0.5]),
     ], { panel: 'plastic-gloss-white' }),
+  electricDrive(s): {
+    drop: ['engine', 'gearbox', 'radiator', 'fuel_tank', 'exhaust', 'prop_shaft'],
+    motor: { part: 'traction_motor_large', at: [s.frontAxle + 0.18, 0.5, 0] },
+    inverter: { part: 'inverter_large', at: [s.frontAxle + 0.42, 0.6, 0.51], on: ['motor'] },
+    pack: { part: 'traction_pack_van', at: [(s.rearAxle + s.frontAxle) / 2, s.panLow - 0.16, 0] },
+    port: { part: 'charge_port', at: [s.frontAxle + 0.1, 0.98, s.side], on: ['front_wing_near'] },
+  },
+  electricAxle: 'trailer_axle_van',
   electric(powertrain, base, s, id, name):
     local grilleFitting = { id: 'grille_panel', part: 'electric_van_grille_panel', at: [0, 0, 0], supportedBy: ['front_bumper'] };
-    local derived = powertrain.electric(base, {
-      id: id,
-      name: name,
-      drop: ['engine', 'gearbox', 'radiator', 'fuel_tank', 'exhaust', 'prop_shaft'],
-      motor: { part: 'traction_motor_large', at: [s.frontAxle + 0.18, 0.5, 0] },
-      inverter: { part: 'inverter_large', at: [s.frontAxle + 0.42, 0.6, 0.51], on: ['motor'] },
-      pack: { part: 'traction_pack_van', at: [(s.rearAxle + s.frontAxle) / 2, s.panLow - 0.16, 0] },
-      port: { part: 'charge_port', at: [s.frontAxle + 0.1, 0.98, s.side], on: ['front_wing_near'] },
-    });
+    local derived = powertrain.electric(base, $.electricDrive(s) + { id: id, name: name });
     derived + {
       fittings: [
-        if f.id == 'rear_axle' then f { part: 'trailer_axle_van' } else f
+        if f.id == 'rear_axle' then f { part: $.electricAxle } else f
         for f in derived.fittings
       ] + [grilleFitting],
     },
+  // The battery van's sites from `base`, its parent's.
+  electricSites(base, s): (import 'powertrain.libsonnet').electric(base, $.electricDrive(s) + {
+    over: { rear_axle: { part: $.electricAxle } },
+    add: [(import 'site.libsonnet').one('grille_panel', 'electric_van_grille_panel')],
+  }),
   // The fittings every van shares; a sibling adds its seats behind the cab, cargo and extras.
   fittings(kit, id, s):
     local fitting = kit.fitting;

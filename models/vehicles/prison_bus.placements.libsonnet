@@ -19,5 +19,5 @@ local bars(j) =
            site.one('roof_vent_fwd', 'roof_vent', [2.0, s.roof, 0]),
            site.one('roof_vent_aft', 'roof_vent', [-2.5, s.roof, 0]),
          ],
-  tags: { 'vehicle-role': ['emergency'] },
+  tags: { 'vehicle-role': ['utility'] },
 }

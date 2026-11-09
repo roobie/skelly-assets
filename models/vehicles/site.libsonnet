@@ -32,4 +32,15 @@ local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car
     headlamps(x, y, z, supportedBy=[]): headlamps(x, y, z),
     batteryBay(tray, at, supportedBy=[]): batteryBay(tray, at),
   },
+  // Every vehicle's placements with each variant's sites laid out from its parent's. A variant shares its parent's
+  // build, so it names its `parent` and gives `sites` as a function of the parent's sites, stating only what differs.
+  // A variant whose parent is unknown or itself a variant keeps no sites, and tools/placements.mjs reports it.
+  variants(all):: {
+    [vehicle]: local entry = all[vehicle];
+      if !std.objectHas(entry, 'parent') then entry
+      else if std.objectHas(all, entry.parent) && !std.objectHas(all[entry.parent], 'parent')
+      then entry { sites: entry.sites(all[entry.parent].sites) }
+      else { [key]: entry[key] for key in std.objectFields(entry) if key != 'sites' }
+    for vehicle in std.objectFields(all)
+  },
 }

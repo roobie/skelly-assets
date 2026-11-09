@@ -5,6 +5,7 @@ read_if:
   - changing what the placements file of a built vehicle holds
   - placing a part from another pack, or declaring a pack's dependencies
   - tagging a vehicle
+  - adding an electric, hybrid or other powertrain variant of a vehicle
 ---
 
 # 1. Vehicle placements are model data
@@ -32,6 +33,13 @@ A vehicle's placements belong to the vehicle, so they ship in the vehicle's own 
 of its own file. A body can serve vehicles in several packs, and following the body would drag every vehicle built on
 it into the body's pack; following the vehicle keeps a shared body correct. See `tools/placements.mjs`,
 `exportPlacements`.
+
+A powertrain variant, such as the electric or hybrid build of a vehicle, shares its parent's build: the few parts of
+its own are pressed in the parent's file and every other part is the parent's. So it shares its parent's pack and
+sites. Its placements file names the parent and states only the sites its powertrain changes, the way Deadvox derives
+the variant's blueprint from the parent's, and it carries the parent's tags; restating the parent's sites would let
+the two drift apart. A variant whose parent is unknown would have nowhere to ship, so the build refuses it. See
+`models/vehicles/site.libsonnet`, `variants`, and `tools/placements.mjs`, `parentProblems`.
 
 A vehicle may place a part from another pack only when its pack declares a dependency on that pack in
 `models/packs.json`; parts are never copied between packs. A copy drifts from its source without anyone noticing,
