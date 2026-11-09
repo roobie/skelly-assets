@@ -11,50 +11,24 @@ What each release changes for those who consume the assets. Each version's secti
 
 ### Breaking
 
-- Vehicle parts that were identical to another part are merged into one model, and every vehicle
-  that used them now places the surviving part. Relink these ids (old → new):
-  - `hatchback_battery_tray` → `battery_tray`
-  - `bucket_truck_front_bumper` → `box_truck_front_bumper`
-  - `bucket_truck_mudguard` → `box_truck_mudguard`
-  - `bucket_truck_rear_underrun` → `box_truck_rear_underrun`
-  - `bucket_truck_windscreen` → `box_truck_windscreen`
-  - `minibus_bonnet` → `camper_van_bonnet`
-  - `minibus_front_bumper` → `camper_van_front_bumper`
-  - `prison_bus_dashboard` → `coach_dashboard`
-  - `prison_bus_rear_window` → `coach_rear_window`
-  - `prison_bus_side_window` → `coach_side_window`
-  - `prison_bus_windscreen` → `coach_windscreen`
-  - `convertible_dashboard` → `coupe_dashboard`
-  - `prisoner_van_front_bumper` → `cube_van_front_bumper`
-  - `tour_bus_open_top_dashboard` → `double_decker_dashboard`
-  - `tour_bus_open_top_destination_sign` → `double_decker_destination_sign`
-  - `tour_bus_open_top_door_aft` → `double_decker_door_aft`
-  - `tour_bus_open_top_door_fwd` → `double_decker_door_fwd`
-  - `tour_bus_open_top_side_window` → `double_decker_side_window`
-  - `heavy_cargo_helicopter_beacon`, `military_transport_helicopter_beacon`,
-    `news_helicopter_beacon` → `helicopter_beacon_red`
-  - `news_helicopter_landing_lamp`, `police_helicopter_landing_lamp` → `helicopter_landing_lamp`
-  - `light_helicopter_seat`, `news_helicopter_seat` → `helicopter_seat`
-  - `minibus_floor`, `prisoner_van_floor`, `riot_van_floor` → `high_roof_van_load_floor`
-  - `minibus_rear_bumper`, `prisoner_van_rear_bumper`, `riot_van_rear_bumper` →
-    `high_roof_van_rear_bumper`
-  - `military_ambulance_<part>`, `military_cargo_truck_<part>` → `military_truck_<part>`, for
-    `bonnet`, `cab`, `chassis`, `dashboard`, `door`, `front_bumper`, `fuel_tank`, `grille`,
-    `rear_bumper`, `rear_mudguard`, `windscreen` and `wing`
-  - `ambulance_bonnet`, `animal_control_van_bonnet`, `cube_van_bonnet`, `ice_cream_van_bonnet`,
-    `prisoner_van_bonnet`, `riot_van_bonnet` → `panel_van_bonnet`
-  - `camper_van_floor` → `panel_van_load_floor`
-  - `camper_van_rear_bumper` → `panel_van_rear_bumper`
-  - `police_car_dashboard`, `taxi_dashboard` → `saloon_dashboard`
-  - `police_car_tail_lamp`, `taxi_tail_lamp` → `saloon_tail_lamp`
-  - `police_car_windscreen`, `taxi_windscreen` → `saloon_windscreen`
-  - `food_truck_dashboard` → `step_van_dashboard`
-  - `food_truck_load_floor` → `step_van_load_floor`
-  - `food_truck_rear_bumper` → `step_van_rear_bumper`
-  - `food_truck_windscreen` → `step_van_windscreen`
-  - `<van>_dashboard` → `van_dashboard` and `<van>_windscreen` → `van_windscreen`, for
-    `ambulance`, `animal_control_van`, `camper_van`, `cube_van`, `high_roof_van`, `ice_cream_van`,
-    `minibus`, `panel_van`, `prisoner_van`, `riot_van` and `security_van`
+- Vehicle parts that were identical to another part are merged into one model, and every vehicle that used
+  them now places the surviving part; for example `prison_bus_windscreen` is now `coach_windscreen`, and
+  `police_car_dashboard` and `taxi_dashboard` are now `saloon_dashboard`.
+- For those who read the sources: model rows and the values authors tune move from
+  `tools/packages/thing-authoring-tool/` to `models/`, and the libraries left in `tools/` export only their
+  builder functions. Released files are unchanged.
+
+### Upgrading from 0.3.1
+
+- Map stored ids through `renames.json` (also the manifest's `renames`). This release does not ship it yet;
+  take it from any later release, whose map is cumulative and covers these ids.
+- Read model rows from the file of the same name under `models/` instead of
+  `tools/packages/thing-authoring-tool/`; three take new names: `models/shambler-parts.libsonnet`,
+  `models/worn-clothing.libsonnet` and `models/flesh-chunks.libsonnet`.
+- Read measures from `models/measures/` (`arm`, `leg`, `bust`, `jacket`, `bags`, `container-masses`) and the
+  item settings from `models/item-settings.libsonnet`.
+- The cans library no longer exports `shellMassKg`; it is local to `models/cans.libsonnet`, so a consumer that
+  imported it keeps its own value.
 
 ### Added
 
@@ -81,17 +55,21 @@ What each release changes for those who consume the assets. Each version's secti
 
 ### Breaking
 
-- Catalogue ids are renamed to plain English. Of the ids already released, rename references:
-  `binder_top` → `chest_binder`, `lame_saber` → `sabre_fencing_jacket`, `hammer_bronze` →
-  `bronze_hammer`, `hat_cotton` → `cotton_hat`, `helmet_barbute` → `barbute`, `helmet_bronze` →
-  `bronze_helmet`, `helmet_conical` → `conical_helm`, `helmet_corinthian` → `corinthian_helm`,
-  `helmet_galea` → `galea`, `hood_ninja` → `ninja_hood`, `wizard_hat_costume` → `wizard_hat`, and
-  the worn parts `jacket_leather_worn_*` → `leather_jacket_worn_*`, `gloves_leather_worn_*` →
-  `leather_gloves_worn_*`, `boots_combat_worn_*` → `combat_boots_worn_*`.
-- Some models move pack to match their category; bundle the new pack: `cutting_board`, `iron_pot`
-  and `pan` move from `skelly.containers` to `skelly.household`, `oven_door` from
-  `skelly.structures` to `skelly.electronics`, and `chest_binder` (was `binder_top`) from
-  `skelly.arcana` to `skelly.wearables`.
+- Catalogue ids are renamed to plain English; for example `binder_top` is now `chest_binder` and
+  `helmet_bronze` is now `bronze_helmet`.
+- Some models move pack to match their category: `cutting_board`, `iron_pot` and `pan` from
+  `skelly.containers` to `skelly.household`, `oven_door` from `skelly.structures` to `skelly.electronics`, and
+  `chest_binder` from `skelly.arcana` to `skelly.wearables`.
+- For those who read the sources: the catalogue moves from `tools/packages/thing-authoring-tool/catalogue/` to
+  `models/catalogue/`.
+
+### Upgrading from 0.3.0
+
+- Map stored ids through `renames.json` (also the manifest's `renames`). This release does not ship it yet;
+  take it from any later release, whose map is cumulative and covers these ids.
+- Bundle the new pack of each moved model.
+- Read catalogue sets from `models/catalogue/sets/` and the worn templates from `models/catalogue/worn.libsonnet`
+  instead of `tools/packages/thing-authoring-tool/catalogue/`.
 
 ### Added
 
@@ -126,8 +104,15 @@ What each release changes for those who consume the assets. Each version's secti
 
 ### Breaking
 
-- `lame_saber` and `sun_shield` move from `skelly.melee` to `skelly.wearables`; bundle
-  `skelly.wearables` for them.
+- `lame_saber` and `sun_shield` move from `skelly.melee` to `skelly.wearables`.
+- For those who read the sources: the vehicle part rows move from
+  `tools/packages/thing-authoring-tool/vehicle-parts.libsonnet` to `models/vehicle-parts.libsonnet`.
+
+### Upgrading from 0.2.0
+
+- Bundle `skelly.wearables` for `lame_saber` and `sun_shield`.
+- Read the vehicle part rows from `models/vehicle-parts.libsonnet`, and the vehicle kits and shared parts from
+  `models/vehicles/`.
 
 ### Added
 
