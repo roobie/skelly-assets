@@ -12,6 +12,7 @@ import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from
 import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } from './packages/mobgen/src/mob/dragon.ts';
 import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
 import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
+import { leaperClip, leaperFrame } from './packages/mobgen/src/mob/leaper/motion.ts';
 
 /** Absolute local rotations, without a coordinate conversion or precision reduction. */
 export const poseFrame = (pose) => ({
@@ -129,6 +130,41 @@ export function creatureClips(figure, template, row) {
     walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
     attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
   } };
+}
+
+/**
+ * The leaper's clips are tracks on its own rig, each grounded on the supports its body keeps. Loops play in
+ * place and state their stride, like every walk; finite clips keep their travel, since a pounce's distance is
+ * the attack. Bodies that lost hind springs get their own sets, as a legless humanoid gets a crawling one;
+ * `limping.walk` is keyed by the side that lost its spring.
+ */
+export function leaperClips(figure, _template, row) {
+  if (!(Number.isInteger(row.walk_frames) && row.walk_frames >= 2 && Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) {
+    throw new RangeError('leaper frame counts must be at least two');
+  }
+  const bake = (name, cut = {}) => {
+    const clip = leaperClip(name);
+    const at = (u) => leaperFrame(figure.realized, name, u, cut);
+    const inPlace = (u) => { const { pose } = at(u); return { ...pose, root: [pose.root[0], pose.root[1], 0] }; };
+    const travel = clip.travel?.at(-1)[1];
+    const baked = clip.loop
+      ? poseClip(inPlace, { loop: true, samplePeriod: 1, frames: row.walk_frames, ...(travel ? { strideMetres: travel, cycles: 1 } : { periodSimSeconds: clip.seconds }) })
+      : poseClip((u) => at(u).pose, {
+        loop: false, samplePeriod: 1, frames: row.attack_frames, durationSimSeconds: clip.seconds,
+        ...(clip.hit === undefined ? {} : { hitAtSimSeconds: clip.hit * clip.seconds }),
+        ...(clip.peak === undefined ? {} : { peakAtSimSeconds: clip.peak * clip.seconds }),
+        ...(clip.air === undefined ? {} : { takeoffAtSimSeconds: clip.air.from * clip.seconds, landAtSimSeconds: clip.air.to * clip.seconds }),
+      });
+    // A charged telegraph is per frame, so it stays aligned with the pose it brightens.
+    const cursor = (i) => (clip.loop ? i / baked.frames.length : i / (baked.frames.length - 1));
+    if (clip.charge) baked.frames = baked.frames.map((frame, i) => ({ ...frame, charge: at(cursor(i)).charge }));
+    return baked;
+  };
+  return {
+    standing: { idle: bake('idle'), walk: bake('stalk'), run: bake('bound'), attack: bake('rake'), pounce: bake('pounce'), flinch: bake('flinch') },
+    limping: { walk: { left: bake('limp', { cuts: ['thigh.L'] }), right: bake('limp', { cuts: ['thigh.R'], mirrored: true }) } },
+    dragging: { walk: bake('drag', { cuts: ['thigh.L', 'thigh.R'] }) },
+  };
 }
 
 /**

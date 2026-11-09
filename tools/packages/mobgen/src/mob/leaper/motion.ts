@@ -72,6 +72,10 @@ interface ClipDef {
   readonly air?: { readonly from: number; readonly to: number; readonly apex: number };
   /** Multiplier on charged materials' emission (mob/crowd.ts, packCharge), as keys. */
   readonly charge?: readonly (readonly [number, number])[];
+  /** When an attack's blow lands, as a fraction of the clip, so a consumer resolves damage on the motion. */
+  readonly hit?: number;
+  /** When a reaction is at its fullest, as a fraction of the clip. */
+  readonly peak?: number;
 }
 
 const rest: EulerDeg = [0, 0, 0];
@@ -262,6 +266,7 @@ const CLIPS = {
     seconds: 1.9,
     loop: false,
     air: { from: 0.42, to: 0.78, apex: 0.9 },
+    hit: 0.78,
     travel: [
       [0, 0],
       [0.32, 0],
@@ -396,6 +401,7 @@ const CLIPS = {
   rake: {
     seconds: 1.4,
     loop: false,
+    hit: 0.62,
     travel: [
       [0, 0],
       [0.3, 0.1],
@@ -507,6 +513,7 @@ const CLIPS = {
   flinch: {
     seconds: 0.5,
     loop: false,
+    peak: 0.22,
     channels: {
       pelvis: {
         track: [

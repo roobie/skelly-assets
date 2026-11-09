@@ -23,6 +23,7 @@ await import(src('mob/insectTemplate.ts'));
 await import(src('mob/floaterTemplate.ts'));
 await import(src('mob/dragonTemplate.ts'));
 await import(src('mob/skeletonTemplate.ts'));
+await import(src('mob/leaper/plan.ts'));
 
 const hex = (colour) => (typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour);
 
