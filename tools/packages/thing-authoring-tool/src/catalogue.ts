@@ -28,7 +28,6 @@ import {
   string,
   unknown,
 } from 'valibot';
-import content from '../items.json' with { type: 'json' };
 import { avatarArm, avatarLeg } from './families/avatarLimbs.ts';
 import { bearTrap } from './families/bearTrap.ts';
 import { block } from './families/block.ts';
@@ -151,6 +150,9 @@ const CatalogueSchema = strictObject({
     check((items) => new Set(items.map(({ id }) => id)).size === items.length, 'duplicate item id'),
   ),
 });
+export type Catalogue = InferOutput<typeof CatalogueSchema>;
+/** What every item's build reads besides the item. */
+export type CatalogueSettings = Omit<Catalogue, 'items'>;
 export type ToolItem = InferOutput<typeof ItemSchema>;
 type ToolPart = ToolItem['parts'][number];
 type ToolDatum = NonNullable<ToolItem['handling']>;
@@ -233,7 +235,7 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
   }
   return { family: part.family, solids, ports: part.ports, axes: [], keepOuts: [] };
 };
-export const loadCatalogue = (value: unknown = content) => {
+export const loadCatalogue = (value: unknown): Catalogue => {
   const data = parse(CatalogueSchema, value);
   for (const item of data.items) {
     for (const part of item.parts) {
@@ -242,14 +244,13 @@ export const loadCatalogue = (value: unknown = content) => {
   }
   return data;
 };
-export const catalogue = loadCatalogue();
-export const palette: Palette = {
+export const itemPalette = ({ defaultMaterial }: Pick<CatalogueSettings, 'defaultMaterial'>): Palette => ({
   familyColors: {},
   specialColors: {},
   materials: MATERIALS,
-  fallbackColor: MATERIALS[catalogue.defaultMaterial]!.colour,
-  fallbackFinish: MATERIALS[catalogue.defaultMaterial]!.finish,
-};
+  fallbackColor: MATERIALS[defaultMaterial]!.colour,
+  fallbackFinish: MATERIALS[defaultMaterial]!.finish,
+});
 
 /** The glTF material name of the item's glow slot; the writer merges same-material slots, so the glow's must be its own. */
 const glowMaterial = (item: ToolItem, slot: string): string => {
@@ -266,13 +267,13 @@ const glowMaterial = (item: ToolItem, slot: string): string => {
 };
 
 /** Builds an item; with a model export's grains its datums read off the drawn voxels (see `drawn.ts`). */
-export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
+export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
   let assembly: Assembly;
   let domain: Domain;
   let masses: Readonly<Record<string, number>>;
   if (item.parts.length === 1) {
-    const wrapped = singlePart({ id: first.id, part: buildPart(first, first.params, catalogue.turnedSides), massKg: first.massKg, units: catalogue.units });
+    const wrapped = singlePart({ id: first.id, part: buildPart(first, first.params, settings.turnedSides), massKg: first.massKg, units: settings.units });
     assembly = {
       ...wrapped.assembly,
       name: item.id,
@@ -289,7 +290,7 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
           params: Object.fromEntries(
             Object.entries(part.params).map(([key, value]) => [key, { values: [value], default: value }]),
           ),
-          build: (params: Readonly<Record<string, string>>) => ({ ...buildPart(part, params, catalogue.turnedSides), family: part.id }),
+          build: (params: Readonly<Record<string, string>>) => ({ ...buildPart(part, params, settings.turnedSides), family: part.id }),
         },
       ]),
     );
@@ -304,14 +305,14 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
       ),
       connections: item.connections,
     };
-    domain = { name: item.id, units: catalogue.units, axisRules: [], families };
+    domain = { name: item.id, units: settings.units, axisRules: [], families };
     masses = Object.fromEntries(item.parts.map((part) => [part.id, part.massKg]));
   }
   const report = validate(assembly, domain);
   if (report.issues.length > 0) {
     throw new Error(`${item.id}: ${JSON.stringify(report.issues)}`);
   }
-  const drawn = drawnGeometry(report.resolved, { ...voxel, revolveFacets: catalogue.facets });
+  const drawn = drawnGeometry(report.resolved, { ...voxel, revolveFacets: settings.facets });
   const drawnSolid = (part: string, solidId: string) => {
     const solid = report.resolved.defs.get(part)?.solids.find(({ id }) => id === solidId);
     if (!(solid && report.resolved.placed.has(part))) {
@@ -322,7 +323,7 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
   const datumAt = (datum: Pick<ToolDatum, 'part' | 'solid' | 'fraction'>): Vec3 => {
     const { min, max } = drawnSolid(datum.part, datum.solid);
     const point = min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3;
-    return scale(applyPoint(report.resolved.placed.get(datum.part)!, point), catalogue.units.metresPerUnit);
+    return scale(applyPoint(report.resolved.placed.get(datum.part)!, point), settings.units.metresPerUnit);
   };
   const directionIn = (part: string, direction: Vec3): Vec3 => {
     const turned = applyDir(report.resolved.placed.get(part)!, direction);
@@ -350,7 +351,7 @@ export const buildItem = (item: ToolItem, voxel?: VoxelGrains) => {
     const extentAlong = (direction: Vec3) => {
       const unit = scale(direction, 1 / Math.hypot(...direction));
       const across = unit.reduce((sum, value, axis) => sum + Math.abs(value) * (max[axis]! - min[axis]!), 0);
-      return across * catalogue.units.metresPerUnit;
+      return across * settings.units.metresPerUnit;
     };
     const side: Vec3 = [
       up[1] * normal[2] - up[2] * normal[1],

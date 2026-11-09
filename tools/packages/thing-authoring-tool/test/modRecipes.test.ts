@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSyn
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { expect, it } from 'vitest';
-import { catalogue } from '../src/catalogue.ts';
+import { catalogue } from '../src/content.ts';
 import { exportThingRecipes } from '../src/cli/export.ts';
 import { loadThingRecipe } from '../src/exports.ts';
 import { installJsonnetSources } from '../../../sources.mjs';
@@ -25,7 +25,7 @@ it('exports one recipe file into its pack output without changing its source roo
     writeFileSync(join(root, 'models/recipes', `${packId}.jsonnet`), JSON.stringify(value));
     writeFileSync(join(root, 'models/recipes', `${packId}.json`), JSON.stringify(value));
     const sourceRoot = readdirSync(root, { recursive: true }).sort();
-    const { modelEntry, glb } = loadThingRecipe(value)[0]!.generate();
+    const { modelEntry, glb } = loadThingRecipe(value, catalogue)[0]!.generate();
     await exportThingRecipes(root, out);
 
     const base = join(out, packId);

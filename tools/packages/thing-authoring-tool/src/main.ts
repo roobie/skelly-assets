@@ -3,7 +3,8 @@ import { createPreview } from '@skelly/tool-ui/preview';
 import { buildLayers, disposeGroup } from '@skelly/tool-ui/scene';
 import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Group } from 'three';
-import { buildItem, catalogue, palette } from './catalogue.ts';
+import { buildItem, itemPalette } from './catalogue.ts';
+import { catalogue } from './content.ts';
 import { exportItem, loadThingRecipe } from './exports.ts';
 
 const select = document.querySelector<HTMLSelectElement>('#item')!;
@@ -13,7 +14,7 @@ const rows = Object.values(
     eager: true,
     import: 'default',
   }),
-).flatMap((value) => loadThingRecipe(value));
+).flatMap((value) => loadThingRecipe(value, catalogue));
 for (const row of rows) {
   const option = document.createElement('option');
   option.value = row.id;
@@ -26,12 +27,12 @@ const show = () => {
   try {
     const row = rows.find(({ id }) => id === select.value)!;
     const item = catalogue.items.find(({ id }) => id === row.source)!;
-    const { report } = buildItem(item);
-    const { physical } = exportItem(item, recipeAsset(row), row.voxel);
+    const { report } = buildItem(item, catalogue);
+    const { physical } = exportItem(item, catalogue, recipeAsset(row), row.voxel);
     const layers = buildLayers(
       report,
       [],
-      palette,
+      itemPalette(catalogue),
       threeRuntime,
       { origin: [0, 0, 0], dir: [0, 1, 0] },
       'finish',

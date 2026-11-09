@@ -117,7 +117,11 @@ declared pack goes unbuilt. CI hands the check two independent builds from `buil
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
 rather than assumed to. A build given a cache folder reuses every export whose code and inputs are unchanged; see
 `packages/thing-export/src/cache.ts`, `exportCache`. A key that leaves out something an export reads would serve
-stale bytes, so a tool caches only rows that name their inputs, and an over-wide key costs only a miss. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
+stale bytes, so a tool caches only rows that name their inputs, and an over-wide key costs only a miss. A worker exports a
+row from the task its tool hands it, the row with the slice of its sources the export reads, because loading the whole
+item catalogue in every worker costs more than most exports; see `recipeTools.mjs`, `recipeTools`, and
+`packages/thing-authoring-tool/src/exports.ts`, `thingTasks`. A thing row's slice gives it the inputs the whole
+catalogue does, so its cache key does not depend on which side loaded it. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
 `packRelease`. The showcase reads this authority rather than maintaining its own model selection; see
 `../site/build.mjs`.
 

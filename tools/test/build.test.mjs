@@ -11,7 +11,7 @@ import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 await installJsonnetSources();
-const { catalogue } = await import('../packages/thing-authoring-tool/src/catalogue.ts');
+const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
 const gunRows = JSON.parse(readFileSync(join(import.meta.dirname, '../packages/gun-authoring-tool/exports/deadvox.json'), 'utf8'));
 
 // A gun row that reads no file, so it exports from any root, and an item row of the thing catalogue.

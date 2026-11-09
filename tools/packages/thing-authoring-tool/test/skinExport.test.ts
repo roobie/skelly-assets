@@ -4,15 +4,17 @@ import type { ExportSkin } from '@skelly/thing-export/skin.ts';
 import { type BufferGeometry, Mesh, type Object3D, SkinnedMesh, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
-import { buildItem, loadCatalogue, palette } from '../src/catalogue.ts';
+import { buildItem, itemPalette, loadCatalogue } from '../src/catalogue.ts';
 import { exportItem } from '../src/exports.ts';
 import { authoredSkin } from '../src/skin.ts';
 import fixture from './fixtures/bend-strip.json' with { type: 'json' };
 
-const item = loadCatalogue(fixture).items[0]!;
+const loaded = loadCatalogue(fixture);
+const item = loaded.items[0]!;
+const palette = itemPalette(loaded);
 const asset = { id: item.id, file: `assets/models/${item.id}.glb` as const };
 const voxel = { voxelGrain: item.voxelGrain! };
-const exported = () => exportItem(item, asset, voxel);
+const exported = () => exportItem(item, loaded, asset, voxel);
 const meshOf = (root: Object3D) => {
   const meshes: SkinnedMesh[] = [];
   root.traverse((node) => {
@@ -97,7 +99,7 @@ it('round trips final voxel vertices with named joints, normalized weights and u
 });
 
 it('skin export leaves rigid output unchanged and adds no skin attributes to rigid models', async () => {
-  const input = { resolved: buildItem(item, voxel).report.resolved, palette, asset, ...voxel };
+  const input = { resolved: buildItem(item, loaded, voxel).report.resolved, palette, asset, ...voxel };
   const before = exportGlb(input);
   exported();
   const after = exportGlb(input);
@@ -139,7 +141,7 @@ const badSkins: Record<string, (valid: ExportSkin) => ExportSkin> = {
 };
 it.each(Object.entries(badSkins))('refuses %s skin data before writing a GLB', (_bad, invalidate) => {
   const out = exportGlb({
-    resolved: buildItem(item, voxel).report.resolved,
+    resolved: buildItem(item, loaded, voxel).report.resolved,
     palette,
     asset,
     ...voxel,
@@ -154,6 +156,6 @@ it.each(Object.entries(badSkins))('refuses %s skin data before writing a GLB', (
 it('refuses ambiguous authoring regions instead of choosing the first one', () => {
   const skin = item.skin!;
   expect(() =>
-    exportItem({ ...item, skin: { ...skin, regions: [...skin.regions, skin.regions[0]!] } }, asset, voxel),
+    exportItem({ ...item, skin: { ...skin, regions: [...skin.regions, skin.regions[0]!] } }, loaded, asset, voxel),
   ).toThrow('ambiguous');
 });
