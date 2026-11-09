@@ -2,6 +2,7 @@
 {
   'apc': import 'apc.placements.libsonnet',
   'army_jeep': import 'army_jeep.placements.libsonnet',
+  'checkpoint_barrier_trailer': import 'checkpoint_barrier_trailer.placements.libsonnet',
   'city_car': import 'city_car.placements.libsonnet',
   'classic_4x4': import 'classic_4x4.placements.libsonnet',
   'convertible': import 'convertible.placements.libsonnet',
