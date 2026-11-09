@@ -7,8 +7,8 @@ read_if:
 
 # Model taxonomy
 
-Model ids name models, but they do not classify them. A fencing jacket and a hard-hat sun shield were filed beside the
-melee weapons because of their ids. With thousands of catalogue rows and vehicle parts, the showcase's shelves
+Model ids name models, but they do not classify them: `lame_saber` is a fencing jacket and `sun_shield` a hard-hat
+brim, though both names read as weapons. With thousands of catalogue rows and vehicle parts, the showcase's shelves
 and filters need classification data written by an author, not guessed. That data also needs a fixed vocabulary.
 Otherwise many people and agents tagging in parallel invent near-synonyms, and each filter splits into several.
 
@@ -18,9 +18,14 @@ how a game treats an item. The two stay separate so that changing a shelf can ne
 ## Category and tags
 
 A model has one category, its shelf, so every model sits in exactly one place. Tags are terms grouped by facet,
-and each facet answers one question: what it is made of, where it is worn, which vehicle it belongs to. A
+and each facet answers one question: what it is made of, where it is worn, what body its vehicle has. A
 filter on a facet then means one thing. A term carries its meaning, so a tagger can choose between two
 terms by reading them and does not have to guess from usage.
+
+Questions that vary independently get separate facets. A vehicle's body and its role are such a pair: a
+police car and a military truck each combine one of each, so `vehicle-body` and `vehicle-role` filter apart
+and combine freely. Within a facet, terms should not overlap, which is why a vehicle that is only damaged is
+`crashed` and a total loss is `wrecked`.
 
 ## The vocabulary is semi-closed
 

@@ -114,24 +114,30 @@
       "terms": {
         "abandoned": "Left to decay: weathered, rusted, flat tyres, broken glass.",
         "burnt": "Burnt out by fire.",
-        "crashed": "Damaged by a crash or collision: crumpled, jackknifed.",
+        "crashed": "Damaged by a crash or collision but still whole: crumpled, jackknifed.",
         "overturned": "On its side or roof.",
+        "wrecked": "A total wreck, beyond repair: stripped, torn apart or burnt to the frame, not just damaged.",
         "broken": "Broken or dead and no longer working.",
         "opened": "Opened, its contents exposed.",
         "empty": "Emptied of its contents.",
         "folded": "Folded flat or packed down."
       }
     },
-    "vehicle": {
-      "meaning": "The kind of vehicle a model is or belongs to: tag its body type and, where one applies, its role.",
+    "vehicle-body": {
+      "meaning": "The body or airframe type of the vehicle a model is or belongs to.",
       "terms": {
         "car": "Cars: hatchbacks, saloons, estates, coupés, SUVs and 4x4s.",
-        "van": "Vans and minibuses, including vans built for a service.",
+        "van": "Vans and minibuses.",
         "truck": "Lorries and trucks with a cab: box, flatbed, tipper, tanker, tractor units.",
         "bus": "Buses and coaches.",
         "motorcycle": "Motorcycles, scooters and quad bikes.",
         "trailer": "Trailers and caravans, towed rather than driven.",
-        "helicopter": "Helicopters.",
+        "helicopter": "Helicopters."
+      }
+    },
+    "vehicle-role": {
+      "meaning": "The service or work the vehicle a model is or belongs to is built for, whatever its body.",
+      "terms": {
         "emergency": "Ambulance, fire, police and rescue service.",
         "military": "Military service.",
         "farm": "Farm work: tractors, harvesters, livestock trailers.",
