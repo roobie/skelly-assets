@@ -21,13 +21,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Cache go-jsonnet
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: tools/jsonnet/bin
           key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
@@ -42,20 +42,20 @@ jobs:
       matrix:
         copy: [1, 2]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Cache go-jsonnet
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: tools/jsonnet/bin
           key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
       - run: node tools/build-all.mjs --out "$RUNNER_TEMP/built"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: built-${{ matrix.copy }}
           path: ${{ runner.temp }}/built
@@ -66,11 +66,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: built-*
           path: ${{ runner.temp }}/fresh
@@ -80,20 +80,20 @@ jobs:
     needs: [test, check]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Cache go-jsonnet
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: tools/jsonnet/bin
           key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
           cache-dependency-path: tools/package-lock.json
       - run: npm ci --prefix tools
       - run: node tools/sources.mjs
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: built-1
           path: built
@@ -116,8 +116,8 @@ jobs:
             mkdir -p _site/$P
             cp -r tools/packages/$P/dist/. _site/$P/
           done
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
@@ -137,7 +137,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # A v* tag publishes that version's release; a push to main replaces the edge pre-release with its build.
   release:
@@ -154,11 +154,11 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: built-1
           path: ${{ runner.temp }}/built
