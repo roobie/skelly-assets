@@ -432,9 +432,10 @@ local fittings(kit, id, s) =
   ]);
   local d = s.driver;
   local driverBase = if plinthed(s) then 'driver_plinth' else 'shell';
-  (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
+  // The shell leads: it is the body a vehicle's placements take their tags from.
+  [fitting('shell', id + '_shell', origin)]
+  + (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
   + [
-    fitting('shell', id + '_shell', origin),
     fitting('windscreen', id + '_windscreen', origin, ['shell']),
     fitting('rear_bumper', id + '_rear_bumper', origin, ['shell']),
     fitting('front_bumper', id + '_front_bumper', origin, ['shell']),
