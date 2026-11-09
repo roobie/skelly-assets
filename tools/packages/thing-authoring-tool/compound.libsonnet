@@ -387,6 +387,11 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
   gripOn(id, solid): { forward: '+x', handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 90 } },
   // A thing standing with its front on +z, held as gripOn holds a tool: raised by its +x side, a quarter roll about it.
   gripStanding(id, solid): { handling: $.gripOn(id, solid).handling + { turn: [90, 0, 0] } },
+  // Things lying on their back put their head end at -z; see docs/decisions/0002-model-frame.md. A row authored with
+  // its head end elsewhere names that end, and the build turns it to -z. A garment's head end is the neck of a top or
+  // the waist of trousers or a skirt; a mattress's is where its user's head goes.
+  headEndOnPlusZ: { forward: '-z' },
+  headEndOnMinusX: { forward: '+x' },
   // The print on a packaged item's named solid and face; with no text it prints the model's display name.
   label(solid, face, text=null, up=null): { label: { solid: solid, face: face } + (if text == null then {} else { text: text }) + (if up == null then {} else { up: up }) },
 }
