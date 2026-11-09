@@ -42,10 +42,58 @@ function load(model) {
         }
         for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
       });
+      if (model.label) gltf.scene.add(printedLabel(model.label));
       return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
     })());
   }
   return cache.get(model.id);
+}
+
+// The manifest's label as a decal on its face: the GLB carries no lettering, so every consumer draws the text itself.
+const LABEL_PX = 512; // the texture's long side
+function printedLabel({ text, at, normal, up, size: [width, height] }) {
+  const canvas = document.createElement('canvas');
+  const scale = LABEL_PX / Math.max(width, height);
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const g = canvas.getContext('2d');
+  const margin = canvas.width * 0.08;
+  const words = text.split(/\s+/);
+  // The largest font at which the words, wrapped to the width, fit the height.
+  let px = canvas.height;
+  let lines = [];
+  for (; px > 4; px *= 0.9) {
+    g.font = `bold ${px}px sans-serif`;
+    lines = words.reduce((rows, word) => {
+      const last = rows.at(-1);
+      if (last !== undefined && g.measureText(`${last} ${word}`).width <= canvas.width - 2 * margin) rows[rows.length - 1] = `${last} ${word}`;
+      else rows.push(word);
+      return rows;
+    }, []);
+    if (lines.every((line) => g.measureText(line).width <= canvas.width - 2 * margin) && lines.length * px * 1.15 <= canvas.height - 2 * margin) break;
+  }
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.lineJoin = 'round';
+  g.lineWidth = px * 0.18;
+  g.strokeStyle = '#fff';
+  g.fillStyle = '#111';
+  lines.forEach((line, i) => {
+    const y = canvas.height / 2 + (i - (lines.length - 1) / 2) * px * 1.15;
+    g.strokeText(line, canvas.width / 2, y);
+    g.fillText(line, canvas.width / 2, y);
+  });
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 4;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, height),
+    new THREE.MeshStandardMaterial({ map, transparent: true, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2 }),
+  );
+  const n = new THREE.Vector3(...normal), u = new THREE.Vector3(...up);
+  mesh.matrixAutoUpdate = false;
+  mesh.matrix.makeBasis(new THREE.Vector3().crossVectors(u, n), u, n).setPosition(...at);
+  return mesh;
 }
 
 const clipSet = (clips) => clips?.standing ?? clips?.crawling ?? clips;
