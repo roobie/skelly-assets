@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { buildManifest } from '../manifest.mjs';
+import { compileJsonnetFile } from '../jsonnet/index.mjs';
 import { exportPlacements, placementProblems } from '../placements.mjs';
 
 const terms = (...names) => ({ terms: new Map(names.map((name) => [name, name])) });
@@ -13,6 +14,8 @@ const models = [
   { id: 'fixture_van_body', pack: 'fixture.vans', taxonomy: van },
   { id: 'fixture_light_bar', pack: 'fixture.rescue' },
   { id: 'fixture_door', pack: 'fixture.vans' },
+  { id: 'fixture_engine', pack: 'fixture.vans' },
+  { id: 'fixture_motor', pack: 'fixture.vans' },
   { id: 'fixture_twice', pack: 'fixture.vans' },
   { id: 'fixture_twice', pack: 'fixture.rescue' },
 ];
@@ -24,7 +27,7 @@ const vanSites = [
 ];
 // The ambulance borrows the van's body from another pack and adds its own light bar and role.
 const ambulance = { sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
-const vehicleRows = { van: ['fixture_van_body', 'fixture_door'], ambulance: ['fixture_light_bar'] };
+const vehicleRows = { van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'], ambulance: ['fixture_light_bar'] };
 const dependsOn = { 'fixture.rescue': ['fixture.vans'] };
 const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary }).join('\n');
 
@@ -68,6 +71,30 @@ test('a vehicle ships in the pack of its own rows, with its body\'s tags and its
     const manifest = buildManifest({ models: [], vehicles: placed.vehicles, files: placed.files, credit: () => ({}) });
     assert.deepEqual(manifest.vehicles.map(({ id, pack, path, tags }) => ({ id, pack, path, tags })), placed.vehicles);
     assert.throws(() => buildManifest({ models: [], vehicles: placed.vehicles, files: [], credit: () => ({}) }), /ambulance/);
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
+// A variant shares its parent's build: laid out from the parent's sites, it ships where the parent's rows do and carries
+// the parent's tags, and a parent that is missing would leave it nowhere to ship.
+test('a variant is laid out from its parent\'s sites, in its parent\'s pack, with its parent\'s tags and its own', () => {
+  const placements = JSON.parse(compileJsonnetFile(join(import.meta.dirname, 'fixtures/variants.jsonnet'), join(import.meta.dirname, '../..')));
+  const van = { ...placements.van, tags: { 'vehicle-role': ['emergency'] } };
+  const { electric_van: electricVan } = placements;
+  assert.deepEqual(electricVan.sites.map(({ id }) => id), ['body', 'motor']);
+  assert.match(problems(placements), /^orphan_van: unknown parent gone_van$/);
+  assert.match(problems({ van, electric_van: { ...electricVan, parent: 'electric_van' } }), /parent electric_van is itself a variant/);
+  assert.match(problems({ van, ambulance: { ...ambulance, parent: 'van' } }), /a variant's rows belong in its parent's file/);
+  const out = mkdtempSync(join(tmpdir(), 'placements-'));
+  try {
+    const placed = exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, out });
+    assert.deepEqual(placed.vehicles.find(({ id }) => id === 'electric_van'), {
+      id: 'electric_van',
+      pack: 'fixture.vans',
+      path: 'vehicles/electric_van.placements.json',
+      tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency', 'farm'] },
+    });
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
