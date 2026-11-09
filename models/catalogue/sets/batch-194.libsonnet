@@ -154,6 +154,8 @@ local beetle(prefix, slot, r, side) =
     h.tube('carving-%d' % i, 'carve', 0.0, 0.0175 + 0.003 * (x + 0.19) / 0.35, x, x + 0.006)
     for i in std.range(0, 6)
   ], { wood: 'wood-oak', brass: 'brass-dull', carve: 'wood-walnut', flame: 'glow-flame', core: 'cloth-yellow' }) + {
+    // Laid out along x, flame at +x, as the torch family is.
+    forward: '+x',
     handling: { part: 'everburning_torch', solid: 'shaft', fraction: [0.3, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', rest: 'upright', roll: 0 },
     anchors: { flame: { part: 'everburning_torch', solid: 'flame', fraction: [0.5, 0.5, 0.5] } },
   } + { taxonomy: { category: 'lighting', tags: { setting: ['fantasy'] } } },

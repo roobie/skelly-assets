@@ -12,7 +12,7 @@ local equipment = b.equipment;
     strapFrontChamfer: 0.025, strapBackChamfer: 0.002, strapWidth: 0.022, strapWall: 0.004,
     housingWidth: 0.060, housingHeight: 0.040, housingDepth: 0.030,
     lensRadius: 0.017, lensDepth: 0.005,
-  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, 'strap-2', [0, -90, 0], [0.5, 0.5, 1]) + {
+  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, 'strap-2', [0, 0, 0], [0.5, 0.5, 1]) + {
     voxelGrain: 0.002,
     anchors: {
       lens: { part: 'equipment', solid: 'lens', fraction: [0.5, 0.5, 0] },
@@ -53,5 +53,5 @@ local equipment = b.equipment;
   equipment('portable_radio', 'portableRadio', 0.600, {
     width: 0.075, height: 0.130, depth: 0.040, antennaLength: 0.048, antennaRadius: 0.002,
     dialRadius: 0.010, dialDepth: 0.008, speakerRadius: 0.026, grilleBars: 9,
-  }, { body: 'polymer-od-green', metal: 'steel-grey', control: 'paint-charcoal', display: 'glass-grey', marker: 'plastic-red' }, 'body', [0, 90, 0], [0.5, 0.25, 0.5]),
+  }, { body: 'polymer-od-green', metal: 'steel-grey', control: 'paint-charcoal', display: 'glass-grey', marker: 'plastic-red' }, 'body', [0, 0, 0], [0.5, 0.25, 0.5]),
 ]
