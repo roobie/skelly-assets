@@ -6,5 +6,5 @@ van.cab + van.saloonFloor + {
   bulkhead: false, slideGlass: true, rearGlass: true,
   windows: [[-2.4, -1.3], [-1.2, -0.1]],
   bands: [{ finish: 'paint-green', y: [0.86, 1.02] }],
-  borrow: { _rear_bumper: 'panel_van_rear_bumper', _floor: 'panel_van_load_floor' },
+  borrow: { _bonnet: 'panel_van_bonnet', _front_bumper: 'panel_van_front_bumper', _rear_bumper: 'panel_van_rear_bumper', _floor: 'panel_van_load_floor' },
 }

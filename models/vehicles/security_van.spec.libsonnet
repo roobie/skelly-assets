@@ -6,6 +6,7 @@ van.cab + van.loadFloor + {
   slideRear: -0.92, bulkhead: false, bumper: 'steel-grey',
   rearWheel: 'wheel_twin_225_75r16c', rearTubIn: 0.62,
   shellMass: 1100, paint: 'paint-charcoal',
+  borrow: { _bonnet: 'panel_van_bonnet' },
   bands: [{ finish: 'reflective-yellow', y: [0.9, 1.02] }],
   box: {
     front: 0, slideFront: -0.12, mass: 2300,

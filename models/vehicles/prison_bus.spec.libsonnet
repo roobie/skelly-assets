@@ -9,7 +9,10 @@ std.objectRemoveKey(coach, 'sign') + {
   doorKick: 2.0, doorFinish: 'paint-charcoal',
   shellMass: 10330,
   bars: { z: 0.04, width: 0.05, pitch: 0.2, rail: 0.06 },
-  // Its glass and dash press identical to the coach's.
-  borrow: { _windscreen: 'coach_windscreen', _side_window: 'coach_side_window', _rear_window: 'coach_rear_window', _dashboard: 'coach_dashboard' },
+  // Its glass, dash and end panels are the coach's pressings.
+  borrow: {
+    _front_panel: 'coach_front_panel', _rear_panel: 'coach_rear_panel',
+    _windscreen: 'coach_windscreen', _side_window: 'coach_side_window', _rear_window: 'coach_rear_window', _dashboard: 'coach_dashboard',
+  },
   bulkhead: { x: 4.04, panelTop: 2.15 },
 }
