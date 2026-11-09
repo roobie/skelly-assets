@@ -2,7 +2,8 @@
 // Usage: node tools/build.mjs [--out dir] [--cache dir] [rowId ...], or node tools/build.mjs --shard i/n --cache dir
 // to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard).
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
-// id of the roster, models/export.json, every row of every recipe file in models/recipes/ and built/manifest.json
+// id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
+// (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs)
 // (tools/manifest.mjs); with ids it builds those roster-source rows, any row
 // in the sources, and no manifest. A roster id is written into --out (by default built/) at its pack's path,
 // tools/layout.mjs, rosterFile; an id outside the roster is written flat, for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and `npm ci` in tools.
@@ -12,9 +13,11 @@ import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { outputPath, readMobRows, readRoster } from './layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
 import { modelTaxonomies } from './check-taxonomy.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from './manifest.mjs';
+import { readDependencies } from './packs.mjs';
+import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
 import { installJsonnetSources } from './sources.mjs';
@@ -194,10 +197,12 @@ async function main() {
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   installJsonnetSources();
-  // A taxonomy problem fails the production build before any model is written.
+  // A taxonomy or pack dependency problem fails the production build before any model is written.
   const taxonomies = positionals.length === 0 ? modelTaxonomies(repo) : [];
+  const vocabulary = readVocabulary(repo);
+  const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
-    const { problems } = taxonomyReport(taxonomies, readVocabulary(repo));
+    const { problems } = taxonomyReport(taxonomies, vocabulary);
     for (const { message } of problems) console.log(`TAXONOMY ${message}`);
     if (problems.length > 0) process.exit(1);
   }
@@ -212,9 +217,21 @@ async function main() {
     if (recipes) {
       for (const file of recipes.files) console.log(`built ${file}`);
       const mobs = mobManifest(readMobRows(repo));
+      const models = withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies);
+      const placed = exportPlacements({
+        placements: readPlacements(repo),
+        models,
+        vehicleRows: readVehicleRows(repo),
+        dependsOn,
+        vocabulary,
+        out,
+      });
+      for (const file of placed.files) console.log(`built ${file}`);
       const manifest = buildManifest({
-        models: withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies),
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files],
+        models,
+        vehicles: placed.vehicles,
+        dependsOn,
+        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
         credit: readCredits(repo),
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));

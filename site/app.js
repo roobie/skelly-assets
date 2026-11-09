@@ -1,5 +1,6 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
-// controls and, for creatures, their body-backed pose clips.
+// controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
+// can be exploded to show each part apart from the others.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -9,6 +10,8 @@ import { samplePose } from './poseSample.mjs';
 const $ = (id) => document.getElementById(id);
 const VIEW_DIR = new THREE.Vector3(0.85, 0.5, 1.25).normalize(); // front three-quarter: models face +z
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
+const EXPLODE = 0.7; // how far an exploded part moves from the vehicle's centre, as a share of its own distance
+const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
 
 const nameOf = (id) => {
   const s = id.replace(/_/g, ' ');
@@ -48,6 +51,35 @@ function load(model) {
   }
   return cache.get(model.id);
 }
+
+const modelsById = new Map();
+
+// A vehicle: the model of each site placed where it sits, a mirrored twin reflected across its own z = 0 plane first.
+// Its parts stay in site order, so the viewer can move each one apart.
+function loadVehicle(vehicle) {
+  if (!cache.has(vehicle.id)) {
+    cache.set(vehicle.id, (async () => {
+      const parts = await Promise.all(vehicle.sites.map((site) => load(modelsById.get(site.model))));
+      const scene = new THREE.Group();
+      const materials = new Map();
+      let triangles = 0;
+      vehicle.sites.forEach((site, i) => {
+        const part = parts[i].scene.clone(true);
+        part.name = site.site;
+        part.position.fromArray(site.at);
+        if (site.mirror) part.scale.z = -1;
+        scene.add(part);
+        triangles += parts[i].triangles;
+        for (const m of parts[i].materials) materials.set(m.name, m);
+      });
+      return { scene, clips: null, body: null, triangles, materials: [...materials.values()] };
+    })());
+  }
+  return cache.get(vehicle.id);
+}
+
+const isVehicle = (entry) => Boolean(entry.sites);
+const loadEntry = (entry) => (isVehicle(entry) ? loadVehicle(entry) : load(entry));
 
 // The manifest's label as a decal on its face: the GLB carries no lettering, so every consumer draws the text itself.
 const LABEL_PX = 512; // the texture's long side
@@ -175,14 +207,14 @@ function setupRenderer(renderer) {
   renderer.setClearColor(0x000000, 0);
 }
 
-// Point the camera at the object from the front three-quarter, far enough to see all of it.
-function frame(camera, object, target = new THREE.Vector3()) {
+// Point the camera at the object from the front three-quarter, or from `direction`, far enough to see all of it.
+function frame(camera, object, target = new THREE.Vector3(), direction = VIEW_DIR) {
   const box = new THREE.Box3().setFromObject(object);
   const sphere = box.getBoundingSphere(new THREE.Sphere());
   const r = Math.max(sphere.radius, 0.01);
   const dist = (r / Math.sin(THREE.MathUtils.degToRad(camera.fov) / 2)) * 1.02;
   target.copy(sphere.center);
-  camera.position.copy(sphere.center).addScaledVector(VIEW_DIR, dist);
+  camera.position.copy(sphere.center).addScaledVector(direction, dist);
   camera.near = dist / 100;
   camera.far = dist * 100;
   camera.updateProjectionMatrix();
@@ -213,7 +245,7 @@ async function drainThumbs() {
   while (queue.length) {
     const { model, canvas } = queue.shift();
     try {
-      const loaded = await load(model);
+      const loaded = await loadEntry(model);
       const obj = instance(loaded, model);
       if (canPose(model, loaded.clips, loaded.body)) {
         const clips = clipSet(loaded.clips), clip = initialClip(clips);
@@ -246,29 +278,31 @@ const seen = new IntersectionObserver((entries) => {
 
 // ---- grid and filters ----
 
-let models = [];
+let entries = []; // vehicles, then models
 let shown = [];
 let taxonomy = { categories: {}, facets: {} };
 // Vocabulary terms are kebab-case, so these capitalised shelf keys never collide with a category.
 const ALL = 'All';
 const UNCATEGORISED = 'Uncategorised';
+const VEHICLES = 'Vehicles';
 let shelf = ALL;
 const picked = new Map(); // facet -> the term its filter requires
 
 const labelOf = (term) => term[0].toUpperCase() + term.slice(1).replaceAll('-', ' ');
-const shelfOf = (model) => model.category ?? UNCATEGORISED;
-const shelfLabel = (key) => (key === ALL || key === UNCATEGORISED ? key : labelOf(key));
+const shelfOf = (entry) => (isVehicle(entry) ? VEHICLES : entry.category ?? UNCATEGORISED);
+const shelfLabel = (key) => ([ALL, UNCATEGORISED, VEHICLES].includes(key) ? key : labelOf(key));
+const shelfTitles = { [VEHICLES]: 'Whole vehicles, assembled from their parts.' };
 
 function renderShelves() {
-  const counts = new Map([[ALL, models.length]]);
-  for (const m of models) counts.set(shelfOf(m), (counts.get(shelfOf(m)) ?? 0) + 1);
-  const categories = [...counts.keys()].filter((key) => key !== ALL && key !== UNCATEGORISED).sort();
-  const names = [ALL, ...categories, ...(counts.has(UNCATEGORISED) ? [UNCATEGORISED] : [])];
+  const counts = new Map([[ALL, entries.length]]);
+  for (const m of entries) counts.set(shelfOf(m), (counts.get(shelfOf(m)) ?? 0) + 1);
+  const categories = [...counts.keys()].filter((key) => ![ALL, UNCATEGORISED, VEHICLES].includes(key)).sort();
+  const names = [ALL, ...(counts.has(VEHICLES) ? [VEHICLES] : []), ...categories, ...(counts.has(UNCATEGORISED) ? [UNCATEGORISED] : [])];
   $('shelves').replaceChildren(...names.map((name) => {
     const b = document.createElement('button');
     b.className = 'chip';
     b.type = 'button';
-    b.title = taxonomy.categories[name] ?? '';
+    b.title = taxonomy.categories[name] ?? shelfTitles[name] ?? '';
     b.setAttribute('aria-pressed', String(name === shelf));
     b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
     b.onclick = () => { shelf = name; renderShelves(); applyFilter(); };
@@ -279,7 +313,7 @@ function renderShelves() {
 // One select per facet that any model uses, listing the terms in use.
 function renderFacets() {
   const used = new Map();
-  for (const m of models) {
+  for (const m of entries) {
     for (const [facet, terms] of Object.entries(m.tags)) {
       const counts = used.get(facet) ?? new Map();
       for (const term of terms) counts.set(term, (counts.get(term) ?? 0) + 1);
@@ -318,7 +352,7 @@ function makeCard(model) {
   label.className = 'label';
   label.innerHTML = '<div class="name"></div><div class="meta"></div>';
   label.querySelector('.name').textContent = nameOf(model.id);
-  label.querySelector('.meta').textContent = `${shelfLabel(shelfOf(model))} · ${kb(model.bytes)}`;
+  label.querySelector('.meta').textContent = `${shelfLabel(shelfOf(model))} · ${isVehicle(model) ? `${model.sites.length} parts` : kb(model.bytes)}`;
   card.append(canvas, label);
   card.onclick = () => openViewer(model);
   if (thumbRenderer) seen.observe(canvas);
@@ -333,9 +367,9 @@ function applyFilter() {
   const term = q.replace(/[\s_]+/g, '-');
   const matches = (m) => !q || m.id.includes(id) || Object.values(m.tags).flat().some((t) => t.includes(term));
   const tagged = (m) => [...picked].every(([facet, t]) => m.tags[facet]?.includes(t));
-  shown = models.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
+  shown = entries.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
   $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
-  $('count').textContent = `${shown.length} of ${models.length} models`;
+  $('count').textContent = `${shown.length} of ${entries.length} models`;
 }
 
 // ---- viewer ----
@@ -349,7 +383,7 @@ function initViewer() {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
-  viewer = { renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null };
+  viewer = { renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false };
 
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -366,6 +400,7 @@ function initViewer() {
     const v = viewer;
     const clips = clipSet(v.loaded?.clips);
     if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], (ms - v.t0) / 1000, v.model.walkSpeed));
+    spreadParts(v);
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -382,8 +417,39 @@ function initViewer() {
   });
 }
 
+// Each part of a vehicle, its assembled position and how far it moves from the vehicle's centre when exploded.
+function explodable(obj) {
+  const centre = new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());
+  return obj.children.map((part) => ({
+    part,
+    home: part.position.clone(),
+    offset: new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3()).sub(centre).multiplyScalar(EXPLODE),
+  }));
+}
+
+function spreadParts(v) {
+  const goal = v.exploded ? 1 : 0;
+  if (v.spread === goal) return;
+  v.spread = Math.abs(goal - v.spread) < 0.001 ? goal : v.spread + (goal - v.spread) * EXPLODE_EASE;
+  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, v.spread);
+}
+
+// Switches a vehicle between assembled and exploded, keeping the camera's direction and fitting the camera to the
+// view it is switching to.
+function explode(exploded) {
+  const v = viewer;
+  v.exploded = exploded;
+  for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'exploded') === exploded));
+  const goal = exploded ? 1 : 0;
+  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, goal);
+  const direction = v.camera.position.clone().sub(v.controls.target).normalize();
+  frame(v.camera, v.obj, v.controls.target, direction);
+  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, v.spread);
+  v.controls.update();
+}
+
 function step(d) {
-  const list = shown.length ? shown : models;
+  const list = shown.length ? shown : entries;
   const i = list.findIndex((m) => m.id === viewer.model?.id);
   openViewer(list[(i + d + list.length) % list.length]);
 }
@@ -396,20 +462,26 @@ async function openViewer(model) {
 
   $('v-category').textContent = shelfLabel(shelfOf(model));
   $('v-name').textContent = nameOf(model.id);
-  $('v-id').textContent = model.file;
-  $('v-download').href = `built/${model.file}`;
-  $('v-download').setAttribute('download', model.file);
+  const file = isVehicle(model) ? model.placements : model.file;
+  $('v-id').textContent = file;
+  $('v-download').href = `built/${file}`;
+  $('v-download').setAttribute('download', file);
+  $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
   $('v-clips').replaceChildren();
+  $('v-clips').setAttribute('aria-label', isVehicle(model) ? 'View' : 'Clip');
 
-  const loaded = await load(model);
+  const loaded = await loadEntry(model);
   if (viewer.model !== model) return; // a later pick overtook this load
 
   if (viewer.obj) viewer.stage.remove(viewer.obj);
   viewer.obj = instance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
+  viewer.parts = isVehicle(model) ? explodable(viewer.obj) : [];
+  viewer.spread = 0;
+  viewer.exploded = false;
   if (canPose(model, loaded.clips, loaded.body)) {
     const clips = clipSet(loaded.clips), clip = initialClip(clips);
     pose(viewer.obj, loaded.body, clip, 0);
@@ -422,9 +494,10 @@ async function openViewer(model) {
   const size = box.getSize(new THREE.Vector3());
   const facts = [
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
+    ...(isVehicle(model) ? [['Parts', model.sites.length]] : []),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
-    ['File', kb(model.bytes)],
+    ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
   ];
   if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
   $('v-facts').replaceChildren(...facts.flatMap(([k, v]) => [
@@ -463,6 +536,18 @@ async function openViewer(model) {
     }));
     pick(names[0]);
   }
+  if (isVehicle(model)) {
+    $('v-clips').replaceChildren(...[['assembled', 'Assembled'], ['exploded', 'Exploded']].map(([view, text]) => {
+      const b = document.createElement('button');
+      b.className = 'chip';
+      b.type = 'button';
+      b.dataset.view = view;
+      b.textContent = text;
+      b.setAttribute('aria-pressed', String(view === 'assembled'));
+      b.onclick = () => explode(view === 'exploded');
+      return b;
+    }));
+  }
 }
 
 // ---- start ----
@@ -478,13 +563,16 @@ async function main() {
     note.textContent = `The 3D previews need WebGL, which this browser did not provide (${err.message}). The models are still listed and can be downloaded from the repository.`;
     $('grid').before(note);
   }
-  ({ taxonomy, models } = await fetch('models.json').then((r) => r.json()));
-  for (const m of models) cards.set(m.id, makeCard(m));
+  const { taxonomy: vocabulary, models, vehicles } = await fetch('models.json').then((r) => r.json());
+  taxonomy = vocabulary;
+  for (const m of models) modelsById.set(m.id, m);
+  entries = [...vehicles, ...models];
+  for (const m of entries) cards.set(m.id, makeCard(m));
   renderShelves();
   renderFacets();
   applyFilter();
   $('search').addEventListener('input', applyFilter);
-  const fromHash = models.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
+  const fromHash = entries.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
   if (fromHash) openViewer(fromHash);
 }
 

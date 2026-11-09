@@ -54,11 +54,14 @@ through the owning exporter. See `tools/build.mjs`, `loadRecipeTools`, and
 `tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
 A vehicle is authored as its own file of part rows in `models/vehicles/`, beside the kits that press its panels
 from its measures, so parallel authors each add files and none edits a shared list. A recipe selects whole
-vehicles, never single parts, so a vehicle's parts all live in one pack; road vehicles, helicopters and wrecks
+vehicles, never single parts, so a vehicle's own parts all live in one pack, and a part it borrows from another pack
+comes through a declared pack dependency, never a copy; road vehicles, helicopters and wrecks
 are separate packs because a product can want traffic without aircraft or ruins. A vehicle's file sets the
 taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
 import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
-`models/recipes/skelly.ground-vehicles.jsonnet`.
+`models/recipes/skelly.ground-vehicles.jsonnet`. Which part sits where on a vehicle is model data too, in the
+vehicle's placements file beside its rows, so the showcase and the games assemble it from one source; why, and what
+stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
@@ -91,13 +94,16 @@ files in the one shared representation, composed in mobgen's rest frame: roots a
 agree, and consumer facing conventions must not become a second baked rig. See `tools/actorCompose.mjs`,
 `decodeFrame` and `sampleClip`.
 
-A consumer reads pack paths from the manifest and bundles the packs it needs. Which packs a product bundles is
+A consumer reads pack paths from the manifest and bundles the packs it needs, with the packs each of them depends
+on, so a pack that refers to another's models never loads without them; see `models/packs.json`. Which packs a product bundles is
 that product's choice, recorded in its own repository rather than copied here, so this repository never has to
 follow a product's selection. A standalone model does not require a playable item or placement, so a pack can
 carry looks one product uses without inventing gameplay for another. Packs are scoped to content, such as a kind
 of thing, an actor family, a site or a scenario, never to a reader; see the selections in `models/recipes/`. The
 showcase consumes all manifest models, independent of product bundling, and shelves and filters them by the
-category and tags their manifest entries carry; see `site/build.mjs`.
+category and tags their manifest entries carry; see `site/build.mjs`. It shows each vehicle assembled from its
+placements, because a pile of loose panels does not show what the vehicle is, and can explode it to show the parts
+it is made of.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
