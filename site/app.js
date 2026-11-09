@@ -57,7 +57,7 @@ function printedLabel({ text, at, normal, up, size: [width, height] }) {
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
   const g = canvas.getContext('2d');
-  const margin = canvas.width * 0.08;
+  const margin = Math.min(canvas.width, canvas.height) * 0.08;
   const words = text.split(/\s+/);
   // The largest font at which the words, wrapped to the width, fit the height.
   let px = canvas.height;
