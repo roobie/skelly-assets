@@ -13,6 +13,8 @@ export interface ResolvedAppearance {
   readonly color: SrgbColor;
   readonly shade: SrgbColor;
   readonly finish: MaterialAppearance['finish'];
+  /** Set when the material came from a paintable finish slot, so a host repaint may replace it. */
+  readonly paintable?: true;
 }
 
 export const srgbToHex = (color: SrgbColor): number =>
@@ -61,10 +63,13 @@ export const resolveAppearance = (
   const context = options.context ?? {};
   const overrides = options.overrides ?? {};
   const slot = overrides.solidSlot ?? overrides.partSlot ?? own(palette.roleSlots, role);
+  const overridden = overrides.solidMaterial ?? overrides.partMaterial;
+  const finished = slot ? own(context.finish, slot) : undefined;
+  // A material a solid or part fixes is its own, so only one the finish slot supplies takes paint.
+  const paintable = overridden === undefined && finished !== undefined && context.paintable?.includes(slot!) === true;
   const material =
-    overrides.solidMaterial ??
-    overrides.partMaterial ??
-    (slot ? own(context.finish, slot) : undefined) ??
+    overridden ??
+    finished ??
     (slot && context.appearanceProfile
       ? own(own(palette.profileFinishes, context.appearanceProfile) ?? {}, slot)
       : undefined) ??
@@ -76,6 +81,7 @@ export const resolveAppearance = (
   return {
     ...(material === undefined ? {} : { material }),
     ...(slot === undefined ? {} : { slot }),
+    ...(paintable ? { paintable } : {}),
     color: [base[0] * shade[0], base[1] * shade[1], base[2] * shade[2]],
     shade,
     finish: selected?.finish ?? palette.fallbackFinish,

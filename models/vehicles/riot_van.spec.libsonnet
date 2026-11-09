@@ -8,5 +8,5 @@ van.cab + van.saloonFloor + {
   bulkhead: false, slideGlass: true, rearGlass: true,
   windows: [[-3.0, -2.4], [-2.3, -1.7], [-1.6, -1.1], [-1.0, -0.1]],
   bands: [{ finish: 'paint-police-blue', y: [0.86, 0.92] }],
-  borrow: { _bonnet: 'panel_van_bonnet', _rear_bumper: 'high_roof_van_rear_bumper', _floor: 'high_roof_van_load_floor' },
+  borrow: { _bonnet: 'panel_van_bonnet', _front_bumper: 'panel_van_front_bumper', _rear_bumper: 'high_roof_van_rear_bumper', _floor: 'high_roof_van_load_floor' },
 }

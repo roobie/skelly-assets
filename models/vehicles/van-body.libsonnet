@@ -60,7 +60,7 @@ local withCab(s) = s + { borrow+: {
   for suffix in std.objectFields(cabPressings)
   if cabPressings[suffix]('van', s) == cabPressings[suffix]('van', cab)
 } };
-local rows(id, s0) = {
+local pressings(id, s0) = {
   local s = withCab(s0),
   local isBox = std.objectHas(s, 'box'),
   local b = s + (if isBox then s.box else {}),
@@ -305,8 +305,9 @@ local rows(id, s0) = {
       for i in std.range(0, std.length(s.bands) - 1)
     ]), finish),
   ] else []),
-  out: k.unborrowed(id, s, rowsOut),
+  out: rowsOut,
 }.out;
+local rows(id, s0) = k.unborrowed(id, withCab(s0), pressings(id, s0));
 {
   cab: cab,
   // Mixed into a spec to floor its body: for loading, or for standing and fitting seats on.
@@ -373,7 +374,7 @@ local rows(id, s0) = {
     add: [(import 'site.libsonnet').one('grille_panel', 'electric_van_grille_panel')],
   }),
   // The fittings every van shares; a sibling adds its seats behind the cab, cargo and extras.
-  fittings(kit, id, s0):
+  fittings(kit, id, s0): k.painted(id, withCab(s0), pressings(id, s0), (
     local s = withCab(s0);
     local part(suffix) = k.partId(id, s, suffix);
     local fitting = kit.fitting;
@@ -421,5 +422,6 @@ local rows(id, s0) = {
     + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, std.min((if isBox then s.box.side else s.side) - 0.13, s.glassOut - 0.02)], on(['shell']))
     + pair('indicator', 'marker_lamp', [nose + 0.02, 0.6, 0.72], on(['front_bumper']))
     + pair('headlamp', 'headlamp_large', [nose, 0.74, 0.68], on(['front_bumper']))
-    + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell']),
+    + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell'])
+  )),
 }

@@ -9,5 +9,5 @@ van.cab + van.saloonFloor + {
   windows: [[-3.0, -2.45], [-2.35, -1.8], [-1.7, -1.14], [-1.04, -0.56], [-0.46, -0.04]],
   bands: [{ finish: 'paint-green', y: [0.86, 0.97] }],
   seatRows: [-0.38, -1.1, -1.82, -2.54],
-  borrow: { _bonnet: 'camper_van_bonnet', _front_bumper: 'camper_van_front_bumper', _rear_bumper: 'high_roof_van_rear_bumper', _floor: 'high_roof_van_load_floor' },
+  borrow: { _bonnet: 'panel_van_bonnet', _front_bumper: 'panel_van_front_bumper', _rear_bumper: 'high_roof_van_rear_bumper', _floor: 'high_roof_van_load_floor' },
 }

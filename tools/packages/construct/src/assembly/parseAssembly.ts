@@ -117,7 +117,17 @@ const parsePartAppearance = (value: unknown, path: string): Parsed<NonNullable<P
     return fail(path, `expected an object, got ${describeValue(value)}`);
   }
   const finish = parseOptional(value, 'finish', path, (v, p) => parseRecord(v, p, parseString));
-  return finish.ok ? pass(finish.value === undefined ? {} : { finish: finish.value }) : finish;
+  if (!finish.ok) {
+    return finish;
+  }
+  const paintable = parseOptional(value, 'paintable', path, parseStringArray);
+  if (!paintable.ok) {
+    return paintable;
+  }
+  return pass({
+    ...(finish.value === undefined ? {} : { finish: finish.value }),
+    ...(paintable.value === undefined ? {} : { paintable: paintable.value }),
+  });
 };
 
 const parsePartInstance = (value: unknown, path: string): Parsed<PartInstance> => {

@@ -120,6 +120,8 @@ export const NeutralModelSchema = strictObject({
   /** Drawn collision for atomic models, whose mass belongs to the item rather than body parts. */
   collision: optional(pipe(array(ModelBoxSchema), nonEmpty('baked collision needs a box'))),
   emissiveMaterial: optional(pipe(string(), nonEmpty('must not be empty'))),
+  /** Finish slots a host repaints on its copy; the GLB marks their materials `paintable` in their extras. */
+  paintable: optional(pipe(array(Id), nonEmpty('lists no slot'))),
   /**
    * Where the hand holds the model, and the XYZ Euler turn in degrees that carries the file's axes onto the held axes,
    * working end +z and up +y, so a model that faces its working end forward needs none.

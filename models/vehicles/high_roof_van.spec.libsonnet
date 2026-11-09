@@ -5,4 +5,5 @@ van.cab + van.loadFloor + {
   rear: -3.2, rearAxle: -1.98, panLow: 0.42,
   roof: 2.75, canton: 2.63, doorTop: 2.3,
   shellMass: 1350, paint: 'paint-drum-blue',
+  borrow: { _bonnet: 'panel_van_bonnet', _front_wing: 'panel_van_front_wing', _front_door: 'panel_van_front_door', _front_bumper: 'panel_van_front_bumper' },
 }

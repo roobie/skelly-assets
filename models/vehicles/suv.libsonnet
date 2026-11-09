@@ -4,7 +4,7 @@ local box = k.box;
 local s = import 'suv.spec.libsonnet';
 local shape = (import 'car-shape.libsonnet')(s);
 local flare(id, axle) = shape.flare(id, 'trim', axle, s.sill, [s.side - 0.01, s.side + 0.03], 0.06, 0.02);
-local body = import 'car-body.libsonnet';
+local body = (import 'car-body.libsonnet').rows;
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, body('suv', s) + [
   // The hybrid's nose: this file is what the thing tool indexes for a vehicle derived from this one.
   row

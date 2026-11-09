@@ -78,7 +78,7 @@ local fender(name, slot, x, hubY, top, thick, z) =
     prism(name + '_aft', slot, [[x - reach, shoulder], [x - flat, top], [x - flat, top + thick], [x - reach - thick, shoulder]], z),
     prism(name + '_fore', slot, [[x + reach, shoulder], [x + reach + thick, shoulder], [x + flat, top + thick], [x + flat, top]], z),
   ];
-local rows(id, s0) = {
+local pressings(id, s0) = {
   local s = spec(s0),
   local conventional = s.bonnet != null,
   local a = s.frontAxle,
@@ -207,8 +207,9 @@ local rows(id, s0) = {
     box('centre_pillar', 'paint', [s.crew[1], s.floor, s.skin], [s.doorRear, s.windowTop, s.side]),
     box('crew_rear', 'paint', [s.cabBack, s.floor, s.skin], [s.crew[0], s.windowTop, s.side]),
   ])),
-  rows: k.unborrowed(id, s, rows),
-}.rows;
+  pressings: rows,
+}.pressings;
+local rows(id, s0) = k.unborrowed(id, spec(s0), pressings(id, s0));
 local items(kit, id, name, s0) =
   local s = spec(s0);
   local parts = [
@@ -224,7 +225,7 @@ local items(kit, id, name, s0) =
     + (if s.bonnet != null then [['_bonnet', 'bonnet', ['protection']], ['_wing', 'wing', ['protection']]] else [])
     + (if s.crew != null then [['_crew_door', 'crew door', ['entry', 'glazing', 'protection']]] else []);
   [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in parts if !k.borrows(s, p[0])];
-local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
+local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
   local part(suffix) = k.partId(id, s, suffix);
   local rearN = std.length(s.rearAxles);
   local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
@@ -275,6 +276,7 @@ local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; l
   + (if s.guard then pair('mudguard', part('_mudguard'), origin, on(['chassis'])) else [])
   + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
   + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
+local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, s0), laid(kit, id, s0));
 {
   spec: spec,
   archCorners: archCorners,

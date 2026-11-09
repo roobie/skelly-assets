@@ -5,7 +5,7 @@ local s = import 'luxury_saloon.spec.libsonnet';
 local nose = s.front - 0.075;
 local hoodNose = s.hoodBack - (nose - s.aPost) * s.hoodFall;
 local vane = 0.0625;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet')('luxury_saloon', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('luxury_saloon', s) + [
   k.compound('luxury_saloon_grille', 9, [
     box('head', 'bright', [nose, hoodNose - 0.03, -0.34], [nose + 0.075, hoodNose + 0.03, 0.34]),
     box('foot', 'bright', [nose, 0.53, -0.34], [nose + 0.075, 0.57, 0.34]),

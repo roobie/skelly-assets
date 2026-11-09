@@ -9,7 +9,7 @@ local shape = (import 'car-shape.libsonnet')(s);
 local rect(from, to, top) = [[from, s.waist], [to, s.waist], [to, top], [from, top]];
 local pane(id, from, to) = shape.side(id, 'glass', rect(from, to, windowTop), [s.skin + 0.01 - 2 * shape.grain, s.skin + 0.01]);
 local post(id, from) = shape.side(id, 'paint', rect(from, from + 0.1, s.roof - 0.02), [s.skin - 0.02, s.glassOut + 0.02]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet')('limousine', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('limousine', s) + [
   k.compound('limousine_stretch', 180, k.bothSides([
     box('skin', 'paint', [s.rearDoorFront, s.floor, s.skin], [s.bRear, s.waist, s.side]),
     box('liner', 'trim', [s.rearDoorFront, s.floor + 0.02, s.skin - 0.03], [s.bRear, s.waist - 0.02, s.skin]),

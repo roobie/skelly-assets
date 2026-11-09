@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { buildManifest } from '../manifest.mjs';
 import { compileJsonnetFile } from '../jsonnet/index.mjs';
+import { MATERIALS } from '../packages/thing-core/src/materials.ts';
 import { exportPlacements, placementProblems } from '../placements.mjs';
 
 const terms = (...names) => ({ terms: new Map(names.map((name) => [name, name])) });
@@ -13,7 +14,7 @@ const van = { tags: { 'vehicle-body': ['van'] } };
 const models = [
   { id: 'fixture_van_body', pack: 'fixture.vans', taxonomy: van },
   { id: 'fixture_light_bar', pack: 'fixture.rescue' },
-  { id: 'fixture_door', pack: 'fixture.vans' },
+  { id: 'fixture_door', pack: 'fixture.vans', paintable: ['paint'] },
   { id: 'fixture_engine', pack: 'fixture.vans' },
   { id: 'fixture_motor', pack: 'fixture.vans' },
   { id: 'fixture_twice', pack: 'fixture.vans' },
@@ -46,6 +47,16 @@ test('a site that cannot be assembled from the built models is a problem', () =>
   assert.match(broken({ id: 'turned', part: 'fixture_door', at: [0, 0, 0], yaw: 1 }), /unknown keys yaw/);
   assert.match(problems({ van: { forward: '+z', sites: [] } }), /no sites/);
   assert.match(problems({ van: { forward: '+y', sites: vanSites } }), /forward is not one of/);
+});
+
+// A finish seeds the paint of the part's copy, so one outside the library or on a part with nothing to paint would set
+// nothing, and only a game would notice.
+test('a site finish names a library material on a part that takes paint', () => {
+  const paint = Object.keys(MATERIALS)[0];
+  const sites = (site) => problems({ van: { forward: '+z', sites: [body, site] } });
+  assert.equal(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: paint }), '');
+  assert.match(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: 'fixture-unknown' }), /not in the finish library/);
+  assert.match(sites({ id: 'engine', part: 'fixture_engine', at: [0, 0, 0], finish: paint }), /no paintable slot/);
 });
 
 // A copied part would drift from its source unseen; an undeclared reference would load without its pack.

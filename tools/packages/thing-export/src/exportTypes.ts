@@ -20,6 +20,8 @@ export type SrgbColor = readonly [red: number, green: number, blue: number];
 export interface AppearanceContext {
   readonly appearanceProfile?: string;
   readonly finish?: Readonly<Record<string, string>>;
+  /** Finish slots whose material a host may repaint; see `appearance.ts`, `resolveAppearance`. */
+  readonly paintable?: readonly string[];
 }
 
 export interface MaterialAppearance {

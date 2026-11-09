@@ -34,7 +34,7 @@ export const exportItem = (
   voxel: VoxelGrains,
   { collision = false }: { readonly collision?: boolean } = {},
 ) => {
-  const { report, masses, handling, label, drawn, glow } = buildItem(item, settings, voxel);
+  const { report, masses, handling, label, drawn, glow, paintable } = buildItem(item, settings, voxel);
   const out = exportGlb({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
@@ -73,6 +73,7 @@ export const exportItem = (
       ...(item.exportMass === 'parts' ? { parts } : {}),
       ...handling,
       ...(glow ? { emissiveMaterial: glow } : {}),
+      ...(paintable.length > 0 ? { paintable } : {}),
       ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
     },
     physical: assemblyProperties(parts),

@@ -9,7 +9,7 @@
   hatchSide: 0.65, glassIn: 0.81, glassOut: 0.895, rearFloorFront: -0.5,
   hoodBack: 0.82, hoodFall: 0.13, lampTop: 0.74,
   bumperLow: 0.22, bumperTop: 0.46, slamTop: 0.6, towerTop: 0.62, grilleHalf: 0.5, grilleLow: 0.48,
-  tumble: 0.25, boot: true, twoDoor: true, archLiner: true, bumperPaint: 'paint-signal-yellow', stripe: 'satin-black',
+  tumble: 0.25, boot: true, twoDoor: true, archLiner: true, stripe: 'satin-black',
   hubHeight: 0.34375, wheelZ: 0.825,
   shellMass: 640, paint: 'paint-signal-yellow',
 }

@@ -31,7 +31,7 @@ local tailPanel(id, slot, low, high, half) = shape.across(id, slot, tailProfile(
 local glassLow = s.waist + 0.06;
 local glassHigh = s.roof - 0.06;
 local glassHalf = 0.26;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet')('hearse', s)) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet').rows('hearse', s)) + [
   // The narrow rear glass, in a blind tail: a real hearse opens by the whole tail, so the hinge stays at its head.
   k.compound('hearse_tailgate', 22, [
     box('skin', 'paint', [s.rear + 0.05, 0.62, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),

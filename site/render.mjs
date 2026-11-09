@@ -61,6 +61,7 @@ function loadVehicle(vehicle) {
         part.name = site.site;
         part.position.fromArray(site.at);
         if (site.mirror) part.scale.x = -1;
+        if (site.paint) repaint(part, site.paint);
         scene.add(part);
         triangles += parts[i].triangles;
         for (const m of parts[i].materials) materials.set(m.name, m);
@@ -69,6 +70,30 @@ function loadVehicle(vehicle) {
     })());
   }
   return cache.get(vehicle.id);
+}
+
+// A site's finish paints that copy of its part, as a game spawning the vehicle would: only the materials the part marks
+// paintable take it, each keeping the shade its export gave it, and the clone's other copies keep their own paint.
+function repaint(part, paint) {
+  const copies = new Map();
+  const painted = (material) => {
+    if (!material.userData?.paintable) return material;
+    if (!copies.has(material)) {
+      const copy = material.clone();
+      const [r, g, b] = paint.colour;
+      const [sr, sg, sb] = material.userData.colourMultiplier ?? [1, 1, 1];
+      copy.color.setRGB(r * sr, g * sg, b * sb, THREE.SRGBColorSpace);
+      copy.metalness = paint.metallic;
+      copy.roughness = paint.roughness;
+      copy.opacity = paint.opacity;
+      copy.transparent = paint.opacity < 1;
+      copies.set(material, copy);
+    }
+    return copies.get(material);
+  };
+  part.traverse((o) => {
+    if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map(painted) : painted(o.material);
+  });
 }
 
 export const isVehicle = (entry) => Boolean(entry.sites);
