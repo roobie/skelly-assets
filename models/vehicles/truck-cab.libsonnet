@@ -223,7 +223,7 @@ local items(kit, id, name, s0) =
   ] + (if s.guard then [['_mudguard', 'mudguard', ['protection']]] else [])
     + (if s.bonnet != null then [['_bonnet', 'bonnet', ['protection']], ['_wing', 'wing', ['protection']]] else [])
     + (if s.crew != null then [['_crew_door', 'crew door', ['entry', 'glazing', 'protection']]] else []);
-  [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in parts if !std.objectHas(std.get(s, 'borrow', {}), p[0])];
+  [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in parts if !k.borrows(s, p[0])];
 local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
   local part(suffix) = k.partId(id, s, suffix);
   local rearN = std.length(s.rearAxles);

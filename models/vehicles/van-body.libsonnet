@@ -337,7 +337,7 @@ local rows(id, s0) = {
     ]
     + (if std.objectHas(s, 'floorPart') then [[s.floorPart.suffix, s.floorPart.label, s.floorPart.capabilities]] else [])
     + (if std.objectHas(s, 'box') then [['_box', 'box body', ['structure', 'protection']]] else []);
-    [part(p[0], p[1], p[2]) for p in parts if !std.objectHas(s.borrow, p[0])],
+    [part(p[0], p[1], p[2]) for p in parts if !k.borrows(s, p[0])],
   cabItems(kit): [
     kit.part('van_windscreen', 'van windscreen', kit.pileSize, ['glazing']),
     kit.part('van_dashboard', 'van dashboard', kit.pileSize, ['structure']),

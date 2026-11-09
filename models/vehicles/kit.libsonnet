@@ -71,8 +71,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   far: far,
   bothSides(pieces): std.map(near, pieces) + std.map(far, pieces),
   // A vehicle whose pressing would be identical to a sibling's fits the sibling's row instead, so a shared part is one
-  // row, item and model. A spec's `borrow` maps each such pressing's suffix to the row it fits; `partId` names the row
-  // a fitting takes and `unborrowed` drops the borrowed pressings from a kit's rows.
+  // row, item and model. A spec's `borrow` maps each such pressing's suffix to the row it fits; `borrows` tells whether a
+  // pressing is borrowed, `partId` names the row a fitting takes and `unborrowed` drops the borrowed pressings from a kit's rows.
+  borrows(s, suffix): std.objectHas(std.get(s, 'borrow', {}), suffix),
   partId(id, s, suffix): std.get(std.get(s, 'borrow', {}), suffix, id + suffix),
   unborrowed(id, s, rows):
     local borrowed = [id + suffix for suffix in std.objectFields(std.get(s, 'borrow', {}))];
