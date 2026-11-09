@@ -51,9 +51,10 @@ local packOf(row) =
   // The ids of the catalogue rows that pack `packId` exports.
   ids(packId):: std.set([id for id in std.objectFields($.packs) if $.packs[id] == packId]),
   // The item rows whose ids `ids` lists, in item order. Every recipe filters the whole item list, so membership is a
-  // field lookup: go-jsonnet's std.setMember walks the set, and a recipe then costs rows times ids.
+  // field lookup: go-jsonnet's std.setMember walks the set, and a recipe then costs rows times ids. std.set drops a
+  // repeated id, which a field comprehension rejects.
   rows(ids)::
-    local wanted = { [id]: true for id in ids };
+    local wanted = { [id]: true for id in std.set(ids) };
     [row for row in (import 'packages/thing-authoring-tool/items.jsonnet').items if std.objectHas(wanted, row.id)],
   // The recipe rows of a pack that holds only catalogue rows.
   recipe(packId):: [

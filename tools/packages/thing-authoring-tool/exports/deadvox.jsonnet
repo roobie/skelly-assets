@@ -3,7 +3,7 @@ local voxel = import '../../../jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import '../../../jsonnet/lib/taxonomy.libsonnet';
 // models/export.json maps each roster pack id to its ids.
 // A field per id, since std.member walks the whole list for every item row.
-local roster = { [id]: true for id in std.flattenArrays(std.objectValues(import '../../../../models/export.json')) };
+local roster = { [id]: true for id in std.set(std.flattenArrays(std.objectValues(import '../../../../models/export.json'))) };
 [
   {
     id: row.id,
