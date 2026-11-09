@@ -76,9 +76,9 @@ jobs:
           path: ${{ runner.temp }}/fresh
       - run: node tools/check-built.mjs --fresh "$RUNNER_TEMP/fresh/built-1" --fresh "$RUNNER_TEMP/fresh/built-2"
 
-  # The site is assembled while the tests still run; only deploying it waits for them.
+  # The site is assembled while the tests and the check still run; only deploying it waits for them.
   pages:
-    needs: check
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -124,7 +124,7 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [test, pages]
+    needs: [test, check, pages]
     permissions:
       pages: write
       id-token: write
