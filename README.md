@@ -2,6 +2,7 @@
 read_if:
   - adding a model, choosing its content pack or consuming shared assets
   - understanding asset ownership, turned-piece appearance or actor clip contracts
+  - labelling a packaged model's print, or drawing labels in a consumer
 ---
 
 # skelly-assets
@@ -93,6 +94,15 @@ Use `manifest.json` as the consumer-facing file authority, not a parallel list i
 `tools/manifest.mjs`, `readCredits`. Nothing sits flat beside the manifest, so every file belongs to a pack a
 consumer can choose to bundle. CI holds every build to its manifest and to the declared packs before it is
 shown or released; see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDifferences`.
+
+### Printed labels
+
+A packaged item without its print reads as a blank box, so a catalogue row can name the face of a piece that
+carries its print and the text, which defaults to the model's display name. The label travels as metadata beside
+the GLB, never as lettering in its geometry: each consumer draws text in its own renderer and font, and relabelling a
+row leaves the model's bytes alone. See `tools/packages/thing-authoring-tool/src/catalogue.ts`, `ItemSchema`, and
+`tools/packages/thing-core/src/schema.ts`, `NeutralModelSchema`; the showcase draws it in `site/app.js`,
+`printedLabel`.
 
 ### Shared turned look and fit limits
 
