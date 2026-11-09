@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local s = import 'cement_mixer.spec.libsonnet';
@@ -70,10 +69,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('rim_side', 'yellow', [-3.72 + wall, s.rimY, 0.64 - wall], [-2.68 - wall, s.rimY + 0.06, 0.64]),
   ]), finish),
   k.compound('cement_mixer_chute', 60, [
-    m.bar('main', 'rust', [-3.32, s.headY - 0.1], [-3.9, 1.84], 0.2, [-0.26, 0.26]),
-    m.bar('tip', 'steel', [-3.9, 1.84], [-4.08, 1.42], 0.14, [-0.2, 0.2]),
+    k.bar('main', 'rust', [-3.32, s.headY - 0.1], [-3.9, 1.84], 0.2, [-0.26, 0.26]),
+    k.bar('tip', 'steel', [-3.9, 1.84], [-4.08, 1.42], 0.14, [-0.2, 0.2]),
   ] + k.bothSides([
-    m.bar('cheek', 'yellow', [-3.3, s.headY - 0.04], [-3.92, 1.92], 0.2, [0.26, 0.29]),
+    k.bar('cheek', 'yellow', [-3.3, s.headY - 0.04], [-3.92, 1.92], 0.2, [0.26, 0.29]),
   ]), finish),
   k.compound('cement_mixer_platform', 70, [
     box('grating', 'alu', [-3.72, s.platformY - 0.04, 0.6], [-3.1, s.platformY, 1.16]),

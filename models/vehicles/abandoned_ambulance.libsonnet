@@ -107,7 +107,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
              finish),
   k.compound('abandoned_ambulance_bumper', 18, [
     // Off its near mount, the end resting on the road.
-    w.xprism('beam', 'trim', [[0.38, -0.3], [0.52, -0.3], [0.16, 1.0], [0.02, 1.0]], [2.6, 2.74]),
+    k.xPrism('beam', 'trim', [[0.38, -0.3], [0.52, -0.3], [0.16, 1.0], [0.02, 1.0]], [2.6, 2.74]),
     box('beam_far', 'trim', [2.6, 0.38, -1.0], [2.74, 0.52, -0.3]),
   ], finish),
   k.compound('abandoned_ambulance_lamp', 6, [

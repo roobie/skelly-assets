@@ -102,7 +102,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
              s.swung('panel', [0.86, s.rear], [1.56, s.rear - 0.56], 0.05, function(t) 0.44 * (1 - t), function(t) 1.8 - 0.36 * t, function(t, y) burn(0.5 + 0.8 * (s.noise(83, t * 1.1, y) - 0.5))),
              finish),
   k.compound('burnt_out_van_bumper', 16, [
-    s.xprism('beam', 'rust', [[0, -0.95], [0.12, -0.95], [0.46, 0.95], [0.34, 0.95]], [2.62, 2.7]),
+    k.xPrism('beam', 'rust', [[0, -0.95], [0.12, -0.95], [0.46, 0.95], [0.34, 0.95]], [2.62, 2.7]),
   ], { rust: 'scrap-rusted' }),
   k.compound('burnt_out_van_engine', 210, [
     box('block', 'soot', [1.78, 0.3, -0.26], [2.32, 0.8, 0.26]),

@@ -65,8 +65,6 @@ local surface(tag, xs, zs, y, thick, slot) = std.flattenArrays([
   ]
   for i in std.range(0, std.length(xs) - 2)
 ]);
-local yprism(id, slot, profile, y) = { id: id, kind: 'prism', slot: slot, axis: 'y', profile: profile, start: y[0], end: y[1] };
-local xprism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
 // A flat door or panel standing on edge, seen from above as a strip from `from` to `to`, both (z, x). It steps down along
 // its length, between `bottom(t)` and `top(t)`, so a door off its hinge can trail its free corner on the road.
 local swung(tag, from, to, thick, bottom, top, slot, cells=8) =
@@ -84,7 +82,7 @@ local swung(tag, from, to, thick, bottom, top, slot, cells=8) =
     local high = top(t);
     local rows = std.max(1, std.ceil((high - low) / 0.14));
     [
-      yprism(tag + '_' + i + '_' + j, slot(t, low + (j + 0.5) * (high - low) / rows), [
+      k.yPrism(tag + '_' + i + '_' + j, slot(t, low + (j + 0.5) * (high - low) / rows), [
         a,
         b,
         [b[0] + nz, b[1] + nx],
@@ -107,8 +105,6 @@ local rim(id, massKg, radius, width, rust='scrap-rusted', dish='steel-spall-blac
   noise: noise,
   sheet: sheet,
   surface: surface,
-  yprism: yprism,
-  xprism: xprism,
   swung: swung,
   rim: rim,
   // Picks the slot from `levels`, [[threshold, slot], ...] highest first.

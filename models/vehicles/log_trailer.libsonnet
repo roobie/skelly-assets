@@ -45,6 +45,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     + bothSides([box('post', 'frame', [3.28, s.frameHigh, 0.92], [3.4, 2.72, 1.04])]),
     { frame: s.frame }),
   k.compound('log_trailer_mudguard', 12,
-    std.flattenArrays([h.arcBand('arc_' + i, 'dark', s.axles[i], s.hub, 0.46, 0.49, 10, 170, 8, [s.wheelZ - 0.13, s.wheelZ + 0.16]) for i in [0, 1]]),
+    std.flattenArrays([k.arc('arc_' + i, 'dark', s.axles[i], s.hub, 0.46, 0.49, 10, 170, 8, [s.wheelZ - 0.13, s.wheelZ + 0.16]) for i in [0, 1]]),
     { dark: s.dark }),
 ])

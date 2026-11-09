@@ -110,7 +110,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   ), finish),
   k.compound('overturned_delivery_van_bumper', 16, lying([
     // Torn from its near mount, so it swings down across the nose.
-    w.xprism('beam', 'trim', [[0.34, -1.0], [0.48, -1.0], [0.76, 0.86], [0.62, 0.86]], [2.56, 2.68]),
+    k.xPrism('beam', 'trim', [[0.34, -1.0], [0.48, -1.0], [0.76, 0.86], [0.62, 0.86]], [2.56, 2.68]),
   ]), finish),
   k.compound('overturned_delivery_van_engine', 240, lying([
     box('block', 'soot', [1.8, 0.5, -0.26], [2.34, 0.98, 0.26]),
@@ -157,8 +157,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
     box('g_tape', 'tape', [-2.5, 0.5, -0.06], [-1.96, 0.51, 0.02]),
     box('h', 'tan', [-1.9, 0.06, -0.5], [-1.5, 0.36, -0.1]),
     box('i', 'card', [-2.42, 0.5, -0.24], [-2.1, 0.74, 0.12]),
-    w.yprism('j', 'card', [[1.3, -3.2], [1.7, -3.42], [1.9, -3.08], [1.5, -2.86]], [0, 0.3]),
-    w.yprism('k', 'tan', [[1.65, -4.2], [1.95, -4.32], [2.05, -4.04], [1.75, -3.92]], [0, 0.2]),
+    k.yPrism('j', 'card', [[1.3, -3.2], [1.7, -3.42], [1.9, -3.08], [1.5, -2.86]], [0, 0.3]),
+    k.yPrism('k', 'tan', [[1.65, -4.2], [1.95, -4.32], [2.05, -4.04], [1.75, -3.92]], [0, 0.2]),
   ], { card: 'cardboard-corrugated', tan: 'paperboard-tan', dark: 'paperboard-brown', tape: 'tape-tan' }),
   k.compound('overturned_delivery_van_seat', 20, std.map(function(piece) s.lie(piece, 0, 0), [
     box('base', 'frame', [-0.22, 0, -0.2], [0.22, 0.3, 0.2]),

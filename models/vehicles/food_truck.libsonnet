@@ -6,7 +6,6 @@ local w = s.windows[0];
 local x0 = w[0] - 0.15;
 local x1 = w[1] + 0.15;
 local n = 6;
-local xprism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
 local awningTop = s.windowTop + 0.1;
 taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('food_truck', s) + [
   k.compound('food_truck_counter', 20, [
@@ -19,12 +18,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libson
     box('far_vent', 'dark', [-1.5, 1.72, -s.glassOut - 0.05], [-1.0, 2.0, -s.glassOut - 0.02]),
   ], { steel: 'steel-stainless', dark: 'plastic-black', paint: s.paint }),
   k.compound('food_truck_awning', 18, [
-    xprism('stripe' + i, if i % 2 == 0 then 'red' else 'white',
+    k.xPrism('stripe' + i, if i % 2 == 0 then 'red' else 'white',
            [[awningTop, s.glassOut], [awningTop + 0.03, s.glassOut], [awningTop - 0.2, s.side + 0.8], [awningTop - 0.23, s.side + 0.8]],
            [x0 + i * (x1 - x0) / n, x0 + (i + 1) * (x1 - x0) / n])
     for i in std.range(0, n - 1)
   ] + [
-    xprism('strut' + i, 'steel',
+    k.xPrism('strut' + i, 'steel',
            [[awningTop - 0.65, s.glassOut], [awningTop - 0.61, s.glassOut], [awningTop - 0.21, s.side + 0.72], [awningTop - 0.25, s.side + 0.72]],
            [[x0, x1 - 0.04][i], [x0 + 0.04, x1][i]])
     for i in [0, 1]

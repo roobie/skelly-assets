@@ -6,17 +6,6 @@
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
-// An x prism's profile is (y, z) and a y prism's is (z, x), both counterclockwise.
-local xprism(id, slot, profile, x) = { id: id, kind: 'prism', slot: slot, axis: 'x', profile: profile, start: x[0], end: x[1] };
-local yprism(id, slot, profile, y) = { id: id, kind: 'prism', slot: slot, axis: 'y', profile: profile, start: y[0], end: y[1] };
-local near(piece) = piece + { id: piece.id + '_near' };
-local far(piece) = piece + { id: piece.id + '_far' } + (
-  if piece.kind == 'box' then { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] }
-  else if piece.axis == 'z' then { start: -piece.end, end: -piece.start }
-  else if piece.axis == 'x' then { profile: std.reverse([[point[0], -point[1]] for point in piece.profile]) }
-  else { profile: std.reverse([[-point[0], point[1]] for point in piece.profile]) }
-);
-local bothSides(pieces) = std.map(near, pieces) + std.map(far, pieces);
 // Whole grains, because a thinner strip rounds to nothing on some walls and to a grain on others, and speckles.
 local grain = 1 / 32;
 // The closed wheel tub behind an arch cut: its inner wall and its roof follow the panel's five-sided opening, from
@@ -95,7 +84,7 @@ local rows(id, s) = {
     wall('lower_mid', [s.rearAxle + s.arch, s.slideRear], [b.sill, b.waist]),
   ] + bands('lower_rear', [tail, s.rearAxle - s.arch], b.side) + bands('lower_mid', [s.rearAxle + s.arch, s.slideRear], b.side) + archPieces('rear_arch', s.rearAxle, b.waist),
   local section(low) = [[low, -b.glassOut], [b.canton, -b.glassOut], [b.roof, -b.roofSide], [b.roof, b.roofSide], [b.canton, b.glassOut], [low, b.glassOut]],
-  local chassis = bothSides([
+  local chassis = k.bothSides([
     box('frame_rail', 'pan', [tail + 0.1, 0.38, 0.42], [nose - 0.1, 0.52, 0.5]),
   ]),
   // A floor's 2 cm rounds to one vertex grain, so a pan closer than two grains would meet its top face and z-fight.
@@ -106,9 +95,9 @@ local rows(id, s) = {
     box('pan_axle', 'pan', [s.rearAxle - s.arch, b.panLow, -rearTubIn], [s.rearAxle + s.arch, panTop, rearTubIn]),
     box('pan_rear', 'pan', [tail + 0.06, b.panLow, -b.skin], [s.rearAxle - s.arch, panTop, b.skin]),
     box('rear_sill', 'paint', [tail, b.sill, -b.skin], [tail + 0.06, b.rearSill, b.skin]),
-    xprism('rear_header', 'paint', section(b.doorTop), [tail, tail + 0.06]),
+    k.xPrism('rear_header', 'paint', section(b.doorTop), [tail, tail + 0.06]),
     box('roof', 'paint', [tail, b.roof - 0.04, -b.roofSide], [if rise || isBox then bodyFront else roofFront, b.roof, b.roofSide]),
-  ] + bothSides(lowerToDoor + (if isBox then [] else [
+  ] + k.bothSides(lowerToDoor + (if isBox then [] else [
     box('skirt', 'pan', [s.rearAxle + s.arch, 0.3, b.side - 0.06], [bodyFront, b.sill, b.side - 0.04]),
   ]) + [
     box('rear_post', 'paint', [tail, b.rearSill, b.hatchSide], [tail + 0.06, b.waist, b.side]),
@@ -118,14 +107,14 @@ local rows(id, s) = {
     if s.bands[i].y[0] >= b.rearSill
   ] + [
     box('rear_post_upper', 'paint', [tail, b.waist, b.hatchSide], [tail + 0.06, b.doorTop, b.glassOut]),
-    xprism('cant', 'paint', [[b.canton, b.glassOut - 0.08], [b.roof - 0.04, b.roofSide - 0.1], [b.roof, b.roofSide], [b.canton, b.glassOut]], [tail, if rise || isBox then bodyFront else roofFront]),
-  ]) + std.map(near, [
+    k.xPrism('cant', 'paint', [[b.canton, b.glassOut - 0.08], [b.roof - 0.04, b.roofSide - 0.1], [b.roof, b.roofSide], [b.canton, b.glassOut]], [tail, if rise || isBox then bodyFront else roofFront]),
+  ]) + std.map(k.near, [
   ] + (if slideFront < bodyFront then [wall('front_lower', [slideFront, bodyFront], [b.sill, b.waist])] + bands('front_lower', [slideFront, bodyFront], b.side) else []))
-  + std.map(near, upper('upper', tail, s.slideRear, rearWindows) + [
+  + std.map(k.near, upper('upper', tail, s.slideRear, rearWindows) + [
     box('over_door', 'paint', [s.slideRear, b.doorTop, b.glassIn], [bodyFront, b.canton, b.glassOut]),
     box('slide_rail', 'pan', [s.slideRear - 0.9, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.side + 0.012]),
   ] + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
-  + std.map(far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
+  + std.map(k.far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
     + bands('wall_mid', [s.slideRear, bodyFront], b.side)
     + upper('upper', tail, bodyFront, b.windows)),
   // Closes the cab's rear without passing the chamfered roof edge.
@@ -144,10 +133,10 @@ local rows(id, s) = {
     box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, hood(nose) - 0.03, s.side - 0.1]),
     box('front_tub_floor', 'pan', [s.frontAxle - s.arch, s.sill, -s.tubIn], [s.frontAxle + s.arch, 0.5, s.tubIn]),
     box('front_apron', 'pan', [s.frontAxle + s.arch, s.sill, -s.side + 0.1], [nose - 0.04, 0.6, s.side - 0.1]),
-  ] + (if s.bulkhead then [xprism('bulkhead', 'lining', cabEnd, [s.bRear - 0.04, s.bRear])] else [])
+  ] + (if s.bulkhead then [k.xPrism('bulkhead', 'lining', cabEnd, [s.bRear - 0.04, s.bRear])] else [])
   + (if isBox then [
     box('cab_roof', 'paint', [s.bRear, s.roof - 0.04, -s.roofSide], [roofFront, s.roof, s.roofSide]),
-    xprism('cab_back', 'paint', cabEnd, [s.bRear, s.bRear + 0.04]),
+    k.xPrism('cab_back', 'paint', cabEnd, [s.bRear, s.bRear + 0.04]),
   ] else if rise then [
     // A short steep fairing: a long shallow slope would show as a few metre-long steps at the vertex grain.
     prism('roof_rise', 'paint', [[s.bRear, s.canton - 0.02], [s.bRear + 0.24, s.cabRoof - 0.04], [s.bRear + 0.24, s.cabRoof], [s.bRear, s.roof]], [-s.roofSide, s.roofSide]),
@@ -157,7 +146,7 @@ local rows(id, s) = {
   + [box('header', 'paint', [roofFront - 0.1, s.cabRoof - 0.1, -s.roofSide], [roofFront + 0.08, s.cabRoof, s.roofSide])]
   + [box('headliner', 'headliner', [s.bFront, s.cabRoof - 0.06, -s.roofSide + 0.02], [roofFront - 0.02, s.cabRoof - 0.04, s.roofSide - 0.02])]
   + chassis
-  + bothSides([
+  + k.bothSides([
     box('cab_skirt', 'pan', [s.bRear, 0.3, s.side - 0.06], [s.frontAxle - s.arch, s.sill, s.side - 0.04]),
     prism('a_pillar', 'paint', [[s.aPost - 0.1, s.waist], [s.aPost, s.waist], [pillarAt(pillarTop) + 0.1, pillarTop], [pillarAt(pillarTop), pillarTop]], [s.glassIn, s.glassOut]),
     box('b_pillar_lower', 'paint', [s.bRear, s.sill, s.skin], [s.bFront, s.waist, s.side]),
@@ -166,7 +155,7 @@ local rows(id, s) = {
   ] + archLiner('front_tub', s.frontAxle - s.arch, s.frontAxle + s.arch, s.sill, s.archTop, s.archCorner, s.tubIn, s.side - 0.1) + (if !rise then [
     prism('a_pillar_top', 'paint', [[pillarAt(pillarTop), pillarTop], [pillarAt(pillarTop) + 0.1, pillarTop], [roofFront, s.cabRoof - 0.02], [roofFront - 0.1, s.cabRoof - 0.02]], [s.roofSide - 0.1, s.glassIn]),
   ] else []) + (if isBox then [
-    xprism('cab_cant', 'paint', [[s.canton, s.glassOut - 0.08], [s.roof - 0.04, s.roofSide - 0.1], [s.roof, s.roofSide], [s.canton, s.glassOut]], [s.bRear, roofFront]),
+    k.xPrism('cab_cant', 'paint', [[s.canton, s.glassOut - 0.08], [s.roof - 0.04, s.roofSide - 0.1], [s.roof, s.roofSide], [s.canton, s.glassOut]], [s.bRear, roofFront]),
   ] else []) + bands('b_pillar', [s.bRear, s.bFront], s.side)),
   local doorAnchors = { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] },
   local winTop = s.windowTop,
@@ -177,7 +166,7 @@ local rows(id, s) = {
       local screenTop = s.cabRoof - 0.05;
       local topLean = s.aLean * (screenTop - s.waist) / (s.cabRoof - s.waist);
       prism('glass', 'glass', [[s.aPost - 0.07, s.waist], [s.aPost - 0.02, s.waist], [s.aPost - 0.02 - topLean, screenTop], [s.aPost - 0.07 - topLean, screenTop]], [-s.glassIn, s.glassIn]),
-    ] + bothSides([
+    ] + k.bothSides([
       prism('quarter', 'glass', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist]] + (if pillarY(s.cowl) > s.windowTop then [[pillarAt(s.windowTop), s.windowTop], [s.cowl, s.windowTop]] else [[s.cowl, pillarY(s.cowl)]]), [s.glassOut - 0.03, s.glassOut - 0.01]),
     ]), { glass: 'glass-clear' }),
     k.compound(id + '_bonnet', 20, [
@@ -189,15 +178,15 @@ local rows(id, s) = {
       prism('corner_rear', 'paint', [[s.frontAxle - s.arch, s.archTop - s.archCorner], [s.frontAxle - s.arch + s.archCorner, s.archTop], [s.frontAxle - s.arch, s.archTop]], [s.side - 0.1, s.side]),
       prism('corner_front', 'paint', [[s.frontAxle + s.arch - s.archCorner, s.archTop], [s.frontAxle + s.arch, s.archTop - s.archCorner], [s.frontAxle + s.arch, s.archTop]], [s.side - 0.1, s.side]),
       prism('nose', 'paint', [[s.frontAxle + s.arch, bumperTop], [nose - 0.2, bumperTop], [nose - 0.2, hood(nose - 0.2)], [s.frontAxle + s.arch, hood(s.frontAxle + s.arch)]], [s.side - 0.1, s.side]),
-      yprism('corner', 'paint', [[s.side - 0.1, nose - 0.2], [s.side, nose - 0.2], [s.side - 0.1, nose]], [bumperTop, hood(nose)]),
+      k.yPrism('corner', 'paint', [[s.side - 0.1, nose - 0.2], [s.side, nose - 0.2], [s.side - 0.1, nose]], [bumperTop, hood(nose)]),
     ] + bands('rear', [s.cowl, s.frontAxle - s.arch], s.side, true)
     + bands('over_arch', [s.frontAxle - s.arch, s.frontAxle + s.arch], s.side, true)
     + bands('nose', [s.frontAxle + s.arch, nose - 0.2], s.side, true), finish),
     k.compound(id + '_front_bumper', 14, [
-      yprism('bar', 'bumper', [[-(s.side - 0.02), s.frontAxle + s.arch], [s.side - 0.02, s.frontAxle + s.arch], [s.side - 0.02, nose - 0.12], [s.side - 0.2, s.front], [-(s.side - 0.2), s.front], [-(s.side - 0.02), nose - 0.12]], [0.3, bumperTop]),
+      k.yPrism('bar', 'bumper', [[-(s.side - 0.02), s.frontAxle + s.arch], [s.side - 0.02, s.frontAxle + s.arch], [s.side - 0.02, nose - 0.12], [s.side - 0.2, s.front], [-(s.side - 0.2), s.front], [-(s.side - 0.02), nose - 0.12]], [0.3, bumperTop]),
       box('grille', 'trim', [nose, 0.66, -0.48], [nose + 0.03, 0.92, 0.48]),
       box('grille_bar', 'bumper', [nose + 0.03, 0.78, -0.48], [nose + 0.04, 0.82, 0.48]),
-    ] + bothSides([
+    ] + k.bothSides([
       box('lamp_bezel', 'trim', [nose, 0.74, 0.5], [nose + 0.015, 0.95, 0.86]),
     ]) + [
       box('intake', 'trim', [s.front, 0.34, -0.5], [s.front + 0.01, 0.46, 0.5]),
@@ -286,14 +275,14 @@ local rows(id, s) = {
       box('deck', 'deck', [tail + 0.06, b.floor - 0.02, -b.skin], [bodyFront - 0.08, b.floor, b.skin]),
     ] else [
       box('deck', 'deck', [tail + 0.06, b.floor - 0.02, -s.tubIn], [bodyFront - 0.08, b.floor, s.tubIn]),
-    ] + bothSides([
+    ] + k.bothSides([
       box('deck_rear', 'deck', [tail + 0.06, b.floor - 0.02, s.tubIn], [s.rearAxle - s.arch, b.floor, b.skin]),
       box('deck_front', 'deck', [s.rearAxle + s.arch, b.floor - 0.02, s.tubIn], [bodyFront - 0.08, b.floor, b.skin]),
     ]), { deck: std.get(s, 'deck', 'plastic-charcoal') }),
   ] else []) + (if isBox then [
     k.compound(id + '_box', s.box.mass, bodyPieces + [
-      xprism('front_wall', 'paint', section(b.sill), [bodyFront - 0.08, bodyFront]),
-    ] + bothSides([
+      k.xPrism('front_wall', 'paint', section(b.sill), [bodyFront - 0.08, bodyFront]),
+    ] + k.bothSides([
       box('step_band' + i, 'band' + i, [bodyFront, s.bands[i].y[0], s.side], [bodyFront + grain, s.bands[i].y[1], b.side])
       for i in std.range(0, std.length(s.bands) - 1)
     ]), finish),

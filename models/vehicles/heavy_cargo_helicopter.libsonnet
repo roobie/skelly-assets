@@ -71,7 +71,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
     k.prism('deck', 'dark', [[s.rampTip, 0], [s.rampTip + 0.1, 0], [s.floorRear, s.floorTop - 0.09], [s.floorRear, s.floorTop]], [-1.45, 1.45]),
     box('hinge_bar', 'dark', [s.floorRear - 0.06, s.floorTop - 0.12, -1.45], [s.floorRear + 0.02, s.floorTop, 1.45]),
   ] + k.bothSides([
-    m.bar('side', 'paint', [s.rampTip + 0.02, 0.1], [s.floorRear, s.floorTop + 0.1], 0.1, [1.35, 1.45]),
+    k.bar('side', 'paint', [s.rampTip + 0.02, 0.1], [s.floorRear, s.floorTop + 0.1], 0.1, [1.35, 1.45]),
   ]), finishes, { hinge_a: ['hinge_bar', [0.5, 0.5, 0.1]], hinge_b: ['hinge_bar', [0.5, 0.5, 0.9]] }),
   k.compound('heavy_cargo_helicopter_windscreen', 60,
              wall('near', 'glass', s.windscreen, [3, s.screenArc])

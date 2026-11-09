@@ -5,8 +5,7 @@ local s = import 'golf_cart.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
-local fender(id, x) = m.arc(id, 'guard', x, s.hub, 0.27, 0.33, 8, 172, 8, [0.4, 0.62]);
+local fender(id, x) = k.arc(id, 'guard', x, s.hub, 0.27, 0.33, 8, 172, 8, [0.4, 0.62]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('golf_cart_frame', s.shellMass, [
     box('spine', 'dark', [-1.08, 0.16, -0.3], [1.12, 0.25, 0.3]),
@@ -29,11 +28,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('roof', 'paint', [-0.76, s.roof - 0.05, -0.6], [0.66, s.roof, 0.6]),
     box('roof_rim', 'dark', [-0.7, s.roof - 0.08, -0.54], [0.6, s.roof - 0.05, 0.54]),
   ] + bothSides([
-    bar('post_front', 'dark', [0.64, 0.92], [0.42, s.roof - 0.05], 0.05, [0.5, 0.55]),
+    k.bar('post_front', 'dark', [0.64, 0.92], [0.42, s.roof - 0.05], 0.05, [0.5, 0.55]),
     box('post_rear', 'dark', [-0.5, 0.58, 0.5], [-0.45, s.roof - 0.05, 0.55]),
   ]), { paint: s.paint, dark: 'paint-charcoal' }),
   k.compound('golf_cart_windscreen', 6, [
-    bar('glass', 'glass', [0.63, 0.96], [0.43, s.roof - 0.08], 0.03, [-0.5, 0.5]),
+    k.bar('glass', 'glass', [0.63, 0.96], [0.43, s.roof - 0.08], 0.03, [-0.5, 0.5]),
   ], { glass: 'glass-clear' }),
   k.compound('golf_cart_bag_rack', 7, [
     box('upright', 'dark', [-1.0, 0.64, -0.36], [-0.94, 1.08, -0.3]),
@@ -54,7 +53,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('saddle', 'dark', [s.rearAxle - 0.08, 0.16, -0.18], [s.rearAxle + 0.08, 0.28, 0.18]),
   ], { dark: 'paint-charcoal' }),
   k.compound('golf_cart_steering_column', 3, [
-    bar('column', 'dark', [0.62, 0.88], [0.38, 1.04], 0.05, [-0.25, -0.19]),
+    k.bar('column', 'dark', [0.62, 0.88], [0.38, 1.04], 0.05, [-0.25, -0.19]),
   ], { dark: 'paint-charcoal' }),
   m.step('golf_cart_step', 3, [-0.34, 0.44], s.floor - 0.02, [s.side, s.side + 0.08]),
 ])

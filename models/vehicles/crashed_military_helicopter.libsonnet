@@ -23,7 +23,6 @@ local blotch(id, slot, x, rows, stations=s.body) =
     burn(id + '_' + i, slot, [x + i * 0.125, x + (i + 1) * 0.125], arcAt(i), stations)
     for i in std.range(0, 2 * last + 1)
   ]);
-local yPrism(id, slot, profile, y) = { id: id, kind: 'prism', slot: slot, axis: 'y', profile: profile, start: y[0], end: y[1] };
 local lerp(a, b, t) = a + (b - a) * t;
 // A tapered tube lying on `ground`, running in plan from `a` to `b`, each { x, z, r }, as stacked slabs.
 local lyingTube(id, slot, a, b, segments=20, layers=8, ground=0) = std.flattenArrays([
@@ -34,7 +33,7 @@ local lyingTube(id, slot, a, b, segments=20, layers=8, ground=0) = std.flattenAr
     local height = 2 * r / layers;
     local mid = (j + 0.5) * height;
     local half = std.sqrt(std.max(r * r - (mid - r) * (mid - r), 0.0004));
-    yPrism(id + '_' + i + '_' + j, slot,
+    k.yPrism(id + '_' + i + '_' + j, slot,
            h.planQuad([lerp(a.x, b.x, t0), lerp(a.z, b.z, t0)], [lerp(a.x, b.x, t1), lerp(a.z, b.z, t1)], half, half),
            [ground + j * height, ground + (j + 1) * height])
     for j in std.range(0, layers - 1)
@@ -45,7 +44,7 @@ local lyingTube(id, slot, a, b, segments=20, layers=8, ground=0) = std.flattenAr
 local standingPlate(id, slot, stations, half=0.04) = [
   local s0 = stations[i];
   local s1 = stations[i + 1];
-  yPrism(id + '_' + i, slot, h.planQuad([(s0.a[0] + s1.a[0]) / 2, (s0.a[1] + s1.a[1]) / 2], [(s0.b[0] + s1.b[0]) / 2, (s0.b[1] + s1.b[1]) / 2], half, half), [s0.y, s1.y])
+  k.yPrism(id + '_' + i, slot, h.planQuad([(s0.a[0] + s1.a[0]) / 2, (s0.a[1] + s1.a[1]) / 2], [(s0.b[0] + s1.b[0]) / 2, (s0.b[1] + s1.b[1]) / 2], half, half), [s0.y, s1.y])
   for i in std.range(0, std.length(stations) - 2)
 ];
 local along(t) = { x: s.boomRoot.x + (s.boomTip.x - s.boomRoot.x) * t, z: s.boomRoot.z + (s.boomTip.z - s.boomRoot.z) * t };
@@ -82,7 +81,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + h.loft('cockpit_bulkhead', 'soot', s.body, x=[s.cockpitRear - 0.05, s.cockpitRear], step=0.05)
              + [
                box('deck', 'soot', [-2.95, 0.18, -0.98], [3.25, s.deck, 0.98]),
-               m.bar('drive_shaft', 'steel', [-3.0, 1.32], [-3.95, 1.42], 0.09, [-0.05, 0.05]),
+               k.bar('drive_shaft', 'steel', [-3.0, 1.32], [-3.95, 1.42], 0.09, [-0.05, 0.05]),
              ]
              // The dark lining makes the open door read as a hole, not as the far wall's paint.
              + h.shell('lining', 'soot', [station + { half: std.max(station.half - 0.08, 0.05), top: station.top - 0.08, bottom: station.bottom + 0.08 } for station in s.body], thick=0.05, x=[-2.95, s.cockpitRear], step=0.125)
@@ -159,11 +158,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              { paint: s.paint, scorch: s.scorch, soot: s.soot }),
   k.compound('crashed_military_helicopter_tail_rotor', 45, [
     k.turned('hub', 'head', 'z', k.disc(0.09, tailHub.z, tailHub.z + 0.1), [tailHub.x, tailHub.y, 0]) + { sides: 8 },
-    m.bar('up', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.25, tailHub.y + 1.0], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
-    m.bar('up_tip', 'tip', [tailHub.x + 0.25, tailHub.y + 1.0], [tailHub.x + 0.3, tailHub.y + 1.2], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
-    m.bar('back', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.75, tailHub.y + 0.25], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
-    m.bar('down', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.2, tailHub.y - 1.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
-    m.bar('stub', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.5, tailHub.y - 0.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08], thickB=0.06),
+    k.bar('up', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.25, tailHub.y + 1.0], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
+    k.bar('up_tip', 'tip', [tailHub.x + 0.25, tailHub.y + 1.0], [tailHub.x + 0.3, tailHub.y + 1.2], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
+    k.bar('back', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.75, tailHub.y + 0.25], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
+    k.bar('down', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.2, tailHub.y - 1.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
+    k.bar('stub', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.5, tailHub.y - 0.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08], thickB=0.06),
   ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
   k.compound('crashed_military_helicopter_cabin_door', 45, [
     lean('skin', 'paint', [-2.75, -1.45], [0.03, 1.72], [1.72, 1.27], 0.05),

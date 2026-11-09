@@ -5,7 +5,6 @@ local s = import 'excavator.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 local doorRear = -0.08;
 local doorFront = 0.72;
 local belt = 1.92;
@@ -70,37 +69,37 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     left(box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.28, s.cabIn + 0.06], [s.cabFront - 0.015, s.cabRoof - 0.06, s.side - 0.06])),
   ], { glass: 'glass-clear' }),
   k.compound('excavator_boom', 1150, [
-    bar('foot', 'paint', s.footPivot, s.knee, 0.34, [-0.2, 0.2], 0.6),
-    bar('reach', 'paint', s.knee, s.tip, 0.6, [-0.2, 0.2], 0.28),
+    k.bar('foot', 'paint', s.footPivot, s.knee, 0.34, [-0.2, 0.2], 0.6),
+    k.bar('reach', 'paint', s.knee, s.tip, 0.6, [-0.2, 0.2], 0.28),
     m.axleDisc('knee_cap', 'paint', s.knee[0], s.knee[1], 0.3, [-0.2, 0.2]),
     m.axleDisc('foot_pin', 'pin', s.footPivot[0], s.footPivot[1], 0.09, [-0.26, 0.26], 12),
   ] + bothSides([
     box('ram_lug', 'paint', [1.7, 2.4, 0.2], [1.95, 2.62, 0.26]),
   ]), { paint: s.paint, pin: 'steel-stainless' }),
   k.compound('excavator_arm', 620, [
-    bar('stick', 'paint', [s.tip[0], s.tip[1] + 0.04], s.wrist, 0.44, [-0.13, 0.13], 0.2),
-    bar('horn', 'paint', [s.tip[0], s.tip[1] + 0.04], [4.06, 3.46], 0.3, [-0.13, 0.13], 0.2),
+    k.bar('stick', 'paint', [s.tip[0], s.tip[1] + 0.04], s.wrist, 0.44, [-0.13, 0.13], 0.2),
+    k.bar('horn', 'paint', [s.tip[0], s.tip[1] + 0.04], [4.06, 3.46], 0.3, [-0.13, 0.13], 0.2),
     m.axleDisc('tip_pin', 'pin', s.tip[0], s.tip[1], 0.09, [-0.22, 0.22], 12),
     m.axleDisc('wrist_pin', 'pin', s.wrist[0], s.wrist[1], 0.07, [-0.17, 0.17], 12),
   ], { paint: s.paint, pin: 'steel-stainless' }),
   k.compound('excavator_bucket', 480,
     m.bucket(2.87, 0.54, 0.5, 240, 395, 0.46) + [
-      bar('ear', 'shell', [3.0, 0.9], [s.wrist[0] + 0.02, s.wrist[1] + 0.04], 0.14, [-0.17, 0.17]),
-      bar('ear_link', 'shell', [3.25, 0.82], [3.38, 1.22], 0.1, [-0.1, 0.1]),
+      k.bar('ear', 'shell', [3.0, 0.9], [s.wrist[0] + 0.02, s.wrist[1] + 0.04], 0.14, [-0.17, 0.17]),
+      k.bar('ear_link', 'shell', [3.25, 0.82], [3.38, 1.22], 0.1, [-0.1, 0.1]),
     ], { shell: 'paint-charcoal', tooth: 'steel-grey' }),
   k.compound('excavator_boom_ram', 110, [
-    bar('barrel', 'dark', [1.2, 1.34], [1.6, 2.02], 0.17, [0.21, 0.33]),
-    bar('rod', 'bright', [1.56, 1.95], [1.84, 2.48], 0.08, [0.235, 0.305]),
+    k.bar('barrel', 'dark', [1.2, 1.34], [1.6, 2.02], 0.17, [0.21, 0.33]),
+    k.bar('rod', 'bright', [1.56, 1.95], [1.84, 2.48], 0.08, [0.235, 0.305]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('excavator_arm_ram', 120, [
-    bar('barrel', 'dark', [2.2, 3.62], [3.2, 3.62], 0.17, [-0.08, 0.08]),
-    bar('rod', 'bright', [3.15, 3.62], [4.0, 3.42], 0.08, [-0.04, 0.04]),
+    k.bar('barrel', 'dark', [2.2, 3.62], [3.2, 3.62], 0.17, [-0.08, 0.08]),
+    k.bar('rod', 'bright', [3.15, 3.62], [4.0, 3.42], 0.08, [-0.04, 0.04]),
     box('saddle', 'dark', [2.14, 3.46, -0.09], [2.3, 3.7, 0.09]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('excavator_bucket_ram', 90, [
-    bar('barrel', 'dark', [4.02, 3.3], [3.72, 2.3], 0.14, [-0.06, 0.06]),
-    bar('rod', 'bright', [3.74, 2.36], [3.46, 1.3], 0.06, [-0.03, 0.03]),
-    bar('link', 'dark', [3.5, 1.3], [3.16, 1.06], 0.08, [-0.05, 0.05]),
+    k.bar('barrel', 'dark', [4.02, 3.3], [3.72, 2.3], 0.14, [-0.06, 0.06]),
+    k.bar('rod', 'bright', [3.74, 2.36], [3.46, 1.3], 0.06, [-0.03, 0.03]),
+    k.bar('link', 'dark', [3.5, 1.3], [3.16, 1.06], 0.08, [-0.05, 0.05]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('excavator_exhaust', 6, [
     k.turned('pipe', 'steel', 'y', k.disc(0.05, 0, 0.42)) + { sides: 12 },

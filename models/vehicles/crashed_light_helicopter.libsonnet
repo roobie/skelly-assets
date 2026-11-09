@@ -1,7 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
-local m = import 'machine-kit.libsonnet';
 local s = import 'crashed_light_helicopter.spec.libsonnet';
 local box = k.box;
 local dome = [-90, 90];
@@ -23,8 +22,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + crease('fold_4', [1.5, 1.6], [120, 240])
              + crease('fold_5', [0.82, 0.92], [105, 130])
              + [
-               m.bar('torn_0', 'paint', [1.42, 0.86], [1.7, 1.0], 0.05, [0.12, 0.34]),
-               m.bar('torn_1', 'crease', [1.55, 0.3], [1.78, 0.42], 0.05, [-0.3, -0.06]),
+               k.bar('torn_0', 'paint', [1.42, 0.86], [1.7, 1.0], 0.05, [0.12, 0.34]),
+               k.bar('torn_1', 'crease', [1.55, 0.3], [1.78, 0.42], 0.05, [-0.3, -0.06]),
              ],
              { paint: s.paint, crease: s.crease }),
   k.compound('crashed_light_helicopter_rear_fairing', 18,
@@ -71,10 +70,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
   ], { paint: s.paint }),
   k.compound('crashed_light_helicopter_tail_rotor', 5, [
     k.turned('hub', 'head', 'z', k.disc(0.05, 0, 0.14), [s.tail.x, s.tail.y, 0]) + { sides: 8 },
-    m.bar('up', 'blade', [s.tail.x, s.tail.y], [s.tail.x + 0.12, s.tail.y + 0.4], 0.11, [0.1, 0.15]),
-    m.bar('up_tip', 'tip', [s.tail.x + 0.12, s.tail.y + 0.4], [s.tail.x + 0.2, s.tail.y + 0.5], 0.11, [0.1, 0.15]),
-    m.bar('down', 'blade', [s.tail.x, s.tail.y], [s.tail.x - 0.38, s.tail.y - 0.22], 0.1, [0.1, 0.15]),
-    m.bar('down_tip', 'tip', [s.tail.x - 0.38, s.tail.y - 0.22], [s.tail.x - 0.5, s.tail.y - 0.24], 0.1, [0.1, 0.15]),
+    k.bar('up', 'blade', [s.tail.x, s.tail.y], [s.tail.x + 0.12, s.tail.y + 0.4], 0.11, [0.1, 0.15]),
+    k.bar('up_tip', 'tip', [s.tail.x + 0.12, s.tail.y + 0.4], [s.tail.x + 0.2, s.tail.y + 0.5], 0.11, [0.1, 0.15]),
+    k.bar('down', 'blade', [s.tail.x, s.tail.y], [s.tail.x - 0.38, s.tail.y - 0.22], 0.1, [0.1, 0.15]),
+    k.bar('down_tip', 'tip', [s.tail.x - 0.38, s.tail.y - 0.22], [s.tail.x - 0.5, s.tail.y - 0.24], 0.1, [0.1, 0.15]),
   ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
   k.compound('crashed_light_helicopter_main_rotor', 40,
              [

@@ -5,7 +5,6 @@ local s = import 'forklift.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-local bar = m.bar;
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('forklift_chassis', s.shellMass, [
     box('spine', 'steel', [-0.62, 0.18, -0.33], [1.08, 0.5, 0.33]),
@@ -18,13 +17,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('floor', 'mat', [0.18, 0.5, -0.33], [0.78, 0.54, 0.33]),
     prism('cowl', 'paint', [[0.74, 0.5], [1.06, 0.5], [1.06, 1.28], [0.88, 1.28]], [-0.34, 0.34]),
     box('dash', 'trim', [0.72, 1.2, -0.3], [0.9, 1.3, 0.3]),
-    bar('column', 'trim', [0.84, 1.22], [0.47, 1.37], 0.06, [-0.03, 0.03]),
+    k.bar('column', 'trim', [0.84, 1.22], [0.47, 1.37], 0.06, [-0.03, 0.03]),
     prism('cover', 'paint', [[-0.64, 0.6], [0.22, 0.6], [0.22, 0.94], [0.1, s.cover], [-0.64, s.cover]], [-s.side, s.side]),
     box('riser', 'paint', [0.16, 0.5, -0.46], [0.22, 0.62, 0.46]),
     box('cover_seam', 'trim', [-0.64, s.cover - 0.01, -0.5], [0.12, s.cover + 0.01, -0.46]),
   ] + bothSides([
     box('skirt', 'paint', [-0.5, 0.22, 0.34], [0.28, 0.62, s.side]),
-  ] + m.arc('fender', 'paint', s.frontAxle, s.frontHub, 0.4, 0.45, 12, 172, 10, [0.34, s.side])
+  ] + k.arc('fender', 'paint', s.frontAxle, s.frontHub, 0.4, 0.45, 12, 172, 10, [0.34, s.side])
   + [
     box('fender_foot', 'paint', [0.28, 0.4, 0.34], [0.46, 0.46, s.side]),
     box('fender_nose', 'paint', [1.25, 0.36, 0.34], [1.3, 0.48, s.side]),
@@ -41,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('rail_front', 'steel', [0.52, s.roof - 0.06, -0.54], [0.6, s.roof, 0.54]),
     box('rail_rear', 'steel', [-0.82, s.roof - 0.06, -0.54], [-0.74, s.roof, 0.54]),
   ] + bothSides([
-    bar('post_front', 'steel', [0.8, 0.72], [0.56, s.roof - 0.02], 0.07, [0.46, 0.53]),
+    k.bar('post_front', 'steel', [0.8, 0.72], [0.56, s.roof - 0.02], 0.07, [0.46, 0.53]),
     box('post_rear', 'steel', [-0.82, 1.08, 0.46], [-0.74, s.roof, 0.53]),
     box('rail_side', 'steel', [-0.82, s.roof - 0.06, 0.46], [0.6, s.roof, 0.54]),
     box('bar_a', 'steel', [-0.74, s.roof - 0.05, 0.1], [0.52, s.roof - 0.01, 0.15]),
@@ -58,7 +57,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('upright', 'steel', [1.16, 0.14, 0.24], [1.3, 2.1, 0.34]),
     box('inner', 'inner', [1.22, 0.3, 0.13], [1.3, 2.0, 0.24]),
     box('chain', 'chain', [1.24, 0.3, 0.07], [1.28, 2.0, 0.1]),
-    bar('tilt_ram', 'bright', [0.9, 1.05], [1.18, 1.1], 0.05, [0.34, 0.39]),
+    k.bar('tilt_ram', 'bright', [0.9, 1.05], [1.18, 1.1], 0.05, [0.34, 0.39]),
   ]), { steel: 'paint-charcoal', inner: 'steel-grey', bright: 'steel-stainless', chain: 'iron-cast' }),
   k.compound('forklift_carriage', 110, [
     box('plate_low', 'steel', [1.3, 0.24, -0.46], [s.carriageFront - 0.04, 0.34, 0.46]),
