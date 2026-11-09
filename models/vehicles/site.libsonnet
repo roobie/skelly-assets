@@ -8,10 +8,28 @@ local pair(id, part, at=origin) = [
   one(id + '_near', part, at),
   one(id + '_far', part, [at[0], at[1], 0 - at[2]]) + { mirror: true },
 ];
+// A vehicle laid out from another's sites: `over` merges fields into a site by id, `drop` removes sites by id and
+// `add` appends sites, so a derived vehicle states only what it changes.
+local adjust(sites, over={}, drop=[], add=[]) =
+  [placed + std.get(over, placed.id, {}) for placed in sites if !std.member(drop, placed.id)] + add;
+local headlamps(x, y, z) = pair('headlamp', 'car_headlamp', [x, y, z]);
+local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car_battery', [at[0], at[1] + 0.03, at[2]])];
 {
   origin: origin,
   one: one,
   pair: pair,
-  headlamps(x, y, z): pair('headlamp', 'car_headlamp', [x, y, z]),
-  batteryBay(tray, at): [one('battery_tray', tray, at), one('battery', 'car_battery', [at[0], at[1] + 0.03, at[2]])],
+  adjust: adjust,
+  headlamps: headlamps,
+  batteryBay: batteryBay,
+  // A game's vehicle kit that emits sites, for the body kits whose `fittings` take one: the fitting list a game's
+  // blueprint is built from then gives the placements too, so the two cannot drift. What holds a part on and how it
+  // is serviced are gameplay, so those arguments are dropped.
+  kit: {
+    origin: origin,
+    fitting(id, part, at, supportedBy=[], service=null): one(id, part, at),
+    pair(id, part, at, supportedBy=null, service=null): pair(id, part, at),
+    on(shared=[], paired=[]): null,
+    headlamps(x, y, z, supportedBy=[]): headlamps(x, y, z),
+    batteryBay(tray, at, supportedBy=[]): batteryBay(tray, at),
+  },
 }

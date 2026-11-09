@@ -59,9 +59,10 @@ comes through a declared pack dependency, never a copy; road vehicles, helicopte
 are separate packs because a product can want traffic without aircraft or ruins. A vehicle's file sets the
 taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
 import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
-`models/recipes/skelly.ground-vehicles.jsonnet`. Which part sits where on a vehicle is model data too, in the
-vehicle's placements file beside its rows, so the showcase and the games assemble it from one source; why, and what
-stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`.
+`models/recipes/skelly.ground-vehicles.jsonnet`. A vehicle drives on the ground unless another pack claims it, so a new
+road vehicle needs no recipe edit; see `models/vehicles/packs.libsonnet`, `vehicles`. Which part sits where on a
+vehicle is model data too, in the vehicle's placements file beside its rows, so the showcase and the games assemble it
+from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
