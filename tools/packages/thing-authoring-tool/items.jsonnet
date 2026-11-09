@@ -18,6 +18,8 @@ local atom(id, family, massKg, dimensions, finish, exportMass) = { id: id, expor
       springLength: 0.17, springWidth: 0.04, springThickness: 0.01,
       panRadius: 0.06, panHeight: 0.006,
       linkCount: 5, linkRadius: 0.018, linkWire: 0.005,
-    }, { frame: 'steel-parkerized', jaw: 'steel-grey', chain: 'steel-grey' }, exportMass='parts'),
+    }, { frame: 'steel-parkerized', jaw: 'steel-grey', chain: 'steel-grey' }, exportMass='parts') + {
+      taxonomy: { category: 'weapons', tags: { weapon: ['trap'], material: ['metal'], setting: ['modern'] } },
+    },
   ],
 }
