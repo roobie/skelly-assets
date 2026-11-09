@@ -1,5 +1,6 @@
 // Builds the repo's models from their sources in models/ into GLB files.
-// Usage: node tools/build.mjs [--out dir] [--cache dir] [rowId ...]
+// Usage: node tools/build.mjs [--out dir] [--cache dir] [rowId ...], or node tools/build.mjs --shard i/n --cache dir
+// to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard).
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/ and built/manifest.json
 // (tools/manifest.mjs); with ids it builds those roster-source rows, any row
@@ -25,7 +26,7 @@ const repo = resolve(here, '..');
 
 // Every model is generated on a worker thread; the files are written here in source order, so the tree does not
 // depend on which model finished first. With a cache folder, unchanged models come from it (recipeTools.mjs, generateRow).
-const exportPool = (cache) => {
+export const exportPool = (cache) => {
   const pool = workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
   return { run: (task) => pool.run({ ...task, cache }), close: () => pool.close() };
 };
@@ -58,6 +59,14 @@ export function partitionRecipe(packId, rows, tools) {
   return partitions;
 }
 
+// Each recipe file's rows of the named tools, one unit per pack and tool, in source order.
+function recipeUnits(root, tools, names) {
+  for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
+  const packs = readRecipes(root).map(({ packId, value }) => ({ packId, partitions: partitionRecipe(packId, value, tools) }));
+  return packs.flatMap(({ packId, partitions }) =>
+    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })));
+}
+
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
 // its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
@@ -65,11 +74,8 @@ export function partitionRecipe(packId, rows, tools) {
 export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool }) {
   installJsonnetSources();
   const tools = await recipeTools();
-  for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
-  const packs = readRecipes(root).map(({ packId, value }) => ({ packId, partitions: partitionRecipe(packId, value, tools) }));
-  const units = packs.flatMap(({ packId, partitions }) =>
-    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })));
+  const units = recipeUnits(root, tools, names);
   for (const { name, rows } of units) tools[name].load(rows);
   const generator = pool ?? exportPool();
   let generated;
@@ -108,10 +114,13 @@ export function withTaxonomy(models, taxonomies) {
   return models.map((model) => ({ ...model, taxonomy: byModel.get(key(model)) }));
 }
 
+// The roster's source rows: TAT's catalogue export, which the roster selects from.
+const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
+
 async function buildRoster(thing, ids, out, roster, pool) {
   let failed = false;
   const models = [];
-  const rows = JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
+  const rows = rosterSource();
   const recipe = thing.load(rows);
   const missing = ids.filter((id) => !recipe.some((row) => row.id === id));
   if (missing.length > 0) {
@@ -138,11 +147,48 @@ async function buildRoster(thing, ids, out, roster, pool) {
   return { failed, models };
 }
 
+// Shard `index` of `count` takes every count-th unit, so each shard's share interleaves all packs and the shards stay
+// balanced however unevenly rows are spread over packs.
+export const shardUnits = (units, { index, count }) => units.filter((_, at) => at % count === index - 1);
+
+// Generates one shard of the production build's cacheable rows into the cache and writes no tree. CI spreads a clean
+// build's generation over runners this way, then builds the tree from their merged caches, where every cacheable row
+// is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
+// which serialises back to the same text.
+export async function fillCacheShard({ root = repo, shard, cache }) {
+  installJsonnetSources();
+  const tools = await recipeTools();
+  const roster = new Set(readRoster(root).map(({ id }) => id));
+  const units = [
+    ...rosterSource().filter((row) => roster.has(row.id)).map((row) => ({ tool: 'thing', row })),
+    ...recipeUnits(root, tools, PRODUCTION_RECIPE_TOOLS).flatMap(({ name, rows }) => rows.map((row) => ({ tool: name, row }))),
+  ].filter(({ tool }) => tools[tool].code !== undefined);
+  const pool = exportPool(cache);
+  try {
+    await Promise.all(shardUnits(units, shard).map((unit) => pool.run(unit)));
+  } finally {
+    await pool.close();
+  }
+}
+
+const parseShard = (text) => {
+  const [index, count] = text.split('/').map(Number);
+  if (!(Number.isInteger(index) && Number.isInteger(count) && index >= 1 && index <= count)) {
+    throw new Error(`--shard takes <index>/<count>, 1 <= index <= count: ${text}`);
+  }
+  return { index, count };
+};
+
 async function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { out: { type: 'string', default: join(repo, 'built') }, cache: { type: 'string' } },
+    options: { out: { type: 'string', default: join(repo, 'built') }, cache: { type: 'string' }, shard: { type: 'string' } },
   });
+  if (values.shard !== undefined) {
+    if (values.cache === undefined || positionals.length > 0) throw new Error('--shard fills a --cache and takes no ids');
+    await fillCacheShard({ shard: parseShard(values.shard), cache: resolve(values.cache) });
+    return;
+  }
   const roster = new Map(readRoster().map((row) => [row.id, row]));
   const ids = positionals.length > 0 ? positionals : [...roster.keys()];
   const out = resolve(values.out);
