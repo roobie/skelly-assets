@@ -8,5 +8,5 @@
   hatchSide: 0.62, glassIn: 0.74, glassOut: 0.825, rearFloorFront: -0.87,
   hoodBack: 0.85, hoodFall: 0.09, lampTop: 0.84,
   tumble: 0.21875, slamTop: 0.68, towerTop: 0.68, boot: true, twoDoor: true, archLiner: true,
-  shellMass: 700, paint: 'paint-graphite',
+  shellMass: 700, paint: 'paint-graphite-metallic',
 }
