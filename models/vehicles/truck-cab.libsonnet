@@ -207,24 +207,25 @@ local rows(id, s0) = {
     box('centre_pillar', 'paint', [s.crew[1], s.floor, s.skin], [s.doorRear, s.windowTop, s.side]),
     box('crew_rear', 'paint', [s.cabBack, s.floor, s.skin], [s.crew[0], s.windowTop, s.side]),
   ])),
-  rows: rows,
+  rows: k.unborrowed(id, s, rows),
 }.rows;
-local items(kit, id, name, s0) = local s = spec(s0); local pile = kit.pileSize; [
-  kit.part(id + '_chassis', name + ' chassis', pile, ['structure']),
-  kit.part(id + '_cab', name + ' cab', pile, ['structure', 'protection']),
-  kit.part(id + '_windscreen', name + ' windscreen', pile, ['glazing']),
-  kit.part(id + '_dashboard', name + ' dashboard', pile, ['structure']),
-  kit.part(id + '_rear_underrun', name + ' rear underrun bar', pile, ['protection']),
-  kit.part(id + '_door', name + ' door', pile, ['entry', 'glazing', 'protection']),
-  kit.part(id + '_front_panel', name + ' front panel', pile, ['protection']),
-  kit.part(id + '_front_bumper', name + ' front bumper', pile, ['protection']),
-] + (if s.guard then [kit.part(id + '_mudguard', name + ' mudguard', pile, ['protection'])] else [])
-  + (if s.bonnet != null then [
-    kit.part(id + '_bonnet', name + ' bonnet', pile, ['protection']),
-    kit.part(id + '_wing', name + ' wing', pile, ['protection']),
-  ] else [])
-  + (if s.crew != null then [kit.part(id + '_crew_door', name + ' crew door', pile, ['entry', 'glazing', 'protection'])] else []);
+local items(kit, id, name, s0) =
+  local s = spec(s0);
+  local parts = [
+    ['_chassis', 'chassis', ['structure']],
+    ['_cab', 'cab', ['structure', 'protection']],
+    ['_windscreen', 'windscreen', ['glazing']],
+    ['_dashboard', 'dashboard', ['structure']],
+    ['_rear_underrun', 'rear underrun bar', ['protection']],
+    ['_door', 'door', ['entry', 'glazing', 'protection']],
+    ['_front_panel', 'front panel', ['protection']],
+    ['_front_bumper', 'front bumper', ['protection']],
+  ] + (if s.guard then [['_mudguard', 'mudguard', ['protection']]] else [])
+    + (if s.bonnet != null then [['_bonnet', 'bonnet', ['protection']], ['_wing', 'wing', ['protection']]] else [])
+    + (if s.crew != null then [['_crew_door', 'crew door', ['entry', 'glazing', 'protection']]] else []);
+  [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in parts if !std.objectHas(std.get(s, 'borrow', {}), p[0])];
 local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
+  local part(suffix) = k.partId(id, s, suffix);
   local rearN = std.length(s.rearAxles);
   local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
   local shaftFrom = gearboxX - s.gearboxLength / 2;
@@ -232,14 +233,14 @@ local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; l
   local shaftCount = std.ceil((shaftFrom - shaftTo) / 2.6);
   local shaftStep = (shaftFrom - shaftTo) / shaftCount;
   [
-    fitting('chassis', id + '_chassis', origin),
+    fitting('chassis', part('_chassis'), origin),
     fitting('front_axle', s.frontAxlePart, [s.frontAxle, s.frontAxleY, 0], ['chassis']),
-    fitting('cab', id + '_cab', origin, ['chassis']),
-    fitting('windscreen', id + '_windscreen', origin, ['cab']),
-    fitting('dashboard', id + '_dashboard', origin, ['cab']),
-    fitting('front_panel', id + '_front_panel', origin, if s.bonnet != null then ['chassis'] else ['cab']),
-    fitting('front_bumper', id + '_front_bumper', origin, ['chassis']),
-    fitting('rear_underrun', id + '_rear_underrun', origin, ['chassis']),
+    fitting('cab', part('_cab'), origin, ['chassis']),
+    fitting('windscreen', part('_windscreen'), origin, ['cab']),
+    fitting('dashboard', part('_dashboard'), origin, ['cab']),
+    fitting('front_panel', part('_front_panel'), origin, if s.bonnet != null then ['chassis'] else ['cab']),
+    fitting('front_bumper', part('_front_bumper'), origin, ['chassis']),
+    fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
     fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
     fitting('radiator', s.radiator, [s.radiatorX, s.radiatorY, 0], ['chassis']),
@@ -265,15 +266,15 @@ local fittings(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; l
   + (if s.raisedSeat then pair('seat_riser', 'seat_riser', [s.seatX, s.floor, 0.58], on(['cab'])) + pair('seat', 'front_seat', [s.seatX, s.seatY, 0.58], on([], ['seat_riser']))
      else pair('seat', 'front_seat', [s.seatX, s.seatY, 0.58], on(['cab'])))
   + (if s.binnacle then [fitting('instrument_binnacle', 'instrument_binnacle', [s.face - s.dashDepth + 0.18, s.waist - 0.04, -0.58], ['dashboard'])] else [])
-  + pair('door', id + '_door', origin, on(['cab']))
+  + pair('door', part('_door'), origin, on(['cab']))
   + pair('mirror', 'door_mirror_large', [s.face - 0.1, s.waist, s.side], on(['cab']))
   + pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.01, s.railBottom - 0.12, std.get(s, 'tailLampZ', s.side - 0.28)], on(['rear_underrun']))
   + kit.headlamps(s.lampX, s.lampY, s.lampZ, ['front_bumper'])
   + pair('marker_lamp', 'marker_lamp', [s.face - s.lean - 0.12, s.roof + 0.11, s.markerZ], on(['cab']))
   + kit.batteryBay('truck_battery_tray', [s.batteryX, s.tankY, -s.batteryZ], ['chassis'])
-  + (if s.guard then pair('mudguard', id + '_mudguard', origin, on(['chassis'])) else [])
-  + (if s.bonnet != null then [fitting('bonnet', id + '_bonnet', origin, ['chassis'])] + pair('wing', id + '_wing', origin, on(['chassis'])) else [])
-  + (if s.crew != null then pair('crew_door', id + '_crew_door', origin, on(['cab'])) else []);
+  + (if s.guard then pair('mudguard', part('_mudguard'), origin, on(['chassis'])) else [])
+  + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
+  + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
 {
   spec: spec,
   archCorners: archCorners,
