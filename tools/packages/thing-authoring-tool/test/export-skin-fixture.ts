@@ -5,11 +5,12 @@ import { exportItem } from '../src/exports.ts';
 import fixture from './fixtures/bend-strip.json' with { type: 'json' };
 
 if (!process.argv[2]) throw new Error('Usage: export-skin-fixture.ts <output directory>');
-const item = loadCatalogue(fixture).items[0]!;
+const loaded = loadCatalogue(fixture);
+const item = loaded.items[0]!;
 const asset = { id: item.id, file: `assets/models/${item.id}.glb` as const };
 const voxel = { voxelGrain: item.voxelGrain! };
 writeRecipeExports(
-  [{ id: item.id, kind: 'item', source: item.id, voxel, generate: () => exportItem(item, asset, voxel) }],
+  [{ id: item.id, kind: 'item', source: item.id, voxel, generate: () => exportItem(item, loaded, asset, voxel) }],
   resolve(process.argv[2]),
   'things',
 );

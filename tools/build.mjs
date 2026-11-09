@@ -72,6 +72,9 @@ function recipeUnits(root, tools, names) {
     names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })));
 }
 
+// Each unit with its tool's tasks, one per row, which loads (and so checks) every unit's rows.
+const withTasks = (tools, units) => Promise.all(units.map(async (unit) => ({ ...unit, tasks: await tools[unit.name].tasks(unit.rows) })));
+
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
 // its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
@@ -82,15 +85,14 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   await installJsonnetSources();
   const tools = await recipeTools();
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
-  const units = recipeUnits(root, tools, names);
-  for (const { name, rows } of units) tools[name].load(rows);
+  const units = await withTasks(tools, recipeUnits(root, tools, names));
   const selected = ids === undefined ? units : units
-    .map((unit) => ({ ...unit, rows: unit.rows.filter((row) => ids.has(row.id)) }))
-    .filter(({ rows }) => rows.length > 0);
+    .map((unit) => ({ ...unit, tasks: unit.tasks.filter((_, at) => ids.has(unit.rows[at].id)) }))
+    .filter(({ tasks }) => tasks.length > 0);
   const generator = pool ?? exportPool();
   let generated;
   try {
-    generated = await Promise.all(selected.map(({ name, rows }) => Promise.all(rows.map((row) => generator.run({ tool: name, row })))));
+    generated = await Promise.all(selected.map(({ name, tasks }) => Promise.all(tasks.map((task) => generator.run({ tool: name, task })))));
   } finally {
     if (!pool) await generator.close();
   }
@@ -130,9 +132,9 @@ const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-au
 async function buildRoster(thing, rows, ids, out, roster, pool) {
   let failed = false;
   const models = [];
-  thing.load(rows);
-  const wanted = rows.filter((row) => ids.includes(row.id));
-  const results = await Promise.allSettled(wanted.map((row) => pool.run({ tool: 'thing', row })));
+  const tasks = await thing.tasks(rows);
+  const wanted = rows.flatMap((row, at) => (ids.includes(row.id) ? [{ id: row.id, task: tasks[at] }] : []));
+  const results = await Promise.allSettled(wanted.map(({ task }) => pool.run({ tool: 'thing', task })));
   for (const [at, { id }] of wanted.entries()) {
     const result = results[at];
     if (result.status === 'rejected') {
@@ -163,13 +165,14 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
-  const units = [
-    ...rosterSource().filter((row) => roster.has(row.id)).map((row) => ({ tool: 'thing', row })),
-    ...recipeUnits(root, tools, PRODUCTION_RECIPE_TOOLS).flatMap(({ name, rows }) => rows.map((row) => ({ tool: name, row }))),
-  ].filter(({ tool }) => tools[tool].code !== undefined);
+  const units = await withTasks(tools, [
+    { name: 'thing', rows: rosterSource().filter((row) => roster.has(row.id)) },
+    ...recipeUnits(root, tools, PRODUCTION_RECIPE_TOOLS),
+  ].filter(({ name, rows }) => tools[name].code !== undefined && rows.length > 0));
+  const tasks = units.flatMap(({ name, tasks }) => tasks.map((task) => ({ tool: name, task })));
   const pool = exportPool(cache);
   try {
-    await Promise.all(shardUnits(units, shard).map((unit) => pool.run(unit)));
+    await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
   } finally {
     await pool.close();
   }

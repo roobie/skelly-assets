@@ -2,6 +2,7 @@ import { Box3, Mesh, Ray, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
 import recipes from '../../../../models/recipes/skelly.wearables.json' with { type: 'json' };
+import { catalogue } from '../src/content.ts';
 import { loadThingRecipe } from '../src/exports.ts';
 
 type Triangle = readonly [Vector3, Vector3, Vector3];
@@ -9,7 +10,7 @@ const direction = new Vector3(1, 0.31, 0.17).normalize();
 const inset = 0.001;
 
 const shell = async (id: string) => {
-  const row = loadThingRecipe(recipes.filter((entry) => entry.id === id))[0];
+  const row = loadThingRecipe(recipes.filter((entry) => entry.id === id), catalogue)[0];
   expect(row).toBeDefined();
   const { glb } = row!.generate();
   const { scene } = await new GLTFLoader().parseAsync(Uint8Array.from(glb).buffer, '');
