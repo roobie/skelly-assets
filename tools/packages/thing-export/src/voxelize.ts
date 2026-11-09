@@ -8,6 +8,9 @@
 // span too short to hold a centre keeps one voxel, inside the shape the sources make together (see `fillAlong`). Open
 // meshes (an odd crossing count) drop the unpaired crossing. What the sources connect stays connected: bodies left
 // apart are joined through the cells the sources meet, to each other and to neighbouring parts (see `bridge`).
+//
+// Cells live in arrays over the box the sources span rather than in maps keyed by lattice position: a part's solids fill
+// much of their box, and an array cell costs a fraction of a map entry, which made voxelizing most of a build's time.
 
 export interface VoxelSource {
   /** Part-local metres, three numbers per vertex. */
@@ -36,15 +39,107 @@ const NUDGE_Y = 0.0291;
 /** Column `index`'s sample line, in voxels: its centre nudged toward the origin. */
 const sampleAt = (index: number, nudge: number): number => (index >= 0 ? index + 0.5 - nudge : index + 0.5 + nudge);
 
-const keyOf = (x: number, y: number, z: number): number =>
-  ((x + HALF_RANGE) * RANGE + (y + HALF_RANGE)) * RANGE + (z + HALF_RANGE);
-const voxelOf = (key: number): [number, number, number] => {
-  const z = key % RANGE;
-  const y = Math.floor(key / RANGE) % RANGE;
-  return [Math.floor(key / RANGE / RANGE) - HALF_RANGE, y - HALF_RANGE, z - HALF_RANGE];
+/** The cells a voxelize call can touch, in voxels on its lattice, with a ring of cells around them that none fills. */
+interface Box {
+  readonly low: readonly [number, number, number];
+  readonly size: readonly [number, number, number];
+}
+
+/**
+ * The box around every vertex of the sources, shifted to the lattice. A filled or met cell lies at most one cell past a
+ * vertex, so two cells of margin keep the outer ring empty, and a step from any cell to its neighbour stays in the box.
+ */
+const boxOf = (sources: readonly VoxelSource[], { grain, origin }: Lattice): Box => {
+  const low = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+  const high = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+  for (const { positions } of sources) {
+    for (let i = 0; i < positions.length; i += 1) {
+      const cell = Math.floor((positions[i]! - origin[i % 3]!) / grain);
+      low[i % 3] = Math.min(low[i % 3]!, cell);
+      high[i % 3] = Math.max(high[i % 3]!, cell);
+    }
+  }
+  if (!Number.isFinite(low[0])) {
+    return { low: [0, 0, 0], size: [0, 0, 0] };
+  }
+  const [lx, ly, lz] = low.map((cell) => cell - 2) as [number, number, number];
+  return { low: [lx, ly, lz], size: [high[0]! + 3 - lx, high[1]! + 3 - ly, high[2]! + 3 - lz] };
 };
 
-type Grid = Map<number, number>;
+/** A cell's key, its index in the box; a cell on the box's outer ring or past it has none. */
+const keyIn = ({ low, size }: Box, x: number, y: number, z: number): number => {
+  const at = [x - low[0], y - low[1], z - low[2]];
+  if (at.some((cell, axis) => cell < 1 || cell > size[axis]! - 2)) {
+    throw new Error(`Voxel ${x},${y},${z} falls outside its sources' box`);
+  }
+  return (at[0]! * size[1] + at[1]!) * size[2] + at[2]!;
+};
+
+const EMPTY = -1;
+
+/**
+ * Voxels and their groups over a box, keyed by their index in it. Keys keep the order of the first set, as a map's
+ * would, so every walk over the cells, and so the mesh, follows the order the sources filled them.
+ */
+class Grid {
+  readonly box: Box;
+  /** Per cell of the box, its group or EMPTY. */
+  readonly #cells: Int32Array;
+  readonly #keys: number[] = [];
+  /** The key offsets to the six neighbours, ±z, ±y, ±x. */
+  readonly steps: readonly number[];
+
+  constructor(box: Box) {
+    this.box = box;
+    const [dx, dy, dz] = box.size;
+    this.#cells = new Int32Array(dx * dy * dz).fill(EMPTY);
+    this.steps = [1, -1, dz, -dz, dy * dz, -dy * dz];
+  }
+
+  get size(): number {
+    return this.#keys.length;
+  }
+
+  keys(): readonly number[] {
+    return this.#keys;
+  }
+
+  voxelOf(key: number): [number, number, number] {
+    const { low, size } = this.box;
+    const z = key % size[2];
+    const rest = (key - z) / size[2];
+    const y = rest % size[1];
+    return [(rest - y) / size[1] + low[0], y + low[1], z + low[2]];
+  }
+
+  has(key: number): boolean {
+    return this.#cells[key]! !== EMPTY;
+  }
+
+  get(key: number): number | undefined {
+    const group = this.#cells[key]!;
+    return group === EMPTY ? undefined : group;
+  }
+
+  set(key: number, group: number): void {
+    if (this.#cells[key] === EMPTY) {
+      this.#keys.push(key);
+    }
+    this.#cells[key] = group;
+  }
+
+  clear(): void {
+    for (const key of this.#keys) {
+      this.#cells[key] = EMPTY;
+    }
+    this.#keys.length = 0;
+  }
+}
+
+interface Lattice {
+  readonly grain: number;
+  readonly origin: readonly number[];
+}
 
 const checkedIndex = (value: number, grain: number): number => {
   const index = Math.floor(value / grain);
@@ -95,7 +190,12 @@ const addTriangle = (
       }
       const key = (checkedIndex(px, grain) + HALF_RANGE) * RANGE + (checkedIndex(py, grain) + HALF_RANGE);
       const depth = wa * at(a, axes.ray) + wb * at(b, axes.ray) + wc * at(c, axes.ray);
-      columns.set(key, [...(columns.get(key) ?? []), depth]);
+      const depths = columns.get(key);
+      if (depths) {
+        depths.push(depth);
+      } else {
+        columns.set(key, [depth]);
+      }
     }
   }
 };
@@ -139,8 +239,15 @@ const SEAM_VOXELS = 1e-3;
 /** All the sources' spans, column by column, joined where they overlap or meet at a seam. */
 const joinSpans = (all: readonly Spans[], grain: number): Spans => {
   const joined: Spans = new Map();
-  for (const [column, spans] of all.flatMap((source) => [...source])) {
-    joined.set(column, [...(joined.get(column) ?? []), ...spans]);
+  for (const source of all) {
+    for (const [column, spans] of source) {
+      const into = joined.get(column);
+      if (into) {
+        into.push(...spans);
+      } else {
+        joined.set(column, [...spans]);
+      }
+    }
   }
   for (const [column, spans] of joined) {
     const merged: [number, number][] = [];
@@ -184,7 +291,7 @@ const fillAlong = (
       voxel[axes.across[0]] = lattice[0]!;
       voxel[axes.across[1]] = lattice[1]!;
       voxel[axes.ray] = checkedIndex((ray + 0.5) * grain, grain);
-      grid.set(keyOf(voxel[0]!, voxel[1]!, voxel[2]!), group);
+      grid.set(keyIn(grid.box, voxel[0]!, voxel[1]!, voxel[2]!), group);
       filled = true;
     };
     for (const span of spans) {
@@ -219,12 +326,12 @@ const THIN_AXES: readonly Axes[] = [
 const fillSource = (
   target: { readonly grid: Grid; readonly group: number; readonly grain: number },
   sampled: readonly { readonly own: Spans; readonly joined: Spans }[],
-  surface: () => Grid,
+  surface: () => readonly number[],
 ): void => {
   const crossed = THIN_AXES.map((axes, index) => fillAlong(target, axes, sampled[index]!));
   if (!crossed.includes(true)) {
-    for (const [key, group] of surface()) {
-      target.grid.set(key, group);
+    for (const key of surface()) {
+      target.grid.set(key, target.group);
     }
   }
 };
@@ -285,9 +392,9 @@ const meetsCell = (axes: readonly SeparatingAxis[], centre: Vec): boolean => {
   return true;
 };
 
-/** Every cell the source's surface meets, with the source's group. */
-const surfaceCells = (source: VoxelSource, grain: number): Grid => {
-  const reach: Grid = new Map();
+/** Every cell the source's surface meets, keyed in `box`, in the order its triangles meet them; a cell may repeat. */
+const surfaceCells = (source: VoxelSource, grain: number, box: Box): number[] => {
+  const reach: number[] = [];
   const { positions, indices } = source;
   const point = (vertex: number): Vec => [
     positions[vertex * 3]!,
@@ -304,7 +411,7 @@ const surfaceCells = (source: VoxelSource, grain: number): Grid => {
       for (let y = low![1]! - 1; y <= high![1]! + 1; y += 1) {
         for (let z = low![2]! - 1; z <= high![2]! + 1; z += 1) {
           if (meetsCell(axes, [(x + 0.5) * grain, (y + 0.5) * grain, (z + 0.5) * grain])) {
-            reach.set(keyOf(x, y, z), source.group);
+            reach.push(keyIn(box, x, y, z));
           }
         }
       }
@@ -313,47 +420,48 @@ const surfaceCells = (source: VoxelSource, grain: number): Grid => {
   return reach;
 };
 
-const NEIGHBOURS = [1, -1, RANGE, -RANGE, RANGE * RANGE, -RANGE * RANGE];
-
-/** The 6-connected bodies of the grid, largest first, as sets of keys. */
-const bodiesOf = (grid: Grid): Set<number>[] => {
-  const seen = new Set<number>();
-  const bodies: Set<number>[] = [];
+/** The 6-connected bodies of the grid, largest first, as keys in the order the walk reaches them. */
+const bodiesOf = (grid: Grid): number[][] => {
+  const seen = new Uint8Array(grid.box.size[0] * grid.box.size[1] * grid.box.size[2]);
+  const bodies: number[][] = [];
   for (const start of grid.keys()) {
-    if (seen.has(start)) {
+    if (seen[start]) {
       continue;
     }
-    const body = new Set([start]);
-    seen.add(start);
+    const body = [start];
+    seen[start] = 1;
     const stack = [start];
     while (stack.length > 0) {
       const key = stack.pop()!;
-      for (const step of NEIGHBOURS) {
+      for (const step of grid.steps) {
         const next = key + step;
-        if (grid.has(next) && !seen.has(next)) {
-          seen.add(next);
-          body.add(next);
+        if (grid.has(next) && !seen[next]) {
+          seen[next] = 1;
+          body.push(next);
           stack.push(next);
         }
       }
     }
     bodies.push(body);
   }
-  return bodies.sort((a, b) => b.size - a.size);
+  return bodies.sort((a, b) => b.length - a.length);
 };
+
+const UNREACHED = -1;
 
 /**
  * Cells by their distance from the joined cells, popped nearest first. A cell may be pushed again when a shorter walk
  * reaches it; the entry at its old distance is then stale and skipped.
  */
-const walkQueue = () => {
-  const distance = new Map<number, number>();
+const walkQueue = (cells: number) => {
+  /** Per cell, its distance, or UNREACHED. */
+  const distance = new Int32Array(cells).fill(UNREACHED);
   const buckets: number[][] = [];
   let lowest = 0;
   return {
     distance,
     push: (cell: number, steps: number): void => {
-      distance.set(cell, steps);
+      distance[cell] = steps;
       const bucket = buckets[steps] ?? [];
       buckets[steps] = bucket;
       bucket.push(cell);
@@ -364,7 +472,7 @@ const walkQueue = () => {
         const cell = buckets[lowest]?.pop();
         if (cell === undefined) {
           lowest += 1;
-        } else if (distance.get(cell) === lowest) {
+        } else if (distance[cell] === lowest) {
           return cell;
         }
       }
@@ -384,28 +492,30 @@ const walkQueue = () => {
  */
 const bridge = (grid: Grid, reach: Grid, anchor: Grid): void => {
   const bodies = bodiesOf(grid);
-  const bodyOf = new Map<number, number>();
+  const cells = grid.box.size[0] * grid.box.size[1] * grid.box.size[2];
+  const bodyOf = new Int32Array(cells);
   bodies.forEach((body, index) => {
     for (const key of body) {
-      bodyOf.set(key, index);
+      bodyOf[key] = index;
     }
   });
-  const queue = walkQueue();
+  const queue = walkQueue(cells);
   const { distance } = queue;
-  const from = new Map<number, number>();
+  /** Per cell a walk reached, the cell it came from. */
+  const from = new Int32Array(cells);
   /** Walks one step out from `cell` through cells the sources meet; the first cell of a body beside it, if any. */
   const stepOut = (cell: number): number | undefined => {
-    const steps = distance.get(cell)! + 1;
+    const steps = distance[cell]! + 1;
     let end: number | undefined;
-    for (const step of NEIGHBOURS) {
+    for (const step of grid.steps) {
       const next = cell + step;
-      if (distance.get(next) === 0) {
+      if (distance[next] === 0) {
         continue;
       }
       if (grid.has(next)) {
         end ??= next;
-      } else if (reach.has(next) && (distance.get(next) ?? Number.POSITIVE_INFINITY) > steps) {
-        from.set(next, cell);
+      } else if (reach.has(next) && (distance[next] === UNREACHED || distance[next]! > steps)) {
+        from[next] = cell;
         queue.push(next, steps);
       }
     }
@@ -417,8 +527,8 @@ const bridge = (grid: Grid, reach: Grid, anchor: Grid): void => {
    */
   const fillWalk = (cell: number): void => {
     const walk = [cell];
-    while (distance.get(walk.at(-1)!) !== 0) {
-      walk.push(from.get(walk.at(-1)!)!);
+    while (distance[walk.at(-1)!] !== 0) {
+      walk.push(from[walk.at(-1)!]!);
     }
     for (const filled of walk.slice(0, -1)) {
       grid.set(filled, reach.get(filled)!);
@@ -446,7 +556,7 @@ const bridge = (grid: Grid, reach: Grid, anchor: Grid): void => {
     const end = stepOut(cell);
     if (end !== undefined) {
       fillWalk(cell);
-      join(bodyOf.get(end)!);
+      join(bodyOf[end]!);
     }
   }
 };
@@ -560,11 +670,12 @@ const exposedFaces = (
   const { d, sign } = sweep;
   const slices = new Map<number, Face[]>();
   let count = 0;
-  for (const [key, group] of grid) {
-    const at = voxelOf(key);
-    const next: [number, number, number] = [at[0], at[1], at[2]];
-    next[d] = at[d]! + sign;
-    const neighbour = grid.get(keyOf(...next));
+  // The neighbour along +d is the step for axis d in Grid.steps, which runs z, y, x.
+  const step = sign * grid.steps[2 * (2 - d)]!;
+  for (const key of grid.keys()) {
+    const group = grid.get(key)!;
+    const at = grid.voxelOf(key);
+    const neighbour = grid.get(key + step);
     if (neighbour !== undefined && !exposeInterface?.(group, neighbour)) {
       continue;
     }
@@ -581,7 +692,7 @@ const boundsOf = (grid: Grid): Bounds => {
   const low = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
   const high = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
   for (const key of grid.keys()) {
-    const at = voxelOf(key);
+    const at = grid.voxelOf(key);
     for (let axis = 0; axis < 3; axis += 1) {
       low[axis] = Math.min(low[axis]!, at[axis]!);
       high[axis] = Math.max(high[axis]!, at[axis]!);
@@ -689,16 +800,10 @@ const checkedGrain = (grain: number): void => {
 };
 
 /**
- * Fills each source's voxels into `filled(index)`, sampled together so thinness is judged on the shape they make, and,
- * with `met`, records the cells their surfaces touch.
+ * Samples the sources together, so thinness is judged on the shape they make: `fill(index, grid)` fills source `index`'s
+ * voxels into `grid`, and `surface(index)` lists the cells its surface meets.
  */
-const sample = (
-  solids: readonly VoxelSource[],
-  lattice: { readonly grain: number; readonly origin: readonly number[] },
-  filled: (index: number) => Grid,
-  met?: Grid,
-): void => {
-  const { grain, origin } = lattice;
+const sample = (solids: readonly VoxelSource[], { grain, origin }: Lattice, box: Box) => {
   const locals = solids.map((source) => ({ ...source, positions: shifted(source.positions, origin, -1) }));
   const spans = locals.map((local) => THIN_AXES.map((axes) => spansOf(crossings(local, grain, axes))));
   const joined = THIN_AXES.map((_, axis) =>
@@ -707,21 +812,20 @@ const sample = (
       grain,
     ),
   );
-  for (const [index, local] of locals.entries()) {
-    let surface: Grid | undefined;
-    const surfaceOf = (): Grid => {
-      surface ??= surfaceCells(local, grain);
-      return surface;
-    };
-    fillSource(
-      { grid: filled(index), group: local.group, grain },
-      spans[index]!.map((own, axis) => ({ own, joined: joined[axis]! })),
-      surfaceOf,
-    );
-    for (const [key, group] of met ? surfaceOf() : []) {
-      met!.set(key, group);
-    }
-  }
+  const surfaces: (readonly number[] | undefined)[] = [];
+  const surface = (index: number): readonly number[] => {
+    surfaces[index] ??= surfaceCells(locals[index]!, grain, box);
+    return surfaces[index];
+  };
+  return {
+    fill: (index: number, grid: Grid): void =>
+      fillSource(
+        { grid, group: locals[index]!.group, grain },
+        spans[index]!.map((own, axis) => ({ own, joined: joined[axis]! })),
+        () => surface(index),
+      ),
+    surface,
+  };
 };
 
 export interface VoxelMeasure {
@@ -744,14 +848,16 @@ export const measureVoxels = (
   origin: readonly number[] = [0, 0, 0],
 ): (VoxelMeasure | undefined)[] => {
   checkedGrain(grain);
-  const grids: Grid[] = sources.map(() => new Map());
-  sample(sources, { grain, origin }, (index) => grids[index]!);
+  const lattice = { grain, origin };
+  const box = boxOf(sources, lattice);
+  const sampled = sample(sources, lattice, box);
+  const grid = new Grid(box);
   const at = (axis: number, cells: number): number => cells * grain + origin[axis]!;
   const measureOf = (grid: Grid): VoxelMeasure => {
     const [low, high] = boundsOf(grid);
     const sum = [0, 0, 0];
     for (const key of grid.keys()) {
-      voxelOf(key).forEach((index, axis) => {
+      grid.voxelOf(key).forEach((index, axis) => {
         sum[axis] = sum[axis]! + index;
       });
     }
@@ -762,7 +868,11 @@ export const measureVoxels = (
       voxels: grid.size,
     };
   };
-  return grids.map((grid) => (grid.size === 0 ? undefined : measureOf(grid)));
+  return sources.map((_, index) => {
+    grid.clear();
+    sampled.fill(index, grid);
+    return grid.size === 0 ? undefined : measureOf(grid);
+  });
 };
 
 /**
@@ -788,11 +898,22 @@ export const voxelize = (
 ): Voxelized => {
   checkedGrain(grain);
   const lattice = { grain, origin };
-  const grid: Grid = new Map();
-  const reach: Grid = new Map();
-  sample(sources, lattice, () => grid, reach);
-  const anchor: Grid = new Map();
-  sample(neighbours, lattice, () => anchor);
+  // Neighbours share the box, so their cells and these sources' are keyed alike.
+  const box = boxOf([...sources, ...neighbours], lattice);
+  const grid = new Grid(box);
+  const reach = new Grid(box);
+  const drawn = sample(sources, lattice, box);
+  for (const [index, { group }] of sources.entries()) {
+    drawn.fill(index, grid);
+    for (const key of drawn.surface(index)) {
+      reach.set(key, group);
+    }
+  }
+  const anchor = new Grid(box);
+  const neighbouring = sample(neighbours, lattice, box);
+  for (const index of neighbours.keys()) {
+    neighbouring.fill(index, anchor);
+  }
   bridge(grid, reach, anchor);
   if (grid.size === 0) {
     return { groups: new Map(), stats: { voxels: 0, faces: 0, quads: 0 } };
