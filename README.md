@@ -56,6 +56,9 @@ are separate packs because a product can want traffic without aircraft or ruins.
 taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
 import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 `models/recipes/skelly.ground-vehicles.jsonnet`.
+Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
+authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
+whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
 
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
