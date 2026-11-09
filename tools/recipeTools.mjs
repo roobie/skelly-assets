@@ -2,7 +2,8 @@
 // loader: `tasks` checks a tool's rows together and gives each the portable data its export needs, and `exportOf`
 // turns one task into its export on a worker thread.
 // Gun rows' sources resolve against this folder, where GAT's own export resolves them. A tool whose rows declare their
-// inputs names the code its exports run, so tools/build.mjs can cache them; see thing-export's cache.ts, exportCache.
+// inputs names the code its exports run and the data that code imports, so tools/build.mjs can cache them; see
+// thing-export's cache.ts, codeFingerprint.
 // Import after tools/sources.mjs, installJsonnetSources: the loaders read the compiled Jsonnet twins.
 import { join } from 'node:path';
 
