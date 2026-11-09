@@ -1,5 +1,5 @@
 // Builds the repo's models from their sources in models/ into GLB files.
-// Usage: node tools/build.mjs [--out dir] [rowId ...]
+// Usage: node tools/build.mjs [--out dir] [--cache dir] [rowId ...]
 // With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/ and built/manifest.json
 // (tools/manifest.mjs); with ids it builds those roster-source rows, any row
@@ -24,8 +24,11 @@ const here = import.meta.dirname;
 const repo = resolve(here, '..');
 
 // Every model is generated on a worker thread; the files are written here in source order, so the tree does not
-// depend on which model finished first.
-const exportPool = () => workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
+// depend on which model finished first. With a cache folder, unchanged models come from it (recipeTools.mjs, generateRow).
+const exportPool = (cache) => {
+  const pool = workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
+  return { run: (task) => pool.run({ ...task, cache }), close: () => pool.close() };
+};
 
 // Splits one recipe file's rows by owning tool, before any loader sees them.
 export function partitionRecipe(packId, rows, tools) {
@@ -138,7 +141,7 @@ async function buildRoster(thing, ids, out, roster, pool) {
 async function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
-    options: { out: { type: 'string', default: join(repo, 'built') } },
+    options: { out: { type: 'string', default: join(repo, 'built') }, cache: { type: 'string' } },
   });
   const roster = new Map(readRoster().map((row) => [row.id, row]));
   const ids = positionals.length > 0 ? positionals : [...roster.keys()];
@@ -153,7 +156,7 @@ async function main() {
     if (problems.length > 0) process.exit(1);
   }
   let failed = false;
-  const pool = exportPool();
+  const pool = exportPool(values.cache && resolve(values.cache));
   try {
     const [built, recipes] = await Promise.all([
       buildRoster((await recipeTools()).thing, ids, out, roster, pool),

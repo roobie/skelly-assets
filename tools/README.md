@@ -103,7 +103,9 @@ Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildMan
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
-rather than assumed to. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
+rather than assumed to. A build given a cache folder reuses every export whose code and inputs are unchanged; see
+`packages/thing-export/src/cache.ts`, `exportCache`. A key that leaves out something an export reads would serve
+stale bytes, so a tool caches only rows that name their inputs, and an over-wide key costs only a miss. Release archives are byte-reproducible for the same reason; see `pack-release.mjs`,
 `packRelease`. The showcase reads this authority rather than maintaining its own model selection; see
 `../site/build.mjs`.
 
