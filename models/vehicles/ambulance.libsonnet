@@ -16,7 +16,7 @@ local plus(tag, u, v, half, arm, face) = [
   face(tag + '_arm_low', [u - half, u - arm], [v - arm, v + arm]),
   face(tag + '_arm_high', [u + arm, u + half], [v - arm, v + arm]),
 ];
-local sidePlus(tag, z0, z1) = plus(tag, -1.5, 2.0, 11 * grain, 5 * grain, function(id, x, y) k.box(id, 'cross', [x[0], y[0], z0], [x[1], y[1], z1]));
+local sidePlus(tag, z0, z1) = plus(tag, -1.5, 2.0, 11 * grain, 4 * grain, function(id, x, y) k.box(id, 'cross', [x[0], y[0], z0], [x[1], y[1], z1]));
 // The chequer cells of one wall between x0 and x1, cut to that span, so a wall and its door stay in step.
 local checks(tag, x0, x1, z0, z1) = [
   k.box(tag + '_' + i + '_' + row, slot(i, row), [std.max(tail + i * block, x0), low + row * rowHeight, z0], [std.min(tail + (i + 1) * block, x1), low + (row + 1) * rowHeight, z1])
