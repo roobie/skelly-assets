@@ -15,7 +15,7 @@ local atom(id, family, massKg, dimensions, finish, solid, exportMass, turn=[0, 0
     serving: serving, foodDepth: height * 0.23, beanRadius: 0.006, beanCount: 6,
   }, { body: 'steel-grey', label: label, stripe: 'paperboard-tan', food: food }, 'wall', exportMass),
   items: [
-    tin('opened_beans', 0.037, 0.11, 'paint-terracotta', 'beans', exportMass='inventory-atom') + { taxonomy: { tags: { state: ['opened'] } } },
+    tin('opened_beans', 0.038, 0.11, 'paint-terracotta', 'beans', exportMass='inventory-atom') + { taxonomy: { tags: { state: ['opened'] } } },
     tin('opened_soup', 0.034, 0.12, 'paperboard-tan', 'soup', exportMass='inventory-atom') + { taxonomy: { tags: { state: ['opened'] } } },
     tin('empty_can', 0.037, 0.11, 'paint-terracotta', 'empty', exportMass='inventory-atom') + { taxonomy: { tags: { state: ['empty'] } } },
     tin('opened_soda', 0.033, 0.115, 'plastic-red', 'drink', exportMass='inventory-atom', food='paint-oxblood', massKg=0.015) + { taxonomy: { tags: { state: ['opened'] } } },
