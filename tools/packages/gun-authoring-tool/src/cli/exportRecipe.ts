@@ -118,8 +118,26 @@ const exporters = {
 // The recipe row kinds this tool owns; a driver hands it only rows of these kinds.
 export const GUN_KINDS: readonly string[] = Object.freeze(Object.keys(exporters));
 
+/**
+ * Per kind, the files a row names, which its export reads besides code; the data the code itself imports is the
+ * driver's to key, since it is the same for every row.
+ */
+const namedFiles = {
+  design: (row: Row) => [row.source],
+  cartridge: (row: Row) => [row.source],
+  attachment: () => [],
+  part: () => [],
+  magazine: (row: Row) => [String((optionsFor(row) as { cartridge?: unknown }).cartridge)],
+} satisfies Record<keyof typeof exporters, (row: Row) => readonly string[]>;
+
 export const loadExportRecipe = (value: unknown = content, root = ROOT): readonly RecipeExport<DeadvoxModelEntry>[] =>
   loadRecipe(
     value,
     Object.fromEntries(Object.entries(exporters).map(([kind, load]) => [kind, (row: Row) => load(row, root)])),
+    Object.fromEntries(
+      Object.entries(namedFiles).map(([kind, files]) => [
+        kind,
+        (row: Row) => files(row).map((file) => [file, readFileSync(resolve(root, file), 'utf8')]),
+      ]),
+    ),
   );

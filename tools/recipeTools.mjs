@@ -23,6 +23,15 @@ const loadRecipeTools = async () => {
       exportOf: (row) => gun.loadExportRecipe([row], here)[0],
       directory: 'gungen',
       index: false,
+      code: [
+        'package-lock.json',
+        'packages/construct/src',
+        'packages/thing-core/src',
+        'packages/thing-export/src',
+        'packages/gun-authoring-tool/src',
+      ],
+      // The gun code imports its tables, cartridges and the materials as JSON, whatever the row.
+      data: ['packages/gun-authoring-tool/src', 'packages/gun-authoring-tool/cartridges', 'packages/thing-core/src'],
     },
     thing: {
       kinds: thing.THING_KINDS,
@@ -44,10 +53,10 @@ const loadRecipeTools = async () => {
 
 // One cache per tool in the build's cache folder, so each tool's entries are keyed by its own code.
 const caches = new Map();
-const cacheOf = async (folder, name, code) => {
+const cacheOf = async (folder, name, { code, data }) => {
   const { codeFingerprint, exportCache } = await import('./packages/thing-export/src/cache.ts');
   const dir = join(folder, name);
-  if (!caches.has(dir)) caches.set(dir, exportCache(dir, codeFingerprint(here, code)));
+  if (!caches.has(dir)) caches.set(dir, exportCache(dir, codeFingerprint(here, code, data)));
   return caches.get(dir);
 };
 
@@ -56,5 +65,5 @@ const cacheOf = async (folder, name, code) => {
 export async function generateRow({ tool, task, cache }) {
   const { generateModel } = await import('./packages/thing-export/src/files.ts');
   const owner = (await recipeTools())[tool];
-  return generateModel(owner.exportOf(task), cache && owner.code ? await cacheOf(cache, tool, owner.code) : undefined);
+  return generateModel(owner.exportOf(task), cache && owner.code ? await cacheOf(cache, tool, owner) : undefined);
 }
