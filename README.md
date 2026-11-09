@@ -54,7 +54,7 @@ from its measures, so parallel authors each add files and none edits a shared li
 vehicles, never single parts, so a vehicle's parts all live in one pack; road vehicles, helicopters and wrecks
 are separate packs because a product can want traffic without aircraft or ruins. A vehicle's file sets the
 taxonomy default for its rows, so the whole vehicle is tagged in one place. The index that lets the catalogue
-import those files is generated; see `tools/vehicle-index.mjs`, `vehicleIndex`, and
+import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 `models/recipes/skelly.ground-vehicles.jsonnet`.
 
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;

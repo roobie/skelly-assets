@@ -1,6 +1,6 @@
-local fit = import '../worn-fit.libsonnet';
-local rows = import 'ground.libsonnet';
-local worn = import '../worn-taxonomy.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local rows = std.flattenArrays(std.objectValues(import 'sets/index.libsonnet'));
+local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 local finish(model) = [r for r in rows if r.id == model][0].parts[0].finish;
 // A fitted template with its shells tagged as the garment they belong to.
 local tagged(own, template) = template + { rows: worn.shells(own, template.rows) };

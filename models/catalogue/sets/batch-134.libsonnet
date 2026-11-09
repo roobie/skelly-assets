@@ -1,4 +1,4 @@
-local h = import '../compound.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local rad(deg) = deg * std.pi / 180;
 
@@ -204,24 +204,171 @@ local galea = {
   // A barbute standing upright, front on +z, 290 mm tall, 200 mm across and 245 mm front to back: a close steel skull
   // reaching down to the neck, with a Y-shaped opening for the eyes, nose and mouth, a low keel and a row of liner
   // rivets.
-  h.compound('helmet_barbute', 1.175,
+  h.compound('helmet_barbute', 2.5,
              shell('skull', barbute.ys, barbute.f, barbute.cuts)
              + [keel('keel', 'shell', 0.122, -0.004, 0.175, 0.115, 0.006, 0.006)]
              + rivetRow('rivet', 'rivet', 0.1, 0.122, -0.004, 0.16, [-150, -120, -90, -60, 60, 90, 120, 150, 180]),
              { shell: 'steel-grey', inside: 'cloth-black', rivet: 'steel-bright' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['medieval'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+
+  // A light close helm with its visor raised, standing upright, front on +z, 300 mm tall and 260 mm front to back: a
+  // rounded skull with a keel, a jutting bevor over the chin, a short gorget flare at the neck and the pointed visor
+  // swung up over the brow on a pivot each side, leaving the face open.
+  h.compound('hc_lighthelm_close_raised', 3.5,
+             shell('skull', closeHelm.ys, closeHelm.f, closeHelm.cuts)
+             + [keel('keel', 'shell', 0.118, 0, 0.185, 0.115, 0.01, 0.006)]
+             + slab('visor-low', 'visor', clip(prow(0.104, 0.136, 0, 0.018), 0, -1, 0), 0.188, 0.21)
+             + slab('visor-high', 'visor', clip(prow(0.092, 0.124, 0, 0.014), 0, -1, 0), 0.21, 0.232)
+             + [box('slit-%d' % i, 'inside', [-0.06, 0.202 + i * 0.012, 0.11], [-0.008, 0.206 + i * 0.012, 0.13]) for i in [0, 1]]
+             + [box('slit-r%d' % i, 'inside', [0.008, 0.202 + i * 0.012, 0.11], [0.06, 0.206 + i * 0.012, 0.13]) for i in [0, 1]]
+             + [h.rod('pivot', 'rivet', 0.01, -0.108, 0.108, 0.198)]
+             + rivetRow('rivet', 'rivet', 0.098, 0.124, 0.006, 0.11, [-120, -60, 60, 120]),
+             { shell: 'steel-blued', visor: 'steel-blued', inside: 'cloth-black', rivet: 'steel-bright' })
+  + { voxelGrain: 0.004 },
+
+  // Sparring headgear standing upright, front on +z, 230 mm tall: a padded leather hood with a wide face opening, a
+  // chin bar, a brow roll, a ringed ear pad each side and laces up the back.
+  h.compound('headgear', 0.55,
+             shell('hood', sparring.ys, sparring.f, sparring.cuts, 'pad')
+             + slab('brow', 'trim', clip(ell(0.11, 0.126, 0), 0, -1, -0.06), 0.165, 0.185)
+             + slab('chin', 'trim', clip(ell(0.11, 0.126, 0), 0, -1, -0.06), 0.0, 0.045)
+             + std.flattenArrays([
+               [
+                 h.turned('ear-pad-%d' % s, 'trim', 'x', [[0, 0.016], [0, 0.034], [0.012, 0.034], [0.012, 0.016], [0, 0.016]], [if s > 0 then 0.098 else -0.11, 0.095, -0.005]),
+                 sideDisc('ear-hole-%d' % s, 'inside', s, 0.104, 0.095, -0.005, 0.016, 0.006, 0.002),
+               ]
+               for s in [-1, 1]
+             ])
+             + [box('lace-%d' % i, 'trim', [-0.02, 0.05 + i * 0.022, -0.124], [0.02, 0.056 + i * 0.022, -0.114]) for i in std.range(0, 4)]
+             + [box('lace-gap', 'inside', [-0.004, 0.05, -0.122], [0.004, 0.15, -0.115])],
+             { pad: 'leather-red', trim: 'vinyl-black', inside: 'cloth-black' })
+  + { voxelGrain: 0.004 },
+
+  // A combat helmet standing on its rim, front on +z, 290 mm front to back and 175 mm tall: a tan composite shell cut
+  // high at the brow, an accessory rail along each side, a night-vision shroud at the front, and a chinstrap with a
+  // cup lying on the floor in front.
+  h.compound('helmet_army', 1.4,
+             shell('shell', ach.ys, ach.f, ach.cuts)
+             + std.flattenArrays([
+               [
+                 box('rail-%d' % s, 'rail', [if s > 0 then 0.104 else -0.12, 0.05, -0.05], [if s > 0 then 0.12 else -0.104, 0.064, 0.04]),
+                 box('strap-%d' % s, 'strap', [if s > 0 then 0.104 else -0.116, 0, -0.014], [if s > 0 then 0.116 else -0.104, 0.05, 0.01]),
+               ] + strip('strap-floor-%d' % s, 'strap', [s * 0.11, 0.0], [s * 0.03, 0.15], 0.02, 0, 0.003)
+               for s in [-1, 1]
+             ])
+             + [
+               box('cup', 'strap', [-0.04, 0, 0.142], [0.04, 0.012, 0.166]),
+               box('shroud', 'rail', [-0.022, 0.088, 0.112], [0.022, 0.118, 0.13]),
+               box('shroud-plate', 'rail', [-0.012, 0.094, 0.13], [0.012, 0.112, 0.134]),
+             ],
+             { shell: 'polymer-fde', inside: 'cloth-black', rail: 'polymer-black', strap: 'nylon-coyote' })
+  + { voxelGrain: 0.004 },
+
+  // A steel flak helmet standing on its rim, front on +z, 280 mm front to back and 175 mm tall: a round pot with a
+  // flared, rolled rim and a leather chinstrap lying out in front with its buckle.
+  h.compound('helmet_army_outdated', 1.2,
+             shell('pot', flak.ys, flak.f)
+             + std.flattenArrays([
+               [box('bail-%d' % s, 'strap', [if s > 0 then 0.112 else -0.122, 0.0, -0.012], [if s > 0 then 0.122 else -0.112, 0.05, 0.012])]
+               + strip('strap-%d' % s, 'strap', [s * 0.118, 0.0], [s * 0.03, 0.16], 0.02, 0, 0.003)
+               for s in [-1, 1]
+             ])
+             + [box('strap-front', 'strap', [-0.034, 0, 0.15], [0.034, 0.003, 0.17]), box('buckle', 'buckle', [-0.014, 0, 0.146], [0.006, 0.006, 0.174])],
+             { shell: 'paint-olive', strap: 'leather-brown', buckle: 'brass-dull' })
+  + { voxelGrain: 0.004 },
+
+  // An eagle helmet standing upright, front on +z, 270 mm tall and 360 mm long: a carved wooden head whose open beak is
+  // the face opening, the hooked upper beak jutting over the brow and the lower beak under the chin, an eye on each
+  // side, painted feather bands round the head and a fan of plumes rising at the back.
+  h.compound('helmet_aztec', 2.5,
+             shell('head', eagle.ys, eagle.f, eagle.cuts)
+             + std.flattenArrays([
+               slab('band-%d' % i, 'band', clip(ell(0.116, 0.136, 0), 0, 1, 0.03), 0.02 + i * 0.06, 0.032 + i * 0.06)
+               for i in [0, 1, 2]
+             ])
+             + [
+               h.prism('beak-top', 'beak', 'x', [[0.235, 0.08], [0.215, 0.19], [0.175, 0.232], [0.15, 0.218], [0.165, 0.08]], -0.032, 0.032),
+               h.prism('beak-top-l', 'beak', 'x', [[0.228, 0.08], [0.205, 0.16], [0.165, 0.16], [0.165, 0.08]], -0.058, -0.032),
+               h.prism('beak-top-r', 'beak', 'x', [[0.228, 0.08], [0.205, 0.16], [0.165, 0.16], [0.165, 0.08]], 0.032, 0.058),
+               h.prism('beak-low', 'beak', 'x', [[0.05, 0.08], [0.046, 0.17], [0.03, 0.195], [0.0, 0.16], [0.0, 0.08]], -0.045, 0.045),
+             ]
+             + std.flattenArrays([
+               [
+                 sideDisc('eye-%d' % s, 'eye', s, 0.088, 0.205, 0.075, 0.017, 0.01, 0.006),
+                 sideDisc('pupil-%d' % s, 'inside', s, 0.094, 0.205, 0.075, 0.008, 0.002, 0.004),
+               ]
+               for s in [-1, 1]
+             ])
+             + [
+               local t = rad(-50 + 25 * i);
+               h.prism('plume-%d' % i, if i % 2 == 0 then 'plume' else 'plume-b', 'x', [[0.23, -0.06], [0.23 + 0.13 * std.cos(rad(25 * (i - 2) + 70)) * 0.4 + 0.02, -0.07 - 0.03], [0.23 + 0.13, -0.13 - 0.02 * i], [0.24 + 0.12, -0.11 - 0.02 * i]], -0.004 + 0.022 * (i - 2), 0.004 + 0.022 * (i - 2))
+               for i in std.range(0, 4)
+             ],
+             { shell: 'wood-walnut', band: 'paint-cream', inside: 'cloth-black', beak: 'paint-crane-yellow', eye: 'paint-white', plume: 'cloth-green', 'plume-b': 'cloth-red' })
+  + { voxelGrain: 0.004 },
+
+  // A batting helmet standing on its ear flaps, front on +z, 255 mm front to back and 210 mm tall: a glossy shell over
+  // a padded liner, an ear flap down each side with its ear hole, a short peak and vent holes in the crown.
+  h.compound('helmet_ball', 0.57,
+             shell('shell', batting.ys, batting.f, batting.cuts)
+             + bill('peak', 'shell', 0.1, 0.19, 0.084, 0.081, 0.094)
+             + std.flattenArrays([
+               [sideDisc('ear-%d' % s, 'inside', s, 0.102, 0.06, -0.012, 0.014, 0.008, 0.002)]
+               for s in [-1, 1]
+             ])
+             + [
+               h.disc('vent-%d' % i, 'inside', 0.007, domeY(0.102, 0.122, 0, 0.12, 0.092, v[0], v[1]) - 0.006, domeY(0.102, 0.122, 0, 0.12, 0.092, v[0], v[1]) + 0.001, v[0], v[1])
+               for i in std.range(0, 3)
+               for v in [[[-0.03, 0.04], [0.03, 0.04], [-0.04, -0.05], [0.04, -0.05]][i]]
+             ],
+             { shell: 'plastic-blue', inside: 'cloth-black' })
+  + { voxelGrain: 0.004 },
+
+  // A bike helmet standing on its rim, front on +z, 260 mm front to back and 155 mm tall: a long rounded shell with
+  // four dark vent channels front to back, a white foam band round the rim, a short visor and straps lying out to a buckle.
+  h.compound('helmet_bike', 0.2,
+             shell('shell', bike.ys, bike.f, bike.cuts)
+             + slab('foam', 'foam', ell(0.102, 0.132, -0.008), 0.0, 0.026)
+             + bill('visor', 'shell', 0.1, 0.165, 0.075, 0.05, 0.056)
+             + std.flattenArrays([
+               strip('strap-%d' % s, 'strap', [s * 0.098, -0.02], [s * 0.02, 0.15], 0.016, 0, 0.003)
+               for s in [-1, 1]
+             ])
+             + [box('buckle', 'buckle', [-0.02, 0, 0.145], [0.02, 0.008, 0.162])],
+             { shell: 'plastic-red', inside: 'plastic-black', foam: 'plastic-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+  + { voxelGrain: 0.004 },
 
   // A closed bronze helmet standing upright, front on +z, 280 mm tall and 255 mm front to back: one rounded shell to
   // the neck with a thickened rim, a single eye slit, a row of breathing holes and a keel over the crown.
-  h.compound('helmet_bronze', 1.11,
+  h.compound('helmet_bronze', 2.2,
              shell('shell', bronzeHelm.ys, bronzeHelm.f, bronzeHelm.cuts)
              + [keel('keel', 'shell', 0.122, -0.004, 0.17, 0.11, 0.014, 0.01)],
              { shell: 'bronze', inside: 'cloth-black' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['ancient'], slot: ['head'] } } },
+
+  // A chitin helmet standing upright, front on +z, 280 mm tall: a full shell of overlapping insect plates with raised
+  // seams, two eye holes and a slotted mouth grille, and a ridge over the crown.
+  h.compound('helmet_chitin', 1.8,
+             shell('shell', chitin(false).ys, chitin(false).f, chitin(false).cuts)
+             + std.flattenArrays([slab('seam-%d' % i, 'seam', clip(ell(0.111, 0.132, 0), 0, 1, 0.08), 0.02 + i * 0.05, 0.028 + i * 0.05) for i in [0, 1]])
+             + slab('seam-brow', 'seam', ell(0.111, 0.132, 0), 0.172, 0.18)
+             + [keel('keel', 'seam', 0.126, 0, 0.17, 0.11, 0.008, 0.012)],
+             { shell: 'chitin-brown', seam: 'leather-chestnut', inside: 'cloth-black' })
+  + { voxelGrain: 0.004 },
+
+  // A light chitin helmet standing upright, front on +z, 280 mm tall: the chitin shell with the face left open from
+  // brow to chin, raised seams and a ridge over the crown.
+  h.compound('helmet_chitin_light', 1.4,
+             shell('shell', chitin(true).ys, chitin(true).f, chitin(true).cuts)
+             + std.flattenArrays([slab('seam-%d' % i, 'seam', clip(ell(0.111, 0.132, 0), 0, 1, 0.0), 0.02 + i * 0.05, 0.028 + i * 0.05) for i in [0, 1]])
+             + slab('seam-brow', 'seam', ell(0.111, 0.132, 0), 0.172, 0.18)
+             + [keel('keel', 'seam', 0.126, 0, 0.17, 0.11, 0.008, 0.012)],
+             { shell: 'chitin-brown', seam: 'leather-chestnut', inside: 'cloth-black' })
+  + { voxelGrain: 0.004 },
 
   // A conical helm standing on its neck guard, front on +z, 340 mm tall and 236 mm across: a tall iron cone rising to a
   // spike over a fur brim, with a skirt of laced iron lames round the back and sides.
-  h.compound('helmet_conical', 1.425, [
+  h.compound('helmet_conical', 2.3, [
     h.turned('bowl', 'iron', 'y', [[0, 0], [0, 0.1], [0.05, 0.098], [0.11, 0.074], [0.16, 0.036], [0.18, 0.016], [0.2, 0.01], [0.215, 0.004], [0.24, 0]], [0, 0.1, 0]),
     h.disc('knop', 'trim', 0.014, 0.28, 0.296),
     ring('fur', 'fur', 0.094, 0.116, 0.085, 0.13),
@@ -235,22 +382,36 @@ local galea = {
     h.disc('tuft-%d' % i, 'fur', 0.008, 0.086, 0.13, 0.115 * std.sin(2 * std.pi * i / 22), 0.115 * std.cos(2 * std.pi * i / 22))
     for i in std.range(0, 21)
   ], { iron: 'steel-grey', trim: 'leather-brown', fur: 'fur-brown' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['medieval'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A Corinthian helm standing upright, front on +z, 285 mm tall and 280 mm front to back: one bronze shell to the
   // neck, flaring at the nape, with almond eye holes either side of a nose guard and a narrow gap between the cheek
   // guards down to the chin.
-  h.compound('helmet_corinthian', 1.31,
+  h.compound('helmet_corinthian', 1.9,
              shell('shell', corinthian.ys, corinthian.f, corinthian.cuts)
              + slab('nape', 'shell', clip(ell(0.112, 0.15, -0.004), 0, 1, -0.04), 0, 0.03)
              + slab('brow', 'shell', clip(ell(0.106, 0.134, -0.004), 0, -1, -0.02), 0.172, 0.182),
              { shell: 'bronze', inside: 'cloth-black' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['ancient'], slot: ['head'] } } },
+
+  // A football helmet standing on its rim, front on +z, 300 mm front to back and 235 mm tall: a glossy shell with a
+  // centre stripe, an ear hole each side, a smoked visor across the eyes and a barred face mask.
+  h.compound('helmet_football', 1.5,
+             shell('shell', football.ys, football.f, football.cuts)
+             + std.flattenArrays([
+               [sideDisc('ear-%d' % s, 'inside', s, 0.116, 0.075, -0.02, 0.012, 0.008, 0.002)]
+               for s in [-1, 1]
+             ])
+             + std.flattenArrays([h.crescent('bar-%d' % i, 'mask', 0.13, 0.138, -40, 40, 8, y, y + 0.009) for i in [0, 1, 2] for y in [[0.025, 0.06, 0.096][i]]])
+             + [h.disc('post-%d' % i, 'mask', 0.0045, 0.025, 0.105, 0.134 * std.sin(rad(a)), 0.134 * std.cos(rad(a))) for i in [0, 1, 2] for a in [[-40, 0, 40][i]]]
+             + [box('visor', 'visor', [-0.074, 0.112, 0.088], [0.074, 0.16, 0.094])],
+             { shell: 'plastic-red', stripe: 'plastic-white', inside: 'cloth-black', mask: 'plastic-grey', visor: 'lens-smoke' })
+  + { voxelGrain: 0.004 },
 
   // A galea standing on its cheek guards, front on +z, 250 mm tall and 330 mm long: an iron bowl with a brow
   // reinforce, a broad neck guard sloping out at the back, a hinged cheek guard hanging each side with brass bosses
   // and a crest knob on top.
-  h.compound('helmet_galea', 1.31,
+  h.compound('helmet_galea', 2.2,
              shell('bowl', galea.ys, galea.f)
              + slab('neck-guard', 'shell', clip(ell(0.124, 0.19, -0.03), 0, 1, -0.07), 0.076, 0.086)
              + slab('brow', 'shell', clip(ell(0.108, 0.126, -0.006), 0, -1, -0.03), 0.118, 0.13)
@@ -267,5 +428,5 @@ local galea = {
                box('crest-holder', 'trim', [-0.006, 0.255, -0.03], [0.006, 0.27, 0.02]),
              ],
              { shell: 'steel-grey', trim: 'brass-dull' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'armour', tags: { slot: ['head'], material: ['metal'], setting: ['ancient'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['ancient'], slot: ['head'] } } },
 ]

@@ -1,4 +1,4 @@
-local h = import '../compound.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local sbox(id, slot, a, b) = box(id, slot, [std.min(a[k], b[k]) for k in [0, 1, 2]], [std.max(a[k], b[k]) for k in [0, 1, 2]]);
 
@@ -137,9 +137,51 @@ local furOpts = { t: 0.026, w: 0.1, fw: 0.021, ct: 0.03, cuff: 0.11, flare: 0.03
 local medicalOpts = { t: 0.006, ct: 0.006, w: 0.084, fw: 0.017, fl: 1.08, cuff: 0.09, flare: 0.006, hem: 0.006 };
 
 [
+  // A pair of plain cotton gloves laid flat side by side, backs up, each 210 mm from cuff to fingertip and 90 mm across
+  // the knuckles, with a short hemmed cuff.
+  h.compound('gloves_light', 0.081, pair(lightOpts), { hand: 'cloth-cream', cuff: 'cloth-cream', hem: 'cloth-cream' })
+  + { voxelGrain: 0.004 },
 
   // A pair of thin black leather dress gloves laid flat, backs up, each 220 mm from cuff to fingertip, with three
   // raised points stitched down the back of the hand.
-  h.compound('gloves_leather', 0.16, pair(leatherOpts, extra=points('stitch', leatherOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'cloth-charcoal', stitch: 'cloth-charcoal' })
+  h.compound('gloves_leather', 0.19, pair(leatherOpts, extra=points('stitch', leatherOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'cloth-charcoal', stitch: 'cloth-charcoal' })
   + { voxelGrain: 0.004 },
+
+  // A pair of thin black leather golfing gloves laid flat, backs up, each 190 mm from wrist to fingertip, with a short
+  // wrist and a strap across the back of the wrist closing on a tab with a press stud.
+  h.compound('gloves_golf', 0.15, pair(golfOpts, extra=wristTab(golfOpts)), { hand: 'leather-black', cuff: 'leather-black', hem: 'leather-black', tab: 'leather-white', stud: 'metal-silver' })
+  + { voxelGrain: 0.004 },
+
+  // A pair of brown leather fingerless gloves laid flat, backs up, each 160 mm long, the fingers cut off past the
+  // first joint and hemmed.
+  h.compound('gloves_fingerless', 0.16, pair(fingerlessOpts), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black' })
+  + { voxelGrain: 0.004 },
+
+  // The same fingerless gloves with three steel slats riveted across the back of each hand, 160 mm long.
+  h.compound('gloves_fingerless_mod', 0.52, pair(fingerlessOpts, extra=guards(fingerlessOpts)), { hand: 'leather-brown', cuff: 'leather-brown', hem: 'leather-black', guard: 'steel-grey', rivet: 'steel-bright' })
+  + { voxelGrain: 0.004 },
+
+  // A pair of glossy black vinyl gloves laid flat, backs up, each 250 mm from cuff to fingertip, with a hooked black
+  // steel claw 30 mm long fixed by a ring to each fingertip and thumb.
+  h.compound('gloves_claws', 0.15, pair(clawOpts, extra=claws(clawOpts)), { hand: 'leather-patent', cuff: 'leather-patent', hem: 'leather-patent', claw: 'steel-parkerized' })
+  + { voxelGrain: 0.002 },
+
+  // A pair of knitted aramid cut-resistant gloves laid flat, backs up, each 230 mm from cuff to fingertip, with a ribbed
+  // knit cuff and an overlocked orange edge.
+  h.compound('gloves_cut_resistant', 0.08, pair(cutOpts, extra=ribs(cutOpts, 4)), { hand: 'aramid-gold', cuff: 'aramid-gold', hem: 'cloth-orange' })
+  + { voxelGrain: 0.004 },
+
+  // A pair of olive overhand protectors laid flat side by side, outside up: padded shields 210 mm long and 110 mm wide
+  // shaped to the back of the hand and closed fingers, with flex seams, an elastic finger loop and a wrist strap.
+  h.compound('gloves_eod', 0.12, overhand('l-', -0.075, 1) + overhand('r-', 0.075, -1), { pad: 'nylon-ranger-green', seam: 'webbing-olive-dark', strap: 'webbing-black', tab: 'hook-loop-grey' })
+  + { voxelGrain: 0.004 },
+
+  // A pair of thick fur gloves laid flat, backs up, each 300 mm from the cuff to the fingertips and 100 mm across the
+  // knuckles, with a wide flared gauntlet cuff and a deep fur ruff round its opening.
+  h.compound('gloves_fur', 0.35, pair(furOpts, 0.115), { hand: 'fur-brown', cuff: 'fur-brown', hem: 'fur-brown' })
+  + { voxelGrain: 0.004 },
+
+  // A pair of thin latex examination gloves laid flat, backs up, each 260 mm from the rolled cuff to the fingertips.
+  h.compound('gloves_medical', 0.012, pair(medicalOpts), { hand: 'plastic-frosted', cuff: 'plastic-frosted', hem: 'plastic-frosted' })
+  + { voxelGrain: 0.002 },
 ]

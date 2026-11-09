@@ -1,4 +1,4 @@
-local h = import '../compound.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 // A box from two opposite corners given in any order, for pieces mirrored across x.
 local sbox(id, slot, a, b) = box(id, slot, [std.min(a[k], b[k]) for k in [0, 1, 2]], [std.max(a[k], b[k]) for k in [0, 1, 2]]);
@@ -112,11 +112,14 @@ local closeHelm(id, mass, heavy, raised) =
   + { voxelGrain: 0.004 };
 
 [
+  // A clear shield visor standing on its lower edge, 260 mm round the curve and 120 mm tall: a thin, short visor on
+  // a black brow strip whose ends clip into the slots at each side of a hard hat.
+  visorShield('shield_visor', 0.11, 0.11, 68, 0.12, 0.002, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }),
 
   // A hard hat sun shield lying flat, 540 mm across and 530 mm from front to back: a wide white plastic brim with a
   // raised collar round an opening that slips over a hard hat's rim, a deep flap at the back for the neck, and four
   // clips inside the collar that grip the rim.
-  h.compound('sun_shield', 0.098,
+  h.compound('sun_shield', 0.25,
              h.crescent('brim', 'brim', 0.118, 0.215, 0, 360, 24, 0, 0.003)
              + h.crescent('flap', 'brim', 0.214, 0.31, 118, 242, 10, 0, 0.003)
              + h.crescent('flap-hem', 'hem', 0.3, 0.31, 118, 242, 10, 0.003, 0.006)
@@ -129,5 +132,54 @@ local closeHelm(id, mass, heavy, raised) =
                for a in [45 + 90 * i]
              ],
              { brim: 'plastic-white', hem: 'plastic-matte-black', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.004, taxonomy: { category: 'clothing', tags: { slot: ['head'], material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+
+  // A plastic airsoft helmet standing on its rim, front on +z, 250 mm across and 160 mm tall: a tan high-cut shell
+  // shaped like a military one, with a rail along each side, a mount shroud over the brow, hook-and-loop patches on
+  // the crown and back, and a black chin strap hanging loose from the rails.
+  local a = 0.12, ht = 0.135, R = (a * a + ht * ht) / (2 * ht), c = ht - R, y0 = 0.02;
+  local rAt(y) = std.sqrt(std.max(0, R * R - sq(y - y0 - c)));
+  h.compound('airsoft_helmet', 0.59,
+             [
+               h.dome('shell', 'shell', a, ht, 0.005, 'y', [0, y0, 0], 10),
+               // The shroud on the brow where a goggle mount slides in.
+               sbox('shroud', 'fitting', [-0.022, 0.07, rAt(0.07) - 0.006], [0.022, 0.108, rAt(0.07) + 0.006]),
+               sbox('shroud-slot', 'strap', [-0.012, 0.08, rAt(0.07) + 0.006], [0.012, 0.098, rAt(0.07) + 0.007]),
+               // Hook-and-loop patches on the crown and the back.
+               sbox('patch-top', 'patch', [-0.04, y0 + ht - 0.006, -0.03], [0.04, y0 + ht + 0.002, 0.04]),
+               sbox('patch-back', 'patch', [-0.04, 0.07, -rAt(0.07) - 0.004], [0.04, 0.11, -rAt(0.07) + 0.008]),
+             ]
+             + std.flattenArrays([
+               [
+                 // A rail along each side, its slots dark, and a strap anchor at each end.
+                 sbox('rail-%d' % (s + 1), 'fitting', [s * (rAt(0.06) - 0.006), 0.045, -0.07], [s * (rAt(0.06) + 0.008), 0.075, 0.07]),
+               ] + [
+                 sbox('rail-%d-slot-%d' % [s + 1, i], 'strap', [s * (rAt(0.06) + 0.008), 0.055, -0.06 + 0.026 * i], [s * (rAt(0.06) + 0.009), 0.065, -0.048 + 0.026 * i])
+                 for i in std.range(0, 4)
+               ] + [
+                 // The chin strap hanging from the rail's ends to the floor and running inside the rim.
+                 sbox('strap-%d-front' % (s + 1), 'strap', [s * (rAt(0.06) + 0.001), 0, 0.052], [s * (rAt(0.06) + 0.004), 0.05, 0.068]),
+                 sbox('strap-%d-back' % (s + 1), 'strap', [s * (rAt(0.06) + 0.001), 0, -0.068], [s * (rAt(0.06) + 0.004), 0.05, -0.052]),
+                 sbox('strap-%d-foot' % (s + 1), 'strap', [s * 0.07, 0, -0.06], [s * (rAt(0.06) + 0.004), 0.003, 0.068]),
+               ]
+               for s in [-1, 1]
+             ])
+             + [
+               sbox('buckle', 'fitting', [-0.018, 0, 0.04], [0.018, 0.008, 0.07]),
+               sbox('chin-cup', 'strap', [-0.07, 0, 0.045], [0.07, 0.003, 0.065]),
+             ],
+             { shell: 'polymer-fde', fitting: 'plastic-matte-black', strap: 'webbing-black', patch: 'hook-loop-grey' })
+  + { voxelGrain: 0.004 },
+
+  // A hardened steel heavy close helm standing on its neck, front on +z, 250 mm across, 280 mm deep and 305 mm
+  // tall: a combed skull, a bevor over the chin, a bulging visor with an eye slit pivoting at the temples, a riveted
+  // brow reinforce and three gorget lames.
+  closeHelm('ch_heavyhelm_close', 4.2, true, false),
+
+  // The same heavy close helm with its visor swung up over the brow, the face open: 340 mm tall.
+  closeHelm('ch_heavyhelm_close_raised', 4.2, true, true),
+
+  // A hardened steel close helm standing on its neck, 250 mm across, 280 mm deep and 305 mm tall: the same combed
+  // skull, bevor and visor as the heavy helm, on a single neck lame and without the brow reinforce.
+  closeHelm('ch_helm_close', 3.5, false, false),
 ]
