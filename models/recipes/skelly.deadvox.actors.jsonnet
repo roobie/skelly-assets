@@ -1,4 +1,5 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local severedParts = std.set([
   'shambler_torso', 'shambler_head', 'shambler_left_arm', 'shambler_right_arm', 'shambler_left_leg', 'shambler_right_leg',
 ]);
@@ -9,7 +10,7 @@ local severedParts = std.set([
     source: row.id,
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
-  }
+  } + taxonomy.of(row)
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
   if std.setMember(row.id, severedParts)
 ]

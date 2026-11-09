@@ -1,4 +1,5 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local owned = std.set([
   'cargo_pants', 'fanny_pack', 'fanny_pack_worn', 'fanny_pack_worn_jacket', 'hiking_backpack', 'hiking_backpack_worn',
   'hiking_backpack_worn_jacket', 'hoodie', 'jacket', 'jeans', 'riot_helmet', 'rubber_boots', 'school_backpack',
@@ -19,7 +20,7 @@ local owned = std.set([
     source: row.id,
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
-  }
+  } + taxonomy.of(row)
   for row in (import 'packages/thing-authoring-tool/items.jsonnet').items
   if std.setMember(row.id, owned)
 ]
