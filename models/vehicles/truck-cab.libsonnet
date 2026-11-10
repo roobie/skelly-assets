@@ -277,10 +277,15 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
   + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
 local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, s0), laid(kit, id, s0));
+// The sites of a truck that its cab and chassis do not lay, so its body can be laid behind another cab.
+local bodySites(kit, sites, id, s0) =
+  local own = std.set([site.id for site in fittings(kit, id, s0)]);
+  [site for site in sites if !std.setMember(site.id, own)];
 {
   spec: spec,
   archCorners: archCorners,
   rows: rows,
   items: items,
   fittings: fittings,
+  bodySites: bodySites,
 }
