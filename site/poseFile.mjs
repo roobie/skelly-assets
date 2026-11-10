@@ -14,7 +14,7 @@
 //
 // Hands come as shorthand, `hands: { <hand bone>: { curl, spread, thumb } }`, which site/fingers.mjs turns into digit
 // angles before `angles` of single digit bones are read, so a file can curl a hand and then open one finger. A held item,
-// `hold: { <hand bone>: { model, at?, turn?, socket, close? } }`, is placed after the reach: the palm is set on the
+// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, close? } }`, is placed after the reach: the palm is set on the
 // item's socket and the fingers then closed on the item by contact, so the grip is read off the item, not drawn by hand.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
 import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem } from './fingers.mjs';

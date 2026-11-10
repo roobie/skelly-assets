@@ -7,7 +7,7 @@ import { posedSolid, signedDepth } from './clearance.mjs';
 
 const HAND_KEYS = new Set(['curl', 'spread', 'thumb']);
 const THUMB_KEYS = new Set(['in', 'across', 'curl']);
-const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'close']);
+const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'close', 'pole']);
 const SOCKET_KEYS = new Set(['at', 'into', 'axis']);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
@@ -151,13 +151,14 @@ export function closeHand(rig, pose, handId, solid) {
 // ---- holding ----
 
 /**
- * Every way a hold does not fit: `{ model, at?, turn?, socket: { at, into, axis }, close? }`. The socket is on the item,
- * in its own frame: `at` where the palm's face meets it, `into` the direction from the palm into the item, `axis` along
- * the grip, the way the thumb points. With `at` the item stands in the world and the arm reaches it; without, the item
- * follows the hand. `close` false leaves the fingers as the pose has them.
+ * Every way a hold does not fit: `{ model, at?, turn?, pole?, socket: { at, into, axis }, close? }`. The socket is on
+ * the item, in its own frame: `at` where the palm's face meets it, `into` the direction from the palm into the item,
+ * `axis` along the grip, the way the thumb points. With `at` the item stands in the world and the arm reaches it, the
+ * elbow bending toward `pole` or the rig's own; without, the item follows the hand. `close` false leaves the fingers
+ * as the pose has them.
  */
 export function holdIssues(rig, handId, hold) {
-  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, socket, close? }`];
+  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, pole?, socket, close? }`];
   const issues = [];
   const hand = boneById(rig).get(handId);
   if (!hand?.reach) issues.push(`hold.${handId}: ${handId} is not a reach bone`);
@@ -165,6 +166,7 @@ export function holdIssues(rig, handId, hold) {
   if (typeof hold.model !== 'string') issues.push(`hold.${handId}.model names a model`);
   if (hold.at !== undefined && !isVector(hold.at)) issues.push(`hold.${handId}.at is a finite point [x, y, z]`);
   if (hold.turn !== undefined && !(Array.isArray(hold.turn) && hold.turn.length === 4 && hold.turn.every(Number.isFinite))) issues.push(`hold.${handId}.turn is a quaternion [x, y, z, w]`);
+  if (hold.pole !== undefined && !isVector(hold.pole)) issues.push(`hold.${handId}.pole is a finite direction [x, y, z]`);
   if (!isObject(hold.socket)) issues.push(`hold.${handId}.socket is { at, into, axis }`);
   else {
     for (const key of Object.keys(hold.socket)) if (!SOCKET_KEYS.has(key)) issues.push(`hold.${handId}.socket: unknown key ${key}`);
@@ -190,15 +192,62 @@ const palmSocket = (hand) => {
   return { at: [sign > 0 ? max[0] : min[0], (min[1] + max[1]) / 2, (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, 0, 1] };
 };
 
+// How far a rotation turns, in degrees.
+const turnOf = (m) => Math.acos(Math.min(1, Math.max(-1, (m[0] + m[4] + m[8] - 1) / 2))) * 180 / Math.PI;
+
+// The joint `bone` set to `angles` in `pose`, each held to its limits, the held ones on `report` when held by more
+// than the twist sweep's last step leaves.
+const HELD_BY = 0.05;
+const setJoint = (pose, bone, angles, report) => {
+  const kept = clampJointAngles(bone, angles);
+  if (kept.some((a, i) => Math.abs(a - angles[i]) > HELD_BY)) report?.push({ bone: bone.id, asked: angles, held: kept });
+  return withAngles(pose, bone, kept);
+};
+
+// The steps the forearm's twist is swept at: its whole range coarsely, then about the best ever finer.
+const TWIST_STEPS = [5, 1, 0.1];
+
+/**
+ * Turns `hand` onto the world orientation `wanted` as far as its limits allow, its parent twisting about itself to
+ * carry it the rest of the way: a wrist does not twist, the forearm does, so a palm is turned onto a socket by both.
+ * The parent's twist is swept within its limits for the one that leaves the hand's own turn least short.
+ */
+function turnHand(rig, pose, hand, wanted, report) {
+  const bones = boneById(rig);
+  const parent = bones.get(hand.parent);
+  const parentAngles = jointAngles(parent, pose.rotations[parent.id] ?? IDENTITY_M);
+  const shortBy = (twist) => {
+    const twisted = withAngles(pose, parent, clampJointAngles(parent, [parentAngles[0], twist, parentAngles[2]]));
+    const local = mulMM(transpose(boneTransforms(rig.bones, twisted).get(parent.id).r), wanted);
+    const angles = jointAngles(hand, local);
+    return { twist, angles, short: turnOf(mulMM(transpose(jointRotation(hand, clampJointAngles(hand, angles))), local)) };
+  };
+  // The least short wins; among equals, the twist that moves the parent least from where the pose has it.
+  const better = (a, b) => !b || a.short < b.short - 1e-6
+    || (Math.abs(a.short - b.short) <= 1e-6 && Math.abs(a.twist - parentAngles[1]) < Math.abs(b.twist - parentAngles[1]));
+  const sweep = (from, to, step) => {
+    let best;
+    for (let twist = from; twist <= to + 1e-9; twist += step) {
+      const tried = shortBy(twist);
+      if (better(tried, best)) best = tried;
+    }
+    return best;
+  };
+  const [min, max] = parent.limits.twist;
+  let best = sweep(min, max, TWIST_STEPS[0]);
+  for (let i = 1; i < TWIST_STEPS.length; i++) best = sweep(Math.max(min, best.twist - TWIST_STEPS[i - 1]), Math.min(max, best.twist + TWIST_STEPS[i - 1]), TWIST_STEPS[i]);
+  const twisted = setJoint(pose, parent, [parentAngles[0], best.twist, parentAngles[2]], report);
+  return setJoint(twisted, hand, best.angles, report);
+}
+
 /**
  * Places `handId` on a hold. With `hold.at` the item is at `at` turned by `turn`, and the arm reaches so the palm's face
- * meets the socket, two-bone IK placing the wrist and the hand then turned onto the socket within its limits; without,
- * the item is placed where the posed palm is. Returns the pose, the item's world transform `{ r, t }` and the reach
- * residual; the hand's held limits go on `report`.
+ * meets the socket, two-bone IK placing the wrist and the hand then turned onto the socket within its limits
+ * (`turnHand`); without, the item is placed where the posed palm is. Returns the pose, the item's world transform
+ * `{ r, t }` and the reach residual; the limits that held go on `report`.
  */
 export function holdItem(rig, pose, handId, hold, report) {
-  const bones = boneById(rig);
-  const hand = bones.get(handId);
+  const hand = boneById(rig).get(handId);
   const own = palmSocket(hand);
   const mate = mulMM(triad(hold.socket.into, hold.socket.axis), transpose(triad(own.into, own.axis)));
   if (hold.at === undefined) {
@@ -209,12 +258,8 @@ export function holdItem(rig, pose, handId, hold, report) {
   const item = { r: hold.turn ? quatToMat3(hold.turn) : IDENTITY_M, t: hold.at };
   const wanted = mulMM(item.r, mate);
   const wrist = sub(applyPoint(item, hold.socket.at), mulMV(wanted, sub(own.at, hand.head)));
-  const reached = solveTwoBone(rig, pose, hand.reach.chain, wrist, hand.reach.pole, report);
-  const parent = boneTransforms(rig.bones, reached.pose).get(hand.parent);
-  const local = mulMM(transpose(parent.r), wanted);
-  const angles = jointAngles(hand, local), kept = clampJointAngles(hand, angles);
-  if (kept.some((a, i) => Math.abs(a - angles[i]) > 1e-6)) report?.push({ bone: handId, asked: angles, held: kept });
-  return { pose: { ...reached.pose, rotations: { ...reached.pose.rotations, [handId]: jointRotation(hand, kept) } }, item, residual: reached.residual };
+  const reached = solveTwoBone(rig, pose, hand.reach.chain, wrist, hold.pole ?? hand.reach.pole, report);
+  return { pose: turnHand(rig, reached.pose, hand, wanted, report), item, residual: reached.residual };
 }
 
 // The item's mesh carried to where it is held, ready for contact.

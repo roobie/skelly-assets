@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { closeHand, handAngles, holdItem } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, frameAbout, jointRotation, length, mulMV, sub } from '../../site/kinematics.mjs';
+import { applyPoint, boneTransforms, frameAbout, jointAngles, jointRotation, length, mat3ToQuat, mulMV, rotY, sub } from '../../site/kinematics.mjs';
 
 // A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's reference side does, one finger of
 // three phalanges hangs from it, flexing about the knuckle row so positive flex curls toward the palm, and a thumb
@@ -78,4 +78,20 @@ test('a held item without a place follows the posed palm, its socket on the palm
   near(applyPoint(item, socket.at), applyPoint(t, [-0.012, 0.905, 0]));
   near(mulMV(item.r, socket.into), mulMV(t.r, [-1, 0, 0]));
   near(mulMV(item.r, socket.axis), mulMV(t.r, [0, 0, 1]));
+});
+
+test('a hold turns the palm onto a socket by twisting the forearm where the wrist cannot twist', () => {
+  const limited = (id, twist) => (bone) => (bone.id === id ? { ...bone, limits: { ...bone.limits, twist } } : bone);
+  const twisting = { ...rig, bones: rig.bones.map(limited('fore', [-80, 80])).map(limited('hand', [0, 0])) };
+  // The item sits so the wrist stays where it hangs, its socket turned 40° about the vertical from the palm's rest
+  // normal: a turn about the hanging arm's own axis, which only the forearm can give.
+  const turn = rotY(40);
+  const at = applyPoint({ r: turn, t: [0, 0.95, 0] }, [-0.012, -0.045, 0]);
+  const report = [];
+  const { pose, residual } = holdItem(twisting, rest, 'hand', { model: 'thing', at, turn: mat3ToQuat(turn), socket: { at: [0, 0, 0], into: [-1, 0, 0], axis: [0, 0, 1] } }, report);
+  assert.ok(residual < 1e-3, `the wrist stays put, residual ${residual}`);
+  assert.deepEqual(report.filter(({ bone }) => bone === 'hand'), [], 'the hand is not held short');
+  const palm = boneTransforms(twisting.bones, pose).get('hand').r;
+  near(mulMV(palm, [-1, 0, 0]), mulMV(turn, [-1, 0, 0]), 1e-3);
+  assert.ok(Math.abs(Math.abs(jointAngles(bones.get('fore'), pose.rotations.fore)[1]) - 40) < 1.5, 'the forearm gives the turn');
 });
