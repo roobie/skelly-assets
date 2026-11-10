@@ -272,6 +272,9 @@ async function openViewer(model) {
   $('v-download').href = `built/${file}`;
   $('v-download').setAttribute('download', file);
   $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
+  // A wearable's fit in a pose is reviewed on the posing page (pose.html).
+  $('v-pose').hidden = !isWearable(model);
+  $('v-pose').href = `pose.html?${new URLSearchParams({ wear: model.id })}`;
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
   $('v-clips').replaceChildren();

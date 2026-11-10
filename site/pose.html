@@ -56,12 +56,15 @@
         <button id="ground" title="Lift the root so the figure stands on y = 0">Ground</button>
       </div>
       <div class="row">
+        <label>Open pose file <input id="pose-open" type="file" accept=".json,application/json"></label>
+      </div>
+      <div class="row">
         <label>Root <input id="root-x" type="number" step="0.01" value="0"><input id="root-y" type="number" step="0.01" value="0"><input id="root-z" type="number" step="0.01" value="0"></label>
       </div>
       <pre id="report">loading</pre>
     </section>
     <section>
-      <h2>Inverse kinematics</h2>
+      <h2>Reach</h2>
       <div class="row">
         <label>End <select id="ik-end"></select></label>
         <button id="ik-solve" class="accent">Solve</button>
@@ -77,11 +80,21 @@
     <section>
       <h2>Clip</h2>
       <div class="row">
+        <label>Clip <select id="clip-source"></select></label>
+        <label>Open <input id="clip-open" type="file" accept=".json,application/json"></label>
+      </div>
+      <div class="row">
         <button id="clip-add">Add frame</button>
         <button id="clip-clear">Clear</button>
         <span id="clip-count" class="muted">0 frames</span>
       </div>
-      <input id="clip-scrub" type="range" min="0" max="0" step="0.01" value="0" disabled>
+      <div class="row">
+        <button id="clip-play" class="accent" disabled>Play</button>
+        <label>Seconds <input id="clip-seconds" type="number" step="0.1" min="0.1" value="1"></label>
+        <label><input id="clip-loop" type="checkbox"> Loop</label>
+      </div>
+      <input id="clip-scrub" type="range" min="0" max="1" step="0.001" value="0" disabled>
+      <pre id="clip-report"></pre>
       <div class="row">
         <button id="download-clip">Download clip JSON</button>
         <button id="download-frame">Frame JSON</button>
@@ -92,8 +105,8 @@
       <h2>Clearance</h2>
       <div class="row">
         <label><input id="probe" type="checkbox"> Probe</label>
-        <span id="probe-counts" class="muted"></span>
       </div>
+      <pre id="probe-report"></pre>
     </section>
     <section>
       <h2>Bones</h2>

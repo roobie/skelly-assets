@@ -6,7 +6,7 @@
 // A pose is a fixture's name (models/poses) or the path of a pose file. `--wear` dresses the doll in those wearables,
 // `--probe` runs the clearance probe and marks its findings, `--screenshot` also saves the page with its controls.
 // Writes <out>/<pose>[-<wear joined by +>].png and, with --screenshot, <out>/ui-<pose>[-<wear>].png; prints one
-// line per pose with the limits that held, the IK residuals and the clearance counts.
+// line per pose with the limits that held, the reach residuals and the clearance findings.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -44,10 +44,11 @@ const fileName = (prefix, name) => `${prefix}${name}${wear.length > 0 ? `-${wear
 const writePng = (path, dataUrl) => writeFileSync(path, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
 
 const list = (angles) => angles.map((a) => a.toFixed(1)).join('/');
+const countBy = (items, key) => Object.entries(Object.groupBy(items, (item) => item[key])).map(([id, some]) => `${id} ${some.length}`).join(', ');
 const describe = ({ report, clearance }) => [
   report.clamped.length === 0 ? 'no limits held' : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
-  ...Object.entries(report.residuals).map(([id, left]) => `${id} residual ${(left * 1000).toFixed(1)} mm`),
-  ...(clearance ? [`clearance ${clearance.counts.pokes} pokes ${clearance.counts.sinks} sinks`] : []),
+  ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
+  ...(clearance ? [`clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')})`] : []),
 ].join('; ');
 
 const site = join(out, 'site');

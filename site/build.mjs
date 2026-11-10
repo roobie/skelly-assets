@@ -15,7 +15,7 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
-import { dollRig, readRigContent } from '../tools/pose/rig.mjs';
+import { dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
@@ -146,12 +146,16 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'clearance.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
-  // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them.
-  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...dollRig(readRigContent(root), doll, dressing), doll: doll.sites, poses }));
+  // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
+  // names the clip actor's plain clips and its walk speed, which paces its walk.
+  const rig = dollRig(readRigContent(root), doll, dressing);
+  const actor = modelsById.get(rig.clips);
+  if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
+  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses }));
   mkdirSync(join(out, 'poses'));
   for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
 }
