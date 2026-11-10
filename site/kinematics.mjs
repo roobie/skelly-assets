@@ -1,7 +1,9 @@
 // Plain-JavaScript kinematics for a rig of bones, loaded as is by the browser and by Node. It is the twin of mobgen's
 // core/pose.ts and core/joints.ts over the same data: a bone has a head, a tail, a joint frame and limits, a pose is a
 // root translation plus one rotation per bone about its head in rest-world axes, composed parent to child. Keeping the
-// same contract lets a doll pose, a mob clip and a game read one format (docs/decisions/0010-pose-tool.md).
+// same contract lets a doll pose, a mob clip and a game read one format (docs/decisions/0010-pose-tool.md). A bone that
+// `pronates` reads its joint in an order of its own, which no mobgen bone asks for, so the twin agrees with mobgen on
+// every bone they share.
 //
 // Matrices are row-major 3×3 arrays and quaternions [x, y, z, w], as the clip files store them.
 
@@ -76,15 +78,28 @@ const jointFrame = ({ frame, id }) => {
   return [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]];
 };
 
-export const jointRotation = (bone, [flex, twist, abduct]) => {
+// A joint's turns compose in the joint's own order, each about the axis the earlier turns carried: a ball joint
+// abducts, twists, then flexes, so the twist chooses which way its hinge lies. A bone that `pronates` twists last, so
+// the twist rolls the posed bone about its own length, as a forearm turns the hand, instead of carrying the flexed bone
+// round a cone; its flex is the outer turn because the middle one reads back only within a quarter turn either way, and
+// an elbow closes further than that while such a bone barely abducts (models/poses/rig.libsonnet, `pronates`).
+const localRotation = ({ pronates }, [flex, twist, abduct]) => (pronates
+  ? mulMM(rotX(flex), mulMM(rotZ(abduct), rotY(twist)))
+  : mulMM(rotZ(abduct), mulMM(rotY(twist), rotX(flex))));
+
+// The angles whose local rotation is `m`, in degrees.
+const localAngles = ({ pronates }, m) => (pronates
+  ? [Math.atan2(m[7], m[4]), Math.atan2(m[2], m[0]), Math.asin(clamp(-m[1], -1, 1))]
+  : [Math.atan2(m[7], m[8]), Math.asin(clamp(-m[6], -1, 1)), Math.atan2(m[3], m[0])]).map((a) => a / DEG);
+
+export const jointRotation = (bone, angles) => {
   const frame = jointFrame(bone);
-  return mulMM(frame, mulMM(mulMM(rotZ(abduct), mulMM(rotY(twist), rotX(flex))), transpose(frame)));
+  return mulMM(frame, mulMM(localRotation(bone, angles), transpose(frame)));
 };
 
 export const jointAngles = (bone, rotation) => {
   const frame = jointFrame(bone);
-  const local = mulMM(transpose(frame), mulMM(rotation, frame));
-  return [Math.atan2(local[7], local[8]) / DEG, Math.asin(clamp(-local[6], -1, 1)) / DEG, Math.atan2(local[3], local[0]) / DEG];
+  return localAngles(bone, mulMM(transpose(frame), mulMM(rotation, frame)));
 };
 
 export const clampJointAngles = ({ limits, id }, angles) => {

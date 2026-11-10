@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
 import { clampJointAngles as mobClampJointAngles, jointAngles as mobJointAngles, jointRotation as mobJointRotation } from '../packages/mobgen/src/core/joints.ts';
 import {
-  applyPoint, boneTransforms, clampJointAngles, frameAbout, jointAngles, jointRotation, length, levelBone, sub, solveTwoBone,
+  applyPoint, boneTransforms, clampJointAngles, frameAbout, jointAngles, jointRotation, length, levelBone, mulMV, normalize, rotAxis, sub, solveTwoBone,
 } from '../../site/kinematics.mjs';
 
 // An arm hanging from a shoulder at the origin: two bones straight down, then a hand, with a hinge elbow that only
@@ -31,6 +31,28 @@ test('joint rotation, angles and limits agree with mobgen on the same bone', () 
     jointAngles(upper, rotation).forEach((v, i) => assert.ok(Math.abs(v - mobJointAngles(upper, rotation)[i]) < 1e-9));
   }
   for (const angles of [[100, 5, -40], [-90, 0, 30], [10, 0, 0]]) assert.deepEqual(clampJointAngles(hand, angles), mobClampJointAngles(hand, angles));
+});
+
+test('a pronating bone twisted after a right-angle flex rolls about itself where a plain bone swings round a cone', () => {
+  const plain = arm.bones[1];
+  const pronating = { ...plain, pronates: true };
+  const posed = (bone, angles) => ({ root: [0, 0, 0], rotations: { fore: jointRotation(bone, angles) } });
+  const flexed = posed(pronating, [90, 0, 0]), rolled = posed(pronating, [90, 40, 0]);
+  const tail = tailOf(arm, flexed, 'fore');
+  near(tailOf(arm, rolled, 'fore'), tail);
+  // The frame has turned by the twist about the posed bone.
+  const along = normalize(sub(tail, plain.head));
+  near(mulMV(rolled.rotations.fore, plain.frame.x), mulMV(rotAxis(along, 40), mulMV(flexed.rotations.fore, plain.frame.x)));
+  // A plain bone twists about its rest axis before it flexes, so the same twist carries the flexed bone round.
+  assert.ok(length(sub(tailOf(arm, posed(plain, [90, 40, 0]), 'fore'), tail)) > 0.1, 'a plain bone\'s tail is carried round');
+});
+
+test('a pronating bone\'s angles read back from its rotation across the whole range an elbow closes through', () => {
+  const pronating = { ...arm.bones[1], pronates: true };
+  for (const angles of [[30, 0, 0], [0, 45, 0], [0, 0, -20], [25, -40, 60], [120, 70, -15], [-60, 30, 10], [150, -80, 0]]) {
+    const read = jointAngles(pronating, jointRotation(pronating, angles));
+    read.forEach((v, i) => assert.ok(Math.abs(v - angles[i]) < 1e-9, `${read} is not ${angles}`));
+  }
 });
 
 test('bone transforms agree with mobgen for a chain of rotated bones', () => {

@@ -91,6 +91,7 @@ export function dollRig(content, doll, dressing) {
         ...(spec.digit ? { digit: spec.digit } : {}),
         ...(spec.spread !== undefined ? { spread: spec.spread } : {}),
         ...(spec.absorbs ? { absorbs: spec.absorbs } : {}),
+        ...(spec.pronates ? { pronates: true } : {}),
       });
     }
   }

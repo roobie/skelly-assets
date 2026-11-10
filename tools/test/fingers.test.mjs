@@ -7,7 +7,8 @@ import { applyPoint, boneTransforms, frameAbout, jointAngles, jointRotation, len
 // A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's
 // reference side does, one finger of three phalanges hangs from it, flexing about the knuckle row so positive flex
 // curls toward the palm, and a thumb of three bones hangs beside its front edge (+z) in the same frame, its root free
-// to swing, roll and lift (models/poses/rig.libsonnet). The arm above is there for the hold's two-bone reach.
+// to swing, roll and lift (models/poses/rig.libsonnet). The arm above is there for the hold's two-bone reach, its
+// forearm pronating as the doll's does.
 const wide = { flex: [-90, 90], twist: [-90, 90], abduct: [-90, 90] };
 const sense = [1, 1, 1];
 const bone = (id, parent, head, tail, box, flexAxis, limits, extra = {}) => ({
@@ -26,7 +27,7 @@ const rig = {
   presets: { fist: { curl: 1, thumb: { across: 0.6, oppose: 0.7, lift: 0.6, curl: 0.8 } } },
   bones: [
     bone('upper', null, [0, 1.5, 0], [0, 1.2, 0], box([-0.04, 1.2, -0.04], [0.04, 1.5, 0.04]), [-1, 0, 0], wide),
-    bone('fore', 'upper', [0, 1.2, 0], [0, 0.95, 0], box([-0.03, 0.95, -0.03], [0.03, 1.2, 0.03]), [-1, 0, 0], { flex: [0, 150], twist: [0, 0], abduct: [0, 0] }),
+    bone('fore', 'upper', [0, 1.2, 0], [0, 0.95, 0], box([-0.03, 0.95, -0.03], [0.03, 1.2, 0.03]), [-1, 0, 0], { flex: [0, 150], twist: [0, 0], abduct: [0, 0] }, { pronates: true }),
     bone('hand', 'fore', [0, 0.95, 0], [0, 0.86, 0], box([-0.012, 0.86, -0.04], [0.012, 0.95, 0.04]), [-1, 0, 0], wide, { reach: { chain: ['upper', 'fore'], pole: [0, 0, -1] } }),
     phalanx(0, [0, 0.86, 0], { flex: [-20, 90], twist: [0, 0], abduct: [-15, 15] }),
     phalanx(1, [0, 0.83, 0], { flex: [0, 110], twist: [0, 0], abduct: [0, 0] }),
@@ -110,18 +111,34 @@ test('a held item without a place follows the posed palm, its socket on the palm
   near(mulMV(item.r, socket.axis), mulMV(t.r, [0, 0, 1]));
 });
 
+// The rig with a forearm that twists under a wrist that cannot, as the doll's arm is.
+const limited = (id, twist) => (bone) => (bone.id === id ? { ...bone, limits: { ...bone.limits, twist } } : bone);
+const twisting = { ...rig, bones: rig.bones.map(limited('fore', [-80, 80])).map(limited('hand', [0, 0])) };
+const socket = { at: [0, 0, 0], into: [-1, 0, 0], axis: [0, 0, 1] };
+// A hold whose socket is the palm's rest face carried to `wrist` and turned by `turn`, so the reach puts the wrist there.
+const holdAt = (wrist, turn) => ({ model: 'thing', at: applyPoint({ r: turn, t: wrist }, [-0.012, -0.045, 0]), turn: mat3ToQuat(turn), socket });
+const wristOf = (pose) => applyPoint(boneTransforms(twisting.bones, pose).get('hand'), bones.get('hand').head);
+
 test('a hold turns the palm onto a socket by twisting the forearm where the wrist cannot twist', () => {
-  const limited = (id, twist) => (bone) => (bone.id === id ? { ...bone, limits: { ...bone.limits, twist } } : bone);
-  const twisting = { ...rig, bones: rig.bones.map(limited('fore', [-80, 80])).map(limited('hand', [0, 0])) };
   // The item sits so the wrist stays where it hangs, its socket turned 40° about the vertical from the palm's rest
   // normal: a turn about the hanging arm's own axis, which only the forearm can give.
   const turn = rotY(40);
-  const at = applyPoint({ r: turn, t: [0, 0.95, 0] }, [-0.012, -0.045, 0]);
   const report = [];
-  const { pose, residual } = holdItem(twisting, rest, 'hand', { model: 'thing', at, turn: mat3ToQuat(turn), socket: { at: [0, 0, 0], into: [-1, 0, 0], axis: [0, 0, 1] } }, report);
+  const { pose, residual } = holdItem(twisting, rest, 'hand', holdAt([0, 0.95, 0], turn), report);
   assert.ok(residual < 1e-3, `the wrist stays put, residual ${residual}`);
   assert.deepEqual(report.filter(({ bone }) => bone === 'hand'), [], 'the hand is not held short');
   const palm = boneTransforms(twisting.bones, pose).get('hand').r;
   near(mulMV(palm, [-1, 0, 0]), mulMV(turn, [-1, 0, 0]), 1e-3);
   assert.ok(Math.abs(Math.abs(jointAngles(bones.get('fore'), pose.rotations.fore)[1]) - 40) < 1.5, 'the forearm gives the turn');
+});
+
+test('a hold on a bent arm rolls the forearm to turn the hand, leaving the wrist where the reach put it', () => {
+  // The item is held out in front with the elbow bent, its socket turned about the vertical, so the palm meets it
+  // only with the forearm's twist, which rolls the hand about the bent forearm rather than swinging the wrist.
+  const wrist = [0, 1.15, 0.2];
+  const { pose, residual } = holdItem(twisting, rest, 'hand', holdAt(wrist, rotY(40)), []);
+  assert.ok(residual < 1e-3, `the reach puts the wrist there, residual ${residual}`);
+  const [flex, twist] = jointAngles(bones.get('fore'), pose.rotations.fore);
+  assert.ok(flex > 30 && Math.abs(twist) > 5, `the elbow bends and the forearm rolls, not flex ${flex}, twist ${twist}`);
+  near(wristOf(pose), wrist, 1e-3);
 });

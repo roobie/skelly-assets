@@ -3,8 +3,9 @@
 // in docs/decisions/0010-pose-tool.md.
 //
 // A pose file names the rig's `id` and `revision`, and is refused by any other. Raise the revision when a change gives
-// a pose already written another meaning: a bone renamed or removed, a pivot, a flex axis or the reference side changed.
-// Widening or narrowing a limit keeps it, since a pose file states its angles and a held angle shows in its report.
+// a pose already written another meaning: a bone renamed or removed, a pivot, a flex axis, the order a joint's turns
+// compose in or the reference side changed. Widening or narrowing a limit keeps it, since a pose file states its
+// angles and a held angle shows in its report.
 //
 // `pivot` is `origin`, the part's own origin, which the avatar draws at the joint it hangs from, or `{ anchor }`, a
 // bust anchor. `along` is the bone's rest direction, used to find its tail when it has no single child bone.
@@ -14,6 +15,12 @@
 // positive abduction carries a limb away from the body. The other side mirrors the ranges of the joint axes that lie
 // in the mirror plane (a limb's twist and abduction; a finger's flex, which is about the knuckle row) and keeps the
 // axis along x, so a pose is mirrored by the `sense` tools/dollRig.mjs gives each bone.
+//
+// A joint's three turns compose in the joint's own order, each about the axis the earlier turns carried
+// (site/kinematics.mjs, `jointRotation`): abduction, then twist, then flex, so a ball joint's twist chooses which way
+// its hinge lies, as the shoulder's humeral rotation does. `pronates` puts a bone's twist last, about the bone its flex
+// has carried: the forearm's twist is pronation and supination, a roll of the hand distal to the elbow hinge, so a bent
+// arm's twist turns the hand where it is instead of swinging the wrist round a cone about the arm's rest line.
 //
 // `reach` marks a bone whose joint two-bone IK places by turning its parent and grandparent, the middle joint bending
 // toward `pole`, a direction in the reference side's axes, unless a pose file gives its own.
@@ -32,8 +39,7 @@
 //
 // The thumb hangs beside the palm's front edge the way the fingers hang below it, so its bones share the fingers'
 // frame; what sets it apart is its root, the only digit joint with all three freedoms, which read as one motion in
-// the joint's own order (site/kinematics.mjs, `jointRotation`, is abduction, then twist, then flex about the axes the
-// earlier turns carried): abduction swings the thumb in the palm's plane, negative across the palm toward the little
+// the joint's order above: abduction swings the thumb in the palm's plane, negative across the palm toward the little
 // finger; twist rolls it about its own length, positive turning its pad from facing the way the palm faces toward
 // facing the fingers, which is opposition; flex then lifts it out of the palm's plane toward the palm side about the
 // hinge the roll has turned, so a lifted thumb leans the way its pad faces. Across, roll and lift together bring the
@@ -70,7 +76,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 3,
+  revision: 4,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -86,7 +92,7 @@ local thumbBones = {
                   limits: { flex: [-30, 30], twist: [-45, 45], abduct: [-20, 20] } },
     upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30, 170] } },
-    forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin',
+    forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true,
                    limits: { flex: [0, 150], twist: [-80, 80], abduct: [0, 0] } },
     hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', reach: { pole: [0.3, 0, -1] },
                 limits: { flex: [-70, 80], twist: [0, 0], abduct: [-25, 20] } },
