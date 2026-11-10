@@ -8,6 +8,18 @@
     tyre: { id: 'tyre_205_55r16', massKg: 9, width: 0.205, outer: 0.316 },
     rim: { id: 'rim_16_alloy', massKg: 9, radius: 0.203, width: 0.165, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.085, spokes: 5, spokeWidth: 0.05, finish: 'paint-silver' },
   },
+  // The 2014-2019 smart fortwo's staggered 15-inch alloys, narrower in front. Tyre and rim masses are estimates for
+  // their sizes.
+  wheel_165_65r15: {
+    class: 'light',
+    tyre: { id: 'tyre_165_65r15', massKg: 7, width: 0.165, outer: 0.298 },
+    rim: { id: 'rim_15_alloy_narrow', massKg: 6.5, radius: 0.1905, width: 0.127, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
+  },
+  wheel_185_60r15: {
+    class: 'light',
+    tyre: { id: 'tyre_185_60r15', massKg: 7.5, width: 0.185, outer: 0.3015 },
+    rim: { id: 'rim_15_alloy', massKg: 7, radius: 0.1905, width: 0.14, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
+  },
   // A steel disc wheel: its wide spokes leave the hand holes between them.
   wheel_295_80r22_5: {
     class: 'heavy',
