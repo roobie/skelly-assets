@@ -5,6 +5,7 @@ read_if:
   - you regenerate the hunting rifle, its civilian cartridge or its optional scope
   - you change the sporter's bore-registered action, furniture joint or silhouette tuning
   - you change the structured Deadvox export recipe or its companion choices
+  - you change the scavenged pipe rifle, its single-shot loading or its board furniture
 ---
 
 # Turn-bolt export
@@ -38,6 +39,12 @@ The carrier, arm and knob share one turn about the carrier's longitudinal centre
 The action is hand-only: unlock, draw, dwell, push and lock share one timeline. Ejection progress comes from the resolved receiver port and carrier stroke, not an independently tuned fraction. Deadvox validates that every turning mover references timelines containing both turn phases, and that all phases fit the duration. Gungen owns visual timing estimates; Deadvox owns skill scaling and mechanical state. See `src/gun/actionDescription.ts`, `resolveGunAction`, `src/gun/cycle.ts`, `boltCycleMotion`, and https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`, `ActionSchema`.
 
 Pump tubes and integral rifle wells use the same neutral model record because loading capacity does not imply a tube shape. Neither exports a detachable-magazine slot or a box round-pose column. The loading anchor describes the mouth, not a hand or inventory transaction; see `src/gun/exportGlb.ts`, `DeadvoxModelEntry`, and `src/gun/anchorData.ts`, `GUN_ANCHORS`.
+
+## Scavenged single-shot
+
+The pipe rifle reuses the sporter's turn-bolt instead of a new action family, so its handling, sweep certification and export contract stay the hunting rifle's; only its look and its loading differ. A top-loaded action over a lower built without a well is a single-shot loaded by hand into the chamber, so the feed rule accepts it instead of demanding a magazine. Only the sporter lower is built without a well, because the other lowers frame the well into their trigger housings. See `src/gun/rules.ts`, `feedIssuesForLower`, and `src/gun/parts.ts`, `WELL_LESS_LOWER_REFUSAL`.
+
+The boards, tape and straps are look content, side-profile estimates rather than measurements, so they are tuned in a table instead of code. The model carries the look and the game data other guns carry and nothing more: it must never read as a record of how a real improvised firearm is made. See `models/guns/tables/pipeRifle.jsonnet` and `src/gun/pipeRifle.ts`, `plankForeEndSolids`.
 
 ## Regeneration and acceptance
 

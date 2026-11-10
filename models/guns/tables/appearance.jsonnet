@@ -84,6 +84,9 @@ local familyHex = {
       'battle-rifle': finish('wood-walnut', 'steel-parkerized'), 'bolt-rifle': finish('wood-walnut', 'steel-parkerized'),
       'bolt-rifle-box': finish('wood-walnut', 'steel-parkerized'), 'bolt-rifle-thumbhole': finish('wood-walnut', 'steel-parkerized'),
       'anti-materiel': finish('polymer-fde', 'steel-parkerized'),
+      // The pipe rifle's tape is on its stock; its fore-end is strapped with clamps and wire.
+      'pipe-rifle': finish('wood-pine', 'scrap-rusted', 'tape-grey'),
+      'pipe-rifle-strapped': finish('wood-pine', 'scrap-rusted', 'steel-galvanised'),
     },
   },
   ammunition: {
