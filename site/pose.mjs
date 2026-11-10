@@ -1,7 +1,8 @@
 // The posing page: the doll, bare or dressed, bent at its rig's joints (rig.json, from tools/dollRig.mjs) by a pose
 // file, by sliders, by two-bone IK or by a clip, its worn pieces riding the parts they are drawn in, so a wearable's fit
 // can be reviewed in a pose and a pose or a clip authored by hand. A clearance probe marks where the body shows through
-// a piece or a piece sinks into the body (clearance.mjs).
+// a piece or a piece sinks into the body (clearance.mjs), and the skin check counts the covered body a camera sees
+// (skin.mjs).
 //
 // The figure is a hierarchy of one three.js joint per bone, each at its bone's head, with the doll part node and the
 // piece sites a bone binds attached under it; a clip frame's quaternions go straight onto the joints, which composes
@@ -18,6 +19,7 @@ import { FRONT_QUARTER } from './modelFrame.mjs';
 import { clipIssues, compilePose, decodeFrame, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
 import { samplePose } from './poseSample.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
+import { addCoveredSkin, skinCheck } from './skin.mjs';
 import { drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
 const ISSUE_COLOUR = { pokes: 0xd0301a, flush: 0xb03ab0, sinks: 0xe0901a };
@@ -210,15 +212,19 @@ function drawTile(obj, size, views) {
 }
 
 // The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, drawn as a tile, with the
-// compile report, the clearance probe's findings when asked and the frame the pose compiled to.
-async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false } = {}) {
+// compile report, the clearance probe's findings and the skin check when asked, and the frame the pose compiled to.
+async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false } = {}) {
   const data = await ready;
   const figure = await buildFigure(data, wear);
+  if (skin) addCoveredSkin(figure, figure.clearance().surface);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
   const { frame, report } = compilePose(data.rig, file);
   applyFrame(figure, frame);
   const found = probing ? probe(figure, frame) : null;
-  return { png: drawTile(figure.root, size, views), report, clearance: found, frame };
+  const png = drawTile(figure.root, size, views);
+  // The marks would draw over the skin check's masks.
+  figure.marks.clear();
+  return { png, report, clearance: found, skin: skin ? skinCheck(figure.root, size, views) : null, frame };
 }
 
 window.posed = posed;

@@ -1,12 +1,13 @@
 // Draws the doll, bare or dressed, in poses as tiles of four views, so a pose file, a fixture or a wearable's fit in a
 // pose can be reviewed without opening the page. The drawing is the posing page's own (site/pose.mjs): this builds the
 // showcase from the tree and drives the page in headless Chromium.
-// Usage: node tools/pose-sheet.mjs [--built built] [--out look/poses] [--size 384] [--views review] [--probe]
+// Usage: node tools/pose-sheet.mjs [--built built] [--out look/poses] [--size 384] [--views review] [--probe] [--skin]
 //   [--wear id,id] [--screenshot] <pose> [<pose> ...]
 // A pose is a fixture's name (models/poses) or the path of a pose file. `--wear` dresses the doll in those wearables,
-// `--probe` runs the clearance probe and marks its findings, `--screenshot` also saves the page with its controls.
-// Writes <out>/<pose>[-<wear joined by +>].png and, with --screenshot, <out>/ui-<pose>[-<wear>].png; prints one
-// line per pose with the limits that held, the reach residuals and the clearance findings.
+// `--probe` runs the clearance probe and marks its findings, `--skin` runs the camera skin check, `--screenshot` also
+// saves the page with its controls. Writes <out>/<pose>[-<wear joined by +>].png, with --skin <out>/skin-<pose>[-<wear>].png
+// and with --screenshot <out>/ui-<pose>[-<wear>].png; prints one line per pose with the limits that held, the reach
+// residuals, the clearance findings and the covered skin each view shows.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -22,6 +23,7 @@ const { values, positionals } = parseArgs({
     size: { type: 'string', default: '384' },
     views: { type: 'string', default: 'review' },
     probe: { type: 'boolean', default: false },
+    skin: { type: 'boolean', default: false },
     wear: { type: 'string', default: '' },
     screenshot: { type: 'boolean', default: false },
   },
@@ -45,10 +47,11 @@ const writePng = (path, dataUrl) => writeFileSync(path, Buffer.from(dataUrl.slic
 
 const list = (angles) => angles.map((a) => a.toFixed(1)).join('/');
 const countBy = (items, key) => Object.entries(Object.groupBy(items, (item) => item[key])).map(([id, some]) => `${id} ${some.length}`).join(', ');
-const describe = ({ report, clearance }) => [
+const describe = ({ report, clearance, skin }) => [
   report.clamped.length === 0 ? 'no limits held' : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
   ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
   ...(clearance ? [`clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.flush.length} flush (${countBy(clearance.flush, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')}) ${clearance.seams.length} seams`] : []),
+  ...(skin ? [`skin showing ${skin.views.map(({ name, showing }) => `${name} ${showing} px`).join(', ')}`] : []),
 ].join('; ');
 
 const site = join(out, 'site');
@@ -61,8 +64,9 @@ try {
   const { page } = await openPage(browser, server.origin, 'pose.html', 'posed');
   for (const { name, pose } of poses) {
     try {
-      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), { wear, pose, size, views: values.views, probe: values.probe });
+      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), { wear, pose, size, views: values.views, probe: values.probe, skin: values.skin });
       writePng(join(out, fileName('', name)), png);
+      if (facts.skin) writePng(join(out, fileName('skin-', name)), facts.skin.png);
       console.log(`${name}: ${describe(facts)}`);
     } catch (error) {
       failed++;
