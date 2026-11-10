@@ -3,11 +3,10 @@
 // can be exploded to show each part apart from the others. What it draws, and how, is render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { canPose, clipSet, frame, isVehicle, loadEntry, makeStage, playable, pose, registerModels, setupRenderer, stillInstance } from './render.mjs';
+import { canPose, clipSet, explodable, frame, isVehicle, loadEntry, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
-const EXPLODE = 0.7; // how far an exploded part moves from the vehicle's centre, as a share of its own distance
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
 
 const nameOf = (id) => {
@@ -215,21 +214,11 @@ function initViewer() {
   });
 }
 
-// Each part of a vehicle, its assembled position and how far it moves from the vehicle's centre when exploded.
-function explodable(obj) {
-  const centre = new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());
-  return obj.children.map((part) => ({
-    part,
-    home: part.position.clone(),
-    offset: new THREE.Box3().setFromObject(part).getCenter(new THREE.Vector3()).sub(centre).multiplyScalar(EXPLODE),
-  }));
-}
-
 function spreadParts(v) {
   const goal = v.exploded ? 1 : 0;
   if (v.spread === goal) return;
   v.spread = Math.abs(goal - v.spread) < 0.001 ? goal : v.spread + (goal - v.spread) * EXPLODE_EASE;
-  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, v.spread);
+  spread(v.parts, v.spread);
 }
 
 // Switches a vehicle between assembled and exploded, keeping the camera's direction and fitting the camera to the
@@ -238,11 +227,10 @@ function explode(exploded) {
   const v = viewer;
   v.exploded = exploded;
   for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'exploded') === exploded));
-  const goal = exploded ? 1 : 0;
-  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, goal);
+  spread(v.parts, exploded ? 1 : 0);
   const direction = v.camera.position.clone().sub(v.controls.target).normalize();
   frame(v.camera, v.obj, v.controls.target, direction);
-  for (const { part, home, offset } of v.parts) part.position.copy(home).addScaledVector(offset, v.spread);
+  spread(v.parts, v.spread);
   v.controls.update();
 }
 

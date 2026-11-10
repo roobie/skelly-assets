@@ -14,6 +14,7 @@ const manifest = {
     { id: 'fixture_notes', pack: 'fixture.vans', path: 'models/fixture_notes.json' },
   ],
   vehicles: [{ id: 'fixture_van', pack: 'fixture.vans', path: 'vehicles/fixture_van.placements.json' }],
+  assemblies: [{ id: 'fixture_door_assembly', sites: [{ site: 'door', model: 'fixture_door', at: [0, 0, 0] }, { site: 'trim', model: 'fixture_body', at: [0.1, 0, 0] }] }],
 };
 
 function builtTree() {
@@ -27,10 +28,11 @@ function builtTree() {
   return built;
 }
 
-test('a look draws what it is asked, every vehicle with --vehicles, and every drawable entry when asked nothing', () => {
+test('a look draws what it is asked, every vehicle or assembly by its flag, and every drawable entry when asked nothing', () => {
   assert.deepEqual(lookIds(manifest, { ids: ['fixture_door'] }), ['fixture_door']);
   assert.deepEqual(lookIds(manifest, { ids: ['fixture_door'], vehicles: true }), ['fixture_door', 'fixture_van']);
-  assert.deepEqual(lookIds(manifest), ['fixture_body', 'fixture_door', 'fixture_van']);
+  assert.deepEqual(lookIds(manifest, { assemblies: true }), ['fixture_door_assembly']);
+  assert.deepEqual(lookIds(manifest), ['fixture_body', 'fixture_door', 'fixture_door_assembly', 'fixture_van']);
   assert.throws(() => lookIds(manifest, { ids: ['fixture_notes'] }), /fixture_notes/);
 });
 
@@ -44,6 +46,21 @@ test('a vehicle picture changes digest when any part it places is rebuilt, and h
     assert.equal(lookDigest(built, manifest, 'fixture_body'), body);
     rmSync(join(built, 'fixture.vans/models/fixture_door.glb'));
     assert.equal(lookDigest(built, manifest, 'fixture_van'), undefined);
+  } finally {
+    rmSync(built, { recursive: true, force: true });
+  }
+});
+
+test('an assembly picture changes digest when one of its parts is rebuilt or moves on its site', () => {
+  const built = builtTree();
+  try {
+    const before = lookDigest(built, manifest, 'fixture_door_assembly');
+    assert.ok(before);
+    const moved = structuredClone(manifest);
+    moved.assemblies[0].sites[1].at = [0.2, 0, 0];
+    assert.notEqual(lookDigest(built, moved, 'fixture_door_assembly'), before);
+    writeFileSync(join(built, 'fixture.vans/models/fixture_body.glb'), 'body, rebuilt');
+    assert.notEqual(lookDigest(built, manifest, 'fixture_door_assembly'), before);
   } finally {
     rmSync(built, { recursive: true, force: true });
   }
