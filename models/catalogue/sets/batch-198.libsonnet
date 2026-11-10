@@ -1,5 +1,6 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local f = import 'packages/thing-authoring-tool/footwear.libsonnet';
+local boots = import 'models/measures/footwear.libsonnet';
 local g = import 'packages/thing-authoring-tool/garments.libsonnet';
 local box = h.box;
 // A ring on y between radii r0 and r1 from y0 to y1.
@@ -53,7 +54,7 @@ local pack(w, ht, d) =
   ];
 local packFinish = { body: 'hide-dragon-black', pocket: 'hide-dragon-black', scute: 'leather-charcoal', back: 'leather-chestnut', strap: 'leather-chestnut', trim: 'bone' };
 // Hide boots: a tall soft boot with a turned-down cuff and two buckled straps round the shaft.
-local hideBoot = f.preset.hiking { t: 0.018, heel: 0.008, top: 0.3, collar: 0.04, collarOut: 0.008, toeSlot: 'rand' };
+local hideBoot = boots.hiking { t: 0.018, heel: 0.008, top: 0.3, collar: 0.04, collarOut: 0.008, toeSlot: 'rand' };
 local hideExtra(b) = function(p, cx) [
   f.band(p + 'strap-a', 'strap', b, cx, b.top * 0.4, b.top * 0.4 + 0.02, 0.004),
   f.band(p + 'strap-b', 'strap', b, cx, b.top * 0.7, b.top * 0.7 + 0.02, 0.004),
@@ -62,7 +63,7 @@ local hideExtra(b) = function(p, cx) [
 ];
 local hideFinish = { sole: 'leather-charcoal', upper: 'hide-dragon-black', rand: 'leather-chestnut', shaft: 'hide-dragon-black', collar: 'leather-chestnut', lining: 'cloth-charcoal', strap: 'leather-chestnut', buckle: 'bone' };
 // Scale boots: lamellar toe steps alternating scale and hide, and the shaft ringed with overlapping scale rows.
-local scaleBoot = f.preset.plated { top: 0.3, collar: 0.03, laneSlots: ['scale', 'hide'] };
+local scaleBoot = boots.plated { top: 0.3, collar: 0.03, laneSlots: ['scale', 'hide'] };
 local scaleExtra(b) = function(p, cx) [
   f.band(p + 'row-%d' % i, if i % 2 == 0 then 'scale' else 'hide', b, cx, b.ankle + i * 0.024, b.ankle + i * 0.024 + (if i % 2 == 0 then 0.024 else 0.02), if i % 2 == 0 then 0.008 else 0.002)
   for i in std.range(0, std.floor((b.top - b.collar - b.ankle) / 0.024) - 1)
