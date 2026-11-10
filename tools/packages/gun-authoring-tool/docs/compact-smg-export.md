@@ -5,7 +5,7 @@ read_if:
   - you add or change the compact SMG's sights
   - you retrace the compact SMG from its reference photo
   - you change the forward cocking tube or sliding handle that the compact SMG reuses
-  - you add the 9x19 cartridge or the compact SMG's Deadvox entry
+  - you add the 9x19 cartridge or the compact SMG's roster entry
   - you choose the reference drawing or photos a Gungen design is traced from
   - you separate a traced design's appearance profile from a generator fixture
   - you change the structured Deadvox export recipe or choose shipped compact-SMG variants
@@ -63,13 +63,13 @@ Each mover is certified with the swept-clearance check, not exempted by family; 
 
 The export uses the shared model envelope rather than adding a compact-SMG channel: hand, loading and sight relationships belong to fitted geometry, not invented gameplay coordinates. See `src/gun/exportGlb.ts`, `DeadvoxModelEntry`, and `src/gun/anchorData.ts`, `GUN_ANCHORS`. Distinct stock and muzzle choices keep separate export identities, so the playable model needs no configuration-specific channel.
 
-The compact SMG is not shipped: no entry in `models/guns/roster.libsonnet`, "designs", exports it, so it stays Gungen-only until a pack wants it. Shipping it is a roster edit of one threaded-muzzle entry per stock, so both stock configurations are available and each accepts a suppressor; the plain-muzzle variants stay Gungen-only. Each shipped variant is its own roster entry so the consumption boundary cannot silently omit a variant or infer equipment from another gun. Only the telescoping stock has a threaded design, `models/guns/designs/compact-smg.jsonnet`, so a fixed-stock entry needs its design first. Exporter-written records remain separate from authored gameplay overlays; see `src/cli/exportRecipe.ts`, `loadExportRecipe`.
+The compact SMG is not shipped: no entry in `models/guns/roster.libsonnet`, "designs", exports it, so it stays Gungen-only until a pack wants it. Shipping it is a roster edit of one threaded-muzzle entry per stock, so both stock configurations are available and each accepts a suppressor; the plain-muzzle variants stay Gungen-only. Each shipped variant is its own roster entry so the consumption boundary cannot silently omit a variant or infer equipment from another gun. Only the telescoping stock has a threaded design, `models/guns/designs/compact-smg.jsonnet`, so a fixed-stock entry needs its design first. The exporter writes model records, not gameplay tuning, which belongs to the consumer; see `src/cli/exportRecipe.ts`, `loadExportRecipe`.
 
 ## Content tunables
 
 No source dimensions the slot, the handle's travel or the knob's reach from the tube. The slot ends where the knob's hand space meets the front-sight block, because the hand cannot pull the knob from further forward; see `src/gun/parts.ts`, `smgTubeFor`. The knob's reach clears the handguard's side, which the side photo cannot show. The notch turn is an engineering choice. The rear aperture is the smallest hole the gun voxel grain keeps open, and the eye relief is an estimate of where the cheek rests on the stock. A cocking tube without a traced notch takes a design-estimate slot length; see `src/gun/smgHandleProportions.ts`, `SMG_HANDLE_PROPORTIONS`.
 
-Profiles, the slot's ends, notch placement and turn duration, and stock lengths are content values in `COMPACT_SMG_PROPORTIONS`, not named constants in code, and design params are enumerated choices only. The traced builders and the telescoping stock style are mechanisms in code, so a modded design can reuse them without a code edit (skelly's `PILLARS.md`, "Content forward compatibility"). The 9x19 cartridge is content beside the other cartridges in `models/guns/cartridges/`. The proportions table owns silhouette defaults independently of any shipped design, as the sporter table does.
+Profiles, the slot's ends, notch placement and turn duration, and stock lengths are content values in `COMPACT_SMG_PROPORTIONS`, not named constants in code, and design params are enumerated choices only. The traced builders and the telescoping stock style are mechanisms in code, so a modded design can reuse them without a code edit (https://github.com/roobie/skelly, `PILLARS.md`, "Content forward compatibility"). The 9x19 cartridge is content beside the other cartridges in `models/guns/cartridges/`. The proportions table owns silhouette defaults independently of any shipped design, as the sporter table does.
 
 ## Archetype decision
 
@@ -77,10 +77,10 @@ Keep the traced compact SMG separate from its canonical generator fixture. Repla
 
 ## Build split
 
-The build rounds run in order. Every build round must pass these checks: validate reports no geometry issues for each design variant, every mover passes its swept-clearance check, and the export loads in Deadvox validation and model preparation. A round only adds checks of its own.
+The build rounds run in order. Every build round must pass these checks: validate reports no geometry issues for each design variant, every mover passes its swept-clearance check, and the export passes the shared firearm model contract. A round only adds checks of its own.
 
 1. **Silhouette.** `models/guns/designs/compact-smg.jsonnet` and `models/guns/designs/compact-smg-plain.jsonnet` on the `compactSmg` template, traced part by part against the reference photo; their datum and muzzle checks are `test/compactSmgReference.test.ts`.
 2. **Charging handle.** The slotted tube, the notch and its held-back turn, the `smg` action and the hand-only handle pairing; their checks are `test/smgChargingHandle.test.ts` and the viewer hold case in `test/cycleView.test.ts`.
 3. **Stocks.** Ship the telescoping stock's two poses and the fixed stock as design variants. Its own checks: the struts clear the end cap and lower at both poses, and the grip datum moves with neither the pose nor the choice of variant.
-4. **Cartridge and Deadvox entry.** Add the 9x19 cartridge as content, chamber the gun and its magazine for it, then export and refresh the two threaded-muzzle variants, one per stock, and credit them in Deadvox. Its own checks: the cartridge validates, and the gungen-deadvox contract test covers both shipped entries.
+4. **Cartridge and roster entry.** Add the 9x19 cartridge as content, chamber the gun and its magazine for it, then ship the two threaded-muzzle variants, one per stock, in `models/guns/roster.libsonnet`, "designs". Its own checks: the cartridge validates, and both shipped entries export.
 5. **Details.** The selector, magazine release and rear sling tab on the lower, and the ejection port on the receiver's right side. Its own checks: the ejection port opens the receiver wall without cutting into the bolt's swept path.
