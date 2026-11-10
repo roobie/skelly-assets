@@ -2,17 +2,22 @@
 // of a vehicle or an assembly beside them, and a contact sheet, so a reviewer, human or agent, can check their looks without opening each one. The drawing
 // is the showcase's own: this builds the showcase from the tree and drives its review page (site/look.mjs) in headless
 // Chromium.
-// Usage: node tools/model-sheet.mjs [--built built] [--out look/sheet] [--size 256] [--vehicles] [--assemblies] [id ...]
+// Usage: node tools/model-sheet.mjs [--built built] [--out look/sheet] [--size 256] [--vehicles] [--assemblies]
+//   [--views review|underside] [--sites prefix,...] [id ...]
 // With no ids and no flag it draws everything. A vehicle is assembled from its built placements, and an assembly
-// (tools/assemblies.mjs) from its kit, on its own so its own parts come apart about its own centre.
-// Writes <out>/tiles/<id>.png, <out>/sheet.json and <out>/index.html; rows of earlier looks into the same folder stay.
+// (tools/assemblies.mjs) from its kit, on its own so its own parts come apart about its own centre. `--views` picks
+// the tile's view set and `--sites` keeps only a vehicle's or an assembly's sites starting with a prefix
+// (site/lookOptions.mjs), so parts a body hides can be drawn on their own.
+// Writes <out>/tiles/<id>.png, <out>/sheet.json and <out>/index.html; rows of earlier looks into the same folder with
+// the same options stay.
 import { execFileSync } from 'node:child_process';
 import { createReadStream, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, resolve, sep } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
-import { LOOK_DIR, lookDigest, lookIds, mergeRows } from './look.mjs';
+import { viewSet } from '../site/lookOptions.mjs';
+import { LOOK_DIR, lookDigest, lookIds, lookName, mergeRows } from './look.mjs';
 import { MANIFEST } from './manifest.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -24,8 +29,13 @@ const { values, positionals } = parseArgs({
     size: { type: 'string', default: '256' },
     vehicles: { type: 'boolean', default: false },
     assemblies: { type: 'boolean', default: false },
+    views: { type: 'string', default: 'review' },
+    sites: { type: 'string', default: '' },
   },
 });
+const options = { views: values.views, sites: values.sites.split(',').filter(Boolean) };
+const views = viewSet(options.views);
+const look = lookName(options);
 const built = resolve(values.built);
 const out = resolve(values.out);
 const size = Number(values.size);
@@ -83,11 +93,11 @@ try {
   for (const id of ids) {
     const digest = lookDigest(built, manifest, id);
     try {
-      const { png, ...facts } = await page.evaluate(([entry, pixels]) => window.look(entry, pixels), [id, size]);
+      const { png, ...facts } = await page.evaluate(([entry, pixels, asked]) => window.look(entry, pixels, asked), [id, size, options]);
       writeAtomic(join(out, 'tiles', `${id}.png`), Buffer.from(png.slice(png.indexOf(',') + 1), 'base64'));
-      drawn.push({ id, ...facts, digest });
+      drawn.push({ id, look, ...facts, digest });
     } catch (error) {
-      drawn.push({ id, error: error.message.split('\n')[0] });
+      drawn.push({ id, look, error: error.message.split('\n')[0] });
     }
   }
 } finally {
@@ -99,7 +109,7 @@ try {
 
 const sheetPath = join(out, 'sheet.json');
 const known = new Set(lookIds(manifest));
-const rows = mergeRows(existsSync(sheetPath) ? JSON.parse(readFileSync(sheetPath, 'utf8')) : [], drawn, known);
+const rows = mergeRows(existsSync(sheetPath) ? JSON.parse(readFileSync(sheetPath, 'utf8')) : [], drawn, known, look);
 writeAtomic(sheetPath, `${JSON.stringify(rows, null, 1)}\n`);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const figure = (r) => r.error
@@ -109,7 +119,7 @@ const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.exploded{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
 input{font:inherit;padding:4px 8px;margin-bottom:12px;width:280px}</style>
-<p>${rows.length} entries · views: front ¾ | rear ¾ / side | top, then a vehicle or an assembly exploded from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
+<p>${rows.length} entries · ${esc(look)} · views: ${esc(views.map(([name]) => name).join(' | '))}, then a vehicle or an assembly exploded from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
 ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);

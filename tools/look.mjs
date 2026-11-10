@@ -59,10 +59,14 @@ export function lookDigest(built, manifest, id) {
   return hash.digest('hex');
 }
 
-// The sheet's rows after a look: each row drawn now replaces its earlier one, so a few redrawn entries still show
-// beside the rest of a batch, and a row whose entry the tree no longer holds is dropped.
-export function mergeRows(previous, drawn, known) {
-  const byId = new Map(previous.filter(({ id }) => known.has(id)).map((row) => [row.id, row]));
+// A look's options as the sheet prints and keys them: its view set and the sites it keeps (site/lookOptions.mjs).
+export const lookName = ({ views = 'review', sites = [] } = {}) => (sites.length > 0 ? `${views} views, sites ${sites.join(', ')}` : `${views} views`);
+
+// The sheet's rows after a look named `look` (lookName): each row drawn now replaces its earlier one, so a few redrawn
+// entries still show beside the rest of a batch, and a row whose entry the tree no longer holds is dropped. A sheet
+// shows one look, so rows drawn with other options are dropped too.
+export function mergeRows(previous, drawn, known, look = lookName()) {
+  const byId = new Map(previous.filter((row) => known.has(row.id) && (row.look ?? lookName()) === look).map((row) => [row.id, row]));
   for (const row of drawn) byId.set(row.id, row);
   return [...byId.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }

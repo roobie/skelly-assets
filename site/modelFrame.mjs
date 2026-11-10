@@ -29,3 +29,16 @@ export const REVIEW_VIEWS = [
   ['side', RIGHT],
   ['top', UP],
 ];
+
+// The underside tile's views, for the parts a vehicle carries under its floor and behind it, such as an exhaust run, a
+// fuel tank or a stack, which the review views hide under the body: both lower three-quarters, the rear and straight
+// up from below.
+export const UNDERSIDE_VIEWS = [
+  ['below front ¾', from(1.25, 0.85, -0.5)],
+  ['below rear ¾', from(-1.25, -0.85, -0.5)],
+  ['rear', from(-1, 0, 0)],
+  ['below', from(0, 0, -1)],
+];
+
+// The view sets a look can draw a tile from, by the name a review asks for.
+export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS };
