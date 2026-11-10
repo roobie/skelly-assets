@@ -1,5 +1,6 @@
-// A wheel as a tyre on a rim (`wheels.libsonnet`) with its class's brake (`wheel-classes.libsonnet`). A vehicle fits the
-// wheel as one model, because a game turns the wheel's site and a placement cannot carry a part along with another's
+// A wheel as a tyre on a rim (`wheels.libsonnet`) with its class's brake (`wheel-classes.libsonnet`). A wheel with no
+// class is braked by drums its axle draws, so no disc brake is claimed to fit a rim built only for drums. A vehicle fits
+// the wheel as one model, because a game turns the wheel's site and a placement cannot carry a part along with another's
 // site; the tyre and the rim are rows of their own too, drawn from the same pieces, so a game can yield them from a
 // salvaged wheel. The brake disc and caliper always have sites of their own: they stay on the hub when the wheel comes
 // off, and the caliper must not turn with the wheel.
@@ -58,6 +59,7 @@ local caliper(c) = {
   finish: { body: p.finish },
 };
 
+local braked(name) = std.objectHas(wheels[name], 'class');
 local classOf(name) = classes[wheels[name].class];
 // Where each brake part's origin sits in the wheel's frame: the disc's hat against the rim's face.
 local discAt(name) = wheels[name].rim.face;
@@ -68,8 +70,7 @@ local wheelRows(name) =
   local w = wheels[name];
   local t = tyre(w);
   local r = rim(w);
-  local c = classOf(name);
-  assert c.caliper.outer < w.rim.radius - w.rim.wall : name + "'s rim is too small for its class's caliper";
+  assert !braked(name) || classOf(name).caliper.outer < w.rim.radius - w.rim.wall : name + "'s rim is too small for its class's caliper";
   [
     k.compound(name, w.tyre.massKg + w.rim.massKg, t.pieces + r.pieces, t.finish + r.finish, anchored),
     k.compound(w.tyre.id, w.tyre.massKg, t.pieces, t.finish, { hub: ['tyre', [0.5, 0.5, 0.5]] }),
@@ -89,11 +90,12 @@ local brakeRows(c) = [
         + std.flattenArrays([wheelRows(name) for name in std.objectFields(wheels)]),
   // A near and far pair of wheel sites `id`, each wheel's frame placed at `at`, through a vehicle kit's `pair` (see
   // `site.libsonnet`, `kit`) so a game's kit can take them too. `brake` is false for the outer wheel of a twin, whose
-  // brake sits on the shared hub behind the inner one, and for a wheel on an axle drawn with its drums.
+  // brake sits on the shared hub behind the inner one, and for a wheel on an axle drawn with its drums, as every wheel
+  // with no class is.
   pair(kit, id, name, at, supportedBy=null, brake=true):
-    local c = classOf(name);
+    assert !brake || braked(name) : name + ' has no disc brake, so its axle draws drums and its pair takes brake=false';
     local axial(dz) = [at[0], at[1], at[2] + dz];
     kit.pair(id, name, at, supportedBy)
-    + (if brake then kit.pair(id + '_brake_disc', c.disc.id, axial(discAt(name)), supportedBy)
-                   + kit.pair(id + '_caliper', c.caliper.id, axial(caliperAt(name)), supportedBy) else []),
+    + (if brake then kit.pair(id + '_brake_disc', classOf(name).disc.id, axial(discAt(name)), supportedBy)
+                   + kit.pair(id + '_caliper', classOf(name).caliper.id, axial(caliperAt(name)), supportedBy) else []),
 }

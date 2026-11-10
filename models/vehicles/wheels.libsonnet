@@ -1,5 +1,6 @@
-// The wheels built as a tyre on a rim, each with its class's brake; see `wheel-kit.libsonnet`. A wheel is keyed by the
-// id of its fused row, the tyre and rim as one model, which weighs what its tyre and rim do.
+// The wheels built as a tyre on a rim, each with its class's brake or, with no class, braked by its axle's drums; see
+// `wheel-kit.libsonnet`. A wheel is keyed by the id of its fused row, the tyre and rim as one model, which weighs what
+// its tyre and rim do.
 // The axis is z with +z outboard; a rim's `face` is where its spokes start, outboard of the hub's centre, and the brake
 // sits inside the barrel behind it.
 {
@@ -25,5 +26,11 @@
     class: 'heavy',
     tyre: { id: 'tyre_295_80r22_5', massKg: 58, width: 0.295, outer: 0.522 },
     rim: { id: 'rim_22_5_steel', massKg: 27, radius: 0.286, width: 0.21, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.14, spokes: 8, spokeWidth: 0.08, finish: 'steel-grey' },
+  },
+  // The M3 half-track's 8.25-20 combat tyre on a six-stud steel disc wheel. Masses are estimates for the size; the
+  // axle's drums brake it.
+  wheel_8_25_20: {
+    tyre: { id: 'tyre_8_25_20', massKg: 45, width: 0.21, outer: 0.464 },
+    rim: { id: 'rim_20_steel', massKg: 30, radius: 0.254, width: 0.17, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.12, spokes: 6, spokeWidth: 0.09, finish: 'paint-olive' },
   },
 }

@@ -2,8 +2,8 @@
 // id of its fused row. Each wheel is its site and its class entry, at (x, y) in the track's frame: x forward, y up from
 // the ground, the band centred across z with +z outboard. `loop` names the wheels the band wraps, counter-clockwise
 // seen from the near side (rear to front along the ground, then back over the top); the other wheels stand on its
-// runs. A machine's track frame is drawn with the band and weighs `frame.massKg`; an armoured hull carries its own
-// suspension arms, so its track has none.
+// runs. A machine's track frame is drawn with the band and weighs `frame.massKg`, in its `finish` when it names one;
+// an armoured hull carries its own suspension arms, so its track has none.
 {
   // A 14-tonne excavator's: 3.75 m long, its drive sprocket at the rear.
   excavator_track: {
@@ -44,5 +44,21 @@
       for i in std.range(0, 6)
     ],
     loop: ['idler', 'road_wheel_0', 'road_wheel_6', 'sprocket'],
+  },
+  // The M3 half-track's rear bogie: a front drive sprocket off the rear axle, a rear idler, two volute-sprung bogies of
+  // two wheels each and one return roller between them. Its frame stands in for the bogie's girder, painted with the
+  // hull. The wheels' spacing is read from side drawings and the published 1.19 m ground contact.
+  half_track_track: {
+    class: 'band_light',
+    frame: { massKg: 180, x: [-2.2, -0.82], y: [0.38, 0.52], halfWidth: 0.12, finish: 'paint-olive' },
+    wheels: [
+      { site: 'sprocket', key: 'sprocket', at: [-0.5, 0.52] },
+      { site: 'idler', key: 'idler', at: [-2.52, 0.42] },
+      { site: 'roller_0', key: 'roller', at: [-1.49, 0.641] },
+    ] + [
+      { site: 'road_wheel_' + i, key: 'roadWheel', at: [[-2.02, -1.68, -1.3, -0.96][i], 0.22] }
+      for i in std.range(0, 3)
+    ],
+    loop: ['idler', 'road_wheel_0', 'road_wheel_3', 'sprocket'],
   },
 }

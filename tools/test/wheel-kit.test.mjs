@@ -21,7 +21,8 @@ const fittings = JSON.parse(evaluateJsonnet(`
     { part: part, mass: body.massKg, pieces: [kit.moved(p, offset) for p in std.parseJson(body.params.pieces)], finish: body.finish };
   {
     [name]: {
-      sites: { [std.strReplace(p.id, '_near', '')]: drawn(p.part, p.at) for p in wheel.pair(site.kit, 'wheel', name, at) if !std.objectHas(p, 'mirror') },
+      braked: std.objectHas(wheels[name], 'class'),
+      sites: { [std.strReplace(p.id, '_near', '')]: drawn(p.part, p.at) for p in wheel.pair(site.kit, 'wheel', name, at, brake=std.objectHas(wheels[name], 'class')) if !std.objectHas(p, 'mirror') },
       tyre: drawn(wheels[name].tyre.id),
       rim: drawn(wheels[name].rim.id),
     }
@@ -31,10 +32,11 @@ const fittings = JSON.parse(evaluateJsonnet(`
 const wheels = Object.entries(fittings);
 
 // A game turns the wheel's site, so the tyre must be drawn by the model at that site and the brake by models elsewhere.
+// A wheel with no class has no brake of its own: its axle draws the drums.
 test("a wheel's site carries the whole wheel and its brake sits at sites of its own", () => {
-  assert.ok(wheels.length > 0);
-  for (const [name, { sites }] of wheels) {
-    assert.deepEqual(Object.keys(sites).sort(), ['wheel', 'wheel_brake_disc', 'wheel_caliper'], name);
+  assert.ok(wheels.some(([, { braked }]) => braked));
+  for (const [name, { braked, sites }] of wheels) {
+    assert.deepEqual(Object.keys(sites).sort(), braked ? ['wheel', 'wheel_brake_disc', 'wheel_caliper'] : ['wheel'], name);
     assert.equal(sites.wheel.part, name);
   }
 });
@@ -51,9 +53,10 @@ test('a wheel weighs and looks the same as its tyre and rim rows', () => {
 const STEP = 0.004;
 
 test('every part of a wheel and its brake rests on another and cuts into none', () => {
-  for (const [name, { sites, tyre, rim }] of wheels) {
-    const parts = { tyre, rim, disc: sites.wheel_brake_disc, caliper: sites.wheel_caliper };
-    for (const [part, base] of [['tyre', 'rim'], ['disc', 'rim'], ['caliper', 'disc']]) {
+  for (const [name, { braked, sites, tyre, rim }] of wheels) {
+    const parts = braked ? { tyre, rim, disc: sites.wheel_brake_disc, caliper: sites.wheel_caliper } : { tyre, rim };
+    const rests = braked ? [['tyre', 'rim'], ['disc', 'rim'], ['caliper', 'disc']] : [['tyre', 'rim']];
+    for (const [part, base] of rests) {
       assert.ok(meeting(parts[part].pieces, parts[base].pieces, STEP).touches, `${name}: ${part} floats clear of ${base}`);
     }
     const all = Object.entries(parts);
