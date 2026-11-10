@@ -1,8 +1,8 @@
-// The review page: draws one model or assembled vehicle as a still tile of four views through the showcase's renderer,
-// with a ground grid so size reads off the picture, since every view is fitted to its square. A vehicle's tile adds its
-// exploded view beside them, twice a view's size because its parts spread wider, so the parts a picture of the whole
-// hides can be reviewed too. tools/model-sheet.mjs drives it headless through `window.look`; opened with `?id=a,b` it
-// shows those tiles in the page.
+// The review page: draws one model, assembled vehicle or kit assembly as a still tile of four views through the
+// showcase's renderer, with a ground grid so size reads off the picture, since every view is fitted to its square. A
+// vehicle's or an assembly's tile adds its exploded view beside them, twice a view's size because its parts spread
+// wider, so the parts a picture of the whole hides can be reviewed too. tools/model-sheet.mjs drives it headless
+// through `window.look`; opened with `?id=a,b` it shows those tiles in the page.
 import * as THREE from 'three';
 import { FRONT_QUARTER, REVIEW_VIEWS } from './modelFrame.mjs';
 import { explodable, frame, isVehicle, loadEntry, makeStage, registerModels, setupRenderer, spread, stillInstance } from './render.mjs';
@@ -19,9 +19,9 @@ const ready = (async () => {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   setupRenderer(renderer);
   stage = makeStage(renderer);
-  const { models, vehicles } = await fetch('models.json').then((r) => r.json());
+  const { models, vehicles, assemblies } = await fetch('models.json').then((r) => r.json());
   registerModels(models);
-  return new Map([...models, ...vehicles].map((entry) => [entry.id, entry]));
+  return new Map([...models, ...vehicles, ...assemblies].map((entry) => [entry.id, entry]));
 })();
 
 // The largest power of ten no longer than the model's longest side, so a grid shows between one and ten cells.
@@ -51,7 +51,7 @@ function drawView(g, obj, [name, direction], x, y, size) {
 async function look(id, size) {
   const entries = await ready;
   const entry = entries.get(id);
-  if (!entry) throw new Error(`${id} is neither a model nor a vehicle of the built tree`);
+  if (!entry) throw new Error(`${id} is no model, vehicle or assembly of the built tree`);
   const loaded = await loadEntry(entry);
   const obj = stillInstance(loaded, entry);
   const exploded = isVehicle(entry);
@@ -68,11 +68,13 @@ async function look(id, size) {
   g.textBaseline = 'top';
   const grid = groundGrid(box, cell);
   stage.add(obj, grid);
-  views.forEach((view, i) => drawView(g, obj, view, (i % 2) * size, Math.floor(i / 2) * size, size));
+  views.forEach((view, i) => {
+    drawView(g, obj, view, (i % 2) * size, Math.floor(i / 2) * size, size);
+  });
   stage.remove(grid);
   if (exploded) {
     spread(explodable(obj), 1);
-    // The same cell as the assembled views, so the spread reads against the vehicle's own size.
+    // The same cell as the assembled views, so the spread reads against the whole's own size.
     const apart = groundGrid(new THREE.Box3().setFromObject(obj), cell);
     stage.add(apart);
     drawView(g, obj, explodedView, size * 2, 0, size * 2);

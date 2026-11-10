@@ -1,5 +1,7 @@
 // What the review tools (model-sheet.mjs, vehicle-gallery.mjs) decide without a browser: which manifest entries to
-// draw, which built files a picture is drawn from, and which pictures those files have since changed under.
+// draw, which built files a picture is drawn from, and which pictures those files have since changed under. A
+// manifest here may also list, under `assemblies`, the kit assemblies the showcase can place from the tree
+// (site/build.mjs), so a look draws them like vehicles.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -9,33 +11,41 @@ export const LOOK_DIR = 'look/sheet';
 
 const vehicleById = (manifest) => new Map(manifest.vehicles.map((vehicle) => [vehicle.id, vehicle]));
 const glbById = (manifest) => new Map(manifest.models.filter(({ path }) => path.endsWith('.glb')).map((model) => [model.id, model]));
+const assemblyById = (manifest) => new Map((manifest.assemblies ?? []).map((assembly) => [assembly.id, assembly]));
 
-// The ids to draw: those named, every vehicle with `vehicles`, or every model and vehicle when neither is given.
-export function lookIds(manifest, { ids = [], vehicles = false } = {}) {
-  const known = new Set([...glbById(manifest).keys(), ...vehicleById(manifest).keys()]);
+// The ids to draw: those named, every vehicle with `vehicles`, every assembly with `assemblies`, or everything when
+// none is given.
+export function lookIds(manifest, { ids = [], vehicles = false, assemblies = false } = {}) {
+  const drawn = [glbById(manifest), vehicleById(manifest), assemblyById(manifest)].map((byId) => [...byId.keys()]);
+  const known = new Set(drawn.flat());
   const unknown = ids.filter((id) => !known.has(id));
-  if (unknown.length > 0) throw new Error(`neither a model nor a vehicle of the built tree: ${unknown.join(' ')}`);
-  const all = vehicles ? [...vehicleById(manifest).keys()] : ids.length > 0 ? [] : [...known];
-  return [...new Set([...ids, ...all])].sort();
+  if (unknown.length > 0) throw new Error(`no model, vehicle or assembly of the built tree: ${unknown.join(' ')}`);
+  const all = [...(vehicles ? drawn[1] : []), ...(assemblies ? drawn[2] : [])];
+  return [...new Set([...ids, ...(ids.length > 0 || vehicles || assemblies ? all : known)])].sort();
 }
 
 const fileOf = ({ pack, path }) => `${pack}/${path}`;
 
-// The built files a picture of `id` is drawn from, under the built tree: a model's GLB, or a vehicle's placements and
-// the GLB of every part they place.
+// The built files a picture of `id` is drawn from, under the built tree: a model's GLB, a vehicle's placements and the
+// GLB of every part they place, or the GLB of every part of an assembly.
 export function lookSources(built, manifest, id) {
+  const models = glbById(manifest);
+  const partFiles = (parts) => [...new Set(parts.map((part) => fileOf(models.get(part))))];
+  const assembly = assemblyById(manifest).get(id);
+  if (assembly) return partFiles(assembly.sites.map(({ model }) => model));
   const vehicle = vehicleById(manifest).get(id);
-  if (!vehicle) return [fileOf(glbById(manifest).get(id))];
+  if (!vehicle) return [fileOf(models.get(id))];
   const placements = fileOf(vehicle);
   const { sites } = JSON.parse(readFileSync(join(built, placements), 'utf8'));
-  const models = glbById(manifest);
-  return [placements, ...new Set(sites.map(({ part }) => fileOf(models.get(part))))];
+  return [placements, ...partFiles(sites.map(({ part }) => part))];
 }
 
 // A digest of everything a picture of `id` shows: its built files and the manifest entries that steer the drawing,
-// such as a printed label. Undefined when the tree no longer holds it or one of its files.
+// such as a printed label or where an assembly sites its parts. Undefined when the tree no longer holds it or one of
+// its files.
 export function lookDigest(built, manifest, id) {
-  const entries = [...glbById(manifest).values(), ...manifest.vehicles].filter((entry) => entry.id === id);
+  const entries = [...glbById(manifest).values(), ...manifest.vehicles, ...assemblyById(manifest).values()]
+    .filter((entry) => entry.id === id);
   if (entries.length === 0) return undefined;
   let files;
   try {

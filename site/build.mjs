@@ -1,6 +1,6 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags and printed label, the vehicles the tree places with the model at each of their sites, and the
-// vocabulary's meanings for the page's labels (models/taxonomy.json).
+// their category, tags and printed label, the vehicles the tree places and the assemblies the kits build with the
+// model at each of their sites, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
@@ -10,6 +10,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
+import { readAssemblies } from '../tools/assemblies.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -60,26 +61,35 @@ const paintOf = (finish) => {
   return { linear: [r, g, b], metallic, roughness, opacity };
 };
 
-// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.
+// The model at each of a vehicle's or an assembly's sites, as the browser places it.
 const modelsById = new Map(models.map((model) => [model.id, model]));
+const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
+const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
+  site,
+  model: part,
+  at,
+  ...(mirror ? { mirror } : {}),
+  ...(finish ? { paint: paintOf(finish) } : {}),
+}));
+
+// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.
 const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
-  const missing = sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
+  const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  return {
-    id,
-    placements: `${pack}/${path}`,
-    tags: tags ?? {},
-    sites: sites.map(({ id: site, part, at, mirror, finish }) => ({
-      site,
-      model: part,
-      at,
-      ...(mirror ? { mirror } : {}),
-      ...(finish ? { paint: paintOf(finish) } : {}),
-    })),
-  };
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, sites: placedSites(sites) };
 });
+
+// Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
+// source, so a tree built before a kit gained a part leaves out the assemblies it cannot place.
+const vehicleIds = new Set(vehicles.map(({ id }) => id));
+const assemblies = readAssemblies(root)
+  .filter(({ sites }) => missingParts(sites).length === 0)
+  .map(({ id, sites }) => {
+    if (modelsById.has(id) || vehicleIds.has(id)) throw new Error(`assembly ${id} shares its id with a model or vehicle`);
+    return { id, sites: placedSites(sites) };
+  });
 
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
 // dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback.
@@ -127,6 +137,6 @@ for (const model of models) if (model.clips && model.body) {
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models, vehicles }));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models, vehicles, assemblies }));
 writeFileSync(join(out, '.nojekyll'), '');
-console.log(`${models.length} models and ${vehicles.length} vehicles into ${out}`);
+console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
