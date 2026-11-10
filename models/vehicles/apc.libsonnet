@@ -15,18 +15,18 @@ local axle(id, massKg, finish) = k.compound(id, massKg, [
 ]), { steel: 'steel-parkerized', hub: 'steel-grey' } + finish);
 local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1.32 + i * 0.16, 2.46, 1.08]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
-  k.compound('apc_hull_belly', 4500, [
+  k.compound('apc_hull_belly', 1660, [
     k.xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
     box('deck', 'floor', [s.rear, s.floor, -0.88], [2.81, s.floor + 0.02, 0.88]),
   ] + bothSides([
     box('lower_wall', 'paint', [s.rear, s.floor, 0.88], [2.81, s.shelf, s.wall]),
   ]), paint + { floor: 'steel-grey' }),
-  k.compound('apc_hull_side', 1700, [
+  k.compound('apc_hull_side', 640, [
     box('shelf', 'paint', [s.rear, s.shelf, 0.88], [2.5, s.shelf + 0.06, s.side]),
     k.xPrism('wall', 'paint', [[s.shelf, 1.25], [s.roof, 1.18], [s.roof, s.sideTop], [s.shelf, s.side]], [s.rear, 2.5]),
     prism('cheek', 'paint', [[2.5, 1.19], [3.2, 1.19], [3.2, 1.77], [2.56, 2.41], [2.5, 2.41]], [1.25, s.side]),
   ], paint),
-  k.compound('apc_hull_nose', 1200, [
+  k.compound('apc_hull_nose', 750, [
     box('floor', 'paint', [2.81, s.belly, -1.25], [3.02, s.belly + 0.06, 1.25]),
     prism('lower_glacis', 'paint', [[3.0, s.belly], [s.nose, 0.97], [3.44, 1.0], [2.96, 0.66]], [-1.25, 1.25]),
     box('nose_plate', 'paint', [3.44, 0.97, -1.25], [s.nose, 1.47, 1.25]),
@@ -36,17 +36,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     prism('cheek', 'paint', [[2.81, s.belly], [3.0, s.belly], [s.nose, 0.97], [s.nose, 1.47], [2.56, s.roofTop], [2.5, s.roofTop], [2.5, 1.19]], [1.19, 1.25]),
     box('tow_eye', 'steel', [s.nose, 0.9, 0.62], [s.nose + 0.08, 1.1, 0.72]),
   ]), paint + { steel: 'steel-parkerized' }),
-  k.compound('apc_hull_roof', 900, [
+  k.compound('apc_hull_roof', 790, [
     box('plate', 'paint', [s.rear, s.roof, -s.sideTop], [2.56, s.roofTop, s.sideTop]),
   ], paint),
-  k.compound('apc_hull_rear', 500, [
+  k.compound('apc_hull_rear', 175, [
     box('sill', 'paint', [s.rear - 0.14, s.belly, -s.wall], [s.rear, 0.81, s.wall]),
     box('header', 'paint', [s.rear - 0.14, 2.19, -s.sideTop], [s.rear, s.roofTop, s.sideTop]),
   ] + bothSides([
     box('post', 'paint', [s.rear - 0.14, 0.81, 0.625], [s.rear, 2.19, 1.25]),
     box('bumper', 'steel', [s.rear - 0.19, 0.72, 0.65], [s.rear - 0.125, 0.81, 1.2]),
   ]), paint + { steel: 'steel-parkerized' }),
-  k.compound('apc_ramp', 300, [
+  k.compound('apc_ramp', 120, [
     box('plate', 'paint', [s.rear - 0.19, 0.81, -0.62], [s.rear - 0.125, 2.19, 0.62]),
     box('rib_low', 'paint', [s.rear - 0.23, 1.1, -0.5], [s.rear - 0.19, 1.16, 0.5]),
     box('rib_high', 'paint', [s.rear - 0.23, 1.75, -0.5], [s.rear - 0.19, 1.81, 0.5]),
@@ -65,8 +65,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('rim_top', 'steel', [-0.5, 0.66, 0.05], [0.5, 0.7, 0.07]),
     box('rim_low', 'steel', [-0.5, 0.02, 0.05], [0.5, 0.06, 0.07]),
   ], paint + { steel: 'steel-parkerized' }),
-  axle('apc_axle_steered', 320, {}),
-  axle('apc_axle_driven', 300, {}),
+  axle('apc_axle_steered', 390, {}),
+  axle('apc_axle_driven', 370, {}),
   k.compound('apc_stowage_bin', 40, [
     box('bin', 'paint', [-0.31, 0.625, s.wall], [0.44, s.shelf, s.side]),
     box('lid_edge', 'steel', [-0.34, 1.12, s.side], [0.47, 1.16, s.side + 0.02]),
@@ -75,12 +75,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_turret_ring', 150, [
     k.turned('ring', 'steel', 'y', k.annulus(0.6, 0.85, 0, 0.1)) + { sides: 24 },
   ], { steel: 'steel-parkerized' }),
-  k.compound('apc_cupola', 90, [
+  k.compound('apc_cupola', 45, [
     k.turned('ring', 'paint', 'y', k.disc(0.36, 0, 0.14)) + { sides: 12 },
     k.turned('lid', 'paint', 'y', k.disc(0.3, 0.14, 0.2)) + { sides: 12 },
     box('hinge', 'steel', [-0.3, 0.14, -0.1], [-0.24, 0.2, 0.1]),
   ], paint + { steel: 'steel-parkerized' }),
-  k.compound('apc_hatch', 35, [
+  k.compound('apc_hatch', 25, [
     box('lid', 'paint', [-0.3, 0, -0.3], [0.3, 0.05, 0.3]),
     box('hinge', 'steel', [-0.3, 0.05, -0.26], [-0.25, 0.08, 0.26]),
     box('handle', 'steel', [0.12, 0.05, -0.1], [0.18, 0.09, 0.1]),
