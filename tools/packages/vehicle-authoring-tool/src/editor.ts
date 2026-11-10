@@ -122,7 +122,7 @@ export const renameFitting = (blueprint: VehicleBlueprintInput, id: string, to: 
 };
 
 /**
- * Replaces one unmirrored fitting with `<base>_near` and `<base>_far`, as `packages/mods/skelly.ground-vehicles/vehicles.jsonnet`, `pair` does.
+ * Replaces one unmirrored fitting with `<base>_near` and `<base>_far`, as `models/vehicles/site.libsonnet`, `pair` does.
  * Every choice is the author's: nothing is inferred from names, and a missing choice refuses the operation.
  */
 export const createMirroredPair = (

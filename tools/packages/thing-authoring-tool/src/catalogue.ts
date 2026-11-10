@@ -316,7 +316,7 @@ const partAppearance = ({ finish, paintable }: ToolPart) => ({ finish, ...(paint
 /** The finish slots any part of the item lets a host repaint, in authored order. */
 const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.parts.flatMap(({ paintable = [] }) => paintable))];
 
-/** Builds an item; with a model export's grains its datums read off the drawn voxels (see `drawn.ts`). */
+/** Builds an item; with a model export's grains its datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
   const forward = item.forward ?? FAMILY_FORWARDS[first.family] ?? '+z';
