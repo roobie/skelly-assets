@@ -84,9 +84,9 @@ export function modelParts(buffer) {
 
 // ---- the doll ----
 
-// The doll's sites and, for each of its part names, the copies of that part in the doll frame as
-// { side, at, box, mirror }, in the order of the dressing's sides. `figure` holds each doll model's `parts` (modelParts) and `anchors`
-// (its things sidecar).
+// The doll's sites, for each of its part names the copies of that part in the doll frame as { side, at, box, mirror },
+// in the order of the dressing's sides, and the bust's anchors, which are in the doll frame too. `figure` holds each
+// doll model's `parts` (modelParts) and `anchors` (its things sidecar).
 export function dollOf(dressing, figure) {
   const { bust, limbs, sides, mirrored: mirroredSide } = dressing.doll;
   const sites = [{ model: bust, at: [0, 0, 0] }];
@@ -107,7 +107,7 @@ export function dollOf(dressing, figure) {
       }
     }
   }
-  return { sites, parts };
+  return { sites, parts, anchors: figure[bust].anchors };
 }
 
 // ---- dressing ----
@@ -157,7 +157,8 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) 
   };
   const pieces = wornPieces(model.id, models, dressing);
   if (pieces.length > 0) {
-    return [...sites, ...pieces.flatMap(({ model: piece, part }) => copiesOf(part).map(({ at, mirror }) => ({ model: piece, at, ...(mirror ? { mirror } : {}) })))];
+    // A piece's site names the doll part it is drawn in, so a poser can move the piece with that part (site/pose.mjs).
+    return [...sites, ...pieces.flatMap(({ model: piece, part }) => copiesOf(part).map(({ at, mirror }) => ({ model: piece, part, at, ...(mirror ? { mirror } : {}) })))];
   }
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));

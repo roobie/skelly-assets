@@ -1,0 +1,17 @@
+{
+  "angles": {
+    "spine": [5, 8, 0],
+    "neck": [-5, -8, 0],
+    "upperArm.R": [-25, 0, -8],
+    "forearm.R": [15, 0, 0],
+    "upperArm.L": [30, 0, 8],
+    "forearm.L": [40, 0, 0],
+    "thigh.R": [30, 0, -3],
+    "shin.R": [10, 0, 0],
+    "thigh.L": [-18, 0, 3],
+    "shin.L": [35, 0, 0],
+    "foot.L": [20, 0, 0]
+  },
+  "level": ["foot.R"],
+  "ground": true
+}
