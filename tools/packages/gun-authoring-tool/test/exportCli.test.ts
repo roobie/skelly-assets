@@ -6,19 +6,21 @@ import process from 'node:process';
 import { parseAssemblyJson } from '@skelly/construct/assembly/parseAssembly.ts';
 import { srgbToHex } from '@skelly/thing-export/appearance.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { GUN_PALETTE, resolveAppearance } from '../src/gun/palette.ts';
 import { readGlb } from './glbReader.ts';
+import { designText } from './helpers.ts';
 
-const read = (dir: string, name: string): string =>
-  readFileSync(join(import.meta.dirname, '..', dir, `${name}.json`), 'utf8');
+const fixtureText = (name: string): string =>
+  readFileSync(join(import.meta.dirname, '..', 'fixtures', `${name}.json`), 'utf8');
 const ASSET = { id: 'ar', file: 'assets/models/ar.glb' } as const;
 
 describe('export CLI core', () => {
   it('exports a design file and a fixture to the same model', () => {
-    const fromDesign = exportFileText(read('designs', 'archetype-ar'), ASSET);
-    const fixture = parseAssemblyJson(read('fixtures', 'archetype-ar'));
+    const fromDesign = exportFileText(designText('archetype-ar'), ASSET);
+    const fixture = parseAssemblyJson(fixtureText('archetype-ar'));
     expect(fromDesign.ok && fixture.ok).toBe(true);
     if (fromDesign.ok && fixture.ok) {
       const fromFixture = exportGunGlb(fixture.assembly, ASSET, { appearanceProfile: 'ar' });
@@ -33,8 +35,8 @@ describe('export CLI core', () => {
   });
 
   it("exports the weapon's eye point and sight axes for ADS", () => {
-    const optic = exportFileText(read('designs', 'archetype-ar'), ASSET);
-    const irons = exportFileText(read('fixtures', 'archetype-ak'), ASSET);
+    const optic = exportFileText(designText('archetype-ar'), ASSET);
+    const irons = exportFileText(fixtureText('archetype-ak'), ASSET);
     expect(optic.ok && irons.ok).toBe(true);
     if (!(optic.ok && irons.ok)) {
       return;
@@ -50,8 +52,8 @@ describe('export CLI core', () => {
   });
 
   it('preserves curated AWM and bare AK fixture appearances on the file-export path', () => {
-    const awm = exportFileText(read('designs', 'archetype-awm'), ASSET);
-    const ak = exportFileText(read('fixtures', 'archetype-ak'), ASSET);
+    const awm = exportFileText(designText('archetype-awm'), ASSET);
+    const ak = exportFileText(fixtureText('archetype-ak'), ASSET);
     expect(awm.ok && ak.ok).toBe(true);
     if (!(awm.ok && ak.ok)) {
       return;
@@ -112,7 +114,7 @@ describe('export CLI core', () => {
         process.execPath,
         [
           join(import.meta.dirname, '../src/cli/export.ts'),
-          'designs/archetype-ar.json',
+          join(DESIGNS, 'archetype-ar.json'),
           '--out',
           glbDir,
           '--entry-out',
@@ -134,12 +136,12 @@ describe('export CLI core', () => {
   });
 
   it('exports a design calibre automatically and resolves an explicit CLI calibre', () => {
-    const designText = read('designs', 'archetype-ak-akm');
-    const designCalibre = (JSON.parse(designText) as { calibre?: string }).calibre;
+    const akmText = designText('archetype-ak-akm');
+    const designCalibre = (JSON.parse(akmText) as { calibre?: string }).calibre;
     expect(designCalibre).toBeTruthy();
-    const fromDesign = exportFileText(designText, ASSET);
+    const fromDesign = exportFileText(akmText, ASSET);
     expect(fromDesign.ok && fromDesign.modelEntry.gun.calibre).toBe(designCalibre);
-    const mismatchedDesign = JSON.parse(designText) as Record<string, unknown>;
+    const mismatchedDesign = JSON.parse(akmText) as Record<string, unknown>;
     mismatchedDesign.calibre = `${designCalibre}-other`;
     expect(exportFileText(JSON.stringify(mismatchedDesign), ASSET)).toMatchObject({
       ok: false,
@@ -152,7 +154,7 @@ describe('export CLI core', () => {
         process.execPath,
         [
           join(import.meta.dirname, '../src/cli/export.ts'),
-          'designs/archetype-ak-akm.json',
+          join(DESIGNS, 'archetype-ak-akm.json'),
           '--out',
           temp,
           '--id',
@@ -176,7 +178,7 @@ describe('export CLI core', () => {
   });
 
   it('refuses a bare assembly with no appearance profile instead of exporting it unstyled', () => {
-    const unprofiled = JSON.stringify({ ...JSON.parse(read('fixtures', 'archetype-ak')), name: 'no-such-fixture' });
+    const unprofiled = JSON.stringify({ ...JSON.parse(fixtureText('archetype-ak')), name: 'no-such-fixture' });
     expect(exportFileText(unprofiled, ASSET)).toMatchObject({
       ok: false,
       message: expect.stringContaining('no-such-fixture'),
@@ -185,7 +187,7 @@ describe('export CLI core', () => {
 
   it('reports malformed input and a bad asset path as messages', () => {
     expect(exportFileText('{nope', ASSET)).toMatchObject({ ok: false });
-    const bad = exportFileText(read('designs', 'archetype-ar'), { id: 'x', file: 'assets/models/X.glb' });
+    const bad = exportFileText(designText('archetype-ar'), { id: 'x', file: 'assets/models/X.glb' });
     expect(bad).toMatchObject({ ok: false, message: expect.stringContaining('invalid-asset-file') });
   });
 });

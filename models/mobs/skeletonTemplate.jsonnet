@@ -4,7 +4,8 @@ local material(color, emissive=0) = { color: color, emissive: emissive };
   description: 'Bare voxel bones on the humanoid rig: separate ribs, open jaw and glowing eye sockets.',
   bodyPlan: 'skeleton',
   status: 'comparison-only',
-  // The shared-rig attack clip this content selects (attack.ts, ATTACK_CLIPS owns the ids).
+  // The shared-rig attack clip this content selects. The ids belong to
+  // `tools/packages/mobgen/src/mob/attack.ts`, `ATTACK_CLIPS`.
   attackClip: 'swipe',
   flinchClip: 'hit-flinch',
   bodyMassKg: 12,
@@ -19,8 +20,8 @@ local material(color, emissive=0) = { color: color, emissive: emissive };
   // The bone colour is drawn between `materials.bone` and this by `boneTint`.
   boneB: [0.74, 0.72, 0.57],
   params: {
-    // The skeleton has no bulk: its stance width is this explicit target (gait.ts, stanceWidthTarget),
-    // not a girth-derived one.
+    // The skeleton has no bulk: its stance width is this explicit target, not a girth-derived one
+    // (`tools/packages/mobgen/src/mob/gait.ts`, `stanceWidthTarget`).
     stepWidth: { min: 0.2, max: 0.24 },
     shoulderWidth: { min: 1.15, max: 1.3 },
     hipWidth: { min: 0.9, max: 1.05 },
@@ -77,7 +78,8 @@ local material(color, emissive=0) = { color: color, emissive: emissive };
     knobHalf: 0.022, kneeWidth: 1.1,
     upperArmRadius: 0.021, forearmRadius: 0.021, thighRadius: 0.024, shinRadius: 0.022,
     // How far the fingertips reach past the wrist (a fraction of height), long enough for four separate
-    // fingers to show below the palm; the hand bone itself stops near the palm (skeleton.ts, skeletonLayout).
+    // fingers to show below the palm; the hand bone itself stops near the palm
+    // (`tools/packages/mobgen/src/mob/skeleton.ts`, `skeletonLayout`).
     handLength: 0.11,
     palmLength: 0.05, palmHalf: [0.012, 0.03],
     // Fingers root this far into the palm; the thumb splays this many degrees off the hand's axis.

@@ -12,7 +12,7 @@ local overallPixels = derived([[27, 94], [1333, 94]], 'Visible buttplate-to-muzz
 local feature(paths) = { kind: 'derived', paths: paths };
 {
   title: 'FAL Para provisional profile',
-  document: 'docs/fal-trace.md',
+  document: 'tools/packages/gun-authoring-tool/docs/fal-trace.md',
   values: {
     barrel5062Mm: sourced(barrel5062, variants),
     barrel5063WikiMm: sourced(440, variants),

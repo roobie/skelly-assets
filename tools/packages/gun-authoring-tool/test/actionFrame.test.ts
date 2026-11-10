@@ -1,5 +1,6 @@
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { describe, expect, it } from 'vitest';
+import frameContent from '../../../../models/guns/tables/arFrames.json' with { type: 'json' };
 import {
   type ActionFrame,
   type CartridgeFrameMeasures,
@@ -8,7 +9,6 @@ import {
   validateActionFrames,
   validateFrameCartridgeClearances,
 } from '../src/gun/actionFrame.ts';
-import frameContent from '../src/gun/arFrames.json' with { type: 'json' };
 import {
   AR_ACTION_FRAMES,
   AR_FRAMES_BY_CALIBRE,

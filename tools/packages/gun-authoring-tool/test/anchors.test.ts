@@ -6,6 +6,7 @@ import type { Assembly, PartDef, Resolved } from '@skelly/construct/assembly/sch
 import { applyDir, applyPoint, cross, dot, length, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { GUN_ANCHOR_POLICY, type GunAnchorDeclarations, selectGunAnchors } from '../src/gun/anchors.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
@@ -139,7 +140,7 @@ describe('hold selection', () => {
   });
 
   it('pump-shotgun design resolves exactly one hold inside the tapered stock grip', () => {
-    const text = readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-pump-shotgun.json'), 'utf8');
+    const text = readFileSync(join(DESIGNS, 'archetype-pump-shotgun.json'), 'utf8');
     const loaded = loadGunDesign(text);
     expect(loaded.ok).toBe(true);
     if (!loaded.ok) {

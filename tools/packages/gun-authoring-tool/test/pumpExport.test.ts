@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
@@ -13,10 +12,10 @@ import { gunDomain } from '../src/gun/domain.ts';
 import { PUMP_ACTION_TRAVEL_U, PUMP_LOADING_PORT_X, PUMP_SHELL_LOADED_LENGTH_U } from '../src/gun/pumpShell.ts';
 import { tubeMagazineCapacity } from '../src/gun/tubeCapacity.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { loadDesigns } from './helpers.ts';
+import { cartridgeText, designText, loadDesigns } from './helpers.ts';
 
 const { assembly } = loadDesigns().find((entry) => entry.assembly.name === 'archetype-pump-shotgun')!;
-const parsed = parseCartridgeJson(readFileSync('cartridges/12-gauge-00-buck.json', 'utf8'));
+const parsed = parseCartridgeJson(cartridgeText('12-gauge-00-buck'));
 if (!parsed.ok || parsed.cartridge.kind !== 'shotshell') {
   throw new Error('missing shell fixture');
 }
@@ -24,7 +23,7 @@ const shell = parsed.cartridge;
 
 it('exports a hand-only coupled 12-gauge action and an integral tube without box round poses', () => {
   const out = exportFileText(
-    readFileSync('designs/archetype-pump-shotgun.json', 'utf8'),
+    designText('archetype-pump-shotgun'),
     { id: 'shotgun_pump', file: 'assets/models/shotgun_pump.glb' },
     { cartridge: shell },
   );

@@ -33,6 +33,9 @@ import {
 import { boxFromMinMax, clipPolygon, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
+import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
+import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
 import { ANTI_MATERIEL_FAMILIES } from './antiMateriel/index.ts';
@@ -59,9 +62,6 @@ import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './eject
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
 import type { MuzzleBore } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
-import physical from './physical.json' with { type: 'json' };
-import pistolAction from './pistolAction.json' with { type: 'json' };
-import pistolDimensions from './pistolDimensions.json' with { type: 'json' };
 import { gunPort } from './portData.ts';
 import {
   PUMP_ACTION_TRAVEL_U,

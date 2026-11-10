@@ -9,15 +9,15 @@ read_if:
 
 # Turn-bolt export
 
-The hunting rifle must exist as a fitted Gungen assembly before Deadvox adds playable handling or loot. Exporting geometry first keeps gameplay from inventing mechanical dimensions. Content and visual timing remain tunable rather than becoming test snapshots; see `src/gun/templates.ts`, `huntingRifle`, `designs/hunting-rifle.jsonnet`, and `src/gun/cycle.ts`, `BOLT_HAND_TIMING`.
+The hunting rifle must exist as a fitted Gungen assembly before Deadvox adds playable handling or loot. Exporting geometry first keeps gameplay from inventing mechanical dimensions. Content and visual timing remain tunable rather than becoming test snapshots; see `src/gun/templates.ts`, `huntingRifle`, `models/guns/designs/hunting-rifle.jsonnet`, and `src/gun/cycle.ts`, `BOLT_HAND_TIMING`.
 
 ## Civilian identity and equipment
 
-The rifle uses a separate civilian cartridge identity rather than silently sharing military ammunition. The shared standards drawing establishes dimensions, not cross-loading permission; unsupported measurements remain unknown. Rendering may use the sourced maximum loaded length when typical length is unknown without filling that unknown in the cartridge record. See `cartridges/308-winchester.jsonnet`, `cartridges/README.md`, and `src/ammo/roundProfile.ts`, `roundProfiles`.
+The rifle uses a separate civilian cartridge identity rather than silently sharing military ammunition. The shared standards drawing establishes dimensions, not cross-loading permission; unsupported measurements remain unknown. Rendering may use the sourced maximum loaded length when typical length is unknown without filling that unknown in the cartridge record. See `models/guns/cartridges/308-winchester.jsonnet`, `models/guns/cartridges/README.md`, and `src/ammo/roundProfile.ts`, `roundProfiles`.
 
 An integral magazine loaded singly through the open bolt distinguishes this sporter from detachable-box rifles and from the pump's closed-action loading. Fixed irons keep fitting the separately exported hunting scope a player choice. The scope's geometry, magnification and reticle belong to Gungen content, not a special Deadvox optic path. See `src/gun/optics.ts`, `OPTIC_TYPE_IDS`, and `src/gun/internalMagazine.ts`, `internalMagazineCapacity`.
 
-Fixed irons and a shallow comb angle preserve a BDL-type sporter's identity rather than a Scout's. Shared shotgun wood contours keep the wrist hand-sized when the comb changes, while the open-notch rear leaf avoids a block pedestal. The design chooses the furniture and sight configuration; proportion tables own its silhouette defaults independently of any shipped design. See `designs/hunting-rifle.jsonnet`, `src/gun/sporterProportions.ts`, `SPORTER_PROPORTIONS`, and `src/gun/taperedStock.ts`, `taperedStockSolids`.
+Fixed irons and a shallow comb angle preserve a BDL-type sporter's identity rather than a Scout's. Shared shotgun wood contours keep the wrist hand-sized when the comb changes, while the open-notch rear leaf avoids a block pedestal. The design chooses the furniture and sight configuration; proportion tables own its silhouette defaults independently of any shipped design. See `models/guns/designs/hunting-rifle.jsonnet`, `src/gun/sporterProportions.ts`, `SPORTER_PROPORTIONS`, and `src/gun/taperedStock.ts`, `taperedStockSolids`.
 
 ## Reference registration
 
@@ -29,7 +29,7 @@ The round action needs bedding below it, not an enclosed box handguard. The mati
 
 ## Geometry and motion boundary
 
-The .308 BDL-type short action holds four rounds in the magazine plus one separately chambered. Reworking the internal well preserves the traced exterior instead of changing the shared gun scale to make ammunition fit. Wall, feed-mouth and follower clearances are stylized authoring choices, not measurements from a real box drawing. The catalogue owns the target and clearances; the staggered column must actually fit, rather than acquire a nominal capacity shim. See `cartridges/catalogue/bolt.jsonnet`, `integralWells`, and `src/gun/internalMagazine.ts`, `internalMagazineLayout`.
+The .308 BDL-type short action holds four rounds in the magazine plus one separately chambered. Reworking the internal well preserves the traced exterior instead of changing the shared gun scale to make ammunition fit. Wall, feed-mouth and follower clearances are stylized authoring choices, not measurements from a real box drawing. The catalogue owns the target and clearances; the staggered column must actually fit, rather than acquire a nominal capacity shim. See `models/guns/cartridges/catalogue/bolt.jsonnet`, `integralWells`, and `src/gun/internalMagazine.ts`, `internalMagazineLayout`.
 
 Cartridge identity must not silently select a different action envelope: modded bolt designs must either size from their selected cartridge or report a validation issue. Reusing the magazine column packer keeps same-side and opposite-side clearance constraints consistent across detachable and integral magazines. See `src/gun/boltCartridge.ts`, `boltCalibreIssue`, and `src/ammo/magazineColumn.ts`, `layoutColumn`.
 

@@ -1,5 +1,6 @@
 local b = import 'packages/thing-authoring-tool/handhelds.libsonnet';
 local params = b.params, atom = b.atom, key = b.key, melee = b.melee, datum = b.datum, held = b.held;
+local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } } };
 [
   melee('crowbar', 'crowbar', 1.5, {
     back: 0.4, reach: 0.231, kickBack: 0.438, kickRise: 0.113, clawAt: 0.105, clawDrop: 0.129, thickness: 0.03, depth: 0.03,
@@ -94,12 +95,12 @@ local params = b.params, atom = b.atom, key = b.key, melee = b.melee, datum = b.
     connections: [{ from: 'lighter.fill', to: 'fuel_fill.base' }],
   },
   atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { taxonomy: { category: 'lighting' } },
-  key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey'),
-  key('pharmacy_key', 0.010, 0.011, 0.039, 'brass'),
-  key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized'),
-  key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass'),
-  key('shed_key', 0.010, 0.012, 0.038, 'steel-grey'),
-  key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued'),
+  key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey') + metalKey,
+  key('pharmacy_key', 0.010, 0.011, 0.039, 'brass') + metalKey,
+  key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized') + metalKey,
+  key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass') + metalKey,
+  key('shed_key', 0.010, 0.012, 0.038, 'steel-grey') + metalKey,
+  key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued') + metalKey,
   atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card') + {
     taxonomy: { category: 'keys', tags: { material: ['plastic'] } },
   },

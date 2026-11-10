@@ -1,3 +1,4 @@
+local defaults = import 'models/measures/keys.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local atom(id, family, massKg, dimensions, finish, solid='body') = {
   id: id,
@@ -7,10 +8,8 @@ local atom(id, family, massKg, dimensions, finish, solid='body') = {
   handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
 };
 local key(id, massKg, bowRadius, shaftLength, metal) = atom(id, 'key', massKg, {
-  bowRadius: bowRadius, shaftLength: shaftLength, shaftWidth: 0.012, thickness: 0.003, toothDepth: 0.008,
-}, { metal: metal }, 'shaft') + {
-  taxonomy: { category: 'keys', tags: { material: ['metal'] } },
-};
+  bowRadius: bowRadius, shaftLength: shaftLength,
+} + defaults.key, { metal: metal }, 'shaft');
 local melee(id, family, massKg, dimensions, finish) = {
   id: id,
   exportMass: 'parts',

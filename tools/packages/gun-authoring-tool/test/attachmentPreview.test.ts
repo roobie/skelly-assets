@@ -6,6 +6,7 @@ import type { Mat3 } from '@skelly/construct/foundation/math.ts';
 import type { AppearanceContext } from '@skelly/thing-export/exportTypes.ts';
 import { Matrix4, Mesh, MeshStandardMaterial, Quaternion } from 'three';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
 import { parseAttachmentFit, previewFittedAttachments } from '../src/gun/attachmentPreview.ts';
 import { attachmentMetadata, attachmentMountSlot, withAttachmentInstanceAppearances } from '../src/gun/attachments.ts';
@@ -81,7 +82,7 @@ const rotationMatrix = (rotation: Mat3): Matrix4 =>
 
 const exportDesign = (assembly: Parameters<typeof exportGunGlb>[0]) => {
   const design = JSON.parse(
-    readFileSync(join(import.meta.dirname, '..', 'designs', `${assembly.name}.json`), 'utf8'),
+    readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8'),
   ) as { template: string; finish?: Readonly<Record<string, string>> };
   const exported = exportGunGlb(
     assembly,
@@ -195,7 +196,7 @@ describe('viewer attachment previews', () => {
       const exported = exportDesign(assembly);
       const { json } = readGlb(exported.glb);
       const design = JSON.parse(
-        readFileSync(join(import.meta.dirname, '..', 'designs', `${assembly.name}.json`), 'utf8'),
+        readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8'),
       ) as { template: string; finish?: Readonly<Record<string, string>> };
       const report = validate(assembly, gunDomain);
       const normalizedReport = { ...report, resolved: withAttachmentInstanceAppearances(report.resolved) };

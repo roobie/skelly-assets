@@ -12,7 +12,7 @@ import {
   strictObject,
   string,
 } from 'valibot';
-import content from './magazines.json' with { type: 'json' };
+import content from '../../../../../models/guns/tables/magazines.json' with { type: 'json' };
 
 const Units = pipe(number(), finite(), minValue(Number.MIN_VALUE));
 const Text = pipe(string(), nonEmpty());

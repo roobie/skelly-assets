@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { formatParseError, parseAssemblyJson } from '@skelly/construct/assembly/parseAssembly.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { gunDomain } from '../gun/domain.ts';
+import { REPO_ROOT } from './content.ts';
 import { checkTraceRecords } from './traceCheck.ts';
 
 const packageRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -28,7 +29,7 @@ const expectationNote = (expected: string[] | undefined, matches: boolean): stri
   return matches ? '  (as expected)' : `  (expected: ${expected.join(', ') || 'pass'})`;
 };
 
-const traceIssues = checkTraceRecords(packageRoot);
+const traceIssues = checkTraceRecords(REPO_ROOT);
 for (const issue of traceIssues) {
   console.log(`INVALID TRACE  ${issue}`);
 }

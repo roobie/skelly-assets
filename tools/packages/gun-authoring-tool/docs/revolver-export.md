@@ -21,7 +21,7 @@ The hinge comes from the swing-side lower yoke edge. The opening angle must carr
 
 ## Cartridge and refresh
 
-The curated design carries its own cartridge identity. Geometry-only exports without cartridge metadata omit the revolver block because the ejector stroke needs a sourced case length. Unknown cartridge measurements stay unknown; presentation may use the sourced maximum overall length when no typical length is available. The generic projectile seating and primer remain visual proxies, not cartridge specifications; see `src/ammo/roundProfile.ts`, `roundProfiles`, and `cartridges/README.md`.
+The curated design carries its own cartridge identity. Geometry-only exports without cartridge metadata omit the revolver block because the ejector stroke needs a sourced case length. Unknown cartridge measurements stay unknown; presentation may use the sourced maximum overall length when no typical length is available. The generic projectile seating and primer remain visual proxies, not cartridge specifications; see `src/ammo/roundProfile.ts`, `roundProfiles`, and `models/guns/cartridges/README.md`.
 
 Asset credits cover runtime media rather than Jsonnet authoring programs. Keeping the manifest's source beside its compiled output must not require that source to credit itself; see deadvox's `assetFileIssues`.
 

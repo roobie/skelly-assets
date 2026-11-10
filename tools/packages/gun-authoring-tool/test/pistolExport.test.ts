@@ -1,12 +1,12 @@
-import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
-import cartridge from '../cartridges/9x19.json' with { type: 'json' };
+import cartridge from '../../../../models/guns/cartridges/9x19.json' with { type: 'json' };
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { readGlb } from './glbReader.ts';
+import { designText } from './helpers.ts';
 import { parseModel } from './modelSchema.ts';
 
 it('exports a cycling semi-auto slide with the calibre and anchors Deadvox admits', () => {
-  const exported = exportFileText(readFileSync('designs/service-nine.json', 'utf8'), {
+  const exported = exportFileText(designText('service-nine'), {
     id: 'fixture_pistol',
     file: 'assets/models/fixture_pistol.glb',
   });

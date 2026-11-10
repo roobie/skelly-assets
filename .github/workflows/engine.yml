@@ -6,6 +6,7 @@ on:
     paths:
       - 'tools/packages/construct/**'
       - 'tools/packages/thing-core/**'
+      - 'models/finishes.jsonnet'
       - 'tools/package.json'
       - 'tools/package-lock.json'
       - 'tools/sources.mjs'
@@ -18,6 +19,7 @@ on:
     paths:
       - 'tools/packages/construct/**'
       - 'tools/packages/thing-core/**'
+      - 'models/finishes.jsonnet'
       - 'tools/package.json'
       - 'tools/package-lock.json'
       - 'tools/sources.mjs'

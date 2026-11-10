@@ -12,6 +12,7 @@ import type {
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
 import { partNodeName, partVoxelGrain } from '@skelly/thing-export/glb.ts';
+import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
@@ -40,7 +41,6 @@ import { getOptic } from './optics.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
-import pistolAction from './pistolAction.json' with { type: 'json' };
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
@@ -99,7 +99,7 @@ export interface GunModelFields {
   };
   /** Unit barrel direction in the same local model frame as anchors. */
   readonly muzzleDirection?: Vec3;
-  /** Exact id from cartridges/, not a slug or display designation. */
+  /** Exact cartridge data id, not a slug or display designation. */
   readonly calibre?: string;
   /** Present on magazine entries; one local pose per round slot, top to bottom. */
   readonly capacity?: number;

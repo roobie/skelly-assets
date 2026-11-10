@@ -6,13 +6,13 @@ import { applyPoint, extrusionPoint, IDENTITY, type Vec3 } from '@skelly/constru
 import { worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { checkDesignFiles } from '../src/cli/designCheck.ts';
 import { AR_FRAMES_BY_CALIBRE } from '../src/gun/arFrames.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { loadFixtures } from './helpers.ts';
 
-const DESIGNS = join(import.meta.dirname, '..', 'designs');
 const PUBLISH_CHECK = join(import.meta.dirname, 'fixtures', 'publish-check');
 
 const localVertices = (solid: Solid): Vec3[] => {

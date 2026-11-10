@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { formatCartridgeParseError, parseCartridgeJson } from '../ammo/parseCartridge.ts';
+import { CARTRIDGES } from './content.ts';
 
 export type ReadCartridgeResult =
   | { readonly ok: true; readonly cartridge?: Cartridge }
@@ -19,7 +20,7 @@ export const readCartridge = (id: string | undefined): ReadCartridgeResult => {
   }
   let text: string;
   try {
-    text = readFileSync(join(import.meta.dirname, '../../cartridges', `${id}.json`), 'utf8');
+    text = readFileSync(join(CARTRIDGES, `${id}.json`), 'utf8');
   } catch {
     return { ok: false, message: `no cartridge data with id ${JSON.stringify(id)}` };
   }

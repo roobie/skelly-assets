@@ -11,6 +11,7 @@ import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { partNodeName } from '@skelly/thing-export/glb.ts';
 import validator from 'gltf-validator';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { AK_MAGAZINE_CALIBRE_BY_VARIANT, AK_MAGAZINE_VARIANT_BY_CALIBRE } from '../src/gun/akMagazineCalibre.ts';
 import { attachmentCompatibility, attachmentCompatibilityPairs } from '../src/gun/attachmentCompatibility.ts';
 import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
@@ -329,7 +330,7 @@ const orderedPair = (a: readonly [string, string], b: readonly [string, string])
   compareChoices(a, b) <= 0 ? [a, b] : [b, a];
 
 const design = (name: string): Assembly => {
-  const text = readFileSync(join(import.meta.dirname, '..', 'designs', `${name}.json`), 'utf8');
+  const text = readFileSync(join(DESIGNS, `${name}.json`), 'utf8');
   const loaded = loadGunDesign(text);
   if (!loaded.ok) {
     throw new Error(`${name}: ${loaded.error.message}`);

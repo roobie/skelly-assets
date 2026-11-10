@@ -3,11 +3,16 @@ import { join } from 'node:path';
 import { parseAssemblyOrThrow } from '@skelly/construct/assembly/parseAssembly.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
+import { CARTRIDGES, DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import type { GltfJson, readGlb } from './glbReader.ts';
 
 const FIXTURES = join(import.meta.dirname, '..', 'fixtures');
-const DESIGNS = join(import.meta.dirname, '..', 'designs');
+
+/** A design file's text, as the export reads it. */
+export const designText = (name: string): string => readFileSync(join(DESIGNS, `${name}.json`), 'utf8');
+/** A cartridge data file's text, by its id. */
+export const cartridgeText = (id: string): string => readFileSync(join(CARTRIDGES, `${id}.json`), 'utf8');
 
 export const expectWatertightMesh = (mesh: TriangleMesh, label = 'mesh'): number => {
   const weld = (index: number): string =>
@@ -94,12 +99,12 @@ export interface CorpusEntry {
 export const loadDesignAssembly = (name: string): MutableAssembly => {
   const result = loadGunDesign(readFileSync(join(DESIGNS, `${name}.json`), 'utf8'));
   if (!result.ok) {
-    throw new Error(`designs/${name}.json: ${result.error.code}: ${result.error.message}`);
+    throw new Error(`${name}.json: ${result.error.code}: ${result.error.message}`);
   }
   return structuredClone(result.design.assembly) as MutableAssembly;
 };
 
-/** Every published design under designs/, as loaded assemblies. */
+/** Every published design, as loaded assemblies. */
 export const loadDesigns = (): CorpusEntry[] =>
   readdirSync(DESIGNS)
     .filter((f) => f.endsWith('.json') && !f.startsWith('look-'))
@@ -107,7 +112,7 @@ export const loadDesigns = (): CorpusEntry[] =>
     .flatMap((f) => {
       const result = loadGunDesign(readFileSync(join(DESIGNS, f), 'utf8'));
       if (!result.ok) {
-        throw new Error(`designs/${f}: ${result.error.code}: ${result.error.message}`);
+        throw new Error(`${f}: ${result.error.code}: ${result.error.message}`);
       }
       return result.declaredStatus === 'published' && result.design.status === 'published'
         ? [{ label: `design ${f}`, assembly: result.design.assembly }]

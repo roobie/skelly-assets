@@ -54,8 +54,8 @@ functions, which are code. The roster filters that catalogue through
 `tools/packages/thing-authoring-tool/exports/deadvox.jsonnet`, `roster`, using `models/export.json` as the
 authority for which families use the roster; see `tools/layout.mjs`, `readRoster`, and `tools/build.mjs`,
 `buildRoster`. Do not select those models again in a recipe. For guns, author the source named by the recipe
-row's `source`; file-backed sources resolve relative to `tools/`, while other gun kinds select their source
-through the owning exporter. See `tools/build.mjs`, `loadRecipeTools`, and
+row's `source`; file-backed sources resolve relative to the repository root, while other gun kinds select their
+source through the owning exporter. See `tools/recipeTools.mjs`, `loadRecipeTools`, and
 `tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
 A vehicle is authored as its own file of part rows in `models/vehicles/`, beside the kits that press its panels
 from its measures, so parallel authors each add files and none edits a shared list. A recipe selects whole

@@ -19,6 +19,7 @@ import {
   tuple,
   unknown,
 } from 'valibot';
+import frameContent from '../../../../../models/guns/tables/arFrames.json' with { type: 'json' };
 import { parseCartridge } from '../ammo/parseCartridge.ts';
 import {
   type ActionFrame,
@@ -27,7 +28,6 @@ import {
   selectFrame,
   validateActionFrames,
 } from './actionFrame.ts';
-import frameContent from './arFrames.json' with { type: 'json' };
 import { mmToU, uToMm } from './units.ts';
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
@@ -179,7 +179,7 @@ const derivedMeasure = (cartridge: FrameCartridge, derivation: FrameDerivation):
     value: snapUnits === undefined ? minimum : uToMm(Math.ceil(mmToU(minimum) / snapUnits - 1e-9) * snapUnits),
     evidence: {
       kind: 'estimate',
-      method: `Derived from cartridges/${cartridge.measures.id}.json (${cartridge.sourceTitle}, ${derivation.description}) plus ${derivation.clearanceUnits}u (${clearance} mm) clearance${SNAP_METHOD[derivation.snap]}.`,
+      method: `Derived from models/guns/cartridges/${cartridge.measures.id}.json (${cartridge.sourceTitle}, ${derivation.description}) plus ${derivation.clearanceUnits}u (${clearance} mm) clearance${SNAP_METHOD[derivation.snap]}.`,
     },
     cartridgeClearance: {
       measure: derivation.measure,

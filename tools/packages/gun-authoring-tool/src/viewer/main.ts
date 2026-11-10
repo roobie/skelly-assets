@@ -90,13 +90,13 @@ const fixtures = Object.entries(
 
 const DESIGN_EXTENSION = /\.json$/;
 const designs = Object.entries(
-  import.meta.glob<string>('../../designs/*.json', { eager: true, import: 'default', query: '?raw' }),
+  import.meta.glob<string>('../../../../../models/guns/designs/*.json', { eager: true, import: 'default', query: '?raw' }),
 )
   .map(([path, text]) => ({ name: path.split('/').at(-1)!.replace(DESIGN_EXTENSION, ''), text }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
 const cartridges = Object.entries(
-  import.meta.glob<string>('../../cartridges/*.json', { eager: true, import: 'default', query: '?raw' }),
+  import.meta.glob<string>('../../../../../models/guns/cartridges/*.json', { eager: true, import: 'default', query: '?raw' }),
 ).flatMap(([path, text]) => {
   const parsed = parseCartridgeJson(text);
   if (!parsed.ok) {

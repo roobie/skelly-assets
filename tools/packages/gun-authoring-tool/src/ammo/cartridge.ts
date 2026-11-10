@@ -14,7 +14,7 @@
 
 export const CARTRIDGE_FORMAT = 1;
 
-/** How much weight a source carries. `synthetic` marks invented test data, never allowed in cartridges/. */
+/** How much weight a source carries. `synthetic` marks invented test data, never allowed in shipped cartridge data. */
 export type SourceReliability = 'standard' | 'manufacturer' | 'secondary' | 'synthetic';
 
 export interface SourceDocument {

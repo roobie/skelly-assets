@@ -1,3 +1,9 @@
+---
+read_if:
+  - you edit or save a vehicle blueprint in the vehicle authoring tool
+  - you change what the tool checks before export
+---
+
 # Vehicle authoring tool
 
 ## Table first, 3D next
@@ -10,7 +16,7 @@ a later 3D view can reuse the operations in `src/editor.ts`.
 Authored sources can share values and build mirrored pairs, so a flat JSON download
 cannot safely write back into Jsonnet. Save (`src/editor.ts`, `saveBlueprint`) is
 for manual merging. Open accepts that saved row; the `blueprint` URL parameter names
-a `.json` file in `blueprints/`.
+a `.json` file in `models/vehicle-blueprints/`.
 
 ## Schema, not admission
 

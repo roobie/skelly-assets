@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import ragdoll from '../../../../models/mobs/leaper/ragdoll.json' with { type: 'json' };
 import type { Realized } from '../src/core/generate.ts';
 import { planOf } from '../src/core/generate.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../src/core/voxelBounds.ts';
@@ -14,7 +15,6 @@ import {
 } from '../src/mob/leaper/motion.ts';
 import { jointCracks } from '../src/mob/leaper/seams.ts';
 import { generateValidLeaper } from '../src/mob/leaper/search.ts';
-import ragdoll from '../src/mob/leaper/ragdoll.json' with { type: 'json' };
 import { sweepGroup } from './sweeps.ts';
 
 const TRUNK = ['spine', 'chest', 'head'];

@@ -62,7 +62,7 @@ const bakeMob = (row) => {
 const MOB_FILES = ['body', 'clips', 'glb'];
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
-  return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src']));
+  return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));
 };
 
 // Bakes the row, or takes its files from the store, and writes each where its row field places it; returns the store

@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { applyPoint, compose, type Transform, transpose, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
@@ -9,10 +8,10 @@ import { exportFileText } from '../src/cli/exportFile.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FILE_FROM_GUNGEN, toFileAxes } from '../src/gun/exportFrame.ts';
 import { readGlb } from './glbReader.ts';
-import { loadFixture } from './helpers.ts';
+import { cartridgeText, designText, loadFixture } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
 
-const exported = exportFileText(readFileSync('designs/archetype-revolver.json', 'utf8'), {
+const exported = exportFileText(designText('archetype-revolver'), {
   id: 'fixture_revolver',
   file: 'assets/models/fixture_revolver.glb',
 });
@@ -60,7 +59,7 @@ it('exports separate moving nodes, chamber geometry and bore-parallel axes that 
       Math.max(...bounds.map(([, max]) => max[axis]!)),
     );
   }
-  const cartridge = parseCartridgeJson(readFileSync('cartridges/357-magnum.json', 'utf8'));
+  const cartridge = parseCartridgeJson(cartridgeText('357-magnum'));
   if (!cartridge.ok || cartridge.cartridge.kind !== 'metallic') {
     throw new Error('Missing cartridge');
   }

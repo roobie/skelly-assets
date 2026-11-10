@@ -44,8 +44,8 @@ than in consumer-specific builders, so shared shapes have one mesh and collision
 
 ### thing-core
 
-`packages/thing-core` originates at the reference commit. Its material source retains the assets catalogue and
-arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
+`packages/thing-core` originates at the reference commit. Its material table, `../models/finishes.jsonnet`, retains the
+assets catalogue and arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
 schemas keep game-owned temporal brands outside the tool pipeline.
 
 ### thing-export
@@ -65,8 +65,8 @@ belong here; admission into a game's content registry remains the consumer's res
 
 ### vehicle-authoring-tool
 
-`packages/vehicle-authoring-tool` originates at the reference commit, including the editor/schema tests and
-blueprint authoring inputs from its ground-vehicle content. Validation here is schema-only: consumer admission
+`packages/vehicle-authoring-tool` originates at the reference commit, including the editor/schema tests. Its
+blueprint inputs are content, in `../models/vehicle-blueprints/`. Validation here is schema-only: consumer admission
 and runtime behaviour remain game-owned.
 
 ### thing-authoring-tool
@@ -81,8 +81,8 @@ fixture exporter and tests belong to this producer.
 ### mobgen
 
 `packages/mobgen` originates at the reference commit, reconciled with the assets-specific signature parts,
-budgets, idle stance and additional body plans. The viewer, CLI, tests and docs belong to the generator;
-ragdoll physics belongs to the consuming game, not the asset bake.
+budgets, idle stance and additional body plans. The viewer, CLI, tests and docs belong to the generator,
+while the templates, palettes and clips a modder tunes are content in `../models/mobs/`; ragdoll physics belongs to the consuming game, not the asset bake.
 
 ## Layout
 
@@ -94,8 +94,9 @@ files, not stale JSON twins; see `recipes.mjs`, `readRecipes`. The common row sc
 Keep one recipe driver so tool ownership is checked before either loader runs. See `build.mjs`,
 `partitionRecipe` and `exportRecipes`, for kind dispatch and duplicate-producer refusal; the owning boundaries
 are `packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `GUN_KINDS`, and
-`packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`. Gun source paths resolve against this tools
-folder, not a game's checkout; see `build.mjs`, `loadRecipeTools`.
+`packages/thing-authoring-tool/src/exports.ts`, `THING_KINDS`. Gun source paths resolve against the
+repository root, not a game's checkout, so a recipe can name gun content under `../models/guns/`; see
+`recipeTools.mjs`, `loadRecipeTools`.
 
 Use the production entry for the complete roster/recipe set, not a tool-local refresh into a consumer tree.
 See `build.mjs`, `main`, `buildRoster` and `PRODUCTION_RECIPE_TOOLS`. Output paths and metadata/index writing

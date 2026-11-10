@@ -1,6 +1,7 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local b = import 'packages/thing-authoring-tool/jacks.libsonnet';
 local tool = b.tool;
-[
+taxonomy.inherit({ category: 'tools', tags: { material: ['metal'] } }, [
   tool('scissor_jack', 'scissorJack', 3.2, {
     baseLength: 0.2, baseWidth: 0.09, baseThickness: 0.006,
     halfSpan: 0.095, halfHeight: 0.045, linkWidth: 0.02, linkDepth: 0.006, linkOffset: 0.03,
@@ -20,4 +21,4 @@ local tool = b.tool;
     casterRadius: 0.05, casterWidth: 0.04,
     chainLength: 0.45, chainWidth: 0.012, hookWidth: 0.04, hookHeight: 0.06,
   }, { frame: 'paint-charcoal', boom: 'plastic-blue', ram: 'steel-grey', chain: 'steel-grey', caster: 'paint-charcoal' }),
-]
+])

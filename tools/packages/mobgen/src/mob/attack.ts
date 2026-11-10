@@ -7,10 +7,10 @@
 // same rotation, but the bone points the other way at rest) — verified against boneTransforms when the
 // clip was added (af2df6a), not assumed; the check itself was not kept.
 
+import clipContent from '../../../../../models/mobs/attackClips.json' with { type: 'json' };
 import { clamp, hermite, type Mat3, mulMM, rotAxis, rotX, rotY, rotZ, smoothstep, type Vec3 } from '../core/math.ts';
 import type { EulerDeg, Pose } from '../core/pose.ts';
 import type { Template } from '../core/template.ts';
-import clipContent from './attackClips.json' with { type: 'json' };
 import { GROUND_SMOOTHING, groundOffset, legGeometryFor, type WalkActor } from './gait.ts';
 import type { HumanoidParams } from './humanoid.ts';
 
@@ -115,7 +115,7 @@ const keyProblem = (key: unknown): string | undefined => {
 const contentClip = (id: string, value: unknown): AttackClip => {
   const clip = value as Partial<AttackClip> | null;
   const bad = (why: string): never => {
-    throw new Error(`attack clip "${id}" in attackClips.jsonnet ${why}`);
+    throw new Error(`attack clip "${id}" in models/mobs/attackClips.jsonnet ${why}`);
   };
   if (typeof clip !== 'object' || clip === null) {
     return bad('is not an object');
@@ -140,7 +140,7 @@ const contentClips: Readonly<Record<string, AttackClip>> = Object.fromEntries(
 );
 
 /** Every shared-rig clip by its content-facing id (the clip's own name). The grab is authored above; every
- * entry of `attackClips.jsonnet` is registered here without a code change and sampled and layered by the
+ * entry of `models/mobs/attackClips.jsonnet` is registered here without a code change and sampled and layered by the
  * same code. The grab's literal key stays statically checked for direct callers; other ids are looked up
  * through `attackClipById`. Templates select an entry through `attackClip`; see attackClipFor. */
 export const ATTACK_CLIPS: { readonly 'lunge-grab': AttackClip } & Readonly<Record<string, AttackClip>> = {

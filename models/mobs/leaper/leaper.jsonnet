@@ -1,5 +1,5 @@
 // The leaper's template: sampling ranges, look, mass, supports and budgets. Body construction is
-// src/mob/leaper/plan.ts, buildLeaper; this file holds only the values it reads.
+// `tools/packages/mobgen/src/mob/leaper/plan.ts`, `buildLeaper`; this file holds only the values it reads.
 local range(min, max) = { min: min, max: max };
 
 // Every colour is HSL so look tuning stays here; resolveMaterials replaces each placeholder colour.
@@ -47,9 +47,10 @@ local charged = { eye: true };
     for name in std.objectFields(hsl)
   },
   materialHsl: hsl,
-  // At the template voxel size; plan.ts, budgetsFor, scales them to other grids. Totals catch a build
-  // that lost or doubled a part. The groups guard the read: the hind springs stay the largest share, or the
-  // body stops reading as a jumper, and the head stays small and slung low, or it reads as a crouched man.
+  // At the template voxel size; `tools/packages/mobgen/src/mob/leaper/plan.ts`, `budgetsFor`, scales them
+  // to other grids. Totals catch a build that lost or doubled a part. The groups guard the read: the hind
+  // springs stay the largest share, or the body stops reading as a jumper, and the head stays small and
+  // slung low, or it reads as a crouched man.
   budgets: {
     totalVoxels: range(1500, 3200),
     totalTriangles: range(3600, 7200),

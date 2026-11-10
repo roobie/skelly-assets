@@ -1,5 +1,5 @@
-import data from './acidTemplate.json' with { type: 'json' };
-import skeleton from './skeletonTemplate.json' with { type: 'json' };
+import data from '../../../../../models/mobs/acidTemplate.json' with { type: 'json' };
+import skeleton from '../../../../../models/mobs/skeletonTemplate.json' with { type: 'json' };
 
 export interface LookAtProfile {
   readonly headBone?: string;

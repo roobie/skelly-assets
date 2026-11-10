@@ -15,7 +15,7 @@ import {
   string,
   tuple,
 } from 'valibot';
-import content from './triggerGuards.json' with { type: 'json' };
+import content from '../../../../../models/guns/tables/triggerGuards.json' with { type: 'json' };
 
 const Finite = pipe(number(), finite());
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));

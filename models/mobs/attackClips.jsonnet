@@ -1,6 +1,6 @@
-// Authored shared-rig attack clips (mob/attack.ts samples and layers them; templates select one by id
-// through `attackClip`). Every key lists every bone the clip touches so its shape is obvious; the first
-// and last key are all-zero for a clean blend in and out.
+// Authored shared-rig attack clips (`tools/packages/mobgen/src/mob/attack.ts` samples and layers them;
+// templates select one by id through `attackClip`). Every key lists every bone the clip touches so its
+// shape is obvious; the first and last key are all-zero for a clean blend in and out.
 local bones = ['spine', 'chest', 'head', 'jaw', 'upperArm.L', 'upperArm.R', 'forearm.L', 'forearm.R'];
 local zeroKey(t) = { t: t, rotations: { [b]: [0, 0, 0] for b in bones } };
 {

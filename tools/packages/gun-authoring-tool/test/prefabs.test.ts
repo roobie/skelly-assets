@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { PrefabReference } from '@skelly/construct/assembly/schema.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
 import { GUN_PREFABS } from '../src/gun/prefabs.ts';
@@ -13,7 +14,7 @@ interface TestDesign {
   };
 }
 
-const designPath = (name: string) => join(import.meta.dirname, '..', 'designs', `${name}.json`);
+const designPath = (name: string) => join(DESIGNS, `${name}.json`);
 const readDesign = (name: string): TestDesign => JSON.parse(readFileSync(designPath(name), 'utf8')) as TestDesign;
 const load = (design: TestDesign) => loadGunDesign(JSON.stringify(design));
 

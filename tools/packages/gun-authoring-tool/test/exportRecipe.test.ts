@@ -33,7 +33,7 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
     {
       id: 'fixture',
       kind: 'design',
-      source: 'packages/gun-authoring-tool/designs/archetype-ak-akm.json',
+      source: 'models/guns/designs/archetype-ak-akm.json',
       voxel: grains,
     },
   ]);

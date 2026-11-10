@@ -54,7 +54,7 @@ module. Their owners are `src/core/body.ts`, `Bone` and `MaterialDef`;
   never severs, are body facts, not Deadvox special cases.
 - **Materials as content.** Per-template colour and glow are look tuning, which
   `PILLARS.md`, "Content forward compatibility" puts in content. See
-  `src/mob/materialTemplates.jsonnet` and `src/mob/materials.ts`, `resolveMaterials`.
+  `models/mobs/materialTemplates.jsonnet` and `src/mob/materials.ts`, `resolveMaterials`.
 - **Per-plan budgets and limb bones** on `BodyPlanDef` (`src/core/generate.ts`). The old
   shared scaling assumed humanoid height and head proportions, and a regex picked limb
   segments by humanoid bone names. Neither holds for a hunched body with differently named
@@ -111,7 +111,7 @@ Construction stays in TypeScript because anatomy is logic rather than authored t
 (`PROJECT.md`, "Design boundaries"). See `src/mob/acid.ts`, `buildAcid`.
 
 **Content and logic split.** Authors tune appearance without changing what makes the body
-an acid zombie. Keeping that tuning in `src/mob/acidTemplate.jsonnet` lets a later tier
+an acid zombie. Keeping that tuning in `models/mobs/acidTemplate.jsonnet` lets a later tier
 remain a data change (`packages/deadvox/docs/acid-zombie.md`, "Ability, not type"). See
 `src/mob/acidTemplate.ts`, `acidTemplate`.
 
@@ -121,7 +121,7 @@ skeletal connectivity. Otherwise repair can disguise a flesh discontinuity. See
 
 **Readiness.** The body is ready because Deadvox hits, severs, poses and lights it; the tag
 never claims more than the game supports (`PROJECT.md`, "Template readiness"). See
-`src/mob/acidTemplate.jsonnet`, `status`.
+`models/mobs/acidTemplate.jsonnet`, `status`.
 
 ### The study's gates become tests
 
@@ -141,7 +141,7 @@ The refitted body needs broad palms to remain distinct from wrists at game resol
 and a fuller neck base to keep its lengthened back from ending in a ledge. Breadth
 variation must remain visible after coarse sampling rather than collapsing into matching
 outlines. These are shape changes, not reasons to relax measurement gates; see
-`src/mob/acidTemplate.jsonnet`, `geometry` and `params`.
+`models/mobs/acidTemplate.jsonnet`, `geometry` and `params`.
 
 Tuning stays in content rather than test literals. Its release-freeze triggers belong in
 `docs/deferred-assertions.md`.
@@ -178,7 +178,7 @@ deadvox's `ActorBodySchema.regions`.
   uses occupied voxel surfaces so protruding skeletal tips also respect the floor. See
   `src/mob/acidPoses.ts`, `acidWalkPose` and `acidDeathPose`, and `src/core/joints.ts`,
   `jointRotation` and `clampJointAngles`. Animation tuning stays with the body content;
-  see `src/mob/acidTemplate.jsonnet`, `animation`.
+  see `models/mobs/acidTemplate.jsonnet`, `animation`.
 - **Gaze and mouth.** Gaze names its head bone rather than requiring a humanoid name, and
   framed joints clamp the combined action and gaze, not just the gaze correction. That holds
   for the simulation's head turn as well as the presentation gaze, because hit boxes and the

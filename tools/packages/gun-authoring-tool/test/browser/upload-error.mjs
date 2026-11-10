@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { DESIGNS } from '../../src/cli/content.ts';
 import { launchChromium } from '../chromium.mjs';
 
 const gungen = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -52,7 +53,7 @@ try {
   await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => document.activeElement.id), 'issues-btn');
   // Keep authoring persistence and the domain views in this existing smoke flow.
-  const design = JSON.parse(readFileSync(resolve(gungen, 'designs/archetype-ar.json'), 'utf8'));
+  const design = JSON.parse(readFileSync(resolve(DESIGNS, 'archetype-ar.json'), 'utf8'));
   await page.goto(`${url}/?design=archetype-ar&ammo=${encodeURIComponent(design.calibre)}`);
   await page.waitForSelector('#param-panel select[aria-label$="part item"]');
   assert(await page.locator('#ammo-info').isVisible(), 'cartridge preview is present');

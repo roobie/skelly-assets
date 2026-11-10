@@ -18,7 +18,7 @@ Pair checks are sufficient because each single already passes validation, and ov
 Attachments are atoms, so their item weight remains authoritative across host-specific
 mount presentation and shared visual models. A gun body sums its authored part masses;
 replaceable geometry belongs to the fitted item instead of competing with its weight.
-See `src/gun/physical.ts`, `gunModelParts`; `src/gun/catalogue.jsonnet`, `parts`; and
+See `src/gun/physical.ts`, `gunModelParts`; `models/guns/tables/catalogue.jsonnet`, `parts`; and
 deadvox's `typeWeightGrams`. Geometric centres are estimates,
 not a source of mass; see `packages/thing-export/src/physical.ts`, `partProperties`.
 
@@ -29,7 +29,7 @@ can keep its own finish across firearms without changing its physical inputs; se
 `src/gun/attachments.ts`, `attachmentInstanceForId`, and
 `packages/thing-export/src/glb.ts`, `exportGlb`.
 
-Every attachment's default look is its product's authored finish in `src/gun/appearance.jsonnet`,
+Every attachment's default look is its product's authored finish in `models/guns/tables/appearance.jsonnet`,
 `attachments`, and an instance's own finish sits over it slot by slot, so an instance that sets
 nothing, or varies one slot, keeps the product's other slots: a suppressor instance with an empty
 finish wears the product's black metal, not the suppressor role's stainless, and an optic instance
