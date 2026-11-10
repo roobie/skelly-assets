@@ -56,6 +56,11 @@ test('a piece passing through a part beneath its face covers that face, and noth
   assert.ok(pokes.every(({ bone, point }) => bone === 'fore' && point[1] >= -0.4), 'the forearm below the cuff is not covered');
 });
 
+test('a piece hung against a part\'s side covers none of the rest of the part', () => {
+  const bag = { piece: 'bag', bone: 'upper', mesh: boxMesh([0.06, 0.1, 0.06], [0.08, -0.153, 0.007]) };
+  assert.deepEqual(clearanceProbe(rig, { body, pieces: [bag] })(still), clean);
+});
+
 test('a joint that turns a covered part out of its piece pokes, and one that turns a part into a piece sinks', () => {
   // The sleeve runs past the elbow, covering the top of the forearm at rest. Swinging the forearm away pulls that out;
   // sliding the upper arm, sleeve and all, down and aside drives the sleeve's wall through the forearm.

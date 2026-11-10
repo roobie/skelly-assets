@@ -8,9 +8,9 @@
 //
 // A body point is covered when a piece is meant to cover it at rest (`coverage`). A covered point outside every piece in
 // a pose `pokes`, unless it is hidden inside the figure, as where one part meets the next, which no one sees; one on
-// a piece's outer surface is `flush`, a coincident face. A piece point the pose drives into a body part `sinks`, unless it was already in there at
-// rest, where pieces meet the next part by design, or it lies in another piece, a `seam` where the garment overlaps
-// itself. The skin check (skin.mjs) draws the same covered surface, so what the probe finds and what a camera sees
+// a piece's outer surface is `flush`, a coincident face. A piece point the pose drives into a body part `sinks`, unless
+// it was already in there at rest, where pieces meet the next part by design, or it lies in another piece, a `seam`
+// where the garment overlaps itself. The skin check (skin.mjs) draws the same covered surface, so what the probe finds and what a camera sees
 // are told of one surface.
 import { add, applyPoint, cross, dot, IDENTITY_M, length, mulMV, normalize, scale, sub, transpose } from './kinematics.mjs';
 
@@ -227,30 +227,21 @@ const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = 
 
 /**
  * Which piece is meant to cover a body point at rest: `cover(bone, { point, normal })`, the point with its face's
- * outward normal, gives the index into
- * `rest.pieces` of the piece meant to cover it, or -1 when none is. A piece covers the points
- * - it spans along the bone it rides, short of its ends, which are its openings (a sleeve covers its arm from cuff to
- *   shoulder seam, not the hand beyond its cuff);
- * - it encloses at rest;
- * - it wraps: a ray from the point straight into its body part, across the part's bone, meets the piece while still
- *   inside that part, so the piece passes through the part beneath the point, as a jacket's shoulder passes through a
- *   deltoid that pokes out above it. A ray along the bone runs out through the part's end, where it nests into the next
- *   piece through that piece's opening: a fingertip's ray meets the cuff its hand reaches into, and the cuff does not
- *   cover the fingertip.
+ * outward normal, gives the index into `rest.pieces` of the piece meant to cover it, or -1 when none is. A piece
+ * covers the points
+ * - it encloses at rest, flush included;
+ * - it passes beneath: a ray from the point straight into its body part, across the part's bone, meets the piece while
+ *   still inside that part, as a jacket's yoke passes through a deltoid that stands proud of it, or a sleeve too narrow
+ *   for its arm passes through the arm.
+ * A ray along the bone runs out through the part's end, where it nests into the next piece through that piece's
+ * opening: a fingertip's ray meets the cuff its hand reaches into, and the cuff does not cover the fingertip. Nor does a
+ * piece cover what it only sits beside, as a belt bag beside the waist it hangs on.
  */
 export function coverage(rig, rest) {
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
   const bodySolids = new Map(rest.body.map(({ bone, mesh }) => [bone, carried(solidOf(mesh), STILL)]));
-  const spans = new Map();
-  rest.pieces.forEach(({ bone: id, mesh }, index) => {
-    const bone = bones.get(id);
-    const axis = normalize(sub(bone.tail, bone.head));
-    const along = Array.from({ length: mesh.positions.length / 3 }, (_, i) => dot(sub(mesh.positions.slice(i * 3, i * 3 + 3), bone.head), axis));
-    spans.set(id, [...(spans.get(id) ?? []), { index, axis, low: Math.min(...along) + COINCIDENT, high: Math.max(...along) - COINCIDENT }]);
-  });
   const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
-  const wrapping = (id, point, normal) => {
+  const beneath = (id, point, normal) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
     let hit = { t: Infinity, index: -1 };
@@ -259,15 +250,11 @@ export function coverage(rig, rest) {
       if (t < hit.t) hit = { t, index };
     });
     if (hit.index < 0) return -1;
-    const own = bodySolids.get(id);
-    return winding(own.tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
+    return winding(bodySolids.get(id).tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
   };
   return (id, { point, normal }) => {
-    const head = bones.get(id).head;
-    const spanning = (spans.get(id) ?? []).find(({ axis, low, high }) => { const s = dot(sub(point, head), axis); return s > low && s < high; });
-    if (spanning) return spanning.index;
     const { depth, index } = depthOutside(pieceSolids, point);
-    return depth <= COINCIDENT ? index : wrapping(id, point, normal);
+    return depth <= COINCIDENT ? index : beneath(id, point, normal);
   };
 }
 
