@@ -1,6 +1,6 @@
 // The assemblies the kits build, each laid out on its own as its kit fits it to a vehicle, so a review can draw and
 // explode one apart from any vehicle: an engine, a turret, a radiator or a fuel tank as its core with every fitting at
-// its own site (models/vehicles/assembly.libsonnet), a wheel with its brake (models/vehicles/wheel-kit.libsonnet), and
+// its own site (models/vehicles/assembly.libsonnet), a wheel with its disc brake (models/vehicles/wheel-kit.libsonnet), and
 // an exhaust as its pipes and parts along its run (models/vehicles/exhaust-kit.libsonnet). Each is
 // named after the part it fits fused, with ASSEMBLY_SUFFIX, so it never takes a model's id.
 import { resolve } from 'node:path';
@@ -38,6 +38,7 @@ export function readAssemblies(root = repo) {
   ] + [
     { id: name + '${ASSEMBLY_SUFFIX}', sites: [plain(placed) for placed in wheelKit.pair(site.kit, 'wheel', name, origin) if isNear(placed)] }
     for name in std.objectFields(wheels)
+    if wheelKit.braked(name)
   ] + [
     local sites = exhaustKit.sites(name, origin, 'assembly');
     local first = sites[0].at;

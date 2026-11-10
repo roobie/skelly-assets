@@ -21,8 +21,8 @@ const fittings = JSON.parse(evaluateJsonnet(`
     { part: part, mass: body.massKg, pieces: [kit.moved(p, offset) for p in std.parseJson(body.params.pieces)], finish: body.finish };
   {
     [name]: {
-      braked: std.objectHas(wheels[name], 'class'),
-      sites: { [std.strReplace(p.id, '_near', '')]: drawn(p.part, p.at) for p in wheel.pair(site.kit, 'wheel', name, at, brake=std.objectHas(wheels[name], 'class')) if !std.objectHas(p, 'mirror') },
+      braked: wheel.braked(name),
+      sites: { [std.strReplace(p.id, '_near', '')]: drawn(p.part, p.at) for p in wheel.pair(site.kit, 'wheel', name, at, brake=wheel.braked(name)) if !std.objectHas(p, 'mirror') },
       tyre: drawn(wheels[name].tyre.id),
       rim: drawn(wheels[name].rim.id),
     }

@@ -85,6 +85,8 @@ local brakeRows(c) = [
 ];
 
 {
+  // Whether wheel `name` carries a disc brake of its own; one without is braked by its axle's drums.
+  braked: braked,
   // Every wheel's row, its tyre's and rim's, and every class's brake rows.
   rows: std.flattenArrays([brakeRows(classes[name]) for name in std.objectFields(classes)])
         + std.flattenArrays([wheelRows(name) for name in std.objectFields(wheels)]),
