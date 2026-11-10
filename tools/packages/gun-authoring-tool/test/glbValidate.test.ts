@@ -29,6 +29,7 @@ describe('gltf-validator', () => {
         appearanceProfile: loaded.design.template,
         ...(loaded.design.finish ? { finish: loaded.design.finish } : {}),
       },
+      { items: loaded.design.items ?? {} },
     );
     if (!result.ok) {
       throw new Error(`${file}: ${JSON.stringify(result.error)}`);

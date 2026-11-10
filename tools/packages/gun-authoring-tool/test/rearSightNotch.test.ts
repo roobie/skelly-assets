@@ -5,7 +5,7 @@ import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { readGlb } from './glbReader.ts';
-import { loadDesigns, type MutableAssembly, partTriangles, type Triangle } from './helpers.ts';
+import { itemsKept, loadDesigns, type MutableAssembly, partTriangles, type Triangle } from './helpers.ts';
 
 const ASSET = { id: 'rear_sight_test', file: 'assets/models/rear_sight_test.glb' };
 
@@ -57,9 +57,9 @@ const openWidthAtLine = (triangles: readonly Triangle[], eye: readonly number[],
   return Number.isFinite(left) && Number.isFinite(right) ? right - left : 0;
 };
 
-const rearSights = loadDesigns().flatMap(({ label, assembly }) => {
+const rearSights = loadDesigns().flatMap(({ label, assembly, items }) => {
   const iron = ironOnly(assembly);
-  return rearSightParts(iron).map((partId) => ({ label, assembly: iron, partId }));
+  return rearSightParts(iron).map((partId) => ({ label, assembly: iron, items: itemsKept(iron, items), partId }));
 });
 
 describe('a rear sight keeps its notch or aperture open in the voxelized file', () => {
@@ -67,7 +67,7 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
     expect(rearSights.length).toBeGreaterThan(0);
   });
 
-  it.each(rearSights)('is open at the gun grain on the sight line: $label, $partId', ({ assembly, partId }) => {
+  it.each(rearSights)('is open at the gun grain on the sight line: $label, $partId', ({ assembly, items, partId }) => {
     const result = exportGunGlb(
       assembly,
       ASSET,
@@ -75,6 +75,7 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
       {
         voxelGrain: gunVoxel.grain,
         voxelDetailGrain: gunVoxel.detailGrain,
+        items,
       },
     );
     if (!result.ok) {

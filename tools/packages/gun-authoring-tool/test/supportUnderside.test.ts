@@ -6,7 +6,7 @@ import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { readGlb } from './glbReader.ts';
-import { loadDesigns, type MutableAssembly, partTriangles } from './helpers.ts';
+import { itemsKept, loadDesigns, type MutableAssembly, partTriangles } from './helpers.ts';
 
 const ASSET = { id: 'support_underside_test', file: 'assets/models/support_underside_test.glb' };
 
@@ -29,10 +29,10 @@ const sightless = (assembly: Parameters<typeof exportGunGlb>[0]): typeof assembl
 };
 
 /** Every published design that selects a support anchor, with the part that declares it. */
-const supportForends = loadDesigns().flatMap(({ label, assembly }) => {
+const supportForends = loadDesigns().flatMap(({ label, assembly, items }) => {
   const selected = selectGunAnchors(resolve(assembly, gunDomain), GUN_ANCHORS, GUN_ANCHOR_POLICY);
   return !('code' in selected) && selected.supportPart !== undefined
-    ? [{ label, assembly, partId: selected.supportPart }]
+    ? [{ label, assembly, items, partId: selected.supportPart }]
     : [];
 });
 
@@ -41,12 +41,13 @@ describe('the exported support anchor rides the underside the voxelized file dra
     expect(supportForends.length).toBeGreaterThan(0);
   });
 
-  it.each(supportForends)('sits on the forend part’s lowest drawn face: $label, $partId', ({ assembly, partId }) => {
+  it.each(supportForends)('sits on the forend part’s lowest drawn face: $label, $partId', ({ assembly, items, partId }) => {
+    const trimmed = sightless(assembly);
     const result = exportGunGlb(
-      sightless(assembly),
+      trimmed,
       ASSET,
       { appearanceProfile: 'ar' },
-      { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain },
+      { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain, items: itemsKept(trimmed, items) },
     );
     if (!result.ok) {
       throw new Error(`export failed: ${JSON.stringify(result.error)}`);
