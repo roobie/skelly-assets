@@ -1,4 +1,5 @@
 // A utility truck on the box truck's measures in white: a locker body, and an insulated boom folded back along it with the basket over the tail.
+// The aerial device, from turret to basket with its hydraulics, weighs as an Altec AT37G.
 (import 'box_truck.spec.libsonnet') + {
   paint: 'paint-white',
   bodyRear: -3.72, bodyFront: 1.86, bodyLow: 0.98, deckTop: 1.5, lockerIn: 0.72, lockerBottom: 0.9,

@@ -28,19 +28,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck',
     ]
     for i in std.range(0, 3)
   ]), finish),
-  k.compound('bucket_truck_turret', 600, [
+  k.compound('bucket_truck_turret', 300, [
     k.turned('ring', 'frame', 'y', k.disc(0.5, 0, 0.14), [s.turretX, s.deckTop, 0]) + { sides: 24 },
     box('housing', 'paint', [s.turretX - 0.42, s.deckTop + 0.14, -0.34], [s.turretX + 0.42, s.deckTop + 0.5, 0.34]),
     m.axleDisc('pin', 'steel', s.turretX, s.boomY - 0.02, 0.08, [-0.28, 0.28], 12),
   ] + k.bothSides([
     box('cheek', 'paint', [s.turretX - 0.24, s.deckTop + 0.5, 0.2], [s.turretX + 0.24, s.boomY + 0.1, 0.26]),
   ]), finish),
-  k.compound('bucket_truck_lower_boom', 400, [
+  k.compound('bucket_truck_lower_boom', 230, [
     box('boom', 'paint', [s.turretX - 0.2, s.boomY - 0.15, -0.16], [s.knuckleX, s.boomY + 0.15, 0.16]),
     box('stripe', 'frame', [s.turretX + 0.4, s.boomY - 0.02, 0.16], [s.knuckleX - 0.2, s.boomY + 0.03, 0.17]),
   ], finish),
   // The boom's pump, valve bank and oil reservoir on the deck, and its lift ram stowed under the folded boom.
-  k.compound('bucket_truck_hydraulics', 730, [
+  k.compound('bucket_truck_hydraulics', 250, [
     box('reservoir', 'paint', [0.8, s.deckTop, -0.7], [1.7, s.deckTop + 0.5, -0.25]),
     box('valve_bank', 'dark', [-1.6, s.deckTop, -0.3], [-1.2, s.deckTop + 0.3, 0.3]),
     k.turned('lift_ram', 'steel', 'x', k.disc(0.09, s.turretX + 0.3, -0.4), [0, s.boomY - 0.26, 0]) + { sides: 12 },
@@ -51,18 +51,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck',
     box('lug', 'frame', [s.cradleX - 0.1, s.boomY - 0.15, 0.16], [s.cradleX + 0.1, s.boomY + 0.04, 0.26]),
     k.bar('leg', 'frame', [s.cradleX + 0.02, s.deckTop], [s.cradleX, s.boomY - 0.2], 0.1, [0.16, 0.26]),
   ]), finish),
-  k.compound('bucket_truck_knuckle', 120, [
+  k.compound('bucket_truck_knuckle', 60, [
     box('elbow', 'frame', [s.knuckleX, s.boomY - 0.17, -0.18], [s.knuckleX + 0.34, s.boomTopY + 0.14, 0.18]),
     m.axleDisc('pin_low', 'steel', s.knuckleX + 0.16, s.boomY, 0.09, [-0.2, 0.2], 12),
     m.axleDisc('pin_high', 'steel', s.knuckleX + 0.16, s.boomTopY, 0.09, [-0.2, 0.2], 12),
   ], finish),
-  k.compound('bucket_truck_insulated_boom', 260, [
+  k.compound('bucket_truck_insulated_boom', 140, [
     box('boom', 'insulated', [s.basketFront + 0.04, s.boomTopY - 0.11, -0.12], [s.knuckleX, s.boomTopY + 0.11, 0.12]),
     box('collar', 'frame', [-1.2, s.boomTopY - 0.13, -0.14], [-1.0, s.boomTopY + 0.13, 0.14]),
     box('band_a', 'dark', [-2.0, s.boomTopY - 0.115, -0.125], [-1.92, s.boomTopY + 0.115, 0.125]),
     box('band_b', 'dark', [0.1, s.boomTopY - 0.115, -0.125], [0.18, s.boomTopY + 0.115, 0.125]),
   ], finish),
-  k.compound('bucket_truck_basket', 110, [
+  k.compound('bucket_truck_basket', 70, [
     box('floor', 'insulated', [s.basketRear, s.basketFloor, -basketZ], [s.basketFront, s.basketFloor + 0.05, basketZ]),
     box('wall_fore', 'insulated', [s.basketFront - 0.05, s.basketFloor, -basketZ], [s.basketFront, s.basketTop, basketZ]),
     box('wall_aft', 'insulated', [s.basketRear, s.basketFloor, -basketZ], [s.basketRear + 0.05, s.basketTop, basketZ]),
