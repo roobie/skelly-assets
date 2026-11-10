@@ -10,15 +10,22 @@ local site = import 'site.libsonnet';
 local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 
 // An accessory's pieces in the part's frame, renamed after its site so they cannot clash with the core's or another
-// fitting's of the same row.
+// fitting's of the same row. The body paint slot keeps its name, so a site's paint repaints the fused part as it
+// repaints the core and each accessory (`docs/decisions/0003-vehicle-paint.md`).
+local paint = 'paint';
 local fitted(accessory) = {
   local role = accessory.site,
+  local named(slot) = if slot == paint then paint else role + '_' + slot,
   pieces: [
-    k.moved(piece, accessory.at) + { id: role + '_' + piece.id, slot: role + '_' + piece.slot }
+    k.moved(piece, accessory.at) + { id: role + '_' + piece.id, slot: named(piece.slot) }
     for piece in accessory.drawn.pieces
   ],
-  finish: { [role + '_' + slot]: accessory.drawn.finish[slot] for slot in std.objectFields(accessory.drawn.finish) },
+  finish: { [named(slot)]: accessory.drawn.finish[slot] for slot in std.objectFields(accessory.drawn.finish) },
 };
+// The finish of the core and its fitted accessories, which must agree on the body paint they share.
+local merged(core, dressed) = std.foldl(function(all, d)
+  assert !std.objectHas(all, paint) || !std.objectHas(d.finish, paint) || all[paint] == d.finish[paint] : 'an assembly paints its parts in one finish';
+  all + d.finish, dressed, core.finish);
 
 {
   // The core and fused rows of a part whose whole dressed mass is `massKg`, so the core takes what its accessories
@@ -29,7 +36,7 @@ local fitted(accessory) = {
     assert accessoryMass < massKg : fusedId + "'s accessories outweigh the whole part";
     [
       k.compound(coreId, massKg - accessoryMass, core.pieces, core.finish),
-      k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), std.foldl(function(all, d) all + d.finish, dressed, core.finish)),
+      k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), merged(core, dressed)),
     ],
   // An accessory's own row.
   row(id, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish),
