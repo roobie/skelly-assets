@@ -1,6 +1,6 @@
 // The review page: draws one model, assembled vehicle or kit assembly as a still tile of four views through the
 // showcase's renderer, with a ground grid so size reads off the picture, since every view is fitted to its square. A
-// vehicle's or an assembly's tile adds its exploded view beside them, twice a view's size because its parts spread
+// vehicle's, an assembly's or a component model's tile adds its exploded view beside them, twice a view's size because its parts spread
 // wider, so the parts a picture of the whole hides can be reviewed too; a wearable's adds itself worn on the doll at
 // that size, so its fit reads beside the loose views. A look can ask for another set of views and for only some of a
 // vehicle's sites (lookOptions.mjs). tools/model-sheet.mjs drives it headless through `window.look`; opened with
@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { facingView } from './explode.mjs';
 import { keepSites, viewSet } from './lookOptions.mjs';
 import { EXPLODED_VIEWS, FRONT_QUARTER } from './modelFrame.mjs';
-import { explodable, frame, isVehicle, isWearable, loadEntry, makeStage, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
+import { comesApart, explodable, frame, isVehicle, isWearable, loadEntry, makeStage, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const BACKGROUND = '#e8e6e1';
 
@@ -63,7 +63,7 @@ async function look(id, size, { views = 'review', sites = [] } = {}) {
   const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const loaded = await loadEntry(entry);
   const obj = stillInstance(loaded, entry);
-  const exploded = isVehicle(entry);
+  const exploded = comesApart(entry);
   const worn = isWearable(entry);
   const wide = exploded || worn;
   const box = new THREE.Box3().setFromObject(obj);
@@ -83,7 +83,7 @@ async function look(id, size, { views = 'review', sites = [] } = {}) {
     drawView(g, obj, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size);
   });
   if (exploded) {
-    const parts = explodable(obj);
+    const parts = explodable(obj, entry);
     spread(parts, 1);
     const [name, direction] = facingView(parts.map(({ offset }) => offset.toArray()), EXPLODED_VIEWS);
     // The same cell as the assembled views, so the spread reads against the whole's own size.
@@ -107,7 +107,7 @@ async function look(id, size, { views = 'review', sites = [] } = {}) {
     png: tile.toDataURL('image/png'),
     sizeM: extent.toArray().map((v) => Math.round(v * 1000) / 1000),
     triangles: Math.round(loaded.triangles),
-    parts: isVehicle(entry) ? entry.sites.length : 1,
+    parts: isVehicle(entry) ? entry.sites.length : entry.components?.length ?? 1,
     beside: exploded ? 'exploded' : worn ? 'worn' : null,
     materials: loaded.materials.map((m) => m.userData?.materialId ?? m.name),
     grid: metres(cell),

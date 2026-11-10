@@ -1,5 +1,6 @@
 // Draws models, assembled vehicles and kit assemblies of a built tree into tiles of four views, with the exploded view
-// of a vehicle or an assembly or a wearable worn on the doll beside them, and a contact sheet, so a reviewer, human or
+// of a vehicle, an assembly or a model that comes in components (tools/components.mjs), or a wearable worn on the doll
+// beside them, and a contact sheet, so a reviewer, human or
 // agent, can check their looks without opening each one. The drawing
 // is the showcase's own: this builds the showcase from the tree and drives its review page (site/look.mjs) in headless
 // Chromium.
@@ -121,7 +122,7 @@ const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.wide{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
 input{font:inherit;padding:4px 8px;margin-bottom:12px;width:280px}</style>
-<p>${rows.length} entries · ${esc(look)} · views: ${esc(views.map(([name]) => name).join(' | '))}, then a vehicle or an assembly exploded, or a wearable worn on the doll, from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
+<p>${rows.length} entries · ${esc(look)} · views: ${esc(views.map(([name]) => name).join(' | '))}, then a vehicle, an assembly or a component model exploded, or a wearable worn on the doll, from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
 ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);

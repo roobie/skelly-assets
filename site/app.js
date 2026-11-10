@@ -1,10 +1,10 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
-// can be exploded to show each part apart from the others; a wearable can be shown loose or worn on the doll. What it
+// can be exploded to show each part apart from the others, as can a model that comes in components; a wearable can be shown loose or worn on the doll. What it
 // draws, and how, is render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { canPose, clipSet, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
+import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
@@ -222,7 +222,7 @@ function spreadParts(v) {
   spread(v.parts, v.spread);
 }
 
-// Switches a vehicle between assembled and exploded, keeping the camera's direction and fitting the camera to the
+// Switches a vehicle or a component model between assembled and exploded, keeping the camera's direction and fitting the camera to the
 // view it is switching to.
 function explode(exploded) {
   const v = viewer;
@@ -275,7 +275,7 @@ async function openViewer(model) {
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
   $('v-clips').replaceChildren();
-  $('v-clips').setAttribute('aria-label', isVehicle(model) || isWearable(model) ? 'View' : 'Clip');
+  $('v-clips').setAttribute('aria-label', comesApart(model) || isWearable(model) ? 'View' : 'Clip');
 
   const loaded = await loadEntry(model);
   if (viewer.model !== model) return; // a later pick overtook this load
@@ -284,7 +284,7 @@ async function openViewer(model) {
   viewer.obj = stillInstance(loaded, model);
   viewer.loaded = loaded;
   viewer.clip = null;
-  viewer.parts = isVehicle(model) ? explodable(viewer.obj) : [];
+  viewer.parts = comesApart(model) ? explodable(viewer.obj, model) : [];
   viewer.spread = 0;
   viewer.exploded = false;
   viewer.worn = false;
@@ -296,7 +296,7 @@ async function openViewer(model) {
   const size = box.getSize(new THREE.Vector3());
   const facts = [
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
-    ...(isVehicle(model) ? [['Parts', model.sites.length]] : []),
+    ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
@@ -338,7 +338,7 @@ async function openViewer(model) {
     }));
     pick(names[0]);
   }
-  if (isVehicle(model)) $('v-clips').replaceChildren(...viewChips([['assembled', 'Assembled'], ['exploded', 'Exploded']], (view) => explode(view === 'exploded')));
+  if (comesApart(model)) $('v-clips').replaceChildren(...viewChips([['assembled', 'Assembled'], ['exploded', 'Exploded']], (view) => explode(view === 'exploded')));
   if (isWearable(model)) $('v-clips').replaceChildren(...viewChips([['loose', looseName(model)], ['worn', 'Worn']], (view) => wear(view === 'worn')));
 }
 
