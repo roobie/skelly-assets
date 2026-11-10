@@ -5,7 +5,8 @@
 //   [--focus bone] [--wear id,id] [--screenshot] <pose> [<pose> ...]
 // A pose is a fixture's name (models/poses) or the path of a pose file. `--wear` dresses the doll in those wearables,
 // `--probe` runs the clearance probe and marks its findings, `--focus` frames the views on one bone and what hangs from
-// it (a hand and its fingers), `--screenshot` also saves the page with its controls.
+// it (a hand and its fingers), `--views eye` draws from the figure's own eyes beside the front three-quarter,
+// `--screenshot` also saves the page with its controls.
 // Writes <out>/<pose>[-<wear joined by +>].png and, with --screenshot, <out>/ui-<pose>[-<wear>].png; prints one
 // line per pose with the limits that held, the reach residuals and the clearance findings.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';

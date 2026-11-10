@@ -42,6 +42,14 @@ test('a pose file that does not fit the rig is refused with every issue named', 
   assert.deepEqual(poseIssues(rig, { rig: ours, angles: { spine: [10, 0, 0] } }), []);
 });
 
+test('a moved part is a share 0..1 of a model some hand holds', () => {
+  const hold = { hand: { model: 'rifle', socket: { at: [0, 0, 0], into: [0, 1, 0], axis: [0, 0, 1] } } };
+  assert.deepEqual(poseIssues(rig, { rig: ours, hold, moved: { rifle: { bolt: 0, handle: 1 } } }), []);
+  const issues = poseIssues(rig, { rig: ours, hold, moved: { rifle: { bolt: 1.5, handle: 'back' }, axe: { head: 0 } } }).join('\n');
+  for (const named of [/moved\.rifle\.bolt is a share/, /moved\.rifle\.handle is a share/, /moved\.axe: no hand holds axe/]) assert.match(issues, named);
+  assert.match(poseIssues(rig, { rig: ours, hold, moved: [] }).join('\n'), /moved maps held models/);
+});
+
 test('angles past a limit are held to it and the hold is reported', () => {
   const { frame, report } = compilePose(rig, { rig: ours, angles: { fore: [170, 0, 0] } });
   assert.deepEqual(report.clamped, [{ bone: 'fore', asked: [170, 0, 0], held: [150, 0, 0] }]);
