@@ -53,12 +53,12 @@ exposed working parts remain useful identification cues at play distance. Repair
 their contents because a closed case would hide the distinction between metal repair and
 clothing repair; folded continuous webbing keeps a sling's ground footprint practical without
 making it look like a rigid rod. See `src/families/equipment.ts`, `repairKit`, `webbingSling`
-and `pliers`, and `models/equipment.libsonnet`.
+and `pliers`, and `models/catalogue/sets/equipment.libsonnet`.
 
 Jacks and the standalone hoist are ordinary carried tools: their jacking quality is authored
 in deadvox content and their models say nothing about load, reach or supported groups, so
 what a jack may lift stays a content and runtime decision. See `src/families/jacks.ts`,
-`engineHoist`, and `models/jacks.libsonnet`.
+`engineHoist`, and `models/catalogue/sets/jacks.libsonnet`.
 
 The preview draws the same construct report the exporter consumes, so visual inspection is
 not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui/src/scene.ts`,
@@ -76,7 +76,7 @@ helper default, so copying a helper cannot silently switch which mass is the aut
 That choice follows each item into its recipe; disagreement is refused rather than silently choosing an
 authority. Geometry and authoring-preview physical properties do not change with
 that export choice. See `src/catalogue.ts`, `ItemSchema`, `src/exports.ts`,
-`exportItem` and `loadThingRecipe`, and `models/cans.libsonnet`, `shellMassKg`.
+`exportItem` and `loadThingRecipe`, and `models/catalogue/sets/cans.libsonnet`, `shellMassKg`.
 
 Trap-state presentation needs a consumer-side model selection rule as well as geometry;
 it does not belong in the geometry authoring tool. See `src/families/bearTrap.ts`, `bearTrap`.
