@@ -10,6 +10,7 @@ local shells = [
   'leather_jacket_worn_body', 'leather_jacket_worn_upper', 'leather_jacket_worn_fore',
   'leather_gloves_worn_palm', 'leather_gloves_worn_fingers', 'leather_gloves_worn_thumb',
   'combat_boots_worn_foot', 'combat_boots_worn_shaft',
+  'tank_top_worn_body',
   'wizard_robe_worn_body', 'wizard_robe_worn_pelvis', 'wizard_robe_worn_upper', 'wizard_robe_worn_fore',
   'wizard_robe_worn_thigh', 'wizard_robe_worn_shin',
 ];

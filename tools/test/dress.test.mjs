@@ -56,6 +56,16 @@ test('a worn piece is drawn in every copy of its segment\'s part, the left one m
   close(pieces[2].at, [0, 0, 0]);
 });
 
+test('a piece that covers some of its part names, in every copy, the doll site that draws that copy', () => {
+  const models = [model('coat', { slot: ['torso'] }), { ...model('coat_worn_cuff', { fit: ['worn'] }), covers: ['sleeve'] }, model('coat_worn', { fit: ['worn'] })];
+  const pieces = wornSites(models[0], { dressing, doll, models }).slice(doll.sites.length);
+  assert.deepEqual(pieces.map(({ covers, bodySite }) => [covers, bodySite]), [
+    [['sleeve'], doll.parts.get('sleeve')[0].site],
+    [['sleeve'], doll.parts.get('sleeve')[1].site],
+    [undefined, undefined],
+  ]);
+});
+
 test('pieces fitted over other clothing and other items\' pieces are not worn with an item', () => {
   const models = [model('coat_worn_cuff', { fit: ['worn'] }), model('coat_worn_jacket', { fit: ['over-jacket'] }), model('coat_hood_worn_body', { fit: ['worn'] })];
   assert.deepEqual(wornPieces('coat', models, dressing), [{ model: 'coat_worn_cuff', part: 'sleeve' }]);

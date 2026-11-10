@@ -67,12 +67,13 @@ function boundPart(bone, groups) {
   return found[0];
 }
 
-// Every mesh under `object` as one triangle mesh in world axes.
+// Every drawn mesh under `object` as one triangle mesh in world axes; what a worn piece hides (hiding.mjs) is not drawn,
+// so it is neither probed nor counted as showing.
 function worldMesh(object) {
   const positions = [], indices = [];
   const p = new THREE.Vector3();
   object.traverse((o) => {
-    if (!o.isMesh) return;
+    if (!o.isMesh || !o.visible) return;
     const base = positions.length / 3;
     const { attributes: { position }, index } = o.geometry;
     for (let i = 0; i < position.count; i++) positions.push(...p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).toArray());
@@ -116,7 +117,8 @@ export async function buildFigure(data, wear) {
   });
   root.updateMatrixWorld(true);
   for (const { bone, part, pieces } of bound) {
-    rest.body.push({ bone: bone.id, mesh: worldMesh(part) });
+    const mesh = worldMesh(part);
+    if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, mesh });
     for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, mesh: worldMesh(group) });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));

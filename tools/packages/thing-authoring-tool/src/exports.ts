@@ -87,6 +87,7 @@ export const exportItem = (
       ...handling,
       ...(glow ? { emissiveMaterial: glow } : {}),
       ...(paintable.length > 0 ? { paintable } : {}),
+      ...(item.covers ? { covers: item.covers } : {}),
       ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
     },
     physical: assemblyProperties(parts),

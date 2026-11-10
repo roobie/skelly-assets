@@ -1,7 +1,7 @@
 // The fitted worn family: each template builds an item's worn shells around the player body's measures, so a
 // garment's worn look is a short spec beside its ground row rather than hand-placed geometry. Each template returns
 // `rows`, the worn models for the export, and `figureModels`, the matching Deadvox entries, so the segment, frame and
-// coverage contract has one source.
+// coverage contract has one source: each shell's coverage is declared once, on `shell` or `paired`.
 local h = import 'compound.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
@@ -49,6 +49,20 @@ local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGra
 local entry(model, frame, covers) = { model: model, frame: frame, covers: covers, pivot: [0, 0, 0], at: [0, 0, 0], turn: [0, 0, 0] };
 local pair(model, side, covers) = [entry(model, 'left_' + side, covers), entry(model, 'right_' + side, covers)];
 
+// A worn shell's row and its Deadvox entries. `covers` names the doll parts or regions the shell encloses at rest,
+// which a consumer stops drawing while it is worn, so it lists nothing the shell leaves showing. `figure` is what the
+// game's entries hide, which still names whole parts where a shell only partly encloses one. No upper sleeve encloses
+// its part: the elbow's cap reaches below the sleeve's end, where the fore sleeve takes over.
+local worn(model, pieces, finish, covers, figure, entries) = {
+  row: row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }),
+  figureModels: entries(figure),
+};
+local shell(model, frame, pieces, finish, covers, figure=covers) =
+  worn(model, pieces, finish, covers, figure, function(c) [entry(model, frame, c)]);
+local paired(model, side, pieces, finish, covers, figure=covers) =
+  worn(model, pieces, finish, covers, figure, function(c) pair(model, side, c));
+local fitted(shells) = { rows: [s.row for s in shells], figureModels: std.flattenArrays([s.figureModels for s in shells]) };
+
 // Where a torso shell's hem falls on the bust, from the hips' bottom.
 local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 
@@ -80,16 +94,23 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // sleeves. `sleeveLayer`, by default the body's, lets a loose body keep close sleeves, so a hanging arm's sleeve
   // stays clear of the hips. `round` softens every corner, for a garment of soft cloth. `hood` lays a hood `hood` deep on the back.
   // `pockets` are 'welt' slits at the hips, a 'patch' pocket either side of the closure, a 'kangaroo' pocket across
-  // the belly, or 'none'. `slots` names the ground row's finish slots the shells reuse: `body`, `trim` and `fastener`,
+  // the belly, or 'none'. `top` 'yoke' covers the shoulders under a yoke and collar; 'straps' cuts the body off at a
+  // neckline between the trunk's top and the shoulders, held up by a strap over each trapezius, for a tank top, and
+  // draws no collar. `slots` names the ground row's finish slots the shells reuse: `body`, `trim` and `fastener`,
   // and with a hood `hood` and `lining`.
   torso(id, finish, spec)::
-    local s = { layer: 'normal', sleeveLayer: self.layer, hem: 'hip', round: 0, sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: 'welt', hood: null,
+    local s = { layer: 'normal', sleeveLayer: self.layer, hem: 'hip', top: 'yoke', round: 0, sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: 'welt', hood: null,
                 slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;
+    assert std.member(['yoke', 'straps'], s.top) : 'torso %s: top %s is neither yoke nor straps' % [id, s.top];
+    local straps = s.top == 'straps';
     local g = layers[s.layer];
     local sl = s.slots;
     local l = self.torsoLevels(s.layer, s.round);
     local hem = hems[s.hem];
     local chestTop = l.ribs.y[1] + bust.chestHeight;
+    local neckline = l.ribs.y[1] + 0.65 * bust.chestHeight;
+    local bodyTop = if straps then neckline else l.chest.y[1];
+    local collar = if straps then 'none' else s.collar;
     local level(id, v, y0, y1) = oct(id, sl.body, y0, y1, v.width, v.depth, v.chamfer);
     local front(y) = (if y < l.waist.y[1] then l.waist else if y < l.ribs.y[1] then l.ribs else l.chest).depth / 2;
     local lowFront = l.waist.depth / 2;
@@ -108,21 +129,33 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       ],
       kangaroo: [h.box('pocket', sl.trim, [-pocketReach, l.waist.y[1] - 0.16, lowFront], [pocketReach, l.waist.y[1] - 0.07, lowFront + 0.006])],
     };
+    // A strap lies on the chest's front and back faces and over its top, its underside clearing the trapezius's rise.
+    local strapX = bust.chestWidth / 4, strapHalf = 0.018, strapT = 0.006;
+    local strapTop = chestTop + 0.008 + g + strapT;
+    local strapFace = l.chest.depth / 2;
+    local strap(name, side) =
+      local x0 = side * strapX - strapHalf, x1 = side * strapX + strapHalf;
+      [
+        h.box('strap-front-' + name, sl.trim, [x0, neckline - 0.01, strapFace - strapT], [x1, strapTop, strapFace]),
+        h.box('strap-top-' + name, sl.trim, [x0, strapTop - strapT, -strapFace], [x1, strapTop, strapFace]),
+        h.box('strap-back-' + name, sl.trim, [x0, neckline - 0.01, -strapFace], [x1, strapTop, -strapFace + strapT]),
+      ];
     local body = [
       level('low', l.waist, hem, l.waist.y[1]),
       level('ribs', l.ribs, l.ribs.y[0] - 0.01, l.ribs.y[1]),
-      level('chest', l.chest, l.chest.y[0] - 0.01, l.chest.y[1]),
+      level('chest', l.chest, l.chest.y[0] - 0.01, bodyTop),
+    ] + (if straps then strap('l', -1) + strap('r', 1) else [
       level('yoke', l.yoke, l.yoke.y[0], l.yoke.y[1]),
-    ] + (if s.collar == 'none' then [] else [
+    ]) + (if collar == 'none' then [] else [
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
-    ]) + (if s.collar == 'lapel' then [
+    ]) + (if collar == 'lapel' then [
       h.prism('lapel-' + side, sl.trim, 'z', [[side * 0.03, chestTop], [side * 0.13, chestTop - 0.02], [side * 0.04, chestTop - 0.15]],
               l.chest.depth / 2, l.chest.depth / 2 + 0.008)
       for side in [-1, 1]
     ] else []) + (if s.zipX == null then [] else [
       // The closure runs down each level's front face.
       h.box('zip-' + v[0], sl.fastener, [s.zipX - 0.005, v[1], front(v[1])], [s.zipX + 0.005, v[2], front(v[1]) + 0.004])
-      for v in [['low', hem, l.waist.y[1]], ['ribs', l.ribs.y[0], l.ribs.y[1]], ['chest', l.chest.y[0], chestTop - 0.02]]
+      for v in [['low', hem, l.waist.y[1]], ['ribs', l.ribs.y[0], l.ribs.y[1]], ['chest', l.chest.y[0], bodyTop - 0.02]]
     ]) + pockets[s.pockets] + (if s.belt then [
       oct('belt', sl.body, hem, hem + 0.035, l.waist.width + 0.008, l.waist.depth + 0.008, l.waist.chamfer),
       h.box('buckle', sl.fastener, [0.1, hem + 0.002, lowFront + 0.004], [0.135, hem + 0.033, lowFront + 0.008]),
@@ -135,12 +168,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
       oct('cuff', sl.trim, -arm.foreLength - 0.004, -arm.foreLength + 0.03, arm.foreWidth + 2 * gs + 0.012, arm.upperDepth + 2 * gs + 0.008, 0.02 + s.round),
     ];
-    {
-      rows: [row(id + '_worn_body', body, finish)]
-            + (if s.sleeves == 'none' then [] else [row(id + '_worn_upper', upper, finish), row(id + '_worn_fore', fore, finish)]),
-      figureModels: [entry(id + '_worn_body', 'clothing_body', ['torso'])]
-                    + (if s.sleeves == 'none' then [] else pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore'])),
-    },
+    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if straps then ['trunk'] else ['torso'])]
+           + (if s.sleeves == 'none' then [] else [
+                paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
+                paired(id + '_worn_fore', 'cuff', fore, finish, ['fore']),
+              ])),
 
   // A long robe: a body shell from the waist up, with a hood lying on the back; a pelvis shell over the hips, with a
   // cord round them, so the robe's lower part stays with the legs when a game twists the chest off the hips; wide
@@ -239,13 +271,16 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       bell('skirt', sl.cloth, [[-s.hem, hemR], [0.06, kneeR - 0.015]]),
       bell('hem', sl.trim, [[-s.hem, hemR + 0.006], [-s.hem + 0.02, hemR + 0.006 - 0.004]]),
     ];
-    {
-      rows: [row(id + '_worn_body', body, finish), row(id + '_worn_pelvis', pelvis, finish), row(id + '_worn_upper', upper, finish),
-             row(id + '_worn_fore', fore, finish), row(id + '_worn_thigh', thigh, finish), row(id + '_worn_shin', shin, finish)],
-      figureModels: [entry(id + '_worn_body', 'clothing_body', ['torso']), entry(id + '_worn_pelvis', 'clothing_body', ['pelvis'])]
-                    + pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore'])
-                    + pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', ['shin']),
-    },
+    // The thigh's bell is narrow by the hip, where the pelvis shell covers the leg, and the shin's ends at the hem, so
+    // neither encloses its part.
+    fitted([
+      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso']),
+      shell(id + '_worn_pelvis', 'clothing_body', pelvis, finish, ['pelvis']),
+      paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
+      paired(id + '_worn_fore', 'cuff', fore, finish, ['fore']),
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
+      paired(id + '_worn_shin', 'hem', shin, finish, [], ['shin']),
+    ]),
 
   // Plate armour: a closed breast and back over the ribs and chest, a gorget, `lames` faulds below the waist over a
   // mail skirt, and pauldrons, rerebraces, couters and vambraces on the arms. Rigid, so it clears the over layer.
@@ -263,6 +298,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local shoulderX = deltoidOuter + g;
     local faulds = 0.05;
     local skirtTop = waistTop - 0.06;
+    // The trunk is enclosed only if the faulds, or the mail under them, reach down past the waist's foot.
+    local skirtFoot = skirtTop - s.lames * faulds - (if s.mail then 0.08 else 0);
     local body = [
       oct('belly', sl.plate, skirtTop, ribTop, bust.waistWidth + 2 * g, bust.ribDepth + 2 * g, cut),
       oct('breast', sl.plate, ribTop - 0.02, chestTop, chestW, chestD, bust.chestChamfer / 2),
@@ -309,12 +346,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('vambrace', sl.plate, -arm.foreLength + 0.012, -0.03, fw + 0.006, fd + 0.004, 0.02),
       oct('vambrace-rim', sl.rim, -arm.foreLength + 0.012, -arm.foreLength + 0.026, fw + 0.012, fd + 0.01, 0.02),
     ];
-    {
-      rows: [row(id + '_worn_body', body, finish)]
-            + (if s.arms then [row(id + '_worn_upper', upper, finish), row(id + '_worn_fore', fore, finish)] else []),
-      figureModels: [entry(id + '_worn_body', 'clothing_body', ['torso'])]
-                    + (if s.arms then pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore']) else []),
-    },
+    // The vambrace stops short of the wrist.
+    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if skirtFoot <= bust.pelvisHeight then ['torso'] else ['shoulders'], ['torso'])]
+           + (if s.arms then [
+                paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
+                paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore']),
+              ] else [])),
 
   // Heavy trooper armour: a broad cuirass of stacked belly bands under a slab breastplate with a chevron, a high
   // collar open at the throat, a power pack with exhaust stacks on the back, a webbing belt with pouches and two
@@ -417,12 +454,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ] + [
       oct('vambrace-rim', 'insignia', -arm.foreLength + 0.012, -arm.foreLength + 0.028, fw + 0.024, fd + 0.022, 0.022),
     ];
-    {
-      ground: h.lifted(body, -(beltY - 0.13)),
-      rows: [row(id + '_worn_body', body, finish), row(id + '_worn_upper', upper, finish), row(id + '_worn_fore', fore, finish)],
-      figureModels: [entry(id + '_worn_body', 'clothing_body', ['torso'])]
-                    + pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore']),
-    },
+    // The vambrace stops short of the wrist.
+    fitted([
+      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso']),
+      paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
+      paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore']),
+    ]) + { ground: h.lifted(body, -(beltY - 0.13)) },
 
   // Heavy trooper leg armour: thick cuisses with a front plate, a square knee guard over a domed cop, and greaves with
   // a front ridge. `ground` stands one thigh and shin on the floor. Slots as `trooper`.
@@ -451,11 +488,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
               -shinLength + 0.03, -0.08),
       oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.01, sw + 0.02, sd + 0.02, leg.shinChamfer / 2 + 0.012),
     ];
-    {
-      ground: h.lifted(shin, shinLength + leg.ankleOverlap) + h.lifted(thigh, shinLength + leg.ankleOverlap + leg.thighLength),
-      rows: [row(id + '_worn_thigh', thigh, finish), row(id + '_worn_shin', shin, finish)],
-      figureModels: pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', ['shin']),
-    },
+    // The cuisse leaves the hip and the knee's cap bare.
+    fitted([
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
+      paired(id + '_worn_shin', 'hem', shin, finish, ['shin']),
+    ]) + { ground: h.lifted(shin, shinLength + leg.ankleOverlap) + h.lifted(thigh, shinLength + leg.ankleOverlap + leg.thighLength) },
 
   // Trousers: a seat over the hips under a waistband, and a leg on each thigh and shin. The shin's leg stops above the
   // ankle bone and an open cuff carries it down to the instep, so the hem reaches the shoe without passing through
@@ -481,11 +518,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local shin = [oct('leg', sl.cloth, cuff[1] - 0.005, 0.025, shinW, shinD, shinCut)]
                  + ring('cuff', sl.cloth, cuff[0] + 0.03, cuff[1], shinW, shinD, shinCut, 0.008)
                  + ring('hem', sl.trim, cuff[0], cuff[0] + 0.03, shinW + 0.004, shinD + 0.004, around(shinCut, 0.002), 0.01);
-    {
-      rows: [row(id + '_worn_pelvis', pelvis, finish), row(id + '_worn_thigh', thigh, finish), row(id + '_worn_shin', shin, finish)],
-      figureModels: [entry(id + '_worn_pelvis', 'clothing_body', ['pelvis'])]
-                    + pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', ['shin']),
-    },
+    // The knee's cap reaches below the thigh's leg, where the shin's takes over, and the cuff stops above the ankle, so
+    // neither leg encloses its part.
+    fitted([
+      shell(id + '_worn_pelvis', 'clothing_body', pelvis, finish, ['pelvis']),
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
+      paired(id + '_worn_shin', 'hem', shin, finish, [], ['shin']),
+    ]),
 
   // Leg harness: cuisses on the thighs, knee cops and greaves on the shins. `slots` names the ground row's finish
   // slots: `shell`, `cop`, `rim` and `strap`.
@@ -511,10 +550,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('greave', sl.shell, -shinLength - leg.ankleOverlap, -0.045, sw, sd, leg.shinChamfer / 2 + 0.01),
       oct('greave-rim', sl.rim, -shinLength - leg.ankleOverlap, -shinLength + 0.005, sw + 0.008, sd + 0.008, leg.shinChamfer / 2 + 0.01),
     ] else []);
-    {
-      rows: [row(id + '_worn_thigh', thigh, finish), row(id + '_worn_shin', shin, finish)],
-      figureModels: pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', if s.greaves then ['shin'] else []),
-    },
+    // The cuisse leaves the hip and the knee's cap bare.
+    fitted([
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
+      paired(id + '_worn_shin', 'hem', shin, finish, if s.greaves then ['shin'] else []),
+    ]),
 
   // Gloves: a palm and cuff on the wrist, fingers on the knuckles and the thumb on its root, so a curled first-person
   // hand bends its glove too. `cuff` is how far the cuff reaches up the forearm; `fingers` false leaves stubs.
@@ -540,12 +580,15 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       h.box('fingers', sl.hand, [-fingerX, -fingerLength - g, -arm.palmWidth / 2 - g], [fingerX, arm.handOverlap, arm.palmWidth / 2 * arm.fingerFrontShare + g]),
     ] + (if s.fingers then [] else [h.box('stub-hem', sl.hem, [-fingerX - 0.001, -fingerLength - g, -arm.palmWidth / 2 - g - 0.001], [fingerX + 0.001, -fingerLength - g + 0.006, arm.palmWidth / 2 * arm.fingerFrontShare + g + 0.001])]);
     local thumb = [h.box('thumb', sl.hand, [-thumbX, -arm.thumbLength - g, -g], [thumbX, 0, arm.thumbProjection + 0.004 + g])];
-    {
+    fitted([
+      paired(id + '_worn_palm', 'glove', palm, finish, ['palm']),
+      // No glove's fingers enclose their part: the doll's fingers reach up into the palm past the shell's top, and
+      // stubs leave their ends bare.
+      paired(id + '_worn_fingers', 'fingers', fingers, finish, [], ['fingers']),
+      paired(id + '_worn_thumb', 'thumb', thumb, finish, ['thumb']),
+    ]) + {
       // One glove standing on its fingertips, cuff up, for a ground model; the fingers hang from the palm's end.
       ground: h.lifted(palm, fingerLength + g + arm.palmLength) + h.lifted(fingers, fingerLength + g),
-      rows: [row(id + '_worn_palm', palm, finish), row(id + '_worn_fingers', fingers, finish), row(id + '_worn_thumb', thumb, finish)],
-      figureModels: pair(id + '_worn_palm', 'glove', ['palm']) + pair(id + '_worn_fingers', 'fingers', ['fingers'])
-                    + pair(id + '_worn_thumb', 'thumb', ['thumb']),
     },
 
   // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,
@@ -588,11 +631,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, b.laces - 1)
     ]);
     local shafted = b.top > leg.shoeHeight;
-    {
+    // The ankle's cap rises above the vamp, inside the shaft, which rides the shin.
+    fitted([paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, [], ['foot'])]
+           + (if shafted then [paired(id + '_worn_shaft', 'hem', shaft, finish, [])] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
       ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),
-      rows: [row(id + '_worn_foot', foot, { lining: 'paint-charcoal' } + finish)] + (if shafted then [row(id + '_worn_shaft', shaft, finish)] else []),
-      figureModels: pair(id + '_worn_foot', 'boot', ['foot']) + (if shafted then pair(id + '_worn_shaft', 'hem', []) else []),
     },
 
   // Rigid goods (hats, helmets, goggles): the ground model itself, worn on the head and scaled to fit. Author the

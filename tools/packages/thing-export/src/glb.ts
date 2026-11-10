@@ -555,7 +555,7 @@ const writeGlb: ExportGlb = (input) => {
   };
   /**
    * One primitive per finish and piece: the part's drawn solids sampled at the grain, so later solids paint over
-   * earlier ones.
+   * earlier ones. Each piece's primitives together form a closed surface.
    */
   const voxelPrimitivesFor = (part: PartExport, items: DisplayItem[], grain: number): Json[] => {
     const finishes: {
@@ -584,9 +584,11 @@ const writeGlb: ExportGlb = (input) => {
     });
     const { groups } = voxelize(sources, grain, latticeOrigin(part.placed, grain, metresPerUnit), {
       neighbours: neighboursOf(part, grain),
+      // A face between pieces is kept on both sides, so a game hiding one piece leaves the rest closed.
       exposeInterface: (group, neighbour) =>
-        !surfaceOf(finishes[group]!.appearance.finish).transparent &&
-        surfaceOf(finishes[neighbour]!.appearance.finish).transparent,
+        finishes[group]!.piece !== finishes[neighbour]!.piece ||
+        (!surfaceOf(finishes[group]!.appearance.finish).transparent &&
+          surfaceOf(finishes[neighbour]!.appearance.finish).transparent),
       preserveFace: input.skin ? preserveSkinFace(input.skin, placedInMetres(part)) : undefined,
     });
     return [...groups].map(([group, buffers]) =>
