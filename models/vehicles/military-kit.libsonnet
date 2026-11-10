@@ -1,6 +1,7 @@
 // Pressings the military family shares. `truckRows`, `truckItems` and `truckFittings` press one high-clearance
 // bonneted six-wheeled chassis, the `military_truck_` rows that `military_cargo_truck` emits, so its cargo and box
-// bodies differ only by what stands on the deck and each new body adds no chassis rows.
+// bodies differ only by what stands on the deck and each new body adds no chassis rows. All three axles are driven,
+// through a transfer case, so the chassis has its own axles rather than a road truck's dead steered beam.
 // The item and fitting builders take a game's vehicle kit as an argument, so this folder imports no game content.
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -41,11 +42,21 @@ local flatGuard(id, slot, x, top, drop, run, z, thick=0.04) = [
   prism(id + '_aft', slot, [[x[0] - run, top - thick - drop], [x[0], top - thick], [x[0], top], [x[0] - run, top - drop]], z),
 ];
 
+// A driven axle in `beamAxle`'s frame (`shared.libsonnet`), its housing and drums sized for the drawn steel to carry
+// a military axle's weight; a steered one adds the knuckles its front wheels turn on.
+local driveAxle(id, massKg, halfTrack, steered) = k.compound(id, massKg, [
+  k.turned('beam', 'steel', 'z', k.disc(0.09, -halfTrack, halfTrack), [0, 0.52, 0]) + { sides: 12 },
+  box('diff', 'steel', [-0.2, 0.33, -0.19], [0.2, 0.71, 0.19]),
+] + bothSides([
+  box('spring_seat', 'steel', [-0.09, 0.6, halfTrack - 0.36], [0.09, 0.64, halfTrack - 0.22]),
+  k.turned('drum', 'steel', 'z', k.disc(0.21, halfTrack - 0.14, halfTrack), [0, 0.52, 0]) + { sides: 12 },
+] + (if steered then [box('knuckle', 'steel', [-0.12, 0.36, halfTrack - 0.3], [0.12, 0.68, halfTrack - 0.14])] else [])), { steel: 'steel-grey' });
+
 local truckDefaults = {
   paint: 'paint-olive',
   frame: 'steel-parkerized',
-  gearboxLength: 0.72,
-  engineLength: 0.86,
+  gearboxLength: 0.95,
+  engineLength: 1.0,
 };
 local truckSpec(s) = truckDefaults + s;
 
@@ -154,6 +165,11 @@ local truckRows(s0) = {
     ] + bothSides([
       box('tow_eye', 'dark', [s.front, s.bumperLow + 0.06, 0.5], [s.front + 0.04, s.bumperTop - 0.06, 0.56]),
     ]), finish),
+    driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true),
+    driveAxle(id + '_axle', s.axleMass, 0.93, false),
+    k.compound(id + '_transfer_case', s.transferCaseMass, [
+      box('case', 'casting', [-0.28, 0, -0.3], [0.28, 0.5, 0.3]),
+    ], { casting: 'steel-grey' }),
     k.compound(id + '_rear_bumper', 40, [
       box('bar', 'frame', [s.rear, s.railBottom - 0.22, -s.bedSide + 0.1], [s.rear + 0.1, s.railBottom - 0.08, s.bedSide - 0.1]),
     ] + bothSides([
@@ -195,12 +211,13 @@ local truckFittings(kit, s0) =
     fitting('grille', id + '_grille', origin, ['chassis']),
     fitting('front_bumper', id + '_front_bumper', origin, ['chassis']),
     fitting('rear_bumper', id + '_rear_bumper', origin, ['chassis']),
-    fitting('front_axle', 'steered_axle_heavy', [s.frontAxle, s.r - 0.52, 0], ['chassis']),
-    fitting('rear_axle_0', 'beam_axle_truck', [s.rearAxles[0], s.r - 0.52, 0], ['chassis']),
-    fitting('rear_axle_1', 'beam_axle_truck', [s.rearAxles[1], s.r - 0.52, 0], ['chassis']),
-    fitting('engine', 'engine_i6_diesel', [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', 'gearbox_truck', [gearboxX, s.engineY + 0.1, 0], ['engine']),
-    fitting('prop_shaft', 'prop_shaft_long', [(shaftFrom + s.rearAxles[0]) / 2, s.railBottom - 0.04, 0], ['gearbox', 'rear_axle_0']),
+    fitting('front_axle', id + '_front_axle', [s.frontAxle, s.r - 0.52, 0], ['chassis']),
+    fitting('rear_axle_0', id + '_axle', [s.rearAxles[0], s.r - 0.52, 0], ['chassis']),
+    fitting('rear_axle_1', id + '_axle', [s.rearAxles[1], s.r - 0.52, 0], ['chassis']),
+    fitting('engine', 'engine_v8_diesel', [s.engineX, s.engineY, 0], ['chassis']),
+    fitting('gearbox', 'gearbox_heavy', [gearboxX, s.engineY - 0.08, 0], ['engine']),
+    fitting('transfer_case', id + '_transfer_case', [s.cabBack - 0.25, s.railBottom - 0.5, 0], ['chassis']),
+    fitting('prop_shaft', 'prop_shaft_long', [(shaftFrom + s.rearAxles[0]) / 2, s.railBottom - 0.04, 0], ['gearbox', 'transfer_case', 'rear_axle_0']),
     fitting('inter_axle_shaft', 'prop_shaft_short', [bogie, s.r + 0.14, 0], ['rear_axle_0', 'rear_axle_1']),
     fitting('radiator', 'radiator_truck', [s.nose - 0.14, 0.98, 0], ['chassis']),
     fitting('fuel_tank', id + '_fuel_tank', [s.tankX, 0.55, s.tankZ], ['chassis']),

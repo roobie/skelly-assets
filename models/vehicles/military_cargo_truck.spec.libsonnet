@@ -10,6 +10,6 @@
   lampY: 1.58, lampZ: 0.38,
   engineX: 2.5, engineY: 1.02,
   tankX: -0.08, tankZ: 0.76, lockerX: [-0.72, 0.2], lockerY: [0.56, 0.86],
-  chassisMass: 4500, shellMass: 900,
+  chassisMass: 2650, shellMass: 900, frontAxleMass: 670, axleMass: 649, transferCaseMass: 178,
   bedMass: 380, bedFloorMass: 320, tiltMass: 180,
 }
