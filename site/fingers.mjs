@@ -115,21 +115,30 @@ const boxPoints = ({ min, max }) => {
   return points;
 };
 
-// How close a part may come to a held item before it is in contact, and how far away a point is still measured.
+// How close a part may come to a held item before it is in contact, how far away a point is still measured, how many
+// steps a joint's swing is checked at and how many halvings then find where it meets the item.
 const CONTACT = 0.001;
 const REACH = 0.05;
+const SWEEP = 12;
 const STEPS = 12;
 
-// The nearest any of `bones` comes to `solid` in the pose, negative when one has sunk in.
-const nearest = (rig, pose, bones, solid) => {
+// The nearest any of `bones` comes to any of `solids` in the pose, negative when one has sunk in.
+const nearest = (rig, pose, bones, solids) => {
   const transforms = boneTransforms(rig.bones, pose);
   let least = Infinity;
   for (const bone of bones) {
     const t = transforms.get(bone.id);
-    for (const p of boxPoints(bone.bind.box)) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
+    for (const p of boxPoints(bone.bind.box)) for (const solid of solids) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
   }
   return least;
 };
+
+// A bone's part box as a posed solid, so a digit can close on another.
+const BOX_FACES = [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]];
+const boxSolid = ({ min, max }, transform) => posedSolid({
+  positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
+  indices: BOX_FACES.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
+}, transform);
 
 const withAngles = (pose, bone, angles) => ({ ...pose, rotations: { ...pose.rotations, [bone.id]: jointRotation(bone, angles) } });
 
@@ -137,23 +146,42 @@ const withAngles = (pose, bone, angles) => ({ ...pose, rotations: { ...pose.rota
  * Closes the digits of `handId` on `solid` (a posed solid, `clearance.mjs`, `posedSolid`), each joint in turn from the
  * knuckle out: a joint flexes from where the pose holds it until the part it moves, or any beyond it, touches the item,
  * or until its limit; the next joint then goes on from there, so a finger wraps a handle and a fingertip stops on a
- * surface. Digits that touch nothing close fully. Returns the pose and, per digit, how far it closed and whether it touched.
+ * surface. The fingers close first and the thumb last, on the item and on the closed fingers, so it comes to rest over
+ * them rather than through them. Digits that touch nothing close fully. Returns the pose and, per digit, how far it
+ * closed and whether it touched.
  */
 export function closeHand(rig, pose, handId, solid) {
   const closed = {};
-  for (const [digit, chain] of digitsOf(rig, handId)) {
+  const digits = [...digitsOf(rig, handId)].sort(([a], [b]) => (a === 'thumb') - (b === 'thumb'));
+  for (const [digit, chain] of digits) {
+    const fingers = digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
+    const transforms = boneTransforms(rig.bones, pose);
+    const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind.box, transforms.get(bone.id)))];
+    const apart = (p, moved) => nearest(rig, p, moved, solids) > CONTACT;
     let touched = false;
     chain.forEach((bone, k) => {
+      // A thumb its root has laid on the item or the fingers keeps its phalanges as posed, pressing its pad where it
+      // landed; bending them on would only lift the pad off.
+      if (digit === 'thumb' && touched) return;
       const moved = chain.slice(k);
       const [flex, twist, abduct] = jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M);
       const at = (f) => withAngles(pose, bone, clampJointAngles(bone, [f, twist, abduct]));
-      // Open and closed as this copy flexes: the far end of its range in the sense that curls toward the palm.
-      let open = flex, closed = bone.sense[0] > 0 ? bone.limits.flex[1] : bone.limits.flex[0];
-      if (nearest(rig, at(open), moved, solid) <= CONTACT) { touched = true; return; }
-      if (nearest(rig, at(closed), moved, solid) > CONTACT) { pose = at(closed); return; }
+      if (!apart(at(flex), moved)) { touched = true; return; }
+      // The far end of the joint's range in the sense that closes: a phalanx curls toward the palm, while the thumb's
+      // root, which a grip opens wide (lifted off the palm), comes back down onto the item from beyond it.
+      const lowers = digit === 'thumb' && k === 0;
+      const end = (bone.sense[0] > 0) !== lowers ? bone.limits.flex[1] : bone.limits.flex[0];
+      // Swept in steps, not judged at the far end alone, so a part cannot pass through a thin item to rest beyond it.
+      let open = flex, closed = end;
+      for (let i = 1; i <= SWEEP; i++) {
+        const next = flex + ((end - flex) * i) / SWEEP;
+        if (!apart(at(next), moved)) { closed = next; break; }
+        open = next;
+      }
+      if (open === end) { pose = at(end); return; }
       for (let i = 0; i < STEPS; i++) {
         const mid = (open + closed) / 2;
-        if (nearest(rig, at(mid), moved, solid) > CONTACT) open = mid; else closed = mid;
+        if (apart(at(mid), moved)) open = mid; else closed = mid;
       }
       pose = at(open);
       touched = true;
@@ -177,6 +205,7 @@ export function holdIssues(rig, handId, hold) {
   const issues = [];
   const hand = boneById(rig).get(handId);
   if (!hand?.reach) issues.push(`hold.${handId}: ${handId} is not a reach bone`);
+  else if (!(hand.grip >= 0 && hand.grip <= 1)) issues.push(`hold.${handId}: ${handId} has no grip share in [0, 1]`);
   for (const key of Object.keys(hold)) if (!HOLD_KEYS.has(key)) issues.push(`hold.${handId}: unknown key ${key}`);
   if (typeof hold.model !== 'string') issues.push(`hold.${handId}.model names a model`);
   if (hold.at !== undefined && !isVector(hold.at)) issues.push(`hold.${handId}.at is a finite point [x, y, z]`);
@@ -199,12 +228,13 @@ const triad = (into, axis) => {
   return [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]];
 };
 
-// The hand's own socket in rest doll axes: the middle of the palm's face, the palm's normal and the thumb's direction
-// along the knuckle row, read off the palm part's box and which way the part faces.
+// The hand's own socket in rest doll axes: the palm's face where the hand's `grip` share of the palm's length from the
+// wrist crosses it, the palm's normal and the thumb's direction along the knuckle row, read off the palm part's box and
+// which way the part faces.
 const palmSocket = (hand) => {
   const { min, max } = hand.bind.box;
   const sign = hand.bind.mirror ? -1 : 1;
-  return { at: [sign > 0 ? max[0] : min[0], (min[1] + max[1]) / 2, (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, 0, 1] };
+  return { at: [sign > 0 ? max[0] : min[0], max[1] + hand.grip * (min[1] - max[1]), (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, 0, 1] };
 };
 
 // How far a rotation turns, in degrees.

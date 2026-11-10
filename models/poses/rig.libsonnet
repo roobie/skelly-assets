@@ -76,7 +76,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 4,
+  revision: 5,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -94,7 +94,10 @@ local thumbBones = {
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30, 170] } },
     forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true,
                    limits: { flex: [0, 150], twist: [-80, 80], abduct: [0, 0] } },
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', reach: { pole: [0.3, 0, -1] },
+    // `grip`: where a held handle crosses the palm, as a share of its length from the wrist (site/fingers.mjs,
+    // `palmSocket`). A power grip seats the handle at the crease just short of the knuckles, so the curling fingers
+    // meet it pad by pad; seated further back, they sweep past its far side before they reach it.
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', reach: { pole: [0.3, 0, -1] }, grip: 0.95,
                 limits: { flex: [-70, 80], twist: [0, 0], abduct: [-25, 20] } },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0],
                  limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },

@@ -63,6 +63,15 @@ the same hand leaves the tips millimetres off a handle and runs into limits ever
 handle the hand can span, with no per-item tuning beyond the socket. CCD remains in the module (`solveCCD`) for a
 fingertip that must land on a point, such as a button, which a grip is not.
 
+The palm meets a handle at the grip crease near the knuckles (the hand bone's `grip` share), not the palm's middle:
+fingers curled from a handle seated mid-palm sweep past its far side before their pads reach it, and close to their
+limits in the air. The thumb is long enough (`models/measures/arm.libsonnet`, `thumbLength`) to reach round a handle
+seated there to the fingers' backs, as an adult's reaches past the index knuckle. The fingers close first and the
+thumb last, on the item and the closed fingers, because a power grip's thumb lies over the fingers rather than under
+them. The thumb starts lifted wide and its root comes down onto the item from beyond, since lifting it from the palm
+side would drive it through the haft it should wrap. Each joint's swing is checked in steps rather than at its end
+alone, so no part passes through a thin item to rest beyond.
+
 ## Out of scope
 
 - **A solver shared with mobgen**, with the doll's frames and limits given to mobgen's humanoid, waits for a humanoid

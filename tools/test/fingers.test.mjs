@@ -8,7 +8,7 @@ import { applyPoint, boneTransforms, frameAbout, jointAngles, jointRotation, len
 // reference side does, one finger of three phalanges hangs from it, flexing about the knuckle row so positive flex
 // curls toward the palm, and a thumb of three bones hangs beside its front edge (+z) in the same frame, its root free
 // to swing, roll and lift (models/poses/rig.libsonnet). The arm above is there for the hold's two-bone reach, its
-// forearm pronating as the doll's does.
+// forearm pronating as the doll's does. A held handle crosses the palm near the knuckles, at the hand's grip share.
 const wide = { flex: [-90, 90], twist: [-90, 90], abduct: [-90, 90] };
 const sense = [1, 1, 1];
 const bone = (id, parent, head, tail, box, flexAxis, limits, extra = {}) => ({
@@ -28,7 +28,7 @@ const rig = {
   bones: [
     bone('upper', null, [0, 1.5, 0], [0, 1.2, 0], box([-0.04, 1.2, -0.04], [0.04, 1.5, 0.04]), [-1, 0, 0], wide),
     bone('fore', 'upper', [0, 1.2, 0], [0, 0.95, 0], box([-0.03, 0.95, -0.03], [0.03, 1.2, 0.03]), [-1, 0, 0], { flex: [0, 150], twist: [0, 0], abduct: [0, 0] }, { pronates: true }),
-    bone('hand', 'fore', [0, 0.95, 0], [0, 0.86, 0], box([-0.012, 0.86, -0.04], [0.012, 0.95, 0.04]), [-1, 0, 0], wide, { reach: { chain: ['upper', 'fore'], pole: [0, 0, -1] } }),
+    bone('hand', 'fore', [0, 0.95, 0], [0, 0.86, 0], box([-0.012, 0.86, -0.04], [0.012, 0.95, 0.04]), [-1, 0, 0], wide, { reach: { chain: ['upper', 'fore'], pole: [0, 0, -1] }, grip: 0.9 }),
     phalanx(0, [0, 0.86, 0], { flex: [-20, 90], twist: [0, 0], abduct: [-15, 15] }),
     phalanx(1, [0, 0.83, 0], { flex: [0, 110], twist: [0, 0], abduct: [0, 0] }),
     phalanx(2, [0, 0.80, 0], { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }),
@@ -40,6 +40,8 @@ const rig = {
 const bones = new Map(rig.bones.map((b) => [b.id, b]));
 const rest = { root: [0, 0, 0], rotations: {} };
 const near = (a, b, tolerance = 1e-9) => assert.ok(length(sub(a, b)) < tolerance, `${a} is not ${b}`);
+// The palm's face where a held handle crosses it, at rest.
+const gripAt = [-0.012, 0.95 - 0.9 * 0.09, 0];
 
 // A closed box mesh, as a held item's mesh comes.
 const boxMesh = ({ min, max }) => {
@@ -84,20 +86,42 @@ test('a preset names a shorthand, and a shorthand over it changes only what it s
   assert.match(handIssues(rig, 'hand', 'wave').join(), /no preset wave/);
 });
 
-test('a hand closes on a handle by contact, each phalanx stopping on it and none sinking in', () => {
-  // A haft a finger's span wide lying along the knuckle row, against the palm face and below the knuckle, out of the
-  // thumb's reach.
-  const handle = { min: [-0.039, 0.833, -0.1], max: [-0.012, 0.86, 0.1] };
-  const solid = posedSolid(boxMesh(handle), { r: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [0, 0, 0] });
+// A square haft `width` across lying along the knuckle row, seated on the palm's grip socket as a hold without a place
+// seats it, reaching `span` either side of the palm's middle.
+const seatedHaft = (width, span) => {
+  const handle = { min: [-width / 2, -width / 2, -span], max: [width / 2, width / 2, span] };
+  const { item } = holdItem(rig, rest, 'hand', { model: 'haft', socket: { at: [width / 2, 0, 0], into: [-1, 0, 0], axis: [0, 0, 1] } }, []);
+  return { solid: posedSolid(boxMesh(handle), item), centre: applyPoint(item, [0, 0, 0]) };
+};
+
+test('a hand closes round a haft on its grip socket, every phalanx resting on it and the fingertip wrapping past it', () => {
+  // The haft spans the finger only, so the thumb meets nothing.
+  const { solid, centre } = seatedHaft(0.024, 0.02);
   const { pose, closed } = closeHand(rig, rest, 'hand', solid);
   assert.ok(closed.index.touched, 'the finger touches the haft');
+  const transforms = boneTransforms(rig.bones, pose);
   for (const id of ['index', 'index2', 'index3']) {
-    const [flex] = closed.index.angles[id];
-    assert.ok(flex > 0 && flex < bones.get(id).limits.flex[1], `${id} stops on the haft, not at a limit`);
-    assert.ok(signedDepth(solid, tipOf(pose, id), 0.05) > -0.0015, `${id} sinks into the haft`);
+    // The pad is the phalanx's palm-side face, -x at rest.
+    const { min, max } = bones.get(id).bind.box;
+    const pad = applyPoint(transforms.get(id), [min[0], (min[1] + max[1]) / 2, 0]);
+    const gap = signedDepth(solid, pad, 0.05);
+    assert.ok(gap > -0.0015 && gap < 0.005, `${id}'s pad rests on the haft, not ${gap * 1000} mm off it`);
   }
-  assert.ok(tipOf(pose, 'index3')[0] < handle.min[0], 'the fingertip wraps past the far side of the haft');
-  assert.ok(!closed.thumb.touched && closed.thumb.angles.thumb[0] === bones.get('thumb').limits.flex[1], 'a digit that meets nothing closes to its limit');
+  assert.ok(tipOf(pose, 'index3')[0] < centre[0], 'the fingertip wraps past the haft\'s middle');
+  const thumb = bones.get('thumb');
+  assert.ok(!closed.thumb.touched && closed.thumb.angles.thumb[0] === thumb.limits.flex[0], 'a digit that meets nothing closes fully');
+});
+
+test('a thumb lifted wide comes down on the far side of a haft, not through it', () => {
+  // The haft spans the thumb too; lifted, the thumb stands beyond it, and lowered all the way it would lie behind it.
+  const { solid, centre } = seatedHaft(0.024, 0.06);
+  const lifted = posedBy(handAngles(rig, 'hand', { thumb: { lift: 1 } }));
+  const { pose, closed } = closeHand(rig, lifted, 'hand', solid);
+  const [lift] = closed.thumb.angles.thumb;
+  const { flex } = bones.get('thumb').limits;
+  assert.ok(closed.thumb.touched && lift > flex[0] && lift < flex[1], `the thumb stops on the haft, not at a limit (${lift})`);
+  for (const id of ['thumb', 'thumb2', 'thumb3']) assert.ok(signedDepth(solid, tipOf(pose, id), 0.05) > -0.0015, `${id} sinks into the haft`);
+  assert.ok(tipOf(pose, 'thumb3')[0] < centre[0], 'the thumb tip rests beyond the haft\'s middle');
 });
 
 test('a held item without a place follows the posed palm, its socket on the palm face with the thumb along its axis', () => {
@@ -106,7 +130,7 @@ test('a held item without a place follows the posed palm, its socket on the palm
   const { item, residual } = holdItem(rig, pose, 'hand', { model: 'thing', socket }, []);
   assert.equal(residual, 0);
   const t = boneTransforms(rig.bones, pose).get('hand');
-  near(applyPoint(item, socket.at), applyPoint(t, [-0.012, 0.905, 0]));
+  near(applyPoint(item, socket.at), applyPoint(t, gripAt));
   near(mulMV(item.r, socket.into), mulMV(t.r, [-1, 0, 0]));
   near(mulMV(item.r, socket.axis), mulMV(t.r, [0, 0, 1]));
 });
@@ -116,7 +140,7 @@ const limited = (id, twist) => (bone) => (bone.id === id ? { ...bone, limits: { 
 const twisting = { ...rig, bones: rig.bones.map(limited('fore', [-80, 80])).map(limited('hand', [0, 0])) };
 const socket = { at: [0, 0, 0], into: [-1, 0, 0], axis: [0, 0, 1] };
 // A hold whose socket is the palm's rest face carried to `wrist` and turned by `turn`, so the reach puts the wrist there.
-const holdAt = (wrist, turn) => ({ model: 'thing', at: applyPoint({ r: turn, t: wrist }, [-0.012, -0.045, 0]), turn: mat3ToQuat(turn), socket });
+const holdAt = (wrist, turn) => ({ model: 'thing', at: applyPoint({ r: turn, t: wrist }, sub(gripAt, [0, 0.95, 0])), turn: mat3ToQuat(turn), socket });
 const wristOf = (pose) => applyPoint(boneTransforms(twisting.bones, pose).get('hand'), bones.get('hand').head);
 
 test('a hold turns the palm onto a socket by twisting the forearm where the wrist cannot twist', () => {

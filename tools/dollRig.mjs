@@ -92,6 +92,7 @@ export function dollRig(content, doll, dressing) {
         ...(spec.spread !== undefined ? { spread: spec.spread } : {}),
         ...(spec.absorbs ? { absorbs: spec.absorbs } : {}),
         ...(spec.pronates ? { pronates: true } : {}),
+        ...(spec.grip !== undefined ? { grip: spec.grip } : {}),
       });
     }
   }
