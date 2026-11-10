@@ -1,0 +1,12 @@
+{
+  "rig": { "id": "doll", "revision": 1 },
+  "angles": {
+    "spine": [0, 80, 0],
+    "neck": [0, -30, 0],
+    "upperArm.R": [40, 0, -20],
+    "forearm.R": [60, 0, 0],
+    "upperArm.L": [-20, 0, 20],
+    "forearm.L": [30, 0, 0]
+  },
+  "ground": true
+}
