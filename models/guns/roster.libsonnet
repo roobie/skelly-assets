@@ -10,6 +10,7 @@
     { id: 'rifle_hunting', design: 'hunting-rifle', weapon: 'rifle' },
     { id: 'revolver', design: 'archetype-revolver', weapon: 'handgun' },
     { id: 'pistol_service', design: 'service-nine', weapon: 'handgun' },
+    { id: 'rifle_pipe', design: 'pipe-rifle', weapon: 'rifle' },
   ],
   // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids;
   // `definition` is the cartridge itself, which may name its own grain.
@@ -53,5 +54,5 @@
   ],
   // Every catalogue part exports as its loose part. A part whose id names one of these actions or frames belongs to
   // its weapon class.
-  partWeapons: { ak: 'rifle', ar: 'rifle', sporter: 'rifle', pump: 'shotgun', pistol: 'handgun', revolver: 'handgun' },
+  partWeapons: { ak: 'rifle', ar: 'rifle', sporter: 'rifle', pipe: 'rifle', pump: 'shotgun', pistol: 'handgun', revolver: 'handgun' },
 }

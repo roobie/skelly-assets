@@ -15,6 +15,7 @@ models/guns/designs/archetype-revolver.json
 models/guns/designs/compact-smg.json
 models/guns/designs/compact-smg-plain.json
 models/guns/designs/hunting-rifle.json
+models/guns/designs/pipe-rifle.json
 models/guns/designs/service-nine.json
 models/guns/references/*.json
 models/guns/tables/*.json

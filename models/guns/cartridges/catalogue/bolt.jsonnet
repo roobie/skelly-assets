@@ -14,5 +14,6 @@ local outerWallU = 0.25;
     import '../5.56x45.jsonnet',
     import '../7.62x39.jsonnet',
     import '../7.62x51.json',
+    import '../9x19.jsonnet',
   ],
 }

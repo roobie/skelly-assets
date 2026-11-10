@@ -100,7 +100,9 @@ it('derives travel from the cartridge even beyond the old class stroke', () => {
   }
   for (const { assembly } of designs) {
     const action = resolveGunAction(resolve(assembly, gunDomain))!;
-    expect(action.cycle.strokeUnits).toBeCloseTo(boltStrokeUnits(BOLT_CARTRIDGE));
+    const carrier = Object.values(assembly.parts).find((part) => part.params?.pattern === 'bolt');
+    const calibre = carrier?.params?.boltCalibre as string | undefined;
+    expect(action.cycle.strokeUnits).toBeCloseTo(boltStrokeUnits(boltCartridge(calibre)));
   }
 });
 
@@ -277,4 +279,24 @@ it('exports integral capacity from the well, iron or fitted-optic sights, and a 
       'turning parts need unlock and lock phases in every referenced timeline',
     );
   }
+});
+
+it('accepts and exports a top-loaded action over a well-less lower as a hand-fed single-shot', () => {
+  const loaded = loadGunDesign(designText('pipe-rifle'));
+  if (!loaded.ok) {
+    throw new Error(loaded.error.message);
+  }
+  expect(validate(loaded.design.assembly, gunDomain).issues).toEqual([]);
+  const out = exportFileText(designText('pipe-rifle'), {
+    id: 'fixture_single_shot',
+    file: 'assets/models/fixture_single_shot.glb',
+  });
+  if (!out.ok) {
+    throw new Error(out.message);
+  }
+  const model = parseModel(out.modelEntry);
+  expect(model.gun.action?.hand).toBeDefined();
+  expect(model.gun.internalMagazine).toBeUndefined();
+  expect(model.gun.slots?.magazine).toBeUndefined();
+  expect(model.anchors?.loading_port).toBeDefined();
 });
