@@ -19,7 +19,7 @@
   bumperFinish: 'paint-oxblood',
   driver: { x: 4.55, y: 1.42, z: 0.62 },
   dashTop: 1.85, dashShelfTop: 1.68,
-  shellMass: 10050,
+  shellMass: 9180,
   mirrorAt: [5.65, 3.35, 1.27], tailLampAt: [-6.13, 1.05, 1.1], headlampAt: [6.1, 0.78, 0.95],
   seats: [{ part: 'bus_seat_coach', x: 3.45 - 0.8 * i, y: 1.42, z: 0.72, sides: 'both' } for i in std.range(0, 11)],
   hold: { rear: -2.28, front: 2.58, y: 0.5 },

@@ -13,7 +13,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck',
   k.compound('refuse_truck_subframe', 460, k.bothSides([
     box('runner', 'frame', [s.bodyRear - 1.4, s.railTop, 0.34], [s.bodyFront, s.bodyLow, 0.46]),
   ]), finish),
-  k.compound('refuse_truck_body', 3200, [
+  k.compound('refuse_truck_body', 4500, [
     layer('wall', 1.24, 0.45),
     layer('shoulder', 1.18, 0.25),
     layer('crown', 1.04, 0.1),
@@ -25,7 +25,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck',
     box('rib_' + i, 'paint', [ribs[i] - 0.05, s.bodyLow + 0.14, 1.24], [ribs[i] + 0.05, s.bodyRise - 0.47, 1.25])
     for i in std.range(0, 5)
   ]), finish),
-  k.compound('refuse_truck_hopper', 1500, [
+  k.compound('refuse_truck_hopper', 1800, [
     prism('hood', 'paint', hood, [-s.cheekIn, s.cheekIn]),
     prism('bowl', 'rust', [[s.hopperRear + 0.45, 0.95], [s.bodyRear, 0.95], [s.bodyRear, 1.3], [s.hopperRear, s.hopperSill], [s.hopperRear, s.hopperSill - 0.05]], [-s.cheekIn, s.cheekIn]),
     box('lip', 'steel', [s.hopperRear - 0.03, s.hopperSill - 0.1, -s.cheekIn], [s.hopperRear + 0.06, s.hopperSill + 0.01, s.cheekIn]),
@@ -39,10 +39,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck',
     box('grab_low', 'dark', [s.hopperRear - 0.02, s.hopperSill + 0.05, 1.125], [s.hopperRear, s.hopperSill + 0.08, 1.155]),
     box('grab_high', 'dark', [s.hopperRear - 0.02, s.hopperLintel - 0.03, 1.125], [s.hopperRear, s.hopperLintel, 1.155]),
   ]), finish),
-  k.compound('refuse_truck_packer', 420, [
+  k.compound('refuse_truck_packer', 800, [
     prism('blade', 'steel', [[s.bodyRear - 1.0, 1.55], [s.bodyRear - 0.55, 1.45], [s.bodyRear - 0.5, s.hopperLintel + 0.02], [s.bodyRear - 0.72, s.hopperLintel + 0.02]], [-1.08, 1.08]),
   ], finish),
-  k.compound('refuse_truck_bin_lift', 240, [
+  k.compound('refuse_truck_bin_lift', 230, [
     box('bar', 'steel', [s.hopperRear - 0.12, 1.2, -0.82], [s.hopperRear - 0.04, 1.28, 0.82]),
     box('comb', 'dark', [s.hopperRear - 0.14, 1.36, -0.82], [s.hopperRear - 0.1, 1.44, 0.82]),
   ] + k.bothSides([

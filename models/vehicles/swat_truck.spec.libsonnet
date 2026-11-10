@@ -1,4 +1,4 @@
-// A bonneted armoured response truck: 6.15 m long, 2.44 m wide, 2.75 m high, 3.5 m wheelbase, about 9 t at the kerb.
+// A bonneted armoured response truck: 6.15 m long, 2.44 m wide, 2.75 m high, 3.5 m wheelbase, about 7.7 t at the kerb.
 // A slab-sided crew box with slit windows and rear doors, a shallow windowed cab and a ram bar. Metres in the vehicle frame.
 {
   rear: -3.1, front: 2.72, side: 1.2, face: 1.1, cabBack: -0.25, doorRear: -0.17, doorFront: 0.94,
@@ -8,7 +8,7 @@
   railBottom: 0.6, railTop: 0.84,
   engine: 'engine_i6_diesel', engineLength: 0.86, gearbox: 'gearbox_truck', radiator: 'radiator_truck',
   paint: 'paint-police-blue',
-  chassisMass: 2600, shellMass: 1150,
+  chassisMass: 900, shellMass: 1150,
   bonnet: { nose: 2.6, back: 1.68, front: 1.52, z: 0.62 },
   engineX: 1.75, engineY: 0.5, radiatorX: 2.42, radiatorY: 0.55,
   bumperLow: 0.48, bumperTop: 0.84, tankX: -0.45, batteryX: -0.45, exhaustX: -1.0, exhaustY: 0.56,

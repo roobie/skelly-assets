@@ -181,7 +181,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
     box('leg', 'dark', [-0.05, -0.18, 0.18], [0.05, 0, 0.26]),
   ]), { dark: 'steel-spall-black' }),
   m.wheel('crashed_military_helicopter_main_wheel', 45, 0.24, 0.16, 0.36, hub='steel-spall-black'),
-  k.compound('crashed_military_helicopter_gear_strut', 40, [
+  k.compound('crashed_military_helicopter_gear_strut', 20, [
     lean('leg', 'steel', [0.1, 0.24], [0.28, 1.56], [0.42, 1.16], 0.05),
     box('axle', 'steel', [0.12, 0.3, 1.5], [0.22, 0.38, 1.66]),
   ], { steel: 'steel-grey' }),

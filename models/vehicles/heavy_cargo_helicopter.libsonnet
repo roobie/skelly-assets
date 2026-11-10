@@ -121,8 +121,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('heavy_cargo_helicopter_fuel_tank', 140, [
     box('tank', 'alu', [-2.4, 0.02, -0.2], [2.4, 0.92, 0.2]),
   ], { alu: 'alu-bare' }),
-  h.mainGear('heavy_cargo_helicopter_front_gear', 200, s.frontGear.x, s.frontGear.radius, s.frontGear.width, s.frontGear.z, s.frontGear.top, s.frontGear.root),
-  h.mainGear('heavy_cargo_helicopter_rear_gear', 220, s.rearGear.x, s.rearGear.radius, s.rearGear.width, s.rearGear.z, s.rearGear.top, s.rearGear.root),
+  h.mainGear('heavy_cargo_helicopter_front_gear', 38, s.frontGear.x, s.frontGear.radius, s.frontGear.width, s.frontGear.z, s.frontGear.top, s.frontGear.root),
+  h.mainGear('heavy_cargo_helicopter_rear_gear', 26, s.rearGear.x, s.rearGear.radius, s.rearGear.width, s.rearGear.z, s.rearGear.top, s.rearGear.root),
   m.wheel('heavy_cargo_helicopter_wheel', 62, s.frontGear.width, 0.22, s.frontGear.radius),
   k.compound('heavy_cargo_helicopter_crew_seat', 24, [
     box('pan', 'dark', [-0.26, 0, -0.26], [0.24, 0.3, 0.26]),

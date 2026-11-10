@@ -55,7 +55,7 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     doors: [{ bay: 1 }],
     rearHoles: city.rearHoles, engineHatch: city.engineHatch,
     tailLampAt: [-9.03, 0.95, 1.1],
-    shellMass: 5300,
+    shellMass: 4470,
     seats: [
       seat(-2.1, 0.36, 'both'),
       seat(-2.9, 0.36, 'both'),

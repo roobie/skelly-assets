@@ -44,7 +44,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('foot', 'frame', [1.55, s.railTop, -0.46], [2.08, s.beamY, 0.46]),
     box('gear', 'frame', [1.68, 1.68, -0.42], [1.98, 2.28, 0.42]),
   ], finish),
-  k.compound('cement_mixer_drum', 2400, drumPieces, finish),
+  k.compound('cement_mixer_drum', 3000, drumPieces, finish),
   k.compound('cement_mixer_roller_stand', 70, [
     box('post', 'yellow', [rollerX - 0.2, s.beamTop, 0.46], [rollerX + 0.2, rollerY, 0.72]),
     box('foot', 'frame', [rollerX - 0.24, s.beamY, 0.46], [rollerX + 0.24, s.beamTop, 0.76]),

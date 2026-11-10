@@ -5,5 +5,5 @@
   cabBack: -0.3, doorRear: -0.22, doorFront: 0.72, windowFront: 0.62, cowl: 0.98, bonnetBackY: 1.1, bonnetFrontY: 1.03, wingTop: 1.04,
   bedFront: -0.38, deckBottom: 0.8125, deckTop: 0.84375, bedTop: 1.22,
   pedestalX: -1.1,
-  cabMass: 430, frameMass: 190,
+  cabMass: 430, frameMass: 194,
 }

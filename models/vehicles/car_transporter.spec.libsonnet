@@ -3,7 +3,7 @@
   rear: -5.5, front: 5.5, face: 5.42, cabBack: 3.6, doorRear: 3.68,
   roof: 2.62, frontAxle: 4.5, rearAxles: [-2.6, -3.95],
   paint: 'paint-oxblood',
-  chassisMass: 4800,
+  chassisMass: 1400,
   lowerTop: 1.19, lowerBottom: 1.1, lowerFront: 3.45,
   upperTop: 2.885, upperBottom: 2.8, upperRear: -4.3, upperFront: 3.5,
   deckSide: 1.2, postIn: 1.13, postOut: 1.24,

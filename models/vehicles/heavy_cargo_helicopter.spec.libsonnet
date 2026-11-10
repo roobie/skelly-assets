@@ -23,5 +23,5 @@
     { x: -6.0, top: 3.85, bottom: 0.55, half: 1.85, waist: 1.0 },
     { x: -8.0, top: 3.78, bottom: 2.2, half: 1.65, waist: 2.5 },
   ],
-  shellMass: 1500, paint: 'paint-olive', trim: 'paint-charcoal',
+  shellMass: 1856, paint: 'paint-olive', trim: 'paint-charcoal',
 }

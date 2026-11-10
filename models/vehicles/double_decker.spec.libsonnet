@@ -26,7 +26,7 @@ local upper = 2.45;
   bumperFinish: 'plastic-black',
   driver: { x: 3.95, y: 0.72, z: 0.72 },
   dashTop: 1.32,
-  shellMass: 8320,
+  shellMass: 7720,
   mirrorAt: [4.97, 2.7, 1.27], tailLampAt: [-5.28, 0.95, 1.1], headlampAt: [5.25, 0.72, 0.95],
   seats:
     [single(x, 'near') for x in [3.05, 2.5]]

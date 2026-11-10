@@ -13,7 +13,7 @@ local cabIn = 0.55;
 local cabOut = 1.15;
 local cabRoof = 2.98;
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane', s) + [
-  k.compound('mobile_crane_deck', 1800, [
+  k.compound('mobile_crane_deck', 3000, [
     box('plate', 'paint', [s.deckRear, s.deckLow, -s.side], [s.deckFront, s.deckTop, s.side]),
     box('tread', 'steel', [0.4, s.deckTop, -s.side], [3.7, s.deckTop + 0.03, -0.9]),
     box('tread_near', 'steel', [0.4, s.deckTop, 0.9], [3.7, s.deckTop + 0.03, s.side]),
@@ -22,7 +22,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     box('stripe', 'reflect', [s.deckRear, s.deckTop - 0.06, s.side], [s.deckFront, s.deckTop - 0.01, s.side + 0.032]),
     box('second_axle_spring', 'steel', [s.secondAxle - 0.62, s.r + 0.04, s.railZ], [s.secondAxle + 0.62, s.railBottom, s.railZ + 0.1]),
   ]), finish),
-  k.compound('mobile_crane_outrigger', 700, [
+  k.compound('mobile_crane_outrigger', 1000, [
     box('beam', 'frame', [-0.24, 0.95, 0], [0.24, s.deckLow, s.side - 0.02]),
     box('end_plate', 'paint', [-0.26, 0.93, s.side - 0.1], [0.26, s.deckLow, s.side + 0.04]),
     box('sleeve', 'paint', [-0.13, 0.7, s.side - 0.06], [0.13, 0.95, s.side + 0.04]),
@@ -36,10 +36,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     box('door_a', 'paint', [-0.4, 0.76, s.side - 0.02], [0.35, 1.12, s.side + 0.012]),
     box('door_b', 'paint', [0.4, 0.76, s.side - 0.02], [1.15, 1.12, s.side + 0.012]),
   ]), finish),
-  k.compound('mobile_crane_slew_ring', 800, [
+  k.compound('mobile_crane_slew_ring', 1200, [
     k.turned('ring', 'frame', 'y', k.disc(1.02, s.deckTop, s.ringTop), [s.ringX, 0, 0]) + { sides: 24 },
   ], finish),
-  k.compound('mobile_crane_turret', 1800, [
+  k.compound('mobile_crane_turret', 3500, [
     box('platform', 'paint', [s.turretRear, s.ringTop, -s.turretSide], [s.turretFront, s.turretTop, s.turretSide]),
   ] + k.bothSides([
     box('foot_plate', 'frame', [-3.94, s.turretTop, 0.36], [-3.16, s.turretTop + 0.1, 0.52]),
@@ -47,7 +47,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     k.bar('cheek_front', 'paint', [-3.24, s.turretTop + 0.1], [-3.6, y + 0.14], 0.3, [0.36, 0.5]),
     k.turned('pin', 'steel', 'z', k.disc(0.13, 0.36, 0.54), [s.boomButt + 0.14, y, 0]) + { sides: 12 },
   ]), finish),
-  k.compound('mobile_crane_counterweight', 8000, [
+  k.compound('mobile_crane_counterweight', 12000, [
     box('slab_' + i, 'weight', [slabs[i], s.turretTop, -s.turretSide], [slabs[i] + 0.28, 2.86, s.turretSide])
     for i in std.range(0, std.length(slabs) - 1)
   ] + [
@@ -86,23 +86,23 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
   ] + k.bothSides([
     box('cheek', 'paint', [-4.36, 2.86, 0.32], [-4.04, 3.3, 0.38]),
   ]), finish),
-  k.compound('mobile_crane_boom_base', 2600, [
+  k.compound('mobile_crane_boom_base', 4200, [
     section('base', 'paint', s.boomButt, 1.0, 0.31, 0.36),
     box('butt_lug', 'frame', [s.boomButt - 0.06, y - 0.16, -0.36], [s.boomButt + 0.3, y + 0.16, 0.36]),
     box('collar', 'frame', [0.82, y - 0.34, -0.39], [1.0, y + 0.34, 0.39]),
     box('rope_guard', 'rope', [-3.6, y + 0.31, -0.04], [1.0, y + 0.34, 0.04]),
   ], finish),
-  k.compound('mobile_crane_boom_stage_1', 1400, [
+  k.compound('mobile_crane_boom_stage_1', 2600, [
     section('stage', 'paint', 1.0, 3.0, 0.26, 0.3),
     box('collar', 'frame', [2.84, y - 0.29, -0.33], [3.0, y + 0.29, 0.33]),
     box('rope', 'rope', [1.0, y + 0.26, -0.04], [3.0, y + 0.29, 0.04]),
   ], finish),
-  k.compound('mobile_crane_boom_stage_2', 1000, [
+  k.compound('mobile_crane_boom_stage_2', 1900, [
     section('stage', 'paint', 3.0, 4.6, 0.22, 0.25),
     box('collar', 'frame', [4.46, y - 0.25, -0.28], [4.6, y + 0.25, 0.28]),
     box('rope', 'rope', [3.0, y + 0.22, -0.04], [4.6, y + 0.25, 0.04]),
   ], finish),
-  k.compound('mobile_crane_boom_stage_3', 700, [
+  k.compound('mobile_crane_boom_stage_3', 1300, [
     section('stage', 'paint', 4.6, 5.9, 0.18, 0.2),
     box('rope', 'rope', [4.6, y + 0.18, -0.04], [5.9, y + 0.21, 0.04]),
     box('head', 'frame', [5.9, y - 0.3, -0.16], [6.14, y + 0.24, 0.16]),
