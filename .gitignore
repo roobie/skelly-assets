@@ -2,5 +2,6 @@
 _site/
 tools/.build/
 models/recipes/*.json
+models/finishes.json
 built/
 look/

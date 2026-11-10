@@ -32,7 +32,7 @@ const loadRecipeTools = async () => {
         'packages/gun-authoring-tool/src',
       ],
       // The gun code imports its tables, cartridges and the materials as JSON, whatever the row.
-      data: ['packages/gun-authoring-tool/src', 'packages/gun-authoring-tool/cartridges', 'packages/thing-core/src'],
+      data: ['packages/gun-authoring-tool/src', 'packages/gun-authoring-tool/cartridges', '../models/finishes.json'],
     },
     thing: {
       kinds: thing.THING_KINDS,

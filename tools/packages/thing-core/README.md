@@ -11,7 +11,7 @@ read_if:
 # thing-core
 
 The modeling core shared by the thing and gun authoring tools. The neutral fields are
-`src/schema.ts`, `NeutralModelSchema`; the material content is `src/materials.jsonnet`,
+`src/schema.ts`, `NeutralModelSchema`; the material content is `models/finishes.jsonnet`,
 validated by `src/materials.ts`, `MaterialSchema`. See `things/README.md` for the boundary's
 reasons and `things/WORK.md`, "Phases" for the remaining suite work.
 

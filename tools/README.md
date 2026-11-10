@@ -44,8 +44,8 @@ than in consumer-specific builders, so shared shapes have one mesh and collision
 
 ### thing-core
 
-`packages/thing-core` originates at the reference commit. Its material source retains the assets catalogue and
-arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
+`packages/thing-core` originates at the reference commit. Its material table, `../models/finishes.jsonnet`, retains the
+assets catalogue and arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
 schemas keep game-owned temporal brands outside the tool pipeline.
 
 ### thing-export
