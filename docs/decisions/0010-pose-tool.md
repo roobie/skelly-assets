@@ -4,7 +4,6 @@ read_if:
   - changing the doll's rig, its joint limits, its reach poles or which side limits are written for
   - choosing an IK solver or an inverse-kinematics library for the doll or a mob
   - wondering why site/kinematics.mjs twins mobgen's pose maths in plain JS
-  - judging the clearance probe's margin or what counts as a garment showing the body through
   - adding fingers, grips or a solver shared with mobgen
 ---
 
@@ -39,9 +38,9 @@ standing figure as the page shows it. three.js's `CCDIKSolver` was not taken: it
 own per-axis Euler limits, a second limit convention on one rig.
 
 **Clearance as a probe, not a pinned count.** A garment rides its doll parts rigidly, so what a pose changes is at
-the joints. The probe (`site/clearance.mjs`, `clearanceProbe`) reports covered body points a pose shows through
-and garment points it newly sinks into the body, each past a margin (the rig's `clearance`), so a flush fit at rest
-is clean and a test can assert the property instead of a count that moves with every garment.
+the joints. The posing page and the pose sheet probe where a pose shows the body through its garment, so a test can
+assert the kind of finding instead of a count that moves with every garment; how findings are told apart is in
+`docs/decisions/0011-clearance-classified.md`.
 
 ## Out of scope
 

@@ -69,3 +69,22 @@ jobs:
         timeout-minutes: 3
       - run: node ../../sources.mjs
       - run: npm run test:sweeps
+
+  tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/tools
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('tools/package-lock.json') }}
+      - name: Install Playwright Chromium
+        timeout-minutes: 3
+        working-directory: tools
+        run: npx playwright install chromium
+      - run: node --test tools/test/*.test.mjs
+        env:
+          ASSETS_SWEEPS: '1'
