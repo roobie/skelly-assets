@@ -83,9 +83,10 @@ function worldMesh(object) {
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
-// joint, and `clearance()` gives the figure's covered surface at rest and the clearance probe over it, made when first
-// asked for, since a figure drawn only to be looked at needs neither. A piece rides the bone of the part copy it is drawn
-// in (its site's part and side); what no bone carries, such as a wearable placed whole, stays where the dressing put it.
+// joint, `pieces` lists the worn pieces with the bones they ride, and `clearance()` gives the figure's covered surface
+// at rest and the clearance probe over it, made when first asked for, since a figure drawn only to be looked at needs
+// neither. A piece rides the bone of the part copy it is drawn in (its site's part and side); what no bone carries,
+// such as a wearable placed whole, stays where the dressing put it.
 export async function buildFigure(data, wear) {
   const { rig } = data;
   const sites = dressedSites(data, wear);
@@ -127,7 +128,7 @@ export async function buildFigure(data, wear) {
     }
     return clearance;
   };
-  return { rig, root, marks, bones, clearance: covered };
+  return { rig, root, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
@@ -211,12 +212,25 @@ function drawTile(obj, size, views) {
   return tile.toDataURL('image/png');
 }
 
+// The figure the last call drew, kept for the next while it asks for the same wear, so a sweep through poses builds
+// the figure and its probe once.
+let kept;
+async function keptFigure(data, wear, skin) {
+  const key = JSON.stringify({ wear, skin });
+  if (kept?.key !== key) {
+    const figure = await buildFigure(data, wear);
+    if (skin) addCoveredSkin(figure, figure.clearance().surface);
+    kept = { key, figure };
+  }
+  return kept.figure;
+}
+
 // The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, drawn as a tile, with the
-// compile report, the clearance probe's findings and the skin check when asked, and the frame the pose compiled to.
+// pieces that ride its bones, the compile report, the clearance probe's findings and the skin check when asked, and the
+// frame the pose compiled to.
 async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false } = {}) {
   const data = await ready;
-  const figure = await buildFigure(data, wear);
-  if (skin) addCoveredSkin(figure, figure.clearance().surface);
+  const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
   const { frame, report } = compilePose(data.rig, file);
   applyFrame(figure, frame);
@@ -224,7 +238,7 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   const png = drawTile(figure.root, size, views);
   // The marks would draw over the skin check's masks.
   figure.marks.clear();
-  return { png, report, clearance: found, skin: skin ? skinCheck(figure.root, size, views) : null, frame };
+  return { png, pieces: figure.pieces, report, clearance: found, skin: skin ? skinCheck(figure.root, size, views) : null, frame };
 }
 
 window.posed = posed;
