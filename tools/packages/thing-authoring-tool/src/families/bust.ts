@@ -6,6 +6,9 @@ import { positive, spheroid } from './shapes.ts';
 /** The bust's segments: the head is its own part so a stance can lift it about the neck while the torso leans. */
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
 
+const region = <T extends ExtrudedPolygonSolid | BoxSolid | RevolvedSolid>(piece: string, solids: T[]): T[] =>
+  solids.map((solid) => ({ ...solid, display: { ...solid.display, piece } }));
+
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
 // neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit.
@@ -124,18 +127,24 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
     // A pectoral: a lens on the chest's front plane, its lower edge the visible fold.
     const pec = (id: string, side: 1 | -1) =>
       oval(id, 'skin', ys(chest + d.chestHeight * 0.3, chest + d.chestHeight * 0.72), { halfX: chestHalfX * 0.36, halfZ: 0.011, cx: side * chestHalfX * 0.46, cz: chestHalfZ - 0.011, power: 2 });
+    // Regions a worn shell's `covers` names, so a garment hides the skin it encloses: the trunk below the armpit,
+    // and the girdle above it, which stays drawn under a garment that leaves the shoulders bare.
     return [
-      oval('waist', 'skin', ys(waist, ribs), { halfX: d.waistWidth / 2, halfZ: d.waistDepth / 2, power: 3, cz: 0.002 }),
-      oval('ribs', 'skin', ys(ribs, chest), { halfX: d.ribWidth / 2, halfZ: d.ribDepth / 2, power: 3 }),
-      // The chest widens from the ribs over a short step, then carries the plane of the pectorals.
-      oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * 0.4), { halfX: chestHalfX * 0.95, halfZ: chestHalfZ - 0.002, power: 3.2 }),
-      oval('chest', 'skin', ys(chest + d.chestHeight * 0.35, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
-      pec('pec-left', 1),
-      pec('pec-right', -1),
-      trapezius('trap-left', 1),
-      trapezius('trap-right', -1),
-      deltoid('shoulder-left', 1),
-      deltoid('shoulder-right', -1),
+      ...region('trunk', [
+        oval('waist', 'skin', ys(waist, ribs), { halfX: d.waistWidth / 2, halfZ: d.waistDepth / 2, power: 3, cz: 0.002 }),
+        oval('ribs', 'skin', ys(ribs, chest), { halfX: d.ribWidth / 2, halfZ: d.ribDepth / 2, power: 3 }),
+        // The chest widens from the ribs over a short step, then carries the plane of the pectorals.
+        oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * 0.4), { halfX: chestHalfX * 0.95, halfZ: chestHalfZ - 0.002, power: 3.2 }),
+      ]),
+      ...region('shoulders', [
+        oval('chest', 'skin', ys(chest + d.chestHeight * 0.35, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
+        pec('pec-left', 1),
+        pec('pec-right', -1),
+        trapezius('trap-left', 1),
+        trapezius('trap-right', -1),
+        deltoid('shoulder-left', 1),
+        deltoid('shoulder-right', -1),
+      ]),
     ];
   }
   if (d.segment === 'neck') {
