@@ -1,4 +1,5 @@
 {
+  "rig": { "id": "doll", "revision": 1 },
   "angles": {},
   "ground": true
 }

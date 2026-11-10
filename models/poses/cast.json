@@ -1,4 +1,5 @@
 {
+  "rig": { "id": "doll", "revision": 1 },
   "angles": {
     "spine": [10, -15, 0],
     "neck": [-5, 15, 0],
@@ -9,8 +10,8 @@
     "thigh.L": [-8, 0, 5],
     "shin.L": [8, 0, 0]
   },
-  "ik": {
-    "hand.R": { "target": [-0.1, 0.4, 0.45], "pole": [-1, -1, -0.3] }
+  "reach": {
+    "hand.R": { "target": [-0.1, 1.19, 0.45], "pole": [-1, -1, -0.3] }
   },
   "level": ["foot.R", "foot.L"],
   "ground": true
