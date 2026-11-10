@@ -473,6 +473,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6),
   vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68),
   vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88),
+  vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95),
   gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3),
   gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3),
   gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42),
