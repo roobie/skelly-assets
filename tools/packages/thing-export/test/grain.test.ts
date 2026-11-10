@@ -4,7 +4,7 @@ import { compileJsonnetFile } from '../../../jsonnet/index.mjs';
 
 const fixture = (name: string) => resolve(import.meta.dirname, 'fixtures', `${name}.jsonnet`);
 const resolved = JSON.parse(compileJsonnetFile(fixture('grain-of'))) as Record<
-  'class' | 'plain' | 'own',
+  'class' | 'plain' | 'own' | 'gun' | 'named',
   { grain: number; detailGrain?: number }
 >;
 
@@ -20,5 +20,16 @@ describe('a source definition grain', () => {
 
   it.each(['grain-unnested', 'grain-zero'])('refuses %s', (name) => {
     expect(() => compileJsonnetFile(fixture(name))).toThrow('positive whole multiple');
+  });
+
+  it('draws a definition that names its class on that class in place of the recipe one', () => {
+    expect(resolved.named).toEqual(resolved.gun);
+  });
+
+  it.each([
+    ['grain-unknown-class', 'names no voxel class'],
+    ['grain-class-and-grain', 'names both'],
+  ])('refuses %s', (name, message) => {
+    expect(() => compileJsonnetFile(fixture(name))).toThrow(message);
   });
 });

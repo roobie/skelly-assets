@@ -153,6 +153,8 @@ const ItemSchema = strictObject({
   glow: optional(name),
   /** The item's own voxel grain in metres, in place of its class grain; the export recipe resolves it. */
   voxelGrain: optional(positive),
+  /** The voxel class the item is drawn on, in place of its recipe's; the export recipe resolves the name. */
+  voxelClass: optional(name),
   /** The model's shelf and facet tags; the repository build holds them to its vocabulary, so this tool only carries them. */
   taxonomy: optional(unknown()),
 });
