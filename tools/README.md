@@ -3,7 +3,7 @@ read_if:
   - building models or adding source-backed per-pack export recipes
   - understanding package origin and the boundary between tools and game consumers
   - reviewing how models or assembled vehicles look, as pictures, contact sheets or a vehicle gallery
-  - changing how a vehicle or a kit assembly comes apart in an exploded view
+  - changing how a vehicle, a kit assembly or a model built of components comes apart in an exploded view
 ---
 
 # Model tools
@@ -154,6 +154,9 @@ engine's accessories round its core. The showcase's viewer explodes a vehicle by
 spreading them by distance alone, because parts that touch sit at nearly the same distance from the centre and would
 move out together. The exploded view looks from the side most parts move toward, because a part pushed out of the
 far side, such as a brake out of the back of its wheel, would hide behind the whole.
+
+A model built of components, such as a gun, is drawn exploded by the same rule, because its parts meet at mount
+sites its file names; see `../docs/decisions/0009-component-mounts.md`.
 
 A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
 The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
