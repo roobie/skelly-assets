@@ -12,7 +12,7 @@ read_if:
 
 A wheel was one model, so a scavenger could take a whole wheel and nothing else. The parts a scavenger takes off a
 corner, a tyre, a rim, a brake disc and a caliper, had no rows. Engines met the same need with a core and salvageable
-accessories in size classes (`docs/decisions/0004-engine-assemblies.md`, "Decision"), and wheels follow it where they
+accessories in size classes (`docs/decisions/0004-assemblies.md`, "Decision"), and wheels follow it where they
 can. A game turns a wheel's site as the vehicle rolls, and a placement has no parent, so a part at a site of its own
 never turns with another site's part. Details thinner than the vehicle grain do not survive voxelizing: they thicken
 to a voxel or close up, so lug nuts, tread and sidewall lettering wait for a finer grain.

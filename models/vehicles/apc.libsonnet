@@ -75,13 +75,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_turret_ring', 150, [
     k.turned('ring', 'steel', 'y', k.annulus(0.6, 0.85, 0, 0.1)) + { sides: 24 },
   ], { steel: 'steel-parkerized' }),
-  k.compound('apc_turret', 1200, [
-    k.turned('body', 'paint', 'y', [[0, 0], [0, 0.76], [0.3, 0.62], [0.42, 0], [0, 0]]) + { sides: 8 },
-    box('mantlet', 'paint', [0.55, 0.04, -0.18], [0.82, 0.3, 0.18]),
-    k.turned('barrel', 'steel', 'x', k.disc(0.05, 0.82, 1.65), [0, 0.16, 0]) + { sides: 8 },
-    k.turned('muzzle', 'steel', 'x', k.disc(0.075, 1.65, 1.75), [0, 0.16, 0]) + { sides: 8 },
-    box('sight', 'glass', [0.3, 0.3, 0.22], [0.5, 0.4, 0.34]),
-  ], paint + { steel: 'steel-parkerized', glass: 'glass-grey' }),
   k.compound('apc_cupola', 90, [
     k.turned('ring', 'paint', 'y', k.disc(0.36, 0, 0.14)) + { sides: 12 },
     k.turned('lid', 'paint', 'y', k.disc(0.3, 0.14, 0.2)) + { sides: 12 },
@@ -92,10 +85,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('hinge', 'steel', [-0.3, 0.05, -0.26], [-0.25, 0.08, 0.26]),
     box('handle', 'steel', [0.12, 0.05, -0.1], [0.18, 0.09, 0.1]),
   ], paint + { steel: 'steel-parkerized' }),
-  k.compound('apc_periscope', 6, [
-    box('housing', 'steel', [-0.11, 0, -0.14], [0.11, 0.1, 0.14]),
-    box('glass', 'glass', [0.11, 0.02, -0.11], [0.12, 0.08, 0.11]),
-  ], { steel: 'steel-parkerized', glass: 'glass-grey' }),
   k.compound('apc_engine_deck', 180, [
     box('frame', 'paint', [1.15, s.roofTop, 0.05], [2.48, 2.44, 1.15]),
     box('exhaust_cowl', 'paint', [0.86, s.roofTop, 0.8], [1.15, 2.53, 1.12]),
@@ -123,4 +112,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('panel', 'dash', [2.15, 1.3, -1.0], [2.3, 1.55, -0.2]),
     box('column', 'steel', [2.05, s.floor, -0.68], [2.15, 1.3, -0.52]),
   ], { dash: 'plastic-black', steel: 'steel-grey' }),
-])
+] + (import 'turret-kit.libsonnet').rows)
