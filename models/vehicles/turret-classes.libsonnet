@@ -21,7 +21,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
       flashHider: { length: 0.1, radius: 0.042 },
     },
     // A 7.62 mm PKT, 1.098 m long overall with a 0.722 m barrel, weighs 10.5 kg. Its barrel is drawn a little thicker
-    // than it is, since a thinner one falls through the vehicle voxel grid.
+    // than it is, since a thinner one falls through the vehicle voxel grid of the fused turret.
     coaxGun: {
       draw: 'coaxGun',
       id: 'pkt_machine_gun',
