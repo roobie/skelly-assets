@@ -1,4 +1,7 @@
 // An eight-wheeled armoured personnel carrier: 7 m long, 2.75 m across the wheels and the side plates. Metres in the vehicle frame.
+// Its masses follow a BTR-80 without crew, fuel or ammunition, yet it weighs about 1.5 t under that 12.2 t: it is drawn
+// about 15% smaller and does not model the water jet, winch, bulkhead and stiffeners, radios, filtration unit, batteries
+// (it fits the shared 14 kg car battery for the real two of 72 kg), tools and spares.
 {
   rear: -3.25, nose: 3.5, roof: 2.31, roofTop: 2.41, floor: 0.82, belly: 0.62, shelf: 1.19,
   side: 1.3125, sideTop: 1.24, wall: 0.94,
