@@ -80,6 +80,15 @@ test('a model whose path is not among the produced files is refused', () => {
   }), /fixture_a/);
 });
 
+test('the manifest carries what a worn shell covers, so a consumer reads it without opening the model entry', () => {
+  const { models } = buildManifest({
+    models: [{ id: 'fixture_a', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [], covers: ['trunk'] }],
+    files: ['fixture.a/assets/models/fixture_a.glb'],
+    credit,
+  });
+  assert.deepEqual(models[0].covers, ['trunk']);
+});
+
 const withRenames = (renames) => buildManifest({
   models: [{ id: 'fixture_a', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [] }],
   files: ['fixture.a/assets/models/fixture_a.glb'],
