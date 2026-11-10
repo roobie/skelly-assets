@@ -176,6 +176,8 @@ local fittings(name) =
   ]),
   // The engines, by the names `sites` takes.
   names: std.objectFields(engines),
+  // Every site an engine can take, so a vehicle that loses its engine can drop them all.
+  siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
   // `assembly.libsonnet`, `sites`, says.
   sites(name, at, detail): assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),

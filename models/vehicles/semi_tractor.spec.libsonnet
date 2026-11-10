@@ -4,7 +4,7 @@
   floor: 1.22, waist: 2.22, roof: 2.96, lean: 0.22,
   frontAxle: 2.72, rearAxles: [-1.85, -3.1],
   wheel: 'wheel_295_80r22_5', r: 0.522, wheelW: 0.295,
-  wheelBrakes: true, frontAxlePart: 'steered_axle_heavy_disc', rearAxlePart: 'beam_axle_truck_disc',
+  wheelBrakes: true, detail: 'assembly', frontAxlePart: 'steered_axle_heavy_disc', rearAxlePart: 'beam_axle_truck_disc',
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-oxblood',

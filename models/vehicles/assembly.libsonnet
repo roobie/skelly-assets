@@ -40,10 +40,14 @@ local merged(core, dressed) = std.foldl(function(all, d)
     ],
   // An accessory's own row.
   row(id, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish),
+  // Every site the part can take: its core's and each accessory's.
+  siteIds(coreSite, accessories): [coreSite] + [a.site for a in accessories],
   // The part's sites, its frame placed at `at`. `detail` picks how much of it is salvageable: 'fused' fits the whole
-  // part as one model at `coreSite`, and 'assembly' fits the core there and each accessory at its own site.
-  sites(coreSite, fusedId, coreId, accessories, at, detail):
+  // part as one model at `coreSite`, and 'assembly' fits the core there and each accessory at its own site. A body
+  // kit that builds a game's blueprint passes its own vehicle kit (`site.libsonnet`, `kit`) and what holds the part
+  // on, so its fittings and placements come from one list.
+  sites(coreSite, fusedId, coreId, accessories, at, detail, kit=site.kit, supportedBy=[]):
     assert std.member(['fused', 'assembly'], detail) : 'a part is fused or an assembly, not ' + detail;
-    if detail == 'fused' then [site.one(coreSite, fusedId, at)]
-    else [site.one(coreSite, coreId, at)] + [site.one(a.site, a.id, plus(at, a.at)) for a in accessories],
+    if detail == 'fused' then [kit.fitting(coreSite, fusedId, at, supportedBy)]
+    else [kit.fitting(coreSite, coreId, at, supportedBy)] + [kit.fitting(a.site, a.id, plus(at, a.at), supportedBy) for a in accessories],
 }

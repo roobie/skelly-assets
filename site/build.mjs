@@ -138,7 +138,7 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs']) cpSync(join(here, f), join(out, f));
 if (!values['no-tree']) cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });
 for (const model of models) if (model.clips && model.body) {
   const clips = JSON.parse(readFileSync(join(built, model.clips), 'utf8'));

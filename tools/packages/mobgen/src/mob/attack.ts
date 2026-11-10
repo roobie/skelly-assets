@@ -155,7 +155,7 @@ export const attackClipById = (id: string): AttackClip | undefined => clipTable[
 
 /** Resolves the clip a template's content selects for the shared rig. A template that attacks through
  * the shared rig must name one; an absent or unknown selection is an error, never a silent fallback to
- * a default clip (skelly's `PILLARS.md`, "Content forward compatibility"). */
+ * a default clip (https://github.com/roobie/skelly, `PILLARS.md`, "Content forward compatibility"). */
 export const attackClipFor = (template: Pick<Template, 'name' | 'attackClip'>): AttackClip => {
   const id = template.attackClip;
   const clip = id === undefined ? undefined : attackClipById(id);

@@ -2,14 +2,15 @@
 // showcase's renderer, with a ground grid so size reads off the picture, since every view is fitted to its square. A
 // vehicle's or an assembly's tile adds its exploded view beside them, twice a view's size because its parts spread
 // wider, so the parts a picture of the whole hides can be reviewed too; a wearable's adds itself worn on the doll at
-// that size, so its fit reads beside the loose views. tools/model-sheet.mjs drives it headless
-// through `window.look`; opened with `?id=a,b` it shows those tiles in the page.
+// that size, so its fit reads beside the loose views. A look can ask for another set of views and for only some of a
+// vehicle's sites (lookOptions.mjs). tools/model-sheet.mjs drives it headless through `window.look`; opened with
+// `?id=a,b` it shows those tiles in the page, and `&views=` and `&sites=a,b` ask as the tool does.
 import * as THREE from 'three';
 import { facingView } from './explode.mjs';
-import { EXPLODED_VIEWS, FRONT_QUARTER, REVIEW_VIEWS } from './modelFrame.mjs';
+import { keepSites, viewSet } from './lookOptions.mjs';
+import { EXPLODED_VIEWS, FRONT_QUARTER } from './modelFrame.mjs';
 import { explodable, frame, isVehicle, isWearable, loadEntry, makeStage, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
-const views = REVIEW_VIEWS.map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
 const BACKGROUND = '#e8e6e1';
 
 let renderer;
@@ -38,21 +39,28 @@ function groundGrid(box, cell) {
 
 const metres = (cell) => (cell >= 1 ? `${cell} m` : `${Math.round(cell * 100)} cm`);
 
-// Draws the object from `direction` into `size` pixels of the tile at (x, y), with the view's name.
-function drawView(g, obj, [name, direction], x, y, size) {
+// Draws the object from `direction` into `size` pixels of the tile at (x, y), with the view's name, over `grid` when
+// the view looks from level or above: from below, the grid would lie between the camera and the object.
+function drawView(g, obj, grid, [name, direction], x, y, size) {
   renderer.setSize(size, size, false);
   frame(camera, obj, new THREE.Vector3(), direction);
+  const gridded = direction.y >= 0;
+  if (gridded) stage.add(grid);
   renderer.render(stage, camera);
+  if (gridded) stage.remove(grid);
   g.drawImage(renderer.domElement, x, y);
   g.fillStyle = '#5b574f';
   g.fillText(name, x + 6, y + 6);
 }
 
-// One entry's tile, `size` pixels a view, as a PNG data URL, with what the sheet prints beside it.
-async function look(id, size) {
+// One entry's tile, `size` pixels a view, as a PNG data URL, with what the sheet prints beside it. `views` names the
+// view set and `sites` the site prefixes a vehicle or an assembly keeps (lookOptions.mjs).
+async function look(id, size, { views = 'review', sites = [] } = {}) {
   const entries = await ready;
-  const entry = entries.get(id);
-  if (!entry) throw new Error(`${id} is no model, vehicle or assembly of the built tree`);
+  const whole = entries.get(id);
+  if (!whole) throw new Error(`${id} is no model, vehicle or assembly of the built tree`);
+  const entry = keepSites(whole, sites);
+  const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const loaded = await loadEntry(entry);
   const obj = stillInstance(loaded, entry);
   const exploded = isVehicle(entry);
@@ -70,29 +78,26 @@ async function look(id, size) {
   g.font = `${Math.max(11, Math.round(size / 20))}px sans-serif`;
   g.textBaseline = 'top';
   const grid = groundGrid(box, cell);
-  stage.add(obj, grid);
-  views.forEach((view, i) => {
-    drawView(g, obj, view, (i % 2) * size, Math.floor(i / 2) * size, size);
+  stage.add(obj);
+  directions.forEach((view, i) => {
+    drawView(g, obj, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size);
   });
-  stage.remove(grid);
   if (exploded) {
     const parts = explodable(obj);
     spread(parts, 1);
     const [name, direction] = facingView(parts.map(({ offset }) => offset.toArray()), EXPLODED_VIEWS);
     // The same cell as the assembled views, so the spread reads against the whole's own size.
     const apart = groundGrid(new THREE.Box3().setFromObject(obj), cell);
-    stage.add(apart);
-    drawView(g, obj, [name, new THREE.Vector3(...direction)], size * 2, 0, size * 2);
-    stage.remove(apart);
+    drawView(g, obj, apart, [name, new THREE.Vector3(...direction)], size * 2, 0, size * 2);
   }
   stage.remove(obj);
   if (worn) {
     const dressed = stillInstance(await loadEntry(wornEntry(entry)), entry);
     const floor = new THREE.Box3().setFromObject(dressed);
     const under = groundGrid(floor, gridCell(Math.max(...floor.getSize(new THREE.Vector3()).toArray())));
-    stage.add(dressed, under);
-    drawView(g, dressed, ['worn front ¾', new THREE.Vector3(...FRONT_QUARTER)], size * 2, 0, size * 2);
-    stage.remove(dressed, under);
+    stage.add(dressed);
+    drawView(g, dressed, under, ['worn front ¾', new THREE.Vector3(...FRONT_QUARTER)], size * 2, 0, size * 2);
+    stage.remove(dressed);
   }
   g.fillStyle = '#9a958a';
   g.fillRect(size, 0, 1, tile.height);
@@ -111,7 +116,9 @@ async function look(id, size) {
 
 window.look = look;
 
-const asked = new URLSearchParams(location.search).get('id');
+const query = new URLSearchParams(location.search);
+const asked = query.get('id');
+const options = { views: query.get('views') ?? 'review', sites: query.get('sites')?.split(',') ?? [] };
 if (asked) {
   for (const id of asked.split(',')) {
     const figure = document.createElement('figure');
@@ -119,7 +126,7 @@ if (asked) {
     caption.textContent = id;
     figure.append(caption);
     document.body.append(figure);
-    look(id, 384).then(
+    look(id, 384, options).then(
       ({ png, sizeM, triangles, grid, beside }) => {
         figure.classList.toggle('wide', Boolean(beside));
         figure.prepend(Object.assign(document.createElement('img'), { src: png, alt: `${id}, four views${beside ? ` and ${beside}` : ''}` }));

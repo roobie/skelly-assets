@@ -1,7 +1,7 @@
 ---
 read_if:
   - you change or consume the revolver model export, shared writer or moving-part transforms
-  - you refresh the revolver or its ammunition in Deadvox
+  - you change the revolver's cartridge or its ammunition export
   - you change the structured Deadvox export recipe
 ---
 
@@ -11,7 +11,7 @@ The revolver uses assembly parts rather than display groups because only parts h
 
 ## Runtime composition
 
-The separate revolver contract avoids pretending that rotating parts follow the linear carrier timeline. See `src/gun/revolverExport.ts`, `RevolverMetadata`, and `src/gun/exportGlb.ts`, `DeadvoxModelEntry`. The playable consumer validates it through deadvox's `RevolverSchema`.
+The separate revolver contract avoids pretending that rotating parts follow the linear carrier timeline. See `src/gun/revolverExport.ts`, `RevolverMetadata`, and `src/gun/exportGlb.ts`, `DeadvoxModelEntry`. The playable consumer validates it through https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`, `RevolverSchema`.
 
 All points, axes and displacements use the exported model frame, with lengths in metres and signed right-hand rotations in radians. Each node's rest transform is its assembled GLB pose, not an identity transform and not a pivot-relative pose. The writer's node list is flat. Consumers must reset to that rest pose each frame rather than accumulate deltas.
 
@@ -19,10 +19,8 @@ Let C be rotation about the exported crane pivot, D rotation about the exported 
 
 The hinge comes from the swing-side lower yoke edge. The opening angle must carry the drum into the reserved swing side and clear every frame solid, not merely unlatch it. The hammer pin follows its body's lower bearing edge; its travel reservation bounds the cocking direction. The trigger root and bow bound its pull. These are stylized pose controls, not measured revolver mechanics. Derivation and clearance live in `src/gun/revolverExport.ts`, `revolverMetadata`; the independent flat-node and clearance probes live in `test/revolverExport.test.ts`.
 
-## Cartridge and refresh
+## Cartridge and metadata
 
 The curated design carries its own cartridge identity. Geometry-only exports without cartridge metadata omit the revolver block because the ejector stroke needs a sourced case length. Unknown cartridge measurements stay unknown; presentation may use the sourced maximum overall length when no typical length is available. The generic projectile seating and primer remain visual proxies, not cartridge specifications; see `src/ammo/roundProfile.ts`, `roundProfiles`, and `models/guns/cartridges/README.md`.
 
-Asset credits cover runtime media rather than Jsonnet authoring programs. Keeping the manifest's source beside its compiled output must not require that source to credit itself; see deadvox's `assetFileIssues`.
-
-A refresh has one metadata writer so exported geometry cannot drift from hand-edited records, while authored gameplay overlays remain untouched. The explicit consumption boundary is `models/guns/roster.libsonnet`; see `src/cli/exportRecipe.ts`, `loadExportRecipe`, and skelly's `packages/deadvox/src/content/base/models-firearms.libsonnet`.
+The exporter is the single writer of the revolver's model metadata, so exported geometry cannot drift from hand-edited records; gameplay tuning belongs to the consumer, not to the export. The explicit consumption boundary is `models/guns/roster.libsonnet`; see `src/cli/exportRecipe.ts`, `loadExportRecipe`.

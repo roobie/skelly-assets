@@ -1,5 +1,6 @@
 // CPU bench for the actor-pool and per-frame crowd simulation in src/viewer/stress.ts. It tracks
-// deadvox's crowd target (skelly's `packages/deadvox/CHALLENGES.md`, "Many zombies in a browser"). Times:
+// deadvox's crowd target (https://github.com/roobie/skelly, `packages/deadvox/CHALLENGES.md`,
+// "Many zombies in a browser"). Times:
 //   1. generating `--pool` distinct valid actors — the same valid-seed search main.ts's "only valid"
 //      checkbox and stress.ts's pool use (generate, realize, keep the first PASS per template slot).
 //   2. the full per-frame posing cost stress.ts's crowd simulation pays per actor: advanceClock, ~10%

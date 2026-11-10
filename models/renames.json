@@ -136,6 +136,7 @@
   "security_van_bonnet": "panel_van_bonnet",
   "security_van_dashboard": "van_dashboard",
   "security_van_windscreen": "van_windscreen",
+  "semi_tractor_stack": "exhaust_semi_tractor",
   "taxi_bonnet": "saloon_bonnet",
   "taxi_boot_lid": "saloon_boot_lid",
   "taxi_dashboard": "saloon_dashboard",

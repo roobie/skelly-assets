@@ -6,7 +6,7 @@ read_if:
   - wondering why a wearable without worn pieces sits on the doll as it does
 ---
 
-# 7. One dressing rule dresses the doll
+# 8. One dressing rule dresses the doll
 
 ## Context
 

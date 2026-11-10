@@ -1,5 +1,5 @@
 // How the showcase and the review sheets dress a wearable on the doll (tools/dress.mjs, `wornSites`); why is in
-// docs/decisions/0007-dressing.md.
+// docs/decisions/0008-dressing.md.
 {
   // The doll: the player's bust, with each limb hung on each side by its own anchor from the bust's anchor of the same
   // name and side, `<anchor>_<side>`. The limb models are built as the figure's right limb, so the left is their mirror.

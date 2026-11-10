@@ -15,7 +15,7 @@ read_if:
 The acid zombie uses a ground-up body because its hunched silhouette and exposed sac
 define its identity independently of humanoid variations. Body facts stay separate from
 game effects so each boundary can be validated before gameplay consumes it. What the
-model must show stays in skelly's `packages/deadvox/docs/acid-zombie.md`, "Model", and its behaviour,
+model must show stays in https://github.com/roobie/skelly, `packages/deadvox/docs/acid-zombie.md`, "Model", and its behaviour,
 including acid immunity and the leg-burning puddle, stays in that doc's other sections.
 
 ## Body rules the plan starts from
@@ -53,7 +53,7 @@ module. Their owners are `src/core/body.ts`, `Bone` and `MaterialDef`;
   (`src/core/body.ts`). A sac that never falls off but bursts on death, and a crusted back that
   never severs, are body facts, not Deadvox special cases.
 - **Materials as content.** Per-template colour and glow are look tuning, which
-  skelly's `PILLARS.md`, "Content forward compatibility" puts in content. See
+  https://github.com/roobie/skelly, `PILLARS.md`, "Content forward compatibility" puts in content. See
   `models/mobs/materialTemplates.jsonnet` and `src/mob/materials.ts`, `resolveMaterials`.
 - **Per-plan budgets and limb bones** on `BodyPlanDef` (`src/core/generate.ts`). The old
   shared scaling assumed humanoid height and head proportions, and a regex picked limb
@@ -77,11 +77,12 @@ and is a defect.
 The voxel grid's local material table must remain the shared consumer boundary: a
 compatibility shim would keep two competing material contracts. See
 `src/core/voxelize.ts`, `materialOf`; `src/viewer/scene.ts`, `vertexColors`;
-`src/cli/view.ts`, `printView`. Deadvox does not re-mesh a fused mass at runtime: it
-decodes the figure from the built body, and hides a carved cell through a per-slot cell
-mask over the baked mesh; see deadvox's `packCellMask`. Material dependencies
-must participate in generated-body identity so tuning changes cannot bypass save
-admission; see deadvox's `collectSimulationSourceGraph`.
+`src/cli/view.ts`, `printView`. Deadvox decodes a fused mass's figure from the built
+body and rebuilds its mesh without the carved cells, reading the same material table; see
+https://github.com/roobie/skelly, `packages/deadvox/src/render/amalgamFlesh.ts`, `buildCarvedGeometry`.
+Material dependencies must participate in generated-body identity so tuning changes cannot
+bypass save admission; see https://github.com/roobie/skelly, `packages/deadvox/tools/simulationFingerprint.ts`,
+`collectSimulationSourceGraph`.
 
 ### Other mobs' outputs that can change
 
@@ -112,7 +113,7 @@ Construction stays in TypeScript because anatomy is logic rather than authored t
 
 **Content and logic split.** Authors tune appearance without changing what makes the body
 an acid zombie. Keeping that tuning in `models/mobs/acidTemplate.jsonnet` lets a later tier
-remain a data change (skelly's `packages/deadvox/docs/acid-zombie.md`, "Ability, not type"). See
+remain a data change (https://github.com/roobie/skelly, `packages/deadvox/docs/acid-zombie.md`, "Ability, not type"). See
 `src/mob/acidTemplate.ts`, `acidTemplate`.
 
 **Measurement.** Shape measurement must be independent of game voxel size and forced
@@ -126,7 +127,7 @@ never claims more than the game supports (`PROJECT.md`, "Template readiness"). S
 ### The study's gates become tests
 
 Known-shape fixtures protect measurement without freezing a generated body
-(skelly's `AGENTS.md`, "Tests"). The shared-frame joint rule needs mutation proof because a wrong
+(https://github.com/roobie/skelly, `AGENTS.md`, "Tests"). The shared-frame joint rule needs mutation proof because a wrong
 axis sign can silently preserve apparently continuous flesh. See
 `test/acidMeasurements.test.ts` and `src/mob/acidMeasurements.ts`, `jointSections`.
 
@@ -144,17 +145,16 @@ outlines. These are shape changes, not reasons to relax measurement gates; see
 `models/mobs/acidTemplate.jsonnet`, `geometry` and `params`.
 
 Tuning stays in content rather than test literals. Its release-freeze triggers belong in
-skelly's `docs/deferred-assertions.md`.
+https://github.com/roobie/skelly, `docs/deferred-assertions.md`.
 
 ## What Deadvox needs
 
-Actor identity must not determine its skeleton. Deadvox resolves a selected body plan
-at the mobgen boundary, keeping each plan's region ownership authoritative rather than
-forcing the acid body's distinct bones through humanoid names. See
-deadvox's `BODY_PLAN`;
-deadvox's `bodyPlanModel`;
+Actor identity must not determine its skeleton. Deadvox resolves a content-selected model
+at one mobgen realization boundary, keeping each plan's region ownership authoritative
+rather than forcing the acid body's distinct bones through humanoid names. See
+https://github.com/roobie/skelly, `packages/deadvox/src/core/zombieFigure.ts`, `zombieFigure`;
 `src/mob/humanoidFigure.ts`, `templateFigure`; and
-deadvox's `ActorBodySchema.regions`.
+https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`, `regions`.
 
 - **Hit regions.** Each plan says which of its bones form head, torso and limbs, because
   renaming acid bones to humanoid names would hide that it is its own skeleton. The sac's
@@ -165,13 +165,13 @@ deadvox's `ActorBodySchema.regions`.
   gore mask sizes itself from the widest body (deadvox
   passes the bone count to `crowdTextureLayout`), so the acid bone count needs no encoding
   change. A severed acid part follows its creature kind's authored drop policy,
-  independently of bone names. See deadvox's
-  `ActorSchema.severedItems` and `createSession`.
+  independently of bone names. See https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`,
+  `severedItems`, and https://github.com/roobie/skelly, `packages/deadvox/src/game/session.ts`, `createSession`.
 - **Death burst.** On death the sac's voxels are removed without leaving a severed item and
   without any simulation consequence, so presentation reads death and the sac stays out of
   saves and fingerprints. Keeping it a disposition rather than a Deadvox special case lets a
   later tier attach an effect by data. See `src/mob/dismember.ts`, `burstBones`, and
-  deadvox's `onBurst`.
+  https://github.com/roobie/skelly, `packages/deadvox/src/render/mobActors.ts`, `onBurst`.
 - **Poses and gait.** The hunched rig needs its own motion rather than humanoid bone aliases.
   Joint-frame clamping keeps layered actions inside the body's articulated limits; the
   death topple is whole-actor motion at the root, not a hips articulation. Ground fitting
@@ -184,12 +184,14 @@ deadvox's `ActorBodySchema.regions`.
   for the simulation's head turn as well as the presentation gaze, because hit boxes and the
   spit anchor read the simulation pose. See `src/mob/lookAt.ts`, `lookAtPose`,
   `src/mob/lookAtProfiles.ts`, `LOOK_AT_PROFILES`, and
-  deadvox's `clampedJointRotation`.
+  https://github.com/roobie/skelly, `packages/deadvox/src/core/zombiePose.ts`,
+  `clampedJointRotation`.
   The mouth anchor belongs to the skull's face opening rather than the hanging jaw or its
   drool, so spit line of sight follows the head through wind-up and gaze. See
   `src/core/body.ts`, `BodyAnchor`, and `src/mob/acid.ts`, `buildAcid`. The spit leaves from
   that anchor posed at the end of the wind-up, so the release is a function of simulation
-  state alone; see deadvox's `posedMouth`.
+  state alone; see https://github.com/roobie/skelly, `packages/deadvox/src/core/zombiePose.ts`,
+  `posedMouth`.
 - **Materials and glow.** Deadvox reads colour and glow from the body's material table. That
   keeps the glow a content value instead of a Deadvox list of glowing material names. How
   it renders is in "Glow render path" below. The wind-up brightening is per-actor state
@@ -202,9 +204,11 @@ deadvox's `ActorBodySchema.regions`.
 
 The sac and eyes use an emissive material: they give off their own light, and the wind-up
 raises the sac's emission. The glow also lights the surroundings by borrowing slots from the
-renderer's existing point-light pool (deadvox's `LightPool`), which
+renderer's existing point-light pool (https://github.com/roobie/skelly, `packages/deadvox/src/render/lightPool.ts`,
+`LightPool`), which
 item lights also use. The nearest glowing actors take the slots item lights leave free, and
-their light casts no shadows. See deadvox's `acidGlows`.
+their light casts no shadows. See https://github.com/roobie/skelly, `packages/deadvox/src/render/lightPool.ts`,
+`acidGlows`.
 
 Emission is chosen over a colour change because a recoloured sac is still shaded by the
 scene's lighting, so it darkens with its surroundings instead of reading as a light source.
@@ -217,7 +221,7 @@ Borrowed slots are chosen over a light path built for crowds. Such a path is cos
 grows with the number of glowing actors and the light's reach, and it costs something even
 when nothing glows. It would also still need occlusion, receiver coverage and a world-domain
 policy before it could ship. Borrowed slots add no draws, passes or shader paths, and a lab
-storey holds few acid zombies (skelly's `packages/deadvox/docs/acid-zombie.md`, "Spawning"), so lighting only the
+storey holds few acid zombies (https://github.com/roobie/skelly, `packages/deadvox/docs/acid-zombie.md`, "Spawning"), so lighting only the
 nearest of them loses little.
 
 ### Far level of detail is its own later item
@@ -235,7 +239,7 @@ later refinement within that direction, not a decision here.
 
 The acid zombie draws its near mesh at distance until the cross-mob far level of detail
 lands. That is acceptable only because labs hold few of them
-(skelly's `packages/deadvox/docs/acid-zombie.md`, "Spawning").
+(https://github.com/roobie/skelly, `packages/deadvox/docs/acid-zombie.md`, "Spawning").
 
 ## Rounds
 
@@ -260,7 +264,8 @@ before it lands.
 4. **Deadvox consumption and effects.** The glow, drips and death splash ship with the body
    so the mob reaches players complete, and stay presentation so they never touch the
    simulation or saves. See "What Deadvox needs" and
-   deadvox's `AcidEffects`.
+   https://github.com/roobie/skelly, `packages/deadvox/src/render/acidEffects.ts`,
+   `AcidEffects`.
 
 The far level of detail follows as its own item, cross-mob, with an owner the lead routes.
 

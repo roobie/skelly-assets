@@ -8,6 +8,7 @@ read_if:
   - adding or applying the catalogue's item drafts
   - bumping the Node version, or why CI and builds pin one exact version
   - opening a PR or cutting a release, and where its change notes and release notes come from
+  - citing skelly's source from a doc or a comment
 ---
 
 # skelly-assets
@@ -70,10 +71,11 @@ import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 road vehicle needs no recipe edit; see `models/vehicles/packs.libsonnet`, `vehicles`. Which part sits where on a
 vehicle is model data too, in the vehicle's placements file beside its rows, so the showcase and the games assemble it
 from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`. A vehicle fits its
-engine or turret either fused or as a core with salvageable fittings; why is in `docs/decisions/0004-assemblies.md`.
-Its wheels turn whole at their sites, with a brake disc and caliper at sites of their own; why is in
-`docs/decisions/0005-wheel-assemblies.md`. A track is a band of links with its sprocket, idler and road wheels at
-sites of their own, in size classes; why is in `docs/decisions/0006-track-assemblies.md`.
+engine, turret, radiator or fuel tank either fused or as a core with salvageable fittings; why is in
+`docs/decisions/0004-assemblies.md`. Its wheels turn whole at their sites, with a brake disc and caliper at sites of
+their own; why is in `docs/decisions/0005-wheel-assemblies.md`. A track is a band of links with its sprocket, idler
+and road wheels at sites of their own, in size classes; why is in `docs/decisions/0006-track-assemblies.md`. An
+exhaust is fused or split along its run into salvageable parts; why is in `docs/decisions/0007-exhaust-assemblies.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
@@ -132,11 +134,15 @@ repoints any entry that named it, so a consumer's saved ids keep resolving after
 a map whose retired id names a model again or whose target is no current model; see `tools/manifest.mjs`,
 `buildManifest`.
 
-A cue into a product's source names the product and the symbol, with no path: deadvox's `typeWeightGrams`, not a
-path to the file that holds it. A reader of this repository alone cannot resolve a path into skelly, and skelly moves
-files, so a path cue goes false while a symbol cue survives the move. The cues name skelly symbols as they stand on
-the skelly revision that pins this release. Nothing checks them, so a renamed symbol goes stale without a failure. A
-path cue may come back if this repository gains a cue check over a skelly checkout.
+### Cues into skelly
+
+A cue into skelly's source starts with skelly's URL, then names the path from skelly's root and the symbol or section:
+https://github.com/roobie/skelly, `packages/deadvox/src/core/items.ts`, `typeWeightGrams`. The URL tells a reader of
+this repository alone where the path resolves, and one fixed form lets a check find every cue. A cue names skelly's
+main, with no line number or pinned commit, so it stays a current claim like a cue into this repository rather than
+one that is true of an old revision. Only the form is checked, because this repository's checks run without a skelly
+checkout; see `tools/skelly-cues.mjs`, `cueIssues`. A cue that skelly's later changes break therefore goes stale
+without a failure, so a change that touches a cue checks it against skelly's main.
 
 ### Printed labels
 

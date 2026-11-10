@@ -156,13 +156,19 @@ move out together. The exploded view looks from the side most parts move toward,
 far side, such as a brake out of the back of its wheel, would hide behind the whole.
 
 A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
-The showcase's viewer dresses it by the same sites; see `../docs/decisions/0007-dressing.md`.
+The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a
 wheel with its brake, is therefore also drawn on its own and exploded about its own centre. The assemblies come from
 the kits themselves, laid out as the kit fits them, so a new kit or kit entry is drawn without a list to keep; see
 `assemblies.mjs`, `readAssemblies`.
+
+The review views look from above, so parts a vehicle carries under its floor or behind its cab, such as an exhaust
+run, a fuel tank or a stack, hide under the body. A look can therefore ask for the underside views instead, and for
+only the sites whose ids start with given prefixes, so those parts are drawn where they sit without the body; the
+grid is left out of a view from below, where it would lie between the camera and the model. See
+`../site/lookOptions.mjs`. A sheet shows one look, so drawing with other options into a folder replaces its rows.
 
 A sheet keeps every entry drawn into its folder, so a batch still reads whole after a few entries are redrawn. Each
 picture records a digest of the built files it was drawn from, so the gallery tells a render older than its model by
