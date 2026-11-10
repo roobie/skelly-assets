@@ -37,6 +37,7 @@
   'crashed_military_helicopter': import 'crashed_military_helicopter.placements.libsonnet',
   'crew_pickup': import 'crew_pickup.placements.libsonnet',
   'cube_van': import 'cube_van.placements.libsonnet',
+  'cv9040': import 'cv9040.placements.libsonnet',
   'dirt_bike': import 'dirt_bike.placements.libsonnet',
   'double_decker': import 'double_decker.placements.libsonnet',
   'electric_box_truck': import 'electric_box_truck.placements.libsonnet',

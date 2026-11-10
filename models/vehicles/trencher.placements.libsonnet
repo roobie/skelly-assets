@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 local s = import 'trencher.spec.libsonnet';
+local track = import 'track-kit.libsonnet';
 {
   sites: [
     site.one('chassis', 'trencher_chassis'),
@@ -19,7 +20,7 @@ local s = import 'trencher.spec.libsonnet';
     site.one('travel_lever', 'gear_lever', [-0.08, 1.56, 0.26]),
     site.one('beacon', 'beacon_amber', [-0.42, s.canopy, 0]),
   ]
-  + site.pair('track', 'trencher_track', [0.1, 0, s.trackZ])
+  + track.pair('trencher_track', [0.1, 0, s.trackZ], 'fused')
   + site.pair('lift_ram', 'trencher_lift_ram')
   + site.pair('step_hanger', 'trencher_step_hanger')
   + site.pair('step', 'trencher_step')

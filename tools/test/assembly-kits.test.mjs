@@ -14,6 +14,7 @@ const fittings = JSON.parse(evaluateJsonnet(`
   local kits = {
     engine: import 'models/vehicles/engine-kit.libsonnet',
     turret: import 'models/vehicles/turret-kit.libsonnet',
+    track: import 'models/vehicles/track-kit.libsonnet',
   };
   local at = [1, 0.5, 0.25];
   {
@@ -55,15 +56,19 @@ test('an assembly looks the same fused as assembled', () => {
   for (const [name, { fused, assembly }] of assemblies) assert.deepEqual(shapes(fused), shapes(assembly), name);
 });
 
+// A track's band and wheels span metres, so they take a coarser step than the default, still a fifth of its thinnest piece.
+const STEP = { track: 0.006 };
+
 test('every accessory of an assembly rests on its core and cuts into nothing', () => {
   for (const [name, { assembly }] of assemblies) {
+    const step = STEP[name.split(' ')[0]];
     const [core, ...accessories] = assembly;
     for (const [i, accessory] of accessories.entries()) {
-      const onCore = meeting(accessory.pieces, core.pieces);
+      const onCore = meeting(accessory.pieces, core.pieces, step);
       assert.ok(onCore.touches, `${name}: ${accessory.site} floats clear of the core`);
       assert.ok(!onCore.overlaps, `${name}: ${accessory.site} cuts into the core`);
       for (const other of accessories.slice(i + 1)) {
-        assert.ok(!meeting(accessory.pieces, other.pieces).overlaps, `${name}: ${accessory.site} cuts into ${other.site}`);
+        assert.ok(!meeting(accessory.pieces, other.pieces, step).overlaps, `${name}: ${accessory.site} cuts into ${other.site}`);
       }
     }
   }

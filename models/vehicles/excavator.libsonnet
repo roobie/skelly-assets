@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'excavator.spec.libsonnet';
+local track = import 'track-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -16,7 +17,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     m.axleDisc('swivel', 'steel', 0, 0.6, 0.2, [-0.9, 0.9]),
     k.turned('slew_ring', 'ring', 'y', k.disc(0.86, 0.86, 1.08), [0, 0, 0]) + { sides: 24 },
   ], { steel: 'paint-charcoal', ring: 'steel-spall-black' }),
-  m.track('excavator_track', 1550, s.trackLength, s.trackRadius, s.trackWidth, 0.09, 'steel-spall-black', 7, 22),
   k.compound('excavator_house', s.shellMass, [
     box('deck', 'paint', [-1.6, 1.06, -s.side], [1.06, s.deck, s.side]),
     prism('hood', 'paint', [[-1.6, s.deck], [-0.36, s.deck], [-0.36, s.hoodTop - 0.08], [-0.46, s.hoodTop], [-1.6, s.hoodTop]], [-s.side, s.side]),
@@ -104,4 +104,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('excavator_exhaust', 6, [
     k.turned('pipe', 'steel', 'y', k.disc(0.05, 0, 0.42)) + { sides: 12 },
   ], { steel: 'steel-spall-black' }),
-])
+] + track.classRows('crawler_medium') + track.trackRows('excavator_track'))
