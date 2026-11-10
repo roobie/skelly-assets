@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'trencher.spec.libsonnet';
+local track = import 'track-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -9,7 +10,7 @@ local along(t) = [s.chainTop[0] + (s.chainTip[0] - s.chainTop[0]) * t, s.chainTo
 local dirX = (s.chainTip[0] - s.chainTop[0]) / std.sqrt(std.pow(s.chainTip[0] - s.chainTop[0], 2) + std.pow(s.chainTip[1] - s.chainTop[1], 2));
 local dirY = (s.chainTip[1] - s.chainTop[1]) / std.sqrt(std.pow(s.chainTip[0] - s.chainTop[0], 2) + std.pow(s.chainTip[1] - s.chainTop[1], 2));
 local chainOffset = 0.17;
-local stepZ = s.trackZ + s.trackWidth / 2 + 0.01;
+local stepZ = s.trackZ + (import 'track-classes.libsonnet').rubber_compact.link.width / 2 + 0.01;
 local tooth(i) =
   local p = along(0.08 + 0.84 * i / 13);
   local under = [p[0] + dirY * chainOffset, p[1] - dirX * chainOffset];
@@ -29,7 +30,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('track_beam_front', 'dark', [0.7, 0.3, 0.5], [1.0, 0.5, s.trackZ]),
     box('track_beam_rear', 'dark', [-0.9, 0.3, 0.5], [-0.6, 0.5, s.trackZ]),
   ]), { dark: 'paint-charcoal' }),
-  m.track('trencher_track', 260, s.trackLength, s.trackRadius, s.trackWidth, 0.08, 'rubber-black', 4, 14),
   k.compound('trencher_hood', 95, [
     prism('hood', 'paint', [[s.hoodBack, s.deck], [s.hoodFront, s.deck], [s.hoodFront, s.hoodTop - 0.16], [s.hoodFront - 0.18, s.hoodTop], [s.hoodBack, s.hoodTop]], [-0.56, 0.56]),
     box('grille', 'dark', [s.hoodFront, s.deck + 0.12, -0.42], [s.hoodFront + 0.02, s.hoodTop - 0.22, 0.42]),
@@ -99,4 +99,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     k.turned('pipe', 'steel', 'y', k.disc(0.04, 0, 0.62)) + { sides: 12 },
     box('rain_cap', 'steel', [-0.06, 0.62, -0.05], [0.06, 0.65, 0.05]),
   ], { steel: 'steel-spall-black' }),
-])
+] + track.classRows('rubber_compact') + track.trackRows('trencher_track'))

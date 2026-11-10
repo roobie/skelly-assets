@@ -32,35 +32,6 @@ local axleDisc(id, slot, x, y, radius, z, sides=24) =
       k.arc('lug_' + i, 'tyre', 0, 0, body - 0.01, outer, at, at + 180 / lugs, 1, [-width / 2, width / 2])
       for i in std.range(0, lugs - 1)
     ]) else []), { tyre: 'rubber-black', rim: hub, cap: 'paint-charcoal' }, { hub: ['rim', [0.5, 0.5, 0.5]] }),
-  // A crawler track centred on its own length and width with the ground at y = 0: the band runs round a sprocket
-  // and an idler of `radius`, with road rollers along a frame between them.
-  track(id, massKg, length, radius, width, band, finish, rollers=5, cleats=18, sprocketFinish='steel-spall-black')::
-    local reach = length / 2 - radius;
-    local half = width / 2;
-    local z = [-half, half];
-    local inner = radius - band;
-    local cleat(i) =
-      local x = -reach + 2 * reach * (i + 0.25) / cleats;
-      box('cleat_b_' + i, 'cleat', [x, -0.0, -half], [x + reach / cleats, 0.03, half]);
-    local cleatTop(i) =
-      local x = -reach + 2 * reach * (i + 0.25) / cleats;
-      box('cleat_t_' + i, 'cleat', [x, 2 * radius - 0.03, -half], [x + reach / cleats, 2 * radius, half]);
-    k.compound(id, massKg, [
-      box('run_bottom', 'band', [-reach, 0.03, -half], [reach, 0.03 + band, half]),
-      box('run_top', 'band', [-reach, 2 * radius - 0.03 - band, -half], [reach, 2 * radius - 0.03, half]),
-      box('frame', 'frame', [-reach, radius - 0.14 * radius / 0.4, -half * 0.5], [reach, radius + 0.2 * radius / 0.4, half * 0.5]),
-      axleDisc('sprocket', 'sprocket', -reach, radius, inner - 0.01, [-half * 0.55, half * 0.55]),
-      axleDisc('idler', 'sprocket', reach, radius, inner - 0.01, [-half * 0.55, half * 0.55]),
-    ] + k.arc('wrap_rear', 'band', -reach, radius, inner, radius, 90, 270, 8, z)
-    + k.arc('wrap_front', 'band', reach, radius, inner, radius, -90, 90, 8, z)
-    + [cleat(i) for i in std.range(0, cleats - 1)]
-    + [cleatTop(i) for i in std.range(0, cleats - 1)]
-    + [
-      local x = -reach + 2 * reach * (i + 1) / (rollers + 1);
-      axleDisc('roller_' + i, 'roller', x, 0.03 + band + radius * 0.2, radius * 0.2, [-half * 0.6, half * 0.6], 12)
-      for i in std.range(0, rollers - 1)
-    ],
-    { band: finish, cleat: finish, frame: 'paint-charcoal', sprocket: sprocketFinish, roller: 'steel-grey' }),
   // A curved dig bucket: a shell around (cx, cy) from `from` to `to` degrees, side plates and teeth at the `from` lip.
   bucket(cx, cy, radius, from, to, halfWidth, thick=0.05, teeth=5, tooth=0.14)::
     local z = [-halfWidth, halfWidth];
