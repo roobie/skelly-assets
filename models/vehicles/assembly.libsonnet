@@ -1,7 +1,7 @@
 // A part built as a core and accessories that are each a row of their own, and the two ways a vehicle fits it: one
 // fused model, or the core with each accessory at its own site, so each is its own loot. Both are drawn from the same
 // pieces and weigh the same, so a vehicle or a mod picks the detail without changing what it is; see
-// `docs/decisions/0004-engine-assemblies.md`.
+// `docs/decisions/0004-assemblies.md`.
 //
 // A drawing is { pieces, finish }. An accessory is { site, id, massKg, drawn, at }: the site it is fitted at, its row,
 // and where its own frame's origin sits in the part's frame. One row may be fitted at several sites.
