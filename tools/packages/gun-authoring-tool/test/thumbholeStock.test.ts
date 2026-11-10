@@ -6,6 +6,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, type Transform, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -13,7 +14,7 @@ import { FAMILIES, FIRING_GRIP } from '../src/gun/parts.ts';
 import { boltRifle } from '../src/gun/templates.ts';
 import { loadFixture, variant } from './helpers.ts';
 
-const design = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-awm.json'), 'utf8')) as {
+const design = JSON.parse(readFileSync(join(DESIGNS, 'archetype-awm.json'), 'utf8')) as {
   assembly: Parameters<typeof validate>[0];
 };
 

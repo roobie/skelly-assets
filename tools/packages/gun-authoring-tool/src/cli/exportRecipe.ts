@@ -19,10 +19,10 @@ import { PART_CATALOGUE } from '../gun/catalogue.ts';
 import type { DeadvoxModelEntry } from '../gun/exportGlb.ts';
 import { exportMagazineGlb } from '../gun/magazineExport.ts';
 import { GUN_PREFABS } from '../gun/prefabs.ts';
+import { REPO_ROOT } from './content.ts';
 import { exportFileText } from './exportFile.ts';
 import { exportPartItem } from './exportPart.ts';
 
-const ROOT = resolve(import.meta.dirname, '../../../..');
 const cartridgeAt = (source: string, root: string) => {
   const parsed = parseCartridgeJson(readFileSync(resolve(root, source), 'utf8'));
   if (!parsed.ok) {
@@ -130,7 +130,7 @@ const namedFiles = {
   magazine: (row: Row) => [String((optionsFor(row) as { cartridge?: unknown }).cartridge)],
 } satisfies Record<keyof typeof exporters, (row: Row) => readonly string[]>;
 
-export const loadExportRecipe = (value: unknown = content, root = ROOT): readonly RecipeExport<DeadvoxModelEntry>[] =>
+export const loadExportRecipe = (value: unknown = content, root = REPO_ROOT): readonly RecipeExport<DeadvoxModelEntry>[] =>
   loadRecipe(
     value,
     Object.fromEntries(Object.entries(exporters).map(([kind, load]) => [kind, (row: Row) => load(row, root)])),

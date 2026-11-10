@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { CARTRIDGES } from '../../src/cli/content.ts';
 import { launchChromium } from '../chromium.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const cartridge = JSON.parse(readFileSync(resolve(root, 'cartridges/12-gauge-00-buck.json'), 'utf8'));
+const cartridge = JSON.parse(readFileSync(resolve(CARTRIDGES, '12-gauge-00-buck.json'), 'utf8'));
 const closure = cartridge.closure.value ?? 'unknown';
 const server = await createServer({ root, server: { host: '127.0.0.1', port: 0 } });
 let browser;

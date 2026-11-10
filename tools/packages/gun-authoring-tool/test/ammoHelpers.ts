@@ -3,8 +3,8 @@ import { join } from 'node:path';
 import type { Cartridge } from '../src/ammo/cartridge.ts';
 import { formatCartridgeParseError, parseCartridge, parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import type { CartridgeIssue } from '../src/ammo/rules.ts';
+import { CARTRIDGES } from '../src/cli/content.ts';
 
-export const CARTRIDGES = join(import.meta.dirname, '..', 'cartridges');
 export const CARTRIDGE_FIXTURES = join(import.meta.dirname, 'fixtures', 'cartridges');
 
 /** Plain JSON, as read from a file, before the parser has seen it. */
@@ -240,7 +240,7 @@ export const unsetPath = (root: JsonObject, path: string): void => {
 
 export interface BrokenCartridgeFixture {
   readonly name: string;
-  /** A file stem in cartridges/, or `synthetic:<shape>`. */
+  /** A cartridge data file stem, or `synthetic:<shape>`. */
   readonly base: string;
   readonly set?: Record<string, Json>;
   readonly unset?: string[];

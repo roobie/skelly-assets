@@ -1,11 +1,11 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 
-const DESIGNS = join(import.meta.dirname, '..', 'designs');
 
 const curated = readdirSync(DESIGNS)
   .filter((file) => file.endsWith('.json') && !file.startsWith('look-'))

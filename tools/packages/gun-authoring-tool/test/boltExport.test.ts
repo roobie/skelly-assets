@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
@@ -16,16 +15,16 @@ import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { internalMagazineCapacity } from '../src/gun/internalMagazine.ts';
-import { loadDesigns } from './helpers.ts';
+import { designText, loadDesigns } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
 
 const designs = loadDesigns().filter(({ assembly }) =>
   Object.values(assembly.parts).some((part) => part.params?.pattern === 'bolt'),
 );
 const BOLT_CARTRIDGE = boltCartridge();
-const hunting = JSON.parse(readFileSync('designs/hunting-rifle.json', 'utf8'));
+const hunting = JSON.parse(designText('hunting-rifle'));
 // The authored design names catalogue items, so only the loader expands it into an assembly.
-const loadedHunting = loadGunDesign(readFileSync('designs/hunting-rifle.json', 'utf8'));
+const loadedHunting = loadGunDesign(designText('hunting-rifle'));
 if (!loadedHunting.ok) {
   throw new Error(loadedHunting.error.message);
 }
@@ -202,7 +201,7 @@ it('keeps the sporting front post tip centred and visible between the rear notch
 
 it('removes a design-excluded attachment from both single and pair certificates', () => {
   // A pistol has few attachment slots, so its whole-gun certificate sweep stays small; one slot finds the baseline.
-  const pistol = JSON.parse(readFileSync('designs/archetype-pistol.json', 'utf8'));
+  const pistol = JSON.parse(designText('archetype-pistol'));
   const loadedPistol = loadGunDesign(JSON.stringify(pistol));
   if (!loadedPistol.ok) {
     throw new Error(loadedPistol.error.message);
@@ -233,7 +232,7 @@ it('removes a design-excluded attachment from both single and pair certificates'
 });
 
 it('exports integral capacity from the well, iron or fitted-optic sights, and a validated phased action', () => {
-  const out = exportFileText(readFileSync('designs/hunting-rifle.json', 'utf8'), {
+  const out = exportFileText(designText('hunting-rifle'), {
     id: 'fixture_hunting',
     file: 'assets/models/fixture_hunting.glb',
   });

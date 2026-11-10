@@ -1,9 +1,10 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
+import { DESIGNS } from './content.ts';
 import { checkDesignFiles } from './designCheck.ts';
 
-const directory = process.argv[2] ?? 'designs';
+const directory = process.argv[2] ?? DESIGNS;
 try {
   const files = readdirSync(directory)
     .filter((file) => file.endsWith('.json') && !file.startsWith('look-'))

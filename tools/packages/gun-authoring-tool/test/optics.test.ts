@@ -21,15 +21,16 @@ import { Box3, Mesh, Ray, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { safeParse } from 'valibot';
 import { describe, expect, it } from 'vitest';
+import appearance from '../../../../models/guns/tables/appearance.json' with { type: 'json' };
+import fixedPrism from '../../../../models/guns/tables/fixedPrism.json' with { type: 'json' };
 import exportRecipe from '../exports/deadvox.json' with { type: 'json' };
-import appearance from '../src/gun/appearance.json' with { type: 'json' };
+import { DESIGNS } from '../src/cli/content.ts';
 import { attachmentCompatibility } from '../src/gun/attachmentCompatibility.ts';
 import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
 import { attachmentInstanceForId, attachmentLookIssue, attachmentSlots } from '../src/gun/attachments.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
-import fixedPrism from '../src/gun/fixedPrism.json' with { type: 'json' };
 import { MOUNT_KINDS, MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_CATALOG, OPTIC_TYPE_IDS } from '../src/gun/optics.ts';
 import { GUN_PALETTE, resolveAppearance } from '../src/gun/palette.ts';
@@ -660,11 +661,10 @@ describe('template optics can be attached, validated, and removed', () => {
 });
 
 describe('authored front-bead contact', () => {
-  const designsDir = join(import.meta.dirname, '..', 'designs');
-  const designs = readdirSync(designsDir)
+  const designs = readdirSync(DESIGNS)
     .filter((file) => file.endsWith('.json'))
     .map((file) => {
-      const loaded = loadGunDesign(readFileSync(join(designsDir, file), 'utf8'));
+      const loaded = loadGunDesign(readFileSync(join(DESIGNS, file), 'utf8'));
       if (!loaded.ok) {
         throw new Error(`${file}: ${loaded.error.message}`);
       }

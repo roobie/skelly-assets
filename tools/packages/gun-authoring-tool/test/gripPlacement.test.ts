@@ -6,12 +6,12 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { applyPoint, extrusionPoint, type Transform, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { TEMPLATES } from '../src/gun/templates.ts';
 import { loadFixtures } from './helpers.ts';
 
-const ROOT = join(import.meta.dirname, '..');
-const designFiles = readdirSync(join(ROOT, 'designs'))
+const designFiles = readdirSync(DESIGNS)
   .filter((file) => file.endsWith('.json'))
   .sort();
 
@@ -76,7 +76,7 @@ const gripMountFace = (assembly: Assembly, gripId: string): readonly Vec3[] => {
 
 const fixtures = loadFixtures().filter((fixture) => fixture.name.startsWith('archetype-'));
 const designs = designFiles.map(
-  (file) => (JSON.parse(readFileSync(join(ROOT, 'designs', file), 'utf8')) as { assembly: Assembly }).assembly,
+  (file) => (JSON.parse(readFileSync(join(DESIGNS, file), 'utf8')) as { assembly: Assembly }).assembly,
 );
 const templatesWithSeparateGrip = TEMPLATES.filter(
   (template) =>

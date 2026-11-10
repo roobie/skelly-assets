@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { PartFamily, Resolved } from '@skelly/construct/assembly/schema.ts';
 import { add, applyDir, applyPoint, IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
@@ -13,9 +12,9 @@ import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { internalMagazineLayout } from '../src/gun/internalMagazine.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
-import { expectWatertightMesh, type MutableAssembly } from './helpers.ts';
+import { designText, expectWatertightMesh, type MutableAssembly } from './helpers.ts';
 
-const loaded = loadGunDesign(readFileSync(new URL('../designs/hunting-rifle.json', import.meta.url), 'utf8'));
+const loaded = loadGunDesign(designText('hunting-rifle'));
 if (!loaded.ok) {
   throw new Error(JSON.stringify(loaded.error));
 }

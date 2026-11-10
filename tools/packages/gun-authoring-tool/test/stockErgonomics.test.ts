@@ -7,6 +7,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, invert } from '@skelly/construct/foundation/math.ts';
 import type { ExtrudedPolygonSolid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
@@ -17,7 +18,7 @@ const PUMP_LENGTH = /^(M|L)$/;
 
 const pumpSamples = (): Assembly[] => {
   const loaded = loadGunDesign(
-    readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-pump-shotgun.json'), 'utf8'),
+    readFileSync(join(DESIGNS, 'archetype-pump-shotgun.json'), 'utf8'),
   );
   if (!loaded.ok) {
     throw new Error(loaded.error.message);

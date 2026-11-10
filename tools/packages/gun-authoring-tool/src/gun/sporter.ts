@@ -5,7 +5,7 @@ import {
   polyhedronVolume,
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import physical from './physical.json' with { type: 'json' };
+import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import { type SectionPocket, subtractAxialPockets, subtractConvexSection } from './receiverSection.ts';
 import { roundedTriggerGuardSolids, TRIGGER_BLADE_ID } from './roundedTriggerGuard.ts';
 import { SPORTER_PROPORTIONS as P } from './sporterProportions.ts';

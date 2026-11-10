@@ -160,7 +160,7 @@ test('a gun row is reused from the cache until the file it names changes', async
   try {
     const source = join(root, row.source);
     mkdirSync(join(source, '..'), { recursive: true });
-    const text = readFileSync(join(import.meta.dirname, '..', row.source), 'utf8');
+    const text = readFileSync(join(import.meta.dirname, '../..', row.source), 'utf8');
     writeFileSync(source, text);
     const cache = exportCache(join(root, 'cache'), 'code');
     const reusedAfter = () => cache.export(loadExportRecipe([row], root)[0]).entry.reused;

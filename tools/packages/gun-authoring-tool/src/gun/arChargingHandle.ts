@@ -1,8 +1,8 @@
 import type { PartFamily } from '@skelly/construct/assembly/schema.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import { AR_ACTION_LAYOUT, AR_ACTION_LAYOUTS, type ARActionLayout, arLayoutFor } from './arLayout.ts';
-import physical from './physical.json' with { type: 'json' };
 import type { SectionPocket } from './receiverSection.ts';
 
 const actionFrameParam = {

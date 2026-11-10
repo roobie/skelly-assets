@@ -4,6 +4,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { Group, InstancedMesh, Matrix4, Mesh, Texture, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { magazineRoundColumn } from '../src/gun/magazineGeometry.ts';
@@ -12,7 +13,7 @@ import { buildDetachedMagazine } from '../src/viewer/magazineView.ts';
 import { buildLayers } from '../src/viewer/scene.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 
-const designPath = join(import.meta.dirname, '..', 'designs', 'archetype-ak.json');
+const designPath = join(DESIGNS, 'archetype-ak.json');
 const cartridge = loadCartridgeFile('7.62x39.json') as MetallicCartridge;
 
 describe('detached magazine viewer', () => {

@@ -1,9 +1,9 @@
 // The tools a recipe row can belong to, each with the kinds it owns, its layout under a pack, and the two halves of its
 // loader: `tasks` checks a tool's rows together and gives each the portable data its export needs, and `exportOf`
 // turns one task into its export on a worker thread.
-// Gun rows' sources resolve against this folder, where GAT's own export resolves them. A tool whose rows declare their
-// inputs names the code its exports run and the data that code imports, so tools/build.mjs can cache them; see
-// thing-export's cache.ts, codeFingerprint.
+// Gun rows name their sources relative to the repository root, which GAT's loader resolves them against. A tool whose
+// rows declare their inputs names the code its exports run and the data that code imports, so tools/build.mjs can
+// cache them; see thing-export's cache.ts, codeFingerprint.
 // Import after tools/sources.mjs, installJsonnetSources: the loaders read the compiled Jsonnet twins.
 import { join } from 'node:path';
 
@@ -18,10 +18,10 @@ const loadRecipeTools = async () => {
     gun: {
       kinds: gun.GUN_KINDS,
       tasks: (rows) => {
-        gun.loadExportRecipe(rows, here);
+        gun.loadExportRecipe(rows);
         return rows;
       },
-      exportOf: (row) => gun.loadExportRecipe([row], here)[0],
+      exportOf: (row) => gun.loadExportRecipe([row])[0],
       directory: 'gungen',
       index: false,
       code: [
@@ -32,7 +32,7 @@ const loadRecipeTools = async () => {
         'packages/gun-authoring-tool/src',
       ],
       // The gun code imports its tables, cartridges and the materials as JSON, whatever the row.
-      data: ['packages/gun-authoring-tool/src', 'packages/gun-authoring-tool/cartridges', '../models/finishes.json'],
+      data: ['../models/guns/tables', '../models/guns/cartridges', '../models/finishes.json'],
     },
     thing: {
       kinds: thing.THING_KINDS,

@@ -5,7 +5,7 @@ import {
   resolveAppearance as resolveCoreAppearance,
 } from '@skelly/thing-export/appearance.ts';
 import type { Palette, SrgbColor } from '@skelly/thing-export/exportTypes.ts';
-import content from './appearance.json' with { type: 'json' };
+import content from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 
 export const hexToSrgb = (hex: number): SrgbColor => [
   ((hex >> 16) & 0xff) / 255,

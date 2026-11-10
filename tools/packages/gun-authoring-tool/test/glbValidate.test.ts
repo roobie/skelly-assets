@@ -2,10 +2,10 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import validator from 'gltf-validator';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 
-const DESIGNS = join(import.meta.dirname, '..', 'designs');
 const names = readdirSync(DESIGNS)
   .filter((f) => f.endsWith('.json') && !f.startsWith('look-'))
   .sort();

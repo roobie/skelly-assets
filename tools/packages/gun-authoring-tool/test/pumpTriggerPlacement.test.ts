@@ -6,13 +6,13 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint } from '@skelly/construct/foundation/math.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { pumpShotgun } from '../src/gun/templates.ts';
 
-const ROOT = join(import.meta.dirname, '..');
 // The authored design names catalogue items, so only the loader expands it into an assembly.
-const loadedPump = loadGunDesign(readFileSync(join(ROOT, 'designs', 'archetype-pump-shotgun.json'), 'utf8'));
+const loadedPump = loadGunDesign(readFileSync(join(DESIGNS, 'archetype-pump-shotgun.json'), 'utf8'));
 if (!loadedPump.ok) {
   throw new Error(loadedPump.error.message);
 }

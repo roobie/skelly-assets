@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename } from 'node:path';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
 import { describe, expect, it } from 'vitest';
@@ -7,9 +6,8 @@ import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { METRES_PER_UNIT } from '../src/gun/exportFrame.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { readGlb } from './glbReader.ts';
-import { expectWatertightMesh, loadFixture } from './helpers.ts';
+import { designText, expectWatertightMesh, loadFixture } from './helpers.ts';
 
-const ROOT = join(import.meta.dirname, '..');
 const cases = [
   { key: 'designs/archetype-ak.json', folder: 'designs', file: 'archetype-ak.json' },
   { key: 'fixtures/ak-standard-handguard.json', folder: 'fixtures', file: 'ak-standard-handguard.json' },
@@ -44,7 +42,7 @@ const assemblyFor = (key: string, folder: string, file: string) => {
   if (folder !== 'designs') {
     return loadFixture(basename(file, '.json'));
   }
-  const loaded = loadGunDesign(readFileSync(join(ROOT, key), 'utf8'));
+  const loaded = loadGunDesign(designText(basename(file, '.json')));
   if (!loaded.ok) {
     throw new Error(`${key}: ${loaded.error.message}`);
   }

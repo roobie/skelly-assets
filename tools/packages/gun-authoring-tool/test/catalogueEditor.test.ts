@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
@@ -15,9 +14,10 @@ import {
   saveDesignForDownload,
 } from '../src/viewer/designEditor.ts';
 import { exportEditorDesign } from '../src/viewer/designExport.ts';
+import { cartridgeText, designText } from './helpers.ts';
 
 const open = () => {
-  const loaded = loadGunDesign(readFileSync(new URL('../designs/archetype-ar.json', import.meta.url), 'utf8'));
+  const loaded = loadGunDesign(designText('archetype-ar'));
   if (!loaded.ok) {
     throw new Error(loaded.error.message);
   }
@@ -91,9 +91,7 @@ describe('catalogue editor adapter', () => {
 
   it('exports curated bodies but refuses the same geometry without authored item selections', () => {
     const state = open();
-    const cartridge = parseCartridgeJson(
-      readFileSync(new URL(`../cartridges/${state.calibre}.json`, import.meta.url), 'utf8'),
-    );
+    const cartridge = parseCartridgeJson(cartridgeText(state.calibre!));
     if (!cartridge.ok) {
       throw new Error(cartridge.error.message);
     }

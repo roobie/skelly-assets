@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { allCitations, collectNodes, unsourcedPaths } from '../src/ammo/measures.ts';
 import { formatCartridgeParseError, parseCartridge, parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import { checkRelations, validateCartridge } from '../src/ammo/rules.ts';
+import { CARTRIDGES } from '../src/cli/content.ts';
 import {
-  CARTRIDGES,
   cartridgeFiles,
   type Json,
   type JsonObject,
