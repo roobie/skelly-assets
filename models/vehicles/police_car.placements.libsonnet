@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'police_car.spec.libsonnet';
 local k = import 'kit.libsonnet';
 local part(suffix) = k.partId('police_car', s, suffix);
@@ -11,9 +12,9 @@ local part(suffix) = k.partId('police_car', s, suffix);
     site.one('front_bumper', part('_front_bumper')),
     site.one('rear_bumper', part('_rear_bumper')),
     site.one('dashboard', part('_dashboard')),
-    site.one('engine', 'engine_i4_petrol', [s.frontAxle - 0.02, 0.28, 0]),
+  ] + engine.sites('i4_petrol', [s.frontAxle - 0.02, 0.28, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.36]),
-    site.one('radiator', 'radiator_car', [s.front - 0.3, 0.32, 0]),
+    site.one('radiator', engine.radiator('i4_petrol'), [s.front - 0.3, 0.32, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [s.rearAxle + 0.65, s.sill, 0]),
     site.one('exhaust', 'exhaust_car', [s.rear + 0.46, 0.2, 0.42]),
     site.one('rear_axle', 'twist_beam', [s.rearAxle, 0, 0]),
