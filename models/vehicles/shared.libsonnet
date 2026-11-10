@@ -106,20 +106,23 @@ local steeredAxle(id, massKg, halfTrack, height) = k.compound(id, massKg, [
 ] + k.bothSides([
   box('spring_seat', 'steel', [-0.09, height + 0.06, 0.42], [0.09, height + 0.1, 0.56]),
   box('king_pin', 'steel', [-0.08, height - 0.12, halfTrack - 0.1], [0.08, height + 0.12, halfTrack + 0.05]),
+  k.turned('drum', 'steel', 'z', k.disc(0.2, halfTrack + 0.05, halfTrack + 0.18), [0, height, 0]) + { sides: 12 },
 ]), { steel: 'steel-grey' });
 // For 8 R19.5 wheels: lighter section, its spring seats under a medium truck's rails.
-local steeredAxleMedium = k.compound('steered_axle_medium', 150, [
+local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
   box('beam', 'steel', [-0.045, 0.385, -0.95], [0.045, 0.475, 0.95]),
 ] + k.bothSides([
   box('spring_seat', 'steel', [-0.07, 0.475, 0.32], [0.07, 0.5, 0.46]),
   box('king_pin', 'steel', [-0.06, 0.33, 0.87], [0.06, 0.53, 1.0]),
+  k.turned('drum', 'steel', 'z', k.disc(0.17, 1.0, 1.12), [0, 0.43, 0]) + { sides: 12 },
 ]), { steel: 'steel-grey' });
 // A low floor passes over the beam, so it drops between risers in the wheel wells, and hubs stay `beamAxle`'s `height`
 // above the base.
-local steeredAxleDrop = k.compound('steered_axle_drop', 260, [
+local steeredAxleDrop = k.compound('steered_axle_drop', 330, [
   box('beam', 'steel', [-0.06, 0.2, -0.86], [0.06, 0.31, 0.86]),
 ] + k.bothSides([
   box('riser', 'steel', [-0.07, 0.2, 0.86], [0.07, 0.64, 0.95]),
+  k.turned('drum', 'steel', 'z', k.disc(0.2, 0.96, 1.09), [0, 0.52, 0]) + { sides: 12 },
 ]), { steel: 'steel-grey' });
 local twistBeam(id, massKg, track) = k.compound(id, massKg, [
   box('beam', 'steel', [0.18, 0.25, -track / 2 + 0.1], [0.26, 0.33, track / 2 - 0.1]),
@@ -461,8 +464,8 @@ local towHitch = k.compound('tow_hitch', 18, [
   inline('engine_i3_small', 85, 0.34, 0.42, 0.52),
   inline('engine_i4_petrol', 140, 0.46, 0.46, 0.55),
   inline('engine_i4_diesel', 185, 0.5, 0.5, 0.62),
-  inline('engine_i6_diesel', 340, 0.86, 0.56, 0.75),
-  inline('engine_i6_heavy_diesel', 640, 1.12, 0.72, 0.95),
+  inline('engine_i6_diesel', 520, 0.86, 0.56, 0.75),
+  inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95),
   vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6),
   vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68),
   gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3),
@@ -487,8 +490,8 @@ local towHitch = k.compound('tow_hitch', 18, [
   twistBeam('twist_beam', 30, 1.52),
   beamAxle('beam_axle_light', 75, 1.5, 0.0625, 0.37),
   beamAxle('beam_axle_van', 110, 1.68, 0.0625, 0.37),
-  beamAxle('beam_axle_truck', 280, 1.86, 0.07, 0.52),
-  steeredAxle('steered_axle_heavy', 240, 0.95, 0.52),
+  beamAxle('beam_axle_truck', 430, 1.86, 0.07, 0.52),
+  steeredAxle('steered_axle_heavy', 350, 0.95, 0.52),
   steeredAxleMedium,
   steeredAxleDrop,
   trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37),

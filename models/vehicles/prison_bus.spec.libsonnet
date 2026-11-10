@@ -7,7 +7,7 @@ std.objectRemoveKey(coach, 'sign') + {
   stripes: [],
   seats: [row { part: 'bus_seat_pair' } for row in coach.seats],
   doorKick: 2.0, doorFinish: 'paint-charcoal',
-  shellMass: 10330,
+  shellMass: 9460,
   bars: { z: 0.04, width: 0.05, pitch: 0.2, rail: 0.06 },
   // Its glass, dash and end panels are the coach's pressings.
   borrow: {
