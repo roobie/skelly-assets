@@ -185,31 +185,66 @@ const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop 
 
 let drawer;
 
-// Four views of the figure, `size` pixels each, as a PNG data URL.
-function drawTile(obj, size, views) {
+// Four views of the figure, `size` pixels each, as a PNG data URL. A close-up frames on `framed`, a part of the figure,
+// and draws only `shown`, that part and what it holds, so the rest of the figure does not stand between it and the camera.
+function drawTile(obj, size, views, { framed = obj, shown = [obj] } = {}) {
   drawer ??= makeDrawer();
   const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const box = new THREE.Box3().setFromObject(obj);
-  const grid = groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())));
+  const grid = framed === obj ? groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray()))) : new THREE.Group();
   const { tile, g } = startTile(size, 2, 2);
+  const kept = new Set();
+  for (const part of shown) part.traverse((o) => kept.add(o));
+  const hidden = [];
+  obj.traverse((o) => { if (o.isMesh && !kept.has(o)) { o.visible = false; hidden.push(o); } });
   drawer.stage.add(obj);
-  directions.forEach((view, i) => drawView(drawer, g, obj, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size));
+  directions.forEach((view, i) => { drawView(drawer, g, framed, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size); });
   drawer.stage.remove(obj);
+  for (const o of hidden) o.visible = true;
   ruleAt(g, { x: size }, tile.height);
   ruleAt(g, { y: size }, tile.width);
   return tile.toDataURL('image/png');
 }
 
-// The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, drawn as a tile, with the
-// compile report, the clearance probe's findings when asked and the frame the pose compiled to.
-async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false } = {}) {
+// The items a pose file holds, each loaded once at the origin: its object to carry and its mesh for the grip to close on.
+async function heldItems(file) {
+  const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
+  return new Map(await Promise.all(models.map(async (model) => {
+    const { scene } = await loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] });
+    const obj = scene.clone(true);
+    obj.updateMatrixWorld(true);
+    return [model, { obj, mesh: worldMesh(obj) }];
+  })));
+}
+
+// A held item placed where the compiled pose holds it, under the figure so it is drawn with it.
+function carry(figure, items, { model, r, t }) {
+  const obj = items.get(model).obj.clone(true);
+  obj.matrixAutoUpdate = false;
+  obj.matrix.set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1);
+  figure.root.add(obj);
+  figure.root.updateMatrixWorld(true);
+  return obj;
+}
+
+// The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, holding what the pose holds,
+// drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, with the compile report,
+// the clearance probe's findings when asked and the frame the pose compiled to.
+async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, focus } = {}) {
   const data = await ready;
   const figure = await buildFigure(data, wear);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
-  const { frame, report } = compilePose(data.rig, file);
+  const items = await heldItems(file);
+  const { frame, report, held } = compilePose(data.rig, file, { meshOf: (model) => items.get(model).mesh });
   applyFrame(figure, frame);
+  // One item held by both hands is placed once.
+  const placed = new Map(Object.values(held).map((item) => [JSON.stringify(item), item]));
+  const carried = [...placed.values()].map((item) => carry(figure, items, item));
   const found = probing ? probe(figure, frame) : null;
-  return { png: drawTile(figure.root, size, views), report, clearance: found, frame };
+  const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
+  if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
+  const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carried] };
+  return { png: drawTile(figure.root, size, views, closeUp), report, clearance: found, frame };
 }
 
 window.posed = posed;

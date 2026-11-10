@@ -2,9 +2,10 @@
 // pose can be reviewed without opening the page. The drawing is the posing page's own (site/pose.mjs): this builds the
 // showcase from the tree and drives the page in headless Chromium.
 // Usage: node tools/pose-sheet.mjs [--built built] [--out look/poses] [--size 384] [--views review] [--probe]
-//   [--wear id,id] [--screenshot] <pose> [<pose> ...]
+//   [--focus bone] [--wear id,id] [--screenshot] <pose> [<pose> ...]
 // A pose is a fixture's name (models/poses) or the path of a pose file. `--wear` dresses the doll in those wearables,
-// `--probe` runs the clearance probe and marks its findings, `--screenshot` also saves the page with its controls.
+// `--probe` runs the clearance probe and marks its findings, `--focus` frames the views on one bone and what hangs from
+// it (a hand and its fingers), `--screenshot` also saves the page with its controls.
 // Writes <out>/<pose>[-<wear joined by +>].png and, with --screenshot, <out>/ui-<pose>[-<wear>].png; prints one
 // line per pose with the limits that held, the reach residuals and the clearance findings.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -22,6 +23,7 @@ const { values, positionals } = parseArgs({
     size: { type: 'string', default: '384' },
     views: { type: 'string', default: 'review' },
     probe: { type: 'boolean', default: false },
+    focus: { type: 'string' },
     wear: { type: 'string', default: '' },
     screenshot: { type: 'boolean', default: false },
   },
@@ -48,6 +50,7 @@ const countBy = (items, key) => Object.entries(Object.groupBy(items, (item) => i
 const describe = ({ report, clearance }) => [
   report.clamped.length === 0 ? 'no limits held' : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
   ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
+  ...Object.entries(report.grips ?? {}).map(([id, grip]) => `${id} grip: ${Object.entries(grip).map(([digit, { touched }]) => `${digit} ${touched ? 'touches' : 'closed free'}`).join(', ')}`),
   ...(clearance ? [`clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')})`] : []),
 ].join('; ');
 
@@ -61,7 +64,7 @@ try {
   const { page } = await openPage(browser, server.origin, 'pose.html', 'posed');
   for (const { name, pose } of poses) {
     try {
-      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), { wear, pose, size, views: values.views, probe: values.probe });
+      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), { wear, pose, size, views: values.views, probe: values.probe, focus: values.focus });
       writePng(join(out, fileName('', name)), png);
       console.log(`${name}: ${describe(facts)}`);
     } catch (error) {

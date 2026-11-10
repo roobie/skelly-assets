@@ -46,11 +46,11 @@ export function ruleAt(g, { x, y }, length) {
   else g.fillRect(0, y, length, 1);
 }
 
-// Draws the object from `direction` into `size` pixels of the tile at (x, y), with the view's name, over `grid` when
-// the view looks from level or above: from below, the grid would lie between the camera and the object.
-export function drawView({ renderer, stage, camera }, g, obj, grid, [name, direction], x, y, size) {
+// Draws the stage from `direction` into `size` pixels of the tile at (x, y), framed on `framed`, with the view's name,
+// over `grid` when the view looks from level or above: from below, the grid would lie between the camera and the object.
+export function drawView({ renderer, stage, camera }, g, framed, grid, [name, direction], x, y, size) {
   renderer.setSize(size, size, false);
-  frame(camera, obj, new THREE.Vector3(), direction);
+  frame(camera, framed, new THREE.Vector3(), direction);
   const gridded = direction.y >= 0;
   if (gridded) stage.add(grid);
   renderer.render(stage, camera);
