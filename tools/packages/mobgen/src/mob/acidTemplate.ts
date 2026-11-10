@@ -1,7 +1,7 @@
 import { registerTemplate, type Template, templateByName } from '../core/template.ts';
 import './acid.ts';
 import './templates.ts';
-import data from './acidTemplate.json' with { type: 'json' };
+import data from '../../../../../models/mobs/acidTemplate.json' with { type: 'json' };
 
 export type AcidTemplate = Template & Omit<typeof data, keyof Template>;
 const content = data as unknown as Omit<AcidTemplate, 'voxelSize' | 'params'> & Pick<Template, 'params'>;

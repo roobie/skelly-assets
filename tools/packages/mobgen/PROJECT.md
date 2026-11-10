@@ -6,9 +6,11 @@ baked and viewed without baking in a particular anatomy or renderer. See `src/co
 
 ## Design boundaries
 
-- Content holds authored values; TypeScript holds feasibility mechanisms. Templates must declare supports
-  and mass rather than relying on humanoid anatomy. See `src/core/template.ts`, `src/core/rules.ts` and
-  `src/core/templateMass.ts`.
+- Content holds authored values; TypeScript holds feasibility mechanisms. The content lives in the models
+  tree, so a look change touches no package code, and it is the only thing the package imports from outside
+  itself. Templates must declare supports and mass rather than relying on humanoid anatomy. See
+  `models/mobs/`, `src/core/template.ts`, `src/core/rules.ts`, `src/core/templateMass.ts` and
+  `test/boundaries.test.ts`.
 - One bone owns each voxel so part topology remains useful for severing. Rigid ownership accepts visible
   seams at bent joints; preserving skeletal connection matters more than retaining every sub-voxel feature.
   See `src/core/voxelize.ts`, `repairJointAdjacencyInPlace`, `repairOverlappingJointAdjacency`, and
@@ -23,7 +25,7 @@ baked and viewed without baking in a particular anatomy or renderer. See `src/co
 
 Materials and colour choices are authored in Jsonnet so changing a look does not require changing a builder.
 Material bytes are local to a voxel grid, not a global palette. Emission is self-light, not a placed light;
-viewer and crowd shaders share that interpretation. See `src/mob/materialTemplates.jsonnet`,
+viewer and crowd shaders share that interpretation. See `models/mobs/materialTemplates.jsonnet`,
 `src/mob/materials.ts`, `resolveMaterials`, `src/viewer/scene.ts`, `fleshMaterial`, and `src/mob/crowd.ts`.
 
 Shared-rig attacks and hit reactions belong to template content rather than its identity, so new templates
@@ -37,7 +39,7 @@ remains an authoring preview. See `src/viewer/main.ts`, `applyDeathFrame`, and `
 Ragdoll groups are different: which bones fall together and how far each joint may swing describe the body,
 so they change with its anatomy and stay with the model, and the game's solver reads them. The game has no
 generic rule for a new anatomy, so a plan the humanoid rules don't fit carries its own. See
-`src/mob/leaper/ragdoll.jsonnet` and `test/leaper.test.ts`.
+`models/mobs/leaper/ragdoll.jsonnet` and `test/leaper.test.ts`.
 
 ## Body plans and readiness
 
@@ -56,7 +58,7 @@ relative shortening so stride does not erase the limp. See `src/mob/quadruped.ts
 
 The skeleton uses the humanoid rig, but its thin geometry snaps to voxel rows and columns to avoid vanishing.
 It declares no flesh marrow and uses an explicit step width rather than girth-derived stance width. See
-`src/mob/skeleton.ts`, `src/mob/skeletonTemplate.jsonnet` and `test/skeleton.test.ts`.
+`src/mob/skeleton.ts`, `models/mobs/skeletonTemplate.jsonnet` and `test/skeleton.test.ts`.
 
 The fused body should read as one grotesque fusion. Complete humanoid members remain severable subtrees
 beneath a non-severable core; arbitrary member orientation means there is no single humanoid gaze target.

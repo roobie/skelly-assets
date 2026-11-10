@@ -1,6 +1,6 @@
 // The skeleton body plan: bare bones on the humanoid rig. It keeps the humanoid's bone names and
 // reference joint layout so the shared walk, idle and attack poses drive it unchanged; its shape,
-// sizes and colours come from the template's `geometry` and `materials` (skeletonTemplate.jsonnet).
+// sizes and colours come from the template's `geometry` and `materials` (`models/mobs/skeletonTemplate.jsonnet`).
 //
 // Face parts, the separate ribs and the digits are snapped to voxel rows and columns: they are near
 // the voxel size, so an unsnapped one would merge with its neighbour or vanish.
