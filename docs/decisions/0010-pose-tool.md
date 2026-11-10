@@ -5,7 +5,7 @@ read_if:
   - choosing an IK solver or an inverse-kinematics library for the doll or a mob
   - wondering why site/kinematics.mjs twins mobgen's pose maths in plain JS
   - judging the clearance probe's margin or what counts as a garment showing the body through
-  - adding fingers, grips or a solver shared with mobgen
+  - posing a hand's fingers, holding an item by a grip socket, or sharing a solver with mobgen
 ---
 
 # 10. The doll poses on mobgen's bone model with its own small solver
