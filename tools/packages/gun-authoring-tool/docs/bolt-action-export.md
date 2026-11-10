@@ -41,7 +41,7 @@ Pump tubes and integral rifle wells use the same neutral model record because lo
 
 ## Regeneration and acceptance
 
-Exporter-written records stay separate from authored handling constructors so refreshes cannot flatten tunable content. Companion choices belong in the consumption recipe rather than an inference from a gun: the boundary must be inspectable even when equipment changes. See `exports/deadvox.jsonnet`, `src/cli/exportRecipe.ts`, `loadExportRecipe`, and `src/cli/refreshDeadvox.ts`. Credits import that recipe so provenance cannot silently describe a different set of outputs.
+Exporter-written records stay separate from authored handling constructors so refreshes cannot flatten tunable content. Companion choices belong in the consumption recipe rather than an inference from a gun: the boundary must be inspectable even when equipment changes. See `models/guns/roster.libsonnet`, `src/cli/exportRecipe.ts`, `loadExportRecipe`, and `src/cli/refreshDeadvox.ts`. Credits import that recipe so provenance cannot silently describe a different set of outputs.
 
 Export storage must not change time semantics, so standalone model records use the pack's temporal catalogue rather than a second allowlist; see deadvox's `TEMPORAL_FIELDS` and, in its time-lint tool, `temporalCatalogueFindings`.
 

@@ -63,7 +63,7 @@ Each mover is certified with the swept-clearance check, not exempted by family; 
 
 The export uses the shared model envelope rather than adding a compact-SMG channel: hand, loading and sight relationships belong to fitted geometry, not invented gameplay coordinates. See `src/gun/exportGlb.ts`, `DeadvoxModelEntry`, and `src/gun/anchorData.ts`, `GUN_ANCHORS`. Distinct stock and muzzle choices keep separate export identities, so the playable model needs no configuration-specific channel.
 
-Ship one threaded-muzzle export per stock, so both stock configurations remain available and each accepts a suppressor. Keep the plain-muzzle variants Gungen-only. These shipping choices belong in `exports/deadvox.jsonnet`, so the consumption boundary cannot silently omit a variant or infer equipment from another gun. Exporter-written records remain separate from authored gameplay overlays; see `src/cli/exportRecipe.ts`, `loadExportRecipe`, and `src/cli/refreshDeadvox.ts`.
+Ship one threaded-muzzle export per stock, so both stock configurations remain available and each accepts a suppressor. Keep the plain-muzzle variants Gungen-only. These shipping choices belong in `models/guns/roster.libsonnet`, so the consumption boundary cannot silently omit a variant or infer equipment from another gun. Exporter-written records remain separate from authored gameplay overlays; see `src/cli/exportRecipe.ts`, `loadExportRecipe`, and `src/cli/refreshDeadvox.ts`.
 
 ## Content tunables
 
