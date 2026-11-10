@@ -489,8 +489,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local thumb = [h.box('thumb', sl.hand, [-thumbX, -arm.thumbLength - g, -g], [thumbX, 0, arm.thumbProjection + 0.004 + g])];
     fitted([
       paired(id + '_worn_palm', 'glove', palm, finish, ['palm']),
-      // Stubs leave the fingers' ends bare.
-      paired(id + '_worn_fingers', 'fingers', fingers, finish, if s.fingers then ['fingers'] else [], ['fingers']),
+      // No glove's fingers enclose their part: the doll's fingers reach up into the palm past the shell's top, and
+      // stubs leave their ends bare.
+      paired(id + '_worn_fingers', 'fingers', fingers, finish, [], ['fingers']),
       paired(id + '_worn_thumb', 'thumb', thumb, finish, ['thumb']),
     ]) + {
       // One glove standing on its fingertips, cuff up, for a ground model; the fingers hang from the palm's end.
