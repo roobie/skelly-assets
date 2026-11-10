@@ -13,7 +13,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck',
   k.compound('refuse_truck_subframe', 460, k.bothSides([
     box('runner', 'frame', [s.bodyRear - 1.4, s.railTop, 0.34], [s.bodyFront, s.bodyLow, 0.46]),
   ]), finish),
-  k.compound('refuse_truck_body', 3200, [
+  k.compound('refuse_truck_body', 3210, [
     layer('wall', 1.24, 0.45),
     layer('shoulder', 1.18, 0.25),
     layer('crown', 1.04, 0.1),
@@ -42,7 +42,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck',
   k.compound('refuse_truck_packer', 420, [
     prism('blade', 'steel', [[s.bodyRear - 1.0, 1.55], [s.bodyRear - 0.55, 1.45], [s.bodyRear - 0.5, s.hopperLintel + 0.02], [s.bodyRear - 0.72, s.hopperLintel + 0.02]], [-1.08, 1.08]),
   ], finish),
-  k.compound('refuse_truck_bin_lift', 240, [
+  k.compound('refuse_truck_bin_lift', 230, [
     box('bar', 'steel', [s.hopperRear - 0.12, 1.2, -0.82], [s.hopperRear - 0.04, 1.28, 0.82]),
     box('comb', 'dark', [s.hopperRear - 0.14, 1.36, -0.82], [s.hopperRear - 0.1, 1.44, 0.82]),
   ] + k.bothSides([

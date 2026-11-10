@@ -134,7 +134,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('yoke_arm', 'steel', [-0.05, 1.01, 0.13], [0.05, 1.2, 0.16]),
     box('foot', 'dark', [-0.22, 0.04, 0.17], [-0.16, 0.06, 0.23]),
   ]), finish),
-  k.compound('technical_steering_box', 12, [
+  k.compound('technical_steering_box', 8, [
     box('box', 'dark', [1.2, 0.5, -0.42], [1.32, 0.6, -0.3]),
     box('drag_link', 'frame', [1.28, 0.44, -0.45], [1.54, 0.47, -0.42]),
     box('arm', 'frame', [1.26, 0.44, -0.42], [1.32, 0.5, -0.38]),
