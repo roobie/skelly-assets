@@ -40,5 +40,14 @@ export const UNDERSIDE_VIEWS = [
   ['below', from(0, 0, -1)],
 ];
 
+// The fit tile's views, for a garment on the doll: straight on from the front and the side, where a hem, a cuff or an
+// armhole lies edge-on, the front three-quarter, and from above, where a shoulder or a collar meets the body.
+export const FIT_VIEWS = [
+  ['front', FORWARD],
+  ['side', RIGHT],
+  ['front ¾', FRONT_QUARTER],
+  ['top', UP],
+];
+
 // The view sets a look can draw a tile from, by the name a review asks for.
-export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS };
+export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, fit: FIT_VIEWS };
