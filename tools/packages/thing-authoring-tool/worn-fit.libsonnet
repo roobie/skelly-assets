@@ -46,10 +46,14 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   oct: oct,
 
   // A jacket, shirt or coat: a body shell over the bust and, unless `sleeves` is 'none', upper and fore sleeves.
+  // `top` 'yoke' covers the shoulders under a yoke and collar; 'straps' cuts the body off at a neckline between the
+  // trunk's top and the shoulders, held up by a strap over each trapezius, for a tank top, and draws no collar.
   // `slots` names the ground row's finish slots the shells reuse: `body`, `trim` and `fastener`.
   torso(id, finish, spec)::
-    local s = { layer: 'normal', hem: 'hip', sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: true,
+    local s = { layer: 'normal', hem: 'hip', top: 'yoke', sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: true,
                 slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;
+    assert std.member(['yoke', 'straps'], s.top) : 'torso %s: top %s is neither yoke nor straps' % [id, s.top];
+    local straps = s.top == 'straps';
     local g = layers[s.layer];
     local sl = s.slots;
     local cut = bust.torsoChamfer / 2;
@@ -59,22 +63,36 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local chestTop = ribTop + bust.chestHeight;
     local chestD = bust.chestDepth + 2 * g, chestW = bust.chestWidth + 2 * g;
     local shoulderX = bust.chestWidth / 2 + bust.shoulderWidth / 2 + 0.03 + g;
+    local neckline = ribTop + 0.65 * bust.chestHeight;
+    local bodyTop = if straps then neckline else chestTop;
+    local collar = if straps then 'none' else s.collar;
     local front(y) = if y < bust.pelvisHeight + bust.waistHeight then lowD / 2 else if y < ribTop then bust.ribDepth / 2 + g else chestD / 2;
+    // A strap lies on the chest's front and back faces and over its top, its underside clearing the trapezius's rise.
+    local strapX = bust.chestWidth / 4, strapHalf = 0.018, strapT = 0.006;
+    local strapTop = chestTop + 0.008 + g + strapT;
+    local strap(name, side) =
+      local x0 = side * strapX - strapHalf, x1 = side * strapX + strapHalf;
+      [
+        h.box('strap-front-' + name, sl.trim, [x0, neckline - 0.01, chestD / 2 - strapT], [x1, strapTop, chestD / 2]),
+        h.box('strap-top-' + name, sl.trim, [x0, strapTop - strapT, -chestD / 2], [x1, strapTop, chestD / 2]),
+        h.box('strap-back-' + name, sl.trim, [x0, neckline - 0.01, -chestD / 2], [x1, strapTop, -chestD / 2 + strapT]),
+      ];
     local body = [
       oct('low', sl.body, hem, bust.pelvisHeight + bust.waistHeight, lowW, lowD, cut),
       oct('ribs', sl.body, bust.pelvisHeight + bust.waistHeight - 0.01, ribTop, bust.ribWidth + 2 * g, bust.ribDepth + 2 * g, cut),
-      oct('chest', sl.body, ribTop - 0.01, chestTop, chestW, chestD, bust.chestChamfer / 2),
+      oct('chest', sl.body, ribTop - 0.01, bodyTop, chestW, chestD, bust.chestChamfer / 2),
+    ] + (if straps then strap('l', -1) + strap('r', 1) else [
       oct('yoke', sl.body, chestTop - 0.13, chestTop + g, 2 * shoulderX, bust.shoulderDepth + 2 * g, 0.03),
-    ] + (if s.collar == 'none' then [] else [
+    ]) + (if collar == 'none' then [] else [
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
-    ]) + (if s.collar == 'lapel' then [
+    ]) + (if collar == 'lapel' then [
       h.prism('lapel-' + side, sl.trim, 'z', [[side * 0.03, chestTop], [side * 0.13, chestTop - 0.02], [side * 0.04, chestTop - 0.15]],
               chestD / 2, chestD / 2 + 0.008)
       for side in [-1, 1]
     ] else []) + (if s.zipX == null then [] else [
       // The closure runs down each level's front face.
       h.box('zip-' + l[0], sl.fastener, [s.zipX - 0.005, l[1], front(l[1])], [s.zipX + 0.005, l[2], front(l[1]) + 0.004])
-      for l in [['low', hem, bust.pelvisHeight + bust.waistHeight], ['ribs', bust.pelvisHeight + bust.waistHeight, ribTop], ['chest', ribTop, chestTop - 0.02]]
+      for l in [['low', hem, bust.pelvisHeight + bust.waistHeight], ['ribs', bust.pelvisHeight + bust.waistHeight, ribTop], ['chest', ribTop, bodyTop - 0.02]]
     ]) + (if s.pockets then [
       h.box('pocket-' + (if side < 0 then 'l' else 'r'), sl.fastener, [side * 0.13 - 0.04, 0.2, lowD / 2], [side * 0.13 + 0.04, 0.208, lowD / 2 + 0.004])
       for side in [-1, 1]
@@ -87,7 +105,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * g + 0.008, arm.upperDepth + 2 * g + 0.004, 0.02),
       oct('cuff', sl.trim, -arm.foreLength, -arm.foreLength + 0.03, arm.foreWidth + 2 * g + 0.012, arm.upperDepth + 2 * g + 0.008, 0.02),
     ];
-    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, ['torso'])]
+    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if straps then ['trunk'] else ['torso'])]
            + (if s.sleeves == 'none' then [] else [
                 paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
                 paired(id + '_worn_fore', 'cuff', fore, finish, ['fore']),
