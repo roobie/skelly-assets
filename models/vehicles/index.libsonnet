@@ -52,6 +52,7 @@
   'horse_box': import 'models/vehicles/horse_box.libsonnet',
   'ice_cream_van': import 'models/vehicles/ice_cream_van.libsonnet',
   'jackknifed_lorry_cab': import 'models/vehicles/jackknifed_lorry_cab.libsonnet',
+  'light_4x4_truck': import 'models/vehicles/light_4x4_truck.libsonnet',
   'light_helicopter': import 'models/vehicles/light_helicopter.libsonnet',
   'light_tactical_vehicle': import 'models/vehicles/light_tactical_vehicle.libsonnet',
   'limousine': import 'models/vehicles/limousine.libsonnet',
