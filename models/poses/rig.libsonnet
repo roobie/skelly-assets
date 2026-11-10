@@ -19,10 +19,7 @@
 //
 // `absorbs` names the bones of the player's mob rig (`clips`, an actor of models/mobs.json) that this bone stands for,
 // children folded into it, so the player's clips play on the doll: the doll's one torso part is mobgen's spine and chest.
-//
-// `clearance.marginMetres` is how far a garment may stand off or pass into the body before the clearance probe
-// (site/clearance.mjs) flags it: the doll's parts and the worn shells are blocky, so their corners meet a few
-// millimetres proud of each other at rest, and the margin is what keeps a fitting garment clean.
+
 local trunk = { model: 'player_bust' };
 local arm = { model: 'player_arm', sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
 local leg = { model: 'player_leg', sided: true, parent: 'pelvis', along: [0, -1, 0] };
@@ -32,7 +29,6 @@ local leg = { model: 'player_leg', sided: true, parent: 'pelvis', along: [0, -1,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
-  clearance: { marginMetres: 0.006 },
   bones: {
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
                     limits: { flex: [-20, 20], twist: [-30, 30], abduct: [-15, 15] } },

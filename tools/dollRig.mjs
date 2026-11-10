@@ -86,7 +86,6 @@ export function dollRig(content, doll, dressing) {
     frame: 'model',
     root: content.root,
     clips: content.clips,
-    clearance: content.clearance,
     bones: ordered.map(({ along, flexAxis, pole, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);

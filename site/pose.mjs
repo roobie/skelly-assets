@@ -11,7 +11,7 @@
 // figure with its controls, and `window.showPose` loads a fixture by name or a pose file object into them.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { clearanceProbe } from './clearance.mjs';
+import { clearanceProbe, coveredSurface } from './clearance.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -20,7 +20,7 @@ import { samplePose } from './poseSample.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
 import { drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
-const ISSUE_COLOUR = { pokes: 0xd0301a, sinks: 0xe0901a };
+const ISSUE_COLOUR = { pokes: 0xd0301a, flush: 0xb03ab0, sinks: 0xe0901a };
 const IDENTITY_Q = [0, 0, 0, 1];
 // The doll at rest, standing on the ground: the page's pose until a fixture is chosen.
 const standing = (rig) => ({ rig: { id: rig.id, revision: rig.revision }, ground: true });
@@ -81,7 +81,8 @@ function worldMesh(object) {
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
-// joint, and `probe` is the clearance probe of the figure at rest. A piece rides the bone of the part copy it is drawn
+// joint, and `clearance()` gives the figure's covered surface at rest and the clearance probe over it, made when first
+// asked for, since a figure drawn only to be looked at needs neither. A piece rides the bone of the part copy it is drawn
 // in (its site's part and side); what no bone carries, such as a wearable placed whole, stays where the dressing put it.
 export async function buildFigure(data, wear) {
   const { rig } = data;
@@ -116,7 +117,15 @@ export async function buildFigure(data, wear) {
     for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, mesh: worldMesh(group) });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));
-  return { rig, root, marks, bones, probe: clearanceProbe(rig, rest, { margin: rig.clearance.marginMetres }) };
+  let clearance;
+  const covered = () => {
+    if (!clearance) {
+      const surface = coveredSurface(rig, rest);
+      clearance = { surface, probe: clearanceProbe(rig, rest, surface) };
+    }
+    return clearance;
+  };
+  return { rig, root, marks, bones, clearance: covered };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
@@ -128,10 +137,10 @@ export function applyFrame(figure, frame) {
   figure.root.updateMatrixWorld(true);
 }
 
-// Runs the clearance probe on the figure in `frame`, marking its findings: pokes in red, sinks in orange, drawn through
-// whatever hides them.
+// Runs the clearance probe on the figure in `frame`, marking its findings: pokes in red, flush points in purple, sinks
+// in orange, drawn through whatever hides them. Seams are the garment overlapping itself, so they are not marked.
 function probe(figure, frame) {
-  const found = figure.probe(boneTransforms(figure.rig.bones, decodeFrame(frame)));
+  const found = figure.clearance().probe(boneTransforms(figure.rig.bones, decodeFrame(frame)));
   figure.marks.clear();
   for (const [kind, color] of Object.entries(ISSUE_COLOUR)) {
     const points = found[kind].flatMap(({ point }) => point);
@@ -350,8 +359,13 @@ async function startPage(data, query) {
     bones.set(state.angles);
     setNumbers(ROOT, state.root);
     if ($('probe').checked) {
-      const { pokes, sinks } = probe(figure, frame);
-      $('probe-report').textContent = [`${pokes.length} poke, ${sinks.length} sink`, pokes.length ? `pokes: ${countBy(pokes, 'bone')}` : '', sinks.length ? `sinks: ${countBy(sinks, 'piece')}` : ''].filter(Boolean).join('\n');
+      const { pokes, flush, sinks, seams } = probe(figure, frame);
+      $('probe-report').textContent = [
+        `${pokes.length} poke, ${flush.length} flush, ${sinks.length} sink, ${seams.length} seam`,
+        pokes.length ? `pokes: ${countBy(pokes, 'bone')}` : '',
+        flush.length ? `flush: ${countBy(flush, 'bone')}` : '',
+        sinks.length ? `sinks: ${countBy(sinks, 'piece')}` : '',
+      ].filter(Boolean).join('\n');
     } else {
       figure.marks.clear();
       $('probe-report').textContent = '';

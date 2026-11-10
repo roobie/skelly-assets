@@ -15,36 +15,52 @@ const boxMesh = ([w, h, d], centre = [0, 0, 0]) => {
   return { positions, indices };
 };
 
+// Two meshes as one, as a part or a piece built of shells that overlap.
+const union = (a, b) => ({ positions: [...a.positions, ...b.positions], indices: [...a.indices, ...b.indices.map((i) => i + a.positions.length / 3)] });
+
 // Two bones hanging down the y axis, an upper arm and a forearm below it, each a 0.1 m thick part.
 const rig = { bones: [{ id: 'upper', head: [0, 0, 0], tail: [0, -0.3, 0] }, { id: 'fore', head: [0, -0.3, 0], tail: [0, -0.6, 0] }] };
 const body = [{ bone: 'upper', mesh: boxMesh([0.1, 0.3, 0.1], [0, -0.15, 0]) }, { bone: 'fore', mesh: boxMesh([0.1, 0.3, 0.1], [0, -0.45, 0]) }];
-const sleeve = (width, length = 0.3) => ({ piece: 'sleeve', bone: 'upper', mesh: boxMesh([width, length, width], [0, -length / 2, 0]) });
+// A sleeve from a centimetre above the shoulder, so the arm's end lies inside it, `length` down the arm.
+const sleeveMesh = (width, length = 0.3) => boxMesh([width, length + 0.01, width], [0, 0.005 - length / 2, 0]);
+const sleeve = (width, length) => ({ piece: 'sleeve', bone: 'upper', mesh: sleeveMesh(width, length) });
 const still = new Map(rig.bones.map(({ id }) => [id, { r: IDENTITY_M, t: [0, 0, 0] }]));
-const margin = 0.006;
+const clean = { pokes: [], flush: [], sinks: [], seams: [] };
 
 test('a sleeve that encloses its arm is clean at rest', () => {
-  const { pokes, sinks } = clearanceProbe(rig, { body, pieces: [sleeve(0.12)] }, { margin })(still);
-  assert.deepEqual({ pokes, sinks }, { pokes: [], sinks: [] });
+  assert.deepEqual(clearanceProbe(rig, { body, pieces: [sleeve(0.12)] })(still), clean);
 });
 
-test('a sleeve narrower than its arm lets the arm poke through at rest', () => {
-  const { pokes } = clearanceProbe(rig, { body, pieces: [sleeve(0.08)] }, { margin })(still);
+test('a sleeve a millimetre narrower than its arm lets the arm poke through at rest', () => {
+  const { pokes } = clearanceProbe(rig, { body, pieces: [sleeve(0.099)] })(still);
   assert.ok(pokes.length > 0);
   assert.ok(pokes.every(({ bone }) => bone === 'upper'), 'only the sleeved bone is covered');
 });
 
-test('the margin forgives a fit within it and no more', () => {
-  const flush = { body, pieces: [sleeve(0.1 - margin)] };
-  assert.deepEqual(clearanceProbe(rig, flush, { margin })(still).pokes, []);
-  assert.ok(clearanceProbe(rig, flush, { margin: 0 })(still).pokes.length > 0);
+test('a sleeve whose faces lie on its arm\'s is flush, not poked through', () => {
+  const { pokes, flush } = clearanceProbe(rig, { body, pieces: [sleeve(0.1)] })(still);
+  assert.deepEqual(pokes, []);
+  assert.ok(flush.length > 0 && flush.every(({ bone }) => bone === 'upper'));
+});
+
+test('an arm face shared with a shell inside the sleeve is hidden, not flush', () => {
+  const lined = { piece: 'sleeve', bone: 'upper', mesh: union(sleeveMesh(0.12), sleeveMesh(0.1)) };
+  assert.deepEqual(clearanceProbe(rig, { body, pieces: [lined] })(still), clean);
+});
+
+test('a piece passing through a part beneath its face covers that face, and nothing beyond its end', () => {
+  // A sleeve run past the elbow over a forearm wider than it: the forearm's sides poke out of the sleeve's lower end.
+  const wide = [body[0], { bone: 'fore', mesh: boxMesh([0.14, 0.3, 0.14], [0, -0.45, 0]) }];
+  const { pokes } = clearanceProbe(rig, { body: wide, pieces: [sleeve(0.12, 0.4)] })(still);
+  assert.ok(pokes.length > 0);
+  assert.ok(pokes.every(({ bone, point }) => bone === 'fore' && point[1] >= -0.4), 'the forearm below the cuff is not covered');
 });
 
 test('a joint that turns a covered part out of its piece pokes, and one that turns a part into a piece sinks', () => {
   // The sleeve runs past the elbow, covering the top of the forearm at rest. Swinging the forearm away pulls that out;
   // sliding the upper arm, sleeve and all, down and aside drives the sleeve's wall through the forearm.
-  const long = { body, pieces: [sleeve(0.12, 0.4)] };
-  const probe = clearanceProbe(rig, long, { margin });
-  assert.deepEqual(probe(still), { pokes: [], sinks: [] });
+  const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12, 0.4)] });
+  assert.deepEqual(probe(still), clean);
   const elbow = [0, -0.3, 0];
   const about = (r, [x, y, z]) => ({ r, t: [x - (r[0] * x + r[1] * y + r[2] * z), y - (r[3] * x + r[4] * y + r[5] * z), z - (r[6] * x + r[7] * y + r[8] * z)] });
   const forearmOut = new Map([...still, ['fore', about(rotZ(90), elbow)]]);
@@ -58,11 +74,21 @@ test('a joint that turns a covered part out of its piece pokes, and one that tur
 test('a piece already sunk into the body at rest is its fit, not a sink', () => {
   // A sleeve thinner than the arm along z but wider along x passes through the arm's sides by design.
   const sunk = { body, pieces: [{ piece: 'sleeve', bone: 'upper', mesh: boxMesh([0.12, 0.3, 0.06], [0, -0.15, 0]) }] };
-  assert.deepEqual(clearanceProbe(rig, sunk, { margin })(still).sinks, []);
+  assert.deepEqual(clearanceProbe(rig, sunk)(still).sinks, []);
 });
 
-test('a probe refuses a negative margin and a pose missing a bone', () => {
-  assert.throws(() => clearanceProbe(rig, { body, pieces: [] }, { margin: -1 }), /margin/);
-  const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12)] }, { margin });
+test('a piece driven into the body inside another piece is a seam, not a sink', () => {
+  // A cuff riding the forearm inside the sleeve's lower end: sliding the upper arm aside drives the sleeve through the
+  // forearm, but where it passes inside the cuff the garment only overlaps itself.
+  const cuff = { piece: 'cuff', bone: 'fore', mesh: boxMesh([0.3, 0.1, 0.3], [0, -0.35, 0]) };
+  const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12, 0.4), cuff] });
+  const { sinks, seams } = probe(new Map([...still, ['upper', { r: IDENTITY_M, t: [-0.06, -0.25, 0] }]]));
+  assert.ok(seams.some(({ piece, into }) => piece === 'sleeve' && into === 'fore'));
+  const sleeveSinks = sinks.filter(({ piece }) => piece === 'sleeve');
+  assert.ok(sleeveSinks.length > 0 && sleeveSinks.every(({ point }) => point[1] < -0.4), 'the sleeve sinks only below the cuff');
+});
+
+test('a probe refuses a pose missing a bone', () => {
+  const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12)] });
   assert.throws(() => probe(new Map([['upper', still.get('upper')]])), /no transform for bone fore/);
 });

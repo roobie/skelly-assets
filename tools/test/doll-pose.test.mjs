@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
-import { clearanceProbe } from '../../site/clearance.mjs';
+import { clearanceProbe, coveredSurface } from '../../site/clearance.mjs';
 import { boneTransforms, dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
 import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
@@ -38,7 +38,6 @@ const rig = dollRig(readRigContent(repo), doll, dressing);
 const models = manifest.models.filter((model) => model.path.endsWith('.glb'));
 const boxOf = (id) => { const entry = models.find((model) => model.id === id); return modelBox(readFileSync(join(built, entry.pack, entry.path))); };
 const rest = restMeshes(rig, wornSites(models.find((model) => model.id === WEAR), { dressing, doll, models, boxOf }), treeMeshes(built, manifest));
-const margin = rig.clearance.marginMetres;
 const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
 const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
@@ -55,9 +54,21 @@ test('every pose fixture compiles on the doll within its limits, and its frame p
   }
 });
 
-test('the jacket at rest is clean within the rig margin', () => {
-  assert.ok(rest.pieces.length > 0);
-  assert.deepEqual(clearanceProbe(rig, rest, { margin })(still), { pokes: [], sinks: [] });
+test('a jacket of boxes standing off the torso and arms is clean at rest', () => {
+  // Each box is its part's bounds grown by a centimetre: convex, so it encloses its part whatever the part's shape.
+  const EASE = 0.01;
+  const boxAround = ({ positions }) => {
+    const points = Array.from({ length: positions.length / 3 }, (_, i) => positions.slice(i * 3, i * 3 + 3));
+    const [min, max] = [Math.min, Math.max].map((pick, side) => [0, 1, 2].map((a) => pick(...points.map((p) => p[a])) + (side ? EASE : -EASE)));
+    const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => [0, 1, 2].map((a) => ((k >> a) & 1 ? max : min)[a]));
+    const indices = [0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6, 0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7, 0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5];
+    return { positions: corners.flat(), indices };
+  };
+  const pieces = rest.body.filter(({ bone }) => /^(spine|upperArm|forearm)/.test(bone)).map(({ bone, mesh }) => ({ piece: `box ${bone}`, bone, mesh: boxAround(mesh) }));
+  const jacket = { body: rest.body, pieces };
+  const surface = coveredSurface(rig, jacket);
+  assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), 'the boxes cover the body');
+  assert.deepEqual(clearanceProbe(rig, jacket, surface)(still), { pokes: [], flush: [], sinks: [], seams: [] });
 });
 
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
@@ -78,6 +89,6 @@ test('upper sleeves narrowed inside their arms let the upper arms poke through',
   };
   const pieces = rest.pieces.map((piece) => (piece.piece === `${WEAR}_worn_upper` ? { ...piece, mesh: narrowed(piece) } : piece));
   assert.ok(pieces.some((piece, i) => piece !== rest.pieces[i]), 'the jacket has upper sleeves to narrow');
-  const { pokes } = clearanceProbe(rig, { ...rest, pieces }, { margin })(still);
+  const { pokes } = clearanceProbe(rig, { ...rest, pieces })(still);
   assert.ok(pokes.some(({ bone }) => bone.startsWith('upperArm.')), 'an upper arm shows through');
 });
