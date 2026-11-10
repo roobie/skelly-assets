@@ -3,6 +3,7 @@ read_if:
   - building models or adding source-backed per-pack export recipes
   - understanding package origin and the boundary between tools and game consumers
   - reviewing how models or assembled vehicles look, as pictures, contact sheets or a vehicle gallery
+  - changing how a vehicle comes apart in an exploded view
 ---
 
 # Model tools
@@ -144,8 +145,15 @@ model in the showcase. See `model-sheet.mjs` and `vehicle-gallery.mjs`.
 They draw through the showcase's own renderer, `../site/render.mjs`, from a built tree, so a review judges what the
 showcase shows and no second renderer can drift from it. A vehicle is assembled from its built placements, the one
 source of where its parts sit; see `../docs/decisions/0001-vehicle-placements.md`. Each picture has four views over a
-ground grid, because a view fitted to its square hides scale. The views look from where the model frame puts the front, not from the
-model's proportions; see `../docs/decisions/0002-model-frame.md`.
+ground grid, because a view fitted to its square hides scale. The views look from where the model frame puts the
+front, not from the model's proportions; see `../docs/decisions/0002-model-frame.md`.
+
+A vehicle's picture adds its exploded view, because a picture of the whole hides the parts inside it, such as an
+engine's accessories round its core. The showcase's viewer explodes a vehicle by the same rule, `../site/explode.mjs`,
+`explode`, so a review judges the parts the showcase shows. The rule clears every part of every other rather than
+spreading them by distance alone, because parts that touch sit at nearly the same distance from the centre and would
+move out together. Placements are flat, so an engine fitted as an assembly comes apart as its sites, each from the
+vehicle's centre, not as a group round its core.
 
 A sheet keeps every entry drawn into its folder, so a batch still reads whole after a few entries are redrawn. Each
 picture records a digest of the built files it was drawn from, so the gallery tells a render older than its model by
@@ -153,5 +161,6 @@ content, not by file times that every rebuild resets; see `look.mjs`, `staleIds`
 `look/`, so a look never leaves tracked changes.
 
 Drawing needs a headless browser and takes seconds per model, so it runs on demand and never in CI, whose wall clock
-comes first. Its tests cover only its logic: which entries a look draws, which way its views look and when a picture is stale. The browser is
-Playwright's Chromium, which the gun tool's browser tests already use.
+comes first. Its tests cover only its logic: which entries a look draws, which way its views look, how an assembly
+comes apart and when a picture is stale. The browser is Playwright's Chromium, which the gun tool's browser tests
+already use.

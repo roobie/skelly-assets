@@ -1,6 +1,7 @@
-// Draws models and assembled vehicles of a built tree into tiles of four views and a contact sheet, so a reviewer,
-// human or agent, can check their looks without opening each one. The drawing is the showcase's own: this builds the
-// showcase from the tree and drives its review page (site/look.mjs) in headless Chromium.
+// Draws models and assembled vehicles of a built tree into tiles of four views, with a vehicle's exploded view beside
+// them, and a contact sheet, so a reviewer, human or agent, can check their looks without opening each one. The drawing
+// is the showcase's own: this builds the showcase from the tree and drives its review page (site/look.mjs) in headless
+// Chromium.
 // Usage: node tools/model-sheet.mjs [--built built] [--out look/sheet] [--size 256] [--vehicles] [id ...]
 // With no ids and no --vehicles it draws every model and vehicle. A vehicle is assembled from its built placements.
 // Writes <out>/tiles/<id>.png, <out>/sheet.json and <out>/index.html; rows of earlier looks into the same folder stay.
@@ -100,12 +101,12 @@ writeAtomic(sheetPath, `${JSON.stringify(rows, null, 1)}\n`);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const figure = (r) => r.error
   ? `<figure data-id="${esc(r.id)}"><figcaption><b>${esc(r.id)}</b><div class=err>${esc(r.error)}</div></figcaption></figure>`
-  : `<figure data-id="${esc(r.id)}"><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, four views"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
+  : `<figure data-id="${esc(r.id)}"${r.exploded ? ' class=exploded' : ''}><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, ${r.exploded ? 'four views and exploded' : 'four views'}"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
 const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
+figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.exploded{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
 input{font:inherit;padding:4px 8px;margin-bottom:12px;width:280px}</style>
-<p>${rows.length} entries · views: front ¾ | rear ¾ / side | top · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
+<p>${rows.length} entries · views: front ¾ | rear ¾ / side | top, then a vehicle exploded from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
 ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);
