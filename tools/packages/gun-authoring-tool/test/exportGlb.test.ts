@@ -671,8 +671,8 @@ describe('glb export: deadvox model entry', () => {
   });
 
   // Sight solids count too, so a gun that draws sights without a sight axis cannot pass as sightless.
-  it.each(loadCorpus())('exports sight metadata exactly when sight parts exist: $label', ({ label, assembly }) => {
-    const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' });
+  it.each(loadCorpus())('exports sight metadata exactly when sight parts exist: $label', ({ label, assembly, items }) => {
+    const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' }, { items });
     if (!result.ok) {
       throw new Error(`${label}: export failed: ${JSON.stringify(result.error)}`);
     }

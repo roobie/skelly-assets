@@ -39,7 +39,11 @@ describe('palette coverage', () => {
       roles.add(family.build(defaults).family);
       for (const [name, spec] of Object.entries(family.params)) {
         for (const value of spec.values) {
-          roles.add(family.build({ ...defaults, [name]: value }).family);
+          const params = { ...defaults, [name]: value };
+          // A refused combination never builds, so it reports no role.
+          if (family.validateParams?.(params) === undefined) {
+            roles.add(family.build(params).family);
+          }
         }
       }
     }

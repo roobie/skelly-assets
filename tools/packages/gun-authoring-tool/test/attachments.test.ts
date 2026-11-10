@@ -30,6 +30,7 @@ import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
 import { OPTIC_CATALOG, opticRailContactSolids } from '../src/gun/optics.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
+import type { PartItems } from '../src/gun/physical.ts';
 import { opticEyeRelief } from '../src/gun/rules.ts';
 import { TEMPLATES } from '../src/gun/templates.ts';
 import { readGlb } from './glbReader.ts';
@@ -338,13 +339,14 @@ const design = (name: string): Assembly => {
   return loaded.design.assembly;
 };
 
-const exported = (assembly: Assembly, id: string, includeCompatibility = true) => {
+const exported = (assembly: Assembly, id: string, includeCompatibility = true, items: PartItems = {}) => {
   const result = exportGunGlb(
     assembly,
     { id, file: `assets/models/${id}.glb` },
     {},
     {
       includeAttachmentCompatibility: includeCompatibility,
+      items,
     },
   );
   if (!result.ok) {
@@ -840,8 +842,8 @@ describe('attachment parts and export metadata', () => {
     expect(corpus.length).toBeGreaterThan(0);
   });
 
-  it.each(corpus)('exports mount poses for $label', ({ label, assembly }) => {
-    const model = exported(assembly, `corpus_${assembly.name.replaceAll('-', '_')}`, false);
+  it.each(corpus)('exports mount poses for $label', ({ label, assembly, items }) => {
+    const model = exported(assembly, `corpus_${assembly.name.replaceAll('-', '_')}`, false, items);
     const slots = model.modelEntry.gun.attachmentSlots ?? [];
     const fitted = model.modelEntry.gun.attachments ?? [];
     expect(

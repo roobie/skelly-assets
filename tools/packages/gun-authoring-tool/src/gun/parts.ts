@@ -87,7 +87,15 @@ import {
 } from './roundedTriggerGuard.ts';
 import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIONS } from './shotgunProportions.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
-import { cutSporterAction, sporterActionDetails, sporterFurniture, sporterLower, sporterStock } from './sporter.ts';
+import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
+import {
+  cutSporterAction,
+  sporterActionDetails,
+  sporterBeddingPockets,
+  sporterFurniture,
+  sporterLower,
+  sporterStock,
+} from './sporter.ts';
 import { SPORTER_PROPORTIONS } from './sporterProportions.ts';
 import { taperedStockSolids } from './taperedStock.ts';
 import {
@@ -1878,7 +1886,17 @@ const receiver: PartFamily = {
     feed: choice('box', 'top', 'tube'),
     section: choice('standard', 'ar', 'pump', 'sporter', 'compact-smg'),
     stockStyle: {
-      ...choice('straight', 'sporting', 'thumbhole', 'm4', 'tapered', 'tapered-sawed', 'ak-buttstock', 'telescoping'),
+      ...choice(
+        'straight',
+        'sporting',
+        'thumbhole',
+        'm4',
+        'tapered',
+        'tapered-sawed',
+        'ak-buttstock',
+        'telescoping',
+        'plank',
+      ),
       from: [{ port: 'stock', param: 'style' }],
     },
     carrierPattern: {
@@ -1901,7 +1919,7 @@ const receiver: PartFamily = {
     rail: choice('full', 'none'),
     integral: { ...choice('no', 'yes'), from: [{ port: 'lower', param: 'integral' }] },
     magazineWell: {
-      values: ['standard', 'recessed'],
+      values: ['standard', 'recessed', 'none'],
       default: 'standard',
       from: [{ port: 'lower', param: 'magazineWell' }],
     },
@@ -2794,6 +2812,8 @@ const compactSmgLower = (top: PortDef, withGuard: boolean): PartDef => {
   };
 };
 
+const WELL_LESS_LOWER_REFUSAL = 'Only the sporter lower is built without a magazine well.';
+
 const lower: PartFamily = {
   name: 'lower',
   params: {
@@ -2808,7 +2828,8 @@ const lower: PartFamily = {
       from: [{ port: 'top', param: 'actionFrame' }],
     },
     triggerGuard: { values: ['present', 'missing'], default: 'present', fault: ['missing'] },
-    magazineWell: choice('standard', 'recessed'),
+    // A single-shot lower has no well: the round goes straight into the chamber.
+    magazineWell: choice('standard', 'recessed', 'none'),
     integral: { ...choice('no', 'yes'), from: [{ port: 'magazine', param: 'integral' }] },
     magazineOrientation: {
       values: MAGAZINE_ORIENTATIONS,
@@ -2829,6 +2850,8 @@ const lower: PartFamily = {
       from: [{ port: 'magazine', param: 'profile' }],
     },
   },
+  validateParams: (params) =>
+    params.magazineWell === 'none' && params.section !== 'sporter' ? WELL_LESS_LOWER_REFUSAL : undefined,
   build(params): PartDef {
     const orientation = orientationParts(params.magazineOrientation ?? 'straight');
     const layout = params.layout ?? 'conventional';
@@ -2976,9 +2999,15 @@ const lower: PartFamily = {
     // x = −7) without entering it. Bullpup: the front face stays at x = −3.5,
     // behind the grip, which leans back from x = 3.
     const conventionalWellX = MAGAZINE_WELL_CENTER_X + (orientation.kind === 'tilt' ? 0.25 : 0);
+    if (params.magazineWell === 'none') {
+      if (params.section !== 'sporter') {
+        throw new Error(WELL_LESS_LOWER_REFUSAL);
+      }
+      return sporterLower(top);
+    }
     const conventionalWell = well(conventionalWellX);
     if (params.section === 'sporter') {
-      return sporterLower(top, conventionalWell.port, conventionalWell.path);
+      return sporterLower(top, conventionalWell);
     }
     if (params.section === 'compact-smg') {
       return compactSmgLower(top, params.triggerGuard !== 'missing');
@@ -4149,6 +4178,8 @@ const handguard: PartFamily = {
     handleStyle: choice('none', 'smg'),
     fit: { values: ['receiver', 'oversized', 'too-tight'], default: 'receiver', fault: ['oversized', 'too-tight'] },
     mount: choice('clamped', 'free-float'),
+    // A plank is a rough board strapped under a sporter action and its barrel instead of fitted furniture.
+    style: choice('fitted', 'plank'),
   },
   build(params): PartDef {
     const lengthClass = cls(params, 'length');
@@ -4244,7 +4275,28 @@ const handguard: PartFamily = {
           ]
         : [];
     let bodySolids: Solid[];
-    if (params.section === 'sporter') {
+    if (params.style === 'plank') {
+      // Only the sporter action sits on the plank; any other receiver carries the board ahead of its front face.
+      bodySolids = plankForeEndSolids({
+        length: len,
+        barrelRadius: BARREL_RADIUS[bore],
+        ...(params.section === 'sporter'
+          ? {
+              bed: {
+                floor: SPORTER_PROPORTIONS.foreEnd.stations.map(([x, , bottom]) => [x, bottom] as const),
+                pockets: sporterBeddingPockets({
+                  handleSpace: boltActionHandSpace(params, SPORTER_PROPORTIONS.receiver.carrierAxisU).box,
+                  ejectionWindow: ejectionPortWindow(
+                    'bolt',
+                    BOLT_TRAVEL.bolt.restX,
+                    SPORTER_PROPORTIONS.receiver.carrierAxisU,
+                  ),
+                }),
+              },
+            }
+          : {}),
+      });
+    } else if (params.section === 'sporter') {
       bodySolids = sporterFurniture({
         length: len,
         barrelRadius: BARREL_RADIUS[bore],
@@ -5427,7 +5479,17 @@ const stock: PartFamily = {
   name: 'stock',
   params: {
     length: size,
-    style: choice('straight', 'sporting', 'ak-buttstock', 'm4', 'tapered', 'tapered-sawed', 'thumbhole', 'telescoping'),
+    style: choice(
+      'straight',
+      'sporting',
+      'ak-buttstock',
+      'm4',
+      'tapered',
+      'tapered-sawed',
+      'thumbhole',
+      'telescoping',
+      'plank',
+    ),
     pose: choice('extended', 'collapsed'),
     combDegrees: choice(...sportingStockParams.combDegrees),
     section: {
@@ -5465,6 +5527,17 @@ const stock: PartFamily = {
         keepOuts: [],
         // The cheek rests on the comb, behind the neck's saddle.
         axes: [{ kind: 'cheek', origin: [AK_COMB.x, akStockTop(AK_COMB.x), 0], dir: X }],
+      };
+    }
+    if (params.style === 'plank') {
+      const boards = plankStockSolids();
+      return {
+        family: 'stock',
+        solids: params.section === 'sporter' ? sporterStock(boards) : boards,
+        ports: [port],
+        keepOuts: [],
+        axes: plankStockAxes(),
+        tags: [FIRING_GRIP],
       };
     }
     if (params.style === 'm4') {

@@ -51,11 +51,14 @@ export const withoutHandleStyle = (family: PartFamily) =>
     ),
   );
 
-// Straight STANAG only accepts M; the rejected lengths have a dedicated contract test.
+// Straight STANAG only accepts M, and only the sporter lower (its section is not swept) is built without a well;
+// the rejected rows have dedicated contract tests.
 export const acceptedCases = (key: string, cases: Record<string, string>[]): Record<string, string>[] =>
   key === 'magazine'
     ? cases.filter(({ profile, length: lengthClass }) => profile !== 'stanag-straight' || lengthClass === 'M')
-    : cases;
+    : key === 'lower'
+      ? cases.filter(({ magazineWell }) => magazineWell !== 'none')
+      : cases;
 
 export const sweepCases = (_key: string, family: PartFamily): Record<string, string>[] =>
   runSweeps ? fullProduct(withoutHandleStyle(family)) : [];

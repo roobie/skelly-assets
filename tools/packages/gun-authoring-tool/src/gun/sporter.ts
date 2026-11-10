@@ -49,7 +49,11 @@ const sporterFinger = (): Box =>
     [P.lower.finger.x[1], P.lower.finger.y[1], P.lower.finger.z[1]],
   );
 
-export const sporterLower = (top: PortDef, magazine: PortDef, path: PartDef['keepOuts'][number]): PartDef => {
+/** The sporter's floorplate, guard and trigger; without a well it is a single-shot lower. */
+export const sporterLower = (
+  top: PortDef,
+  well?: { readonly port: PortDef; readonly path: PartDef['keepOuts'][number] },
+): PartDef => {
   const { finger, guardWallU: wall, guardHalfWidthU: half, plateThicknessU: plate, plateHalfWidthU: width } = P.lower;
   return {
     family: 'lower',
@@ -86,8 +90,8 @@ export const sporterLower = (top: PortDef, magazine: PortDef, path: PartDef['kee
         }),
       ),
     ],
-    ports: [top, magazine],
-    keepOuts: [{ id: 'trigger-finger', kind: 'trigger-finger', box: sporterFinger() }, path],
+    ports: well ? [top, well.port] : [top],
+    keepOuts: [{ id: 'trigger-finger', kind: 'trigger-finger', box: sporterFinger() }, ...(well ? [well.path] : [])],
     axes: [],
   };
 };
@@ -208,25 +212,16 @@ export const sporterSupport = (length: number): readonly [number, number, number
   return [x, point[2], 0];
 };
 
-export const sporterFurniture = ({
-  length,
-  barrelRadius,
-  roundSection,
-  magazine,
-  handleSpace,
-  ejectionWindow,
-}: {
-  length: number;
-  barrelRadius: number;
-  roundSection: (radius: number) => readonly Vec2[];
-  magazine: { depth: number; width: number; x: number };
-  handleSpace: Box;
-  ejectionWindow: { readonly x: readonly [number, number]; readonly y: readonly [number, number] };
-}): Solid[] => {
-  const capStart = length - P.foreEnd.capLengthU;
-  const stations = furnitureStations(length);
+/** The action's room inside its bedding: what any sporter-action stock bed leaves uncut. */
+export interface SporterBedding {
+  readonly magazine?: { readonly depth: number; readonly width: number; readonly x: number };
+  readonly handleSpace: Box;
+  readonly ejectionWindow: { readonly x: readonly [number, number]; readonly y: readonly [number, number] };
+}
+
+export const sporterBeddingPockets = ({ magazine, handleSpace, ejectionWindow }: SporterBedding): SectionPocket[] => {
   const { finger, mountY } = P.lower;
-  const pockets: SectionPocket[] = [
+  return [
     { x: ejectionWindow.x, y: ejectionWindow.y, z: [P.receiver.flatRadiusU, P.foreEnd.halfWidthU] },
     {
       x: [handleSpace.center[0] - handleSpace.half[0], handleSpace.center[0] + handleSpace.half[0]],
@@ -241,11 +236,15 @@ export const sporterFurniture = ({
       }),
     ),
     { x: P.handle.reliefX, y: [P.handle.reliefBottomU, P.receiver.ringRadiusU], z: [0, P.foreEnd.halfWidthU] },
-    {
-      x: [magazine.x - magazine.depth / 2, magazine.x + magazine.depth / 2],
-      y: [P.stock.joinBottomU, P.receiver.flatRadiusU],
-      z: [-magazine.width / 2, magazine.width / 2],
-    },
+    ...(magazine
+      ? [
+          {
+            x: [magazine.x - magazine.depth / 2, magazine.x + magazine.depth / 2] as const,
+            y: [P.stock.joinBottomU, P.receiver.flatRadiusU] as const,
+            z: [-magazine.width / 2, magazine.width / 2] as const,
+          },
+        ]
+      : []),
     { x: finger.x, y: [mountY + finger.y[0], mountY + finger.y[1]], z: finger.z },
     {
       x: [P.recoilLug.rearX, P.recoilLug.frontX],
@@ -253,6 +252,21 @@ export const sporterFurniture = ({
       z: [-P.recoilLug.halfWidthU, P.recoilLug.halfWidthU],
     },
   ];
+};
+
+export const sporterFurniture = ({
+  length,
+  barrelRadius,
+  roundSection,
+  ...bedding
+}: SporterBedding & {
+  length: number;
+  barrelRadius: number;
+  roundSection: (radius: number) => readonly Vec2[];
+}): Solid[] => {
+  const capStart = length - P.foreEnd.capLengthU;
+  const stations = furnitureStations(length);
+  const pockets = sporterBeddingPockets(bedding);
   return stations.slice(1).flatMap((end, index) => {
     const start = stations[index]!;
     const cuts = [

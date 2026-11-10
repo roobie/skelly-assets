@@ -414,6 +414,35 @@ const huntingRifle: Template = {
   ],
 };
 
+/** The hunting rifle's turn-bolt action, scavenged into a single-shot: pipe barrel strapped to rough boards. */
+const pipeRifle: Template = {
+  ...huntingRifle,
+  name: 'pipe-rifle',
+  variant: '9x19',
+  description: 'Home-made single-shot turn-bolt rifle: a pipe barrel strapped to a plank, with a board stock.',
+  slots: huntingRifle.slots
+    .filter(({ id }) => id !== 'magazine' && id !== 'sight')
+    .map((slot) => {
+      if (slot.id === 'receiver') {
+        return { ...slot, params: { ...slot.params, rail: 'none' } };
+      }
+      if (slot.id === 'lower') {
+        return { ...slot, params: { layout: 'conventional', magazineWell: 'none' } };
+      }
+      if (slot.id === 'stock') {
+        return { ...slot, params: { length: 'M', style: 'plank' } };
+      }
+      if (slot.id === 'handguard') {
+        return { ...slot, params: { ...slot.params, style: 'plank' }, chance: 1 };
+      }
+      if (slot.id === 'barrel') {
+        return { ...slot, params: { length: 'M', muzzle: 'plain' } };
+      }
+      return slot;
+    }),
+  connections: huntingRifle.connections.filter(({ to }) => to !== 'magazine.top' && to !== 'sight.base'),
+};
+
 const compactSmg: Template = {
   ...smg,
   name: 'compact-smg',
@@ -650,6 +679,7 @@ export const TEMPLATES: readonly Template[] = [
   smg,
   boltRifle,
   huntingRifle,
+  pipeRifle,
   compactSmg,
   boltRifleBox,
   boltRifleThumbhole,

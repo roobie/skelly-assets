@@ -26,7 +26,7 @@ local item(id, family, selector, params, massKg, profile) =
       boltHandle: 'rest', rail: 'none', magazineWell: 'standard', integral: 'no', boltHandleProfile: 'standard',
       handleStyle: 'auto', carrierPattern: 'pump', stockStyle: 'tapered', boltCalibre: '308-winchester',
     }, 0.9, 'pump-shotgun'),
-    item('receiver_sporter', 'receiver', ['section'], {
+    item('receiver_sporter', 'receiver', ['section', 'magazineWell'], {
       section: 'sporter', action: 'bolt', actionFrame: 'small', feed: 'top', bore: 'M', chargingHandle: 'side',
       boltHandle: 'rest', rail: 'full', magazineWell: 'recessed', boltHandleProfile: 'sporter', handleStyle: 'auto',
       carrierPattern: 'bolt', stockStyle: 'sporting', integral: 'yes', boltCalibre: '308-winchester',
@@ -91,7 +91,7 @@ local item(id, family, selector, params, massKg, profile) =
     }, 0.15, 'pump-shotgun'),
     row('lower-thumbhole', 'lower', { layout: 'thumbhole' }, 0.2),
     row('lower-trigger', 'lower', { layout: 'trigger' }, 0.2),
-    item('lower_sporter', 'lower', ['layout', 'section'], {
+    item('lower_sporter', 'lower', ['layout', 'section', 'magazineWell'], {
       layout: 'conventional', section: 'sporter', actionFrame: 'small', triggerGuard: 'present', magazineWell: 'recessed',
       magazineProfile: 'standard', magazineOrientation: 'straight', integral: 'yes', boltCalibre: '308-winchester',
     }, 0.18, 'hunting-rifle'),
@@ -146,31 +146,31 @@ local item(id, family, selector, params, massKg, profile) =
     item('handguard_ak', 'handguard', ['layout'], {
       layout: 'ak', mount: 'clamped', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'S',
       actionFrame: 'small', boltCalibre: '308-winchester', section: 'ak', length: 'M', bore: 'S',
-      boltHandleProfile: 'standard',
+      boltHandleProfile: 'standard', style: 'fitted',
     }, 0.25, 'ak'),
     row('handguard-ak-standard', 'handguard', { layout: 'standard', section: 'ak' }, 0.25),
     item('handguard_ar_clamped', 'handguard', ['layout', 'mount', 'actionFrame'], {
       layout: 'ar', mount: 'clamped', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'M',
       actionFrame: 'small', boltCalibre: '308-winchester', section: 'ar', length: 'M', bore: 'M',
-      boltHandleProfile: 'standard',
+      boltHandleProfile: 'standard', style: 'fitted',
     }, 0.35, 'ar'),
     // The large frame's wider barrel extension opens the handguard's bore, so its clamped handguard is its own shape.
     item('handguard_ar_large_clamped', 'handguard', ['layout', 'mount', 'actionFrame'], {
       layout: 'ar', mount: 'clamped', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'M',
       actionFrame: 'large', boltCalibre: '308-winchester', section: 'ar', length: 'M', bore: 'M',
-      boltHandleProfile: 'standard',
+      boltHandleProfile: 'standard', style: 'fitted',
     }, 0.4, 'ar'),
     row('handguard-ar-free-float', 'handguard', { layout: 'ar', mount: 'free-float', actionFrame: 'small' }, 0.46),
     // The large frame's free-float rail is traced to its own length and top rail, so it is its own shape.
     item('handguard_ar_large_free_float', 'handguard', ['layout', 'mount', 'actionFrame'], {
       layout: 'ar', mount: 'free-float', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'M',
       actionFrame: 'large', boltCalibre: '308-winchester', section: 'ar', length: 'L', bore: 'none',
-      boltHandleProfile: 'standard',
+      boltHandleProfile: 'standard', style: 'fitted',
     }, 0.62, 'ar'),
-    item('handguard_sporter', 'handguard', ['layout', 'section'], {
+    item('handguard_sporter', 'handguard', ['layout', 'section', 'style'], {
       layout: 'standard', section: 'sporter', clearance: 'M', handleStyle: 'none', fit: 'receiver', mount: 'clamped',
       barrelBore: 'M', actionFrame: 'small', boltHandleProfile: 'sporter', boltCalibre: '308-winchester', length: 'L',
-      bore: 'M',
+      bore: 'M', style: 'fitted',
     }, 0.35, 'hunting-rifle'),
     row('handguard-compact-smg', 'handguard', { layout: 'standard', section: 'compact-smg' }, 0.25),
     row('handguard-standard-short', 'handguard', { layout: 'standard', section: 'standard', length: 'S' }, 0.15),
@@ -248,6 +248,38 @@ local item(id, family, selector, params, massKg, profile) =
     item('revolver_grip', 'revolver-grip', [], { length: 'M', butt: 'round' }, 0.08, 'revolver'),
     item('revolver_hammer', 'revolver-hammer', [], {}, 0.03, 'revolver'),
     item('revolver_trigger', 'revolver-trigger', [], { frameSize: 'M' }, 0.025, 'revolver'),
+    // The scavenged single-shot: the sporter turn-bolt on a 9x19 chamber, a pipe barrel and board furniture.
+    item('receiver_pipe', 'receiver', ['section', 'magazineWell'], {
+      section: 'sporter', action: 'bolt', actionFrame: 'small', feed: 'top', bore: 'M', chargingHandle: 'side',
+      boltHandle: 'rest', rail: 'none', magazineWell: 'none', boltHandleProfile: 'sporter', handleStyle: 'auto',
+      carrierPattern: 'bolt', stockStyle: 'plank', integral: 'no', boltCalibre: '9x19',
+    }, 0.55, 'pipe-rifle'),
+    item('bolt_carrier_pipe', 'bolt-carrier', ['pattern', 'boltCalibre'], {
+      pattern: 'bolt', handleStyle: 'auto', handleProfile: 'sporter', feed: 'top', section: 'sporter', bore: 'M',
+      action: 'bolt', actionFrame: 'small', boltCalibre: '9x19',
+    }, 0.25, 'pipe-rifle'),
+    item('bolt_handle_pipe', 'bolt-handle-arm', ['handleProfile', 'boltCalibre'], {
+      handleProfile: 'sporter', section: 'sporter', feed: 'top', bore: 'M', action: 'bolt', boltCalibre: '9x19',
+    }, 0.06, 'pipe-rifle'),
+    item('bolt_knob_pipe', 'bolt-handle-knob', ['handleProfile', 'boltCalibre'], {
+      handleProfile: 'sporter', section: 'sporter', feed: 'top', bore: 'M', action: 'bolt', boltCalibre: '9x19',
+    }, 0.02, 'pipe-rifle'),
+    item('lower_pipe', 'lower', ['layout', 'section', 'magazineWell'], {
+      layout: 'conventional', section: 'sporter', actionFrame: 'small', triggerGuard: 'present', magazineWell: 'none',
+      magazineProfile: 'standard', magazineOrientation: 'straight', integral: 'no', boltCalibre: '9x19',
+    }, 0.12, 'pipe-rifle'),
+    item('barrel_pipe', 'barrel', ['section', 'length', 'muzzle'], {
+      section: 'sporter', length: 'M', profile: 'standard', muzzle: 'plain', frontSightStyle: 'sporting',
+      handguardLength: 'M', handguardLayout: 'standard', bore: 'M', actionFrame: 'small', tubeLengthPercent: '75',
+    }, 0.85, 'pipe-rifle'),
+    item('handguard_pipe', 'handguard', ['section', 'style'], {
+      layout: 'standard', section: 'sporter', clearance: 'M', handleStyle: 'none', fit: 'receiver', mount: 'clamped',
+      barrelBore: 'M', actionFrame: 'small', boltHandleProfile: 'sporter', boltCalibre: '9x19', length: 'M',
+      bore: 'M', style: 'plank',
+    }, 0.4, 'pipe-rifle-strapped'),
+    item('stock_pipe', 'stock', ['style'], {
+      style: 'plank', length: 'M', combDegrees: '2', section: 'sporter',
+    }, 0.55, 'pipe-rifle'),
     row('heavy-receiver', 'heavy-receiver', {}, 2.5),
     row('heavy-bolt-carrier', 'heavy-bolt-carrier', {}, 1.3),
     row('heavy-lower', 'heavy-lower', {}, 0.5),

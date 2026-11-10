@@ -151,7 +151,7 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
   },
   handguard: {
     anchors: (params, part) =>
-      params.section === 'sporter'
+      params.section === 'sporter' && params.style !== 'plank'
         ? { support: frameAt(sporterSupport(part.ports.find((port) => port.id === 'front')!.pos[0])) }
         : undersideSupport(part, 0.6),
   },

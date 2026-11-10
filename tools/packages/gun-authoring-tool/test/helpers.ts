@@ -5,6 +5,7 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
 import { CARTRIDGES, DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
+import type { PartItems } from '../src/gun/physical.ts';
 import type { GltfJson, readGlb } from './glbReader.ts';
 
 const FIXTURES = join(import.meta.dirname, '..', 'fixtures');
@@ -93,6 +94,8 @@ export type MutableAssembly = Mutable<Assembly>;
 export interface CorpusEntry {
   label: string;
   assembly: Assembly;
+  /** The catalogue items a design names; an export needs them where rows alone cannot tell two parts apart. */
+  items: PartItems;
 }
 
 /** A design file's loaded assembly, with its item references expanded into the parts they name. */
@@ -115,9 +118,13 @@ export const loadDesigns = (): CorpusEntry[] =>
         throw new Error(`${f}: ${result.error.code}: ${result.error.message}`);
       }
       return result.declaredStatus === 'published' && result.design.status === 'published'
-        ? [{ label: `design ${f}`, assembly: result.design.assembly }]
+        ? [{ label: `design ${f}`, assembly: result.design.assembly, items: result.design.items ?? {} }]
         : [];
     });
+
+/** The item references a trimmed copy of a design keeps: only those naming a part it still builds. */
+export const itemsKept = (assembly: Assembly, items: PartItems): PartItems =>
+  Object.fromEntries(Object.entries(items).filter(([id]) => id in assembly.parts));
 
 /**
  * The regression corpus that property tests iterate instead of seeds: every fixture that
@@ -129,7 +136,7 @@ export const loadCorpus = (
 ): CorpusEntry[] => [
   ...loadFixtures()
     .filter(applies)
-    .map((assembly) => ({ label: `fixture ${assembly.name}`, assembly })),
+    .map((assembly) => ({ label: `fixture ${assembly.name}`, assembly, items: {} })),
   ...loadDesigns(),
 ];
 

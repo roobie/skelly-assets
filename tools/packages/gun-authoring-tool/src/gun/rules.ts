@@ -181,8 +181,10 @@ const feedIssuesForLower = (r: Resolved, receiver: PortRef, lower: PortRef): Iss
   const hasWell = lowerDef.ports.some((port) => port.mount === 'magazine') || hasGripMagazineWell(r, lower.part);
   const layout = r.params.get(lower.part)?.layout?.value;
   const what = layout ? `${lower.part} (${layout})` : lower.part;
+  // A top-loaded action over a lower built without a well is a single-shot: the round goes into the chamber by hand.
+  const singleShot = feed === 'top' && r.params.get(lower.part)?.magazineWell?.value === 'none';
 
-  if ((feed === 'box' || feed === 'top') && !hasWell) {
+  if ((feed === 'box' || (feed === 'top' && !singleShot)) && !hasWell) {
     return [
       {
         rule: 'feed-match',
