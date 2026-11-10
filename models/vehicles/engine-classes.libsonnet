@@ -42,7 +42,7 @@
     },
     alternator: { id: 'alternator_heavy', massKg: 14, radius: 0.1, length: 0.24 },
     starter: { id: 'starter_motor_heavy', massKg: 18, radius: 0.075, length: 0.34 },
-    airBox: { id: 'air_box_heavy', massKg: 8, length: 0.5, height: 0.28, width: 0.24 },
+    airBox: { id: 'air_box_heavy', massKg: 8, length: 0.5, height: 0.28, width: 0.2 },
     fuelPump: { id: 'fuel_pump_heavy', massKg: 4, size: 0.14 },
     driveBelt: { id: 'drive_belt_heavy', massKg: 0.8, width: 0.03, thickness: 0.016 },
   },

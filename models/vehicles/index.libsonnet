@@ -37,6 +37,7 @@
   'crashed_military_helicopter': import 'models/vehicles/crashed_military_helicopter.libsonnet',
   'crew_pickup': import 'models/vehicles/crew_pickup.libsonnet',
   'cube_van': import 'models/vehicles/cube_van.libsonnet',
+  'cv9040': import 'models/vehicles/cv9040.libsonnet',
   'dirt_bike': import 'models/vehicles/dirt_bike.libsonnet',
   'double_decker': import 'models/vehicles/double_decker.libsonnet',
   'electric_crossover': import 'models/vehicles/electric_crossover.libsonnet',
