@@ -67,9 +67,30 @@ export interface ExportPortMetadata {
   readonly mount: string;
   readonly gender: Gender;
   readonly size?: string;
+  /** What the interface is built for within its mount type; both sides of a joint declare the same one or neither. */
+  readonly standard?: string;
   readonly frame: PortMatingFrame;
   /** One port node can describe a repeated run of mating positions. */
   readonly slots?: RepeatedPortMetadata;
+}
+
+/**
+ * A joint between two parts, recorded on the part farther from the root: its `interface` port meets the `site` port
+ * of a part nearer the root, at the site's slot `slot` (or at its own slot `interfaceSlot`), its up turned `roll`
+ * degrees about the site's normal.
+ */
+export interface ExportMount {
+  readonly site: PartPortId;
+  readonly interface: PartPortId;
+  readonly slot?: number;
+  readonly interfaceSlot?: number;
+  readonly roll?: number;
+}
+
+/** A part's joints: `mount` placed it, `meets` are the others that close a loop. */
+export interface PartMounts {
+  readonly mount?: ExportMount;
+  readonly meets: readonly ExportMount[];
 }
 
 export interface GlbAssetIdentity {
