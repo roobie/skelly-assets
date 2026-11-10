@@ -48,8 +48,19 @@ function checkLimits(name, limits) {
   }
 }
 
+// Whether a joint axis lies in the doll's mirror plane (x = 0) or runs along x; a copy mirrored across x turns the
+// opposite way about an in-plane axis and the same way about x, so a limit range mirrors with the former and keeps
+// with the latter. Any other axis has no mirrored twin on the same frame and is refused.
+const inMirrorPlane = (axis, name) => {
+  const [x, y, z] = axis;
+  if (Math.abs(x) < 1e-9) return true;
+  if (Math.hypot(y, z) < 1e-9) return false;
+  throw new Error(`rig: bone ${name} has a joint axis ${axis.map((a) => a.toFixed(3)).join(',')} neither along x nor square to it, so its mirrored copy cannot share its limits`);
+};
+
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A sided bone off the
-// reference side mirrors its twist and abduction limits and its reach pole across x.
+// reference side mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense`
+// each angle takes there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying.
 export function dollRig(content, doll, dressing) {
   const { sides } = dressing.doll;
   if (!sides.includes(content.reference)) throw new Error(`rig: limits are written for the ${content.reference}, which the doll has no side of`);
@@ -63,16 +74,22 @@ export function dollRig(content, doll, dressing) {
       const head = spec.pivot === 'origin' ? copy.at : doll.anchors[spec.pivot?.anchor];
       if (!head) throw new Error(`rig: no pivot for ${name}: ${JSON.stringify(spec.pivot)}`);
       const mirrored = spec.sided && side !== content.reference;
-      const limits = { flex: spec.limits.flex, twist: mirrored ? mirrorRange(spec.limits.twist) : spec.limits.twist, abduct: mirrored ? mirrorRange(spec.limits.abduct) : spec.limits.abduct };
+      const flexAxis = spec.flexAxis ?? [1, 0, 0];
+      const axes = frameAbout([0, 0, 0], spec.along, flexAxis);
+      const sense = ['x', 'y', 'z'].map((axis) => (mirrored && inMirrorPlane(axes[axis], name) ? -1 : 1));
+      const limits = Object.fromEntries(AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]));
       bones.push({
         id: sided(name, side),
         parent: spec.parent === null ? null : sided(spec.parent, side),
         head,
         along: spec.along,
-        flexAxis: spec.flexAxis ?? [1, 0, 0],
+        flexAxis,
         limits,
-        bind: { model: spec.model, part: spec.part, side, site: copy.site, box: copy.box },
+        sense,
+        bind: { model: spec.model, part: spec.part, side, site: copy.site, box: copy.box, mirror: Boolean(copy.mirror) },
         ...(spec.reach ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole } : {}),
+        ...(spec.digit ? { digit: spec.digit } : {}),
+        ...(spec.spread !== undefined ? { spread: spec.spread } : {}),
         ...(spec.absorbs ? { absorbs: spec.absorbs } : {}),
       });
     }
