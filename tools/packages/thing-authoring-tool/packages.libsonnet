@@ -1,3 +1,4 @@
+local poses = import 'models/measures/handling.libsonnet';
 local defaults = import 'models/measures/packages.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local package(id, family, massKg, dimensions, finish, exportMass, heldSolid='body') = {
@@ -5,7 +6,7 @@ local package(id, family, massKg, dimensions, finish, exportMass, heldSolid='bod
   exportMass: exportMass,
   parts: [{ id: 'package', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
   connections: [],
-  handling: { part: 'package', solid: heldSolid, fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
+  handling: poses.inHand + { part: 'package', solid: heldSolid },
 };
 local carton(id, massKg, width, height, depth, body, label, exportMass, extra={}, heldSolid='body') =
   local d = defaults.carton;
