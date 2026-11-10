@@ -48,6 +48,7 @@
   'food_truck': import 'models/vehicles/food_truck.libsonnet',
   'forklift': import 'models/vehicles/forklift.libsonnet',
   'golf_cart': import 'models/vehicles/golf_cart.libsonnet',
+  'half_track': import 'models/vehicles/half_track.libsonnet',
   'hearse': import 'models/vehicles/hearse.libsonnet',
   'heavy_cargo_helicopter': import 'models/vehicles/heavy_cargo_helicopter.libsonnet',
   'high_roof_van': import 'models/vehicles/high_roof_van.libsonnet',
