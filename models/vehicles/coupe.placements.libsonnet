@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'coupe.spec.libsonnet';
 {
   sites: [
@@ -9,9 +10,9 @@ local s = import 'coupe.spec.libsonnet';
     site.one('front_bumper', 'coupe_front_bumper'),
     site.one('rear_bumper', 'coupe_rear_bumper'),
     site.one('dashboard', 'coupe_dashboard'),
-    site.one('engine', 'engine_i4_petrol', [s.frontAxle - 0.02, 0.2, 0]),
+  ] + engine.sites('i4_petrol', [s.frontAxle - 0.02, 0.2, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.36]),
-    site.one('radiator', 'radiator_car', [s.front - 0.3, 0.32, 0]),
+    site.one('radiator', engine.radiator('i4_petrol'), [s.front - 0.3, 0.32, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [s.rearAxle + 0.65, s.sill, 0]),
     site.one('exhaust', 'exhaust_small', [s.rear + 0.46, 0.2, 0.42]),
     site.one('rear_axle', 'twist_beam', [s.rearAxle, 0, 0]),

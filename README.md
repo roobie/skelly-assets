@@ -56,7 +56,9 @@ authority for which families use the roster; see `tools/layout.mjs`, `readRoster
 `buildRoster`. Do not select those models again in a recipe. For guns, author the source named by the recipe
 row's `source`; file-backed sources resolve relative to the repository root, while other gun kinds select their
 source through the owning exporter. See `tools/recipeTools.mjs`, `loadRecipeTools`, and
-`tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
+`tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`. The firearms pack's guns, cartridges,
+attachments and magazines are listed in `models/guns/roster.libsonnet`, so adding one is a content edit; the code that
+turns each entry into its recipe row is `tools/packages/gun-authoring-tool/exports/deadvox.jsonnet`.
 A vehicle is authored as its own file of part rows in `models/vehicles/`, beside the kits that press its panels
 from its measures, so parallel authors each add files and none edits a shared list. A recipe selects whole
 vehicles, never single parts, so a vehicle's own parts all live in one pack, and a part it borrows from another pack
@@ -67,7 +69,8 @@ import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 `models/recipes/skelly.ground-vehicles.jsonnet`. A vehicle drives on the ground unless another pack claims it, so a new
 road vehicle needs no recipe edit; see `models/vehicles/packs.libsonnet`, `vehicles`. Which part sits where on a
 vehicle is model data too, in the vehicle's placements file beside its rows, so the showcase and the games assemble it
-from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`.
+from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`. A vehicle fits its
+engine either fused or as a core with salvageable accessories; why is in `docs/decisions/0004-engine-assemblies.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
