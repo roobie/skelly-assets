@@ -271,7 +271,8 @@ export const disposeActor = (actor: Actor): void => {
 };
 
 // ---- The deadvox shambler, for scale comparison ----
-// Box sizes copied from deadvox's `FIGURE_BOXES` constant, colours from its shambler mesh materials (not imported:
+// Box sizes copied from https://github.com/roobie/skelly, `packages/deadvox/src/core/zombieRegions.ts`,
+// `FIGURE_BOXES`, colours from its shambler mesh materials (not imported:
 // subprojects don't share code across the repo boundary). Kept in metres, at the same scale as the
 // generated figure, placed 1 m to its right (+X).
 

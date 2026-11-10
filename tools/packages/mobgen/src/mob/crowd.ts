@@ -70,8 +70,8 @@ export const packSeveredMask = (
 
 /** Packs how bloodied `slot`'s body is, 0 (clean) to 1, into its mask texel's green channel.
  * CROWD_BEGIN_VERTEX hands it on as `vCrowdBloodiness`, with the bone-local position and bone, for a host to
- * shade stains from (deadvox's render/bloodStain.ts). A reused row keeps the last value written, so every
- * packer writes it. */
+ * shade stains from (https://github.com/roobie/skelly, `packages/deadvox/src/render/bloodStain.ts`,
+ * `BLOOD_STAIN_COLOR_FRAGMENT`). A reused row keeps the last value written, so every packer writes it. */
 export const packBloodiness = (
   data: Float32Array,
   layout: CrowdTextureLayout,

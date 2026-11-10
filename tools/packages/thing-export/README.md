@@ -98,8 +98,8 @@ defines. See `packages/gun-authoring-tool/src/gun/exportGlb.ts`, `sightMetadata`
 
 A part with baked collision also names its grain, so a consumer's own datums can snap to
 the same lattice. A cargo space does this to fit the drawn bed it fills; see
-`packages/thing-core/src/schema.ts`, `ModelPartSchema`, and skelly's `packages/deadvox/DESIGN.md`,
-"Vehicles".
+`packages/thing-core/src/schema.ts`, `ModelPartSchema`, and
+https://github.com/roobie/skelly, `packages/deadvox/DESIGN.md`, "Vehicles".
 
 No solid or stretch of a solid vanishes. Any stretch thinner than the grain, such as a
 whole sheet, a guard's bar or a tube's wall, keeps one voxel of thickness, and a solid that
