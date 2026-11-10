@@ -20,7 +20,7 @@ local defaults = {
   archChamfer: 0.3,
   frontZ: self.side - self.wheelW / 2 - 0.02,
   rearZ: self.side - self.wheelW / 2 - 0.01,
-  rearInnerZ: self.rearZ - self.wheelW,
+  rearInnerZ: self.rearZ - (if self.twinRear then self.wheelW else 0),
   railZ: 0.44,
   railFront: if self.bonnet != null then self.bonnet.nose - 0.1 else self.face - 0.1,
   bumperLow: self.r + 0.02,
@@ -38,11 +38,14 @@ local defaults = {
   guard: true,
   guardTop: 2 * self.r + 0.06,
   frontAxlePart: 'steered_axle_heavy',
-  rearAxlePart: 'beam_axle_truck',
   // Fits the wheels with `wheel-kit.libsonnet`'s brakes, which take the place of the axles' drums, so the axle parts
   // are then ones drawn without them.
   wheelBrakes: false,
   frontAxleY: self.r - 0.52,
+  rearAxlePart: 'beam_axle_truck',
+  rearAxleY: self.r - 0.52,
+  // A light truck runs single rear wheels where a heavier one runs twins.
+  twinRear: true,
   grille: true,
   tankX: self.cabBack - 0.75,
   tankY: self.railBottom - 0.22,
@@ -260,7 +263,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('gear_lever', 'gear_lever', [s.seatX + 0.3, s.floor + 0.42, 0], ['cab']),
     fitting('marker_lamp_mid', 'marker_lamp', [s.face - s.lean - 0.12, s.roof + 0.11, 0], ['cab']),
   ] + [
-    fitting('rear_axle_' + i, s.rearAxlePart, [s.rearAxles[i], s.r - 0.52, 0], ['chassis'])
+    fitting('rear_axle_' + i, s.rearAxlePart, [s.rearAxles[i], s.rearAxleY, 0], ['chassis'])
     for i in std.range(0, rearN - 1)
   ] + [
     fitting('prop_shaft_' + i, 'prop_shaft_long', [shaftFrom - shaftStep * (i + 0.5), s.railBottom + 0.02, 0], ['chassis'])
@@ -268,8 +271,9 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   ] + (if rearN > 1 then [
     fitting('inter_axle_shaft', 'prop_shaft_short', [(s.rearAxles[0] + s.rearAxles[1]) / 2, s.r + 0.1, 0], ['rear_axle_0', 'rear_axle_1']),
   ] else []) + std.flattenArrays([
-    wheels('rear_wheel_' + i, [s.rearAxles[i], s.r, s.rearZ], on(['rear_axle_' + i]), brake=false)
-    + wheels('rear_inner_wheel_' + i, [s.rearAxles[i], s.r, s.rearInnerZ], on(['rear_axle_' + i]))
+    // The outer wheel of a twin shares its inner wheel's brake.
+    wheels('rear_wheel_' + i, [s.rearAxles[i], s.r, s.rearZ], on(['rear_axle_' + i]), brake=!s.twinRear)
+    + (if s.twinRear then wheels('rear_inner_wheel_' + i, [s.rearAxles[i], s.r, s.rearInnerZ], on(['rear_axle_' + i])) else [])
     for i in std.range(0, rearN - 1)
   ]) + wheels('front_wheel', [s.frontAxle, s.r, s.frontZ], on(['front_axle']))
   + (if s.raisedSeat then pair('seat_riser', 'seat_riser', [s.seatX, s.floor, 0.58], on(['cab'])) + pair('seat', 'front_seat', [s.seatX, s.seatY, 0.58], on([], ['seat_riser']))
@@ -285,10 +289,15 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
   + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
 local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, s0), laid(kit, id, s0));
+// The sites of a truck that its cab and chassis do not lay, so its body can be laid behind another cab.
+local bodySites(kit, sites, id, s0) =
+  local own = std.set([site.id for site in fittings(kit, id, s0)]);
+  [site for site in sites if !std.setMember(site.id, own)];
 {
   spec: spec,
   archCorners: archCorners,
   rows: rows,
   items: items,
   fittings: fittings,
+  bodySites: bodySites,
 }

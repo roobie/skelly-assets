@@ -18,4 +18,18 @@
     fuelPump: { id: 'fuel_pump_light', massKg: 1.5, size: 0.08 },
     driveBelt: { id: 'drive_belt_light', massKg: 0.3, width: 0.02, thickness: 0.012 },
   },
+  // A light truck's or a big off-roader's: bigger than a car's, smaller than a heavy truck's.
+  medium: {
+    radiator: 'radiator_van',
+    drive: {
+      crank: { at: [0, 0], radius: 0.09 },
+      pump: { at: [0.24, 0], radius: 0.06 },
+      alternator: { at: [0, 0.4], radius: 0.045 },
+    },
+    alternator: { id: 'alternator_medium', massKg: 8, radius: 0.085, length: 0.18 },
+    starter: { id: 'starter_motor_medium', massKg: 10, radius: 0.06, length: 0.26 },
+    airBox: { id: 'air_box_medium', massKg: 4, length: 0.36, height: 0.2, width: 0.26 },
+    fuelPump: { id: 'fuel_pump_medium', massKg: 2, size: 0.1 },
+    driveBelt: { id: 'drive_belt_medium', massKg: 0.4, width: 0.025, thickness: 0.014 },
+  },
 }

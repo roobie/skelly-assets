@@ -40,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper
   ] + k.bothSides([
     box('runner', 'frame', [s.bodyRear + 0.2, s.railTop, 0.3], [s.bodyFront, s.bodyLow, 0.44]),
   ]), finish),
-  k.compound('street_sweeper_hopper', 1300, hopperPieces + k.bothSides([
+  k.compound('street_sweeper_hopper', 2250, hopperPieces + k.bothSides([
     box('band', 'band', [s.bodyRear + 0.3, 1.9, s.bodySide], [s.hopperFront, 2.14, s.bodySide + 0.032]),
     box('rib_a', 'steel', [-2.2, s.bodyLow, s.bodySide], [-2.12, 1.9, s.bodySide + 0.032]),
     box('rib_b', 'steel', [-1.2, s.bodyLow, s.bodySide], [-1.12, 1.9, s.bodySide + 0.032]),
@@ -61,7 +61,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper
   ] + k.bothSides([
     box('band', 'band', [s.hopperFront, 1.9, s.bodySide], [s.bodyFront, 2.14, s.bodySide + 0.032]),
   ]), finish),
-  k.compound('street_sweeper_fan_housing', 170, k.bothSides([
+  k.compound('street_sweeper_fan_housing', 300, k.bothSides([
     box('housing', 'steel', [0.05, 1.2, s.bodySide], [0.85, 1.78, s.bodySide + 0.0625]),
   ] + [
     box('louvre_' + i, 'dark', [0.11, 1.27 + i * 0.1, s.bodySide + 0.0625], [0.79, 1.32 + i * 0.1, s.bodySide + 0.094])

@@ -7,7 +7,7 @@ local s = import 'box_truck.spec.libsonnet';
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('box_truck', s) + [
   r for r in t.rows('electric_box_truck', s { grille: false }) if r.id == 'electric_box_truck_front_panel'
 ] + [
-  k.compound('box_truck_box_floor', 420, [
+  k.compound('box_truck_box_floor', 400, [
     box('deck', 'deck', [s.boxRear, s.boxFloor, -s.boxSide], [s.boxFront, s.boxFloorTop, s.boxSide]),
     box('skirt', 'steel', [s.boxRear, s.boxFloor - 0.08, -s.boxSide], [s.boxFront, s.boxFloor, s.boxSide]),
   ] + k.bothSides([

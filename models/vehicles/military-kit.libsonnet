@@ -44,16 +44,6 @@ local flatGuard(id, slot, x, top, drop, run, z, thick=0.04) = [
   prism(id + '_aft', slot, [[x[0] - run, top - thick - drop], [x[0], top - thick], [x[0], top], [x[0] - run, top - drop]], z),
 ];
 
-// A driven axle in `beamAxle`'s frame (`shared.libsonnet`), its housing and drums sized for the drawn steel to carry
-// a military axle's weight; a steered one adds the knuckles its front wheels turn on.
-local driveAxle(id, massKg, halfTrack, steered) = k.compound(id, massKg, [
-  k.turned('beam', 'steel', 'z', k.disc(0.09, -halfTrack, halfTrack), [0, 0.52, 0]) + { sides: 12 },
-  box('diff', 'steel', [-0.2, 0.33, -0.19], [0.2, 0.71, 0.19]),
-] + bothSides([
-  box('spring_seat', 'steel', [-0.09, 0.6, halfTrack - 0.36], [0.09, 0.64, halfTrack - 0.22]),
-  k.turned('drum', 'steel', 'z', k.disc(0.21, halfTrack - 0.14, halfTrack), [0, 0.52, 0]) + { sides: 12 },
-] + (if steered then [box('knuckle', 'steel', [-0.12, 0.36, halfTrack - 0.3], [0.12, 0.68, halfTrack - 0.14])] else [])), { steel: 'steel-grey' });
-
 local truckDefaults = {
   paint: 'paint-olive',
   frame: 'steel-parkerized',
@@ -184,8 +174,8 @@ local truckRows(s0) = {
     k.compound(id + '_front_shaft', s.frontShaftMass, [
       k.turned('tube', 'steel', 'x', k.disc(0.04, -(shaft.to - shaft.from) / 2, (shaft.to - shaft.from) / 2)),
     ], { steel: 'steel-grey' }),
-    driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true),
-    driveAxle(id + '_axle', s.axleMass, 0.93, false),
+    mk.driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true),
+    mk.driveAxle(id + '_axle', s.axleMass, 0.93, false),
     k.compound(id + '_transfer_case', s.transferCaseMass, [
       box('case', 'casting', [-0.28, 0, -0.3], [0.28, 0.5, 0.3]),
     ], { casting: 'steel-grey' }),
