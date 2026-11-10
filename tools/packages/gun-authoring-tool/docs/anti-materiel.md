@@ -6,7 +6,7 @@ read_if:
 
 # Anti-materiel rifle archetype
 
-The M82 is a proportion reference, not manufacturing geometry; the tool's modelling rule is in skelly's `things/README.md`, "Rules". The curated design is `models/guns/designs/archetype-anti-materiel.json`, with vocabulary in `src/gun/antiMateriel/`.
+The M82 is a proportion reference, not manufacturing geometry; the tool's modelling rule is in https://github.com/roobie/skelly, `things/README.md`, "Rules". The curated design is `models/guns/designs/archetype-anti-materiel.json`, with vocabulary in `src/gun/antiMateriel/`.
 
 The dedicated receiver, lower and magazine exist because the shared families are sized for smaller rifle cartridges. They keep the common receiver, lower and magazine roles so shared feed and geometry rules still apply; see `src/gun/antiMateriel/heavyReceiver.ts`; `src/gun/antiMateriel/heavyLower.ts`; `src/gun/antiMateriel/heavyMagazine.ts`; and `src/gun/antiMateriel/rules.ts`.
 

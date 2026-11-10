@@ -12,8 +12,9 @@ read_if:
 
 The modeling core shared by the thing and gun authoring tools. The neutral fields are
 `src/schema.ts`, `NeutralModelSchema`; the material content is `models/finishes.jsonnet`,
-validated by `src/materials.ts`, `MaterialSchema`. See skelly's `things/README.md` for the boundary's
-reasons and skelly's `things/WORK.md`, "Phases" for the remaining suite work.
+validated by `src/materials.ts`, `MaterialSchema`. The boundary's reasons are in
+https://github.com/roobie/skelly, `things/README.md`, and the remaining suite work in
+https://github.com/roobie/skelly, `things/WORK.md`, "Phases".
 
 ## Contract
 
@@ -30,13 +31,15 @@ reasons and skelly's `things/WORK.md`, "Phases" for the remaining suite work.
   schema. The envelope then names no kind of thing, nothing leaks between packs, and one
   entry can carry several packs' blocks without their names clashing. A field two packs
   both want is promoted into the envelope on purpose. The gun pack's block and the composed
-  Deadvox schema are deadvox's `GunModelSchema` and `ModelSchema`.
+  Deadvox schema are https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`,
+  `GunModelSchema` and `ModelSchema`.
 - Materials share one content table so tools and the game read the same appearance and a
   mod changes it in one place. Mass is authored, not inferred from material density or a
   drawn envelope: items can mix materials and hide complex internal shapes. See
-  skelly's `things/README.md`, "Rules". Baked appearance is not a second tuning source; references
+  https://github.com/roobie/skelly, `things/README.md`, "Rules". Baked appearance is not a second tuning source; references
   retain authored shades while resolving shared values. See `src/materials.ts`,
-  `MaterialReferenceSchema`, and deadvox's `applyModelMaterials`.
+  `MaterialReferenceSchema`, and https://github.com/roobie/skelly, `packages/deadvox/src/render/modelMaterials.ts`,
+  `applyModelMaterials`.
 - Part mass choices and appearance profiles belong to the authoring domain, not to a
   material's identity. See `models/guns/tables/catalogue.jsonnet`, `parts`, and
   `models/guns/tables/appearance.jsonnet`, `profileFinishes`.
@@ -45,8 +48,9 @@ reasons and skelly's `things/WORK.md`, "Phases" for the remaining suite work.
   atom reads its item weight. This keeps one authority during the tool migration while
   thing-tool rows each own an item and can share geometry without sharing a mass. See
   `src/schema.ts`, `ModelPartSchema`; `src/mass.ts`, `modelMassKg`; and
-  skelly's `things/WORK.md`, "Decisions". Consumers must not count baked replaceable geometry and
-  its child item twice; see deadvox's `modelBodyMassKg`.
+  https://github.com/roobie/skelly, `things/WORK.md`, "Decisions". Consumers must not count baked replaceable geometry and
+  its child item twice; see https://github.com/roobie/skelly, `packages/deadvox/src/core/modelMass.ts`,
+  `modelBodyMassKg`.
 - Baked collision and named anchors are neutral because any consumer that places a thing
   needs its solid extent and its attachment points, whatever kind of thing it is. A part's
   collision travels with its mass, so a consumer never pairs one export's boxes with
@@ -54,4 +58,4 @@ reasons and skelly's `things/WORK.md`, "Phases" for the remaining suite work.
 
 Helper tests preserve the same dependency direction as production code: physical
 conservation is checked above the core rather than importing the exporter into it. See
-`test/singlePart.test.ts` and skelly's `test/things-deadvox-contract.test.mjs`.
+`test/singlePart.test.ts` and https://github.com/roobie/skelly, `test/things-deadvox-contract.test.mjs`.

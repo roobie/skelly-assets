@@ -8,6 +8,7 @@ read_if:
   - adding or applying the catalogue's item drafts
   - bumping the Node version, or why CI and builds pin one exact version
   - opening a PR or cutting a release, and where its change notes and release notes come from
+  - citing skelly's source from a doc or a comment
 ---
 
 # skelly-assets
@@ -133,11 +134,15 @@ repoints any entry that named it, so a consumer's saved ids keep resolving after
 a map whose retired id names a model again or whose target is no current model; see `tools/manifest.mjs`,
 `buildManifest`.
 
-A cue into a product's source names the product and the symbol, with no path: deadvox's `typeWeightGrams`, not a
-path to the file that holds it. A reader of this repository alone cannot resolve a path into skelly, and skelly moves
-files, so a path cue goes false while a symbol cue survives the move. The cues name skelly symbols as they stand on
-the skelly revision that pins this release. Nothing checks them, so a renamed symbol goes stale without a failure. A
-path cue may come back if this repository gains a cue check over a skelly checkout.
+### Cues into skelly
+
+A cue into skelly's source starts with skelly's URL, then names the path from skelly's root and the symbol or section:
+https://github.com/roobie/skelly, `packages/deadvox/src/core/items.ts`, `typeWeightGrams`. The URL tells a reader of
+this repository alone where the path resolves, and one fixed form lets a check find every cue. A cue names skelly's
+main, with no line number or pinned commit, so it stays a current claim like a cue into this repository rather than
+one that is true of an old revision. Only the form is checked, because this repository's checks run without a skelly
+checkout; see `tools/skelly-cues.mjs`, `cueIssues`. A cue that skelly's later changes break therefore goes stale
+without a failure, so a change that touches a cue checks it against skelly's main.
 
 ### Printed labels
 

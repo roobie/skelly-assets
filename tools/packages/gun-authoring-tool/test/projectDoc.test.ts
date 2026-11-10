@@ -1,10 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-// PROJECT.md cues code as a backticked `src/...ts` path, a comma and a backticked symbol
-// (skelly's `AGENTS.md`, "Zero drift"), not by line number, so a cue only goes stale when the
-// symbol is renamed or removed. deadvox cues (deadvox's `symbol`, no path) point at
-// another package and are not checked here.
+// PROJECT.md cues code as a backticked `src/...ts` path, a comma and a backticked symbol, not by
+// line number, so a cue only goes stale when the symbol is renamed or removed. A cue into skelly
+// starts with skelly's URL and is held to its form by tools/skelly-cues.mjs, not resolved here.
 
 const root = new URL('../', import.meta.url);
 const doc = readFileSync(new URL('PROJECT.md', root), 'utf8');

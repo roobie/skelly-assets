@@ -10,7 +10,6 @@
 // at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
 // for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
 // `npm ci` in tools.
-// Adapted from skelly's tools/model-look.mjs (see README.md beside this file).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
