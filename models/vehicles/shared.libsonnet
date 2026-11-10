@@ -488,6 +488,8 @@ local towHitch = k.compound('tow_hitch', 18, [
   steeredAxleMedium,
   steeredAxleDrop,
   trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37),
+  // A De Dion tube carries no differential, so it is drawn as an undriven axle with its drum brakes.
+  trailerAxle('de_dion_axle_small', 35, 1.43, 0.045, 0.3015),
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37),
   trailerAxle('trailer_axle_truck', 190, 1.86, 0.065, 0.52),
   propShaft('prop_shaft_short', 10, 1.2),
@@ -535,6 +537,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   inverter('inverter_car', 14, 0.36, 0.14, 0.26),
   inverter('inverter_large', 45, 0.6, 0.24, 0.42),
   tractionPack('traction_pack_light', 70, 0.52, 0.2, 0.74),
+  tractionPack('traction_pack_small', 160, 1.0, 0.12, 1.0),
   tractionPack('traction_pack_car', 300, 1.6, 0.11, 1.2),
   tractionPack('traction_pack_van', 500, 2.4, 0.16, 1.24),
   tractionPack('hybrid_pack', 45, 0.6, 0.11, 0.6),
