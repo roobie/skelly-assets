@@ -86,13 +86,15 @@ local strut(id, massKg) = k.compound(id, massKg, [
   box('knuckle', 'steel', [-0.05, -0.06, -0.05], [0.05, 0.06, 0]),
   k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.47), [0, 0.06, -0.02]),
 ], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
-local beamAxle(id, massKg, track, radius, height) = k.compound(id, massKg, [
+// An axle drawn without its drums is for a wheel kit's disc brakes, which have sites of their own; see `wheel-kit.libsonnet`.
+local beamAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]) + { sides: 12 },
   box('diff', 'steel', [-0.14, height - 0.13, -0.13], [0.14, height + 0.13, 0.13]),
 ] + k.bothSides([
   box('spring_seat', 'steel', [-0.09, height + radius - 0.01, track / 2 - 0.36], [0.09, height + radius + 0.04, track / 2 - 0.22]),
+] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.4, -0.06, 0.06), [0, height, track / 2 - 0.1]) + { sides: 12 },
-]), { steel: 'steel-grey' });
+] else [])), { steel: 'steel-grey' });
 // An undriven axle has no differential; its frame matches `beamAxle`, so hubs sit at `height` above the base.
 local trailerAxle(id, massKg, track, radius, height) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]),
@@ -101,13 +103,18 @@ local trailerAxle(id, massKg, track, radius, height) = k.compound(id, massKg, [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.2, -0.05, 0.05), [0, height, track / 2 - 0.1]),
 ]), { steel: 'steel-grey' });
 // A steered I-beam for 295 wheels, in `beamAxle`'s frame: the king pins stand at the beam's ends.
-local steeredAxle(id, massKg, halfTrack, height) = k.compound(id, massKg, [
+local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, height - 0.06, -halfTrack], [0.06, height + 0.06, halfTrack]),
 ] + k.bothSides([
   box('spring_seat', 'steel', [-0.09, height + 0.06, 0.42], [0.09, height + 0.1, 0.56]),
   box('king_pin', 'steel', [-0.08, height - 0.12, halfTrack - 0.1], [0.08, height + 0.12, halfTrack + 0.05]),
+] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(0.2, halfTrack + 0.05, halfTrack + 0.18), [0, height, 0]) + { sides: 12 },
-]), { steel: 'steel-grey' });
+] else [])), { steel: 'steel-grey' });
+// A drum axle's mass less the class's brake at each end, so a vehicle swapping drums for the kit's brakes weighs the same.
+local discBrakes = local c = (import 'wheel-classes.libsonnet').heavy; 2 * (c.disc.massKg + c.caliper.massKg);
+local truckDriveAxle = 430;
+local truckSteeredAxle = 350;
 // For 8 R19.5 wheels: lighter section, its spring seats under a medium truck's rails.
 local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
   box('beam', 'steel', [-0.045, 0.385, -0.95], [0.045, 0.475, 0.95]),
@@ -488,8 +495,10 @@ local towHitch = k.compound('tow_hitch', 18, [
   twistBeam('twist_beam', 30, 1.52),
   beamAxle('beam_axle_light', 75, 1.5, 0.0625, 0.37),
   beamAxle('beam_axle_van', 110, 1.68, 0.0625, 0.37),
-  beamAxle('beam_axle_truck', 430, 1.86, 0.07, 0.52),
-  steeredAxle('steered_axle_heavy', 350, 0.95, 0.52),
+  beamAxle('beam_axle_truck', truckDriveAxle, 1.86, 0.07, 0.52),
+  steeredAxle('steered_axle_heavy', truckSteeredAxle, 0.95, 0.52),
+  beamAxle('beam_axle_truck_disc', truckDriveAxle - discBrakes, 1.86, 0.07, 0.52, drums=false),
+  steeredAxle('steered_axle_heavy_disc', truckSteeredAxle - discBrakes, 0.95, 0.52, drums=false),
   steeredAxleMedium,
   steeredAxleDrop,
   trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37),

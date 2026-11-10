@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 local engine = import 'engine-kit.libsonnet';
+local wheel = import 'wheel-kit.libsonnet';
 local s = import 'police_car.spec.libsonnet';
 local k = import 'kit.libsonnet';
 local part(suffix) = k.partId('police_car', s, suffix);
@@ -30,8 +31,8 @@ local part(suffix) = k.partId('police_car', s, suffix);
   + site.pair('tail_lamp', part('_tail_lamp'))
   + site.pair('beacon', 'beacon_blue', [-0.4, s.roof + 0.12, 0.34])
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.28, s.side - 0.105 - 0.05])
-  + site.pair('front_wheel', 'wheel_205_55r16', [s.frontAxle, 0.316, s.side - 0.105])
-  + site.pair('rear_wheel', 'wheel_205_55r16', [s.rearAxle, 0.316, s.side - 0.105])
+  + wheel.pair(site.kit, 'front_wheel', 'wheel_205_55r16', [s.frontAxle, 0.316, s.side - 0.105], 'assembly')
+  + wheel.pair(site.kit, 'rear_wheel', 'wheel_205_55r16', [s.rearAxle, 0.316, s.side - 0.105], 'assembly')
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.66, 0.62)

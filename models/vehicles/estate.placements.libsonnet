@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 local engine = import 'engine-kit.libsonnet';
+local wheel = import 'wheel-kit.libsonnet';
 local s = import 'estate.spec.libsonnet';
 {
   sites: [
@@ -25,8 +26,8 @@ local s = import 'estate.spec.libsonnet';
   + site.pair('rear_door', 'estate_rear_door')
   + site.pair('tail_lamp', 'estate_tail_lamp')
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.28, 0.75])
-  + site.pair('front_wheel', 'wheel_205_55r16', [s.frontAxle, 0.316, 0.8])
-  + site.pair('rear_wheel', 'wheel_205_55r16', [s.rearAxle, 0.316, 0.8])
+  + wheel.pair(site.kit, 'front_wheel', 'wheel_205_55r16', [s.frontAxle, 0.316, 0.8], 'assembly')
+  + wheel.pair(site.kit, 'rear_wheel', 'wheel_205_55r16', [s.rearAxle, 0.316, 0.8], 'assembly')
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
