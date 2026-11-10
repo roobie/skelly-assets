@@ -50,7 +50,7 @@ const shell = async (id: string) => {
 };
 
 it('exports the over-jacket utility vest clear of the hoodie shell', async () => {
-  const hoodie = await shell('worn_hoodie_body');
+  const hoodie = await shell('hoodie_worn_body');
   const vest = await shell('utility_vest_worn_jacket');
   expect(hoodie.points.filter(vest.contains)).toHaveLength(0);
   expect(vest.points.filter(hoodie.contains)).toHaveLength(0);
