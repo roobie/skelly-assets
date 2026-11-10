@@ -44,6 +44,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_bust',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
+    voxelGrain: 0.006,
     // The head is its own part so a stance lifts it about the neck's top while the torso leans; the head mates to
     // the torso there, so the whole stands exactly as one piece would.
     parts: [
@@ -52,7 +53,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       bustSegment('neck', 1, { skin: skin }, [jointPin('neck'), neckSocket(
         [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0],
       )]),
-      bustSegment('head', 5, { skin: skin, hair: 'body-hair', eye: 'body-eye', mouth: 'body-mouth' }, [neckPin]),
+      bustSegment('head', 5, { skin: skin, hair: 'body-hair', eye: 'body-eye', white: 'body-eye-white', mouth: 'body-mouth' }, [neckPin]),
     ],
     connections: [
       { from: 'neck.head', to: 'head.head' },
@@ -77,6 +78,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_arm',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
+    voxelGrain: 0.006,
     // One segment per part so the first-person view bends the arm at its joints; each segment is drawn about its
     // own joint and mates to the segment above it there, so the whole hangs exactly as one piece would.
     parts: [
@@ -111,6 +113,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_leg',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
+    voxelGrain: 0.006,
     // One segment per part so a stance bends the leg at the knee and ankle; each segment is drawn about its own joint
     // and mates to the segment above it there, so the whole stands exactly as one piece would.
     parts: [

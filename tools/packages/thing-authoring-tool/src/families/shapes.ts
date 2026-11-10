@@ -51,6 +51,25 @@ export const round = (
   origin,
   axis,
 });
+/**
+ * A spheroid turned about `axis` through `centre`: `halfAxial` along the axis, `radius` across it. For the round
+ * joints and caps of a body, where a box end shows a wedge once posed.
+ */
+export const spheroid = (
+  id: string,
+  centre: Vec3,
+  [halfAxial, radius]: Vec2,
+  [axis, slot]: readonly ['x' | 'y' | 'z', string],
+  steps = 10,
+): RevolvedSolid => {
+  const profile: Vec2[] = [[-halfAxial, 0]];
+  for (let i = 1; i < steps; i++) {
+    const a = -halfAxial + (2 * halfAxial * i) / steps;
+    profile.push([a, radius * Math.sqrt(Math.max(0, 1 - (a / halfAxial) ** 2))]);
+  }
+  profile.push([halfAxial, 0], [-halfAxial, 0]);
+  return { id, kind: 'revolved', axis, origin: centre, profile, slot, creaseDegrees: 90 };
+};
 /** A straight bar between two profile points, `[width, depth]` across. */
 export const link = (
   id: string,

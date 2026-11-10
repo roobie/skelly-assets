@@ -54,7 +54,7 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
         + (if doll == null then [] else [socket('doll', [0, bust.pelvisHeight + 0.02, bust.waistDepth / 2], [0, 0, 1], [0, 1, 0])])),
       segment('neck', 'bust', bust, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
-      segment('head', 'bust', bust, 'head', 1, ['skin', 'hair', 'eye', 'mouth'], [pin('head', [0, -1, 0])]),
+      segment('head', 'bust', bust, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
