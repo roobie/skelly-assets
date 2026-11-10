@@ -1,7 +1,7 @@
 local b = import 'packages/thing-authoring-tool/clothing-bags.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local atom = b.atom, garment = b.garment;
-local bags = import 'measures/bags.libsonnet';
+local bags = import 'models/measures/bags.libsonnet';
 local worn(slot, material) = { category: 'clothing', tags: { slot: slot, material: material, setting: ['modern'] } };
 // The garment models lie folded flat.
 local folded(slot, material) = worn(slot, material) + { tags+: { state: ['folded'] } };

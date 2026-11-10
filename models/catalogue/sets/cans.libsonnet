@@ -2,10 +2,10 @@ local c = import 'packages/thing-authoring-tool/cans.libsonnet';
 local atom = c.atom, tin = c.tin;
 local shellMassKg = 0.100;
 [
-  tin('opened_beans', 0.037, 0.11, 'paint-terracotta', 'beans', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { tags: { state: ['opened'] } } },
-  tin('opened_soup', 0.034, 0.12, 'paperboard-tan', 'soup', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { tags: { state: ['opened'] } } },
-  tin('empty_can', 0.037, 0.11, 'paint-terracotta', 'empty', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { tags: { state: ['empty'] } } },
-  tin('opened_soda', 0.033, 0.115, 'plastic-red', 'drink', exportMass='inventory-atom', massKg=0.015, food='paint-oxblood') + { taxonomy: { tags: { state: ['opened'] } } },
+  tin('opened_beans', 0.037, 0.11, 'paint-terracotta', 'beans', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { category: 'food', tags: { state: ['opened'] } } },
+  tin('opened_soup', 0.034, 0.12, 'paperboard-tan', 'soup', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { category: 'food', tags: { state: ['opened'] } } },
+  tin('empty_can', 0.037, 0.11, 'paint-terracotta', 'empty', exportMass='inventory-atom', massKg=shellMassKg) + { taxonomy: { category: 'food', tags: { state: ['empty'] } } },
+  tin('opened_soda', 0.033, 0.115, 'plastic-red', 'drink', exportMass='inventory-atom', massKg=0.015, food='paint-oxblood') + { taxonomy: { category: 'food', tags: { state: ['opened'] } } },
   atom('can_opener', 'handOpener', 0.100, {
     handleLength: 0.127, tangWidth: 0.008, tangDepth: 0.006,
     gripLength: 0.092, gripWidth: 0.014, gripDepth: 0.014,

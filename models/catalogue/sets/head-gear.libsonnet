@@ -158,5 +158,5 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       strap_back_inner: goggleAnchor('strap_6', [0.5, 0.5, 1]),
       strap_back_outer: goggleAnchor('strap_6', [0.5, 0.5, 0]),
     },
-  } + { taxonomy: { tags: { slot: ['face'] } } },
+  } + { taxonomy: { category: 'electrical', tags: { slot: ['face'] } } },
 ]
