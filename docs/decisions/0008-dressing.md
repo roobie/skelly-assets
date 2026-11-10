@@ -46,4 +46,9 @@ shows as such on the doll too.
 Every slot the vocabulary names needs a place on the doll, or the showcase build fails for the first wearable that
 names it; a test holds the content to that, see `tools/test/dress.test.mjs`. A worn-only set, with pieces but no loose
 model, is not a wearable here and stays shown as its pieces. A rigid head piece is placed by its slot rather than by
-the fit a consumer gives it.
+the fit a consumer gives it, so its opening must clear the doll's head and hair with its brim at the brow: a hat whose
+cone is the head's own width would clip the hair's corners. The wizard hat (`models/catalogue/sets/batch-129.libsonnet`)
+widens only its foot for that, near upright over the height of the head, and keeps its cone and brim their original
+size above and around it, because scaling the whole hat to the head makes it absurdly wide and stretching its opening
+to the head's outline makes a box of it. A skullcap, with no height to spare, sits a little high at the brow; it is
+accepted until a cap has worn pieces of its own.
