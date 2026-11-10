@@ -71,7 +71,7 @@ road vehicle needs no recipe edit; see `models/vehicles/packs.libsonnet`, `vehic
 vehicle is model data too, in the vehicle's placements file beside its rows, so the showcase and the games assemble it
 from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`. A vehicle fits its
 engine either fused or as a core with salvageable accessories; why is in `docs/decisions/0004-engine-assemblies.md`.
-Its wheels are fused or a tyre on a rim, with a brake disc and caliper at sites of their own; why is in
+Its wheels turn whole at their sites, with a brake disc and caliper at sites of their own; why is in
 `docs/decisions/0005-wheel-assemblies.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load

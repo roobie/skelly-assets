@@ -39,9 +39,9 @@ local defaults = {
   guardTop: 2 * self.r + 0.06,
   frontAxlePart: 'steered_axle_heavy',
   rearAxlePart: 'beam_axle_truck',
-  // A `detail` of `wheel-kit.libsonnet` fits the wheels with their brakes, which take the place of the axles' drums, so
-  // the axle parts are then ones drawn without them; null fits plain wheels.
-  wheelDetail: null,
+  // Fits the wheels with `wheel-kit.libsonnet`'s brakes, which take the place of the axles' drums, so the axle parts
+  // are then ones drawn without them.
+  wheelBrakes: false,
   frontAxleY: self.r - 0.52,
   grille: true,
   tankX: self.cabBack - 0.75,
@@ -233,8 +233,8 @@ local items(kit, id, name, s0) =
 local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
   local part(suffix) = k.partId(id, s, suffix);
   local wheels(site, at, supportedBy, brake=true) =
-    if s.wheelDetail == null then pair(site, s.wheel, at, supportedBy)
-    else wheelKit.pair(kit, site, s.wheel, at, s.wheelDetail, supportedBy, brake);
+    if s.wheelBrakes then wheelKit.pair(kit, site, s.wheel, at, supportedBy, brake)
+    else pair(site, s.wheel, at, supportedBy);
   local rearN = std.length(s.rearAxles);
   local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
   local shaftFrom = gearboxX - s.gearboxLength / 2;

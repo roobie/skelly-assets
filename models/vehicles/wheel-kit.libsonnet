@@ -1,7 +1,8 @@
-// A wheel as a tyre on a rim (`wheels.libsonnet`) with its class's brake (`wheel-classes.libsonnet`), and the two ways a
-// vehicle fits it: the wheel as one fused model, or its tyre and rim each at their own site, so each is its own loot.
-// Both are drawn from the same pieces and weigh the same. The brake disc and caliper always have sites of their own:
-// they stay on the hub when the wheel comes off, and a game turns the wheel's site, which must not carry the caliper.
+// A wheel as a tyre on a rim (`wheels.libsonnet`) with its class's brake (`wheel-classes.libsonnet`). A vehicle fits the
+// wheel as one model, because a game turns the wheel's site and a placement cannot carry a part along with another's
+// site; the tyre and the rim are rows of their own too, drawn from the same pieces, so a game can yield them from a
+// salvaged wheel. The brake disc and caliper always have sites of their own: they stay on the hub when the wheel comes
+// off, and the caliper must not turn with the wheel.
 // A wheel's frame is the hub's centre with the axle along z, +z outboard.
 local k = import 'kit.libsonnet';
 local classes = import 'wheel-classes.libsonnet';
@@ -83,20 +84,16 @@ local brakeRows(c) = [
 ];
 
 {
-  // Every wheel's fused, tyre and rim rows and every class's brake rows.
+  // Every wheel's row, its tyre's and rim's, and every class's brake rows.
   rows: std.flattenArrays([brakeRows(classes[name]) for name in std.objectFields(classes)])
         + std.flattenArrays([wheelRows(name) for name in std.objectFields(wheels)]),
   // A near and far pair of wheel sites `id`, each wheel's frame placed at `at`, through a vehicle kit's `pair` (see
-  // `site.libsonnet`, `kit`) so a game's kit can take them too. `detail` picks how much of the wheel is salvageable:
-  // 'fused' fits the whole wheel as one model at `id`, and 'assembly' fits the rim there and the tyre at its own site.
-  // `brake` is false for the outer wheel of a twin, whose brake sits on the shared hub behind the inner one.
-  pair(kit, id, name, at, detail, supportedBy=null, brake=true):
-    assert std.member(['fused', 'assembly'], detail) : 'a wheel is fused or an assembly, not ' + detail;
-    local w = wheels[name];
+  // `site.libsonnet`, `kit`) so a game's kit can take them too. `brake` is false for the outer wheel of a twin, whose
+  // brake sits on the shared hub behind the inner one.
+  pair(kit, id, name, at, supportedBy=null, brake=true):
     local c = classOf(name);
     local axial(dz) = [at[0], at[1], at[2] + dz];
-    (if detail == 'fused' then kit.pair(id, name, at, supportedBy)
-     else kit.pair(id, w.rim.id, at, supportedBy) + kit.pair(id + '_tyre', w.tyre.id, at, supportedBy))
+    kit.pair(id, name, at, supportedBy)
     + (if brake then kit.pair(id + '_brake_disc', c.disc.id, axial(discAt(name)), supportedBy)
                    + kit.pair(id + '_caliper', c.caliper.id, axial(caliperAt(name)), supportedBy) else []),
 }
