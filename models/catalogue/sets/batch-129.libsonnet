@@ -51,6 +51,31 @@ local turbanWrap(prefix, side, y0, rise, w, steps=12) = [
   for i in std.range(0, steps - 1)
 ];
 local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], [0.34, 0]];
+// The wizard hat's opening follows the doll's head and hair at its foot, a superellipse `a` across x and `b` along z
+// with room round them, because a round opening the cone's size lets the hair's corners through. It keeps that
+// opening up to `foot`, above the hair worn with the brim at the brow, and blends into the round cone by `blend`;
+// outside, the hat keeps the cone's shape except where a wall `wall` thick must stand round the opening.
+local wizardFit = { a: 0.102, b: 0.122, n: 12, foot: 0.078, blend: 0.114, wall: 0.006, band: 0.022, steps: 48 };
+local wizardOpening(th) = local f = wizardFit;
+  std.pow(std.pow(std.abs(std.sin(th)) / f.a, f.n) + std.pow(std.abs(std.cos(th)) / f.b, f.n), -1 / f.n);
+local wizardInner(th, y) =
+  local f = wizardFit, round = radiusAt(wizardPath, y) - f.wall;
+  local u = std.min(1, std.max(0, (y - f.foot) / (f.blend - f.foot))), s = u * u * (3 - 2 * u);
+  round + (1 - s) * std.max(0, wizardOpening(th) - round);
+local wizardOuter(th, y) = std.max(radiusAt(wizardPath, y), wizardInner(th, y) + wizardFit.wall);
+// A wall standing on y from y0 to y1 between radii `inner(bearing, y)` and `outer(bearing, y)`, bearing 0 at +z, as
+// convex pieces round the axis because prisms must be convex.
+local loft(prefix, slot, inner, outer, y0, y1, steps=wizardFit.steps) = [
+  local a0 = 2 * std.pi * j / steps, a1 = 2 * std.pi * (j + 1) / steps, y = (y0 + y1) / 2;
+  local at(r, a) = [r * std.cos(a), r * std.sin(a)];
+  h.prism('%s-%d' % [prefix, j], slot, 'y', [at(inner(a0, y), a0), at(inner(a1, y), a1), at(outer(a1, y), a1), at(outer(a0, y), a0)], y0, y1)
+  for j in std.range(0, steps - 1)
+];
+// Bands `step` tall from y0 to y1 of a loft.
+local lofts(prefix, slot, inner, outer, y0, y1, step) = std.flattenArrays([
+  loft('%s-%d' % [prefix, k], slot, inner, outer, y0 + k * step, y0 + (k + 1) * step)
+  for k in std.range(0, std.ceil((y1 - y0) / step - 1e-9) - 1)
+]);
 
 [
   // A wide-brimmed woven straw sun hat sitting on its brim, 400 mm across and 120 mm tall: a rounded crown on a
@@ -120,21 +145,22 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
 
   // A blue costume wizard hat standing on its brim, 380 mm across and 336 mm tall: a tall cone on a wide floppy
   // brim, a gold band round its foot and gold stars stitched over the cone and brim.
-  local coneStar(id, x, y, r) = local z = std.sqrt(std.pow(radiusAt(wizardPath, y), 2) - x * x);
+  local coneStar(id, x, y, r) = local z = std.sqrt(std.pow(wizardOuter(std.atan2(x, radiusAt(wizardPath, y)), y), 2) - x * x);
     star(id, 'star', 'z', r, z - 0.005, z + 0.002, function(u, v) [x + u, y + v]);
-  local sideStar(id, side, z, y, r) = local x = std.sqrt(std.pow(radiusAt(wizardPath, y), 2) - z * z);
+  local sideStar(id, side, z, y, r) = local x = std.sqrt(std.pow(wizardOuter(side * std.pi / 2, y), 2) - z * z);
     star(id, 'star', 'x', r, side * x - 0.005, side * x + 0.002, function(u, v) [y + v, z + u]);
   local brimStar(id, x, z, r) = star(id, 'star', 'y', r, 0.004, 0.009, function(u, v) [z + v, x + u]);
   h.compound('wizard_hat', 0.1,
              [
-               shell('cone', 'cloth', wizardPath, 0.006),
-               ring('brim', 'cloth', 0, 0.006, 0.098, 0.19),
-               ring('band', 'band', 0.006, 0.022, 0.1, 0.108),
+               shell('cone', 'cloth', [[wizardFit.blend, radiusAt(wizardPath, wizardFit.blend)]] + [p for p in wizardPath if p[0] > wizardFit.blend], wizardFit.wall),
              ]
-             + coneStar('star-a', 0, 0.075, 0.022) + coneStar('star-b', -0.025, 0.17, 0.016) + coneStar('star-c', 0.012, 0.25, 0.012)
+             + loft('brim', 'cloth', wizardInner, function(th, y) 0.19, 0, 0.006)
+             + lofts('foot', 'cloth', wizardInner, wizardOuter, 0.006, wizardFit.blend, 0.006)
+             + lofts('band', 'band', function(th, y) wizardOuter(th, y) - 0.005, function(th, y) wizardOuter(th, y) + 0.003, 0.006, 0.006 + wizardFit.band, 0.0055)
+             + coneStar('star-a', 0, 0.05, 0.022) + coneStar('star-b', -0.025, 0.17, 0.016) + coneStar('star-c', 0.012, 0.25, 0.012)
              + sideStar('star-d', 1, 0.01, 0.11, 0.018) + sideStar('star-e', -1, -0.01, 0.15, 0.016) + sideStar('star-f', 1, -0.02, 0.21, 0.012)
-             + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.12, 0.09, 0.016) + brimStar('star-i', -0.12, 0.1, 0.016)
-             + brimStar('star-j', -0.1, -0.12, 0.016),
+             + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.138, 0.103, 0.016) + brimStar('star-i', -0.132, 0.11, 0.016)
+             + brimStar('star-j', -0.11, -0.132, 0.016),
              { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 

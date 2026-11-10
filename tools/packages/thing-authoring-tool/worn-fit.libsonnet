@@ -80,6 +80,113 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
                     + (if s.sleeves == 'none' then [] else pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore'])),
     },
 
+  // A long robe: a body shell from the waist up, with a hood lying on the back; a pelvis shell over the hips, with a
+  // cord round them, so the robe's lower part stays with the legs when a game twists the chest off the hips; wide
+  // sleeves that hug the arm on the body side, so a hanging arm's sleeve clears the hips, and flare outwards and fore
+  // and aft; and the skirt as a bell on each thigh and shin, since a skirt hung from the hips would have to stand far
+  // out fore and aft to hold a striding leg. `hem` is how far below the knee the skirt falls. `stars` are [x, y] on
+  // the chest's front and `moon` the [x, y, radius] of a crescent there. `slots` names the ground row's finish slots:
+  // `cloth`, `hood`, `lining` and `trim`.
+  robe(id, finish, spec)::
+    local s = { layer: 'normal', hem: 0.22, stars: [], moon: null,
+                slots: { cloth: 'cloth', hood: 'hood', lining: 'lining', trim: 'gold' } } + spec;
+    local g = layers[s.layer], sl = s.slots;
+    local cut = bust.torsoChamfer / 2;
+    local waistTop = bust.pelvisHeight + bust.waistHeight;
+    local ribTop = waistTop + bust.ribHeight;
+    local chestTop = ribTop + bust.chestHeight;
+    local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
+    local chestW = bust.chestWidth + 2 * g, chestD = bust.chestDepth + 2 * g;
+    local shoulderX = bust.chestWidth / 2 + bust.shoulderWidth / 2 + 0.03 + g;
+    // The pelvis shell's hem covers the tops of the thigh bells however far a leg swings. The cord sits below the
+    // body shell's overlap, so a twisted waist does not cut through it.
+    local hem = -0.08;
+    local cordY = bust.pelvisHeight - 0.04;
+    local star(i, p) = [
+      h.box('star-%d-a' % i, sl.trim, [p[0] - 0.014, p[1] - 0.004, chestD / 2], [p[0] + 0.014, p[1] + 0.004, chestD / 2 + 0.003]),
+      h.box('star-%d-b' % i, sl.trim, [p[0] - 0.004, p[1] - 0.014, chestD / 2], [p[0] + 0.004, p[1] + 0.014, chestD / 2 + 0.003]),
+    ];
+    // A crescent upright on the chest's front, built from convex quads because prisms must be convex.
+    local moon(m) =
+      local steps = 6, a0 = 200, a1 = 340;
+      local ang(i) = (a0 + (a1 - a0) * i / steps) * std.pi / 180;
+      local pt(r, i) = [m[0] + r * std.sin(ang(i)), m[1] + r * std.cos(ang(i))];
+      [
+        h.prism('moon-%d' % i, sl.trim, 'z', [pt(m[2], i), pt(m[2], i + 1), pt(m[2] * 0.6, i + 1), pt(m[2] * 0.6, i)], chestD / 2, chestD / 2 + 0.003)
+        for i in std.range(0, steps - 1)
+      ];
+    local pelvis = [
+      oct('hips', sl.cloth, hem, bust.pelvisHeight + 0.01, lowW, lowD, cut),
+      oct('cord', sl.trim, cordY, cordY + 0.014, lowW + 0.01, lowD + 0.01, cut),
+    ] + [
+      h.box('cord-end-%d' % i, sl.trim, [0.05 + 0.025 * i, cordY - 0.16 + 0.03 * i, lowD / 2], [0.06 + 0.025 * i, cordY, lowD / 2 + 0.008])
+      for i in [0, 1]
+    ];
+    local body = [
+      oct('waist', sl.cloth, bust.pelvisHeight - 0.01, waistTop, bust.waistWidth + 2 * g, bust.waistDepth + 2 * g, cut),
+      oct('ribs', sl.cloth, waistTop - 0.01, ribTop, bust.ribWidth + 2 * g, bust.ribDepth + 2 * g, cut),
+      oct('chest', sl.cloth, ribTop - 0.01, chestTop, chestW, chestD, bust.chestChamfer / 2),
+      oct('yoke', sl.cloth, chestTop - 0.13, chestTop + g, 2 * shoulderX, bust.shoulderDepth + 2 * g, 0.03),
+      oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.04, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
+      // The hood lies down on the upper back, its shimmering lining showing at the open top.
+      oct('hood', sl.hood, chestTop - 0.2, chestTop + 0.03, 0.26, 0.07, 0.025, cz=-chestD / 2 - 0.025),
+      oct('hood-lining', sl.lining, chestTop + 0.03, chestTop + 0.036, 0.22, 0.045, 0.02, cz=-chestD / 2 - 0.025),
+    ] + std.flattenArrays([star(i, s.stars[i]) for i in std.range(0, std.length(s.stars) - 1)])
+      + (if s.moon == null then [] else moon(s.moon));
+    // On the model arm, a right arm, the body side is +x, so a sleeve flares towards -x.
+    local uw = arm.upperWidth + 2 * g + 0.01, ud = arm.upperDepth + 2 * g + 0.01;
+    local upper = [
+      oct('sleeve', sl.cloth, -arm.upperLength / 2, 0.03, uw, ud, 0.02),
+      oct('sleeve-flare', sl.cloth, -arm.upperLength - arm.seamOverlap, -arm.upperLength / 2 + 0.01, uw + 0.02, ud + 0.03, 0.025, cx=-0.01),
+    ];
+    // The forearm sleeve widens in tiers to a bell past the wrist; each tier keeps its body-side face just off the
+    // forearm, so the hanging sleeve clears the hip.
+    local tiers = 4, reach = arm.foreLength + 0.02, inner = arm.foreWidth / 2 + 0.006;
+    local tier(k) =
+      local outer = arm.foreWidth / 2 + g + 0.02 * k;
+      { y0: -reach * (k + 1) / tiers, y1: if k == 0 then arm.seamOverlap else -reach * k / tiers + 0.01,
+        w: inner + outer, d: arm.upperDepth + 2 * g + 0.045 * k, cx: (inner - outer) / 2 };
+    local last = tier(tiers - 1);
+    local fore = [
+      local t = tier(k);
+      oct('sleeve-%d' % k, sl.cloth, t.y0, t.y1, t.w, t.d, 0.02, cx=t.cx)
+      for k in std.range(0, tiers - 1)
+    ] + [
+      oct('cuff', sl.trim, -reach, -reach + 0.025, last.w + 0.008, last.d + 0.008, 0.022, cx=last.cx),
+      oct('cuff-lining', sl.lining, -reach - 0.003, -reach + 0.003, last.w - 0.012, last.d - 0.012, 0.018, cx=last.cx),
+    ];
+    // The bells, turned about the leg, stay inside the hanging arm, which swings fore and aft but never sideways:
+    // beside the sleeve the thigh's bell is narrower than the sleeve stands off the hip, and the pelvis shell covers
+    // the thigh there. Below the sleeve it widens to just inside the hanging hand, below the fingertips it flares,
+    // and the shin's bell flares on to the hem.
+    // The shoulder joint is the deltoid cap's centre and each hip a quarter of the pelvis in from its side.
+    local jointX = bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
+    local jointY = chestTop - bust.shoulderHeight / 2 - bust.deltoidDrop;
+    local hipX = bust.pelvisWidth / 4;
+    local sleeveClear = jointX - inner - 0.012 - hipX;
+    local handClear = jointX - arm.palmThickness / 2 - 0.006 - hipX;
+    // Heights in the thigh's frame, taking the hip as the bust's base: the sleeve's end, lowest at its deep back edge,
+    // which dips as the elbow bends, and the fingertips.
+    local sleeveEnd = jointY - arm.upperLength - reach - 0.03;
+    local fingertips = jointY - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
+    local bell(id, slot, rings) = h.turned(id, slot, 'y', [[rings[0][0], 0]] + rings + [[rings[std.length(rings) - 1][0], 0]]);
+    local kneeR = handClear + 0.035, hemR = kneeR + 0.04;
+    local thigh = [
+      bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [hem - 0.01, handClear],
+                               [sleeveEnd, sleeveClear], [0.03, sleeveClear - 0.01]]),
+    ];
+    local shin = [
+      bell('skirt', sl.cloth, [[-s.hem, hemR], [0.06, kneeR - 0.015]]),
+      bell('hem', sl.trim, [[-s.hem, hemR + 0.006], [-s.hem + 0.02, hemR + 0.006 - 0.004]]),
+    ];
+    {
+      rows: [row(id + '_worn_body', body, finish), row(id + '_worn_pelvis', pelvis, finish), row(id + '_worn_upper', upper, finish),
+             row(id + '_worn_fore', fore, finish), row(id + '_worn_thigh', thigh, finish), row(id + '_worn_shin', shin, finish)],
+      figureModels: [entry(id + '_worn_body', 'clothing_body', ['torso']), entry(id + '_worn_pelvis', 'clothing_body', ['pelvis'])]
+                    + pair(id + '_worn_upper', 'sleeve', ['upper']) + pair(id + '_worn_fore', 'cuff', ['fore'])
+                    + pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', ['shin']),
+    },
+
   // Plate armour: a closed breast and back over the ribs and chest, a gorget, `lames` faulds below the waist over a
   // mail skirt, and pauldrons, rerebraces, couters and vambraces on the arms. Rigid, so it clears the over layer.
   // `slots` names the ground row's finish slots: `plate`, `rim`, `strap`, `rivet` and `mail`.
