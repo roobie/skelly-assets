@@ -38,7 +38,7 @@ gun palette. See `src/gun/attachments.ts`, `withDefaultLook`.
 
 A slot the role's finish cannot stand in for, an optic's lens coating, must be selected by the
 product look, because the role's opaque metal would otherwise fill a lens without a word
-(`PILLARS.md`, "Content forward compatibility"). Content that leaves such a slot unselected, and a
+(skelly's `PILLARS.md`, "Content forward compatibility"). Content that leaves such a slot unselected, and a
 look whose material does not exist, fail when content loads and when an instance is built, with
 no fallback coating in code. See `src/gun/attachments.ts`, `attachmentLookIssue`.
 

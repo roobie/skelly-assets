@@ -15,7 +15,7 @@ read_if:
 The acid zombie uses a ground-up body because its hunched silhouette and exposed sac
 define its identity independently of humanoid variations. Body facts stay separate from
 game effects so each boundary can be validated before gameplay consumes it. What the
-model must show stays in `packages/deadvox/docs/acid-zombie.md`, "Model", and its behaviour,
+model must show stays in skelly's `packages/deadvox/docs/acid-zombie.md`, "Model", and its behaviour,
 including acid immunity and the leg-burning puddle, stays in that doc's other sections.
 
 ## Body rules the plan starts from
@@ -53,7 +53,7 @@ module. Their owners are `src/core/body.ts`, `Bone` and `MaterialDef`;
   (`src/core/body.ts`). A sac that never falls off but bursts on death, and a crusted back that
   never severs, are body facts, not Deadvox special cases.
 - **Materials as content.** Per-template colour and glow are look tuning, which
-  `PILLARS.md`, "Content forward compatibility" puts in content. See
+  skelly's `PILLARS.md`, "Content forward compatibility" puts in content. See
   `models/mobs/materialTemplates.jsonnet` and `src/mob/materials.ts`, `resolveMaterials`.
 - **Per-plan budgets and limb bones** on `BodyPlanDef` (`src/core/generate.ts`). The old
   shared scaling assumed humanoid height and head proportions, and a regex picked limb
@@ -112,7 +112,7 @@ Construction stays in TypeScript because anatomy is logic rather than authored t
 
 **Content and logic split.** Authors tune appearance without changing what makes the body
 an acid zombie. Keeping that tuning in `models/mobs/acidTemplate.jsonnet` lets a later tier
-remain a data change (`packages/deadvox/docs/acid-zombie.md`, "Ability, not type"). See
+remain a data change (skelly's `packages/deadvox/docs/acid-zombie.md`, "Ability, not type"). See
 `src/mob/acidTemplate.ts`, `acidTemplate`.
 
 **Measurement.** Shape measurement must be independent of game voxel size and forced
@@ -126,7 +126,7 @@ never claims more than the game supports (`PROJECT.md`, "Template readiness"). S
 ### The study's gates become tests
 
 Known-shape fixtures protect measurement without freezing a generated body
-(`AGENTS.md`, "Tests"). The shared-frame joint rule needs mutation proof because a wrong
+(skelly's `AGENTS.md`, "Tests"). The shared-frame joint rule needs mutation proof because a wrong
 axis sign can silently preserve apparently continuous flesh. See
 `test/acidMeasurements.test.ts` and `src/mob/acidMeasurements.ts`, `jointSections`.
 
@@ -144,7 +144,7 @@ outlines. These are shape changes, not reasons to relax measurement gates; see
 `models/mobs/acidTemplate.jsonnet`, `geometry` and `params`.
 
 Tuning stays in content rather than test literals. Its release-freeze triggers belong in
-`docs/deferred-assertions.md`.
+skelly's `docs/deferred-assertions.md`.
 
 ## What Deadvox needs
 
@@ -217,7 +217,7 @@ Borrowed slots are chosen over a light path built for crowds. Such a path is cos
 grows with the number of glowing actors and the light's reach, and it costs something even
 when nothing glows. It would also still need occlusion, receiver coverage and a world-domain
 policy before it could ship. Borrowed slots add no draws, passes or shader paths, and a lab
-storey holds few acid zombies (`packages/deadvox/docs/acid-zombie.md`, "Spawning"), so lighting only the
+storey holds few acid zombies (skelly's `packages/deadvox/docs/acid-zombie.md`, "Spawning"), so lighting only the
 nearest of them loses little.
 
 ### Far level of detail is its own later item
@@ -235,7 +235,7 @@ later refinement within that direction, not a decision here.
 
 The acid zombie draws its near mesh at distance until the cross-mob far level of detail
 lands. That is acceptable only because labs hold few of them
-(`packages/deadvox/docs/acid-zombie.md`, "Spawning").
+(skelly's `packages/deadvox/docs/acid-zombie.md`, "Spawning").
 
 ## Rounds
 
