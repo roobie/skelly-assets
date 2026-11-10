@@ -72,6 +72,13 @@ them. The thumb starts lifted wide and its root comes down onto the item from be
 side would drive it through the haft it should wrap. Each joint's swing is checked in steps rather than at its end
 alone, so no part passes through a thin item to rest beyond.
 
+The wrist flexes about the knuckle row, as the fingers do, and deviates about the palm's normal. Its limits are a
+wrist's: far more flexion and extension than deviation. Bent about the arm's flex axis instead, the hand would swing in
+the palm's plane, so the wide range would go to deviation, and a held item would leave the wrist's real bend to a
+contorted elbow and shoulder. A hold's elbow pole points down and out, as a person's elbow does; where a hold asks
+past a limit, the limit widens only within a person's range and only as far as a hold has shown it needs, and the rest
+is the socket's or the pole's to fix.
+
 ## Out of scope
 
 - **A solver shared with mobgen**, with the doll's frames and limits given to mobgen's humanoid, waits for a humanoid

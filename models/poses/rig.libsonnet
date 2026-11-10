@@ -76,7 +76,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 5,
+  revision: 6,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -92,13 +92,20 @@ local thumbBones = {
                   limits: { flex: [-30, 30], twist: [-45, 45], abduct: [-20, 20] } },
     upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30, 170] } },
+    // Negative twist supinates, turning the palm up from facing the body; a support hand under a rifle's handguard,
+    // its elbow down and out, takes nearly all of it.
     forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true,
-                   limits: { flex: [0, 150], twist: [-80, 80], abduct: [0, 0] } },
+                   limits: { flex: [0, 150], twist: [-90, 80], abduct: [0, 0] } },
+    // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do,
+    // and its abduction is deviation, positive toward the thumb; about the arm's flex axis a turn would move the hand
+    // in the palm's plane. The wrist bends further toward the little finger than the thumb: a pistol grip, raked
+    // back, is held with the wrist deviated that way. The reach pole puts the elbow down and out, as an arm reaching
+    // in front of the body carries it.
     // `grip`: where a held handle crosses the palm, as a share of its length from the wrist (site/fingers.mjs,
     // `palmSocket`). A power grip seats the handle at the crease just short of the knuckles, so the curling fingers
     // meet it pad by pad; seated further back, they sweep past its far side before they reach it.
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', reach: { pole: [0.3, 0, -1] }, grip: 0.95,
-                limits: { flex: [-70, 80], twist: [0, 0], abduct: [-25, 20] } },
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: [0.5, -1, -0.3] }, grip: 0.95,
+                limits: { flex: [-70, 80], twist: [0, 0], abduct: [-35, 20] } },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0],
                  limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },
     shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0],

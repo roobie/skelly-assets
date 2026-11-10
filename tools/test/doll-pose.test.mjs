@@ -98,6 +98,23 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right fingertip mirrors the left across x');
 });
 
+test('a flexed wrist bends either hand toward its palm and an abducted one toward its thumb', () => {
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  const asked = (side, angles) => ({ [`hand.${side}`]: bones.get(`hand.${side}`).sense.map((sense, i) => sense * angles[i]) });
+  for (const [angles, toward] of [[[40, 0, 0], 'palm'], [[0, 0, 15], 'thumb']]) {
+    const { frame, report } = compilePose(rig, { rig: { id: rig.id, revision: rig.revision }, angles: { ...asked('L', angles), ...asked('R', angles) } });
+    assert.deepEqual(report.clamped, []);
+    const posed = boneTransforms(rig.bones, decodeFrame(frame));
+    for (const side of ['L', 'R']) {
+      const hand = bones.get(`hand.${side}`);
+      const along = normalize(sub(applyPoint(posed.get(hand.id), hand.tail), applyPoint(posed.get(hand.id), hand.head)));
+      // At rest the palm faces the body and the thumb runs forward, +z, on either hand.
+      const way = toward === 'palm' ? [hand.bind.mirror ? -1 : 1, 0, 0] : [0, 0, 1];
+      assert.ok(dot(along, way) > 0.2, `the ${side} hand bends toward its ${toward}, along ${along}`);
+    }
+  }
+});
+
 test('opposition rolls either thumb pad toward its own little finger, the mirrored copy a mirror of the reference', () => {
   const shorthand = { thumb: { oppose: 1, lift: 0.5 } };
   const { frame, report } = compilePose(rig, { rig: { id: rig.id, revision: rig.revision }, hands: { 'hand.L': shorthand, 'hand.R': shorthand } });
