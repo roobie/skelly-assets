@@ -66,6 +66,22 @@ test('an assembly picture changes digest when one of its parts is rebuilt or mov
   }
 });
 
+test('a wearable picture changes digest when the doll it is worn on is rebuilt or it moves on the doll', () => {
+  const built = builtTree();
+  try {
+    const worn = { ...manifest, worn: { fixture_door: [{ model: 'fixture_body', at: [0, 0, 0] }, { model: 'fixture_door', at: [0, 1, 0] }] } };
+    const before = lookDigest(built, worn, 'fixture_door');
+    assert.notEqual(before, lookDigest(built, manifest, 'fixture_door'));
+    const moved = structuredClone(worn);
+    moved.worn.fixture_door[1].at = [0, 1.1, 0];
+    assert.notEqual(lookDigest(built, moved, 'fixture_door'), before);
+    writeFileSync(join(built, 'fixture.vans/models/fixture_body.glb'), 'body, rebuilt');
+    assert.notEqual(lookDigest(built, worn, 'fixture_door'), before);
+  } finally {
+    rmSync(built, { recursive: true, force: true });
+  }
+});
+
 test('a printed label steers the picture, so relabelling a model changes its digest', () => {
   const built = builtTree();
   try {
