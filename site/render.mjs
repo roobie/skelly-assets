@@ -48,19 +48,21 @@ function load(model) {
   return cache.get(model.id);
 }
 
-// A vehicle: the model of each site placed where it sits, a mirrored twin reflected across its own x = 0 plane first.
-// Its parts stay in site order, so the viewer can move each one apart.
-function loadVehicle(vehicle) {
-  if (!cache.has(vehicle.id)) {
-    cache.set(vehicle.id, (async () => {
-      const parts = await Promise.all(vehicle.sites.map((site) => load(modelsById.get(site.model))));
+// Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
+// across its own x = 0 plane when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
+// in site order, so the viewer can move each one apart.
+function loadSites(entry) {
+  if (!cache.has(entry.id)) {
+    cache.set(entry.id, (async () => {
+      const parts = await Promise.all(entry.sites.map((site) => load(modelsById.get(site.model))));
       const scene = new THREE.Group();
       const materials = new Map();
       let triangles = 0;
-      vehicle.sites.forEach((site, i) => {
+      entry.sites.forEach((site, i) => {
         const part = parts[i].scene.clone(true);
-        part.name = site.site;
+        part.name = site.site ?? site.model;
         part.position.fromArray(site.at);
+        if (site.turn) part.quaternion.fromArray(site.turn);
         if (site.mirror) part.scale.x = -1;
         if (site.paint) repaint(part, site.paint);
         scene.add(part);
@@ -70,7 +72,7 @@ function loadVehicle(vehicle) {
       return { scene, clips: null, body: null, triangles, materials: [...materials.values()] };
     })());
   }
-  return cache.get(vehicle.id);
+  return cache.get(entry.id);
 }
 
 // A site's finish paints that copy of its part, as a game spawning the vehicle would: only the materials the part marks
@@ -114,7 +116,13 @@ export function explodable(vehicle) {
 export function spread(parts, share) {
   for (const { part, home, offset } of parts) part.position.copy(home).addScaledVector(offset, share);
 }
-export const loadEntry = (entry) => (isVehicle(entry) ? loadVehicle(entry) : load(entry));
+export const loadEntry = (entry) => (isVehicle(entry) ? loadSites(entry) : load(entry));
+
+// A wearable's worn view: the doll wearing it (models.json's `worn`, from tools/dress.mjs), drawn as sites.
+export const isWearable = (entry) => Boolean(entry.worn);
+export const wornEntry = (entry) => ({ id: `${entry.id} worn`, sites: entry.worn });
+// What the loose view of a wearable is called: folded when it lies folded.
+export const looseName = (entry) => (entry.tags?.state?.includes('folded') ? 'Folded' : 'Loose');
 
 // The manifest's label as a decal on its face: the GLB carries no lettering, so every consumer draws the text itself.
 const LABEL_PX = 512; // the texture's long side

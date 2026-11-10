@@ -155,6 +155,9 @@ spreading them by distance alone, because parts that touch sit at nearly the sam
 move out together. The exploded view looks from the side most parts move toward, because a part pushed out of the
 far side, such as a brake out of the back of its wheel, would hide behind the whole.
 
+A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
+The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
+
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a
 wheel with its brake, is therefore also drawn on its own and exploded about its own centre. The assemblies come from

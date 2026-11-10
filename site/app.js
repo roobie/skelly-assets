@@ -1,9 +1,10 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
-// can be exploded to show each part apart from the others. What it draws, and how, is render.mjs's.
+// can be exploded to show each part apart from the others; a wearable can be shown loose or worn on the doll. What it
+// draws, and how, is render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { canPose, clipSet, explodable, frame, isVehicle, loadEntry, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance } from './render.mjs';
+import { canPose, clipSet, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
@@ -180,7 +181,7 @@ function initViewer() {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
-  viewer = { renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false };
+  viewer = { renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, worn: false };
 
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -234,6 +235,24 @@ function explode(exploded) {
   v.controls.update();
 }
 
+// Switches a wearable between loose and worn on the doll, keeping the camera's direction and fitting the camera to the
+// view it is switching to.
+async function wear(worn) {
+  const v = viewer;
+  const model = v.model;
+  v.worn = worn;
+  for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'worn') === worn));
+  const entry = worn ? wornEntry(model) : model;
+  const loaded = await loadEntry(entry);
+  if (v.model !== model || v.worn !== worn) return; // a later pick overtook this load
+  v.stage.remove(v.obj);
+  v.obj = stillInstance(loaded, entry);
+  v.stage.add(v.obj);
+  const direction = v.camera.position.clone().sub(v.controls.target).normalize();
+  frame(v.camera, v.obj, v.controls.target, direction);
+  v.controls.update();
+}
+
 function step(d) {
   const list = shown.length ? shown : entries;
   const i = list.findIndex((m) => m.id === viewer.model?.id);
@@ -256,7 +275,7 @@ async function openViewer(model) {
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
   $('v-clips').replaceChildren();
-  $('v-clips').setAttribute('aria-label', isVehicle(model) ? 'View' : 'Clip');
+  $('v-clips').setAttribute('aria-label', isVehicle(model) || isWearable(model) ? 'View' : 'Clip');
 
   const loaded = await loadEntry(model);
   if (viewer.model !== model) return; // a later pick overtook this load
@@ -268,6 +287,7 @@ async function openViewer(model) {
   viewer.parts = isVehicle(model) ? explodable(viewer.obj) : [];
   viewer.spread = 0;
   viewer.exploded = false;
+  viewer.worn = false;
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
@@ -318,19 +338,21 @@ async function openViewer(model) {
     }));
     pick(names[0]);
   }
-  if (isVehicle(model)) {
-    $('v-clips').replaceChildren(...[['assembled', 'Assembled'], ['exploded', 'Exploded']].map(([view, text]) => {
-      const b = document.createElement('button');
-      b.className = 'chip';
-      b.type = 'button';
-      b.dataset.view = view;
-      b.textContent = text;
-      b.setAttribute('aria-pressed', String(view === 'assembled'));
-      b.onclick = () => explode(view === 'exploded');
-      return b;
-    }));
-  }
+  if (isVehicle(model)) $('v-clips').replaceChildren(...viewChips([['assembled', 'Assembled'], ['exploded', 'Exploded']], (view) => explode(view === 'exploded')));
+  if (isWearable(model)) $('v-clips').replaceChildren(...viewChips([['loose', looseName(model)], ['worn', 'Worn']], (view) => wear(view === 'worn')));
 }
+
+// A chip for each of a model's views, [view, text], the first pressed; picking one calls `pick` with its view.
+const viewChips = (views, pick) => views.map(([view, text], i) => {
+  const b = document.createElement('button');
+  b.className = 'chip';
+  b.type = 'button';
+  b.dataset.view = view;
+  b.textContent = text;
+  b.setAttribute('aria-pressed', String(i === 0));
+  b.onclick = () => pick(view);
+  return b;
+});
 
 // ---- start ----
 

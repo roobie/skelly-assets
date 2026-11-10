@@ -14,7 +14,7 @@ local segmentOf(id) = std.reverse(std.split(id, '_'))[0];
 {
   // `own` is the taxonomy of the garment the shells belong to; each shell adds its slot and fit.
   shells(own, rows):: [
-    row + { taxonomy: taxonomy.over(own, { tags: { slot: [slots[segmentOf(row.id)]], fit: ['worn'] } }) }
+    row + { taxonomy: taxonomy.over(own, { tags: { slot: [slots[segmentOf(row.id)].slot], fit: ['worn'] } }) }
     for row in rows
   ],
 }

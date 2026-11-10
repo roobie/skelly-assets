@@ -1,6 +1,7 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
 // their category, tags and printed label, the vehicles the tree places and the assemblies the kits build with the
-// model at each of their sites, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
+// model at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the
+// page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
+import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -63,6 +65,14 @@ const paintOf = (finish) => {
 
 // The model at each of a vehicle's or an assembly's sites, as the browser places it.
 const modelsById = new Map(models.map((model) => [model.id, model]));
+
+// Each wearable worn on the doll, as the sites the browser composes its worn view from (tools/dress.mjs). A tree with no
+// wearable, such as one of mobs alone, needs no doll.
+const wearables = new Set(models.filter((model) => isWearable(model, models)));
+const dressing = readDressing(root);
+const doll = wearables.size > 0 ? readDoll(built, manifest, dressing) : undefined;
+const boxOf = (id) => modelBox(readFileSync(join(built, modelsById.get(id).file)));
+const shown = models.map((model) => (wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : model));
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
   site,
@@ -137,6 +147,6 @@ for (const model of models) if (model.clips && model.body) {
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models, vehicles, assemblies }));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies }));
 writeFileSync(join(out, '.nojekyll'), '');
 console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
