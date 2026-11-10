@@ -68,6 +68,46 @@ export const oval = (id: string, slot: string, [bottom, top]: readonly [number, 
   slot,
 });
 type Range = readonly [number, number];
+/** A range open at either end. */
+type Bounds = readonly [number | undefined, number | undefined];
+/** A convex counterclockwise profile cut to the half-plane `coordinate >= limit` (or `<=` with `keep` -1). */
+const cutProfile = (profile: readonly Vec2[], coordinate: 0 | 1, limit: number, keep: 1 | -1): Vec2[] => {
+  const inside = (p: Vec2) => keep * (p[coordinate] - limit) >= 0;
+  const crossing = (p: Vec2, q: Vec2): Vec2 => {
+    const t = (limit - p[coordinate]) / (q[coordinate] - p[coordinate]);
+    return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+  };
+  const cut = profile.flatMap((p, i) => {
+    const q = profile[(i + 1) % profile.length]!;
+    if (inside(p)) return inside(q) ? [p] : [p, crossing(p, q)];
+    return inside(q) ? [crossing(p, q)] : [];
+  });
+  // A vertex on the cut line is its own crossing, which would repeat it.
+  return cut.filter((p, i) => Math.hypot(p[0] - cut[(i + 1) % cut.length]![0], p[1] - cut[(i + 1) % cut.length]![1]) > 1e-9);
+};
+/**
+ * An oval slab cut square to the ranges `x` and `z` it is given, so a hair mass can end at a hairline or a parting
+ * while following the skull's curve round the rest of its edge.
+ */
+export const ovalCut = (
+  id: string,
+  slot: string,
+  range: Range,
+  shape: Oval,
+  cut: { x?: Bounds; z?: Bounds },
+): ExtrudedPolygonSolid => {
+  const whole = oval(id, slot, range, shape);
+  const limits: [0 | 1, number | undefined, 1 | -1][] = [
+    [0, cut.z?.[0], 1],
+    [0, cut.z?.[1], -1],
+    [1, cut.x?.[0], 1],
+    [1, cut.x?.[1], -1],
+  ];
+  return {
+    ...whole,
+    profile: limits.reduce<readonly Vec2[]>((profile, [coordinate, limit, keep]) => (limit === undefined ? profile : cutProfile(profile, coordinate, limit, keep)), whole.profile),
+  };
+};
 type Section = Pick<Oval, 'halfX' | 'halfZ' | 'cz'>;
 const section = (from: Required<Section>, to: Required<Section>, t: number): Required<Section> => ({
   halfX: from.halfX + (to.halfX - from.halfX) * t,

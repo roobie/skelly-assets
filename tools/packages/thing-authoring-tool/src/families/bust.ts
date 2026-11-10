@@ -1,12 +1,10 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { optional, parse, picklist, strictObject } from 'valibot';
-import { block, dome, oval, taper } from './body.ts';
+import { parse, picklist, strictObject } from 'valibot';
+import { block, dome, oval, ovalCut } from './body.ts';
 import { positive, spheroid } from './shapes.ts';
 
 /** The bust's segments: the head is its own part so a stance can lift it about the neck while the torso leans. */
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
-/** How the head wears its hair: full, cropped close to the skull so a hat or helmet sits on the skull, or none. */
-const HAIR_STYLES = ['full', 'cropped', 'none'] as const;
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
@@ -17,7 +15,6 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const d = parse(
     strictObject({
       segment: picklist(BUST_SEGMENTS),
-      hair: optional(picklist(HAIR_STYLES), 'full'),
       /** How far the neck reaches up into the head; its top is the head's joint. */
       neckOverlap: positive,
       pelvisWidth: positive,
@@ -146,9 +143,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       oval('neck', 'skin', ys(shoulders, crown + d.neckOverlap), { halfX: d.neckWidth / 2, halfZ: d.neckWidth / 2, power: 2.4 }),
     ];
   }
-  // The head: a skull domed toward the crown, cheeks narrowing to a chin, and hair. Full hair is a domed mass with a
-  // swept fringe; it stays within the box the old cap filled, which hats are fitted round. Cropped hair follows the
-  // skull a hair's breadth out, so a hat's foot can close on the skull instead of the hair mass.
+  // The head: a skull domed toward the crown, cheeks narrowing to a chin, and hair: a domed mass with a swept fringe
+  // that stays within the box the old cap filled, which hats are fitted round.
   const hairTop = top + 0.006;
   const hairLine = top - d.hairCover;
   const skullFull = { halfX, halfZ, cz: 0 };
@@ -161,23 +157,20 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
     ear('left-ear', 1),
     ear('right-ear', -1),
   ];
-  const hair = {
-    full: [
-      ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + 0.005, halfZ: halfZ + 0.005, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: 2.8 }),
-      block('back-hair', 'hair', [-halfX - 0.004, halfX + 0.004], ys(brow + 0.03, hairLine + 0.01), [-halfZ - 0.004, -halfZ + d.hairCover * 0.9]),
-      block('nape-hair', 'hair', [-halfX * 0.82, halfX * 0.82], ys(brow - 0.005, brow + 0.035), [-halfZ - 0.002, -halfZ + 0.03]),
-      block('side-hair-left', 'hair', [halfX - 0.004, halfX + 0.005], ys(eyeY + 0.012, hairLine + 0.01), [-halfZ + d.hairCover * 0.9, 0.025]),
-      block('side-hair-right', 'hair', [-halfX - 0.005, -halfX + 0.004], ys(eyeY + 0.012, hairLine + 0.01), [-halfZ + d.hairCover * 0.9, 0.025]),
-      // The fringe sweeps: lower and fuller on the figure's left, lifted on the right.
-      block('fringe-left', 'hair', [-0.01, halfX + 0.004], ys(hairLine - 0.012, hairLine + 0.02), [halfZ - 0.03, halfZ + 0.005]),
-      block('fringe-right', 'hair', [-halfX - 0.004, 0], ys(hairLine + 0.004, hairLine + 0.02), [halfZ - 0.03, halfZ + 0.004]),
-    ],
-    cropped: [
-      ...dome('hair', 'hair', ys(hairLine, top + 0.003), [{ halfX: halfX + 0.003, halfZ: halfZ + 0.003, cz: 0 }, { halfX: halfX * 0.45, halfZ: halfZ * 0.5, cz: -0.012 }], { slices: 5, power: 2.6 }),
-      block('back-hair', 'hair', [-halfX - 0.003, halfX + 0.003], ys(brow + 0.03, hairLine + 0.01), [-halfZ - 0.003, -halfZ + 0.02]),
-    ],
-    none: [],
-  }[d.hair];
+  // The hair below the dome lies on the skull a hair's breadth out, cut square at the hairline, nape and parting, so
+  // it has no corners wider than the skull for a hat's foot to catch on.
+  const pelt = { halfX: halfX + 0.005, halfZ: halfZ + 0.005, power: facePower };
+  const hairBack = -halfZ + d.hairCover * 0.9;
+  const hair = [
+    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + 0.005, halfZ: halfZ + 0.005, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: 2.8 }),
+    ovalCut('back-hair', 'hair', ys(brow + 0.03, hairLine + 0.01), pelt, { z: [undefined, hairBack] }),
+    ovalCut('nape-hair', 'hair', ys(brow - 0.005, brow + 0.035), { ...pelt, halfX: halfX * 0.82 }, { z: [undefined, -halfZ + 0.03] }),
+    ovalCut('side-hair-left', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [halfX - 0.004, undefined], z: [hairBack, 0.025] }),
+    ovalCut('side-hair-right', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [undefined, -halfX + 0.004], z: [hairBack, 0.025] }),
+    // The fringe sweeps: lower and fuller on the figure's left, lifted on the right.
+    ovalCut('fringe-left', 'hair', ys(hairLine - 0.012, hairLine + 0.02), pelt, { x: [-0.01, undefined], z: [halfZ - 0.03, undefined] }),
+    ovalCut('fringe-right', 'hair', ys(hairLine + 0.004, hairLine + 0.02), pelt, { x: [undefined, 0], z: [halfZ - 0.03, undefined] }),
+  ];
   // The lips lie on the jaw's front, which sits back from the brow's.
   const mouthZ = halfZ * 0.88 - halfZ * 0.04;
   return [
