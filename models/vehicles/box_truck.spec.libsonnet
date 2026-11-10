@@ -9,7 +9,7 @@
   railBottom: 0.62, railTop: 0.86,
   engine: 'engine_i6_diesel', engineLength: 0.86, gearbox: 'gearbox_truck', radiator: 'radiator_truck',
   paint: 'paint-police-blue',
-  chassisMass: 750, shellMass: 600,
+  chassisMass: 700, shellMass: 560,
   // Box
   boxRear: -3.78, boxFront: 1.82, boxFloor: 1.02, boxFloorTop: 1.09375, boxTop: 3.5, boxSide: 1.25,
 }

@@ -8,7 +8,7 @@ local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', a
 local doors = [[-3.55, -2.55], [-2.45, -1.0], [-0.9, 0.3], [0.4, 1.74]];
 local basketZ = 0.4;
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck', s) + [
-  k.compound('bucket_truck_subframe', 420, [
+  k.compound('bucket_truck_subframe', 400, [
     box('deck', 'alu', [s.bodyRear, s.deckTop - 0.06, -0.72], [s.bodyFront, s.deckTop, 0.72]),
     box('tail', 'frame', [s.bodyRear, s.lockerBottom, -0.72], [s.bodyRear + 0.06, s.deckTop - 0.06, 0.72]),
   ] + k.bothSides([
@@ -17,7 +17,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck',
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'paint', [s.bodyRear - 0.02, s.lockerBottom + 0.06, -s.side + i * s.side / 3], [s.bodyRear, s.lockerBottom + 0.2, -s.side + (i + 1) * s.side / 3])
     for i in std.range(0, 5)
   ], finish),
-  k.compound('bucket_truck_locker', 210, [
+  k.compound('bucket_truck_locker', 180, [
     box('case', 'paint', [s.bodyRear, s.lockerBottom + 0.06, s.lockerIn], [s.bodyFront - 0.02, s.deckTop + 0.3, s.side]),
     box('lid', 'alu', [s.bodyRear - 0.02, s.deckTop + 0.3, s.lockerIn - 0.02], [s.bodyFront, s.deckTop + 0.33, s.side + 0.01]),
     box('band', 'reflect', [s.bodyRear, s.deckTop + 0.1, s.side], [s.bodyFront - 0.02, s.deckTop + 0.17, s.side + 0.012]),
