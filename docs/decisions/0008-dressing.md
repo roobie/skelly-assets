@@ -33,7 +33,10 @@ rather than drawn askew.
 
 A wearable with no worn pieces is placed by its slot: against the doll part its slot's place names, centred across
 and sunk into it by a share of its own depth. This shows where it belongs and roughly how big it is beside the body,
-which a reviewer can judge before the item has worn pieces. A folded or lying wearable is stood up first, head end
+which a reviewer can judge before the item has worn pieces. A head piece is placed by the bust's brow anchor
+instead, its origin at the hairline: a hat stands on its brim in the model frame, so its brim meets the head at the
+brow whatever the hat's height, where sinking it by a share of its height would set a tall hat over the face and a
+low cap above the head. A folded or lying wearable is stood up first, head end
 up and front forward, because the model frame lays every garment flat the same way
 (`docs/decisions/0002-model-frame.md`, "Decision"). Its pose stays as authored, so an unsettled front or lying pose
 shows as such on the doll too.
@@ -43,4 +46,9 @@ shows as such on the doll too.
 Every slot the vocabulary names needs a place on the doll, or the showcase build fails for the first wearable that
 names it; a test holds the content to that, see `tools/test/dress.test.mjs`. A worn-only set, with pieces but no loose
 model, is not a wearable here and stays shown as its pieces. A rigid head piece is placed by its slot rather than by
-the fit a consumer gives it.
+the fit a consumer gives it, so its opening must clear the doll's head and hair with its brim at the brow: a hat whose
+cone is the head's own width would clip the hair's corners. The wizard hat (`models/catalogue/sets/batch-129.libsonnet`)
+widens only its foot for that, near upright over the height of the head, and keeps its cone and brim their original
+size above and around it, because scaling the whole hat to the head makes it absurdly wide and stretching its opening
+to the head's outline makes a box of it. A skullcap, with no height to spare, sits a little high at the brow; it is
+accepted until a cap has worn pieces of its own.

@@ -170,10 +170,11 @@ function rest(box, region, { against, sink }) {
 }
 
 // The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
-// for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`. `boxOf` gives a
-// loose model's box in its own frame.
+// for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its origin at
+// the place's bust anchor, or its box rested against the place's part. `boxOf` gives a loose model's box in its own
+// frame.
 export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) {
-  const { sites, parts } = doll;
+  const { sites, parts, anchors } = doll;
   const copiesOf = (part) => {
     const copies = parts.get(part);
     if (!copies) throw new Error(`${model.id}: the doll has no part ${part}`);
@@ -187,6 +188,11 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) 
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));
   if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
+  if (place.anchor) {
+    const at = anchors[place.anchor];
+    if (!at) throw new Error(`${model.id}: the doll has no anchor ${place.anchor} to place it at`);
+    return [...sites, { model: model.id, at }];
+  }
   const copies = copiesOf(place.part);
   const region = union((place.both ? copies : copies.slice(0, 1)).map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));

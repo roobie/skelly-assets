@@ -62,10 +62,12 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     ],
     // The pivots code poses from: the neck where the torso meets the head, the head's own pivot above it, a
     // shoulder at each deltoid cap's centre and a hip under each side of the pelvis. Left is the figure's left, +x.
+    // The brow, where the hair meets the face, is where a hat's brim sits (models/dressing.libsonnet).
     anchors: {
       spine: { part: 'torso', solid: 'waist', fraction: [0.5, (0.2 - bust.pelvisHeight) / bust.waistHeight, 0.5] },
       neck: { part: 'neck', solid: 'neck', fraction: [0.5, 0, 0.5] },
       head: { part: 'neck', solid: 'neck', fraction: [0.5, 1, 0.5] },
+      brow: { part: 'head', solid: 'hair-0', fraction: [0.5, 0, 0.5] },
       eye_left: { part: 'head', solid: 'left-eye', fraction: [0.5, 0.5, 1] },
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
       shoulder_left: shoulder('left'),
