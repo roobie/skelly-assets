@@ -1,6 +1,6 @@
 // Where a posed garment stops enclosing the body it covers, shared by the pose page, the pose sheet and the clearance
 // sweep. Nothing is forgiven by a margin: every finding is classified instead, so a fit that is merely flush or a
-// seam where two pieces meet is told apart from a body part showing through. Why is in docs/decisions/0010-pose-tool.md.
+// seam where two pieces meet is told apart from a body part showing through. Why is in docs/decisions/0011-clearance-classified.md.
 //
 // The probe takes the doll at rest, as tools/dollRig.mjs, `restMeshes` gives it: `body`, a mesh per bone, and `pieces`,
 // a mesh per worn piece with the bone it rides, all in the rig frame. A mesh is a closed triangle mesh

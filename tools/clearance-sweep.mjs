@@ -2,7 +2,7 @@
 // (site/clearance.mjs) and the camera skin check (site/skin.mjs) on each, so a fit is checked on the whole wardrobe at
 // once and ranked by how much body shows. The drawing and the checks are the posing page's own (site/pose.mjs), driven
 // in headless Chromium as tools/pose-sheet.mjs drives it. Why the checks classify rather than forgive is in
-// docs/decisions/0010-pose-tool.md.
+// docs/decisions/0011-clearance-classified.md.
 // Usage: node tools/clearance-sweep.mjs [--built built] [--out look/sweep] [--size 384] [--views review]
 //   [--wear id,id] [<pose> ...]
 // Poses are fixture names (models/poses), all of them by default; `--wear` limits the sweep to those wearables.
