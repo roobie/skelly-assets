@@ -88,7 +88,7 @@ local links(name) =
     ];
   std.flattenArrays([wrap(i) + run(i) for i in std.range(0, n - 1)]);
 
-// The band of links, and a machine's track frame between its wheels.
+// The band of links, and a machine's track frame between its wheels, in charcoal unless the track names its finish.
 local core(name) =
   local t = tracks[name];
   local l = link(classOf(name));
@@ -100,7 +100,7 @@ local core(name) =
     ]) + (if std.objectHas(t, 'frame') then [
       k.box('frame', 'frame', [t.frame.x[0], t.frame.y[0], -t.frame.halfWidth], [t.frame.x[1], t.frame.y[1], t.frame.halfWidth]),
     ] else []),
-    finish: l.finish + (if std.objectHas(t, 'frame') then { frame: 'paint-charcoal' } else {}),
+    finish: l.finish + (if std.objectHas(t, 'frame') then { frame: std.get(t.frame, 'finish', 'paint-charcoal') } else {}),
   };
 // The band weighs its links, with a machine's frame.
 local bandMass(name) =

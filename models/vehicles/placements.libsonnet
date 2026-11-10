@@ -55,6 +55,7 @@
   'food_truck': import 'food_truck.placements.libsonnet',
   'forklift': import 'forklift.placements.libsonnet',
   'golf_cart': import 'golf_cart.placements.libsonnet',
+  'half_track': import 'half_track.placements.libsonnet',
   'hearse': import 'hearse.placements.libsonnet',
   'heavy_cargo_helicopter': import 'heavy_cargo_helicopter.placements.libsonnet',
   'high_roof_van': import 'high_roof_van.placements.libsonnet',

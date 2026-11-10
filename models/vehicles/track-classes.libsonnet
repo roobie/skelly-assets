@@ -32,4 +32,14 @@ local steel = 'steel-spall-black';
     idler: { id: 'track_idler_armoured', massKg: 110, radius: 0.29, width: 0.36, gap: 0.12, tyre: 0.04, hub: { radius: 0.13, stub: 0.12 }, finish: { wheel: 'paint-charcoal', tyre: 'rubber-black', hub: 'steel-grey' } },
     roadWheel: { id: 'road_wheel_armoured', massKg: 85, radius: 0.31, width: 0.4, gap: 0.12, tyre: 0.05, hub: { radius: 0.12, stub: 0.12 }, finish: { wheel: 'paint-charcoal', tyre: 'rubber-black', hub: 'steel-grey' } },
   },
+  // A WWII half-track's: a moulded rubber band on steel cables with steel guide horns at its centre, run on twin
+  // rubber-tyred bogie wheels between a front drive sprocket and a rear idler. Its 4-inch pitch and 12-inch width are
+  // the M3's; the wheel and band masses are estimates for their sizes.
+  band_light: {
+    link: { pitch: 0.1016, width: 0.31, thickness: 0.04, lug: { length: 0.05, height: 0.02 }, horn: { length: 0.05, height: 0.07, width: 0.04 }, massKg: 3, finish: { shoe: 'rubber-black', horn: steel } },
+    sprocket: { id: 'track_sprocket_band', massKg: 90, radius: 0.29, width: 0.24, gap: 0.06, tyre: 0, hub: { radius: 0.12, stub: 0.06 }, finish: { wheel: steel, hub: 'steel-grey' } },
+    idler: { id: 'track_idler_band', massKg: 80, radius: 0.27, width: 0.24, gap: 0.06, tyre: 0, hub: { radius: 0.11, stub: 0.06 }, finish: { wheel: 'paint-olive', hub: 'steel-grey' } },
+    roadWheel: { id: 'road_wheel_band', massKg: 40, radius: 0.16, width: 0.24, gap: 0.06, tyre: 0.03, hub: { radius: 0.07, stub: 0.06 }, finish: { wheel: 'paint-olive', tyre: 'rubber-black', hub: 'steel-grey' } },
+    roller: { id: 'track_roller_band', massKg: 18, radius: 0.11, width: 0.22, gap: 0.06, tyre: 0.02, hub: { radius: 0.03, stub: 0.04 }, finish: { wheel: 'paint-olive', tyre: 'rubber-black', hub: 'steel-grey' } },
+  },
 }
