@@ -13,7 +13,7 @@ local s = t.spec(import 'semi_tractor.spec.libsonnet');
       site.one('fairing', 'semi_tractor_fairing'),
       site.one('fifth_wheel', 'semi_tractor_fifth_wheel'),
       site.one('catwalk', 'semi_tractor_catwalk'),
-    ] + exhaust.sites(site.kit, 'exhaust_semi_tractor', [s.sleeperBack - 0.12, 0, 1.0], s.detail, paired=true)
-    + fuelTank.sites(site.kit, 'fuel_tank_truck', [s.tankX, s.tankY, -(s.side - 0.34)], s.detail, 'fuel_tank_far'),
+    ] + exhaust.sites('exhaust_semi_tractor', [s.sleeperBack - 0.12, 0, 1.0], s.detail, paired=true)
+    + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, -(s.side - 0.34)], s.detail, 'fuel_tank_far'),
   ),
 }

@@ -1,9 +1,10 @@
-// A radiator as its core and its class's fan and hoses (`cooling-classes.libsonnet`), and the two ways a vehicle fits
-// it: one fused model, or each part at its own site, so each is its own loot. Both are drawn from the same pieces and
-// weigh the same.
+// A radiator as an assembly (`assembly.libsonnet`): its core and its class's fan and hoses
+// (`cooling-classes.libsonnet`).
 // A radiator's frame has the core's middle plane at x = 0, its base at y = 0, centred on z, the
 // engine behind it along -x.
 local k = import 'kit.libsonnet';
+local assembly = import 'assembly.libsonnet';
+local site = import 'site.libsonnet';
 local classes = import 'cooling-classes.libsonnet';
 local radiators = import 'radiators.libsonnet';
 local box = k.box;
@@ -14,7 +15,7 @@ local core = { half: 0.03, tank: 0.015, tankWidth: 0.04 };
 local shroud = 0.02;
 local hoseInset = 0.06;
 
-// Each part in its own frame, as its comment says, with the finish of each slot it draws.
+// Each part in its own frame, as its comment says, drawn as `assembly.libsonnet` takes a drawing.
 // The core and its side tanks, in the radiator's frame.
 local coreDrawn(r, c) = {
   pieces: [
@@ -48,60 +49,39 @@ local hose(c) = {
   finish: { hose: 'rubber-black' },
 };
 
+local fusedId(name) = name;
 local coreId(name) = name + '_core';
 local classOf(name) = classes[radiators[name].class];
-// Where each part's origin sits in the radiator's frame: the fan centred on the core's back, the upper hose off the
-// near-side tank's top and the lower off the far-side tank's foot, so coolant crosses the core.
-local mounts(name) =
-  local r = radiators[name];
-  local back = -core.half - core.tank;
-  local z = r.width / 2 - core.tankWidth / 2;
-  {
-    cooling_fan: [-core.half, r.height / 2, 0],
-    radiator_hose_upper: [back, r.height - hoseInset, z],
-    radiator_hose_lower: [back, hoseInset, -z],
-  };
-local parts(c) = { cooling_fan: { draw: fan(c), id: c.fan.id, massKg: c.fan.massKg }, hose: { draw: hose(c), id: c.hose.id, massKg: c.hose.massKg } };
-// Each site's part, by the site's id.
-local fitted = { cooling_fan: 'cooling_fan', radiator_hose_upper: 'hose', radiator_hose_lower: 'hose' };
-local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-
-local radiatorRows(name) =
+// Each part as `assembly.libsonnet` fits it: the fan centred on the core's back, the upper hose off the near-side
+// tank's top and the lower off the far-side tank's foot, so coolant crosses the core.
+local fittings(name) =
   local r = radiators[name];
   local c = classOf(name);
-  local body = coreDrawn(r, c);
+  local back = -core.half - core.tank;
+  local z = r.width / 2 - core.tankWidth / 2;
+  local fanFitting = { id: c.fan.id, massKg: c.fan.massKg, drawn: fan(c) };
+  local hoseFitting = { id: c.hose.id, massKg: c.hose.massKg, drawn: hose(c) };
   assert c.fan.radius + shroud < std.min(r.width / 2 - core.tankWidth, r.height / 2) : name + "'s core is too small for its class's fan";
-  local placed = [
-    local p = parts(c)[fitted[id]];
-    { id: id, massKg: p.massKg, pieces: [k.moved(piece, mounts(name)[id]) + { id: id + '_' + piece.id } for piece in p.draw.pieces], finish: p.draw.finish }
-    for id in std.objectFields(fitted)
-  ];
-  local partMass = std.sum([p.massKg for p in placed]);
-  assert partMass < r.massKg : name + "'s fan and hoses outweigh the whole radiator";
   [
-    k.compound(coreId(name), r.massKg - partMass, body.pieces, body.finish),
-    k.compound(name, r.massKg, body.pieces + std.flattenArrays([p.pieces for p in placed]), std.foldl(function(all, p) all + p.finish, placed, body.finish)),
+    fanFitting { site: 'cooling_fan', at: [-core.half, r.height / 2, 0] },
+    hoseFitting { site: 'radiator_hose_upper', at: [back, r.height - hoseInset, z] },
+    hoseFitting { site: 'radiator_hose_lower', at: [back, hoseInset, -z] },
   ];
-
-local partRows(c) = [
-  local p = parts(c)[key];
-  k.compound(p.id, p.massKg, p.draw.pieces, p.draw.finish)
-  for key in ['cooling_fan', 'hose']
-];
 
 {
-  // Every radiator's core and fused rows and every class's fan and hose rows.
-  rows: std.flattenArrays([partRows(classes[name]) for name in std.objectFields(classes)])
-        + std.flattenArrays([radiatorRows(name) for name in std.objectFields(radiators)]),
+  // Every class's fan and hose rows and every radiator's core and fused rows.
+  rows: std.flattenArrays([
+    [assembly.row(c.fan.id, c.fan.massKg, fan(c)), assembly.row(c.hose.id, c.hose.massKg, hose(c))]
+    for c in std.objectValues(classes)
+  ]) + std.flattenArrays([
+    assembly.rows(fusedId(name), coreId(name), radiators[name].massKg, coreDrawn(radiators[name], classOf(name)), fittings(name))
+    for name in std.objectFields(radiators)
+  ]),
+  // The radiators, by the names `sites` takes.
+  names: std.objectFields(radiators),
   // Every site a radiator can take, so a vehicle that loses its engine can drop them all.
-  siteIds: ['radiator'] + std.objectFields(fitted),
-  // A vehicle's radiator sites through a vehicle kit (`site.libsonnet`, `kit`), the radiator's frame placed at `at`.
-  // `detail` is 'fused', one model at the `radiator` site, or 'assembly', the core there and each part at its own site.
-  sites(kit, name, at, detail, supportedBy=[]):
-    assert std.member(['fused', 'assembly'], detail) : 'a radiator is fused or an assembly, not ' + detail;
-    if detail == 'fused' then [kit.fitting('radiator', name, at, supportedBy)]
-    else [kit.fitting('radiator', coreId(name), at, supportedBy)] + [
-      kit.fitting(id, parts(classOf(name))[fitted[id]].id, plus(at, mounts(name)[id]), supportedBy)
-      for id in std.objectFields(fitted)
-    ],
+  siteIds: assembly.siteIds('radiator', fittings(self.names[0])),
+  // A vehicle's radiator sites, the radiator's frame placed at `at`, as `assembly.libsonnet`, `sites`, says.
+  sites(name, at, detail, kit=site.kit, supportedBy=[]):
+    assembly.sites('radiator', fusedId(name), coreId(name), fittings(name), at, detail, kit, supportedBy),
 }

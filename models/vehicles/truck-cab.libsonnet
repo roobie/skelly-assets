@@ -260,8 +260,8 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
     fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
-  ] + cooling.sites(kit, s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, ['chassis'])
-  + fuelTank.sites(kit, 'fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, supportedBy=['chassis']) + [
+  ] + cooling.sites(s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, kit=kit, supportedBy=['chassis'])
+  + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, kit=kit, supportedBy=['chassis']) + [
     fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, 0.2], ['engine', 'chassis']),
     // The driver sits on the far side, away from the kerb, as on the buses.
     fitting('steering_wheel', 'steering_wheel', [s.face - s.dashDepth - 0.03, s.seatY + 0.72, -0.58], ['dashboard']),

@@ -1,8 +1,9 @@
-// A fuel tank as its body, its class's filler neck (`fuel-tank-classes.libsonnet`) and a pair of straps, and the two
-// ways a vehicle fits it: one fused model, or each part at its own site, so each is its own loot. Both are drawn from
-// the same pieces and weigh the same.
+// A fuel tank as an assembly (`assembly.libsonnet`): its body, its class's filler neck (`fuel-tank-classes.libsonnet`)
+// and a pair of straps.
 // A tank's frame is centred on x and z with its base at y = 0.
 local k = import 'kit.libsonnet';
+local assembly = import 'assembly.libsonnet';
+local site = import 'site.libsonnet';
 local classes = import 'fuel-tank-classes.libsonnet';
 local tanks = import 'fuel-tanks.libsonnet';
 local box = k.box;
@@ -11,7 +12,7 @@ local capHeight = 0.03;
 
 local classOf(name) = classes[tanks[name].class];
 
-// Each part in its own frame, as its comment says, with the finish of each slot it draws.
+// Each part in its own frame, as its comment says, drawn as `assembly.libsonnet` takes a drawing.
 // The body in the tank's frame: a slab chamfered along its lower edges, or a drum lying along x.
 local body(t, c) = {
   local b = c.body,
@@ -52,61 +53,43 @@ local strap(t, c) = {
   finish: { strap: s.finish },
 };
 
+local fusedId(name) = name;
 local bodyId(name) = name + '_body';
 local strapId(name) = name + '_strap';
-// Where each part's origin sits in the tank's frame: the neck midway along the tank, between the straps, on a slab's
-// +z side or a drum's top, and a strap a third of the tank's length either side of its middle.
-local mounts(name) =
-  local t = tanks[name];
-  {
-    filler_neck: if classOf(name).neck.mount == 'side' then [0, t.height / 2, t.width / 2] else [0, t.height, 0],
-    strap_front: [t.length / 3, 0, 0],
-    strap_rear: [-t.length / 3, 0, 0],
-  };
-local parts(name) =
+// Each part as `assembly.libsonnet` fits it for a tank at site `id`, each site named after the tank's: the neck midway
+// along the tank, between the straps, on a slab's +z side or a drum's top, and a strap a third of the tank's length
+// either side of its middle.
+local fittings(name, id) =
   local t = tanks[name];
   local c = classOf(name);
-  {
-    filler_neck: { draw: neck(c), id: c.neck.id, massKg: c.neck.massKg },
-    strap_front: { draw: strap(t, c), id: strapId(name), massKg: t.strapKg },
-    strap_rear: self.strap_front,
-  };
-local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-
-local tankRows(name) =
-  local t = tanks[name];
-  local c = classOf(name);
-  local drawn = body(t, c);
-  local p = parts(name);
-  local placed = [
-    { id: role, pieces: [k.moved(piece, mounts(name)[role]) + { id: role + '_' + piece.id } for piece in p[role].draw.pieces], finish: p[role].draw.finish }
-    for role in std.objectFields(p)
-  ];
-  local partMass = std.sum([p[role].massKg for role in std.objectFields(p)]);
-  assert partMass < t.massKg : name + "'s neck and straps outweigh the whole tank";
+  local strapFitting = { id: strapId(name), massKg: t.strapKg, drawn: strap(t, c) };
   [
-    k.compound(bodyId(name), t.massKg - partMass, drawn.pieces, drawn.finish),
-    k.compound(strapId(name), t.strapKg, p.strap_front.draw.pieces, p.strap_front.draw.finish),
-    k.compound(name, t.massKg, drawn.pieces + std.flattenArrays([q.pieces for q in placed]), std.foldl(function(all, q) all + q.finish, placed, drawn.finish)),
+    {
+      site: id + '_filler_neck',
+      id: c.neck.id,
+      massKg: c.neck.massKg,
+      drawn: neck(c),
+      at: if c.neck.mount == 'side' then [0, t.height / 2, t.width / 2] else [0, t.height, 0],
+    },
+    strapFitting { site: id + '_strap_front', at: [t.length / 3, 0, 0] },
+    strapFitting { site: id + '_strap_rear', at: [-t.length / 3, 0, 0] },
   ];
-
-local neckRows(c) = local n = neck(c); [k.compound(c.neck.id, c.neck.massKg, n.pieces, n.finish)];
 
 {
-  // Every tank's body, strap and fused rows and every class's neck row.
-  rows: std.flattenArrays([neckRows(classes[name]) for name in std.objectFields(classes)])
-        + std.flattenArrays([tankRows(name) for name in std.objectFields(tanks)]),
+  // Every class's neck row and every tank's strap, body and fused rows.
+  rows: [assembly.row(c.neck.id, c.neck.massKg, neck(c)) for c in std.objectValues(classes)]
+        + std.flattenArrays([
+          local t = tanks[name];
+          [assembly.row(strapId(name), t.strapKg, strap(t, classOf(name)))]
+          + assembly.rows(fusedId(name), bodyId(name), t.massKg, body(t, classOf(name)), fittings(name, 'fuel_tank'))
+          for name in std.objectFields(tanks)
+        ]),
+  // The tanks, by the names `sites` takes.
+  names: std.objectFields(tanks),
   // Every site a tank fitted at site `id` can take, so a vehicle that loses its engine can drop them all.
-  siteIds(id='fuel_tank'): [id] + [id + '_' + role for role in std.objectFields(parts(std.objectFields(tanks)[0]))],
-  // A vehicle's tank sites through a vehicle kit (`site.libsonnet`, `kit`), the tank's frame placed at `at`. `detail`
-  // is 'fused', one model at site `id`, or 'assembly', the body there and each part at a site named after it.
-  sites(kit, name, at, detail, id='fuel_tank', supportedBy=[]):
-    assert std.member(['fused', 'assembly'], detail) : 'a fuel tank is fused or an assembly, not ' + detail;
-    if detail == 'fused' then [kit.fitting(id, name, at, supportedBy)]
-    else
-      local p = parts(name);
-      [kit.fitting(id, bodyId(name), at, supportedBy)] + [
-        kit.fitting(id + '_' + role, p[role].id, plus(at, mounts(name)[role]), supportedBy)
-        for role in std.objectFields(p)
-      ],
+  siteIds(id='fuel_tank'): assembly.siteIds(id, fittings(self.names[0], id)),
+  // A vehicle's tank sites, the tank's frame placed at `at`, as `assembly.libsonnet`, `sites`, says, with the tank at
+  // site `id`.
+  sites(name, at, detail, id='fuel_tank', kit=site.kit, supportedBy=[]):
+    assembly.sites(id, fusedId(name), bodyId(name), fittings(name, id), at, detail, kit, supportedBy),
 }

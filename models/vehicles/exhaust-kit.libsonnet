@@ -4,6 +4,7 @@
 // pipe up to the converter, the mid pipe between it and the muffler, and the tailpipe behind the muffler with its tip.
 // An exhaust's frame is its `route`'s, `exhausts.libsonnet`.
 local k = import 'kit.libsonnet';
+local site = import 'site.libsonnet';
 local classes = import 'exhaust-classes.libsonnet';
 local exhausts = import 'exhausts.libsonnet';
 local round(piece) = piece + { sides: 12 };
@@ -179,10 +180,13 @@ local siteIds = { front_pipe: 'exhaust_front_pipe', cat: 'catalytic_converter', 
         + std.flattenArrays([exhaustRows(name) for name in std.objectFields(exhausts)]),
   // Every site an exhaust can take, so a vehicle that loses its engine can drop them all.
   siteIds: ['exhaust'] + std.objectValues(siteIds),
-  // A vehicle's exhaust sites through a vehicle kit (`site.libsonnet`, `kit`), the exhaust's frame placed at `at`.
-  // `detail` is 'fused', one model at the `exhaust` site, or 'assembly', each part at its own site. `paired` fits a
-  // near-side exhaust and its far-side reflection, each site's id taking the pair's suffixes.
-  sites(kit, name, at, detail, paired=false, supportedBy=[]):
+  // The exhausts, by the names `sites` takes.
+  names: std.objectFields(exhausts),
+  // A vehicle's exhaust sites, the exhaust's frame placed at `at`. `detail` is 'fused', one model at the `exhaust`
+  // site, or 'assembly', each part at its own site. `paired` fits a near-side exhaust and its far-side reflection,
+  // each site's id taking the pair's suffixes. `kit` and `supportedBy` are as `assembly.libsonnet`, `sites`, takes
+  // them.
+  sites(name, at, detail, paired=false, kit=site.kit, supportedBy=[]):
     assert std.member(['fused', 'assembly'], detail) : 'an exhaust is fused or an assembly, not ' + detail;
     local fit(id, part, offset) =
       if paired then kit.pair(id, part, plus(at, offset), supportedBy) else [kit.fitting(id, part, plus(at, offset), supportedBy)];

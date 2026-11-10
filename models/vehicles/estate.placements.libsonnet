@@ -16,9 +16,9 @@ local s = import 'estate.spec.libsonnet';
     site.one('dashboard', 'estate_dashboard'),
   ] + engine.sites('i4_petrol', [s.frontAxle - 0.02, 0.32, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.42]),
-  ] + cooling.sites(site.kit, engine.radiator('i4_petrol'), [s.front - 0.3, 0.32, 0], 'assembly')
-  + tank.sites(site.kit, 'fuel_tank_car', [-0.72, s.sill, 0], 'assembly')
-  + exhaust.sites(site.kit, 'exhaust_estate', [s.rear + 0.46, 0.2, 0.42], 'assembly') + [
+  ] + cooling.sites(engine.radiator('i4_petrol'), [s.front - 0.3, 0.32, 0], 'assembly')
+  + tank.sites('fuel_tank_car', [-0.72, s.sill, 0], 'assembly')
+  + exhaust.sites('exhaust_estate', [s.rear + 0.46, 0.2, 0.42], 'assembly') + [
     site.one('rear_axle', 'twist_beam', [s.rearAxle, 0, 0]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, 0.78, -0.37]),
     site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.55, 0]),

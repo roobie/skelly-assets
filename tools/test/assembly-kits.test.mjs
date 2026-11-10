@@ -14,6 +14,8 @@ const fittings = JSON.parse(evaluateJsonnet(`
   local kits = {
     engine: import 'models/vehicles/engine-kit.libsonnet',
     turret: import 'models/vehicles/turret-kit.libsonnet',
+    radiator: import 'models/vehicles/cooling-kit.libsonnet',
+    'fuel tank': import 'models/vehicles/fuel-tank-kit.libsonnet',
   };
   local at = [1, 0.5, 0.25];
   {
