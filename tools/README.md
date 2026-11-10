@@ -161,6 +161,12 @@ wheel with its brake, is therefore also drawn on its own and exploded about its 
 the kits themselves, laid out as the kit fits them, so a new kit or kit entry is drawn without a list to keep; see
 `assemblies.mjs`, `readAssemblies`.
 
+The review views look from above, so parts a vehicle carries under its floor or behind its cab, such as an exhaust
+run, a fuel tank or a stack, hide under the body. A look can therefore ask for the underside views instead, and for
+only the sites whose ids start with given prefixes, so those parts are drawn where they sit without the body; the
+grid is left out of a view from below, where it would lie between the camera and the model. See
+`../site/lookOptions.mjs`. A sheet shows one look, so drawing with other options into a folder replaces its rows.
+
 A sheet keeps every entry drawn into its folder, so a batch still reads whole after a few entries are redrawn. Each
 picture records a digest of the built files it was drawn from, so the gallery tells a render older than its model by
 content, not by file times that every rebuild resets; see `look.mjs`, `staleIds`. Output defaults to the ignored

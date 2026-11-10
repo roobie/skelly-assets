@@ -3,8 +3,9 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
-import { FORWARD, REVIEW_VIEWS, RIGHT, UP } from '../../site/modelFrame.mjs';
-import { lookDigest, lookIds, mergeRows, staleIds } from '../look.mjs';
+import { keepSites, viewSet } from '../../site/lookOptions.mjs';
+import { FORWARD, REVIEW_VIEWS, RIGHT, UNDERSIDE_VIEWS, UP } from '../../site/modelFrame.mjs';
+import { lookDigest, lookIds, lookName, mergeRows, staleIds } from '../look.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 const manifest = {
@@ -80,6 +81,32 @@ test('a printed label steers the picture, so relabelling a model changes its dig
 test('a redrawn row replaces its earlier one, the rest of the batch stays and a removed entry leaves', () => {
   const previous = [{ id: 'a', digest: 'old' }, { id: 'b', digest: 'b' }, { id: 'gone', digest: 'x' }];
   assert.deepEqual(mergeRows(previous, [{ id: 'a', digest: 'new' }], new Set(['a', 'b'])), [{ id: 'a', digest: 'new' }, { id: 'b', digest: 'b' }]);
+});
+
+test('a sheet shows one look, so a look with other options drops the rows drawn before it', () => {
+  const underside = lookName({ views: 'underside' });
+  const previous = [{ id: 'a', digest: '1' }, { id: 'b', digest: '1', look: underside }];
+  assert.deepEqual(mergeRows(previous, [{ id: 'c', look: underside }], new Set(['a', 'b', 'c']), underside).map(({ id }) => id), ['b', 'c']);
+});
+
+test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {
+  const van = { id: 'fixture_van', sites: [{ site: 'body' }, { site: 'exhaust_front_pipe' }, { site: 'muffler' }, { site: 'door_far' }] };
+  const kept = keepSites(van, ['exhaust_', 'muffler']);
+  assert.deepEqual(kept.sites.map(({ site }) => site), ['exhaust_front_pipe', 'muffler']);
+  assert.notEqual(kept.id, van.id);
+  assert.equal(keepSites(van), van);
+  assert.throws(() => keepSites(van, ['radiator']), /radiator/);
+  assert.throws(() => keepSites({ id: 'fixture_door' }, ['door']), /fixture_door/);
+  assert.throws(() => viewSet('sideways'), /sideways/);
+});
+
+test('the underside views look up from below at both ends, and the rear from straight behind', () => {
+  const dot = (a, b) => a.reduce((sum, x, i) => sum + x * b[i], 0);
+  const view = Object.fromEntries(UNDERSIDE_VIEWS);
+  assert.ok(dot(view['below front ¾'], UP) < 0 && dot(view['below front ¾'], FORWARD) > 0);
+  assert.ok(dot(view['below rear ¾'], UP) < 0 && dot(view['below rear ¾'], FORWARD) < 0);
+  assert.equal(dot(view.rear, FORWARD), -1);
+  assert.equal(dot(view.below, UP), -1);
 });
 
 test('a render is stale when its model changed or left the tree, never when it failed to draw', () => {

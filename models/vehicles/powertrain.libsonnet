@@ -3,7 +3,16 @@
 // `motor`, `inverter`, `pack` and `port` are each `{ part, at }`. `drop` names the sites to remove, `over` merges fields
 // into a kept site by id, and `add` appends sites that are not part of the drive, such as a badge.
 local site = import 'site.libsonnet';
-local combustion = ['engine', 'gearbox', 'radiator', 'fuel_tank', 'fuel_tank_near', 'fuel_tank_far', 'exhaust', 'exhaust_near', 'exhaust_far'];
+local engine = import 'engine-kit.libsonnet';
+local cooling = import 'cooling-kit.libsonnet';
+local fuelTank = import 'fuel-tank-kit.libsonnet';
+local exhaust = import 'exhaust-kit.libsonnet';
+// Every site of a combustion drive, from each kit's own list, so a kit's new part cannot outlive the engine it serves.
+// A tank or an exhaust may be fitted on both sides.
+local sides(id) = [id, id + '_near', id + '_far'];
+local combustion = engine.siteIds + ['gearbox'] + cooling.siteIds
+                   + std.flattenArrays([fuelTank.siteIds(id) for id in sides('fuel_tank')])
+                   + std.flattenArrays([sides(id) for id in exhaust.siteIds]);
 local role(key, id=key) = { key: key, id: id };
 local derive(base, o, drop, roles) =
   local ids = [placed.id for placed in base];

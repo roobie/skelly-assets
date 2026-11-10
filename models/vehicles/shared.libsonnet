@@ -58,12 +58,6 @@ local vee(id, massKg, length, width, height) = k.compound(id, massKg, [
 local gearbox(id, massKg, length, width, height) = k.compound(id, massKg, [
   box('case', 'casting', [-length / 2, 0, -width / 2], [length / 2, height, width / 2]),
 ], { casting: 'steel-grey' });
-local radiator(id, massKg, width, height) = k.compound(id, massKg, [
-  box('core', 'core', [-0.03, 0, -width / 2], [0.03, height, width / 2]),
-], { core: 'paint-charcoal' });
-local tank(id, massKg, finish, length, width, height) = k.compound(id, massKg, [
-  box('tank', 'tank', [-length / 2, 0, -width / 2], [length / 2, height, width / 2]),
-], { tank: finish });
 // A straight run along x from `-length / 2` to the tail at x = 0 is the wrong way round for a blueprint to place,
 // so the origin is the silencer's centre and the pipe runs forward to `pipe`.
 local exhaust(id, massKg, pipe, tail, silencer, tip='steel-stainless', steel='steel-spall-black') = k.compound(id, massKg, [
@@ -478,17 +472,8 @@ local towHitch = k.compound('tow_hitch', 18, [
   gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3),
   gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42),
   gearbox('gearbox_heavy', 240, 0.95, 0.52, 0.55),
-  radiator('radiator_small', 5, 0.62, 0.36),
-  radiator('radiator_car', 7, 0.76, 0.42),
-  radiator('radiator_van', 10, 0.82, 0.55),
-  radiator('radiator_truck', 28, 0.9, 0.95),
-  tank('fuel_tank_car', 9, 'polymer-black', 0.42, 0.6, 0.16),
-  tank('fuel_tank_van', 14, 'polymer-black', 0.52, 0.72, 0.24),
-  tank('fuel_tank_truck', 28, 'alu-bare', 0.9, 0.52, 0.52),
-  exhaust('exhaust_car', 12, 2.2, 0.25, [0.42, 0.42]),
   exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted'),
   exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]),
-  exhaust('exhaust_small', 8, 2.2, 0.31, [0.3, 0.22]),
   exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]),
   exhaust('exhaust_military', 9, 1.4, 0.2, [0.4, 0.16], 'steel-spall-black'),
   exhaustSideHigh,
@@ -567,3 +552,4 @@ local towHitch = k.compound('tow_hitch', 18, [
   attendantSeat,
   controlStick,
 ] + (import 'engine-kit.libsonnet').rows + (import 'wheel-kit.libsonnet').rows
+  + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows
