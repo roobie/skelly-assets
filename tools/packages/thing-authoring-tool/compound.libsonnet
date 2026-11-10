@@ -1,4 +1,5 @@
 // Row helpers shared by catalogue batches, so each batch file holds only its own rows.
+local poses = import 'models/measures/handling.libsonnet';
 local params(values) = { [key]: if std.type(values[key]) == 'array' then std.manifestJsonMinified(values[key]) else std.toString(values[key]) for key in std.objectFields(values) };
 local item(id, family, massKg, dimensions, finish) = {
   id: id,
@@ -380,13 +381,12 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
          ]
        else []),
   // A small thing held upright in the hand by its named solid, as the medicine bottles in food-medical.libsonnet are.
-  // Its turn carries the thing's top, +y, onto the held working end, which an upright hold raises.
-  inHand(id, solid): { handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 } },
+  inHand(id, solid): { handling: poses.inHand + { part: id, solid: solid } },
   // A held tool laid out along x with its working end at +x, gripped on a named solid. The row names that axis once,
   // so the build turns the tool, and its grip turn, onto +z.
-  gripOn(id, solid): { forward: '+x', handling: { part: id, solid: solid, fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 90 } },
-  // A thing standing with its front on +z, held as gripOn holds a tool: raised by its +x side, a quarter roll about it.
-  gripStanding(id, solid): { handling: $.gripOn(id, solid).handling + { turn: [90, 0, 0] } },
+  gripOn(id, solid): { forward: '+x', handling: poses.grip + { part: id, solid: solid } },
+  // A thing standing with its front on +z, held as gripOn holds a tool but turned to stand.
+  gripStanding(id, solid): { handling: $.gripOn(id, solid).handling + poses.gripStanding },
   // Things lying on their back put their head end at -z; see docs/decisions/0002-model-frame.md. A row authored with
   // its head end elsewhere names that end, and the build turns it to -z. A garment's head end is the neck of a top or
   // the waist of trousers or a skirt; a mattress's is where its user's head goes.

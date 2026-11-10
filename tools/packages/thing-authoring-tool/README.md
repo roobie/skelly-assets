@@ -61,11 +61,12 @@ in deadvox content and their models say nothing about load, reach or supported g
 what a jack may lift stays a content and runtime decision. See `src/families/jacks.ts`,
 `engineHoist`, and `models/catalogue/sets/jacks.libsonnet`.
 
-A builder's starting sizes, finishes and taxonomy are content a modder tunes, so they live
-in `models/`, and the builder keeps only the rules that tie one part to another. A default
+A builder's starting sizes, finishes, taxonomy and hold are content a modder tunes, so they
+live in `models/`, and the builder keeps only the rules that tie one part to another. A default
 that scales with the item is stored as a share of the item's size, so the rule stays in the
 builder and the share stays in the content. See `packages.libsonnet`, `carton`, and
-`models/measures/packages.libsonnet`.
+`models/measures/packages.libsonnet`; for holds, `compound.libsonnet`, `gripStanding`, and
+`models/measures/handling.libsonnet`.
 
 The preview draws the same construct report the exporter consumes, so visual inspection is
 not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui/src/scene.ts`,

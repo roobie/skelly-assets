@@ -91,7 +91,7 @@ A look review gives a page path for each design, with a `camera=` view (side, re
 
 Attachments are separate geometry and identity so a fitted choice can be replaced without changing the host firearm's appearance or geometry. Compatibility is certified by the firearm domain and fails closed when a pair is absent; see `docs/attachments.md` and `src/gun/attachmentCompatibility.ts`, `attachmentCompatibilityPairs`.
 
-A Gungen change to any export Deadvox consumes refreshes its GLB and model entry in the same PR: a stale copy can still validate and load, so drift otherwise stays silent. The authored consumption boundary is `exports/deadvox.jsonnet`; explicit companion choices keep a gun's refresh from silently selecting other items. See `src/cli/exportRecipe.ts`, `loadExportRecipe`.
+A Gungen change to any export Deadvox consumes refreshes its GLB and model entry in the same PR: a stale copy can still validate and load, so drift otherwise stays silent. The authored consumption boundary is `models/guns/roster.libsonnet`; explicit companion choices keep a gun's refresh from silently selecting other items. See `src/cli/exportRecipe.ts`, `loadExportRecipe`.
 
 Exporter-written records stay separate from Deadvox's authored overlays so refreshes cannot flatten gameplay tuning. Synchronization compares those records rather than maintaining a second list of fields to omit. Platform floating-point roundoff is not authored content drift, so numeric comparison tolerates it; see skelly's `test/model-export-sync.mjs`, `exportDifference`.
 
