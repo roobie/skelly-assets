@@ -9,9 +9,7 @@ local atom(id, family, massKg, dimensions, finish, solid='body') = {
 };
 local key(id, massKg, bowRadius, shaftLength, metal) = atom(id, 'key', massKg, {
   bowRadius: bowRadius, shaftLength: shaftLength,
-} + defaults.key, { metal: metal }, 'shaft') + {
-  taxonomy: { category: 'keys', tags: { material: ['metal'] } },
-};
+} + defaults.key, { metal: metal }, 'shaft');
 local melee(id, family, massKg, dimensions, finish) = {
   id: id,
   exportMass: 'parts',
