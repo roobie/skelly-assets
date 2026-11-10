@@ -1,5 +1,5 @@
 // The mod's item rows (thing tool) and GAT's gun roster (gun tool), one array; tools/build.mjs picks the tool by
-// each row's kind. The gun rows' sources stay relative to tools/, where GAT's loader resolves them.
+// each row's kind. The gun rows' sources are relative to the repository root, where GAT's loader resolves them.
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local catalogue = import 'models/catalogue/packs.libsonnet';
 // The worn sling shells are no catalogue rows, so the pack names them.

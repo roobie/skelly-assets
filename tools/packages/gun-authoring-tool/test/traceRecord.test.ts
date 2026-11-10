@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, expect, it } from 'vitest';
+import { TRACE_REFERENCES } from '../src/cli/content.ts';
 import { checkTraceRecords } from '../src/cli/traceCheck.ts';
 import { parseTraceRecord, resolveTraceReference } from '../src/gun/traceRecord.ts';
 import { parseTraceSvg } from '../src/gun/traceSvg.ts';
@@ -28,7 +29,7 @@ const reference = {
 };
 const record = { title: 'Test trace', document: 'docs/study.md', values: {}, reference };
 const roots: string[] = [];
-const cue = (file: string): string => `[${file}](../references/${file})`;
+const cue = (file: string): string => `[${file}](../${TRACE_REFERENCES}/${file})`;
 afterEach(() => {
   for (const root of roots.splice(0)) {
     rmSync(root, { recursive: true, force: true });
@@ -37,10 +38,10 @@ afterEach(() => {
 const fixture = () => {
   const root = mkdtempSync(join(tmpdir(), 'gun-trace-'));
   roots.push(root);
-  mkdirSync(join(root, 'references'));
+  mkdirSync(join(root, TRACE_REFERENCES), { recursive: true });
   mkdirSync(join(root, 'docs'));
-  writeFileSync(join(root, 'references/shape.trace.json'), JSON.stringify(record));
-  writeFileSync(join(root, 'references/shape.svg'), svg);
+  writeFileSync(join(root, TRACE_REFERENCES, 'shape.trace.json'), JSON.stringify(record));
+  writeFileSync(join(root, TRACE_REFERENCES, 'shape.svg'), svg);
   writeFileSync(join(root, 'docs/study.md'), `${cue('shape.trace.json')} ${cue('shape.svg')}`);
   return root;
 };
@@ -48,7 +49,7 @@ const fixture = () => {
 it('rejects an SVG/record path mismatch through the check used by validate', () => {
   const root = fixture();
   expect(checkTraceRecords(root)).toEqual([]);
-  writeFileSync(join(root, 'references/shape.svg'), svg.replace('id="outline"', 'id="renamed"'));
+  writeFileSync(join(root, TRACE_REFERENCES, 'shape.svg'), svg.replace('id="outline"', 'id="renamed"'));
   expect(checkTraceRecords(root)).toEqual([expect.stringContaining('missing SVG path outline')]);
 });
 
@@ -69,7 +70,7 @@ it('requires study links to both the record and SVG, so a moved or missing cue f
 it('accepts an invented gun record with no reference evidence', () => {
   const root = fixture();
   writeFileSync(
-    join(root, 'references/shape.trace.json'),
+    join(root, TRACE_REFERENCES, 'shape.trace.json'),
     JSON.stringify({
       title: 'Invented gun',
       document: 'docs/study.md',

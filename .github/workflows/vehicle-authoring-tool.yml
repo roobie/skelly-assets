@@ -6,6 +6,8 @@ on:
     paths:
       - 'tools/packages/vehicle-authoring-tool/**'
       - 'tools/packages/thing-core/**'
+      - 'models/finishes.jsonnet'
+      - 'models/vehicle-blueprints/**'
       - 'tools/packages/construct/**'
       - 'tools/package.json'
       - 'tools/package-lock.json'
@@ -19,6 +21,8 @@ on:
     paths:
       - 'tools/packages/vehicle-authoring-tool/**'
       - 'tools/packages/thing-core/**'
+      - 'models/finishes.jsonnet'
+      - 'models/vehicle-blueprints/**'
       - 'tools/packages/construct/**'
       - 'tools/package.json'
       - 'tools/package-lock.json'

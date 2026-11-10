@@ -12,7 +12,7 @@ import {
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
 import { type Forward, FRONT_TURNS } from '@skelly/thing-core/frame';
-import unitScale from './unitScale.json' with { type: 'json' };
+import unitScale from '../../../../../models/guns/tables/unitScale.json' with { type: 'json' };
 
 /**
  * The scale is anchored to a sourced STANAG magazine dimension; the export applies the resolved

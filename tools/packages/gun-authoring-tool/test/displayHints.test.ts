@@ -7,6 +7,7 @@ import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import { exportGlb, partNodeName } from '@skelly/thing-export/glb.ts';
 import { Mesh } from 'three';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { GUN_PALETTE } from '../src/gun/palette.ts';
@@ -113,7 +114,7 @@ describe('per-solid display hints', () => {
   });
 
   it('does not require or retain display hints while loading a design', () => {
-    const raw = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-ar.json'), 'utf8')) as {
+    const raw = JSON.parse(readFileSync(join(DESIGNS, 'archetype-ar.json'), 'utf8')) as {
       assembly: { parts: Record<string, Record<string, unknown>> };
     };
     // A catalogue item part fixes everything but placement, so the hints go on a part the design builds itself.

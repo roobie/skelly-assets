@@ -2,7 +2,7 @@ import { registerTemplate, type Template, templateByName } from '../core/templat
 import { attackClipFor } from './attack.ts';
 import './skeleton.ts';
 import './templates.ts';
-import data from './skeletonTemplate.json' with { type: 'json' };
+import data from '../../../../../models/mobs/skeletonTemplate.json' with { type: 'json' };
 
 export type SkeletonTemplate = Template & Omit<typeof data, keyof Template>;
 const content = data as unknown as Omit<SkeletonTemplate, 'voxelSize' | 'params'> & Pick<Template, 'params'>;

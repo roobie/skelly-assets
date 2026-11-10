@@ -1,8 +1,9 @@
 // The leaper body plan: an ambush predator built around folded hind springs. The rest pose is its
 // everyday coiled crouch, so validation judges the body it spends its life in; every other stance is a
-// clip on this rig (see motion.ts). Values a look change would tune live in leaper.jsonnet; proportions
-// and joint ranges that the supports, the coil, the clips and the region contract depend on live here.
+// clip on this rig (see motion.ts). Values a look change would tune live in `models/mobs/leaper/leaper.jsonnet`;
+// proportions and joint ranges that the supports, the coil, the clips and the region contract depend on live here.
 
+import content from '../../../../../../models/mobs/leaper/leaper.json' with { type: 'json' };
 import type { Body, BodyRegion, Bone, Feature, Material } from '../../core/body.ts';
 import { registerBodyPlan, sampleParams } from '../../core/generate.ts';
 import {
@@ -23,7 +24,6 @@ import type { Budgets } from '../../core/rules.ts';
 import type { Shape } from '../../core/sdf.ts';
 import { type Genome, registerTemplate, type Template } from '../../core/template.ts';
 import { resolveMaterials } from '../materials.ts';
-import content from './leaper.json' with { type: 'json' };
 
 export const LEAPER_TEMPLATE = content as unknown as Template;
 

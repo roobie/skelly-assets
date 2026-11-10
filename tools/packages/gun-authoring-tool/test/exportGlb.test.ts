@@ -26,6 +26,7 @@ import type { GlbAssetIdentity, Palette } from '@skelly/thing-export/exportTypes
 import { exportGlb, partNodeName, srgbToLinear } from '@skelly/thing-export/glb.ts';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
+import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import type { SelectedAnchors } from '../src/gun/anchors.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
@@ -47,7 +48,7 @@ import { expectWatertightMesh, loadCorpus, partTriangles, variant } from './help
 import { sweepGroup } from './sweeps.ts';
 
 const design = (name: string): Assembly => {
-  const result = loadGunDesign(readFileSync(join(import.meta.dirname, '..', 'designs', `${name}.json`), 'utf8'));
+  const result = loadGunDesign(readFileSync(join(DESIGNS, `${name}.json`), 'utf8'));
   if (!result.ok) {
     throw new Error(`${name}: ${result.error.message}`);
   }

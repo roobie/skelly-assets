@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { COMPACT_SMG_PROPORTIONS } from '../src/gun/compactSmgProportions.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
@@ -15,7 +17,7 @@ const variants = [
 ] as const;
 
 const load = (file: string): Resolved => {
-  const loaded = loadGunDesign(readFileSync(new URL(`../designs/${file}`, import.meta.url), 'utf8'));
+  const loaded = loadGunDesign(readFileSync(join(DESIGNS, file), 'utf8'));
   if (!loaded.ok) {
     throw new Error(JSON.stringify(loaded.error));
   }

@@ -3,22 +3,24 @@ import { basename, join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGeometry } from '../src/gun/glbWriter.ts';
 import { GUN_PALETTE } from '../src/gun/palette.ts';
 
-const ROOT = join(import.meta.dirname, '..');
-const folders = ['designs', 'fixtures'] as const;
+const FOLDERS = { designs: DESIGNS, fixtures: join(import.meta.dirname, '..', 'fixtures') } as const;
+type Folder = keyof typeof FOLDERS;
 
-const jsonFiles = (directory: string): string[] =>
-  readdirSync(join(ROOT, directory), { withFileTypes: true }).flatMap((entry) => {
+/** The JSON files under a folder root, by their path inside it. */
+const jsonFiles = (root: string, skipLooks: boolean, directory = ''): string[] =>
+  readdirSync(join(root, directory), { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
-    if (directory.startsWith('designs') && entry.name.startsWith('look-')) {
+    if (skipLooks && entry.name.startsWith('look-')) {
       return [];
     }
     if (entry.isDirectory()) {
-      return jsonFiles(path);
+      return jsonFiles(root, skipLooks, path);
     }
     return entry.name.endsWith('.json') ? [path] : [];
   });
@@ -29,12 +31,13 @@ interface ExportCase {
   readonly assembly: Assembly;
 }
 
-const cases: ExportCase[] = folders.flatMap((folder) =>
-  jsonFiles(folder)
+const cases: ExportCase[] = (Object.keys(FOLDERS) as Folder[]).flatMap((folder) =>
+  jsonFiles(FOLDERS[folder], folder === 'designs')
     .sort()
-    .map((key) => {
-      const file = basename(key);
-      const text = readFileSync(join(ROOT, key), 'utf8');
+    .map((path) => {
+      const key = `${folder}/${path}`;
+      const file = basename(path);
+      const text = readFileSync(join(FOLDERS[folder], path), 'utf8');
       let assembly: Assembly;
       if (folder === 'designs') {
         const loaded = loadGunDesign(text);

@@ -13,7 +13,7 @@ import {
   strictObject,
   string,
 } from 'valibot';
-import content from './catalogue.json' with { type: 'json' };
+import content from '../../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { gunDomain } from './domain.ts';
 import { GUN_FINISH_SLOTS, GUN_PALETTE } from './palette.ts';
 

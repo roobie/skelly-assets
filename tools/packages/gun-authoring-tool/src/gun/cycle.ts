@@ -9,9 +9,8 @@ import {
   worldSolid,
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import { AR_CYCLIC_RPM, SMALL_AR_FRAME } from './arFrames.ts';
-
-import pistolAction from './pistolAction.json' with { type: 'json' };
 
 export type GunAction = 'ak' | 'ar' | 'smg' | 'slide';
 export type CycleMode = 'fire' | 'hand';

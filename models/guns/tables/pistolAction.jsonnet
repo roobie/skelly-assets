@@ -1,4 +1,4 @@
-local cartridge = import '../../cartridges/9x19.jsonnet';
+local cartridge = import 'models/guns/cartridges/9x19.jsonnet';
 {
   strokeBasis: 'derived from cartridge overall length',
   feedClearanceMm: 10.5,

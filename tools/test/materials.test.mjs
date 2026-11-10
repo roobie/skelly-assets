@@ -10,7 +10,7 @@ const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/e
 const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
 const { MATERIALS } = await import('../packages/thing-core/src/materials.ts');
 const { exportCache } = await import('../packages/thing-export/src/cache.ts');
-const compiled = JSON.parse(readFileSync(new URL('../packages/thing-core/src/materials.json', import.meta.url)));
+const compiled = JSON.parse(readFileSync(new URL('../../models/finishes.json', import.meta.url)));
 
 const glbJson = (bytes) => {
   const buffer = Buffer.from(bytes);

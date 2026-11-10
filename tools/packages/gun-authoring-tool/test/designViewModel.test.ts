@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type { DesignLoadResult } from '@skelly/construct/assembly/design.ts';
 import { loadDesign } from '@skelly/construct/assembly/designLoader.ts';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { GUN_PREFABS, type PrefabCatalogue } from '../src/gun/prefabs.ts';
@@ -10,7 +11,7 @@ import { ar } from '../src/gun/templates.ts';
 import { buildDesignViewModel } from '../src/viewer/designViewModel.ts';
 import { loadDesignAssembly } from './helpers.ts';
 
-const arText = readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-ar.json'), 'utf8');
+const arText = readFileSync(join(DESIGNS, 'archetype-ar.json'), 'utf8');
 // Edits change construction params, which a catalogue item reference fixes, so they start from the built parts.
 const arValues = () => ({ ...JSON.parse(arText), assembly: loadDesignAssembly('archetype-ar') });
 

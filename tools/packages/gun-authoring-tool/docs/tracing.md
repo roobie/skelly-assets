@@ -8,7 +8,7 @@ read_if:
 
 # Gun tracing
 
-A record beside its SVG keeps provenance and uncertainty with the authored content rather than in a disposable script or a hand-synchronized measurement table. The SVG owns contour vertices, so derived envelopes cannot silently disagree with the drawing. Study docs retain interpretation and limits instead of copying measurements. See `../references/fal-profile.trace.json`, `reference`, `../src/gun/traceRecord.ts`, `resolveTraceReference`, and `../src/cli/traceCheck.ts`, `checkTraceRecords`.
+A record beside its SVG keeps provenance and uncertainty with the authored content rather than in a disposable script or a hand-synchronized measurement table. The SVG owns contour vertices, so derived envelopes cannot silently disagree with the drawing. Study docs retain interpretation and limits instead of copying measurements. See `models/guns/references/fal-profile.trace.jsonnet`, `reference`, `../src/gun/traceRecord.ts`, `resolveTraceReference`, and `../src/cli/traceCheck.ts`, `checkTraceRecords`.
 
 Reference evidence is optional because invented and science-fiction guns can author proportions without a photograph. A new traced gun is content, not a new code selector; see `../src/gun/traceRecord.ts`, `parseTraceRecord`. Sourced, derived and unknown values remain distinct because a visual envelope or extrapolation must not acquire the authority of a published dimension.
 

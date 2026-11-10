@@ -7,7 +7,7 @@ import { SIZE_CLASSES, type SizeClass } from '@skelly/construct/foundation/conve
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { BoxSolid, Solid, SolidDisplayHints, SolidFinish, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import physical from '../physical.json' with { type: 'json' };
+import physical from '../../../../../../models/guns/tables/physical.json' with { type: 'json' };
 
 export const X: Vec3 = [1, 0, 0];
 export const NEG_X: Vec3 = [-1, 0, 0];

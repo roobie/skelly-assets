@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { parseTraceRecord, resolveTraceReference } from '../gun/traceRecord.ts';
+import { TRACE_REFERENCES } from './content.ts';
 
 const PATH_SEPARATOR = /[\\/]/;
 const LINK = /\]\(([^\s)]+)\)/g;
@@ -16,9 +17,10 @@ const inside = (root: string, file: string): string => {
 const cites = (document: string, documentPath: string, target: string): boolean =>
   [...document.matchAll(LINK)].some((match) => resolve(dirname(documentPath), match[1]!) === target);
 
-export const checkTraceRecords = (packageRoot: string): string[] => {
-  const root = resolve(packageRoot);
-  const references = resolve(root, 'references');
+/** Checks every trace record under root's references, whose study documents resolve against root too. */
+export const checkTraceRecords = (repositoryRoot: string): string[] => {
+  const root = resolve(repositoryRoot);
+  const references = resolve(root, TRACE_REFERENCES);
   return readdirSync(references)
     .filter((file) => file.endsWith('.trace.json'))
     .sort()

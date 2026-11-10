@@ -10,6 +10,7 @@ import { buildLayers as buildToolLayers } from '@skelly/tool-ui/scene';
 import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { describe, expect, it } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { GUN_PALETTE } from '../src/gun/palette.ts';
@@ -52,7 +53,7 @@ describe('viewer geometry', () => {
   });
 
   it('uses the curated AWM finish with its independent mechanical template on the viewer path', () => {
-    const text = readFileSync(join(import.meta.dirname, '..', 'designs', 'archetype-awm.json'), 'utf8');
+    const text = readFileSync(join(DESIGNS, 'archetype-awm.json'), 'utf8');
     const loaded = loadGunDesign(text);
     expect(loaded.ok).toBe(true);
     if (!loaded.ok) {

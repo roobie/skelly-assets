@@ -13,7 +13,7 @@ import {
   string,
   tuple,
 } from 'valibot';
-import content from './materials.json' with { type: 'json' };
+import content from '../../../../models/finishes.json' with { type: 'json' };
 
 const Fraction = pipe(number(), finite(), minValue(0), maxValue(1));
 const Colour = tuple([Fraction, Fraction, Fraction]);

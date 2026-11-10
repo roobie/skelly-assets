@@ -64,7 +64,8 @@ per class cannot fit every item: an attachment mounts beside a finer receiver, a
 is smaller than a few item voxels. The item's own definition names it, beside a one-line
 reason, because that definition is where the item's look is authored; a recipe holds no
 list of exceptions. The recipe compiles the resolved grain into each row, so the exporter
-and the contract tests read one explicit value. See `tools/jsonnet/lib/voxel-grains.libsonnet`,
+and the contract tests read one explicit value. The grains are content a modder tunes, in
+`models/voxel-grains.libsonnet`; the rule that picks one stays code. See `tools/jsonnet/lib/voxel-grains.libsonnet`,
 `of`, and the recipes `packages/deadvox/mods/skelly.deadvox.scenario.gauntlet.city/exports/things.jsonnet` and
 `packages/gun-authoring-tool/exports/deadvox.jsonnet`.
 

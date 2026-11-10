@@ -4,7 +4,7 @@ import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { OpticAperture } from '@skelly/thing-core/optic-aperture';
 import type { Reticle } from '@skelly/thing-core/reticle';
-import appearanceContent from './appearance.json' with { type: 'json' };
+import appearanceContent from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import { toFileAxes } from './exportFrame.ts';
 import { MOUNT_STANDARDS, type MountKind } from './mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_TYPE_IDS, opticRailContactSolids } from './optics.ts';

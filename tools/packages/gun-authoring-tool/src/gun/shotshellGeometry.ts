@@ -2,8 +2,8 @@
 
 import type { ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { MATERIALS } from '@skelly/thing-core/materials';
+import appearance from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import type { Measure, Shotshell } from '../ammo/cartridge.ts';
-import appearance from './appearance.json' with { type: 'json' };
 
 type ShotshellSolid = RevolvedSolid | ExtrudedPolygonSolid;
 

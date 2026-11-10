@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const REPO = resolve(ROOT, '../..');
+/** The authored mob content, which lives in the models tree so a look change touches no code. */
+const CONTENT = resolve(ROOT, '../../../models/mobs');
 const IMPORT_SPECIFIER = /\bfrom\s+'([^']+)'|\bimport\s+'([^']+)'|\bimport\(\s*'([^']+)'\s*\)/g;
 const DOMAIN_DIR = /(^|\/)\.\.\/(mob|viewer|cli)(\/|$)/;
 
@@ -32,12 +34,13 @@ describe('import boundaries', () => {
     expect(files.length).toBeGreaterThan(coreFiles.length);
   });
 
-  it('keeps every mobgen source and test import within the package', () => {
+  it('keeps every mobgen source and test import within the package or its content', () => {
     for (const file of files) {
       for (const spec of specifiers(file)) {
         if (spec.startsWith('.')) {
           const target = resolve(file, '..', spec);
-          expect(relative(ROOT, target).startsWith('..'), `${relative(REPO, file)} -> ${spec}`).toBe(false);
+          const outside = [ROOT, CONTENT].every((home) => relative(home, target).startsWith('..'));
+          expect(outside, `${relative(REPO, file)} -> ${spec}`).toBe(false);
         }
         expect(spec.startsWith('/'), `${relative(REPO, file)} -> ${spec}`).toBe(false);
       }
@@ -55,7 +58,7 @@ describe('import boundaries', () => {
     }
   });
 
-  it('keeps the leaper standalone: core, shared mob plumbing and its own files only', () => {
+  it('keeps the leaper standalone: core, shared mob plumbing and its own files and content only', () => {
     const leaperFiles = srcFiles.filter((file) => file.startsWith(`${LEAPER}/`));
     expect(leaperFiles.length).toBeGreaterThan(0);
     for (const file of leaperFiles) {
@@ -65,6 +68,7 @@ describe('import boundaries', () => {
           spec.startsWith('.') &&
           (target.startsWith(join(ROOT, 'src/core/')) ||
             target.startsWith(`${LEAPER}/`) ||
+            target.startsWith(`${CONTENT}/leaper/`) ||
             SHARED_PLUMBING.includes(target));
         expect(allowed, `${relative(REPO, file)} -> ${spec}`).toBe(true);
       }

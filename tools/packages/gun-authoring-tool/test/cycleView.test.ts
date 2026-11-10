@@ -6,6 +6,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint } from '@skelly/construct/foundation/math.ts';
 import { type Mesh, Vector3 } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { DESIGNS } from '../src/cli/content.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -63,7 +64,7 @@ describe('action cycle viewer', () => {
     const controls = stubControls();
     // The authored design names catalogue items, so only the loader expands it into an assembly.
     const loaded = loadGunDesign(
-      readFileSync(join(import.meta.dirname, '..', 'designs', 'hunting-rifle.json'), 'utf8'),
+      readFileSync(join(DESIGNS, 'hunting-rifle.json'), 'utf8'),
     );
     if (!loaded.ok) {
       throw new Error(loaded.error.message);
@@ -174,7 +175,7 @@ describe('action cycle viewer', () => {
 
   it('shows the SMG handle held in its notch while held and home after release', () => {
     const controls = stubControls();
-    const loaded = loadGunDesign(readFileSync(join(import.meta.dirname, '..', 'designs', 'compact-smg.json'), 'utf8'));
+    const loaded = loadGunDesign(readFileSync(join(DESIGNS, 'compact-smg.json'), 'utf8'));
     if (!loaded.ok) {
       throw new Error(loaded.error.message);
     }

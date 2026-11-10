@@ -16,11 +16,11 @@ import {
   tuple,
   variant,
 } from 'valibot';
-import appearance from './appearance.json' with { type: 'json' };
-import fixedPrism from './fixedPrism.json' with { type: 'json' };
+import appearance from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
+import fixedPrism from '../../../../../models/guns/tables/fixedPrism.json' with { type: 'json' };
+import opticPresentation from '../../../../../models/guns/tables/opticPresentation.json' with { type: 'json' };
+import reticleContent from '../../../../../models/guns/tables/reticles.json' with { type: 'json' };
 import type { MountRequirement } from './mounts.ts';
-import opticPresentation from './opticPresentation.json' with { type: 'json' };
-import reticleContent from './reticles.json' with { type: 'json' };
 
 export const opticRailContactSolids = (solids: readonly Solid[]): readonly Solid[] =>
   solids.filter((solid) => solid.kind === 'box' && solid.id.endsWith('foot'));

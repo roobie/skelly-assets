@@ -1,8 +1,8 @@
 import { Mesh, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
+import appearance from '../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import exportRecipe from '../exports/deadvox.json' with { type: 'json' };
-import appearance from '../src/gun/appearance.json' with { type: 'json' };
 import { exportAttachmentGlb } from '../src/gun/attachmentExport.ts';
 import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import { getOptic } from '../src/gun/optics.ts';

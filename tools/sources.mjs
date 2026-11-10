@@ -1,4 +1,4 @@
-// Compile package Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
+// Compile the packages' and the models' Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
 // Await installJsonnetSources before importing package code, or run this module directly to refresh the twins (with
 // --digest, to print the digest of their inputs instead).
 import { createHash } from 'node:crypto';
@@ -16,7 +16,7 @@ const repositoryRoot = resolve(here, '..');
 let sourcesInstalled = false;
 
 export const jsonnetFiles = (directory) => {
-  if (directory === undefined) return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(resolve(here, '../models/recipes'))];
+  if (directory === undefined) return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(join(repositoryRoot, 'models'))];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {

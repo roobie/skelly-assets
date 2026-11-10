@@ -12,6 +12,7 @@ import {
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import recipe from '../exports/deadvox.json' with { type: 'json' };
+import { REPO_ROOT } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
@@ -20,9 +21,8 @@ import { FAMILIES, LOWER_LAYOUTS } from '../src/gun/parts.ts';
 import { cornerGuardRear, isTriggerBlade } from '../src/gun/roundedTriggerGuard.ts';
 import { triggerGuard } from '../src/gun/rules.ts';
 import { TRIGGER_GUARDS } from '../src/gun/triggerGuards.ts';
-import { loadCorpus, loadFixture } from './helpers.ts';
+import { designText, loadCorpus, loadFixture } from './helpers.ts';
 
-const ROOT = resolve(import.meta.dirname, '../../..');
 
 /** The part has trigger blades, and each one lies in its finger space. */
 const hasPlacedTrigger = (def: PartDef): boolean => {
@@ -50,7 +50,7 @@ const lowerBuilds = () => [
 describe('traced AR large lower and grip', () => {
   const report = () => {
     const loaded = loadGunDesign(
-      readFileSync(resolve(ROOT, 'packages/gun-authoring-tool/designs/archetype-ar-large.json'), 'utf8'),
+      designText('archetype-ar-large'),
     );
     if (!loaded.ok) {
       throw new Error(loaded.error.message);
@@ -161,7 +161,7 @@ describe('trigger guards', () => {
     const designs = recipe.filter(({ kind }) => kind === 'design');
     expect(designs.length).toBeGreaterThan(0);
     for (const { source } of designs) {
-      const loaded = loadGunDesign(readFileSync(resolve(ROOT, source), 'utf8'));
+      const loaded = loadGunDesign(readFileSync(resolve(REPO_ROOT, source), 'utf8'));
       if (!loaded.ok) {
         throw new Error(source);
       }

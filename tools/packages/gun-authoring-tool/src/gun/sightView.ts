@@ -2,7 +2,7 @@ import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { applyPoint, dot, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { check, minValue, number, parse, pipe, strictObject } from 'valibot';
-import content from './sightView.json' with { type: 'json' };
+import content from '../../../../../models/guns/tables/sightView.json' with { type: 'json' };
 
 const Distance = pipe(number(), minValue(0));
 const SightViewSchema = pipe(

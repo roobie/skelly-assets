@@ -29,7 +29,11 @@ const add = document.querySelector<HTMLFormElement>('#add')!;
 const parts = document.querySelector<HTMLDataListElement>('#parts')!;
 const pairDialog = document.querySelector<HTMLDialogElement>('#pair')!;
 
-const files = import.meta.glob('../blueprints/*.json', { query: '?raw', import: 'default', eager: true });
+const files = import.meta.glob('../../../../models/vehicle-blueprints/*.json', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 const blueprints = Object.entries(files).map(([path, text]) => ({
   file: path.split('/').at(-1)!,
   blueprint: loadSavedBlueprint(text as string),
