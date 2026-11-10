@@ -4,7 +4,7 @@ read_if:
   - you add an authoring tool that exports neutral models
   - you change physical inputs or interpret exported mass and centres of mass
   - you share export recipes or file writing between authoring tools
-  - you move thing recipes between mods or change per-mod export discovery
+  - you choose which pack's recipe selects a thing
   - you change or judge voxelized export
   - you give an item, attachment or round its own voxel grain
 ---
@@ -24,19 +24,14 @@ See `packages/construct/src/assembly/template.ts`, `Template.variantParams`, and
 
 ## Recipe ownership
 
-Thing recipes live at exports/things.jsonnet inside the mod that owns their item rows.
-Ownership is stated once, beside the item, so a recipe moves with its row between mods.
-Discovery rather than a central target list makes uneven mod sizes irrelevant and gives
-third-party mods the same path. See `tools/thing-recipes.ts`, `thingRecipeDirectories`, and
-`packages/thing-authoring-tool/src/cli/export.ts`, `exportThingRecipes`.
-Shared authoring helpers stay in the tool and recipes import them by path.
+A thing's recipe is its pack's, chosen by content; the rule and its reasons are in
+`tools/README.md`, "Layout". Shared authoring helpers stay in the tool and recipes import
+them by path.
 
 The row contract, dispatch validation and output identity are shared to keep unsupported
 selections from becoming silent omissions; see `src/recipe.ts`, `loadRecipe`. Node-only
 file writing is separate from browser-safe geometry and preview code; see `src/files.ts`,
-`writeRecipeExports`. Each owning mod receives its own recipe-derived registration index,
-so content needs no second model list. Credits derive their file set from the same recipes
-through `tools/jsonnet/lib/export-files.libsonnet`.
+`writeRecipeExports`.
 
 ## Voxelized export
 
@@ -66,8 +61,8 @@ reason, because that definition is where the item's look is authored; a recipe h
 list of exceptions. The recipe compiles the resolved grain into each row, so the exporter
 and the contract tests read one explicit value. The grains are content a modder tunes, in
 `models/voxel-grains.libsonnet`; the rule that picks one stays code. See `tools/jsonnet/lib/voxel-grains.libsonnet`,
-`of`, and the recipes `packages/deadvox/mods/skelly.deadvox.scenario.gauntlet.city/exports/things.jsonnet` and
-`packages/gun-authoring-tool/exports/deadvox.jsonnet`.
+`of`, and its users `tools/packages/thing-authoring-tool/exports/deadvox.jsonnet` and
+`tools/packages/gun-authoring-tool/exports/deadvox.jsonnet`.
 
 A part asks for the finest grain by carrying a tag in its definition, so the choice sits
 with the part's content and the exporter holds no list of part names. See `src/glb.ts`,
@@ -103,7 +98,7 @@ defines. See `packages/gun-authoring-tool/src/gun/exportGlb.ts`, `sightMetadata`
 
 A part with baked collision also names its grain, so a consumer's own datums can snap to
 the same lattice. A cargo space does this to fit the drawn bed it fills; see
-`packages/thing-core/src/schema.ts`, `ModelPartSchema`, and `packages/deadvox/DESIGN.md`,
+`packages/thing-core/src/schema.ts`, `ModelPartSchema`, and skelly's `packages/deadvox/DESIGN.md`,
 "Vehicles".
 
 No solid or stretch of a solid vanishes. Any stretch thinner than the grain, such as a

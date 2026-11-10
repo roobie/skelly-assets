@@ -169,7 +169,7 @@ const round6 = (value: number): number => {
 
 /**
  * Convert a generated column into the optional DeadvoxModelEntry `rounds` field. Each round's centre is written in the
- * file's axes; `place` moves it, in magazine units, onto the drawn model (see `drawn.ts`).
+ * file's axes; `place` moves it, in magazine units, onto the drawn model (see `tools/packages/thing-export/src/drawn.ts`).
  */
 export const magazineRoundPoses = (
   column: Column,

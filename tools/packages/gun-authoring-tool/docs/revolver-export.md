@@ -25,4 +25,4 @@ The curated design carries its own cartridge identity. Geometry-only exports wit
 
 Asset credits cover runtime media rather than Jsonnet authoring programs. Keeping the manifest's source beside its compiled output must not require that source to credit itself; see deadvox's `assetFileIssues`.
 
-A refresh has one metadata writer so exported geometry cannot drift from hand-edited records, while authored gameplay overlays remain untouched. The explicit consumption boundary is `exports/deadvox.jsonnet`; see `src/cli/refreshDeadvox.ts`, `loadExportRecipe`, and `packages/mods/skelly.firearms/models-firearms.libsonnet`.
+A refresh has one metadata writer so exported geometry cannot drift from hand-edited records, while authored gameplay overlays remain untouched. The explicit consumption boundary is `exports/deadvox.jsonnet`; see `src/cli/exportRecipe.ts`, `loadExportRecipe`, and skelly's `packages/deadvox/src/content/base/models-firearms.libsonnet`.
