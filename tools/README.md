@@ -152,7 +152,8 @@ A vehicle's picture adds its exploded view, because a picture of the whole hides
 engine's accessories round its core. The showcase's viewer explodes a vehicle by the same rule, `../site/explode.mjs`,
 `explode`, so a review judges the parts the showcase shows. The rule clears every part of every other rather than
 spreading them by distance alone, because parts that touch sit at nearly the same distance from the centre and would
-move out together.
+move out together. The exploded view looks from the side most parts move toward, because a part pushed out of the
+far side, such as a brake out of the back of its wheel, would hide behind the whole.
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a

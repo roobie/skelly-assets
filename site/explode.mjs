@@ -63,3 +63,11 @@ export function explode(boxes) {
   }
   return offsets;
 }
+
+// The view of `views`, [name, direction] pairs, that the most parts move toward, the first on a tie: a part pushed out
+// of the far side of the whole, such as a brake out of the back of its wheel, would hide behind it from the other side.
+export function facingView(offsets, views) {
+  const toward = (offset, direction) => offset.reduce((sum, x, axis) => sum + x * direction[axis], 0) > 0;
+  const facing = ([, direction]) => offsets.filter((offset) => toward(offset, direction)).length;
+  return views.reduce((best, view) => (facing(view) > facing(best) ? view : best));
+}

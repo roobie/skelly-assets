@@ -15,6 +15,12 @@ const from = (forward, right, up) => unit([0, 1, 2].map((i) => forward * FORWARD
 // The front three-quarter, from the right: the showcase's default view and the review tile's first.
 export const FRONT_QUARTER = from(1.25, 0.85, 0.5);
 
+// The views an exploded view looks from: the front three-quarter from either side, as its parts move out toward one.
+export const EXPLODED_VIEWS = [
+  ['exploded front ¾', FRONT_QUARTER],
+  ['exploded front ¾, left', from(1.25, -0.85, 0.5)],
+];
+
 // The review tile's views. The rear three-quarter mirrors the front through the vertical axis, so the two show both
 // sides; the side view is a profile from the right, which is a vehicle's near side.
 export const REVIEW_VIEWS = [

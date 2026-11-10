@@ -4,11 +4,11 @@
 // wider, so the parts a picture of the whole hides can be reviewed too. tools/model-sheet.mjs drives it headless
 // through `window.look`; opened with `?id=a,b` it shows those tiles in the page.
 import * as THREE from 'three';
-import { FRONT_QUARTER, REVIEW_VIEWS } from './modelFrame.mjs';
+import { facingView } from './explode.mjs';
+import { EXPLODED_VIEWS, REVIEW_VIEWS } from './modelFrame.mjs';
 import { explodable, frame, isVehicle, loadEntry, makeStage, registerModels, setupRenderer, spread, stillInstance } from './render.mjs';
 
 const views = REVIEW_VIEWS.map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
-const explodedView = ['exploded front ¾', new THREE.Vector3(...FRONT_QUARTER)];
 const BACKGROUND = '#e8e6e1';
 
 let renderer;
@@ -73,11 +73,13 @@ async function look(id, size) {
   });
   stage.remove(grid);
   if (exploded) {
-    spread(explodable(obj), 1);
+    const parts = explodable(obj);
+    spread(parts, 1);
+    const [name, direction] = facingView(parts.map(({ offset }) => offset.toArray()), EXPLODED_VIEWS);
     // The same cell as the assembled views, so the spread reads against the whole's own size.
     const apart = groundGrid(new THREE.Box3().setFromObject(obj), cell);
     stage.add(apart);
-    drawView(g, obj, explodedView, size * 2, 0, size * 2);
+    drawView(g, obj, [name, new THREE.Vector3(...direction)], size * 2, 0, size * 2);
     stage.remove(apart);
   }
   stage.remove(obj);

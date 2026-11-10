@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { explode } from '../../site/explode.mjs';
-import { UP } from '../../site/modelFrame.mjs';
+import { explode, facingView } from '../../site/explode.mjs';
+import { EXPLODED_VIEWS, RIGHT, UP } from '../../site/modelFrame.mjs';
 
 const box = (min, max) => ({ min, max });
 const centre = ({ min, max }) => min.map((x, axis) => (x + max[axis]) / 2);
@@ -57,4 +57,13 @@ test('a part with no line of its own, at the assembly centre, is lifted clear of
   assert.deepEqual(still, [0, 0, 0]);
   assert.ok(Math.hypot(...cross(lifted, UP)) < 1e-9 && dot(lifted, UP) > 0, 'the second part is not lifted');
   assert.ok(!overlapping(plate, shifted(post, lifted)));
+});
+
+test('an exploded view looks from the side its parts move out toward, and from the first view when they part evenly', () => {
+  const left = RIGHT.map((x) => -x);
+  const [first] = EXPLODED_VIEWS;
+  const fromLeft = facingView([left, left, RIGHT], EXPLODED_VIEWS);
+  assert.ok(dot(fromLeft[1], left) > 0);
+  assert.equal(facingView([RIGHT, RIGHT, left], EXPLODED_VIEWS), first);
+  assert.equal(facingView([left, RIGHT], EXPLODED_VIEWS), first);
 });
