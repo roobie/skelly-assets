@@ -21,9 +21,16 @@ local measures = import 'measures/jacket.libsonnet';
 local jacketLevel(id) =
   local d = measures[id];
   prism(id, 'cloth', d.bottom, d.top, d.width, d.depth, d.chamfer);
-local hoodieLevel(id) =
+local bust = import 'measures/bust.libsonnet';
+local hoodieLayer = 0.012;
+// The hoodie is cut closer than the jacket, but never closer than its cloth layer over the widest bust section a
+// level spans; its waist level reaches up over the ribs.
+local hoodieLevel(id, bodyWidth, bodyDepth) =
   local d = measures[id];
-  prism(id, 'cloth', d.bottom, d.top, d.width - 0.02, d.depth - 0.015, d.chamfer + 0.01);
+  prism(id, 'cloth', d.bottom, d.top, std.max(d.width - 0.02, bodyWidth + 2 * hoodieLayer),
+        std.max(d.depth - 0.015, bodyDepth + 2 * hoodieLayer), d.chamfer + 0.01);
+// An upper sleeve's head rises over the deltoid, which stands wider than the body's chest level.
+local sleeveHead = bust.shoulderHeight / 2 + bust.deltoidDrop;
 local trousers = { cloth: 'cloth-pants-player', trim: 'paint-charcoal' };
 local rubber = { cloth: 'rubber-black', trim: 'paint-charcoal' };
 local sneaker = { cloth: 'cloth-pants-player', trim: 'rubber-black' };
@@ -38,19 +45,19 @@ worn.shells(clothing(['fabric']), [
     box('left-pocket', 'trim', [-0.155, 0.16, 0.12], [-0.04, 0.25, 0.14]),
     box('right-pocket', 'trim', [0.04, 0.16, 0.12], [0.155, 0.25, 0.14]),
   ], jacket),
-  garment('worn_jacket_upper', [prism('sleeve', 'cloth', -0.32, 0.025, 0.125, 0.13, 0.02)], jacket),
+  garment('worn_jacket_upper', [prism('sleeve', 'cloth', -0.32, sleeveHead, 0.125, 0.13, 0.02)], jacket),
   garment('worn_jacket_fore', [
     prism('sleeve', 'cloth', -0.24, 0.025, 0.115, 0.125, 0.02),
     prism('cuff', 'trim', -0.255, -0.215, 0.105, 0.115, 0.02),
   ], jacket),
   garment('worn_hoodie_body', [
-    hoodieLevel('hem'),
-    hoodieLevel('waist'),
-    hoodieLevel('chest'),
+    hoodieLevel('hem', bust.pelvisWidth, bust.pelvisDepth),
+    hoodieLevel('waist', bust.ribWidth, bust.ribDepth),
+    hoodieLevel('chest', bust.chestWidth, bust.chestDepth),
     prism('hood', 'cloth', 0.34, 0.63, 0.30, 0.10, 0.04, cz=-0.07),
     box('kangaroo-pocket', 'trim', [-0.15, 0.18, 0.10], [0.15, 0.27, 0.12]),
   ], hoodie),
-  garment('worn_hoodie_upper', [prism('sleeve', 'cloth', -0.32, 0.025, 0.125, 0.13, 0.03)], hoodie),
+  garment('worn_hoodie_upper', [prism('sleeve', 'cloth', -0.32, sleeveHead, 0.125, 0.13, 0.03)], hoodie),
   garment('worn_hoodie_fore', [
     prism('sleeve', 'cloth', -0.24, 0.025, 0.115, 0.125, 0.03),
     prism('cuff', 'trim', -0.255, -0.215, 0.105, 0.115, 0.025),
