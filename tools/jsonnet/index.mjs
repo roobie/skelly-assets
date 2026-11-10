@@ -70,15 +70,16 @@ export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT,
   return runJsonnet(...fileArgs(sourcePath, repositoryRoot, overlay));
 }
 
-// compileJsonnetFile in a child process that leaves the caller free, so many sources compile at once.
-export function compileJsonnetFileAsync(sourcePath, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
-  return runJsonnetAsync(...fileArgs(sourcePath, repositoryRoot, overlay));
-}
-
 // Evaluates a Jsonnet expression with the repository's library paths. Jsonnet is lazy, so an expression that keeps
 // only a few fields of a large source evaluates just those fields.
 export function evaluateJsonnet(expression, repositoryRoot = REPOSITORY_ROOT) {
   return runJsonnet([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, expression);
+}
+
+// evaluateJsonnet in a child process that leaves the caller free, so many expressions evaluate at once; `label` names
+// the expression in a failure.
+export function evaluateJsonnetAsync(expression, repositoryRoot = REPOSITORY_ROOT, { label = expression } = {}) {
+  return runJsonnetAsync([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, label);
 }
 
 // Compiles many sources in one go-jsonnet run, each to the text compileJsonnetFile gives it. One run evaluates a file

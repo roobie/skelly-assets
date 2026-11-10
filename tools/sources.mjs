@@ -8,7 +8,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { compileJsonnetFileAsync, compileJsonnetFiles, libraryPaths } from './jsonnet/index.mjs';
+import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
 
 const here = import.meta.dirname;
@@ -129,9 +129,15 @@ const forEachConcurrently = async (items, work) => {
   await Promise.all(Array.from({ length: Math.min(availableParallelism(), items.length) }, worker));
 };
 
+// A fragment stands in for its row file only when the two cannot differ, so each compile holds its row file to plain
+// data, naming the file and field that is not; see jsonnet/plain-data.libsonnet.
+const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
+const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
+
 const compileFragments = (rows, { root, store }) =>
   forEachConcurrently(rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))), async ({ path, key }) => {
-    replaceFile(storeEntry(store, 'rows', key), await compileJsonnetFileAsync(path, compileRoot(root)));
+    const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
+    replaceFile(storeEntry(store, 'rows', key), fragment);
   });
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
@@ -176,10 +182,11 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
 }
 
-// This module and the compiler driver beside it; the compiler binary is pinned by jsonnet/runtime.json, an input.
+// This module and the compiler driver and plain-data check beside it; the compiler binary is pinned by
+// jsonnet/runtime.json, an input.
 export const compilerCode = () => [
   fileURLToPath(import.meta.url),
-  ...readdirSync(join(here, 'jsonnet')).filter((name) => name.endsWith('.mjs')).sort().map((name) => join(here, 'jsonnet', name)),
+  ...readdirSync(join(here, 'jsonnet')).filter((name) => /\.(mjs|libsonnet)$/.test(name)).sort().map((name) => join(here, 'jsonnet', name)),
 ];
 
 const installOptions = () => ({
