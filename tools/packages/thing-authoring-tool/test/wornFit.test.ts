@@ -49,9 +49,10 @@ const shell = async (id: string) => {
   };
 };
 
-it('exports the over-jacket utility vest clear of the hoodie shell', async () => {
-  const hoodie = await shell('hoodie_worn_body');
+// Both torso garments take the over-jacket gear, so it must clear each of them.
+it.each(['jacket_worn_body', 'hoodie_worn_body'])('exports the over-jacket utility vest clear of %s', async (id) => {
+  const garment = await shell(id);
   const vest = await shell('utility_vest_worn_jacket');
-  expect(hoodie.points.filter(vest.contains)).toHaveLength(0);
-  expect(vest.points.filter(hoodie.contains)).toHaveLength(0);
+  expect(garment.points.filter(vest.contains)).toHaveLength(0);
+  expect(vest.points.filter(garment.contains)).toHaveLength(0);
 });

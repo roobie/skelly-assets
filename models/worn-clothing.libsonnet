@@ -1,88 +1,22 @@
-local prism(id, slot, bottom, top, width, depth, chamfer, cx=0, cz=0) = {
-  id: id, slot: slot, kind: 'prism', axis: 'y', start: bottom, end: top,
-  profile: [[point[0] + cz, point[1] + cx] for point in [
-    [-depth / 2 + chamfer, -width / 2], [depth / 2 - chamfer, -width / 2],
-    [depth / 2, -width / 2 + chamfer], [depth / 2, width / 2 - chamfer],
-    [depth / 2 - chamfer, width / 2], [-depth / 2 + chamfer, width / 2],
-    [-depth / 2, width / 2 - chamfer], [-depth / 2, -width / 2 + chamfer],
-  ]],
-};
+// The everyday clothes' worn shells, fitted round the player body by the worn-fit templates. Their finishes are the
+// figure's own worn colours rather than the ground rows'.
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
-local box(id, slot, low, high) = { id: id, slot: slot, kind: 'box', min: low, max: high };
-local garment(id, pieces, finish) = {
-  id: id, exportMass: 'inventory-atom',
-  parts: [{ id: 'garment', family: 'compound', massKg: 0.1,
-    params: { pieces: std.manifestJson(pieces) }, finish: finish, ports: [] }],
-  connections: [],
-};
-local jacket = { cloth: 'cloth-shirt-player', trim: 'paint-charcoal', fastener: 'steel-grey' };
-local hoodie = { cloth: 'plastic-red', trim: 'paint-charcoal' };
-local measures = import 'measures/jacket.libsonnet';
-local jacketLevel(id) =
-  local d = measures[id];
-  prism(id, 'cloth', d.bottom, d.top, d.width, d.depth, d.chamfer);
-local bust = import 'measures/bust.libsonnet';
-local hoodieLayer = 0.012;
-// The hoodie is cut closer than the jacket, but never closer than its cloth layer over the widest bust section a
-// level spans; its waist level reaches up over the ribs.
-local hoodieLevel(id, bodyWidth, bodyDepth) =
-  local d = measures[id];
-  prism(id, 'cloth', d.bottom, d.top, std.max(d.width - 0.02, bodyWidth + 2 * hoodieLayer),
-        std.max(d.depth - 0.015, bodyDepth + 2 * hoodieLayer), d.chamfer + 0.01);
-// An upper sleeve's head rises over the deltoid, which stands wider than the body's chest level.
-local sleeveHead = bust.shoulderHeight / 2 + bust.deltoidDrop;
-local trousers = { cloth: 'cloth-pants-player', trim: 'paint-charcoal' };
-local rubber = { cloth: 'rubber-black', trim: 'paint-charcoal' };
-local sneaker = { cloth: 'cloth-pants-player', trim: 'rubber-black' };
+local jacket = import 'measures/jacket.libsonnet';
 local clothing(material) = { category: 'clothing', tags: { material: material, setting: ['modern'] } };
-worn.shells(clothing(['fabric']), [
-  garment('jacket_worn_body', [
-    jacketLevel('hem'),
-    jacketLevel('waist'),
-    jacketLevel('chest'),
-    prism('collar', 'trim', 0.6, 0.66, 0.16, 0.16, 0.02),
-    box('zip', 'fastener', [-0.006, 0.09, 0.129], [0.006, 0.61, 0.14]),
-    box('left-pocket', 'trim', [-0.155, 0.16, 0.12], [-0.04, 0.25, 0.14]),
-    box('right-pocket', 'trim', [0.04, 0.16, 0.12], [0.155, 0.25, 0.14]),
-  ], jacket),
-  garment('jacket_worn_upper', [prism('sleeve', 'cloth', -0.32, sleeveHead, 0.125, 0.13, 0.02)], jacket),
-  garment('jacket_worn_fore', [
-    prism('sleeve', 'cloth', -0.24, 0.025, 0.115, 0.125, 0.02),
-    prism('cuff', 'trim', -0.255, -0.215, 0.105, 0.115, 0.02),
-  ], jacket),
-  garment('hoodie_worn_body', [
-    hoodieLevel('hem', bust.pelvisWidth, bust.pelvisDepth),
-    hoodieLevel('waist', bust.ribWidth, bust.ribDepth),
-    hoodieLevel('chest', bust.chestWidth, bust.chestDepth),
-    prism('hood', 'cloth', 0.34, 0.63, 0.30, 0.10, 0.04, cz=-0.07),
-    box('kangaroo-pocket', 'trim', [-0.15, 0.18, 0.10], [0.15, 0.27, 0.12]),
-  ], hoodie),
-  garment('hoodie_worn_upper', [prism('sleeve', 'cloth', -0.32, sleeveHead, 0.125, 0.13, 0.03)], hoodie),
-  garment('hoodie_worn_fore', [
-    prism('sleeve', 'cloth', -0.24, 0.025, 0.115, 0.125, 0.03),
-    prism('cuff', 'trim', -0.255, -0.215, 0.105, 0.115, 0.025),
-  ], hoodie),
-  garment('jeans_worn_pelvis', [
-    prism('seat', 'cloth', -0.01, 0.185, 0.355, 0.225, 0.025),
-    prism('waistband', 'trim', 0.15, 0.19, 0.36, 0.23, 0.025),
-  ], trousers),
-  garment('jeans_worn_thigh', [prism('leg', 'cloth', -0.44, 0.025, 0.175, 0.19, 0.02)], trousers),
-  garment('jeans_worn_shin', [
-    prism('leg', 'cloth', -0.325, 0.025, 0.14, 0.155, 0.02),
-    prism('hem', 'trim', -0.325, -0.29, 0.145, 0.16, 0.02),
-  ], trousers),
-]) + worn.shells(clothing(['rubber']), [
-  garment('rubber_boots_worn_shaft', [
-    prism('shaft', 'cloth', -0.33, 0.025, 0.16, 0.18, 0.02),
-    prism('rim', 'trim', -0.02, 0.03, 0.17, 0.19, 0.02),
-  ], rubber),
-  garment('rubber_boots_worn_foot', [
-    prism('upper', 'cloth', -0.075, 0.02, 0.13, 0.30, 0.02, cz=0.075),
-    box('sole', 'trim', [-0.07, -0.09, -0.08], [0.07, -0.065, 0.23]),
-  ], rubber),
-]) + worn.shells(clothing(['fabric', 'rubber']), [
-  garment('sneakers_worn_foot', [
-    prism('upper', 'cloth', -0.075, 0, 0.13, 0.30, 0.02, cz=0.075),
-    box('sole', 'trim', [-0.07, -0.09, -0.08], [0.07, -0.065, 0.23]),
-  ], sneaker),
-])
+local jacketShells = fit.torso('jacket', { cloth: 'cloth-shirt-player', trim: 'paint-charcoal', fastener: 'steel-grey' }, jacket);
+// Soft cloth under the jacket, its hood lying flat enough on the back that the over-jacket gear clears it.
+local hoodieShells = fit.torso('hoodie', { cloth: 'plastic-red', trim: 'paint-charcoal' }, {
+  round: 0.01, collar: 'none', zipX: null, pockets: 'kangaroo', hood: 0.03,
+  slots: { body: 'cloth', trim: 'trim', hood: 'cloth', lining: 'cloth' },
+});
+local jeansShells = fit.trousers('jeans', { cloth: 'cloth-pants-player', trim: 'paint-charcoal' });
+// Rubber boots stand loose over trousers.
+local rubberBoots = fit.feet('rubber_boots', { upper: 'rubber-black', toe: 'rubber-black', sole: 'paint-charcoal', collar: 'paint-charcoal' },
+                             { l: 0.3, w: 0.13, s: 0.025, toe: 0.06, instep: 0.085, top: 0.38, laces: 0 }, { ease: 0.016 });
+// High-tops: a shoe that stopped below the ankle bone would pass beneath it, so the probe would take it as covered.
+local sneakers = fit.feet('sneakers', { upper: 'cloth-pants-player', toe: 'rubber-black', sole: 'rubber-black', collar: 'rubber-black' },
+                          { l: 0.3, w: 0.13, s: 0.025, toe: 0.05, instep: 0.065, top: 0.155, laces: 0 });
+worn.shells(clothing(['fabric']), jacketShells.rows + hoodieShells.rows + jeansShells.rows)
++ worn.shells(clothing(['rubber']), rubberBoots.rows)
++ worn.shells(clothing(['fabric', 'rubber']), sneakers.rows)

@@ -6,7 +6,7 @@ local shells = [
   'utility_vest_worn', 'utility_vest_worn_jacket',
   'jacket_worn_body', 'jacket_worn_upper', 'jacket_worn_fore', 'hoodie_worn_body', 'hoodie_worn_upper', 'hoodie_worn_fore',
   'jeans_worn_pelvis', 'jeans_worn_thigh', 'jeans_worn_shin',
-  'rubber_boots_worn_foot', 'rubber_boots_worn_shaft', 'sneakers_worn_foot',
+  'rubber_boots_worn_foot', 'rubber_boots_worn_shaft', 'sneakers_worn_foot', 'sneakers_worn_shaft',
   'leather_jacket_worn_body', 'leather_jacket_worn_upper', 'leather_jacket_worn_fore',
   'leather_gloves_worn_palm', 'leather_gloves_worn_fingers', 'leather_gloves_worn_thumb',
   'combat_boots_worn_foot', 'combat_boots_worn_shaft',
