@@ -22,7 +22,7 @@ local shutter(name, x0, x1, y0, y1) = [
 local rungs = std.range(0, 12);
 local gantry = [s.bodyRear + 0.6, -1.2, 0.5];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', s) + [
-  k.compound('fire_engine_body', 3000, [
+  k.compound('fire_engine_body', 3900, [
     box('floor', 'frame', [s.bodyRear, s.bodyFloor - 0.05, -s.bodySide], [s.bodyFront, s.bodyFloor, s.bodySide]),
     box('roof', 'paint', [s.bodyRear, s.bodyTop - 0.05, -s.bodySide], [s.bodyFront, s.bodyTop, s.bodySide]),
     box('front_wall', 'paint', [s.bodyFront - 0.05, s.bodyFloor, -s.bodySide], [s.bodyFront, s.bodyTop, s.bodySide]),
@@ -48,7 +48,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', 
   k.compound('fire_engine_water_tank', 2000, [
     box('tank', 'tank', [archRear + 0.1, s.bodyFloor, -0.82], [archFront + 0.5, s.bodyTop - 0.1, 0.82]),
   ], finish),
-  k.compound('fire_engine_lockers', 120,
+  k.compound('fire_engine_lockers', 200,
     shutter('fore', -0.5, s.bodyFront - 0.08, shutterLow, shutterTop)
     + shutter('mid', archFront + 0.02, -0.6, shutterLow, shutterTop)
     + shutter('wheel', archRear + 0.02, archFront - 0.02, shutterLow, shutterTop)

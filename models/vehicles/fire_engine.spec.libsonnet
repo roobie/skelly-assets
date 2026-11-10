@@ -9,7 +9,7 @@
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-red',
   bumperPaint: 'paint-white',
-  chassisMass: 2600, shellMass: 1880,
+  chassisMass: 1200, shellMass: 2200,
   guard: false,
   // Locker body
   bodyRear: -3.85, bodyFront: 0.85, bodyLow: 0.72, bodyFloor: 1.15, bodyTop: 3.0, bodySide: 1.24, ladderY: 3.26,

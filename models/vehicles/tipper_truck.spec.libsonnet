@@ -7,7 +7,7 @@
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-crane-yellow',
-  chassisMass: 2800, shellMass: 1680,
+  chassisMass: 1300, shellMass: 1680,
   // Tub
   tubRear: -3.95, tubFront: 1.87, tubFloor: 1.28, tubFloorTop: 1.34375, tubSide: 1.23, wallIn: 1.13, wallTop: 2.62, wallTopRear: 2.44,
   canopyTop: 3.16, canopyFront: 2.95, ramX: 2.01,
