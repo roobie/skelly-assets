@@ -70,10 +70,10 @@ import those files is generated; see `tools/row-index.mjs`, `rowIndex`, and
 road vehicle needs no recipe edit; see `models/vehicles/packs.libsonnet`, `vehicles`. Which part sits where on a
 vehicle is model data too, in the vehicle's placements file beside its rows, so the showcase and the games assemble it
 from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`. A vehicle fits its
-engine or turret either fused or as a core with salvageable fittings; why is in `docs/decisions/0004-assemblies.md`.
-Its wheels turn whole at their sites, with a brake disc and caliper at sites of their own; why is in
-`docs/decisions/0005-wheel-assemblies.md`. Its exhaust, fuel tank and radiator are likewise fused or split into
-salvageable parts; why is in `docs/decisions/0006-exhaust-tank-cooling-assemblies.md`.
+engine, turret, radiator or fuel tank either fused or as a core with salvageable fittings; why is in
+`docs/decisions/0004-assemblies.md`. Its wheels turn whole at their sites, with a brake disc and caliper at sites of
+their own; why is in `docs/decisions/0005-wheel-assemblies.md`. Its exhaust is likewise fused or split along its run
+into salvageable parts; why is in `docs/decisions/0006-exhaust-assemblies.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
