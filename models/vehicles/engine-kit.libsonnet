@@ -190,6 +190,8 @@ local accessoryRows(c) = [
   // Every engine's core and fused rows and every class's accessory rows.
   rows: std.flattenArrays([accessoryRows(classes[name]) for name in std.objectFields(classes)])
         + std.flattenArrays([engineRows(name) for name in std.objectFields(engines)]),
+  // Every site an engine can take, so a vehicle that loses its engine can drop them all.
+  siteIds: ['engine'] + [a.site for a in accessories],
   // A vehicle's engine sites, the engine's frame placed at `at`. `detail` picks how much of it is salvageable:
   // 'fused' fits the whole engine as one model at the `engine` site, and 'assembly' fits the core there and each
   // accessory at its own site.
