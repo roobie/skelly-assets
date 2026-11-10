@@ -7,7 +7,7 @@ import { runSweeps } from './sweeps.ts';
  * family not listed here (including every family added later) gets the full product.
  *
  * Why these: they are the families whose full products dominate the default run (`receiver` alone is
- * most of the combinations). For `receiver`, `barrel` and `handguard`, on a sample of `parts.ts`
+ * most of the combinations). For `receiver`, `barrel` and `handguard`, on a sample of `src/gun/parts.ts`
  * mutants the array killed every mutant the full product killed, where 2-wise missed one. The
  * other sampled families were not measured; they are sampled for run time and the sweep keeps their
  * full products.

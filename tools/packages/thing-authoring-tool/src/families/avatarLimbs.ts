@@ -7,7 +7,7 @@ import { positive } from './shapes.ts';
 // toward +z. Each limb is mirror-symmetric in x, so one model serves either side, and code poses it about its joint.
 
 /**
- * The arm's segments, each its own part so the view can bend the arm at its joints (`packages/deadvox/DESIGN.md`,
+ * The arm's segments, each its own part so the view can bend the arm at its joints (skelly's `packages/deadvox/DESIGN.md`,
  * "Models"). A segment's origin is the joint it turns about, so its part mates to the segment above at that joint.
  */
 const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'fingers', 'thumb'] as const;
@@ -126,7 +126,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): (ExtrudedPo
 };
 
 /**
- * The leg's segments, each its own part so a stance can bend the leg at the knee and ankle (`packages/deadvox/DESIGN.md`,
+ * The leg's segments, each its own part so a stance can bend the leg at the knee and ankle (skelly's `packages/deadvox/DESIGN.md`,
  * "Crouching and lying prone"). Like the arm's, each segment is drawn about the joint it turns about.
  */
 const LEG_SEGMENTS = ['thigh', 'shin', 'foot'] as const;
