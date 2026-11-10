@@ -56,7 +56,9 @@ authority for which families use the roster; see `tools/layout.mjs`, `readRoster
 `buildRoster`. Do not select those models again in a recipe. For guns, author the source named by the recipe
 row's `source`; file-backed sources resolve relative to the repository root, while other gun kinds select their
 source through the owning exporter. See `tools/recipeTools.mjs`, `loadRecipeTools`, and
-`tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`.
+`tools/packages/gun-authoring-tool/src/cli/exportRecipe.ts`, `loadExportRecipe`. The firearms pack's guns, cartridges,
+attachments and magazines are listed in `models/guns/roster.libsonnet`, so adding one is a content edit; the code that
+turns each entry into its recipe row is `tools/packages/gun-authoring-tool/exports/deadvox.jsonnet`.
 A vehicle is authored as its own file of part rows in `models/vehicles/`, beside the kits that press its panels
 from its measures, so parallel authors each add files and none edits a shared list. A recipe selects whole
 vehicles, never single parts, so a vehicle's own parts all live in one pack, and a part it borrows from another pack
