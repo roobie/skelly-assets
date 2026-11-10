@@ -1,6 +1,6 @@
 {
   "name": "archetype-ar",
-  "description": "AR-pattern rifle with a flat-top rail, rear charging handle, and front-sight block.",
+  "description": "AR-pattern rifle with a flat-top rail, rear charging handle, front-sight block and rail rear sight.",
   "expect": [],
   "root": "receiver",
   "parts": {
@@ -61,10 +61,7 @@
         "style": "ar"
       }
     },
-    "sight": {
-      "family": "sight",
-      "params": { "type": "lpvo-1-6x" }
-    }
+    "rear-sight": { "family": "rail-rear-sight" }
   },
   "connections": [
     { "from": "receiver.charging-handle", "to": "charging-handle.mount" },
@@ -98,13 +95,13 @@
       "to": "stock.front"
     },
     {
-      "from": "receiver.rail",
-      "to": "sight.base",
-      "slot": 3
-    },
-    {
       "from": "barrel.front-sight",
       "to": "front-sight.base"
+    },
+    {
+      "from": "receiver.rail",
+      "to": "rear-sight.base",
+      "slot": 0
     }
   ]
 }

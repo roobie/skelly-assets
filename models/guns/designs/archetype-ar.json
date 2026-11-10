@@ -4,7 +4,7 @@
   "calibre": "5.56x45",
   "assembly": {
     "name": "archetype-ar",
-    "description": "Classic AR-pattern rifle with an A2 front-sight block at the gas station.",
+    "description": "Classic AR-pattern rifle with iron sights: an A2 front-sight block at the gas station and a fixed aperture rear sight on the upper's rail.",
     "root": "receiver",
     "parts": {
       "receiver": { "item": "receiver_ar" },
@@ -27,10 +27,7 @@
       },
       "stock": { "item": "stock_m4_medium" },
       "front-sight": { "item": "front_sight_ar" },
-      "sight": {
-        "family": "sight",
-        "params": { "type": "lpvo-1-6x" }
-      }
+      "rear-sight": { "family": "rail-rear-sight" }
     },
     "connections": [
       { "from": "receiver.charging-handle", "to": "charging-handle.mount" },
@@ -67,13 +64,13 @@
         "to": "stock.front"
       },
       {
-        "from": "receiver.rail",
-        "to": "sight.base",
-        "slot": 3
-      },
-      {
         "from": "barrel.front-sight",
         "to": "front-sight.base"
+      },
+      {
+        "from": "receiver.rail",
+        "to": "rear-sight.base",
+        "slot": 0
       }
     ]
   },

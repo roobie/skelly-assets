@@ -77,6 +77,7 @@ import {
   subtractAxialPockets,
   subtractConvexSection,
 } from './receiverSection.ts';
+import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
 import {
   curvedTriggerBlade,
@@ -489,6 +490,8 @@ const AR_STOCK_PORT_Y = 0;
 export const HANDGUARD_CLEARANCE: Record<SizeClass, number> = { S: 0.25, M: 0.25, L: 0.5 };
 const HANDGUARD_WALL_THICKNESS = 0.5;
 const RECEIVER_FRONT_HALF_HEIGHT = 2.5;
+/** How high over the bore a conventional front post's top stands; a rail rear sight's aperture lines up with it. */
+const IRON_SIGHT_LINE_U = 5;
 export const BOLT_CARRIER_RUNNING_CLEARANCE_U = 0.1;
 const SMG_HANDLE_FRONT_CLEARANCE_U = 0.5;
 const BOLT_HANDLE_ARM_RADIUS_U = 0.375;
@@ -3857,7 +3860,7 @@ const frontSight: PartFamily = {
     const ak = params.style === 'ak';
     const postHalf = GRID;
     const postHalfZ = ak ? SIGHT_GRAIN : GRID / 2;
-    let conventionalPostTop = params.style === 'sporting' ? RECEIVER_FRONT_HALF_HEIGHT + 1 : 5;
+    let conventionalPostTop = params.style === 'sporting' ? RECEIVER_FRONT_HALF_HEIGHT + 1 : IRON_SIGHT_LINE_U;
     if (params.section === 'sporter') {
       conventionalPostTop = SPORTER_PROPORTIONS.frontSight.sightLineU;
     }
@@ -4003,6 +4006,23 @@ const railFrontSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 }],
+      tags: [VOXEL_DETAIL],
+    };
+  },
+};
+
+/** A fixed aperture rear sight on an AR upper's top rail, its aperture on the conventional front post's sight line. */
+const railRearSight: PartFamily = {
+  name: 'rail-rear-sight',
+  params: {},
+  build(): PartDef {
+    const apertureU = IRON_SIGHT_LINE_U - RECEIVER_SECTION.ar.faces.top.y;
+    return {
+      family: 'rail-rear-sight',
+      solids: railRearSightSolids(apertureU),
+      ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
+      keepOuts: [],
+      axes: [{ kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }],
       tags: [VOXEL_DETAIL],
     };
   },
@@ -5673,6 +5693,7 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   'front-sight': frontSight,
   'front-sight-bead': muzzleBead,
   'rail-front-sight': railFrontSight,
+  'rail-rear-sight': railRearSight,
   'sporting-rear-sight': sportingRearSight,
   'gas-cylinder': gasCylinder,
   'gas-block': gasBlock,

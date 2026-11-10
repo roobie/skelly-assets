@@ -683,7 +683,7 @@ describe('glb export: deadvox model entry', () => {
   });
 
   it('exports optic ocular diameter and eye relief with the sight line', () => {
-    const optic = exported(design('archetype-ar'));
+    const optic = exported(design('archetype-battle-rifle'));
     const iron = exported(design('archetype-ak'));
     expect(optic.modelEntry.gun.sight?.eyeReliefMetres).toBeGreaterThan(0);
     expect(optic.modelEntry.gun.sight?.ocularDiameterMetres).toBeGreaterThan(0);

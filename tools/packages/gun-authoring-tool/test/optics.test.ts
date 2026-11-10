@@ -48,7 +48,7 @@ import {
   smg,
 } from '../src/gun/templates.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { loadDesignAssembly, type MutableAssembly } from './helpers.ts';
+import { loadDesignAssembly, type MutableAssembly, scopedArDesign } from './helpers.ts';
 
 /** A point or direction in the optic's own axes, in the exported file's axes and metres, as the file draws it. */
 const inFile = ([x, y, z]: readonly number[], scale = METRES_PER_UNIT): Vector3 =>
@@ -720,7 +720,8 @@ describe('curated optic mounts', () => {
       ['archetype-anti-materiel', ['high-mag-5-25x']],
     ] as const;
     for (const [name, types] of designs) {
-      const assembly = loadDesignAssembly(name);
+      // The AR ships with irons; its optic goes where a player fits one.
+      const assembly = name === 'archetype-ar' ? scopedArDesign() : loadDesignAssembly(name);
       for (const type of types) {
         assembly.parts.sight!.params = { type };
         expectContactOnPhysicalRail(assembly, type);

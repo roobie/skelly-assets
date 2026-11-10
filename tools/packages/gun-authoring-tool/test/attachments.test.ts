@@ -34,7 +34,7 @@ import type { PartItems } from '../src/gun/physical.ts';
 import { opticEyeRelief } from '../src/gun/rules.ts';
 import { TEMPLATES } from '../src/gun/templates.ts';
 import { readGlb } from './glbReader.ts';
-import { loadCorpus } from './helpers.ts';
+import { loadCorpus, scopedArDesign } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
 
 /** The middle of three notches, where an attachment spanning its neighbours stays on the rail. */
@@ -577,7 +577,7 @@ describe('attachment parts and export metadata', () => {
 
     // Builds and exports the AR design with default attachment compatibility metadata.
     beforeAll(() => {
-      defaultModsModel = exported(design('archetype-ar'), 'ar_default_mods');
+      defaultModsModel = exported(scopedArDesign(), 'ar_default_mods');
     });
 
     it('exports fitted default mods as node-backed metadata linked to mount slots', () => {
@@ -721,8 +721,30 @@ describe('attachment parts and export metadata', () => {
     ).toBe(true);
   });
 
+  it("ships the AR with a removable rear iron and offers a scope on the upper's rail in its place", () => {
+    const { attachments, compatibility, compatibilityPairs = [] } = exported(design('archetype-ar'), 'ar_irons')
+      .modelEntry.gun;
+    const rear = attachments?.find(({ id }) => id === 'rail-rear-sight');
+    expect(rear?.kind).toBe('iron-sight');
+    expect(attachments?.some(({ kind }) => kind === 'optic')).toBe(false);
+    expect(compatibility?.[rear!.mountedAt]).toContain('rail-rear-sight');
+    const scopeSlots = Object.entries(compatibility ?? {})
+      .filter(([slot, ids]) => slot.startsWith('receiver.') && ids.includes('optic-lpvo-1-6x'))
+      .map(([slot]) => slot);
+    expect(scopeSlots.length).toBeGreaterThan(0);
+    expect(validate(scopedArDesign(), gunDomain).issues).toEqual([]);
+    // Fitting the scope takes the rear iron off: no pair offers both on the upper's rail.
+    expect(compatibilityPairs.length).toBeGreaterThan(0);
+    const together = compatibilityPairs.filter((pair) =>
+      ['optic-lpvo-1-6x', 'rail-rear-sight'].every((id) =>
+        pair.some(([slot, fitted]) => fitted === id && slot.startsWith('receiver.')),
+      ),
+    );
+    expect(together).toEqual([]);
+  });
+
   it('rejects two fitted attachments whose rail notch spans overlap', () => {
-    const model = exported(design('archetype-ar'), 'ar_overlap');
+    const model = exported(scopedArDesign(), 'ar_overlap');
     const fitted = model.modelEntry.gun.attachments?.find(({ mount }) => mount !== 'muzzle');
     const anchor = model.modelEntry.gun.attachmentSlots?.find(({ id }) => id === fitted?.mountedAt);
     const span = fitted?.properties.railSpanNotches;

@@ -5,7 +5,7 @@ import { CORE_RULE_IDS } from '@skelly/construct/foundation/issue.ts';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
 import { pistolBarrelCrown } from '../src/gun/rules.ts';
-import { loadFixture, variant } from './helpers.ts';
+import { loadFixture, scopedArDesign, variant } from './helpers.ts';
 
 const rulesFailed = (a: Assembly, domain: Domain = gunDomain) =>
   [...new Set(validate(a, domain).issues.map((i) => i.rule))].sort();
@@ -65,7 +65,7 @@ describe('rules', () => {
   });
 
   it('keep-out: explicitly allowed front sights may occupy a sightline volume', () => {
-    const ar = loadFixture('archetype-ar');
+    const ar = scopedArDesign();
     const sight = gunDomain.families.sight!;
     const withAllowance = (allow: boolean): Domain => ({
       ...gunDomain,

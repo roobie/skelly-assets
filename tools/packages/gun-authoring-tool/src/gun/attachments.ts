@@ -90,6 +90,7 @@ const akMuzzleDevices = {
 export const ATTACHMENT_IDS = [
   ...OPTIC_TYPE_IDS.map((id) => `optic-${id}`),
   'rail-front-sight',
+  'rail-rear-sight',
   'real-suppressor',
   'improvised-suppressor',
   'ak-slant-compensator',
@@ -284,14 +285,18 @@ const opticMetadata = (
   };
 };
 
-const railFrontSightMetadata = (metresPerUnit: number, part?: PartDef): AttachmentCoreMetadata => {
+const railIronSightMetadata = (
+  id: 'rail-front-sight' | 'rail-rear-sight',
+  metresPerUnit: number,
+  part?: PartDef,
+): AttachmentCoreMetadata => {
   const axis = part?.axes.find(({ kind }) => kind === 'sight');
   const span = railSpanNotches(part, 'rail-top');
   if (!part) {
-    throw new Error('Front sight has no geometry for mass metadata');
+    throw new Error(`${id} has no geometry for mass metadata`);
   }
   return {
-    id: 'rail-front-sight',
+    id,
     kind: 'iron-sight',
     mount: 'rail-top',
     properties: span ? { railSpanNotches: span } : {},
@@ -381,7 +386,8 @@ export const attachmentMetadata = (
       case 'sight':
         return opticMetadata(params, metresPerUnit, part);
       case 'rail-front-sight':
-        return railFrontSightMetadata(metresPerUnit, part);
+      case 'rail-rear-sight':
+        return railIronSightMetadata(family, metresPerUnit, part);
       case 'suppressor':
         return suppressorMetadata(params, part);
       case 'ak-muzzle-device':

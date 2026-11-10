@@ -150,6 +150,16 @@ describe('front-sight families', () => {
     expect(frontAxis[1]).toBeCloseTo(receiverRailWorld[1] + 1, 8);
   });
 
+  it("lines the clamped AR's rail rear aperture up with its front post top", () => {
+    const front = fixedSight('archetype-ar', 'front-sight');
+    const rear = fixedSight('archetype-ar', 'rear-sight');
+    const axisWorld = ({ sight, placed }: ReturnType<typeof fixedSight>) =>
+      applyPoint(placed, sight.axes.find(({ kind }) => kind === 'sight')!.origin);
+    const post = front.sight.solids.find(({ id }) => id === 'post');
+    const postTop = applyPoint(front.placed, [0, localSolidBounds(post!)[1][1], 0]);
+    expect(axisWorld(rear)[1]).toBeCloseTo(postTop[1], 8);
+  });
+
   it('fits the clamped AR handguard against the fixed block and keeps the free-float handguard clear', () => {
     const classic = fixedSight('archetype-ar', 'front-sight');
     const handguard = classic.report.resolved.defs.get('handguard')!;

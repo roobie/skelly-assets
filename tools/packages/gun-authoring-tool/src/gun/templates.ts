@@ -133,6 +133,8 @@ export const ar: Template = {
       chance: 0.8,
       when: { part: 'handguard', param: 'mount', equals: 'free-float' },
     },
+    // The rear iron the A2 front post is aimed with.
+    { id: 'rear-sight', family: 'rail-rear-sight', when: { part: 'handguard', param: 'mount', equals: 'clamped' } },
     {
       id: 'sight',
       family: 'sight',
@@ -162,6 +164,12 @@ export const ar: Template = {
     {
       from: 'barrel.front-sight',
       to: 'front-sight.base',
+      when: { part: 'handguard', param: 'mount', equals: 'clamped' },
+    },
+    {
+      from: 'receiver.rail',
+      slot: 0,
+      to: 'rear-sight.base',
       when: { part: 'handguard', param: 'mount', equals: 'clamped' },
     },
     {

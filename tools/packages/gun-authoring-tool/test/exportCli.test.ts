@@ -35,7 +35,7 @@ describe('export CLI core', () => {
   });
 
   it("exports the weapon's eye point and sight axes for ADS", () => {
-    const optic = exportFileText(designText('archetype-ar'), ASSET);
+    const optic = exportFileText(designText('archetype-battle-rifle'), ASSET);
     const irons = exportFileText(fixtureText('archetype-ak'), ASSET);
     expect(optic.ok && irons.ok).toBe(true);
     if (!(optic.ok && irons.ok)) {
