@@ -60,6 +60,10 @@ local pressings(id, s) = {
   local doorFinish = paint + { paint: doorPaint },
   local rearPanelTop = s.rearSill,
   local floorBack = if boot then s.rear + 0.1 else s.tailWaist,
+  // `s.bootFloor` raises the floor behind the seats over an engine under it.
+  local bootFloor = std.get(s, 'bootFloor', 0.48 + lift),
+  // `s.towerFront` stops the strut towers short of a nose too short for them.
+  local towerFront = std.get(s, 'towerFront', s.frontAxle + 0.45),
   // Closes the arch fore and aft, because a look down past the wheel otherwise leaves through the open underside of the wing.
   local archEnds(name, axle) = [
     box(name + '_liner_fore', 'trim', [axle + s.arch, 0.2 + lift, s.skin - 0.26], [axle + s.arch + 0.04, s.archTop - shape.chamfer + 0.0625, s.skin]),
@@ -76,7 +80,7 @@ local pressings(id, s) = {
       box('carpet', 'carpet', [s.rearFloorFront, s.floor, -s.skin + 0.04], [s.cowl, s.floor + 0.01, s.skin - 0.04]),
       box('tunnel', 'carpet', [s.rearFloorFront + 0.35, s.floor, -0.12], [s.cowl, 0.45 + lift, 0.12]),
     ] + (if cab then [] else [
-      box('rear_floor', 'pan', [floorBack, 0.38 + lift, -s.skin], [s.rearFloorFront, 0.48 + lift, s.skin]),
+      box('rear_floor', 'pan', [floorBack, bootFloor - 0.1, -s.skin], [s.rearFloorFront, bootFloor, s.skin]),
     ]) + [
       box('bulkhead', 'paint', [s.cowl, s.floor, -s.skin + 0.02], [s.aPost, s.waist - 0.04, s.skin - 0.02]),
       box('slam_panel', 'paint', [nose - 0.05, 0.35 + lift, -slam], [nose, slamTop, slam]),
@@ -99,7 +103,7 @@ local pressings(id, s) = {
     else []) + bothSides([
       box('sill', 'paint', [s.rearDoorArch, s.sill, s.skin - 0.02], [s.aPost, s.floor, s.side]),
       box('chassis_leg', 'pan', [s.aPost, s.floor, rail], [nose, 0.42 + lift, std.get(s, 'legOuter', 0.62)]),
-      box('strut_tower', 'paint', [s.aPost + 0.05, 0.42 + lift, rail], [s.frontAxle + 0.45, std.get(s, 'towerTop', s.waist - 0.12), std.get(s, 'towerOuter', 0.6)]),
+      box('strut_tower', 'paint', [s.aPost + 0.05, 0.42 + lift, rail], [towerFront, std.get(s, 'towerTop', s.waist - 0.12), std.get(s, 'towerOuter', 0.6)]),
       box('a_post', 'paint', [s.cowl, s.floor, s.skin - 0.02], [s.aPost, s.waist, s.side]),
       box('b_pillar', 'paint', [s.bRear, s.floor, s.skin - 0.02], [s.bFront, s.waist, s.glassOut + 0.02]),
     ] + shape.side('a_pillar', 'paint', [[pillarBack, s.waist], [s.aPost, s.waist], [s.aPost - s.aLean, s.roof], [pillarBack - s.aLean, s.roof]], [s.glassIn - 0.02, s.glassOut])
@@ -108,8 +112,10 @@ local pressings(id, s) = {
       box('cant_rail', 'paint', [roofRear, s.roof - 0.04, roofHalf - 0.01], [roofFront, s.roof + 0.02, s.glassOut - lean]),
     ]) + (if cab then [
       box('cab_corner', 'paint', [s.tailWaist, s.floor - 0.1, s.skin - 0.02], [s.rearDoorArch, s.waist, s.side]),
-    ] + shape.side('c_pillar', 'paint', [[s.tailWaist, s.waist], [s.cWaist, s.waist], [s.cWaist + s.cLean, s.roof], [s.tailWaist, s.roof]], [s.glassIn, s.glassOut]) else [
+    ] + shape.side('c_pillar', 'paint', [[s.tailWaist, s.waist], [s.cWaist, s.waist], [s.cWaist + s.cLean, s.roof], [s.tailWaist, s.roof]], [s.glassIn, s.glassOut]) else (if s.rearAxle - s.arch > s.rear + 0.1 then [
+      // A rear arch that reaches the tail's corner leaves no quarter panel behind it.
       box('quarter_rear', 'paint', [s.rear + 0.1, std.min(s.floor, bumperLow - 0.06), s.skin], [s.rearAxle - s.arch, tailTop, s.side]),
+    ] else []) + [
       // The lamp's corner, closed round the lens, so the tail reads square from the side and from above.
       box('tail_over', 'paint', [s.rear + 0.04, s.lampTop, s.hatchSide], [if boot then s.rear + 0.1 else std.max(s.rear + 0.1, std.min(s.tailWaist, s.rear + 0.2)), if boot then s.deck - 0.03 else tailTop, s.side]),
     ] + (if boot then [
@@ -119,7 +125,7 @@ local pressings(id, s) = {
       box('tail_under', 'paint', [s.rear + 0.04, bumperTop, s.hatchSide], [s.rear + 0.1, 0.62 + lift, s.side]),
       box('quarter_arch', 'paint', [s.rearAxle - s.arch, s.archTop, s.skin], [s.rearDoor, s.waist, s.side]),
       shape.aftCorner('quarter_corner_aft', 'paint', s.rearAxle, [s.skin, s.side]),
-      box('boot_side', 'trim', [floorBack, 0.48 + lift, s.glassIn - 0.04], [s.rearFloorFront, s.waist, s.skin]),
+      box('boot_side', 'trim', [floorBack, bootFloor, s.glassIn - 0.04], [s.rearFloorFront, s.waist, s.skin]),
     ]) + (if !cab && !hasDoorCorner then [
       shape.foreCorner('quarter_corner_fore', 'paint', s.rearAxle, [s.skin, s.side]),
     ] else []) + (if std.get(s, 'archLiner', false) then archLiner('front', s.frontAxle) + (if cab then [] else archLiner('rear', s.rearAxle)) else []) + (if twoDoor then [
