@@ -2,8 +2,10 @@
 // bonneted six-wheeled chassis, the `military_truck_` rows that `military_cargo_truck` emits, so its cargo and box
 // bodies differ only by what stands on the deck and each new body adds no chassis rows. All three axles are driven,
 // through a transfer case, so the chassis has its own axles rather than a road truck's dead steered beam.
+// Its wheels and winch are its own rows too, because their real weights are far above the shared parts that look alike.
 // The item and fitting builders take a game's vehicle kit as an argument, so this folder imports no game content.
 local k = import 'kit.libsonnet';
+local mk = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -59,6 +61,9 @@ local truckDefaults = {
   engineLength: 1.0,
 };
 local truckSpec(s) = truckDefaults + s;
+// Where the transfer case hangs, and the front shaft that runs from its front face to the front axle's differential.
+local transferX(s) = s.cabBack - 0.25;
+local frontShaft(s) = { from: transferX(s) + 0.24, to: s.frontAxle - 0.16, y: 0.6 };
 
 local id = 'military_truck';
 local truckRows(s0) = {
@@ -67,6 +72,10 @@ local truckRows(s0) = {
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2,
   local cross = [s.rear + 0.1 + i * (s.nose - s.rear - 0.3) / 7 for i in std.range(0, 7)],
   local bearers = [s.bedRear + 0.1 + i * (s.bedFront - s.bedRear - 0.2) / 6 for i in std.range(0, 6)],
+  // The winch hangs under the rails' front ends, its drum behind the bumper and its worm gearbox behind the drum.
+  local winchX = s.nose - 0.04,
+  local winchY = s.railBottom - 0.18,
+  local shaft = frontShaft(s),
   rows: [
     k.compound(id + '_chassis', s.chassisMass, [
       box('crossmember_' + i, 'frame', [cross[i] - 0.05, s.railBottom + 0.03, -s.railZ], [cross[i] + 0.05, s.railTop - 0.03, s.railZ])
@@ -161,10 +170,20 @@ local truckRows(s0) = {
     ], finish),
     k.compound(id + '_front_bumper', 110, [
       box('bar', 'paint', [s.nose + 0.04, s.bumperLow, -s.wingZ], [s.front, s.bumperTop, s.wingZ]),
-      box('winch', 'dark', [s.nose + 0.08, s.bumperTop, -0.26], [s.front - 0.02, s.bumperTop + 0.14, 0.26]),
     ] + bothSides([
       box('tow_eye', 'dark', [s.front, s.bumperLow + 0.06, 0.5], [s.front + 0.04, s.bumperTop - 0.06, 0.56]),
     ]), finish),
+    k.compound(id + '_winch', s.winchMass, [
+      k.turned('drum', 'steel', 'z', k.disc(0.17, -0.27, 0.27), [winchX, winchY, 0]) + { sides: 12 },
+      box('gearbox', 'casting', [winchX - 0.34, winchY - 0.12, 0.04], [winchX - 0.16, winchY + 0.16, 0.32]),
+    ] + bothSides([
+      k.turned('flange', 'steel', 'z', k.disc(0.21, 0.27, 0.3), [winchX, winchY, 0]) + { sides: 12 },
+      box('cheek', 'frame', [winchX - 0.18, winchY - 0.14, 0.3], [winchX + 0.18, s.railBottom, s.railZ - 0.08]),
+    ]), finish + { steel: 'steel-grey', casting: 'steel-grey' }),
+    mk.wheel(id + '_wheel', s.wheelMass, 0.32, 0.254, s.r, 26, 0.04, s.frame),
+    k.compound(id + '_front_shaft', s.frontShaftMass, [
+      k.turned('tube', 'steel', 'x', k.disc(0.04, -(shaft.to - shaft.from) / 2, (shaft.to - shaft.from) / 2)),
+    ], { steel: 'steel-grey' }),
     driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true),
     driveAxle(id + '_axle', s.axleMass, 0.93, false),
     k.compound(id + '_transfer_case', s.transferCaseMass, [
@@ -191,6 +210,12 @@ local truckItems(kit) = local pile = kit.pileSize; local name = 'military truck'
   kit.part(id + '_front_bumper', name + ' front bumper', pile, ['protection']),
   kit.part(id + '_rear_bumper', name + ' rear bumper', pile, ['protection']),
   kit.part(id + '_fuel_tank', name + ' fuel tank', [9, 5], ['fuel']),
+  kit.part(id + '_winch', name + ' winch', [6, 4], []),
+  kit.part(id + '_wheel', name + ' wheel', [6, 6], ['wheel']),
+  kit.part(id + '_front_axle', name + ' front axle', [12, 4], ['steered', 'driven', 'structure']),
+  kit.part(id + '_axle', name + ' axle', [12, 4], ['driven', 'structure']),
+  kit.part(id + '_transfer_case', name + ' transfer case', [4, 3], ['driven']),
+  kit.part(id + '_front_shaft', name + ' front shaft', [8, 1], []),
 ];
 
 local truckFittings(kit, s0) =
@@ -202,6 +227,7 @@ local truckFittings(kit, s0) =
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2;
   local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
   local shaftFrom = gearboxX - s.gearboxLength / 2;
+  local front = frontShaft(s);
   [
     fitting('chassis', id + '_chassis', origin),
     fitting('cab', id + '_cab', origin, ['chassis']),
@@ -216,7 +242,9 @@ local truckFittings(kit, s0) =
     fitting('rear_axle_1', id + '_axle', [s.rearAxles[1], s.r - 0.52, 0], ['chassis']),
     fitting('engine', 'engine_v8_diesel', [s.engineX, s.engineY, 0], ['chassis']),
     fitting('gearbox', 'gearbox_heavy', [gearboxX, s.engineY - 0.08, 0], ['engine']),
-    fitting('transfer_case', id + '_transfer_case', [s.cabBack - 0.25, s.railBottom - 0.5, 0], ['chassis']),
+    fitting('transfer_case', id + '_transfer_case', [transferX(s), s.railBottom - 0.5, 0], ['chassis']),
+    fitting('front_shaft', id + '_front_shaft', [(front.from + front.to) / 2, front.y, 0], ['transfer_case', 'front_axle']),
+    fitting('winch', id + '_winch', origin, ['chassis']),
     fitting('prop_shaft', 'prop_shaft_long', [(shaftFrom + s.rearAxles[0]) / 2, s.railBottom - 0.04, 0], ['gearbox', 'transfer_case', 'rear_axle_0']),
     fitting('inter_axle_shaft', 'prop_shaft_short', [bogie, s.r + 0.14, 0], ['rear_axle_0', 'rear_axle_1']),
     fitting('radiator', 'radiator_truck', [s.nose - 0.14, 0.98, 0], ['chassis']),
@@ -227,9 +255,9 @@ local truckFittings(kit, s0) =
     fitting('battery_tray', 'truck_battery_tray', [-0.15, 0.96, 0], ['chassis']),
     fitting('battery', 'car_battery', [-0.15, 0.99, 0], ['battery_tray']),
   ]
-  + pair('front_wheel', s.wheel, [s.frontAxle, s.r, s.wheelZ], on(['front_axle']))
-  + pair('middle_wheel', s.wheel, [s.rearAxles[0], s.r, s.wheelZ], on(['rear_axle_0']))
-  + pair('rear_wheel', s.wheel, [s.rearAxles[1], s.r, s.wheelZ], on(['rear_axle_1']))
+  + pair('front_wheel', id + '_wheel', [s.frontAxle, s.r, s.wheelZ], on(['front_axle']))
+  + pair('middle_wheel', id + '_wheel', [s.rearAxles[0], s.r, s.wheelZ], on(['rear_axle_0']))
+  + pair('rear_wheel', id + '_wheel', [s.rearAxles[1], s.r, s.wheelZ], on(['rear_axle_1']))
   + pair('seat', 'front_seat', [s.cabBack + 0.52, s.floor, s.seatZ], on(['cab']))
   + pair('door', id + '_door', origin, on(['cab']))
   + pair('wing', id + '_wing', origin, on(['chassis']))
