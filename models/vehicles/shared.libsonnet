@@ -462,7 +462,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   farmWheel('wheel_11_2r24', 55, 0.284, 0.305, 0.57, 18),
   wheel('wheel_265_75r16', 32, 0.265, 0.203, 0.402),
   twinWheel('wheel_twin_225_75r16c', 60, 0.225, 0.203, 0.372),
-  m.wheel('wheel_military_22_5', 95, 0.32, 0.286, 0.522, 26, 0.04, 'steel-parkerized'),
+  m.wheel('wheel_military_22_5', 165, 0.32, 0.286, 0.522, 26, 0.04, 'steel-parkerized'),
   m.wheel('wheel_military_16', 30, 0.19, 0.203, 0.37, 18, 0.04, 'steel-parkerized'),
   spareCarrier,
   farmWheel('wheel_6_50r16_ag', 24, 0.165, 0.203, 0.37, 14),
