@@ -218,10 +218,6 @@ local vanRoof = compound('box_van_roof', 40, [
 ], { paint: 'plastic-white' });
 
 // Parts real cars share: each has its own frame, about its mount or centre, so any host can place it.
-local wheel = compound('wheel_205_55r16', 18, [
-  turned('tyre', 'tyre', 'z', [[-0.1025, 0.203], [-0.1025, 0.295], [-0.085, 0.316], [0.085, 0.316], [0.1025, 0.295], [0.1025, 0.203], [-0.1025, 0.203]]) + { sides: 24 },
-  turned('rim', 'rim', 'z', disc(0.203, -0.07, 0.07)) + { sides: 24 },
-], { tyre: 'rubber-black', rim: 'steel-grey' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
 local frontSeat = compound('front_seat', 16, [
   box('base', 'frame', [-0.25, 0, -0.24], [0.25, 0.1, 0.24]),
   box('cushion', 'cloth', [-0.26, 0.1, -0.25], [0.24, 0.24, 0.25]),
@@ -488,7 +484,6 @@ local rows = [
   vanSide,
   vanFront,
   vanRoof,
-  wheel,
   frontSeat,
   doorMirror,
   steeringWheel,
