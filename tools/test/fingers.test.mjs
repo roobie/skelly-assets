@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
-import { closeHand, handAngles, holdItem } from '../../site/fingers.mjs';
+import { closeHand, handAngles, handIssues, holdItem } from '../../site/fingers.mjs';
 import { applyPoint, boneTransforms, frameAbout, jointAngles, jointRotation, length, mat3ToQuat, mulMV, rotY, sub } from '../../site/kinematics.mjs';
 
-// A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's reference side does, one finger of
-// three phalanges hangs from it, flexing about the knuckle row so positive flex curls toward the palm, and a thumb
-// lies along its front edge, flexing toward the palm about the way the finger hangs. The arm above is there for the
-// hold's two-bone reach.
+// A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's
+// reference side does, one finger of three phalanges hangs from it, flexing about the knuckle row so positive flex
+// curls toward the palm, and a thumb of three bones hangs beside its front edge (+z) in the same frame, its root free
+// to swing, roll and lift (models/poses/rig.libsonnet). The arm above is there for the hold's two-bone reach.
 const wide = { flex: [-90, 90], twist: [-90, 90], abduct: [-90, 90] };
 const sense = [1, 1, 1];
 const bone = (id, parent, head, tail, box, flexAxis, limits, extra = {}) => ({
@@ -17,9 +17,13 @@ const box = (min, max) => ({ min, max });
 const phalanxId = (k) => (k === 0 ? 'index' : `index${k + 1}`);
 const phalanx = (k, head, limits) => bone(phalanxId(k), k === 0 ? 'hand' : phalanxId(k - 1), head, [head[0], head[1] - 0.03, head[2]],
   box([-0.008, head[1] - 0.03, -0.008], [0.008, head[1], 0.008]), [0, 0, -1], limits, { digit: 'index', ...(k === 0 ? { spread: 1 } : {}) });
+const thumbId = (k) => (k === 0 ? 'thumb' : `thumb${k + 1}`);
+const thumb = (k, head, limits) => bone(thumbId(k), k === 0 ? 'hand' : thumbId(k - 1), head, [head[0], head[1] - 0.02, head[2]],
+  box([-0.006, head[1] - 0.02, 0.04], [0.006, head[1], 0.056]), [0, 0, -1], limits, { digit: 'thumb' });
 const rig = {
   id: 'fixture',
   revision: 1,
+  presets: { fist: { curl: 1, thumb: { across: 0.6, oppose: 0.7, lift: 0.6, curl: 0.8 } } },
   bones: [
     bone('upper', null, [0, 1.5, 0], [0, 1.2, 0], box([-0.04, 1.2, -0.04], [0.04, 1.5, 0.04]), [-1, 0, 0], wide),
     bone('fore', 'upper', [0, 1.2, 0], [0, 0.95, 0], box([-0.03, 0.95, -0.03], [0.03, 1.2, 0.03]), [-1, 0, 0], { flex: [0, 150], twist: [0, 0], abduct: [0, 0] }),
@@ -27,7 +31,9 @@ const rig = {
     phalanx(0, [0, 0.86, 0], { flex: [-20, 90], twist: [0, 0], abduct: [-15, 15] }),
     phalanx(1, [0, 0.83, 0], { flex: [0, 110], twist: [0, 0], abduct: [0, 0] }),
     phalanx(2, [0, 0.80, 0], { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }),
-    bone('thumb', 'hand', [0, 0.93, 0.04], [0, 0.93, 0.08], box([-0.008, 0.922, 0.04], [0.008, 0.938, 0.08]), [0, -1, 0], { flex: [-20, 60], twist: [0, 0], abduct: [-80, 20] }, { digit: 'thumb' }),
+    thumb(0, [0, 0.93, 0.04], { flex: [-10, 60], twist: [0, 70], abduct: [-60, 25] }),
+    thumb(1, [0, 0.91, 0.04], { flex: [-10, 60], twist: [0, 0], abduct: [0, 0] }),
+    thumb(2, [0, 0.89, 0.04], { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }),
   ],
 };
 const bones = new Map(rig.bones.map((b) => [b.id, b]));
@@ -43,14 +49,38 @@ const boxMesh = ({ min, max }) => {
 };
 const tipOf = (pose, id) => { const b = bones.get(id); return applyPoint(boneTransforms(rig.bones, pose).get(id), b.tail); };
 
-test('a curl shorthand turns every digit toward the palm by its share, the thumb across by its own', () => {
-  const angles = handAngles(rig, 'hand', { curl: 0.5, spread: 1, thumb: { in: 1, across: 0.5 } });
+const posedBy = (angles) => ({ root: [0, 0, 0], rotations: Object.fromEntries(Object.entries(angles).map(([id, a]) => [id, jointRotation(bones.get(id), a)])) });
+// The thumb's pad faces the way the palm does at rest.
+const thumbPad = (pose) => mulMV(boneTransforms(rig.bones, pose).get('thumb').r, [-1, 0, 0]);
+
+test('a curl shorthand turns every digit toward the palm by its share, the thumb across, rolled and lifted by its own', () => {
+  const angles = handAngles(rig, 'hand', { curl: 0.5, spread: 1, thumb: { lift: 1, across: 0.5, oppose: 0.5, curl: 0.5 } });
   assert.deepEqual(angles.index, [45, 0, 15]);
   assert.deepEqual(angles.index2, [55, 0, 0]);
   assert.deepEqual(angles.index3, [40, 0, 0]);
-  assert.deepEqual(angles.thumb, [60, 0, -40]);
-  const pose = { root: [0, 0, 0], rotations: Object.fromEntries(Object.entries(angles).map(([id, a]) => [id, jointRotation(bones.get(id), a)])) };
+  assert.deepEqual(angles.thumb, [60, 35, -30]);
+  assert.deepEqual(angles.thumb2, [30, 0, 0]);
+  assert.deepEqual(angles.thumb3, [40, 0, 0]);
+  const pose = posedBy(angles);
   assert.ok(tipOf(pose, 'index3')[0] < tipOf(rest, 'index3')[0] - 0.02, 'the curled fingertip comes back toward the palm face');
+});
+
+test('opposition rolls the thumb pad toward the fingers, and a lift carries the thumb toward the palm face', () => {
+  const rolled = posedBy(handAngles(rig, 'hand', { thumb: { oppose: 1 } }));
+  assert.ok(thumbPad(rolled)[2] < -0.9, `the rolled pad faces the little finger's side, not ${thumbPad(rolled)}`);
+  near(tipOf(rolled, 'thumb3'), tipOf(rest, 'thumb3'), 1e-9);
+  const lifted = posedBy(handAngles(rig, 'hand', { thumb: { lift: 1 } }));
+  const tip = sub(tipOf(lifted, 'thumb3'), bones.get('thumb').head);
+  assert.ok(tip[0] < -0.8 * length(tip), 'the lifted thumb stands out of the palm plane on the palm side');
+});
+
+test('a preset names a shorthand, and a shorthand over it changes only what it says', () => {
+  assert.deepEqual(handAngles(rig, 'hand', 'fist'), handAngles(rig, 'hand', rig.presets.fist));
+  const eased = handAngles(rig, 'hand', { preset: 'fist', thumb: { curl: 0 } });
+  assert.deepEqual(eased.thumb, handAngles(rig, 'hand', 'fist').thumb);
+  assert.deepEqual(eased.thumb3, [0, 0, 0]);
+  assert.deepEqual(eased.index, handAngles(rig, 'hand', 'fist').index);
+  assert.match(handIssues(rig, 'hand', 'wave').join(), /no preset wave/);
 });
 
 test('a hand closes on a handle by contact, each phalanx stopping on it and none sinking in', () => {

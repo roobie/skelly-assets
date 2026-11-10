@@ -46,8 +46,13 @@ is clean and a test can assert the property instead of a count that moves with e
 ## Fingers and grips
 
 Fingers are more bones under the hand in the same content (`models/poses/rig.libsonnet`, `fingerBones`), one per
-phalanx, the thumb on its own two bones because it opposes rather than flexes. A pose file curls and spreads a hand
-by shorthand (`site/fingers.mjs`, `handAngles`) so a clip's author never names fifteen bones for a fist.
+phalanx. The thumb is three bones in the fingers' frame (`thumbBones`) rather than a digit of its own kind: a
+metacarpal that swings, rolls and lifts, then two phalanges that only bend. Opposition is the roll of that root,
+read in the joint's own order with its swing and lift, because one three-freedom joint at the root is what lets the
+same thumb wrap over a handle and meet a fingertip, while a fixed "opposition axis" does one of the two. A pose file
+curls and spreads a hand by shorthand (`site/fingers.mjs`, `handAngles`), and names whole hands by preset
+(`models/poses/hands.libsonnet`), so a clip's author never names twenty bones for a fist and every fist is the same
+fist until a preset changes.
 
 A grip is planned palm first, then fingers (`site/fingers.mjs`, `holdItem` then `closeHand`): the item carries a
 grip socket, where the palm's face meets it and which way the thumb runs, the arm's two-bone solve puts the wrist

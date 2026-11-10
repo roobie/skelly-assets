@@ -97,3 +97,20 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
   const [l, r] = [tip('L'), tip('R')];
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right fingertip mirrors the left across x');
 });
+
+test('opposition rolls either thumb pad toward its own little finger, the mirrored copy a mirror of the reference', () => {
+  const shorthand = { thumb: { oppose: 1, lift: 0.5 } };
+  const { frame, report } = compilePose(rig, { rig: { id: rig.id, revision: rig.revision }, hands: { 'hand.L': shorthand, 'hand.R': shorthand } });
+  assert.deepEqual(report.clamped, []);
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  const posed = boneTransforms(rig.bones, decodeFrame(frame));
+  const tip = (side) => { const bone = bones.get(`thumb3.${side}`); return applyPoint(posed.get(bone.id), bone.tail); };
+  for (const side of ['L', 'R']) {
+    const root = bones.get(`thumb.${side}`);
+    // The pad faces the way the palm does at rest, and the little finger lies at -z of either hand.
+    const pad = mulMV(posed.get(root.id).r, [root.bind.mirror ? -1 : 1, 0, 0]);
+    assert.ok(pad[2] < -0.5, `the ${side} thumb pad turns toward the little finger, not ${pad}`);
+  }
+  const [l, r] = [tip('L'), tip('R')];
+  assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
+});

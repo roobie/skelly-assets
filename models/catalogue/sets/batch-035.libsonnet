@@ -61,8 +61,10 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
       segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset])]
         + [socket(hand.fingers[i], [0, -arm.palmLength, hand.centre(i)]) for i in std.range(0, std.length(hand.fingers) - 1)]),
-      segment('thumb-' + s[0], 'avatarArm', arm, 'thumb', 0.01, ['skin'], [pin('thumb'), socket(hand.thumbTip, [0, -hand.thumbHinge, 0])]),
-      segment(hand.thumbTip + '-' + s[0], 'avatarArm', arm, 'thumbTip', 0.005, ['skin'], [pin(hand.thumbTip)]),
+    ] + [
+      segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
+              [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []))
+      for k in std.range(0, hand.thumbBones - 1)
     ] + [
       segment(hand.part(hand.fingers[i], k) + '-' + s[0], 'avatarArm', arm { finger: hand.fingers[i], phalanx: k }, 'finger', 0.003, ['skin'],
               [pin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [socket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []))
@@ -84,8 +86,10 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       { from: 'torso.shoulder-%s' % s[0], to: 'upper-%s.shoulder' % s[0] },
       { from: 'upper-%s.elbow' % s[0], to: 'fore-%s.elbow' % s[0] },
       { from: 'fore-%s.wrist' % s[0], to: 'palm-%s.wrist' % s[0] },
-      { from: 'palm-%s.thumb' % s[0], to: 'thumb-%s.thumb' % s[0] },
-      { from: 'thumb-%s.%s' % [s[0], hand.thumbTip], to: '%s-%s.%s' % [hand.thumbTip, s[0], hand.thumbTip] },
+    ] + [
+      local part = hand.thumbPart(k), above = if k == 0 then 'palm' else hand.thumbPart(k - 1);
+      { from: '%s-%s.%s' % [above, s[0], part], to: '%s-%s.%s' % [part, s[0], part] }
+      for k in std.range(0, hand.thumbBones - 1)
     ] + [
       local part = hand.part(hand.fingers[i], k), above = if k == 0 then 'palm' else hand.part(hand.fingers[i], k - 1);
       { from: '%s-%s.%s' % [above, s[0], part], to: '%s-%s.%s' % [part, s[0], part] }

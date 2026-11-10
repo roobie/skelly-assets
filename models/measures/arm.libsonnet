@@ -9,7 +9,8 @@
   fingerThicknessShare: 0.8, thumbThicknessShare: 0.7, fingerFrontShare: 0.9, thumbRootShare: 0.3,
   thumbInset: 0.004, thumbProjection: 0.014,
   // The fingers from the thumb's side (+z) with their lengths as shares of `fingerLength`, the gap between them, each
-  // finger's phalanges as shares of its length (knuckle first), and the thumb tip's share of the thumb.
+  // finger's phalanges as shares of its length (knuckle first), and the thumb's bones as shares of its length (the
+  // metacarpal first, then the two phalanges).
   fingers: ['index', 'middle', 'ring', 'little'], fingerShares: [0.94, 1, 0.92, 0.78], fingerGap: 0.0035,
-  phalanxShares: [0.45, 0.3, 0.25], thumbTipShare: 0.45,
+  phalanxShares: [0.45, 0.3, 0.25], thumbShares: [0.4, 0.33, 0.27],
 }

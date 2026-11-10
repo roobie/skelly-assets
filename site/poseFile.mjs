@@ -12,8 +12,9 @@
 // the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
 // models/poses/rig.libsonnet.
 //
-// Hands come as shorthand, `hands: { <hand bone>: { curl, spread, thumb } }`, which site/fingers.mjs turns into digit
-// angles before `angles` of single digit bones are read, so a file can curl a hand and then open one finger. A held item,
+// Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
+// its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a
+// file can curl a hand and then open one finger. A held item,
 // `hold: { <hand bone>: { model, at?, turn?, pole?, socket, close? } }`, is placed after the reach: the palm is set on the
 // item's socket and the fingers then closed on the item by contact, so the grip is read off the item, not drawn by hand.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';

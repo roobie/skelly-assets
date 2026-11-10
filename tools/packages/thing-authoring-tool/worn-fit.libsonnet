@@ -458,18 +458,21 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, std.length(hand.fingers) - 1)
       for k in phalanges
     ];
-    local thumb = [h.box('thumb', sl.hand, [-thumbX, -hand.thumbHinge - g, -g], [thumbX, 0, arm.thumbProjection + 0.004 + g])];
-    local thumbTip = [h.box('thumb-tip', sl.hand, [-thumbX, -(arm.thumbLength - hand.thumbHinge) - g, -g], [thumbX, arm.handOverlap, arm.thumbProjection + 0.004 + g])];
+    // A thumb piece in its bone's frame, down the bone's length; the root piece ends at the root, the rest reach into
+    // the bone above.
+    local thumbPieces = [
+      { id: id + '_worn_' + hand.thumbPart(k), frame: hand.thumbPart(k), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, if k == 0 then 0 else arm.handOverlap, arm.thumbProjection + 0.004 + g])] }
+      for k in std.range(0, hand.thumbBones - 1)
+    ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.
     local fingerLength = if s.fingers then arm.fingerLength else 0.02;
     local fingers = [h.box('fingers', sl.hand, [-fingerX, -fingerLength - g, -arm.palmWidth / 2 - g], [fingerX, arm.handOverlap, arm.palmWidth / 2 * arm.fingerFrontShare + g])];
     {
       // One glove standing on its fingertips, cuff up, for a ground model; the fingers hang from the palm's end.
       ground: h.lifted(palm, fingerLength + g + arm.palmLength) + h.lifted(fingers, fingerLength + g),
-      rows: [row(id + '_worn_palm', palm, finish), row(id + '_worn_thumb', thumb, finish), row(id + '_worn_' + hand.thumbTip + '', thumbTip, finish)]
-            + [row(piece.id, piece.pieces, finish) for piece in fingerPieces],
-      figureModels: pair(id + '_worn_palm', 'glove', ['palm']) + pair(id + '_worn_thumb', 'thumb', ['thumb']) + pair(id + '_worn_' + hand.thumbTip + '', hand.thumbTip, [hand.thumbTip])
-                    + std.flattenArrays([pair(piece.id, piece.frame, [piece.frame]) for piece in fingerPieces]),
+      rows: [row(id + '_worn_palm', palm, finish)] + [row(piece.id, piece.pieces, finish) for piece in thumbPieces + fingerPieces],
+      figureModels: pair(id + '_worn_palm', 'glove', ['palm'])
+                    + std.flattenArrays([pair(piece.id, piece.frame, [piece.frame]) for piece in thumbPieces + fingerPieces]),
     },
 
   // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,

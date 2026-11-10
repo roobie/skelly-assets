@@ -20,7 +20,8 @@ local armSegment(id, massKg, finish, ports, segment={ segment: id }) = {
 };
 local hand = import 'models/measures/hand.libsonnet';
 local fingerCount = std.length(hand.fingers);
-// Each phalanx hangs from the one above it, the knuckle phalanx from the palm; the thumb's tip hangs from its root.
+// Each phalanx hangs from the one above it, the knuckle phalanx from the palm; the thumb's bones hang likewise from its
+// root on the palm's edge.
 local phalanx(i, k) = armSegment(
   hand.part(hand.fingers[i], k), 0.15 / (fingerCount * hand.phalanges), { skin: skin },
   [jointPin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [jointSocket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []),
@@ -29,6 +30,15 @@ local phalanx(i, k) = armSegment(
 local phalanxConnection(i, k) = {
   from: (if k == 0 then 'palm' else hand.part(hand.fingers[i], k - 1)) + '.' + hand.part(hand.fingers[i], k),
   to: hand.part(hand.fingers[i], k) + '.' + hand.part(hand.fingers[i], k),
+};
+local thumbBone(k) = armSegment(
+  hand.thumbPart(k), 0.05 / hand.thumbBones, { skin: skin },
+  [jointPin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []),
+  { segment: 'thumb', phalanx: k },
+);
+local thumbConnection(k) = {
+  from: (if k == 0 then 'palm' else hand.thumbPart(k - 1)) + '.' + hand.thumbPart(k),
+  to: hand.thumbPart(k) + '.' + hand.thumbPart(k),
 };
 local legSegment(id, massKg, finish, ports) = {
   id: id,
@@ -100,15 +110,13 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
         jointPin('wrist'),
         jointSocket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset]),
       ] + [jointSocket(hand.fingers[i], [0, -arm.palmLength, hand.centre(i)]) for i in std.range(0, fingerCount - 1)]),
-      armSegment('thumb', 0.03, { skin: skin }, [jointPin('thumb'), jointSocket(hand.thumbTip, [0, -hand.thumbHinge, 0])]),
-      armSegment(hand.thumbTip, 0.02, { skin: skin }, [jointPin(hand.thumbTip)], { segment: 'thumbTip' }),
-    ] + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
+    ] + [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)]
+      + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     connections: [
       { from: 'upper.elbow', to: 'fore.elbow' },
       { from: 'fore.wrist', to: 'palm.wrist' },
-      { from: 'palm.thumb', to: 'thumb.thumb' },
-      { from: 'thumb.' + hand.thumbTip, to: hand.thumbTip + '.' + hand.thumbTip },
-    ] + [phalanxConnection(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
+    ] + [thumbConnection(k) for k in std.range(0, hand.thumbBones - 1)]
+      + [phalanxConnection(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     // The pivots code poses from: the shoulder the arm hangs from, sitting at the bust's shoulder anchor, each joint
     // below it, and the grip a held item sits at in the palm.
     anchors: {

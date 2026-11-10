@@ -14,7 +14,7 @@ type LimbSolid = ExtrudedPolygonSolid | BoxSolid | RevolvedSolid;
  * The arm's segments, each its own part so the view can bend the arm at its joints
  * (https://github.com/roobie/skelly, `packages/deadvox/DESIGN.md`, "Models"). A segment's origin is the joint it turns about, so its part mates to the segment above at that joint.
  */
-const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'finger', 'thumb', 'thumbTip'] as const;
+const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'finger', 'thumb'] as const;
 
 // A list param arrives as the measures' JSON text; what it holds is checked after parsing.
 const numbers = pipe(string(), transform((s) => JSON.parse(s) as number[]), array(number()));
@@ -35,9 +35,9 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       fingers: names,
       fingerShares: numbers,
       fingerGap: positive,
-      /** Each finger's phalanges as shares of its length, knuckle first; the thumb tip's share of the thumb. */
+      /** Each finger's phalanges as shares of its length, knuckle first; the thumb's bones as shares of its length. */
       phalanxShares: numbers,
-      thumbTipShare: positive,
+      thumbShares: numbers,
       upperLength: positive,
       upperWidth: positive,
       upperDepth: positive,
@@ -81,7 +81,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const wristTop = wrist + d.foreLength * d.wristShare;
   const thumbRoot = wrist - d.palmLength * d.thumbRootShare;
   const thumbEdge = halfPalm - d.thumbInset;
-  const thumbHinge = thumbRoot - d.thumbLength * (1 - d.thumbTipShare);
   // The fingers across the palm, the index at the thumb's side, +z, each a shade shorter toward the little one.
   const span = halfPalm + halfPalm * d.fingerFrontShare;
   const fingerWidth = (span - (d.fingers.length - 1) * d.fingerGap) / d.fingers.length;
@@ -91,16 +90,20 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   if (d.segment === 'finger' && (fingerAt < 0 || !(phalanx >= 0 && phalanx < d.phalanxShares.length))) {
     throw new Error(`finger segment needs a finger of ${d.fingers.join(' ')} and a phalanx below ${d.phalanxShares.length}, not ${d.finger} ${d.phalanx}`);
   }
+  if (d.segment === 'thumb' && !(phalanx >= 0 && phalanx < d.thumbShares.length)) {
+    throw new Error(`thumb segment needs a phalanx below ${d.thumbShares.length}, not ${d.phalanx}`);
+  }
   const phalanxLength = (k: number) => d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
   const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
+  const thumbLength = (k: number) => d.thumbLength * (d.thumbShares[k] ?? 0);
+  const thumbTop = thumbRoot - d.thumbShares.slice(0, phalanx).reduce((sum, _, k) => sum + thumbLength(k), 0);
   // Each segment's joint in the arm frame; the segment is drawn about it as its own origin.
   const origins: Record<(typeof ARM_SEGMENTS)[number], readonly [number, number]> = {
     upper: [0, 0],
     fore: [elbow, 0],
     palm: [wrist, 0],
     finger: [phalanxTop, fingerCentre(fingerAt)],
-    thumb: [thumbRoot, thumbEdge],
-    thumbTip: [thumbHinge, thumbEdge],
+    thumb: [thumbTop, thumbEdge],
   };
   const [originY, originZ] = origins[d.segment];
   const ys = (bottom: number, top: number): [number, number] => [bottom - originY, top - originY];
@@ -138,13 +141,12 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       return [block(d.finger!, 'skin', [-thick, thick], ys(phalanxTop - phalanxLength(phalanx), phalanxTop + d.handOverlap), [-half, half])];
     }
     case 'thumb': {
-      const thick = halfThick * d.thumbThicknessShare;
-      return [block('thumb', 'skin', [-thick, thick], ys(thumbHinge, thumbRoot), [thumbEdge - originZ, halfPalm + d.thumbProjection - originZ])];
-    }
-    case 'thumbTip': {
-      // The tip stands clear of the palm's edge, which it hangs beside rather than from.
-      const thick = halfThick * d.thumbThicknessShare * 0.8;
-      return [block('thumb-tip', 'skin', [-thick, thick], ys(thumbRoot - d.thumbLength, thumbHinge + d.handOverlap), [halfPalm - originZ + 0.001, halfPalm + d.thumbProjection - originZ - 0.002])];
+      // The metacarpal sinks into the palm's edge; the phalanges beyond it stand clear of the edge they hang beside,
+      // a shade slimmer, each reaching into the bone above it so the joint stays closed when it bends.
+      const slim = phalanx === 0 ? 1 : 0.8;
+      const thick = halfThick * d.thumbThicknessShare * slim;
+      const zs: [number, number] = phalanx === 0 ? [thumbEdge, halfPalm + d.thumbProjection] : [halfPalm + 0.001, halfPalm + d.thumbProjection - 0.002];
+      return [block('thumb', 'skin', [-thick, thick], ys(thumbTop - thumbLength(phalanx), thumbTop + (phalanx === 0 ? 0 : d.handOverlap)), [zs[0] - originZ, zs[1] - originZ])];
     }
     default:
       return d.segment satisfies never;

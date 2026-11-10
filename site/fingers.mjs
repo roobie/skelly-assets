@@ -5,8 +5,8 @@
 import { applyPoint, boneTransforms, clampJointAngles, cross, jointAngles, jointRotation, length, mulMM, mulMV, normalize, quatToMat3, rotBetween, solveTwoBone, sub, transpose, IDENTITY_M } from './kinematics.mjs';
 import { posedSolid, signedDepth } from './clearance.mjs';
 
-const HAND_KEYS = new Set(['curl', 'spread', 'thumb']);
-const THUMB_KEYS = new Set(['in', 'across', 'curl']);
+const HAND_KEYS = new Set(['preset', 'curl', 'spread', 'thumb']);
+const THUMB_KEYS = new Set(['across', 'oppose', 'lift', 'curl']);
 const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'close', 'pole']);
 const SOCKET_KEYS = new Set(['at', 'into', 'axis']);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -40,13 +40,24 @@ const shareOf = (bone, axis, share) => {
   return signed >= 0 ? signed * max : -signed * min;
 };
 
-/** Every way a hand shorthand does not fit: `{ curl: share | { <digit>: share }, spread: share, thumb: { in, across, curl } }`. */
+// A hand shorthand as written, a preset's name or `{ preset?, curl?, spread?, thumb? }`, over the preset it names.
+const SHAPE = '{ preset?, curl, spread, thumb: { across, oppose, lift, curl } } or the name of one of the rig\'s presets';
+const presetOf = (rig, hand) => (typeof hand === 'string' ? rig.presets?.[hand] : hand.preset !== undefined ? rig.presets?.[hand.preset] : {});
+const resolveHand = (rig, hand) => {
+  const preset = presetOf(rig, hand) ?? {};
+  const own = typeof hand === 'string' ? {} : hand;
+  return { ...preset, ...own, thumb: { ...preset.thumb, ...own.thumb } };
+};
+
+/** Every way a hand shorthand does not fit: `{ preset?, curl: share | { <digit>: share }, spread: share, thumb: { across, oppose, lift, curl } }`. */
 export function handIssues(rig, handId, hand) {
+  if (typeof hand === 'string') return rig.presets?.[hand] ? [] : [`hands.${handId}: the rig has no preset ${hand}`];
+  if (!isObject(hand)) return [`hands.${handId} is ${SHAPE}`];
   const issues = [];
-  if (!isObject(hand)) return [`hands.${handId} is { curl, spread, thumb }`];
   const digits = digitsOf(rig, handId);
   if (digits.size === 0) issues.push(`hands.${handId}: ${handId} has no digits`);
   for (const key of Object.keys(hand)) if (!HAND_KEYS.has(key)) issues.push(`hands.${handId}: unknown key ${key}`);
+  if (hand.preset !== undefined && !rig.presets?.[hand.preset]) issues.push(`hands.${handId}: the rig has no preset ${hand.preset}`);
   if (hand.curl !== undefined && !isShare(hand.curl)) {
     if (!isObject(hand.curl)) issues.push(`hands.${handId}.curl is a share -1..1 or one per finger`);
     else for (const [digit, share] of Object.entries(hand.curl)) {
@@ -56,7 +67,7 @@ export function handIssues(rig, handId, hand) {
   }
   if (hand.spread !== undefined && !isShare(hand.spread)) issues.push(`hands.${handId}.spread is a share -1..1`);
   if (hand.thumb !== undefined) {
-    if (!isObject(hand.thumb)) issues.push(`hands.${handId}.thumb is { in, across, curl }`);
+    if (!isObject(hand.thumb)) issues.push(`hands.${handId}.thumb is { across, oppose, lift, curl }`);
     else for (const [key, share] of Object.entries(hand.thumb)) {
       if (!THUMB_KEYS.has(key)) issues.push(`hands.${handId}.thumb: unknown key ${key}`);
       else if (!isShare(share)) issues.push(`hands.${handId}.thumb.${key} is a share -1..1`);
@@ -66,19 +77,23 @@ export function handIssues(rig, handId, hand) {
 }
 
 /**
- * The joint angles a hand shorthand asks of the digits of `handId`: a finger's `curl` flexes each of its joints by that
- * share of its range, `spread` abducts the knuckles by their share of the spread, and the thumb's `in` flexes its root
- * toward the palm, `across` carries it across the palm and `curl` bends its tip. Returns `{ <bone>: [flex, twist, abduct] }`.
+ * The joint angles a hand shorthand (or the preset it names, under its own keys) asks of the digits of `handId`: a
+ * finger's `curl` flexes each of its joints by that share of its range, `spread` abducts the knuckles by their share
+ * of the spread, and the thumb's root goes `across` the palm, rolls into opposition by `oppose` and `lift`s toward the
+ * palm, while `curl` bends the joints beyond it (models/poses/rig.libsonnet, the thumb). Returns
+ * `{ <bone>: [flex, twist, abduct] }`.
  */
-export function handAngles(rig, handId, hand) {
+export function handAngles(rig, handId, asked) {
+  const hand = resolveHand(rig, asked);
   const angles = {};
   const curlOf = (digit) => (isObject(hand.curl) ? hand.curl[digit] ?? 0 : hand.curl ?? 0);
   for (const [digit, chain] of digitsOf(rig, handId)) {
     if (digit === 'thumb') {
       const [root, ...rest] = chain;
-      // Across the palm is the thumb's negative abduction (models/poses/rig.libsonnet).
-      angles[root.id] = [shareOf(root, 'flex', hand.thumb?.in ?? 0), 0, shareOf(root, 'abduct', -(hand.thumb?.across ?? 0))];
-      for (const bone of rest) angles[bone.id] = [shareOf(bone, 'flex', hand.thumb?.curl ?? 0), 0, 0];
+      const { across = 0, oppose = 0, lift = 0, curl = 0 } = hand.thumb;
+      // Across the palm is the root's negative abduction.
+      angles[root.id] = [shareOf(root, 'flex', lift), shareOf(root, 'twist', oppose), shareOf(root, 'abduct', -across)];
+      for (const bone of rest) angles[bone.id] = [shareOf(bone, 'flex', curl), 0, 0];
       continue;
     }
     chain.forEach((bone, k) => {
