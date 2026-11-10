@@ -3,8 +3,9 @@
 // shows, from the views a sheet is reviewed from, for a coincident face as much as for a poke.
 //
 // The covered surface (clearance.mjs, `coveredSurface`) is drawn on a layer of its own over the figure drawn flat, in
-// a colour nothing else is drawn in, nudged towards the camera by a pixel's depth step, so a face it shares with the
-// doll part beneath, or with a garment, draws as showing: a tie is what a coincident face shows as.
+// a colour nothing else is drawn in, nudged towards the camera by a few depth steps, so a face it shares with the doll
+// part beneath, or with a garment, draws as showing: a tie is what a coincident face shows as. The nudge is a constant
+// one, not scaled by the face's slope, which would drive a face seen edge-on through a garment standing off it.
 // The views are drawn without antialiasing, so a pixel shows or it does not, and with the camera's depth range held to
 // the figure, so the depth buffer resolves a garment standing off the body by far less than a pixel.
 import * as THREE from 'three';
@@ -18,18 +19,18 @@ const showingMaterial = new THREE.MeshBasicMaterial({
   color: new THREE.Color().setRGB(...SHOWING.map((c) => c / 255)),
   side: THREE.DoubleSide,
   polygonOffset: true,
-  polygonOffsetFactor: -1,
-  polygonOffsetUnits: -1,
+  polygonOffsetFactor: 0,
+  polygonOffsetUnits: -4,
 });
 const figureMaterial = new THREE.MeshLambertMaterial({ color: 0xb4b0a8 });
 
 /**
  * Adds the covered surface to the figure, riding its joints on the skin layer: for each body part of `surface`, the
- * triangles of its covered samples. `figure` is the posing page's (pose.mjs, `buildFigure`), still at rest.
+ * triangles of its samples covered whole. `figure` is the posing page's (pose.mjs, `buildFigure`), still at rest.
  */
 export function addCoveredSkin(figure, surface) {
   for (const { bone, samples } of surface) {
-    const shown = samples.filter(({ cover }) => cover >= 0);
+    const shown = samples.filter(({ whole }) => whole);
     if (shown.length === 0) continue;
     const positions = shown.flatMap(({ corners }) => corners.flat());
     const geometry = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));

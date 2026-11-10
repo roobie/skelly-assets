@@ -260,12 +260,18 @@ export function coverage(rig, rest) {
 
 /**
  * The body's surface with what covers it: for each body part { bone, samples }, its sampled surface as above, each
- * sample with `cover`, the index into `rest.pieces` of the piece meant to cover it, or -1. The probe tests the covered
- * samples; the skin check draws their triangles.
+ * sample with `cover`, the index into `rest.pieces` of the piece meant to cover it, or -1, and for a covered sample
+ * `whole`, whether its corners are covered too. The probe tests the covered samples. The skin check draws the
+ * triangles of the whole ones, since a triangle a hem or a cuff crosses would draw its uncovered part as showing.
  */
 export function coveredSurface(rig, rest) {
   const cover = coverage(rig, rest);
-  return rest.body.map(({ bone, mesh }) => ({ bone, samples: sampledSurface(mesh).map((sample) => ({ ...sample, cover: cover(bone, sample) })) }));
+  const sampled = (bone, sample) => {
+    const index = cover(bone, sample);
+    const whole = index >= 0 && sample.corners.every((point) => cover(bone, { point, normal: sample.normal }) >= 0);
+    return { ...sample, cover: index, whole };
+  };
+  return rest.body.map(({ bone, mesh }) => ({ bone, samples: sampledSurface(mesh).map((sample) => sampled(bone, sample)) }));
 }
 
 /**
