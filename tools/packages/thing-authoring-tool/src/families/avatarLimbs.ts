@@ -1,7 +1,7 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { parse, picklist, strictObject } from 'valibot';
+import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
 import { block, oval, slab, taper } from './body.ts';
-import { positive, requireConvex, spheroid } from './shapes.ts';
+import { positive, requireConvex, scalar, spheroid } from './shapes.ts';
 
 // The player's limbs hang from their joint: origin on the joint at the limb's top, y up, the limb down -y, front
 // toward +z. Each limb is mirror-symmetric in x, so one model serves either side, and code poses it about its joint.
@@ -14,16 +14,30 @@ type LimbSolid = ExtrudedPolygonSolid | BoxSolid | RevolvedSolid;
  * The arm's segments, each its own part so the view can bend the arm at its joints
  * (https://github.com/roobie/skelly, `packages/deadvox/DESIGN.md`, "Models"). A segment's origin is the joint it turns about, so its part mates to the segment above at that joint.
  */
-const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'fingers', 'thumb'] as const;
+const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'finger', 'thumb', 'thumbTip'] as const;
+
+// A list param arrives as the measures' JSON text; what it holds is checked after parsing.
+const numbers = pipe(string(), transform((s) => JSON.parse(s) as number[]), array(number()));
+const names = pipe(string(), transform((s) => JSON.parse(s) as string[]), array(string()));
 
 /**
  * One segment of a bare arm, the hand edge-on to the thigh with its
- * thumb forward. The whole arm's measures come in, so every segment is drawn from the same figures.
+ * thumb forward. The whole arm's measures come in, so every segment is drawn from the same figures. A `finger` segment
+ * is one phalanx: `finger` names which and `phalanx` counts from the knuckle.
  */
 export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[] => {
   const d = parse(
     strictObject({
       segment: picklist(ARM_SEGMENTS),
+      finger: optional(string()),
+      phalanx: optional(scalar),
+      /** The fingers from the thumb's side, their lengths as shares of `fingerLength`, and the gap between them. */
+      fingers: names,
+      fingerShares: numbers,
+      fingerGap: positive,
+      /** Each finger's phalanges as shares of its length, knuckle first; the thumb tip's share of the thumb. */
+      phalanxShares: numbers,
+      thumbTipShare: positive,
       upperLength: positive,
       upperWidth: positive,
       upperDepth: positive,
@@ -67,13 +81,26 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const wristTop = wrist + d.foreLength * d.wristShare;
   const thumbRoot = wrist - d.palmLength * d.thumbRootShare;
   const thumbEdge = halfPalm - d.thumbInset;
+  const thumbHinge = thumbRoot - d.thumbLength * (1 - d.thumbTipShare);
+  // The fingers across the palm, the index at the thumb's side, +z, each a shade shorter toward the little one.
+  const span = halfPalm + halfPalm * d.fingerFrontShare;
+  const fingerWidth = (span - (d.fingers.length - 1) * d.fingerGap) / d.fingers.length;
+  const fingerCentre = (i: number) => halfPalm * d.fingerFrontShare - i * (fingerWidth + d.fingerGap) - fingerWidth / 2;
+  const fingerAt = d.fingers.indexOf(d.finger ?? '');
+  const phalanx = d.phalanx ?? 0;
+  if (d.segment === 'finger' && (fingerAt < 0 || !(phalanx >= 0 && phalanx < d.phalanxShares.length))) {
+    throw new Error(`finger segment needs a finger of ${d.fingers.join(' ')} and a phalanx below ${d.phalanxShares.length}, not ${d.finger} ${d.phalanx}`);
+  }
+  const phalanxLength = (k: number) => d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
+  const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
   // Each segment's joint in the arm frame; the segment is drawn about it as its own origin.
   const origins: Record<(typeof ARM_SEGMENTS)[number], readonly [number, number]> = {
     upper: [0, 0],
     fore: [elbow, 0],
     palm: [wrist, 0],
-    fingers: [knuckles, 0],
+    finger: [phalanxTop, fingerCentre(fingerAt)],
     thumb: [thumbRoot, thumbEdge],
+    thumbTip: [thumbHinge, thumbEdge],
   };
   const [originY, originZ] = origins[d.segment];
   const ys = (bottom: number, top: number): [number, number] => [bottom - originY, top - originY];
@@ -103,24 +130,21 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
         slab('palm', 'skin', ys(knuckles, wrist + d.handOverlap), { halfX: halfThick, halfZ: halfPalm, chamfer: 0.02 }),
         block('knuckles', 'skin', [-halfThick - 0.002, -halfThick + 0.004], ys(knuckles, knuckles + 0.014), [-halfPalm + 0.004, halfPalm * d.fingerFrontShare - 0.004]),
       ];
-    case 'fingers': {
-      // Four fingers across the palm, the index at the thumb's side, +z, each a shade shorter toward the little one.
-      const gap = 0.0035;
-      const span = halfPalm + halfPalm * d.fingerFrontShare;
-      const width = (span - 3 * gap) / 4;
-      const shares = [0.94, 1, 0.92, 0.78];
-      const thick = halfThick * d.fingerThicknessShare;
-      return shares.map((share, i) => {
-        const front = halfPalm * d.fingerFrontShare - i * (width + gap);
-        return block(['little', 'ring', 'middle', 'index'][3 - i]!, 'skin', [-thick, thick], ys(knuckles - d.fingerLength * share, knuckles + d.handOverlap), [front - width, front]);
-      });
+    case 'finger': {
+      // One phalanx, reaching into the one above it so the joint stays closed when it curls; the tip a shade slimmer.
+      const slim = phalanx === d.phalanxShares.length - 1 ? 0.85 : 1;
+      const thick = halfThick * d.fingerThicknessShare * slim;
+      const half = (fingerWidth / 2) * slim;
+      return [block(d.finger!, 'skin', [-thick, thick], ys(phalanxTop - phalanxLength(phalanx), phalanxTop + d.handOverlap), [-half, half])];
     }
     case 'thumb': {
       const thick = halfThick * d.thumbThicknessShare;
-      return [
-        block('thumb', 'skin', [-thick, thick], ys(thumbRoot - d.thumbLength * 0.6, thumbRoot), [thumbEdge - originZ, halfPalm + d.thumbProjection - originZ]),
-        block('thumb-tip', 'skin', [-thick * 0.8, thick * 0.8], ys(thumbRoot - d.thumbLength, thumbRoot - d.thumbLength * 0.55), [thumbEdge - originZ + 0.002, halfPalm + d.thumbProjection - originZ - 0.002]),
-      ];
+      return [block('thumb', 'skin', [-thick, thick], ys(thumbHinge, thumbRoot), [thumbEdge - originZ, halfPalm + d.thumbProjection - originZ])];
+    }
+    case 'thumbTip': {
+      // The tip stands clear of the palm's edge, which it hangs beside rather than from.
+      const thick = halfThick * d.thumbThicknessShare * 0.8;
+      return [block('thumb-tip', 'skin', [-thick, thick], ys(thumbRoot - d.thumbLength, thumbHinge + d.handOverlap), [halfPalm - originZ + 0.001, halfPalm + d.thumbProjection - originZ - 0.002])];
     }
     default:
       return d.segment satisfies never;

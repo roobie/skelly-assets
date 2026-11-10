@@ -6,6 +6,7 @@ local h = import 'compound.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 
 // How far each layer stands off the skin. An outer layer clears every inner one on the same segment.
 local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };
@@ -426,17 +427,17 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       figureModels: pair(id + '_worn_thigh', 'trouser', ['thigh']) + pair(id + '_worn_shin', 'hem', if s.greaves then ['shin'] else []),
     },
 
-  // Gloves: a palm and cuff on the wrist, fingers on the knuckles and the thumb on its root, so a curled first-person
-  // hand bends its glove too. `cuff` is how far the cuff reaches up the forearm; `fingers` false leaves stubs.
-  // The model arm is a right arm whose palm faces +x, so the back of the hand, where `back` details go, is -x.
+  // Gloves: a palm and cuff on the wrist, a piece on each phalanx and on each thumb bone, so a curled hand bends its
+  // glove at every joint. `cuff` is how far the cuff reaches up the forearm; `fingers` false leaves stubs on the knuckle
+  // phalanges only. The model arm is a right arm whose palm faces +x, so the back of the hand, where `back` details go,
+  // is -x.
   hands(id, finish, spec)::
     local s = { layer: 'under', cuff: 0.05, flare: 0.006, hem: 0.006, fingers: true, backRidges: 0,
                 slots: { hand: 'hand', cuff: 'cuff', hem: 'hem', ridge: 'stitch' } } + spec;
     local g = layers[s.layer], sl = s.slots;
     local palmX = arm.palmThickness / 2 + g, palmZ = arm.palmWidth / 2 + g;
     local wristX = arm.wristWidth / 2 + g, wristZ = arm.wristWidth / 2 + arm.wristDepthExtra + g;
-    local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g;
-    local fingerLength = if s.fingers then arm.fingerLength else 0.02;
+    local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g, fingerZ = hand.width / 2 + g;
     local thumbX = arm.palmThickness * arm.thumbThicknessShare / 2 + g;
     local palm = [
       h.box('palm', sl.hand, [-palmX, -arm.palmLength - g, -palmZ], [palmX, arm.handOverlap, palmZ]),
@@ -446,16 +447,29 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
         h.box('ridge-%d' % i, sl.ridge, [-palmX - 0.003, -arm.palmLength + 0.02, -0.02 + i * 0.02 - 0.002], [-palmX, 0, -0.02 + i * 0.02 + 0.002])
         for i in std.range(0, s.backRidges - 1)
       ];
-    local fingers = [
-      h.box('fingers', sl.hand, [-fingerX, -fingerLength - g, -arm.palmWidth / 2 - g], [fingerX, arm.handOverlap, arm.palmWidth / 2 * arm.fingerFrontShare + g]),
-    ] + (if s.fingers then [] else [h.box('stub-hem', sl.hem, [-fingerX - 0.001, -fingerLength - g, -arm.palmWidth / 2 - g - 0.001], [fingerX + 0.001, -fingerLength - g + 0.006, arm.palmWidth / 2 * arm.fingerFrontShare + g + 0.001])]);
-    local thumb = [h.box('thumb', sl.hand, [-thumbX, -arm.thumbLength - g, -g], [thumbX, 0, arm.thumbProjection + 0.004 + g])];
+    // A phalanx piece in its phalanx's frame: a sleeve down its length; a stub glove ends the knuckle phalanx short.
+    local phalanx(i, k) =
+      local length = if s.fingers then hand.length(i, k) else 0.02;
+      [h.box('finger', sl.hand, [-fingerX, -length - g, -fingerZ], [fingerX, arm.handOverlap, fingerZ])]
+      + (if s.fingers then [] else [h.box('stub-hem', sl.hem, [-fingerX - 0.001, -length - g, -fingerZ - 0.001], [fingerX + 0.001, -length - g + 0.006, fingerZ + 0.001])]);
+    local phalanges = if s.fingers then std.range(0, hand.phalanges - 1) else [0];
+    local fingerPieces = [
+      { id: id + '_worn_' + hand.part(hand.fingers[i], k), frame: hand.part(hand.fingers[i], k), pieces: phalanx(i, k) }
+      for i in std.range(0, std.length(hand.fingers) - 1)
+      for k in phalanges
+    ];
+    local thumb = [h.box('thumb', sl.hand, [-thumbX, -hand.thumbHinge - g, -g], [thumbX, 0, arm.thumbProjection + 0.004 + g])];
+    local thumbTip = [h.box('thumb-tip', sl.hand, [-thumbX, -(arm.thumbLength - hand.thumbHinge) - g, -g], [thumbX, arm.handOverlap, arm.thumbProjection + 0.004 + g])];
+    // The loose glove's fingers, one block across the knuckles, for the ground model.
+    local fingerLength = if s.fingers then arm.fingerLength else 0.02;
+    local fingers = [h.box('fingers', sl.hand, [-fingerX, -fingerLength - g, -arm.palmWidth / 2 - g], [fingerX, arm.handOverlap, arm.palmWidth / 2 * arm.fingerFrontShare + g])];
     {
       // One glove standing on its fingertips, cuff up, for a ground model; the fingers hang from the palm's end.
       ground: h.lifted(palm, fingerLength + g + arm.palmLength) + h.lifted(fingers, fingerLength + g),
-      rows: [row(id + '_worn_palm', palm, finish), row(id + '_worn_fingers', fingers, finish), row(id + '_worn_thumb', thumb, finish)],
-      figureModels: pair(id + '_worn_palm', 'glove', ['palm']) + pair(id + '_worn_fingers', 'fingers', ['fingers'])
-                    + pair(id + '_worn_thumb', 'thumb', ['thumb']),
+      rows: [row(id + '_worn_palm', palm, finish), row(id + '_worn_thumb', thumb, finish), row(id + '_worn_' + hand.thumbTip + '', thumbTip, finish)]
+            + [row(piece.id, piece.pieces, finish) for piece in fingerPieces],
+      figureModels: pair(id + '_worn_palm', 'glove', ['palm']) + pair(id + '_worn_thumb', 'thumb', ['thumb']) + pair(id + '_worn_' + hand.thumbTip + '', hand.thumbTip, [hand.thumbTip])
+                    + std.flattenArrays([pair(piece.id, piece.frame, [piece.frame]) for piece in fingerPieces]),
     },
 
   // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,

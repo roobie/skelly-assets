@@ -19,6 +19,7 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 local plastic = 'plastic-gloss-white';
 local socket(id, pos, normal=[0, -1, 0], up=[0, 0, 1]) = { id: id, mount: 'assembly-joint', gender: 'female', pos: pos, normal: normal, up: up, required: true };
 local pin(id, normal=[0, 1, 0], up=[0, 0, 1], pos=[0, 0, 0]) = { id: id, mount: 'assembly-joint', gender: 'male', pos: pos, normal: normal, up: up, required: true };
@@ -58,9 +59,16 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
-      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('knuckles', [0, -arm.palmLength, 0]), socket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset])]),
-      segment('fingers-' + s[0], 'avatarArm', arm, 'fingers', 0.04, ['skin'], [pin('knuckles')]),
-      segment('thumb-' + s[0], 'avatarArm', arm, 'thumb', 0.01, ['skin'], [pin('thumb')]),
+      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset])]
+        + [socket(hand.fingers[i], [0, -arm.palmLength, hand.centre(i)]) for i in std.range(0, std.length(hand.fingers) - 1)]),
+      segment('thumb-' + s[0], 'avatarArm', arm, 'thumb', 0.01, ['skin'], [pin('thumb'), socket(hand.thumbTip, [0, -hand.thumbHinge, 0])]),
+      segment(hand.thumbTip + '-' + s[0], 'avatarArm', arm, 'thumbTip', 0.005, ['skin'], [pin(hand.thumbTip)]),
+    ] + [
+      segment(hand.part(hand.fingers[i], k) + '-' + s[0], 'avatarArm', arm { finger: hand.fingers[i], phalanx: k }, 'finger', 0.003, ['skin'],
+              [pin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [socket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []))
+      for i in std.range(0, std.length(hand.fingers) - 1)
+      for k in std.range(0, hand.phalanges - 1)
+    ] + [
       segment('thigh-' + s[0], 'avatarLeg', leg, 'thigh', 1, ['skin'], [pin('hip'), socket('knee', [0, -leg.thighLength, 0])]),
       segment('shin-' + s[0], 'avatarLeg', leg, 'shin', 0.6, ['skin'], [pin('knee'), socket('ankle', [0, leg.shoeHeight - leg.length + leg.thighLength, 0])]),
       segment('foot-' + s[0], 'avatarLeg', leg, 'foot', 0.2, ['skin'], [pin('ankle')]),
@@ -76,8 +84,14 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       { from: 'torso.shoulder-%s' % s[0], to: 'upper-%s.shoulder' % s[0] },
       { from: 'upper-%s.elbow' % s[0], to: 'fore-%s.elbow' % s[0] },
       { from: 'fore-%s.wrist' % s[0], to: 'palm-%s.wrist' % s[0] },
-      { from: 'palm-%s.knuckles' % s[0], to: 'fingers-%s.knuckles' % s[0] },
       { from: 'palm-%s.thumb' % s[0], to: 'thumb-%s.thumb' % s[0] },
+      { from: 'thumb-%s.%s' % [s[0], hand.thumbTip], to: '%s-%s.%s' % [hand.thumbTip, s[0], hand.thumbTip] },
+    ] + [
+      local part = hand.part(hand.fingers[i], k), above = if k == 0 then 'palm' else hand.part(hand.fingers[i], k - 1);
+      { from: '%s-%s.%s' % [above, s[0], part], to: '%s-%s.%s' % [part, s[0], part] }
+      for i in std.range(0, std.length(hand.fingers) - 1)
+      for k in std.range(0, hand.phalanges - 1)
+    ] + [
       { from: 'pelvis.hip-%s' % s[0], to: 'thigh-%s.hip' % s[0] },
       { from: 'thigh-%s.knee' % s[0], to: 'shin-%s.knee' % s[0] },
       { from: 'shin-%s.ankle' % s[0], to: 'foot-%s.ankle' % s[0] },

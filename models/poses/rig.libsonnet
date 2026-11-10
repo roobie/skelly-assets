@@ -23,12 +23,33 @@
 // `clearance.marginMetres` is how far a garment may stand off or pass into the body before the clearance probe
 // (site/clearance.mjs) flags it: the doll's parts and the worn shells are blocky, so their corners meet a few
 // millimetres proud of each other at rest, and the margin is what keeps a fitting garment clean.
+//
+// A finger bone names its `digit` and, at the knuckle, its `spread`, how it shares a spread of the hand (-1 toward the
+// thumb, 1 away), so a pose file's hand shorthand (site/fingers.mjs) can curl and spread a hand without naming bones.
+// A finger flexes about z, the knuckle row, so positive flex curls it toward the palm; the thumb hangs at the palm's
+// front edge and flexes about z too, toward the palm, while its abduction carries it across the palm toward the little
+// finger, so flex then abduction brings its pad to oppose the fingers.
 local trunk = { model: 'player_bust' };
 local arm = { model: 'player_arm', sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
 local leg = { model: 'player_leg', sided: true, parent: 'pelvis', along: [0, -1, 0] };
+local hand = import 'models/measures/hand.libsonnet';
+local digit(name) = arm { pivot: 'origin', flexAxis: [0, 0, 1], digit: name };
+local fingerCount = std.length(hand.fingers);
+// The knuckle hyperextends a little and spreads; the joints beyond it only curl, the middle one furthest.
+local phalanxLimits = [{ flex: [-20, 90], abduct: [-15, 15] }, { flex: [0, 110], abduct: [0, 0] }, { flex: [0, 80], abduct: [0, 0] }];
+local fingerBones = {
+  [hand.part(hand.fingers[i], k)]: digit(hand.fingers[i]) {
+    part: hand.part(hand.fingers[i], k),
+    parent: if k == 0 then 'hand' else hand.part(hand.fingers[i], k - 1),
+    limits: phalanxLimits[if hand.phalanges == 1 then 0 else std.min(k, 2)] { twist: [0, 0] },
+    [if k == 0 then 'spread']: -1 + 2 * i / (fingerCount - 1),
+  }
+  for i in std.range(0, fingerCount - 1)
+  for k in std.range(0, hand.phalanges - 1)
+};
 {
   id: 'doll',
-  revision: 1,
+  revision: 2,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -48,15 +69,13 @@ local leg = { model: 'player_leg', sided: true, parent: 'pelvis', along: [0, -1,
                    limits: { flex: [0, 150], twist: [-80, 80], abduct: [0, 0] } },
     hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', reach: { pole: [0.3, 0, -1] },
                 limits: { flex: [-70, 80], twist: [0, 0], abduct: [-25, 20] } },
-    fingers: arm { part: 'fingers', parent: 'hand', pivot: 'origin',
-                   limits: { flex: [0, 90], twist: [0, 0], abduct: [0, 0] } },
-    thumb: arm { part: 'thumb', parent: 'hand', pivot: 'origin',
-                 limits: { flex: [-20, 60], twist: [0, 0], abduct: [-30, 40] } },
+    thumb: digit('thumb') { part: 'thumb', parent: 'hand', limits: { flex: [-20, 60], twist: [0, 0], abduct: [-20, 80] } },
+    thumbTip: digit('thumb') { part: hand.thumbTip, parent: 'thumb', limits: { flex: [0, 80], twist: [0, 0], abduct: [0, 0] } },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0],
                  limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },
     shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0],
                 limits: { flex: [0, 140], twist: [0, 0], abduct: [0, 0] } },
     foot: leg { part: 'foot', parent: 'shin', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: [0, 0, 1] },
                 limits: { flex: [-30, 45], twist: [-10, 10], abduct: [-20, 20] } },
-  },
+  } + fingerBones,
 }
