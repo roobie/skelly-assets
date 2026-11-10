@@ -76,6 +76,14 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   near: near,
   far: far,
   bothSides(pieces): std.map(near, pieces) + std.map(far, pieces),
+  // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
+  moved(piece, by):
+    local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
+    if piece.kind == 'box' then piece { min: [piece.min[i] + by[i] for i in [0, 1, 2]], max: [piece.max[i] + by[i] for i in [0, 1, 2]] }
+    else if piece.kind == 'turned' then piece { origin: [piece.origin[i] + by[i] for i in [0, 1, 2]] }
+    else
+      local along = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[piece.axis];
+      piece { profile: shift(piece.profile, along[1], along[2]), start: piece.start + by[along[0]], end: piece.end + by[along[0]] },
   // A vehicle whose pressing would be identical to a sibling's fits the sibling's row instead, so a shared part is one
   // row, item and model. A spec's `borrow` maps each such pressing's suffix to the row it fits; `borrows` tells whether a
   // pressing is borrowed, `partId` names the row a fitting takes and `unborrowed` drops the borrowed pressings from a kit's rows.
