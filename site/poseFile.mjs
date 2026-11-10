@@ -17,10 +17,13 @@
 // file can curl a hand and then open one finger. A held item,
 // `hold: { <hand bone>: { model, at?, turn?, pole?, socket, close? } }`, is placed after the reach: the palm is set on the
 // item's socket and the fingers then closed on the item by contact, so the grip is read off the item, not drawn by hand.
+// A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
+// end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
+// so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
 import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem } from './fingers.mjs';
 
-const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold']);
+const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold', 'moved']);
 const REACH_KEYS = new Set(['target', 'pole']);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -54,6 +57,14 @@ export function poseIssues(rig, file) {
   });
   bonesOf('hands', file.hands, (id, hand) => issues.push(...handIssues(rig, id, hand)));
   bonesOf('hold', file.hold, (id, hold) => issues.push(...holdIssues(rig, id, hold)));
+  if (file.moved !== undefined) {
+    if (!isObject(file.moved)) issues.push('moved maps held models to their moved parts');
+    else for (const [model, parts] of Object.entries(file.moved)) {
+      if (!Object.values(file.hold ?? {}).some((hold) => hold?.model === model)) issues.push(`moved.${model}: no hand holds ${model}`);
+      if (!isObject(parts)) issues.push(`moved.${model} maps part names to shares 0..1`);
+      else for (const [part, share] of Object.entries(parts)) if (!(Number.isFinite(share) && share >= 0 && share <= 1)) issues.push(`moved.${model}.${part} is a share 0..1`);
+    }
+  }
   if (file.level !== undefined) {
     if (!Array.isArray(file.level)) issues.push('level lists bone ids');
     else for (const id of file.level) if (!bones.has(id)) issues.push(`level: the rig has no bone ${id}`);

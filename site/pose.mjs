@@ -18,7 +18,7 @@ import { FRONT_QUARTER } from './modelFrame.mjs';
 import { clipIssues, compilePose, decodeFrame, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
 import { samplePose } from './poseSample.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
-import { drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
+import { drawEye, drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
 const ISSUE_COLOUR = { pokes: 0xd0301a, sinks: 0xe0901a };
 const IDENTITY_Q = [0, 0, 0, 1];
@@ -206,12 +206,65 @@ function drawTile(obj, size, views, { framed = obj, shown = [obj] } = {}) {
   return tile.toDataURL('image/png');
 }
 
-// The items a pose file holds, each loaded once at the origin: its object to carry and its mesh for the grip to close on.
+// The figure's eyes: half the head's height above the head's joint, a little inside its face, looking the way the head
+// faces; the head is not drawn from there, as the camera stands inside it.
+const EYES_INSIDE_FACE = 0.02;
+function eyesOf(figure) {
+  const { bone, joint } = figure.bones.get('head');
+  const { min, max } = bone.bind.box;
+  const eye = joint.localToWorld(new THREE.Vector3(0, (max[1] - min[1]) / 2, max[2] - bone.head[2] - EYES_INSIDE_FACE));
+  const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(joint.getWorldQuaternion(new THREE.Quaternion()));
+  return { eye, forward, head: joint };
+}
+
+// Two views of the figure, `size` pixels each: from its own eyes, as a player sees what the hands do, beside the front
+// three-quarter that shows where it stands.
+function drawEyeTile(obj, size, figure) {
+  drawer ??= makeDrawer();
+  const { eye, forward, head } = eyesOf(figure);
+  const box = new THREE.Box3().setFromObject(obj);
+  const grid = groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())));
+  const { tile, g } = startTile(size, 2, 1);
+  const hidden = [];
+  head.traverse((o) => { if (o.isMesh) { o.visible = false; hidden.push(o); } });
+  drawer.stage.add(obj, grid);
+  drawEye(drawer, g, 'eyes', eye, forward, 0, 0, size);
+  for (const o of hidden) o.visible = true;
+  drawView(drawer, g, obj, grid, ['front ¾', new THREE.Vector3(...FRONT_QUARTER)], size, 0, size);
+  drawer.stage.remove(obj, grid);
+  ruleAt(g, { x: size }, tile.height);
+  return tile.toDataURL('image/png');
+}
+
+// The node of `obj` marked as the part `part`; the model needs exactly one.
+function partNode(obj, model, part) {
+  const found = [];
+  obj.traverse((node) => { if (node.userData.part === part) found.push(node); });
+  if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
+  return found[0];
+}
+
+// Slides the part `part` of `obj` the share `share` of the way along its linear motion, whose ends are in the part's own
+// axes and in the model's unit, which the model's root node states (the gun exporter's `gungen` extras).
+function movePart(obj, model, part, share) {
+  const node = partNode(obj, model, part);
+  const { motion } = node.userData;
+  if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
+  let unit;
+  for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
+  if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
+  const stroke = new THREE.Vector3(...motion.rearmost).sub(new THREE.Vector3(...motion.rest)).multiplyScalar(share * unit);
+  node.position.add(stroke.applyQuaternion(node.quaternion));
+}
+
+// The items a pose file holds, each loaded once at the origin, its parts moved as the file says: its object to carry
+// and its mesh for the grip to close on.
 async function heldItems(file) {
   const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
   return new Map(await Promise.all(models.map(async (model) => {
     const { scene } = await loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] });
     const obj = scene.clone(true);
+    for (const [part, share] of Object.entries(file.moved?.[model] ?? {})) movePart(obj, model, part, share);
     obj.updateMatrixWorld(true);
     return [model, { obj, mesh: worldMesh(obj) }];
   })));
@@ -228,8 +281,8 @@ function carry(figure, items, { model, r, t }) {
 }
 
 // The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, holding what the pose holds,
-// drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, with the compile report,
-// the clearance probe's findings when asked and the frame the pose compiled to.
+// drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, or from its own eyes when
+// `views` is `eye`, with the compile report, the clearance probe's findings when asked and the frame the pose compiled to.
 async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, focus } = {}) {
   const data = await ready;
   const figure = await buildFigure(data, wear);
@@ -244,7 +297,8 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
   if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
   const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carried] };
-  return { png: drawTile(figure.root, size, views, closeUp), report, clearance: found, frame };
+  const png = views === 'eye' ? drawEyeTile(figure.root, size, figure) : drawTile(figure.root, size, views, closeUp);
+  return { png, report, clearance: found, frame };
 }
 
 window.posed = posed;

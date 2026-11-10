@@ -59,3 +59,22 @@ export function drawView({ renderer, stage, camera }, g, framed, grid, [name, di
   g.fillStyle = '#5b574f';
   g.fillText(name, x + 6, y + 6);
 }
+
+// Draws the stage as seen from `eye` looking along `forward` into `size` pixels of the tile at (x, y): a first-person
+// view, wide like a game's and framed on nothing, with the view's name.
+const EYE_FOV = 70;
+export function drawEye({ renderer, stage, camera }, g, name, eye, forward, x, y, size) {
+  renderer.setSize(size, size, false);
+  camera.fov = EYE_FOV;
+  camera.near = 0.02;
+  camera.far = 100;
+  camera.up.set(0, 1, 0);
+  camera.position.copy(eye);
+  camera.lookAt(eye.clone().add(forward));
+  camera.updateProjectionMatrix();
+  renderer.render(stage, camera);
+  camera.fov = 30;
+  g.drawImage(renderer.domElement, x, y);
+  g.fillStyle = '#5b574f';
+  g.fillText(name, x + 6, y + 6);
+}
