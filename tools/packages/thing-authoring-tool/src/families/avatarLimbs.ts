@@ -1,10 +1,14 @@
-import type { BoxSolid, ExtrudedPolygonSolid } from '@skelly/construct/shapes/solid.ts';
+import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { parse, picklist, strictObject } from 'valibot';
-import { block, slab } from './body.ts';
-import { positive } from './shapes.ts';
+import { block, oval, slab, taper } from './body.ts';
+import { positive, requireConvex, spheroid } from './shapes.ts';
 
 // The player's limbs hang from their joint: origin on the joint at the limb's top, y up, the limb down -y, front
 // toward +z. Each limb is mirror-symmetric in x, so one model serves either side, and code poses it about its joint.
+// Every solid stays within the measures a worn shell is fitted to: a segment tapers toward its lower joint and ends
+// in a round cap of the lower segment's section, so a bent joint turns on a ball instead of opening a wedge.
+
+type LimbSolid = ExtrudedPolygonSolid | BoxSolid | RevolvedSolid;
 
 /**
  * The arm's segments, each its own part so the view can bend the arm at its joints
@@ -16,7 +20,7 @@ const ARM_SEGMENTS = ['upper', 'fore', 'palm', 'fingers', 'thumb'] as const;
  * One segment of a bare arm, the hand edge-on to the thigh with its
  * thumb forward. The whole arm's measures come in, so every segment is drawn from the same figures.
  */
-export const avatarArm = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid)[] => {
+export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[] => {
   const d = parse(
     strictObject({
       segment: picklist(ARM_SEGMENTS),
@@ -58,7 +62,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): (ExtrudedPo
   const elbow = -d.upperLength;
   const wrist = elbow - d.foreLength;
   const knuckles = wrist - d.palmLength;
-  const tips = knuckles - d.fingerLength;
   const halfPalm = d.palmWidth / 2;
   const halfThick = d.palmThickness / 2;
   const wristTop = wrist + d.foreLength * d.wristShare;
@@ -74,52 +77,51 @@ export const avatarArm = (params: Readonly<Record<string, string>>): (ExtrudedPo
   };
   const [originY, originZ] = origins[d.segment];
   const ys = (bottom: number, top: number): [number, number] => [bottom - originY, top - originY];
+  const upperHalfX = d.upperWidth / 2;
+  const upperHalfZ = d.upperDepth / 2;
+  const foreHalfX = d.foreWidth / 2;
+  const foreHalfZ = d.foreWidth / 2 + d.foreDepthExtra;
+  const wristHalfX = d.wristWidth / 2;
+  const wristHalfZ = d.wristWidth / 2 + d.wristDepthExtra;
   switch (d.segment) {
     case 'upper':
       return [
-        slab('upper-arm', 'skin', ys(elbow, 0), {
-          halfX: d.upperWidth / 2,
-          halfZ: d.upperDepth / 2,
-          chamfer: d.armChamfer,
-        }),
+        // The named solid spans the whole segment at its narrow end, so the anchors on it keep their places.
+        oval('upper-arm', 'skin', ys(elbow, 0), { halfX: upperHalfX * 0.82, halfZ: upperHalfZ * 0.82, power: 2.4 }),
+        ...taper('upper-arm-flesh', 'skin', ys(elbow + d.upperLength * 0.15, 0), [{ halfX: upperHalfX * 0.84, halfZ: upperHalfZ * 0.84 }, { halfX: upperHalfX, halfZ: upperHalfZ }], { slices: 4, power: 2.4 }),
+        spheroid('elbow', [0, elbow - originY, 0], [foreHalfZ * 0.9, foreHalfX * 0.95], ['x', 'skin']),
       ];
     case 'fore':
       return [
-        slab('forearm', 'skin', ys(wristTop, elbow + d.seamOverlap), {
-          halfX: d.foreWidth / 2,
-          halfZ: d.foreWidth / 2 + d.foreDepthExtra,
-          chamfer: d.armChamfer,
-        }),
-        slab('wrist', 'skin', ys(wrist, wristTop + d.seamOverlap), {
-          halfX: d.wristWidth / 2,
-          halfZ: d.wristWidth / 2 + d.wristDepthExtra,
-          chamfer: d.wristChamfer,
-        }),
+        oval('forearm', 'skin', ys(wristTop + d.foreLength * 0.12, elbow + d.seamOverlap), { halfX: foreHalfX, halfZ: foreHalfZ, power: 2.4 }),
+        oval('forearm-low', 'skin', ys(wristTop - d.foreLength * 0.08, wristTop + d.foreLength * 0.16), { halfX: (foreHalfX + wristHalfX) / 2, halfZ: (foreHalfZ + wristHalfZ) / 2, power: 2.4 }),
+        oval('wrist', 'skin', ys(wrist, wristTop + d.seamOverlap), { halfX: wristHalfX, halfZ: wristHalfZ, power: 2.6 }),
       ];
     case 'palm':
       return [
-        block('palm', 'skin', [-halfThick, halfThick], ys(knuckles, wrist + d.handOverlap), [-halfPalm, halfPalm]),
+        // The palm's edges are rounded, and the knuckles ridge the back of the hand, -x.
+        slab('palm', 'skin', ys(knuckles, wrist + d.handOverlap), { halfX: halfThick, halfZ: halfPalm, chamfer: 0.02 }),
+        block('knuckles', 'skin', [-halfThick - 0.002, -halfThick + 0.004], ys(knuckles, knuckles + 0.014), [-halfPalm + 0.004, halfPalm * d.fingerFrontShare - 0.004]),
       ];
-    case 'fingers':
+    case 'fingers': {
+      // Four fingers across the palm, the index at the thumb's side, +z, each a shade shorter toward the little one.
+      const gap = 0.0035;
+      const span = halfPalm + halfPalm * d.fingerFrontShare;
+      const width = (span - 3 * gap) / 4;
+      const shares = [0.94, 1, 0.92, 0.78];
+      const thick = halfThick * d.fingerThicknessShare;
+      return shares.map((share, i) => {
+        const front = halfPalm * d.fingerFrontShare - i * (width + gap);
+        return block(['little', 'ring', 'middle', 'index'][3 - i]!, 'skin', [-thick, thick], ys(knuckles - d.fingerLength * share, knuckles + d.handOverlap), [front - width, front]);
+      });
+    }
+    case 'thumb': {
+      const thick = halfThick * d.thumbThicknessShare;
       return [
-        block(
-          'fingers',
-          'skin',
-          [-halfThick * d.fingerThicknessShare, halfThick * d.fingerThicknessShare],
-          ys(tips, knuckles + d.handOverlap),
-          [-halfPalm, halfPalm * d.fingerFrontShare],
-        ),
+        block('thumb', 'skin', [-thick, thick], ys(thumbRoot - d.thumbLength * 0.6, thumbRoot), [thumbEdge - originZ, halfPalm + d.thumbProjection - originZ]),
+        block('thumb-tip', 'skin', [-thick * 0.8, thick * 0.8], ys(thumbRoot - d.thumbLength, thumbRoot - d.thumbLength * 0.55), [thumbEdge - originZ + 0.002, halfPalm + d.thumbProjection - originZ - 0.002]),
       ];
-    case 'thumb':
-      return [
-        block(
-          'thumb',
-          'skin',
-          [-halfThick * d.thumbThicknessShare, halfThick * d.thumbThicknessShare],
-          ys(thumbRoot - d.thumbLength, thumbRoot),
-          [thumbEdge - originZ, halfPalm + d.thumbProjection - originZ],
-        ),
-      ];
+    }
     default:
       return d.segment satisfies never;
   }
@@ -135,7 +137,7 @@ const LEG_SEGMENTS = ['thigh', 'shin', 'foot'] as const;
  * One segment of a bare leg whose foot lies `length` below the hip joint.
  * The whole leg's measures come in, so every segment is drawn from the same figures.
  */
-export const avatarLeg = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid)[] => {
+export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[] => {
   const d = parse(
     strictObject({
       segment: picklist(LEG_SEGMENTS),
@@ -165,35 +167,59 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): (ExtrudedPo
   const knee = -d.thighLength;
   const sole = -d.length;
   const ankle = sole + d.shoeHeight;
-  const halfShoe = d.shoeWidth / 2;
+  const halfShoe = d.shoeWidth / 2 - d.upperSideInset;
   const origin = { thigh: 0, shin: knee, foot: ankle }[d.segment];
   const ys = (bottom: number, top: number): [number, number] => [bottom - origin, top - origin];
+  const thighHalfX = d.thighWidth / 2;
+  const thighHalfZ = d.thighDepth / 2;
+  const shinHalfX = d.shinWidth / 2;
+  const shinHalfZ = d.shinDepth / 2;
   switch (d.segment) {
     case 'thigh':
       return [
-        slab('thigh', 'skin', ys(knee, 0), {
-          halfX: d.thighWidth / 2,
-          halfZ: d.thighDepth / 2,
-          chamfer: d.thighChamfer,
-        }),
+        // The named solid spans the whole segment at the knee's section, so the anchors on it keep their places.
+        oval('thigh', 'skin', ys(knee, 0), { halfX: shinHalfX * 1.05, halfZ: shinHalfZ * 1.05, power: 2.6 }),
+        ...taper('thigh-flesh', 'skin', ys(knee + d.thighLength * 0.12, 0), [{ halfX: shinHalfX * 1.1, halfZ: shinHalfZ * 1.1 }, { halfX: thighHalfX, halfZ: thighHalfZ }], { slices: 5, power: 2.6 }),
+        spheroid('knee', [0, knee - origin, 0], [shinHalfZ, shinHalfX * 1.08], ['x', 'skin']),
       ];
-    case 'shin':
+    case 'shin': {
+      const shinLength = knee - ankle;
       return [
-        slab('shin', 'skin', ys(ankle - d.ankleOverlap, knee + d.kneeOverlap), {
-          halfX: d.shinWidth / 2,
-          halfZ: d.shinDepth / 2,
-          chamfer: d.shinChamfer,
-        }),
+        oval('shin', 'skin', ys(ankle - d.ankleOverlap, knee + d.kneeOverlap), { halfX: shinHalfX * 0.74, halfZ: shinHalfZ * 0.76, power: 2.6 }),
+        oval('calf', 'skin', ys(knee - shinLength * 0.55, knee + d.kneeOverlap), { halfX: shinHalfX, halfZ: shinHalfZ, power: 2.6, cz: -0.004 }),
+        oval('shin-mid', 'skin', ys(knee - shinLength * 0.75, knee - shinLength * 0.5), { halfX: shinHalfX * 0.88, halfZ: shinHalfZ * 0.9, power: 2.6, cz: -0.002 }),
       ];
-    case 'foot':
+    }
+    case 'foot': {
+      // A bare foot: a round heel under the ankle, an instep wedge sloping down to a row of toes.
+      const heelBack = -d.heelReach + d.upperLengthInset;
+      const toeFront = d.toeReach - d.upperLengthInset - d.upperBackShift;
+      const toeTop = sole + d.shoeHeight * 0.3;
+      // In the x-axis profile's (y, z) plane, counterclockwise runs instep top, toe root, sole, heel.
+      const instep: Vec2[] = [
+        [ankle + 0.008 - origin, 0.045],
+        [toeTop - origin, toeFront - 0.04],
+        [sole - origin, toeFront - 0.045],
+        [sole - origin, heelBack + 0.01],
+        [ankle + 0.008 - origin, heelBack + 0.02],
+      ];
+      requireConvex(instep, 'instep');
+      const toeWidths = [0.018, 0.015, 0.014, 0.013, 0.012];
+      const toeGap = (2 * halfShoe - toeWidths.reduce((sum, w) => sum + w, 0)) / (toeWidths.length - 1);
+      let edge = halfShoe;
+      const toes = toeWidths.map((width, i) => {
+        const toe = block(['big', 'second', 'third', 'fourth', 'little'][i]!, 'skin', [edge - width, edge], ys(sole, sole + d.shoeHeight * 0.28 - i * 0.002), [toeFront - 0.045, toeFront - i * 0.004]);
+        edge -= width + toeGap;
+        return toe;
+      });
       return [
-        slab('foot', 'skin', ys(sole, ankle), {
-          halfX: halfShoe - d.upperSideInset,
-          halfZ: (d.heelReach + d.toeReach) / 2 - d.upperLengthInset,
-          chamfer: d.shoeChamfer,
-          cz: (d.toeReach - d.heelReach) / 2 - d.upperBackShift,
-        }),
+        oval('heel', 'skin', ys(sole, ankle - 0.015), { halfX: halfShoe * 0.95, halfZ: 0.05, power: 2.6, cz: heelBack + 0.05 }),
+        spheroid('ankle', [0, 0, 0], [shinHalfZ * 0.8, shinHalfX * 0.8], ['x', 'skin']),
+        { id: 'instep', kind: 'extruded-polygon', axis: 'x', profile: instep, z: [-halfShoe, halfShoe], slot: 'skin' },
+        // The model is the right foot, so the big toe is on its inner side, +x; the left foot is its mirror.
+        ...toes,
       ];
+    }
     default:
       return d.segment satisfies never;
   }
