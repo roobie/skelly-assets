@@ -7,6 +7,8 @@
   decks: [{ waist: 2.1, top: 3.05, bayFront: 5.35, pitch: 1.45, bays: 7 }],
   frontAxle: 3.2, rearAxle: -2.9, arch: 0.62, archTop: 1.2, frontWell: 0.86, rearWell: 0.6,
   wheel: 'wheel_295_80r22_5', wheelR: 0.522, wheelZ: 1.1, wheelTwin: 0.3,
+  // A modern coach brakes on air discs.
+  wheelBrakes: 'disc',
   lean: 0.35, screens: [[1.34, 3.1]], screenPost: true, pillar: 0.1,
   doors: [{ bay: 0, width: 0.95 }], doorLeaves: 1, doorSteps: 4, doorSill: 0.35, doorKick: 0.3, doorFinish: 'plastic-black',
   rearHoles: [{ y: [2.3, 3.05], z: 0.9 }], engineHatch: [0.55, 1.75],

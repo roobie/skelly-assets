@@ -4,6 +4,8 @@
   floor: 1.22, waist: 2.14, roof: 2.86, lean: 0.2,
   frontAxle: 3.68, rearAxles: [-1.9],
   wheel: 'wheel_295_80r22_5', r: 0.522, wheelW: 0.295,
+  // A modern European rigid brakes on air discs.
+  wheelBrakes: 'disc',
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_diesel', engineLength: 0.86, gearbox: 'gearbox_truck', radiator: 'radiator_truck',
   paint: 'paint-drum-blue',

@@ -4,6 +4,8 @@
   floor: 1.22, waist: 2.16, roof: 2.9, lean: 0.2,
   frontAxle: 3.0, rearAxles: [-1.85, -3.2],
   wheel: 'wheel_295_80r22_5', r: 0.522, wheelW: 0.295,
+  // A tipper keeps air drums, which stand up to site work better than discs.
+  wheelBrakes: 'drum',
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-crane-yellow',

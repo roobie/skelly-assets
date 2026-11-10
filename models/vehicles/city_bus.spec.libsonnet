@@ -10,6 +10,8 @@ local single = bus.single;
   decks: [{ waist: 1.15, top: 2.55, bayFront: 5.6, pitch: 1.35, bays: 8 }],
   frontAxle: 3.3, frontAxlePart: 'steered_axle_drop', rearAxle: -2.6, arch: 0.62, archTop: 1.12, frontWell: 0.86, rearWell: 0.6,
   wheel: 'wheel_295_80r22_5', wheelR: 0.522, wheelZ: 1.1, wheelTwin: 0.3,
+  // A low-floor bus brakes on air discs.
+  wheelBrakes: 'disc',
   lean: 0.14, screens: [[0.92, 2.5]], pillar: 0.1,
   doors: [{ bay: 0 }, { bay: 3 }], doorSill: 0.3, doorKick: 0.28, doorFinish: 'plastic-black',
   rearHoles: [{ y: [1.55, 2.5], z: 0.95 }], engineHatch: [0.5, 1.4],

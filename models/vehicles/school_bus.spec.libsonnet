@@ -10,6 +10,8 @@ local benchOverWell(x) = bench(x) { y: 1.15, riser: 0.38 };
   decks: [{ waist: 1.75, top: 2.42, bayFront: 3.6, pitch: 0.8, bays: 11 }],
   frontAxle: 4.4, rearAxle: -2.2, arch: 0.62, archTop: 1.14, frontWell: 0.86, rearWell: 0.56,
   wheel: 'wheel_295_80r22_5', wheelR: 0.522, wheelZ: 1.05, wheelTwin: 0.3,
+  // A bonneted school bus brakes on air drums.
+  wheelBrakes: 'drum',
   bonnet: { cowl: 3.75, cowlY: 1.72, noseY: 1.5, flankY: 0.72, halfWidth: 0.88 },
   lean: 0.2, screens: [[1.72, 2.62]], screenPost: true, pillar: 0.1,
   doors: [{ bay: 0 }], doorLeaves: 1, doorSill: 0.5, doorKick: 0.42, doorSteps: 2, doorFinish: 'paint-signal-yellow',

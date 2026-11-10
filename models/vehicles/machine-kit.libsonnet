@@ -11,15 +11,17 @@ local axleDisc(id, slot, x, y, radius, z, sides=24) =
   axleDisc: axleDisc,
   // A driven axle in `beamAxle`'s frame (`shared.libsonnet`), its housing and drums sized for the drawn steel to carry
   // an all-wheel-drive truck's axle weight; a steered one adds the knuckles its front wheels turn on. Its spring seats
-  // span `seatZ`, under the springs of the chassis it hangs from.
-  driveAxle(id, massKg, halfTrack, steered, seatZ=[halfTrack - 0.36, halfTrack - 0.22])::
+  // span `seatZ`, under the springs of the chassis it hangs from. Without `drums` it leaves them to wheels that carry
+  // the wheel kit's (`wheel-kit.libsonnet`).
+  driveAxle(id, massKg, halfTrack, steered, seatZ=[halfTrack - 0.36, halfTrack - 0.22], drums=true)::
     k.compound(id, massKg, [
       k.turned('beam', 'steel', 'z', k.disc(0.09, -halfTrack, halfTrack), [0, 0.52, 0]) + { sides: 12 },
       box('diff', 'steel', [-0.2, 0.33, -0.19], [0.2, 0.71, 0.19]),
     ] + k.bothSides([
       box('spring_seat', 'steel', [-0.09, 0.6, seatZ[0]], [0.09, 0.64, seatZ[1]]),
+    ] + (if drums then [
       k.turned('drum', 'steel', 'z', k.disc(0.21, halfTrack - 0.14, halfTrack), [0, 0.52, 0]) + { sides: 12 },
-    ] + (if steered then [box('knuckle', 'steel', [-0.12, 0.36, halfTrack - 0.3], [0.12, 0.68, halfTrack - 0.14])] else [])), { steel: 'steel-grey' }),
+    ] else []) + (if steered then [box('knuckle', 'steel', [-0.12, 0.36, halfTrack - 0.3], [0.12, 0.68, halfTrack - 0.14])] else [])), { steel: 'steel-grey' }),
   // A tyre on its hub at the origin, lugged when `lugs` is above zero so it reads as off-road.
   wheel(id, massKg, width, rim, outer, lugs=0, lug=0.025, hub='steel-grey')::
     local body = outer - (if lugs > 0 then lug else 0);
