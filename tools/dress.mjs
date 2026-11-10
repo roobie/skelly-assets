@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { glbJson } from './glb.mjs';
+import { glbAccessor, glbJson } from './glb.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -44,9 +44,9 @@ const nodeTransform = ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale
 // ---- reading a built model ----
 
 // Each mesh node of a GLB's scene with the part it belongs to (the nearest node marking `extras.part`, as the export
-// does), that part node's origin in the model frame and the node's box in the model frame.
-function meshNodes(buffer) {
-  const gltf = glbJson(buffer);
+// does), that part node's origin in the model frame, the node's box in the model frame, its mesh and the transform from
+// the node's frame to the model frame.
+function meshNodes(buffer, gltf = glbJson(buffer)) {
   const found = [];
   const walk = (index, toModel, part) => {
     const node = gltf.nodes[index];
@@ -58,7 +58,7 @@ function meshNodes(buffer) {
         const { min, max } = gltf.accessors[attributes.POSITION];
         return boxOf(corners({ min, max }).map(here));
       }));
-      found.push({ part: own, box });
+      found.push({ part: own, box, mesh: gltf.meshes[node.mesh], toModel: here });
     }
     for (const child of node.children ?? []) walk(child, here, own);
   };
@@ -82,17 +82,41 @@ export function modelParts(buffer) {
   return [...byName.values()];
 }
 
+const TRIANGLES = 4;
+
+// Each part of a model as one triangle mesh in the model frame, { part, positions: xyz triples, indices }, so a check can
+// test points against the part's surface.
+export function modelMeshes(buffer) {
+  const gltf = glbJson(buffer);
+  const byName = new Map();
+  for (const { part, mesh, toModel } of meshNodes(buffer, gltf)) {
+    if (!part) continue;
+    const into = byName.get(part.name) ?? { part: part.name, positions: [], indices: [] };
+    byName.set(part.name, into);
+    for (const { attributes, indices, mode = TRIANGLES } of mesh.primitives) {
+      if (mode !== TRIANGLES) throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
+      const base = into.positions.length / 3;
+      const positions = glbAccessor(buffer, gltf, attributes.POSITION);
+      for (let i = 0; i < positions.length; i += 3) into.positions.push(...toModel(positions.slice(i, i + 3)));
+      const order = indices === undefined ? Array.from({ length: positions.length / 3 }, (_, i) => i) : glbAccessor(buffer, gltf, indices);
+      for (const index of order) into.indices.push(base + index);
+    }
+  }
+  return [...byName.values()];
+}
+
 // ---- the doll ----
 
-// The doll's sites and, for each of its part names, the copies of that part in the doll frame as
-// { side, at, box, mirror }, in the order of the dressing's sides. `figure` holds each doll model's `parts` (modelParts) and `anchors`
-// (its things sidecar).
+// The doll's sites, for each of its part names the copies of that part in the doll frame as
+// { side, site, at, box, mirror }, in the order of the dressing's sides, where `site` indexes the doll site that draws
+// the copy, and the bust's anchors, which are in the doll frame too. `figure` holds each doll model's `parts`
+// (modelParts) and `anchors` (its things sidecar).
 export function dollOf(dressing, figure) {
   const { bust, limbs, sides, mirrored: mirroredSide } = dressing.doll;
   const sites = [{ model: bust, at: [0, 0, 0] }];
   const parts = new Map();
   const add = (copy) => parts.set(copy.part, [...(parts.get(copy.part) ?? []), copy]);
-  for (const { part, at, box } of figure[bust].parts) add({ part, side: 'centre', at, box });
+  for (const { part, at, box } of figure[bust].parts) add({ part, side: 'centre', site: 0, at, box });
   for (const { model, anchor } of limbs) {
     const own = figure[model].anchors[anchor];
     for (const side of sides) {
@@ -100,14 +124,14 @@ export function dollOf(dressing, figure) {
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
       const flip = mirror ? mirrorX : (p) => p;
-      sites.push({ model, at: difference(hung, flip(own)), ...(mirror ? { mirror } : {}) });
+      const site = sites.push({ model, at: difference(hung, flip(own)), ...(mirror ? { mirror } : {}) }) - 1;
       for (const { part, at, box } of figure[model].parts) {
         const local = moved(box, difference([0, 0, 0], own));
-        add({ part, side, at: sum(hung, flip(difference(at, own))), box: moved(mirror ? mirrored(local) : local, hung), ...(mirror ? { mirror } : {}) });
+        add({ part, side, site, at: sum(hung, flip(difference(at, own))), box: moved(mirror ? mirrored(local) : local, hung), ...(mirror ? { mirror } : {}) });
       }
     }
   }
-  return { sites, parts };
+  return { sites, parts, anchors: figure[bust].anchors };
 }
 
 // ---- dressing ----
@@ -157,7 +181,8 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) 
   };
   const pieces = wornPieces(model.id, models, dressing);
   if (pieces.length > 0) {
-    return [...sites, ...pieces.flatMap(({ model: piece, part }) => copiesOf(part).map(({ at, mirror }) => ({ model: piece, at, ...(mirror ? { mirror } : {}) })))];
+    // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part.
+    return [...sites, ...pieces.flatMap(({ model: piece, part }) => copiesOf(part).map(({ side, at, mirror }) => ({ model: piece, part, side, at, ...(mirror ? { mirror } : {}) })))];
   }
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));

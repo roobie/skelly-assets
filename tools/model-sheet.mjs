@@ -12,15 +12,14 @@
 // (site/lookOptions.mjs), so parts a body hides can be drawn on their own.
 // Writes <out>/tiles/<id>.png, <out>/sheet.json and <out>/index.html; rows of earlier looks into the same folder with
 // the same options stay.
-import { execFileSync } from 'node:child_process';
-import { createReadStream, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
-import { createServer } from 'node:http';
-import { extname, join, resolve, sep } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { viewSet } from '../site/lookOptions.mjs';
 import { LOOK_DIR, lookDigest, lookIds, lookName, mergeRows } from './look.mjs';
 import { MANIFEST } from './manifest.mjs';
+import { buildSite, launchBrowser, openPage, serveSite } from './reviewSite.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const { values, positionals } = parseArgs({
@@ -51,47 +50,20 @@ const writeAtomic = (path, data) => {
 // ---- the showcase, served to the browser ----
 
 const site = join(out, 'site');
-execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, '--no-tree', site], { stdio: ['ignore', 'ignore', 'inherit'] });
+buildSite(built, site);
 const { assemblies, models } = JSON.parse(readFileSync(join(site, 'models.json'), 'utf8'));
 const worn = Object.fromEntries(models.filter((model) => model.worn).map(({ id, worn: sites }) => [id, sites]));
 const manifest = { ...JSON.parse(readFileSync(join(built, MANIFEST), 'utf8')), assemblies, worn };
 const ids = lookIds(manifest, { ids: positionals, vehicles: values.vehicles, assemblies: values.assemblies });
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary' };
-const isFile = (path) => existsSync(path) && statSync(path).isFile();
-// The showcase built without its tree holds only the files it rewrites, such as plain clips; the rest come from the tree.
-const sitePath = (pathname) => {
-  const path = resolve(site, `.${pathname}`);
-  if (!path.startsWith(site + sep)) return undefined;
-  if (isFile(path) || !pathname.startsWith('/built/')) return path;
-  const fromTree = resolve(built, `.${pathname.slice('/built'.length)}`);
-  return fromTree.startsWith(built + sep) ? fromTree : undefined;
-};
-const server = createServer((request, response) => {
-  const path = sitePath(decodeURIComponent(new URL(request.url, 'http://look').pathname));
-  if (!path || !isFile(path)) {
-    response.writeHead(404).end();
-    return;
-  }
-  response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' });
-  createReadStream(path).pipe(response);
-});
-await new Promise((done) => server.listen(0, '127.0.0.1', done));
+const server = await serveSite(site, built);
 
 // ---- drawing ----
 
-const { chromium } = await import('playwright');
-// Headless Chromium has no GPU, so WebGL runs on the SwiftShader software rasteriser.
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const browser = await launchBrowser();
 const drawn = [];
 const started = performance.now();
 try {
-  const page = await browser.newPage();
-  const pageErrors = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.goto(`http://127.0.0.1:${server.address().port}/look.html`);
-  await page.waitForFunction(() => typeof window.look === 'function', undefined, { timeout: 30_000 }).catch(() => {
-    throw new Error(`the review page did not start: ${pageErrors.join('; ') || 'no error reported'}`);
-  });
+  const { page } = await openPage(browser, server.origin, 'look.html', 'look');
   mkdirSync(join(out, 'tiles'), { recursive: true });
   for (const id of ids) {
     const digest = lookDigest(built, manifest, id);
