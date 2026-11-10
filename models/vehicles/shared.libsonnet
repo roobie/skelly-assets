@@ -464,7 +464,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   inline('engine_i3_small', 85, 0.34, 0.42, 0.52),
   inline('engine_i4_petrol', 140, 0.46, 0.46, 0.55),
   inline('engine_i4_diesel', 185, 0.5, 0.5, 0.62),
-  inline('engine_i6_diesel', 520, 0.86, 0.56, 0.75),
+  inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75),
   inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95),
   vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6),
   vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68),
