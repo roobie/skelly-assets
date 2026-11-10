@@ -6,6 +6,7 @@ local s = t.spec(import 'bucket_truck.spec.libsonnet');
     site.one('subframe', 'bucket_truck_subframe'),
     site.one('turret', 'bucket_truck_turret'),
     site.one('lower_boom', 'bucket_truck_lower_boom'),
+    site.one('hydraulics', 'bucket_truck_hydraulics'),
     site.one('cradle', 'bucket_truck_cradle'),
     site.one('knuckle', 'bucket_truck_knuckle'),
     site.one('insulated_boom', 'bucket_truck_insulated_boom'),
