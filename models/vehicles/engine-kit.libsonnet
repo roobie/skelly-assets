@@ -1,9 +1,8 @@
-// An engine as a fused core and its class's salvageable accessories (`engine-classes.libsonnet`), and the two ways a
-// vehicle fits it: one fused model, or the core with each accessory at its own site, so each is its own loot. Both are
-// drawn from the same pieces and weigh the same, so a vehicle or a mod picks the detail without changing what it is.
-// An engine's frame is `shared.libsonnet`'s: x forward along the crank, y up from the sump's base, centred on x and z.
+// An engine as an assembly (`assembly.libsonnet`): a core and its class's salvageable accessories
+// (`engine-classes.libsonnet`). An engine's frame is `shared.libsonnet`'s: x forward along the crank, y up from the
+// sump's base, centred on x and z.
 local k = import 'kit.libsonnet';
-local site = import 'site.libsonnet';
+local assembly = import 'assembly.libsonnet';
 local classes = import 'engine-classes.libsonnet';
 local engines = import 'engines.libsonnet';
 local box = k.box;
@@ -128,8 +127,6 @@ local mounts(name) =
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
   };
-local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-
 // The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round.
 local core(name) =
   local e = engines[name];
@@ -159,47 +156,29 @@ local core(name) =
     finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' },
   };
 
-// An accessory's pieces in the engine's frame, renamed after it so they cannot clash with the core's.
-local fitted(drawn, role, at) = {
-  pieces: [
-    k.moved(piece, at) + { id: role + '_' + piece.id, slot: role + '_' + piece.slot }
-    for piece in drawn.pieces
-  ],
-  finish: { [role + '_' + slot]: drawn.finish[slot] for slot in std.objectFields(drawn.finish) },
-};
-
-local engineRows(name) =
-  local e = engines[name];
+// The engine's accessories as `assembly.libsonnet` fits them, in the order a vehicle lists their sites.
+local fittings(name) =
   local c = classOf(name);
-  local body = core(name);
-  local dressed = [fitted(a.draw(c), a.site, mounts(name)[a.key]) for a in accessories];
-  local accessoryMass = std.sum([c[a.key].massKg for a in accessories]);
-  assert accessoryMass < e.massKg : name + "'s accessories outweigh the whole engine";
   [
-    k.compound(coreId(name), e.massKg - accessoryMass, body.pieces, body.finish),
-    k.compound(fusedId(name), e.massKg, body.pieces + std.flattenArrays([d.pieces for d in dressed]), std.foldl(function(all, d) all + d.finish, dressed, body.finish)),
+    { site: a.site, id: c[a.key].id, massKg: c[a.key].massKg, drawn: a.draw(c), at: mounts(name)[a.key] }
+    for a in accessories
   ];
-
-local accessoryRows(c) = [
-  local drawn = a.draw(c);
-  k.compound(c[a.key].id, c[a.key].massKg, drawn.pieces, drawn.finish)
-  for a in accessories
-];
 
 {
   // Every engine's core and fused rows and every class's accessory rows.
-  rows: std.flattenArrays([accessoryRows(classes[name]) for name in std.objectFields(classes)])
-        + std.flattenArrays([engineRows(name) for name in std.objectFields(engines)]),
-  // A vehicle's engine sites, the engine's frame placed at `at`. `detail` picks how much of it is salvageable:
-  // 'fused' fits the whole engine as one model at the `engine` site, and 'assembly' fits the core there and each
-  // accessory at its own site.
-  sites(name, at, detail):
-    assert std.member(['fused', 'assembly'], detail) : 'an engine is fused or an assembly, not ' + detail;
-    if detail == 'fused' then [site.one('engine', fusedId(name), at)]
-    else [site.one('engine', coreId(name), at)] + [
-      site.one(a.site, classOf(name)[a.key].id, plus(at, mounts(name)[a.key]))
-      for a in accessories
-    ],
+  rows: [
+    assembly.row(c[a.key].id, c[a.key].massKg, a.draw(c))
+    for c in std.objectValues(classes)
+    for a in accessories
+  ] + std.flattenArrays([
+    assembly.rows(fusedId(name), coreId(name), engines[name].massKg, core(name), fittings(name))
+    for name in std.objectFields(engines)
+  ]),
+  // The engines, by the names `sites` takes.
+  names: std.objectFields(engines),
+  // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
+  // `assembly.libsonnet`, `sites`, says.
+  sites(name, at, detail): assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,
 }
