@@ -1,5 +1,7 @@
 import { fromEulerXyzDegrees, mulMV, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { MATERIALS } from '@skelly/thing-core/materials';
+import { NeutralModelSchema } from '@skelly/thing-core/schema';
+import { parse } from 'valibot';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
 import { buildItem, loadCatalogue } from '../src/catalogue.ts';
@@ -338,6 +340,20 @@ it('refuses a paintable slot that colours no solid', () => {
   const input = paintFixture();
   const part = { ...input.items[0]!.parts[0]!, paintable: ['glass'], finish: { paint: material, trim: material, glass: material } };
   expect(() => loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part] }] })).toThrow('paintable slot glass');
+});
+it('carries what a worn shell covers into its model entry', () => {
+  const input = fixture();
+  const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], covers: ['trunk', 'upper_arm_left'] }] });
+  const { modelEntry } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  expect(parse(NeutralModelSchema, modelEntry).covers).toEqual(['trunk', 'upper_arm_left']);
+});
+it.each([
+  ['an empty list', [], 'covers nothing'],
+  ['an id out of the id alphabet', ['Upper-Arm'], 'must be lowercase letters'],
+  ['an id named twice', ['trunk', 'trunk'], 'covers one twice'],
+])('refuses covers holding %s', (_case, covers, message) => {
+  const input = fixture();
+  expect(() => loadCatalogue({ ...input, items: [{ ...input.items[0], covers }] })).toThrow(message);
 });
 it('exports the player bust with joint anchors that seat the limbs symmetrically about the centre line', () => {
   const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;

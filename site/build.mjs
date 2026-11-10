@@ -13,9 +13,9 @@ import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
 import { modelComponents } from '../tools/components.mjs';
-import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
+import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
-import { dollRig, readRigContent } from '../tools/dollRig.mjs';
+import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
@@ -37,7 +37,7 @@ const walkSpeedOf = (clips) => {
 };
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, label, clips, body }) => ({
+  .map(({ id, pack, path, category, tags, label, clips, body, covers }) => ({
     id,
     category: category ?? null,
     label: label ?? null,
@@ -45,9 +45,10 @@ const models = manifest.models
     file: `${pack}/${path}`,
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
+    covers,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, label, clips, body }) => ({
+  .map(({ id, file, category, tags, label, clips, body, covers }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
@@ -57,6 +58,7 @@ const models = manifest.models
     clips,
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
+    ...(covers ? { covers } : {}),
   }));
 
 // A site's finish as the browser repaints with it: the manifest's material for that finish, as a game reads it.
@@ -146,13 +148,20 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
   // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
   // names the clip actor's plain clips and its walk speed, which paces its walk.
   const rig = dollRig(readRigContent(root), doll, dressing);
+  // A worn piece hides what it declares it covers, so a declaration it does not enclose would open the body to view.
+  const gaps = shown.filter(({ worn }) => worn?.some(({ covers }) => covers))
+    .flatMap(({ worn }) => coverGaps(rig, worn, (id, keep) => modelMeshes(readFileSync(join(built, modelsById.get(id).file)), keep)));
+  if (gaps.length > 0) {
+    const where = ({ piece, side, name, open, at }) => `${piece} (${side}) covers ${name}, but ${open === 'nothing' ? 'it names nothing there' : `${open} samples show, one at [${at.map((x) => x.toFixed(3))}]`}`;
+    throw new Error(`worn pieces would hide body they do not enclose:\n${gaps.map(where).join('\n')}`);
+  }
   const actor = modelsById.get(rig.clips);
   if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
   writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses }));

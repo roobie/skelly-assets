@@ -6,6 +6,7 @@ read_if:
   - an export refuses a part's mass as implausible for its drawn voxels
   - you make part of an item glow or rename a glowing material
   - you mark which of a part's finish slots take paint
+  - you make a worn shell hide the doll parts or regions under it
   - you investigate skin authoring or voxel deformation topology
 ---
 
@@ -120,3 +121,13 @@ the body never recolours trim drawn in the same colour. The build refuses a pain
 that colours no solid, because its paint would land nowhere. Why a vehicle site seeds the
 paint is in `docs/decisions/0003-vehicle-paint.md`. See `src/catalogue.ts`, `buildPart`, and
 `tools/packages/thing-export/src/appearance.ts`, `resolveAppearance`.
+
+## Covers
+
+A worn shell's row names what of the doll it hides, as `covers`: doll parts, or pieces of
+the part the shell is drawn on, and the model entry and manifest carry it to the consumer.
+A shell lies flush on the skin it is fitted to, so skin left drawn beneath shows through it.
+The row names what it covers because the shell's cut is authored there, and a consumer
+holds no list of garments. The doll draws each region it may hide as its own piece, so a
+garment that leaves the shoulders bare hides only the trunk. See `src/families/bust.ts`,
+`bust`, and `tools/packages/thing-core/src/schema.ts`, `NeutralModelSchema`.

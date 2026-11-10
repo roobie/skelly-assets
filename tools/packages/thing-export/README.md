@@ -6,6 +6,7 @@ read_if:
   - you share export recipes or file writing between authoring tools
   - you choose which pack's recipe selects a thing
   - you change or judge voxelized export
+  - you hide or detach a model's display piece on its own
   - you give an item, attachment or round its own voxel grain
 ---
 
@@ -118,6 +119,11 @@ touch only face to face, so pieces whose solids meet can still come out touching
 edge or a corner, or a cell apart. Those pieces are joined through the cells their surfaces
 meet, inside a part and across to the parts beside it; solids that do not meet stay apart.
 See `src/voxelize.ts`, `bridge`, and `src/glb.ts`, `neighboursOf`.
+
+A solid's display piece is its own primitive, and every piece is a closed surface: faces
+between two pieces are drawn on both sides, though faces between two finishes of one piece
+are not. A game hides or detaches a piece on its own, so the rest must show no hole where
+it was. See `src/glb.ts`, `voxelPrimitivesFor`.
 
 A voxelized model replaces the smooth one in place rather than shipping beside it: two
 files per model would need a selector and a second registration for no consumer that

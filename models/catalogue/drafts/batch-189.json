@@ -47,7 +47,7 @@
       "wearPerDamage": 0.004
     },
     "description": "A sleeveless cotton top with a deep round neck and wide armholes. Cool to wear and easy to move in.",
-    "notes": "Folded on a shelf, neck at +z, 240 mm by 280 mm and 24 mm tall: heather-grey cotton with a ribbed scoop neck and armholes cut into the shoulders, painted dark where the openings are. Slot `undershirt` is new: it is the base layer under a shirt, as `bra` sits under one, so a shirt or jacket can still go over it in `torso`. A tank top worn on its own also sits in that slot. The worn look is pending: no worn model is authored."
+    "notes": "Folded on a shelf, neck at +z, 240 mm by 280 mm and 24 mm tall: heather-grey cotton with a ribbed scoop neck and armholes cut into the shoulders, painted dark where the openings are. Slot `undershirt` is new: it is the base layer under a shirt, as `bra` sits under one, so a shirt or jacket can still go over it in `torso`. A tank top worn on its own also sits in that slot."
   },
   {
     "id": "thermal_shirt",
