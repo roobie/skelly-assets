@@ -29,6 +29,7 @@
   'classic_small_car': import 'classic_small_car.placements.libsonnet',
   'coach': import 'coach.placements.libsonnet',
   'combine_harvester': import 'combine_harvester.placements.libsonnet',
+  'conventional_box_truck': import 'conventional_box_truck.placements.libsonnet',
   'convertible': import 'convertible.placements.libsonnet',
   'coupe': import 'coupe.placements.libsonnet',
   'crashed_hatchback': import 'crashed_hatchback.placements.libsonnet',
