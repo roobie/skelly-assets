@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pose</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: grid; grid-template-columns: 380px 1fr; height: 100vh; overflow: hidden; font-size: 13px; }
+    aside { overflow-y: auto; padding: 12px 16px; border-right: 1px solid var(--line); }
+    main { position: relative; background: var(--stage); }
+    main canvas { display: block; width: 100%; height: 100%; }
+    section { margin-bottom: 14px; }
+    h1 { font-size: 18px; margin-bottom: 10px; }
+    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-bottom: 4px; }
+    label { display: inline-flex; gap: 6px; align-items: center; }
+    input, select, button { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; }
+    input[type=number] { width: 68px; }
+    input[type=text] { width: 220px; }
+    input[type=range] { padding: 0; border: 0; background: none; }
+    button { cursor: pointer; }
+    button.accent { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+    pre { font-size: 12px; background: var(--sunk); padding: 6px 8px; border-radius: 6px; white-space: pre-wrap; margin: 6px 0 0; min-height: 1.6em; }
+    pre.error { color: var(--accent); }
+    details.bone { border-top: 1px solid var(--line); padding: 4px 0; }
+    details.bone summary { cursor: pointer; display: flex; justify-content: space-between; list-style: none; }
+    details.bone summary::before { content: "▸ "; color: var(--muted); }
+    details.bone[open] summary::before { content: "▾ "; }
+    details.bone .angles { color: var(--muted); font-variant-numeric: tabular-nums; }
+    details.bone label { display: grid; grid-template-columns: 56px 1fr 44px; width: 100%; margin: 2px 0; }
+    details.bone label output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+    #clip-scrub { width: 100%; }
+    .muted { color: var(--muted); }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <aside>
+    <h1>Pose</h1>
+    <section>
+      <h2>Figure</h2>
+      <div class="row">
+        <label>Wear <input id="wear" type="text" placeholder="wearable ids, comma separated"></label>
+        <button id="load">Load</button>
+      </div>
+      <div class="row">
+        <label>Pose <select id="fixture"></select></label>
+        <button id="ground" title="Lift the root so the figure stands on y = 0">Ground</button>
+      </div>
+      <div class="row">
+        <label>Root <input id="root-x" type="number" step="0.01" value="0"><input id="root-y" type="number" step="0.01" value="0"><input id="root-z" type="number" step="0.01" value="0"></label>
+      </div>
+      <pre id="report">loading</pre>
+    </section>
+    <section>
+      <h2>Inverse kinematics</h2>
+      <div class="row">
+        <label>End <select id="ik-end"></select></label>
+        <button id="ik-solve" class="accent">Solve</button>
+      </div>
+      <div class="row">
+        <label>Target <input id="ik-tx" type="number" step="0.01"><input id="ik-ty" type="number" step="0.01"><input id="ik-tz" type="number" step="0.01"></label>
+      </div>
+      <div class="row">
+        <label>Pole <input id="ik-px" type="number" step="0.1" value="0"><input id="ik-py" type="number" step="0.1" value="0"><input id="ik-pz" type="number" step="0.1" value="-1"></label>
+      </div>
+      <pre id="ik-report"></pre>
+    </section>
+    <section>
+      <h2>Clip</h2>
+      <div class="row">
+        <button id="clip-add">Add frame</button>
+        <button id="clip-clear">Clear</button>
+        <span id="clip-count" class="muted">0 frames</span>
+      </div>
+      <input id="clip-scrub" type="range" min="0" max="0" step="0.01" value="0" disabled>
+      <div class="row">
+        <button id="download-clip">Download clip JSON</button>
+        <button id="download-frame">Frame JSON</button>
+        <button id="download-pose">Pose file</button>
+      </div>
+    </section>
+    <section>
+      <h2>Clearance</h2>
+      <div class="row">
+        <label><input id="probe" type="checkbox"> Probe</label>
+        <span id="probe-counts" class="muted"></span>
+      </div>
+    </section>
+    <section>
+      <h2>Bones</h2>
+      <div id="bones"></div>
+    </section>
+  </aside>
+  <main id="view"></main>
+  <script type="module" src="pose.mjs"></script>
+</body>
+</html>

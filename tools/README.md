@@ -161,6 +161,12 @@ sites its file names; see `../docs/decisions/0009-component-mounts.md`.
 A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
 The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
 
+A pose sheet, `pose-sheet.mjs`, draws the doll bent by a pose fixture or a pose file, bare or dressed, because a
+wearable worn still does not show whether it fits when a limb bends, and a pose written by hand needs seeing before
+it becomes a clip. It draws through the posing page, `../site/pose.mjs`, which hangs each worn piece from the bone of
+the part it is drawn in, so the sheet shows what the page shows; see `../docs/decisions/0010-pose-tool.md`. The sheets
+reach the showcase through one served site and one headless browser, `reviewSite.mjs`, so no sheet serves it its own way.
+
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a
 wheel with its brake, is therefore also drawn on its own and exploded about its own centre. The assemblies come from

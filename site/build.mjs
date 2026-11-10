@@ -6,7 +6,7 @@
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
-import { cpSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -15,6 +15,7 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
+import { dollRig, readRigContent } from '../tools/pose/rig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
@@ -24,6 +25,7 @@ const root = resolve(here, '..');
 const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false } } });
 const out = resolve(root, positionals[0] ?? '_site');
 const built = resolve(values.built);
+const POSES = 'models/poses';
 
 const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
 // A walk clip states its stride in metres; the viewer paces it by the authored walk speed of the row that baked it.
@@ -144,7 +146,15 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'clearance.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+// The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
+if (doll) {
+  const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
+  // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them.
+  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...dollRig(readRigContent(root), doll, dressing), doll: doll.sites, poses }));
+  mkdirSync(join(out, 'poses'));
+  for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
+}
 if (!values['no-tree']) cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });
 for (const model of models) if (model.clips && model.body) {
   const clips = JSON.parse(readFileSync(join(built, model.clips), 'utf8'));
