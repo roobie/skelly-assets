@@ -40,7 +40,64 @@ export const slab = (
   z: [bottom, top],
   slot,
 });
+
+interface Oval extends Omit<Footprint, 'chamfer'> {
+  /** Corners of the superellipse: 2 is an ellipse, higher is squarer. */
+  power?: number;
+  sides?: number;
+}
+
+/**
+ * A superellipse of `sides` points, `halfU` along the first profile coordinate and `halfV` along the second, as a
+ * convex counterclockwise profile. Body masses are rounded, so a limb or a skull reads as flesh rather than a crate.
+ */
+export const ovalProfile = (halfU: number, halfV: number, { power = 2.6, sides = 16, cu = 0, cv = 0 } = {}): Vec2[] =>
+  Array.from({ length: sides }, (_, i): Vec2 => {
+    const a = (2 * Math.PI * i) / sides;
+    const shape = (t: number) => Math.sign(t) * Math.abs(t) ** (2 / power);
+    return [cu + halfU * shape(Math.cos(a)), cv + halfV * shape(Math.sin(a))];
+  });
+
+/** An upright rounded slab: `slab` with a superellipse footprint. */
+export const oval = (id: string, slot: string, [bottom, top]: readonly [number, number], { halfX, halfZ, cx = 0, cz = 0, power, sides }: Oval): ExtrudedPolygonSolid => ({
+  id,
+  kind: 'extruded-polygon',
+  axis: 'y',
+  profile: ovalProfile(halfZ, halfX, { power, sides, cu: cz, cv: cx }),
+  z: [bottom, top],
+  slot,
+});
 type Range = readonly [number, number];
+type Section = Pick<Oval, 'halfX' | 'halfZ' | 'cz'>;
+const section = (from: Required<Section>, to: Required<Section>, t: number): Required<Section> => ({
+  halfX: from.halfX + (to.halfX - from.halfX) * t,
+  halfZ: from.halfZ + (to.halfZ - from.halfZ) * t,
+  cz: from.cz + (to.cz - from.cz) * t,
+});
+/**
+ * A limb or mass tapering from one section at the bottom to another at the top, as `slices` stacked ovals named
+ * `<id>-<index>` from the bottom. A `curve` reshapes the taper: `(t) => Math.sqrt(1 - t * t)` rounds it like a dome.
+ */
+export const taper = (
+  id: string,
+  slot: string,
+  [bottom, top]: Range,
+  [from, to]: readonly [Section, Section],
+  { slices = 3, power, curve = (t: number) => t }: { slices?: number; power?: number; curve?: (t: number) => number } = {},
+): ExtrudedPolygonSolid[] => {
+  const start = { cz: 0, ...from };
+  const end = { cz: 0, ...to };
+  return Array.from({ length: slices }, (_, i) => {
+    const y0 = bottom + ((top - bottom) * i) / slices;
+    const y1 = bottom + ((top - bottom) * (i + 1)) / slices;
+    // Each slice takes the section at its own top, so the stack never pokes out of the taper it approximates.
+    const at = section(start, end, curve((i + 1) / slices));
+    return oval(`${id}-${i}`, slot, [y0, y1], { ...at, ...(power === undefined ? {} : { power }) });
+  });
+};
+/** A dome: a taper whose sections shrink on a quarter ellipse, full at the bottom and `to` at the top. */
+export const dome = (id: string, slot: string, range: Range, sections: readonly [Section, Section], options: { slices?: number; power?: number } = {}) =>
+  taper(id, slot, range, sections, { ...options, curve: (t) => 1 - Math.sqrt(Math.max(0, 1 - t * t)) });
 export const block = (
   id: string,
   slot: string,
