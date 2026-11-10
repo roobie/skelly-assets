@@ -42,6 +42,7 @@
     { source: 'optic-mini-reflex' },
     { source: 'optic-tube-dot' },
     { source: 'rail-front-sight' },
+    { source: 'rail-rear-sight' },
     { source: 'real-suppressor' },
     { source: 'tactical-flashlight-mount' },
   ],

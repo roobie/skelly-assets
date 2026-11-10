@@ -4,6 +4,7 @@
 //   scene -> root node (named by the asset id)
 //     -> one node per part, named `<part id>:<registry key>`, placed by its resolved transform, carrying one
 //        mesh with one primitive per drawn solid (the solids the viewer draws: `displaySolids ?? solids`)
+//        and, unless it is the root, the joint that mounts it on a part nearer the root (mounts.ts, partMounts)
 //        -> one empty child node per port, named `<part>.<port>`, with the port metadata in glTF `extras`
 // Vertices are in the part's local frame times the domain's `units.metresPerUnit`; the node transform supplies the placement.
 
@@ -33,6 +34,7 @@ import type {
   PartPortId,
   SrgbColor,
 } from './exportTypes.ts';
+import { partMounts } from './mounts.ts';
 import { matrixOf, prepareSkin, preserveSkinFace, SkinError, skinPoints } from './skin.ts';
 import { voxelize } from './voxelize.ts';
 
@@ -224,6 +226,7 @@ const portMetadata = (partId: string, port: PortDef, placed: Transform): ExportP
     mount: port.mount,
     gender: port.gender,
     ...(port.size === undefined ? {} : { size: port.size }),
+    ...(port.standard === undefined ? {} : { standard: port.standard }),
     frame: {
       position: frame.t,
       normal: [frame.r[0], frame.r[3], frame.r[6]],
@@ -380,6 +383,7 @@ const writeGlb: ExportGlb = (input) => {
           ]
         : [];
     });
+  const mounts = partMounts(resolved);
 
   const skin = input.skin === undefined ? undefined : prepareSkin(input.skin);
   const bin = new BinaryBuffer();
@@ -616,6 +620,7 @@ const writeGlb: ExportGlb = (input) => {
             partVoxelGrain(part.def, { voxelGrain: input.voxelGrain, voxelDetailGrain: input.voxelDetailGrain }),
           );
     const name = partNodeName(part.id, part.family);
+    const joints = mounts.get(part.id);
     const node: Json = { name };
     const rotation = quaternion(part.placed.r);
     if (!(skin || isIdentity(part.placed.r))) {
@@ -644,6 +649,8 @@ const writeGlb: ExportGlb = (input) => {
       ...(appearance.slot === undefined ? {} : { slot: appearance.slot }),
       solids: drawn.map((s) => s.id),
       ...(part.def.motion ? { motion: motionMetadata(part.def.motion) } : {}),
+      ...(joints?.mount ? { mount: joints.mount } : {}),
+      ...(joints && joints.meets.length > 0 ? { meets: joints.meets } : {}),
     };
 
     const children: number[] = [];

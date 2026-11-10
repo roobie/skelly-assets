@@ -25,7 +25,9 @@ export const definePartChecks = (family: PartFamily, cases: Record<string, strin
   let gridStep = GRID;
   if (family.name === 'forend' || family.name === 'ar-charging-handle') {
     gridStep = GRID / 5;
-  } else if (['front-sight', 'rail-front-sight', 'ak-rear-sight', 'sporting-rear-sight'].includes(family.name)) {
+  } else if (
+    ['front-sight', 'rail-front-sight', 'rail-rear-sight', 'ak-rear-sight', 'sporting-rear-sight'].includes(family.name)
+  ) {
     gridStep = GRID / 4;
   } else if (['frame', 'slide', 'sight'].includes(family.name)) {
     // A sight datum and its corridor can bisect quarter-grid aperture edges.

@@ -98,16 +98,31 @@ function repaint(part, paint) {
 }
 
 export const isVehicle = (entry) => Boolean(entry.sites);
+// Whether an entry can be shown apart: a vehicle or an assembly by the model at each site, a model by its components
+// (models.json's `components`, from tools/components.mjs).
+export const comesApart = (entry) => Boolean(entry.sites || entry.components);
 
-// Each part of an assembled vehicle, where it sits assembled and how far it moves when exploded; see explode.mjs.
-export function explodable(vehicle) {
-  const boxes = vehicle.children.map((part) => {
-    const box = new THREE.Box3().setFromObject(part);
+// The objects an instance of `entry` comes apart into: each site's model, or each component's part node, which the
+// GLB keeps beside the others under its root.
+function piecesOf(obj, entry) {
+  if (!entry.components) return obj.children;
+  const byPart = new Map();
+  obj.traverse((o) => {
+    if (o.userData.part !== undefined) byPart.set(o.userData.part, o);
+  });
+  return entry.components.map((part) => byPart.get(part));
+}
+
+// Each piece of an instance of `entry`, where it sits assembled and how far it moves when exploded; see explode.mjs.
+export function explodable(obj, entry) {
+  const pieces = piecesOf(obj, entry);
+  const boxes = pieces.map((piece) => {
+    const box = new THREE.Box3().setFromObject(piece);
     return { min: box.min.toArray(), max: box.max.toArray() };
   });
   return explode(boxes).map((offset, i) => ({
-    part: vehicle.children[i],
-    home: vehicle.children[i].position.clone(),
+    part: pieces[i],
+    home: pieces[i].position.clone(),
     offset: new THREE.Vector3(...offset),
   }));
 }

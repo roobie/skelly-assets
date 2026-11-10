@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { glbJson } from './glb.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -41,8 +42,6 @@ const nodeTransform = ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale
   (p) => sum(rotate(rotation, p.map((x, a) => x * scale[a])), translation);
 
 // ---- reading a built model ----
-
-const glbJson = (buffer) => JSON.parse(buffer.subarray(20, 20 + buffer.readUInt32LE(12)).toString('utf8'));
 
 // Each mesh node of a GLB's scene with the part it belongs to (the nearest node marking `extras.part`, as the export
 // does), that part node's origin in the model frame and the node's box in the model frame.

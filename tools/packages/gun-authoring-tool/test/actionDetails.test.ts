@@ -5,7 +5,7 @@ import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
-import { loadCorpus, loadDesigns, loadFixture } from './helpers.ts';
+import { loadCorpus, loadFixture, scopedArDesign } from './helpers.ts';
 
 const limits = (
   box: Box,
@@ -146,7 +146,7 @@ describe('visible action details', () => {
   });
 
   it('rejects a rail feature that physically occupies the AR T-grip', () => {
-    const { assembly } = loadDesigns().find(({ label }) => label.includes('archetype-ar.json'))!;
+    const assembly = scopedArDesign();
     const resolved = resolve(assembly, gunDomain);
     const point = [-16.55, 1.975, 1.75] as const;
     const local = applyPoint(invert(resolved.placed.get('sight')!), point);

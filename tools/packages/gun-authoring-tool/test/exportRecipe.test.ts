@@ -96,7 +96,9 @@ describe('recipe iron sight lattice', () => {
     }
   });
   it.for(loadExportRecipe().filter(({ kind }) => kind === 'design'))(
-    'puts $id iron sight eye on a drawn voxel top, which lies on its fine lattice',
+    // A notch's eye is on a drawn top, a lattice plane; a closed aperture's is midway between its drawn rows, which
+    // can be mid-row, so the half lattice holds both.
+    'puts $id iron sight eye on a drawn top or aperture centre, on its fine half lattice',
     (row, context) => {
       const { sight } = (
         row.generate().modelEntry as unknown as { gun: { sight: { kind: string; eye: readonly number[] } } }
@@ -106,7 +108,7 @@ describe('recipe iron sight lattice', () => {
         return;
       }
       ironSights += 1;
-      const step = row.voxel.voxelDetailGrain ?? row.voxel.voxelGrain;
+      const step = (row.voxel.voxelDetailGrain ?? row.voxel.voxelGrain) / 2;
       expect(Math.abs(sight.eye[1]! / step - Math.round(sight.eye[1]! / step)), row.id).toBeLessThan(1e-6);
     },
   );

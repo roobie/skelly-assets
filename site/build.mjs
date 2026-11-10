@@ -1,7 +1,7 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags and printed label, the vehicles the tree places and the assemblies the kits build with the
-// model at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the
-// page's labels (models/taxonomy.json).
+// their category, tags, printed label and the components a model comes apart into (tools/components.mjs), the
+// vehicles the tree places and the assemblies the kits build with the model at each of their sites, the sites that
+// dress each wearable on the doll, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
+import { modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
@@ -72,7 +73,12 @@ const wearables = new Set(models.filter((model) => isWearable(model, models)));
 const dressing = readDressing(root);
 const doll = wearables.size > 0 ? readDoll(built, manifest, dressing) : undefined;
 const boxOf = (id) => modelBox(readFileSync(join(built, modelsById.get(id).file)));
-const shown = models.map((model) => (wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : model));
+// A wearable shows itself worn beside its loose views, and any other model that comes apart shows its components apart.
+const apart = (model) => {
+  const components = modelComponents(readFileSync(join(built, model.file)));
+  return components ? { ...model, components } : model;
+};
+const shown = models.map((model) => (wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model)));
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
   site,
