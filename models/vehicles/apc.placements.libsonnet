@@ -16,7 +16,7 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
     one('cupola', 'apc_cupola', [-1.2, s.roofTop, 0.6]),
     one('driver_hatch', 'apc_hatch', [s.driverX, s.roofTop, s.driverZ]),
     one('engine_deck', 'apc_engine_deck'),
-    one('engine', 'engine_i6_heavy_diesel', [1.95, 0.85, 0.47]),
+    one('engine', 'engine_v8_turbo_diesel', [1.95, 0.85, 0.47]),
     one('gearbox', 'gearbox_heavy', [0.95, 0.85, 0.47]),
     one('radiator', 'radiator_truck', [2.6, 1.0, 0.47]),
     one('exhaust', 'exhaust_military', [1.4, 1.85, 0.6]),
