@@ -64,6 +64,7 @@
   'hybrid_suv': import 'hybrid_suv.placements.libsonnet',
   'ice_cream_van': import 'ice_cream_van.placements.libsonnet',
   'jackknifed_lorry_cab': import 'jackknifed_lorry_cab.placements.libsonnet',
+  'light_4x4_truck': import 'light_4x4_truck.placements.libsonnet',
   'light_helicopter': import 'light_helicopter.placements.libsonnet',
   'light_tactical_vehicle': import 'light_tactical_vehicle.placements.libsonnet',
   'limousine': import 'limousine.placements.libsonnet',
