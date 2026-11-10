@@ -17,5 +17,5 @@ local port = b.port, part = b.part;
       ], 'paper-pages-cream', port('male', [0, 1, 0])),
     ],
     connections: [{ from: 'board.binding', to: 'block.binding' }],
-  } + { taxonomy: { tags: { material: ['paper'] } } },
+  } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
 ]

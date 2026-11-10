@@ -1,6 +1,6 @@
 // A 20 litre pressed-steel jerry can. The welded seam flange, the X pressed into each face and the corner spout are what
 // read as a jerry can rather than a plain box.
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 
 // 345 mm wide, 165 mm deep, 470 mm to the top of its three handles.
 local handle(name, x) = [
@@ -25,5 +25,6 @@ local cross(side) =
   { body: 'polymer-od-green', seam: 'polymer-od-green', handle: 'polymer-od-green', spout: 'steel-grey', cap: 'paint-charcoal' }) + {
     handling: { part: 'jerry_can', solid: 'handle-b', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     voxelGrain: 0.004,
+    taxonomy: { category: 'containers' },
   },
 ]

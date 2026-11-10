@@ -33,10 +33,11 @@ local wornIn = {
   'weapon-parts': 'skelly.wearables',
 };
 // Shields are armour, but a game hands them out with the melee weapons they are carried with. Fuzes arm explosives,
-// not guns.
+// not guns. A grenade or a trap is a weapon but no melee weapon, so each keeps the shelf of its own kind.
 local placed = {
   'skelly.melee': ['kite_shield', 'tower_shield'],
-  'skelly.explosives': ['delay_fuze', 'impact_fuze'],
+  'skelly.explosives': ['delay_fuze', 'frag_grenade', 'impact_fuze'],
+  'skelly.traps': ['bear_trap'],
 };
 local placedIn = { [id]: pack for pack in std.objectFields(placed) for id in placed[pack] };
 local packOf(row) =
@@ -56,8 +57,8 @@ local packOf(row) =
   rows(ids)::
     local wanted = { [id]: true for id in std.set(ids) };
     [row for row in (import 'packages/thing-authoring-tool/items.jsonnet').items if std.objectHas(wanted, row.id)],
-  // The recipe rows of a pack that holds only catalogue rows.
-  recipe(packId):: [
+  // The item recipe rows that export `rows`, each under its own id.
+  items(rows):: [
     {
       id: row.id,
       kind: 'item',
@@ -65,6 +66,8 @@ local packOf(row) =
       voxel: voxel.of(voxel.item, row),
       options: { mass: row.exportMass },
     } + taxonomy.of(row)
-    for row in $.rows($.ids(packId))
+    for row in rows
   ],
+  // The recipe rows of the catalogue rows that pack `packId` exports.
+  recipe(packId):: $.items($.rows($.ids(packId))),
 }
