@@ -72,8 +72,9 @@ vehicle is model data too, in the vehicle's placements file beside its rows, so 
 from one source; why, and what stays gameplay, is in `docs/decisions/0001-vehicle-placements.md`. A vehicle fits its
 engine, turret, radiator or fuel tank either fused or as a core with salvageable fittings; why is in
 `docs/decisions/0004-assemblies.md`. Its wheels turn whole at their sites, with a brake disc and caliper at sites of
-their own; why is in `docs/decisions/0005-wheel-assemblies.md`. Its exhaust is likewise fused or split along its run
-into salvageable parts; why is in `docs/decisions/0006-exhaust-assemblies.md`.
+their own; why is in `docs/decisions/0005-wheel-assemblies.md`. A track is a band of links with its sprocket, idler
+and road wheels at sites of their own, in size classes; why is in `docs/decisions/0006-track-assemblies.md`. An
+exhaust is fused or split along its run into salvageable parts; why is in `docs/decisions/0007-exhaust-assemblies.md`.
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.

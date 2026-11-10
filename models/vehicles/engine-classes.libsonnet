@@ -32,4 +32,18 @@
     fuelPump: { id: 'fuel_pump_medium', massKg: 2, size: 0.1 },
     driveBelt: { id: 'drive_belt_medium', massKg: 0.4, width: 0.025, thickness: 0.014 },
   },
+  // A heavy truck's or an armoured vehicle's: a V8 diesel of 12 litres or more.
+  heavy: {
+    radiator: 'radiator_truck',
+    drive: {
+      crank: { at: [0, 0], radius: 0.12 },
+      pump: { at: [0.32, 0], radius: 0.08 },
+      alternator: { at: [0, 0.62], radius: 0.06 },
+    },
+    alternator: { id: 'alternator_heavy', massKg: 14, radius: 0.1, length: 0.24 },
+    starter: { id: 'starter_motor_heavy', massKg: 18, radius: 0.075, length: 0.34 },
+    airBox: { id: 'air_box_heavy', massKg: 8, length: 0.5, height: 0.28, width: 0.2 },
+    fuelPump: { id: 'fuel_pump_heavy', massKg: 4, size: 0.14 },
+    driveBelt: { id: 'drive_belt_heavy', massKg: 0.8, width: 0.03, thickness: 0.016 },
+  },
 }

@@ -13,8 +13,7 @@ local steel = 'steel-parkerized';
 // Each fitting in its own frame, as its comment says, with the finish of each slot it draws.
 // Lies along x on its bore, the origin on the receiver's front face: the receiver stands back inside the turret and
 // the barrel runs forward through the mask.
-local heavyGun(c) = {
-  local g = c.heavyGun,
+local gun(c, g) = {
   local r = g.receiver,
   pieces: [
     box('receiver', 'steel', [-r.length, -r.height / 2, -r.width / 2], [0, r.height / 2, r.width / 2]),
@@ -25,9 +24,8 @@ local heavyGun(c) = {
   ],
   finish: { steel: steel, barrel: 'steel-spall-black' },
 };
-// Framed as the heavy gun; its firing solenoid hangs under the receiver.
-local coaxGun(c) = {
-  local g = c.coaxGun,
+// Framed as the main gun; its firing solenoid hangs under the receiver.
+local coaxGun(c, g) = {
   local r = g.receiver,
   pieces: [
     box('receiver', 'steel', [-r.length, -r.height / 2, -r.width / 2], [0, r.height / 2, r.width / 2]),
@@ -38,8 +36,7 @@ local coaxGun(c) = {
   finish: { steel: steel, barrel: 'steel-spall-black' },
 };
 // Stands on the roof, the origin under the centre of its base ring, the window facing forward.
-local sight(c) = {
-  local s = c.sight,
+local sight(c, s) = {
   pieces: [
     round(k.turned('base', 'steel', 'y', k.disc(s.width * 0.6, 0, 0.03))),
     box('head', 'paint', [-s.length / 2, 0.03, -s.width / 2], [s.length / 2, s.height, s.width / 2]),
@@ -48,8 +45,7 @@ local sight(c) = {
   finish: { paint: c.paint, steel: steel, glass: 'glass-grey' },
 };
 // Stands on a roof, the origin under the centre of its housing, the glass facing forward.
-local periscope(c) = {
-  local p = c.periscope,
+local periscope(c, p) = {
   pieces: [
     box('housing', 'steel', [-p.length / 2, 0, -p.width / 2], [p.length / 2, p.height, p.width / 2]),
     box('glass', 'glass', [p.length / 2, p.height * 0.2, -p.width / 2 + 0.03], [p.length / 2 + 0.01, p.height * 0.8, p.width / 2 - 0.03]),
@@ -57,8 +53,7 @@ local periscope(c) = {
   finish: { steel: steel, glass: 'glass-grey' },
 };
 // Lies on the roof, the origin under the lid's centre, hinged at its rear.
-local hatch(c) = {
-  local h = c.hatch,
+local hatch(c, h) = {
   pieces: [
     round(k.turned('lid', 'paint', 'y', k.disc(h.radius, 0, h.thickness))),
     box('hinge', 'steel', [-h.radius - 0.04, 0, -0.1], [-h.radius + 0.02, h.thickness + 0.03, 0.1]),
@@ -68,8 +63,7 @@ local hatch(c) = {
 };
 // Stands on its foot, the origin under the foot's centre, the tube raised forward by its elevation; the tube's lower
 // rear edge rests on the foot.
-local smokeLauncher(c) = {
-  local l = c.smokeLauncher,
+local smokeLauncher(c, l) = {
   local foot = 0.03,
   local half = l.bore / 2,
   local e = k.rad(l.elevation),
@@ -81,50 +75,42 @@ local smokeLauncher(c) = {
   finish: { paint: c.paint, steel: steel },
 };
 
-local classOf(name) = classes[turrets[name].class];
-local coreId(name) = name + '_core';
-local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-local band(t, i) = {
-  bottom: t.height * i / t.bands,
-  top: t.height * (i + 1) / t.bands,
-  outer: t.baseRadius - (t.baseRadius - t.roofRadius) * i / (t.bands - 1),
-  inner: self.outer - t.wall,
-};
-// The bands the gun mask passes through: those the heavy gun's receiver spans in height.
-local gunBand(t, c, i) =
-  local b = band(t, i);
-  local half = c.heavyGun.receiver.height / 2;
-  b.top > t.bore.height - half && b.bottom < t.bore.height + half;
-local gunBands(t, c) = [i for i in std.range(0, t.bands - 1) if gunBand(t, c, i)];
-
-// The fittings a class draws, each by its class entry.
 local drawings = {
-  heavyGun: heavyGun,
+  gun: gun,
   coaxGun: coaxGun,
   sight: sight,
   periscope: periscope,
   hatch: hatch,
   smokeLauncher: smokeLauncher,
 };
+local guns = ['gun', 'coaxGun'];
+local entries(c) = [c[key] for key in std.objectFields(c) if key != 'paint'];
+local drawn(c, e) = drawings[e.draw](c, e);
 
-// The turret's fittings in the order a vehicle lists their sites: each one's site id, its class entry and where its
-// origin sits in the turret's frame.
+local classOf(name) = classes[turrets[name].class];
+local coreId(name) = name + '_core';
+local launcherFrame = 0.08;
+
+// The launchers each smoke rack stands in its row: `across` is the axis the rack reaches into the shell along.
+local acrossOf(rack) = { x: 'z', z: 'x' }[rack.along];
+local axis = { x: 0, y: 1, z: 2 };
+local launchers(t) = std.flattenArrays([
+  [
+    local offset = (i - (rack.count - 1) / 2) * rack.spacing;
+    [rack.at[a] + (if a == axis[rack.along] then offset else 0) for a in [0, 1, 2]]
+    for i in std.range(0, rack.count - 1)
+  ]
+  for rack in t.smokeRacks
+]);
+
+// The turret's fittings in the order a vehicle lists their sites, the smoke launchers numbered across its racks.
 local fittings(name) =
   local t = turrets[name];
   local c = classOf(name);
-  local on(site, key, at) = { site: site, id: c[key].id, massKg: c[key].massKg, drawn: drawings[key](c), at: at };
-  local rack = t.smokeRack;
-  [
-    on('heavy_machine_gun', 'heavyGun', [t.mask.back, t.bore.height, t.bore.heavy]),
-    on('coaxial_machine_gun', 'coaxGun', [t.mask.back, t.bore.height, t.bore.coax]),
-    on('turret_sight', 'sight', [t.sight[0], t.height, t.sight[1]]),
-    on('turret_periscope_0', 'periscope', [t.periscope[0], t.height, t.periscope[1]]),
-    on('turret_periscope_1', 'periscope', [t.periscope[0], t.height, -t.periscope[1]]),
-    on('turret_hatch', 'hatch', [t.hatch[0], t.height, t.hatch[1]]),
-  ] + [
-    on('smoke_launcher_' + i, 'smokeLauncher', [rack.x, rack.height, (i - (rack.count - 1) / 2) * rack.spacing])
-    for i in std.range(0, rack.count - 1)
-  ];
+  local on(site, e, at) = { site: site, id: e.id, massKg: e.massKg, drawn: drawn(c, e), at: at, entry: e };
+  [on(f.site, c[f.key], f.at) for f in t.fittings]
+  + [on('smoke_launcher_' + i, c.smokeLauncher, launchers(t)[i]) for i in std.range(0, std.length(launchers(t)) - 1)];
+local fittingsDrawn(name, draws) = [f for f in fittings(name) if std.member(draws, f.entry.draw)];
 
 // A convex polygon cut to the side of a line where `side` is not negative; `side` is linear in the point.
 local clip(polygon, side) =
@@ -138,64 +124,110 @@ local clip(polygon, side) =
     + (if (a >= 0) != (b >= 0) then [[p[0] + (q[0] - p[0]) * a / (a - b), p[1] + (q[1] - p[1]) * a / (a - b)]] else [])
     for i in std.range(0, n - 1)
   ]);
-// A y prism's profile is (z, x): the corner of a `sides`-gon of circumradius `radius` at `angle` degrees from +x
-// toward +z, so the first face looks forward.
-local corner(radius, angle, sides) =
+// A y prism's profile is (z, x). A cone's corners lie on a `sides`-gon round the ring, the first face looking forward.
+local corner(radius, angle) =
   local a = k.rad(angle);
   [radius * std.sin(a), radius * std.cos(a)];
+local plan(t) =
+  local s = t.shell;
+  if std.objectHas(s, 'sides') then
+    local at(radius) = [corner(radius, (j - 0.5) * 360 / s.sides) for j in std.range(0, s.sides - 1)];
+    { base: at(s.baseRadius), roof: at(s.roofRadius) }
+  else s;
+// A convex polygon, its corners running from +x toward +z, with each side moved `by` toward its inside.
+local inset(polygon, by) =
+  local n = std.length(polygon);
+  local inward(p, q) =
+    local d = [q[0] - p[0], q[1] - p[1]];
+    local length = std.sqrt(d[0] * d[0] + d[1] * d[1]);
+    [d[1] / length, -d[0] / length];
+  [
+    local a = inward(polygon[(i + n - 1) % n], polygon[i]);
+    local b = inward(polygon[i], polygon[(i + 1) % n]);
+    local scale = by / (1 + a[0] * b[0] + a[1] * b[1]);
+    [polygon[i][0] + (a[0] + b[0]) * scale, polygon[i][1] + (a[1] + b[1]) * scale]
+    for i in std.range(0, n - 1)
+  ];
+local band(t, i) =
+  local p = plan(t);
+  local f = i / (t.bands - 1);
+  local outer = [[p.base[j][a] + (p.roof[j][a] - p.base[j][a]) * f for a in [0, 1]] for j in std.range(0, std.length(p.base) - 1)];
+  {
+    bottom: t.height * i / t.bands,
+    top: t.height * (i + 1) / t.bands,
+    outer: outer,
+    inner: inset(outer, t.wall),
+  };
+// The guns' common bore height, and the bands the gun mask passes through: those the tallest receiver spans.
+local boreOf(name) =
+  local heights = std.set([g.at[1] for g in fittingsDrawn(name, guns)]);
+  assert std.length(heights) == 1 : name + "'s guns share one bore height, so its mask has one row of ports";
+  heights[0];
+local maskBackOf(name) =
+  local backs = std.set([g.at[0] for g in fittingsDrawn(name, guns)]);
+  assert std.length(backs) == 1 : name + "'s guns abut its mask's back, so they share one x";
+  backs[0];
+local gunBands(name) =
+  local t = turrets[name];
+  local half = std.foldl(std.max, [g.entry.receiver.height / 2 for g in fittingsDrawn(name, guns)], 0);
+  local y = boreOf(name);
+  [i for i in std.range(0, t.bands - 1) if band(t, i).top > y - half && band(t, i).bottom < y + half];
 
-// The welded shell, roof, gun mask and barrel jacket, and the rack the smoke launchers stand on.
+// The welded shell, roof, gun mask and any barrel jacket, and the racks the smoke launchers stand on.
 local core(name) =
   local t = turrets[name];
   local c = classOf(name);
-  local step = 360 / t.sides;
-  local gun = gunBands(t, c);
+  local gun = gunBands(name);
   // Each band is a ring of flat faces, each face convex, wound counter-clockwise; the gun bands leave the front face
   // open for the mask.
+  local sides = std.length(plan(t).base);
   local face(i, j) =
     local b = band(t, i);
-    local from = (j - 0.5) * step;
-    local to = (j + 0.5) * step;
-    k.yPrism('band_%d_face_%d' % [i, j], 'paint', [corner(b.inner, to, t.sides), corner(b.outer, to, t.sides), corner(b.outer, from, t.sides), corner(b.inner, from, t.sides)], [b.bottom, b.top]);
+    local next = (j + 1) % sides;
+    k.yPrism('band_%d_face_%d' % [i, j], 'paint', [b.inner[next], b.outer[next], b.outer[j], b.inner[j]], [b.bottom, b.top]);
   local shell = [
     face(i, j)
     for i in std.range(0, t.bands - 1)
-    for j in std.range(0, t.sides - 1)
+    for j in std.range(0, sides - 1)
     if !(j == 0 && std.member(gun, i))
   ];
-  // The roof plate round the hatch's square opening, as the four convex pieces left when the opening is cut out.
-  local roofPlate = [corner(t.roofRadius, -(j + 0.5) * step, t.sides) for j in std.range(0, t.sides - 1)];
-  local open = c.hatch.opening / 2;
-  local hx = t.hatch[0];
-  local hz = t.hatch[1];
-  local ahead(p) = p[1] - (hx + open);
-  local behind(p) = (hx - open) - p[1];
+  // The roof plate round the hatches' square openings, which stand side by side across it: the convex pieces ahead of
+  // and behind them, and between and beside them.
+  local roofPlate = std.reverse(plan(t).roof);
+  local hatches = std.sort(fittingsDrawn(name, ['hatch']), function(h) h.at[2]);
+  local open = std.set([h.entry.opening / 2 for h in hatches]);
+  local hx = std.set([h.at[0] for h in hatches]);
+  assert std.length(hx) == 1 && std.length(open) == 1 : name + "'s hatches stand side by side, alike";
+  local ahead(p) = p[1] - (hx[0] + open[0]);
+  local behind(p) = (hx[0] - open[0]) - p[1];
+  local strip = clip(clip(roofPlate, function(p) -ahead(p)), function(p) -behind(p));
+  local edges = [null] + std.flattenArrays([[h.at[2] - open[0], h.at[2] + open[0]] for h in hatches]) + [null];
+  local beside(from, to) = clip(clip(strip, function(p) if from == null then 1 else p[0] - from), function(p) if to == null then 1 else to - p[0]);
   local roof = [
     k.yPrism('roof_' + piece.id, 'paint', piece.profile, [t.height - t.wall, t.height])
     for piece in [
       { id: 'front', profile: clip(roofPlate, ahead) },
       { id: 'rear', profile: clip(roofPlate, behind) },
-      { id: 'near', profile: clip(clip(clip(roofPlate, function(p) -ahead(p)), function(p) -behind(p)), function(p) p[0] - (hz + open)) },
-      { id: 'far', profile: clip(clip(clip(roofPlate, function(p) -ahead(p)), function(p) -behind(p)), function(p) (hz - open) - p[0]) },
+    ] + [
+      { id: 'beside_%d' % i, profile: beside(edges[2 * i], edges[2 * i + 1]) }
+      for i in std.range(0, std.length(hatches))
     ]
   ];
   // The gun mask spans the gun bands, with a square port round each gun's barrel at the bore height.
   local m = t.mask;
+  local back = maskBackOf(name);
   local low = band(t, gun[0]).bottom;
   local high = band(t, gun[std.length(gun) - 1]).top;
-  local y = t.bore.height;
-  local ports = std.sort([
-    { at: t.bore.heavy, half: c.heavyGun.barrel.radius },
-    { at: t.bore.coax, half: c.coaxGun.barrel.radius },
-  ], function(p) p.at);
-  local widest = std.max(ports[0].half, ports[1].half);
-  local slab(id, z0, z1, y0, y1) = box('mask_' + id, 'paint', [m.back, y0, z0], [m.front, y1, z1]);
-  local edges = [m.across[0]] + std.flattenArrays([[p.at - p.half, p.at + p.half] for p in ports]) + [m.across[1]];
+  local y = boreOf(name);
+  local ports = std.sort([{ at: g.at[2], half: g.entry.barrel.radius } for g in fittingsDrawn(name, guns)], function(p) p.at);
+  local widest = std.foldl(std.max, [p.half for p in ports], 0);
+  local slab(id, z0, z1, y0, y1) = box('mask_' + id, 'paint', [back, y0, z0], [m.front, y1, z1]);
+  local portEdges = [m.across[0]] + std.flattenArrays([[p.at - p.half, p.at + p.half] for p in ports]) + [m.across[1]];
   local mask = [
     slab('low', m.across[0], m.across[1], low, y - widest),
     slab('high', m.across[0], m.across[1], y + widest, high),
   ] + [
-    slab('between_%d' % i, edges[2 * i], edges[2 * i + 1], y - widest, y + widest)
+    slab('between_%d' % i, portEdges[2 * i], portEdges[2 * i + 1], y - widest, y + widest)
     for i in std.range(0, std.length(ports))
   ] + std.flattenArrays([
     if p.half < widest then [
@@ -205,27 +237,37 @@ local core(name) =
     for i in std.range(0, std.length(ports) - 1)
     for p in [ports[i]]
   ]);
-  local jacket = round(k.turned('jacket', 'jacket', 'x', k.annulus(c.heavyGun.barrel.radius, t.jacket.radius, m.front, m.front + t.jacket.length), [0, y, t.bore.heavy]));
-  local rack = t.smokeRack;
-  local reach = (rack.count - 1) / 2 * rack.spacing + c.smokeLauncher.bore;
+  local jacket = if std.objectHas(t, 'jacket') then
+    local g = [f for f in fittings(name) if f.site == t.jacket.gun][0];
+    [round(k.turned('jacket', 'jacket', 'x', k.annulus(g.entry.barrel.radius, t.jacket.radius, m.front, m.front + t.jacket.length), [0, y, g.at[2]]))]
+  else [];
+  // Each rack runs the length of its row of launcher feet, and from just outside them into the shell.
+  local rack(i, r) =
+    local along = axis[r.along];
+    local across = axis[acrossOf(r)];
+    local spread = (r.count - 1) / 2 * r.spacing + c.smokeLauncher.bore;
+    local out = r.at[across] - launcherFrame * std.sign(r.reach - r.at[across]);
+    local lo = [if a == along then r.at[a] - spread else if a == across then std.min(out, r.reach) else r.at[1] - 0.04 for a in [0, 1, 2]];
+    local hi = [if a == along then r.at[a] + spread else if a == across then std.max(out, r.reach) else r.at[1] for a in [0, 1, 2]];
+    box(if std.length(t.smokeRacks) == 1 then 'smoke_rack' else 'smoke_rack_%d' % i, 'steel', lo, hi);
   {
-    pieces: shell + roof + mask + [
-      jacket,
-      box('smoke_rack', 'steel', [rack.x - 0.08, rack.height - 0.04, -reach], [rack.inset, rack.height, reach]),
-    ],
-    finish: { paint: t.paint, steel: steel, jacket: 'steel-spall-black' },
+    pieces: shell + roof + mask + jacket + [rack(i, t.smokeRacks[i]) for i in std.range(0, std.length(t.smokeRacks) - 1)],
+    finish: { paint: t.paint, steel: steel } + (if std.objectHas(t, 'jacket') then { jacket: 'steel-spall-black' } else {}),
   };
 
+local classRows(name) =
+  local c = classes[name];
+  [assembly.row(e.id, e.massKg, drawn(c, e)) + taxonomy.of(e) for e in entries(c)];
+local turretRows(name) =
+  assembly.rows(name, coreId(name), turrets[name].massKg, core(name), fittings(name));
+
 {
-  // Every class's fitting rows and every turret's core and fused rows.
-  rows: [
-    assembly.row(c[key].id, c[key].massKg, drawings[key](c)) + taxonomy.of(c[key])
-    for c in std.objectValues(classes)
-    for key in std.objectFields(drawings)
-  ] + std.flattenArrays([
-    assembly.rows(name, coreId(name), turrets[name].massKg, core(name), fittings(name))
-    for name in std.objectFields(turrets)
-  ]),
+  // A class's fitting rows, which one vehicle on the class emits; and a turret's core and fused rows, which its vehicle
+  // emits, so they carry its tags.
+  classRows: classRows,
+  turretRows: turretRows,
+  // Every row the kit draws.
+  rows: std.flattenArrays([classRows(name) for name in std.objectFields(classes)] + [turretRows(name) for name in std.objectFields(turrets)]),
   // The turrets, by the names `sites` takes.
   names: std.objectFields(turrets),
   // A vehicle's turret sites, the turret's frame placed at `at`; `detail` is 'fused' or 'assembly', as

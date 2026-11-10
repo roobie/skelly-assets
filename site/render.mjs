@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { explode } from './explode.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { samplePose } from './poseSample.mjs';
 
@@ -95,6 +96,24 @@ function repaint(part, paint) {
 }
 
 export const isVehicle = (entry) => Boolean(entry.sites);
+
+// Each part of an assembled vehicle, where it sits assembled and how far it moves when exploded; see explode.mjs.
+export function explodable(vehicle) {
+  const boxes = vehicle.children.map((part) => {
+    const box = new THREE.Box3().setFromObject(part);
+    return { min: box.min.toArray(), max: box.max.toArray() };
+  });
+  return explode(boxes).map((offset, i) => ({
+    part: vehicle.children[i],
+    home: vehicle.children[i].position.clone(),
+    offset: new THREE.Vector3(...offset),
+  }));
+}
+
+// Moves explodable parts the share `share` of the way from assembled (0) to exploded (1).
+export function spread(parts, share) {
+  for (const { part, home, offset } of parts) part.position.copy(home).addScaledVector(offset, share);
+}
 export const loadEntry = (entry) => (isVehicle(entry) ? loadVehicle(entry) : load(entry));
 
 // The manifest's label as a decal on its face: the GLB carries no lettering, so every consumer draws the text itself.

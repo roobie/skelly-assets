@@ -6,7 +6,7 @@ read_if:
   - adding an exhaust size class
 ---
 
-# 6. An exhaust splits along its run into pipes and salvageable parts in size classes
+# 7. An exhaust splits along its run into pipes and salvageable parts in size classes
 
 ## Context
 

@@ -84,6 +84,11 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     else
       local along = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[piece.axis];
       piece { profile: shift(piece.profile, along[1], along[2]), start: piece.start + by[along[0]], end: piece.end + by[along[0]] },
+  // A z prism turned `degrees` counter-clockwise about the z axis, so one part's pieces can be laid round a loop.
+  rolled(piece, degrees):
+    assert piece.kind == 'prism' && piece.axis == 'z' : piece.id + ' is not a z prism, so it cannot roll about z';
+    local a = rad(degrees);
+    piece { profile: [[p[0] * std.cos(a) - p[1] * std.sin(a), p[0] * std.sin(a) + p[1] * std.cos(a)] for p in piece.profile] },
   // A vehicle whose pressing would be identical to a sibling's fits the sibling's row instead, so a shared part is one
   // row, item and model. A spec's `borrow` maps each such pressing's suffix to the row it fits; `borrows` tells whether a
   // pressing is borrowed, `partId` names the row a fitting takes and `unborrowed` drops the borrowed pressings from a kit's rows.

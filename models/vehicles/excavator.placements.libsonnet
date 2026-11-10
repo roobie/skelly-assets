@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 local s = import 'excavator.spec.libsonnet';
+local track = import 'track-kit.libsonnet';
 {
   sites: [
     site.one('carbody', 'excavator_carbody'),
@@ -25,7 +26,7 @@ local s = import 'excavator.spec.libsonnet';
     site.one('tail_lamp_near', 'tail_lamp_small', [-2.2, 1.5, 0.9]),
     site.one('tail_lamp_far', 'tail_lamp_small', [-2.2, 1.5, -0.9]),
   ]
-  + site.pair('track', 'excavator_track', [0, 0, s.trackZ])
+  + track.pair('excavator_track', [0, 0, s.trackZ], 'fused')
   + site.pair('boom_ram', 'excavator_boom_ram')
   + site.batteryBay('battery_tray', [-0.05, s.deck, 0.7]),
   tags: { 'vehicle-role': ['construction'] },
