@@ -53,3 +53,85 @@ test('an engine weighs the same fused as assembled', () => {
 test('an engine looks the same fused as assembled', () => {
   for (const [name, { fused, assembly }] of engines) assert.deepEqual(shapes(fused), shapes(assembly), name);
 });
+
+// The solid a piece draws, as a signed distance (negative inside) and its bounding box, so pieces of different kinds
+// can be tested against each other by sampling the space their boxes share.
+const ALONG = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] };
+function outline(polygon, [u, v]) {
+  let inside = false;
+  let nearest = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const [ax, ay] = polygon[i];
+    const [bx, by] = polygon[(i + 1) % polygon.length];
+    if ((ay > v) !== (by > v) && u < ax + ((v - ay) / (by - ay)) * (bx - ax)) inside = !inside;
+    const dx = bx - ax;
+    const dy = by - ay;
+    const t = dx || dy ? Math.max(0, Math.min(1, ((u - ax) * dx + (v - ay) * dy) / (dx * dx + dy * dy))) : 0;
+    nearest = Math.min(nearest, Math.hypot(u - ax - t * dx, v - ay - t * dy));
+  }
+  return inside ? -nearest : nearest;
+}
+function solid(piece) {
+  if (piece.kind === 'box') {
+    return {
+      min: piece.min,
+      max: piece.max,
+      distance: (p) => Math.max(...[0, 1, 2].map((i) => Math.max(piece.min[i] - p[i], p[i] - piece.max[i]))),
+    };
+  }
+  const [axis, u, v] = ALONG[piece.axis];
+  const min = [];
+  const max = [];
+  if (piece.kind === 'prism') {
+    [min[axis], max[axis]] = [piece.start, piece.end];
+    for (const [i, c] of [[u, 0], [v, 1]]) [min[i], max[i]] = [Math.min(...piece.profile.map((p) => p[c])), Math.max(...piece.profile.map((p) => p[c]))];
+    return { min, max, distance: (p) => Math.max(outline(piece.profile, [p[u], p[v]]), piece.start - p[axis], p[axis] - piece.end) };
+  }
+  const o = piece.origin;
+  const radius = Math.max(...piece.profile.map((p) => p[1]));
+  [min[axis], max[axis]] = [o[axis] + Math.min(...piece.profile.map((p) => p[0])), o[axis] + Math.max(...piece.profile.map((p) => p[0]))];
+  for (const i of [u, v]) [min[i], max[i]] = [o[i] - radius, o[i] + radius];
+  return { min, max, distance: (p) => outline(piece.profile, [p[axis] - o[axis], Math.hypot(p[u] - o[u], p[v] - o[v])]) };
+}
+
+// How two drawn parts meet, sampled every `STEP` m: whether they come within a step of each other, and whether they
+// share any space deeper than `DEPTH` m, which faces that only abut never do.
+const STEP = 0.002;
+const DEPTH = 0.0005;
+function meeting(a, b) {
+  let touches = false;
+  let overlaps = false;
+  for (const p of a.map(solid)) {
+    for (const q of b.map(solid)) {
+      const lo = [0, 1, 2].map((i) => Math.max(p.min[i], q.min[i]) - STEP);
+      const hi = [0, 1, 2].map((i) => Math.min(p.max[i], q.max[i]) + STEP);
+      if (lo.some((l, i) => l > hi[i])) continue;
+      for (let x = lo[0]; x <= hi[0]; x += STEP) {
+        for (let y = lo[1]; y <= hi[1]; y += STEP) {
+          for (let z = lo[2]; z <= hi[2]; z += STEP) {
+            const dp = p.distance([x, y, z]);
+            const dq = q.distance([x, y, z]);
+            if (dp <= STEP && dq <= STEP) touches = true;
+            if (dp < -DEPTH && dq < -DEPTH) overlaps = true;
+          }
+        }
+      }
+    }
+  }
+  return { touches, overlaps };
+}
+
+test('every accessory of an assembled engine rests on its core and cuts into nothing', () => {
+  for (const [name, { assembly }] of engines) {
+    const [core, ...accessories] = assembly;
+    assert.equal(core.site, 'engine', name);
+    for (const [i, accessory] of accessories.entries()) {
+      const onCore = meeting(accessory.pieces, core.pieces);
+      assert.ok(onCore.touches, `${name}: ${accessory.site} floats clear of the core`);
+      assert.ok(!onCore.overlaps, `${name}: ${accessory.site} cuts into the core`);
+      for (const other of accessories.slice(i + 1)) {
+        assert.ok(!meeting(accessory.pieces, other.pieces).overlaps, `${name}: ${accessory.site} cuts into ${other.site}`);
+      }
+    }
+  }
+});

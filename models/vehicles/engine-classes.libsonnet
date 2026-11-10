@@ -10,7 +10,7 @@
     drive: {
       crank: { at: [0, 0], radius: 0.075 },
       pump: { at: [0.2, 0], radius: 0.05 },
-      alternator: { at: [0.06, 0.32], radius: 0.035 },
+      alternator: { at: [0, 0.32], radius: 0.035 },
     },
     alternator: { id: 'alternator_light', massKg: 6, radius: 0.07, length: 0.15 },
     starter: { id: 'starter_motor_light', massKg: 4, radius: 0.045, length: 0.2 },

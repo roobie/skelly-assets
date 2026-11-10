@@ -13,23 +13,24 @@ local pulleyDepth = 0.03;
 local ductLength = 0.06;
 
 // Each accessory in its own frame, as its comment says, with the finish of each slot it draws.
-// Lies along x on its axis, centred on its case; the pulley stands forward of the case.
+// Lies along x on its axis, centred on its case; the pulley stands forward of the case. Its mounting boss is cast on the
+// engine's core, since how far it stands off the block differs between the engines of a class.
 local alternator(c) = {
   local a = c.alternator,
   pieces: [
     round(k.turned('case', 'case', 'x', k.disc(a.radius, -a.length / 2, a.length / 2))),
     round(k.turned('pulley', 'pulley', 'x', k.disc(c.drive.alternator.radius, a.length / 2, a.length / 2 + pulleyDepth))),
-    box('bracket', 'case', [-a.length * 0.3, -0.02, -a.radius - 0.03], [a.length * 0.3, 0.02, -a.radius + 0.01]),
   ],
   finish: { case: 'alu-bare', pulley: 'steel-spall-black' },
 };
-// Lies along x on its axis, centred on its motor; the pinion's nose reaches back past the motor to the flywheel.
+// Lies along x on its axis, centred on its motor; the pinion's nose reaches back past the motor to the flywheel, and
+// the solenoid rides under the motor, clear of the intake above.
 local starter(c) = {
   local s = c.starter,
   pieces: [
     round(k.turned('motor', 'motor', 'x', k.disc(s.radius, -s.length / 2, s.length / 2))),
     round(k.turned('nose', 'nose', 'x', k.disc(s.radius * 0.6, -s.length / 2 - 0.04, -s.length / 2))),
-    round(k.turned('solenoid', 'nose', 'x', k.disc(s.radius * 0.55, -s.length * 0.1, s.length * 0.4), [0, s.radius * 1.3, 0])),
+    round(k.turned('solenoid', 'nose', 'x', k.disc(s.radius * 0.55, -s.length * 0.1, s.length * 0.4), [0, -s.radius * 1.3, 0])),
   ],
   finish: { motor: 'paint-charcoal', nose: 'steel-grey' },
 };
@@ -74,16 +75,18 @@ local driveBelt(c) =
     local cos = std.sqrt(1 - sin * sin);
     [dv / span * cos + du / span * sin, -du / span * cos + dv / span * sin];
   local angle(v) = std.atan2(v[1], v[0]);
-  // Each pulley's wrap, from the run arriving to the run leaving, as points on its rim.
+  // Each pulley's wrap, from the run arriving to the run leaving, as points just off its rim: far enough out that each
+  // straight piece only grazes the pulley at its middle, so the belt rides the pulley without cutting into it.
   local wrap(i) =
     local p = pulleys[i];
     local from = angle(runNormal((i + n - 1) % n));
     local to0 = angle(runNormal(i));
     local to = if to0 < from then to0 + 2 * std.pi else to0;
     local steps = std.max(1, std.ceil((to - from) / (std.pi / 6)));
+    local reach = p.radius / std.cos((to - from) / steps / 2);
     [
       local a = from + (to - from) * j / steps;
-      [p.at[0] + p.radius * std.cos(a), p.at[1] + p.radius * std.sin(a)]
+      [p.at[0] + reach * std.cos(a), p.at[1] + reach * std.sin(a)]
       for j in std.range(0, steps)
     ];
   local rim = std.flattenArrays([wrap(i) for i in std.range(0, n - 1)]);
@@ -120,7 +123,7 @@ local mounts(name) =
   local crank = crankHeight(e);
   {
     alternator: [e.length / 2 - c.alternator.length / 2, crank + c.drive.alternator.at[0], c.drive.alternator.at[1]],
-    starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank, e.width / 2 + c.starter.radius],
+    starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width / 2 + c.starter.radius],
     airBox: [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
@@ -135,6 +138,13 @@ local core(name) =
   local w = e.width;
   local h = e.height;
   local pulley(id, at, radius) = round(k.turned(id, 'pulley', 'x', k.disc(radius, l / 2, l / 2 + pulleyDepth), [0, crankHeight(e) + at[0], at[1]]));
+  // The alternator's mounting boss bridges the block's side to the class's alternator, which the belt fixes in place.
+  local alt = mounts(name).alternator;
+  local standOff = alt[2] - c.alternator.radius - w / 2;
+  assert standOff >= 0 : name + "'s block reaches into its class's alternator";
+  local boss = if standOff > 0 then [
+    box('alternator_boss', 'casting', [alt[0] - c.alternator.length * 0.3, alt[1] - 0.02, w / 2], [alt[0] + c.alternator.length * 0.3, alt[1] + 0.02, w / 2 + standOff]),
+  ] else [];
   {
     pieces: [
       box('sump', 'casting', [-l / 2, 0, -w * 0.42], [l / 2, h * 0.2, w * 0.42]),
@@ -145,7 +155,7 @@ local core(name) =
       box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
       pulley('crank_pulley', c.drive.crank.at, c.drive.crank.radius),
       pulley('pump_pulley', c.drive.pump.at, c.drive.pump.radius),
-    ],
+    ] + boss,
     finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' },
   };
 

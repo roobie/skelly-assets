@@ -37,4 +37,6 @@ changes what can be looted, never how it drives.
 
 A consumer that knows only the `engine` site still gets a whole engine from a fused vehicle and a bare core from an
 assembled one; the accessory sites are new fittings it has to learn to offer them as loot. A test holds the fused and
-assembled fittings of every engine to the same mass and the same drawn pieces; see `tools/test/engine-kit.test.mjs`.
+assembled fittings of every engine to the same mass and the same drawn pieces, and each accessory to resting on the
+core without cutting into it or another accessory, since a part that floats or clips reads as broken; see
+`tools/test/engine-kit.test.mjs`.
