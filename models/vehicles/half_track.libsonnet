@@ -4,6 +4,7 @@ local m = import 'military-kit.libsonnet';
 local mk = import 'machine-kit.libsonnet';
 local s = import 'half_track.spec.libsonnet';
 local track = import 'track-kit.libsonnet';
+local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -98,7 +99,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('front_spring', 'spring', [s.frontAxle - 0.5, s.hub + 0.12, s.rail.z[0]], [s.frontAxle + 0.5, s.rail.y[0], s.rail.z[1]]),
     box('axle_seat', 'steel', [s.rearAxle - 0.09, 0.64, s.rail.z[0]], [s.rearAxle + 0.09, s.rail.y[0], s.rail.z[1]]),
   ]), finish),
-  mk.driveAxle('half_track_front_axle', 600, s.wheelZ - 0.03, true, s.rail.z),
+  // Its wheels carry the wheel kit's drums, so it is drawn without its own and is lighter by theirs.
+  mk.driveAxle('half_track_front_axle', 600 - 2 * wheelKit.brakeMass('medium', 'drum'), s.wheelZ - 0.03, true, s.rail.z, drums=false),
   // The rear axle drives the sprockets, so its hubs end at theirs.
   mk.driveAxle('half_track_rear_axle', 650, s.trackZ - 0.18, false, s.rail.z),
   // One volute-sprung bogie: its arms carry two road wheels' hubs and its bracket bolts to the track's girder above

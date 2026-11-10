@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 local bus = import 'bus-body.libsonnet';
+local wheelKit = import 'wheel-kit.libsonnet';
 local s = import 'articulated_bus.spec.libsonnet';
 local startsWith(id, prefixes) = std.length([1 for prefix in prefixes if std.startsWith(id, prefix)]) > 0;
 // The fore section keeps the cab and the rear section the engine and tail, so each drops the other's end.
@@ -16,7 +17,7 @@ local rename(id) =
   then 'articulated_bus' + tail
   else id;
 local inAft(placed) = placed { id: 'aft_' + placed.id, part: rename(placed.part) };
-local midAxle(placed) = if placed.id == 'rear_axle' then placed { part: 'trailer_axle_truck' } else placed;
+local midAxle(placed) = if placed.id == 'rear_axle' then placed { part: wheelKit.axle('trailer_axle_truck', std.get(s.fore, 'wheelBrakes')) } else placed;
 local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
 {
   sites: [

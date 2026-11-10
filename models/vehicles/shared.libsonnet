@@ -2,6 +2,7 @@
 // part's base, centred on x and z unless a comment says otherwise.
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
+local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
@@ -80,7 +81,6 @@ local strut(id, massKg) = k.compound(id, massKg, [
   box('knuckle', 'steel', [-0.05, -0.06, -0.05], [0.05, 0.06, 0]),
   k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.47), [0, 0.06, -0.02]),
 ], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
-// An axle drawn without its drums is for a wheel kit's disc brakes, which have sites of their own; see `wheel-kit.libsonnet`.
 local beamAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]) + { sides: 12 },
   box('diff', 'steel', [-0.14, height - 0.13, -0.13], [0.14, height + 0.13, 0.13]),
@@ -90,12 +90,13 @@ local beamAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, m
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.4, -0.06, 0.06), [0, height, track / 2 - 0.1]) + { sides: 12 },
 ] else [])), { steel: 'steel-grey' });
 // An undriven axle has no differential; its frame matches `beamAxle`, so hubs sit at `height` above the base.
-local trailerAxle(id, massKg, track, radius, height) = k.compound(id, massKg, [
+local trailerAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]),
 ] + k.bothSides([
   box('spring_seat', 'steel', [-0.08, height + radius, track / 2 - 0.36], [0.08, height + radius + 0.04, track / 2 - 0.26]),
+] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.2, -0.05, 0.05), [0, height, track / 2 - 0.1]),
-]), { steel: 'steel-grey' });
+] else [])), { steel: 'steel-grey' });
 // A steered I-beam for 295 wheels, in `beamAxle`'s frame: the king pins stand at the beam's ends.
 local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, height - 0.06, -halfTrack], [0.06, height + 0.06, halfTrack]),
@@ -105,8 +106,13 @@ local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, ma
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(0.2, halfTrack + 0.05, halfTrack + 0.18), [0, height, 0]) + { sides: 12 },
 ] else [])), { steel: 'steel-grey' });
-// A drum axle's mass less the class's brake at each end, so a vehicle swapping drums for the kit's brakes weighs the same.
-local discBrakes = local c = (import 'wheel-classes.libsonnet').heavy; 2 * (c.disc.massKg + c.caliper.massKg);
+// An axle drawn with its drums, and its twin drawn without them for wheels carrying the kit's brakes at sites of their
+// own (`wheel-kit.libsonnet`, `axle`). The twin is lighter by the kit's drum brake of `class` at each end, so a vehicle
+// braked by those weighs what it does on the drawn drums.
+local withBare(draw, id, massKg, class) = [
+  draw(id, massKg, true),
+  draw(wheelKit.axle(id, 'drum'), massKg - 2 * wheelKit.brakeMass(class, 'drum'), false),
+];
 local truckDriveAxle = 430;
 local truckSteeredAxle = 350;
 // For 8 R19.5 wheels: lighter section, its spring seats under a medium truck's rails.
@@ -119,12 +125,13 @@ local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
 ]), { steel: 'steel-grey' });
 // A low floor passes over the beam, so it drops between risers in the wheel wells, and hubs stay `beamAxle`'s `height`
 // above the base.
-local steeredAxleDrop = k.compound('steered_axle_drop', 330, [
+local steeredAxleDrop(id, massKg, drums) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, 0.2, -0.86], [0.06, 0.31, 0.86]),
 ] + k.bothSides([
   box('riser', 'steel', [-0.07, 0.2, 0.86], [0.07, 0.64, 0.95]),
+] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(0.2, 0.96, 1.09), [0, 0.52, 0]) + { sides: 12 },
-]), { steel: 'steel-grey' });
+] else [])), { steel: 'steel-grey' });
 local twistBeam(id, massKg, track) = k.compound(id, massKg, [
   box('beam', 'steel', [0.18, 0.25, -track / 2 + 0.1], [0.26, 0.33, track / 2 - 0.1]),
 ] + k.bothSides([
@@ -481,17 +488,16 @@ local towHitch = k.compound('tow_hitch', 18, [
   twistBeam('twist_beam', 30, 1.52),
   beamAxle('beam_axle_light', 75, 1.5, 0.0625, 0.37),
   beamAxle('beam_axle_van', 110, 1.68, 0.0625, 0.37),
-  beamAxle('beam_axle_truck', truckDriveAxle, 1.86, 0.07, 0.52),
-  steeredAxle('steered_axle_heavy', truckSteeredAxle, 0.95, 0.52),
-  beamAxle('beam_axle_truck_disc', truckDriveAxle - discBrakes, 1.86, 0.07, 0.52, drums=false),
-  steeredAxle('steered_axle_heavy_disc', truckSteeredAxle - discBrakes, 0.95, 0.52, drums=false),
   steeredAxleMedium,
-  steeredAxleDrop,
   trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37),
-  // A De Dion tube carries no differential, so it is drawn as an undriven axle with its drum brakes.
-  trailerAxle('de_dion_axle_small', 35, 1.43, 0.045, 0.3015),
+  // A De Dion tube carries no differential, so it is drawn as an undriven axle. Its wheels carry the kit's drums, so it
+  // is drawn without its own and is lighter by theirs.
+  trailerAxle('de_dion_axle_small', 35 - 2 * wheelKit.brakeMass('light', 'drum'), 1.43, 0.045, 0.3015, drums=false),
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37),
-  trailerAxle('trailer_axle_truck', 190, 1.86, 0.065, 0.52),
+] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', truckDriveAxle, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', truckSteeredAxle, 'heavy')
++ withBare(steeredAxleDrop, 'steered_axle_drop', 330, 'heavy')
++ withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 190, 'heavy') + [
   propShaft('prop_shaft_short', 10, 1.2),
   propShaft('prop_shaft_long', 22, 2.6),
   bench('bench_seat_2', 18, 1.0),
@@ -554,5 +560,5 @@ local towHitch = k.compound('tow_hitch', 18, [
   stretcher,
   attendantSeat,
   controlStick,
-] + (import 'engine-kit.libsonnet').rows + (import 'wheel-kit.libsonnet').rows
+] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
   + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows

@@ -3,6 +3,7 @@
 // the same spec, taking its kit as an argument so this folder stays free of Deadvox imports.
 // A door takes the place of one window bay on the near side; the driver sits on the far side, away from the kerb.
 local k = import 'kit.libsonnet';
+local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 // What is left of [lo, hi] once the cuts are taken out.
@@ -401,6 +402,11 @@ local laid(kit, id, s) =
   local part(suffix) = k.partId(id, s, suffix);
   local g = layout(s);
   local p = s.power;
+  // A spec's `wheelBrakes` is the kind of `wheel-kit.libsonnet` brake its wheels carry, as a truck's is
+  // (`truck-cab.libsonnet`); without it the axles brake them.
+  local brake = std.get(s, 'wheelBrakes');
+  local axle(part) = wheelKit.axle(part, brake);
+  local wheels(site, at, supportedBy, braked=true) = wheelKit.pair(kit, site, s.wheel, at, if braked then brake else null, supportedBy);
   local deckPanes = std.flattenArrays([
     local deck = s.decks[i];
     local panes = g.panes(deck);
@@ -448,8 +454,8 @@ local laid(kit, id, s) =
     fitting('steering_wheel', 'steering_wheel', [d.x + 0.42, d.y + 0.62, -d.z], ['steering_column']),
     fitting('instruments', 'instrument_binnacle', [d.x + 0.64, dashTop(s), -d.z], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [d.x + 0.36, d.y, -d.z + 0.34], [driverBase]),
-    fitting('rear_axle', 'beam_axle_truck', [s.rearAxle, s.wheelR - 0.52, 0], ['shell']),
-    fitting('front_axle', std.get(s, 'frontAxlePart', 'steered_axle_heavy'), [s.frontAxle, s.wheelR - 0.52, 0], ['shell']),
+    fitting('rear_axle', axle('beam_axle_truck'), [s.rearAxle, s.wheelR - 0.52, 0], ['shell']),
+    fitting('front_axle', axle(std.get(s, 'frontAxlePart', 'steered_axle_heavy')), [s.frontAxle, s.wheelR - 0.52, 0], ['shell']),
     fitting('engine', p.engine, p.engineAt, ['shell']),
     fitting('gearbox', p.gearbox, p.gearboxAt, ['engine']),
     fitting('radiator', p.radiator, p.radiatorAt, ['shell']),
@@ -469,9 +475,10 @@ local laid(kit, id, s) =
   + deckPanes
   + doors
   + seats
-  + pair('front_wheel', s.wheel, [s.frontAxle, s.wheelR, s.wheelZ], on(['front_axle']))
-  + pair('rear_wheel', s.wheel, [s.rearAxle, s.wheelR, s.wheelZ], on(['rear_axle']))
-  + pair('rear_inner_wheel', s.wheel, [s.rearAxle, s.wheelR, s.wheelZ - s.wheelTwin], on(['rear_axle']))
+  + wheels('front_wheel', [s.frontAxle, s.wheelR, s.wheelZ], on(['front_axle']))
+  // The outer wheel of a twin shares its inner wheel's brake.
+  + wheels('rear_wheel', [s.rearAxle, s.wheelR, s.wheelZ], on(['rear_axle']), braked=false)
+  + wheels('rear_inner_wheel', [s.rearAxle, s.wheelR, s.wheelZ - s.wheelTwin], on(['rear_axle']))
   + pair('door_mirror', 'door_mirror_bus', s.mirrorAt, on(['shell']))
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))

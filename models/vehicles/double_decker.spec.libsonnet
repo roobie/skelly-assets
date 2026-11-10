@@ -17,6 +17,8 @@ local upper = 2.45;
   upperFloorMass: 420,
   frontAxle: 2.85, frontAxlePart: 'steered_axle_drop', rearAxle: -2.1, arch: 0.62, archTop: 1.12, frontWell: 0.86, rearWell: 0.6,
   wheel: 'wheel_295_80r22_5', wheelR: 0.522, wheelZ: 1.1, wheelTwin: 0.3,
+  // A low-floor bus brakes on air discs.
+  wheelBrakes: 'disc',
   lean: 0.1, screens: [[0.95, 2.15], [3.05, 3.88]], pillar: 0.1,
   doors: [{ bay: 0 }], doorSill: 0.3, doorKick: 0.28, doorFinish: 'plastic-black',
   rearHoles: [{ y: [1.6, 2.15], z: 0.85 }, { y: [3.05, 3.88], z: 0.85 }], engineHatch: [0.5, 1.45],

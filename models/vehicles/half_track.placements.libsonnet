@@ -41,7 +41,7 @@ local bogieAt(i) = [(roadWheels[2 * i].at[j] + roadWheels[2 * i + 1].at[j]) / 2 
     one('gear_lever', 'gear_lever', [0.75, s.floor, 0]),
     one('tow_hitch', 'tow_hitch', [s.rear - 0.06, 0.66, 0]),
   ]
-  + wheel.pair(site.kit, 'front_wheel', 'wheel_8_25_20', [s.frontAxle, s.hub, s.wheelZ], brake=false)
+  + wheel.pair(site.kit, 'front_wheel', 'wheel_8_25_20', [s.frontAxle, s.hub, s.wheelZ], 'drum')
   + track.pair('half_track_track', [0, 0, s.trackZ], 'assembly')
   + std.flattenArrays([pair('bogie_' + i, 'half_track_bogie', bogieAt(i)) for i in std.range(0, std.length(roadWheels) / 2 - 1)])
   + pair('cab_door', 'half_track_cab_door')
