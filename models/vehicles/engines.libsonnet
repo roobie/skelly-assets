@@ -7,6 +7,8 @@
   i3_petrol: { class: 'light', massKg: 81, length: 0.4, width: 0.44, height: 0.44 },
   i4_petrol: { class: 'light', massKg: 140, length: 0.46, width: 0.46, height: 0.55 },
   i4_diesel: { class: 'light', massKg: 185, length: 0.5, width: 0.5, height: 0.62 },
+  // A 3-litre pushrod car six of about 85 kW. Its mass and measures are estimates for a six of its size.
+  i6_petrol: { class: 'light', massKg: 210, length: 0.78, width: 0.44, height: 0.66 },
   // A 6.3-litre White 160AX side-valve six of 110 kW, as in the M3 half-track. Its mass and measures are estimates for a
   // long-stroke truck six of its size, since no source gives them.
   i6_petrol_large: { class: 'medium', massKg: 540, length: 1.0, width: 0.6, height: 0.75 },
