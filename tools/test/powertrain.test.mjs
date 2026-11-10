@@ -11,7 +11,12 @@ test('an electric variant fits no part of its parent\'s combustion drive', () =>
   const { left, kitParts } = JSON.parse(evaluateJsonnet(`
     local powertrain = import 'models/vehicles/powertrain.libsonnet';
     local drive = { part: 'fixture_drive', at: [0, 0, 0] };
-    local kits = [import 'models/vehicles/engine-kit.libsonnet'];
+    local kits = [
+      import 'models/vehicles/engine-kit.libsonnet',
+      import 'models/vehicles/cooling-kit.libsonnet',
+      import 'models/vehicles/fuel-tank-kit.libsonnet',
+      import 'models/vehicles/exhaust-kit.libsonnet',
+    ];
     {
       left: [placed.part for placed in powertrain.electric((import 'models/vehicles/saloon.placements.libsonnet').sites, { motor: drive, inverter: drive, pack: drive, port: drive })],
       kitParts: std.flattenArrays([[row.id for row in kit.rows] for kit in kits]),
