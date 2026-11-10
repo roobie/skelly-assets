@@ -40,5 +40,14 @@ export const UNDERSIDE_VIEWS = [
   ['below', from(0, 0, -1)],
 ];
 
+// The straight tile's views, square to the model's axes, for reading a joint's turn against its frame: a roll about a
+// bone shows end-on, a swing in a plane shows square to that plane, where a three-quarter view mixes them.
+export const STRAIGHT_VIEWS = [
+  ['front', FORWARD],
+  ['left', from(0, -1, 0)],
+  ['right', RIGHT],
+  ['top', UP],
+];
+
 // The view sets a look can draw a tile from, by the name a review asks for.
-export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS };
+export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, straight: STRAIGHT_VIEWS };
