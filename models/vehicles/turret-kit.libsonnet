@@ -255,9 +255,12 @@ local core(name) =
     finish: { paint: t.paint, steel: steel } + (if std.objectHas(t, 'jacket') then { jacket: 'steel-spall-black' } else {}),
   };
 
+// A gun's own row is a firearm, drawn on the gun class as a hand-held one is, since its barrel is thinner than a vehicle
+// voxel; the fused turret draws it on the vehicle class with the rest of the turret.
+local voxelOf(e) = if std.member(guns, e.draw) then { voxelClass: 'gun' } else {};
 local classRows(name) =
   local c = classes[name];
-  [assembly.row(e.id, e.massKg, drawn(c, e)) + taxonomy.of(e) for e in entries(c)];
+  [assembly.row(e.id, e.massKg, drawn(c, e)) + taxonomy.of(e) + voxelOf(e) for e in entries(c)];
 local turretRows(name) =
   assembly.rows(name, coreId(name), turrets[name].massKg, core(name), fittings(name));
 
