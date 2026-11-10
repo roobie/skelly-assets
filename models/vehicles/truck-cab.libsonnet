@@ -4,6 +4,7 @@
 // A spec with `bonnet` gets a bonneted cab with wings; without it the cab sits over the engine with its wheel
 // arches in the cab skirts. `crew` gives a second door pair at `[rear, front]`.
 local k = import 'kit.libsonnet';
+local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -37,6 +38,9 @@ local defaults = {
   guard: true,
   guardTop: 2 * self.r + 0.06,
   frontAxlePart: 'steered_axle_heavy',
+  // Fits the wheels with `wheel-kit.libsonnet`'s brakes, which take the place of the axles' drums, so the axle parts
+  // are then ones drawn without them.
+  wheelBrakes: false,
   frontAxleY: self.r - 0.52,
   rearAxlePart: 'beam_axle_truck',
   rearAxleY: self.r - 0.52,
@@ -231,6 +235,9 @@ local items(kit, id, name, s0) =
   [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in parts if !k.borrows(s, p[0])];
 local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local pair = kit.pair; local on = kit.on; local origin = kit.origin;
   local part(suffix) = k.partId(id, s, suffix);
+  local wheels(site, at, supportedBy, brake=true) =
+    if s.wheelBrakes then wheelKit.pair(kit, site, s.wheel, at, supportedBy, brake)
+    else pair(site, s.wheel, at, supportedBy);
   local rearN = std.length(s.rearAxles);
   local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
   local shaftFrom = gearboxX - s.gearboxLength / 2;
@@ -264,10 +271,11 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   ] + (if rearN > 1 then [
     fitting('inter_axle_shaft', 'prop_shaft_short', [(s.rearAxles[0] + s.rearAxles[1]) / 2, s.r + 0.1, 0], ['rear_axle_0', 'rear_axle_1']),
   ] else []) + std.flattenArrays([
-    pair('rear_wheel_' + i, s.wheel, [s.rearAxles[i], s.r, s.rearZ], on(['rear_axle_' + i]))
-    + (if s.twinRear then pair('rear_inner_wheel_' + i, s.wheel, [s.rearAxles[i], s.r, s.rearInnerZ], on(['rear_axle_' + i])) else [])
+    // The outer wheel of a twin shares its inner wheel's brake.
+    wheels('rear_wheel_' + i, [s.rearAxles[i], s.r, s.rearZ], on(['rear_axle_' + i]), brake=!s.twinRear)
+    + (if s.twinRear then wheels('rear_inner_wheel_' + i, [s.rearAxles[i], s.r, s.rearInnerZ], on(['rear_axle_' + i])) else [])
     for i in std.range(0, rearN - 1)
-  ]) + pair('front_wheel', s.wheel, [s.frontAxle, s.r, s.frontZ], on(['front_axle']))
+  ]) + wheels('front_wheel', [s.frontAxle, s.r, s.frontZ], on(['front_axle']))
   + (if s.raisedSeat then pair('seat_riser', 'seat_riser', [s.seatX, s.floor, 0.58], on(['cab'])) + pair('seat', 'front_seat', [s.seatX, s.seatY, 0.58], on([], ['seat_riser']))
      else pair('seat', 'front_seat', [s.seatX, s.seatY, 0.58], on(['cab'])))
   + (if s.binnacle then [fitting('instrument_binnacle', 'instrument_binnacle', [s.face - s.dashDepth + 0.18, s.waist - 0.04, -0.58], ['dashboard'])] else [])
