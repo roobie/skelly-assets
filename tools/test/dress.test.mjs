@@ -17,13 +17,15 @@ const dressing = {
     { slot: 'torso', part: 'chest', against: [0, 0, 1], sink: 0.5 },
     { slot: 'arms', part: 'sleeve', both: true, against: [0, -1, 0], sink: 0 },
     { slot: 'hands', part: 'sleeve', against: [0, 0, 0], sink: 0 },
+    { slot: 'head', anchor: 'brow' },
+    { slot: 'face', anchor: 'nose' },
   ],
   slots: { body: { slot: 'torso', part: 'chest' }, cuff: { slot: 'arms', part: 'sleeve' } },
 };
 const figure = {
   bust: {
     parts: [{ part: 'chest', at: [0, 0, 0], box: box([-0.2, 0, -0.1], [0.2, 0.6, 0.1]) }],
-    anchors: { shoulder_right: [-0.3, 0.5, 0], shoulder_left: [0.3, 0.5, 0] },
+    anchors: { shoulder_right: [-0.3, 0.5, 0], shoulder_left: [0.3, 0.5, 0], brow: [0, 0.8, 0.05] },
   },
   limb: {
     parts: [{ part: 'sleeve', at: [0, -0.2, 0], box: box([-0.05, -0.4, -0.05], [0.1, 0, 0.05]) }],
@@ -71,6 +73,14 @@ test('a wearable with no pieces rests against its place\'s part, sunk by its sha
   // torso is listed before hands, so the chest takes it: its front face at the chest's, half of it sunk in.
   close(site.at, [0, 0.3, 0.1]);
   assert.equal(site.turn, undefined);
+});
+
+test('a wearable placed by an anchor stands with its origin at the bust anchor, whatever its box', () => {
+  const hat = model('hat', { slot: ['head'] });
+  const [site] = wornSites(hat, { dressing, doll, models: [hat], boxOf: () => box([-0.2, 0, -0.2], [0.2, 0.9, 0.2]) }).slice(doll.sites.length);
+  close(site.at, [0, 0.8, 0.05]);
+  const mask = model('mask', { slot: ['face'] });
+  assert.throws(() => wornSites(mask, { dressing, doll, models: [mask], boxOf: () => box([0, 0, 0], [1, 1, 1]) }), /nose/);
 });
 
 test('a place on both sides spans both copies of its part', () => {

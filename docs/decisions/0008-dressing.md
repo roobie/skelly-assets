@@ -33,7 +33,10 @@ rather than drawn askew.
 
 A wearable with no worn pieces is placed by its slot: against the doll part its slot's place names, centred across
 and sunk into it by a share of its own depth. This shows where it belongs and roughly how big it is beside the body,
-which a reviewer can judge before the item has worn pieces. A folded or lying wearable is stood up first, head end
+which a reviewer can judge before the item has worn pieces. A head piece is placed by the bust's brow anchor
+instead, its origin at the hairline: a hat stands on its brim in the model frame, so its brim meets the head at the
+brow whatever the hat's height, where sinking it by a share of its height would set a tall hat over the face and a
+low cap above the head. A folded or lying wearable is stood up first, head end
 up and front forward, because the model frame lays every garment flat the same way
 (`docs/decisions/0002-model-frame.md`, "Decision"). Its pose stays as authored, so an unsettled front or lying pose
 shows as such on the doll too.
