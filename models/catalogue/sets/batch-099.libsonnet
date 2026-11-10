@@ -169,9 +169,9 @@ local beltStrap(len, w, t=0.004) = [
   // reinforced toe and heel and laces to the top.
   bootPair('combat_boots', 1.1, { l: 0.3, w: 0.105, s: 0.026, toe: 0.06, instep: 0.085, top: 0.22, shaft: 0.12, laces: 6 }, 0.02, {
     upper: 'nylon-coyote',
-    toe: 'polymer-fde',
+    toe: 'leather-coyote',
     sole: 'rubber-black',
-    collar: 'polymer-fde',
+    collar: 'leather-coyote',
     laces: 'webbing-black',
   }, function(p, xc) [
     box(p + '-heel-cup', 'collar', [xc - 0.0525, 0.026, -0.152], [xc + 0.0525, 0.07, -0.12]),

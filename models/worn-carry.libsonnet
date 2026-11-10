@@ -201,7 +201,7 @@ local sling =
   ];
 
 [
-  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'polymer-od-green', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
+  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'cloth-olive-drab', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
   wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }, tag('armour', 'torso', 'fabric')),
   backpack('school_backpack', 0.6, 0.15),
   backpack('hiking_backpack', 1.4, 0.06),

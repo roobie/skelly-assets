@@ -90,7 +90,7 @@ local furHat = [
     h.turned('crown', 'felt', 'y', [[0, 0], [0, 0.084], [0.06, 0.088], [0.1, 0.082], [0.12, 0.066], [0.131, 0.04], [0.135, 0]]),
     h.turned('brim', 'felt', 'y', [[0, 0.08], [0, 0.128], [0.008, 0.138], [0.02, 0.142], [0.022, 0.136], [0.012, 0.128], [0.006, 0.08], [0, 0.08]]),
     ring('band', 'band', 0.084, 0.0895, 0.006, 0.032),
-  ], { felt: 'cloth-charcoal', band: 'satin-black' })
+  ], { felt: 'felt-charcoal', band: 'satin-black' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A chaplet lying flat, 220 mm across: a ring of twisted dried stems 24 mm thick, set with leaves and a few dried
