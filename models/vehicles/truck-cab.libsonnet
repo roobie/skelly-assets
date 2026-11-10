@@ -5,6 +5,8 @@
 // arches in the cab skirts. `crew` gives a second door pair at `[rear, front]`.
 local k = import 'kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
+local cooling = import 'cooling-kit.libsonnet';
+local fuelTank = import 'fuel-tank-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -41,6 +43,9 @@ local defaults = {
   // Fits the wheels with `wheel-kit.libsonnet`'s brakes, which take the place of the axles' drums, so the axle parts
   // are then ones drawn without them.
   wheelBrakes: false,
+  // Fits the radiator and fuel tank as one model each, 'fused', or as the parts of `cooling-kit.libsonnet` and
+  // `fuel-tank-kit.libsonnet`, 'assembly', so each part is its own loot.
+  detail: 'fused',
   frontAxleY: self.r - 0.52,
   rearAxlePart: 'beam_axle_truck',
   rearAxleY: self.r - 0.52,
@@ -255,8 +260,8 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
     fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
-    fitting('radiator', s.radiator, [s.radiatorX, s.radiatorY, 0], ['chassis']),
-    fitting('fuel_tank', 'fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], ['chassis']),
+  ] + cooling.sites(kit, s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, ['chassis'])
+  + fuelTank.sites(kit, 'fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, supportedBy=['chassis']) + [
     fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, 0.2], ['engine', 'chassis']),
     // The driver sits on the far side, away from the kerb, as on the buses.
     fitting('steering_wheel', 'steering_wheel', [s.face - s.dashDepth - 0.03, s.seatY + 0.72, -0.58], ['dashboard']),
