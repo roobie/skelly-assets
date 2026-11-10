@@ -1,6 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'apc.spec.libsonnet';
+local turret = import 'turret-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
@@ -112,4 +113,4 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('panel', 'dash', [2.15, 1.3, -1.0], [2.3, 1.55, -0.2]),
     box('column', 'steel', [2.05, s.floor, -0.68], [2.15, 1.3, -0.52]),
   ], { dash: 'plastic-black', steel: 'steel-grey' }),
-] + (import 'turret-kit.libsonnet').rows)
+] + turret.classRows('one_man_mg') + turret.turretRows('apc_turret'))
