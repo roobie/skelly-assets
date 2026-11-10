@@ -451,7 +451,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   wheel('wheel_235_75r15', 26, 0.235, 0.19, 0.367),
   wheel('wheel_225_75r16c', 28, 0.225, 0.203, 0.372),
   wheel('wheel_8r19_5', 48, 0.21, 0.248, 0.43),
-  wheel('wheel_295_80r22_5', 85, 0.295, 0.286, 0.522),
   farmWheel('wheel_16_9r30', 160, 0.43, 0.381, 0.78, 24),
   farmWheel('wheel_11_2r24', 55, 0.284, 0.305, 0.57, 18),
   wheel('wheel_265_75r16', 32, 0.265, 0.203, 0.402),
@@ -557,4 +556,4 @@ local towHitch = k.compound('tow_hitch', 18, [
   stretcher,
   attendantSeat,
   controlStick,
-] + (import 'engine-kit.libsonnet').rows
+] + (import 'engine-kit.libsonnet').rows + (import 'wheel-kit.libsonnet').rows
