@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import type { Body } from '../src/core/body.ts';
+import { registerBodyPlan } from '../src/core/generate.ts';
+import { registerTemplate, type Template } from '../src/core/template.ts';
 import { cellIndex, worldPosition } from '../src/core/voxelize.ts';
-import { acidTemplate } from '../src/mob/acidTemplate.ts';
 import {
   type BoneVoxelBox,
   type HumanoidFigure,
@@ -8,10 +10,53 @@ import {
   humanoidFigure,
   templateFigure,
 } from '../src/mob/humanoidFigure.ts';
-import { TEMPLATES } from '../src/mob/templates.ts';
 
 // Fixture seeds: Deadvox authors the shipped pool, and its own tests check those.
 const FIXTURE_SEEDS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+// One cheap bone whose budget rejects every odd seed, so an odd seed's next seed is valid: a figure
+// that fell through to the next valid seed would return that body instead of refusing.
+const VALID_SEED = 2;
+const alternatingTemplate: Template = {
+  name: 'fixture-alternating-validity',
+  bodyPlan: 'fixture-alternating-validity',
+  description: 'fixture',
+  voxelSize: 0.05,
+  bodyMassKg: 1,
+  params: {},
+  supportBones: ['spine'],
+  materials: { flesh: { color: [0.5, 0.5, 0.5], emissive: 0 }, bone: { color: [1, 1, 1], emissive: 0 } },
+  budgets: {
+    totalVoxels: { min: 1, max: Number.POSITIVE_INFINITY },
+    totalTriangles: { min: 0, max: Number.POSITIVE_INFINITY },
+    groups: {},
+  },
+};
+const alternatingBody: Body = {
+  bones: [{ id: 'spine', parent: null, head: [0, 0, 0], tail: [0, 0.2, 0] }],
+  features: [
+    {
+      bone: 'spine',
+      op: 'add',
+      material: 'flesh',
+      shape: { kind: 'capsule', a: [0, 0.06, 0], b: [0, 0.2, 0], ra: 0.06, rb: 0.06 },
+    },
+  ],
+  materials: alternatingTemplate.materials,
+};
+registerBodyPlan(alternatingTemplate.bodyPlan, {
+  sample: () => ({ params: {}, wounds: [] }),
+  build: () => alternatingBody,
+  paramOrder: [],
+  woundBones: [],
+  budgets: (genome, template) =>
+    genome.seed % 2 === 0
+      ? template.budgets
+      : { ...template.budgets, totalVoxels: { min: Number.POSITIVE_INFINITY, max: Number.POSITIVE_INFINITY } },
+  limbBones: [],
+  regionBones: { head: [], torso: ['spine'], leftArm: [], rightArm: [], leftLeg: [], rightLeg: [] },
+});
+registerTemplate(alternatingTemplate);
 
 const REGION_BONES: Readonly<Record<HumanoidHitRegion, readonly string[]>> = {
   head: ['head', 'jaw'],
@@ -75,22 +120,8 @@ describe('shared humanoid hit-region figures', () => {
     }
   });
 
-  it('never draws one seed as another seed: every model refuses a seed that is not valid itself', () => {
-    for (const { name } of [...TEMPLATES, acidTemplate].filter(
-      (template) => (template.status ?? 'ready') === 'ready',
-    )) {
-      const realized = FIXTURE_SEEDS.flatMap((seed) => {
-        try {
-          return [{ seed, figure: templateFigure(name, seed) }];
-        } catch {
-          return [];
-        }
-      });
-      expect(realized.length, name).toBeGreaterThan(0);
-      expect(
-        realized.filter(({ seed, figure }) => figure.genome.seed !== seed).map(({ seed }) => seed),
-        name,
-      ).toEqual([]);
-    }
+  it('never draws one seed as another seed: a model refuses a seed that is not valid itself', () => {
+    expect(templateFigure(alternatingTemplate.name, VALID_SEED).genome.seed).toBe(VALID_SEED);
+    expect(() => templateFigure(alternatingTemplate.name, VALID_SEED - 1)).toThrowError('not valid');
   });
 });
