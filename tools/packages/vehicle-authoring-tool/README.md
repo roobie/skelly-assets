@@ -1,3 +1,9 @@
+---
+read_if:
+  - you edit or save a vehicle blueprint in the vehicle authoring tool
+  - you change what the tool checks before export
+---
+
 # Vehicle authoring tool
 
 ## Table first, 3D next

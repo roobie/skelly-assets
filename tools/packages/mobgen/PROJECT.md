@@ -1,3 +1,10 @@
+---
+read_if:
+  - you change how mobgen builds, poses or bakes a body
+  - you add a body plan or a mob template
+  - you decide what mobgen code may import
+---
+
 # mobgen — procedural voxel actors
 
 Mobgen keeps body construction independent of feasibility rules and rendering so body plans can be tested,
