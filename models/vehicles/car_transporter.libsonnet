@@ -15,14 +15,14 @@ local slopeTail(id, a, b, z) = prism(id, 'deck', [[b[0], b[1] - thick], [a[0], a
 local headAt(f) = [s.upperFront + f * (s.headTip[0] - s.upperFront), s.upperTop + f * (s.headTip[1] - s.upperTop)];
 local tailAt(f) = [s.upperRear + f * (s.tailTip[0] - s.upperRear), s.upperTop + f * (s.tailTip[1] - s.upperTop)];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', s) + [
-  k.compound('car_transporter_lower_deck', 1200, [
+  k.compound('car_transporter_lower_deck', 2000, [
     box('plate', 'deck', [s.rear, s.lowerBottom, -s.deckSide], [s.lowerFront, s.lowerTop, s.deckSide]),
     box('cross_rear', 'frame', [-5.4, s.railTop, -0.46], [-5.2, s.lowerBottom, 0.46]),
   ] + k.bothSides([
     box('runner', 'frame', [s.rear + 0.1, s.railTop, 0.3], [s.lowerFront, s.lowerBottom, 0.44]),
   ]), finish),
   // Bars stay below the wheel tracks, because the cargo face is this part's highest point.
-  k.compound('car_transporter_upper_deck', 1100, k.bothSides([
+  k.compound('car_transporter_upper_deck', 1800, k.bothSides([
     box('track', 'deck', [s.upperRear, s.upperBottom, trackIn], [s.upperFront, s.upperTop, s.deckSide]),
   ]) + [
     box('cross_' + i, 'frame', [crossXs[i] - 0.05, s.upperBottom - 0.06, -s.deckSide], [crossXs[i] + 0.05, s.upperBottom + 0.03, s.deckSide])
@@ -45,7 +45,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporte
     box('root_bar', 'frame', [s.upperRear - 0.16, s.upperBottom - 0.04, -0.5], [s.upperRear + 0.08, s.upperTop - 0.03, 0.5]),
     box('tip_bar', 'frame', [s.tailTip[0], s.tailTip[1] - 0.16, -0.5], [s.tailTip[0] + 0.14, s.tailTip[1] - 0.02, 0.5]),
   ], finish),
-  k.compound('car_transporter_deck_posts', 700, k.bothSides(std.flattenArrays([
+  k.compound('car_transporter_deck_posts', 1000, k.bothSides(std.flattenArrays([
     [
       box('post_' + i, 'paint', [postXs[i] - 0.07, s.lowerBottom, s.postIn], [postXs[i] + 0.07, s.upperBottom, s.postOut]),
     ]

@@ -7,7 +7,7 @@
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-oxblood',
-  chassisMass: 2500, shellMass: 1480,
+  chassisMass: 1600, shellMass: 1480,
   bonnet: { nose: 3.46, back: 2.2, front: 1.98, z: 0.72 },
   bumperPaint: 'steel-stainless',
   radiatorX: 3.2, radiatorY: 0.72,

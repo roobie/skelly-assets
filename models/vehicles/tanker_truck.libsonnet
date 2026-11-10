@@ -12,7 +12,7 @@ local manholes = [s.barrelRear + 1.2, (s.barrelRear + s.barrelFront) / 2, s.barr
 local ladderX = s.barrelRear - s.dish - 0.1;
 local posts = [s.barrelRear + 0.5 + i * (s.barrelFront - s.barrelRear - 1.0) / 5 for i in std.range(0, 5)];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck', s) + [
-  k.compound('tanker_truck_barrel', 2500, [
+  k.compound('tanker_truck_barrel', 3000, [
     turned('shell', 'tank', 'x', [
       [s.barrelRear - s.dish, 0],
       [s.barrelRear - s.dish, s.barrelRadius * 0.55],

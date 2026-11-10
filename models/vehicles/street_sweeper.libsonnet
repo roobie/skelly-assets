@@ -40,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper
   ] + k.bothSides([
     box('runner', 'frame', [s.bodyRear + 0.2, s.railTop, 0.3], [s.bodyFront, s.bodyLow, 0.44]),
   ]), finish),
-  k.compound('street_sweeper_hopper', 950, hopperPieces + k.bothSides([
+  k.compound('street_sweeper_hopper', 1300, hopperPieces + k.bothSides([
     box('band', 'band', [s.bodyRear + 0.3, 1.9, s.bodySide], [s.hopperFront, 2.14, s.bodySide + 0.032]),
     box('rib_a', 'steel', [-2.2, s.bodyLow, s.bodySide], [-2.12, 1.9, s.bodySide + 0.032]),
     box('rib_b', 'steel', [-1.2, s.bodyLow, s.bodySide], [-1.12, 1.9, s.bodySide + 0.032]),

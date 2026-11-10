@@ -14,7 +14,7 @@ dd {
   screens: [dd.screens[0]],
   rearHoles: [dd.rearHoles[0]],
   paint: 'paint-green', accent: 'paint-cream', bumperFinish: 'paint-charcoal',
-  shellMass: 7420,
+  shellMass: 6590,
   // The lower deck's glass, doors, dash, sign and end panels are the double decker's pressings.
   borrow: {
     _front_panel: 'double_decker_front_panel', _rear_panel: 'double_decker_rear_panel',

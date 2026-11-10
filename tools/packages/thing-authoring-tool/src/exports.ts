@@ -5,6 +5,7 @@ import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts
 import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, type Catalogue, type CatalogueSettings, itemPalette, type ToolItem } from './catalogue.ts';
+import { checkDrawnDensity, type DensityBounds, DensityBoundsSchema } from './density.ts';
 import { authoredSkin } from './skin.ts';
 
 /** The material names in a GLB's JSON chunk, which follows the 12-byte header and its own 8-byte chunk header. */
@@ -38,9 +39,15 @@ export const exportItem = (
   settings: CatalogueSettings,
   asset: ReturnType<typeof recipeAsset>,
   voxel: VoxelGrains,
-  { collision = false }: { readonly collision?: boolean } = {},
+  {
+    collision = false,
+    density,
+  }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
   const { report, masses, handling, label, drawn, glow, paintable } = buildItem(item, settings, voxel);
+  if (density) {
+    checkDrawnDensity(item, report.resolved, drawn, masses, density);
+  }
   const out = exportGlb({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
@@ -88,6 +95,7 @@ export const exportItem = (
 const itemOptions = strictObject({
   mass: picklist(['parts', 'inventory-atom']),
   collision: optional(literal(true)),
+  density: optional(DensityBoundsSchema),
 });
 /**
  * An item row's export against a catalogue, and its inputs: what the export reads besides code and the row, namely its
@@ -110,7 +118,11 @@ const itemKind = ({ items, ...settings }: Catalogue) => {
       if (options.mass !== item.exportMass) {
         throw new Error(`Recipe mass ownership differs from tool item ${row.source}`);
       }
-      return () => exportItem(item, settings, recipeAsset(row), recipeVoxel(row), { collision: options.collision === true });
+      return () =>
+        exportItem(item, settings, recipeAsset(row), recipeVoxel(row), {
+          collision: options.collision === true,
+          density: options.density,
+        });
     },
     inputs: (row: RecipeRow) => {
       const item = itemOf(row);

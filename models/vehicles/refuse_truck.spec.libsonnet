@@ -7,7 +7,7 @@
   railBottom: 0.74, railTop: 0.99,
   engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
   paint: 'paint-green',
-  chassisMass: 2600, shellMass: 1380,
+  chassisMass: 1300, shellMass: 1380,
   // Body and hopper
   bodyRear: -3.0, bodyFront: 2.85, bodyLow: 1.3, bodyRise: 3.3, bodyRiseRear: 3.45,
   hopperRear: -4.85, hopperSill: 1.55, hopperLintel: 2.15, cheekIn: 1.12,

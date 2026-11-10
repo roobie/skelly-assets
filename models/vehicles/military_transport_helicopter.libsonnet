@@ -98,7 +98,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('military_transport_helicopter_fuel_tank', 110, [
     box('tank', 'alu', [-0.45, 0, -0.5], [0.45, 0.9, 0.5]),
   ], { alu: 'alu-bare' }),
-  h.mainGear('military_transport_helicopter_main_gear', 150, s.mainGear.x, s.mainGear.radius, s.mainGear.width, s.mainGear.z, s.mainGear.top, s.mainGear.root),
+  h.mainGear('military_transport_helicopter_main_gear', 45, s.mainGear.x, s.mainGear.radius, s.mainGear.width, s.mainGear.z, s.mainGear.top, s.mainGear.root),
   m.wheel('military_transport_helicopter_main_wheel', 48, s.mainGear.width, 0.2, s.mainGear.radius),
   h.tailGear('military_transport_helicopter_tail_gear', 45, s.tailGear.x, s.tailGear.radius, s.tailGear.width, s.tailGear.top, s.tailGear.rake, s.tailGear.brace),
   m.wheel('military_transport_helicopter_tail_wheel', 14, s.tailGear.width, 0.14, s.tailGear.radius),

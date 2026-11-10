@@ -9,7 +9,7 @@ local blockX0 = s.bodyRear + 0.1;
 local blockLength = (s.bodyFront - 0.1 - blockX0) / 12;
 local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - 0.1) / 0.09) - 1);
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
-  k.compound('rescue_truck_racking', 1450, [
+  k.compound('rescue_truck_racking', 2200, [
     box('racking', 'frame', [-3.3, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
   ], finish),
   k.compound('rescue_truck_marking', 8, k.bothSides([

@@ -83,7 +83,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('fore', 'paint', [s.cutFront - 0.02, s.cut, s.side - 0.02], [s.cutFront + 0.02, s.waist + 0.02, s.side + 0.01]),
     box('aft', 'paint', [s.cutRear + 0.02, s.cut, s.side - 0.02], [s.cutRear + 0.06, s.waist + 0.02, s.side + 0.01]),
   ], finish, { hinge_a: ['fore', [0.5, 0.1, 0.5]], hinge_b: ['fore', [0.5, 0.9, 0.5]] }),
-  k.compound('army_jeep_steering_box', 14, [
+  k.compound('army_jeep_steering_box', 7, [
     box('box', 'dark', [0.72, 0.52, -0.42], [0.86, 0.62, -0.34]),
     box('drag_link', 'frame', [0.8, 0.46, -0.43], [1.0, 0.49, -0.4]),
     box('arm', 'frame', [0.78, 0.46, -0.42], [0.84, 0.52, -0.36]),

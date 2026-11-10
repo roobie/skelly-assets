@@ -3,6 +3,7 @@ read_if:
   - you author or export a non-gun item
   - you inspect the thing tool's viewer or its assembly boundary
   - you change a tool item's mass, finish or geometry
+  - an export refuses a part's mass as implausible for its drawn voxels
   - you make part of an item glow or rename a glowing material
   - you mark which of a part's finish slots take paint
   - you investigate skin authoring or voxel deformation topology
@@ -77,6 +78,14 @@ That choice follows each item into its recipe; disagreement is refused rather th
 authority. Geometry and authoring-preview physical properties do not change with
 that export choice. See `src/catalogue.ts`, `ItemSchema`, `src/exports.ts`,
 `exportItem` and `loadThingRecipe`, and `models/catalogue/sets/cans.libsonnet`, `shellMassKg`.
+
+An authored mass is free to drift from its geometry, and a part that silently carries another part's weight
+misleads every consumer that strips or swaps parts. So a recipe row may bound its parts' drawn density, per material
+where a material is lighter, and the export refuses a part whose mass its drawn voxels could not weigh. Drawn voxels,
+not a solid's nominal volume, are what the consumer sees and collides with. The bounds are tuning content in the
+pack that owns the rows, since only content knows what its parts are made of; material ids name appearance, not
+substance, so a bound for one is a content choice rather than a physical fact the tool could hold. See
+`src/density.ts`, `checkDrawnDensity`, and `models/measures/vehicle-part-density.libsonnet`.
 
 Trap-state presentation needs a consumer-side model selection rule as well as geometry;
 it does not belong in the geometry authoring tool. See `src/families/bearTrap.ts`, `bearTrap`.

@@ -4,7 +4,7 @@
   nose: 4.2, cockpitRear: 1.6, doorFront: 0.5, doorRear: -1.4, cabinRear: -2.8, tear: -3.3,
   deck: 0.3, mastFoot: 2.6, hub: 3.15, enginesY: 2.3, enginesZ: 0.46,
   boomRoot: { x: -4.5, z: 0.7, r: 0.42 }, boomTip: { x: -9.7, z: 2.9, r: 0.2 },
-  shellMass: 2640, paint: 'paint-olive', scorch: 'plastic-scorched', soot: 'steel-spall-black',
+  shellMass: 2660, paint: 'paint-olive', scorch: 'plastic-scorched', soot: 'steel-spall-black',
   body: [
     { x: 4.2, top: 0.95, bottom: 0.4, half: 0.2, waist: 0.65 },
     { x: 3.95, top: 1.32, bottom: 0.14, half: 0.68, waist: 0.68 },

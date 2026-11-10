@@ -114,7 +114,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   ] + bothSides([
     box('ring_side', 'frame', [-0.66, s.roof + 0.06, 0.3], [0.0, s.roof + 0.14, 0.36]),
   ]), finish),
-  k.compound('utility_4x4_steering_box', 16, [
+  k.compound('utility_4x4_steering_box', 14, [
     box('box', 'dark', [1.0, 0.56, -0.42], [1.16, 0.68, -0.3]),
     box('drag_link', 'frame', [1.1, 0.48, -0.45], [1.5, 0.51, -0.42]),
     box('arm', 'frame', [1.06, 0.48, -0.42], [1.12, 0.56, -0.38]),
