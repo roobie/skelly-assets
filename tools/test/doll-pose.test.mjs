@@ -7,7 +7,7 @@ import process from 'node:process';
 import { after, test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
 import { clearanceProbe } from '../../site/clearance.mjs';
-import { boneTransforms, dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
+import { applyPoint, boneTransforms, dot, length, mulMV, normalize, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
 import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
 import { modelTaxonomies } from '../check-taxonomy.mjs';
@@ -80,4 +80,20 @@ test('upper sleeves narrowed inside their arms let the upper arms poke through',
   assert.ok(pieces.some((piece, i) => piece !== rest.pieces[i]), 'the jacket has upper sleeves to narrow');
   const { pokes } = clearanceProbe(rig, { ...rest, pieces }, { margin })(still);
   assert.ok(pokes.some(({ bone }) => bone.startsWith('upperArm.')), 'an upper arm shows through');
+});
+
+test('a curled hand closes toward its own palm on both sides, the mirrored copy a mirror of the reference', () => {
+  const { frame, report } = compilePose(rig, { rig: { id: rig.id, revision: rig.revision }, hands: { 'hand.L': { curl: 1 }, 'hand.R': { curl: 1 } } });
+  assert.deepEqual(report.clamped, []);
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  const curled = boneTransforms(rig.bones, decodeFrame(frame));
+  const tip = (side) => { const bone = bones.get(`index3.${side}`); return applyPoint(curled.get(bone.id), bone.tail); };
+  for (const side of ['L', 'R']) {
+    const hand = bones.get(`hand.${side}`), knuckle = bones.get(`index.${side}`);
+    const intoPalm = mulMV(curled.get(hand.id).r, [hand.bind.mirror ? -1 : 1, 0, 0]);
+    // The fingers hang from the palm's mid-thickness, so a full curl ends a few millimetres toward the palm face.
+    assert.ok(dot(sub(tip(side), applyPoint(curled.get(knuckle.id), knuckle.head)), intoPalm) > 0.005, `the ${side} fingertip comes back toward the palm`);
+  }
+  const [l, r] = [tip('L'), tip('R')];
+  assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right fingertip mirrors the left across x');
 });

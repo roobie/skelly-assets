@@ -11,9 +11,15 @@
 // the rig's own; the levelled bones are levelled again after it. Grounding before the reach lets a target be read off
 // the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
 // models/poses/rig.libsonnet.
+//
+// Hands come as shorthand, `hands: { <hand bone>: { curl, spread, thumb } }`, which site/fingers.mjs turns into digit
+// angles before `angles` of single digit bones are read, so a file can curl a hand and then open one finger. A held item,
+// `hold: { <hand bone>: { model, at?, turn?, socket, close? } }`, is placed after the reach: the palm is set on the
+// item's socket and the fingers then closed on the item by contact, so the grip is read off the item, not drawn by hand.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
+import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem } from './fingers.mjs';
 
-const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground']);
+const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold']);
 const REACH_KEYS = new Set(['target', 'pole']);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -45,6 +51,8 @@ export function poseIssues(rig, file) {
     if (!isVector(goal.target)) issues.push(`reach.${id}.target is a finite point [x, y, z]`);
     if (goal.pole !== undefined && !isVector(goal.pole)) issues.push(`reach.${id}.pole is a finite direction [x, y, z]`);
   });
+  bonesOf('hands', file.hands, (id, hand) => issues.push(...handIssues(rig, id, hand)));
+  bonesOf('hold', file.hold, (id, hold) => issues.push(...holdIssues(rig, id, hold)));
   if (file.level !== undefined) {
     if (!Array.isArray(file.level)) issues.push('level lists bone ids');
     else for (const id of file.level) if (!bones.has(id)) issues.push(`level: the rig has no bone ${id}`);
@@ -84,15 +92,18 @@ export const groundLift = (rig, pose) => -Math.min(...posedCorners(rig, pose).ma
 
 /**
  * A pose file into a clip frame. Refuses a file with issues (`poseIssues`), naming them all. Returns the frame with the
- * limits that held and the reach distances left, so a caller or a test sees what the file asked that the rig refused.
+ * limits that held, the reach distances left and, per holding hand, how its grip closed, so a caller or a test sees
+ * what the file asked that the rig refused; `held` carries each held item's model and world transform `{ r, t }` for
+ * the caller to draw it. A file with a `hold` needs `meshOf(model)`, the item's closed triangle mesh in its own frame.
  */
-export function compilePose(rig, file) {
+export function compilePose(rig, file, { meshOf } = {}) {
   const issues = poseIssues(rig, file);
   if (issues.length > 0) throw new Error(`pose does not fit rig ${rig.id}: ${issues.join('; ')}`);
-  const report = { clamped: [], residuals: {} };
+  const report = { clamped: [], residuals: {}, grips: {} };
   const rotations = {};
+  const asked = Object.assign({}, ...Object.entries(file.hands ?? {}).map(([id, hand]) => handAngles(rig, id, hand)), file.angles ?? {});
   for (const bone of rig.bones) {
-    const angles = file.angles?.[bone.id];
+    const angles = asked[bone.id];
     if (!angles) continue;
     const held = clampJointAngles(bone, angles);
     if (held.some((a, i) => a !== angles[i])) report.clamped.push({ bone: bone.id, asked: angles, held });
@@ -107,7 +118,15 @@ export function compilePose(rig, file) {
     if (!goal) continue;
     ({ pose, residual: report.residuals[bone.id] } = solveTwoBone(rig, pose, bone.reach.chain, goal.target, goal.pole ?? bone.reach.pole, report.clamped));
   }
-  return { frame: encodeFrame(level(pose, report.clamped)), report };
+  const held = {};
+  for (const [id, hold] of Object.entries(file.hold ?? {})) {
+    if (!meshOf) throw new Error(`hold.${id}: compiling a hold needs the held item's mesh`);
+    let item;
+    ({ pose, item, residual: report.residuals[id] } = holdItem(rig, pose, id, hold, report.clamped));
+    if (hold.close !== false) ({ pose, closed: report.grips[id] } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item)));
+    held[id] = { model: hold.model, ...item };
+  }
+  return { frame: encodeFrame(level(pose, report.clamped)), report, held };
 }
 
 // A pose of matrices as a clip frame of quaternions, and back.

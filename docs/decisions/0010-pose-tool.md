@@ -43,12 +43,23 @@ the joints. The probe (`site/clearance.mjs`, `clearanceProbe`) reports covered b
 and garment points it newly sinks into the body, each past a margin (the rig's `clearance`), so a flush fit at rest
 is clean and a test can assert the property instead of a count that moves with every garment.
 
+## Fingers and grips
+
+Fingers are more bones under the hand in the same content (`models/poses/rig.libsonnet`, `fingerBones`), one per
+phalanx, the thumb on its own two bones because it opposes rather than flexes. A pose file curls and spreads a hand
+by shorthand (`site/fingers.mjs`, `handAngles`) so a clip's author never names fifteen bones for a fist.
+
+A grip is planned palm first, then fingers (`site/fingers.mjs`, `holdItem` then `closeHand`): the item carries a
+grip socket, where the palm's face meets it and which way the thumb runs, the arm's two-bone solve puts the wrist
+there, and each finger then flexes joint by joint from the knuckle out until the part it moves touches the item. The
+fingers close by contact, not toward fingertip targets, because a target is a point the author guesses on the
+item's surface, and a chain of three short phalanges under joint limits rarely reaches it exactly (fingertip CCD on
+the same hand leaves the tips millimetres off a handle and runs into limits every step), while contact wraps any
+handle the hand can span, with no per-item tuning beyond the socket. CCD remains in the module (`solveCCD`) for a
+fingertip that must land on a point, such as a button, which a grip is not.
+
 ## Out of scope
 
-- **Fingers and grips** wait for a hand with jointed fingers or a held item whose grip needs review (#132). They will
-  be more bones under the hand in the same content, posed by a constrained CCD that applies each joint's limits at
-  every step, the thumb on its own frame because it opposes rather than flexes, and a grip planned wrist first, then
-  fingers, with the palm held against the item's grip sockets. The two-bone solve has no closed form for them.
 - **A solver shared with mobgen**, with the doll's frames and limits given to mobgen's humanoid, waits for a humanoid
   mob that needs limits or a mob that needs IK (#133); until then the twin and its agreement test are cheaper than a
   shared module across the generator.

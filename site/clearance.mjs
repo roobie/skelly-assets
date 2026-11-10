@@ -31,8 +31,8 @@ function boundsOf(points) {
 
 const nearBox = ({ min, max }, p, reach) => [0, 1, 2].every((a) => p[a] >= min[a] - reach && p[a] <= max[a] + reach);
 
-// A mesh carried by a bone transform, as triangles with their bounds.
-function posedSolid(mesh, transform) {
+// A mesh carried by a transform, as triangles with their bounds; a grip closes on one (site/fingers.mjs).
+export function posedSolid(mesh, transform) {
   const count = mesh.indices.length / 3;
   const triangles = Array.from({ length: count }, (_, t) => triangleCorners(mesh, t).map((p) => applyPoint(transform, p)));
   return { triangles, bounds: boundsOf(triangles.flat()) };
@@ -93,7 +93,7 @@ function triangleDistance(p, [a, b, c]) {
  * How far `p` lies outside the solid, negative inside, as long as that is no more than `reach` either way; beyond it,
  * only the side is known, as ±Infinity.
  */
-function signedDepth({ triangles, bounds }, p, reach) {
+export function signedDepth({ triangles, bounds }, p, reach) {
   if (!nearBox(bounds, p, reach)) return Infinity;
   let crossings = 0, nearest = Infinity;
   for (const triangle of triangles) {
