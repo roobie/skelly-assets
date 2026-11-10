@@ -1,5 +1,6 @@
 // Draws models, assembled vehicles and kit assemblies of a built tree into tiles of four views, with the exploded view
-// of a vehicle or an assembly beside them, and a contact sheet, so a reviewer, human or agent, can check their looks without opening each one. The drawing
+// of a vehicle or an assembly or a wearable worn on the doll beside them, and a contact sheet, so a reviewer, human or
+// agent, can check their looks without opening each one. The drawing
 // is the showcase's own: this builds the showcase from the tree and drives its review page (site/look.mjs) in headless
 // Chromium.
 // Usage: node tools/model-sheet.mjs [--built built] [--out look/sheet] [--size 256] [--vehicles] [--assemblies]
@@ -50,8 +51,9 @@ const writeAtomic = (path, data) => {
 
 const site = join(out, 'site');
 execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, '--no-tree', site], { stdio: ['ignore', 'ignore', 'inherit'] });
-const { assemblies } = JSON.parse(readFileSync(join(site, 'models.json'), 'utf8'));
-const manifest = { ...JSON.parse(readFileSync(join(built, MANIFEST), 'utf8')), assemblies };
+const { assemblies, models } = JSON.parse(readFileSync(join(site, 'models.json'), 'utf8'));
+const worn = Object.fromEntries(models.filter((model) => model.worn).map(({ id, worn: sites }) => [id, sites]));
+const manifest = { ...JSON.parse(readFileSync(join(built, MANIFEST), 'utf8')), assemblies, worn };
 const ids = lookIds(manifest, { ids: positionals, vehicles: values.vehicles, assemblies: values.assemblies });
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary' };
 const isFile = (path) => existsSync(path) && statSync(path).isFile();
@@ -114,12 +116,12 @@ writeAtomic(sheetPath, `${JSON.stringify(rows, null, 1)}\n`);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const figure = (r) => r.error
   ? `<figure data-id="${esc(r.id)}"><figcaption><b>${esc(r.id)}</b><div class=err>${esc(r.error)}</div></figcaption></figure>`
-  : `<figure data-id="${esc(r.id)}"${r.exploded ? ' class=exploded' : ''}><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, ${r.exploded ? 'four views and exploded' : 'four views'}"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
+  : `<figure data-id="${esc(r.id)}"${r.beside ? ' class=wide' : ''}><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, four views${r.beside ? ` and ${r.beside}` : ''}"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
 const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.exploded{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
+figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.wide{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
 input{font:inherit;padding:4px 8px;margin-bottom:12px;width:280px}</style>
-<p>${rows.length} entries · ${esc(look)} · views: ${esc(views.map(([name]) => name).join(' | '))}, then a vehicle or an assembly exploded from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
+<p>${rows.length} entries · ${esc(look)} · views: ${esc(views.map(([name]) => name).join(' | '))}, then a vehicle or an assembly exploded, or a wearable worn on the doll, from the front ¾ · sizes x × y × z · <input id=q placeholder="filter by id"></p><main>
 ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);

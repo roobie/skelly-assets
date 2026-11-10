@@ -89,7 +89,7 @@ local brakeRows(c) = [
         + std.flattenArrays([wheelRows(name) for name in std.objectFields(wheels)]),
   // A near and far pair of wheel sites `id`, each wheel's frame placed at `at`, through a vehicle kit's `pair` (see
   // `site.libsonnet`, `kit`) so a game's kit can take them too. `brake` is false for the outer wheel of a twin, whose
-  // brake sits on the shared hub behind the inner one.
+  // brake sits on the shared hub behind the inner one, and for a wheel on an axle drawn with its drums.
   pair(kit, id, name, at, supportedBy=null, brake=true):
     local c = classOf(name);
     local axial(dz) = [at[0], at[1], at[2] + dz];
