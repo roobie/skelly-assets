@@ -50,7 +50,9 @@ local turbanWrap(prefix, side, y0, rise, w, steps=12) = [
   h.crescent('%s-%d' % [prefix, i], 'wrap', r - 0.006, r + 0.006, side * 180 * i / steps, side * 180 * (i + 1) / steps, 1, y, y + w)[0]
   for i in std.range(0, steps - 1)
 ];
-local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], [0.34, 0]];
+// The wizard hat's cone stands near upright at its foot so it clears the doll's head and hair worn with its brim at
+// the brow, and tapers from there.
+local wizardPath = [[0.006, 0.158], [0.085, 0.154], [0.17, 0.105], [0.26, 0.05], [0.35, 0.01], [0.36, 0]];
 
 [
   // A wide-brimmed woven straw sun hat sitting on its brim, 400 mm across and 120 mm tall: a rounded crown on a
@@ -118,7 +120,7 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
              { cloth: 'cloth-cream', wrap: 'cloth-white' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
-  // A blue costume wizard hat standing on its brim, 380 mm across and 336 mm tall: a tall cone on a wide floppy
+  // A blue costume wizard hat standing on its brim, 480 mm across and 360 mm tall: a tall cone on a wide floppy
   // brim, a gold band round its foot and gold stars stitched over the cone and brim.
   local coneStar(id, x, y, r) = local z = std.sqrt(std.pow(radiusAt(wizardPath, y), 2) - x * x);
     star(id, 'star', 'z', r, z - 0.005, z + 0.002, function(u, v) [x + u, y + v]);
@@ -128,13 +130,13 @@ local wizardPath = [[0.006, 0.105], [0.12, 0.07], [0.24, 0.035], [0.33, 0.008], 
   h.compound('wizard_hat', 0.1,
              [
                shell('cone', 'cloth', wizardPath, 0.006),
-               ring('brim', 'cloth', 0, 0.006, 0.098, 0.19),
-               ring('band', 'band', 0.006, 0.022, 0.1, 0.108),
+               ring('brim', 'cloth', 0, 0.006, 0.152, 0.24),
+               ring('band', 'band', 0.006, 0.022, 0.154, 0.162),
              ]
              + coneStar('star-a', 0, 0.075, 0.022) + coneStar('star-b', -0.025, 0.17, 0.016) + coneStar('star-c', 0.012, 0.25, 0.012)
              + sideStar('star-d', 1, 0.01, 0.11, 0.018) + sideStar('star-e', -1, -0.01, 0.15, 0.016) + sideStar('star-f', 1, -0.02, 0.21, 0.012)
-             + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.12, 0.09, 0.016) + brimStar('star-i', -0.12, 0.1, 0.016)
-             + brimStar('star-j', -0.1, -0.12, 0.016),
+             + brimStar('star-g', 0.0, 0.2, 0.02) + brimStar('star-h', 0.16, 0.12, 0.016) + brimStar('star-i', -0.155, 0.13, 0.016)
+             + brimStar('star-j', -0.13, -0.155, 0.016),
              { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' })
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 

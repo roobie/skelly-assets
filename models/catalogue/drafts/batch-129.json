@@ -121,7 +121,7 @@
       "wearPerDamage": 0.03
     },
     "description": "A tall pointed costume hat of blue cotton with a wide brim, a gold band and gold stars stitched all over. It casts no spells.",
-    "notes": "Standing on its brim, 380 mm across and 336 mm tall: a blue cone on a wide flat brim, a gold band at its foot and gold five-pointed stars on the cone and brim. The model stands as a hollow cone. Slot `head`. The worn look is pending: no worn model is authored."
+    "notes": "Standing on its brim, 480 mm across and 360 mm tall: a blue cone on a wide flat brim, a gold band at its foot and gold five-pointed stars on the cone and brim. The model stands as a hollow cone. Slot `head`. The worn look is pending: no worn model is authored."
   },
   {
     "id": "zucchetto",
