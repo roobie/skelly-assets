@@ -155,5 +155,17 @@
   "tour_bus_open_top_front_panel": "double_decker_front_panel",
   "tour_bus_open_top_rear_panel": "double_decker_rear_panel",
   "tour_bus_open_top_side_window": "double_decker_side_window",
-  "wizard_hat_costume": "wizard_hat"
+  "wizard_hat_costume": "wizard_hat",
+  "worn_boot_foot": "rubber_boots_worn_foot",
+  "worn_boot_shaft": "rubber_boots_worn_shaft",
+  "worn_hoodie_body": "hoodie_worn_body",
+  "worn_hoodie_fore": "hoodie_worn_fore",
+  "worn_hoodie_upper": "hoodie_worn_upper",
+  "worn_jacket_body": "jacket_worn_body",
+  "worn_jacket_fore": "jacket_worn_fore",
+  "worn_jacket_upper": "jacket_worn_upper",
+  "worn_sneaker_foot": "sneakers_worn_foot",
+  "worn_trousers_pelvis": "jeans_worn_pelvis",
+  "worn_trousers_shin": "jeans_worn_shin",
+  "worn_trousers_thigh": "jeans_worn_thigh"
 }

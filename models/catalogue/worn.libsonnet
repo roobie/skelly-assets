@@ -14,7 +14,7 @@ local clothing(material, setting=['modern']) = { category: 'clothing', tags: { m
                                                                 { l: 0.3, w: 0.105, s: 0.026, toe: 0.06, instep: 0.085, top: 0.22, shaft: 0.12, laces: 6 })),
   // A shirt or jacket goes over it, so it takes the under layer.
   tank_top: tagged(clothing(['fabric']), fit.torso('tank_top', finish('tank_top'), {
-    layer: 'under', top: 'straps', sleeves: 'none', zipX: null, pockets: false, slots: { body: 'cloth', trim: 'bind' },
+    layer: 'under', top: 'straps', sleeves: 'none', zipX: null, pockets: 'none', slots: { body: 'cloth', trim: 'bind' },
   })),
   wizard_robe: tagged(clothing(['fabric'], ['fantasy']), fit.robe('wizard_robe', finish('wizard_robe'), {
     stars: [[0.07, 0.56], [0.14, 0.5], [-0.13, 0.49]], moon: [-0.06, 0.53, 0.04],
