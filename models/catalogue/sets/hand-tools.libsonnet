@@ -18,6 +18,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     prism('blade', 'blade', 'y', [[-0.055, 0.100], [0.055, 0.100], [0.015, 0.500], [-0.015, 0.500]], -0.002, 0.002),
   ], { handle: 'wood-walnut', blade: 'steel-grey' }) + gripOn('hand_saw', 'rear') + {
     voxelGrain: 0.004,
+    taxonomy: { category: 'tools' },
   },
   // A 150 mm shank with a 105 mm moulded handle, 0.255 m overall.
   compound('screwdriver', 0.160, [
@@ -25,14 +26,15 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     turned('shaft', 'shaft', 'x', [[0.105, 0], [0.105, 0.0035], [0.250, 0.0035], [0.255, 0.002], [0.255, 0]]),
   ], { handle: 'plastic-yellow', shaft: 'steel-blued' }) + gripOn('screwdriver', 'handle') + {
     voxelGrain: 0.002,
+    taxonomy: { category: 'tools' },
   },
   // A small reel of bare copper wire, 94 mm across the flanges and 60 mm wide.
   item('copper_wire', 'spool', 0.080, {
     outerRadius: 0.047, coreRadius: 0.015, windingRadius: 0.040, height: 0.060,
     flangeHeight: 0.004, flangeInset: 0.002, windings: 6, grooveDepth: 0.002,
-  }, { core: 'plastic-black', winding: 'copper' }) + { voxelGrain: 0.004 },
+  }, { core: 'plastic-black', winding: 'copper' }) + { voxelGrain: 0.004, taxonomy: { category: 'electrical' } },
   // A 32 mm outer diameter compression spring of 4 mm stock, eight turns.
-  item('small_spring', 'coil', 0.020, { radius: 0.014, tubeRadius: 0.002, turns: 8, pitch: 0.005 }, { body: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['metal'] } } },
+  item('small_spring', 'coil', 0.020, { radius: 0.014, tubeRadius: 0.002, turns: 8, pitch: 0.005 }, { body: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // Four 75 mm brass butt hinges with steel pins, opened flat, two by two.
   compound('hinge_set', 0.360,
     hinge('a', -0.040, -0.034) + hinge('b', 0.040, -0.034) + hinge('c', -0.040, 0.034) + hinge('d', 0.040, 0.034),
@@ -44,7 +46,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     screw('screw-a', -0.016),
     screw('screw-b', 0),
     screw('screw-c', 0.016),
-  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { tags: { material: ['metal'] } } },
+  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // A pocket torch strapped to a steel plate with two tape bands.
   compound('taped_flashlight_mount', 0.120, [
     box('plate', 'plate', [-0.060, 0, -0.025], [0.065, 0.003, 0.025]),

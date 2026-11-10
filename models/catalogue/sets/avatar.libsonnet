@@ -4,8 +4,8 @@ local hip(x) = { part: 'pelvis', solid: 'pelvis', fraction: [x, 0.12, 0.5] };
 // Shared finishes keep exposed skin continuous across separately posed parts.
 local skin = 'body-skin-player';
 local underwear = 'cloth-pants-player';
-local arm = import 'measures/arm.libsonnet';
-local leg = import 'measures/leg.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 // A limb joint: the socket on the segment above, at the joint, faces down; the pin at the segment's own origin faces
 // up, so mated the lower segment hangs straight from the joint.
 local jointSocket(id, pos) = { id: id, mount: 'assembly-joint', gender: 'female', pos: pos, normal: [0, -1, 0], up: [0, 0, 1], required: true };
@@ -27,7 +27,7 @@ local legSegment(id, massKg, finish, ports) = {
   ports: ports,
 };
 local foot = { skin: skin };
-local bust = import 'measures/bust.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
 local bustSegment(id, massKg, finish, ports) = {
   id: id,
   family: 'bust',

@@ -92,6 +92,20 @@ fixtureTest('an edited row file recompiles its own fragment, which the twin read
   assert.deepEqual(value('catalogue'), [{ id: 'a', value: 2 }, { id: 'b', kept: true }]);
 });
 
+// A fragment is its row file's manifested JSON, so a row file that is not plain data would build differently from its
+// source; the compile refuses it, naming the file and the field.
+for (const [problem, row, message] of [
+  ['a function', "{ id: 'b', shape: function(x) x }", /\[0\]\.shape: is a function/],
+  ['a hidden field', "{ id: 'b', parts:: [] }", /\[0\]\.parts: is hidden/],
+  ['a late-bound self', "{ id: 'b', size: 1, box: { edge: $.size } }", /\[0\]\.box: reads late-bound self\.size/],
+  ['a super', "{ id: 'b', tags+: ['round'] }", /\[0\]\.tags: reads super\.tags/],
+]) {
+  fixtureTest(`a row file with ${problem} fails naming its file and field`, async ({ write, refresh }) => {
+    write('rows/b.libsonnet', `[${row}]`);
+    await assert.rejects(refresh(), (error) => error.message.includes('rows/b.libsonnet') && message.test(error.message));
+  });
+}
+
 fixtureTest('a new file that shadows an import recompiles its importer', async ({ write, refresh, value }) => {
   write('pkg/lib/value.libsonnet', '{ value: 3 }');
   await refresh();
@@ -131,7 +145,7 @@ fixtureTest('an import of a text block fails rather than going untraced', async 
   await assert.rejects(refresh(), /text block/);
 });
 
-test('the twin digest covers this module and the compiler driver', () => {
+test('the twin digest covers this module, the compiler driver and the plain-data check', () => {
   const code = compilerCode().map((path) => relative(root, path));
-  for (const driver of ['tools/sources.mjs', 'tools/jsonnet/index.mjs']) assert.ok(code.includes(driver), driver);
+  for (const driver of ['tools/sources.mjs', 'tools/jsonnet/index.mjs', 'tools/jsonnet/plain-data.libsonnet']) assert.ok(code.includes(driver), driver);
 });

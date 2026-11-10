@@ -25,7 +25,9 @@ twins over it, not every row again, and one run evaluates the catalogue the reci
 fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
 late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
-library. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
+library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would
+otherwise build silently and a mod's row file should fail where it is written; see `jsonnet/plain-data.libsonnet`,
+`rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
 exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
