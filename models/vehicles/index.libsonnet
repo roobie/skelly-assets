@@ -29,6 +29,7 @@
   'classic_small_car': import 'models/vehicles/classic_small_car.libsonnet',
   'coach': import 'models/vehicles/coach.libsonnet',
   'combine_harvester': import 'models/vehicles/combine_harvester.libsonnet',
+  'conventional_box_truck': import 'models/vehicles/conventional_box_truck.libsonnet',
   'convertible': import 'models/vehicles/convertible.libsonnet',
   'coupe': import 'models/vehicles/coupe.libsonnet',
   'crashed_hatchback': import 'models/vehicles/crashed_hatchback.libsonnet',
