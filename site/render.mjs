@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { explode } from './explode.mjs';
+import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { samplePose } from './poseSample.mjs';
 
@@ -50,7 +51,8 @@ function load(model) {
 
 // Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
 // across its own x = 0 plane when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
-// in site order, so the viewer can move each one apart.
+// in site order, so the viewer can move each one apart. What a worn piece's site covers of the doll is not drawn
+// (hiding.mjs).
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
     cache.set(entry.id, (async () => {
@@ -69,6 +71,7 @@ function loadSites(entry) {
         triangles += parts[i].triangles;
         for (const m of parts[i].materials) materials.set(m.name, m);
       });
+      hideCovered(scene.children, entry.sites);
       return { scene, clips: null, body: null, triangles, materials: [...materials.values()] };
     })());
   }

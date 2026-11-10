@@ -1,9 +1,11 @@
 // The doll's rig from models/poses/rig.libsonnet and the built doll (tools/dress.mjs, `dollOf`): a bone per doll part
 // copy in mobgen's bone shape (id, parent, head, tail, frame, limits, parents first), with a `bind` naming the part copy
 // it moves, so site/kinematics.mjs poses the doll as it would pose a mob. Also the doll's rest meshes per bone, which
-// the clearance probe (site/clearance.mjs) compares in a pose.
+// the clearance probe (site/clearance.mjs) compares in a pose, and the check that a worn piece encloses what it hides.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { coveredSurface } from '../site/clearance.mjs';
+import { hides } from '../site/hiding.mjs';
 import { add, dot, frameAbout, scale, sub } from '../site/kinematics.mjs';
 import { modelMeshes } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
@@ -128,12 +130,40 @@ export function restMeshes(rig, sites, meshesOf) {
     if (!mesh) throw new Error(`rig: ${site.model} has no part ${bone.bind.part} for ${bone.id}`);
     return { bone: bone.id, mesh: placed(mesh, site) };
   });
-  const pieces = sites.filter((site) => site.part !== undefined).map((site) => {
-    const bone = rig.bones.find(({ bind }) => bind.part === site.part && bind.side === site.side);
-    if (!bone) throw new Error(`rig: no bone moves the ${site.side} ${site.part} that ${site.model} is drawn in`);
-    return { piece: site.model, bone: bone.id, mesh: placed(wholeModel(meshesOf(site.model)), site) };
-  });
+  const pieces = sites.filter((site) => site.part !== undefined)
+    .map((site) => ({ piece: site.model, bone: boneOf(rig, site).id, mesh: placed(wholeModel(meshesOf(site.model)), site) }));
   return { body, pieces };
+}
+
+const boneOf = (rig, { model, part, side }) => {
+  const bone = rig.bones.find(({ bind }) => bind.part === part && bind.side === side);
+  if (!bone) throw new Error(`rig: no bone moves the ${side} ${part} that ${model} is drawn in`);
+  return bone;
+};
+
+/**
+ * What a wearable's worn pieces would open to view by hiding it: for each piece site of `sites` (tools/dress.mjs,
+ * `wornSites`) and each name it covers (site/hiding.mjs), { piece, side, name, open, at } when `open` of the named
+ * surface's samples, the first at `at`, are not wholly covered at rest by the wearable's pieces drawn on the same doll
+ * part copy, or { piece, side, name, open: 'nothing' } when the name hides nothing of the copy. Only the pieces riding
+ * that copy count, since only they move with it in every pose. `meshesOf(id, keep?)` gives a model's part meshes
+ * (tools/dress.mjs, `modelMeshes`) of the primitives `keep(part, piece)` picks.
+ */
+export function coverGaps(rig, sites, meshesOf) {
+  const riding = (site) => sites.filter((other) => other.part === site.part && other.side === site.side);
+  return sites.filter(({ covers }) => covers).flatMap((site) => {
+    const bone = boneOf(rig, site).id;
+    const doll = sites[site.bodySite];
+    const pieces = riding(site).map((other) => ({ piece: other.model, bone, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
+    return site.covers.flatMap((name) => {
+      const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
+      const gap = { piece: site.model, side: site.side, name };
+      if (!hidden) return [{ ...gap, open: 'nothing' }];
+      const [{ samples }] = coveredSurface(rig, { body: [{ bone, mesh: placed(hidden, doll) }], pieces });
+      const open = samples.filter(({ whole }) => !whole);
+      return open.length === 0 ? [] : [{ ...gap, open: open.length, at: open[0].point }];
+    });
+  });
 }
 
 // A built tree's part meshes by model id, read once each.
