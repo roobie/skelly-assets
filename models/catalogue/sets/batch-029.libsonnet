@@ -126,10 +126,10 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
   + lid('lid', 'copper', 'brass', 0.09, 0.14, 0.018, 0.012), { copper: 'copper', tin: 'steel-grey', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A pot hammered from a heavy steel sheet, 200 mm across the crimped rim and 75 mm deep, with a wire bail.
-  makeshiftPot('makeshift_pot', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking', 'improvised'] } },
+  makeshiftPot('makeshift_pot', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // The same pot hammered from copper sheet.
-  makeshiftPot('makeshift_copper_pot', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking', 'improvised'] } },
+  makeshiftPot('makeshift_copper_pot', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // A hardwood rolling pin 460 mm long: a 300 mm barrel 64 mm across and a turned handle at each end.
   h.compound('rolling_pin', 0.7, [

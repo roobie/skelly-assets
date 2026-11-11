@@ -218,5 +218,5 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     for i in std.range(0, 2)
   ], { arm: 'steel-stainless', grip: 'rubber-black' }) + h.gripOn('tongs', 'arm-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] } } },
 ]

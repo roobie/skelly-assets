@@ -78,7 +78,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
   ] + [
     // A stamped label plate on the front of the frame.
     box('label', 'label', [-0.025, 0.022, 0.099], [0.025, 0.036, 0.102]),
-  ], { frame: 'steel-stainless', mesh: 'steel-grey', wire: 'steel-bright', label: 'brass' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  ], { frame: 'steel-stainless', mesh: 'steel-grey', wire: 'steel-bright', label: 'brass' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['laboratory'] } } },
 
   // A hand sieve twisted from stiff wire: a loop 130 mm across holding a disc of fine mesh, its two wire ends
   // twisted into a 120 mm handle with a hanging loop, 255 mm overall. Lies along x, handle to +x.

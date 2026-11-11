@@ -2861,12 +2861,12 @@
     {"type":"crawler","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
     {"type":"crawler","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":11,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
     {"type":"amalgam","template":"fused-mass","model":"fused-mass","seed":1,"scale":4,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
-    {"type":"acid_zombie","template":"acid","model":"acid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
+    {"type":"acid_zombie","template":"acid","model":"acid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
     {"type":"player","template":"humanoid","model":"humanoid","crawls":false,"seed":1,"scale":1,"pack":"skelly.body","lod_divisor":0,"walkCycles":4}
   ]
 }

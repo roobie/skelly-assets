@@ -116,7 +116,7 @@ local forkPieces(t) = [
     disc('leg-%d' % i, 'iron', 0.012, 0, 0.032, 0.09 * std.sin(2 * std.pi * i / 3), 0.09 * std.cos(2 * std.pi * i / 3))
     for i in [0, 1, 2]
   ] + bail('bail', 'wire', 0.134, 0.1, 0.008, 36), { iron: 'iron-cast', wire: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A stainless table fork 210 mm long lying flat.
   h.compound('fork', 0.079, forkPieces(0.003), { fork: 'steel-stainless' })

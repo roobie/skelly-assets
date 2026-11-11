@@ -57,7 +57,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     ring('lip', 'glass', 0.014, 0.022, 0.292, 0.3),
     h.turned('distillate', 'liquor', 'y', [[0, 0], [0, 0.022], [0.015, 0.05], [0.035, 0.065], [0.035, 0]], [0, 0.02, 0]),
     ring('straw', 'straw', 0.03, 0.055, 0, 0.022),
-  ], { glass: 'glass-clear', liquor: 'resin-honey', straw: 'straw-wicker' }) + h.inHand('receiver_flask', 'flask') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], place: ['laboratory'], setting: ['medieval'] } } },
+  ], { glass: 'glass-clear', liquor: 'resin-honey', straw: 'straw-wicker' }) + h.inHand('receiver_flask', 'flask') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A glass retort 150 mm across the bulb in a straw ring: its neck rises off the top, bends over and runs 350 mm
   // down to the right, tapering to a narrow open tip.
@@ -113,7 +113,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.turned('barrel', 'glass', 'z', [[0, 0], [0, 0.008], [0.04, 0.007], [0.04, 0]], [0.06, 0.045, -0.02]),
     box('key', 'glass', [0.054, 0.03, 0.02], [0.066, 0.06, 0.026]),
     h.turned('stem', 'glass', 'x', [[0, 0], [0, 0.0045], [0.095, 0.0035], [0.095, 0]], [0.06, 0.045, 0]),
-  ], { glass: 'glass-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], place: ['laboratory'] } } },
+  ], { glass: 'glass-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'] } } },
 
   // Three slender glass phials 85 mm tall in a little oak block, each holding a different tincture under a cork
   // sealed with red wax.

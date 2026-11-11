@@ -173,7 +173,7 @@ local washboard(w, ht) =
     for i in std.range(0, 9)
   ], { foam: 'cloth-yellow', scour: 'cloth-green', pore: 'paint-crane-yellow' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
   // A makeshift haircut kit, 200 mm long: a rolled leather wrap tied with cord, a pair of steel scissors laid open on
   // top of the roll under the ties, a sharpened glass blade poking out of one end and a scrap of mirror tucked against
   // the back.

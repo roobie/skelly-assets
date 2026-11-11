@@ -48,7 +48,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     blanket: 'cloth-turnout', fold: 'canvas-grey', case: 'paint-drum-blue', panel: 'paint-charcoal', knob: 'plastic-matte-black',
     mark: 'plastic-gloss-white', socket: 'brass-dull', handle: 'plastic-matte-black', cable: 'rubber-black',
     holder: 'plastic-red', rod: 'steel-heat-tint', clamp: 'copper',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A bench wire-drawing machine on a steel base 500 by 240 mm: a die block with a row of tapering holes at -x, a
   // capstan drum 160 mm across at +x turned by a crank on top, and a length of wire running from the die to the drum.

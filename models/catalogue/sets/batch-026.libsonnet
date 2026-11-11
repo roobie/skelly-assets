@@ -22,7 +22,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     prism('beak', 'beak', 'x', [[0.06, 0.03], [0.064, 0.048], [0.069, 0.03]], -0.009, 0.009),
     box('eye-l', 'eye', [-0.021, 0.071, 0.021], [-0.017, 0.075, 0.025]),
     box('eye-r', 'eye', [0.017, 0.071, 0.021], [0.021, 0.075, 0.025]),
-  ], { body: 'rubber-yellow', beak: 'plastic-orange', eye: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
+  ], { body: 'rubber-yellow', beak: 'plastic-orange', eye: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], place: ['bathroom'], setting: ['modern'] } } },
 
   // A toilet brush 380 mm long: a 300 mm plastic handle with a hanging hole ring and a 75 mm round head of
   // bristles on a twisted steel stem with a domed tip.
@@ -145,7 +145,7 @@ local ring(id, slot, profile, origin) = turned(id, slot, 'x', profile + [profile
     turned('seal', 'seal', 'x', [[0, 0], [0, 0.03], [0.025, 0.025], [0.04, 0.016], [0.04, 0]], [0.56, 0.08, 0]),
   ], { handle: 'plastic-black', bellows: 'plastic-red', seal: 'plastic-black' }) + h.gripOn('bellows_plunger', 'handle') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'plastic'], setting: ['sci-fi'] }, keywords: ['cleaning'] } },
+  } + { taxonomy: { category: 'household', tags: { material: ['rubber', 'plastic'], place: ['bathroom'], setting: ['sci-fi'] }, keywords: ['cleaning'] } },
 
   // A toilet plunger 540 mm long: a 450 mm wooden handle and a red rubber cup 150 mm across, open at +x.
   h.compound('toilet_plunger', 0.26, [

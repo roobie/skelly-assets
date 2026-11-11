@@ -77,7 +77,7 @@ local dress(o) =
 [
   // A cotton kitchen apron folded to 260 mm by 320 mm and 24 mm tall: the bib on top, its neck strap along
   // the top edge, the waist ties down both side edges and a split patch pocket near the hem.
-  apron('cotton_apron', 0.31, { cloth: 'cloth-cream', bib: 'cloth-cream', binding: 'cloth-navy', strap: 'cloth-navy', pocket: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  apron('cotton_apron', 0.31, { cloth: 'cloth-cream', bib: 'cloth-cream', binding: 'cloth-navy', strap: 'cloth-navy', pocket: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], slot: ['torso'], setting: ['modern'] } } },
 
   // A cut-resistant aramid apron folded the same, a little stiffer, with black binding and black ties.
   apron('cut_resistant_apron', 0.39, { cloth: 'aramid-gold', bib: 'aramid-gold', binding: 'webbing-black', strap: 'webbing-black', pocket: 'aramid-gold' }, { ht: 0.03, t: 0.005 }) + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },

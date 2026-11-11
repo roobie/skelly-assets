@@ -149,7 +149,7 @@ local bail(radius, earY, topY, wire, grip) = [
     disc('lid-top', 'glass', 0.048, 0.014, 0.016),
     box('patch', 'patch', [0.01, 0.016, -0.012], [0.035, 0.0175, 0.012]),
   ], { glass: 'glass-clear', patch: 'plastic-frosted' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A seven-day plastic pill organiser, 150 mm long, 32 mm deep and 22 mm tall: a frosted strip of seven
   // compartments, each under its own coloured snap lid with a thumb tab at the front.

@@ -176,5 +176,5 @@ local frets(n, nut, scale, half, y) = [
     box('tooth-%d' % i, 'blade', [0.16, 0.012, -0.038 + i * 0.0084], [0.18, 0.016, -0.034 + i * 0.0084])
     for i in std.range(0, 9)
   ], { body: 'plastic-blue', grip: 'rubber-black', switch: 'plastic-white', blade: 'steel-grey', cutter: 'steel-bright', plug: 'plastic-black' })
-  + h.gripOn('electric_shears', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + h.gripOn('electric_shears', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], place: ['farm'], setting: ['modern'] } } },
 ]
