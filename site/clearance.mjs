@@ -323,3 +323,14 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
     return findings;
   };
 }
+
+/**
+ * Where a ray from `p` along the unit vector `dir` first meets a closed mesh: `{ inside: true }` when `p` lies in it
+ * deeper than a coincident face, otherwise `{ inside: false, distance }` to the first face beyond a coincident one,
+ * Infinity when the ray misses. It answers a gear piece's question, how far a point stands off the surface beneath it.
+ */
+export function rayDistance(mesh, p, dir) {
+  const solid = carried(solidOf(mesh), STILL);
+  if (isInside(solid, p)) return { inside: true };
+  return { inside: false, distance: firstHit(solid.tree, p, dir, Infinity) };
+}

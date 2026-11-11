@@ -11,7 +11,9 @@ const region = <T extends ExtrudedPolygonSolid | BoxSolid | RevolvedSolid>(piece
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
-// neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit.
+// neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit, except
+// the head's: the hair lies `hairThickness` off the skull on a superellipse of exponent `facePower`, and the straps of
+// head gear are fitted to that plan (models/head-band.libsonnet), so those two measures move them.
 // The head segment is drawn about the neck's top, the joint it turns about. The model's anchors name solids here, so
 // a joint follows the solid that seats its limb.
 export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
@@ -47,9 +49,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       headDepth: positive,
       jawHeight: positive,
       hairCover: positive,
-      /** How far the hair lies off the skull, and how far the nose bridge stands off the brow's front. */
       hairThickness: positive,
-      noseBridge: positive,
+      facePower: positive,
     }),
     params,
   );
@@ -70,7 +71,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   // The shoulder: a spheroid filling the deltoid's box, so the arm hangs from a round cap rather than a cube.
   const deltoid = (id: string, side: 1 | -1) =>
     spheroid(id, [side * deltoidX, deltoidY - origin, 0], [d.shoulderWidth / 2, Math.min(d.shoulderHeight, d.shoulderDepth) / 2], ['x', 'skin']);
-  const facePower = 2.8;
+  const facePower = d.facePower;
   /** Where the face's rounded front lies at `x`, so a feature can sit on the surface rather than stand off it. */
   const faceZ = (x: number) => halfZ * (1 - Math.abs(x / halfX) ** facePower) ** (1 / facePower);
   // The face: whites set into the skull with an iris standing proud, a brow bar over each, a bridged nose and lips.
@@ -163,7 +164,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const skull = [
     oval('brow', 'skin', ys(eyeY - 0.03, brow + (top - brow) * 0.45), { ...skullFull, power: facePower }),
     ...dome('cranium', 'skin', ys(brow + (top - brow) * 0.45, top), [skullFull, { halfX: halfX * 0.6, halfZ: halfZ * 0.62, cz: -0.012 }], { slices: 4, power: 2.6 }),
-    oval('cheeks', 'skin', ys(crown + d.jawHeight * 0.7, eyeY - 0.025), { halfX: halfX * 0.96, halfZ: halfZ * 0.96, power: 2.8, cz: -halfZ * 0.02 }),
+    oval('cheeks', 'skin', ys(crown + d.jawHeight * 0.7, eyeY - 0.025), { halfX: halfX * 0.96, halfZ: halfZ * 0.96, power: facePower, cz: -halfZ * 0.02 }),
     oval('jaw', 'skin', ys(crown + d.jawHeight * 0.32, crown + d.jawHeight * 0.75), { halfX: halfX * 0.86, halfZ: halfZ * 0.88, power: 2.6, cz: -halfZ * 0.04 }),
     oval('chin', 'skin', ys(crown, crown + d.jawHeight * 0.36), { halfX: halfX * 0.6, halfZ: halfZ * 0.66, power: 2.6, cz: halfZ * 0.04 }),
     ear('left-ear', 1),
@@ -174,7 +175,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const pelt = { halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, power: facePower };
   const hairBack = -halfZ + d.hairCover * 0.9;
   const hair = [
-    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: 2.8 }),
+    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: facePower }),
     ovalCut('back-hair', 'hair', ys(brow + 0.03, hairLine + 0.01), pelt, { z: [undefined, hairBack] }),
     ovalCut('nape-hair', 'hair', ys(brow - 0.005, brow + 0.035), { ...pelt, halfX: halfX * 0.82 }, { z: [undefined, -halfZ + 0.03] }),
     ovalCut('side-hair-left', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [halfX - 0.004, undefined], z: [hairBack, 0.025] }),
@@ -190,7 +191,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
     ...hair,
     ...eye(1),
     ...eye(-1),
-    block('nose-bridge', 'skin', [-0.008, 0.008], ys(eyeY - 0.034, eyeY + 0.004), [halfZ - 0.003, halfZ + d.noseBridge]),
+    block('nose-bridge', 'skin', [-0.008, 0.008], ys(eyeY - 0.034, eyeY + 0.004), [halfZ - 0.003, halfZ + 0.009]),
     block('nose', 'skin', [-0.013, 0.013], ys(eyeY - 0.05, eyeY - 0.03), [halfZ - 0.003, halfZ + 0.017]),
     block('mouth', 'mouth', [-halfX * 0.3, halfX * 0.3], ys(crown + d.jawHeight * 0.52, crown + d.jawHeight * 0.6), [mouthZ - 0.004, mouthZ + 0.002]),
   ];

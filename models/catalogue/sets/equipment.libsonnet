@@ -1,6 +1,10 @@
 local b = import 'packages/thing-authoring-tool/equipment.libsonnet';
 local equipment = b.equipment;
-local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
+local strapWall = 0.004;
+local strapPlan = band.outlines(strapWall);
+local strapHeight = band.height(band.wornAt.headlamp);
+local strapSolid(edge) = 'strap-%d' % band.edges[edge];
 [
   equipment('blowtorch', 'blowtorch', 0.900, {
     radius: 0.026, bodyHeight: 0.115, footHeight: 0.008, neckRadius: 0.012,
@@ -8,26 +12,26 @@ local bust = import 'models/measures/bust.libsonnet';
     mouthLength: 0.020, mouthRadius: 0.013, valveRadius: 0.016,
   }, { body: 'plastic-blue', rubber: 'paint-charcoal', metal: 'steel-grey', control: 'plastic-red' }, 'body', [0, 0, 0]) + { taxonomy: { category: 'tools' } },
   equipment('headlamp', 'headlamp', 0.180, {
-    // The head's plan needs a fitted contour, not a loose circular band.
-    strapHalfWidth: bust.headBand.halfWidth, strapFront: bust.headBand.front, strapBack: bust.headBand.back,
-    strapFrontChamfer: 0.025, strapBackChamfer: 0.002, strapWidth: 0.022, strapWall: 0.004,
+    // Authored facing -z, so the band's plan is turned half round to put the face there.
+    strapInner: band.turnedAround(strapPlan.inner), strapOuter: band.turnedAround(strapPlan.outer),
+    strapBottom: strapHeight.bottom, strapTop: strapHeight.top,
     housingWidth: 0.060, housingHeight: 0.040, housingDepth: 0.030,
     lensRadius: 0.017, lensDepth: 0.005,
-  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, 'strap-2', [0, 0, 0], [0.5, 0.5, 1]) + {
+  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, strapSolid('back'), [0, 0, 0], [0.5, 0.5, 1]) + {
     voxelGrain: 0.002,
     anchors: {
       lens: { part: 'equipment', solid: 'lens', fraction: [0.5, 0.5, 0] },
       housing_bottom: { part: 'equipment', solid: 'body', fraction: [0.5, 0, 0.5] },
       housing_top: { part: 'equipment', solid: 'body', fraction: [0.5, 1, 0.5] },
       housing_back: { part: 'equipment', solid: 'body', fraction: [0.5, 0.5, 1] },
-      strap_left_inner: { part: 'equipment', solid: 'strap-4', fraction: [0, 0.5, 0.5] },
-      strap_left_outer: { part: 'equipment', solid: 'strap-4', fraction: [1, 0.5, 0.5] },
-      strap_right_inner: { part: 'equipment', solid: 'strap-0', fraction: [1, 0.5, 0.5] },
-      strap_right_outer: { part: 'equipment', solid: 'strap-0', fraction: [0, 0.5, 0.5] },
-      strap_front_inner: { part: 'equipment', solid: 'strap-6', fraction: [0.5, 0.5, 1] },
-      strap_front_outer: { part: 'equipment', solid: 'strap-6', fraction: [0.5, 0.5, 0] },
-      strap_back_inner: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 0] },
-      strap_back_outer: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 1] },
+      strap_left_inner: { part: 'equipment', solid: strapSolid('right'), fraction: [0, 0.5, 0.5] },
+      strap_left_outer: { part: 'equipment', solid: strapSolid('right'), fraction: [1, 0.5, 0.5] },
+      strap_right_inner: { part: 'equipment', solid: strapSolid('left'), fraction: [1, 0.5, 0.5] },
+      strap_right_outer: { part: 'equipment', solid: strapSolid('left'), fraction: [0, 0.5, 0.5] },
+      strap_front_inner: { part: 'equipment', solid: strapSolid('front'), fraction: [0.5, 0.5, 1] },
+      strap_front_outer: { part: 'equipment', solid: strapSolid('front'), fraction: [0.5, 0.5, 0] },
+      strap_back_inner: { part: 'equipment', solid: strapSolid('back'), fraction: [0.5, 0.5, 0] },
+      strap_back_outer: { part: 'equipment', solid: strapSolid('back'), fraction: [0.5, 0.5, 1] },
     },
   } + { taxonomy: { category: 'lighting' } },
   equipment('weapon_sling', 'webbingSling', 0.150, {
