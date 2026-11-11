@@ -216,7 +216,7 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // A pair of yellow rubber kitchen gloves laid flat, each 360 mm from the rolled lip of its long cuff to the
   // fingertips, with grip ridges across the fingertips.
   h.compound('rubber_gloves', 0.08, pair(rubberGlove, 0.078), { glove: 'plastic-yellow', cuff: 'plastic-yellow', lip: 'plastic-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cleaning'], tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin black costume gloves laid flat, each 230 mm from cuff to fingertip, with the hand's bones printed
   // in white on the back.
