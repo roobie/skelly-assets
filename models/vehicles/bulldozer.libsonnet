@@ -10,29 +10,38 @@ local skin = 0.04;
 local doorRear = -1.0;
 local doorFront = -0.25;
 local post = 0.12;
-// The moldboard curls forward round a centre ahead of the blade, its cutting edge on the ground.
-local blade = { cx: 3.6, cy: 0.72, radius: 1.0, halfWidth: 1.63, back: 2.42 };
+// The moldboard curls forward round a centre ahead of the blade, `sweep` degrees above and below it, its cutting edge
+// on the ground.
+local blade = { cx: 3.6, cy: 0.72, radius: 1.0, sweep: 45, halfWidth: 1.63, back: 2.42, depth: 0.26 };
+local bladeAngle(i) = 180 - blade.sweep + 2 * blade.sweep * i / 6;
 local bladeFace = [
-  [blade.cx + blade.radius * std.cos(k.rad(135 + 15 * i)), blade.cy + blade.radius * std.sin(k.rad(135 + 15 * i))]
+  [blade.cx + blade.radius * std.cos(k.rad(bladeAngle(i))), blade.cy + blade.radius * std.sin(k.rad(bladeAngle(i)))]
   for i in std.range(0, 6)
 ];
+local lip = blade.cx - blade.radius * std.cos(k.rad(blade.sweep));
 local ribs = [-1.2, -0.5, 0, 0.5, 1.2];
-local ripper = { beam: [-2.95, -2.65], mount: [-2.05, -1.9] };
+// Each push arm swings on a trunnion on its track frame's outer face; its front end and each lift cylinder's rod sit
+// in a clevis on the blade's back, between two ears.
+local arm = { pivot: [-0.1, 0.5], end: [blade.back - 0.02, 0.33], z: [1.24, 1.4] };
+local lift = { foot: [1.6, 1.78], pin: [blade.back - 0.04, 1.2], z: [s.hoodSide + 0.04, s.hoodSide + 0.24] };
+local ear = 0.04;
+local ripper = { beam: [-2.95, -2.65], top: 1.1, mount: [-2.05, -1.9] };
+local shankX = (ripper.beam[0] + ripper.beam[1]) / 2;
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('bulldozer_mainframe', 3000, [
     box('belly_guard', 'steel', [-0.2, 0.36, -0.55], [1.88, 0.42, 0.55]),
     box('front_cross', 'steel', [1.8, 0.42, -0.38], [1.88, s.frameTop, 0.38]),
     box('equaliser_bar', 'steel', [1.42, 0.48, -0.78], [1.56, 0.62, 0.78]),
   ] + bothSides([
-    box('rail', 'steel', [ripper.mount[1], 0.42, 0.38], [1.88, s.frameTop, 0.55]),
+    box('rail', 'steel', [ripper.mount[1], 0.42, 0.38], [1.88, s.frameTop, s.hoodSide]),
     k.turned('pivot_shaft', 'steel', 'z', k.disc(0.1, 0.55, 0.78), [-0.6, 0.55, 0]) + { sides: 12 },
-    box('lift_post', 'steel', [1.5, s.frameTop, s.hoodSide], [1.7, 1.88, s.hoodSide + 0.04]),
+    box('lift_post', 'steel', [1.5, s.frameTop, s.hoodSide], [1.7, 1.88, lift.z[0]]),
   ]), { steel: 'paint-charcoal' }),
   k.compound('bulldozer_final_drive', 450, [
     m.axleDisc('housing', 'steel', -0.85, 1.0, 0.36, [0.55, 0.77]),
   ], { steel: 'paint-charcoal' }),
   k.compound('bulldozer_hood', 400, [
-    prism('top', 'paint', [[s.hoodRear, s.hoodTop - skin], [s.hoodFront, s.noseTop - skin], [s.hoodFront, s.noseTop], [s.hoodRear, s.hoodTop]], [-s.hoodSide, s.hoodSide]),
+    prism('top', 'paint', [[s.hoodRear, s.hoodTop - skin], [s.hoodFront, s.noseTop - skin], [s.hoodFront, s.noseTop], [s.hoodRear, s.hoodTop]], [skin - s.hoodSide, s.hoodSide - skin]),
     box('bulkhead', 'paint', [s.hoodRear, s.frameTop, -s.hoodSide], [s.hoodRear + 0.05, s.hoodTop - skin, s.hoodSide]),
     box('grille', 'grille', [s.hoodFront, s.frameTop, -s.hoodSide], [s.hoodFront + 0.1, s.noseTop, s.hoodSide]),
   ] + [
@@ -41,7 +50,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ], { paint: s.paint, grille: 'paint-charcoal' }),
   // An engine side panel lifts off for service, so it is a part of its own a scavenger can take.
   k.compound('bulldozer_engine_panel', 30, [
-    prism('skin', 'paint', [[s.hoodRear + 0.05, s.frameTop], [s.hoodFront, s.frameTop], [s.hoodFront, s.noseTop - skin], [s.hoodRear + 0.05, s.hoodTop - skin]], [s.hoodSide - skin, s.hoodSide]),
+    prism('skin', 'paint', [[s.hoodRear + 0.05, s.frameTop], [s.hoodFront, s.frameTop], [s.hoodFront, s.noseTop], [s.hoodRear + 0.05, s.hoodTop]], [s.hoodSide - skin, s.hoodSide]),
   ] + [
     box('louvre_%d' % i, 'trim', [0.6, 1.3 + 0.1 * i, s.hoodSide], [1.5, 1.33 + 0.1 * i, s.hoodSide + 0.01])
     for i in std.range(0, 3)
@@ -75,42 +84,47 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.45, -s.cabSide + post], [s.cabFront - 0.015, s.cabRoof, s.cabSide - post]),
   ], { glass: 'glass-clear' }),
   k.compound('bulldozer_blade', 2400,
-    k.arc('moldboard', 'paint', blade.cx, blade.cy, blade.radius - 0.04, blade.radius, 135, 225, 6, [-blade.halfWidth, blade.halfWidth]) + [
-      box('cutting_edge', 'edge', [2.86, 0, -blade.halfWidth], [2.95, 0.12, blade.halfWidth]),
-      box('upper_beam', 'paint', [blade.back, 0.9, -1.5], [2.68, 1.12, 1.5]),
-      box('lower_beam', 'paint', [blade.back, 0.22, -1.5], [2.68, 0.44, 1.5]),
+    k.arc('moldboard', 'paint', blade.cx, blade.cy, blade.radius - 0.04, blade.radius, 180 - blade.sweep, 180 + blade.sweep, 6, [-blade.halfWidth, blade.halfWidth]) + [
+      box('cutting_edge', 'edge', [lip - 0.03, 0, -blade.halfWidth], [lip + 0.06, 0.12, blade.halfWidth]),
+      box('upper_beam', 'paint', [blade.back, 0.9, -1.5], [blade.back + blade.depth, 1.12, 1.5]),
+      box('lower_beam', 'paint', [blade.back, 0.22, -1.5], [blade.back + blade.depth, 0.44, 1.5]),
     ] + [
-      box('rib_%d' % i, 'paint', [blade.back, 0.44, ribs[i] - 0.03], [2.64, 0.9, ribs[i] + 0.03])
+      box('rib_%d' % i, 'paint', [blade.back, 0.44, ribs[i] - 0.03], [blade.back + blade.depth - 0.04, 0.9, ribs[i] + 0.03])
       for i in std.range(0, std.length(ribs) - 1)
     ] + bothSides([
       prism('end_plate', 'paint', bladeFace, [blade.halfWidth - 0.05, blade.halfWidth]),
-      box('arm_ear', 'paint', [2.3, 0.22, 1.22], [blade.back, 0.5, 1.42]),
-      box('lift_ear_inner', 'paint', [2.34, 0.98, 0.52], [blade.back, 1.26, 0.56]),
-      box('lift_ear_outer', 'paint', [2.34, 0.98, 0.76], [blade.back, 1.26, 0.8]),
+      box('arm_ear_inner', 'paint', [blade.back - 0.16, 0.18, arm.z[0] - ear], [blade.back, 0.5, arm.z[0]]),
+      box('arm_ear_outer', 'paint', [blade.back - 0.16, 0.18, arm.z[1]], [blade.back, 0.5, arm.z[1] + ear]),
+      box('lift_ear_inner', 'paint', [blade.back - 0.08, 0.98, lift.z[0] - ear], [blade.back, 1.26, lift.z[0]]),
+      box('lift_ear_outer', 'paint', [blade.back - 0.08, 0.98, lift.z[1]], [blade.back, 1.26, lift.z[1] + ear]),
     ]), { paint: s.paint, edge: 'steel-grey' }),
   k.compound('bulldozer_push_arm', 420, [
-    k.bar('arm', 'paint', [-0.1, 0.47], [blade.back, 0.32], 0.26, [1.24, 1.4]),
-    m.axleDisc('trunnion', 'steel', -0.1, 0.47, 0.14, [1.22, 1.42]),
+    k.bar('arm', 'paint', arm.pivot, arm.end, 0.26, arm.z),
+    m.axleDisc('trunnion', 'steel', arm.pivot[0], arm.pivot[1], 0.1, [s.trackZ + track.frame('bulldozer_track').halfWidth, arm.z[0]]),
   ], { paint: s.paint, steel: 'paint-charcoal' }),
   k.compound('bulldozer_lift_cylinder', 110, [
-    k.bar('barrel', 'dark', [1.6, 1.78], [2.1, 1.42], 0.2, [0.56, 0.76]),
-    k.bar('rod', 'bright', [2.04, 1.46], [blade.back, 1.18], 0.08, [0.62, 0.7]),
+    k.bar('barrel', 'dark', lift.foot, [2.1, 1.42], 0.2, lift.z),
+    k.bar('rod', 'bright', [2.04, 1.46], lift.pin, 0.08, [lift.z[0] + 0.06, lift.z[1] - 0.06]),
+    m.axleDisc('pin', 'bright', lift.pin[0], lift.pin[1], 0.04, lift.z, 12),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
   k.compound('bulldozer_ripper', 900, [
     box('mount', 'steel', [ripper.mount[0], 0.42, -0.5], [ripper.mount[1], 1.42, 0.5]),
-    box('beam', 'paint', [ripper.beam[0], 0.55, -1.1], [ripper.beam[1], 1.1, 1.1]),
+    box('beam', 'paint', [ripper.beam[0], 0.55, -1.1], [ripper.beam[1], ripper.top, 1.1]),
   ] + bothSides([
-    k.bar('upper_link', 'steel', [-2.0, 1.0], [-2.72, 1.0], 0.14, [0.4, 0.5]),
-    k.bar('lower_link', 'steel', [-2.0, 0.6], [-2.72, 0.65], 0.14, [0.4, 0.5]),
+    k.bar('upper_link', 'steel', [ripper.mount[0] + 0.05, 1.0], [ripper.beam[1] - 0.07, 1.0], 0.14, [0.4, 0.5]),
+    k.bar('lower_link', 'steel', [ripper.mount[0] + 0.05, 0.6], [ripper.beam[1] - 0.07, 0.65], 0.14, [0.4, 0.5]),
   ]), { paint: s.paint, steel: 'paint-charcoal' }),
   // A shank is pinned in its pocket in the beam, so one worn or broken is drawn out and swapped on its own.
   k.compound('bulldozer_ripper_shank', 120, [
-    k.bar('shank', 'steel', [-2.78, 1.25], [-2.86, 0.32], 0.3, [-0.05, 0.05], 0.24),
-    k.bar('foot', 'steel', [-2.86, 0.32], [-2.66, 0.12], 0.2, [-0.05, 0.05], 0.1),
-    k.bar('tip', 'tip', [-2.7, 0.15], [-2.58, 0.08], 0.08, [-0.04, 0.04]),
+    k.bar('shank', 'steel', [shankX + 0.02, 1.25], [shankX - 0.06, 0.32], 0.3, [-0.05, 0.05], 0.24),
+    k.bar('foot', 'steel', [shankX - 0.06, 0.32], [shankX + 0.14, 0.12], 0.2, [-0.05, 0.05], 0.1),
+    k.bar('tip', 'tip', [shankX + 0.1, 0.15], [shankX + 0.22, 0.08], 0.08, [-0.04, 0.04]),
   ], { steel: 'paint-charcoal', tip: 'steel-grey' }),
+  // Its eyes bear on the mount's back and the beam's front, where their pins run.
   k.compound('bulldozer_ripper_cylinder', 60, [
-    k.bar('barrel', 'dark', [-1.95, 1.38], [-2.42, 1.19], 0.18, [0.24, 0.38]),
-    k.bar('rod', 'bright', [-2.38, 1.2], [-2.72, 1.07], 0.07, [0.28, 0.34]),
+    m.axleDisc('foot_eye', 'dark', ripper.mount[0] - 0.06, 1.36, 0.06, [0.24, 0.38], 12),
+    k.bar('barrel', 'dark', [ripper.mount[0] - 0.06, 1.36], [ripper.mount[0] - 0.42, 1.2], 0.18, [0.24, 0.38]),
+    k.bar('rod', 'bright', [ripper.mount[0] - 0.38, 1.21], [ripper.beam[1] + 0.05, ripper.top - 0.03], 0.07, [0.28, 0.34]),
+    m.axleDisc('rod_eye', 'bright', ripper.beam[1] + 0.05, ripper.top - 0.03, 0.05, [0.28, 0.34], 12),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }),
 ] + track.classRows('crawler_heavy') + track.trackRows('bulldozer_track'))
