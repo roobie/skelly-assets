@@ -4,6 +4,7 @@ local roof = std.foldl(std.max, [p[1] for p in s.torso.profile], 0);
 {
   sites: [
     site.one('hull', 'security_walker_hull'),
+    site.one('belly', 'security_walker_belly'),
     site.one('face_guard', 'security_walker_face_guard'),
     site.one('sensor_window', 'security_walker_sensor_window'),
     site.one('sensor_array', 'security_walker_sensor_array'),

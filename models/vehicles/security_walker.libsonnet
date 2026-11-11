@@ -184,6 +184,8 @@ local toe(t) =
 local pod = { rear: -0.55, front: 0.95, low: 3.85, high: 4.4, z: [1.18, 1.68] };
 local podMid = (pod.z[0] + pod.z[1]) / 2;
 local trunnion = { z: [1.1, 1.14], boss: [1.14, 1.18], radius: 0.12 };
+// The belly frame runs under the flat of the belly, short of the glacis and the rear bevel.
+local belly = { y: hull.profile[0][1], rear: hull.profile[0][0] + 0.15, front: hull.profile[1][0] - 0.1, ribs: [-0.85, -0.25, 0.4] };
 local tubes = [[y, z] for y in [4.0, 4.25] for z in [podMid - 0.15, podMid, podMid + 0.15]];
 
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sci-fi'] } }, [
@@ -202,6 +204,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     box('face_side', 'paint', [faceInner, s.window.low, s.window.half], [face, s.window.high, hull.half]),
     lug('hip_ram_lug', rams.hip.base, rams.hip, [hull.half, rams.hip.z0]),
   ]), { paint: s.paint, frame: s.frame } + stripes),
+  // The belly is framed rather than bare: a keel skid and two stringers carry it if it settles on rough ground, ribs
+  // tie them across, and service panels between them reach the power pack from below.
+  k.compound('security_walker_belly', 240, [
+    box('keel', 'frame', [belly.rear, belly.y - 0.12, -0.12], [belly.front, belly.y, 0.12]),
+  ] + [
+    box('rib_%d' % i, 'frame', [belly.ribs[i] - 0.05, belly.y - 0.06, -0.85], [belly.ribs[i] + 0.05, belly.y, 0.85])
+    for i in std.range(0, std.length(belly.ribs) - 1)
+  ] + bothSides([
+    box('stringer', 'frame', [belly.rear, belly.y - 0.09, 0.55], [belly.front, belly.y, 0.65]),
+    box('panel', 'paint', [belly.ribs[1] + 0.12, belly.y - 0.03, 0.2], [belly.ribs[2] - 0.12, belly.y, 0.47]),
+    k.turned('drain', 'frame', 'y', k.disc(0.05, -0.04, 0), [belly.ribs[0] - 0.3, belly.y, 0.35]) + { sides: 12 },
+  ]), { paint: s.paint, frame: s.frame }),
   // Bolted to the flanks behind the hips, so a scavenger lifts one off on its own.
   k.compound('security_walker_flank_armour', 120, [
     box('plate', 'paint', [-1.45, 3.05, hull.half], [-0.6, 4.05, hull.half + 0.05]),
