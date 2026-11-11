@@ -73,7 +73,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     smokeLauncher: { draw: 'smokeLauncher', id: 'galix_launcher_76mm', massKg: 2.5, bore: 0.08, length: 0.2, elevation: 45 },
   },
   // A main battle tank's three-man turret: a 120 mm smoothbore gun with a coaxial 7.62 mm machine gun. The values are a
-  // generic Western tank's, from the published figures of that era's guns and fittings; the masses of the sights, hatches
+  // generic Western tank's, from the published figures of 120 mm tank guns and their fittings; the masses of the sights, hatches
   // and basket are estimates.
   mbt_120mm: {
     paint: 'paint-olive',
@@ -87,7 +87,9 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
       receiver: { length: 1.2, height: 0.5, width: 0.6 },
       barrel: { length: 5.28, radius: 0.1 },
       fumeExtractor: { from: 2.0, length: 0.9, radius: 0.16 },
-      voxelGrain: 0.008,
+      // The finest grain whose lattice still spans the gun from its origin (`tools/packages/thing-export/src/voxelize.ts`,
+      // `HALF_RANGE`), three cells of the gun class's so its voxels nest in that lattice.
+      voxelGrain: 0.006,
     },
     // A 7.62 mm general-purpose machine gun of about 1.2 m and 11 kg, with a 0.56 m barrel.
     coaxGun: {

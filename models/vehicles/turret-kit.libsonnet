@@ -284,9 +284,9 @@ local core(name) =
     finish: { paint: t.paint, steel: steel } + (if std.objectHas(t, 'jacket') then { jacket: 'steel-spall-black' } else {}),
   };
 
-// A gun's own row is a firearm, drawn on the gun class as a hand-held one is, since its barrel is thinner than a vehicle
-// voxel, unless it is too long for that class's lattice and names its own grain; the fused turret draws it on the
-// vehicle class with the rest of the turret.
+// A fitting that names its own `voxelGrain` is drawn on that grain. Otherwise a gun's own row is a firearm, drawn on the
+// gun class as a hand-held one is, since its barrel is thinner than a vehicle voxel; the fused turret draws every
+// fitting on the vehicle class with the rest of the turret.
 local voxelOf(e) =
   if std.objectHas(e, 'voxelGrain') then { voxelGrain: e.voxelGrain }
   else if std.member(guns, e.draw) then { voxelClass: 'gun' }
