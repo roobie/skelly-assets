@@ -24,9 +24,12 @@ const specifiers = (file: string): string[] =>
 const srcFiles = walk(join(ROOT, 'src'));
 const files = [...srcFiles, ...walk(join(ROOT, 'test'))];
 const coreFiles = srcFiles.filter((f) => relative(ROOT, f).startsWith('src/core/'));
-const LEAPER = join(ROOT, 'src/mob/leaper');
-/** Shared mob plumbing the leaper may build on; everything else outside core is another mob's. */
-const SHARED_PLUMBING = ['dismember.ts', 'crowd.ts', 'materials.ts'].map((name) => join(ROOT, 'src/mob', name));
+/** Shared mob plumbing a standalone mob may build on; everything else outside core is another mob's. */
+const SHARED_PLUMBING = ['dismember.ts', 'crowd.ts', 'materials.ts', 'keyframes.ts'].map((name) =>
+  join(ROOT, 'src/mob', name),
+);
+/** Mobs kept standalone, each in its own source and content directory. */
+const STANDALONE_MOBS = ['leaper'];
 
 describe('import boundaries', () => {
   it('finds the files it is meant to police', () => {
@@ -58,17 +61,18 @@ describe('import boundaries', () => {
     }
   });
 
-  it('keeps the leaper standalone: core, shared mob plumbing and its own files and content only', () => {
-    const leaperFiles = srcFiles.filter((file) => file.startsWith(`${LEAPER}/`));
-    expect(leaperFiles.length).toBeGreaterThan(0);
-    for (const file of leaperFiles) {
+  it.each(STANDALONE_MOBS)('keeps the %s standalone: core, shared mob plumbing and its own files and content only', (mob) => {
+    const home = join(ROOT, 'src/mob', mob);
+    const mobFiles = srcFiles.filter((file) => file.startsWith(`${home}/`));
+    expect(mobFiles.length).toBeGreaterThan(0);
+    for (const file of mobFiles) {
       for (const spec of specifiers(file)) {
         const target = resolve(file, '..', spec);
         const allowed =
           spec.startsWith('.') &&
           (target.startsWith(join(ROOT, 'src/core/')) ||
-            target.startsWith(`${LEAPER}/`) ||
-            target.startsWith(`${CONTENT}/leaper/`) ||
+            target.startsWith(`${home}/`) ||
+            target.startsWith(`${CONTENT}/${mob}/`) ||
             SHARED_PLUMBING.includes(target));
         expect(allowed, `${relative(REPO, file)} -> ${spec}`).toBe(true);
       }
