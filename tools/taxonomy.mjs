@@ -1,5 +1,5 @@
 // The model taxonomy: the vocabulary in models/taxonomy.json, the inheritance rule that resolves a row's taxonomy over
-// its defaults, and the report that holds every model's taxonomy to the vocabulary. Why it is shaped this way is in
+// its defaults, and the report that holds every model's taxonomy to the vocabulary and lists its keywords not yet curated. Why it is shaped this way is in
 // models/TAXONOMY.md; tools/check-taxonomy.mjs collects the models' taxonomies and runs the report.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -8,11 +8,12 @@ const repo = resolve(import.meta.dirname, '..');
 export const VOCABULARY = 'models/taxonomy.json';
 
 const KEBAB = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+const isTerm = (value) => typeof value === 'string' && KEBAB.test(value);
 const isObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-// A row's own taxonomy over a default: its category replaces the default's, and each facet it names replaces that
-// facet's terms, so the facets it leaves out are inherited. tools/jsonnet/lib/taxonomy.libsonnet, over, is the same
+// A row's own taxonomy over a default: its category and keywords replace the default's, and each facet it names replaces
+// that facet's terms, so the facets it leaves out are inherited. tools/jsonnet/lib/taxonomy.libsonnet, over, is the same
 // rule for Jsonnet sources.
 export function inheritTaxonomy(base = {}, own = {}) {
   return { ...base, ...own, tags: { ...base.tags, ...own.tags } };
@@ -30,7 +31,7 @@ function termTable(table, where) {
 // models/taxonomy.json, read strictly: a key the reader does not know is an error, never skipped.
 export function readVocabulary(root = repo) {
   const value = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-  const known = new Set(['_doc', 'untaggedPacks', 'categories', 'facets']);
+  const known = new Set(['_doc', 'untaggedPacks', 'categories', 'facets', 'keywords']);
   for (const key of Object.keys(value)) if (!known.has(key)) throw new Error(`${VOCABULARY}: unknown key ${key}`);
   const untaggedPacks = value.untaggedPacks ?? [];
   if (!Array.isArray(untaggedPacks) || untaggedPacks.some((pack) => typeof pack !== 'string')) {
@@ -45,8 +46,15 @@ export function readVocabulary(root = repo) {
     }
     return [facet, { meaning: entry.meaning, terms: termTable(entry.terms, `facet ${facet}`) }];
   }));
-  return { untaggedPacks: new Set(untaggedPacks), categories: termTable(value.categories, 'categories'), facets };
+  const keywords = value.keywords ?? [];
+  if (!Array.isArray(keywords) || !keywords.every(isTerm)) {
+    throw new Error(`${VOCABULARY}: keywords must list kebab-case terms`);
+  }
+  if (new Set(keywords).size !== keywords.length) throw new Error(`${VOCABULARY}: keywords lists a term twice`);
+  return { untaggedPacks: new Set(untaggedPacks), categories: termTable(value.categories, 'categories'), facets, keywords: new Set(keywords) };
 }
+
+const keywordList = (taxonomy) => (isObject(taxonomy) && Array.isArray(taxonomy.keywords) ? taxonomy.keywords : []);
 
 // One model's departures from the vocabulary: malformed taxonomy, unknown category, facet or term.
 export function modelProblems({ pack, id, taxonomy }, vocabulary) {
@@ -56,7 +64,7 @@ export function modelProblems({ pack, id, taxonomy }, vocabulary) {
   const malformed = (message) => problems.push({ pack, id, problem: 'malformed', message: `${at}: ${message}` });
   if (taxonomy === undefined) return [];
   if (!isObject(taxonomy)) return [{ pack, id, problem: 'malformed', message: `${at}: taxonomy must be an object` }];
-  for (const key of Object.keys(taxonomy)) if (key !== 'category' && key !== 'tags') malformed(`unknown taxonomy key ${key}`);
+  for (const key of Object.keys(taxonomy)) if (!['category', 'tags', 'keywords'].includes(key)) malformed(`unknown taxonomy key ${key}`);
   if (taxonomy.category !== undefined) {
     if (typeof taxonomy.category !== 'string') malformed('category must be one term');
     else if (!vocabulary.categories.has(taxonomy.category)) unknown('category', taxonomy.category);
@@ -74,11 +82,25 @@ export function modelProblems({ pack, id, taxonomy }, vocabulary) {
     if (new Set(terms).size !== terms.length) malformed(`${facet} lists a term twice`);
     for (const term of terms) if (!vocabulary.facets.get(facet).terms.has(term)) unknown(facet, term);
   }
+  if (taxonomy.keywords !== undefined) {
+    const { keywords } = taxonomy;
+    if (!Array.isArray(keywords) || !keywords.every(isTerm)) {
+      malformed('keywords must list kebab-case terms');
+    } else if (new Set(keywords).size !== keywords.length) malformed('keywords lists a term twice');
+  }
   return problems;
 }
 
+// One model's well-formed keywords that the vocabulary does not list yet. Keywords admit new terms by review, so these
+// are reported for a reviewer to curate or reject, never failed; a malformed keyword is a problem (modelProblems).
+export function unlistedKeywords({ pack, id, taxonomy }, vocabulary) {
+  return keywordList(taxonomy).filter((keyword) => isTerm(keyword) && !vocabulary.keywords.has(keyword))
+    .map((keyword) => ({ pack, id, keyword, message: `${pack}/${id}: keyword ${keyword} is not listed in ${VOCABULARY}` }));
+}
+
 // Every model held to the vocabulary. models: { pack, id, taxonomy }. untagged: the models without a category;
-// problems: every departure, each failing the build. A model without a category is a problem unless the vocabulary
+// unlisted: the keywords not yet curated (unlistedKeywords), reported only; problems: every departure, each failing the
+// build. A model without a category is a problem unless the vocabulary
 // lists its pack as untagged; a listed pack is a problem once every model of it has a category, or if no model has it,
 // so the list only shrinks.
 export function taxonomyReport(models, vocabulary) {
@@ -94,17 +116,19 @@ export function taxonomyReport(models, vocabulary) {
     if (!packs.has(pack)) problems.push({ pack, problem: 'stale-untagged-pack', message: `${VOCABULARY}: untaggedPacks lists ${pack}, which has no model` });
     else if (!untaggedPacks.has(pack)) problems.push({ pack, problem: 'stale-untagged-pack', message: `${VOCABULARY}: every model of ${pack} has a category; remove it from untaggedPacks` });
   }
+  const unlisted = models.flatMap((model) => unlistedKeywords(model, vocabulary));
   const order = (a, b) => byText(a.pack, b.pack) || byText(a.id ?? '', b.id ?? '') || byText(a.message, b.message);
-  return { untagged: untagged.sort(order), problems: problems.sort(order) };
+  return { untagged: untagged.sort(order), unlisted: unlisted.sort(order), problems: problems.sort(order) };
 }
 
-// A model's taxonomy as the manifest carries it: its category, and its tags with empty facets dropped and facets and
-// terms sorted, so the manifest does not change with authoring order.
+// A model's taxonomy as the manifest carries it: its category, its tags with empty facets dropped and facets and terms
+// sorted, and its keywords sorted, so the manifest does not change with authoring order.
 export function manifestTaxonomy(taxonomy = {}) {
   const tags = Object.entries(taxonomy.tags ?? {}).filter(([, terms]) => terms.length > 0).sort(([a], [b]) => byText(a, b))
     .map(([facet, terms]) => [facet, [...terms].sort(byText)]);
   return {
     ...(taxonomy.category === undefined ? {} : { category: taxonomy.category }),
     ...(tags.length === 0 ? {} : { tags: Object.fromEntries(tags) }),
+    ...(keywordList(taxonomy).length === 0 ? {} : { keywords: [...taxonomy.keywords].sort(byText) }),
   };
 }

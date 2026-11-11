@@ -91,7 +91,7 @@ for value until they are derived from our own models. See `tools/test/catalogue-
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
-Every model also needs a category and may carry facet tags, from the vocabulary in `models/taxonomy.json`.
+Every model also needs a category and may carry facet tags and keywords, from the vocabulary in `models/taxonomy.json`.
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
 `models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
 
