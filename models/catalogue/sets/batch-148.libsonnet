@@ -97,7 +97,7 @@ local plankGuard(prefix, z, side, shift=0) =
     wood: 'wood-pine',
     rag: 'cloth-rag',
     string: 'cord-cotton',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['wood', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['wood', 'fabric'], slot: ['legs'] } } },
 
   // A pair of light steel leg guards 600 mm long from hip to ankle, each a chain leg with a narrow plate down the
   // thigh and another down the shin, buckled on with leather straps, laid side by side.

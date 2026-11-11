@@ -126,7 +126,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                     box('pocket-fur-r', 'fur', [0.058, ht + 0.004, 0.06], [0.142, ht + 0.01, 0.075]),
                                   ],
              { cloth: 'cloth-red', sleeve: 'cloth-red', fur: 'fur-pale', belt: 'leather-black', buckle: 'metal-gold' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A short sleeveless red jacket folded, 320 mm by 260 mm and 45 mm tall: white faux fur round the collar, the
   // armholes, down the front and along the hem, closed with three white pompom buttons.
@@ -144,7 +144,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                           for z in [0.06 - i * 0.055]
                                         ],
              { cloth: 'cloth-red', fur: 'fur-pale', hole: 'cloth-crimson' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A red insulated ski jacket folded thick, 380 mm by 320 mm and 75 mm tall: quilted baffles, a black yoke over the
   // shoulders, the red hood folded down on top, a zip up the front and zipped chest and hip pockets.
@@ -166,7 +166,7 @@ local trench(id, mass, w, d, ht, folds, sleeved, finish) =
                                     strip('pocket-zip-r', 'zip', [0.15, -0.135], [0.09, -0.075], ht + 0.005, 0.006, 0.004),
                                   ],
              { cloth: 'nylon-red', yoke: 'cloth-black', trim: 'plastic-charcoal', zip: 'plastic-matte-black' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless canvas duster folded long, 380 mm by 320 mm and 55 mm tall in five layers: a short shoulder cape
   // between the armholes, a stand collar, three leather buttons and two flapped hip pockets.

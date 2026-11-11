@@ -145,14 +145,14 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                for k in std.range(0, 1)
              ],
              { hair: 'cloth-blue', strand: 'cloth-navy', cap: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A red clown nose, a ball 40 mm across with a slit at the back where it pinches on.
   h.compound('clown_nose', 0.003, [
     ball('nose', 'nose', 0.02, 0, 0, 0, 8),
     box('slit', 'slit', [-0.009, 0.014, -0.0195], [0.009, 0.026, -0.016]),
   ], { nose: 'plastic-red', slit: 'plastic-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A clown wig sitting crown up, 300 mm across: a bald pink crown between two big puffs of curls and a ring of
   // curls round the back, in bright colours.
@@ -180,7 +180,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                for i in [0, 1, 2]
              ],
              { skin: 'plastic-pink', cap: 'cloth-white', red: 'cloth-red', orange: 'cloth-orange', yellow: 'cloth-yellow', green: 'cloth-green', blue: 'cloth-blue', purple: 'cloth-purple' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
   // A golden crown standing upright, 190 mm across and 95 mm tall: a 40 mm band between raised rims, with eight
   // small flowering trees rising from it, their canopies set with red blossoms, and a red stone in the band between
   // each pair of trees.
@@ -193,7 +193,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                for i in std.range(0, 7)
              ],
              { gold: 'metal-gold', rim: 'brass-polished', blossom: 'gem-red', stone: 'gem-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'], setting: ['fantasy'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['head'], setting: ['fantasy'] } } },
 
   // A heavy golden crown standing upright, 200 mm across and 115 mm tall: a 45 mm band between raised rims, set
   // round with red, blue and green stones, and eight tall stepped points each tipped with a gold ball.
@@ -216,7 +216,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                for i in std.range(0, 15)
              ],
              { gold: 'metal-gold', rim: 'brass-polished', red: 'gem-red', blue: 'gem-blue', green: 'gem-green' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A pair of steel identity tags on a ball chain lying in a loop, 180 mm across: two 50 by 29 mm stamped tags
   // overlapping at the front, the second hung from a short loop of chain.
@@ -226,7 +226,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
              + idTag('a-', 0.008, 0.118, 0.0)
              + idTag('b-', -0.016, 0.135, 0.003),
              { chain: 'steel-stainless', tag: 'steel-stainless', rim: 'steel-grey', text: 'steel-grey', hole: 'plastic-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], setting: ['modern'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['metal'], setting: ['modern'], slot: ['neck'] } } },
 
   // A sports mouthguard lying flat, 70 mm across and 60 mm deep: a horseshoe channel moulded to the upper teeth,
   // open on top, with a tether tab at the front.
@@ -251,7 +251,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                ring('tab-hole', 'hole', 0.0, 0.0025, 0.01, 0.0105, 0, 0.04),
              ],
              { guard: 'plastic-clear-blue', tab: 'plastic-blue', hole: 'plastic-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['martial-arts'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A black bow tie lying flat, 130 mm across the bow and 60 mm tall: two pleated wings either side of a wrapped
   // knot, its neckband laid out in a loop behind with a sliding adjuster.
@@ -270,7 +270,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
              + h.strapLoop('band', 'band', 0.06, 0.05, 0.012, 0.002, 0, 0, -0.05)
              + [box('adjuster', 'slide', [-0.012, 0.002, -0.108], [0.012, 0.004, -0.092])],
              { bow: 'satin-black', pleat: 'cloth-charcoal', band: 'cloth-black', slide: 'metal-silver' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
   // A fur-lined sleeping bag laid out flat and open, 2 m long and 800 mm across the shoulders: a quilted olive shell
   // tapering to the foot, a rounded hood, and the top corner turned back to show the fur lining. A zip runs down the
   // right side.
@@ -288,19 +288,19 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                for i in std.range(0, 7)
              ],
              { shell: 'cloth-olive-drab', baffle: 'webbing-olive-dark', fur: 'fur-pale', zip: 'plastic-matte-black' })
-  + { voxelGrain: 0.008 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.008 } + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // The fur-lined sleeping bag rolled tight, 450 mm long and 260 mm across, the fur showing in rings on its ends,
   // two black compression straps round it and a carry strap over the top.
   h.compound('rolled_fur_lined_sleeping_bag', 3, bedRoll(0.45, 0.13, 5),
              { shell: 'cloth-olive-drab', lining: 'fur-pale', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A plain sleeping bag rolled tight, 400 mm long and 200 mm across, a navy shell wound round a grey flannel lining,
   // with two black compression straps and a carry strap.
   h.compound('rolled_sleeping_bag', 1.1, bedRoll(0.4, 0.1, 4),
              { shell: 'cloth-navy', lining: 'wool-grey', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A blue plastic tarpaulin folded into a 400 by 300 mm stack, 60 mm thick: a reinforced hem with three metal
   // grommets runs along the top fold's edge, and a corner patch.
@@ -331,7 +331,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
              ]
              + coil('coil', 0.085, -0.005, 0.016, 4, 0.01, 0.004 + 0.002, 0.012),
              { box: 'leather-patent', strap: 'leather-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['leather'], slot: ['arms'] } } },
 
   // A head tefillin laid out flat: a black leather box 30 mm across of four ridged compartments on a 40 mm base,
   // threaded on a strap loop sized to the head, knotted at the back, with the two long ends trailing out behind.
@@ -351,5 +351,5 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                lock('end-r', 'strap', [0.006, -0.232], [0.07, -0.64], 0.01, 0.01, 0.003),
              ],
              { box: 'leather-patent', strap: 'leather-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['leather'], slot: ['head'] } } },
 ]

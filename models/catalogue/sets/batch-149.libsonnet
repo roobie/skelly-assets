@@ -203,7 +203,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
     for p in ['l-', 'r-']
     for z in [if p == 'l-' then -0.085 else 0.085]
   ]), { shell: 'plastic-grey', trim: 'plastic-matte-black', hinge: 'plastic-matte-black', pad: 'plastic-charcoal', strap: 'webbing-black', hook: 'hook-loop-grey' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic', 'fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Firefighter's turnout trousers folded on a shelf, 400 mm by 360 mm and 90 mm tall: tan flame-resistant shell, two
   // reflective bands at the cuff end, a bellows cargo pocket, a black knee patch, and red braces folded over the top.
@@ -222,7 +222,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
     ]
     for s in [-1, 1]
   ]), { cloth: 'cloth-turnout', trim: 'cloth-turnout', band: 'reflective-yellow', patch: 'leather-black', brace: 'cloth-red', hardware: 'steel-bright' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Grey canvas work trousers folded on a shelf, 300 mm by 400 mm and 60 mm tall, a raised layer of cotton padding
   // over the top face quilted on in diamond stitching a shade lighter than the cloth.
@@ -234,7 +234,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
   // A pair of carpet greaves laid side by side: a square of carpet 300 mm long rolled into an open tube round each
   // shin, 128 mm across, its open back showing the pile and jute backing, held with two bands of duct tape.
   h.compound('carpet_greaves', 0.93, carpetRoll('l-shin', 0.05, 0.064, -0.15, 0.15, -0.075) + carpetRoll('r-shin', 0.05, 0.064, -0.15, 0.15, 0.075), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['legs'] } } },
 
   // A pair of carpet leg guards laid side by side: per leg an open carpet roll round the shin, 300 mm long and 128 mm
   // across, and a wider one round the thigh, 280 mm long and 170 mm across, each taped twice, open backs up.
@@ -243,7 +243,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
     for p in ['l-', 'r-']
     for z in [if p == 'l-' then -0.095 else 0.095]
   ]), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['legs'] } } },
 
   // A pair of hardened mail half-leggings laid flat side by side, 760 mm long, 170 mm across at the thigh and 100 mm
   // at the ankle, covering the front and sides only: leather-bound open edges with a zigzag lace each side.
@@ -314,7 +314,7 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
   // and 190 mm at the cuff, quilted lengthwise through their cut-resistant layers, with four buckled leg straps each
   // and a webbing waist belt.
   h.compound('chainsaw_chaps', 1.8, chaps({ saw: true, t: 0.012 }), { panel: 'cloth-orange', stitch: 'cloth-orange', strap: 'webbing-black', buckle: 'plastic-matte-black', belt: 'webbing-black', label: 'cloth-white' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A pair of black leather chaps laid flat, outside up, 820 mm long: two leg panels 270 mm across at the thigh and
   // 190 mm at the cuff, a tan-whipstitched welt and a zip down each outer edge, a buckled belt and a laced front.

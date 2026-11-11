@@ -80,7 +80,7 @@ local cartridgeNecklace(id, mass, body) =
              + cowrie('c4', 0.02, 0.011, 0.014, 0.004, 'z')
              + cowrie('c5', -0.017, 0.014, 0.014, 0.004, 'z'),
              { shell: 'bone', slit: 'leather-chestnut' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['bone'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone'], slot: ['head'] } } },
 
   // Cowrie necklace: a cotton cord about 450 mm round laid as a ring 140 mm across, with thirteen 14 mm cowries
   // strung along its front half.
@@ -93,12 +93,12 @@ local cartridgeNecklace(id, mass, body) =
                for i in std.range(0, 12)
              ]),
              { cord: 'cord-cotton', shell: 'bone', slit: 'leather-chestnut' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['bone', 'fabric'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone', 'fabric'], slot: ['neck'] } } },
 
   // Cufflinks: a pair, each a 16 mm round face on a post with a swivel bar, standing face up side by side.
   h.compound('cufflinks', 0.021, cufflink('l', -0.012) + cufflink('r', 0.012),
              { face: 'metal-silver', centre: 'metal-silver', post: 'metal-silver', bar: 'metal-silver' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear', 'jewellery'], tags: { material: ['metal'], setting: ['modern'], slot: ['arms'] } } },
 
   // Intricate cufflinks: the same silver pair with a raised gold gear round each face and a small gold cog
   // overlapping the domed centre.
@@ -115,7 +115,7 @@ local cartridgeNecklace(id, mass, body) =
                for p in [['l', -0.012], ['r', 0.012]]
              ]),
              { face: 'metal-silver', centre: 'metal-silver', post: 'metal-silver', bar: 'metal-silver', gear: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], setting: ['modern'], slot: ['arms'] } } },
 
   // Cuffs: a pair of starched white wrist cuffs, each a thin band 70 mm deep closed into a ring 80 mm across, lying
   // on its side side by side, with a grey stitched hem round each open edge and two dark buttons on the overlap tab.
@@ -131,7 +131,7 @@ local cartridgeNecklace(id, mass, body) =
                for x in [-0.046 + 0.092 * i]
              ]),
              { cloth: 'cloth-bright-white', seam: 'cloth-heather-grey', button: 'plastic-tortoiseshell' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // Devil horns: a red plastic headband 150 mm across standing on its ends, with two 45 mm horns that lean outward.
   h.compound('devil_horn_headband', 0.025,
@@ -145,7 +145,7 @@ local cartridgeNecklace(id, mass, body) =
                for s in [-1, 1]
              ]),
              { band: 'lacquer-red', horn: 'lacquer-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // Devil tail: a red plastic tail 600 mm long and 20 mm thick at the root, lying in an S, with a spade tip 60 mm
   // across and a black clip at the root for a belt.
@@ -156,7 +156,7 @@ local cartridgeNecklace(id, mass, body) =
                box('clip', 'clip', [-0.31, 0, -0.012], [-0.285, 0.024, 0.012]),
              ],
              { tail: 'lacquer-red', tip: 'lacquer-red', clip: 'plastic-matte-black' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['waist'] } } },
 
   // Diver's watch: a 42 mm steel case with a black turning bezel, lying face up on its steel link bracelet, laid
   // open 210 mm long.
@@ -189,17 +189,17 @@ local cartridgeNecklace(id, mass, body) =
                h.turned('bore', 'bore', 'y', [[0, 0.004], [0, 0.006], [0.012, 0.006], [0.012, 0.004], [0, 0.004]]),
              ],
              { body: 'plastic-tortoiseshell', bore: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['plastic'], slot: ['head'] } } },
 
   // Ordnance-cartridge necklace: a fine gold chain laid in a ring 120 mm across with a spent 25 mm brass case
   // 75 mm long hanging from it, a red stone set in its mouth.
-  cartridgeNecklace('fancy_ordnance_cartridge_necklace', 0.075, [0.075, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  cartridgeNecklace('fancy_ordnance_cartridge_necklace', 0.075, [0.075, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // Pistol-cartridge necklace: the same chain with a spent 9 mm pistol case 19 mm long.
-  cartridgeNecklace('fancy_pistol_cartridge_necklace', 0.026, [0.02, 0.005, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  cartridgeNecklace('fancy_pistol_cartridge_necklace', 0.026, [0.02, 0.005, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // Rifle-cartridge necklace: the same chain with a spent bottlenecked rifle case 48 mm long.
-  cartridgeNecklace('fancy_rifle_cartridge_necklace', 0.03, [0.048, 0.006, 0.0035, 0.008]) + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  cartridgeNecklace('fancy_rifle_cartridge_necklace', 0.03, [0.048, 0.006, 0.0035, 0.008]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // Faux fur cat ears: a black headband 150 mm across standing on its ends, with two fluffy triangular ears 45 mm
   // tall, pink inside.
@@ -214,7 +214,7 @@ local cartridgeNecklace(id, mass, body) =
                for s in [-1, 1]
              ]),
              { band: 'plastic-matte-black', fur: 'fur-pale', inner: 'plastic-pink' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // Faux fur cat tail: a fluffy tail 550 mm long and 50 mm thick at the root, lying in a gentle S, with a darker
   // tip and a black clip at the root for a belt.
@@ -222,7 +222,7 @@ local cartridgeNecklace(id, mass, body) =
              tail(0.5, 0.024, 0.016, 40, 0.06, 0.2)
              + [box('clip', 'clip', [-0.29, 0, -0.012], [-0.262, 0.03, 0.012])],
              { tail: 'fur-pale', tip: 'fur-brown', clip: 'plastic-matte-black' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // Faux fur kitty collar: a fluffy band 25 mm wide laid as a ring 130 mm across, open at the back where it
   // fastens, with a 14 mm gold bell on a ring at the front.

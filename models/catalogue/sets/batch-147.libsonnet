@@ -94,13 +94,13 @@ local cordNecklace(id, mass, body) =
 
   // A plain cotton cord laid in a ring 130 mm across, knotted at the back, wound at the front round the groove of
   // a spent 25 mm cannon case 80 mm long lying mouth outward.
-  cordNecklace('simple_ordnance_cartridge_necklace', 0.046, [0.08, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_ordnance_cartridge_necklace', 0.046, [0.08, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // The same cord with a spent 9 mm pistol case 19 mm long.
-  cordNecklace('simple_pistol_cartridge_necklace', 0.0055, [0.019, 0.0049, 0, 0]) + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_pistol_cartridge_necklace', 0.0055, [0.019, 0.0049, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // The same cord with a spent bottlenecked rifle case 51 mm long, 12 mm across the body.
-  cordNecklace('simple_rifle_cartridge_necklace', 0.014, [0.051, 0.006, 0.0042, 0.009]) + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_rifle_cartridge_necklace', 0.014, [0.051, 0.006, 0.0042, 0.009]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // A pocket reliquary lying open, 75 mm across: an oval silver case 36 mm by 28 mm and 8 mm deep lined in red
   // velvet with a sliver of bone bedded in it, its lid hinged open at -z bearing a raised cross, and a ring at +z.
@@ -137,7 +137,7 @@ local cordNecklace(id, mass, body) =
                for i in std.range(0, 2)
              ],
              { fur: 'fur-pale', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A silver tie clip 55 mm long and 6 mm wide lying flat: a polished front bar with an engraved band near one end,
   // folded back on itself into a spring blade beneath.
@@ -150,7 +150,7 @@ local cordNecklace(id, mass, body) =
                box('band-b', 'line', [-0.015, 0.0035, -0.003], [-0.014, 0.0040, 0.003]),
              ],
              { silver: 'metal-silver', line: 'plastic-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A handful of wooden hair beads loose in a heap 55 mm across: fourteen round and barrel beads 8 to 12 mm thick,
   // each with a hole through for a braid, in pale and dark woods.
@@ -180,7 +180,7 @@ local cordNecklace(id, mass, body) =
                ][i]]
              ],
              { pale: 'wood-birch', dark: 'wood-walnut' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['head'] } } },
 
   // A woven cord anklet lying flat in a ring 80 mm across: a band 6 mm wide woven in repeating red, yellow, green
   // and blue chevrons, its tie ends knotted and trailing at -z.
@@ -202,7 +202,7 @@ local cordNecklace(id, mass, body) =
                flat('tail-right', 'green', [[-0.001, -R - 0.004], [0.002, -R - 0.004], [0.01, -R - 0.029], [0.007, -R - 0.03]], 0, 0.002),
              ],
              { red: 'cloth-red', yellow: 'cloth-yellow', green: 'cloth-green', blue: 'cloth-blue' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A plain digital wristwatch lying face up with its strap opened out, 230 mm end to end: a black plastic case
   // 38 mm across with a steel face plate, a green display and four steel buttons on its sides, on a black resin

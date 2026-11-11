@@ -85,7 +85,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('latch-a', 'latch', [-0.33, 0.06, 0.125], [-0.3, 0.085, 0.133]),
     box('latch-b', 'latch', [0.05, 0.06, 0.085], [0.08, 0.085, 0.099]),
     h.prism('lid-ridge', 'shell', 'y', [[-0.07, -0.34], [0.07, -0.34], [0.09, -0.3], [0.09, -0.1], [-0.09, -0.1], [-0.09, -0.3]], 0.12, 0.125),
-  ], { shell: 'leather-charcoal', seam: 'steel-bright', handle: 'leather-black', latch: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { shell: 'leather-charcoal', seam: 'steel-bright', handle: 'leather-black', latch: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['music'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A slim nylon daypack 300 mm wide, 450 mm tall and 120 mm deep, standing front +z, with a domed top, a zipped
   // front pocket, a grab loop and two thin shoulder straps on its back.
@@ -113,7 +113,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('clip-right', 'clip', [0.125, 0.11, -0.02], [0.145, 0.15, 0.02]),
   ] + h.webbing('back-row', 'trim', -0.11, 0.11, [0.03, 0.065, 0.1], -0.048), {
     body: 'cloth-olive-drab', trim: 'webbing-olive-dark', zip: 'plastic-matte-black', clip: 'plastic-matte-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A mesh drawstring bag 400 mm wide and 500 mm long lying flat, its open netting showing the floor, its mouth hem at -z, cords running down both
   // sides to reinforced bottom corners, and a toggle on the cords.
@@ -138,7 +138,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('toggle', 'toggle', [-0.045, 0, -0.31], [0.045, 0.02, -0.285]),
     box('side-left', 'hem', [-0.205, 0, -0.21], [-0.2, 0.03, 0.24]),
     box('side-right', 'hem', [0.2, 0, -0.21], [0.205, 0.03, 0.24]),
-  ], { net: 'plastic-hivis', hem: 'nylon-black', cord: 'cord-cotton', toggle: 'plastic-orange' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  ], { net: 'plastic-hivis', hem: 'nylon-black', cord: 'cord-cotton', toggle: 'plastic-orange' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['diving'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A roll-top dry bag 200 mm across and 430 mm tall standing up, its top rolled flat into a band clipped down at
   // both ends, with two shoulder straps on its back.
@@ -170,7 +170,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('back-strap-b', 'strap', [0.05, 0.06, -0.165], [0.1, 0.26, -0.14]),
   ] + overHandle('handle-a', 'strap', 0.15, -0.08, 0.035) + overHandle('handle-b', 'strap', 0.15, 0.04, 0.035), {
     body: 'plastic-blue', end: 'plastic-charcoal', clip: 'plastic-matte-black', cord: 'cord-cotton', strap: 'webbing-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A canvas duffel 600 mm long and 300 mm across lying along x, zipped along the top, with darker end panels, two
   // carry handles over the top and a shoulder strap lying in front of it.
@@ -188,7 +188,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('pad', 'end', [-0.07, 0, 0.165], [0.07, 0.008, 0.205]),
   ] + overHandle('handle-a', 'handle', 0.15, -0.09, 0.035) + overHandle('handle-b', 'handle', 0.15, 0.09, 0.035), {
     body: 'cloth-canvas', end: 'cloth-khaki', zip: 'steel-grey', strap: 'webbing-olive-dark', handle: 'webbing-olive-dark',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A dump pouch rolled up and stowed: 150 mm wide, 120 mm tall and 60 mm deep, held shut by a hook-and-loop flap,
   // with two webbing straps on its back and a drawcord toggle at the side.
@@ -219,7 +219,7 @@ local hide(id) = h.compound(id, 0.25, [
     box('buckle-lower', 'buckle', [0.08, 0.265, 0.026], [0.11, 0.305, 0.032]),
   ] + shoulderStraps(0.1, 0.15, 0.68, -0.02, 0.05, 0.015), {
     rail: 'wood-oak', slat: 'wood-pine', strap: 'leather-tan', buckle: 'brass-dull',
-  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'containers', tags: { material: ['wood', 'leather'], slot: ['back'] } } },
+  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['wood', 'leather'], slot: ['back'] } } },
 
   // A golf bag 250 mm across and 900 mm tall standing on its foot, with a moulded top cuff and dividers, a long
   // front pocket, an umbrella sleeve at its side, two folded stand legs and shoulder straps on its back.
@@ -259,7 +259,7 @@ local hide(id) = h.compound(id, 0.25, [
     h.turned('port', 'port', 'x', [[0, 0], [0, 0.018], [0.002, 0.018], [0.002, 0]], [0.272, 0.2, 0.02]),
   ] + grab('handle', 'handle', 0.13, 0.373, 0, 0.04, 0.015), {
     shell: 'plastic-black', seam: 'steel-grey', latch: 'steel-bright', handle: 'plastic-matte-black', trigger: 'plastic-charcoal', port: 'velvet-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A plastic jerrycan 350 mm wide, 470 mm tall and 165 mm deep standing front +z, with three handles across the
   // top, a capped spout at one corner, an X pressed into each face and canvas shoulder straps on its back.
@@ -279,5 +279,5 @@ local hide(id) = h.compound(id, 0.25, [
     box('strap-bottom', 'strap', [-0.15, 0.06, -0.1], [0.15, 0.09, -0.0825]),
   ] + shoulderStraps(0.08, 0.05, 0.42, -0.1, 0.045, 0.015), {
     body: 'plastic-red', cap: 'plastic-matte-black', strap: 'cloth-khaki',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['fuel'], tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['back'] } } },
 ]

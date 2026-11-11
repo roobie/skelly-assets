@@ -54,7 +54,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              ]
              + [box('clasp', 'metal', [-0.007, 0, -0.077], [0.007, 0.006, -0.053])],
              { pearl: 'pearl', metal: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A round button badge lying face up, 25 mm across and 4 mm tall: a rolled steel back with a pin behind, and a
   // printed face in an orange ring round a white field with a black centre.
@@ -100,7 +100,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
                for k in std.range(0, 5)
              ],
              { metal: 'metal-gold', stone: 'gem-clear' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'glass'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['hands'] } } },
 
   // A silver promise ring standing upright, 21 mm across and 6 mm wide: a flat band with a line of engraved script
   // running all the way round its middle, shown as one continuous darkened groove.
@@ -109,7 +109,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              + band('band-back', 0.009, bandR, 0.001, 0.003, 24, plain('metal'))
              + band('script', 0.009, bandR, -0.001, 0.001, 24, plain('script')),
              { metal: 'metal-silver', script: 'steel-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A signet ring standing upright, 21 mm across and 25 mm tall: a gold band rising to a flat oval table on top, set
   // with a silver face whose stamped crest has worn faint.
@@ -122,7 +122,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
                box('crest-b', 'crest', [-0.003, 0.0235, -0.001], [0.003, 0.0245, 0.001]),
              ],
              { gold: 'metal-gold', silver: 'metal-silver', crest: 'steel-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A gold wedding ring standing upright, 21 mm across and 4 mm wide: a plain unbroken band with one small diamond
   // set flush into its top.
@@ -130,7 +130,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              band('band', 0.0085, bandR, -0.002, 0.002, 24, plain('metal'))
              + [box('stone', 'stone', [-0.0012, 0.0192, -0.0012], [0.0012, 0.021, 0.0012])],
              { metal: 'metal-gold', stone: 'gem-clear' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A service medal lying face up, 35 mm wide and 92 mm long: a striped blue, white and red ribbon drape with a brass
   // pin bar along its top, a ring, and a bronze cross with a gold centre bearing a star.
@@ -153,5 +153,5 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              + [flat('star-core', 'star', [star[i] for i in std.range(0, 9) if i % 2 == 1], 0.004, 0.005)]
              + [flat('star-point-%d' % i, 'star', [star[(2 * i + 9) % 10], star[2 * i], star[2 * i + 1]], 0.004, 0.005) for i in std.range(0, 4)],
              { edge: 'cloth-blue', stripe: 'cloth-cream', ribbon: 'cloth-red', brass: 'brass-polished', cross: 'bronze', centre: 'metal-gold', star: 'brass-polished' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

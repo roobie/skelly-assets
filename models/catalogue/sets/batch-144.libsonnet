@@ -54,7 +54,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                'petal-orange': 'plastic-red',
                'petal-white': 'plastic-white',
              })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], slot: ['feet'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric', 'plastic'], slot: ['feet'] } } },
 
   // A costume headband standing on its ends, front on +z: a black plastic band 150 mm across arching 140 mm high,
   // with two furry brown triangular cat ears 55 mm tall standing on its crown, each with a pale inner ear.
@@ -76,7 +76,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                for s in [if side == 'l' then -1 else 1]
              ]),
              { band: 'plastic-black', fur: 'fur-brown', inner: 'fur-pale' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A costume tail 600 mm long lying in an S-curve: a furry tawny tube 50 mm thick at the root tapering to a pale tip,
   // with a black plastic belt clip at the root end.
@@ -93,7 +93,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                box('clip-tongue', 'clip', [-0.3, 0.03, -0.01], [-0.27, 0.036, 0.01]),
              ],
              { fur: 'fur-brown', tip: 'fur-pale', clip: 'plastic-black' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A costume collar laid in a ring 120 mm across: a band of white fur 25 mm wide and 20 mm thick, with a small brass
   // bell on a ring at the front and a black snap fastening at the back.
@@ -116,7 +116,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                box('tag', 'chain', [0.004, 0, -0.047], [0.01, 0.002, -0.043]),
              ],
              { chain: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['feet'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['feet'] } } },
 
   // A handful of hair beads standing loose in a heap 60 mm across: twelve gold tube beads 10 mm thick and 6 to 10 mm
   // long, each with a 4 mm hole through for a lock of hair, some ridged round the middle and some plain.
@@ -134,14 +134,14 @@ local flower(prefix, slot, x, z, y0=0.002) =
                for i in std.range(0, 11)
              ],
              { bead: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A captive-bead lip ring lying flat, 14 mm across: a hoop of 2 mm wire with a 4 mm bead held in its opening.
   h.compound('gold_lip_ring', 0.0025,
              h.crescent('hoop', 'ring', 0.005, 0.007, 20, 340, 18, 0, 0.002)
              + [ball('bead', 'ring', 0.0025, 0, 0.002, 0.0065)],
              { ring: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['face'] } } },
 
   // A lip stud standing on its back, 12 mm tall: a flat 6 mm disc back, a short post and a 6 mm ball screwed on top.
   h.compound('gold_lip_stud', 0.003,
@@ -151,13 +151,13 @@ local flower(prefix, slot, x, z, y0=0.002) =
                ball('ball', 'stud', 0.0028, 0.001, 0.009, 0.001),
              ],
              { stud: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['face'] } } },
 
   // A seamless nose hoop lying flat, 11 mm across, of fine wire with a narrow gap where it opens to go in.
   h.compound('gold_nose_ring', 0.0005,
              h.crescent('hoop', 'ring', 0.0035, 0.0055, 15, 345, 16, 0, 0.002),
              { ring: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['face'] } } },
 
   // A nose stud standing on its bent end, 12 mm tall: a 6 mm domed head on top of a short post that bends into an L
   // at its foot.
@@ -169,7 +169,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                box('bend', 'stud', [0, 0, 0], [0.006, 0.002, 0.002]),
              ],
              { stud: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['face'] } } },
 
   // An open toe ring lying flat, 20 mm across: a 4 mm band with a raised round boss at the front and its ends left
   // apart at the back so it can be squeezed to fit.
@@ -177,7 +177,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
              h.crescent('band', 'ring', 0.008, 0.01, 200, 520, 20, 0, 0.004)
              + [ball('boss', 'ring', 0.0025, 0, 0.003, 0.0095)],
              { ring: 'metal-gold' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['feet'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['feet'] } } },
 
   // A self-winding wristwatch lying face up with its link bracelet opened out, 210 mm end to end: a 38 mm gold case
   // with a ridged bezel round a white dial and black hands under the crystal, a winding crown on +x, and a gold
@@ -226,7 +226,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                for i in std.range(0, 7)
              ],
              { chain: 'metal-gold', medal: 'metal-gold', relief: 'brass-polished' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', keywords: ['religious'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A handmade pendant on a cotton cord laid in a loop 160 mm across: a 40 mm disc whittled from pale wood with a ring
   // and a cross-mark burnt into its face, hung from a cord knotted through a hole at its top.
@@ -242,7 +242,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
                ring('hole-ring', 'cord', 0.0015, 0.003, 0.006, 0.008, 0, 0.0945),
              ],
              { cord: 'cord-cotton', wood: 'wood-pine', burn: 'bark' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'fabric'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', keywords: ['religious'], tags: { material: ['wood', 'fabric'], slot: ['neck'] } } },
 
   // An oval brooch lying face up, 36 mm by 26 mm: a domed green jade cabochon in a gold rope-edged bezel, with a
   // steel pin and catch across its back.
@@ -262,5 +262,5 @@ local flower(prefix, slot, x, z, y0=0.002) =
                for i in std.range(0, 23)
              ],
              { bezel: 'metal-gold', stone: 'gem-green', pin: 'steel-bright' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['torso'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['torso'] } } },
 ]

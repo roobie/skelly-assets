@@ -44,7 +44,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       box('placket', 'collar', [-0.012, top, -0.12], [0.012, top + 0.002, 0.15]),
     ],
     { cloth: 'cloth-black', collar: 'cloth-black', tab: 'cloth-cream', button: 'plastic-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A garish pink faux fur coat folded, 380 mm by 320 mm and 60 mm tall, its fluffy shawl collar rolled along the
   // back, two small patch pockets and a short cotton-lined front edge with toggles.
@@ -57,7 +57,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + [box('edge', 'lining', [-0.012, top, -0.1], [0.012, top + 0.003, 0.16])]
     + buttons('toggle', 0, -0.06, 0.1, 3, top, 0.008),
     { cloth: 'petal-pink', collar: 'petal-pink', pocket: 'petal-pink', lining: 'cloth-cream', button: 'plastic-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown fur coat folded, 380 mm by 320 mm and 60 mm tall, its deep fur collar rolled along the back, two small
   // pockets and three dark buttons down the front.
@@ -70,7 +70,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + [box('edge', 'lining', [-0.01, top, -0.1], [0.01, top + 0.003, 0.16])]
     + buttons('button', 0, -0.06, 0.1, 3, top, 0.009),
     { cloth: 'fur-brown', collar: 'fur-brown', pocket: 'fur-brown', lining: 'leather-brown', button: 'leather-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A gutskin parka folded thin, 300 mm by 240 mm and 30 mm tall: pale translucent strips of split gut sewn in
   // bands across the body, the hood folded down on top with a sinew-bound rim.
@@ -80,7 +80,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + ridges('seam', 'seam', -0.15, 0.15, [-0.06, -0.02, 0.02, 0.06, 0.1], top, 0.002, 0.004)
     + hood(0.2, -0.12, -0.0, top + 0.002, 0.008, 0.006),
     { cloth: 'skin-rawhide', seam: 'leather-brown', hood: 'skin-rawhide', rim: 'leather-brown' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['prehistoric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], setting: ['prehistoric'], slot: ['torso'], state: ['folded'] } } },
 
   // A white lab coat folded, 340 mm by 280 mm and 30 mm tall: notched lapels either side of the buttoned front,
   // two big hip pockets and a breast pocket with a clear pocket protector holding two pens.
@@ -126,7 +126,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-l', -0.16, -0.06, 0.02, 0.12, top + 0.006, 0.004, 0.02)
     + pocket('pocket-r', 0.06, 0.16, 0.02, 0.12, top + 0.006, 0.004, 0.02),
     { cloth: 'cloth-navy', baffle: 'cloth-navy', hood: 'cloth-navy', rim: 'fur-brown', zip: 'plastic-matte-black', pocket: 'cloth-navy', flap: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A canvas duster folded, 380 mm by 320 mm and 60 mm tall: the shoulder cape lying over the back half, a collar
   // rolled along the back, a row of buttons and two flapped hip pockets.
@@ -186,7 +186,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     h.foldedGarment(0.26, 0.2, top, 3)
     + hood(0.16, -0.1, 0.02, top, 0.006, 0.006),
     { cloth: 'cloth-cream', hood: 'cloth-cream', rim: 'cloth-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A white bed sheet folded flat, 300 mm by 240 mm and 20 mm tall, the top fold showing the two eye holes cut
   // through it.
@@ -228,5 +228,5 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       box('cord', 'cord', [-0.13, top, 0.06], [0.13, top + 0.004, 0.068]),
     ],
     { cloth: 'cloth-black', hood: 'cloth-black', rim: 'plastic-charcoal', mask: 'plastic-charcoal', cord: 'wool-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['torso'], state: ['folded'] } } },
 ]

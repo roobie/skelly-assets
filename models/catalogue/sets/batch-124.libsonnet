@@ -216,7 +216,7 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // A pair of yellow rubber kitchen gloves laid flat, each 360 mm from the rolled lip of its long cuff to the
   // fingertips, with grip ridges across the fingertips.
   h.compound('rubber_gloves', 0.08, pair(rubberGlove, 0.078), { glove: 'plastic-yellow', cuff: 'plastic-yellow', lip: 'plastic-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cleaning'], tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin black costume gloves laid flat, each 230 mm from cuff to fingertip, with the hand's bones printed
   // in white on the back.
@@ -227,7 +227,7 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // knuckle shell, padded finger joints and a grey hook-and-loop wrist strap with a black pull tab.
   h.compound('duty_gloves', 0.15, pair(tacticalGlove),
              { glove: 'nylon-coyote', cuff: 'nylon-coyote', shell: 'plastic-matte-black', pad: 'plastic-charcoal', strap: 'hook-loop-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of white cotton dress gloves laid flat, each 230 mm from cuff to fingertip, with three stitch lines down the
   // back and a snap at the wrist.
@@ -237,7 +237,7 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // A pair of padded winter gloves laid flat, each 260 mm from cuff to fingertip and 30 mm thick, quilted across the
   // back in navy with a long gathered charcoal knit cuff.
   h.compound('winter_gloves', 0.19, pair(winterGlove, 0.074), { glove: 'cloth-navy', cuff: 'cloth-charcoal', quilt: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of grey knitted wool gloves laid flat, each 250 mm from cuff to fingertip with a 70 mm dark ribbed cuff. The xl
   // and xs sizes share this model.
@@ -253,7 +253,7 @@ local wrapPair(r, w, tail, t, tie=false) = wrapRoll('l-', -0.045, r, w, tail, t,
   // thumb, knuckle strip and heel strip, and a stiff khaki safety cuff bound in leather.
   h.compound('work_gloves', 0.2, pair(workGlove, 0.075),
              { glove: 'cloth-cream', cuff: 'cloth-khaki', leather: 'leather-tan', binding: 'leather-brown' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['fabric', 'leather'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of red cotton hand wraps rolled up, each roll 50 mm wide and 45 mm across, a 120 mm tail unrolled and
   // ending in a thumb loop.

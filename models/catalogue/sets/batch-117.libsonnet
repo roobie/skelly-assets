@@ -150,7 +150,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     + buttons('shirt-stud', 0, -0.11, -0.03, 3, top + 0.002, 0.003)
     + [h.disc('button', 'satin-button', 0.008, top, top + 0.004, 0, 0.065)],
     { cloth: 'cloth-black', shirt: 'cloth-bright-white', lapel: 'leather-patent', bow: 'leather-patent', button: 'plastic-black', 'satin-button': 'leather-patent' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless denim vest folded, 300 mm by 240 mm and 25 mm tall: a shirt collar along the back, two buttoned
   // flap pockets on the chest, a row of metal buttons down the front and the waistband seam across the hem.
@@ -186,7 +186,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     ]
     + buttons('button', 0.008, 0.0, 0.1, 5, top, 0.0045),
     { cloth: 'wool-grey', back: 'cloth-black', welt: 'plastic-charcoal', button: 'plastic-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // An olive drab padded army winter jacket folded, 380 mm by 320 mm and 50 mm tall: quilted baffles, the hood
   // folded down on top, a zip with a storm flap, two flapped chest pockets, two flapped hip pockets and a
@@ -206,7 +206,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     + pocket('hip-l', -0.17, -0.06, 0.07, 0.155, top + 0.005, 0.005, 0.025)
     + pocket('hip-r', 0.06, 0.17, 0.07, 0.155, top + 0.005, 0.005, 0.025),
     { cloth: 'cloth-olive-drab', baffle: 'cloth-olive-drab', hood: 'cloth-olive-drab', rim: 'webbing-olive-dark', zip: 'plastic-matte-black', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', patch: 'hook-loop-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A blue cotton summer robe folded flat, 320 mm by 260 mm and 25 mm tall: the white collar band crossing
   // left over right, and the folded red sash laid across the hem.

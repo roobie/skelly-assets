@@ -92,7 +92,7 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
     box('strap-right', 'trim', [0.055, 0.03, -0.11], [0.11, 0.42, -0.085]),
     box('back-pad', 'trim', [-0.13, 0.06, -0.095], [0.13, 0.3, -0.085]),
   ], { body: 'nylon-red', trim: 'nylon-black', grip: 'plastic-matte-black', mesh: 'mesh-black' })
-  + h.inHand('travelpack', 'grab-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  + h.inHand('travelpack', 'grab-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A woven straw basket 360 mm tall and 320 mm across at the mouth, flaring from its base, under a domed lid with a
   // loop handle, with woven rings every 60 mm and two leather shoulder straps on its back.

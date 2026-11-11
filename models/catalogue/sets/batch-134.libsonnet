@@ -242,7 +242,7 @@ local galea = {
              + [box('lace-%d' % i, 'trim', [-0.02, 0.05 + i * 0.022, -0.124], [0.02, 0.056 + i * 0.022, -0.114]) for i in std.range(0, 4)]
              + [box('lace-gap', 'inside', [-0.004, 0.05, -0.122], [0.004, 0.15, -0.115])],
              { pad: 'leather-red', trim: 'vinyl-black', inside: 'cloth-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['martial-arts'], tags: { material: ['leather'], setting: ['modern'], slot: ['head'] } } },
 
   // A combat helmet standing on its rim, front on +z, 290 mm front to back and 175 mm tall: a tan composite shell cut
   // high at the brow, an accessory rail along each side, a night-vision shroud at the front, and a chinstrap with a
@@ -262,7 +262,7 @@ local galea = {
                box('shroud-plate', 'rail', [-0.012, 0.094, 0.13], [0.012, 0.112, 0.134]),
              ],
              { shell: 'polymer-fde', inside: 'cloth-black', rail: 'polymer-black', strap: 'nylon-coyote' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A steel flak helmet standing on its rim, front on +z, 280 mm front to back and 175 mm tall: a round pot with a
   // flared, rolled rim and a leather chinstrap lying out in front with its buckle.
@@ -275,7 +275,7 @@ local galea = {
              ])
              + [box('strap-front', 'strap', [-0.034, 0, 0.15], [0.034, 0.003, 0.17]), box('buckle', 'buckle', [-0.014, 0, 0.146], [0.006, 0.006, 0.174])],
              { shell: 'paint-olive', strap: 'leather-brown', buckle: 'brass-dull' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['metal'], setting: ['modern'], slot: ['head'] } } },
 
   // An eagle helmet standing upright, front on +z, 270 mm tall and 360 mm long: a carved wooden head whose open beak is
   // the face opening, the hooked upper beak jutting over the brow and the lower beak under the chin, an eye on each
