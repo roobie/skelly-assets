@@ -48,7 +48,11 @@ export const rotBetween = (from, to) => {
   return rotAxis(axis, Math.atan2(s, c) / DEG);
 };
 
-export const quatToMat3 = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
+// Divided by the quaternion's squared length, so one rounded to a file's few decimals still turns without skewing.
+export const quatToMat3 = ([x, y, z, w]) => {
+  const s = 2 / (x * x + y * y + z * z + w * w);
+  return [1 - s * (y * y + z * z), s * (x * y - z * w), s * (x * z + y * w), s * (x * y + z * w), 1 - s * (x * x + z * z), s * (y * z - x * w), s * (x * z - y * w), s * (y * z + x * w), 1 - s * (x * x + y * y)];
+};
 
 export const mat3ToQuat = (m) => {
   const trace = m[0] + m[4] + m[8];

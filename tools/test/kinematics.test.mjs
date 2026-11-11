@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
 import { clampJointAngles as mobClampJointAngles, jointAngles as mobJointAngles, jointRotation as mobJointRotation } from '../packages/mobgen/src/core/joints.ts';
 import {
-  applyPoint, boneTransforms, clampJointAngles, frameAbout, jointAngles, jointRotation, length, levelBone, mulMV, normalize, rotAxis, sub, solveTwoBone,
+  applyPoint, boneTransforms, clampJointAngles, frameAbout, jointAngles, jointRotation, length, levelBone, mat3ToQuat, mulMM, mulMV, normalize, quatToMat3, rotAxis, rotX, rotZ, sub, solveTwoBone,
 } from '../../site/kinematics.mjs';
 
 // An arm hanging from a shoulder at the origin: two bones straight down, then a hand, with a hinge elbow that only
@@ -108,4 +108,12 @@ test('a levelled bone keeps its rest orientation within its limits whatever its 
   const tooFar = { ...bentArm, rotations: { ...bentArm.rotations, fore: jointRotation(arm.bones[1], [120, 0, 0]) } };
   levelBone(arm, tooFar, 'hand', report);
   assert.equal(report[0]?.bone, 'hand');
+});
+
+test('a quaternion rounded to a few decimals still turns rigidly', () => {
+  const rounded = mat3ToQuat(mulMM(rotX(15), rotZ(-50))).map((x) => Math.round(x * 1e4) / 1e4 + 3e-5);
+  const m = quatToMat3(rounded);
+  const columns = [0, 1, 2].map((c) => [m[c], m[c + 3], m[c + 6]]);
+  for (const column of columns) assert.ok(Math.abs(length(column) - 1) < 1e-9);
+  assert.ok(Math.abs(columns[0][0] * columns[1][0] + columns[0][1] * columns[1][1] + columns[0][2] * columns[1][2]) < 1e-9);
 });
