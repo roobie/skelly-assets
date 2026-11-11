@@ -4,10 +4,13 @@
 // draws, and how, is render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { makeCombobox } from './combobox.mjs';
+import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, filterQuery, isBrowsing, knownOnly, landingModels, matches, parseFilter, shelfOf, suggestions } from './filter.mjs';
 import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
+const SUGGESTION_LIMIT = 40; // terms a combobox lists at once; typing narrows them
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
 
 const nameOf = (id) => {
@@ -46,6 +49,7 @@ async function drainThumbs() {
   drawing = true;
   while (queue.length) {
     const { model, canvas } = queue.shift();
+    if (!canvas.isConnected) continue;
     try {
       const loaded = await loadEntry(model);
       const obj = stillInstance(loaded, model);
@@ -78,19 +82,19 @@ const seen = new IntersectionObserver((entries) => {
 
 let entries = []; // vehicles, then models
 const byId = new Map();
-let shown = [];
+let shown = []; // what the filter selects, or the landing page's few models
+let visible = 0; // how many of `shown` have a card
 let taxonomy = { categories: {}, facets: {} };
-// Vocabulary terms are kebab-case, so these capitalised shelf keys never collide with a category.
-const ALL = 'All';
-const UNCATEGORISED = 'Uncategorised';
-const VEHICLES = 'Vehicles';
-let shelf = ALL;
-const picked = new Map(); // facet -> the term its filter requires
+let filter = emptyFilter();
+let reshuffle = 0; // landing pages asked for since the page opened
+const combos = new Map(); // dimension -> its combobox
 
 const labelOf = (term) => term[0].toUpperCase() + term.slice(1).replaceAll('-', ' ');
-const shelfOf = (entry) => (isVehicle(entry) ? VEHICLES : entry.category ?? UNCATEGORISED);
 const shelfLabel = (key) => ([ALL, UNCATEGORISED, VEHICLES].includes(key) ? key : labelOf(key));
 const shelfTitles = { [VEHICLES]: 'Whole vehicles, assembled from their parts.' };
+const dimensionLabel = (dimension) => (dimension === KEYWORD ? 'Keywords' : labelOf(dimension));
+const dimensionMeaning = (dimension) => (dimension === KEYWORD ? 'Words a model is also known by.' : taxonomy.facets[dimension]?.meaning ?? '');
+const pickedCount = () => Object.values(filter.picks).reduce((n, terms) => n + terms.length, 0);
 
 function renderShelves() {
   const counts = new Map([[ALL, entries.length]]);
@@ -103,48 +107,49 @@ function renderShelves() {
     b.type = 'button';
     b.dataset.shelf = name;
     b.title = taxonomy.categories[name] ?? shelfTitles[name] ?? '';
-    b.setAttribute('aria-pressed', String(name === shelf));
     b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
     b.onclick = () => pickShelf(name);
     return b;
   }));
+  markShelf(false);
+}
+
+function markShelf(scroll) {
+  for (const b of $('shelves').children) {
+    const pressed = b.dataset.shelf === filter.shelf;
+    b.setAttribute('aria-pressed', String(pressed));
+    if (pressed && scroll) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
 }
 
 // Pressing a chip in place keeps keyboard focus on it and keeps a scrolled chip row where it is.
 function pickShelf(name) {
-  shelf = name;
-  for (const b of $('shelves').children) {
-    const pressed = b.dataset.shelf === name;
-    b.setAttribute('aria-pressed', String(pressed));
-    if (pressed) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  }
+  filter.shelf = name;
+  markShelf(true);
   applyFilter();
 }
 
-// One select per facet that any model uses, listing the terms in use.
+// One combobox for the keywords and one for each tag facet that any model uses, suggesting the terms that still
+// leave models once the rest of the filter is applied.
 function renderFacets() {
-  const used = new Map();
-  for (const m of entries) {
-    for (const [facet, terms] of Object.entries(m.tags)) {
-      const counts = used.get(facet) ?? new Map();
-      for (const term of terms) counts.set(term, (counts.get(term) ?? 0) + 1);
-      used.set(facet, counts);
-    }
-  }
-  $('facets').replaceChildren(...[...used.keys()].sort().map((facet) => {
-    const select = document.createElement('select');
-    select.className = 'facet';
-    select.title = taxonomy.facets[facet]?.meaning ?? '';
-    select.setAttribute('aria-label', labelOf(facet));
-    const option = (value, text, title = '') => Object.assign(document.createElement('option'), { value, textContent: text, title });
-    select.append(option('', `Any ${facet}`), ...[...used.get(facet)].sort(([a], [b]) => (a < b ? -1 : 1))
-      .map(([term, n]) => option(term, `${labelOf(term)} (${n})`, taxonomy.facets[facet]?.terms[term] ?? '')));
-    select.onchange = () => {
-      if (select.value) picked.set(facet, select.value);
-      else picked.delete(facet);
-      applyFilter();
-    };
-    return select;
+  const facets = [...new Set(entries.flatMap((m) => Object.keys(m.tags)))].sort();
+  $('facets').replaceChildren(...[KEYWORD, ...facets].map((dimension) => {
+    const combo = makeCombobox({
+      label: dimensionLabel(dimension),
+      title: dimensionMeaning(dimension),
+      textOf: labelOf,
+      suggest: (text) => suggestions(entries, filter, dimension)
+        .filter(({ term }) => !text || term.includes(text.replace(/\s+/g, '-')))
+        .slice(0, SUGGESTION_LIMIT)
+        .map(({ term, count }) => ({ value: term, text: labelOf(term), detail: count, title: taxonomy.facets[dimension]?.terms[term] ?? '' })),
+      onChange: (terms) => {
+        if (terms.length) filter.picks[dimension] = terms;
+        else delete filter.picks[dimension];
+        applyFilter();
+      },
+    });
+    combos.set(dimension, combo);
+    return combo.element;
   }));
 }
 
@@ -170,18 +175,40 @@ function makeCard(model) {
   return card;
 }
 
-const cards = new Map();
+// Cards exist only for what is shown, so a page of thousands of matches still draws a page of previews at a time.
+function showCards(upTo) {
+  const from = $('grid').children.length;
+  visible = Math.min(upTo, shown.length);
+  $('grid').append(...shown.slice(from, visible).map(makeCard));
+  const browsing = isBrowsing(filter);
+  $('more').hidden = !browsing && visible >= shown.length;
+  $('more').textContent = browsing ? 'Show other models' : `Show ${Math.min(PAGE_SIZE, shown.length - visible)} more`;
+}
+
+function writeUrl() {
+  const query = filterQuery(filter);
+  history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+}
 
 function applyFilter() {
-  const q = $('search').value.trim().toLowerCase();
-  const id = q.replace(/\s+/g, '_');
-  const term = q.replace(/[\s_]+/g, '-');
-  const matches = (m) => !q || m.id.includes(id) || [...Object.values(m.tags).flat(), ...m.keywords].some((t) => t.includes(term));
-  const tagged = (m) => [...picked].every(([facet, t]) => m.tags[facet]?.includes(t));
-  shown = entries.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
-  $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
-  $('count').textContent = `${shown.length} of ${entries.length} models`;
-  $('facets-toggle').textContent = picked.size ? `Tags (${picked.size})` : 'Tags';
+  shown = isBrowsing(filter) ? landingModels(entries, dailySeed() + reshuffle) : entries.filter((m) => matches(m, filter));
+  seen.disconnect();
+  queue.length = 0;
+  $('grid').replaceChildren();
+  showCards(PAGE_SIZE);
+  $('count').textContent = isBrowsing(filter)
+    ? `Showing ${shown.length} of ${entries.length} models: search, or pick a category or a filter, to find more`
+    : `${shown.length} of ${entries.length} models`;
+  $('facets-toggle').textContent = pickedCount() ? `Filters (${pickedCount()})` : 'Filters';
+  writeUrl();
+}
+
+// The page's controls as a linked URL left them.
+function restoreFilter() {
+  filter = knownOnly(parseFilter(location.search), entries);
+  $('search').value = filter.q;
+  markShelf(false);
+  for (const [dimension, combo] of combos) combo.set(filter.picks[dimension] ?? []);
 }
 
 // ---- viewer ----
@@ -272,7 +299,7 @@ async function wear(worn) {
 }
 
 function step(d) {
-  const list = shown.length ? shown : entries;
+  const list = shown;
   const i = list.findIndex((m) => m.id === viewer.model?.id);
   openViewer(list[(i + d + list.length) % list.length]);
 }
@@ -513,11 +540,20 @@ async function main() {
   registerModels(models);
   entries = [...vehicles, ...models];
   for (const m of entries) byId.set(m.id, m);
-  for (const m of entries) cards.set(m.id, makeCard(m));
   renderShelves();
   renderFacets();
+  restoreFilter();
   applyFilter();
-  $('search').addEventListener('input', applyFilter);
+  $('search').addEventListener('input', () => {
+    filter.q = $('search').value;
+    applyFilter();
+  });
+  $('more').onclick = () => {
+    if (isBrowsing(filter)) {
+      reshuffle++;
+      applyFilter();
+    } else showCards(visible + PAGE_SIZE);
+  };
   $('facets-toggle').onclick = () => {
     const open = $('facets-toggle').getAttribute('aria-expanded') !== 'true';
     $('facets-toggle').setAttribute('aria-expanded', String(open));
