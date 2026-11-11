@@ -104,10 +104,12 @@ local thumbBones = {
     // are a supple wrist's, so a hand reaching across a rolled rifle to its charging handle bends back as far as it
     // can rather than stopping short of the handle. The reach pole puts the elbow down and out, as an arm reaching
     // in front of the body carries it.
-    // `grip`: where a held handle crosses the palm, as a share of its length from the wrist (site/fingers.mjs,
-    // `palmSocket`). A power grip seats the handle at the crease just short of the knuckles, so the curling fingers
-    // meet it pad by pad; seated further back, they sweep past its far side before they reach it.
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: [0.5, -1, -0.3] }, grip: 0.95,
+    // `grip`: where a handle held in a power grip crosses the palm, as a share of its length from the wrist
+    // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle deep in the
+    // palm, in the wedge between the palm and the lifted thumb's root, so the palm's heel and the thumb's root both
+    // bear on it and the fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook
+    // it and the palm stands beside it like a paddle.
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: [0.5, -1, -0.3] }, grip: 0.7,
                 limits: { flex: [-80, 85], twist: [0, 0], abduct: [-45, 25] } },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0],
                  limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },

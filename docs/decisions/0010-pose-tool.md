@@ -69,17 +69,18 @@ is held between two pads, a contact closing finds no such pair, and the author k
 on. The pose report gives each pinching digit's miss rather than the limits it met, since CCD presses against limits on
 its way to a point it still reaches.
 
-The palm meets a handle at the grip crease near the knuckles (the hand bone's `grip` share), not the palm's middle:
-fingers curled from a handle seated mid-palm sweep past its far side before their pads reach it, and close to their
-limits in the air. The thumb is long enough (`models/measures/arm.libsonnet`, `thumbLength`) to reach round a handle
-seated there, as an adult's reaches past the index knuckle. The fingers close first and the thumb last, so it can lie
-on the closed fingers where a haft is too thick to wrap. The thumb starts lifted wide and its root comes down onto the
-item from beyond, since lifting it from the palm side would drive it through the haft it should wrap. The grip preset
-swings it wide and rolls it well into opposition, so its pad comes down on the haft beside the index rather than on the
-fingers' backs, which leaves a slim haft held by the fingers alone. A supporting hand under a handguard has its own
-preset, the thumb swung in and barely rolled, so it lies along the handguard as a shooter's does instead of standing
-off it. Each joint's swing is checked in steps rather than at its end
-alone, so no part passes through a thin item to rest beyond.
+A power grip seats a handle deep in the palm (the hand bone's `grip` share), in the wedge between the palm and the
+lifted thumb's root, so the palm's heel and the thumb's root both bear on it and the fingers wrap right round it into
+a fist; seated at the knuckle crease, the fingers only hook it and the palm stands beside it like a paddle. A hold that
+is no power grip, such as a hand cradling a handguard or pinching a latch, names its own seat on the palm. The fingers
+close first and the thumb last, so it closes over the haft's far side onto the curled fingers. The thumb starts lifted
+off the palm and its root comes down onto the item from beyond, since lifting it from the palm side would drive it
+through the haft it should wrap. The grip preset swings it across the palm and rolls it partly into opposition; swung
+wide instead, it lies along the haft and leaves the hand open round it. A joint the preset sinks into the item opens
+until its parts rest on it, or opens fully and leaves the joints beyond it to free theirs. A supporting hand under a
+handguard has its own preset, the thumb swung in and barely rolled, so it lies along the handguard as a shooter's does
+instead of standing off it. Each joint's swing is checked in steps rather than at its end alone, so no part passes through a thin item to
+rest beyond, and each part is probed over a lattice on its faces, so an item's edge cannot pass between the probes.
 
 The wrist flexes about the knuckle row, as the fingers do, and deviates about the palm's normal. Its limits are a
 wrist's: far more flexion and extension than deviation. Bent about the arm's flex axis instead, the hand would swing in

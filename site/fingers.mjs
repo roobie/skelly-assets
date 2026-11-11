@@ -106,12 +106,15 @@ export function handAngles(rig, handId, asked) {
 
 // ---- contact ----
 
-// The points a bone's part is probed at: the corners, edge middles and face centres of its rest box, which stand in for
-// a blocky phalanx closely enough to feel a surface.
+// The points a bone's part is probed at: a lattice over the faces of its rest box, a quarter of each edge apart, which
+// stands in for a blocky phalanx closely enough to feel a surface, an item's edge included, which would pass between
+// the corners and face middles alone.
+const LATTICE = 4;
 const boxPoints = ({ min, max }) => {
   const points = [];
-  for (const x of [min[0], (min[0] + max[0]) / 2, max[0]]) for (const y of [min[1], (min[1] + max[1]) / 2, max[1]]) for (const z of [min[2], (min[2] + max[2]) / 2, max[2]]) {
-    if (x !== (min[0] + max[0]) / 2 || y !== (min[1] + max[1]) / 2 || z !== (min[2] + max[2]) / 2) points.push([x, y, z]);
+  const at = (a, i) => min[a] + (i / LATTICE) * (max[a] - min[a]);
+  for (let i = 0; i <= LATTICE; i++) for (let j = 0; j <= LATTICE; j++) for (let k = 0; k <= LATTICE; k++) {
+    if ([i, j, k].some((n) => n === 0 || n === LATTICE)) points.push([at(0, i), at(1, j), at(2, k)]);
   }
   return points;
 };
@@ -141,15 +144,34 @@ const boxSolid = ({ min, max }, transform) => posedSolid({
   indices: BOX_FACES.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
 }, transform);
 
+// Sweeps an angle from `from` toward `to` for the first angle where `hit` holds, in steps and then halving the step it
+// came in, so a part cannot pass through a thin item to rest beyond it: `met`, that angle, and `short`, the last before
+// it that missed; undefined when it never holds.
+const sweepTo = (from, to, hit) => {
+  let short = from, met;
+  for (let i = 1; i <= SWEEP && met === undefined; i++) {
+    const next = from + ((to - from) * i) / SWEEP;
+    if (hit(next)) met = next; else short = next;
+  }
+  if (met === undefined) return undefined;
+  for (let i = 0; i < STEPS; i++) {
+    const mid = (short + met) / 2;
+    if (hit(mid)) met = mid; else short = mid;
+  }
+  return { short, met };
+};
+
 const withAngles = (pose, bone, angles) => ({ ...pose, rotations: { ...pose.rotations, [bone.id]: jointRotation(bone, angles) } });
 
 /**
  * Closes the digits of `handId` on `solid` (a posed solid, `clearance.mjs`, `posedSolid`), each joint in turn from the
  * knuckle out: a joint flexes from where the pose holds it until the part it moves, or any beyond it, touches the item,
  * or until its limit; the next joint then goes on from there, so a finger wraps a handle and a fingertip stops on a
- * surface. The fingers close first and the thumb last, on the item and on the closed fingers, so it comes to rest over
- * them rather than through them. Digits that touch nothing close fully; the digits named in `keep` stay as the pose
- * has them. Returns the pose and, per digit closed, how far it closed and whether it touched.
+ * surface. A joint whose parts the pose sinks into the item opens instead until they rest on it, or, when its range
+ * cannot lift them clear, opens fully and leaves the next joint out to free them. The fingers close first and the thumb
+ * last, on the item and on the closed fingers, so it comes to rest over them rather than through them. Digits that
+ * touch nothing close fully; the digits named in `keep` stay as the pose has them. Returns the pose and, per digit
+ * closed, how far it closed and whether it touched.
  */
 export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
   const closed = {};
@@ -168,25 +190,23 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
       const moved = chain.slice(k);
       const [flex, twist, abduct] = jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M);
       const at = (f) => withAngles(pose, bone, clampJointAngles(bone, [f, twist, abduct]));
-      if (!apart(at(flex), moved)) { touched = true; return; }
-      // The far end of the joint's range in the sense that closes: a phalanx curls toward the palm, while the thumb's
-      // root, which a grip opens wide (lifted off the palm), comes back down onto the item from beyond it.
+      // The ends of the joint's range in the senses that close and open it: a phalanx curls toward the palm, while the
+      // thumb's root, which a grip opens wide (lifted off the palm), comes back down onto the item from beyond it.
       const lowers = digit === 'thumb' && k === 0;
-      const end = (bone.sense[0] > 0) !== lowers ? bone.limits.flex[1] : bone.limits.flex[0];
-      // Swept in steps, not judged at the far end alone, so a part cannot pass through a thin item to rest beyond it.
-      let open = flex, closed = end;
-      for (let i = 1; i <= SWEEP; i++) {
-        const next = flex + ((end - flex) * i) / SWEEP;
-        if (!apart(at(next), moved)) { closed = next; break; }
-        open = next;
+      const [opened, end] = (bone.sense[0] > 0) !== lowers ? bone.limits.flex : [...bone.limits.flex].reverse();
+      const gap = nearest(rig, at(flex), moved, solids);
+      if (gap < -CONTACT) {
+        // Posed sunk into the item: backed out the way the joint opens until it rests on the surface, or as far as it
+        // goes, leaving the joints beyond it to free their parts.
+        const out = sweepTo(flex, opened, (f) => apart(at(f), moved));
+        pose = at(out ? out.met : opened);
+        if (out) touched = true;
+        return;
       }
-      if (open === end) { pose = at(end); return; }
-      for (let i = 0; i < STEPS; i++) {
-        const mid = (open + closed) / 2;
-        if (apart(at(mid), moved)) open = mid; else closed = mid;
-      }
-      pose = at(open);
-      touched = true;
+      if (gap <= CONTACT) { touched = true; return; }
+      const met = sweepTo(flex, end, (f) => !apart(at(f), moved));
+      pose = at(met ? met.short : end);
+      if (met) touched = true;
     });
     closed[digit] = { touched, angles: Object.fromEntries(chain.map((bone) => [bone.id, jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10)])) };
   }

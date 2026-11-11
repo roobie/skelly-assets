@@ -144,14 +144,23 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test('the grip preset lays either thumb\'s pad on a held haft, wrapping it rather than resting on the fingers', () => {
-  // A square haft along the knuckle row, seated on the palm's grip socket and following the hand; the forearm is bent
-  // so the hand stands clear of the body.
+test('the grip preset seats a haft in the wedge of palm and thumb, the thumb closing over it, on either hand', () => {
+  // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
+  // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
-  const corner = (i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? 1 : -1) * (a === 2 ? 0.1 : width / 2));
-  const quads = [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]];
-  const haft = { positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap(corner), indices: quads.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]) };
+  const rim = (end) => [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => {
+    const angle = ((2 * i + 1) * Math.PI) / 8;
+    return [Math.cos(angle), Math.sin(angle)].map((c) => (c * width) / 2 / Math.cos(Math.PI / 8)).concat(end * 0.1);
+  });
+  const ring = [0, 1, 2, 3, 4, 5, 6, 7];
+  const sides = ring.flatMap((i) => [i, (i + 1) % 8, 8 + ((i + 1) % 8), i, 8 + ((i + 1) % 8), 8 + i]);
+  const caps = [1, 2, 3, 4, 5, 6].flatMap((k) => [0, k, k + 1, 8, 8 + k, 9 + k]);
+  const haft = { positions: [...rim(-1), ...rim(1)], indices: [...sides, ...caps] };
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  // A part's nearest approach to the haft over its box's corners, edges and faces, negative when sunk in.
+  const lattice = ({ min, max }) => [0, 1, 2, 3].flatMap((i) => [0, 1, 2, 3].flatMap((j) => [0, 1, 2, 3].map((k) => [i, j, k])))
+    .filter((steps) => steps.some((s) => s === 0 || s === 3))
+    .map((steps) => steps.map((s, a) => min[a] + (s / 3) * (max[a] - min[a])));
   for (const side of ['L', 'R']) {
     const forearm = bones.get(`forearm.${side}`);
     const file = {
@@ -161,11 +170,18 @@ test('the grip preset lays either thumb\'s pad on a held haft, wrapping it rathe
       hold: { [`hand.${side}`]: { model: 'haft', socket: { at: [-width / 2, 0, 0], into: [1, 0, 0], axis: [0, 0, 1] } } },
     };
     const { frame, report, held } = compilePose(rig, file, { meshOf: () => haft });
-    assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb comes down on the grip`);
+    const item = held[`hand.${side}`];
+    const solid = posedSolid(haft, item);
+    const transforms = boneTransforms(rig.bones, decodeFrame(frame));
+    const gap = (id) => Math.min(...lattice(bones.get(id).bind.box).map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
+    const digits = rig.bones.filter((bone) => bone.digit && bone.id.endsWith(`.${side}`));
+    for (const bone of digits) assert.ok(gap(bone.id) > -0.0015, `${bone.id} sinks ${(-gap(bone.id) * 1000).toFixed(1)} mm into the haft`);
+    assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
+    assert.ok(gap(`thumb.${side}`) < 0.003, `the ${side} thumb's root bears on the haft, not ${(gap(`thumb.${side}`) * 1000).toFixed(1)} mm off it`);
+    // Away from the palm is the socket's `into`; the tip past the haft's middle that way has closed over it.
     const tip = bones.get(`thumb3.${side}`);
-    const pad = applyPoint(boneTransforms(rig.bones, decodeFrame(frame)).get(tip.id), padOf(tip));
-    const gap = signedDepth(posedSolid(haft, held[`hand.${side}`]), pad, 0.1);
-    assert.ok(gap > -0.0015 && gap < 0.003, `the ${side} thumb pad rests on the haft, not ${(gap * 1000).toFixed(1)} mm off it`);
+    const beyond = dot(sub(applyPoint(transforms.get(tip.id), padOf(tip)), item.t), mulMV(item.r, [1, 0, 0]));
+    assert.ok(beyond > 0, `the ${side} thumb closes over the haft's far side, not ${(beyond * 1000).toFixed(1)} mm short of its middle`);
   }
 });
 
