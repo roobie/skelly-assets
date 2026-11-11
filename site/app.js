@@ -421,16 +421,16 @@ function modelRef(id) {
 }
 
 const isScalar = (v) => v === null || typeof v !== 'object';
-const scalar = (v) => (typeof v === 'number' ? document.createTextNode(String(Math.abs(v) < 1e-9 ? 0 : Number(v.toPrecision(4)))) : modelRef(String(v)));
-// A record's fields as a definition list. A nested record or list folds under its key, open while it reads in a line.
+const scalar = (v) => (typeof v === 'number' ? String(Math.abs(v) < 1e-9 ? 0 : Number(v.toPrecision(4))) : String(v));
 function tree(record) {
   const dl = document.createElement('dl');
   dl.className = 'tree';
   for (const [key, value] of Object.entries(record)) {
     if (isScalar(value) || (Array.isArray(value) && value.every(isScalar))) {
-      const dd = document.createElement('dd');
-      for (const [i, v] of [value].flat().entries()) dd.append(...(i ? [', '] : []), scalar(v));
-      dl.append(Object.assign(document.createElement('dt'), { textContent: key }), dd);
+      dl.append(
+        Object.assign(document.createElement('dt'), { textContent: key }),
+        Object.assign(document.createElement('dd'), { textContent: [value].flat().map(scalar).join(', ') }),
+      );
       continue;
     }
     const fold = document.createElement('details');
@@ -443,7 +443,6 @@ function tree(record) {
   return dl;
 }
 
-// A record under its file's name, folded until asked for.
 function record(title, data) {
   const fold = document.createElement('details');
   fold.className = 'record';
@@ -451,7 +450,6 @@ function record(title, data) {
   return fold;
 }
 
-// Each part with the model it is, where it is one, and its mass: a vehicle's sites, or the parts its sidecar lists.
 function partRows(model, sidecar) {
   if (isVehicle(model)) return model.sites.map(({ site, model: id }) => [site, id, byId.get(id)?.massKg]);
   return Object.entries(sidecar?.parts ?? {}).map(([name, { item, massKg }]) => [name, item, massKg]);
