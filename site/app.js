@@ -77,6 +77,7 @@ const seen = new IntersectionObserver((entries) => {
 // ---- grid and filters ----
 
 let entries = []; // vehicles, then models
+const byId = new Map();
 let shown = [];
 let taxonomy = { categories: {}, facets: {} };
 // Vocabulary terms are kebab-case, so these capitalised shelf keys never collide with a category.
@@ -219,6 +220,10 @@ function initViewer() {
   $('v-close').onclick = () => $('viewer').close();
   $('viewer').addEventListener('close', () => { if (location.hash) history.replaceState(null, '', location.pathname + location.search); });
   $('viewer').addEventListener('click', (e) => { if (e.target === $('viewer')) $('viewer').close(); });
+  $('v-meta').addEventListener('toggle', () => {
+    if ($('v-meta').open) $('v-meta').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    showMeta();
+  });
   $('v-prev').onclick = () => step(-1);
   $('v-next').onclick = () => step(1);
   document.addEventListener('keydown', (e) => {
@@ -290,6 +295,7 @@ async function openViewer(model) {
   $('v-pose').href = `pose.html?${new URLSearchParams({ wear: model.id })}`;
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
+  showMeta();
   $('v-clips').replaceChildren();
   $('v-clips').setAttribute('aria-label', comesApart(model) || isWearable(model) ? 'View' : 'Clip');
 
@@ -313,6 +319,7 @@ async function openViewer(model) {
   const facts = [
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
+    ...(massOf(model) === undefined ? [] : [['Mass', kg(massOf(model))]]),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
@@ -370,6 +377,121 @@ const viewChips = (views, pick) => views.map(([view, text], i) => {
   return b;
 });
 
+// ---- metadata ----
+
+// The manifest and the models' sidecars, as the built tree holds them, fetched once the metadata panel is open. A
+// failed fetch is forgotten, so opening the panel again retries it.
+const fetched = new Map();
+function builtJson(path) {
+  if (!fetched.has(path)) {
+    fetched.set(path, fetch(`built/${path}`).then((r) => {
+      if (!r.ok) throw new Error(`${path}: ${r.status} ${r.statusText}`);
+      return r.json();
+    }).catch((err) => {
+      fetched.delete(path);
+      throw err;
+    }));
+  }
+  return fetched.get(path);
+}
+const kg = (n) => (n >= 1000 ? `${(n / 1000).toFixed(2)} t` : n >= 1 ? `${Number(n.toFixed(2))} kg` : `${Math.round(n * 1000)} g`);
+// A vehicle weighs what the models at its sites weigh.
+function massOf(entry) {
+  if (!isVehicle(entry)) return entry.massKg;
+  const masses = entry.sites.map(({ model }) => byId.get(model)?.massKg);
+  return masses.includes(undefined) ? undefined : masses.reduce((a, b) => a + b, 0);
+}
+
+// An id's text, which a narrow column wraps after its separators rather than inside a word.
+function breakable(text) {
+  const fragment = document.createDocumentFragment();
+  for (const [i, piece] of text.split(/(?<=[_-])/).entries()) fragment.append(...(i ? [document.createElement('wbr')] : []), piece);
+  return fragment;
+}
+
+// A model id names another model, which the viewer opens in this one's place; anything else is its own text.
+function modelRef(id) {
+  const target = typeof id === 'string' && byId.get(id);
+  if (!target || target === viewer.model) return breakable(id ?? '');
+  const a = Object.assign(document.createElement('a'), { href: `#${id}` });
+  a.append(breakable(id));
+  a.onclick = (e) => { e.preventDefault(); openViewer(target); };
+  return a;
+}
+
+const isScalar = (v) => v === null || typeof v !== 'object';
+const scalar = (v) => (typeof v === 'number' ? document.createTextNode(String(Math.abs(v) < 1e-9 ? 0 : Number(v.toPrecision(4)))) : modelRef(String(v)));
+// A record's fields as a definition list. A nested record or list folds under its key, open while it reads in a line.
+function tree(record) {
+  const dl = document.createElement('dl');
+  dl.className = 'tree';
+  for (const [key, value] of Object.entries(record)) {
+    if (isScalar(value) || (Array.isArray(value) && value.every(isScalar))) {
+      const dd = document.createElement('dd');
+      for (const [i, v] of [value].flat().entries()) dd.append(...(i ? [', '] : []), scalar(v));
+      dl.append(Object.assign(document.createElement('dt'), { textContent: key }), dd);
+      continue;
+    }
+    const fold = document.createElement('details');
+    fold.open = JSON.stringify(value).length < 80;
+    const size = Object.keys(value).length;
+    fold.append(Object.assign(document.createElement('summary'), { textContent: `${key} (${size} ${Array.isArray(value) ? 'items' : 'fields'})` }), tree(value));
+    dl.append(Object.assign(document.createElement('dd'), { className: 'nested' }));
+    dl.lastChild.append(fold);
+  }
+  return dl;
+}
+
+// A record under its file's name, folded until asked for.
+function record(title, data) {
+  const fold = document.createElement('details');
+  fold.className = 'record';
+  fold.append(Object.assign(document.createElement('summary'), { textContent: title }), tree(data));
+  return fold;
+}
+
+// Each part with the model it is, where it is one, and its mass: a vehicle's sites, or the parts its sidecar lists.
+function partRows(model, sidecar) {
+  if (isVehicle(model)) return model.sites.map(({ site, model: id }) => [site, id, byId.get(id)?.massKg]);
+  return Object.entries(sidecar?.parts ?? {}).map(([name, { item, massKg }]) => [name, item, massKg]);
+}
+
+async function showMeta() {
+  const model = viewer.model;
+  $('v-parts').hidden = true;
+  $('v-records').replaceChildren();
+  if (!$('v-meta').open) return;
+  $('v-records').textContent = 'Loading…';
+  const file = isVehicle(model) ? model.placements : model.sidecar;
+  let manifest;
+  let sidecar;
+  try {
+    [manifest, sidecar] = await Promise.all([builtJson('manifest.json'), file && builtJson(file)]);
+  } catch (err) {
+    if (viewer.model === model) $('v-records').textContent = `The metadata did not load (${err.message}).`;
+    return;
+  }
+  if (viewer.model !== model) return; // a later pick overtook this load
+
+  const rows = partRows(model, sidecar);
+  $('v-parts').tBodies[0].replaceChildren(...rows.map(([name, id, massKg]) => {
+    const tr = document.createElement('tr');
+    tr.append(...[breakable(name), modelRef(id), massKg === undefined ? '' : kg(massKg)].map((cell, i) => {
+      const td = document.createElement('td');
+      if (i === 2) td.className = 'num';
+      td.append(cell);
+      return td;
+    }));
+    return tr;
+  }));
+  $('v-parts').hidden = rows.length === 0;
+  const entry = [...manifest.models, ...manifest.vehicles].find(({ id }) => id === model.id);
+  $('v-records').replaceChildren(
+    ...(entry ? [record('manifest.json', entry)] : []),
+    ...(sidecar ? [record(file.split('/').pop(), sidecar)] : []),
+  );
+}
+
 // ---- start ----
 
 async function main() {
@@ -387,6 +509,7 @@ async function main() {
   taxonomy = vocabulary;
   registerModels(models);
   entries = [...vehicles, ...models];
+  for (const m of entries) byId.set(m.id, m);
   for (const m of entries) cards.set(m.id, makeCard(m));
   renderShelves();
   renderFacets();

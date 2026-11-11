@@ -121,7 +121,9 @@ of thing, an actor family, a site or a scenario, never to a reader; see the sele
 showcase consumes all manifest models, independent of product bundling, and shelves and filters them by the
 category and tags their manifest entries carry; see `site/build.mjs`. It shows each vehicle assembled from its
 placements, because a pile of loose panels does not show what the vehicle is, and can explode it to show the parts
-it is made of.
+it is made of. Its metadata panel lists a model's manifest entry and sidecar field by field as the built tree holds
+them, rather than a chosen set of fields, so the panel shows what a consumer reads without following each format
+change; see `site/app.js`, `showMeta`.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through

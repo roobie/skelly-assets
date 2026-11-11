@@ -132,6 +132,28 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 .button.ghost { background: transparent; color: var(--text); border-color: var(--line); }
 .button[hidden] { display: none; }
 
+.meta { margin-top: 12px; font-size: 13px; }
+.meta summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 6px; }
+.meta > summary {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600;
+  min-height: 44px;
+}
+.meta summary::marker { content: ""; }
+.meta summary::before { content: "▸"; color: var(--muted); }
+.meta details[open] > summary::before, .meta[open] > summary::before { content: "▾"; }
+.parts { width: 100%; border-collapse: collapse; margin: 4px 0 12px; font-variant-numeric: tabular-nums; }
+.parts[hidden] { display: none; }
+.parts th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 4px 8px 4px 0; }
+.parts td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); overflow-wrap: break-word; vertical-align: top; }
+.parts .num { text-align: right; padding-right: 0; white-space: nowrap; }
+.parts a { display: inline-block; min-height: 24px; }
+.record > summary { font-family: ui-monospace, monospace; font-size: 12px; }
+.tree { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 2px 12px; margin: 2px 0 6px 14px; }
+.tree dt { color: var(--muted); }
+.tree dd { margin: 0; overflow-wrap: anywhere; }
+.tree dd.nested { grid-column: 1 / -1; }
+.tree summary { min-height: 24px; color: var(--muted); }
+
 .foot { color: var(--muted); font-size: 13px; padding-bottom: 40px; }
 .foot p { border-top: 1px solid var(--line); padding-top: 16px; margin: 0; max-width: 80ch; }
 

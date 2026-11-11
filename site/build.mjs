@@ -1,5 +1,5 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, printed label and the components a model comes apart into (tools/components.mjs), the
+// their category, tags, printed label, sidecar and mass, and the components a model comes apart into (tools/components.mjs), the
 // vehicles the tree places and the assemblies the kits build with the model at each of their sites, the sites that
 // dress each wearable on the doll, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
@@ -35,6 +35,15 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
+// Each model's sidecar, keyed by the model file it names, with the mass of its parts summed; the viewer reads the
+// sidecar itself, and a vehicle's mass sums its sites' models.
+const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
+  .filter((f) => f.endsWith('.model.json'))
+  .map((f) => {
+    const { file, parts } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
+    const masses = Object.values(parts ?? {}).map(({ massKg }) => massKg);
+    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...(masses.length ? { massKg: masses.reduce((a, b) => a + b, 0) } : {}) }];
+  })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
   .map(({ id, pack, path, category, tags, label, clips, body, covers }) => ({
@@ -59,6 +68,7 @@ const models = manifest.models
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
     ...(covers ? { covers } : {}),
+    ...sidecars.get(file),
   }));
 
 // A site's finish as the browser repaints with it: the manifest's material for that finish, as a game reads it.
