@@ -63,6 +63,7 @@
   'livestock_trailer': import 'models/vehicles/livestock_trailer.libsonnet',
   'log_trailer': import 'models/vehicles/log_trailer.libsonnet',
   'luxury_saloon': import 'models/vehicles/luxury_saloon.libsonnet',
+  'main_battle_tank': import 'models/vehicles/main_battle_tank.libsonnet',
   'microcar': import 'models/vehicles/microcar.libsonnet',
   'military_ambulance': import 'models/vehicles/military_ambulance.libsonnet',
   'military_cargo_truck': import 'models/vehicles/military_cargo_truck.libsonnet',
