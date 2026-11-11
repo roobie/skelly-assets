@@ -51,7 +51,7 @@ const countBy = (items, key) => Object.entries(Object.groupBy(items, (item) => i
 const describe = ({ report, clearance }) => [
   report.clamped.length === 0 ? 'no limits held' : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
   ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
-  ...Object.entries(report.grips ?? {}).map(([id, grip]) => `${id} grip: ${Object.entries(grip).map(([digit, { touched }]) => `${digit} ${touched ? 'touches' : 'closed free'}`).join(', ')}`),
+  ...Object.entries(report.grips ?? {}).map(([id, grip]) => `${id} grip: ${Object.entries(grip).map(([digit, { touched, residual }]) => `${digit} ${residual !== undefined ? `pinches ${(residual * 1000).toFixed(1)} mm off` : touched ? 'touches' : 'closed free'}`).join(', ')}`),
   ...(clearance ? [`clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')})`] : []),
 ].join('; ');
 

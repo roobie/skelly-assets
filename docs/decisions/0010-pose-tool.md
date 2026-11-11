@@ -60,8 +60,13 @@ there, and each finger then flexes joint by joint from the knuckle out until the
 fingers close by contact, not toward fingertip targets, because a target is a point the author guesses on the
 item's surface, and a chain of three short phalanges under joint limits rarely reaches it exactly (fingertip CCD on
 the same hand leaves the tips millimetres off a handle and runs into limits every step), while contact wraps any
-handle the hand can span, with no per-item tuning beyond the socket. CCD remains in the module (`solveCCD`) for a
-fingertip that must land on a point, such as a button, which a grip is not.
+handle the hand can span, with no per-item tuning beyond the socket.
+
+A pinch is the exception (`site/fingers.mjs`, `pinchItem`): a hold names digits and the points on the item their pads
+must reach, CCD bends those digits there, and the rest close by contact. A thin tab such as a charging handle's latch
+is held between two pads, a contact closing finds no such pair, and the author knows the two faces the pads belong
+on. The pose report gives each pinching digit's miss rather than the limits it met, since CCD presses against limits on
+its way to a point it still reaches.
 
 The palm meets a handle at the grip crease near the knuckles (the hand bone's `grip` share), not the palm's middle:
 fingers curled from a handle seated mid-palm sweep past its far side before their pads reach it, and close to their

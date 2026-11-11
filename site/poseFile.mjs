@@ -15,13 +15,14 @@
 // Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
 // its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a
 // file can curl a hand and then open one finger. A held item,
-// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, close? } }`, is placed after the reach: the palm is set on the
-// item's socket and the fingers then closed on the item by contact, so the grip is read off the item, not drawn by hand.
+// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, pinch?, close? } }`, is placed after the reach: the palm is
+// set on the item's socket, the digits `pinch` names set their pads on its points, and the others then closed on the
+// item by contact, so the grip is read off the item, not drawn by hand.
 // A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
 // end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
 // so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
-import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem } from './fingers.mjs';
+import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pinchItem } from './fingers.mjs';
 
 const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold', 'moved']);
 const REACH_KEYS = new Set(['target', 'pole']);
@@ -104,9 +105,9 @@ export const groundLift = (rig, pose) => -Math.min(...posedCorners(rig, pose).ma
 
 /**
  * A pose file into a clip frame. Refuses a file with issues (`poseIssues`), naming them all. Returns the frame with the
- * limits that held, the reach distances left and, per holding hand, how its grip closed, so a caller or a test sees
- * what the file asked that the rig refused; `held` carries each held item's model and world transform `{ r, t }` for
- * the caller to draw it. A file with a `hold` needs `meshOf(model)`, the item's closed triangle mesh in its own frame.
+ * limits that held, the reach distances left and, per holding hand, how its grip closed and how near its pinch came,
+ * so a caller or a test sees what the file asked that the rig refused; `held` carries each held item's model and world
+ * transform `{ r, t }` for the caller to draw it. A file with a `hold` needs `meshOf(model)`, the item's closed triangle mesh in its own frame.
  */
 export function compilePose(rig, file, { meshOf } = {}) {
   const issues = poseIssues(rig, file);
@@ -135,7 +136,11 @@ export function compilePose(rig, file, { meshOf } = {}) {
     if (!meshOf) throw new Error(`hold.${id}: compiling a hold needs the held item's mesh`);
     let item;
     ({ pose, item, residual: report.residuals[id] } = holdItem(rig, pose, id, hold, report.clamped));
-    if (hold.close !== false) ({ pose, closed: report.grips[id] } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item)));
+    let pinched = {};
+    if (hold.pinch) ({ pose, pinched } = pinchItem(rig, pose, id, hold.pinch, item));
+    let closed = {};
+    if (hold.close !== false) ({ pose, closed } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item), { keep: Object.keys(pinched) }));
+    if (hold.close !== false || hold.pinch) report.grips[id] = { ...closed, ...pinched };
     held[id] = { model: hold.model, ...item };
   }
   return { frame: encodeFrame(level(pose, report.clamped)), report, held };

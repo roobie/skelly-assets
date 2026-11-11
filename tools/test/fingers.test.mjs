@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
-import { closeHand, handAngles, handIssues, holdItem } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, frameAbout, jointAngles, jointRotation, length, mat3ToQuat, mulMV, rotY, sub } from '../../site/kinematics.mjs';
+import { closeHand, handAngles, handIssues, holdItem, padOf } from '../../site/fingers.mjs';
+import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
+import { applyPoint, boneTransforms, dot, frameAbout, jointAngles, jointRotation, length, mat3ToQuat, mulMV, rotY, sub } from '../../site/kinematics.mjs';
 
 // A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's
 // reference side does, one finger of three phalanges hangs from it, flexing about the knuckle row so positive flex
@@ -122,6 +123,24 @@ test('a thumb lifted wide comes down on the far side of a haft, not through it',
   assert.ok(closed.thumb.touched && lift > flex[0] && lift < flex[1], `the thumb stops on the haft, not at a limit (${lift})`);
   for (const id of ['thumb', 'thumb2', 'thumb3']) assert.ok(signedDepth(solid, tipOf(pose, id), 0.05) > -0.0015, `${id} sinks into the haft`);
   assert.ok(tipOf(pose, 'thumb3')[0] < centre[0], 'the thumb tip rests beyond the haft\'s middle');
+});
+
+test('a held pinch sets the thumb and index pads on either face of a thin tab, closing leaving them there', () => {
+  // A tab 8 mm thick across the knuckle row, before the palm where the curled index and the opposed thumb meet, held
+  // with its frame on the hand's: its socket is the palm's own.
+  const tab = { min: [-0.03, 0.88, 0.006], max: [-0.01, 0.9, 0.014] };
+  const pinch = { index: [-0.02, 0.89, tab.min[2]], thumb: [-0.02, 0.89, tab.max[2]] };
+  const file = { rig: { id: rig.id, revision: rig.revision }, hold: { hand: { model: 'tab', socket: { at: gripAt, into: [-1, 0, 0], axis: [0, 0, 1] }, pinch } } };
+  const { frame, report: { grips: { hand: pinched } }, held } = compilePose(rig, file, { meshOf: () => boxMesh(tab) });
+  const solid = posedSolid(boxMesh(tab), held.hand);
+  const transforms = boneTransforms(rig.bones, decodeFrame(frame));
+  const pad = (id) => applyPoint(transforms.get(id), padOf(bones.get(id)));
+  for (const [digit, tip] of [['index', 'index3'], ['thumb', 'thumb3']]) {
+    assert.ok(pinched[digit].residual < 0.0005, `the ${digit} pad reaches its point, not ${pinched[digit].residual * 1000} mm off`);
+    assert.ok(Math.abs(signedDepth(solid, pad(tip), 0.05)) < 0.0005, `the ${digit} pad rests on the tab`);
+  }
+  const across = sub(pad('thumb3'), pad('index3'));
+  assert.ok(dot(sub([-0.02, 0.89, 0.01], pad('index3')), across) > 0 && dot(sub(pad('thumb3'), [-0.02, 0.89, 0.01]), across) > 0, 'the tab lies between the pads');
 });
 
 test('a held item without a place follows the posed palm, its socket on the palm face with the thumb along its axis', () => {

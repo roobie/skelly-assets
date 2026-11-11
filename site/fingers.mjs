@@ -1,13 +1,14 @@
 // Hands over a rig from tools/dollRig.mjs, loaded as is by the browser and by Node like kinematics.mjs: a hand's digits
 // read off the rig, a pose file's hand shorthand turned into joint angles, a grip closed on a held item by contact, and
-// a hand placed on an item's grip socket. Why grips close by contact rather than by fingertip targets, and why the
-// palm is placed before the fingers, is in docs/decisions/0010-pose-tool.md.
+// a hand placed on an item's grip socket, with named digits pinching points on the item. Why grips close by
+// contact while a pinch reaches fingertip targets, and why the palm is placed before the fingers, is in
+// docs/decisions/0010-pose-tool.md.
 import { applyPoint, boneTransforms, clampJointAngles, cross, jointAngles, jointRotation, length, mulMM, mulMV, normalize, quatToMat3, rotBetween, solveTwoBone, sub, transpose, IDENTITY_M } from './kinematics.mjs';
 import { posedSolid, signedDepth } from './clearance.mjs';
 
 const HAND_KEYS = new Set(['preset', 'curl', 'spread', 'thumb']);
 const THUMB_KEYS = new Set(['across', 'oppose', 'lift', 'curl']);
-const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'close', 'pole']);
+const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'close', 'pole', 'pinch']);
 const SOCKET_KEYS = new Set(['at', 'into', 'axis']);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
@@ -147,13 +148,14 @@ const withAngles = (pose, bone, angles) => ({ ...pose, rotations: { ...pose.rota
  * knuckle out: a joint flexes from where the pose holds it until the part it moves, or any beyond it, touches the item,
  * or until its limit; the next joint then goes on from there, so a finger wraps a handle and a fingertip stops on a
  * surface. The fingers close first and the thumb last, on the item and on the closed fingers, so it comes to rest over
- * them rather than through them. Digits that touch nothing close fully. Returns the pose and, per digit, how far it
- * closed and whether it touched.
+ * them rather than through them. Digits that touch nothing close fully; the digits named in `keep` stay as the pose
+ * has them. Returns the pose and, per digit closed, how far it closed and whether it touched.
  */
-export function closeHand(rig, pose, handId, solid) {
+export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
   const closed = {};
   const digits = [...digitsOf(rig, handId)].sort(([a], [b]) => (a === 'thumb') - (b === 'thumb'));
   for (const [digit, chain] of digits) {
+    if (keep.includes(digit)) continue;
     const fingers = digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
     const transforms = boneTransforms(rig.bones, pose);
     const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind.box, transforms.get(bone.id)))];
@@ -194,14 +196,15 @@ export function closeHand(rig, pose, handId, solid) {
 // ---- holding ----
 
 /**
- * Every way a hold does not fit: `{ model, at?, turn?, pole?, socket: { at, into, axis }, close? }`. The socket is on
- * the item, in its own frame: `at` where the palm's face meets it, `into` the direction from the palm into the item,
- * `axis` along the grip, the way the thumb points. With `at` the item stands in the world and the arm reaches it, the
- * elbow bending toward `pole` or the rig's own; without, the item follows the hand. `close` false leaves the fingers
- * as the pose has them.
+ * Every way a hold does not fit: `{ model, at?, turn?, pole?, socket: { at, into, axis }, pinch?, close? }`. The
+ * socket is on the item, in its own frame: `at` where the palm's face meets it, `into` the direction from the palm into
+ * the item, `axis` along the grip, the way the thumb points. With `at` the item stands in the world and the arm reaches
+ * it, the elbow bending toward `pole` or the rig's own; without, the item follows the hand. `pinch`,
+ * `{ <digit>: [x, y, z] }`, sets each named digit's pad on that point of the item, in its frame. `close` false leaves
+ * the other digits as the pose has them.
  */
 export function holdIssues(rig, handId, hold) {
-  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, pole?, socket, close? }`];
+  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, pole?, socket, pinch?, close? }`];
   const issues = [];
   const hand = boneById(rig).get(handId);
   if (!hand?.reach) issues.push(`hold.${handId}: ${handId} is not a reach bone`);
@@ -215,6 +218,16 @@ export function holdIssues(rig, handId, hold) {
   else {
     for (const key of Object.keys(hold.socket)) if (!SOCKET_KEYS.has(key)) issues.push(`hold.${handId}.socket: unknown key ${key}`);
     for (const key of SOCKET_KEYS) if (!isVector(hold.socket[key])) issues.push(`hold.${handId}.socket.${key} is a finite [x, y, z]`);
+  }
+  if (hold.pinch !== undefined) {
+    if (!isObject(hold.pinch)) issues.push(`hold.${handId}.pinch is { <digit>: [x, y, z] }`);
+    else {
+      const digits = digitsOf(rig, handId);
+      for (const [digit, point] of Object.entries(hold.pinch)) {
+        if (!digits.has(digit)) issues.push(`hold.${handId}.pinch: ${handId} has no digit ${digit}`);
+        if (!isVector(point)) issues.push(`hold.${handId}.pinch.${digit} is a finite point [x, y, z]`);
+      }
+    }
   }
   if (hold.close !== undefined && typeof hold.close !== 'boolean') issues.push(`hold.${handId}.close is true or false`);
   return issues;
@@ -310,23 +323,24 @@ export function holdItem(rig, pose, handId, hold, report) {
 // The item's mesh carried to where it is held, ready for contact.
 export const heldSolid = (mesh, item) => posedSolid(mesh, item);
 
-// ---- fingertip IK, for comparison ----
+// ---- pinching ----
 
 /**
- * Cyclic coordinate descent on `chain` (bone ids, root first) so the last bone's tail reaches `target`, each joint held
- * to its limits at every step. Returns the pose and the distance left. Kept beside `closeHand` so the two can be
- * compared on the same hand; a grip is closed by contact, not by this.
+ * Cyclic coordinate descent on `chain` (bone ids, root first) so `end`, a point of the last bone in rest doll axes
+ * (its tail unless given), reaches `target`, each joint held to its limits at every step. Returns the pose and the
+ * distance left.
  */
-export function solveCCD(rig, pose, chain, target, { iterations = 24, report } = {}) {
+export function solveCCD(rig, pose, chain, target, { end: endAt, iterations = 24, report } = {}) {
   const bones = boneById(rig);
   const tip = bones.get(chain.at(-1));
+  const reach = endAt ?? tip.tail;
   let residual = Infinity;
   for (let i = 0; i < iterations && residual > 1e-4; i++) {
     for (const id of [...chain].reverse()) {
       const bone = bones.get(id);
       const transforms = boneTransforms(rig.bones, pose);
       const joint = applyPoint(transforms.get(id), bone.head);
-      const end = applyPoint(transforms.get(tip.id), tip.tail);
+      const end = applyPoint(transforms.get(tip.id), reach);
       const turn = rotBetween(normalize(sub(end, joint)), normalize(sub(target, joint)));
       const parent = bone.parent === null ? IDENTITY_M : transforms.get(bone.parent).r;
       const local = mulMM(transpose(parent), mulMM(turn, transforms.get(id).r));
@@ -334,7 +348,34 @@ export function solveCCD(rig, pose, chain, target, { iterations = 24, report } =
       if (kept.some((a, k) => Math.abs(a - angles[k]) > 1e-6)) report?.push({ bone: id, asked: angles, held: kept });
       pose = { ...pose, rotations: { ...pose.rotations, [id]: jointRotation(bone, kept) } };
     }
-    residual = length(sub(applyPoint(boneTransforms(rig.bones, pose).get(tip.id), tip.tail), target));
+    residual = length(sub(applyPoint(boneTransforms(rig.bones, pose).get(tip.id), reach), target));
   }
   return { pose, residual };
+}
+
+// How far back from the tip a digit's pad lies, as a share of its last phalanx.
+const PAD = 0.3;
+
+/** The pad of a digit's last bone `tip` in rest doll axes: on the face of its part the palm faces, near the tip. */
+export const padOf = (tip) => {
+  const { min, max } = tip.bind.box;
+  return [tip.bind.mirror ? min[0] : max[0], min[1] + PAD * (max[1] - min[1]), (min[2] + max[2]) / 2];
+};
+
+/**
+ * Sets the pad of each digit `pinch` names on its point of `item` (`{ r, t }`, the point in the item's frame) by
+ * `solveCCD` over the digit's chain, the palm staying where the hold placed it. Returns the pose and, per digit, the
+ * distance its pad is left from its point and its angles. The descent meets limits on its way however the pinch ends,
+ * so what a pinch could not reach shows in that distance, not as held limits.
+ */
+export function pinchItem(rig, pose, handId, pinch, item) {
+  const digits = digitsOf(rig, handId);
+  const pinched = {};
+  for (const [digit, point] of Object.entries(pinch)) {
+    const chain = digits.get(digit);
+    let residual;
+    ({ pose, residual } = solveCCD(rig, pose, chain.map((bone) => bone.id), applyPoint(item, point), { end: padOf(chain.at(-1)) }));
+    pinched[digit] = { residual, angles: Object.fromEntries(chain.map((bone) => [bone.id, jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10)])) };
+  }
+  return { pose, pinched };
 }
