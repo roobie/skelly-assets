@@ -80,7 +80,7 @@ local hakama(id, mass) =
   hakama('hakama', 0.9) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // A plain black practice hakama folded the same way, lighter cloth.
-  hakama('hakama_gi', 0.7) + { parts: [super.parts[0] { finish: { cloth: 'cloth-black', pleat: 'plastic-charcoal', tie: 'cloth-black' } }] } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
+  hakama('hakama_gi', 0.7) + { parts: [super.parts[0] { finish: { cloth: 'cloth-black', pleat: 'plastic-charcoal', tie: 'cloth-black' } }] } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // A black haori folded flat, 380 mm by 340 mm and 40 mm tall: the collar band running down both front edges, the
   // wide sleeves folded in along each side, gold crests and a sprig of gold embroidery, and a gold tie cord.
@@ -138,7 +138,7 @@ local hakama(id, mass) =
                                  + buttons('pocket-snap', 'snap', -0.09, [0.035], ht + 0.008, 0.005)
                                  + buttons('pocket-snap-r', 'snap', 0.09, [0.035], ht + 0.008, 0.005),
              { cloth: 'cloth-olive-drab', flap: 'cloth-olive-drab', snap: 'steel-parkerized' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A grey-green combat blouse folded flat, 360 mm by 320 mm and 50 mm tall: a mandarin collar, a zip under a flap,
   // two breast pockets with angled flaps, and grey hook-and-loop panels above them and between them for patches.
@@ -163,7 +163,7 @@ local hakama(id, mass) =
                                            box('pen-pocket', 'flap', [-w / 2 + 0.012, ht, -0.13], [-w / 2 + 0.05, ht + 0.004, -0.09]),
                                          ],
              { cloth: 'cloth-ucp', flap: 'cloth-ucp', loop: 'hook-loop-grey' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A white double-breasted chef's jacket folded flat, 360 mm by 320 mm and 50 mm tall: a stand collar, the front
   // panel crossing over to one side, and two columns of black knot buttons.

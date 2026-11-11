@@ -239,7 +239,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + std.flattenArrays([meridian('seam-%d' % a, 'seam', linerPath, a, 0, 0.126, 0.005, 0.002, 7, lift) for a in [0, 90, 180, 270]])
              + h.crescent('hem', 'seam', 0.094, 0.1, 0, 360, 16, lift - 0.002, lift + 0.004),
              { cloth: 'cloth-olive-drab', seam: 'webbing-olive-dark' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
   // An iron kabuto standing on its neck guard, 360 mm across the turnbacks and 360 mm tall to its crest: a low black
   // bowl with raised ribs and a gilt band round its foot, a neck guard of four flaring black plates laced in red
   // round the back and sides with their front ends turned back as wings, gilt horns rising from the brow, and a red
@@ -306,7 +306,7 @@ local ridingHelmet(id, mass, peak, fin) =
 
   // A sheet metal helmet, 300 mm across its collar and 290 mm tall: a crude riveted bucket with the face cut out, a
   // cotton pad showing round the opening, on a flared bevor collar.
-  sheetHelmet('sheet_metal_helmet', 2.4, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  sheetHelmet('sheet_metal_helmet', 2.4, false) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A sheet metal great helm, 300 mm across its collar and 290 mm tall: the riveted bucket closed over the face with a
   // narrow eye slit and rows of breathing holes, on a flared bevor collar.
@@ -374,7 +374,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + std.flattenArrays([skin('cord-%d' % k, 'cord', scrapPath, 45 * k + 20 - 1.5, 45 * k + 20 + 1.5, 0.0, 0.134, 0.003, 0.01, 7, lift) for k in std.range(0, 7)])
              + h.crescent('cord-ring', 'cord', scrapPath[0][1] + 0.006, scrapPath[0][1] + 0.011, 0, 360, 20, lift + 0.03, lift + 0.035),
              { base: 'scrap-rusted', galv: 'steel-galvanised', bright: 'steel-bright', rust: 'rust-red', bolt: 'steel-grey', cord: 'cord-cotton', cloth: 'cloth-rag' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // The top of a large wolf skull made into a helmet, lying on its teeth, 340 mm from the back of the braincase to the
   // nose and 205 mm across the cheekbones: a domed braincase with a ridge down the middle, cheekbones flaring round

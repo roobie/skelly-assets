@@ -71,7 +71,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     h.disc('knot', 'tie', 0.014, 0.004, 0.016, 0, 0.45),
     box('crease', 'seam', [-0.3, 0.004, 0.1], [0.3, 0.005, 0.106]),
   ], { bag: 'plastic-black', seam: 'plastic-charcoal', tie: 'plastic-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['improvised'], tags: { material: ['plastic'], slot: ['torso'] } } },
 
   // A large cotton flag folded into an oblong, 340 mm by 250 mm and 48 mm tall in four layers: six rainbow stripes
   // run across the top fold, with a canvas hoist strip and two brass grommets along its left end.
@@ -146,5 +146,5 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
   ] + sleeve('l-', -0.21, 0.02, -0.04, 0.11, 0.06, 0.02, 0.04)
   + [box('sleeve-band', 'band', [-0.08, 0.08, -0.096], [-0.04, 0.082, 0.016])],
              { cloth: 'cloth-khaki', sleeve: 'cloth-khaki', cuff: 'cloth-black', flap: 'cloth-khaki', band: 'reflective-yellow', silver: 'mirror-silver', clasp: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 ]

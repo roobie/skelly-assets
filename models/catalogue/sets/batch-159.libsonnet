@@ -74,7 +74,7 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
                                   + knitBands(0.18, 0.24, 0.05)
                                   + tassels(0.18, 0.24, 0.046, 12, 0.035),
              { cloth: 'cloth-red', rib: 'cloth-red', band: 'cloth-cream', tassel: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A knitted cotton scarf about 2.5 m long folded into a deeper stack, 200 mm across, 300 mm deep and 76 mm tall:
   // ribbed grey knit with two navy bands near the end and navy tassels at the front.
@@ -102,5 +102,5 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
     box('veil-hem', 'hem', [-0.11, 0.02, 0.008], [0.11, 0.022, 0.02]),
     box('band', 'band', [-0.11, 0.012, 0.05], [0.11, 0.016, 0.07]),
   ], { cloth: 'cloth-bright-white', veil: 'cloth-black', hem: 'cloth-charcoal', band: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 ]

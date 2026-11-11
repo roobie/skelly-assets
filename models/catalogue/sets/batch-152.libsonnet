@@ -211,7 +211,7 @@ local cheer = { cloth: 'cloth-red', pleat: 'cloth-crimson', band: 'cloth-red', s
     box('border', 'seam', [-0.17, 0.03, 0.12], [0.17, 0.034, 0.14]),
     strip('belt', 'belt', [-0.15, -0.1], [0.13, -0.01], 0.034, 0.025, 0.005),
     strip('belt-end', 'belt', [0.13, -0.01], [0.09, 0.07], 0.034, 0.025, 0.005),
-  ], { cloth: 'cloth-orange', seam: 'cloth-yellow', belt: 'cloth-brown' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
+  ], { cloth: 'cloth-orange', seam: 'cloth-yellow', belt: 'cloth-brown' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // Mesh basketball shorts folded once, 360 mm by 300 mm and 30 mm tall: knee-length legs, a wide elastic
   // waistband with a white drawstring, and a white stripe down each side.

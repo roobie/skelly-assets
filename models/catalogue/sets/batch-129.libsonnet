@@ -80,7 +80,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                ring('band', 'band', 0.012, 0.032, 0.085, 0.091),
              ],
              { silk: 'satin-black', band: 'cloth-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // An oiled black leather three-cornered hat sitting on its brim, 360 mm across and 136 mm tall: a
   // round crown inside a brim turned up into three walls, one corner to the front, gold braid along the wall tops and
@@ -142,7 +142,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
              + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.138, 0.103, 0.016) + brimStar('star-i', -0.132, 0.11, 0.016)
              + brimStar('star-j', -0.11, -0.132, 0.016),
              { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A crimson silk skullcap lying crown up, 174 mm across and 56 mm tall: a shallow cap with a short stem at the crown and a bound rim.
   h.compound('zucchetto', 0.021,
@@ -153,7 +153,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                h.disc('stem-knot', 'silk', 0.008, 0.05, 0.056),
              ],
              { silk: 'cloth-crimson' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // Panoramic night-vision goggles as they come off a helmet, 178 mm across, 132 mm deep and 92 mm tall: four
   // image tubes on one housing, the inner pair with rubber eyecups at the back (-z) and the outer pair set back
@@ -205,5 +205,5 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                for s in [if i == 0 then -1 else 1]
              ]),
              { cup: 'plastic-yellow', cushion: 'vinyl-black', wire: 'steel-grey', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 ]

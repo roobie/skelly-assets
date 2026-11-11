@@ -201,7 +201,7 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
   // and blue temples.
   h.compound('safety_glasses', 0.027, wrapLens(0.085, 58, 0.044),
              { lens: 'plastic-clear', frame: 'plastic-blue', temple: 'plastic-blue' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // Ski goggles 172 mm across and 90 mm tall: a broad curved amber-mirrored lens in a white frame with a dark
   // foam lining behind, and a wide black strap in a loop behind.
@@ -218,13 +218,13 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
              + wrapBand('foam', 'foam', R - 0.01, 0.012, -span + 1, span - 1, 26, cz, function(ang) lo(ang) - 0.006, function(ang) hi(ang) + 0.006)
              + wrapBand('strap', 'strap', ex, 0.003, 90, 270, 20, ez, function(ang) 0.03, function(ang) 0.07),
              { lens: 'glass-lens-amber', frame: 'plastic-white', foam: 'plastic-charcoal', strap: 'webbing-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['cold-weather'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // Welding goggles 140 mm across: two round black cups 54 mm across with dark green filter glass in steel rims, vents on the
   // cups, a short bridge and a black elastic strap in a loop behind.
   h.compound('welding_goggles', 0.18, cupGoggles(0.02, 0.027, 0.032, 0.014, 0.018, true),
              { cup: 'plastic-black', rim: 'steel-grey', lens: 'glass-lens-green', bridge: 'steel-grey', strap: 'webbing-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'glass'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['metalworking', 'safety-gear'], tags: { material: ['metal', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Carved bone snow goggles 156 mm across: a band curved to the face with a narrow slit before each eye, a notch
   // over the nose, and a rawhide tie looping round behind.
@@ -251,7 +251,7 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
                for s in [if side == 'l' then -1 else 1]
              ],
              { bone: 'wax-ivory', soot: 'screen-black', tie: 'skin-rawhide' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['bone'], setting: ['prehistoric'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['bone'], setting: ['prehistoric'], slot: ['face'] } } },
 
   // Classic sunglasses with the temples folded, 148 mm across and 48 mm tall: a thick black plastic frame with a
   // heavy brow over dark lenses.

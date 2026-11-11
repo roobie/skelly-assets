@@ -159,7 +159,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                  + wrapBand('nose', 'nose', r + 0.0025, 0.003, -22, 22, 6, cz, function(a) 0.09 - 0.008 * sq(a / 22), function(a) 0.098 - 0.008 * sq(a / 22))
                                  + backStraps(r, span, 0.052, [0.03, 0.075], 0.11, 0.006),
              { shell: 'cloth-cream', cloth: 'cloth-cream', nose: 'foil-alu', strap: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 
   // A white goalie's mask standing on its chin, 200 mm across and 250 mm tall: a moulded plastic shell with two eye
   // holes, a ridge down the nose, rows of breathing holes over the cheeks and mouth, and three elastic straps.
@@ -237,7 +237,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
     strip('end-l', 'cloth', [-0.01, -0.24], [-0.05, -0.31], 0, 0.035, 0.01),
     strip('end-r', 'cloth', [0.01, -0.24], [0.05, -0.31], 0, 0.035, 0.01),
   ], { cloth: 'cloth-navy', opening: 'cloth-black', hem: 'cloth-charcoal', crease: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['improvised'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 
   // A white plastic skull mask standing on its chin, 180 mm across and 240 mm tall: a thin moulded shell shaped as a
   // grinning skull, with deep black eye sockets, a nose hole, a row of teeth and an elastic cord behind.
@@ -256,7 +256,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                  ]
                                  + backStraps(r, span, c, [0.15], 0.11, 0.004),
              { shell: 'bone', bone: 'bone', hole: 'plastic-matte-black', tooth: 'enamel-white', strap: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A plastic pumpkin mask that pulls down over the head, 270 mm across and 240 mm tall: an orange lobed shell with
   // triangle eyes, a triangle nose and a jagged grin cut through it, and a green stalk on top.
@@ -280,7 +280,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
       for i in std.range(0, 7)
     ]),
              { shell: 'plastic-orange', stalk: 'leaf-green', face: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A fake white beard laid flat, 200 mm across and 230 mm long: a fluffy beard hanging to a point, a curled grey-white
   // moustache over a mouth hole, sideburns up to the ears and an elastic cord across the top.
@@ -303,5 +303,5 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
     for i in std.range(0, 9)
     for p in [[[-0.07, 0.01], [-0.035, 0.025], [0, 0.03], [0.035, 0.025], [0.07, 0.01], [-0.05, 0.065], [0, 0.07], [0.05, 0.065], [-0.022, 0.11], [0.022, 0.11]][i]]
   ], { beard: 'cloth-bright-white', tache: 'plastic-bag', mouth: 'cloth-charcoal', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 ]

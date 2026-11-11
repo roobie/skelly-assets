@@ -224,7 +224,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
     sbox(p + 'pad', 'pad', [cx - 0.046, 0.026, 0.062], [cx + 0.046, 0.032, 0.098]),
     sbox(p + 'seam', 'pad', [cx - 0.051, 0, -0.004], [cx + 0.051, 0.028, 0.006]),
   ], 0.09), { leather: 'leather-tan', gauntlet: 'cloth-turnout', band: 'reflective-yellow', pad: 'leather-brown' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['leather', 'fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A right-hand fencing gauntlet laid flat, back up, 230 mm from cuff to fingertip: a suede glove with a padded
   // back, a wrist strap and a wide cotton gauntlet cuff 130 mm long.

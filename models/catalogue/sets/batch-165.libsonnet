@@ -217,7 +217,7 @@ local rucksack(id, massKg, o) =
     for i in [0, 1]
     for x in [[-0.1, 0.1][i]]
   ]), { body: 'cloth-denim', leg: 'cloth-denim-faded', band: 'cloth-denim-faded', zip: 'brass', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], slot: ['back'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['back'] } } },
 
   // A bed sheet knotted into a bundle 350 mm long and 210 mm across, its twisted ends knotted on top and
   // the long twisted loop that goes over the shoulder lying flat round it.
@@ -230,7 +230,7 @@ local rucksack(id, massKg, o) =
     box('knot-ear-r', 'strap', [0.04, 0.195, -0.02], [0.09, 0.225, 0.02]),
     h.prism('twist-l', 'strap', 'z', [[-0.08, 0.2], [-0.04, 0.23], [-0.2, 0.02], [-0.24, 0.0]], -0.02, 0.02),
     h.prism('twist-r', 'strap', 'z', [[0.04, 0.225], [0.09, 0.2], [0.24, 0.0], [0.2, 0.02]], -0.02, 0.02),
-  ] + h.strapLoop('loop', 'strap', 0.45, 0.17, 0.045, 0.02, 0, 0, 0), { body: 'cloth-cream', fold: 'cloth-white', strap: 'cloth-white' }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  ] + h.strapLoop('loop', 'strap', 0.45, 0.17, 0.045, 0.02, 0, 0, 0), { body: 'cloth-cream', fold: 'cloth-white', strap: 'cloth-white' }) + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A nylon messenger bag 380 mm wide, 290 mm tall and 110 mm deep under a full flap held by two buckled straps,
   // with a padded shoulder strap lying in a U on the floor behind it.

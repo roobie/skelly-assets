@@ -97,7 +97,7 @@ local foldedScarf(w, d, ht, folds) =
       for i in std.range(0, 5)
       for y in [0.08 + 0.018 * i]
     ], { knit: 'wool-grey', cuff: 'felt-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A green-grey cotton utility cap standing on its band, 250 mm across the top and 260 mm from back to peak, 110
   // mm tall: a crown flaring up to a flat eight-cornered top, its seams running to each corner, and a cloth peak.
@@ -176,7 +176,7 @@ local foldedScarf(w, d, ht, folds) =
     ring('band', 'stitch', crownR(0.075, 0.032, 1.8, 0.012) - 0.003, crownR(0.075, 0.032, 1.8, 0.006) + 0.0015, 0.006, 0.012),
   ] + ribs('mark', 'stitch', crownR(0.075, 0.032, 1.8, 0.02) - 0.002, crownR(0.075, 0.032, 1.8, 0.016) + 0.0015, 12, 6, 0.014, 0.018),
     { cloth: 'cloth-black', stitch: 'cloth-cream' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A cream cotton cap standing on its rim, 180 mm across and 90 mm tall: a straight brimless band rounded over a
   // flat top, embroidered in a yellow band of diamonds round the side.
@@ -233,7 +233,7 @@ local foldedScarf(w, d, ht, folds) =
     ring('band', 'band', 0.0, 0.094, 0.012, 0.04),
     box('buckle', 'buckle', [-0.018, 0.016, 0.088], [0.018, 0.038, 0.097]),
     box('buckle-hole', 'band', [-0.011, 0.022, 0.094], [0.011, 0.032, 0.098]),
-  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
+  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' }) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A grey felted cotton porkpie hat resting on its brim, 270 mm across and 95 mm tall: a short flat-topped crown
   // with a round channel pressed into its top, a black ribbon band and a narrow brim turned up all round.
@@ -278,5 +278,5 @@ local foldedScarf(w, d, ht, folds) =
     h.turned('droop', 'cloth', 'y', [[0, 0], [0, 0.011], [0.07, 0.022], [0.07, 0]], [0.12, 0.105, 0]),
     ball('pompom', 'fur', 0.03, 0.12, 0.09, 0),
   ], { cloth: 'cloth-red', fur: 'fur-pale' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['head'] } } },
 ]
