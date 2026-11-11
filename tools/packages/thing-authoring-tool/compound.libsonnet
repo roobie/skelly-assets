@@ -12,6 +12,11 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
 {
   item: item,
   compound(id, massKg, pieces, finish): item(id, 'compound', massKg, { pieces: pieces }, finish),
+  // One compound part of an item made of several, such as a can and the lid that comes off it, met at its `ports`.
+  part(id, massKg, pieces, finish, ports): { id: id, family: 'compound', massKg: massKg, params: params({ pieces: pieces }), finish: finish, ports: ports },
+  // Where two parts meet: `normal` points out of the part and `up` sets the roll. A host port turned off the
+  // vertical tips the part fitted to it, so a lid can sit askew without its own pieces turning.
+  port(id, gender, pos, normal, up=[1, 0, 0]): { id: id, mount: 'assembly-joint', gender: gender, pos: pos, normal: normal, up: up, required: true },
   box(id, slot, min, max): { id: id, slot: slot, kind: 'box', min: min, max: max },
   turned(id, slot, axis, profile, origin=null): { id: id, slot: slot, kind: 'turned', axis: axis, profile: profile } + (if origin == null then {} else { origin: origin }),
   // The compound check takes counterclockwise outlines only, so a clockwise one is turned round here. On the y axis
