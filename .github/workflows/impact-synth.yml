@@ -1,0 +1,52 @@
+name: impact-synth
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/packages/impact-synth/**'
+      - 'models/sounds/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.node-version'
+      - '.github/actions/node/**'
+      - '.github/workflows/impact-synth.yml'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - 'tools/packages/impact-synth/**'
+      - 'models/sounds/**'
+      - 'tools/package.json'
+      - 'tools/package-lock.json'
+      - 'tools/sources.mjs'
+      - 'tools/jsonnet/**'
+      - '.node-version'
+      - '.github/actions/node/**'
+      - '.github/workflows/impact-synth.yml'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/packages/impact-synth
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache go-jsonnet
+        uses: actions/cache@v4
+        with:
+          path: tools/jsonnet/bin
+          key: jsonnet-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/jsonnet/runtime.json') }}
+      - uses: ./.github/actions/node
+        with:
+          npm-cache: true
+      - run: npm ci --prefix ../..
+      - run: npm run typecheck
+      - run: npm test
