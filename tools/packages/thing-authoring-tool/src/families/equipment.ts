@@ -1,6 +1,19 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
-import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { integer, minValue, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import {
+  array,
+  integer,
+  minLength,
+  minValue,
+  number,
+  parse,
+  picklist,
+  pipe,
+  strictObject,
+  string,
+  transform,
+  tuple,
+} from 'valibot';
 import { annulus, box, link, positive, round } from './shapes.ts';
 
 const count = pipe(string(), transform(Number), integer(), minValue(1));
@@ -59,16 +72,20 @@ export const blowtorch = (params: Readonly<Record<string, string>>) => {
   ];
 };
 
+const vec3 = tuple([number(), number(), number()]);
+const strapPieces = pipe(
+  string(),
+  transform((text): unknown => JSON.parse(text)),
+  array(strictObject({ id: string(), min: vec3, max: vec3 })),
+  minLength(1),
+);
+
+// The strap comes as boxes fitted round the wearer's head (models/head-band.libsonnet); the housing sits on its front
+// and the adjuster on its back.
 export const headlamp = (params: Readonly<Record<string, string>>) => {
   const d = parse(
     strictObject({
-      strapHalfWidth: positive,
-      strapFront: positive,
-      strapBack: positive,
-      strapFrontChamfer: positive,
-      strapBackChamfer: positive,
-      strapWidth: positive,
-      strapWall: positive,
+      strap: strapPieces,
       housingWidth: positive,
       housingHeight: positive,
       housingDepth: positive,
@@ -77,37 +94,17 @@ export const headlamp = (params: Readonly<Record<string, string>>) => {
     }),
     params,
   );
-  if (
-    d.strapWall >= Math.min(d.strapHalfWidth, d.strapFront, d.strapBack) ||
-    d.strapFrontChamfer >= Math.min(d.strapHalfWidth, d.strapFront) ||
-    d.strapBackChamfer >= Math.min(d.strapHalfWidth, d.strapBack) ||
-    2 * d.lensRadius > Math.min(d.housingWidth, d.housingHeight)
-  ) {
+  if (2 * d.lensRadius > Math.min(d.housingWidth, d.housingHeight)) {
     throw new Error('Invalid headlamp dimensions');
   }
-  const outline = (x: number, front: number, back: number): Vec2[] => [
-    [-front + d.strapFrontChamfer, -x],
-    [back - d.strapBackChamfer, -x],
-    [back, -x + d.strapBackChamfer],
-    [back, x - d.strapBackChamfer],
-    [back - d.strapBackChamfer, x],
-    [-front + d.strapFrontChamfer, x],
-    [-front, x - d.strapFrontChamfer],
-    [-front, -x + d.strapFrontChamfer],
-  ];
-  const inner = outline(d.strapHalfWidth, d.strapFront, d.strapBack);
-  const outer = outline(d.strapHalfWidth + d.strapWall, d.strapFront + d.strapWall, d.strapBack + d.strapWall);
-  const strap = inner.map(
-    (point, i): Solid => ({
-      id: `strap-${i}`,
-      kind: 'extruded-polygon',
-      axis: 'y',
-      profile: [point, outer[i]!, outer[(i + 1) % inner.length]!, inner[(i + 1) % inner.length]!],
-      z: [0, d.strapWidth],
-      slot: 'strap',
-    }),
+  const strap = d.strap.map(({ id, min: [x0, y0, z0], max: [x1, y1, z1] }) =>
+    box(id, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2], [x1 - x0, y1 - y0, z1 - z0], 'strap'),
   );
-  const z = -d.strapFront - d.strapWall - d.housingDepth / 2;
+  const strapFront = -Math.min(...d.strap.map(({ min }) => min[2]));
+  const back = d.strap.reduce((last, piece) => (piece.max[2] > last.max[2] ? piece : last));
+  const [strapBottom, strapTop] = [back.min[1], back.max[1]];
+  const strapWidth = strapTop - strapBottom;
+  const z = -strapFront - d.housingDepth / 2;
   return [
     ...strap,
     box('body', [0, d.housingHeight / 2, z], [d.housingWidth, d.housingHeight, d.housingDepth], 'body'),
@@ -131,8 +128,8 @@ export const headlamp = (params: Readonly<Record<string, string>>) => {
     ),
     box(
       'adjuster',
-      [0, d.strapWidth / 2, d.strapBack + d.strapWall],
-      [d.housingWidth * 0.7, d.strapWidth * 1.2, d.strapWall * 2],
+      [0, strapBottom + strapWidth / 2, back.max[2]],
+      [d.housingWidth * 0.7, strapWidth * 1.2, (back.max[2] - back.min[2]) * 2],
       'control',
     ),
   ];

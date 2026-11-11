@@ -17,6 +17,8 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 // player's figure poses it about, so the figure matches the player's. `doll` is a part held against the waist, its
 // back on the belly, with the forearms bent forward and in under it; `masses` gives the stand's and the doll's mass.
 local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
+local bustMeasures = bust { hairRing: band.hairRing };
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local plastic = 'plastic-gloss-white';
@@ -47,14 +49,14 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     exportMass: 'parts',
     parts: [
       stand,
-      segment('pelvis', 'bust', bust, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
+      segment('pelvis', 'bust', bustMeasures, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
         + [socket('hip-' + s[0], [s[1] * hipX, hipY, 0]) for s in sides]),
-      segment('torso', 'bust', bust, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
+      segment('torso', 'bust', bustMeasures, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
         + [socket('shoulder-' + s[0], [s[1] * shoulderX, shoulderY, 0]) for s in sides]
         + (if doll == null then [] else [socket('doll', [0, bust.pelvisHeight + 0.02, bust.waistDepth / 2], [0, 0, 1], [0, 1, 0])])),
-      segment('neck', 'bust', bust, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
+      segment('neck', 'bust', bustMeasures, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
-      segment('head', 'bust', bust, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
+      segment('head', 'bust', bustMeasures, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),

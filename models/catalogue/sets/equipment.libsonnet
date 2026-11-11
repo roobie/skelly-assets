@@ -1,5 +1,9 @@
 local b = import 'packages/thing-authoring-tool/equipment.libsonnet';
 local equipment = b.equipment;
+local band = import 'models/head-band.libsonnet';
+local headlampGrain = 0.002;
+// The headlamp's family lays its lens toward -z, which the build turns onto +z.
+local headlampStrap = band.strap('headlamp', headlampGrain, 0.004, forward=180);
 [
   equipment('blowtorch', 'blowtorch', 0.900, {
     radius: 0.026, bodyHeight: 0.115, footHeight: 0.008, neckRadius: 0.012,
@@ -7,27 +11,17 @@ local equipment = b.equipment;
     mouthLength: 0.020, mouthRadius: 0.013, valveRadius: 0.016,
   }, { body: 'plastic-blue', rubber: 'paint-charcoal', metal: 'steel-grey', control: 'plastic-red' }, 'body', [0, 0, 0]) + { taxonomy: { category: 'tools' } },
   equipment('headlamp', 'headlamp', 0.180, {
-    // The hair's square rear corners need a fitted contour, not a loose circular band.
-    strapHalfWidth: 0.093, strapFront: 0.103, strapBack: 0.105,
-    strapFrontChamfer: 0.025, strapBackChamfer: 0.002, strapWidth: 0.022, strapWall: 0.004,
+    strap: headlampStrap.pieces,
     housingWidth: 0.060, housingHeight: 0.040, housingDepth: 0.030,
     lensRadius: 0.017, lensDepth: 0.005,
-  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, 'strap-2', [0, 0, 0], [0.5, 0.5, 1]) + {
-    voxelGrain: 0.002,
+  }, { strap: 'cord-olive', body: 'plastic-red', metal: 'steel-grey', lens: 'glass-grey', control: 'paint-charcoal' }, headlampStrap.anchors.strap_back_inner.solid, [0, 0, 0], [0.5, 0.5, 1]) + {
+    voxelGrain: headlampGrain,
     anchors: {
       lens: { part: 'equipment', solid: 'lens', fraction: [0.5, 0.5, 0] },
       housing_bottom: { part: 'equipment', solid: 'body', fraction: [0.5, 0, 0.5] },
       housing_top: { part: 'equipment', solid: 'body', fraction: [0.5, 1, 0.5] },
       housing_back: { part: 'equipment', solid: 'body', fraction: [0.5, 0.5, 1] },
-      strap_left_inner: { part: 'equipment', solid: 'strap-4', fraction: [0, 0.5, 0.5] },
-      strap_left_outer: { part: 'equipment', solid: 'strap-4', fraction: [1, 0.5, 0.5] },
-      strap_right_inner: { part: 'equipment', solid: 'strap-0', fraction: [1, 0.5, 0.5] },
-      strap_right_outer: { part: 'equipment', solid: 'strap-0', fraction: [0, 0.5, 0.5] },
-      strap_front_inner: { part: 'equipment', solid: 'strap-6', fraction: [0.5, 0.5, 1] },
-      strap_front_outer: { part: 'equipment', solid: 'strap-6', fraction: [0.5, 0.5, 0] },
-      strap_back_inner: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 0] },
-      strap_back_outer: { part: 'equipment', solid: 'strap-2', fraction: [0.5, 0.5, 1] },
-    },
+    } + { [name]: { part: 'equipment' } + headlampStrap.anchors[name] for name in std.objectFields(headlampStrap.anchors) },
   } + { taxonomy: { category: 'lighting' } },
   equipment('weapon_sling', 'webbingSling', 0.150, {
     foldedLength: 0.290, width: 0.028, thickness: 0.003,
