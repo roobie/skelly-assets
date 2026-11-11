@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
-import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, filterQuery, isBrowsing, knownOnly, landingModels, matches, parseFilter, shelfOf, suggestions } from './filter.mjs';
+import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, filterQuery, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseFilter, shelfOf, suggestions } from './filter.mjs';
 import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -191,7 +191,7 @@ function writeUrl() {
 }
 
 function applyFilter() {
-  shown = isBrowsing(filter) ? landingModels(entries, dailySeed() + reshuffle) : entries.filter((m) => matches(m, filter));
+  shown = isBrowsing(filter) ? landingModels(entries, landingSeed(dailySeed(), reshuffle)) : entries.filter((m) => matches(m, filter));
   seen.disconnect();
   queue.length = 0;
   $('grid').replaceChildren();
@@ -299,7 +299,7 @@ async function wear(worn) {
 }
 
 function step(d) {
-  const list = shown;
+  const list = shown.some((m) => m.id === viewer.model?.id) ? shown : entries;
   const i = list.findIndex((m) => m.id === viewer.model?.id);
   openViewer(list[(i + d + list.length) % list.length]);
 }

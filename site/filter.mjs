@@ -20,7 +20,13 @@ export const emptyFilter = () => ({ q: '', shelf: ALL, picks: {} });
 
 export const isBrowsing = ({ q, shelf, picks }) => !q.trim() && shelf === ALL && Object.values(picks).every((terms) => terms.length === 0);
 
-// Every part narrows: the search text and the shelf, then each picked term, whatever its dimension.
+// Dimensions combine with AND and the terms picked in one tag facet with OR. Most facets give a model a single term
+// (setting, place, fit), so AND within one would leave nothing after a second pick, where OR widens. Keywords narrow
+// instead: a model has several, and each further one is a refinement.
+const termsMatch = (entry, dimension, terms) => (dimension === KEYWORD
+  ? terms.every((t) => entry.keywords.includes(t))
+  : terms.length === 0 || terms.some((t) => termsOf(entry, dimension).includes(t)));
+
 export function matches(entry, { q, shelf, picks }) {
   if (shelf !== ALL && shelfOf(entry) !== shelf) return false;
   const text = q.trim().toLowerCase();
@@ -29,15 +35,19 @@ export function matches(entry, { q, shelf, picks }) {
     const term = text.replace(/[\s_]+/g, '-');
     if (!entry.id.includes(id) && ![...Object.values(entry.tags).flat(), ...entry.keywords].some((t) => t.includes(term))) return false;
   }
-  return Object.entries(picks).every(([dimension, terms]) => terms.every((t) => termsOf(entry, dimension).includes(t)));
+  return Object.entries(picks).every(([dimension, terms]) => termsMatch(entry, dimension, terms));
 }
 
-// The terms of `dimension` that a further pick would still leave models for, with how many, most models first.
+// The terms of `dimension` that a further pick would offer models for, with how many, most models first. A tag facet's
+// own picks are left out of the filter so its other terms stay on offer, since a further pick there widens; a keyword
+// narrows, so its picks stay in.
 export function suggestions(entries, filter, dimension) {
   const taken = new Set(filter.picks[dimension] ?? []);
+  const { [dimension]: own, ...others } = filter.picks;
+  const basis = dimension === KEYWORD ? filter : { ...filter, picks: others };
   const counts = new Map();
   for (const entry of entries) {
-    if (!matches(entry, filter)) continue;
+    if (!matches(entry, basis)) continue;
     for (const term of termsOf(entry, dimension)) if (!taken.has(term)) counts.set(term, (counts.get(term) ?? 0) + 1);
   }
   return [...counts].sort(([a, n], [b, m]) => m - n || (a < b ? -1 : 1)).map(([term, count]) => ({ term, count }));
@@ -85,6 +95,10 @@ export function knownOnly(filter, entries) {
 
 // The same day gives the same seed, so a reload does not reshuffle the models under the reader.
 export const dailySeed = (date = new Date()) => date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate();
+
+// The seed of a landing page: the day, mixed with how many times the reader asked for another, so that no reshuffle
+// of one day lands on another day's set.
+export const landingSeed = (day, reshuffle) => Math.imul(day ^ Math.imul(reshuffle, 0x9e3779b1), 0x85ebca6b) >>> 0;
 
 // mulberry32: a small seeded generator returning numbers in [0, 1).
 function random(seed) {
