@@ -439,8 +439,16 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local wristX = arm.wristWidth / 2 + g, wristZ = arm.wristWidth / 2 + arm.wristDepthExtra + g;
     local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g, fingerZ = hand.width / 2 + g;
     local thumbX = arm.palmThickness * arm.thumbThicknessShare / 2 + g;
+    // The palm ends along the knuckle row, which slants back toward the little finger, so the glove's palm follows it
+    // rather than standing square past the little finger's root, where a curled finger would come out through it.
+    local last = std.length(hand.fingers) - 1;
+    local knuckleY(i) = hand.knuckle(i)[1] - g;
+    local edgeY(from, to, z) = knuckleY(from) + (knuckleY(to) - knuckleY(from)) * (z - hand.centre(from)) / (hand.centre(to) - hand.centre(from));
+    local outline = [[arm.handOverlap, palmZ], [edgeY(0, 1, palmZ), palmZ]]
+                    + [[knuckleY(i), hand.centre(i)] for i in std.range(1, last - 1)]
+                    + [[edgeY(last, last - 1, -palmZ), -palmZ], [arm.handOverlap, -palmZ]];
     local palm = [
-      h.box('palm', sl.hand, [-palmX, -arm.palmLength - g, -palmZ], [palmX, arm.handOverlap, palmZ]),
+      h.prism('palm', sl.hand, 'x', outline, -palmX, palmX),
       oct('cuff', sl.cuff, 0, s.cuff, 2 * (wristX + s.flare), 2 * (wristZ + s.flare), 0.012),
     ] + (if s.hem > 0 then [oct('cuff-hem', sl.hem, s.cuff - s.hem, s.cuff + 0.002, 2 * (wristX + s.flare) + 0.004, 2 * (wristZ + s.flare) + 0.004, 0.012)] else [])
       + [
@@ -448,9 +456,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
         for i in std.range(0, s.backRidges - 1)
       ];
     // A phalanx piece in its phalanx's frame: a sleeve down its length; a stub glove ends the knuckle phalanx short.
+    // Its root end stands past the skin's, which reaches into the bone above to close the joint, so a curled joint
+    // shows glove at its back rather than the skin's end face.
     local phalanx(i, k) =
       local length = if s.fingers then hand.length(i, k) else 0.02;
-      [h.box('finger', sl.hand, [-fingerX, -length - g, -fingerZ], [fingerX, arm.handOverlap, fingerZ])]
+      [h.box('finger', sl.hand, [-fingerX, -length - g, -fingerZ], [fingerX, arm.handOverlap + g, fingerZ])]
       + (if s.fingers then [] else [h.box('stub-hem', sl.hem, [-fingerX - 0.001, -length - g, -fingerZ - 0.001], [fingerX + 0.001, -length - g + 0.006, fingerZ + 0.001])]);
     local phalanges = if s.fingers then std.range(0, hand.phalanges - 1) else [0];
     local fingerPieces = [
@@ -458,10 +468,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, std.length(hand.fingers) - 1)
       for k in phalanges
     ];
-    // A thumb piece in its bone's frame, down the bone's length; the root piece ends at the root, the rest reach into
-    // the bone above.
+    // A thumb piece in its bone's frame, down the bone's length; the root piece ends just past the root, the rest reach
+    // into the bone above, each past the skin's end for the same reason as a phalanx's.
     local thumbPieces = [
-      { id: id + '_worn_' + hand.thumbPart(k), frame: hand.thumbPart(k), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, if k == 0 then 0 else arm.handOverlap, arm.thumbProjection + 0.004 + g])] }
+      { id: id + '_worn_' + hand.thumbPart(k), frame: hand.thumbPart(k), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbProjection + 0.004 + g])] }
       for k in std.range(0, hand.thumbBones - 1)
     ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.
