@@ -13,6 +13,7 @@
   'boat_trailer': import 'models/vehicles/boat_trailer.libsonnet',
   'box_truck': import 'models/vehicles/box_truck.libsonnet',
   'bucket_truck': import 'models/vehicles/bucket_truck.libsonnet',
+  'bulldozer': import 'models/vehicles/bulldozer.libsonnet',
   'burnt_out_bus': import 'models/vehicles/burnt_out_bus.libsonnet',
   'burnt_out_saloon': import 'models/vehicles/burnt_out_saloon.libsonnet',
   'burnt_out_van': import 'models/vehicles/burnt_out_van.libsonnet',
