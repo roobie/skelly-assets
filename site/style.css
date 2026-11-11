@@ -132,15 +132,15 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 .button.ghost { background: transparent; color: var(--text); border-color: var(--line); }
 .button[hidden] { display: none; }
 
-.meta { margin-top: 12px; font-size: 13px; }
-.meta summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 6px; }
-.meta > summary {
+.metadata { margin-top: 12px; font-size: 13px; }
+.metadata summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 6px; }
+.metadata > summary {
   font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600;
   min-height: 44px;
 }
-.meta summary::marker { content: ""; }
-.meta summary::before { content: "▸"; color: var(--muted); }
-.meta details[open] > summary::before, .meta[open] > summary::before { content: "▾"; }
+.metadata summary::marker { content: ""; }
+.metadata summary::before { content: "▸"; color: var(--muted); }
+.metadata details[open] > summary::before, .metadata[open] > summary::before { content: "▾"; }
 .parts { width: 100%; border-collapse: collapse; margin: 4px 0 12px; font-variant-numeric: tabular-nums; }
 .parts[hidden] { display: none; }
 .parts th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 4px 8px 4px 0; }
@@ -158,10 +158,9 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 .foot p { border-top: 1px solid var(--line); padding-top: 16px; margin: 0; max-width: 80ch; }
 
 @media (max-width: 760px) {
-  .top { flex-direction: column; align-items: flex-start; padding-top: 24px; }
+  .top { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 16px; padding-bottom: 8px; }
   .top, .controls, .grid, .foot { padding-left: 16px; padding-right: 16px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .top { gap: 8px; padding-top: 16px; padding-bottom: 8px; }
   .top h1 { font-size: 22px; }
   .top p { margin-top: 4px; font-size: 13px; }
   /* A phone shows the grid under one row of controls: the categories scroll sideways and the tags fold away. */
