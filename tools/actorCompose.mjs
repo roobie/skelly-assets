@@ -114,6 +114,6 @@ export function applyMotion(base, motion, time, seed) {
   return { root: [...base.root], rotations };
 }
 
-export { decodeFrame } from '../site/clipFrames.mjs';
+export { clipSpanSeconds, decodeFrame } from '../site/clipFrames.mjs';
 
 export const sampleClip = (clip, cursor) => sampleFrames(clip, cursor, slerpQuat);

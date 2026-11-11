@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
-import { decodeFrame, sampleClip } from './clipFrames.mjs';
+import { clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -188,7 +188,7 @@ const slerp = (() => {
 // clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
 const spanOf = (clip, walkSpeed) => {
   if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / walkSpeed;
-  return clip.loop ? clip.periodSimSeconds : clip.durationSimSeconds ?? clip.durationRealSeconds;
+  return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
 // A clip at `phase`, 0 to 1 of its span; a loop's cursor is its phase, a finite clip's its seconds.
 const clipAt = (clip, phase, span) => sampleClip(clip, clip.loop ? phase : phase * span, slerp);

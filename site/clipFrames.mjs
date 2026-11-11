@@ -1,6 +1,6 @@
 // Clip frames, as a clip stores them: sampling a clip and decoding a frame into matrices. Loaded as is by the browser
-// and by Node, because the browser cannot reach tools/actorCompose.mjs (mobgen TypeScript, Jsonnet source), which
-// re-exports these for the games and tools that compose clips.
+// and by Node, because the browser cannot reach tools/actorCompose.mjs (mobgen TypeScript, Jsonnet source). That
+// module wraps sampleClip with mobgen's slerp and re-exports the rest.
 import { quatToMat3 } from './kinematics.mjs';
 
 /** A finite clip carries exactly one span key, named for the clock its caller samples it on; never guess. */

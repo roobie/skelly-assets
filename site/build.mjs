@@ -113,7 +113,7 @@ const assemblies = readAssemblies(root)
 
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
 // dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback
-// (site/clipFrames.mjs, which both read).
+// (site/clipFrames.mjs, which this build and the pages read).
 const poseFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
 const idleAt = (set, body, time) => {
   const idle = set.idle?.slack ?? set.idle?.aggravated ?? set.idle;
