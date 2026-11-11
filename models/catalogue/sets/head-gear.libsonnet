@@ -1,5 +1,6 @@
 // Head gear in the worn frame: origin at the centre of deadvox's head region, y up, the face toward +z, the wearer's
 // left at +x. Clearances are measured against the player bust's head (`avatar.libsonnet`, `bust`).
+local band = import 'models/head-band.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local turned(id, slot, axis, profile, origin) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
@@ -83,28 +84,10 @@ local g = {
   tubeBack: 0.102,
   tubeFront: 0.178,
   lensDepth: 0.004,
-  strapHalfWidth: 0.093,
-  strapFront: 0.103,
-  strapBack: 0.105,
   strapWall: 0.004,
-  strapBottom: 0.026,
-  strapTop: 0.048,
+  voxelGrain: 0.002,
 };
-// Hair makes the rear corners square; a circular band either floats off the sides or cuts those corners.
-local strapOutline(x, front, back) = [
-  [-back + 0.002, -x], [front - 0.025, -x], [front, -x + 0.025], [front, x - 0.025],
-  [front - 0.025, x], [-back + 0.002, x], [-back, x - 0.002], [-back, -x + 0.002],
-];
-local strapInner = strapOutline(g.strapHalfWidth, g.strapFront, g.strapBack);
-local strapOuter = strapOutline(g.strapHalfWidth + g.strapWall, g.strapFront + g.strapWall, g.strapBack + g.strapWall);
-local goggleStrap = [
-  {
-    id: 'strap_%d' % i, kind: 'prism', slot: 'strap', axis: 'y',
-    profile: [strapInner[i], strapOuter[i], strapOuter[(i + 1) % 8], strapInner[(i + 1) % 8]],
-    start: g.strapBottom, end: g.strapTop,
-  }
-  for i in std.range(0, 7)
-];
+local goggleStrap = band.strap('night_vision_goggles', g.voxelGrain, g.strapWall);
 local optic(side) = [
   turned('tube_%s' % side, 'body', 'z', disc(g.tubeRadius, g.tubeFront - g.tubeBack),
          [if side == 'left' then g.eyeSpacing / 2 else -g.eyeSpacing / 2, 0, g.tubeBack]),
@@ -131,10 +114,10 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
   {
     id: 'night_vision_goggles',
     exportMass: 'parts',
-    voxelGrain: 0.002,
+    voxelGrain: g.voxelGrain,
     parts: [{
       id: 'goggles', family: 'compound', massKg: 0.55,
-      params: params({ pieces: goggleStrap + optic('left') + optic('right') + [
+      params: params({ pieces: [box(piece.id, 'strap', piece.min, piece.max) for piece in goggleStrap.pieces] + optic('left') + optic('right') + [
         box('bridge', 'body', [-0.064, 0.014, 0.103], [0.064, 0.034, 0.125]),
       ] }),
       finish: { body: 'polymer-od-green', strap: 'rubber-black', lens: 'glass-lens-green' },
@@ -149,14 +132,6 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       lens_right: goggleAnchor('lens_right', [0.5, 0.5, 1]),
       lens_left_edge: goggleAnchor('lens_left', [1, 0.5, 1]),
       lens_right_edge: goggleAnchor('lens_right', [1, 0.5, 1]),
-      strap_left_inner: goggleAnchor('strap_4', [0, 0.5, 0.5]),
-      strap_left_outer: goggleAnchor('strap_4', [1, 0.5, 0.5]),
-      strap_right_inner: goggleAnchor('strap_0', [1, 0.5, 0.5]),
-      strap_right_outer: goggleAnchor('strap_0', [0, 0.5, 0.5]),
-      strap_front_inner: goggleAnchor('strap_2', [0.5, 0.5, 0]),
-      strap_front_outer: goggleAnchor('strap_2', [0.5, 0.5, 1]),
-      strap_back_inner: goggleAnchor('strap_6', [0.5, 0.5, 1]),
-      strap_back_outer: goggleAnchor('strap_6', [0.5, 0.5, 0]),
-    },
+    } + { [name]: { part: 'goggles' } + goggleStrap.anchors[name] for name in std.objectFields(goggleStrap.anchors) },
   } + { taxonomy: { category: 'electrical', tags: { slot: ['face'] } } },
 ]
