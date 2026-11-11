@@ -16,7 +16,7 @@ const FIXTURE = {
     material: { meaning: 'What it is made of.', terms: { metal: 'Metal.', wood: 'Wood.' } },
     setting: { meaning: 'Its era.', terms: { modern: 'Now.' } },
   },
-  keywords: ['hand-tool'],
+  keywords: { 'hand-tool': 'A tool held in the hand.' },
 };
 
 const inTemp = (prefix, work) => {
@@ -79,7 +79,8 @@ test('the vocabulary is refused when a term is not kebab-case, has no meaning, o
   assert.throws(() => vocabularyOf({ ...FIXTURE, categories: { tools: ' ' } }), /has no meaning/);
   assert.throws(() => vocabularyOf({ ...FIXTURE, facets: { material: { meaning: 'x', terms: { metal: '' } } } }), /has no meaning/);
   assert.throws(() => vocabularyOf({ ...FIXTURE, strict: true }), /unknown key strict/);
-  assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: ['Hand tool'] }), /kebab-case/);
+  assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: { 'Hand tool': 'A tool.' } }), /not kebab-case/);
+  assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: { 'hand-tool': '' } }), /keywords term hand-tool has no meaning/);
 });
 
 // [default, own, resolved]: the JavaScript and Jsonnet implementations of the rule must agree on each case.
