@@ -100,20 +100,16 @@ export function pressCheckPoses(rig, check, strokes) {
       hands: { 'hand.L': left.hands },
       hold: { 'hand.R': { ...held, pole: gripPole, socket: check.grip.socket } },
     };
-    if (left.hold) {
-      const { socket, beneath, pole, pinch } = left.hold;
-      const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
-      const drawn = (p) => add(p, strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)));
-      file.hold['hand.L'] = {
-        ...held,
-        pole,
-        socket: { at: r4(drawn(mulMV(unroll, socket.at))), into: r4(mulMV(unroll, socket.into)), axis: r4(mulMV(unroll, socket.axis)) },
-        ...(pinch ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(drawn(p))])) } : {}),
-      };
-    } else {
-      file.angles['hand.L'] = left.reach.hand;
-      file.reach = { 'hand.L': { target: r4(inWorld(rifle, left.reach.at)), pole: left.reach.pole } };
-    }
+    const { socket, beneath, pole, pinch, close } = left.hold;
+    const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
+    const drawn = (p) => add(p, strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)));
+    file.hold['hand.L'] = {
+      ...held,
+      pole,
+      socket: { at: r4(drawn(mulMV(unroll, socket.at))), into: r4(mulMV(unroll, socket.into)), axis: r4(mulMV(unroll, socket.axis)) },
+      ...(pinch ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(drawn(p))])) } : {}),
+      ...(close === false ? { close } : {}),
+    };
     if (moved) file.moved = { [check.rifle]: moved };
     return file;
   };

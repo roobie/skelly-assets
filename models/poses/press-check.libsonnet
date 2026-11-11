@@ -6,9 +6,8 @@
 //
 // Points and sockets are in the rifle's frame (its bore along +z, the port side -x). A frame's `carry` turns the rifle
 // (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the rifle point the eyes turn to and
-// `tilt` leans the head toward the figure's right. A left hand `hold`s a socket, may `pinch` named rifle points (moved
-// with the charging handle's draw), or `reach`es a rifle point with its own wrist angles and hand shorthand where no
-// socket fits.
+// `tilt` leans the head toward the figure's right. The left hand `hold`s a socket, may `pinch` named rifle points
+// (moved with the charging handle's draw) and, with `close: false`, rests there open instead of gripping.
 // The handguard's underside, palm up, the thumb along the bore. `beneath` keeps it below the bore however the rifle
 // rolls, as a supporting hand stays under the handguard while the other hand rolls the rifle.
 local support = { hold: { socket: { at: [0.013, -0.0225, 0.1], into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0.766] }, beneath: true, pole: [0, -1, 0] }, hands: 'support' };
@@ -46,10 +45,21 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-3-handle': turned { left: pinch(0) },
     'press-4-retracted': turned + retracted { left: pinch(1) },
     'press-5-inspect': turned + retracted { left: pinch(1) },
-    // The handle let go, the hand open beside the receiver's left side.
-    'press-6-released': turned { left: { reach: { at: [0.09, 0.03, -0.1], pole: [0.3, -1, 0], hand: [0, 0, 0] }, hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } } } },
-    // The left index pushes the port cover shut; the cover is part of the receiver mesh, so it has no motion.
-    'press-7-cover': turned { left: { reach: { at: [-0.08, 0.055, -0.11], pole: [0.5, -0.87, 0], hand: [30, 0, 0] }, hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } } } },
+    // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
+    'press-6-released': turned {
+      left: {
+        hold: { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.3, -1, 0], close: false },
+        hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
+      },
+    },
+    // The left hand over the receiver's right side, its index pad pushing the port cover up shut; the cover is part of
+    // the receiver mesh, so it has no motion.
+    'press-7-cover': turned {
+      left: {
+        hold: { socket: { at: [-0.022, 0.039, -0.07], into: [0.5, -0.866, 0], axis: [0, 0, -1] }, pole: [0.5, -0.87, 0], pinch: { index: [-0.026, -0.012, -0.1] } },
+        hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
+      },
+    },
     'press-8-fire': ready,
   },
 }
