@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
-import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, filterQuery, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseFilter, shelfOf, suggestions } from './filter.mjs';
+import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, shelfOf, stateHash, suggestions } from './filter.mjs';
 import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -88,6 +88,8 @@ let taxonomy = { categories: {}, facets: {} };
 let filter = emptyFilter();
 let reshuffle = 0; // landing pages asked for since the page opened
 const combos = new Map(); // dimension -> its combobox
+let closedByHash = false; // the viewer is closing because the hash no longer names a model
+let pushedOpen = false; // opening the viewer added a history entry that closing it should take back
 
 const labelOf = (term) => term[0].toUpperCase() + term.slice(1).replaceAll('-', ' ');
 const shelfLabel = (key) => ([ALL, UNCATEGORISED, VEHICLES].includes(key) ? key : labelOf(key));
@@ -185,12 +187,21 @@ function showCards(upTo) {
   $('more').textContent = browsing ? 'Show other models' : `Show ${Math.min(PAGE_SIZE, shown.length - visible)} more`;
 }
 
-function writeUrl() {
-  const query = filterQuery(filter);
-  history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+// The page's state as it stands, which is what the hash holds.
+const currentState = () => {
+  const open = $('viewer').open && viewer.model;
+  return { filter, reshuffle, model: open ? viewer.model.id : null, view: open ? viewer.view : null, info: Boolean(open) && $('v-meta').open };
+};
+
+// A change of state replaces the hash's history entry, so that Back does not step through every keystroke and filter pick;
+// only opening a model pushes one, so that Back closes the viewer and returns to the grid as it was.
+function writeHash(push = false) {
+  const hash = stateHash(currentState());
+  const url = `${location.pathname}${location.search}${hash ? `#${hash}` : ''}`;
+  if (hash !== location.hash.slice(1)) history[push ? 'pushState' : 'replaceState'](null, '', url);
 }
 
-function applyFilter() {
+function showFilter() {
   shown = isBrowsing(filter) ? landingModels(entries, landingSeed(dailySeed(), reshuffle)) : entries.filter((m) => matches(m, filter));
   seen.disconnect();
   queue.length = 0;
@@ -200,15 +211,28 @@ function applyFilter() {
     ? `Showing ${shown.length} of ${entries.length} models: search, or pick a category or a filter, to find more`
     : `${shown.length} of ${entries.length} models`;
   $('facets-toggle').textContent = pickedCount() ? `Filters (${pickedCount()})` : 'Filters';
-  writeUrl();
 }
 
-// The page's controls as a linked URL left them.
-function restoreFilter() {
-  filter = knownOnly(parseFilter(location.search), entries);
+function applyFilter() {
+  showFilter();
+  writeHash();
+}
+
+// Puts the page into a state a link, a reload or a step through history left: the controls, the grid and the open model.
+function restore(state) {
+  filter = knownOnly(state.filter, entries);
+  reshuffle = state.reshuffle;
   $('search').value = filter.q;
   markShelf(false);
   for (const [dimension, combo] of combos) combo.set(filter.picks[dimension] ?? []);
+  showFilter();
+  const model = byId.get(state.model);
+  if (model) openViewer(model, state);
+  else if ($('viewer').open) {
+    closedByHash = true;
+    $('viewer').close();
+  }
+  writeHash();
 }
 
 // ---- viewer ----
@@ -222,7 +246,7 @@ function initViewer() {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
-  viewer = { renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, worn: false };
+  viewer = { view: null, renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, worn: false };
 
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -245,11 +269,18 @@ function initViewer() {
   });
 
   $('v-close').onclick = () => $('viewer').close();
-  $('viewer').addEventListener('close', () => { if (location.hash) history.replaceState(null, '', location.pathname + location.search); });
+  $('viewer').addEventListener('close', () => {
+    const pushed = pushedOpen;
+    pushedOpen = false;
+    if (closedByHash) closedByHash = false;
+    else if (pushed) history.back();
+    else writeHash();
+  });
   $('viewer').addEventListener('click', (e) => { if (e.target === $('viewer')) $('viewer').close(); });
   $('v-meta').addEventListener('toggle', () => {
     if ($('v-meta').open) $('v-meta').scrollIntoView({ block: 'start', behavior: 'smooth' });
     showMeta();
+    writeHash();
   });
   $('v-prev').onclick = () => step(-1);
   $('v-next').onclick = () => step(1);
@@ -272,6 +303,8 @@ function spreadParts(v) {
 function explode(exploded) {
   const v = viewer;
   v.exploded = exploded;
+  v.view = exploded ? 'exploded' : null;
+  writeHash();
   for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'exploded') === exploded));
   spread(v.parts, exploded ? 1 : 0);
   const direction = v.camera.position.clone().sub(v.controls.target).normalize();
@@ -286,6 +319,8 @@ async function wear(worn) {
   const v = viewer;
   const model = v.model;
   v.worn = worn;
+  v.view = worn ? 'worn' : null;
+  writeHash();
   for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'worn') === worn));
   const entry = worn ? wornEntry(model) : model;
   const loaded = await loadEntry(entry);
@@ -304,11 +339,16 @@ function step(d) {
   openViewer(list[(i + d + list.length) % list.length]);
 }
 
-async function openViewer(model) {
+// `restored` is the state to show when a link or history brought the model: its view and whether its details are open.
+async function openViewer(model, restored = null) {
   if (!viewer) return;
+  const opening = !$('viewer').open;
   viewer.model = model;
-  if (!$('viewer').open) $('viewer').showModal();
-  history.replaceState(null, '', `#${model.id}`);
+  viewer.view = null;
+  if (opening) $('viewer').showModal();
+  if (restored) $('v-meta').open = restored.info;
+  writeHash(opening && !restored);
+  pushedOpen ||= opening && !restored;
 
   $('v-category').textContent = shelfLabel(shelfOf(model));
   $('v-name').textContent = nameOf(model.id);
@@ -378,6 +418,8 @@ async function openViewer(model) {
     const names = ['walk', 'attack', 'pounce', 'idle'].filter((n) => playable(clips[n]));
     const pick = (name) => {
       viewer.clip = name;
+      viewer.view = name === names[0] ? null : name;
+      writeHash();
       viewer.t0 = performance.now();
       for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String(b.dataset.clip === name));
     };
@@ -390,10 +432,12 @@ async function openViewer(model) {
       b.onclick = () => pick(n);
       return b;
     }));
-    pick(names[0]);
+    pick(names.includes(restored?.view) ? restored.view : names[0]);
   }
   if (comesApart(model)) $('v-clips').replaceChildren(...viewChips([['assembled', 'Assembled'], ['exploded', 'Exploded']], (view) => explode(view === 'exploded')));
+  if (comesApart(model) && restored?.view === 'exploded') explode(true);
   if (isWearable(model)) $('v-clips').replaceChildren(...viewChips([['loose', looseName(model)], ['worn', 'Worn']], (view) => wear(view === 'worn')));
+  if (isWearable(model) && restored?.view === 'worn') wear(true);
 }
 
 // A chip for each of a model's views, [view, text], the first pressed; picking one calls `pick` with its view.
@@ -445,7 +489,7 @@ function breakable(text) {
 function modelRef(id) {
   const target = typeof id === 'string' && byId.get(id);
   if (!target || target === viewer.model) return breakable(id ?? '');
-  const a = Object.assign(document.createElement('a'), { href: `#${id}` });
+  const a = Object.assign(document.createElement('a'), { href: `#${stateHash({ ...currentState(), model: id, view: null, info: false })}` });
   a.append(breakable(id));
   a.onclick = (e) => { e.preventDefault(); openViewer(target); };
   return a;
@@ -542,8 +586,6 @@ async function main() {
   for (const m of entries) byId.set(m.id, m);
   renderShelves();
   renderFacets();
-  restoreFilter();
-  applyFilter();
   $('search').addEventListener('input', () => {
     filter.q = $('search').value;
     applyFilter();
@@ -558,8 +600,11 @@ async function main() {
     const open = $('facets-toggle').getAttribute('aria-expanded') !== 'true';
     $('facets-toggle').setAttribute('aria-expanded', String(open));
   };
-  const fromHash = entries.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
-  if (fromHash) openViewer(fromHash);
+  restore(parseState(location.hash));
+  window.addEventListener('hashchange', () => {
+    const state = parseState(location.hash);
+    if (location.hash.slice(1) !== stateHash(currentState())) restore(state);
+  });
 }
 
 main();

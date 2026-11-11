@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { KEYWORD, dailySeed, emptyFilter, filterQuery, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseFilter, shelfOf, suggestions } from '../../site/filter.mjs';
+import { KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
 
 const model = (id, category, tags = {}, keywords = []) => ({ id, category, tags, keywords });
 const entries = [
@@ -38,15 +38,22 @@ test('only an empty filter is browsing', () => {
   assert.ok(!isBrowsing(filterOf({ picks: { material: ['wood'] } })));
 });
 
-test('a filter survives the round trip through its URL query', () => {
+test('the whole page state survives the round trip through the URL hash', () => {
   const filter = filterOf({ q: 'oak door', shelf: 'building', picks: { [KEYWORD]: ['entrance'], material: ['wood', 'steel'], place: ['urban'] } });
-  assert.deepEqual(parseFilter(filterQuery(filter)), filter);
-  assert.equal(filterQuery(emptyFilter()), '');
+  const state = { filter, reshuffle: 3, model: 'oak_door', view: 'exploded', info: true };
+  assert.deepEqual(parseState(`#${stateHash(state)}`), state);
+  assert.equal(stateHash(emptyState()), '');
+});
+
+test('a view and the details belong to an open model only', () => {
+  const state = { ...emptyState(), view: 'walk', info: true };
+  assert.deepEqual(parseState(stateHash(state)), emptyState());
 });
 
 test('a pick the catalogue lacks is dropped from a linked filter', () => {
-  const linked = parseFilter('cat=gone&kw=entrance&kw=nonsense&tag=material:wood&tag=material:unobtainium&tag=malformed');
+  const linked = parseState('#cat=gone&kw=entrance&kw=nonsense&tag=material:wood&tag=material:unobtainium&tag=malformed&r=-2').filter;
   assert.deepEqual(knownOnly(linked, entries), filterOf({ picks: { [KEYWORD]: ['entrance'], material: ['wood'] } }));
+  assert.equal(parseState('#r=junk').reshuffle, 0);
 });
 
 test('suggestions list only the terms that leave models, without those already picked', () => {

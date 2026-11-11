@@ -21,8 +21,8 @@ CI builds them and publishes each version as a release, so you can use the asset
 
 **Browse them:** <https://roobie.github.io/skelly-assets/>: turn each model around, play the creatures' clips
 and download any of them. The page opens on a handful of models rather than drawing thousands of previews at
-once, which is slow to load, and keyword and tag filters, whose state is in the page's URL, let you narrow the
-catalogue to a view you can link.
+once, which is slow to load, and keyword and tag filters narrow the catalogue, and the page keeps its whole state in the
+URL hash, so any view, down to an open model, is a link you can share.
 
 ## Layout
 

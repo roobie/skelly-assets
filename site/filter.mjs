@@ -56,18 +56,29 @@ export function suggestions(entries, filter, dimension) {
 // ---- the URL ----
 // `?q=text&cat=shelf&kw=a&kw=b&tag=facet:term`: a part left out is not filtering.
 
-export function filterQuery({ q, shelf, picks }) {
+// ---- the page's state, as a URL hash ----
+
+// Everything that makes the page look as it does lives in the hash, so that a link restores it and the server never sees
+// it: the filter, the landing page's reshuffle count, and the open model with its chosen view and whether its details are
+// unfolded. The shape is { filter, reshuffle, model, view, info }; `model` and `view` are null when nothing is open or chosen.
+export const emptyState = () => ({ filter: emptyFilter(), reshuffle: 0, model: null, view: null, info: false });
+
+export function stateHash({ filter, reshuffle, model, view, info }) {
   const params = new URLSearchParams();
-  if (q.trim()) params.set('q', q.trim());
-  if (shelf !== ALL) params.set('cat', shelf);
-  for (const [dimension, terms] of Object.entries(picks)) {
+  if (model) params.set('m', model);
+  if (model && view) params.set('v', view);
+  if (model && info) params.set('info', '1');
+  if (filter.q.trim()) params.set('q', filter.q.trim());
+  if (filter.shelf !== ALL) params.set('cat', filter.shelf);
+  for (const [dimension, terms] of Object.entries(filter.picks)) {
     for (const term of terms) params.append(dimension === KEYWORD ? 'kw' : 'tag', dimension === KEYWORD ? term : `${dimension}:${term}`);
   }
-  return params.toString();
+  if (reshuffle > 0) params.set('r', String(reshuffle));
+  return params.toString().replaceAll('%3A', ':'); // a colon is safe in a hash and reads better in a link
 }
 
-export function parseFilter(search) {
-  const params = new URLSearchParams(search);
+export function parseState(hash) {
+  const params = new URLSearchParams(hash.replace(/^#/, ''));
   const filter = { ...emptyFilter(), q: params.get('q') ?? '', shelf: params.get('cat') || ALL };
   const pick = (dimension, term) => {
     const terms = (filter.picks[dimension] ??= []);
@@ -78,7 +89,14 @@ export function parseFilter(search) {
     const at = tag.indexOf(':');
     if (at > 0) pick(tag.slice(0, at), tag.slice(at + 1));
   }
-  return filter;
+  const reshuffle = Number(params.get('r'));
+  return {
+    filter,
+    reshuffle: Number.isSafeInteger(reshuffle) && reshuffle > 0 ? reshuffle : 0,
+    model: params.get('m') || null,
+    view: params.get('v') || null,
+    info: params.get('info') === '1',
+  };
 }
 
 // A pick the catalogue does not have would match nothing and could not be removed, so it is dropped.
