@@ -6,7 +6,8 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
-import { clearanceProbe } from '../../site/clearance.mjs';
+import { clearanceProbe, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { padOf } from '../../site/fingers.mjs';
 import { applyPoint, boneTransforms, dot, length, mulMV, normalize, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
 import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
@@ -130,4 +131,29 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   }
   const [l, r] = [tip('L'), tip('R')];
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
+});
+
+test('the grip preset lays either thumb\'s pad on a held haft, wrapping it rather than resting on the fingers', () => {
+  // A square haft along the knuckle row, seated on the palm's grip socket and following the hand; the forearm is bent
+  // so the hand stands clear of the body.
+  const width = 0.03;
+  const corner = (i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? 1 : -1) * (a === 2 ? 0.1 : width / 2));
+  const quads = [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]];
+  const haft = { positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap(corner), indices: quads.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]) };
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  for (const side of ['L', 'R']) {
+    const forearm = bones.get(`forearm.${side}`);
+    const file = {
+      rig: { id: rig.id, revision: rig.revision },
+      angles: { [forearm.id]: forearm.sense.map((sense, i) => sense * [90, 0, 0][i]) },
+      hands: { [`hand.${side}`]: 'grip' },
+      hold: { [`hand.${side}`]: { model: 'haft', socket: { at: [-width / 2, 0, 0], into: [1, 0, 0], axis: [0, 0, 1] } } },
+    };
+    const { frame, report, held } = compilePose(rig, file, { meshOf: () => haft });
+    assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb comes down on the grip`);
+    const tip = bones.get(`thumb3.${side}`);
+    const pad = applyPoint(boneTransforms(rig.bones, decodeFrame(frame)).get(tip.id), padOf(tip));
+    const gap = signedDepth(posedSolid(haft, held[`hand.${side}`]), pad, 0.1);
+    assert.ok(gap > -0.0015 && gap < 0.003, `the ${side} thumb pad rests on the haft, not ${(gap * 1000).toFixed(1)} mm off it`);
+  }
 });

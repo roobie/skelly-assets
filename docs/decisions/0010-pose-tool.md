@@ -71,10 +71,13 @@ its way to a point it still reaches.
 The palm meets a handle at the grip crease near the knuckles (the hand bone's `grip` share), not the palm's middle:
 fingers curled from a handle seated mid-palm sweep past its far side before their pads reach it, and close to their
 limits in the air. The thumb is long enough (`models/measures/arm.libsonnet`, `thumbLength`) to reach round a handle
-seated there to the fingers' backs, as an adult's reaches past the index knuckle. The fingers close first and the
-thumb last, on the item and the closed fingers, because a power grip's thumb lies over the fingers rather than under
-them. The thumb starts lifted wide and its root comes down onto the item from beyond, since lifting it from the palm
-side would drive it through the haft it should wrap. Each joint's swing is checked in steps rather than at its end
+seated there, as an adult's reaches past the index knuckle. The fingers close first and the thumb last, so it can lie
+on the closed fingers where a haft is too thick to wrap. The thumb starts lifted wide and its root comes down onto the
+item from beyond, since lifting it from the palm side would drive it through the haft it should wrap. The grip preset
+swings it wide and rolls it well into opposition, so its pad comes down on the haft beside the index rather than on the
+fingers' backs, which leaves a slim haft held by the fingers alone. A supporting hand under a handguard has its own
+preset, the thumb swung in and barely rolled, so it lies along the handguard as a shooter's does instead of standing
+off it. Each joint's swing is checked in steps rather than at its end
 alone, so no part passes through a thin item to rest beyond.
 
 The wrist flexes about the knuckle row, as the fingers do, and deviates about the palm's normal. Its limits are a
