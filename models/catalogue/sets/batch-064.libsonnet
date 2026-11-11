@@ -49,7 +49,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     knob: 'steel-bright',
     switch: 'lacquer-red',
     cord: 'rubber-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A propane forge: an insulated steel drum 280 mm across and 340 mm long lying front to back on a welded stand,
   // its mouth on +z lined with fire brick and glowing, a burner tube standing in its top fed by a hose. 0.56 m tall.
@@ -79,7 +79,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     bell: 'brass-dull',
     hose: 'rubber-black',
     stand: 'steel-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A handled hot cut: a 25 by 40 mm chisel head 150 mm tall on a 300 mm hickory handle, struck on its top and
   // set edge-down on hot stock.
@@ -150,7 +150,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     wheel: 'brick-buff',
     iron: 'iron-dull',
     treadle: 'wood-pine',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'], place: ['workshop'] } } },
 
   // A sheet of sandpaper, 230 by 280 mm, grit side up with one corner folded back to show the paper.
   h.compound('sandpaper', 0.015, [

@@ -48,7 +48,7 @@ local heatPack(used) =
     box('pin-b', 'pin', [-0.106, 0.026, 0.006], [-0.1, 0.034, 0.008]),
   ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + h.gripOn('electric_carving_knife', 'handle') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A gravity water filter 300 mm tall and 130 mm across: a clear reservoir on top, a cloth pad, then charcoal,
   // sand and gravel in plain bands held by a white frame, a lid with a knob and a tap at the foot.
@@ -139,7 +139,7 @@ local heatPack(used) =
     box('handle-back', 'body', [-0.112, 0.03, -0.007], [-0.096, 0.086, 0.007]),
   ], { body: 'clay-terracotta', lid: 'clay-terracotta' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] }, keywords: ['cooking'] } },
+  } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A drip coffeemaker 250 mm tall, 180 mm wide and 220 mm deep: a base with a warming plate under a glass carafe,
   // a water tower at the back, a head over the filter basket and a red switch on the front.
@@ -159,7 +159,7 @@ local heatPack(used) =
     box('switch', 'switch', [0.04, 0.008, 0.11], [0.07, 0.022, 0.114]),
   ], { body: 'plastic-black', gauge: 'plastic-clear', plate: 'steel-grey', basket: 'plastic-charcoal', carafe: 'glass-clear', coffee: 'wood-walnut', switch: 'plastic-red' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A small glass 50 mm across holding sugar syrup, a wooden skewer clipped across the rim by a peg and hung in
   // the syrup, its lower half crusted with sugar crystals.
@@ -191,7 +191,7 @@ local heatPack(used) =
   ]) + [
     h.turned('lid', 'base', 'y', [[0, 0], [0, 0.14], [0.012, 0.136], [0.025, 0.1], [0.03, 0]], [0, 0.22, 0]),
     h.disc('vent', 'dial', 0.03, 0.25, 0.256),
-  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A 1 litre glass jar 132 mm tall, left open, full of brine with peeled eggs packed in it.
   h.compound('fermenting_eggs', 1.3, [
@@ -243,7 +243,7 @@ local heatPack(used) =
     h.turned('chute', 'lid', 'y', [[0, 0.028], [0, 0.036], [0.09, 0.036], [0.09, 0.028], [0, 0.028]], [0.045, 0.292, 0]),
     h.disc('pusher', 'pusher', 0.027, 0.3, 0.4, 0.045, 0),
     h.disc('pusher-cap', 'pusher', 0.04, 0.392, 0.4, 0.045, 0),
-  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A pressure stove for petrol 210 mm tall and 140 mm across the pot supports: a brass tank with a filler cap
   // and a pump, a burner on a riser, three legs carrying a pot ring, and a valve key.

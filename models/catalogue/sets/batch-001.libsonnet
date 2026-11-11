@@ -16,7 +16,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('pump', 'pump', [0.06, 0.92, -0.08], [0.20, 1.08, 0.08]),
     box('pump-head', 'pump', [0.04, 1.08, -0.10], [0.22, 1.10, 0.10]),
     dial('gauge', 'gauge', 0.10, 0.75, 0.19, 0.035, 0.03),
-  ], { frame: 'steel-grey', tank: 'paint-red', motor: 'paint-charcoal', pump: 'alu-bare', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'steel-grey', tank: 'paint-red', motor: 'paint-charcoal', pump: 'alu-bare', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A small tilting electric arc furnace: a 1.3 m refractory-lined shell under a domed roof, three graphite
   // electrodes rising to 2 m from a mast at the side.
@@ -63,7 +63,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('blade', 'blade', [-0.31, 1.29, -0.081], [-0.29, 1.60, -0.075]),
     box('guide', 'blade', [-0.33, 1.42, -0.10], [-0.27, 1.60, -0.06]),
     turned('motor', 'motor', 'x', [[0, 0], [0, 0.09], [0.25, 0.09], [0.25, 0]], [0.30, 0.45, 0]),
-  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A pine box, 0.46 by 0.36 m and 0.3 m deep, its lid leaning back on its hinge, a charger with a meter,
   // a dial and two lamps on its top, and its red and black clip leads hung over the front rim.
@@ -133,7 +133,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     turned('handle-a', 'steel', 'x', [[0, 0], [0, 0.008], [0.22, 0.008], [0.22, 0.016], [0.25, 0.016], [0.25, 0]], [0.12, 1.15, 0]),
     turned('handle-b', 'steel', 'y', [[0, 0], [0, 0.008], [0.16, 0.008], [0.16, 0.016], [0.19, 0.016], [0.19, 0]], [0.135, 1.16, 0]),
     turned('handle-c', 'steel', 'y', [[0, 0], [0, 0.016], [0.03, 0.016], [0.03, 0.008], [0.19, 0.008], [0.19, 0]], [0.135, 0.95, 0]),
-  ], { base: 'iron-cast', column: 'steel-stainless', head: 'polymer-od-green', motor: 'paint-charcoal', steel: 'steel-grey' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { base: 'iron-cast', column: 'steel-stainless', head: 'polymer-od-green', motor: 'paint-charcoal', steel: 'steel-grey' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A steel foot locker, 0.92 by 0.5 m and 0.48 m tall, with a charging panel set into its front.
   h.compound('charging_foot_locker', 53, [
@@ -199,7 +199,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     post('ram-foot', 'ram', 0, 0.92, 0, 0.04, 0.03),
     turned('pump-handle', 'ram', 'x', [[0, 0], [0, 0.01], [0.30, 0.01], [0.30, 0]], [0.06, 1.25, 0.04]),
     dial('gauge', 'gauge', 0, 1.50, 0.07, 0.04, 0.02),
-  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['metalworking'] } },
+  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['metalworking'] } },
 
   // An industrial 2.2 m long jointer: cast infeed and outfeed tables on a closed stand, the cutterhead in
   // the gap between them, a fence along the back and the bridge guard over the cut.
@@ -214,7 +214,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('fence-bracket', 'cutter', [-0.06, 0.82, -0.30], [0.06, 0.90, -0.22]),
     dial('wheel-a', 'cutter', -0.25, 0.50, 0.22, 0.06, 0.03),
     dial('wheel-b', 'cutter', 0.25, 0.50, 0.22, 0.06, 0.03),
-  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A sliding compound mitre saw on its extension wings, 1.24 m wide: base and turntable, fence, the head
   // on two rails behind, a 254 mm blade under a half guard.
@@ -238,7 +238,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     prism('guard', 'head', 'x', [[0.25, -0.14], [0.32, -0.12], [0.37, -0.07], [0.39, 0], [0.37, 0.07], [0.32, 0.12], [0.25, 0.14]], -0.03, 0.03),
     turned('blade', 'blade', 'x', [[0, 0], [0, 0.127], [0.004, 0.127], [0.004, 0]], [-0.002, 0.25, 0]),
     box('handle', 'handle', [-0.02, 0.38, 0.10], [0.12, 0.41, 0.20]),
-  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A free-standing electric convection oven, 0.6 m wide, 0.6 m deep and 0.69 m tall, door facing +z.
   h.compound('oven', 93, [
@@ -261,7 +261,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ], {
     foot: 'rubber-black', body: 'paint-white', door: 'paint-charcoal', window: 'glass-grey',
     handle: 'steel-stainless', display: 'glass-lens-green', knob: 'plastic-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A home oxygen concentrator on casters, 0.38 m wide and 0.7 m tall, with a flow meter and humidifier
   // bottle on its front and a filter grille at the back.
@@ -277,5 +277,5 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ] + [
     turned('caster-%d' % i, 'caster', 'x', [[0, 0], [0, 0.03], [0.025, 0.03], [0, 0]], [[-0.17, 0.145][i % 2], 0.03, [-0.13, 0.13][std.floor(i / 2)]])
     for i in std.range(0, 3)
-  ], { body: 'plastic-white', panel: 'plastic-grey', glass: 'glass-clear', switch: 'plastic-green', caster: 'rubber-black' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-white', panel: 'plastic-grey', glass: 'glass-clear', switch: 'plastic-green', caster: 'rubber-black' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
 ]

@@ -160,7 +160,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     for i in std.range(0, 7)
   ], {
     bell: 'steel-grey', rim: 'steel-bright', mouth: 'coal-black', strap: 'rubber-black',
-  }) + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  }) + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['farm'] } } },
 
   // A dressage whip, 110 cm long: a rubber-capped handle with a braided grip, a slim tapering black shaft and a
   // short nylon lash at the tip (+x).

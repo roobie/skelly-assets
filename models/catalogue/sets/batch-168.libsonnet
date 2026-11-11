@@ -181,7 +181,7 @@ local bodysuit =
     metal: 'steel-bright',
     strap: 'webbing-black',
     pocket: 'nylon-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel', 'holdall'] } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel'] } },
 
   // A large polyester duffel 700 mm long and 340 mm by 340 mm across, with a zipped front pocket.
   h.compound('large_duffel_bag', 1.4, duffel({ len: 0.7, ht: 0.34, dp: 0.34, bandX: 0.13, pocket: { w: 0.3, ht: 0.14 } }), {

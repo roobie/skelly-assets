@@ -123,7 +123,7 @@ local segment(i, n, r0, r) =
     for i in [0, 1, 2]
     for j in [0, 1]
   ]), { tray: 'plastic-white', glass: 'plastic-amber', label: 'paper-white', 'cap-a': 'plastic-yellow', 'cap-b': 'plastic-blue' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], place: ['hospital'], setting: ['modern'] } } },
 
   // A strip of torn cloth rolled into a bandage 45 mm wide and 26 mm across, its loose end trailing 30 mm.
   h.compound('makeshift_bandage', 0.0083, [

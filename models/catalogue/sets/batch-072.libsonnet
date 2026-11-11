@@ -37,7 +37,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     for z in [-0.009 + r * 0.018]
   ]), { rack: 'plastic-white', box: 'plastic-clear', label: 'paper-white', band: 'plastic-blue', cuvette: 'plastic-clear', grip: 'plastic-frosted' }) + h.label('label', '+z') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
   // A pair of electrodes, a copper plate and a steel plate 30 by 60 mm, held 20 mm apart in a black bar, with
   // red and black leads 0.2 m long running to two battery clamps, all laid flat.
   h.compound('electrolysis_kit', 0.21, [
@@ -82,7 +82,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     h.tube('tube', 'glass', 0.0035, 0.006, -0.05, 0.05, 0.006),
   ], { glass: 'glass-clear' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['glass'], place: ['laboratory'], setting: ['modern'] } } },
   // A dial hygrometer 46 mm across and 14 mm deep in a white case, standing on a small foot with its dial to
   // the front: a needle over dry, comfortable and wet bands.
   h.compound('hygrometer', 0.019, [
@@ -126,7 +126,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     h.box('label-stripe', 'band', [0.04, 0.0125, -0.005], [0.092, 0.013, 0.005]),
   ], { box: 'paperboard-tan', paper: 'paper-white', band: 'plastic-red', label: 'paper-white' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'containers', keywords: ['water-purification'], tags: { material: ['paper'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'containers', keywords: ['water-purification'], tags: { material: ['paper'], place: ['laboratory'], setting: ['modern'] } } },
   // A wall hygroscope on a flat walnut board 120 mm wide, 400 mm tall and 20 mm deep, front on +z: a round
   // dial at the top, a wide glazed window below showing a dark stretched hair running down past a scale to a
   // coiled spring, and a hanging ring.

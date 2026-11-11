@@ -75,7 +75,7 @@ local forkPieces(t) = [
     box('handle-grip', 'plastic', [0.088, 0.05, -0.009], [0.102, 0.165, 0.009]),
     box('handle-foot', 'plastic', [0.073, 0.045, -0.008], [0.1, 0.058, 0.008]),
   ], { glass: 'glass-clear', plastic: 'plastic-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass', 'plastic'], setting: ['modern'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass', 'plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A stainless mesh colander 220 mm across the rim and 108 mm tall on a foot ring, with a handle at each side;
   // 280 mm over the handles.
@@ -90,7 +90,7 @@ local forkPieces(t) = [
     ]
     for i in [0, 1]
   ]), { mesh: 'mesh-black', steel: 'steel-stainless' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A wooden chopping board 410 by 250 mm and 20 mm thick lying flat, with a hanging slot at its +x end.
   h.compound('cutting_board', 1.4, [
@@ -99,7 +99,7 @@ local forkPieces(t) = [
     box('side-a', 'wood', [0.155, 0, -0.125], [0.185, 0.02, -0.03]),
     box('side-b', 'wood', [0.155, 0, 0.03], [0.185, 0.02, 0.125]),
   ], { wood: 'wood-birch' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A cast-iron camp dutch oven: a pot 260 mm across and 105 mm deep on three stub legs, a flanged lid that holds
   // coals, a loop on the lid and a wire bail over the top; 285 mm across the bail ears.
@@ -116,7 +116,7 @@ local forkPieces(t) = [
     disc('leg-%d' % i, 'iron', 0.012, 0, 0.032, 0.09 * std.sin(2 * std.pi * i / 3), 0.09 * std.cos(2 * std.pi * i / 3))
     for i in [0, 1, 2]
   ] + bail('bail', 'wire', 0.134, 0.1, 0.008, 36), { iron: 'iron-cast', wire: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A stainless table fork 210 mm long lying flat.
   h.compound('fork', 0.079, forkPieces(0.003), { fork: 'steel-stainless' })
@@ -161,7 +161,7 @@ local forkPieces(t) = [
     box('lug-a', 'iron', [-0.125, 0.09, -0.03], [-0.1, 0.106, 0.03]),
     box('lug-b', 'iron', [0.1, 0.09, -0.03], [0.125, 0.106, 0.03]),
   ], { iron: 'iron-cast', enamel: 'paint-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A stainless stovetop kettle 170 mm across the base and 165 mm tall to its lid knob, with a spout on its -x side
   // and an arched handle with a black grip; 190 mm over the spout.
@@ -174,5 +174,5 @@ local forkPieces(t) = [
     box('post-b', 'steel', [0.034, 0.12, -0.006], [0.042, 0.2, 0.006]),
     box('grip', 'grip', [-0.045, 0.195, -0.01], [0.045, 0.212, 0.01]),
   ], { steel: 'steel-stainless', grip: 'plastic-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['cooking'] } },
 ]

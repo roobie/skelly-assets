@@ -128,7 +128,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     pad: 'cloth-navy', skirt: 'leather-tan', seat: 'leather-chestnut', horn: 'leather-chestnut',
     leather: 'leather-chestnut', stirrup: 'wood-oak', cinch: 'cord-cotton', bridle: 'leather-brown', bit: 'steel-stainless',
-  }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'] } } },
+  }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'], place: ['farm'] } } },
 
   // A portable platform scale for a horse or a cow: a 1960 by 720 mm galvanised steel deck 100 mm tall on
   // four rubber feet, under a ribbed rubber mat, with its readout lying on the mat on a short cable and a
@@ -156,7 +156,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     deck: 'steel-galvanised', mat: 'rubber-black', foot: 'rubber-offblack', handle: 'steel-grey',
     readout: 'plastic-white', display: 'lcd-green', key: 'plastic-blue', cable: 'plastic-black',
-  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], place: ['farm'], setting: ['modern'] } } },
 
   // Sheep shears 310 mm long like the forged pair, with plastic sleeves over the handles.
   h.compound('shears', 0.47, sheepShears(true),

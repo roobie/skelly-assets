@@ -19,11 +19,11 @@ local anvil(s) = h.scaled([
 local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black' };
 [
   // A 26 kg anvil: 520 mm long horn to heel, 200 mm high, a 90 mm wide face.
-  h.compound('anvil', 37, anvil(0.8), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  h.compound('anvil', 37, anvil(0.8), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
   // A small 15 kg anvil: 300 mm long and 120 mm high.
-  h.compound('small_anvil', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  h.compound('small_anvil', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
   // A 225 kg smithy anvil: 960 mm long and 375 mm high, a 165 mm face.
-  h.compound('heavy_anvil', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  h.compound('heavy_anvil', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
   // A 400 mm offcut of a machine bed, 150 mm high on a 200 mm flange: torch-cut ends, a ground top face rounded off at
   // one end, two bolt bosses, and patches of the machine's old paint and rust.
   h.compound('scavenged_anvil', 66, [
@@ -115,7 +115,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     for i in std.range(0, 3)
     for x in [[-0.17, 0.17][i % 2]]
     for z in [[-0.12, 0.12][std.floor(i / 2)]]
-  ], { pan: 'paint-charcoal', coal: 'coal-black', ember: 'glow-flame', pipe: 'steel-grey', blower: 'paint-oxblood', grip: 'wood-oak' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  ], { pan: 'paint-charcoal', coal: 'coal-black', ember: 'glow-flame', pipe: 'steel-grey', blower: 'paint-oxblood', grip: 'wood-oak' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
   // A drum kiln 580 mm across and 850 mm high: an open-head drum with its lid clamped on, a short chimney on the lid
   // and four air holes round the foot.
   local r = 0.29, ht = 0.85;

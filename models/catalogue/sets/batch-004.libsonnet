@@ -55,7 +55,7 @@ local caster(i, x, z) = [
   ] + [
     box('vent-slat-%d' % k, 'body', [-0.21 + k * 0.035, 0.03, 0.225], [-0.195 + k * 0.035, 0.07, 0.23])
     for k in std.range(0, 11)
-  ], { body: 'paint-charcoal', door: 'plastic-black', vent: 'plastic-grey', seal: 'rubber-black', handle: 'steel-stainless', coil: 'steel-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'paint-charcoal', door: 'plastic-black', vent: 'plastic-grey', seal: 'rubber-black', handle: 'steel-stainless', coil: 'steel-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 100-tablet over-the-counter bottle, 44 mm across and 92 mm tall with its push-and-turn cap.
   bottle('acetaminophen', 0.063, 0.022, 0.07, 0.017, 0.02, 0.012,

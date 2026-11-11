@@ -176,7 +176,7 @@ local pipLayout = {
     h.rod('arm', 'rod', 0.004, -0.056, 0.0, 0.313),
     turned('ring', 'rod', 'y', [[0, 0.046], [0, 0.051], [0.006, 0.051], [0.006, 0.046], [0, 0.046]], [0.047, 0.31, 0]),
   ], { base: 'paint-oxblood', rod: 'steel-stainless', clamp: 'iron-dull' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A radio receiver module, 100 mm wide, 35 mm tall and 65 mm deep: a bare aluminium box with screwed end
   // plates, a gold antenna jack and a short rubber antenna on the front, a status lamp and a pin header behind.

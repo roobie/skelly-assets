@@ -468,7 +468,7 @@ local mailBundle(o) =
                for i in [0, 1]
              ]),
              { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-cream', button: 'cloth-cream', pocket: 'cloth-cream', flap: 'cloth-cream', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal', strap: 'cloth-cream', tab: 'hook-loop-grey' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], place: ['farm'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dog-handler's bite suit folded into a thick bundle, 460 mm by 380 mm and 160 mm tall: denim outer quilted in
   // raised channels over the padding strips, a stand collar, a zipped front, the padded sleeves rolled along both

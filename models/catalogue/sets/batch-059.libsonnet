@@ -117,7 +117,7 @@ local scythe(withNibs, w0) =
   // A two-handled scythe: a 1.4 m wooden snath with two grips and a 700 mm curved steel blade hung off its far end.
   h.compound('scythe', 3, scythe(true, 0.075), { snath: 'wood-oak', nib: 'wood-birch', ring: 'steel-grey', blade: 'steel-heat-tint', spine: 'steel-grey' }) + gripAt('scythe', 'snath', 0.3) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], place: ['farm'] } } },
   // A costume reaper's scythe of hollow plastic: a 1.4 m knotted black pole and a 700 mm moulded blade with a
   // skull raised on it.
   h.compound('toy_scythe', 0.5, scythe(false, 0.16) + [
@@ -154,7 +154,7 @@ local scythe(withNibs, w0) =
   + arcBlade('spine', 'metal', 0.30, -0.13, 0.172, 0.008, 0.004, -40, 165, 18, 0.014, 0.021),
   { handle: 'wood-oak', metal: 'steel-grey', blade: 'steel-heat-tint' }) + gripAt('sickle', 'handle', 0.5) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], place: ['farm'] } } },
   // A stone sickle 350 mm long: a forked stick haft with a knapped crescent of stone set along its side, bound at each
   // end with rawhide.
   h.compound('stone_sickle', 0.41, [
@@ -164,7 +164,7 @@ local scythe(withNibs, w0) =
     h.tube('bind-b', 'bind', 0.012, 0.018, 0.29, 0.315, 0.016, 0),
   ] + arcBlade('stone', 'stone', 0.235, 0.09, 0.14, 0.035, 0.035, 225, 135, 8, 0.008, 0.024), { haft: 'bark', bind: 'skin-rawhide', stone: 'stone-grey' }) + gripAt('stone_sickle', 'haft', 0.2) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], place: ['farm'], setting: ['prehistoric'] } } },
   // A petrol hedge trimmer 1 m long: a 330 mm engine housing with a rear loop handle, a front bail and hand guard, and
   // a 530 mm double-sided cutter bar.
   local yb = 0.09;

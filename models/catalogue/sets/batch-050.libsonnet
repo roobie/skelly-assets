@@ -119,7 +119,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.disc('snow', 'ice', 0.04, 0.035, 0.07, 0, 0.035),
     // The power switch on the front of the tower.
     box('switch', 'trim', [0.055, 0.15, -0.005], [0.075, 0.17, 0.002]),
-  ], { body: 'plastic-red', clear: 'plastic-clear', trim: 'plastic-white', dark: 'paint-charcoal', ice: 'chalk-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-red', clear: 'plastic-clear', trim: 'plastic-white', dark: 'paint-charcoal', ice: 'chalk-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A copper pot still 620 mm wide and 560 mm tall: a riveted boiler 300 mm across with a domed shoulder, a column
   // and helmet with a thermometer port, a swan-neck arm running down to a worm tub with a tap at the front.
@@ -188,7 +188,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     box('handle-top', 'steel', [-0.075, 0.084, -0.006], [-0.045, 0.092, 0.006]),
     box('handle-low', 'steel', [-0.075, 0.03, -0.006], [-0.05, 0.038, 0.006]),
     box('grip', 'black', [-0.075, 0.03, -0.007], [-0.065, 0.092, 0.007]),
-  ], { steel: 'steel-stainless', black: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'] } } },
+  ], { steel: 'steel-stainless', black: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
 
   // A two-slice toaster 270 mm wide, 160 mm deep and 190 mm tall: a brushed metal shell on a black base, two
   // bread slots in the top, and a carriage lever, browning dial and cancel button on the front.
@@ -208,7 +208,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.turned('dial', 'black', 'z', [[0, 0], [0, 0.011], [0.012, 0.009], [0.012, 0]], [0.095, 0.075, 0.078]),
     box('button', 'red', [0.088, 0.04, 0.078], [0.102, 0.052, 0.084]),
     box('crumb-tray', 'black', [-0.1, 0.0, 0.08], [0.0, 0.012, 0.083]),
-  ], { metal: 'steel-stainless', black: 'plastic-black', dark: 'paint-charcoal', red: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cooking'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { metal: 'steel-stainless', black: 'plastic-black', dark: 'paint-charcoal', red: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cooking'], tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A countertop vacuum sealer 350 mm long, 150 mm deep and 80 mm tall: a silver base with a black hinged lid,
   // a latch at each end, a soft-touch button strip along the front and the cutter rail on top.
@@ -226,7 +226,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     // The bag cutter rail across the back of the lid.
     box('rail', 'grey', [-0.14, 0.075, -0.06], [0.14, 0.081, -0.045]),
     box('cutter', 'red', [0.06, 0.081, -0.062], [0.075, 0.088, -0.043]),
-  ], { metal: 'steel-stainless', black: 'plastic-black', panel: 'screen-black', white: 'plastic-white', red: 'plastic-red', grey: 'plastic-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { metal: 'steel-stainless', black: 'plastic-black', panel: 'screen-black', white: 'plastic-white', red: 'plastic-red', grey: 'plastic-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A cast aluminium stovetop waffle iron 300 mm long: a closed round mould 160 mm across and 45 mm thick with a
   // grid cast into its top, hinged at -x, and two long handles with wooden grips running to +x.
@@ -246,7 +246,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     box('arm-upper', 'alu', [0.015, 0.028, 0.004], [0.08, 0.036, 0.012]),
     h.rod('grip-lower', 'wood', 0.008, 0.08, 0.15, 0.01) + { origin: [0.08, 0.01, -0.008] },
     h.rod('grip-upper', 'wood', 0.008, 0.08, 0.15, 0.032) + { origin: [0.08, 0.032, 0.008] },
-  ], { alu: 'alu-bare', rib: 'steel-grey', dark: 'paint-charcoal', wood: 'wood-walnut' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'] } } },
+  ], { alu: 'alu-bare', rib: 'steel-grey', dark: 'paint-charcoal', wood: 'wood-walnut' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
 
   // A slow sand filter in a 20 litre bucket, 300 mm across the rim and 370 mm tall: a white pail filled with sand
   // over gravel, a wire bail handle and a blue drip tap low on the front.

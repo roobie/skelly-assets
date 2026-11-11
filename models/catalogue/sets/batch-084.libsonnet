@@ -218,7 +218,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('hasp', 'latch', [-0.01, 0.12, 0.09], [0.01, 0.155, 0.096]),
     box('foot', 'seam', [-0.205, 0, -0.085], [0.205, 0.006, 0.085]),
   ], { body: 'paint-red', seam: 'paint-charcoal', handle: 'plastic-matte-black', latch: 'steel-bright' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'], state: ['empty'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'], state: ['empty'] } } },
 
   // A tabletop vacuum former 350 mm wide: a base with a perforated platen, a clamp frame riding two columns, a
   // heater hood on top and a pump hose at the back.
@@ -248,7 +248,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     for i in std.range(0, 8)
     for j in std.range(0, 6)
   ], { base: 'alu-bare', platen: 'steel-grey', hole: 'coal-black', switch: 'plastic-red', column: 'steel-stainless', frame: 'alu-bare', sheet: 'plastic-clear', grip: 'plastic-matte-black', heater: 'plastic-charcoal', element: 'steel-heat-tint', hose: 'plastic-frosted' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A portable inverter arc welder: a cased power unit 130 mm wide, 300 mm deep and 210 mm tall with a carry
   // handle, its control panel on +z, and two leads laid out in front to an electrode holder and an earth clamp.
@@ -280,7 +280,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('earth-b', 'clamp', [0.035, 0.016, 0.3], [0.065, 0.028, 0.4]),
     box('earth-spring', 'trim', [0.04, 0.012, 0.33], [0.06, 0.016, 0.35]),
   ], { case: 'paint-crane-yellow', trim: 'plastic-charcoal', panel: 'plastic-matte-black', knob: 'plastic-red', display: 'lcd-green', socket: 'brass', handle: 'rubber-black', cable: 'rubber-black', holder: 'plastic-red', clamp: 'copper' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A makeshift arc welder on a 380 by 260 mm plank: two salvaged transformers with copper windings wired in
   // series, a taped mains cord, and leads to a wooden-handled electrode holder and a spring clamp.

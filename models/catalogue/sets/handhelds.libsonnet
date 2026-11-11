@@ -52,7 +52,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
   }, { handle: 'plastic-black', guard: 'steel-stainless', blade: 'steel-stainless' }) + held('kitchen_knife', 'handle', [0.491935483871, 0.5, 0.5], hold='forward', roll=0) + {
     voxelGrain: 0.004,
     anchors: { strike: datum('kitchen_knife', 'blade', [0.99625, 0.636363636364, 0.5]) },
-  } + { taxonomy: { category: 'household', keywords: ['cooking'] } },
+  } + { taxonomy: { category: 'household', tags: { place: ['kitchen'] }, keywords: ['cooking'] } },
   melee('machete', 'knife', 0.55, {
     back: 0.274, joinAt: -0.15, reach: 0.245, spine: 0.02, drop: 0.05, thickness: 0.006, handleRadius: 0.014, guardHalf: 0.022, guardDepth: 0.014,
   }, { handle: 'wood-walnut', guard: 'steel-grey', blade: 'steel-grey' }) + held('machete', 'handle', [0.612903225806, 0.5, 0.5], hold='forward', roll=0) + {

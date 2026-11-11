@@ -183,5 +183,5 @@ local medicalOpts = { t: 0.006, ct: 0.006, w: 0.084, fw: 0.017, fl: 1.08, cuff: 
 
   // A pair of thin latex examination gloves laid flat, backs up, each 260 mm from the rolled cuff to the fingertips.
   h.compound('examination_gloves', 0.012, pair(medicalOpts), { hand: 'plastic-frosted', cuff: 'plastic-frosted', hem: 'plastic-frosted' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['safety-gear'], tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['safety-gear'], tags: { material: ['rubber'], place: ['hospital'], setting: ['modern'], slot: ['hands'] } } },
 ]
