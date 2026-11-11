@@ -105,5 +105,5 @@ local steelFinish = { plate: 'steel-stainless', chain: 'steel', strap: 'leather-
     trim: 'ceramic-grey',
     liner: 'felt-grey',
     strap: 'hook-loop-grey',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['arms'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic'], setting: ['modern'], slot: ['arms'] } } },
 ]

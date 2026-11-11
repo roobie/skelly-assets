@@ -95,7 +95,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   h.compound('forged_shears', 0.43, sheepShears(false),
              { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + h.gripOn('forged_shears', 'handle-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // A western saddle 580 mm long and 450 mm across the skirts, with a horn, a raised cantle, a wool pad
   // beneath, stirrups on leathers each side and a bridle with its bit laid coiled on the seat.
@@ -162,7 +162,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   h.compound('shears', 0.47, sheepShears(true),
              { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + h.gripOn('shears', 'grip-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['gardening'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // The portable radio below with its tuning knob pulled off and a bodged board, a copper coil, an aluminium
   // plate and loose wires taped to its back, some wires led over the top to the front.
@@ -212,5 +212,5 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ]), {
     chassis: 'plastic-black', shell: 'plastic-red', window: 'screen-black', lamp: 'plastic-white',
     antenna: 'plastic-black', tyre: 'rubber-tread', hub: 'alu-bare',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

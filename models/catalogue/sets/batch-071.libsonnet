@@ -36,7 +36,7 @@ local gauge(id, x, y, z) = [
     h.box('lash-a', 'cord', [-0.3, 0, 0.06], [-0.288, 0.052, 0.144]),
     h.box('lash-b', 'cord', [0.29, 0, 0.06], [0.302, 0.052, 0.144]),
     h.turned('hank', 'cord', 'y', [[0, 0.02], [0, 0.04], [0.016, 0.04], [0.016, 0.02], [0, 0.02]], [0.1, 0.122, -0.01]),
-  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'fabric'] } } },
+  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', keywords: ['water-purification'], tags: { material: ['plastic', 'fabric'] } } },
   // A small triple-beam balance 0.32 m long: a cast base, a 140 mm pan on the left, three graduated beams with
   // brass riders running right to a pointer and zero mark.
   h.compound('triple_beam_balance', 2, [

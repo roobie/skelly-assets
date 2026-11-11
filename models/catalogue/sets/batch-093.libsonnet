@@ -129,7 +129,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     strap('strap-l', -0.11, 0.46),
     strap('strap-r', 0.11, 0.46),
   ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A heavy plate carrier lying flat, front up: a front panel 380 mm wide and 480 mm long over the back panel, its
   // plate pocket under six rows of PALS webbing, a raised collar round the neck opening, a red quick-release tab at
@@ -145,7 +145,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('release', 'release', [-0.025, 0.061, -0.11], [0.025, 0.07, -0.085]),
     box('release-cable', 'trim', [-0.004, 0.058, -0.17], [0.004, 0.064, -0.11]),
   ], { cloth: 'cloth-olive-drab', pocket: 'cloth-olive-drab', pals: 'webbing-olive-dark', pad: 'cloth-olive-drab', trim: 'plastic-matte-black', release: 'plastic-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A light plate carrier lying flat, front up: a front panel 280 mm wide and 340 mm long over the back panel, with
   // three rows of PALS webbing, thin shoulder straps, and an elastic cummerbund wing on each side with two rifle
@@ -159,7 +159,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     for k in [0, 1]
     for x in [[[-0.14 - 0.03, -0.14 - 0.075], [0.14 + 0.03, 0.14 + 0.075]][i][k]]
   ], { cloth: 'cloth-black', pocket: 'cloth-black', pals: 'webbing-black', pad: 'cloth-black', trim: 'plastic-charcoal', mag: 'webbing-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // The same light plate carrier, 280 mm wide and 340 mm long, with plain cummerbund wings, a radio pouch 70 mm
   // wide and 130 mm tall standing on its left shoulder strap and a small steel hook on the chest for a glow stick.
@@ -173,5 +173,5 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('hook-post', 'hook', [0.043, 0.062, -0.05], [0.049, 0.078, -0.044]),
     box('hook-tip', 'hook', [0.043, 0.074, -0.065], [0.049, 0.078, -0.05]),
   ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black', pouch: 'webbing-olive-dark', flap: 'nylon-coyote', hook: 'steel' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

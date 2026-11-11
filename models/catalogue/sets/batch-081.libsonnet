@@ -97,7 +97,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     box('bolt-c', 'plate', [-0.08, 0.025, 0.035], [-0.064, 0.033, 0.051]),
     box('bolt-d', 'plate', [0.064, 0.025, 0.035], [0.08, 0.033, 0.051]),
   ], { body: 'paint-drum-blue', anvil: 'steel-grey', plate: 'steel-grey', screw: 'steel-bright' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // Tongue-and-groove pliers 300 mm long with 60 mm angled jaws and dipped grips.
   h.item('tongue_and_groove_pliers', 'pliers', 0.55, {
     kind: 'groove', length: 0.300, jawLength: 0.075, spread: 0.075,
@@ -224,7 +224,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     rod('bar-end-a', 'screw', 0.006, -0.02, -0.012, 0.009) + { origin: [-0.02, 0.009, -0.112] },
     rod('bar-end-b', 'screw', 0.006, 0.072, 0.08, 0.009) + { origin: [0.072, 0.009, -0.112] },
   ], { frame: 'paint-red', pad: 'steel-grey', screw: 'steel-bright' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal'] } } },
 
   // A 240 mm claw bar: a hexagonal steel shank with a flattened chisel end at -x and a gooseneck claw rising at +x,
   // its tip split for pulling nails.

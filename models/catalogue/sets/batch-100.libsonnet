@@ -130,7 +130,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       h.disc(p + 'bobble-b', 'tie', 0.009, 0.104, 0.122, cx + 0.012, shaftZ({ l: 0.3, rz: 0.066 }) + 0.075),
     ]
   ), { sole: 'plastic-grey', upper: 'cloth-khaki', shaft: 'wool-grey', collar: 'cloth-white', lining: 'felt-grey', tie: 'cloth-khaki' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of fur-lined leather boots, 300 mm long and 280 mm tall: brown leather uppers on a rubber sole, the fur
   // lining turned down over the top in a thick cuff and showing at the opening, laced through two leather thongs.
@@ -141,7 +141,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       band(p + 'thong-b', 'thong', { rx: 0.052, rz: 0.064, l: 0.3 }, cx, 0.16, 0.166),
     ]
   ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'fur-brown', lining: 'fur-brown', thong: 'skin-rawhide' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of leather hiking boots, 290 mm long and 170 mm tall at the padded ankle collar, laced up the front on a
   // deep lugged sole whose rubber rand wraps the toe.
@@ -198,14 +198,14 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       box(p + 'shin-tie', 'wrap', [cx - 0.036, 0.13, zf - 0.008], [cx + 0.032, 0.14, zf + 0.009]),
     ]
   ), { sole: 'rubber-black', upper: 'cloth-rag', shaft: 'cloth-rag', collar: 'cloth-rag-shadow', lining: 'paint-charcoal', wrap: 'cloth-rag-shadow', scrap: 'scrap-rusted', patch: 'steel-grey', bolt: 'steel' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric', 'metal'], slot: ['feet'] } } },
 
   // A pair of steel-toed work boots, 290 mm long and 180 mm tall: tan leather uppers on a thick black sole, a darker
   // leather cap over the swollen steel toe, a padded collar and laces up the front.
   h.compound('steel_toe_boots', 2, pair(work, 0.03, function(p, cx)
     laces(p, work, cx, 0.075, 0.165)
   ), { sole: 'plastic-charcoal', upper: 'polymer-fde', shaft: 'polymer-fde', collar: 'leather-brown', lining: 'paint-charcoal', toecap: 'leather-brown', tongue: 'polymer-fde', lace: 'leather-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of western boots, 300 mm long and 320 mm tall: a narrow pointed brown toe on a leather sole with a stacked
   // 30 mm heel, a tall black shaft stitched in cream chevrons, and a pull tab either side of the top.
@@ -230,7 +230,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
   h.compound('winter_boots', 2.7, pair(winter, 0.03, function(p, cx)
     laces(p, winter, cx, 0.1, 0.22, 0.02) + [band(p + 'shell', 'shell', winter, cx, winter.t, 0.075, 0.004)]
   ), { sole: 'plastic-charcoal', upper: 'rubber-black', shaft: 'cloth-khaki', collar: 'wool-grey', lining: 'wool-grey', shell: 'rubber-black', tongue: 'cloth-khaki', lace: 'leather-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['rubber', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of hardened steel mail chausses laid flat, 300 mm from the tie at the top of the leg to the heel, each
   // foot turning out 200 mm to the side, the rows of rings showing as ridges.

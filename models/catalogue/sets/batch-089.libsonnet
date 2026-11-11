@@ -24,7 +24,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     cuff: 'cloth-khaki',
     strap: 'cloth-khaki',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { material: ['fabric'] } } },
 
   // A cotton quiver 700 mm long and 100 mm across with a flat bag 700 mm by 110 mm strapped along its side for a
   // takedown bow's limbs, and a small accessory pouch sewn on top.
@@ -42,7 +42,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     for i in [0, 1]
     for x in [[0.12, 0.52][i]]
   ], { body: 'cloth-olive-drab', cuff: 'webbing-olive-dark', bag: 'cloth-olive-drab', strap: 'webbing-olive-dark' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { material: ['fabric'] } } },
 
   // A nylon radio pouch 80 mm wide, 160 mm tall and 50 mm deep, open-topped with a shock-cord retainer across the
   // top and a toggle, and two webbing straps on its back.

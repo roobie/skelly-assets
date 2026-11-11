@@ -135,7 +135,7 @@ local segment(i, n, r0, r) =
     box('tail', 'cloth', [-0.020, 0, 0.004], [0.018, 0.0012, 0.032]),
     box('fray', 'layer', [-0.019, 0, 0.032], [0.015, 0.0010, 0.035]),
   ], { cloth: 'cloth-rag', layer: 'cloth-rag-shadow' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['fabric'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A small heap of five cotton balls, each about 22 mm across, slightly squashed where they rest.
   h.compound('cotton_ball', 0.0025, [

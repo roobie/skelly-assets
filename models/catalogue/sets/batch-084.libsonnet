@@ -96,7 +96,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     prism('tooth-%d' % i, 'blade', 'y', [[z, x], [z, x + 0.012], [z - 0.006, x + 0.006]], 0.006, 0.01)
     for i in std.range(0, 18)
   ], { grip: 'wood-oak', blade: 'bronze', rivet: 'bronze-polished' })
-  + h.gripOn('bronze_saw', 'grip-a') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
+  + h.gripOn('bronze_saw', 'grip-a') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
   // A moulded screwdriver case 280 by 90 mm opened flat on its hinge: six drivers from 140 to 250 mm in the tray,
   // the empty lid behind.
@@ -187,7 +187,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     zrod('tap-thread-%d' % i, 'stock', 0.0058, 0.09 + i * 0.008, 0.093 + i * 0.008, 0, 0.008)
     for i in std.range(0, 4)
   ], { handle: 'steel-bright', grip: 'steel-parkerized', stock: 'steel-grey', die: 'steel-heat-tint', hole: 'coal-black', tap: 'steel-hardened' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // Straight-cut tin snips 250 mm long lying flat: short broad jaws on a pivot bolt, a spring between the handles,
   // and plastic-dipped grips spread at the back.
@@ -201,7 +201,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     disc('pivot', 'pivot', 0.009, 0.0, 0.013, 0.163, 0),
     box('spring', 'spring', [0.126, 0.003, -0.02], [0.131, 0.007, 0.02]),
   ], { jaw: 'steel-grey', arm: 'steel-grey', grip: 'plastic-yellow', pivot: 'steel-bright', spring: 'steel-blued' })
-  + h.gripOn('tin_snips', 'grip-lower') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('tin_snips', 'grip-lower') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A steel toolbox 420 by 180 mm and 200 mm tall to the lid's ridge: a box body, a hip-roofed lid with a folding
   // handle, two snap latches and a hasp on the front.
@@ -280,7 +280,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('earth-b', 'clamp', [0.035, 0.016, 0.3], [0.065, 0.028, 0.4]),
     box('earth-spring', 'trim', [0.04, 0.012, 0.33], [0.06, 0.016, 0.35]),
   ], { case: 'paint-crane-yellow', trim: 'plastic-charcoal', panel: 'plastic-matte-black', knob: 'plastic-red', display: 'lcd-green', socket: 'brass', handle: 'rubber-black', cable: 'rubber-black', holder: 'plastic-red', clamp: 'copper' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A makeshift arc welder on a 380 by 260 mm plank: two salvaged transformers with copper windings wired in
   // series, a taped mains cord, and leads to a wooden-handled electrode holder and a spring clamp.
@@ -312,7 +312,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('spring-clamp-a', 'clamp', [0.145, 0.0, 0.24], [0.17, 0.008, 0.33]),
     box('spring-clamp-b', 'clamp', [0.145, 0.014, 0.24], [0.17, 0.022, 0.33]),
   ], { plank: 'wood-pine', core: 'iron-dull', winding: 'copper', bolt: 'steel-grey', wire: 'copper', tape: 'tape-grey', cable: 'rubber-black', plug: 'plastic-white', handle: 'wood-birch', clamp: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['improvised', 'metalworking'], tags: { material: ['metal'] } } },
 
   // A welding blanket 1.8 by 1.8 m folded to 500 by 400 mm and 60 mm thick, with a stitched hem and brass
   // grommets at the corners.
@@ -321,5 +321,5 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     disc('grommet-a', 'grommet', 0.008, 0.06, 0.063, -0.225, 0.175),
     disc('grommet-b', 'grommet', 0.008, 0.06, 0.063, 0.225, 0.175),
   ], { cloth: 'canvas-grey', hem: 'cord-cotton', grommet: 'brass' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

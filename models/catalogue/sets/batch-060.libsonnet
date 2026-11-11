@@ -84,7 +84,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('hinge-r', 'handle', [0.03, 0.162, -0.004], [0.036, 0.172, 0.004]),
   ] + arc('handle', 'handle', 0, 0.172, 0.029, 0.036, 0, 180, 10, 0.008), {
     body: 'plastic-green', diffuser: 'plastic-frosted', switch: 'plastic-black', handle: 'plastic-black',
-  }) + h.inHand('electric_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + h.inHand('electric_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small pressure lantern burning white gas, 24 cm tall to the bail: a 10 cm fount with its pump and valve on the
   // front, a glass globe between two posts and a vented hood.
@@ -96,7 +96,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     turned('filler', 'brass', 'y', [[0, 0], [0, 0.008], [0.008, 0.008], [0.008, 0]], [-0.03, 0.062, -0.012]),
   ] + lanternTop(0.084, 0.08, 0.034), {
     fount: 'paint-red', frame: 'steel-grey', brass: 'brass', globe: 'glass-clear', hood: 'paint-red', bail: 'steel-grey',
-  }) + h.inHand('gasoline_lantern', 'fount') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + h.inHand('gasoline_lantern', 'fount') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A propane lantern head, 20 cm tall to the bail, that screws onto a gas cylinder: a burner collar with its valve
   // knob and igniter button, a glass globe and a vented hood.
@@ -107,7 +107,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('igniter', 'knob', [0.024, 0.026, -0.008], [0.04, 0.04, 0.008]),
   ] + lanternTop(0.05, 0.075, 0.032), {
     fount: 'paint-green', frame: 'steel-grey', brass: 'brass', knob: 'plastic-black', globe: 'glass-clear', hood: 'paint-green', bail: 'steel-grey',
-  }) + h.inHand('propane_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + h.inHand('propane_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A hand-held road flare, 30 cm long and 28 mm across: a red paper tube with a plastic cap over the striker at +x
   // and a plastic grip plug at the other end. The striker is the +x tip, the end that burns, and the only slot that glows.
@@ -171,7 +171,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     cup('cup-%s%d' % [if side < 0 then 'l' else 'r', i], side * 0.021 * i, 0.15)
     for i in std.range(1, 4)
     for side in [-1, 1]
-  ], { metal: 'metal-silver' }) + h.inHand('menorah', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
+  ], { metal: 'metal-silver' }) + h.inHand('menorah', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', keywords: ['religious'], tags: { material: ['metal'] } } },
 
   // A wheel-thrown clay oil lamp, 14 cm long: a round closed bowl 9 cm across with a sunken top and fill hole, a
   // nozzle to +z for the wick and a tab handle at the back.

@@ -135,7 +135,7 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
     laces: 'plastic-yellow',
   }, function(p, xc) [
     h.turned(p + '-bulb', 'bulb', 'y', [[0, 0], [0, 0.082], [0.03, 0.084], [0.06, 0.07], [0.08, 0.04], [0.088, 0]], [xc, 0.02, 0.13]),
-  ]) + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['feet'] } } },
+  ]) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], slot: ['feet'] } } },
 
   // A pair of black dance shoes, each 270 mm long and 85 mm wide, laced, on a thin suede sole and a flared 50 mm heel.
   shoePair('dance_shoes', 0.6, { l: 0.27, w: 0.085, s: 0.006, H: 0.05, back: 0.05, ball: 0.042, toe: 0.028, laces: 3 }, 0.02, {
@@ -158,7 +158,7 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
     collar: 'leather-black',
     laces: 'cloth-black',
     lining: 'paperboard-tan',
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of navy canvas espadrilles, each 270 mm long and 95 mm wide, slip-on, on a 20 mm sole of coiled jute rope.
   shoePair('espadrilles', 0.64, { l: 0.27, w: 0.095, s: 0.02, H: 0, back: 0.04, ball: 0.04, toe: 0.028, laces: 0 }, 0.02, {

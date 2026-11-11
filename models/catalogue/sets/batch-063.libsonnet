@@ -19,11 +19,11 @@ local anvil(s) = h.scaled([
 local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black' };
 [
   // A 26 kg anvil: 520 mm long horn to heel, 200 mm high, a 90 mm wide face.
-  h.compound('anvil', 37, anvil(0.8), anvilFinish) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  h.compound('anvil', 37, anvil(0.8), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A small 15 kg anvil: 300 mm long and 120 mm high.
-  h.compound('small_anvil', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  h.compound('small_anvil', 7.5, anvil(0.47), anvilFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A 225 kg smithy anvil: 960 mm long and 375 mm high, a 165 mm face.
-  h.compound('heavy_anvil', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  h.compound('heavy_anvil', 240, anvil(1.5), anvilFinish) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A 400 mm offcut of a machine bed, 150 mm high on a 200 mm flange: torch-cut ends, a ground top face rounded off at
   // one end, two bolt bosses, and patches of the machine's old paint and rust.
   h.compound('scavenged_anvil', 66, [
@@ -40,7 +40,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     box('paint-b', 'paint', [-0.12, 0.031, -0.1], [0.05, 0.0315, -0.065]),
     box('rust-a', 'rust', [0.0, 0.04, 0.0595], [0.1, 0.1, 0.061]),
     box('cut-a', 'cut', [-0.2005, 0.03, -0.06], [-0.2, 0.15, 0.06]),
-  ], { body: 'steel-parkerized', face: 'steel-bright', bolt: 'iron-dull', paint: 'paint-olive', rust: 'rust-red', cut: 'steel-heat-tint' }) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { body: 'steel-parkerized', face: 'steel-bright', bolt: 'iron-dull', paint: 'paint-olive', rust: 'rust-red', cut: 'steel-heat-tint' }) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A hardwood stump 300 mm high and 260 mm across, three steel plates and a square bar bolted across its sawn top.
   local r = 0.13, ht = 0.3;
   h.compound('stump_anvil', 15, [
@@ -53,7 +53,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
   ] + [
     h.disc('bolt-%d' % i, 'bolt', 0.008, ht + 0.014, ht + 0.02, [-0.09, 0.09][i % 2], [-0.055, 0.055][std.floor(i / 2)])
     for i in std.range(0, 3)
-  ], { bark: 'bark', end: 'wood-pine', grain: 'wood-oak', plate: 'steel-grey', bar: 'steel-bright', bolt: 'iron-dull' }) + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  ], { bark: 'bark', end: 'wood-pine', grain: 'wood-oak', plate: 'steel-grey', bar: 'steel-bright', bolt: 'iron-dull' }) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal', 'wood'] } } },
   // Bolt cutters 460 mm long: tubular arms with red grips, splaying to 70 mm apart, the compound head plates and pivot
   // bolts, and short stubby jaws closed at +x.
   local arm(id, slot, sgn, x0, x1, z0, z1, w0, w1) = h.prism(id, slot, 'y', [[sgn * z0, x0], [sgn * (z0 + w0), x0], [sgn * (z1 + w1), x1], [sgn * z1, x1]], -0.008, 0.008);
@@ -93,7 +93,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     h.disc('riser', 'gap', 0.018, 0.1945, 0.1955, 0.1, -0.03),
     h.disc('pin-a', 'pin', 0.006, 0.12, 0.215, -L - 0.015, 0),
     h.disc('pin-b', 'pin', 0.006, 0.12, 0.215, L + 0.015, 0),
-  ], { flask: 'wood-oak', sand: 'brick-buff', gap: 'coal-black', pin: 'steel-grey' }) + { taxonomy: { category: 'tools', tags: { material: ['wood', 'stone'] } } },
+  ], { flask: 'wood-oak', sand: 'brick-buff', gap: 'coal-black', pin: 'steel-grey' }) + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['wood', 'stone'] } } },
   // A tabletop charcoal forge 480 mm long: a steel pan 380 by 280 mm on four short legs, a round firepot holding
   // charcoal, and an air pipe to a hand-cranked blower at the +x end.
   local yp = 0.08;
@@ -115,7 +115,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     for i in std.range(0, 3)
     for x in [[-0.17, 0.17][i % 2]]
     for z in [[-0.12, 0.12][std.floor(i / 2)]]
-  ], { pan: 'paint-charcoal', coal: 'coal-black', ember: 'glow-flame', pipe: 'steel-grey', blower: 'paint-oxblood', grip: 'wood-oak' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  ], { pan: 'paint-charcoal', coal: 'coal-black', ember: 'glow-flame', pipe: 'steel-grey', blower: 'paint-oxblood', grip: 'wood-oak' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A drum kiln 580 mm across and 850 mm high: an open-head drum with its lid clamped on, a short chimney on the lid
   // and four air holes round the foot.
   local r = 0.29, ht = 0.85;
@@ -134,14 +134,14 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     h.turned('shank', 'shank', 'x', [[0, 0], [0, 0.0095], [0.15, 0.0095], [0.15, 0]], [0.012, 0.0105, 0]),
     h.prism('wedge', 'shank', 'z', [[0.162, 0.001], [0.19, 0.0085], [0.19, 0.0125], [0.162, 0.02]], -0.0085, 0.0085),
     h.prism('edge', 'edge', 'z', [[0.19, 0.0085], [0.2, 0.01], [0.2, 0.011], [0.19, 0.0125]], -0.0085, 0.0085),
-  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + h.gripOn('chisel', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + h.gripOn('chisel', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A crucible like a stout tumbler, 165 mm high and 135 mm across the rim, thick-walled, with a pouring lip and a
   // little dross on the floor.
   h.compound('crucible', 1, [
     h.turned('pot', 'pot', 'y', [[0, 0], [0, 0.058], [0.15, 0.067], [0.165, 0.067], [0.165, 0.055], [0.025, 0.046], [0.025, 0]]),
     h.disc('dross', 'dross', 0.044, 0.025, 0.028),
     h.prism('lip', 'pot', 'y', [[0.06, -0.012], [0.06, 0.012], [0.078, 0.006], [0.078, -0.006]], 0.155, 0.167),
-  ], { pot: 'ceramic-grey', dross: 'coal-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['ceramic'] } } },
+  ], { pot: 'ceramic-grey', dross: 'coal-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['ceramic'] } } },
   // A crude cast bronze nail 40 mm long: a lumpy round head and a square shank tapering to a blunt point.
   h.compound('crude_bronze_nail', 0.006, [
     h.turned('head', 'nail', 'x', [[0, 0], [0, 0.0045], [0.0025, 0.004], [0.0025, 0]], [0, 0.003, 0]),
@@ -154,5 +154,5 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     h.disc('hole-%d-%d' % [row, i], 'hole', 0.0045 - 0.00018 * (i + 9 * row), 0.0075, 0.0085, -0.068 + i * 0.017, [-0.009, 0.009][row])
     for row in [0, 1]
     for i in std.range(0, 8)
-  ], { plate: 'steel-grey', hole: 'coal-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { plate: 'steel-grey', hole: 'coal-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 ]

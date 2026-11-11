@@ -137,7 +137,7 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
     tentacleTube('t%d-' % i, (i - 2.5) * 0.125, -0.375, 0.75, 0.11, 0.008)
     for i in std.range(0, 5)
   ]), { sock: 'cloth-green', cuff: 'cloth-white', stripe: 'cloth-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of straw rope sandals lying sole down, 240 mm long and 85 mm across, the woven soles ridged across, rope
   // loops along the sides and the long ties laid out beside them.
