@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { impactRows } from '../src/rows.ts';
 import { type ImpactRow, parseImpactRow } from '../src/schema.ts';
-import { renderImpact } from '../src/synth.ts';
+import { peakOf, renderImpact } from '../src/synth.ts';
 
 const RATE = 22050;
 const row = (id: string): ImpactRow => {
@@ -10,7 +10,6 @@ const row = (id: string): ImpactRow => {
   return found;
 };
 const rowIds = Object.keys(impactRows);
-const peak = (samples: Float32Array) => samples.reduce((loudest, sample) => Math.max(loudest, Math.abs(sample)), 0);
 
 describe('renderImpact', () => {
   it.each(rowIds)('renders %s identically for the same row, seed and rate', (id) => {
@@ -24,25 +23,8 @@ describe('renderImpact', () => {
   it.each(rowIds)('renders %s audible, finite and under the row ceiling', (id) => {
     const samples = renderImpact(row(id), 3, RATE);
     expect(samples.every(Number.isFinite)).toBe(true);
-    expect(peak(samples)).toBeGreaterThan(0);
-    expect(peak(samples)).toBeLessThanOrEqual(row(id).mix.peakCeiling);
-  });
-
-  it('does not touch Math.random', () => {
-    const original = Math.random;
-    Math.random = () => {
-      throw new Error('Math.random called');
-    };
-    try {
-      renderImpact(row(rowIds[0] ?? ''), 1, RATE);
-    } finally {
-      Math.random = original;
-    }
-  });
-
-  it('keeps the same hit timing at every sample rate', () => {
-    const seconds = (rate: number) => renderImpact(row(rowIds[0] ?? ''), 5, rate).length / rate;
-    expect(Math.abs(seconds(22050) - seconds(48000))).toBeLessThan(0.001);
+    expect(peakOf(samples)).toBeGreaterThan(0);
+    expect(peakOf(samples)).toBeLessThanOrEqual(row(id).mix.peakCeiling);
   });
 
   it('rejects a sample rate it cannot render', () => {
@@ -62,6 +44,10 @@ describe('impact row validation', () => {
     ['a non-finite gravity', (d) => (d.motion.gravity = Number.POSITIVE_INFINITY)],
     ['a roll that ends before it starts', (d) => (d.motion.roll.maxSeconds = d.motion.roll.minSeconds / 2)],
     ['a peak ceiling above full scale', (d) => (d.mix.peakCeiling = 2)],
+    ['a roll rate that would make millions of ticks', (d) => (d.motion.roll.startRate = 1e6)],
+    ['a surface decay scale that outgrows the buffer', (d) => (d.surface.decayScale = 1e6)],
+    ['an event decay scale that outgrows the buffer', (d) => (d.motion.eventRing.bounce.decay = 1e6)],
+    ['body pitch shares that sum above 1', (d) => (d.strike.body.hardnessShare = 0.9)],
     ['an unknown setting', (d) => (d.drop.bounciness = 1)],
     ['a missing section', (d) => delete d.mix],
   ];

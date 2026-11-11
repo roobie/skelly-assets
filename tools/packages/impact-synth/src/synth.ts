@@ -39,6 +39,8 @@ function mulberry32(seed: number): Rng {
   };
 }
 const symmetric = (rng: Rng) => rng() * 2 - 1;
+// A four-draw sum has a spread of 1/sqrt(3), so this scales it to about one. It stays 1.73, not the exact root,
+// because that is what BR approved by ear.
 const gaussian = (rng: Rng) => (rng() + rng() + rng() + rng() - 2) * 1.73;
 const derivedSeed = (seed: number, index: number) => (seed ^ Math.imul(index + 1, 0x9e3779b1)) >>> 0;
 const lowPassCoefficient = (hz: number, sampleRate: number) => 1 - Math.exp((-2 * Math.PI * hz) / sampleRate);
@@ -49,13 +51,15 @@ interface Context {
   sampleRate: number;
 }
 
-const tumbleSpread = ({ row }: Context) => Math.min(1.5, row.drop.tumble / row.motion.referenceTumble);
+const tumbleSpread = ({ row }: Context) => Math.min(row.motion.maxTumbleSpread, row.drop.tumble / row.motion.referenceTumble);
 
 // Rim landings favour upper modes and body landings lower ones, plus scatter per mode.
-function landingWeights(count: number, pose: number, spread: number, rng: Rng) {
+function landingWeights({ row }: Context, pose: number, spread: number, rng: Rng) {
+  const { scatter, poseWeight } = row.strike.landing;
+  const count = row.object.modes.length;
   return Array.from({ length: count }, (_, i) => {
     const position = count > 1 ? i / (count - 1) - 0.5 : 0;
-    return Math.exp(spread * (0.5 * gaussian(rng) + 1.4 * pose * position));
+    return Math.exp(spread * (scatter * gaussian(rng) + poseWeight * pose * position));
   });
 }
 
@@ -66,7 +70,7 @@ function usableRestitution({ motion, drop }: ImpactRow, impactSpeed: number) {
 }
 
 function planBounces(context: Context, restitution: number, rng: Rng): Hit[] {
-  const { motion, drop, object } = context.row;
+  const { motion, drop } = context.row;
   const { tumble } = drop;
   const spread = tumbleSpread(context);
   const hits: Hit[] = [];
@@ -79,7 +83,7 @@ function planBounces(context: Context, restitution: number, rng: Rng): Hit[] {
       t,
       hardness: clamp01(hitSpeed / motion.hardSpeed),
       level: (hitSpeed / motion.hardSpeed) ** motion.amplitudeExponent,
-      weights: landingWeights(object.modes.length, symmetric(rng), spread, rng),
+      weights: landingWeights(context, symmetric(rng), spread, rng),
     });
     const rebound = speed * restitution;
     if (rebound < motion.rollSpeed) break;
@@ -92,7 +96,7 @@ function planBounces(context: Context, restitution: number, rng: Rng): Hit[] {
 }
 
 function planRoll(context: Context, startSeconds: number, rng: Rng): Hit[] {
-  const { motion, drop, object } = context.row;
+  const { motion, drop } = context.row;
   const { roll } = motion;
   const spread = tumbleSpread(context);
   const duration = lerp(roll.minSeconds, roll.maxSeconds, rng());
@@ -102,16 +106,16 @@ function planRoll(context: Context, startSeconds: number, rng: Rng): Hit[] {
   let elapsed = 0;
   while (elapsed < duration) {
     const progress = elapsed / duration;
-    const wobble = Math.sin(2 * Math.PI * wobbleHz * elapsed * (1 - 0.4 * progress) + wobblePhase);
+    const wobble = Math.sin(2 * Math.PI * wobbleHz * elapsed * (1 - roll.wobbleSlowing * progress) + wobblePhase);
     hits.push({
       kind: 'roll',
       t: startSeconds + elapsed,
       hardness: roll.hardness,
       level: roll.level * lerp(1, roll.endLevel, progress) * (1 + roll.wobbleDepth * wobble),
-      weights: landingWeights(object.modes.length, wobble, spread, rng),
+      weights: landingWeights(context, wobble, spread, rng),
     });
     const rate = roll.startRate * (roll.endRate / roll.startRate) ** progress;
-    elapsed += (1 / rate) * (1 + 0.5 * drop.tumble * symmetric(rng));
+    elapsed += (1 / rate) * (1 + roll.tickJitter * drop.tumble * symmetric(rng));
   }
   let t = startSeconds + duration;
   for (const rock of motion.rocks) {
@@ -121,7 +125,7 @@ function planRoll(context: Context, startSeconds: number, rng: Rng): Hit[] {
       t,
       hardness: roll.hardness,
       level: rock.level,
-      weights: landingWeights(object.modes.length, symmetric(rng), spread, rng),
+      weights: landingWeights(context, symmetric(rng), spread, rng),
     });
   }
   return hits;
@@ -138,16 +142,17 @@ function planEvents(context: Context, seed: number): Hit[] {
   return [...bounces, ...planRoll(context, lastBounce.t + motion.roll.settleSeconds, rng)];
 }
 
-function addContact(layer: Float32Array, start: number, hit: Hit, gain: number, sampleRate: number, rng: Rng) {
-  const length = Math.max(2, Math.round(lerp(0.003, 0.0008, hit.hardness) * sampleRate));
-  const a = lowPassCoefficient(lerp(1800, 14000, hit.hardness), sampleRate);
+function addContact(layer: Float32Array, start: number, hit: Hit, gain: number, { row, sampleRate }: Context, rng: Rng) {
+  const { contact } = row.strike;
+  const length = Math.max(2, Math.round(lerp(contact.softSeconds, contact.hardSeconds, hit.hardness) * sampleRate));
+  const a = lowPassCoefficient(lerp(contact.softHz, contact.hardHz, hit.hardness), sampleRate);
   let first = 0;
   let second = 0;
   for (let i = 0; i < length && start + i < layer.length; i++) {
     const noise = symmetric(rng) * Math.sin((Math.PI * i) / length);
     first += a * (noise - first);
     second += a * (first - second);
-    layer[start + i] += second * gain;
+    layer[start + i] = layer[start + i]! + second * gain;
   }
 }
 
@@ -161,36 +166,37 @@ function addTick(layer: Float32Array, start: number, hit: Hit, tick: Tick, gain:
     first += a * (noise - first);
     const once = noise - first;
     second += a * (once - second);
-    layer[start + i] += (once - second) * (1 - i / length) ** 2 * gain;
+    layer[start + i] = layer[start + i]! + (once - second) * (1 - i / length) ** 2 * gain;
   }
 }
 
-function addBody(layer: Float32Array, start: number, hit: Hit, body: Body, gain: number, sampleRate: number, rng: Rng) {
-  const hz = lerp(body.lowHz, body.highHz, 0.7 * hit.hardness + 0.3 * rng());
+function addBody(layer: Float32Array, start: number, hit: Hit, body: Body, gain: number, { row, sampleRate }: Context, rng: Rng) {
+  const shape = row.strike.body;
+  const hz = lerp(body.lowHz, body.highHz, shape.hardnessShare * hit.hardness + shape.randomShare * rng());
   const seconds = body.ms * 0.001;
   const length = Math.round(seconds * sampleRate);
-  const attack = 0.001 * sampleRate;
+  const attack = shape.attackSeconds * sampleRate;
   for (let i = 0; i < length && start + i < layer.length; i++) {
     const t = i / sampleRate;
     const envelope = Math.min(1, i / attack) * Math.exp((-LN_SILENCE * t) / seconds);
     const tone =
-      Math.sin(2 * Math.PI * hz * t) + (body.overtone ? 0.4 * Math.sin(2 * Math.PI * hz * body.overtone * t) : 0);
-    layer[start + i] += tone * envelope * gain;
+      Math.sin(2 * Math.PI * hz * t) + (body.overtone ? shape.overtoneLevel * Math.sin(2 * Math.PI * hz * body.overtone * t) : 0);
+    layer[start + i] = layer[start + i]! + tone * envelope * gain;
   }
 }
 
 function chokeRing(layer: Float32Array, start: number, factor: number, { row, sampleRate }: Context) {
   const fade = Math.max(1, Math.round(row.mix.chokeFadeSeconds * sampleRate));
   for (let i = start; i < layer.length; i++) {
-    layer[i] *= lerp(1, factor, Math.min(1, (i - start) / fade));
+    layer[i] = layer[i]! * (lerp(1, factor, Math.min(1, (i - start) / fade)));
   }
 }
 
 // The pair's gains sum to 1, so splitting a mode keeps its level; scatter 0 gives every hit the same pair.
-function ringPartials(hz: number, split: Split | null, scatter: number, rng: Rng) {
+function ringPartials(hz: number, split: Split | null, spacing: { least: number; spread: number }, scatter: number, rng: Rng) {
   const phase = () => rng() * 2 * Math.PI * scatter;
   if (!split) return [{ hz, share: 1, phase: phase() }];
-  const apart = split.ratio * lerp(1, 0.25 + 1.5 * rng(), scatter);
+  const apart = split.ratio * lerp(1, spacing.least + spacing.spread * rng(), scatter);
   const lean = split.lean * lerp(1, symmetric(rng), scatter);
   return [
     { hz: hz * (1 - apart / 2), share: (1 + lean) / 2, phase: phase() },
@@ -215,18 +221,19 @@ function tailSeconds(hit: Hit, { row }: Context) {
 
 function addRing(layer: Float32Array, start: number, hit: Hit, spinning: Variation['spin'], gain: number, context: Context, rng: Rng) {
   const { row, sampleRate } = context;
-  const { object, surface, motion, mix } = row;
+  const { object, surface, motion, mix, strike } = row;
   const treatment = motion.eventRing[hit.kind];
   const lastMode = object.modes.length - 1;
-  const attack = Math.max(1, lerp(0.0015, 0.0004, hit.hardness) * sampleRate);
+  const attack = Math.max(1, lerp(strike.ring.softAttackSeconds, strike.ring.hardAttackSeconds, hit.hardness) * sampleRate);
   const scatter = hit.weights.some((w) => w !== 1) ? 1 : 0;
-  const tilt = (1 - hit.hardness ** 0.6) * mix.upperModeTiltDb;
-  const spin = spinCurve(spinning, Math.round(tailSeconds(hit, context) * sampleRate), sampleRate);
+  const tilt = (1 - hit.hardness ** strike.ring.tiltExponent) * mix.upperModeTiltDb;
+  const spin = spinCurve(spinning, Math.min(Math.round(tailSeconds(hit, context) * sampleRate), layer.length - start), sampleRate);
   object.modes.forEach((mode, index) => {
-    const partials = ringPartials(mode.hz, object.split, scatter, rng);
+    // Drawn before the Nyquist skip so the random draws, and so the sound, do not shift with the sample rate.
+    const partials = ringPartials(mode.hz, object.split, strike.splitSpacing, scatter, rng);
     if (mode.hz >= sampleRate / 2) return;
     const position = lastMode > 0 ? index / lastMode : 0;
-    const amplitude = gain * treatment.level * mode.gain * hit.weights[index] * 10 ** ((-tilt * position) / 20);
+    const amplitude = gain * treatment.level * mode.gain * hit.weights[index]! * 10 ** ((-tilt * position) / 20);
     const seconds = mode.ms * 0.001 * surface.decayScale * treatment.decay;
     const length = Math.round(seconds * sampleRate);
     const decay = LN_SILENCE / (seconds * sampleRate);
@@ -235,18 +242,16 @@ function addRing(layer: Float32Array, start: number, hit: Hit, spinning: Variati
     const fadePerSample = Math.exp(-decay);
     for (let i = 0; i < length && start + i < layer.length; i++, fade *= fadePerSample) {
       let tone = 0;
-      for (let p = 0; p < partials.length; p++) {
-        tone += partials[p].share * Math.sin(steps[p] * i + partials[p].phase);
-      }
-      layer[start + i] += fade * Math.min(1, i / attack) * spin[i] * tone;
+      for (const [p, partial] of partials.entries()) tone += partial.share * Math.sin(steps[p]! * i + partial.phase);
+      layer[start + i] = layer[start + i]! + fade * Math.min(1, i / attack) * spin[i]! * tone;
     }
   });
-  if (object.head) addBody(layer, start, hit, object.head, gain * treatment.level * object.head.gain, sampleRate, rng);
+  if (object.head) addBody(layer, start, hit, object.head, gain * treatment.level * object.head.gain, context, rng);
 }
 
 function fadeEnd(layer: Float32Array, length: number, { row, sampleRate }: Context) {
   const fade = Math.min(length, Math.round(row.mix.endFadeSeconds * sampleRate));
-  for (let i = 0; i < fade; i++) layer[length - 1 - i] *= i / fade;
+  for (let i = 0; i < fade; i++) layer[length - 1 - i] = layer[length - 1 - i]! * (i / fade);
 }
 
 function secondStrike(strike: DoubleStrike, tumble: number, rng: Rng) {
@@ -269,7 +274,8 @@ function tumbleVariation(hit: Hit, context: Context, rng: Rng): Variation {
   };
 }
 
-const peakOf = (samples: Float32Array) => samples.reduce((peak, sample) => Math.max(peak, Math.abs(sample)), 0);
+/** The largest absolute sample. */
+export const peakOf = (samples: Float32Array) => samples.reduce((peak, sample) => Math.max(peak, Math.abs(sample)), 0);
 
 /**
  * One drop of the row's object on its surface, as mono samples between -1 and 1. The result depends only on the
@@ -294,21 +300,21 @@ export function renderImpact(row: ImpactRow, seed: number, sampleRate: number): 
     const rng = mulberry32(derivedSeed(seed, index));
     const strike = (at: number, level: number) => {
       const contactGain = hit.level * level * mix.contactLevel * object.contactGain * surface.contactGain;
-      addContact(contact, at, hit, contactGain, sampleRate, rng);
+      addContact(contact, at, hit, contactGain, context, rng);
       addRing(ring, at, hit, spin, hit.level * level * mix.ringLevel * object.ringGain, context, rng);
     };
     chokeRing(ring, start, row.motion.eventRing[hit.kind].choke, context);
     strike(start, 1);
     if (echo) strike(start + Math.round(echo.seconds * sampleRate), echo.level);
     if (surface.tick) addTick(ground, start, hit, surface.tick, hit.level * surface.tick.gain, sampleRate, rng);
-    if (surface.body) addBody(ground, start, hit, surface.body, hit.level * surface.body.gain, sampleRate, rng);
+    if (surface.body) addBody(ground, start, hit, surface.body, hit.level * surface.body.gain, context, rng);
   });
 
   for (const layer of [contact, ring, ground]) fadeEnd(layer, length, context);
   const samples = new Float32Array(length);
-  for (let i = 0; i < length; i++) samples[i] += contact[i] + ring[i] + ground[i];
+  for (let i = 0; i < length; i++) samples[i] = contact[i]! + ring[i]! + ground[i]!;
   const loudest = peakOf(samples);
   const gain = loudest > 0 ? Math.min(mix.outputGain, mix.peakCeiling / loudest) : mix.outputGain;
-  for (let i = 0; i < length; i++) samples[i] = samples[i] * gain;
+  for (let i = 0; i < length; i++) samples[i] = samples[i]! * gain;
   return samples;
 }

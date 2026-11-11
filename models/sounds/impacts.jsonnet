@@ -10,6 +10,8 @@ local motion = {
   hardSpeed: 5,
   amplitudeExponent: 1.2,
   referenceTumble: 0.2,
+  // The most a tumble can widen the scatter of landings, as a multiple of the reference tumble's.
+  maxTumbleSpread: 1.5,
   // How each kind of event treats the metal: decay scale, ring level, and how far it chokes earlier ring.
   eventRing: {
     bounce: { decay: 1, level: 1, choke: 0.35 },
@@ -28,6 +30,9 @@ local motion = {
     wobbleDepth: 0.45,
     minWobbleHz: 2.5,
     maxWobbleHz: 4.5,
+    // How far the wobble slows by the end of the roll, and how far tumble jitters the gaps between ticks.
+    wobbleSlowing: 0.4,
+    tickJitter: 0.5,
   },
   rocks: [
     { gap: 0.08, level: 0.018 },
@@ -46,14 +51,34 @@ local mix = {
   endFadeSeconds: 0.015,
 };
 
+// How a single strike is shaped, whatever the object and surface: the contact burst, the ring's attack and tilt,
+// the pitch of a body thud, and how landings scatter the modes.
+local strike = {
+  contact: { softSeconds: 0.003, hardSeconds: 0.0008, softHz: 1800, hardHz: 14000 },
+  ring: {
+    softAttackSeconds: 0.0015,
+    hardAttackSeconds: 0.0004,
+    // Softer hits tilt the upper modes down by upperModeTiltDb times one minus hardness to this power.
+    tiltExponent: 0.6,
+  },
+  // A body thud's pitch is its hardness share of the range plus a random share.
+  body: { attackSeconds: 0.001, overtoneLevel: 0.4, hardnessShare: 0.7, randomShare: 0.3 },
+  landing: { scatter: 0.5, poseWeight: 1.4 },
+  // A split pair's spacing varies from the least to the most of its ratio between hits.
+  splitSpacing: { least: 0.25, spread: 1.5 },
+};
+
 local drop = { height: 1.2, restitution: 0.65, tumble: 0.2 };
 
-local concrete = {
+local concreteBase = {
   decayScale: 1,
   contactGain: 1,
   hardness: 1,
   tick: { shortMs: 3, longMs: 5, highPassHz: 3200, gain: 0.55 },
 };
+// The slab under a metal case also thuds; the glass vial was approved by ear without that thud, so its slab has none.
+local concreteSlab = concreteBase + { body: { lowHz: 600, highHz: 1900, overtone: 0, ms: 12, gain: 0.5 } };
+local concreteTickOnly = concreteBase + { body: null };
 
 // Hz, time to -60 dB in ms, and level of each mode of the object's ring.
 local modes(hzs, mss, gains) = [
@@ -79,7 +104,8 @@ local gains = [1, 0.8, 0.6, 0.42, 0.28];
       head: { lowHz: 1100, highHz: 1900, overtone: 0, ms: 35, gain: 0.9 },
       modes: modes(hz, [440, 400, 360, 300, 250], gains),
     },
-    surface: concrete + { body: { lowHz: 600, highHz: 1900, overtone: 0, ms: 12, gain: 0.5 } },
+    surface: concreteSlab,
+    strike: strike,
     drop: drop,
     motion: motion,
     mix: mix,
@@ -98,7 +124,8 @@ local gains = [1, 0.8, 0.6, 0.42, 0.28];
       head: null,
       modes: modes(hz, [250, 180, 120, 80, 50], gains),
     },
-    surface: concrete + { body: null },
+    surface: concreteTickOnly,
+    strike: strike,
     drop: drop,
     motion: motion,
     mix: mix,

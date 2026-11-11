@@ -16,12 +16,12 @@ samples. See `src/synth.ts`, `renderImpact`.
   one that renders at load get the same samples, and a seed is a variant a player can hear again. So the core uses
   a seeded generator, never `Math.random`, and nothing of Web Audio; a consumer copies the samples into whatever
   buffer its audio API wants.
-- Every tuning number is in a row, none in the code, so a mod or a new material is a content edit. Rows are
+- Every tuning number is in a row, none in the code (the code keeps only unit conversions and the scale of its noise draw), so a mod or a new material is a content edit. Rows are
   `models/sounds/impacts.jsonnet`, validated on load by `src/schema.ts`, `ImpactRowSchema`, which rejects a
   setting out of range, so a bad row fails where it is written and not as silence or a hang at play time.
 - The code keeps only what is the synth's own: the three kinds of event (bounce, roll, rock) and the -60 dB
   definition of a decay time.
-- Only sounds the project owns are authored here. The reason is in `README.md`, "Sounds".
+- Only sounds the project owns are authored here; the reason is in `README.md`, "Sounds".
 
 ## Rows
 

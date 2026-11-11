@@ -5,6 +5,7 @@ import {
   integer,
   maxValue,
   minValue,
+  maxLength,
   minLength,
   nullable,
   number,
@@ -23,8 +24,11 @@ const Hz = pipe(Positive, maxValue(96000));
 const Ms = pipe(Positive, maxValue(10000));
 const Seconds = pipe(Positive, maxValue(10));
 
+const Rate = pipe(Positive, maxValue(200));
+const Scale = pipe(Positive, maxValue(10));
+
 const ordered = <T extends Record<string, number>>(low: keyof T & string, high: keyof T & string) =>
-  check<T, string>((range) => range[low] <= range[high], `${low} must not exceed ${high}`);
+  check<T, string>((range) => range[low]! <= range[high]!, `${low} must not exceed ${high}`);
 
 /** A mode of the object's ring: its pitch, how long it takes to fall 60 dB, and its level. */
 const ModeSchema = strictObject({ hz: Hz, ms: Ms, gain: NonNegative });
@@ -67,11 +71,11 @@ const ObjectSchema = strictObject({
   spin: nullable(SpinSchema),
   doubleStrike: nullable(DoubleStrikeSchema),
   head: nullable(BodySchema),
-  modes: pipe(array(ModeSchema), minLength(1)),
+  modes: pipe(array(ModeSchema), minLength(1), maxLength(32)),
 });
 
 const SurfaceSchema = strictObject({
-  decayScale: Positive,
+  decayScale: Scale,
   contactGain: NonNegative,
   hardness: Fraction,
   tick: nullable(TickSchema),
@@ -81,19 +85,39 @@ const SurfaceSchema = strictObject({
 /** Below 1, so a drop's bounces always die away. */
 const Restitution = pipe(number(), finite(), minValue(0), check((value) => value < 1, 'must be below 1'));
 
+const StrikeSchema = pipe(
+  strictObject({
+    contact: pipe(
+      strictObject({ softSeconds: Seconds, hardSeconds: Seconds, softHz: Hz, hardHz: Hz }),
+      ordered('hardSeconds', 'softSeconds'),
+      ordered('softHz', 'hardHz'),
+    ),
+    ring: pipe(
+      strictObject({ softAttackSeconds: Seconds, hardAttackSeconds: Seconds, tiltExponent: Positive }),
+      ordered('hardAttackSeconds', 'softAttackSeconds'),
+    ),
+    body: pipe(
+      strictObject({ attackSeconds: Seconds, overtoneLevel: NonNegative, hardnessShare: Fraction, randomShare: Fraction }),
+      check(({ hardnessShare, randomShare }) => hardnessShare + randomShare <= 1, 'the pitch shares must not sum above 1'),
+    ),
+    landing: strictObject({ scatter: NonNegative, poseWeight: NonNegative }),
+    splitSpacing: strictObject({ least: NonNegative, spread: NonNegative }),
+  }),
+);
+
 const DropSchema = strictObject({
   height: pipe(Positive, maxValue(100)),
   restitution: Restitution,
   tumble: Fraction,
 });
 
-const EventRingSchema = strictObject({ decay: Positive, level: NonNegative, choke: Fraction });
+const EventRingSchema = strictObject({ decay: Scale, level: NonNegative, choke: Fraction });
 
 const RollSchema = pipe(
   strictObject({
     level: NonNegative,
-    startRate: Positive,
-    endRate: Positive,
+    startRate: Rate,
+    endRate: Rate,
     minSeconds: Seconds,
     maxSeconds: Seconds,
     settleSeconds: NonNegative,
@@ -102,6 +126,8 @@ const RollSchema = pipe(
     wobbleDepth: Fraction,
     minWobbleHz: Hz,
     maxWobbleHz: Hz,
+    wobbleSlowing: Fraction,
+    tickJitter: Fraction,
   }),
   ordered('minSeconds', 'maxSeconds'),
   ordered('minWobbleHz', 'maxWobbleHz'),
@@ -116,9 +142,10 @@ const MotionSchema = strictObject({
   hardSpeed: Positive,
   amplitudeExponent: Positive,
   referenceTumble: Positive,
+  maxTumbleSpread: pipe(Positive, maxValue(10)),
   eventRing: strictObject({ bounce: EventRingSchema, roll: EventRingSchema, rock: EventRingSchema }),
   roll: RollSchema,
-  rocks: array(strictObject({ gap: Positive, level: NonNegative })),
+  rocks: pipe(array(strictObject({ gap: Positive, level: NonNegative })), maxLength(16)),
 });
 
 const MixSchema = strictObject({
@@ -135,6 +162,7 @@ const MixSchema = strictObject({
 export const ImpactRowSchema = strictObject({
   object: ObjectSchema,
   surface: SurfaceSchema,
+  strike: StrikeSchema,
   drop: DropSchema,
   motion: MotionSchema,
   mix: MixSchema,

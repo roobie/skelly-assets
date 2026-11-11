@@ -1,5 +1,5 @@
 {
   "extends": "../construct/tsconfig.json",
-  "compilerOptions": { "resolveJsonModule": true, "noUncheckedIndexedAccess": false },
+  "compilerOptions": { "resolveJsonModule": true },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
