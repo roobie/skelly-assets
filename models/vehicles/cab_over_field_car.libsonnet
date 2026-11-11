@@ -321,6 +321,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   ]), finish),
   k.compound(id + '_crew_seat', s.mass.crewSeat, [
     box('plank', 'seat', [-0.45, 0, -0.17], [0.45, 0.05, 0.17]),
-    box('back', 'seat', [-0.45, 0.2, 0.15], [0.45, 0.55, 0.19]),
+    box('back', 'seat', [-0.45, 0, 0.15], [0.45, 0.55, 0.19]),
   ], { seat: 'polymer-black' }),
 ])
