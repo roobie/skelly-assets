@@ -16,6 +16,7 @@
   'burnt_out_bus': import 'burnt_out_bus.placements.libsonnet',
   'burnt_out_saloon': import 'burnt_out_saloon.placements.libsonnet',
   'burnt_out_van': import 'burnt_out_van.placements.libsonnet',
+  'cab_over_field_car': import 'cab_over_field_car.placements.libsonnet',
   'camper_van': import 'camper_van.placements.libsonnet',
   'car_trailer': import 'car_trailer.placements.libsonnet',
   'car_transporter': import 'car_transporter.placements.libsonnet',
