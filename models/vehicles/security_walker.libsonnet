@@ -81,14 +81,16 @@ local rear = hull.profile[6][0];
 // full-width body starts `clear` beyond the joint disc of the clevis it meets, so the joint can turn.
 local clear = 0.08;
 local joints = {
-  knee: { clevis: 0.26, tongue: 0.22, cheek: [0.13, 0.24] },
-  ankle: { clevis: 0.22, tongue: 0.18, cheek: [0.11, 0.2] },
-  foot: { clevis: 0.16, tongue: 0.15, cheek: [0.11, 0.22] },
+  knee: { clevis: 0.32, tongue: 0.27, cheek: [0.16, 0.3] },
+  ankle: { clevis: 0.27, tongue: 0.22, cheek: [0.13, 0.25] },
+  foot: { clevis: 0.2, tongue: 0.18, cheek: [0.13, 0.26] },
 };
-local hub = 0.34;
-local thighHalf = 0.24;
-local shinHalf = 0.2;
-local tarsusHalf = 0.16;
+local hub = 0.4;
+local thighHalf = 0.3;
+local shinHalf = 0.25;
+local tarsusHalf = 0.2;
+// How far a joint's pin stands out of its outer cheek.
+local pin = 0.04;
 local tongueEnd(id, slot, at, toward, joint, thick) = [
   m.axleDisc(id + '_boss', slot, at[0], at[1], joint.tongue, [L - joint.cheek[0], L + joint.cheek[0]]),
   k.bar(id + '_tongue', slot, at, reach(at, toward, joint.clevis + clear), thick, [L - joint.cheek[0], L + joint.cheek[0]]),
@@ -107,35 +109,56 @@ local body(a, b, from, to, thick, half, thickB=null) =
   k.bar('body', 'paint', reach(a, b, from), reach(b, a, to), thick, [L - half, L + half], thickB);
 
 // Each ram pins to a lug on one segment and a lug on the next, its barrel and rod parts of their own so an animation
-// slides the rod out of the barrel's mouth.
+// slides the rod out of the barrel's mouth. A ram as deep as it is wide reads as one round piston from any side, and a
+// ram that spans a joint stands just clear of that joint's pin, so its lugs stay short enough to read as part of the leg.
 local rams = {
-  hip: { base: [1.25, 3.2], end: along(s.hip, s.knee, 0.55, 0.1), z: [1.04, 1.2], bore: 0.16, massKg: [35, 8] },
-  knee: { base: along(s.hip, s.knee, 0.35, -0.12), end: along(s.knee, s.ankle, 0.45, -0.12), z: [L + 0.28, L + 0.4], bore: 0.18, massKg: [40, 8] },
-  ankle: { base: along(s.knee, s.ankle, 0.55, 0.12), end: along(s.ankle, s.foot, 0.5, 0.1), z: [L + 0.28, L + 0.38], bore: 0.16, massKg: [25, 5] },
+  hip: { base: [1.25, 3.2], end: along(s.hip, s.knee, 0.55, 0.1), z0: 1.04, bore: 0.16, massKg: [35, 8] },
+  knee: { base: along(s.hip, s.knee, 0.35, -0.15), end: along(s.knee, s.ankle, 0.45, -0.15), z0: L + joints.knee.cheek[1] + pin + 0.02, bore: 0.2, massKg: [45, 10] },
+  ankle: { base: along(s.knee, s.ankle, 0.55, 0.15), end: along(s.ankle, s.foot, 0.5, 0.13), z0: L + joints.ankle.cheek[1] + pin + 0.02, bore: 0.18, massKg: [32, 8] },
 };
+local ramZ(r) = [r.z0, r.z0 + r.bore];
 local eye(ram) = ram.bore * 0.45;
-local lug(id, at, ram, z) = m.axleDisc(id, 'frame', at[0], at[1], eye(ram) + 0.03, z, 12);
+local lug(id, at, ram, z) = m.axleDisc(id, 'frame', at[0], at[1], eye(ram) + 0.05, z, 12);
 local ram(name, r) =
   local mouth = along(r.base, r.end, 0.55);
-  local rodZ = [r.z[0] + 0.03, r.z[1] - 0.03];
+  local gland = reach(mouth, r.base, 0.06);
+  local rod = r.bore * 0.6;
+  local rodZ = [r.z0 + (r.bore - rod) / 2, r.z0 + (r.bore + rod) / 2];
   local finish = { dark: s.frame, bright: 'steel-stainless' };
   [
     k.compound('security_walker_%s_ram_barrel' % name, r.massKg[0], [
-      m.axleDisc('base_eye', 'dark', r.base[0], r.base[1], eye(r), r.z, 12),
-      k.bar('barrel', 'dark', r.base, mouth, r.bore, r.z),
+      m.axleDisc('base_eye', 'dark', r.base[0], r.base[1], eye(r), ramZ(r), 12),
+      k.bar('barrel', 'dark', r.base, gland, r.bore, ramZ(r)),
+      // The gland collar at the mouth, where the rod leaves the barrel.
+      k.bar('gland', 'dark', gland, mouth, r.bore * 1.3, ramZ(r)),
     ], finish, { base: ['base_eye', centre] }),
     k.compound('security_walker_%s_ram_rod' % name, r.massKg[1], [
-      k.bar('rod', 'bright', mouth, r.end, r.bore * 0.45, rodZ),
-      m.axleDisc('end_eye', 'bright', r.end[0], r.end[1], eye(r) * 0.9, r.z, 12),
+      k.bar('rod', 'bright', mouth, r.end, rod, rodZ),
+      m.axleDisc('end_eye', 'bright', r.end[0], r.end[1], eye(r) * 0.9, ramZ(r), 12),
     ], finish, { end: ['end_eye', centre] }),
   ];
 
-// Hydraulic hoses loop round the outside of each joint's bend, laid against the inboard face at `z` that they flex beside.
-local hoses(name, massKg, at, radius, from, to, z) =
-  k.compound('security_walker_%s_hoses' % name, massKg,
-             k.arc('lower', 'hose', at[0], at[1], radius, radius + 0.06, from, to, 10, [z - 0.035, z])
-             + k.arc('upper', 'hose', at[0], at[1], radius + 0.07, radius + 0.13, from, to, 10, [z - 0.07, z - 0.035]),
-             { hose: 'rubber-black' });
+// A hose sags from a fitting at `a`, pulled toward `c`, to a fitting at `b`: a quadratic curve in the side view, which
+// reads as slack hose where an arc about the joint would read as a ring. Each fitting reaches across z from the hose to
+// the face it plugs into, `fitA` and `fitB`.
+local hoseBore = 0.06;
+local curve(a, c, b, t) = plus(plus(scaled(a, (1 - t) * (1 - t)), scaled(c, 2 * t * (1 - t))), scaled(b, t * t));
+local hoseRun(id, run) =
+  local steps = 10;
+  local points = [curve(run.a, run.c, run.b, i / steps) for i in std.range(0, steps)];
+  local z = [run.z, run.z + hoseBore];
+  local fitting(name, at, span) =
+    box('%s_%s' % [id, name], 'fitting', [at[0] - 0.05, at[1] - 0.05, std.min(span, z[0])], [at[0] + 0.05, at[1] + 0.05, std.max(span, z[1])]);
+  [k.bar('%s_%d' % [id, i], 'hose', points[i], points[i + 1], hoseBore, z) for i in std.range(0, steps - 1)]
+  // A round bend between each two straight runs, so the curve has no notches.
+  + [m.axleDisc('%s_bend_%d' % [id, i], 'hose', points[i][0], points[i][1], hoseBore / 2, z, 8) for i in std.range(1, steps - 1)]
+  + [fitting('fitting_a', run.a, run.fitA), fitting('fitting_b', run.b, run.fitB)];
+local hoses(name, massKg, runs) =
+  k.compound('security_walker_%s_hoses' % name, massKg, std.flattenArrays([
+    hoseRun('hose_%d' % i, runs[i])
+    for i in std.range(0, std.length(runs) - 1)
+  ]), { hose: 'rubber-black', fitting: 'steel-grey' });
+local polar(at, degrees, r) = plus(at, [r * std.cos(k.rad(degrees)), r * std.sin(k.rad(degrees))]);
 
 // The foot: three clawed toes forward and a spur behind, splayed in plan round its pivot.
 local toes = [
@@ -177,7 +200,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
   + bothSides([
     prism('side', 'paint', hull.profile, [hull.half - hull.plate, hull.half]),
     box('face_side', 'paint', [faceInner, s.window.low, s.window.half], [face, s.window.high, hull.half]),
-    lug('hip_ram_lug', rams.hip.base, rams.hip, [hull.half, rams.hip.z[0]]),
+    lug('hip_ram_lug', rams.hip.base, rams.hip, [hull.half, rams.hip.z0]),
   ]), { paint: s.paint, frame: s.frame } + stripes),
   // Bolted to the flanks behind the hips, so a scavenger lifts one off on its own.
   k.compound('security_walker_flank_armour', 120, [
@@ -202,35 +225,35 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     k.turned('filter', 'steel', 'y', k.disc(0.07, 0, 0.2), [0.25, 3.3, -0.4]) + { sides: 12 },
   ], { paint: s.frame, steel: 'steel-stainless' }),
   // The hip drive turns the thigh; it is the leg's root, bolted to the torso's flank.
-  k.compound('security_walker_hip_drive', 260, [
-    m.axleDisc('drive', 'frame', s.hip[0], s.hip[1], 0.42, [hull.half, L - thighHalf]),
+  k.compound('security_walker_hip_drive', 300, [
+    m.axleDisc('drive', 'frame', s.hip[0], s.hip[1], 0.48, [hull.half, L - thighHalf]),
   ], { frame: s.frame }, { pivot: ['drive', centre] }),
-  k.compound('security_walker_thigh', 820, [
+  k.compound('security_walker_thigh', 1000, [
     m.axleDisc('hub', 'paint', s.hip[0], s.hip[1], hub, [L - thighHalf, L + thighHalf]),
-    m.axleDisc('hip_cap', 'frame', s.hip[0], s.hip[1], 0.2, [L + thighHalf, L + thighHalf + 0.08]),
-    body(s.hip, s.knee, 0, joints.knee.clevis + clear, 0.56, thighHalf, 0.46),
-    m.axleDisc('knee_pin', 'frame', s.knee[0], s.knee[1], 0.1, [L + joints.knee.cheek[1], L + joints.knee.cheek[1] + 0.04], 12),
-    lug('hip_ram_lug', rams.hip.end, rams.hip, [rams.hip.z[1], L - thighHalf]),
-    lug('knee_ram_lug', rams.knee.base, rams.knee, [L + thighHalf, rams.knee.z[0]]),
-  ] + clevisEnd('knee', 'paint', s.knee, s.hip, joints.knee, 0.46), { paint: s.paint, frame: s.frame }, {
+    m.axleDisc('hip_cap', 'frame', s.hip[0], s.hip[1], 0.24, [L + thighHalf, L + thighHalf + 0.08]),
+    body(s.hip, s.knee, 0, joints.knee.clevis + clear, 0.7, thighHalf, 0.56),
+    m.axleDisc('knee_pin', 'frame', s.knee[0], s.knee[1], 0.11, [L + joints.knee.cheek[1], L + joints.knee.cheek[1] + pin], 12),
+    lug('hip_ram_lug', rams.hip.end, rams.hip, [ramZ(rams.hip)[1], L - thighHalf]),
+    lug('knee_ram_lug', rams.knee.base, rams.knee, [L + thighHalf, rams.knee.z0]),
+  ] + clevisEnd('knee', 'paint', s.knee, s.hip, joints.knee, 0.56), { paint: s.paint, frame: s.frame }, {
     hip: ['hub', centre],
     knee: ['knee_cheek_outer', centre],
   }),
-  k.compound('security_walker_shin', 640, [
-    body(s.knee, s.ankle, joints.knee.clevis + clear, joints.ankle.clevis + clear, 0.44, shinHalf, 0.36),
-    m.axleDisc('ankle_pin', 'frame', s.ankle[0], s.ankle[1], 0.09, [L + joints.ankle.cheek[1], L + joints.ankle.cheek[1] + 0.04], 12),
-    lug('knee_ram_lug', rams.knee.end, rams.knee, [L + shinHalf, rams.knee.z[0]]),
-    lug('ankle_ram_lug', rams.ankle.base, rams.ankle, [L + shinHalf, rams.ankle.z[0]]),
-  ] + tongueEnd('knee', 'paint', s.knee, s.ankle, joints.knee, 0.4)
-  + clevisEnd('ankle', 'paint', s.ankle, s.knee, joints.ankle, 0.32), { paint: s.paint, frame: s.frame }, {
+  k.compound('security_walker_shin', 780, [
+    body(s.knee, s.ankle, joints.knee.clevis + clear, joints.ankle.clevis + clear, 0.54, shinHalf, 0.44),
+    m.axleDisc('ankle_pin', 'frame', s.ankle[0], s.ankle[1], 0.1, [L + joints.ankle.cheek[1], L + joints.ankle.cheek[1] + pin], 12),
+    lug('knee_ram_lug', rams.knee.end, rams.knee, [L + shinHalf, rams.knee.z0]),
+    lug('ankle_ram_lug', rams.ankle.base, rams.ankle, [L + shinHalf, rams.ankle.z0]),
+  ] + tongueEnd('knee', 'paint', s.knee, s.ankle, joints.knee, 0.48)
+  + clevisEnd('ankle', 'paint', s.ankle, s.knee, joints.ankle, 0.42), { paint: s.paint, frame: s.frame }, {
     knee: ['knee_boss', centre],
     ankle: ['ankle_cheek_outer', centre],
   }),
-  k.compound('security_walker_tarsus', 300, [
-    body(s.ankle, s.foot, joints.ankle.clevis + clear, joints.foot.clevis + clear, 0.32, tarsusHalf),
-    lug('ankle_ram_lug', rams.ankle.end, rams.ankle, [L + tarsusHalf, rams.ankle.z[0]]),
-  ] + tongueEnd('ankle', 'paint', s.ankle, s.foot, joints.ankle, 0.28)
-  + tongueEnd('foot', 'paint', s.foot, s.ankle, joints.foot, 0.24), { paint: s.paint, frame: s.frame }, {
+  k.compound('security_walker_tarsus', 380, [
+    body(s.ankle, s.foot, joints.ankle.clevis + clear, joints.foot.clevis + clear, 0.42, tarsusHalf, 0.34),
+    lug('ankle_ram_lug', rams.ankle.end, rams.ankle, [L + tarsusHalf, rams.ankle.z0]),
+  ] + tongueEnd('ankle', 'paint', s.ankle, s.foot, joints.ankle, 0.36)
+  + tongueEnd('foot', 'paint', s.foot, s.ankle, joints.foot, 0.3), { paint: s.paint, frame: s.frame }, {
     ankle: ['ankle_boss', centre],
     foot: ['foot_boss', centre],
   }),
@@ -238,7 +261,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     k.yPrism('sole', 'paint', ccw([[p[1], p[0]] for p in [plan(22.5 + 45 * i, 0.32, 0) for i in std.range(0, 7)]]), [0, 0.22]),
   ] + std.flattenArrays([toe(t) for t in toes]) + std.flattenArrays([
     [
-      prism('cheek_' + side.name, 'paint', [[s.foot[0] - 0.22, 0.22], [s.foot[0] + 0.22, 0.22], [s.foot[0] + 0.12, s.foot[1]], [s.foot[0] - 0.12, s.foot[1]]], side.z),
+      prism('cheek_' + side.name, 'paint', [[s.foot[0] - 0.26, 0.22], [s.foot[0] + 0.26, 0.22], [s.foot[0] + 0.15, s.foot[1]], [s.foot[0] - 0.15, s.foot[1]]], side.z),
       m.axleDisc('cheek_disc_' + side.name, 'paint', s.foot[0], s.foot[1], joints.foot.clevis, side.z),
     ]
     for side in [
@@ -247,9 +270,20 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     ]
   ]), { paint: s.paint, claw: 'steel-gunmetal' }, { pivot: ['cheek_disc_outer', centre] }),
 ] + ram('hip', rams.hip) + ram('knee', rams.knee) + ram('ankle', rams.ankle) + [
-  hoses('hip', 6, s.hip, 0.46, 105, 250, hull.half + 0.07),
-  hoses('knee', 4, s.knee, 0.3, -130, 122, L - joints.knee.cheek[1]),
-  hoses('ankle', 3, s.ankle, 0.27, 50, 300, L - joints.ankle.cheek[1]),
+  // The hip's hoses run in the gap between the flank and the thigh, from the flank behind the hip drive to the thigh.
+  hoses('hip', 8, [
+    { a: [-0.5, 3.72], c: [-0.9, 2.4], b: along(s.hip, s.knee, 0.6, -0.15), z: 1.09, fitA: hull.half, fitB: L - thighHalf },
+    { a: [-0.42, 3.76], c: [-1.1, 2.25], b: along(s.hip, s.knee, 0.68, -0.08), z: 1.16, fitA: hull.half, fitB: L - thighHalf },
+  ]),
+  // The knee's and the ankle's sag round the outside of each bend on the leg's outer face, where the rams leave room.
+  hoses('knee', 6, [
+    { a: along(s.knee, s.hip, 0.42 / length(s.knee, s.hip), -0.2), c: polar(s.knee, -3.5, 0.95), b: along(s.knee, s.ankle, 0.42 / length(s.knee, s.ankle), 0.2), z: L + thighHalf, fitA: L + thighHalf, fitB: L + shinHalf },
+    { a: along(s.knee, s.hip, 0.5 / length(s.knee, s.hip), -0.12), c: polar(s.knee, -3.5, 1.15), b: along(s.knee, s.ankle, 0.5 / length(s.knee, s.ankle), 0.12), z: L + thighHalf + hoseBore, fitA: L + thighHalf, fitB: L + shinHalf },
+  ]),
+  hoses('ankle', 5, [
+    { a: along(s.ankle, s.knee, 0.4 / length(s.ankle, s.knee), 0.16), c: polar(s.ankle, 176, 0.8), b: along(s.ankle, s.foot, 0.36 / length(s.ankle, s.foot), -0.15), z: L + shinHalf, fitA: L + shinHalf, fitB: L + tarsusHalf },
+    { a: along(s.ankle, s.knee, 0.48 / length(s.ankle, s.knee), 0.08), c: polar(s.ankle, 176, 0.98), b: along(s.ankle, s.foot, 0.52 / length(s.ankle, s.foot), -0.15), z: L + shinHalf + hoseBore, fitA: L + shinHalf, fitB: L + tarsusHalf },
+  ]),
   k.compound('security_walker_pod_mount', 60, [
     box('bracket', 'frame', [-0.1, pod.low, hull.half], [0.5, 4.3, trunnion.z[0]]),
     m.axleDisc('trunnion', 'frame', s.trunnion[0], s.trunnion[1], trunnion.radius, trunnion.z),

@@ -11,7 +11,7 @@
   },
   // The sensor window across the face.
   window: { low: 3.5, high: 3.78, half: 0.75 },
-  legZ: 1.48,
+  legZ: 1.54,
   hip: [0, 3.35],
   knee: [0.8, 2.4],
   ankle: [-0.55, 1.15],
