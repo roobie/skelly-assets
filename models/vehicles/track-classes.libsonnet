@@ -23,9 +23,8 @@ local steel = 'steel-spall-black';
     idler: { id: 'track_idler_crawler', massKg: 60, radius: 0.32, width: 0.2, gap: 0, tyre: 0, hub: { radius: 0.14, stub: 0.05 }, finish: { wheel: 'paint-charcoal', hub: 'steel-grey' } },
     roller: { id: 'track_roller_crawler', massKg: 17, radius: 0.08, width: 0.3, gap: 0, tyre: 0, hub: { radius: 0.04, stub: 0.02 }, finish: { wheel: 'steel-grey', hub: 'steel-grey' } },
   },
-  // A 20-tonne crawler dozer's: deeper, wider single-grouser shoes on a heavier chain than an excavator's, since the
-  // dozer pushes on its tracks rather than sitting on them. The 203 mm pitch and 560 mm shoe are a D6-class machine's;
-  // the part masses are estimates for their drawn steel.
+  // A mid-size crawler dozer's: deeper, wider single-grouser shoes on a heavier chain than an excavator's, since the
+  // dozer pushes on its tracks rather than sitting on them.
   crawler_heavy: {
     link: { id: 'track_shoe_crawler_heavy', massKg: 45, pitch: 0.203, width: 0.56, thickness: 0.1, lug: { length: 0.04, height: 0.06 }, finish: { shoe: steel } },
     sprocket: { id: 'track_sprocket_crawler_heavy', massKg: 300, radius: 0.42, width: 0.24, gap: 0, tyre: 0, hub: { radius: 0.16, stub: 0.05 }, finish: { wheel: steel, hub: 'steel-grey' } },
