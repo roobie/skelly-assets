@@ -20,7 +20,7 @@ local track = import 'track-kit.libsonnet';
     site.one('beacon', 'beacon_amber', [-1.1, s.roofTop, -0.55]),
   ]
   + [site.one('ripper_shank_' + i, 'bulldozer_ripper_shank', [0, 0, (i - 1) * 0.85]) for i in std.range(0, 2)]
-  + track.pair('bulldozer_track', [0, 0, s.trackZ], 'fused')
+  + track.pair('bulldozer_track', [0, 0, s.trackZ], 'assembly')
   + site.pair('final_drive', 'bulldozer_final_drive')
   + site.pair('engine_panel', 'bulldozer_engine_panel')
   + site.pair('cab_door', 'bulldozer_cab_door')
