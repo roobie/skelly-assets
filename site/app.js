@@ -77,6 +77,7 @@ const seen = new IntersectionObserver((entries) => {
 // ---- grid and filters ----
 
 let entries = []; // vehicles, then models
+const byId = new Map();
 let shown = [];
 let taxonomy = { categories: {}, facets: {} };
 // Vocabulary terms are kebab-case, so these capitalised shelf keys never collide with a category.
@@ -100,12 +101,24 @@ function renderShelves() {
     const b = document.createElement('button');
     b.className = 'chip';
     b.type = 'button';
+    b.dataset.shelf = name;
     b.title = taxonomy.categories[name] ?? shelfTitles[name] ?? '';
     b.setAttribute('aria-pressed', String(name === shelf));
     b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
-    b.onclick = () => { shelf = name; renderShelves(); applyFilter(); };
+    b.onclick = () => pickShelf(name);
     return b;
   }));
+}
+
+// Pressing a chip in place keeps keyboard focus on it and keeps a scrolled chip row where it is.
+function pickShelf(name) {
+  shelf = name;
+  for (const b of $('shelves').children) {
+    const pressed = b.dataset.shelf === name;
+    b.setAttribute('aria-pressed', String(pressed));
+    if (pressed) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  applyFilter();
 }
 
 // One select per facet that any model uses, listing the terms in use.
@@ -168,6 +181,7 @@ function applyFilter() {
   shown = entries.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
   $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
   $('count').textContent = `${shown.length} of ${entries.length} models`;
+  $('facets-toggle').textContent = picked.size ? `Tags (${picked.size})` : 'Tags';
 }
 
 // ---- viewer ----
@@ -206,6 +220,10 @@ function initViewer() {
   $('v-close').onclick = () => $('viewer').close();
   $('viewer').addEventListener('close', () => { if (location.hash) history.replaceState(null, '', location.pathname + location.search); });
   $('viewer').addEventListener('click', (e) => { if (e.target === $('viewer')) $('viewer').close(); });
+  $('v-meta').addEventListener('toggle', () => {
+    if ($('v-meta').open) $('v-meta').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    showMeta();
+  });
   $('v-prev').onclick = () => step(-1);
   $('v-next').onclick = () => step(1);
   document.addEventListener('keydown', (e) => {
@@ -277,6 +295,7 @@ async function openViewer(model) {
   $('v-pose').href = `pose.html?${new URLSearchParams({ wear: model.id })}`;
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
+  showMeta();
   $('v-clips').replaceChildren();
   $('v-clips').setAttribute('aria-label', comesApart(model) || isWearable(model) ? 'View' : 'Clip');
 
@@ -301,6 +320,7 @@ async function openViewer(model) {
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
+    ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
@@ -358,6 +378,120 @@ const viewChips = (views, pick) => views.map(([view, text], i) => {
   return b;
 });
 
+// ---- metadata ----
+
+// The manifest and the models' sidecars, as the built tree holds them, fetched once the metadata panel is open. A
+// failed fetch is forgotten, so opening the panel again retries it.
+const fetched = new Map();
+function builtJson(path) {
+  if (!fetched.has(path)) {
+    fetched.set(path, fetch(`built/${path}`).then((r) => {
+      if (!r.ok) throw new Error(`${path}: ${r.status} ${r.statusText}`);
+      return r.json();
+    }).catch((err) => {
+      fetched.delete(path);
+      throw err;
+    }));
+  }
+  return fetched.get(path);
+}
+
+// The unit follows the mass as the finer unit rounds it, so a mass just short of a boundary never reads as 1000 of
+// the finer unit.
+function kg(n) {
+  const grams = Math.round(n * 1000);
+  if (grams < 1000) return `${grams} g`;
+  const kilos = Math.round(grams / 10) / 100;
+  return kilos < 1000 ? `${kilos} kg` : `${(kilos / 1000).toFixed(2)} t`;
+}
+
+function breakable(text) {
+  const fragment = document.createDocumentFragment();
+  for (const [i, piece] of text.split(/(?<=[_-])/).entries()) fragment.append(...(i ? [document.createElement('wbr')] : []), piece);
+  return fragment;
+}
+
+// A model id names another model, which the viewer opens in this one's place; anything else is its own text.
+function modelRef(id) {
+  const target = typeof id === 'string' && byId.get(id);
+  if (!target || target === viewer.model) return breakable(id ?? '');
+  const a = Object.assign(document.createElement('a'), { href: `#${id}` });
+  a.append(breakable(id));
+  a.onclick = (e) => { e.preventDefault(); openViewer(target); };
+  return a;
+}
+
+const isScalar = (v) => v === null || typeof v !== 'object';
+const scalar = (v) => (typeof v === 'number' ? String(Math.abs(v) < 1e-9 ? 0 : Number(v.toPrecision(4))) : String(v));
+function tree(record) {
+  const dl = document.createElement('dl');
+  dl.className = 'tree';
+  for (const [key, value] of Object.entries(record)) {
+    if (isScalar(value) || (Array.isArray(value) && value.every(isScalar))) {
+      dl.append(
+        Object.assign(document.createElement('dt'), { textContent: key }),
+        Object.assign(document.createElement('dd'), { textContent: [value].flat().map(scalar).join(', ') }),
+      );
+      continue;
+    }
+    const fold = document.createElement('details');
+    fold.open = JSON.stringify(value).length < 80;
+    const size = Object.keys(value).length;
+    fold.append(Object.assign(document.createElement('summary'), { textContent: `${key} (${size} ${Array.isArray(value) ? 'items' : 'fields'})` }), tree(value));
+    dl.append(Object.assign(document.createElement('dd'), { className: 'nested' }));
+    dl.lastChild.append(fold);
+  }
+  return dl;
+}
+
+function record(title, data) {
+  const fold = document.createElement('details');
+  fold.className = 'record';
+  fold.append(Object.assign(document.createElement('summary'), { textContent: title }), tree(data));
+  return fold;
+}
+
+function partRows(model, sidecar) {
+  if (isVehicle(model)) return model.sites.map(({ site, model: id }) => [site, id, byId.get(id)?.massKg]);
+  return Object.entries(sidecar?.parts ?? {}).map(([name, { item, massKg }]) => [name, item, massKg]);
+}
+
+async function showMeta() {
+  const model = viewer.model;
+  $('v-parts').hidden = true;
+  $('v-records').replaceChildren();
+  if (!$('v-meta').open) return;
+  $('v-records').textContent = 'Loading…';
+  const file = isVehicle(model) ? model.placements : model.sidecar;
+  let manifest;
+  let sidecar;
+  try {
+    [manifest, sidecar] = await Promise.all([builtJson('manifest.json'), file && builtJson(file)]);
+  } catch (err) {
+    if (viewer.model === model) $('v-records').textContent = `The metadata did not load (${err.message}).`;
+    return;
+  }
+  if (viewer.model !== model) return; // a later pick overtook this load
+
+  const rows = partRows(model, sidecar);
+  $('v-parts').tBodies[0].replaceChildren(...rows.map(([name, id, massKg]) => {
+    const tr = document.createElement('tr');
+    tr.append(...[breakable(name), modelRef(id), massKg === undefined ? '' : kg(massKg)].map((cell, i) => {
+      const td = document.createElement('td');
+      if (i === 2) td.className = 'num';
+      td.append(cell);
+      return td;
+    }));
+    return tr;
+  }));
+  $('v-parts').hidden = rows.length === 0;
+  const entry = [...manifest.models, ...manifest.vehicles].find(({ id }) => id === model.id);
+  $('v-records').replaceChildren(
+    ...(entry ? [record('manifest.json', entry)] : []),
+    ...(sidecar ? [record(file.split('/').pop(), sidecar)] : []),
+  );
+}
+
 // ---- start ----
 
 async function main() {
@@ -375,11 +509,16 @@ async function main() {
   taxonomy = vocabulary;
   registerModels(models);
   entries = [...vehicles, ...models];
+  for (const m of entries) byId.set(m.id, m);
   for (const m of entries) cards.set(m.id, makeCard(m));
   renderShelves();
   renderFacets();
   applyFilter();
   $('search').addEventListener('input', applyFilter);
+  $('facets-toggle').onclick = () => {
+    const open = $('facets-toggle').getAttribute('aria-expanded') !== 'true';
+    $('facets-toggle').setAttribute('aria-expanded', String(open));
+  };
   const fromHash = entries.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
   if (fromHash) openViewer(fromHash);
 }

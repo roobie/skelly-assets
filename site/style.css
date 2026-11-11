@@ -71,6 +71,13 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
   color: var(--text); font: inherit; font-size: 13px; padding: 6px 10px; cursor: pointer;
 }
 .count { margin-left: auto; color: var(--muted); font-size: 13px; }
+.facets-toggle {
+  display: none;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: 13px; padding: 8px 14px; cursor: pointer;
+}
+.facets-toggle::after { content: " ▾"; color: var(--muted); }
+.facets-toggle[aria-expanded="true"]::after { content: " ▴"; }
 
 .grid {
   display: grid; gap: 14px;
@@ -125,15 +132,51 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 .button.ghost { background: transparent; color: var(--text); border-color: var(--line); }
 .button[hidden] { display: none; }
 
+.metadata { margin-top: 12px; font-size: 13px; }
+.metadata summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 6px; }
+.metadata > summary {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600;
+  min-height: 44px;
+}
+.metadata summary::marker { content: ""; }
+.metadata summary::before { content: "▸"; color: var(--muted); }
+.metadata details[open] > summary::before, .metadata[open] > summary::before { content: "▾"; }
+.parts { width: 100%; border-collapse: collapse; margin: 4px 0 12px; font-variant-numeric: tabular-nums; }
+.parts[hidden] { display: none; }
+.parts th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 4px 8px 4px 0; }
+.parts td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); overflow-wrap: break-word; vertical-align: top; }
+.parts .num { text-align: right; padding-right: 0; white-space: nowrap; }
+.parts a { display: inline-block; min-height: 24px; }
+.record > summary { font-family: ui-monospace, monospace; font-size: 12px; }
+.tree { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 2px 12px; margin: 2px 0 6px 14px; }
+.tree dt { color: var(--muted); }
+.tree dd { margin: 0; overflow-wrap: anywhere; }
+.tree dd.nested { grid-column: 1 / -1; }
+.tree summary { min-height: 24px; color: var(--muted); }
+
 .foot { color: var(--muted); font-size: 13px; padding-bottom: 40px; }
 .foot p { border-top: 1px solid var(--line); padding-top: 16px; margin: 0; max-width: 80ch; }
 
 @media (max-width: 760px) {
-  .top { flex-direction: column; align-items: flex-start; padding-top: 24px; }
+  .top { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 16px; padding-bottom: 8px; }
   .top, .controls, .grid, .foot { padding-left: 16px; padding-right: 16px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .count { margin-left: 0; width: 100%; }
-  #search { flex-basis: 100%; }
+  .top h1 { font-size: 22px; }
+  .top p { margin-top: 4px; font-size: 13px; }
+  /* A phone shows the grid under one row of controls: the categories scroll sideways and the tags fold away. */
+  .controls { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  #search { flex: 1 1 0; min-height: 44px; }
+  .facets-toggle { display: block; min-height: 44px; }
+  .chips {
+    flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -16px; padding: 0 16px; scroll-padding: 0 16px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; min-height: 40px; }
+  .facets { flex: 1 1 100%; }
+  .facets-toggle[aria-expanded="false"] ~ .facets { display: none; }
+  .facet { flex: 1 1 calc(50% - 3px); min-height: 40px; }
+  .count { margin-left: 0; width: 100%; font-size: 12px; }
   .viewer { grid-template-columns: 1fr; grid-template-rows: 55% 45%; }
   .info { border-left: 0; border-top: 1px solid var(--line); }
 }
