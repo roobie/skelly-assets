@@ -149,10 +149,10 @@ local can(damage) =
     exportMass: 'parts',
     voxelGrain: 0.006,
     parts: [
-      h.part('body', m.mass.body, body, { wall: 'steel-galvanised', rim: 'steel-galvanised', handle: 'steel-galvanised' }, [
+      h.part('body', 'compound', m.mass.body, { pieces: body }, { wall: 'steel-galvanised', rim: 'steel-galvanised', handle: 'steel-galvanised' }, [
         h.port('lid', 'female', [atTop[0] + pivot[0], m.height, atTop[1] + pivot[2]], turn([0, 1, 0]), turn([1, 0, 0])),
       ]),
-      h.part('lid', m.mass.lid, lidPieces, { lid: 'steel-galvanised', handle: 'steel-galvanised' }, [
+      h.part('lid', 'compound', m.mass.lid, { pieces: lidPieces }, { lid: 'steel-galvanised', handle: 'steel-galvanised' }, [
         h.port('body', 'male', pivot, [0, -1, 0]),
       ]),
     ],

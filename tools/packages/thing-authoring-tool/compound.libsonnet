@@ -1,19 +1,15 @@
 // Row helpers shared by catalogue batches, so each batch file holds only its own rows.
 local poses = import 'models/measures/handling.libsonnet';
 local params(values) = { [key]: if std.type(values[key]) == 'array' then std.manifestJsonMinified(values[key]) else std.toString(values[key]) for key in std.objectFields(values) };
-local item(id, family, massKg, dimensions, finish) = {
-  id: id,
-  exportMass: 'parts',
-  parts: [{ id: id, family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] }],
-  connections: [],
-};
+// One part of a row, met to the others at its `ports`, such as a lamp's reservoir or the lid that comes off a can.
+local part(id, family, massKg, dimensions, finish, ports=[]) = { id: id, family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: ports };
+local item(id, family, massKg, dimensions, finish) = { id: id, exportMass: 'parts', parts: [part(id, family, massKg, dimensions, finish)], connections: [] };
 // A cylinder along x from `x0` to `x1`, its axis at height `y`.
 local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', axis: 'x', profile: [[0, 0], [0, radius], [x1 - x0, radius], [x1 - x0, 0]], origin: [x0, y, 0] };
 {
   item: item,
+  part: part,
   compound(id, massKg, pieces, finish): item(id, 'compound', massKg, { pieces: pieces }, finish),
-  // One compound part of an item made of several, such as a can and the lid that comes off it, met at its `ports`.
-  part(id, massKg, pieces, finish, ports): { id: id, family: 'compound', massKg: massKg, params: params({ pieces: pieces }), finish: finish, ports: ports },
   // Where two parts meet: `normal` points out of the part and `up` sets the roll. A host port turned off the
   // vertical tips the part fitted to it, so a lid can sit askew without its own pieces turning.
   port(id, gender, pos, normal, up=[1, 0, 0]): { id: id, mount: 'assembly-joint', gender: gender, pos: pos, normal: normal, up: up, required: true },
