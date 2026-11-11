@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 6 },
+  "rig": { "id": "doll", "revision": 7 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
@@ -9,7 +9,10 @@
     "neck": [33.7746, -6.193, 12],
     "head": [25.331, -4.6447, 8]
   },
-  "hands": { "hand.L": { "curl": 0.1, "thumb": { "across": 0.2, "lift": 0.2, "oppose": 0.4 } } },
+  "hands": {
+    "hand.R": "grip",
+    "hand.L": { "curl": 0.1, "thumb": { "across": 0.2, "lift": 0.2, "oppose": 0.4 } }
+  },
   "hold": {
     "hand.R": {
       "model": "rifle_assault",

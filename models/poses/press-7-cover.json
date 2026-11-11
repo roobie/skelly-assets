@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 6 },
+  "rig": { "id": "doll", "revision": 7 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
@@ -10,6 +10,7 @@
     "head": [25.331, -4.6447, 8]
   },
   "hands": {
+    "hand.R": "grip",
     "hand.L": {
       "curl": { "little": 0.9, "middle": 0.8, "ring": 0.9 },
       "thumb": { "across": 0.4, "lift": 0.3, "oppose": 0.6 }

@@ -41,8 +41,9 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
   // The butt pad's middle, pressed into the pocket: a point in the torso's frame, from the right shoulder joint.
   butt: [0, -0.02, -0.38],
   pocket: [0.06, -0.11, 0.04],
-  // The right palm on the pistol grip; each frame gives the elbow's pole.
-  grip: { socket: { at: [-0.016, -0.09, -0.164], into: [0.781, 0.188, -0.596], axis: [0, 0.95, 0.3] } },
+  // The right palm on the pistol grip in a power grip, so the thumb closes down the grip's left side rather than
+  // lying where the hand at rest leaves it, across the grip's back; each frame gives the elbow's pole.
+  grip: { socket: { at: [-0.016, -0.09, -0.164], into: [0.781, 0.188, -0.596], axis: [0, 0.95, 0.3] }, hands: 'grip' },
   frames: {
     'press-1-fire': ready,
     'press-2-turned': turned { left: support },

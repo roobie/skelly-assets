@@ -97,7 +97,7 @@ export function pressCheckPoses(rig, check, strokes) {
       ground: true,
       level: ['foot.R', 'foot.L'],
       angles: { ...check.stance, ...lookAt(inWorld(rifle, look), tilt) },
-      hands: { 'hand.L': left.hands },
+      hands: { 'hand.R': check.grip.hands, 'hand.L': left.hands },
       hold: { 'hand.R': { ...held, pole: gripPole, socket: check.grip.socket } },
     };
     const { socket, grip, beneath, pole, pinch, close } = left.hold;
