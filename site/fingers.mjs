@@ -8,9 +8,10 @@ import { posedSolid, signedDepth } from './clearance.mjs';
 
 const HAND_KEYS = new Set(['preset', 'curl', 'spread', 'thumb']);
 const THUMB_KEYS = new Set(['across', 'oppose', 'lift', 'curl']);
-const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'grip', 'close', 'pole', 'pinch']);
+const HOLD_KEYS = new Set(['model', 'at', 'turn', 'socket', 'grip', 'slant', 'close', 'pole', 'pinch']);
 const SOCKET_KEYS = new Set(['at', 'into', 'axis']);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+const isSlant = (degrees) => degrees >= -90 && degrees <= 90;
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
 const isShare = (v) => Number.isFinite(v) && v >= -1 && v <= 1;
 const boneById = (rig) => new Map(rig.bones.map((bone) => [bone.id, bone]));
@@ -216,25 +217,30 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
 // ---- holding ----
 
 /**
- * Every way a hold does not fit: `{ model, at?, turn?, pole?, socket: { at, into, axis }, grip?, pinch?, close? }`.
+ * Every way a hold does not fit: `{ model, at?, turn?, pole?, socket: { at, into, axis }, grip?, slant?, pinch?, close? }`.
  * The socket is on the item, in its own frame: `at` where the palm's face meets it, `into` the direction from the palm
  * into the item, `axis` along the grip, the way the thumb points. `grip` is where on the palm the socket sits, a share
- * of its length from the wrist, the hand's own (a power grip's) unless given. With `at` the item stands in the world
+ * of its length from the wrist, and `slant` how far in degrees its axis turns from square across the palm, its thumb
+ * end toward the fingers; each is the hand's own (a power grip's) unless given. With `at` the item stands in the world
  * and the arm reaches it, the elbow bending toward `pole` or the rig's own; without, the item follows the hand.
  * `pinch`, `{ <digit>: [x, y, z] }`, sets each named digit's pad on that point of the item, in its frame. `close`
  * false leaves the other digits as the pose has them.
  */
 export function holdIssues(rig, handId, hold) {
-  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, pole?, socket, grip?, pinch?, close? }`];
+  if (!isObject(hold)) return [`hold.${handId} is { model, at?, turn?, pole?, socket, grip?, slant?, pinch?, close? }`];
   const issues = [];
   const hand = boneById(rig).get(handId);
   if (!hand?.reach) issues.push(`hold.${handId}: ${handId} is not a reach bone`);
-  else if (!(hand.grip >= 0 && hand.grip <= 1)) issues.push(`hold.${handId}: ${handId} has no grip share in [0, 1]`);
+  else {
+    if (!(hand.grip >= 0 && hand.grip <= 1)) issues.push(`hold.${handId}: ${handId} has no grip share in [0, 1]`);
+    if (!isSlant(hand.gripSlant)) issues.push(`hold.${handId}: ${handId} has no grip slant in [-90, 90] degrees`);
+  }
   for (const key of Object.keys(hold)) if (!HOLD_KEYS.has(key)) issues.push(`hold.${handId}: unknown key ${key}`);
   if (typeof hold.model !== 'string') issues.push(`hold.${handId}.model names a model`);
   if (hold.at !== undefined && !isVector(hold.at)) issues.push(`hold.${handId}.at is a finite point [x, y, z]`);
   if (hold.turn !== undefined && !(Array.isArray(hold.turn) && hold.turn.length === 4 && hold.turn.every(Number.isFinite))) issues.push(`hold.${handId}.turn is a quaternion [x, y, z, w]`);
   if (hold.grip !== undefined && !(hold.grip >= 0 && hold.grip <= 1)) issues.push(`hold.${handId}.grip is a share in [0, 1]`);
+  if (hold.slant !== undefined && !isSlant(hold.slant)) issues.push(`hold.${handId}.slant is degrees in [-90, 90]`);
   if (hold.pole !== undefined && !isVector(hold.pole)) issues.push(`hold.${handId}.pole is a finite direction [x, y, z]`);
   if (!isObject(hold.socket)) issues.push(`hold.${handId}.socket is { at, into, axis }`);
   else {
@@ -264,12 +270,13 @@ const triad = (into, axis) => {
 };
 
 // The hand's own socket in rest doll axes: the palm's face where `grip`, a share of the palm's length from the wrist,
-// crosses it, the palm's normal and the thumb's direction along the knuckle row, read off the palm part's box and which
-// way the part faces.
-const palmSocket = (hand, grip) => {
+// crosses it, the palm's normal, and the thumb's direction across the palm turned `slant` degrees toward the fingers,
+// read off the palm part's box and which way the part faces.
+const palmSocket = (hand, grip, slant) => {
   const { min, max } = hand.bind.box;
   const sign = hand.bind.mirror ? -1 : 1;
-  return { at: [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, 0, 1] };
+  const a = slant * Math.PI / 180;
+  return { at: [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, -Math.sin(a), Math.cos(a)] };
 };
 
 // How far a rotation turns, in degrees.
@@ -328,7 +335,7 @@ function turnHand(rig, pose, hand, wanted, report) {
  */
 export function holdItem(rig, pose, handId, hold, report) {
   const hand = boneById(rig).get(handId);
-  const own = palmSocket(hand, hold.grip ?? hand.grip);
+  const own = palmSocket(hand, hold.grip ?? hand.grip, hold.slant ?? hand.gripSlant);
   const mate = mulMM(triad(hold.socket.into, hold.socket.axis), transpose(triad(own.into, own.axis)));
   if (hold.at === undefined) {
     const t = boneTransforms(rig.bones, pose).get(handId);

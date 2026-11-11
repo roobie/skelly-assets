@@ -9,7 +9,7 @@ import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core
 import { clearanceProbe, posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { add, applyPoint, boneTransforms, dot, length, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
-import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
+import { compilePose, decodeFrame, frameAngles } from '../../site/poseFile.mjs';
 import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
 import { modelTaxonomies } from '../check-taxonomy.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
@@ -144,7 +144,7 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test('the grip preset seats a haft in the wedge of palm and thumb, the finger roots on it and the thumb closing over it, on either hand', () => {
+test('the grip preset seats a haft in the wedge of palm and thumb, slanted so every finger wraps it from its root, the thumb closing over it, on either hand', () => {
   // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
   // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
@@ -176,16 +176,25 @@ test('the grip preset seats a haft in the wedge of palm and thumb, the finger ro
     const gap = (id) => Math.min(...lattice(bones.get(id).bind.box).map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
     const digits = rig.bones.filter((bone) => bone.digit && bone.id.endsWith(`.${side}`));
     for (const bone of digits) assert.ok(gap(bone.id) > -0.0015, `${bone.id} sinks ${(-gap(bone.id) * 1000).toFixed(1)} mm into the haft`);
-    // A closed fist has no daylight at the finger roots: each knuckle phalanx bears on the haft.
-    for (const bone of digits.filter((b) => b.spread !== undefined)) {
-      assert.ok(gap(bone.id) < 0.005, `${bone.id} stands ${(gap(bone.id) * 1000).toFixed(1)} mm off the haft`);
+    // A closed fist has no daylight in it: every phalanx of every finger, the little one's too, bears on the haft.
+    for (const bone of digits.filter((b) => b.digit !== 'thumb')) {
+      assert.ok(gap(bone.id) < 0.004, `${bone.id} stands ${(gap(bone.id) * 1000).toFixed(1)} mm off the haft`);
     }
+    // Slanted across the palm, the haft lies furthest from the index finger's root and nearest the little finger's, so
+    // the knuckles bend more toward the little finger, as a hand's do round a handle; held square, the little finger's
+    // knuckle bends least and the finger stands off the fist.
+    const angles = frameAngles(rig, frame);
+    const flex = (id) => Math.abs(angles[id][0]);
+    assert.ok(flex(`little.${side}`) >= flex(`index.${side}`), `the ${side} little finger's knuckle bends ${flex(`little.${side}`).toFixed(0)}°, less than the index's ${flex(`index.${side}`).toFixed(0)}°`);
+    // Away from the palm is the socket's `into`; a tip past the haft's middle that way has wrapped round it.
+    const beyond = (tip) => dot(sub(applyPoint(transforms.get(tip.id), padOf(tip)), item.t), mulMV(item.r, [1, 0, 0]));
+    // Every finger wraps the haft, the little one too, so none stands off a handle the others hold.
+    const tips = digits.filter((bone) => bone.digit !== 'thumb' && !digits.some((other) => other.parent === bone.id));
+    for (const tip of tips) assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
     assert.ok(gap(`thumb.${side}`) < 0.003, `the ${side} thumb's root bears on the haft, not ${(gap(`thumb.${side}`) * 1000).toFixed(1)} mm off it`);
-    // Away from the palm is the socket's `into`; the tip past the haft's middle that way has closed over it.
-    const tip = bones.get(`thumb3.${side}`);
-    const beyond = dot(sub(applyPoint(transforms.get(tip.id), padOf(tip)), item.t), mulMV(item.r, [1, 0, 0]));
-    assert.ok(beyond > 0, `the ${side} thumb closes over the haft's far side, not ${(beyond * 1000).toFixed(1)} mm short of its middle`);
+    const thumbTip = bones.get(`thumb3.${side}`);
+    assert.ok(beyond(thumbTip) > 0, `the ${side} thumb closes over the haft's far side, not ${(-beyond(thumbTip) * 1000).toFixed(1)} mm short of its middle`);
   }
 });
 

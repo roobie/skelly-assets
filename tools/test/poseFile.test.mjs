@@ -18,7 +18,7 @@ const rig = {
     bone('spine', 'pelvis', [0, 1.1, 0], [0, 1.5, 0], wide, { absorbs: ['chest'] }),
     bone('upper', 'spine', [0.2, 1.45, 0], [0.2, 1.15, 0], wide),
     bone('fore', 'upper', [0.2, 1.15, 0], [0.2, 0.9, 0], { flex: [0, 150], twist: [0, 0], abduct: [0, 0] }),
-    bone('hand', 'fore', [0.2, 0.9, 0], [0.2, 0.8, 0], wide, { reach: { chain: ['upper', 'fore'], pole: [0, 0, -1] }, grip: 0.9 }),
+    bone('hand', 'fore', [0.2, 0.9, 0], [0.2, 0.8, 0], wide, { reach: { chain: ['upper', 'fore'], pole: [0, 0, -1] }, grip: 0.9, gripSlant: 0 }),
   ],
 };
 const ours = { id: rig.id, revision: rig.revision };

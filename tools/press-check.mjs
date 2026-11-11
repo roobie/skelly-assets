@@ -98,9 +98,9 @@ export function pressCheckPoses(rig, check, strokes) {
       level: ['foot.R', 'foot.L'],
       angles: { ...check.stance, ...lookAt(inWorld(rifle, look), tilt) },
       hands: { 'hand.R': check.grip.hands, 'hand.L': left.hands },
-      hold: { 'hand.R': { ...held, pole: gripPole, socket: check.grip.socket } },
+      hold: { 'hand.R': { ...held, pole: gripPole, ...check.grip.hold } },
     };
-    const { socket, grip, beneath, pole, pinch, close } = left.hold;
+    const { socket, grip, slant, beneath, pole, pinch, close } = left.hold;
     const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
     const drawn = (p) => add(p, strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)));
     file.hold['hand.L'] = {
@@ -108,6 +108,7 @@ export function pressCheckPoses(rig, check, strokes) {
       pole,
       socket: { at: r4(drawn(mulMV(unroll, socket.at))), into: r4(mulMV(unroll, socket.into)), axis: r4(mulMV(unroll, socket.axis)) },
       ...(grip !== undefined ? { grip } : {}),
+      ...(slant !== undefined ? { slant } : {}),
       ...(pinch ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(drawn(p))])) } : {}),
       ...(close === false ? { close } : {}),
     };
