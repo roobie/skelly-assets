@@ -134,7 +134,7 @@ local anvilFinish = { body: 'iron-dull', face: 'steel-bright', hole: 'coal-black
     h.turned('shank', 'shank', 'x', [[0, 0], [0, 0.0095], [0.15, 0.0095], [0.15, 0]], [0.012, 0.0105, 0]),
     h.prism('wedge', 'shank', 'z', [[0.162, 0.001], [0.19, 0.0085], [0.19, 0.0125], [0.162, 0.02]], -0.0085, 0.0085),
     h.prism('edge', 'edge', 'z', [[0.19, 0.0085], [0.2, 0.01], [0.2, 0.011], [0.19, 0.0125]], -0.0085, 0.0085),
-  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + h.gripOn('chisel', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking', 'woodworking'], tags: { material: ['metal'] } } },
+  ], { head: 'steel-heat-tint', shank: 'steel-grey', edge: 'steel-bright' }) + h.gripOn('chisel', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
   // A crucible like a stout tumbler, 165 mm high and 135 mm across the rim, thick-walled, with a pouring lip and a
   // little dross on the floor.
   h.compound('crucible', 1, [

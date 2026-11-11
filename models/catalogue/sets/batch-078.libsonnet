@@ -224,5 +224,5 @@ local washboard(w, ht) =
     h.box('tie-r', 'cord', [0.038, 0.130, -0.014], [0.044, 0.210, 0.050]),
   ], { frame: 'wood-oak', board: 'wood-pine', rib: 'wood-birch', block: 'plastic-blue', bristle: 'plastic-white', cord: 'cord-cotton' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', keywords: ['cleaning', 'hygiene'], tags: { material: ['wood'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['wood'] } } },
 ]
