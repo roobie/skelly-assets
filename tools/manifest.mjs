@@ -1,8 +1,8 @@
 // manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names, label, what a worn
-// shell covers and credits, every vehicle's placements file and tags (tools/placements.mjs), and every pack's
-// dependencies (tools/packs.mjs) and produced files, every retired model id mapped to its current one
-// (models/renames.json), and the finish library a vehicle site names its paint from. tools/build.mjs writes it;
-// tools/check-built.mjs holds every fresh build to it.
+// shell covers, the authored mass and drawn volume of a model whose tool authors them, and credits, every vehicle's
+// placements file and tags (tools/placements.mjs), and every pack's dependencies (tools/packs.mjs) and produced files,
+// every retired model id mapped to its current one (models/renames.json), and the finish library a vehicle site names
+// its paint from. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -101,8 +101,8 @@ export function mobManifest(rows) {
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-// models: { id, kind, pack, path, taxonomy?, nodes?, label?, covers?, clips? }, paths logical under the pack; vehicles:
-// { id, pack, path, tags } of each vehicle's placements; dependsOn: pack -> the packs it depends on; files: every
+// models: { id, kind, pack, path, taxonomy?, nodes?, label?, covers?, clips?, massKg?, volumeM3? }, paths logical under
+// the pack; vehicles: { id, pack, path, tags } of each vehicle's placements; dependsOn: pack -> the packs it depends on; files: every
 // produced file as <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id;
 // finishes: finish id -> its glTF material.
 export function buildManifest({ models, vehicles = [], dependsOn = {}, files, credit, renames = {}, finishes = {} }) {
@@ -134,6 +134,7 @@ export function buildManifest({ models, vehicles = [], dependsOn = {}, files, cr
       ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
       ...(model.label === undefined ? {} : { label: model.label }),
       ...(model.covers === undefined ? {} : { covers: [...model.covers] }),
+      ...(model.massKg === undefined ? {} : { massKg: model.massKg, volumeM3: model.volumeM3 }),
       ...(model.clips === undefined ? {} : { clips: model.clips }),
       ...(model.body === undefined ? {} : { body: model.body }),
       credits: credit(`built/${file}`),
@@ -150,7 +151,7 @@ export function buildManifest({ models, vehicles = [], dependsOn = {}, files, cr
   const stale = renameProblems(renames, models);
   if (stale.length) throw new Error(`${RENAMES}: ${stale.join('; ')}`);
   return {
-    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. covers: on a worn shell, the doll parts, or pieces of the part it is drawn on (a GLB primitive\'s extras.piece), that a consumer stops drawing while it is worn, so skin under the shell never shows through. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle\'s pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body\'s tags with its own added. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.',
+    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg and volumeM3: a catalogue model\'s authored mass and the volume of the voxels it is drawn with, in cubic metres, from which a density follows; a model whose tool does not author its mass has neither. covers: on a worn shell, the doll parts, or pieces of the part it is drawn on (a GLB primitive\'s extras.piece), that a consumer stops drawing while it is worn, so skin under the shell never shows through. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle\'s pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body\'s tags with its own added. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
     vehicles: vehicleEntries,

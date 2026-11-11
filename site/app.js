@@ -14,6 +14,7 @@ const nameOf = (id) => {
   const s = id.replace(/_/g, ' ');
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
+const massText = (kg) => `${kg.toLocaleString('en', { maximumSignificantDigits: 3 })} kg`;
 const kb = (n) => (n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
 
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
@@ -297,17 +298,21 @@ async function openViewer(model) {
   viewer.controls.update();
 
   const size = box.getSize(new THREE.Vector3());
+  const shelfKey = shelfOf(model);
   const facts = [
+    ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
+    ...(model.massKg === undefined ? [] : [['Mass', massText(model.massKg)]]),
+    ...(model.massKg > 0 && model.volumeM3 > 0 ? [['Density', `${Math.round(model.massKg / model.volumeM3).toLocaleString('en')} kg/m³`]] : []),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
   ];
   if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
-  $('v-facts').replaceChildren(...facts.flatMap(([k, v]) => [
-    Object.assign(document.createElement('dt'), { textContent: k }),
+  $('v-facts').replaceChildren(...facts.flatMap(([k, v, title = '']) => [
+    Object.assign(document.createElement('dt'), { textContent: k, title }),
     Object.assign(document.createElement('dd'), { textContent: v }),
   ]));
 

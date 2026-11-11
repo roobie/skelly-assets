@@ -234,6 +234,13 @@ it('omits runtime part masses only when inventory-atom export is authored', () =
   expect(atom.glb).toEqual(assembly.glb);
   expect(atom.physical).toEqual(assembly.physical);
 });
+it('reports the authored mass and a positive drawn volume, which the showcase turns into a density', () => {
+  const input = fixture();
+  const loaded = loadCatalogue(input);
+  const { physical } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  expect(physical.massKg).toBe(loaded.items[0]!.parts.reduce((sum, part) => sum + part.massKg, 0));
+  expect(physical.volumeM3).toBeGreaterThan(0);
+});
 it('refuses recipe mass ownership that differs from the authored item', () => {
   const item = catalogue.items[0]!;
   expect(() =>
