@@ -11,6 +11,8 @@
   headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
   // How far the hair lies off the skull, and the exponent of the plan superellipse the face, skull and hair share.
   hairThickness: 0.005, facePower: 2.8,
+  // How far back the hair's dome sits on the skull, so the crown's hair lies thicker behind than over the brow.
+  hairSweep: 0.004,
   // How far the head's attachment frame sits above the top of the neck, about mid-skull. Hidden, as no body part
   // takes it.
   headFrameRise:: 0.0804,

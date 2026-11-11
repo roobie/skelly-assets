@@ -1,5 +1,5 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { parse, picklist, strictObject } from 'valibot';
+import { array, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
 import { block, dome, oval, ovalCut } from './body.ts';
 import { positive, spheroid } from './shapes.ts';
 
@@ -11,9 +11,9 @@ const region = <T extends ExtrudedPolygonSolid | BoxSolid | RevolvedSolid>(piece
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
-// neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit, except
-// the head's: the hair lies `hairThickness` off the skull on a superellipse of exponent `facePower`, and the straps of
-// head gear are fitted to that plan (models/head-band.libsonnet), so those two measures move them.
+// neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit. Head
+// gear straps are fitted to the ring of hair drawn just above the hairline, which models/head-band.libsonnet lays out
+// on the head's voxel lattice and passes here as `hairRing`.
 // The head segment is drawn about the neck's top, the joint it turns about. The model's anchors name solids here, so
 // a joint follows the solid that seats its limb.
 export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
@@ -51,6 +51,12 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       hairCover: positive,
       hairThickness: positive,
       facePower: positive,
+      hairSweep: positive,
+      hairRing: pipe(
+        string(),
+        transform((text): unknown => JSON.parse(text)),
+        strictObject({ bottom: number(), top: number(), rows: array(tuple([number(), number(), number()])) }),
+      ),
     }),
     params,
   );
@@ -175,7 +181,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const pelt = { halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, power: facePower };
   const hairBack = -halfZ + d.hairCover * 0.9;
   const hair = [
-    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: facePower }),
+    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -d.hairSweep }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: facePower }),
     ovalCut('back-hair', 'hair', ys(brow + 0.03, hairLine + 0.01), pelt, { z: [undefined, hairBack] }),
     ovalCut('nape-hair', 'hair', ys(brow - 0.005, brow + 0.035), { ...pelt, halfX: halfX * 0.82 }, { z: [undefined, -halfZ + 0.03] }),
     ovalCut('side-hair-left', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [halfX - 0.004, undefined], z: [hairBack, 0.025] }),
@@ -183,6 +189,9 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
     // The fringe sweeps: lower and fuller on the figure's left, lifted on the right.
     ovalCut('fringe-left', 'hair', ys(hairLine - 0.012, hairLine + 0.02), pelt, { x: [-0.01, undefined], z: [halfZ - 0.03, undefined] }),
     ovalCut('fringe-right', 'hair', ys(hairLine + 0.004, hairLine + 0.02), pelt, { x: [undefined, 0], z: [halfZ - 0.03, undefined] }),
+    ...d.hairRing.rows.map(([back, front, half], i) =>
+      block(`hair-ring-${i}`, 'hair', [-half, half], ys(d.hairRing.bottom, d.hairRing.top), [back, front]),
+    ),
   ];
   // The lips lie on the jaw's front, which sits back from the brow's.
   const mouthZ = halfZ * 0.88 - halfZ * 0.04;

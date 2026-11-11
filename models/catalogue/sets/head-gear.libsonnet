@@ -85,17 +85,9 @@ local g = {
   tubeFront: 0.178,
   lensDepth: 0.004,
   strapWall: 0.004,
+  voxelGrain: 0.002,
 };
-local strapPlan = band.outlines(g.strapWall);
-local strapHeight = band.height(band.wornAt.night_vision_goggles);
-local goggleStrap = [
-  {
-    id: 'strap_%d' % i, kind: 'prism', slot: 'strap', axis: 'y',
-    profile: [strapPlan.inner[i], strapPlan.outer[i], strapPlan.outer[(i + 1) % std.length(strapPlan.inner)], strapPlan.inner[(i + 1) % std.length(strapPlan.inner)]],
-    start: strapHeight.bottom, end: strapHeight.top,
-  }
-  for i in std.range(0, std.length(strapPlan.inner) - 1)
-];
+local goggleStrap = band.strap('night_vision_goggles', g.voxelGrain, g.strapWall);
 local optic(side) = [
   turned('tube_%s' % side, 'body', 'z', disc(g.tubeRadius, g.tubeFront - g.tubeBack),
          [if side == 'left' then g.eyeSpacing / 2 else -g.eyeSpacing / 2, 0, g.tubeBack]),
@@ -122,10 +114,10 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
   {
     id: 'night_vision_goggles',
     exportMass: 'parts',
-    voxelGrain: 0.002,
+    voxelGrain: g.voxelGrain,
     parts: [{
       id: 'goggles', family: 'compound', massKg: 0.55,
-      params: params({ pieces: goggleStrap + optic('left') + optic('right') + [
+      params: params({ pieces: [box(piece.id, 'strap', piece.min, piece.max) for piece in goggleStrap.pieces] + optic('left') + optic('right') + [
         box('bridge', 'body', [-0.064, 0.014, 0.103], [0.064, 0.034, 0.125]),
       ] }),
       finish: { body: 'polymer-od-green', strap: 'rubber-black', lens: 'glass-lens-green' },
@@ -140,14 +132,6 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
       lens_right: goggleAnchor('lens_right', [0.5, 0.5, 1]),
       lens_left_edge: goggleAnchor('lens_left', [1, 0.5, 1]),
       lens_right_edge: goggleAnchor('lens_right', [1, 0.5, 1]),
-      strap_left_inner: goggleAnchor('strap_%d' % band.edges.left, [0, 0.5, 0.5]),
-      strap_left_outer: goggleAnchor('strap_%d' % band.edges.left, [1, 0.5, 0.5]),
-      strap_right_inner: goggleAnchor('strap_%d' % band.edges.right, [1, 0.5, 0.5]),
-      strap_right_outer: goggleAnchor('strap_%d' % band.edges.right, [0, 0.5, 0.5]),
-      strap_front_inner: goggleAnchor('strap_%d' % band.edges.front, [0.5, 0.5, 0]),
-      strap_front_outer: goggleAnchor('strap_%d' % band.edges.front, [0.5, 0.5, 1]),
-      strap_back_inner: goggleAnchor('strap_%d' % band.edges.back, [0.5, 0.5, 1]),
-      strap_back_outer: goggleAnchor('strap_%d' % band.edges.back, [0.5, 0.5, 0]),
-    },
+    } + { [name]: { part: 'goggles' } + goggleStrap.anchors[name] for name in std.objectFields(goggleStrap.anchors) },
   } + { taxonomy: { category: 'electrical', tags: { slot: ['face'] } } },
 ]

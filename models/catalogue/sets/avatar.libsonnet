@@ -28,11 +28,12 @@ local legSegment(id, massKg, finish, ports) = {
 };
 local foot = { skin: skin };
 local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
 local bustSegment(id, massKg, finish, ports) = {
   id: id,
   family: 'bust',
   massKg: massKg,
-  params: params(bust { segment: id }),
+  params: params(bust { segment: id, hairRing: band.hairRing }),
   finish: finish,
   ports: ports,
 };

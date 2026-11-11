@@ -74,16 +74,16 @@ export function subdivided(mesh, pitch = PITCH) {
   return out;
 }
 
-// A mesh's surface as the probe samples it: its subdivided triangles, each as { corners, point, normal }, sampled at
-// its centroid with its outward normal. A centroid lies inside one face, so a step off it along that normal leaves
+// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal },
+// sampled at its centroid with its outward normal. A centroid lies inside one face, so a step off it along that normal leaves
 // the face's plane, where a corner's step along one of its faces could run along a plane another face lies in. A
 // mirrored copy's faces are turned inside out, which its negative volume shows.
-function sampledSurface(mesh) {
+export function sampledSurface(mesh, pitch = PITCH) {
   const faces = triangles(mesh);
   const outward = faces.reduce((sum, [a, b, c]) => sum + dot(a, cross(b, c)), 0) < 0 ? -1 : 1;
   return faces.flatMap((face) => {
     const normal = scale(normalize(cross(sub(face[1], face[0]), sub(face[2], face[0]))), outward);
-    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }).map((corners) => ({ corners, point: centroid(corners), normal }));
+    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal }));
   });
 }
 
@@ -220,7 +220,7 @@ function depthOutside(solids, p) {
 // A step off a face along its normal, past a coincident face: where the step lands tells whether the face is on the
 // figure's outside, where it shows, or on a face inside it, where the shells a part or a piece is built from overlap
 // or one part meets the next.
-const STEP = 2 * COINCIDENT;
+export const STEP = 2 * COINCIDENT;
 
 // Whether `p` lies outside every one of the solids.
 const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = local(p); return boxDistance(tree.bounds, q) > 0 || winding(tree, q) === 0; });
@@ -325,12 +325,11 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
 }
 
 /**
- * Where a ray from `p` along the unit vector `dir` first meets a closed mesh: `{ inside: true }` when `p` lies in it
- * deeper than a coincident face, otherwise `{ inside: false, distance }` to the first face beyond a coincident one,
- * Infinity when the ray misses. It answers a gear piece's question, how far a point stands off the surface beneath it.
+ * A closed mesh as a gear check reads it: `depth(p)`, how far `p` lies outside it, negative inside, and `reach(p, dir)`,
+ * how far the ray from `p` along the unit vector `dir` runs before it meets the mesh beyond a coincident face, Infinity
+ * when it misses. They answer a gear piece's question, how far a point stands off the surface beneath it.
  */
-export function rayDistance(mesh, p, dir) {
+export function meshProbe(mesh) {
   const solid = carried(solidOf(mesh), STILL);
-  if (isInside(solid, p)) return { inside: true };
-  return { inside: false, distance: firstHit(solid.tree, p, dir, Infinity) };
+  return { depth: (p) => signedDepth(solid, p), reach: (p, dir) => firstHit(solid.tree, p, dir, Infinity) };
 }
