@@ -99,7 +99,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
   {
     id: 'riot_helmet',
     exportMass: 'parts',
-    taxonomy: { category: 'armour', tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
+    taxonomy: { category: 'armour', keywords: ['police'], tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
     parts: [{
       id: 'helmet',
       family: 'compound',

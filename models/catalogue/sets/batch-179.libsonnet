@@ -452,7 +452,7 @@ local steelFinish(steel) = { plate: steel, rim: steel, strap: 'leather-brown', b
   h.compound('riot_chest_guard', 1.2, riotChest(), {
     shell: 'plastic-matte-black', pad: 'plastic-charcoal', webbing: 'webbing-black', band: 'cloth-cream', strap: 'hook-loop-grey',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // Bronze scale armour, 660 mm across the shoulder flaps and 590 mm long.
   h.compound('bronze_scale_armour', 7.7, scaleArmour(), {
@@ -462,11 +462,11 @@ local steelFinish(steel) = { plate: steel, rim: steel, strap: 'leather-brown', b
 
   // Paper-block cuirass, 460 mm across and 630 mm long.
   h.compound('book_armour', 9.2, bookPlate(), { cover: 'paper-butcher', pages: 'paper-white', tape: 'tape-silver' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['torso'] } } },
 
   // Carpet cuirass folded at the shoulders, 540 mm across and 610 mm long.
   h.compound('carpet_cuirass', 2.5, carpetCuirass(), { carpet: 'carpet-pile', binding: 'cloth-brown', cord: 'cord-cotton', hole: 'plastic-charcoal' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // Hardened mail vest, 490 mm across and 630 mm long laid flat.
   h.compound('hardened_steel_mail_vest', 4.5, mailVest(), { mail: 'steel-mail-dark', ring: 'steel-mail', strap: 'leather-brown', buckle: 'steel' })

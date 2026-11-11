@@ -45,14 +45,14 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
   }, { handle: 'rubber-black', guard: 'steel-blued', blade: 'steel-blued' }) + held('kabar', 'handle', [0.407142857143, 0.5, 0.5], hold='forward', roll=0) + {
     anchors: { strike: datum('kabar', 'blade', [1, 0.5, 0.5]) },
     voxelGrain: 0.004,
-    taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['modern'] } },
+    taxonomy: { category: 'weapons', keywords: ['military'], tags: { weapon: ['blade'], material: ['metal'], setting: ['modern'] } },
   },
   melee('kitchen_knife', 'knife', 0.15, {
     back: 0.115, joinAt: 0.01, reach: 0.247, spine: 0.015, drop: 0.028, thickness: 0.006, handleRadius: 0.011, guardHalf: 0.016, guardDepth: 0.012,
   }, { handle: 'plastic-black', guard: 'steel-stainless', blade: 'steel-stainless' }) + held('kitchen_knife', 'handle', [0.491935483871, 0.5, 0.5], hold='forward', roll=0) + {
     voxelGrain: 0.004,
     anchors: { strike: datum('kitchen_knife', 'blade', [0.99625, 0.636363636364, 0.5]) },
-  } + { taxonomy: { category: 'household' } },
+  } + { taxonomy: { category: 'household', keywords: ['cooking'] } },
   melee('machete', 'knife', 0.55, {
     back: 0.274, joinAt: -0.15, reach: 0.245, spine: 0.02, drop: 0.05, thickness: 0.006, handleRadius: 0.014, guardHalf: 0.022, guardDepth: 0.014,
   }, { handle: 'wood-walnut', guard: 'steel-grey', blade: 'steel-grey' }) + held('machete', 'handle', [0.612903225806, 0.5, 0.5], hold='forward', roll=0) + {
@@ -87,14 +87,14 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
   local port(id, gender, pos, normal) = { id: id, mount: 'fuel-fill', gender: gender, pos: pos, normal: normal, up: [1, 0, 0], required: true };
   carrier + {
     voxelGrain: 0.002,
-    taxonomy: { category: 'lighting' },
+    taxonomy: { category: 'lighting', keywords: ['fire-starting'] },
     parts: [
       carrier.parts[0] + { ports: [port('fill', 'female', [0, 0.005, 0], [0, 1, 0])] },
       { id: 'fuel_fill', family: 'block', massKg: 0.001, params: params({ width: 0.014, height: 0.04, depth: 0.008 }), finish: { body: 'fuel-amber' }, ports: [port('base', 'male', [0, 0, 0], [0, -1, 0])] },
     ],
     connections: [{ from: 'lighter.fill', to: 'fuel_fill.base' }],
   },
-  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { taxonomy: { category: 'lighting' } },
+  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { taxonomy: { category: 'lighting', keywords: ['fire-starting'] } },
   key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey') + metalKey,
   key('pharmacy_key', 0.010, 0.011, 0.039, 'brass') + metalKey,
   key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized') + metalKey,

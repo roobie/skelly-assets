@@ -18,7 +18,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     prism('blade', 'blade', 'y', [[-0.055, 0.100], [0.055, 0.100], [0.015, 0.500], [-0.015, 0.500]], -0.002, 0.002),
   ], { handle: 'wood-walnut', blade: 'steel-grey' }) + gripOn('hand_saw', 'rear') + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', keywords: ['woodworking'] },
   },
   // A 150 mm shank with a 105 mm moulded handle, 0.255 m overall.
   compound('screwdriver', 0.160, [
@@ -54,11 +54,11 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     turned('lens', 'lens', 'x', [[0.125, 0], [0.125, 0.017], [0.130, 0.017], [0.130, 0]], [-0.060, 0.022, 0]),
     box('band-a', 'band', [-0.040, 0, -0.021], [-0.032, 0.041, 0.021]),
     box('band-b', 'band', [0.010, 0, -0.021], [0.018, 0.041, 0.021]),
-  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts' } },
+  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'] } },
   // A vertical grip: an 80 mm wood handle in a rubber sleeve under a clamp plate.
   compound('scrap_foregrip', 0.180, [
     box('plate', 'plate', [-0.025, 0.080, -0.025], [0.025, 0.086, 0.025]),
     turned('handle', 'handle', 'y', [[0, 0], [0, 0.018], [0.010, 0.022], [0.070, 0.022], [0.080, 0.018], [0.080, 0]]),
     turned('sleeve', 'sleeve', 'y', [[0.015, 0], [0.015, 0.0235], [0.065, 0.0235], [0.065, 0]]),
-  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts' } },
+  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'] } },
 ]

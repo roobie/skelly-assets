@@ -73,7 +73,7 @@ local poundRunes =
     for i in std.range(0, 5)
     for a in [[60, 100, 140, 220, 260, 300][i]]
   ], { metal: 'metal-platinum', gem: 'crystal-glow-violet', rune: 'crystal-glow-violet' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', keywords: ['jewellery'], tags: { material: ['metal'], setting: ['fantasy'], slot: ['hands'] } } },
 
   // A pair of fist guards laid flat, backs up, fingers to +z, 230 mm from cuff to knuckle bar and 100 mm across: thick
   // fingerless leather wraps, a curved steel plate riveted over each back, a heavy steel bar across the knuckles and a
