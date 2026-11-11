@@ -1,5 +1,6 @@
 local b = import 'packages/thing-authoring-tool/equipment.libsonnet';
 local equipment = b.equipment;
+local bust = import 'models/measures/bust.libsonnet';
 [
   equipment('blowtorch', 'blowtorch', 0.900, {
     radius: 0.026, bodyHeight: 0.115, footHeight: 0.008, neckRadius: 0.012,
@@ -7,8 +8,8 @@ local equipment = b.equipment;
     mouthLength: 0.020, mouthRadius: 0.013, valveRadius: 0.016,
   }, { body: 'plastic-blue', rubber: 'paint-charcoal', metal: 'steel-grey', control: 'plastic-red' }, 'body', [0, 0, 0]) + { taxonomy: { category: 'tools' } },
   equipment('headlamp', 'headlamp', 0.180, {
-    // The hair's square rear corners need a fitted contour, not a loose circular band.
-    strapHalfWidth: 0.093, strapFront: 0.103, strapBack: 0.105,
+    // The head's plan needs a fitted contour, not a loose circular band.
+    strapHalfWidth: bust.headBand.halfWidth, strapFront: bust.headBand.front, strapBack: bust.headBand.back,
     strapFrontChamfer: 0.025, strapBackChamfer: 0.002, strapWidth: 0.022, strapWall: 0.004,
     housingWidth: 0.060, housingHeight: 0.040, housingDepth: 0.030,
     lensRadius: 0.017, lensDepth: 0.005,

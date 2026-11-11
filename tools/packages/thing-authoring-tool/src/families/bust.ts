@@ -47,6 +47,9 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       headDepth: positive,
       jawHeight: positive,
       hairCover: positive,
+      /** How far the hair lies off the skull, and how far the nose bridge stands off the brow's front. */
+      hairThickness: positive,
+      noseBridge: positive,
     }),
     params,
   );
@@ -168,10 +171,10 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   ];
   // The hair below the dome lies on the skull a hair's breadth out, cut square at the hairline, nape and parting, so
   // it has no corners wider than the skull for a hat's foot to catch on.
-  const pelt = { halfX: halfX + 0.005, halfZ: halfZ + 0.005, power: facePower };
+  const pelt = { halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, power: facePower };
   const hairBack = -halfZ + d.hairCover * 0.9;
   const hair = [
-    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + 0.005, halfZ: halfZ + 0.005, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: 2.8 }),
+    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -0.004 }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: 2.8 }),
     ovalCut('back-hair', 'hair', ys(brow + 0.03, hairLine + 0.01), pelt, { z: [undefined, hairBack] }),
     ovalCut('nape-hair', 'hair', ys(brow - 0.005, brow + 0.035), { ...pelt, halfX: halfX * 0.82 }, { z: [undefined, -halfZ + 0.03] }),
     ovalCut('side-hair-left', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [halfX - 0.004, undefined], z: [hairBack, 0.025] }),
@@ -187,7 +190,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
     ...hair,
     ...eye(1),
     ...eye(-1),
-    block('nose-bridge', 'skin', [-0.008, 0.008], ys(eyeY - 0.034, eyeY + 0.004), [halfZ - 0.003, halfZ + 0.009]),
+    block('nose-bridge', 'skin', [-0.008, 0.008], ys(eyeY - 0.034, eyeY + 0.004), [halfZ - 0.003, halfZ + d.noseBridge]),
     block('nose', 'skin', [-0.013, 0.013], ys(eyeY - 0.05, eyeY - 0.03), [halfZ - 0.003, halfZ + 0.017]),
     block('mouth', 'mouth', [-halfX * 0.3, halfX * 0.3], ys(crown + d.jawHeight * 0.52, crown + d.jawHeight * 0.6), [mouthZ - 0.004, mouthZ + 0.002]),
   ];

@@ -1,5 +1,6 @@
 // Head gear in the worn frame: origin at the centre of deadvox's head region, y up, the face toward +z, the wearer's
 // left at +x. Clearances are measured against the player bust's head (`avatar.libsonnet`, `bust`).
+local bust = import 'models/measures/bust.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local turned(id, slot, axis, profile, origin) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
@@ -83,14 +84,14 @@ local g = {
   tubeBack: 0.102,
   tubeFront: 0.178,
   lensDepth: 0.004,
-  strapHalfWidth: 0.093,
-  strapFront: 0.103,
-  strapBack: 0.105,
+  strapHalfWidth: bust.headBand.halfWidth,
+  strapFront: bust.headBand.front,
+  strapBack: bust.headBand.back,
   strapWall: 0.004,
   strapBottom: 0.026,
   strapTop: 0.048,
 };
-// Hair makes the rear corners square; a circular band either floats off the sides or cuts those corners.
+// A circular band either floats off the sides or cuts the head's rear corners, so the band follows the head's plan.
 local strapOutline(x, front, back) = [
   [-back + 0.002, -x], [front - 0.025, -x], [front, -x + 0.025], [front, x - 0.025],
   [front - 0.025, x], [-back + 0.002, x], [-back, x - 0.002], [-back, -x + 0.002],
