@@ -100,12 +100,24 @@ function renderShelves() {
     const b = document.createElement('button');
     b.className = 'chip';
     b.type = 'button';
+    b.dataset.shelf = name;
     b.title = taxonomy.categories[name] ?? shelfTitles[name] ?? '';
     b.setAttribute('aria-pressed', String(name === shelf));
     b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
-    b.onclick = () => { shelf = name; renderShelves(); applyFilter(); };
+    b.onclick = () => pickShelf(name);
     return b;
   }));
+}
+
+// Pressing a chip in place keeps keyboard focus on it and keeps a scrolled chip row where it is.
+function pickShelf(name) {
+  shelf = name;
+  for (const b of $('shelves').children) {
+    const pressed = b.dataset.shelf === name;
+    b.setAttribute('aria-pressed', String(pressed));
+    if (pressed) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  applyFilter();
 }
 
 // One select per facet that any model uses, listing the terms in use.
@@ -168,6 +180,7 @@ function applyFilter() {
   shown = entries.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
   $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
   $('count').textContent = `${shown.length} of ${entries.length} models`;
+  $('facets-toggle').textContent = picked.size ? `Tags (${picked.size})` : 'Tags';
 }
 
 // ---- viewer ----
@@ -379,6 +392,10 @@ async function main() {
   renderFacets();
   applyFilter();
   $('search').addEventListener('input', applyFilter);
+  $('facets-toggle').onclick = () => {
+    const open = $('facets-toggle').getAttribute('aria-expanded') !== 'true';
+    $('facets-toggle').setAttribute('aria-expanded', String(open));
+  };
   const fromHash = entries.find((m) => m.id === decodeURIComponent(location.hash.slice(1)));
   if (fromHash) openViewer(fromHash);
 }

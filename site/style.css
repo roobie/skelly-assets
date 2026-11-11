@@ -71,6 +71,13 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
   color: var(--text); font: inherit; font-size: 13px; padding: 6px 10px; cursor: pointer;
 }
 .count { margin-left: auto; color: var(--muted); font-size: 13px; }
+.facets-toggle {
+  display: none;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: 13px; padding: 8px 14px; cursor: pointer;
+}
+.facets-toggle::after { content: " ▾"; color: var(--muted); }
+.facets-toggle[aria-expanded="true"]::after { content: " ▴"; }
 
 .grid {
   display: grid; gap: 14px;
@@ -132,8 +139,23 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
   .top { flex-direction: column; align-items: flex-start; padding-top: 24px; }
   .top, .controls, .grid, .foot { padding-left: 16px; padding-right: 16px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .count { margin-left: 0; width: 100%; }
-  #search { flex-basis: 100%; }
+  .top { gap: 8px; padding-top: 16px; padding-bottom: 8px; }
+  .top h1 { font-size: 22px; }
+  .top p { margin-top: 4px; font-size: 13px; }
+  /* A phone shows the grid under one row of controls: the categories scroll sideways and the tags fold away. */
+  .controls { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  #search { flex: 1 1 0; min-height: 44px; }
+  .facets-toggle { display: block; min-height: 44px; }
+  .chips {
+    flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -16px; padding: 0 16px; scroll-padding: 0 16px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; min-height: 40px; }
+  .facets { flex: 1 1 100%; }
+  .facets-toggle[aria-expanded="false"] ~ .facets { display: none; }
+  .facet { flex: 1 1 calc(50% - 3px); min-height: 40px; }
+  .count { margin-left: 0; width: 100%; font-size: 12px; }
   .viewer { grid-template-columns: 1fr; grid-template-rows: 55% 45%; }
   .info { border-left: 0; border-top: 1px solid var(--line); }
 }
