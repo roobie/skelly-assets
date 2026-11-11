@@ -86,11 +86,12 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
 }
 .combo-list[hidden] { display: none; }
-.combo-option, .combo-empty { display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.combo-option { display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; }
 .combo-option span { color: var(--muted); }
 .combo-option[aria-selected="true"] { background: var(--accent); color: var(--accent-text); }
 .combo-option[aria-selected="true"] span { color: inherit; opacity: 0.8; }
-.combo-empty { color: var(--muted); cursor: default; }
+.combo-status { display: block; margin: 2px 0 0 10px; font-size: 12px; color: var(--muted); }
+.combo-status:empty { display: none; }
 .count { margin-left: auto; color: var(--muted); font-size: 13px; }
 .facets-toggle {
   border: 1px solid var(--line); border-radius: 999px; background: var(--surface);

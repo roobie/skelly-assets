@@ -26,9 +26,11 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   const list = element('ul', { id: `${id}-list`, className: 'combo-list', hidden: true });
   list.setAttribute('role', 'listbox');
   list.setAttribute('aria-label', label);
+  const status = element('span', { className: 'combo-status' });
+  status.setAttribute('role', 'status');
   const chips = element('span', { className: 'combo-chips' });
   const caption = element('label', { className: 'combo-label', htmlFor: input.id, textContent: label, title });
-  const root = element('div', { className: 'combo' }, caption, element('div', { className: 'combo-field' }, chips, input), list);
+  const root = element('div', { className: 'combo' }, caption, element('div', { className: 'combo-field' }, chips, input), list, status);
 
   const open = () => !list.hidden;
   const setActive = (i) => {
@@ -42,6 +44,7 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   };
   const close = () => {
     list.hidden = true;
+    status.textContent = '';
     input.setAttribute('aria-expanded', 'false');
     setActive(-1);
   };
@@ -66,31 +69,39 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
     if (!options[i]) return;
     input.value = '';
     change([...values, options[i].value]);
-    show();
+    show(true);
   }
 
-  function show() {
+  // The first option is highlighted once the reader types or presses an arrow, not on focus alone.
+  function show(highlight) {
     options = suggest(input.value.trim().toLowerCase());
-    list.replaceChildren(...(options.length ? options.map((o, i) => {
+    status.textContent = options.length ? '' : 'No matches';
+    list.replaceChildren(...options.map((o, i) => {
       const li = element('li', { id: `${id}-opt-${i}`, className: 'combo-option', title: o.title ?? '' }, o.text, ...(o.detail === undefined ? [] : [element('span', { textContent: o.detail })]));
       li.setAttribute('role', 'option');
       li.setAttribute('aria-selected', 'false');
-      li.onmousedown = (e) => { e.preventDefault(); pick(i); };
+      li.dataset.index = i;
       return li;
-    }) : [element('li', { className: 'combo-empty', textContent: 'No matches' })]));
-    list.hidden = false;
-    input.setAttribute('aria-expanded', 'true');
-    setActive(options.length ? 0 : -1);
+    }));
+    list.hidden = options.length === 0;
+    input.setAttribute('aria-expanded', String(options.length > 0));
+    setActive(highlight && options.length ? 0 : -1);
   }
 
-  input.addEventListener('input', show);
-  input.addEventListener('focus', show);
+  // The mousedown that picks an option is cancelled so the input keeps focus and its list stays open.
+  list.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const option = e.target.closest('[role="option"]');
+    if (option) pick(Number(option.dataset.index));
+  });
+  input.addEventListener('input', () => show(true));
+  input.addEventListener('focus', () => show(false));
   input.addEventListener('blur', close);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
-      if (!open()) { show(); return; }
-      if (options.length) setActive((active + (e.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length);
+      if (!open()) { show(true); return; }
+      if (options.length) setActive(e.key === 'ArrowDown' ? (active + 1) % options.length : (active < 0 ? options.length : active) - 1);
     } else if (e.key === 'Enter') {
       if (open() && active >= 0) { e.preventDefault(); pick(active); }
     } else if (e.key === 'Escape') {
@@ -107,7 +118,5 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
       values = [...next];
       renderChips();
     },
-    // Rebuilds the open list, as when another filter has changed what remains to suggest.
-    refresh() { if (open()) show(); },
   };
 }
