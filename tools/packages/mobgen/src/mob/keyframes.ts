@@ -83,8 +83,8 @@ export interface ClipDef {
 
 /** Looks a clip up by name, refusing an unknown one rather than falling back to another. */
 export const clipLookup =
-  <Name extends string>(mob: string, clips: Readonly<Record<Name, ClipDef>>) =>
-  (name: string): ClipDef & { readonly name: Name } => {
+  <Name extends string, Def extends ClipDef = ClipDef>(mob: string, clips: Readonly<Record<Name, Def>>) =>
+  (name: string): Def & { readonly name: Name } => {
     if (!Object.hasOwn(clips, name)) {
       throw new Error(`unknown ${mob} clip "${name}"; known: ${Object.keys(clips).join(', ')}`);
     }
