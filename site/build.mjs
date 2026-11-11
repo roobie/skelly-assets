@@ -1,7 +1,8 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, printed label, sidecar and mass, and the components a model comes apart into (tools/components.mjs), the
-// vehicles the tree places and the assemblies the kits build with the model at each of their sites, the sites that
-// dress each wearable on the doll, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
+// their category, tags, printed label, sidecar and mass, and the components a model comes apart into
+// (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
+// at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
+// labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
@@ -35,14 +36,14 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
-// Each model's sidecar, keyed by the model file it names, with the mass of its parts summed; the viewer reads the
-// sidecar itself, and a vehicle's mass sums its sites' models.
+// A whole goes unweighed while any of its parts does, rather than showing a mass short of what it weighs.
+const massOf = (masses) => (masses.length === 0 || masses.includes(undefined) ? {} : { massKg: masses.reduce((a, b) => a + b, 0) });
+// Each model's sidecar, keyed by the model file it names, with the mass of its parts.
 const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
   .filter((f) => f.endsWith('.model.json'))
   .map((f) => {
     const { file, parts } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
-    const masses = Object.values(parts ?? {}).map(({ massKg }) => massKg);
-    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...(masses.length ? { massKg: masses.reduce((a, b) => a + b, 0) } : {}) }];
+    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...massOf(Object.values(parts ?? {}).map(({ massKg }) => massKg)) }];
   })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
@@ -102,13 +103,19 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
-// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.
+// Each vehicle the manifest places (tools/placements.mjs), with its tags, the model at each site and their mass.
 const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, sites: placedSites(sites) };
+  return {
+    id,
+    placements: `${pack}/${path}`,
+    tags: tags ?? {},
+    sites: placedSites(sites),
+    ...massOf(sites.map(({ part }) => modelsById.get(part).massKg)),
+  };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from

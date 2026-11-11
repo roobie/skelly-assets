@@ -319,7 +319,7 @@ async function openViewer(model) {
   const facts = [
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
-    ...(massOf(model) === undefined ? [] : [['Mass', kg(massOf(model))]]),
+    ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
@@ -394,15 +394,16 @@ function builtJson(path) {
   }
   return fetched.get(path);
 }
-const kg = (n) => (n >= 1000 ? `${(n / 1000).toFixed(2)} t` : n >= 1 ? `${Number(n.toFixed(2))} kg` : `${Math.round(n * 1000)} g`);
-// A vehicle weighs what the models at its sites weigh.
-function massOf(entry) {
-  if (!isVehicle(entry)) return entry.massKg;
-  const masses = entry.sites.map(({ model }) => byId.get(model)?.massKg);
-  return masses.includes(undefined) ? undefined : masses.reduce((a, b) => a + b, 0);
+
+// The unit follows the mass as the finer unit rounds it, so a mass just short of a boundary never reads as 1000 of
+// the finer unit.
+function kg(n) {
+  const grams = Math.round(n * 1000);
+  if (grams < 1000) return `${grams} g`;
+  const kilos = Math.round(grams / 10) / 100;
+  return kilos < 1000 ? `${kilos} kg` : `${(kilos / 1000).toFixed(2)} t`;
 }
 
-// An id's text, which a narrow column wraps after its separators rather than inside a word.
 function breakable(text) {
   const fragment = document.createDocumentFragment();
   for (const [i, piece] of text.split(/(?<=[_-])/).entries()) fragment.append(...(i ? [document.createElement('wbr')] : []), piece);
