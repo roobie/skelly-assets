@@ -31,6 +31,8 @@ local defaults = {
   framePaint: 'paint-charcoal',
   doorFront: self.face - 0.16,
   windowTop: self.roof - 0.05,
+  // The top of the roof's crown, which roof gear stands on.
+  crown: self.roof + 0.15,
   seatX: self.doorRear + 0.62,
   // A truck driver sits high over the wheel, so the seat stands on a riser unless the cab roof is too low for it.
   raisedSeat: true,
@@ -141,7 +143,7 @@ local pressings(id, s0) = {
       box('tunnel', 'trim', [s.seatX - 0.2, s.floor, -0.24], [s.face - 0.3, s.floor + 0.42, 0.24]),
       box('back_wall', 'paint', [s.cabBack, s.floor - 0.05, -s.side], [s.cabBack + 0.05, s.roof, s.side]),
       prism('roof', 'paint', [[s.cabBack, s.roof], [roofFront + 0.02, s.roof], [roofFront - 0.08, s.roof + 0.11], [s.cabBack, s.roof + 0.11]], [-s.side + 0.02, s.side - 0.02]),
-      box('crown', 'paint', [s.cabBack, s.roof + 0.11, -s.side + 0.2], [roofFront - 0.14, s.roof + 0.15, s.side - 0.2]),
+      box('crown', 'paint', [s.cabBack, s.roof + 0.11, -s.side + 0.2], [roofFront - 0.14, s.crown, s.side - 0.2]),
       box('visor', 'trim', [roofFront - 0.02, s.roof - 0.05, -s.glassIn], [roofFront + 0.05, s.roof + 0.02, s.glassIn]),
       box('headliner', 'headliner', [s.cabBack + 0.05, s.roof - 0.02, -s.skin], [roofFront - 0.08, s.roof, s.skin]),
     ] + (if conventional then [

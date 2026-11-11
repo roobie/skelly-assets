@@ -4,6 +4,7 @@
   'abandoned_army_truck': import 'abandoned_army_truck.placements.libsonnet',
   'abandoned_pickup': import 'abandoned_pickup.placements.libsonnet',
   'air_ambulance': import 'air_ambulance.placements.libsonnet',
+  'airport_crash_tender': import 'airport_crash_tender.placements.libsonnet',
   'ambulance': import 'ambulance.placements.libsonnet',
   'animal_control_van': import 'animal_control_van.placements.libsonnet',
   'apc': import 'apc.placements.libsonnet',

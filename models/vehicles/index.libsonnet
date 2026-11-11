@@ -4,6 +4,7 @@
   'abandoned_army_truck': import 'models/vehicles/abandoned_army_truck.libsonnet',
   'abandoned_pickup': import 'models/vehicles/abandoned_pickup.libsonnet',
   'air_ambulance': import 'models/vehicles/air_ambulance.libsonnet',
+  'airport_crash_tender': import 'models/vehicles/airport_crash_tender.libsonnet',
   'ambulance': import 'models/vehicles/ambulance.libsonnet',
   'animal_control_van': import 'models/vehicles/animal_control_van.libsonnet',
   'apc': import 'models/vehicles/apc.libsonnet',
