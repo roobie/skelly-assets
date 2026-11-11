@@ -20,7 +20,9 @@ seeded generator rows, and a build turns both into binary glTF (`.glb`).
 CI builds them and publishes each version as a release, so you can use the assets without building anything.
 
 **Browse them:** <https://roobie.github.io/skelly-assets/>: turn each model around, play the creatures' clips
-and download any of them.
+and download any of them. The page opens on a handful of models rather than drawing thousands of previews at
+once, which is slow to load, and keyword and tag filters, whose state is in the page's URL, let you narrow the
+catalogue to a view you can link.
 
 ## Layout
 
