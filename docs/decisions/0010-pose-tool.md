@@ -6,6 +6,7 @@ read_if:
   - wondering why site/kinematics.mjs twins mobgen's pose maths in plain JS
   - judging the clearance probe's margin or what counts as a garment showing the body through
   - posing a hand's fingers, holding an item by a grip socket, or sharing a solver with mobgen
+  - changing the press check's key frames or why its pose files are generated
 ---
 
 # 10. The doll poses on mobgen's bone model with its own small solver
@@ -86,6 +87,14 @@ the palm's plane, so the wide range would go to deviation, and a held item would
 contorted elbow and shoulder. A hold's elbow pole points down and out, as a person's elbow does; where a hold asks
 past a limit, the limit widens only within a person's range and only as far as a hold has shown it needs, and the rest
 is the socket's or the pole's to fix.
+
+## Key frames for placed items
+
+A pose file states a held item's place in world terms, and where a rifle sits depends on the posed figure: its butt
+pad in the shoulder pocket the stance moves, the eyes the head turns. A sequence such as the press check is therefore
+written as key frames in the rifle's own terms (`models/poses/press-check.libsonnet`) and its pose files are generated
+from them (`tools/press-check.mjs`), so a change to the doll's proportions or a frame is a rerun rather than eight
+files of hand-carried coordinates, and a test compares the files with what the tool writes.
 
 ## Out of scope
 

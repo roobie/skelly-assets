@@ -8,21 +8,23 @@ import { after, test } from 'node:test';
 import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
 import { clearanceProbe, posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { padOf } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, dot, length, mulMV, normalize, scale, sub } from '../../site/kinematics.mjs';
+import { add, applyPoint, boneTransforms, dot, length, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
 import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
 import { modelTaxonomies } from '../check-taxonomy.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
+import { partStrokes, poseJson, pressCheckPoses, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 
-// The doll and one jacket built from the repo's own content, so these check the rig, the fixtures and the probe against
-// the doll as it is drawn, not against a stand-in.
+// The doll, one jacket and the press check's rifle built from the repo's own content, so these check the rig, the
+// fixtures and the probe against the doll as it is drawn, not against a stand-in.
 const repo = resolve(import.meta.dirname, '../..');
 const WEAR = 'leather_jacket';
+const pressCheck = readPressCheck(repo);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
-execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', WEAR, `${WEAR}_worn_body`, `${WEAR}_worn_upper`, `${WEAR}_worn_fore`], { cwd: repo, stdio: 'pipe' });
+execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', WEAR, `${WEAR}_worn_body`, `${WEAR}_worn_upper`, `${WEAR}_worn_fore`, pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
 
 // A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, as the
 // manifest would list them.
@@ -38,7 +40,13 @@ const doll = readDoll(built, manifest, dressing);
 const rig = dollRig(readRigContent(repo), doll, dressing);
 const models = manifest.models.filter((model) => model.path.endsWith('.glb'));
 const boxOf = (id) => { const entry = models.find((model) => model.id === id); return modelBox(readFileSync(join(built, entry.pack, entry.path))); };
-const rest = restMeshes(rig, wornSites(models.find((model) => model.id === WEAR), { dressing, doll, models, boxOf }), treeMeshes(built, manifest));
+const meshes = treeMeshes(built, manifest);
+const rest = restMeshes(rig, wornSites(models.find((model) => model.id === WEAR), { dressing, doll, models, boxOf }), meshes);
+// A held item as one mesh of all its parts at rest.
+const itemMesh = (id) => meshes(id).reduce((mesh, part) => {
+  const base = mesh.positions.length / 3;
+  return { positions: [...mesh.positions, ...part.positions], indices: [...mesh.indices, ...part.indices.map((i) => base + i)] };
+}, { positions: [], indices: [] });
 const margin = rig.clearance.marginMetres;
 const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
@@ -47,9 +55,12 @@ const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
 test('every pose fixture compiles on the doll within its limits, and its frame poses a mob the same way', () => {
   assert.ok(fixtures.length > 0);
   for (const { name, file } of fixtures) {
-    const { frame, report } = compilePose(rig, file);
+    const { frame, report } = compilePose(rig, file, { meshOf: itemMesh });
     assert.deepEqual(report.clamped, [], `${name} asks past a limit`);
     for (const [id, left] of Object.entries(report.residuals)) assert.ok(left < 1e-6, `${name}: ${id} falls ${left} m short`);
+    for (const [hand, digits] of Object.entries(report.grips)) {
+      for (const [digit, { residual }] of Object.entries(digits)) assert.ok(!(residual > 1e-3), `${name}: ${hand} ${digit} pinches ${residual} m off`);
+    }
     // mobgen's own transforms of the frame as a mob clip reader decodes it agree with ours.
     const theirs = mobBoneTransforms(rig.bones, actorDecodeFrame(frame)), ours = boneTransforms(rig.bones, decodeFrame(frame));
     for (const bone of rig.bones) theirs.get(bone.id).t.forEach((v, i) => assert.ok(Math.abs(v - ours.get(bone.id).t[i]) < 1e-9, `${name}: ${bone.id}`));
@@ -155,5 +166,31 @@ test('the grip preset lays either thumb\'s pad on a held haft, wrapping it rathe
     const pad = applyPoint(boneTransforms(rig.bones, decodeFrame(frame)).get(tip.id), padOf(tip));
     const gap = signedDepth(posedSolid(haft, held[`hand.${side}`]), pad, 0.1);
     assert.ok(gap > -0.0015 && gap < 0.003, `the ${side} thumb pad rests on the haft, not ${(gap * 1000).toFixed(1)} mm off it`);
+  }
+});
+
+const rifleEntry = models.find((model) => model.id === pressCheck.rifle);
+const pressPoses = pressCheckPoses(rig, pressCheck, partStrokes(readFileSync(join(built, rifleEntry.pack, rifleEntry.path))));
+
+test('the press check\'s pose files are what its tool writes from its key frames', () => {
+  assert.ok(Object.keys(pressPoses).length > 0);
+  for (const [name, file] of Object.entries(pressPoses)) {
+    assert.equal(readFileSync(join(repo, 'models/poses', `${name}.json`), 'utf8'), `${poseJson(file)}\n`, `${name}: run tools/press-check.mjs`);
+  }
+});
+
+test('through the press check the rifle points ahead and down, its butt pad against the body', () => {
+  const torso = rest.body.find((part) => part.bone === 'spine').mesh;
+  for (const [name, file] of Object.entries(pressPoses)) {
+    const { model, at, turn } = file.hold['hand.R'];
+    assert.equal(model, pressCheck.rifle);
+    const r = quatToMat3(turn), bore = mulMV(r, [0, 0, 1]);
+    const heading = Math.atan2(bore[0], bore[2]) * 180 / Math.PI, tip = -Math.asin(bore[1]) * 180 / Math.PI;
+    assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
+    assert.ok(tip > 0 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
+    const { frame } = compilePose(rig, file, { meshOf: itemMesh });
+    const chest = posedSolid(torso, boneTransforms(rig.bones, decodeFrame(frame)).get('spine'));
+    const gap = signedDepth(chest, add(mulMV(r, pressCheck.butt), at), 0.1);
+    assert.ok(Math.abs(gap) < 0.01, `${name}: the butt pad stands ${(gap * 1000).toFixed(0)} mm off the chest`);
   }
 });
