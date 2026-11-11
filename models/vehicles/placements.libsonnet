@@ -14,6 +14,7 @@
   'boat_trailer': import 'boat_trailer.placements.libsonnet',
   'box_truck': import 'box_truck.placements.libsonnet',
   'bucket_truck': import 'bucket_truck.placements.libsonnet',
+  'bulldozer': import 'bulldozer.placements.libsonnet',
   'burnt_out_bus': import 'burnt_out_bus.placements.libsonnet',
   'burnt_out_saloon': import 'burnt_out_saloon.placements.libsonnet',
   'burnt_out_van': import 'burnt_out_van.placements.libsonnet',

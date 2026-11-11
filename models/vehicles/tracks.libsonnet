@@ -18,6 +18,21 @@
     ],
     loop: ['sprocket', 'idler'],
   },
+  // A 20-tonne crawler dozer's: idlers at both ends of the ground run and the drive sprocket raised over the rear one,
+  // out of the dirt and clear of the shocks the blade sends through the rollers, so the band runs as a triangle.
+  bulldozer_track: {
+    class: 'crawler_heavy',
+    frame: { massKg: 600, x: [-1.1, 1.1], y: [0.38, 0.56], halfWidth: 0.16 },
+    wheels: [
+      { site: 'sprocket', key: 'sprocket', at: [-0.85, 1.0] },
+      { site: 'idler_rear', key: 'idler', at: [-1.5, 0.49] },
+      { site: 'idler_front', key: 'idler', at: [1.44, 0.49] },
+    ] + [
+      { site: 'roller_' + i, key: 'roller', at: [-0.96 + 0.32 * i, 0.27] }
+      for i in std.range(0, 6)
+    ],
+    loop: ['idler_rear', 'idler_front', 'sprocket'],
+  },
   // A 6-tonne trencher's rubber track: 2.5 m long, its drive sprocket at the rear.
   trencher_track: {
     class: 'rubber_compact',
