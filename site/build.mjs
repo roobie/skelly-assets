@@ -112,7 +112,8 @@ const assemblies = readAssemblies(root)
   });
 
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
-// dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback.
+// dependency-free site has no bundler. Compose here in Node so the viewer only needs plain pose-frame playback
+// (site/clipFrames.mjs, which both read).
 const poseFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
 const idleAt = (set, body, time) => {
   const idle = set.idle?.slack ?? set.idle?.aggravated ?? set.idle;
@@ -148,7 +149,7 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'poseSample.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();

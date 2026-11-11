@@ -13,11 +13,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
+import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
-import { clipIssues, compilePose, decodeFrame, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
-import { samplePose } from './poseSample.mjs';
+import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
 import { addCoveredSkin, skinCheck } from './skin.mjs';
 import { drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
@@ -191,7 +191,7 @@ const spanOf = (clip, walkSpeed) => {
   return clip.loop ? clip.periodSimSeconds : clip.durationSimSeconds ?? clip.durationRealSeconds;
 };
 // A clip at `phase`, 0 to 1 of its span; a loop's cursor is its phase, a finite clip's its seconds.
-const clipAt = (clip, phase, span) => samplePose(clip, clip.loop ? phase : phase * span, slerp);
+const clipAt = (clip, phase, span) => sampleClip(clip, clip.loop ? phase : phase * span, slerp);
 // A clip of the rig's frames, its span stated the way its loop needs.
 const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), frames });
 

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { decodeFrame } from '../../site/clipFrames.mjs';
 import { add, applyPoint, boneTransforms, frameAbout, length, mat3ToQuat, mulMM, rotX, rotY, sub } from '../../site/kinematics.mjs';
-import { clipIssues, compilePose, decodeFrame, groundLift, poseFileOf, poseIssues, rigFrame } from '../../site/poseFile.mjs';
+import { clipIssues, compilePose, groundLift, poseFileOf, poseIssues, rigFrame } from '../../site/poseFile.mjs';
 
 // A rig in tools/dollRig.mjs, `dollRig`'s shape: a pelvis standing a metre up, a spine that absorbs a mob's chest, and
 // an arm whose hand reaches by two-bone IK. Each part box hugs its bone.

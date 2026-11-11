@@ -7,7 +7,7 @@ import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
 import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
-import { samplePose } from './poseSample.mjs';
+import { sampleClip } from './clipFrames.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -227,7 +227,7 @@ const slerp = (a, b, w) => new THREE.Quaternion(...a).slerp(new THREE.Quaternion
 
 export function pose(scene, body, clip, time) {
   if (!playable(clip)) return;
-  const pose = samplePose(clip, time, slerp), transforms = [], byId = new Map();
+  const pose = sampleClip(clip, time, slerp), transforms = [], byId = new Map();
   for (const bone of body.bones) {
     const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
     let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
