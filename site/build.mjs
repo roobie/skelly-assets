@@ -36,15 +36,10 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
-// A whole goes unweighed while any of its parts does, rather than showing a mass short of what it weighs.
-const massOf = (masses) => (masses.length === 0 || masses.includes(undefined) ? {} : { massKg: masses.reduce((a, b) => a + b, 0) });
-// Each model's sidecar, keyed by the model file it names, with the mass of its parts.
+// Each model's sidecar, keyed by the model file it names.
 const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
   .filter((f) => f.endsWith('.model.json'))
-  .map((f) => {
-    const { file, parts } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
-    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...massOf(Object.values(parts ?? {}).map(({ massKg }) => massKg)) }];
-  })));
+  .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
   .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
@@ -108,12 +103,12 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
-// A vehicle weighs its sites' models together and fills the volume of their voxels; one site's model without a mass
-// leaves the vehicle without either.
+// A vehicle weighs its sites' models together and fills the volume of their voxels. A figure comes only when every
+// site's model has it, rather than a total short of what the vehicle holds.
 const vehiclePhysical = (sites) => {
   const parts = sites.map(({ model }) => modelsById.get(model));
-  if (parts.some(({ massKg }) => massKg === undefined)) return {};
-  return { massKg: parts.reduce((sum, { massKg }) => sum + massKg, 0), volumeM3: parts.reduce((sum, { volumeM3 }) => sum + volumeM3, 0) };
+  const total = (key) => (parts.some((part) => part[key] === undefined) ? {} : { [key]: parts.reduce((sum, part) => sum + part[key], 0) });
+  return { ...total('massKg'), ...total('volumeM3') };
 };
 
 // Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
