@@ -31,7 +31,7 @@ local post(id, massKg, length, side, c, wood, extras=[], extraFinish={}) =
     h.turned('collar', 'collar', 'z', [[0, 0], [0, 0.0040], [0.003, 0.0040], [0.003, 0]], [0, 0.007, 0.0155]),
     h.turned('shaft', 'peg', 'z', [[0, 0], [0, 0.0032], [0.003, 0.0028], [0.026, 0.0012], [0.026, 0]], [0, 0.007, 0.0185]),
     h.box('hole', 'hole', [-0.0017, 0.0062, 0.036], [0.0017, 0.0078, 0.038]),
-  ], { peg: 'wood-walnut', collar: 'bone', hole: 'void-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'bone'] } } },
+  ], { peg: 'wood-walnut', collar: 'bone', hole: 'void-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'bone'] }, keywords: ['music'] } },
   // An 8 x 8 inch timber, 184 mm square and 2.44 m long, with a long drying check down one face.
   post('wood_beam', 41, 2.440, 0.184, 0.004, 'wood-pine', [
     h.box('check-a', 'check', [-0.700, 0.184, -0.003], [0.350, 0.186, 0.003]),

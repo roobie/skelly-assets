@@ -96,7 +96,7 @@ local cartons(y, hw, front) = [
     box('door', 'body', [-0.30, 0.11, 0.29], [0.30, 0.928, 0.32]),
     box('handle', 'handle', [0.23, 0.55, 0.32], [0.26, 0.88, 0.345]),
     dial('dial', 'grille', -0.20, 0.07, 0.30, 0.018, 0.01),
-  ], { body: 'paint-white', grille: 'plastic-grey', seal: 'rubber-black', handle: 'plastic-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'paint-white', grille: 'plastic-grey', seal: 'rubber-black', handle: 'plastic-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A household fridge with the freezer above, 0.6 m wide, 0.67 m deep and 1.5 m tall, doors on +z.
   h.compound('household_fridge', 58, feet(0.30, 0.335) + [
@@ -107,7 +107,7 @@ local cartons(y, hw, front) = [
     box('freezer-door', 'door', [-0.30, 1.035, 0.31], [0.30, 1.495, 0.335]),
     box('handle-a', 'handle', [0.23, 0.62, 0.335], [0.26, 0.98, 0.36]),
     box('handle-b', 'handle', [0.23, 1.06, 0.335], [0.26, 1.26, 0.36]),
-  ], { body: 'steel-grey', door: 'steel-stainless', grille: 'plastic-black', seal: 'rubber-black', handle: 'plastic-black', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'steel-grey', door: 'steel-stainless', grille: 'plastic-black', seal: 'rubber-black', handle: 'plastic-black', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A shop chest freezer with two sliding glass lids, 1.86 m long, 0.66 m deep and 0.85 m tall, stock inside.
   h.compound('display_freezer', 150, [

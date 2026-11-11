@@ -55,7 +55,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     lamp: 'plastic-clear-red',
     cord: 'plastic-black',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // An induction hotplate, 290 mm wide, 350 mm deep and 60 mm tall: a grey plastic case under a black glass
   // top marked with one cooking ring, a sloped control strip along the front with a green display and
@@ -81,7 +81,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     button: 'plastic-white',
     cord: 'plastic-black',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A homemade vacuum sealer, 350 mm long, 150 mm deep and 120 mm tall: a pine board carrying a hinged
   // aluminium press bar over a heating strip, a small aquarium air pump wired to the board, a clear hose
@@ -121,7 +121,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     tape: 'tape-grey',
     cord: 'plastic-black',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'] }, keywords: ['improvised'] } },
 
   // A camping mess kit, 150 mm across and 110 mm tall: an aluminium pot with a frying-pan lid seated
   // upside down on it, the pan's folding handle swung over the top and the pot's wire bail folded down
@@ -141,7 +141,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     box('ear-b', 'hinge', [0.07, 0.06, -0.006], [0.074, 0.072, 0.006]),
     turned('bail', 'handle', 'z', [[0, 0.069], [0, 0.072], [0.003, 0.072], [0.003, 0.069], [0, 0.069]], [0, 0.066, -0.0015]),
   ], { pot: 'alu-bare', rim: 'steel-grey', base: 'paint-charcoal', hinge: 'steel-grey', handle: 'steel-grey', grip: 'rubber-black' })
-  + h.inHand('mess_kit', 'pot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + h.inHand('mess_kit', 'pot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'military'] } },
 
   // A compact countertop microwave, 400 mm wide, 230 mm tall and 300 mm deep: a white steel case on
   // feet, a black door with a dark window and a bar handle, and a control panel on the right with a
@@ -178,7 +178,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     key: 'plastic-white',
     cord: 'plastic-black',
   })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A granite mortar 120 mm across and 70 mm tall with a deep round bowl, and a club-shaped stone
   // pestle 120 mm long resting across its rim.
@@ -186,7 +186,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     turned('mortar', 'mortar', 'y', [[0, 0], [0, 0.05], [0.012, 0.06], [0.07, 0.06], [0.07, 0.047], [0.055, 0.044], [0.04, 0.036], [0.028, 0.02], [0.022, 0]]),
     turned('pestle', 'pestle', 'x', [[0, 0], [0, 0.017], [0.012, 0.02], [0.03, 0.017], [0.09, 0.011], [0.115, 0.013], [0.12, 0]], [-0.05, 0.08, 0.012]),
   ], { mortar: 'stone-grey', pestle: 'stone-whet' })
-  + h.inHand('mortar_pestle', 'mortar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['stone'] } } },
+  + h.inHand('mortar_pestle', 'mortar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['stone'] }, keywords: ['cooking'] } },
 
   // An electric multi-cooker, 250 mm wide, 245 mm tall and 245 mm deep: a stainless steel pot body on a
   // black base, a black locking lid with a steam valve and a float pin, two side handles and a sloped
@@ -215,7 +215,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     key: 'plastic-grey',
     cord: 'plastic-black',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A kerosene pressure stove, 150 mm across and 170 mm tall: a squat round steel fuel tank with a filler
   // cap and a hand pump on its side, a brass riser to a burner head, and four pot supports on uprights
@@ -249,7 +249,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     'burner-cap': 'iron-cast',
     support: 'steel-parkerized',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A hand-cranked screw oil press, 200 mm long and 150 mm tall: a horizontal steel barrel on a clamp
   // bracket, a funnel hopper on top for seeds, a crank arm with a wooden knob at one end, a press-cake
@@ -302,7 +302,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     disc('t-knob-l', 'knob', 0.008, 0.236, 0.26, -0.045, 0),
     disc('t-knob-r', 'knob', 0.008, 0.236, 0.26, 0.045, 0),
   ], { iron: 'iron-cast', die: 'steel-grey', 'die-mark': 'paint-charcoal', screw: 'steel-stainless', plunger: 'steel-grey', knob: 'wood-walnut' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A jar of cucumbers fermenting in brine, cloth tied over the mouth.
   fermentJar('fermenting_pickles', 1.1, [
@@ -325,7 +325,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     turned('label', 'label', 'y', [[0, 0], [0, 0.0315], [0.06, 0.0315], [0.06, 0]], [0.03, 0.05, 0]),
     disc('cap', 'cap', 0.014, 0.188, 0.205, 0.03, 0),
   ], { can: 'alu-bare', jets: 'paint-charcoal', well: 'paint-charcoal', simmer: 'alu-bare', bottle: 'plastic-clear', label: 'paper-white', cap: 'plastic-blue' })
-  + h.inHand('soda_can_stove', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + h.inHand('soda_can_stove', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // A single-burner propane stove, 230 mm wide, 180 mm deep and 110 mm tall: a green steel bowl on three
   // wire legs carrying a ported burner head and four pot supports, with a brass regulator and
@@ -358,7 +358,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     knob: 'plastic-black',
     support: 'steel-parkerized',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
   // A hand quern, 300 mm across and 230 mm tall to the top of its handle: a thick lower millstone with a
   // spout lip where the flour spills, a thinner runner stone on top with a dark feed hole in its centre

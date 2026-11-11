@@ -29,7 +29,7 @@ local pipLayout = {
     for face in std.objectFields(pipFaces)
     for i in std.range(0, pipFaces[face].n - 1)
   ], { body: 'enamel-white', pip: 'plastic-black' })
-  + h.inHand('six_sided_die', 'cube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.inHand('six_sided_die', 'cube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A poppy seed head, 47 mm tall and 28 mm across: a short cut stem, a round green pod and
   // a flat purple crown with eight ridges radiating from its centre.
@@ -88,7 +88,7 @@ local pipLayout = {
     disc('cap-%d' % i, 'capacitor', 0.003, 0.002, 0.012, -0.035 + (i % 3) * 0.008, -0.04 + std.floor(i / 3) * 0.008)
     for i in std.range(0, 5)
   ], { board: 'circuit-green', socket: 'plastic-gloss-white', lid: 'steel-stainless', contact: 'foil-gold', chip: 'plastic-black', capacitor: 'alu-bare' })
-  + h.inHand('processor', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + h.inHand('processor', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A radio repeater module in a grey case 200 mm wide, 80 mm tall and 125 mm deep: a black front panel with
   // two carry handles, status lamps and a keyed data port, cooling fins on the back and two rubber whip antennas
@@ -155,7 +155,7 @@ local pipLayout = {
     box('chip-%d' % i, 'chip', [-0.062 + i * 0.016, 0.002, -0.004], [-0.051 + i * 0.016, 0.0035, 0.009])
     for i in std.range(0, 7)
   ], { board: 'circuit-green', contact: 'foil-gold', label: 'paper-white', chip: 'plastic-black' })
-  + h.inHand('ram_stick', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + h.inHand('ram_stick', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A rusty reinforcing bar, 800 mm long and 16 mm across.
   h.compound('rebar', 1.1, [
@@ -222,7 +222,7 @@ local pipLayout = {
     box('trace-end-%d' % i, 'trace', [0.032 - i * 0.006, 0.0015, -0.01 + i * 0.006], [0.034 - i * 0.006, 0.0025, 0.02])
     for i in std.range(0, 3)
   ], { card: 'plastic-clear', chip: 'plastic-black', trace: 'foil-gold' })
-  + h.inHand('prototype_data_card', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['sci-fi'] } } },
+  + h.inHand('prototype_data_card', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['sci-fi'] }, keywords: ['computer'] } },
 
   // A small tin of rubber cement, 64 mm across and 105 mm tall: a red printed can with a white label band and a
   // black screw cap that carries the brush.

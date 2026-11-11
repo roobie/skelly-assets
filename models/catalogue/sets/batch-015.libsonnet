@@ -176,6 +176,6 @@ local fibreTube(axis, length, radius, band) =
     ] + [
       box('pedal-%d' % i, 'pedal', [0.07 * i - 0.012, 0.06, 0.02], [0.07 * i + 0.012, 0.072, 0.12])
       for i in [-1, 0, 1]
-    ], { case: 'wood-walnut', felt: 'paint-oxblood', white: 'wax-ivory', black: 'plastic-black', pedal: 'brass' }) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+    ], { case: 'wood-walnut', felt: 'paint-oxblood', white: 'wax-ivory', black: 'plastic-black', pedal: 'brass' }) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] }, keywords: ['music'] } },
   ]
 )

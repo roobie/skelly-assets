@@ -31,7 +31,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
     box('shard-b', 'crystal', [0.0, 0.002, 0.002], [0.012, 0.005, 0.01]),
     box('shard-c', 'crystal', [-0.006, 0.002, 0.008], [0.002, 0.008, 0.016]),
     box('shard-d', 'crystal', [0.004, 0.002, -0.012], [0.01, 0.004, -0.004]),
-  ], { bag: 'plastic-clear', zip: 'plastic-blue', crystal: 'plastic-frosted' }) + inHand('meth', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'] } } },
+  ], { bag: 'plastic-clear', zip: 'plastic-blue', crystal: 'plastic-frosted' }) + inHand('meth', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'] }, keywords: ['recreational-drug'] } },
 
   // A 50 ml amber glass dropper bottle of homemade herbal oil, 36 mm across and 110 mm tall with its
   // rubber bulb, labelled with a strip of tape.
@@ -54,7 +54,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
 
   // A 50-tablet bottle of long-lasting painkillers, 40 mm across and 80 mm tall with its cap.
   bottle('naproxen', 0.05, 0.02, 0.064, 0.015, 0.0175, 0.012,
-         { body: 'plastic-white', label: 'plastic-green', cap: 'plastic-green' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+         { body: 'plastic-white', label: 'plastic-green', cap: 'plastic-green' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A blister card of twelve square pieces of gum, 70 mm by 50 mm and lying flat, three rows of four,
   // with a mint-green printed band.
@@ -65,7 +65,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
     box('piece-%d-%d' % [i, j], 'gum', [-0.022 + i * 0.014, 0.002, -0.02 + j * 0.014], [-0.012 + i * 0.014, 0.006, -0.01 + j * 0.014])
     for i in std.range(0, 3)
     for j in std.range(0, 2)
-  ], { foil: 'alu-bare', print: 'plastic-green', gum: 'plastic-white' }) + inHand('nicotine_gum', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { foil: 'alu-bare', print: 'plastic-green', gum: 'plastic-white' }) + inHand('nicotine_gum', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['tobacco'] } },
 
   // A round plastic can of nicotine pouches, 68 mm across and 24 mm tall, its snap lid carrying a small
   // compartment on top for used pouches.
@@ -73,7 +73,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
     disc('body', 'body', 0.033, 0, 0.016),
     turned('lid', 'lid', 'y', [[0.013, 0], [0.013, 0.034], [0.02, 0.034], [0.022, 0.032], [0.022, 0]]),
     disc('catch', 'catch', 0.016, 0.022, 0.025),
-  ], { body: 'plastic-white', lid: 'plastic-blue', catch: 'plastic-white' }) + inHand('nicotine_pouch', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-white', lid: 'plastic-blue', catch: 'plastic-white' }) + inHand('nicotine_pouch', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['tobacco'] } },
 
   // A 250 ml bottle of green night-time cough syrup, 62 mm across and 165 mm tall, with a dosing cup
   // over the cap.
@@ -84,7 +84,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
   // A pharmacy prescription vial, 37 mm across and 70 mm tall, amber with a white child-proof cap.
   bottle('oxycodone', 0.041, 0.0185, 0.058, 0.0185, 0.0195, 0.012,
          { body: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' },
-         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A single two-tone capsule, 26 mm long and 11 mm across, lying along z, one half apple-red and the
   // other white.

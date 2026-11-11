@@ -33,7 +33,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('arm-b', 'arm', [-0.125, 1.68, 0.18], [0.90, 1.76, 0.25]),
     box('arm-c', 'arm', [-0.125, 1.56, -0.25], [0.90, 1.64, -0.18]),
     box('spout', 'lining', [-1.00, 0.85, -0.08], [-0.60, 0.95, 0.08]),
-  ], { frame: 'steel-grey', shell: 'paint-charcoal', lining: 'clay-terracotta', roof: 'steel-grey', electrode: 'stone-grey', arm: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'stone'], setting: ['modern'] } } },
+  ], { frame: 'steel-grey', shell: 'paint-charcoal', lining: 'clay-terracotta', roof: 'steel-grey', electrode: 'stone-grey', arm: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'stone'], setting: ['modern'] }, keywords: ['metalworking'] } },
 
   // An upright arcade cabinet, 0.66 m wide, 0.82 m deep and 1.85 m tall, screen and controls facing +z.
   h.compound('arcade_machine', 64, [
@@ -63,7 +63,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('blade', 'blade', [-0.31, 1.29, -0.081], [-0.29, 1.60, -0.075]),
     box('guide', 'blade', [-0.33, 1.42, -0.10], [-0.27, 1.60, -0.06]),
     turned('motor', 'motor', 'x', [[0, 0], [0, 0.09], [0.25, 0.09], [0.25, 0]], [0.30, 0.45, 0]),
-  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A pine box, 0.46 by 0.36 m and 0.3 m deep, its lid leaning back on its hinge, a charger with a meter,
   // a dial and two lamps on its top, and its red and black clip leads hung over the front rim.
@@ -113,7 +113,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ] + [
     box('warning', 'warning', [-0.08, 0.45, -0.08], [0.08, 0.455, 0.08]),
     turned('terminal', 'terminal', 'x', [[0, 0], [0, 0.02], [0.04, 0.02], [0.04, 0]], [0.42, 0.30, 0]),
-  ], { frame: 'steel-grey', core: 'lead', fin: 'alu-bare', warning: 'plastic-yellow', terminal: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['sci-fi'] } } },
+  ], { frame: 'steel-grey', core: 'lead', fin: 'alu-bare', warning: 'plastic-yellow', terminal: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['sci-fi'] }, keywords: ['radiation'] } },
 
   // A floor drill press, 1.37 m tall: cast base, a 90 mm column, a round table on its arm, the head with
   // a vertical motor behind and three feed handles.
@@ -199,7 +199,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     post('ram-foot', 'ram', 0, 0.92, 0, 0.04, 0.03),
     turned('pump-handle', 'ram', 'x', [[0, 0], [0, 0.01], [0.30, 0.01], [0.30, 0]], [0.06, 1.25, 0.04]),
     dial('gauge', 'gauge', 0, 1.50, 0.07, 0.04, 0.02),
-  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['metalworking'] } },
 
   // An industrial 2.2 m long jointer: cast infeed and outfeed tables on a closed stand, the cutterhead in
   // the gap between them, a fence along the back and the bridge guard over the cut.
@@ -214,7 +214,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('fence-bracket', 'cutter', [-0.06, 0.82, -0.30], [0.06, 0.90, -0.22]),
     dial('wheel-a', 'cutter', -0.25, 0.50, 0.22, 0.06, 0.03),
     dial('wheel-b', 'cutter', 0.25, 0.50, 0.22, 0.06, 0.03),
-  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A sliding compound mitre saw on its extension wings, 1.24 m wide: base and turntable, fence, the head
   // on two rails behind, a 254 mm blade under a half guard.
@@ -238,7 +238,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     prism('guard', 'head', 'x', [[0.25, -0.14], [0.32, -0.12], [0.37, -0.07], [0.39, 0], [0.37, 0.07], [0.32, 0.12], [0.25, 0.14]], -0.03, 0.03),
     turned('blade', 'blade', 'x', [[0, 0], [0, 0.127], [0.004, 0.127], [0.004, 0]], [-0.002, 0.25, 0]),
     box('handle', 'handle', [-0.02, 0.38, 0.10], [0.12, 0.41, 0.20]),
-  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A free-standing electric convection oven, 0.6 m wide, 0.6 m deep and 0.69 m tall, door facing +z.
   h.compound('oven', 93, [
@@ -261,7 +261,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ], {
     foot: 'rubber-black', body: 'paint-white', door: 'paint-charcoal', window: 'glass-grey',
     handle: 'steel-stainless', display: 'glass-lens-green', knob: 'plastic-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A home oxygen concentrator on casters, 0.38 m wide and 0.7 m tall, with a flow meter and humidifier
   // bottle on its front and a filter grille at the back.

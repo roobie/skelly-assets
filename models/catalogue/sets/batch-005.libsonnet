@@ -54,13 +54,13 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('top', 'top', [-0.028, 0.06, -0.0115], [0.028, 0.086, 0.0115]),
     box('band', 'band', [-0.028, 0.012, -0.0115], [0.028, 0.03, 0.0115]),
     box('foil', 'foil', [-0.01, 0.086, -0.006], [0.01, 0.088, 0.006]),
-  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + inHand('cigarette', 'pack') + h.label('top', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + inHand('cigarette', 'pack') + h.label('top', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['tobacco'] } },
 
   // One cigar, 150 mm long and 18 mm thick, lying along x with its rounded head at +x and a red paper band.
   h.compound('cigar', 0.014, [
     turned('body', 'leaf', 'x', [[0, 0], [0, 0.008], [0.135, 0.009], [0.145, 0.0075], [0.15, 0.004], [0.15, 0]], [-0.075, 0.009, 0]),
     turned('band', 'band', 'x', [[0.1, 0], [0.1, 0.0098], [0.114, 0.0098], [0.114, 0]], [-0.075, 0.009, 0]),
-  ], { leaf: 'leather-brown', band: 'paint-red' }) + h.gripOn('cigar', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plant'] } } },
+  ], { leaf: 'leather-brown', band: 'paint-red' }) + h.gripOn('cigar', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plant'] }, keywords: ['tobacco'] } },
 
   // A 30 g squeeze tube of anaesthetic cream, 130 mm long and 26 mm across, lying flat along x with the
   // crimped end at +x and the screw cap at -x. Round behind the cap, it keeps its full width to the crimp
@@ -79,7 +79,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('crimp', 'tube', [0.055, 0.0115, -0.0135], [0.07, 0.0145, 0.0135]),
     turned('stripe', 'stripe', 'x', [[0.01, 0], [0.01, 0.0134], [0.034, 0.0134], [0.034, 0]], [-0.05, 0.013, 0]),
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.007], [0.015, 0.007], [0.015, 0]], [-0.065, 0.013, 0]),
-  ], { tube: 'plastic-white', stripe: 'plastic-red', cap: 'plastic-red' }) + inHand('anaesthetic_cream', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { tube: 'plastic-white', stripe: 'plastic-red', cap: 'plastic-red' }) + inHand('anaesthetic_cream', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A small zip bag, 40 mm by 50 mm and lying flat, with a pinch of white powder in its bottom half.
   h.compound('cocaine', 0.0036, [
@@ -87,7 +87,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('zip', 'zip', [-0.02, 0, -0.025], [0.02, 0.003, -0.02]),
     box('powder', 'powder', [-0.014, 0.002, -0.008], [0.014, 0.006, 0.02]),
     box('heap', 'powder', [-0.008, 0.006, 0], [0.008, 0.008, 0.014]),
-  ], { bag: 'glass-clear', zip: 'plastic-red', powder: 'plastic-white' }) + inHand('cocaine', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bag: 'glass-clear', zip: 'plastic-red', powder: 'plastic-white' }) + inHand('cocaine', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['recreational-drug'] } },
 
   // A 250 ml plastic soda bottle of dark homemade cola, 54 mm across and 150 mm tall, with a strip of
   // tape for a label. The body shows the liquid, as through clear plastic.
@@ -103,7 +103,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     disc('vial', 'glass', 0.006, 0, 0.024),
     disc('rocks', 'rocks', 0.004, 0.002, 0.012),
     disc('cap', 'cap', 0.0068, 0.022, 0.032),
-  ], { glass: 'glass-clear', rocks: 'wax-ivory', cap: 'plastic-red' }) + inHand('crack', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] } } },
+  ], { glass: 'glass-clear', rocks: 'wax-ivory', cap: 'plastic-red' }) + inHand('crack', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] }, keywords: ['recreational-drug'] } },
 
   // A 250 ml bottle of orange cough syrup, 62 mm across and 165 mm tall, with a dosing cup over the cap.
   bottle('cough_syrup', 0.35, 0.031, 0.105, 0.014, 0.022, 0.03,
@@ -121,5 +121,5 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     turned('bottle', 'glass', 'y', [[0, 0], [0, 0.031], [0.095, 0.031], [0.12, 0.011], [0.15, 0.011], [0.15, 0]]),
     disc('cork', 'cork', 0.0095, 0.145, 0.165),
     turned('tape', 'tape', 'y', [[0.035, 0], [0.035, 0.0315], [0.06, 0.0315], [0.06, 0]]),
-  ], { glass: 'glass-clear', cork: 'wood-birch', tape: 'tape-grey' }) + inHand('makeshift_antiseptic', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['glass', 'wood'] } } },
+  ], { glass: 'glass-clear', cork: 'wood-birch', tape: 'tape-grey' }) + inHand('makeshift_antiseptic', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['glass', 'wood'] }, keywords: ['improvised'] } },
 ]

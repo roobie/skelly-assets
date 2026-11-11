@@ -50,7 +50,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     h.box('ferrule', 'ferrule', [1.0, -0.024, -0.038], [1.035, 0.024, 0.038]),
     h.box('stitch-a', 'stitch', [1.09, -0.025, -0.067], [1.1, 0.025, 0.067]),
     h.box('stitch-b', 'stitch', [1.15, -0.025, -0.084], [1.16, 0.025, 0.084]),
-  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + h.gripOn('broom', 'handle') + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] } } },
+  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + h.gripOn('broom', 'handle') + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] }, keywords: ['cleaning'] } },
   // A single down-filled mattress, 1.9 m by 0.9 m and 0.18 m deep, quilted in puffed channels across its width.
   h.compound('down_mattress', 4.7,
     mattress(0.17)
@@ -66,7 +66,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
   // Four 72 mm RC buggy wheels lying two by two, 0.15 m square.
   h.compound('remote_control_car_wheels', 0.15,
     wheel(0, -0.038, -0.038) + wheel(1, 0.038, -0.038) + wheel(2, -0.038, 0.038) + wheel(3, 0.038, 0.038),
-    { tyre: 'rubber-tread', rim: 'steel-bright', hub: 'plastic-matte-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber', 'plastic'], setting: ['modern'] } } },
+    { tyre: 'rubber-tread', rim: 'steel-bright', hub: 'plastic-matte-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber', 'plastic'], setting: ['modern'] }, keywords: ['toy'] } },
   // A 250 mm piece cut from a tyre tread, 115 mm wide and 40 mm deep with its lugs.
   h.compound('rubber_tire_chunk', 0.9,
     h.curvedPlate('carcass', 'carcass', chunkOutline, 0, 0.022, chunkR, 8)

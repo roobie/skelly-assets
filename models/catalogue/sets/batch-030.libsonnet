@@ -25,7 +25,7 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
     turned('base', 'base', 'y', [[0, 0], [0, 0.122], [0.010, 0.122], [0.010, 0]]),
   ] + potHandle('handle-a', 1, 0.128, 0.205, 0.025) + potHandle('handle-b', -1, 0.128, 0.205, 0.025), {
     body: 'steel-stainless', base: 'alu-bare', handle: 'steel-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A clear acrylic tumbler 110 mm tall, 80 mm across the mouth and 64 mm at its thick base.
   h.compound('plastic_tumbler', 0.058, [
