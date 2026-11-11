@@ -32,6 +32,7 @@
   "convertible_front_bumper": "coupe_front_bumper",
   "convertible_front_wing": "coupe_front_wing",
   "convertible_rear_bumper": "coupe_rear_bumper",
+  "cross_drive_transmission": "cv9040_transmission",
   "cube_van_bonnet": "panel_van_bonnet",
   "cube_van_dashboard": "van_dashboard",
   "cube_van_front_bumper": "panel_van_front_bumper",
