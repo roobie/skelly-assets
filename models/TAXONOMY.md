@@ -1,7 +1,7 @@
 ---
 read_if:
-  - tagging models, or choosing a model's category or tags
-  - adding or requesting a taxonomy term
+  - tagging models, or choosing a model's category, tags or keywords
+  - adding or requesting a taxonomy term or keyword
   - changing how the showcase or a consumer groups and filters models
 ---
 
@@ -22,6 +22,9 @@ and each facet answers one question: what it is made of, where it is worn, what 
 filter on a facet then means one thing. A term carries its meaning, so a tagger can choose between two
 terms by reading them and does not have to guess from usage.
 
+A facet is many-valued because a model can be true of several answers at once. A model worn on two parts of the
+body names both slots, and one found in a gym and in a home names both `place` terms, so a filter on either finds it.
+
 Questions that vary independently get separate facets. A vehicle's body and its role are such a pair: a
 police car and a military truck each combine one of each, so `vehicle-body` and `vehicle-role` filter apart
 and combine freely. Within a facet, terms should not overlap, which is why a vehicle that is only damaged is
@@ -39,11 +42,21 @@ requests. It merges synonyms, prefers an existing term where one fits, and adds 
 commit before the tags that use them. A single owner keeps the list small and orthogonal, and requests from
 parallel taggers never race on the file.
 
+## Keywords are open by review
+
+Facets answer fixed questions, so a search needs words that no facet asks for: what a thing is also called, what it
+is used for, what it belongs with. A model may carry `keywords`, a list of kebab-case search words. A closed list
+would stall every new model on a vocabulary edit for words that only help a search, so keywords are admitted by
+review instead. `models/taxonomy.json` lists the curated keywords; a well-formed keyword not on that list is reported
+by the check and the build, never failed, and the reviewer adds it to the list or asks for a listed synonym. A
+malformed keyword still fails, because a search can only match the one form. The reported list is how the curated
+list grows without a single owner reconciling every word first.
+
 ## Defaults and overrides
 
 A set, kit, recipe or mob sheet can set a default that its rows inherit. Each row can override it. The row's
-category replaces the default's. Each facet the row names replaces that facet's terms, and the facets it leaves
-out are inherited. Replacing a facet, rather than adding to it, lets an override drop an inherited term
+category and keywords replace the default's. Each facet the row names replaces that facet's terms, and the facets
+it leaves out are inherited. Replacing a facet, rather than adding to it, lets an override drop an inherited term
 (an empty list clears the facet).
 
 Put a tag where its fact lives. What an object is (its material, the slot it is worn in) goes on the

@@ -163,7 +163,7 @@ function applyFilter() {
   const q = $('search').value.trim().toLowerCase();
   const id = q.replace(/\s+/g, '_');
   const term = q.replace(/[\s_]+/g, '-');
-  const matches = (m) => !q || m.id.includes(id) || Object.values(m.tags).flat().some((t) => t.includes(term));
+  const matches = (m) => !q || m.id.includes(id) || [...Object.values(m.tags).flat(), ...m.keywords].some((t) => t.includes(term));
   const tagged = (m) => [...picked].every(([facet, t]) => m.tags[facet]?.includes(t));
   shown = entries.filter((m) => (shelf === ALL || shelfOf(m) === shelf) && tagged(m) && matches(m));
   $('grid').replaceChildren(...shown.map((m) => cards.get(m.id)));
@@ -299,6 +299,7 @@ async function openViewer(model) {
   const size = box.getSize(new THREE.Vector3());
   const facts = [
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
+    ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],

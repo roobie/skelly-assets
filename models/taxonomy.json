@@ -1,5 +1,5 @@
 {
-  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, and any tags, terms grouped by facet. Every term carries its one-line meaning. Why it is semi-closed, and how a term is requested and added, is in models/TAXONOMY.md.",
+  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, any tags, terms grouped by facet, and any keywords. Every category and facet term carries its one-line meaning; keywords lists the curated search words. Why tags are semi-closed and keywords open by review, and how a term is requested and added, is in models/TAXONOMY.md.",
   "categories": {
     "ammunition": "Cartridges, rounds, shells, spent cases and the boxes and cans made to hold them.",
     "arcana": "Magical and occult objects: wands, rune tablets, charms, ritual gear.",
@@ -50,6 +50,12 @@
         "rubber": "Rubber and soft elastomers.",
         "stone": "Stone, concrete and mineral.",
         "wood": "Wood, worked or rough."
+      }
+    },
+    "place": {
+      "meaning": "Where the model is typically found; a model found in several places names each.",
+      "terms": {
+        "gym": "A gym or fitness centre: training equipment, gym bags, mats."
       }
     },
     "setting": {
@@ -131,5 +137,9 @@
         "trap": "Traps set to catch or wound."
       }
     }
-  }
+  },
+  "keywords": [
+    "duffel",
+    "holdall"
+  ]
 }

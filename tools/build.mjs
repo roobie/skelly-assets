@@ -229,7 +229,8 @@ async function main() {
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
-    const { problems } = taxonomyReport(taxonomies, vocabulary);
+    const { unlisted, problems } = taxonomyReport(taxonomies, vocabulary);
+    for (const { message } of unlisted) console.log(`TAXONOMY note: ${message}`);
     for (const { message } of problems) console.log(`TAXONOMY ${message}`);
     if (problems.length > 0) process.exit(1);
   }
