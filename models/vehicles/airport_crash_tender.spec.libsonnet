@@ -1,6 +1,6 @@
-// A six-wheel-drive airport crash tender: 11.2 m long, 3.0 m wide, 3.6 m to the roof turret, on 14.00 R25 flotation
-// tyres. It weighs about 21 t empty and 35 t laden with 12,500 l of water and 1,500 l of foam concentrate, which its
-// tanks carry as cargo rather than as their own mass.
+// A six-wheel-drive airport crash tender: 11.2 m long, 3.0 m wide, about 4 m to the top of its roof turret, on
+// 14.00 R25 flotation tyres. It weighs about 21 t empty and 35 t laden with 12,500 l of water and 1,500 l of foam
+// concentrate, which its tanks carry as cargo rather than as their own mass.
 {
   rear: -5.6, front: 5.6, side: 1.5, face: 5.36, cabBack: 2.9, doorRear: 3.98,
   crew: [2.98, 3.9],
@@ -25,5 +25,6 @@
   bodyRear: -5.52, bodyFront: 2.82, bodyLow: 0.92, bodyFloor: 1.45, bodyTop: 3.4, bodySide: 1.5,
   // Roof turret on the cab roof and bumper turret on the front bumper, both aimed straight ahead.
   turretX: 3.62, bumperTurretX: 5.48,
-  bodyMass: 5600, waterTankMass: 1600, foamTankMass: 260, pumpMass: 720,
+  bodyMass: 5600, waterTankMass: 1600, foamTankMass: 260, pumpMass: 720, lockersMass: 520,
+  turretMountMass: 140, turretMass: 210, bumperTurretMass: 70, roofRailMass: 90, ladderMass: 30,
 }
