@@ -26,7 +26,7 @@ local bag(slot) = { category: 'containers', tags: { slot: slot, material: ['fabr
   }, folded(['torso'], ['fabric'])),
   atom('fanny_pack', 'bag', 0.200, bags.fanny_pack, bags.finish.fanny_pack, taxonomy=bag(['waist'])),
   atom('school_backpack', 'bag', 0.600, bags.school_backpack, bags.finish.school_backpack, 'handle', bag(['back'])),
-  atom('hiking_backpack', 'bag', 1.400, bags.hiking_backpack, bags.finish.hiking_backpack, 'handle', bag(['back'])),
+  atom('hiking_backpack', 'bag', 1.400, bags.hiking_backpack, bags.finish.hiking_backpack, 'handle', bag(['back']) + { keywords: ['camping'] }),
   // A fitted chamfered crown clears the bust's square hair corners without an oversized circular cap.
   atom('baseball_cap', 'cap', 0.080, {
     width: 0.204, depth: 0.244, height: 0.08, chamfer: 0.04,

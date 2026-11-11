@@ -164,7 +164,7 @@ local leatherSections = [
 
   // A tyre plate laid flat, 550 mm from the shoulder chunks to the hem and 600 mm across the side tapes.
   h.compound('tyre_plate', 2.3, tirePlate(), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', tape: 'tape-silver' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'fabric'], slot: ['torso'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber', 'fabric'], slot: ['torso'] } } },
 
   // A denim vest folded on a shelf, 340 mm by 280 mm and 40 mm tall, steel plates riveted over both chest panels and
   // the belly, metal buttons down the front between them.

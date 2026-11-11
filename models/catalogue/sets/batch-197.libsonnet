@@ -58,7 +58,7 @@ local plates = 8;
     coal: 'plastic-charcoal',
     ember: 'glow-flame',
     rune: 'crystal-glow-blue',
-  }) + h.gripOn('spider_shell_forge', 'handle-front-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
+  }) + h.gripOn('spider_shell_forge', 'handle-front-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
 
   // A stiff paper sack 110 mm wide, 70 mm deep and 190 mm tall, its top rolled down twice over about a litre of grey
   // mortar, with a red band round its middle printed with a pale blue rune.

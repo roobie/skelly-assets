@@ -185,7 +185,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     leg: 'knit-fr',
     zip: 'steel-bright',
     rib: 'webbing-olive-dark',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dress uniform folded on a shelf: a navy jacket 380 mm by 360 mm on folded trousers 320 mm by 420 mm, 90 mm
   // tall in all. Gold buttons, shoulder boards with rank bars, rows of ribbons and two medals over the left breast,
@@ -222,7 +222,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     ribbon0: 'cloth-crimson',
     ribbon1: 'cloth-blue',
     ribbon2: 'cloth-green',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A sealed environmental suit folded to 460 mm by 440 mm and 80 mm tall, legs folded up, with its attached boots
   // standing on the bundle and its attached gloves lying on the sleeves: brown cloth with blue shoulders, a ring neck
@@ -256,7 +256,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     lining: 'cloth-charcoal',
     glove: 'vinyl-black',
     cuff: 'cloth-brown',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['radiation'], tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
 
   // The same sealed suit worn down: its top half rolled to the waist and the sleeves knotted round it, folded to
   // 420 mm by 380 mm and 70 mm tall with the roll across the back, the knotted sleeves and their gloves hanging over
@@ -284,7 +284,7 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     lining: 'cloth-charcoal',
     glove: 'vinyl-black',
     cuff: 'cloth-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['radiation'], tags: { material: ['fabric'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs', 'hands', 'feet'], state: ['folded'] } } },
 
   // A two-piece business suit folded on a shelf: a charcoal jacket 380 mm by 360 mm on folded trousers 320 mm by
   // 420 mm, 90 mm tall in all, the jacket's lapels meeting over a cream shirt front and a red tie, a pocket square in
@@ -302,5 +302,5 @@ local mailFinish(m) = { mail: m, binding: 'leather-brown', hole: 'cloth-black', 
     shirt: 'cloth-cream',
     tie: 'cloth-crimson',
     square: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

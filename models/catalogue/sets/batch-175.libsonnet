@@ -139,24 +139,24 @@ local bra(cw, ch, ties) =
   // Lycra bikini bottoms laid flat, 300 mm across the waist with ties and 160 mm long: a front panel narrowing to the
   // crotch, a waistband, and a tie knotted in a bow at each hip.
   h.compound('bikini_bottom', 0.021, briefs(0.26, 0.07, 0.16, 0.012, true), { cloth: 'cloth-blue', band: 'cloth-blue', tie: 'cloth-bright-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Lycra thong bottoms laid flat, 300 mm across the waist string and 130 mm long: a small triangle front narrowing to
   // a string at the crotch, on a thin string waistband.
   h.compound('thong_bikini_bottoms', 0.0081, briefs(0.12, 0.012, 0.11, 0.008, false, 0)
                                            + [box('waist-string', 'tie', [-0.15, 0, -0.06], [0.15, 0.003, -0.054])]
                                            + cord('back-string', 'tie', [[0, 0.054], [0, 0.075]], 0), { cloth: 'cloth-red', band: 'cloth-red', tie: 'cloth-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A lycra bikini top laid flat, 380 mm across its band strings and 200 mm tall with its neck strings: two
   // triangle cups 120 mm across, lightly padded, joined by a tied centre, with band and neck strings.
   h.compound('bikini_top', 0.022, bra(0.12, 0.12, true), { cloth: 'cloth-blue', seam: 'cloth-navy', tie: 'cloth-bright-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A small lycra bikini top laid flat, 300 mm across its strings: two small triangle cups 80 mm across on thin
   // strings.
   h.compound('small_bikini_top', 0.011, bra(0.08, 0.08, false), { cloth: 'cloth-red', seam: 'cloth-crimson', tie: 'cloth-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A full-face diving mask standing on its chin, 200 mm across and 230 mm tall: a clear domed visor over the whole
   // face in an oval face-port frame, a black rubber skirt behind it, a moulded adapter port on the chin for a tank hose

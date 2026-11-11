@@ -181,20 +181,20 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   // One-piece swimsuit laid flat, 500 mm from crotch to shoulders and 300 mm across the hips, printed with a striped
   // flag and starred canton, its shoulder straps folded down over the front.
   h.compound('flag_swimsuit', 0.24, swimsuit(), { cloth: 'lycra-red', strap: 'lycra-red', band: 'lycra-black', lining: 'cloth-crimson', stripe: 'cloth-bright-white', canton: 'cloth-navy', star: 'cloth-bright-white' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // Swim goggles standing on their cups, front on +z: two 40 mm cups on a nose bridge, 120 mm across, the silicone
   // strap looped behind.
   h.compound('swim_goggles', 0.03, g.eyewear({ kind: 'goggles', rIn: 0.015, rOut: 0.02, depth: 0.016, gap: 0.014, strapW: 0.008 }),
              { cup: 'plastic-clear-blue', rim: 'rubber-black', lens: 'lens-smoke', bridge: 'rubber-black', strap: 'plastic-blue' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'rubber'], slot: ['face'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['plastic', 'rubber'], slot: ['face'], setting: ['modern'] } } },
 
   // Long-sleeved rash vest folded on a shelf, 300 mm by 300 mm and 40 mm tall, contrast sleeves and a chest panel.
   h.compound('rashguard', 0.38,
              g.jacket({ w: 0.3, d: 0.3, ht: 0.04, front: 'none', buttons: 0, collar: { r: 0.055, wd: 0.016, ht: 0.01, gap: 30 }, sleeves: { kind: 'flat', w: 0.07, t: 0.005 } })
              + [box('panel', 'panel', [-0.08, 0.04, -0.06], [0.08, 0.043, 0.0])],
              { cloth: 'lycra-black', collar: 'lycra-blue', sleeve: 'lycra-blue', panel: 'lycra-blue' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Mail shark suit laid out flat, 1.8 m from hood to toes and 950 mm across the arms.
   h.compound('shark_suit', 9.1, sharkSuit(), { mail: 'steel-mail', row: 'steel-mail-dark', collar: 'cloth-black' })
@@ -207,24 +207,24 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
   // Black racing briefs laid flat, 300 mm across the waist and 150 mm deep.
   h.compound('racing_briefs', 0.052, briefs([[0.075, 0.15], [0.05, 0.145], [0.025, 0.115], [0.0, 0.08], [-0.03, 0.05], [-0.075, 0.038]]),
              { cloth: 'lycra-black', band: 'lycra-black', cord: 'cord-cotton' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Blue swim briefs laid flat, 320 mm across the waist and 170 mm deep, fuller at the sides, with contrast panels.
   h.compound('swim_briefs', 0.07, briefs([[0.085, 0.16], [0.05, 0.158], [0.02, 0.13], [-0.01, 0.09], [-0.045, 0.055], [-0.085, 0.042]], true),
              { cloth: 'lycra-blue', band: 'cloth-navy', cord: 'cord-cotton', panel: 'cloth-navy' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Swim cap standing on its rim, 190 mm across and 120 mm tall, with a rolled edge.
   h.compound('swim_cap', 0.091,
              g.hat({ crown: { r: 0.095, ht: 0.12, p: 2.2, hollow: 0.003 } })
              + [g.ring('roll', 'roll', 0.092, 0.098, 0, 0.008)],
              { crown: 'cloth-yellow', roll: 'cloth-yellow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['head'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['rubber'], slot: ['head'], setting: ['modern'] } } },
 
   // Swim fins lying flat as a pair, each 600 mm long: a closed foot pocket and a blade 200 mm wide at the tip.
   h.compound('swim_fins', 1.6, fin('l-', -0.115) + fin('r-', 0.115),
              { sole: 'rubber-black', upper: 'rubber-black', blade: 'rubber-yellow', rail: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving', 'swimming'], tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Swimming trunks folded on a shelf, 300 mm by 280 mm and 45 mm tall: an elastic waistband with a tied drawcord, a
   // mesh liner showing at the waist and stripes down the sides.
@@ -240,7 +240,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                g.strip('cord-r', 'cord', [0.01, 0.12], [0.035, 0.045], 0.05, 0.006, 0.005),
              ],
              { cloth: 'cloth-green', band: 'cloth-navy', liner: 'mesh-white', seam: 'cloth-navy', stripe: 'cloth-cream', cord: 'cord-cotton' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Full wetsuit folded on a shelf, 380 mm by 320 mm and 100 mm tall: black neoprene with blue side panels and collar,
   // a grey chest zip, grey knee pads, the sleeves folded along the sides behind grey flatlock seams and the blue zip
@@ -260,13 +260,13 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                box('yoke-seam-r', 'seam', [0.07, 0.1, 0.1], [0.107, 0.103, 0.108]),
              ],
              { cloth: 'neoprene-black', collar: 'cloth-blue', front: 'canvas-grey', sleeve: 'neoprene-black', panel: 'cloth-blue', pad: 'canvas-grey', leash: 'cloth-blue', seam: 'canvas-grey' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving'], tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Neoprene split-toe dive socks lying flat side by side, both pointing the same way, each 250 mm heel to toe and
   // 100 mm up the leg.
   h.compound('wetsuit_booties', 0.3, diveSocks,
              { sock: 'neoprene-black', heel: 'cloth-charcoal', toe: 'cloth-charcoal', cuff: 'cloth-blue', sole: 'rubber-black', split: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving'], tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Thick neoprene dive boots standing as a pair, each 290 mm long and 190 mm tall, on hard rubber soles with a side zip.
   h.compound('thick_wetsuit_booties', 1.2,
@@ -277,11 +277,11 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                  f.band(p + 'strap', 'strap', diveBoot, cx, 0.1, 0.12, 0.004),
                ]),
              { sole: 'rubber-black', upper: 'neoprene-black', shaft: 'neoprene-black', collar: 'cloth-blue', lining: 'cloth-charcoal', toecap: 'rubber-black', zip: 'plastic-matte-black', strap: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving'], tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Neoprene dive gloves lying flat as a pair, backs up, each 250 mm long with a bound cuff.
   h.compound('wetsuit_gloves', 0.2,
              g.glovePair({ t: 0.012, cuff: 0.07, flare: 0.05, binding: 'binding', knuckle: 'knuckle' }),
              { glove: 'neoprene-black', cuff: 'neoprene-black', binding: 'cloth-blue', knuckle: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['hands'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving'], tags: { material: ['rubber'], slot: ['hands'], setting: ['modern'] } } },
 ]

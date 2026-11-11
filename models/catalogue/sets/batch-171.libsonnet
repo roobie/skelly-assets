@@ -378,13 +378,13 @@ local mailSuit() =
   h.compound('junkyard_plate_armour', 29, sheetSuit({ mail: true }), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
   })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Heavy junkyard plate armour: mail at the gaps and a second sheet bolted over the chest.
   h.compound('heavy_junkyard_plate_armour', 31, sheetSuit({ mail: true, heavy: true }), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
   })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Nomad mail suit, powered, folded on a shelf: 420 mm by 360 mm and 90 mm tall.
   h.compound('powered_ventilated_mail_suit', 10, mailSuit(), {

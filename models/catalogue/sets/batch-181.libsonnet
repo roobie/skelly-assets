@@ -196,7 +196,7 @@ local mirrorArmor(id, mass, style) =
                                          + tread('arm-l', -sx, -0.06, 0.07, 0.13, st)
                                          + tread('arm-r', sx, -0.06, 0.07, 0.13, st),
              { cloth: 'leather-brown', collar: 'leather-brown', front: 'leather-brown', sleeve: 'leather-brown', button: 'brass-dull', tyre: 'rubber-tread', lug: 'rubber-offblack' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'rubber'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['leather', 'rubber'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A thick black leather jacket folded flat, 420 mm by 340 mm and 80 mm tall, covered in carved bone: a breastbone
   // down the front with four curved ribs off each side, knuckle bones over the shoulders and a long bone down each

@@ -317,7 +317,7 @@ local mailBundle(o) =
                for s in sides
              ]),
              { plate: 'plastic-matte-black', edge: 'plastic-charcoal', strap: 'hook-loop-grey', buckle: 'plastic-charcoal', band: 'felt-grey' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A lacquered lamellar armour laid out flat, 1.3 m from collar to toe: the box cuirass of six laced rows of
   // black lames, a broad laced shoulder board either side, four laced skirt panels hanging below, cloth sleeves set
@@ -403,7 +403,7 @@ local mailBundle(o) =
                ][i]]
              ],
              { cloth: 'canvas-grey', steel: 'steel-bright', rust: 'rust-red', zinc: 'steel-galvanised', string: 'cord-cotton' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A tyre-rubber suit laid out flat, 1.3 m from collar to toe: curved chunks cut from tyres, chevron tread up, over
   // the chest, back, arms and legs, strung together with string at their corners.
@@ -449,7 +449,7 @@ local mailBundle(o) =
                ][i]]
              ],
              { rubber: 'rubber-black', lug: 'rubber-tread', string: 'cord-cotton' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A beekeeper's coverall folded square, 360 mm by 300 mm and 80 mm thick: white cotton, a zipped front, a
   // stand collar, a flapped chest pocket, the sleeves folded in along the sides, and the elastic ankle straps with
