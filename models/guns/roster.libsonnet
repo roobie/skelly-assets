@@ -1,6 +1,6 @@
 // The guns and gun items the firearms pack exports; packages/gun-authoring-tool/exports/deadvox.jsonnet turns each into
 // its export row. `weapon` is the weapon class (models/TAXONOMY.md) a gun is or an item serves; an item fitted to any
-// gun names none.
+// gun names none. A design or attachment may also name `keywords` (models/TAXONOMY.md).
 {
   // A curated design in models/guns/designs/, by file name.
   designs: [
@@ -10,7 +10,7 @@
     { id: 'rifle_hunting', design: 'hunting-rifle', weapon: 'rifle' },
     { id: 'revolver', design: 'archetype-revolver', weapon: 'handgun' },
     { id: 'pistol_service', design: 'service-nine', weapon: 'handgun' },
-    { id: 'rifle_pipe', design: 'pipe-rifle', weapon: 'rifle' },
+    { id: 'rifle_pipe', design: 'pipe-rifle', weapon: 'rifle', keywords: ['improvised'] },
   ],
   // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids;
   // `definition` is the cartridge itself, which may name its own grain.
@@ -32,18 +32,18 @@
   attachments: [
     { source: 'ak-slant-compensator', weapon: 'rifle' },
     { source: 'foregrip' },
-    { source: 'improvised-suppressor' },
-    { source: 'optic-digital-thermal' },
-    { source: 'optic-fixed-prism-4x' },
-    { source: 'optic-high-mag-5-25x' },
+    { source: 'improvised-suppressor', keywords: ['silencer'] },
+    { source: 'optic-digital-thermal', keywords: ['scope'] },
+    { source: 'optic-fixed-prism-4x', keywords: ['scope'] },
+    { source: 'optic-high-mag-5-25x', keywords: ['scope'] },
     { source: 'optic-holographic' },
-    { source: 'optic-hunting-3-9x' },
-    { source: 'optic-lpvo-1-6x' },
+    { source: 'optic-hunting-3-9x', keywords: ['scope'] },
+    { source: 'optic-lpvo-1-6x', keywords: ['scope'] },
     { source: 'optic-mini-reflex' },
     { source: 'optic-tube-dot' },
     { source: 'rail-front-sight' },
     { source: 'rail-rear-sight' },
-    { source: 'real-suppressor' },
+    { source: 'real-suppressor', keywords: ['silencer'] },
     { source: 'tactical-flashlight-mount' },
   ],
   // A magazine by its source id, loaded with a cartridge in models/guns/cartridges/ and drawn in an appearance profile.
@@ -56,4 +56,6 @@
   // Every catalogue part exports as its loose part. A part whose id names one of these actions or frames belongs to
   // its weapon class.
   partWeapons: { ak: 'rifle', ar: 'rifle', sporter: 'rifle', pipe: 'rifle', pump: 'shotgun', pistol: 'handgun', revolver: 'handgun' },
+  // The keywords a part takes from the action or frame its id names, as its gun design does.
+  partKeywords: { pipe: ['improvised'] },
 }

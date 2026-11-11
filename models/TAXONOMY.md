@@ -47,10 +47,11 @@ parallel taggers never race on the file.
 Facets answer fixed questions, so a search needs words that no facet asks for: what a thing is also called, what it
 is used for, what it belongs with. A model may carry `keywords`, a list of kebab-case search words. A closed list
 would stall every new model on a vocabulary edit for words that only help a search, so keywords are admitted by
-review instead. `models/taxonomy.json` lists the curated keywords; a well-formed keyword not on that list is reported
-by the check and the build, never failed, and the reviewer adds it to the list or asks for a listed synonym. A
-malformed keyword still fails, because a search can only match the one form. The reported list is how the curated
-list grows without a single owner reconciling every word first.
+review instead. `models/taxonomy.json` lists each curated keyword with its one-line meaning, so a reviewer can tell a
+new concept from a synonym of a listed word; a well-formed keyword not on that list is reported by the check and the
+build, never failed, and the reviewer adds it to the list or asks for a listed synonym. A malformed keyword still
+fails, because a search can only match the one form. The reported list is how the curated list grows without a single
+owner reconciling every word first.
 
 ## Defaults and overrides
 

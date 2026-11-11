@@ -46,12 +46,7 @@ export function readVocabulary(root = repo) {
     }
     return [facet, { meaning: entry.meaning, terms: termTable(entry.terms, `facet ${facet}`) }];
   }));
-  const keywords = value.keywords ?? [];
-  if (!Array.isArray(keywords) || !keywords.every(isTerm)) {
-    throw new Error(`${VOCABULARY}: keywords must list kebab-case terms`);
-  }
-  if (new Set(keywords).size !== keywords.length) throw new Error(`${VOCABULARY}: keywords lists a term twice`);
-  return { untaggedPacks: new Set(untaggedPacks), categories: termTable(value.categories, 'categories'), facets, keywords: new Set(keywords) };
+  return { untaggedPacks: new Set(untaggedPacks), categories: termTable(value.categories, 'categories'), facets, keywords: termTable(value.keywords, 'keywords') };
 }
 
 const keywordList = (taxonomy) => (isObject(taxonomy) && Array.isArray(taxonomy.keywords) ? taxonomy.keywords : []);
