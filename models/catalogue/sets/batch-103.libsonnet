@@ -286,7 +286,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
   h.compound('steel_toe_sneakers', 1.4, pair(sneaker + { l: 0.254, toeSlot: 'toe' }, 0.03, function(p, cx)
     instepLaces(p, sneaker + { l: 0.254 }, cx, 4)
   ), { sole: 'plastic-grey', upper: 'leather-black', toe: 'plastic-charcoal', shaft: 'leather-black', collar: 'plastic-charcoal', lining: 'paint-charcoal', tongue: 'leather-black', lace: 'webbing-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of plain white cotton socks laid flat, one across the other, each 290 mm from cuff to heel and 240 mm from
   // heel to toe, with a grey heel and toe.

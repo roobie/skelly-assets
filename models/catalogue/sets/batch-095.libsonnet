@@ -99,7 +99,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       box('edge-a', 'rag', [-0.15, 0, -w / 2 - 0.006], [0.12, 0.01, -w / 2 + 0.008]),
       box('edge-b', 'rag-dark', [-0.15, 0, w / 2 - 0.008], [0.12, 0.01, w / 2 + 0.006]),
     ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' }) + h.headEndOnPlusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A survivor-forged mild steel ESBI side plate: a hexagon 200 mm long and 150 mm across, 6 mm thick, on a nylon pad
   // that shows round its edge, with one nylon strap across.
@@ -119,7 +119,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       box('wrap-%d' % i, if i % 2 == 0 then 'rag' else 'rag-dark', [[-0.075, -0.015, 0.045][i], 0, [-0.05, -0.079, -0.05][i]], [[-0.045, 0.015, 0.075][i], 0.01, [0.05, 0.079, 0.05][i]])
       for i in [0, 1, 2]
     ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A commercial hard steel plate, 300 mm long and 250 mm across with a shooter's cut, bent round a 300 mm radius,
   // with a black rubber guard round its edges.

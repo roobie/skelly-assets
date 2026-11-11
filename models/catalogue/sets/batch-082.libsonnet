@@ -169,7 +169,7 @@ local tray(w, d, ht, t) = [
     rod('bit', 'bit', 0.0025, 0.117, 0.14, 0.05),
   ], { handle: 'wood-walnut', frame: 'steel-grey', wheel: 'paint-red', chuck: 'steel-bright', bit: 'steel-blued' }) + h.gripOn('hand_drill', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'] } } },
 
   // A coil of 24 mm rubber hose, 24 cm across, three turns high with its loose end laid over the top.
   h.compound('hose', 0.42, [
@@ -187,7 +187,7 @@ local tray(w, d, ht, t) = [
     halfSpan: 0.08, halfHeight: 0.035, linkWidth: 0.018, linkDepth: 0.006, linkOffset: 0.024,
     screwRadius: 0.006, crankLength: 0.02, crankRadius: 0.007,
     saddleLength: 0.07, saddleWidth: 0.05, saddleThickness: 0.008,
-  }, { frame: 'scrap-rusted', link: 'steel-bright', screw: 'steel-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  }, { frame: 'scrap-rusted', link: 'steel-bright', screw: 'steel-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
   // A petrol breaker, 92 cm from the T handle to the point: a two-stroke engine block with its fuel tank on top and
   // a pull starter on the front, then the drive cylinder and the moil point.

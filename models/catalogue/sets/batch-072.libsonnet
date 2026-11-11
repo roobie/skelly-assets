@@ -126,7 +126,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     h.box('label-stripe', 'band', [0.04, 0.0125, -0.005], [0.092, 0.013, 0.005]),
   ], { box: 'paperboard-tan', paper: 'paper-white', band: 'plastic-red', label: 'paper-white' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'containers', keywords: ['water-purification'], tags: { material: ['paper'], setting: ['modern'] } } },
   // A wall hygroscope on a flat walnut board 120 mm wide, 400 mm tall and 20 mm deep, front on +z: a round
   // dial at the top, a wide glazed window below showing a dark stretched hair running down past a scale to a
   // coiled spring, and a hanging ring.
@@ -402,7 +402,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     hose: 'plastic-clear-blue',
   }) + {
     voxelGrain: 0.008,
-  } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'machinery', keywords: ['improvised'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A lab cracking reactor taken down and strapped to a 1.2 by 1.0 m pallet: the main reactor column in a
   // 1 m section with flanged ends, a long riser pipe, a cyclone separator with its cone, a bundle of short
   // flanged pipe spools, and the controller cabinet, about 0.75 m high in all.

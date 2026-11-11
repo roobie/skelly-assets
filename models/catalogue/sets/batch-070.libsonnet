@@ -63,7 +63,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     body: 'plastic-black', face: 'plastic-charcoal', gimbal: 'plastic-grey', stick: 'steel-bright', knob: 'rubber-black',
     'button-red': 'plastic-red', 'button-yellow': 'plastic-yellow', 'button-green': 'plastic-green', 'button-blue': 'plastic-blue',
     switch: 'steel-grey', label: 'plastic-white', base: 'plastic-black', aerial: 'steel-bright',
-  }) + h.inHand('hobby_radio_transmitter', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + h.inHand('hobby_radio_transmitter', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A rugged handheld controller for a real vehicle, 200 by 130 mm and 50 mm thick, face up: a screen, two rows of
   // toggle switches, a drive stick, yellow corner bumpers and a stubby rubber aerial out of the back.
@@ -157,5 +157,5 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     for i in std.range(0, 2)
   ] + [
     ringY('tape', 'tape', 0.047, 0.052, 0.085, 0.1),
-  ], { plastic: 'plastic-clear', tape: 'tape-silver' }) + h.inHand('makeshift_funnel', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'] } } },
+  ], { plastic: 'plastic-clear', tape: 'tape-silver' }) + h.inHand('makeshift_funnel', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['plastic'] } } },
 ]

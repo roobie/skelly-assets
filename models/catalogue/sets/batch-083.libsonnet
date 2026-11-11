@@ -43,7 +43,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('wrap-x', 'lashing', [0.098, 0.034, -0.016], [0.138, 0.038, -0.010]),
     box('wrap-y', 'lashing', [0.098, 0.034, 0.010], [0.138, 0.038, 0.016]),
   ], { haft: 'bark', head: 'iron-dull', face: 'steel-bright', lashing: 'steel-galvanised' })
-  + h.gripOn('makeshift_hammer', 'haft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  + h.gripOn('makeshift_hammer', 'haft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal', 'wood'] } } },
 
   // A stitched leather hose about 1.5 m long and 18 mm thick, coiled flat in three loops 0.23 m across, its two ends
   // laid out with a hard leather collar on each.
@@ -76,7 +76,7 @@ local pickArm(prefix, stations, y0, y1) = [
     rod('hose', 'hose', 0.006, 0.15, 0.21, 0.035),
     turned('bulb', 'pump', 'x', [[0, 0], [0, 0.012], [0.02, 0.03], [0.07, 0.03], [0.09, 0.012], [0.09, 0]], [0.21, 0.035, 0]),
   ], { box: 'board-mdf', platen: 'wood-pine', hole: 'plastic-matte-black', frame: 'wood-pine', sheet: 'plastic-clear', hose: 'rubber-black', pump: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
   // A welding mat about 0.9 by 0.7 m sewn from glass-fibre oven batts under an aramid cover, folded to 450 by 350 mm
   // and 70 mm thick, its quilting stitched as thin sunken lines a shade darker than the cover and tied with a cord.
@@ -87,7 +87,7 @@ local pickArm(prefix, stations, y0, y1) = [
     ] + [
       box('tie', 'tie', [0.064, -0.001, -0.177], [0.07, 0.0715, 0.177]),
     ], { cloth: 'aramid-gold', stitch: 'cloth-turnout', tie: 'jute' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['improvised', 'metalworking'], tags: { material: ['fabric'] } } },
 
   // A set of five needle files 140 mm long, each with its own cut, laid in a vinyl wallet 150 by 80 mm.
   h.compound('metal_file', 0.087, [
@@ -95,7 +95,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('band', 'band', [-0.04, 0.0025, -0.042], [-0.032, 0.010, 0.042]),
   ] + std.flattenArrays([needleFile('file-%d' % i, -0.032 + i * 0.016, [0.003, 0.0025, 0.002, 0.003, 0.0015][i]) for i in std.range(0, 4)]),
   { wallet: 'vinyl-black', band: 'webbing-black', handle: 'plastic-red', file: 'steel-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A hand concrete float: a 150 by 75 mm iron blade with rounded front corners and a bent iron strap handle.
   h.compound('concrete_float', 0.3, [
@@ -169,7 +169,7 @@ local pickArm(prefix, stations, y0, y1) = [
     box('head', 'body', [0.22, 0.005, -0.009], [0.245, 0.03, 0.009]),
     prism('nozzle', 'nozzle', 'z', [[0.236, 0.004], [0.249, 0.006], [0.258, -0.005], [0.252, -0.009]], -0.0055, 0.0055),
   ], { handle: 'brass-polished', body: 'brass-dull', red: 'plastic-red', blue: 'plastic-blue', 'red-hose': 'rubber-black', 'blue-hose': 'rubber-black', tube: 'steel-bright', nozzle: 'copper' })
-  + h.gripOn('oxyacetylene_torch', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('oxyacetylene_torch', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 100 mm wall brush, 210 mm long: a flat beavertail wooden handle, a steel ferrule and a block of bristle.
   h.compound('paint_brush', 0.2, [
@@ -205,7 +205,7 @@ local pickArm(prefix, stations, y0, y1) = [
       for i in std.range(0, 7)
     ]) + [[0.085, 0.0012], [0.085, 0]], [-0.02, 0.009, 0]),
   ], { handle: 'steel-grey', knurl: 'steel-galvanised', reamer: 'steel-bright' })
-  + h.gripOn('pin_reamer', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('pin_reamer', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A pair of 170 mm slip-joint pliers with ridged jaws and red dipped grips.
   h.item('pliers', 'pliers', 0.2, {

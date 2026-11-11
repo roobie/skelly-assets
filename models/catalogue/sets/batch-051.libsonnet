@@ -77,7 +77,7 @@ local hangHook(id, x, y, z, r, foot) =
     barZ('lever', 'lever', [-0.07, 0.33], [0.5, 0.95], 0.03, 0.058, 0.074),
     h.turned('grip', 'grip', 'z', [[0, 0], [0, 0.018], [0.12, 0.018], [0.12, 0]], [0.5, 0.95, 0.006]),
     h.prism('hold-down', 'frame', 'z', [[0.04, 0.26], [0.12, 0.26], [0.12, 0.31], [0.07, 0.31]], -0.04, 0.03),
-  ], { frame: 'paint-olive', bolt: 'steel-grey', blade: 'steel-bright', lever: 'steel-grey', grip: 'rubber-black' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  ], { frame: 'paint-olive', bolt: 'steel-grey', blade: 'steel-bright', lever: 'steel-grey', grip: 'rubber-black' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // A steel fire bowl 550 mm across and 160 mm deep on three legs, its rim 440 mm off the ground, with a bar grate in
   // the bottom.
@@ -101,7 +101,7 @@ local hangHook(id, x, y, z, r, foot) =
     hoop('handle-%d' % i, 'leg', 0.025, 0.033, -0.006, 0.006, x, 0.43)
     for i in [0, 1]
     for x in [[-0.3, 0.3][i]]
-  ], { bowl: 'iron-dull', leg: 'steel-parkerized', grate: 'steel-grey' }) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  ], { bowl: 'iron-dull', leg: 'steel-parkerized', grate: 'steel-grey' }) + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'] } } },
 
   // A folding chair folded flat and standing on its feet: 450 mm wide, 880 mm tall and 70 mm deep, a grey moulded
   // seat and back on a tubular steel frame, the seat folded up against the front legs.
@@ -121,7 +121,7 @@ local hangHook(id, x, y, z, r, foot) =
   ] + [
     disc('foot-%d' % i, 'foot', 0.014, 0, 0.012, [-0.2, 0.2, -0.18, 0.18][i], [0, 0, -0.026, -0.026][i])
     for i in std.range(0, 3)
-  ], { frame: 'steel-grey', panel: 'plastic-grey', foot: 'rubber-black', hole: 'plastic-charcoal' }) + { taxonomy: { category: 'furniture', tags: { material: ['metal', 'plastic'], setting: ['modern'], state: ['folded'] } } },
+  ], { frame: 'steel-grey', panel: 'plastic-grey', foot: 'rubber-black', hole: 'plastic-charcoal' }) + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['metal', 'plastic'], setting: ['modern'], state: ['folded'] } } },
 
   // A foot-cranked barrel churn: a staved oak barrel 340 mm long and 240 mm across, lying in a two-ended stand
   // 460 mm tall, with a crank at one end and a treadle bar along the floor.
@@ -177,7 +177,7 @@ local hangHook(id, x, y, z, r, foot) =
     ]
     for i in [0, 1]
     for x in [[-0.25, 0.25][i]]
-  ]), { canvas: 'cloth-olive-drab', rail: 'alu-bare', leg: 'alu-bare', strap: 'webbing-olive-dark', buckle: 'plastic-matte-black' }) + { taxonomy: { category: 'furniture', tags: { material: ['fabric', 'metal'], state: ['folded'] } } },
+  ]), { canvas: 'cloth-olive-drab', rail: 'alu-bare', leg: 'alu-bare', strap: 'webbing-olive-dark', buckle: 'plastic-matte-black' }) + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['fabric', 'metal'], state: ['folded'] } } },
 
   // A wooden deck chair folded flat: three nested beech frames 1.2 m long and 550 mm wide, 80 mm thick, with a
   // blue and white striped canvas sling on top.
@@ -318,7 +318,7 @@ local hangHook(id, x, y, z, r, foot) =
     rod('chimney', 'pipe', 0.016, -0.15, 0.15, 0.056) + { origin: [-0.15, 0.056, 0.08] },
     h.tube('chimney-clip-a', 'handle', 0.016, 0.018, -0.1, -0.09, 0.056, 0.08),
     h.tube('chimney-clip-b', 'handle', 0.016, 0.018, 0.09, 0.1, 0.056, 0.08),
-  ], { steel: 'steel-stainless', seam: 'steel-grey', slot: 'coal-black', handle: 'steel-parkerized', pipe: 'steel-galvanised' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], state: ['folded'] } } },
+  ], { steel: 'steel-stainless', seam: 'steel-grey', slot: 'coal-black', handle: 'steel-parkerized', pipe: 'steel-galvanised' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', keywords: ['camping', 'cooking'], tags: { material: ['metal'], state: ['folded'] } } },
 
   // A wooden oil press 1.8 m tall: two oak posts on a bed 1.2 m long, a heavy head beam carrying a 120 mm wooden
   // screw, a follower block over a slatted press basket in a drip tray, and a 1.6 m capstan bar through the screw head.
@@ -377,7 +377,7 @@ local hangHook(id, x, y, z, r, foot) =
     box('handle-a', 'latch', [-0.07, 0.014, 0.25], [-0.06, 0.024, 0.28]),
     box('handle-b', 'latch', [0.06, 0.014, 0.25], [0.07, 0.024, 0.28]),
     box('handle-grip', 'handle', [-0.07, 0.012, 0.28], [0.07, 0.026, 0.295]),
-  ], { top: 'steel-galvanised', groove: 'plastic-charcoal', leg: 'steel-grey', latch: 'steel-parkerized', handle: 'plastic-matte-black' }) + { taxonomy: { category: 'furniture', tags: { material: ['metal'], state: ['folded'] } } },
+  ], { top: 'steel-galvanised', groove: 'plastic-charcoal', leg: 'steel-grey', latch: 'steel-parkerized', handle: 'plastic-matte-black' }) + { taxonomy: { category: 'furniture', keywords: ['camping'], tags: { material: ['metal'], state: ['folded'] } } },
 
   // A small water mill: a paddle wheel 1.24 m across and 260 mm wide on an oak axle, turning a pair of 500 mm millstones
   // in a plank housing behind it with a grain hopper on top.

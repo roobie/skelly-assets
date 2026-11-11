@@ -76,7 +76,7 @@ local toothLump(p, x, z, k) = [
     disc('nail' + i + '-' + j, 'nail', 0.002, 0.04, 0.08, -0.25 + i * 0.1, -0.085 + j * 0.084)
     for i in std.range(0, 5)
     for j in [0, 1, 2]
-  ], { batten: 'wood-oak', board: 'wood-pine', nail: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
+  ], { batten: 'wood-oak', board: 'wood-pine', nail: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', keywords: ['improvised'], tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
 
   // A tin can 75 mm across and 110 mm tall bound with black tape, a nail through its lid for a striker, and a
   // pull string tied to the pin and coiled at its foot.

@@ -115,7 +115,7 @@ local molle(id, x0, x1, z0, rows, y) = [
     box('waist-right', 'strap', [0.17, 0, 0.02], [0.32, 0.004, 0.05]),
     box('buckle', 'stud', [0.3, 0.004, 0.015], [0.33, 0.01, 0.055]),
   ], { body: 'cloth-canvas', flap: 'cloth-canvas', strap: 'cloth-khaki', stud: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // A small nylon pouch 50 mm wide, 130 mm tall and 45 mm deep that takes one torch, with a snapped flap.
   h.compound('flashlight_pouch', 0.031, pouch(0.05, 0.13, 0.045, 0.04, 1) + [
@@ -178,5 +178,5 @@ local molle(id, x0, x1, z0, rows, y) = [
   + molle('wing-webbing-l', -w / 2 - 0.078, -w / 2 - 0.002, 0.04, 5, t * 0.6)
   + molle('wing-webbing-r', w / 2 + 0.002, w / 2 + 0.078, 0.04, 5, t * 0.6),
   { body: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'plastic-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 ]

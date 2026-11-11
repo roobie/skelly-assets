@@ -29,7 +29,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
       h.disc('pivot', 'pivot', 0.004, -0.004, 0.009, 0.0, 0.0),
     ], { blade: 'steel-stainless', handle: 'plastic-orange', pivot: 'steel-grey' }) + h.gripOn('pinking_scissors', 'loop-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // A full-strip desk stapler, 160 mm long, 38 mm wide and 55 mm tall: a black plastic cap over an aluminium magazine,
   // hinged at the back above a base with a steel anvil at the front.
   h.compound('stapler', 0.32, [
@@ -60,7 +60,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.turned('bruise', 'bruise', 'x', [[0, 0], [0, 0.0185], [0.008, 0.0115], [0.008, 0]], [0.093, 0.020, 0]),
   ], { wood: 'wood-oak', bark: 'bark', bruise: 'wood-walnut' }) + h.gripOn('wooden_billet', 'bark') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A 200 mm straight wooden spindle, 30 mm thick, its working end ground flat and caked with wet rock grit, a
   // turned-down neck at the other end for a bow string or the palm.
   h.compound('stick_rock_drill', 0.076, [
@@ -98,5 +98,5 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.turned('spike', 'point', 'x', [[0, 0], [0, 0.0065], [0.040, 0.004], [0.072, 0.0012], [0.075, 0.0004], [0.075, 0]], [0, 0.017, 0]),
   ], { handle: 'bone', point: 'body-bone' }) + h.gripOn('bone_awl', 'grip') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['bone'], setting: ['prehistoric'] } } },
 ]
