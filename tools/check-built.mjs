@@ -1,6 +1,7 @@
 // Check fresh builds of the complete tree (tools/build-all.mjs). The first fresh tree must satisfy its manifest and the
-// declared packs (tools/manifest.mjs, treeDifferences) and fit the head-gear straps to the head (tools/strap-fit.mjs); every further fresh tree must equal the first byte for byte,
-// which shows the build is deterministic across independent runs.
+// declared packs (tools/manifest.mjs, treeDifferences) and fit the head-gear straps to the head (tools/strap-fit.mjs);
+// every further fresh tree must equal the first byte for byte, which shows the build is deterministic across
+// independent runs.
 // Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a temporary folder.
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
