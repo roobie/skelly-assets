@@ -29,7 +29,7 @@ const SHARED_PLUMBING = ['dismember.ts', 'crowd.ts', 'materials.ts', 'keyframes.
   join(ROOT, 'src/mob', name),
 );
 /** Mobs kept standalone, each in its own source and content directory. */
-const STANDALONE_MOBS = ['leaper'];
+const STANDALONE_MOBS = ['leaper', 'walker'];
 
 describe('import boundaries', () => {
   it('finds the files it is meant to police', () => {
