@@ -51,6 +51,20 @@ local axleDisc(id, slot, x, y, radius, z, sides=24) =
       k.bar('tooth_' + i, 'tooth', lip, tip, 0.05, [at - 0.04, at + 0.04], 0.03)
       for i in std.range(0, teeth - 1)
     ],
+  // A cab's side door written outboard-positive at `side`: a skin up to the belt, a glazed frame above it under a head
+  // rail, and a handle by its leading edge; it hangs on its rear stile. `y` is [bottom, belt, head, top], and `place`
+  // moves each piece onto the side of the machine its cab stands on.
+  cabDoor(id, massKg, x, y, side, paint, place=function(piece) piece):: k.compound(id, massKg, std.map(place, [
+    box('skin', 'paint', [x[0], y[0], side - 0.04], [x[1], y[1], side]),
+    box('top', 'paint', [x[0], y[2], side - 0.04], [x[1], y[3], side]),
+    box('stile_rear', 'paint', [x[0], y[1], side - 0.04], [x[0] + 0.05, y[2], side]),
+    box('stile_front', 'paint', [x[1] - 0.05, y[1], side - 0.04], [x[1], y[2], side]),
+    box('glass', 'glass', [x[0] + 0.05, y[1], side - 0.03], [x[1] - 0.05, y[2], side - 0.01]),
+    box('handle', 'trim', [x[1] - 0.2, y[1] - 0.12, side], [x[1] - 0.06, y[1] - 0.08, side + 0.02]),
+  ]), { paint: paint, trim: 'plastic-black', glass: 'glass-clear' }, {
+    hinge_a: ['skin', [0, 0.2, 0]],
+    hinge_b: ['skin', [0, 0.8, 0]],
+  }),
   // A folding step with a grab rail is how an open machine is entered: its hinge runs along the tread's rear edge.
   step(id, massKg, x, y, z, finish='paint-charcoal', rail=null):: k.compound(id, massKg, [
     box('tread', 'tread', [x[0], y - 0.06, z[0]], [x[1], y, z[1]]),

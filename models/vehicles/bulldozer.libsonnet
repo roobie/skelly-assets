@@ -70,17 +70,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('front_quarter_glass', 'glass', [doorFront, s.belt, s.cabSide - 0.03], [s.cabFront - post, s.cabRoof, s.cabSide - 0.01]),
     box('console', 'trim', [-0.55, s.deck + 0.05, 0.3], [-0.3, s.deck + 0.55, 0.45]),
   ]), { paint: s.paint, floor: 'rubber-black', trim: 'plastic-black', glass: 'glass-clear' }),
-  k.compound('bulldozer_cab_door', 45, [
-    box('skin', 'paint', [doorRear, s.deck + 0.05, s.cabSide - 0.04], [doorFront, s.belt, s.cabSide]),
-    box('top', 'paint', [doorRear, s.cabRoof - 0.06, s.cabSide - 0.04], [doorFront, s.cabRoof, s.cabSide]),
-    box('stile_rear', 'paint', [doorRear, s.belt, s.cabSide - 0.04], [doorRear + 0.05, s.cabRoof - 0.06, s.cabSide]),
-    box('stile_front', 'paint', [doorFront - 0.05, s.belt, s.cabSide - 0.04], [doorFront, s.cabRoof - 0.06, s.cabSide]),
-    box('glass', 'glass', [doorRear + 0.05, s.belt, s.cabSide - 0.03], [doorFront - 0.05, s.cabRoof - 0.06, s.cabSide - 0.01]),
-    box('handle', 'trim', [doorFront - 0.2, s.belt - 0.12, s.cabSide], [doorFront - 0.06, s.belt - 0.08, s.cabSide + 0.02]),
-  ], { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' }, {
-    hinge_a: ['skin', [1, 0.2, 0]],
-    hinge_b: ['skin', [1, 0.8, 0]],
-  }),
+  m.cabDoor('bulldozer_cab_door', 45, [doorRear, doorFront], [s.deck + 0.05, s.belt, s.cabRoof - 0.06, s.cabRoof], s.cabSide, s.paint),
   k.compound('bulldozer_windscreen', 22, [
     box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.45, -s.cabSide + post], [s.cabFront - 0.015, s.cabRoof, s.cabSide - post]),
   ], { glass: 'glass-clear' }),
