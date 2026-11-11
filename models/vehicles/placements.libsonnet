@@ -77,6 +77,7 @@
   'livestock_trailer': import 'livestock_trailer.placements.libsonnet',
   'log_trailer': import 'log_trailer.placements.libsonnet',
   'luxury_saloon': import 'luxury_saloon.placements.libsonnet',
+  'main_battle_tank': import 'main_battle_tank.placements.libsonnet',
   'microcar': import 'microcar.placements.libsonnet',
   'military_ambulance': import 'military_ambulance.placements.libsonnet',
   'military_cargo_truck': import 'military_cargo_truck.placements.libsonnet',
