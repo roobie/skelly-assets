@@ -71,7 +71,10 @@ its way to a point it still reaches.
 
 A power grip seats a handle deep in the palm (the hand bone's `grip` share), in the wedge between the palm and the
 lifted thumb's root, so the palm's heel and the thumb's root both bear on it and the fingers wrap right round it into
-a fist; seated at the knuckle crease, the fingers only hook it and the palm stands beside it like a paddle. A hold that
+a fist; seated at the knuckle crease, the fingers only hook it and the palm stands beside it like a paddle. The
+knuckle row slants back toward the little finger, as the metacarpal heads arc, and sits toward the palm's face, so each
+finger's root closes onto the handle and the fist steps down from index to little; a palm split in two would arch the
+same way only with another bone and part for every hand, glove and mob to carry. A hold that
 is no power grip, such as a hand cradling a handguard or pinching a latch, names its own seat on the palm. The fingers
 close first and the thumb last, so it closes over the haft's far side onto the curled fingers. The thumb starts lifted
 off the palm and its root comes down onto the item from beyond, since lifting it from the palm side would drive it

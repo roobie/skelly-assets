@@ -108,8 +108,8 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       armSegment('fore', 1.1, { skin: skin }, [jointPin('elbow'), jointSocket('wrist', [0, -arm.foreLength, 0])]),
       armSegment('palm', 0.3, { skin: skin }, [
         jointPin('wrist'),
-        jointSocket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset]),
-      ] + [jointSocket(hand.fingers[i], [0, -arm.palmLength, hand.centre(i)]) for i in std.range(0, fingerCount - 1)]),
+        jointSocket('thumb', hand.thumbRoot),
+      ] + [jointSocket(hand.fingers[i], hand.knuckle(i)) for i in std.range(0, fingerCount - 1)]),
     ] + [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)]
       + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     connections: [

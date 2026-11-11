@@ -1,6 +1,6 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
-import { block, oval, slab, taper } from './body.ts';
+import { block, oval, taper } from './body.ts';
 import { positive, requireConvex, scalar, spheroid } from './shapes.ts';
 
 // The player's limbs hang from their joint: origin on the joint at the limb's top, y up, the limb down -y, front
@@ -70,6 +70,12 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       /** How far the thumb sinks into the palm's front edge, and how far past it the thumb stands out. */
       thumbInset: positive,
       thumbProjection: positive,
+      /** How far the thumb's root sits toward the palm's face; the palm segment does not draw it, the thumb's socket does. */
+      thumbVolar: positive,
+      /** How far each finger's knuckle sits back from the palm's length toward the wrist, the index first. */
+      knuckleBack: numbers,
+      /** How far the knuckles sit toward the palm's face; the fingers' sockets place them, the palm only ends there. */
+      knuckleVolar: positive,
     }),
     params,
   );
@@ -127,12 +133,31 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
         oval('forearm-low', 'skin', ys(wristTop - d.foreLength * 0.08, wristTop + d.foreLength * 0.16), { halfX: (foreHalfX + wristHalfX) / 2, halfZ: (foreHalfZ + wristHalfZ) / 2, power: 2.4 }),
         oval('wrist', 'skin', ys(wrist, wristTop + d.seamOverlap), { halfX: wristHalfX, halfZ: wristHalfZ, power: 2.6 }),
       ];
-    case 'palm':
+    case 'palm': {
+      // The palm ends along the knuckle row, which slants back toward the little finger; past the outer knuckles the
+      // row's line carries on to either edge, so the outline stays convex. Each knuckle ridges the back of the hand, -x.
+      const knuckleAt = (i: number) => knuckles + (d.knuckleBack[i] ?? 0);
+      const last = d.fingers.length - 1;
+      const edgeY = (from: number, to: number, z: number) =>
+        knuckleAt(from) + ((knuckleAt(to) - knuckleAt(from)) * (z - fingerCentre(from))) / (fingerCentre(to) - fingerCentre(from));
+      const corner = 0.01;
+      const top = wrist + d.handOverlap;
+      // Counterclockwise in the x axis's (y, z) plane: down the thumb's edge, along the knuckles, up the little finger's.
+      const outline: Vec2[] = [
+        [top - corner, halfPalm],
+        [edgeY(0, 1, halfPalm), halfPalm],
+        ...Array.from({ length: last - 1 }, (_, k): Vec2 => [knuckleAt(k + 1), fingerCentre(k + 1)]),
+        [edgeY(last, last - 1, -halfPalm), -halfPalm],
+        [top - corner, -halfPalm],
+        [top, -halfPalm + corner],
+        [top, halfPalm - corner],
+      ].map(([y, z]): Vec2 => [y - originY, z]);
+      requireConvex(outline, 'palm');
       return [
-        // The palm's edges are rounded, and the knuckles ridge the back of the hand, -x.
-        slab('palm', 'skin', ys(knuckles, wrist + d.handOverlap), { halfX: halfThick, halfZ: halfPalm, chamfer: 0.02 }),
-        block('knuckles', 'skin', [-halfThick - 0.002, -halfThick + 0.004], ys(knuckles, knuckles + 0.014), [-halfPalm + 0.004, halfPalm * d.fingerFrontShare - 0.004]),
+        { id: 'palm', kind: 'extruded-polygon', axis: 'x', profile: outline, z: [-halfThick, halfThick], slot: 'skin' },
+        ...d.fingers.map((finger, i) => block(`knuckle-${finger}`, 'skin', [-halfThick - 0.002, -halfThick + 0.004], ys(knuckleAt(i), knuckleAt(i) + 0.014), [fingerCentre(i) - fingerWidth / 2, fingerCentre(i) + fingerWidth / 2])),
       ];
+    }
     case 'finger': {
       // One phalanx, reaching into the one above it so the joint stays closed when it curls; the tip a shade slimmer.
       const slim = phalanx === d.phalanxShares.length - 1 ? 0.85 : 1;

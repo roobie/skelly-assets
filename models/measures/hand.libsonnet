@@ -13,6 +13,9 @@ local phalanges = std.length(arm.phalanxShares);
   width: width,
   // The finger's centre across the palm, the index at the thumb's side.
   centre(i):: halfPalm * arm.fingerFrontShare - i * (width + arm.fingerGap) - width / 2,
+  // A finger's knuckle on the palm, from the wrist in the arm's frame (thickness, along, across); and the thumb's root.
+  knuckle(i):: [arm.knuckleVolar, -arm.palmLength + arm.knuckleBack[i], self.centre(i)],
+  thumbRoot:: [arm.thumbVolar, -arm.palmLength * arm.thumbRootShare, halfPalm - arm.thumbInset],
   length(i, k):: arm.fingerLength * arm.fingerShares[i] * arm.phalanxShares[k],
   // The knuckle phalanx carries the finger's name and the ones beyond count on from 2, a shape the shell id rule
   // (packages/thing-authoring-tool/catalogue.ts's row id) allows; the thumb's bones are `thumb`, `thumb2`, `thumb3`

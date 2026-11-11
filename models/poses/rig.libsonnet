@@ -76,7 +76,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 6,
+  revision: 7,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
