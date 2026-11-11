@@ -213,7 +213,7 @@ const buildWalker = (genome: Genome, template: Template): Body => {
     part(rig, 'hull', box(at(0.64 * x * p.stance, 2.1, 0.14), [r(0.28), r(0.22), r(0.38)]), 'frame');
     // A shoulder rail where the pod yoke turns.
     part(rig, 'hull', box(at(0.82 * x, 2.66, -0.14), [r(0.05), r(0.22), r(0.28)]), 'frame');
-    // Warning stripes along the lower flank, behind the pod, as on the drivable walker.
+    // Warning stripes along the lower flank, behind the pod.
     hazardBand(rig, 'hull', box(at(0.8 * x, 2.3, 0.5), [r(0.03), r(0.12), r(0.42)]), 'armor', r(0.28), 'x');
   }
   hazardBand(rig, 'hull', box(at(0, 2.26, -1.02), [r(0.74), r(0.13), r(0.2)]), 'armor', r(0.3), 'z');

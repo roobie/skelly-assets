@@ -58,9 +58,10 @@ const recoil = (at: number, back: EulerDeg, kick: EulerDeg, settle: number) =>
   ] as const;
 
 const SHOTS = [0.42, 0.52, 0.62] as const;
-/** The pods dip onto a target at a man's height ahead and turn in to cross their fire on it. */
-const AIM: EulerDeg = [-7, 0, 6];
-const KICK: EulerDeg = [3, 0, 6];
+/** The pods dip onto a target at a man's height ahead and turn in from their splay to bear on it together. */
+const AIM: EulerDeg = [-7, 0, -10];
+/** Each shot kicks the pods up, not off their bearing. */
+const KICK: EulerDeg = [3, 0, -10];
 
 const CLIPS = {
   /** On guard: the hull holds still while servos hunt in short, discrete moves; the sensor head snaps from

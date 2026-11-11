@@ -3,7 +3,8 @@
 local range(min, max) = { min: min, max: max };
 
 // Every colour is HSL so look tuning stays here; resolveMaterials replaces each placeholder colour. The
-// palette matches the drivable security walker's finishes, so the mob and the vehicle read as one line.
+// palette is the slate, charcoal and warning-yellow finish of the security walker line, so the mob and a
+// drivable walker in that line read as one family.
 local hsl = {
   // Slate armour plate: the box, the pods and the leg plating.
   armor: ['armorHue', 'armorSat', 'armorLight'],
