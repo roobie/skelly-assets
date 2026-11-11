@@ -64,17 +64,18 @@ local classes = import 'track-classes.libsonnet';
   },
   // A main battle tank's: seven road wheels a side between a raised drive sprocket at the rear and an idler at the front,
   // and four return rollers under the top run. The road wheels stand on the band's ground run; the sprocket and idler
-  // are alike in radius and height, so the top run is level and each roller, midway between two road wheels, meets it.
+  // are alike in radius and axle height, so the top run is level and each roller, midway between two road wheels, meets
+  // it.
   mbt_track: {
     local c = classes[self.class],
     local wheelY = c.roadWheel.radius + c.link.thickness + c.link.pad.height,
-    local endY = 0.74,
-    local runY = endY + c.sprocket.radius,
+    local endAxleY = 0.74,
+    local runY = endAxleY + c.sprocket.radius,
     assert c.sprocket.radius == c.idler.radius : 'a level top run needs a sprocket and idler of one radius',
     class: 'armoured_heavy',
     wheels: [
-      { site: 'sprocket', key: 'sprocket', at: [-3.45, endY] },
-      { site: 'idler', key: 'idler', at: [3.2, endY] },
+      { site: 'sprocket', key: 'sprocket', at: [-3.45, endAxleY] },
+      { site: 'idler', key: 'idler', at: [3.2, endAxleY] },
     ] + [
       { site: 'road_wheel_' + i, key: 'roadWheel', at: [-2.4 + 0.8 * i, wheelY] }
       for i in std.range(0, 6)
