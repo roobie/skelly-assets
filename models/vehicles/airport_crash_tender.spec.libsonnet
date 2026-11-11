@@ -7,14 +7,17 @@
   floor: 1.5, waist: 2.08, roof: 3.12, lean: 0.32,
   frontAxle: 3.9, rearAxles: [-1.6, -3.2],
   wheel: 'wheel_385_95r25', r: 0.685, wheelW: 0.385,
-  // An off-road truck's single flotation tyres, braked on air discs, on driven axles front and rear.
+  // An off-road truck's single flotation tyres, braked on air discs.
   wheelBrakes: 'disc',
   twinRear: false,
-  frontAxlePart: 'beam_axle_wide', rearAxlePart: 'beam_axle_wide',
-  railBottom: 1.0, railTop: 1.3,
+  frontAxlePart: 'steered_axle_wide', rearAxlePart: 'beam_axle_wide',
+  // The rails stand far enough apart for the V8's block and heads to sit between them.
+  railBottom: 1.0, railTop: 1.3, railZ: 0.55,
   engine: 'engine_v8_diesel_heavy', engineLength: 1.15, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
-  // The sump clears the front axle's differential below it.
-  engineY: 0.84,
+  // The V8 stands too tall to sit under the cab floor over the front axle, so it sits low behind the front wheel wells,
+  // under the cab's back and the body's front, with its gearbox between the same two crossmembers. The radiator ahead
+  // and the exhaust beneath drop to stay under the floors, and the fuel tank and battery hang behind the engine.
+  engineX: 2.35, engineY: 0.33, radiatorY: 0.48, exhaustY: 0.2, tankX: 1.35,
   paint: 'paint-lime-yellow',
   chassisMass: 3800, shellMass: 2300,
   guard: false,
