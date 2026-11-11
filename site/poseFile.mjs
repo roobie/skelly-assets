@@ -15,9 +15,9 @@
 // Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
 // its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a
 // file can curl a hand and then open one finger. A held item,
-// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, pinch?, close? } }`, is placed after the reach: the palm is
-// set on the item's socket, the digits `pinch` names set their pads on its points, and the others then closed on the
-// item by contact, so the grip is read off the item, not drawn by hand.
+// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, grip?, pinch?, close? } }`, is placed after the reach: the
+// palm is set on the item's socket, the digits `pinch` names set their pads on its points, and the others then closed
+// on the item by contact, so the grip is read off the item, not drawn by hand.
 // A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
 // end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
 // so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.

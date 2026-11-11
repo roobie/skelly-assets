@@ -8,14 +8,18 @@
 // (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the rifle point the eyes turn to and
 // `tilt` leans the head toward the figure's right. The left hand `hold`s a socket, may `pinch` named rifle points
 // (moved with the charging handle's draw) and, with `close: false`, rests there open instead of gripping.
+// The left hand never takes the rifle in a power grip: it cradles, pinches and pushes with the fingers, so its sockets
+// meet the palm at the knuckle crease (`crease`), where the fingers' bases carry a handguard, not deep in the palm.
+local crease = 0.95;
 // The handguard's underside, palm up, the thumb along the bore. `beneath` keeps it below the bore however the rifle
 // rolls, as a supporting hand stays under the handguard while the other hand rolls the rifle.
-local support = { hold: { socket: { at: [0.013, -0.0225, 0.1], into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0.766] }, beneath: true, pole: [0, -1, 0] }, hands: 'support' };
+local support = { hold: { socket: { at: [0.013, -0.0225, 0.1], into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0.766] }, grip: crease, beneath: true, pole: [0, -1, 0] }, hands: 'support' };
 // The thumb pad on the rear face of the T's left wing and the index pad on the latch's front face, the palm beside and
 // behind the T; the other fingers close on the rifle by contact.
 local pinch(drawn) = {
   hold: {
     socket: { at: [0.062, 0.002, -0.161], into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
+    grip: crease,
     pole: [0.483, -0.866, -0.129],
     pinch: { thumb: [0.02, 0.022, -0.196], index: [0.024, 0.022, -0.18] },
   },
@@ -48,7 +52,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
     'press-6-released': turned {
       left: {
-        hold: { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.3, -1, 0], close: false },
+        hold: { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, grip: crease, pole: [0.3, -1, 0], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },
@@ -56,7 +60,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     // the receiver mesh, so it has no motion.
     'press-7-cover': turned {
       left: {
-        hold: { socket: { at: [-0.022, 0.039, -0.07], into: [0.5, -0.866, 0], axis: [0, 0, -1] }, pole: [0.5, -0.87, 0], pinch: { index: [-0.026, -0.012, -0.1] } },
+        hold: { socket: { at: [-0.022, 0.039, -0.07], into: [0.5, -0.866, 0], axis: [0, 0, -1] }, grip: crease, pole: [0.5, -0.87, 0], pinch: { index: [-0.026, -0.012, -0.1] } },
         hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
       },
     },
