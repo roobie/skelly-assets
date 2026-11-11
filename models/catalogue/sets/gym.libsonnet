@@ -45,7 +45,7 @@ local dumbbell(grip, hr, r, w, hex=true) =
     head('head-r', half + collar, half + collar + w),
   ];
 
-// An Olympic bar 2.2 m long lying along x with its axis at height `y`: a 28 mm shaft knurled either side of the
+// A standard 20 kg bar 2.2 m long lying along x with its axis at height `y`: a 28 mm shaft knurled either side of the
 // middle, sleeve collars 1.31 m apart and 50 mm sleeves out to the end caps. Slots: shaft, knurl, sleeve.
 local barbell(y) = [
   barX('shaft', 'shaft', 0.014, -0.655, 0.655, y),
@@ -90,11 +90,11 @@ local kettlebell(r, cy) =
   h.compound('light_dumbbell', 2, dumbbell(0.11, 0.015, 0.045, 0.05, hex=false), { handle: 'plastic-blue', knurl: 'plastic-blue', head: 'plastic-blue', collar: 'plastic-blue' })
   + h.inHand('light_dumbbell', 'handle') + { voxelGrain: 0.004 } + gym('recreation', ['plastic'], ['free-weights', 'fitness']),
 
-  // An empty 20 kg Olympic barbell, 2.2 m long, lying on its collars.
+  // An empty standard 20 kg barbell, 2.2 m long, lying on its collars.
   h.compound('barbell', 20, barbell(0.035), { shaft: 'steel-bright', knurl: 'steel-hardened', sleeve: 'steel-bright' })
   + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'weightlifting', 'strength-training']),
 
-  // A loaded Olympic barbell, 60 kg: the 20 kg bar with a 20 kg bumper plate 450 mm across on each sleeve, held by
+  // A loaded barbell, 60 kg: the 20 kg bar with a 20 kg bumper plate 450 mm across on each sleeve, held by
   // spring clips, standing on the plates.
   h.compound('loaded_barbell', 60, barbell(0.225) + plate('plate-l', 'x', 0.225, 0.065, [-0.752, 0.225, 0]) + plate('plate-r', 'x', 0.225, 0.065, [0.687, 0.225, 0]) + [
     ring('clip-l', 'clip', 'x', 0.0255, 0.035, 0.018, [-0.775, 0.225, 0]),
