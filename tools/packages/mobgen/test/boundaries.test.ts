@@ -25,7 +25,7 @@ const srcFiles = walk(join(ROOT, 'src'));
 const files = [...srcFiles, ...walk(join(ROOT, 'test'))];
 const coreFiles = srcFiles.filter((f) => relative(ROOT, f).startsWith('src/core/'));
 /** Shared mob plumbing a standalone mob may build on; everything else outside core is another mob's. */
-const SHARED_PLUMBING = ['dismember.ts', 'crowd.ts', 'materials.ts', 'keyframes.ts'].map((name) =>
+const SHARED_PLUMBING = ['dismember.ts', 'crowd.ts', 'materials.ts', 'keyframes.ts', 'budgets.ts'].map((name) =>
   join(ROOT, 'src/mob', name),
 );
 /** Mobs kept standalone, each in its own source and content directory. */
