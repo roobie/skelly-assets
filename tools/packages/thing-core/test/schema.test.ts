@@ -58,4 +58,17 @@ describe('material table', () => {
     expect(safeParse(MaterialSchema, { ...material, colour: [0, 0, 2] }).success).toBe(false);
     expect(safeParse(MaterialSchema, { ...material, finish: { metallic: 0 } }).success).toBe(false);
   });
+
+  it('takes a fabric grain only on a non-metallic finish with a sheen', () => {
+    const fabric = { kind: 'knit', grain: 0.003, relief: 0.5, noise: 0.1, crease: 0.2, fold: 0.08 };
+    const sheen = { colour: [0.6, 0.6, 0.6], roughness: 0.5 };
+    const cloth = { colour: [0.2, 0.3, 0.4], finish: { metallic: 0, roughness: 0.9, sheen, fabric } };
+    expect(safeParse(MaterialSchema, cloth).success).toBe(true);
+    expect(safeParse(MaterialSchema, { ...cloth, finish: { ...cloth.finish, metallic: 1 } }).success).toBe(false);
+    expect(safeParse(MaterialSchema, { ...cloth, finish: { metallic: 0, roughness: 0.9, fabric } }).success).toBe(false);
+    expect(
+      safeParse(MaterialSchema, { ...cloth, finish: { ...cloth.finish, fabric: { ...fabric, kind: 'chainmail' } } })
+        .success,
+    ).toBe(false);
+  });
 });

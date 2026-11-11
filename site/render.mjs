@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { explode } from './explode.mjs';
+import { wearFabrics } from './fabric.mjs';
 import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { samplePose } from './poseSample.mjs';
@@ -42,6 +43,7 @@ function load(model) {
         }
         for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
       });
+      wearFabrics(gltf.scene);
       if (model.label) gltf.scene.add(printedLabel(model.label));
       return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
     })());
