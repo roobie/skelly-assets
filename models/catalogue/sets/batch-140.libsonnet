@@ -226,5 +226,5 @@ local mailCoif(id, mass) = hood(id, mass, {
     box('tie-l', 'tie', [-0.05, 0.0, 0.188], [-0.044, 0.07, 0.202]),
     box('tie-r', 'tie', [0.044, 0.0, 0.188], [0.05, 0.07, 0.202]),
   ], { hat: 'cloth-bright-white', cloth: 'cloth-bright-white', trim: 'cloth-cream', veil: 'mesh-black', tie: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head', 'face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['farm'], setting: ['modern'], slot: ['head', 'face'] } } },
 ]

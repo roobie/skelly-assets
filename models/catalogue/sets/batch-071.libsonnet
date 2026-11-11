@@ -59,7 +59,7 @@ local gauge(id, x, y, z) = [
     for k in std.range(0, 10)
   ], { base: 'paint-charcoal', pan: 'steel-stainless', beam: 'steel-stainless', rider: 'brass', mark: 'plastic-black' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
   // A pocket aneroid barometer in a plastic case 64 mm across and 14 mm deep, standing on its rim with its dial
   // to the front and a hanging lug on top.
   h.compound('barometer', 0.07, [

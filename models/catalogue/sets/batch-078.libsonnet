@@ -34,7 +34,7 @@ local washboard(w, ht) =
     for i in std.range(0, 3)
   ], { housing: 'enamel-white', skirt: 'rubber-black', tread: 'rubber-black', rib: 'plastic-charcoal', bezel: 'steel-stainless', dial: 'paper-white', needle: 'plastic-red', lens: 'glass-clear' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal', 'rubber'], place: ['bathroom'], setting: ['modern'] } } },
   // A hand scrub brush, 140 mm long and 60 mm wide: a blue plastic block with a finger ridge on top and rows of stiff
   // white bristle tufts underneath.
   h.compound('brush', 0.11, [
@@ -76,7 +76,7 @@ local washboard(w, ht) =
     h.box('loop', 'stripe', [-0.112, 0.012, -0.006], [-0.094, 0.016, 0.006]),
   ], { cloth: 'cloth-cream', stripe: 'cloth-red' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['fabric'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['fabric'], place: ['kitchen'], setting: ['modern'] } } },
   // A cordless hair trimmer, 150 mm long: a black plastic body tapering to a brushed aluminium neck, a steel blade with
   // a comb of teeth at +x, and a sliding switch on top.
   h.compound('electric_hair_trimmer', 0.17, [
@@ -173,7 +173,7 @@ local washboard(w, ht) =
     for i in std.range(0, 9)
   ], { foam: 'cloth-yellow', scour: 'cloth-green', pore: 'paint-crane-yellow' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
   // A makeshift haircut kit, 200 mm long: a rolled leather wrap tied with cord, a pair of steel scissors laid open on
   // top of the roll under the ties, a sharpened glass blade poking out of one end and a scrap of mirror tucked against
   // the back.

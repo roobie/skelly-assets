@@ -16,5 +16,5 @@ local shellMassKg = 0.100;
     cutterRadius: 0.008, cutterThickness: 0.002,
     spindleRadius: 0.003, spindleHeight: 0.022,
     keyLength: 0.042, keyWidth: 0.014, keyThickness: 0.006,
-  }, { body: 'steel-grey', grip: 'plastic-red', wheel: 'steel-parkerized', key: 'paint-charcoal' }, 'grip-left', exportMass='parts', turn=[0, 0, 0], roll=90) + { taxonomy: { category: 'household', keywords: ['cooking'] } },
+  }, { body: 'steel-grey', grip: 'plastic-red', wheel: 'steel-parkerized', key: 'paint-charcoal' }, 'grip-left', exportMass='parts', turn=[0, 0, 0], roll=90) + { taxonomy: { category: 'household', tags: { place: ['kitchen'] }, keywords: ['cooking'] } },
 ]

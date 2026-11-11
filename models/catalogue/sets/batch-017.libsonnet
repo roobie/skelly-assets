@@ -164,7 +164,7 @@ local alderParts =
         box('tang', 'spine', [x0 - 0.03, 0.008, spine(0) - 0.03], [x0 - 0.01, 0.06, spine(0) - 0.012]),
         box('tang-lug', 'spine', [x0 - 0.034, 0.05, spine(0) - 0.034], [x0 - 0.006, 0.058, spine(0) - 0.008]),
       ], { spine: 'steel', blade: 'steel-blued', edge: 'steel-stainless' })
-    + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+    + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['farm'] } } },
   ]
 )
 + (

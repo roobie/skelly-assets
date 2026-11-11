@@ -165,7 +165,7 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
     sbox(p + 'fold-a', 'sleeve', [cx - 0.03, 0.02, -0.19], [cx - 0.024, 0.024, -0.02]),
     sbox(p + 'fold-b', 'sleeve', [cx + 0.02, 0.02, -0.18], [cx + 0.026, 0.024, -0.03]),
   ], 0.085), { leather: 'leather-white', sleeve: 'cloth-cream', elastic: 'cloth-bright-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'fabric'], place: ['farm'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of boxing gloves lying palm down side by side, each 290 mm from cuff to knuckles and 130 mm high: padded
   // red fists with the thumb sewn along the side, a white strap round the cuff and dark lining in the opening.

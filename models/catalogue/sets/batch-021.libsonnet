@@ -178,7 +178,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     for i in std.range(0, 4)
   ] + [
     box('handle', 'handle', [-0.2, 0.71, 0.3], [0.2, 0.73, 0.32]),
-  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A top-loading washing machine 690 mm wide, 700 mm deep and 1.1 m tall to the top of its console, in white
   // enamel: a hinged lid with a dark glass window over the drum, and a raised control console along the back with

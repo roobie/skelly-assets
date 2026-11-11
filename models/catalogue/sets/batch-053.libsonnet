@@ -78,7 +78,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
       box('lead-%s-run' % e.id, e.id, [e.x * 1.06 - 0.0025, 0.115, -0.0025], [e.x * 1.06 + 0.0025, 0.12, 0.06]),
     ]
     for e in [{ id: 'red', x: -0.1 }, { id: 'black', x: 0.1 }]
-  ]), { acrylic: 'plastic-clear', tray: 'plastic-frosted', gel: 'jelly-pale', buffer: 'plastic-clear-blue', lid: 'plastic-clear', red: 'plastic-red', black: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ]), { acrylic: 'plastic-clear', tray: 'plastic-frosted', gel: 'jelly-pale', buffer: 'plastic-clear-blue', lid: 'plastic-clear', red: 'plastic-red', black: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A hand-crank battery charger, 110 mm long, 75 mm tall and 60 mm deep: a heavy orange case holding a geared
   // dynamo, a folding crank on the right end, and on top an adjustable cradle of two sliding jaws holding a cell.

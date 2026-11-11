@@ -101,7 +101,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       h.turned('pen-b', 'pen-b', 'z', [[0, 0], [0, 0.0045], [0.05, 0.0045], [0.05, 0]], [0.085, top + 0.012, -0.1]),
     ],
     { cloth: 'cloth-cream', lapel: 'cloth-cream', pocket: 'cloth-cream', button: 'plastic-clear', protector: 'plastic-clear', pen: 'plastic-blue', 'pen-b': 'plastic-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['laboratory'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A yellow vinyl rain coat folded, 320 mm by 260 mm and 25 mm tall: the hood folded down on top, two very large
   // flapped pockets and snap studs down the front.

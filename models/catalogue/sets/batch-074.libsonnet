@@ -89,7 +89,7 @@ local tentBag(length, r) =
     box('switch', 'switch', [0.016, 0.038, 0.072], [0.040, 0.062, 0.082]),
     box('switch-rocker', 'rocker', [0.019, 0.050, 0.081], [0.037, 0.059, 0.086]),
   ], { body: 'enamel-white', foot: 'rubber-black', panel: 'plastic-charcoal', motor: 'steel-grey', cup: 'rubber-black', well: 'plastic-charcoal', dial: 'plastic-black', mark: 'paint-white', switch: 'plastic-black', rocker: 'plastic-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A storm-glass barometer 500 mm tall: a pear-shaped sealed glass body 200 mm across, half full of
   // water, with a thin spout rising from near its foot to above its shoulder, on a turned oak stand.

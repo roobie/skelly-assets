@@ -65,7 +65,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     rod('port-b', 'port', 0.0035, -0.092, -0.07, 0.009) + { origin: [-0.092, 0.009, 0.014] },
     rod('cap-a', 'cap', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, -0.014] },
     rod('cap-b', 'tip', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, 0.014] },
-  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + h.label('label', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + h.label('label', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
 
   // A reused 250 ml trigger spray bottle of homemade deodorising wash, 55 mm across and 200 mm tall,
   // labelled with a strip of tape.

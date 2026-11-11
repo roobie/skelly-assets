@@ -243,7 +243,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     box('clip-wire-b', 'wire', [0.016, 0.008, -0.16], [0.018, 0.01, -0.13]),
     box('clip-wire-c', 'wire', [-0.018, 0.008, -0.162], [0.018, 0.01, -0.16]),
   ], { paper: 'paper-white', top: 'paint-cream', ink: 'plastic-grey', heading: 'paint-oxblood', clip: 'plastic-black', wire: 'steel-stainless' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], place: ['office'], setting: ['modern'] } } },
 
   // A glassy egg from a giant spider, a ball 46 mm across with a short drawn-out tip, shards of hard
   // glowing matter crowded at its centre.

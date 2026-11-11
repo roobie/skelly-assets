@@ -77,7 +77,7 @@ local hangHook(id, x, y, z, r, foot) =
     barZ('lever', 'lever', [-0.07, 0.33], [0.5, 0.95], 0.03, 0.058, 0.074),
     h.turned('grip', 'grip', 'z', [[0, 0], [0, 0.018], [0.12, 0.018], [0.12, 0]], [0.5, 0.95, 0.006]),
     h.prism('hold-down', 'frame', 'z', [[0.04, 0.26], [0.12, 0.26], [0.12, 0.31], [0.07, 0.31]], -0.04, 0.03),
-  ], { frame: 'paint-olive', bolt: 'steel-grey', blade: 'steel-bright', lever: 'steel-grey', grip: 'rubber-black' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  ], { frame: 'paint-olive', bolt: 'steel-grey', blade: 'steel-bright', lever: 'steel-grey', grip: 'rubber-black' }) + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
 
   // A steel fire bowl 550 mm across and 160 mm deep on three legs, its rim 440 mm off the ground, with a bar grate in
   // the bottom.
@@ -150,7 +150,7 @@ local hangHook(id, x, y, z, r, foot) =
     h.turned('crank-grip', 'stand', 'x', [[0, 0], [0, 0.014], [0.09, 0.014], [0.09, 0]], [0.285, cy, 0.17]),
     barY('treadle', 'stand', [-0.19, 0.2], [0.3, 0.2], 0.08, 0.04, 0.065),
     box('pitman', 'iron', [0.288, 0.065, 0.164], [0.3, cy, 0.176]),
-  ], { barrel: 'wood-oak', hoop: 'iron-dull', hatch: 'wood-pine', stand: 'wood-pine', iron: 'iron-dull' }) + { taxonomy: { category: 'household', tags: { material: ['wood', 'metal'] } } },
+  ], { barrel: 'wood-oak', hoop: 'iron-dull', hatch: 'wood-pine', stand: 'wood-pine', iron: 'iron-dull' }) + { taxonomy: { category: 'household', tags: { material: ['wood', 'metal'], place: ['farm'] } } },
 
   // A folding army cot folded for carrying: 1 m long, 220 mm wide and 150 mm tall, the olive canvas bed folded
   // between two aluminium side rails, the legs folded under and two straps round it.
@@ -242,7 +242,7 @@ local hangHook(id, x, y, z, r, foot) =
     box('pump', 'pump', [0.15, 0.06, 0.18], [0.27, 0.2, 0.28]),
     barZ('pump-pedal', 'grip', [0.15, 0.2], [0.33, 0.24], 0.02, 0.19, 0.27),
     h.turned('hose', 'grip', 'z', [[0, 0], [0, 0.008], [0.3, 0.008], [0.3, 0]], [0.12, 0.008, -0.12]),
-  ], { frame: 'paint-red', table: 'steel-grey', steel: 'steel-bright', grip: 'rubber-black', pump: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  ], { frame: 'paint-red', table: 'steel-grey', steel: 'steel-bright', grip: 'rubber-black', pump: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'] } } },
 
   // A steel butchering rack folded for carrying: three 600 mm legs and a crossbar strapped together, with three
   // open S-hooks hung over the bar and a short chain coiled on the ground in front.

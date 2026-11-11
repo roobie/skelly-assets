@@ -21,7 +21,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     ringY('core', 'core', 0.020, 0.022, 0, 0.100),
     h.box('tail', 'paper', [-0.045, 0.020, 0.054], [0.040, 0.098, 0.057]),
     h.box('perforation', 'perforation', [-0.045, 0.058, 0.057], [0.040, 0.060, 0.058]),
-  ], { paper: 'paper-white', core: 'paperboard-tan', perforation: 'cloth-cream' }) + { voxelGrain: 0.002 } + h.inHand('toilet_paper', 'roll') + { taxonomy: { category: 'household', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['hygiene'] } },
+  ], { paper: 'paper-white', core: 'paperboard-tan', perforation: 'cloth-cream' }) + { voxelGrain: 0.002 } + h.inHand('toilet_paper', 'roll') + { taxonomy: { category: 'household', tags: { material: ['paper'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A battery toothbrush, 230 mm long: a 29 mm thick handle with a power button, a slim neck and a round brush head.
   h.compound('electric_toothbrush', 0.089, [
     h.turned('body', 'body', 'x', [[0, 0], [0, 0.013], [0.006, 0.0145], [0.150, 0.0135], [0.172, 0.006], [0.172, 0]], [0, 0.0145, 0]),
@@ -33,7 +33,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.disc('bristles', 'bristles', 0.0062, 0.0185, 0.029, 0.218, 0),
   ], { body: 'plastic-gloss-white', band: 'plastic-blue', button: 'plastic-blue', bristles: 'plastic-clear-blue' }) + h.gripOn('electric_toothbrush', 'body') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['hygiene'] } },
+  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A manual toothbrush, 180 mm long: a flat handle with a rubber thumb pad, a thin neck and a tufted head.
   h.compound('toothbrush', 0.02, [
     h.box('handle', 'handle', [0, 0, -0.0065], [0.110, 0.010, 0.0065]),
@@ -45,7 +45,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.box('bristles-tip', 'tip', [0.153, 0.018, -0.0048], [0.162, 0.020, 0.0048]),
   ], { handle: 'plastic-blue', grip: 'rubber-white', bristles: 'plastic-gloss-white', tip: 'plastic-clear-blue' }) + h.gripOn('toothbrush', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['hygiene'] } },
+  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A cotton canvas hammock rolled for carrying: a 320 mm roll 90 mm across, tied twice, gathered at each end into a rope loop.
   h.compound('hammock', 0.82, [
     h.rod('roll', 'cloth', 0.045, -0.160, 0.160, 0.045),
@@ -87,5 +87,5 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.disc('knob', 'knob', 0.018, 0.128, 0.138),
     h.box('lug-a', 'pot', [-0.112, 0.074, -0.030], [-0.095, 0.086, 0.030]),
     h.box('lug-b', 'pot', [0.095, 0.074, -0.030], [0.112, 0.086, 0.030]),
-  ], { pot: 'paint-oxblood', rim: 'ceramic-white', lid: 'paint-oxblood', knob: 'ceramic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] }, keywords: ['cooking'] } },
+  ], { pot: 'paint-oxblood', rim: 'ceramic-white', lid: 'paint-oxblood', knob: 'ceramic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], place: ['kitchen'] }, keywords: ['cooking'] } },
 ]

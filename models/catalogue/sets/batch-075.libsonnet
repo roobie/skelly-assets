@@ -109,7 +109,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     h.prism('lever', 'lever', 'z', [[0.040, 0.030], [0.040, 0.036], [-0.040, 0.042], [-0.044, 0.038], [-0.040, 0.034]], -0.010, 0.010),
     h.prism('grip', 'pad', 'z', [[-0.030, 0.0405], [-0.044, 0.0415], [-0.046, 0.0385], [-0.032, 0.0375]], -0.011, 0.011),
   ], { body: 'plastic-charcoal', housing: 'alu-bare', lever: 'steel-bright', pad: 'plastic-black', slot: 'coal-black', pin: 'steel-stainless' })
-  + h.inHand('hole_punch', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.inHand('hole_punch', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['office'], setting: ['modern'] } } },
 
   // A metal ballpoint 130 mm long and 9.6 mm across: a steel barrel with a band, a ribbed grip tapering to a cone and
   // the writing tip at +x, and a pocket clip and push button at -x.

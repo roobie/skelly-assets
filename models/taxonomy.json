@@ -55,7 +55,14 @@
     "place": {
       "meaning": "Where the model is typically found; a model found in several places names each.",
       "terms": {
-        "gym": "A gym or fitness centre: training equipment, gym bags, mats."
+        "bathroom": "A bathroom or washroom: toilets, basins, baths, toilet brushes, towels, soap.",
+        "farm": "A farm: tools and equipment for crops and livestock, feed, harvest gear.",
+        "gym": "A gym or fitness centre: training equipment, gym bags, mats.",
+        "hospital": "A hospital or surgery: beds, drips, medical and surgical equipment.",
+        "kitchen": "A kitchen: cookware, utensils, crockery and food-preparation appliances.",
+        "laboratory": "A laboratory: glassware, lab instruments and sample containers.",
+        "office": "An office: desks, stationery, filing and office machines.",
+        "workshop": "A workshop or garage: workbenches, vises, machine and hand tools."
       }
     },
     "setting": {
@@ -160,7 +167,6 @@
     "free-weights": "Weights lifted free rather than on a machine: dumbbells, kettlebells, barbells, plates.",
     "fuel": "Fuel and its containers: jerrycans, propane tanks, gas canisters, fuel drums.",
     "gardening": "Used for garden and yard work: rakes, hoes, trowels, hedge trimmers, mowers, flower pots.",
-    "holdall": "A large soft bag for carrying clothes or kit, carried in the hand or over a shoulder.",
     "hygiene": "Personal care and grooming: toothbrushes, combs, razors, shaving kits, hair dryers, toilet paper.",
     "improvised": "Made from scrap or whatever was to hand rather than built for the job: makeshift tools, scrap and tyre armour, pipe guns.",
     "insect": "Insects and insect-like creatures: giant roaches, ant queens.",
@@ -183,11 +189,12 @@
     "swimming": "Swimwear and swimming gear: swimsuits, trunks, swim caps, goggles, fins, float vests.",
     "tobacco": "Tobacco and nicotine products and their use: cigarettes, cigars, rolling tobacco, nicotine gum, vapes, pipes.",
     "toy": "Toys and playthings: dolls, plushies, figurines, remote-control cars, yo-yos, dice.",
+    "undead": "Anything dead that still moves, zombie or not: zombies, death knights, skeletons, ghosts.",
     "underwear": "Underwear and base layers: briefs, boxers, bras, undershirts, corsets, long underwear, tights.",
     "water-purification": "Makes water safe to drink: purifiers, filters, filter straws, rain catchers.",
     "weightlifting": "Lifting weights: barbells, plates, racks.",
     "woodworking": "Used to work wood: table saws, planers, jointers, hand saws, chisels, clamps.",
     "yoga": "Yoga and stretching: mats, blocks.",
-    "zombie": "The walking dead: shamblers, runners, crawlers and other zombies."
+    "zombie": "Reanimated corpses that shamble, run or crawl at the living: shamblers, runners, crawlers, fused masses."
   }
 }

@@ -177,7 +177,7 @@ local hakama(id, mass) =
                                   + buttons('button-a', 'button', -0.04, [0.03, -0.04, -0.11], ht + 0.004, 0.008)
                                   + buttons('button-b', 'button', 0.1, [0.03, -0.04, -0.11], ht + 0.004, 0.008),
              { cloth: 'cloth-cream', piping: 'cloth-cream', button: 'cloth-black' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A thin orange emergency windbreaker folded small, 340 mm by 300 mm and 35 mm tall: the hood rolled into the
   // collar, a dark zip down the front, slanted pocket zips, and a yellow reflective band round the chest and sleeves.

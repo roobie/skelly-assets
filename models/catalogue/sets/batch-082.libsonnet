@@ -115,7 +115,7 @@ local tray(w, d, ht, t) = [
     box('spoke-a', 'iron', [-0.24, 0.414, 0.165], [-0.06, 0.426, 0.177]),
     box('spoke-b', 'iron', [-0.156, 0.33, 0.165], [-0.144, 0.51, 0.177]),
     turned('crank-knob', 'frame', 'z', [[0, 0], [0, 0.012], [0.06, 0.012], [0.06, 0]], [-0.15, 0.51, 0.177]),
-  ], { frame: 'wood-oak', body: 'wood-pine', chute: 'wood-birch', iron: 'iron-cast', grain: 'straw-pale' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'] } } },
+  ], { frame: 'wood-oak', body: 'wood-pine', chute: 'wood-birch', iron: 'iron-cast', grain: 'straw-pale' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'], place: ['farm'] } } },
 
   // A 230 mm cut-off wheel, 3 mm thick with a 22 mm bore and a printed paper label.
   h.compound('cut_off_wheel', 0.3, [

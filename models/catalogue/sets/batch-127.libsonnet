@@ -173,7 +173,7 @@ local furHat = [
     ring('band', 'band', 0.08, 0.096, 0, 0.05),
     h.turned('body', 'cloth', 'y', [[0, 0], [0, 0.094], [0.12, 0.104], [0.165, 0.11], [0.18, 0.106], [0.19, 0.08], [0.192, 0]], [0, 0.048, 0]),
   ] + ribs('pleat', 'cloth', 18, 0.1, 0.007, 0.05, 0.2), { band: 'cloth-cream', cloth: 'cloth-bright-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], setting: ['modern'], slot: ['head'] } } },
 
   // A snug cotton knit hat standing upright, 180 mm tall: a rounded crown over a ribbed cuff turned up at the brow.
   h.compound('cotton_hat', 0.08, [

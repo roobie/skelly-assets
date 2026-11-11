@@ -34,7 +34,7 @@ local duffel(l, r) =
   ];
 local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body: body, trim: 'webbing-black', grip: 'plastic-matte-black' })
   + h.inHand(id, 'grip') + { voxelGrain: 0.004 }
-  + { taxonomy: { category: 'containers', tags: { material: ['fabric'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel', 'holdall'] } };
+  + { taxonomy: { category: 'containers', tags: { material: ['fabric'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel'] } };
 [
   // A canvas loot sack about 380 mm tall and 320 mm across when stuffed, its neck gathered and tied with cord
   // above a short tuft of cloth.

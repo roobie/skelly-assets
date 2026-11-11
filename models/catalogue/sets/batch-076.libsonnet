@@ -42,7 +42,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.box('strike', 'anvil', [0.068, 0.016, -0.010], [0.074, 0.032, 0.010]),
   ], { base: 'plastic-black', foot: 'rubber-black', anvil: 'steel-grey', magazine: 'alu-bare', cap: 'plastic-charcoal' }) + h.gripOn('stapler', 'cap') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['office'], setting: ['modern'] } } },
   // A 200 mm length of leg bone, 30 mm thick in the shaft and swelling to 46 mm at the knuckled ends.
   h.compound('bone_billet', 0.2, [
     h.turned('shaft', 'bone', 'x', [[0, 0], [0, 0.012], [0.006, 0.020], [0.022, 0.021], [0.045, 0.015], [0.155, 0.015], [0.178, 0.020], [0.194, 0.019], [0.200, 0.011], [0.200, 0]], [-0.100, 0.023, 0]),

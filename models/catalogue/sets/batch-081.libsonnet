@@ -97,7 +97,7 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     box('bolt-c', 'plate', [-0.08, 0.025, 0.035], [-0.064, 0.033, 0.051]),
     box('bolt-d', 'plate', [0.064, 0.025, 0.035], [0.08, 0.033, 0.051]),
   ], { body: 'paint-drum-blue', anvil: 'steel-grey', plate: 'steel-grey', screw: 'steel-bright' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
   // Tongue-and-groove pliers 300 mm long with 60 mm angled jaws and dipped grips.
   h.item('tongue_and_groove_pliers', 'pliers', 0.55, {
     kind: 'groove', length: 0.300, jawLength: 0.075, spread: 0.075,
