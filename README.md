@@ -169,6 +169,14 @@ outside the shared producer guarantee: they have no producer, and closing that g
 
 For pipeline ownership and authoring entry points, see `tools/README.md`.
 
+## Sounds
+
+Sounds are rows too: `models/sounds/` holds Jsonnet rows that `tools/packages/impact-synth` renders to samples,
+so a consumer ships a few numbers per sound instead of recorded audio. Only sounds the project owns live here, the
+way only models it owns do: a sound that is synthesised or recorded by us carries the same licence as the models,
+and a sampled or downloaded one would bring its own terms and make the licence page as complicated as the
+sound's origin.
+
 ## Using the assets
 
 Fetch a pinned release rather than building or tracking this repository: from a `v*` release, download
