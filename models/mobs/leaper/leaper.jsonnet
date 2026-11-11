@@ -47,7 +47,7 @@ local charged = { eye: true };
     for name in std.objectFields(hsl)
   },
   materialHsl: hsl,
-  // At the template voxel size; `tools/packages/mobgen/src/mob/leaper/plan.ts`, `budgetsFor`, scales them
+  // At the template voxel size; `tools/packages/mobgen/src/mob/budgets.ts`, `gridScaledBudgets`, scales them
   // to other grids. Totals catch a build that lost or doubled a part. The groups guard the read: the hind
   // springs stay the largest share, or the body stops reading as a jumper, and the head stays small and
   // slung low, or it reads as a crouched man.

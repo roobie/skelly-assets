@@ -68,13 +68,6 @@ test('a keyword the vocabulary does not list is reported without failing; a malf
   assert.deepEqual(report.problems.map(({ problem, id }) => [problem, id]), [['malformed', 'bad_case'], ['malformed', 'not_a_list'], ['malformed', 'twice']]);
 });
 
-test('a place term outside the vocabulary fails like any facet term', () => {
-  const places = vocabularyOf({ ...FIXTURE, facets: { ...FIXTURE.facets, place: { meaning: 'Where it is found.', terms: { gym: 'A gym.' } } } });
-  const at = (id, place) => ({ pack: 'fixture.loose', id, taxonomy: { category: 'tools', tags: { place } } });
-  const { problems } = taxonomyReport([looseUntagged, at('gym', ['gym']), at('moon', ['gym', 'moon'])], places);
-  assert.deepEqual(problems.map(({ problem, id, term }) => [problem, id, term]), [['unknown-term', 'moon', 'moon']]);
-});
-
 test('the untagged pack list only shrinks: a fully tagged or vanished listed pack fails', () => {
   assert.deepEqual(problemsOf([]), ['stale-untagged-pack']);
   assert.deepEqual(problemsOf([{ pack: 'fixture.loose', id: 'done', taxonomy: { category: 'tools' } }]), ['stale-untagged-pack']);

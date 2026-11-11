@@ -86,8 +86,8 @@ export function modelParts(buffer) {
 const TRIANGLES = 4;
 
 // Each part of a model as one triangle mesh in the model frame, { part, positions: xyz triples, indices }, so a check can
-// test points against the part's surface. `keep(part, piece)` picks the primitives, by their part and the piece the
-// export marks them as, if any; every one by default.
+// test points against the part's surface. `keep(part, piece, slot)` picks the primitives, by their part and the piece
+// and material slot the export marks them as, if any; every one by default.
 export function modelMeshes(buffer, keep = () => true) {
   const gltf = glbJson(buffer);
   const byName = new Map();
@@ -96,7 +96,7 @@ export function modelMeshes(buffer, keep = () => true) {
     const into = byName.get(part.name) ?? { part: part.name, positions: [], indices: [] };
     byName.set(part.name, into);
     for (const { attributes, indices, mode = TRIANGLES, extras } of mesh.primitives) {
-      if (!keep(part.name, extras?.piece)) continue;
+      if (!keep(part.name, extras?.piece, extras?.slot)) continue;
       if (mode !== TRIANGLES) throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
       const base = into.positions.length / 3;
       const positions = glbAccessor(buffer, gltf, attributes.POSITION);
