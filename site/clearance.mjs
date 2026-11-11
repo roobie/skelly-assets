@@ -31,11 +31,52 @@ function boundsOf(points) {
 
 const nearBox = ({ min, max }, p, reach) => [0, 1, 2].every((a) => p[a] >= min[a] - reach && p[a] <= max[a] + reach);
 
-// A mesh carried by a transform, as triangles with their bounds; a grip closes on one (site/fingers.mjs).
+// A grip probes hundreds of points per joint step against an item of thousands of triangles, so a solid keeps its
+// triangles in a bounding-volume hierarchy and a probe visits only the boxes that can change its answer.
+const LEAF = 4;
+// Node boxes are tested this much larger than their triangles, so rounding can never prune a triangle that counts.
+const SLACK = 1e-9;
+
+function hierarchy(triangles) {
+  const box = boundsOf(triangles.flat());
+  if (triangles.length <= LEAF) return { ...box, triangles };
+  const extent = [0, 1, 2].map((a) => box.max[a] - box.min[a]);
+  const axis = extent.indexOf(Math.max(...extent));
+  const centre = ([a, b, c]) => a[axis] + b[axis] + c[axis];
+  const sorted = [...triangles].sort((s, t) => centre(s) - centre(t));
+  const half = sorted.length >> 1;
+  return { ...box, children: [hierarchy(sorted.slice(0, half)), hierarchy(sorted.slice(half))] };
+}
+
+// A mesh carried by a transform, as a hierarchy of its triangles with their bounds; a grip closes on one
+// (site/fingers.mjs).
 export function posedSolid(mesh, transform) {
   const count = mesh.indices.length / 3;
   const triangles = Array.from({ length: count }, (_, t) => triangleCorners(mesh, t).map((p) => applyPoint(transform, p)));
-  return { triangles, bounds: boundsOf(triangles.flat()) };
+  return { tree: hierarchy(triangles), bounds: boundsOf(triangles.flat()) };
+}
+
+const INVERSE_RAY = RAY.map((x) => 1 / x);
+
+// Slab test: does the ray from `p` meet the box ahead of the point?
+function rayMeetsBox({ min, max }, p) {
+  let near = 0, far = Infinity;
+  for (let a = 0; a < 3; a++) {
+    const t1 = (min[a] - SLACK - p[a]) * INVERSE_RAY[a], t2 = (max[a] + SLACK - p[a]) * INVERSE_RAY[a];
+    near = Math.max(near, Math.min(t1, t2));
+    far = Math.min(far, Math.max(t1, t2));
+  }
+  return near <= far;
+}
+
+// Squared, as the nearest-distance search compares it against a squared limit at every node it passes.
+function boxDistanceSquared({ min, max }, p) {
+  let sum = 0;
+  for (let a = 0; a < 3; a++) {
+    const gap = Math.max(min[a] - SLACK - p[a], 0, p[a] - max[a] - SLACK);
+    sum += gap * gap;
+  }
+  return sum;
 }
 
 // The points a mesh is probed at: its vertices, once each, and its triangles' centroids, which stand in for the faces
@@ -93,16 +134,31 @@ function triangleDistance(p, [a, b, c]) {
  * How far `p` lies outside the solid, negative inside, as long as that is no more than `reach` either way; beyond it,
  * only the side is known, as ±Infinity.
  */
-export function signedDepth({ triangles, bounds }, p, reach) {
+export function signedDepth({ tree, bounds }, p, reach) {
   if (!nearBox(bounds, p, reach)) return Infinity;
-  let crossings = 0, nearest = Infinity;
-  for (const triangle of triangles) {
-    if (rayCrosses(p, triangle)) crossings++;
-    nearest = Math.min(nearest, triangleDistance(p, triangle));
-  }
-  const inside = crossings % 2 === 1;
+  const inside = crossings(tree, p) % 2 === 1;
+  const nearest = boxDistanceSquared(tree, p) > reach * reach ? Infinity : nearestDistance(tree, p, reach);
   if (nearest > reach) return inside ? -Infinity : Infinity;
   return inside ? -nearest : nearest;
+}
+
+function crossings(node, p) {
+  if (!rayMeetsBox(node, p)) return 0;
+  if (node.triangles) return node.triangles.filter((triangle) => rayCrosses(p, triangle)).length;
+  return crossings(node.children[0], p) + crossings(node.children[1], p);
+}
+
+// The distance from `p` to the nearest triangle under `node`, whose box lies within `reach`, when that is within
+// `reach` and below `best`; otherwise some distance past one of them. The nearer child goes first, so its triangles
+// can rule out the farther one's box.
+function nearestDistance(node, p, reach, best = Infinity) {
+  if (node.triangles) return node.triangles.reduce((least, triangle) => Math.min(least, triangleDistance(p, triangle)), best);
+  const [a, b] = node.children;
+  const toA = boxDistanceSquared(a, p), toB = boxDistanceSquared(b, p);
+  const [near, toNear, far, toFar] = toA <= toB ? [a, toA, b, toB] : [b, toB, a, toA];
+  if (toNear <= Math.min(reach, best) ** 2) best = nearestDistance(near, p, reach, best);
+  if (toFar <= Math.min(reach, best) ** 2) best = nearestDistance(far, p, reach, best);
+  return best;
 }
 
 const STILL = { r: IDENTITY_M, t: [0, 0, 0] };
