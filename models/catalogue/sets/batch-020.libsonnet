@@ -167,7 +167,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
   ]) + [
     disc('badge', 'hub', 0.02, 0, 0.004) + { axis: 'z', origin: [0, hubY, 0.034] },
   ], { body: 'plastic-white', switch: 'plastic-grey', hub: 'plastic-blue', blade: 'plastic-clear-blue', guard: 'steel-stainless' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A portable hard drive, 118 mm by 80 mm and 18 mm thick, its long sides rounded, with a hand-written label on
   // top, a status light and a short cable coiled beside it.
@@ -185,7 +185,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     ring('coil', 'cable', 0.018, 0.022, 0, 0.004, 0.085, 0.01),
     box('lead', 'cable', [0.061, 0.0, -0.002], [0.07, 0.004, 0.002]),
   ], { shell: 'plastic-charcoal', label: 'paper-white', ink: 'paint-police-blue', port: 'alu-bare', light: 'lcd-green', cable: 'plastic-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // An insulating fire brick, 230 mm by 114 mm by 64 mm, lying on its broad face: a plain pale buff block.
   h.compound('fire_brick', 1.2, [

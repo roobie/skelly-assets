@@ -66,7 +66,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     h.prism('lug', 'iron', 'y', [[-0.03, -0.125], [-0.022, -0.16], [0.022, -0.16], [0.03, -0.125]], 0.04, 0.048),
   ], { iron: 'iron-cast', hole: 'coal-black' }) + h.gripOn('pan', 'handle') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A pizza wheel 230 mm long lying flat: a 130 mm moulded handle, a steel fork and a 100 mm cutting wheel.
   h.compound('pizza_cutter', 0.18, [
@@ -76,7 +76,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     disc('hub', 'steel', 0.01, 0.002, 0.014, 0.18, 0),
   ], { handle: 'plastic-red', steel: 'steel-stainless' }) + h.gripOn('pizza_cutter', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A child's bowl 120 mm across and 45 mm deep in bright plastic, with a non-slip ring under its foot.
   h.compound('childs_plastic_bowl', 0.065, [
@@ -104,7 +104,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
   h.compound('pot', 1.6, [
     potShell('pot', 'steel', 0.095, 0.13, 0.004),
   ] + loopHandle('handle-a', 'steel', 1, 0.095, 0.1, 0.022) + loopHandle('handle-b', 'steel', -1, 0.095, 0.1, 0.022)
-  + lid('lid', 'steel', 'knob', 0.095, 0.13), { steel: 'steel-stainless', knob: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  + lid('lid', 'steel', 'knob', 0.095, 0.13), { steel: 'steel-stainless', knob: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A 20 litre enamelled canner 360 mm across and 260 mm tall with a lid, two side handles and a wire jar rack whose
   // handles rest on the rim.
@@ -116,20 +116,20 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     box('rack-b', 'rack', [0.12, 0.25, 0.044], [0.188, 0.258, 0.05]),
     box('rack-c', 'rack', [-0.188, 0.25, -0.05], [-0.12, 0.258, -0.044]),
     box('rack-d', 'rack', [-0.188, 0.25, 0.044], [-0.12, 0.258, 0.05]),
-  ], { enamel: 'paint-drum-blue', trim: 'plastic-black', rack: 'steel-galvanised' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { enamel: 'paint-drum-blue', trim: 'plastic-black', rack: 'steel-galvanised' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A tin-lined copper pot 180 mm across and 140 mm deep with two cast brass handles and a copper lid.
   h.compound('copper_pot', 2.4, [
     potShell('pot', 'copper', 0.09, 0.14, 0.004),
     turned('lining', 'tin', 'y', [[0.004, 0], [0.004, 0.084], [0.138, 0.084], [0.138, 0.08], [0.008, 0.08], [0.008, 0]]),
   ] + loopHandle('handle-a', 'brass', 1, 0.09, 0.11, 0.025, 0.035, 0.008) + loopHandle('handle-b', 'brass', -1, 0.09, 0.11, 0.025, 0.035, 0.008)
-  + lid('lid', 'copper', 'brass', 0.09, 0.14, 0.018, 0.012), { copper: 'copper', tin: 'steel-grey', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + lid('lid', 'copper', 'brass', 0.09, 0.14, 0.018, 0.012), { copper: 'copper', tin: 'steel-grey', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A pot hammered from a heavy steel sheet, 200 mm across the crimped rim and 75 mm deep, with a wire bail.
-  makeshiftPot('makeshift_pot', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  makeshiftPot('makeshift_pot', 0.9, 'steel-grey', 'iron-dull', 0.008) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // The same pot hammered from copper sheet.
-  makeshiftPot('makeshift_copper_pot', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  makeshiftPot('makeshift_copper_pot', 1, 'copper', 'verdigris', 0.004) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // A hardwood rolling pin 460 mm long: a 300 mm barrel 64 mm across and a turned handle at each end.
   h.compound('rolling_pin', 0.7, [
@@ -138,7 +138,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     turned('handle-b', 'wood', 'x', [[0, 0], [0, 0.008], [0.01, 0.012], [0.03, 0.016], [0.068, 0.017], [0.08, 0.014], [0.08, 0]], [0.15, 0.032, 0]),
   ], { wood: 'wood-birch' }) + h.gripOn('rolling_pin', 'handle-a') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['wood'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['wood'] }, keywords: ['cooking'] } },
 
   // A child's training cup 70 mm across and 115 mm tall to the spout: a body with two side grips and a snap-on lid
   // with a soft spout at the front (+z).
@@ -168,7 +168,7 @@ local makeshiftPot(id, massKg, metal, mark, t) = h.compound(id, massKg, [
     turned('grip', 'grip', 'x', [[0, 0], [0, 0.009], [0.08, 0.011], [0.1, 0.008], [0.105, 0], [0, 0]], [r + 0.05, 0.008, 0]),
   ], { mesh: 'steel-stainless', steel: 'steel-stainless', grip: 'plastic-black' }) + h.gripOn('splatter_guard', 'grip') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A dessert spoon 190 mm long lying on its back: a flat handle widening to its end and an oval bowl 45 mm long.
   local oval(a, b, cx) = [[std.sin(i * std.pi / 8) * b, cx + std.cos(i * std.pi / 8) * a] for i in std.range(0, 15)];

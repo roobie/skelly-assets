@@ -19,7 +19,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     box('front', 'front', [-0.33, -0.01, 0.21], [0.33, 0.11, 0.222]),
     box('pull', 'pull', [-0.2, 0.09, 0.222], [0.2, 0.1, 0.234]),
   ], { tray: 'steel-grey', floor: 'iron-dull', front: 'paint-charcoal', pull: 'steel-stainless' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // The bare steel body of an electric oven, 600 mm wide, 690 mm tall and 600 mm deep, door, controls and
   // drawer gone: a white shell round a dark enamelled cavity with rack ridges, an empty control bay above and
@@ -146,7 +146,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     wire('wire-%d' % i, ['wire-red', 'wire-blue'][i % 2], -0.2 + i * 0.13, 0.02, -0.32 + (i % 2) * 0.02, -0.26)
     for i in std.range(0, 3)
   ], { top: 'enamel-white', bowl: 'steel-stainless', hole: 'paint-charcoal', block: 'ceramic-white', 'wire-red': 'plastic-red', 'wire-blue': 'plastic-blue' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A 250 ml squeeze bottle of hair dye, 56 mm across and 165 mm tall to the tip of its pointed applicator
   // nozzle, with a dark label and a wide colour swatch band that names the shade.
@@ -157,7 +157,7 @@ local wire(id, slot, x, y, z0, z1) = turned(id, slot, 'z', [[0, 0], [0, 0.003], 
     turned('label', 'label', 'y', [[0, 0], [0, 0.0285], [0.075, 0.0285], [0.075, 0]], [0, 0.02, 0]),
     turned('swatch', 'swatch', 'y', [[0, 0], [0, 0.029], [0.03, 0.029], [0.03, 0]], [0, 0.04, 0]),
   ], { bottle: 'plastic-white', tip: 'plastic-black', label: 'plastic-charcoal', swatch: 'cloth-brown' })
-  + h.inHand('hair_dye', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.inHand('hair_dye', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['hygiene'] } },
 
   // A screw-top glass jar 70 mm across and 95 mm tall, filled with clear mineral oil over grey lumps of a
   // reactive metal, with a black lid and a yellow hazard label.

@@ -97,7 +97,7 @@ local alderParts =
     knob: 'plastic-black',
     resistor: 'paint-cream',
   })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A fired clay building brick, 190 by 90 mm and 57 mm tall, with a shallow frog pressed into its top
   // face, lying flat.
@@ -237,7 +237,7 @@ local alderParts =
     handle: 'leather-brown',
     knob: 'plastic-black',
     foot: 'rubber-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A cardboard archery target box, 600 mm wide, 450 mm tall and 190 mm deep, standing on its long edge:
   // packed tight with cloth, its seams taped, and a painted target of five coloured rings on the front.

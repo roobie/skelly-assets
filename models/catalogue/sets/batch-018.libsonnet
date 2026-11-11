@@ -198,7 +198,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     for x in [[0.18, 0.21, 0.24, 0.27][i]]
     for s in [[1, -1, 1, -1][i]]
   ], { stalk: 'plant-dried', root: 'paperboard-brown', leaf: 'plastic-green', bud: 'paint-olive' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] }, keywords: ['recreational-drug'] } },
 
   // A shop cash register, 360 mm wide, 360 mm deep and 300 mm tall: a cash drawer in the base with a lock and a
   // finger pull, a raked keypad of number and function keys, a receipt printer with paper showing at its slot, and

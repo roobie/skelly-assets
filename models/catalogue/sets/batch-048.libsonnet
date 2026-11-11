@@ -69,7 +69,7 @@ local heatPack(used) =
     box('tap-lever', 'tap', [-0.004, 0.02, 0.072], [0.004, 0.034, 0.08]),
   ], { frame: 'plastic-white', gravel: 'stone-grey', sand: 'brick-buff', charcoal: 'coal-black', pad: 'cloth-cream', reservoir: 'plastic-clear-blue', tap: 'plastic-blue' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['water-purification'] } },
 
   // A portable bullet smoker 600 mm tall and 300 mm across: a charcoal bowl on three legs, a straight body with a
   // front fuel door and side handles, a domed lid with a vent, a dial thermometer and a top handle.
@@ -96,7 +96,7 @@ local heatPack(used) =
   ] + [
     around('foot-%d' % i, 'leg', 60 + 120 * i, 0.13, 0.04, 0.04, 0, 0.008)
     for i in std.range(0, 2)
-  ], { body: 'paint-charcoal', trim: 'steel-grey', handle: 'plastic-black', thermo: 'paint-white', door: 'paint-charcoal', leg: 'steel-grey' }) + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  ], { body: 'paint-charcoal', trim: 'steel-grey', handle: 'plastic-black', thermo: 'paint-white', door: 'paint-charcoal', leg: 'steel-grey' }) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A small charcoal cooker 300 mm tall to the top of its flue: a 120 mm steel tank with a firebox door and a
   // pot grate on top, a flue pipe out the back that turns up, and a brass pilot valve on the front.
@@ -114,7 +114,7 @@ local heatPack(used) =
     ring('flue-cap', 'rim', 0.01, 0.02, 0.29, 0.296, 0, -0.105),
   ], { tank: 'iron-dull', rim: 'steel-grey', grate: 'iron-cast', door: 'iron-cast', pilot: 'brass', flue: 'steel-galvanised' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A crude hand-built clay pot 150 mm tall and 190 mm across the belly, open at the top, with two lugs.
   h.compound('clay_pot', 0.68, [
@@ -139,7 +139,7 @@ local heatPack(used) =
     box('handle-back', 'body', [-0.112, 0.03, -0.007], [-0.096, 0.086, 0.007]),
   ], { body: 'clay-terracotta', lid: 'clay-terracotta' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] }, keywords: ['cooking'] } },
 
   // A drip coffeemaker 250 mm tall, 180 mm wide and 220 mm deep: a base with a warming plate under a glass carafe,
   // a water tower at the back, a head over the filter basket and a red switch on the front.
@@ -159,7 +159,7 @@ local heatPack(used) =
     box('switch', 'switch', [0.04, 0.008, 0.11], [0.07, 0.022, 0.114]),
   ], { body: 'plastic-black', gauge: 'plastic-clear', plate: 'steel-grey', basket: 'plastic-charcoal', carafe: 'glass-clear', coffee: 'wood-walnut', switch: 'plastic-red' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A small glass 50 mm across holding sugar syrup, a wooden skewer clipped across the rim by a peg and hung in
   // the syrup, its lower half crusted with sugar crystals.
@@ -191,7 +191,7 @@ local heatPack(used) =
   ]) + [
     h.turned('lid', 'base', 'y', [[0, 0], [0, 0.14], [0.012, 0.136], [0.025, 0.1], [0.03, 0]], [0, 0.22, 0]),
     h.disc('vent', 'dial', 0.03, 0.25, 0.256),
-  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A 1 litre glass jar 132 mm tall, left open, full of brine with peeled eggs packed in it.
   h.compound('fermenting_eggs', 1.3, [
@@ -225,7 +225,7 @@ local heatPack(used) =
     for s in [-1, 1]
   ]), { stove: 'alu-bare', fuel: 'chalk-white', vent: 'plastic-charcoal' }) + h.inHand('hexamine_stove', 'base') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
   // A food processor 400 mm tall to the top of its pusher: a motor base with two buttons, a clear bowl with a
   // side handle, a lid with a feed tube on the right and a pusher in it, and a blade on its spindle.
@@ -243,7 +243,7 @@ local heatPack(used) =
     h.turned('chute', 'lid', 'y', [[0, 0.028], [0, 0.036], [0.09, 0.036], [0.09, 0.028], [0, 0.028]], [0.045, 0.292, 0]),
     h.disc('pusher', 'pusher', 0.027, 0.3, 0.4, 0.045, 0),
     h.disc('pusher-cap', 'pusher', 0.04, 0.392, 0.4, 0.045, 0),
-  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A pressure stove for petrol 210 mm tall and 140 mm across the pot supports: a brass tank with a filler cap
   // and a pump, a burner on a riser, three legs carrying a pot ring, and a valve key.
@@ -266,15 +266,15 @@ local heatPack(used) =
     for i in std.range(0, 2)
   ]), { tank: 'brass', cap: 'brass-dull', burner: 'brass-dull', leg: 'steel-grey', pump: 'steel-grey', key: 'steel-grey' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
   // A single-use chemical heat pack, 120 by 90 mm and 12 mm thick, with a pull tab to start it.
   h.compound('heatpack', 0.06, heatPack(false), { pouch: 'plastic-white', crimp: 'plastic-white', print: 'plastic-red', tab: 'plastic-orange' }) + h.inHand('heatpack', 'pouch') + h.label('print', '+y') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['cold-weather'] } },
 
   // The same pack spent: flatter, gone hard in lumps, its print faded and its tab gone.
   h.compound('used_heat_pack', 0.065, heatPack(true), { pouch: 'plastic-grey', crimp: 'plastic-grey', print: 'paint-oxblood', lump: 'plastic-grey' }) + h.inHand('used_heat_pack', 'pouch') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['cold-weather'] } },
 ]

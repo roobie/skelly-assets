@@ -126,7 +126,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
       [0, 0], [0, 0.060], [0.125, 0.080], [0.125, 0.088], [0.155, 0.088], [0.155, 0.078], [0.012, 0.052], [0.012, 0],
     ]),
   ], { clay: 'clay-terracotta' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] }, keywords: ['gardening'] } },
 
   // A wind-up twin-bell alarm clock 110 mm across and 150 mm tall on two feet, its hands stopped at ten past ten.
   local cy = 0.075;
@@ -220,7 +220,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     edgeRing('eye-a', 'wire', 'z', 0.003, 0.006, 0.004, -0.146, 0.006, 0),
     edgeRing('eye-b', 'wire', 'z', 0.003, 0.006, 0.004, 0.146, 0.006, 0),
   ], { wire: 'steel-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['improvised'] } },
 
   // A small mechanical delay fuze 46 mm long: a threaded steel nose, an olive plastic body with a striker lever along
   // its side, and a safety pin with a pull ring.

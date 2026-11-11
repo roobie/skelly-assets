@@ -61,7 +61,7 @@ local bail(radius, earY, topY, wire, grip) = [
     box('part-d', 'yellow', [-0.08, 0.052, 0, ], [-0.02, 0.056, 0.04]),
     box('part-e', 'red', [0.0, 0.052, -0.01], [0.04, 0.056, 0.04]),
   ], { board: 'paperboard-tan', lid: 'paint-white', red: 'paint-red', sky: 'plastic-blue', yellow: 'plastic-yellow', green: 'plastic-green' })
-  + h.label('title', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
+  + h.label('title', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A 20 pound barbecue propane cylinder, 305 mm across and 460 mm tall: a white steel bottle on a foot
   // ring, a guard collar round a brass valve with a black handwheel at the top.
@@ -77,7 +77,7 @@ local bail(radius, earY, topY, wire, grip) = [
     disc('stem', 'brass', 0.008, 0.465, 0.475),
     disc('wheel', 'wheel', 0.04, 0.475, 0.49),
   ], { paint: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal', brass: 'brass', wheel: 'plastic-black' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A sealed meal ration bag lying flat, 260 mm long, 150 mm wide and 40 mm thick: a heavy tan pouch
   // with crimped seals at both ends and a dark printed panel.

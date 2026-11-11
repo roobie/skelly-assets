@@ -130,7 +130,7 @@ local collapsedDrum(length, width, thick, plate) =
   // fittings, a water valve on one end, towing rings and side D-rings, and a dark stencilled panel on top.
   h.compound('collapsible_water_drum', 21, collapsedDrum(0.85, 0.5, 0.06, 0.11),
              { rubber: 'polymer-fde', plate: 'steel-grey', valve: 'brass', ring: 'steel', stencil: 'paint-charcoal' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] }, keywords: ['camping'] } },
 
   // A 500 gallon collapsible fuel drum emptied and pressed flat, 2.5 m long over its towing rings, 1.1 m wide and
   // 260 mm tall at the valve: a black rubber body tapering into gathered collars round flat steel end fittings, a
@@ -175,5 +175,5 @@ local collapsedDrum(length, width, thick, plate) =
     box('hook-side', 'hook', [0.69, 0.02, -0.005], [0.7, 0.03, 0.05]),
     box('hook-tip', 'hook', [0.665, 0.02, 0.04], [0.69, 0.03, 0.05]),
   ], { bag: 'cloth-navy', zip: 'plastic-black', hook: 'steel', pocket: 'plastic-clear' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] }, keywords: ['luggage'] } },
 ]

@@ -74,7 +74,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     for i in [0, 1]
     for x in [[0.035, 0.125][i]]
   ], { leather: 'leather-brown', 'leather-dark': 'leather-chestnut', cord: 'cord-cotton', cloth: 'cloth-canvas' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['leather', 'fabric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['leather', 'fabric'] }, keywords: ['improvised'] } },
 
   // A panel engine air filter, 240 by 170 mm and 40 mm deep: a black plastic frame round off-white pleated paper,
   // with a soft sealing lip round its bottom edge.
@@ -105,7 +105,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     for i in std.range(0, 5)
     for w in [[[-0.095, 0.055, 0, 0.03], [-0.1, 0.075, 0.02, 0.02], [-0.098, 0.035, -0.022, 0.022], [-0.1, 0.03, 0.025, 0.018], [-0.097, 0.08, -0.018, 0.019], [-0.11, 0.06, -0.005, 0.016]][i]]
   ], { bottle: 'plastic-frosted', paper: 'paper-white', hose: 'rubber-black', tape: 'tape-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['plastic', 'paper'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['plastic', 'paper'] }, keywords: ['improvised'] } },
 
   // A spin-on oil filter, 100 mm across and 150 mm long, lying on its side with its base plate to the front: a
   // blue-painted steel can with a domed end and printed band, a rolled seam, a rubber gasket ring, a threaded centre
@@ -139,7 +139,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     disc('bore-in', 'bore', 0.0035, 0.15, 0.1502, -0.016, 0),
     disc('bore-out', 'bore', 0.0035, 0.15, 0.1502, 0.016, 0),
   ], { can: 'steel-bright', solder: 'lead', tape: 'tape-grey', wire: 'steel-grey', copper: 'copper', bore: 'plastic-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] }, keywords: ['improvised'] } },
 
   // A five-point seat harness laid out flat, about 700 mm across and 900 mm long: black webbing 50 mm wide, two
   // shoulder straps, two lap straps and a crotch strap meeting at a round turn-release buckle, each strap with a

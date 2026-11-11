@@ -157,5 +157,5 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
     h.box('stripe', 'stripe', [-0.11, 0.035, -0.17], [0.11, 0.037, -0.15]),
   ], { foam: 'foam-orange', slot: 'plastic-charcoal', stripe: 'plastic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 320 mm talking doll in a red dress, a speaker grille and press button on its chest.
-  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 ]
