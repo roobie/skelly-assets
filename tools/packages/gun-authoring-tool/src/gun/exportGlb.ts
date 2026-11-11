@@ -42,6 +42,7 @@ import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
+import { compareCodeUnits } from './compareCodeUnits.ts';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
@@ -760,12 +761,16 @@ const drawnAnchors = (
       }
     : {};
 
+/** The sight an export describes: the lowest priority, then the first id. */
+export const compareSightCandidates = (a: { priority: number; id: string }, b: { priority: number; id: string }): number =>
+  a.priority - b.priority || compareCodeUnits(a.id, b.id);
+
 const sightMetadata = (resolved: Resolved, voxel?: VoxelFile): GunModelFields['sight'] => {
   const candidates = [...resolved.defs.entries()].flatMap(([id, part]) => {
     const candidate = sightCandidate(resolved, id, part);
     return candidate ? [candidate] : [];
   });
-  const [chosen] = candidates.sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
+  const [chosen] = candidates.sort(compareSightCandidates);
   if (!chosen) {
     return undefined;
   }
