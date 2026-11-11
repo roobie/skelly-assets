@@ -496,6 +496,8 @@ local towHitch = k.compound('tow_hitch', 18, [
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37),
 ] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', truckDriveAxle, 'heavy')
 + withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', truckSteeredAxle, 'heavy')
+// An all-wheel-drive truck's axle under flotation tyres: its track is as wide as the truck, so its wheels stand flush with the body.
++ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums), 'beam_axle_wide', 600, 'heavy')
 + withBare(steeredAxleDrop, 'steered_axle_drop', 330, 'heavy')
 + withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 190, 'heavy') + [
   propShaft('prop_shaft_short', 10, 1.2),
