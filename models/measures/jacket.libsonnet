@@ -1,6 +1,3 @@
-// The garment envelope also seats the outer shells, so changing the jacket cannot leave its gear fitted to skin.
-{
-  hem: { bottom: 0.08, top: 0.23, width: 0.37, depth: 0.24, chamfer: 0.025 },
-  waist: { bottom: 0.2, top: 0.38, width: 0.35, depth: 0.235, chamfer: 0.025 },
-  chest: { bottom: 0.35, top: 0.62, width: 0.44, depth: 0.26, chamfer: 0.03 },
-}
+// The jacket's fit, shared by its worn shells and the gear seated over them, so changing the jacket cannot leave its
+// gear fitted to skin. Every torso garment that takes the over-jacket gear stays inside this one.
+{ layer: 'over', sleeveLayer: 'normal', pockets: 'patch', slots: { body: 'cloth', trim: 'trim', fastener: 'fastener' } }

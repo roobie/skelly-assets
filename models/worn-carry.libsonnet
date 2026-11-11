@@ -2,6 +2,7 @@
 local carry(overJacket, suffix) =
 local bust = import 'measures/bust.libsonnet';
 local jacket = import 'measures/jacket.libsonnet';
+local wornFit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local bags = import 'measures/bags.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
@@ -13,20 +14,21 @@ local mirrored(id, slot, xs, ys, zs) = [
 local level(bottom, height, width, depth, chamfer) = {
   y: [bottom, bottom + height], hx: width / 2, hz: depth / 2, c: chamfer / 2,
 };
-local jacketLevel(d, bottom, top) = level(bottom, top - bottom, d.width, d.depth, d.chamfer * 2);
-local jacketSplit = (jacket.chest.bottom + jacket.chest.top) / 2;
+local shell = wornFit.torsoLevels(jacket.layer);
+local shellLevel(l) = { y: l.y, hx: l.width / 2, hz: l.depth / 2, c: l.chamfer };
 local torso = if overJacket then {
-  pelvis: jacketLevel(jacket.hem, 0, jacket.hem.top),
-  waist: jacketLevel(jacket.waist, jacket.hem.top, jacket.chest.bottom),
-  ribs: jacketLevel(jacket.chest, jacket.chest.bottom, jacketSplit),
-  chest: jacketLevel(jacket.chest, jacketSplit, jacket.chest.top),
+  pelvis: shellLevel(shell.pelvis),
+  waist: shellLevel(shell.waist),
+  ribs: shellLevel(shell.ribs),
+  chest: shellLevel(shell.chest),
 } else {
   pelvis: level(0, bust.pelvisHeight, bust.pelvisWidth, bust.pelvisDepth, bust.torsoChamfer),
   waist: level(self.pelvis.y[1], bust.waistHeight, bust.waistWidth, bust.waistDepth, bust.torsoChamfer),
   ribs: level(self.waist.y[1], bust.ribHeight, bust.ribWidth, bust.ribDepth, bust.torsoChamfer),
   chest: level(self.ribs.y[1], bust.chestHeight, bust.chestWidth, bust.chestDepth, bust.chestChamfer),
 };
-local shoulderTop = torso.chest.y[1];
+// Over the jacket the shoulders are its yoke's top.
+local shoulderTop = if overJacket then shell.yoke.y[1] else torso.chest.y[1];
 local grain = 0.004;
 // A sample just below the garment's outward step can fill a cell above it; end the narrow waist on a voxel face.
 local waistTop = std.floor(torso.waist.y[1] / grain) * grain;
@@ -183,10 +185,10 @@ local wornAtom(id, massKg, pieces, finish, taxonomy=null) = {
 // to the slung gun's stock. Its foot meets the gun where
 // https://github.com/roobie/skelly, `packages/deadvox/src/content/base/models-firearms.libsonnet`, `slung`, hangs it.
 local sling =
-  local deltoidX = if overJacket then jacket.chest.width / 2 - fit.slingInset
+  local deltoidX = if overJacket then torso.chest.hx - fit.slingInset
                   else bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
   local deltoidTop = if overJacket then shoulderTop + fit.slingClearance else shoulderTop - bust.deltoidDrop;
-  local half = if overJacket then jacket.chest.depth / 2 + fit.slingClearance else bust.shoulderDepth / 2;
+  local half = if overJacket then torso.chest.hz + fit.slingClearance else bust.shoulderDepth / 2;
   local xs = [-deltoidX - 0.012, -deltoidX + 0.012];
   local pad = [deltoidTop + 0.004, deltoidTop + 0.012];
   [
@@ -199,7 +201,7 @@ local sling =
   ];
 
 [
-  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'polymer-od-green', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
+  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'cloth-olive-drab', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
   wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }, tag('armour', 'torso', 'fabric')),
   backpack('school_backpack', 0.6, 0.15),
   backpack('hiking_backpack', 1.4, 0.06),

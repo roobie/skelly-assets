@@ -123,6 +123,17 @@ export const NeutralModelSchema = strictObject({
   /** Finish slots a host repaints on its copy; the GLB marks their materials `paintable` in their extras. */
   paintable: optional(pipe(array(Id), nonEmpty('lists no slot'))),
   /**
+   * The doll parts, or pieces of the part a worn shell is drawn on, that a consumer stops drawing while the shell is
+   * worn: skin lying flush under a shell would show through it.
+   */
+  covers: optional(
+    pipe(
+      array(Id),
+      nonEmpty('covers nothing'),
+      check((ids) => new Set(ids).size === ids.length, 'covers one twice'),
+    ),
+  ),
+  /**
    * Where the hand holds the model, and the XYZ Euler turn in degrees that carries the file's axes onto the held axes,
    * working end +z and up +y, so a model that faces its working end forward needs none.
    */

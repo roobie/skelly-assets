@@ -15,17 +15,22 @@ import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs'
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 
-// The doll and one jacket built from the repo's own content, so these check the rig, the fixtures and the probe against
-// the doll as it is drawn, not against a stand-in.
+// The doll and some garments built from the repo's own content, so these check the rig, the fixtures, the probe and the
+// fitted shells against the doll as it is drawn, not against a stand-in.
 const repo = resolve(import.meta.dirname, '../..');
 const WEAR = 'leather_jacket';
+// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet).
+const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers'];
+const sources = await modelTaxonomies(repo);
+const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
-execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', WEAR, `${WEAR}_worn_body`, `${WEAR}_worn_upper`, `${WEAR}_worn_fore`], { cwd: repo, stdio: 'pipe' });
+const wears = [WEAR, ...CLOTHES];
+execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)])], { cwd: repo, stdio: 'pipe' });
 
 // A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, as the
 // manifest would list them.
-const taxonomies = new Map((await modelTaxonomies(repo)).map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
+const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
 const manifest = {
   models: readdirSync(built).flatMap((pack) => readdirSync(join(built, pack, 'assets/models')).map((file) => {
     const id = file.slice(0, -'.glb'.length);
@@ -37,7 +42,8 @@ const doll = readDoll(built, manifest, dressing);
 const rig = dollRig(readRigContent(repo), doll, dressing);
 const models = manifest.models.filter((model) => model.path.endsWith('.glb'));
 const boxOf = (id) => { const entry = models.find((model) => model.id === id); return modelBox(readFileSync(join(built, entry.pack, entry.path))); };
-const rest = restMeshes(rig, wornSites(models.find((model) => model.id === WEAR), { dressing, doll, models, boxOf }), treeMeshes(built, manifest));
+const restIn = (wear) => restMeshes(rig, wornSites(models.find((model) => model.id === wear), { dressing, doll, models, boxOf }), treeMeshes(built, manifest));
+const rest = restIn(WEAR);
 const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
 const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
@@ -91,4 +97,14 @@ test('upper sleeves narrowed inside their arms let the upper arms poke through',
   assert.ok(pieces.some((piece, i) => piece !== rest.pieces[i]), 'the jacket has upper sleeves to narrow');
   const { pokes } = clearanceProbe(rig, { ...rest, pieces })(still);
   assert.ok(pokes.some(({ bone }) => bone.startsWith('upperArm.')), 'an upper arm shows through');
+});
+
+test('each fitted everyday garment covers the body and leaves none of it poking through at rest', () => {
+  for (const wear of CLOTHES) {
+    const dressed = restIn(wear);
+    const surface = coveredSurface(rig, dressed);
+    assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
+    const { pokes } = clearanceProbe(rig, dressed, surface)(still);
+    assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
+  }
 });
