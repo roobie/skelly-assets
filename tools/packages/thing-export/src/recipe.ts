@@ -43,7 +43,8 @@ export interface ModelExport<Model extends NeutralModel = NeutralModel> {
 }
 export interface ModelPhysical {
   readonly massKg: number;
-  readonly volumeM3: number;
+  /** Left out by a tool that weighs its parts but does not measure the voxels it draws, such as the gun tool. */
+  readonly volumeM3?: number;
 }
 export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
   readonly id: string;

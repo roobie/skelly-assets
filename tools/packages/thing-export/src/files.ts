@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { modelMassKg } from '@skelly/thing-core/mass';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import type { CachedExport, ExportCache } from './cache.ts';
 import type { ModelExport, ModelPhysical, RecipeExport } from './recipe.ts';
@@ -44,6 +45,18 @@ export const generateModel = (row: RecipeExport, cache?: ExportCache): Generated
   };
 };
 
+/**
+ * A tool that reports no total weighs its model through its parts' masses, as the sidecar lists them; a model with any
+ * part unweighed stays unweighed rather than showing a mass short of what it weighs.
+ */
+const physicalOf = ({ physical, modelEntry }: GeneratedModel): ModelPhysical | undefined => {
+  if (physical !== undefined) return physical;
+  const parts = Object.values(modelEntry.parts ?? {});
+  return parts.length > 0 && parts.every(({ massKg }) => massKg !== undefined)
+    ? { massKg: modelMassKg({ parts: modelEntry.parts ?? {} }) }
+    : undefined;
+};
+
 /** Writes generated rows in the given order, so the files do not depend on which row finished first. */
 export const writeModelExports = (
   outputs: readonly GeneratedModel[],
@@ -67,16 +80,20 @@ export const writeModelExports = (
     files.push(`${directory}/${modelEntry.id}.model.json`, modelEntry.file);
   }
   return {
-    models: outputs.map(({ id, kind, modelEntry, partNodes, physical }) => ({
-      id,
-      kind,
-      path: modelEntry.file,
-      partNodes,
-      ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
-      ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
-      ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
-      ...(physical === undefined ? {} : { physical }),
-    })),
+    models: outputs.map((output) => {
+      const { id, kind, modelEntry, partNodes } = output;
+      const physical = physicalOf(output);
+      return {
+        id,
+        kind,
+        path: modelEntry.file,
+        partNodes,
+        ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
+        ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
+        ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
+        ...(physical === undefined ? {} : { physical }),
+      };
+    }),
     files,
   };
 };
