@@ -75,4 +75,43 @@
       { along: 'x', at: [-0.1, 0.5, -1.12], spacing: 0.14, count: 3, reach: -0.95 },
     ],
   },
+  // A main battle tank's three-man turret: a wide welded box with wedged front cheeks and a long bustle, the gun on the
+  // centre line in a thick mantlet with the coaxial gun on the far side, the commander and gunner on the near side and
+  // the loader on the far side under hatches side by side, and the crew's basket on the bustle. Its plan is a generic
+  // Western tank's, and its mass is an estimate for a turret of its armour.
+  mbt_turret: {
+    local height = 0.85,
+    local bore = 0.45,
+    local back = 0.95,
+    local hatchX = -0.55,
+    class: 'mbt_120mm',
+    massKg: 16500,
+    paint: 'paint-olive',
+    shell: {
+      base: [[-0.7, 1.75], [0.7, 1.75], [1.65, 1.2], [1.7, -1.4], [1.45, -2.5], [-1.45, -2.5], [-1.7, -1.4], [-1.65, 1.2]],
+      roof: [[-0.62, 1.62], [0.62, 1.62], [1.55, 1.12], [1.6, -1.35], [1.38, -2.4], [-1.38, -2.4], [-1.6, -1.35], [-1.55, 1.12]],
+    },
+    bands: 5,
+    height: height,
+    wall: 0.1,
+    mask: { front: 1.95, across: [-0.55, 0.55] },
+    jacket: { gun: 'main_gun', length: 0.3, radius: 0.17 },
+    fittings: [
+      { site: 'main_gun', key: 'mainGun', at: [back, bore, 0] },
+      { site: 'coaxial_machine_gun', key: 'coaxGun', at: [back, bore, -0.42] },
+      { site: 'gunner_sight', key: 'gunnerSight', at: [0.8, height, 0.8] },
+      { site: 'commander_sight', key: 'commanderSight', at: [0.1, height, 1.05] },
+      { site: 'turret_periscope_0', key: 'periscope', at: [0.15, height, -0.8] },
+      { site: 'turret_periscope_1', key: 'periscope', at: [0.15, height, 0.45] },
+      { site: 'commander_hatch', key: 'hatch', at: [hatchX, height, 0.8] },
+      { site: 'loader_hatch', key: 'hatch', at: [hatchX, height, -0.8] },
+      // The basket's front rests against the foot of the bustle's rear face, which slopes in above it.
+      { site: 'bustle_rack', key: 'bustleRack', at: [-2.5, 0.05, 0] },
+    ],
+    // A cluster of four on each side, ahead of the bustle.
+    smokeRacks: [
+      { along: 'x', at: [-0.5, 0.5, 1.72], spacing: 0.13, count: 4, reach: 1.5 },
+      { along: 'x', at: [-0.5, 0.5, -1.72], spacing: 0.13, count: 4, reach: -1.5 },
+    ],
+  },
 }
