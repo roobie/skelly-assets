@@ -1,5 +1,5 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, printed label and the components a model comes apart into (tools/components.mjs), the
+// their category, tags, keywords, printed label and the components a model comes apart into (tools/components.mjs), the
 // vehicles the tree places and the assemblies the kits build with the model at each of their sites, the sites that
 // dress each wearable on the doll, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
@@ -37,23 +37,25 @@ const walkSpeedOf = (clips) => {
 };
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, label, clips, body, covers }) => ({
+  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers }) => ({
     id,
     category: category ?? null,
     label: label ?? null,
     tags: tags ?? {},
+    keywords: keywords ?? [],
     file: `${pack}/${path}`,
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
     covers,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, label, clips, body, covers }) => ({
+  .map(({ id, file, category, tags, keywords, label, clips, body, covers }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
     category,
     tags,
+    keywords,
     label,
     clips,
     body,
@@ -92,13 +94,14 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
-// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site.
+// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
+// keywords of its own.
 const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, sites: placedSites(sites) };
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placedSites(sites) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
