@@ -49,6 +49,8 @@ import type { HumanoidParams } from '../mob/humanoid.ts';
 import { type IdleStance, idlePose } from '../mob/idle.ts';
 import { leaperClip, leaperFrame, locomotionFor } from '../mob/leaper/motion.ts';
 import { LEAPER_TEMPLATE } from '../mob/leaper/plan.ts';
+import { walkerClip, walkerFrame } from '../mob/walker/motion.ts';
+import { WALKER_TEMPLATE } from '../mob/walker/plan.ts';
 import { LOOK_AT_REST, type LookAtState, lookAtPose } from '../mob/lookAt.ts';
 import { LOOK_AT_PROFILES, type LookAtProfile } from '../mob/lookAtProfiles.ts';
 import { QUADRUPED_SEVERABLE_PARTS, quadrupedGaitPose, quadrupedHitPose, quadrupedPose } from '../mob/quadruped.ts';
@@ -63,6 +65,7 @@ const TEMPLATES: readonly Template[] = [
   acidTemplate,
   skeletonTemplate,
   LEAPER_TEMPLATE,
+  WALKER_TEMPLATE,
 ];
 
 /** Plans posed by the shared humanoid walk, idle, attack and death. */
@@ -459,6 +462,9 @@ const load = (genome: Genome, realized: Realized, realizeMs: number): void => {
   } else if (template.bodyPlan === 'leaper') {
     actor.applyPose(leaperFrame(realized, 'idle', 0).pose);
     severPart.replaceChildren(...severableParts(realized.body.bones).map((part) => new Option(part, part)));
+  } else if (template.bodyPlan === 'walker') {
+    actor.applyPose(walkerFrame(realized, 'idle', 0).pose);
+    severPart.replaceChildren(...severableParts(realized.body.bones).map((part) => new Option(part, part)));
   } else if (template.bodyPlan === 'acid') {
     lastAcidPose = acidIdlePose(realized, idleTime);
     actor.applyPose(lastAcidPose);
@@ -726,7 +732,7 @@ const advanceWalk = (dt: number, walking: boolean, speed: number): void => {
     groundGroup.position.z = gridZ;
     return;
   }
-  if (['quadruped', 'acid', 'leaper'].includes(current.template.bodyPlan)) {
+  if (['quadruped', 'acid', 'leaper', 'walker'].includes(current.template.bodyPlan)) {
     gaitDistance += speed * dt;
     gridZ = (gridZ + speed * dt) % 0.5;
     groundGroup.position.z = gridZ;
@@ -883,9 +889,35 @@ const applyLeaperFrame = (loaded: Loaded, dt: number): void => {
   applyLookAt(loaded, shown.pose, dt);
 };
 
+/** The walker plays its clips on its own rig: the fire pose over the stomp, or the idle when it stands. */
+const applyWalkerFrame = (loaded: Loaded, dt: number): void => {
+  const speed = walkOn.checked ? Number(speedInput.value) : 0;
+  advanceWalk(dt, walkOn.checked, speed);
+  const fire = walkerClip('fire');
+  advanceAttack(dt, fire.seconds);
+  const cuts = { cuts: severedCuts };
+  let shown;
+  if (attackTime !== undefined) {
+    shown = walkerFrame(loaded.realized, fire.name, attackTime / fire.seconds, cuts);
+  } else if (speed > 0) {
+    const stride = walkerClip('stomp').travel!.at(-1)![1];
+    const { pose, ...rest } = walkerFrame(loaded.realized, 'stomp', (gaitDistance / stride) % 1, cuts);
+    // The grid carries the travel, so the gait plays in place.
+    shown = { ...rest, pose: { ...pose, root: [pose.root[0], pose.root[1], 0] as const } };
+  } else {
+    const idle = walkerClip('idle');
+    shown = walkerFrame(loaded.realized, idle.name, (idleTime / idle.seconds) % 1, cuts);
+  }
+  applyLookAt(loaded, shown.pose, dt);
+};
+
 const applyLiveFrame = (loaded: Loaded, dt: number): void => {
   if (loaded.template.bodyPlan === 'leaper') {
     applyLeaperFrame(loaded, dt);
+    return;
+  }
+  if (loaded.template.bodyPlan === 'walker') {
+    applyWalkerFrame(loaded, dt);
     return;
   }
   if (loaded.template.bodyPlan === 'acid') {
