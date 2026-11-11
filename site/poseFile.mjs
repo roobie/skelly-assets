@@ -110,9 +110,8 @@ export function compilePose(rig, file) {
   return { frame: encodeFrame(level(pose, report.clamped)), report };
 }
 
-// A pose of matrices as a clip frame of quaternions, and back.
+// A pose of matrices as a clip frame of quaternions; decodeFrame (site/clipFrames.mjs) reads one back.
 export const encodeFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
-export const decodeFrame = (frame) => ({ root: [...frame.root], rotations: Object.fromEntries(Object.entries(frame.rotations).map(([id, q]) => [id, quatToMat3(q)])) });
 
 // A frame's angles per bone, as the page's sliders hold them.
 export const frameAngles = (rig, frame) => Object.fromEntries(rig.bones.filter((bone) => frame.rotations[bone.id]).map((bone) => [bone.id, jointAngles(bone, quatToMat3(frame.rotations[bone.id]))]));

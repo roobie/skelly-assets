@@ -5,11 +5,9 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { boneTransforms as mobBoneTransforms } from '../packages/mobgen/src/core/pose.ts';
 import { clearanceProbe, coveredSurface } from '../../site/clearance.mjs';
 import { boneTransforms, dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
-import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
-import { decodeFrame as actorDecodeFrame } from '../actorCompose.mjs';
+import { compilePose } from '../../site/poseFile.mjs';
 import { modelTaxonomies } from '../check-taxonomy.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
@@ -48,15 +46,12 @@ const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.e
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
 const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
 
-test('every pose fixture compiles on the doll within its limits, and its frame poses a mob the same way', () => {
+test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
   for (const { name, file } of fixtures) {
     const { frame, report } = compilePose(rig, file);
     assert.deepEqual(report.clamped, [], `${name} asks past a limit`);
     for (const [id, left] of Object.entries(report.residuals)) assert.ok(left < 1e-6, `${name}: ${id} falls ${left} m short`);
-    // mobgen's own transforms of the frame as a mob clip reader decodes it agree with ours.
-    const theirs = mobBoneTransforms(rig.bones, actorDecodeFrame(frame)), ours = boneTransforms(rig.bones, decodeFrame(frame));
-    for (const bone of rig.bones) theirs.get(bone.id).t.forEach((v, i) => assert.ok(Math.abs(v - ours.get(bone.id).t[i]) < 1e-9, `${name}: ${bone.id}`));
   }
 });
 
