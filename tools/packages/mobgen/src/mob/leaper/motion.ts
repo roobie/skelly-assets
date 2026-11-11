@@ -6,77 +6,19 @@
 
 import type { Bone } from '../../core/body.ts';
 import type { Realized } from '../../core/generate.ts';
-import { jointRotation } from '../../core/joints.ts';
-import { lerp } from '../../core/math.ts';
-import type { EulerDeg, Pose } from '../../core/pose.ts';
-import { posedVoxelSurfaceBoundsForBones } from '../../core/voxelBounds.ts';
+import type { EulerDeg } from '../../core/pose.ts';
 import { severedBoneSet } from '../dismember.ts';
+import {
+  type Angles,
+  both,
+  type ClipDef,
+  type ClipFrame,
+  channelAngles,
+  clipLookup,
+  groundedFrame,
+  type Track,
+} from '../keyframes.ts';
 import { LEAPER_TEMPLATE } from './plan.ts';
-
-type Key = readonly [number, EulerDeg];
-type Track = readonly Key[];
-type Angles = Record<string, EulerDeg>;
-
-const ease = (t: number): number => t * t * (3 - 2 * t);
-
-/** The eased value of `track` at `u`; a looping track wraps, and its last key should repeat its first. */
-const sample = (track: Track, u: number): EulerDeg => {
-  const first = track[0]!;
-  if (u <= first[0]) {
-    return first[1];
-  }
-  for (let i = 1; i < track.length; i++) {
-    const [u1, b] = track[i]!;
-    const [u0, a] = track[i - 1]!;
-    if (u <= u1) {
-      const t = ease((u - u0) / Math.max(1e-9, u1 - u0));
-      return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
-    }
-  }
-  return track.at(-1)![1];
-};
-
-const scalar = (keys: readonly (readonly [number, number])[], u: number): number =>
-  sample(
-    keys.map(([at, value]) => [at, [value, 0, 0]] as const),
-    u,
-  )[0];
-
-/** A sided channel; `shift` offsets the limb's cycle, as a fraction of the clip. */
-interface Channel {
-  readonly track: Track;
-  readonly shift?: number;
-}
-
-/** Mirrored sides share flex; twist and abduct change sign (plan.ts, jointFrames). */
-const mirror = ([flex, twist, abduct]: EulerDeg): EulerDeg => [flex, -twist, -abduct];
-const SIDE_SWAP: Readonly<Record<string, string>> = { L: 'R', R: 'L' };
-const otherSide = (id: string): string => {
-  const [name, side] = id.split('.');
-  return side === undefined ? id : `${name}.${SIDE_SWAP[side]}`;
-};
-
-/** The same track on both sides, mirrored, each with its own cycle offset. */
-const both = (name: string, track: Track, shifts: readonly [number, number] = [0, 0]): Record<string, Channel> => ({
-  [`${name}.L`]: { track, shift: shifts[0] },
-  [`${name}.R`]: { track: track.map(([u, angles]) => [u, mirror(angles)] as const), shift: shifts[1] },
-});
-
-interface ClipDef {
-  readonly seconds: number;
-  readonly loop: boolean;
-  readonly channels: Readonly<Record<string, Channel>>;
-  /** Forward travel in metres over the clip, as keys. */
-  readonly travel?: readonly (readonly [number, number])[];
-  /** The airborne span and its apex above the straight line from takeoff to landing height, in metres. */
-  readonly air?: { readonly from: number; readonly to: number; readonly apex: number };
-  /** Multiplier on charged materials' emission (mob/crowd.ts, packCharge), as keys. */
-  readonly charge?: readonly (readonly [number, number])[];
-  /** When an attack's blow lands, as a fraction of the clip, so a consumer resolves damage on the motion. */
-  readonly hit?: number;
-  /** When a reaction is at its fullest, as a fraction of the clip. */
-  readonly peak?: number;
-}
 
 const rest: EulerDeg = [0, 0, 0];
 
@@ -669,24 +611,11 @@ export type LeaperClip = keyof typeof CLIPS;
 export const LEAPER_CLIPS = Object.keys(CLIPS) as readonly LeaperClip[];
 
 /** Looks a clip up by name, refusing an unknown one rather than falling back to another. */
-export const leaperClip = (name: string): ClipDef & { readonly name: LeaperClip } => {
-  if (!Object.hasOwn(CLIPS, name)) {
-    throw new Error(`unknown leaper clip "${name}"; known: ${LEAPER_CLIPS.join(', ')}`);
-  }
-  return { ...(CLIPS[name as LeaperClip] as ClipDef), name: name as LeaperClip };
-};
+export const leaperClip = clipLookup<LeaperClip>('leaper', CLIPS);
 
 /** Joint angles of a clip at normalized time `u` (0..1), keyed by bone id. */
-export const clipAngles = (name: string, u: number, mirrored = false): Angles => {
-  const clip = leaperClip(name);
-  const angles: Angles = {};
-  for (const [id, { track, shift = 0 }] of Object.entries(clip.channels)) {
-    const local = clip.loop ? (((u + shift) % 1) + 1) % 1 : u;
-    const value = sample(track, local);
-    angles[mirrored ? otherSide(id) : id] = mirrored ? mirror(value) : value;
-  }
-  return angles;
-};
+export const clipAngles = (name: string, u: number, mirrored = false): Angles =>
+  channelAngles(leaperClip(name), u, mirrored);
 
 /** Which locomotion clip a body can still use, from the bones a cut has taken. */
 export const locomotionFor = (
@@ -717,20 +646,6 @@ export const supportsFor = (bones: readonly Bone[], hidden: ReadonlySet<string>)
   return supports;
 };
 
-const posed = (bones: readonly Bone[], angles: Angles, root: Pose['root']): Pose => ({
-  root,
-  rotations: Object.fromEntries(
-    bones.filter((bone) => angles[bone.id]).map((bone) => [bone.id, jointRotation(bone, angles[bone.id]!)]),
-  ),
-});
-
-export interface LeaperFrame {
-  readonly pose: Pose;
-  /** True while the clip carries the body clear of the ground. */
-  readonly airborne: boolean;
-  readonly charge: number;
-}
-
 export interface FrameOptions {
   /** Cut points already severed (mob/dismember.ts, severedBoneSet). */
   readonly cuts?: readonly string[];
@@ -738,35 +653,16 @@ export interface FrameOptions {
   readonly mirrored?: boolean;
 }
 
-/** The pose of a clip at normalized time `u`, standing on the ground: the lowest remaining voxel touches
- * it, except in a clip's airborne span, which arcs between the takeoff and landing heights. */
+/** The pose of a clip at normalized time `u`, standing on the ground (keyframes.ts, groundedFrame). */
 export const leaperFrame = (
   realized: Pick<Realized, 'body' | 'voxels'>,
   name: string,
   u: number,
   { cuts = [], mirrored = false }: FrameOptions = {},
-): LeaperFrame => {
+): ClipFrame => {
   const clip = leaperClip(name);
   const { bones } = realized.body;
   const hidden = severedBoneSet(bones, cuts);
   const visible = bones.filter((bone) => !hidden.has(bone.id)).map((bone) => bone.id);
-  const travel = clip.travel ? scalar(clip.travel, u) : 0;
-  const lifted = (at: number): number => {
-    const pose = posed(bones, clipAngles(name, at, mirrored), [0, 0, 0]);
-    return -Math.min(...posedVoxelSurfaceBoundsForBones(realized, pose, visible).values());
-  };
-  const { air } = clip;
-  const airborne = air !== undefined && u > air.from && u < air.to;
-  let height: number;
-  if (airborne) {
-    const s = (u - air.from) / (air.to - air.from);
-    height = lerp(lifted(air.from), lifted(air.to), s) + 4 * air.apex * s * (1 - s);
-  } else {
-    height = lifted(u);
-  }
-  return {
-    pose: posed(bones, clipAngles(name, u, mirrored), [0, height, -travel]),
-    airborne,
-    charge: clip.charge ? scalar(clip.charge, u) : 1,
-  };
+  return groundedFrame(realized, clip, (at) => channelAngles(clip, at, mirrored), u, visible);
 };

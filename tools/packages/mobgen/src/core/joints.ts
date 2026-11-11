@@ -1,5 +1,5 @@
 import type { Bone } from './body.ts';
-import { clamp, type Mat3, mulMM, rotX, rotY, rotZ, transpose } from './math.ts';
+import { clamp, cross, dot, type Mat3, mulMM, normalize, rotX, rotY, rotZ, scale, sub, transpose, type Vec3 } from './math.ts';
 import type { EulerDeg } from './pose.ts';
 
 const jointFrame = (bone: Bone): Mat3 => {
@@ -8,6 +8,15 @@ const jointFrame = (bone: Bone): Mat3 => {
   }
   const { x, y, z } = bone.frame;
   return [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]];
+};
+
+/** A joint frame whose x is exactly the flex axis and whose y follows the bone as closely as stays square
+ * to it, so flex turns the bone about `flexAxis` (see jointRotation). */
+export const frameAbout = (bone: Bone, flexAxis: Vec3): NonNullable<Bone['frame']> => {
+  const x = normalize(flexAxis);
+  const along = sub(bone.tail, bone.head);
+  const y = normalize(sub(along, scale(x, dot(along, x))));
+  return { x, y, z: cross(x, y) };
 };
 
 export const jointRotation = (bone: Bone, angles: EulerDeg): Mat3 => {
