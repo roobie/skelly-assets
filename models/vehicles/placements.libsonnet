@@ -104,6 +104,7 @@
   'school_bus': import 'school_bus.placements.libsonnet',
   'scooter': import 'scooter.placements.libsonnet',
   'security_van': import 'security_van.placements.libsonnet',
+  'security_walker': import 'security_walker.placements.libsonnet',
   'semi_tractor': import 'semi_tractor.placements.libsonnet',
   'semi_trailer': import 'semi_trailer.placements.libsonnet',
   'shuttle_bus': import 'shuttle_bus.placements.libsonnet',
