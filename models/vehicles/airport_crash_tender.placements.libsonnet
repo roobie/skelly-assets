@@ -14,7 +14,7 @@ local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
     site.one('roof_rail', 'airport_crash_tender_roof_rail'),
     site.one('rear_ladder', 'airport_crash_tender_rear_ladder'),
     site.one('crew_bench', 'bench_seat_3', [3.35, s.floor, 0]),
-    site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.roof, 0]),
+    site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.crown, 0]),
   ]
   + site.pair('lockers', 'airport_crash_tender_lockers')
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 1.3]),
