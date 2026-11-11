@@ -316,18 +316,21 @@ async function openViewer(model) {
   viewer.controls.update();
 
   const size = box.getSize(new THREE.Vector3());
+  const shelfKey = shelfOf(model);
   const facts = [
+    ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
     ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
     ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),
+    ...(model.massKg > 0 && model.volumeM3 > 0 ? [['Density', `${Math.round(model.massKg / model.volumeM3).toLocaleString('en')} kg/m³`]] : []),
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
   ];
   if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
-  $('v-facts').replaceChildren(...facts.flatMap(([k, v]) => [
-    Object.assign(document.createElement('dt'), { textContent: k }),
+  $('v-facts').replaceChildren(...facts.flatMap(([k, v, title = '']) => [
+    Object.assign(document.createElement('dt'), { textContent: k, title }),
     Object.assign(document.createElement('dd'), { textContent: v }),
   ]));
 

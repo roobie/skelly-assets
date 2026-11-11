@@ -4,7 +4,7 @@ import { join, relative } from 'node:path';
 import process from 'node:process';
 import { threadId } from 'node:worker_threads';
 import type { NeutralModel } from '@skelly/thing-core/schema';
-import type { ModelExport, RecipeExport } from './recipe.ts';
+import type { ModelExport, ModelPhysical, RecipeExport } from './recipe.ts';
 
 const SOURCE_FILE = /\.(ts|mjs|js)$/;
 const TEST_FILE = /\.test\.(ts|mjs|js)$/;
@@ -133,17 +133,25 @@ export const exportCache = (dir: string, code: string): ExportCache => {
         generated = row.generate();
         return {
           glb: generated.glb,
-          json: JSON.stringify({ modelEntry: generated.modelEntry, partNodes: generated.partNodes }),
+          json: JSON.stringify({
+            modelEntry: generated.modelEntry,
+            partNodes: generated.partNodes,
+            physical: generated.physical,
+          }),
         };
       });
       if (generated) {
         return { model: generated, entry: { key, reused } };
       }
-      const { modelEntry, partNodes } = JSON.parse(String(files.json)) as {
+      const { modelEntry, partNodes, physical } = JSON.parse(String(files.json)) as {
         modelEntry: NeutralModel;
         partNodes: string[];
+        physical?: ModelPhysical;
       };
-      return { model: { modelEntry, partNodes, glb: files.glb as Uint8Array }, entry: { key, reused } };
+      return {
+        model: { modelEntry, partNodes, glb: files.glb as Uint8Array, ...(physical === undefined ? {} : { physical }) },
+        entry: { key, reused },
+      };
     },
   };
 };

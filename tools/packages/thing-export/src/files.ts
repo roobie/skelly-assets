@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import type { CachedExport, ExportCache } from './cache.ts';
-import type { ModelExport, RecipeExport } from './recipe.ts';
+import type { ModelExport, ModelPhysical, RecipeExport } from './recipe.ts';
 
 // Serialised in-process: a formatter subprocess per model cost more than generating most models.
 const formattedJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
@@ -17,6 +17,7 @@ export interface WrittenRecipe {
     readonly label?: NeutralModel['label'];
     readonly paintable?: NeutralModel['paintable'];
     readonly covers?: NeutralModel['covers'];
+    readonly physical?: ModelPhysical;
   }[];
   readonly files: readonly string[];
 }
@@ -31,8 +32,16 @@ export interface GeneratedModel extends ModelExport {
 }
 export const generateModel = (row: RecipeExport, cache?: ExportCache): GeneratedModel => {
   const { model, entry } = cache ? cache.export(row) : { model: row.generate() };
-  const { modelEntry, glb, partNodes } = model;
-  return { id: row.id, kind: row.kind, modelEntry, glb, partNodes, ...(entry === undefined ? {} : { entry }) };
+  const { modelEntry, glb, partNodes, physical } = model;
+  return {
+    id: row.id,
+    kind: row.kind,
+    modelEntry,
+    glb,
+    partNodes,
+    ...(physical === undefined ? {} : { physical }),
+    ...(entry === undefined ? {} : { entry }),
+  };
 };
 
 /** Writes generated rows in the given order, so the files do not depend on which row finished first. */
@@ -58,7 +67,7 @@ export const writeModelExports = (
     files.push(`${directory}/${modelEntry.id}.model.json`, modelEntry.file);
   }
   return {
-    models: outputs.map(({ id, kind, modelEntry, partNodes }) => ({
+    models: outputs.map(({ id, kind, modelEntry, partNodes, physical }) => ({
       id,
       kind,
       path: modelEntry.file,
@@ -66,6 +75,7 @@ export const writeModelExports = (
       ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
       ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
       ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
+      ...(physical === undefined ? {} : { physical }),
     })),
     files,
   };

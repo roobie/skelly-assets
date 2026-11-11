@@ -47,7 +47,7 @@ const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files 
   })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers }) => ({
+  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
     category: category ?? null,
     label: label ?? null,
@@ -57,9 +57,11 @@ const models = manifest.models
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
     covers,
+    massKg,
+    volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, keywords, label, clips, body, covers }) => ({
+  .map(({ id, file, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
@@ -72,6 +74,7 @@ const models = manifest.models
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
     ...(covers ? { covers } : {}),
     ...sidecars.get(file),
+    ...(massKg === undefined ? {} : { massKg, volumeM3 }),
   }));
 
 // A site's finish as the browser repaints with it: the manifest's material for that finish, as a game reads it.
@@ -105,21 +108,23 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
-// Each vehicle the manifest places (tools/placements.mjs), with its tags, the model at each site and their mass; a
-// vehicle has no keywords of its own.
+// A vehicle weighs its sites' models together and fills the volume of their voxels; one site's model without a mass
+// leaves the vehicle without either.
+const vehiclePhysical = (sites) => {
+  const parts = sites.map(({ model }) => modelsById.get(model));
+  if (parts.some(({ massKg }) => massKg === undefined)) return {};
+  return { massKg: parts.reduce((sum, { massKg }) => sum + massKg, 0), volumeM3: parts.reduce((sum, { volumeM3 }) => sum + volumeM3, 0) };
+};
+
+// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
+// keywords of its own.
 const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  return {
-    id,
-    placements: `${pack}/${path}`,
-    tags: tags ?? {},
-    keywords: [],
-    sites: placedSites(sites),
-    ...massOf(sites.map(({ part }) => modelsById.get(part).massKg)),
-  };
+  const placed = placedSites(sites);
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, ...vehiclePhysical(placed) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
