@@ -46,7 +46,10 @@ test('a base walker site the sleek walker neither drops nor overrides is placed 
     const expected = expectedFrom(site);
     assert.deepEqual(bySite.get(expected.id), expected, site.id);
   }
-  for (const id of spec.dropped) assert.notDeepEqual(bySite.get(id), baseSite.get(id), `${id} is dropped, so it must not stay as it was`);
+  for (const id of spec.dropped) {
+    const now = bySite.get(id);
+    assert.ok(now === undefined || now.part !== baseSite.get(id).part || now.at.some((v, i) => v !== baseSite.get(id).at[i]), `${id} is dropped, so it is absent or replaced`);
+  }
 });
 
 test('every site id is unique and the sleek walker defines only parts of its own name', () => {
@@ -54,15 +57,14 @@ test('every site id is unique and the sleek walker defines only parts of its own
   assert.ok(data.own.every(r => r.id.startsWith('security_walker_sleek_')));
 });
 
-test('the carrier keeps the original hip ram lugs welded on and solid at the drive face and hose outlets', () => {
+test('the carrier keeps the original hip ram lugs welded on and meets the hip drive and hoses', () => {
   const lugs = ps => ps.filter(p => p.id.startsWith('hip_ram_lug_'));
   assert.deepEqual(lugs(body), lugs(pieces(rows.get('security_walker_hull'))));
   const structural = body.filter(p => !p.id.startsWith('hip_ram_lug_'));
   for (const lug of lugs(body)) assert.ok(meeting([lug], structural, 0.02).touches, `${lug.id} must be welded to carrier`);
-  const face = spec.base.torso.half;
-  for (const z of [-face, face]) {
-    for (const [x, y] of [spec.base.hip, [-0.5, 3.72], [-0.42, 3.76]]) {
-      assert.ok(body.some(p => solid(p).distance([x, y, z]) <= 1e-8), `missing drive/hose face at ${x},${y},${z}`);
+  for (const side of ['near', 'far']) {
+    for (const id of ['hip_hoses', 'hip_drive']) {
+      assert.ok(meeting(drawn(bySite.get(`${id}_${side}`)), body, 0.004).touches, `${id}_${side} must meet the carrier`);
     }
   }
 });
@@ -174,11 +176,17 @@ function siteBounds(site, boxes) {
   return { min: [0, 1, 2].map(i => Math.min(...placed.map(b => b.min[i]))), max: [0, 1, 2].map(i => Math.max(...placed.map(b => b.max[i]))) };
 }
 
-// Everything below the rotor stays put; the rotor itself is the bearing, which touches the carrier on purpose.
+// The fittings that stay put while the upper body turns: the borrowed ones and the fixed new ones. Classified once on
+// the authored placement so a displaced fitting stays in its group.
+const fixedIds = new Set([
+  ...sleek.filter(p => base.some(b => JSON.stringify(expectedFrom(b)) === JSON.stringify(p)) && !spec.weaponSites.includes(p.id)),
+  ...sleek.filter(p => /^(carrier|terrain_camera|base_headlamp|floodlight)/.test(p.id)),
+].map(p => p.id));
+
+// The rotor itself is the bearing, which touches the carrier on purpose.
 function rotaryClearance(sites, boxes) {
-  const fixedInherited = sites.filter(p => base.some(b => JSON.stringify(expectedFrom(b)) === JSON.stringify(p)) && !spec.weaponSites.includes(p.id));
-  const fixed = [...fixedInherited, ...sites.filter(p => /^(carrier|terrain_camera|base_headlamp|floodlight)/.test(p.id))];
-  const turning = sites.filter(p => !fixed.includes(p) && p.id !== 'rotor');
+  const fixed = sites.filter(p => fixedIds.has(p.id));
+  const turning = sites.filter(p => !fixedIds.has(p.id) && p.id !== 'rotor');
   const fixedTop = Math.max(...fixed.map(p => siteBounds(p, boxes).max[1]));
   const rotor = siteBounds(sites.find(p => p.id === 'rotor'), boxes);
   const hull = siteBounds(sites.find(p => p.id === 'hull'), boxes);
@@ -188,13 +196,21 @@ function rotaryClearance(sites, boxes) {
     floorGap: hull.min[1] - rotor.max[1],
   };
 }
-const clears = ({ upperGap, bearingGap, floorGap }) =>
-  upperGap >= spec.yawClearance && bearingGap >= -1e-6 && bearingGap <= spec.grain && Math.abs(floorGap) <= spec.grain;
+const holds = ({ upperGap, bearingGap, floorGap }) => ({
+  upperGap: upperGap >= spec.yawClearance,
+  bearingGap: bearingGap >= -1e-6 && bearingGap <= spec.grain,
+  floorGap: Math.abs(floorGap) <= spec.grain,
+});
+const clears = gaps => Object.values(holds(gaps)).every(Boolean);
 
 test('the turning upper body clears the fixed body at every yaw, with the rotor seated on the carrier and under the hull', async () => {
   const boxes = await exportedBoxes();
   assert.ok(clears(rotaryClearance(sleek, boxes)), JSON.stringify(rotaryClearance(sleek, boxes)));
-  const raised = (id, dy) => sleek.map(p => (p.id === id ? atY(p, p.at[1] + dy) : p));
-  assert.ok(!clears(rotaryClearance(raised('hull', -0.2), boxes)), 'a hull sunk into the fixed body must fail');
-  assert.ok(!clears(rotaryClearance(raised('rotor', 0.1), boxes)), 'a rotor floating above the carrier must fail');
+  const displaced = (id, dy) => sleek.map(p => (p.id === id ? atY(p, p.at[1] + dy) : p));
+  // Each case breaks one condition and no other, so removing any condition from `clears` is caught.
+  const alone = { upperGap: ['cooling_pack', -0.2], bearingGap: ['carrier', -0.1], floorGap: ['hull', 0.1] };
+  for (const [gap, [id, dy]] of Object.entries(alone)) {
+    const failing = Object.entries(holds(rotaryClearance(displaced(id, dy), boxes))).filter(([, ok]) => !ok).map(([name]) => name);
+    assert.deepEqual(failing, [gap], `${id} displaced by ${dy}`);
+  }
 });
