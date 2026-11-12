@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
-import { modelComponents } from '../tools/components.mjs';
+import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
@@ -93,7 +93,10 @@ const apart = (model) => {
   const components = modelComponents(readFileSync(join(built, model.file)));
   return components ? { ...model, components } : model;
 };
-const shown = models.map((model) => (wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model)));
+const shown = models.map((model) => {
+  const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model);
+  return { ...entry, form: formOf(entry) };
+});
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
   site,
@@ -119,7 +122,7 @@ const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
   const placed = placedSites(sites);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, ...vehiclePhysical(placed) };
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
