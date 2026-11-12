@@ -12,7 +12,8 @@
     { id: 'pistol_service', design: 'service-nine', weapon: 'handgun' },
     { id: 'rifle_pipe', design: 'pipe-rifle', weapon: 'rifle', keywords: ['improvised'] },
   ],
-  // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids.
+  // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids. A
+  // vehicle gun's shell has no weapon class to name.
   cartridges: [
     { name: '5_d_56x45', source: '5.56x45', weapon: 'rifle' },
     { name: '7_d_62x39', source: '7.62x39', weapon: 'rifle' },
@@ -21,6 +22,8 @@
     { name: '338_h_lapua_h_magnum', source: '338-lapua-magnum', weapon: 'rifle' },
     { name: '7_d_62x54r', source: '7.62x54r', weapon: 'rifle' },
     { name: '50_h_bmg', source: '50-bmg', weapon: 'rifle' },
+    { name: '40x365r', source: '40x365r', keywords: ['military'] },
+    { name: '120x570', source: '120x570', keywords: ['military'] },
     { name: '357_h_magnum', source: '357-magnum', weapon: 'handgun' },
     { name: '9x19', source: '9x19', weapon: 'handgun' },
   ],
