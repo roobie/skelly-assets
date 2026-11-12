@@ -1,8 +1,9 @@
 // model-history.json: for each GLB model id and each vehicle id (its placements file), the release that introduced it,
-// the release that last changed its file and the file's hash, so the showcase can say when a model appeared and moved. Builds are
-// reproducible (the assets workflow holds two builds equal), so a hash differs between releases only when the model really changed. Each release carries
-// the cumulative file, built from the previous release's; why the history is not read from git is that a model's id and
-// source move, while its published bytes are what a consumer sees.
+// the release that last changed its file and the file's hash, so the showcase can say when a model appeared and
+// moved. Builds are reproducible (the assets workflow holds two builds equal), so a hash differs between releases
+// only when the model really changed. Each release carries the cumulative file, built from the previous release's;
+// why the history is not read from git is that a model's id and source move, while its published bytes are what a
+// consumer sees.
 // A model absent from a release leaves the history, so one that returns is new again: a gap in the releases is a gap a
 // consumer could have seen, and keeping the old entry would claim a continuity nobody can check.
 // Usage: node tools/model-history.mjs release --tag <v*> --built <dir> --out <file>
@@ -151,7 +152,8 @@ function releaseCommand({ tag, built, out }) {
     // A silent fresh start would stamp every model as introduced now, and that error could not be undone later.
     if (previous === undefined) {
       const backfill = `node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>`;
-      throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`${backfill}\` and attach it to that release`);
+      const advice = `build one with \`${backfill}\` and attach it to that release`;
+      throw new Error(`${before} has no ${HISTORY_ASSET}; ${advice}`);
     }
   }
   const manifest = readJson(join(built, MANIFEST));
