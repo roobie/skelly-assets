@@ -39,6 +39,9 @@ const EMPTY_PORTS: PartDef['ports'] = [];
 const EMPTY_KEEPOUTS: PartDef['keepOuts'] = [];
 const EMPTY_AXES: PartDef['axes'] = [];
 const MM_DOMAIN: Domain['units'] = { metresPerUnit: 0.001, grid: 0.001, bevel: 0 };
+// The lattice samples a revolved solid's mesh, so a voxelized cartridge is meshed near-round first: its facet edges
+// then sit well inside a voxel and no flat shows through as a stepped side.
+const VOXEL_SAMPLED_FACETS = 96;
 
 interface CartridgeLook {
   readonly appearance?: AppearanceContext | undefined;
@@ -106,7 +109,7 @@ const makeModelExport = (
   const result = exportGlb({
     resolved,
     palette: AMMO_PALETTE,
-    revolveFacets: voxels ? 96 : GUN_APPEARANCE.smoothCartridgeSides,
+    revolveFacets: voxels ? VOXEL_SAMPLED_FACETS : GUN_APPEARANCE.roundSides,
     asset,
     appearance: effectiveAppearance,
     ...(voxels ? voxel : {}),
