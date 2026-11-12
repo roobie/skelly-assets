@@ -275,29 +275,40 @@ function walk(route, pieces = fixed) {
 
 const routes = Object.entries(spec.routes);
 
-test('every route starts outside straight through its door\'s opening and ends beside its seat', () => {
-  assert.ok(routes.length > 0, 'vacuous: no routes');
-  const { body, doors } = spec;
-  // Each door's opening as the plan span it lets through, the axis across it and the side of the hull it is on.
-  const openings = {
-    side: { across: 0, span: doors.side.x, along: 1, outside: (v) => v > body.half },
-    rear: { across: 1, span: [-doors.rear.half, doors.rear.half], along: 0, outside: (v) => v < body.rear },
-  };
-  for (const [name, { door, seat, path }] of routes) {
-    const { across, span, along, outside } = openings[door];
-    const [start, next] = path;
-    assert.ok(outside(start[along]), `${name} starts inside the hull`);
-    assert.ok(span[0] < start[across] && start[across] < span[1], `${name} starts beside its door`);
-    assert.equal(next[across], start[across], `${name} turns before it is through its door`);
-    // The doll at the route's end, facing along its last leg, is within one crouched depth of the seat in plan.
-    const end = path.at(-1);
-    const facingX = Math.abs(end[0] - path.at(-2)[0]) > Math.abs(end[1] - path.at(-2)[1]);
-    const half = facingX ? [crouch.depth / 2, crouch.width / 2] : [crouch.width / 2, crouch.depth / 2];
-    const apart = (lo, hi, at, reach) => Math.max(0, lo - (at + reach), at - reach - hi);
-    const gap = Math.min(...site[seat].pieces.map(solid)
-      .map((p) => Math.hypot(apart(p.min[0], p.max[0], end[0], half[0]), apart(p.min[2], p.max[2], end[1], half[1]))));
-    assert.ok(gap <= crouch.depth, `${name} ends ${gap.toFixed(2)} m from ${seat}`);
-  }
+// Each door's opening as the plan span it lets through, the axis across it and the side of the hull it is on.
+const openings = {
+  side: { across: 0, span: spec.doors.side.x, along: 1, outside: (v) => v > spec.body.half },
+  rear: { across: 1, span: [-spec.doors.rear.half, spec.doors.rear.half], along: 0, outside: (v) => v < spec.body.rear },
+};
+const seats = sites.filter((s) => ['apc_scifi_wheeled_bench', 'apc_scifi_wheeled_driver_seat'].includes(s.part));
+// How a route fails to lead from outside, straight through its door's opening, to beside its own seat: the seat it
+// names must be the nearest to the doll at its end, facing along its last leg, and within one crouched depth in plan.
+function routeFaults({ door, seat, path }) {
+  const faults = [];
+  const { across, span, along, outside } = openings[door];
+  const [start, next] = path;
+  if (!outside(start[along])) faults.push('starts inside the hull');
+  if (!(span[0] < start[across] && start[across] < span[1])) faults.push('starts beside its door');
+  if (next[across] !== start[across]) faults.push('turns before it is through its door');
+  const end = path.at(-1);
+  const facingX = Math.abs(end[0] - path.at(-2)[0]) > Math.abs(end[1] - path.at(-2)[1]);
+  const half = facingX ? [crouch.depth / 2, crouch.width / 2] : [crouch.width / 2, crouch.depth / 2];
+  const apart = (lo, hi, at, reach) => Math.max(0, lo - (at + reach), at - reach - hi);
+  const gap = (s) => Math.min(...s.pieces.map(solid)
+    .map((p) => Math.hypot(apart(p.min[0], p.max[0], end[0], half[0]), apart(p.min[2], p.max[2], end[1], half[1]))));
+  const nearest = seats.reduce((a, b) => (gap(b) < gap(a) ? b : a));
+  if (nearest.id !== seat) faults.push(`ends nearer ${nearest.id} than ${seat}`);
+  if (gap(site[seat]) > crouch.depth) faults.push(`ends ${gap(site[seat]).toFixed(2)} m from ${seat}`);
+  return faults;
+}
+
+test('every route starts outside straight through its door\'s opening and ends beside its own seat', () => {
+  assert.ok(routes.length > 0 && seats.length > 1, 'vacuous: no routes or no seats to choose between');
+  for (const [name, route] of routes) assert.deepEqual(routeFaults(route), [], name);
+});
+
+test('a route that names another seat than the one it ends beside is caught, so the seat check can fail', () => {
+  assert.ok(routeFaults({ ...spec.routes.sideToBayBench, seat: 'driver_seat' }).length > 0);
 });
 
 test('a crouching player fits through every door and along every aisle to the seats', () => {

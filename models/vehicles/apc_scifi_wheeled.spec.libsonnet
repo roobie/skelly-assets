@@ -62,16 +62,17 @@ local radius = wheels[wheel].tyre.outer;
   locker: { x: [-1.06, -0.72], z: [1.13, 1.49], top: 1.5 },
   rack: { x: [0.58, 1.0], z: [1.2, 1.49], top: 1.6 },
   // The aisles a crouching soldier walks, each from outside its `door`, straight in through the opening's middle, to
-  // standing beside its `seat` site, as (x, z) waypoints on the floor. `tools/test/apc-scifi-wheeled.test.mjs` walks the
-  // player's doll along them.
+  // standing beside its `seat` site, as (x, z) waypoints on the floor. Between the rear benches a soldier keeps to the
+  // side of the bench they will take. `tools/test/apc-scifi-wheeled.test.mjs` walks the player's doll along them.
   local sideIn = (s.doors.side.x[0] + s.doors.side.x[1]) / 2,
   local kerb = s.body.half + 0.55,
   local tailgate = s.body.rear - 0.8,
+  local benchSide = (s.body.core - s.body.wall - s.bench.depth) / 2,
   routes: {
-    sideToRearBenches: { door: 'side', seat: 'rear_bench_near', path: [[sideIn, kerb], [sideIn, 0], [-2.4, 0]] },
+    sideToRearBenches: { door: 'side', seat: 'rear_bench_near', path: [[sideIn, kerb], [sideIn, benchSide], [-2.4, benchSide]] },
     sideToBayBench: { door: 'side', seat: 'bay_bench_far', path: [[sideIn, kerb], [sideIn, -0.75]] },
     sideToDriver: { door: 'side', seat: 'driver_seat', path: [[sideIn, kerb], [sideIn, 0.6], [0.86, 0.6]] },
-    rearToRearBenches: { door: 'rear', seat: 'rear_bench_far', path: [[tailgate, 0], [-1.6, 0]] },
+    rearToRearBenches: { door: 'rear', seat: 'rear_bench_far', path: [[tailgate, -benchSide], [-1.6, -benchSide]] },
   },
   // A boxy weapon station on its ring, its front face sloped back, with one cannon and a launcher pod on each cheek.
   turret: {
