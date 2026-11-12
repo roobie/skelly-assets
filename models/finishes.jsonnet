@@ -6,7 +6,7 @@ local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n
   'wood-birch': material(hex(12687973)),
   'polymer-black': material(hex(2369835)),
   'polymer-od-green': material(hex(4937782)),
-  'polymer-fde': material(hex(11637090)),
+  'polymer-fde': material(hex(9732191)),
   'steel-blued': material(hex(4082009)),
   'steel-parkerized': material(hex(4935500)),
   'steel-stainless': material(hex(11843768)),
