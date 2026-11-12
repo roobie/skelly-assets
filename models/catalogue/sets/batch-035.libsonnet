@@ -17,6 +17,8 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 // player's figure poses it about, so the figure matches the player's. `doll` is a part held against the waist, its
 // back on the belly, with the forearms bent forward and in under it; `masses` gives the stand's and the doll's mass.
 local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
+local bustMeasures = bust { hairRing: band.hairRing };
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
@@ -48,19 +50,19 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     exportMass: 'parts',
     parts: [
       stand,
-      segment('pelvis', 'bust', bust, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
+      segment('pelvis', 'bust', bustMeasures, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
         + [socket('hip-' + s[0], [s[1] * hipX, hipY, 0]) for s in sides]),
-      segment('torso', 'bust', bust, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
+      segment('torso', 'bust', bustMeasures, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
         + [socket('shoulder-' + s[0], [s[1] * shoulderX, shoulderY, 0]) for s in sides]
         + (if doll == null then [] else [socket('doll', [0, bust.pelvisHeight + 0.02, bust.waistDepth / 2], [0, 0, 1], [0, 1, 0])])),
-      segment('neck', 'bust', bust, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
+      segment('neck', 'bust', bustMeasures, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
-      segment('head', 'bust', bust, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
+      segment('head', 'bust', bustMeasures, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
-      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset])]
-        + [socket(hand.fingers[i], [0, -arm.palmLength, hand.centre(i)]) for i in std.range(0, std.length(hand.fingers) - 1)]),
+      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', hand.thumbRoot)]
+        + [socket(hand.fingers[i], hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
     ] + [
       segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
               [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []))
@@ -173,5 +175,5 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
     h.box('stripe', 'stripe', [-0.11, 0.035, -0.17], [0.11, 0.037, -0.15]),
   ], { foam: 'foam-orange', slot: 'plastic-charcoal', stripe: 'plastic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 320 mm talking doll in a red dress, a speaker grille and press button on its chest.
-  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 ]

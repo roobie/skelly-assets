@@ -123,7 +123,7 @@ local segment(i, n, r0, r) =
     for i in [0, 1, 2]
     for j in [0, 1]
   ]), { tray: 'plastic-white', glass: 'plastic-amber', label: 'paper-white', 'cap-a': 'plastic-yellow', 'cap-b': 'plastic-blue' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], place: ['hospital'], setting: ['modern'] } } },
 
   // A strip of torn cloth rolled into a bandage 45 mm wide and 26 mm across, its loose end trailing 30 mm.
   h.compound('makeshift_bandage', 0.0083, [
@@ -135,7 +135,7 @@ local segment(i, n, r0, r) =
     box('tail', 'cloth', [-0.020, 0, 0.004], [0.018, 0.0012, 0.032]),
     box('fray', 'layer', [-0.019, 0, 0.032], [0.015, 0.0010, 0.035]),
   ], { cloth: 'cloth-rag', layer: 'cloth-rag-shadow' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['fabric'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A small heap of five cotton balls, each about 22 mm across, slightly squashed where they rest.
   h.compound('cotton_ball', 0.0025, [

@@ -1,7 +1,8 @@
 // Dressing a wearable on the doll, the default player avatar, by the rule in models/dressing.libsonnet: the sites the
 // showcase (site/build.mjs) composes into its worn view, which the review sheets draw too. A site is
 // { model, at, mirror?, turn? }: the model mirrored across its own x = 0 plane, then turned by the quaternion `turn`,
-// then moved by `at`, as site/render.mjs places it.
+// then moved by `at`, as site/render.mjs places it. A worn piece's site adds the doll part copy it rides
+// { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs).
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
@@ -85,15 +86,17 @@ export function modelParts(buffer) {
 const TRIANGLES = 4;
 
 // Each part of a model as one triangle mesh in the model frame, { part, positions: xyz triples, indices }, so a check can
-// test points against the part's surface.
-export function modelMeshes(buffer) {
+// test points against the part's surface. `keep(part, piece, slot)` picks the primitives, by their part and the piece
+// and material slot the export marks them as, if any; every one by default.
+export function modelMeshes(buffer, keep = () => true) {
   const gltf = glbJson(buffer);
   const byName = new Map();
   for (const { part, mesh, toModel } of meshNodes(buffer, gltf)) {
     if (!part) continue;
     const into = byName.get(part.name) ?? { part: part.name, positions: [], indices: [] };
     byName.set(part.name, into);
-    for (const { attributes, indices, mode = TRIANGLES } of mesh.primitives) {
+    for (const { attributes, indices, mode = TRIANGLES, extras } of mesh.primitives) {
+      if (!keep(part.name, extras?.piece, extras?.slot)) continue;
       if (mode !== TRIANGLES) throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
       const base = into.positions.length / 3;
       const positions = glbAccessor(buffer, gltf, attributes.POSITION);
@@ -102,7 +105,7 @@ export function modelMeshes(buffer) {
       for (const index of order) into.indices.push(base + index);
     }
   }
-  return [...byName.values()];
+  return [...byName.values()].filter(({ indices }) => indices.length > 0);
 }
 
 // ---- the doll ----
@@ -140,15 +143,16 @@ const tagsOf = (model, facet) => model.tags?.[facet] ?? [];
 const isPieceOf = (id, model) => model.id === `${id}_worn` || (model.id.startsWith(`${id}_worn_`) && !model.id.slice(`${id}_worn_`.length).includes('_'));
 
 // The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in: `<id>_worn` in the
-// dressing's `piece` part, `<id>_worn_<segment>` in the segment's part. Pieces fitted over other clothing are left
-// out, so the doll wears each item on its own.
+// dressing's `piece` part, `<id>_worn_<segment>` in the segment's part, and what it covers of that part, as its model
+// declares. Pieces fitted over other clothing are left out, so the doll wears each item on its own.
 export function wornPieces(id, models, dressing) {
   return models.filter((model) => tagsOf(model, 'fit').includes('worn') && isPieceOf(id, model)).map((model) => {
-    if (model.id === `${id}_worn`) return { model: model.id, part: dressing.piece };
+    const covers = model.covers ? { covers: model.covers } : {};
+    if (model.id === `${id}_worn`) return { model: model.id, part: dressing.piece, ...covers };
     const segment = model.id.slice(`${id}_worn_`.length);
     const slot = dressing.slots[segment];
     if (!slot) throw new Error(`${model.id}: worn segment ${segment} is not in the dressing's slots`);
-    return { model: model.id, part: slot.part };
+    return { model: model.id, part: slot.part, ...covers };
   });
 }
 
@@ -170,10 +174,11 @@ function rest(box, region, { against, sink }) {
 }
 
 // The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
-// for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`. `boxOf` gives a
-// loose model's box in its own frame.
+// for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its origin at
+// the place's bust anchor, or its box rested against the place's part. `boxOf` gives a loose model's box in its own
+// frame.
 export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) {
-  const { sites, parts } = doll;
+  const { sites, parts, anchors } = doll;
   const copiesOf = (part) => {
     const copies = parts.get(part);
     if (!copies) throw new Error(`${model.id}: the doll has no part ${part}`);
@@ -181,12 +186,20 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel }) 
   };
   const pieces = wornPieces(model.id, models, dressing);
   if (pieces.length > 0) {
-    // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part.
-    return [...sites, ...pieces.flatMap(({ model: piece, part }) => copiesOf(part).map(({ side, at, mirror }) => ({ model: piece, part, side, at, ...(mirror ? { mirror } : {}) })))];
+    // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part, and a piece
+    // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs).
+    return [...sites, ...pieces.flatMap(({ model: piece, part, covers }) => copiesOf(part).map(({ side, at, mirror, site }) => ({
+      model: piece, part, side, at, ...(mirror ? { mirror } : {}), ...(covers ? { covers, bodySite: site } : {}),
+    })))];
   }
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));
   if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
+  if (place.anchor) {
+    const at = anchors[place.anchor];
+    if (!at) throw new Error(`${model.id}: the doll has no anchor ${place.anchor} to place it at`);
+    return [...sites, { model: model.id, at }];
+  }
   const copies = copiesOf(place.part);
   const region = union((place.both ? copies : copies.slice(0, 1)).map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));

@@ -1,7 +1,8 @@
 // Holds every model's taxonomy to the vocabulary (tools/taxonomy.mjs, taxonomyReport) and lists the models without a
 // category, for authors and tagging agents. tools/build.mjs runs the same report before it builds anything.
 // Usage: node tools/check-taxonomy.mjs [--json] [--pack <packId> ...]. It exits 1 when any problem remains in the
-// selected packs; untagged models in packs the vocabulary lists as untagged are reported, not failed.
+// selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the vocabulary does not list
+// yet, are reported, not failed.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -30,10 +31,12 @@ export async function modelTaxonomies(root = repo) {
 
 const inPacks = (packs) => (entry) => packs.length === 0 || packs.includes(entry.pack);
 
-function printReport({ untagged, problems }) {
+function printReport({ untagged, unlisted, problems }) {
   const byPack = Map.groupBy(untagged, ({ pack }) => pack);
   console.log(`untagged: ${untagged.length} model(s) in ${byPack.size} pack(s)`);
   for (const [pack, models] of byPack) console.log(`  ${pack} (${models.length}): ${models.map(({ id }) => id).join(' ')}`);
+  console.log(`unlisted keywords: ${unlisted.length}`);
+  for (const { message } of unlisted) console.log(`  ${message}`);
   console.log(`problems: ${problems.length}`);
   for (const { message } of problems) console.log(`  ${message}`);
 }
@@ -41,7 +44,7 @@ function printReport({ untagged, problems }) {
 async function main() {
   const { values } = parseArgs({ options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } } });
   const report = taxonomyReport(await modelTaxonomies(repo), readVocabulary(repo));
-  const selected = { untagged: report.untagged.filter(inPacks(values.pack)), problems: report.problems.filter(inPacks(values.pack)) };
+  const selected = Object.fromEntries(Object.entries(report).map(([key, entries]) => [key, entries.filter(inPacks(values.pack))]));
   if (values.json) console.log(JSON.stringify(selected, null, 2));
   else printReport(selected);
   return selected.problems.length > 0 ? 1 : 0;

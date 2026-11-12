@@ -6,7 +6,7 @@ import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { declaredPacks, outputPath, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
-import { samplePose } from '../../site/poseSample.mjs';
+import { sampleClip } from '../../site/clipFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
@@ -96,13 +96,13 @@ test('the showcase lists every model of the manifest at its pack path, ships the
         assert.ok(Object.values(set).some((clip) => ['pose', 'overlay', 'jointDelta'].includes(clip?.kind)), `${model.file} has no viewer-playable clip`);
         for (const name of ['walk', 'attack', 'idle']) if (set[name]?.kind === 'pose') for (const time of [0, 1.234]) {
           const clip = set[name];
-          assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
+          assert.ok(sampleClip(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
         }
         // Death falls run on the render clock, so its span key differs from every other finite clip's.
         for (const direction of ['forward', 'backward']) if (set.death?.[direction]) for (const time of [0, 1.234]) {
           const clip = set.death[direction];
           assert.equal(clip.kind, 'pose');
-          assert.ok(samplePose(clip, time, (a) => a), `${model.file} has an unsampleable death ${direction} clip`);
+          assert.ok(sampleClip(clip, time, (a) => a), `${model.file} has an unsampleable death ${direction} clip`);
           sampledDeaths++;
         }
       }

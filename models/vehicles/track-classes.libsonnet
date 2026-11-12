@@ -23,6 +23,14 @@ local steel = 'steel-spall-black';
     idler: { id: 'track_idler_crawler', massKg: 60, radius: 0.32, width: 0.2, gap: 0, tyre: 0, hub: { radius: 0.14, stub: 0.05 }, finish: { wheel: 'paint-charcoal', hub: 'steel-grey' } },
     roller: { id: 'track_roller_crawler', massKg: 17, radius: 0.08, width: 0.3, gap: 0, tyre: 0, hub: { radius: 0.04, stub: 0.02 }, finish: { wheel: 'steel-grey', hub: 'steel-grey' } },
   },
+  // A mid-size crawler dozer's: deeper, wider single-grouser shoes on a heavier chain than an excavator's, since the
+  // dozer pushes on its tracks rather than sitting on them.
+  crawler_heavy: {
+    link: { id: 'track_shoe_crawler_heavy', massKg: 45, pitch: 0.203, width: 0.56, thickness: 0.1, lug: { length: 0.04, height: 0.06 }, finish: { shoe: steel } },
+    sprocket: { id: 'track_sprocket_crawler_heavy', massKg: 300, radius: 0.42, width: 0.24, gap: 0, tyre: 0, hub: { radius: 0.16, stub: 0.05 }, finish: { wheel: steel, hub: 'steel-grey' } },
+    idler: { id: 'track_idler_crawler_heavy', massKg: 250, radius: 0.33, width: 0.24, gap: 0, tyre: 0, hub: { radius: 0.14, stub: 0.05 }, finish: { wheel: 'paint-charcoal', hub: 'steel-grey' } },
+    roller: { id: 'track_roller_crawler_heavy', massKg: 60, radius: 0.11, width: 0.4, gap: 0, tyre: 0, hub: { radius: 0.05, stub: 0.03 }, finish: { wheel: 'steel-grey', hub: 'steel-grey' } },
+  },
   // A 20 to 30 t armoured vehicle's: rubber-padded steel links with a centre guide horn, run on twin rubber-tyred road
   // wheels on torsion-bar arms, a toothed drive sprocket and an idler. The wheel and link masses are estimates from
   // their drawn steel and aluminium; no maker publishes them.
@@ -41,5 +49,15 @@ local steel = 'steel-spall-black';
     idler: { id: 'track_idler_band', massKg: 80, radius: 0.27, width: 0.24, gap: 0.06, tyre: 0, hub: { radius: 0.11, stub: 0.06 }, finish: { wheel: 'paint-olive', hub: 'steel-grey' } },
     roadWheel: { id: 'road_wheel_band', massKg: 40, radius: 0.16, width: 0.24, gap: 0.06, tyre: 0.03, hub: { radius: 0.07, stub: 0.06 }, finish: { wheel: 'paint-olive', tyre: 'rubber-black', hub: 'steel-grey' } },
     roller: { id: 'track_roller_band', massKg: 18, radius: 0.11, width: 0.22, gap: 0.06, tyre: 0.02, hub: { radius: 0.03, stub: 0.04 }, finish: { wheel: 'paint-olive', tyre: 'rubber-black', hub: 'steel-grey' } },
+  },
+  // A 55 to 65 t main battle tank's: wide double-pin steel links with rubber pads and a centre guide horn, run on twin
+  // rubber-tyred road wheels on torsion-bar arms, a rear drive sprocket, a front idler and twin return rollers. The
+  // 0.635 m width is the common Western tank track's; the link and wheel masses are estimates for their drawn steel.
+  armoured_heavy: {
+    link: { id: 'track_link_heavy', massKg: 40, pitch: 0.184, width: 0.635, thickness: 0.07, pad: { height: 0.03, inset: 0.05 }, horn: { length: 0.1, height: 0.12, width: 0.08 }, finish: { shoe: steel, pad: 'rubber-black', horn: steel } },
+    sprocket: { id: 'track_sprocket_heavy', massKg: 300, radius: 0.33, width: 0.5, gap: 0.14, tyre: 0, hub: { radius: 0.16, stub: 0.12 }, finish: { wheel: steel, hub: 'steel-grey' } },
+    idler: { id: 'track_idler_heavy', massKg: 220, radius: 0.33, width: 0.5, gap: 0.14, tyre: 0.04, hub: { radius: 0.14, stub: 0.12 }, finish: { wheel: 'paint-charcoal', tyre: 'rubber-black', hub: 'steel-grey' } },
+    roadWheel: { id: 'road_wheel_heavy', massKg: 130, radius: 0.35, width: 0.56, gap: 0.14, tyre: 0.05, hub: { radius: 0.13, stub: 0.12 }, finish: { wheel: 'paint-charcoal', tyre: 'rubber-black', hub: 'steel-grey' } },
+    roller: { id: 'track_roller_heavy', massKg: 35, radius: 0.18, width: 0.4, gap: 0.14, tyre: 0.03, hub: { radius: 0.04, stub: 0.06 }, finish: { wheel: 'paint-charcoal', tyre: 'rubber-black', hub: 'steel-grey' } },
   },
 }

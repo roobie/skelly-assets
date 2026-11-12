@@ -238,9 +238,19 @@ const portMetadata = (partId: string, port: PortDef, placed: Transform): ExportP
 
 type Json = Record<string, unknown>;
 
-/** The glTF material the writer gives a surface of this appearance. */
+const SHEEN = 'KHR_materials_sheen';
+
+/**
+ * The glTF material the writer gives a surface of this appearance. A sheen is glTF's own extension, so any loader draws
+ * it; a fabric's grain has no glTF form and rides in the extras for a renderer that draws it; see
+ * `docs/decisions/0013-fabric-finishes.md`, "Decision".
+ */
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
+  const extras = {
+    ...(material === undefined ? {} : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
+    ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
+  };
   return {
     name: hex(srgb),
     pbrMetallicRoughness: {
@@ -249,9 +259,17 @@ export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }
       roughnessFactor: finish.roughness,
     },
     ...(opacity < 1 ? { alphaMode: 'BLEND' } : {}),
-    ...(material === undefined
+    ...(finish.sheen === undefined
       ? {}
-      : { extras: { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) } }),
+      : {
+          extensions: {
+            [SHEEN]: {
+              sheenColorFactor: finish.sheen.colour.map(srgbToLinear),
+              sheenRoughnessFactor: finish.sheen.roughness,
+            },
+          },
+        }),
+    ...(Object.keys(extras).length === 0 ? {} : { extras }),
   };
 };
 
@@ -555,7 +573,7 @@ const writeGlb: ExportGlb = (input) => {
   };
   /**
    * One primitive per finish and piece: the part's drawn solids sampled at the grain, so later solids paint over
-   * earlier ones.
+   * earlier ones. Each piece's primitives together form a closed surface.
    */
   const voxelPrimitivesFor = (part: PartExport, items: DisplayItem[], grain: number): Json[] => {
     const finishes: {
@@ -584,9 +602,11 @@ const writeGlb: ExportGlb = (input) => {
     });
     const { groups } = voxelize(sources, grain, latticeOrigin(part.placed, grain, metresPerUnit), {
       neighbours: neighboursOf(part, grain),
+      // A face between pieces is kept on both sides, so a game hiding one piece leaves the rest closed.
       exposeInterface: (group, neighbour) =>
-        !surfaceOf(finishes[group]!.appearance.finish).transparent &&
-        surfaceOf(finishes[neighbour]!.appearance.finish).transparent,
+        finishes[group]!.piece !== finishes[neighbour]!.piece ||
+        (!surfaceOf(finishes[group]!.appearance.finish).transparent &&
+          surfaceOf(finishes[neighbour]!.appearance.finish).transparent),
       preserveFace: input.skin ? preserveSkinFace(input.skin, placedInMetres(part)) : undefined,
     });
     return [...groups].map(([group, buffers]) =>
@@ -710,8 +730,10 @@ const writeGlb: ExportGlb = (input) => {
     },
   };
 
+  const sheened = materials.some((material) => (material.extensions as Json | undefined)?.[SHEEN] !== undefined);
   const json: Json = {
     asset: { version: '2.0', generator: input.generator ?? 'skelly assembly engine' },
+    ...(sheened ? { extensionsUsed: [SHEEN] } : {}),
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes,

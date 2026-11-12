@@ -166,8 +166,11 @@ wearable worn still does not show whether it fits when a limb bends, and a pose 
 it becomes a clip. It draws through the posing page, `../site/pose.mjs`, which hangs each worn piece from the bone of
 the part it is drawn in, and compiles the file by `../site/poseFile.mjs`, `compilePose`, as the page does, so the
 sheet shows what the page shows. With `--probe` it marks where the pose shows the body through the garment
-(`../site/clearance.mjs`, `clearanceProbe`); see `../docs/decisions/0010-pose-tool.md`. The sheets
-reach the showcase through one served site and one headless browser, `reviewSite.mjs`, so no sheet serves it its own way.
+(`../site/clearance.mjs`, `clearanceProbe`), and with `--skin` it draws what of the covered body each review view
+shows (`../site/skin.mjs`, `skinCheck`); see `../docs/decisions/0011-clearance-classified.md`. The clearance sweep,
+`clearance-sweep.mjs`, runs both on every wearable riding the doll's bones in every pose fixture, because a change
+to the doll or the rig moves every fit at once. The sheets and the sweep reach the showcase through one served site
+and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a

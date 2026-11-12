@@ -93,7 +93,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('buckle-%d' % i, 'buckle', [x - 0.016, 0.155, -0.012], [x + 0.016, 0.166, 0.012])
     for i in [0, 1]
     for x in [[-0.16, 0.16][i]]
-  ], { foam: 'foam-eva', seam: 'plastic-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
+  ], { foam: 'foam-eva', seam: 'plastic-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['rubber'], setting: ['modern'] } } },
   // A steel combination lockbox 24 cm wide, 12 cm tall and 14 cm deep: a lid hinged at the back, a number dial
   // and a turn handle on the front at +z, and rubber feet.
   h.compound('safe_box', 2.7, [
@@ -175,7 +175,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('grille-post-%d' % i, 'trim', [x - 0.0015, 0.04, 0.0555], [x + 0.0015, 0.2, 0.0575])
     for i in std.range(0, 2)
     for x in [[-0.08, 0, 0.08][i]]
-  ], { case: 'enamel-white', recess: 'paint-charcoal', foot: 'plastic-black', trim: 'steel-stainless', knob: 'plastic-black', element: 'steel-grey', lamp: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { case: 'enamel-white', recess: 'paint-charcoal', foot: 'plastic-black', trim: 'steel-stainless', knob: 'plastic-black', element: 'steel-grey', lamp: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cold-weather'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // An aerosol paint can 21 cm tall to the cap and 66 mm across: a painted steel body with a label band, a domed
   // top with a rolled rim and a cap the colour of the paint.
@@ -242,7 +242,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('eye-lens', 'lens', [[-0.192, 0.008], [-0.19, 0.008]]),
   ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + h.gripOn('homemade_telescope', 'tube-outer') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A pocket tear gas canister 9 cm tall and 34 mm across: a black body with a label band, a red flip-top
   // actuator with its nozzle facing +z and a key ring at the back.

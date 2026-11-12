@@ -135,7 +135,7 @@ local ninjaDress(id, mass, ht, sleeved) =
   ]) + [
     box('label', 'label', [-0.16, t - 0.006, 0.02], [-0.07, t - 0.002, 0.07]),
   ], { shell: 'cloth-safety-orange', hole: 'cloth-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black', label: 'reflective-yellow' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['swimming'], tags: { material: ['fabric', 'plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // A makeshift float laid flat, front up, about 360 mm by 500 mm and 120 mm tall: four inflated hides, each tied shut
   // at the neck and bound round with two leather bands, lashed in two rows onto a flat rawhide harness with flat
@@ -244,10 +244,10 @@ local ninjaDress(id, mass, ht, sleeved) =
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A blue maid's dress folded long, 320 mm by 400 mm and 50 mm tall, with its frilled white apron, collar and cuffs.
-  maidDress('maid_dress', 0.7, 0.32, 0.4, 0.05, 'cloth-blue') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  maidDress('maid_dress', 0.7, 0.32, 0.4, 0.05, 'cloth-blue') + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // The short black version, folded smaller: 300 mm by 320 mm and 35 mm tall.
-  maidDress('short_maid_dress', 0.45, 0.3, 0.32, 0.035, 'cloth-black') + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  maidDress('short_maid_dress', 0.45, 0.3, 0.32, 0.035, 'cloth-black') + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A short off-white costume dress folded, 300 mm by 340 mm and 30 mm tall, printed with crossing bandage wraps and
   // with torn wrap ends hanging off the hem.
@@ -267,7 +267,7 @@ local ninjaDress(id, mass, ht, sleeved) =
                                     for i in std.range(0, 3)
                                   ],
              { cloth: 'cloth-cream', sleeve: 'cloth-cream', waist: 'cloth-rag', wrap: 'cloth-rag', hole: 'cloth-rag-shadow' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A short black dress folded, 300 mm by 340 mm and 40 mm tall: sleeves folded along the sides with red cuffs, a red
   // mandarin collar and wrap edge, a red hem band and a red waist tie with straight hanging ends.
@@ -312,5 +312,5 @@ local ninjaDress(id, mass, ht, sleeved) =
                                  + bandX('hem-fur', 'fur', -d / 2 + 0.075, 0.04, w, ht + 0.008, 0.012)
                                  + bandX('belt', 'belt', waistZ, 0.03, w, ht + 0.004, 0.005),
              { cloth: 'cloth-red', sleeve: 'cloth-red', waist: 'cloth-red', fur: 'fur-pale', belt: 'leather-black', buckle: 'metal-gold' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'] } } },
 ]

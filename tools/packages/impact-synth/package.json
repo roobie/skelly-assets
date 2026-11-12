@@ -1,0 +1,26 @@
+{
+  "name": "@skelly/impact-synth",
+  "version": "0.0.0",
+  "private": true,
+  "license": "EUPL-1.2",
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema.ts",
+    "./synth": "./src/synth.ts",
+    "./rows": "./src/rows.ts"
+  },
+  "scripts": {
+    "pretypecheck": "node ../../sources.mjs",
+    "typecheck": "tsc --noEmit",
+    "pretest": "node ../../sources.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "valibot": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}

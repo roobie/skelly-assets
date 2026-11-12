@@ -156,7 +156,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     box('pull', 'binding', [-0.015, 0.078, 0.08], [0.015, 0.081, 0.1]),
   ] + flatRows('wing-left-row', 'strap', -0.26, -0.16, [-0.01, 0.04, 0.09], 0.006)
   + flatRows('wing-right-row', 'strap', 0.16, 0.26, [-0.01, 0.04, 0.09], 0.006), { cloth: 'nylon-coyote', flap: 'nylon-coyote', strap: 'webbing-olive-dark', binding: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A hardened-steel front plate 250 mm by 300 mm cut by hand, its edges a little crooked, on a nylon pad and
   // strapped on with two webbing straps.

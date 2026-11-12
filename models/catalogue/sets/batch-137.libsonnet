@@ -92,11 +92,11 @@ local potHelm(id, mass, r, ht, finishes) =
 
   // A soup pot helmet, an iron pot 200 mm across and 130 mm deep upside down on its rim, with a strap through the
   // side handles.
-  potHelm('pot_helmet', 2.6, 0.1, 0.13, { pot: 'iron-cast', rim: 'iron-cast', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
+  potHelm('pot_helmet', 2.6, 0.1, 0.13, { pot: 'iron-cast', rim: 'iron-cast', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A canning pot helmet, a blue enamelled steel canner 330 mm across and 260 mm deep upside down on its rim, with a
   // strap through the side handles.
-  potHelm('canning_pot_helmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
+  potHelm('canning_pot_helmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A stock pot great helm, an aluminium stock pot 260 mm across and 290 mm deep upside down on its rim, front on +z:
   // a T cut through the front wall for the eyes, nose and mouth with the stuffed blanket showing through it and
@@ -128,7 +128,7 @@ local potHelm(id, mass, r, ht, finishes) =
     for s in [-1, 1]
   ]),
              { pot: 'alu-bare', cut: 'cloth-charcoal', blanket: 'wool-grey', handle: 'steel-grey', cord: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A tactical full helmet standing on its neck guard, front on +z, 270 mm across and 310 mm tall: a matte black
   // ballistic shell closing over the whole head with a moulded chin bar, a dark visor across the face, a flared

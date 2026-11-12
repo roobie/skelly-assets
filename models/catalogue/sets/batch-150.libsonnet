@@ -264,7 +264,7 @@ local laminarLeg(p, cx, n, z0, pitch, w0, w1, r) =
     for cx in [if p == 'l-' then -0.1 else 0.1]
     for cz in [if p == 'l-' then -0.015 else 0.015]
   ]), { pad: 'cloth-charcoal', cup: 'plastic-grey', rib: 'plastic-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'fabric'], slot: ['legs'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic', 'fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // A pair of mild steel mail leggings laid flat side by side, outside up, each 860 mm from hip to ankle, 240 mm
   // across at the thigh and 130 mm at the ankle, with a leather band and two tie points at the top and a strap under

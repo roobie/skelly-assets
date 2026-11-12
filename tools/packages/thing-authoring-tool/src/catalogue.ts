@@ -128,6 +128,7 @@ const ItemSchema = strictObject({
       roll: NeutralModelSchema.entries.roll,
     }),
   ),
+  covers: optional(NeutralModelSchema.entries.covers),
   /** Named datums on solids, exported as the model's anchors. */
   anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
   /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */

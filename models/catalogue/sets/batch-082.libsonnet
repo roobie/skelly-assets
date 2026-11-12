@@ -115,7 +115,7 @@ local tray(w, d, ht, t) = [
     box('spoke-a', 'iron', [-0.24, 0.414, 0.165], [-0.06, 0.426, 0.177]),
     box('spoke-b', 'iron', [-0.156, 0.33, 0.165], [-0.144, 0.51, 0.177]),
     turned('crank-knob', 'frame', 'z', [[0, 0], [0, 0.012], [0.06, 0.012], [0.06, 0]], [-0.15, 0.51, 0.177]),
-  ], { frame: 'wood-oak', body: 'wood-pine', chute: 'wood-birch', iron: 'iron-cast', grain: 'straw-pale' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'] } } },
+  ], { frame: 'wood-oak', body: 'wood-pine', chute: 'wood-birch', iron: 'iron-cast', grain: 'straw-pale' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'], place: ['farm'] } } },
 
   // A 230 mm cut-off wheel, 3 mm thick with a 22 mm bore and a printed paper label.
   h.compound('cut_off_wheel', 0.3, [
@@ -169,7 +169,7 @@ local tray(w, d, ht, t) = [
     rod('bit', 'bit', 0.0025, 0.117, 0.14, 0.05),
   ], { handle: 'wood-walnut', frame: 'steel-grey', wheel: 'paint-red', chuck: 'steel-bright', bit: 'steel-blued' }) + h.gripOn('hand_drill', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'] } } },
 
   // A coil of 24 mm rubber hose, 24 cm across, three turns high with its loose end laid over the top.
   h.compound('hose', 0.42, [
@@ -187,7 +187,7 @@ local tray(w, d, ht, t) = [
     halfSpan: 0.08, halfHeight: 0.035, linkWidth: 0.018, linkDepth: 0.006, linkOffset: 0.024,
     screwRadius: 0.006, crankLength: 0.02, crankRadius: 0.007,
     saddleLength: 0.07, saddleWidth: 0.05, saddleThickness: 0.008,
-  }, { frame: 'scrap-rusted', link: 'steel-bright', screw: 'steel-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  }, { frame: 'scrap-rusted', link: 'steel-bright', screw: 'steel-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
   // A petrol breaker, 92 cm from the T handle to the point: a two-stroke engine block with its fuel tank on top and
   // a pull starter on the front, then the drive cylinder and the moil point.

@@ -131,7 +131,7 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
     box('lead-drop', 'lead', [-0.004, 0, -0.103], [0.004, y0 - 0.045, -0.095]),
     h.turned('plug', 'earpiece', 'z', [[0, 0], [0, 0.009], [0.03, 0.009], [0.035, 0.005], [0.035, 0]], [0, 0.009, -0.235]),
   ], { cap: 'cloth-olive-drab', pad: 'webbing-olive-dark', earpiece: 'plastic-matte-black', strap: 'leather-brown', buckle: 'steel-bright', lead: 'rubber-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // Mild steel heavy close helm, 310 mm tall: a tall comb, three gorget lames and a riveted plate over the bevor.
   closeHelm('mild_steel_heavy_close_helm', 4.1, 0.02, 3, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },

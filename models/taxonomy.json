@@ -1,5 +1,5 @@
 {
-  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, and any tags, terms grouped by facet. Every term carries its one-line meaning. Why it is semi-closed, and how a term is requested and added, is in models/TAXONOMY.md.",
+  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, any tags, terms grouped by facet, and any keywords. Every category, facet term and keyword carries its one-line meaning. Why tags are semi-closed and keywords open by review, and how a term is requested and added, is in models/TAXONOMY.md.",
   "categories": {
     "ammunition": "Cartridges, rounds, shells, spent cases and the boxes and cans made to hold them.",
     "arcana": "Magical and occult objects: wands, rune tablets, charms, ritual gear.",
@@ -50,6 +50,19 @@
         "rubber": "Rubber and soft elastomers.",
         "stone": "Stone, concrete and mineral.",
         "wood": "Wood, worked or rough."
+      }
+    },
+    "place": {
+      "meaning": "Where the model is typically found; a model found in several places names each.",
+      "terms": {
+        "bathroom": "A bathroom or washroom: toilets, basins, baths, toilet brushes, towels, soap.",
+        "farm": "A farm: tools and equipment for crops and livestock, feed, harvest gear.",
+        "gym": "A gym or fitness centre: training equipment, gym bags, mats.",
+        "hospital": "A hospital or surgery: beds, drips, medical and surgical equipment.",
+        "kitchen": "A kitchen: cookware, utensils, crockery and food-preparation appliances.",
+        "laboratory": "A laboratory: glassware, lab instruments and sample containers.",
+        "office": "An office: desks, stationery, filing and office machines.",
+        "workshop": "A workshop or garage: workbenches, vises, machine and hand tools."
       }
     },
     "setting": {
@@ -131,5 +144,57 @@
         "trap": "Traps set to catch or wound."
       }
     }
+  },
+  "keywords": {
+    "alchemy": "Alchemical and apothecary apparatus: alembics, retorts, athanors, phials, sand and water baths.",
+    "appliance": "Domestic electrical appliances, large or small: fridges, ovens, washing machines, toasters, heaters.",
+    "archery": "Gear for shooting a bow: quivers, bow slings, targets.",
+    "camping": "Gear for camping and backpacking: tents, shelters, sleeping bags, camp stoves, cots, frame packs.",
+    "cardio": "Equipment for cardiovascular training: treadmills, rowers, exercise bikes.",
+    "cleaning": "Things used to clean a home: brooms, mops, sponges, plungers, scrubbing brushes.",
+    "cold-weather": "Made to keep warm in the cold: winter coats, mittens, thermals, balaclavas, heaters, heat packs.",
+    "computer": "Computers, their parts and their storage: laptops, tablets, processors, memory, drives.",
+    "cooking": "Used to cook or prepare food: pots, pans, stoves, cookers, kitchen utensils and appliances.",
+    "costume": "Fancy dress and dress-up: Santa, clown, ghost and animal outfits, horns, halos, fake fangs.",
+    "diving": "Gear for diving and underwater work: wetsuits, fins, diving masks, dive bags.",
+    "dragon": "Dragons and dragon-like creatures.",
+    "duffel": "A soft cylindrical bag with carry handles, carried in the hand or over a shoulder.",
+    "elemental": "Creatures made of an element: fire, water, storm.",
+    "fire-starting": "Used to start a fire: lighters, matches, fire pistons, bow drills, flint and steel, ember carriers.",
+    "firefighting": "Firefighters' gear and kit: turnout coats, fire helmets, extinguishers, halligans, flame-resistant wear.",
+    "fitness": "General fitness training: light weights, mats, cardio machines.",
+    "formalwear": "Formal dress and its accessories: suits, tuxedos, gowns, dress shirts, ties, cufflinks.",
+    "free-weights": "Weights lifted free rather than on a machine: dumbbells, kettlebells, barbells, plates.",
+    "fuel": "Fuel and its containers: jerrycans, propane tanks, gas canisters, fuel drums.",
+    "gardening": "Used for garden and yard work: rakes, hoes, trowels, hedge trimmers, mowers, flower pots.",
+    "hygiene": "Personal care and grooming: toothbrushes, combs, razors, shaving kits, hair dryers, toilet paper.",
+    "improvised": "Made from scrap or whatever was to hand rather than built for the job: makeshift tools, scrap and tyre armour, pipe guns.",
+    "insect": "Insects and insect-like creatures: giant roaches, ant queens.",
+    "jewellery": "Jewellery and personal adornment: rings, earrings, necklaces, bracelets, anklets, piercings, crowns.",
+    "luggage": "Bags and cases for travel: suitcases, garment bags, travel packs, briefcases, duffel bags.",
+    "martial-arts": "Martial arts and combat sport wear and gear: gis, belts, sparring headgear, mouthguards.",
+    "metalworking": "Used to work metal: anvils, forges, tongs, swages, files, welders, metal presses.",
+    "military": "Military issue or military style: combat uniforms, plate carriers, load-bearing vests, military packs.",
+    "music": "Musical instruments and gear for playing or recording music: instruments, stands, microphones, amplifiers.",
+    "painkiller": "Relieves pain: analgesic tablets, opioids, numbing creams and ointments.",
+    "police": "Police and law-enforcement gear: badges, duty belts, riot armour and helmets.",
+    "radiation": "Detects, measures or protects against radiation: Geiger counters, dosimeter badges, iodide tablets, sealed suits.",
+    "recreational-drug": "Drugs taken for their effect rather than as medicine, and their paraphernalia: cannabis, cocaine, pipes.",
+    "religious": "Religious vestments and ritual objects: prayer shawls, tefillin, monastic robes, habits, holy symbols.",
+    "safety-gear": "Personal protective equipment for work: hard hats, safety glasses, ear defenders, cut-resistant and chemical protection.",
+    "scope": "A magnifying optical sight for a gun.",
+    "sewing": "Used for sewing, tailoring and needlework: needles, thread, pinking scissors, pattern sets.",
+    "silencer": "A suppressor that muffles a gun's report.",
+    "strength-training": "Equipment for building strength: weights, benches, racks, machines.",
+    "swimming": "Swimwear and swimming gear: swimsuits, trunks, swim caps, goggles, fins, float vests.",
+    "tobacco": "Tobacco and nicotine products and their use: cigarettes, cigars, rolling tobacco, nicotine gum, vapes, pipes.",
+    "toy": "Toys and playthings: dolls, plushies, figurines, remote-control cars, yo-yos, dice.",
+    "undead": "Anything dead that still moves, zombie or not: zombies, death knights, skeletons, ghosts.",
+    "underwear": "Underwear and base layers: briefs, boxers, bras, undershirts, corsets, long underwear, tights.",
+    "water-purification": "Makes water safe to drink: purifiers, filters, filter straws, rain catchers.",
+    "weightlifting": "Lifting weights: barbells, plates, racks.",
+    "woodworking": "Used to work wood: table saws, planers, jointers, hand saws, chisels, clamps.",
+    "yoga": "Yoga and stretching: mats, blocks.",
+    "zombie": "Reanimated corpses that shamble, run or crawl at the living: shamblers, runners, crawlers, fused masses."
   }
 }

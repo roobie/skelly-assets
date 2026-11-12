@@ -134,5 +134,5 @@ local coverall(o) =
   // face window in a black rim, a zip flap, black gloves folded on top and black boots sealed to the legs standing out
   // over the front.
   h.compound('hazmat_suit', 3.8, coverall({ w: 0.5, d: 0.42, ht: 0.14, hood: 0.3, win: [0.22, 0.13], gloves: true, boots: true, rim: true }), { cloth: 'rubber-yellow', hood: 'rubber-yellow', window: 'plastic-clear', zip: 'rubber-yellow', glove: 'jade-green', cuff: 'plastic-matte-black', boot: 'plastic-matte-black', sole: 'plastic-charcoal' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head', 'hands', 'feet'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['radiation', 'safety-gear'], tags: { material: ['rubber'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head', 'hands', 'feet'], state: ['folded'] } } },
 ]

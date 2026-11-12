@@ -16,7 +16,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     turned('head', 'head', 'x', [[0, 0], [0, 0.019], [0.006, 0.018], [0.010, 0.016], [0.010, 0]], [-0.004, 0, 0]),
   ], { body: 'steel-hardened', head: 'steel-heat-tint' }) + h.gripOn('drift', 'body') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // A benchtop electric heat-treating forge, 300 mm wide, 240 mm deep and 260 mm tall: a painted steel case with a
   // hinged door over a glowing chamber, a control panel at the right and a mains cord at the back. Front on +z.
@@ -49,7 +49,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     knob: 'steel-bright',
     switch: 'lacquer-red',
     cord: 'rubber-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A propane forge: an insulated steel drum 280 mm across and 340 mm long lying front to back on a welded stand,
   // its mouth on +z lined with fire brick and glowing, a burner tube standing in its top fed by a hose. 0.56 m tall.
@@ -79,7 +79,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     bell: 'brass-dull',
     hose: 'rubber-black',
     stand: 'steel-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A handled hot cut: a 25 by 40 mm chisel head 150 mm tall on a 300 mm hickory handle, struck on its top and
   // set edge-down on hot stock.
@@ -90,7 +90,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     prism('edge', 'edge', 'z', [[0.290, -0.065], [0.315, -0.065], [0.3035, -0.095], [0.3015, -0.095]], -0.020, 0.020),
   ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + h.gripOn('hot_cut', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // A sheet of riveted mail 250 mm square laid flat, its rows of rings standing proud and its far edge rolled up.
   h.compound('mild_steel_mail_sheet', 0.95, [
@@ -150,7 +150,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     wheel: 'brick-buff',
     iron: 'iron-dull',
     treadle: 'wood-pine',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'], place: ['workshop'] } } },
 
   // A sheet of sandpaper, 230 by 280 mm, grit side up with one corner folded back to show the paper.
   h.compound('sandpaper', 0.015, [
@@ -199,7 +199,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     ring('eye', 'rod', 0.012, 0.020, 0.017, 0.027, 0.07, 0.272),
     ring('die-a', 'die', 0.008, 0.025, 0, 0.022, 0.175, -0.035),
     ring('die-b', 'die', 0.005, 0.022, 0, 0.020, 0.175, 0.030),
-  ], { block: 'steel-grey', groove: 'steel-bright', rod: 'steel-blued', die: 'steel-hardened' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { block: 'steel-grey', groove: 'steel-bright', rod: 'steel-blued', die: 'steel-hardened' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // Stainless kitchen tongs 300 mm long lying on their side, open: two pressed arms sprung from a looped end, with
   // scalloped heads and rubber grips.
@@ -218,5 +218,5 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     for i in std.range(0, 2)
   ], { arm: 'steel-stainless', grip: 'rubber-black' }) + h.gripOn('tongs', 'arm-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] } } },
 ]

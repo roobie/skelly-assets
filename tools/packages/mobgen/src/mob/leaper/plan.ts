@@ -6,10 +6,10 @@
 import content from '../../../../../../models/mobs/leaper/leaper.json' with { type: 'json' };
 import type { Body, BodyRegion, Bone, Feature, Material } from '../../core/body.ts';
 import { registerBodyPlan, sampleParams } from '../../core/generate.ts';
+import { frameAbout } from '../../core/joints.ts';
 import {
   add,
   clamp,
-  cross,
   dot,
   length,
   lerp3,
@@ -20,9 +20,9 @@ import {
   sub,
   type Vec3,
 } from '../../core/math.ts';
-import type { Budgets } from '../../core/rules.ts';
 import type { Shape } from '../../core/sdf.ts';
 import { type Genome, registerTemplate, type Template } from '../../core/template.ts';
+import { gridScaledBudgets } from '../budgets.ts';
 import { resolveMaterials } from '../materials.ts';
 
 export const LEAPER_TEMPLATE = content as unknown as Template;
@@ -120,15 +120,6 @@ const JOINT_LIMITS: Readonly<Record<string, readonly [Range, Range, Range]>> = {
     [-10, 10],
     [-10, 10],
   ],
-};
-
-/** A joint frame whose x is exactly the flex axis and whose y follows the bone as closely as stays square
- * to it (see core/joints.ts, jointRotation). */
-const frameAbout = (bone: Bone, flexAxis: Vec3): NonNullable<Bone['frame']> => {
-  const x = normalize(flexAxis);
-  const along = sub(bone.tail, bone.head);
-  const y = normalize(sub(along, scale(x, dot(along, x))));
-  return { x, y, z: cross(x, y) };
 };
 
 /** Gives every bone its frame and range. Every joint flexes about the body's right axis, so the coil and
@@ -353,31 +344,12 @@ const buildHindlimb = (rig: Rig, side: Side, x: number, { at, r, p }: Limb): voi
   }
 };
 
-/** Budgets are authored at the template voxel size; another resolution keeps the same body, so counts
- * scale with cell volume and triangles with cell area. */
-const budgetsFor = (genome: Genome, template: Template): Budgets => {
-  const ratio = template.voxelSize / genome.voxelSize;
-  const volume = ratio ** 3;
-  const area = ratio ** 2;
-  const { totalVoxels, totalTriangles, groups } = template.budgets;
-  return {
-    totalVoxels: { min: totalVoxels.min * volume, max: totalVoxels.max * volume },
-    totalTriangles: { min: totalTriangles.min * area, max: totalTriangles.max * area },
-    groups: Object.fromEntries(
-      Object.entries(groups).map(([name, group]) => [
-        name,
-        { ...group, min: group.min * volume, max: group.max * volume },
-      ]),
-    ),
-  };
-};
-
 registerBodyPlan('leaper', {
   sample: (rng, template) => ({ params: sampleParams(rng, template.params, PARAM_ORDER), wounds: [] }),
   build: buildLeaper,
   paramOrder: PARAM_ORDER,
   woundBones: [],
-  budgets: budgetsFor,
+  budgets: gridScaledBudgets,
   limbBones: LIMB_BONES,
   regionBones: LEAPER_REGION_BONES,
 });

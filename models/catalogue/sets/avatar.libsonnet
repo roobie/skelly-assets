@@ -50,11 +50,12 @@ local legSegment(id, massKg, finish, ports) = {
 };
 local foot = { skin: skin };
 local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
 local bustSegment(id, massKg, finish, ports) = {
   id: id,
   family: 'bust',
   massKg: massKg,
-  params: params(bust { segment: id }),
+  params: params(bust { segment: id, hairRing: band.hairRing }),
   finish: finish,
   ports: ports,
 };
@@ -66,7 +67,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_bust',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
-    voxelGrain: 0.006,
+    voxelGrain: bust.voxelGrain,
     // The head is its own part so a stance lifts it about the neck's top while the torso leans; the head mates to
     // the torso there, so the whole stands exactly as one piece would.
     parts: [
@@ -84,10 +85,12 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     ],
     // The pivots code poses from: the neck where the torso meets the head, the head's own pivot above it, a
     // shoulder at each deltoid cap's centre and a hip under each side of the pelvis. Left is the figure's left, +x.
+    // The brow, where the hair meets the face, is where a hat's brim sits (models/dressing.libsonnet).
     anchors: {
       spine: { part: 'torso', solid: 'waist', fraction: [0.5, (0.2 - bust.pelvisHeight) / bust.waistHeight, 0.5] },
       neck: { part: 'neck', solid: 'neck', fraction: [0.5, 0, 0.5] },
       head: { part: 'neck', solid: 'neck', fraction: [0.5, 1, 0.5] },
+      brow: { part: 'head', solid: 'hair-0', fraction: [0.5, 0, 0.5] },
       eye_left: { part: 'head', solid: 'left-eye', fraction: [0.5, 0.5, 1] },
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
       shoulder_left: shoulder('left'),
@@ -100,7 +103,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_arm',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
-    voxelGrain: 0.006,
+    voxelGrain: bust.voxelGrain,
     // One segment per part so the first-person view bends the arm at its joints; each segment is drawn about its
     // own joint and mates to the segment above it there, so the whole hangs exactly as one piece would.
     parts: [
@@ -132,7 +135,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     id: 'player_leg',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
-    voxelGrain: 0.006,
+    voxelGrain: bust.voxelGrain,
     // One segment per part so a stance bends the leg at the knee and ankle; each segment is drawn about its own joint
     // and mates to the segment above it there, so the whole stands exactly as one piece would.
     parts: [

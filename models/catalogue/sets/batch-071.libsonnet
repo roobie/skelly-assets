@@ -36,7 +36,7 @@ local gauge(id, x, y, z) = [
     h.box('lash-a', 'cord', [-0.3, 0, 0.06], [-0.288, 0.052, 0.144]),
     h.box('lash-b', 'cord', [0.29, 0, 0.06], [0.302, 0.052, 0.144]),
     h.turned('hank', 'cord', 'y', [[0, 0.02], [0, 0.04], [0.016, 0.04], [0.016, 0.02], [0, 0.02]], [0.1, 0.122, -0.01]),
-  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'fabric'] } } },
+  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', keywords: ['water-purification'], tags: { material: ['plastic', 'fabric'] } } },
   // A small triple-beam balance 0.32 m long: a cast base, a 140 mm pan on the left, three graduated beams with
   // brass riders running right to a pointer and zero mark.
   h.compound('triple_beam_balance', 2, [
@@ -59,7 +59,7 @@ local gauge(id, x, y, z) = [
     for k in std.range(0, 10)
   ], { base: 'paint-charcoal', pan: 'steel-stainless', beam: 'steel-stainless', rider: 'brass', mark: 'plastic-black' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
   // A pocket aneroid barometer in a plastic case 64 mm across and 14 mm deep, standing on its rim with its dial
   // to the front and a hanging lug on top.
   h.compound('barometer', 0.07, [

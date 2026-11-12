@@ -64,7 +64,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
   h.compound('leather_cat_ears', 0.021,
              arcZ('band', 'band', earR - 0.006, earR, -115, 115, 18, -0.005, 0.005, 0, earCy) + ear('l') + ear('r'),
              { band: 'plastic-matte-black', ear: 'leather-patent', inner: 'plastic-pink' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'plastic'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['leather', 'plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A glossy black leather tail lying on the floor in a loose S, 550 mm long and 30 mm thick at the root, tapering to
   // the tip, with a strap loop at the root for a belt.
@@ -73,7 +73,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
              + h.strapLoop('loop', 'strap', 0.02, 0.012, 0.01, 0.004, 0, -0.29, 0)
              + [h.stud('snap', 'snap', -0.275, 0.004, 0, 0.004, 0.003)],
              { tail: 'leather-patent', strap: 'leather-black', snap: 'metal-silver' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A black leather collar lying flat, 135 mm across and 22 mm tall: a closed band buckled at the back, a steel ring
   // at the front with a small bell lying beside it.
@@ -101,7 +101,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     h.prism('tooth-%d' % i, 'tooth', 'y', [zx(0.085, a, -0.0035), zx(0.085, a, 0.0035), zx(0.085 + len * 0.35, a, 0.005), zx(0.085 + len, a), zx(0.085 + len * 0.35, a, -0.005)], 0, 0.006)
     for i in std.range(0, 8)
   ], { thong: 'leather-tan', tooth: 'bone' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['bone', 'leather'], setting: ['prehistoric'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone', 'leather'], setting: ['prehistoric'], slot: ['neck'] } } },
 
   // A gold bangle lying flat, 72 mm across and 4 mm tall, set round its top with six black onyx stones.
   h.compound('onyx_gold_bracelet', 0.03, [
@@ -110,7 +110,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     cabochon('stone-%d' % i, 'stone', 0.0035, 0.002, 0.032 * std.sin(rad(60 * i)), 0.004, 0.032 * std.cos(rad(60 * i)))
     for i in std.range(0, 5)
   ], { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['arms'] } } },
 
   // A pair of gold cufflinks lying face up, each 16 mm across and 13 mm tall: a round gold face inset with black onyx
   // on a short post over a swivel bar.
@@ -124,7 +124,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     for s in ['l', 'r']
     for x in [if s == 'l' then -0.012 else 0.012]
   ]), { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['arms'] } } },
 
   // A pair of gold drop earrings lying flat, each 30 mm long: a gold hoop with a gold cap holding a black onyx drop.
   h.compound('onyx_gold_earring', 0.007, std.flattenArrays([
@@ -136,7 +136,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     for s in ['l', 'r']
     for x in [if s == 'l' then -0.011 else 0.011]
   ]), { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['head'] } } },
 
   // A gold chain necklace lying flat in a loop, 140 mm across, with an oval gold pendant at the front set with a
   // domed black onyx.
@@ -146,7 +146,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     h.disc('bezel', 'metal', 0.01, 0, 0.003, 0, 0.087),
     cabochon('stone', 'stone', 0.0075, 0.003, 0, 0.003, 0.087),
   ], { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['neck'] } } },
 
   // A gold ring standing upright, 22 mm across and 26 mm tall: a plain band with a domed black onyx in a raised
   // setting on top.
@@ -155,7 +155,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     h.disc('setting', 'metal', 0.0045, 0.02, 0.023, 0, 0),
     cabochon('stone', 'stone', 0.004, 0.003, 0, 0.023, 0),
   ], { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['hands'] } } },
 
   // A gold tiara standing upright, 155 mm across and 42 mm tall at the front: a half circlet rising to a row of
   // points, highest in the middle, set with black onyx stones along its front.
@@ -167,5 +167,5 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
              + [tiaraStone('stone-c', 0, 0.026, 0.006)]
              + [tiaraStone('stone-%d' % i, a, 0.008, 0.0035) for i in std.range(0, 3) for a in [[-48, -24, 24, 48][i]]],
              { metal: 'metal-gold', stone: 'gem-onyx' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'stone'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['head'] } } },
 ]

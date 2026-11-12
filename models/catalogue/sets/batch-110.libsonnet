@@ -83,13 +83,13 @@ local star(id, x, z, y, s=0.009) = [
              + limbGuard('leg-l-', -0.11, 0.02, 0.62, 0.17, 0.12)
              + limbGuard('leg-r-', 0.11, 0.02, 0.62, 0.17, 0.12),
              { board: 'paperboard-tan', edge: 'paperboard-brown', tape: 'tape-grey' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A cardboard cuirass lying front up, 600 mm from the neck to the hem and 460 mm across: a front board curved
   // across the chest over a flat back board, joined by tape at the shoulders, with taped seams and bands across the
   // front where the layers are glued.
   h.compound('cardboard_cuirass', 0.7, cuirass('', 0, 0.46, 0.6, 0), { board: 'paperboard-tan', edge: 'paperboard-brown', tape: 'tape-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['torso'] } } },
 
   // A hand-cut cardboard badge lying face up, 80 mm tall and 66 mm across: a shield shape with a darker cut edge,
   // marker lettering that shrinks along each line, and a brass safety pin on the back.
@@ -106,17 +106,17 @@ local star(id, x, z, y, s=0.009) = [
     for j in std.range(0, [5, 6, 4][i] - 1)
     for s in [std.max(0.35, 1 - j * 0.14)]
   ], { board: 'paperboard-tan', edge: 'paperboard-brown', ink: 'cloth-black', pin: 'brass-polished' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['paper'], slot: ['torso'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['paper'], slot: ['torso'] } } },
 
   // A cardboard crown standing upright, 190 mm across and 110 mm tall: a 60 mm band with eight cut points, its
   // ends overlapping at the back under a strip of tape.
   h.compound('cardboard_crown', 0.03, crown(0.095, 0.06, 0.05), { board: 'paperboard-tan', edge: 'paperboard-brown', tape: 'tape-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['paper'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['paper'], slot: ['head'] } } },
 
   // The same crown let out to fit over a hat, 220 mm across: a darker strip of board taped in at the back widens the
   // band, so the seam tape is long.
   h.compound('loosened_cardboard_crown', 0.04, crown(0.11, 0.06, 0.05, 8, 0.004, 24), { board: 'paperboard-tan', edge: 'paperboard-brown', tape: 'tape-grey' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['paper'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['paper'], slot: ['head'] } } },
 
   // A cardboard great helm standing upright, face on +z, 330 mm tall and 260 mm across: a flat-topped drum of
   // board with a flat face plate, a dark eye slit under a brow band, breathing holes low on the right, a taped cross
@@ -138,7 +138,7 @@ local star(id, x, z, y, s=0.009) = [
     for j in [0, 1, 2]
     if i + j < 4
   ], { board: 'paperboard-tan', edge: 'paperboard-brown', tape: 'tape-grey', slit: 'screen-black', lining: 'alu-bare' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['head'] } } },
 
   // A large flag folded into a thick triangle, 560 mm along the long edge and 280 mm deep: the blue field with
   // white stars on top, red and white stripes showing along the long edge where the last fold tucks in.

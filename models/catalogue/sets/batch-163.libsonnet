@@ -82,7 +82,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'cloth-blue',
     trim: 'plastic-matte-black',
     webbing: 'cloth-blue',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { taxonomy: { category: 'containers', keywords: ['toy'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A hunting pack 380 mm wide, 720 mm tall and 260 mm deep with a top lid, side pockets, side compression straps,
   // a padded hip belt and two lashing straps under the base for a bedroll or game bag.
@@ -108,7 +108,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'webbing-olive-dark',
     trim: 'plastic-matte-black',
     webbing: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A high-volume leather rucksack 420 mm wide, 820 mm tall and 300 mm deep with a deep lid, side pockets, three
   // rows of compression straps and a hip belt.
@@ -119,7 +119,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'leather-black',
     trim: 'brass-dull',
     webbing: 'leather-black',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['back'] } } },
+  }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['leather'], slot: ['back'] } } },
 
   // A flat nylon wallet pouch 120 mm by 90 mm and 15 mm thick, zipped across its top, sewn on an ankle band 300 mm
   // long and 60 mm wide with a hook-and-loop patch at one end, laid flat.
@@ -177,7 +177,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     ]
     for i in [0, 1]
     for x in [[-0.11, 0.11][i]]
-  ]), { frame: 'wood-pine', strap: 'leather-brown', buckle: 'iron-dull' }) + { taxonomy: { category: 'containers', tags: { material: ['wood', 'leather'], slot: ['back'] } } },
+  ]), { frame: 'wood-pine', strap: 'leather-brown', buckle: 'iron-dull' }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['wood', 'leather'], slot: ['back'] } } },
 
   // A trapper's pack 460 mm wide, 820 mm tall and 340 mm deep: waxed canvas stretched round a pole frame whose
   // corner posts stand proud, gathered at the top by a drawstring, with canvas shoulder straps behind.
@@ -281,5 +281,5 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     for i in [0, 1]
     for x in [[-0.18, 0.18][i]]
   ], { shell: 'plastic-charcoal', seam: 'steel-grey', handle: 'plastic-black', metal: 'metal-silver' })
-  + h.gripOn('briefcase', 'handle-grip') + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.gripOn('briefcase', 'handle-grip') + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

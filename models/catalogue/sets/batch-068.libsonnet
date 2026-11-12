@@ -40,7 +40,7 @@ local frets(n, nut, scale, half, y) = [
     box('arm-%d' % i, 'keys', [-0.063 + i * 0.029, 0.013, 0.002], [-0.057 + i * 0.029, 0.017, 0.0105])
     for i in std.range(0, 11)
   ], { body: 'metal-silver', keys: 'metal-silver', cup: 'steel-mirror', hole: 'plastic-matte-black' })
-  + h.gripOn('flute', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.gripOn('flute', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A five-string kantele, 460 mm long, 150 mm across the peg end and 70 mm across the tail, 60 mm deep: a carved
   // wooden box with a pale soundboard and a round sound hole, steel strings fanning from a tail bar to a slanted row
@@ -60,7 +60,7 @@ local frets(n, nut, scale, half, y) = [
     flatY('string-%d' % i, 'string', strip([pegs[i][0] + (pegs[i][1] + 0.05) * 0.1, pegs[i][1]], tails[i], 0.002), 0.06, 0.062)
     for i in std.range(0, 4)
   ], { box: 'wood-birch', top: 'wood-pine', hole: 'plastic-matte-black', metal: 'steel-bright', string: 'steel-mirror' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood'] } } },
 
   // A golden krar, a bowl lyre 1 m tall and 760 mm across the yoke: a round bowl sound box 360 mm across faced with
   // a skin, two arms spreading up from it to a crossbar, and six strings fanning from a tailpiece on the skin up to
@@ -81,7 +81,7 @@ local frets(n, nut, scale, half, y) = [
     rodZ('peg-%d' % i, 'frame', 0.012, -0.075, 0.0, -0.2 + i * 0.08, 0.945)
     for i in std.range(0, 5)
   ], { bowl: 'metal-gold', skin: 'brass-polished', frame: 'metal-gold', string: 'steel-mirror' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'] } } },
 
   // A soprano ukulele, 580 mm long: a figure-eight body 240 mm long, 165 mm across and 60 mm deep with a pale top, a
   // sound hole and a bridge, a neck with a dark fingerboard and twelve frets, a flat headstock with four tuners and
@@ -109,7 +109,7 @@ local frets(n, nut, scale, half, y) = [
     flatY('string-%d' % i, 'string', strip([-0.229, -0.015 + i * 0.01], [0.173, -0.012 + i * 0.008], 0.002), 0.066, 0.068)
     for i in std.range(0, 3)
   ], { sides: 'wood-oak', top: 'wood-pine', hole: 'plastic-matte-black', dark: 'wood-walnut', nut: 'bone', fret: 'steel-bright', metal: 'steel-bright', button: 'plastic-white', string: 'cord-cotton' })
-  + h.gripOn('ukulele', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'], setting: ['modern'] } } },
+  + h.gripOn('ukulele', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A full-size violin, 600 mm long: a body 355 mm long and 205 mm across with an arched top, f-holes, a bridge, a
   // black tailpiece and chin rest, a black fingerboard over the neck, a pegbox with four pegs ending in a scroll, and
@@ -143,7 +143,7 @@ local frets(n, nut, scale, half, y) = [
     flatY('string-%d' % i, 'string', strip([-0.18, -0.012 + i * 0.008], [0.186, -0.0075 + i * 0.005], 0.002), 0.058, 0.06)
     for i in std.range(0, 3)
   ], { ribs: 'wood-walnut', top: 'wood-oak', hole: 'plastic-matte-black', bridge: 'wood-pine', ebony: 'lacquer-black', string: 'steel-mirror' })
-  + h.gripOn('violin', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  + h.gripOn('violin', 'neck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood'] } } },
 
   // A steel dog whistle, 60 mm long and 10 mm across: a tube with a flattened mouthpiece, a sound window, a knurled
   // tuning sleeve and a lanyard ring at the far end.
@@ -176,5 +176,5 @@ local frets(n, nut, scale, half, y) = [
     box('tooth-%d' % i, 'blade', [0.16, 0.012, -0.038 + i * 0.0084], [0.18, 0.016, -0.034 + i * 0.0084])
     for i in std.range(0, 9)
   ], { body: 'plastic-blue', grip: 'rubber-black', switch: 'plastic-white', blade: 'steel-grey', cutter: 'steel-bright', plug: 'plastic-black' })
-  + h.gripOn('electric_shears', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + h.gripOn('electric_shears', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], place: ['farm'], setting: ['modern'] } } },
 ]

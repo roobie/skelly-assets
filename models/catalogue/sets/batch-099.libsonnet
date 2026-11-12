@@ -148,7 +148,7 @@ local beltStrap(len, w, t=0.004) = [
     box(p + '-band', 'band', [xc - 0.0546, 0.2, -0.159], [xc + 0.0546, 0.225, -0.011]),
     box(p + '-loop-l', 'collar', [xc - 0.0546, 0.36, -0.1], [xc - 0.05, 0.41, -0.07]),
     box(p + '-loop-r', 'collar', [xc + 0.05, 0.36, -0.1], [xc + 0.0546, 0.41, -0.07]),
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of boots 300 mm long, 105 mm wide and 220 mm tall, sheathed in overlapping bands of insect shell.
   bootPair('chitin_boots', 1.7, { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 }, 0.03, {
@@ -169,11 +169,11 @@ local beltStrap(len, w, t=0.004) = [
   // reinforced toe and heel and laces to the top.
   bootPair('combat_boots', 1.1, { l: 0.3, w: 0.105, s: 0.026, toe: 0.06, instep: 0.085, top: 0.22, shaft: 0.12, laces: 6 }, 0.02, {
     upper: 'nylon-coyote',
-    toe: 'polymer-fde',
+    toe: 'leather-coyote',
     sole: 'rubber-black',
-    collar: 'polymer-fde',
+    collar: 'leather-coyote',
     laces: 'webbing-black',
   }, function(p, xc) [
     box(p + '-heel-cup', 'collar', [xc - 0.0525, 0.026, -0.152], [xc + 0.0525, 0.07, -0.12]),
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 ]

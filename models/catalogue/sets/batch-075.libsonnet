@@ -52,7 +52,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     standing('top', 'steel', [[0.118, 0.011], [0.125, 0.011], [0.127, 0.006]]),
     standing('drip', 'drip', [[0.127, 0.005], [0.134, 0.0045], [0.136, 0.003]]),
   ], { mod: 'alu-anodized-black', screen: 'screen-black', button: 'steel-stainless', steel: 'steel-stainless', tank: 'plastic-clear', drip: 'plastic-black' })
-  + h.inHand('box_mod_vaporiser', 'mod') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.inHand('box_mod_vaporiser', 'mod') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['tobacco'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A personal water filter straw 225 mm long and 30 mm across: a blue tube with a grey band, a black mouthpiece cap
   // at +x and a black intake cap at -x.
@@ -62,7 +62,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('band', 'band', [[-0.020, 0.0155], [0.000, 0.0155]]),
     alongX('mouth', 'cap', [[0.085, 0.0155], [0.100, 0.0155], [0.108, 0.010], [0.1125, 0.009]]),
   ], { body: 'plastic-blue', band: 'plastic-grey', cap: 'plastic-black' })
-  + h.gripOn('filter_straw', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.gripOn('filter_straw', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['camping', 'water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A straight glass stem 120 mm long and 8 mm across ending in a 26 mm bulb with an open hole on top.
   h.compound('crackpipe', 0.01, [
@@ -71,7 +71,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     disc('hole', 'hole', 0.004, 0.0115, 0.0132, 0.050, 0),
     disc('soot', 'soot', 0.008, -0.005, 0.005, 0.050, 0),
   ], { glass: 'glass-clear', hole: 'coal-black', soot: 'plastic-scorched' })
-  + h.gripOn('crackpipe', 'stem') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
+  + h.gripOn('crackpipe', 'stem') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['recreational-drug'], tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A hand-blown spoon pipe 110 mm long: a clear glass body swelling to 32 mm at the bowl end, green swirls, a bowl
   // on top with a dark hole and a carb hole on the +z side.
@@ -84,7 +84,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     disc('bowl-hole', 'hole', 0.0065, 0.017, 0.0175, 0.030, 0),
     turned('carb', 'hole', 'z', [[0, 0], [0, 0.002], [0.001, 0.002], [0.001, 0]], [0.008, 0.002, 0.0115]),
   ], { glass: 'glass-clear', swirl: 'glass-lens-green', hole: 'coal-black' })
-  + h.inHand('glass_pipe', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
+  + h.inHand('glass_pipe', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['recreational-drug'], tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A carved briar tobacco pipe 150 mm long: a 34 mm bowl 45 mm tall at +x with a charred hole, a round shank and a
   // tapering black stem with a flat bit at -x.
@@ -109,7 +109,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     h.prism('lever', 'lever', 'z', [[0.040, 0.030], [0.040, 0.036], [-0.040, 0.042], [-0.044, 0.038], [-0.040, 0.034]], -0.010, 0.010),
     h.prism('grip', 'pad', 'z', [[-0.030, 0.0405], [-0.044, 0.0415], [-0.046, 0.0385], [-0.032, 0.0375]], -0.011, 0.011),
   ], { body: 'plastic-charcoal', housing: 'alu-bare', lever: 'steel-bright', pad: 'plastic-black', slot: 'coal-black', pin: 'steel-stainless' })
-  + h.inHand('hole_punch', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.inHand('hole_punch', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['office'], setting: ['modern'] } } },
 
   // A metal ballpoint 130 mm long and 9.6 mm across: a steel barrel with a band, a ribbed grip tapering to a cone and
   // the writing tip at +x, and a pocket clip and push button at -x.

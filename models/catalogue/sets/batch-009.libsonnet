@@ -35,7 +35,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     tip('tip-d', [-0.004, 0.0135, -0.006], 0.003),
     turned('stem', 'stem', 'x', [[0, 0], [0, 0.0012], [0.016, 0.0012], [0.016, 0]], [0.008, 0.0015, 0.022]),
   ], { bag: 'plastic-bag', seal: 'plastic-red', bud: 'plant-dried', tip: 'leaf-green', stem: 'paperboard-tan' })
-  + h.inHand('cannabis', 'film') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'plant'], setting: ['modern'] } } },
+  + h.inHand('cannabis', 'film') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'plant'], setting: ['modern'] }, keywords: ['recreational-drug'] } },
 
   // A squat 50 ml jar of wintergreen ointment, 56 mm across and 42 mm tall with its lid: white with a
   // paper label band and a green screw lid.
@@ -44,7 +44,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('label', 'label', 'y', [[0, 0], [0, 0.0264], [0.018, 0.0264], [0.018, 0]], [0, 0.006, 0]),
     turned('lid', 'lid', 'y', [[0, 0], [0, 0.028], [0.011, 0.028], [0.012, 0.026], [0.012, 0]], [0, 0.03, 0]),
   ], { jar: 'enamel-white', label: 'paper-white', lid: 'plastic-green' })
-  + h.inHand('wintergreen_ointment', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + h.inHand('wintergreen_ointment', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A pharmacy prescription vial of sedative tablets, 28 mm across and 62 mm tall, amber with a white
   // child-proof cap and a white label.

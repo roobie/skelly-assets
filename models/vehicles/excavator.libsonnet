@@ -54,17 +54,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('seat_box', 'floor', [-0.1, s.deck + 0.06, 0.5], [0.4, s.deck + 0.2, 1.05]),
     box('console', 'trim', [0.42, s.deck + 0.06, 0.48], [0.62, s.deck + 0.52, 1.08]),
   ]), { paint: s.paint, floor: 'rubber-black', trim: 'plastic-black', glass: 'glass-clear' }),
-  k.compound('excavator_cab_door', 40, std.map(left, [
-    box('skin', 'paint', [doorRear, s.deck + 0.02, s.side - 0.04], [doorFront, belt, s.side]),
-    box('top', 'paint', [doorRear, s.cabRoof - 0.12, s.side - 0.04], [doorFront, s.cabRoof - 0.06, s.side]),
-    box('stile_rear', 'paint', [doorRear, belt, s.side - 0.04], [doorRear + 0.05, s.cabRoof - 0.12, s.side]),
-    box('stile_front', 'paint', [doorFront - 0.05, belt, s.side - 0.04], [doorFront, s.cabRoof - 0.12, s.side]),
-    box('glass', 'glass', [doorRear + 0.05, belt, s.side - 0.03], [doorFront - 0.05, s.cabRoof - 0.12, s.side - 0.01]),
-    box('handle', 'trim', [doorFront - 0.2, belt - 0.12, s.side], [doorFront - 0.06, belt - 0.08, s.side + 0.02]),
-  ]), { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' }, {
-    hinge_a: ['skin', [0, 0.2, 0]],
-    hinge_b: ['skin', [0, 0.8, 0]],
-  }),
+  m.cabDoor('excavator_cab_door', 40, [doorRear, doorFront], [s.deck + 0.02, belt, s.cabRoof - 0.12, s.cabRoof - 0.06], s.side, s.paint, left),
   k.compound('excavator_windscreen', 18, [
     left(box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.28, s.cabIn + 0.06], [s.cabFront - 0.015, s.cabRoof - 0.06, s.side - 0.06])),
   ], { glass: 'glass-clear' }),

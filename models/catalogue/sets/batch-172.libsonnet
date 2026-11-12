@@ -317,7 +317,7 @@ local mailBundle(o) =
                for s in sides
              ]),
              { plate: 'plastic-matte-black', edge: 'plastic-charcoal', strap: 'hook-loop-grey', buckle: 'plastic-charcoal', band: 'felt-grey' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A lacquered lamellar armour laid out flat, 1.3 m from collar to toe: the box cuirass of six laced rows of
   // black lames, a broad laced shoulder board either side, four laced skirt panels hanging below, cloth sleeves set
@@ -403,7 +403,7 @@ local mailBundle(o) =
                ][i]]
              ],
              { cloth: 'canvas-grey', steel: 'steel-bright', rust: 'rust-red', zinc: 'steel-galvanised', string: 'cord-cotton' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A tyre-rubber suit laid out flat, 1.3 m from collar to toe: curved chunks cut from tyres, chevron tread up, over
   // the chest, back, arms and legs, strung together with string at their corners.
@@ -449,7 +449,7 @@ local mailBundle(o) =
                ][i]]
              ],
              { rubber: 'rubber-black', lug: 'rubber-tread', string: 'cord-cotton' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A beekeeper's coverall folded square, 360 mm by 300 mm and 80 mm thick: white cotton, a zipped front, a
   // stand collar, a flapped chest pocket, the sleeves folded in along the sides, and the elastic ankle straps with
@@ -468,7 +468,7 @@ local mailBundle(o) =
                for i in [0, 1]
              ]),
              { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-cream', button: 'cloth-cream', pocket: 'cloth-cream', flap: 'cloth-cream', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal', strap: 'cloth-cream', tab: 'hook-loop-grey' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], place: ['farm'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dog-handler's bite suit folded into a thick bundle, 460 mm by 380 mm and 160 mm tall: denim outer quilted in
   // raised channels over the padding strips, a stand collar, a zipped front, the padded sleeves rolled along both

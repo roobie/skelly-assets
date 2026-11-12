@@ -33,7 +33,8 @@ local duffel(l, r) =
     box('grip', 'grip', [-hx - 0.03, reach - 0.012, -0.022], [hx + 0.03, reach + 0.008, 0.022]),
   ];
 local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body: body, trim: 'webbing-black', grip: 'plastic-matte-black' })
-  + h.inHand(id, 'grip') + { voxelGrain: 0.004 };
+  + h.inHand(id, 'grip') + { voxelGrain: 0.004 }
+  + { taxonomy: { category: 'containers', tags: { material: ['fabric'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel'] } };
 [
   // A canvas loot sack about 380 mm tall and 320 mm across when stuffed, its neck gathered and tied with cord
   // above a short tuft of cloth.
@@ -91,7 +92,7 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
     box('strap-right', 'trim', [0.055, 0.03, -0.11], [0.11, 0.42, -0.085]),
     box('back-pad', 'trim', [-0.13, 0.06, -0.095], [0.13, 0.3, -0.085]),
   ], { body: 'nylon-red', trim: 'nylon-black', grip: 'plastic-matte-black', mesh: 'mesh-black' })
-  + h.inHand('travelpack', 'grab-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  + h.inHand('travelpack', 'grab-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A woven straw basket 360 mm tall and 320 mm across at the mouth, flaring from its base, under a domed lid with a
   // loop handle, with woven rings every 60 mm and two leather shoulder straps on its back.
@@ -110,14 +111,14 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
   + h.inHand('wicker_backpack', 'lid-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plant'], slot: ['back'] } } },
 
   // A lycra gym duffel 560 mm long and 280 mm across.
-  gym('large_gym_bag', 0.6, 0.56, 0.14, 'nylon-red') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('large_gym_bag', 0.6, 0.56, 0.14, 'nylon-red'),
 
   // A lycra gym duffel 480 mm long and 240 mm across.
-  gym('gym_bag', 0.59, 0.48, 0.12, 'cloth-navy') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('gym_bag', 0.59, 0.48, 0.12, 'cloth-navy'),
 
   // A lycra gym duffel 420 mm long and 210 mm across.
-  gym('small_gym_bag', 0.46, 0.42, 0.105, 'cloth-charcoal') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('small_gym_bag', 0.46, 0.42, 0.105, 'cloth-charcoal'),
 
   // A lycra gym duffel 640 mm long and 320 mm across.
-  gym('extra_large_gym_bag', 0.75, 0.64, 0.16, 'cloth-blue') + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  gym('extra_large_gym_bag', 0.75, 0.64, 0.16, 'cloth-blue'),
 ]

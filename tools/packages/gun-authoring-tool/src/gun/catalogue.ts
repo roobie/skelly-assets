@@ -14,6 +14,7 @@ import {
   string,
 } from 'valibot';
 import content from '../../../../../models/guns/tables/catalogue.json' with { type: 'json' };
+import { compareCodeUnits } from './compareCodeUnits.ts';
 import { gunDomain } from './domain.ts';
 import { GUN_FINISH_SLOTS, GUN_PALETTE } from './palette.ts';
 
@@ -79,7 +80,7 @@ export const loadPartCatalogue = (raw: unknown, domain: Domain = gunDomain): Par
   const placement = new Set(parsed.placementParams);
   const items = parsed.parts.filter(isItem);
   const sorted = (table: Readonly<Record<string, string>>) =>
-    Object.entries(table).sort(([a], [b]) => a.localeCompare(b));
+    Object.entries(table).sort(([a], [b]) => compareCodeUnits(a, b));
   // Finish is identity too: a different finish of the same construction is its own item.
   const identities = items.map(({ family, params, finish }) =>
     JSON.stringify([family, sorted(params), sorted(finish)]),

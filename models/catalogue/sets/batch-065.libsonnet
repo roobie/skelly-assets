@@ -59,7 +59,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('sight-rear', 'trim', [0.08, 0.06, -0.008], [0.09, 0.074, 0.008]),
   ], { stock: 'plastic-yellow', body: 'plastic-blue', muzzle: 'plastic-orange', trim: 'plastic-black', metal: 'steel' }) + h.gripOn('air_launcher', 'grip') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A hand-held air horn, 22 cm tall: a 66 mm can of compressed gas with a red plastic horn screwed on top and a
   // push button on the cap; the horn's bell faces +z.
@@ -160,7 +160,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     for i in std.range(0, 7)
   ], {
     bell: 'steel-grey', rim: 'steel-bright', mouth: 'coal-black', strap: 'rubber-black',
-  }) + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  }) + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['farm'] } } },
 
   // A dressage whip, 110 cm long: a rubber-capped handle with a braided grip, a slim tapering black shaft and a
   // short nylon lash at the tip (+x).
@@ -192,7 +192,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('hinge', 'collar', [0.175, 0.0, -0.012], [0.188, 0.034, 0.012]),
   ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + h.gripOn('folding_shovel', 'grip') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A human skull, 19 cm front to back, face on +z, its bone covered in dark etched rings and lines.
   h.compound('etched_skull', 0.8, [
@@ -232,7 +232,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
       for i in std.range(0, 2)
     ]
     for e in [['a', -0.252], ['b', 0.25]]
-  ]), { fur: 'fur-brown', tie: 'skin-rawhide', hide: 'leather-tan' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather'], setting: ['prehistoric'] } } },
+  ]), { fur: 'fur-brown', tie: 'skin-rawhide', hide: 'leather-tan' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['leather'], setting: ['prehistoric'] } } },
 
   // A pencil glass cutter, 16 cm long: an aluminium oil-reservoir handle with a rubber band, a brass neck and head
   // with breaking notches, and a steel wheel at the tip (+x).
@@ -286,7 +286,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     for i in std.range(0, 4)
   ], { body: 'paint-cream', recess: 'coal-black', feet: 'plastic-charcoal', knob: 'plastic-black', lamp: 'plastic-orange', grille: 'steel-bright' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cold-weather'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // Hand bellows, 52 cm long: two pear-shaped oak boards with handles at -x, pleated leather between them, and a
   // brass nozzle at +x.

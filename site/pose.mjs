@@ -1,7 +1,8 @@
 // The posing page: the doll, bare or dressed, bent at its rig's joints (rig.json, from tools/dollRig.mjs) by a pose
 // file, by sliders, by two-bone IK or by a clip, its worn pieces riding the parts they are drawn in, so a wearable's fit
 // can be reviewed in a pose and a pose or a clip authored by hand. A clearance probe marks where the body shows through
-// a piece or a piece sinks into the body (clearance.mjs).
+// a piece or a piece sinks into the body (clearance.mjs), and the skin check counts the covered body a camera sees
+// (skin.mjs).
 //
 // The figure is a hierarchy of one three.js joint per bone, each at its bone's head, with the doll part node and the
 // piece sites a bone binds attached under it; a clip frame's quaternions go straight onto the joints, which composes
@@ -11,16 +12,17 @@
 // figure with its controls, and `window.showPose` loads a fixture by name or a pose file object into them.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { clearanceProbe } from './clearance.mjs';
+import { clearanceProbe, coveredSurface } from './clearance.mjs';
+import { clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
-import { clipIssues, compilePose, decodeFrame, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
-import { samplePose } from './poseSample.mjs';
+import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
+import { addCoveredSkin, skinCheck } from './skin.mjs';
 import { drawEye, drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
-const ISSUE_COLOUR = { pokes: 0xd0301a, sinks: 0xe0901a };
+const ISSUE_COLOUR = { pokes: 0xd0301a, flush: 0xb03ab0, sinks: 0xe0901a };
 const IDENTITY_Q = [0, 0, 0, 1];
 // The doll at rest, standing on the ground: the page's pose until a fixture is chosen.
 const standing = (rig) => ({ rig: { id: rig.id, revision: rig.revision }, ground: true });
@@ -65,12 +67,13 @@ function boundPart(bone, groups) {
   return found[0];
 }
 
-// Every mesh under `object` as one triangle mesh in world axes.
+// Every drawn mesh under `object` as one triangle mesh in world axes; what a worn piece hides (hiding.mjs) is not drawn,
+// so it is neither probed nor counted as showing.
 function worldMesh(object) {
   const positions = [], indices = [];
   const p = new THREE.Vector3();
   object.traverse((o) => {
-    if (!o.isMesh) return;
+    if (!o.isMesh || !o.visible) return;
     const base = positions.length / 3;
     const { attributes: { position }, index } = o.geometry;
     for (let i = 0; i < position.count; i++) positions.push(...p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).toArray());
@@ -81,8 +84,10 @@ function worldMesh(object) {
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
-// joint, and `probe` is the clearance probe of the figure at rest. A piece rides the bone of the part copy it is drawn
-// in (its site's part and side); what no bone carries, such as a wearable placed whole, stays where the dressing put it.
+// joint, `pieces` lists the worn pieces with the bones they ride, and `clearance()` gives the figure's covered surface
+// at rest and the clearance probe over it, made when first asked for, since a figure drawn only to be looked at needs
+// neither. A piece rides the bone of the part copy it is drawn in (its site's part and side); what no bone carries,
+// such as a wearable placed whole, stays where the dressing put it.
 export async function buildFigure(data, wear) {
   const { rig } = data;
   const sites = dressedSites(data, wear);
@@ -112,11 +117,20 @@ export async function buildFigure(data, wear) {
   });
   root.updateMatrixWorld(true);
   for (const { bone, part, pieces } of bound) {
-    rest.body.push({ bone: bone.id, mesh: worldMesh(part) });
+    const mesh = worldMesh(part);
+    if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, mesh });
     for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, mesh: worldMesh(group) });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));
-  return { rig, root, marks, bones, probe: clearanceProbe(rig, rest, { margin: rig.clearance.marginMetres }) };
+  let clearance;
+  const covered = () => {
+    if (!clearance) {
+      const surface = coveredSurface(rig, rest);
+      clearance = { surface, probe: clearanceProbe(rig, rest, surface) };
+    }
+    return clearance;
+  };
+  return { rig, root, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
@@ -128,10 +142,10 @@ export function applyFrame(figure, frame) {
   figure.root.updateMatrixWorld(true);
 }
 
-// Runs the clearance probe on the figure in `frame`, marking its findings: pokes in red, sinks in orange, drawn through
-// whatever hides them.
+// Runs the clearance probe on the figure in `frame`, marking its findings: pokes in red, flush points in purple, sinks
+// in orange, drawn through whatever hides them. Seams are the garment overlapping itself, so they are not marked.
 function probe(figure, frame) {
-  const found = figure.probe(boneTransforms(figure.rig.bones, decodeFrame(frame)));
+  const found = figure.clearance().probe(boneTransforms(figure.rig.bones, decodeFrame(frame)));
   figure.marks.clear();
   for (const [kind, color] of Object.entries(ISSUE_COLOUR)) {
     const points = found[kind].flatMap(({ point }) => point);
@@ -174,10 +188,10 @@ const slerp = (() => {
 // clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
 const spanOf = (clip, walkSpeed) => {
   if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / walkSpeed;
-  return clip.loop ? clip.periodSimSeconds : clip.durationSimSeconds ?? clip.durationRealSeconds;
+  return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
 // A clip at `phase`, 0 to 1 of its span; a loop's cursor is its phase, a finite clip's its seconds.
-const clipAt = (clip, phase, span) => samplePose(clip, clip.loop ? phase : phase * span, slerp);
+const clipAt = (clip, phase, span) => sampleClip(clip, clip.loop ? phase : phase * span, slerp);
 // A clip of the rig's frames, its span stated the way its loop needs.
 const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), frames });
 
@@ -280,12 +294,26 @@ function carry(figure, items, { model, r, t }) {
   return obj;
 }
 
+// The figure the last call drew, kept for the next while it asks for the same wear, so a sweep through poses builds
+// the figure and its probe once.
+let kept;
+async function keptFigure(data, wear, skin) {
+  const key = JSON.stringify({ wear, skin });
+  if (kept?.key !== key) {
+    const figure = await buildFigure(data, wear);
+    if (skin) addCoveredSkin(figure, figure.clearance().surface);
+    kept = { key, figure };
+  }
+  return kept.figure;
+}
+
 // The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, holding what the pose holds,
 // drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, or from its own eyes when
-// `views` is `eye`, with the compile report, the clearance probe's findings when asked and the frame the pose compiled to.
-async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, focus } = {}) {
+// `views` is `eye`, with the pieces that ride its bones, the compile report, the clearance probe's findings and the
+// skin check when asked, and the frame the pose compiled to.
+async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false, focus } = {}) {
   const data = await ready;
-  const figure = await buildFigure(data, wear);
+  const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
   const items = await heldItems(file);
   const { frame, report, held } = compilePose(data.rig, file, { meshOf: (model) => items.get(model).mesh });
@@ -298,7 +326,12 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
   const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carried] };
   const png = views === 'eye' ? drawEyeTile(figure.root, size, figure) : drawTile(figure.root, size, views, closeUp);
-  return { png, report, clearance: found, frame };
+  // The marks would draw over the skin check's masks.
+  figure.marks.clear();
+  const skinFound = skin ? skinCheck(figure.root, size, views) : null;
+  // The figure is kept for the next call, which holds what its own pose holds.
+  for (const obj of carried) figure.root.remove(obj);
+  return { png, pieces: figure.pieces, report, clearance: found, skin: skinFound, frame };
 }
 
 window.posed = posed;
@@ -439,8 +472,13 @@ async function startPage(data, query) {
     bones.set(state.angles);
     setNumbers(ROOT, state.root);
     if ($('probe').checked) {
-      const { pokes, sinks } = probe(figure, frame);
-      $('probe-report').textContent = [`${pokes.length} poke, ${sinks.length} sink`, pokes.length ? `pokes: ${countBy(pokes, 'bone')}` : '', sinks.length ? `sinks: ${countBy(sinks, 'piece')}` : ''].filter(Boolean).join('\n');
+      const { pokes, flush, sinks, seams } = probe(figure, frame);
+      $('probe-report').textContent = [
+        `${pokes.length} poke, ${flush.length} flush, ${sinks.length} sink, ${seams.length} seam`,
+        pokes.length ? `pokes: ${countBy(pokes, 'bone')}` : '',
+        flush.length ? `flush: ${countBy(flush, 'bone')}` : '',
+        sinks.length ? `sinks: ${countBy(sinks, 'piece')}` : '',
+      ].filter(Boolean).join('\n');
     } else {
       figure.marks.clear();
       $('probe-report').textContent = '';

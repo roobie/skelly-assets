@@ -127,7 +127,7 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   for (const [at, { packId, name }] of selected.entries()) {
     const tool = tools[name];
     const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: ids === undefined && tool.index });
-    models.push(...written.models.map(({ id, kind, path, partNodes, label, paintable }) => ({ id, kind, pack: packId, path, nodes: partNodes, label, paintable })));
+    models.push(...written.models.map(({ id, kind, path, partNodes, label, paintable, covers }) => ({ id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers })));
     files.push(...written.files.map((file) => outputPath(packId, file)));
   }
   return { models, files };
@@ -180,7 +180,7 @@ async function buildRoster(thing, rows, ids, out, roster, pool) {
     writeFileSync(join(out, file), glb);
     console.log(`built ${file}`);
     const row = roster.get(id);
-    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label, paintable: modelEntry.paintable });
+    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label, paintable: modelEntry.paintable, covers: modelEntry.covers });
   }
   return { failed, models };
 }
@@ -229,7 +229,8 @@ async function main() {
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
-    const { problems } = taxonomyReport(taxonomies, vocabulary);
+    const { unlisted, problems } = taxonomyReport(taxonomies, vocabulary);
+    for (const { message } of unlisted) console.log(`TAXONOMY note: ${message}`);
     for (const { message } of problems) console.log(`TAXONOMY ${message}`);
     if (problems.length > 0) process.exit(1);
   }

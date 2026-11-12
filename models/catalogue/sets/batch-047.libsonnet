@@ -96,7 +96,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     h.rod('cap', 'cap', 0.0135, 0.104, 0.124, 0.0135),
     box('label', 'label', [-0.055, 0.006, -0.03], [0.02, 0.007, 0.03]),
   ], { body: 'plastic-clear-blue', cap: 'plastic-blue', label: 'plastic-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] }, keywords: ['camping'] } },
 
   // A brushed stainless steel water bottle for 750 ml, 73 mm across and 260 mm tall with a rounded shoulder, a
   // black screw cap and a carry loop on top.
@@ -139,7 +139,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     ]
     for i in [0, 1, 2]
   ]), { steel: 'steel-grey', brass: 'brass', crown: 'brass-dull', knob: 'plastic-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A butcher's knife roll laid open, 400 mm by 320 mm: a waxed canvas sheet with leather edging and a leather pocket
   // strip along the back holding a cleaver, a butcher knife, a boning knife, a skinning knife and a honing steel,

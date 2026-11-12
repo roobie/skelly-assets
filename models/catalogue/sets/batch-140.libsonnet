@@ -175,7 +175,7 @@ local mailCoif(id, mass) = hood(id, mass, {
       for y in [0.065 + 0.01 * i]
     ],
     fin: { cloth: 'felt-grey', stitch: 'cloth-black', trim: 'cloth-black', face: 'screen-black' },
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head', 'face'] } } },
+  }) + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['head', 'face'] } } },
 
   // A flame-resistant knit hood standing upright, 370 mm across its bib and 310 mm tall: a snug hood with a bound
   // face opening and a long bib that tucks under a collar, ribbed where it gathers at the neck.
@@ -185,7 +185,7 @@ local mailCoif(id, mass) = hood(id, mass, {
     mantle: { side: 0.055, fb: 0.08, hemSide: 0.06, back: 0.02, folds: 5, fold: 0.01 },
     rows: spread(0.104, 0.12, 3),
     fin: { cloth: 'knit-fr', stitch: 'knit-fr', trim: 'cloth-charcoal', face: 'cloth-black' },
-  }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  }) + { taxonomy: { category: 'armour', keywords: ['firefighting', 'safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A yellow vinyl rain hood standing upright, 340 mm across and 325 mm tall: a loose hood with a stiffened peak over
   // the face, a seam up the back and a drawstring with toggles at the chin.
@@ -226,5 +226,5 @@ local mailCoif(id, mass) = hood(id, mass, {
     box('tie-l', 'tie', [-0.05, 0.0, 0.188], [-0.044, 0.07, 0.202]),
     box('tie-r', 'tie', [0.044, 0.0, 0.188], [0.05, 0.07, 0.202]),
   ], { hat: 'cloth-bright-white', cloth: 'cloth-bright-white', trim: 'cloth-cream', veil: 'mesh-black', tie: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head', 'face'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['farm'], setting: ['modern'], slot: ['head', 'face'] } } },
 ]

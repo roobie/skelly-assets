@@ -190,7 +190,7 @@ local dummy(id, massKg, armour) =
     box('stalk-%d' % i, 'dark', [p[0] - 0.002, 0, p[1] - 0.002], [p[0] + 0.002, 0.016, p[1] + 0.002])
     for i in std.range(0, 11)
   ], { straw: 'straw-pale', arm: 'straw-pale', tie: 'silk-cord-crimson', dark: 'plant-dried' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plant'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plant'] }, keywords: ['toy'] } },
 
   // A cut sunflower head 260 mm across lying face up: a domed brown disc of seeds 170 mm across ringed with
   // yellow petals over green bracts, with a stub of stalk behind.

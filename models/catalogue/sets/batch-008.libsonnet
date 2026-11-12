@@ -43,7 +43,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     box('band', 'band', [-0.0255, 0.012, -0.013], [0.0255, 0.03, 0.013]),
     turned('sign', 'sign', 'z', [[0, 0], [0, 0.011], [0.0015, 0.011], [0.0015, 0]], [0, 0.062, 0.0125]),
     turned('trefoil', 'trefoil', 'z', [[0, 0], [0, 0.004], [0.002, 0.004], [0.002, 0]], [0, 0.062, 0.0125]),
-  ], { carton: 'paint-police-blue', band: 'paper-white', sign: 'plastic-yellow', trefoil: 'plastic-black' }) + inHand('prussian_blue', 'carton') + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { carton: 'paint-police-blue', band: 'paper-white', sign: 'plastic-yellow', trefoil: 'plastic-black' }) + inHand('prussian_blue', 'carton') + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['radiation'] } },
 
   // A sealed single-use olive foil sachet of clotting powder, 50 mm by 70 mm and lying flat, with a white
   // printed panel, a red stripe and crimped ends.
@@ -65,7 +65,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     rod('port-b', 'port', 0.0035, -0.092, -0.07, 0.009) + { origin: [-0.092, 0.009, 0.014] },
     rod('cap-a', 'cap', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, -0.014] },
     rod('cap-b', 'tip', 0.004, -0.1, -0.092, 0.009) + { origin: [-0.1, 0.009, 0.014] },
-  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + h.label('label', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bag: 'plastic-clear', label: 'paper-white', port: 'plastic-white', cap: 'plastic-blue', tip: 'plastic-red' }) + inHand('saline', 'bag') + h.label('label', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
 
   // A reused 250 ml trigger spray bottle of homemade deodorising wash, 55 mm across and 200 mm tall,
   // labelled with a strip of tape.
@@ -130,7 +130,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
   // child-proof cap and a white label.
   bottle('tramadol', 0.035, 0.0165, 0.058, 0.0165, 0.0175, 0.012,
          { body: 'plastic-amber', label: 'paper-white', cap: 'plastic-blue' },
-         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A wide-mouthed 100-tablet supplement bottle, 60 mm across and 110 mm tall, white with an orange
   // label and a white cap.

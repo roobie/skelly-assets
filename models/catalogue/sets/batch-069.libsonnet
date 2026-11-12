@@ -95,7 +95,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   h.compound('forged_shears', 0.43, sheepShears(false),
              { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + h.gripOn('forged_shears', 'handle-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // A western saddle 580 mm long and 450 mm across the skirts, with a horn, a raised cantle, a wool pad
   // beneath, stirrups on leathers each side and a bridle with its bit laid coiled on the seat.
@@ -128,7 +128,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     pad: 'cloth-navy', skirt: 'leather-tan', seat: 'leather-chestnut', horn: 'leather-chestnut',
     leather: 'leather-chestnut', stirrup: 'wood-oak', cinch: 'cord-cotton', bridle: 'leather-brown', bit: 'steel-stainless',
-  }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'] } } },
+  }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'], place: ['farm'] } } },
 
   // A portable platform scale for a horse or a cow: a 1960 by 720 mm galvanised steel deck 100 mm tall on
   // four rubber feet, under a ribbed rubber mat, with its readout lying on the mat on a short cable and a
@@ -156,13 +156,13 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     deck: 'steel-galvanised', mat: 'rubber-black', foot: 'rubber-offblack', handle: 'steel-grey',
     readout: 'plastic-white', display: 'lcd-green', key: 'plastic-blue', cable: 'plastic-black',
-  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], place: ['farm'], setting: ['modern'] } } },
 
   // Sheep shears 310 mm long like the forged pair, with plastic sleeves over the handles.
   h.compound('shears', 0.47, sheepShears(true),
              { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + h.gripOn('shears', 'grip-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['gardening'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // The portable radio below with its tuning knob pulled off and a bodged board, a copper coil, an aluminium
   // plate and loose wires taped to its back, some wires led over the top to the front.
@@ -212,5 +212,5 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ]), {
     chassis: 'plastic-black', shell: 'plastic-red', window: 'screen-black', lamp: 'plastic-white',
     antenna: 'plastic-black', tyre: 'rubber-tread', hub: 'alu-bare',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

@@ -47,7 +47,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.0085], [0.020, 0.0085], [0.024, 0.0065], [0.024, 0]], [0.008, 0.0085, 0]),
     turned('lug', 'body', 'x', [[0, 0], [0, 0.003], [0.004, 0.003], [0.004, 0]], [-0.034, 0.0085, 0]),
     turned('ring', 'ring', 'z', [[0, 0.0045], [0, 0.0065], [0.002, 0.0065], [0.002, 0.0045], [0, 0.0045]], [-0.039, 0.0085, -0.001]),
-  ], { body: 'steel-stainless', knurl: 'steel-grey', seal: 'rubber-black', cap: 'steel-stainless', ring: 'steel-bright' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'steel-stainless', knurl: 'steel-grey', seal: 'rubber-black', cap: 'steel-stainless', ring: 'steel-bright' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A curled sheet of willow bark about 260 by 90 mm and 7 mm thick, grey furrowed outside up over a pale inner layer.
   local outline = [[-0.130, -0.040], [-0.090, -0.046], [0.020, -0.044], [0.125, -0.036], [0.132, 0.030], [0.060, 0.045], [-0.060, 0.044], [-0.128, 0.034]];

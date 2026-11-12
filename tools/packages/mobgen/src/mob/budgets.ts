@@ -45,3 +45,22 @@ export const heightHeadBudgets = (genome: Genome, template: Template): Budgets =
     groups,
   };
 };
+
+/** Budgets authored at the template voxel size, for a body that keeps its size on another grid: counts
+ * scale with cell volume and triangles with cell area. */
+export const gridScaledBudgets = (genome: Genome, template: Template): Budgets => {
+  const ratio = template.voxelSize / genome.voxelSize;
+  const volume = ratio ** 3;
+  const area = ratio ** 2;
+  const { totalVoxels, totalTriangles, groups } = template.budgets;
+  return {
+    totalVoxels: { min: totalVoxels.min * volume, max: totalVoxels.max * volume },
+    totalTriangles: { min: totalTriangles.min * area, max: totalTriangles.max * area },
+    groups: Object.fromEntries(
+      Object.entries(groups).map(([name, group]) => [
+        name,
+        { ...group, min: group.min * volume, max: group.max * volume },
+      ]),
+    ),
+  };
+};

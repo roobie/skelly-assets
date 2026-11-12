@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { decodeFrame } from '../../site/clipFrames.mjs';
 import { closeHand, handAngles, handIssues, holdItem, padOf } from '../../site/fingers.mjs';
-import { compilePose, decodeFrame } from '../../site/poseFile.mjs';
+import { compilePose } from '../../site/poseFile.mjs';
 import { applyPoint, boneTransforms, dot, frameAbout, jointAngles, jointRotation, length, mat3ToQuat, mulMV, rotY, sub } from '../../site/kinematics.mjs';
 
 // A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's

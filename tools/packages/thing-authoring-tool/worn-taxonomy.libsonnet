@@ -1,8 +1,8 @@
 // Taxonomy for worn shells (models/TAXONOMY.md): the slot a shell covers is the segment its id ends in, and every shell
 // is shaped for the player body, so an author names only what the garment is.
 local taxonomy = import '../../jsonnet/lib/taxonomy.libsonnet';
-// The segments a shell id may end in, `<item>_worn_<segment>`: the names worn-fit.libsonnet's templates and the
-// hand-built shells in models/worn-clothing.libsonnet give their shells.
+// The segments a shell id may end in, `<item>_worn_<segment>`: the names worn-fit.libsonnet's templates give their
+// shells.
 local hand = import 'models/measures/hand.libsonnet';
 local segments = ['body', 'upper', 'fore', 'palm', 'pelvis', 'thigh', 'shin', 'foot', 'shaft']
                  + [hand.thumbPart(k) for k in std.range(0, hand.thumbBones - 1)]

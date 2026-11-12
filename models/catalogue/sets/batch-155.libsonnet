@@ -134,7 +134,7 @@ local mask(id, zipped) =
     box('calf-tie-drop-%d' % i, 'cord', [x - 0.004, 0, 0.17], [x + 0.004, 0.04, 0.178])
     for i in [0, 1]
     for x in [[-0.07, 0.06][i]]
-  ], { cloth: 'cloth-charcoal', waistband: 'cloth-black', seam: 'cloth-black', cord: 'cloth-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  ], { cloth: 'cloth-charcoal', waistband: 'cloth-black', seam: 'cloth-black', cord: 'cloth-black' }) + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Padded army winter trousers folded thick, 290 mm by 360 mm and 90 mm tall: quilted channels across the seat,
   // belt loops, a bellows cargo pocket and padded knee panels.
@@ -150,7 +150,7 @@ local mask(id, zipped) =
     stud: 'plastic-matte-black',
     knee: 'webbing-olive-dark',
     quilt: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // White martial arts trousers folded thin, 250 mm by 330 mm and 24 mm tall: a drawcord waist and nothing else.
   folded('martial_arts_trousers', 0.28, { w: 0.25, d: 0.33, ht: 0.024, folds: 2, loops: false }, [],
@@ -175,7 +175,7 @@ local mask(id, zipped) =
     g.strip('neck-rib-%d' % i, 'rib', [-0.08, -0.112 + 0.01 * i], [0.08, -0.112 + 0.01 * i], 0.013, 0.003, 0.001)
     for i in std.range(0, 3)
   ], { knit: 'cloth-olive-drab', rib: 'webbing-olive-dark', face: 'screen-black' }) + h.headEndOnPlusZ
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A cotton bandana folded corner to corner twice and laid flat, 390 mm along the folded edge at +z and 195 mm
   // deep: the fold rolled over, a white border inset from the hemmed edges and a scatter of white motifs on red.

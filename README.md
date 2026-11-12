@@ -91,7 +91,7 @@ for value until they are derived from our own models. See `tools/test/catalogue-
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
-Every model also needs a category and may carry facet tags, from the vocabulary in `models/taxonomy.json`.
+Every model also needs a category and may carry facet tags and keywords, from the vocabulary in `models/taxonomy.json`.
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
 `models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
 
@@ -168,6 +168,14 @@ its own development round; sharing a model does not imply universal fit. `paper_
 outside the shared producer guarantee: they have no producer, and closing that gap requires its own ruling.
 
 For pipeline ownership and authoring entry points, see `tools/README.md`.
+
+## Sounds
+
+Sounds are rows too: `models/sounds/` holds Jsonnet rows that `tools/packages/impact-synth` renders to samples,
+so a consumer ships a few numbers per sound instead of recorded audio. Only sounds the project owns live here, the
+way only models it owns do: a sound that is synthesised or recorded by us carries the same licence as the models,
+and a sampled or downloaded one would bring its own terms and make the licence page as complicated as the
+sound's origin.
 
 ## Using the assets
 

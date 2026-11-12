@@ -80,5 +80,13 @@ plans so its tuning cannot move them. See `src/mob/leaper/plan.ts`, `LEAPER_TEMP
 `src/mob/leaper/seams.ts`, `jointCracks`; `src/mob/leaper/motion.ts`, `locomotionFor`; and
 `test/boundaries.test.ts`.
 
+The security walker is a machine, not an animal, so it is its own plan: every joint is a hinge in the line of
+travel and its parts are plate that must read as built, not grown. A machine that weighs tonnes must plant
+its feet, and keyed legs slide as the body moves, so its legs are solved to ground targets while only the hull,
+head and pods are keyed. It validates at its template grid only: at boss scale it exceeds the far-LOD
+triangle cap other mobs meet, so it carries no far-LOD search. It stays standalone like the leaper and
+shares only clip plumbing with it. See `src/mob/walker/plan.ts`, `WALKER_TEMPLATE`;
+`src/mob/walker/motion.ts`, `walkerAngles`; and `src/mob/keyframes.ts`, `groundedFrame`.
+
 Population-quality assertions belong in explicit sweeps because they measure distributions rather than an
 individual body's contract. See `test/sweeps.ts`, `sweepGroup`, and `src/cli/stats.ts`.

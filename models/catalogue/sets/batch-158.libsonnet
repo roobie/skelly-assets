@@ -50,7 +50,7 @@ local cowlRibs = 32;
     flat('knot-stripe-%d' % i, 'stripe', [[-0.02, -0.215 + 0.018 * i], [0.02, -0.205 + 0.018 * i], [0.019, -0.199 + 0.018 * i], [-0.021, -0.209 + 0.018 * i]], 0.012, 0.014)
     for i in std.range(0, 1)
   ], { cloth: 'cloth-blue', stripe: 'cloth-shimmer', clip: 'metal-silver' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A green silk-look necktie rolled up as it is stored, 100 mm across and 80 mm tall: the narrow end coiled at the
   // centre, the turns rising to the wide blade outside with gold stripes slanting round it, and the pointed end of the
@@ -76,7 +76,7 @@ local cowlRibs = 32;
     h.prism('tip-stripe-%d' % j, 'stripe', 'y', [[q[1], q[0]] for q in [[x, r + 0.004], [x + 0.006, r + 0.004], [x + 0.026, r + coilH1 - 0.004], [x + 0.02, r + coilH1 - 0.004]]], 0.004, 0.0055)
     for j in std.range(0, 2)
   ], { cloth: 'cloth-green', stripe: 'brass-dull' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A skinny necktie folded in half and laid flat, 710 mm long: the 50 mm blade and the 30 mm tail side by side,
   // joined at the fold, black checked in white with pointed tips.
@@ -95,7 +95,7 @@ local cowlRibs = 32;
     for j in std.range(0, 2)
     if (i + j) % 2 == 0
   ], { cloth: 'cloth-black', check: 'cloth-bright-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A set of plastic vampire fangs lying gum down, 56 mm across, 48 mm deep and 26 mm tall: a pink horseshoe of gum
   // carrying a row of white teeth, with two long pointed canines.
@@ -113,7 +113,7 @@ local cowlRibs = 32;
                for a in [-36, 36]
              ],
              { gum: 'plastic-pink', tooth: 'bone' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A white wedding veil laid loosely folded, 280 mm by 220 mm and 20 mm tall with its comb: a thin double layer of
   // fine net falling in soft folds from the comb, edged with scalloped lace, a silver comb studded with pearls

@@ -22,3 +22,4 @@ models/guns/tables/*.json
 models/mobs/**/*.json
 built/
 look/
+models/sounds/*.json

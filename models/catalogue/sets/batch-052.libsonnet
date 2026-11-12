@@ -102,7 +102,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     box('key-%d-%d' % [c, r], 'key', [-0.019 + c * 0.0135, 0.016, 0.012 + r * 0.0095], [-0.010 + c * 0.0135, 0.0175, 0.019 + r * 0.0095])
     for c in std.range(0, 2)
     for r in std.range(0, 3)
-  ], { body: 'plastic-charcoal', face: 'alu-bare', screen: 'lcd-green', key: 'plastic-grey', nav: 'steel-stainless' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-charcoal', face: 'alu-bare', screen: 'lcd-green', key: 'plastic-grey', nav: 'steel-stainless' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A handmade Yagi antenna on a 600 mm square wooden boom, pointing toward +x: a reflector, a split driven
   // element with its coax lead and four directors, copper rods running across z.
@@ -129,7 +129,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     box('page-up', 'button', [-0.072, 0.008, -0.022], [-0.064, 0.009, -0.004]),
     box('page-down', 'button', [-0.072, 0.008, 0.004], [-0.064, 0.009, 0.022]),
     box('power', 'button', [0.040, 0.002, -0.0585], [0.055, 0.005, -0.0575]),
-  ], { back: 'alu-bare', bezel: 'plastic-charcoal', screen: 'paper-white', button: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { back: 'alu-bare', bezel: 'plastic-charcoal', screen: 'paper-white', button: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A hand-built port probe, 125 by 75 by 45 mm, lying face up: a rubber-bumpered box with a small display and
   // keys, a bank of plugs and sockets across its top end (-z) and down one side, and two flying leads.

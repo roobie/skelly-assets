@@ -21,7 +21,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     ringY('core', 'core', 0.020, 0.022, 0, 0.100),
     h.box('tail', 'paper', [-0.045, 0.020, 0.054], [0.040, 0.098, 0.057]),
     h.box('perforation', 'perforation', [-0.045, 0.058, 0.057], [0.040, 0.060, 0.058]),
-  ], { paper: 'paper-white', core: 'paperboard-tan', perforation: 'cloth-cream' }) + { voxelGrain: 0.002 } + h.inHand('toilet_paper', 'roll') + { taxonomy: { category: 'household', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { paper: 'paper-white', core: 'paperboard-tan', perforation: 'cloth-cream' }) + { voxelGrain: 0.002 } + h.inHand('toilet_paper', 'roll') + { taxonomy: { category: 'household', tags: { material: ['paper'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A battery toothbrush, 230 mm long: a 29 mm thick handle with a power button, a slim neck and a round brush head.
   h.compound('electric_toothbrush', 0.089, [
     h.turned('body', 'body', 'x', [[0, 0], [0, 0.013], [0.006, 0.0145], [0.150, 0.0135], [0.172, 0.006], [0.172, 0]], [0, 0.0145, 0]),
@@ -33,7 +33,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.disc('bristles', 'bristles', 0.0062, 0.0185, 0.029, 0.218, 0),
   ], { body: 'plastic-gloss-white', band: 'plastic-blue', button: 'plastic-blue', bristles: 'plastic-clear-blue' }) + h.gripOn('electric_toothbrush', 'body') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A manual toothbrush, 180 mm long: a flat handle with a rubber thumb pad, a thin neck and a tufted head.
   h.compound('toothbrush', 0.02, [
     h.box('handle', 'handle', [0, 0, -0.0065], [0.110, 0.010, 0.0065]),
@@ -45,7 +45,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.box('bristles-tip', 'tip', [0.153, 0.018, -0.0048], [0.162, 0.020, 0.0048]),
   ], { handle: 'plastic-blue', grip: 'rubber-white', bristles: 'plastic-gloss-white', tip: 'plastic-clear-blue' }) + h.gripOn('toothbrush', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], place: ['bathroom'], setting: ['modern'] }, keywords: ['hygiene'] } },
   // A cotton canvas hammock rolled for carrying: a 320 mm roll 90 mm across, tied twice, gathered at each end into a rope loop.
   h.compound('hammock', 0.82, [
     h.rod('roll', 'cloth', 0.045, -0.160, 0.160, 0.045),
@@ -53,7 +53,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     ringX('stripe-b', 'stripe', 0, 0.0455, 0.080, 0.110, 0.045),
     ringX('tie-a', 'rope', 0, 0.048, -0.040, -0.030, 0.045),
     ringX('tie-b', 'rope', 0, 0.048, 0.030, 0.040, 0.045),
-  ] + gatheredEnds('cloth', 'rope', 0.160, 0.045, 0.045), { cloth: 'cloth-canvas', stripe: 'cloth-orange', rope: 'cord-cotton' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], state: ['folded'] } } },
+  ] + gatheredEnds('cloth', 'rope', 0.160, 0.045, 0.045), { cloth: 'cloth-canvas', stripe: 'cloth-orange', rope: 'cord-cotton' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], state: ['folded'] }, keywords: ['camping'] } },
   // A cord net hammock bundled for carrying: 360 mm of gathered netting 70 mm across, tied twice, ending in rope loops.
   h.compound('hammock_net', 0.4, [
     local c = h.hexPack(0.011, [3, 2, 1])[i];
@@ -62,7 +62,7 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
   ] + [
     ringX('tie-a', 'rope', 0, 0.036, -0.060, -0.050, 0.036),
     ringX('tie-b', 'rope', 0, 0.036, 0.050, 0.060, 0.036),
-  ] + gatheredEnds('net', 'rope', 0.180, 0.030, 0.036), { net: 'cord-cotton', rope: 'jute' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], state: ['folded'] } } },
+  ] + gatheredEnds('net', 'rope', 0.180, 0.030, 0.036), { net: 'cord-cotton', rope: 'jute' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], state: ['folded'] }, keywords: ['camping'] } },
   // A small pewter serving bowl, 110 mm across and 45 mm deep on a low foot ring.
   h.compound('pewter_bowl', 0.3, [
     h.turned('bowl', 'bowl', 'y', [[0, 0], [0, 0.030], [0.005, 0.030], [0.009, 0.040], [0.025, 0.051], [0.043, 0.055], [0.045, 0.055], [0.045, 0.052], [0.026, 0.048], [0.012, 0.037], [0.008, 0.025], [0.008, 0]]),
@@ -87,5 +87,5 @@ local gatheredEnds(slot, rope, x, r, y) = std.flattenArrays([
     h.disc('knob', 'knob', 0.018, 0.128, 0.138),
     h.box('lug-a', 'pot', [-0.112, 0.074, -0.030], [-0.095, 0.086, 0.030]),
     h.box('lug-b', 'pot', [0.095, 0.074, -0.030], [0.112, 0.086, 0.030]),
-  ], { pot: 'paint-oxblood', rim: 'ceramic-white', lid: 'paint-oxblood', knob: 'ceramic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
+  ], { pot: 'paint-oxblood', rim: 'ceramic-white', lid: 'paint-oxblood', knob: 'ceramic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], place: ['kitchen'] }, keywords: ['cooking'] } },
 ]

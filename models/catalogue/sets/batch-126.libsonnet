@@ -93,18 +93,18 @@ local brimCurl(p, sx, r0, r1) =
   // A pair of holiday gloves laid flat side by side, backs up, each 250 mm from fur cuff to fingertip and 92 mm across
   // the knuckles: bright red cotton with a thick roll of white faux fur round each cuff.
   h.compound('santa_gloves', 0.08, pair(santaOpts, santa, 0.082), { hand: 'cloth-red', cuff: 'cloth-red', fur: 'fur-pale' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of padded army winter gloves laid flat side by side, backs up, each 300 mm from cuff to fingertip and
   // 100 mm across the knuckles: olive cotton quilted in channels over the back and fingers, with a gauntlet cuff
   // drawn in by a cord and toggle.
   h.compound('army_winter_gloves', 0.21, pair(armyOpts, army, 0.088), { hand: 'cloth-olive-drab', cuff: 'cloth-olive-drab', quilt: 'webbing-olive-dark', cord: 'plastic-matte-black', toggle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of knitted cotton sleeves laid flat side by side, each 740 mm long, 124 mm wide at the ribbed cuff and
   // tapering to a closed, rounded tip, with knitted bands round them.
   h.compound('tentacle_sleeves', 0.15, tentacleSleeve('l-', -0.075) + tentacleSleeve('r-', 0.075), { tube: 'cloth-green', cuff: 'cloth-cream', band: 'cloth-cream' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A ten-gallon hat standing on its brim: 440 mm across the brim, which curls up at the sides, and 190 mm tall to a
   // high crown with a crease down its top, wound with a dark band above the brim.

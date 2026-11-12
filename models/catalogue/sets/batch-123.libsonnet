@@ -169,7 +169,7 @@ local medicalOpts = { t: 0.006, ct: 0.006, w: 0.084, fw: 0.017, fl: 1.08, cuff: 
   // A pair of knitted aramid cut-resistant gloves laid flat, backs up, each 230 mm from cuff to fingertip, with a ribbed
   // knit cuff and an overlocked orange edge.
   h.compound('cut_resistant_gloves', 0.08, pair(cutOpts, extra=ribs(cutOpts, 4)), { hand: 'aramid-gold', cuff: 'aramid-gold', hem: 'cloth-orange' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of olive overhand protectors laid flat side by side, outside up: padded shields 210 mm long and 110 mm wide
   // shaped to the back of the hand and closed fingers, with flex seams, an elastic finger loop and a wrist strap.
@@ -183,5 +183,5 @@ local medicalOpts = { t: 0.006, ct: 0.006, w: 0.084, fw: 0.017, fl: 1.08, cuff: 
 
   // A pair of thin latex examination gloves laid flat, backs up, each 260 mm from the rolled cuff to the fingertips.
   h.compound('examination_gloves', 0.012, pair(medicalOpts), { hand: 'plastic-frosted', cuff: 'plastic-frosted', hem: 'plastic-frosted' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['rubber'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['safety-gear'], tags: { material: ['rubber'], place: ['hospital'], setting: ['modern'], slot: ['hands'] } } },
 ]
