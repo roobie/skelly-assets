@@ -93,6 +93,22 @@ test('a piece driven into the body inside another piece is a seam, not a sink', 
   assert.ok(sleeveSinks.length > 0 && sleeveSinks.every(({ point }) => point[1] < -0.4), 'the sleeve sinks only below the cuff');
 });
 
+test('a piece that declares the regions it covers passes beneath none of its part\'s other regions', () => {
+  // A torso of a trunk and shoulders standing proud of it, as the export marks its regions, and a top over the trunk
+  // whose side walls rise beneath the shoulders' sides, as a tank top's armholes lie beneath the deltoids.
+  const torso = [boxMesh([0.4, 0.4, 0.2], [0, 0.2, 0]), boxMesh([0.5, 0.2, 0.2], [0, 0.5, 0])];
+  const spine = { bones: [{ id: 'spine', head: [0, 0, 0], tail: [0, 0.6, 0] }] };
+  const torsoBody = [{ bone: 'spine', part: 'torso', mesh: { ...union(...torso), pieces: [...Array(12).fill('trunk'), ...Array(12).fill('shoulders')] } }];
+  const top = (width, covers) => ({ piece: 'top', bone: 'spine', covers, mesh: boxMesh([width, 0.517, 0.22], [0, 0.25, 0]) });
+  const probe = (piece) => clearanceProbe(spine, { body: torsoBody, pieces: [piece] })(new Map([['spine', still.get('upper')]]));
+  // Counted, since a failing deep comparison of thousands of findings builds a diff that exhausts memory.
+  const counted = (findings) => Object.fromEntries(Object.entries(findings).map(([kind, list]) => [kind, list.length]));
+  assert.deepEqual(counted(probe(top(0.42, ['trunk']))), counted(clean), 'the bare shoulders are not meant to be covered');
+  assert.ok(probe(top(0.42, undefined)).pokes.length > 0, 'without a declaration the shoulders are meant to be covered');
+  const { pokes } = probe(top(0.38, ['trunk']));
+  assert.ok(pokes.length > 0 && pokes.every(({ point }) => point[1] <= 0.4), 'a top too narrow for the trunk it covers still lets it poke');
+});
+
 test('a probe refuses a pose missing a bone', () => {
   const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12)] });
   assert.throws(() => probe(new Map([['upper', still.get('upper')]])), /no transform for bone fore/);
