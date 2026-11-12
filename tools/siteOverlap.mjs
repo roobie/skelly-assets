@@ -210,7 +210,7 @@ function seatingUseProblems(fits, grain, measured) {
     const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
     if (!depths) return [`${where} is unused: no vehicle overlaps on it`];
     if (covered === 0) return [`${where} is dead: every overlap on it is deeper than ${millimetres(depth)} mm`];
-    if (covered > 0 && depth - covered > LOOSE * grain) {
+    if (depth - covered > LOOSE * grain) {
       return [`${where} is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`];
     }
     return [];

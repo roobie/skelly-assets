@@ -131,12 +131,12 @@ test('a pair no vehicle overlaps on is reported unused', () => {
 
 test('a pair or entry capped far above the overlap it covers is reported, one capped near it is not', () => {
   const roles = ['body', 'lamp'];
-  const loose = report({ van: vehicle(bodyAndLamp) }, [fit(['lamp', 'body', 0.5 + 3 * GRAIN])], roles);
+  const loose = report({ van: vehicle(bodyAndLamp) }, [fit(['lamp', 'body', 0.5 + 1.5 * GRAIN])], roles);
   assert.match(loose.problems.join(), /pair lamp and body is capped at \d+ mm, far above the \d+ mm it covers/);
   const near = report({ van: vehicle(bodyAndLamp) }, [fit(['lamp', 'body', 0.5 + GRAIN / 2])], roles);
   assert.deepEqual(near.problems, []);
   const entry = (depth) => ({ sites: ['body', 'lamp'], depth, why: 'seated' });
-  const capped = report({ van: vehicle(bodyAndLamp, { overlaps: [entry(0.5 + 3 * GRAIN)] }) });
+  const capped = report({ van: vehicle(bodyAndLamp, { overlaps: [entry(0.5 + 1.5 * GRAIN)] }) });
   assert.match(capped.problems.join(), /far above/);
   assert.deepEqual(report({ van: vehicle(bodyAndLamp, { overlaps: [entry(0.5 + GRAIN / 2)] }) }).problems, []);
 });
