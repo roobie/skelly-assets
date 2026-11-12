@@ -21,7 +21,8 @@ local s = import 'classic_4x4.spec.libsonnet';
     site.one('exhaust', 'exhaust_car', [s.rear + 0.42, 0.27, 0.42]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
     site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.77, 0]),
-    site.one('rear_bench', 'bench_seat_3', [-1.0, 0.7, 0]),
+    // A two-seat bench fits between the rear wheel arches; a three-seat one would stand on the tyres.
+    site.one('rear_bench', 'bench_seat_2', [-1.0, 0.7, 0]),
     site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.2, 0]),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.37, 0]),
   ]
@@ -35,10 +36,4 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
-  unjudged: [
-    site.unjudged('rear_bench', 'rear_wheel_far', 0.063,
-      'The base piece of bench_seat_3 runs into the tyre_far piece of wheel_265_75r16.'),
-    site.unjudged('rear_bench', 'rear_wheel_near', 0.063,
-      'The base piece of bench_seat_3 runs into the tyre piece of wheel_265_75r16.'),
-  ],
 }
