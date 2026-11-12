@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { modelComponents } from '../components.mjs';
+import { formOf, modelComponents } from '../components.mjs';
 
 // A GLB holding only its JSON chunk, which is all the reader looks at.
 const glb = (gltf) => {
@@ -38,4 +38,11 @@ test('a model whose parts declare no mount does not come apart', () => {
 
 test('a skinned model does not come apart, since moving a skinned part node moves none of its vertices', () => {
   assert.equal(modelComponents(glb({ ...mounted(), skins: [{ joints: [] }] })), undefined);
+});
+
+test('an entry placing models at sites, or with several components, is an assembly; any other is an atom', () => {
+  assert.equal(formOf({ sites: [] }), 'assembly');
+  assert.equal(formOf({ components: ['frame', 'lid'] }), 'assembly');
+  assert.equal(formOf({ components: ['frame'] }), 'atom');
+  assert.equal(formOf({}), 'atom');
 });
