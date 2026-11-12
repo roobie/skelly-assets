@@ -264,7 +264,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       'A part bolted to the rails sits a few centimetres into them.',
       [
       ['air_box', 'chassis', 0.065],
-      ['alternator', 'frame', 0.083],
       ['backfill_blade', 'chassis', 0.065],
       ['bumper', 'chassis', 0.085],
       ['cab_back', 'chassis', 0.065],

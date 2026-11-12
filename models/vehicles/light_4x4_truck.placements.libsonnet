@@ -26,8 +26,4 @@ local shaftRear = s.transferX - 0.2;
     site.overlap('cab', 'air_box', 0.123,
       'The air box sits in the cab well, which is drawn as a solid block around it.'),
   ],
-  unjudged: [
-    site.unjudged('chassis', 'alternator', 0.084,
-      'The spring_0 piece of light_4x4_truck_chassis runs into the case piece of alternator_medium.'),
-  ],
 }
