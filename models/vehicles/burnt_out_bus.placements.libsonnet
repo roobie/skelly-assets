@@ -28,14 +28,14 @@ local s = import 'burnt_out_bus.spec.libsonnet';
     pair('seat_' + i, 'burnt_out_bus_seat_frame', [s.seats[i].x, s.seats[i].y, 0.72])
     for i in std.range(0, std.length(s.seats) - 1)
   ]),
-  unjudged: [
-    site.unjudged('floor', 'front_rim_far', 0.046,
-      'The deck_0_34 piece of burnt_out_bus_floor runs into the outer_band_far piece of burnt_out_bus_rim.'),
-    site.unjudged('floor', 'front_rim_near', 0.044,
-      'The deck_9_27 piece of burnt_out_bus_floor runs into the outer_band piece of burnt_out_bus_rim.'),
-    site.unjudged('floor', 'rear_rim_far', 0.046,
-      'The deck_0_9 piece of burnt_out_bus_floor runs into the outer_band_far piece of burnt_out_bus_dual_rim.'),
-    site.unjudged('floor', 'rear_rim_near', 0.047,
-      'The deck_9_13 piece of burnt_out_bus_floor runs into the outer_band piece of burnt_out_bus_dual_rim.'),
+  overlaps: [
+    site.overlap('floor', 'front_rim_far', 0.046,
+      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+    site.overlap('floor', 'front_rim_near', 0.044,
+      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+    site.overlap('floor', 'rear_rim_far', 0.046,
+      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+    site.overlap('floor', 'rear_rim_near', 0.047,
+      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
   ],
 }

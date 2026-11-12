@@ -38,16 +38,18 @@ local id = 'heavy_cargo_helicopter';
   + pair('crew_seat', id + '_crew_seat', [6.0, s.floorTop, 0.62])
   + pair('control_stick', 'control_stick', [6.35, s.floorTop, 0.62]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('sponson_far', 'fuel_tank_far', 0.4,
+      'The sponson draws a tank block of its own, and the fuel tank sits inside it.'),
+    site.overlap('sponson_near', 'fuel_tank_near', 0.4,
+      'The sponson draws a tank block of its own, and the fuel tank sits inside it.'),
+    site.overlap('windscreen', 'front_pylon', 0.074,
+      'The front pylon fairing runs up into the windscreen frame.'),
+  ],
   unjudged: [
     site.unjudged('cockpit_bulkhead', 'crew_door_far', 0.06,
       'The plate_0 piece of heavy_cargo_helicopter_cockpit_bulkhead runs into the lower_0_0_far piece of heavy_cargo_helicopter_crew_door.'),
     site.unjudged('cockpit_bulkhead', 'crew_door_near', 0.06,
       'The plate_0 piece of heavy_cargo_helicopter_cockpit_bulkhead runs into the lower_0_0 piece of heavy_cargo_helicopter_crew_door.'),
-    site.unjudged('sponson_far', 'fuel_tank_far', 0.4,
-      'The tank_far piece of heavy_cargo_helicopter_sponson runs into the tank_far piece of heavy_cargo_helicopter_fuel_tank.'),
-    site.unjudged('sponson_near', 'fuel_tank_near', 0.4,
-      'The tank piece of heavy_cargo_helicopter_sponson runs into the tank piece of heavy_cargo_helicopter_fuel_tank.'),
-    site.unjudged('windscreen', 'front_pylon', 0.074,
-      'The near_0_0 piece of heavy_cargo_helicopter_windscreen runs into the fairing_23 piece of heavy_cargo_helicopter_front_pylon.'),
   ],
 }

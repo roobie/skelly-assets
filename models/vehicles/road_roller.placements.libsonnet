@@ -27,15 +27,17 @@ local s = import 'road_roller.spec.libsonnet';
   + site.headlamps(2.02, 1.4, 0.46)
   + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('front_yoke', 'front_drum', 0.151,
+      'The front drum turns inside the yoke neck, which is drawn solid across it.'),
+    site.overlap('platform', 'fuel_tank', 0.146,
+      'The fuel tank sits against the platform spine, which is drawn solid around it.'),
+    site.overlap('platform', 'rear_drum', 0.176,
+      'The rear drum turns inside the platform spine, which is drawn solid across it.'),
+  ],
   unjudged: [
     site.unjudged('engine_hood', 'engine', 0.271,
       'The hood piece of road_roller_engine_hood runs into the block piece of engine_i3_small.'),
-    site.unjudged('front_yoke', 'front_drum', 0.151,
-      'The neck piece of road_roller_front_yoke runs into the roll piece of road_roller_drum.'),
-    site.unjudged('platform', 'fuel_tank', 0.146,
-      'The spine piece of road_roller_platform runs into the body piece of fuel_tank_car.'),
-    site.unjudged('platform', 'rear_drum', 0.176,
-      'The spine piece of road_roller_platform runs into the roll piece of road_roller_drum.'),
     site.unjudged('rear_drum', 'fuel_tank', 0.146,
       'The roll piece of road_roller_drum runs into the body piece of fuel_tank_car.'),
   ],

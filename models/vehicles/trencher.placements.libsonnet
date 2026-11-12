@@ -29,14 +29,16 @@ local track = import 'track-kit.libsonnet';
   + site.headlamps(s.hoodFront + 0.02, 1.34, 0.42)
   + site.batteryBay('battery_tray', [0.2, s.deck, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('chassis', 'digging_boom', 0.24,
+      'The digging boom\'s head sprocket is carried inside the rear tower of the chassis.'),
+    site.overlap('hood', 'engine', 0.308,
+      'The engine sits under the hood, which is drawn as a solid block around it.'),
+  ],
   unjudged: [
-    site.unjudged('chassis', 'digging_boom', 0.24,
-      'The rear_tower piece of trencher_chassis runs into the head_sprocket piece of trencher_digging_boom.'),
     site.unjudged('chassis', 'track_far', 0.087,
       'The track_beam_rear_far piece of trencher_chassis runs into the sprocket_hub_far piece of trencher_track.'),
     site.unjudged('chassis', 'track_near', 0.087,
       'The track_beam_rear_near piece of trencher_chassis runs into the sprocket_hub piece of trencher_track.'),
-    site.unjudged('hood', 'engine', 0.308,
-      'The hood piece of trencher_hood runs into the block piece of engine_i4_diesel.'),
   ],
 }

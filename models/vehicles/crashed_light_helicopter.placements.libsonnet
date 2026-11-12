@@ -22,12 +22,12 @@ local s = import 'crashed_light_helicopter.spec.libsonnet';
     one('console', 'light_helicopter_console', [1.08, s.floor, 0]),
   ]
   + pair('seat_frame', 'crashed_light_helicopter_seat_frame', [0.5, s.floor, 0.3]),
-  unjudged: [
-    site.unjudged('main_gearbox', 'seat_frame_far', 0.05,
-      'The mount piece of light_helicopter_main_gearbox runs into the back_far piece of crashed_light_helicopter_seat_frame.'),
-    site.unjudged('main_gearbox', 'seat_frame_near', 0.05,
-      'The mount piece of light_helicopter_main_gearbox runs into the back piece of crashed_light_helicopter_seat_frame.'),
-    site.unjudged('skids', 'door', 0.05,
-      'The near_front_0_0 piece of crashed_light_helicopter_skids runs into the frame piece of crashed_light_helicopter_door.'),
+  overlaps: [
+    site.overlap('main_gearbox', 'seat_frame_far', 0.05,
+      'The seat frame is shoved back into the gearbox mount.'),
+    site.overlap('main_gearbox', 'seat_frame_near', 0.05,
+      'The seat frame is shoved back into the gearbox mount.'),
+    site.overlap('skids', 'door', 0.05,
+      'The crash has pushed the skid up into the door frame.'),
   ],
 }

@@ -16,16 +16,18 @@ local site = import 'site.libsonnet';
       site.one('water_tank', 'cement_mixer_water_tank'),
     ] + site.pair('roller_stand', 'cement_mixer_roller_stand'),
   ),
+  overlaps: [
+    site.overlap('drive', 'drum', 0.238,
+      'The drum\'s head band turns on the drive pedestal, which is drawn up into it.'),
+    site.overlap('subframe', 'drive', 0.12,
+      'The drive\'s foot is bolted down into the runner of the subframe.'),
+  ],
   unjudged: [
     site.unjudged('dashboard', 'radiator', 0.06,
       'The lower piece of tipper_truck_dashboard runs into the core piece of radiator_truck.'),
-    site.unjudged('drive', 'drum', 0.238,
-      'The pedestal piece of cement_mixer_drive runs into the band_0 piece of cement_mixer_drum.'),
     site.unjudged('gearbox', 'drive', 0.09,
       'The case piece of gearbox_heavy runs into the foot piece of cement_mixer_drive.'),
     site.unjudged('gearbox', 'exhaust', 0.06,
       'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
-    site.unjudged('subframe', 'drive', 0.12,
-      'The runner_near piece of cement_mixer_subframe runs into the foot piece of cement_mixer_drive.'),
   ],
 }
