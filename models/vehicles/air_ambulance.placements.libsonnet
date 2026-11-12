@@ -23,7 +23,8 @@ local s = import 'air_ambulance.spec.libsonnet';
     one('console', 'air_ambulance_console', [2.02, 0.92, 0]),
     one('cyclic', 'control_stick', [1.6, s.floor, 0]),
     one('stretcher', 'stretcher', [-0.7, s.floor, -0.36]),
-    one('locker', 'air_ambulance_locker', [0.72, s.floor, -0.36]),
+    // The locker stands at the stretcher's head, behind the far sliding door's leading edge and its rib.
+    one('locker', 'air_ambulance_locker', [0.42, s.floor, -0.36]),
     one('attendant_seat', 'attendant_seat', [0.3, s.floor, 0.42]),
     one('tail_beacon', 'air_ambulance_beacon', [-6.98, 3.25, 0]),
     one('cowl_beacon', 'air_ambulance_beacon', [-1.5, 2.9, 0]),
@@ -43,7 +44,5 @@ local s = import 'air_ambulance.spec.libsonnet';
       'The roof_16_3 piece of air_ambulance_cabin_rear runs into the cowl_17 piece of air_ambulance_engine_cowl.'),
     site.unjudged('engine_cowl', 'main_gearbox', 0.207,
       'The pylon piece of air_ambulance_engine_cowl runs into the case piece of air_ambulance_main_gearbox.'),
-    site.unjudged('locker', 'sliding_door_far', 0.06,
-      'The carcass piece of air_ambulance_locker runs into the hinge_rib_far piece of air_ambulance_sliding_door.'),
   ],
 }
