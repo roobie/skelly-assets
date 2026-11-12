@@ -115,3 +115,21 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
     rmSync(out, { recursive: true, force: true });
   }
 });
+
+// A listed overlap that names a site the vehicle lacks, has no depth cap or gives no text would silence nothing or
+// hide why.
+test('a listed overlap names two different sites of the vehicle, its depth cap and its text', () => {
+  const entry = (textKey, extra = {}) =>
+    ({ sites: ['door_near', 'door_far'], depth: 0.05, [textKey]: 'the doors are seated in the body', ...extra });
+  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note']]) {
+    const listing = (entries) =>
+      problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites, [listKey]: entries } });
+    assert.equal(listing([entry(textKey)]), '');
+    assert.match(listing([entry(textKey, { sites: ['door_near', 'gone'] })]), /two different sites of the vehicle/);
+    assert.match(listing([entry(textKey, { sites: ['door_near', 'door_near'] })]), /two different sites of the vehicle/);
+    assert.match(listing([entry(textKey, { depth: 0 })]), /needs a depth above 0/);
+    assert.match(listing([entry(textKey, { [textKey]: '' })]), new RegExp(`needs a ${textKey}`));
+    assert.match(listing([entry(textKey, { extra: 1 })]), /unknown keys extra/);
+    assert.match(listing('door_near'), new RegExp(`${listKey} is not a list`));
+  }
+});

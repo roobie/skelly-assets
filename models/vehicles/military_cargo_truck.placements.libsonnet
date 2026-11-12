@@ -11,4 +11,8 @@ local id = 'military_cargo_truck';
     site.one('tilt', id + '_tilt'),
   ],
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('cab', 'gearbox', 0.27,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
 }

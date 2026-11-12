@@ -42,4 +42,16 @@ local wheel = id + '_wheel';
   + pair('tail_lamp', 'tail_lamp_small', [s.rear, 0.92, 0.88])
   + site.batteryBay('truck_battery_tray', [1.25, 0.9, -0.5]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('hull', 'gearbox', 0.34,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
+  unjudged: [
+    site.unjudged('frame', 'front_prop_shaft', 0.034,
+      'The cross_4 piece of light_tactical_vehicle_frame runs into the tube piece of prop_shaft_short.'),
+    site.unjudged('frame', 'rear_prop_shaft', 0.032,
+      'The cross_2 piece of light_tactical_vehicle_frame runs into the tube piece of light_tactical_vehicle_rear_prop_shaft.'),
+    site.unjudged('tailgate', 'fuel_tank', 0.052,
+      'The gate piece of light_tactical_vehicle_tailgate runs into the body piece of fuel_tank_car.'),
+  ],
 }

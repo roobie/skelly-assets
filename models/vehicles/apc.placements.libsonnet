@@ -49,4 +49,14 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
   ]
   + site.batteryBay('truck_battery_tray', [-2.75, s.floor + 0.3, 0.5]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('ammo_rack', 'wall_locker_far', 0.06,
+      'The rack piece of apc_ammo_rack runs into the locker_far piece of apc_wall_locker.'),
+    site.unjudged('nose', 'roof', 0.05,
+      'The cheek_near piece of apc_hull_nose runs into the plate piece of apc_hull_roof.'),
+    site.unjudged('radiator', 'exhaust', 0.06,
+      'The core piece of radiator_truck runs into the pipe piece of exhaust_military.'),
+    site.unjudged('rear', 'tow_hitch', 0.06,
+      'The sill piece of apc_hull_rear runs into the bar piece of tow_hitch.'),
+  ],
 }

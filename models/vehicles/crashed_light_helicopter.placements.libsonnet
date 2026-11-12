@@ -22,4 +22,16 @@ local s = import 'crashed_light_helicopter.spec.libsonnet';
     one('console', 'light_helicopter_console', [1.08, s.floor, 0]),
   ]
   + pair('seat_frame', 'crashed_light_helicopter_seat_frame', [0.5, s.floor, 0.3]),
+  unjudged: [
+    site.unjudged('main_gearbox', 'seat_frame_far', 0.05,
+      'The mount piece of light_helicopter_main_gearbox runs into the back_far piece of crashed_light_helicopter_seat_frame.'),
+    site.unjudged('main_gearbox', 'seat_frame_near', 0.05,
+      'The mount piece of light_helicopter_main_gearbox runs into the back piece of crashed_light_helicopter_seat_frame.'),
+    site.unjudged('rear_fairing', 'main_gearbox', 0.05,
+      'The bulkhead_0 piece of crashed_light_helicopter_rear_fairing runs into the case piece of light_helicopter_main_gearbox.'),
+    site.unjudged('rear_fairing', 'mast', 0.055,
+      'The wall_33_7 piece of crashed_light_helicopter_rear_fairing runs into the shaft piece of crashed_light_helicopter_mast.'),
+    site.unjudged('skids', 'door', 0.05,
+      'The near_front_0_0 piece of crashed_light_helicopter_skids runs into the frame piece of crashed_light_helicopter_door.'),
+  ],
 }

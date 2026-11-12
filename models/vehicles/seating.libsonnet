@@ -1,0 +1,405 @@
+// Which vehicle parts may sink into which, and how far. A fit is a reason and the exact pairs of roles it is true of:
+// `[seated, into, depth]` says that a part at a site of role `seated` sits in a part at a site of role `into` up to
+// `depth` metres, in either direction and for every vehicle, because of the fit's reason `why`. A role is a site id
+// without its `_near` / `_far` side and its number, so `wheel_front_near` and `wheel_front_far` are both
+// `wheel_front`, and a role is named exactly, not by a pattern. Two parts at different sites overlap only when they
+// share more than one voxel grain of depth (`tools/siteOverlap.mjs`), and a pair covers an overlap no deeper than its
+// depth. A pair that no vehicle overlaps on, that is far deeper than any vehicle's overlap, that names a role no
+// drawn site has, or that two fits list is reported. The reasons for the rule are in
+// `docs/decisions/0014-site-overlap.md`.
+local fit(why, pairs) = { why: why, pairs: pairs };
+{
+  fits: [
+    fit(
+      'A wheel is set over the hub of its axle, strut or gear leg, so the solids share the hub.',
+      [
+      ['front_wheel', 'front_axle', 0.124],
+      ['front_wheel', 'front_strut', 0.037],
+      ['main_wheel', 'gear_strut', 0.06],
+      ['middle_wheel', 'rear_axle', 0.091],
+      ['rear_inner_wheel', 'rear_axle', 0.095],
+      ['rear_wheel', 'rear_axle', 0.125],
+      ['rear_wheel', 'shock', 0.055],
+      ['wheel', 'axle', 0.065],
+      ],
+    ),
+    fit(
+      'A wheel stands in its arch, which the body draws as boxes that are not cut away around the tyre.',
+      [
+      ['front_rim', 'shell', 0.068],
+      ['front_wheel', 'crushed_nose', 0.068],
+      ['front_wheel', 'shell', 0.092],
+      ['rear_rim', 'shell', 0.068],
+      ['rear_wheel', 'shell', 0.12],
+      ['rim_rear', 'shell', 0.055],
+      ],
+    ),
+    fit(
+      'A brake disc is set on the hub of its axle.',
+      [
+      ['aft_rear_inner_wheel_brake_disc', 'aft_rear_axle', 0.055],
+      ['front_wheel_brake_disc', 'front_axle', 0.055],
+      ['rear_inner_wheel_brake_disc', 'rear_axle', 0.055],
+      ['rear_wheel_brake_disc', 'rear_axle', 0.055],
+      ],
+    ),
+    fit(
+      'A beam axle\'s diff housing and spring seats run into the rails or floor above it.',
+      [
+      ['aft_rear_axle', 'aft_shell', 0.055],
+      ['axle', 'belly', 0.092],
+      ['axle', 'chassis', 0.065],
+      ['front_axle', 'chassis', 0.055],
+      ['front_axle', 'frame', 0.085],
+      ['front_axle', 'front_pivot', 0.065],
+      ['front_axle', 'shell', 0.055],
+      ['rear_axle', 'chassis', 0.065],
+      ['rear_axle', 'frame', 0.095],
+      ['rear_axle', 'rear_body', 0.065],
+      ['rear_axle', 'shell', 0.128],
+      ],
+    ),
+    fit(
+      'A shaft ends inside the unit it drives or the shaft it joins.',
+      [
+      ['aft_prop_shaft', 'aft_gearbox', 0.037],
+      ['aft_prop_shaft', 'aft_rear_axle', 0.04],
+      ['front_prop_shaft', 'front_axle', 0.04],
+      ['front_prop_shaft', 'gearbox', 0.037],
+      ['front_prop_shaft', 'shell', 0.037],
+      ['inter_axle_shaft', 'rear_axle', 0.04],
+      ['prop_shaft', 'gearbox', 0.04],
+      ['prop_shaft', 'motor', 0.04],
+      ['prop_shaft', 'prop_shaft', 0.04],
+      ['prop_shaft', 'rear_axle', 0.04],
+      ['prop_shaft', 'rear_prop_shaft', 0.04],
+      ['prop_shaft', 'shell', 0.037],
+      ['prop_shaft', 'transfer_case', 0.04],
+      ['rear_prop_shaft', 'rear_axle', 0.04],
+      ],
+    ),
+    fit(
+      'An exhaust starts at the engine and is hung from the body, so it shares a little volume with what it leaves and hangs from.',
+      [
+      ['catalytic_converter', 'shell', 0.064],
+      ['exhaust', 'chassis', 0.085],
+      ['exhaust', 'engine', 0.065],
+      ['exhaust', 'frame', 0.085],
+      ['exhaust', 'shell', 0.085],
+      ],
+    ),
+    fit(
+      'The engine sits in its bay: its sump and mounts run into the rails, axle and bonnet around it.',
+      [
+      ['engine', 'bonnet', 0.155],
+      ['engine', 'cab', 0.067],
+      ['engine', 'chassis', 0.155],
+      ['engine', 'frame', 0.125],
+      ['engine', 'front_axle', 0.155],
+      ['engine', 'front_bumper', 0.068],
+      ['engine', 'fuselage', 0.055],
+      ['engine', 'gearbox', 0.115],
+      ['engine', 'shell', 0.097],
+      ],
+    ),
+    fit(
+      'The gearbox sits in the tunnel or bay between the rails: its case runs into the surrounding body block.',
+      [
+      ['gearbox', 'bonnet', 0.085],
+      ['gearbox', 'cab', 0.181],
+      ['gearbox', 'chassis', 0.092],
+      ['gearbox', 'frame', 0.065],
+      ['gearbox', 'shell', 0.181],
+      ['gearbox', 'tub', 0.065],
+      ],
+    ),
+    fit(
+      'The dashboard is a block that fills the cowl of the cabin shell and the tunnel below it.',
+      [
+      ['dashboard', 'gearbox', 0.19],
+      ['dashboard', 'shell', 0.245],
+      ['dashboard', 'steering_column', 0.065],
+      ],
+    ),
+    fit(
+      'A fuel tank is slung in the rails or under the floor, so its shell runs into them.',
+      [
+      ['fuel_tank', 'belly', 0.068],
+      ['fuel_tank', 'body_floor', 0.049],
+      ['fuel_tank', 'box_floor', 0.037],
+      ['fuel_tank', 'chassis', 0.151],
+      ['fuel_tank', 'frame', 0.151],
+      ['fuel_tank', 'rear_bench', 0.063],
+      ['fuel_tank', 'shell', 0.151],
+      ['tank', 'frame', 0.059],
+      ],
+    ),
+    fit(
+      'The radiator stands in its opening and the panels around it close over its frame.',
+      [
+      ['radiator', 'body', 0.065],
+      ['radiator', 'bonnet', 0.065],
+      ['radiator', 'cab', 0.055],
+      ['radiator', 'chassis', 0.065],
+      ['radiator', 'engine_cover', 0.065],
+      ['radiator', 'engine_hood', 0.065],
+      ['radiator', 'hood', 0.065],
+      ['radiator', 'house', 0.065],
+      ['radiator', 'shell', 0.065],
+      ],
+    ),
+    fit(
+      'The front bumper is a block let into the nose of the shell, with the radiator and the push bar behind it.',
+      [
+      ['front_bumper', 'push_bar', 0.065],
+      ['front_bumper', 'radiator', 0.065],
+      ['front_bumper', 'shell', 0.185],
+      ],
+    ),
+    fit(
+      'The rear bumper wraps the end of the body and the exhaust tip.',
+      [
+      ['rear_bumper', 'box', 0.065],
+      ['rear_bumper', 'exhaust', 0.055],
+      ['rear_bumper', 'shell', 0.092],
+      ],
+    ),
+    fit(
+      'A door closes into the edge of the shell and of its neighbour, whose frames are drawn to the same line.',
+      [
+      ['aft_door_aft', 'aft_door_fwd', 0.065],
+      ['door_aft', 'door_fwd', 0.065],
+      ['front_door', 'shell', 0.068],
+      ],
+    ),
+    fit(
+      'A windscreen and its frame are let into the shell\'s pillars.',
+      [
+      ['screen_frame', 'near_side', 0.058],
+      ['windscreen', 'shell', 0.063],
+      ['windscreen_frame', 'far_side', 0.051],
+      ['windscreen_frame', 'near_side', 0.051],
+      ['windscreen_frame', 'roof', 0.051],
+      ],
+    ),
+    fit(
+      'A seat or bench base is let into the floor, tunnel or tub it stands on.',
+      [
+      ['bench', 'cab', 0.13],
+      ['facing_seat', 'shell', 0.13],
+      ['front_seat', 'tub', 0.055],
+      ['rear_bench', 'shell', 0.13],
+      ['seat', 'shell', 0.055],
+      ],
+    ),
+    fit(
+      'The destination sign is let into the roof line of the bus shell.',
+      [
+      ['destination_sign', 'shell', 0.084],
+      ],
+    ),
+    fit(
+      'A headlamp or lamp is let into the panel that carries it.',
+      [
+      ['headlamp', 'front_panel', 0.055],
+      ['headlamp', 'hull', 0.055],
+      ['landing_lamp', 'belly', 0.068],
+      ['searchlight', 'belly', 0.054],
+      ['tail_lamp', 'shell', 0.065],
+      ['tail_lamp', 'tail_door', 0.055],
+      ],
+    ),
+    fit(
+      'A front panel or bonnet closes over the shell\'s edge, its grille and the engine\'s top.',
+      [
+      ['bonnet', 'chassis', 0.055],
+      ['bonnet', 'cooling_fan', 0.053],
+      ['bonnet', 'grille', 0.055],
+      ['bonnet', 'radiator_hose_upper', 0.04],
+      ['bonnet', 'shell', 0.067],
+      ['front_panel', 'shell', 0.054],
+      ],
+    ),
+    fit(
+      'A partition, bulkhead or floor is let into the walls it divides.',
+      [
+      ['bed_floor', 'bed_side', 0.055],
+      ['body_floor', 'body_side', 0.055],
+      ['body_front', 'body_side', 0.065],
+      ['box_floor', 'box_front', 0.055],
+      ['breast_bar', 'partition', 0.065],
+      ['cockpit_bulkhead', 'fuselage', 0.065],
+      ['dash', 'shell', 0.068],
+      ['floor', 'near_side', 0.065],
+      ['floor', 'side', 0.055],
+      ['partition', 'shell', 0.055],
+      ['tub_floor', 'tub_side', 0.058],
+      ],
+    ),
+    fit(
+      'Side walls are let into the roof, floor and end panels they join.',
+      [
+      ['back', 'far_side', 0.066],
+      ['back', 'near_side', 0.066],
+      ['back', 'roof', 0.068],
+      ['far_side', 'front', 0.065],
+      ['far_side', 'roof', 0.068],
+      ['front', 'roof', 0.068],
+      ['near_side', 'front', 0.065],
+      ['near_side', 'roof', 0.068],
+      ['rear', 'roof', 0.068],
+      ['side', 'roof', 0.092],
+      ],
+    ),
+    fit(
+      'A cladding plate or bolster is laid over the post it covers.',
+      [
+      ['bolster', 'stake', 0.065],
+      ['plate', 'side', 0.067],
+      ],
+    ),
+    fit(
+      'A part bolted to the rails sits a few centimetres into them.',
+      [
+      ['air_box', 'chassis', 0.065],
+      ['alternator', 'frame', 0.083],
+      ['backfill_blade', 'chassis', 0.065],
+      ['bumper', 'chassis', 0.085],
+      ['cab_back', 'chassis', 0.065],
+      ['grille', 'chassis', 0.065],
+      ['hitch', 'chassis', 0.065],
+      ['radiator_hose_lower', 'chassis', 0.044],
+      ['rear_step', 'chassis', 0.085],
+      ['rear_underrun', 'chassis', 0.085],
+      ['resting_leg', 'chassis', 0.04],
+      ['starter_motor', 'frame', 0.065],
+      ['steering_box', 'frame', 0.085],
+      ['tow_hitch', 'frame', 0.065],
+      ],
+    ),
+    fit(
+      'A hull plate or hood closes over the hull edge.',
+      [
+      ['glacis', 'hull', 0.065],
+      ['hood', 'hull', 0.045],
+      ['roof', 'hull', 0.065],
+      ],
+    ),
+    fit(
+      'A tail boom takes its rotor, fin and cone, and the fairings run into it.',
+      [
+      ['tail_boom', 'cabin_rear', 0.065],
+      ['tail_boom', 'engine_cowl', 0.09],
+      ['tail_boom', 'rear_fairing', 0.066],
+      ['tail_boom', 'tail_cone', 0.065],
+      ['tail_boom', 'tail_rotor', 0.065],
+      ['tail_boom', 'tail_surfaces', 0.125],
+      ],
+    ),
+    fit(
+      'A rotor is set on its mast and a gearbox on the mast or pylon it drives.',
+      [
+      ['front_gearbox', 'front_mast', 0.097],
+      ['front_gearbox', 'front_pylon', 0.094],
+      ['front_rotor', 'front_mast', 0.097],
+      ['main_rotor', 'mast', 0.095],
+      ['rear_gearbox', 'rear_mast', 0.097],
+      ['rear_gearbox', 'rear_pylon', 0.095],
+      ['rear_rotor', 'rear_mast', 0.092],
+      ],
+    ),
+    fit(
+      'Engine cowls and turbines close over the airframe and each other.',
+      [
+      ['cabin_rear', 'turbine', 0.044],
+      ['engine_cowl', 'mast', 0.071],
+      ['engine_cowl', 'rear_fairing', 0.067],
+      ['engine_cowl', 'roof', 0.068],
+      ['engine_cowl', 'turbine', 0.068],
+      ['engine_cowling', 'main_gearbox', 0.13],
+      ['engine_cowling', 'roof', 0.099],
+      ['engine_cowling', 'tail_cone', 0.099],
+      ['engine_cowling', 'turbine', 0.13],
+      ['tail_cone', 'turbine', 0.058],
+      ['tail_section', 'turbine', 0.065],
+      ['turbine', 'rear_fairing', 0.067],
+      ['turbine', 'roof', 0.094],
+      ],
+    ),
+    fit(
+      'A canopy and its frame close onto the seats and the fairing.',
+      [
+      ['canopy', 'canopy_frame', 0.065],
+      ['canopy', 'rear_fairing', 0.055],
+      ['canopy', 'seat_frame', 0.055],
+      ['canopy_frame', 'door', 0.04],
+      ['canopy_frame', 'rear_fairing', 0.067],
+      ['canopy_frame', 'seat', 0.065],
+      ],
+    ),
+    fit(
+      'A skid, pylon or window is let into the fuselage it is mounted on.',
+      [
+      ['cabin_windows', 'fuselage', 0.094],
+      ['cowling', 'fuselage', 0.089],
+      ['front_pylon', 'fuselage', 0.094],
+      ['rear_pylon', 'fuselage', 0.1],
+      ['rear_pylon', 'tail_section', 0.092],
+      ['sponson', 'fuselage', 0.063],
+      ],
+    ),
+    fit(
+      'A ram\'s end is pinned inside the lug of the part it moves.',
+      [
+      ['arm_ram', 'arm', 0.079],
+      ['arm_ram', 'boom', 0.12],
+      ['boom_ram', 'boom', 0.095],
+      ['boom_ram', 'house', 0.095],
+      ['bucket_ram', 'arm', 0.125],
+      ['bucket_ram', 'bucket', 0.071],
+      ['lift_ram', 'digging_boom', 0.085],
+      ['tilt_ram', 'bucket', 0.041],
+      ['tilt_ram', 'lift_arms', 0.068],
+      ],
+    ),
+    fit(
+      'A boom, arm or bucket joint is pinned inside the part it turns on.',
+      [
+      ['arm', 'bucket', 0.071],
+      ['basket', 'insulated_boom', 0.085],
+      ['boom', 'mast', 0.066],
+      ['boom_stage', 'hook_block', 0.05],
+      ['hydraulics', 'turret', 0.055],
+      ['lift_arms', 'bucket', 0.063],
+      ['lower_boom', 'turret', 0.082],
+      ['ripper', 'ripper_shank', 0.092],
+      ],
+    ),
+    fit(
+      'A strut\'s knuckle or arm is pinned into the axle or body it hangs from.',
+      [
+      ['front_strut', 'front_axle', 0.055],
+      ['front_strut', 'shell', 0.055],
+      ],
+    ),
+    fit(
+      'A landing-gear stub is set into the wheel rim it carries.',
+      [
+      ['front_gear', 'front_wheel', 0.04],
+      ['main_gear', 'main_wheel', 0.04],
+      ['rear_gear', 'rear_wheel', 0.04],
+      ],
+    ),
+    fit(
+      'A frame or chassis rail runs into the floor pan, tub or panel that it carries.',
+      [
+      ['chassis', 'cab', 0.085],
+      ['chassis', 'floor', 0.055],
+      ['frame', 'leg_shield', 0.059],
+      ['frame', 'rear_fenders', 0.055],
+      ['frame', 'shell', 0.085],
+      ['frame', 'tub', 0.065],
+      ],
+    ),
+  ],
+}

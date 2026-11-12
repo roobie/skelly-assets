@@ -27,4 +27,14 @@ local s = import 'abandoned_ambulance.spec.libsonnet';
   + pair('wheel_front', 'abandoned_ambulance_wheel', [s.frontAxle, s.hubY, s.wheelZ])
   + pair('wheel_rear', 'abandoned_ambulance_wheel', [s.rearAxle, s.hubY, s.wheelZ]),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('chassis', 'wheel_front_far', 0.05,
+      'The axle_front piece of abandoned_ambulance_chassis runs into the tyre_far piece of abandoned_ambulance_wheel.'),
+    site.unjudged('chassis', 'wheel_front_near', 0.05,
+      'The axle_front piece of abandoned_ambulance_chassis runs into the tyre piece of abandoned_ambulance_wheel.'),
+    site.unjudged('chassis', 'wheel_rear_far', 0.05,
+      'The axle_rear piece of abandoned_ambulance_chassis runs into the tyre_far piece of abandoned_ambulance_wheel.'),
+    site.unjudged('chassis', 'wheel_rear_near', 0.05,
+      'The axle_rear piece of abandoned_ambulance_chassis runs into the tyre piece of abandoned_ambulance_wheel.'),
+  ],
 }

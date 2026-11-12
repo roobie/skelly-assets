@@ -23,4 +23,10 @@ local s = import 'crashed_military_helicopter.spec.libsonnet';
   + pair('engine', 'crashed_military_helicopter_engine', [-0.75, s.enginesY, s.enginesZ])
   + pair('seat_frame', 'crashed_military_helicopter_seat_frame', [2.15, s.deck + 0.18, 0.55]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('cowling', 'engine_far', 0.04,
+      'The far_10_6 piece of crashed_military_helicopter_cowling runs into the case_far piece of crashed_military_helicopter_engine.'),
+    site.unjudged('fuselage', 'main_gearbox', 0.044,
+      'The cabin_door_side_8_10 piece of crashed_military_helicopter_fuselage runs into the case piece of military_transport_helicopter_main_gearbox.'),
+  ],
 }

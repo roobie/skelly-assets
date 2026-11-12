@@ -17,4 +17,8 @@ local cages(tag, y) = std.flattenArrays([
   + site.pair('hatches', 'animal_control_van_hatches')
   + site.pair('rear_hatches', 'animal_control_van_rear_hatches'),
   tags: { 'vehicle-role': ['utility'] },
+  unjudged: [
+    site.unjudged('exhaust', 'rear_axle', 0.06,
+      'The tailpipe piece of exhaust_long runs into the beam piece of beam_axle_van.'),
+  ],
 }

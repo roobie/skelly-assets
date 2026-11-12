@@ -28,4 +28,12 @@ local bench(id, x, z) = site.pair(id, 'apc_scifi_wheeled_bench', [x, floorTop, z
     + site.pair('headlamp', 'headlamp_large', [b.fender, l.y, l.z])
     + site.pair('tail_lamp', 'tail_lamp_small', [b.rear, l.tailY, l.tailZ]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('weapon_station', 'cannon', 0.073,
+      'The turret piece of apc_scifi_wheeled_weapon_station runs into the mantlet piece of apc_scifi_wheeled_cannon.'),
+    site.unjudged('weapon_station', 'launcher_far', 0.08,
+      'The turret piece of apc_scifi_wheeled_weapon_station runs into the arm_far piece of apc_scifi_wheeled_launcher.'),
+    site.unjudged('weapon_station', 'launcher_near', 0.08,
+      'The turret piece of apc_scifi_wheeled_weapon_station runs into the arm piece of apc_scifi_wheeled_launcher.'),
+  ],
 }

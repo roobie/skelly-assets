@@ -16,4 +16,16 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
   + site.pair('rear_beacon', 'beacon_amber', [s.bodyRear + 0.1, s.bodyRiseRear - 0.12, 0.95])
   + site.pair('high_lamp', 'tail_lamp_tall', [s.hopperRear - 0.01, s.hopperSill + 0.05, 1.2]),
   tags: { 'vehicle-role': ['utility'] },
+  unjudged: [
+    site.unjudged('dashboard', 'radiator', 0.06,
+      'The lower piece of refuse_truck_dashboard runs into the core piece of radiator_truck.'),
+    site.unjudged('gearbox', 'exhaust', 0.06,
+      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
+    site.unjudged('mudguard_far', 'hopper', 0.036,
+      'The guard_1_aft_far piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
+    site.unjudged('mudguard_near', 'hopper', 0.036,
+      'The guard_1_aft piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
+    site.unjudged('subframe', 'hopper', 0.12,
+      'The runner_near piece of refuse_truck_subframe runs into the bowl piece of refuse_truck_hopper.'),
+  ],
 }

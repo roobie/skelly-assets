@@ -31,4 +31,20 @@ local track = import 'track-kit.libsonnet';
   + site.pair('boom_ram', 'excavator_boom_ram')
   + site.batteryBay('battery_tray', [-0.05, s.deck, 0.7]),
   tags: { 'vehicle-role': ['construction'] },
+  unjudged: [
+    site.unjudged('boom', 'arm', 0.191,
+      'The reach piece of excavator_boom runs into the stick piece of excavator_arm.'),
+    site.unjudged('carbody', 'track_far', 0.06,
+      'The centre piece of excavator_carbody runs into the link_45_shoe_far piece of excavator_track.'),
+    site.unjudged('carbody', 'track_near', 0.06,
+      'The centre piece of excavator_carbody runs into the link_45_shoe piece of excavator_track.'),
+    site.unjudged('house', 'boom', 0.282,
+      'The boom_foot piece of excavator_house runs into the foot piece of excavator_boom.'),
+    site.unjudged('house', 'counterweight', 0.05,
+      'The deck piece of excavator_house runs into the block piece of excavator_counterweight.'),
+    site.unjudged('house', 'engine', 0.375,
+      'The hood piece of excavator_house runs into the block piece of engine_i6_diesel.'),
+    site.unjudged('house', 'fuel_tank', 0.26,
+      'The tool_cover piece of excavator_house runs into the body piece of fuel_tank_truck.'),
+  ],
 }

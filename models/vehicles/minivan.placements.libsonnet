@@ -18,4 +18,8 @@ local s = import 'minivan.spec.libsonnet';
       site.one('door_track', 'minivan_door_track'),
     ],
   }),
+  unjudged: [
+    site.unjudged('shell', 'third_row', 0.063,
+      'The rear_liner_top_near piece of minivan_shell runs into the cushion piece of bench_seat_3.'),
+  ],
 }

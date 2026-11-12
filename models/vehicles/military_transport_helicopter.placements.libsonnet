@@ -34,4 +34,18 @@ local id = 'military_transport_helicopter';
   + pair('control_stick', 'control_stick', [3.3, s.floor, 0.56])
   + pair('troop_bench', id + '_troop_bench', [0, s.floor, 0]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('engine_cowling', 'cabin_door_far', 0.054,
+      'The nacelle_far piece of military_transport_helicopter_engine_cowling runs into the upper_0_0_far piece of military_transport_helicopter_cabin_door.'),
+    site.unjudged('engine_cowling', 'cabin_door_near', 0.054,
+      'The nacelle_near piece of military_transport_helicopter_engine_cowling runs into the upper_0_0 piece of military_transport_helicopter_cabin_door.'),
+    site.unjudged('tail_cone', 'tail_gear', 0.058,
+      'The wall_6_23 piece of military_transport_helicopter_tail_cone runs into the strut piece of military_transport_helicopter_tail_gear.'),
+    site.unjudged('tail_surfaces', 'tail_rotor', 0.044,
+      'The fin piece of military_transport_helicopter_tail_surfaces runs into the hub piece of military_transport_helicopter_tail_rotor.'),
+    site.unjudged('turbine_far', 'cabin_door_far', 0.072,
+      'The accessories_far piece of military_transport_helicopter_turbine runs into the upper_0_0_far piece of military_transport_helicopter_cabin_door.'),
+    site.unjudged('turbine_near', 'cabin_door_near', 0.072,
+      'The accessories piece of military_transport_helicopter_turbine runs into the upper_0_0 piece of military_transport_helicopter_cabin_door.'),
+  ],
 }

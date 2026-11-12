@@ -33,4 +33,12 @@ local sideZ = 0;
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.17, 0.62, 0.86])
   + site.pair('rear_indicator', 'marker_lamp', [s.rear - 0.17, 0.78, 0.86])
   + site.pair('marker', 'marker_lamp', [s.front + 0.14, 2.14, 0.95]),
+  unjudged: [
+    site.unjudged('chassis', 'nose_cap', 0.087,
+      'The side_rail_near piece of caravan_chassis runs into the below piece of caravan_nose_cap.'),
+    site.unjudged('nose_cap', 'steady_front_far', 0.125,
+      'The below piece of caravan_nose_cap runs into the collar_far piece of caravan_steady.'),
+    site.unjudged('nose_cap', 'steady_front_near', 0.125,
+      'The below piece of caravan_nose_cap runs into the collar piece of caravan_steady.'),
+  ],
 }

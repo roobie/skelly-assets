@@ -24,4 +24,18 @@ local s = import 'golf_cart.spec.libsonnet';
   + site.pair('rear_wheel', 'wheel_145r10', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.tail - 0.03, 0.4, 0.32])
   + site.headlamps(s.nose + 0.03, 0.42, 0.3),
+  unjudged: [
+    site.unjudged('front_cowl', 'steering_column', 0.032,
+      'The dash piece of golf_cart_front_cowl runs into the column piece of golf_cart_steering_column.'),
+    site.unjudged('motor', 'pack', 0.06,
+      'The lead piece of traction_motor_light runs into the case piece of traction_pack_light.'),
+    site.unjudged('rear_body', 'charge_port', 0.06,
+      'The seat_box piece of golf_cart_rear_body runs into the socket piece of charge_port.'),
+    site.unjudged('rear_body', 'inverter', 0.125,
+      'The tail piece of golf_cart_rear_body runs into the case piece of inverter_car.'),
+    site.unjudged('rear_body', 'motor', 0.116,
+      'The tail piece of golf_cart_rear_body runs into the reducer piece of traction_motor_light.'),
+    site.unjudged('rear_body', 'pack', 0.185,
+      'The seat_box piece of golf_cart_rear_body runs into the case piece of traction_pack_light.'),
+  ],
 }

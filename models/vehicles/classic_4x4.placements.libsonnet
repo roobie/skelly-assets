@@ -35,4 +35,10 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
+  unjudged: [
+    site.unjudged('rear_bench', 'rear_wheel_far', 0.063,
+      'The base piece of bench_seat_3 runs into the tyre_far piece of wheel_265_75r16.'),
+    site.unjudged('rear_bench', 'rear_wheel_near', 0.063,
+      'The base piece of bench_seat_3 runs into the tyre piece of wheel_265_75r16.'),
+  ],
 }

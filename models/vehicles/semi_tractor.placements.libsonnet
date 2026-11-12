@@ -17,4 +17,14 @@ local s = t.spec(import 'semi_tractor.spec.libsonnet');
     ] + exhaust.sites('exhaust_semi_tractor', [s.sleeperBack - 0.12, 0, 1.0], s.detail, paired=true)
     + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, -(s.side - 0.34)], s.detail, 'fuel_tank_far'),
   ),
+  unjudged: [
+    site.unjudged('rear_underrun', 'rear_inner_wheel_1_far', 0.059,
+      'The bar piece of semi_tractor_rear_underrun runs into the tyre_far piece of wheel_295_80r22_5.'),
+    site.unjudged('rear_underrun', 'rear_inner_wheel_1_near', 0.059,
+      'The bar piece of semi_tractor_rear_underrun runs into the tyre piece of wheel_295_80r22_5.'),
+    site.unjudged('rear_underrun', 'rear_wheel_1_far', 0.059,
+      'The bar piece of semi_tractor_rear_underrun runs into the tyre_far piece of wheel_295_80r22_5.'),
+    site.unjudged('rear_underrun', 'rear_wheel_1_near', 0.059,
+      'The bar piece of semi_tractor_rear_underrun runs into the tyre piece of wheel_295_80r22_5.'),
+  ],
 }

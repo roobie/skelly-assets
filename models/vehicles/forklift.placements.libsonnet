@@ -29,4 +29,20 @@ local s = import 'forklift.spec.libsonnet';
   + site.pair('work_lamp', 'work_lamp', [0.69, 1.72, 0.42])
   + site.batteryBay('battery_tray', [-0.4, 0.64, 0.46]),
   tags: { 'vehicle-role': ['construction'] },
+  unjudged: [
+    site.unjudged('body', 'engine', 0.212,
+      'The cover piece of forklift_body runs into the block piece of engine_i4_diesel.'),
+    site.unjudged('body', 'guard', 0.045,
+      'The fender_5_near piece of forklift_body runs into the post_front_near piece of forklift_guard.'),
+    site.unjudged('chassis', 'counterweight', 0.206,
+      'The tail piece of forklift_chassis runs into the lower piece of forklift_counterweight.'),
+    site.unjudged('chassis', 'drive_axle', 0.28,
+      'The spine piece of forklift_chassis runs into the diff piece of forklift_drive_axle.'),
+    site.unjudged('chassis', 'gearbox', 0.3,
+      'The spine piece of forklift_chassis runs into the case piece of gearbox_transaxle.'),
+    site.unjudged('chassis', 'steer_axle', 0.124,
+      'The steer_mount piece of forklift_chassis runs into the trunnion piece of forklift_steer_axle.'),
+    site.unjudged('counterweight', 'steer_axle', 0.121,
+      'The lower piece of forklift_counterweight runs into the trunnion piece of forklift_steer_axle.'),
+  ],
 }

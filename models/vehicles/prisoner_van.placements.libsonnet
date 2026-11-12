@@ -10,4 +10,8 @@ local s = import 'prisoner_van.spec.libsonnet';
   + site.pair('rear_bars', 'prisoner_van_rear_bars')
   + site.pair('side_bench', 'prisoner_van_side_bench'),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('exhaust', 'rear_axle', 0.06,
+      'The tailpipe piece of exhaust_long runs into the beam piece of beam_axle_van.'),
+  ],
 }

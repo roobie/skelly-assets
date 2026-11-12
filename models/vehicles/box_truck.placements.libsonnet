@@ -9,4 +9,8 @@ local s = import 'box_truck.spec.libsonnet';
   ]
   + site.pair('box_side', 'box_truck_box_side')
   + site.pair('rear_door', 'box_truck_rear_door'),
+  unjudged: [
+    site.unjudged('dashboard', 'radiator', 0.06,
+      'The lower piece of box_truck_dashboard runs into the core piece of radiator_truck.'),
+  ],
 }

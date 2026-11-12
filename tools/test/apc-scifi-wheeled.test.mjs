@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
-import { meeting, solid } from './pieces.mjs';
+import { solid } from '../pieceSolid.mjs';
+import { meeting } from './pieces.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 // Every site of the carrier with its part's pieces drawn where the site puts them, mirrored on the far side, and the

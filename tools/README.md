@@ -112,7 +112,9 @@ same representation for every reader so changing a rig does not require parallel
 
 The taxonomy is checked before anything is built, from the source rows rather than from the export tools, so
 one report covers the roster, the recipes and the mob sheet alike, and the export tools only carry the field. See
-`check-sources.mjs`, `modelSources`, and `build.mjs`, `withSources`; the why is in `../models/TAXONOMY.md`.
+`check-sources.mjs`, `modelSources`, and `build.mjs`, `withSources`; the why is in `../models/TAXONOMY.md`. The same
+report holds each vehicle's parts at different sites clear of each other; see `siteOverlap.mjs`, `siteOverlaps`, and
+`../docs/decisions/0014-site-overlap.md`.
 
 Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
 `readCredits`, for model identity, actor companions and attribution. `check-built.mjs` holds a fresh build to the

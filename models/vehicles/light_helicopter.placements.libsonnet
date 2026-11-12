@@ -25,4 +25,18 @@ local s = import 'light_helicopter.spec.libsonnet';
   ]
   + pair('door', 'light_helicopter_door')
   + pair('seat', 'helicopter_seat', [0.64, s.floor, 0.3]),
+  unjudged: [
+    site.unjudged('belly', 'skids', 0.054,
+      'The belly_13 piece of light_helicopter_belly runs into the cross_0 piece of light_helicopter_skids.'),
+    site.unjudged('door_far', 'seat_far', 0.05,
+      'The rear_rib_0_0_far piece of light_helicopter_door runs into the back_far piece of helicopter_seat.'),
+    site.unjudged('door_near', 'seat_near', 0.05,
+      'The rear_rib_0_0 piece of light_helicopter_door runs into the back piece of helicopter_seat.'),
+    site.unjudged('rear_fairing', 'main_gearbox', 0.05,
+      'The bulkhead_0 piece of light_helicopter_rear_fairing runs into the case piece of light_helicopter_main_gearbox.'),
+    site.unjudged('rear_fairing', 'mast', 0.055,
+      'The wall_33_7 piece of light_helicopter_rear_fairing runs into the shaft piece of light_helicopter_mast.'),
+    site.unjudged('rear_fairing', 'skids', 0.062,
+      'The wall_26_1 piece of light_helicopter_rear_fairing runs into the cross_1 piece of light_helicopter_skids.'),
+  ],
 }
