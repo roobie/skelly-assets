@@ -29,6 +29,8 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
   + site.pair('cab_beacon', 'beacon_amber', [s.face - s.lean - 0.6, s.roof + 0.15, 0.9]),
   tags: { 'vehicle-role': ['construction'] },
   overlaps: [
+    site.overlap('counterweight', 'winch', 0.06,
+      'The winch sits on the front edge of the counterweight, and the lower coils of its rope sink into the top plate.'),
     site.overlap('deck', 'front_outrigger_far', 0.125,
       'The outrigger beam slides inside the deck runner that houses it.'),
     site.overlap('deck', 'front_outrigger_near', 0.125,

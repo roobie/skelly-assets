@@ -12,6 +12,8 @@ local s = import 'tanker_truck.spec.libsonnet';
   overlaps: [
     site.overlap('barrel', 'walkway', 0.05,
       'The bearers of the walkway are let into the shell of the barrel.'),
+    site.overlap('saddle', 'valve_gear', 0.066,
+      'The manifold pipe of the valve gear runs through a rear cradle plate of the saddle.'),
   ],
   unjudged: [
     site.unjudged('dashboard', 'radiator', 0.06,
