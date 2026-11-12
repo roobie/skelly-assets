@@ -1,4 +1,4 @@
-// model-history.json: for each GLB model id, the release that introduced it, the release that last changed its file and
+// model-history.json: for each GLB model id and each vehicle id (its placements file), the release that introduced it, the release that last changed its file and
 // the file's hash, so the showcase can say when a model appeared and moved. Builds are reproducible (the assets workflow
 // holds two builds equal), so a hash differs between releases only when the model really changed. Each release carries
 // the cumulative file, built from the previous release's; why the history is not read from git is that a model's id and
@@ -40,23 +40,25 @@ export function previousTag(tags, tag) {
   return earlier.at(-1);
 }
 
-/** id -> sha256 of its GLB, for the models a built tree's manifest names. */
+const sha256 = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
+
+/**
+ * id -> sha256 of the file a built tree's manifest names: a model's GLB, or a vehicle's placements file, which is what
+ * a vehicle is made of beside the models at its sites.
+ */
 export function hashModels(built, manifest) {
   const hashes = {};
-  for (const { id, pack, path } of manifest.models) {
-    if (!path.endsWith('.glb')) continue;
-    if (Object.hasOwn(hashes, id)) throw new Error(`model ${id} has more than one GLB`);
-    hashes[id] = createHash('sha256').update(readFileSync(join(built, pack, path))).digest('hex');
-  }
+  const add = (id, pack, path) => {
+    if (Object.hasOwn(hashes, id)) throw new Error(`${id} names more than one file to hash`);
+    hashes[id] = sha256(join(built, pack, path));
+  };
+  for (const { id, pack, path } of manifest.models) if (path.endsWith('.glb')) add(id, pack, path);
+  for (const { id, pack, path } of manifest.vehicles ?? []) add(id, pack, path);
   return hashes;
 }
 
-/**
- * The history after `version`. previous: the earlier release's history or undefined; hashes: the models of this
- * release; renames: retired id -> current id. A renamed model keeps its history, and merged models keep the earliest
- * introduction; merging counts as a change, since no one hash stands for both.
- */
-export function mergeHistory({ previous, version, hashes, renames = {} }) {
+/** The previous history's entries by the ids this release holds: renamed ids move, removed ones are dropped. */
+function carry(previous, hashes, renames) {
   const carried = {};
   for (const [id, entry] of Object.entries(previous?.models ?? {})) {
     const current = renames[id] ?? id;
@@ -68,6 +70,16 @@ export function mergeHistory({ previous, version, hashes, renames = {} }) {
       sha256: null,
     };
   }
+  return carried;
+}
+
+/**
+ * The history after `version`. previous: the earlier release's history or undefined; hashes: the models of this
+ * release; renames: retired id -> current id. A renamed model keeps its history, and merged models keep the earliest
+ * introduction; merging counts as a change, since no one hash stands for both.
+ */
+export function mergeHistory({ previous, version, hashes, renames = {} }) {
+  const carried = carry(previous, hashes, renames);
   const models = {};
   for (const [id, sha256] of Object.entries(hashes).sort(([a], [b]) => (a < b ? -1 : 1))) {
     const was = carried[id];
@@ -77,10 +89,31 @@ export function mergeHistory({ previous, version, hashes, renames = {} }) {
   return { version, models };
 }
 
-/** How a model stands against a release's history: its two versions, and whether the build differs; undefined when new. */
-export function standing(history, id, sha256) {
-  const entry = history.models[id];
-  return entry && { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== sha256 };
+/**
+ * How each id of a later build stands against a release's history, through the renames since: its two versions and
+ * whether the build differs, or null when no release holds it.
+ */
+export function standings(history, hashes, renames = {}) {
+  const carried = carry(history, hashes, renames);
+  return Object.fromEntries(Object.keys(hashes).map((id) => {
+    const entry = carried[id];
+    return [id, entry === undefined ? null : { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
+  }));
+}
+
+/**
+ * A vehicle stands by its placements file and the models at its sites: it was introduced with its placements file, a
+ * part's introduction says nothing of the vehicle, and it last changed when its placements or any part did. A part no
+ * release holds is a change.
+ */
+export function vehicleStanding(own, parts) {
+  if (own === null) return null;
+  const updates = [own.updated, ...parts.filter(Boolean).map(({ updated }) => updated)];
+  return {
+    introduced: own.introduced,
+    updated: updates.sort(compareVersions).at(-1),
+    changed: own.changed || parts.some((part) => part === null || part.changed),
+  };
 }
 
 const gh = (...args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 2 ** 28 });
@@ -111,7 +144,7 @@ function releaseCommand({ tag, built, out }) {
     previous = publishedHistory(before, dir);
     rmSync(dir, { recursive: true, force: true });
     // A silent fresh start would stamp every model as introduced now, and that error could not be undone later.
-    if (previous === undefined) throw new Error(`${before} has no ${HISTORY_ASSET}; backfill it (node tools/model-history.mjs backfill) and attach it to that release`);
+    if (previous === undefined) throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>\` and attach it to that release`);
   }
   const manifest = readJson(join(built, MANIFEST));
   write(out, mergeHistory({ previous, version: tag, hashes: hashModels(built, manifest), renames: manifest.renames }));
@@ -148,5 +181,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const { values } = parseArgs({ args: rest, options: { tag: { type: 'string' }, built: { type: 'string' }, out: { type: 'string' }, work: { type: 'string' }, optional: { type: 'boolean', default: false } } });
   const commands = { release: releaseCommand, fetch: fetchCommand, backfill: backfillCommand };
   if (!commands[command] || !values.out) throw new Error('usage: node tools/model-history.mjs release|fetch|backfill --out <file> (see the file header)');
+  if (command === 'backfill' && !values.work) throw new Error('backfill needs --work <dir>, where it downloads each release and deletes it again');
+  if (command === 'release' && !(values.tag && values.built)) throw new Error('release needs --tag <v*> and --built <dir>');
   commands[command]({ ...values, out: resolve(values.out) });
 }

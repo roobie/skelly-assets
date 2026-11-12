@@ -14,7 +14,6 @@
 // models show no versions.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
@@ -22,12 +21,12 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
-import { hashModels, standing } from '../tools/model-history.mjs';
+import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
-import { readVersion, versionHtml } from './version.mjs';
+import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
 import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
@@ -105,11 +104,11 @@ const apart = (model) => {
   return components ? { ...model, components } : model;
 };
 const history = values.history && JSON.parse(readFileSync(values.history, 'utf8'));
-const hashes = history && hashModels(built, manifest);
-const repository = process.env.GITHUB_REPOSITORY ?? 'roobie/skelly-assets';
+// Each model and vehicle against the release, through the renames since, by the code that writes the next release's history.
+const stands = history && standings(history, hashModels(built, manifest), manifest.renames);
 const shown = models.map((model) => {
   const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model);
-  return { ...entry, form: formOf(entry), ...(history ? { history: standing(history, model.id, hashes[model.id]) ?? null } : {}) };
+  return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
@@ -136,7 +135,7 @@ const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
   const placed = placedSites(sites);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed) };
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed), ...(history ? { history: vehicleStanding(stands[id], placed.map(({ model }) => stands[model])) } : {}) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
@@ -219,7 +218,7 @@ for (const model of models) if (model.clips && model.body) {
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `https://github.com/${repository}/releases/tag/` } } : {}) }));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `${REPOSITORY}/releases/tag/` } } : {}) }));
 // A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
 // built without the viewers links nothing it lacks.
 const listed = readTools(root);
