@@ -41,7 +41,8 @@ test('a skinned model does not come apart, since moving a skinned part node move
 });
 
 test('an entry placing models at sites, or with several components, is an assembly; any other is an atom', () => {
-  assert.equal(formOf({ sites: [] }), 'assembly');
+  assert.equal(formOf({ sites: [{}] }), 'assembly');
+  assert.equal(formOf({ sites: [] }), 'atom');
   assert.equal(formOf({ components: ['frame', 'lid'] }), 'assembly');
   assert.equal(formOf({ components: ['frame'] }), 'atom');
   assert.equal(formOf({}), 'atom');

@@ -5,7 +5,7 @@ import { glbJson } from './glb.mjs';
 
 // Whether an entry is built from other models or is one piece. It is derived, never tagged, so no curated term can
 // disagree with the model: an assembly places other models at sites, or has more than one component.
-export const formOf = ({ sites, components }) => (sites || (components?.length ?? 0) > 1 ? 'assembly' : 'atom');
+export const formOf = ({ sites, components }) => ((sites?.length ?? 0) > 0 || (components?.length ?? 0) > 1 ? 'assembly' : 'atom');
 
 // The part ids of a model's components, in node order, or undefined when it does not come apart: when no part declares
 // a mount, or when its parts are skinned, since a skinned part follows its joints and moving its node moves nothing.
