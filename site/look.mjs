@@ -86,6 +86,8 @@ const query = new URLSearchParams(location.search);
 const options = { views: query.get('views') ?? 'review', sites: query.get('sites')?.split(',') ?? [] };
 const hint = Object.assign(document.createElement('p'), { textContent: 'A few of the day\'s models. Pick any to draw them instead.' });
 const tiles = document.createElement('div');
+// The page's static container: the deploy's footer follows it in the body, so content appended to the body would land below the footer.
+const content = document.getElementById('content');
 
 function drawTiles(asked, landing) {
   hint.hidden = asked.length > 0;
@@ -129,6 +131,6 @@ ready.then(({ byId, landing }) => {
     },
   });
   picker.set(picked);
-  document.body.append(picker.element, hint, tiles);
+  content.append(picker.element, hint, tiles);
   drawTiles(picked, landing);
 });
