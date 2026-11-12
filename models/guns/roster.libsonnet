@@ -7,6 +7,7 @@
     { id: 'rifle_assault', design: 'archetype-ar', weapon: 'rifle' },
     { id: 'rifle_ak', design: 'archetype-ak-akm', weapon: 'rifle' },
     { id: 'shotgun_pump', design: 'archetype-pump-shotgun', weapon: 'shotgun' },
+    { id: 'rifle_anti_materiel', design: 'archetype-anti-materiel', weapon: 'rifle' },
     { id: 'rifle_hunting', design: 'hunting-rifle', weapon: 'rifle' },
     { id: 'revolver', design: 'archetype-revolver', weapon: 'handgun' },
     { id: 'pistol_service', design: 'service-nine', weapon: 'handgun' },

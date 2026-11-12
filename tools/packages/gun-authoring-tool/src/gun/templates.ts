@@ -22,6 +22,7 @@ const sightMix = (...weights: readonly (readonly [OpticTypeId, number])[]): read
 const SML = ['S', 'M', 'L'] as const;
 const BATTLE_MAGAZINE_ORIENTATIONS = ['straight', 'tilt', 'slant-5', 'slant-8', 'slant-10'] as const;
 const GENERATED_AK_CALIBRE = '7.62x39';
+const GENERATED_ANTI_MATERIEL_CALIBRE = '50-bmg';
 
 export const battleRifle: Template = {
   name: 'battle-rifle',
@@ -637,6 +638,7 @@ export const antiMateriel: Template = {
   name: 'anti-materiel',
   description:
     'Semi-automatic anti-materiel rifle: perforated box shroud, two-chamber arrowhead muzzle brake, folding bipod, strut-mounted carry handle, recoil-pad stock with optional monopod.',
+  variant: GENERATED_ANTI_MATERIEL_CALIBRE,
   root: 'receiver',
   slots: [
     { id: 'receiver', family: 'heavy-receiver', params: { action: 'auto', feed: 'box', bore: 'L' } },
