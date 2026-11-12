@@ -145,6 +145,15 @@ export const loadThingRecipe = (value: unknown, catalogue: Catalogue) => {
   );
 };
 /**
+ * The thing rows of whole recipe files, for a driver that reads them without the build's partition: a pack's recipe
+ * also holds rows other tools own, such as its guns.
+ */
+export const loadThingRecipeFiles = (files: readonly unknown[], catalogue: Catalogue) =>
+  loadThingRecipe(
+    files.flatMap((rows) => (rows as readonly RecipeRow[]).filter(({ kind }) => THING_KINDS.includes(kind))),
+    catalogue,
+  );
+/**
  * Each row with the one-item catalogue its export reads, once every row has loaded against the whole catalogue: a
  * build worker exports a row from its slice, since loading the whole catalogue costs each worker more than most
  * exports do. The slice gives the row the same inputs, so its cache key is the same.
