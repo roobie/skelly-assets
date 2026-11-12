@@ -39,7 +39,9 @@ export function solid(piece) {
   if (piece.kind === 'prism') {
     [min[axis], max[axis]] = [piece.start, piece.end];
     for (const [i, c] of [[u, 0], [v, 1]]) [min[i], max[i]] = [Math.min(...piece.profile.map((p) => p[c])), Math.max(...piece.profile.map((p) => p[c]))];
-    return { min, max, distance: (p) => Math.max(outline(piece.profile, [p[u], p[v]]), piece.start - p[axis], p[axis] - piece.end) };
+    // A cut plane's signed distance, so a piece cut to sloped plates is sampled as the shape it draws.
+    const cuts = (piece.clip ?? []).map(({ normal, offset }) => (p) => (normal[0] * p[0] + normal[1] * p[1] + normal[2] * p[2] - offset) / Math.hypot(...normal));
+    return { min, max, distance: (p) => Math.max(outline(piece.profile, [p[u], p[v]]), piece.start - p[axis], p[axis] - piece.end, ...cuts.map((cut) => cut(p))) };
   }
   const o = piece.origin;
   const radius = Math.max(...piece.profile.map((p) => p[1]));

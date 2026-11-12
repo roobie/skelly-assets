@@ -24,6 +24,9 @@ const point2 = tuple([coordinate, coordinate]);
 const point3 = tuple([coordinate, coordinate, coordinate]);
 const axis = picklist(['x', 'y', 'z']);
 const named = { id: pipe(string(), nonEmpty()), slot: pipe(string(), nonEmpty()) };
+// A half-space a prism is cut to, keeping the side where dot(normal, point) <= offset, so one piece can carry plates
+// sloped across more than its own axis.
+const clipPlane = strictObject({ normal: point3, offset: coordinate });
 const Piece = variant('kind', [
   strictObject({ ...named, kind: picklist(['box']), min: point3, max: point3 }),
   strictObject({
@@ -33,6 +36,7 @@ const Piece = variant('kind', [
     profile: pipe(array(point2), minLength(3)),
     start: coordinate,
     end: coordinate,
+    clip: optional(pipe(array(clipPlane), minLength(1))),
   }),
   strictObject({
     ...named,
@@ -82,6 +86,8 @@ export const compound = (params: Readonly<Record<string, string>>, defaultSides?
         axis: piece.axis,
         profile: piece.profile,
         z: [piece.start, piece.end],
+        // A bevel would round the edges the cut planes make, so a clipped prism is drawn unbevelled.
+        ...(piece.clip ? { clip: piece.clip, display: { bevel: false } } : {}),
         slot: piece.slot,
       };
     }
