@@ -4,6 +4,8 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { roundProfiles } from '../src/ammo/roundProfile.ts';
+import { BMG_CARTRIDGE } from '../src/gun/antiMateriel/cartridge.ts';
+import { HEAVY_MAGAZINE_ROUNDS } from '../src/gun/antiMateriel/heavyMagazine.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FILE_AXES } from '../src/gun/exportFrame.ts';
 import { magazineCenterline } from '../src/gun/magazineCenterline.ts';
@@ -64,6 +66,7 @@ describe('generated magazine round columns', () => {
   it('exports a detached magazine with byte geometry and metadata for the fitted round column', () => {
     const result = exportMagazineGlb({
       asset: { id: 'magazine_ak', file: 'assets/models/magazine-ak.glb' },
+      family: 'magazine',
       params: { length: 'L', profile: 'ak-curved', orientation: 'straight', variant: 'ak74' },
       cartridge,
       appearance: { appearanceProfile: 'ak' },
@@ -80,6 +83,22 @@ describe('generated magazine round columns', () => {
     const [first, second] = result.modelEntry.gun.rounds!.map(({ at }) => at[FILE_AXES.side]);
     expect(first).not.toBe(0);
     expect(Math.sign(second!)).toBe(-Math.sign(first!));
+  });
+
+  it('exports the .50 BMG heavy magazine loose with its nominal rounds clear of its walls and slanted floor', () => {
+    const result = exportMagazineGlb({
+      asset: { id: 'magazine_heavy', file: 'assets/models/magazine-heavy.glb' },
+      family: 'heavy-magazine',
+      params: {},
+      cartridge: BMG_CARTRIDGE,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.modelEntry.gun.calibre).toBe(BMG_CARTRIDGE.id);
+    expect(result.modelEntry.gun.capacity).toBe(HEAVY_MAGAZINE_ROUNDS);
+    expect(result.modelEntry.gun.rounds).toHaveLength(HEAVY_MAGAZINE_ROUNDS);
   });
 
   it('keeps the STANAG 20 straight with a slanted floorplate and the 30-round shared top', () => {

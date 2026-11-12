@@ -355,7 +355,7 @@ const attachmentData = (resolved: Resolved): (AttachmentMetadata & { node: strin
 
 const magazineSlotData = (resolved: Resolved): NonNullable<GunModelFields['slots']>['magazine'] | undefined => {
   const [partId, instance] =
-    Object.entries(resolved.assembly.parts).find(([, part]) => part.family === 'magazine') ?? [];
+    Object.entries(resolved.assembly.parts).find(([id]) => resolved.defs.get(id)?.family === 'magazine') ?? [];
   const transform = partId && resolved.placed.get(partId);
   if (!(partId && instance && transform) || resolved.params.get(partId)?.integral?.value === 'yes') {
     return undefined;

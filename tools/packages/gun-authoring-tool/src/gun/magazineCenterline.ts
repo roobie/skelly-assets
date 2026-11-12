@@ -19,7 +19,7 @@ const DISPLAY_SECTOR_ID = /^curve-display-\d+$/;
 const DISPLAY_BOTTOM_ID = 'curve-display-straight-bottom';
 const SECTOR_BOTTOM_ID = 'curve-sector-straight-bottom';
 
-/** Read a generated magazine's centreline from its own upper body and curve sectors. */
+/** Read a generated magazine's centreline from its own upper body and curve sectors, or from its straight body. */
 export const magazineCenterline = (solids: readonly Solid[]): MagazineCenterline | undefined => {
   const upper = solids.find((solid) => solid.id === 'upper-body');
   if (upper?.kind === 'extruded-polygon') {
@@ -70,6 +70,23 @@ export const magazineCenterline = (solids: readonly Solid[]): MagazineCenterline
       sectionWidths: [half[2] * 2, half[2] * 2],
       sectionDepths: [half[0] * 2, half[0] * 2],
       rearX: center[0] - half[0],
+    };
+  }
+  if (body?.kind === 'extruded-polygon' && body.profile.length === 4) {
+    // A straight body drawn [rear-bottom, front-bottom, front-top, rear-top]. A round spans the body's depth, so
+    // on a slanted bottom the column ends at the bottom's highest corner.
+    const [rearBottom, frontBottom, frontTop, rearTop] = body.profile as readonly [Vec2, Vec2, Vec2, Vec2];
+    const centerX = (rearTop[0] + frontTop[0]) / 2;
+    const width = body.z[1] - body.z[0];
+    return {
+      points: [
+        [centerX, Math.min(rearTop[1], frontTop[1])],
+        [centerX, Math.max(rearBottom[1], frontBottom[1])],
+      ],
+      width,
+      sectionWidths: [width, width],
+      sectionDepths: [frontTop[0] - rearTop[0], frontBottom[0] - rearBottom[0]],
+      rearX: Math.min(...body.profile.map(([x]) => x)),
     };
   }
   return undefined;

@@ -100,10 +100,11 @@ describe('recipe iron sight lattice', () => {
     // can be mid-row, so the half lattice holds both.
     'puts $id iron sight eye on a drawn top or aperture centre, on its fine half lattice',
     (row, context) => {
+      // A gun that ships without sights, its optic left for the player to fit, has no eye to check.
       const { sight } = (
-        row.generate().modelEntry as unknown as { gun: { sight: { kind: string; eye: readonly number[] } } }
+        row.generate().modelEntry as unknown as { gun: { sight?: { kind: string; eye: readonly number[] } } }
       ).gun;
-      if (sight.kind !== 'iron') {
+      if (sight?.kind !== 'iron') {
         context.skip();
         return;
       }

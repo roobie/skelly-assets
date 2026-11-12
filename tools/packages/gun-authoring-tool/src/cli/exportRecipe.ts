@@ -17,8 +17,7 @@ import { ATTACHMENT_IDS } from '../gun/attachments.ts';
 import { exportCartridgeModel } from '../gun/cartridgeExport.ts';
 import { PART_CATALOGUE } from '../gun/catalogue.ts';
 import type { DeadvoxModelEntry } from '../gun/exportGlb.ts';
-import { exportMagazineGlb } from '../gun/magazineExport.ts';
-import { GUN_PREFABS } from '../gun/prefabs.ts';
+import { exportMagazineGlb, magazinePrefab } from '../gun/magazineExport.ts';
 import { REPO_ROOT } from './content.ts';
 import { exportFileText } from './exportFile.ts';
 import { exportPartItem } from './exportPart.ts';
@@ -91,7 +90,7 @@ const exporters = {
       }),
       optionsFor(row),
     );
-    const prefab = GUN_PREFABS.find(({ id, family }) => id === row.source && family === 'magazine');
+    const prefab = magazinePrefab(row.source);
     if (!prefab) {
       throw new Error('unknown magazine prefab source');
     }
@@ -102,6 +101,7 @@ const exporters = {
     return () => {
       const result = exportMagazineGlb({
         asset: assetFor(row),
+        family: prefab.family,
         params: prefab.fixedParams,
         cartridge,
         appearance: { appearanceProfile: options.appearanceProfile },

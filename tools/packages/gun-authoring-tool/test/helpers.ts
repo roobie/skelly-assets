@@ -122,6 +122,19 @@ export const scopedArDesign = (type = 'lpvo-1-6x'): MutableAssembly => {
   return assembly;
 };
 
+/** Fits a scope to an anti-materiel rifle's receiver rail: it ships without one, as a player fits one. */
+export const fitAntiMaterielScope = (assembly: MutableAssembly, type = 'high-mag-5-25x'): void => {
+  assembly.parts.sight = { family: 'sight', params: { type } };
+  assembly.connections = [...assembly.connections, { from: 'receiver.rail', to: 'sight.base', slot: 5 }];
+};
+
+/** The published anti-materiel rifle with a scope on its receiver rail. */
+export const scopedAntiMaterielDesign = (type?: string): MutableAssembly => {
+  const assembly = loadDesignAssembly('archetype-anti-materiel');
+  fitAntiMaterielScope(assembly, type);
+  return assembly;
+};
+
 /** Every published design, as loaded assemblies. */
 export const loadDesigns = (): CorpusEntry[] =>
   readdirSync(DESIGNS)
