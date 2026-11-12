@@ -4,6 +4,7 @@ import validator from 'gltf-validator';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
+import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
 import { loadCartridges, loadCartridgeFile } from './ammoHelpers.ts';
 
@@ -58,22 +59,29 @@ describe('standalone cartridge GLBs', () => {
     );
   });
 
-  it('draws a cartridge whose look names its own case in that material, on its round and its loose case', () => {
-    const ownCases = Object.entries(GUN_APPEARANCE.cartridgeCases);
-    expect(ownCases.length).toBeGreaterThan(0);
-    const corpus = loadCartridges();
-    for (const [id, material] of ownCases) {
-      const named = corpus.find((entry) => entry.id === id)!;
-      const result = exportCartridgeModels(named);
+  it('draws every metallic corpus cartridge with the case material its finish names, on its round and its loose case', () => {
+    const metallic = loadCartridges().filter((entry) => entry.kind !== 'shotshell');
+    expect(metallic.length).toBeGreaterThan(0);
+    for (const entry of metallic) {
+      const result = exportCartridgeModels(entry);
       if (!result.ok) {
         throw new Error(JSON.stringify(result.error));
       }
       for (const model of [result.models.round, result.models.case]) {
         const primitives = (glbJson(model.glb).meshes as { primitives: { extras: Record<string, string> }[] }[])[0]!
           .primitives;
-        expect(primitives.find(({ extras }) => extras.solid === 'case')?.extras.material, id).toBe(material);
+        expect(primitives.find(({ extras }) => extras.solid === 'case')?.extras.material, entry.id).toBe(
+          cartridgeFinish(entry).case,
+        );
       }
     }
+  });
+
+  it('lets a cartridge named in the case table override the shared case, and no other', () => {
+    const table = { [cartridge.id]: 'steel' };
+    expect(cartridgeFinish(cartridge, table).case).toBe('steel');
+    expect(cartridgeFinish({ ...cartridge, id: 'fixture.other' }, table).case).toBe(GUN_APPEARANCE.cartridgeFinish.case);
+    expect(cartridgeFinish(cartridge, {}).case).toBe(GUN_APPEARANCE.cartridgeFinish.case);
   });
 
   it('honours an explicit identity when exporting one cartridge component', () => {

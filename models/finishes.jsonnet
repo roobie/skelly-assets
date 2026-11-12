@@ -17,6 +17,7 @@ local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n
   lead: material([0.38, 0.4, 0.42]),
   steel: material([0.29, 0.32, 0.31]),
   // Cartridge cases. Grey steel cases are polymer-coated; a silver one is zinc-plated, like Barnaul's Silver Bear.
+  // The `steel` prefix keeps the name in the metal wear class; do not reorder the words.
   'steel-polymer-coated': material([0.5, 0.51, 0.52]) + { finish: { metallic: 0.3, roughness: 0.6 } },
   'steel-zinc-plated': material([0.82, 0.84, 0.87]) + { finish: { metallic: 0.8, roughness: 0.3 } },
   'paperboard-brown': material([0.27, 0.23, 0.17]),

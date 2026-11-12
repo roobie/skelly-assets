@@ -1,3 +1,4 @@
+import { MATERIALS } from '@skelly/thing-core/materials';
 import { srgbToLinear } from '@skelly/thing-export/glb.ts';
 import validator from 'gltf-validator';
 import { Box3, Raycaster, Texture, Vector3 } from 'three';
@@ -7,7 +8,7 @@ import type { Shotshell } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
 import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
-import { shotshellGeometry, shotshellHullColor } from '../src/gun/shotshellGeometry.ts';
+import { shotshellGeometry, shotshellHullMaterial } from '../src/gun/shotshellGeometry.ts';
 import { buildAmmoMeshes } from '../src/viewer/ammoLayer.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { readGlb } from './glbReader.ts';
@@ -94,7 +95,7 @@ describe('shotshell cartridge export', () => {
     const { json } = readGlb(result.models.round.glb);
     const hull = json.meshes[0]!.primitives.find((primitive) => primitive.extras?.solid === 'hull')!;
     expect(json.materials[hull.material]!.pbrMetallicRoughness.baseColorFactor.slice(0, 3)).toEqual(
-      shotshellHullColor(blue).map(srgbToLinear),
+      MATERIALS[shotshellHullMaterial(blue)]!.colour.map(srgbToLinear),
     );
   });
 

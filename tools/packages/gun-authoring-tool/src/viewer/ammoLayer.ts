@@ -16,17 +16,14 @@ import {
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { Cartridge, Shotshell } from '../ammo/cartridge.ts';
 import { roundProfiles } from '../ammo/roundProfile.ts';
-import { cartridgeFinish } from '../gun/cartridgeFinish.ts';
+import { cartridgeFinish, type CartridgeFinish } from '../gun/cartridgeFinish.ts';
 import { shotshellGeometry } from '../gun/shotshellGeometry.ts';
 import { mmToU } from '../gun/units.ts';
 
 const DEFAULT_ROUND_FACETS = 24;
 const ROUND_CREASE_DEGREES = 12;
-/** The material each cartridge slot shows; see `src/gun/cartridgeFinish.ts`, `cartridgeFinish`. */
-export type AmmoFinish = Readonly<Record<string, string>>;
-
 /** The cartridge's own finish, with `ammoCase` trying another case material on it when it names one. */
-export const ammoFinishFromQuery = (cartridge: Cartridge, ammoCase: string | null): AmmoFinish => ({
+export const ammoFinishFromQuery = (cartridge: Cartridge, ammoCase: string | null): CartridgeFinish => ({
   ...cartridgeFinish(cartridge),
   ...(ammoCase !== null && Object.hasOwn(MATERIALS, ammoCase) ? { case: ammoCase } : {}),
 });
@@ -48,7 +45,7 @@ export const ammoEnvironment = (renderer: WebGLRenderer): Texture => {
 };
 
 /** One material per slot, drawn as the export draws it, so the viewer shows the cartridge's exported look. */
-const finishMaterials = (finish: AmmoFinish, env: Texture) => {
+const finishMaterials = (finish: CartridgeFinish, env: Texture) => {
   const bySlot = new Map<string, MeshStandardMaterial>();
   return (slot: string): MeshStandardMaterial => {
     const known = bySlot.get(slot);
@@ -86,7 +83,7 @@ const revolvedGeometry = (profile: readonly Vec2[], facets: number): BufferGeome
   return geometry;
 };
 
-const buildShellMeshes = (shell: Shotshell, finish: AmmoFinish, env: Texture, facets: number): AmmoMeshes => {
+const buildShellMeshes = (shell: Shotshell, finish: CartridgeFinish, env: Texture, facets: number): AmmoMeshes => {
   const solids = shotshellGeometry(shell);
   const materialFor = finishMaterials(finish, env);
   const groupOf = (parts: typeof solids.round): Group => {
@@ -123,7 +120,7 @@ const buildShellMeshes = (shell: Shotshell, finish: AmmoFinish, env: Texture, fa
 /** Build the loose loaded round/shell and fired case in real-size-derived gungen units, axis along +X. */
 export const buildAmmoMeshes = (
   cartridge: Cartridge,
-  finish: AmmoFinish,
+  finish: CartridgeFinish,
   env: Texture,
   facets = DEFAULT_ROUND_FACETS,
 ): AmmoMeshes => {
