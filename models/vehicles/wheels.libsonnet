@@ -41,9 +41,10 @@
   // An 18.00 R25 flotation tyre on a wide 25-inch steel disc wheel, as heavy cranes and container handlers run. Masses
   // are estimates for the size.
   wheel_18_00r25: {
+    title: 'Wheel 18.00R25',
     class: 'heavy',
-    tyre: { id: 'tyre_18_00r25', massKg: 420, width: 0.498, outer: 0.8075 },
-    rim: { id: 'rim_25_steel_wide', massKg: 180, radius: 0.3175, width: 0.33, wall: 0.035, face: 0.06, faceThickness: 0.04, hub: 0.18, spokes: 10, spokeWidth: 0.09, finish: 'steel-grey' },
+    tyre: { id: 'tyre_18_00r25', title: 'Tyre 18.00R25', massKg: 420, width: 0.498, outer: 0.8075 },
+    rim: { id: 'rim_25_steel_wide', title: 'Wide 25-inch steel rim', massKg: 180, radius: 0.3175, width: 0.33, wall: 0.035, face: 0.06, faceThickness: 0.04, hub: 0.18, spokes: 10, spokeWidth: 0.09, finish: 'steel-grey' },
   },
   // The M3 half-track's 8.25-20 combat tyre on a six-stud steel disc wheel. Masses are estimates for the size.
   wheel_8_25_20: {
