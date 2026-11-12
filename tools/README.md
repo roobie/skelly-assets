@@ -158,6 +158,11 @@ far side, such as a brake out of the back of its wheel, would hide behind the wh
 A model built of components, such as a gun, is drawn exploded by the same rule, because its parts meet at mount
 sites its file names; see `../docs/decisions/0009-component-mounts.md`.
 
+The sleek security walker's upper hull turns over the original's legs, so its review renders both walkers from
+production recipes and reports the exported boxes' clearance at several hull yaws; see
+`security-walker-review.mjs`, `buildWalkers`. That check covers the authored rest pose only, not gait, weapon
+elevation, balance or runtime articulation.
+
 A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
 The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
 
