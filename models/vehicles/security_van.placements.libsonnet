@@ -10,8 +10,4 @@ local s = import 'security_van.spec.libsonnet';
   ]
   + site.pair('cab_plate', 'security_van_cab_plate')
   + site.pair('rear_door_bars', 'security_van_rear_door_bars'),
-  unjudged: [
-    site.unjudged('exhaust', 'rear_axle', 0.063,
-      'The silencer piece of exhaust_long runs into the beam piece of beam_axle_van.'),
-  ],
 }

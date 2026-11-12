@@ -10,8 +10,4 @@ local s = import 'food_truck.spec.libsonnet';
     site.one('flue', 'food_truck_flue'),
   ]
   + site.pair('door_step', 'door_step_walk_in', [s.bFront, 0.3, s.side]),
-  unjudged: [
-    site.unjudged('exhaust', 'rear_axle', 0.054,
-      'The silencer piece of exhaust_long runs into the beam piece of beam_axle_van.'),
-  ],
 }

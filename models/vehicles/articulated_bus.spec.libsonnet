@@ -14,7 +14,7 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     shafts: [{ part: 'prop_shaft_short', at: [-6.1, 0.55, 0] }],
     radiator: 'radiator_truck', radiatorAt: [-8.8, 0.32, 0],
     tank: 'fuel_tank_truck', tankAt: [-6.75, 0.32, 0.86],
-    exhaust: 'exhaust_long', exhaustAt: [-8.2, 0.48, -0.56],
+    exhaust: 'exhaust_long', exhaustAt: [-8.2, 0.36, -0.56],
     batteryAt: [8.4, 0.42, -0.9],
   },
 };

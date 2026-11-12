@@ -23,7 +23,7 @@ local s = import 'suv.spec.libsonnet';
     site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.15, 0]),
     site.one('front_axle', 'beam_axle_light', [s.frontAxle, 0.032, 0]),
     site.one('front_prop_shaft', 'prop_shaft_short', [1.05, 0.42, 0]),
-    site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.34, 0.5]),
+    site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.24, 0.5]),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.35, 0]),
   ]
   + site.pair('front_wing', 'suv_front_wing')
@@ -39,10 +39,4 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
-  unjudged: [
-    site.unjudged('front_axle', 'exhaust', 0.06,
-      'The beam piece of beam_axle_light runs into the pipe piece of exhaust_long.'),
-    site.unjudged('rear_axle', 'exhaust', 0.06,
-      'The beam piece of beam_axle_light runs into the pipe piece of exhaust_long.'),
-  ],
 }
