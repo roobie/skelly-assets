@@ -5,6 +5,7 @@ read_if:
   - which way a model faces, or whether a consumer converts its axes
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
+  - naming a model, or showing its name in a consumer
   - adding or applying the catalogue's item drafts
   - bumping the Node version, or why CI and builds pin one exact version
   - opening a PR or cutting a release, and where its change notes and release notes come from
@@ -98,6 +99,17 @@ Every model also needs a category and may carry facet tags and keywords, from th
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
 `models/TAXONOMY.md`; `node tools/check-sources.mjs` lists what is still untagged.
 
+### Titles
+
+Every model carries a `title`, the name a player would use ("7.62×54R round", "Field radio", "Burnt-out bus"),
+authored beside its definition: in its catalogue or roster row, its recipe row, its vehicle's `placements.libsonnet`
+or its row in `models/mobs.json`. A family built from a roster or a set function authors the title next to the data
+that varies. No title is ever computed from an id: ids are stable keys that change when a model is merged or split, and
+a name cut from one reads as the key it is ("Round 7 d 62x54r"), so every consumer would show a worse name than the
+author would give. A title is short, plain English, spells calibres with × and R, and names no real maker or product.
+The build and `node tools/check-sources.mjs` refuse a model without one, see `tools/titles.mjs`, `titleProblems`; the
+manifest, the showcase, the vehicle gallery and the thing export's label text all read the same field.
+
 ### Outputs and consumers
 
 The no-id production run of `tools/build.mjs` is the roster and recipe entry point: it writes each model under
@@ -153,7 +165,7 @@ without a failure, so a change that touches a cue checks it against skelly's mai
 ### Printed labels
 
 A packaged item without its print reads as a blank box, so a catalogue row can name the face of a piece that
-carries its print and the text, which defaults to the model's display name. The label travels as metadata beside
+carries its print and the text, which defaults to the model's title. The label travels as metadata beside
 the GLB, never as lettering in its geometry: each consumer draws text in its own renderer and font, and relabelling a
 row leaves the model's bytes alone. See `tools/packages/thing-authoring-tool/src/catalogue.ts`, `ItemSchema`, and
 `tools/packages/thing-core/src/schema.ts`, `NeutralModelSchema`; the showcase draws it in `site/app.js`,
