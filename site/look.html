@@ -4,8 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Model look</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    body { margin: 16px; font: 14px system-ui, sans-serif; background: #f4f2ee; color: #1d1c1a; }
+    body { margin: 16px; font-size: 14px; }
+    .combo { max-width: 480px; }
+    p { color: var(--muted); }
     figure { margin: 0 0 16px; max-width: 768px; }
     figure.wide { max-width: 1536px; }
     img { display: block; width: 100%; height: auto; }
@@ -19,7 +22,8 @@
     }
   </script>
 </head>
-<body data-analytics-badge>
+<body data-site-footer>
+  <main id="content"></main>
   <script type="module" src="look.mjs"></script>
 </body>
 </html>

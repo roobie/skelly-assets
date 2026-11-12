@@ -58,7 +58,7 @@ local alderParts =
     h.rod('thread', 'foot', 0.004, -0.185, -0.17, 0.006),
     h.rod('shaft', 'rod', 0.0025, -0.17, 0.195, 0.006),
     turned('tip', 'rod', 'x', [[0, 0], [0, 0.0035], [0.005, 0.0035], [0.005, 0]], [0.195, 0.006, 0]),
-  ], { foot: 'brass', rod: 'copper' })
+  ], { foot: 'brass', rod: 'copper' }) + { title: 'Antenna' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A small audio amplifier board, 80 by 60 mm on a 1.6 mm green board: a black amplifier chip bolted to
@@ -96,7 +96,7 @@ local alderParts =
     pot: 'steel-grey',
     knob: 'plastic-black',
     resistor: 'paint-cream',
-  })
+  }) + { title: 'Amplifier' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A fired clay building brick, 190 by 90 mm and 57 mm tall, with a shallow frog pressed into its top
@@ -108,14 +108,14 @@ local alderParts =
     box('rim-back', 'clay', [-0.06, 0.045, -0.045], [0.06, 0.057, -0.025]),
     box('rim-front', 'clay', [-0.06, 0.045, 0.025], [0.06, 0.057, 0.045]),
     box('frog', 'frog', [-0.06, 0.045, -0.025], [0.06, 0.047, 0.025]),
-  ], { clay: 'clay-terracotta', frog: 'paint-terracotta' })
+  ], { clay: 'clay-terracotta', frog: 'paint-terracotta' }) + { title: 'Brick' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['ceramic'] } } },
 
   // A strip of alder bark peeled off a trunk, 300 mm long and about 100 mm across before it curled, 8 mm
   // thick: it has rolled into an open quill with its gap turned up and back, one lip curled tighter than
   // the other. The outer skin is grey-brown and the inner face shows the red-orange alder bark turns once
   // cut. Both long edges break off in uneven steps and both ends are torn.
-  h.compound('alder_bark', 0.095, alderParts, { bark: 'bark', inner: 'copper', mark: 'paint-charcoal' })
+  h.compound('alder_bark', 0.095, alderParts, { bark: 'bark', inner: 'copper', mark: 'paint-charcoal' }) + { title: 'Alder bark' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plant'] } } },
 
   // A sheet of birch bark, 300 mm long and 120 mm across its curl, about 4 mm thick: a chalky white outer
@@ -124,7 +124,7 @@ local alderParts =
     box('lenticel-%d-%d' % [i, j], 'mark', [-0.13 + 0.04 * i + 0.012 * (j % 2), 0.0248 - 0.0006 * std.abs(j - 1), -0.016 + 0.014 * j], [-0.112 + 0.04 * i + 0.012 * (j % 2) - 0.004 * (i % 2), 0.0264, -0.0145 + 0.014 * j])
     for i in std.range(0, 6)
     for j in std.range(0, 2)
-  ], { bark: 'enamel-white', inner: 'paperboard-tan', mark: 'paint-charcoal' })
+  ], { bark: 'enamel-white', inner: 'paperboard-tan', mark: 'paint-charcoal' }) + { title: 'Birch bark' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plant'] } } },
 
   // A loose steel blade blank, 500 mm long: a 380 mm blade 44 mm deep with a clipped point and a ground
@@ -135,7 +135,7 @@ local alderParts =
     plate('tang', 'steel', [[-0.25, 0.01], [-0.25, -0.01], [-0.13, -0.012], [-0.13, 0.012]], 0, 0.003),
     disc('hole-a', 'hole', 0.003, 0.0026, 0.0032, -0.22, 0),
     disc('hole-b', 'hole', 0.003, 0.0026, 0.0032, -0.16, 0),
-  ], { steel: 'steel', edge: 'steel-stainless', hole: 'paint-charcoal' })
+  ], { steel: 'steel', edge: 'steel-stainless', hole: 'paint-charcoal' }) + { title: 'Blade' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 ]
 + (
@@ -163,7 +163,7 @@ local alderParts =
         box('heel', 'spine', [x0 - 0.03, 0, spine(0) - 0.05], [x0, 0.008, spine(0)]),
         box('tang', 'spine', [x0 - 0.03, 0.008, spine(0) - 0.03], [x0 - 0.01, 0.06, spine(0) - 0.012]),
         box('tang-lug', 'spine', [x0 - 0.034, 0.05, spine(0) - 0.034], [x0 - 0.006, 0.058, spine(0) - 0.008]),
-      ], { spine: 'steel', blade: 'steel-blued', edge: 'steel-stainless' })
+      ], { spine: 'steel', blade: 'steel-blued', edge: 'steel-stainless' }) + { title: 'Scythe blade' }
     + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['farm'] } } },
   ]
 )
@@ -188,7 +188,7 @@ local alderParts =
     ]) + [
       turned('tie-%d' % i, 'cord', 'x', [[0, 0.086], [0, 0.092], [0.012, 0.092], [0.012, 0.086], [0, 0.086]], [[-0.42, 0.4][i], 0.06, 0])
       for i in [0, 1]
-    ], { bark: 'wood-walnut', wood: 'wood-pine', cord: 'cord-olive' }) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+    ], { bark: 'wood-walnut', wood: 'wood-pine', cord: 'cord-olive' }) + { title: 'Branch bundle' } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   ]
 )
 + [
@@ -199,7 +199,7 @@ local alderParts =
     disc('glue', 'glue', 0.022, 0.003, 0.042),
     turned('label', 'label', 'y', [[0, 0.025], [0, 0.0256], [0.03, 0.0256], [0.03, 0.025], [0, 0.025]], [0, 0.01, 0]),
     turned('cork', 'cork', 'y', [[0, 0], [0, 0.014], [0.012, 0.0155], [0.012, 0]], [0, 0.052, 0]),
-  ], { glass: 'glass-clear', glue: 'resin-honey', label: 'paper-butcher', cork: 'cork' })
+  ], { glass: 'glass-clear', glue: 'resin-honey', label: 'paper-butcher', cork: 'cork' }) + { title: 'Bone glue' }
   + h.inHand('bone_glue', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A valve guitar amplifier head, 560 mm wide, 250 mm tall and 240 mm deep: a black covered cabinet on
@@ -237,7 +237,7 @@ local alderParts =
     handle: 'leather-brown',
     knob: 'plastic-black',
     foot: 'rubber-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
+  }) + { title: 'Amplifier head' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A cardboard archery target box, 600 mm wide, 450 mm tall and 190 mm deep, standing on its long edge:
   // packed tight with cloth, its seams taped, and a painted target of five coloured rings on the front.
@@ -262,7 +262,7 @@ local alderParts =
     'ring-2': 'paint-drum-blue',
     'ring-3': 'paint-red',
     'ring-4': 'plastic-yellow',
-  }) + { taxonomy: { category: 'recreation', tags: { material: ['paper', 'fabric'] } } },
+  }) + { title: 'Archery target box' } + { taxonomy: { category: 'recreation', tags: { material: ['paper', 'fabric'] } } },
 
   // A body pillow rolled up for carrying, 620 mm long and 320 mm across, lying along x: the printed cover
   // rolled round itself so its ends show the spiral, held by two navy webbing straps with steel buckles.
@@ -280,7 +280,7 @@ local alderParts =
       box('buckle-%d' % i, 'buckle', [[-0.2, 0.17][i] - 0.004, 0.318, -0.02], [[-0.2, 0.17][i] + 0.034, 0.328, 0.02]),
     ]
     for i in [0, 1]
-  ]), { cover: 'cloth-cotton', print: 'plastic-pink', strap: 'cloth-navy', buckle: 'steel-stainless' }) + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'] } } },
+  ]), { cover: 'cloth-cotton', print: 'plastic-pink', strap: 'cloth-navy', buckle: 'steel-stainless' }) + { title: 'Body pillow' } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'] } } },
 ]
 + (
   // A withered bouquet in a paper wrap, 470 mm long, lying flat: a fan of dry stems tied with twine at the
@@ -314,7 +314,7 @@ local alderParts =
       'bloom-red': 'paint-oxblood',
       'bloom-cream': 'wax-cream',
       'bloom-pink': 'cloth-shirt-faded',
-    })
+    }) + { title: 'Bouquet' }
     + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
   ]
 )
@@ -338,7 +338,7 @@ local alderParts =
     ] + [
       h.rod('vessel-a', 'vessel', 0.004, -0.07, -0.02, 0.012),
       turned('vessel-b', 'vessel', 'z', [[0, 0], [0, 0.0035], [0.04, 0.003], [0.04, 0]], [0.004, 0.008, -0.06]),
-    ], { bladder: 'jelly-pale', tissue: 'body-gore', vessel: 'body-gore' })
+    ], { bladder: 'jelly-pale', tissue: 'body-gore', vessel: 'body-gore' }) + { title: 'Float bladders' }
     + { voxelGrain: 0.002 } + { taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } } },
   ]
 )
@@ -358,6 +358,6 @@ local alderParts =
       [0.028 + 0.03 * c - 0.007 * s, 0.03 * s + 0.007 * c],
     ], -0.044, -0.004)
     for k in std.range(0, 4)
-  ], { petal: 'plastic-pink', sepal: 'paint-green', stem: 'plant-dried' })
+  ], { petal: 'plastic-pink', sepal: 'paint-green', stem: 'plant-dried' }) + { title: 'Giant flower bud' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 ]

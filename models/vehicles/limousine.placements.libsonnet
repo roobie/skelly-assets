@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'limousine.spec.libsonnet';
 {
+  title: 'Limousine',
   sites: (import 'car-sites.libsonnet')('limousine', s, {
     over: {
       engine: { part: 'engine_v8_petrol', at: [s.frontAxle - 0.02, 0.2, 0] },

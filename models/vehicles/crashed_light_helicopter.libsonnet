@@ -24,7 +24,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
                k.bar('torn_0', 'paint', [1.42, 0.86], [1.7, 1.0], 0.05, [0.12, 0.34]),
                k.bar('torn_1', 'crease', [1.55, 0.3], [1.78, 0.42], 0.05, [-0.3, -0.06]),
              ],
-             { paint: s.paint, crease: s.crease }),
+             { paint: s.paint, crease: s.crease }) + { title: 'Crashed light helicopter belly' },
   k.compound('crashed_light_helicopter_rear_fairing', 18,
              h.shell('wall', 'paint', s.body, thick=0.0625, x=[-2.05, s.bulkhead])
              + h.loft('bulkhead', 'paint', s.body, x=[s.bulkhead - 0.05, s.bulkhead], step=0.05)
@@ -35,25 +35,25 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
                box('deck', 'dark', [-1.02, 0.4, -0.42], [0.1, 0.45, 0.42]),
                k.turned('pylon', 'paint', 'y', [[1.45, 0], [1.45, 0.3], [1.91, 0.12], [1.91, 0], [1.45, 0]]) + { sides: 12 },
              ],
-             { paint: s.paint, dark: trim, crease: s.crease }),
+             { paint: s.paint, dark: trim, crease: s.crease }) + { title: 'Crashed light helicopter rear fairing' },
   k.compound('crashed_light_helicopter_canopy', 8,
              // Only the far and rear panes are left; the front of the bubble went with the nose.
              h.shell('far', 'glass', s.body, x=[s.doorRear, s.doorFront], arc=[270, 345])
              + h.shell('far_shard', 'glass', s.body, x=[s.doorFront, 1.28], arc=[280, 320])
              + h.shell('rear', 'glass', s.body, x=[s.bulkhead, s.doorRear], arc=h.dome)
              + h.shell('near_shard', 'glass', s.body, x=[s.doorRear, 0.6], arc=[20, 62]),
-             { glass: 'glass-clear' }),
+             { glass: 'glass-clear' }) + { title: 'Crashed light helicopter canopy' },
   k.compound('crashed_light_helicopter_canopy_frame', 6,
              h.shell('front_bow', 'frame', s.body, x=[s.doorFront - 0.04, s.doorFront + 0.04], arc=h.dome, step=0.08)
              + h.shell('rear_bow', 'frame', s.body, x=[s.doorRear - 0.04, s.doorRear + 0.04], arc=h.dome, step=0.08)
              + h.shell('spine', 'frame', s.body, x=[s.bulkhead, 1.28], arc=[-5, 5], sides=32)
              + h.shell('rail_near', 'frame', s.body, x=[s.doorRear, s.doorFront], arc=[s.doorArc - 3, s.doorArc + 3], sides=120)
              + h.shell('rail_far', 'frame', s.body, x=[s.doorRear, s.doorFront], arc=[360 - s.doorArc - 3, 360 - s.doorArc + 3], sides=120),
-             { frame: s.paint }),
+             { frame: s.paint }) + { title: 'Crashed light helicopter canopy frame' },
   k.compound('crashed_light_helicopter_door', 7, [
     box('frame', 'frame', [-0.3, 0, 1.05], [0.5, 0.05, 1.75]),
     box('pane', 'glass', [-0.22, 0.05, 1.13], [0.42, 0.075, 1.67]),
-  ], { glass: 'glass-clear', frame: s.paint }),
+  ], { glass: 'glass-clear', frame: s.paint }) + { title: 'Crashed light helicopter door' },
   k.compound('crashed_light_helicopter_tail_boom', 12,
              h.boom('boom', 'paint', { x: -1.85, y: 0.93, r: 0.14 }, { x: -2.85, y: 0.72, r: 0.11 })
              + h.boom('sagged', 'paint', { x: -2.85, y: 0.7, r: 0.11 }, { x: s.tail.x + 0.1, y: s.tail.y, r: 0.06 })
@@ -61,19 +61,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
                k.turned('buckle', 'dark', 'x', k.disc(0.14, -2.92, -2.78), [0, 0.71, 0]) + { sides: 8 },
                box('gearbox', 'dark', [s.tail.x - 0.08, s.tail.y - 0.07, -0.07], [s.tail.x + 0.08, s.tail.y + 0.07, 0.07]),
              ],
-             { paint: s.boomPaint, dark: trim }),
+             { paint: s.boomPaint, dark: trim }) + { title: 'Crashed light helicopter tail boom' },
   k.compound('crashed_light_helicopter_tail_surfaces', 3, [
     h.fin('fin', 'paint', [[-3.84, 0.36], [-4.16, 0.32], [-4.42, 0.98], [-4.14, 0.98]]),
     h.fin('ventral', 'paint', [[-3.92, 0.32], [-4.16, 0.32], [-4.3, 0.0], [-4.1, 0.0]]),
     box('stabiliser', 'paint', [-3.74, 0.46, -0.48], [-3.48, 0.5, 0.48]),
-  ], { paint: s.paint }),
+  ], { paint: s.paint }) + { title: 'Crashed light helicopter tail surfaces' },
   k.compound('crashed_light_helicopter_tail_rotor', 5, [
     k.turned('hub', 'head', 'z', k.disc(0.05, 0, 0.14), [s.tail.x, s.tail.y, 0]) + { sides: 8 },
     k.bar('up', 'blade', [s.tail.x, s.tail.y], [s.tail.x + 0.12, s.tail.y + 0.4], 0.11, [0.1, 0.15]),
     k.bar('up_tip', 'tip', [s.tail.x + 0.12, s.tail.y + 0.4], [s.tail.x + 0.2, s.tail.y + 0.5], 0.11, [0.1, 0.15]),
     k.bar('down', 'blade', [s.tail.x, s.tail.y], [s.tail.x - 0.38, s.tail.y - 0.22], 0.1, [0.1, 0.15]),
     k.bar('down_tip', 'tip', [s.tail.x - 0.38, s.tail.y - 0.22], [s.tail.x - 0.5, s.tail.y - 0.24], 0.1, [0.1, 0.15]),
-  ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
+  ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }) + { title: 'Crashed light helicopter tail rotor' },
   k.compound('crashed_light_helicopter_main_rotor', 40,
              [
                k.turned('hub', 'head', 'y', k.disc(0.14, s.hub - 0.08, s.hub + 0.04)) + { sides: 12 },
@@ -85,8 +85,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              // Whipped up and back on the far side, kinked where it hit the boom.
              + h.ribbon('b', 'blade', [[-0.03, s.hub, -0.1], [-0.5, 2.3, -1.0], [-0.95, 2.62, -1.65], [-1.55, 2.5, -2.15], [-2.35, 2.05, -2.45]], 0.2, thick=0.0625, step=0.1)
              + h.ribbon('b_tip', 'tip', [[-2.35, 2.05, -2.45], [-2.8, 1.72, -2.55]], 0.2, thick=0.0625, step=0.1),
-             { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
-  h.mast('crashed_light_helicopter_mast', 12, s.hub - s.mastFoot),
+             { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }) + { title: 'Crashed light helicopter main rotor' },
+  h.mast('crashed_light_helicopter_mast', 12, s.hub - s.mastFoot) + { title: 'Crashed light helicopter mast' },
   k.compound('crashed_light_helicopter_skids', 20,
              // Each leg is splayed flat and each skid snapped, so the pieces lie on the ground beside the belly.
              h.ribbon('leg_front_near', 'tube', [[0.72, 0.1, 0.5], [0.74, 0.1, 1.2]], 0.1, thick=0.1)
@@ -96,10 +96,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + h.ribbon('near_rear', 'tube', [[-0.04, 0.1, 1.0], [-1.05, 0.1, 1.08], [-1.3, 0.18, 1.1]], 0.1, thick=0.1)
              + h.ribbon('far_rear', 'tube', [[0.28, 0.1, -1.22], [-0.55, 0.1, -1.12], [-1.05, 0.1, -0.95], [-1.3, 0.18, -0.88]], 0.1, thick=0.1)
              + h.ribbon('far_front', 'tube', [[0.62, 0.1, -1.05], [1.45, 0.1, -1.18], [1.9, 0.1, -0.98], [2.12, 0.28, -0.84]], 0.1, thick=0.1),
-             { tube: trim }),
+             { tube: trim }) + { title: 'Crashed light helicopter skids' },
   k.compound('crashed_light_helicopter_seat_frame', 7, [
     box('pan', 'dark', [-0.24, 0, -0.23], [0.22, 0.08, 0.23]),
     box('cushion', 'seat', [-0.24, 0.08, -0.23], [0.22, 0.18, 0.23]),
     k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.23, 0.23]),
-  ], { dark: trim, seat: 'cloth-seat' }),
+  ], { dark: trim, seat: 'cloth-seat' }) + { title: 'Crashed light helicopter seat frame' },
 ])

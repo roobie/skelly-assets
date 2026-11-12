@@ -34,6 +34,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       chestWidth: positive,
       chestDepth: positive,
       chestHeight: positive,
+      /** How far up the chest the armpit lies, as a share of its height: the trunk region's top. */
+      armpit: positive,
       torsoChamfer: positive,
       chestChamfer: positive,
       shoulderWidth: positive,
@@ -143,11 +145,12 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       ...region('trunk', [
         oval('waist', 'skin', ys(waist, ribs), { halfX: d.waistWidth / 2, halfZ: d.waistDepth / 2, power: 3, cz: 0.002 }),
         oval('ribs', 'skin', ys(ribs, chest), { halfX: d.ribWidth / 2, halfZ: d.ribDepth / 2, power: 3 }),
-        // The chest widens from the ribs over a short step, then carries the plane of the pectorals.
-        oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * 0.4), { halfX: chestHalfX * 0.95, halfZ: chestHalfZ - 0.002, power: 3.2 }),
+        // The chest widens from the ribs over a short step, then carries the plane of the pectorals. Below the armpit
+        // it stays inside the hanging arm, so a sleeveless shell can enclose it without passing through the arm.
+        oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * d.armpit), { halfX: chestHalfX * 0.94, halfZ: chestHalfZ - 0.002, power: 3.2 }),
       ]),
       ...region('shoulders', [
-        oval('chest', 'skin', ys(chest + d.chestHeight * 0.35, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
+        oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
         pec('pec-left', 1),
         pec('pec-right', -1),
         trapezius('trap-left', 1),

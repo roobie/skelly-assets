@@ -5,6 +5,9 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local id = 'cab_over_field_car';
+local vehicle = import 'cab_over_field_car.placements.libsonnet';
+// A compound row of this vehicle, titled with its title and the part's `label`.
+local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
 local finish = { paint: 'paint-olive', frame: 'steel-spall-black', dark: 'steel-spall-black', trim: 'paint-charcoal', liner: 'steel-spall-black', glass: 'glass-clear', seal: 'rubber-black', seam: 'steel-spall-black' };
 
 // Edges are functions of height, so a raked or diagonal edge draws as one piece.
@@ -52,7 +55,7 @@ local handle(name, x) = box(name, 'dark', [x - 0.2, s.belt - 0.08, s.side], [x, 
 
 local d = s.cabDoor;
 local doorFront(y) = frontLine(y) - s.skin;
-local cabDoor = k.compound(id + '_cab_door', s.mass.cabDoor, [
+local cabDoor = part('_cab_door', 'cab door', s.mass.cabDoor, [
   box('skin', 'paint', [d.stepAft, d.step, s.side - s.skin], [d.fore, s.belt, s.side]),
   flat('fore', [[d.foot, d.low], [d.fore, d.low], [d.fore, d.step], [d.stepFore, d.step]]),
   flat('aft', [[d.rear, d.stepAftTop], [d.stepAft, d.step], [d.stepAft, s.belt], [d.rear, s.belt]]),
@@ -66,7 +69,7 @@ local cabDoor = k.compound(id + '_cab_door', s.mass.cabDoor, [
   finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] });
 
 local e = s.sideDoor;
-local sideDoor = k.compound(id + '_side_door', s.mass.sideDoor, [
+local sideDoor = part('_side_door', 'side door', s.mass.sideDoor, [
   rect('skin', e.rear, e.fore, e.low, s.belt),
   strap('hinge_low', e.fore + 0.02, s.hinges.side[0]),
   strap('hinge_high', e.fore + 0.02, s.hinges.side[1]),
@@ -82,7 +85,7 @@ local rd = s.rearDoor;
 local skinBack(edge) = plus(edge, s.skin);
 local backAt(y) = if y <= s.belt then s.rear else rearLine(y);
 local rearSection(name, slot, low, high, z) = section(name, slot, backAt, skinBack(backAt), low, high, z);
-local rearDoor = k.compound(id + '_rear_door', s.mass.rearDoor, [
+local rearDoor = part('_rear_door', 'rear door', s.mass.rearDoor, [
   rearSection('skin', 'paint', rd.low, s.belt, [-rd.half, rd.half]),
   rearSection('under_window', 'paint', s.belt, rd.windowLow, [-rd.half, rd.half]),
   rearSection('over_window', 'paint', rd.windowHigh, rd.top, [-rd.half, rd.half]),
@@ -176,7 +179,7 @@ local tyrePieces = [
   k.turned('boss', 'boss', 'z', k.disc(0.09, -0.15, 0.15)) + { sides: 12 },
 ] + lugs;
 local wheelFinish = { tyre: 'rubber-black', rim: 'paint-olive', boss: 'steel-spall-black' };
-local shaft(name, mass, span) = local half = (span[1] - span[0]) / 2; k.compound(name, mass, [k.turned('tube', 'steel', 'x', k.disc(s.shaftRadius, -half, half))], { steel: 'paint-charcoal' });
+local shaft(suffix, label, mass, span) = local half = (span[1] - span[0]) / 2; part(suffix, label, mass, [k.turned('tube', 'steel', 'x', k.disc(s.shaftRadius, -half, half))], { steel: 'paint-charcoal' });
 
 local dp = s.downpipe;
 local pipeZ = s.exhaustAt[2];
@@ -191,18 +194,18 @@ local screenSection(name, slot, low, high, z) = section(name, slot, plus(frontLi
 local spring(i, reach, y) = box('leaf_' + i, 'steel', [-reach, y, s.springZ - 0.035], [reach, y + 0.02, s.springZ + 0.035]);
 
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
-  k.compound(id + '_wheel', s.mass.wheel, tyrePieces, wheelFinish, { hub: ['rim', [0.5, 0.5, 0.5]] }),
-  k.compound(id + '_spare_wheel', s.mass.spare, [
+  part('_wheel', 'wheel', s.mass.wheel, tyrePieces, wheelFinish, { hub: ['rim', [0.5, 0.5, 0.5]] }),
+  part('_spare_wheel', 'spare wheel', s.mass.spare, [
     box('bracket', 'boss', [-s.voxel, -0.12, -0.12], [0, 0.12, 0.12]),
     k.turned('boss', 'boss', 'x', k.disc(0.09, -halfWheel, halfWheel), [-s.voxel - halfWheel, 0, 0]) + { sides: 12 },
   ] + [p { axis: 'x', origin: [-s.voxel - halfWheel, 0, 0] } for p in tyrePieces if p.kind == 'turned' && p.id != 'boss'], wheelFinish),
-  k.compound(id + '_jerry_can', s.mass.jerryCan, [
+  part('_jerry_can', 'jerry can', s.mass.jerryCan, [
     box('can', 'can', [-0.195, 0, -0.17], [-0.03125, 0.43, 0.17]),
     box('handle', 'can', [-0.13, 0.43, -0.1], [-0.09, 0.47, 0.1]),
     box('bracket', 'frame', [-0.21, -0.03125, -0.19], [0, 0, 0.19]),
     box('strap', 'strap', [-0.21, 0, -0.03], [-0.195, 0.44, 0.03]),
   ], { can: 'polymer-od-green', frame: 'steel-parkerized', strap: 'plastic-orange' }),
-  k.compound(id + '_axle', s.mass.axle, [
+  part('_axle', 'axle', s.mass.axle, [
     box('diff', 'steel', [-s.diffHalf, s.diffLow, -0.16], [s.diffHalf, s.diffHigh, 0.16]),
     box('half_shaft', 'steel', [-0.04, s.shaftHigh - 0.04, -s.portalZ[0]], [0.04, s.shaftHigh + 0.04, s.portalZ[0]]),
   ] + bothSides([
@@ -212,34 +215,34 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     spring(1, s.springHalf * 0.75, s.springBase + 0.02),
     spring(2, s.springHalf * 0.5, s.springBase),
   ]), { steel: 'paint-charcoal', drum: 'steel-spall-black' }),
-  k.compound(id + '_transfer_case', s.mass.transfer, [box('case', 'casting', [-s.transferHalf, 0, -0.18], [s.transferHalf, s.transferHeight, 0.18])], { casting: 'paint-charcoal' }),
-  shaft(id + '_front_prop_shaft', s.mass.frontShaft, s.frontShaft),
-  shaft(id + '_rear_prop_shaft', s.mass.rearShaft, s.rearShaft),
-  k.compound(id + '_downpipe', s.mass.downpipe, [
+  part('_transfer_case', 'transfer case', s.mass.transfer, [box('case', 'casting', [-s.transferHalf, 0, -0.18], [s.transferHalf, s.transferHeight, 0.18])], { casting: 'paint-charcoal' }),
+  shaft('_front_prop_shaft', 'front prop shaft', s.mass.frontShaft, s.frontShaft),
+  shaft('_rear_prop_shaft', 'rear prop shaft', s.mass.rearShaft, s.rearShaft),
+  part('_downpipe', 'downpipe', s.mass.downpipe, [
     box('riser', 'pipe', [dp.x[0], dp.low, dp.manifoldZ[0]], [dp.x[1], dp.manifoldTop, dp.manifoldZ[1]]),
     box('cross', 'pipe', [dp.x[0], dp.low, pipeZ - dp.half], [dp.x[1], dp.high, dp.manifoldZ[0]]),
     box('along', 'pipe', [dp.x[1], dp.low, pipeZ - dp.half], [pipeEnd + dp.half, dp.high, pipeZ + dp.half]),
     box('drop', 'pipe', [pipeEnd - dp.half, s.exhaustAt[1] + s.exhaustPipeTop - dp.half, pipeZ - dp.half], [pipeEnd + dp.half, dp.low, pipeZ + dp.half]),
   ], { pipe: 'steel-heat-tint' }),
-  k.compound(id + '_frame', s.mass.frame, [
+  part('_frame', 'frame', s.mass.frame, [
     box('cross_' + i, 'frame', [s.crossmembers[i] - 0.03, s.railTop - 0.035, -s.railZ[1]], [s.crossmembers[i] + 0.03, s.railTop, s.railZ[1]])
     for i in std.range(0, std.length(s.crossmembers) - 1)
   ] + bothSides([
     box('rail', 'frame', [s.rear, s.railLow, s.railZ[0]], [s.railFore, s.railTop, s.railZ[1]]),
   ]), finish),
-  k.compound(id + '_front_bumper', s.mass.frontBumper, [
+  part('_front_bumper', 'front bumper', s.mass.frontBumper, [
     box('beam', 'paint', [s.nose, b.low, -s.bumperHalf], [s.front - s.voxel, b.high, s.bumperHalf]),
     box('tow_eye', 'dark', [s.front - s.voxel, b.low + 0.01, -0.07], [s.front, b.high - 0.01, 0.07]),
   ] + bothSides([
     k.xPrism('gusset', 'paint', [[b.low, b.gussetZ - 0.13], [b.low, b.gussetZ + 0.13], [b.low - b.gussetDrop, b.gussetZ + 0.06], [b.low - b.gussetDrop, b.gussetZ - 0.06]], [s.nose + 0.02, s.front - 0.02]),
     k.bar('stay', 'dark', [s.nose + 0.02, b.low + 0.03], [fa.foreBase[0] + 0.02, fa.foreBase[1] - 0.03], s.voxel, [s.side - 0.05, s.side - 0.02]),
   ]), finish),
-  k.compound(id + '_rear_bumper', s.mass.rearBumper, [
+  part('_rear_bumper', 'rear bumper', s.mass.rearBumper, [
     box('beam', 'paint', [s.rearBumper, s.rearBumperY[0], -s.bumperHalf], [s.rear, s.rearBumperY[1], s.bumperHalf]),
   ] + bothSides([
     box('flap', 'flap', [s.rearBumper + 0.02, s.flapLow, s.flapZ[0]], [s.rearBumper + 0.05, s.rearBumperY[0], s.flapZ[1]]),
   ]), finish + { flap: 'rubber-black' }),
-  k.compound(id + '_hull', s.mass.hull, bothSides(hullSide) + [
+  part('_hull', 'hull', s.mass.hull, bothSides(hullSide) + [
     box('rear_floor', 'trim', [s.rear, s.floorUnder, -s.wellIn], [s.coverBack, s.rearFloor, s.wellIn]),
     box('cab_floor', 'trim', [s.coverFore, s.cabFloorUnder, -s.wellIn], [s.nose - s.skin, s.cabFloor, s.wellIn]),
     box('rear_sill', 'paint', [s.rear, s.rearLow, -rd.half], [s.rear + s.skin, rd.low, rd.half]),
@@ -265,7 +268,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   ] + bothSides([
     box('tunnel_side', 'trim', [s.tunnelBack, s.cabFloor, s.tunnelHalf], [s.nose - s.skin, s.tunnelTop, s.tunnelHalf + s.skin]),
   ]), finish),
-  k.compound(id + '_grille', s.mass.grille, [
+  part('_grille', 'grille', s.mass.grille, [
     box('backing', 'dark', [s.nose - s.skin, g.low, -g.half], [s.nose - 0.01, g.high, g.half]),
     box('frame_low', 'paint', [s.nose - 0.01, g.low, -g.half], [s.nose + s.voxel, g.low + g.frame, g.half]),
     box('frame_high', 'paint', [s.nose - 0.01, g.high - g.frame, -g.half], [s.nose + s.voxel, g.high, g.half]),
@@ -275,22 +278,22 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('bar_' + i, 'paint', [s.nose - 0.01, g.low + g.frame + i * slotPitch - s.voxel / 2, -g.half], [s.nose, g.low + g.frame + i * slotPitch + s.voxel / 2, g.half])
     for i in std.range(1, g.slots - 1)
   ], finish),
-  k.compound(id + '_headlamp', s.mass.headlamp, [
+  part('_headlamp', 'headlamp', s.mass.headlamp, [
     k.turned('bowl', 'dark', 'x', k.disc(0.12, -0.01, 0.03125)) + { sides: 24 },
     k.turned('lens', 'lens', 'x', k.disc(0.1, 0.03125, 0.0625)) + { sides: 24 },
   ], { dark: 'paint-olive', lens: 'plastic-frosted' }),
-  k.compound(id + '_blackout_lamp', s.mass.blackoutLamp, [
+  part('_blackout_lamp', 'blackout lamp', s.mass.blackoutLamp, [
     k.turned('bowl', 'dark', 'x', k.disc(0.075, 0, 0.0625)) + { sides: 16 },
   ], { dark: 'steel-spall-black' }),
-  k.compound(id + '_tail_lamp', s.mass.tailLamp, [
+  part('_tail_lamp', 'tail lamp', s.mass.tailLamp, [
     box('bracket', 'dark', [-0.03125, 0, -0.17], [0.06, 0.03125, 0.17]),
     k.turned('red', 'red', 'x', k.disc(0.08, -0.03125, 0.03125), [0, 0.1, 0.09]) + { sides: 16 },
     k.turned('clear', 'clear', 'x', k.disc(0.08, -0.03125, 0.03125), [0, 0.1, -0.09]) + { sides: 16 },
   ], { dark: 'steel-spall-black', red: 'plastic-red', clear: 'plastic-frosted' }),
-  k.compound(id + '_wiper', s.mass.wiper, [
+  part('_wiper', 'wiper', s.mass.wiper, [
     box('blade', 'dark', [frontLine(windscreenLow + 0.04), windscreenLow + 0.03, 0.12], [frontLine(windscreenLow + 0.04) + s.voxel, windscreenLow + 0.03 + s.voxel, 0.68]),
   ], finish),
-  k.compound(id + '_door_mirror', s.mass.mirror, [
+  part('_door_mirror', 'door mirror', s.mass.mirror, [
     box('arm', 'dark', [-0.015, 0, 0], [0.015, s.voxel, 0.07]),
     box('stalk', 'dark', [-0.015, 0, 0.04], [0.015, 0.22, 0.07]),
     k.xPrism('head', 'dark', [[0.2, 0.04], [0.24, 0.01], [0.38, 0.01], [0.42, 0.04], [0.42, 0.13], [0.38, 0.16], [0.24, 0.16], [0.2, 0.13]], [-0.025, 0.025]),
@@ -298,7 +301,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   cabDoor,
   sideDoor,
   rearDoor,
-  k.compound(id + '_windscreen', s.mass.windscreen, [
+  part('_windscreen', 'windscreen', s.mass.windscreen, [
     screenSection('centre_post', 'seal', windscreenLow, windscreenHigh, [-s.seal / 2, s.seal / 2]),
     screenSection('seal_low', 'seal', windscreenLow, windscreenLow + s.seal, [-s.screenHalf, s.screenHalf]),
     screenSection('seal_high', 'seal', windscreenHigh - s.seal, windscreenHigh, [-s.screenHalf, s.screenHalf]),
@@ -307,19 +310,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     screenSection('seal_side', 'seal', windscreenLow + s.seal, windscreenHigh - s.seal, [s.screenHalf - s.seal, s.screenHalf]),
   ]),
   finish),
-  k.compound(id + '_dashboard', s.mass.dashboard, [
+  part('_dashboard', 'dashboard', s.mass.dashboard, [
     box('shelf', 'trim', [dash.back, s.tunnelTop + s.skin, -dash.half], [frontLine(dash.back) - 0.05, dash.top, dash.half]),
     box('dials', 'dark', [dash.back - s.voxel, s.tunnelTop + 0.1, -0.8], [dash.back, dash.top - 0.02, -0.4]),
     k.bar('column', 'dark', [dash.back, s.wheelY + 0.03], [s.wheelX + 0.03, s.wheelY], 0.05, [-s.seatZ - 0.025, -s.seatZ + 0.025]),
   ], finish),
-  k.compound(id + '_engine_cover', s.mass.engineCover, [
+  part('_engine_cover', 'engine cover', s.mass.engineCover, [
     box('top', 'trim', [s.coverBack, s.coverTop - s.skin, -s.coverHalf], [s.coverFore, s.coverTop, s.coverHalf]),
     box('back', 'trim', [s.coverBack, s.rearFloor, -s.coverHalf], [s.coverBack + s.skin, s.coverTop - s.skin, s.coverHalf]),
     box('front', 'trim', [s.coverFore - s.skin, s.cabFloor, -s.coverHalf], [s.coverFore, s.coverTop - s.skin, s.coverHalf]),
   ] + bothSides([
     box('side', 'trim', [s.coverBack, s.cabFloor, s.coverHalf - s.skin], [s.coverFore, s.coverTop - s.skin, s.coverHalf]),
   ]), finish),
-  k.compound(id + '_crew_seat', s.mass.crewSeat, [
+  part('_crew_seat', 'crew seat', s.mass.crewSeat, [
     box('plank', 'seat', [-0.45, 0, -0.17], [0.45, 0.05, 0.17]),
     box('back', 'seat', [-0.45, 0, 0.15], [0.45, 0.55, 0.19]),
   ], { seat: 'polymer-black' }),

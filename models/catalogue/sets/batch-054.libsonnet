@@ -33,7 +33,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
   ], {
     body: 'polymer-od-green', guard: 'rubber-black', panel: 'plastic-charcoal', screen: 'lcd-green',
     switch: 'plastic-red', handle: 'alu-bare', socket: 'alu-bare', pin: 'plastic-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Field power pack' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A thumb drive 50 mm long: an 18 mm by 8 mm plastic body with a lanyard hole, and a 12 mm metal plug.
   h.compound('usb_drive', 0.0055, [
@@ -43,7 +43,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     box('tongue', 'tongue', [0.0125, 0.002, -0.005], [0.0252, 0.004, 0.005]),
     box('hole-a', 'hole', [0.018, 0.0065, -0.004], [0.021, 0.0068, -0.002]),
     box('hole-b', 'hole', [0.018, 0.0065, 0.002], [0.021, 0.0068, 0.004]),
-  ], { body: 'plastic-blue', loop: 'plastic-black', plug: 'steel-stainless', tongue: 'plastic-black', hole: 'plastic-black' }) + {
+  ], { body: 'plastic-blue', loop: 'plastic-black', plug: 'steel-stainless', tongue: 'plastic-black', hole: 'plastic-black' }) + { title: 'USB drive' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
@@ -53,7 +53,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     h.turned('band', 'band', 'x', [[0, 0], [0, 0.0175], [0.006, 0.0175], [0.006, 0]], [0.118, 0.023, 0]),
     h.turned('head', 'head', 'x', [[0, 0], [0, 0.012], [0.006, 0.019], [0.014, 0.0225], [0.024, 0.023], [0.034, 0.0215], [0.040, 0.016], [0.043, 0.008], [0.043, 0]], [0.155, 0.023, 0]),
     box('switch', 'switch', [0.075, 0.038, -0.005], [0.093, 0.0415, 0.005]),
-  ], { handle: 'plastic-gloss-white', band: 'alu-bare', head: 'plastic-pink', switch: 'plastic-charcoal' }) + h.gripOn('vibrator', 'handle') + {
+  ], { handle: 'plastic-gloss-white', band: 'alu-bare', head: 'plastic-pink', switch: 'plastic-charcoal' }) + { title: 'Vibrator' } + h.gripOn('vibrator', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -65,7 +65,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     box('tape', 'tape', [-0.055, 0, 0.004], [-0.02, 0.003, 0.012]),
     strip('wrench', 'metal', [-0.03, -0.012], [0.04, -0.014], 0.005, 0.002),
     strip('wrench-leg', 'metal', [0.0375, -0.0135], [0.04, -0.028], 0.005, 0.002),
-  ], { metal: 'scrap-rusted', tape: 'tape-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
+  ], { metal: 'scrap-rusted', tape: 'tape-grey' }) + { title: 'Crude picklock' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
   // Two lengths of thin bent wire: an 80 mm pick with a kinked tip and an L-shaped 60 mm tension wrench.
   h.compound('emergency_lockpick', 0.004, [
@@ -75,13 +75,13 @@ local strip(id, slot, a, b, w, t, y0=0) =
     strip('pick-back', 'wire', [-0.04, 0.014], [-0.02, 0.014], 0.002, 0.002),
     strip('wrench', 'wire', [-0.03, -0.01], [0.03, -0.01], 0.002, 0.002),
     strip('wrench-leg', 'wire', [0.03, -0.01], [0.03, -0.022], 0.002, 0.002),
-  ], { wire: 'steel-galvanised' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { wire: 'steel-galvanised' }) + { title: 'Emergency lockpick' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 1.52 m construction pry bar of 26 mm round steel, pointed at one end and forged to a hardened chisel at the other.
   h.compound('heavy_crowbar', 5.5, [
     h.turned('bar', 'bar', 'x', [[0, 0], [0, 0.004], [0.08, 0.013], [1.44, 0.013], [1.44, 0]], [0, 0.013, 0]),
     h.prism('chisel', 'tip', 'z', [[1.44, 0], [1.44, 0.026], [1.52, 0.015], [1.52, 0.011]], -0.015, 0.015),
-  ], { bar: 'steel-parkerized', tip: 'steel-bright' }) + h.gripOn('heavy_crowbar', 'bar') + {
+  ], { bar: 'steel-parkerized', tip: 'steel-bright' }) + { title: 'Heavy crowbar' } + h.gripOn('heavy_crowbar', 'bar') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -98,7 +98,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     flat('pick-c', 'head', [[0.47, -0.15], [0.452, -0.168], [0.46, -0.14]], 0.005, 0.015),
     box('hammer-neck', 'head', [0.475, 0.003, 0.016], [0.505, 0.017, 0.05]),
     box('hammer', 'head', [0.47, 0, 0.05], [0.51, 0.02, 0.07]),
-  ], { shaft: 'paint-police-blue', grip: 'rubber-black', head: 'steel-stainless' }) + h.gripOn('ice_axe', 'grip') + {
+  ], { shaft: 'paint-police-blue', grip: 'rubber-black', head: 'steel-stainless' }) + { title: 'Ice ax' } + h.gripOn('ice_axe', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'rubber'], setting: ['modern'] } } },
 
@@ -136,7 +136,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     for i in [0, 1, 2, 3]
   ] + [
     box('gauge', 'handle', [-0.074, 0.006, 0.03], [-0.03, 0.009, 0.044]),
-  ], { case: 'leather-brown', zip: 'brass-dull', band: 'webbing-black', handle: 'plastic-matte-black', pick: 'steel-stainless' }) + {
+  ], { case: 'leather-brown', zip: 'brass-dull', band: 'webbing-black', handle: 'plastic-matte-black', pick: 'steel-stainless' }) + { title: 'Lockpick set' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'], setting: ['modern'] } } },
 ]

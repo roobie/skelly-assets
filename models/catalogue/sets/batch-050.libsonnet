@@ -42,7 +42,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.disc('nut', 'iron', 0.04, 0.82, 0.86),
     h.disc('head', 'iron', 0.03, 0.86, 0.9),
     box('bar', 'iron', [-0.2, 0.87, -0.01], [0.2, 0.89, 0.01]),
-  ], { wood: 'wood-oak', gap: 'paint-charcoal', iron: 'iron-dull' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'] } } },
+  ], { wood: 'wood-oak', gap: 'paint-charcoal', iron: 'iron-dull' }) + { title: 'Fruit press' } + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['wood', 'metal'] } } },
 
   // A shallow woven sieve 240 mm across and 45 mm deep: a coiled rim of plant strips round a tight basket-weave
   // floor.
@@ -59,7 +59,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     local z = -0.1 + i * 0.0125, c = std.sqrt(0.0121 - z * z) - 0.004;
     box('weft-%d' % i, if i % 2 == 0 then 'strip' else 'weave', [-c, 0.006, z - 0.004], [c, 0.008, z + 0.004])
     for i in std.range(0, 16)
-  ], { weave: 'straw-wicker', strip: 'plant-dried', rim: 'plant-dried', gap: 'bark' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plant'] } } },
+  ], { weave: 'straw-wicker', strip: 'plant-dried', rim: 'plant-dried', gap: 'bark' }) + { title: 'Woven sieve' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plant'] } } },
 
   // A laboratory test sieve 200 mm across and 50 mm tall: a polished stainless frame with a stepped skirt that
   // nests on the next sieve, and a fine woven mesh across its middle.
@@ -78,7 +78,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
   ] + [
     // A stamped label plate on the front of the frame.
     box('label', 'label', [-0.025, 0.022, 0.099], [0.025, 0.036, 0.102]),
-  ], { frame: 'steel-stainless', mesh: 'steel-grey', wire: 'steel-bright', label: 'brass' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['laboratory'] } } },
+  ], { frame: 'steel-stainless', mesh: 'steel-grey', wire: 'steel-bright', label: 'brass' }) + { title: 'Steel sieve' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['laboratory'] } } },
 
   // A hand sieve twisted from stiff wire: a loop 130 mm across holding a disc of fine mesh, its two wire ends
   // twisted into a 120 mm handle with a hanging loop, 255 mm overall. Lies along x, handle to +x.
@@ -95,7 +95,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     for i in std.range(0, 9)
   ] + [
     ring('loop', 'wire', 0.012, 0.002, 0.0, 0.135, 0),
-  ], { wire: 'steel-bright', mesh: 'steel-grey', strand: 'steel-stainless' }) + h.gripOn('makeshift_wire_sieve', 'twist-5') + {
+  ], { wire: 'steel-bright', mesh: 'steel-grey', strand: 'steel-stainless' }) + { title: 'Makeshift wire sieve' } + h.gripOn('makeshift_wire_sieve', 'twist-5') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
@@ -119,7 +119,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.disc('snow', 'ice', 0.04, 0.035, 0.07, 0, 0.035),
     // The power switch on the front of the tower.
     box('switch', 'trim', [0.055, 0.15, -0.005], [0.075, 0.17, 0.002]),
-  ], { body: 'plastic-red', clear: 'plastic-clear', trim: 'plastic-white', dark: 'paint-charcoal', ice: 'chalk-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
+  ], { body: 'plastic-red', clear: 'plastic-clear', trim: 'plastic-white', dark: 'paint-charcoal', ice: 'chalk-white' }) + { title: 'Shaved ice maker' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A copper pot still 620 mm wide and 560 mm tall: a riveted boiler 300 mm across with a domed shoulder, a column
   // and helmet with a thermometer port, a swan-neck arm running down to a worm tub with a tap at the front.
@@ -145,7 +145,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     box('handle-l', 'brass', [-0.315, 0.2, -0.02], [-0.295, 0.24, 0.02]),
     // A drain tap at the boiler's foot.
     h.turned('drain', 'brass', 'z', [[0, 0], [0, 0.01], [0.04, 0.01], [0.04, 0]], [-0.15, 0.04, 0.14]),
-  ], { copper: 'copper', brass: 'brass', dial: 'paint-white', tub: 'steel-galvanised', water: 'water' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
+  ], { copper: 'copper', brass: 'brass', dial: 'paint-white', tub: 'steel-galvanised', water: 'water' }) + { title: 'Still' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A home-made mess kit laid out together, 240 mm across: a steel billy can with a wire bail and a lid, a
   // kerosene burner with a pump, pot supports and a brass burner head, and a glass jar of fuel in front.
@@ -174,7 +174,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     // A spoon lying in front of the pot.
     box('spoon-handle', 'steel', [-0.115, 0, 0.065], [-0.035, 0.003, 0.073]),
     h.disc('spoon-bowl', 'steel', 0.016, 0, 0.006, -0.02, 0.069),
-  ], { steel: 'steel-stainless', black: 'plastic-black', wire: 'steel-bright', tank: 'steel-grey', brass: 'brass', soot: 'coal-black', glass: 'glass-clear', fuel: 'fuel-amber', cork: 'cork' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['camping', 'improvised'], tags: { material: ['metal'] } } },
+  ], { steel: 'steel-stainless', black: 'plastic-black', wire: 'steel-bright', tank: 'steel-grey', brass: 'brass', soot: 'coal-black', glass: 'glass-clear', fuel: 'fuel-amber', cork: 'cork' }) + { title: 'Makeshift mess kit' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['camping', 'improvised'], tags: { material: ['metal'] } } },
 
   // A stainless teapot 120 mm across and 125 mm tall over its knob, 175 mm from the spout tip to the back of the
   // loop handle; spout to +x.
@@ -188,7 +188,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     box('handle-top', 'steel', [-0.075, 0.084, -0.006], [-0.045, 0.092, 0.006]),
     box('handle-low', 'steel', [-0.075, 0.03, -0.006], [-0.05, 0.038, 0.006]),
     box('grip', 'black', [-0.075, 0.03, -0.007], [-0.065, 0.092, 0.007]),
-  ], { steel: 'steel-stainless', black: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
+  ], { steel: 'steel-stainless', black: 'plastic-black' }) + { title: 'Teapot' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
 
   // A two-slice toaster 270 mm wide, 160 mm deep and 190 mm tall: a brushed metal shell on a black base, two
   // bread slots in the top, and a carriage lever, browning dial and cancel button on the front.
@@ -208,7 +208,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.turned('dial', 'black', 'z', [[0, 0], [0, 0.011], [0.012, 0.009], [0.012, 0]], [0.095, 0.075, 0.078]),
     box('button', 'red', [0.088, 0.04, 0.078], [0.102, 0.052, 0.084]),
     box('crumb-tray', 'black', [-0.1, 0.0, 0.08], [0.0, 0.012, 0.083]),
-  ], { metal: 'steel-stainless', black: 'plastic-black', dark: 'paint-charcoal', red: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cooking'], tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] } } },
+  ], { metal: 'steel-stainless', black: 'plastic-black', dark: 'paint-charcoal', red: 'plastic-red' }) + { title: 'Toaster' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cooking'], tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A countertop vacuum sealer 350 mm long, 150 mm deep and 80 mm tall: a silver base with a black hinged lid,
   // a latch at each end, a soft-touch button strip along the front and the cutter rail on top.
@@ -226,7 +226,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     // The bag cutter rail across the back of the lid.
     box('rail', 'grey', [-0.14, 0.075, -0.06], [0.14, 0.081, -0.045]),
     box('cutter', 'red', [0.06, 0.081, -0.062], [0.075, 0.088, -0.043]),
-  ], { metal: 'steel-stainless', black: 'plastic-black', panel: 'screen-black', white: 'plastic-white', red: 'plastic-red', grey: 'plastic-grey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
+  ], { metal: 'steel-stainless', black: 'plastic-black', panel: 'screen-black', white: 'plastic-white', red: 'plastic-red', grey: 'plastic-grey' }) + { title: 'Vacuum sealer' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
   // A cast aluminium stovetop waffle iron 300 mm long: a closed round mould 160 mm across and 45 mm thick with a
   // grid cast into its top, hinged at -x, and two long handles with wooden grips running to +x.
@@ -246,7 +246,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     box('arm-upper', 'alu', [0.015, 0.028, 0.004], [0.08, 0.036, 0.012]),
     h.rod('grip-lower', 'wood', 0.008, 0.08, 0.15, 0.01) + { origin: [0.08, 0.01, -0.008] },
     h.rod('grip-upper', 'wood', 0.008, 0.08, 0.15, 0.032) + { origin: [0.08, 0.032, 0.008] },
-  ], { alu: 'alu-bare', rib: 'steel-grey', dark: 'paint-charcoal', wood: 'wood-walnut' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
+  ], { alu: 'alu-bare', rib: 'steel-grey', dark: 'paint-charcoal', wood: 'wood-walnut' }) + { title: 'Waffle iron' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'] } } },
 
   // A slow sand filter in a 20 litre bucket, 300 mm across the rim and 370 mm tall: a white pail filled with sand
   // over gravel, a wire bail handle and a blue drip tap low on the front.
@@ -272,7 +272,7 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     h.turned('spigot', 'tap', 'z', [[0, 0], [0, 0.01], [0.035, 0.01], [0.035, 0]], [0, 0.04, 0.13]),
     box('tap-lever', 'tap', [-0.004, 0.05, 0.15], [0.004, 0.075, 0.162]),
     box('tap-nozzle', 'tap', [-0.006, 0.02, 0.155], [0.006, 0.035, 0.167]),
-  ], { bucket: 'plastic-white', sand: 'brick-buff', gravel: 'stone-grey', wire: 'steel-bright', tap: 'plastic-blue' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', keywords: ['water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bucket: 'plastic-white', sand: 'brick-buff', gravel: 'stone-grey', wire: 'steel-bright', tap: 'plastic-blue' }) + { title: 'Sand water filter' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', keywords: ['water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A battery water purifier 220 mm tall: a grey housing with a lit display and buttons on the front, a clear
   // filter canister on its side, a pump head on top with an outlet nozzle, and an intake hose coiled at its foot.
@@ -297,5 +297,5 @@ local ring(id, slot, r, w, y, x=0, z=0) = h.turned(id, slot, 'y', [[0, r - w], [
     ring('hose-a', 'hose', 0.05, 0.005, 0.0, -0.02, -0.1),
     ring('hose-b', 'hose', 0.042, 0.005, 0.01, -0.02, -0.1),
     h.turned('strainer', 'trim', 'x', [[0, 0], [0, 0.009], [0.03, 0.009], [0.03, 0]], [0.03, 0.006, -0.1]),
-  ], { body: 'plastic-grey', trim: 'plastic-charcoal', lcd: 'lcd-green', green: 'plastic-green', clear: 'plastic-clear-blue', filter: 'paper-white', hose: 'plastic-frosted' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-grey', trim: 'plastic-charcoal', lcd: 'lcd-green', green: 'plastic-green', clear: 'plastic-clear-blue', filter: 'paper-white', hose: 'plastic-frosted' }) + { title: 'Water purifier' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

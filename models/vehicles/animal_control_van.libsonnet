@@ -1,6 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'animal_control_van.spec.libsonnet';
+local vehicle = import 'animal_control_van.placements.libsonnet';
 local box = k.box;
 local b = s.box;
 local depth = b.glassIn - b.cageIn;
@@ -14,7 +15,7 @@ local hatch(tag, x, y) = [
   box(tag + '_bar' + i, 'steel', [x + i * 0.145, y[0], b.side + 0.012], [x + i * 0.145 + 0.04, y[1], b.side + 0.03])
   for i in std.range(0, 4)
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('animal_control_van', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('animal_control_van', vehicle.title, s) + [
   k.compound('animal_control_van_cage', 26, [
     box('floor', 'steel', [0, 0, 0], [b.width, 0.03, depth]),
     box('top', 'steel', [0, b.cageHeight - 0.03, 0], [b.width, b.cageHeight, depth]),
@@ -25,11 +26,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libson
   ] + [
     box('door_bar' + i, 'mesh', [0.04 + i * 0.14, 0.03, 0], [0.08 + i * 0.14, b.cageHeight - 0.03, 0.03])
     for i in std.range(0, 3)
-  ], { steel: 'steel-galvanised', mesh: 'steel-grey' }),
+  ], { steel: 'steel-galvanised', mesh: 'steel-grey' }) + { title: 'Animal control van cage' },
   k.compound('animal_control_van_hatches', 18, std.flattenArrays([
     hatch('low' + i, b.columns[i], [1.08, 1.54]) + hatch('high' + i, b.columns[i], [1.62, 2.1])
     for i in [0, 1, 2]
-  ]), { dark: 'paint-charcoal', steel: 'steel-stainless' }),
+  ]), { dark: 'paint-charcoal', steel: 'steel-stainless' }) + { title: 'Animal control van hatches' },
   // One rear leaf's grilles, whose face looks along x.
   k.compound('animal_control_van_rear_hatches', 8, std.flattenArrays([
     [
@@ -41,5 +42,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libson
       for i in std.range(0, 4)
     ]
     for tag in [['low', 1.08, 1.54], ['high', 1.62, 2.1]]
-  ]), { dark: 'paint-charcoal', steel: 'steel-stainless' }),
+  ]), { dark: 'paint-charcoal', steel: 'steel-stainless' }) + { title: 'Animal control van rear hatches' },
 ])

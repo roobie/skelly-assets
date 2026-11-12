@@ -86,7 +86,7 @@ local cartons(y, hw, front) = [
     box('muffler', 'metal', [0.05, 0.25, -0.15], [0.20, 0.31, -0.06]),
     prism('tank', 'tank', 'x', [[0.31, -0.165], [0.31, 0.165], [0.39, 0.16], [0.42, 0.12], [0.42, -0.12], [0.39, -0.16]], -0.20, 0.20),
     post('cap', 'black', -0.08, 0.42, 0, 0.03, 0.02),
-  ], { frame: 'paint-charcoal', engine: 'paint-red', metal: 'alu-bare', black: 'plastic-black', alternator: 'steel-grey', outlet: 'plastic-grey', switch: 'plastic-red', tank: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'paint-charcoal', engine: 'paint-red', metal: 'alu-bare', black: 'plastic-black', alternator: 'steel-grey', outlet: 'plastic-grey', switch: 'plastic-red', tank: 'paint-red' }) + { title: 'Portable generator' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An upright household freezer, 0.6 m wide, 0.64 m deep and 0.93 m tall, one door on +z.
   h.compound('upright_freezer', 110, feet(0.30, 0.32) + [
@@ -96,7 +96,7 @@ local cartons(y, hw, front) = [
     box('door', 'body', [-0.30, 0.11, 0.29], [0.30, 0.928, 0.32]),
     box('handle', 'handle', [0.23, 0.55, 0.32], [0.26, 0.88, 0.345]),
     dial('dial', 'grille', -0.20, 0.07, 0.30, 0.018, 0.01),
-  ], { body: 'paint-white', grille: 'plastic-grey', seal: 'rubber-black', handle: 'plastic-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'paint-white', grille: 'plastic-grey', seal: 'rubber-black', handle: 'plastic-grey', foot: 'rubber-black' }) + { title: 'Upright freezer' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A household fridge with the freezer above, 0.6 m wide, 0.67 m deep and 1.5 m tall, doors on +z.
   h.compound('household_fridge', 58, feet(0.30, 0.335) + [
@@ -107,7 +107,7 @@ local cartons(y, hw, front) = [
     box('freezer-door', 'door', [-0.30, 1.035, 0.31], [0.30, 1.495, 0.335]),
     box('handle-a', 'handle', [0.23, 0.62, 0.335], [0.26, 0.98, 0.36]),
     box('handle-b', 'handle', [0.23, 1.06, 0.335], [0.26, 1.26, 0.36]),
-  ], { body: 'steel-grey', door: 'steel-stainless', grille: 'plastic-black', seal: 'rubber-black', handle: 'plastic-black', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'steel-grey', door: 'steel-stainless', grille: 'plastic-black', seal: 'rubber-black', handle: 'plastic-black', foot: 'rubber-black' }) + { title: 'Household fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A shop chest freezer with two sliding glass lids, 1.86 m long, 0.66 m deep and 0.85 m tall, stock inside.
   h.compound('display_freezer', 150, [
@@ -133,7 +133,7 @@ local cartons(y, hw, front) = [
         [-0.85 + i * 0.21, 0.36, -0.25 + j * 0.26], [-0.66 + i * 0.21, 0.36 + 0.10 + 0.05 * ((i + j) % 2), -0.02 + j * 0.26])
     for i in std.range(0, 7)
     for j in std.range(0, 1)
-  ], { body: 'paint-white', grille: 'plastic-grey', rim: 'alu-bare', glass: 'glass-clear', 'pack-a': 'paperboard-tan', 'pack-b': 'plastic-blue', 'pack-c': 'paint-cream' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  ], { body: 'paint-white', grille: 'plastic-grey', rim: 'alu-bare', glass: 'glass-clear', 'pack-a': 'paperboard-tan', 'pack-b': 'plastic-blue', 'pack-c': 'paint-cream' }) + { title: 'Display freezer' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A deli display case, 0.92 m wide, 0.76 m deep and 1.25 m tall: a steel counter base, an upright glass
   // front with a sloped top edge over three tiers of trays and sliding glass doors at the back for the server. Every face sits on
@@ -159,17 +159,17 @@ local cartons(y, hw, front) = [
         [-0.16 + k * 0.29, [0.76, 0.94, 1.09][t] + 0.05, [0.30, 0.12, -0.08][t]])
     for t in std.range(0, 2)
     for k in std.range(0, 2)
-  ], { base: 'steel-galvanised', grille: 'plastic-black', trim: 'alu-bare', shelf: 'steel-grey', glass: 'glass-clear', 'tray-a': 'paint-cream', 'tray-b': 'paint-terracotta', 'tray-c': 'plastic-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  ], { base: 'steel-galvanised', grille: 'plastic-black', trim: 'alu-bare', shelf: 'steel-grey', glass: 'glass-clear', 'tray-a': 'paint-cream', 'tray-b': 'paint-terracotta', 'tray-c': 'plastic-green' }) + { title: 'Display fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A single glass-door shop freezer, 0.62 m wide, 0.66 m deep and 1.86 m tall, cartons on wire shelves.
   cooler('glass_freezer', 160, 0.62, 0.66, 1.855, 1, [0.19, 0.55, 0.92, 1.29], cartons,
-         { body: 'paint-white', grille: 'plastic-black', sign: 'plastic-blue', frame: 'paint-charcoal', glass: 'glass-clear', handle: 'steel-grey', shelf: 'steel-grey', 'carton-a': 'paperboard-tan', 'carton-b': 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+         { body: 'paint-white', grille: 'plastic-black', sign: 'plastic-blue', frame: 'paint-charcoal', glass: 'glass-clear', handle: 'steel-grey', shelf: 'steel-grey', 'carton-a': 'paperboard-tan', 'carton-b': 'plastic-white' }) + { title: 'Glass-door freezer' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A single glass-door drinks fridge, 0.62 m wide, 0.62 m deep and 1.98 m tall, bottles on its shelves.
   cooler('glass_fridge', 130, 0.62, 0.62, 1.98, 1, [0.19, 0.52, 0.86, 1.20, 1.54], bottles,
-         { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+         { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { title: 'Glass-door fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A two-door drinks fridge, 1.1 m wide, 0.7 m deep and 2 m tall, bottles on its shelves.
   cooler('double_glass_fridge', 230, 1.10, 0.70, 1.998, 2, [0.19, 0.52, 0.86, 1.20, 1.54], bottles,
-         { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+         { body: 'paint-charcoal', grille: 'plastic-black', sign: 'plastic-red', frame: 'alu-bare', glass: 'glass-clear', handle: 'alu-bare', shelf: 'steel-grey', 'bottle-a': 'plastic-green', 'bottle-b': 'plastic-red', 'bottle-c': 'fuel-amber' }) + { title: 'Double glass-door fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 ]

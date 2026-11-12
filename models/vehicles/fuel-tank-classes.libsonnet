@@ -6,13 +6,13 @@
   light: {
     body: { shape: 'slab', chamfer: 0.04, finish: 'polymer-black' },
     // Leaves the tank's +z side, runs out `reach` and turns up `rise` toward the filler flap.
-    neck: { id: 'fuel_filler_neck_light', massKg: 1, mount: 'side', radius: 0.025, reach: 0.15, rise: 0.06, cap: 0.04, finish: 'steel-spall-black' },
+    neck: { id: 'fuel_filler_neck_light', title: 'Light fuel filler neck', massKg: 1, mount: 'side', radius: 0.025, reach: 0.15, rise: 0.06, cap: 0.04, finish: 'steel-spall-black' },
     strap: { width: 0.04, thickness: 0.03125, finish: 'steel-spall-black' },
   },
   heavy: {
     body: { shape: 'drum', finish: 'alu-bare' },
     // Stands `rise` up off the drum's top.
-    neck: { id: 'fuel_filler_neck_heavy', massKg: 2, mount: 'top', radius: 0.05, reach: 0, rise: 0.06, cap: 0.07, finish: 'alu-bare' },
+    neck: { id: 'fuel_filler_neck_heavy', title: 'Heavy fuel filler neck', massKg: 2, mount: 'top', radius: 0.05, reach: 0, rise: 0.06, cap: 0.07, finish: 'alu-bare' },
     strap: { width: 0.06, thickness: 0.03125, finish: 'steel-stainless' },
   },
 }

@@ -62,39 +62,39 @@ local molle(id, x0, x1, z0, rows, y) = [
   // loop sewn to its back.
   h.compound('ammo_pouch', 0.13, pouch(0.15, 0.11, 0.05, 0.05, 1) + [
     stud('stud', 'stud', 0, 0.08, 0.028),
-  ], { body: 'leather-brown', flap: 'leather-brown', strap: 'leather-black', stud: 'brass' })
+  ], { body: 'leather-brown', flap: 'leather-brown', strap: 'leather-black', stud: 'brass' }) + { title: 'Ammo pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A canvas satchel 200 mm wide, 150 mm tall and 60 mm deep, sized for one long magazine, with a buckled flap and
   // a waist strap lying coiled round it.
-  satchel('ammo_satchel', 0.18, 'cloth-canvas', 'steel-grey') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['fabric'] } } },
+  satchel('ammo_satchel', 0.18, 'cloth-canvas', 'steel-grey') + { title: 'Ammo satchel' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['fabric'] } } },
 
   // The same satchel in heavy leather with a brass buckle.
-  satchel('leather_ammo_satchel', 0.6, 'leather-brown', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['leather', 'fabric'] } } },
+  satchel('leather_ammo_satchel', 0.6, 'leather-brown', 'brass') + { title: 'Leather ammo satchel' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['leather', 'fabric'] } } },
 
   // A webbing tab 160 mm long and 50 mm wide with a loop 60 mm across for an axe or a long tool's handle.
-  beltLoop('large_belt_loop', 0.015, 0.16, 0.05, 0.03) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('large_belt_loop', 0.015, 0.16, 0.05, 0.03) + { title: 'Large belt loop' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A webbing tab 120 mm long and 40 mm wide with a loop 40 mm across for a hammer or a knife.
-  beltLoop('medium_belt_loop', 0.008, 0.12, 0.04, 0.02) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('medium_belt_loop', 0.008, 0.12, 0.04, 0.02) + { title: 'Medium belt loop' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A webbing tab 90 mm long and 25 mm wide with a loop 24 mm across for a screwdriver or a torch.
-  beltLoop('small_belt_loop', 0.004, 0.09, 0.025, 0.012) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  beltLoop('small_belt_loop', 0.004, 0.09, 0.025, 0.012) + { title: 'Small belt loop' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A square nylon pouch 140 mm wide, 170 mm tall and 90 mm deep for a one-litre canteen, with a snapped flap and
   // two webbing straps on its back.
   h.compound('canteen_pouch', 0.18, pouch(0.14, 0.17, 0.09, 0.06) + [
     stud('stud', 'stud', 0, 0.14, 0.048),
     box('side-pocket', 'body', [0.07, 0.02, -0.025], [0.09, 0.09, 0.025]),
-  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'polymer-od-green', stud: 'plastic-black' })
+  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'polymer-od-green', stud: 'plastic-black' }) + { title: 'Canteen pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A canvas pouch 90 mm wide, 200 mm tall and 45 mm deep for one rifle magazine, with a snapped flap and a harness
   // strap lying round it.
-  chestPouch('canvas_chest_pouch', 0.075, 'cloth-canvas', 'cloth-khaki', 'steel-grey') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
+  chestPouch('canvas_chest_pouch', 0.075, 'cloth-canvas', 'cloth-khaki', 'steel-grey') + { title: 'Canvas chest pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // The same chest pouch in thick leather with a leather harness.
-  chestPouch('leather_chest_pouch', 0.5, 'leather-brown', 'leather-black', 'brass') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather', 'fabric'] } } },
+  chestPouch('leather_chest_pouch', 0.5, 'leather-brown', 'leather-black', 'brass') + { title: 'Leather chest pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather', 'fabric'] } } },
 
   // A canvas chest rig lying flat: four magazine pouches 70 mm wide and 160 mm long in a row 320 mm across, on a
   // back panel, with two shoulder straps crossing behind and a waist strap either side.
@@ -114,13 +114,13 @@ local molle(id, x0, x1, z0, rows, y) = [
     box('waist-left', 'strap', [-0.32, 0, 0.02], [-0.17, 0.004, 0.05]),
     box('waist-right', 'strap', [0.17, 0, 0.02], [0.32, 0.004, 0.05]),
     box('buckle', 'stud', [0.3, 0.004, 0.015], [0.33, 0.01, 0.055]),
-  ], { body: 'cloth-canvas', flap: 'cloth-canvas', strap: 'cloth-khaki', stud: 'steel-grey' })
+  ], { body: 'cloth-canvas', flap: 'cloth-canvas', strap: 'cloth-khaki', stud: 'steel-grey' }) + { title: 'Chest rig' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // A small nylon pouch 50 mm wide, 130 mm tall and 45 mm deep that takes one torch, with a snapped flap.
   h.compound('flashlight_pouch', 0.031, pouch(0.05, 0.13, 0.045, 0.04, 1) + [
     stud('stud', 'stud', 0, 0.11, 0.0255, 0.006),
-  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'polymer-od-green', stud: 'plastic-black' })
+  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'polymer-od-green', stud: 'plastic-black' }) + { title: 'Flashlight pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A nylon utility pouch 120 mm wide, 150 mm tall and 60 mm deep with a hook-and-loop flap and a row of webbing
@@ -129,7 +129,7 @@ local molle(id, x0, x1, z0, rows, y) = [
     body: 'cloth-olive-drab',
     flap: 'cloth-olive-drab',
     strap: 'polymer-od-green',
-  })
+  }) + { title: 'Gadget pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A drop-leg nylon pouch 180 mm wide, 230 mm tall and 110 mm deep, big enough for a mask and a spare filter, with
@@ -142,7 +142,7 @@ local molle(id, x0, x1, z0, rows, y) = [
     flap: 'cloth-olive-drab',
     strap: 'polymer-od-green',
     buckle: 'plastic-black',
-  })
+  }) + { title: 'Gas mask pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A round nylon bottle pouch 90 mm across and 230 mm tall with a drawcord top and a flat pocket on its front.
@@ -153,7 +153,7 @@ local molle(id, x0, x1, z0, rows, y) = [
     box('pocket', 'flap', [-0.035, 0.03, 0.035], [0.035, 0.14, 0.058]),
     box('pocket-flap', 'flap', [-0.037, 0.11, 0.055], [0.037, 0.143, 0.061]),
     box('back-strap', 'strap', [-0.0125, 0.04, -0.05], [0.0125, 0.21, -0.042]),
-  ], { body: 'cloth-olive-drab', flap: 'polymer-od-green', strap: 'polymer-od-green', stud: 'plastic-black' })
+  ], { body: 'cloth-olive-drab', flap: 'polymer-od-green', strap: 'polymer-od-green', stud: 'plastic-black' }) + { title: 'Bottle pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
 
   // A heavy webbing vest laid flat, front up with its neck at -z: 520 mm wide and 560 mm long, two padded front
@@ -177,6 +177,6 @@ local molle(id, x0, x1, z0, rows, y) = [
   + molle('webbing-r', 0.03, w / 2 - 0.02, top + 0.012, 8, t)
   + molle('wing-webbing-l', -w / 2 - 0.078, -w / 2 - 0.002, 0.04, 5, t * 0.6)
   + molle('wing-webbing-r', w / 2 + 0.002, w / 2 + 0.078, 0.04, 5, t * 0.6),
-  { body: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'plastic-black' })
+  { body: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'plastic-black' }) + { title: 'Heavy load-bearing vest' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 ]

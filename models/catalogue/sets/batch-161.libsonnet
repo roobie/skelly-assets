@@ -59,13 +59,13 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
   // A long knitted wool scarf folded in a stack, 270 mm by 180 mm and 52 mm tall (about 2.4 m by 280 mm
   // unfolded): navy with two cream stripes across the top fold and a fringe hanging from the front edge.
   h.compound('long_wool_scarf', 0.35, scarf(0.27, 0.18, 0.048, 4, 9, [-0.08, 0.08], 18),
-             { cloth: 'cloth-navy', rib: 'cloth-navy', stripe: 'cloth-cream', fringe: 'cloth-navy' })
+             { cloth: 'cloth-navy', rib: 'cloth-navy', stripe: 'cloth-cream', fringe: 'cloth-navy' }) + { title: 'Long wool scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A plain wool scarf folded in a stack, 200 mm by 140 mm and 38 mm tall (about 1.5 m by 200 mm unfolded): grey
   // knit with darker rib lines and a short fringe.
   h.compound('wool_scarf', 0.14, scarf(0.2, 0.14, 0.034, 3, 7, [], 13),
-             { cloth: 'wool-grey', rib: 'plastic-charcoal', stripe: 'wool-grey', fringe: 'wool-grey' })
+             { cloth: 'wool-grey', rib: 'plastic-charcoal', stripe: 'wool-grey', fringe: 'wool-grey' }) + { title: 'Wool scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A wool prayer shawl folded square, 300 mm by 230 mm and 35 mm tall (about 1.8 m by 1.4 m unfolded): cream wool
@@ -77,7 +77,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
   ] + [
     box('atara', 'atara', [-0.11, 0.03, -0.113], [0.11, 0.035, -0.078]),
   ] + tassel('tassel-l', -0.135, 0.115, 0.03) + tassel('tassel-r', 0.135, 0.115, 0.03),
-  { cloth: 'cloth-cream', band: 'cloth-black', atara: 'cloth-shimmer', tassel: 'cloth-bright-white' })
+  { cloth: 'cloth-cream', band: 'cloth-black', atara: 'cloth-shimmer', tassel: 'cloth-bright-white' }) + { title: 'Tallit gadol' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A sports throat guard standing on its edge, 132 mm across and 90 mm tall: a padded nylon band 8 mm thick, open at
@@ -93,7 +93,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
              ]
              + wall('hook', 'hook', guardR1, guardR1 + 0.003, 118, 148, 4, function(a) 0.05, 0.08)
              + wall('loop', 'hook', guardR0 - 0.003, guardR0, -148, -118, 4, function(a) 0.05, 0.08),
-             { cloth: 'nylon-black', binding: 'cloth-charcoal', hook: 'hook-loop-grey' })
+             { cloth: 'nylon-black', binding: 'cloth-charcoal', hook: 'hook-loop-grey' }) + { title: 'Throat guard' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A mercenary throat guard standing on its edge, 176 mm across and 112 mm tall: a ballistic collar 14 mm thick in a
@@ -106,7 +106,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
              + wall('flap-patch', 'hook', 0.086, 0.088, -22, 22, 6, function(a) 0.022, 0.07)
              + wall('hook', 'hook', 0.086, 0.089, 118, 143, 4, function(a) 0.062, 0.09)
              + wall('loop', 'hook', 0.061, 0.064, -148, -122, 4, function(a) 0.058, 0.1),
-             { cover: 'nylon-coyote', inner: 'nylon-black', seam: 'webbing-olive-dark', hook: 'hook-loop-grey' })
+             { cover: 'nylon-coyote', inner: 'nylon-black', seam: 'webbing-olive-dark', hook: 'hook-loop-grey' }) + { title: 'Ballistic throat guard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A fencing gorget standing on its lower edge, 290 mm across and 170 mm tall: a stiff collar of rubber under black
@@ -127,6 +127,6 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
              + wall('bind-nape-l', 'binding', 0.073, 0.089, 112, 160, 7, function(a) 0.075, 0.08)
              + wall('bind-nape-r', 'binding', 0.073, 0.089, -160, -112, 7, function(a) 0.075, 0.08)
              + wall('hook', 'hook', 0.061, 0.064, -158, -130, 4, function(a) 0.11, 0.16),
-             { cover: 'nylon-black', binding: 'cloth-red', hook: 'hook-loop-grey' })
+             { cover: 'nylon-black', binding: 'cloth-red', hook: 'hook-loop-grey' }) + { title: 'Fencing gorget' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 ]

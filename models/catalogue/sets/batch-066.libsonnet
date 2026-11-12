@@ -30,7 +30,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('cap-ring', 'cap', [[0.034, 0.0124], [0.038, 0.0124]]),
     box('clip', 'cap', [0.036, 0.011, -0.003], [0.064, 0.016, 0.003]),
     box('clip-tip', 'cap', [0.012, 0.014, -0.003], [0.036, 0.016, 0.003]),
-  ], { body: 'plastic-grey', label: 'paper-white', cap: 'plastic-black' }) + h.gripOn('permanent_marker', 'barrel') + {
+  ], { body: 'plastic-grey', label: 'paper-white', cap: 'plastic-black' }) + { title: 'Permanent marker' } + h.gripOn('permanent_marker', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -51,7 +51,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     for i in std.range(0, 11)
   ] + h.crescent('bow', 'case', 0.006, 0.008, 0, 360, 12, 0.004, 0.007, 0, 0.0405), {
     case: 'metal-gold', dial: 'enamel-white', hand: 'plastic-matte-black',
-  }) + h.inHand('pocket_watch', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + { title: 'Pocket watch' } + h.inHand('pocket_watch', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A glazed porcelain urn 30 cm tall and 20 cm across the belly: a turned foot, a round body with a gold band, a
   // narrow neck and a domed lid with a knob.
@@ -61,7 +61,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     turned('foot-ring', 'gold', 'y', [[0.012, 0.058], [0.012, 0.0615], [0.016, 0.0615], [0.016, 0.058], [0.012, 0.058]]),
     standing('lid', 'porcelain', [[0.26, 0.056], [0.268, 0.056], [0.28, 0.045], [0.29, 0.02]]),
     standing('knob', 'gold', [[0.288, 0.008], [0.294, 0.012], [0.302, 0.01], [0.306, 0.004]]),
-  ], { porcelain: 'ceramic-white', gold: 'metal-gold' }) + h.inHand('porcelain_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
+  ], { porcelain: 'ceramic-white', gold: 'metal-gold' }) + { title: 'Porcelain urn' } + h.inHand('porcelain_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
 
   // A riding crop 60 cm long: a black fibreglass shaft tapering from 12 to 5 mm, a leather-bound grip with a
   // knob and a flat leather popper at the tip on +x.
@@ -71,7 +71,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('shaft', 'shaft', [[-0.166, 0.006], [0.25, 0.003], [0.262, 0.0025]]),
     alongX('keeper', 'grip', [[0.25, 0.0042], [0.262, 0.0042]]),
     box('popper', 'popper', [0.256, -0.015, -0.002], [0.3, 0.015, 0.002]),
-  ], { grip: 'leather-black', shaft: 'plastic-black', popper: 'leather-brown' }) + h.gripOn('riding_crop', 'grip') + {
+  ], { grip: 'leather-black', shaft: 'plastic-black', popper: 'leather-brown' }) + { title: 'Riding crop' } + h.gripOn('riding_crop', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'rubber'] } } },
 
@@ -93,7 +93,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('buckle-%d' % i, 'buckle', [x - 0.016, 0.155, -0.012], [x + 0.016, 0.166, 0.012])
     for i in [0, 1]
     for x in [[-0.16, 0.16][i]]
-  ], { foam: 'foam-eva', seam: 'plastic-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['rubber'], setting: ['modern'] } } },
+  ], { foam: 'foam-eva', seam: 'plastic-charcoal', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Rolled sleeping mat' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['rubber'], setting: ['modern'] } } },
   // A steel combination lockbox 24 cm wide, 12 cm tall and 14 cm deep: a lid hinged at the back, a number dial
   // and a turn handle on the front at +z, and rubber feet.
   h.compound('safe_box', 2.7, [
@@ -116,7 +116,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('tick-%d' % i, 'mark', [-0.04 + 0.016 * std.sin(a) - 0.001, 0.06 + 0.016 * std.cos(a) - 0.001, 0.08], [-0.04 + 0.016 * std.sin(a) + 0.001, 0.06 + 0.016 * std.cos(a) + 0.001, 0.0825])
     for i in std.range(0, 7)
     for a in [std.pi * i / 4]
-  ], { steel: 'paint-charcoal', seam: 'plastic-matte-black', metal: 'steel-stainless', dial: 'plastic-black', mark: 'paint-white', foot: 'rubber-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { steel: 'paint-charcoal', seam: 'plastic-matte-black', metal: 'steel-stainless', dial: 'plastic-black', mark: 'paint-white', foot: 'rubber-black' }) + { title: 'Safe box' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A child's beach bucket 16 cm across the rim and 13 cm tall with a thin plastic carry handle, a toy spade and a
   // toy rake standing in it, their heads above the rim.
@@ -136,7 +136,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
   ] + [
     box('tine-%d' % i, 'rake', [0.002 + i * 0.0115, 0.188, 0.016], [0.0065 + i * 0.0115, 0.208, 0.022])
     for i in std.range(0, 4)
-  ] + arc('handle', 'handle', 0, 0.117, 0.081, 0.085, 0, 180, 16, 0.004), { bucket: 'plastic-red', stripe: 'plastic-white', spade: 'plastic-yellow', rake: 'plastic-blue', handle: 'plastic-white' }) + h.inHand('toy_bucket_and_spade', 'bucket') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ] + arc('handle', 'handle', 0, 0.117, 0.081, 0.085, 0, 180, 16, 0.004), { bucket: 'plastic-red', stripe: 'plastic-white', spade: 'plastic-yellow', rake: 'plastic-blue', handle: 'plastic-white' }) + { title: 'Toy bucket and spade' } + h.inHand('toy_bucket_and_spade', 'bucket') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A letter-size printout folded in three, 21.6 by 9.3 cm, with a row of printed digits and lines of text on the
   // top panel and the folded edge showing at +z.
@@ -151,7 +151,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
   ] + [
     box('line-%d' % i, 'print', [-0.09, 0.004, 0.01 + i * 0.008], [0.09 - (i % 2) * 0.04, 0.005, 0.013 + i * 0.008])
     for i in std.range(0, 3)
-  ], { paper: 'paper-white', print: 'plastic-matte-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { paper: 'paper-white', print: 'plastic-matte-black' }) + { title: 'Access code printout' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A portable electric heater 20 cm wide, 25 cm tall and 11 cm deep: a steel case on two feet, a chrome grille
   // over the heating bars on the front at +z, two knobs on top and a carry slot in the top.
@@ -175,7 +175,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('grille-post-%d' % i, 'trim', [x - 0.0015, 0.04, 0.0555], [x + 0.0015, 0.2, 0.0575])
     for i in std.range(0, 2)
     for x in [[-0.08, 0, 0.08][i]]
-  ], { case: 'enamel-white', recess: 'paint-charcoal', foot: 'plastic-black', trim: 'steel-stainless', knob: 'plastic-black', element: 'steel-grey', lamp: 'plastic-red' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cold-weather'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { case: 'enamel-white', recess: 'paint-charcoal', foot: 'plastic-black', trim: 'steel-stainless', knob: 'plastic-black', element: 'steel-grey', lamp: 'plastic-red' }) + { title: 'Small space heater' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cold-weather'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // An aerosol paint can 21 cm tall to the cap and 66 mm across: a painted steel body with a label band, a domed
   // top with a rolled rim and a cap the colour of the paint.
@@ -186,7 +186,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     standing('dome', 'metal', [[0.155, 0.033], [0.162, 0.031], [0.172, 0.022], [0.176, 0.015]]),
     standing('collar', 'metal', [[0.172, 0.0215], [0.176, 0.0215]]),
     standing('cap', 'cap', [[0.17, 0.03], [0.205, 0.03], [0.21, 0.028]]),
-  ], { metal: 'alu-bare', body: 'paint-red', label: 'paper-white', cap: 'plastic-red' }) + h.inHand('spray_can', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { metal: 'alu-bare', body: 'paint-red', label: 'paper-white', cap: 'plastic-red' }) + { title: 'Spray can' } + h.inHand('spray_can', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
   // A wooden stepladder standing open, 1.5 m tall: two front rails with five flat treads, two rear legs joined by
   // braces, a top cap and steel spreader bars, the treads facing +z.
   local rail(id, slot, x0, x1, zBottom, zTop, top, depth) = h.prism(id, slot, 'x', [
@@ -215,7 +215,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     for i in std.range(0, 3)
     for x in [[-0.225, 0.225, -0.215, 0.215][i]]
     for z in [[0.36, 0.36, -0.42, -0.42][i]]
-  ], { wood: 'wood-pine', cap: 'wood-oak', metal: 'steel-grey', foot: 'rubber-black' }) + { voxelGrain: 0.01 } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['modern'] } } },
+  ], { wood: 'wood-pine', cap: 'wood-oak', metal: 'steel-grey', foot: 'rubber-black' }) + { title: 'Stepladder' } + { voxelGrain: 0.01 } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A stick of charcoal 10 cm long and 12 mm across, sharpened to a point at +x, its back half wrapped in a twist of
   // rag to keep the fingers clean.
@@ -224,7 +224,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('wrap', 'rag', [[-0.046, 0.0075], [-0.002, 0.0075]]),
     alongX('tie', 'tie', [[-0.034, 0.0085], [-0.03, 0.0085]]),
     alongX('tie-b', 'tie', [[-0.012, 0.0085], [-0.008, 0.0085]]),
-  ], { charcoal: 'coal-black', rag: 'cloth-rag', tie: 'cord-cotton' }) + h.gripOn('charcoal_stick', 'wrap') + {
+  ], { charcoal: 'coal-black', rag: 'cloth-rag', tie: 'cord-cotton' }) + { title: 'Charcoal stick' } + h.gripOn('charcoal_stick', 'wrap') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
 
@@ -240,7 +240,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     alongX('tape-tip', 'tape', [[0.168, 0.0235], [0.186, 0.0235]]),
     alongX('lens', 'lens', [[0.186, 0.018], [0.19, 0.018]]),
     alongX('eye-lens', 'lens', [[-0.192, 0.008], [-0.19, 0.008]]),
-  ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + h.gripOn('homemade_telescope', 'tube-outer') + {
+  ], { 'tube-a': 'plastic-black', 'tube-b': 'plastic-grey', tape: 'tape-grey', cap: 'rubber-black', lens: 'glass-clear' }) + { title: 'Homemade telescope' } + h.gripOn('homemade_telescope', 'tube-outer') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
@@ -255,7 +255,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('guard', 'actuator', [-0.008, 0.074, -0.016], [0.008, 0.09, -0.012]),
     turned('nozzle', 'nozzle', 'z', [[0, 0], [0, 0.003], [0.003, 0.003], [0.003, 0]], [0, 0.082, 0.0115]),
     box('thumb', 'nozzle', [-0.006, 0.09, -0.006], [0.006, 0.092, 0.006]),
-  ] + h.crescent('ring', 'ring', 0.007, 0.009, 0, 360, 12, 0.076, 0.078, 0, -0.026), { body: 'plastic-black', label: 'paint-police-blue', actuator: 'plastic-red', nozzle: 'plastic-black', ring: 'steel-stainless' }) + h.inHand('tear_gas_spray', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ] + h.crescent('ring', 'ring', 0.007, 0.009, 0, 360, 12, 0.076, 0.078, 0, -0.026), { body: 'plastic-black', label: 'paint-police-blue', actuator: 'plastic-red', nozzle: 'plastic-black', ring: 'steel-stainless' }) + { title: 'Tear gas spray' } + h.inHand('tear_gas_spray', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A small whistle 6 cm long cast from a dark, faintly blue alloy in sharp, uneven angles: a skewed mouthpiece
   // at -x, a body made of a twisted wedge and a crooked fin, a black window through the body and a loop at +x.
@@ -265,5 +265,5 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     h.prism('tip', 'metal', 'x', [[0.003, -0.006], [0.013, -0.008], [0.009, 0.005]], 0.02, 0.03),
     h.prism('fin', 'metal', 'z', [[-0.006, 0.012], [0.014, 0.016], [0.026, 0.028], [0.006, 0.022]], -0.002, 0.002),
     h.prism('window', 'window', 'x', [[0.008, 0.003], [0.014, 0.004], [0.01, 0.009]], -0.006, 0.006),
-  ] + h.crescent('loop', 'metal', 0.003, 0.0045, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + h.inHand('angular_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ] + h.crescent('loop', 'metal', 0.003, 0.0045, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + { title: 'Angular whistle' } + h.inHand('angular_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

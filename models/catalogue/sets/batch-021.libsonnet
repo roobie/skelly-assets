@@ -40,7 +40,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     for i in std.range(0, 4)
   ] + [
     box('label', 'label', [-0.04, 0.008, 0.03], [0.04, 0.0095, 0.08]),
-  ], { steel: 'steel-grey', label: 'paint-white' })
+  ], { steel: 'steel-grey', label: 'paint-white' }) + { title: 'Hard steel armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'] } } },
 
   // A small mechanical impact fuze 12 mm across and 22 mm long, standing on its threaded base: a steel nose cone
@@ -49,19 +49,19 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     turned('thread', 'thread', 'y', [[0, 0], [0, 0.005], [0.006, 0.005], [0.006, 0]]),
     turned('band', 'band', 'y', [[0, 0], [0, 0.006], [0.006, 0.006], [0.006, 0]], [0, 0.006, 0]),
     turned('nose', 'nose', 'y', [[0, 0], [0, 0.006], [0.004, 0.0055], [0.008, 0.0035], [0.01, 0.002], [0.01, 0]], [0, 0.012, 0]),
-  ], { thread: 'brass', band: 'plastic-black', nose: 'steel-grey' })
+  ], { thread: 'brass', band: 'plastic-black', nose: 'steel-grey' }) + { title: 'Impact fuze' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['metal', 'plastic'], setting: ['modern'], weapon: ['explosive'] } } },
 
   // A ground glass lens 30 mm across and 4 mm thick at the centre, lying flat.
   h.compound('lens', 0.0038, [
     turned('lens', 'glass', 'y', [[0, 0], [0, 0.015], [0.001, 0.015], [0.0025, 0.011], [0.004, 0]]),
-  ], { glass: 'glass-clear' })
+  ], { glass: 'glass-clear' }) + { title: 'Lens' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A small ground glass lens 16 mm across and 4 mm thick at the centre, lying flat.
   h.compound('small_lens', 0.0011, [
     turned('lens', 'glass', 'y', [[0, 0], [0, 0.008], [0.001, 0.008], [0.0025, 0.006], [0.004, 0]]),
-  ], { glass: 'glass-clear' })
+  ], { glass: 'glass-clear' }) + { title: 'Small lens' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A household incandescent bulb 60 mm across and 108 mm tall, standing on its screw base: a dark contact tip, a
@@ -76,7 +76,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
       [0, 0], [0, 0.014], [0.012, 0.017], [0.026, 0.024], [0.042, 0.03], [0.056, 0.03], [0.068, 0.026], [0.076, 0.018],
       [0.08, 0.008], [0.081, 0],
     ], [0, 0.027, 0]),
-  ], { tip: 'plastic-black', cap: 'alu-bare', glass: 'glass-clear' })
+  ], { tip: 'plastic-black', cap: 'alu-bare', glass: 'glass-clear' }) + { title: 'Light bulb' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['glass', 'metal'], setting: ['modern'] } } },
 
   // A small brass padlock lying on its back, 30 mm wide, 30 mm long and 14 mm thick, with a round steel shackle
@@ -93,7 +93,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     h.prism('arch-5', 'shackle', 'y', [[0.0305, 0.0061], [0.033, 0.0104], [0.027, 0.012], [0.027, 0.007]], 0.0045, 0.0095),
     box('blade', 'key', [-0.0015, 0.006, -0.022], [0.0015, 0.008, -0.015]),
     h.prism('bow', 'key', 'y', [[-0.022, -0.003], [-0.022, 0.003], [-0.026, 0.007], [-0.033, 0.007], [-0.036, 0.003], [-0.036, -0.003], [-0.033, -0.007], [-0.026, -0.007]], 0.006, 0.008),
-  ], { body: 'brass', shackle: 'steel-stainless', key: 'steel-grey' })
+  ], { body: 'brass', shackle: 'steel-stainless', key: 'steel-grey' }) + { title: 'Lock' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A lotus flower 150 mm across cut with a short length of stem: a ring of broad pink petals spread flat, an inner
@@ -124,7 +124,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     turned('stamens', 'stamen', 'y', [[0, 0], [0, 0.024], [0.016, 0.024], [0.016, 0]], [0, 0.018, 0]),
     turned('pod', 'pod', 'y', [[0, 0], [0, 0.01], [0.014, 0.016], [0.014, 0]], [0, 0.03, 0]),
     h.rod('stem', 'leaf', 0.004, 0.012, 0.11, 0.006),
-  ], { petal: 'plastic-pink', leaf: 'leaf-green', stamen: 'plastic-yellow', pod: 'leaf-green' })
+  ], { petal: 'plastic-pink', leaf: 'leaf-green', stamen: 'plastic-yellow', pod: 'leaf-green' }) + { title: 'Lotus' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A pillowcase stuffed with straw and rolled for carrying, 360 mm long and 200 mm across, tied with cord in two
@@ -136,7 +136,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     h.rod('straw-core', 'straw', 0.035, -0.172, 0.172, 0.1),
     h.tube('tie-a', 'cord', 0.1, 0.104, -0.1, -0.088, 0.1, 0),
     h.tube('tie-b', 'cord', 0.1, 0.104, 0.088, 0.1, 0.1, 0),
-  ], { cloth: 'cloth-cotton', straw: 'plant-dried', cord: 'cord-olive' })
+  ], { cloth: 'cloth-cotton', straw: 'plant-dried', cord: 'cord-olive' }) + { title: 'Makeshift pillow' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric', 'plant'] }, keywords: ['improvised'] } },
 
   // A hank of mild steel wire, loose loops about 100 mm across lying in a flat coil, held by three short twists of
@@ -149,7 +149,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     box('twist-a', 'wire', [0.042, 0, -0.003], [0.058, 0.012, 0.003]),
     box('twist-b', 'wire', [-0.003, 0, 0.042], [0.003, 0.012, 0.058]),
     box('twist-c', 'wire', [-0.058, 0, -0.003], [-0.042, 0.012, 0.003]),
-  ], { wire: 'steel-grey' })
+  ], { wire: 'steel-grey' }) + { title: 'Mild steel wire' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A bare 42-inch LCD panel, 960 mm wide, 570 mm tall and 26 mm thick, lying face up: a dark screen in a black
@@ -162,7 +162,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     box('bezel-right', 'bezel', [0.465, 0.018, -0.27], [0.48, 0.026, 0.265]),
     box('screen', 'screen', [-0.465, 0.018, -0.27], [0.465, 0.024, 0.265]),
     box('board', 'board', [-0.2, 0.004, 0.285], [0.2, 0.016, 0.3]),
-  ], { back: 'steel-grey', bezel: 'plastic-black', screen: 'plastic-charcoal', board: 'circuit-green' })
+  ], { back: 'steel-grey', bezel: 'plastic-black', screen: 'plastic-charcoal', board: 'circuit-green' }) + { title: 'Large LCD screen' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A built-in dishwasher 600 mm wide, 600 mm deep and 840 mm tall: a stainless door with a control strip and a
@@ -178,7 +178,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     for i in std.range(0, 4)
   ] + [
     box('handle', 'handle', [-0.2, 0.71, 0.3], [0.2, 0.73, 0.32]),
-  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { title: 'Household dishwasher' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A top-loading washing machine 690 mm wide, 700 mm deep and 1.1 m tall to the top of its console, in white
   // enamel: a hinged lid with a dark glass window over the drum, and a raised control console along the back with
@@ -195,13 +195,13 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     disc('dial-b', 'rim', 0.035, 0, 0.025) + { axis: 'z', origin: [0.22, 1.005, -0.236] },
     box('display', 'display', [-0.08, 0.985, -0.236], [0.08, 1.025, -0.232]),
     box('kick', 'trim', [-0.345, 0.02, 0.35], [0.345, 0.1, 0.355]),
-  ], { body: 'enamel-white', foot: 'rubber-black', trim: 'plastic-grey', rim: 'steel-stainless', glass: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'enamel-white', foot: 'rubber-black', trim: 'plastic-grey', rim: 'steel-stainless', glass: 'plastic-charcoal', display: 'lcd-green' }) + { title: 'Household washing machine' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 240 litre water heater 500 mm across and 1.3 m tall to the tops of its pipe stubs.
-  waterHeater('household_water_heater', 65, 0.25, 1.15) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
+  waterHeater('household_water_heater', 65, 0.25, 1.15) + { title: 'Household water heater' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 400 litre family-sized water heater 600 mm across and 1.6 m tall to the tops of its pipe stubs.
-  waterHeater('large_water_heater', 100, 0.3, 1.42) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
+  waterHeater('large_water_heater', 100, 0.3, 1.42) + { title: 'Large water heater' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A petrol push mower: a red steel deck 520 mm wide and 560 mm long on four 180 mm wheels, an engine with a black
   // shroud, fuel cap and starter pull on top, a side discharge chute, and a steel handle rising 1 m behind it with a
@@ -237,5 +237,5 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     hub: 'plastic-grey',
     handle: 'steel-grey',
     grip: 'rubber-black',
-  }) + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['gardening'] } },
+  }) + { title: 'Lawnmower' } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['gardening'] } },
 ]

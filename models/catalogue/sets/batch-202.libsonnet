@@ -72,7 +72,7 @@ local poundRunes =
     bandRune('rune-%d' % i, 'rune', 0.0105, a, 0.0105, -0.0012, 0.0012)
     for i in std.range(0, 5)
     for a in [[60, 100, 140, 220, 260, 300][i]]
-  ], { metal: 'metal-platinum', gem: 'crystal-glow-violet', rune: 'crystal-glow-violet' })
+  ], { metal: 'metal-platinum', gem: 'crystal-glow-violet', rune: 'crystal-glow-violet' }) + { title: 'Storage ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', keywords: ['jewellery'], tags: { material: ['metal'], setting: ['fantasy'], slot: ['hands'] } } },
 
   // A pair of fist guards laid flat, backs up, fingers to +z, 230 mm from cuff to knuckle bar and 100 mm across: thick
@@ -80,7 +80,7 @@ local poundRunes =
   // glowing violet flame mark on each plate.
   h.compound('flame_marked_fist_guards', 1.2,
              g.glovePair(fistGuard, 0.07, fistExtra),
-             { glove: 'leather-tan', cuff: 'leather-tan', trim: 'leather-oxblood', steel: 'steel-grey', rivet: 'steel-bright', flame: 'crystal-glow-violet' })
+             { glove: 'leather-tan', cuff: 'leather-tan', trim: 'leather-oxblood', steel: 'steel-grey', rivet: 'steel-bright', flame: 'crystal-glow-violet' }) + { title: 'Flame-marked fist guards' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['leather', 'metal'], setting: ['fantasy'], weapon: ['blunt'] } } },
 
   // A single right-hand steel gauntlet laid flat, back up, fingers to +z, 300 mm from cuff to fingertip and 140 mm
@@ -88,6 +88,6 @@ local poundRunes =
   // cuff, and glowing blue rune marks on the plate and cuff.
   h.compound('rune_carved_steel_gauntlet', 0.8,
              g.glove('r-', 0, 1, pound) + poundRunes,
-             { glove: 'leather-black', cuff: 'steel-bright', trim: 'leather-black', steel: 'steel-bright', rivet: 'steel-grey', rune: 'crystal-glow-blue' })
+             { glove: 'leather-black', cuff: 'steel-bright', trim: 'leather-black', steel: 'steel-bright', rivet: 'steel-grey', rune: 'crystal-glow-blue' }) + { title: 'Rune-carved steel gauntlet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal', 'leather'], setting: ['fantasy'], weapon: ['blunt'] } } },
 ]

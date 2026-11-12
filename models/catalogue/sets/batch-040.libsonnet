@@ -50,23 +50,23 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     h.box('ferrule', 'ferrule', [1.0, -0.024, -0.038], [1.035, 0.024, 0.038]),
     h.box('stitch-a', 'stitch', [1.09, -0.025, -0.067], [1.1, 0.025, 0.067]),
     h.box('stitch-b', 'stitch', [1.15, -0.025, -0.084], [1.16, 0.025, 0.084]),
-  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + h.gripOn('broom', 'handle') + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] }, keywords: ['cleaning'] } },
+  ], { handle: 'wood-pine', cap: 'plastic-red', straw: 'straw-pale', ferrule: 'steel-galvanised', stitch: 'cloth-red' }) + { title: 'Broom' } + h.gripOn('broom', 'handle') + { taxonomy: { category: 'household', tags: { material: ['wood', 'plant'], setting: ['modern'] }, keywords: ['cleaning'] } },
   // A single down-filled mattress, 1.9 m by 0.9 m and 0.18 m deep, quilted in puffed channels across its width.
   h.compound('down_mattress', 4.7,
     mattress(0.17)
     + g.quilt({ style: 'channels', along: 'z', pitch: 0.095, r: 0.022, x0: -0.92, x1: 0.92, z0: -0.43, z1: 0.43, y: 0.17 }),
-    { cover: 'cloth-cream', piping: 'cloth-heather-grey', quilt: 'cloth-cream' }) + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'] } } },
+    { cover: 'cloth-cream', piping: 'cloth-heather-grey', quilt: 'cloth-cream' }) + { title: 'Down mattress' } + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'] } } },
   // A single sprung mattress, 1.9 m by 0.9 m and 0.18 m deep, striped ticking with tufts and side vents.
   h.compound('mattress', 18,
     mattress(0.18)
     + [h.box('stripe-%d' % i, 'stripe', [-0.94, 0.174, -0.42 + i * 0.07], [0.94, 0.176, -0.405 + i * 0.07]) for i in std.range(0, 12)]
     + [h.disc('tuft-%d-%d' % [i, j], 'tuft', 0.012, 0.174, 0.18, -0.75 + i * 0.25, -0.3 + j * 0.3) for i in std.range(0, 6) for j in std.range(0, 2)]
     + [h.disc('vent-%d' % i, 'vent', 0.008, 0.07, 0.11, s * 0.6, 0.452) for i in [0, 1] for s in [[-1, 1][i]]],
-    { cover: 'cloth-cream', piping: 'cloth-navy', stripe: 'cloth-blue', tuft: 'cloth-navy', vent: 'steel-grey' }) + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
+    { cover: 'cloth-cream', piping: 'cloth-navy', stripe: 'cloth-blue', tuft: 'cloth-navy', vent: 'steel-grey' }) + { title: 'Mattress' } + h.headEndOnMinusX + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } },
   // Four 72 mm RC buggy wheels lying two by two, 0.15 m square.
   h.compound('remote_control_car_wheels', 0.15,
     wheel(0, -0.038, -0.038) + wheel(1, 0.038, -0.038) + wheel(2, -0.038, 0.038) + wheel(3, 0.038, 0.038),
-    { tyre: 'rubber-tread', rim: 'steel-bright', hub: 'plastic-matte-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber', 'plastic'], setting: ['modern'] }, keywords: ['toy'] } },
+    { tyre: 'rubber-tread', rim: 'steel-bright', hub: 'plastic-matte-black' }) + { title: 'Remote-control car wheels' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber', 'plastic'], setting: ['modern'] }, keywords: ['toy'] } },
   // A 250 mm piece cut from a tyre tread, 115 mm wide and 40 mm deep with its lugs.
   h.compound('rubber_tire_chunk', 0.9,
     h.curvedPlate('carcass', 'carcass', chunkOutline, 0, 0.022, chunkR, 8)
@@ -77,18 +77,18 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
       for x in [-0.113 + i * 0.033 + j * 0.012]
       for z in [[-0.048, 0.006][j]]
     ]),
-    { carcass: 'rubber-offblack', tread: 'rubber-tread' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['rubber'] } } },
+    { carcass: 'rubber-offblack', tread: 'rubber-tread' }) + { title: 'Rubber tyre chunk' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['rubber'] } } },
   // A strip cut from a tyre, 140 mm wide and 16 mm thick, curled in two and a half turns 0.4 m across.
   h.compound('rubber_tire_strip', 6.5,
     coil(2.5, 0.1, 0.04, 0.016, 0.14) + [h.box('tail', 'strip', [-0.16, 0, -0.206], [0, 0.14, -0.19])],
-    { strip: 'rubber-tread' }) + { taxonomy: { category: 'materials', tags: { material: ['rubber'] } } },
+    { strip: 'rubber-tread' }) + { title: 'Rubber tyre strip' } + { taxonomy: { category: 'materials', tags: { material: ['rubber'] } } },
   // A fist-sized stone 80 mm long with one knapped edge.
   h.compound('sharp_rock', 0.56, [
     h.prism('body', 'stone', 'z', [[-0.04, 0.012], [-0.025, 0], [0.01, 0], [0.03, 0.01], [0.022, 0.04], [-0.01, 0.05], [-0.035, 0.038]], -0.024, 0.022),
     h.ball('round', 'stone', 0.03, -0.008, 0.024, 0, 0.8),
     h.prism('edge', 'edge', 'y', [[-0.02, 0.015], [0.018, 0.015], [0.0, 0.04]], 0.008, 0.034),
     h.prism('flake', 'edge', 'y', [[-0.012, 0.02], [0.01, 0.022], [-0.002, 0.034]], 0.034, 0.04),
-  ], { stone: 'stone-grey', edge: 'stone-whet' }) + h.inHand('sharp_rock', 'round') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['prehistoric'] } } },
+  ], { stone: 'stone-grey', edge: 'stone-whet' }) + { title: 'Sharp rock' } + h.inHand('sharp_rock', 'round') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['prehistoric'] } } },
   // A collapsible stock for an underbarrel grenade launcher, 0.26 m closed: a mount, twin steel rods and a butt plate.
   h.compound('grenade_launcher_stock', 0.32, [
     h.box('mount', 'body', [0, 0.005, -0.022], [0.06, 0.055, 0.022]),
@@ -98,7 +98,7 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     h.box('butt', 'body', [0.24, 0, -0.024], [0.256, 0.11, 0.024]),
     h.box('pad', 'pad', [0.256, 0, -0.024], [0.264, 0.11, 0.024]),
     h.box('cheek', 'body', [0.17, 0.045, -0.02], [0.24, 0.06, 0.02]),
-  ], { body: 'polymer-black', latch: 'steel-parkerized', rod: 'steel-parkerized', pad: 'rubber-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['plastic'], weapon: ['explosive'] } } },
+  ], { body: 'polymer-black', latch: 'steel-parkerized', rod: 'steel-parkerized', pad: 'rubber-black' }) + { title: 'Grenade launcher stock' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['plastic'], weapon: ['explosive'] } } },
   // A giant wasp's stinger, 150 mm: a lumpy, flattened venom sac on a short neck, a brown
   // sheath and a tapering black lance barbed on both edges.
   h.compound('wasp_stinger', 0.036, [
@@ -115,12 +115,12 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
     for s in [-1, 1]
     for x in [0.1 + i * 0.012]
     for r in [0.008 - (x - 0.062) * 0.003 / 0.06]
-  ], { flesh: 'flesh-membrane', sheath: 'chitin-brown', lance: 'chitin-black' }) + h.gripOn('wasp_stinger', 'sheath') + {
+  ], { flesh: 'flesh-membrane', sheath: 'chitin-brown', lance: 'chitin-black' }) + { title: 'Wasp stinger' } + h.gripOn('wasp_stinger', 'sheath') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
   // A broken block of paraffin wax about 100 by 60 by 45 mm.
   h.compound('paraffin_wax', 0.2, [
     h.prism('block', 'wax', 'z', [[-0.05, 0], [0.045, 0], [0.05, 0.02], [0.032, 0.042], [-0.02, 0.046], [-0.05, 0.034]], -0.03, 0.026),
     h.prism('lump', 'wax', 'z', [[-0.04, 0.045], [0.02, 0.045], [0.0, 0.055], [-0.035, 0.052]], -0.02, 0.012),
-  ], { wax: 'wax-ivory' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: {  } } },
+  ], { wax: 'wax-ivory' }) + { title: 'Paraffin wax' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: {  } } },
 ]

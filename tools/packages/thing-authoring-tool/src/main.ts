@@ -5,16 +5,14 @@ import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Group } from 'three';
 import { buildItem, itemPalette } from './catalogue.ts';
 import { catalogue } from './content.ts';
-import { exportItem, loadThingRecipe } from './exports.ts';
+import { exportItem, loadThingRecipeFiles } from './exports.ts';
 
 const select = document.querySelector<HTMLSelectElement>('#item')!;
 const preview = createPreview(document.querySelector<HTMLCanvasElement>('#view')!);
-const rows = Object.values(
-  import.meta.glob('../../../../models/recipes/*.json', {
-    eager: true,
-    import: 'default',
-  }),
-).flatMap((value) => loadThingRecipe(value, catalogue));
+const rows = loadThingRecipeFiles(
+  Object.values(import.meta.glob('../../../../models/recipes/*.json', { eager: true, import: 'default' })),
+  catalogue,
+);
 for (const row of rows) {
   const option = document.createElement('option');
   option.value = row.id;

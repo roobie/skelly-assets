@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'convertible.spec.libsonnet';
 {
+  title: 'Convertible',
   sites: (import 'car-sites.libsonnet')('convertible', s, {
     over: {
       engine: { at: [s.frontAxle - 0.02, 0.2, 0] },

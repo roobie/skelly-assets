@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'crashed_hatchback.spec.libsonnet';
 {
+  title: 'Crashed hatchback',
   sites: [
     one('shell', 'crashed_hatchback_shell'),
     one('crushed_nose', 'crashed_hatchback_crushed_nose'),

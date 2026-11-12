@@ -56,7 +56,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
     h.rod('pin-red', 'pin', 0.002, 0.085, 0.1, 0.014) + { origin: [0.085, 0.014, 0.0765] },
     h.rod('plug-black', 'black', 0.005, -0.045, -0.02, 0.014) + { origin: [-0.045, 0.014, 0.0835] },
     h.rod('pin-black', 'pin', 0.002, -0.06, -0.045, 0.014) + { origin: [-0.06, 0.014, 0.0835] },
-  ], { red: 'plastic-red', black: 'plastic-black', tie: 'plastic-white', pin: 'brass' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['rubber', 'metal'], setting: ['modern'] } } },
+  ], { red: 'plastic-red', black: 'plastic-black', tie: 'plastic-white', pin: 'brass' }) + { title: 'Speaker cable' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['rubber', 'metal'], setting: ['modern'] } } },
 
   // A coil of black balanced audio patch cable about 1.5 m long, 120 mm across, with a three-pin male plug at one
   // end and the matching socket at the other lying on top.
@@ -70,7 +70,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
   + [
     box('lead-a', 'cable', [-0.082, 0.004, -0.018], [-0.074, 0.022, -0.012]),
     box('lead-b', 'cable', [0.074, 0.004, 0.012], [0.082, 0.022, 0.018]),
-  ], { cable: 'rubber-black', strap: 'hook-loop-grey', boot: 'plastic-black', shell: 'steel-stainless', nose: 'plastic-charcoal' })
+  ], { cable: 'rubber-black', strap: 'hook-loop-grey', boot: 'plastic-black', shell: 'steel-stainless', nose: 'plastic-charcoal' }) + { title: 'XLR cable' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['rubber', 'metal'], setting: ['modern'] } } },
 
   // A folding tripod guitar stand 0.75 m tall in black-painted aluminium tube: three legs splayed 0.5 m across, a
@@ -90,7 +90,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
       box('yoke-base', 'leg', [-0.035, 0.72, -0.008], [0.035, 0.735, 0.008]),
       box('yoke-l', 'foot', [-0.04, 0.72, -0.012], [-0.022, 0.8, 0.012]),
       box('yoke-r', 'foot', [0.022, 0.72, -0.012], [0.04, 0.8, 0.012]),
-    ], { leg: 'alu-anodized-black', hub: 'plastic-charcoal', foot: 'rubber-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'] } } },
+    ], { leg: 'alu-anodized-black', hub: 'plastic-charcoal', foot: 'rubber-black' }) + { title: 'Guitar stand' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'] } } },
 
   // Closed-back studio headphones 0.26 m across and 0.2 m tall: a padded headband over two round ear cups 90 mm
   // across with cushions facing in, standing on the cups.
@@ -107,7 +107,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
       h.turned('pad-l', 'pad', 'x', [[0, 0.022], [0, 0.04], [0.02, 0.044], [0.02, 0.02], [0, 0.022]], [-0.1, 0.048, 0]),
       h.turned('pad-r', 'pad', 'x', [[0, 0.02], [0, 0.044], [0.02, 0.04], [0.02, 0.022], [0, 0.02]], [0.08, 0.048, 0]),
       h.disc('jack', 'metal', 0.004, 0, 0.006, -0.115, 0),
-    ], { shell: 'plastic-charcoal', pad: 'leather-black', metal: 'steel-stainless' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['leather', 'plastic'], setting: ['modern'] } } },
+    ], { shell: 'plastic-charcoal', pad: 'leather-black', metal: 'steel-stainless' }) + { title: 'Headphones' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['leather', 'plastic'], setting: ['modern'] } } },
 
   // A telescoping boom microphone stand in black-painted aluminium, shown closed: a tripod base 0.7 m across, a mast
   // 1 m tall with a clutch at the joint, and a boom 0.8 m long tilted up and forward with a counterweight at the
@@ -125,7 +125,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
       box('knuckle', 'clutch', [-0.022, 0.985, -0.018], [0.022, 1.035, 0.018]),
       h.disc('weight', 'weight', 0.025, 0.85, 0.93, 0, -0.3),
       box('clip', 'clip', [-0.012, 1.19, 0.49], [0.012, 1.23, 0.53]),
-    ], { tube: 'alu-anodized-black', clutch: 'plastic-charcoal', foot: 'rubber-black', leg: 'alu-anodized-black', weight: 'steel-parkerized', clip: 'plastic-black' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'] } } },
+    ], { tube: 'alu-anodized-black', clutch: 'plastic-charcoal', foot: 'rubber-black', leg: 'alu-anodized-black', weight: 'steel-parkerized', clip: 'plastic-black' }) + { title: 'Microphone stand' } + { voxelGrain: 0.008 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'] } } },
 
   // A handheld dynamic microphone 180 mm long: a ball grille 52 mm across on a tapering black handle with a
   // three-pin socket in its tail. The grille points to +x.
@@ -135,7 +135,7 @@ taxonomy.inherit({ keywords: ['music'] }, [
     ballX('grille', 'grille', 0.128, 0.026, 0.0265),
     h.turned('socket', 'socket', 'x', [[0, 0], [0, 0.008], [0.002, 0.008], [0.002, 0]], [-0.002, 0.0265, 0]),
     box('badge', 'collar', [0.04, 0.0395, -0.004], [0.06, 0.0415, 0.004]),
-  ], { handle: 'alu-anodized-black', collar: 'steel-stainless', grille: 'steel-grey', socket: 'brass' }) + h.gripOn('xlr_microphone', 'handle') + {
+  ], { handle: 'alu-anodized-black', collar: 'steel-stainless', grille: 'steel-grey', socket: 'brass' }) + { title: 'XLR microphone' } + h.gripOn('xlr_microphone', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -205,11 +205,11 @@ taxonomy.inherit({ keywords: ['music'] }, [
     ] + [
       h.disc('jack-%d' % i, 'jack', 0.006, 0.07, 0.09, -0.2 + i * 0.04, -0.181) + { kind: 'turned', axis: 'z', profile: [[0, 0], [0, 0.006], [0.004, 0.006], [0.004, 0]], origin: [-0.2 + i * 0.04, 0.08, -0.184] }
       for i in std.range(0, 7)
-    ], { case: 'steel-parkerized', face: 'plastic-charcoal', knob: 'plastic-black', slot: 'plastic-black', fader: 'plastic-grey', master: 'plastic-red', meter: 'lcd-green', jack: 'steel-stainless' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+    ], { case: 'steel-parkerized', face: 'plastic-charcoal', knob: 'plastic-black', slot: 'plastic-black', fader: 'plastic-grey', master: 'plastic-red', meter: 'lcd-green', jack: 'steel-stainless' }) + { title: 'Mixer' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A medium guitar plectrum in red plastic, 30 mm long and 26 mm across, a rounded triangle tip forward on +z. Real picks are under
   // 1 mm thick; this one is drawn at the finest 2 mm grain.
   h.compound('plectrum', 0.0004, [
     h.prism('pick', 'pick', 'y', [[q[1], q[0]] for q in [[0, 0.016], [-0.01, 0.002], [-0.013, -0.006], [-0.009, -0.012], [0, -0.014], [0.009, -0.012], [0.013, -0.006], [0.01, 0.002]]], 0, 0.002),
-  ], { pick: 'plastic-red' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'] } } },
+  ], { pick: 'plastic-red' }) + { title: 'Plectrum' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'] } } },
 ])

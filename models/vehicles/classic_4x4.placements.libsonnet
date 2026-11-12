@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'classic_4x4.spec.libsonnet';
 {
+  title: 'Classic 4x4',
   sites: [
     site.one('shell', 'classic_4x4_shell'),
     site.one('windscreen', 'classic_4x4_windscreen'),

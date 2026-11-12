@@ -12,6 +12,7 @@
 {
   // A one-man turret of 7 mm welded armour as on an eight-wheeled carrier, coned from the ring to a flat roof.
   apc_turret: {
+    title: 'APC turret',
     local height = 0.455,
     local bore = 0.2,
     local back = 0.47,
@@ -43,6 +44,7 @@
   // hatch with a sight ahead of it. Its plan is read from drawings of the vehicle and its mass is an estimate, since
   // neither is published.
   cv9040_turret: {
+    title: 'Tracked infantry fighting vehicle turret',
     local height = 0.75,
     local bore = 0.37,
     local back = 0.85,
@@ -80,6 +82,7 @@
   // the loader on the far side under hatches side by side, and the crew's basket on the bustle. Its plan is a generic
   // Western tank's, and its mass is an estimate for a turret of its armour.
   mbt_turret: {
+    title: 'Main battle tank turret',
     local height = 0.85,
     local bore = 0.45,
     local back = 0.95,

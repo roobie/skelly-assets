@@ -3,6 +3,7 @@ local s = import 'sports_car.spec.libsonnet';
 local seatX = s.cowl - 0.55;
 local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
 {
+  title: 'Sports car',
   sites: (import 'car-sites.libsonnet')('sports_car', s, {
     drop: ['rear_bench'],
     over: {

@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'hearse.spec.libsonnet';
 {
+  title: 'Hearse',
   sites: (import 'car-sites.libsonnet')('hearse', s, {
     drop: ['rear_bench'],
     over: {

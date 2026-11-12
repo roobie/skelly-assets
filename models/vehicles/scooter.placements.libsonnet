@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'scooter.spec.libsonnet';
 {
+  title: 'Scooter',
   sites: [
     site.one('frame', 'scooter_frame'),
     site.one('floorboard', 'scooter_floorboard'),

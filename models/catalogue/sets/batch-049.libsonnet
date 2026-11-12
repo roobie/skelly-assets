@@ -54,7 +54,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     pointer: 'paint-white',
     lamp: 'plastic-clear-red',
     cord: 'plastic-black',
-  })
+  }) + { title: 'Hotplate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // An induction hotplate, 290 mm wide, 350 mm deep and 60 mm tall: a grey plastic case under a black glass
@@ -80,7 +80,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     display: 'lcd-green',
     button: 'plastic-white',
     cord: 'plastic-black',
-  })
+  }) + { title: 'Induction hotplate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A homemade vacuum sealer, 350 mm long, 150 mm deep and 120 mm tall: a pine board carrying a hinged
@@ -120,7 +120,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     wire: 'plastic-red',
     tape: 'tape-grey',
     cord: 'plastic-black',
-  })
+  }) + { title: 'Makeshift sealer' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'] }, keywords: ['improvised'] } },
 
   // A camping mess kit, 150 mm across and 110 mm tall: an aluminium pot with a frying-pan lid seated
@@ -140,7 +140,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     box('ear-a', 'hinge', [-0.074, 0.06, -0.006], [-0.07, 0.072, 0.006]),
     box('ear-b', 'hinge', [0.07, 0.06, -0.006], [0.074, 0.072, 0.006]),
     turned('bail', 'handle', 'z', [[0, 0.069], [0, 0.072], [0.003, 0.072], [0.003, 0.069], [0, 0.069]], [0, 0.066, -0.0015]),
-  ], { pot: 'alu-bare', rim: 'steel-grey', base: 'paint-charcoal', hinge: 'steel-grey', handle: 'steel-grey', grip: 'rubber-black' })
+  ], { pot: 'alu-bare', rim: 'steel-grey', base: 'paint-charcoal', hinge: 'steel-grey', handle: 'steel-grey', grip: 'rubber-black' }) + { title: 'Mess kit' }
   + h.inHand('mess_kit', 'pot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'military'] } },
 
   // A compact countertop microwave, 400 mm wide, 230 mm tall and 300 mm deep: a white steel case on
@@ -177,7 +177,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     knob: 'plastic-grey',
     key: 'plastic-white',
     cord: 'plastic-black',
-  })
+  }) + { title: 'Microwave oven' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A granite mortar 120 mm across and 70 mm tall with a deep round bowl, and a club-shaped stone
@@ -185,7 +185,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
   h.compound('mortar_pestle', 1.1, [
     turned('mortar', 'mortar', 'y', [[0, 0], [0, 0.05], [0.012, 0.06], [0.07, 0.06], [0.07, 0.047], [0.055, 0.044], [0.04, 0.036], [0.028, 0.02], [0.022, 0]]),
     turned('pestle', 'pestle', 'x', [[0, 0], [0, 0.017], [0.012, 0.02], [0.03, 0.017], [0.09, 0.011], [0.115, 0.013], [0.12, 0]], [-0.05, 0.08, 0.012]),
-  ], { mortar: 'stone-grey', pestle: 'stone-whet' })
+  ], { mortar: 'stone-grey', pestle: 'stone-whet' }) + { title: 'Mortar and pestle' }
   + h.inHand('mortar_pestle', 'mortar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['stone'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // An electric multi-cooker, 250 mm wide, 245 mm tall and 245 mm deep: a stainless steel pot body on a
@@ -214,7 +214,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     display: 'screen-black',
     key: 'plastic-grey',
     cord: 'plastic-black',
-  })
+  }) + { title: 'Multi-cooker' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A kerosene pressure stove, 150 mm across and 170 mm tall: a squat round steel fuel tank with a filler
@@ -248,7 +248,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     brass: 'brass',
     'burner-cap': 'iron-cast',
     support: 'steel-parkerized',
-  })
+  }) + { title: 'Oil cooker' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A hand-cranked screw oil press, 200 mm long and 150 mm tall: a horizontal steel barrel on a clamp
@@ -278,7 +278,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     wick: 'cloth-cream',
     crank: 'steel-grey',
     knob: 'wood-birch',
-  })
+  }) + { title: 'Manual oil press' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'wood'] } } },
 
   // A cast-iron pasta extruder, 100 mm across and 230 mm tall: a vertical barrel clamped to a bench by a
@@ -301,7 +301,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     box('t-bar', 'iron', [-0.05, 0.228, -0.004], [0.05, 0.236, 0.004]),
     disc('t-knob-l', 'knob', 0.008, 0.236, 0.26, -0.045, 0),
     disc('t-knob-r', 'knob', 0.008, 0.236, 0.26, 0.045, 0),
-  ], { iron: 'iron-cast', die: 'steel-grey', 'die-mark': 'paint-charcoal', screw: 'steel-stainless', plunger: 'steel-grey', knob: 'wood-walnut' })
+  ], { iron: 'iron-cast', die: 'steel-grey', 'die-mark': 'paint-charcoal', screw: 'steel-stainless', plunger: 'steel-grey', knob: 'wood-walnut' }) + { title: 'Pasta extruder' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
   // A jar of cucumbers fermenting in brine, cloth tied over the mouth.
@@ -310,7 +310,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     for i in std.range(0, 5)
   ] + [
     disc('dill', 'dill', 0.003, 0.09, 0.11, -0.03, 0.012),
-  ], { brine: 'syrup-green', pickle: 'leaf-green', dill: 'plant-dried' }) + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },
+  ], { brine: 'syrup-green', pickle: 'leaf-green', dill: 'plant-dried' }) + { title: 'Fermenting pickles' } + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },
 
   // A soda-can alcohol stove kit, 140 mm across and 200 mm tall: a short double-walled stove cut from two
   // cans with a ring of jet holes round its top, a simmer ring with a tab handle resting on it, and the 500 ml
@@ -324,7 +324,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     turned('bottle', 'bottle', 'y', [[0, 0], [0, 0.031], [0.16, 0.031], [0.18, 0.014], [0.188, 0.012], [0.188, 0]], [0.03, 0, 0]),
     turned('label', 'label', 'y', [[0, 0], [0, 0.0315], [0.06, 0.0315], [0.06, 0]], [0.03, 0.05, 0]),
     disc('cap', 'cap', 0.014, 0.188, 0.205, 0.03, 0),
-  ], { can: 'alu-bare', jets: 'paint-charcoal', well: 'paint-charcoal', simmer: 'alu-bare', bottle: 'plastic-clear', label: 'paper-white', cap: 'plastic-blue' })
+  ], { can: 'alu-bare', jets: 'paint-charcoal', well: 'paint-charcoal', simmer: 'alu-bare', bottle: 'plastic-clear', label: 'paper-white', cap: 'plastic-blue' }) + { title: 'Soda can stove' }
   + h.inHand('soda_can_stove', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking', 'improvised'] } },
 
   // A single-burner propane stove, 230 mm wide, 180 mm deep and 110 mm tall: a green steel bowl on three
@@ -357,7 +357,7 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     brass: 'brass',
     knob: 'plastic-black',
     support: 'steel-parkerized',
-  })
+  }) + { title: 'Propane cooker' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
   // A hand quern, 300 mm across and 230 mm tall to the top of its handle: a thick lower millstone with a
@@ -372,12 +372,12 @@ local fermentJar(id, mass, fill, finishes) = h.compound(id, mass, [
     ring('flour', 'flour', 0.14, 0.15, 0.1, 0.0015),
     disc('peg', 'handle', 0.016, 0.16, 0.23, 0.1, 0),
     disc('peg-cap', 'handle', 0.019, 0.22, 0.235, 0.1, 0),
-  ], { stone: 'stone-grey', runner: 'stone-whet', eye: 'paint-charcoal', flour: 'chalk-white', handle: 'wood-oak' })
+  ], { stone: 'stone-grey', runner: 'stone-whet', eye: 'paint-charcoal', flour: 'chalk-white', handle: 'wood-oak' }) + { title: 'Rock quern' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'household', tags: { material: ['stone', 'wood'], setting: ['ancient'] } } },
 
   // A jar of shredded cabbage fermenting in its own brine under a stone weight, cloth tied over the mouth.
   fermentJar('fermenting_sauerkraut', 1.5, [
     disc('kraut', 'kraut', 0.045, 0.004, 0.085),
     disc('weight', 'weight', 0.03, 0.085, 0.098),
-  ], { brine: 'jelly-pale', kraut: 'straw-pale', weight: 'stone-grey' }) + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },
+  ], { brine: 'jelly-pale', kraut: 'straw-pale', weight: 'stone-grey' }) + { title: 'Fermenting sauerkraut' } + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },
 ]

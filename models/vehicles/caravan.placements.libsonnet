@@ -3,6 +3,7 @@ local s = import 'caravan.spec.libsonnet';
 local windowY = s.windowLow;
 local sideZ = 0;
 {
+  title: 'Caravan',
   sites: [
     site.one('chassis', 'caravan_chassis'),
     site.one('floor', 'caravan_floor'),

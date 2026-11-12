@@ -51,7 +51,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     standing('tank', 'tank', [[0.092, 0.0105], [0.118, 0.0105]]),
     standing('top', 'steel', [[0.118, 0.011], [0.125, 0.011], [0.127, 0.006]]),
     standing('drip', 'drip', [[0.127, 0.005], [0.134, 0.0045], [0.136, 0.003]]),
-  ], { mod: 'alu-anodized-black', screen: 'screen-black', button: 'steel-stainless', steel: 'steel-stainless', tank: 'plastic-clear', drip: 'plastic-black' })
+  ], { mod: 'alu-anodized-black', screen: 'screen-black', button: 'steel-stainless', steel: 'steel-stainless', tank: 'plastic-clear', drip: 'plastic-black' }) + { title: 'Box mod vaporiser' }
   + h.inHand('box_mod_vaporiser', 'mod') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['tobacco'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A personal water filter straw 225 mm long and 30 mm across: a blue tube with a grey band, a black mouthpiece cap
@@ -61,7 +61,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('body', 'body', [[-0.090, 0.015], [0.085, 0.015]]),
     alongX('band', 'band', [[-0.020, 0.0155], [0.000, 0.0155]]),
     alongX('mouth', 'cap', [[0.085, 0.0155], [0.100, 0.0155], [0.108, 0.010], [0.1125, 0.009]]),
-  ], { body: 'plastic-blue', band: 'plastic-grey', cap: 'plastic-black' })
+  ], { body: 'plastic-blue', band: 'plastic-grey', cap: 'plastic-black' }) + { title: 'Filter straw' }
   + h.gripOn('filter_straw', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['camping', 'water-purification'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A straight glass stem 120 mm long and 8 mm across ending in a 26 mm bulb with an open hole on top.
@@ -70,7 +70,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     h.ball('bulb', 'glass', 0.013, 0.050, 0, 0),
     disc('hole', 'hole', 0.004, 0.0115, 0.0132, 0.050, 0),
     disc('soot', 'soot', 0.008, -0.005, 0.005, 0.050, 0),
-  ], { glass: 'glass-clear', hole: 'coal-black', soot: 'plastic-scorched' })
+  ], { glass: 'glass-clear', hole: 'coal-black', soot: 'plastic-scorched' }) + { title: 'Crack pipe' }
   + h.gripOn('crackpipe', 'stem') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['recreational-drug'], tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A hand-blown spoon pipe 110 mm long: a clear glass body swelling to 32 mm at the bowl end, green swirls, a bowl
@@ -83,7 +83,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     disc('bowl', 'glass', 0.011, 0.010, 0.017, 0.030, 0),
     disc('bowl-hole', 'hole', 0.0065, 0.017, 0.0175, 0.030, 0),
     turned('carb', 'hole', 'z', [[0, 0], [0, 0.002], [0.001, 0.002], [0.001, 0]], [0.008, 0.002, 0.0115]),
-  ], { glass: 'glass-clear', swirl: 'glass-lens-green', hole: 'coal-black' })
+  ], { glass: 'glass-clear', swirl: 'glass-lens-green', hole: 'coal-black' }) + { title: 'Glass pipe' }
   + h.inHand('glass_pipe', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', keywords: ['recreational-drug'], tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A carved briar tobacco pipe 150 mm long: a 34 mm bowl 45 mm tall at +x with a charred hole, a round shank and a
@@ -94,7 +94,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('shank', 'wood', [[-0.030, 0.0065], [0.025, 0.0075]], 0.012),
     alongX('ferrule', 'band', [[-0.033, 0.0068], [-0.030, 0.0068]], 0.012),
     alongX('stem', 'stem', [[-0.098, 0.004], [-0.090, 0.0045], [-0.033, 0.0058]], 0.012),
-  ], { wood: 'wood-walnut', char: 'coal-black', band: 'brass-polished', stem: 'lacquer-black' })
+  ], { wood: 'wood-walnut', char: 'coal-black', band: 'brass-polished', stem: 'lacquer-black' }) + { title: 'Tobacco pipe' }
   + h.gripOn('tobacco_pipe', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A desktop single-hole punch 90 by 45 mm and 42 mm tall: a charcoal base, an aluminium punch housing at +x cut by a
@@ -108,7 +108,7 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     standing('punch', 'pin', [[0.030, 0.004], [0.034, 0.004]], 0.026, 0),
     h.prism('lever', 'lever', 'z', [[0.040, 0.030], [0.040, 0.036], [-0.040, 0.042], [-0.044, 0.038], [-0.040, 0.034]], -0.010, 0.010),
     h.prism('grip', 'pad', 'z', [[-0.030, 0.0405], [-0.044, 0.0415], [-0.046, 0.0385], [-0.032, 0.0375]], -0.011, 0.011),
-  ], { body: 'plastic-charcoal', housing: 'alu-bare', lever: 'steel-bright', pad: 'plastic-black', slot: 'coal-black', pin: 'steel-stainless' })
+  ], { body: 'plastic-charcoal', housing: 'alu-bare', lever: 'steel-bright', pad: 'plastic-black', slot: 'coal-black', pin: 'steel-stainless' }) + { title: 'Hole punch' }
   + h.inHand('hole_punch', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['office'], setting: ['modern'] } } },
 
   // A metal ballpoint 130 mm long and 9.6 mm across: a steel barrel with a band, a ribbed grip tapering to a cone and
@@ -122,16 +122,16 @@ local scissors(reach, width, lx, lz, r0, r1, point) =
     alongX('tip', 'tip', [[0.061, 0.0012], [0.065, 0.0004]]),
     box('clip', 'clip', [-0.058, 0.0045, -0.0015], [-0.022, 0.0065, 0.0015]),
     box('clip-end', 'clip', [-0.024, 0.0045, -0.0018], [-0.020, 0.0072, 0.0018]),
-  ], { body: 'steel-stainless', band: 'metal-gold', grip: 'rubber-black', tip: 'steel-grey', clip: 'steel-stainless', button: 'steel-stainless' })
+  ], { body: 'steel-stainless', band: 'metal-gold', grip: 'rubber-black', tip: 'steel-grey', clip: 'steel-stainless', button: 'steel-stainless' }) + { title: 'Pen' }
   + h.gripOn('pen', 'barrel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // Office scissors 180 mm long: 115 mm pointed steel blades opened a little and black plastic finger loops.
   h.compound('scissors', 0.053, scissors(0.122, 0.016, -0.042, 0.017, 0.010, 0.0165, 0), {
     blade: 'steel-stainless', handle: 'plastic-black', pivot: 'steel-grey',
-  }) + h.gripOn('scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Scissors' } + h.gripOn('scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // Child's scissors 130 mm long: short blades with rounded tips and bright red finger loops.
   h.compound('childs_scissors', 0.04, scissors(0.084, 0.014, -0.032, 0.014, 0.008, 0.0135, 0.002), {
     blade: 'steel-grey', handle: 'plastic-red', pivot: 'steel-stainless',
-  }) + h.gripOn('childs_scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Child\'s scissors' } + h.gripOn('childs_scissors', 'shank-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

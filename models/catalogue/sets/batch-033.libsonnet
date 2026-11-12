@@ -65,7 +65,7 @@ local dial(prefix, r, x, y, z, at) =
     hexY('bushing-hex', 'galv', 0.02, 0, 0.008, 0.1, -0.075 + 0.02),
     disc('bushing-hole', 'dark', 0.0085, 0.008, 0.009, 0.1, -0.055),
     turned('bushing-boss', 'galv', 'y', [[0, 0.0085], [0, 0.0145], [0.006, 0.0145], [0.006, 0.0085], [0, 0.0085]], [0.1, 0.008, -0.055]),
-  ], { black: 'iron-dull', galv: 'steel-galvanised', dark: 'plastic-charcoal' })
+  ], { black: 'iron-dull', galv: 'steel-galvanised', dark: 'plastic-charcoal' }) + { title: 'Pipe fittings' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A dial pressure gauge built into a short length of thick-walled pipe: the pipe 200 mm long and 60 mm across with
@@ -92,7 +92,7 @@ local dial(prefix, r, x, y, z, at) =
     face: 'paint-white',
     ink: 'plastic-black',
     danger: 'paint-red',
-  })
+  }) + { title: 'Pressure gauge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A compact three-plunger high-pressure pump, 190 mm long, 120 mm deep and 110 mm tall: a cast-iron crankcase on a
@@ -132,7 +132,7 @@ local dial(prefix, r, x, y, z, at) =
     cap: 'plastic-yellow',
     brass: 'brass-polished',
     dark: 'plastic-charcoal',
-  })
+  }) + { title: 'High-pressure pump' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A handheld thermocouple pyrometer laid flat: a meter 150 mm by 75 mm and 32 mm thick in a yellow rubber boot,
@@ -168,7 +168,7 @@ local dial(prefix, r, x, y, z, at) =
     cable: 'plastic-black',
     handle: 'plastic-black',
     probe: 'steel-stainless',
-  })
+  }) + { title: 'Pyrometer' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['rubber', 'metal'] } } },
 
   // A hand crank bent from one iron rod 16 mm across, lying flat: a shaft 200 mm long with a square drive end and a
@@ -184,7 +184,7 @@ local dial(prefix, r, x, y, z, at) =
     rodX('pin', 'iron', r, 0.06, 0.175, y, 0.14),
     h.tube('grip', 'grip', r, 0.012, 0.072, 0.162, y, 0.14),
     rodX('peen', 'iron', 0.01, 0.175, 0.18, y, 0.14),
-  ], { iron: 'iron-dull', grip: 'iron-cast' })
+  ], { iron: 'iron-dull', grip: 'iron-cast' }) + { title: 'Hand crank' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A small thick-walled steel pressure vessel standing upright, 400 mm tall and 180 mm across with rounded heads: a
@@ -207,7 +207,7 @@ local dial(prefix, r, x, y, z, at) =
   ] + [
     box('plate-line-%d' % i, 'stamp', [-0.028, 0.142 + i * 0.012, 0.092], [0.028 - (i % 2) * 0.014, 0.146 + i * 0.012, 0.093])
     for i in std.range(0, 3)
-  ], { steel: 'steel-grey', weld: 'steel-heat-tint', fitting: 'brass-dull', dark: 'plastic-charcoal', plate: 'steel-bright', stamp: 'iron-dull' })
+  ], { steel: 'steel-grey', weld: 'steel-heat-tint', fitting: 'brass-dull', dark: 'plastic-charcoal', plate: 'steel-bright', stamp: 'iron-dull' }) + { title: 'Small pressure vessel' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A small cast-iron centrifugal pump, 170 mm tall, 150 mm wide and 190 mm deep: a round volute casing facing front
@@ -234,7 +234,7 @@ local dial(prefix, r, x, y, z, at) =
     rodZ('shaft', 'shaft', 0.008, -0.13, -0.09, 0, cy),
     box('key', 'shaft', [-0.002, cy + 0.007, -0.125], [0.002, cy + 0.01, -0.1]),
     rodZ('drain', 'bolt', 0.005, 0.0, 0.03, -0.035, cy - 0.052),
-  ], { iron: 'iron-cast', bolt: 'steel-grey', shaft: 'steel-bright', dark: 'plastic-charcoal' })
+  ], { iron: 'iron-cast', bolt: 'steel-grey', shaft: 'steel-bright', dark: 'plastic-charcoal' }) + { title: 'Well pump' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A refrigerant recovery machine, 380 mm wide, 230 mm deep and 330 mm tall: a steel cabinet with a carry handle
@@ -289,7 +289,7 @@ local dial(prefix, r, x, y, z, at) =
     knob: 'plastic-black',
     brass: 'brass',
     vent: 'plastic-black',
-  })
+  }) + { title: 'Refrigerant recovery machine' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A plastic clothes hanger hung facing front, 420 mm wide and 230 mm tall with its hook: sloping shoulders, a
@@ -309,6 +309,6 @@ local dial(prefix, r, x, y, z, at) =
     local a0 = i * std.pi / 6, a1 = (i + 1) * std.pi / 6;
     seg('hook-%d' % i, 'hook', [-0.022 + 0.022 * std.cos(a0), 0.19 + 0.022 * std.sin(a0)], [-0.022 + 0.022 * std.cos(a1), 0.19 + 0.022 * std.sin(a1)], 0.004, -0.002, 0.002)
     for i in std.range(0, 7)
-  ], { plastic: 'plastic-black', hook: 'steel-bright' })
+  ], { plastic: 'plastic-black', hook: 'steel-bright' }) + { title: 'Clothes hanger' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

@@ -76,7 +76,7 @@ switch would have stayed off until the last pack was tagged, and new packs would
 list, every finished pack is locked in, and a pack that is not listed is strict from its first model. When
 the list is empty, the key goes and the gate is fully strict.
 
-`tools/check-taxonomy.mjs` prints the untagged models and every problem; its `--json` output is for tagging
+`tools/check-sources.mjs` prints the untagged models and every problem; its `--json` output is for tagging
 agents. `tools/build.mjs` runs the same report and fails before it writes any model.
 
 ## The manifest is the authority

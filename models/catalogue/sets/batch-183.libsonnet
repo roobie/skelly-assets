@@ -77,17 +77,17 @@ local dress(o) =
 [
   // A cotton kitchen apron folded to 260 mm by 320 mm and 24 mm tall: the bib on top, its neck strap along
   // the top edge, the waist ties down both side edges and a split patch pocket near the hem.
-  apron('cotton_apron', 0.31, { cloth: 'cloth-cream', bib: 'cloth-cream', binding: 'cloth-navy', strap: 'cloth-navy', pocket: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], slot: ['torso'], setting: ['modern'] } } },
+  apron('cotton_apron', 0.31, { cloth: 'cloth-cream', bib: 'cloth-cream', binding: 'cloth-navy', strap: 'cloth-navy', pocket: 'cloth-cream' }) + { title: 'Cotton apron' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], slot: ['torso'], setting: ['modern'] } } },
 
   // A cut-resistant aramid apron folded the same, a little stiffer, with black binding and black ties.
-  apron('cut_resistant_apron', 0.39, { cloth: 'aramid-gold', bib: 'aramid-gold', binding: 'webbing-black', strap: 'webbing-black', pocket: 'aramid-gold' }, { ht: 0.03, t: 0.005 }) + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  apron('cut_resistant_apron', 0.39, { cloth: 'aramid-gold', bib: 'aramid-gold', binding: 'webbing-black', strap: 'webbing-black', pocket: 'aramid-gold' }, { ht: 0.03, t: 0.005 }) + { title: 'Cut-resistant apron' } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A heavy leather work apron folded to 260 mm by 320 mm and 36 mm tall: riveted pocket, leather ties and a buckle
   // on the neck strap.
-  apron('leather_apron', 1.4, { cloth: 'leather-tan', bib: 'leather-tan', binding: 'leather-chestnut', strap: 'leather-chestnut', pocket: 'leather-tan', rivet: 'brass-dull' }, { ht: 0.036, t: 0.006, rivets: true, buckle: true }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  apron('leather_apron', 1.4, { cloth: 'leather-tan', bib: 'leather-tan', binding: 'leather-chestnut', strap: 'leather-chestnut', pocket: 'leather-tan', rivet: 'brass-dull' }, { ht: 0.036, t: 0.006, rivets: true, buckle: true }) + { title: 'Leather apron' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A blue PVC splash apron folded to 260 mm by 320 mm and 24 mm tall, with white ties and binding.
-  apron('plastic_apron', 0.35, { cloth: 'nitrile-blue', bib: 'nitrile-blue', binding: 'cloth-bright-white', strap: 'cloth-bright-white', pocket: 'nitrile-blue' }) + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
+  apron('plastic_apron', 0.35, { cloth: 'nitrile-blue', bib: 'nitrile-blue', binding: 'cloth-bright-white', strap: 'cloth-bright-white', pocket: 'nitrile-blue' }) + { title: 'Plastic apron' } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // A short yellow dress with black stripes, folded to 280 mm by 300 mm and 40 mm tall, with its gauzy wings laid on
   // top and the antenna headband resting on them.
@@ -105,7 +105,7 @@ local dress(o) =
     strip('antenna-r', 'wire', [0.03, -0.02], [0.06, 0.06], ht + 0.012, 0.004, 0.004),
     h.disc('antenna-tip-l', 'wire', 0.009, ht + 0.012, ht + 0.026, -0.06, 0.062),
     h.disc('antenna-tip-r', 'wire', 0.009, ht + 0.012, ht + 0.026, 0.06, 0.062),
-  ], { cloth: 'cloth-yellow', stripe: 'cloth-black', lining: 'cloth-black', trim: 'cloth-black', wing: 'mesh-white', wire: 'plastic-matte-black' })
+  ], { cloth: 'cloth-yellow', stripe: 'cloth-black', lining: 'cloth-black', trim: 'cloth-black', wing: 'mesh-white', wire: 'plastic-matte-black' }) + { title: 'Bee dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
   // A navy wool blazer folded flat, 360 mm by 340 mm and 60 mm tall: crossed lapels, two brass buttons, flapped hip
   // pockets and a breast welt, the sleeves folded in along each side.
@@ -116,7 +116,7 @@ local dress(o) =
   }) + [
     flat('shirt', 'shirt', [[-0.062, 0.17], [0.062, 0.17], [0, -0.045]], 0.06 - 0.001, 0.002),
     flat('tie', 'tie', [[-0.01, 0.17], [0.01, 0.17], [0.016, 0.02], [0, -0.01], [-0.016, 0.02]], 0.06, 0.003),
-  ], { shirt: 'cloth-bright-white', tie: 'cloth-crimson', cloth: 'cloth-navy', collar: 'cloth-navy', front: 'cloth-navy', button: 'brass-dull', pocket: 'cloth-navy', flap: 'cloth-navy', sleeve: 'cloth-navy' })
+  ], { shirt: 'cloth-bright-white', tie: 'cloth-crimson', cloth: 'cloth-navy', collar: 'cloth-navy', front: 'cloth-navy', button: 'brass-dull', pocket: 'cloth-navy', flap: 'cloth-navy', sleeve: 'cloth-navy' }) + { title: 'Blazer' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A strapless black patent bodysuit laid flat, 240 mm wide and 270 mm long, folded double: a corset bodice with
@@ -131,12 +131,12 @@ local dress(o) =
     strip('bone-r', 'trim', [0.06, 0.06], [0.045, -0.06], 0.012, 0.004, 0.002),
     strip('leg-l', 'trim', [-0.11, -0.06], [-0.025, -0.15], 0.012, 0.004, 0.002),
     strip('leg-r', 'trim', [0.11, -0.06], [0.025, -0.15], 0.012, 0.004, 0.002),
-  ], { suit: 'leather-patent', trim: 'cloth-bright-white' })
+  ], { suit: 'leather-patent', trim: 'cloth-bright-white' }) + { title: 'Bunny bodysuit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['leather'], slot: ['torso'], setting: ['modern'] } } },
 
   // A pale blue long-sleeved button shirt folded as a shop folds it, 240 mm by 300 mm and 35 mm tall: collar
   // points, a placket of small white buttons.
-  shirt('button_shirt', 0.32, { cloth: 'cloth-blue', collar: 'cloth-blue', front: 'cloth-blue', button: 'cloth-bright-white', lining: 'cloth-navy' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  shirt('button_shirt', 0.32, { cloth: 'cloth-blue', collar: 'cloth-blue', front: 'cloth-blue', button: 'cloth-bright-white', lining: 'cloth-navy' }) + { title: 'Button shirt' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A blue and white cheerleader dress folded small, 240 mm by 280 mm and 25 mm tall: a white chest band where the
   // lettering goes, white neck trim and a pleated skirt hem of alternating white panels.
@@ -147,7 +147,7 @@ local dress(o) =
   ] + [
     box('pleat-%d' % i, 'trim', [-w / 2 + 0.01 + i * 0.04, ht, -d / 2], [-w / 2 + 0.03 + i * 0.04, ht + 0.003, -0.05])
     for i in std.range(0, 5)
-  ], { cloth: 'cloth-blue', lining: 'cloth-navy', trim: 'cloth-bright-white' })
+  ], { cloth: 'cloth-blue', lining: 'cloth-navy', trim: 'cloth-bright-white' }) + { title: 'Cheerleader dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A short red cheerleader tank top folded small, 200 mm by 200 mm and 20 mm tall: white straps and neck trim, and
@@ -157,7 +157,7 @@ local dress(o) =
     box('strap-l', 'trim', [-0.075, ht, d / 2 - 0.03], [-0.055, ht + 0.003, d / 2]),
     box('strap-r', 'trim', [0.055, ht, d / 2 - 0.03], [0.075, ht + 0.003, d / 2]),
     box('chest-band', 'trim', [-w / 2, ht, -0.015], [w / 2, ht + 0.003, 0.02]),
-  ], { cloth: 'cloth-red', lining: 'cloth-crimson', trim: 'cloth-bright-white' })
+  ], { cloth: 'cloth-red', lining: 'cloth-crimson', trim: 'cloth-bright-white' }) + { title: 'Cheerleader crop top' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A combat shirt folded flat, 280 mm by 320 mm and 40 mm tall: a thin khaki torso with a short zip under a mandarin
@@ -181,14 +181,14 @@ local dress(o) =
   ]) + [
     box('pen-slot', 'flap', [-w / 2 + 0.06, ht + 0.006, -0.1], [-w / 2 + 0.075, ht + 0.01, -0.04]),
     h.disc('pen-cap', 'zip', 0.004, ht + 0.01, ht + 0.016, -w / 2 + 0.0675, -0.04),
-  ], { cloth: 'cloth-khaki', collar: 'cloth-khaki', front: 'cloth-khaki', button: 'cloth-khaki', sleeve: 'cloth-olive-drab', flap: 'cloth-olive-drab', patch: 'hook-loop-grey', zip: 'plastic-matte-black' })
+  ], { cloth: 'cloth-khaki', collar: 'cloth-khaki', front: 'cloth-khaki', button: 'cloth-khaki', sleeve: 'cloth-olive-drab', flap: 'cloth-olive-drab', patch: 'hook-loop-grey', zip: 'plastic-matte-black' }) + { title: 'Combat shirt' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A denim shirt folded as a shop folds it, 240 mm by 300 mm and 40 mm tall: collar points, pearl snaps down the
   // placket and two flapped chest pockets with snaps.
   shirt('denim_shirt', 0.39, { cloth: 'cloth-denim', collar: 'cloth-denim', front: 'cloth-denim', button: 'pearl', pocket: 'cloth-denim', flap: 'cloth-denim-faded', lining: 'cloth-denim-faded' }, {
     ht: 0.036, pockets: [{ x: 0.06, z: -0.035, w: 0.05, d: 0.055, flap: 0.018, snap: true }],
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  }) + { title: 'Denim shirt' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A long cotton dress folded in a thick bundle, 280 mm by 360 mm and 50 mm tall: a scooped neckline and a sash
   // wrapped round the waist and tied in a bow on top.
@@ -203,13 +203,13 @@ local dress(o) =
     strip('bow-end-l', 'sash', [-0.004, z - 0.01], [-0.02, z - 0.08], ht + 0.004, 0.014, 0.004),
     strip('bow-end-r', 'sash', [0.004, z - 0.01], [0.025, z - 0.075], ht + 0.004, 0.014, 0.004),
   ], { cloth: 'cloth-sage', lining: 'cloth-charcoal', trim: 'cloth-sage', sash: 'cloth-cream' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  + h.headEndOnPlusZ + { title: 'Dress' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A white pocket shirt folded as a shop folds it, 240 mm by 300 mm and 35 mm tall: collar points, a placket of
   // small buttons and one patch pocket on the left breast.
   shirt('dress_shirt', 0.32, { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-bright-white', button: 'cloth-cream', pocket: 'cloth-cream', lining: 'cloth-cream' }, {
     pockets: [{ x: -0.06, z: -0.035, w: 0.05, d: 0.055, flap: 0, single: true }],
-  }) + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
+  }) + { title: 'Dress shirt' } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A wedding gown folded into a deep box-sized bundle, 560 mm by 460 mm and 140 mm tall: the boned bodice with a
   // sweetheart neckline lying on top, a pearl-studded waist band, and tiers of tulle ruffles spilling over the hem
@@ -238,6 +238,6 @@ local dress(o) =
     h.turned('ruffle-side-%d-%d' % [s + 1, i], 'tulle', 'z', [[0, 0], [0, 0.018], [d * 0.7, 0.018], [d * 0.7, 0]], [s * (w / 2 + 0.004), ht * (i + 0.5) / 3, -d / 2])
     for s in [-1, 1]
     for i in [0, 1, 2]
-  ], { cloth: 'cloth-cream', bodice: 'cloth-bright-white', pearl: 'pearl', tulle: 'mesh-white', lace: 'cloth-cream' })
+  ], { cloth: 'cloth-cream', bodice: 'cloth-bright-white', pearl: 'pearl', tulle: 'mesh-white', lace: 'cloth-cream' }) + { title: 'Wedding dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 ]

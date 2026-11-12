@@ -89,11 +89,11 @@ local leaf(id, slot, x, z, ht, w, lean) =
     frame: 'plastic-black', glass: 'glass-clear', soil: 'bark', stone: 'stone-grey', purple: 'plant-purple',
     leaf: 'leaf-green', twig: 'wood-walnut', chitin: 'chitin-black', glow: 'crystal-glow-white', wing: 'chitin-brown',
     mesh: 'mesh-black', handle: 'steel-bright',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['sci-fi'] } } },
+  }) + { title: 'Firefly terrarium' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['sci-fi'] } } },
 
   // Hand-forged sheep shears 310 mm long: two leaf-shaped blades sprung open by a bow of the same steel.
   h.compound('forged_shears', 0.43, sheepShears(false),
-             { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + h.gripOn('forged_shears', 'handle-a') + {
+             { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + { title: 'Forged shears' } + h.gripOn('forged_shears', 'handle-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
@@ -128,7 +128,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     pad: 'cloth-navy', skirt: 'leather-tan', seat: 'leather-chestnut', horn: 'leather-chestnut',
     leather: 'leather-chestnut', stirrup: 'wood-oak', cinch: 'cord-cotton', bridle: 'leather-brown', bit: 'steel-stainless',
-  }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'], place: ['farm'] } } },
+  }) + { title: 'Horse tack' } + { voxelGrain: 0.006 } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'metal'], place: ['farm'] } } },
 
   // A portable platform scale for a horse or a cow: a 1960 by 720 mm galvanised steel deck 100 mm tall on
   // four rubber feet, under a ribbed rubber mat, with its readout lying on the mat on a short cable and a
@@ -156,11 +156,11 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], {
     deck: 'steel-galvanised', mat: 'rubber-black', foot: 'rubber-offblack', handle: 'steel-grey',
     readout: 'plastic-white', display: 'lcd-green', key: 'plastic-blue', cable: 'plastic-black',
-  }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], place: ['farm'], setting: ['modern'] } } },
+  }) + { title: 'Livestock scale' } + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'rubber'], place: ['farm'], setting: ['modern'] } } },
 
   // Sheep shears 310 mm long like the forged pair, with plastic sleeves over the handles.
   h.compound('shears', 0.47, sheepShears(true),
-             { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + h.gripOn('shears', 'grip-a') + {
+             { bow: 'steel-bright', handle: 'steel-bright', blade: 'steel-stainless', grip: 'plastic-red' }) + { title: 'Shears' } + h.gripOn('shears', 'grip-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['gardening'], tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -183,10 +183,10 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ], radioFinish + {
     plate: 'alu-bare', board: 'circuit-green', chip: 'plastic-black', coil: 'copper', tape: 'tape-grey',
     'wire-red': 'plastic-red', 'wire-yellow': 'plastic-yellow',
-  }) + h.inHand('modified_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Modified radio' } + h.inHand('modified_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A portable transistor radio 190 mm wide, 115 mm tall and 50 mm deep with a carry handle.
-  h.compound('radio', 0.51, radio(true), radioFinish) + h.inHand('radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  h.compound('radio', 0.51, radio(true), radioFinish) + { title: 'Radio' } + h.inHand('radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A remote-controlled toy truck 310 mm long and 190 mm wide over its fat tyres, front on +z, with a red
   // shell, dark windows, bumpers and a whip antenna at the back.
@@ -212,5 +212,5 @@ local leaf(id, slot, x, z, ht, w, lean) =
   ]), {
     chassis: 'plastic-black', shell: 'plastic-red', window: 'screen-black', lamp: 'plastic-white',
     antenna: 'plastic-black', tyre: 'rubber-tread', hub: 'alu-bare',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Remote-control car' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

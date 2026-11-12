@@ -50,7 +50,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
   ] + [
     blade('blade-%d' % i, 'blade', 0, hubY, i * std.pi / 3 + std.pi / 6, 0.05, 0.40, 0.06, 0.12, 0.20, 0.215)
     for i in std.range(0, 5)
-  ], { frame: 'steel-galvanised', deck: 'steel-grey', housing: 'paint-green', hopper: 'steel-galvanised', shaft: 'steel-grey', gearbox: 'paint-green', hub: 'steel-grey', blade: 'paint-white', vane: 'paint-red' }) + { voxelGrain: 0.01 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'steel-galvanised', deck: 'steel-grey', housing: 'paint-green', hopper: 'steel-galvanised', shaft: 'steel-grey', gearbox: 'paint-green', hub: 'steel-grey', blade: 'paint-white', vane: 'paint-red' }) + { title: 'Windmill' } + { voxelGrain: 0.01 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A compact point-and-shoot camera, 100 by 60 by 30 mm, its lens toward +z and screen on the back.
   h.compound('camera', 0.2, [
@@ -65,7 +65,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     disc('power', 'trim', 0.003, 0.060, 0.062, 0.018, 0),
     box('screen', 'screen', [-0.040, 0.008, -0.017], [0.022, 0.052, -0.015]),
     box('dial', 'trim', [0.030, 0.020, -0.017], [0.042, 0.040, -0.015]),
-  ], { body: 'alu-bare', trim: 'plastic-charcoal', lens: 'glass-grey', flash: 'plastic-frosted', button: 'steel-stainless', screen: 'screen-black' }) + h.inHand('camera', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'alu-bare', trim: 'plastic-charcoal', lens: 'glass-grey', flash: 'plastic-frosted', button: 'steel-stainless', screen: 'screen-black' }) + { title: 'Camera' } + h.inHand('camera', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A digital single-lens reflex camera, a 140 by 100 by 75 mm body with a 110 mm zoom lens toward +z,
   // the hand grip on the camera's right (-x), a prism hump and hot shoe on top.
@@ -85,7 +85,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     turned('glass', 'glass', 'z', [[0, 0], [0, 0.028], [0.002, 0.028], [0.002, 0]], [0.004, 0.042, 0.150]),
     box('screen', 'screen', [-0.045, 0.010, -0.037], [0.035, 0.065, -0.035]),
     box('eyecup', 'grip', [-0.012, 0.072, -0.044], [0.012, 0.094, -0.032]),
-  ], { body: 'polymer-black', grip: 'rubber-black', metal: 'steel-stainless', trim: 'plastic-charcoal', lens: 'polymer-black', glass: 'glass-grey', screen: 'screen-black' }) + h.inHand('professional_camera', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  ], { body: 'polymer-black', grip: 'rubber-black', metal: 'steel-stainless', trim: 'plastic-charcoal', lens: 'polymer-black', glass: 'glass-grey', screen: 'screen-black' }) + { title: 'Professional camera' } + h.inHand('professional_camera', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A candy-bar mobile phone, 110 by 48 by 16 mm, lying screen up with its earpiece toward -z: a small
   // display above a twelve-key pad and a round navigation key, a stub antenna on top.
@@ -102,7 +102,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     box('key-%d-%d' % [c, r], 'key', [-0.019 + c * 0.0135, 0.016, 0.012 + r * 0.0095], [-0.010 + c * 0.0135, 0.0175, 0.019 + r * 0.0095])
     for c in std.range(0, 2)
     for r in std.range(0, 3)
-  ], { body: 'plastic-charcoal', face: 'alu-bare', screen: 'lcd-green', key: 'plastic-grey', nav: 'steel-stainless' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-charcoal', face: 'alu-bare', screen: 'lcd-green', key: 'plastic-grey', nav: 'steel-stainless' }) + { title: 'Cell phone' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A handmade Yagi antenna on a 600 mm square wooden boom, pointing toward +x: a reflector, a split driven
   // element with its coax lead and four directors, copper rods running across z.
@@ -119,7 +119,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     el('director-c', 'element', 0.170, 0.135),
     el('director-d', 'element', 0.275, 0.130),
     box('clamp', 'terminal', [-0.240, y - 0.014, -0.014], [-0.200, y + 0.014, 0.014]),
-  ], { boom: 'wood-pine', element: 'copper', terminal: 'plastic-black', lead: 'plastic-black' }) + h.gripOn('directional_antenna', 'boom') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  ], { boom: 'wood-pine', element: 'copper', terminal: 'plastic-black', lead: 'plastic-black' }) + { title: 'Directional antenna' } + h.gripOn('directional_antenna', 'boom') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A 158 by 115 by 8 mm e-ink tablet lying screen up, the wide bezel with page buttons toward -x.
   h.compound('eink_tablet_pc', 0.16, [
@@ -129,7 +129,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
     box('page-up', 'button', [-0.072, 0.008, -0.022], [-0.064, 0.009, -0.004]),
     box('page-down', 'button', [-0.072, 0.008, 0.004], [-0.064, 0.009, 0.022]),
     box('power', 'button', [0.040, 0.002, -0.0585], [0.055, 0.005, -0.0575]),
-  ], { back: 'alu-bare', bezel: 'plastic-charcoal', screen: 'paper-white', button: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { back: 'alu-bare', bezel: 'plastic-charcoal', screen: 'paper-white', button: 'plastic-grey' }) + { title: 'E-ink tablet' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A hand-built port probe, 125 by 75 by 45 mm, lying face up: a rubber-bumpered box with a small display and
   // keys, a bank of plugs and sockets across its top end (-z) and down one side, and two flying leads.
@@ -153,7 +153,7 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
   ] + [
     box('port-side-%d' % i, if i % 2 == 0 then 'socket' else 'port', [0.035, 0.012, -0.040 + i * 0.018], [0.041, 0.026, -0.030 + i * 0.018])
     for i in std.range(0, 4)
-  ], { body: 'polymer-od-green', bumper: 'rubber-black', screen: 'lcd-green', pcb: 'circuit-green', key: 'plastic-grey', port: 'steel-stainless', socket: 'brass', lead: 'plastic-red', clip: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'polymer-od-green', bumper: 'rubber-black', screen: 'lcd-green', pcb: 'circuit-green', key: 'plastic-grey', port: 'steel-stainless', socket: 'brass', lead: 'plastic-red', clip: 'plastic-black' }) + { title: 'Electronic lock probe' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A handheld field meter, 160 by 65 by 35 mm, lying face up with its sensor head toward -z: a rubber
   // boot, a display, a row of signal lamps and a selector knob.
@@ -168,5 +168,5 @@ local strut(prefix, slot, x0, z0, y0, x1, z1, y1, t, n) = [
   ] + [
     box('lamp-%d' % i, if i < 2 then 'lamp-green' else if i < 4 then 'lamp-yellow' else 'lamp-red', [-0.022 + i * 0.009, 0.035, -0.054], [-0.016 + i * 0.009, 0.037, -0.048])
     for i in std.range(0, 4)
-  ], { body: 'plastic-yellow', boot: 'rubber-black', head: 'plastic-charcoal', screen: 'lcd-green', knob: 'plastic-black', 'lamp-green': 'plastic-green', 'lamp-yellow': 'plastic-orange', 'lamp-red': 'plastic-red' }) + h.inHand('emf_detector', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-yellow', boot: 'rubber-black', head: 'plastic-charcoal', screen: 'lcd-green', knob: 'plastic-black', 'lamp-green': 'plastic-green', 'lamp-yellow': 'plastic-orange', 'lamp-red': 'plastic-red' }) + { title: 'EMF detector' } + h.inHand('emf_detector', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 ]

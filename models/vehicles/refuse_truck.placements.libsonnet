@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local s = t.spec(import 'refuse_truck.spec.libsonnet');
 {
+  title: 'Refuse truck',
   sites: t.fittings(site.kit, 'refuse_truck', s) + [
     site.one('subframe', 'refuse_truck_subframe'),
     site.one('body', 'refuse_truck_body'),

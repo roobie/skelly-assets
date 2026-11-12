@@ -160,7 +160,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
                box('cross_' + i, 'frame', [-3.2 + i * 1.2, s.rail[0] + 0.04, -s.railZ], [-3.1 + i * 1.2, s.rail[1] - 0.04, s.railZ])
                for i in std.range(0, 5)
              ] + w.field('floor', 'y', [c.back, c.front], [-c.side, c.side], 0.125, 0.125, floorPlate),
-             fin),
+             fin) + { title: 'Abandoned army truck chassis' },
   k.compound('abandoned_army_truck_engine', 900, [
     box('block', 'iron', [1.78, b.low, -0.3], [2.86, 1.42, 0.3]),
     box('head', 'rust', [1.82, 1.42, -0.24], [2.8, 1.54, 0.24]),
@@ -171,12 +171,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
     box('radiator', 'rust', [2.96, b.low, -0.46], [3.1, 1.58, 0.46]),
     k.turned('fan_hub', 'dark', 'x', k.disc(0.3, 2.86, 2.96), [0, 1.26, 0]) + { sides: 12 },
     box('coil', 'iron', [2.2, 1.0, -0.42], [2.5, 1.2, -0.3]),
-  ], fin),
+  ], fin) + { title: 'Abandoned army truck engine' },
   k.compound('abandoned_army_truck_bonnet', 110,
              w.field('roof', 'y', [b.back, b.front], [-b.z, b.z], 0.0625, 0.125, bonnetRoof)
              + w.field('far', 'z', [b.back, b.front], [b.low, b.high], 0.0625, 0.0625, bonnetFar)
              + [box('near_sill', 'rust', [b.back, b.low, b.z - 0.03], [b.front, b.low + 0.12, b.z + 0.03])],
-             fin),
+             fin) + { title: 'Abandoned army truck bonnet' },
   k.compound('abandoned_army_truck_bonnet_flap', 22, [
     // Hinged along the top edge and thrown up off the engine, so the near side stands open.
     xBar('rear', 'olive', [b.high - 0.06, b.z], [1.98, 1.22], 0.04, [b.back + 0.1, 2.1]),
@@ -184,9 +184,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
     xBar('middle', 'fade', [b.high - 0.08, b.z], [1.95, 1.22], 0.04, [2.1, 2.6]),
     xBar('slit_b', 'dark', [1.78, b.z + 0.26], [1.85, b.z + 0.42], 0.05, [2.14, 2.56]),
     xBar('front', 'rust', [b.high - 0.1, b.z], [1.92, 1.22], 0.04, [2.6, b.front - 0.08]),
-  ], fin),
+  ], fin) + { title: 'Abandoned army truck bonnet flap' },
   k.compound('abandoned_army_truck_grille', 60,
-             w.field('guard', 'x', [-b.z, b.z], [b.low, b.nose + 0.06], 0.035, 0.125, grille), fin),
+             w.field('guard', 'x', [-b.z, b.z], [b.low, b.nose + 0.06], 0.035, 0.125, grille), fin) + { title: 'Abandoned army truck grille' },
   k.compound('abandoned_army_truck_wings', 120,
              w.field('near_top', 'y', [b.back + 0.1, s.nose], [b.z, s.wing.z], 0.125, 0.0625, wingTop)
              + w.field('far_top', 'y', [b.back + 0.1, s.nose], [-s.wing.z, -b.z], 0.125, 0.0625, wingTop)
@@ -195,23 +195,23 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
              + [
                k.turned('lamp_near', 'dark', 'x', k.annulus(0.07, 0.13, 3.0, 3.12), [0, 1.42, 0.82]) + { sides: 12 },
                k.turned('lamp_far', 'rust', 'x', k.annulus(0.07, 0.13, 3.0, 3.12), [0, 1.42, -0.82]) + { sides: 12 },
-             ], fin),
+             ], fin) + { title: 'Abandoned army truck wings' },
   k.compound('abandoned_army_truck_bumper', 70,
              w.field('bar', 'x', [-1.14, 1.14], [s.wing.board, 1.04], 0.125, 0.03125, bumper)
              + [
                box('horn_near', 'rust', [s.nose - 0.1, 0.84, 0.3], [s.front - 0.12, 0.96, 0.42]),
                box('horn_far', 'rust', [s.nose - 0.1, 0.84, -0.42], [s.front - 0.12, 0.96, -0.3]),
-             ], fin),
+             ], fin) + { title: 'Abandoned army truck bumper' },
   k.compound('abandoned_army_truck_near_side', 110,
-             w.field('wall', 'z', [c.back, c.front], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabWall(1, 137, true)), fin),
+             w.field('wall', 'z', [c.back, c.front], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabWall(1, 137, true)), fin) + { title: 'Abandoned army truck near side' },
   k.compound('abandoned_army_truck_far_side', 170,
-             w.field('wall', 'z', [c.back, c.front], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabWall(-1, 139, false)), fin),
+             w.field('wall', 'z', [c.back, c.front], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabWall(-1, 139, false)), fin) + { title: 'Abandoned army truck far side' },
   k.compound('abandoned_army_truck_cab_roof', 95,
-             w.field('skin', 'y', [c.back, c.front], [-c.side, c.side], 0.0625, 0.125, cabRoof), fin),
+             w.field('skin', 'y', [c.back, c.front], [-c.side, c.side], 0.0625, 0.125, cabRoof), fin) + { title: 'Abandoned army truck cab roof' },
   k.compound('abandoned_army_truck_cab_back', 80,
-             w.field('skin', 'x', [-c.side, c.side], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabBack), fin),
+             w.field('skin', 'x', [-c.side, c.side], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabBack), fin) + { title: 'Abandoned army truck cab back panel' },
   k.compound('abandoned_army_truck_screen_frame', 70,
-             w.field('skin', 'x', [-c.side, c.side], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabFront), fin),
+             w.field('skin', 'x', [-c.side, c.side], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabFront), fin) + { title: 'Abandoned army truck screen frame' },
   k.compound('abandoned_army_truck_near_door', 60, [
     // Rusted off its upper hinge and swung out past its stop.
     yBar('skin', 'olive', [c.side, c.door[1]], [1.72, 0.82], 0.05, [c.floor, 1.42]),
@@ -221,13 +221,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
     yBar('frame_top', 'rust', [c.side, c.door[1]], [1.72, 0.82], 0.05, [2.24, 2.32]),
     yBar('frame_back', 'fade', [1.66, 0.87], [1.72, 0.82], 0.05, [c.waist, 2.24]),
     yBar('frame_front', 'rust', [c.side, c.door[1]], [1.08, 1.37], 0.05, [c.waist, 2.24]),
-  ], fin),
-  k.compound('abandoned_army_truck_seat_frames', 30, seat('near', 0.98, 0.52) + seat('far', 0.98, -0.52), fin),
+  ], fin) + { title: 'Abandoned army truck near door' },
+  k.compound('abandoned_army_truck_seat_frames', 30, seat('near', 0.98, 0.52) + seat('far', 0.98, -0.52), fin) + { title: 'Abandoned army truck seat frames' },
   k.compound('abandoned_army_truck_dash', 30, [
     box('panel', 'rust', [1.46, c.floor, -0.96], [c.front - 0.03, c.waist, 0.96]),
     zBar('column', 'iron', [1.5, 1.42], [1.26, 1.7], 0.05, [0.5, 0.56]),
     zBar('wheel', 'dark', [1.14, 1.6], [1.38, 1.82], 0.04, [0.32, 0.72]),
-  ], fin),
+  ], fin) + { title: 'Abandoned army truck dash' },
   k.compound('abandoned_army_truck_bed_floor', 400,
              [
                box('beam_near', 'rust', [s.bed.rear, s.rail[1], 0.36], [s.bed.front, s.deck[0], 0.46]),
@@ -236,30 +236,30 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
                box('joist_' + i, if i % 2 == 0 then 'rust' else 'rustRed', [s.bed.rear + 0.05 + i * 0.58, s.deck[0] - 0.08, -s.bed.side], [s.bed.rear + 0.13 + i * 0.58, s.deck[0], s.bed.side])
                for i in std.range(0, 6)
              ] + w.field('boards', 'y', [s.bed.rear, s.bed.front], [-s.bed.side, s.bed.side], 0.125, 0.16, deckBoards),
-             fin),
+             fin) + { title: 'Abandoned army truck bed floor' },
   k.compound('abandoned_army_truck_bed_near', 120,
-             w.field('boards', 'z', [s.bed.rear, s.bed.front], [s.deck[1], s.bed.wall], 0.0625, 0.04, boards(1, 157)), fin),
+             w.field('boards', 'z', [s.bed.rear, s.bed.front], [s.deck[1], s.bed.wall], 0.0625, 0.04, boards(1, 157)), fin) + { title: 'Abandoned army truck bed (near side)' },
   k.compound('abandoned_army_truck_bed_far', 120,
-             w.field('boards', 'z', [s.bed.rear, s.bed.front], [s.deck[1], s.bed.wall], 0.0625, 0.04, boards(-1, 163)), fin),
+             w.field('boards', 'z', [s.bed.rear, s.bed.front], [s.deck[1], s.bed.wall], 0.0625, 0.04, boards(-1, 163)), fin) + { title: 'Abandoned army truck bed (far side)' },
   k.compound('abandoned_army_truck_headboard', 70,
-             w.field('boards', 'x', [-s.bed.side, s.bed.side], [s.deck[1], 2.05], 0.0625, 0.0625, headboard), fin),
+             w.field('boards', 'x', [-s.bed.side, s.bed.side], [s.deck[1], 2.05], 0.0625, 0.0625, headboard), fin) + { title: 'Abandoned army truck headboard' },
   k.compound('abandoned_army_truck_tailgate', 60, [
     // Dropped on its hinges and hanging down off the bed.
     zBar('plank_a', 'fade', [s.bed.rear, s.deck[1]], [s.bed.rear - 0.18, 0.84], 0.05, [-s.bed.side, -0.5]),
     zBar('plank_b', 'wood', [s.bed.rear, s.deck[1]], [s.bed.rear - 0.18, 0.84], 0.05, [-0.5, 0.2]),
     zBar('plank_c', 'rust', [s.bed.rear, s.deck[1]], [s.bed.rear - 0.18, 0.96], 0.05, [0.2, 0.7]),
     zBar('plank_d', 'olive', [s.bed.rear, s.deck[1]], [s.bed.rear - 0.18, 0.84], 0.05, [0.7, s.bed.side]),
-  ], fin),
+  ], fin) + { title: 'Abandoned army truck tailgate' },
   k.compound('abandoned_army_truck_hoops', 110,
              std.flattenArrays([hoop(i) for i in std.range(0, s.hoop.count - 1)]) + [
                box('rail_near', 'rust', [s.bed.rear + 0.05, s.hoop.shoulder - 0.05, s.bed.side], [stations[s.hoop.count - 1] + 0.07, s.hoop.shoulder, s.bed.side + 0.05]),
                box('rail_far', 'rust', [s.bed.rear + 0.05, s.hoop.shoulder - 0.05, -s.bed.side - 0.05], [stations[s.hoop.count - 1] + 0.07, s.hoop.shoulder, -s.bed.side]),
-             ], fin),
+             ], fin) + { title: 'Abandoned army truck hoops' },
   k.compound('abandoned_army_truck_canvas', 25,
              w.field('near', 'z', [s.bed.rear + 0.05, s.bed.front], [s.bed.wall, s.hoop.shoulder], 0.0625, 0.0625, tatter(1, 167))
              + w.field('far', 'z', [s.bed.rear + 0.05, s.bed.front], [s.bed.wall, s.hoop.shoulder], 0.0625, 0.0625, tatter(-1, 173))
              + w.field('top', 'y', [s.bed.rear + 0.05, s.bed.front], [-s.hoop.top, s.hoop.top], 0.0625, 0.125, draped),
-             fin),
+             fin) + { title: 'Abandoned army truck canvas' },
   k.compound('abandoned_army_truck_wheel', 105, [
     // The tyre is flat, so its outline is a circle cut off along the ground with the rim sitting just above.
     k.prism('tyre', 'rubber', arc, [-0.16, 0.16]),
@@ -268,5 +268,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
     k.turned('rim', 'rim', 'z', k.disc(s.rimR, 0.16, 0.18)) + { sides: 24 },
     k.turned('hub', 'hub', 'z', k.disc(0.12, 0.18, 0.22)) + { sides: 12 },
     k.turned('back', 'rim', 'z', k.disc(s.rimR, -0.18, -0.16)) + { sides: 24 },
-  ], { rubber: 'rubber-offblack', side: 'rubber-black', rim: 'scrap-rusted', hub: 'steel-spall-black' }),
+  ], { rubber: 'rubber-offblack', side: 'rubber-black', rim: 'scrap-rusted', hub: 'steel-spall-black' }) + { title: 'Abandoned army truck wheel' },
 ])

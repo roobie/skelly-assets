@@ -51,7 +51,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                box('fork-b', 'twig', [-0.022, 0.017, 0.002], [-0.018, 0.024, 0.012]),
                h.prism('leaf', 'leaf', 'y', [[-0.004, -0.06], [0.006, -0.052], [0.012, -0.04], [0.006, -0.034], [-0.006, -0.042]], 0.0, 0.002),
              ],
-             { berry: 'pearl', twig: 'plant-purple', leaf: 'verdigris' })
+             { berry: 'pearl', twig: 'plant-purple', leaf: 'verdigris' }) + { title: 'Pale bush berries' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
   // A heavy alien fruit about 240 mm across and 270 mm tall: a squat egg of hard dark rind split into eight raised
@@ -81,7 +81,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                ball('knob-%d' % i, 'knob', 0.011, 0.035 * std.sin(2 * std.pi * i / 5), 0.262, 0.035 * std.cos(2 * std.pi * i / 5))
                for i in std.range(0, 4)
              ],
-             { rind: 'chitin-brown', rib: 'bark', stalk: 'plant-dried', knob: 'plant-purple' })
+             { rind: 'chitin-brown', rib: 'bark', stalk: 'plant-dried', knob: 'plant-purple' }) + { title: 'Hard-rind fruit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
   // A wobbly blue-green fruit lying on its side, 96 mm long and 68 mm thick: a smooth translucent jelly-like egg
@@ -95,7 +95,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                box('shine', 'shine', [-0.024, 0.064, -0.013], [0.016, 0.068, -0.007]),
                h.turned('core-end', 'core', 'x', [[0, 0], [0, 0.012], [0.003, 0.012], [0.003, 0]], [-0.046, 0.034, 0]),
              ],
-             { flesh: 'jelly-teal', core: 'verdigris', nub: 'plant-dried', shine: 'crystal-glow-white' })
+             { flesh: 'jelly-teal', core: 'verdigris', nub: 'plant-dried', shine: 'crystal-glow-white' }) + { title: 'Jelly fruit' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
   // A small corked glass vial of glittering crystal dust, 16 mm across and 48 mm tall with the cork: the bottom
@@ -106,7 +106,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                h.turned('glass', 'glass', 'y', [[0, 0.0058], [0, 0.007], [0.024, 0.007], [0.026, 0.0062], [0.027, 0.0075], [0.029, 0.0075], [0.029, 0.0058], [0, 0.0058]], [0, 0.014, 0]),
                h.turned('cork', 'cork', 'y', [[0, 0], [0, 0.0055], [0.005, 0.006], [0.009, 0.0068], [0.009, 0]], [0, 0.039, 0]),
              ],
-             { dust: 'gem-pink', glass: 'glass-clear', cork: 'cork' })
+             { dust: 'gem-pink', glass: 'glass-clear', cork: 'cork' }) + { title: 'Crystal dust vial' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['sci-fi'] } } },
 
   // A tiny round-bellied glass phial of refined crystal powder, 18 mm across and 36 mm tall: the powder fills the
@@ -118,7 +118,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                h.turned('neck', 'glass', 'y', [[0, 0.0028], [0, 0.0035], [0.004, 0.0035], [0.004, 0.0028], [0, 0.0028]], [0, 0.023, 0]),
                h.turned('seal', 'seal', 'y', [[0, 0], [0, 0.0045], [0.003, 0.0048], [0.007, 0.004], [0.009, 0]], [0, 0.027, 0]),
              ],
-             { powder: 'gem-pink', glass: 'glass-clear', seal: 'lacquer-black' })
+             { powder: 'gem-pink', glass: 'glass-clear', seal: 'lacquer-black' }) + { title: 'Refined crystal powder phial' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['sci-fi'] } } },
 
   // A strange crystal the size of a thumb tip, 27 mm tall and 14 mm across: a stubby six-sided point with two
@@ -133,7 +133,7 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
              ]
              + sidePoint('point-a', 'point-a', 0.0026, 0.004, 0.0105, 0.005, 0.0015)
              + sidePoint('point-b', 'point-b', 0.0022, -0.004, -0.0095, 0.004, -0.002),
-             { crystal: 'gem-pink', facet: 'petal-pink', 'point-a': 'petal-pink', 'point-b': 'gem-pink' })
+             { crystal: 'gem-pink', facet: 'petal-pink', 'point-a': 'petal-pink', 'point-b': 'gem-pink' }) + { title: 'Strange crystal' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['glass'], setting: ['sci-fi'] } } },
 
   // A small vial of clear treatment, 20 mm across and 56 mm tall: a glass vial with 10 ml of clear liquid, a grey
@@ -149,6 +149,6 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
                h.disc('stopper', 'stopper', 0.0062, 0.046, 0.05),
                h.turned('cap', 'cap', 'y', [[0, 0], [0, 0.0072], [0.009, 0.0072], [0.009, 0]], [0, 0.046, 0]),
              ],
-             { glass: 'glass-clear', liquid: 'water', fleck: 'gem-clear', label: 'plastic-white', stopper: 'rubber-black', cap: 'foil-alu' })
+             { glass: 'glass-clear', liquid: 'water', fleck: 'gem-clear', label: 'plastic-white', stopper: 'rubber-black', cap: 'foil-alu' }) + { title: 'Crystal tonic vial' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['sci-fi'] } } },
 ]

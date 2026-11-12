@@ -13,6 +13,7 @@ import {
   strictObject,
   string,
 } from 'valibot';
+import { TitleSchema } from '@skelly/thing-export/title.ts';
 import content from '../../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { compareCodeUnits } from './compareCodeUnits.ts';
 import { gunDomain } from './domain.ts';
@@ -26,6 +27,8 @@ const EntrySchema = strictObject({
   massKg: pipe(number(), finite(), minValue(Number.MIN_VALUE)),
   params: optional(Params),
   finish: optional(Params),
+  // The player-facing name an item carries into its export row; masses that no design names have none.
+  title: optional(TitleSchema),
 });
 const CatalogueSchema = strictObject({ placementParams: array(string()), parts: array(EntrySchema) });
 

@@ -3,6 +3,7 @@ local van = import 'van-body.libsonnet';
 local s = import 'ambulance.spec.libsonnet';
 local tail = van.tail(s);
 {
+  title: 'Ambulance',
   sites: van.fittings(site.kit, 'ambulance', s) + [
     site.one('locker', 'ambulance_locker'),
     site.one('stretcher', 'stretcher', [-1.8, s.box.floor, 0.1]),

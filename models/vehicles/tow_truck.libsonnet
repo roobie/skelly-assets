@@ -14,7 +14,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     for i in std.range(0, 5)
   ] + k.bothSides([
     box('runner', 'frame', [s.deckRear + 0.1, s.railTop, 0.3], [s.deckFront, s.deckBottom, 0.44]),
-  ]), finish),
+  ]), finish) + { title: 'Tow truck deck' },
   k.compound('tow_truck_locker', 110, [
     box('case', 'frame', [-2.9, s.deckTop, s.lockerIn], [s.deckFront - 0.1, s.lockerTop, s.side]),
     box('lid', 'alu', [-2.92, s.lockerTop, s.lockerIn - 0.02], [s.deckFront - 0.08, s.lockerTop + 0.04, s.side + 0.01]),
@@ -22,7 +22,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   ] + [
     box('handle_' + i, 'alu', [lockerDoors[i] - 0.14, s.lockerTop - 0.2, s.side], [lockerDoors[i] + 0.14, s.lockerTop - 0.14, s.side + 0.03])
     for i in std.range(0, 3)
-  ], finish),
+  ], finish) + { title: 'Tow truck locker' },
   k.compound('tow_truck_cab_guard', 40, [
     box('top', 'yellow', [s.deckFront - 0.1, 2.68, -s.side + 0.1], [s.deckFront, 2.78, s.side - 0.1]),
   ] + [
@@ -30,37 +30,37 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     for i in slats
   ] + k.bothSides([
     box('post', 'yellow', [s.deckFront - 0.1, s.deckTop, s.side - 0.2], [s.deckFront, 2.68, s.side - 0.1]),
-  ]), finish),
+  ]), finish) + { title: 'Tow truck cab guard' },
   k.compound('tow_truck_mast', 170, [
     box('saddle', 'yellow', [s.pivot[0] - 0.42, s.deckTop, -0.36], [s.pivot[0] + 0.42, s.deckTop + 0.14, 0.36]),
     m.axleDisc('pin', 'steel', s.pivot[0], s.pivot[1], 0.07, [-0.3, 0.3], 12),
   ] + k.bothSides([
     k.bar('cheek', 'yellow', [s.pivot[0] + 0.3, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.3, [0.19, 0.26], 0.2),
     k.bar('cheek_aft', 'yellow', [s.pivot[0] - 0.36, s.deckTop + 0.14], [s.pivot[0], s.pivot[1] + 0.1], 0.2, [0.19, 0.26], 0.14),
-  ]), finish),
+  ]), finish) + { title: 'Tow truck mast' },
   k.compound('tow_truck_boom', 420, [
     k.bar('box', 'yellow', s.pivot, s.stageEnd, 0.4, [-0.17, 0.17], 0.32),
     k.bar('collar', 'frame', [s.stageEnd[0] + 0.1, s.stageEnd[1] - 0.04], s.stageEnd, 0.36, [-0.19, 0.19]),
-  ], finish),
+  ], finish) + { title: 'Tow truck boom' },
   k.compound('tow_truck_boom_stage', 130, [
     k.bar('stage', 'steel', s.stageEnd, s.tip, 0.22, [-0.11, 0.11]),
     m.axleDisc('sheave', 'frame', s.tip[0] - 0.02, s.tip[1], 0.15, [-0.13, 0.13], 12),
     box('work_lamp', 'white', [s.tip[0] + 0.1, s.tip[1] + 0.1, -0.09], [s.tip[0] + 0.2, s.tip[1] + 0.19, 0.09]),
-  ], finish),
+  ], finish) + { title: 'Tow truck boom stage' },
   k.compound('tow_truck_boom_ram', 70, [
     k.bar('sleeve', 'frame', [-0.75, s.deckTop], [-1.08, 1.86], 0.16, [-0.08, 0.08]),
     k.bar('rod', 'steel', [-1.08, 1.86], [-1.3, 2.46], 0.09, [-0.045, 0.045]),
-  ], finish),
+  ], finish) + { title: 'Tow truck boom ram' },
   k.compound('tow_truck_winch', 95, [
     m.axleDisc('drum', 'dark', 0.9, s.deckTop + 0.3, 0.22, [-0.36, 0.36], 16),
     m.axleDisc('line', 'chain', 0.9, s.deckTop + 0.3, 0.24, [-0.2, 0.2], 16),
   ] + k.bothSides([
     box('stand', 'yellow', [0.72, s.deckTop, 0.36], [1.08, s.deckTop + 0.42, 0.42]),
-  ]), finish),
+  ]), finish) + { title: 'Tow truck winch' },
   k.compound('tow_truck_line', 25, [
     k.bar('run_up', 'chain', [0.9, s.deckTop + 0.54], [s.pivot[0], s.pivot[1] + 0.24], 0.05, [-0.03, 0.03]),
     k.bar('run_out', 'chain', [s.pivot[0], s.pivot[1] + 0.24], [s.tip[0] - 0.02, s.tip[1] + 0.15], 0.05, [-0.03, 0.03]),
-  ], finish),
+  ], finish) + { title: 'Tow truck line' },
   k.compound('tow_truck_sling', 65, [
     box('fall', 'chain', [s.slingX - 0.03, 1.46, -0.03], [s.slingX + 0.03, s.tip[1], 0.03]),
     box('block', 'yellow', [s.slingX - 0.08, 1.28, -0.1], [s.slingX + 0.08, 1.46, 0.1]),
@@ -69,10 +69,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   ] + k.bothSides([
     box('strap', 'rubber', [s.slingX - 0.05, 0.68, 0.56], [s.slingX + 0.05, 1.18, 0.66]),
     box('wheel_stop', 'frame', [s.slingX - 0.1, 0.68, 0.76], [s.slingX + 0.04, 0.78, 0.86]),
-  ]), finish),
+  ]), finish) + { title: 'Tow truck sling' },
   k.compound('tow_truck_stabiliser', 45, [
     box('sleeve', 'yellow', [-3.33, 0.62, 0.8], [-3.17, s.deckBottom, 0.96]),
     box('leg', 'steel', [-3.3, 0.44, 0.83], [-3.2, 0.62, 0.93]),
     box('foot', 'frame', [-3.42, 0.38, 0.72], [-3.08, 0.44, 1.04]),
-  ], finish),
+  ], finish) + { title: 'Tow truck stabiliser' },
 ])

@@ -98,6 +98,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
 [
   {
     id: 'riot_helmet',
+    title: 'Riot helmet',
     exportMass: 'parts',
     taxonomy: { category: 'armour', keywords: ['police'], tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
     parts: [{
@@ -113,6 +114,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
   },
   {
     id: 'night_vision_goggles',
+    title: 'Night vision goggles',
     exportMass: 'parts',
     voxelGrain: g.voxelGrain,
     parts: [{

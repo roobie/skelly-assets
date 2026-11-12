@@ -37,7 +37,7 @@ local fibreTube(axis, length, radius, band) =
     box('front-right', 'board', [0.012, 0.002, 0.028], [0.046, 0.042, 0.03]),
     box('front-low', 'board', [-0.012, 0.002, 0.028], [0.012, 0.026, 0.03]),
     box('stencil', 'stencil', [-0.036, 0.008, 0.03], [0.036, 0.016, 0.032]),
-  ], { board: 'paperboard-brown', stencil: 'paint-charcoal' })
+  ], { board: 'paperboard-brown', stencil: 'paint-charcoal' }) + { title: 'Carton of three ammunition clips' }
   + h.label('stencil', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A fibreboard container for one hand grenade, standing on end: 75 mm across its steel caps and 135 mm
@@ -47,7 +47,7 @@ local fibreTube(axis, length, radius, band) =
     cap: 'steel-grey',
     tape: 'cloth-olive-drab',
     band: 'plastic-yellow',
-  })
+  }) + { title: 'Grenade container' }
   + h.inHand('grenade_container', 'tube') + { voxelGrain: 0.004 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper', 'metal'], setting: ['modern'] } } },
 
   // A fibreboard container for one 60 mm mortar round, lying down: 400 mm long and 76 mm across its steel
@@ -57,7 +57,7 @@ local fibreTube(axis, length, radius, band) =
     cap: 'steel-grey',
     tape: 'cloth-olive-drab',
     band: 'plastic-yellow',
-  })
+  }) + { title: 'Mortar round container' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'ammunition', tags: { material: ['paper', 'metal'], setting: ['modern'] } } },
 ]
 + (
@@ -78,7 +78,7 @@ local fibreTube(axis, length, radius, band) =
       box('handle-post-a', 'handle', [-0.12, 0.118, -0.008], [-0.1, 0.15, 0.008]),
       box('handle-post-b', 'handle', [0.04, 0.118, -0.008], [0.06, 0.15, 0.008]),
       box('handle', 'handle', [-0.12, 0.15, -0.012], [0.06, 0.166, 0.012]),
-    ], { tube: 'paint-olive', cap: 'paint-charcoal', mark: 'plastic-yellow', clamp: 'steel', handle: 'plastic-black' }) + { taxonomy: { category: 'ammunition', tags: { material: ['metal'], setting: ['modern'] } } },
+    ], { tube: 'paint-olive', cap: 'paint-charcoal', mark: 'plastic-yellow', clamp: 'steel', handle: 'plastic-black' }) + { title: 'Recoilless round container' } + { taxonomy: { category: 'ammunition', tags: { material: ['metal'], setting: ['modern'] } } },
   ]
 )
 + [
@@ -110,7 +110,7 @@ local fibreTube(axis, length, radius, band) =
     fin: 'alu-bare',
     flange: 'steel-galvanised',
     cap: 'steel-stainless',
-  })
+  }) + { title: 'Magnetron' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A golden platter from a supercomputer's storage, lying flat: 400 mm across and 8 mm thick, with copper
@@ -130,7 +130,7 @@ local fibreTube(axis, length, radius, band) =
       [r0 * std.cos(a) + 0.002 * std.sin(a), r0 * std.sin(a) - 0.002 * std.cos(a)],
     ], 0.008, 0.01)
     for k in std.range(0, 7)
-  ], { gold: 'foil-gold', hub: 'steel-stainless', trace: 'copper' })
+  ], { gold: 'foil-gold', hub: 'steel-stainless', trace: 'copper' }) + { title: 'Supercomputer platter' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'] } } },
 
   // A full-length dressing mirror, 500 mm wide and 1650 mm tall, its glass in a slim aluminium frame
@@ -146,7 +146,7 @@ local fibreTube(axis, length, radius, band) =
     box('foot-right', 'stand', [0.2, 0, -0.12], [0.24, 0.03, 0.12]),
     box('hinge', 'stand', [-0.04, 1.36, -0.03], [0.04, 1.4, -0.015]),
     box('leg', 'stand', [-0.02, 0.2, -0.025], [0.02, 1.36, -0.015]),
-  ], { glass: 'glass-grey', frame: 'alu-bare', stand: 'alu-anodized-black' }) + { taxonomy: { category: 'furniture', tags: { material: ['glass', 'metal'], setting: ['modern'] } } },
+  ], { glass: 'glass-grey', frame: 'alu-bare', stand: 'alu-anodized-black' }) + { title: 'Standing mirror' } + { taxonomy: { category: 'furniture', tags: { material: ['glass', 'metal'], setting: ['modern'] } } },
 ]
 + (
   // An upright piano, 1500 mm wide, 1230 mm tall and 600 mm deep: a walnut case with its fallboard open on
@@ -176,6 +176,6 @@ local fibreTube(axis, length, radius, band) =
     ] + [
       box('pedal-%d' % i, 'pedal', [0.07 * i - 0.012, 0.06, 0.02], [0.07 * i + 0.012, 0.072, 0.12])
       for i in [-1, 0, 1]
-    ], { case: 'wood-walnut', felt: 'paint-oxblood', white: 'wax-ivory', black: 'plastic-black', pedal: 'brass' }) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] }, keywords: ['music'] } },
+    ], { case: 'wood-walnut', felt: 'paint-oxblood', white: 'wax-ivory', black: 'plastic-black', pedal: 'brass' }) + { title: 'Piano' } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] }, keywords: ['music'] } },
   ]
 )

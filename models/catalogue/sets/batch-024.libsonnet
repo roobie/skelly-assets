@@ -87,7 +87,7 @@ local dummy(id, massKg, armour) =
     box('board', 'board', [0.112, 0, -0.024], [0.146, 0.002, 0.024]),
     box('chip', 'chip', [0.12, 0.002, -0.01], [0.134, 0.004, 0.01]),
     box('plug', 'plug', [0.138, 0.002, -0.016], [0.146, 0.006, 0.016]),
-  ], { frame: 'alu-bare', bezel: 'plastic-black', screen: 'screen-black', ribbon: 'foil-gold', board: 'circuit-green', chip: 'plastic-matte-black', plug: 'plastic-white' })
+  ], { frame: 'alu-bare', bezel: 'plastic-black', screen: 'screen-black', ribbon: 'foil-gold', board: 'circuit-green', chip: 'plastic-matte-black', plug: 'plastic-white' }) + { title: 'Small LCD screen' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A wet adobe brick, 250 mm by 125 mm and 75 mm tall, its edges slumped and flecked with chopped straw.
@@ -103,7 +103,7 @@ local dummy(id, massKg, armour) =
   ] + [
     box('straw-side-%d' % i, 'straw', [-0.1 + i * 0.05, 0.02 + (i % 2) * 0.02, 0.066], [-0.08 + i * 0.05, 0.024 + (i % 2) * 0.02, 0.068])
     for i in std.range(0, 3)
-  ], { clay: 'clay-wet', straw: 'straw-pale' })
+  ], { clay: 'clay-wet', straw: 'straw-pale' }) + { title: 'Soft adobe brick' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['stone'] } } },
 
   // A block of pressed soybean and wheat dough, 140 mm by 90 mm and 40 mm tall, grown over with pale mould
@@ -119,7 +119,7 @@ local dummy(id, massKg, armour) =
     box('patch-c', 'spores', [0.046, 0.034, 0.015], [0.071, 0.036, 0.04]),
     box('patch-d', 'spores', [-0.071, 0.012, -0.02], [-0.07, 0.026, 0.01]),
     box('patch-e', 'spores', [-0.03, 0.01, 0.045], [0.0, 0.024, 0.047]),
-  ], { dough: 'mushroom-pale', mould: 'fleece-pale', spores: 'cloth-sage' })
+  ], { dough: 'mushroom-pale', mould: 'fleece-pale', spores: 'cloth-sage' }) + { title: 'Mouldy soy and wheat cake' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
   // A swing-out spare wheel carrier lying flat: a 50 mm square steel arm 700 mm long with a hinge bracket and
@@ -142,11 +142,11 @@ local dummy(id, massKg, armour) =
   ] + [
     box('latch', 'latch', [-0.31, 0.05, -0.012], [-0.17, 0.062, 0.012]),
     box('latch-tab', 'latch', [-0.33, 0.05, -0.035], [-0.31, 0.07, 0.035]),
-  ], { body: 'paint-charcoal', pin: 'steel-grey', stud: 'steel-bright', latch: 'steel-grey' })
+  ], { body: 'paint-charcoal', pin: 'steel-grey', stud: 'steel-bright', latch: 'steel-grey' }) + { title: 'Spare tyre carrier' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] } } },
 
   // A heavy suspension coil spring, 120 mm across and about 240 mm tall, wound from 13 mm steel bar.
-  h.item('spring', 'coil', 2.8, { radius: 0.054, tubeRadius: 0.0065, turns: 8, pitch: 0.032 }, { body: 'steel-parkerized' })
+  h.item('spring', 'coil', 2.8, { radius: 0.054, tubeRadius: 0.0065, turns: 8, pitch: 0.032 }, { body: 'steel-parkerized' }) + { title: 'Spring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] } } },
 
   // A handful of spurge, five stems about 160 mm long, each topped with a flat spray of small yellow-green
@@ -163,7 +163,7 @@ local dummy(id, massKg, armour) =
       leaf('leaf-%d' % i, 'stem', 90 + s[0] * 2 + 25, polar(s[1] * 0.45, 90 + s[0] * 2, -0.08, 0)[0], polar(s[1] * 0.45, 90 + s[0] * 2, -0.08, 0)[1], 0.035, 0.008, 0.004 + i * 0.002, 0.006 + i * 0.002),
     ]
     for i in std.range(0, 4)
-  ]), { stem: 'leaf-green', bract: 'cloth-sage', flower: 'plastic-yellow' })
+  ]), { stem: 'leaf-green', bract: 'cloth-sage', flower: 'plastic-yellow' }) + { title: 'Spurge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A steel armour plate for a vest, 250 mm by 300 mm with the top corners cut, about 2 mm thick and curved
@@ -171,7 +171,7 @@ local dummy(id, massKg, armour) =
   local plate = [[-0.125, 0.15], [0.125, 0.15], [0.125, -0.09], [0.07, -0.15], [-0.07, -0.15], [-0.125, -0.09]];
   local coat = [[-0.115, 0.14], [0.115, 0.14], [0.115, -0.086], [0.066, -0.14], [-0.066, -0.14], [-0.115, -0.086]];
   h.compound('steel_armor', 2.7, h.smoothPlate('plate', 'plate', plate, 0, 0.004, 0.4, 25)
-    + h.smoothPlate('coat', 'coat', coat, 0.003, 0.004, 0.4, 23), { plate: 'steel-grey', coat: 'plastic-charcoal' })
+    + h.smoothPlate('coat', 'coat', coat, 0.003, 0.004, 0.4, 23), { plate: 'steel-grey', coat: 'plastic-charcoal' }) + { title: 'Steel armour' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['metal'] } } },
 
   // A straw doll 250 mm tall, a bundle of straw bent over for a head and tied off at the neck and waist, the
@@ -189,7 +189,7 @@ local dummy(id, massKg, armour) =
     local p = polar(0.057, i * 30);
     box('stalk-%d' % i, 'dark', [p[0] - 0.002, 0, p[1] - 0.002], [p[0] + 0.002, 0.016, p[1] + 0.002])
     for i in std.range(0, 11)
-  ], { straw: 'straw-pale', arm: 'straw-pale', tie: 'silk-cord-crimson', dark: 'plant-dried' })
+  ], { straw: 'straw-pale', arm: 'straw-pale', tie: 'silk-cord-crimson', dark: 'plant-dried' }) + { title: 'Straw doll' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plant'] }, keywords: ['toy'] } },
 
   // A cut sunflower head 260 mm across lying face up: a domed brown disc of seeds 170 mm across ringed with
@@ -205,7 +205,7 @@ local dummy(id, massKg, armour) =
   ] + [
     petal('petal-%d' % i, 'petal', i * 15, 0.075, 0.13, 0.028, 0.018 + (i % 2) * 0.004, 0.022 + (i % 2) * 0.004)
     for i in std.range(0, 23)
-  ], { green: 'leaf-green', seeds: 'bark', core: 'coal-black', petal: 'plastic-yellow' })
+  ], { green: 'leaf-green', seeds: 'bark', core: 'coal-black', petal: 'plastic-yellow' }) + { title: 'Sunflower' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A slab of tree bark 240 mm long, 120 mm wide and 8 mm thick, curled across, rough outer bark up and
@@ -219,7 +219,7 @@ local dummy(id, massKg, armour) =
                h.onCurvedFace('crack-%d' % i, 'crack', slab, 0.004, 0.005, 0.08, [[-0.03, -0.1], [0.0, -0.06], [0.025, -0.11]][i], [[-0.025, 0.05], [0.005, 0.1], [0.03, 0.0]][i], 0.004)
                for i in std.range(0, 2)
              ],
-             { inner: 'wood-oak', outer: 'bark', crack: 'coal-black' })
+             { inner: 'wood-oak', outer: 'bark', crack: 'coal-black' }) + { title: 'Tanbark' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant', 'wood'] } } },
 
   // A 42-inch flat-screen television, 960 mm wide and 570 mm tall, on a centre stand 300 mm across; its front
@@ -232,7 +232,7 @@ local dummy(id, massKg, armour) =
     box('screen', 'screen', [-0.465, 0.09, 0.03], [0.465, 0.625, 0.032]),
     box('logo', 'logo', [-0.02, 0.076, 0.03], [0.02, 0.082, 0.034]),
     box('lamp', 'lamp', [0.4, 0.074, 0.03], [0.41, 0.08, 0.034]),
-  ], { stand: 'plastic-black', bezel: 'plastic-charcoal', screen: 'screen-black', logo: 'metal-silver', lamp: 'plastic-red' })
+  ], { stand: 'plastic-black', bezel: 'plastic-charcoal', screen: 'screen-black', logo: 'metal-silver', lamp: 'plastic-red' }) + { title: 'Television' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A bimetal thermostat 80 mm long: a steel base plate with a ceramic block holding a brass-and-steel strip
@@ -256,7 +256,7 @@ local dummy(id, massKg, armour) =
     box('lug-b', 'copper', [-0.034, 0.021, 0.004], [-0.02, 0.023, 0.014]),
     disc('hole-a', 'hole', 0.0025, 0.003, 0.004, -0.045, 0),
     disc('hole-b', 'hole', 0.0025, 0.003, 0.004, 0.045, 0),
-  ], { steel: 'steel-grey', ceramic: 'ceramic-white', brass: 'brass-polished', silver: 'metal-silver', knob: 'plastic-black', copper: 'copper', hole: 'coal-black' })
+  ], { steel: 'steel-grey', ceramic: 'ceramic-white', brass: 'brass-polished', silver: 'metal-silver', knob: 'plastic-black', copper: 'copper', hole: 'coal-black' }) + { title: 'Thermostat' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A bunch of five raw tobacco leaves, each about 250 mm long and 100 mm wide, fanned out from their stalks,
@@ -271,14 +271,14 @@ local dummy(id, massKg, armour) =
   ]) + [
     h.rod('stalks', 'rib', 0.008, -0.14, -0.1, 0.008),
     h.tube('string', 'tie', 0.008, 0.011, -0.128, -0.12, 0.008, 0),
-  ], { leaf: 'leaf-green', rib: 'cloth-sage', tie: 'cord-cotton' })
+  ], { leaf: 'leaf-green', rib: 'cloth-sage', tie: 'cord-cotton' }) + { title: 'Raw tobacco' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A home-made armoured training dummy 1.75 m tall: the wooden dummy below with scrap steel bolted over its
   // chest, belly, shoulders, forearms and shins, and a dented steel bucket for a helmet.
-  dummy('armoured_training_dummy', 64, true) + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'] } } },
+  dummy('armoured_training_dummy', 64, true) + { title: 'Armoured training dummy' } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'] } } },
 
   // A home-made wooden training dummy 1.75 m tall on crossed feet: a post for legs, a plank torso, a round
   // head and forearms held forward, with silver tape marking where to strike.
-  dummy('light_training_dummy', 47, false) + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  dummy('light_training_dummy', 47, false) + { title: 'Light training dummy' } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
 ]

@@ -32,7 +32,7 @@ local washboard(w, ht) =
   ] + [
     h.disc('foot-%d' % i, 'skirt', 0.010, 0, 0.004, [-0.12, 0.12][i % 2], [-0.12, 0.12][std.floor(i / 2)])
     for i in std.range(0, 3)
-  ], { housing: 'enamel-white', skirt: 'rubber-black', tread: 'rubber-black', rib: 'plastic-charcoal', bezel: 'steel-stainless', dial: 'paper-white', needle: 'plastic-red', lens: 'glass-clear' }) + {
+  ], { housing: 'enamel-white', skirt: 'rubber-black', tread: 'rubber-black', rib: 'plastic-charcoal', bezel: 'steel-stainless', dial: 'paper-white', needle: 'plastic-red', lens: 'glass-clear' }) + { title: 'Bathroom scale' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'rubber'], place: ['bathroom'], setting: ['modern'] } } },
   // A hand scrub brush, 140 mm long and 60 mm wide: a blue plastic block with a finger ridge on top and rows of stiff
@@ -45,7 +45,7 @@ local washboard(w, ht) =
     h.box('tuft-%d-%d' % [i, j], 'bristle', [-0.060 + i * 0.012, 0, -0.025 + j * 0.0125], [-0.052 + i * 0.012, 0.010, -0.017 + j * 0.0125])
     for i in std.range(0, 10)
     for j in std.range(0, 3)
-  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + h.gripOn('brush', 'ridge') + {
+  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + { title: 'Scrub brush' } + h.gripOn('brush', 'ridge') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 150 mm square of blue cotton cloth for patching, hemmed on two sides with one corner turned back.
@@ -54,7 +54,7 @@ local washboard(w, ht) =
     h.prism('fold', 'fold', 'y', [[0.045, 0.075], [0.075, 0.045], [0.045, 0.045]], 0.002, 0.004),
     h.box('hem-a', 'hem', [-0.075, 0.002, -0.075], [0.075, 0.003, -0.069]),
     h.box('hem-b', 'hem', [-0.075, 0.002, -0.069], [-0.069, 0.003, 0.075]),
-  ], { cloth: 'cloth-shirt-blue', fold: 'cloth-navy', hem: 'cloth-navy' }) + {
+  ], { cloth: 'cloth-shirt-blue', fold: 'cloth-navy', hem: 'cloth-navy' }) + { title: 'Cotton patchwork' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
   // A wad of torn-up old clothes, 250 by 200 mm and 70 mm high: a folded pile of grubby rags with strips hanging off.
@@ -64,7 +64,7 @@ local washboard(w, ht) =
     h.box('rag', 'denim', [-0.13, 0.0, 0.01], [-0.118, 0.050, 0.08]),
     h.box('rag-top', 'denim', [-0.13, 0.056, 0.01], [-0.04, 0.062, 0.08]),
     h.box('tear', 'tear', [0.02, 0.056, 0.02], [0.08, 0.058, 0.08]),
-  ], { cloth: 'cloth-rag', strip: 'cloth-shirt-faded', denim: 'cloth-denim-faded', tear: 'cloth-rag-shadow' }) + {
+  ], { cloth: 'cloth-rag', strip: 'cloth-shirt-faded', denim: 'cloth-denim-faded', tear: 'cloth-rag-shadow' }) + { title: 'Tattered garment' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
   // A cotton dish towel folded to 200 by 130 mm and 16 mm thick, cream with two red woven stripes and a hanging loop.
@@ -74,7 +74,7 @@ local washboard(w, ht) =
     h.box('stripe-a-side', 'stripe', [0.100, 0.0, -0.050], [0.102, 0.018, -0.040]),
     h.box('stripe-b-side', 'stripe', [0.100, 0.0, 0.040], [0.102, 0.018, 0.050]),
     h.box('loop', 'stripe', [-0.112, 0.012, -0.006], [-0.094, 0.016, 0.006]),
-  ], { cloth: 'cloth-cream', stripe: 'cloth-red' }) + {
+  ], { cloth: 'cloth-cream', stripe: 'cloth-red' }) + { title: 'Dish towel' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['fabric'], place: ['kitchen'], setting: ['modern'] } } },
   // A cordless hair trimmer, 150 mm long: a black plastic body tapering to a brushed aluminium neck, a steel blade with
@@ -91,7 +91,7 @@ local washboard(w, ht) =
   ] + [
     h.box('switch', 'switch', [-0.010, 0.028, -0.005], [0.010, 0.032, 0.005]),
     h.box('lamp', 'lamp', [-0.030, 0.026, -0.002], [-0.026, 0.030, 0.002]),
-  ], { body: 'plastic-black', grip: 'rubber-black', neck: 'alu-bare', blade: 'steel-stainless', switch: 'plastic-charcoal', lamp: 'plastic-green' }) + h.gripOn('electric_hair_trimmer', 'body') + {
+  ], { body: 'plastic-black', grip: 'rubber-black', neck: 'alu-bare', blade: 'steel-stainless', switch: 'plastic-charcoal', lamp: 'plastic-green' }) + { title: 'Electric hair trimmer' } + h.gripOn('electric_hair_trimmer', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', keywords: ['hygiene'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
   // A home hair colouring kit in its carton, 210 mm tall, 150 mm wide and 70 mm deep, front on +z: a white box with a
@@ -104,7 +104,7 @@ local washboard(w, ht) =
     h.prism('face', 'face', 'z', [[-0.012, 0.075], [0.012, 0.075], [0.022, 0.090], [0.024, 0.120], [0.014, 0.140], [-0.014, 0.140], [-0.024, 0.120], [-0.022, 0.090]], 0.037, 0.038),
     h.box('label', 'label', [-0.050, 0.044, 0.035], [0.050, 0.054, 0.037]),
     h.box('shade', 'hair', [0.075, 0.120, -0.025], [0.076, 0.170, 0.025]),
-  ], { carton: 'paper-white', band: 'plastic-pink', hair: 'leather-chestnut', face: 'body-skin-player', label: 'paper-white' }) + h.label('band', '+z') + {
+  ], { carton: 'paper-white', band: 'plastic-pink', hair: 'leather-chestnut', face: 'body-skin-player', label: 'paper-white' }) + { title: 'Hair dye kit' } + h.label('band', '+z') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['hygiene'], tags: { material: ['paper'], setting: ['modern'] } } },
   // A string mop, 1.3 m long, lying along x: a 24 mm wooden pole with a hanging hole at the butt, a steel clamp
@@ -120,7 +120,7 @@ local washboard(w, ht) =
     for i in std.range(0, 12)
   ] + [
     h.box('yarn-core', 'yarn', [0.390, 0.0, -0.030], [0.460, 0.026, 0.030]),
-  ], { pole: 'wood-pine', hole: 'plastic-charcoal', collar: 'steel-galvanised', yarn: 'cord-cotton' }) + h.gripOn('mop', 'pole') + {
+  ], { pole: 'wood-pine', hole: 'plastic-charcoal', collar: 'steel-galvanised', yarn: 'cord-cotton' }) + { title: 'Mop' } + h.gripOn('mop', 'pole') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['wood', 'fabric'], setting: ['modern'] } } },
   // A collapsible flat mop folded for storage, 600 mm long: three nested aluminium tube sections with locking collars,
@@ -135,7 +135,7 @@ local washboard(w, ht) =
     h.box('swivel', 'grip', [0.226, 0.026, -0.010], [0.250, 0.060, 0.010]),
     h.box('frame', 'frame', [0.180, 0.016, -0.175], [0.300, 0.026, 0.175]),
     h.box('pad', 'pad', [0.176, 0, -0.178], [0.304, 0.016, 0.178]),
-  ], { grip: 'plastic-blue', tube: 'alu-bare', frame: 'plastic-grey', pad: 'cloth-cream' }) + h.gripOn('collapsible_mop', 'grip') + {
+  ], { grip: 'plastic-blue', tube: 'alu-bare', frame: 'plastic-grey', pad: 'cloth-cream' }) + { title: 'Collapsible mop' } + h.gripOn('collapsible_mop', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['metal', 'plastic'], setting: ['modern'], state: ['folded'] } } },
   // One double-edged safety razor blade, 38 by 22 mm and drawn 2 mm thick (the finest grain): bright ground edges
@@ -148,7 +148,7 @@ local washboard(w, ht) =
     h.box('slot', 'slot', [-0.012, 0, -0.002], [0.012, 0.0004, 0.002]),
     h.box('edge-a', 'edge', [-0.019, 0, 0.008], [0.019, 0.002, 0.011]),
     h.box('edge-b', 'edge', [-0.019, 0, -0.011], [0.019, 0.002, -0.008]),
-  ], { blade: 'steel-stainless', slot: 'plastic-charcoal', edge: 'steel-mirror' }) + {
+  ], { blade: 'steel-stainless', slot: 'plastic-charcoal', edge: 'steel-mirror' }) + { title: 'Razor blade' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['hygiene'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A travel shaving kit, 210 by 100 mm and 40 mm thick: a black nylon case with rounded corners, a zip running round
@@ -161,7 +161,7 @@ local washboard(w, ht) =
     h.box('loop-b', 'loop', [-0.120, 0.024, -0.012], [-0.106, 0.028, 0.012]),
     h.box('loop-c', 'loop', [-0.124, 0.012, -0.012], [-0.120, 0.028, 0.012]),
     h.box('patch', 'patch', [-0.030, 0.040, -0.020], [0.030, 0.041, 0.020]),
-  ], { case: 'nylon-black', zip: 'plastic-charcoal', pull: 'steel-grey', loop: 'webbing-black', patch: 'cloth-charcoal' }) + h.gripOn('shaving_kit', 'case') + {
+  ], { case: 'nylon-black', zip: 'plastic-charcoal', pull: 'steel-grey', loop: 'webbing-black', patch: 'cloth-charcoal' }) + { title: 'Shaving kit' } + h.gripOn('shaving_kit', 'case') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['hygiene'], tags: { material: ['fabric'], setting: ['modern'] } } },
   // A kitchen sponge, 95 by 65 mm and 25 mm thick: yellow foam with a green scouring pad bonded to the top.
@@ -171,7 +171,7 @@ local washboard(w, ht) =
   ] + [
     h.box('pore-%d' % i, 'pore', [-0.040 + (i % 5) * 0.018, 0.006 + std.floor(i / 5) * 0.006, 0.0325], [-0.036 + (i % 5) * 0.018, 0.008 + std.floor(i / 5) * 0.006, 0.0330])
     for i in std.range(0, 9)
-  ], { foam: 'cloth-yellow', scour: 'cloth-green', pore: 'paint-crane-yellow' }) + {
+  ], { foam: 'cloth-yellow', scour: 'cloth-green', pore: 'paint-crane-yellow' }) + { title: 'Sponge' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] } } },
   // A makeshift haircut kit, 200 mm long: a rolled leather wrap tied with cord, a pair of steel scissors laid open on
@@ -192,7 +192,7 @@ local washboard(w, ht) =
     h.turned('loop-b-ring', 'steel', 'y', [[0, 0.007], [0, 0.012], [0.004, 0.012], [0.004, 0.007], [0, 0.007]], [-0.056, 0.069, -0.010]),
     h.prism('shard', 'glass', 'y', [[-0.008, 0.070], [0.012, 0.070], [0.0, 0.100]], 0.020, 0.024),
     h.box('shard-wrap', 'cord', [0.070, 0.018, -0.010], [0.080, 0.026, 0.014]),
-  ], { leather: 'leather-brown', flap: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', steel: 'steel-bright', pivot: 'steel-grey', glass: 'glass-clear' }) + h.gripOn('makeshift_haircut_kit', 'roll') + {
+  ], { leather: 'leather-brown', flap: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', steel: 'steel-bright', pivot: 'steel-grey', glass: 'glass-clear' }) + { title: 'Makeshift haircut kit' } + h.gripOn('makeshift_haircut_kit', 'roll') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['hygiene', 'improvised'], tags: { material: ['leather', 'metal'] } } },
   // A makeshift shaving kit laid open, 150 by 120 mm: a leather wallet holding a straight blade knapped from glass in a
@@ -207,12 +207,12 @@ local washboard(w, ht) =
     h.tube('grip-cord', 'cord', 0.007, 0.0085, -0.040, -0.020, 0.017, 0),
     h.prism('edge', 'glass', 'x', [[0.010, -0.010], [0.024, -0.010], [0.022, 0.004], [0.012, 0.012]], 0.004, 0.064),
     h.box('soap', 'soap', [0.020, 0.012, 0.022], [0.050, 0.030, 0.050]),
-  ], { leather: 'leather-brown', pocket: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', grip: 'wood-oak', glass: 'glass-clear', soap: 'wax-cream' }) + {
+  ], { leather: 'leather-brown', pocket: 'leather-tan', cord: 'cord-cotton', mirror: 'mirror-silver', grip: 'wood-oak', glass: 'glass-clear', soap: 'wax-cream' }) + { title: 'Makeshift shaving kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['hygiene', 'improvised'], tags: { material: ['leather', 'glass'] } } },
   // A wooden washboard, 400 mm tall and 260 mm wide, front on +z: stiles with feet, a top rail with a soap ledge and a
   // bed of round ribs.
-  h.compound('washboard', 1.1, washboard(0.26, 0.40), { frame: 'wood-oak', board: 'wood-pine', rib: 'wood-birch' }) + {
+  h.compound('washboard', 1.1, washboard(0.26, 0.40), { frame: 'wood-oak', board: 'wood-pine', rib: 'wood-birch' }) + { title: 'Washboard' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['wood'] } } },
   // A washing kit, 400 mm tall: the same kind of wooden washboard with a blue scrub brush tied across its ribs with
@@ -222,7 +222,7 @@ local washboard(w, ht) =
     h.box('bristle', 'bristle', [-0.056, 0.144, 0.010], [0.056, 0.196, 0.030]),
     h.box('tie-l', 'cord', [-0.044, 0.130, -0.014], [-0.038, 0.210, 0.050]),
     h.box('tie-r', 'cord', [0.038, 0.130, -0.014], [0.044, 0.210, 0.050]),
-  ], { frame: 'wood-oak', board: 'wood-pine', rib: 'wood-birch', block: 'plastic-blue', bristle: 'plastic-white', cord: 'cord-cotton' }) + {
+  ], { frame: 'wood-oak', board: 'wood-pine', rib: 'wood-birch', block: 'plastic-blue', bristle: 'plastic-white', cord: 'cord-cotton' }) + { title: 'Wash kit' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['wood'] } } },
 ]

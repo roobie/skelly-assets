@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'abandoned_ambulance.spec.libsonnet';
 {
+  title: 'Abandoned ambulance',
   sites: [
     one('chassis', 'abandoned_ambulance_chassis'),
     one('cab', 'abandoned_ambulance_cab'),

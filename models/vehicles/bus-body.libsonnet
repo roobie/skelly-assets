@@ -43,8 +43,11 @@ local layout(s) = {
   leafWidth: (self.doorways[0][1] - self.doorways[0][0]) / std.get(s, 'doorLeaves', 2),
   doorHeight: s.decks[0].top - s.doorSill,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
+  windowLabel(i): if i == 0 then 'side window' else 'upper window',
 };
-local pressings(id, s) = {
+local pressings(id, title, s) = {
+  // A compound row of this bus, titled with the bus's title and the part's `label`.
+  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
   local g = layout(s),
   local face = g.face,
   local xf = g.xf,
@@ -220,7 +223,7 @@ local pressings(id, s) = {
   local lampSurround = k.bothSides([
     box('lamp_surround', 'black', [s.rear - 0.03, s.tailLampAt[1] - 0.05, s.tailLampAt[2] - 0.12], [s.rear + 0.01, s.tailLampAt[1] + 0.53, s.tailLampAt[2] + 0.12]),
   ]),
-  local shell = k.compound(id + '_shell', s.shellMass, floorPieces + steps + wheelhouses + rearBands + rearSides + frontBands + rails + wraps + lampSurround + (if std.get(s, 'openTop', false) then [] else [
+  local shell = part('_shell', 'shell', s.shellMass, floorPieces + steps + wheelhouses + rearBands + rearSides + frontBands + rails + wraps + lampSurround + (if std.get(s, 'openTop', false) then [] else [
     box('ceiling', 'headliner', [s.rear, s.roofBase - 0.03, -s.side], [crownRoof, s.roofBase, s.side]),
     k.xPrism('roof', 'paint', [
       [s.roofBase, -s.side],
@@ -239,7 +242,7 @@ local pressings(id, s) = {
     black: 'plastic-black',
     yellow: 'paint-crane-yellow',
   }),
-  local screenRow = k.compound(id + '_windscreen', 30 * std.length(screens), [
+  local screenRow = part('_windscreen', 'windscreen', 30 * std.length(screens), [
     // The rake's steps round differently in each prism, so the post stays a voxel inside the side panels and the glass a voxel behind that.
     prism('glass_' + i, 'glass', [[xf(screens[i][0]) - 0.11, screens[i][0]], [xf(screens[i][0]) - 2 * voxel, screens[i][0]], [xf(screens[i][1]) - 2 * voxel, screens[i][1]], [xf(screens[i][1]) - 0.11, screens[i][1]]], [-(s.side - 0.08), s.side - 0.08])
     for i in std.range(0, std.length(screens) - 1)
@@ -250,18 +253,18 @@ local pressings(id, s) = {
     local deck = s.decks[i];
     local w = deck.pitch - s.pillar;
     local h = deck.top - deck.waist;
-    k.compound(id + g.windowSuffix(i), 14 * w * h, [
+    part(g.windowSuffix(i), g.windowLabel(i), 14 * w * h, [
       // A pane sits off the grid its pillars rounded to, so it runs a voxel behind them or daylight shows at the join.
       box('glass', 'glass', [-w / 2 - voxel, -voxel, -0.02], [w / 2 + voxel, h + voxel, 0.02]),
     ] + (if std.get(s, 'paneSash', false) then [
            box('sash', 'frame', [-w / 2, h * 0.5 - 0.025, -0.03], [w / 2, h * 0.5 + 0.025, 0.03]),
          ] else []), { glass: 'glass-clear', frame: 'steel-grey' }),
-  local leafRow(suffix, hingeFraction) =
+  local leafRow(suffix, label, hingeFraction) =
     local w = g.leafWidth;
     local h = g.doorHeight;
     local kick = std.get(s, 'doorKick', 0.3);
     local hingeSign = if hingeFraction > 0.5 then 1 else -1;
-    k.compound(id + suffix, 45 * w * h, [
+    part(suffix, label, 45 * w * h, [
       box('kick', 'door', [-w / 2, 0, -0.03], [w / 2, kick, 0.03]),
       box('glass', 'glass', [-w / 2, kick, -0.015], [w / 2, h, 0.015]),
       box('stile', 'door', [hingeSign * w / 2 - 0.03, 0, -0.03], [hingeSign * w / 2 + 0.03, h, 0.03]),
@@ -271,14 +274,14 @@ local pressings(id, s) = {
       hinge_a: ['stile', [0.5, 0.1, 0.5]],
       hinge_b: ['stile', [0.5, 0.9, 0.5]],
     }),
-  local leaves = if std.get(s, 'doorLeaves', 2) == 2 then [leafRow('_door_fwd', 1), leafRow('_door_aft', 0)] else [leafRow('_door', 1)],
-  local bumper(suffix, x0, x1, mass) = k.compound(id + suffix, mass, [
+  local leaves = if std.get(s, 'doorLeaves', 2) == 2 then [leafRow('_door_fwd', 'front door', 1), leafRow('_door_aft', 'rear door', 0)] else [leafRow('_door', 'door', 1)],
+  local bumper(suffix, label, x0, x1, mass) = part(suffix, label, mass, [
     box('bar', 'bar', [x0, std.get(s, 'bumperY', [0.28, 0.6])[0], -(s.side + 0.03125)], [x1, std.get(s, 'bumperY', [0.28, 0.6])[1], s.side + 0.03125]),
   ], { bar: std.get(s, 'bumperFinish', 'plastic-black') }),
   local lampY = s.headlampAt[1],
   local lampZ = s.headlampAt[2],
   local flatFront = if g.bonneted then [] else [
-    k.compound(id + '_front_panel', 45, [
+    part('_front_panel', 'front panel', 45, [
       box('mask', 'paint', [face - 0.08, s.sill, -s.skin], [face, screens[0][0], s.skin]),
       box('grille', 'trim', [face, 0.68, -0.6], [face + 0.015, 0.84, 0.6]),
     ] + k.bothSides([
@@ -288,7 +291,7 @@ local pressings(id, s) = {
       box('lamp_surround_inner', 'trim', [face, lampY, lampZ - 0.25], [face + 0.03125, lampY + 0.22, lampZ - 0.17]),
       box('lamp_surround_outer', 'trim', [face, lampY, lampZ + 0.17], [face + 0.03125, lampY + 0.22, lampZ + 0.25]),
     ]), finish),
-    bumper('_front_bumper', s.front - 0.04, s.front + 0.07, 40),
+    bumper('_front_bumper', 'front bumper', s.front - 0.04, s.front + 0.07, 40),
   ],
   // A bonnet stands on the cowl and carries its own wings, because the wheel it clears sits ahead of the body.
   local bon = std.get(s, 'bonnet', null),
@@ -297,18 +300,18 @@ local pressings(id, s) = {
   local bonnetEnd = noseX - 0.04,
   local hoodY(x) = bon.cowlY + (bon.noseY - bon.cowlY) * (x - face) / (noseX - face),
   local bonnetRows = if !g.bonneted then [] else [
-    k.compound(id + '_bonnet', 60, [
+    part('_bonnet', 'bonnet', 60, [
       prism('top', 'paint', [[face, hoodY(face) - 0.06], [bonnetEnd, hoodY(bonnetEnd) - 0.06], [bonnetEnd, hoodY(bonnetEnd)], [face, hoodY(face)]], [-bon.halfWidth, bon.halfWidth]),
     ] + k.bothSides([
       prism('flank', 'paint', [[face, bon.flankY], [bonnetEnd, bon.flankY], [bonnetEnd, hoodY(bonnetEnd)], [face, hoodY(face)]], [bon.halfWidth - 0.05, bon.halfWidth]),
     ]), { paint: s.paint }),
-    k.compound(id + '_grille', 24, [
+    part('_grille', 'grille', 24, [
       box('surround', 'trim', [noseX - 0.04, bon.flankY, -bon.halfWidth], [noseX, hoodY(noseX), bon.halfWidth]),
     ] + [
       box('bar_' + i, 'bright', [noseX, bon.flankY + 0.06 + 0.11 * i, -bon.halfWidth + 0.34], [noseX + 0.03, bon.flankY + 0.1 + 0.11 * i, bon.halfWidth - 0.34])
       for i in std.range(0, std.floor((hoodY(noseX) - bon.flankY - 0.14) / 0.11))
     ], { trim: 'plastic-black', bright: 'steel-stainless' }),
-    k.compound(id + '_front_wing', 35, [
+    part('_front_wing', 'front wing', 35, [
       box('crown', 'paint', [face, s.archTop, bon.halfWidth], [noseX, s.archTop + 0.08, s.side - 0.02]),
       box('valance_rear', 'paint', [face, 0.62, bon.halfWidth], [s.frontAxle - s.arch, s.archTop, s.side - 0.02]),
       box('valance_front', 'paint', [s.frontAxle + s.arch, 0.62, bon.halfWidth], [noseX, s.archTop, s.side - 0.02]),
@@ -316,13 +319,13 @@ local pressings(id, s) = {
       prism('fillet_front', 'paint', [[s.frontAxle + s.arch, s.archTop - archChamfer], [s.frontAxle + s.arch, s.archTop], [s.frontAxle + s.arch - archChamfer, s.archTop]], [bon.halfWidth, s.side - 0.02]),
       prism('shoulder', 'paint', [[face, s.archTop + 0.08], [noseX, s.archTop + 0.08], [noseX, s.archTop + 0.14], [face, hoodY(face) - 0.1]], [bon.halfWidth, bon.halfWidth + 0.14]),
     ], { paint: s.paint }),
-    bumper('_front_bumper', noseX, s.front, 40),
+    bumper('_front_bumper', 'front bumper', noseX, s.front, 40),
   ],
   local driver = s.driver,
   local rearRows = [
-    bumper('_rear_bumper', s.rear - 0.07, s.rear + 0.03, 35),
+    bumper('_rear_bumper', 'rear bumper', s.rear - 0.07, s.rear + 0.03, 35),
   ] + (if rearGlazed(s) then [
-         k.compound(id + '_rear_window', 12 * std.length(rearGlass(s)) + (if flank == null then 0 else 12), [
+         part('_rear_window', 'rear window', 12 * std.length(rearGlass(s)) + (if flank == null then 0 else 12), [
            box('glass_' + i, 'glass', [s.rear + 0.02, rearGlass(s)[i].y[0], -rearGlass(s)[i].z], [s.rear + 0.06, rearGlass(s)[i].y[1], rearGlass(s)[i].z])
            for i in std.range(0, std.length(rearGlass(s)) - 1)
          ] + (if flank == null then [] else k.bothSides([
@@ -330,7 +333,7 @@ local pressings(id, s) = {
               ])), { glass: 'glass-clear' }),
        ] else []) + (if has(s, 'engineHatch') then [
                        // A louvred hatch over the rear engine.
-                       k.compound(id + '_rear_panel', 55, [
+                       part('_rear_panel', 'rear panel', 55, [
                          box('hatch', 'paint', [s.rear - 0.02, s.engineHatch[0], -s.tailLampAt[2] + 0.13], [s.rear + 0.01, s.engineHatch[1], s.tailLampAt[2] - 0.13]),
                        ] + [
                          box('louvre_' + i, 'trim', [s.rear - 0.035, s.engineHatch[0] + 0.1 + 0.12 * i, -0.75], [s.rear - 0.02, s.engineHatch[0] + 0.15 + 0.12 * i, 0.75])
@@ -342,7 +345,7 @@ local pressings(id, s) = {
     local well = s.stairWell;
     local runs = spans(s.rear + 0.08, xf(y) - 0.08, [well.x]);
     [
-      k.compound(id + '_upper_floor', s.upperFloorMass, [
+      part('_upper_floor', 'upper floor', s.upperFloorMass, [
         box('deck_' + i, 'floor', [runs[i][0], y - 0.1, -s.skin], [runs[i][1], y, s.skin])
         for i in std.range(0, std.length(runs) - 1)
       ] + [
@@ -351,7 +354,7 @@ local pressings(id, s) = {
     ],
   pressings: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
-    k.compound(id + '_dashboard', 40, [
+    part('_dashboard', 'dashboard', 40, [
       box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - 0.14, dashTop(s), -0.28]),
     ] + (if has(s, 'dashShelfTop') then [
            box('shelf', 'trim', [face - 0.5, s.floor, -0.28], [xf(s.dashShelfTop) - 0.14, s.dashShelfTop, s.skin]),
@@ -359,7 +362,7 @@ local pressings(id, s) = {
   ] + (if has(s, 'sign') then [
          local y = s.sign.y;
          local face = xf(y[0]);
-         k.compound(id + '_destination_sign', 8, [
+         part('_destination_sign', 'destination sign', 8, [
            // Proud of the front wall, because the panel is see-through and a coplanar wall behind it would z-fight.
            box('case', 'trim', [xf(y[1]) - 0.06, y[0], -s.sign.z], [face + 0.04, y[1], s.sign.z]),
            box('lower_lip', 'trim', [face, y[0], -s.sign.z], [face + 0.05, y[0] + 0.04, s.sign.z]),
@@ -368,7 +371,7 @@ local pressings(id, s) = {
          ], { trim: 'plastic-black', lit: 'plastic-orange' }),
        ] else []),
 }.pressings;
-local rows(id, s) = k.unborrowed(id, s, pressings(id, s));
+local rows(id, title, s) = k.unborrowed(id, s, pressings(id, title, s));
 local items(kit, id, name, s) =
   local panel(suffix, label, capabilities) = [suffix, label, capabilities];
   local g = layout(s);
@@ -483,7 +486,7 @@ local laid(kit, id, s) =
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))
   + kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell']);
-local fittings(kit, id, s) = k.painted(id, s, pressings(id, s), laid(kit, id, s));
+local fittings(kit, id, s) = k.painted(id, s, pressings(id, '', s), laid(kit, id, s));
 {
   rows: rows, items: items, fittings: fittings, layout: layout,
   // A seat pair's placement at (x, y), for a spec's `seats`.

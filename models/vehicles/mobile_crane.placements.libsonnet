@@ -3,6 +3,7 @@ local t = import 'truck-cab.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local s = t.spec(import 'mobile_crane.spec.libsonnet');
 {
+  title: 'Mobile crane',
   sites: t.fittings(site.kit, 'mobile_crane', s) + [
     site.one('front_axle_2', wheelKit.axle(s.frontAxlePart, s.wheelBrakes), [s.secondAxle, s.frontAxleY, 0]),
     site.one('deck', 'mobile_crane_deck'),

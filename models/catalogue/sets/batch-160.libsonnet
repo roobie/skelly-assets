@@ -70,7 +70,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
              foldedScarf(0.3, 0.2, 4, 0.006, 0.15, 8)
              + stripes(0.15, 0.2, 0.006, 0.15)
              + fringe(0.3, 0.2, 9),
-             wool)
+             wool) + { title: 'Scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A long knitted wool scarf about 2.5 m long and 220 mm wide, folded in eight into a stack 340 x 220 x 48 mm with
@@ -79,7 +79,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
              foldedScarf(0.34, 0.22, 8, 0.006, 0.42, 8)
              + stripes(0.17, 0.22, 0.006, 0.42)
              + fringe(0.59, 0.22, 10),
-             wool)
+             wool) + { title: 'Long scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A fur scarf about 1.2 m long and 160 mm wide, folded in three into a soft stack 300 x 160 x 48 mm with one
@@ -87,7 +87,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
   h.compound('fur_scarf', 0.3,
              foldedScarf(0.3, 0.16, 3, 0.016, 0.12, 1)
              + furEnd(0.27, 0.16, 0.016),
-             fur)
+             fur) + { title: 'Fur scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A long fur scarf about 2.2 m long and 180 mm wide, folded in six into a soft stack 340 x 180 x 96 mm with one
@@ -95,6 +95,6 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
   h.compound('long_fur_scarf', 0.55,
              foldedScarf(0.34, 0.18, 6, 0.016, 0.4, 1)
              + furEnd(0.57, 0.18, 0.016),
-             fur)
+             fur) + { title: 'Long fur scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 ]

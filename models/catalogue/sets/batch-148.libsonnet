@@ -97,17 +97,17 @@ local plankGuard(prefix, z, side, shift=0) =
     wood: 'wood-pine',
     rag: 'cloth-rag',
     string: 'cord-cotton',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['wood', 'fabric'], slot: ['legs'] } } },
+  }) + { title: 'Plank shin guards' } + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['wood', 'fabric'], slot: ['legs'] } } },
 
   // A pair of light steel leg guards 600 mm long from hip to ankle, each a chain leg with a narrow plate down the
   // thigh and another down the shin, buckled on with leather straps, laid side by side.
-  h.compound('mild_steel_light_leg_guards', 4.2, legPair('light'), steelFinish) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_light_leg_guards', 4.2, legPair('light'), steelFinish) + { title: 'Mild steel light leg guards' } + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of steel leg guards 600 mm long: half-round cuisse and greave plates on a chain leg, a domed knee cop
   // with a side wing.
-  h.compound('mild_steel_leg_guards', 6.9, legPair('standard'), steelFinish) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_leg_guards', 6.9, legPair('standard'), steelFinish) + { title: 'Mild steel leg guards' } + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 
   // A pair of heavy steel leg guards 600 mm long: thicker, wider plates than the standard pair, a rolled hip edge,
   // lames above and below the knee cop and a flare over the ankle.
-  h.compound('mild_steel_heavy_leg_guards', 9.4, legPair('heavy'), steelFinish) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
+  h.compound('mild_steel_heavy_leg_guards', 9.4, legPair('heavy'), steelFinish) + { title: 'Mild steel heavy leg guards' } + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], slot: ['legs'], setting: ['medieval'] } } },
 ]

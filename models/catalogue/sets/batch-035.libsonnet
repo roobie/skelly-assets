@@ -134,11 +134,11 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
           [r * std.cos(e) * std.sin(a) + 0.001, 0.0214 + r * std.sin(e) + 0.001, r * std.cos(e) * std.cos(a) + 0.001])
     for i in std.range(0, 9)
     for j in [-2, -1, 0, 1, 2]
-  ], { cover: 'plastic-gloss-white', dimple: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { cover: 'plastic-gloss-white', dimple: 'plastic-grey' }) + { title: 'Golf ball' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 70 mm wooden tee lying along x: a cupped head 11 mm across, a 4 mm shank and a point.
   h.compound('golf_tee', 0.00095, [
     h.turned('tee', 'wood', 'x', [[0, 0], [0, 0.0055], [0.004, 0.0055], [0.010, 0.0022], [0.060, 0.0020], [0.070, 0]], [-0.035, 0.0055, 0]),
-  ], { wood: 'wood-birch' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
+  ], { wood: 'wood-birch' }) + { title: 'Golf tee' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood'] } } },
   // An indoor volleyball 210 mm across, its 18 panels grouped by colour: blue at the poles, yellow at the sides,
   // white between.
   h.compound('indoor_volleyball', 0.25, [
@@ -147,16 +147,16 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
   ] + [
     cap('cap-%s' % c[0], c[1], 0.105, 0.028, c[2], c[3], [0, 0.105, 0], steps=8) + { sides: 24 }
     for c in [['top', 'blue', 'y', 1], ['bottom', 'blue', 'y', -1], ['right', 'yellow', 'x', 1], ['left', 'yellow', 'x', -1]]
-  ], { white: 'plastic-gloss-white', blue: 'plastic-blue', yellow: 'plastic-yellow' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { white: 'plastic-gloss-white', blue: 'plastic-blue', yellow: 'plastic-yellow' }) + { title: 'Indoor volleyball' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A white shop-window mannequin of the player's build on a round steel stand.
-  mannequin('mannequin', standMassKg=2) + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  mannequin('mannequin', standMassKg=2) + { title: 'Mannequin' } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // The same mannequin holding a talking doll against its waist, wired to sound off.
-  mannequin('mannequin_decoy', doll(), 0.48, 2.52) + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  mannequin('mannequin_decoy', doll(), 0.48, 2.52) + { title: 'Mannequin decoy' } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 76 mm by 25 mm vulcanised rubber puck with a grey printed disc on its face.
   h.compound('puck', 0.13, [
     h.disc('puck', 'rubber', 0.038, 0, 0.0254),
     h.disc('print', 'print', 0.02, 0.0254, 0.0262),
-  ], { rubber: 'rubber-black', print: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
+  ], { rubber: 'rubber-black', print: 'plastic-grey' }) + { title: 'Hockey puck' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
   // A nylon shuttlecock 90 mm tall standing on its cork base: a 25 mm domed cork and a 66 mm flared skirt.
   h.compound('shuttlecock', 0.0092, [
     h.turned('cork', 'cork', 'y', [[0, 0], [0, 0.007], [0.004, 0.0115], [0.010, 0.0125], [0.020, 0.0125], [0.020, 0]]),
@@ -164,7 +164,7 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
     h.turned('skirt', 'skirt', 'y', [[0, 0.009], [0, 0.0115], [0.070, 0.033], [0.070, 0.030], [0, 0.009]], [0, 0.020, 0]),
     h.turned('ring-a', 'ring', 'y', [[0, 0.016], [0, 0.0175], [0.003, 0.0185], [0.003, 0.017], [0, 0.016]], [0, 0.040, 0]),
     h.turned('ring-b', 'ring', 'y', [[0, 0.020], [0, 0.0215], [0.003, 0.0225], [0.003, 0.021], [0, 0.020]], [0, 0.052, 0]),
-  ], { cork: 'cork', band: 'leather-white', skirt: 'plastic-gloss-white', ring: 'plastic-blue' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { cork: 'cork', band: 'leather-white', skirt: 'plastic-gloss-white', ring: 'plastic-blue' }) + { title: 'Shuttlecock' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 370 mm by 250 mm foam kickboard, 35 mm thick, with a rounded nose at +z and two hand slots near it.
   h.compound('swimming_kickboard', 0.13, [
     h.prism('board', 'foam', 'y', [
@@ -173,7 +173,7 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
     h.box('slot-l', 'slot', [-0.085, -0.0005, 0.08], [-0.035, 0.0355, 0.13]),
     h.box('slot-r', 'slot', [0.035, -0.0005, 0.08], [0.085, 0.0355, 0.13]),
     h.box('stripe', 'stripe', [-0.11, 0.035, -0.17], [0.11, 0.037, -0.15]),
-  ], { foam: 'foam-orange', slot: 'plastic-charcoal', stripe: 'plastic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { foam: 'foam-orange', slot: 'plastic-charcoal', stripe: 'plastic-white' }) + { title: 'Swimming kickboard' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 320 mm talking doll in a red dress, a speaker grille and press button on its chest.
-  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
+  h.compound('talking_doll', 0.48, doll(), dollFinish) + { title: 'Talking doll' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 ]

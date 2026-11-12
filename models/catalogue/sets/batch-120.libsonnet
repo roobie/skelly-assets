@@ -155,53 +155,53 @@ local cotton = { cloth: 'cloth-cream', stitch: 'cloth-khaki', trim: 'cloth-khaki
 [
   // A green nylon coif standing upright, 330 mm across the shoulder curtain and 310 mm tall: a padded hood with a
   // bound face opening, quilted rings round the curtain and a buttoned chin strap.
-  coif('nylon_coif', 0.62, nylon) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['head'] } } },
+  coif('nylon_coif', 0.62, nylon) + { title: 'Nylon coif' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['head'] } } },
 
   // The same coif in grey layered wool, heavier.
-  coif('wool_coif', 0.62, wool) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['head'] } } },
+  coif('wool_coif', 0.62, wool) + { title: 'Wool coif' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['head'] } } },
 
   // A green nylon aketon folded flat, 360 mm by 320 mm and 60 mm tall: quilted channels down the body, a stand
   // collar, a button front, and quilted sleeves folded in along both sides.
-  coat('nylon_aketon', 1.5, 0.36, 0.32, 0.06, 'full', false, 'buttons', nylon) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('nylon_aketon', 1.5, 0.36, 0.32, 0.06, 'full', false, 'buttons', nylon) + { title: 'Nylon aketon' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A green nylon aketon vest folded flat, 340 mm by 320 mm and 55 mm tall: the same quilted body with bound
   // armholes and no sleeves.
-  coat('nylon_aketon_vest', 1.1, 0.34, 0.32, 0.055, 'none', false, 'buttons', nylon) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('nylon_aketon_vest', 1.1, 0.34, 0.32, 0.055, 'none', false, 'buttons', nylon) + { title: 'Nylon aketon vest' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // Canvas arming pants folded in a long bundle, 260 mm by 420 mm and 45 mm tall, with lacing points at the waist.
-  pants('canvas_arming_pants', 1.2, canvas) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
+  pants('canvas_arming_pants', 1.2, canvas) + { title: 'Canvas arming pants' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
 
   // Green nylon arming pants, folded the same way.
-  pants('nylon_arming_pants', 0.9, nylon) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
+  pants('nylon_arming_pants', 0.9, nylon) + { title: 'Nylon arming pants' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
 
   // Grey quilted wool arming pants, folded the same way.
-  pants('wool_arming_pants', 1.2, wool) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
+  pants('wool_arming_pants', 1.2, wool) + { title: 'Wool arming pants' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['legs'], state: ['folded'] } } },
 
   // A grey quilted wool aketon folded flat, 360 mm by 320 mm and 65 mm tall, wooden buttons down the front.
-  coat('wool_aketon', 2.2, 0.36, 0.32, 0.065, 'full', false, 'buttons', wool) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('wool_aketon', 2.2, 0.36, 0.32, 0.065, 'full', false, 'buttons', wool) + { title: 'Wool aketon' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A grey quilted wool aketon vest folded flat, 340 mm by 320 mm and 60 mm tall, no sleeves.
-  coat('wool_aketon_vest', 1.5, 0.34, 0.32, 0.06, 'none', false, 'buttons', wool) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('wool_aketon_vest', 1.5, 0.34, 0.32, 0.06, 'none', false, 'buttons', wool) + { title: 'Wool aketon vest' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A cream cotton gambeson folded flat, 420 mm by 380 mm and 90 mm tall: a long greatcoat, its quilted skirt folded
   // back up over the hem end, thick quilted sleeves, a stand collar and a front closed with tied laces.
-  coat('gambeson', 3.5, 0.42, 0.38, 0.09, 'full', true, 'ties', cotton) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('gambeson', 3.5, 0.42, 0.38, 0.09, 'full', true, 'ties', cotton) + { title: 'Gambeson' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A canvas gambeson folded the same way.
-  coat('canvas_gambeson', 3.8, 0.42, 0.38, 0.09, 'full', true, 'ties', canvas) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('canvas_gambeson', 3.8, 0.42, 0.38, 0.09, 'full', true, 'ties', canvas) + { title: 'Canvas gambeson' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A canvas gambeson with thinner sleeves, folded the same way.
-  coat('thin_sleeved_canvas_gambeson', 3.3, 0.42, 0.38, 0.085, 'thin', true, 'ties', canvas) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('thin_sleeved_canvas_gambeson', 3.3, 0.42, 0.38, 0.085, 'thin', true, 'ties', canvas) + { title: 'Thin sleeved canvas gambeson' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless canvas gambeson folded the same way, armholes bound in brown.
-  coat('canvas_gambeson_vest', 2.8, 0.4, 0.38, 0.08, 'none', true, 'ties', canvas) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
+  coat('canvas_gambeson_vest', 2.8, 0.4, 0.38, 0.08, 'none', true, 'ties', canvas) + { title: 'Canvas gambeson vest' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['torso'], state: ['folded'] } } },
 
   // A pair of canvas arming mittens laid flat side by side, backs up, each 285 mm from cuff to fingertip: thick
   // quilted mitts with flared gauntlet cuffs.
-  h.compound('canvas_arming_mittens', 0.4, mitten('l-', -0.075, -1) + mitten('r-', 0.075, 1), canvas)
+  h.compound('canvas_arming_mittens', 0.4, mitten('l-', -0.075, -1) + mitten('r-', 0.075, 1), canvas) + { title: 'Canvas arming mittens' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // The same mittens in green nylon.
-  h.compound('nylon_arming_mittens', 0.32, mitten('l-', -0.075, -1) + mitten('r-', 0.075, 1), nylon)
+  h.compound('nylon_arming_mittens', 0.32, mitten('l-', -0.075, -1) + mitten('r-', 0.075, 1), nylon) + { title: 'Nylon arming mittens' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['hands'] } } },
 ]

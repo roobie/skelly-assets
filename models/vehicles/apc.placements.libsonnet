@@ -5,6 +5,7 @@ local s = import 'apc.spec.libsonnet';
 local turret = import 'turret-kit.libsonnet';
 local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
 {
+  title: 'APC',
   sites: [
     one('belly', 'apc_hull_belly'),
     one('nose', 'apc_hull_nose'),

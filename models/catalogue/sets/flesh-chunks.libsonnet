@@ -34,8 +34,8 @@ local chunk(id, massKg, length, width, height) =
     handling: { part: 'lump', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, 0], hold: 'upright', roll: 0 },
   };
 [
-  chunk('flesh_chunk_small', 0.03, 0.04, 0.035, 0.022),
-  chunk('flesh_chunk_medium', 0.1, 0.065, 0.055, 0.032),
-  chunk('flesh_chunk_large', 0.3, 0.1, 0.085, 0.045),
-  chunk('flesh_chunk_strip', 0.1, 0.11, 0.04, 0.026),
+  chunk('flesh_chunk_small', 0.03, 0.04, 0.035, 0.022) + { title: 'Small flesh chunk' },
+  chunk('flesh_chunk_medium', 0.1, 0.065, 0.055, 0.032) + { title: 'Medium flesh chunk' },
+  chunk('flesh_chunk_large', 0.3, 0.1, 0.085, 0.045) + { title: 'Large flesh chunk' },
+  chunk('flesh_chunk_strip', 0.1, 0.11, 0.04, 0.026) + { title: 'Flesh strip' },
 ]

@@ -222,17 +222,17 @@ local mailBundle(o) =
   // breastplate with a centre ridge over a three-lame fauld and a mail skirt, shoulder cops with two lames, arm and
   // leg plates around domed elbow and knee cops, sabaton lames and buckled leather straps. Tempered steel shows its
   // heat tint.
-  h.compound('tempered_plate_armour', 25, qtSuit({}), plateFinish('steel-heat-tint'))
+  h.compound('tempered_plate_armour', 25, qtSuit({}), plateFinish('steel-heat-tint')) + { title: 'Tempered plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The light suit on the same layout: thin plates, small shoulder cops with one lame, no wings on the cops and
   // no sabatons, still over a mail skirt and gussets.
-  h.compound('light_tempered_plate_armour', 18, qtSuit({ t: 0.003, cop: 0.075, copLames: 1, lames: 2, wings: false, feet: false }), plateFinish('steel-heat-tint'))
+  h.compound('light_tempered_plate_armour', 18, qtSuit({ t: 0.003, cop: 0.075, copLames: 1, lames: 2, wings: false, feet: false }), plateFinish('steel-heat-tint')) + { title: 'Light tempered plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The heavy suit on the same layout: thick plates, a gorget over the neck, broad shoulder cops with three lames,
   // a four-lame fauld and winged cops.
-  h.compound('heavy_tempered_plate_armour', 39, qtSuit({ t: 0.006, cop: 0.105, copLames: 3, lames: 4, gorget: true }), plateFinish('steel-heat-tint'))
+  h.compound('heavy_tempered_plate_armour', 39, qtSuit({ t: 0.006, cop: 0.105, copLames: 3, lames: 4, gorget: true }), plateFinish('steel-heat-tint')) + { title: 'Heavy tempered plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Plate armour over a fitted black bodysuit, laid out flat, 1.3 m from collar to toe: the tempered plate suit
@@ -254,7 +254,7 @@ local mailBundle(o) =
                sbox('line-leg-' + sideName(s), 'vent', [s * (L.legX + 0.088), 0.008, L.leg0], [s * (L.legX + 0.094), 0.014, L.leg1 + 0.12])
                for s in sides
              ],
-             plateFinish('steel-heat-tint') + { under: 'nylon-black', vent: 'plastic-charcoal' })
+             plateFinish('steel-heat-tint') + { under: 'nylon-black', vent: 'plastic-charcoal' }) + { title: 'Ventilated plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A leather armour suit laid out flat, 1.3 m from collar to toe: a thick leather torso, sleeves and leggings
@@ -301,7 +301,7 @@ local mailBundle(o) =
              ]
              + [box('lace-' + i, 'lace', [-0.006, 0.01, L.neck + 0.04 + i * 0.05], [0.006, 0.014, L.neck + 0.07 + i * 0.05]) for i in std.range(0, 9)]
              + [box('belt', 'lace', [-0.23, 0.01, L.hem + 0.02], [0.23, 0.016, L.hem + 0.06]), box('belt-buckle', 'rivet', [-0.025, 0.016, L.hem + 0.015], [0.025, 0.02, L.hem + 0.065])],
-             { leather: 'leather-chestnut', plate: 'steel-grey', rivet: 'steel-bright', lace: 'leather-black' })
+             { leather: 'leather-chestnut', plate: 'steel-grey', rivet: 'steel-bright', lace: 'leather-black' }) + { title: 'Plated leather armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A riot suit laid out flat, 1.4 m from collar to toe: black moulded plastic chest and limb shells with grey
@@ -316,7 +316,7 @@ local mailBundle(o) =
                + [sbox('foot-strap-' + sideName(s), 'strap', [s * L.legX - 0.07, 0, L.leg1 + 0.11], [s * L.legX + 0.07, 0.04, L.leg1 + 0.13])]
                for s in sides
              ]),
-             { plate: 'plastic-matte-black', edge: 'plastic-charcoal', strap: 'hook-loop-grey', buckle: 'plastic-charcoal', band: 'felt-grey' })
+             { plate: 'plastic-matte-black', edge: 'plastic-charcoal', strap: 'hook-loop-grey', buckle: 'plastic-charcoal', band: 'felt-grey' }) + { title: 'Riot armour suit' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['police'], tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A lacquered lamellar armour laid out flat, 1.3 m from collar to toe: the box cuirass of six laced rows of
@@ -352,7 +352,7 @@ local mailBundle(o) =
                + [sbox('suneate-%s-tie-%d' % [sideName(s), i], 'lace', [s * L.legX - 0.075, 0.012, z], [s * L.legX + 0.075, 0.015, z + 0.012]) for i in [0, 1] for z in [[0.47, 0.64][i]]]
                for s in sides
              ]),
-             { lame: 'lacquer-black', lace: 'cloth-crimson', gilt: 'brass-polished', sleeve: 'cloth-navy', iron: 'iron-dull' })
+             { lame: 'lacquer-black', lace: 'cloth-crimson', gilt: 'brass-polished', sleeve: 'cloth-navy', iron: 'iron-dull' }) + { title: 'Lacquered lamellar armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A scrap-metal suit laid out flat, 1.3 m from collar to toe: cotton wraps cut to a torso, sleeves and leggings,
@@ -402,7 +402,7 @@ local mailBundle(o) =
                  [L.legX, 0.16, 0.62],
                ][i]]
              ],
-             { cloth: 'canvas-grey', steel: 'steel-bright', rust: 'rust-red', zinc: 'steel-galvanised', string: 'cord-cotton' })
+             { cloth: 'canvas-grey', steel: 'steel-bright', rust: 'rust-red', zinc: 'steel-galvanised', string: 'cord-cotton' }) + { title: 'Scrap suit' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A tyre-rubber suit laid out flat, 1.3 m from collar to toe: curved chunks cut from tyres, chevron tread up, over
@@ -448,7 +448,7 @@ local mailBundle(o) =
                  [L.legX, 0.39, L.legX, 0.44],
                ][i]]
              ],
-             { rubber: 'rubber-black', lug: 'rubber-tread', string: 'cord-cotton' })
+             { rubber: 'rubber-black', lug: 'rubber-tread', string: 'cord-cotton' }) + { title: 'Tyre suit' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['torso', 'arms', 'legs'] } } },
 
   // A beekeeper's coverall folded square, 360 mm by 300 mm and 80 mm thick: white cotton, a zipped front, a
@@ -467,7 +467,7 @@ local mailBundle(o) =
                ]
                for i in [0, 1]
              ]),
-             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-cream', button: 'cloth-cream', pocket: 'cloth-cream', flap: 'cloth-cream', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal', strap: 'cloth-cream', tab: 'hook-loop-grey' })
+             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', front: 'cloth-cream', button: 'cloth-cream', pocket: 'cloth-cream', flap: 'cloth-cream', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal', strap: 'cloth-cream', tab: 'hook-loop-grey' }) + { title: 'Beekeeping suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], place: ['farm'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A dog-handler's bite suit folded into a thick bundle, 460 mm by 380 mm and 160 mm tall: denim outer quilted in
@@ -476,16 +476,16 @@ local mailBundle(o) =
   h.compound('bite_suit', 6,
              g.jacket({ w: 0.46, d: 0.38, ht: 0.16, folds: 4, front: 'placket', frontW: 0.04, frontT: 0.008, buttons: 0, collar: { r: 0.08, wd: 0.04, ht: 0.035, gap: 30 }, sleeves: { kind: 'roll', r: 0.055 } })
              + g.quilt({ style: 'channels', x0: -0.12, x1: 0.12, z0: -0.17, z1: 0.04, y: 0.16, pitch: 0.045, r: 0.014 }),
-             { cloth: 'cloth-denim', collar: 'aramid-gold', front: 'cloth-denim-faded', button: 'cloth-denim-faded', sleeve: 'cloth-denim', stitch: 'cloth-denim-faded', cuff: 'aramid-gold', quilt: 'cloth-denim-faded' })
+             { cloth: 'cloth-denim', collar: 'aramid-gold', front: 'cloth-denim-faded', button: 'cloth-denim-faded', sleeve: 'cloth-denim', stitch: 'cloth-denim-faded', cuff: 'aramid-gold', quilt: 'cloth-denim-faded' }) + { title: 'Bite suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A case-hardened mail hauberk folded to 380 mm by 420 mm and 60 mm tall: a long mail shirt of dark rings with
   // sleeves along its sides, a leather-bound neck and a split skirt.
-  h.compound('hardened_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
+  h.compound('hardened_steel_mail_hauberk', 12, mailBundle({ d: 0.42, slit: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' }) + { title: 'Hardened steel mail hauberk' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A case-hardened mail jumpsuit folded to 380 mm by 440 mm and 60 mm tall: sleeves along the sides and the legs
   // folded up over the body under a leather belt, with a leather-bound neck.
-  h.compound('hardened_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' })
+  h.compound('hardened_steel_mail_jumpsuit', 14, mailBundle({ d: 0.44, legs: true }), { mail: 'steel-mail-dark', binding: 'leather-black', hole: 'cloth-black', buckle: 'brass-dull' }) + { title: 'Hardened steel mail jumpsuit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

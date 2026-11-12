@@ -67,10 +67,10 @@ function boundPart(bone, groups) {
   return found[0];
 }
 
-// Every drawn mesh under `object` as one triangle mesh in world axes; what a worn piece hides (hiding.mjs) is not drawn,
-// so it is neither probed nor counted as showing.
+// Every drawn mesh under `object` as one triangle mesh in world axes, each triangle with the region its primitive is
+// marked as; what a worn piece hides (hiding.mjs) is not drawn, so it is neither probed nor counted as showing.
 function worldMesh(object) {
-  const positions = [], indices = [];
+  const positions = [], indices = [], pieces = [];
   const p = new THREE.Vector3();
   object.traverse((o) => {
     if (!o.isMesh || !o.visible) return;
@@ -79,8 +79,9 @@ function worldMesh(object) {
     for (let i = 0; i < position.count; i++) positions.push(...p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).toArray());
     if (index) for (let i = 0; i < index.count; i++) indices.push(base + index.getX(i));
     else for (let i = 0; i < position.count; i++) indices.push(base + i);
+    for (let t = 0; t < (index ?? position).count / 3; t++) pieces.push(o.geometry.userData.piece);
   });
-  return { positions, indices };
+  return { positions, indices, pieces };
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
@@ -118,8 +119,8 @@ export async function buildFigure(data, wear) {
   root.updateMatrixWorld(true);
   for (const { bone, part, pieces } of bound) {
     const mesh = worldMesh(part);
-    if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, mesh });
-    for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, mesh: worldMesh(group) });
+    if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, part: bone.bind.part, mesh });
+    for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, covers: site.covers, mesh: worldMesh(group) });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));
   let clearance;

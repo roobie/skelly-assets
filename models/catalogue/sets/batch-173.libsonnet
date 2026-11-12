@@ -111,28 +111,28 @@ local coverall(o) =
 [
   // A hardened steel mail suit folded on a shelf, 400 mm by 340 mm and 90 mm tall: sleeves, folded-up legs and a mail
   // coif 180 mm across laid face up at the neck. The high-carbon and rusted suits share this model.
-  h.compound('hardened_steel_mail_suit', 18, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true }) + face(0.09, 0.08, false), { mail: 'steel-mail-dark', binding: 'leather-brown', opening: 'cloth-black' })
+  h.compound('hardened_steel_mail_suit', 18, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true }) + face(0.09, 0.08, false), { mail: 'steel-mail-dark', binding: 'leather-brown', opening: 'cloth-black' }) + { title: 'Hardened steel mail suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 
   // A tempered steel mail suit folded on a shelf, 400 mm by 340 mm and 90 mm tall, made as one conductive cage: a coif
   // with a wire grille over the face, mail mitts hanging over the front fold, mail socks on the legs and a bright
   // braided bonding strap down the middle joining the parts.
-  h.compound('faraday_mail_suit', 25, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true, mitts: true, socks: true, braid: true }) + face(0.09, 0.08, true), { mail: 'steel-heat-tint', binding: 'leather-brown', opening: 'cloth-black', cage: 'steel-bright', braid: 'bronze-polished' })
+  h.compound('faraday_mail_suit', 25, mailSuit({ d: 0.34, ht: 0.09, sleeves: true, legs: true, coif: true, mitts: true, socks: true, braid: true }) + face(0.09, 0.08, true), { mail: 'steel-heat-tint', binding: 'leather-brown', opening: 'cloth-black', cage: 'steel-bright', braid: 'bronze-polished' }) + { title: 'Faraday mail suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs', 'head', 'hands', 'feet'], state: ['folded'] } } },
 
   // A disposable white cleansuit folded on a shelf, 380 mm by 320 mm and 70 mm tall: a hooded coverall of spun plastic
   // sheet with a zip flap, elastic cuffs and booties folded over the front.
-  h.compound('cleansuit', 0.2, coverall({ w: 0.38, d: 0.32, ht: 0.07, hood: 0.2, win: [0.12, 0.07], cuffs: true, booties: true }), { cloth: 'cloth-bright-white', hood: 'cloth-bright-white', window: 'cloth-charcoal', zip: 'plastic-charcoal', cuff: 'cloth-cream' })
+  h.compound('cleansuit', 0.2, coverall({ w: 0.38, d: 0.32, ht: 0.07, hood: 0.2, win: [0.12, 0.07], cuffs: true, booties: true }), { cloth: 'cloth-bright-white', hood: 'cloth-bright-white', window: 'cloth-charcoal', zip: 'plastic-charcoal', cuff: 'cloth-cream' }) + { title: 'Cleansuit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 
   // A firefighter's aluminised entry suit folded on a shelf, 440 mm by 380 mm and 110 mm tall: a hooded coverall in
   // silvered flame-resistant cloth with a gold-faced visor in the hood, a zip flap and attached gauntlets.
-  h.compound('entry_suit', 4.5, coverall({ w: 0.44, d: 0.38, ht: 0.11, hood: 0.26, win: [0.18, 0.1], gloves: true, rim: true }), { cloth: 'foil-alu', hood: 'foil-alu', window: 'foil-gold', zip: 'foil-alu', glove: 'foil-alu', cuff: 'cloth-turnout' })
+  h.compound('entry_suit', 4.5, coverall({ w: 0.44, d: 0.38, ht: 0.11, hood: 0.26, win: [0.18, 0.1], gloves: true, rim: true }), { cloth: 'foil-alu', hood: 'foil-alu', window: 'foil-gold', zip: 'foil-alu', glove: 'foil-alu', cuff: 'cloth-turnout' }) + { title: 'Entry suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head', 'hands'], state: ['folded'] } } },
 
   // A yellow encapsulating hazmat suit folded on a shelf, 500 mm by 420 mm and 140 mm tall: a hood with a broad clear
   // face window in a black rim, a zip flap, black gloves folded on top and black boots sealed to the legs standing out
   // over the front.
-  h.compound('hazmat_suit', 3.8, coverall({ w: 0.5, d: 0.42, ht: 0.14, hood: 0.3, win: [0.22, 0.13], gloves: true, boots: true, rim: true }), { cloth: 'rubber-yellow', hood: 'rubber-yellow', window: 'plastic-clear', zip: 'rubber-yellow', glove: 'jade-green', cuff: 'plastic-matte-black', boot: 'plastic-matte-black', sole: 'plastic-charcoal' })
+  h.compound('hazmat_suit', 3.8, coverall({ w: 0.5, d: 0.42, ht: 0.14, hood: 0.3, win: [0.22, 0.13], gloves: true, boots: true, rim: true }), { cloth: 'rubber-yellow', hood: 'rubber-yellow', window: 'plastic-clear', zip: 'rubber-yellow', glove: 'jade-green', cuff: 'plastic-matte-black', boot: 'plastic-matte-black', sole: 'plastic-charcoal' }) + { title: 'Hazmat suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['radiation', 'safety-gear'], tags: { material: ['rubber'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head', 'hands', 'feet'], state: ['folded'] } } },
 ]

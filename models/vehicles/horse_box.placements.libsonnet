@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'horse_box.spec.libsonnet';
 local axleIds = std.range(0, std.length(s.axles) - 1);
 {
+  title: 'Horse box',
   sites: [
     site.one('chassis', 'horse_box_chassis'),
     site.one('floor', 'horse_box_floor'),

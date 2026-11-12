@@ -1,6 +1,6 @@
 // The model taxonomy: the vocabulary in models/taxonomy.json, the inheritance rule that resolves a row's taxonomy over
 // its defaults, and the report that holds every model's taxonomy to the vocabulary and lists its keywords not yet curated. Why it is shaped this way is in
-// models/TAXONOMY.md; tools/check-taxonomy.mjs collects the models' taxonomies and runs the report.
+// models/TAXONOMY.md; tools/check-sources.mjs collects the models' taxonomies and runs the report.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 

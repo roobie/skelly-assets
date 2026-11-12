@@ -82,7 +82,7 @@ local foldedScarf(w, d, ht, folds) =
       // The ties that hold the flaps up, knotted over the crown.
       box('tie', 'tie', [-0.004, 0.112, -0.03], [0.004, 0.118, 0.03]),
       box('tie-knot', 'tie', [-0.008, 0.112, -0.008], [0.008, 0.122, 0.008]),
-    ], { cloth: 'cloth-red', check: 'cloth-black', tie: 'cord-cotton' })
+    ], { cloth: 'cloth-red', check: 'cloth-black', tie: 'cord-cotton' }) + { title: 'Hunting cap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A grey wool knit hat standing upright, 190 mm across and 200 mm tall: a soft rounded crown over a deep ribbed
@@ -96,7 +96,7 @@ local foldedScarf(w, d, ht, folds) =
       ring('course-%d' % i, 'knit', crownR(0.086, 0.2, 2.2, y + 0.004) - 0.003, crownR(0.086, 0.2, 2.2, y) + 0.002, y, y + 0.004)
       for i in std.range(0, 5)
       for y in [0.08 + 0.018 * i]
-    ], { knit: 'wool-grey', cuff: 'felt-grey' })
+    ], { knit: 'wool-grey', cuff: 'felt-grey' }) + { title: 'Knit hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A green-grey cotton utility cap standing on its band, 250 mm across the top and 260 mm from back to peak, 110
@@ -111,7 +111,7 @@ local foldedScarf(w, d, ht, folds) =
   ] + seams('seam', 'seam', 0.01, 0.118, 8, 0.104)
     + sector('peak', 'cloth', 0.085, 0.094, 0.16, -70, 70, 10, 0.02, 0.028)
     + sector('peak-edge', 'seam', [0.089, 0.152], 0.094, 0.162, -66, 66, 10, 0.028, 0.03),
-    { cloth: 'cloth-ucp', band: 'cloth-ucp', seam: 'cloth-charcoal' })
+    { cloth: 'cloth-ucp', band: 'cloth-ucp', seam: 'cloth-charcoal' }) + { title: 'Eight-point cap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A brown wool newsboy cap standing on its band, 250 mm across and 260 mm from back to peak, 95 mm tall: a full,
@@ -122,7 +122,7 @@ local foldedScarf(w, d, ht, folds) =
     h.disc('button', 'button', 0.012, 0.098, 0.106, 0, 0.012),
   ] + seams('seam', 'seam', 0.014, 0.075, 8, 0.096, 0.0025)
     + sector('peak', 'cloth', 0.08, 0.09, 0.15, -65, 65, 10, 0.022, 0.03),
-    { cloth: 'cloth-brown', band: 'cloth-brown', seam: 'cloth-charcoal', button: 'cloth-brown' })
+    { cloth: 'cloth-brown', band: 'cloth-brown', seam: 'cloth-charcoal', button: 'cloth-brown' }) + { title: 'Newsboy cap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A pair of padded cotton ear pads laid flat, 280 mm across with their cord: two round pads 90 mm wide and 25 mm
@@ -138,7 +138,7 @@ local foldedScarf(w, d, ht, folds) =
     box('cord-back', 'cord', [-0.05, 0.008, -0.035], [0.05, 0.012, -0.031]),
     box('tie-l2', 'cord', [-0.15, 0.002, 0.01], [-0.132, 0.006, 0.014]),
     box('tie-r2', 'cord', [0.132, 0.002, 0.01], [0.15, 0.006, 0.014]),
-  ], { pad: 'cloth-charcoal', rim: 'cloth-black', cord: 'cord-cotton' })
+  ], { pad: 'cloth-charcoal', rim: 'cloth-black', cord: 'cord-cotton' }) + { title: 'Ear pads' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // An orange felt sombrero resting on its brim, 600 mm across and 260 mm tall: a broad brim rolled up at the edge
@@ -159,14 +159,14 @@ local foldedScarf(w, d, ht, folds) =
   ] + [
     box('strap', 'strap', [-0.004, 0.012, 0.1], [0.004, 0.022, 0.235]),
     box('strap-2', 'strap', [0.02, 0.012, 0.1], [0.028, 0.022, 0.225]),
-  ], { felt: 'cloth-orange', white: 'cloth-cream', yellow: 'cloth-yellow', strap: 'cord-cotton' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
+  ], { felt: 'cloth-orange', white: 'cloth-cream', yellow: 'cloth-yellow', strap: 'cord-cotton' }) + { title: 'Sombrero' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A navy cotton headscarf folded square, 220 mm by 200 mm and 25 mm tall, a hemmed edge on top and a pin through
   // the corner.
   h.compound('hijab', 0.13, foldedScarf(0.22, 0.2, 0.025, 4) + [
     box('pin', 'pin', [0.06, 0.028, 0.06], [0.1, 0.031, 0.063]),
     h.disc('pin-head', 'pin', 0.005, 0.026, 0.034, 0.058, 0.0615),
-  ], { cloth: 'cloth-navy', hem: 'cloth-navy', pin: 'metal-silver' })
+  ], { cloth: 'cloth-navy', hem: 'cloth-navy', pin: 'metal-silver' }) + { title: 'Hijab' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A black cotton skullcap resting on its rim, 150 mm across and 32 mm tall: a shallow round dome with a band of
@@ -175,7 +175,7 @@ local foldedScarf(w, d, ht, folds) =
     crown('dome', 'cloth', 0.075, 0.032, 1.8),
     ring('band', 'stitch', crownR(0.075, 0.032, 1.8, 0.012) - 0.003, crownR(0.075, 0.032, 1.8, 0.006) + 0.0015, 0.006, 0.012),
   ] + ribs('mark', 'stitch', crownR(0.075, 0.032, 1.8, 0.02) - 0.002, crownR(0.075, 0.032, 1.8, 0.016) + 0.0015, 12, 6, 0.014, 0.018),
-    { cloth: 'cloth-black', stitch: 'cloth-cream' })
+    { cloth: 'cloth-black', stitch: 'cloth-cream' }) + { title: 'Kippah' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A cream cotton cap standing on its rim, 180 mm across and 90 mm tall: a straight brimless band rounded over a
@@ -186,7 +186,7 @@ local foldedScarf(w, d, ht, folds) =
     ring('emb-bottom', 'emb', 0.086, 0.09, 0.012, 0.016),
   ] + ribs('emb', 'emb', 0.086, 0.09, 24, 5, 0.022, 0.044, 0)
     + h.crescent('top-ring', 'emb', 0.045, 0.05, 0, 360, 16, 0.09, 0.093),
-    { cloth: 'cloth-cream', emb: 'cloth-yellow' })
+    { cloth: 'cloth-cream', emb: 'cloth-yellow' }) + { title: 'Kufi cap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A white frilled headpiece laid flat, 200 mm across and 70 mm deep: a stiff crescent band edged with a pleated
@@ -208,7 +208,7 @@ local foldedScarf(w, d, ht, folds) =
                box('tie-r', 'ribbon', [0.066, 0, -0.032], [0.11, 0.003, -0.024]),
                box('bow', 'ribbon', [-0.012, 0.011, 0.034], [0.012, 0.016, 0.044]),
              ],
-             { cloth: 'cloth-bright-white', frill: 'cloth-bright-white', ribbon: 'satin-black' })
+             { cloth: 'cloth-bright-white', frill: 'cloth-bright-white', ribbon: 'satin-black' }) + { title: 'Frilled headpiece' }
   + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A black cotton face veil folded flat, 220 mm by 200 mm and 22 mm tall: the eye slit's bound edges showing on the
@@ -219,7 +219,7 @@ local foldedScarf(w, d, ht, folds) =
     box('slit', 'slit', [-0.075, 0.022, 0.016], [0.075, 0.023, 0.03]),
     box('tie-l', 'trim', [-0.1, 0.002, -0.17], [-0.092, 0.006, -0.1]),
     box('tie-r', 'trim', [0.092, 0.002, -0.17], [0.1, 0.006, -0.1]),
-  ], { cloth: 'cloth-black', hem: 'cloth-black', trim: 'cloth-charcoal', slit: 'satin-black' })
+  ], { cloth: 'cloth-black', hem: 'cloth-black', trim: 'cloth-charcoal', slit: 'satin-black' }) + { title: 'Niqab' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['face'] } } },
 
   // A black cotton pointed hat resting on its brim, 400 mm across and 360 mm tall: a broad flat brim and a tall cone
@@ -233,7 +233,7 @@ local foldedScarf(w, d, ht, folds) =
     ring('band', 'band', 0.0, 0.094, 0.012, 0.04),
     box('buckle', 'buckle', [-0.018, 0.016, 0.088], [0.018, 0.038, 0.097]),
     box('buckle-hole', 'band', [-0.011, 0.022, 0.094], [0.011, 0.032, 0.098]),
-  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' }) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
+  ], { cloth: 'cloth-charcoal', band: 'cloth-purple', buckle: 'brass-dull' }) + { title: 'Pointed hat' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A grey felted cotton porkpie hat resting on its brim, 270 mm across and 95 mm tall: a short flat-topped crown
   // with a round channel pressed into its top, a black ribbon band and a narrow brim turned up all round.
@@ -245,7 +245,7 @@ local foldedScarf(w, d, ht, folds) =
     ], [0, 0.008, 0]),
     ring('band', 'band', 0.0, 0.094, 0.008, 0.032),
     box('bow', 'band', [0.088, 0.014, -0.012], [0.098, 0.03, 0.012]),
-  ], { cloth: 'felt-grey', band: 'satin-black' })
+  ], { cloth: 'felt-grey', band: 'satin-black' }) + { title: 'Pork pie hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A blue-grey cotton mail carrier's peaked cap standing on its band, 240 mm across and 270 mm from back to peak,
@@ -264,7 +264,7 @@ local foldedScarf(w, d, ht, folds) =
       h.turned('button-l', 'button', 'x', [[0, 0], [0, 0.005], [0.005, 0.004], [0.005, 0]], [0.089, 0.025, 0.03]),
       h.turned('button-r', 'button', 'x', [[0, 0], [0, 0.004], [0.005, 0.005], [0.005, 0]], [-0.094, 0.025, 0.03]),
     ],
-    { cloth: 'cloth-blue', band: 'cloth-navy', seam: 'cloth-navy', peak: 'vinyl-black', badge: 'cloth-cream', eagle: 'cloth-navy', button: 'metal-silver' })
+    { cloth: 'cloth-blue', band: 'cloth-navy', seam: 'cloth-navy', peak: 'vinyl-black', badge: 'cloth-cream', eagle: 'cloth-navy', button: 'metal-silver' }) + { title: 'Mail carrier cap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A red cotton holiday hat standing on its trim, 220 mm across and 220 mm tall: a soft cone flopping over to one
@@ -277,6 +277,6 @@ local foldedScarf(w, d, ht, folds) =
     // The tip's last stretch hangs down beside the cone, narrowing to the pompom.
     h.turned('droop', 'cloth', 'y', [[0, 0], [0, 0.011], [0.07, 0.022], [0.07, 0]], [0.12, 0.105, 0]),
     ball('pompom', 'fur', 0.03, 0.12, 0.09, 0),
-  ], { cloth: 'cloth-red', fur: 'fur-pale' })
+  ], { cloth: 'cloth-red', fur: 'fur-pale' }) + { title: 'Santa hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['head'] } } },
 ]

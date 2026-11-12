@@ -77,11 +77,11 @@ local fittings(name, id) =
 
 {
   // Every class's neck row and every tank's strap, body and fused rows.
-  rows: [assembly.row(c.neck.id, c.neck.massKg, neck(c)) for c in std.objectValues(classes)]
+  rows: [assembly.row(c.neck.id, c.neck.title, c.neck.massKg, neck(c)) for c in std.objectValues(classes)]
         + std.flattenArrays([
           local t = tanks[name];
-          [assembly.row(strapId(name), t.strapKg, strap(t, classOf(name)))]
-          + assembly.rows(fusedId(name), bodyId(name), t.massKg, body(t, classOf(name)), fittings(name, 'fuel_tank'))
+          [assembly.row(strapId(name), t.title + ' strap', t.strapKg, strap(t, classOf(name)))]
+          + assembly.rows(fusedId(name), bodyId(name), t.title, t.title + ' body', t.massKg, body(t, classOf(name)), fittings(name, 'fuel_tank'))
           for name in std.objectFields(tanks)
         ]),
   // The tanks, by the names `sites` takes.

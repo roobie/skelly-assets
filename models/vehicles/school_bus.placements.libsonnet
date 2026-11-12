@@ -3,6 +3,7 @@ local bus = import 'bus-body.libsonnet';
 local s = import 'school_bus.spec.libsonnet';
 local headerX(y) = bus.layout(s).xf(y) + 0.03;
 {
+  title: 'School bus',
   sites: bus.fittings(site.kit, 'school_bus', s) + [
     site.one('rear_door', 'school_bus_rear_door'),
     site.one('stop_arm', 'school_bus_stop_arm', [2.95, 1.5, -s.side - 0.03]),

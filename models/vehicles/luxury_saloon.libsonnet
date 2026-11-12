@@ -2,10 +2,11 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local s = import 'luxury_saloon.spec.libsonnet';
+local vehicle = import 'luxury_saloon.placements.libsonnet';
 local nose = s.front - 0.075;
 local hoodNose = s.hoodBack - (nose - s.aPost) * s.hoodFall;
 local vane = 0.0625;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('luxury_saloon', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('luxury_saloon', vehicle.title, s) + [
   k.compound('luxury_saloon_grille', 9, [
     box('head', 'bright', [nose, hoodNose - 0.03, -0.34], [nose + 0.075, hoodNose + 0.03, 0.34]),
     box('foot', 'bright', [nose, 0.53, -0.34], [nose + 0.075, 0.57, 0.34]),
@@ -16,11 +17,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libson
   ]) + [
     box('vane_' + i, 'bright', [nose + 0.04, 0.57, -0.3 + 2 * i * vane], [nose + 0.07, hoodNose - 0.03, -0.3 + (2 * i + 1) * vane])
     for i in std.range(0, 4)
-  ], { bright: 'steel-bright', dark: 'plastic-black' }),
+  ], { bright: 'steel-bright', dark: 'plastic-black' }) + { title: 'Luxury saloon grille' },
   k.compound('luxury_saloon_brightwork', 3, k.bothSides([
     box('front_sill', 'bright', [s.bFront, 0.4, s.side - 0.02], [s.cowl, 0.44, s.side + 0.03]),
     box('rear_sill', 'bright', [s.rearDoorArch, 0.4, s.side - 0.02], [s.bRear, 0.44, s.side + 0.03]),
     box('front_belt', 'bright', [s.bFront, s.waist - 0.03, s.side - 0.02], [s.cowl, s.waist, s.side + 0.03]),
     box('rear_belt', 'bright', [s.rearDoorArch, s.waist - 0.03, s.side - 0.02], [s.bRear, s.waist, s.side + 0.03]),
-  ]), { bright: 'steel-bright' }),
+  ]), { bright: 'steel-bright' }) + { title: 'Luxury saloon brightwork' },
 ])

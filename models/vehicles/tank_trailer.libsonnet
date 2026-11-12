@@ -22,14 +22,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('guard_arm', 'frame', [s.axle - 0.05, 0.75, 0.55], [s.axle + 0.05, 0.78, 0.92]),
   ]) + [
     box('hose_hanger', 'frame', [0.58, s.frameLow, 0.55], [0.64, 0.8, 0.72]),
-  ] + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameLow + 0.1]), finish),
+  ] + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameLow + 0.1]), finish) + { title: 'Tank trailer chassis' },
   // Stepped to hug the barrel, which sinks into each saddle's top step.
   k.compound('tank_trailer_saddle', 18, [
     box('base', 'frame', [-0.06, s.frameHigh, -0.55], [0.06, 0.84, 0.55]),
   ] + bothSides([
     box('low', 'frame', [-0.06, 0.84, 0.3], [0.06, 0.98, 0.55]),
     box('high', 'frame', [-0.06, 0.98, 0.45], [0.06, 1.12, 0.57]),
-  ]), finish),
+  ]), finish) + { title: 'Tank trailer saddle' },
   k.compound('tank_trailer_barrel', 340, [
     section('shell', 'paint', s.radius, s.barrelRear, s.barrelFront),
     section('rear_dish', 'paint', 0.5, s.barrelRear - 0.08, s.barrelRear),
@@ -45,13 +45,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   + [section('band_' + i, 'frame', s.radius + 0.012, bandAt[i], bandAt[i] + 0.04) for i in std.range(0, std.length(bandAt) - 1)]
   + bothSides([
     box('side_plate', 'plate', [-0.2, 1.3, 0.56], [0.25, 1.56, 0.635]),
-  ]), finish { chrome: 'steel-bright', plate: 'plastic-orange' }),
+  ]), finish { chrome: 'steel-bright', plate: 'plastic-orange' }) + { title: 'Tank trailer barrel' },
   k.compound('tank_trailer_walkway', 22, [
     box('tread', 'tread', [0.12, 2.03, -0.18], [1.1, 2.06, 0.18]),
     box('tread_rear', 'tread', [-1.3, 2.03, -0.18], [-0.53, 2.06, 0.18]),
     box('foot_front', 'frame', [0.5, 1.98, -0.1], [0.56, 2.03, 0.1]),
     box('foot_rear', 'frame', [-1.0, 1.98, -0.1], [-0.94, 2.03, 0.1]),
-  ], { tread: 'steel-galvanised', frame: s.frame }),
+  ], { tread: 'steel-galvanised', frame: s.frame }) + { title: 'Tank trailer walkway' },
   k.compound('tank_trailer_ladder', 9, [
     box('rung_' + i, 'steel', [s.barrelRear - 0.16, 1.1 + 0.2 * i, -0.2], [s.barrelRear - 0.12, 1.13 + 0.2 * i, 0.2])
     for i in std.range(0, 4)
@@ -59,11 +59,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('rail', 'steel', [s.barrelRear - 0.16, 1.0, 0.2], [s.barrelRear - 0.12, 2.06, 0.24]),
     box('top_stay', 'steel', [s.barrelRear - 0.16, 1.96, 0.2], [s.barrelRear + 0.1, 2.0, 0.24]),
     box('low_stay', 'steel', [s.barrelRear - 0.16, 1.02, 0.2], [s.barrelRear - 0.02, 1.06, 0.24]),
-  ]), { steel: 'steel-galvanised' }),
+  ]), { steel: 'steel-galvanised' }) + { title: 'Tank trailer ladder' },
   k.compound('tank_trailer_hose', 12, [
     k.turned('hose', 'hose', 'x', k.disc(0.045, -1.1, 0.72), [0, 0.84, 0.66]) + { sides: 8 },
     box('front_clip', 'steel', [0.56, 0.8, 0.6], [0.66, 0.9, 0.72]),
     box('rear_clip', 'steel', [s.axle - 0.05, 0.78, 0.6], [s.axle + 0.05, 0.89, 0.72]),
-  ], { hose: 'rubber-black', steel: 'steel-galvanised' }),
-  h.mudguard('tank_trailer_mudguard', 8, s.axle, s.hub, 0.4, 0.43, [0.82, s.wheelZ + 0.14], s.frame),
+  ], { hose: 'rubber-black', steel: 'steel-galvanised' }) + { title: 'Tank trailer hose' },
+  h.mudguard('tank_trailer_mudguard', 8, s.axle, s.hub, 0.4, 0.43, [0.82, s.wheelZ + 0.14], s.frame) + { title: 'Tank trailer mudguard' },
 ])

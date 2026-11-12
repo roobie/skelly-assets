@@ -3,6 +3,7 @@ local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'saloon.spec.libsonnet';
 {
+  title: 'Hybrid saloon',
   parent: 'saloon',
   sites(base): powertrain.hybrid(base, {
     over: { front_bumper: { part: 'hybrid_saloon_front_bumper' } },

@@ -1,42 +1,48 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { clearanceProbe, coveredSurface, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { clearanceProbe, COINCIDENT, coveredSurface, posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
+import { hides } from '../../site/hiding.mjs';
 import { add, applyPoint, boneTransforms, dot, length, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
-import { modelTaxonomies } from '../check-taxonomy.mjs';
+import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { partStrokes, poseJson, pressCheckPoses, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
+import { CLEAN, counted } from './findings.mjs';
 
 // The doll, some garments and the press check's rifle built from the repo's own content, so these check the rig, the
 // fixtures, the probe and the fitted shells against the doll as it is drawn, not against a stand-in.
 const repo = resolve(import.meta.dirname, '../..');
 const WEAR = 'leather_jacket';
-// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet).
-const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers'];
+// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet), and the sleeveless top whose
+// armholes stand beside the arm (models/catalogue/worn.libsonnet).
+const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_top'];
 const pressCheck = readPressCheck(repo);
-const sources = await modelTaxonomies(repo);
+const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
 const wears = [WEAR, ...CLOTHES];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
 
-// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, as the
-// manifest would list them.
+// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy and what
+// they cover, from the model entry the thing export writes beside each (a gun export writes none), as the manifest
+// would list them.
 const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
 const manifest = {
   models: readdirSync(built).flatMap((pack) => readdirSync(join(built, pack, 'assets/models')).map((file) => {
     const id = file.slice(0, -'.glb'.length);
-    return { id, pack, path: `assets/models/${file}`, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
+    const entry = join(built, pack, 'things', `${id}.model.json`);
+    const { covers } = existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')) : {};
+    return { id, pack, path: `assets/models/${file}`, covers, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
   })),
 };
 const dressing = readDressing(repo);
@@ -82,7 +88,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
   const jacket = { body: rest.body, pieces };
   const surface = coveredSurface(rig, jacket);
   assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), 'the boxes cover the body');
-  assert.deepEqual(clearanceProbe(rig, jacket, surface)(still), { pokes: [], flush: [], sinks: [], seams: [] });
+  assert.deepEqual(counted(clearanceProbe(rig, jacket, surface)(still)), CLEAN);
 });
 
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
@@ -245,4 +251,31 @@ test('each fitted everyday garment covers the body and leaves none of it poking 
     const { pokes } = clearanceProbe(rig, dressed, surface)(still);
     assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
   }
+});
+
+test('a garment that leaves regions of a part bare leaves none of their skin below the top of the regions it covers', () => {
+  // A piece that declares what it covers is not meant to cover the other regions it passes beneath, so the rest probe
+  // above cannot see their skin poke through its wall. Below the top of the regions it does cover, that skin lies where
+  // the wall wraps the part, so it would.
+  const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
+  let checked = 0;
+  for (const wear of CLOTHES) {
+    const dressed = restIn(wear);
+    const plain = dressed.pieces.map(({ covers, ...piece }) => piece);
+    dressed.pieces.forEach(({ piece, bone, covers }, index) => {
+      const body = dressed.body.find((entry) => entry.bone === bone);
+      // Covering the whole part leaves no bare region to probe; only the cost of the probe is saved by skipping it.
+      if (!covers || covers.includes(body.part)) return;
+      const [declared] = coveredSurface(rig, { body: [body], pieces: dressed.pieces });
+      const [undeclared] = coveredSurface(rig, { body: [body], pieces: plain });
+      const height = ({ point }) => dot(point, axes.get(bone));
+      const top = declared.samples.reduce((most, sample) => (hides(covers, body.part, sample.region) ? Math.max(most, height(sample)) : most), -Infinity);
+      if (top === -Infinity) return;
+      checked += 1;
+      const bare = declared.samples.filter(({ cover }, i) => cover < 0 && undeclared.samples[i].cover === index);
+      const below = bare.filter((sample) => height(sample) < top - COINCIDENT);
+      assert.equal(below.length, 0, `${wear}: ${piece} passes beneath bare skin below the top of ${covers}`);
+    });
+  }
+  assert.ok(checked > 0, 'no garment declares a region narrower than its part, so nothing was checked');
 });

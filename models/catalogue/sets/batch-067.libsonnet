@@ -27,7 +27,7 @@ local seat(y, w) = [
     turned('bucket', 'lid', 'y', [[0, 0], [0, 0.1], [0.2, 0.125], [0.2, 0]], [0, 0.08, 0]),
     box('hinge', 'body', [-0.12, 0.30, -0.165], [0.12, 0.315, -0.15]),
     box('lid', 'lid', [-0.15, 0.31, -0.165], [0.15, 0.58, -0.15]),
-  ], { body: 'plastic-grey', seat: 'plastic-white', lid: 'plastic-white', leg: 'plastic-grey', bag: 'plastic-black' }) + {
+  ], { body: 'plastic-grey', seat: 'plastic-white', lid: 'plastic-white', leg: 'plastic-grey', bag: 'plastic-black' }) + { title: 'Camp toilet' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['camping'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
@@ -43,7 +43,7 @@ local seat(y, w) = [
     box('handle-a', 'seat', [-0.05, 0.012, 0.14], [-0.04, 0.026, 0.16]),
     box('handle-b', 'seat', [0.04, 0.012, 0.14], [0.05, 0.026, 0.16]),
     box('handle', 'seat', [-0.05, 0.012, 0.15], [0.05, 0.026, 0.162]),
-  ], { body: 'plastic-grey', seat: 'plastic-grey', lid: 'plastic-white', leg: 'plastic-grey' }) + {
+  ], { body: 'plastic-grey', seat: 'plastic-grey', lid: 'plastic-white', leg: 'plastic-grey' }) + { title: 'Folded camp toilet' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', keywords: ['camping'], tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] } } },
 
@@ -57,7 +57,7 @@ local seat(y, w) = [
       alongX('strap', 'strap', [[0.0, 0.0345], [0.03, 0.0345]], 0.035),
       box('strap-tab', 'strap', [0.0, 0.065, -0.01], [0.045, 0.07, 0.01]),
       alongX('ferrule', 'shaft', [[0.45, 0.005], [0.53, 0.0025], [0.545, 0.001]], 0.035),
-    ], { handle: 'wood-walnut', shaft: 'alu-bare', canopy: 'nylon-black', strap: 'cloth-charcoal' }) + h.gripOn('umbrella', 'grip') + {
+    ], { handle: 'wood-walnut', shaft: 'alu-bare', canopy: 'nylon-black', strap: 'cloth-charcoal' }) + { title: 'Umbrella' } + h.gripOn('umbrella', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal', 'fabric'], setting: ['modern'] } } },
 
@@ -72,7 +72,7 @@ local seat(y, w) = [
     local a = std.pi * i / 6;
     box('hole-%d' % i, 'groove', [0.0415 * std.sin(a) - 0.003, 0.0145, 0.0415 * std.cos(a) - 0.003], [0.0415 * std.sin(a) + 0.003, 0.0205, 0.0415 * std.cos(a) + 0.003])
     for i in std.range(0, 11)
-  ], { stone: 'stone-grey', groove: 'paint-charcoal' }) + h.inHand('spiral_stone', 'stone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { stone: 'stone-grey', groove: 'paint-charcoal' }) + { title: 'Spiral stone' } + h.inHand('spiral_stone', 'stone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A pocket whistle gadget 7 cm long: an orange whistle body with a mouthpiece at -x, a compass on top, a strip
   // thermometer on its front (+z), a magnifier lens at +x and a lanyard ring.
@@ -91,7 +91,7 @@ local seat(y, w) = [
     turned('lens', 'lens', 'x', [[0, 0], [0, 0.0075], [0.0045, 0.0075], [0.0045, 0]], [0.022, 0.007, 0]),
   ] + h.crescent('loop', 'trim', 0.003, 0.005, 0, 360, 8, 0.002, 0.005, -0.028, -0.012), {
     body: 'plastic-orange', dark: 'plastic-black', trim: 'plastic-charcoal', face: 'enamel-white', needle: 'plastic-red', lens: 'glass-clear',
-  }) + h.inHand('whistle_multitool', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Whistle multitool' } + h.inHand('whistle_multitool', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A five-string banjo 82 cm long lying face up, neck along +x, drawn full size and scaled by 0.75 towards the
   // reference's 72 cm: a wooden resonator pot 25 cm across with a steel
@@ -123,7 +123,7 @@ local seat(y, w) = [
   ] + [
     box('fret-%d' % i, 'metal', [0.5 - 0.6 * (1 - std.pow(2, -i / 12)), 0.074, -0.016], [0.502 - 0.6 * (1 - std.pow(2, -i / 12)), 0.076, 0.016])
     for i in std.range(1, 17)
-  ], 0.75), { wood: 'wood-walnut', metal: 'steel-stainless', head: 'cloth-cream', bridge: 'wood-birch', board: 'lacquer-black' }) + h.gripOn('banjo', 'neck') + {
+  ], 0.75), { wood: 'wood-walnut', metal: 'steel-stainless', head: 'cloth-cream', bridge: 'wood-birch', board: 'lacquer-black' }) + { title: 'Banjo' } + h.gripOn('banjo', 'neck') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
@@ -146,7 +146,7 @@ local seat(y, w) = [
     for i in std.range(0, 7)
   ]) + [
     box('badge', 'badge', [-0.015, 0.09, 0.129], [0.015, 0.11, 0.132]),
-  ], { shell: 'lacquer-red', metal: 'steel-stainless', head: 'cloth-cream', badge: 'brass' }) + h.inHand('tom_drum', 'shell') + {
+  ], { shell: 'lacquer-red', metal: 'steel-stainless', head: 'cloth-cream', badge: 'brass' }) + { title: 'Tom drum' } + h.inHand('tom_drum', 'shell') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
@@ -169,7 +169,7 @@ local seat(y, w) = [
       box('tack-%d' % i, 'tack', [0.139 * s - 0.003, 0.234, 0.139 * c - 0.003], [0.139 * s + 0.003, 0.24, 0.139 * c + 0.003]),
     ]
     for i in std.range(0, 11)
-  ]), { shell: 'wood-oak', head: 'skin-rawhide', cord: 'jute', tack: 'steel-grey' }) + h.inHand('hide_drum', 'shell') + {
+  ]), { shell: 'wood-oak', head: 'skin-rawhide', cord: 'jute', tack: 'steel-grey' }) + { title: 'Hide drum' } + h.inHand('hide_drum', 'shell') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 ]

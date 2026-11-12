@@ -56,6 +56,7 @@ local transferX(s) = s.cabBack - 0.25;
 local frontShaft(s) = { from: transferX(s) + 0.24, to: s.frontAxle - 0.16, y: 0.6 };
 
 local id = 'military_truck';
+local title = 'Military truck';
 local truckRows(s0) = {
   local s = truckSpec(s0),
   local finish = { paint: s.paint, trim: 'paint-charcoal', glass: 'glass-clear', dark: 'steel-spall-black', frame: s.frame, liner: 'cloth-olive-drab', spring: 'steel-grey' },
@@ -90,7 +91,7 @@ local truckRows(s0) = {
       box('locker', 'paint', [s.lockerX[0], s.lockerY[0], -0.96], [s.lockerX[1], s.lockerY[1], -s.railZ - 0.02]),
       box('locker_lid', 'trim', [s.lockerX[0] + 0.04, s.lockerY[0] + 0.05, -0.97], [s.lockerX[1] - 0.04, s.lockerY[1] - 0.05, -0.96]),
       box('locker_hanger', 'frame', [s.lockerX[0] + 0.1, s.lockerY[1], -0.5], [s.lockerX[1] - 0.1, s.railBottom + 0.04, -s.railZ]),
-    ], finish),
+    ], finish) + { title: title + ' chassis' },
     k.compound(id + '_cab', s.shellMass, bothSides([
       box('sill', 'paint', [s.cabBack, s.floor - 0.12, s.skin], [s.cabFront, s.floor, s.side]),
       box('rear_post', 'paint', [s.cabBack, s.floor, s.skin], [s.doorRear, s.roof, s.side]),
@@ -108,7 +109,7 @@ local truckRows(s0) = {
       box('roof', 'paint', [s.cabBack - 0.02, s.roof, -s.side - 0.02], [s.cabFront + 0.08, s.roof + 0.05, s.side + 0.02]),
       box('roof_crown', 'paint', [s.cabBack + 0.08, s.roof + 0.05, -s.side + 0.12], [s.cabFront - 0.1, s.roof + 0.09, s.side - 0.12]),
       box('headliner', 'liner', [s.cabBack + 0.05, s.roof - 0.02, -s.skin], [s.cabFront - 0.06, s.roof, s.skin]),
-    ], finish),
+    ], finish) + { title: title + ' cab' },
     k.compound(id + '_door', 55, [
       box('skin', 'paint', [s.doorRear, s.floor, s.skin], [s.doorFront, s.waist, s.side]),
       box('rail_rear', 'paint', [s.doorRear, s.waist, s.skin], [s.doorRear + 0.06, s.roof - 0.08, s.side]),
@@ -117,33 +118,33 @@ local truckRows(s0) = {
       box('handle', 'trim', [s.doorRear + 0.08, s.waist - 0.12, s.side], [s.doorRear + 0.22, s.waist - 0.08, s.side + 0.02]),
       box('hinge_top', 'trim', [s.doorFront - 0.03, s.waist - 0.14, s.side], [s.doorFront + 0.04, s.waist - 0.08, s.side + 0.015]),
       box('hinge_low', 'trim', [s.doorFront - 0.03, s.floor + 0.12, s.side], [s.doorFront + 0.04, s.floor + 0.18, s.side + 0.015]),
-    ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
+    ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: title + ' door' },
     k.compound(id + '_windscreen', 26, [
       box('glass_' + side.n, 'glass', [s.cabFront - 0.04, s.waist, side.a], [s.cabFront - 0.01, s.roof - 0.02, side.b])
       for side in [{ n: 'near', a: 0.04, b: s.skin }, { n: 'far', a: -s.skin, b: -0.04 }]
     ] + bothSides([
       box('back_glass', 'glass', [s.cabBack + 0.01, s.waist, 0.12], [s.cabBack + 0.04, s.roof - 0.1, s.skin]),
-    ]), { glass: 'glass-clear' }),
+    ]), { glass: 'glass-clear' }) + { title: title + ' windscreen' },
     k.compound(id + '_fuel_tank', 28, [
       box('tank', 'paint', [-0.45, 0, -0.26], [0.45, 0.52, 0.26]),
       box('filler', 'dark', [0.28, 0.52, -0.05], [0.38, 0.55, 0.05]),
-    ], finish),
+    ], finish) + { title: title + ' fuel tank' },
     k.compound(id + '_dashboard', 25, [
       box('panel', 'trim', [s.cabFront - 0.22, s.floor + 0.42, -s.skin], [s.cabFront - 0.06, s.waist, s.skin]),
       box('column', 'trim', [s.cabFront - 0.3, s.floor + 0.8, -s.seatZ - 0.03], [s.cabFront - 0.22, s.floor + 0.86, -s.seatZ + 0.03]),
-    ], finish),
+    ], finish) + { title: title + ' dashboard' },
     k.compound(id + '_bonnet', 85, [
       prism('top', 'paint', [[s.cabFront, s.bonnetBack - 0.05], [s.nose, s.bonnetFront - 0.05], [s.nose, s.bonnetFront], [s.cabFront, s.bonnetBack]], [-s.bonnetZ, s.bonnetZ]),
     ] + bothSides([
       prism('side', 'paint', [[s.cabFront, s.bonnetLow], [s.nose, s.bonnetLow], [s.nose, s.bonnetFront - 0.04], [s.cabFront, s.bonnetBack - 0.04]], [s.bonnetZ - 0.03, s.bonnetZ]),
-    ] + slats('louvre', 'trim', s.cabFront + 0.3, s.nose - 0.5, 5, function(id, slot, x) box(id, slot, [x, s.bonnetLow + 0.3, s.bonnetZ], [x + 0.08, s.bonnetBack - 0.18, s.bonnetZ + 0.01]))), finish),
+    ] + slats('louvre', 'trim', s.cabFront + 0.3, s.nose - 0.5, 5, function(id, slot, x) box(id, slot, [x, s.bonnetLow + 0.3, s.bonnetZ], [x + 0.08, s.bonnetBack - 0.18, s.bonnetZ + 0.01]))), finish) + { title: title + ' bonnet' },
     k.compound(id + '_grille', 60, [
       box('backing', 'dark', [s.nose - 0.03, s.bonnetLow - 0.04, -s.bonnetZ], [s.nose + 0.03, s.bonnetFront, s.bonnetZ]),
       box('head', 'paint', [s.nose + 0.03, s.bonnetFront - 0.08, -s.bonnetZ - 0.02], [s.nose + 0.08, s.bonnetFront + 0.02, s.bonnetZ + 0.02]),
       box('foot', 'paint', [s.nose + 0.03, s.bonnetLow - 0.04, -s.bonnetZ - 0.02], [s.nose + 0.08, s.bonnetLow + 0.04, s.bonnetZ + 0.02]),
     ] + bothSides([
       box('cheek', 'paint', [s.nose + 0.03, s.bonnetLow - 0.04, s.bonnetZ - 0.04], [s.nose + 0.08, s.bonnetFront + 0.02, s.bonnetZ + 0.02]),
-    ]) + slats('bar', 'paint', -s.bonnetZ + 0.12, s.bonnetZ - 0.12, 9, function(id, slot, z) box(id, slot, [s.nose + 0.03, s.bonnetLow + 0.04, z - 0.025], [s.nose + 0.07, s.bonnetFront - 0.08, z + 0.025])), finish),
+    ]) + slats('bar', 'paint', -s.bonnetZ + 0.12, s.bonnetZ - 0.12, 9, function(id, slot, z) box(id, slot, [s.nose + 0.03, s.bonnetLow + 0.04, z - 0.025], [s.nose + 0.07, s.bonnetFront - 0.08, z + 0.025])), finish) + { title: title + ' grille' },
     k.compound(id + '_wing', 48, flatGuard('guard', 'paint', [s.frontAxle - 0.46, s.frontAxle + 0.72], s.wingTop, 0.3, 0.3, [s.bonnetZ, s.wingZ], 0.05) + [
       box('apron', 'paint', [s.cabFront, s.bonnetLow, s.bonnetZ], [s.frontAxle + 0.72, s.wingTop - 0.05, s.bonnetZ + 0.03]),
       box('lip', 'paint', [s.frontAxle - 0.46, s.wingTop - 0.1, s.wingZ - 0.02], [s.frontAxle + 0.72, s.wingTop - 0.05, s.wingZ]),
@@ -152,38 +153,38 @@ local truckRows(s0) = {
       box('board_tie', 'frame', [s.doorRear + 0.05, s.boardY + 0.05, s.skin - 0.04], [s.doorRear + 0.13, s.floor - 0.12, s.skin]),
       box('step', 'trim', [s.doorRear + 0.22, s.stepY + 0.05, s.side + 0.02], [s.doorFront - 0.2, s.stepY + 0.09, s.side + 0.18]),
       box('step_tread_post', 'frame', [s.doorRear + 0.3, s.stepY + 0.05, s.side + 0.04], [s.doorRear + 0.36, s.boardY, s.side + 0.08]),
-    ], finish),
+    ], finish) + { title: title + ' wing' },
     k.compound(id + '_rear_mudguard', 22, flatGuard('guard', 'paint', [s.rearAxles[1] - s.r - 0.08, s.rearAxles[0] + s.r + 0.08], s.mudguardTop, 0.22, 0.12, [s.railZ + 0.16, s.bedSide - 0.03], 0.04) + [
       box('hanger_fore', 'frame', [s.rearAxles[0] + 0.42, s.mudguardTop, s.railZ + 0.2], [s.rearAxles[0] + 0.5, s.deckBottom, s.railZ + 0.28]),
       box('hanger_aft', 'frame', [s.rearAxles[1] - 0.5, s.mudguardTop, s.railZ + 0.2], [s.rearAxles[1] - 0.42, s.deckBottom, s.railZ + 0.28]),
       box('flap', 'dark', [s.rearAxles[1] - s.r - 0.22, s.r - 0.2, s.railZ + 0.4], [s.rearAxles[1] - s.r - 0.2, s.mudguardTop - 0.26, s.bedSide - 0.03]),
-    ], finish),
+    ], finish) + { title: title + ' rear mudguard' },
     k.compound(id + '_front_bumper', 110, [
       box('bar', 'paint', [s.nose + 0.04, s.bumperLow, -s.wingZ], [s.front, s.bumperTop, s.wingZ]),
     ] + bothSides([
       box('tow_eye', 'dark', [s.front, s.bumperLow + 0.06, 0.5], [s.front + 0.04, s.bumperTop - 0.06, 0.56]),
-    ]), finish),
+    ]), finish) + { title: title + ' front bumper' },
     k.compound(id + '_winch', s.winchMass, [
       k.turned('drum', 'steel', 'z', k.disc(0.17, -0.27, 0.27), [winchX, winchY, 0]) + { sides: 12 },
       box('gearbox', 'casting', [winchX - 0.34, winchY - 0.12, 0.04], [winchX - 0.16, winchY + 0.16, 0.32]),
     ] + bothSides([
       k.turned('flange', 'steel', 'z', k.disc(0.21, 0.27, 0.3), [winchX, winchY, 0]) + { sides: 12 },
       box('cheek', 'frame', [winchX - 0.18, winchY - 0.14, 0.3], [winchX + 0.18, s.railBottom, s.railZ - 0.08]),
-    ]), finish + { steel: 'steel-grey', casting: 'steel-grey' }),
-    mk.wheel(id + '_wheel', s.wheelMass, 0.32, 0.254, s.r, 26, 0.04, s.frame),
+    ]), finish + { steel: 'steel-grey', casting: 'steel-grey' }) + { title: title + ' winch' },
+    mk.wheel(id + '_wheel', s.wheelMass, 0.32, 0.254, s.r, 26, 0.04, s.frame) + { title: title + ' wheel' },
     k.compound(id + '_front_shaft', s.frontShaftMass, [
       k.turned('tube', 'steel', 'x', k.disc(0.04, -(shaft.to - shaft.from) / 2, (shaft.to - shaft.from) / 2)),
-    ], { steel: 'steel-grey' }),
-    mk.driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true),
-    mk.driveAxle(id + '_axle', s.axleMass, 0.93, false),
+    ], { steel: 'steel-grey' }) + { title: title + ' front shaft' },
+    mk.driveAxle(id + '_front_axle', s.frontAxleMass, 0.93, true) + { title: title + ' front axle' },
+    mk.driveAxle(id + '_axle', s.axleMass, 0.93, false) + { title: title + ' rear axle' },
     k.compound(id + '_transfer_case', s.transferCaseMass, [
       box('case', 'casting', [-0.28, 0, -0.3], [0.28, 0.5, 0.3]),
-    ], { casting: 'steel-grey' }),
+    ], { casting: 'steel-grey' }) + { title: title + ' transfer case' },
     k.compound(id + '_rear_bumper', 40, [
       box('bar', 'frame', [s.rear, s.railBottom - 0.22, -s.bedSide + 0.1], [s.rear + 0.1, s.railBottom - 0.08, s.bedSide - 0.1]),
     ] + bothSides([
       box('hanger', 'frame', [s.rear + 0.02, s.railBottom - 0.08, s.railZ - 0.08], [s.rear + 0.1, s.railBottom + 0.04, s.railZ]),
-    ]), finish),
+    ]), finish) + { title: title + ' rear bumper' },
   ],
 }.rows;
 

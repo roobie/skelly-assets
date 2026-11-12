@@ -16,7 +16,11 @@ const boxMesh = (min, max) => {
   ];
   return { positions, indices };
 };
-const merged = (meshes) => meshes.reduce((a, b) => ({ positions: [...a.positions, ...b.positions], indices: [...a.indices, ...b.indices.map((i) => i + a.positions.length / 3)] }), { positions: [], indices: [] });
+const merged = (meshes) => meshes.reduce((a, b) => ({
+  positions: [...a.positions, ...b.positions],
+  indices: [...a.indices, ...b.indices.map((i) => i + a.positions.length / 3)],
+  pieces: [...a.pieces, ...Array(b.indices.length / 3).fill(b.piece)],
+}), { positions: [], indices: [], pieces: [] });
 
 // A torso of two closed regions, as the export keeps them: the trunk below the armpit and the shoulders above it, and
 // an arm beside it on its own bone.

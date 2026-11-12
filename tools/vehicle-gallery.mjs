@@ -26,15 +26,12 @@ const manifest = JSON.parse(readFileSync(join(built, MANIFEST), 'utf8'));
 const sheetPath = join(sheetDir, 'sheet.json');
 if (!existsSync(sheetPath)) throw new Error(`${sheetPath}: no sheet; draw the vehicles with tools/model-sheet.mjs --vehicles`);
 const vehicleTags = new Map(manifest.vehicles.map(({ id, tags }) => [id, tags ?? {}]));
+const vehicleTitles = new Map(manifest.vehicles.map(({ id, title }) => [id, title]));
 const rows = JSON.parse(readFileSync(sheetPath, 'utf8')).filter(({ id }) => vehicleTags.has(id));
 const stale = new Set(staleIds(rows, (id) => lookDigest(built, manifest, id)));
 
 const escapeHtml = (text) =>
   String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-const nameOf = (id) => {
-  const s = id.replace(/_/g, ' ');
-  return s.charAt(0).toUpperCase() + s.slice(1);
-};
 const tileOf = (id) => join(sheetDir, 'tiles', `${id}.png`);
 
 function readReview(id) {
@@ -48,9 +45,9 @@ function readReview(id) {
 
 const vehicles = rows.map((row) => {
   try {
-    return { ...row, name: nameOf(row.id), tags: vehicleTags.get(row.id), stale: stale.has(row.id), ...readReview(row.id) };
+    return { ...row, title: vehicleTitles.get(row.id), tags: vehicleTags.get(row.id), stale: stale.has(row.id), ...readReview(row.id) };
   } catch (error) {
-    return { ...row, name: nameOf(row.id), tags: vehicleTags.get(row.id), broken: String(error) };
+    return { ...row, title: vehicleTitles.get(row.id), tags: vehicleTags.get(row.id), broken: String(error) };
   }
 });
 
@@ -71,7 +68,7 @@ function card(vehicle) {
   const faults = vehicle.review?.faults ?? [];
   const tags = Object.entries(vehicle.tags).map(([facet, terms]) => `<div><dt>${escapeHtml(facet)}</dt><dd>${escapeHtml(terms.join(', '))}</dd></div>`);
   return `<article class="card" id="${escapeHtml(vehicle.id)}">
-  <header><h3>${escapeHtml(vehicle.name)}</h3>${vehicle.stale ? '<span class="pill fault">Render predates model</span>' : ''}${verdict(vehicle)}</header>
+  <header><h3>${escapeHtml(vehicle.title)}</h3>${vehicle.stale ? '<span class="pill fault">Render predates model</span>' : ''}${verdict(vehicle)}</header>
   ${vehicle.broken ? `<p class="note">${escapeHtml(vehicle.broken)}</p>` : ''}
   ${vehicle.error ? `<p class="note">No render: ${escapeHtml(vehicle.error)}</p>` : `<dl>
     <div><dt>L × W × H</dt><dd>${metres(vehicle.sizeM)}</dd></div>
@@ -79,7 +76,7 @@ function card(vehicle) {
     <div><dt>Triangles</dt><dd>${vehicle.triangles.toLocaleString('en-GB')}</dd></div>
     ${tags.join('\n    ')}
   </dl>
-  <figure><img src="${escapeHtml(relative(resolve(out, '..'), tileOf(vehicle.id)))}" alt="${escapeHtml(vehicle.name)}: front and rear three-quarter, side and top views" loading="lazy"></figure>`}
+  <figure><img src="${escapeHtml(relative(resolve(out, '..'), tileOf(vehicle.id)))}" alt="${escapeHtml(vehicle.title)}: front and rear three-quarter, side and top views" loading="lazy"></figure>`}
   ${faults.length > 0 ? `<ul class="faults${vehicle.reviewStale ? ' old' : ''}">${faults.map((fault) => `<li>${escapeHtml(fault)}</li>`).join('')}</ul>` : ''}
 </article>`;
 }

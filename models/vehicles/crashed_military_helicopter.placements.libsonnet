@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'crashed_military_helicopter.spec.libsonnet';
 {
+  title: 'Crashed military helicopter',
   sites: [
     one('fuselage', 'crashed_military_helicopter_fuselage'),
     one('windscreen', 'crashed_military_helicopter_windscreen'),

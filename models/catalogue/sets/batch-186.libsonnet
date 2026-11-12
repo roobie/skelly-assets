@@ -75,19 +75,19 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
   // and 20 mm tall: a cream waistband with its long ties looped back across the top, and two patch pockets at the
   // hem.
   h.compound('waist_apron_long', 0.21, waistApron({ w: 0.24, d: 0.28, ht: 0.02, folds: 3 }),
-             { cloth: 'cloth-black', band: 'cloth-cream', pocket: 'cloth-black', seam: 'cloth-charcoal' })
+             { cloth: 'cloth-black', band: 'cloth-cream', pocket: 'cloth-black', seam: 'cloth-charcoal' }) + { title: 'Waist apron long' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'], setting: ['modern'] } } },
 
   // A short cotton server's apron, about 500 mm wide and 300 mm deep opened out, folded in half to 250 mm by 150 mm
   // and 8 mm thin: a navy waistband with its ties looped back over the top and a row of three pockets.
   h.compound('waist_apron_short', 0.089, waistApron({ w: 0.25, d: 0.15, ht: 0.008, folds: 2, pockets: 3, pd: 0.06 }),
-             { cloth: 'cloth-cream', band: 'cloth-navy', pocket: 'cloth-cream', seam: 'cloth-navy' })
+             { cloth: 'cloth-cream', band: 'cloth-navy', pocket: 'cloth-cream', seam: 'cloth-navy' }) + { title: 'Waist apron short' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'], setting: ['modern'] } } },
 
   // A black cotton witch's dress with full sleeves, folded to 300 mm by 340 mm and 40 mm tall: purple neck and hem
   // trim, pointed cuffs hanging past the hem and a jagged hem of four points.
   h.compound('witch_dress', 0.6, witchDress({ pl: 0.035, cuffL: 0.05 }),
-             { cloth: 'cloth-black', sleeve: 'cloth-black', hole: 'void-black', trim: 'cloth-purple', point: 'cloth-black' })
+             { cloth: 'cloth-black', sleeve: 'cloth-black', hole: 'void-black', trim: 'cloth-purple', point: 'cloth-black' }) + { title: 'Witch dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], setting: ['fantasy'] } } },
 
   // A floor-length black witch's dress folded in a thick bundle, 320 mm by 360 mm and 60 mm tall: purple trim, long
@@ -100,13 +100,13 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
     turned('pouch-cord', 'cord', 'z', [[0, 0.012], [0, 0.016], [0.006, 0.016], [0.006, 0.012], [0, 0.012]], [px, ht + 0.02, pz + 0.048]),
     strip('pouch-tie-l', 'cord', [px - 0.012, pz + 0.052], [px - 0.035, pz + 0.11], ht, 0.005, 0.004),
     strip('pouch-tie-r', 'cord', [px + 0.012, pz + 0.052], [px + 0.02, pz + 0.115], ht, 0.005, 0.004),
-  ], { cloth: 'cloth-black', sleeve: 'cloth-black', hole: 'void-black', trim: 'cloth-purple', point: 'cloth-black', pouch: 'cloth-purple', cord: 'cloth-cream' })
+  ], { cloth: 'cloth-black', sleeve: 'cloth-black', hole: 'void-black', trim: 'cloth-purple', point: 'cloth-black', pouch: 'cloth-purple', cord: 'cloth-cream' }) + { title: 'Long witch dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], setting: ['fantasy'] } } },
 
   // A short purple witch's dress folded small, 280 mm by 260 mm and 30 mm tall: black trim, short pointed cuffs and
   // a jagged hem of three points.
   h.compound('short_witch_dress', 0.34, witchDress({ w: 0.28, d: 0.26, ht: 0.03, folds: 3, sw: 0.065, points: 3, pl: 0.03, cuffL: 0.04, neckR: 0.05 }),
-             { cloth: 'cloth-purple', sleeve: 'cloth-purple', hole: 'void-black', trim: 'cloth-black', point: 'cloth-purple' })
+             { cloth: 'cloth-purple', sleeve: 'cloth-purple', hole: 'void-black', trim: 'cloth-black', point: 'cloth-purple' }) + { title: 'Short witch dress' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], setting: ['fantasy'] } } },
 
   // A wool pullover hoodie folded, 360 mm by 320 mm and 60 mm tall: the hood folded down over the neck with its
@@ -123,13 +123,13 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
                                     strip('cord-r', 'cord', [0.035, d / 2 - 0.11], [0.04, 0.005], ht + 0.014, 0.005, 0.004),
                                   ]
                                   + bandX('hem', 'cuff', -d / 2 + 0.014, 0.026, w - 0.16, ht, 0.004),
-             { cloth: 'knit-wool', sleeve: 'knit-wool', hood: 'knit-wool', cuff: 'wool-grey', pocket: 'knit-wool', cord: 'cloth-cream' })
+             { cloth: 'knit-wool', sleeve: 'knit-wool', hood: 'knit-wool', cuff: 'wool-grey', pocket: 'knit-wool', cord: 'cloth-cream' }) + { title: 'Wool hoodie' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A pair of cotton arm warmers laid flat side by side, each a knit tube 380 mm long tapering from 100 mm at the
   // upper arm to 75 mm at the wrist, ribbed at both ends.
   h.compound('arm_warmers', 0.08, knitTube('l-', -0.06, 0.1, 0.075, 0.38, 0.006, 0.03) + knitTube('r-', 0.06, 0.1, 0.075, 0.38, 0.006, 0.03),
-             { knit: 'cloth-heather-grey', rib: 'cloth-charcoal' })
+             { knit: 'cloth-heather-grey', rib: 'cloth-charcoal' }) + { title: 'Arm warmers' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['arms'], setting: ['modern'] } } },
 
   // A wool belly band laid flat, a knit tube 300 mm wide and 220 mm tall pressed flat to 14 mm: rounded folds down
@@ -147,6 +147,6 @@ local knitTube(prefix, cx, w0, w1, d, t, rb, ribPitch=0.012) =
     local x = -w / 2 + 0.014 + i * 0.008;
     box('rib-%d' % i, 'knit', [x, t, -d / 2 + 0.016], [x + 0.004, t + 0.002, d / 2 - 0.016])
     for i in std.range(0, std.floor((w - 0.028) / 0.008) - 1)
-  ], { knit: 'knit-wool', rib: 'knit-wool' })
+  ], { knit: 'knit-wool', rib: 'knit-wool' }) + { title: 'Bellyband' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 ]

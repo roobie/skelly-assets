@@ -46,7 +46,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     cyl('stub-discharge', 'copper', 'y', 0.0035, 0.16, 0.225, [0.03, 0, -0.02]),
     cyl('stub-process', 'copper', 'y', 0.003, 0.16, 0.215, [0, 0, 0.035]),
     disc('crimp', 'copper', 0.0045, 0.215, 0.22, 0, 0.035),
-  ], { base: 'steel-grey', rubber: 'rubber-black', shell: 'paint-charcoal', seam: 'steel-parkerized', terminal: 'plastic-black', copper: 'copper' })
+  ], { base: 'steel-grey', rubber: 'rubber-black', shell: 'paint-charcoal', seam: 'steel-parkerized', terminal: 'plastic-black', copper: 'copper' }) + { title: 'Compressor' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A heavy V-belt, 2 m round, lying on its side as a loop 640 mm across: 22 mm wide at the back face tapering to
@@ -56,7 +56,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   ] + [
     box('print-%d' % i, 'print', [-0.07 + i * 0.03, 0.007, 0.319], [-0.05 + i * 0.03, 0.015, 0.322])
     for i in std.range(0, 4)
-  ], { belt: 'rubber-black', print: 'paint-white' })
+  ], { belt: 'rubber-black', print: 'paint-white' }) + { title: 'Drive belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['rubber'] } } },
 
   // A belt cobbled from leather strapping, laid out as a loop 860 mm long, 45 mm wide and 7 mm thick, its joint
@@ -73,7 +73,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     box('wrap-%d' % i, 'cord', [x - 0.005, -0.001, -0.159], [x + 0.005, 0.014, -0.101])
     for i in [0, 1]
     for x in [[0.035, 0.125][i]]
-  ], { leather: 'leather-brown', 'leather-dark': 'leather-chestnut', cord: 'cord-cotton', cloth: 'cloth-canvas' })
+  ], { leather: 'leather-brown', 'leather-dark': 'leather-chestnut', cord: 'cord-cotton', cloth: 'cloth-canvas' }) + { title: 'Makeshift drive belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['leather', 'fabric'] }, keywords: ['improvised'] } },
 
   // A panel engine air filter, 240 by 170 mm and 40 mm deep: a black plastic frame round off-white pleated paper,
@@ -88,7 +88,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   ] + [
     h.prism('pleat-%d' % i, 'paper', 'z', [[-0.11 + i * 0.22 / 27, 0.008], [-0.11 + (i + 1) * 0.22 / 27, 0.008], [-0.11 + (i + 0.5) * 0.22 / 27, 0.037]], -0.075, 0.075)
     for i in std.range(0, 26)
-  ], { lip: 'rubber-black', frame: 'plastic-black', valley: 'paperboard-tan', paper: 'paper-white' })
+  ], { lip: 'rubber-black', frame: 'plastic-black', valley: 'paperboard-tan', paper: 'paper-white' }) + { title: 'Air filter' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['paper', 'plastic'] } } },
 
   // A cut-down plastic bottle, 110 mm across and 190 mm long, lying on its side: its neck taped onto a stub of hose
@@ -104,7 +104,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     h.ball('wad-%d' % i, 'paper', w[3], w[0], w[1], w[2])
     for i in std.range(0, 5)
     for w in [[[-0.095, 0.055, 0, 0.03], [-0.1, 0.075, 0.02, 0.02], [-0.098, 0.035, -0.022, 0.022], [-0.1, 0.03, 0.025, 0.018], [-0.097, 0.08, -0.018, 0.019], [-0.11, 0.06, -0.005, 0.016]][i]]
-  ], { bottle: 'plastic-frosted', paper: 'paper-white', hose: 'rubber-black', tape: 'tape-grey' })
+  ], { bottle: 'plastic-frosted', paper: 'paper-white', hose: 'rubber-black', tape: 'tape-grey' }) + { title: 'Makeshift air filter' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['plastic', 'paper'] }, keywords: ['improvised'] } },
 
   // A spin-on oil filter, 100 mm across and 150 mm long, lying on its side with its base plate to the front: a
@@ -121,7 +121,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   ] + [
     cyl('inlet-%d' % i, 'hole', 'z', 0.0045, 0.075, 0.0752, [0.021 * std.cos(std.pi / 3 * i), 0.05 + 0.021 * std.sin(std.pi / 3 * i), 0])
     for i in std.range(0, 5)
-  ], { can: 'paint-drum-blue', band: 'paint-white', seam: 'steel-grey', plate: 'steel-galvanised', gasket: 'rubber-black', hole: 'plastic-black' })
+  ], { can: 'paint-drum-blue', band: 'paint-white', seam: 'steel-grey', plate: 'steel-galvanised', gasket: 'rubber-black', hole: 'plastic-black' }) + { title: 'Oil filter' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] } } },
 
   // A food tin, 85 mm across and 110 mm tall, turned into a filter: a soldered-on lid with two copper hose nipples,
@@ -138,7 +138,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     ring('barb-out', 'copper', 'y', 0.006, 0.0075, 0.138, 0.144, [0.016, 0, 0]),
     disc('bore-in', 'bore', 0.0035, 0.15, 0.1502, -0.016, 0),
     disc('bore-out', 'bore', 0.0035, 0.15, 0.1502, 0.016, 0),
-  ], { can: 'steel-bright', solder: 'lead', tape: 'tape-grey', wire: 'steel-grey', copper: 'copper', bore: 'plastic-black' })
+  ], { can: 'steel-bright', solder: 'lead', tape: 'tape-grey', wire: 'steel-grey', copper: 'copper', bore: 'plastic-black' }) + { title: 'Makeshift oil filter' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] }, keywords: ['improvised'] } },
 
   // A five-point seat harness laid out flat, about 700 mm across and 900 mm long: black webbing 50 mm wide, two
@@ -165,7 +165,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     disc('buckle', 'buckle', 0.05, 0.003, 0.018),
     disc('dial', 'dial', 0.032, 0.018, 0.026),
     box('dial-grip', 'buckle', [-0.028, 0.026, -0.005], [0.028, 0.032, 0.005]),
-  ], { webbing: 'webbing-black', pad: 'cloth-red', steel: 'steel-bright', hole: 'plastic-black', buckle: 'alu-bare', dial: 'paint-red' })
+  ], { webbing: 'webbing-black', pad: 'cloth-red', steel: 'steel-bright', hole: 'plastic-black', buckle: 'alu-bare', dial: 'paint-red' }) + { title: 'Five-point harness' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['fabric'] } } },
 
   // A diesel glow plug, 100 mm long, lying on its side: a terminal stud and nut, a plastic insulating collar, a
@@ -181,7 +181,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     for i in std.range(0, 4)
   ] + [
     turned('heater', 'heater', 'x', [[0, 0], [0, 0.0025], [0.016, 0.0025], [0.018, 0.0015], [0.018, 0]], [0.032, 0.007, 0]),
-  ], { stud: 'brass', collar: 'plastic-black', body: 'steel-bright', thread: 'steel-grey', heater: 'steel-heat-tint' })
+  ], { stud: 'brass', collar: 'plastic-black', body: 'steel-bright', thread: 'steel-grey', heater: 'steel-heat-tint' }) + { title: 'Glow plug' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'vehicle-parts', tags: { material: ['metal'] } } },
 
   // A twin-cylinder industrial compressor pump, 420 mm wide and 420 mm tall: a red cast-iron crankcase on feet, two
@@ -208,7 +208,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     box('pipe-drop-right', 'copper', [0.056, 0.384, 0.055], [0.074, 0.402, 0.089]),
     cyl('intake-left', 'filter', 'y', 0.04, 0.41, 0.45, [-0.075, 0, -0.02]),
     cyl('intake-right', 'filter', 'y', 0.04, 0.41, 0.45, [0.075, 0, -0.02]),
-  ], { iron: 'iron-cast', case: 'paint-red', window: 'plastic-clear', steel: 'steel-grey', wheel: 'paint-red', groove: 'iron-cast', head: 'alu-bare', copper: 'copper', filter: 'paint-charcoal' })
+  ], { iron: 'iron-cast', case: 'paint-red', window: 'plastic-clear', steel: 'steel-grey', wheel: 'paint-red', groove: 'iron-cast', head: 'alu-bare', copper: 'copper', filter: 'paint-charcoal' }) + { title: 'Industrial compressor' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A 400 mm length of heavy-wall steel pipe, 48 mm across with an 11 mm wall, threaded at both ends: one end open
@@ -219,7 +219,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     tube('thread-right', 'thread', 0.013, 0.0243, 0.17, 0.2, 0.0245, 0),
     turned('cap', 'cap', 'x', [[0, 0.0235], [0, 0.0275], [0.035, 0.0275], [0.035, 0], [0.031, 0], [0.031, 0.0235], [0, 0.0235]], [0.174, 0.0245, 0]),
     tube('stripe', 'stripe', 0.023, 0.0242, -0.02, 0.02, 0.0245, 0),
-  ], { pipe: 'steel-grey', thread: 'steel-parkerized', cap: 'plastic-red', stripe: 'paint-crane-yellow' })
+  ], { pipe: 'steel-grey', thread: 'steel-parkerized', cap: 'plastic-red', stripe: 'paint-crane-yellow' }) + { title: 'Heavy-duty pipe' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A loose set of heavy forged steel pipe fittings for 48 mm pipe, spread over about 330 by 230 mm: a 90-degree
@@ -237,7 +237,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
   ] + [
     disc('bolt-hole-%d' % i, 'hole', 0.007, 0.016, 0.0162, 0.12 + 0.05 * std.cos(std.pi / 2 * i + std.pi / 4), 0.07 + 0.05 * std.sin(std.pi / 2 * i + std.pi / 4))
     for i in std.range(0, 3)
-  ], { forged: 'steel-parkerized', flange: 'steel-grey', hole: 'plastic-black' })
+  ], { forged: 'steel-parkerized', flange: 'steel-grey', hole: 'plastic-black' }) + { title: 'Heavy-duty pipe fittings' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A flanged gate valve, 270 mm long and 330 mm tall: a short heavy-wall pipe body with a bolted flange at each end,
@@ -259,7 +259,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     box('spoke-x', 'wheel', [-0.068, 0.263, -0.007], [0.068, 0.275, 0.007]),
     box('spoke-z', 'wheel', [-0.007, 0.263, -0.068], [0.007, 0.275, 0.068]),
     cyl('stem-nut', 'bolt', 'y', 0.01, 0.282, 0.292, [0, 0, 0]),
-  ], { body: 'iron-cast', bolt: 'steel-grey', stem: 'steel-bright', wheel: 'paint-red' })
+  ], { body: 'iron-cast', bolt: 'steel-grey', stem: 'steel-bright', wheel: 'paint-red' }) + { title: 'Heavy-duty gate valve' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A horizontal steel pressure vessel, 3 m long and 600 mm across, with elliptical heads, standing on two saddles:
@@ -306,7 +306,7 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     cyl('lug-eye-left', 'hole', 'z', 0.025, -0.016, 0.016, [-0.6, 0.88, 0]),
     cyl('lug-eye-right', 'hole', 'z', 0.025, -0.016, 0.016, [0.6, 0.88, 0]),
     box('nameplate', 'plate', [-0.6, 0.48, 0.29], [-0.4, 0.6, 0.302]),
-  ], { shell: 'paint-cream', weld: 'steel-grey', saddle: 'paint-charcoal', nozzle: 'steel-grey', cover: 'steel-grey', bolt: 'steel-parkerized', hole: 'plastic-black', plate: 'steel-stainless' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  ], { shell: 'paint-cream', weld: 'steel-grey', saddle: 'paint-charcoal', nozzle: 'steel-grey', cover: 'steel-grey', bolt: 'steel-parkerized', hole: 'plastic-black', plate: 'steel-stainless' }) + { title: 'Large pressure vessel' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 
   // A nitrogen separation membrane module, 600 mm long and 64 mm across: a stainless tube with machined end caps, a
   // brass air inlet and nitrogen outlet on the ends, a vent port near the outlet and a blue label band.
@@ -324,6 +324,6 @@ local finned(id, slot, r0, r1, y0, pitch, fins, x, z) =
     ring('label', 'label', 'x', 0.029, 0.031, -0.12, 0.12, [0, 0.032, 0]),
     box('arrow', 'arrow', [-0.06, 0.0615, -0.006], [0.06, 0.0635, 0.006]),
     h.prism('arrow-head', 'arrow', 'y', [[-0.014, 0.06], [0, 0.085], [0.014, 0.06]], 0.0615, 0.0635),
-  ], { tube: 'steel-stainless', cap: 'alu-bare', groove: 'steel-grey', brass: 'brass', label: 'paint-police-blue', arrow: 'paint-white' })
+  ], { tube: 'steel-stainless', cap: 'alu-bare', groove: 'steel-grey', brass: 'brass', label: 'paint-police-blue', arrow: 'paint-white' }) + { title: 'Nitrogen membrane filter' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
 ]

@@ -3,6 +3,7 @@ local wheelKit = import 'wheel-kit.libsonnet';
 local s = import 'semi_trailer.spec.libsonnet';
 local axleIds = std.range(0, std.length(s.axles) - 1);
 {
+  title: 'Semi trailer',
   sites: [
     site.one('chassis', 'semi_trailer_chassis'),
     site.one('floor', 'semi_trailer_floor'),

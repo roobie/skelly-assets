@@ -21,8 +21,10 @@ shoulders should be.
 
 **Hide by region, not by slot.** The bust's torso is cut into regions along its own solids
 (`tools/packages/thing-authoring-tool/src/families/bust.ts`, `bust`): the trunk below the armpit and the shoulders above
-it. The cut follows existing solids, so it adds no geometry and moves no fit. A garment that covers only part of a
-region needs a finer cut, made when such a garment is added, not in advance.
+it. The cut follows existing solids, so it adds no geometry. Both regions meet at the bust's `armpit` measure, so
+no shoulder skin lies beside the trunk below its top, where a sleeveless shell's side would wrap it without hiding
+it. The trunk stays inside the hanging arm, so a sleeveless shell can enclose it with sides the arm never lies over. A
+garment that covers only part of a region needs a finer cut, made when such a garment is added, not in advance.
 
 **Each region is a closed surface.** The export keeps the faces where two regions meet
 (`tools/packages/thing-export/src/glb.ts`, `voxelPrimitivesFor`), so hiding one region shows the other's closed face,

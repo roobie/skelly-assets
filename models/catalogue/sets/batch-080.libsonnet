@@ -92,7 +92,7 @@ local chainsaw(engine) =
   // reaching 160 mm from the haft and a short poll behind the eye.
   h.compound('ax', 1.6, haft(0.78, 0.016) + axeHead(0.78, 0.10, 0.020, 0.16, 0.15, 0.035), {
     haft: 'wood-oak', head: 'steel-grey', poll: 'steel-grey', edge: 'steel-bright',
-  }) + h.gripOn('ax', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Ax' } + h.gripOn('ax', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A 21 inch tubular bow saw lying flat: a painted steel bow 25 mm across arching 0.27 m over a 0.84 m blade, a
   // black grip on the rear end and a tension lever at the front.
@@ -107,14 +107,14 @@ local chainsaw(engine) =
     box('lever', 'lever', [0.83, -0.014, 0.0], [0.88, 0.014, 0.012]),
     flat('blade', 'blade', [[0.01, -0.018], [0.87, -0.018], [0.87, 0.008], [0.01, 0.008]], -0.002, 0.002),
     flat('teeth', 'teeth', [[0.03, -0.024], [0.85, -0.024], [0.85, -0.018], [0.03, -0.018]], -0.0025, 0.0025),
-  ], { frame: 'paint-red', grip: 'plastic-black', lever: 'plastic-black', blade: 'steel-bright', teeth: 'steel-grey' })
+  ], { frame: 'paint-red', grip: 'plastic-black', lever: 'plastic-black', blade: 'steel-bright', teeth: 'steel-grey' }) + { title: 'Bow saw' }
   + h.gripOn('bow_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // An 18 inch petrol chainsaw 0.82 m long standing on its base: orange powerhead, black handles and a 0.48 m bar.
   h.compound('chainsaw', 7.6, chainsaw(true), {
     body: 'plastic-orange', cover: 'plastic-orange', handle: 'plastic-black', grip: 'rubber-black', guard: 'plastic-black',
     bar: 'steel-bright', chain: 'steel-parkerized', sprocket: 'plastic-charcoal', starter: 'plastic-black', battery: 'plastic-black',
-  }) + h.gripOn('chainsaw', 'rear-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Chainsaw' } + h.gripOn('chainsaw', 'rear-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless 165 mm circular saw 0.44 m long standing on its shoe: the blade on +z under its upper guard with the
   // lower guard below the shoe, the motor on -z, a closed top handle and the battery at the back.
@@ -141,7 +141,7 @@ local chainsaw(engine) =
     ], {
     shoe: 'alu-bare', blade: 'steel-bright', guard: 'alu-bare', lower: 'plastic-red', body: 'plastic-yellow',
     grip: 'rubber-black', handle: 'plastic-black', battery: 'plastic-black',
-  }) + h.gripOn('cordless_circular_saw', 'handle-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Cordless circular saw' } + h.gripOn('cordless_circular_saw', 'handle-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 350 mm hatchet with a cast copper wedge through a split haft, lashed above and below with rawhide.
   h.compound('copper_ax', 0.72, haft(0.35, 0.012) + [
@@ -149,23 +149,23 @@ local chainsaw(engine) =
     flat('wedge-edge', 'edge', [[0.265, 0.062], [0.335, 0.062], [0.338, 0.076], [0.262, 0.076]], -0.003, 0.003),
     wrap('lash-a', 0.262, 0.0135, 0.016),
     wrap('lash-b', 0.334, 0.0135, 0.012),
-  ], { haft: 'wood-birch', head: 'copper', edge: 'copper', lashing: 'skin-rawhide' })
+  ], { haft: 'wood-birch', head: 'copper', edge: 'copper', lashing: 'skin-rawhide' }) + { title: 'Copper ax' }
   + h.gripOn('copper_ax', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
   // An 18 inch battery chainsaw 0.82 m long: green body, battery pack in the top and no starter.
   h.compound('battery_chainsaw', 6.7, chainsaw(false), {
     body: 'plastic-green', cover: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', guard: 'plastic-black',
     bar: 'steel-bright', chain: 'steel-parkerized', sprocket: 'plastic-black', starter: 'plastic-black', battery: 'plastic-charcoal',
-  }) + h.gripOn('battery_chainsaw', 'rear-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Battery chainsaw' } + h.gripOn('battery_chainsaw', 'rear-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A ground stone axe head 150 mm long, 75 mm across the edge and 34 mm thick, lying flat with its edge on +z.
-  h.compound('hand_axe', 0.9, celt('celt', 0, -0.07, 0.08, 0.045, 0.075, 0.017), { stone: 'stone-grey' })
+  h.compound('hand_axe', 0.9, celt('celt', 0, -0.07, 0.08, 0.045, 0.075, 0.017), { stone: 'stone-grey' }) + { title: 'Hand ax' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['stone'], setting: ['prehistoric'] } } },
 
   // A 15 inch carpenter's hatchet: a 380 mm haft and a head with a 95 mm edge and a square hammer poll.
   h.compound('hatchet', 0.9, haft(0.38, 0.014) + axeHead(0.38, 0.075, 0.016, 0.11, 0.095, 0.030), {
     haft: 'wood-walnut', head: 'steel-blued', poll: 'steel-grey', edge: 'steel-bright',
-  }) + h.gripOn('hatchet', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Hatchet' } + h.gripOn('hatchet', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A 560 mm knee-hafted stone adze lying flat: a straight stick with a short foot bent toward +z at its head,
   // a stone blade lashed on the foot's front with its edge across the swing, 50 mm wide.
@@ -177,14 +177,14 @@ local chainsaw(engine) =
     flat('blade-edge', 'stone', [[0.538, 0.150], [0.555, 0.148], [0.551, 0.168], [0.545, 0.168]], -0.023, 0.023),
     bar('lash-a', 'lashing', [0.482, 0.040], [0.545, 0.040], 0.012, -0.021, 0.021),
     bar('lash-b', 'lashing', [0.488, 0.078], [0.550, 0.078], 0.012, -0.021, 0.021),
-  ], { haft: 'wood-oak', stone: 'stone-grey', lashing: 'skin-rawhide' })
+  ], { haft: 'wood-oak', stone: 'stone-grey', lashing: 'skin-rawhide' }) + { title: 'Primitive adze' }
   + h.gripOn('primitive_adze', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
 
   // A 560 mm stone axe lying flat: a ground stone celt through a split stick, bound above and below with rawhide.
   h.compound('primitive_axe', 1, haft(0.56, 0.016) + celt('celt', 0.50, -0.045, 0.11, 0.040, 0.070, 0.015) + [
     wrap('lash-a', 0.462, 0.0185, 0.022),
     wrap('lash-b', 0.538, 0.0185, 0.018),
-  ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' })
+  ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' }) + { title: 'Primitive ax' }
   + h.gripOn('primitive_axe', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
 
   // A 460 mm wood saw lying flat: a 340 mm taper blade, toothed edge on -z, in a closed beech handle held by three
@@ -199,6 +199,6 @@ local chainsaw(engine) =
   ] + [
     h.turned('screw-%d' % i, 'screw', 'y', [[0, 0], [0, 0.0055], [0.026, 0.0055], [0.026, 0]], [0.112, -0.013, [-0.040, 0.0, 0.040][i]])
     for i in [0, 1, 2]
-  ], { handle: 'wood-pine', blade: 'steel-bright', teeth: 'steel-grey', screw: 'brass' })
+  ], { handle: 'wood-pine', blade: 'steel-bright', teeth: 'steel-grey', screw: 'brass' }) + { title: 'Saw' }
   + h.gripOn('saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
 ]

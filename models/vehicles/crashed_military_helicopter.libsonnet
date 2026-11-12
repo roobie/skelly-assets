@@ -95,7 +95,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + blotch('b_far_edge', 'scorch', -1.75, [[325, 340], [335, 350], [318, 355], [300, 340], [302, 322], [300, 312]])
              + blotch('b_nose', 'scorch', 2.75, [[100, 125], [100, 138], [104, 150], [100, 142], [108, 132]])
              + blotch('b_nose_core', 'soot', 3.0, [[105, 122], [108, 130], [112, 124]]),
-             { paint: s.paint, scorch: s.scorch, soot: s.soot, steel: 'steel-grey', glass: 'glass-grey' }),
+             { paint: s.paint, scorch: s.scorch, soot: s.soot, steel: 'steel-grey', glass: 'glass-grey' }) + { title: 'Crashed military helicopter fuselage' },
   k.compound('crashed_military_helicopter_windscreen', 30,
              // The near windscreen is gone, so the burnt cockpit shows through its frame.
              wall('side_near', 'glass', [1.75, 2.55], [14, 100], 0.05)
@@ -104,7 +104,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + wall('door_far', 'glass', [2.68, 3.4], [260, 346], 0.05)
              + wall('screen_far', 'glass', [3.52, s.nose], [260, 346], 0.05)
              + wall('screen_near', 'glass', [3.52, 3.72], [60, 100], 0.05),
-             { glass: 'glass-grey' }),
+             { glass: 'glass-grey' }) + { title: 'Crashed military helicopter windscreen' },
   k.compound('crashed_military_helicopter_cowling', 150,
              wall('far', 'paint', [-2.5, 1.2], [180, 360], 0.06, s.doghouse)
              + wall('crown', 'paint', [-2.5, 1.2], [0, 22], 0.06, s.doghouse)
@@ -116,9 +116,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + blotch('b_sill', 'soot', -1.75, [[118, 158], [118, 148], [118, 170], [118, 142], [118, 150], [118, 138], [118, 134]], s.doghouse)
              + blotch('b_far', 'scorch', -1.9, [[320, 350], [305, 345], [300, 330], [312, 352], [300, 325], [318, 340]], s.doghouse)
              + blotch('b_front', 'scorch', 0.05, [[30, 118], [40, 96], [34, 72]], s.doghouse),
-             { paint: s.paint, scorch: s.scorch, soot: s.soot }),
-  h.turbine('crashed_military_helicopter_engine', 210, 1.5, 0.26, finish='steel-spall-black', dark='plastic-scorched'),
-  h.mast('crashed_military_helicopter_mast', 90, s.hub - s.mastFoot, radius=0.09),
+             { paint: s.paint, scorch: s.scorch, soot: s.soot }) + { title: 'Crashed military helicopter cowling' },
+  h.turbine('crashed_military_helicopter_engine', 210, 1.5, 0.26, finish='steel-spall-black', dark='plastic-scorched') + { title: 'Crashed military helicopter engine' },
+  h.mast('crashed_military_helicopter_mast', 90, s.hub - s.mastFoot, radius=0.09) + { title: 'Crashed military helicopter mast' },
   k.compound('crashed_military_helicopter_main_rotor', 340,
              [
                k.turned('hub', 'head', 'y', k.disc(0.32, s.hub - 0.12, s.hub + 0.04)) + { sides: 12 },
@@ -135,11 +135,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + h.ribbon('c_tip', 'tip', [[5.0, 0.09, -4.35], [5.7, 0.09, -4.5]], 0.5)
              // Kinked upward, then gone at the break.
              + h.ribbon('d', 'blade', [[-0.2, 3.1, -0.2], [-1.2, 3.1, -1.05], [-2.1, 3.42, -1.85], [-3.3, 3.2, -2.9]], 0.5, endWidth=0.16),
-             { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
+             { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }) + { title: 'Crashed military helicopter main rotor' },
   k.compound('crashed_military_helicopter_snapped_blade', 70,
              h.ribbon('blade', 'blade', [[-0.9, 0.08, 3.9], [-2.2, 0.08, 4.5], [-3.6, 0.08, 4.65], [-4.4, 0.09, 5.1]], 0.5, step=0.25)
              + h.ribbon('tip', 'tip', [[-4.4, 0.09, 5.1], [-4.95, 0.09, 5.35]], 0.5, step=0.25),
-             { blade: 'paint-charcoal', tip: 'paint-crane-yellow' }),
+             { blade: 'paint-charcoal', tip: 'paint-crane-yellow' }) + { title: 'Crashed military helicopter rotor blade (snapped)' },
   k.compound('crashed_military_helicopter_tail_boom', 260,
              lyingTube('tear', 'soot', s.boomRoot, along(0.03) + { r: 0.41 }, segments=1)
              + lyingTube('boom', 'paint', along(0.03) + { r: 0.41 }, s.boomTip)
@@ -155,7 +155,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
              + [box('gearbox', 'soot', [tailHub.x - 0.12, tailHub.y - 0.12, tailHub.z - 0.22], [tailHub.x + 0.12, tailHub.y + 0.12, tailHub.z + 0.02])]
              + lyingTube('b_0', 'soot', along(0.03) + { r: 0.43 }, along(0.22) + { r: 0.4 }, segments=4)
              + lyingTube('b_1', 'scorch', along(0.22) + { r: 0.4 }, along(0.34) + { r: 0.37 }, segments=3),
-             { paint: s.paint, scorch: s.scorch, soot: s.soot }),
+             { paint: s.paint, scorch: s.scorch, soot: s.soot }) + { title: 'Crashed military helicopter tail boom' },
   k.compound('crashed_military_helicopter_tail_rotor', 45, [
     k.turned('hub', 'head', 'z', k.disc(0.09, tailHub.z, tailHub.z + 0.1), [tailHub.x, tailHub.y, 0]) + { sides: 8 },
     k.bar('up', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.25, tailHub.y + 1.0], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
@@ -163,26 +163,26 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } 
     k.bar('back', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.75, tailHub.y + 0.25], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
     k.bar('down', 'blade', [tailHub.x, tailHub.y], [tailHub.x - 0.2, tailHub.y - 1.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08]),
     k.bar('stub', 'blade', [tailHub.x, tailHub.y], [tailHub.x + 0.5, tailHub.y - 0.1], 0.2, [tailHub.z + 0.02, tailHub.z + 0.08], thickB=0.06),
-  ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }),
+  ], { blade: 'paint-charcoal', tip: 'paint-crane-yellow', head: 'steel-grey' }) + { title: 'Crashed military helicopter tail rotor' },
   k.compound('crashed_military_helicopter_cabin_door', 45, [
     lean('skin', 'paint', [-2.75, -1.45], [0.03, 1.72], [1.72, 1.27], 0.05),
     k.prism('foot', 'paint', [[-2.75, 0], [-1.45, 0], [-1.45, 0.04], [-2.75, 0.04]], [1.62, 1.84]),
     lean('b_0', 'soot', [-2.75, -2.2], [0.5, 1.61], [1.5, 1.34], 0.08),
     lean('b_1', 'scorch', [-2.2, -1.75], [0.9, 1.5], [1.72, 1.29], 0.08),
-  ], { paint: s.paint, scorch: s.scorch, soot: s.soot }),
+  ], { paint: s.paint, scorch: s.scorch, soot: s.soot }) + { title: 'Crashed military helicopter cabin door' },
   k.compound('crashed_military_helicopter_console', 40, [
     box('pedestal', 'dark', [2.4, s.deck, -0.18], [3.1, 0.78, 0.18]),
     k.prism('panel', 'dark', [[2.95, 0.78], [3.3, 0.78], [3.24, 1.2], [3.0, 1.2]], [-0.75, 0.75]),
-  ], { dark: 'plastic-scorched' }),
+  ], { dark: 'plastic-scorched' }) + { title: 'Crashed military helicopter console' },
   k.compound('crashed_military_helicopter_seat_frame', 18, [
     box('pan', 'dark', [-0.26, 0, -0.26], [0.26, 0.05, 0.26]),
     k.prism('back', 'dark', [[-0.34, 0.05], [-0.26, 0.05], [-0.34, 0.68], [-0.42, 0.68]], [-0.26, 0.26]),
   ] + k.bothSides([
     box('leg', 'dark', [-0.05, -0.18, 0.18], [0.05, 0, 0.26]),
-  ]), { dark: 'steel-spall-black' }),
-  m.wheel('crashed_military_helicopter_main_wheel', 45, 0.24, 0.16, 0.36, hub='steel-spall-black'),
+  ]), { dark: 'steel-spall-black' }) + { title: 'Crashed military helicopter seat frame' },
+  m.wheel('crashed_military_helicopter_main_wheel', 45, 0.24, 0.16, 0.36, hub='steel-spall-black') + { title: 'Crashed military helicopter main wheel' },
   k.compound('crashed_military_helicopter_gear_strut', 20, [
     lean('leg', 'steel', [0.1, 0.24], [0.28, 1.56], [0.42, 1.16], 0.05),
     box('axle', 'steel', [0.12, 0.3, 1.5], [0.22, 0.38, 1.66]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Crashed military helicopter gear strut' },
 ])

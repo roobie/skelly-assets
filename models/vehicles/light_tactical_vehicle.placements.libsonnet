@@ -5,6 +5,7 @@ local s = import 'light_tactical_vehicle.spec.libsonnet';
 local id = 'light_tactical_vehicle';
 local wheel = id + '_wheel';
 {
+  title: 'Light tactical vehicle',
   sites: [
     one('frame', id + '_frame'),
     one('hull', id + '_hull'),

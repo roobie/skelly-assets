@@ -28,7 +28,7 @@ local pipLayout = {
     box('pip-%s-%d' % [face, i], 'pip', c[0], c[1])
     for face in std.objectFields(pipFaces)
     for i in std.range(0, pipFaces[face].n - 1)
-  ], { body: 'enamel-white', pip: 'plastic-black' })
+  ], { body: 'enamel-white', pip: 'plastic-black' }) + { title: 'Six-sided die' }
   + h.inHand('six_sided_die', 'cube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A poppy seed head, 47 mm tall and 28 mm across: a short cut stem, a round green pod and
@@ -48,7 +48,7 @@ local pipLayout = {
       [-0.0015 * std.cos(a + std.pi / 2), -0.0015 * std.sin(a + std.pi / 2)],
     ], 0.045, 0.047)
     for i in std.range(0, 7)
-  ], { pod: 'leaf-green', crown: 'plant-purple' })
+  ], { pod: 'leaf-green', crown: 'plant-purple' }) + { title: 'Poppy seed head' }
   + h.inHand('poppy_seed_head', 'pod') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A small switching power converter, 150 mm wide, 60 mm tall and 100 mm deep: a bare aluminium case, a fan
@@ -68,7 +68,7 @@ local pipLayout = {
   ] + [
     h.rod('lead-%d' % i, 'lead-%d' % i, 0.0025, 0.08, 0.12, 0) + { origin: [0.08, 0.031, -0.006 + i * 0.006] }
     for i in [0, 1, 2]
-  ], { case: 'alu-bare', fan: 'plastic-black', guard: 'steel-bright', socket: 'plastic-black', switch: 'plastic-red', label: 'paper-white', 'lead-0': 'plastic-red', 'lead-1': 'plastic-black', 'lead-2': 'plastic-yellow' })
+  ], { case: 'alu-bare', fan: 'plastic-black', guard: 'steel-bright', socket: 'plastic-black', switch: 'plastic-red', label: 'paper-white', 'lead-0': 'plastic-red', 'lead-1': 'plastic-black', 'lead-2': 'plastic-yellow' }) + { title: 'Power supply' }
   + h.inHand('power_supply', 'case') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A processor board, 150 by 110 mm: a green circuit board with a socketed processor under a steel lid in the
@@ -87,7 +87,7 @@ local pipLayout = {
   ] + [
     disc('cap-%d' % i, 'capacitor', 0.003, 0.002, 0.012, -0.035 + (i % 3) * 0.008, -0.04 + std.floor(i / 3) * 0.008)
     for i in std.range(0, 5)
-  ], { board: 'circuit-green', socket: 'plastic-gloss-white', lid: 'steel-stainless', contact: 'foil-gold', chip: 'plastic-black', capacitor: 'alu-bare' })
+  ], { board: 'circuit-green', socket: 'plastic-gloss-white', lid: 'steel-stainless', contact: 'foil-gold', chip: 'plastic-black', capacitor: 'alu-bare' }) + { title: 'Processing chip' }
   + h.inHand('processor', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A radio repeater module in a grey case 200 mm wide, 80 mm tall and 125 mm deep: a black front panel with
@@ -119,7 +119,7 @@ local pipLayout = {
     ]
     for i in [0, 1]
     for x in [[-0.07, 0.07][i]]
-  ]), { case: 'alu-bare', panel: 'alu-anodized-black', handle: 'steel-stainless', 'lamp-green': 'gem-green', 'lamp-red': 'gem-red', label: 'paper-white', connector: 'brass-polished', antenna: 'rubber-black' })
+  ]), { case: 'alu-bare', panel: 'alu-anodized-black', handle: 'steel-stainless', 'lamp-green': 'gem-green', 'lamp-red': 'gem-red', label: 'paper-white', connector: 'brass-polished', antenna: 'rubber-black' }) + { title: 'Radio repeater module' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A 1.2 m length of narrow-gauge track: two light steel rails 600 mm apart, 64 mm tall with a worn bright head,
@@ -142,7 +142,7 @@ local pipLayout = {
     for r in [0, 1]
     for s in [-1, 1]
     for z in [[-0.3, 0.3][r]]
-  ], { sleeper: 'wood-walnut', rail: 'scrap-rusted', tread: 'steel-bright', spike: 'iron-dull' })
+  ], { sleeper: 'wood-walnut', rail: 'scrap-rusted', tread: 'steel-bright', spike: 'iron-dull' }) + { title: 'Length of light rail' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'structures', tags: { material: ['metal', 'wood'] } } },
 
   // A desktop memory stick, 133 mm long and 31 mm tall, lying flat: a green board with eight black chips, a
@@ -154,13 +154,13 @@ local pipLayout = {
   ] + [
     box('chip-%d' % i, 'chip', [-0.062 + i * 0.016, 0.002, -0.004], [-0.051 + i * 0.016, 0.0035, 0.009])
     for i in std.range(0, 7)
-  ], { board: 'circuit-green', contact: 'foil-gold', label: 'paper-white', chip: 'plastic-black' })
+  ], { board: 'circuit-green', contact: 'foil-gold', label: 'paper-white', chip: 'plastic-black' }) + { title: 'RAM stick' }
   + h.inHand('ram_stick', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A rusty reinforcing bar, 800 mm long and 16 mm across.
   h.compound('rebar', 1.1, [
     turned('bar', 'bar', 'x', [[0, 0], [0, 0.008], [0.8, 0.008], [0.8, 0]], [-0.4, 0.008, 0]),
-  ], { bar: 'scrap-rusted' })
+  ], { bar: 'scrap-rusted' }) + { title: 'Rebar' }
   + h.gripOn('rebar', 'bar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A laboratory ring stand, 520 mm tall: a painted cast iron base 200 by 130 mm, a 12 mm steel rod standing at
@@ -175,7 +175,7 @@ local pipLayout = {
     turned('thumb', 'clamp', 'z', [[0, 0], [0, 0.008], [0.006, 0.008], [0.006, 0]], [-0.07, 0.313, 0.034]),
     h.rod('arm', 'rod', 0.004, -0.056, 0.0, 0.313),
     turned('ring', 'rod', 'y', [[0, 0.046], [0, 0.051], [0.006, 0.051], [0.006, 0.046], [0, 0.046]], [0.047, 0.31, 0]),
-  ], { base: 'paint-oxblood', rod: 'steel-stainless', clamp: 'iron-dull' })
+  ], { base: 'paint-oxblood', rod: 'steel-stainless', clamp: 'iron-dull' }) + { title: 'Ring stand' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A radio receiver module, 100 mm wide, 35 mm tall and 65 mm deep: a bare aluminium box with screwed end
@@ -193,7 +193,7 @@ local pipLayout = {
     turned('screw-%d-%d' % [s, c], 'plate', 'x', [[0, 0], [0, 0.0025], [0.0015, 0.0025], [0.0015, 0]], [s * 0.05 + (if s < 0 then -0.0015 else 0), [0.007, 0.028][c], [-0.024, 0.024][c]])
     for s in [-1, 1]
     for c in [0, 1]
-  ], { case: 'alu-bare', plate: 'steel-stainless', jack: 'brass-polished', antenna: 'rubber-black', lamp: 'gem-green', label: 'paper-white', header: 'plastic-black' })
+  ], { case: 'alu-bare', plate: 'steel-stainless', jack: 'brass-polished', antenna: 'rubber-black', lamp: 'gem-green', label: 'paper-white', header: 'plastic-black' }) + { title: 'Radio receiver' }
   + h.inHand('receiver', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A small refrigerant cylinder, 90 mm across and 220 mm tall: a white steel body on a foot ring with a
@@ -207,7 +207,7 @@ local pipLayout = {
     turned('valve', 'valve', 'y', [[0, 0], [0, 0.009], [0.008, 0.009], [0.008, 0.007], [0.016, 0.007], [0.016, 0]], [0, 0.196, 0]),
     h.rod('port', 'valve', 0.004, 0.0, 0.016, 0.204),
     turned('cap', 'cap', 'y', [[0, 0], [0, 0.009], [0.01, 0.009], [0.01, 0]], [0, 0.212, 0]),
-  ], { body: 'paint-white', band: 'paint-drum-blue', valve: 'brass-polished', cap: 'plastic-black' })
+  ], { body: 'paint-white', band: 'paint-drum-blue', valve: 'brass-polished', cap: 'plastic-black' }) + { title: 'Refrigerant tank' }
   + h.inHand('refrigerant_tank', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A clear plastic card 84 by 54 mm with a chip and gold traces set in it, lying flat.
@@ -221,7 +221,7 @@ local pipLayout = {
   ] + [
     box('trace-end-%d' % i, 'trace', [0.032 - i * 0.006, 0.0015, -0.01 + i * 0.006], [0.034 - i * 0.006, 0.0025, 0.02])
     for i in std.range(0, 3)
-  ], { card: 'plastic-clear', chip: 'plastic-black', trace: 'foil-gold' })
+  ], { card: 'plastic-clear', chip: 'plastic-black', trace: 'foil-gold' }) + { title: 'Prototype data card' }
   + h.inHand('prototype_data_card', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['sci-fi'] }, keywords: ['computer'] } },
 
   // A small tin of rubber cement, 64 mm across and 105 mm tall: a red printed can with a white label band and a
@@ -234,7 +234,7 @@ local pipLayout = {
     local a = i * std.pi / 6;
     box('grip-%d' % i, 'cap', [0.0162 * std.cos(a) - 0.001, 0.086, 0.0162 * std.sin(a) - 0.001], [0.0162 * std.cos(a) + 0.001, 0.1, 0.0162 * std.sin(a) + 0.001])
     for i in std.range(0, 11)
-  ], { can: 'paint-red', label: 'paint-white', cap: 'plastic-black' })
+  ], { can: 'paint-red', label: 'paint-white', cap: 'plastic-black' }) + { title: 'Rubber cement' }
   + h.inHand('rubber_cement', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A mound of rice grown over with white mould, 120 mm across and 35 mm tall.
@@ -244,7 +244,7 @@ local pipLayout = {
     local p = [[0.02, 0.01, 0.026], [-0.025, 0.008, 0.024], [0.004, -0.03, 0.022], [-0.012, 0.022, 0.03], [0.036, -0.02, 0.016], [-0.04, -0.018, 0.014], [0.008, 0.006, 0.034]][i];
     turned('mould-%d' % i, 'mould', 'y', [[0, 0], [0, 0.009], [0.003, 0.007], [0.005, 0]], [p[0], p[2] - 0.002, p[1]])
     for i in std.range(0, 6)
-  ], { rice: 'paint-cream', mould: 'cloth-sage' })
+  ], { rice: 'paint-cream', mould: 'cloth-sage' }) + { title: 'Koji rice' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
   // A clear acrylic block 55 mm on a side with a small black six-sided crystal cast into its centre.
@@ -252,7 +252,7 @@ local pipLayout = {
     box('block', 'block', [-0.0275, 0, -0.0275], [0.0275, 0.055, 0.0275]),
     h.prism('crystal', 'crystal', 'y', [[0.007 * std.cos(i * std.pi / 3), 0.007 * std.sin(i * std.pi / 3)] for i in std.range(0, 5)], 0.016, 0.036),
     turned('tip', 'crystal', 'y', [[0, 0], [0, 0.007], [0.008, 0]], [0, 0.036, 0]),
-  ], { block: 'plastic-clear', crystal: 'obsidian' })
+  ], { block: 'plastic-clear', crystal: 'obsidian' }) + { title: 'Crystal sample' }
   + h.inHand('crystal_sample', 'block') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A gnarled tree root, 220 mm long and 32 mm across at its thick end, lying along x: reddish bark, a pale cut
@@ -271,6 +271,6 @@ local pipLayout = {
       [r[1] - nz * r[4], r[0] - nx * r[4]],
     ], 0.006, 0.006 + r[4] * 1.5)
     for i in std.range(0, 2)
-  ], { bark: 'leather-chestnut', cut: 'wood-pine' })
+  ], { bark: 'leather-chestnut', cut: 'wood-pine' }) + { title: 'Sassafras root' }
   + h.inHand('sassafras_root', 'root') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant', 'wood'] } } },
 ]

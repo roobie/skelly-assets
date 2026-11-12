@@ -29,6 +29,7 @@ const fixture = () => ({
   items: [
     {
       id: 'fixture',
+      title: 'Fixture',
       exportMass: 'parts',
       parts: [
         {
@@ -86,11 +87,11 @@ it('keeps compound round opt-outs through catalogue assembly building', () => {
   expect(solids.find(({ id }) => id === 'round')).not.toHaveProperty('sides');
 });
 
-it('exports a label on its face, its text defaulting to the display name', () => {
+it('exports a label on its face, its text defaulting to the authored title', () => {
   const input = fixture();
   const carton = { id: 'carton', slot: 'body', kind: 'box', min: [-0.05, 0, -0.02], max: [0.05, 0.2, 0.02] };
   const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify([carton]) } };
-  const item = { ...input.items[0], parts: [part], connections: [], label: { solid: 'carton', face: '+z' } };
+  const item = { ...input.items[0], title: 'Oat flakes', parts: [part], connections: [], label: { solid: 'carton', face: '+z' } };
   const loaded = loadCatalogue({ ...input, items: [item] });
   const { label } = exportItem(
     loaded.items[0]!,
@@ -104,6 +105,12 @@ it('exports a label on its face, its text defaulting to the display name', () =>
   expect(label?.at[2]).toBeCloseTo(0.02);
   expect(label?.size[0]).toBeCloseTo(0.1);
   expect(label?.size[1]).toBeCloseTo(0.2);
+});
+
+it('rejects a catalogue item without a title', () => {
+  const input = fixture();
+  const { title: _title, ...untitled } = input.items[0]!;
+  expect(() => loadCatalogue({ ...input, items: [untitled] })).toThrow(/title/);
 });
 
 it('exports a grip following the held solid through resizing and assembly placement', () => {
@@ -247,6 +254,7 @@ it('refuses recipe mass ownership that differs from the authored item', () => {
     loadThingRecipe([
       {
         id: 'fixture',
+        title: 'Fixture',
         kind: 'item',
         source: item.id,
         voxel: ROW_VOXEL,
@@ -258,14 +266,14 @@ it('refuses recipe mass ownership that differs from the authored item', () => {
 it('refuses a recipe row without a voxel class, so no model exports smooth', () => {
   const item = catalogue.items[0]!;
   expect(() =>
-    loadThingRecipe([{ id: 'fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }], catalogue),
+    loadThingRecipe([{ id: 'fixture', title: 'Fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }], catalogue),
   ).toThrow('Expected "voxel"');
 });
 it.each([0, -1])('refuses a voxel class grain of %s', (grain) => {
   const item = catalogue.items[0]!;
   expect(() =>
     loadThingRecipe([
-      { id: 'fixture', kind: 'item', source: item.id, voxel: { grain }, options: { mass: item.exportMass } },
+      { id: 'fixture', title: 'Fixture', kind: 'item', source: item.id, voxel: { grain }, options: { mass: item.exportMass } },
     ], catalogue),
   ).toThrow('Invalid');
 });
@@ -277,7 +285,7 @@ it('refuses unknown geometry families during catalogue loading', () => {
 it('refuses recipe references outside the authored item set', () => {
   expect(() =>
     loadThingRecipe([
-      { id: 'fixture', kind: 'item', source: 'fixture-unknown', voxel: ROW_VOXEL, options: { mass: 'parts' } },
+      { id: 'fixture', title: 'Fixture', kind: 'item', source: 'fixture-unknown', voxel: ROW_VOXEL, options: { mass: 'parts' } },
     ], catalogue),
   ).toThrow('Unknown tool item');
 });

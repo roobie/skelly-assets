@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'light_helicopter.spec.libsonnet';
 {
+  title: 'Light helicopter',
   sites: [
     one('belly', 'light_helicopter_belly'),
     one('rear_fairing', 'light_helicopter_rear_fairing'),

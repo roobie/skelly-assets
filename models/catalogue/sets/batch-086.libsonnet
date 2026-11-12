@@ -42,7 +42,7 @@ taxonomy.inherit({ keywords: ['toy'] }, [
     h.ball('eye-l', 'eye', 0.012, -0.075, 0.17, 0.36),
     h.ball('eye-r', 'eye', 0.012, 0.075, 0.17, 0.36),
     box('mouth', 'mouth', [-0.04, 0.1, 0.43], [0.04, 0.108, 0.455]),
-  ], { hide: 'cloth-shirt-blue', belly: 'cloth-cream', eye: 'plastic-matte-black', mouth: 'cloth-crimson' }) + { taxonomy: { category: 'recreation', tags: { material: ['fabric'], setting: ['modern'] } } },
+  ], { hide: 'cloth-shirt-blue', belly: 'cloth-cream', eye: 'plastic-matte-black', mouth: 'cloth-crimson' }) + { title: 'Shark plushie' } + { taxonomy: { category: 'recreation', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A stuffed bear 300 mm tall sitting with its legs out in front, front on +z: round head and ears, a pale
   // muzzle, belly and foot pads, and a red ribbon tied at the neck.
@@ -68,7 +68,7 @@ taxonomy.inherit({ keywords: ['toy'] }, [
     h.ball('nose', 'eye', 0.01, 0, 0.25, 0.076),
     h.ball('eye-l', 'eye', 0.007, -0.026, 0.278, 0.058),
     h.ball('eye-r', 'eye', 0.007, 0.026, 0.278, 0.058),
-  ], { fur: 'fur-brown', pale: 'fur-pale', ribbon: 'cloth-red', eye: 'plastic-matte-black' })
+  ], { fur: 'fur-brown', pale: 'fur-pale', ribbon: 'cloth-red', eye: 'plastic-matte-black' }) + { title: 'Teddy bear' }
   + h.inHand('teddy_bear', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A plastic action figure 150 mm tall on a round peg base: blue suit, red boots and gloves, a yellow belt and
@@ -76,7 +76,7 @@ taxonomy.inherit({ keywords: ['toy'] }, [
   h.compound('toy_figurine', 0.12, figure, {
     base: 'plastic-black', boot: 'plastic-red', suit: 'plastic-blue', trim: 'plastic-yellow',
     skin: 'latex-pale', hair: 'plastic-black', eye: 'plastic-matte-black',
-  }) + h.inHand('toy_figurine', 'torso') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Toy figurine' } + h.inHand('toy_figurine', 'torso') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A collectible figure 320 mm tall: a caped knight in grey armour with a sword planted point-down in front of him,
   // standing on a square black plinth.
@@ -97,7 +97,7 @@ taxonomy.inherit({ keywords: ['toy'] }, [
   ], {
     plinth: 'lacquer-black', trim: 'brass-polished', boot: 'iron-dull', suit: 'steel-grey', cape: 'cloth-crimson',
     blade: 'steel-bright', skin: 'latex-pale', hair: 'leather-chestnut', eye: 'plastic-matte-black',
-  }) + h.inHand('collectible_knight_figure', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Collectible knight figure' } + h.inHand('collectible_knight_figure', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A plastic yo-yo 64 mm across and 35 mm wide, standing on its rim, face on +z, with its string wound in the
   // gap and a tail ending in a finger loop lying beside it.
@@ -110,6 +110,6 @@ taxonomy.inherit({ keywords: ['toy'] }, [
     box('string-tail', 'string', [0.003, 0, -0.001], [0.05, 0.002, 0.001]),
     box('string-bend', 'string', [0.048, 0, -0.001], [0.05, 0.002, 0.05]),
     turned('loop', 'string', 'y', [[0, 0.008], [0, 0.0105], [0.002, 0.0105], [0.002, 0.008], [0, 0.008]], [0.049, 0, 0.06]),
-  ], { shell: 'plastic-red', string: 'cord-cotton', cap: 'plastic-white' })
+  ], { shell: 'plastic-red', string: 'cord-cotton', cap: 'plastic-white' }) + { title: 'Yo-yo' }
   + h.inHand('yoyo', 'halves') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 ])

@@ -51,6 +51,8 @@ local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n
   'paint-signal-yellow': self['paint-oxblood'] + { colour: [1, 0.8, 0.03] },
   'paint-lime-yellow': self['paint-oxblood'] + { colour: [0.72, 0.86, 0.06] },
   'paint-sand': material([0.78, 0.67, 0.48]),
+  // Flat dark earth armour paint, darker than the FDE polymer so a lit hull still reads as earth rather than sand.
+  'paint-fde': material(hex(6180664)),
   'steel-gunmetal': material([0.36, 0.39, 0.43]) + { finish: { metallic: 0.7, roughness: 0.4 } },
   'cell-glow-teal': material([0.2, 0.95, 0.85]) + { finish: { metallic: 0, roughness: 0.1 } },
   'paint-armour-blue': self['paint-oxblood'] + { colour: hex(1325726) },

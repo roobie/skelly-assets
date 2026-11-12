@@ -72,15 +72,15 @@ local hakama(id, mass) =
                                                    box('cord-knot', 'cord', [0.04, ht + 0.012, -0.095], [0.07, ht + 0.03, -0.065]),
                                                    strip('cord-end-a', 'cord', [0.06, -0.08], [0.1, -d / 2], ht + 0.012, 0.008),
                                                    strip('cord-end-b', 'cord', [0.05, -0.08], [0.06, -d / 2], ht + 0.012, 0.008),
-                                                 ], { cloth: 'cloth-black', hood: 'cloth-black', seam: 'plastic-charcoal', cord: 'cord-cotton' })
+                                                 ], { cloth: 'cloth-black', hood: 'cloth-black', seam: 'plastic-charcoal', cord: 'cord-cotton' }) + { title: 'Hooded black robe' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso', 'arms'], state: ['folded'], setting: ['fantasy'] } } },
 
   // A navy pleated hakama folded in a long bundle, 300 mm by 420 mm and 45 mm tall, with its back board at one end
   // and the long ties crossed over the top.
-  hakama('hakama', 0.9) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
+  hakama('hakama', 0.9) + { title: 'Hakama' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // A plain black practice hakama folded the same way, lighter cloth.
-  hakama('hakama_gi', 0.7) + { parts: [super.parts[0] { finish: { cloth: 'cloth-black', pleat: 'plastic-charcoal', tie: 'cloth-black' } }] } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
+  hakama('hakama_gi', 0.7) + { title: 'Hakama gi' } + { parts: [super.parts[0] { finish: { cloth: 'cloth-black', pleat: 'plastic-charcoal', tie: 'cloth-black' } }] } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // A black haori folded flat, 380 mm by 340 mm and 40 mm tall: the collar band running down both front edges, the
   // wide sleeves folded in along each side, gold crests and a sprig of gold embroidery, and a gold tie cord.
@@ -100,7 +100,7 @@ local hakama(id, mass) =
     strip('sprig-leaf-a', 'gold', [0.1, -0.09], [0.12, -0.1], ht + 0.006, 0.006),
     strip('sprig-leaf-b', 'gold', [0.115, -0.05], [0.095, -0.04], ht + 0.006, 0.006),
     strip('sprig-leaf-c', 'gold', [0.125, -0.02], [0.14, -0.035], ht + 0.006, 0.006),
-  ], { cloth: 'cloth-black', collar: 'cloth-black', gold: 'metal-gold' })
+  ], { cloth: 'cloth-black', collar: 'cloth-black', gold: 'metal-gold' }) + { title: 'Haori' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso', 'arms'], state: ['folded'], setting: ['medieval'] } } },
 
   // A towelling bathrobe folded thick, 360 mm by 320 mm and 80 mm tall: a wide shawl collar meeting in a V, two patch
@@ -115,7 +115,7 @@ local hakama(id, mass) =
     box('belt-knot', 'belt', [-0.025, ht + 0.014, -0.022], [0.025, ht + 0.034, 0.022]),
     strip('belt-end-a', 'belt', [-0.01, -0.02], [-0.05, -d / 2 + 0.01], ht + 0.014, 0.035, 0.006),
     strip('belt-end-b', 'belt', [0.01, -0.02], [0.06, -d / 2 + 0.02], ht + 0.014, 0.035, 0.006),
-  ], { cloth: 'cloth-cream', collar: 'cloth-cream', belt: 'cloth-blue' })
+  ], { cloth: 'cloth-cream', collar: 'cloth-cream', belt: 'cloth-blue' }) + { title: 'House coat' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso', 'arms'], state: ['folded'], setting: ['modern'] } } },
 
   // An olive field jacket folded flat, 380 mm by 340 mm and 70 mm tall: a tall stand collar that hides a rolled hood,
@@ -137,7 +137,7 @@ local hakama(id, mass) =
                                  + buttons('epaulette-button-r', 'snap', 0.1, [cz + 0.034], ht + 0.004, 0.006)
                                  + buttons('pocket-snap', 'snap', -0.09, [0.035], ht + 0.008, 0.005)
                                  + buttons('pocket-snap-r', 'snap', 0.09, [0.035], ht + 0.008, 0.005),
-             { cloth: 'cloth-olive-drab', flap: 'cloth-olive-drab', snap: 'steel-parkerized' })
+             { cloth: 'cloth-olive-drab', flap: 'cloth-olive-drab', snap: 'steel-parkerized' }) + { title: 'Field jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A grey-green combat blouse folded flat, 360 mm by 320 mm and 50 mm tall: a mandarin collar, a zip under a flap,
@@ -162,7 +162,7 @@ local hakama(id, mass) =
                                            box('rank', 'loop', [-0.022, ht + 0.004, -0.02], [0.022, ht + 0.008, 0.04]),
                                            box('pen-pocket', 'flap', [-w / 2 + 0.012, ht, -0.13], [-w / 2 + 0.05, ht + 0.004, -0.09]),
                                          ],
-             { cloth: 'cloth-ucp', flap: 'cloth-ucp', loop: 'hook-loop-grey' })
+             { cloth: 'cloth-ucp', flap: 'cloth-ucp', loop: 'hook-loop-grey' }) + { title: 'Combat blouse' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A white double-breasted chef's jacket folded flat, 360 mm by 320 mm and 50 mm tall: a stand collar, the front
@@ -176,7 +176,7 @@ local hakama(id, mass) =
                                   ]
                                   + buttons('button-a', 'button', -0.04, [0.03, -0.04, -0.11], ht + 0.004, 0.008)
                                   + buttons('button-b', 'button', 0.1, [0.03, -0.04, -0.11], ht + 0.004, 0.008),
-             { cloth: 'cloth-cream', piping: 'cloth-cream', button: 'cloth-black' })
+             { cloth: 'cloth-cream', piping: 'cloth-cream', button: 'cloth-black' }) + { title: 'Chef\'s jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['kitchen'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A thin orange emergency windbreaker folded small, 340 mm by 300 mm and 35 mm tall: the hood rolled into the
@@ -187,7 +187,7 @@ local hakama(id, mass) =
     box('zip', 'zip', [-0.004, ht, -d / 2], [0.004, ht + 0.003, d / 2 - 0.05]),
     strip('pocket-zip-l', 'zip', [-0.13, -0.12], [-0.08, -0.05], ht, 0.006, 0.003),
     strip('pocket-zip-r', 'zip', [0.13, -0.12], [0.08, -0.05], ht, 0.006, 0.003),
-  ] + bandX('band', 'band', 0.04, 0.028, w, ht, 0.003), { cloth: 'cloth-orange', zip: 'plastic-charcoal', band: 'reflective-yellow' })
+  ] + bandX('band', 'band', 0.04, 0.028, w, ht, 0.003), { cloth: 'cloth-orange', zip: 'plastic-charcoal', band: 'reflective-yellow' }) + { title: 'Emergency jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A red flannel jacket folded flat, 360 mm by 320 mm and 70 mm tall, checked with dark stripes: a brown corduroy
@@ -210,7 +210,7 @@ local hakama(id, mass) =
   + buttons('button', 'button', 0, [cz - 0.1, cz - 0.15, cz - 0.2, cz - 0.23], ht + 0.006, 0.006)
   + pocket('chest-l', 'cloth', 'cloth', -0.09, 0.0, 0.09, 0.1, ht + 0.002)
   + pocket('chest-r', 'cloth', 'cloth', 0.09, 0.0, 0.09, 0.1, ht + 0.002),
-             { cloth: 'cloth-red', check: 'cloth-black', collar: 'cloth-brown', button: 'plastic-charcoal' })
+             { cloth: 'cloth-red', check: 'cloth-black', collar: 'cloth-brown', button: 'plastic-charcoal' }) + { title: 'Flannel jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A denim jacket folded flat, 360 mm by 320 mm and 60 mm tall: a pointed collar, a yoke seam, two chest pockets
@@ -239,7 +239,7 @@ local hakama(id, mass) =
                                  + buttons('pocket-button-r', 'button', 0.09, [-0.062], ht + 0.008, 0.006)
                                  + buttons('band-button-l', 'button', -0.15, [-d / 2 + 0.02], ht + 0.005, 0.006)
                                  + buttons('band-button-r', 'button', 0.15, [-d / 2 + 0.02], ht + 0.005, 0.006),
-             { cloth: 'cloth-denim', stitch: 'leather-tan', button: 'brass-dull' })
+             { cloth: 'cloth-denim', stitch: 'leather-tan', button: 'brass-dull' }) + { title: 'Denim jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A black leather motorcycle jacket folded flat, 360 mm by 300 mm and 70 mm tall: wide lapels with snap studs, a
@@ -260,7 +260,7 @@ local hakama(id, mass) =
                                      + buttons('stud-l', 'zip', -0.11, [cz - 0.04], ht + 0.008, 0.005)
                                      + buttons('stud-r', 'zip', 0.11, [cz - 0.04], ht + 0.008, 0.005),
              { cloth: 'leather-black', zip: 'metal-silver' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { title: 'Leather jacket' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A thin khaki cotton jacket folded flat, 340 mm by 300 mm and 40 mm tall: the hood laid on top with its crown
   // draped over the front edge and two pale drawcords, a zip down the front and two pocket welts.
@@ -274,7 +274,7 @@ local hakama(id, mass) =
                                       strip('welt-l', 'cloth', [-0.13, -0.11], [-0.09, -0.05], ht, 0.012),
                                       strip('welt-r', 'cloth', [0.13, -0.11], [0.09, -0.05], ht, 0.012),
                                     ],
-             { cloth: 'cloth-khaki', zip: 'plastic-charcoal', cord: 'cord-cotton' })
+             { cloth: 'cloth-khaki', zip: 'plastic-charcoal', cord: 'cord-cotton' }) + { title: 'Light jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A black wrap-over jacket folded flat, 320 mm by 280 mm and 30 mm tall: the collar band crossing the chest, a
@@ -293,7 +293,7 @@ local hakama(id, mass) =
     ]
     for s in ['l', 'r']
     for x in [if s == 'l' then 0.04 else 0.12]
-  ]), { cloth: 'cloth-black', sash: 'cloth-navy', gauntlet: 'cloth-black' })
+  ]), { cloth: 'cloth-black', sash: 'cloth-navy', gauntlet: 'cloth-black' }) + { title: 'Black wrap jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A red wool varsity jacket folded flat, 380 mm by 320 mm and 70 mm tall: white leather sleeves folded round the
@@ -314,6 +314,6 @@ local hakama(id, mass) =
     box('letter-l', 'stripe', [-0.15, ht, -0.115], [-0.13, ht + 0.005, -0.03]),
     box('letter-r', 'stripe', [-0.09, ht, -0.115], [-0.07, ht + 0.005, -0.03]),
     box('letter-bar', 'stripe', [-0.13, ht, -0.083], [-0.09, ht + 0.005, -0.063]),
-  ], { cloth: 'cloth-red', sleeve: 'leather-white', stripe: 'cloth-cream', snap: 'metal-silver' })
+  ], { cloth: 'cloth-red', sleeve: 'leather-white', stripe: 'cloth-cream', snap: 'metal-silver' }) + { title: 'Varsity jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 ]

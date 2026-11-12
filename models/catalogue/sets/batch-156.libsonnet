@@ -89,7 +89,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
   ] + [
     h.disc('bead-%d' % i, 'bead', 0.0045, 0, 0.008, -0.09 + 0.015 * i, 0.086)
     for i in std.range(0, 12)
-  ], { cloth: 'cloth-bright-white', hem: 'cloth-bright-white', tie: 'cord-cotton', bead: 'pearl' })
+  ], { cloth: 'cloth-bright-white', hem: 'cloth-bright-white', tie: 'cord-cotton', bead: 'pearl' }) + { title: 'Face veil' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['face'], state: ['folded'] } } },
 
   // A fencing mask standing on its bib, 230 mm across and 330 mm tall: a dark steel mesh cage curving round the face,
@@ -125,7 +125,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                       for i in std.range(0, 9)
                                     ]
                                     + [box('tongue-root', 'pad', [-0.025, 0.318, -0.07], [0.025, 0.333, 0.0])],
-             { shell: 'mesh-black', wire: 'steel-grey', pad: 'cloth-bright-white', bib: 'cloth-bright-white' })
+             { shell: 'mesh-black', wire: 'steel-grey', pad: 'cloth-bright-white', bib: 'cloth-bright-white' }) + { title: 'Fencing mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['face'] } } },
 
   // A ballistic face mask standing on its chin, 200 mm across and 250 mm tall: a black moulded shell covering the
@@ -144,7 +144,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                   for a in [-25 + 10 * i]
                                 ]
                                 + backStraps(r, span, c, [0.07, 0.17], 0.16, 0.025),
-             { shell: 'plastic-matte-black', trim: 'plastic-charcoal', lens: 'lens-smoke', vent: 'screen-black', strap: 'webbing-black' })
+             { shell: 'plastic-matte-black', trim: 'plastic-charcoal', lens: 'lens-smoke', vent: 'screen-black', strap: 'webbing-black' }) + { title: 'Ballistic face mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A white cotton dust mask standing on its lower edge, 160 mm across and 105 mm tall: a pleated cloth cup over the
@@ -158,7 +158,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                  ])
                                  + wrapBand('nose', 'nose', r + 0.0025, 0.003, -22, 22, 6, cz, function(a) 0.09 - 0.008 * sq(a / 22), function(a) 0.098 - 0.008 * sq(a / 22))
                                  + backStraps(r, span, 0.052, [0.03, 0.075], 0.11, 0.006),
-             { shell: 'cloth-cream', cloth: 'cloth-cream', nose: 'foil-alu', strap: 'cord-cotton' })
+             { shell: 'cloth-cream', cloth: 'cloth-cream', nose: 'foil-alu', strap: 'cord-cotton' }) + { title: 'Dust mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 
   // A white goalie's mask standing on its chin, 200 mm across and 250 mm tall: a moulded plastic shell with two eye
@@ -182,7 +182,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                      for a in [-24 + 16 * i]
                                    ])
                                    + backStraps(r, span, c, [0.08, 0.17], 0.15, 0.015),
-             { shell: 'enamel-white', ridge: 'enamel-white', hole: 'plastic-matte-black', strap: 'webbing-black' })
+             { shell: 'enamel-white', ridge: 'enamel-white', hole: 'plastic-matte-black', strap: 'webbing-black' }) + { title: 'Goalie mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A beaked leather mask standing upright, 190 mm across, 230 mm tall and 290 mm from strap to beak tip: a stitched
@@ -213,7 +213,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                   ])
                                   + wrapBand('stitch', 'seam', r + 0.002, 0.003, -span + 4, span - 4, 20, cz, function(a) ovalHigh(a, span + 6, 0.12, 0.11, 2.6) - 0.012, function(a) ovalHigh(a, span + 6, 0.12, 0.11, 2.6) - 0.008)
                                   + backStraps(r, span, 0.12, [0.1, 0.18], 0.1, 0.02),
-             { shell: 'leather-black', leather: 'leather-black', seam: 'leather-tan', rim: 'brass-polished', lens: 'lens-smoke', strap: 'leather-tan' })
+             { shell: 'leather-black', leather: 'leather-black', seam: 'leather-tan', rim: 'brass-polished', lens: 'lens-smoke', strap: 'leather-tan' }) + { title: 'Plague mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'glass'], slot: ['face'] } } },
 
   // A cotton T-shirt knotted into a mask, laid flat, 300 mm across and 440 mm long: the shirt's body creased where
@@ -236,7 +236,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
     ellipse('knot', 'cloth', 0.035, 0.028, 0, -0.225, 0, 0.026),
     strip('end-l', 'cloth', [-0.01, -0.24], [-0.05, -0.31], 0, 0.035, 0.01),
     strip('end-r', 'cloth', [0.01, -0.24], [0.05, -0.31], 0, 0.035, 0.01),
-  ], { cloth: 'cloth-navy', opening: 'cloth-black', hem: 'cloth-charcoal', crease: 'cloth-navy' })
+  ], { cloth: 'cloth-navy', opening: 'cloth-black', hem: 'cloth-charcoal', crease: 'cloth-navy' }) + { title: 'Tied shirt mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['improvised'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 
   // A white plastic skull mask standing on its chin, 180 mm across and 240 mm tall: a thin moulded shell shaped as a
@@ -255,7 +255,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
                                    for i in std.range(0, 9)
                                  ]
                                  + backStraps(r, span, c, [0.15], 0.11, 0.004),
-             { shell: 'bone', bone: 'bone', hole: 'plastic-matte-black', tooth: 'enamel-white', strap: 'cord-cotton' })
+             { shell: 'bone', bone: 'bone', hole: 'plastic-matte-black', tooth: 'enamel-white', strap: 'cord-cotton' }) + { title: 'Skull mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A plastic pumpkin mask that pulls down over the head, 270 mm across and 240 mm tall: an orange lobed shell with
@@ -279,7 +279,7 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
       patch('grin-%d' % i, 'face', std.max(rAt(0.05), rAt(0.085)), 0, -36 + 9 * i, -36 + 9 * (i + 1), 0.05 + (if i % 2 == 0 then 0 else 0.008), 0.085 - (if i % 2 == 0 then 0.01 else 0), 2)
       for i in std.range(0, 7)
     ]),
-             { shell: 'plastic-orange', stalk: 'leaf-green', face: 'plastic-matte-black' })
+             { shell: 'plastic-orange', stalk: 'leaf-green', face: 'plastic-matte-black' }) + { title: 'Pumpkin mask' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A fake white beard laid flat, 200 mm across and 230 mm long: a fluffy beard hanging to a point, a curled grey-white
@@ -302,6 +302,6 @@ local triangle(id, slot, rAt, cz, ac, w, yb, yt, n=4) = std.flattenArrays([
     ellipse('tuft-%d' % i, 'beard', 0.018, 0.016, p[0], p[1], 0.02, 0.007, 10)
     for i in std.range(0, 9)
     for p in [[[-0.07, 0.01], [-0.035, 0.025], [0, 0.03], [0.035, 0.025], [0.07, 0.01], [-0.05, 0.065], [0, 0.07], [0.05, 0.065], [-0.022, 0.11], [0.022, 0.11]][i]]
-  ], { beard: 'cloth-bright-white', tache: 'plastic-bag', mouth: 'cloth-charcoal', cord: 'cord-cotton' })
+  ], { beard: 'cloth-bright-white', tache: 'plastic-bag', mouth: 'cloth-charcoal', cord: 'cord-cotton' }) + { title: 'Santa beard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['face'] } } },
 ]

@@ -35,7 +35,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('rim-left', 'trim', [-0.46, 0.5, -0.2], [-0.43, 0.53, 0.2]),
     box('rim-right', 'trim', [0.43, 0.5, -0.2], [0.46, 0.53, 0.2]),
     box('brace', 'trim', [-0.03, 0.51, -0.2], [0.03, 0.53, 0.2]),
-  ], { glass: 'glass-clear', trim: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', trim: 'plastic-black' }) + { title: 'Medium aquarium' } + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A freshly glued 50 gallon aquarium, 900 mm long, 510 mm tall and 440 mm deep: bare glass panes on a
   // glass floor with no frame yet, white silicone beads in every corner and masking tape strapping the
@@ -65,7 +65,7 @@ local flatCarton(length, width, height, thickness, crease) =
       { id: 'long', min: [std.min(c.inner, c.outer), y, std.min(0.22 * side.s, 0.23 * side.s)], max: [std.max(c.inner, c.outer), y + 0.05, std.max(0.22 * side.s, 0.23 * side.s)] },
       { id: 'end', min: [std.min(c.end, c.outer), y, std.min(0.16 * side.s, 0.22 * side.s)], max: [std.max(c.end, c.outer), y + 0.05, std.max(0.16 * side.s, 0.22 * side.s)] },
     ]
-  ], { glass: 'glass-clear', silicone: 'plastic-white', tape: 'paint-cream' }) + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', silicone: 'plastic-white', tape: 'paint-cream' }) + { title: 'Medium aquarium, drying' } + { taxonomy: { category: 'containers', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A large canvas sack, 420 mm wide, 290 mm deep and 560 mm tall, standing slumped and flattened with
   // its neck gathered and tied with an olive cord, the tied-off cloth flaring above the tie.
@@ -80,7 +80,7 @@ local flatCarton(length, width, height, thickness, crease) =
     turned('tie', 'cord', 'y', [[0, 0], [0, 0.038], [0.016, 0.038], [0.016, 0]], [0, 0.46, 0]),
     box('tie-end-a', 'cord', [0.032, 0.39, 0.03], [0.04, 0.47, 0.038]),
     box('tie-end-b', 'cord', [0.02, 0.4, 0.036], [0.028, 0.47, 0.044]),
-  ], { canvas: 'cloth-canvas', cord: 'cord-olive' })
+  ], { canvas: 'cloth-canvas', cord: 'cord-olive' }) + { title: 'Canvas sack' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A thin white carrier bag standing open, 280 mm wide and 400 mm tall with its handles, with a U cut
@@ -97,7 +97,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('handle-left-top', 'bag', [-0.14, 0.38, -0.008], [-0.07, 0.4, 0.008]),
   ] + [
     box('print', 'print', [-0.06, 0.08, 0.04], [0.06, 0.18, 0.044]),
-  ], { bag: 'plastic-white', print: 'plastic-red' })
+  ], { bag: 'plastic-white', print: 'plastic-red' }) + { title: 'Plastic bag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A 500 ml plastic water bottle, 66 mm across and 184 mm tall, pale blue-clear with a wraparound
@@ -109,7 +109,7 @@ local flatCarton(length, width, height, thickness, crease) =
     turned('label', 'label', 'y', [[0, 0], [0, 0.0345], [0.06, 0.0345], [0.06, 0]], [0, 0.044, 0]),
     disc('neck-ring', 'cap', 0.017, 0.162, 0.165),
     turned('cap', 'cap', 'y', [[0, 0], [0, 0.0155], [0.015, 0.0155], [0.016, 0.014], [0.016, 0]], [0, 0.166, 0]),
-  ], { bottle: 'plastic-clear-blue', label: 'plastic-blue', cap: 'plastic-white' })
+  ], { bottle: 'plastic-clear-blue', label: 'plastic-blue', cap: 'plastic-white' }) + { title: 'Plastic bottle' }
   + h.inHand('plastic_bottle', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An empty pharmacy prescription bottle, 50 mm across and 104 mm tall, amber with a white paper label
@@ -121,24 +121,24 @@ local flatCarton(length, width, height, thickness, crease) =
   ] + [
     box('grip-%d' % i, 'cap', [0.0255 * std.cos(i * std.pi / 6) - 0.0015, 0.088, 0.0255 * std.sin(i * std.pi / 6) - 0.0015], [0.0255 * std.cos(i * std.pi / 6) + 0.0015, 0.102, 0.0255 * std.sin(i * std.pi / 6) + 0.0015])
     for i in std.range(0, 11)
-  ], { bottle: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' })
+  ], { bottle: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' }) + { title: 'Pill bottle' }
   + h.inHand('pill_bottle', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'], state: ['empty'] } } },
 
   // A knocked-down large shipping carton lying flat, 1.5 m by 1.2 m and 10 mm thick: an 800 by 700 by
   // 500 mm box with its flaps above and below the panels and a glue tab at one end.
-  h.compound('flattened_large_box', 3.7, flatCarton(0.8, 0.7, 0.5, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('flattened_large_box', 3.7, flatCarton(0.8, 0.7, 0.5, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { title: 'Flattened large box' } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
 
   // A knocked-down shipping carton lying flat, 800 mm by 700 mm and 10 mm thick: a 450 by 350 by 350 mm
   // box with its flaps above and below the panels and a glue tab at one end.
-  h.compound('flattened_medium_box', 0.55, flatCarton(0.45, 0.35, 0.35, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('flattened_medium_box', 0.55, flatCarton(0.45, 0.35, 0.35, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { title: 'Flattened medium box' } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
 
   // A knocked-down long carton lying flat, 2.2 m by 800 mm and 10 mm thick: a 1.8 m by 400 by 400 mm
   // box for long things, with its flaps above and below the panels and a glue tab at one end.
-  h.compound('flattened_oversize_box', 3.6, flatCarton(1.8, 0.4, 0.4, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
+  h.compound('flattened_oversize_box', 3.6, flatCarton(1.8, 0.4, 0.4, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { title: 'Flattened oversize box' } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
 
   // A knocked-down small carton lying flat, 300 mm by 240 mm and 8 mm thick: a 180 by 120 by 120 mm box
   // with its flaps above and below the panels and a glue tab at one end.
-  h.compound('flattened_small_box', 0.06, flatCarton(0.18, 0.12, 0.12, 0.008, 0.004), { board: 'paperboard-tan', crease: 'paperboard-brown' })
+  h.compound('flattened_small_box', 0.06, flatCarton(0.18, 0.12, 0.12, 0.008, 0.004), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { title: 'Flattened small box' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },
 
   // A black hard plastic handgun case lying flat, 516 mm long, 330 mm deep and 104 mm tall: a ribbed lid
@@ -158,7 +158,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('latch-b', 'latch', [0.13, 0.03, 0.172], [0.19, 0.072, 0.18]),
     box('hinge-a', 'latch', [-0.18, 0.04, -0.172], [-0.1, 0.06, -0.164]),
     box('hinge-b', 'latch', [0.1, 0.04, -0.172], [0.18, 0.06, -0.164]),
-  ], { shell: 'polymer-black', seam: 'plastic-grey', handle: 'rubber-black', latch: 'plastic-grey' })
+  ], { shell: 'polymer-black', seam: 'plastic-grey', handle: 'rubber-black', latch: 'plastic-grey' }) + { title: 'Handgun case' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small closed cardboard box, 210 mm long, 120 mm wide and 92 mm tall, its top flaps meeting under a
@@ -171,7 +171,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('tape-end-a', 'tape', [-0.108, 0.04, -0.024], [-0.104, 0.096, 0.024]),
     box('tape-end-b', 'tape', [0.104, 0.04, -0.024], [0.108, 0.096, 0.024]),
     box('label', 'label', [0.036, 0.092, 0.03], [0.096, 0.094, 0.056]),
-  ], { board: 'paperboard-tan', tape: 'paperboard-brown', label: 'paper-white' })
+  ], { board: 'paperboard-tan', tape: 'paperboard-brown', label: 'paper-white' }) + { title: 'Small box' }
   + h.inHand('small_box', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A small grey steel box, 210 mm long, 128 mm wide and 98 mm tall, with a lipped hinged lid, a folding
@@ -186,7 +186,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('hasp', 'handle', [-0.012, 0.05, 0.06], [0.012, 0.084, 0.064]),
     box('staple', 'handle', [-0.004, 0.056, 0.064], [0.004, 0.064, 0.07]),
     box('hinge', 'handle', [-0.09, 0.064, -0.066], [0.09, 0.076, -0.06]),
-  ], { steel: 'steel-grey', handle: 'steel' })
+  ], { steel: 'steel-grey', handle: 'steel' }) + { title: 'Small metal box' }
   + h.inHand('small_metal_box', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A small walnut keepsake box, 220 mm long, 140 mm wide and 104 mm tall, with an overhanging lid, a pale
@@ -203,7 +203,7 @@ local flatCarton(length, width, height, thickness, crease) =
     box('foot-%d' % i, 'wood', [f[0] - 0.014, 0, f[1] - 0.014], [f[0] + 0.014, 0.008, f[1] + 0.014])
     for i in [0, 1, 2, 3]
     for f in [[[-0.09, -0.05], [0.09, -0.05], [-0.09, 0.05], [0.09, 0.05]][i]]
-  ], { wood: 'wood-walnut', inlay: 'wood-birch', brass: 'brass' })
+  ], { wood: 'wood-walnut', inlay: 'wood-birch', brass: 'brass' }) + { title: 'Small wooden box' }
   + h.inHand('small_wooden_box', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['wood'], setting: ['modern'] } } },
 
   // A small printed snack carton, 120 mm tall, 90 mm wide and 50 mm deep, red with a cream window panel on
@@ -214,6 +214,6 @@ local flatCarton(length, width, height, thickness, crease) =
     box('tuck-edge', 'flap', [-0.045, 0.11, 0.025], [0.045, 0.118, 0.026]),
     box('panel', 'panel', [-0.032, 0.04, 0.025], [0.032, 0.096, 0.027]),
     box('band', 'band', [-0.045, 0.012, 0.025], [0.045, 0.026, 0.027]),
-  ], { print: 'paint-red', flap: 'paperboard-tan', panel: 'paint-cream', band: 'plastic-yellow' })
+  ], { print: 'paint-red', flap: 'paperboard-tan', panel: 'paint-cream', band: 'plastic-yellow' }) + { title: 'Snack box' }
   + h.inHand('snack_box', 'body') + h.label('panel', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
 ]

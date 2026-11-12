@@ -3,6 +3,7 @@
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'city_bus.spec.libsonnet';
 {
+  title: 'Electric city bus',
   parent: 'city_bus',
   sites(base): powertrain.electric(base, {
     drop: ['engine', 'gearbox', 'radiator', 'fuel_tank', 'exhaust', 'rear_panel'],
