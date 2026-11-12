@@ -49,8 +49,8 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
   ]
   + site.batteryBay('truck_battery_tray', [-2.75, s.floor + 0.3, 0.5]),
   tags: { 'vehicle-role': ['military'] },
-  unjudged: [
-    site.unjudged('nose', 'roof', 0.05,
-      'The cheek_near piece of apc_hull_nose runs into the plate piece of apc_hull_roof.'),
+  overlaps: [
+    site.overlap('nose', 'roof', 0.05,
+      'The sloped nose rises to the roof, so the top edge of its cheek runs into the roof plate it meets.'),
   ],
 }
