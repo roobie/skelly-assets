@@ -31,4 +31,10 @@ local s = import 'muscle_car.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.68, 0.7)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
+  unjudged: [
+    site.unjudged('rear_bench', 'exhaust_far', 0.054,
+      'The cat_can_far piece of bench_seat_2 runs into the base piece of exhaust_small.'),
+    site.unjudged('rear_bench', 'exhaust_near', 0.054,
+      'The cat_can piece of bench_seat_2 runs into the base piece of exhaust_small.'),
+  ],
 }

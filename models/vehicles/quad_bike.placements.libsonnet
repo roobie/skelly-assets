@@ -27,6 +27,8 @@ local s = import 'quad_bike.spec.libsonnet';
       'The fender_top_far piece of quad_bike_front_fenders runs into the shock_far piece of quad_bike_front_arm.'),
     site.unjudged('front_fenders', 'front_arm_near', 0.05,
       'The fender_top_near piece of quad_bike_front_fenders runs into the shock piece of quad_bike_front_arm.'),
+    site.unjudged('seat', 'tank', 0.05,
+      'The base piece of quad_bike_seat runs into the tank piece of quad_bike_tank.'),
     site.unjudged('swing_arm', 'rear_fenders', 0.06,
       'The deck piece of quad_bike_swing_arm runs into the shock_mount piece of quad_bike_rear_fenders.'),
   ],

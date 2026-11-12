@@ -20,4 +20,10 @@ local s = import 'scooter.spec.libsonnet';
     site.one('centre_stand', 'motorbike_centre_stand', [0.125, 0, 0]),
     site.one('tail_lamp', 'tail_lamp_small', [-0.89, 0.53, 0]),
   ],
+  unjudged: [
+    site.unjudged('frame', 'fork', 0.05,
+      'The stem piece of scooter_frame runs into the head piece of scooter_fork.'),
+    site.unjudged('leg_shield', 'fork', 0.05,
+      'The stem piece of scooter_leg_shield runs into the horn_cover piece of scooter_fork.'),
+  ],
 }

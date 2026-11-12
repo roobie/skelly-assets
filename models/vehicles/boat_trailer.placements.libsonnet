@@ -15,4 +15,8 @@ local s = import 'boat_trailer.spec.libsonnet';
   + site.pair('mudguard', 'boat_trailer_mudguard')
   + site.pair('wheel', 'wheel_165_70r13', [s.axle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.04, s.frameLow - 0.05, 0.46]),
+  unjudged: [
+    site.unjudged('chassis', 'jockey_wheel', 0.035,
+      'The drawbar_near piece of boat_trailer_chassis runs into the post piece of trailer_jockey_wheel.'),
+  ],
 }

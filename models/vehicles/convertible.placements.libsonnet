@@ -14,4 +14,8 @@ local s = import 'convertible.spec.libsonnet';
     },
     add: [site.one('folded_hood', 'convertible_folded_hood')],
   }),
+  unjudged: [
+    site.unjudged('exhaust', 'rear_bench', 0.064,
+      'The base piece of exhaust_car runs into the cat_can piece of bench_seat_3.'),
+  ],
 }

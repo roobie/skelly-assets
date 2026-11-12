@@ -13,6 +13,8 @@ local s = import 'saloon.spec.libsonnet';
     port: { part: 'charge_port', at: [s.rearAxle - 0.15, s.archTop + 0.05, s.side] },
   }),
   unjudged: [
+    site.unjudged('shell', 'charge_port', 0.06,
+      'The quarter_arch_near piece of saloon_shell runs into the socket piece of charge_port.'),
     site.unjudged('shell', 'pack', 0.08,
       'The floor_pan piece of saloon_shell runs into the case piece of traction_pack_car.'),
   ],

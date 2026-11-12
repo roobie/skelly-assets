@@ -32,9 +32,19 @@ local s = import 'news_helicopter.spec.libsonnet';
   + pair('rear_door', 'news_helicopter_rear_door')
   + pair('seat', 'helicopter_seat', [1.0, s.floor, 0.32]),
   unjudged: [
+    site.unjudged('belly', 'camera_ball', 0.054,
+      'The stem piece of news_helicopter_belly runs into the skin_keel_41_3 piece of news_helicopter_camera_ball.'),
+    site.unjudged('belly', 'skids', 0.063,
+      'The core_0 piece of news_helicopter_belly runs into the cross_1 piece of news_helicopter_skids.'),
     site.unjudged('engine_cowl', 'main_gearbox', 0.131,
       'The pylon piece of news_helicopter_engine_cowl runs into the case piece of news_helicopter_main_gearbox.'),
+    site.unjudged('rear_bench', 'rear_door_far', 0.045,
+      'The back piece of news_helicopter_rear_bench runs into the pane_1_1_far piece of news_helicopter_rear_door.'),
+    site.unjudged('rear_bench', 'rear_door_near', 0.045,
+      'The back piece of news_helicopter_rear_bench runs into the pane_1_1 piece of news_helicopter_rear_door.'),
     site.unjudged('rear_fairing', 'downlink_dome', 0.062,
       'The dome piece of news_helicopter_rear_fairing runs into the skin_keel_21_2 piece of news_helicopter_downlink_dome.'),
+    site.unjudged('roof', 'main_gearbox', 0.063,
+      'The case piece of news_helicopter_roof runs into the roof_4_1 piece of news_helicopter_main_gearbox.'),
   ],
 }

@@ -26,6 +26,8 @@ local rearAt(x) = local p = s.at([x, s.hubY]); [p[0], p[1], s.wheelZ];
   + pair('first_axle_wheel', 'jackknifed_lorry_cab_rear_wheel', rearAt(s.rearAxles[0]))
   + pair('last_axle_wheel', 'jackknifed_lorry_cab_rear_wheel', rearAt(s.rearAxles[1])),
   unjudged: [
+    site.unjudged('back', 'fuel_tank', 0.048,
+      'The skin_7_0 piece of jackknifed_lorry_cab_back runs into the skin_0_13 piece of jackknifed_lorry_cab_fuel_tank.'),
     site.unjudged('chassis', 'earth', 0.063,
       'The heap_13_10 piece of jackknifed_lorry_cab_chassis runs into the cross_5 piece of jackknifed_lorry_cab_earth.'),
     site.unjudged('chassis', 'nose', 0.044,
@@ -34,6 +36,8 @@ local rearAt(x) = local p = s.at([x, s.hubY]); [p[0], p[1], s.wheelZ];
       'The floor_6_8 piece of jackknifed_lorry_cab_chassis runs into the frame_3_10 piece of jackknifed_lorry_cab_windscreen_frame.'),
     site.unjudged('earth', 'bumper', 0.125,
       'The heap_6_17 piece of jackknifed_lorry_cab_earth runs into the far piece of jackknifed_lorry_cab_bumper.'),
+    site.unjudged('near_side', 'fuel_tank', 0.05,
+      'The skin_7_0 piece of jackknifed_lorry_cab_near_side runs into the wall_0_0 piece of jackknifed_lorry_cab_fuel_tank.'),
     site.unjudged('nose', 'bumper', 0.125,
       'The end piece of jackknifed_lorry_cab_nose runs into the side_near_5_9 piece of jackknifed_lorry_cab_bumper.'),
     site.unjudged('nose', 'earth', 0.093,

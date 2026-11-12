@@ -51,5 +51,7 @@ local wheel = id + '_wheel';
       'The tube piece of light_tactical_vehicle_frame runs into the cross_4 piece of prop_shaft_short.'),
     site.unjudged('frame', 'rear_prop_shaft', 0.032,
       'The tube piece of light_tactical_vehicle_frame runs into the cross_2 piece of light_tactical_vehicle_rear_prop_shaft.'),
+    site.unjudged('tailgate', 'fuel_tank', 0.052,
+      'The gate piece of light_tactical_vehicle_tailgate runs into the body piece of fuel_tank_car.'),
   ],
 }

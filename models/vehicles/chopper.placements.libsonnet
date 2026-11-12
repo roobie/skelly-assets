@@ -20,4 +20,8 @@ local s = import 'chopper.spec.libsonnet';
     site.one('tail_lamp', 'tail_lamp_small', [-1.27, 0.5, 0]),
   ]
   + site.pair('foot_peg', 'chopper_foot_peg'),
+  unjudged: [
+    site.unjudged('frame', 'saddle', 0.054,
+      'The nose piece of chopper_frame runs into the seat_post piece of chopper_saddle.'),
+  ],
 }

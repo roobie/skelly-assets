@@ -12,4 +12,8 @@ local rearRow = s.seatRows[std.length(s.seatRows) - 1];
   ] + [
     site.one('seats_rear', 'bus_seat_pair', [rearRow, s.floor, -farColumn]),
   ],
+  unjudged: [
+    site.unjudged('exhaust', 'rear_axle', 0.06,
+      'The tailpipe piece of exhaust_long runs into the beam piece of beam_axle_van.'),
+  ],
 }

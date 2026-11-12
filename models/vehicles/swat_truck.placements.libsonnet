@@ -19,6 +19,10 @@ local s = import 'swat_truck.spec.libsonnet';
   + site.pair('crew_bench', 'crew_bench', [s.benchX, s.body.floorTop, s.benchZ]),
   tags: { 'vehicle-role': ['emergency'] },
   unjudged: [
+    site.unjudged('body_floor', 'rear_step', 0.05,
+      'The rear_apron piece of swat_truck_body_floor runs into the hanger_near piece of swat_truck_rear_step.'),
+    site.unjudged('front_bumper', 'ram', 0.087,
+      'The arm_near piece of swat_truck_front_bumper runs into the bar piece of swat_truck_ram.'),
     site.unjudged('radiator', 'exhaust', 0.06,
       'The pipe piece of radiator_truck runs into the core piece of exhaust_long.'),
   ],

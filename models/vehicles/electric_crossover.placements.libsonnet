@@ -32,6 +32,8 @@ local s = import 'electric_crossover.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.8, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.55, -0.44]),
   unjudged: [
+    site.unjudged('shell', 'charge_port', 0.06,
+      'The quarter_arch_near piece of electric_crossover_shell runs into the socket piece of charge_port.'),
     site.unjudged('shell', 'pack', 0.08,
       'The floor_pan piece of electric_crossover_shell runs into the case piece of traction_pack_car.'),
   ],

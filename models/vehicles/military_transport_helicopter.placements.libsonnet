@@ -35,6 +35,8 @@ local id = 'military_transport_helicopter';
   + pair('troop_bench', id + '_troop_bench', [0, s.floor, 0]),
   tags: { 'vehicle-role': ['military'] },
   unjudged: [
+    site.unjudged('tail_cone', 'tail_gear', 0.058,
+      'The strut piece of military_transport_helicopter_tail_cone runs into the wall_6_23 piece of military_transport_helicopter_tail_gear.'),
     site.unjudged('tail_surfaces', 'tail_rotor', 0.044,
       'The fin piece of military_transport_helicopter_tail_surfaces runs into the hub piece of military_transport_helicopter_tail_rotor.'),
   ],

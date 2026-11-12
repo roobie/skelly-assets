@@ -8,4 +8,8 @@ local s = import 'ice_cream_van.spec.libsonnet';
     site.one('roof_cone', 'ice_cream_van_roof_cone'),
     site.one('freezer', 'ice_cream_van_freezer'),
   ],
+  unjudged: [
+    site.unjudged('exhaust', 'rear_axle', 0.063,
+      'The silencer piece of exhaust_long runs into the beam piece of beam_axle_van.'),
+  ],
 }

@@ -16,4 +16,8 @@ local axleIds = std.range(0, std.length(s.axles) - 1);
   + site.pair('ramp', 'car_trailer_ramp')
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.04, s.frameLow, 0.8])
   + site.pair('marker', 'marker_lamp', [1.56, 1.2, 0.47]),
+  unjudged: [
+    site.unjudged('chassis', 'jockey_wheel', 0.035,
+      'The drawbar_near piece of car_trailer_chassis runs into the post piece of trailer_jockey_wheel.'),
+  ],
 }

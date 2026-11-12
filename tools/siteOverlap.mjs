@@ -15,7 +15,7 @@ import { solid } from './pieceSolid.mjs';
 const repo = resolve(import.meta.dirname, '..');
 
 // Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
-// the overlaps it allows and has not judged, the fits by role and every site id of the catalogue: { grain, fits,
+// the overlaps it allows and has not judged, the fits by role and every drawn site's id: { grain, fits,
 // roles, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps, unjudged } } }. A site whose part is
 // a roster model has no pieces to compare, so it is left out.
 export function readSitePieces(root = repo) {
@@ -32,7 +32,7 @@ export function readSitePieces(root = repo) {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
     fits: (import 'models/vehicles/seating.libsonnet').fits,
     roles: std.set(std.flattenArrays([
-      [site.id for site in placements[vehicle].sites]
+      [site.id for site in placements[vehicle].sites if std.objectHas(drawn, site.part)]
       for vehicle in std.objectFields(placements)
       if std.objectHas(placements[vehicle], 'sites')
     ])),
@@ -100,47 +100,48 @@ export function siteOverlaps(sites, grain) {
 // A site's role: its id without the side it is on and its number, so every vehicle's wheels share one fit.
 export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').replace(/_\d+(?=_|$)/g, '');
 
-const FIT_KEYS = ['depth', 'into', 'seated', 'why'];
+const FIT_KEYS = ['pairs', 'why'];
 const EPSILON = 1e-9;
+const LOOSE = 2; // grains a cap may exceed the depth it was measured at
 
-// Why the fits cannot be trusted, as messages: a malformed fit, a role no site of the catalogue has, and a pair of
-// roles that two fits cover, whose depths would then disagree.
+// Why the fits cannot be trusted, as messages: a malformed fit or pair, a role no drawn site has, and a pair of roles
+// that is listed twice, whose depths would then disagree.
 export function seatingProblems(fits, roles) {
   const known = new Set(roles.map(roleOf));
-  const covered = new Map();
+  const listed = new Map();
   return fits.flatMap((fit, i) => {
     const where = `seating fit ${i + 1} (${String(fit?.why).slice(0, 40)})`;
     const keys = Object.keys(fit ?? {}).sort();
     const shape = [
       ...(keys.join() === FIT_KEYS.join() ? [] : [`${where}: has keys ${keys.join(' ')}, not ${FIT_KEYS.join(' ')}`]),
-      ...(fit?.depth > 0 ? [] : [`${where}: needs a depth above 0`]),
       ...(typeof fit?.why === 'string' && fit.why !== '' ? [] : [`${where}: needs a why`]),
-      ...['seated', 'into']
-        .filter((side) => !Array.isArray(fit?.[side]) || fit[side].length === 0)
-        .map((side) => `${where}: ${side} needs at least one role`),
+      ...(Array.isArray(fit?.pairs) && fit.pairs.length > 0 ? [] : [`${where}: needs at least one pair`]),
     ];
     if (shape.length > 0) return shape;
-    const unknown = [...fit.seated, ...fit.into].filter((role) => !known.has(role));
-    const clashes = fit.seated.flatMap((a) => fit.into.map((b) => key(a, b))).filter((pair) => {
-      const earlier = covered.get(pair);
-      covered.set(pair, earlier ?? i);
-      return earlier !== undefined && earlier !== i;
+    return fit.pairs.flatMap((pair) => {
+      const [seated, into, depth] = Array.isArray(pair) ? pair : [];
+      const name = `${where}: pair ${seated} and ${into}`;
+      if (pair.length !== 3 || typeof seated !== 'string' || typeof into !== 'string' || !(depth > 0)) {
+        return [`${where}: pair ${JSON.stringify(pair)} is not [seated, into, depth] with a depth above 0`];
+      }
+      const earlier = listed.get(key(seated, into));
+      listed.set(key(seated, into), earlier ?? i);
+      return [
+        ...[seated, into]
+          .filter((role) => !known.has(role))
+          .map((role) => `${where}: role ${role} is the role of no site with pieces`),
+        ...(earlier === undefined ? [] : [`${name} is also listed in fit ${earlier + 1}`]),
+      ];
     });
-    return [
-      ...[...new Set(unknown)].map((role) => `${where}: role ${role} is the role of no site`),
-      ...[...new Set(clashes)].map((pair) =>
-        `${where}: ${pair.split('\n').join(' and ')} is also covered by fit ${covered.get(pair) + 1}`),
-    ];
   });
 }
 
-// How deep (m) the fits let parts of the two roles sink into each other: the deepest fit that names one in `seated`
-// and the other in `into`, or 0.
+// How deep (m) the fits let parts of the two roles sink into each other: the depth of the pair that names them, in
+// either orientation, or 0.
 export function fitDepth(fits, roleA, roleB) {
-  return Math.max(0, ...fits
-    .filter(({ seated, into }) =>
-      (seated.includes(roleA) && into.includes(roleB)) || (seated.includes(roleB) && into.includes(roleA)))
-    .map(({ depth }) => depth));
+  const pair = key(roleA, roleB);
+  const depths = fits.flatMap(({ pairs }) => pairs).filter(([a, b]) => key(a, b) === pair).map(([, , depth]) => depth);
+  return Math.max(0, ...depths);
 }
 
 const millimetres = (metres) => Math.round(metres * 1e3);
@@ -152,6 +153,7 @@ const millimetres = (metres) => Math.round(metres * 1e3);
 export function overlapReport({ grain, fits, roles, vehicles }) {
   const problems = seatingProblems(fits, roles);
   const notes = [];
+  const measured = new Map();
   for (const [vehicle, { parent, sites, overlaps, unjudged }] of Object.entries(vehicles)) {
     const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
     const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
@@ -162,6 +164,8 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
     const describe = ({ sites: [a, b], parts: [partA, partB] }) =>
       `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
     for (const overlap of found.values()) {
+      const rolePair = key(...overlap.sites.map(roleOf));
+      measured.set(rolePair, [...(measured.get(rolePair) ?? []), overlap.depth]);
       const cap = Math.max(roleDepth(overlap), allowed.get(key(...overlap.sites))?.depth ?? 0);
       const [partA, partB] = overlap.parts;
       const [a, b] = overlap.sites;
@@ -181,6 +185,9 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
       else if (!overlap) problems.push(`${where} is stale: the parts no longer overlap`);
       else if (roleDepth(overlap) + EPSILON >= overlap.depth) {
         problems.push(`${where} is stale: the seating already covers it`);
+      } else if (entry.depth - overlap.depth > LOOSE * grain) {
+        const [capped, measures] = [entry.depth, overlap.depth].map(millimetres);
+        problems.push(`${where} is capped at ${capped} mm, far above the ${measures} mm it measures`);
       }
       seen.add(pair);
       if (overlap && unjudged.includes(entry)) {
@@ -189,7 +196,23 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
       }
     }
   }
+  problems.push(...seatingUseProblems(fits, grain, measured));
   return { problems, notes };
+}
+
+// Pairs of the fits that no vehicle uses: one no vehicle overlaps on, or one whose depth is far above the deepest
+// overlap it covers, so the table keeps no pair that has lost its reason and no cap that has come loose.
+function seatingUseProblems(fits, grain, measured) {
+  return fits.flatMap(({ pairs }, i) => pairs.flatMap(([seated, into, depth]) => {
+    const depths = measured.get(key(seated, into));
+    const covered = Math.max(0, ...(depths ?? []).filter((found) => found <= depth + EPSILON));
+    const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
+    if (!depths) return [`${where} is unused: no vehicle overlaps on it`];
+    if (covered > 0 && depth - covered > LOOSE * grain) {
+      return [`${where} is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`];
+    }
+    return [];
+  }));
 }
 
 export const siteOverlapReport = (root = repo) => overlapReport(readSitePieces(root));

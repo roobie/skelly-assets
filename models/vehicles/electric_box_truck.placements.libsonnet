@@ -18,6 +18,8 @@ local s = (import 'truck-cab.libsonnet').spec(import 'box_truck.spec.libsonnet')
   unjudged: [
     site.unjudged('chassis', 'pack', 0.087,
       'The spring_1 piece of box_truck_chassis runs into the case piece of traction_pack_van.'),
+    site.unjudged('inverter', 'charge_port', 0.06,
+      'The case piece of inverter_large runs into the socket piece of charge_port.'),
     site.unjudged('pack', 'pack_lower', 0.05,
       'The case piece of traction_pack_van runs into the lead piece of traction_pack_van.'),
   ],

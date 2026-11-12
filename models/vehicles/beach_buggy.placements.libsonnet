@@ -27,6 +27,8 @@ local s = import 'beach_buggy.spec.libsonnet';
   unjudged: [
     site.unjudged('engine', 'fuel_tank', 0.032,
       'The alternator_case piece of engine_i4_petrol runs into the body piece of fuel_tank_car.'),
+    site.unjudged('frame', 'roll_bar', 0.033,
+      'The upper_rail_near piece of beach_buggy_frame runs into the brace_near piece of beach_buggy_roll_bar.'),
     site.unjudged('gearbox', 'fuel_tank', 0.146,
       'The body piece of gearbox_transaxle runs into the case piece of fuel_tank_car.'),
     site.unjudged('rear_axle', 'engine', 0.06,

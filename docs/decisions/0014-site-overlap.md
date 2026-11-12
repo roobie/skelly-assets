@@ -28,20 +28,23 @@ shallow one. See `tools/siteOverlap.mjs`, `siteOverlaps`.
 
 An overlap is allowed in two places, so each fact is stated once where it is true:
 
-- A fit, for every vehicle: `models/vehicles/seating.libsonnet` says that parts of some roles sit into parts of other
-  roles up to a depth, in either orientation. A role is a site id without side and number, and a fit names whole roles:
-  a pattern would match parts nobody meant and let a real mistake pass. Fits are a table by role and not fields on the
-  part rows because the rows are a strict, cached schema and a fit belongs to how parts are placed. A catch-all role
-  is split before it is given a fit, so the depth follows the real fit. The table is checked on every run, so it
-  cannot rot: a malformed fit, a role no site has, or two fits for one pair of roles fail the build.
+- A fit, for every vehicle: `models/vehicles/seating.libsonnet` lists, under one reason, the exact pairs of roles
+  that sink into each other and how deep, in either orientation. A role is a site id without side and number, and a
+  pair names whole roles: a pattern or a cross product of role sets would cover pairs nobody judged and let a real
+  mistake pass, and one cap for pairs that differ three- or fourfold would hide the deeper ones. Each depth is the
+  pair's own deepest overlap plus a small margin. A pair belongs in a fit only when its reason is true of those two
+  parts; one nobody can explain is `unjudged` in the vehicle. Fits are a table by role and not fields on the part rows
+  because the rows are a strict, cached schema and a fit belongs to how parts are placed. The table is checked on every
+  run, so it cannot rot: a malformed fit, a role no drawn site has, a pair listed twice, a pair no vehicle overlaps
+  on, or a depth more than two grains above what any vehicle measures fails the build.
 - The vehicle, for what only it does: `overlaps` in its placements file says why a pair is correct, and `unjudged`
   holds an overlap nobody has judged, which may be a defect. Neither fails the build, but `unjudged` prints a note on
   every run, so it stays visible until someone decides. See `models/vehicles/site.libsonnet`, `overlap` and
   `unjudged`. A variant allows its parent's entries as well as its own.
 
-Every allowance is a depth cap: a fit or entry that grows deeper than declared fails again, so the cap is the
-contract, not the pair. An entry whose pair no longer overlaps, that a fit already covers, or that is listed twice
-fails the build, so the lists carry no dead weight.
+Every allowance is a depth cap: a pair or entry that grows deeper than declared fails again, so the cap is the
+contract, not the pair. An entry whose pair no longer overlaps, that a fit already covers, that is listed twice or
+whose cap is more than two grains above its measured depth fails the build, so the lists carry no dead weight.
 
 ## Consequences
 
@@ -52,6 +55,9 @@ shaft whose upper half runs through a chassis crossmember measures about half it
 that needs a measure of how much of the thinner part is inside, not the mutual depth.
 
 The check evaluates every vehicle part's pieces, so its cost follows piece evaluation and not the comparison.
+
+A variant that inherits an unjudged entry prints only its parent's note, so each unjudged pair is said once however
+many variants share it.
 
 The build is the only gate over the whole catalogue; the unit tests hold the rule on small fixtures, so a catalogue
 change cannot make them fail.
