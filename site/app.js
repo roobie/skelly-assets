@@ -13,10 +13,7 @@ const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, befor
 const SUGGESTION_LIMIT = 40; // terms a combobox lists at once; typing narrows them
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
 
-const nameOf = (id) => {
-  const s = id.replace(/_/g, ' ');
-  return s.charAt(0).toUpperCase() + s.slice(1);
-};
+const CLIP_NAMES = { walk: 'Walk', attack: 'Attack', pounce: 'Pounce', idle: 'Idle' };
 const kb = (n) => (n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
 
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
@@ -166,12 +163,12 @@ function makeCard(model) {
   canvas.className = 'thumb';
   canvas.width = canvas.height = 1;
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', nameOf(model.id));
+  canvas.setAttribute('aria-label', model.title);
   canvas._model = model;
   const label = document.createElement('div');
   label.className = 'label';
   label.innerHTML = '<div class="name"></div><div class="meta"></div>';
-  label.querySelector('.name').textContent = nameOf(model.id);
+  label.querySelector('.name').textContent = model.title;
   label.querySelector('.meta').textContent = `${shelfLabel(shelfOf(model))} · ${isVehicle(model) ? `${model.sites.length} parts` : kb(model.bytes)}`;
   card.append(canvas, label);
   card.onclick = () => openViewer(model);
@@ -361,7 +358,7 @@ async function openViewer(model, restored = null) {
   pushedOpen ||= opening && !restored;
 
   $('v-category').textContent = shelfLabel(shelfOf(model));
-  $('v-name').textContent = nameOf(model.id);
+  $('v-name').textContent = model.title;
   const file = isVehicle(model) ? model.placements : model.file;
   $('v-id').textContent = file;
   $('v-download').href = `built/${file}`;
@@ -439,7 +436,7 @@ async function openViewer(model, restored = null) {
       b.className = 'chip';
       b.type = 'button';
       b.dataset.clip = n;
-      b.textContent = nameOf(n);
+      b.textContent = CLIP_NAMES[n];
       b.onclick = () => pick(n);
       return b;
     }));

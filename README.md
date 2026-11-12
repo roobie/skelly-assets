@@ -96,7 +96,7 @@ see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
 Every model also needs a category and may carry facet tags and keywords, from the vocabulary in `models/taxonomy.json`.
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
-`models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
+`models/TAXONOMY.md`; `node tools/check-sources.mjs` lists what is still untagged.
 
 ### Outputs and consumers
 

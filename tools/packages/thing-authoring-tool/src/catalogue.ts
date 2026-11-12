@@ -106,6 +106,8 @@ const PartSchema = strictObject({
 });
 const ItemSchema = strictObject({
   id: name,
+  /** What the item is called wherever it is listed or printed; authored, never derived from the id. */
+  title: pipe(string(), nonEmpty()),
   exportMass: picklist(['parts', 'inventory-atom']),
   /**
    * The axis the row puts its front on, or a held thing its working end, when that is not +z: a kit laid out along
@@ -134,8 +136,8 @@ const ItemSchema = strictObject({
   /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
   display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
   /**
-   * The face of a solid that carries the item's print, and the print's text, which defaults to the model's display
-   * name. The part defaults to the item's first, which is a compound's only one; the top defaults to +y on a side
+   * The face of a solid that carries the item's print, and the print's text, which defaults to the model's title.
+   * The part defaults to the item's first, which is a compound's only one; the top defaults to +y on a side
    * face, and to the back on the top or bottom face, so the text reads from the front.
    */
   label: optional(

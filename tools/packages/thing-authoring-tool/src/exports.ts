@@ -2,7 +2,7 @@ import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
-import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, type Catalogue, type CatalogueSettings, itemPalette, type ToolItem } from './catalogue.ts';
 import { checkDrawnDensity, type DensityBounds, DensityBoundsSchema } from './density.ts';
@@ -88,7 +88,7 @@ export const exportItem = (
       ...(glow ? { emissiveMaterial: glow } : {}),
       ...(paintable.length > 0 ? { paintable } : {}),
       ...(item.covers ? { covers: item.covers } : {}),
-      ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
+      ...(label ? { label: { ...label, text: item.label?.text ?? item.title } } : {}),
     },
     physical: { ...assemblyProperties(parts), volumeM3: drawnVolumeM3(report.resolved, drawn) },
   };
