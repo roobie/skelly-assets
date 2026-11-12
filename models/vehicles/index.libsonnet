@@ -8,6 +8,7 @@
   'ambulance': import 'models/vehicles/ambulance.libsonnet',
   'animal_control_van': import 'models/vehicles/animal_control_van.libsonnet',
   'apc': import 'models/vehicles/apc.libsonnet',
+  'apc_scifi_wheeled': import 'models/vehicles/apc_scifi_wheeled.libsonnet',
   'army_jeep': import 'models/vehicles/army_jeep.libsonnet',
   'articulated_bus': import 'models/vehicles/articulated_bus.libsonnet',
   'beach_buggy': import 'models/vehicles/beach_buggy.libsonnet',
