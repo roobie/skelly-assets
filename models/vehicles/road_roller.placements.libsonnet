@@ -28,8 +28,6 @@ local s = import 'road_roller.spec.libsonnet';
   + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
   unjudged: [
-    site.unjudged('engine_hood', 'engine', 0.271,
-      'The hood piece of road_roller_engine_hood runs into the block piece of engine_i3_small.'),
     site.unjudged('front_yoke', 'front_drum', 0.151,
       'The neck piece of road_roller_front_yoke runs into the roll piece of road_roller_drum.'),
     site.unjudged('platform', 'front_yoke', 0.087,

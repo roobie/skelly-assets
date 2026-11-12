@@ -141,7 +141,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['radiator', 'cab', 0.055],
       ['radiator', 'chassis', 0.065],
       ['radiator', 'engine_cover', 0.065],
-      ['radiator', 'engine_hood', 0.065],
       ['radiator', 'hood', 0.065],
       ['radiator', 'house', 0.065],
       ['radiator', 'shell', 0.065],
