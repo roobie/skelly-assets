@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
+import { KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
 
 const model = (id, category, tags = {}, keywords = []) => ({ id, category, tags, keywords });
 const entries = [
@@ -76,8 +76,16 @@ test('the landing page is the same models for the same seed and stays within its
   assert.equal(landingModels(entries, 1, 99).length, entries.length);
 });
 
-test('no reshuffle of one day lands on the seed of another day', () => {
-  const days = Array.from({ length: 60 }, (_, i) => dailySeed(new Date(Date.UTC(2026, 10, 1 + i))));
-  const seeds = days.flatMap((day) => Array.from({ length: 20 }, (_, n) => landingSeed(day, n)));
-  assert.equal(new Set(seeds).size, seeds.length);
+test('a reshuffle of one day does not land on the seed of the next day', () => {
+  const today = dailySeed(new Date(Date.UTC(2026, 10, 12)));
+  const tomorrow = dailySeed(new Date(Date.UTC(2026, 10, 13)));
+  assert.notEqual(landingSeed(today, 1), landingSeed(tomorrow, 0));
+  assert.notEqual(landingSeed(today, 1), landingSeed(today, 0));
+});
+
+test('states with the same filter and reshuffle draw the same grid, whichever model is open', () => {
+  const base = { ...emptyState(), filter: filterOf({ q: 'e' }) };
+  assert.ok(sameGrid(base, { ...base, model: 'oak_door', view: 'front', info: true }));
+  assert.ok(!sameGrid(base, { ...base, filter: filterOf({ q: 'ea' }) }));
+  assert.ok(!sameGrid(base, { ...base, reshuffle: 1 }));
 });

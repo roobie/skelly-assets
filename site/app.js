@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
-import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, shelfOf, stateHash, suggestions } from './filter.mjs';
+import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from './filter.mjs';
 import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -86,6 +86,7 @@ let shown = []; // what the filter selects, or the landing page's few models
 let visible = 0; // how many of `shown` have a card
 let taxonomy = { categories: {}, facets: {} };
 let filter = emptyFilter();
+let drawn = false; // the grid has been built at least once
 let reshuffle = 0; // landing pages asked for since the page opened
 const combos = new Map(); // dimension -> its combobox
 let closedByHash = false; // the viewer is closing because the hash no longer names a model
@@ -202,6 +203,7 @@ function writeHash(push = false) {
 }
 
 function showFilter() {
+  drawn = true;
   shown = isBrowsing(filter) ? landingModels(entries, landingSeed(dailySeed(), reshuffle)) : entries.filter((m) => matches(m, filter));
   seen.disconnect();
   queue.length = 0;
@@ -218,17 +220,24 @@ function applyFilter() {
   writeHash();
 }
 
-// Puts the page into a state a link, a reload or a step through history left: the controls, the grid and the open model.
+// Puts the page into a state a link, a reload or a step through history left. Only what differs is redone: stepping Back
+// from an open model must return to the grid as it was, with its extra pages and scroll, and a change of filter must not
+// reload the model that stays open.
 function restore(state) {
-  filter = knownOnly(state.filter, entries);
-  reshuffle = state.reshuffle;
-  $('search').value = filter.q;
-  markShelf(false);
-  for (const [dimension, combo] of combos) combo.set(filter.picks[dimension] ?? []);
-  showFilter();
+  const target = { ...state, filter: knownOnly(state.filter, entries) };
+  const was = currentState();
+  if (!drawn || !sameGrid(was, target)) {
+    filter = target.filter;
+    reshuffle = target.reshuffle;
+    $('search').value = filter.q;
+    markShelf(false);
+    for (const [dimension, combo] of combos) combo.set(filter.picks[dimension] ?? []);
+    showFilter();
+  }
   const model = byId.get(state.model);
-  if (model) openViewer(model, state);
-  else if ($('viewer').open) {
+  if (model) {
+    if (model.id !== was.model || state.view !== was.view || state.info !== was.info) openViewer(model, state);
+  } else if ($('viewer').open) {
     closedByHash = true;
     $('viewer').close();
   }

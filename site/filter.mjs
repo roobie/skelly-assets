@@ -43,7 +43,7 @@ export function matches(entry, { q, shelf, picks }) {
 // narrows, so its picks stay in.
 export function suggestions(entries, filter, dimension) {
   const taken = new Set(filter.picks[dimension] ?? []);
-  const { [dimension]: own, ...others } = filter.picks;
+  const { [dimension]: _own, ...others } = filter.picks;
   const basis = dimension === KEYWORD ? filter : { ...filter, picks: others };
   const counts = new Map();
   for (const entry of entries) {
@@ -52,9 +52,6 @@ export function suggestions(entries, filter, dimension) {
   }
   return [...counts].sort(([a, n], [b, m]) => m - n || (a < b ? -1 : 1)).map(([term, count]) => ({ term, count }));
 }
-
-// ---- the URL ----
-// `?q=text&cat=shelf&kw=a&kw=b&tag=facet:term`: a part left out is not filtering.
 
 // ---- the page's state, as a URL hash ----
 
@@ -98,6 +95,9 @@ export function parseState(hash) {
     info: params.get('info') === '1',
   };
 }
+
+// Whether two states draw the same grid: they agree on the filter and the reshuffle, whatever model each has open.
+export const sameGrid = (a, b) => stateHash({ ...emptyState(), filter: a.filter, reshuffle: a.reshuffle }) === stateHash({ ...emptyState(), filter: b.filter, reshuffle: b.reshuffle });
 
 // A pick the catalogue does not have would match nothing and could not be removed, so it is dropped.
 export function knownOnly(filter, entries) {
