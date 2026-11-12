@@ -47,7 +47,7 @@ const showing = (width) => page.evaluate(async (sleeveWidth) => {
     const geometry = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(mesh.positions, 3)).setIndex(mesh.indices);
     joint.add(new THREE.Mesh(geometry));
   }
-  addCoveredSkin({ bones: new Map([['arm', { joint }]]) }, coveredSurface(rig, rest));
+  addCoveredSkin({ bones: new Map([['arm', { joint }]]) }, coveredSurface(rig, rest, { whole: true }));
   return skinCheck(joint, 128, 'review').views.map(({ showing }) => showing);
 }, width);
 
