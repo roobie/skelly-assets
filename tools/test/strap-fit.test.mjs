@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { strapFindings } from '../strap-fit.mjs';
+import { anchorFindings, strapFindings } from '../strap-fit.mjs';
 
 // Closed axis-aligned boxes of 12 outward-wound triangles each, as one mesh.
 const boxes = (...spans) => {
@@ -52,4 +52,25 @@ test('a strap whose inner face lies inside the head is reported', () => {
   const [only, ...rest] = findings(strapRound({ left: -GRAIN }));
   assert.deepEqual(rest, []);
   assert.match(only, /^gear: \d+ of \d+ samples of the strap's inner face lie inside the head/);
+});
+
+// Strap anchors on the box head's left side, the inner anchor `gap` off it and the outer a wall further out, in the
+// gear frame; a half turn about y in all carries the gear frame's -x onto the head's +x.
+const leftAnchors = ({ gap = GRAIN, inner = -(HALF[0] + gap), outer = inner - WALL } = {}) => ({
+  strap_left_inner: [inner, 0, 0],
+  strap_left_outer: [outer, 0, 0],
+});
+const turned = { frame: { height: 0.75, turn: 90 }, worn: { at: 0.25, turn: 90 } };
+const anchorsFit = (anchors) => anchorFindings({ head: headAt(1, 0), anchors, ...turned, model: 'gear' });
+
+test('strap anchors fit where the head lies within the strap thickness inward of the inner anchor', () => {
+  assert.deepEqual(anchorsFit(leftAnchors()), []);
+  const [only, ...rest] = anchorsFit(leftAnchors({ gap: 3 * GRAIN }));
+  assert.deepEqual(rest, []);
+  assert.match(only, /^gear: looking in from its left strap's inner anchor .*, the head lies 6\.0 mm off/);
+});
+
+test('strap anchors naming the outer face as the inner one are reported', () => {
+  const swapped = leftAnchors({ inner: -(HALF[0] + GRAIN + WALL), outer: -(HALF[0] + GRAIN) });
+  assert.match(anchorsFit(swapped)[0], /^gear: looking in from its left strap's inner anchor .*, the head is missed/);
 });

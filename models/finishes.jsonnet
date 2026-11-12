@@ -16,6 +16,9 @@ local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n
   copper: material([0.7, 0.34, 0.19]),
   lead: material([0.38, 0.4, 0.42]),
   steel: material([0.29, 0.32, 0.31]),
+  // Cartridge cases: steel ones are polymer-coated grey, since a bright nickel or zinc plating looked wrong on them.
+  // The `steel` prefix keeps the name in the metal wear class; do not reorder the words.
+  'steel-polymer-coated': material([0.5, 0.51, 0.52]) + { finish: { metallic: 0.3, roughness: 0.6 } },
   'paperboard-brown': material([0.27, 0.23, 0.17]),
   'paper-cover-sage': material([0.527, 0.593, 0.556]) + { finish: { metallic: 0, roughness: 1 } },
   'paper-pages-cream': material([0.945, 0.926, 0.849]) + { finish: { metallic: 0, roughness: 1 } },

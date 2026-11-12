@@ -5,10 +5,11 @@ import type { AppearanceContext, GlbAssetIdentity, GlbExportError } from '@skell
 import { type CartridgeModelKind, cartridgeModelAsset } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type RoundProfiles, roundProfiles } from '../ammo/roundProfile.ts';
+import { cartridgeFinish } from './cartridgeFinish.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { AMMO_PALETTE, GUN_APPEARANCE } from './palette.ts';
-import { shotshellGeometry, shotshellHullMaterial } from './shotshellGeometry.ts';
+import { shotshellGeometry } from './shotshellGeometry.ts';
 
 interface CartridgeModel {
   readonly glb: Uint8Array;
@@ -70,11 +71,7 @@ const makeModelExport = (
   const resolved = resolve(assembly, domain);
   const effectiveAppearance: AppearanceContext = {
     ...appearance,
-    finish: {
-      ...GUN_APPEARANCE.cartridgeFinish,
-      ...(cartridge.kind === 'shotshell' ? { hull: shotshellHullMaterial(cartridge) } : {}),
-      ...appearance?.finish,
-    },
+    finish: { ...cartridgeFinish(cartridge), ...appearance?.finish },
   };
   // No voxel grain: a cartridge's rim and taper land unevenly on any grain, so it is drawn as a faceted lathe.
   const result = exportGlb({

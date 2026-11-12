@@ -1,7 +1,6 @@
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
-import { pagesAnalyticsPlugin } from '../../pagesAnalyticsPlugin.ts';
 import { TEST_POOL } from '../../testPool.ts';
 
 // The manual sweep run has no per-test timer: its work is bounded, so only the workflow's job timeout caps a hang.
@@ -11,8 +10,6 @@ const sweepTimeout = process.env.MOBGEN_SWEEPS === '1' ? { testTimeout: 0, hookT
 export default defineConfig({
   base: './',
   resolve: { alias: { '@mobgen': fileURLToPath(new URL('./src', import.meta.url)) } },
-  // biome-ignore lint/style/noProcessEnv: only the Pages deploy opts into production analytics.
-  plugins: [pagesAnalyticsPlugin(process.env.PAGES_ANALYTICS === '1')],
   build: {
     chunkSizeWarningLimit: 1000, // three.js; fine for a debug viewer
     rollupOptions: {
