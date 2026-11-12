@@ -32,10 +32,6 @@ local track = import 'track-kit.libsonnet';
   unjudged: [
     site.unjudged('chassis', 'digging_boom', 0.24,
       'The rear_tower piece of trencher_chassis runs into the head_sprocket piece of trencher_digging_boom.'),
-    site.unjudged('chassis', 'track_far', 0.087,
-      'The track_beam_rear_far piece of trencher_chassis runs into the sprocket_hub_far piece of trencher_track.'),
-    site.unjudged('chassis', 'track_near', 0.087,
-      'The track_beam_rear_near piece of trencher_chassis runs into the sprocket_hub piece of trencher_track.'),
     site.unjudged('hood', 'engine', 0.308,
       'The hood piece of trencher_hood runs into the block piece of engine_i4_diesel.'),
   ],

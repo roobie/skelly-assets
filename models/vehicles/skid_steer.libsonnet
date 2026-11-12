@@ -44,10 +44,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     hinge_a: ['stile_near', [0.5, 0.1, 1]],
     hinge_b: ['stile_near', [0.5, 0.9, 1]],
   }) + { title: 'Skid-steer loader door' },
+  // The cover rests on the frame's sponsons, dropping between them and behind them to the frame's floor.
   k.compound('skid_steer_engine_cover', 90, [
-    prism('hood', 'paint', [[-1.24, 0.5], [s.cageRear, 0.5], [s.cageRear, 1.42], [-1.1, 1.42], [-1.24, 1.24]], [-0.47, 0.47]),
+    prism('hood', 'paint', [[-1.24, 0.8], [s.cageRear, 0.8], [s.cageRear, 1.42], [-1.1, 1.42], [-1.24, 1.24]], [-0.47, 0.47]),
+    box('skirt', 'paint', [-1.24, 0.5, -0.35], [s.cageRear, 0.8, 0.35]),
     box('hood_top_vent', 'trim', [-1.0, 1.42, -0.3], [-0.55, 1.44, 0.3]),
-  ], { paint: s.paint, trim: 'paint-charcoal' }) + { title: 'Skid-steer loader engine cover' },
+  ] + bothSides([
+    box('tail', 'paint', [-1.24, 0.5, 0.35], [-1.05, 0.8, 0.47]),
+  ]), { paint: s.paint, trim: 'paint-charcoal' }) + { title: 'Skid-steer loader engine cover' },
   k.compound('skid_steer_tail_door', 30, [
     box('panel', 'trim', [-1.28, 0.42, -0.5], [-1.22, 1.22, 0.5]),
     box('grille_a', 'bar', [-1.29, 0.66, -0.36], [-1.28, 0.7, 0.36]),
