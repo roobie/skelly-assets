@@ -7,6 +7,7 @@ import type {
   GlbExportError,
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
+import { featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
 import { type CartridgeModelKind, cartridgeModelAsset } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type RoundProfiles, roundProfiles } from '../ammo/roundProfile.ts';
@@ -43,6 +44,25 @@ interface CartridgeLook {
   readonly appearance?: AppearanceContext | undefined;
   readonly voxel?: Partial<VoxelGrains>;
 }
+
+/**
+ * The thinnest feature that shapes a cartridge's outline, in metres: its rim, which every head has, where an extractor
+ * groove is absent from rimmed and shotshell heads.
+ */
+const rimThickness = (cartridge: Cartridge): number => {
+  const { value } = cartridge.kind === 'shotshell' ? cartridge.head.rimThickness : cartridge.case.rim.thickness;
+  if (value === null) {
+    throw new Error(`cartridge ${cartridge.id} has no rim thickness`);
+  }
+  return value * MM_DOMAIN.metresPerUnit;
+};
+
+/**
+ * A cartridge whose rim is too thin for its grain is drawn smooth, as voxels would lose its rim and step its taper;
+ * a large one keeps the voxel look of the guns around it. Its data may decide either way.
+ */
+const voxelized = (cartridge: Cartridge, voxelGrain: number | undefined): boolean =>
+  voxelGrain !== undefined && (cartridge.voxelize ?? featureFitsGrain(rimThickness(cartridge), voxelGrain));
 
 const makeModelExport = (
   cartridge: Cartridge,
@@ -82,13 +102,14 @@ const makeModelExport = (
       ...appearance?.finish,
     },
   };
+  const voxels = voxelized(cartridge, voxel?.voxelGrain);
   const result = exportGlb({
     resolved,
     palette: AMMO_PALETTE,
-    revolveFacets: 96,
+    revolveFacets: voxels ? 96 : GUN_APPEARANCE.smoothCartridgeSides,
     asset,
     appearance: effectiveAppearance,
-    ...voxel,
+    ...(voxels ? voxel : {}),
   });
   if (!result.ok) {
     return result;

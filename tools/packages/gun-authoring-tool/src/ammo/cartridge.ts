@@ -123,6 +123,8 @@ export interface CartridgeBase {
   readonly notes: readonly string[];
   /** The voxel grain in metres its round and case export at, in place of their class grain. */
   readonly voxelGrain?: number;
+  /** Draws the round and case voxelized (true) or smooth (false) whatever its rim measures against the grain. */
+  readonly voxelize?: boolean;
 }
 
 // ---------------------------------------------------------------- metallic cartridges

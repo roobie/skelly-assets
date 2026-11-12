@@ -98,5 +98,8 @@ local familyHex = {
     fallbackFinishMaterial: 'brass',
   },
   cartridgeFinish: { case: 'brass', bullet: 'copper', primer: 'brass', closure: 'paperboard-brown' },
+  // A cartridge too small to voxelize is drawn as a lathe of this many sides: few enough to sit beside voxel guns as a
+  // faceted object rather than a smooth one, enough that a round still reads round.
+  smoothCartridgeSides: 12,
   hullMaterials: { red: 'plastic-red', green: 'plastic-green', blue: 'plastic-blue', black: 'plastic-black', white: 'plastic-white', yellow: 'plastic-yellow' },
 }

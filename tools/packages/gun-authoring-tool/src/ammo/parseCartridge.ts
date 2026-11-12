@@ -285,6 +285,7 @@ const parseBase = (source: Obj, path: string): CartridgeBase => {
     relatedTo: field(source, 'relatedTo', path, list(parseRelation)),
     notes: field(source, 'notes', path, list(nonEmptyString)),
     ...optional(source, 'voxelGrain', path, positive),
+    ...optional(source, 'voxelize', path, boolean),
   };
 };
 
@@ -481,7 +482,7 @@ const SHOTSHELL_KEYS = [
 
 const parseCartridgeOrThrow = (value: unknown): Cartridge => {
   const kind = discriminant(value, '', 'kind', ['metallic', 'shotshell'] as const);
-  const source = object(value, '', kind === 'metallic' ? METALLIC_KEYS : SHOTSHELL_KEYS, ['voxelGrain']);
+  const source = object(value, '', kind === 'metallic' ? METALLIC_KEYS : SHOTSHELL_KEYS, ['voxelGrain', 'voxelize']);
   return kind === 'metallic' ? parseMetallic(source, '') : parseShotshell(source, '');
 };
 
