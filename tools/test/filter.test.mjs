@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
+import { FORM, KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
 
 const model = (id, category, tags = {}, keywords = []) => ({ id, category, tags, keywords });
 const entries = [
@@ -88,4 +88,17 @@ test('states with the same filter and reshuffle draw the same grid, whichever mo
   assert.ok(sameGrid(base, { ...base, model: 'oak_door', view: 'front', info: true }));
   assert.ok(!sameGrid(base, { ...base, filter: filterOf({ q: 'ea' }) }));
   assert.ok(!sameGrid(base, { ...base, reshuffle: 1 }));
+});
+
+test('the form dimension filters like a tag facet and round-trips through its own hash token', () => {
+  const formed = [{ ...model('a', null), form: 'atom' }, { ...model('b', null), form: 'assembly' }, { ...model('c', null, { form: ['atom'] }), form: 'assembly' }];
+  const picked = (terms, more = {}) => formed.filter((e) => matches(e, filterOf({ picks: { [FORM]: terms, ...more } }))).map((e) => e.id);
+  assert.deepEqual(picked(['atom']), ['a']);
+  assert.deepEqual(picked(['atom', 'assembly']), ['a', 'b', 'c']);
+  assert.deepEqual(picked(['assembly'], { form: ['atom'] }), ['c'], 'a taxonomy facet of the same name is not the derived form');
+  assert.deepEqual(suggestions(formed, filterOf({ picks: { [FORM]: ['atom'] } }), FORM), [{ term: 'assembly', count: 2 }]);
+  const state = { ...emptyState(), filter: filterOf({ picks: { [FORM]: ['assembly'], material: ['wood'] } }) };
+  assert.equal(stateHash(state), 'form=assembly&tag=material:wood');
+  assert.deepEqual(parseState(stateHash(state)).filter.picks, state.filter.picks);
+  assert.deepEqual(knownOnly(filterOf({ picks: { [FORM]: ['atom', 'bogus'] } }), formed).picks, { [FORM]: ['atom'] });
 });
