@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { clearanceProbe, COINCIDENT, coveredSurface, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { clearanceProbe, COINCIDENT, coveredSurface, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { hides } from '../../site/hiding.mjs';
@@ -30,7 +30,8 @@ const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
-// The worn garments that fit by shells but sit outside the everyday clothes: a robe over the legs, boots over the shins.
+// Worn garments beyond the everyday clothes, chosen for covering parts those leave out: a robe over the legs, boots over
+// the shins. `leather_gloves` is left out because it pokes at rest (118 pokes measured).
 const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
@@ -246,11 +247,11 @@ test('through the press check the rifle points ahead and down, its butt pad agai
 });
 
 test('each fitted garment covers the body and leaves none of it poking through at rest', () => {
-  for (const wear of [WEAR, ...CLOTHES, ...OTHER_WORN]) {
+  for (const wear of wears) {
     const dressed = restIn(wear);
     const surface = coveredSurface(rig, dressed);
     assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
-    const { pokes } = clearanceProbe(rig, dressed, surface)(still);
+    const { pokes } = restClearance(rig, dressed, surface);
     assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
   }
 });

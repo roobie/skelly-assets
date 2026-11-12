@@ -180,7 +180,7 @@ export function coverGaps(rig, sites, meshesOf) {
       const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
       const gap = { piece: site.model, side: site.side, name };
       if (!hidden) return [{ ...gap, open: 'nothing' }];
-      const [{ samples }] = coveredSurface(rig, { body: [{ bone, part: site.part, mesh: placed(hidden, doll) }], pieces });
+      const [{ samples }] = coveredSurface(rig, { body: [{ bone, part: site.part, mesh: placed(hidden, doll) }], pieces }, { whole: true });
       const open = samples.filter(({ whole }) => !whole);
       return open.length === 0 ? [] : [{ ...gap, open: open.length, at: open[0].point }];
     });

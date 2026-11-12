@@ -43,6 +43,9 @@ function boundsOf(points) {
   return { min, max };
 }
 
+// Whether the boxes overlap, the first widened by `margin`.
+const boxesMeet = (a, b, margin) => [0, 1, 2].every((k) => a.min[k] - margin <= b.max[k] && b.min[k] <= a.max[k] + margin);
+
 // How far `p` lies outside the box, zero inside it.
 function boxDistance({ min, max }, p) {
   let sum = 0;
@@ -258,6 +261,9 @@ export function coverage(rig, rest) {
   const bodySolids = new Map(rest.body.map(({ bone, mesh }) => [bone, carried(solidOf(mesh), STILL)]));
   const parts = new Map(rest.body.map(({ bone, part }) => [bone, part]));
   const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
+  // A body point is covered inside a piece, or beneath it where a ray into its own part meets the piece inside that
+  // part, so a part whose box misses every piece's box, a coincident face's width wide, has nothing covered.
+  const reached = new Set([...bodySolids].filter(([, { tree }]) => pieceSolids.some((piece) => boxesMeet(tree.bounds, piece.tree.bounds, COINCIDENT))).map(([bone]) => bone));
   const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
   const beneath = (id, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
@@ -272,6 +278,7 @@ export function coverage(rig, rest) {
     return winding(bodySolids.get(id).tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
   };
   return (id, sample) => {
+    if (!reached.has(id)) return -1;
     const { depth, index } = depthOutside(pieceSolids, sample.point);
     return depth <= COINCIDENT ? index : beneath(id, sample);
   };
@@ -279,16 +286,17 @@ export function coverage(rig, rest) {
 
 /**
  * The body's surface with what covers it: for each body part { bone, samples }, its sampled surface as above, each
- * sample with `cover`, the index into `rest.pieces` of the piece meant to cover it, or -1, and for a covered sample
- * `whole`, whether its corners are covered too. The probe tests the covered samples. The skin check draws the
- * triangles of the whole ones, since a triangle a hem or a cuff crosses would draw its uncovered part as showing.
+ * sample with `cover`, the index into `rest.pieces` of the piece meant to cover it, or -1. The probe tests the covered
+ * samples. With `whole`, each sample also says whether its corners are covered too, which costs three more queries per
+ * covered sample: the skin check draws the triangles of the whole ones, since a triangle a hem or a cuff crosses would
+ * draw its uncovered part as showing, so only a caller that draws or counts them asks.
  */
-export function coveredSurface(rig, rest) {
+export function coveredSurface(rig, rest, { whole = false } = {}) {
   const cover = coverage(rig, rest);
   const sampled = (bone, sample) => {
     const index = cover(bone, sample);
-    const whole = index >= 0 && sample.corners.every((point) => cover(bone, { ...sample, point }) >= 0);
-    return { ...sample, cover: index, whole };
+    if (!whole) return { ...sample, cover: index };
+    return { ...sample, cover: index, whole: index >= 0 && sample.corners.every((point) => cover(bone, { ...sample, point }) >= 0) };
   };
   return rest.body.map(({ bone, mesh }) => ({ bone, samples: sampledSurface(mesh).map((sample) => sampled(bone, sample)) }));
 }
@@ -302,7 +310,7 @@ export function coveredSurface(rig, rest) {
  * depth }: how far the piece passes into the body part `into`; a seam is { piece, into, point }.
  */
 export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
-  const covered = surface.flatMap(({ bone, samples }) => samples.flatMap(({ point, normal, cover }) => (cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }])));
+  const covered = coveredPoints(rest, surface);
   const bodyTrees = rest.body.map(({ mesh }) => solidOf(mesh));
   const pieceTrees = rest.pieces.map(({ mesh }) => solidOf(mesh));
   const restBody = bodyTrees.map((tree) => carried(tree, STILL));
@@ -319,16 +327,7 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
     };
     const posedPieces = rest.pieces.map(({ bone }, i) => carried(pieceTrees[i], at(bone)));
     const posedBody = rest.body.map(({ bone }, i) => carried(bodyTrees[i], at(bone)));
-    const findings = { pokes: [], flush: [], sinks: [], seams: [] };
-    const figure = [...posedPieces, ...posedBody];
-    for (const { bone, piece, point, normal } of covered) {
-      const posed = applyPoint(at(bone), point);
-      const { depth } = depthOutside(posedPieces, posed);
-      if (depth === -Infinity) continue;
-      if (!outsideAll(figure, add(posed, scale(mulMV(at(bone).r, normal), STEP)))) continue;
-      if (depth > COINCIDENT) findings.pokes.push({ bone, piece, point: posed, depth });
-      else findings.flush.push({ bone, piece, point: posed });
-    }
+    const findings = { ...bareFindings(covered, posedPieces, posedBody, at), sinks: [], seams: [] };
     pieces.forEach(({ piece, bone, points }, own) => {
       const others = posedPieces.filter((_, i) => i !== own);
       for (const { point, sunk } of points) {
@@ -341,6 +340,34 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
     });
     return findings;
   };
+}
+
+/**
+ * The probe's findings with the doll at rest, as `clearanceProbe(...)` gives them for the identity pose, without the
+ * work that pose cannot need: a piece point is sunk into exactly the body parts it already was at rest, so there are
+ * no sinks or seams to look for and the pieces are never sampled.
+ */
+export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
+  const solids = (parts) => parts.map(({ mesh }) => carried(solidOf(mesh), STILL));
+  return { ...bareFindings(coveredPoints(rest, surface), solids(rest.pieces), solids(rest.body), () => STILL), sinks: [], seams: [] };
+}
+
+// The covered samples of a surface, each with the piece meant to cover it.
+const coveredPoints = (rest, surface) => surface.flatMap(({ bone, samples }) => samples.flatMap(({ point, normal, cover }) => (cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }])));
+
+// The pokes and flush points of covered samples against the posed pieces and body.
+function bareFindings(covered, posedPieces, posedBody, at) {
+  const findings = { pokes: [], flush: [] };
+  const figure = [...posedPieces, ...posedBody];
+  for (const { bone, piece, point, normal } of covered) {
+    const posed = applyPoint(at(bone), point);
+    const { depth } = depthOutside(posedPieces, posed);
+    if (depth === -Infinity) continue;
+    if (!outsideAll(figure, add(posed, scale(mulMV(at(bone).r, normal), STEP)))) continue;
+    if (depth > COINCIDENT) findings.pokes.push({ bone, piece, point: posed, depth });
+    else findings.flush.push({ bone, piece, point: posed });
+  }
+  return findings;
 }
 
 /**
