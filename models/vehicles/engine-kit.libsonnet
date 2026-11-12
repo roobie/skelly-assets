@@ -14,9 +14,9 @@ local ductLength = 0.06;
 local blockTop = 0.72;
 local headHalf = 0.44;
 local crankHeight(e) = e.height * 0.2;
-// Each class with its alternator pulley placed. A high alternator rests on the block's top beside the head of the
-// class's tallest and widest engines, so one belt fits every engine of the class. It is on the exhaust side because the
-// intake manifold stands higher than the block's top.
+// Each class with its alternator pulley placed. A high alternator stands level with the block's top, hung from the side
+// of the head of the class's tallest and widest engines, so one belt fits every engine of the class. It is on the
+// exhaust side because the intake manifold stands higher than the block's top.
 local classes =
   local listed = import 'engine-classes.libsonnet';
   local high(name, c) =

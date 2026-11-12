@@ -11,7 +11,7 @@
   tailRotor: { x: -8.9, y: 3.75, z: 0.24, radius: 1.35 },
   mainGear: { x: 2.6, radius: 0.4375, width: 0.24, z: 1.45, top: 0.85, root: 0.9 },
   tailGear: { x: -3.9, radius: 0.3, width: 0.16, top: 1.7, rake: 0.25, brace: { x: -3.05, y: 1.35 } },
-  // The engines stand high enough on the hump for the cabin door's top edge to pass under their nacelles.
+  // The engines stand high enough on the roof shoulders for the cabin door's top edge to pass under their nacelles.
   engine: { x: -1.3, y: 3.13, z: 0.85, length: 1.6, radius: 0.34 },
   body: [
     { x: 5.75, top: 1.62, bottom: 1.2, half: 0.1, waist: 1.3 },

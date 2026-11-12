@@ -40,9 +40,9 @@ local id = 'heavy_cargo_helicopter';
   tags: { 'vehicle-role': ['military'] },
   overlaps: [
     site.overlap('cockpit_bulkhead', 'crew_door_far', 0.06,
-      'The crew door\'s frame is let into the cockpit bulkhead, and the door does not swing through it.'),
+      'The crew door hangs on the cockpit bulkhead, so its hinge edge is let into it.'),
     site.overlap('cockpit_bulkhead', 'crew_door_near', 0.06,
-      'The crew door\'s frame is let into the cockpit bulkhead, and the door does not swing through it.'),
+      'The crew door hangs on the cockpit bulkhead, so its hinge edge is let into it.'),
     site.overlap('sponson_far', 'fuel_tank_far', 0.4,
       'The sponson draws a tank block of its own, and the fuel tank sits inside it.'),
     site.overlap('sponson_near', 'fuel_tank_near', 0.4,

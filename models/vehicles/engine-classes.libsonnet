@@ -26,7 +26,7 @@
       crank: { at: [0, 0], radius: 0.09 },
       pump: { at: [0.24, 0], radius: 0.06 },
       // A light truck's engine sits between frame rails and springs that reach up past the block's side, so its
-      // alternator rides high, on the block's top beside the head, where `engine-kit.libsonnet` places it.
+      // alternator rides high, level with the block's top beside the head, where `engine-kit.libsonnet` places it.
       alternator: { high: true, radius: 0.045 },
     },
     alternator: { id: 'alternator_medium', title: 'Medium alternator', massKg: 8, radius: 0.085, length: 0.18 },
