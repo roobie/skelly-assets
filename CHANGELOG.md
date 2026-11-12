@@ -27,6 +27,21 @@ What each release changes for those who consume the assets. Each version's secti
 - The anti-materiel rifle exports as `rifle_anti_materiel`, a rifle in the firearms pack, without an optic: its receiver rail
   takes the pack's optics as attachments. It has a magazine slot, and its ten-round `50-bmg` magazine exports loose as
   `magazine_bmg_10`. The gun tool's anti-materiel template generates rifles chambered in `50-bmg`.
+- Sci-fi wheeled carrier: `apc_scifi_wheeled`, a low, slab-sided armoured hull slung between four large 18.00 R25
+  flotation wheels, its long glacis raked down to a wedge nose between two fenders like a bullet's point, every face
+  flat, every outer joint bevelled. Its wheel wells are half octagons, and a wedge over the glacis closes each front well
+  off from the nose. The hull is a hollow shell a crouching player can enter by a big rear ramp door or a side door on
+  the kerb side, to troop benches along the walls, a driver's seat with controls behind a vision slit in the glacis and
+  periscopes in the roof, a locker and an equipment rack. A boxy turret with a single cannon, a launcher pod on each
+  cheek, a gunner's sight and a commander's panoramic sight turns all round over periscopes ringing the roof hatches;
+  grab rails along the hull's sides and a stowage pannier complete it, all in flat dark earth paint. Its shell, roof,
+  glacis, doors, seats, optics and fittings are separable rows of their own, tagged `sci-fi` and `armoured`, in the
+  ground-vehicles pack.
+  
+  The kit gains the 18.00 R25 wheel `wheel_18_00r25` (tyre `tyre_18_00r25` on rim `rim_25_steel_wide`) and the darker
+  flat dark earth vehicle paint `paint-fde`. Compound prisms can be cut by sloped planes, so armour plates need not lie
+  along an axis; a plate's cut can bound a skin of armour behind it, so a hull can be hollow; and two cuts can be
+  bevelled where they meet, so a joint is a flat chamfer.
 - For game developers: a new bolt carbine variant, `bolt_carbine_drum`, fed from a rotary drum of rocket bolts in place
   of the box magazine.
 - For game developers: a new vehicle, `bulldozer`, a 20-tonne crawler dozer in construction yellow with a high-drive
@@ -58,6 +73,8 @@ What each release changes for those who consume the assets. Each version's secti
   `religious` and `safety-gear`.
 - A generic main battle tank, `main_battle_tank`, of about 60 t: its turret, 120 mm gun, sights, hatches, smoke
   dischargers, bustle basket, tracks, wheels, skirts, V12 engine and transmission each come off as their own part.
+- Each release carries `model-history.json`: for every model, the release that introduced it, the release that last changed its file and the file's hash. The showcase shows these on each model, and marks a model that main has changed since the latest release.
+- The showcase's footer names the version it shows: the latest release tag and the main commit it follows, each linked to GitHub, or just the tag when main sits exactly on a release.
 - For game developers: a model's manifest entry can carry a `place` tag, where the thing is typically found (first term
   `gym`), and `keywords`, extra kebab-case search words. The gym bags are tagged `place: gym`, and the showcase's search
   finds models by their keywords.
@@ -80,6 +97,9 @@ What each release changes for those who consume the assets. Each version's secti
   rubber pad, which makes each gun about 0.1 m longer, and bevelled slabs in place of raw boxes. The bolt carbine's
   magazine is straight, square to the bore, and deeper fore and aft, because its rocket bolts are longer.
 - 7.62×39mm and 7.62×54mmR rounds and cases now have grey polymer-coated steel cases; other cartridges stay brass. The viewer's brass and copper now use the content's matte finish.
+- For game developers: every model now carries an authored `title`, the name a player would use, and the manifest, the
+  showcase, the vehicle gallery and the thing export's label text read it. The build refuses a model without one. Ids
+  are no longer turned into display names, so a printed label that named no text now reads the model's title.
 - The `polymer-fde` finish is a darker, greyer flat dark earth instead of a pale tan, so the anti-materiel rifle's stock
   and grip and every catalogue item finished in it, such as ration pouches and the tan helmet, look darker.
 - The manifest carries `massKg` for a gun, a gun part and any other model whose tool weighs its parts but gives no total, as the sum of the parts' masses; `volumeM3` stays out for them.
@@ -98,7 +118,10 @@ What each release changes for those who consume the assets. Each version's secti
 - The night vision goggles' and headlamp's straps follow the player bust's hair all round, one strap voxel off it, as a
   narrower band that sits lower on the goggles and higher on the headlamp; their strap anchors move with them, and the
   bust's crown hair sits a little further back.
+- The showcase's model look page opens on a few of the day's models instead of an empty page, with a picker that draws the models you choose and keeps them in the page's link.
+- The worn tank top's armholes stand clear of the arm, so no skin shows through its sides at rest; above the armpit only a front and a back panel rise to the straps. The player bust's lower chest is a touch narrower so the top's sides can enclose it inside the hanging arm.
 - A thin gun part, such as the AR charging handle or a revolver trigger, draws at the fine detail grain and no longer zigzags between two voxel layers.
+- The showcase's thing viewer opens again: it lists the thing models of each pack instead of failing on the pack's guns.
 
 ## 0.5.0 - 2026-11-11
 
