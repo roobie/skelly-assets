@@ -25,6 +25,8 @@ local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, oute
 local tyreProfile(width, rim, outer, taper) = [[-width / 2, rim], [-width / 2, outer - width * taper], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * taper], [width / 2, rim], [-width / 2, rim]];
 local rad(degrees) = degrees * std.pi / 180;
 local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+local beyond(cut) = { normal: [-x for x in cut.normal], offset: -cut.offset };
+local inset(cut, depth) = cut { offset: cut.offset - depth * std.sqrt(dot(cut.normal, cut.normal)) };
 // The plane through three (x, y, z) points, as a normal and its offset; which side it faces is left to the caller.
 local planeThrough(a, b, c) =
   local u = [b[i] - a[i] for i in [0, 1, 2]];
@@ -88,17 +90,15 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     assert side != 0 : 'a plate must not pass through the point it keeps';
     if side > 0 then { normal: [-x for x in plane.normal], offset: -plane.offset } else plane,
   farCut: farCut,
-  // The x where the plane through three (x, y, z) points passes height y at side offset z, for a fitting seated on a plate.
-  plateX(points, y, z):
-    local plane = planeThrough(points[0], points[1], points[2]);
-    (plane.offset - plane.normal[1] * y - plane.normal[2] * z) / plane.normal[0],
+  // A plate's cut moved `depth` m inward, and the cut keeping the far side of a plane.
+  inset: inset,
+  beyond: beyond,
+  // The cuts bounding a skin `depth` m thick behind a plate, so a hollow hull's armour is a wall, not a solid block.
+  skin(cut, depth): [cut, beyond(inset(cut, depth))],
   // A prism cut by the planes `plates` lists, each from `plate`: a convex solid whose faces need not lie along an axis.
   clipped(piece, plates):
     assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';
     piece { clip: plates },
-  // Whether one of `plates` leaves every (x, y, z) corner of a convex piece beyond it, so cutting the piece by them would
-  // leave nothing to draw.
-  cutAway(corners, plates): std.any([std.all([dot(c.normal, q) >= c.offset - 1e-6 for q in corners]) for c in plates]),
   // A roller shutter in a locker wall, from `z[0]` to `z[1]`: horizontal slats in alternating `alu` and `steel`, with a
   // grab bar in `dark` along its foot.
   shutter(name, x0, x1, y0, y1, z): [
