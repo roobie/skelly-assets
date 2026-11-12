@@ -17,7 +17,7 @@ text.
 ## Who may do what
 
 - An agent may prepare a release: the branch, its changelog section and a draft PR.
-- BR picks the version and decides when to release.
+- BR, the repository owner, picks the version and decides when to release.
 - Merging the release PR needs BR's go-ahead.
 - Tagging publishes to every consumer and cannot be taken back, so an agent tags only on BR's word for that version.
 
@@ -36,7 +36,7 @@ text.
    the version's section of `CHANGELOG.md` and deletes the notes it gathered. A tag build cannot push to main, so the
    section lands before the tag; see `changes/README.md`, "A release".
 5. Commit, push and open a draft PR labelled `no-changelog`: the section is the notes already reviewed, not a change
-   of its own.
+   of its own. Mark it ready once its CI is green, since a draft cannot merge.
 6. If main moves on before the merge, merge main into the branch, then restore `CHANGELOG.md` and `changes/` from
    origin/main and run the release step again. It refuses a version that already has a section (`tools/changelog.mjs`,
    `addSection`), and the regathered section is the only way main's new notes get in. Never hand-edit the section:
@@ -46,12 +46,13 @@ text.
 
 7. When CI is green and BR says go, merge the PR with a merge commit, the way every PR here lands.
 8. On BR's word, tag that merge commit with an annotated `v<version>` tag whose message is the tag name, and push the
-   tag. The tag build reads the section from the tagged tree and refuses a tag without one; see
-   `.github/workflows/assets.yml`, `release`. It builds the tree twice, clean, and publishes only when the builds
-   agree; see `README.md`, "Releases", and `tools/pack-release.mjs`, `packRelease`.
-9. Watch the tag's run to the end. Then check the release: its body is the section, it carries one archive per pack,
-   the files `packRelease` writes beside them, and `model-history.json`. A failed run publishes nothing; rerun it if
-   the cause was transient, and otherwise report to BR before touching the tag, because consumers pin tags.
+   tag. The release body carries the notes, so the message adds nothing a consumer reads. The tag build reads the
+   section from the tagged tree and refuses a tag without one; see `.github/workflows/assets.yml`, `release`. It
+   builds the tree twice, clean, and publishes only when the builds agree; see `README.md`, "Releases".
+9. Watch the tag's run to the end. Then check the release: its body is the section, and it carries one archive per
+   pack, the files `tools/pack-release.mjs`, `packRelease`, writes beside them, and `model-history.json`. A failed run
+   publishes nothing. Rerun it if the cause was transient. If the previous release lacks `model-history.json`, give it
+   the file (step 3) and rerun. Otherwise report to BR before touching the tag, because consumers pin tags.
 
 ## After it
 

@@ -297,7 +297,8 @@ showcase; a short loop visibly jumps at its wrap. The showcase carries no compos
 
 Agent skills live in `.agents/skills/`, the shared location several coding agents read, so every agent follows one
 copy of a process such as a release. Claude Code reads only `.claude/skills/`, so that directory is a link to the
-shared one rather than a second copy. A skill's `description` says when to read it, in place of `read_if`, because
+shared one rather than a second copy. A clone without symlink support gets a one-line file there instead, and
+Claude Code then finds no skills. A skill's `description` says when to read it, in place of `read_if`, because
 agents select skills by that field.
 
 ## Licence
