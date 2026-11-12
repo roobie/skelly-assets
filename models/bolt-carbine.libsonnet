@@ -45,26 +45,27 @@ local boxMagazine = [
 ]);
 
 // A rotary drum, a revolver cylinder hung on a neck below the magwell: its chambers lie along the bore around its
-// axle, so it is as long as a box magazine is deep and holds more bolts. Brass bands bind it, and the bolts' noses
-// and the axle cap show on its front face.
-local drumRadius = 0.066;
+// axle, so it is as long as a box magazine is deep and holds more bolts. It runs a little past the magwell's front so
+// it reads as the heavier feed. Brass bands bind it. Its front face is a raised cover plate with the spring's winding
+// key on a hub, sized in whole voxels so each layer reads at the gun's grain.
+local drumRadius = 0.069;
 local drumY = magTop - 0.022 - drumRadius;
-local drumLength = magFront - magBack;
-local chambers = 8;
+local drumLength = 0.139;
+local drumFront = magBack + drumLength;
+local onFace(id, slot, profile) = h.turned(id, slot, 'x', profile, [drumFront, drumY, 0]) + { sides: 8 };
 local drumMagazine = [
   magwell,
   box('drum-neck', 'body', [magBack + 0.012, drumY + drumRadius - 0.01, -0.035], [magFront - 0.012, magTop, 0.035]),
   h.turned('drum', 'body', 'x', [[0, 0], [0, drumRadius - 0.006], [0.006, drumRadius], [drumLength - 0.006, drumRadius], [drumLength, drumRadius - 0.006], [drumLength, 0]], [magBack, drumY, 0]) + { sides: 8 },
 ] + [
-  local x = if end == 'back' then magBack + 0.014 else magFront - 0.024;
+  local x = if end == 'back' then magBack + 0.014 else drumFront - 0.024;
   h.turned('drum-band-%s' % end, 'trim', 'x', [[0, 0], [0, drumRadius + 0.003], [0.01, drumRadius + 0.003], [0.01, 0]], [x, drumY, 0]) + { sides: 8 }
   for end in ['back', 'front']
 ] + [
-  h.turned('drum-axle', 'metal', 'x', [[0, 0], [0, 0.02], [0.008, 0.015], [0.008, 0]], [magFront, drumY, 0]) + { sides: 8 },
-] + [
-  local a = 2 * std.pi * i / chambers;
-  h.turned('drum-nose-%d' % i, 'accent', 'x', [[0, 0], [0, 0.011], [0.006, 0.005], [0.006, 0]], [magFront, drumY + 0.044 * std.cos(a), 0.044 * std.sin(a)]) + { sides: 8 }
-  for i in std.range(0, chambers - 1)
+  onFace('drum-cover', 'metal', [[0, 0], [0, drumRadius - 0.014], [0.004, drumRadius - 0.014], [0.004, 0]]),
+  onFace('drum-hub', 'body', [[0, 0], [0, 0.024], [0.008, 0.024], [0.012, 0.02], [0.012, 0]]),
+  box('drum-key', 'trim', [drumFront + 0.012, drumY - 0.04, -0.008], [drumFront + 0.024, drumY + 0.04, 0.008]),
+  box('drum-key-boss', 'metal', [drumFront + 0.012, drumY - 0.012, -0.012], [drumFront + 0.028, drumY + 0.012, 0.012]),
 ];
 
 local carbine(id, massKg, magazine) =
