@@ -52,7 +52,7 @@ local planet(prefix, slot, len, a, y, r) =
     h.turned('crystal', 'crystal', 'x', [[0, 0], [0.006, 0.008], [0.02, 0.008], [0.02, 0]], [-0.19, 0.012, 0]),
     h.turned('band-a', 'brass', 'x', [[0, 0], [0, 0.0072], [0.004, 0.0072], [0.004, 0]], [-0.05, 0.012, 0]),
     h.turned('band-b', 'brass', 'x', [[0, 0], [0, 0.0058], [0.004, 0.0058], [0.004, 0]], [0.04, 0.012, 0]),
-  ], { wood: 'wood-walnut', grip: 'leather-brown', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + h.gripOn('crystal_butt_wand', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'glass'], setting: ['fantasy'] } } },
+  ], { wood: 'wood-walnut', grip: 'leather-brown', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + { title: 'Crystal-butt wand' } + h.gripOn('crystal_butt_wand', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'glass'], setting: ['fantasy'] } } },
 
   // A wall sconce: an oak back plate 120 mm wide and 300 mm tall bound with iron straps, an iron arm reaching 120 mm
   // out to a cup that holds a carved wooden torch, burning on top, 600 mm tall overall. Front on +z.
@@ -72,7 +72,7 @@ local planet(prefix, slot, len, a, y, r) =
     band: 'brass-dull',
     head: 'cloth-charred',
     flame: 'glow-flame',
-  }) + h.gripStanding('everburning_wall_sconce', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
+  }) + { title: 'Everburning wall sconce' } + h.gripStanding('everburning_wall_sconce', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 
   // A parabolan felt patch: a small square of iridescent felt 50 by 40 mm and 3 mm thick, with a frayed corner.
   h.compound('iridescent_felt_patch', 0.003, [
@@ -85,7 +85,7 @@ local planet(prefix, slot, len, a, y, r) =
     local x0 = -0.03 + 0.014 * i;
     h.prism('sheen-%d' % i, if i % 2 == 0 then 'sheen-a' else 'sheen-b', 'y', [[-0.0135, std.max(-0.025, x0)], [-0.0135, std.min(0.025, x0 + 0.008)], [0.0135, std.min(0.025, x0 + 0.02)], [0.0135, std.max(-0.025, x0 + 0.012)]], 0.003, 0.0034)
     for i in std.range(0, 3)
-  ], { felt: 'iridescent', stitch: 'cord-cotton', 'sheen-a': 'jelly-teal', 'sheen-b': 'cloth-purple' }) + h.inHand('iridescent_felt_patch', 'felt') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], { felt: 'iridescent', stitch: 'cord-cotton', 'sheen-a': 'jelly-teal', 'sheen-b': 'cloth-purple' }) + { title: 'Iridescent felt patch' } + h.inHand('iridescent_felt_patch', 'felt') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A handful of glowing mushroom strips: six slim strips cut from a bioluminescent cap, each about 90 mm long, 14 mm
   // wide and 6 mm thick, with the cap's skin along one edge, heaped loosely about 100 by 70 mm and 20 mm tall.
@@ -98,7 +98,7 @@ local planet(prefix, slot, len, a, y, r) =
       strand('glow-%d' % i, 'glow', [-0.04, y + 0.0065 - tilt * 0.9], [0.04, y + 0.0065 + tilt * 0.9], 0.002, z0 + 0.004, z0 + 0.008),
     ]
     for i in std.range(0, 5)
-  ]), { flesh: 'jelly-pale', skin: 'jelly-teal', glow: 'crystal-glow-blue' }) + h.inHand('glowing_mushroom_strips', 'strip-1') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
+  ]), { flesh: 'jelly-pale', skin: 'jelly-teal', glow: 'crystal-glow-blue' }) + { title: 'Glowing mushroom strips' } + h.inHand('glowing_mushroom_strips', 'strip-1') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
 
   // Three pure white moss capsules, each a round horn tube 60 mm long and 16 mm across with a blunt closed tip and a
   // plug of green moss in its open end, tied together in a bundle with a twine band.
@@ -111,7 +111,7 @@ local planet(prefix, slot, len, a, y, r) =
     for i in [0, 1, 2]
   ]) + [
     h.tube('tie', 'tie', 0.017, 0.0185, -0.008, -0.002, 0.008 + 0.016 * 0.866 / 3, 0),
-  ], { capsule: 'enamel-white', moss: 'leaf-green', tie: 'jute' }) + h.inHand('horn_moss_capsules', 'horn-0') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone', 'plant'], setting: ['fantasy'] } } },
+  ], { capsule: 'enamel-white', moss: 'leaf-green', tie: 'jute' }) + { title: 'Horn moss capsules' } + h.inHand('horn_moss_capsules', 'horn-0') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone', 'plant'], setting: ['fantasy'] } } },
   // A chair grown from one gnarled piece of wood, 500 mm wide, 520 mm deep and 950 mm tall, its seat 450 mm up. Its
   // legs lean and kink, flaring into roots at the floor, and twisting branches knot together between the back posts.
   // Front on +z.
@@ -149,7 +149,7 @@ local planet(prefix, slot, len, a, y, r) =
     strand('branch-d', 'wood', [0.0, 0.48], [0.19, 0.62], 0.024, -0.215, -0.195),
     box('knot-back', 'bark', [-0.035, 0.65, -0.235], [0.035, 0.72, -0.19]),
     box('knot-post', 'bark', [-0.235, 0.7, -0.24], [-0.19, 0.75, -0.2]),
-  ], { wood: 'wood-oak', bark: 'bark' }) + h.gripStanding('gnarled_grown_chair', 'crest-l') + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'], setting: ['fantasy'] } } },
+  ], { wood: 'wood-oak', bark: 'bark' }) + { title: 'Gnarled grown chair' } + h.gripStanding('gnarled_grown_chair', 'crest-l') + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A homemade standing candelabra 1.5 m tall: a heavy oak post on a crossed foot, with two crossed arms near the top
   // holding four carved wooden torches round a fifth in the middle, each burning. The arms span 800 mm.
@@ -179,7 +179,7 @@ local planet(prefix, slot, len, a, y, r) =
     band: 'brass-dull',
     head: 'cloth-charred',
     flame: 'glow-flame',
-  }) + h.gripStanding('everburning_torch_candelabra', 'post') + { voxelGrain: 0.01 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
+  }) + { title: 'Everburning torch candelabra' } + h.gripStanding('everburning_torch_candelabra', 'post') + { voxelGrain: 0.01 } + { taxonomy: { category: 'lighting', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 
   // A tabletop orrery 800 mm across its longest arm: a turned walnut plinth 360 mm across and 80 mm tall with a brass
   // gear plate and a side crank, a steel column 450 mm tall carrying a brass sun on top, and six planets on arms of
@@ -214,5 +214,5 @@ local planet(prefix, slot, len, a, y, r) =
     red: 'paint-terracotta',
     copper: 'copper',
     gold: 'bronze-polished',
-  }) + h.gripOn('orrery', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood', 'metal'] } } },
+  }) + { title: 'Orrery' } + h.gripOn('orrery', 'plinth') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood', 'metal'] } } },
 ]

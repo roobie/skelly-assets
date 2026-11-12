@@ -20,7 +20,7 @@ local round(piece) = piece + { sides: 16 };
 local row(id, pieces, grain=0.004) = h.compound(id, 0.1, pieces, livery) + { voxelGrain: grain };
 // A fitted row with `add` appended to its pieces.
 local extend(r, add, grain=0.004) =
-  h.compound(r.id, 0.1, std.parseJson(r.parts[0].params.pieces) + add, r.parts[0].finish) + { voxelGrain: grain };
+  h.compound(r.id, 0.1, std.parseJson(r.parts[0].params.pieces) + add, r.parts[0].finish) + { voxelGrain: grain, title: r.title };
 
 // Body: breastplate with a keel over a plackart, three fauld lames, a pair of tassets in front, a gorget of two lames.
 local waistTop = bust.pelvisHeight + bust.waistHeight;
@@ -150,20 +150,20 @@ local helmet = [
 local gloves = fit.hands('gauntlet_plate', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.04, hem: 0.02, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'trim', ridge: 'rivet' },
-}).rows;
+}, 'Plate gauntlets').rows;
 local boots = fit.feet('sabaton_plate', sabaton,
-                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.075, instep: 0.115, top: 0.28, shaft: 0.15, laces: 0 }).rows;
+                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.075, instep: 0.115, top: 0.28, shaft: 0.15, laces: 0 }, title='Plate sabatons').rows;
 
 armour.of('medieval', [
-  row('armor_plate_worn_body', body),
-  row('armor_plate_worn_upper', upper, 0.008),
-  row('armor_plate_worn_fore', fore),
-  row('legguard_plate_worn_thigh', thigh),
-  row('legguard_plate_worn_shin', shin),
+  row('armor_plate_worn_body', body) + { title: 'Plate body armour' },
+  row('armor_plate_worn_upper', upper, 0.008) + { title: 'Plate upper arm armour' },
+  row('armor_plate_worn_fore', fore) + { title: 'Plate forearm armour' },
+  row('legguard_plate_worn_thigh', thigh) + { title: 'Plate thigh guard' },
+  row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard' },
 ] + [
   local seg = std.split(r.id, '_worn_')[1];
   if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r
   for r in gloves + boots
 ] + [
-  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { voxelGrain: 0.006 },
+  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { title: 'Plate armet' } + { voxelGrain: 0.006 },
 ])

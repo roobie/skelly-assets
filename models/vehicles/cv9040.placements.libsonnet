@@ -3,6 +3,7 @@ local pair = site.pair;
 local hull = import 'armoured-hull-kit.libsonnet';
 local s = import 'cv9040.spec.libsonnet';
 {
+  title: 'Tracked infantry fighting vehicle',
   sites: hull.sites(s) + [
     site.one('rear', 'cv9040_hull_rear'),
     site.one('rear_door', 'cv9040_rear_door'),

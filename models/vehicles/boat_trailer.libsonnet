@@ -31,7 +31,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('side_rail', 'frame', [s.rear, s.frameLow, 0.42], [s.front, s.frameHigh, 0.5]),
     box('spring', 'frame', [s.axle - 0.34, s.hub, 0.46], [s.axle + 0.34, s.frameLow, 0.5]),
     box('guard_bracket', 'frame', [s.axle - 0.24, s.frameLow, 0.5], [s.axle + 0.24, s.frameHigh, 0.6]),
-  ]) + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameHigh]), { frame: s.paint }),
+  ]) + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameHigh]), { frame: s.paint }) + { title: 'Boat trailer chassis' },
   k.compound('boat_trailer_bunks', 14, [
     box('cross_rear', 'frame', [s.rear + 0.2, s.frameHigh, -0.42], [s.rear + 0.28, 0.56, 0.42]),
     box('cross_front', 'frame', [s.front - 0.2, s.frameHigh, -0.42], [s.front - 0.12, 0.56, 0.42]),
@@ -39,12 +39,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('roller_brace', 'frame', [1.17, s.frameLow, -0.34], [1.23, s.frameHigh, 0.34]),
   ] + bothSides([
     box('bunk', 'carpet', [s.rear + 0.1, 0.56, 0.2], [s.front - 0.04, s.bunkTop, 0.3]),
-  ]), { frame: s.paint, carpet: 'rubber-black', roller: 'plastic-black' }),
+  ]), { frame: s.paint, carpet: 'rubber-black', roller: 'plastic-black' }) + { title: 'Boat trailer bunks' },
   k.compound('boat_trailer_winch_post', 12, [
     box('post', 'frame', [s.winchX - 0.04, s.frameHigh, -0.04], [s.winchX + 0.04, 1.08, 0.04]),
     box('winch', 'winch', [s.winchX - 0.02, 0.92, -0.1], [s.winchX + 0.1, 1.04, 0.1]),
     box('bow_stop', 'stop', [1.49, 0.84, -0.05], [s.winchX - 0.04, 0.92, 0.05]),
-  ], { frame: s.paint, winch: 'paint-charcoal', stop: 'rubber-black' }),
+  ], { frame: s.paint, winch: 'paint-charcoal', stop: 'rubber-black' }) + { title: 'Boat trailer winch post' },
   k.compound('boat_trailer_boat', 150, [
     box('keel', 'hull', [-1.5, 0.58, -0.03], [1.15, s.bunkTop, 0.03]),
     solidLayer('bottom_low', 'hull', [s.bunkTop, 0.68], 0.46, 1.3),
@@ -62,7 +62,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   + wallLayer('side_high', 'hull', [0.98, 1.1], 0.7, 1.55, 0.08)
   + wallLayer('gunwale', 'wood', [1.1, 1.14], 0.72, 1.57, 0.07), {
     hull: 'paint-white', stripe: 'paint-drum-blue', floor: 'wood-pine', wood: 'wood-oak',
-  }),
+  }) + { title: 'Boat trailer boat' },
   k.compound('boat_trailer_outboard', 40, [
     box('clamp', 'cowl', [s.transom - 0.05, 0.98, -0.06], [s.transom, 1.1, 0.06]),
     box('powerhead', 'cowl', [s.transom - 0.36, 1.02, -0.11], [s.transom - 0.05, 1.3, 0.11]),
@@ -70,6 +70,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('plate', 'leg', [s.transom - 0.34, 0.5, -0.08], [s.transom - 0.1, 0.54, 0.08]),
     box('gearcase', 'leg', [s.transom - 0.3, 0.42, -0.05], [s.transom - 0.14, 0.5, 0.05]),
     box('propeller', 'prop', [s.transom - 0.36, 0.38, -0.07], [s.transom - 0.3, 0.52, 0.07]),
-  ], { cowl: 'paint-charcoal', leg: 'steel-grey', prop: 'alu-bare' }),
-  h.mudguard('boat_trailer_mudguard', 3, s.axle, s.hub, 0.31, 0.34, [0.6, s.wheelZ + 0.11], 'steel-galvanised'),
+  ], { cowl: 'paint-charcoal', leg: 'steel-grey', prop: 'alu-bare' }) + { title: 'Boat trailer outboard' },
+  h.mudguard('boat_trailer_mudguard', 3, s.axle, s.hub, 0.31, 0.34, [0.6, s.wheelZ + 0.11], 'steel-galvanised') + { title: 'Boat trailer mudguard' },
 ])

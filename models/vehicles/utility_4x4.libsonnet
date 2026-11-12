@@ -29,7 +29,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('utility_4x4_wheel', 45, [
     k.turned('tyre', 'tyre', 'z', tyre) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.disc(0.22, -0.105, 0.105)) + { sides: 24 },
-  ], { tyre: 'rubber-black', rim: 'paint-olive' }, { hub: ['rim', [0.5, 0.5, 0.5]] }),
+  ], { tyre: 'rubber-black', rim: 'paint-olive' }, { hub: ['rim', [0.5, 0.5, 0.5]] }) + { title: 'Utility 4x4 wheel' },
   k.compound('utility_4x4_frame', s.frameMass, [
     box('cross_front', 'frame', [s.nose - 0.12, 0.5, -0.42], [s.nose, 0.58, 0.42]),
     box('cross_mid', 'frame', [-0.1, 0.5, -0.42], [0.0, 0.58, 0.42]),
@@ -40,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('rail', 'frame', [s.rear, 0.5, 0.34], [s.nose, 0.58, 0.42]),
     box('sill_bracket', 'frame', [-0.5, 0.5, 0.42], [-0.4, 0.56, 0.94]),
     box('sill_bracket_fore', 'frame', [0.4, 0.5, 0.42], [0.5, 0.56, 0.94]),
-  ]), finish),
+  ]), finish) + { title: 'Utility 4x4 frame' },
   k.compound('utility_4x4_hull', s.hullMass, bothSides(
     m.arched('rear_panel', 'paint', [s.rear, s.cabBack], [s.sill, s.rearPanelTop], [s.panelIn, s.side], [{ x: s.rearAxle, y: s.hub, r: s.archR }])
     + m.arched('wing_panel', 'paint', [s.hoodBack, s.nose], [s.sill, s.hoodFrontY], [s.panelIn, s.side], [{ x: s.frontAxle, y: s.hub, r: s.archR }])
@@ -77,15 +77,15 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('rear_step', 'dark', [s.rear - 0.02, 0.74, -0.58], [s.rear, 0.78, 0.58]),
     box('rear_hatch', 'trim', [s.rear - 0.02, 0.84, -0.58], [s.rear, s.rearPanelTop - 0.04, 0.58]),
   ] + shape.across('cargo_bulkhead_head', 'paint', rect(s.cabBack - 0.04, s.cabBack, s.waist, s.roof), s.skin)
-  + shape.across('windscreen_head', 'paint', rect(s.cabFront - 0.06, s.cabFront + 0.02, s.roof - 0.08, s.roof), s.skin), finish),
+  + shape.across('windscreen_head', 'paint', rect(s.cabFront - 0.06, s.cabFront + 0.02, s.roof - 0.08, s.roof), s.skin), finish) + { title: 'Utility 4x4 hull' },
   k.compound('utility_4x4_hood', 80, [
     prism('top', 'paint', [[s.hoodBack, s.hoodBackY - 0.04], [s.nose, s.hoodFrontY - 0.04], [s.nose, s.hoodFrontY], [s.hoodBack, s.hoodBackY]], [-s.side, s.side]),
     prism('bulge', 'paint', [[s.hoodBack + 0.1, s.hoodBackY - 0.01], [s.nose - 0.3, s.hoodFrontY + 0.06], [s.nose - 0.34, s.hoodFrontY + 0.1], [s.hoodBack + 0.14, s.hoodBackY + 0.04]], [-0.48, 0.48]),
-  ], finish),
+  ], finish) + { title: 'Utility 4x4 hood' },
   k.compound('utility_4x4_face', 70, [
     box('panel', 'paint', [s.nose - 0.04, s.sill + 0.06, -s.side], [s.nose, s.hoodFrontY, s.side]),
     box('rib_top', 'paint', [s.nose, s.hoodFrontY - 0.06, -s.side], [s.nose + 0.02, s.hoodFrontY, s.side]),
-  ] + m.slats('slot', 'dark', -0.44, 0.44, 9, function(id, slot, z) box(id, slot, [s.nose, 0.72, z - 0.025], [s.nose + 0.01, 1.0, z + 0.025])), finish),
+  ] + m.slats('slot', 'dark', -0.44, 0.44, 9, function(id, slot, z) box(id, slot, [s.nose, 0.72, z - 0.025], [s.nose + 0.01, 1.0, z + 0.025])), finish) + { title: 'Utility 4x4 face' },
   k.compound('utility_4x4_guard', 95, [
     box('bar', 'paint', [s.nose, 0.56, -s.side], [s.frontBumper, 0.72, s.side]),
     box('winch', 'dark', [s.nose + 0.02, 0.72, -0.2], [s.frontBumper - 0.02, 0.84, 0.2]),
@@ -96,16 +96,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('upright_inner', 'frame', [s.frontBumper - 0.05, 0.72, 0.28], [s.frontBumper - 0.01, 1.16, 0.32]),
     box('stay', 'frame', [s.nose + 0.02, 1.0, 0.7], [s.frontBumper - 0.05, 1.04, 0.74]),
     box('tow_eye', 'dark', [s.frontBumper, 0.6, 0.86], [s.frontBumper + 0.04, 0.68, 0.92]),
-  ]), finish),
-  door('utility_4x4_front_door', -0.02, s.hoodBack, s.cabFront - 0.06, s.cabFront - 0.14),
-  door('utility_4x4_rear_door', s.cabBack + 0.08, -0.06, -0.06, -0.14),
+  ]), finish) + { title: 'Utility 4x4 guard' },
+  door('utility_4x4_front_door', -0.02, s.hoodBack, s.cabFront - 0.06, s.cabFront - 0.14) + { title: 'Utility 4x4 front door' },
+  door('utility_4x4_rear_door', s.cabBack + 0.08, -0.06, -0.06, -0.14) + { title: 'Utility 4x4 rear door' },
   k.compound('utility_4x4_windscreen', 30, [
-  ] + bothSides(shape.band('glass', 'glass', rect(s.cabFront - 0.03, s.cabFront, s.waist, s.roof - 0.08), function(inset) [0.04, s.skinIn - inset])), finish),
+  ] + bothSides(shape.band('glass', 'glass', rect(s.cabFront - 0.03, s.cabFront, s.waist, s.roof - 0.08), function(inset) [0.04, s.skinIn - inset])), finish) + { title: 'Utility 4x4 windscreen' },
   k.compound('utility_4x4_dashboard', 16, [
     box('panel', 'trim', [s.cabFront - 0.12, s.floor + 0.44, -s.skinIn], [s.cabFront + 0.02, s.waist, s.skinIn]),
     box('column', 'dark', [s.cabFront - 0.2, s.waist + 0.1, -0.54], [s.cabFront - 0.12, s.waist + 0.16, -0.48]),
     box('column_foot', 'dark', [s.cabFront - 0.14, s.waist, -0.54], [s.cabFront - 0.12, s.waist + 0.1, -0.48]),
-  ], finish),
+  ], finish) + { title: 'Utility 4x4 dashboard' },
   k.compound('utility_4x4_hatch', 45, [
     box('ring_fore', 'frame', [-0.06, s.roof + 0.06, -0.36], [0.0, s.roof + 0.14, 0.36]),
     box('ring_aft', 'frame', [-0.66, s.roof + 0.06, -0.36], [-0.6, s.roof + 0.14, 0.36]),
@@ -113,10 +113,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('catch', 'dark', [-0.04, s.roof + 0.1, -0.05], [0.0, s.roof + 0.18, 0.05]),
   ] + bothSides([
     box('ring_side', 'frame', [-0.66, s.roof + 0.06, 0.3], [0.0, s.roof + 0.14, 0.36]),
-  ]), finish),
+  ]), finish) + { title: 'Utility 4x4 hatch' },
   k.compound('utility_4x4_steering_box', 14, [
     box('box', 'dark', [1.0, 0.56, -0.42], [1.16, 0.68, -0.3]),
     box('drag_link', 'frame', [1.1, 0.48, -0.45], [1.5, 0.51, -0.42]),
     box('arm', 'frame', [1.06, 0.48, -0.42], [1.12, 0.56, -0.38]),
-  ], finish),
+  ], finish) + { title: 'Utility 4x4 steering box' },
 ])

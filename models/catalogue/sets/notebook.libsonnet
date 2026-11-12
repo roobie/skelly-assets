@@ -3,7 +3,7 @@ local b = import 'packages/thing-authoring-tool/readables.libsonnet';
 local port = b.port, part = b.part;
 [
   {
-    id: 'notebook', exportMass: 'inventory-atom', voxelGrain: 0.002,
+    id: 'notebook', title: 'Notebook', exportMass: 'inventory-atom', voxelGrain: 0.002,
     // Metres, measured from the primitive-paper GLB's cover and pages geometry.
     // Part masses serve the tool's physical report only; each book item owns its weight.
     parts: [

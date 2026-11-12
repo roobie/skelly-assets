@@ -10,6 +10,7 @@ local s = import 'microcar.spec.libsonnet';
 local front = { wheel: 'wheel_165_65r15', hub: 0.298, z: 0.7345 };
 local rear = { wheel: 'wheel_185_60r15', hub: 0.3015, z: 0.715 };
 {
+  title: 'Microcar',
   sites: [
     site.one('shell', 'microcar_shell'),
     site.one('windscreen', 'microcar_windscreen'),

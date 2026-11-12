@@ -42,13 +42,13 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     glass: 'glass-clear',
     liquor: 'resin-honey',
     lute: 'clay-terracotta',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  }) + { title: 'Alembic' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A gourd-shaped glass boiling flask 145 mm across and 230 mm tall, its short neck ending in a rolled lip, empty.
   h.compound('cucurbit', 0.5, [
     h.turned('cucurbit', 'glass', 'y', [[0, 0], [0, 0.035], [0.01, 0.05], [0.04, 0.068], [0.08, 0.072], [0.12, 0.065], [0.15, 0.05], [0.175, 0.035], [0.2, 0.028], [0.225, 0.026], [0.225, 0]]),
     ring('lip', 'glass', 0.02, 0.03, 0.22, 0.23),
-  ], { glass: 'glass-clear' }) + h.inHand('cucurbit', 'cucurbit') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  ], { glass: 'glass-clear' }) + { title: 'Cucurbit' } + h.inHand('cucurbit', 'cucurbit') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A round glass receiver 160 mm across with a 130 mm neck, sitting in a plaited straw ring, a little distillate in
   // the bottom of the ball.
@@ -57,7 +57,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     ring('lip', 'glass', 0.014, 0.022, 0.292, 0.3),
     h.turned('distillate', 'liquor', 'y', [[0, 0], [0, 0.022], [0.015, 0.05], [0.035, 0.065], [0.035, 0]], [0, 0.02, 0]),
     ring('straw', 'straw', 0.03, 0.055, 0, 0.022),
-  ], { glass: 'glass-clear', liquor: 'resin-honey', straw: 'straw-wicker' }) + h.inHand('receiver_flask', 'flask') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  ], { glass: 'glass-clear', liquor: 'resin-honey', straw: 'straw-wicker' }) + { title: 'Receiver flask' } + h.inHand('receiver_flask', 'flask') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A glass retort 150 mm across the bulb in a straw ring: its neck rises off the top, bends over and runs 350 mm
   // down to the right, tapering to a narrow open tip.
@@ -67,7 +67,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
   ] + h.pipe('neck', 'glass', [[-0.01, 0.15], [0.07, 0.205], [0.38, 0.05]], [0.02, 0.017, 0.007]), {
     glass: 'glass-clear',
     straw: 'straw-wicker',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  }) + { title: 'Retort' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A glass pelican 340 mm tall for distilling a liquor round and round: a gourd body holding a green liquor, a
   // rounded head stoppered and luted at the top, and two arms that leave the head, run down either side and turn back
@@ -80,7 +80,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
   ] + std.flattenArrays([
     h.pipe('arm-%s' % side[0], 'glass', [[side[1] * 0.02, 0.24], [side[1] * 0.11, 0.215], [side[1] * 0.11, 0.12], [side[1] * 0.04, 0.07]], 0.008)
     for side in [['l', -1], ['r', 1]]
-  ]), { glass: 'glass-clear', liquor: 'syrup-green', lute: 'clay-terracotta' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  ]), { glass: 'glass-clear', liquor: 'syrup-green', lute: 'clay-terracotta' }) + { title: 'Pelican' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // An earthenware aludel for subliming, 520 mm tall: a round-bellied pot for the matter, three open pear-shaped pots
   // stacked on it, each fitted into the one below, and a domed cap with a vent knob, every joint luted with pale clay.
@@ -95,7 +95,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
   ] + [
     h.turned('cap', 'clay', 'y', [[0, 0], [0, 0.036], [0.02, 0.04], [0.045, 0.034], [0.065, 0.02], [0.075, 0.008], [0.08, 0]], [0, 0.44, 0]),
     h.disc('vent', 'clay', 0.01, 0.515, 0.525),
-  ], { clay: 'clay-terracotta', lute: 'brick-buff' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['ceramic'], setting: ['medieval'] } } },
+  ], { clay: 'clay-terracotta', lute: 'brick-buff' }) + { title: 'Aludel' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['ceramic'], setting: ['medieval'] } } },
 
   // A philosopher's egg: an egg-shaped glass flask 110 mm across and 280 mm tall, its long neck drawn shut in the
   // flame, standing blunt end down in a straw ring with a black matter in the bottom.
@@ -103,7 +103,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.turned('egg', 'glass', 'y', [[0, 0], [0.004, 0.025], [0.015, 0.042], [0.035, 0.053], [0.06, 0.055], [0.09, 0.05], [0.115, 0.04], [0.135, 0.027], [0.148, 0.014], [0.155, 0.009], [0.25, 0.007], [0.26, 0.004], [0.265, 0]], [0, 0.012, 0]),
     h.turned('matter', 'matter', 'y', [[0, 0], [0.004, 0.022], [0.012, 0.035], [0.025, 0.045], [0.025, 0]], [0, 0.016, 0]),
     ring('straw', 'straw', 0.028, 0.045, 0, 0.02),
-  ], { glass: 'glass-clear', matter: 'coal-black', straw: 'straw-wicker' }) + h.inHand('philosophers_egg', 'egg') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
+  ], { glass: 'glass-clear', matter: 'coal-black', straw: 'straw-wicker' }) + { title: 'Philosopher\'s egg' } + h.inHand('philosophers_egg', 'egg') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['medieval'] } } },
 
   // A pear-shaped glass separating funnel 290 mm long lying on its side: a ground stopper in its neck, and a glass
   // stopcock with a flat key above the long stem, for drawing off the lower of two liquids that will not mix.
@@ -113,7 +113,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.turned('barrel', 'glass', 'z', [[0, 0], [0, 0.008], [0.04, 0.007], [0.04, 0]], [0.06, 0.045, -0.02]),
     box('key', 'glass', [0.054, 0.03, 0.02], [0.066, 0.06, 0.026]),
     h.turned('stem', 'glass', 'x', [[0, 0], [0, 0.0045], [0.095, 0.0035], [0.095, 0]], [0.06, 0.045, 0]),
-  ], { glass: 'glass-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'] } } },
+  ], { glass: 'glass-clear' }) + { title: 'Separating funnel' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass'] } } },
 
   // Three slender glass phials 85 mm tall in a little oak block, each holding a different tincture under a cork
   // sealed with red wax.
@@ -136,7 +136,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     'tincture-2': 'syrup-orange',
     cork: 'cork',
     wax: 'lacquer-red',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['glass', 'wood'], setting: ['medieval'] } } },
+  }) + { title: 'Sealed phials' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['glass', 'wood'], setting: ['medieval'] } } },
 
   // A tin-glazed albarello, the waisted apothecary jar, 205 mm tall and 110 mm across: white glaze with cobalt bands
   // above and below a cream label band, its mouth tied over with a parchment cover and string.
@@ -148,7 +148,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.disc('cover', 'cover', 0.047, 0.2, 0.204),
     ring('cover-skirt', 'cover', 0.041, 0.045, 0.185, 0.204),
     ring('string', 'string', 0.044, 0.047, 0.19, 0.194),
-  ], { glaze: 'ceramic-white', blue: 'paint-armour-blue', label: 'paper-pages-cream', cover: 'paper-butcher', string: 'cord-cotton' }) + h.inHand('apothecary_jar', 'jar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['ceramic'], setting: ['medieval'] } } },
+  ], { glaze: 'ceramic-white', blue: 'paint-armour-blue', label: 'paper-pages-cream', cover: 'paper-butcher', string: 'cord-cotton' }) + { title: 'Apothecary jar' } + h.inHand('apothecary_jar', 'jar') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['ceramic'], setting: ['medieval'] } } },
 
   // A round glass flask 180 mm across and 320 mm tall to the cork, its belly caged in woven wicker with a loop
   // handle at the shoulder.
@@ -162,7 +162,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     ring('weave-%d' % i, 'weave', b[1] - 0.01, b[1] + 0.002, b[0], b[0] + 0.008)
     for i in [0, 1, 2, 3]
     for b in [[[0.03, 0.087], [0.065, 0.093], [0.1, 0.093], [0.135, 0.079]][i]]
-  ], { glass: 'glass-clear', cork: 'cork', wicker: 'straw-wicker', weave: 'straw-pale' }) + h.inHand('wicker_flask', 'cage') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['glass', 'plant'], setting: ['medieval'] } } },
+  ], { glass: 'glass-clear', cork: 'cork', wicker: 'straw-wicker', weave: 'straw-pale' }) + { title: 'Wicker flask' } + h.inHand('wicker_flask', 'cage') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['glass', 'plant'], setting: ['medieval'] } } },
 
   // A brick athanor 1.45 m tall: a round iron-hooped furnace 600 mm across on a plinth, with a fire door and an ash
   // door glowing below it, a tall fuel tower on top under a domed lid that feeds charcoal down as it burns, and a
@@ -191,7 +191,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     ring('tower-hoop-%d' % i, 'iron', 0.15, 0.17, y, y + 0.02)
     for i in [0, 1]
     for y in [[1.0, 1.22][i]]
-  ], { brick: 'brick-buff', iron: 'iron-dull', ember: 'glow-flame', sand: 'brick-buff', glass: 'glass-clear' }) + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['ceramic', 'metal'], setting: ['medieval'] } } },
+  ], { brick: 'brick-buff', iron: 'iron-dull', ember: 'glow-flame', sand: 'brick-buff', glass: 'glass-clear' }) + { title: 'Athanor' } + { voxelGrain: 0.008 } + { taxonomy: { category: 'machinery', tags: { material: ['ceramic', 'metal'], setting: ['medieval'] } } },
 
   // A sand bath: a wrought iron pan 300 mm across on three stub feet, filled with sand, a round glass flask buried to
   // its middle so it heats evenly.
@@ -205,7 +205,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     local a = 2 * std.pi * i / 3;
     h.disc('foot-%d' % i, 'iron', 0.012, 0, 0.03, 0.1 * std.sin(a), 0.1 * std.cos(a))
     for i in [0, 1, 2]
-  ], { iron: 'iron-dull', sand: 'brick-buff', glass: 'glass-clear' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'stone'], setting: ['medieval'] } } },
+  ], { iron: 'iron-dull', sand: 'brick-buff', glass: 'glass-clear' }) + { title: 'Sand bath' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'stone'], setting: ['medieval'] } } },
 
   // A water bath, the bain-marie: a copper pan 300 mm across and 180 mm deep with a rolled rim and two ring handles,
   // nearly full of water, a round glass flask standing in it to be warmed gently.
@@ -216,14 +216,14 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     bulb('flask', 'glass', 0.06, 0.062, 0.018, 0.26),
     h.turned('handle-l', 'copper', 'z', [[0, 0.012], [0, 0.018], [0.006, 0.018], [0.006, 0.012], [0, 0.012]], [-0.165, 0.15, -0.003]),
     h.turned('handle-r', 'copper', 'z', [[0, 0.012], [0, 0.018], [0.006, 0.018], [0.006, 0.012], [0, 0.012]], [0.165, 0.15, -0.003]),
-  ], { copper: 'copper', water: 'water', glass: 'glass-clear' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { copper: 'copper', water: 'water', glass: 'glass-clear' }) + { title: 'Water bath' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A bone-ash cupel 35 mm across and 19 mm tall for assaying, its shallow dish holding the silver bead left when the
   // lead has soaked away.
   h.compound('cupel', 0.02, [
     h.turned('cupel', 'ash', 'y', [[0, 0], [0, 0.015], [0.019, 0.0175], [0.019, 0.012], [0.015, 0.006], [0.013, 0]]),
     h.ball('bead', 'silver', 0.003, 0, 0.0155, 0),
-  ], { ash: 'bone', silver: 'metal-silver' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['medieval'] } } },
+  ], { ash: 'bone', silver: 'metal-silver' }) + { title: 'Cupel' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['medieval'] } } },
 
   // An iron spatula 190 mm long lying flat: a round shank, a thin flat blade at one end and a small round scoop at
   // the other for taking up powders.
@@ -232,7 +232,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     box('neck', 'iron', [0.015, 0, -0.004], [0.026, 0.006, 0.004]),
     box('blade', 'iron', [0.02, 0, -0.008], [0.09, 0.0015, 0.008]),
     h.disc('scoop', 'iron', 0.009, 0, 0.004, -0.09, 0),
-  ], { iron: 'iron-dull' }) + h.gripOn('spatula', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { iron: 'iron-dull' }) + { title: 'Spatula' } + h.gripOn('spatula', 'shank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A wrought iron casting ladle 580 mm long: a deep bowl 110 mm across with a pouring lip, and a long iron handle
   // ending in a turned wooden grip.
@@ -241,7 +241,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.prism('lip', 'iron', 'y', [[-0.014, 0.05], [0.014, 0.05], [0.006, 0.068], [-0.006, 0.068]], 0.045, 0.055),
     h.rod('handle', 'iron', 0.006, -0.42, -0.05, 0.05),
     h.turned('grip', 'grip', 'x', [[0, 0], [0, 0.012], [0.005, 0.014], [0.11, 0.014], [0.12, 0.011], [0.12, 0]], [-0.53, 0.05, 0]),
-  ], { iron: 'iron-dull', grip: 'wood-walnut' }) + h.gripOn('iron_ladle', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { iron: 'iron-dull', grip: 'wood-walnut' }) + { title: 'Iron ladle' } + h.gripOn('iron_ladle', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A forged iron tripod 220 mm across and 190 mm tall: a flat-bar ring on three straight legs with flattened feet,
   // for standing a vessel over a fire or brazier.
@@ -254,7 +254,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
       h.disc('foot-%d' % i, 'iron', 0.012, 0, 0.005, x, z),
     ]
     for i in [0, 1, 2]
-  ]), { iron: 'iron-dull' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ]), { iron: 'iron-dull' }) + { title: 'Iron tripod' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // An hourglass 200 mm tall: two blown glass bulbs joined at a narrow waist between turned walnut end plates on
   // three posts, most of the sand run through into the lower bulb and a thread of it still falling.
@@ -269,7 +269,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     local a = 2 * std.pi * i / 3;
     h.disc('post-%d' % i, 'wood', 0.005, 0.015, 0.185, 0.042 * std.sin(a), 0.042 * std.cos(a))
     for i in [0, 1, 2]
-  ], { wood: 'wood-walnut', glass: 'glass-clear', sand: 'brick-buff' }) + h.inHand('hourglass', 'glass') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'wood'], setting: ['medieval'] } } },
+  ], { wood: 'wood-walnut', glass: 'glass-clear', sand: 'brick-buff' }) + { title: 'Hourglass' } + h.inHand('hourglass', 'glass') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'wood'], setting: ['medieval'] } } },
 
   // A grimoire lying shut, 280 by 210 mm and 70 mm thick: a thick page block in oxblood leather over boards, a
   // raised-band spine, brass corners, a brass roundel on the cover and two brass clasps holding it closed.
@@ -294,7 +294,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     ]
     for i in [0, 1]
     for z in [[-0.07, 0.07][i]]
-  ]), { leather: 'leather-oxblood', pages: 'paper-pages-cream', brass: 'brass-dull' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['leather', 'paper'], setting: ['medieval'] } } },
+  ]), { leather: 'leather-oxblood', pages: 'paper-pages-cream', brass: 'brass-dull' }) + { title: 'Grimoire' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['leather', 'paper'], setting: ['medieval'] } } },
 
   // A touchstone: a slab of fine black stone 80 by 50 by 12 mm, its top streaked with gold where pieces were rubbed
   // on it to judge their fineness by the colour of the mark.
@@ -303,7 +303,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
   ] + [
     box('streak-%d' % i, 'gold', [-0.03 + i * 0.012, 0.012, -0.016 + (i % 2) * 0.004], [-0.026 + i * 0.012, 0.0135, 0.014 - (i % 2) * 0.006])
     for i in [0, 1, 2, 3, 4]
-  ], { stone: 'gem-onyx', gold: 'metal-gold' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['stone'], setting: ['medieval'] } } },
+  ], { stone: 'gem-onyx', gold: 'metal-gold' }) + { title: 'Touchstone' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['stone'], setting: ['medieval'] } } },
 
   // A brass astrolabe 160 mm across lying face up: the mater with its raised limb, a plate inside it, the open rete
   // over the plate with its off-centre ecliptic ring, a sighting rule pinned at the centre, and the throne and
@@ -321,7 +321,7 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.disc('pin', 'brass', 0.004, 0, 0.015),
     h.prism('throne', 'brass', 'y', [[0.075, -0.02], [0.075, 0.02], [0.095, 0.01], [0.095, -0.01]], 0, 0.008),
     ring('shackle', 'brass', 0.008, 0.012, 0.002, 0.006, 0, 0.103),
-  ], { brass: 'brass', plate: 'brass-dull' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { brass: 'brass', plate: 'brass-dull' }) + { title: 'Astrolabe' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A distilling worm 610 mm tall: an oak tub 420 mm across, iron-hooped and full of cold water, holding a copper
   // coil of five turns. The vapour comes in at the top from the still and runs down through the coil, and the
@@ -346,5 +346,5 @@ taxonomy.inherit({ keywords: ['alchemy'] }, [
     h.rod('outlet', 'copper', 0.01, 0.12, 0.3, 0.07),
     h.disc('spout', 'copper', 0.01, 0.03, 0.07, 0.29, 0),
     box('tap', 'brass', [0.255, 0.06, -0.012], [0.275, 0.085, 0.012]),
-  ], { wood: 'wood-oak', water: 'water', iron: 'iron-dull', copper: 'copper', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['medieval'] } } },
+  ], { wood: 'wood-oak', water: 'water', iron: 'iron-dull', copper: 'copper', brass: 'brass' }) + { title: 'Distilling worm' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['medieval'] } } },
 ])

@@ -22,14 +22,14 @@ local sheet(l, w, t, e, face, edge) = [
     disc('cap-top', 'captop', 0.0095, 0.063, 0.064),
     h.tube('label', 'label', 0.016, 0.0166, 0, 0.026) + { axis: 'y', origin: [0, 0.012, 0] },
     box('label-mark', 'mark', [-0.006, 0.017, 0.0164], [0.006, 0.033, 0.0172]),
-  ], { glass: 'glass-clear', metal: 'mirror-silver', cap: 'plastic-black', captop: 'plastic-charcoal', label: 'paper-white', mark: 'paint-red' })
+  ], { glass: 'glass-clear', metal: 'mirror-silver', cap: 'plastic-black', captop: 'plastic-charcoal', label: 'paper-white', mark: 'paint-red' }) + { title: 'Mercury' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass', 'metal'] } } },
 
   // A sheet of window glass, 1220 mm by 915 mm and 2.4 mm thick, lying flat, its green-tinged edges showing and a
   // maker's sticker in one corner.
   h.compound('glass_sheet', 6.7, sheet(1.22, 0.915, 0.0024, 0.006, 'glass', 'edge') + [
     box('sticker', 'sticker', [0.5, 0.0024, 0.34], [0.58, 0.0034, 0.4]),
-  ], { glass: 'glass-clear', edge: 'syrup-green', sticker: 'paper-white' })
+  ], { glass: 'glass-clear', edge: 'syrup-green', sticker: 'paper-white' }) + { title: 'Glass sheet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A pane of bullet-resistant glass, 305 mm square and 57 mm thick: layers of glass and clear plastic bonded
@@ -55,7 +55,7 @@ local sheet(l, w, t, e, face, edge) = [
     ]
     for f in ['top', 'bottom']
     for y in [if f == 'top' then t else 0]
-  ]), { glass: 'glass-clear', interlayer: 'plastic-frosted', frame: 'steel-grey' })
+  ]), { glass: 'glass-clear', interlayer: 'plastic-frosted', frame: 'steel-grey' }) + { title: 'Reinforced glass pane' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['glass', 'metal'] } } },
 
   // A sheet of bullet-resistant glass, 1220 mm by 915 mm and 19 mm thick, lying flat: laminated glass edged all
@@ -66,14 +66,14 @@ local sheet(l, w, t, e, face, edge) = [
     for y in [[0.006, 0.012][i]]
   ] + [
     box('stripe', 'stripe', [-0.3, 0.019, 0.4], [0.3, 0.02, 0.45]),
-  ], { glass: 'glass-clear', interlayer: 'plastic-frosted', frame: 'steel-grey', stripe: 'paint-crane-yellow' })
+  ], { glass: 'glass-clear', interlayer: 'plastic-frosted', frame: 'steel-grey', stripe: 'paint-crane-yellow' }) + { title: 'Reinforced glass sheet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['glass', 'metal'] } } },
 
   // A sheet of tempered safety glass, 1220 mm by 965 mm and 6 mm thick, lying flat, with the etched maker's mark
   // tempered glass carries in one corner.
   h.compound('tempered_glass_sheet', 18, sheet(1.22, 0.965, 0.006, 0.006, 'glass', 'edge') + [
     box('mark', 'mark', [0.52, 0.006, 0.4], [0.58, 0.007, 0.44]),
-  ], { glass: 'glass-clear', edge: 'syrup-green', mark: 'plastic-frosted' })
+  ], { glass: 'glass-clear', edge: 'syrup-green', mark: 'plastic-frosted' }) + { title: 'Tempered glass sheet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A gallon can of paint, 168 mm across and 192 mm tall: a steel can with rolled rims, a pressed lid, a wire bail
@@ -93,7 +93,7 @@ local sheet(l, w, t, e, face, edge) = [
     box('ear-right', 'can', [r - 0.002, 0.15, -0.008], [r + 0.004, 0.166, 0.008]),
   ] + h.bend('bail', 'bail', [[-r - 0.003, 0.158], [-r - 0.003, 0.198], [-0.04, 0.244], [0.04, 0.244], [r + 0.003, 0.198], [r + 0.003, 0.158]], 0.004, -0.002, 0.002) + [
     rod('grip', 'grip', 0.007, -0.03, 0.03, 0.244),
-  ], { can: 'steel-stainless', lid: 'steel-grey', paint: 'paint-red', panel: 'paper-white', bail: 'steel-bright', grip: 'plastic-black' })
+  ], { can: 'steel-stainless', lid: 'steel-grey', paint: 'paint-red', panel: 'paper-white', bail: 'steel-bright', grip: 'plastic-black' }) + { title: 'Bucket of paint' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A door viewer, 14 mm across and 48 mm long, lying on its side: a brass barrel with a wide domed lens flange at
@@ -107,7 +107,7 @@ local sheet(l, w, t, e, face, edge) = [
     box('slot-a', 'slot', [-0.0282, 0.0105 - 0.0008, -0.0085], [-0.0275, 0.0105 + 0.0008, -0.004]),
     box('slot-b', 'slot', [-0.0282, 0.0105 - 0.0008, 0.004], [-0.0275, 0.0105 + 0.0008, 0.0085]),
     rod('eye-glass', 'lens', 0.004, -0.0286, -0.0278, 0.0105),
-  ], { brass: 'brass-polished', sleeve: 'brass-dull', lens: 'glass-clear', slot: 'plastic-black' })
+  ], { brass: 'brass-polished', sleeve: 'brass-dull', lens: 'glass-clear', slot: 'plastic-black' }) + { title: 'Peephole' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'structures', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A roll of insect screen, 300 mm wide and 66 mm across, wound on a card core: its loose end lies a little
@@ -126,6 +126,6 @@ local sheet(l, w, t, e, face, edge) = [
   ] + [
     box('tail', 'mesh', [-0.15, 0, 0.02], [0.15, 0.002, 0.09]),
     h.tube('tape', 'tape', 0.033, 0.0345, -0.012, 0.012, 0.033),
-  ], { mesh: 'mesh-black', shade: 'plastic-charcoal', core: 'paperboard-tan', tape: 'tape-tan' })
+  ], { mesh: 'mesh-black', shade: 'plastic-charcoal', core: 'paperboard-tan', tape: 'tape-tan' }) + { title: 'Screen mesh' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 ]

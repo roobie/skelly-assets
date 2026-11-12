@@ -41,7 +41,7 @@ export function matches(entry, { q, shelf, picks }) {
   if (text) {
     const id = text.replace(/\s+/g, '_');
     const term = text.replace(/[\s_]+/g, '-');
-    if (!entry.id.includes(id) && ![...Object.values(entry.tags).flat(), ...entry.keywords].some((t) => t.includes(term))) return false;
+    if (!entry.id.includes(id) && !entry.title.toLowerCase().includes(text) && ![...Object.values(entry.tags).flat(), ...entry.keywords].some((t) => t.includes(term))) return false;
   }
   return Object.entries(picks).every(([dimension, terms]) => termsMatch(entry, dimension, terms));
 }

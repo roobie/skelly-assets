@@ -1,7 +1,8 @@
 {
-  "recipe": [{"id":"invalid_material_fixture","kind":"item","source":"invalid_material_fixture","voxel":{"grain":0.01},"options":{"mass":"parts"}}],
+  "recipe": [{"id":"invalid_material_fixture","title":"Fixture material","kind":"item","source":"invalid_material_fixture","voxel":{"grain":0.01},"options":{"mass":"parts"}}],
   "item": {
     "id":"invalid_material_fixture",
+    "title":"Fixture material",
     "exportMass":"parts",
     "parts":[{
       "id":"body","family":"compound","massKg":1,

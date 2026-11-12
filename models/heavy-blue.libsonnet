@@ -18,7 +18,7 @@ local bootFinish = { upper: 'paint-armour-navy', toe: 'paint-armour-blue', sole:
 // A fitted row with its pieces filtered and added to: drops the pieces `drop` names, appends `add`.
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain };
+  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local round(piece) = piece + { sides: 16 };
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
@@ -128,14 +128,14 @@ local helmet = [
   round(h.rod('filter', 'trim', 0.03, 0.2, 0.26, 0.08)) + { origin: [-0.235, 0.08, 0.09] },
 ];
 
-local body = fit.trooper('armor_heavy', livery).rows;
-local legs = fit.trooperLegs('legguard_heavy', livery).rows;
+local body = fit.trooper('armor_heavy', livery, title='Heavy body armour').rows;
+local legs = fit.trooperLegs('legguard_heavy', livery, title='Heavy leg guards').rows;
 local gloves = fit.hands('gloves_heavy', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.07, hem: 0.02, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}).rows;
+}, 'Heavy gauntlets').rows;
 local boots = fit.feet('boots_heavy', bootFinish,
-                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.085, instep: 0.11, top: 0.28, shaft: 0.15, laces: 0 }).rows;
+                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.085, instep: 0.11, top: 0.28, shaft: 0.15, laces: 0 }, title='Heavy boots').rows;
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03);
@@ -154,5 +154,5 @@ armour.of(null, [
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
-  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { voxelGrain: 0.006 },
+  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { title: 'Heavy helmet' } + { voxelGrain: 0.006 },
 ])

@@ -33,7 +33,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ]) + [
     box('engine_hatch', 'paint', [-3.5, s.shoulder + 0.06, -0.72], [-2.9, s.shoulder + 0.09, 0.72]),
     box('radiator_screen', 'mesh', [-2.3, s.shoulder + 0.06, -0.72], [-1.8, s.shoulder + 0.09, 0.72]),
-  ], { paint: s.paint, dark: 'paint-charcoal', mesh: 'steel-galvanised', yellow: 'paint-white' }),
+  ], { paint: s.paint, dark: 'paint-charcoal', mesh: 'steel-galvanised', yellow: 'paint-white' }) + { title: 'Combine harvester body' },
   k.compound('combine_harvester_cab', 420, [
     box('floor', 'mat', [s.cabRear, s.cabFloor, -s.cabSide], [s.cabFront, s.cabFloor + 0.04, s.cabSide]),
     box('roof', 'paint', [s.cabRear - 0.1, s.cabRoof - 0.08, -s.cabSide - 0.12], [s.cabFront + 0.2, s.cabRoof, s.cabSide + 0.12]),
@@ -51,7 +51,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('post_rear', 'dark', [s.cabRear, s.cabFloor, s.cabSide - 0.06], [s.cabRear + 0.08, s.cabRoof - 0.08, s.cabSide]),
     box('side_lower', 'paint', [s.cabRear + 0.08, s.cabFloor, s.cabSide - 0.04], [door - 0.05, s.shoulderCab, s.cabSide]),
     box('side_glass', 'glass', [s.cabRear + 0.08, s.shoulderCab, s.cabSide - 0.04], [door - 0.05, s.cabRoof - 0.08, s.cabSide - 0.01]),
-  ]), { paint: s.paint, dark: 'paint-charcoal', mat: 'rubber-black', glass: 'glass-clear' }),
+  ]), { paint: s.paint, dark: 'paint-charcoal', mat: 'rubber-black', glass: 'glass-clear' }) + { title: 'Combine harvester cab' },
   k.compound('combine_harvester_cab_door', 42, [
     box('frame_low', 'paint', [door + 0.01, s.cabFloor + 0.04, s.cabSide - 0.04], [s.cabFront - 0.06, s.shoulderCab - 0.2, s.cabSide]),
     box('glass', 'glass', [door + 0.05, s.shoulderCab - 0.2, s.cabSide - 0.03], [s.cabFront - 0.1, s.cabRoof - 0.14, s.cabSide - 0.01]),
@@ -61,34 +61,34 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ], { paint: s.paint, glass: 'glass-clear' }, {
     hinge_a: ['stile', [0, 0.1, 1]],
     hinge_b: ['stile', [0, 0.9, 1]],
-  }),
+  }) + { title: 'Combine harvester cab door' },
   k.compound('combine_harvester_windscreen', 30, [
     box('glass', 'glass', [s.cabFront - 0.02, s.cabFloor + 0.1, -s.cabSide + 0.06], [s.cabFront + 0.02, s.cabRoof - 0.11, s.cabSide - 0.06]),
-  ], { glass: 'glass-clear' }),
+  ], { glass: 'glass-clear' }) + { title: 'Combine harvester windscreen' },
   k.compound('combine_harvester_grain_tank', 340, [
     box('rear_wall', 'paint', [s.tankRear, s.shoulder, -s.tankSide], [s.tankRear + 0.05, s.tankTop, s.tankSide]),
     box('front_wall', 'paint', [s.tankFront - 0.05, s.shoulder, -s.tankSide], [s.tankFront, s.tankTop, s.tankSide]),
   ] + bothSides([
     box('side_wall', 'paint', [s.tankRear, s.shoulder, s.tankSide - 0.05], [s.tankFront, s.tankTop, s.tankSide]),
     box('rim', 'yellow', [s.tankRear, s.tankTop - 0.1, s.tankSide - 0.02], [s.tankFront, s.tankTop, s.tankSide + 0.02]),
-  ]), { paint: s.paint, yellow: 'paint-white' }),
+  ]), { paint: s.paint, yellow: 'paint-white' }) + { title: 'Combine harvester grain tank' },
   // Apart from the tank because a load floor's face is the top of its whole part.
   k.compound('combine_harvester_grain_floor', 80, [
     box('plate', 'steel', [s.tankRear + 0.05, s.shoulder - 0.03125, -s.tankSide + 0.05], [s.tankFront - 0.05, s.tankFloorTop, s.tankSide - 0.05]),
-  ], { steel: 'steel-galvanised' }),
+  ], { steel: 'steel-galvanised' }) + { title: 'Combine harvester grain floor' },
   k.compound('combine_harvester_unloading_auger', 210, [
     k.turned('tube', 'tube', 'x', k.disc(0.15, -1.9, 1.2), [-0.6, 3.15, -1.2]) + { sides: 12 },
     box('spout', 'tube', [-2.62, 2.85, -1.32], [-2.42, 3.1, -1.08]),
     box('root', 'dark', [0.34, 2.7, -1.3], [0.62, 3.2, -1.02]),
     box('cradle', 'dark', [-2.1, 3.0, -1.3], [-1.96, 3.1, -0.9]),
     box('cradle_post', 'dark', [-2.06, s.shoulder + 0.06, -1.0], [-2.0, 3.0, -0.9]),
-  ], { tube: 'paint-white', dark: 'paint-charcoal' }),
+  ], { tube: 'paint-white', dark: 'paint-charcoal' }) + { title: 'Combine harvester unloading auger' },
   k.compound('combine_harvester_feeder', 640, [
     k.bar('housing', 'paint', [s.bodyFront, 1.68], [s.headerRear + 0.06, 0.8], 0.82, [-0.58, 0.58], 0.74),
   ] + bothSides([
     k.bar('lift_ram', 'dark', [s.bodyFront + 0.12, 0.74], [2.2, 0.84], 0.1, [0.5, 0.6]),
     k.bar('lift_rod', 'bright', [2.16, 0.84], [2.56, 0.98], 0.05, [0.52, 0.58]),
-  ]), { paint: s.paint, dark: 'paint-charcoal', bright: 'steel-stainless' }),
+  ]), { paint: s.paint, dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Combine harvester feeder' },
   k.compound('combine_harvester_header', 1900, [
     box('floor', 'paint', [s.headerRear, 0.2, -s.headerHalf], [s.headerFront, 0.3, s.headerHalf]),
     box('rear_wall', 'paint', [s.headerRear, 0.26, -s.headerHalf], [s.headerRear + 0.1, s.wallTop, s.headerHalf]),
@@ -107,7 +107,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     prism('end_plate', 'paint', [[s.headerRear, 0.18], [s.headerFront + 0.06, 0.18], [s.headerFront + 0.4, 0.26], [s.headerRear + 0.62, s.wallTop], [s.headerRear, s.wallTop]], [s.headerHalf - 0.04, s.headerHalf]),
     prism('divider', 'yellow', [[s.headerFront, 0.18], [s.headerFront + 0.42, 0.22], [s.headerFront, 0.56]], [s.headerHalf - 0.1, s.headerHalf + 0.03]),
     k.bar('reel_arm', 'dark', [s.headerRear + 0.1, s.wallTop], [s.reel[0], s.reel[1]], 0.1, [s.headerHalf - 0.1, s.headerHalf - 0.04]),
-  ]), { paint: s.paint, yellow: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal' }),
+  ]), { paint: s.paint, yellow: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal' }) + { title: 'Combine harvester header' },
   k.compound('combine_harvester_reel', 180, [
     m.axleDisc('shaft', 'dark', s.reel[0], s.reel[1], 0.05, [-s.headerHalf + 0.1, s.headerHalf - 0.1], 12),
   ] + std.flattenArrays([
@@ -120,14 +120,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
       k.bar('spider_far_' + i, 'dark', s.reel, tip, 0.04, [-s.headerHalf * 0.72 - 0.04, -s.headerHalf * 0.72]),
     ]
     for i in std.range(0, bats - 1)
-  ]), { yellow: 'paint-white', dark: 'paint-charcoal' }),
+  ]), { yellow: 'paint-white', dark: 'paint-charcoal' }) + { title: 'Combine harvester reel' },
   k.compound('combine_harvester_front_axle', 620, [
     m.axleDisc('tube', 'dark', s.frontAxle, s.frontHub, 0.13, [-s.frontZ + 0.1, s.frontZ - 0.1], 16),
-  ], { dark: 'paint-charcoal' }),
+  ], { dark: 'paint-charcoal' }) + { title: 'Combine harvester front axle' },
   k.compound('combine_harvester_rear_axle', 320, [
     box('beam', 'dark', [s.rearAxle - 0.09, s.rearHub - 0.07, -s.rearZ + 0.1], [s.rearAxle + 0.09, s.rearHub + 0.07, s.rearZ - 0.1]),
     box('pivot', 'dark', [s.rearAxle - 0.2, s.rearHub - 0.02, -0.34], [s.rearAxle + 0.2, s.sill + 0.04, 0.34]),
-  ], { dark: 'paint-charcoal' }),
+  ], { dark: 'paint-charcoal' }) + { title: 'Combine harvester rear axle' },
   k.compound('combine_harvester_ladder', 28, [
     box('rail_a', 'dark', [1.76, 0.5, 1.26], [1.8, s.cabFloor, 1.3]),
     box('rail_b', 'dark', [2.2, 0.5, 1.26], [2.24, s.cabFloor, 1.3]),
@@ -135,9 +135,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     local y = 0.5 + i * 0.3;
     box('rung_' + i, 'dark', [1.76, y, 1.26], [2.24, y + 0.04, 1.3])
     for i in std.range(0, 5)
-  ], { dark: 'paint-charcoal' }),
+  ], { dark: 'paint-charcoal' }) + { title: 'Combine harvester ladder' },
   k.compound('combine_harvester_straw_chopper', 260, [
     prism('hood', 'dark', [[s.bodyRear - 0.42, 0.72], [s.bodyRear + 0.34, 0.72], [s.bodyRear + 0.34, 1.26], [s.bodyRear - 0.3, 1.26]], [-0.86, 0.86]),
     box('chute', 'steel', [s.bodyRear - 0.5, 0.68, -0.82], [s.bodyRear - 0.2, 0.74, 0.82]),
-  ], { dark: 'paint-charcoal', steel: 'steel-galvanised' }),
+  ], { dark: 'paint-charcoal', steel: 'steel-galvanised' }) + { title: 'Combine harvester straw chopper' },
 ])

@@ -8,8 +8,9 @@ local spares = catalogue.ids('skelly.ground-vehicles');
 // A spare is an ordinary item; a catalogue row may name its own grain in place of its class's.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local title = import 'tools/jsonnet/lib/title.libsonnet';
 [
   if std.objectHas(vehicleParts, row.id) then packs.partRecipe(row)
-  else { id: row.id, kind: 'item', source: row.id, voxel: voxel.of(voxel.item, row), options: { mass: row.exportMass } } + taxonomy.of(row)
+  else { id: row.id, kind: 'item', source: row.id, voxel: voxel.of(voxel.item, row), options: { mass: row.exportMass } } + title.of(row) + taxonomy.of(row)
   for row in catalogue.rows(std.objectFields(vehicleParts) + spares)
 ]

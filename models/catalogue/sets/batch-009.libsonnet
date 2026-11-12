@@ -9,7 +9,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
   // A foil blister card of ten plain white antibiotic tablets, 70 mm by 35 mm and lying flat, two rows of
   // five, with a green printed band at one end.
   h.compound('narrow_spectrum_antibiotic', 0.0054, h.blister(0.07, 0.035, 5, 2, h.tablet(0.0045)),
-             { foil: 'alu-bare', print: 'plastic-green', tablet: 'chalk-white' })
+             { foil: 'alu-bare', print: 'plastic-green', tablet: 'chalk-white' }) + { title: 'Narrow-spectrum antibiotic' }
   + h.inHand('narrow_spectrum_antibiotic', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A small clear zip bag of dried cannabis buds, 80 mm by 60 mm and lying flat, with a red press seal
@@ -34,7 +34,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     tip('tip-c', [0.015, 0.0125, -0.012], 0.0035),
     tip('tip-d', [-0.004, 0.0135, -0.006], 0.003),
     turned('stem', 'stem', 'x', [[0, 0], [0, 0.0012], [0.016, 0.0012], [0.016, 0]], [0.008, 0.0015, 0.022]),
-  ], { bag: 'plastic-bag', seal: 'plastic-red', bud: 'plant-dried', tip: 'leaf-green', stem: 'paperboard-tan' })
+  ], { bag: 'plastic-bag', seal: 'plastic-red', bud: 'plant-dried', tip: 'leaf-green', stem: 'paperboard-tan' }) + { title: 'Cannabis' }
   + h.inHand('cannabis', 'film') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'plant'], setting: ['modern'] }, keywords: ['recreational-drug'] } },
 
   // A squat 50 ml jar of wintergreen ointment, 56 mm across and 42 mm tall with its lid: white with a
@@ -43,7 +43,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('jar', 'jar', 'y', [[0, 0], [0, 0.026], [0.028, 0.026], [0.03, 0.024], [0.032, 0.024], [0.032, 0]]),
     turned('label', 'label', 'y', [[0, 0], [0, 0.0264], [0.018, 0.0264], [0.018, 0]], [0, 0.006, 0]),
     turned('lid', 'lid', 'y', [[0, 0], [0, 0.028], [0.011, 0.028], [0.012, 0.026], [0.012, 0]], [0, 0.03, 0]),
-  ], { jar: 'enamel-white', label: 'paper-white', lid: 'plastic-green' })
+  ], { jar: 'enamel-white', label: 'paper-white', lid: 'plastic-green' }) + { title: 'Wintergreen ointment' }
   + h.inHand('wintergreen_ointment', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A pharmacy prescription vial of sedative tablets, 28 mm across and 62 mm tall, amber with a white
@@ -52,7 +52,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('vial', 'vial', 'y', [[0, 0], [0, 0.014], [0.05, 0.014], [0.05, 0]]),
     turned('label', 'label', 'y', [[0, 0], [0, 0.0144], [0.028, 0.0144], [0.028, 0]], [0, 0.01, 0]),
     turned('cap', 'cap', 'y', [[0, 0], [0, 0.0155], [0.011, 0.0155], [0.012, 0.0145], [0.012, 0]], [0, 0.05, 0]),
-  ], { vial: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' })
+  ], { vial: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' }) + { title: 'Fast-acting sedative' }
   + h.inHand('fast_acting_sedative', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A red plastic first aid case, 240 mm wide, 170 mm tall and 75 mm deep, standing on its edge with a
@@ -68,7 +68,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     box('post-b', 'handle', [0.035, 0.17, -0.01], [0.045, 0.19, 0.01]),
     box('latch-a', 'latch', [-0.095, 0.17, -0.006], [-0.075, 0.176, 0.014]),
     box('latch-b', 'latch', [0.075, 0.17, -0.006], [0.095, 0.176, 0.014]),
-  ], { case: 'plastic-red', seam: 'plastic-grey', cross: 'paint-white', handle: 'plastic-grey', latch: 'plastic-white' })
+  ], { case: 'plastic-red', seam: 'plastic-grey', cross: 'paint-white', handle: 'plastic-grey', latch: 'plastic-white' }) + { title: 'First aid box' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A blue plastic 30 gallon closed-head barrel, 480 mm across and 720 mm tall, with two moulded rolling
@@ -80,7 +80,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('ring', 'body', 'y', [[0, 0.2], [0, 0.236], [0.02, 0.236], [0.02, 0.2]], [0, 0.7, 0]),
     disc('bung-large', 'bung', 0.035, 0.7, 0.72, 0.12, 0),
     disc('bung-small', 'bung', 0.025, 0.7, 0.72, -0.12, 0),
-  ], { body: 'plastic-blue', bung: 'plastic-white' }) + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-blue', bung: 'plastic-white' }) + { title: 'Plastic barrel' } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A red open-head 30 gallon steel drum, 465 mm across and 745 mm tall, with two rolled rolling hoops, a
   // lid held by a bolted clamp ring and a small bung in the lid.
@@ -92,7 +92,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('clamp', 'clamp', 'y', [[0, 0.215], [0, 0.242], [0.025, 0.242], [0.025, 0.215]], [0, 0.71, 0]),
     box('bolt', 'clamp', [0.235, 0.712, -0.025], [0.26, 0.732, 0.025]),
     disc('bung', 'bung', 0.025, 0.73, 0.745, -0.13, 0.06),
-  ], { body: 'paint-red', clamp: 'steel', bung: 'steel-grey' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'paint-red', clamp: 'steel', bung: 'steel-grey' }) + { title: '100-liter steel drum' } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An olive drab closed-head 55 gallon steel drum, 585 mm across and 880 mm tall, with two rolled rolling
   // hoops, rolled chimes top and bottom, and two screw bungs in the top, one large and one small.
@@ -104,5 +104,5 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('chime-foot', 'chime', 'y', [[0, 0.27], [0, 0.296], [0.014, 0.296], [0.014, 0.27]]),
     disc('bung-large', 'bung', 0.036, 0.87, 0.9, 0.18, 0),
     disc('bung-small', 'bung', 0.025, 0.87, 0.9, -0.18, 0),
-  ], { body: 'paint-olive', chime: 'paint-olive', bung: 'steel-grey' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'paint-olive', chime: 'paint-olive', bung: 'steel-grey' }) + { title: '200-liter steel drum' } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

@@ -4,6 +4,7 @@ local k = import 'kit.libsonnet';
 local box = k.box;
 local turned = k.turned;
 local s = import 'tanker_truck.spec.libsonnet';
+local vehicle = import 'tanker_truck.placements.libsonnet';
 local at = [0, s.barrelY, 0];
 local finish = { tank: 'steel-bright', band: 'steel-grey', frame: 'paint-charcoal', paint: s.paint, pipe: 'steel-galvanised', tread: 'alu-bare', valve: 'paint-red', hose: 'rubber-black' };
 local bands = [s.barrelRear + 0.45 + i * (s.barrelFront - s.barrelRear - 0.9) / 4 for i in std.range(0, 4)];
@@ -11,7 +12,7 @@ local saddles = [s.barrelRear + 1.0, -0.65, s.barrelFront - 0.55];
 local manholes = [s.barrelRear + 1.2, (s.barrelRear + s.barrelFront) / 2, s.barrelFront - 1.2];
 local ladderX = s.barrelRear - s.dish - 0.1;
 local posts = [s.barrelRear + 0.5 + i * (s.barrelFront - s.barrelRear - 1.0) / 5 for i in std.range(0, 5)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck', vehicle.title, s) + [
   k.compound('tanker_truck_barrel', 3000, [
     turned('shell', 'tank', 'x', [
       [s.barrelRear - s.dish, 0],
@@ -30,7 +31,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
   ] + [
     turned('manhole_' + i, 'band', 'y', k.disc(0.3, s.barrelY + s.barrelRadius - 0.08, s.walkY + 0.1), [manholes[i], 0, 0]) + { sides: 12 }
     for i in std.range(0, 2)
-  ], finish),
+  ], finish) + { title: 'Tanker truck barrel' },
   k.compound('tanker_truck_saddle', 240, std.flattenArrays([
     [
       box('foot_' + i, 'frame', [saddles[i] - 0.16, s.railTop, -0.56], [saddles[i] + 0.16, s.railTop + 0.08, 0.56]),
@@ -38,7 +39,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
       box('high_' + i, 'frame', [saddles[i] - 0.1, 1.5, -0.74], [saddles[i] + 0.1, 1.76, 0.74]),
     ]
     for i in std.range(0, 2)
-  ]), finish),
+  ]), finish) + { title: 'Tanker truck saddle' },
   k.compound('tanker_truck_walkway', 95, [
     box('tread', 'tread', [s.barrelRear + 0.2, s.walkY, -0.24], [s.barrelFront - 0.2, s.walkY + 0.03, 0.24]),
   ] + [
@@ -49,7 +50,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
   ] + [
     box('post_' + i, 'band', [posts[i] - 0.02, s.walkY - 0.12, 0.36], [posts[i] + 0.02, s.railY, 0.4])
     for i in std.range(0, 5)
-  ]), finish),
+  ]), finish) + { title: 'Tanker truck walkway' },
   k.compound('tanker_truck_ladder', 26, k.bothSides([
     box('stile', 'band', [ladderX, s.railTop, 0.36], [ladderX + 0.04, s.walkY + 0.32, 0.4]),
     box('stay_low', 'band', [ladderX + 0.04, s.barrelY - 0.3, 0.36], [s.barrelRear - s.dish + 0.04, s.barrelY - 0.26, 0.4]),
@@ -57,7 +58,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
   ]) + [
     box('rung_' + i, 'band', [ladderX, s.railTop + 0.4 + i * 0.3, -0.36], [ladderX + 0.04, s.railTop + 0.43 + i * 0.3, 0.36])
     for i in std.range(0, 7)
-  ], finish),
+  ], finish) + { title: 'Tanker truck ladder' },
   k.compound('tanker_truck_valve_gear', 180, [
     turned('rear_outlet', 'pipe', 'x', k.disc(0.08, s.barrelRear - s.dish - 0.1, s.barrelRear + 0.4), [0, 1.42, 0.5]),
     turned('rear_outlet_far', 'pipe', 'x', k.disc(0.08, s.barrelRear - s.dish - 0.1, s.barrelRear + 0.4), [0, 1.42, -0.5]),
@@ -76,5 +77,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
     box('tube_hanger_b', 'frame', [1.5, 1.12, 0.44], [1.58, 1.17, 1.12]),
     box('tube_hanger_far_a', 'frame', [-1.1, 1.12, -1.12], [-1.02, 1.17, -0.44]),
     box('tube_hanger_far_b', 'frame', [0.7, 1.12, -1.12], [0.78, 1.17, -0.44]),
-  ], finish),
+  ], finish) + { title: 'Tanker truck valve gear' },
 ])

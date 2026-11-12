@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'swat_truck.spec.libsonnet';
 {
+  title: 'SWAT truck',
   sites: (import 'truck-cab.libsonnet').fittings(site.kit, 'swat_truck', s) + [
     site.one('body_floor', 'swat_truck_body_floor'),
     site.one('body_glass', 'swat_truck_body_glass'),

@@ -58,7 +58,7 @@ local plates = 8;
     coal: 'plastic-charcoal',
     ember: 'glow-flame',
     rune: 'crystal-glow-blue',
-  }) + h.gripOn('spider_shell_forge', 'handle-front-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
+  }) + { title: 'Spider-shell forge' } + h.gripOn('spider_shell_forge', 'handle-front-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['stone', 'bone'], setting: ['fantasy'] } } },
 
   // A stiff paper sack 110 mm wide, 70 mm deep and 190 mm tall, its top rolled down twice over about a litre of grey
   // mortar, with a red band round its middle printed with a pale blue rune.
@@ -72,7 +72,7 @@ local plates = 8;
     box('rune-bar', 'rune', [-0.014, 0.082, 0.0355], [0.014, 0.088, 0.038]),
     box('rune-hook', 'rune', [0.008, 0.088, 0.0355], [0.014, 0.1, 0.038]),
     box('spill', 'mortar', [-0.03, 0.19, -0.008], [0.02, 0.193, 0.01]),
-  ], { paper: 'paper-butcher', band: 'cloth-crimson', rune: 'crystal-glow-blue', mortar: 'stone-grey' }) + h.inHand('fireproof_mortar', 'sack') + h.label('band', '-z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'], setting: ['fantasy'] } } },
+  ], { paper: 'paper-butcher', band: 'cloth-crimson', rune: 'crystal-glow-blue', mortar: 'stone-grey' }) + { title: 'Fireproof mortar' } + h.inHand('fireproof_mortar', 'sack') + h.label('band', '-z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'], setting: ['fantasy'] } } },
 
   // A loose cluster of crimped wool about 150 mm long, 90 mm wide and 70 mm high, pale and faintly shimmering, its
   // locks ending in lighter tips.
@@ -84,5 +84,5 @@ local plates = 8;
     ball('tip-%d' % i, 'tip', 0.013, t[0], t[1], t[2], 0.8)
     for i in std.range(0, 5)
     for t in [[[-0.075, 0.03, -0.005], [0.072, 0.028, 0.0], [0.03, 0.068, 0.012], [-0.025, 0.07, -0.01], [0.005, 0.02, 0.045], [-0.05, 0.016, 0.042]][i]]
-  ], { wool: 'fur-pale', tip: 'feather-white' }) + h.inHand('shimmerwool_tuft', 'tuft-1') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['fantasy'] } } },
+  ], { wool: 'fur-pale', tip: 'feather-white' }) + { title: 'Shimmerwool tuft' } + h.inHand('shimmerwool_tuft', 'tuft-1') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['fantasy'] } } },
 ]

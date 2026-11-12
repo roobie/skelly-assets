@@ -4,6 +4,7 @@ local pair = site.pair;
 local s = import 'military_transport_helicopter.spec.libsonnet';
 local id = 'military_transport_helicopter';
 {
+  title: 'Military transport helicopter',
   sites: [
     one('belly', id + '_belly'),
     one('tail_cone', id + '_tail_cone'),

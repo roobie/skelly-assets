@@ -159,10 +159,10 @@ local fur = layout({
 [
   // A short-sleeved cotton jumpsuit folded, 360 mm by 320 mm and about 70 mm tall: zip front, two chest pockets and
   // the legs folded up over the lower body.
-  folded('jumpsuit', 1.1, suit(layout({ pockets: chestPockets })), orange) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('jumpsuit', 1.1, suit(layout({ pockets: chestPockets })), orange) + { title: 'Jumpsuit' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // The same jumpsuit without pockets.
-  folded('pocketless_jumpsuit', 1.1, suit(layout({})), orange) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('pocketless_jumpsuit', 1.1, suit(layout({})), orange) + { title: 'Pocketless jumpsuit' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A white jumpsuit printed with red stripes and a blue starred corner on the chest, folded as the jumpsuit.
   folded('flag_jumpsuit', 1.1, suit(flag)
@@ -176,14 +176,14 @@ local fur = layout({
                                   for i in std.range(0, 4)
                                   for j in std.range(0, 3)
                                 ],
-         cloth('cloth-bright-white', 'cloth-red') + { stripe: 'cloth-red', canton: 'cloth-navy', star: 'cloth-bright-white', button: 'cloth-bright-white' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-bright-white', 'cloth-red') + { stripe: 'cloth-red', canton: 'cloth-navy', star: 'cloth-bright-white', button: 'cloth-bright-white' }) + { title: 'Flag jumpsuit' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A black long-sleeved jumpsuit printed with bones, its skull-printed hood unzipped and folded back over the collar.
-  folded('skeleton_jumpsuit', 1.2, suit(skeleton { hood: { w: 0.15, l: 0.1 } }) + legBones(skeleton) + chestBones(skeleton, 3), skeletonFinish) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('skeleton_jumpsuit', 1.2, suit(skeleton { hood: { w: 0.15, l: 0.1 } }) + legBones(skeleton) + chestBones(skeleton, 3), skeletonFinish) + { title: 'Skeleton jumpsuit' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // The same jumpsuit with its hood zipped up and laid face up over the chest, showing the skull.
   folded('zipped_skeleton_jumpsuit', 1.2, suit(skeleton) + legBones(skeleton) + chestBones(skeleton, 3)
-                                           + hoodUp(skeleton, 0.16, 0.2, -0.035, skeleton.ht + 0.018, true), skeletonFinish) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+                                           + hoodUp(skeleton, 0.16, 0.2, -0.035, skeleton.ht + 0.018, true), skeletonFinish) + { title: 'Zipped skeleton jumpsuit' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // An off-white jumpsuit printed with crossing bandage wraps, a few loose ends trailing off the sides.
   folded('mummy_jumpsuit', 1.1, suit(mummy)
@@ -205,11 +205,11 @@ local fur = layout({
                                    box('loose-end-1-drop', 'wrap', [mummy.w / 2 - 0.004, 0.0, -0.09], [mummy.w / 2, mummy.legTop + 0.004, -0.076]),
                                    box('loose-end-2', 'wrap', [-mummy.w / 2 - 0.004, 0.0, 0.03], [-mummy.w / 2, mummy.ht + 0.01, 0.044]),
                                  ],
-         cloth('cloth-cream', 'cloth-khaki') + { wrap: 'cloth-white' }) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-cream', 'cloth-khaki') + { wrap: 'cloth-white' }) + { title: 'Mummy jumpsuit' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Navy canvas work coveralls folded, 360 mm by 320 mm and about 90 mm tall: zip front, flapped chest pockets with
   // press studs, flapped thigh pockets on the folded legs.
-  folded('work_coveralls', 1.1, suit(coverall), cloth('cloth-navy', 'cloth-charcoal') + { button: 'steel-grey' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  folded('work_coveralls', 1.1, suit(coverall), cloth('cloth-navy', 'cloth-charcoal') + { button: 'steel-grey' }) + { title: 'Work coveralls' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Brown duck coveralls with a quilted lining, folded thicker, a pale fleece collar and double knees.
   folded('insulated_work_coveralls', 2, suit(heavy)
@@ -217,7 +217,7 @@ local fur = layout({
                                             box('knee-%d' % (s + 1), 'knee', [s * heavy.legX - 0.05, heavy.legTop, heavy.legZ1 - heavy.legs.cuff - 0.05], [s * heavy.legX + 0.05, heavy.legTop + 0.004, heavy.legZ1 - heavy.legs.cuff - 0.004])
                                             for s in [-1, 1]
                                           ],
-         cloth('cloth-brown', 'suede-brown') + { collar: 'fur-pale', button: 'brass-dull', knee: 'suede-brown' }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-brown', 'suede-brown') + { collar: 'fur-pale', button: 'brass-dull', knee: 'suede-brown' }) + { title: 'Insulated work coveralls' } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Red cotton long underwear folded thin, 300 mm by 270 mm and about 50 mm tall: a buttoned placket from a round
   // neck, ribbed cuffs at the wrists and ankles.
@@ -227,7 +227,7 @@ local fur = layout({
                                 for s in [-1, 1]
                                 for i in std.range(0, 3)
                               ],
-         cloth('cloth-red', 'cloth-crimson') + { cuff: 'cloth-crimson', rib: 'cloth-red', button: 'pearl' }) + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-red', 'cloth-crimson') + { cuff: 'cloth-crimson', rib: 'cloth-red', button: 'pearl' }) + { title: 'Union suit' } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A thick knitted wool onesie folded, 360 mm by 320 mm and about 110 mm tall: a hood folded back, footed legs and
   // pale zigzag pattern bands across the chest, sleeves and legs.
@@ -236,7 +236,7 @@ local fur = layout({
                              + zigzag('band-leg-b', 'band', -wool.w / 2 + 0.03, wool.w / 2 - 0.03, -0.075, 0.008, 10, wool.legTop)
                              + zigzag('band-chest', 'band', -0.1, 0.1, wool.chest[0] + 0.02, 0.008, 6, wool.ht + 0.003)
                              + std.flattenArrays([zigzag('band-sleeve-%d' % (s + 1), 'band', s * (wool.w / 2 - 0.06), s * (wool.w / 2 - 0.004), 0.0, 0.008, 2, wool.ht + 0.006) for s in [-1, 1]]),
-         cloth('cloth-navy', 'cloth-blue') + { band: 'cloth-cream', foot: 'cloth-cream', cuff: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-navy', 'cloth-blue') + { band: 'cloth-cream', foot: 'cloth-cream', cuff: 'cloth-cream' }) + { title: 'Wool onesie' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A red wool onesie folded as the thick onesie, its hood carrying two black horns and a pointed tail lying across
   // the folded legs.
@@ -251,13 +251,13 @@ local fur = layout({
                                      box('tail-drop', 'tail', [0.17, 0.0, -0.106], [0.182, wool.legTop + 0.006, -0.094]),
                                      g.flat('tail-tip', 'horn', [[0.182, -0.124], [0.214, -0.1], [0.182, -0.076]], 0.0, 0.01),
                                    ],
-         cloth('cloth-red', 'cloth-crimson') + { horn: 'cloth-black', tail: 'cloth-red', foot: 'cloth-crimson', cuff: 'cloth-crimson' }) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-red', 'cloth-crimson') + { horn: 'cloth-black', tail: 'cloth-red', foot: 'cloth-crimson', cuff: 'cloth-crimson' }) + { title: 'Devil onesie' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A thin stretch full-body suit folded small, 200 mm by 170 mm and about 40 mm tall: no openings, the hood lying
   // over the chest.
   folded('zentai', 0.2, suit(zentai) + hoodUp(zentai, 0.11, 0.1, zentai.legZ1 + 0.004, zentai.legY, false)
                         + [box('hood-seam', 'seam', [-0.002, zentai.legY + 0.01, zentai.legZ1 + 0.02], [0.002, zentai.legY + 0.013, zentai.legZ1 + 0.1])],
-         cloth('cloth-green', 'leaf-green')) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+         cloth('cloth-green', 'leaf-green')) + { title: 'Zentai' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A full-body animal costume, 7 kg of faux fur: the body folded thick, 460 mm by 400 mm, with footed paws, and the
   // big costume head, 260 mm across, sitting on the chest with round ears, a pale muzzle and a fluffy tail out one side.
@@ -281,5 +281,5 @@ local fur = layout({
                              h.turned('tail', 'cloth', 'x', [[0, 0], [0, 0.04], [0.06, 0.055], [0.13, 0.05], [0.17, 0.035], [0.19, 0]], [fur.w / 2 - 0.03, 0.06, -0.12]),
                              h.turned('tail-tip', 'muzzle', 'x', [[0, 0], [0, 0.036], [0.025, 0.02], [0.03, 0]], [fur.w / 2 + 0.155, 0.06, -0.12]),
                            ],
-         cloth('fur-brown', 'leather-black') + { head: 'fur-brown', muzzle: 'fur-pale', nose: 'leather-black', eye: 'screen-black', foot: 'fur-pale' }) + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
+         cloth('fur-brown', 'leather-black') + { head: 'fur-brown', muzzle: 'fur-pale', nose: 'leather-black', eye: 'screen-black', foot: 'fur-pale' }) + { title: 'Fursuit' } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs', 'head'], state: ['folded'] } } },
 ]

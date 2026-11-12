@@ -4,6 +4,7 @@ local exhaust = import 'exhaust-kit.libsonnet';
 local fuelTank = import 'fuel-tank-kit.libsonnet';
 local s = t.spec(import 'semi_tractor.spec.libsonnet');
 {
+  title: 'Semi tractor unit',
   // The twin stacks take the place of the cab's exhaust.
   sites: site.adjust(
     t.fittings(site.kit, 'semi_tractor', s),

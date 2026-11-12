@@ -76,7 +76,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
       for n in std.range(0, std.length(neckLine) - 2)
     ]
     for k in [-1, 1]
-  ]), { cloth: 'cloth-heather-grey', band: 'lycra-black' })
+  ]), { cloth: 'cloth-heather-grey', band: 'lycra-black' }) + { title: 'Sports bra' }
   + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A cotton tank top folded, 240 mm by 280 mm and 20 mm tall: a deep scoop neck, wide-cut armholes with ribbed
@@ -87,12 +87,12 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
                                + armholes(w, d / 2 - 0.045, 0.04, ht, 'bind')
                                + [box('hem', 'bind', [-w / 2, ht, -d / 2 + 0.004], [w / 2, ht + 0.003, -d / 2 + 0.016])],
              { cloth: 'cloth-heather-grey', bind: 'cloth-heather-grey', hole: 'cloth-charcoal' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + h.headEndOnPlusZ + { title: 'Tank top' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A thermal undershirt folded, 280 mm by 290 mm and 22 mm tall: thin charcoal stretch knit with a black mock collar,
   // long sleeves folded in with grey ribbed cuffs, and grey flatlock seams.
   stretchTop('thermal_shirt', 0.2, 0.28, 0.29, 0.022, 0.012, [-0.09, 0.09],
-             { cloth: 'cloth-charcoal', sleeve: 'cloth-charcoal', collar: 'lycra-black', cuff: 'lycra-grey', seam: 'lycra-grey' }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+             { cloth: 'cloth-charcoal', sleeve: 'cloth-charcoal', collar: 'lycra-black', cuff: 'lycra-grey', seam: 'lycra-grey' }) + { title: 'Thermal shirt' } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A pair of cotton tights laid flat, 220 mm across the hips and 660 mm long unstretched: an elastic waistband, a
   // reinforced panty top with a gusset, two legs tapering to the ankle and the feet turned out with darker toes and
@@ -109,13 +109,13 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     flat('toe-r', 'band', [[0.115, -0.314], [0.14, -0.315], [0.14, -0.28], [0.115, -0.281]], 0.004, 0.002),
     flat('heel-l', 'band', [[-0.075, -0.27], [-0.05, -0.27], [-0.05, -0.305], [-0.075, -0.3]], 0.004, 0.002),
     flat('heel-r', 'band', [[0.05, -0.27], [0.075, -0.27], [0.075, -0.3], [0.05, -0.305]], 0.004, 0.002),
-  ], { cloth: 'cloth-black', panty: 'cloth-black', band: 'cloth-charcoal' })
+  ], { cloth: 'cloth-black', panty: 'cloth-black', band: 'cloth-charcoal' }) + { title: 'Tights' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs', 'feet'] } } },
 
   // A long-sleeved compression top folded, 280 mm by 290 mm and 22 mm tall: blue stretch knit with black panels down
   // the sides and along the sleeves, a crew collar and black cuffs.
   stretchTop('compression_top', 0.2, 0.28, 0.29, 0.022, 0.005, [-0.1, -0.08, 0.08, 0.1],
-             { cloth: 'lycra-blue', sleeve: 'lycra-blue', collar: 'lycra-black', cuff: 'lycra-black', seam: 'lycra-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
+             { cloth: 'lycra-blue', sleeve: 'lycra-blue', collar: 'lycra-black', cuff: 'lycra-black', seam: 'lycra-black' }) + { title: 'Compression top' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms'], state: ['folded'] } } },
 
   // A pair of compression shorts laid flat, 250 mm across and 270 mm long: a wide grey elastic waistband, short close
   // legs with grey bound hems and grey flatlock seams.
@@ -129,7 +129,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     strip('seam', 'hem', [0, 0.1], [0, 0.0], 0.006, 0.006, 0.002),
     strip('seam-l', 'hem', [-0.07, 0.03], [-0.07, -0.11], 0.006, 0.006, 0.002),
     strip('seam-r', 'hem', [0.07, 0.03], [0.07, -0.11], 0.006, 0.006, 0.002),
-  ], { cloth: 'lycra-black', band: 'cloth-heather-grey', hem: 'lycra-grey' })
+  ], { cloth: 'lycra-black', band: 'cloth-heather-grey', hem: 'lycra-grey' }) + { title: 'Compression shorts' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A white cotton undershirt folded, 270 mm by 280 mm and 22 mm tall: a V neck, short sleeves folded out and a
@@ -139,7 +139,7 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
                                 + vNeck(0.04, d, d / 2 - 0.075, ht, 'bind')
                                 + shortSleeves(w, ht, d / 2 - 0.02, 0.085)
                                 + [box('hem', 'bind', [-w / 2, ht, -d / 2 + 0.004], [w / 2, ht + 0.003, -d / 2 + 0.016])],
-             { cloth: 'cloth-bright-white', sleeve: 'cloth-bright-white', bind: 'cloth-cream', hole: 'cloth-heather-grey' })
+             { cloth: 'cloth-bright-white', sleeve: 'cloth-bright-white', bind: 'cloth-cream', hole: 'cloth-heather-grey' }) + { title: 'Undershirt' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A unitard laid flat, 200 mm across and 800 mm long unstretched: a sleeveless crew-necked top running straight into
@@ -157,6 +157,6 @@ local stretchTop(id, mass, w, d, ht, collarHt, seams, finishes) =
     strip('arm-r-b', 'bind', [0.055, 0.27], [0.055, 0.34], 0.005, 0.008, 0.003),
     strip('ankle-l', 'bind', [-0.07, -0.455], [-0.025, -0.455], 0.005, 0.01, 0.003),
     strip('ankle-r', 'bind', [0.025, -0.455], [0.07, -0.455], 0.005, 0.01, 0.003),
-  ] + neck(0.045, 0.34, 0.005, 'bind', 0.008), { cloth: 'cloth-purple', bind: 'lycra-black', hole: 'void-black' })
+  ] + neck(0.045, 0.34, 0.005, 'bind', 0.008), { cloth: 'cloth-purple', bind: 'lycra-black', hole: 'void-black' }) + { title: 'Unitard' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'] } } },
 ]

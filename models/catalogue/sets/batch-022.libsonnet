@@ -13,7 +13,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('neck', 'frame', [0.062, 0, -0.016], [0.08, 0.012, 0.016]),
     box('handle', 'frame', [0.08, 0.001, -0.013], [0.21, 0.011, 0.013]),
     disc('knob', 'frame', 0.015, 0.001, 0.011, 0.205, 0),
-  ], { frame: 'wood-walnut', glass: 'mirror-silver' })
+  ], { frame: 'wood-walnut', glass: 'mirror-silver' }) + { title: 'Mirror' }
   + h.gripOn('mirror', 'handle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['wood', 'glass'] } } },
 
   // A black builder's tub 140 mm across and 95 mm tall holding about a litre of mixed mortar, its top heaped and
@@ -24,7 +24,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     h.ball('lump-a', 'mortar', 0.022, -0.02, 0.084, 0.01, 0.5),
     h.ball('lump-b', 'mortar', 0.016, 0.025, 0.084, -0.015, 0.55),
     h.ball('lump-c', 'mortar', 0.014, 0.01, 0.084, 0.03, 0.6),
-  ], { tub: 'plastic-black', mortar: 'stone-grey' })
+  ], { tub: 'plastic-black', mortar: 'stone-grey' }) + { title: 'Adobe mortar' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'] } } },
 
   // A micro motor 25 mm across and 50 mm long with its shaft, lying along x: a steel can with flats top and bottom,
@@ -37,7 +37,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('tab-a', 'tab', [0.02, 0.018, -0.002], [0.024, 0.02, 0.002]),
     box('tab-b', 'tab', [0.02, 0.005, -0.002], [0.024, 0.007, 0.002]),
     box('label', 'label', [-0.012, 0.0215, -0.006], [0.01, 0.0255, 0.006]),
-  ], { can: 'steel-bright', cap: 'plastic-white', shaft: 'steel-stainless', tab: 'brass-polished', label: 'steel-grey' })
+  ], { can: 'steel-bright', cap: 'plastic-white', shaft: 'steel-stainless', tab: 'brass-polished', label: 'steel-grey' }) + { title: 'Micro motor' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cut patch of wetsuit neoprene 120 by 50 mm and 4 mm thick, one corner curling up, a knit face on top.
@@ -45,7 +45,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('foam', 'foam', [-0.06, 0, -0.025], [0.045, 0.004, 0.025]),
     h.prism('curl', 'foam', 'z', [[0.045, 0], [0.06, 0.006], [0.06, 0.01], [0.045, 0.004]], -0.025, 0.025),
     box('face', 'face', [-0.058, 0.004, -0.023], [0.044, 0.005, 0.023]),
-  ], { foam: 'neoprene-black', face: 'nylon-black' })
+  ], { foam: 'neoprene-black', face: 'nylon-black' }) + { title: 'Neoprene' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['rubber', 'fabric'] } } },
 
   // A standard 1219 by 1016 mm wooden pallet, 140 mm tall: seven top deck boards and three bottom boards across
@@ -66,7 +66,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
   ] + [
     box('bottom-%d' % i, 'board', [[-0.6095, -0.045, 0.5095][i], 0, -0.508], [[-0.5095, 0.045, 0.6095][i], 0.019, 0.508])
     for i in [0, 1, 2]
-  ], { board: 'wood-pine', stringer: 'wood-oak' })
+  ], { board: 'wood-pine', stringer: 'wood-oak' }) + { title: 'Pallet' }
   + { voxelGrain: 0.01 } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
 
   // A packed cargo parachute about 900 by 420 by 380 mm: an olive nylon pack tray closed by four side flaps, bound
@@ -95,7 +95,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('link-a', 'steel', [0.1, 0.386, -0.05], [0.18, 0.398, -0.03]),
     box('link-b', 'steel', [0.1, 0.386, 0.03], [0.18, 0.398, 0.05]),
     box('card', 'card', [-0.2, 0.2, 0.216], [-0.06, 0.3, 0.22]),
-  ], { nylon: 'cloth-olive-drab', tray: 'nylon-ranger-green', flap: 'cloth-olive-drab', webbing: 'webbing-olive-dark', line: 'webbing-olive-dark', steel: 'steel-grey', card: 'paper-white' })
+  ], { nylon: 'cloth-olive-drab', tray: 'nylon-ranger-green', flap: 'cloth-olive-drab', webbing: 'webbing-olive-dark', line: 'webbing-olive-dark', steel: 'steel-grey', card: 'paper-white' }) + { title: 'Cargo parachute' }
   + { voxelGrain: 0.01 } + { taxonomy: { category: 'tools', tags: { material: ['fabric', 'metal'], setting: ['modern'] } } },
 
   // A stone eyeball 78 mm across resting on the ground, looking out along +z: a pale grey ball with a green stone iris
@@ -105,7 +105,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     turned('iris', 'iris', 'z', [[0, 0], [0, 0.019], [0.004, 0.017], [0.006, 0]], [0, 0.039, 0.033]),
     box('pupil-v', 'pupil', [-0.0025, 0.027, 0.036], [0.0025, 0.051, 0.041]),
     box('pupil-h', 'pupil', [-0.012, 0.0365, 0.036], [0.012, 0.0415, 0.041]),
-  ], { stone: 'stone-grey', iris: 'jade-green', pupil: 'obsidian' })
+  ], { stone: 'stone-grey', iris: 'jade-green', pupil: 'obsidian' }) + { title: 'Petrified eye' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A small coil of piano wire about 40 mm across, five loose turns held by a twist of the same wire.
@@ -115,7 +115,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
   ] + [
     box('twist', 'wire', [0.016, 0, -0.002], [0.024, 0.009, 0.002]),
     box('end', 'wire', [-0.019, 0.006, 0.008], [-0.003, 0.008, 0.01]),
-  ], { wire: 'steel-bright' })
+  ], { wire: 'steel-bright' }) + { title: 'Piano wire' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A bed pillow rolled for carrying, 360 mm long and 180 mm across, its cotton case showing the spiral of the roll at
@@ -129,7 +129,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     box('edge', 'case', [-0.18, 0.17, 0.012], [0.18, 0.181, 0.045]),
     h.tube('tie-a', 'cord', 0.09, 0.094, -0.11, -0.098, 0.09, 0),
     h.tube('tie-b', 'cord', 0.09, 0.094, 0.098, 0.11, 0.09, 0),
-  ], { case: 'cloth-cream', fill: 'cloth-white', shadow: 'cloth-rag-shadow', cord: 'cord-cotton' })
+  ], { case: 'cloth-cream', fill: 'cloth-white', shadow: 'cloth-rag-shadow', cord: 'cord-cotton' }) + { title: 'Pillow' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric'] } } },
 
   // A piezo igniter 70 mm long lying along x: a black plastic body with a red push button at -x, an aluminium sleeve
@@ -141,7 +141,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     h.rod('nut', 'sleeve', 0.006, 0.012, 0.016, 0.007),
     h.rod('electrode', 'wire', 0.001, 0.03, 0.04, 0.007),
     box('tip', 'wire', [0.038, 0.007, -0.001], [0.04, 0.013, 0.001]),
-  ], { button: 'plastic-red', body: 'plastic-black', sleeve: 'alu-bare', wire: 'steel-bright' })
+  ], { button: 'plastic-red', body: 'plastic-black', sleeve: 'alu-bare', wire: 'steel-bright' }) + { title: 'Piezo igniter' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['fire-starting'] } },
 
   // A twisted-wire bore brush 350 mm long lying along x: a steel finger loop at -x, a long twisted shaft and a cotton
@@ -155,7 +155,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
   ] + [
     h.rod('brush', 'cotton', 0.009, 0.06, 0.16, 0.009),
     turned('tip', 'cotton', 'x', [[0, 0], [0, 0.009], [0.006, 0.007], [0.01, 0]], [0.16, 0.009, 0]),
-  ], { wire: 'steel-galvanised', cotton: 'cloth-bright-white' })
+  ], { wire: 'steel-galvanised', cotton: 'cloth-bright-white' }) + { title: 'Bore brush' }
   + h.gripOn('bore_brush', 'shaft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'fabric'] } } },
 
   // A cheap plastic plant pot 180 mm across at the rim and 150 mm tall, tapering to 130 mm at the base, with a
@@ -166,6 +166,6 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
       [0.006, 0],
     ]),
     turned('rim', 'pot', 'y', [[0, 0.084], [0, 0.092], [0.012, 0.092], [0.012, 0.084], [0, 0.084]], [0, 0.138, 0]),
-  ], { pot: 'paint-terracotta' })
+  ], { pot: 'paint-terracotta' }) + { title: 'Plastic flower pot' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['gardening'] } },
 ]

@@ -107,7 +107,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                for i in std.range(0, 4)
                for x in [-0.194 + i * 0.022]
              ],
-             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' }) + h.headEndOnPlusX
+             { plate: 'steel-grey', strap: 'leather-brown', buckle: 'steel-bright', rune: 'steel-blued' }) + { title: 'Steel bracer' } + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of quilted wool arming mittens laid flat, backs up, each 270 mm from cuff to fingertip: thick mitts with a
@@ -123,7 +123,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                            for i in std.range(0, 2)
                            for v in [[-0.035, 0, 0.035][i]]
                          ]),
-             wool + { cuff: 'cloth-shimmer', trim: 'cloth-purple' })
+             wool + { cuff: 'cloth-shimmer', trim: 'cloth-purple' }) + { title: 'Shimmering wool arming mittens' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // Quilted wool arming pants folded in a long bundle, 260 mm by 420 mm and 40 mm tall: the waistband at the far end
@@ -149,18 +149,18 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                                                   ]
                                                   for i in std.range(0, 3)
                                                   for x in [spread(-0.1, 0.1, 4)[i]]
-                                                ]), wool { split: 'velvet-black' })
+                                                ]), wool { split: 'velvet-black' }) + { title: 'Shimmering wool arming pants' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { slot: ['legs'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // A quilted wool greatcoat folded flat, 400 mm by 380 mm and 60 mm tall: a stand collar, a front closed with
   // tied laces, sleeves quilted in rings along both sides, and its long skirt folded back up over the hem end.
-  coat('shimmering_wool_gambeson', 2.5, 0.4, 0.38, 0.06, 0.022, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('shimmering_wool_gambeson', 2.5, 0.4, 0.38, 0.06, 0.022, 0.1) + { title: 'Shimmering wool gambeson' } + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // The same greatcoat with thin sleeves, folded the same way.
-  coat('thin_sleeved_shimmering_wool_gambeson', 2.2, 0.38, 0.38, 0.058, 0.014, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('thin_sleeved_shimmering_wool_gambeson', 2.2, 0.38, 0.38, 0.058, 0.014, 0.1) + { title: 'Thin sleeved shimmering wool gambeson' } + { taxonomy: { category: 'armour', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // The same long quilted coat without sleeves, its armholes bound in violet.
-  coat('shimmering_wool_gambeson_vest', 1.9, 0.36, 0.38, 0.055, 0, 0.1) + { taxonomy: { category: 'armour', tags: { slot: ['torso'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
+  coat('shimmering_wool_gambeson_vest', 1.9, 0.36, 0.38, 0.055, 0, 0.1) + { title: 'Shimmering wool gambeson vest' } + { taxonomy: { category: 'armour', tags: { slot: ['torso'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // A loose wool blouse folded flat, 300 mm by 300 mm and 30 mm tall: a ruffled collar, a deep slit neck laced
   // across with a cord, wide sleeves folded along the sides and ruffled cuffs at the hem end.
@@ -192,7 +192,7 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                                          for s in [-1, 1]
                                          for x0 in [if s < 0 then -w / 2 else w / 2 - 0.085]
                                        ]),
-             wool + { opening: 'cloth-charcoal', cuff: 'cloth-shimmer', collar: 'cloth-shimmer' })
+             wool + { opening: 'cloth-charcoal', cuff: 'cloth-shimmer', collar: 'cloth-shimmer' }) + { title: 'Shimmering wool blouse' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['torso', 'arms'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 
   // Wool knee breeches folded flat, 240 mm by 340 mm and 30 mm tall: a deep waistband, a buttoned fall flap at the
@@ -212,6 +212,6 @@ local coat(id, mass, w, d, ht, sleeveR, skirt) =
                                             h.disc('knee-button-%d' % i, 'button', 0.005, ht + 0.005, ht + 0.009, x, -d / 2 + 0.018)
                                             for i in [0, 1, 2, 3]
                                             for x in [[-0.1, -0.08, 0.08, 0.1][i]]
-                                          ], wool)
+                                          ], wool) + { title: 'Shimmering wool breeches' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { slot: ['legs'], material: ['fabric'], setting: ['medieval'], state: ['folded'] } } },
 ]

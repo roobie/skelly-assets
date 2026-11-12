@@ -47,7 +47,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'cloth-canvas',
     lining: 'cloth-cotton',
     ties: 'cord-cotton',
-  })
+  }) + { title: 'Cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A thin black cotton cloak folded to 300 mm by 240 mm and 30 mm high, hood on top and narrow black ties.
@@ -56,7 +56,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'cloth-black',
     lining: 'plastic-charcoal',
     ties: 'plastic-charcoal',
-  })
+  }) + { title: 'Dark cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A heavy denim cloak folded to 330 mm by 270 mm and 55 mm high, hood on top, closed at the neck by two steel
@@ -67,7 +67,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'cloth-denim',
     lining: 'cloth-cream',
     clasp: 'metal-silver',
-  })
+  }) + { title: 'Denim cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A fur cloak folded to 340 mm by 280 mm and 60 mm high, fur side out, with a thick ruff of paler fur round the
@@ -78,7 +78,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     cloth: 'fur-brown',
     ruff: 'fur-pale',
     clasp: 'bronze',
-  })
+  }) + { title: 'Fur cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['back'], state: ['folded'] } } },
 
   // A leather cloak folded to 330 mm by 270 mm and 50 mm high, hood on top and a brass chained clasp at the neck.
@@ -87,7 +87,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'leather-brown',
     lining: 'suede-brown',
     clasp: 'brass-dull',
-  })
+  }) + { title: 'Leather cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['back'], state: ['folded'] } } },
 
   // A reversible hooded cloak folded to 300 mm by 250 mm and 35 mm high, black outside and red inside, the red
@@ -97,7 +97,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'cloth-black',
     lining: 'velvet-red',
     clasp: 'metal-silver',
-  })
+  }) + { title: 'Reversible black cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['back'], state: ['folded'] } } },
 
   // A wool cloak folded to 330 mm by 270 mm and 55 mm high, hood on top, pinned at the neck by a ring brooch.
@@ -106,7 +106,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'wool-grey',
     lining: 'felt-grey',
     clasp: 'metal-silver',
-  })
+  }) + { title: 'Wool cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A long hooded cotton robe folded to 320 mm by 260 mm and 40 mm high, hood on top and a rope belt tied round
@@ -127,7 +127,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     hood: 'cloth-brown',
     lining: 'cloth-cream',
     belt: 'cord-cotton',
-  })
+  }) + { title: 'Hooded robe' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A red cotton mascot's cape folded to 320 mm by 260 mm and 45 mm high, a yellow trim on each fold's front edge,
@@ -145,7 +145,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     trim: 'cloth-yellow',
     emblem: 'paint-red',
     ties: 'cloth-yellow',
-  })
+  }) + { title: 'Mascot cape' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A heavy cape of metal-fibre cloth folded to 320 mm by 260 mm and 40 mm high, its top split diagonally into a
@@ -159,7 +159,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     field: 'metal-silver',
     moon: 'cloth-cream',
     clasp: 'metal-silver',
-  })
+  }) + { title: 'Heraldic cape' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A traditional straw rain cape 850 mm long laid flat, 450 mm across the shoulders and 750 mm across the hem,
@@ -183,7 +183,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     thatch: 'straw-wicker',
     strand: 'straw-rope',
     rope: 'jute',
-  })
+  }) + { title: 'Straw cape' }
   + { voxelGrain: 0.008 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['back'] } } },
 
   // A rain poncho folded into its own flat packet 140 mm by 100 mm and 18 mm thick, held by a paper band.
@@ -192,7 +192,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
   ], {
     cloth: 'cloth-yellow',
     band: 'paper-white',
-  })
+  }) + { title: 'Rain poncho' }
   + h.label('band', '+y')
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['torso'], state: ['folded'] } } },
 
@@ -216,7 +216,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     grass: 'plant-dried',
     'grass-dry': 'straw-wicker',
     cord: 'straw-rope',
-  })
+  }) + { title: 'Grass cloak' }
   + { voxelGrain: 0.008 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['back'] } } },
 
   // A large heavy-duty flag folded to 300 mm by 220 mm and 50 mm high, its folds showing bands of red, white and
@@ -247,6 +247,6 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     grommet: 'brass-polished',
     rope: 'cord-cotton',
     toggle: 'wood-oak',
-  })
+  }) + { title: 'National flag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'], state: ['folded'] } } },
 ]

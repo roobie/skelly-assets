@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { withTaxonomy } from '../build.mjs';
+import { withSources } from '../build.mjs';
 import { compileJsonnetFile } from '../jsonnet/index.mjs';
 import { buildManifest } from '../manifest.mjs';
 import { inheritTaxonomy, readVocabulary, taxonomyReport, VOCABULARY } from '../taxonomy.mjs';
@@ -120,11 +120,11 @@ local cases = ${JSON.stringify(cases)};
 }));
 
 test('the manifest carries each model\'s category, sorted tags and sorted keywords, without empty facets', () => {
-  const models = withTaxonomy(
+  const models = withSources(
     [{ id: 'axe', kind: 'item', pack: 'fixture.a', path: 'axe.glb', nodes: [] }, { id: 'rock', kind: 'item', pack: 'fixture.a', path: 'rock.glb', nodes: [] }],
     [
-      { pack: 'fixture.a', id: 'axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] }, keywords: ['splitting', 'felling'] } },
-      { pack: 'fixture.a', id: 'rock' },
+      { pack: 'fixture.a', id: 'axe', title: 'Fixture Axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] }, keywords: ['splitting', 'felling'] } },
+      { pack: 'fixture.a', id: 'rock', title: 'Fixture Rock' },
     ],
   );
   const { models: entries } = buildManifest({ models, files: ['fixture.a/axe.glb', 'fixture.a/rock.glb'], credit: () => ({ author: 'a', licence: 'l' }) });
@@ -136,5 +136,5 @@ test('the manifest carries each model\'s category, sorted tags and sorted keywor
 });
 
 test('a built model whose source row was not read for its taxonomy stops the build', () => {
-  assert.throws(() => withTaxonomy([{ id: 'stray', pack: 'fixture.a' }], []), /stray/);
+  assert.throws(() => withSources([{ id: 'stray', pack: 'fixture.a' }], []), /stray/);
 });

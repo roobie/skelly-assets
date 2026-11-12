@@ -25,7 +25,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('lash-back', 'lashing', [0.29, 0.014, -0.018], [0.3, 0.049, 0.018]),
     box('lash-over', 'lashing', [0.226, 0.066, -0.016], [0.296, 0.07, 0.016]),
     box('lash-under', 'lashing', [0.226, 0.0, -0.016], [0.296, 0.004, 0.016]),
-  ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' })
+  ], { haft: 'wood-birch', stone: 'stone-grey', lashing: 'skin-rawhide' }) + { title: 'Primitive hammer' }
   + h.gripOn('primitive_hammer', 'haft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone', 'wood'], setting: ['prehistoric'] } } },
 
   // A hand propane torch 0.42 m long: a brass cylinder fitting and control valve, a moulded grip, a steel burner tube
@@ -40,7 +40,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     rod('tube', 'tube', 0.006, 0.17, 0.37, 0.02),
     turned('nozzle', 'nozzle', 'x', [[0, 0], [0, 0.009], [0.04, 0.016], [0.05, 0.016], [0.05, 0]], [0.37, 0.02, 0]),
     rod('nozzle-mouth', 'mouth', 0.011, 0.418, 0.421, 0.02),
-  ], { brass: 'brass', knob: 'plastic-red', grip: 'plastic-yellow', tube: 'steel-stainless', nozzle: 'steel-heat-tint', mouth: 'coal-black' })
+  ], { brass: 'brass', knob: 'plastic-red', grip: 'plastic-yellow', tube: 'steel-stainless', nozzle: 'steel-heat-tint', mouth: 'coal-black' }) + { title: 'Propane torch' }
   + h.gripOn('propane_torch', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cordless reciprocating saw 0.45 m long with its blade: a motor body on a D handle over the battery pack, a
@@ -63,7 +63,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
   ] + [
     box('tooth-%d' % i, 'blade', [0.262 + i * 0.012, 0.083, -0.002], [0.268 + i * 0.012, 0.088, 0.002])
     for i in std.range(0, 10)
-  ], { body: 'plastic-red', grip: 'rubber-black', battery: 'plastic-charcoal', trigger: 'plastic-matte-black', shoe: 'steel-bright', blade: 'steel-grey' })
+  ], { body: 'plastic-red', grip: 'rubber-black', battery: 'plastic-charcoal', trigger: 'plastic-matte-black', shoe: 'steel-bright', blade: 'steel-grey' }) + { title: 'Reciprocating saw' }
   + h.gripOn('reciprocating_saw', 'handle-top') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A long zipped nylon kit bag 600 by 130 mm and 35 mm thick, sized for barrels and tools, with a carry strap
@@ -78,7 +78,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('strap-loop', 'strap', [-0.08, 0.036, -0.012], [0.08, 0.048, 0.012]),
     box('panel', 'panel', [0.12, 0.032, -0.05], [0.24, 0.034, 0.04]),
     box('panel-mark', 'mark', [0.15, 0.034, -0.03], [0.21, 0.035, 0.02]),
-  ], { bag: 'nylon-black', zip: 'webbing-black', pull: 'steel-grey', strap: 'webbing-olive-dark', panel: 'plastic-grey', mark: 'paint-charcoal' })
+  ], { bag: 'nylon-black', zip: 'webbing-black', pull: 'steel-grey', strap: 'webbing-olive-dark', panel: 'plastic-grey', mark: 'paint-charcoal' }) + { title: 'Rifle maintenance kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
   // A cast bronze wood saw 0.5 m overall: a 380 mm blade tapering from 90 to 35 mm deep, toothed along its edge,
@@ -95,7 +95,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     local x = 0.13 + i * 0.019, z = -0.05 + (x - 0.12) * 0.027 / 0.38;
     prism('tooth-%d' % i, 'blade', 'y', [[z, x], [z, x + 0.012], [z - 0.006, x + 0.006]], 0.006, 0.01)
     for i in std.range(0, 18)
-  ], { grip: 'wood-oak', blade: 'bronze', rivet: 'bronze-polished' })
+  ], { grip: 'wood-oak', blade: 'bronze', rivet: 'bronze-polished' }) + { title: 'Bronze saw' }
   + h.gripOn('bronze_saw', 'grip-a') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'], setting: ['ancient'] } } },
 
   // A moulded screwdriver case 280 by 90 mm opened flat on its hinge: six drivers from 140 to 250 mm in the tray,
@@ -116,7 +116,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
   + driver('d4', -0.13, 0.06, 0.054, 0.016, 0.010, 'handle-yellow')
   + driver('d5', -0.13, 0.04, 0.067, 0.016, 0.009, 'handle-red')
   + driver('d6', -0.13, 0.01, 0.078, 0.016, 0.008, 'handle-yellow'),
-  { case: 'plastic-charcoal', latch: 'plastic-matte-black', 'handle-red': 'plastic-red', 'handle-yellow': 'plastic-yellow', shaft: 'steel-stainless' })
+  { case: 'plastic-charcoal', latch: 'plastic-matte-black', 'handle-red': 'plastic-red', 'handle-yellow': 'plastic-yellow', shaft: 'steel-stainless' }) + { title: 'Screwdriver set' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A hard case 320 by 220 mm, opened with its lid standing behind: a foam tray holding a hammer, a file, a mini
@@ -148,7 +148,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     xrod('punch', 'steel', 0.004, -0.14, 0.0, 0.069, 0.09),
     xrod('punch-tip', 'steel', 0.002, 0.0, 0.02, 0.069, 0.09),
   ],
-  { case: 'paint-olive', foam: 'foam-eva', latch: 'steel-grey', battery: 'plastic-charcoal', led: 'lcd-green', grip: 'rubber-black', steel: 'steel-grey', wood: 'wood-walnut', blade: 'steel-blued', shaft: 'steel-stainless' })
+  { case: 'paint-olive', foam: 'foam-eva', latch: 'steel-grey', battery: 'plastic-charcoal', led: 'lcd-green', grip: 'rubber-black', steel: 'steel-grey', wood: 'wood-walnut', blade: 'steel-blued', shaft: 'steel-stainless' }) + { title: 'Firearm repair kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A pencil soldering iron 220 mm long: a cord strain relief, a ribbed grip, a steel heater barrel and a copper
@@ -163,7 +163,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
   ] + [
     rod('rib-%d' % i, 'handle', 0.0115, 0.04 + i * 0.008, 0.044 + i * 0.008, 0.012)
     for i in std.range(0, 3)
-  ], { cord: 'rubber-black', handle: 'plastic-blue', grip: 'rubber-black', barrel: 'steel-stainless', tip: 'copper' })
+  ], { cord: 'rubber-black', handle: 'plastic-blue', grip: 'rubber-black', barrel: 'steel-stainless', tip: 'copper' }) + { title: 'Soldering iron' }
   + h.gripOn('soldering_iron', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A die stock 400 mm across its handles holding a 38 mm round die, and a T tap wrench 180 mm across with a tap,
@@ -186,7 +186,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
   ] + [
     zrod('tap-thread-%d' % i, 'stock', 0.0058, 0.09 + i * 0.008, 0.093 + i * 0.008, 0, 0.008)
     for i in std.range(0, 4)
-  ], { handle: 'steel-bright', grip: 'steel-parkerized', stock: 'steel-grey', die: 'steel-heat-tint', hole: 'coal-black', tap: 'steel-hardened' })
+  ], { handle: 'steel-bright', grip: 'steel-parkerized', stock: 'steel-grey', die: 'steel-heat-tint', hole: 'coal-black', tap: 'steel-hardened' }) + { title: 'Thread-cutting set' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // Straight-cut tin snips 250 mm long lying flat: short broad jaws on a pivot bolt, a spring between the handles,
@@ -200,7 +200,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     prism('grip-upper', 'grip', 'y', [[-0.032, 0.122], [-0.014, 0.122], [-0.034, 0.0], [-0.052, 0.0]], 0.003, 0.012),
     disc('pivot', 'pivot', 0.009, 0.0, 0.013, 0.163, 0),
     box('spring', 'spring', [0.126, 0.003, -0.02], [0.131, 0.007, 0.02]),
-  ], { jaw: 'steel-grey', arm: 'steel-grey', grip: 'plastic-yellow', pivot: 'steel-bright', spring: 'steel-blued' })
+  ], { jaw: 'steel-grey', arm: 'steel-grey', grip: 'plastic-yellow', pivot: 'steel-bright', spring: 'steel-blued' }) + { title: 'Tin snips' }
   + h.gripOn('tin_snips', 'grip-lower') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A steel toolbox 420 by 180 mm and 200 mm tall to the lid's ridge: a box body, a hip-roofed lid with a folding
@@ -217,7 +217,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('latch-b', 'latch', [0.14, 0.11, 0.09], [0.17, 0.16, 0.097]),
     box('hasp', 'latch', [-0.01, 0.12, 0.09], [0.01, 0.155, 0.096]),
     box('foot', 'seam', [-0.205, 0, -0.085], [0.205, 0.006, 0.085]),
-  ], { body: 'paint-red', seam: 'paint-charcoal', handle: 'plastic-matte-black', latch: 'steel-bright' })
+  ], { body: 'paint-red', seam: 'paint-charcoal', handle: 'plastic-matte-black', latch: 'steel-bright' }) + { title: 'Toolbox' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'], state: ['empty'] } } },
 
   // A tabletop vacuum former 350 mm wide: a base with a perforated platen, a clamp frame riding two columns, a
@@ -247,7 +247,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('hole-%d-%d' % [i, j], 'hole', [-0.1 + i * 0.025, 0.076, -0.08 + j * 0.025], [-0.094 + i * 0.025, 0.077, -0.074 + j * 0.025])
     for i in std.range(0, 8)
     for j in std.range(0, 6)
-  ], { base: 'alu-bare', platen: 'steel-grey', hole: 'coal-black', switch: 'plastic-red', column: 'steel-stainless', frame: 'alu-bare', sheet: 'plastic-clear', grip: 'plastic-matte-black', heater: 'plastic-charcoal', element: 'steel-heat-tint', hose: 'plastic-frosted' })
+  ], { base: 'alu-bare', platen: 'steel-grey', hole: 'coal-black', switch: 'plastic-red', column: 'steel-stainless', frame: 'alu-bare', sheet: 'plastic-clear', grip: 'plastic-matte-black', heater: 'plastic-charcoal', element: 'steel-heat-tint', hose: 'plastic-frosted' }) + { title: 'Vacuum former' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A portable inverter arc welder: a cased power unit 130 mm wide, 300 mm deep and 210 mm tall with a carry
@@ -279,7 +279,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('earth-a', 'clamp', [0.035, 0.0, 0.3], [0.065, 0.012, 0.4]),
     box('earth-b', 'clamp', [0.035, 0.016, 0.3], [0.065, 0.028, 0.4]),
     box('earth-spring', 'trim', [0.04, 0.012, 0.33], [0.06, 0.016, 0.35]),
-  ], { case: 'paint-crane-yellow', trim: 'plastic-charcoal', panel: 'plastic-matte-black', knob: 'plastic-red', display: 'lcd-green', socket: 'brass', handle: 'rubber-black', cable: 'rubber-black', holder: 'plastic-red', clamp: 'copper' })
+  ], { case: 'paint-crane-yellow', trim: 'plastic-charcoal', panel: 'plastic-matte-black', knob: 'plastic-red', display: 'lcd-green', socket: 'brass', handle: 'rubber-black', cable: 'rubber-black', holder: 'plastic-red', clamp: 'copper' }) + { title: 'Welder' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A makeshift arc welder on a 380 by 260 mm plank: two salvaged transformers with copper windings wired in
@@ -311,7 +311,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('holder-tape', 'tape', [0.114, 0.0, 0.29], [0.146, 0.03, 0.305]),
     box('spring-clamp-a', 'clamp', [0.145, 0.0, 0.24], [0.17, 0.008, 0.33]),
     box('spring-clamp-b', 'clamp', [0.145, 0.014, 0.24], [0.17, 0.022, 0.33]),
-  ], { plank: 'wood-pine', core: 'iron-dull', winding: 'copper', bolt: 'steel-grey', wire: 'copper', tape: 'tape-grey', cable: 'rubber-black', plug: 'plastic-white', handle: 'wood-birch', clamp: 'steel-grey' })
+  ], { plank: 'wood-pine', core: 'iron-dull', winding: 'copper', bolt: 'steel-grey', wire: 'copper', tape: 'tape-grey', cable: 'rubber-black', plug: 'plastic-white', handle: 'wood-birch', clamp: 'steel-grey' }) + { title: 'Makeshift arc welder' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['improvised', 'metalworking'], tags: { material: ['metal'] } } },
 
   // A welding blanket 1.8 by 1.8 m folded to 500 by 400 mm and 60 mm thick, with a stitched hem and brass
@@ -320,6 +320,6 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('hem', 'hem', [-0.25, 0.06, 0.17], [0.25, 0.062, 0.18]),
     disc('grommet-a', 'grommet', 0.008, 0.06, 0.063, -0.225, 0.175),
     disc('grommet-b', 'grommet', 0.008, 0.06, 0.063, 0.225, 0.175),
-  ], { cloth: 'canvas-grey', hem: 'cord-cotton', grommet: 'brass' })
+  ], { cloth: 'canvas-grey', hem: 'cord-cotton', grommet: 'brass' }) + { title: 'Welding blanket' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

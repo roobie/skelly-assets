@@ -11,11 +11,11 @@ local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - 0.1) / 0.09) 
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_racking', 2200, [
     box('racking', 'frame', [-3.3, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
-  ], finish),
+  ], finish) + { title: 'Rescue truck racking' },
   k.compound('rescue_truck_marking', 8, k.bothSides([
     box('block_' + i, if i % 2 == 0 then 'hivis' else 'blue', [blockX0 + i * blockLength, s.bodyTop - 0.28, s.bodySide], [blockX0 + (i + 1) * blockLength, s.bodyTop - 0.1, s.bodySide + 0.032])
     for i in blocks
-  ]), finish),
+  ]), finish) + { title: 'Rescue truck marking' },
   k.compound('rescue_truck_rear_shutter', 70, [
     box('bar', 'dark', [s.bodyRear - 0.03, s.shutterLow, -s.shutterSide], [s.bodyRear, s.shutterLow + 0.1, s.shutterSide]),
     box('head', 'frame', [s.bodyRear - 0.05, s.shutterTop, -s.shutterSide - 0.04], [s.bodyRear, s.shutterTop + 0.1, s.shutterSide + 0.04]),
@@ -27,7 +27,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   ] + [
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'reflect', [s.bodyRear - 0.01, s.bodyFloor + i * 0.3, s.shutterSide + 0.04], [s.bodyRear, s.bodyFloor + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 5)
-  ]), finish),
+  ]), finish) + { title: 'Rescue truck rear shutter' },
   k.compound('rescue_truck_roof_rack', 170, [
     box('beam_' + i, 'frame', [beams[i] - 0.05, s.rackY - 0.05, -s.rackSide], [beams[i] + 0.05, s.rackY, s.rackSide])
     for i in std.range(0, std.length(beams) - 1)
@@ -43,7 +43,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
       box('upright_' + i, 'alu', [beams[i] - 0.025, s.rackY, s.rackSide - 0.05], [beams[i] + 0.025, s.rackY + 0.26, s.rackSide]),
     ]
     for i in std.range(0, std.length(beams) - 1)
-  ])), finish),
+  ])), finish) + { title: 'Rescue truck roof rack' },
   k.compound('rescue_truck_roof_gear', 320, [
     box('long_case', 'yellow', [-3.3, s.rackY + 0.03, 0.2], [-1.3, s.rackY + 0.36, 0.92]),
     box('long_case_lid', 'dark', [-3.3, s.rackY + 0.36, 0.2], [-1.3, s.rackY + 0.4, 0.92]),
@@ -59,7 +59,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('stretcher_side_b', 'orange', [-1.85, s.rackY + 0.08, -0.31], [0.25, s.rackY + 0.18, -0.26]),
     box('stretcher_end_a', 'orange', [-1.85, s.rackY + 0.08, -0.75], [-1.8, s.rackY + 0.18, -0.31]),
     box('stretcher_end_b', 'orange', [0.2, s.rackY + 0.08, -0.75], [0.25, s.rackY + 0.18, -0.31]),
-  ], finish),
+  ], finish) + { title: 'Rescue truck roof gear' },
   k.compound('rescue_truck_light_mast', 90, [
     box('foot', 'frame', [s.mastX - 0.16, s.bodyTop, -0.16], [s.mastX + 0.0, s.bodyTop + 0.08, 0.16]),
     box('stage_a', 'white', [s.mastX - 0.13, s.bodyTop + 0.08, -0.1], [s.mastX - 0.03, 3.52, 0.1]),
@@ -69,7 +69,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('lamp_b', 'frame', [s.mastX - 0.14, s.mastTop + 0.08, 0.3], [s.mastX, s.mastTop + 0.32, 0.72]),
     box('glass_a', 'lamp', [s.mastX, s.mastTop + 0.1, -0.7], [s.mastX + 0.015, s.mastTop + 0.3, -0.32]),
     box('glass_b', 'lamp', [s.mastX, s.mastTop + 0.1, 0.32], [s.mastX + 0.015, s.mastTop + 0.3, 0.7]),
-  ], finish),
+  ], finish) + { title: 'Rescue truck light mast' },
   k.compound('rescue_truck_winch', 130, [
     box('cradle_base', 'frame', [s.front, 0.72, -0.42], [s.front + 0.26, 0.78, 0.42]),
     box('cheek_near', 'frame', [s.front, 0.78, 0.34], [s.front + 0.26, 1.0, 0.4]),
@@ -77,5 +77,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     k.turned('drum', 'dark', 'z', k.disc(0.09, -0.34, 0.34), [s.front + 0.13, 0.89, 0]) + { sides: 12 },
     box('fairlead', 'steel', [s.front + 0.26, 0.82, -0.14], [s.front + 0.3, 0.96, 0.14]),
     box('hook', 'yellow', [s.front + 0.3, 0.86, -0.04], [s.front + 0.36, 0.94, 0.04]),
-  ], finish),
+  ], finish) + { title: 'Rescue truck winch' },
 ])

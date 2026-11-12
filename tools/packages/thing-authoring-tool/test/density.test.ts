@@ -14,6 +14,7 @@ const cube = (massKg: number, material: string) =>
     items: [
       {
         id: 'cube',
+        title: 'Fixture cube',
         exportMass: 'parts',
         parts: [
           {
@@ -31,7 +32,7 @@ const cube = (massKg: number, material: string) =>
   });
 const exportCube = (massKg: number, density: DensityBounds, material = 'steel-grey') => {
   const [row] = loadThingRecipe(
-    [{ id: 'cube', kind: 'item', source: 'cube', voxel: { grain: GRAIN }, options: { mass: 'parts', density } }],
+    [{ id: 'cube', title: 'Fixture cube', kind: 'item', source: 'cube', voxel: { grain: GRAIN }, options: { mass: 'parts', density } }],
     cube(massKg, material),
   );
   return row!.generate();

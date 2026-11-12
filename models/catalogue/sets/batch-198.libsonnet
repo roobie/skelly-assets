@@ -73,34 +73,34 @@ local scaleGlove = { t: 0.02, cuff: 0.11, flare: 0.07, mail: 'scale', binding: '
 [
   // A circlet 170 mm across and 25 mm tall: a band of dark wood with copper bands round both edges, copper studs
   // and a pointed copper plaque at the brow.
-  h.compound('copper_circlet', 0.45, circlet(0.085, 0.025), { band: 'wood-oak', trim: 'copper' })
+  h.compound('copper_circlet', 0.45, circlet(0.085, 0.025), { band: 'wood-oak', trim: 'copper' }) + { title: 'Copper circlet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood', 'metal'], slot: ['head'] } } },
 
   // A black dragonhide backpack 360 mm wide, 520 mm tall and 220 mm deep: a squared body under a deep lid, a front
   // pocket scaled with raised scutes, side pockets, a hip belt and bone buckles.
-  h.compound('dragonhide_backpack', 2.5, pack(0.36, 0.52, 0.22), packFinish) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'], slot: ['back'] } } },
+  h.compound('dragonhide_backpack', 2.5, pack(0.36, 0.52, 0.22), packFinish) + { title: 'Dragonhide backpack' } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'], slot: ['back'] } } },
 
   // The large dragonhide backpack, 440 mm wide, 640 mm tall and 270 mm deep, cut for a big body.
-  h.compound('large_dragonhide_backpack', 3.5, pack(0.44, 0.64, 0.27), packFinish) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'], slot: ['back'] } } },
+  h.compound('large_dragonhide_backpack', 3.5, pack(0.44, 0.64, 0.27), packFinish) + { title: 'Large dragonhide backpack' } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'], slot: ['back'] } } },
 
   // A standing pair of black dragonhide boots 290 mm long and 300 mm tall, with a turned-down cuff and two
   // bone-buckled straps round each shaft.
-  h.compound('dragonhide_boots', 2.2, f.pair(hideBoot, 0.02, hideExtra(hideBoot)), hideFinish) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
+  h.compound('dragonhide_boots', 2.2, f.pair(hideBoot, 0.02, hideExtra(hideBoot)), hideFinish) + { title: 'Dragonhide boots' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
 
   // The oversized dragonhide boots, 360 mm long and 360 mm tall, cut for a big or misshapen foot.
   local xlHide = hideBoot { l: 0.36, w: 0.135, ankle: 0.1, top: 0.36, rx: 0.058, rz: 0.072 };
-  h.compound('oversized_dragonhide_boots', 3.5, f.pair(xlHide, 0.02, hideExtra(xlHide)), hideFinish) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
+  h.compound('oversized_dragonhide_boots', 3.5, f.pair(xlHide, 0.02, hideExtra(xlHide)), hideFinish) + { title: 'Oversized dragonhide boots' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
 
   // A standing pair of black dragonscale boots 300 mm long and 300 mm tall: hide boots armoured in overlapping
   // rows of glossy black scales from the toe up the shaft.
-  h.compound('dragonscale_boots', 3, f.pair(scaleBoot, 0.02, scaleExtra(scaleBoot)), scaleFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
+  h.compound('dragonscale_boots', 3, f.pair(scaleBoot, 0.02, scaleExtra(scaleBoot)), scaleFinish) + { title: 'Dragonscale boots' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
 
   // The oversized dragonscale boots, 370 mm long and 360 mm tall.
   local xlScale = scaleBoot { l: 0.37, w: 0.14, ankle: 0.12, top: 0.36, rx: 0.062, rz: 0.075 };
-  h.compound('oversized_dragonscale_boots', 4.5, f.pair(xlScale, 0.02, scaleExtra(xlScale)), scaleFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
+  h.compound('oversized_dragonscale_boots', 4.5, f.pair(xlScale, 0.02, scaleExtra(xlScale)), scaleFinish) + { title: 'Oversized dragonscale boots' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['feet'] } } },
 
   // A pair of black dragonscale gauntlets laid flat side by side, backs up, 300 mm from cuff to fingertip: hide
   // gloves with rows of scales over the back and fingers, a scale knuckle ridge and wide flared cuffs.
-  h.compound('dragonscale_gauntlets', 0.37, g.glovePair(scaleGlove, 0.085), { glove: 'hide-dragon-black', cuff: 'hide-dragon-black', scale: 'chitin-black', trim: 'leather-chestnut' })
+  h.compound('dragonscale_gauntlets', 0.37, g.glovePair(scaleGlove, 0.085), { glove: 'hide-dragon-black', cuff: 'hide-dragon-black', scale: 'chitin-black', trim: 'leather-chestnut' }) + { title: 'Dragonscale gauntlets' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['hands'] } } },
 ]

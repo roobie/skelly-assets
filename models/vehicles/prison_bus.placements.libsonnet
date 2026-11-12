@@ -10,6 +10,7 @@ local bars(j) =
   // The door takes the near side of its bay.
   if std.member([door.bay for door in s.doors], j) then [twin[1]] else twin;
 {
+  title: 'Prison bus',
   sites: bus.fittings(site.kit, 'prison_bus', s)
          + std.flattenArrays([bars(j) for j in std.range(0, deck.bays - 1)])
          + [

@@ -102,13 +102,13 @@ local nylon = {
   // A brown leather belt holster 180 mm tall, 60 mm across at the trigger guard and 32 mm thick, with a thumb-break
   // strap snapped over the mouth and a belt loop on its back.
   h.compound('holster', 0.21, holster('holster', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0.08), leather)
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
+  + { title: 'Holster' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A tan leather fast-draw holster 150 mm tall, raked forward 30 mm at the toe, open-topped and cut low over the
   // trigger guard so the gun clears it at once, with a steel tension screw and a belt loop on its back.
   h.compound('fast_draw_holster', 0.17, holster('fd', 0.15, 0.036, 0.03, 0.03, 0.095, 0.03, 0.03, false, 0.07) + [
     h.stud('fd-screw', 'stud', 0.004, 0.1, 0.015, 0.005, 0.003),
-  ], leather { body: 'leather-tan', stud: 'steel-bright' })
+  ], leather { body: 'leather-tan', stud: 'steel-bright' }) + { title: 'Fast draw holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A chestnut leather holster 260 mm tall for a long-barrelled handgun, hung from a belt shank 90 mm above its
@@ -125,7 +125,7 @@ local nylon = {
     box('leg-back', 'loop', [-0.07, 0, -0.16], [0.07, 0.004, -0.135]),
     box('leg-left', 'loop', [-0.07, 0, -0.16], [-0.045, 0.004, -0.02]),
     box('leg-right', 'loop', [0.045, 0, -0.16], [0.07, 0.004, -0.02]),
-  ] + buckleFrame('leg-buckle', 0.08, 0.03, 0.035, 0.005, 0, 0.008, -0.075 + 0.0), leather { body: 'leather-chestnut', trim: 'leather-brown', strap: 'leather-brown', loop: 'leather-brown', buckle: 'brass-dull' })
+  ] + buckleFrame('leg-buckle', 0.08, 0.03, 0.035, 0.005, 0, 0.008, -0.075 + 0.0), leather { body: 'leather-chestnut', trim: 'leather-brown', strap: 'leather-brown', loop: 'leather-brown', buckle: 'brass-dull' }) + { title: 'Large holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // Two brown leather holsters 180 mm tall side by side, 85 mm apart, each with its own thumb break, sewn to a
@@ -133,7 +133,7 @@ local nylon = {
   h.compound('double_holster', 0.46, holster('left', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0.08, -0.045)
     + holster('right', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0.08, 0.04) + [
     box('bridge', 'loop', [-0.07, 0.11, -0.022], [0.065, 0.15, -0.016]),
-  ], leather)
+  ], leather) + { title: 'Double holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // Two charcoal nylon holsters 180 mm tall with black webbing trim, the outer one riding 44 mm in front of the inner
@@ -142,7 +142,7 @@ local nylon = {
     + holster('outer', 0.18, 0.036, 0.032, 0.03, 0.08, 0.012, 0.004, true, 0, -0.018, 0.044, 0) + [
     box('spacer', 'loop', [-0.03, 0.09, 0.016], [0.012, 0.16, 0.028]),
     box('spacer-band', 'trim', [-0.031, 0.12, 0.014], [0.013, 0.13, 0.03]),
-  ], nylon { body: 'cloth-charcoal' })
+  ], nylon { body: 'cloth-charcoal' }) + { title: 'Stacked double holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A brown leather shoulder holster laid flat, 640 mm across: two shoulder loops of 25 mm strap meeting at a
@@ -168,7 +168,7 @@ local nylon = {
     box('mag-flap-b', 'strap', [0.293, 0.026, 0.0], [0.335, 0.03, 0.052]),
     h.disc('mag-stud-a', 'stud', 0.005, 0.03, 0.033, 0.27, 0.03),
     h.disc('mag-stud-b', 'stud', 0.005, 0.03, 0.033, 0.314, 0.03),
-  ], leather)
+  ], leather) + { title: 'Shoulder holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A black nylon single-point sling laid flat: a body loop 1.3 m round of 32 mm webbing with a sliding adjuster,
@@ -185,7 +185,7 @@ local nylon = {
       box('hook-jaw', 'hook', [0.605, 0, 0.005], [0.62, 0.008, 0.02]),
       box('hook-gate', 'hook', [0.585, 0.002, 0.014], [0.607, 0.006, 0.019]),
       box('join', 'buckle', [0.33, 0, -0.02], [0.36, 0.008, 0.02]),
-    ], { strap: 'webbing-black', buckle: 'plastic-matte-black', bungee: 'cloth-charcoal', hook: 'steel-grey' })
+    ], { strap: 'webbing-black', buckle: 'plastic-matte-black', bungee: 'cloth-charcoal', hook: 'steel-grey' }) + { title: 'Single-point sling' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A western gun belt 1.1 m long and 65 mm wide in brown leather, laid in a U with a brass buckle, a row of
@@ -198,6 +198,6 @@ local nylon = {
     box('drop-loop', 'loop', [0.12, 0.005, 0.016], [0.19, 0.009, 0.109]),
   ] + lyingHolster('gun', 0.2, 0.036, 0.03, 0.026, 0.08, 0.155, 0.11, 1) + [
     box('thong', 'strap', [0.12, 0.03, 0.14], [0.19, 0.033, 0.148]),
-  ], leather { stud: 'brass-dull', keeper: 'leather-chestnut', buckle: 'brass-dull', hole: 'leather-black' })
+  ], leather { stud: 'brass-dull', keeper: 'leather-chestnut', buckle: 'brass-dull', hole: 'leather-black' }) + { title: 'Western gun belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 ]

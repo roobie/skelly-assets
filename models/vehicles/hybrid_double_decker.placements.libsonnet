@@ -2,6 +2,7 @@
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'double_decker.spec.libsonnet';
 {
+  title: 'Hybrid double-decker bus',
   parent: 'double_decker',
   sites(base): powertrain.hybrid(base, {
     motor: { part: 'traction_motor_large', at: [-1.7, 0.24, 0] },

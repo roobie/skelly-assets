@@ -48,7 +48,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     blanket: 'cloth-turnout', fold: 'canvas-grey', case: 'paint-drum-blue', panel: 'paint-charcoal', knob: 'plastic-matte-black',
     mark: 'plastic-gloss-white', socket: 'brass-dull', handle: 'plastic-matte-black', cable: 'rubber-black',
     holder: 'plastic-red', rod: 'steel-heat-tint', clamp: 'copper',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  }) + { title: 'Welding kit' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A bench wire-drawing machine on a steel base 500 by 240 mm: a die block with a row of tapering holes at -x, a
   // capstan drum 160 mm across at +x turned by a crank on top, and a length of wire running from the die to the drum.
@@ -74,7 +74,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     disc('hub', 'frame', 0.02, 0.165, 0.19, 0.09, 0),
     box('crank', 'frame', [0.08, 0.19, -0.012], [0.25, 0.205, 0.012]),
     disc('crank-grip', 'grip', 0.014, 0.205, 0.29, 0.235, 0),
-  ], { base: 'paint-charcoal', frame: 'steel-grey', die: 'steel-hardened', hole: 'void-black', drum: 'steel-bright', wire: 'copper', grip: 'wood-oak' })
+  ], { base: 'paint-charcoal', frame: 'steel-grey', die: 'steel-hardened', hole: 'void-black', drum: 'steel-bright', wire: 'copper', grip: 'wood-oak' }) + { title: 'Wire-drawing machine' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
 
   // A home-made concrete float: a 610 by 120 mm pine board 22 mm thick with a rounded oak grip on two blocks.
@@ -87,7 +87,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     rod('grip', 'grip', 0.018, 0.16, 0.45, 0.075),
     box('nail-a', 'nail', [0.185, 0.0, -0.004], [0.195, 0.023, 0.004]),
     box('nail-b', 'nail', [0.415, 0.0, -0.004], [0.425, 0.023, 0.004]),
-  ], { board: 'wood-pine', block: 'wood-pine', grip: 'wood-oak', nail: 'steel-grey' })
+  ], { board: 'wood-pine', block: 'wood-pine', grip: 'wood-oak', nail: 'steel-grey' }) + { title: 'Wooden float' }
   + h.gripOn('wooden_float', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'] } } },
 
   // A 48 inch pipe wrench 1.2 m long lying flat: a red I-beam handle, a cast frame at +x with a knurled adjusting nut,
@@ -110,14 +110,14 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
   ] + [
     box('hook-tooth-%d' % i, 'jaw', [1.065 + i * 0.02, 0.008, 0.114], [1.075 + i * 0.02, 0.048, 0.12])
     for i in std.range(0, 6)
-  ], { handle: 'paint-red', hole: 'void-black', frame: 'iron-dull', jaw: 'steel-grey', nut: 'steel-parkerized' })
+  ], { handle: 'paint-red', hole: 'void-black', frame: 'iron-dull', jaw: 'steel-grey', nut: 'steel-parkerized' }) + { title: 'Giant pipe wrench' }
   + h.gripOn('giant_pipe_wrench', 'handle-web') + { voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An 18 inch adjustable spanner, 460 mm long, jaws opening to about 60 mm.
-  adjustable('large_adjustable_wrench', 2.2, 0.46) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  adjustable('large_adjustable_wrench', 2.2, 0.46) + { title: 'Large adjustable wrench' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 6 inch adjustable spanner, 150 mm long, jaws opening to about 20 mm.
-  adjustable('small_adjustable_wrench', 0.075, 0.15) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  adjustable('small_adjustable_wrench', 0.075, 0.15) + { title: 'Small adjustable wrench' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A craft knife 100 mm long: a ribbed 9 mm handle, a tapered collet and a pointed angled blade.
   h.compound('craft_knife', 0.0096, [
@@ -128,7 +128,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
   ] + [
     turned('collet', 'collet', 'x', [[0, 0], [0, 0.0055], [0.008, 0.0055], [0.016, 0.003], [0.016, 0]], [0.072, 0, 0]),
     h.prism('blade', 'blade', 'z', [[0.084, -0.002], [0.101, -0.0045], [0.088, 0.003], [0.084, 0.003]], -0.001, 0.001),
-  ], { handle: 'plastic-charcoal', rib: 'alu-bare', collet: 'alu-bare', blade: 'steel-mirror' })
+  ], { handle: 'plastic-charcoal', rib: 'alu-bare', collet: 'alu-bare', blade: 'steel-mirror' }) + { title: 'Craft knife' }
   + h.gripOn('craft_knife', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A three-lobed fidget spinner about 95 mm across and 11 mm thick lying flat: a bearing in the middle under round caps
@@ -147,6 +147,6 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
   ] + [
     turned('weight-%d' % i, 'weight', 'y', [[0, 0.007], [0, 0.0115], [0.0105, 0.0115], [0.0105, 0.007], [0, 0.007]], [lobe(i).x, 0.0005, lobe(i).z])
     for i in [0, 1, 2]
-  ], { body: 'plastic-blue', bearing: 'steel-bright', cap: 'plastic-matte-black', weight: 'steel-mirror' })
+  ], { body: 'plastic-blue', bearing: 'steel-bright', cap: 'plastic-matte-black', weight: 'steel-mirror' }) + { title: 'Fidget spinner' }
   + h.inHand('fidget_spinner', 'hub') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

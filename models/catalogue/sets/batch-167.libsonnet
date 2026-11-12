@@ -44,7 +44,7 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
     h.turned('tie', 'cord', 'y', [[0, 0], [0, 0.042], [0.014, 0.042], [0.014, 0]], [0, 0.315, 0]),
     box('tie-end-a', 'cord', [0.035, 0.24, 0.02], [0.045, 0.325, 0.03]),
     box('tie-end-b', 'cord', [0.025, 0.25, 0.034], [0.035, 0.325, 0.044]),
-  ], { body: 'cloth-canvas', cord: 'cord-cotton' }) + h.inHand('swag_bag', 'tuft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  ], { body: 'cloth-canvas', cord: 'cord-cotton' }) + { title: 'Swag bag' } + h.inHand('swag_bag', 'tuft') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
 
   // A pack frame 620 mm tall and 340 mm wide: two pine uprights with three cross slats and a shelf 220 mm deep at the
   // foot, carrying a bundle of olive canvas with its top rolled down over the front, lashed to the frame with two
@@ -70,7 +70,7 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
     box('strap-right', 'leather', [0.07, 0.08, -0.15], [0.11, 0.59, -0.13]),
     box('strap-left-pad', 'leather', [-0.115, 0.38, -0.165], [-0.065, 0.54, -0.15]),
     box('strap-right-pad', 'leather', [0.065, 0.38, -0.165], [0.115, 0.54, -0.15]),
-  ], { wood: 'wood-pine', canvas: 'cloth-olive-drab', cord: 'skin-rawhide', leather: 'leather-tan' })
+  ], { wood: 'wood-pine', canvas: 'cloth-olive-drab', cord: 'skin-rawhide', leather: 'leather-tan' }) + { title: 'Trapper pack' }
   + h.inHand('trapper_pack', 'slat-top') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'], slot: ['back'] } } },
 
   // A nylon daypack 290 mm wide, 440 mm tall and 170 mm deep with a rounded top, a zipped front pocket, mesh bottle
@@ -91,7 +91,7 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
     box('strap-left', 'trim', [-0.11, 0.03, -0.11], [-0.055, 0.42, -0.085]),
     box('strap-right', 'trim', [0.055, 0.03, -0.11], [0.11, 0.42, -0.085]),
     box('back-pad', 'trim', [-0.13, 0.06, -0.095], [0.13, 0.3, -0.085]),
-  ], { body: 'nylon-red', trim: 'nylon-black', grip: 'plastic-matte-black', mesh: 'mesh-black' })
+  ], { body: 'nylon-red', trim: 'nylon-black', grip: 'plastic-matte-black', mesh: 'mesh-black' }) + { title: 'Travel pack' }
   + h.inHand('travelpack', 'grab-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A woven straw basket 360 mm tall and 320 mm across at the mouth, flaring from its base, under a domed lid with a
@@ -107,18 +107,18 @@ local gym(id, massKg, l, r, body) = h.compound(id, massKg, duffel(l, r), { body:
   ] + [
     strap('strap-left', 'strap', [0.03, -0.128], [0.34, -0.152], -0.1, -0.07, -0.008),
     strap('strap-right', 'strap', [0.03, -0.128], [0.34, -0.152], 0.07, 0.1, -0.008),
-  ], { body: 'straw-wicker', rim: 'jute', strap: 'leather-tan' })
+  ], { body: 'straw-wicker', rim: 'jute', strap: 'leather-tan' }) + { title: 'Wicker backpack' }
   + h.inHand('wicker_backpack', 'lid-loop') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plant'], slot: ['back'] } } },
 
   // A lycra gym duffel 560 mm long and 280 mm across.
-  gym('large_gym_bag', 0.6, 0.56, 0.14, 'nylon-red'),
+  gym('large_gym_bag', 0.6, 0.56, 0.14, 'nylon-red') + { title: 'Large gym bag' },
 
   // A lycra gym duffel 480 mm long and 240 mm across.
-  gym('gym_bag', 0.59, 0.48, 0.12, 'cloth-navy'),
+  gym('gym_bag', 0.59, 0.48, 0.12, 'cloth-navy') + { title: 'Gym bag' },
 
   // A lycra gym duffel 420 mm long and 210 mm across.
-  gym('small_gym_bag', 0.46, 0.42, 0.105, 'cloth-charcoal'),
+  gym('small_gym_bag', 0.46, 0.42, 0.105, 'cloth-charcoal') + { title: 'Small gym bag' },
 
   // A lycra gym duffel 640 mm long and 320 mm across.
-  gym('extra_large_gym_bag', 0.75, 0.64, 0.16, 'cloth-blue'),
+  gym('extra_large_gym_bag', 0.75, 0.64, 0.16, 'cloth-blue') + { title: 'Extra large gym bag' },
 ]

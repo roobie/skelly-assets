@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'dirt_bike.spec.libsonnet';
 local raised = [0, s.engineLift, 0];
 {
+  title: 'Dirt bike',
   sites: [
     site.one('frame', 'dirt_bike_frame'),
     site.one('engine', 'motorbike_engine', raised),

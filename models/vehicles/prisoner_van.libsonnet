@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'prisoner_van.spec.libsonnet';
 local van = import 'van-body.libsonnet';
+local vehicle = import 'prisoner_van.placements.libsonnet';
 local box = k.box;
 local tail = van.tail(s);
 // Vertical bars at a spacing the vehicle grain can hold, with top and bottom rails tying them to the frame.
@@ -18,19 +19,19 @@ local sideBars(tag, z, window) =
     box(tag + '_' + i, 'steel', [(middle + i * 4 - 1) * grain, s.windowSill, z[0]], [(middle + i * 4 + 1) * grain, s.windowTop, z[1]])
     for i in [-1, 0, 1]
   ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('prisoner_van', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('prisoner_van', vehicle.title, s) + [
   // One rear leaf's window bars.
   k.compound('prisoner_van_rear_bars', 9, bars('rear', 0.1, s.hatchSide - 0.1, 5, rearBar) + [
     box('rail_low', 'steel', [tail - 0.03, s.windowSill - 0.03, 0.08], [tail, s.windowSill + 0.01, s.hatchSide - 0.08]),
     box('rail_high', 'steel', [tail - 0.03, s.windowTop - 0.01, 0.08], [tail, s.windowTop + 0.03, s.hatchSide - 0.08]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Prisoner van rear bars' },
   k.compound('prisoner_van_side_bars', 14, std.flattenArrays([
     sideBars('near_' + i, [s.glassOut - 0.01, s.glassOut + 0.03], s.windows[i])
     for i in [0, 1]
   ] + [
     sideBars('far_' + i, [-s.glassOut - 0.03, -s.glassOut + 0.01], s.windows[i])
     for i in [0, 1, 2]
-  ]), { steel: 'steel-grey' }),
+  ]), { steel: 'steel-grey' }) + { title: 'Prisoner van side bars' },
   // A steel cage wall behind the cab, so the prisoners can't reach the driver.
   k.compound('prisoner_van_cab_cage', 40, [
     box('frame_top', 'steel', [-0.08, 2.1, -0.84], [-0.04, 2.14, 0.84]),
@@ -38,12 +39,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('prisoner_van',
   ] + [
     box('bar' + i, 'steel', [-0.08, s.floor, -0.82 + i * 0.205], [-0.04, 2.1, -0.78 + i * 0.205])
     for i in std.range(0, 8)
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Prisoner van cab cage' },
   // A steel bench down a wall, so its occupants sit facing across the aisle.
   k.compound('prisoner_van_side_bench', 38, [
     box('seat', 'steel', [-2.8, 0.98, 0.3], [-0.5, 1.04, 0.72]),
     box('back', 'steel', [-2.8, 1.04, 0.66], [-0.5, 1.6, 0.72]),
     box('leg_rear', 'steel', [-2.7, s.floor, 0.34], [-2.62, 0.98, 0.72]),
     box('leg_front', 'steel', [-0.7, s.floor, 0.34], [-0.62, 0.98, 0.72]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Prisoner van side bench' },
 ])

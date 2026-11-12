@@ -5,6 +5,7 @@ local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = (import 'truck-cab.libsonnet').spec(import 'box_truck.spec.libsonnet');
 {
+  title: 'Electric box truck',
   parent: 'box_truck',
   sites(base): powertrain.electric(base, {
     over: { front_panel: { part: 'electric_box_truck_front_panel' } },

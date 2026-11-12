@@ -88,7 +88,7 @@ local tentBag(length, r) =
     box('dial-mark', 'mark', [-0.0265, 0.054, 0.0835], [-0.0235, 0.062, 0.085]),
     box('switch', 'switch', [0.016, 0.038, 0.072], [0.040, 0.062, 0.082]),
     box('switch-rocker', 'rocker', [0.019, 0.050, 0.081], [0.037, 0.059, 0.086]),
-  ], { body: 'enamel-white', foot: 'rubber-black', panel: 'plastic-charcoal', motor: 'steel-grey', cup: 'rubber-black', well: 'plastic-charcoal', dial: 'plastic-black', mark: 'paint-white', switch: 'plastic-black', rocker: 'plastic-red' })
+  ], { body: 'enamel-white', foot: 'rubber-black', panel: 'plastic-charcoal', motor: 'steel-grey', cup: 'rubber-black', well: 'plastic-charcoal', dial: 'plastic-black', mark: 'paint-white', switch: 'plastic-black', rocker: 'plastic-red' }) + { title: 'Vortex mixer' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A storm-glass barometer 500 mm tall: a pear-shaped sealed glass body 200 mm across, half full of
@@ -102,7 +102,7 @@ local tentBag(length, r) =
     turned('spout', 'glass', 'y', [[0, 0], [0, 0.010], [0.37, 0.008], [0.38, 0.012], [0.38, 0]], [0, 0.11, 0.135]),
     turned('spout-water', 'water', 'y', [[0, 0], [0, 0.006], [0.12, 0.006], [0.12, 0]], [0, 0.11, 0.135]),
     turned('stopper', 'stopper', 'y', [[0, 0], [0, 0.011], [0.02, 0.013], [0.02, 0]], [0, 0.405, 0]),
-  ], { stand: 'wood-oak', glass: 'glass-clear', water: 'water', stopper: 'cork' })
+  ], { stand: 'wood-oak', glass: 'glass-clear', water: 'water', stopper: 'cork' }) + { title: 'Weather glass' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'wood'] } } },
 
   // A weather station built into a hard briefcase, 400 mm wide, 300 mm deep and 90 mm thick closed,
@@ -134,32 +134,32 @@ local tentBag(length, r) =
     box('handle', 'handle', [-0.06, 0.012, 0.15], [0.06, 0.024, 0.172]),
     box('latch-a', 'latch', [-0.15, 0.03, 0.15], [-0.12, 0.045, 0.155]),
     box('latch-b', 'latch', [0.12, 0.03, 0.15], [0.15, 0.045, 0.155]),
-  ], { 'case': 'alu-bare', rim: 'plastic-black', deck: 'plastic-grey', keys: 'paint-cream', keyline: 'plastic-charcoal', gauge: 'plastic-white', needle: 'paint-red', grille: 'mesh-black', slot: 'plastic-black', bezel: 'plastic-charcoal', screen: 'lcd-green', handle: 'plastic-black', latch: 'steel-grey' })
+  ], { 'case': 'alu-bare', rim: 'plastic-black', deck: 'plastic-grey', keys: 'paint-cream', keyline: 'plastic-charcoal', gauge: 'plastic-white', needle: 'paint-red', grille: 'mesh-black', slot: 'plastic-black', bezel: 'plastic-charcoal', screen: 'lcd-green', handle: 'plastic-black', latch: 'steel-grey' }) + { title: 'Weather station' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A one-person lean-to packed for carrying, 900 mm long: a dozen peeled poles 30 mm thick under a rolled
   // hide, tied with rawhide thongs.
   h.compound('shelter_kit', 6.5, shelterBundle(0.9, 0.015, [5, 4, 3], 0.06, [-0.3, 0, 0.3]),
-             { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' })
+             { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' }) + { title: 'Shelter kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 
   // The same lean-to bundle, damaged: one pole snapped short and a torn flap of hide hanging loose.
   h.compound('damaged_shelter_kit', 6.3, shelterBundle(0.9, 0.015, [5, 4, 3], 0.06, [-0.3, 0, 0.3], true),
-             { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide', tear: 'coal-black' })
+             { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide', tear: 'coal-black' }) + { title: 'Damaged shelter kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'], state: ['broken'] } } },
 
   // A large hide shelter packed for hauling, 3 m long: a dozen poles 40 mm thick under a heavy rolled hide.
   h.compound('large_shelter_kit', 35, shelterBundle(3.0, 0.02, [5, 4, 3], 0.08, [-1.1, -0.4, 0.4, 1.1]),
-             { pole: 'wood-pine', 'pole-dark': 'bark', hide: 'leather-brown', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' })
+             { pole: 'wood-pine', 'pole-dark': 'bark', hide: 'leather-brown', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' }) + { title: 'Large shelter kit' }
   + { voxelGrain: 0.008 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 
   // A family tent in its storage bag, 700 mm long and 160 mm across, poles in a side pocket.
   h.compound('large_tent_kit', 2.9, tentBag(0.7, 0.08),
-             { bag: 'nylon-ranger-green', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+             { bag: 'nylon-ranger-green', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Large tent kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A one-person tent in its stuff sack, 420 mm long and 100 mm across, poles in a side pocket.
   h.compound('tent_kit', 0.71, tentBag(0.42, 0.05),
-             { bag: 'nylon-red', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+             { bag: 'nylon-red', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Tent kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

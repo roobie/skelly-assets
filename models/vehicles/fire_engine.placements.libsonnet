@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local s = t.spec(import 'fire_engine.spec.libsonnet');
 {
+  title: 'Fire engine',
   sites: t.fittings(site.kit, 'fire_engine', s) + [
     site.one('body', 'fire_engine_body'),
     site.one('cab_stripe', 'fire_engine_cab_stripe'),

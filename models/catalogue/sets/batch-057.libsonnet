@@ -43,7 +43,7 @@ local shift(p, dx, dy, dz) =
 local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [0, r0], [x1 - x0, r1], [x1 - x0, 0]], [x0, y, z]);
 [
   // A plain steel J hook, 30 mm long and 14 mm across the bend, with a ring eye and a barbed point, lying flat.
-  h.compound('fishing_hook', 0.0005, hook('steel', 0.006, 0.002, 0.002, 0.022, 0.009, 0.002), { steel: 'steel-blued' })
+  h.compound('fishing_hook', 0.0005, hook('steel', 0.006, 0.002, 0.002, 0.022, 0.009, 0.002), { steel: 'steel-blued' }) + { title: 'Fishing hook' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A hook carved from bone, 42 mm long, 4 mm stock, with a knob at the top of the shank and a fibre lashing for the
@@ -58,7 +58,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                for i in [0, 1, 2]
              ]
              + [box('tail', 'cord', [0.0105, 0.001, 0.02], [0.022, 0.003, 0.022])],
-             { bone: 'bone', cord: 'jute' })
+             { bone: 'bone', cord: 'jute' }) + { title: 'Bone fishing hook' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['bone'], setting: ['prehistoric'] } } },
 
   // A two-piece spinning rod taken apart for carrying: two 1 m sections side by side held by two hook-and-loop
@@ -89,7 +89,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                for s in [0, 1]
                for x in [[-0.03, 0.38][s]]
              ]),
-             { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'steel-grey', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black', strap: 'hook-loop-grey' })
+             { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'steel-grey', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black', strap: 'hook-loop-grey' }) + { title: 'Two-piece fishing rod, packed' }
   + gripOn('packed_two_piece_fishing_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
 
   // A rough stick 900 mm long and 45 mm across at the butt, its bark on, with a cotton line tied at the tip, run
@@ -114,7 +114,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
              + [shift(p, -0.29, 0.0465, -0.008) for p in hook('hook', 0.006, 0.002, 0.002, 0.022, 0.009, 0.002)]
              + [
              ],
-             { bark: 'bark', cut: 'wood-pine', line: 'cloth-cream', hook: 'steel-grey' })
+             { bark: 'bark', cut: 'wood-pine', line: 'cloth-cream', hook: 'steel-grey' }) + { title: 'Stick fishing rod' }
   + gripOn('stick_fishing_rod', 'stick') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
 
   // A 2 m one-piece spinning rod: rubber butt cap, a 300 mm cork grip, a screw reel seat with a small spinning reel,
@@ -132,7 +132,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
              ]
              + guides('guide', [[-0.3, 0.014, 0.0064], [-0.05, 0.01, 0.0056], [0.2, 0.007, 0.0047], [0.45, 0.005, 0.0039], [0.68, 0.004, 0.003], [0.88, 0.003, 0.0024]], y)
              + spinningReel('reel', -0.62, y, 0.011),
-             { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' })
+             { cap: 'rubber-black', cork: 'cork', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' }) + { title: 'Spinning rod' }
   + gripOn('spinning_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A telescoping spinning rod pushed shut, 500 mm long: a rubber cap, an EVA foam grip, a screw reel seat with a small
@@ -160,7 +160,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                tube('guide-ring', 'guide', 0.006, 0.0075, 0.174, 0.176, y, 0.022),
              ]
              + spinningReel('reel', -0.015, y, 0.0125),
-             { cap: 'rubber-black', foam: 'rubber-offblack', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' })
+             { cap: 'rubber-black', foam: 'rubber-offblack', seat: 'plastic-charcoal', blank: 'polymer-black', wrap: 'alu-bare', guide: 'steel-stainless', reel: 'plastic-charcoal', spool: 'alu-bare', line: 'plastic-green', knob: 'plastic-black' }) + { title: 'Telescoping fishing rod, packed' }
   + gripOn('packed_telescoping_fishing_rod', 'grip') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'rubber'], setting: ['modern'], state: ['folded'] } } },
 
   // A whittled wooden hand reel, 150 mm long: a 30 mm round handle, then a spool section with a lip at each end and
@@ -177,7 +177,7 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                box('notch', 'shadow', [0.065, 0.02, -0.003], [0.071, 0.04, 0.003]),
                box('line-end', 'line', [0.06, 0.029, -0.001], [0.085, 0.031, 0.001]),
              ],
-             { wood: 'wood-pine', line: 'cord-cotton', shadow: 'wood-walnut' })
+             { wood: 'wood-pine', line: 'cord-cotton', shadow: 'wood-walnut' }) + { title: 'Wooden hand reel' }
   + gripOn('wooden_hand_reel', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'] } } },
 
   // A moulded plastic hand reel, 158 mm long: a ribbed handle, a spool 70 mm across wound with green line, and an
@@ -198,6 +198,6 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                tube('eyelet', 'eyelet', 0.003, 0.0045, 0.028, 0.032, 0.0845, 0),
                box('eyelet-post', 'guard', [0.028, 0.08, -0.002], [0.032, 0.081, 0.002]),
              ],
-             { handle: 'plastic-black', spool: 'plastic-red', line: 'plastic-green', guard: 'plastic-charcoal', eyelet: 'steel-stainless' })
+             { handle: 'plastic-black', spool: 'plastic-red', line: 'plastic-green', guard: 'plastic-charcoal', eyelet: 'steel-stainless' }) + { title: 'Plastic hand reel' }
   + gripOn('plastic_hand_reel', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

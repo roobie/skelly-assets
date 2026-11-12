@@ -4,39 +4,45 @@
 // sits inside the barrel behind it.
 {
   wheel_205_55r16: {
+    title: 'Wheel 205/55R16',
     class: 'light',
-    tyre: { id: 'tyre_205_55r16', massKg: 9, width: 0.205, outer: 0.316 },
-    rim: { id: 'rim_16_alloy', massKg: 9, radius: 0.203, width: 0.165, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.085, spokes: 5, spokeWidth: 0.05, finish: 'paint-silver' },
+    tyre: { id: 'tyre_205_55r16', title: 'Tyre 205/55R16', massKg: 9, width: 0.205, outer: 0.316 },
+    rim: { id: 'rim_16_alloy', title: '16-inch alloy rim', massKg: 9, radius: 0.203, width: 0.165, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.085, spokes: 5, spokeWidth: 0.05, finish: 'paint-silver' },
   },
   // The 2014-2019 smart fortwo's staggered 15-inch alloys, narrower in front. Tyre and rim masses are estimates for
   // their sizes.
   wheel_165_65r15: {
+    title: 'Wheel 165/65R15',
     class: 'light',
-    tyre: { id: 'tyre_165_65r15', massKg: 7, width: 0.165, outer: 0.298 },
-    rim: { id: 'rim_15_alloy_narrow', massKg: 6.5, radius: 0.1905, width: 0.127, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
+    tyre: { id: 'tyre_165_65r15', title: 'Tyre 165/65R15', massKg: 7, width: 0.165, outer: 0.298 },
+    rim: { id: 'rim_15_alloy_narrow', title: 'Narrow 15-inch alloy rim', massKg: 6.5, radius: 0.1905, width: 0.127, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
   },
   wheel_185_60r15: {
+    title: 'Wheel 185/60R15',
     class: 'light',
-    tyre: { id: 'tyre_185_60r15', massKg: 7.5, width: 0.185, outer: 0.3015 },
-    rim: { id: 'rim_15_alloy', massKg: 7, radius: 0.1905, width: 0.14, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
+    tyre: { id: 'tyre_185_60r15', title: 'Tyre 185/60R15', massKg: 7.5, width: 0.185, outer: 0.3015 },
+    rim: { id: 'rim_15_alloy', title: '15-inch alloy rim', massKg: 7, radius: 0.1905, width: 0.14, wall: 0.02, face: 0.03, faceThickness: 0.03, hub: 0.075, spokes: 6, spokeWidth: 0.04, finish: 'paint-silver' },
   },
   // A steel disc wheel: its wide spokes leave the hand holes between them.
   wheel_295_80r22_5: {
+    title: 'Wheel 295/80R22.5',
     class: 'heavy',
-    tyre: { id: 'tyre_295_80r22_5', massKg: 58, width: 0.295, outer: 0.522 },
-    rim: { id: 'rim_22_5_steel', massKg: 27, radius: 0.286, width: 0.21, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.14, spokes: 8, spokeWidth: 0.08, finish: 'steel-grey' },
+    tyre: { id: 'tyre_295_80r22_5', title: 'Tyre 295/80R22.5', massKg: 58, width: 0.295, outer: 0.522 },
+    rim: { id: 'rim_22_5_steel', title: '22.5-inch steel rim', massKg: 27, radius: 0.286, width: 0.21, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.14, spokes: 8, spokeWidth: 0.08, finish: 'steel-grey' },
   },
   // A 14.00 R25 flotation tyre on a 25-inch steel disc wheel, as off-road crash tenders and cranes run. Masses are
   // estimates for the size.
   wheel_385_95r25: {
+    title: 'Wheel 385/95R25',
     class: 'heavy',
-    tyre: { id: 'tyre_385_95r25', massKg: 150, width: 0.385, outer: 0.685 },
-    rim: { id: 'rim_25_steel', massKg: 85, radius: 0.3175, width: 0.254, wall: 0.03, face: 0.05, faceThickness: 0.035, hub: 0.16, spokes: 10, spokeWidth: 0.08, finish: 'steel-grey' },
+    tyre: { id: 'tyre_385_95r25', title: 'Tyre 385/95R25', massKg: 150, width: 0.385, outer: 0.685 },
+    rim: { id: 'rim_25_steel', title: '25-inch steel rim', massKg: 85, radius: 0.3175, width: 0.254, wall: 0.03, face: 0.05, faceThickness: 0.035, hub: 0.16, spokes: 10, spokeWidth: 0.08, finish: 'steel-grey' },
   },
   // The M3 half-track's 8.25-20 combat tyre on a six-stud steel disc wheel. Masses are estimates for the size.
   wheel_8_25_20: {
+    title: 'Wheel 8.25-20',
     class: 'medium',
-    tyre: { id: 'tyre_8_25_20', massKg: 45, width: 0.21, outer: 0.464 },
-    rim: { id: 'rim_20_steel', massKg: 30, radius: 0.254, width: 0.17, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.12, spokes: 6, spokeWidth: 0.09, finish: 'paint-olive' },
+    tyre: { id: 'tyre_8_25_20', title: 'Tyre 8.25-20', massKg: 45, width: 0.21, outer: 0.464 },
+    rim: { id: 'rim_20_steel', title: '20-inch steel rim', massKg: 30, radius: 0.254, width: 0.17, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.12, spokes: 6, spokeWidth: 0.09, finish: 'paint-olive' },
   },
 }

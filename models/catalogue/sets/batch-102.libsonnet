@@ -171,7 +171,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     h.disc('%s-spike-%d-%d' % [p, i, j], 'spike', 0.006, 0, 0.006, xc + [-0.03, 0.03][j], -0.12 + i * 0.07)
     for i in std.range(0, 3)
     for j in [0, 1]
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  ]) + { title: 'Golf shoes' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of mail booties, each 280 mm long, 105 mm wide and 160 mm tall, slumped soft with no stiff sole, a turned
   // cuff and a leather tie round each ankle. The steel grades ride on finishes maps.
@@ -190,7 +190,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
   ]) + [
     box(p + '-tie', 'tie', [xc - 0.054, 0.1, -0.146], [xc + 0.054, 0.108, -0.002]),
     box(p + '-tie-end', 'tie', [xc - 0.004, 0.06, -0.006], [xc + 0.004, 0.104, 0.0]),
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
+  ]) + { title: 'Chainmail chausses' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of steel sabatons, each 280 mm long and 110 mm wide: six lames stepping down the instep to a pointed toe
   // cap, a heel cup and ankle plate, and a leather strap under the arch. The steel grades ride on finishes maps.
@@ -200,7 +200,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     lining: 'leather-brown',
     strap: 'leather-brown',
     buckle: 'brass-dull',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
+  }) + { title: 'Sabaton' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of high-heeled pumps, each 240 mm long and 75 mm wide, on 85 mm stiletto heels, in glossy red leather.
   h.compound('heels', 0.5, pairOf(0.075, 0.03, pump), {
@@ -208,7 +208,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     sole: 'leather-black',
     heel: 'leather-black',
     insole: 'leather-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'High heels' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of split-toe work boots in thin black leather, each 270 mm long, 95 mm wide and 200 mm tall, closed down
   // the inner side by a row of small brass clasps.
@@ -222,7 +222,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     local x = xc + inward(xc) * 0.0477;
     box('%s-clasp-%d' % [p, i], 'clasp', [x - 0.003, 0.08 + i * 0.022, -0.1], [x + 0.003, 0.088 + i * 0.022, -0.075])
     for i in std.range(0, 4)
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
+  ]) + { title: 'Jikatabi' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
 
   // A pair of split-toe canvas shoes, each 270 mm long, 95 mm wide and 110 mm tall, on thick treaded rubber soles,
   // laced up the front.
@@ -232,7 +232,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     sole: 'rubber-black',
     collar: 'rubber-black',
     laces: 'cloth-white',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'Jikatabi sneakers' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of brown leather boots pulled up to the knee, each 290 mm long, 100 mm wide and 420 mm tall, with a block
   // heel and a zip down the inner side.
@@ -245,7 +245,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
   }, function(p, xc) calf(p, xc, 0.1, 0.2, 0.42, -0.141, -0.015) + [
     local x = xc + inward(xc) * 0.05;
     box(p + '-zip', 'zip', [x - 0.002, 0.06, -0.08], [x + 0.002, 0.39, -0.072]),
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  ]) + { title: 'Knee-high boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of leather hiking sandals, each 280 mm long and 100 mm wide, on 26 mm treaded rubber soles, with straps
   // over the toes, instep and ankle, a buckle on the ankle strap and a heel strap.
@@ -254,7 +254,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     footbed: 'leather-brown',
     strap: 'leather-brown',
     buckle: 'brass-dull',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'Leather sandals' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of red canvas low-top tennis shoes, each 280 mm long and 95 mm wide, with white rubber soles and toe caps
   // and white laces.
@@ -264,7 +264,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     sole: 'paint-white',
     collar: 'cloth-red',
     laces: 'cloth-white',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'Low-top sneakers' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of soft leather moccasins, each 270 mm long and 95 mm wide, with a gathered U-shaped panel over the toes, a
   // fur cuff and a lace tie round the ankle.
@@ -280,7 +280,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     h.disc(p + '-panel-toe', 'panel', 0.032, 0.035, 0.044, xc, 0.088),
     box(p + '-tie-front', 'tie', [xc - 0.03, 0.062, -0.001], [xc + 0.03, 0.066, 0.004]),
     box(p + '-tie-end', 'tie', [xc + 0.03, 0.04, -0.001], [xc + 0.034, 0.066, 0.004]),
-  ]) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
+  ]) + { title: 'Moccasins' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['feet'] } } },
 
   // A pair of black leather motorcycle police boots, each 290 mm long, 100 mm wide and 420 mm tall, on thick lugged
   // soles, with a buckled strap over the instep and another round the top of the calf.
@@ -296,5 +296,5 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     h.prism(p + '-instep-strap', 'strap', 'x', [[0.08, -0.02], [0.098, -0.02], [0.118, -0.045], [0.1, -0.045]], xc - 0.054, xc + 0.054),
   ] + wrapStrap(p + '-top-strap', 'strap', xc, 0.05, 0.36, 0.385, -0.141, -0.009)
   + sideBuckle(p + '-instep-buckle', xc, 0.115, 0.1, -0.03)
-  + sideBuckle(p + '-top-buckle', xc, 0.115, 0.372, -0.075)) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  + sideBuckle(p + '-top-buckle', xc, 0.115, 0.372, -0.075)) + { title: 'Motorcycle police boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 ]

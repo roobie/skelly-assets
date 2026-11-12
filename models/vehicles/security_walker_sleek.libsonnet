@@ -1,6 +1,7 @@
 local k = import 'kit.libsonnet';
 local s = import 'security_walker_sleek.spec.libsonnet';
 local original = import 'security_walker.libsonnet';
+local vehicle = import 'security_walker_sleek.placements.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local box = k.box;
 local h = s.hull;
@@ -12,7 +13,7 @@ local lift = s.weaponLift;
 local lamp = s.lights;
 local centre = [0.5, 0.5, 0.5];
 local finish = { paint: s.paint, frame: s.frame, trim: s.trim, black: 'plastic-black', glass: 'lens-smoke', lamp: 'plastic-frosted' };
-local part(name, kg, pieces, anchors={}) = k.compound('security_walker_sleek_' + name, kg, pieces, finish, anchors) + { voxelGrain: s.grain };
+local part(name, label, kg, pieces, anchors={}) = k.compound('security_walker_sleek_' + name, kg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label, voxelGrain: s.grain };
 local oldHull = [r for r in original if r.id == 'security_walker_hull'][0];
 // The original lugs, not a re-estimate, so the hydraulic interface is unchanged.
 local hipLugs = [p for p in std.parseJson(oldHull.parts[0].params.pieces) if std.startsWith(p.id, 'hip_ram_lug_')];
@@ -50,7 +51,7 @@ local feedPieces = std.flattenArrays([
   for i in std.range(0,std.length(feed.path)-2)
 ]);
 taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}},[
-  part('carrier', 1000, [
+  part('carrier', 'carrier', 1000, [
     box('belly', 'frame', [-1.30,belly-0.07,-0.76],[1.35,belly,0.76]),
     box('rear_bulkhead', 'frame', [-1.34,belly,-0.98],[-1.27,3.80,0.98]),
     box('deck', 'frame', [-1.27,statorLow-0.05,-0.92],[0.95,statorLow,0.92]),
@@ -69,13 +70,13 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     box('headlamp_backplate','frame',[lamp.baseHeadlamps[0]-0.15,lamp.baseHeadlamps[1],lamp.baseHeadlamps[2]-0.14],[lamp.baseHeadlamps[0]-0.06,lamp.baseHeadlamps[1]+0.25,lamp.baseHeadlamps[2]+0.14]),
   ]) + hipLugs, {axis:['stator',centre]}),
 
-  part('rotor', 240, [
+  part('rotor', 'rotor', 240, [
     ring('bearing','trim',s.rotary.inner,0.86,axisY,h.low),
     ring('seal','black',0.86,s.rotary.outer,axisY,axisY+0.04),
     k.turned('union_rotor','trim','y',k.disc(0.17,axisY,h.low)) + {sides:16},
   ], {axis:['bearing',[0.5,0,0.5]]}),
 
-  part('hull', 950, shell + [
+  part('hull', 'hull', 950, shell + [
     k.yPrism('floor','frame',h.bottom,[h.low,h.low+h.wall]),
     k.yPrism('roof','paint',h.roof,[h.high-h.wall,h.high]),
     box('nose_recess','black',[1.40,4.00,-0.38],[1.51,4.06,0.38]),
@@ -88,7 +89,7 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     box('headlamp_backplate','frame',[lamp.turretHeadlamps[0]-0.10,lamp.turretHeadlamps[1],lamp.turretHeadlamps[2]-0.14],[lamp.turretHeadlamps[0]-0.06,lamp.turretHeadlamps[1]+0.25,lamp.turretHeadlamps[2]+0.14]),
   ])),
 
-  part('cooling_pack', 150, [
+  part('cooling_pack', 'cooling pack', 150, [
     k.prism('shroud','paint',[[-1.66,4.04],[-1.08,4.04],[-1.03,4.31],[-1.44,4.39],[-1.66,4.30]],[-0.55,0.55]),
     box('vent_recess','black',[-1.69,4.07,-0.47],[-1.66,4.32,0.47]),
   ] + [
@@ -99,13 +100,13 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     box('exhaust_lip','frame',[-1.61,4.25,0.55],[-1.12,4.30,0.60]),
   ])),
 
-  part('roof_hatch', 25, [
+  part('roof_hatch', 'roof hatch', 25, [
     box('lid','paint',[-0.62,h.high,-0.19],[-0.08,h.high+0.04,0.17]),
     box('hinge','trim',[-0.64,h.high+0.04,-0.16],[-0.60,h.high+0.08,0.14]),
     box('handle','frame',[-0.26,h.high+0.04,-0.07],[-0.22,h.high+0.09,0.05]),
   ]),
 
-  part('ammo_cassette', 40, [
+  part('ammo_cassette', 'ammo cassette', 40, [
     // Heights are on the unlifted pod; the case stands clear of its raised hazard stripe.
     box('case','paint',[-0.63,3.70+lift,1.74],[-0.07,4.10+lift,2.02]),
     box('lid','frame',[-0.64,4.10+lift,1.74],[-0.06,4.13+lift,2.04]),
@@ -118,7 +119,7 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     box('handle_grip','black',[-0.49,4.19+lift,1.80],[-0.21,4.23+lift,1.86]),
   ]),
 
-  part('ammo_feed', 8, feedPieces + [
+  part('ammo_feed', 'ammo feed', 8, feedPieces + [
     box('cassette_coupler','frame',[-0.10,feedY-0.07,1.81],[-0.03,feedY+0.07,1.95]),
     // Clears the original gun cradle, which it must not cross.
     box('receiver_adapter','frame',[0.31,feedY-0.065,1.51],[0.41,feedY+0.065,1.57]),
@@ -127,7 +128,7 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     for i in std.range(1,std.length(feed.path)-2)
   ]),
 
-  part('floodlight', 7, [
+  part('floodlight', 'floodlight', 7, [
     box('foot','frame',[-0.07,0,-0.20],[0.05,0.04,0.20]),
     box('housing','black',[-0.06,0.10,-0.30],[0.08,0.28,0.30]),
     box('lens','lamp',[0.08,0.12,-0.28],[0.12,0.26,0.28]),
@@ -140,7 +141,7 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     for i in std.range(0,2)
   ]),
 
-  part('terrain_camera', 3, [
+  part('terrain_camera', 'terrain camera', 3, [
     box('housing','frame',[-0.10,-0.08,-0.08],[0.10,0.06,0.08]),
     box('lens','glass',[-0.06,-0.09,-0.05],[0.06,-0.08,0.05]),
   ]),

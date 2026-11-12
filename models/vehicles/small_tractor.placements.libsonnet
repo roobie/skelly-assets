@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'small_tractor.spec.libsonnet';
 {
+  title: 'Small tractor',
   sites: [
     site.one('chassis', 'small_tractor_chassis'),
     site.one('bonnet', 'small_tractor_bonnet'),

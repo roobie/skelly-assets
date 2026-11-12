@@ -36,50 +36,50 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('apron', 'paint', [0.95, 0.3, 0.5], [1.5, 0.66, 0.565]),
     box('running_board', 'board', [-0.85, 0.2, 0.56], [0.85, 0.24, s.side]),
     box('sill', 'pan', [-0.85, 0.2, s.body - 0.02], [0.85, s.floor, 0.6]),
-  ] + wing('rear_wing', s.rearAxle, -14, 180)), { pan: 'paint-charcoal', paint: s.paint, trim: 'plastic-black', glass: 'glass-clear', board: 'rubber-black' }),
-  k.compound('classic_small_car_front_wing', 5, wing('arc', s.frontAxle, 0, 194), { paint: s.paint }),
+  ] + wing('rear_wing', s.rearAxle, -14, 180)), { pan: 'paint-charcoal', paint: s.paint, trim: 'plastic-black', glass: 'glass-clear', board: 'rubber-black' }) + { title: 'Classic small car shell' },
+  k.compound('classic_small_car_front_wing', 5, wing('arc', s.frontAxle, 0, 194), { paint: s.paint }) + { title: 'Classic small car front wing' },
   k.compound('classic_small_car_windscreen', 9, [
     prism('glass', 'glass', [[0.85, s.waist], [0.89, s.waist], [fore(top) + 0.03, top], [fore(top) - 0.01, top]], [-0.5, 0.5]),
-  ], { glass: 'glass-clear' }),
+  ], { glass: 'glass-clear' }) + { title: 'Classic small car windscreen' },
   k.compound('classic_small_car_door', 22, [
     box('skin', 'paint', [s.doorRear, s.floor, s.body - 0.03], [s.doorFront, s.waist, s.body]),
     prism('glass', 'glass', [[s.doorRear, s.waist], [s.doorFront, s.waist], [fore(top) - 0.06, top], [s.doorRear, top]], [s.body - 0.02, s.body - 0.01]),
     box('handle', 'bright', [s.doorRear + 0.05, s.waist - 0.11, s.body - 0.01], [s.doorRear + 0.15, s.waist - 0.08, s.body + 0.015]),
-  ], paint + { bright: 'steel-bright' }, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
+  ], paint + { bright: 'steel-bright' }, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Classic small car door' },
   k.compound('classic_small_car_bonnet', 11, [
     prism('top', 'paint', [[0.92, 0.95], [1.6, 0.82], [1.6, 0.86], [0.92, 0.99]], [-0.5, 0.5]),
     prism('nose', 'paint', [[1.6, 0.82], [1.72, 0.54], [1.76, 0.56], [1.6, 0.86]], [-0.5, 0.5]),
     prism('seam', 'trim', [[0.92, 0.97], [1.6, 0.84], [1.6, 0.88], [0.92, 1.01]], [-0.03, 0.03]),
   ] + bothSides([
     prism('side', 'paint', [[0.92, 0.3], [1.72, 0.3], [1.72, 0.54], [1.6, 0.84], [0.92, 0.97]], [0.48, 0.51]),
-  ]), { paint: s.paint, trim: 'steel-bright' }),
+  ]), { paint: s.paint, trim: 'steel-bright' }) + { title: 'Classic small car bonnet' },
   k.compound('classic_small_car_grille', 3, [
     box('surround', 'bright', [1.72, 0.42, -0.2], [1.77, 0.72, 0.2]),
     box('mesh', 'dark', [1.76, 0.45, -0.17], [1.78, 0.69, 0.17]),
-  ], { bright: 'steel-bright', dark: 'plastic-black' }),
+  ], { bright: 'steel-bright', dark: 'plastic-black' }) + { title: 'Classic small car grille' },
   k.compound('classic_small_car_boot_lid', 10, [
     prism('lid', 'paint', [[-1.82, 0.72], [-1.32, s.waist], [-1.32, s.waist + 0.03], [-1.84, 0.75]], [-0.5, 0.5]),
-  ], { paint: s.paint }, { hinge_a: ['lid', [1, 1, 1]], hinge_b: ['lid', [1, 1, 0]] }),
+  ], { paint: s.paint }, { hinge_a: ['lid', [1, 1, 1]], hinge_b: ['lid', [1, 1, 0]] }) + { title: 'Classic small car boot lid' },
   k.compound('classic_small_car_front_bumper', 6, [
     box('bar', 'bright', [1.78, 0.36, -0.68], [1.82, 0.45, 0.68]),
   ] + bothSides([
     box('stay', 'dark', [1.72, 0.38, 0.4], [1.78, 0.43, 0.44]),
     box('overrider', 'bright', [1.79, 0.32, 0.32], [1.83, 0.5, 0.37]),
-  ]), { bright: 'steel-bright', dark: 'paint-charcoal' }),
+  ]), { bright: 'steel-bright', dark: 'paint-charcoal' }) + { title: 'Classic small car front bumper' },
   k.compound('classic_small_car_rear_bumper', 6, [
     box('bar', 'bright', [s.rear, 0.36, -s.body - 0.03], [s.rear + 0.04, 0.45, s.body + 0.03]),
   ] + bothSides([
     box('stay', 'dark', [s.rear + 0.04, 0.38, 0.4], [s.rear + 0.1, 0.43, 0.44]),
     box('overrider', 'bright', [s.rear - 0.01, 0.32, 0.32], [s.rear + 0.03, 0.5, 0.37]),
-  ]), { bright: 'steel-bright', dark: 'paint-charcoal' }),
+  ]), { bright: 'steel-bright', dark: 'paint-charcoal' }) + { title: 'Classic small car rear bumper' },
   k.compound('classic_small_car_dashboard', 8, [
     box('panel', 'trim', [0.72, 0.62, -0.5], [0.85, s.waist - 0.01, 0.5]),
     box('column', 'trim', [0.5, 0.63, -0.3], [0.75, 0.69, -0.22]),
-  ], { trim: 'plastic-black' }),
+  ], { trim: 'plastic-black' }) + { title: 'Classic small car dashboard' },
   k.compound('classic_small_car_front_axle', 16, [
     box('beam', 'steel', [s.frontAxle - 0.04, s.hub - 0.04, -s.wheelZ + 0.06], [s.frontAxle + 0.04, s.hub + 0.04, s.wheelZ - 0.06]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Classic small car front axle' },
   k.compound('classic_small_car_rear_axle', 22, [
     box('beam', 'steel', [s.rearAxle - 0.04, s.hub - 0.04, -s.wheelZ + 0.06], [s.rearAxle + 0.04, s.hub + 0.04, s.wheelZ - 0.06]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Classic small car rear axle' },
 ])

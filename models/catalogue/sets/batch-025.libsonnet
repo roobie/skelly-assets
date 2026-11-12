@@ -26,7 +26,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     box('header', 'chip', [-0.040, 0.012, 0.020], [-0.010, 0.020, 0.026]),
     turned('socket', 'socket', 'z', [[0, 0], [0, 0.005], [0.006, 0.005], [0.006, 0.0035], [0.014, 0.0035], [0.014, 0]], [0.030, 0.014, 0.034]),
     box('led', 'led', [0.044, 0.012, 0.026], [0.048, 0.015, 0.030]),
-  ], { tray: 'metal-silver', board: 'circuit-green', shield: 'steel-galvanised', chip: 'plastic-matte-black', cap: 'plastic-blue', socket: 'brass-polished', led: 'plastic-red' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { tray: 'metal-silver', board: 'circuit-green', shield: 'steel-galvanised', chip: 'plastic-matte-black', cap: 'plastic-blue', socket: 'brass-polished', led: 'plastic-red' }) + { title: 'Transponder' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A sap spile: a steel tube 80 mm long, 12 mm across at the head, tapering to a 7 mm spout, with a bucket hook.
   h.compound('tree_spile', 0.018, [
@@ -35,7 +35,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     box('hook-stem', 'hook', [-0.022, 0, -0.001], [-0.018, 0.004, 0.001]),
     box('hook-foot', 'hook', [-0.022, 0, -0.001], [-0.010, 0.002, 0.001]),
     box('hook-tip', 'hook', [-0.012, 0, -0.001], [-0.010, 0.004, 0.001]),
-  ], { tube: 'steel-galvanised', hook: 'steel-grey' }) + h.inHand('tree_spile', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { tube: 'steel-galvanised', hook: 'steel-grey' }) + { title: 'Tree spile' } + h.inHand('tree_spile', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A crushproof thumb drive: a 62 mm knurled steel capsule, 17 mm across, its cap screwed on over a rubber seal, with
   // a small split ring through the tail.
@@ -47,7 +47,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.0085], [0.020, 0.0085], [0.024, 0.0065], [0.024, 0]], [0.008, 0.0085, 0]),
     turned('lug', 'body', 'x', [[0, 0], [0, 0.003], [0.004, 0.003], [0.004, 0]], [-0.034, 0.0085, 0]),
     turned('ring', 'ring', 'z', [[0, 0.0045], [0, 0.0065], [0.002, 0.0065], [0.002, 0.0045], [0, 0.0045]], [-0.039, 0.0085, -0.001]),
-  ], { body: 'steel-stainless', knurl: 'steel-grey', seal: 'rubber-black', cap: 'steel-stainless', ring: 'steel-bright' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['computer'] } },
+  ], { body: 'steel-stainless', knurl: 'steel-grey', seal: 'rubber-black', cap: 'steel-stainless', ring: 'steel-bright' }) + { title: 'Rugged USB drive' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A curled sheet of willow bark about 260 by 90 mm and 7 mm thick, grey furrowed outside up over a pale inner layer.
   local outline = [[-0.130, -0.040], [-0.090, -0.046], [0.020, -0.044], [0.125, -0.036], [0.132, 0.030], [0.060, 0.045], [-0.060, 0.044], [-0.128, 0.034]];
@@ -59,7 +59,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
       h.onCurvedFace('furrow-%d' % i, 'furrow', [[p[1], p[0]] for p in outline], 0.002, 0.005, r, [z, -0.110 + i * 0.012], [z + 0.004, 0.105 - i * 0.010], 0.004)
       for i in std.range(0, 4)
       for z in [[-0.028, -0.012, 0.002, 0.016, 0.030][i]]
-    ], { inner: 'wood-birch', bark: 'bark', furrow: 'coal-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
+    ], { inner: 'wood-birch', bark: 'bark', furrow: 'coal-black' }) + { title: 'Willow bark' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // About 6 m of 2 mm steel wire in a loose 150 mm coil, twist-tied in two places, one end sticking out.
   h.compound('wire', 0.17, [
@@ -69,7 +69,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     box('tie-a', 'tie', [-0.078, 0, -0.004], [-0.064, 0.019, 0.004]),
     box('tie-b', 'tie', [0.064, 0, -0.004], [0.078, 0.019, 0.004]),
     box('end', 'wire', [-0.003, 0.012, 0.068], [0.003, 0.015, 0.110]),
-  ], { wire: 'steel-bright', tie: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { wire: 'steel-bright', tie: 'steel-grey' }) + { title: 'Wire' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A short coil of barbed wire, 220 mm across: two twisted strands with four-point barbs every 50 mm or so.
   h.compound('barbed_wire', 0.18, [
@@ -86,7 +86,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
       box('barb-y-%d' % k, 'barb', [x - 0.0015, y - 0.006, z - 0.0015], [x + 0.0015, y + 0.008, z + 0.0015]),
     ]
     for k in std.range(0, 13)
-  ]), { wire: 'steel-galvanised', barb: 'steel-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ]), { wire: 'steel-galvanised', barb: 'steel-grey' }) + { title: 'Barbed wire' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A 152 mm square of woven steel mesh, drawn as wires every 10 mm with open squares between, the weft lying on the warp.
   h.compound('wire_mesh', 0.03, [
@@ -95,7 +95,7 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
   ] + [
     box('weft-%d' % i, 'mesh', [-0.076, 0.002, -0.076 + i * 0.01], [0.076, 0.004, -0.074 + i * 0.01])
     for i in std.range(0, 15)
-  ], { mesh: 'steel-bright' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { mesh: 'steel-bright' }) + { title: 'Wire mesh' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A corn husk parcel of cooked rice, 140 mm long and 55 mm across, tied at both ends, split along the top where the
   // rice inside has grown white and yellow-green mould.
@@ -113,5 +113,5 @@ local torus(id, slot, R, t, y, x=0, z=0, n=10) = turned(id, slot, 'y', [
     h.ball('mould-c', 'mould', 0.007, 0.030, 0.056, 0.005, 0.5),
     h.ball('spore-a', 'spore', 0.005, -0.006, 0.058, 0.005, 0.5),
     h.ball('spore-b', 'spore', 0.004, 0.024, 0.059, -0.003, 0.5),
-  ], { husk: 'straw-pale', tie: 'jute', rice: 'cloth-cream', vein: 'plant-dried', mould: 'fleece-pale', spore: 'cloth-sage' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
+  ], { husk: 'straw-pale', tie: 'jute', rice: 'cloth-cream', vein: 'plant-dried', mould: 'fleece-pale', spore: 'cloth-sage' }) + { title: 'Koji rice parcel' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 ]

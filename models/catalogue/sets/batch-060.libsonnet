@@ -34,7 +34,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
   h.compound('small_candle', 0.014, [
     turned('wax', 'wax', 'y', [[0, 0], [0, 0.0065], [0.135, 0.0058], [0.145, 0.004], [0.148, 0]]),
     disc('wick', 'wick', 0.0008, 0.146, 0.152),
-  ], { wax: 'wax-ivory', wick: 'cloth-charred' }) + h.inHand('small_candle', 'wax') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plant'] } } },
+  ], { wax: 'wax-ivory', wick: 'cloth-charred' }) + { title: 'Small candle' } + h.inHand('small_candle', 'wax') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plant'] } } },
 
   // A pocket diving torch, 10 cm long and 25 mm across: a knurled aluminium tube, a sealed tail cap and a
   // rubber-ringed head round the lens at +x.
@@ -49,7 +49,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     torchBody('bezel', 'bezel', [[0.096, 0.013], [0.1, 0.013]]),
     turned('lens', 'lens', 'x', [[0, 0], [0, 0.01], [0.0012, 0.01], [0.0012, 0]], [0.1, 0, 0]),
     box('lanyard', 'cap', [0.001, -0.004, -0.0125], [0.008, 0.004, -0.010]),
-  ], { body: 'alu-anodized-black', grip: 'alu-bare', cap: 'plastic-black', seal: 'plastic-orange', bezel: 'alu-bare', lens: 'glass-clear' }) + h.gripOn('mini_diving_flashlight', 'tube') + {
+  ], { body: 'alu-anodized-black', grip: 'alu-bare', cap: 'plastic-black', seal: 'plastic-orange', bezel: 'alu-bare', lens: 'glass-clear' }) + { title: 'Mini diving flashlight' } + h.gripOn('mini_diving_flashlight', 'tube') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
@@ -65,7 +65,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     turned('lens', 'lens', 'x', [[0, 0], [0, 0.02], [0.0015, 0.02], [0.0015, 0]], [0.13, 0, 0]),
     box('lug', 'cap', [0.03, -0.026, -0.006], [0.07, -0.016, 0.006]),
     box('mark', 'collar', [0.086, 0.019, -0.002], [0.09, 0.023, 0.002]),
-  ], { body: 'plastic-yellow', grip: 'rubber-black', cap: 'plastic-black', collar: 'plastic-charcoal', lens: 'glass-clear' }) + h.gripOn('variable_diving_flashlight', 'barrel') + {
+  ], { body: 'plastic-yellow', grip: 'rubber-black', cap: 'plastic-black', collar: 'plastic-charcoal', lens: 'glass-clear' }) + { title: 'Variable-beam diving flashlight' } + h.gripOn('variable_diving_flashlight', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
@@ -84,7 +84,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('hinge-r', 'handle', [0.03, 0.162, -0.004], [0.036, 0.172, 0.004]),
   ] + arc('handle', 'handle', 0, 0.172, 0.029, 0.036, 0, 180, 10, 0.008), {
     body: 'plastic-green', diffuser: 'plastic-frosted', switch: 'plastic-black', handle: 'plastic-black',
-  }) + h.inHand('electric_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Electric lantern' } + h.inHand('electric_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small pressure lantern burning white gas, 24 cm tall to the bail: a 10 cm fount with its pump and valve on the
   // front, a glass globe between two posts and a vented hood.
@@ -96,7 +96,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     turned('filler', 'brass', 'y', [[0, 0], [0, 0.008], [0.008, 0.008], [0.008, 0]], [-0.03, 0.062, -0.012]),
   ] + lanternTop(0.084, 0.08, 0.034), {
     fount: 'paint-red', frame: 'steel-grey', brass: 'brass', globe: 'glass-clear', hood: 'paint-red', bail: 'steel-grey',
-  }) + h.inHand('gasoline_lantern', 'fount') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + { title: 'Gasoline lantern' } + h.inHand('gasoline_lantern', 'fount') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A propane lantern head, 20 cm tall to the bail, that screws onto a gas cylinder: a burner collar with its valve
   // knob and igniter button, a glass globe and a vented hood.
@@ -107,7 +107,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('igniter', 'knob', [0.024, 0.026, -0.008], [0.04, 0.04, 0.008]),
   ] + lanternTop(0.05, 0.075, 0.032), {
     fount: 'paint-green', frame: 'steel-grey', brass: 'brass', knob: 'plastic-black', globe: 'glass-clear', hood: 'paint-green', bail: 'steel-grey',
-  }) + h.inHand('propane_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + { title: 'Propane lantern' } + h.inHand('propane_lantern', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', keywords: ['camping'], tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A hand-held road flare, 30 cm long and 28 mm across: a red paper tube with a plastic cap over the striker at +x
   // and a plastic grip plug at the other end. The striker is the +x tip, the end that burns, and the only slot that glows.
@@ -117,7 +117,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     torchBody('band', 'label', [[0.12, 0.0143], [0.18, 0.0143]]),
     torchBody('cap', 'cap', [[0.262, 0.0155], [0.3, 0.0155]]),
     torchBody('striker', 'striker', [[0.3, 0.012], [0.302, 0.012]]),
-  ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + h.gripOn('road_flare', 'plug') + {
+  ], { plug: 'plastic-black', tube: 'paint-red', label: 'paper-white', cap: 'plastic-black', striker: 'paperboard-brown' }) + { title: 'Road flare' } + h.gripOn('road_flare', 'plug') + {
     glow: 'striker',
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'lighting', tags: { material: ['paper', 'plastic'], setting: ['modern'] } } },
@@ -137,7 +137,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('clip', 'clip', [-0.012, 0.03, -0.031], [0.012, 0.14, -0.027]),
     box('clip-hinge', 'clip', [-0.014, 0.13, -0.031], [0.014, 0.145, -0.026]),
     box('battery-door', 'grip', [-0.026, 0.004, 0.026], [0.026, 0.04, 0.028]),
-  ], { body: 'plastic-orange', switch: 'rubber-black', bezel: 'plastic-black', lens: 'crystal-glow-white', grip: 'rubber-black', clip: 'steel-grey' }) + h.inHand('heavy_flashlight', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  ], { body: 'plastic-orange', switch: 'rubber-black', bezel: 'plastic-black', lens: 'crystal-glow-white', grip: 'rubber-black', clip: 'steel-grey' }) + { title: 'Heavy flashlight' } + h.inHand('heavy_flashlight', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // Eight metres of LED strip wound on a 9 cm reel with an open spoked front, the loose end hanging off with its plug.
   h.compound('led_strip', 0.15, [
@@ -156,7 +156,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('tail-led-a', 'led', [0.05, 0.0012, -0.002], [0.054, 0.0025, 0.002]),
     box('tail-led-b', 'led', [0.064, 0.0012, -0.002], [0.068, 0.0025, 0.002]),
     box('tail-plug', 'plug', [0.075, 0.0, -0.006], [0.088, 0.006, 0.006]),
-  ], { reel: 'plastic-black', strip: 'plastic-gloss-white', led: 'plastic-yellow', plug: 'plastic-black' }) + h.inHand('led_strip', 'coil') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { reel: 'plastic-black', strip: 'plastic-gloss-white', led: 'plastic-yellow', plug: 'plastic-black' }) + { title: 'LED strip' } + h.inHand('led_strip', 'coil') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A nine-branched candleholder for Hanukkah, 18 cm across and 18 cm tall: eight cups on four nested half-round
   // arms facing +z, and a raised ninth cup on the centre stem.
@@ -171,7 +171,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     cup('cup-%s%d' % [if side < 0 then 'l' else 'r', i], side * 0.021 * i, 0.15)
     for i in std.range(1, 4)
     for side in [-1, 1]
-  ], { metal: 'metal-silver' }) + h.inHand('menorah', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', keywords: ['religious'], tags: { material: ['metal'] } } },
+  ], { metal: 'metal-silver' }) + { title: 'Menorah' } + h.inHand('menorah', 'base') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', keywords: ['religious'], tags: { material: ['metal'] } } },
 
   // A wheel-thrown clay oil lamp, 14 cm long: a round closed bowl 9 cm across with a sunken top and fill hole, a
   // nozzle to +z for the wick and a tab handle at the back.
@@ -185,7 +185,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     disc('wick', 'wick', 0.0025, 0.031, 0.035, 0, 0.074),
     box('handle', 'clay', [-0.004, 0.012, -0.058], [0.004, 0.044, -0.04]),
     box('handle-top', 'clay', [-0.004, 0.036, -0.052], [0.004, 0.048, -0.034]),
-  ], { clay: 'clay-terracotta', 'clay-dark': 'brick-buff', hole: 'coal-black', wick: 'cloth-charred' }) + h.inHand('clay_oil_lamp', 'bowl') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['ceramic'], setting: ['ancient'] } } },
+  ], { clay: 'clay-terracotta', 'clay-dark': 'brick-buff', hole: 'coal-black', wick: 'cloth-charred' }) + { title: 'Clay oil lamp' } + h.inHand('clay_oil_lamp', 'bowl') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['ceramic'], setting: ['ancient'] } } },
 
   // An old brass acetylene lamp, 15 cm tall: a gas chamber below a water tank with its drip valve on top, a polished
   // reflector facing +z round the burner tip, and a hanging hook at the back.
@@ -201,7 +201,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     box('hook-back', 'band', [-0.003, 0.06, -0.044], [0.003, 0.15, -0.04]),
     box('hook-top', 'band', [-0.003, 0.146, -0.04], [0.003, 0.15, -0.02]),
     box('hook-tip', 'band', [-0.003, 0.136, -0.024], [0.003, 0.15, -0.02]),
-  ], { brass: 'brass', band: 'brass-dull', reflector: 'brass-polished', mirror: 'mirror-silver' }) + h.inHand('acetylene_lamp', 'chamber') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
+  ], { brass: 'brass', band: 'brass-dull', reflector: 'brass-polished', mirror: 'mirror-silver' }) + { title: 'Acetylene lamp' } + h.inHand('acetylene_lamp', 'chamber') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
 
   // A clip-on book light, 13 cm long: a spring clip, a gooseneck arching over to +x and a small LED head facing down.
   h.compound('reading_light', 0.05, [
@@ -213,7 +213,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
   ] + arc('neck', 'neck', 0.02, 0.017, 0.047, 0.053, 60, 180, 14, 0.006) + [
     box('head', 'body', [0.032, 0.056, -0.013], [0.078, 0.066, 0.013]),
     box('led', 'led', [0.038, 0.054, -0.01], [0.074, 0.056, 0.01]),
-  ], { body: 'plastic-black', pad: 'rubber-black', neck: 'alu-bare', led: 'plastic-frosted' }) + h.inHand('reading_light', 'jaw-high') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-black', pad: 'rubber-black', neck: 'alu-bare', led: 'plastic-frosted' }) + { title: 'Reading light' } + h.inHand('reading_light', 'jaw-high') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A remote-controlled table lamp, 23 cm tall: a weighted round base, a slim aluminium stem and a white mushroom
   // shade with a frosted diffuser underneath.
@@ -223,5 +223,5 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
     disc('stem', 'stem', 0.006, 0.016, 0.175),
     disc('diffuser', 'diffuser', 0.058, 0.172, 0.176),
     turned('shade', 'body', 'y', [[0.176, 0], [0.176, 0.068], [0.184, 0.068], [0.205, 0.058], [0.222, 0.036], [0.23, 0.012], [0.231, 0]]),
-  ], { body: 'plastic-gloss-white', stem: 'alu-bare', diffuser: 'plastic-frosted', status: 'plastic-clear-blue' }) + h.inHand('smart_lamp', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { body: 'plastic-gloss-white', stem: 'alu-bare', diffuser: 'plastic-frosted', status: 'plastic-clear-blue' }) + { title: 'Smart lamp' } + h.inHand('smart_lamp', 'base') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 ]

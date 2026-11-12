@@ -117,7 +117,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       box(p + 'zip', 'zip', [if cx < 0 then cx + 0.044 else cx - 0.048, 0.03, shaftZ({ l: 0.28, rz: 0.056 }) - 0.006], [if cx < 0 then cx + 0.048 else cx - 0.044, 0.21, shaftZ({ l: 0.28, rz: 0.056 }) + 0.006]),
       band(p + 'seam', 'collar', { rx: 0.045, rz: 0.056, l: 0.28 }, cx, 0.1, 0.106, 0.002),
     ]
-  ), { sole: 'rubber-black', upper: 'cloth-denim', shaft: 'cloth-denim', collar: 'leather-brown', lining: 'paint-charcoal', zip: 'steel' })
+  ), { sole: 'rubber-black', upper: 'cloth-denim', shaft: 'cloth-denim', collar: 'leather-brown', lining: 'paint-charcoal', zip: 'steel' }) + { title: 'Denim boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of faux fur boots, 300 mm long and 280 mm tall: a soft cloth foot on a thick grey sole under a tall shaggy
@@ -129,7 +129,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       h.disc(p + 'bobble-a', 'tie', 0.009, 0.112, 0.13, cx - 0.012, shaftZ({ l: 0.3, rz: 0.066 }) + 0.075),
       h.disc(p + 'bobble-b', 'tie', 0.009, 0.104, 0.122, cx + 0.012, shaftZ({ l: 0.3, rz: 0.066 }) + 0.075),
     ]
-  ), { sole: 'plastic-grey', upper: 'cloth-khaki', shaft: 'wool-grey', collar: 'cloth-white', lining: 'felt-grey', tie: 'cloth-khaki' })
+  ), { sole: 'plastic-grey', upper: 'cloth-khaki', shaft: 'wool-grey', collar: 'cloth-white', lining: 'felt-grey', tie: 'cloth-khaki' }) + { title: 'Faux fur boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of fur-lined leather boots, 300 mm long and 280 mm tall: brown leather uppers on a rubber sole, the fur
@@ -140,14 +140,14 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       band(p + 'thong-a', 'thong', { rx: 0.052, rz: 0.064, l: 0.3 }, cx, 0.11, 0.116),
       band(p + 'thong-b', 'thong', { rx: 0.052, rz: 0.064, l: 0.3 }, cx, 0.16, 0.166),
     ]
-  ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'fur-brown', lining: 'fur-brown', thong: 'skin-rawhide' })
+  ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'fur-brown', lining: 'fur-brown', thong: 'skin-rawhide' }) + { title: 'Fur boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of leather hiking boots, 290 mm long and 170 mm tall at the padded ankle collar, laced up the front on a
   // deep lugged sole whose rubber rand wraps the toe.
   h.compound('hiking_boots', 0.81, pair(hiking, 0.03, function(p, cx)
     laces(p, hiking, cx, 0.07, 0.15)
-  ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'cloth-khaki', lining: 'paint-charcoal', rand: 'plastic-charcoal', tongue: 'cloth-khaki', lace: 'nylon-red' })
+  ), { sole: 'rubber-black', upper: 'leather-brown', shaft: 'leather-brown', collar: 'cloth-khaki', lining: 'paint-charcoal', rand: 'plastic-charcoal', tongue: 'cloth-khaki', lace: 'nylon-red' }) + { title: 'Hiking boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
   // A pair of leather armour boots, 290 mm long and 250 mm tall: black leather uppers with a moulded brown hardened
   // leather cap over the toe and a plate down the shin, buckled on with three rawhide straps.
@@ -164,7 +164,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       for i in std.range(0, 2)
       for y in [0.11 + i * 0.045]
     ])
-  ), { sole: 'leather-brown', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-brown', lining: 'paint-charcoal', plate: 'leather-brown', strap: 'skin-rawhide', buckle: 'steel' })
+  ), { sole: 'leather-brown', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-brown', lining: 'paint-charcoal', plate: 'leather-brown', strap: 'skin-rawhide', buckle: 'steel' }) + { title: 'Leather armour boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of armoured boots, 300 mm long and 270 mm tall: a steel greave closed round the shin, overlapping steel
@@ -181,7 +181,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       for i in [0, 1, 2, 3]
       for s in [if i < 2 then -1 else 1]
     ]
-  ), { sole: 'leather-black', upper: 'steel', shaft: 'steel', collar: 'leather-brown', lining: 'paint-charcoal', plate: 'steel', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel-grey' })
+  ), { sole: 'leather-black', upper: 'steel', shaft: 'steel', collar: 'leather-brown', lining: 'paint-charcoal', plate: 'steel', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel-grey' }) + { title: 'Armoured boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of scrap boots, 290 mm long and 200 mm tall: cloth wrapped round and round a foot and shin and bound with
@@ -197,14 +197,14 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       box(p + 'ankle', 'patch', [cx + s * scrap.rx - 0.006, 0.03, shaftZ(scrap) - 0.03], [cx + s * scrap.rx + 0.008, 0.09, shaftZ(scrap) + 0.026]),
       box(p + 'shin-tie', 'wrap', [cx - 0.036, 0.13, zf - 0.008], [cx + 0.032, 0.14, zf + 0.009]),
     ]
-  ), { sole: 'rubber-black', upper: 'cloth-rag', shaft: 'cloth-rag', collar: 'cloth-rag-shadow', lining: 'paint-charcoal', wrap: 'cloth-rag-shadow', scrap: 'scrap-rusted', patch: 'steel-grey', bolt: 'steel' })
+  ), { sole: 'rubber-black', upper: 'cloth-rag', shaft: 'cloth-rag', collar: 'cloth-rag-shadow', lining: 'paint-charcoal', wrap: 'cloth-rag-shadow', scrap: 'scrap-rusted', patch: 'steel-grey', bolt: 'steel' }) + { title: 'Scrap boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric', 'metal'], slot: ['feet'] } } },
 
   // A pair of steel-toed work boots, 290 mm long and 180 mm tall: tan leather uppers on a thick black sole, a darker
   // leather cap over the swollen steel toe, a padded collar and laces up the front.
   h.compound('steel_toe_boots', 2, pair(work, 0.03, function(p, cx)
     laces(p, work, cx, 0.075, 0.165)
-  ), { sole: 'plastic-charcoal', upper: 'polymer-fde', shaft: 'polymer-fde', collar: 'leather-brown', lining: 'paint-charcoal', toecap: 'leather-brown', tongue: 'polymer-fde', lace: 'leather-black' })
+  ), { sole: 'plastic-charcoal', upper: 'polymer-fde', shaft: 'polymer-fde', collar: 'leather-brown', lining: 'paint-charcoal', toecap: 'leather-brown', tongue: 'polymer-fde', lace: 'leather-black' }) + { title: 'Steel toe boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of western boots, 300 mm long and 320 mm tall: a narrow pointed brown toe on a leather sole with a stacked
@@ -222,14 +222,14 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       for i in [0, 1]
       for s in [[-1, 1][i]]
     ]
-  ), { sole: 'wood-walnut', upper: 'leather-brown', shaft: 'leather-black', collar: 'leather-brown', lining: 'paint-charcoal', stitch: 'paint-cream' })
+  ), { sole: 'wood-walnut', upper: 'leather-brown', shaft: 'leather-black', collar: 'leather-brown', lining: 'paint-charcoal', stitch: 'paint-cream' }) + { title: 'Western boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of winter boots, 310 mm long and 260 mm tall: a black rubber shell over the foot on a thick cleated sole,
   // a khaki nylon shaft laced up the front, and a deep grey wool lining rolled over the top.
   h.compound('winter_boots', 2.7, pair(winter, 0.03, function(p, cx)
     laces(p, winter, cx, 0.1, 0.22, 0.02) + [band(p + 'shell', 'shell', winter, cx, winter.t, 0.075, 0.004)]
-  ), { sole: 'plastic-charcoal', upper: 'rubber-black', shaft: 'cloth-khaki', collar: 'wool-grey', lining: 'wool-grey', shell: 'rubber-black', tongue: 'cloth-khaki', lace: 'leather-black' })
+  ), { sole: 'plastic-charcoal', upper: 'rubber-black', shaft: 'cloth-khaki', collar: 'wool-grey', lining: 'wool-grey', shell: 'rubber-black', tongue: 'cloth-khaki', lace: 'leather-black' }) + { title: 'Winter boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['rubber', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of hardened steel mail chausses laid flat, 300 mm from the tie at the top of the leg to the heel, each
@@ -237,14 +237,14 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
   h.compound('hardened_mail_chausses', 3.1, std.flattenArrays([
     chausse(if s < 0 then 'l-' else 'r-', s, s * 0.075, 0.2, 0.12, 0.2, 0.1, 0.01, 0.005)
     for s in [-1, 1]
-  ]), { mail: 'steel-hardened', ring: 'steel-mail', tie: 'leather-brown' })
+  ]), { mail: 'steel-hardened', ring: 'steel-mail', tie: 'leather-brown' }) + { title: 'Hardened mail chausses' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A single hardened steel sabaton, 280 mm long and 100 mm tall: seven overlapping lames stepping down from the
   // ankle over the instep to a rounded toe cap, open behind and under the heel, held on by a strap under the arch and
   // a buckled strap round the back of the heel.
   h.compound('hardened_sabaton', 1.4, boot('', sabaton(0.28), 0) + sabatonStraps('', sabaton(0.28), 0),
-    { sole: 'leather-brown', plate: 'steel-hardened', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel', lining: 'paint-charcoal' })
+    { sole: 'leather-brown', plate: 'steel-hardened', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel', lining: 'paint-charcoal' }) + { title: 'Hardened sabaton' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of hardened sheet metal sabatons, 300 mm long and 95 mm tall: three thick bent steel plates riveted over the
@@ -255,7 +255,7 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       for i in [0, 1, 2, 3]
       for s in [if i < 2 then -1 else 1]
     ]
-  ), { sole: 'leather-brown', plate: 'steel-hardened', edge: 'steel-parkerized', strap: 'leather-brown', buckle: 'steel', rivet: 'steel', lining: 'paint-charcoal' })
+  ), { sole: 'leather-brown', plate: 'steel-hardened', edge: 'steel-parkerized', strap: 'leather-brown', buckle: 'steel', rivet: 'steel', lining: 'paint-charcoal' }) + { title: 'Hardened sheet sabatons' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['feet'] } } },
 
   // A pair of rusty mail chausses laid flat, 300 mm from the tie at the top of the leg to the heel, each foot turning
@@ -265,6 +265,6 @@ local winter = { l: 0.31, w: 0.118, t: 0.028, layers: 5, ankle: 0.1, top: 0.26, 
       h.prism((if s < 0 then 'l-' else 'r-') + 'sole', 'tie', 'y', [[0.015, s * 0.075], [0.085, s * 0.075], [0.075, s * 0.28], [0.025, s * 0.28]], 0.015, 0.019),
     ]
     for s in [-1, 1]
-  ]), { mail: 'steel-mail', ring: 'scrap-rusted', tie: 'leather-brown' })
+  ]), { mail: 'steel-mail', ring: 'scrap-rusted', tie: 'leather-brown' }) + { title: 'Rusty mail chausses' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 ]

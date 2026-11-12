@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'livestock_trailer.spec.libsonnet';
 local axleIds = std.range(0, std.length(s.axles) - 1);
 {
+  title: 'Livestock trailer',
   sites: [
     site.one('chassis', 'livestock_trailer_chassis'),
     site.one('floor', 'livestock_trailer_floor'),

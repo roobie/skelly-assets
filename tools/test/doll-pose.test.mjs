@@ -10,7 +10,7 @@ import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { add, applyPoint, boneTransforms, dot, length, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
-import { modelTaxonomies } from '../check-taxonomy.mjs';
+import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { partStrokes, poseJson, pressCheckPoses, readPressCheck } from '../press-check.mjs';
@@ -24,7 +24,7 @@ const WEAR = 'leather_jacket';
 // armholes stand beside the arm (models/catalogue/worn.libsonnet).
 const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_top'];
 const pressCheck = readPressCheck(repo);
-const sources = await modelTaxonomies(repo);
+const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));

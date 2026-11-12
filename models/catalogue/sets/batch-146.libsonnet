@@ -53,7 +53,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
                for k in std.range(1, 7)
              ]
              + [box('clasp', 'metal', [-0.007, 0, -0.077], [0.007, 0.006, -0.053])],
-             { pearl: 'pearl', metal: 'metal-gold' })
+             { pearl: 'pearl', metal: 'metal-gold' }) + { title: 'Pearl collar' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A round button badge lying face up, 25 mm across and 4 mm tall: a rolled steel back with a pin behind, and a
@@ -64,7 +64,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
     h.disc('ring', 'ring', 0.0125, 0.001, 0.003),
     h.disc('field', 'field', 0.0095, 0.003, 0.004),
     h.disc('centre', 'centre', 0.0045, 0.004, 0.005),
-  ], { back: 'steel-bright', ring: 'plastic-orange', field: 'enamel-white', centre: 'lacquer-black' })
+  ], { back: 'steel-bright', ring: 'plastic-orange', field: 'enamel-white', centre: 'lacquer-black' }) + { title: 'Pin badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'paper'], setting: ['modern'], slot: ['torso'] } } },
 
   // A film radiation badge lying face up, 40 mm by 58 mm and 10 mm thick: a white plastic holder with a steel clip
@@ -83,7 +83,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
     local a = 120 * k + 180;
     flat('trefoil-%d' % k, 'mark', [onCircle(0.0028, a - 30, 0, 0.018), onCircle(0.0078, a - 30, 0, 0.018), onCircle(0.0078, a + 30, 0, 0.018), onCircle(0.0028, a + 30, 0, 0.018)], 0.009, 0.01)
     for k in std.range(0, 2)
-  ], { body: 'enamel-white', clip: 'steel-bright', window: 'plastic-amber', 'filter-a': 'foil-alu', 'filter-b': 'bronze', label: 'plastic-hivis', mark: 'lacquer-black' })
+  ], { body: 'enamel-white', clip: 'steel-bright', window: 'plastic-amber', 'filter-a': 'foil-alu', 'filter-b': 'bronze', label: 'plastic-hivis', mark: 'lacquer-black' }) + { title: 'Radiation badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A gold engagement ring standing upright, 21 mm across and 27 mm tall: a slim band with a raised gold setting on
@@ -99,7 +99,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
                ball('cluster-%d' % k, 'stone', 0.0014, p[0], p[1], 0.0215)
                for k in std.range(0, 5)
              ],
-             { metal: 'metal-gold', stone: 'gem-clear' })
+             { metal: 'metal-gold', stone: 'gem-clear' }) + { title: 'Engagement ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['hands'] } } },
 
   // A silver promise ring standing upright, 21 mm across and 6 mm wide: a flat band with a line of engraved script
@@ -108,7 +108,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              band('band', 0.009, bandR, -0.003, -0.001, 24, plain('metal'))
              + band('band-back', 0.009, bandR, 0.001, 0.003, 24, plain('metal'))
              + band('script', 0.009, bandR, -0.001, 0.001, 24, plain('script')),
-             { metal: 'metal-silver', script: 'steel-grey' })
+             { metal: 'metal-silver', script: 'steel-grey' }) + { title: 'Promise ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A signet ring standing upright, 21 mm across and 25 mm tall: a gold band rising to a flat oval table on top, set
@@ -121,7 +121,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
                box('crest-a', 'crest', [-0.001, 0.0235, -0.003], [0.001, 0.0245, 0.003]),
                box('crest-b', 'crest', [-0.003, 0.0235, -0.001], [0.003, 0.0245, 0.001]),
              ],
-             { gold: 'metal-gold', silver: 'metal-silver', crest: 'steel-grey' })
+             { gold: 'metal-gold', silver: 'metal-silver', crest: 'steel-grey' }) + { title: 'Signet ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A gold wedding ring standing upright, 21 mm across and 4 mm wide: a plain unbroken band with one small diamond
@@ -129,7 +129,7 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
   h.compound('wedding_ring', 0.0091,
              band('band', 0.0085, bandR, -0.002, 0.002, 24, plain('metal'))
              + [box('stone', 'stone', [-0.0012, 0.0192, -0.0012], [0.0012, 0.021, 0.0012])],
-             { metal: 'metal-gold', stone: 'gem-clear' })
+             { metal: 'metal-gold', stone: 'gem-clear' }) + { title: 'Wedding ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['hands'] } } },
 
   // A service medal lying face up, 35 mm wide and 92 mm long: a striped blue, white and red ribbon drape with a brass
@@ -152,6 +152,6 @@ local brilliant(id, slot, r, x, y0, z) = h.turned(id, slot, 'y', [[0, 0], [r * 0
              + [h.disc('boss', 'centre', 0.0075, 0, 0.004, 0, 0.038)]
              + [flat('star-core', 'star', [star[i] for i in std.range(0, 9) if i % 2 == 1], 0.004, 0.005)]
              + [flat('star-point-%d' % i, 'star', [star[(2 * i + 9) % 10], star[2 * i], star[2 * i + 1]], 0.004, 0.005) for i in std.range(0, 4)],
-             { edge: 'cloth-blue', stripe: 'cloth-cream', ribbon: 'cloth-red', brass: 'brass-polished', cross: 'bronze', centre: 'metal-gold', star: 'brass-polished' })
+             { edge: 'cloth-blue', stripe: 'cloth-cream', ribbon: 'cloth-red', brass: 'brass-polished', cross: 'bronze', centre: 'metal-gold', star: 'brass-polished' }) + { title: 'Service medal' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

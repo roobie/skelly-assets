@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 {
+  title: 'Cement mixer',
   // The drum and its frames take the place of the tipper's tub.
   sites: site.adjust(
     (import 'tipper_truck.placements.libsonnet').sites,

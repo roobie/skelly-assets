@@ -105,30 +105,30 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
   // A pair of white cotton ankle socks laid flat, 230 mm from heel to toe with a 50 mm cuff above the heel, a grey
   // heel and toe and a ribbed band at the top.
   h.compound('ankle_socks', 0.045, sockPair(0.08, 0.05, 0.23, 0.005, 0.02),
-    { sock: 'cloth-white', heel: 'felt-grey', toe: 'felt-grey', cuff: 'cloth-cotton', stripe: 'felt-grey' })
+    { sock: 'cloth-white', heel: 'felt-grey', toe: 'felt-grey', cuff: 'cloth-cotton', stripe: 'felt-grey' }) + { title: 'Ankle socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of plastic shopping bags flattened out, each 200 mm across and 400 mm long with its handles knotted where
   // it closed round the ankle.
   h.compound('bag_socks', 0.012, bagSock('l-', -0.12) + bagSock('r-', 0.12),
-    { bag: 'plastic-white', knot: 'plastic-frosted', print: 'plastic-blue' })
+    { bag: 'plastic-white', knot: 'plastic-frosted', print: 'plastic-blue' }) + { title: 'Bag socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['feet'] } } },
 
   // A pair of thin white crew socks laid flat, 230 mm heel to toe with a 150 mm leg, two red stripes round the cuff.
   h.compound('disposable_socks', 0.039, sockPair(0.08, 0.15, 0.23, 0.003, 0.03, [0.034, 0.05]),
-    { sock: 'cloth-white', heel: 'cloth-white', toe: 'cloth-white', cuff: 'cloth-white', stripe: 'cloth-red' })
+    { sock: 'cloth-white', heel: 'cloth-white', toe: 'cloth-white', cuff: 'cloth-white', stripe: 'cloth-red' }) + { title: 'Disposable socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of thick grey wool crew socks laid flat, 240 mm heel to toe with a 170 mm leg, a cream heel and toe and a
   // red stripe below a ribbed cuff.
   h.compound('wool_socks', 0.15, sockPair(0.09, 0.17, 0.24, 0.012, 0.035, [0.045]),
-    { sock: 'wool-grey', heel: 'paint-cream', toe: 'paint-cream', cuff: 'wool-grey', stripe: 'cloth-red' })
+    { sock: 'wool-grey', heel: 'paint-cream', toe: 'paint-cream', cuff: 'wool-grey', stripe: 'cloth-red' }) + { title: 'Wool socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of black cotton over-the-knee stockings laid flat, 230 mm heel to toe with a 600 mm leg and a wide grey
   // band at the top.
   h.compound('stockings', 0.14, sockPair(0.085, 0.6, 0.23, 0.005, 0.05, [0.06]),
-    { sock: 'cloth-black', heel: 'cloth-black', toe: 'cloth-black', cuff: 'felt-grey', stripe: 'felt-grey' })
+    { sock: 'cloth-black', heel: 'cloth-black', toe: 'cloth-black', cuff: 'felt-grey', stripe: 'felt-grey' }) + { title: 'Stockings' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // Six long cotton tubes laid flat side by side, each 750 mm long and 110 mm wide at its ribbed cuff, tapering to a
@@ -136,19 +136,19 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
   h.compound('tentacle_stockings', 0.45, std.flattenArrays([
     tentacleTube('t%d-' % i, (i - 2.5) * 0.125, -0.375, 0.75, 0.11, 0.008)
     for i in std.range(0, 5)
-  ]), { sock: 'cloth-green', cuff: 'cloth-white', stripe: 'cloth-white' })
+  ]), { sock: 'cloth-green', cuff: 'cloth-white', stripe: 'cloth-white' }) + { title: 'Tentacle stockings' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of straw rope sandals lying sole down, 240 mm long and 85 mm across, the woven soles ridged across, rope
   // loops along the sides and the long ties laid out beside them.
   h.compound('straw_sandals', 0.12, sandal('l-', -0.07) + sandal('r-', 0.07),
-    { sole: 'straw-wicker', weave: 'paperboard-tan', rope: 'paperboard-tan' })
+    { sole: 'straw-wicker', weave: 'paperboard-tan', rope: 'paperboard-tan' }) + { title: 'Straw sandals' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['feet'] } } },
 
   // A pair of black split-toe socks lying sole down, 250 mm long, each ankle cuff laid flat behind the heel and closed
   // by four brass clasps.
   h.compound('tabi', 0.1, tabi('l-', -0.055, -1) + tabi('r-', 0.055, 1),
-    { cloth: 'cloth-black', cuff: 'cloth-black', clasp: 'brass-dull' })
+    { cloth: 'cloth-black', cuff: 'cloth-black', clasp: 'brass-dull' }) + { title: 'Tabi socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of black leather boots that reach past the knee, 280 mm long and 660 mm tall, on a stacked 50 mm heel,
@@ -157,7 +157,7 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
     f.band(p + 'thigh', 'shaft', thighHigh, cx, 0.4, 0.63, 0.006),
     f.band(p + 'knee', 'collar', thighHigh, cx, 0.39, 0.4, 0.008),
     box(p + 'zip', 'zip', [if cx < 0 then cx + thighHigh.rx - 0.002 else cx - thighHigh.rx - 0.003, 0.04, f.shaftZ(thighHigh) - 0.005], [if cx < 0 then cx + thighHigh.rx + 0.003 else cx - thighHigh.rx + 0.002, 0.62, f.shaftZ(thighHigh) + 0.005]),
-  ]), { sole: 'rubber-black', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', zip: 'steel' })
+  ]), { sole: 'rubber-black', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', zip: 'steel' }) + { title: 'Thigh high boots' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'rubber'], slot: ['feet'] } } },
 
   // A pair of rubber overshoes standing, each a 170 mm shell over the front of a 290 mm foot with a steel cap over
@@ -168,6 +168,6 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
     box(p + 'heel-strap-l', 'strap', [cx - toecap.w * 0.48, 0, -toecap.l / 2], [cx - toecap.w * 0.48 + 0.006, 0.006, toecap.from + 0.01]),
     box(p + 'heel-strap-r', 'strap', [cx + toecap.w * 0.48 - 0.006, 0, -toecap.l / 2], [cx + toecap.w * 0.48, 0.006, toecap.from + 0.01]),
     box(p + 'buckle', 'buckle', [cx + toecap.w * 0.48, 0.026, toecap.from - 0.02], [cx + toecap.w * 0.48 + 0.004, 0.048, toecap.from - 0.004]),
-  ]), { sole: 'rubber-black', upper: 'rubber-black', steel: 'steel-grey', lining: 'paint-charcoal', strap: 'rubber-black', buckle: 'steel' })
+  ]), { sole: 'rubber-black', upper: 'rubber-black', steel: 'steel-grey', lining: 'paint-charcoal', strap: 'rubber-black', buckle: 'steel' }) + { title: 'Toecaps' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'metal'], slot: ['feet'] } } },
 ]

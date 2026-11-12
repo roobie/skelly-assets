@@ -18,7 +18,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     for i in [0, 1]
   ])
   + h.drawbar(s.front + 0.04, 0.5, s.tip, [s.frameLow, s.frameHigh]),
-  finish),
+  finish) + { title: 'Car trailer chassis' },
   // Cargo stands on a load floor's highest face, so every piece here tops out at the deck. A cargo cell must lie inside one
   // box, so the joins between boards and track fall on the 0.1 m cell lines.
   k.compound('car_trailer_deck', 120, [
@@ -27,7 +27,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('rub_rail', 'paint', [s.rear, s.deckLow - 0.04, s.side - 0.02], [s.front, s.deck, s.side + 0.02]),
     box('track', 'paint', [s.rear, s.deckLow, 0.6], [1.1, s.deck, s.side - 0.02]),
     box('front_boards', 'wood', [1.1, s.deckLow, 0.6], [s.front, s.deck, s.side - 0.02]),
-  ]), { wood: 'wood-oak', paint: s.paint }),
+  ]), { wood: 'wood-oak', paint: s.paint }) + { title: 'Car trailer deck' },
   // Stowed flat beside the main rail under the deck, running forward from the rear rail and stopping short of the wheels.
   k.compound('car_trailer_ramp', 30, [
     box('tread', 'ramp', [s.rear, s.rampLow, s.rampInner], [s.rear + s.rampLength, s.rampLow + 0.06, s.rampOuter]),
@@ -35,15 +35,15 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     local x = s.rear + s.rampLength * (i + 1) / 6;
     box('cleat_' + i, 'ramp', [x - 0.02, s.rampLow - 0.02, s.rampInner], [x + 0.02, s.rampLow, s.rampOuter])
     for i in std.range(0, 4)
-  ], { ramp: s.ramp }),
+  ], { ramp: s.ramp }) + { title: 'Car trailer ramp' },
   k.compound('car_trailer_wheel_stop', 30, [
     box('bar', 'frame', [1.1, s.deck, -s.side + 0.1], [1.26, s.deck + 0.16, s.side - 0.1]),
-  ], finish),
+  ], finish) + { title: 'Car trailer wheel stop' },
   k.compound('car_trailer_headboard', 32, [
     box('top', 'paint', [1.48, 1.22, -0.5], [1.56, 1.3, 0.5]),
     box('winch_bar', 'paint', [1.48, 0.86, -0.5], [1.56, 0.92, 0.5]),
     box('winch', 'frame', [1.34, 0.92, -0.14], [1.56, 1.1, 0.14]),
   ] + bothSides([
     box('post', 'paint', [1.48, s.deck, 0.44], [1.56, 1.3, 0.5]),
-  ]), finish),
+  ]), finish) + { title: 'Car trailer headboard' },
 ])

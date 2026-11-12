@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local bus = import 'bus-body.libsonnet';
 local s = import 'articulated_bus.spec.libsonnet';
+local vehicle = import 'articulated_bus.placements.libsonnet';
 local box = k.box;
 local endsWith(id, suffixes) = std.length([1 for suffix in suffixes if std.endsWith(id, suffix)]) > 0;
 local x = s.bellowsX;
@@ -23,22 +24,22 @@ local rib(i) =
   ];
 taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, [
   r
-  for r in bus.rows('articulated_bus', s.fore)
+  for r in bus.rows('articulated_bus', vehicle.title, s.fore)
   if r.id != 'articulated_bus_rear_bumper'
 ] + [
   r
-  for r in bus.rows('articulated_bus_aft', s.aft)
+  for r in bus.rows('articulated_bus_aft', vehicle.title + ' rear section', s.aft)
   if endsWith(r.id, ['_shell', '_rear_bumper', '_rear_panel', '_rear_window'])
 ] + [
   k.compound('articulated_bus_bellows', 160, std.flattenArrays([rib(i) for i in std.range(0, ribs - 1)]), {
     fold: 'rubber-black',
     gusset: 'plastic-charcoal',
-  }),
+  }) + { title: 'Articulated bus bellows' },
   // Paints over the windscreen pillar the rear section's shell keeps at this end, so both ends of the joint match.
   k.compound('articulated_bus_aft_end_panel', 30, k.bothSides([
     box('panel', 'paint', [s.aft.front - 0.25, s.aft.decks[0].waist, s.aft.skin - 0.01], [s.aft.front, s.aft.decks[0].top, s.aft.side + 0.03]),
-  ]), { paint: s.aft.paint }),
+  ]), { paint: s.aft.paint }) + { title: 'Articulated bus rear section end panel' },
   k.compound('articulated_bus_joint', 420, [
     box('turntable', 'plate', [x[0] - 0.02, s.fore.sill, -s.fore.skin], [x[1] + 0.02, s.fore.floor, s.fore.skin]),
-  ], { plate: 'plastic-charcoal' }),
+  ], { plate: 'plastic-charcoal' }) + { title: 'Articulated bus joint' },
 ])

@@ -3,6 +3,7 @@
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'microcar.spec.libsonnet';
 {
+  title: 'Electric microcar',
   parent: 'microcar',
   sites(base): powertrain.electric(base, {
     over: { shell: { part: 'electric_microcar_shell' }, front_bumper: { part: 'electric_microcar_front_bumper' } },

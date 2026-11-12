@@ -46,7 +46,7 @@ local heatPack(used) =
     box('plug', 'plug', [-0.1, 0.02, -0.012], [-0.075, 0.04, 0.012]),
     box('pin-a', 'pin', [-0.106, 0.026, -0.008], [-0.1, 0.034, -0.006]),
     box('pin-b', 'pin', [-0.106, 0.026, 0.006], [-0.1, 0.034, 0.008]),
-  ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + h.gripOn('electric_carving_knife', 'handle') + {
+  ], { body: 'plastic-white', trigger: 'plastic-charcoal', collar: 'plastic-charcoal', blade: 'steel-stainless', rivet: 'steel-grey', cord: 'plastic-white', plug: 'plastic-white', pin: 'brass' }) + { title: 'Electric carving knife' } + h.gripOn('electric_carving_knife', 'handle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], place: ['kitchen'], setting: ['modern'] } } },
 
@@ -67,7 +67,7 @@ local heatPack(used) =
   ] + [
     box('tap', 'tap', [-0.008, 0.006, 0.064], [0.008, 0.02, 0.085]),
     box('tap-lever', 'tap', [-0.004, 0.02, 0.072], [0.004, 0.034, 0.08]),
-  ], { frame: 'plastic-white', gravel: 'stone-grey', sand: 'brick-buff', charcoal: 'coal-black', pad: 'cloth-cream', reservoir: 'plastic-clear-blue', tap: 'plastic-blue' }) + {
+  ], { frame: 'plastic-white', gravel: 'stone-grey', sand: 'brick-buff', charcoal: 'coal-black', pad: 'cloth-cream', reservoir: 'plastic-clear-blue', tap: 'plastic-blue' }) + { title: 'Charcoal water filter' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['water-purification'] } },
 
@@ -96,7 +96,7 @@ local heatPack(used) =
   ] + [
     around('foot-%d' % i, 'leg', 60 + 120 * i, 0.13, 0.04, 0.04, 0, 0.008)
     for i in std.range(0, 2)
-  ], { body: 'paint-charcoal', trim: 'steel-grey', handle: 'plastic-black', thermo: 'paint-white', door: 'paint-charcoal', leg: 'steel-grey' }) + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
+  ], { body: 'paint-charcoal', trim: 'steel-grey', handle: 'plastic-black', thermo: 'paint-white', door: 'paint-charcoal', leg: 'steel-grey' }) + { title: 'Charcoal smoker' } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A small charcoal cooker 300 mm tall to the top of its flue: a 120 mm steel tank with a firebox door and a
   // pot grate on top, a flue pipe out the back that turns up, and a brass pilot valve on the front.
@@ -112,7 +112,7 @@ local heatPack(used) =
     h.tube('flue-out', 'flue', 0, 0.014, 0, 0.05) + { axis: 'z', origin: [0, 0.11, -0.1] },
     ring('flue-up', 'flue', 0.01, 0.014, 0.096, 0.3, 0, -0.105),
     ring('flue-cap', 'rim', 0.01, 0.02, 0.29, 0.296, 0, -0.105),
-  ], { tank: 'iron-dull', rim: 'steel-grey', grate: 'iron-cast', door: 'iron-cast', pilot: 'brass', flue: 'steel-galvanised' }) + {
+  ], { tank: 'iron-dull', rim: 'steel-grey', grate: 'iron-cast', door: 'iron-cast', pilot: 'brass', flue: 'steel-galvanised' }) + { title: 'Charcoal cooker' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
@@ -124,7 +124,7 @@ local heatPack(used) =
     ]),
     box('lug-a', 'pot', [-0.106, 0.1, -0.015], [-0.082, 0.112, 0.015]),
     box('lug-b', 'pot', [0.082, 0.1, -0.015], [0.106, 0.112, 0.015]),
-  ], { pot: 'clay-terracotta' }) + {
+  ], { pot: 'clay-terracotta' }) + { title: 'Clay pot' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
 
@@ -137,7 +137,7 @@ local heatPack(used) =
     box('handle-top', 'body', [-0.1, 0.075, -0.007], [-0.05, 0.088, 0.007]),
     box('handle-bottom', 'body', [-0.095, 0.022, -0.007], [-0.055, 0.034, 0.007]),
     box('handle-back', 'body', [-0.112, 0.03, -0.007], [-0.096, 0.086, 0.007]),
-  ], { body: 'clay-terracotta', lid: 'clay-terracotta' }) + {
+  ], { body: 'clay-terracotta', lid: 'clay-terracotta' }) + { title: 'Clay teapot' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['ceramic'], place: ['kitchen'] }, keywords: ['cooking'] } },
 
@@ -157,7 +157,7 @@ local heatPack(used) =
     box('carafe-handle', 'body', [-0.007, 0.06, 0.103], [0.007, 0.136, 0.115]),
     box('carafe-handle-low', 'body', [-0.007, 0.06, 0.09], [0.007, 0.07, 0.115]),
     box('switch', 'switch', [0.04, 0.008, 0.11], [0.07, 0.022, 0.114]),
-  ], { body: 'plastic-black', gauge: 'plastic-clear', plate: 'steel-grey', basket: 'plastic-charcoal', carafe: 'glass-clear', coffee: 'wood-walnut', switch: 'plastic-red' }) + {
+  ], { body: 'plastic-black', gauge: 'plastic-clear', plate: 'steel-grey', basket: 'plastic-charcoal', carafe: 'glass-clear', coffee: 'wood-walnut', switch: 'plastic-red' }) + { title: 'Coffeemaker' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
@@ -173,7 +173,7 @@ local heatPack(used) =
     h.ball('crystal-%d' % i, 'crystal', 0.005, p[0], 0.016 + i * 0.006, p[1], 1.2)
     for i in std.range(0, 4)
     for p in [[[0.003, 0.0], [-0.002, 0.003], [0, -0.003], [0.003, 0.002], [-0.003, -0.001]][i]]
-  ], { glass: 'glass-clear', syrup: 'resin-honey', skewer: 'wood-birch', peg: 'wood-pine', spring: 'steel-grey', crystal: 'salt-white' }) + h.inHand('crystallizing_sugar', 'glass') + {
+  ], { glass: 'glass-clear', syrup: 'resin-honey', skewer: 'wood-birch', peg: 'wood-pine', spring: 'steel-grey', crystal: 'salt-white' }) + { title: 'Crystallising sugar' } + h.inHand('crystallizing_sugar', 'glass') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'food', tags: { material: ['glass'] } } },
 
@@ -191,7 +191,7 @@ local heatPack(used) =
   ]) + [
     h.turned('lid', 'base', 'y', [[0, 0], [0, 0.14], [0.012, 0.136], [0.025, 0.1], [0.03, 0]], [0, 0.22, 0]),
     h.disc('vent', 'dial', 0.03, 0.25, 0.256),
-  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  ], { base: 'plastic-white', dial: 'plastic-charcoal', tray: 'plastic-amber', lip: 'plastic-white' }) + { title: 'Dehydrator' } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A 1 litre glass jar 132 mm tall, left open, full of brine with peeled eggs packed in it.
   h.compound('fermenting_eggs', 1.3, [
@@ -205,7 +205,7 @@ local heatPack(used) =
     h.ball('egg-%d' % i, 'egg', 0.02, p[0], p[1], p[2], 1.3)
     for i in std.range(0, 5)
     for p in [[[-0.02, 0.03, 0.0], [0.02, 0.03, 0.005], [0, 0.06, -0.022], [0.0, 0.065, 0.02], [-0.015, 0.098, 0.0], [0.018, 0.1, 0.004]][i]]
-  ], { jar: 'glass-clear', thread: 'glass-clear', brine: 'syrup-green', egg: 'wax-cream' }) + h.inHand('fermenting_eggs', 'jar') + {
+  ], { jar: 'glass-clear', thread: 'glass-clear', brine: 'syrup-green', egg: 'wax-cream' }) + { title: 'Fermenting eggs' } + h.inHand('fermenting_eggs', 'jar') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'food', tags: { material: ['glass'], state: ['opened'] } } },
 
@@ -223,7 +223,7 @@ local heatPack(used) =
       box('vent-%d' % (s + 1), 'vent', [-0.018, 0.012, s * 0.0375 - 0.0022], [0.018, 0.03, s * 0.0375 + 0.0022]),
     ]
     for s in [-1, 1]
-  ]), { stove: 'alu-bare', fuel: 'chalk-white', vent: 'plastic-charcoal' }) + h.inHand('hexamine_stove', 'base') + {
+  ]), { stove: 'alu-bare', fuel: 'chalk-white', vent: 'plastic-charcoal' }) + { title: 'Hexamine stove' } + h.inHand('hexamine_stove', 'base') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
@@ -243,7 +243,7 @@ local heatPack(used) =
     h.turned('chute', 'lid', 'y', [[0, 0.028], [0, 0.036], [0.09, 0.036], [0.09, 0.028], [0, 0.028]], [0.045, 0.292, 0]),
     h.disc('pusher', 'pusher', 0.027, 0.3, 0.4, 0.045, 0),
     h.disc('pusher-cap', 'pusher', 0.04, 0.392, 0.4, 0.045, 0),
-  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  ], { base: 'plastic-white', button: 'plastic-charcoal', bowl: 'plastic-clear', blade: 'steel-stainless', lid: 'plastic-clear', pusher: 'plastic-white' }) + { title: 'Food processor' } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A pressure stove for petrol 210 mm tall and 140 mm across the pot supports: a brass tank with a filler cap
   // and a pump, a burner on a riser, three legs carrying a pot ring, and a valve key.
@@ -264,17 +264,17 @@ local heatPack(used) =
       around('clamp-%d' % i, 'leg', 30 + 120 * i, 0.05, 0.016, 0.012, 0.07, 0.078),
     ]
     for i in std.range(0, 2)
-  ]), { tank: 'brass', cap: 'brass-dull', burner: 'brass-dull', leg: 'steel-grey', pump: 'steel-grey', key: 'steel-grey' }) + {
+  ]), { tank: 'brass', cap: 'brass-dull', burner: 'brass-dull', leg: 'steel-grey', pump: 'steel-grey', key: 'steel-grey' }) + { title: 'Gasoline cooker' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['camping', 'cooking'] } },
 
   // A single-use chemical heat pack, 120 by 90 mm and 12 mm thick, with a pull tab to start it.
-  h.compound('heatpack', 0.06, heatPack(false), { pouch: 'plastic-white', crimp: 'plastic-white', print: 'plastic-red', tab: 'plastic-orange' }) + h.inHand('heatpack', 'pouch') + h.label('print', '+y') + {
+  h.compound('heatpack', 0.06, heatPack(false), { pouch: 'plastic-white', crimp: 'plastic-white', print: 'plastic-red', tab: 'plastic-orange' }) + { title: 'Heat pack' } + h.inHand('heatpack', 'pouch') + h.label('print', '+y') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['cold-weather'] } },
 
   // The same pack spent: flatter, gone hard in lumps, its print faded and its tab gone.
-  h.compound('used_heat_pack', 0.065, heatPack(true), { pouch: 'plastic-grey', crimp: 'plastic-grey', print: 'paint-oxblood', lump: 'plastic-grey' }) + h.inHand('used_heat_pack', 'pouch') + {
+  h.compound('used_heat_pack', 0.065, heatPack(true), { pouch: 'plastic-grey', crimp: 'plastic-grey', print: 'paint-oxblood', lump: 'plastic-grey' }) + { title: 'Used heat pack' } + h.inHand('used_heat_pack', 'pouch') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['cold-weather'] } },
 ]

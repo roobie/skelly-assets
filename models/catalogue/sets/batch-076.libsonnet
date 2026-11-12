@@ -27,7 +27,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
       h.prism('shank-a', 'handle', 'y', [[0.002, -0.034], [0.002, 0.004], [0.010, 0.004], [0.010, -0.036]], 0.002, 0.007),
       h.prism('shank-b', 'handle', 'y', [[-0.010, -0.036], [-0.010, 0.004], [-0.002, 0.004], [-0.002, -0.034]], -0.003, 0.002),
       h.disc('pivot', 'pivot', 0.004, -0.004, 0.009, 0.0, 0.0),
-    ], { blade: 'steel-stainless', handle: 'plastic-orange', pivot: 'steel-grey' }) + h.gripOn('pinking_scissors', 'loop-a') + {
+    ], { blade: 'steel-stainless', handle: 'plastic-orange', pivot: 'steel-grey' }) + { title: 'Pinking scissors' } + h.gripOn('pinking_scissors', 'loop-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // A full-strip desk stapler, 160 mm long, 38 mm wide and 55 mm tall: a black plastic cap over an aluminium magazine,
@@ -40,7 +40,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.prism('magazine', 'magazine', 'z', [[-0.076, 0.018], [0.074, 0.020], [0.074, 0.032], [-0.076, 0.032]], -0.013, 0.013),
     h.prism('cap', 'cap', 'z', [[-0.080, 0.030], [0.080, 0.032], [0.080, 0.044], [0.055, 0.055], [-0.060, 0.050], [-0.080, 0.042]], -0.018, 0.018),
     h.box('strike', 'anvil', [0.068, 0.016, -0.010], [0.074, 0.032, 0.010]),
-  ], { base: 'plastic-black', foot: 'rubber-black', anvil: 'steel-grey', magazine: 'alu-bare', cap: 'plastic-charcoal' }) + h.gripOn('stapler', 'cap') + {
+  ], { base: 'plastic-black', foot: 'rubber-black', anvil: 'steel-grey', magazine: 'alu-bare', cap: 'plastic-charcoal' }) + { title: 'Stapler' } + h.gripOn('stapler', 'cap') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['office'], setting: ['modern'] } } },
   // A 200 mm length of leg bone, 30 mm thick in the shaft and swelling to 46 mm at the knuckled ends.
@@ -50,7 +50,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.ball('knuckle-b', 'bone', 0.011, -0.090, 0.024, -0.011),
     h.ball('knuckle-c', 'bone', 0.011, 0.091, 0.022, 0.011),
     h.box('scuff', 'wear', [0.080, 0.036, -0.012], [0.098, 0.040, 0.012]),
-  ], { bone: 'bone', wear: 'body-bone' }) + h.gripOn('bone_billet', 'shaft') + {
+  ], { bone: 'bone', wear: 'body-bone' }) + { title: 'Bone billet' } + h.gripOn('bone_billet', 'shaft') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['prehistoric'] } } },
   // A 200 mm baton of hardwood, 40 mm thick, the bark left on the grip and the striking end rounded and bruised.
@@ -58,7 +58,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.turned('baton', 'wood', 'x', [[0, 0], [0, 0.016], [0.004, 0.019], [0.180, 0.020], [0.192, 0.018], [0.200, 0.011], [0.200, 0]], [-0.100, 0.020, 0]),
     h.turned('bark', 'bark', 'x', [[0, 0], [0, 0.0175], [0.004, 0.0205], [0.090, 0.0205], [0.090, 0]], [-0.100, 0.020, 0]),
     h.turned('bruise', 'bruise', 'x', [[0, 0], [0, 0.0185], [0.008, 0.0115], [0.008, 0]], [0.093, 0.020, 0]),
-  ], { wood: 'wood-oak', bark: 'bark', bruise: 'wood-walnut' }) + h.gripOn('wooden_billet', 'bark') + {
+  ], { wood: 'wood-oak', bark: 'bark', bruise: 'wood-walnut' }) + { title: 'Wooden billet' } + h.gripOn('wooden_billet', 'bark') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A 200 mm straight wooden spindle, 30 mm thick, its working end ground flat and caked with wet rock grit, a
@@ -67,7 +67,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.turned('spindle', 'wood', 'x', [[0, 0], [0, 0.012], [0.006, 0.015], [0.030, 0.015], [0.036, 0.011], [0.050, 0.011], [0.056, 0.015], [0.186, 0.015], [0.186, 0]], [-0.100, 0.015, 0]),
     h.turned('grit', 'grit', 'x', [[0, 0], [0, 0.0155], [0.010, 0.0155], [0.014, 0.0135], [0.014, 0]], [0.086, 0.015, 0]),
     h.turned('cord', 'cord', 'x', [[0, 0], [0, 0.0125], [0.012, 0.0125], [0.012, 0]], [-0.067, 0.015, 0]),
-  ], { wood: 'wood-birch', grit: 'stone-grey', cord: 'cord-cotton' }) + h.gripOn('stick_rock_drill', 'spindle') + {
+  ], { wood: 'wood-birch', grit: 'stone-grey', cord: 'cord-cotton' }) + { title: 'Stick and rock drill' } + h.gripOn('stick_rock_drill', 'spindle') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
   // A 150 mm stub of bone, 36 mm across the knuckle end, ground down to a short blunt point.
@@ -76,7 +76,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.ball('knuckle-a', 'bone', 0.010, -0.066, 0.020, 0.009),
     h.ball('knuckle-b', 'bone', 0.009, -0.066, 0.019, -0.009),
     h.turned('tip', 'tip', 'x', [[0, 0], [0, 0.0045], [0.010, 0.0015], [0.010, 0]], [0.065, 0.018, 0]),
-  ], { bone: 'bone', tip: 'body-bone' }) + h.gripOn('bone_punch', 'body') + {
+  ], { bone: 'bone', tip: 'body-bone' }) + { title: 'Bone punch' } + h.gripOn('bone_punch', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['prehistoric'] } } },
   // A 150 mm punch: a round 100 mm nail clamped between two split wooden cheeks 130 mm long, bound with three
@@ -88,7 +88,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.box('wrap-a', 'cord', [-0.062, -0.0015, -0.0125], [-0.052, 0.0225, 0.0125]),
     h.box('wrap-b', 'cord', [-0.012, -0.0015, -0.0125], [-0.002, 0.0225, 0.0125]),
     h.box('wrap-c', 'cord', [0.038, -0.0015, -0.0125], [0.048, 0.0225, 0.0125]),
-  ], { wood: 'wood-pine', nail: 'steel-grey', cord: 'jute' }) + h.gripOn('nail_punch', 'cheek-b') + {
+  ], { wood: 'wood-pine', nail: 'steel-grey', cord: 'jute' }) + { title: 'Nail punch' } + h.gripOn('nail_punch', 'cheek-b') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
   // A 150 mm sewing awl: a 75 mm grip carved from a bone end, then a 75 mm spike tapering to a needle point.
@@ -96,7 +96,7 @@ local loop(id, x, z, r0, r1, y0, y1) = h.turned(id, 'handle', 'y', [[0, r0], [0,
     h.turned('grip', 'handle', 'x', [[0, 0], [0, 0.013], [0.006, 0.017], [0.020, 0.016], [0.035, 0.012], [0.070, 0.011], [0.075, 0.008], [0.075, 0]], [-0.075, 0.017, 0]),
     h.ball('knob', 'handle', 0.009, -0.068, 0.019, 0.008),
     h.turned('spike', 'point', 'x', [[0, 0], [0, 0.0065], [0.040, 0.004], [0.072, 0.0012], [0.075, 0.0004], [0.075, 0]], [0, 0.017, 0]),
-  ], { handle: 'bone', point: 'body-bone' }) + h.gripOn('bone_awl', 'grip') + {
+  ], { handle: 'bone', point: 'body-bone' }) + { title: 'Bone awl' } + h.gripOn('bone_awl', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['bone'], setting: ['prehistoric'] } } },
 ]

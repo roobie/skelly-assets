@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'bulldozer.spec.libsonnet';
 local track = import 'track-kit.libsonnet';
 {
+  title: 'Bulldozer',
   sites: [
     site.one('mainframe', 'bulldozer_mainframe'),
     site.one('hood', 'bulldozer_hood'),

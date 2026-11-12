@@ -5,6 +5,7 @@ local s = import 'overturned_delivery_van.spec.libsonnet';
 local hubAcross = s.across - s.hub;
 local seatAcross = s.across - s.floor;
 {
+  title: 'Overturned delivery van',
   sites: [
     one('shell', 'overturned_delivery_van_shell'),
     one('chassis', 'overturned_delivery_van_chassis'),

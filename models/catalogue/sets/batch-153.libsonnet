@@ -94,13 +94,13 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
     fold(0.22, 0.2, 0.024, 3)
     + [box('waistband', 'waistband', [-0.11, 0.022, -0.1], [0.11, 0.028, -0.055])]
     + [box('seam', 'seam', [-0.002, 0.024, -0.055], [0.002, 0.026, 0.09])],
-    { cloth: 'cloth-black', waistband: 'cloth-charcoal', seam: 'cloth-charcoal' })
+    { cloth: 'cloth-black', waistband: 'cloth-charcoal', seam: 'cloth-charcoal' }) + { title: 'Leggings' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // A rag loincloth laid flat, 180 mm across and 300 mm long on a 600 mm tie cord: mismatched cotton scraps.
   h.compound('loincloth', 0.069,
     loincloth(0.18, 0.3, 0.004, [[-0.08, -0.08, -0.01, 0.02, 'patch'], [0.015, 0.0, 0.085, 0.09, 'patch-b']]),
-    { cloth: 'cloth-rag', cord: 'cord-cotton', patch: 'cloth-khaki', 'patch-b': 'cloth-cream' })
+    { cloth: 'cloth-rag', cord: 'cord-cotton', patch: 'cloth-khaki', 'patch-b': 'cloth-cream' }) + { title: 'Loincloth' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'] } } },
 
   // A fur pelt loincloth laid flat, 200 mm across and 300 mm long with its leg tabs and tail, tied on with a
@@ -115,7 +115,7 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
       for z in [[-0.1, -0.1, 0.07, 0.07][k]]
     ]
     + [h.prism('tail', 'cloth', 'y', [[0.14, -0.03], [0.14, 0.03], [0.2, 0.012], [0.2, -0.012]], 0, 0.012)],
-    { cloth: 'fur-brown', cord: 'skin-rawhide', belly: 'fur-pale' })
+    { cloth: 'fur-brown', cord: 'skin-rawhide', belly: 'fur-pale' }) + { title: 'Fur loincloth' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 
   // A leather loincloth laid flat, 200 mm across and 300 mm long: square leather patches stitched together on a
@@ -127,13 +127,13 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
       [-0.003, -0.13, 0.003, 0.14, 'stitch'],
       [-0.1, -0.003, 0.1, 0.003, 'stitch'],
     ], false, 0.005, 0.65),
-    { cloth: 'leather-brown', cord: 'leather-tan', patch: 'leather-chestnut', stitch: 'cord-cotton' })
+    { cloth: 'leather-brown', cord: 'leather-tan', patch: 'leather-chestnut', stitch: 'cord-cotton' }) + { title: 'Leather loincloth' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'] } } },
 
   // A wool loincloth laid flat, 170 mm across and 280 mm long on a 600 mm cord: knitted scraps sewn together.
   h.compound('wool_loincloth', 0.083,
     loincloth(0.17, 0.28, 0.006, [[-0.075, -0.07, 0.0, 0.03, 'patch'], [0.01, 0.01, 0.08, 0.08, 'patch-b']]),
-    { cloth: 'wool-grey', cord: 'cord-cotton', patch: 'felt-grey', 'patch-b': 'felt-brown' })
+    { cloth: 'wool-grey', cord: 'cord-cotton', patch: 'felt-grey', 'patch-b': 'felt-brown' }) + { title: 'Wool loincloth' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'] } } },
 
   // A cotton skirt far shorter than a miniskirt laid flat: 360 mm across the flared hem, 260 mm at the waist and 140 mm
@@ -150,17 +150,17 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
       for k in [0, 1]
       for s in [[-1, 1][k]]
     ],
-    { cloth: 'cloth-denim', waistband: 'cloth-denim', button: 'metal-silver', seam: 'cloth-cream' })
+    { cloth: 'cloth-denim', waistband: 'cloth-denim', button: 'metal-silver', seam: 'cloth-cream' }) + { title: 'Nanoskirt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'] } } },
 
   // Plain khaki cotton trousers folded, 260 mm by 340 mm and 56 mm tall: belt loops, a button and a back pocket.
   folded('pants', 0.69, { ht: 0.056, pocket: { x: 0.06, z: -0.07, w: 0.11, d: 0.12 } },
-         { cloth: 'cloth-khaki', waistband: 'cloth-khaki', loop: 'cloth-khaki', button: 'brass-dull', seam: 'cloth-brown', pocket: 'cloth-khaki' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-khaki', waistband: 'cloth-khaki', loop: 'cloth-khaki', button: 'brass-dull', seam: 'cloth-brown', pocket: 'cloth-khaki' }) + { title: 'Pants' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Military field trousers folded, 270 mm by 340 mm and 64 mm tall: a flapped back pocket and a bellows cargo
   // pocket on the thigh.
   folded('army_trousers', 0.85, { w: 0.27, ht: 0.064, pocket: { x: 0.07, z: -0.09, w: 0.1, d: 0.1, flap: 0.03 }, cargo: { x: -0.05, z: 0.06, w: 0.12, d: 0.13 } },
-         { cloth: 'cloth-olive-drab', waistband: 'cloth-olive-drab', loop: 'cloth-olive-drab', button: 'plastic-matte-black', seam: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-olive-drab', waistband: 'cloth-olive-drab', loop: 'cloth-olive-drab', button: 'plastic-matte-black', seam: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { title: 'Army trousers' } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Checkered cotton trousers folded, 260 mm by 320 mm and 40 mm tall: a small check of raised grey squares, 16 mm
   // across, on charcoal cloth stands in for the print, which no finish provides.
@@ -172,38 +172,38 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
       for j in std.range(0, 17)
       if (i + j) % 2 == 0
     ],
-    { cloth: 'cloth-charcoal', waistband: 'cloth-charcoal', loop: 'cloth-charcoal', button: 'metal-silver', seam: 'cloth-black', check: 'cloth-heather-grey' })
+    { cloth: 'cloth-charcoal', waistband: 'cloth-charcoal', loop: 'cloth-charcoal', button: 'metal-silver', seam: 'cloth-black', check: 'cloth-heather-grey' }) + { title: 'Checkered trousers' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Cotton trousers lined with synthetic fur, folded thick, 280 mm by 360 mm and 90 mm tall: pale fur shows at the
   // waist and along the folded sides.
   folded('faux_fur_trousers', 1.3, { w: 0.28, d: 0.36, ht: 0.09, folds: 4, lining: true, pocket: { x: 0.07, z: -0.08, w: 0.11, d: 0.12 } },
-         { cloth: 'cloth-charcoal', waistband: 'cloth-charcoal', loop: 'cloth-charcoal', button: 'metal-silver', seam: 'cloth-black', pocket: 'cloth-charcoal', lining: 'fur-pale' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-charcoal', waistband: 'cloth-charcoal', loop: 'cloth-charcoal', button: 'metal-silver', seam: 'cloth-black', pocket: 'cloth-charcoal', lining: 'fur-pale' }) + { title: 'Faux fur trousers' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Cotton trousers lined with real fur, folded thick, 280 mm by 360 mm and 90 mm tall, a drawcord at the waist and
   // brown fur showing at the waist and sides.
   folded('fur_trousers', 1.3, { w: 0.28, d: 0.36, ht: 0.09, folds: 4, lining: true, loops: false },
-         { cloth: 'cloth-brown', waistband: 'cloth-brown', seam: 'leather-brown', cord: 'skin-rawhide', lining: 'fur-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
+         { cloth: 'cloth-brown', waistband: 'cloth-brown', seam: 'leather-brown', cord: 'skin-rawhide', lining: 'fur-brown' }) + { title: 'Fur trousers' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], state: ['folded'] } } },
 
   // Light nylon hiking trousers folded, 250 mm by 330 mm and 50 mm tall: a flapped back pocket, a slim cargo
   // pocket and a knee seam where the zip-off leg joins.
   h.compound('hiking_trousers', 0.35,
     trousers({ w: 0.25, d: 0.33, ht: 0.05, pocket: { x: 0.065, z: -0.085, w: 0.09, d: 0.09, flap: 0.025 }, cargo: { x: -0.06, z: 0.03, w: 0.09, d: 0.1, flap: 0.025 } })
     + [box('zip', 'zip', [-0.125, 0.05, 0.1], [0.125, 0.053, 0.106])],
-    { cloth: 'cloth-ucp', waistband: 'cloth-ucp', loop: 'cloth-ucp', button: 'plastic-matte-black', seam: 'cloth-charcoal', pocket: 'cloth-ucp', flap: 'cloth-charcoal', stud: 'plastic-matte-black', zip: 'plastic-matte-black' })
+    { cloth: 'cloth-ucp', waistband: 'cloth-ucp', loop: 'cloth-ucp', button: 'plastic-matte-black', seam: 'cloth-charcoal', pocket: 'cloth-ucp', flap: 'cloth-charcoal', stud: 'plastic-matte-black', zip: 'plastic-matte-black' }) + { title: 'Hiking trousers' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Black leather trousers folded, 270 mm by 340 mm and 60 mm tall: belt loops, a steel button and a long side
   // seam, no pockets.
   folded('leather_trousers', 1.5, { w: 0.27, ht: 0.06, folds: 3 },
-         { cloth: 'leather-black', waistband: 'leather-black', loop: 'leather-black', button: 'steel-bright', seam: 'leather-charcoal' }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'leather-black', waistband: 'leather-black', loop: 'leather-black', button: 'steel-bright', seam: 'leather-charcoal' }) + { title: 'Leather trousers' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Insulated ski trousers folded, 270 mm by 340 mm and 60 mm tall: an elastic drawcord waist and padded knees.
   folded('ski_trousers', 0.77, { w: 0.27, d: 0.34, ht: 0.06, folds: 3, loops: false, knee: { z: 0.07, d: 0.12 } },
-         { cloth: 'cloth-navy', waistband: 'nylon-black', seam: 'nylon-black', cord: 'cord-cotton', knee: 'nylon-black' }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-navy', waistband: 'nylon-black', seam: 'nylon-black', cord: 'cord-cotton', knee: 'nylon-black' }) + { title: 'Ski trousers' } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Tactical trousers folded, 270 mm by 340 mm and 64 mm tall: reinforced belt loops, flapped back pocket, cargo
   // pocket with a press stud and an articulated knee panel.
   folded('tactical_trousers', 0.86, { w: 0.27, ht: 0.064, pocket: { x: 0.075, z: -0.09, w: 0.09, d: 0.09, flap: 0.025 }, cargo: { x: 0.06, z: 0.045, w: 0.11, d: 0.12 }, knee: { z: 0.07, d: 0.12 } },
-         { cloth: 'nylon-coyote', waistband: 'nylon-coyote', loop: 'webbing-black', button: 'plastic-matte-black', seam: 'cloth-brown', pocket: 'nylon-coyote', flap: 'cloth-brown', stud: 'plastic-matte-black', knee: 'cloth-brown' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'nylon-coyote', waistband: 'nylon-coyote', loop: 'webbing-black', button: 'plastic-matte-black', seam: 'cloth-brown', pocket: 'nylon-coyote', flap: 'cloth-brown', stud: 'plastic-matte-black', knee: 'cloth-brown' }) + { title: 'Tactical trousers' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 ]

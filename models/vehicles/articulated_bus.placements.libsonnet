@@ -20,6 +20,7 @@ local inAft(placed) = placed { id: 'aft_' + placed.id, part: rename(placed.part)
 local midAxle(placed) = if placed.id == 'rear_axle' then placed { part: wheelKit.axle('trailer_axle_truck', std.get(s.fore, 'wheelBrakes')) } else placed;
 local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
 {
+  title: 'Articulated bus',
   sites: [
     midAxle(placed)
     for placed in bus.fittings(site.kit, 'articulated_bus', s.fore)

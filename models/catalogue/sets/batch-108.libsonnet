@@ -141,13 +141,13 @@ local legGuard(p, cx, s) =
   // A pair of mild steel splint vambraces laid side by side, open side down, each 120 mm from the forearm end to the
   // wrist and 110 mm across: canvas shells with four riveted steel splints alternating with bare canvas, leather
   // binding and one buckled strap. The high steel pair shares this model with its own splint finish.
-  h.compound('high_carbon_steel_splint_vambraces', 0.43, splintGuard('l-', -0.075, 0, 0.12, 0.11, 0.095, 0.07, 4, [0]) + splintGuard('r-', 0.075, 0, 0.12, 0.11, 0.095, 0.07, 4, [0]), splintFinishes('steel-bright'))
+  h.compound('high_carbon_steel_splint_vambraces', 0.43, splintGuard('l-', -0.075, 0, 0.12, 0.11, 0.095, 0.07, 4, [0]) + splintGuard('r-', 0.075, 0, 0.12, 0.11, 0.095, 0.07, 4, [0]), splintFinishes('steel-bright')) + { title: 'High-carbon steel splint vambraces' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of mild steel brigandine gloves laid flat side by side, backs up, each 250 mm from cuff to fingertip and
   // 100 mm across the knuckles: canvas gloves with leather cuffs, nine riveted steel plates over the back of the
   // hand and a plate on each finger joint. The medium steel pair shares this model.
-  h.compound('mild_steel_brigandine_gloves', 0.69, glove('l-', -0.07, -1) + glove('r-', 0.07, 1), { canvas: 'cloth-canvas', cuff: 'leather-brown', plate: 'steel-bright', rivet: 'steel-bright', buckle: 'steel' })
+  h.compound('mild_steel_brigandine_gloves', 0.69, glove('l-', -0.07, -1) + glove('r-', 0.07, 1), { canvas: 'cloth-canvas', cuff: 'leather-brown', plate: 'steel-bright', rivet: 'steel-bright', buckle: 'steel' }) + { title: 'Mild steel brigandine gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['hands'] } } },
 
   // A pair of thin mild steel elbow guards standing dome up side by side, each a 90 mm cop 30 mm high with a rolled
@@ -159,28 +159,28 @@ local legGuard(p, cx, s) =
     for p in ['l-', 'r-']
     for s in [if p == 'l-' then -1 else 1]
     for cx in [s * 0.085]
-  ]), { cop: 'steel-bright', rim: 'steel-bright', strap: 'leather-brown' })
+  ]), { cop: 'steel-bright', rim: 'steel-bright', strap: 'leather-brown' }) + { title: 'Mild steel elbow guards' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of thin mild steel knee guards standing dome up side by side, each a 100 mm cop 35 mm high with a lame
   // above and below and a wing on the outer side, 200 mm from the top lame to the bottom one.
-  h.compound('mild_steel_knee_guards', 0.7, kneeGuard('l-', -0.1, -1) + kneeGuard('r-', 0.1, 1), { cop: 'steel-bright', rim: 'steel-bright', lame: 'steel-bright', strap: 'leather-brown' })
+  h.compound('mild_steel_knee_guards', 0.7, kneeGuard('l-', -0.1, -1) + kneeGuard('r-', 0.1, 1), { cop: 'steel-bright', rim: 'steel-bright', lame: 'steel-bright', strap: 'leather-brown' }) + { title: 'Mild steel knee guards' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['legs'] } } },
 
   // A pair of mild steel shoulder guards lying crown up side by side, each four overlapping lames 150 mm across and
   // 150 mm from the strap end to the lowest lame, with a buckle tab to strap them to a brigandine's shoulders.
-  h.compound('mild_steel_shoulder_guards', 1.2, shoulderGuard('l-', -0.07, -0.085) + shoulderGuard('r-', -0.07, 0.085), { lame: 'steel-bright', rivet: 'steel-bright', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
+  h.compound('mild_steel_shoulder_guards', 1.2, shoulderGuard('l-', -0.07, -0.085) + shoulderGuard('r-', -0.07, 0.085), { lame: 'steel-bright', rivet: 'steel-bright', strap: 'leather-brown', buckle: 'steel' }) + { title: 'Mild steel shoulder guards' } + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['torso'] } } },
 
   // A pair of mild steel splint greaves laid side by side, open side down, each 340 mm from knee to ankle, 140 mm
   // across at the calf and 100 mm at the ankle: canvas shells with five riveted splints and two buckled straps. The
   // medium steel pair shares this model.
-  h.compound('mild_steel_splint_greaves', 1.3, splintGuard('l-', -0.1, 0, 0.34, 0.14, 0.1, 0.08, 5, [-0.08, 0.1]) + splintGuard('r-', 0.1, 0, 0.34, 0.14, 0.1, 0.08, 5, [-0.08, 0.1]), splintFinishes('steel-bright'))
+  h.compound('mild_steel_splint_greaves', 1.3, splintGuard('l-', -0.1, 0, 0.34, 0.14, 0.1, 0.08, 5, [-0.08, 0.1]) + splintGuard('r-', 0.1, 0, 0.34, 0.14, 0.1, 0.08, 5, [-0.08, 0.1]), splintFinishes('steel-bright')) + { title: 'Mild steel splint greaves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['legs'] } } },
 
   // A pair of mild steel splint leg guards laid side by side, open side down, each 780 mm from hip to ankle: a
   // splinted thigh section 200 mm across at the top, a steel knee cop with a side wing and a splinted shin section,
   // each section with two buckled straps. The other steels share this model with their own splint finish.
-  h.compound('hardened_steel_splint_leg_guards', 4.2, legGuard('l-', -0.13, -1) + legGuard('r-', 0.13, 1), splintFinishes('steel-bright') + { cop: 'steel-bright', rim: 'steel-bright' })
+  h.compound('hardened_steel_splint_leg_guards', 4.2, legGuard('l-', -0.13, -1) + legGuard('r-', 0.13, 1), splintFinishes('steel-bright') + { cop: 'steel-bright', rim: 'steel-bright' }) + { title: 'Hardened steel splint leg guards' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['legs'] } } },
 ]

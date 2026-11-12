@@ -8,7 +8,7 @@ local livery = { plate: 'paint-olive', trim: 'steel-parkerized', strap: 'webbing
 local gauntlet = livery + { hand: 'leather-black' };
 local trooperBoot = { upper: 'leather-black', toe: 'paint-olive', sole: 'rubber-tread', collar: 'paint-crane-yellow', laces: 'webbing-olive-dark' };
 // A worn template's own ground shells as the item's ground model.
-local suit(id, massKg, worn) = worn + { rows: [h.compound(id, massKg, worn.ground, worn.rows[0].parts[0].finish) + { voxelGrain: 0.004 }] + worn.rows };
+local suit(id, title, massKg, worn) = worn + { rows: [h.compound(id, massKg, worn.ground, worn.rows[0].parts[0].finish) + { title: title, voxelGrain: 0.004 }] + worn.rows };
 // The trooper helm, base at the neck and face towards +z, the wearer's front: a flared neck guard, a deep shell under
 // a domed crown with a yellow crest, an amber visor slit under a brow bar, a wedge faceplate with grille slats and a
 // filter canister on the left cheek.
@@ -31,16 +31,16 @@ local helmet = [
   h.rod('filter', 'trim', 0.026, 0.115, 0.165, 0.08) + { origin: [-0.165, 0.08, 0.07] },
 ];
 local set = {
-  armor_trooper: suit('armor_trooper', 16.0, fit.trooper('armor_trooper', livery)),
+  armor_trooper: suit('armor_trooper', 'Trooper body armour', 16.0, fit.trooper('armor_trooper', livery, title='Trooper body armour')),
   helmet_trooper: fit.head('helmet_trooper', -0.1) + {
-    rows: [h.compound('helmet_trooper', 2.8, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { voxelGrain: 0.004 }],
+    rows: [h.compound('helmet_trooper', 2.8, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { title: 'Trooper helmet' } + { voxelGrain: 0.004 }],
   },
-  gloves_trooper: suit('gloves_trooper', 1.2, fit.hands('gloves_trooper', gauntlet, {
+  gloves_trooper: suit('gloves_trooper', 'Trooper gauntlets', 1.2, fit.hands('gloves_trooper', gauntlet, {
     layer: 'normal', cuff: 0.13, flare: 0.03, hem: 0.016, backRidges: 4,
     slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-  })),
-  boots_trooper: suit('boots_trooper', 2.6, fit.feet('boots_trooper', trooperBoot,
-                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.07, instep: 0.095, top: 0.27, shaft: 0.135, laces: 0 })),
-  legguard_trooper: suit('legguard_trooper', 6.5, fit.trooperLegs('legguard_trooper', livery)),
+  }, 'Trooper gauntlets')),
+  boots_trooper: suit('boots_trooper', 'Trooper boots', 2.6, fit.feet('boots_trooper', trooperBoot,
+                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.07, instep: 0.095, top: 0.27, shaft: 0.135, laces: 0 }, title='Trooper boots')),
+  legguard_trooper: suit('legguard_trooper', 'Trooper leg guards', 6.5, fit.trooperLegs('legguard_trooper', livery, title='Trooper leg guards')),
 };
 armour.of(null, std.flattenArrays([set[k].rows for k in std.objectFields(set)]))

@@ -18,7 +18,7 @@ local gauge(id, x, y, z) = [
     h.turned('spout-band', 'rim', 'y', [[0, 0.025], [0, 0.034], [0.012, 0.034], [0.012, 0.025], [0, 0.025]]),
     h.disc('strainer', 'strainer', 0.05, 0.12, 0.123),
     h.box('tab', 'rim', [0.255, 0.4, -0.02], [0.3, 0.428, 0.02]),
-  ], { cone: 'steel-galvanised', rim: 'steel-grey', strainer: 'mesh-black' }) + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { cone: 'steel-galvanised', rim: 'steel-grey', strainer: 'mesh-black' }) + { title: 'Metal funnel' } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
   // A blue tarpaulin rolled to 0.9 m by 0.13 m and tied with cord, four 1.2 m poles bound alongside it.
   h.compound('rain_catcher_kit', 6.4, [
     h.rod('roll', 'tarp', 0.062, -0.45, 0.45, 0.062),
@@ -36,7 +36,7 @@ local gauge(id, x, y, z) = [
     h.box('lash-a', 'cord', [-0.3, 0, 0.06], [-0.288, 0.052, 0.144]),
     h.box('lash-b', 'cord', [0.29, 0, 0.06], [0.302, 0.052, 0.144]),
     h.turned('hank', 'cord', 'y', [[0, 0.02], [0, 0.04], [0.016, 0.04], [0.016, 0.02], [0, 0.02]], [0.1, 0.122, -0.01]),
-  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { taxonomy: { category: 'tools', keywords: ['water-purification'], tags: { material: ['plastic', 'fabric'] } } },
+  ], { tarp: 'plastic-blue', edge: 'plastic-blue', grommet: 'alu-bare', pole: 'bark', cord: 'cord-cotton' }) + { title: 'Rain catcher kit' } + { taxonomy: { category: 'tools', keywords: ['water-purification'], tags: { material: ['plastic', 'fabric'] } } },
   // A small triple-beam balance 0.32 m long: a cast base, a 140 mm pan on the left, three graduated beams with
   // brass riders running right to a pointer and zero mark.
   h.compound('triple_beam_balance', 2, [
@@ -57,7 +57,7 @@ local gauge(id, x, y, z) = [
   ] + [
     h.box('tick-%d' % k, 'mark', [-0.05 + k * 0.02, 0.074, 0.018], [-0.048 + k * 0.02, 0.0755, 0.022])
     for k in std.range(0, 10)
-  ], { base: 'paint-charcoal', pan: 'steel-stainless', beam: 'steel-stainless', rider: 'brass', mark: 'plastic-black' }) + {
+  ], { base: 'paint-charcoal', pan: 'steel-stainless', beam: 'steel-stainless', rider: 'brass', mark: 'plastic-black' }) + { title: 'Triple beam balance' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
   // A pocket aneroid barometer in a plastic case 64 mm across and 14 mm deep, standing on its rim with its dial
@@ -74,7 +74,7 @@ local gauge(id, x, y, z) = [
     local a = std.pi * (0.75 + 1.5 * k / 10);
     h.box('tick-%d' % k, 'tick', [0.021 * std.cos(a) - 0.001, 0.032 + 0.021 * std.sin(a) - 0.001, 0.0155], [0.021 * std.cos(a) + 0.001, 0.032 + 0.021 * std.sin(a) + 0.001, 0.0165])
     for k in std.range(0, 10)
-  ], { case: 'plastic-charcoal', face: 'plastic-gloss-white', needle: 'paint-red', tick: 'plastic-black', band: 'plastic-blue', 'band-fair': 'plastic-yellow' }) + {
+  ], { case: 'plastic-charcoal', face: 'plastic-gloss-white', needle: 'paint-red', tick: 'plastic-black', band: 'plastic-blue', 'band-fair': 'plastic-yellow' }) + { title: 'Barometer' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A sealed steel canister 60 mm across and 100 mm tall: a bolted lid, a hazard band with black chevrons and a
@@ -94,7 +94,7 @@ local gauge(id, x, y, z) = [
     h.box('chevron-%d' % k, 'stripe', [0.031 * std.cos(a) - 0.003, 0.05, 0.031 * std.sin(a) - 0.003], [0.031 * std.cos(a) + 0.003, 0.074, 0.031 * std.sin(a) + 0.003])
     for k in std.range(0, 9)
     if k != 2
-  ], { body: 'steel-stainless', lid: 'steel-grey', band: 'plastic-hivis', stripe: 'plastic-black', bolt: 'steel-blued', window: 'jelly-teal' }) + {
+  ], { body: 'steel-stainless', lid: 'steel-grey', band: 'plastic-hivis', stripe: 'plastic-black', bolt: 'steel-blued', window: 'jelly-teal' }) + { title: 'Sealed hazard canister' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'containers', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
   // A 3 m skid of reactor plumbing 0.9 m wide and 1.1 m tall: two electric compressors, three thick-walled pipe runs
@@ -155,7 +155,7 @@ local gauge(id, x, y, z) = [
     switch: 'paint-red',
     cable: 'plastic-black',
     gauge: 'plastic-gloss-white',
-  }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { title: 'Ammonia plant pipework' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
   // A salvaged ammonia reactor 2.9 m tall: a 0.7 m steel pressure vessel with domed heads on four legs over a skid,
   // banded with an electric heating jacket, a relief valve and gauge on top, flanged inlet and outlet at +x and a
   // power cabinet bolted to the skid.
@@ -208,7 +208,7 @@ local gauge(id, x, y, z) = [
     warning: 'plastic-hivis',
     cable: 'plastic-black',
     gauge: 'plastic-gloss-white',
-  }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { title: 'Ammonia plant reactor' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
   // An aluminium field case 0.44 m by 0.32 m and 0.14 m deep opened with its lid up behind, its foam holding a small
   // digital balance, a spectrophotometer, a melting point block, a pH meter and probe, a cuvette rack and a stack
   // of chromatography paper.
@@ -264,7 +264,7 @@ local gauge(id, x, y, z) = [
     glass: 'plastic-clear',
     cuvette: 'plastic-frosted',
     paper: 'paper-white',
-  }) + {
+  }) + { title: 'Field chemistry kit' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

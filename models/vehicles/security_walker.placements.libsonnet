@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'security_walker.spec.libsonnet';
 local roof = std.foldl(std.max, [p[1] for p in s.torso.profile], 0);
 {
+  title: 'Security walker',
   sites: [
     site.one('hull', 'security_walker_hull'),
     site.one('belly', 'security_walker_belly'),

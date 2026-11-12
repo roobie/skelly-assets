@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'tank_trailer.spec.libsonnet';
 {
+  title: 'Tank trailer',
   sites: [
     site.one('chassis', 'tank_trailer_chassis'),
   ]

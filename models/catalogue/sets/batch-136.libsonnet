@@ -130,18 +130,18 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
     box('lead', 'lead', [-0.004, 0, -0.2], [0.004, 0.008, -0.095]),
     box('lead-drop', 'lead', [-0.004, 0, -0.103], [0.004, y0 - 0.045, -0.095]),
     h.turned('plug', 'earpiece', 'z', [[0, 0], [0, 0.009], [0.03, 0.009], [0.035, 0.005], [0.035, 0]], [0, 0.009, -0.235]),
-  ], { cap: 'cloth-olive-drab', pad: 'webbing-olive-dark', earpiece: 'plastic-matte-black', strap: 'leather-brown', buckle: 'steel-bright', lead: 'rubber-black' })
+  ], { cap: 'cloth-olive-drab', pad: 'webbing-olive-dark', earpiece: 'plastic-matte-black', strap: 'leather-brown', buckle: 'steel-bright', lead: 'rubber-black' }) + { title: 'Tank crew helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // Mild steel heavy close helm, 310 mm tall: a tall comb, three gorget lames and a riveted plate over the bevor.
-  closeHelm('mild_steel_heavy_close_helm', 4.1, 0.02, 3, true, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('mild_steel_heavy_close_helm_visor_up', 4.1, 0.02, 3, true, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_heavy_close_helm', 4.1, 0.02, 3, true, false) + { title: 'Mild steel heavy close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_heavy_close_helm_visor_up', 4.1, 0.02, 3, true, true) + { title: 'Mild steel heavy close helm with visor raised' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // Mild steel close helm, 300 mm tall: a comb and two gorget lames.
-  closeHelm('mild_steel_close_helm', 3.6, 0.012, 2, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('mild_steel_close_helm_visor_up', 3.6, 0.012, 2, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_close_helm', 3.6, 0.012, 2, false, false) + { title: 'Mild steel close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_close_helm_visor_up', 3.6, 0.012, 2, false, true) + { title: 'Mild steel close helm with visor raised' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // Mild steel light close helm, 290 mm tall: a low comb and a single gorget lame.
-  closeHelm('mild_steel_light_close_helm', 3.1, 0.006, 1, false, false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
-  closeHelm('mild_steel_light_close_helm_visor_up', 3.1, 0.006, 1, false, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_light_close_helm', 3.1, 0.006, 1, false, false) + { title: 'Mild steel light close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('mild_steel_light_close_helm_visor_up', 3.1, 0.006, 1, false, true) + { title: 'Mild steel light close helm with visor raised' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A mild steel nasal helm resting on its nasal bar, front on +z, 210 mm across and 235 mm tall: a pointed round
   // skull 160 mm deep with riveted bands crossing over the top, a brow band, a leather lining showing at the rim, a
@@ -167,7 +167,7 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
     for s in [-1, 1]
   ])
   + [box('buckle', 'buckle', [0.05, y0 - 0.02, -0.014], [0.062, y0 - 0.01, 0.014])],
-             { plate: 'steel-bright', band: 'steel-grey', lining: 'leather-brown', rivet: 'steel-grey', strap: 'leather-brown', buckle: 'brass-dull' })
+             { plate: 'steel-bright', band: 'steel-grey', lining: 'leather-brown', rivet: 'steel-grey', strap: 'leather-brown', buckle: 'brass-dull' }) + { title: 'Mild steel nasal helm' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A mild steel turban helmet resting on its ear guards, front on +z, 240 mm across and 330 mm tall: a broad bulbous
@@ -203,6 +203,6 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
     + [rivet('ear-hinge-%d-%d' % [s + 1, j], 'rivet', 0.119, s * 90 + 30 * j, y0 - 0.006, 0.008) for j in [-1, 1]]
     for s in [-1, 1]
   ]),
-             { plate: 'steel-bright', band: 'steel-bright', rivet: 'brass-dull' })
+             { plate: 'steel-bright', band: 'steel-bright', rivet: 'brass-dull' }) + { title: 'Mild steel turban helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 ]

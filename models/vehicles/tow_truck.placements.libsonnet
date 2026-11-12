@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = (import 'truck-cab.libsonnet').spec(import 'tow_truck.spec.libsonnet');
 {
+  title: 'Tow truck',
   // The deck and boom take the place of the box truck's box.
   sites: site.adjust(
     (import 'box_truck.placements.libsonnet').sites,

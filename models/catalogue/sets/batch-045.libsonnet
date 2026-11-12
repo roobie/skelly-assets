@@ -15,9 +15,9 @@ local boardFinish = { board: 'wood-pine', end: 'wood-birch', grain: 'wood-birch'
 local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 0.5, 0.5] } };
 [
   // An 8 ft 2 by 4: 2440 by 89 by 38 mm.
-  h.compound('long_plank', 4.2, board(2.44), boardFinish) + gripAt('long_plank', 'board', 0.08) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('long_plank', 4.2, board(2.44), boardFinish) + { title: 'Long plank' } + gripAt('long_plank', 'board', 0.08) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 2 ft 2 by 4: 610 by 89 by 38 mm.
-  h.compound('short_plank', 1, board(0.61), boardFinish) + gripAt('short_plank', 'board', 0.2) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  h.compound('short_plank', 1, board(0.61), boardFinish) + { title: 'Short plank' } + gripAt('short_plank', 'board', 0.2) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A 300 mm offcut of 2 by 4 with two half-depth notches 50 mm wide sawn across its top face, for lap joints.
   local len = 0.3, w = 0.089, t = 0.038, d = 0.019;
   h.compound('notched_plank', 0.44, [
@@ -29,7 +29,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
     box('block-c', 'board', [0.25, d, -w / 2], [len - 0.003, t, w / 2]),
     box('notch-a', 'end', [0.05, d - 0.001, -w / 2], [0.1, d + 0.0005, w / 2]),
     box('notch-b', 'end', [0.2, d - 0.001, -w / 2], [0.25, d + 0.0005, w / 2]),
-  ], boardFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  ], boardFinish) + { title: 'Notched plank' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A panel of three edge-glued boards, 1220 by 610 by 25 mm, lying flat, glue lines along x.
   local len = 1.22, w = 0.61, t = 0.025;
   h.compound('wood_panel', 9.4, [
@@ -44,7 +44,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
     box('grain-%d' % i, 'grain', [len * g[0], t - 0.002, g[1] - 0.002], [len * g[2], t + 0.0005, g[1] + 0.002])
     for i in std.range(0, 3)
     for g in [[[0.1, -0.22, 0.7], [0.35, 0.02, 0.9], [0.05, 0.25, 0.5], [0.55, -0.15, 0.95]][i]]
-  ], { board: 'wood-pine', end: 'wood-birch', seam: 'wood-oak', grain: 'wood-birch' }) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  ], { board: 'wood-pine', end: 'wood-birch', seam: 'wood-oak', grain: 'wood-birch' }) + { title: 'Wood panel' } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A press screw carved from one log, 1200 mm long: a 160 mm square head bored through for a turning bar, a plain
   // collar, then 900 mm of coarse thread 180 mm across the crests on a 120 mm core.
   local head = 0.16, pitch = 0.05, x0 = 0.25, n = 18;
@@ -58,7 +58,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
       for i in std.range(0, n - 1)
     ]) + [[n * pitch, 0]], [x0, 0.09, 0]),
     h.turned('tip', 'body', 'x', [[0, 0], [0, 0.06], [0.05, 0.035], [0.05, 0]], [x0 + n * pitch, 0.09, 0]),
-  ], { head: 'wood-oak', bore: 'coal-black', body: 'wood-oak' }) + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
+  ], { head: 'wood-oak', bore: 'coal-black', body: 'wood-oak' }) + { title: 'Giant wood screw' } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   // A sawn length of trunk 1400 mm long and 220 mm across in bark, its cut ends showing rings round a dark pith, with
   // two lopped branch stubs.
   local r = 0.11, len = 1.4;
@@ -81,12 +81,12 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
     h.turned('stub-a-cut', 'end', 'y', [[0, 0], [0, 0.022], [0.002, 0.022], [0.002, 0]], [0.45, 2 * r + 0.03, 0.01]),
     h.turned('stub-b', 'bark', 'z', [[0, 0], [0, 0.024], [0.045, 0.02], [0.045, 0]], [1.0, r + 0.02, r - 0.015]),
     h.turned('stub-b-cut', 'end', 'z', [[0, 0], [0, 0.017], [0.002, 0.017], [0.002, 0]], [1.0, r + 0.02, r + 0.03]),
-  ], { bark: 'bark', end: 'wood-pine', ring: 'wood-oak' }) + { taxonomy: { category: 'nature', tags: { material: ['wood'] } } },
+  ], { bark: 'bark', end: 'wood-pine', ring: 'wood-oak' }) + { title: 'Log' } + { taxonomy: { category: 'nature', tags: { material: ['wood'] } } },
   // A ten-foot hardwood pole, 3050 mm long and 40 mm across, tapering to 34 mm at the top, with a worn end.
   h.compound('long_pole', 2.2, [
     h.turned('pole', 'pole', 'x', [[0, 0], [0, 0.018], [0.006, 0.02], [3.0, 0.017], [3.05, 0.015], [3.05, 0]], [0, 0.02, 0]),
     h.turned('butt', 'end', 'x', [[0, 0], [0, 0.016], [0.002, 0.016], [0.002, 0]], [-0.0015, 0.02, 0]),
-  ], { pole: 'wood-birch', end: 'wood-oak' }) + gripAt('long_pole', 'pole', 0.3) + { taxonomy: { category: 'weapons', tags: { material: ['wood'], weapon: ['polearm'] } } },
+  ], { pole: 'wood-birch', end: 'wood-oak' }) + { title: 'Long pole' } + gripAt('long_pole', 'pole', 0.3) + { taxonomy: { category: 'weapons', tags: { material: ['wood'], weapon: ['polearm'] } } },
   // A shock-corded aluminium tent pole folded into a bundle of six 470 mm sections, 9.5 mm across, the joints
   // staggered so each section's ferrule shows, the cord peeping between the end sections.
   local r = 0.00475, len = 0.47, centres = h.hexPack(r + 0.0003, [3, 2, 1]);
@@ -101,7 +101,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
     h.turned('cord', 'cord', 'x', [[0, 0], [0, 0.0015], [0.016, 0.0015], [0.016, 0]], [-len / 2 - 0.008, centres[0].y + r, (centres[0].z + centres[1].z) / 2]),
     box('band-a', 'band', [-0.13, 0, centres[0].z - r - 0.0015], [-0.11, centres[5].y + r + 0.0015, centres[2].z + r + 0.0015]),
     box('band-b', 'band', [0.11, 0, centres[0].z - r - 0.0015], [0.13, centres[5].y + r + 0.0015, centres[2].z + r + 0.0015]),
-  ], { tube: 'alu-bare', ferrule: 'steel-grey', cord: 'cord-cotton', band: 'webbing-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], state: ['folded'] } } },
+  ], { tube: 'alu-bare', ferrule: 'steel-grey', cord: 'cord-cotton', band: 'webbing-black' }) + { title: 'Tent pole' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], state: ['folded'] } } },
   // A tanned hide folded fur side out, about 340 by 220 mm and 14 mm thick: a fold rolled along the back edge, two leg
   // tabs and a tail flap poking out, and the pale flesh side showing beneath.
   local t = 0.006, tab(id, slot, pts, y0, y1) = h.prism(id, slot, 'y', [[p[1], p[0]] for p in pts], y0, y1);
@@ -116,7 +116,7 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
     tab('leg-b-fur', 'fur', [[0.095, 0.105], [0.15, 0.1], [0.153, 0.155], [0.118, 0.162]], t, t + 0.004),
     tab('tail', 'flesh', [[0.17, -0.02], [0.24, -0.005], [0.24, 0.02], [0.17, 0.04]], 0, t * 0.7),
     tab('tail-fur', 'fur', [[0.172, -0.012], [0.235, 0], [0.235, 0.015], [0.172, 0.032]], t * 0.7, t * 1.2),
-  ], { fur: 'fur-brown', flesh: 'leather-tan' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  ], { fur: 'fur-brown', flesh: 'leather-tan' }) + { title: 'Tanned pelt' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
   // A loose lock of raw fleece about 160 by 90 mm and 60 mm high: crimped puffs bunched together, the tips drawn out.
   h.compound('wool_staple', 0.01, [
     h.ball('puff-%d' % i, if i >= 6 then 'tip' else 'wool', p[3], p[0], p[1], p[2], p[4])
@@ -126,5 +126,5 @@ local gripAt(id, solid, f) = h.gripOn(id, solid) + { handling+: { fraction: [f, 
       [-0.005, 0.045, 0.012, 0.026, 0.8], [-0.05, 0.022, -0.02, 0.022, 0.9], [0.0, 0.022, 0.03, 0.022, 0.9],
       [0.075, 0.018, 0.0, 0.016, 0.9], [-0.072, 0.016, 0.01, 0.015, 0.9], [0.06, 0.044, -0.004, 0.012, 1],
     ][i]]
-  ], { wool: 'cloth-cream', tip: 'fleece-pale' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], { wool: 'cloth-cream', tip: 'fleece-pale' }) + { title: 'Wool staple' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 ]

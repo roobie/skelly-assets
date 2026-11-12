@@ -71,7 +71,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
     box('spring_near_b', 'rust', [s.rearAxle - 0.35, 0.22, 0.52], [s.rearAxle + 0.35, 0.28, 0.6]),
     box('spring_far_b', 'rust', [s.rearAxle - 0.35, 0.22, -0.6], [s.rearAxle + 0.35, 0.28, -0.52]),
     box('drum', 'rust', [s.frontAxle - 0.13, 0.24, 0.72], [s.frontAxle + 0.13, 0.48, 0.86]),
-  ]), finish),
+  ]), finish) + { title: 'Overturned delivery van chassis' },
   k.compound('overturned_delivery_van_shell', 760, lying(
     nearWall + farWall
     + w.columnSheet('roof', 'y', [s.rear, roofFront], w.constant(-s.side), w.constant(s.side), function(x) [roofTop(x) - 0.1, roofTop(x)], scraped(23))
@@ -98,41 +98,41 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
       box('rear_post', 'paint', [s.rear, 0.62, 0.86], [s.rear + 0.08, 2.04, s.skin]),
       box('lamp_socket', 'soot', [2.46, 0.56, 0.4], [2.52, 0.86, 0.72]),
     ])
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van shell' },
   k.compound('overturned_delivery_van_bonnet', 24, lying(
     // Buckled by the roll, its skin rippled across and sprung up at the crushed corner.
     w.surface('skin', w.grid(1.75, 2.54, 6), w.grid(-0.94, 0.8, 11), function(x, z)
       hood(x) + 0.07 * std.sin(x * 14) * (x - 1.75) + (if z > 0.3 then 0.26 * (z - 0.3) * (x - 1.75) else 0), 0.05, function(x, z)
       local v = w.panelNoise(35, x, z);
       if v > 0.68 then 'rust' else if v > 0.6 then 'grime' else 'paint'),
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van bonnet' },
   k.compound('overturned_delivery_van_bumper', 16, lying([
     // Torn from its near mount, so it swings down across the nose.
     k.xPrism('beam', 'trim', [[0.34, -1.0], [0.48, -1.0], [0.76, 0.86], [0.62, 0.86]], [2.56, 2.68]),
-  ]), finish),
+  ]), finish) + { title: 'Overturned delivery van bumper' },
   k.compound('overturned_delivery_van_engine', 240, lying([
     box('block', 'soot', [1.8, 0.5, -0.26], [2.34, 0.98, 0.26]),
     box('sump', 'rust', [1.86, 0.3, -0.2], [2.3, 0.5, 0.2]),
     box('gearbox', 'soot', [1.2, 0.34, -0.14], [1.8, 0.64, 0.14]),
-  ]), finish),
+  ]), finish) + { title: 'Overturned delivery van engine' },
   k.compound('overturned_delivery_van_cab_door_sprung', 34, lying(
     // Sprung on its hinges by the roll, it now stands up off the top of the wreck.
     w.swung('panel', [0.98, 1.3], [1.72, 0.42], 0.05, w.constant(s.floor), w.constant(s.waist), function(t, y) skin(37)(t * 2, y), 8)
     + w.swung('top_rail', [0.98, 1.3], [1.72, 0.42], 0.05, w.constant(1.9), w.constant(1.98), function(t, y) 'paint', 4)
     + w.swung('rear_bar', [1.66, 0.49], [1.72, 0.42], 0.05, w.constant(s.waist), w.constant(1.9), function(t, y) 'paint', 1),
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van cab door (sprung)' },
   k.compound('overturned_delivery_van_cab_door', 36, lying(
     w.columnSheet('panel', 'z', [0.1, 1.3], w.constant(s.floor), w.constant(s.waist), w.constant([-s.side, -s.skin]), scraped(39))
     + w.columnSheet('bar', 'z', [0.1, 0.2], w.constant(s.waist), w.constant(1.9), w.constant([-s.side, -s.skin]), scraped(41)),
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van cab door' },
   k.compound('overturned_delivery_van_rear_door_upper', 34, lying(
     // The upper door droops open under its own weight.
     w.swung('panel', [0.86, s.rear], [0.46, s.rear - 0.8], 0.05, w.constant(0.62), w.constant(2.04), function(t, y) skin(43)(t * 2, y), 7),
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van rear door (upper)' },
   k.compound('overturned_delivery_van_rear_door_lower', 34, lying(
     // The lower door has fallen flat open on the road.
     w.columnSheet('panel', 'z', [s.rear - 0.86, s.rear], w.constant(0.62), w.constant(2.04), w.constant([-s.side, -s.side + 0.05]), skin(45)),
-  ), finish),
+  ), finish) + { title: 'Overturned delivery van rear door (lower)' },
   k.compound('overturned_delivery_van_shelving', 40, lying([
     box('upright_rear', 'rack', [-2.2, s.floor, -0.9], [-2.16, 1.9, -0.86]),
     box('upright_mid', 'rack', [-1.2, s.floor, -0.9], [-1.16, 1.9, -0.86]),
@@ -140,7 +140,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
     box('shelf_low', 'rack', [-2.2, 0.94, -0.9], [-0.16, 0.98, -0.5]),
     box('shelf_mid', 'rack', [-2.2, 1.4, -0.9], [-0.16, 1.44, -0.5]),
     box('shelf_high', 'rack', [-2.2, 1.86, -0.9], [-0.16, 1.9, -0.5]),
-  ]), { rack: 'steel-galvanised' }),
+  ]), { rack: 'steel-galvanised' }) + { title: 'Overturned delivery van shelving' },
   k.compound('overturned_delivery_van_parcels', 60, [
     // Spilled from the burst rear doors across the road.
     box('a', 'card', [-3.95, 0, 0.62], [-3.45, 0.36, 1.1]),
@@ -157,16 +157,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
     box('i', 'card', [-2.42, 0.5, -0.24], [-2.1, 0.74, 0.12]),
     k.yPrism('j', 'card', [[1.3, -3.2], [1.7, -3.42], [1.9, -3.08], [1.5, -2.86]], [0, 0.3]),
     k.yPrism('k', 'tan', [[1.65, -4.2], [1.95, -4.32], [2.05, -4.04], [1.75, -3.92]], [0, 0.2]),
-  ], { card: 'cardboard-corrugated', tan: 'paperboard-tan', dark: 'paperboard-brown', tape: 'tape-tan' }),
+  ], { card: 'cardboard-corrugated', tan: 'paperboard-tan', dark: 'paperboard-brown', tape: 'tape-tan' }) + { title: 'Overturned delivery van parcels' },
   k.compound('overturned_delivery_van_seat', 20, std.map(function(piece) s.lie(piece, 0, 0), [
     box('base', 'frame', [-0.22, 0, -0.2], [0.22, 0.3, 0.2]),
     box('pad', 'cloth', [-0.24, 0.3, -0.24], [0.24, 0.42, 0.24]),
     k.prism('back', 'cloth', [[-0.24, 0.42], [-0.12, 0.42], [-0.3, 1.02], [-0.42, 1.02]], [-0.24, 0.24]),
-  ]), { frame: 'steel-spall-black', cloth: 'cloth-seat' }),
+  ]), { frame: 'steel-spall-black', cloth: 'cloth-seat' }) + { title: 'Overturned delivery van seat' },
   k.compound('overturned_delivery_van_wheel', 34, [
     // The tyre's axis stands upright because the van lies on its side.
     k.turned('tyre', 'tyre', 'y', [[-0.11, 0.2], [-0.11, 0.33], [-0.09, 0.36], [0.09, 0.36], [0.11, 0.33], [0.11, 0.2], [-0.11, 0.2]]) + { sides: 24 },
     k.turned('rim', 'rim', 'y', k.disc(0.2, -0.08, 0.08)) + { sides: 24 },
     k.turned('hub', 'hub', 'y', k.disc(0.08, 0.08, 0.11)) + { sides: 12 },
-  ], { tyre: 'rubber-black', rim: 'steel-grey', hub: 'paint-charcoal' }),
+  ], { tyre: 'rubber-black', rim: 'steel-grey', hub: 'paint-charcoal' }) + { title: 'Overturned delivery van wheel' },
 ])
