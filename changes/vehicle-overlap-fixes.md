@@ -9,3 +9,4 @@ Vehicle parts no longer run through each other where they were misplaced:
 - the road roller's engine hood is a panelled bay, raised to clear the engine inside it.
 - the heavy truck gearbox sits under the frame's rail top, clear of the bodies standing on it, and the mobile crane's rides over its second axle;
 - the beach buggy's rear axle is a pair of half-shafts beside its engine, and its fuel tank sits on the transaxle;
+- the road roller's fuel tank sits along the spine ahead of the rear drum.
