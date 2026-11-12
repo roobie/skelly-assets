@@ -93,7 +93,7 @@ local sheet(l, w, t, e, face, edge) = [
     box('ear-right', 'can', [r - 0.002, 0.15, -0.008], [r + 0.004, 0.166, 0.008]),
   ] + h.bend('bail', 'bail', [[-r - 0.003, 0.158], [-r - 0.003, 0.198], [-0.04, 0.244], [0.04, 0.244], [r + 0.003, 0.198], [r + 0.003, 0.158]], 0.004, -0.002, 0.002) + [
     rod('grip', 'grip', 0.007, -0.03, 0.03, 0.244),
-  ], { can: 'steel-stainless', lid: 'steel-grey', paint: 'paint-red', panel: 'paper-white', bail: 'steel-bright', grip: 'plastic-black' }) + { title: 'Red paint' }
+  ], { can: 'steel-stainless', lid: 'steel-grey', paint: 'paint-red', panel: 'paper-white', bail: 'steel-bright', grip: 'plastic-black' }) + { title: 'Bucket of paint' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A door viewer, 14 mm across and 48 mm long, lying on its side: a brass barrel with a wide domed lens flange at

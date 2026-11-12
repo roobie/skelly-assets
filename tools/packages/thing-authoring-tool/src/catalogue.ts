@@ -9,6 +9,7 @@ import { singlePart } from '@skelly/thing-core/single-part';
 import { drawnGeometry } from '@skelly/thing-export/drawn.ts';
 import type { Palette, VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { hex } from '@skelly/thing-export/glb.ts';
+import { TitleSchema } from '@skelly/thing-export/title.ts';
 import {
   array,
   boolean,
@@ -107,7 +108,7 @@ const PartSchema = strictObject({
 const ItemSchema = strictObject({
   id: name,
   /** What the item is called wherever it is listed or printed; authored, never derived from the id. */
-  title: pipe(string(), nonEmpty()),
+  title: TitleSchema,
   exportMass: picklist(['parts', 'inventory-atom']),
   /**
    * The axis the row puts its front on, or a held thing its working end, when that is not +z: a kit laid out along

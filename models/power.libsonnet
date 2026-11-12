@@ -19,7 +19,7 @@ local bootFinish = { upper: 'steel-gunmetal', toe: 'paint-graphite', sole: 'rubb
 
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain };
+  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
 local round(piece) = piece + { sides: 12 };
@@ -134,14 +134,14 @@ local helmet = [
   for i in [0, 1]
 ];
 
-local body = fit.trooper('armor_power', livery).rows;
-local legs = fit.trooperLegs('legguard_power', livery).rows;
+local body = fit.trooper('armor_power', livery, title='Power body armour').rows;
+local legs = fit.trooperLegs('legguard_power', livery, title='Power leg guards').rows;
 local gloves = fit.hands('gloves_power', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.05, hem: 0.018, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}).rows;
+}, 'Power gauntlets').rows;
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.075, instep: 0.1, top: 0.275, shaft: 0.14, laces: 0 }).rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.075, instep: 0.1, top: 0.275, shaft: 0.14, laces: 0 }, title='Power boots').rows;
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);

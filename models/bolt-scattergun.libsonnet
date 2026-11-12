@@ -43,5 +43,5 @@ local pumpX1 = 0.545;
     // Three brass shells held on the right side of the receiver.
     h.turned('shell-%d' % i, 'round', 'z', [[0, 0], [0, 0.014], [0.012, 0.014], [0.014, 0.011], [0.014, 0]], [-0.135 + i * 0.045, 0.205, w])
     for i in [0, 1, 2]
-  ], { round: 'brass' }) + { title: 'Bolt scattergun' },
+  ], { round: 'brass' }) + { title: 'Basic scattergun' },
 ]

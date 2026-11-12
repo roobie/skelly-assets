@@ -18,6 +18,7 @@ local segmentOf(id) = std.reverse(std.split(id, '_'))[0];
 {
   // The ground row of the garment a worn family is fitted for, whose authored title and finish the shells reuse.
   groundRow(id):: [row for row in groundRows if row.id == id][0],
+  groundTitle(id):: self.groundRow(id).title,
   // `own` is the taxonomy of the garment the shells belong to; each shell adds its slot and fit.
   shells(own, rows):: [
     row + { taxonomy: taxonomy.over(own, { tags: { slot: [slots[segmentOf(row.id)].slot], fit: ['worn'] } }) }

@@ -289,7 +289,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // Plate armour: a closed breast and back over the ribs and chest, a gorget, `lames` faulds below the waist over a
   // mail skirt, and pauldrons, rerebraces, couters and vambraces on the arms. Rigid, so it clears the over layer.
   // `slots` names the ground row's finish slots: `plate`, `rim`, `strap`, `rivet` and `mail`.
-  plate(id, finish, spec={})::
+  plate(id, finish, spec={}, title=null)::
     local s = { layer: 'over', lames: 2, plackart: false, mail: true, arms: true,
                 slots: { plate: 'plate', rim: 'rim', strap: 'strap', rivet: 'rivet', mail: 'mail' } } + spec;
     local g = layers[s.layer], sl = s.slots;
@@ -351,17 +351,17 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('vambrace-rim', sl.rim, -arm.foreLength + 0.012, -arm.foreLength + 0.026, fw + 0.012, fd + 0.01, 0.02),
     ];
     // The vambrace stops short of the wrist.
-    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if skirtFoot <= bust.pelvisHeight then ['torso'] else ['shoulders'], ['torso'])]
+    fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if skirtFoot <= bust.pelvisHeight then ['torso'] else ['shoulders'], ['torso'], title=named(title, 'body'))]
            + (if s.arms then [
-                paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
-                paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore']),
+                paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper'], title=named(title, 'upper arm')),
+                paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore'], title=named(title, 'forearm')),
               ] else [])),
 
   // Heavy trooper armour: a broad cuirass of stacked belly bands under a slab breastplate with a chevron, a high
   // collar open at the throat, a power pack with exhaust stacks on the back, a webbing belt with pouches and two
   // tasset lames; on the arms, oversized flat-topped pauldrons with a comb, and ribbed vambraces. `ground` is the
   // cuirass standing on the floor, for the item's ground model. Slots: `plate`, `trim`, `strap`, `rivet`, `insignia`.
-  trooper(id, finish, spec={})::
+  trooper(id, finish, spec={}, title=null)::
     local s = { layer: 'cloak' } + spec;
     local g = layers[s.layer];
     local cut = bust.torsoChamfer / 2;
@@ -460,14 +460,14 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ];
     // The vambrace stops short of the wrist.
     fitted([
-      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso']),
-      paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper']),
-      paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore']),
+      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso'], title=named(title, 'body')),
+      paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper'], title=named(title, 'upper arm')),
+      paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore'], title=named(title, 'forearm')),
     ]) + { ground: h.lifted(body, -(beltY - 0.13)) },
 
   // Heavy trooper leg armour: thick cuisses with a front plate, a square knee guard over a domed cop, and greaves with
   // a front ridge. `ground` stands one thigh and shin on the floor. Slots as `trooper`.
-  trooperLegs(id, finish, spec={})::
+  trooperLegs(id, finish, spec={}, title=null)::
     local s = { layer: 'cloak' } + spec;
     local g = layers[s.layer];
     local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
@@ -494,8 +494,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ];
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
-      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
-      paired(id + '_worn_shin', 'hem', shin, finish, ['shin']),
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh'], title=named(title, 'thigh')),
+      paired(id + '_worn_shin', 'hem', shin, finish, ['shin'], title=named(title, 'shin')),
     ]) + { ground: h.lifted(shin, shinLength + leg.ankleOverlap) + h.lifted(thigh, shinLength + leg.ankleOverlap + leg.thighLength) },
 
   // Trousers: a seat over the hips under a waistband, and a leg on each thigh and shin. The shin's leg stops above the
@@ -532,7 +532,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 
   // Leg harness: cuisses on the thighs, knee cops and greaves on the shins. `slots` names the ground row's finish
   // slots: `shell`, `cop`, `rim` and `strap`.
-  legs(id, finish, spec={})::
+  legs(id, finish, spec={}, title=null)::
     local s = { layer: 'over', greaves: true, slots: { shell: 'shell', cop: 'cop', rim: 'rim', strap: 'strap' } } + spec;
     local g = layers[s.layer], sl = s.slots;
     local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
@@ -556,8 +556,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ] else []);
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
-      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh']),
-      paired(id + '_worn_shin', 'hem', shin, finish, if s.greaves then ['shin'] else []),
+      paired(id + '_worn_thigh', 'trouser', thigh, finish, [], ['thigh'], title=named(title, 'thigh')),
+      paired(id + '_worn_shin', 'hem', shin, finish, if s.greaves then ['shin'] else [], title=named(title, 'shin')),
     ]),
 
   // Gloves: a palm and cuff on the wrist, a piece on each phalanx and on each thumb bone, so a curled hand bends its

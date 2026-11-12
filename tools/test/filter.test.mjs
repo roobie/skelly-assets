@@ -9,6 +9,7 @@ const entries = [
   model('oak_log', 'nature', { material: ['wood'] }),
   { id: 'jeep', title: 'Fixture jeep', tags: {}, keywords: [], sites: [] },
   model('loose', null),
+  { id: 'x1', title: 'Fixture teapot', category: 'tools', tags: {}, keywords: [] },
 ];
 const ids = (filter) => entries.filter((e) => matches(e, filter)).map((e) => e.id);
 const filterOf = (changes) => ({ ...emptyFilter(), ...changes });
@@ -17,6 +18,10 @@ test('a filter keeps only the models that satisfy every dimension it names', () 
   assert.deepEqual(ids(filterOf({ picks: { material: ['wood'], place: ['urban'] } })), ['oak_door']);
   assert.deepEqual(ids(filterOf({ picks: { [KEYWORD]: ['entrance'], material: ['steel'] } })), ['steel_door']);
   assert.deepEqual(ids(filterOf({ shelf: 'building', q: 'oak' })), ['oak_door']);
+});
+
+test('the search text matches a model by its title, not only its id', () => {
+  assert.deepEqual(ids(filterOf({ q: 'teapot' })), ['x1']);
 });
 
 test('terms picked in one tag facet widen the match, where two keywords narrow it', () => {

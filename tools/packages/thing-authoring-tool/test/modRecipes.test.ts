@@ -41,7 +41,7 @@ it('exports one recipe file into its pack output without changing its source roo
 
 it('loads only the thing rows of recipe files that also hold another tool’s rows', () => {
   const item = catalogue.items.find(({ exportMass }) => exportMass === 'parts')!;
-  const thingRow = { id: 'fixture_thing', kind: 'item', source: item.id, voxel: { grain: 0.01 }, options: { mass: 'parts' } };
+  const thingRow = { id: 'fixture_thing', title: 'Fixture thing', kind: 'item', source: item.id, voxel: { grain: 0.01 }, options: { mass: 'parts' } };
   const gunRow = (id: string) => ({ id, kind: 'design', source: 'fixture.gun.json', voxel: { grain: 0.01 } });
   const files = [[gunRow('fixture_gun')], [gunRow('fixture_other_gun'), thingRow]];
   expect(loadThingRecipeFiles(files, catalogue).map(({ id }) => id)).toEqual(['fixture_thing']);

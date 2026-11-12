@@ -6,7 +6,7 @@
   // A curated design in models/guns/designs/, by file name.
   designs: [
     { id: 'rifle_assault', title: 'Assault rifle', design: 'archetype-ar', weapon: 'rifle' },
-    { id: 'rifle_ak', title: 'Long-stroke rifle', design: 'archetype-ak-akm', weapon: 'rifle' },
+    { id: 'rifle_ak', title: 'AK rifle', design: 'archetype-ak-akm', weapon: 'rifle' },
     { id: 'shotgun_pump', title: 'Pump-action shotgun', design: 'archetype-pump-shotgun', weapon: 'shotgun' },
     { id: 'rifle_anti_materiel', title: 'Anti-materiel rifle', design: 'archetype-anti-materiel', weapon: 'rifle' },
     { id: 'rifle_hunting', title: 'Hunting rifle', design: 'hunting-rifle', weapon: 'rifle' },
@@ -30,7 +30,7 @@
   ],
   // An attachment by its source id; its look, if any, is in models/guns/tables/appearance.jsonnet.
   attachments: [
-    { source: 'ak-slant-compensator', title: 'Slant compensator', weapon: 'rifle' },
+    { source: 'ak-slant-compensator', title: 'AK slant compensator', weapon: 'rifle' },
     { source: 'foregrip', title: 'Foregrip' },
     { source: 'improvised-suppressor', title: 'Improvised suppressor', keywords: ['silencer'] },
     { source: 'optic-digital-thermal', title: 'Digital thermal optic', keywords: ['scope'] },
@@ -49,9 +49,9 @@
   // A magazine by its source id, loaded with a cartridge in models/guns/cartridges/ and drawn in an appearance profile.
   // Its title is its authored `form` and "for" the cartridge's `designation`.
   magazines: [
-    { id: 'magazine_stanag_20', form: '20-round magazine', source: 'stanag-20', calibre: '5.56x45', appearanceProfile: 'ar', weapon: 'rifle' },
-    { id: 'magazine_stanag_30', form: '30-round magazine', source: 'stanag-30', calibre: '5.56x45', appearanceProfile: 'ar', weapon: 'rifle' },
-    { id: 'magazine_akm_30', form: '30-round curved magazine', source: 'akm-30', calibre: '7.62x39', appearanceProfile: 'ak', weapon: 'rifle' },
+    { id: 'magazine_stanag_20', form: '20-round AR magazine', source: 'stanag-20', calibre: '5.56x45', appearanceProfile: 'ar', weapon: 'rifle' },
+    { id: 'magazine_stanag_30', form: '30-round AR magazine', source: 'stanag-30', calibre: '5.56x45', appearanceProfile: 'ar', weapon: 'rifle' },
+    { id: 'magazine_akm_30', form: '30-round curved AK magazine', source: 'akm-30', calibre: '7.62x39', appearanceProfile: 'ak', weapon: 'rifle' },
     { id: 'magazine_pistol_9', form: 'Pistol magazine', source: 'pistol-9', calibre: '9x19', appearanceProfile: 'pistol', weapon: 'handgun' },
     { id: 'magazine_bmg_10', form: '10-round magazine', source: 'bmg-10', calibre: '50-bmg', appearanceProfile: 'anti-materiel', weapon: 'rifle' },
   ],

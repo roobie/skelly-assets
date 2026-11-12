@@ -110,7 +110,7 @@ it('exports a label on its face, its text defaulting to the authored title', () 
 it('rejects a catalogue item without a title', () => {
   const input = fixture();
   const { title: _title, ...untitled } = input.items[0]!;
-  expect(() => loadCatalogue({ ...input, items: [untitled] })).toThrow();
+  expect(() => loadCatalogue({ ...input, items: [untitled] })).toThrow(/title/);
 });
 
 it('exports a grip following the held solid through resizing and assembly placement', () => {

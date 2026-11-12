@@ -423,7 +423,7 @@ async function openViewer(model, restored = null) {
 
   if (canPose(model, loaded.clips, loaded.body)) {
     const clips = clipSet(loaded.clips);
-    const names = ['walk', 'attack', 'pounce', 'idle'].filter((n) => playable(clips[n]));
+    const names = Object.keys(CLIP_NAMES).filter((n) => playable(clips[n]));
     const pick = (name) => {
       viewer.clip = name;
       viewer.view = name === names[0] ? null : name;

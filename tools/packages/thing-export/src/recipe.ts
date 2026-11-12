@@ -16,6 +16,7 @@ import {
   unknown,
 } from 'valibot';
 import type { VoxelGrains } from './exportTypes.ts';
+import { TitleSchema } from './title.ts';
 
 const grain = pipe(number(), gtValue(0));
 // Every row names its voxel class, so no model drifts smooth beside voxel ones by omission; a row lacking one is refused.
@@ -26,7 +27,7 @@ const RowSchema = strictObject({
   voxel: strictObject({ grain, detailGrain: optional(grain), detailThinParts: optional(boolean()) }),
   options: optional(unknown()),
   // What the model is called wherever it is listed or printed; authored, never derived from the id.
-  title: pipe(string(), nonEmpty()),
+  title: TitleSchema,
   // The model's shelf and facet tags; the repository build holds them to its vocabulary, so export only carries them.
   taxonomy: optional(unknown()),
 });

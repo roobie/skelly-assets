@@ -101,14 +101,10 @@ The build refuses a model without them in a strict pack. Why, and how to request
 
 ### Titles
 
-Every model carries a `title`, the name a player would use ("7.62×54R round", "Field radio", "Burnt-out bus"),
-authored beside its definition: in its catalogue or roster row, its recipe row, its vehicle's `placements.libsonnet`
-or its row in `models/mobs.json`. A family built from a roster or a set function authors the title next to the data
-that varies. No title is ever computed from an id: ids are stable keys that change when a model is merged or split, and
-a name cut from one reads as the key it is ("Round 7 d 62x54r"), so every consumer would show a worse name than the
-author would give. A title is short, plain English, spells calibres with × and R, and names no real maker or product.
-The build and `node tools/check-sources.mjs` refuse a model without one, see `tools/titles.mjs`, `titleProblems`; the
-manifest, the showcase, the vehicle gallery and the thing export's label text all read the same field.
+A title is authored with its model and never computed from an id: ids are stable keys that change when a model is
+merged or split, and a name cut from one reads as the key it is ("Round 7 d 62x54r"). So every consumer shows the
+author's name. The rule and where it is checked are in `tools/titles.mjs`, `titleProblems`: models by the pre-build
+report, vehicles by `tools/placements.mjs`, `placementProblems`.
 
 ### Outputs and consumers
 

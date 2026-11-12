@@ -125,7 +125,6 @@ export function buildManifest({ models, vehicles = [], dependsOn = {}, files, cr
     const key = `${model.pack}/${model.id}`;
     if (ids.has(key)) throw new Error(`${model.id}: two models of one id in ${model.pack}`);
     ids.add(key);
-    if (typeof model.title !== 'string') throw new Error(`${model.id}: no title`);
     return {
       id: model.id,
       title: model.title,
@@ -145,7 +144,6 @@ export function buildManifest({ models, vehicles = [], dependsOn = {}, files, cr
   const vehicleIds = new Set();
   const vehicleEntries = [...vehicles].sort((a, b) => byText(a.id, b.id)).map(({ id, title, pack, path, tags }) => {
     const file = outputPath(pack, path);
-    if (typeof title !== 'string') throw new Error(`vehicle ${id}: no title`);
     if (!known.has(file)) throw new Error(`vehicle ${id}: ${file} is not a produced file`);
     if (vehicleIds.has(id)) throw new Error(`vehicle ${id}: placed twice`);
     vehicleIds.add(id);
