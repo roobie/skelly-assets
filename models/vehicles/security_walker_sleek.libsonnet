@@ -7,7 +7,7 @@ local h = s.hull;
 local axisY = s.rotary.centre[1];
 local statorLow = axisY - 0.08;
 local face = s.base.torso.half;
-local belly = s.base.torso.profile[0][1];
+local belly = s.belly;
 local lift = s.weaponLift;
 local lamp = s.lights;
 local centre = [0.5, 0.5, 0.5];
@@ -52,11 +52,11 @@ local feedPieces = std.flattenArrays([
 taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}},[
   part('carrier', 1000, [
     box('belly', 'frame', [-1.30,belly-0.07,-0.76],[1.35,belly,0.76]),
-    box('rear_bulkhead', 'frame', [-1.34,2.85,-0.98],[-1.27,3.80,0.98]),
+    box('rear_bulkhead', 'frame', [-1.34,belly,-0.98],[-1.27,3.80,0.98]),
     box('deck', 'frame', [-1.27,statorLow-0.05,-0.92],[0.95,statorLow,0.92]),
     ring('stator', 'frame', s.rotary.inner, s.rotary.outer, statorLow, axisY),
     k.turned('union','trim','y',k.disc(0.17,axisY-0.22,axisY)) + {sides:16},
-    k.prism('lower_nose','paint',[[1.27,2.85],[1.43,3.17],[1.43,3.38],[1.27,3.50]],[-0.92,0.92]),
+    k.prism('lower_nose','paint',[[1.27,belly],[1.43,3.17],[1.43,3.38],[1.27,3.50]],[-0.92,0.92]),
     k.prism('upper_nose','paint',[[1.27,3.38],[1.43,3.38],[0.98,3.77],[0.90,3.77]],[-0.92,0.92]),
     k.prism('floodlight_plinth','frame',[[1.18,lamp.floodlight[1]-0.06],[lamp.floodlight[0]+0.05,lamp.floodlight[1]-0.06],[lamp.floodlight[0]+0.05,lamp.floodlight[1]],[1.16,lamp.floodlight[1]]],[-0.20,0.20]),
   ] + k.bothSides([
@@ -80,8 +80,8 @@ taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}
     k.yPrism('roof','paint',h.roof,[h.high-h.wall,h.high]),
     box('nose_recess','black',[1.40,4.00,-0.38],[1.51,4.06,0.38]),
   ] + k.bothSides([
-    k.prism('shoulder','paint',[[-0.27,4.04],[0.61,4.04],[0.50,4.40],[-0.17,4.42]],[0.63,1.00]),
-    box('shoulder_inset','frame',[-0.10,4.20,0.96],[0.50,4.43,1.00]),
+    k.prism('shoulder','paint',[[-0.27,4.04],[0.61,4.04],[0.50,4.40],[-0.17,4.42]],[0.63,face]),
+    box('shoulder_inset','frame',[-0.10,4.20,face-0.04],[0.50,4.43,face]),
     box('lifting_eye','trim',[-0.82,h.high,0.37],[-0.69,h.high+0.04,0.42]),
     box('lamp_plinth','frame',[0.62,4.22,0.44],[0.82,4.30,0.56]),
     k.prism('headlamp_brace','frame',[[0.45,lamp.turretHeadlamps[1]],[lamp.turretHeadlamps[0]-0.06,lamp.turretHeadlamps[1]],[lamp.turretHeadlamps[0]-0.06,lamp.turretHeadlamps[1]+0.06],[0.50,lamp.turretHeadlamps[1]+0.18]],[lamp.turretHeadlamps[2]-0.08,lamp.turretHeadlamps[2]+0.08]),

@@ -22,7 +22,7 @@ local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
       site.one('cooling_pack', 'security_walker_sleek_cooling_pack'),
       site.one('roof_hatch', 'security_walker_sleek_roof_hatch'),
     ] + [site.one(o.id, o.part, o.at) + (if o.part == 'ifv_turret_periscope' then {} else { finish: s.paint }) for o in s.optics]
-      + site.pair('terrain_camera', 'security_walker_sleek_terrain_camera', [0.90, 2.78, 0.60])
+      + site.pair('terrain_camera', 'security_walker_sleek_terrain_camera', [0.90, s.belly - 0.07, 0.60])
       + site.pair('smoke_launcher', 'smoke_launcher_81mm', [-0.63, s.hull.high, 0.45])
       + site.pair('work_lamp', 'work_lamp', [0.72, 4.30, 0.50])
       + site.pair('ammo_cassette', 'security_walker_sleek_ammo_cassette', [0, 0, 0])

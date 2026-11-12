@@ -4,6 +4,7 @@ local base = import 'security_walker.spec.libsonnet';
 local high = 4.45;
 {
   base: base,
+  belly: base.torso.profile[0][1],
   paint: base.paint,
   frame: base.frame,
   trim: 'steel-grey',
