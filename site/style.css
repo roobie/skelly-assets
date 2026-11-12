@@ -43,7 +43,9 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
 }
 .top h1 { font-size: 30px; letter-spacing: -0.02em; }
 .top p { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }
-.repo { white-space: nowrap; font-weight: 600; text-decoration: none; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; justify-content: flex-end; }
+.links a { white-space: nowrap; text-decoration: none; }
+.repo { font-weight: 600; }
 
 .controls {
   position: sticky; top: 0; z-index: 2;
@@ -186,6 +188,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
   .top, .controls, .grid, .foot { padding-left: 16px; padding-right: 16px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
   .top h1 { font-size: 22px; }
+  .links { justify-content: flex-start; }
   .top p { margin-top: 4px; font-size: 13px; }
   /* A phone shows the grid under one row of controls: the categories scroll sideways and the tags fold away. */
   .controls { gap: 8px; padding-top: 8px; padding-bottom: 8px; }

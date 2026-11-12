@@ -147,26 +147,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/tools
-      - name: Build mobgen viewer
-        working-directory: tools/packages/mobgen
-        run: PAGES_ANALYTICS=1 npx vite build
-      - name: Build gun-authoring-tool viewer
-        working-directory: tools/packages/gun-authoring-tool
-        run: PAGES_ANALYTICS=1 npx vite build
-      - name: Build thing-authoring-tool viewer
-        working-directory: tools/packages/thing-authoring-tool
-        run: npx vite build
-      - name: Build vehicle-authoring-tool viewer
-        working-directory: tools/packages/vehicle-authoring-tool
-        run: npx vite build
+      - run: PAGES_ANALYTICS=1 node site/build-viewers.mjs
       - uses: actions/upload-artifact@v7
         with:
           name: viewers
-          path: |
-            tools/packages/mobgen/dist
-            tools/packages/gun-authoring-tool/dist
-            tools/packages/thing-authoring-tool/dist
-            tools/packages/vehicle-authoring-tool/dist
+          path: tools/packages/*/dist
           if-no-files-found: error
           retention-days: 1
 
@@ -185,13 +170,7 @@ jobs:
         with:
           name: viewers
           path: tools/packages
-      - name: Assemble the site
-        run: |
-          node site/build.mjs _site
-          for P in mobgen gun-authoring-tool thing-authoring-tool vehicle-authoring-tool; do
-            mkdir -p _site/$P
-            cp -r tools/packages/$P/dist/. _site/$P/
-          done
+      - run: node site/build.mjs --require-viewers _site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
