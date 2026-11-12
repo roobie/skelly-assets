@@ -102,7 +102,7 @@ export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').repl
 
 const FIT_KEYS = ['pairs', 'why'];
 const EPSILON = 1e-9;
-const LOOSE = 2; // grains a cap may exceed the depth it was measured at
+const LOOSE = 1; // grains a cap may exceed the depth it was measured at
 
 // Why the fits cannot be trusted, as messages: a malformed fit or pair, a role no drawn site has, and a pair of roles
 // that is listed twice, whose depths would then disagree.
@@ -119,9 +119,10 @@ export function seatingProblems(fits, roles) {
     ];
     if (shape.length > 0) return shape;
     return fit.pairs.flatMap((pair) => {
-      const [seated, into, depth] = Array.isArray(pair) ? pair : [];
+      const items = Array.isArray(pair) ? pair : [];
+      const [seated, into, depth] = items;
       const name = `${where}: pair ${seated} and ${into}`;
-      if (pair.length !== 3 || typeof seated !== 'string' || typeof into !== 'string' || !(depth > 0)) {
+      if (items.length !== 3 || typeof seated !== 'string' || typeof into !== 'string' || !(depth > 0)) {
         return [`${where}: pair ${JSON.stringify(pair)} is not [seated, into, depth] with a depth above 0`];
       }
       const earlier = listed.get(key(seated, into));
@@ -208,6 +209,7 @@ function seatingUseProblems(fits, grain, measured) {
     const covered = Math.max(0, ...(depths ?? []).filter((found) => found <= depth + EPSILON));
     const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
     if (!depths) return [`${where} is unused: no vehicle overlaps on it`];
+    if (covered === 0) return [`${where} is dead: every overlap on it is deeper than ${millimetres(depth)} mm`];
     if (covered > 0 && depth - covered > LOOSE * grain) {
       return [`${where} is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`];
     }

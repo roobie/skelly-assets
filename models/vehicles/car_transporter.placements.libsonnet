@@ -13,8 +13,12 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
   ]
   + site.pair('ramp', 'car_transporter_ramp'),
   unjudged: [
+    site.unjudged('dashboard', 'radiator', 0.06,
+      'The lower piece of car_transporter_dashboard runs into the core piece of radiator_truck.'),
     site.unjudged('deck_posts', 'upper_deck', 0.058,
       'The cross_6 piece of car_transporter_deck_posts runs into the post_0_near piece of car_transporter_upper_deck.'),
+    site.unjudged('gearbox', 'exhaust', 0.06,
+      'The pipe piece of gearbox_heavy runs into the case piece of exhaust_long.'),
     site.unjudged('lower_deck', 'deck_posts', 0.058,
       'The plate piece of car_transporter_lower_deck runs into the tail_post_near piece of car_transporter_deck_posts.'),
     site.unjudged('mudguard_far', 'lower_deck', 0.063,

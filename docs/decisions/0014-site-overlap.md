@@ -36,7 +36,7 @@ An overlap is allowed in two places, so each fact is stated once where it is tru
   parts; one nobody can explain is `unjudged` in the vehicle. Fits are a table by role and not fields on the part rows
   because the rows are a strict, cached schema and a fit belongs to how parts are placed. The table is checked on every
   run, so it cannot rot: a malformed fit, a role no drawn site has, a pair listed twice, a pair no vehicle overlaps
-  on, or a depth more than two grains above what any vehicle measures fails the build.
+  on, or a depth more than a grain above what any vehicle measures fails the build.
 - The vehicle, for what only it does: `overlaps` in its placements file says why a pair is correct, and `unjudged`
   holds an overlap nobody has judged, which may be a defect. Neither fails the build, but `unjudged` prints a note on
   every run, so it stays visible until someone decides. See `models/vehicles/site.libsonnet`, `overlap` and
@@ -44,7 +44,7 @@ An overlap is allowed in two places, so each fact is stated once where it is tru
 
 Every allowance is a depth cap: a pair or entry that grows deeper than declared fails again, so the cap is the
 contract, not the pair. An entry whose pair no longer overlaps, that a fit already covers, that is listed twice or
-whose cap is more than two grains above its measured depth fails the build, so the lists carry no dead weight.
+whose cap is more than a grain above its measured depth fails the build, so the lists carry no dead weight.
 
 ## Consequences
 

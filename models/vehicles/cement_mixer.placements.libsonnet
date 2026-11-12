@@ -17,6 +17,8 @@ local site = import 'site.libsonnet';
     ] + site.pair('roller_stand', 'cement_mixer_roller_stand'),
   ),
   unjudged: [
+    site.unjudged('dashboard', 'radiator', 0.06,
+      'The lower piece of tipper_truck_dashboard runs into the core piece of radiator_truck.'),
     site.unjudged('drive', 'drum', 0.238,
       'The pedestal piece of cement_mixer_drive runs into the band_0 piece of cement_mixer_drum.'),
     site.unjudged('drum', 'hopper', 0.058,
@@ -25,6 +27,8 @@ local site = import 'site.libsonnet';
       'The band_2 piece of cement_mixer_drum runs into the tank piece of cement_mixer_water_tank.'),
     site.unjudged('gearbox', 'drive', 0.09,
       'The case piece of gearbox_heavy runs into the foot piece of cement_mixer_drive.'),
+    site.unjudged('gearbox', 'exhaust', 0.06,
+      'The pipe piece of gearbox_heavy runs into the case piece of exhaust_long.'),
     site.unjudged('rear_frame', 'drum', 0.058,
       'The head piece of cement_mixer_rear_frame runs into the band_14 piece of cement_mixer_drum.'),
     site.unjudged('subframe', 'drive', 0.12,

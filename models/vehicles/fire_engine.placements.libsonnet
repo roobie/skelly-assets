@@ -18,4 +18,10 @@ local s = t.spec(import 'fire_engine.spec.libsonnet');
   + site.pair('cab_beacon', 'beacon_blue', [s.face - s.lean - 0.45, s.roof + 0.11, 0.9])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 0.95]),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('dashboard', 'radiator', 0.06,
+      'The lower piece of fire_engine_dashboard runs into the core piece of radiator_truck.'),
+    site.unjudged('gearbox', 'exhaust', 0.06,
+      'The pipe piece of gearbox_heavy runs into the case piece of exhaust_long.'),
+  ],
 }
