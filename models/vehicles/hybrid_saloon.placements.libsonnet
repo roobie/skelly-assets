@@ -10,22 +10,17 @@ local s = import 'saloon.spec.libsonnet';
     port: { part: 'charge_port', at: [s.rearAxle - 0.15, s.archTop + 0.05, s.side] },
     add: site.pair('badge', 'hybrid_badge', [s.cowl - 0.25, s.waist - 0.2, s.side])
          + [site.one('rear_badge', 'hybrid_badge_rear', [s.rear + 0.02, 0.8, 0.4])],
+    // The motor-generator starts the engine and charges the battery, so the hybrid carries no starter or alternator.
+    drop: ['alternator', 'starter_motor'],
     motor: { part: 'traction_motor_car', at: [s.frontAxle - 0.02, 0.3, 0.38] },
-    inverter: { part: 'inverter_car', at: [s.frontAxle - 0.05, 0.66, 0.38] },
+    // The inverter sits on the transaxle, clear of the air box on the motor's side.
+    inverter: { part: 'inverter_car', at: [s.frontAxle - 0.05, 0.6, -0.4] },
     pack: { part: 'hybrid_pack', at: [s.rearAxle - 0.5, 0.2, 0] },
   }),
   unjudged: [
-    site.unjudged('air_box', 'inverter', 0.055,
-      'The box piece of air_box_light runs into the case piece of inverter_car.'),
-    site.unjudged('alternator', 'motor', 0.058,
-      'The case piece of alternator_light runs into the stator piece of traction_motor_car.'),
-    site.unjudged('engine', 'inverter', 0.053,
-      'The intake piece of engine_i4_petrol_core runs into the case piece of inverter_car.'),
     site.unjudged('engine', 'motor', 0.059,
       'The intake piece of engine_i4_petrol_core runs into the stator piece of traction_motor_car.'),
     site.unjudged('shell', 'charge_port', 0.06,
       'The quarter_arch_near piece of saloon_shell runs into the socket piece of charge_port.'),
-    site.unjudged('starter_motor', 'motor', 0.042,
-      'The motor piece of starter_motor_light runs into the reducer piece of traction_motor_car.'),
   ],
 }
