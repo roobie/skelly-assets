@@ -36,18 +36,20 @@ file writing is separate from browser-safe geometry and preview code; see `src/f
 
 ## Voxelized export
 
-Every model exports as a greedy voxel mesh, and the recipe loader refuses a row that
-names no voxel class, so no model drifts smooth beside voxel ones by omission. The sampler
-lives here because this package may not import deadvox's mesher; see `src/recipe.ts`,
-`RowSchema`, `src/voxelize.ts`, `voxelize`, and `src/glb.ts`, `voxelPrimitivesFor`.
+Models export as greedy voxel meshes, except where the thin-feature rule below draws one
+another way. The recipe loader refuses a row that names no voxel class, so no model drifts
+off the lattice by omission. The sampler lives here because this package may not import
+deadvox's mesher; see `src/recipe.ts`, `RowSchema`, `src/voxelize.ts`, `voxelize`, and
+`src/glb.ts`, `voxelPrimitivesFor`.
 
 A feature thinner than a couple of voxels lands unevenly on the lattice: a whole voxel on
 one side and none on the other. One shared rule says when a feature is too thin for its
 grain, phrased as thickness against grain so every exporter asks it the same way, and each
-caller decides what to draw instead. A small cartridge, whose rim is under the rule, is
-drawn as a faceted lathe, as no grain fine enough to hold it would sit beside the guns; a
-large shell still voxelizes. The span is content; see `src/featureFit.ts`,
-`featureFitsGrain`, and `models/voxel-grains.libsonnet`, `featureVoxels`.
+caller decides what to draw instead. A cartridge is measured by its rim at its row's grain:
+under the rule it is drawn as a faceted lathe, as no grain fine enough to hold it would sit
+beside the guns, and its data may force voxels with `voxelize`. The span is content; see
+`src/featureFit.ts`, `featureFitsGrain`, and `models/voxel-grains.libsonnet`,
+`featureVoxels`.
 
 Four grains, all content values: a coarse one for vehicles, furniture and the parts made
 to attach to them; a fine one for firearms, their magazines and hand-held items; a middle

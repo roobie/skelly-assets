@@ -14,7 +14,7 @@ local taxonomy(category, weapon=null, keywords=[]) = {
 local design(row) = {
   id: row.id, kind: 'design', source: 'models/guns/designs/' + row.design + '.json', voxel: voxel.gun,
 } + taxonomy('weapons', row.weapon, std.get(row, 'keywords', []));
-// A cartridge exports as its round and its case, both measured against the grain its definition names.
+// A cartridge exports as its round and its case, both measured against the item grain or the one its definition names.
 local cartridge(row) = [
   {
     id: component + '_' + row.name, kind: 'cartridge', source: 'models/guns/cartridges/' + row.source + '.json',
