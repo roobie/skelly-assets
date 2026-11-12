@@ -24,6 +24,7 @@ local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, oute
 // A tyre's turned section, its shoulders rounded off by `taper` of its width.
 local tyreProfile(width, rim, outer, taper) = [[-width / 2, rim], [-width / 2, outer - width * taper], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * taper], [width / 2, rim], [-width / 2, rim]];
 local rad(degrees) = degrees * std.pi / 180;
+local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 // Convex trapezoids around a centre, since a prism must be convex. Angles run counter-clockwise from +x.
 local arc(id, slot, cx, cy, inner, outer, from, to, steps, z) = [
   local a0 = rad(from + (to - from) * i / steps);
@@ -48,6 +49,8 @@ local bar(id, slot, a, b, thick, z, thickB=null) =
   prism(id, slot, [[a[0] - na[0], a[1] - na[1]], [b[0] - nb[0], b[1] - nb[1]], [b[0] + nb[0], b[1] + nb[1]], [a[0] + na[0], a[1] + na[1]]], z);
 local near(piece) = piece + { id: piece.id + '_near' };
 local far(piece) = piece + { id: piece.id + '_far' } + (
+  if std.objectHas(piece, 'clip') then { clip: [c { normal: [c.normal[0], c.normal[1], -c.normal[2]] } for c in piece.clip] } else {}
+) + (
   if piece.kind == 'box' then { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] }
   else if piece.kind == 'prism' && piece.axis == 'z' then { start: -piece.end, end: -piece.start }
   else if piece.kind == 'prism' && piece.axis == 'x' then { profile: std.reverse([[p[0], -p[1]] for p in piece.profile]) }
@@ -69,6 +72,25 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   rad: rad,
   arc: arc,
   bar: bar,
+  // The plane through three (x, y, z) points as a cut that keeps the side holding `inside`, so an armour plate is
+  // authored by its corners rather than by a normal worked out by hand.
+  plate(a, b, c, inside):
+    local u = [b[i] - a[i] for i in [0, 1, 2]];
+    local v = [c[i] - a[i] for i in [0, 1, 2]];
+    local n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+    local facing = if dot(n, [inside[i] - a[i] for i in [0, 1, 2]]) > 0 then [-x for x in n] else n;
+    { normal: facing, offset: dot(facing, a) },
+  // The x where the plane through three (x, y, z) points passes height y at side offset z, for a fitting seated on a plate.
+  plateX(points, y, z):
+    local cut = self.plate(points[0], points[1], points[2], points[0]);
+    (cut.offset - cut.normal[1] * y - cut.normal[2] * z) / cut.normal[0],
+  // A prism cut by the planes `plates` lists, each from `plate`: a convex solid whose faces need not lie along an axis.
+  clipped(piece, plates):
+    assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';
+    piece { clip: plates },
+  // Whether one of `plates` leaves every (x, y, z) corner of a convex piece beyond it, so cutting the piece by them would
+  // leave nothing to draw.
+  cutAway(corners, plates): std.any([std.all([dot(c.normal, q) >= c.offset - 1e-6 for q in corners]) for c in plates]),
   // A roller shutter in a locker wall, from `z[0]` to `z[1]`: horizontal slats in alternating `alu` and `steel`, with a
   // grab bar in `dark` along its foot.
   shutter(name, x0, x1, y0, y1, z): [
@@ -87,14 +109,17 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
-    if piece.kind == 'box' then piece { min: [piece.min[i] + by[i] for i in [0, 1, 2]], max: [piece.max[i] + by[i] for i in [0, 1, 2]] }
-    else if piece.kind == 'turned' then piece { origin: [piece.origin[i] + by[i] for i in [0, 1, 2]] }
-    else
-      local along = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[piece.axis];
-      piece { profile: shift(piece.profile, along[1], along[2]), start: piece.start + by[along[0]], end: piece.end + by[along[0]] },
+    local cut = if std.objectHas(piece, 'clip') then { clip: [c { offset: c.offset + dot(c.normal, by) } for c in piece.clip] } else {};
+    (if piece.kind == 'box' then piece { min: [piece.min[i] + by[i] for i in [0, 1, 2]], max: [piece.max[i] + by[i] for i in [0, 1, 2]] }
+     else if piece.kind == 'turned' then piece { origin: [piece.origin[i] + by[i] for i in [0, 1, 2]] }
+     else
+       local along = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[piece.axis];
+       piece { profile: shift(piece.profile, along[1], along[2]), start: piece.start + by[along[0]], end: piece.end + by[along[0]] })
+    + cut,
   // A z prism turned `degrees` counter-clockwise about the z axis, so one part's pieces can be laid round a loop.
   rolled(piece, degrees):
     assert piece.kind == 'prism' && piece.axis == 'z' : piece.id + ' is not a z prism, so it cannot roll about z';
+    assert !std.objectHas(piece, 'clip') : piece.id + ' is cut by planes, which rolling would leave behind';
     local a = rad(degrees);
     piece { profile: [[p[0] * std.cos(a) - p[1] * std.sin(a), p[0] * std.sin(a) + p[1] * std.cos(a)] for p in piece.profile] },
   // A vehicle whose pressing would be identical to a sibling's fits the sibling's row instead, so a shared part is one
