@@ -14,13 +14,15 @@ local ladderX = s.barrelRear - s.dish - 0.1;
 // A saddle's cradle rises from its foot to the barrel's underside, in convex segments since a prism must be convex.
 local cradleHalf = 0.92;
 local cradleSteps = 8;
+// The top of a saddle's foot on the rails, where its cradle starts.
+local footTop = s.railTop + 0.08;
 local cradle(id, x) =
   local reach = std.asin(cradleHalf / s.barrelRadius);
   local rim(j) =
     local a = -reach + 2 * reach * j / cradleSteps;
     [s.barrelY - s.barrelRadius * std.cos(a), s.barrelRadius * std.sin(a)];
   [
-    k.xPrism(id + '_' + j, 'frame', [[s.railTop + 0.08, rim(j)[1]], rim(j), rim(j + 1), [s.railTop + 0.08, rim(j + 1)[1]]], [x - 0.1, x + 0.1])
+    k.xPrism(id + '_' + j, 'frame', [[footTop, rim(j)[1]], rim(j), rim(j + 1), [footTop, rim(j + 1)[1]]], [x - 0.1, x + 0.1])
     for j in std.range(0, cradleSteps - 1)
   ];
 local posts = [s.barrelRear + 0.5 + i * (s.barrelFront - s.barrelRear - 1.0) / 5 for i in std.range(0, 5)];
@@ -46,7 +48,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck',
   ], finish) + { title: 'Tanker truck barrel' },
   k.compound('tanker_truck_saddle', 240, std.flattenArrays([
     [
-      box('foot_' + i, 'frame', [saddles[i] - 0.16, s.railTop, -0.56], [saddles[i] + 0.16, s.railTop + 0.08, 0.56]),
+      box('foot_' + i, 'frame', [saddles[i] - 0.16, s.railTop, -0.56], [saddles[i] + 0.16, footTop, 0.56]),
     ] + cradle('cradle_' + i, saddles[i])
     for i in std.range(0, 2)
   ]), finish) + { title: 'Tanker truck saddle' },
