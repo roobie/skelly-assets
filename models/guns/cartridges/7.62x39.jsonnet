@@ -1,7 +1,7 @@
 {
   "format": 1,
   // A case about 11 mm across needs the fine grain to keep its taper, shoulder and bullet; the item grain draws blocks.
-  "voxelGrain": 0.001,
+  "voxelGrain": 0.002,
   "kind": "metallic",
   "id": "7.62x39",
   "designation": "7.62×39mm",

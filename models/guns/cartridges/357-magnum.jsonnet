@@ -4,7 +4,7 @@ local unknown = { value: null, cite: null, note: 'Not specified by the governing
 {
   format: 1,
   // A case under 10 mm across needs the fine grain to keep its rim and bullet; the item grain draws an L of blocks.
-  voxelGrain: 0.001,
+  voxelGrain: 0.002,
   kind: 'metallic',
   id: '357-magnum',
   designation: '.357 Magnum',

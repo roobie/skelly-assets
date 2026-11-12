@@ -1,7 +1,7 @@
 {
   "format": 1,
   // A 20 mm hull is two item voxels across; the fine grain keeps it round and its brass head and rim apart.
-  "voxelGrain": 0.001,
+  "voxelGrain": 0.002,
   "kind": "shotshell",
   "id": "12-gauge-00-buck",
   "designation": "12 gauge 2¾-inch 00 buckshot",
