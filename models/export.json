@@ -1,6 +1,7 @@
 {
   "skelly.bolt-guns": [
     "bolt_carbine",
+    "bolt_carbine_drum",
     "bolt_scattergun",
     "bolt_plasma_caster"
   ],
