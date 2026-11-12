@@ -2,9 +2,9 @@ local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local bolt = import 'bolt-gun.libsonnet';
 local box = h.box;
 
-// An oversized bolt carbine, about 0.84 m long and deep for its length: a slab receiver, an armoured barrel shroud
+// An oversized bolt carbine, about 0.94 m long and deep for its length: a slab receiver, an armoured barrel shroud
 // nearly as deep as the receiver, a fat barrel ending in a slotted muzzle brake, a deep box magazine of rocket bolts
-// ahead of the grip and a stubby butt. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's
+// ahead of the grip and the family's skeleton stock. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's
 // muzzle faces +z; the side view shows its profile.
 
 local w = 0.055;  // half the receiver's width
@@ -21,8 +21,8 @@ local barrelY = 0.245;
   ] + [
     // A fat barrel and a muzzle brake with three side ports and a dark bore.
     h.rod('barrel', 'metal', 0.03, 0.38, 0.43, barrelY) + { sides: 48 },  // round, as at the commit this was authored on; turned shapes default to eight sides
-    box('brake', 'metal', [0.43, barrelY - 0.042, -0.046], [0.51, barrelY + 0.042, 0.046]),
-    box('brake-cap', 'metal', [0.51, barrelY - 0.035, -0.04], [0.522, barrelY + 0.035, 0.04]),
+    h.prism('brake', 'metal', 'x', bolt.bevel(barrelY - 0.042, barrelY + 0.042, 0.046, 0.012), 0.43, 0.51),
+    h.prism('brake-cap', 'metal', 'x', bolt.bevel(barrelY - 0.035, barrelY + 0.035, 0.04, 0.01), 0.51, 0.522),
   ] + [
     box('port-%d' % i, 'vent', [0.442 + i * 0.022, barrelY - 0.03, -0.0475], [0.456 + i * 0.022, barrelY + 0.03, 0.0475])
     for i in [0, 1, 2]
