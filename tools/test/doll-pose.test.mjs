@@ -5,9 +5,10 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { clearanceProbe, coveredSurface, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { clearanceProbe, COINCIDENT, coveredSurface, posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
+import { hides } from '../../site/hiding.mjs';
 import { add, applyPoint, boneTransforms, dot, length, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { modelSources } from '../check-sources.mjs';
@@ -249,5 +250,28 @@ test('each fitted everyday garment covers the body and leaves none of it poking 
     assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
     const { pokes } = clearanceProbe(rig, dressed, surface)(still);
     assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
+  }
+});
+
+test('a garment that leaves regions of a part bare leaves none of their skin below the top of the regions it covers', () => {
+  // A piece that declares what it covers is not meant to cover the other regions it passes beneath, so the rest probe
+  // above cannot see their skin poke through its wall. Below the top of the regions it does cover, that skin lies where
+  // the wall wraps the part, so it would.
+  const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
+  for (const wear of CLOTHES) {
+    const dressed = restIn(wear);
+    if (!dressed.pieces.some(({ covers }) => covers)) continue;
+    const declared = coveredSurface(rig, dressed);
+    const undeclared = coveredSurface(rig, { ...dressed, pieces: dressed.pieces.map(({ covers, ...piece }) => piece) });
+    dressed.pieces.forEach(({ piece, bone, covers }, index) => {
+      if (!covers) return;
+      const { part } = dressed.body.find((body) => body.bone === bone);
+      const at = declared.findIndex((surface) => surface.bone === bone);
+      const height = ({ point }) => dot(point, axes.get(bone));
+      const top = declared[at].samples.reduce((most, sample) => (hides(covers, part, sample.region) ? Math.max(most, height(sample)) : most), -Infinity);
+      const bare = declared[at].samples.filter(({ cover }, i) => cover < 0 && undeclared[at].samples[i].cover === index);
+      const below = bare.filter((sample) => height(sample) < top - COINCIDENT);
+      assert.equal(below.length, 0, `${wear}: ${piece} passes beneath bare skin below the top of ${covers}`);
+    });
   }
 });

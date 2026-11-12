@@ -150,7 +150,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
         oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * d.armpit), { halfX: chestHalfX * 0.94, halfZ: chestHalfZ - 0.002, power: 3.2 }),
       ]),
       ...region('shoulders', [
-        oval('chest', 'skin', ys(chest + d.chestHeight * 0.35, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
+        oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), { halfX: chestHalfX, halfZ: chestHalfZ - 0.006, power: 3.6 }),
         pec('pec-left', 1),
         pec('pec-right', -1),
         trapezius('trap-left', 1),
