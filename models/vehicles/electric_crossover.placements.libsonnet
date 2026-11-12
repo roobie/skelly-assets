@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'electric_crossover.spec.libsonnet';
 {
+  title: 'Electric crossover',
   sites: [
     site.one('shell', 'electric_crossover_shell'),
     site.one('windscreen', 'electric_crossover_windscreen'),

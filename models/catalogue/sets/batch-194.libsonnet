@@ -63,7 +63,7 @@ local beetle(prefix, slot, r, side) =
   ] + [
     box('glyph-%d' % i, 'rune', [-0.06 + 0.12 * (i % 2) - 0.006, 0.17 + 0.012 * std.floor(i / 2), 0.053], [-0.06 + 0.12 * (i % 2) + 0.006, 0.175 + 0.012 * std.floor(i / 2), 0.056])
     for i in std.range(0, 3)
-  ], { body: 'leather-chestnut', flap: 'leather-chestnut', strap: 'leather-tan', metal: 'brass-dull', stitch: 'cord-cotton', rune: 'crystal-glow-violet' }) + h.inHand('rune_stitched_satchel', 'body') + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'] } } },
+  ], { body: 'leather-chestnut', flap: 'leather-chestnut', strap: 'leather-tan', metal: 'brass-dull', stitch: 'cord-cotton', rune: 'crystal-glow-violet' }) + { title: 'Rune-stitched satchel' } + h.inHand('rune_stitched_satchel', 'body') + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['fantasy'] } } },
 
   // A squat iron chest 600 mm wide, 400 mm tall and 420 mm deep with banded corners, a hinged lid, a hasp and two
   // side handles; violet rune lines run round the front and lid.
@@ -102,7 +102,7 @@ local beetle(prefix, slot, r, side) =
     box('lid-glyph-%d' % i, 'rune', [-0.25 + 0.0625 * i, 0.345, 0.215], [-0.234 + 0.0625 * i, 0.375, 0.219])
     for i in std.range(0, 8)
     if i != 4
-  ], { iron: 'iron-dull', band: 'steel-parkerized', rune: 'crystal-glow-violet' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { iron: 'iron-dull', band: 'steel-parkerized', rune: 'crystal-glow-violet' }) + { title: 'Rune iron preservation chest' } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A carved wooden ball 124 mm across, a stag beetle in relief on each side and a carved band round its middle.
   h.compound('carved_beetle_ball', 0.74, [
@@ -110,7 +110,7 @@ local beetle(prefix, slot, r, side) =
     h.turned('band-top', 'band', 'y', [[0, 0.054], [0, 0.0595], [0.004, 0.0595], [0.004, 0.054], [0, 0.054]], [0, 0.082, 0]),
     h.turned('band-low', 'band', 'y', [[0, 0.054], [0, 0.0595], [0.004, 0.0595], [0.004, 0.054], [0, 0.054]], [0, 0.038, 0]),
   ] + beetle('beetle-front', 'relief', 0.062, 1) + beetle('beetle-back', 'relief', 0.062, -1),
-  { wood: 'wood-oak', band: 'wood-walnut', relief: 'chitin-brown' }) + h.inHand('carved_beetle_ball', 'ball') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
+  { wood: 'wood-oak', band: 'wood-walnut', relief: 'chitin-brown' }) + { title: 'Carved beetle ball' } + h.inHand('carved_beetle_ball', 'ball') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A rune of amber resin 34 mm across and 10 mm thick, wrapped in a leaf 70 mm long whose sides fold over it.
   h.compound('leaf_wrapped_resin_rune', 0.029, [
@@ -125,7 +125,7 @@ local beetle(prefix, slot, r, side) =
     box('fold-right', 'leaf', [0.008, 0.002, -0.022], [0.02, 0.014, 0.022]),
     box('fold-right-top', 'leaf', [0.011, 0.014, -0.02], [0.02, 0.016, 0.02]),
     box('vein', 'stem', [-0.034, 0.002, -0.001], [-0.02, 0.003, 0.001]),
-  ], { leaf: 'leaf-green', stem: 'plant-dried', resin: 'resin-honey', rune: 'wood-walnut' }) + h.inHand('leaf_wrapped_resin_rune', 'resin') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['plant'], setting: ['fantasy'] } } },
+  ], { leaf: 'leaf-green', stem: 'plant-dried', resin: 'resin-honey', rune: 'wood-walnut' }) + { title: 'Leaf-wrapped resin rune' } + h.inHand('leaf_wrapped_resin_rune', 'resin') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['plant'], setting: ['fantasy'] } } },
 
   // A gold skeleton key 64 mm long lying flat, with a ring bow round a small blue crystal, a round shank and a
   // two-toothed bit.
@@ -136,7 +136,7 @@ local beetle(prefix, slot, r, side) =
     box('bit', 'gold', [0.024, 0.0, 0.0], [0.034, 0.004, 0.014]),
     box('bit-tooth', 'gold', [0.028, 0.0, 0.014], [0.03, 0.004, 0.018]),
     box('bit-tip', 'gold', [0.032, 0.0, 0.014], [0.036, 0.004, 0.018]),
-  ], { gold: 'metal-gold', crystal: 'crystal-glow-blue' }) + h.gripOn('gold_skeleton_key', 'bow') + { voxelGrain: 0.002 } + { taxonomy: { category: 'keys', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { gold: 'metal-gold', crystal: 'crystal-glow-blue' }) + { title: 'Gold skeleton key' } + h.gripOn('gold_skeleton_key', 'bow') + { voxelGrain: 0.002 } + { taxonomy: { category: 'keys', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // An engraved wooden torch 500 mm long lying along x: a fluted grip bound with brass, and a brass cup at the head
   // holding a flame that never goes out.
@@ -153,7 +153,7 @@ local beetle(prefix, slot, r, side) =
     local x = -0.04 + 0.03 * i;
     h.tube('carving-%d' % i, 'carve', 0.0, 0.0175 + 0.003 * (x + 0.19) / 0.35, x, x + 0.006)
     for i in std.range(0, 6)
-  ], { wood: 'wood-oak', brass: 'brass-dull', carve: 'wood-walnut', flame: 'glow-flame', core: 'cloth-yellow' }) + {
+  ], { wood: 'wood-oak', brass: 'brass-dull', carve: 'wood-walnut', flame: 'glow-flame', core: 'cloth-yellow' }) + { title: 'Everburning torch' } + {
     // Laid out along x, flame at +x, as the torch family is.
     forward: '+x',
     handling: { part: 'everburning_torch', solid: 'shaft', fraction: [0.3, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', rest: 'upright', roll: 0 },
@@ -169,7 +169,7 @@ local beetle(prefix, slot, r, side) =
     box('guard', 'relief', [-0.006, 0.002, -0.007], [-0.004, 0.004, 0.007]),
     box('grip', 'relief', [-0.012, 0.002, -0.001], [-0.006, 0.004, 0.001]),
     box('pommel', 'relief', [-0.015, 0.002, -0.002], [-0.012, 0.004, 0.002]),
-  ], { silver: 'metal-silver', relief: 'steel-grey' }) + h.inHand('silver_weapon_token', 'coin') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { silver: 'metal-silver', relief: 'steel-grey' }) + { title: 'Silver weapon token' } + h.inHand('silver_weapon_token', 'coin') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A slender wooden wand 380 mm long lying along x, tapering from a carved grip to a fine tip, with a brass socket
   // at its base holding a mana crystal.
@@ -182,7 +182,7 @@ local beetle(prefix, slot, r, side) =
   ] + [
     h.tube('grip-ring-%d' % i, 'carve', 0.0, 0.0105, -0.13 + 0.02 * i, -0.124 + 0.02 * i)
     for i in std.range(0, 4)
-  ], { wood: 'wood-walnut', carve: 'wood-oak', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + h.gripOn('crystal_socket_wand', 'grip') + {
+  ], { wood: 'wood-walnut', carve: 'wood-oak', brass: 'brass-dull', crystal: 'crystal-glow-blue' }) + { title: 'Crystal-socket wand' } + h.gripOn('crystal_socket_wand', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'arcana', tags: { material: ['wood', 'metal'], setting: ['fantasy'] } } },
 ]

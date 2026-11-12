@@ -20,7 +20,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('sill_bracket', 'frame', [0.2, 0.46, 0.38], [0.3, 0.52, s.skinIn]),
     box('bed_bracket_fore', 'frame', [-0.7, 0.58, 0.3], [-0.6, s.deckBottom, 0.38]),
     box('bed_bracket_aft', 'frame', [-2.3, 0.58, 0.3], [-2.2, s.deckBottom, 0.38]),
-  ]), finish),
+  ]), finish) + { title: 'Technical frame' },
   k.compound('technical_cab', s.cabMass, bothSides([
     box('sill', 'paint', [s.cabBack, s.sill, s.skinIn - 0.02], [s.cowl, s.floor, s.skin]),
     box('rear_post', 'paint', [s.cabBack, s.floor, s.skinIn], [s.doorRear, s.roof, s.skin]),
@@ -42,7 +42,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('roof_rust', 'rustred', [-0.18, s.roof + 0.05, 0.1], [0.3, s.roof + 0.06, 0.56]),
     prism('header', 'paint', [[0.62, s.roof - 0.06], [0.74, s.roof - 0.06], [0.74, s.roof], [0.62, s.roof]], [-s.skin, s.skin]),
     box('back_rust', 'rust', [s.cabBack - 0.01, 0.7, -0.5], [s.cabBack, 0.98, -0.18]),
-  ], finish),
+  ], finish) + { title: 'Technical cab' },
   k.compound('technical_door', 32, [
     box('skin', 'paint', [s.doorRear, s.floor, s.skinIn], [s.doorFront, s.waist, s.skin]),
     box('stile', 'paint', [s.doorRear, s.waist, s.skinIn], [s.doorRear + 0.06, s.roof - 0.06, s.skin]),
@@ -52,32 +52,32 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('handle', 'dark', [s.doorRear + 0.08, s.waist - 0.1, s.skin], [s.doorRear + 0.22, s.waist - 0.06, s.skin + 0.02]),
     box('rust_low', 'rust', [s.doorRear + 0.1, s.floor + 0.02, s.skin], [s.doorFront - 0.24, s.floor + 0.14, s.skin + 0.01]),
     box('rust_patch', 'rustred', [0.32, 0.86, s.skin], [0.56, 1.02, s.skin + 0.01]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
+  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Technical door' },
   k.compound('technical_windows', 22, [
     prism('windscreen', 'glass', [[0.93, s.waist], [0.97, s.waist], [0.7, s.roof - 0.04], [0.66, s.roof - 0.04]], [-s.skinIn, s.skinIn]),
     box('back_glass', 'glass', [s.cabBack + 0.01, s.waist, -0.58], [s.cabBack + 0.03, s.roof - 0.1, 0.58]),
-  ], finish),
+  ], finish) + { title: 'Technical windows' },
   k.compound('technical_dashboard', 11, [
     box('panel', 'trim', [s.cowl - 0.3, s.floor + 0.42, -s.skinIn], [s.cowl - 0.04, s.waist - 0.02, s.skinIn]),
     box('column', 'dark', [s.cowl - 0.33, s.floor + 0.66, -0.4], [s.cowl - 0.3, s.floor + 0.7, -0.36]),
-  ], finish),
+  ], finish) + { title: 'Technical dashboard' },
   k.compound('technical_bonnet', 30, [
     prism('top', 'cream', [[s.cowl, s.bonnetBackY - 0.04], [s.nose, s.bonnetFrontY - 0.04], [s.nose, s.bonnetFrontY], [s.cowl, s.bonnetBackY]], [-0.72, 0.72]),
     box('dent', 'rustred', [1.6, 1.06, -0.46], [2.0, 1.075, -0.12]),
-  ], finish),
+  ], finish) + { title: 'Technical bonnet' },
   k.compound('technical_wing', 16, m.arched('panel', 'paint', [s.cowl, s.nose + 0.05], [s.sill, s.wingTop], [s.panelIn, s.side], [{ x: s.frontAxle, y: s.hub, r: s.archR }]) + [
     box('top', 'paint', [s.cowl, s.wingTop - 0.04, 0.72], [s.nose + 0.05, s.wingTop, s.panelIn]),
     box('inner', 'trim', [s.cowl, s.sill, s.innerZ - 0.03], [s.nose, s.wingTop - 0.04, s.innerZ]),
     box('crown', 'trim', [s.frontAxle - 0.46, 0.82, s.innerZ], [s.frontAxle + 0.46, 0.85, s.panelIn]),
     box('rust', 'rust', [s.nose - 0.26, s.sill + 0.02, s.side], [s.nose + 0.05, 0.72, s.side + 0.01]),
     box('rust_arc', 'rustred', [1.0, 0.68, s.side], [1.14, 0.86, s.side + 0.01]),
-  ], finish),
+  ], finish) + { title: 'Technical wing' },
   k.compound('technical_grille', 18, [
     box('backing', 'dark', [s.nose, s.sill + 0.08, -s.side], [s.nose + 0.05, s.bonnetFrontY, s.side]),
     box('head', 'paint', [s.nose + 0.05, s.bonnetFrontY - 0.06, -s.side], [s.nose + 0.07, s.bonnetFrontY, s.side]),
     box('foot', 'rust', [s.nose + 0.05, s.sill + 0.08, -s.side], [s.nose + 0.07, s.sill + 0.16, s.side]),
     box('bar', 'rust', [s.nose + 0.05, 0.78, -0.44], [s.nose + 0.07, 0.82, 0.44]),
-  ], finish),
+  ], finish) + { title: 'Technical grille' },
   k.compound('technical_bull_bar', 42, [
     box('bar', 'rust', [s.nose + 0.1, 0.5, -0.9], [s.frontBumper, 0.66, 0.9]),
     box('top', 'dark', [s.frontBumper - 0.06, 1.0, -0.56], [s.frontBumper - 0.01, 1.05, 0.5]),
@@ -87,10 +87,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('post_mid', 'dark', [s.frontBumper - 0.06, 0.66, 0.18], [s.frontBumper - 0.01, 1.0, 0.22]),
     box('stay_near', 'rust', [s.nose + 0.07, 0.56, 0.3], [s.nose + 0.1, 0.62, 0.38]),
     box('stay_far', 'rust', [s.nose + 0.07, 0.56, -0.38], [s.nose + 0.1, 0.62, -0.3]),
-  ], finish),
+  ], finish) + { title: 'Technical bull bar' },
   k.compound('technical_bed_floor', 50, [
     box('floor', 'floor', [s.rear + 0.04, s.deckBottom, -s.panelIn], [s.bedFront, s.deckTop, s.panelIn]),
-  ], finish),
+  ], finish) + { title: 'Technical bed floor' },
   k.compound('technical_bed', 110, bothSides(
     m.arched('side', 'paint', [s.rear + 0.04, s.bedFront], [s.sill, s.bedTop], [s.panelIn, s.side], [{ x: s.rearAxle, y: s.hub, r: s.archR }])
     + [
@@ -105,19 +105,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     ]
   ) + [
     box('headboard', 'paint', [s.bedFront - 0.04, s.deckTop, -s.side], [s.bedFront, s.bedTop, s.side]),
-  ], finish),
+  ], finish) + { title: 'Technical bed' },
   k.compound('technical_tailgate', 26, [
     box('gate', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.bedTop, s.panelIn]),
     box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, 1.0, 0.2]),
     box('catch', 'dark', [s.rear - 0.02, s.bedTop - 0.08, 0.76], [s.rear, s.bedTop - 0.04, 0.84]),
-  ], finish),
+  ], finish) + { title: 'Technical tailgate' },
   k.compound('technical_roll_hoop', 34, [
     box('top', 'rust', [s.bedFront - 0.12, 1.8, -0.72], [s.bedFront - 0.06, 1.86, 0.72]),
     box('foot_bar', 'rust', [s.bedFront - 0.14, s.deckTop, -0.72], [s.bedFront - 0.04, s.deckTop + 0.03, 0.72]),
   ] + bothSides([
     box('leg', 'rust', [s.bedFront - 0.12, s.deckTop + 0.03, 0.66], [s.bedFront - 0.06, 1.8, 0.72]),
     box('brace', 'dark', [s.bedFront - 0.06, 1.6, 0.66], [s.cabBack, 1.64, 0.72]),
-  ]), finish),
+  ]), finish) + { title: 'Technical roll hoop' },
   // A mount only: the post ends in an empty yoke behind a welded gun shield, its slot left clear.
   k.compound('technical_pedestal', 85, [
     box('base', 'steel', [-0.26, 0, -0.26], [0.26, 0.04, 0.26]),
@@ -133,10 +133,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('shield', 'rust', [0.14, 0.98, 0.09], [0.17, 1.44, 0.36]),
     box('yoke_arm', 'steel', [-0.05, 1.01, 0.13], [0.05, 1.2, 0.16]),
     box('foot', 'dark', [-0.22, 0.04, 0.17], [-0.16, 0.06, 0.23]),
-  ]), finish),
+  ]), finish) + { title: 'Technical pedestal' },
   k.compound('technical_steering_box', 8, [
     box('box', 'dark', [1.2, 0.5, -0.42], [1.32, 0.6, -0.3]),
     box('drag_link', 'frame', [1.28, 0.44, -0.45], [1.54, 0.47, -0.42]),
     box('arm', 'frame', [1.26, 0.44, -0.42], [1.32, 0.5, -0.38]),
-  ], finish),
+  ], finish) + { title: 'Technical steering box' },
 ])

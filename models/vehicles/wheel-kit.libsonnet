@@ -116,9 +116,9 @@ local kinds = {
     ],
     rows(b): [
       local d = disc(b);
-      k.compound(b.disc.id, b.disc.massKg, d.pieces, d.finish),
+      k.compound(b.disc.id, b.disc.massKg, d.pieces, d.finish) + { title: b.disc.title },
       local p = caliper(b);
-      k.compound(b.caliper.id, b.caliper.massKg, p.pieces, p.finish),
+      k.compound(b.caliper.id, b.caliper.massKg, p.pieces, p.finish) + { title: b.caliper.title },
     ],
   },
   drum: {
@@ -126,16 +126,16 @@ local kinds = {
     fits(b, inside): b.drum.radius + b.drum.wall + b.backingPlate.lip < inside,
     sites(b, face): [
       { suffix: '_brake_drum', part: b.drum.id, dz: face },
-      { suffix: '_brake_shoes', part: b.shoeAssembly, dz: face - b.drum.depth },
+      { suffix: '_brake_shoes', part: b.shoeAssembly.id, dz: face - b.drum.depth },
     ],
     rows(b): [
       local d = drum(b);
-      k.compound(b.drum.id, b.drum.massKg, d.pieces, d.finish),
+      k.compound(b.drum.id, b.drum.massKg, d.pieces, d.finish) + { title: b.drum.title },
       local a = shoeAssembly(b);
-      k.compound(b.shoeAssembly, self.mass(b) - b.drum.massKg, a.pieces, a.finish),
+      k.compound(b.shoeAssembly.id, self.mass(b) - b.drum.massKg, a.pieces, a.finish) + { title: b.shoeAssembly.title },
     ] + [
       local d = part[1](b);
-      k.compound(b[part[0]].id, b[part[0]].massKg, d.pieces, d.finish)
+      k.compound(b[part[0]].id, b[part[0]].massKg, d.pieces, d.finish) + { title: b[part[0]].title }
       for part in [['backingPlate', backingPlate], ['shoes', shoes], ['wheelCylinder', wheelCylinder]]
     ],
   },
@@ -149,9 +149,9 @@ local wheelRows(name) =
   local unfit = [kind for kind in std.objectFields(classOf(name)) if !kinds[kind].fits(classOf(name)[kind], w.rim.radius - w.rim.wall)];
   assert unfit == [] : name + "'s rim is too small for its class's " + std.join(' and ', unfit) + ' brake';
   [
-    k.compound(name, w.tyre.massKg + w.rim.massKg, t.pieces + r.pieces, t.finish + r.finish, anchored),
-    k.compound(w.tyre.id, w.tyre.massKg, t.pieces, t.finish, { hub: ['tyre', [0.5, 0.5, 0.5]] }),
-    k.compound(w.rim.id, w.rim.massKg, r.pieces, r.finish, anchored),
+    k.compound(name, w.tyre.massKg + w.rim.massKg, t.pieces + r.pieces, t.finish + r.finish, anchored) + { title: w.title },
+    k.compound(w.tyre.id, w.tyre.massKg, t.pieces, t.finish, { hub: ['tyre', [0.5, 0.5, 0.5]] }) + { title: w.tyre.title },
+    k.compound(w.rim.id, w.rim.massKg, r.pieces, r.finish, anchored) + { title: w.rim.title },
   ];
 
 {

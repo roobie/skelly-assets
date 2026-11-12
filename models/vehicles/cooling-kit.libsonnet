@@ -71,10 +71,10 @@ local fittings(name) =
 {
   // Every class's fan and hose rows and every radiator's core and fused rows.
   rows: std.flattenArrays([
-    [assembly.row(c.fan.id, c.fan.massKg, fan(c)), assembly.row(c.hose.id, c.hose.massKg, hose(c))]
+    [assembly.row(c.fan.id, c.fan.title, c.fan.massKg, fan(c)), assembly.row(c.hose.id, c.hose.title, c.hose.massKg, hose(c))]
     for c in std.objectValues(classes)
   ]) + std.flattenArrays([
-    assembly.rows(fusedId(name), coreId(name), radiators[name].massKg, coreDrawn(radiators[name], classOf(name)), fittings(name))
+    assembly.rows(fusedId(name), coreId(name), radiators[name].title, radiators[name].title + ' core', radiators[name].massKg, coreDrawn(radiators[name], classOf(name)), fittings(name))
     for name in std.objectFields(radiators)
   ]),
   // The radiators, by the names `sites` takes.

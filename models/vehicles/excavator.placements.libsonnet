@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'excavator.spec.libsonnet';
 local track = import 'track-kit.libsonnet';
 {
+  title: 'Excavator',
   sites: [
     site.one('carbody', 'excavator_carbody'),
     site.one('house', 'excavator_house'),

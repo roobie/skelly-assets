@@ -5,6 +5,7 @@ local s = import 'abandoned_army_truck.spec.libsonnet';
 local fixed(id) = one(id, 'abandoned_army_truck_' + id);
 local wheel(id, x) = pair(id, 'abandoned_army_truck_wheel', [x, s.hubY, s.wheelZ]);
 {
+  title: 'Abandoned army truck',
   sites: [
     fixed('chassis'),
     fixed('engine'),

@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'army_jeep.spec.libsonnet';
 {
+  title: 'Army 4x4',
   sites: [
     one('frame', 'army_jeep_frame'),
     one('tub', 'army_jeep_tub'),

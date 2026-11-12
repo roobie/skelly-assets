@@ -25,12 +25,12 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
     turned('base', 'base', 'y', [[0, 0], [0, 0.122], [0.010, 0.122], [0.010, 0]]),
   ] + potHandle('handle-a', 1, 0.128, 0.205, 0.025) + potHandle('handle-b', -1, 0.128, 0.205, 0.025), {
     body: 'steel-stainless', base: 'alu-bare', handle: 'steel-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['cooking'] } },
+  }) + { title: 'Stock pot' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['cooking'] } },
 
   // A clear acrylic tumbler 110 mm tall, 80 mm across the mouth and 64 mm at its thick base.
   h.compound('plastic_tumbler', 0.058, [
     turned('cup', 'cup', 'y', [[0, 0], [0, 0.032], [0.110, 0.040], [0.110, 0.037], [0.012, 0.030], [0.012, 0]]),
-  ], { cup: 'plastic-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { cup: 'plastic-clear' }) + { title: 'Plastic tumbler' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A stemmed wine glass 200 mm tall: a 75 mm foot, a slender stem and a tulip bowl 88 mm across.
   h.compound('wine_glass', 0.15, [
@@ -39,20 +39,20 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
       [0.120, 0.034], [0.150, 0.044], [0.180, 0.042], [0.200, 0.038], [0.200, 0.036], [0.180, 0.040],
       [0.150, 0.042], [0.120, 0.032], [0.104, 0.010], [0.104, 0],
     ]),
-  ], { glass: 'glass-clear' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'] } } },
+  ], { glass: 'glass-clear' }) + { title: 'Wine glass' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'] } } },
 
   // A sealed business envelope 241 by 105 mm lying back up, showing its pointed flap.
   h.compound('envelope', 0.005, [
     box('body', 'paper', [-0.1205, 0, -0.0525], [0.1205, 0.002, 0.0525]),
     prism('flap', 'flap', 'y', [[0.0525, -0.1205], [0.0525, 0.1205], [-0.004, 0]], 0.002, 0.003),
-  ], { paper: 'paper-white', flap: 'paper-white' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
+  ], { paper: 'paper-white', flap: 'paper-white' }) + { title: 'Envelope' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
 
   // A plastic gift card the size of a bank card, 86 by 54 mm, with a printed band and a magnetic stripe.
   h.compound('gift_card', 0.005, [
     box('card', 'card', [-0.043, 0, -0.027], [0.043, 0.002, 0.027]),
     box('band', 'print', [-0.043, 0.002, -0.004], [0.043, 0.0025, 0.012]),
     box('logo', 'logo', [-0.036, 0.002, -0.022], [-0.016, 0.0025, -0.010]),
-  ], { card: 'plastic-red', print: 'plastic-white', logo: 'foil-gold' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { card: 'plastic-red', print: 'plastic-white', logo: 'foil-gold' }) + { title: 'Gift card' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A folded greeting card 177 by 127 mm standing half open as a tent, a printed panel on its front face.
   h.compound('greeting_card', 0.015, [
@@ -60,12 +60,12 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
     prism('back', 'card', 'x', [[0, -0.048], [0.120, -0.002], [0.120, -0.004], [0, -0.050]], -0.0885, 0.0885),
     prism('picture', 'picture', 'x', [[0.020, 0.0435], [0.100, 0.0128], [0.100, 0.0148], [0.020, 0.0455]], -0.060, 0.060),
     prism('heart', 'heart', 'x', [[0.045, 0.0352], [0.075, 0.0237], [0.075, 0.0257], [0.045, 0.0372]], -0.015, 0.015),
-  ], { card: 'paper-white', picture: 'cloth-blue', heart: 'plastic-red' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
+  ], { card: 'paper-white', picture: 'cloth-blue', heart: 'plastic-red' }) + { title: 'Greeting card' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
 
   // A handwritten letter on one A4 sheet, 297 by 210 mm, lying flat face up.
   h.compound('letter', 0.005, [
     box('sheet', 'paper', [-0.105, 0, -0.1485], [0.105, 0.002, 0.1485]),
-  ] + lines('line', 'ink', -0.085, 0.085, 0.125, -0.110, 18, 0.002), { paper: 'paper-white', ink: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
+  ] + lines('line', 'ink', -0.085, 0.085, 0.125, -0.110, 18, 0.002), { paper: 'paper-white', ink: 'plastic-charcoal' }) + { title: 'Letter' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
 
   // A picture postcard 152 by 102 mm lying picture up: sky over green hills with a white border.
   h.compound('postcard', 0.003, [
@@ -73,5 +73,5 @@ local lines(prefix, slot, x0, x1, z0, z1, n, y) = [
     box('sky', 'sky', [-0.070, 0.002, -0.045], [0.070, 0.0025, 0.010]),
     box('land', 'land', [-0.070, 0.002, 0.010], [0.070, 0.0025, 0.045]),
     box('sun', 'sun', [0.035, 0.0025, -0.035], [0.050, 0.003, -0.020]),
-  ], { card: 'paper-white', sky: 'plastic-blue', land: 'leaf-green', sun: 'plastic-yellow' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
+  ], { card: 'paper-white', sky: 'plastic-blue', land: 'leaf-green', sun: 'plastic-yellow' }) + { title: 'Postcard' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'] } } },
 ]

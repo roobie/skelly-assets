@@ -32,7 +32,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     post('crank-handle', 'handle', 0.10, 1.03, 0, 0.012, 0.03),
     box('switch', 'switch', [-0.08, 0.40, 0.26], [0.08, 0.50, 0.29]),
     box('button', 'button', [-0.03, 0.43, 0.29], [0.03, 0.47, 0.30]),
-  ], { stand: 'paint-charcoal', table: 'iron-cast', steel: 'steel-grey', head: 'paint-cream', motor: 'paint-charcoal', handle: 'plastic-black', switch: 'plastic-yellow', button: 'plastic-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { stand: 'paint-charcoal', table: 'iron-cast', steel: 'steel-grey', head: 'paint-cream', motor: 'paint-charcoal', handle: 'plastic-black', switch: 'plastic-yellow', button: 'plastic-red' }) + { title: 'Planer' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A heavy floor router table, 1.47 m long and 0.7 m deep, 0.98 m tall to the fence: a cast top on a
   // steel cabinet, an aluminium insert plate with the bit through it, a fence with its dust hood, and
@@ -57,7 +57,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     turned('dust-port', 'hood', 'z', [[0, 0], [0, 0.05], [0.10, 0.05], [0.10, 0]], [0, 0.94, -0.30]),
     box('switch', 'switch', [0.30, 0.78, 0.30], [0.42, 0.84, 0.34]),
     box('paddle', 'paddle', [0.33, 0.79, 0.34], [0.39, 0.83, 0.36]),
-  ], { cabinet: 'paint-police-blue', foot: 'steel-grey', door: 'paint-police-blue', steel: 'steel-grey', top: 'iron-cast', plate: 'alu-bare', hood: 'plastic-black', switch: 'plastic-yellow', paddle: 'plastic-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { cabinet: 'paint-police-blue', foot: 'steel-grey', door: 'paint-police-blue', steel: 'steel-grey', top: 'iron-cast', plate: 'alu-bare', hood: 'plastic-black', switch: 'plastic-yellow', paddle: 'plastic-red' }) + { title: 'Router table' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A cross-legged work light stand, 1.7 m tall: four legs spread 0.9 m, a pole with its locking collar,
   // and a 0.28 m flood head on a yoke facing +z, its fins at the back.
@@ -88,7 +88,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
   ] + [
     box('fin-%d' % i, 'head', [-0.13 + i * 0.037, 1.48, -0.08], [-0.12 + i * 0.037, 1.64, -0.05])
     for i in std.range(0, 7)
-  ], { frame: 'steel-grey', foot: 'rubber-black', knob: 'plastic-black', head: 'plastic-yellow', lens: 'glass-clear', handle: 'plastic-black' }) + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { frame: 'steel-grey', foot: 'rubber-black', knob: 'plastic-black', head: 'plastic-yellow', lens: 'glass-clear', handle: 'plastic-black' }) + { title: 'Standing floodlight' } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A floor lamp, 1.7 m tall: a weighted round base 0.28 m across, a thin pole with a pull switch and a
   // 0.44 m drum shade over the bulb.
@@ -103,7 +103,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     box('spider-a', 'pole', [-0.15, 1.69, -0.006], [0.15, 1.70, 0.006]),
     box('spider-b', 'pole', [-0.006, 1.69, -0.15], [0.006, 1.70, 0.15]),
     post('spider-hub', 'pole', 0, 1.60, 0, 0.008, 0.10),
-  ], { base: 'paint-charcoal', pole: 'steel-stainless', switch: 'plastic-black', bulb: 'glass-clear', shade: 'cloth-cotton' }) + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'fabric'], setting: ['modern'] } } },
+  ], { base: 'paint-charcoal', pole: 'steel-stainless', switch: 'plastic-black', bulb: 'glass-clear', shade: 'cloth-cotton' }) + { title: 'Standing lamp' } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'fabric'], setting: ['modern'] } } },
 
   // A mains water purifier, 0.36 m wide and 0.5 m tall: a cabinet with a UV lamp tube along its top,
   // three filter bowls on its front, a display and a tap on the side.
@@ -126,7 +126,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     sideDial('tap-stem', 'steel', 0.18, 0.12, -0.02, 0.012, 0.06),
     post('tap-spout', 'steel', 0.225, 0.07, -0.02, 0.01, 0.05),
     post('tap-handle', 'handle', 0.21, 0.13, -0.02, 0.012, 0.04),
-  ], { cabinet: 'paint-white', steel: 'steel-stainless', bowl: 'plastic-blue', tube: 'steel-stainless', display: 'glass-lens-green', lamp: 'glass-lens-amber', handle: 'plastic-blue' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['water-purification'] } },
+  ], { cabinet: 'paint-white', steel: 'steel-stainless', bowl: 'plastic-blue', tube: 'steel-stainless', display: 'glass-lens-green', lamp: 'glass-lens-amber', handle: 'plastic-blue' }) + { title: 'Stationary water purifier' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['water-purification'] } },
 
   // A cabinet table saw, 1.35 m across its fence rail and 1.02 m tall: a closed base, a cast top with two
   // wings, a 254 mm blade showing through the throat plate, the riving knife, a rip fence, and the height
@@ -153,7 +153,7 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     dial('height-knob', 'handle', 0.06, 0.55, 0.275, 0.012, 0.05),
     sideDial('tilt-wheel', 'wheel', 0.25, 0.55, 0, 0.08, 0.025),
     sideDial('tilt-knob', 'handle', 0.275, 0.55, 0.06, 0.012, 0.05),
-  ], { cabinet: 'paint-charcoal', steel: 'steel-grey', top: 'iron-cast', throat: 'plastic-red', blade: 'steel-grey', fence: 'alu-bare', handle: 'plastic-black', switch: 'plastic-yellow', paddle: 'plastic-red', wheel: 'iron-cast' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { cabinet: 'paint-charcoal', steel: 'steel-grey', top: 'iron-cast', throat: 'plastic-red', blade: 'steel-grey', fence: 'alu-bare', handle: 'plastic-black', switch: 'plastic-yellow', paddle: 'plastic-red', wheel: 'iron-cast' }) + { title: 'Table saw' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A round bulkhead light, 0.2 m across and 0.09 m deep, as it hangs on a wall facing +z: a steel back
   // plate, a frosted dome and a two-bar guard over it.
@@ -177,5 +177,5 @@ local sideDial(id, slot, x0, y, z, radius, depth) = turned(id, slot, 'x', [[0, 0
     for s in [-1, 1]
   ]) + [
     box('gland', 'gland', [-0.012, 0, -0.045], [0.012, 0.012, -0.02]),
-  ], { plate: 'steel-grey', dome: 'plastic-white', guard: 'steel-grey', gland: 'rubber-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { plate: 'steel-grey', dome: 'plastic-white', guard: 'steel-grey', gland: 'rubber-black' }) + { title: 'Wall light' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

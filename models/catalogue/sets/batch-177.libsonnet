@@ -203,78 +203,78 @@ taxonomy.inherit({ keywords: ['diving'] }, [
   h.compound('thick_wetsuit_gloves', 0.35, g.glovePair({ t: 0.02, cuff: 0.075, flare: 0.056, fingerW: 0.019, binding: 'binding', knuckle: 'grip' }, 0.075, function(p, cx, s) [
     g.sbox(p + 'strap', 'strap', [cx - 0.058, 0.018, -0.05], [cx + 0.058, 0.024, -0.028]),
     g.sbox(p + 'strap-tab', 'tab', [cx + s * 0.03, 0.024, -0.05], [cx + s * 0.058, 0.027, -0.028]),
-  ]), { glove: 'neoprene-black', cuff: 'neoprene-black', binding: 'canvas-grey', grip: 'plastic-charcoal', strap: 'nylon-black', tab: 'hook-loop-grey' })
+  ]), { glove: 'neoprene-black', cuff: 'neoprene-black', binding: 'canvas-grey', grip: 'plastic-charcoal', strap: 'nylon-black', tab: 'hook-loop-grey' }) + { title: 'Thick wetsuit gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['hands'], setting: ['modern'] } } },
 
   // A 3 mm neoprene diving hood standing upright, 225 mm across and 310 mm tall: a snug hood closing round the face,
   // its opening bound in grey tape, a flatlock seam up the back and a short collar at the neck.
   h.compound('wetsuit_hood', 0.2, hood(snugProfile, hoodFace, []),
-    { cloth: 'neoprene-black', face: 'screen-black', trim: 'canvas-grey', stitch: 'canvas-grey' })
+    { cloth: 'neoprene-black', face: 'screen-black', trim: 'canvas-grey', stitch: 'canvas-grey' }) + { title: 'Wetsuit hood' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['head'], setting: ['modern'] } } },
 
   // A 5 mm neoprene cold-water hood standing upright, 310 mm tall: a snug hood whose bib slumps on the floor in a long
   // front flap and a shorter back flap, 416 mm from front to back, a blue-bound face opening, a flatlock seam up the back and a vent valve on the crown.
   h.compound('thick_wetsuit_hood', 0.35, hood(bibProfile, hoodFace, bibFlaps + [
     h.disc('vent', 'vent', 0.012, 0.296, 0.312, 0, 0.0),
-  ] + h.crescent('bib-seam', 'stitch', rAt(bibProfile, 0.06) - 0.004, rAt(bibProfile, 0.06) + 0.003, -170, 170, 16, 0.06, 0.066)), { cloth: 'neoprene-black', face: 'screen-black', trim: 'cloth-blue', stitch: 'canvas-grey', vent: 'plastic-charcoal' })
+  ] + h.crescent('bib-seam', 'stitch', rAt(bibProfile, 0.06) - 0.004, rAt(bibProfile, 0.06) + 0.003, -170, 170, 16, 0.06, 0.066)), { cloth: 'neoprene-black', face: 'screen-black', trim: 'cloth-blue', stitch: 'canvas-grey', vent: 'plastic-charcoal' }) + { title: 'Thick wetsuit hood' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['head'], setting: ['modern'] } } },
 
   // A neoprene wetsuit jacket folded flat, 360 mm by 340 mm and 50 mm tall: a zip up the front to a tall stand
   // collar, long sleeves folded flat along both sides, grey flatlock seams, a grey zip and blue collar and side panels.
   h.compound('wetsuit_jacket', 1, top({ w: 0.36, d: 0.34, ht: 0.05, front: 'placket', collar: { r: 0.06, wd: 0.016, ht: 0.028, gap: 14 }, sleeves: { kind: 'flat', w: 0.075, t: 0.006 } }) + [
     box('zip-pull', 'button', [0.006, 0.055, 0.03], [0.018, 0.06, 0.06]),
-  ], { cloth: 'neoprene-black', collar: 'cloth-blue', front: 'canvas-grey', button: 'steel-bright', sleeve: 'neoprene-black', panel: 'cloth-blue', stitch: 'canvas-grey' }) + h.headEndOnPlusZ
+  ], { cloth: 'neoprene-black', collar: 'cloth-blue', front: 'canvas-grey', button: 'steel-bright', sleeve: 'neoprene-black', panel: 'cloth-blue', stitch: 'canvas-grey' }) + { title: 'Wetsuit jacket' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Neoprene wetsuit pants folded flat, 240 mm by 360 mm and 40 mm tall: a grey drawcord waist, flatlock seams, a
   // rubbery knee patch and the two grey ankle cuffs side by side at the fold.
-  h.compound('wetsuit_pants', 0.8, legwear({ knee: true, cuffs: true }), legFin('canvas-grey', 'canvas-grey')) + h.headEndOnPlusZ
+  h.compound('wetsuit_pants', 0.8, legwear({ knee: true, cuffs: true }), legFin('canvas-grey', 'canvas-grey')) + { title: 'Wetsuit pants' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Thin neoprene wetsuit pants folded flat, 220 mm by 340 mm and 24 mm tall: a blue drawcord waist, flatlock seams
   // and the two blue ankle cuffs side by side at the fold.
-  h.compound('thin_wetsuit_pants', 0.48, legwear({ w: 0.22, d: 0.34, ht: 0.024, folds: 3, band: 0.03, cuffs: true }), legFin('cloth-blue', 'canvas-grey')) + h.headEndOnPlusZ
+  h.compound('thin_wetsuit_pants', 0.48, legwear({ w: 0.22, d: 0.34, ht: 0.024, folds: 3, band: 0.03, cuffs: true }), legFin('cloth-blue', 'canvas-grey')) + { title: 'Thin wetsuit pants' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Neoprene wetsuit shorts folded flat, 260 mm by 220 mm and 30 mm tall: a drawcord waist and a blue side seam.
-  h.compound('wetsuit_shorts', 0.43, legwear({ w: 0.26, d: 0.22, ht: 0.03, folds: 3, band: 0.035 }), legFin('neoprene-black', 'cloth-blue')) + h.headEndOnPlusZ
+  h.compound('wetsuit_shorts', 0.43, legwear({ w: 0.26, d: 0.22, ht: 0.03, folds: 3, band: 0.035 }), legFin('neoprene-black', 'cloth-blue')) + { title: 'Wetsuit shorts' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Technical neoprene shorts folded flat, 280 mm by 240 mm and 36 mm tall: a drawcord waist and a big flapped
   // bellows pocket on each thigh under a grey flap, each with a press stud and a drain eyelet, and a grey waistband.
-  h.compound('technical_wetsuit_shorts', 0.69, legwear({ w: 0.28, d: 0.24, ht: 0.036, folds: 3, band: 0.035, cargo: { w: 0.11, d: 0.12, z: -0.03 } }), legFin('canvas-grey', 'canvas-grey') + { flap: 'canvas-grey' }) + h.headEndOnPlusZ
+  h.compound('technical_wetsuit_shorts', 0.69, legwear({ w: 0.28, d: 0.24, ht: 0.036, folds: 3, band: 0.035, cargo: { w: 0.11, d: 0.12, z: -0.03 } }), legFin('canvas-grey', 'canvas-grey') + { flap: 'canvas-grey' }) + { title: 'Technical wetsuit shorts' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // A long-sleeved spring suit laid flat, front up, 1.16 m across the sleeves and 940 mm from neck to leg hem:
   // short legs, a chest zip, and pink side panels, collar and seams.
-  h.compound('spring_suit', 1.3, suit({ legs: 'short', zip: 'chest' }), suitFin('neoprene-black', 'plastic-pink', 'plastic-pink'))
+  h.compound('spring_suit', 1.3, suit({ legs: 'short', zip: 'chest' }), suitFin('neoprene-black', 'plastic-pink', 'plastic-pink')) + { title: 'Spring suit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'] } } },
 
   // A sleeveless spring suit laid flat, front up, 430 mm across and 940 mm from neck to leg hem: ocean-blue
   // neoprene with black side panels, bound armholes, short legs and a back zip whose pull strap lies over the shoulder.
-  h.compound('sleeveless_spring_suit', 0.9, suit({ sleeves: 'none', legs: 'short' }), suitFin('cloth-blue', 'neoprene-black', 'neoprene-black') + { cuff: 'neoprene-black' })
+  h.compound('sleeveless_spring_suit', 0.9, suit({ sleeves: 'none', legs: 'short' }), suitFin('cloth-blue', 'neoprene-black', 'neoprene-black') + { cuff: 'neoprene-black' }) + { title: 'Sleeveless spring suit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'] } } },
 
   // A thick full-length wetsuit laid flat, front up, 1.16 m across the sleeves and 1.48 m from neck to ankle: 5 mm
   // neoprene with grey side panels and flatlock seams, rubber knee pads and a back zip whose pull strap lies over the
   // shoulder.
-  h.compound('thick_wetsuit', 3.8, suit({ t: 0.016, knees: true }), suitFin('neoprene-black', 'plastic-charcoal', 'canvas-grey'))
+  h.compound('thick_wetsuit', 3.8, suit({ t: 0.016, knees: true }), suitFin('neoprene-black', 'plastic-charcoal', 'canvas-grey')) + { title: 'Thick wetsuit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'] } } },
 
   // A short-sleeved neoprene shirt folded flat, 300 mm by 320 mm and 30 mm tall: a crew neck and collar, grey side panels
   // and flatlock seams across the shoulders.
-  h.compound('wetsuit_top', 0.4, top({}), { cloth: 'neoprene-black', collar: 'canvas-grey', panel: 'canvas-grey', stitch: 'canvas-grey' }) + h.headEndOnPlusZ
+  h.compound('wetsuit_top', 0.4, top({}), { cloth: 'neoprene-black', collar: 'canvas-grey', panel: 'canvas-grey', stitch: 'canvas-grey' }) + { title: 'Wetsuit top' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // A long-sleeved neoprene shirt folded flat, 320 mm by 330 mm and 40 mm tall: a crew neck, sleeves folded flat
   // along both sides, blue side panels and grey flatlock seams.
   h.compound('long_sleeved_wetsuit_top', 0.55, top({ w: 0.32, d: 0.33, ht: 0.04, sleeves: { kind: 'flat', w: 0.07, t: 0.006 } }),
-    { cloth: 'neoprene-black', collar: 'cloth-blue', sleeve: 'neoprene-black', panel: 'cloth-blue', stitch: 'canvas-grey' }) + h.headEndOnPlusZ
+    { cloth: 'neoprene-black', collar: 'cloth-blue', sleeve: 'neoprene-black', panel: 'cloth-blue', stitch: 'canvas-grey' }) + { title: 'Long sleeved wetsuit top' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // A thin long-sleeved neoprene shirt folded flat, 300 mm by 320 mm and 26 mm tall: a crew neck, sleeves folded flat
   // along both sides, a blue collar, grey side panels and grey flatlock seams.
   h.compound('thin_long_sleeved_wetsuit_top', 0.67, top({ ht: 0.026, sleeves: { kind: 'flat', w: 0.065, t: 0.004 } }),
-    { cloth: 'neoprene-black', collar: 'cloth-blue', sleeve: 'neoprene-black', panel: 'canvas-grey', stitch: 'canvas-grey' }) + h.headEndOnPlusZ
+    { cloth: 'neoprene-black', collar: 'cloth-blue', sleeve: 'neoprene-black', panel: 'canvas-grey', stitch: 'canvas-grey' }) + { title: 'Thin long sleeved wetsuit top' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 ])

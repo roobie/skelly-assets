@@ -149,27 +149,27 @@ local outsert(id, mass, lens) =
   // A mild steel mail aventail laid out flat, 640 mm across: a broad curtain of dull rings that hangs from a cap
   // helmet's rim over the face, neck and shoulders, its inner edge sewn to a leather band pierced for lacing and its
   // open back tied with thongs.
-  mailCurtain('mild_steel_mail_aventail', 2.4, 0.1, 0.3, 8, 'steel-mail') + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
+  mailCurtain('mild_steel_mail_aventail', 2.4, 0.1, 0.3, 8, 'steel-mail') + { title: 'Mild steel mail aventail' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
 
   // A mild steel partial aventail laid out flat, 400 mm across: a narrower ring of the same mail on a laced leather
   // band, reaching only the face and neck.
-  mailCurtain('mild_steel_mail_half_aventail', 0.83, 0.1, 0.19, 4, 'steel-mail') + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  mailCurtain('mild_steel_mail_half_aventail', 0.83, 0.1, 0.19, 4, 'steel-mail') + { title: 'Mild steel mail half aventail' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A crude mild steel half mask for a cap helmet, 190 mm across and 135 mm tall at the nose: a plain jaw plate with
   // a nose ridge, breathing slots and hinged hooks, and no ornament.
-  faceMask('mild_steel_half_mask', 1.1, false, { plate: 'steel-bright', ridge: 'steel-bright', vent: 'plastic-matte-black', hook: 'steel-grey' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('mild_steel_half_mask', 1.1, false, { plate: 'steel-bright', ridge: 'steel-bright', vent: 'plastic-matte-black', hook: 'steel-grey' }) + { title: 'Mild steel half mask' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A medium steel half mask, the same 190 mm plate in grey steel with domed rivets along the brow and jaw and a
   // raised band across each cheek.
-  faceMask('riveted_steel_half_mask', 1.1, true, { plate: 'steel-grey', ridge: 'steel-grey', vent: 'plastic-matte-black', hook: 'steel-bright', trim: 'steel-bright' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('riveted_steel_half_mask', 1.1, true, { plate: 'steel-grey', ridge: 'steel-grey', vent: 'plastic-matte-black', hook: 'steel-bright', trim: 'steel-bright' }) + { title: 'Riveted steel half mask' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A mesh nape guard laid out flat, 330 mm across and 120 mm deep: an open cotton lattice that hangs from the back
   // of a hard hat, bound at its edges, with a hook-and-loop strip along the top edge.
-  napeCurtain('mesh_nape_protector', 0.02, true, { cloth: 'cloth-cream', binding: 'cloth-khaki', strip: 'hook-loop-grey' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  napeCurtain('mesh_nape_protector', 0.02, true, { cloth: 'cloth-cream', binding: 'cloth-khaki', strip: 'hook-loop-grey' }) + { title: 'Mesh nape protector' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A cotton nape guard laid out flat, 330 mm across and 120 mm deep: a khaki curtain that hangs from the back of a
   // hard hat, bound in brown, with a hook-and-loop strip along the top edge.
-  napeCurtain('nape_protector', 0.04, false, { cloth: 'cloth-khaki', binding: 'cloth-brown', strip: 'hook-loop-grey' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
+  napeCurtain('nape_protector', 0.04, false, { cloth: 'cloth-khaki', binding: 'cloth-brown', strip: 'hook-loop-grey' }) + { title: 'Nape protector' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A single-tube night-vision monocular switched on, 60 mm wide, 75 mm tall and 200 mm long with its mount: a
   // dark tube with a wide objective at the front, a rubber eyecup at the back glowing green, a lit green lamp on top, a battery tube along
@@ -192,18 +192,18 @@ local outsert(id, mass, lens) =
     sbox('arm', 'mount', [-0.009, 0.058, -0.075], [0.009, 0.068, 0.012]),
     h.turned('arm-pivot', 'mount', 'x', [[0, 0], [0, 0.007], [0.024, 0.007], [0.024, 0]], [-0.012, 0.062, 0.002]),
     h.prism('shoe', 'mount', 'z', [[-0.015, 0.068], [0.015, 0.068], [0.02, 0.084], [-0.02, 0.084]], -0.09, -0.06),
-  ], { housing: 'plastic-charcoal', objective: 'screen-black', eyecup: 'vinyl-black', display: 'lcd-green', knob: 'plastic-matte-black', mount: 'steel-parkerized' })
+  ], { housing: 'plastic-charcoal', objective: 'screen-black', eyecup: 'vinyl-black', display: 'lcd-green', knob: 'plastic-matte-black', mount: 'steel-parkerized' }) + { title: 'Powered night vision monocular' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A clear lens outsert, 175 mm round the curve and 85 mm tall: a thin flexible shield shaped to a gas mask's single
   // eyepiece, with black clip tabs at its ends, top and foot.
-  outsert('clear_outsert_lens', 0.054, 'plastic-clear') + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  outsert('clear_outsert_lens', 0.054, 'plastic-clear') + { title: 'Clear outsert lens' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A breaching outsert, the same 175 mm shield in green shade plastic, for cutting-torch work.
-  outsert('cutting_outsert_lens', 0.054, 'glass-lens-green') + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  outsert('cutting_outsert_lens', 0.054, 'glass-lens-green') + { title: 'Cutting outsert lens' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A sunlight outsert, the same 175 mm shield tinted smoke grey against glare and flashes.
-  outsert('tinted_outsert_lens', 0.054, 'lens-smoke') + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  outsert('tinted_outsert_lens', 0.054, 'lens-smoke') + { title: 'Tinted outsert lens' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A plastic chin cup standing on its edge, 70 mm across the cup, 40 mm tall and 25 mm deep: a shallow moulded cup with a
   // strap slot at each end and a short stub of chin strap through each slot.
@@ -217,7 +217,7 @@ local outsert(id, mass, lens) =
                                             ]
                                             for s in [-1, 1]
                                           ]),
-             { cup: 'plastic-charcoal', strap: 'webbing-black' })
+             { cup: 'plastic-charcoal', strap: 'webbing-black' }) + { title: 'Plastic chin guard' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A costume jaw guard standing on its lower edge, 230 mm across and 90 mm tall: a grey moulded shell curving
@@ -241,6 +241,6 @@ local outsert(id, mass, lens) =
                                                ]
                                                for s in [-1, 1]
                                              ]),
-             { shell: 'plastic-charcoal', teeth: 'bone', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+             { shell: 'plastic-charcoal', teeth: 'bone', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Plastic mandible guard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 ]

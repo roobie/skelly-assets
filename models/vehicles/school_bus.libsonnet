@@ -1,7 +1,8 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'school_bus.spec.libsonnet';
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('school_bus', s) + [
+local vehicle = import 'school_bus.placements.libsonnet';
+taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('school_bus', vehicle.title, s) + [
   // The rear exit swings on its far edge, in the centre of the rear wall.
   k.compound('school_bus_rear_door', 42, [
     k.box('skin', 'paint', [s.rear - 0.01, 1.0, -0.5], [s.rear + 0.07, 1.72, 0.5]),
@@ -13,9 +14,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libson
   ], { paint: s.paint, glass: 'glass-clear', trim: 'plastic-black' }, {
     hinge_a: ['stile_far', [0.5, 0.05, 0]],
     hinge_b: ['stile_far', [0.5, 0.95, 0]],
-  }),
+  }) + { title: 'School bus rear door' },
   k.compound('school_bus_stop_arm', 3, [
     k.box('arm', 'frame', [-0.03, -0.03, -0.02], [0.2, 0.03, 0.02]),
     k.prism('sign', 'face', [[-0.34, -0.09], [-0.2, -0.23], [-0.06, -0.23], [0.08, -0.09], [0.08, 0.09], [-0.06, 0.23], [-0.2, 0.23], [-0.34, 0.09]], [-0.015, 0.015]),
-  ], { frame: 'steel-grey', face: 'plastic-red' }),
+  ], { frame: 'steel-grey', face: 'plastic-red' }) + { title: 'School bus stop arm' },
 ])

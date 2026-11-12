@@ -89,18 +89,18 @@ local cordNecklace(id, mass, body) =
                box('clasp', 'link', [-0.011, 0, -0.112], [0.011, 0.007, -0.1]),
                box('clasp-plate', 'centre', [-0.008, 0.007, -0.11], [0.008, 0.008, -0.102]),
              ],
-             { case: 'metal-gold', bezel: 'metal-silver', dial: 'metal-silver', hand: 'metal-gold', link: 'metal-gold', centre: 'metal-silver' })
+             { case: 'metal-gold', bezel: 'metal-silver', dial: 'metal-silver', hand: 'metal-gold', link: 'metal-gold', centre: 'metal-silver' }) + { title: 'Dress watch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['arms'] } } },
 
   // A plain cotton cord laid in a ring 130 mm across, knotted at the back, wound at the front round the groove of
   // a spent 25 mm cannon case 80 mm long lying mouth outward.
-  cordNecklace('simple_ordnance_cartridge_necklace', 0.046, [0.08, 0.0125, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_ordnance_cartridge_necklace', 0.046, [0.08, 0.0125, 0, 0]) + { title: 'Simple ordnance cartridge necklace' } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // The same cord with a spent 9 mm pistol case 19 mm long.
-  cordNecklace('simple_pistol_cartridge_necklace', 0.0055, [0.019, 0.0049, 0, 0]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_pistol_cartridge_necklace', 0.0055, [0.019, 0.0049, 0, 0]) + { title: 'Simple pistol cartridge necklace' } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // The same cord with a spent bottlenecked rifle case 51 mm long, 12 mm across the body.
-  cordNecklace('simple_rifle_cartridge_necklace', 0.014, [0.051, 0.006, 0.0042, 0.009]) + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
+  cordNecklace('simple_rifle_cartridge_necklace', 0.014, [0.051, 0.006, 0.0042, 0.009]) + { title: 'Simple rifle cartridge necklace' } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'fabric'], slot: ['neck'] } } },
 
   // A pocket reliquary lying open, 75 mm across: an oval silver case 36 mm by 28 mm and 8 mm deep lined in red
   // velvet with a sliver of bone bedded in it, its lid hinged open at -z bearing a raised cross, and a ring at +z.
@@ -116,7 +116,7 @@ local cordNecklace(id, mass, body) =
                box('hinge', 'silver', [-0.006, 0, -0.008], [0.006, 0.004, -0.005]),
                torus('bail', 'silver', 0.004, 0.0012, 'z', [0, 0.004, 0.032], 6),
              ],
-             { silver: 'metal-silver', relief: 'metal-silver', lining: 'velvet-red', bone: 'bone' })
+             { silver: 'metal-silver', relief: 'metal-silver', lining: 'velvet-red', bone: 'bone' }) + { title: 'Small relic' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal', 'bone'], state: ['opened'] } } },
 
   // A costume bunny tail: a fluffy white pom-pom 80 mm across sitting on its flat back, a cluster of soft balls round
@@ -136,7 +136,7 @@ local cordNecklace(id, mass, body) =
                ball('top-%d' % i, 'fur', 0.016, p[0], p[1], 0.04)
                for i in std.range(0, 2)
              ],
-             { fur: 'fur-pale', clip: 'plastic-matte-black' })
+             { fur: 'fur-pale', clip: 'plastic-matte-black' }) + { title: 'Bunny tail' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A silver tie clip 55 mm long and 6 mm wide lying flat: a polished front bar with an engraved band near one end,
@@ -149,7 +149,7 @@ local cordNecklace(id, mass, body) =
                box('band-a', 'line', [-0.018, 0.0035, -0.003], [-0.017, 0.0040, 0.003]),
                box('band-b', 'line', [-0.015, 0.0035, -0.003], [-0.014, 0.0040, 0.003]),
              ],
-             { silver: 'metal-silver', line: 'plastic-charcoal' })
+             { silver: 'metal-silver', line: 'plastic-charcoal' }) + { title: 'Tie clip' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A handful of wooden hair beads loose in a heap 55 mm across: fourteen round and barrel beads 8 to 12 mm thick,
@@ -179,7 +179,7 @@ local cordNecklace(id, mass, body) =
                  [0.006, 200, 0.0045, 0.008, 0.009],
                ][i]]
              ],
-             { pale: 'wood-birch', dark: 'wood-walnut' })
+             { pale: 'wood-birch', dark: 'wood-walnut' }) + { title: 'Wooden hair beads' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['head'] } } },
 
   // A woven cord anklet lying flat in a ring 80 mm across: a band 6 mm wide woven in repeating red, yellow, green
@@ -201,7 +201,7 @@ local cordNecklace(id, mass, body) =
                flat('tail-left', 'blue', [[-0.002, -R - 0.004], [0.001, -R - 0.004], [-0.007, -R - 0.03], [-0.01, -R - 0.029]], 0, 0.002),
                flat('tail-right', 'green', [[-0.001, -R - 0.004], [0.002, -R - 0.004], [0.01, -R - 0.029], [0.007, -R - 0.03]], 0, 0.002),
              ],
-             { red: 'cloth-red', yellow: 'cloth-yellow', green: 'cloth-green', blue: 'cloth-blue' })
+             { red: 'cloth-red', yellow: 'cloth-yellow', green: 'cloth-green', blue: 'cloth-blue' }) + { title: 'Woven anklet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A plain digital wristwatch lying face up with its strap opened out, 230 mm end to end: a black plastic case
@@ -235,6 +235,6 @@ local cordNecklace(id, mass, body) =
                box('tongue', 'buckle', [-0.0012, 0.004, -0.115], [0.0012, 0.0055, -0.097]),
              ]
              + [h.disc('hole-%d' % i, 'hole', 0.0012, 0.0035, 0.0042, 0, 0.06 + 0.007 * i) for i in std.range(0, 6)],
-             { case: 'plastic-matte-black', plate: 'steel-bright', display: 'lcd-green', digit: 'plastic-black', button: 'steel-bright', strap: 'rubber-black', buckle: 'steel-bright', hole: 'plastic-charcoal' })
+             { case: 'plastic-matte-black', plate: 'steel-bright', display: 'lcd-green', digit: 'plastic-black', button: 'steel-bright', strap: 'rubber-black', buckle: 'steel-bright', hole: 'plastic-charcoal' }) + { title: 'Wristwatch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['arms'] } } },
 ]

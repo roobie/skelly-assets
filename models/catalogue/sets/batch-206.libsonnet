@@ -104,30 +104,30 @@ local wristComputer = [
 [
   // A grey web belt 1.1 m long with a black steel emitter box with a grey lid 90 by 64 mm on its buckle run, a crossed-out flame on
   // the lid and a violet crystal glowing in the flame.
-  h.compound('flame_ward_belt', 0.39, fieldBelt(flameEmblem, false), beltFinish('crystal-glow-violet'))
+  h.compound('flame_ward_belt', 0.39, fieldBelt(flameEmblem, false), beltFinish('crystal-glow-violet')) + { title: 'Flame-ward belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['sci-fi'], slot: ['waist'] } } },
 
   // The same belt with its emitter box cracked across and its crystal gone dark.
-  h.compound('flame_ward_belt_cracked', 0.39, fieldBelt(flameEmblem, true), beltFinish('gem-purple'))
+  h.compound('flame_ward_belt_cracked', 0.39, fieldBelt(flameEmblem, true), beltFinish('gem-purple')) + { title: 'Flame-ward belt, cracked' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['sci-fi'], slot: ['waist'], state: ['broken'] } } },
 
   // The same web belt with a shield on the emitter lid and a blue crystal glowing in the shield.
-  h.compound('shield_belt', 0.39, fieldBelt(shieldEmblem, false), beltFinish('crystal-glow-blue'))
+  h.compound('shield_belt', 0.39, fieldBelt(shieldEmblem, false), beltFinish('crystal-glow-blue')) + { title: 'Shield belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['sci-fi'], slot: ['waist'] } } },
 
   // The shield belt with its emitter box cracked across and its crystal gone dark.
-  h.compound('shield_belt_cracked', 0.39, fieldBelt(shieldEmblem, true), beltFinish('gem-blue'))
+  h.compound('shield_belt_cracked', 0.39, fieldBelt(shieldEmblem, true), beltFinish('gem-blue')) + { title: 'Shield belt cracked' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], setting: ['sci-fi'], slot: ['waist'], state: ['broken'] } } },
 
   // Square-lensed glasses 150 mm across with thick black temples, a crystal pod 38 mm long on the right temple and a
   // glowing display strip in the right lens.
   h.compound('crystal_sight_glasses', 0.05, sightGlasses,
-             { frame: 'plastic-matte-black', lens: 'lens-smoke', temple: 'plastic-matte-black', pad: 'plastic-clear', pod: 'plastic-charcoal', crystal: 'crystal-glow-violet', display: 'crystal-glow-blue' })
+             { frame: 'plastic-matte-black', lens: 'lens-smoke', temple: 'plastic-matte-black', pad: 'plastic-clear', pod: 'plastic-charcoal', crystal: 'crystal-glow-violet', display: 'crystal-glow-blue' }) + { title: 'Crystal sight glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['sci-fi'], slot: ['face'] } } },
 
   // A wrist computer: a 48 by 34 mm slate with a crystal face in a jade-green housing on a black strap laid open 210
   // mm long.
   h.compound('crystal_wrist_computer', 0.07, wristComputer,
-             { housing: 'jade-green', face: 'crystal-glow-blue', button: 'metal-gold', strap: 'plastic-charcoal', clasp: 'metal-gold' })
+             { housing: 'jade-green', face: 'crystal-glow-blue', button: 'metal-gold', strap: 'plastic-charcoal', clasp: 'metal-gold' }) + { title: 'Crystal wrist computer' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['sci-fi'], slot: ['arms'] } } },
 ]

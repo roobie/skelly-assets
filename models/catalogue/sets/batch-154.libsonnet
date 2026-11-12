@@ -173,7 +173,7 @@ local grassSkirt(w, len, n) =
     stitch: 'cloth-charcoal',
     metal: 'steel-bright',
     stripe: 'cloth-saffron',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Police breeches' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Navy mail carrier shorts folded once, 360 mm by 280 mm and 30 mm tall: belt loops, zip fly, front pockets and
   // a thin red stripe down each side.
@@ -184,7 +184,7 @@ local grassSkirt(w, len, n) =
     stitch: 'cloth-charcoal',
     metal: 'steel-bright',
     stripe: 'cloth-red',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Postman shorts' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Red costume trousers folded at the knee, 400 mm by 460 mm and 60 mm tall: an elastic drawstring waist, two
   // deep front pockets and thick white faux-fur cuffs wrapped round the folded hems.
@@ -196,7 +196,7 @@ local grassSkirt(w, len, n) =
     metal: 'cloth-crimson',
     cord: 'cloth-cream',
     trim: 'fur-pale',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Santa pants' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Red costume shorts folded once, 360 mm by 260 mm and 28 mm tall: a drawstring waist and narrow white cuffs.
   h.compound('santa_shorts', 0.42, trousers({ w: 0.36, d: 0.26, ht: 0.028, folds: 2, crotch: 0.15, drawstring: true, pockets: false, hemTrim: 0.025 }), {
@@ -207,7 +207,7 @@ local grassSkirt(w, len, n) =
     metal: 'cloth-crimson',
     cord: 'cloth-cream',
     trim: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Santa shorts' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Plain khaki shorts folded once, 360 mm by 280 mm and 28 mm tall: belt loops, zip fly and front pockets.
   h.compound('shorts', 0.4, trousers({ w: 0.36, d: 0.28, ht: 0.028, folds: 2, crotch: 0.16 }), {
@@ -216,7 +216,7 @@ local grassSkirt(w, len, n) =
     seam: 'cloth-brown',
     stitch: 'cloth-brown',
     metal: 'brass-dull',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Shorts' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Olive cargo shorts folded once, 380 mm by 340 mm and 34 mm tall: a flapped bellows pocket on each leg.
   h.compound('cargo_shorts', 0.4, trousers({ w: 0.38, d: 0.34, ht: 0.034, folds: 2, crotch: 0.17, cargo: true }), {
@@ -227,7 +227,7 @@ local grassSkirt(w, len, n) =
     metal: 'plastic-matte-black',
     pocket: 'cloth-olive-drab',
     flap: 'webbing-olive-dark',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Cargo shorts' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Cut-off denim shorts folded once, 370 mm by 260 mm and 30 mm tall: orange top-stitching, a brass button and
   // white threads frayed out of the cut hems.
@@ -238,7 +238,7 @@ local grassSkirt(w, len, n) =
     stitch: 'cloth-orange',
     metal: 'brass-dull',
     thread: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Denim cut-offs' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // A short cotton skirt laid flat, 340 mm across the waist, 440 mm across the hem and 260 mm long: a few soft
   // gathers and one small patch pocket on the hip.
@@ -247,7 +247,7 @@ local grassSkirt(w, len, n) =
     pleat: 'leaf-green',
     band: 'cloth-green',
     pocket: 'leaf-green',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + h.headEndOnPlusZ + { title: 'Skirt' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A costume schoolgirl skirt laid flat, 340 mm across the waist, 480 mm across the hem and 260 mm long: navy
   // knife pleats all round and two white bands near the hem.
@@ -256,7 +256,7 @@ local grassSkirt(w, len, n) =
     pleat: 'cloth-charcoal',
     band: 'cloth-navy',
     stripe: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Pleated costume skirt' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A denim skirt laid flat, 340 mm across the waist, 420 mm across the hem and 400 mm long: an orange-stitched
   // front seam and hem, a zip fly with a brass button and a patch pocket.
@@ -266,7 +266,7 @@ local grassSkirt(w, len, n) =
     stitch: 'cloth-orange',
     metal: 'brass-dull',
     pocket: 'cloth-denim-faded',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Denim skirt' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A grass skirt laid flat, 360 mm across the waist and 400 mm long: a twisted cord with its tie ends lying down
   // the sides and a dense, overlapping fringe of dried grass blades with a ragged hem.
@@ -274,7 +274,7 @@ local grassSkirt(w, len, n) =
     cord: 'straw-rope',
     grass: 'plant-dried',
     grass2: 'straw-wicker',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Grass skirt' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], setting: ['modern'], slot: ['legs'] } } },
 
   // A black leather miniskirt laid flat, 320 mm across the waist, 380 mm across the hem and 220 mm long: a zip
   // fly, a centre seam and a short slit up from the hem.
@@ -284,7 +284,7 @@ local grassSkirt(w, len, n) =
     stitch: 'leather-charcoal',
     metal: 'steel-bright',
     seam: 'plastic-charcoal',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Leather miniskirt' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['legs'] } } },
 
   // An ankle-length cotton skirt, 800 mm long, folded in half at the knee and laid flat: 340 mm across the waist,
   // 520 mm across the fold and 420 mm long, soft gathers running down to the fold and the trim band of the hem
@@ -294,7 +294,7 @@ local grassSkirt(w, len, n) =
     pleat: 'suede-brown',
     band: 'cloth-brown',
     stripe: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Long skirt' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Cotton trousers with broad black and white crosswise stripes, folded at the knee, 380 mm by 460 mm and 48 mm
   // tall, the stripes running over the top and round the rolled hems.
@@ -305,7 +305,7 @@ local grassSkirt(w, len, n) =
     stitch: 'cloth-charcoal',
     metal: 'steel-bright',
     stripe: 'cloth-black',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Striped pants' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Grey canvas work trousers folded at the knee, 400 mm by 460 mm and 60 mm tall: double-layer knee patches, a
   // hammer loop and a rule pocket on the right leg, belt loops and a zip fly.
@@ -317,5 +317,5 @@ local grassSkirt(w, len, n) =
     metal: 'steel-bright',
     patch: 'cloth-charcoal',
     pocket: 'cloth-charcoal',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Work trousers' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 ]

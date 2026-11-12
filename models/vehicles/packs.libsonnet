@@ -3,6 +3,7 @@
 local fleet = import 'index.libsonnet';
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local title = import 'tools/jsonnet/lib/title.libsonnet';
 local density = import 'models/measures/vehicle-part-density.libsonnet';
 local claimed = {
   'skelly.aircraft': [
@@ -43,5 +44,5 @@ local others = std.flattenArrays(std.objectValues(claimed));
     source: row.id,
     voxel: voxel.of(voxel.vehicle, row),
     options: { mass: row.exportMass, collision: true, density: density },
-  } + taxonomy.of(row),
+  } + title.of(row) + taxonomy.of(row),
 }

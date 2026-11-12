@@ -146,7 +146,7 @@ local oval(a, b, p, n, cx, cy) = [
       sbox('clip-%d-tab' % (s + 1), 'clip', [s * 0.05 - 0.016, 0.06, -0.094], [s * 0.05 + 0.016, 0.076, -0.104]),
     ]
     for s in [-1, 1]
-  ]), { cup: 'plastic-orange', cushion: 'vinyl-black', arm: 'steel-bright', clip: 'plastic-matte-black' })
+  ]), { cup: 'plastic-orange', cushion: 'vinyl-black', arm: 'steel-bright', clip: 'plastic-matte-black' }) + { title: 'Helmet ear muffs lowered' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
 
   // A ballistic jaw guard standing on its lower edge, 230 mm across and 70 mm deep at the chin: a moulded tan
@@ -170,21 +170,21 @@ local oval(a, b, p, n, cx, cy) = [
                                                   ]
                                                   for s in [-1, 1]
                                                 ]),
-             { shell: 'polymer-fde', vent: 'plastic-matte-black', adapter: 'plastic-matte-black' })
+             { shell: 'polymer-fde', vent: 'plastic-matte-black', adapter: 'plastic-matte-black' }) + { title: 'Ballistic mandible guard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A hardened steel mail aventail laid out flat, 640 mm across: a broad curtain of dark rings that hangs from a
   // helmet's rim over the face, neck and shoulders, its inner edge sewn to a leather band pierced for lacing and
   // its open back tied with thongs.
-  mailCurtain('hardened_steel_mail_aventail', 2.4, 0.1, 0.3, 8) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
+  mailCurtain('hardened_steel_mail_aventail', 2.4, 0.1, 0.3, 8) + { title: 'Hardened steel mail aventail' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['neck', 'face'] } } },
 
   // A hardened steel partial aventail laid out flat, 400 mm across: a narrower ring of mail on the same laced
   // leather band, reaching only the face and neck.
-  mailCurtain('hardened_steel_mail_half_aventail', 0.83, 0.1, 0.19, 4) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  mailCurtain('hardened_steel_mail_half_aventail', 0.83, 0.1, 0.19, 4) + { title: 'Hardened steel mail half aventail' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A hardened steel half mask for a cap helmet, 190 mm across and 135 mm tall at the nose: a dark grey jaw plate
   // with a nose ridge, breathing slots, hinged hooks at the top corners and gold bands inlaid along its edges.
-  faceMask('gilded_steel_half_mask', 1.2, 'inlay', { plate: 'steel-hardened', ridge: 'steel-hardened', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'metal-gold' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('gilded_steel_half_mask', 1.2, 'inlay', { plate: 'steel-hardened', ridge: 'steel-hardened', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'metal-gold' }) + { title: 'Gilded steel half mask' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A helmet counterweight pouch, 100 mm wide, 70 mm tall and 30 mm deep: a small black nylon pouch with a flap,
   // a hook-and-loop panel on the back that presses onto the rear of a helmet, and a press stud.
@@ -192,7 +192,7 @@ local oval(a, b, p, n, cx, cy) = [
                                           + [
                                             h.stud('stud', 'stud', 0, 0.052, 0.018),
                                             sbox('loop-panel', 'panel', [-0.045, 0.008, -0.015], [0.045, 0.065, -0.019]),
-                                          ], { body: 'nylon-black', flap: 'cloth-charcoal', strap: 'hook-loop-grey', stud: 'steel-bright', panel: 'hook-loop-grey' })
+                                          ], { body: 'nylon-black', flap: 'cloth-charcoal', strap: 'hook-loop-grey', stud: 'steel-bright', panel: 'hook-loop-grey' }) + { title: 'Helmet counterweight pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A thermal night-vision binocular switched on, 130 mm wide, 75 mm tall and 110 mm long: a dark housing with
@@ -219,20 +219,20 @@ local oval(a, b, p, n, cx, cy) = [
     sbox('arm', 'mount', [-0.01, 0.092, -0.06], [0.01, 0.104, 0]),
     h.turned('arm-pivot', 'mount', 'x', [[0, 0], [0, 0.008], [0.026, 0.008], [0.026, 0]], [-0.013, 0.098, -0.012]),
     h.prism('shoe', 'mount', 'z', [[-0.016, 0.104], [0.016, 0.104], [0.022, 0.124], [-0.022, 0.124]], -0.075, -0.05),
-  ], { housing: 'plastic-charcoal', objective: 'screen-black', eyecup: 'vinyl-black', display: 'lcd-green', knob: 'plastic-matte-black', mount: 'steel-parkerized' })
+  ], { housing: 'plastic-charcoal', objective: 'screen-black', eyecup: 'vinyl-black', display: 'lcd-green', knob: 'plastic-matte-black', mount: 'steel-parkerized' }) + { title: 'Powered thermal night vision goggles' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A clear thermoplastic face shield standing on its lower edge, 400 mm round the curve and 210 mm tall, on a
   // black brow bracket whose arms reach back to the slot clips at each side of a hard hat.
-  faceShield('face_shield', 0.2, 0.15, 75, 0.21, 0.004, false, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  faceShield('face_shield', 0.2, 0.15, 75, 0.21, 0.004, false, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }) + { title: 'Face shield' } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A bomb-disposal blast visor standing on its lower edge, 330 mm round the curve and 200 mm tall: a thick clear
   // shield in a moulded black rim, on a heavy brow bracket with arms to the helmet's rail clips.
-  faceShield('blast_visor', 1.1, 0.12, 78, 0.2, 0.01, true, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'steel-parkerized', rim: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  faceShield('blast_visor', 1.1, 0.12, 78, 0.2, 0.01, true, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'steel-parkerized', rim: 'plastic-matte-black' }) + { title: 'Blast visor' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A high steel half mask for a cap helmet, 190 mm across and 135 mm tall at the nose: a grey jaw plate with a
   // nose ridge, breathing slots and hinged hooks, and a raised steel moustache curling up across its face.
-  faceMask('moustached_steel_half_mask', 1.2, 'tache', { plate: 'steel-blued', ridge: 'steel-blued', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'steel-bright' }) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
+  faceMask('moustached_steel_half_mask', 1.2, 'tache', { plate: 'steel-blued', ridge: 'steel-blued', vent: 'plastic-matte-black', hook: 'steel-grey', trim: 'steel-bright' }) + { title: 'Moustached steel half mask' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['face'] } } },
 
   // A vision-correcting lens frame for a full-face gas mask, 100 mm across and 40 mm tall: two prescription lenses
   // in a thin black rim joined at the bridge, with a sprung post that clips behind the mask's visor.
@@ -249,7 +249,7 @@ local oval(a, b, p, n, cx, cy) = [
     sbox('bridge', 'frame', [-0.006, 0.022, 0], [0.006, 0.028, 0.004]),
     sbox('post', 'post', [-0.0025, 0.026, -0.002], [0.0025, 0.046, 0.002]),
     sbox('post-spring', 'post', [-0.006, 0.042, -0.012], [0.006, 0.046, 0.002]),
-  ], { frame: 'plastic-matte-black', lens: 'plastic-clear', post: 'steel-bright' })
+  ], { frame: 'plastic-matte-black', lens: 'plastic-clear', post: 'steel-bright' }) + { title: 'Mask lens insert' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // An aramid-lined nape guard laid out flat, 330 mm across and 120 mm deep: a curved curtain of khaki cotton
@@ -268,6 +268,6 @@ local oval(a, b, p, n, cx, cy) = [
                                               local p = onArc(0.19, 180, cz);
                                               sbox('quilt-%d' % i, 'binding', [-0.09 + 0.06 * i - 0.002, 0.004, p[1] - 0.04], [-0.09 + 0.06 * i + 0.002, 0.0055, p[1] + 0.04])
                                               for i in std.range(1, 2)
-                                            ], { cloth: 'cloth-khaki', binding: 'aramid-gold', strip: 'hook-loop-grey' })
+                                            ], { cloth: 'cloth-khaki', binding: 'aramid-gold', strip: 'hook-loop-grey' }) + { title: 'Aramid nape guard' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 ]

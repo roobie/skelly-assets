@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'skid_steer.spec.libsonnet';
 {
+  title: 'Skid-steer loader',
   sites: [
     site.one('frame', 'skid_steer_frame'),
     site.one('cage', 'skid_steer_cage'),

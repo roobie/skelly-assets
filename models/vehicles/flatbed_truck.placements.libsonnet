@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'flatbed_truck.spec.libsonnet';
 {
+  title: 'Flatbed truck',
   sites: (import 'truck-cab.libsonnet').fittings(site.kit, 'flatbed_truck', s) + [
     site.one('deck', 'flatbed_truck_deck'),
     site.one('headboard', 'flatbed_truck_headboard'),

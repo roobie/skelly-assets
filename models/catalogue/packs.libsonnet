@@ -2,6 +2,7 @@
 // a pack is one shelf a game can load whole; `placed` names the few rows a pack takes from another shelf.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local title = import 'tools/jsonnet/lib/title.libsonnet';
 local rows = std.flattenArrays(std.objectValues(import 'sets/index.libsonnet'));
 local byCategory = {
   ammunition: 'skelly.firearms',
@@ -65,7 +66,7 @@ local packOf(row) =
       source: row.id,
       voxel: voxel.of(voxel.item, row),
       options: { mass: row.exportMass },
-    } + taxonomy.of(row)
+    } + title.of(row) + taxonomy.of(row)
     for row in rows
   ],
   // The recipe rows of the catalogue rows that pack `packId` exports.

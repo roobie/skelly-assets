@@ -61,7 +61,7 @@ local periscopeReach = 0.12;
 local headlampBack = 0.06;
 local tailLampDepth = 0.06;
 
-local rows(s) =
+local rows(s, title) =
   local a = s.armour;
   local n = nose(s);
   local paint = { paint: s.paint };
@@ -87,13 +87,13 @@ local rows(s) =
       box('deck', 'floor', [back(s), s.floor, -innerWall(s)], [s.lowerGlacisX, floorTop(s), innerWall(s)]),
     ] + k.bothSides([
       prism('lower_wall', 'paint', [[back(s), s.floor], [s.lowerGlacisX, s.floor]] + wallFront + [[back(s), s.shelf]], [innerWall(s), s.wall]),
-    ]), paint + { floor: 'steel-grey' }),
+    ]), paint + { floor: 'steel-grey' }) + { title: title + ' hull belly' },
     // The near side's sponson over the track: its shelf and its upper wall up to the roof, both ending at the upper
     // glacis.
     k.compound(s.id + '_hull_side', s.massKg.side, [
       prism('shelf', 'paint', [[back(s), s.shelf], upperAtY(s.shelf), upperAtY(shelfTop(s)), [back(s), shelfTop(s)]], [s.wall, s.side]),
       prism('wall', 'paint', [[back(s), shelfTop(s)], upperAtY(shelfTop(s)), upperAtY(s.roof), [back(s), s.roof]], [s.side - a.upperWall, s.side]),
-    ], paint),
+    ], paint) + { title: title + ' hull side' },
     // The glacis plates, mitred where they meet and the upper one level with the roof at its top; its wings over the
     // sponsons from the shelf up; the nose's
     // cheeks between the plates; and its towing eyes, hung under the lower glacis.
@@ -107,47 +107,47 @@ local rows(s) =
       local x = s.nose - 0.04;
       local y = meet(n.lowerOuter, vertical(x - e.length))[1];
       box('tow_eye', 'steel', [x - e.length, y - e.height, e.z], [x, y, e.z + e.width]),
-    ]), paint + { steel: steel }),
+    ]), paint + { steel: steel }) + { title: title + ' hull nose' },
     // The roof, its front edge bevelled to the upper glacis's inner face.
     k.compound(s.id + '_hull_roof', s.massKg.roof, [
       k.prism('plate', 'paint', [[back(s), s.roof], upperAtY(s.roof), upperAtY(s.roofTop), [back(s), s.roofTop]], [-s.side, s.side]),
-    ], paint),
+    ], paint) + { title: title + ' hull roof' },
     k.compound(s.id + '_turret_ring', s.ring.massKg, [
       k.turned('ring', 'steel', 'y', k.annulus(s.ring.inner, s.ring.outer, 0, s.ring.height)) + { sides: s.ring.sides },
-    ], { steel: steel }),
+    ], { steel: steel }) + { title: title + ' turret ring' },
     // The engine deck's frame on the roof, its louvres spread along it.
     k.compound(s.id + '_engine_deck', d.massKg, [
       box('frame', 'paint', [d.x[0], s.roofTop, d.z[0]], [d.x[1], s.roofTop + 0.02, d.z[1]]),
     ] + [
       box('louvre_' + i, 'grille', [d.x[0] + (i + 0.2) * pitch, s.roofTop + 0.02, d.z[0] + 0.05], [d.x[0] + (i + 0.8) * pitch, s.roofTop + 0.05, d.z[1] - 0.05])
       for i in std.range(0, d.louvres - 1)
-    ], paint + { grille: 'plastic-black' }),
+    ], paint + { grille: 'plastic-black' }) + { title: title + ' engine deck' },
     // A road wheel's trailing torsion-bar arm, near side: the origin is the wheel's axle, the arm runs back and up to its
     // pivot on the hull's wall and its hub end meets the wheel's stub.
     local arm = s.roadArm;
     k.compound(s.id + '_road_arm', arm.massKg, [
       k.bar('arm', 'steel', [0, 0], arm.pivot, arm.thick, [s.wall, armOut]),
       k.turned('pivot', 'steel', 'z', k.disc(arm.pivotRadius, s.wall, armOut), [arm.pivot[0], arm.pivot[1], 0]) + { sides: 12 },
-    ], { steel: steel }),
+    ], { steel: steel }) + { title: title + ' road arm' },
     // A fuel tank in the near sponson over the track, its filler under the roof.
     local mid = (f.x[0] + f.x[1]) / 2;
     local across = (s.wall + s.side) / 2;
     k.compound(s.id + '_fuel_tank', f.massKg, [
       box('tank', 'paint', [f.x[0], shelfTop(s), s.wall + 0.02], [f.x[1], s.roof - 0.02, s.side - a.upperWall - 0.02]),
       box('filler', 'steel', [mid - 0.05, s.roof - 0.02, across - 0.05], [mid + 0.05, s.roof, across + 0.05]),
-    ], paint + { steel: steel }),
+    ], paint + { steel: steel }) + { title: title + ' fuel tank' },
     // Ready rounds standing on the floor behind an armoured door on the rack's near face.
     k.compound(s.id + '_ammo_rack', r.massKg, [
       box('rack', 'steel', [r.x[0], floorTop(s), r.z[0]], [r.x[1], r.top, r.z[1]]),
       box('door', 'paint', [r.x[0] + 0.05, floorTop(s) + 0.1, r.z[1]], [r.x[1] - 0.05, r.top - 0.05, r.z[1] + 0.03]),
-    ], paint + { steel: 'steel-grey' }),
+    ], paint + { steel: 'steel-grey' }) + { title: title + ' ammo rack' },
     // A cross-drive automatic gearbox and steering unit standing on the floor, its output shafts on the drive sprockets'
     // axis out to the hull's walls, where the final drives take them on: the origin is on that axis, so the sprockets'
     // axle places it, and the case's middle stands `offset` along x from it, clear of the glacis.
     k.compound(s.id + '_transmission', t.massKg, [
       box('case', 'casting', [t.offset - t.length / 2, -below, -t.width / 2], [t.offset + t.length / 2, t.above, t.width / 2]),
       k.turned('output_shafts', 'shaft', 'z', k.disc(t.shaft, -innerWall(s), innerWall(s))) + { sides: 12 },
-    ], { casting: 'steel-grey', shaft: 'steel-spall-black' }),
+    ], { casting: 'steel-grey', shaft: 'steel-spall-black' }) + { title: title + ' transmission' },
   ];
 
 local sites(s) =
@@ -181,7 +181,8 @@ local sites(s) =
   + site.batteryBay('truck_battery_tray', [s.battery.x, floor, s.battery.z]);
 
 {
-  // The hull's rows and sites; the vehicle adds its own and its track and turret rows.
+  // The hull's rows, each titled after the vehicle's `title`, and sites; the vehicle adds its own and its track and
+  // turret rows.
   rows: rows,
   sites: sites,
   // The height of the floor deck's top, for what the vehicle stands on it.

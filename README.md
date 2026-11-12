@@ -5,6 +5,7 @@ read_if:
   - which way a model faces, or whether a consumer converts its axes
   - understanding asset ownership, turned-piece appearance or actor clip contracts
   - labelling a packaged model's print, or drawing labels in a consumer
+  - naming a model, or showing its name in a consumer
   - adding or applying the catalogue's item drafts
   - bumping the Node version, or why CI and builds pin one exact version
   - cutting a release, and where its model-history.json comes from
@@ -97,7 +98,18 @@ see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
 Every model also needs a category and may carry facet tags and keywords, from the vocabulary in `models/taxonomy.json`.
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
-`models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
+`models/TAXONOMY.md`; `node tools/check-sources.mjs` lists what is still untagged.
+
+### Titles
+
+A title is authored with its model and never computed from an id: ids are stable keys that change when a model is
+merged or split, and a name cut from one reads as the key it is ("Round 7 d 62x54r"). So every consumer shows the
+author's name.
+
+A title is short plain English, spells calibres with × and R, names no real maker or product, and may use a weapon
+family's common name such as AK or AR. The check that it is present and plain is `tools/packages/thing-export/src/title.ts`,
+`titleFlaw`; it runs on models in the pre-build report, `tools/titles.mjs`, `titleProblems`, and on vehicles in
+`tools/placements.mjs`, `placementProblems`.
 
 ### Outputs and consumers
 
@@ -154,7 +166,7 @@ without a failure, so a change that touches a cue checks it against skelly's mai
 ### Printed labels
 
 A packaged item without its print reads as a blank box, so a catalogue row can name the face of a piece that
-carries its print and the text, which defaults to the model's display name. The label travels as metadata beside
+carries its print and the text, which defaults to the model's title. The label travels as metadata beside
 the GLB, never as lettering in its geometry: each consumer draws text in its own renderer and font, and relabelling a
 row leaves the model's bytes alone. See `tools/packages/thing-authoring-tool/src/catalogue.ts`, `ItemSchema`, and
 `tools/packages/thing-core/src/schema.ts`, `NeutralModelSchema`; the showcase draws it in `site/app.js`,

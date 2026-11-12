@@ -1,5 +1,6 @@
 local site = import 'site.libsonnet';
 {
+  title: 'Rescue truck',
   // Racking and roof gear take the place of the fire engine's tank, ladder and pump.
   sites: site.adjust(
     (import 'fire_engine.placements.libsonnet').sites,

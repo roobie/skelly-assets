@@ -91,7 +91,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                box('rear_liner_near', 'soot', [s.rearAxle - s.arch, 0.125, s.skin - 0.3], [s.rearAxle + s.arch, 0.68, s.skin - 0.26]),
                box('rear_liner_far', 'soot', [s.rearAxle - s.arch, 0.125, -s.skin + 0.26], [s.rearAxle + s.arch, 0.68, -s.skin + 0.3]),
              ],
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon shell' },
   // Warped by the heat and sprung off its catch, so the front edge stands clear of the nose.
   k.compound('burnt_out_saloon_bonnet', 13,
              w.plate('skin', 'y', [s.aPost, s.nose + 0.02], [-s.skin + 0.03, s.skin - 0.03],
@@ -101,14 +101,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                    function(x, z) true,
                    function(x, z) w.burnt(x, z, 22),
                    thick=0.0625),
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon bonnet' },
   k.compound('burnt_out_saloon_boot_lid', 11,
              w.plate('skin', 'y', [s.rear + 0.04, s.deckFront - 0.02], [-s.glassIn + 0.02, s.glassIn - 0.02],
                    function(x, z) s.deck + 0.03 + 0.07 * (s.deckFront - x) / (s.deckFront - s.rear) * (0.6 + z * 0.5) - 0.03 * w.fbm(x, z, 24),
                    function(x, z) true,
                    function(x, z) w.burnt(x, z, 25, 0.05),
                    thick=0.0625),
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon boot lid' },
   // Swung out on its one remaining hinge, the free corner dropped until it rests on the ground.
   k.compound('burnt_out_saloon_door', 18,
              std.flattenArrays([
@@ -134,7 +134,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                ] else [])
                for i in std.range(0, 13)
              ]),
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon door' },
   // The bar has dropped off its far mounting and hangs to the ground.
   k.compound('burnt_out_saloon_front_bumper', 8,
              w.plate('bar', 'x', [-s.side + 0.03, s.side - 0.03], [0, 0.45],
@@ -144,7 +144,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                      y >= low && y < low + 0.16,
                    function(z, y) w.burnt(z, y, 31, 0.03),
                    thick=0.0625),
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon front bumper' },
   k.compound('burnt_out_saloon_rear_bumper', 7,
              w.plate('bar', 'x', [-s.side + 0.03, s.side - 0.03], [0.05, 0.5],
                    function(z, y) s.rear + 0.09 - 0.03 * w.fbm(z, y, 32),
@@ -153,7 +153,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                      y >= low && y < low + 0.17,
                    function(z, y) w.burnt(z, y, 33, 0.06),
                    thick=-0.0625),
-             w.burntFinish),
+             w.burntFinish) + { title: 'Burnt-out saloon rear bumper' },
   k.compound('burnt_out_saloon_rim', 9, [
     k.turned('flange', 'rim', 'z', k.annulus(0.17, 0.2, -0.08, 0.07)) + { sides: 24 },
     k.turned('dish', 'dark', 'z', k.disc(0.17, -0.08, 0.02)) + { sides: 24 },
@@ -166,7 +166,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
             function(x, z) if w.fbm(x, z, 35) > 0.5 then 'residue' else 'dark',
             thick=0.03125), {
     rim: 'rust-red', dark: 'steel-spall-black', steel: 'iron-dull', residue: 'plastic-scorched',
-  }),
+  }) + { title: 'Burnt-out saloon rim' },
   k.compound('burnt_out_saloon_seat_frame', 6,
              [
                box('rail_inner', 'frame', [-0.26, 0, -0.24], [0.26, 0.05, -0.2]),
@@ -181,7 +181,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
              ]
              + [box('spring_' + i, 'rust', [-0.2 + i * 0.1, 0.17, -0.2], [-0.17 + i * 0.1, 0.2, 0.2]) for i in std.range(0, 3)]
              + [w.bar('back_spring_' + i, 'rust', [-0.28 - i * 0.04, 0.32 + i * 0.12], [-0.27 - i * 0.04, 0.35 + i * 0.12], 0.03, [-0.2, 0.2]) for i in std.range(0, 2)],
-             { frame: 'steel-spall-black', rust: 'rust-red' }),
+             { frame: 'steel-spall-black', rust: 'rust-red' }) + { title: 'Burnt-out saloon seat frame' },
   k.compound('burnt_out_saloon_bench_frame', 9,
              [
                box('pan_front', 'frame', [0.24, 0, -0.68], [0.3, 0.26, 0.68]),
@@ -193,19 +193,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
                w.bar('back_top', 'frame', [-0.42, 0.64], [-0.43, 0.68], 0.05, [-0.68, 0.68]),
              ]
              + [box('spring_' + i, 'rust', [-0.2 + i * 0.1, 0.23, -0.62], [-0.17 + i * 0.1, 0.26, 0.62]) for i in std.range(0, 3)],
-             { frame: 'steel-spall-black', rust: 'rust-red' }),
+             { frame: 'steel-spall-black', rust: 'rust-red' }) + { title: 'Burnt-out saloon bench frame' },
   k.compound('burnt_out_saloon_dash_frame', 10, [
     box('beam', 'steel', [s.cowl - 0.2, s.waist - 0.17, -s.skin], [s.cowl - 0.14, s.waist - 0.11, s.skin]),
     w.bar('column', 'steel', [s.cowl - 0.14, s.waist - 0.12], [s.cowl - 0.42, s.waist - 0.02], 0.05, [-0.4, -0.35]),
     k.turned('ring', 'rust', 'x', k.annulus(0.15, 0.175, -0.0156, 0.0156), [s.cowl - 0.42, s.waist - 0.02, -0.375]) + { sides: 16 },
     box('spoke', 'steel', [s.cowl - 0.436, s.waist - 0.04, -0.53], [s.cowl - 0.404, s.waist, -0.22]),
     box('console', 'steel', [s.cowl - 0.2, s.floor, -0.05], [s.cowl - 0.14, s.waist - 0.17, 0.05]),
-  ], { steel: 'steel-spall-black', rust: 'rust-red' }),
+  ], { steel: 'steel-spall-black', rust: 'rust-red' }) + { title: 'Burnt-out saloon dash frame' },
   k.compound('burnt_out_saloon_engine', 160, [
     box('block', 'block', [-0.25, 0.08, -0.32], [0.25, 0.42, 0.26]),
     box('head', 'block', [-0.22, 0.42, -0.26], [0.22, 0.54, 0.2]),
     box('sump', 'dark', [-0.25, 0, -0.26], [0.25, 0.08, 0.2]),
     box('manifold', 'rust', [0.25, 0.26, -0.26], [0.3, 0.46, 0.2]),
     box('gearbox', 'dark', [-0.2, 0.03, -0.72], [0.2, 0.38, -0.32]),
-  ], { block: 'iron-cast', dark: 'steel-spall-black', rust: 'rust-red' }),
+  ], { block: 'iron-cast', dark: 'steel-spall-black', rust: 'rust-red' }) + { title: 'Burnt-out saloon engine' },
 ])

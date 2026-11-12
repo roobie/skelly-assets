@@ -22,7 +22,7 @@ local cross(side) =
     h.turned('cap', 'cap', 'y', [[0.032, 0], [0.032, 0.026], [0.048, 0.026], [0.052, 0.020], [0.052, 0]], [-0.118, 0.425, 0.020]),
     h.box('cap-lever', 'cap', [-0.150, 0.468, 0.010], [-0.086, 0.477, 0.030]),
   ] + cross('front') + cross('back') + handle('handle-a', -0.040) + handle('handle-b', 0.040) + handle('handle-c', 0.120),
-  { body: 'polymer-od-green', seam: 'polymer-od-green', handle: 'polymer-od-green', spout: 'steel-grey', cap: 'paint-charcoal' }) + {
+  { body: 'polymer-od-green', seam: 'polymer-od-green', handle: 'polymer-od-green', spout: 'steel-grey', cap: 'paint-charcoal' }) + { title: 'Jerry can' } + {
     handling: { part: 'jerry_can', solid: 'handle-b', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     voxelGrain: 0.004,
     taxonomy: { category: 'containers', keywords: ['fuel'] },

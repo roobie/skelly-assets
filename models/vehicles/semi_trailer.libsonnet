@@ -22,10 +22,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     ]
     + bothSides([box('main_rail', 'frame', [s.rear, s.frameLow, 0.4], [s.front, s.frameHigh, 0.52])]
                 + std.flattenArrays([suspension(i) for i in axleIds])),
-    { frame: s.frame, rubber: 'rubber-black' }),
+    { frame: s.frame, rubber: 'rubber-black' }) + { title: 'Semi trailer chassis' },
   k.compound('semi_trailer_floor', 400, [
     box('deck', 'wood', [s.rear, s.frameHigh, -1.24], [s.front, s.floor, 1.24]),
-  ], { wood: 'wood-oak' }),
+  ], { wood: 'wood-oak' }) + { title: 'Semi trailer floor' },
   k.compound('semi_trailer_side', 350,
     [
       box('skin', 'paint', [s.rear + 0.04, s.frameHigh, s.side - 0.03], [s.front, s.roof - 0.06, s.side]),
@@ -36,18 +36,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
       box('front_post', 'trim', [s.front - 0.08, 1.2, s.side - 0.1], [s.front + 0.02, s.roof - 0.06, s.side + 0.06]),
     ]
     + [box('rib_' + i, 'trim', [-6.0 + 1.2 * i - 0.03, 1.42, s.side], [-6.0 + 1.2 * i + 0.03, s.roof - 0.16, s.side + 0.06]) for i in std.range(0, 10)],
-    { paint: s.paint, band: s.band, trim: s.trim }),
+    { paint: s.paint, band: s.band, trim: s.trim }) + { title: 'Semi trailer side' },
   k.compound('semi_trailer_roof', 200, [
     box('skin', 'trim', [s.rear, s.roof - 0.06, -s.side - 0.02], [s.front, s.roof, s.side + 0.02]),
     box('rear_header', 'trim', [s.rear - 0.02, s.roof - 0.18, -s.side], [s.rear + 0.1, s.roof - 0.06, s.side]),
   ] + [box('bow_' + i, 'trim', [-6.0 + 1.2 * i - 0.06, s.roof, -s.side + 0.1], [-6.0 + 1.2 * i + 0.06, s.roof + 0.02, s.side - 0.1]) for i in std.range(0, 10)],
-  { trim: s.trim }),
+  { trim: s.trim }) + { title: 'Semi trailer roof' },
   k.compound('semi_trailer_front_wall', 150, [
     box('skin', 'paint', [s.front - 0.04, s.frameHigh, -s.side + 0.08], [s.front, s.roof - 0.06, s.side - 0.08]),
     box('band', 'band', [s.front, s.bandLow, -s.side + 0.08], [s.front + 0.03, s.bandHigh, s.side - 0.08]),
     box('air_lines', 'frame', [s.front, 1.46, -0.3], [s.front + 0.06, 1.6, 0.3]),
     box('foot_step', 'frame', [s.front, 1.3, -0.3], [s.front + 0.1, 1.36, 0.3]),
-  ], { paint: s.paint, band: s.band, frame: s.frame }),
+  ], { paint: s.paint, band: s.band, frame: s.frame }) + { title: 'Semi trailer front wall' },
   // Barn doors hinge on the rear posts and meet on the centre line.
   k.compound('semi_trailer_rear_door', 60, [
     box('skin', 'paint', [s.rear - 0.02, s.floor, 0.02], [s.rear + 0.03, s.roof - 0.18, s.side - 0.1]),
@@ -58,12 +58,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('handle_outer', 'frame', [s.rear - 0.08, 2.0, 0.8], [s.rear - 0.04, 2.05, 0.93]),
   ] + [box('hinge_' + i, 'trim', [s.rear - 0.05, s.floor + 0.25 + 0.7 * i, s.side - 0.2], [s.rear - 0.02, s.floor + 0.33 + 0.7 * i, s.side - 0.08]) for i in std.range(0, 3)],
   { paint: s.paint, band: s.band, trim: s.trim, frame: s.frame },
-  { hinge_a: ['skin', [0.5, 0.1, 1]], hinge_b: ['skin', [0.5, 0.9, 1]] }),
+  { hinge_a: ['skin', [0.5, 0.1, 1]], hinge_b: ['skin', [0.5, 0.9, 1]] }) + { title: 'Semi trailer rear door' },
   k.compound('semi_trailer_kingpin', 60, [
     box('plate', 'steel', [s.kingpin - 0.6, s.frameLow - 0.06, -0.6], [s.kingpin + 0.6, s.frameLow - 0.02, 0.6]),
     k.turned('pin', 'steel', 'y', k.disc(0.055, s.frameLow - 0.24, s.frameLow - 0.06), [s.kingpin, 0, 0]),
     k.turned('flange', 'steel', 'y', k.disc(0.09, s.frameLow - 0.27, s.frameLow - 0.24), [s.kingpin, 0, 0]),
-  ], { steel: 'steel-grey' }),
+  ], { steel: 'steel-grey' }) + { title: 'Semi trailer kingpin' },
   // Fits at the foot, so the brace reaches back up to its own cross member.
   k.compound('semi_trailer_landing_leg', 60, [
     box('shoe', 'frame', [-0.17, 0, -0.13], [0.17, 0.06, 0.13]),
@@ -71,23 +71,23 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('outer_tube', 'frame', [-0.07, 0.55, -0.07], [0.07, s.frameLow, 0.07]),
     box('gearbox', 'frame', [-0.1, 0.82, -0.1], [0.1, 1.0, 0.1]),
     k.prism('brace', 'frame', [[-0.06, 0.7], [-0.06, 0.8], [-0.76, s.frameLow], [-0.9, s.frameLow]], [-0.03, 0.03]),
-  ], { frame: s.frame, steel: 'steel-galvanised' }),
+  ], { frame: s.frame, steel: 'steel-galvanised' }) + { title: 'Semi trailer landing leg' },
   k.compound('semi_trailer_side_guard', 20, [
     box('rail_low', 'frame', [-0.4, 0.62, s.side - 0.07], [2.5, 0.72, s.side - 0.02]),
     box('rail_high', 'frame', [-0.4, 0.9, s.side - 0.07], [2.5, 1.0, s.side - 0.02]),
     box('post_rear', 'frame', [-0.3, 0.62, s.side - 0.1], [-0.22, 1.3, s.side - 0.05]),
     box('post_mid', 'frame', [1.0, 0.62, s.side - 0.1], [1.08, 1.3, s.side - 0.05]),
     box('post_front', 'frame', [2.3, 0.62, s.side - 0.1], [2.38, 1.3, s.side - 0.05]),
-  ], { frame: s.frame }),
+  ], { frame: s.frame }) + { title: 'Semi trailer side guard' },
   k.compound('semi_trailer_mudguard', 18,
     std.flattenArrays([
       k.arc('arc_' + i, 'frame', s.axles[i], s.hub, 0.55, 0.58, 12, 168, 8, [s.wheelZ - 0.18, s.wheelZ + 0.2])
       + [box('strut_' + i, 'frame', [s.axles[i] - 0.05, s.hub + 0.56, s.wheelZ - 0.12], [s.axles[i] + 0.05, s.frameHigh, s.wheelZ + 0.1])]
       for i in axleIds
-    ]), { frame: s.frame }),
+    ]), { frame: s.frame }) + { title: 'Semi trailer mudguard' },
   k.compound('semi_trailer_underrun', 40, [
     box('bar', 'frame', [s.rear + 0.02, 0.48, -1.2], [s.rear + 0.14, 0.6, 1.2]),
     box('stripe', 'reflector', [s.rear + 0.0, 0.5, -1.15], [s.rear + 0.02, 0.58, 1.15]),
   ] + bothSides([box('strut', 'frame', [s.rear + 0.06, 0.6, 0.42], [s.rear + 0.16, s.frameLow, 0.5])]),
-  { frame: s.frame, reflector: 'reflective-yellow' }),
+  { frame: s.frame, reflector: 'reflective-yellow' }) + { title: 'Semi trailer underrun' },
 ])

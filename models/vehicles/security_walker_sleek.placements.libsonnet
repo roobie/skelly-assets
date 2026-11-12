@@ -5,6 +5,7 @@ local s = import 'security_walker_sleek.spec.libsonnet';
 local baseSite(id) = [p for p in base.sites if p.id == id][0];
 local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
 {
+  title: 'Sleek security walker',
   sites: site.adjust(base.sites,
     over={
       hull: { id: 'carrier', part: 'security_walker_sleek_carrier' },

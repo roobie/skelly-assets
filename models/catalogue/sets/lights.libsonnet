@@ -3,6 +3,7 @@ local part = h.part, port = h.port;
 [
   {
     id: 'frag_grenade',
+    title: 'Fragmentation grenade',
     exportMass: 'parts',
     parts: [part('grenade', 'grenade', 0.400, {
       radius: 0.032, height: 0.068, neckRadius: 0.010, neckHeight: 0.008, headRadius: 0.0125, headHeight: 0.012,
@@ -15,6 +16,7 @@ local part = h.part, port = h.port;
   // Burn-down mass belongs to the inventory row, so these export no part masses.
   {
     id: 'torch',
+    title: 'Torch',
     taxonomy: { category: 'lighting' },
     exportMass: 'inventory-atom',
     parts: [part('torch', 'torch', 0.350, { length: 0.42, shaftRadius: 0.014, headLength: 0.10, headRadius: 0.03 }, { shaft: 'wood-birch', head: 'cloth-charred' })],
@@ -25,6 +27,7 @@ local part = h.part, port = h.port;
   },
   {
     id: 'candle',
+    title: 'Candle',
     taxonomy: { category: 'lighting' },
     exportMass: 'inventory-atom',
     parts: [part('candle', 'candle', 0.150, { radius: 0.023, height: 0.10, wickRadius: 0.0012, wickHeight: 0.012 }, { body: 'wax-ivory', wick: 'cloth-charred' })],
@@ -36,6 +39,7 @@ local part = h.part, port = h.port;
   },
   {
     id: 'oil_lamp',
+    title: 'Oil lamp',
     taxonomy: { category: 'lighting' },
     exportMass: 'parts',
     parts: [
@@ -53,6 +57,7 @@ local part = h.part, port = h.port;
   // Broken in a fall: the arm is kinked and the shade hangs forward off its joint.
   {
     id: 'dead_desk_lamp',
+    title: 'Broken desk lamp',
     exportMass: 'parts',
     parts: [
       part('base', 'cylinder', 0.500, { radius: 0.047, height: 0.012 }, { body: 'paint-charcoal' }, [port('arm', 'female', [0, 0.012, 0], [0, 1, 0])]),

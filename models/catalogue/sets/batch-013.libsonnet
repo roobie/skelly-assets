@@ -52,7 +52,7 @@ local carton(id, massKg, picture, finish) =
     lid: 'plastic-white',
     band: 'plastic-blue',
     handle: 'plastic-white',
-  }) + h.label('band-front', '+z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Plastic tub' } + h.label('band-front', '+z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small steel gas cylinder, 40 mm across and 120 mm tall, with a domed shoulder, a printed band and a
   // black plastic valve head with a side outlet and a knob.
@@ -62,7 +62,7 @@ local carton(id, massKg, picture, finish) =
     disc('valve', 'valve', 0.01, 0.102, 0.114),
     box('outlet', 'valve', [0.008, 0.104, -0.004], [0.018, 0.112, 0.004]),
     disc('knob', 'valve', 0.007, 0.114, 0.12),
-  ], { steel: 'steel-grey', band: 'paint-white', valve: 'plastic-black' })
+  ], { steel: 'steel-grey', band: 'paint-white', valve: 'plastic-black' }) + { title: 'Pressurized canister' }
   + h.inHand('pressurized_canister', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A toy radio-controlled car carton, 300 by 150 by 80 mm, with a red car on a blue printed panel and a
@@ -79,12 +79,12 @@ local carton(id, massKg, picture, finish) =
     box('remote', 'tyre', [0.072, 0.03, 0.044], [0.116, 0.07, 0.048]),
     box('remote-stick', 'window', [0.08, 0.045, 0.048], [0.088, 0.06, 0.052]),
     box('remote-aerial', 'tyre', [0.106, 0.07, 0.044], [0.11, 0.118, 0.048]),
-  ], { carton: 'plastic-yellow', panel: 'plastic-blue', strip: 'paint-white', car: 'plastic-red', window: 'paint-white', tyre: 'plastic-black' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
+  ], { carton: 'plastic-yellow', panel: 'plastic-blue', strip: 'paint-white', car: 'plastic-red', window: 'paint-white', tyre: 'plastic-black' }) + { title: 'Remote-control car box' } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A standard shot glass, 48 mm across the rim and 58 mm tall, tapering to a thick heavy base.
   h.compound('shot_glass', 0.071, [
     turned('glass', 'glass', 'y', [[0, 0], [0, 0.02], [0.058, 0.024], [0.058, 0.0205], [0.014, 0.017], [0.014, 0]]),
-  ], { glass: 'glass-clear' })
+  ], { glass: 'glass-clear' }) + { title: 'Shot glass' }
   + h.inHand('shot_glass', 'glass') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A camping propane cylinder, 116 mm across and 300 mm tall, green steel with a yellow printed band, a
@@ -98,7 +98,7 @@ local carton(id, massKg, picture, finish) =
     ring('band', 'band', 0.056, 0.061, 0.06, 0.17),
     disc('valve', 'valve', 0.012, 0.258, 0.284),
     disc('valve-top', 'valve', 0.009, 0.284, 0.3),
-  ], { paint: 'plastic-green', band: 'plastic-yellow', valve: 'brass' })
+  ], { paint: 'plastic-green', band: 'plastic-yellow', valve: 'brass' }) + { title: 'Small propane tank' }
   + h.inHand('small_propane_tank', 'tank') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A single-use squeeze tube, 30 mm long and 10 mm across, lying down: a crimped tail, a white body
@@ -108,7 +108,7 @@ local carton(id, massKg, picture, finish) =
     turned('body', 'tube', 'x', [[0, 0], [0, 0.002], [0.006, 0.005], [0.016, 0.005], [0.018, 0.003], [0.018, 0]], [-0.01, 0.005, 0]),
     rod('nozzle', 'tube', 0.002, 0.008, 0.011, 0.005),
     rod('cap', 'cap', 0.0035, 0.011, 0.015, 0.005),
-  ], { tube: 'plastic-white', cap: 'plastic-red' })
+  ], { tube: 'plastic-white', cap: 'plastic-red' }) + { title: 'Small squeeze tube' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A 10.1 ounce caulk cartridge lying down, 50 mm across and 265 mm long: a white tube with a blue printed
@@ -119,7 +119,7 @@ local carton(id, massKg, picture, finish) =
     rod('follower', 'follower', 0.021, -0.107, -0.103, 0.025),
     turned('shoulder', 'tube', 'x', [[0, 0], [0, 0.025], [0.012, 0.012], [0.012, 0]], [0.1, 0.025, 0]),
     turned('nozzle', 'tube', 'x', [[0, 0], [0, 0.007], [0.05, 0.003], [0.05, 0]], [0.112, 0.025, 0]),
-  ], { tube: 'plastic-white', label: 'plastic-blue', follower: 'plastic-black' })
+  ], { tube: 'plastic-white', label: 'plastic-blue', follower: 'plastic-black' }) + { title: 'Caulk cartridge' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A clear acrylic leaflet stand, 220 mm wide, 300 mm tall and 140 mm deep: a leaning back panel on a flat
@@ -131,7 +131,7 @@ local carton(id, massKg, picture, finish) =
     h.prism('side-left', 'acrylic', 'x', [[0.006, -0.056], [0.006, 0.02], [0.12, 0.004], [0.12, -0.072]], -0.11, -0.106),
     h.prism('side-right', 'acrylic', 'x', [[0.006, -0.056], [0.006, 0.02], [0.12, 0.004], [0.12, -0.072]], 0.106, 0.11),
     h.prism('leaflet', 'leaflet', 'x', [[0.006, -0.05], [0.006, -0.046], [0.2, -0.072], [0.2, -0.076]], -0.1, 0.1),
-  ], { acrylic: 'plastic-clear', leaflet: 'paint-cream' })
+  ], { acrylic: 'plastic-clear', leaflet: 'paint-cream' }) + { title: 'Leaflet stand' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A science kit carton, 300 by 150 by 80 mm, with two children and a spoked flywheel engine printed on a
@@ -149,7 +149,7 @@ local carton(id, massKg, picture, finish) =
     box('spoke-a', 'wheel', [-0.044, 0.068, 0.044], [0.012, 0.072, 0.048]),
     box('spoke-b', 'wheel', [-0.018, 0.042, 0.044], [-0.014, 0.098, 0.048]),
     box('crank', 'engine', [-0.016, 0.066, 0.048], [0.02, 0.072, 0.052]),
-  ], { carton: 'plastic-green', panel: 'paint-cream', strip: 'paint-white', skin: 'paint-terracotta', 'shirt-a': 'plastic-orange', 'shirt-b': 'plastic-blue', engine: 'brass', wheel: 'steel-grey' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
+  ], { carton: 'plastic-green', panel: 'paint-cream', strip: 'paint-white', skin: 'paint-terracotta', 'shirt-a': 'plastic-orange', 'shirt-b': 'plastic-blue', engine: 'brass', wheel: 'steel-grey' }) + { title: 'Engine kit box' } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A cleaned animal stomach lying on its side, 210 mm long and 140 mm across, swollen with water, its neck
   // gathered and tied off with a cord whose ends hang loose.
@@ -159,7 +159,7 @@ local carton(id, massKg, picture, finish) =
     turned('tuft', 'gut', 'x', [[0, 0], [0, 0.011], [0.014, 0.02], [0.026, 0.016], [0.026, 0]], [0.074, 0.07, 0]),
     box('cord-end-a', 'cord', [0.066, 0.02, 0.012], [0.072, 0.07, 0.018]),
     box('cord-end-b', 'cord', [0.06, 0.03, 0.004], [0.066, 0.06, 0.01]),
-  ], { gut: 'wax-cream', cord: 'cord-olive' })
+  ], { gut: 'wax-cream', cord: 'cord-olive' }) + { title: 'Sealed stomach' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['flesh'] } } },
 ]
 + (
@@ -179,7 +179,7 @@ local carton(id, massKg, picture, finish) =
       hoop('hoop-high', 0.51, 0.55),
       hoop('hoop-top', 0.66, 0.7),
       turned('bung', 'bung', 'z', [[0, 0], [0, 0.022], [0.014, 0.022], [0.014, 0]], [0, height / 2, r(height / 2) - 0.008]),
-    ], { wood: 'wood-pine', hoop: 'steel', bung: 'wood-walnut' }) + { taxonomy: { category: 'containers', tags: { material: ['wood'], setting: ['modern'] } } },
+    ], { wood: 'wood-pine', hoop: 'steel', bung: 'wood-walnut' }) + { title: 'Wooden barrel' } + { taxonomy: { category: 'containers', tags: { material: ['wood'], setting: ['modern'] } } },
   ]
 )
 + [
@@ -188,7 +188,7 @@ local carton(id, massKg, picture, finish) =
     box('sheet', 'paper', [-0.12, 0, -0.06], [0.12, 0.002, 0.06]),
     h.prism('flap', 'paper', 'x', [[0.002, -0.06], [0.004, -0.06], [0.024, 0.056], [0.022, 0.056]], -0.12, 0.12),
     rod('fold', 'paper', 0.003, -0.12, 0.12, 0.003) + { origin: [-0.12, 0.003, -0.06] },
-  ], { paper: 'paperboard-tan' })
+  ], { paper: 'paperboard-tan' }) + { title: 'Butcher paper' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A torn-off sheet of kitchen foil, 300 mm square, lying loosely crumpled with crinkle ridges across it.
@@ -204,7 +204,7 @@ local carton(id, massKg, picture, finish) =
     for x in [[-0.05, 0.07][i]]
   ] + [
     h.prism('corner', 'foil', 'z', [[0.11, 0.002], [0.15, 0.002], [0.15, 0.03]], 0.1, 0.15),
-  ], { foil: 'alu-bare' })
+  ], { foil: 'alu-bare' }) + { title: 'Foil sheet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A roll of kitchen foil lying down, 300 mm long and 56 mm across, its cardboard core showing at both ends
@@ -213,7 +213,7 @@ local carton(id, massKg, picture, finish) =
     turned('core', 'core', 'x', [[0, 0.016], [0, 0.02], [0.3, 0.02], [0.3, 0.016], [0, 0.016]], [-0.15, 0.028, 0]),
     turned('foil', 'foil', 'x', [[0, 0.02], [0, 0.028], [0.29, 0.028], [0.29, 0.02], [0, 0.02]], [-0.145, 0.028, 0]),
     box('tail', 'foil', [-0.145, 0, 0], [0.145, 0.002, 0.08]),
-  ], { core: 'paperboard-brown', foil: 'alu-bare' })
+  ], { core: 'paperboard-brown', foil: 'alu-bare' }) + { title: 'Foil roll' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal', 'paper'], setting: ['modern'] } } },
 
   // A 420 pound propane cylinder standing upright, 600 mm across and 1220 mm tall: a white steel shell with
@@ -234,5 +234,5 @@ local carton(id, massKg, picture, finish) =
     disc('valve', 'valve', 0.03, 1.1, 1.17),
     box('valve-outlet', 'valve', [0.03, 1.13, -0.012], [0.07, 1.15, 0.012]),
     disc('wheel', 'wheel', 0.055, 1.17, 1.185),
-  ] + handHoleRing('collar', 'paint', 0.16, 0.172, 1.12, 1.19, 50, 8), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
+  ] + handHoleRing('collar', 'paint', 0.16, 0.172, 1.12, 1.19, 50, 8), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { title: 'Extra large propane tank' } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 ]

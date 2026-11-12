@@ -3,9 +3,10 @@ local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local s = import 'flatbed_truck.spec.libsonnet';
+local vehicle = import 'flatbed_truck.placements.libsonnet';
 local plankEdges = [-s.deckSide + 0.05, -1, -0.5, 0, 0.5, 1, s.deckSide - 0.05];
 local stakes = [s.deckRear + 0.5 + i * (s.deckFront - s.deckRear - 0.9) / 5 for i in std.range(0, 5)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck', vehicle.title, s) + [
   k.compound('flatbed_truck_deck', 720, [
     box('bed', 'steel', [s.deckRear, s.deckBottom + 0.02, -s.deckSide + 0.05], [s.deckFront, s.deckTop - 0.05, s.deckSide - 0.05]),
     box('tail', 'steel', [s.deckRear - 0.03, s.deckBottom, -s.deckSide], [s.deckRear + 0.05, s.deckTop, s.deckSide]),
@@ -18,7 +19,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck'
   ] + [
     box('stake_' + i, 'steel', [stakes[i] - 0.05, s.deckBottom - 0.05, s.deckSide - 0.005], [stakes[i] + 0.05, s.deckTop, s.deckSide + 0.02])
     for i in std.range(0, 5)
-  ]), { planks: 'wood-pine', planks_dark: 'wood-oak', steel: s.paint }),
+  ]), { planks: 'wood-pine', planks_dark: 'wood-oak', steel: s.paint }) + { title: 'Flatbed truck deck' },
   k.compound('flatbed_truck_headboard', 110, [
     box('frame_top', 'steel', [s.deckFront - 0.08, s.boardTop - 0.08, -s.deckSide], [s.deckFront, s.boardTop, s.deckSide]),
     box('frame_low', 'steel', [s.deckFront - 0.08, s.deckTop, -s.deckSide], [s.deckFront, s.deckTop + 0.1, s.deckSide]),
@@ -27,10 +28,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck'
     for i in std.range(0, 7)
   ] + k.bothSides([
     box('post', 'steel', [s.deckFront - 0.08, s.deckTop, s.deckSide - 0.1], [s.deckFront, s.boardTop, s.deckSide]),
-  ]), { steel: s.paint, bar: 'steel-grey' }),
+  ]), { steel: s.paint, bar: 'steel-grey' }) + { title: 'Flatbed truck headboard' },
   k.compound('flatbed_truck_toolbox', 28, [
     box('box', 'steel', [-0.5, 0, -0.26], [0.5, 0.42, 0.26]),
     box('lid', 'lid', [-0.46, 0.05, 0.26], [0.46, 0.38, 0.27]),
     box('catch', 'trim', [-0.06, 0.28, 0.27], [0.06, 0.33, 0.285]),
-  ], { steel: 'paint-charcoal', lid: 'alu-bare', trim: 'plastic-black' }),
+  ], { steel: 'paint-charcoal', lid: 'alu-bare', trim: 'plastic-black' }) + { title: 'Flatbed truck toolbox' },
 ])

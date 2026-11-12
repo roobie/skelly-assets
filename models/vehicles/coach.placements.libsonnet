@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'coach.spec.libsonnet';
 {
+  title: 'Coach',
   sites: (import 'bus-body.libsonnet').fittings(site.kit, 'coach', s) + [
     site.one('hold_floor', 'coach_hold_floor'),
   ]

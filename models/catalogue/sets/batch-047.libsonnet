@@ -59,7 +59,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     box('slot-a', 'slot', [0.042, 0.036, 0.168], [0.045, 0.046, 0.171]),
     box('slot-b', 'slot', [0.057, 0.036, 0.168], [0.06, 0.046, 0.171]),
     box('slot-earth', 'slot', [0.049, 0.029, 0.168], [0.053, 0.033, 0.171]),
-  ], { cable: 'plastic-orange', prong: 'brass', slot: 'plastic-black' })
+  ], { cable: 'plastic-orange', prong: 'brass', slot: 'plastic-black' }) + { title: 'Extension cable' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A heavy tow cable: 9 m of 12 mm steel wire rope in a black plastic jacket, coiled 440 mm across, with a crimped
@@ -71,7 +71,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     box('tail-l', 'cable', [-0.08, 0.024, 0.194], [-0.02, 0.036, 0.206]),
     box('tail-r', 'cable', [0.02, 0.024, 0.194], [0.08, 0.036, 0.206]),
   ] + hook('hook-l', -0.12, 0.2, -1, 0.024, 0.012) + hook('hook-r', 0.12, 0.2, 1, 0.024, 0.012),
-  { cable: 'plastic-charcoal', sleeve: 'steel-galvanised', hook: 'paint-red' })
+  { cable: 'plastic-charcoal', sleeve: 'steel-galvanised', hook: 'paint-red' }) + { title: 'Heavy-duty tow cable' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A single jumper lead 1 m long: black insulated copper cable 6 mm thick in two loose loops 170 mm across, with a
@@ -80,7 +80,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     box('lead-l', 'cable', [-0.045, 0.006, 0.074], [-0.01, 0.012, 0.08]),
     box('lead-r', 'cable', [0.01, 0.006, 0.074], [0.045, 0.012, 0.08]),
   ] + clamp('clamp-l', -0.045, -1, 0.004, 0.077) + clamp('clamp-r', 0.045, 1, 0.004, 0.077),
-  { cable: 'plastic-black', boot: 'plastic-red', jaw: 'copper' })
+  { cable: 'plastic-black', boot: 'plastic-red', jaw: 'copper' }) + { title: 'Jumper cable' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['rubber', 'metal'], setting: ['modern'] } } },
 
   // An empty collapsible water bottle for 500 ml, lying flat: a clear blue soft body 210 mm long and 100 mm wide with
@@ -95,7 +95,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     h.rod('neck', 'cap', 0.011, 0.096, 0.104, 0.011),
     h.rod('cap', 'cap', 0.0135, 0.104, 0.124, 0.0135),
     box('label', 'label', [-0.055, 0.006, -0.03], [0.02, 0.007, 0.03]),
-  ], { body: 'plastic-clear-blue', cap: 'plastic-blue', label: 'plastic-white' })
+  ], { body: 'plastic-clear-blue', cap: 'plastic-blue', label: 'plastic-white' }) + { title: 'Collapsible bottle' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] }, keywords: ['camping'] } },
 
   // A brushed stainless steel water bottle for 750 ml, 73 mm across and 260 mm tall with a rounded shoulder, a
@@ -108,7 +108,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     disc('base-ring', 'trim', 0.0368, 0.004, 0.008),
     disc('cap', 'cap', 0.024, 0.232, 0.252),
     turned('loop', 'cap', 'z', [[0, 0.008], [0, 0.0125], [0.008, 0.0125], [0.008, 0.008], [0, 0.008]], [0, 0.252, -0.004]),
-  ], { steel: 'steel-stainless', trim: 'steel-grey', cap: 'plastic-black' })
+  ], { steel: 'steel-stainless', trim: 'steel-grey', cap: 'plastic-black' }) + { title: 'Steel water bottle' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A single-burner cooker for acetylene, 170 mm across and 95 mm tall: a steel ring base with three uprights
@@ -138,7 +138,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
       ], 0.084, 0.092),
     ]
     for i in [0, 1, 2]
-  ]), { steel: 'steel-grey', brass: 'brass', crown: 'brass-dull', knob: 'plastic-black' })
+  ]), { steel: 'steel-grey', brass: 'brass', crown: 'brass-dull', knob: 'plastic-black' }) + { title: 'Acetylene cooker' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] }, keywords: ['cooking'] } },
 
   // A butcher's knife roll laid open, 400 mm by 320 mm: a waxed canvas sheet with leather edging and a leather pocket
@@ -164,7 +164,7 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     box('buckle-side', 'rivet', [-0.196, 0.008, 0.06], [-0.192, 0.011, 0.084]),
     box('buckle-side-b', 'rivet', [-0.176, 0.008, 0.06], [-0.172, 0.011, 0.084]),
     box('buckle-bar', 'rivet', [-0.196, 0.008, 0.08], [-0.172, 0.011, 0.084]),
-  ], { canvas: 'cloth-canvas', leather: 'leather-brown', edge: 'leather-tan', blade: 'steel-stainless', handle: 'plastic-black', rivet: 'steel-grey' })
+  ], { canvas: 'cloth-canvas', leather: 'leather-brown', edge: 'leather-tan', blade: 'steel-stainless', handle: 'plastic-black', rivet: 'steel-grey' }) + { title: 'Butchering kit' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['fabric', 'metal'] } } },
 
   // A hand-cranked can seamer in green-painted cast steel, 440 mm tall on a base 220 mm wide and 240 mm deep: a rear
@@ -189,6 +189,6 @@ local knife(prefix, x, w, z0, z1, hl, tip=0.04) = [
     h.rod('pivot', 'steel', 0.012, 0.032, 0.044, 0.085) + { origin: [0.032, 0.085, -0.1] },
     box('lever', 'steel', [0.044, 0.078, -0.11], [0.2, 0.092, -0.09]),
     h.rod('grip', 'knob', 0.013, 0.2, 0.25, 0.085) + { origin: [0.2, 0.085, -0.1] },
-  ], { frame: 'paint-green', steel: 'steel-bright', knob: 'wood-walnut' })
+  ], { frame: 'paint-green', steel: 'steel-bright', knob: 'wood-walnut' }) + { title: 'Can sealer' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

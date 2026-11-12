@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'crew_pickup.spec.libsonnet';
 {
+  title: 'Crew-cab pickup',
   sites: [
     site.one('shell', 'crew_pickup_shell'),
     site.one('windscreen', 'crew_pickup_windscreen'),

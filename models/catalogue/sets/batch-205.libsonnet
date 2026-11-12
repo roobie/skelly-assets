@@ -47,7 +47,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     steel: 'steel-grey',
     crystal: 'pearl',
     shard: 'gem-clear',
-  }) + h.inHand('milky_crystal_focus', 'foot') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  }) + { title: 'Milky crystal focus' } + h.inHand('milky_crystal_focus', 'foot') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A household flashlight 140 mm long, lying on its side with its head at +x: a plastic tail cap and grip, an
   // aluminium body with a glass window showing a blue crystal rod inside, a flared aluminium head and a crystal lens.
@@ -74,7 +74,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     crystal: 'crystal-glow-blue',
     glass: 'glass-clear',
     switch: 'rubber-black',
-  }) + h.inHand('crystal_cell_flashlight', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
+  }) + { title: 'Crystal-cell flashlight' } + h.inHand('crystal_cell_flashlight', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A camp lantern 110 mm across and 170 mm tall to its handle: a plastic base, an aluminium canister with its domed lid
   // shut on a hinge at the back, a thin line of blue light leaking under the lid, and a wire bail handle.
@@ -104,7 +104,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     rib: 'steel-grey',
     crystal: 'crystal-glow-blue',
     steel: 'steel-grey',
-  }) + h.inHand('crystal_lantern', 'can') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
+  }) + { title: 'Crystal lantern' } + h.inHand('crystal_lantern', 'can') + { voxelGrain: 0.004 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
 
   // A standing floor lamp 1.7 m tall: a weighted steel base 300 mm across, a steel pole with a white plastic collar
   // and a cone shade 400 mm across, a blue crystal rod hanging in its socket under the shade, and a power cord running
@@ -135,7 +135,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     cord: 'plastic-matte-black',
     plug: 'plastic-white',
     prong: 'brass-polished',
-  }) + h.inHand('crystal_floor_lamp', 'pole') + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
+  }) + { title: 'Crystal floor lamp' } + h.inHand('crystal_floor_lamp', 'pole') + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'plastic'], setting: ['sci-fi'] } } },
 
   // A lump of something like black glass 70 mm across, three swollen lobes run together with an oily sheen and
   // violet flecks sunk in its skin.
@@ -154,7 +154,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     body: 'void-black',
     sheen: 'iridescent',
     fleck: 'crystal-glow-violet',
-  }) + h.inHand('chaos_stone', 'lobe-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  }) + { title: 'Chaos stone' } + h.inHand('chaos_stone', 'lobe-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A stepped grey pyramid 260 mm square and 240 mm tall on a steel plate, a blue crystal column in a steel collar on
   // its peak, a sight tube of teal fluid across its front, and four lumps of dark glassy stone set round its foot,
@@ -185,7 +185,7 @@ local lump(id, slot, w, ht, x, y, z) = [
     fluid: 'jelly-teal',
     panel: 'plastic-matte-black',
     rock: 'chitin-black',
-  }) + h.inHand('psionic_transporter_beacon', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['stone', 'metal'], setting: ['sci-fi'] } } },
+  }) + { title: 'Psionic transporter beacon' } + h.inHand('psionic_transporter_beacon', 'plate') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['stone', 'metal'], setting: ['sci-fi'] } } },
 
   // A chunky handset 100 by 55 by 30 mm lying on its back, top end at +x: a dark plastic case on a steel frame, a small
   // blank screen, a keypad and a teal fluid window, with a blue crystal rod 50 mm long sticking out of its top end
@@ -212,5 +212,5 @@ local lump(id, slot, w, ht, x, y, z) = [
     fluid: 'jelly-teal',
     key: 'rubber-black',
     crystal: 'crystal-glow-blue',
-  }) + h.inHand('psionic_transporter_remote', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['sci-fi'] } } },
+  }) + { title: 'Psionic transporter remote' } + h.inHand('psionic_transporter_remote', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['sci-fi'] } } },
 ]

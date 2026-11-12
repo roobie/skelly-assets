@@ -137,12 +137,12 @@ local bracer(p, cx, l, w0, w1) =
 [
   // An immature wildwood weaver: a living carved-wood creature like a spider 60 mm long and 80 mm across its
   // legs, with short needle forelegs and bright watching eyes.
-  h.compound('young_wildwood_weaver', 0.02, weaver(1.0, 0.022, false), weaverFinish { eye: 'gem-citrine' })
+  h.compound('young_wildwood_weaver', 0.02, weaver(1.0, 0.022, false), weaverFinish { eye: 'gem-citrine' }) + { title: 'Young wildwood weaver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A grown wildwood weaver: the same creature 75 mm long and 100 mm across its legs, with long needle forelegs,
   // a pair of pale blade mandibles and dark, unlit eyes.
-  h.compound('grown_wildwood_weaver', 0.039, weaver(1.25, 0.04, true), weaverFinish { eye: 'gem-onyx' })
+  h.compound('grown_wildwood_weaver', 0.039, weaver(1.25, 0.04, true), weaverFinish { eye: 'gem-onyx' }) + { title: 'Grown wildwood weaver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A braided steel belt 1.1 m long and 30 mm wide laid in a U, its plaits shown as alternating raised links, with
@@ -162,7 +162,7 @@ local bracer(p, cx, l, w0, w1) =
     ] + [
       h.turned('grip-wrap-%d' % i, 'buckle', 'x', [[0, 0], [0, 0.0105], [0.004, 0.0105], [0.004, 0]], [-0.325 + i * 0.013, 0.009, -0.035])
       for i in std.range(0, 5)
-    ], { strap: 'steel-grey', plait: 'steel-bright', buckle: 'steel-parkerized', hole: 'plastic-matte-black', grip: 'steel-parkerized' })
+    ], { strap: 'steel-grey', plait: 'steel-bright', buckle: 'steel-parkerized', hole: 'plastic-matte-black', grip: 'steel-parkerized' }) + { title: 'Braided steel belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A lesser dimensional tool belt: a 50 mm brown leather work belt 1.1 m long laid in a U, with two flapped tan
@@ -171,7 +171,7 @@ local bracer(p, cx, l, w0, w1) =
   h.compound('lesser_bottomless_tool_belt', 1.5, toolBelt([
     { x: -0.07, w: 0.12, l: 0.12, s: 1, stone: 0.006 },
     { x: 0.08, w: 0.12, l: 0.12, s: 1, stone: 0.006 },
-  ]), beltFinish)
+  ]), beltFinish) + { title: 'Lesser bottomless tool belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['waist'] } } },
 
   // A greater dimensional tool belt: the same work belt with four pouches, two on each run, a hammer in a steel
@@ -181,7 +181,7 @@ local bracer(p, cx, l, w0, w1) =
     { x: 0.03, w: 0.13, l: 0.13, s: 1, stone: 0.009 },
     { x: -0.06, w: 0.11, l: 0.11, s: -1, stone: 0.009 },
     { x: 0.08, w: 0.11, l: 0.11, s: -1, stone: 0.009 },
-  ]) + hammer('hammer', 0.27, 0, 0.005) + h.crescent('hammer-loop', 'tool', 0.016, 0.02, 0, 360, 12, 0.005, 0.03, 0.19, 0), beltFinish)
+  ]) + hammer('hammer', 0.27, 0, 0.005) + h.crescent('hammer-loop', 'tool', 0.016, 0.02, 0, 360, 12, 0.005, 0.03, 0.19, 0), beltFinish) + { title: 'Greater bottomless tool belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['waist'] } } },
 
   // A technomancer's tool belt: a 60 mm black leather belt 1.15 m long laid in a U, faced with steel plates carved
@@ -220,7 +220,7 @@ local bracer(p, cx, l, w0, w1) =
     tool: 'steel-bright',
     grip: 'plastic-red',
     wood: 'wood-oak',
-  })
+  }) + { title: 'Rune forged tool belt' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'metal'], setting: ['fantasy'], slot: ['waist'] } } },
 
   // A wide fighting girdle 1.1 m long and 100 mm wide in black leather laid in a U, edged in oxblood, a band of
@@ -242,7 +242,7 @@ local bracer(p, cx, l, w0, w1) =
       ]
       for i in [0, 1]
       for x in [[0.0, 0.07][i]]
-    ]), { strap: 'leather-black', edge: 'leather-oxblood', rune: 'crystal-glow-violet', frog: 'leather-oxblood', buckle: 'bronze-polished', hole: 'plastic-matte-black' })
+    ]), { strap: 'leather-black', edge: 'leather-oxblood', rune: 'crystal-glow-violet', frog: 'leather-oxblood', buckle: 'bronze-polished', hole: 'plastic-matte-black' }) + { title: 'Girdle of hidden arms' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['fantasy'], slot: ['waist'] } } },
 
   // A pair of steel bracers lying side by side, convex side up, wrists towards +z: each a curved plate 250 mm long,
@@ -255,6 +255,6 @@ local bracer(p, cx, l, w0, w1) =
     strap: 'leather-brown',
     buckle: 'brass-dull',
     rivet: 'brass-dull',
-  })
+  }) + { title: 'Steel bracers' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 ]

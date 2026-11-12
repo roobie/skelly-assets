@@ -53,7 +53,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     box('fleck-a', 'gold', [0.006, 0.036, 0.0], [0.008, 0.038, 0.002]),
     box('fleck-b', 'gold', [-0.018, 0.022, 0.014], [-0.016, 0.024, 0.016]),
     box('fleck-c', 'garnet', [0.012, 0.016, 0.018], [0.014, 0.018, 0.02]),
-  ], { pearl: 'pearl', sheen: 'iridescent', glint: 'crystal-glow-white', gold: 'metal-gold', garnet: 'gem-red' }) + h.inHand('burrower_pearl', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { pearl: 'pearl', sheen: 'iridescent', glint: 'crystal-glow-white', gold: 'metal-gold', garnet: 'gem-red' }) + { title: 'Burrower pearl' } + h.inHand('burrower_pearl', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A shield-sized armour plate 840 mm long, 620 mm wide and 30 mm thick, domed across its width, with three raised
   // growth ridges and a pale seam of mineral along its crest.
@@ -63,7 +63,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     h.onCurvedFace('vein-a', 'vein', buletteOutline, 0, 0.03, 0.9, [-0.36, 0.02], [-0.08, -0.04], 0.012),
     h.onCurvedFace('vein-b', 'vein', buletteOutline, 0, 0.03, 0.9, [0.06, 0.05], [0.34, -0.02], 0.012),
-  ], { plate: 'iron-dull', ridge: 'steel-blued', vein: 'gem-aquamarine' }) + h.inHand('burrower_armour_plate', 'plate-8') + { voxelGrain: 0.008 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ], { plate: 'iron-dull', ridge: 'steel-blued', vein: 'gem-aquamarine' }) + { title: 'Burrower armour plate' } + h.inHand('burrower_armour_plate', 'plate-8') + { voxelGrain: 0.008 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
 
   // A plate of black spider shell 460 mm long, 360 mm wide and 8 mm thick, curved across its width, with red seams
   // where its segments meet and two short spurs on its crest.
@@ -73,7 +73,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     h.turned('spur-a', 'shell', 'y', [[0, 0], [0, 0.012], [0.03, 0]], [-0.07, h.curvedTopAt(chitinOutline, 0, 0.008, 0.6, -0.07) - 0.004, 0.02]),
     h.turned('spur-b', 'shell', 'y', [[0, 0], [0, 0.012], [0.03, 0]], [0.07, h.curvedTopAt(chitinOutline, 0, 0.008, 0.6, 0.07) - 0.004, -0.02]),
-  ], { shell: 'lacquer-black', seam: 'lacquer-red' }) + h.inHand('black_spider_shell_plate', 'plate-12') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { shell: 'lacquer-black', seam: 'lacquer-red' }) + { title: 'Black spider shell plate' } + h.inHand('black_spider_shell_plate', 'plate-12') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A hooked fang 150 mm along its curve and 26 mm across at the root, black and glossy, with a green venom groove down
   // its outer face, a bead of venom at the tip and a ragged lump of gum at the root.
@@ -82,7 +82,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     box('gum-tag', 'gum', [0.0, 0.0, -0.012], [0.022, 0.012, 0.014]),
   ] + spike('groove', 'venom', 0.13, 0.95, 0.03, 0.0, 0.006, 0.002, 8, 2.9) + [
     ball('drop', 'venom', 0.004, 0.03 + 0.13 * std.sin(1.1), 0.13 * (1 - std.cos(1.1)) + 0.005, 0.0),
-  ], { fang: 'gem-onyx', gum: 'flesh-membrane', venom: 'syrup-green' }) + h.gripOn('black_spider_fang', 'gum') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { fang: 'gem-onyx', gum: 'flesh-membrane', venom: 'syrup-green' }) + { title: 'Black spider fang' } + h.gripOn('black_spider_fang', 'gum') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A straight branch 1.3 m long and 50 mm thick in its bark, ringed with carved rune bands that glow pale blue.
   h.compound('rune_carved_branch', 1.2, [
@@ -96,25 +96,25 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     box('glyph-%d' % i, 'rune', [-0.36 + 0.3 * i, 0.03, 0.022], [-0.33 + 0.3 * i, 0.036, 0.028])
     for i in [0, 1, 2]
-  ], { bark: 'bark', heart: 'wood-pine', rune: 'gem-aquamarine' }) + h.gripOn('rune_carved_branch', 'branch') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'], setting: ['fantasy'] } } },
+  ], { bark: 'bark', heart: 'wood-pine', rune: 'gem-aquamarine' }) + { title: 'Rune-carved branch' } + h.gripOn('rune_carved_branch', 'branch') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
   // A corked glass vial 64 mm tall and 26 mm across, two thirds full of a pale green powder that glows.
   h.compound('glow_dust', 0.035, [
     h.turned('vial', 'glass', 'y', [[0, 0], [0, 0.013], [0.05, 0.013], [0.054, 0.009], [0.056, 0.009], [0.056, 0]], [0, 0, 0]),
     h.disc('powder', 'dust', 0.0132, 0.002, 0.034),
     h.turned('cork', 'cork', 'y', [[0, 0], [0, 0.0085], [0.012, 0.0095], [0.012, 0]], [0, 0.052, 0]),
-  ], { glass: 'glass-clear', dust: 'gem-peridot', cork: 'cork' }) + h.inHand('glow_dust', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['fantasy'] } } },
+  ], { glass: 'glass-clear', dust: 'gem-peridot', cork: 'cork' }) + { title: 'Glow dust' } + h.inHand('glow_dust', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['fantasy'] } } },
 
   // A brass-footed glass globe 120 mm tall and 84 mm across with a glowing ball inside, its domed brass cover swung
   // back on a rear hinge.
   h.compound('glow_light', 0.52, lampBody + [
     backDome('cover', 'brass', 0.038, 0.06, 0.003, [0, 0.05, -0.044]),
-  ], { brass: 'brass-polished', glass: 'glass-clear', glow: 'gem-aquamarine' }) + h.inHand('glow_light', 'foot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['fantasy'] } } },
+  ], { brass: 'brass-polished', glass: 'glass-clear', glow: 'gem-aquamarine' }) + { title: 'Glow lamp' } + h.inHand('glow_light', 'foot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['fantasy'] } } },
 
   // The same reading light with its domed brass cover shut over the globe: 120 mm tall and 84 mm across.
   h.compound('glow_light_covered', 0.5, lampBody + [
     h.dome('cover', 'brass', 0.04, 0.072, 0.003, 'y', [0, 0.016, 0]),
-  ], { brass: 'brass-polished', glass: 'glass-clear', glow: 'gem-aquamarine' }) + h.inHand('glow_light_covered', 'foot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['fantasy'] } } },
+  ], { brass: 'brass-polished', glass: 'glass-clear', glow: 'gem-aquamarine' }) + { title: 'Glow lamp, covered' } + h.inHand('glow_light_covered', 'foot') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal', 'glass'], setting: ['fantasy'] } } },
 
   // A clear violet sphere 48 mm across with a pale blue light at its heart.
   h.compound('violet_glow_pearl', 0.14, [
@@ -122,7 +122,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     ball('heart', 'heart', 0.011, 0, 0.024, 0),
     h.turned('glow', 'glow', 'z', [[0, 0], [0, 0.01], [0.002, 0.009], [0.004, 0.005], [0.005, 0]], [0, 0.024, 0.0205]),
     box('glint', 'glint', [-0.012, 0.038, 0.012], [-0.006, 0.042, 0.016]),
-  ], { shell: 'gem-purple', heart: 'gem-aquamarine', glow: 'crystal-glow-blue', glint: 'crystal-glow-white' }) + h.inHand('violet_glow_pearl', 'sphere') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['glass'], setting: ['fantasy'] } } },
+  ], { shell: 'gem-purple', heart: 'gem-aquamarine', glow: 'crystal-glow-blue', glint: 'crystal-glow-white' }) + { title: 'Violet glow pearl' } + h.inHand('violet_glow_pearl', 'sphere') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['glass'], setting: ['fantasy'] } } },
 
   // A smooth stone 165 mm long, pinched in the middle into two unequal lobes, one sandy and one dark, joined by a band
   // of milky quartz.
@@ -130,7 +130,7 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     h.turned('lobe-large', 'pale', 'x', [[0, 0], [0, 0.02], [0.02, 0.045], [0.05, 0.052], [0.08, 0.04], [0.088, 0.03], [0.088, 0]], [-0.085, 0.05, 0]),
     h.turned('waist', 'quartz', 'x', [[0, 0], [0, 0.031], [0.012, 0.031], [0.012, 0]], [0.0, 0.05, 0]),
     h.turned('lobe-small', 'dark', 'x', [[0, 0], [0, 0.028], [0.02, 0.04], [0.045, 0.038], [0.065, 0.022], [0.07, 0]], [0.01, 0.05, 0]),
-  ], { pale: 'brick-buff', quartz: 'gem-opaque', dark: 'stone-whet' }) + h.gripOn('twin_lobed_gizzard_stone', 'lobe-large') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { pale: 'brick-buff', quartz: 'gem-opaque', dark: 'stone-whet' }) + { title: 'Twin-lobed gizzard stone' } + h.gripOn('twin_lobed_gizzard_stone', 'lobe-large') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
 
   // A segmented feeding tube 300 mm long, tapering from 14 mm across at its fleshy root to a needle point.
   h.compound('bloodsucker_proboscis', 0.03, [
@@ -139,12 +139,12 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
   ] + [
     h.tube('band-%d' % i, 'band', 0.002, 0.0075 - 0.0012 * i, 0.04 + 0.045 * i, 0.046 + 0.045 * i, 0.018, 0)
     for i in [0, 1, 2, 3]
-  ], { flesh: 'flesh-membrane', shell: 'chitin-brown', band: 'bone' }) + h.gripOn('bloodsucker_proboscis', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { flesh: 'flesh-membrane', shell: 'chitin-brown', band: 'bone' }) + { title: 'Bloodsucker proboscis' } + h.gripOn('bloodsucker_proboscis', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'], setting: ['fantasy'] } } },
 
   // A curved fragment of stone eggshell 125 mm long, 90 mm wide and 6 mm thick, broken to sharp edges and speckled.
   h.compound('stone_eggshell_shard', 0.14, h.curvedPlate('shell', 'shell', shellOutline, 0, 0.006, 0.08, 20) + [
     h.onCurvedFace('speck-%d' % i, 'speck', shellOutline, 0, 0.006, 0.08, s[0], s[1], 0.005)
     for i in std.range(0, 4)
     for s in [[[[-0.04, -0.01], [-0.035, -0.012]], [[-0.01, 0.015], [-0.005, 0.016]], [[0.02, -0.02], [0.026, -0.018]], [[0.04, 0.012], [0.046, 0.01]], [[0.0, -0.03], [0.005, -0.028]]][i]]
-  ], { shell: 'stone-grey', speck: 'stone-whet' }) + h.inHand('stone_eggshell_shard', 'shell-10') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
+  ], { shell: 'stone-grey', speck: 'stone-whet' }) + { title: 'Stone eggshell shard' } + h.inHand('stone_eggshell_shard', 'shell-10') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['stone'], setting: ['fantasy'] } } },
 ]

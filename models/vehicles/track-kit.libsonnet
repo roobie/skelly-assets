@@ -118,11 +118,11 @@ local wheelKeys = ['sprocket', 'idler', 'roadWheel', 'roller'];
 
 local classRows(name) =
   local c = classes[name];
-  (if std.objectHas(c.link, 'id') then [k.compound(c.link.id, c.link.massKg, link(c).pieces, link(c).finish)] else [])
-  + [k.compound(c[key].id, c[key].massKg, wheel(c[key]).pieces, wheel(c[key]).finish) for key in wheelKeys if std.objectHas(c, key)];
+  (if std.objectHas(c.link, 'id') then [k.compound(c.link.id, c.link.massKg, link(c).pieces, link(c).finish) + { title: c.link.title }] else [])
+  + [k.compound(c[key].id, c[key].massKg, wheel(c[key]).pieces, wheel(c[key]).finish) + { title: c[key].title } for key in wheelKeys if std.objectHas(c, key)];
 local trackRows(name) =
   local accessories = fittings(name);
-  assembly.rows(name, bandId(name), bandMass(name) + std.sum([a.massKg for a in accessories]), core(name), accessories);
+  assembly.rows(name, bandId(name), tracks[name].title, tracks[name].title + ' band', bandMass(name) + std.sum([a.massKg for a in accessories]), core(name), accessories);
 
 {
   // A class's link and wheel rows, which one vehicle on the class emits; and a track's band and fused rows,

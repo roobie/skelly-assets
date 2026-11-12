@@ -43,7 +43,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       box('tab', 'tab', [-0.02, top, -0.12], [0.02, top + 0.01, -0.112]),
       box('placket', 'collar', [-0.012, top, -0.12], [0.012, top + 0.002, 0.15]),
     ],
-    { cloth: 'cloth-black', collar: 'cloth-black', tab: 'cloth-cream', button: 'plastic-charcoal' })
+    { cloth: 'cloth-black', collar: 'cloth-black', tab: 'cloth-cream', button: 'plastic-charcoal' }) + { title: 'Cassock' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A garish pink faux fur coat folded, 380 mm by 320 mm and 60 mm tall, its fluffy shawl collar rolled along the
@@ -56,7 +56,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-r', 0.06, 0.16, 0.04, 0.13, top, 0.006)
     + [box('edge', 'lining', [-0.012, top, -0.1], [0.012, top + 0.003, 0.16])]
     + buttons('toggle', 0, -0.06, 0.1, 3, top, 0.008),
-    { cloth: 'petal-pink', collar: 'petal-pink', pocket: 'petal-pink', lining: 'cloth-cream', button: 'plastic-charcoal' })
+    { cloth: 'petal-pink', collar: 'petal-pink', pocket: 'petal-pink', lining: 'cloth-cream', button: 'plastic-charcoal' }) + { title: 'Faux fur coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown fur coat folded, 380 mm by 320 mm and 60 mm tall, its deep fur collar rolled along the back, two small
@@ -69,7 +69,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-r', 0.06, 0.16, 0.04, 0.13, top, 0.006)
     + [box('edge', 'lining', [-0.01, top, -0.1], [0.01, top + 0.003, 0.16])]
     + buttons('button', 0, -0.06, 0.1, 3, top, 0.009),
-    { cloth: 'fur-brown', collar: 'fur-brown', pocket: 'fur-brown', lining: 'leather-brown', button: 'leather-black' })
+    { cloth: 'fur-brown', collar: 'fur-brown', pocket: 'fur-brown', lining: 'leather-brown', button: 'leather-black' }) + { title: 'Fur coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A gutskin parka folded thin, 300 mm by 240 mm and 30 mm tall: pale translucent strips of split gut sewn in
@@ -79,7 +79,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     h.foldedGarment(0.3, 0.24, top, 3)
     + ridges('seam', 'seam', -0.15, 0.15, [-0.06, -0.02, 0.02, 0.06, 0.1], top, 0.002, 0.004)
     + hood(0.2, -0.12, -0.0, top + 0.002, 0.008, 0.006),
-    { cloth: 'skin-rawhide', seam: 'leather-brown', hood: 'skin-rawhide', rim: 'leather-brown' })
+    { cloth: 'skin-rawhide', seam: 'leather-brown', hood: 'skin-rawhide', rim: 'leather-brown' }) + { title: 'Gutskin parka' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['leather'], setting: ['prehistoric'], slot: ['torso'], state: ['folded'] } } },
 
   // A white lab coat folded, 340 mm by 280 mm and 30 mm tall: notched lapels either side of the buttoned front,
@@ -100,7 +100,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       h.turned('pen-a', 'pen', 'z', [[0, 0], [0, 0.0045], [0.05, 0.0045], [0.05, 0]], [0.062, top + 0.012, -0.1]),
       h.turned('pen-b', 'pen-b', 'z', [[0, 0], [0, 0.0045], [0.05, 0.0045], [0.05, 0]], [0.085, top + 0.012, -0.1]),
     ],
-    { cloth: 'cloth-cream', lapel: 'cloth-cream', pocket: 'cloth-cream', button: 'plastic-clear', protector: 'plastic-clear', pen: 'plastic-blue', 'pen-b': 'plastic-red' })
+    { cloth: 'cloth-cream', lapel: 'cloth-cream', pocket: 'cloth-cream', button: 'plastic-clear', protector: 'plastic-clear', pen: 'plastic-blue', 'pen-b': 'plastic-red' }) + { title: 'Lab coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], place: ['laboratory'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A yellow vinyl rain coat folded, 320 mm by 260 mm and 25 mm tall: the hood folded down on top, two very large
@@ -112,7 +112,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-l', -0.155, -0.035, 0.0, 0.12, top, 0.004, 0.035)
     + pocket('pocket-r', 0.035, 0.155, 0.0, 0.12, top, 0.004, 0.035)
     + buttons('snap', 0, 0.0, 0.12, 4, top, 0.006),
-    { cloth: 'plastic-yellow', hood: 'plastic-yellow', rim: 'plastic-yellow', pocket: 'plastic-yellow', flap: 'plastic-yellow', button: 'steel-grey' })
+    { cloth: 'plastic-yellow', hood: 'plastic-yellow', rim: 'plastic-yellow', pocket: 'plastic-yellow', flap: 'plastic-yellow', button: 'steel-grey' }) + { title: 'Raincoat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A navy padded winter coat folded, 380 mm by 320 mm and 65 mm tall: quilted baffles across the body, the hood
@@ -125,7 +125,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + [box('zip', 'zip', [-0.005, top, -0.02], [0.005, top + 0.008, 0.16])]
     + pocket('pocket-l', -0.16, -0.06, 0.02, 0.12, top + 0.006, 0.004, 0.02)
     + pocket('pocket-r', 0.06, 0.16, 0.02, 0.12, top + 0.006, 0.004, 0.02),
-    { cloth: 'cloth-navy', baffle: 'cloth-navy', hood: 'cloth-navy', rim: 'fur-brown', zip: 'plastic-matte-black', pocket: 'cloth-navy', flap: 'cloth-navy' })
+    { cloth: 'cloth-navy', baffle: 'cloth-navy', hood: 'cloth-navy', rim: 'fur-brown', zip: 'plastic-matte-black', pocket: 'cloth-navy', flap: 'cloth-navy' }) + { title: 'Winter coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A canvas duster folded, 380 mm by 320 mm and 60 mm tall: the shoulder cape lying over the back half, a collar
@@ -138,7 +138,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + buttons('button', 0, 0.04, 0.14, 3, top, 0.007)
     + pocket('pocket-l', -0.17, -0.06, 0.05, 0.14, top, 0.004, 0.03)
     + pocket('pocket-r', 0.06, 0.17, 0.05, 0.14, top, 0.004, 0.03),
-    { cloth: 'cloth-canvas', cape: 'cloth-canvas', collar: 'cloth-canvas', button: 'leather-brown', pocket: 'cloth-canvas', flap: 'cloth-canvas' })
+    { cloth: 'cloth-canvas', cape: 'cloth-canvas', collar: 'cloth-canvas', button: 'leather-brown', pocket: 'cloth-canvas', flap: 'cloth-canvas' }) + { title: 'Duster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A pale faux fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep shawl collar rolled along the back,
@@ -151,7 +151,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-l', -0.19, -0.07, 0.06, 0.16, top, 0.006, 0.03)
     + pocket('pocket-r', 0.07, 0.19, 0.06, 0.16, top, 0.006, 0.03)
     + buttons('toggle', 0, -0.06, 0.12, 4, top, 0.008),
-    { cloth: 'fur-pale', collar: 'fur-pale', lining: 'cloth-khaki', pocket: 'fur-pale', flap: 'fur-pale', button: 'leather-brown' })
+    { cloth: 'fur-pale', collar: 'fur-pale', lining: 'cloth-khaki', pocket: 'fur-pale', flap: 'fur-pale', button: 'leather-brown' }) + { title: 'Faux fur duster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown fur duster folded thick, 420 mm by 360 mm and 80 mm tall: a deep fur collar rolled along the back,
@@ -164,7 +164,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + pocket('pocket-l', -0.19, -0.07, 0.06, 0.16, top, 0.006, 0.03)
     + pocket('pocket-r', 0.07, 0.19, 0.06, 0.16, top, 0.006, 0.03)
     + buttons('button', 0, -0.04, 0.12, 4, top, 0.009),
-    { cloth: 'fur-brown', collar: 'fur-brown', lining: 'leather-black', pocket: 'fur-brown', flap: 'fur-brown', button: 'leather-black' })
+    { cloth: 'fur-brown', collar: 'fur-brown', lining: 'leather-black', pocket: 'fur-brown', flap: 'fur-brown', button: 'leather-black' }) + { title: 'Fur duster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown leather duster folded, 400 mm by 340 mm and 60 mm tall: the shoulder cape over the back half, a wide
@@ -177,7 +177,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + buttons('button', 0, 0.03, 0.15, 4, top, 0.007)
     + pocket('pocket-l', -0.18, -0.06, 0.05, 0.15, top, 0.004, 0.03)
     + pocket('pocket-r', 0.06, 0.18, 0.05, 0.15, top, 0.004, 0.03),
-    { cloth: 'leather-brown', cape: 'leather-brown', collar: 'leather-brown', button: 'brass-dull', pocket: 'leather-brown', flap: 'leather-brown' })
+    { cloth: 'leather-brown', cape: 'leather-brown', collar: 'leather-brown', button: 'brass-dull', pocket: 'leather-brown', flap: 'leather-brown' }) + { title: 'Leather duster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A white hooded ghost robe folded small, 260 mm by 200 mm and 12 mm tall, the pointed hood folded down on top.
@@ -185,7 +185,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
   h.compound('ghost_robe', 0.5,
     h.foldedGarment(0.26, 0.2, top, 3)
     + hood(0.16, -0.1, 0.02, top, 0.006, 0.006),
-    { cloth: 'cloth-cream', hood: 'cloth-cream', rim: 'cloth-white' })
+    { cloth: 'cloth-cream', hood: 'cloth-cream', rim: 'cloth-white' }) + { title: 'Ghost robe' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A white bed sheet folded flat, 300 mm by 240 mm and 20 mm tall, the top fold showing the two eye holes cut
@@ -197,7 +197,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       h.turned('eye-l', 'hole', 'y', [[0, 0], [0, 0.016], [0.001, 0.016], [0.001, 0]], [-0.045, top - 0.0008, -0.01]),
       h.turned('eye-r', 'hole', 'y', [[0, 0], [0, 0.016], [0.001, 0.016], [0.001, 0]], [0.045, top - 0.0008, -0.01]),
     ],
-    { cloth: 'cloth-cream', hole: 'cloth-black' })
+    { cloth: 'cloth-cream', hole: 'cloth-black' }) + { title: 'Bedsheet ghost costume' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A grey wool greatcoat folded, 400 mm by 340 mm and 70 mm tall: a wide turned-down collar along the back, two rows
@@ -214,7 +214,7 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
     + buttons('button-r', 0.05, -0.03, 0.15, 4, top, 0.01)
     + pocket('pocket-l', -0.19, -0.09, 0.07, 0.15, top, 0.004, 0.03)
     + pocket('pocket-r', 0.09, 0.19, 0.07, 0.15, top, 0.004, 0.03),
-    { cloth: 'wool-grey', collar: 'wool-grey', button: 'brass-dull', pocket: 'wool-grey', flap: 'wool-grey' })
+    { cloth: 'wool-grey', collar: 'wool-grey', button: 'brass-dull', pocket: 'wool-grey', flap: 'wool-grey' }) + { title: 'Greatcoat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A black hooded reaper robe folded small, 260 mm by 200 mm and 14 mm tall: the deep hood folded down on top with
@@ -227,6 +227,6 @@ local ridges(prefix, slot, x0, x1, zs, top, t=0.003, w=0.006) = [
       box('mask', 'mask', [-0.04, top + 0.006, -0.03], [0.04, top + 0.008, 0.026]),
       box('cord', 'cord', [-0.13, top, 0.06], [0.13, top + 0.004, 0.068]),
     ],
-    { cloth: 'cloth-black', hood: 'cloth-black', rim: 'plastic-charcoal', mask: 'plastic-charcoal', cord: 'wool-grey' })
+    { cloth: 'cloth-black', hood: 'cloth-black', rim: 'plastic-charcoal', mask: 'plastic-charcoal', cord: 'wool-grey' }) + { title: 'Grim reaper robe' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['torso'], state: ['folded'] } } },
 ]

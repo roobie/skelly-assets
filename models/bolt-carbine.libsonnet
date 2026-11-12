@@ -103,6 +103,6 @@ local carbine(id, massKg, magazine) =
   ], { round: 'brass' });
 
 [
-  carbine('bolt_carbine', 11.5, boxMagazine),
-  carbine('bolt_carbine_drum', 12.5, drumMagazine),
+  carbine('bolt_carbine', 11.5, boxMagazine) + { title: 'Bolt carbine' },
+  carbine('bolt_carbine_drum', 12.5, drumMagazine) + { title: 'Drum-fed bolt carbine' },
 ]

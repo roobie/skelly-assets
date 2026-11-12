@@ -301,27 +301,27 @@ local patches(list, y) = [
 [
   // Hardened steel mirror armour laid flat, 520 mm from neck to waist and 600 mm across its side straps: a 210 mm
   // polished disc over the chest and a 130 mm one over the belly, rectangular plates round them, on a leather jerkin.
-  h.compound('hardened_steel_mirror_armour', 5, mirrorArmour(), { leather: 'leather-chestnut', disc: 'mirror-silver', rim: 'brass-dull', plate: 'steel-hardened', rivet: 'brass-dull', strap: 'leather-black', buckle: 'steel-bright' })
+  h.compound('hardened_steel_mirror_armour', 5, mirrorArmour(), { leather: 'leather-chestnut', disc: 'mirror-silver', rim: 'brass-dull', plate: 'steel-hardened', rivet: 'brass-dull', strap: 'leather-black', buckle: 'steel-bright' }) + { title: 'Hardened steel mirror armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A rusty sleeveless mail vest folded on a shelf, 380 mm by 300 mm and 60 mm tall.
-  h.compound('rusty_mail_vest', 5.6, mailVest({ rust: true }), { mail: 'steel-mail', binding: 'leather-tan', strap: 'leather-tan', buckle: 'iron-dull', rust: 'rust-red' }) + h.headEndOnPlusZ
+  h.compound('rusty_mail_vest', 5.6, mailVest({ rust: true }), { mail: 'steel-mail', binding: 'leather-tan', strap: 'leather-tan', buckle: 'iron-dull', rust: 'rust-red' }) + { title: 'Rusty mail vest' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'], state: ['folded'] } } },
 
   // A hard plastic chest guard laid flat, 560 mm from the shoulder caps to the lowest belly plate and 580 mm across the side straps.
-  h.compound('hard_chest_guard', 0.79, hardGuard(), { plate: 'uhmw-white', pad: 'neoprene-black', strap: 'webbing-black', buckle: 'plastic-matte-black', vent: 'plastic-charcoal' })
+  h.compound('hard_chest_guard', 0.79, hardGuard(), { plate: 'uhmw-white', pad: 'neoprene-black', strap: 'webbing-black', buckle: 'plastic-matte-black', vent: 'plastic-charcoal' }) + { title: 'Hard chest guard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // Two hammered steel sheets laid flat, 570 mm from neck to waist and 600 mm across the riveted belts.
-  h.compound('sheet_metal_chest_guard', 9.6, sheetGuard({}), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' })
+  h.compound('sheet_metal_chest_guard', 9.6, sheetGuard({}), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' }) + { title: 'Sheet metal chest guard' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
 
   // The same with a second sheet laid over the first and riveted through, 750 mm from the shoulder belts to the waist.
-  h.compound('heavy_sheet_metal_chest_guard', 15, sheetGuard({ l: 0.6, double: true, belts: [-0.14, 0.02, 0.17] }), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' })
+  h.compound('heavy_sheet_metal_chest_guard', 15, sheetGuard({ l: 0.6, double: true, belts: [-0.14, 0.02, 0.17] }), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' }) + { title: 'Heavy sheet metal chest guard' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
 
   // One sheet cut in half for the upper chest, laid flat over its half back sheet: 300 mm long, 600 mm across the belt.
-  h.compound('light_sheet_metal_chest_guard', 5.3, sheetGuard({ l: 0.28, arm: 0.1, belts: [0.04] }), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' })
+  h.compound('light_sheet_metal_chest_guard', 5.3, sheetGuard({ l: 0.28, arm: 0.1, belts: [0.04] }), { sheet: 'steel-bright', rivet: 'steel-grey', strap: 'leather-tan', dent: 'steel-grey' }) + { title: 'Light sheet metal chest guard' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
 
   // A padded sweatshirt folded on a shelf, 380 mm by 330 mm and 80 mm tall, patched in odd cloth.
@@ -329,7 +329,7 @@ local patches(list, y) = [
              g.jacket({ w: 0.38, d: 0.33, ht: 0.08, folds: 4, front: 'none', buttons: [], collar: { r: 0.06, wd: 0.018, ht: 0.012, gap: 0 }, sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
              + patches([[-0.06, -0.07, 0.1, 0.09, 'patch-a'], [0.06, -0.05, 0.09, 0.1, 'patch-b'], [0.0, -0.135, 0.13, 0.04, 'patch-c'], [-0.15, 0.02, 0.06, 0.12, 'patch-b'], [0.15, -0.06, 0.06, 0.1, 'patch-a'], [0.15, 0.08, 0.06, 0.07, 'patch-c']], 0.08)
              + [box('hem-rib', 'cuff', [-0.19, 0.0, -0.18], [0.19, 0.08, -0.165])],
-             { cloth: 'wool-grey', collar: 'cloth-charcoal', sleeve: 'wool-grey', cuff: 'cloth-charcoal', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-denim', 'patch-c': 'cloth-red' }) + h.headEndOnPlusZ
+             { cloth: 'wool-grey', collar: 'cloth-charcoal', sleeve: 'wool-grey', cuff: 'cloth-charcoal', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-denim', 'patch-c': 'cloth-red' }) + { title: 'Padded sweatshirt' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A padded sleeveless shirt folded on a shelf, 360 mm by 320 mm and 60 mm tall, a patchwork of mismatched cloth.
@@ -338,24 +338,24 @@ local patches(list, y) = [
              + h.crescent('neck', 'binding', 0.065, 0.08, -180, 180, 16, 0.06, 0.066, 0, 0.07)
              + std.flattenArrays([h.crescent('armhole-' + sideName(s), 'binding', 0.05, 0.064, if s > 0 then 180 else 0, if s > 0 then 360 else 180, 10, 0.06, 0.066, s * 0.18, 0.06) for s in sides])
              + patches([[-0.08, -0.09, 0.12, 0.1, 'patch-a'], [0.06, -0.1, 0.11, 0.09, 'patch-b'], [-0.08, 0.0, 0.08, 0.06, 'patch-c'], [0.07, -0.01, 0.09, 0.08, 'patch-d'], [0.0, -0.145, 0.2, 0.025, 'patch-c']], 0.06),
-             { cloth: 'cloth-khaki', binding: 'cloth-charcoal', 'patch-a': 'cloth-blue', 'patch-b': 'cloth-red', 'patch-c': 'cloth-green', 'patch-d': 'cloth-yellow' }) + h.headEndOnPlusZ
+             { cloth: 'cloth-khaki', binding: 'cloth-charcoal', 'patch-a': 'cloth-blue', 'patch-b': 'cloth-red', 'patch-c': 'cloth-green', 'patch-d': 'cloth-yellow' }) + { title: 'Padded sleeveless shirt' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A plain one-piece bronze cuirass laid flat, 480 mm from neck to waist and 600 mm across its side straps.
-  h.compound('bronze_cuirass', 8, cuirass({ w: 0.42, l: 0.48, ridge: false, dents: true }), { plate: 'bronze', back: 'bronze', rim: 'bronze-polished', ridge: 'bronze', rivet: 'bronze', strap: 'leather-tan', scale: 'bronze', lining: 'leather-tan', dent: 'verdigris' })
+  h.compound('bronze_cuirass', 8, cuirass({ w: 0.42, l: 0.48, ridge: false, dents: true }), { plate: 'bronze', back: 'bronze', rim: 'bronze-polished', ridge: 'bronze', rivet: 'bronze', strap: 'leather-tan', scale: 'bronze', lining: 'leather-tan', dent: 'verdigris' }) + { title: 'Bronze cuirass' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['ancient'] } } },
 
   // A steel cavalry cuirass laid flat, 460 mm from neck to waist: breast over back, brass rivets round the edge, brass
   // scales on the shoulder straps and the red lining showing at the waist.
-  h.compound('steel_cuirass', 7.5, cuirass({ edgeRivets: true, scales: true, lining: true }), { plate: 'steel-grey', back: 'steel-grey', rim: 'steel-grey', ridge: 'steel-grey', rivet: 'brass-polished', strap: 'leather-black', scale: 'brass-polished', lining: 'cloth-crimson', dent: 'steel-grey' })
+  h.compound('steel_cuirass', 7.5, cuirass({ edgeRivets: true, scales: true, lining: true }), { plate: 'steel-grey', back: 'steel-grey', rim: 'steel-grey', ridge: 'steel-grey', rivet: 'brass-polished', strap: 'leather-black', scale: 'brass-polished', lining: 'cloth-crimson', dent: 'steel-grey' }) + { title: 'Steel cuirass' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'] } } },
 
   // A scrap cuirass laid flat, 400 mm from neck to hem: odd metal pieces tied to each other and a cloth backing.
-  h.compound('scrap_cuirass', 3.4, tiedPieces(scrapPieces, 'backing') + scrapStrings(0.0125), { backing: 'cloth-khaki', 'metal-a': 'steel-bright', 'metal-b': 'iron-dull', 'metal-c': 'steel-galvanised', 'metal-d': 'rust-red', string: 'cord-cotton' })
+  h.compound('scrap_cuirass', 3.4, tiedPieces(scrapPieces, 'backing') + scrapStrings(0.0125), { backing: 'cloth-khaki', 'metal-a': 'steel-bright', 'metal-b': 'iron-dull', 'metal-c': 'steel-galvanised', 'metal-d': 'rust-red', string: 'cord-cotton' }) + { title: 'Scrap cuirass' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso'] } } },
 
   // A tyre cuirass laid flat, 400 mm from neck to hem: tread-faced chunks of tyre tied to each other with string.
-  h.compound('tyre_cuirass', 4, tiedPieces(tirePieces, 'backing') + scrapStrings(0.026), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', string: 'cord-cotton' })
+  h.compound('tyre_cuirass', 4, tiedPieces(tirePieces, 'backing') + scrapStrings(0.026), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', string: 'cord-cotton' }) + { title: 'Tyre cuirass' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['torso'] } } },
 
   // A fencing jacket folded back up on a shelf, 380 mm by 340 mm and 60 mm tall: a stand collar, the zip down the back
@@ -369,14 +369,14 @@ local patches(list, y) = [
                box('crotch-strap-drop', 'cloth', [-0.035, 0.0, -0.176], [0.035, 0.066, -0.17]),
                h.disc('strap-snap', 'zip', 0.008, 0.066, 0.07, 0, -0.19),
              ],
-             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal' }) + h.headEndOnPlusZ
+             { cloth: 'cloth-bright-white', collar: 'cloth-bright-white', sleeve: 'cloth-bright-white', zip: 'plastic-charcoal' }) + { title: 'Fencing jacket' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
 
   // Football shoulder pads laid flat, 640 mm from back panel to the arm straps and 640 mm across the epaulettes.
-  h.compound('football_armor', 1.8, shoulderPads(), { shell: 'enamel-white', pad: 'foam-eva', lace: 'cord-cotton', strap: 'webbing-black' })
+  h.compound('football_armor', 1.8, shoulderPads(), { shell: 'enamel-white', pad: 'foam-eva', lace: 'cord-cotton', strap: 'webbing-black' }) + { title: 'Football armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], slot: ['torso'], setting: ['modern'] } } },
 
   // A high steel sleeveless mail vest folded on a shelf, 380 mm by 300 mm and 60 mm tall.
-  h.compound('high_carbon_steel_mail_vest', 8.5, mailVest({}), { mail: 'steel-mail-dark', binding: 'leather-black', strap: 'leather-black', buckle: 'steel-bright' }) + h.headEndOnPlusZ
+  h.compound('high_carbon_steel_mail_vest', 8.5, mailVest({}), { mail: 'steel-mail-dark', binding: 'leather-black', strap: 'leather-black', buckle: 'steel-bright' }) + { title: 'High-carbon steel mail vest' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'], setting: ['medieval'], state: ['folded'] } } },
 ]

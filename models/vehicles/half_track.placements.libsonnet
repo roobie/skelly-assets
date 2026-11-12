@@ -14,6 +14,7 @@ local axleY(hub) = hub - 0.52;
 local roadWheels = [w for w in tracks.half_track_track.wheels if w.key == 'roadWheel'];
 local bogieAt(i) = [(roadWheels[2 * i].at[j] + roadWheels[2 * i + 1].at[j]) / 2 for j in [0, 1]] + [s.trackZ];
 {
+  title: 'Half-track',
   // The engine and radiator are fitted as assemblies so each accessory is its own salvage. The transfer case splits the
   // drive: the short shaft forward under the engine to the steered axle, its own short shaft back to the rear axle.
   sites: [

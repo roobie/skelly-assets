@@ -112,7 +112,7 @@ local rucksack(id, massKg, o) =
   ] + [
     box('stitch-f-%d' % i, 'lace', [-0.075 + i * 0.016, 0.083, 0.03], [-0.067 + i * 0.016, 0.087, 0.032])
     for i in std.range(0, 9)
-  ], { body: 'leather-brown', patch: 'leather-chestnut', scrap: 'leather-tan', flap: 'leather-brown', lace: 'skin-rawhide', toggle: 'bone' })
+  ], { body: 'leather-brown', patch: 'leather-chestnut', scrap: 'leather-tan', flap: 'leather-brown', lace: 'skin-rawhide', toggle: 'bone' }) + { title: 'Leather pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A canvas drop-leg bag 200 mm wide, 250 mm tall and 90 mm deep with a buckled flap, a zipped front pocket, a
@@ -127,7 +127,7 @@ local rucksack(id, massKg, o) =
     box('buckle-r', 'buckle', [0.041, 0.15, 0.052], [0.074, 0.175, 0.058]),
     box('hanger', 'strap', [-0.02, 0.2, -0.05], [0.02, 0.36, -0.045]),
     box('belt-loop', 'strap', [-0.025, 0.31, -0.06], [0.025, 0.36, -0.05]),
-  ] + floorStraps('thigh', 'strap', 2, -0.045, 0.12, 0.07, 0.03, 0.004), { body: 'cloth-canvas', flap: 'cloth-canvas', pocket: 'cloth-khaki', zip: 'steel-grey', strap: 'cloth-olive-drab', buckle: 'plastic-matte-black' })
+  ] + floorStraps('thigh', 'strap', 2, -0.045, 0.12, 0.07, 0.03, 0.004), { body: 'cloth-canvas', flap: 'cloth-canvas', pocket: 'cloth-khaki', zip: 'steel-grey', strap: 'cloth-olive-drab', buckle: 'plastic-matte-black' }) + { title: 'Drop-leg bag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A small canvas purse 150 mm wide, 110 mm tall and 35 mm deep with a zipped top and a slip pocket on its front,
@@ -138,7 +138,7 @@ local rucksack(id, massKg, o) =
     box('zip-pull', 'zip', [0.05, 0.1, 0.0175], [0.058, 0.114, 0.021]),
     box('slip-pocket', 'pocket', [-0.065, 0.008, 0.0175], [0.065, 0.07, 0.022]),
     box('pocket-hem', 'strap', [-0.065, 0.064, 0.022], [0.065, 0.07, 0.024]),
-  ] + floorStraps('leg', 'strap', 2, -0.0175, 0.1, 0.06, 0.02, 0.004), { body: 'cloth-navy', zip: 'steel-grey', pocket: 'cloth-navy', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+  ] + floorStraps('leg', 'strap', 2, -0.0175, 0.1, 0.06, 0.02, 0.004), { body: 'cloth-navy', zip: 'steel-grey', pocket: 'cloth-navy', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Small leg purse' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A nylon drop-leg pouch 140 mm wide, 180 mm tall and 60 mm deep with a hook-and-loop flap, two rows of webbing
@@ -149,7 +149,7 @@ local rucksack(id, massKg, o) =
     box('hanger', 'strap', [-0.02, 0.15, -0.035], [0.02, 0.32, -0.031]),
     box('hanger-buckle', 'buckle', [-0.024, 0.24, -0.039], [0.024, 0.27, -0.031]),
     box('belt-loop', 'strap', [-0.025, 0.28, -0.045], [0.025, 0.32, -0.035]),
-  ] + floorStraps('thigh', 'strap', 2, -0.03, 0.11, 0.065, 0.025, 0.004), { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', tab: 'hook-loop-grey', strap: 'webbing-olive-dark', buckle: 'plastic-matte-black' })
+  ] + floorStraps('thigh', 'strap', 2, -0.03, 0.11, 0.065, 0.025, 0.004), { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', tab: 'hook-loop-grey', strap: 'webbing-olive-dark', buckle: 'plastic-matte-black' }) + { title: 'Drop-leg pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A pair of zipped nylon dive pouches, each 110 mm wide, 160 mm tall and 50 mm deep with blue piping, each on a black
@@ -164,7 +164,7 @@ local rucksack(id, massKg, o) =
     ] + floorStraps('band-%d' % i, 'band', 1, -0.025, 0.04, 0.05, 0.045, 0.006, buckleSlot='trim', cx=x)
     for i in [0, 1]
     for x in [[-0.1, 0.1][i]]
-  ]), { body: 'nylon-black', trim: 'cloth-blue', zip: 'steel-grey', mesh: 'mesh-black', band: 'rubber-black' })
+  ]), { body: 'nylon-black', trim: 'cloth-blue', zip: 'steel-grey', mesh: 'mesh-black', band: 'rubber-black' }) + { title: 'Diving thigh pouches' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'rubber'], setting: ['modern'], slot: ['legs'] } } },
 
   // A canvas longarm bag lying on its side, 1.1 m long and 260 mm across, zipped along its top and round one end,
@@ -192,7 +192,7 @@ local rucksack(id, massKg, o) =
     box('strap-pad', 'trim', [-0.1, 0.004, r + 0.035], [0.1, 0.014, r + 0.085]),
     box('clip-l', 'zip', [-0.47, 0.004, r - 0.02], [-0.43, 0.012, r]),
     box('clip-r', 'zip', [0.43, 0.004, r - 0.02], [0.47, 0.012, r]),
-  ], { body: 'cloth-canvas', trim: 'leather-brown', zip: 'steel-grey', strap: 'cloth-khaki' }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  ], { body: 'cloth-canvas', trim: 'leather-brown', zip: 'steel-grey', strap: 'cloth-khaki' }) + { title: 'Longarm bag' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A pair of denim trousers made into a knapsack, standing 300 mm tall: the seat sewn shut and gathered at the
   // waistband with string, each leg turned up behind as a shoulder strap and tied off through a belt loop.
@@ -216,7 +216,7 @@ local rucksack(id, massKg, o) =
     ]
     for i in [0, 1]
     for x in [[-0.1, 0.1][i]]
-  ]), { body: 'cloth-denim', leg: 'cloth-denim-faded', band: 'cloth-denim-faded', zip: 'brass', cord: 'cord-cotton' })
+  ]), { body: 'cloth-denim', leg: 'cloth-denim-faded', band: 'cloth-denim-faded', zip: 'brass', cord: 'cord-cotton' }) + { title: 'Makeshift knapsack' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['back'] } } },
 
   // A bed sheet knotted into a bundle 350 mm long and 210 mm across, its twisted ends knotted on top and
@@ -230,7 +230,7 @@ local rucksack(id, massKg, o) =
     box('knot-ear-r', 'strap', [0.04, 0.195, -0.02], [0.09, 0.225, 0.02]),
     h.prism('twist-l', 'strap', 'z', [[-0.08, 0.2], [-0.04, 0.23], [-0.2, 0.02], [-0.24, 0.0]], -0.02, 0.02),
     h.prism('twist-r', 'strap', 'z', [[0.04, 0.225], [0.09, 0.2], [0.24, 0.0], [0.2, 0.02]], -0.02, 0.02),
-  ] + h.strapLoop('loop', 'strap', 0.45, 0.17, 0.045, 0.02, 0, 0, 0), { body: 'cloth-cream', fold: 'cloth-white', strap: 'cloth-white' }) + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
+  ] + h.strapLoop('loop', 'strap', 0.45, 0.17, 0.045, 0.02, 0, 0, 0), { body: 'cloth-cream', fold: 'cloth-white', strap: 'cloth-white' }) + { title: 'Bedsheet sling bag' } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A nylon messenger bag 380 mm wide, 290 mm tall and 110 mm deep under a full flap held by two buckled straps,
   // with a padded shoulder strap lying in a U on the floor behind it.
@@ -256,7 +256,7 @@ local rucksack(id, massKg, o) =
     box('strap-back', 'strap', [-0.2, 0, -0.46], [0.2, 0.004, -0.42]),
     box('strap-pad', 'trim', [-0.13, 0.004, -0.465], [0.13, 0.016, -0.415]),
     box('strap-slider', 'buckle', [-0.205, 0.004, -0.3], [-0.155, 0.012, -0.27]),
-  ], { body: 'cloth-charcoal', flap: 'cloth-charcoal', trim: 'nylon-black', reflect: 'reflective-yellow', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+  ], { body: 'cloth-charcoal', flap: 'cloth-charcoal', trim: 'nylon-black', reflect: 'reflective-yellow', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Messenger bag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A large MOLLE rucksack 380 mm wide, 600 mm tall and 280 mm deep with a lid, webbing on its front and sides, a
@@ -264,21 +264,21 @@ local rucksack(id, massKg, o) =
   rucksack('large_military_rucksack', 1.3, {
     w: 0.38, ht: 0.6, d: 0.28, lid: 0.08, rows: 9, front: false, side: true, belt: true,
     cloth: 'cloth-olive-drab', trim: 'webbing-olive-dark', webbing: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Large military rucksack' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A medium MOLLE rucksack 340 mm wide, 500 mm tall and 230 mm deep with a lid, webbing on its front and sides, a
   // flapped front pouch and padded shoulder straps.
   rucksack('medium_military_rucksack', 1, {
     w: 0.34, ht: 0.5, d: 0.23, lid: 0.07, rows: 8, front: true, side: false, belt: false,
     cloth: 'nylon-coyote', trim: 'cloth-khaki', webbing: 'cloth-khaki',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Medium military rucksack' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A MOLLE assault pack 300 mm wide, 440 mm tall and 200 mm deep with a lid, webbing on its front and sides, a
   // flapped front pouch and padded shoulder straps.
   rucksack('military_assault_pack', 0.75, {
     w: 0.3, ht: 0.44, d: 0.2, lid: 0.05, rows: 7, front: true, side: false, belt: false,
     cloth: 'nylon-ranger-green', trim: 'webbing-olive-dark', webbing: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Military assault pack' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A string net bag 320 mm wide and 420 mm long lying slumped on the floor, knotted in a 32 mm mesh that bulges
   // 60 mm over its flat underside, with a drawcord through its mouth and the two cotton straps that carry it running
@@ -311,7 +311,7 @@ local rucksack(id, massKg, o) =
     box('drawcord-l', 'cord', [-0.07, 0, -l / 2 - 0.08], [-0.064, 0.006, -l / 2]),
     box('drawcord-r', 'cord', [0.064, 0, -l / 2 - 0.08], [0.07, 0.006, -l / 2]),
     box('cord-lock', 'cord', [-0.075, 0, -l / 2 - 0.1], [0.075, 0.01, -l / 2 - 0.08]),
-  ], { net: 'cord-cotton', strap: 'cloth-cream', cord: 'cord-cotton' })
+  ], { net: 'cord-cotton', strap: 'cloth-cream', cord: 'cord-cotton' }) + { title: 'Net backpack' }
   + h.inHand('net_backpack', 'hem') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
 
   // A nylon pet carrier backpack 330 mm wide, 420 mm tall and 270 mm deep with a clear domed window on its front
@@ -333,6 +333,6 @@ local rucksack(id, massKg, o) =
     for a in [i * std.pi / 6]
   ] + shoulderStraps('trim', 0.07, 0.06, 0.04, 0.4, -0.15), {
     body: 'cloth-blue', trim: 'nylon-black', window: 'plastic-clear', zip: 'steel-grey', mesh: 'mesh-black', hole: 'plastic-black',
-  })
+  }) + { title: 'Pet carrier backpack' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['back'] } } },
 ]

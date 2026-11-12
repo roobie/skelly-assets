@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'luxury_saloon.spec.libsonnet';
 {
+  title: 'Luxury saloon',
   sites: (import 'car-sites.libsonnet')('luxury_saloon', s, {
     over: {
       engine: { part: 'engine_v8_petrol' },

@@ -78,7 +78,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   ]) + [
     box('strap', 'strap', [-0.27, 0.008, -0.13], [-0.24, 0.012, 0.13]),
     box('strap-buckle', 'buckle', [-0.272, 0.008, -0.01], [-0.238, 0.016, 0.01]),
-  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + h.headEndOnMinusX
+  ], { mail: 'steel-grey', strap: 'leather-brown', buckle: 'steel' }) + { title: 'Medium steel mail sleeves' } + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of sleeves cut from a heavy cotton shirt, laid flat side by side, 560 mm long, 180 mm across at the
@@ -101,7 +101,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('cord', 'stitch', [-0.29, 0.01, -0.14], [-0.282, 0.016, 0.14]),
     box('cord-end-a', 'stitch', [-0.33, 0.0, -0.01], [-0.282, 0.005, -0.004]),
     box('cord-end-b', 'stitch', [-0.32, 0.0, 0.004], [-0.282, 0.005, 0.01]),
-  ], { cloth: 'cloth-canvas', leather: 'leather-brown', stitch: 'skin-rawhide' }) + h.headEndOnMinusX
+  ], { cloth: 'cloth-canvas', leather: 'leather-brown', stitch: 'skin-rawhide' }) + { title: 'Leather padded sleeves' } + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'leather'], slot: ['arms'] } } },
 
   // A pair of light leather archery vambraces laid side by side, crown up: each a stiff curved guard 220 mm long
@@ -119,7 +119,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
       for x in [-0.085 + i * 0.07]
     ])
     for s in [-1, 1]
-  ]), { leather: 'leather-brown', edge: 'leather-black', strap: 'leather-black', buckle: 'brass' }) + h.headEndOnMinusX
+  ]), { leather: 'leather-brown', edge: 'leather-black', strap: 'leather-black', buckle: 'brass' }) + { title: 'Leather vambraces' } + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['arms'] } } },
 
   // A plate carrier lying flat, front up: a front panel 360 mm wide and 460 mm long over the back panel, a plate
@@ -128,7 +128,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
   h.compound('plate_carrier', 2.3, carrier(0.36, 0.46, 0.14, 5, true) + [
     strap('strap-l', -0.11, 0.46),
     strap('strap-r', 0.11, 0.46),
-  ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black' })
+  ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black' }) + { title: 'Plate carrier' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A heavy plate carrier lying flat, front up: a front panel 380 mm wide and 480 mm long over the back panel, its
@@ -144,7 +144,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('lower-back-hem', 'trim', [-0.15, 0.0, 0.352], [0.15, 0.022, 0.36]),
     box('release', 'release', [-0.025, 0.061, -0.11], [0.025, 0.07, -0.085]),
     box('release-cable', 'trim', [-0.004, 0.058, -0.17], [0.004, 0.064, -0.11]),
-  ], { cloth: 'cloth-olive-drab', pocket: 'cloth-olive-drab', pals: 'webbing-olive-dark', pad: 'cloth-olive-drab', trim: 'plastic-matte-black', release: 'plastic-red' })
+  ], { cloth: 'cloth-olive-drab', pocket: 'cloth-olive-drab', pals: 'webbing-olive-dark', pad: 'cloth-olive-drab', trim: 'plastic-matte-black', release: 'plastic-red' }) + { title: 'Heavy plate carrier' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A light plate carrier lying flat, front up: a front panel 280 mm wide and 340 mm long over the back panel, with
@@ -158,7 +158,7 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     for i in [0, 1]
     for k in [0, 1]
     for x in [[[-0.14 - 0.03, -0.14 - 0.075], [0.14 + 0.03, 0.14 + 0.075]][i][k]]
-  ], { cloth: 'cloth-black', pocket: 'cloth-black', pals: 'webbing-black', pad: 'cloth-black', trim: 'plastic-charcoal', mag: 'webbing-black' })
+  ], { cloth: 'cloth-black', pocket: 'cloth-black', pals: 'webbing-black', pad: 'cloth-black', trim: 'plastic-charcoal', mag: 'webbing-black' }) + { title: 'Light plate carrier' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // The same light plate carrier, 280 mm wide and 340 mm long, with plain cummerbund wings, a radio pouch 70 mm
@@ -172,6 +172,6 @@ local strap(id, x, l) = box(id, 'pad', [x - 0.035, 0, -l / 2 - 0.05], [x + 0.035
     box('hook-base', 'hook', [0.04, 0.058, -0.06], [0.052, 0.062, -0.04]),
     box('hook-post', 'hook', [0.043, 0.062, -0.05], [0.049, 0.078, -0.044]),
     box('hook-tip', 'hook', [0.043, 0.074, -0.065], [0.049, 0.078, -0.05]),
-  ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black', pouch: 'webbing-olive-dark', flap: 'nylon-coyote', hook: 'steel' })
+  ], { cloth: 'nylon-coyote', pocket: 'nylon-coyote', pals: 'webbing-olive-dark', pad: 'nylon-coyote', trim: 'plastic-matte-black', pouch: 'webbing-olive-dark', flap: 'nylon-coyote', hook: 'steel' }) + { title: 'Light plate carrier with radio pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

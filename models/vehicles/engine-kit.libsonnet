@@ -167,11 +167,11 @@ local fittings(name) =
 {
   // Every engine's core and fused rows and every class's accessory rows.
   rows: [
-    assembly.row(c[a.key].id, c[a.key].massKg, a.draw(c))
+    assembly.row(c[a.key].id, c[a.key].title, c[a.key].massKg, a.draw(c))
     for c in std.objectValues(classes)
     for a in accessories
   ] + std.flattenArrays([
-    assembly.rows(fusedId(name), coreId(name), engines[name].massKg, core(name), fittings(name))
+    assembly.rows(fusedId(name), coreId(name), engines[name].title, engines[name].title + ' core', engines[name].massKg, core(name), fittings(name))
     for name in std.objectFields(engines)
   ]),
   // The engines, by the names `sites` takes.

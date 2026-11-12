@@ -49,7 +49,7 @@ local cowlRibs = 32;
   ] + [
     flat('knot-stripe-%d' % i, 'stripe', [[-0.02, -0.215 + 0.018 * i], [0.02, -0.205 + 0.018 * i], [0.019, -0.199 + 0.018 * i], [-0.021, -0.209 + 0.018 * i]], 0.012, 0.014)
     for i in std.range(0, 1)
-  ], { cloth: 'cloth-blue', stripe: 'cloth-shimmer', clip: 'metal-silver' })
+  ], { cloth: 'cloth-blue', stripe: 'cloth-shimmer', clip: 'metal-silver' }) + { title: 'Clip-on tie' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A green silk-look necktie rolled up as it is stored, 100 mm across and 80 mm tall: the narrow end coiled at the
@@ -75,7 +75,7 @@ local cowlRibs = 32;
     local r = coilR(coilN), x = 0.012 + 0.022 * j;
     h.prism('tip-stripe-%d' % j, 'stripe', 'y', [[q[1], q[0]] for q in [[x, r + 0.004], [x + 0.006, r + 0.004], [x + 0.026, r + coilH1 - 0.004], [x + 0.02, r + coilH1 - 0.004]]], 0.004, 0.0055)
     for j in std.range(0, 2)
-  ], { cloth: 'cloth-green', stripe: 'brass-dull' })
+  ], { cloth: 'cloth-green', stripe: 'brass-dull' }) + { title: 'Necktie' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A skinny necktie folded in half and laid flat, 710 mm long: the 50 mm blade and the 30 mm tail side by side,
@@ -94,7 +94,7 @@ local cowlRibs = 32;
     for i in std.range(0, 61)
     for j in std.range(0, 2)
     if (i + j) % 2 == 0
-  ], { cloth: 'cloth-black', check: 'cloth-bright-white' })
+  ], { cloth: 'cloth-black', check: 'cloth-bright-white' }) + { title: 'Skinny tie' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A set of plastic vampire fangs lying gum down, 56 mm across, 48 mm deep and 26 mm tall: a pink horseshoe of gum
@@ -112,7 +112,7 @@ local cowlRibs = 32;
                h.turned('fang-%d' % (if a < 0 then 0 else 1), 'tooth', 'y', [[0, 0], [0, 0.0034], [0.005, 0.0032], [0.013, 0.0018], [0.019, 0]], [p[0], 0.008, p[1]])
                for a in [-36, 36]
              ],
-             { gum: 'plastic-pink', tooth: 'bone' })
+             { gum: 'plastic-pink', tooth: 'bone' }) + { title: 'Vampire fangs' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A white wedding veil laid loosely folded, 280 mm by 220 mm and 20 mm tall with its comb: a thin double layer of
@@ -136,7 +136,7 @@ local cowlRibs = 32;
   ] + [
     h.disc('pearl-%d' % i, 'pearl', 0.0035, 0.012, 0.017, -0.048 + 0.012 * i, -0.082)
     for i in std.range(0, 8)
-  ], { cloth: 'mesh-white', lace: 'lace-white', comb: 'metal-silver', pearl: 'pearl' })
+  ], { cloth: 'mesh-white', lace: 'lace-white', comb: 'metal-silver', pearl: 'pearl' }) + { title: 'Wedding veil' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 
   // A chunky knit cowl lying flat as a loop, 285 mm across and 64 mm tall: a soft oatmeal wool tube ribbed all the way
@@ -155,7 +155,7 @@ local cowlRibs = 32;
       band('rib-%d-c' % k, 0.044, 0.061, cowlRr * 0.8 + 0.002),
     ]
     for k in std.range(0, cowlRibs - 1)
-  ]), { cloth: 'jute', rib: 'cloth-cream' })
+  ]), { cloth: 'jute', rib: 'cloth-cream' }) + { title: 'Knit cowl' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A keffiyeh of woven dry grass folded square, 300 mm across and 34 mm tall with its cords: a crisscross of
@@ -172,7 +172,7 @@ local cowlRibs = 32;
   ] + [
     ringY('cord-a', 'cord', 0.078, 0.087, 0.026, 0.032),
     ringY('cord-b', 'cord', 0.082, 0.091, 0.032, 0.038, 0.004, 0.003),
-  ], { cloth: 'straw-wicker', strand: 'plant-dried', cord: 'jute' })
+  ], { cloth: 'straw-wicker', strand: 'plant-dried', cord: 'jute' }) + { title: 'Grass keffiyeh' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 
   // A crimson cotton headscarf folded square, 240 mm by 220 mm and 23 mm tall: a cream border woven in along its
@@ -184,6 +184,6 @@ local cowlRibs = 32;
   ] + [
     box('fringe-%d' % i, 'fringe', [-0.112 + 0.012 * i, 0.002, 0.11], [-0.108 + 0.012 * i, 0.006, 0.13])
     for i in std.range(0, 18)
-  ], { cloth: 'cloth-crimson', hem: 'cloth-cream', fringe: 'cloth-crimson' })
+  ], { cloth: 'cloth-crimson', hem: 'cloth-cream', fringe: 'cloth-crimson' }) + { title: 'Headscarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 ]

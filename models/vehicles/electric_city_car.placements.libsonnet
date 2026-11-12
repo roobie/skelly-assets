@@ -2,6 +2,7 @@
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'city_car.spec.libsonnet';
 {
+  title: 'Electric city car',
   parent: 'city_car',
   sites(base): powertrain.electric(base, {
     over: { front_bumper: { part: 'electric_city_car_front_bumper' } },

@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local s = t.spec(import 'street_sweeper.spec.libsonnet');
 {
+  title: 'Street sweeper',
   sites: t.fittings(site.kit, 'street_sweeper', s) + [
     site.one('subframe', 'street_sweeper_subframe'),
     site.one('hopper', 'street_sweeper_hopper'),

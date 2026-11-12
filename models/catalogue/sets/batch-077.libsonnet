@@ -60,7 +60,7 @@ local spool(n, x, z, y0) = [
     handle: 'plastic-yellow',
     blade: 'steel-stainless',
     pivot: 'steel-grey',
-  }) + h.gripOn('aramid_shears', 'loop-a') + {
+  }) + { title: 'Aramid shears' } + h.gripOn('aramid_shears', 'loop-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // Two 360 mm wooden knitting needles, 7 mm thick, side by side with a round knob at each head.
@@ -70,7 +70,7 @@ local spool(n, x, z, y0) = [
       h.ball('knob-%d' % n, 'knob', 0.006, -0.180, 0.006, 0.020 * n - 0.030),
     ]
     for n in [1, 2]
-  ]), { needle: 'wood-birch', knob: 'wood-walnut' }) + h.gripOn('knitting_needles', 'needle-1') + {
+  ]), { needle: 'wood-birch', knob: 'wood-walnut' }) + { title: 'Knitting needles' } + h.gripOn('knitting_needles', 'needle-1') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['wood'] } } },
   // A standing frame loom 0.68 m wide and 0.82 m tall on two 0.30 m feet: pine posts and beams, a warp of cotton
@@ -90,32 +90,32 @@ local spool(n, x, z, y0) = [
   ] + [
     h.box('warp-%d' % i, 'warp', [-0.250 + i * 0.020 - 0.002, 0.300, -0.002], [-0.250 + i * 0.020 + 0.002, 0.740, 0.002])
     for i in std.range(0, 25)
-  ], { frame: 'wood-pine', rod: 'wood-oak', cloth: 'cloth-cream', stripe: 'cloth-red', warp: 'cord-cotton' }) + {
+  ], { frame: 'wood-pine', rod: 'wood-oak', cloth: 'cloth-cream', stripe: 'cloth-red', warp: 'cord-cotton' }) + { title: 'Frame loom' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'fabric'] } } },
   // A bone needle 110 mm long and 7 mm thick, filed to a point, with a wide flat head and a drilled eye.
-  h.compound('bone_needle', 0.004, needle('needle', 0.100, 0.0035, 0.008, 0.002, 0.003), { needle: 'bone' }) + h.inHand('bone_needle', 'shaft') + {
+  h.compound('bone_needle', 0.004, needle('needle', 0.100, 0.0035, 0.008, 0.002, 0.003), { needle: 'bone' }) + { title: 'Bone needle' } + h.inHand('bone_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['bone'], setting: ['prehistoric'] } } },
   // A curved steel suture-style needle: a half circle 50 mm across, 3 mm thick, with a pointed tip and an eye end.
   h.compound('curved_needle', 0.0068, h.crescent('arc', 'needle', 0.0235, 0.0265, -90, 90, 12, 0, 0.003) + [
     h.prism('point', 'needle', 'y', [[0.0, -0.0270], [0.0, -0.0230], [-0.009, -0.0250]], 0, 0.003),
     h.box('eye', 'needle', [0.0225, 0, -0.006], [0.0285, 0.003, 0.0]),
-  ], { needle: 'steel-stainless' }) + h.inHand('curved_needle', 'arc-6') + {
+  ], { needle: 'steel-stainless' }) + { title: 'Curved needle' } + h.inHand('curved_needle', 'arc-6') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'medical', keywords: ['sewing'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A heavy steel darning needle 100 mm long and 3.6 mm thick with a long eye.
-  h.compound('steel_needle', 0.0054, needle('needle', 0.092, 0.0018, 0.008, 0.002, 0.002), { needle: 'steel-stainless' }) + h.inHand('steel_needle', 'shaft') + {
+  h.compound('steel_needle', 0.0054, needle('needle', 0.092, 0.0018, 0.008, 0.002, 0.002), { needle: 'steel-stainless' }) + { title: 'Steel needle' } + h.inHand('steel_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['metal'] } } },
   // A whittled wooden needle 120 mm long and 7 mm thick, with a narrow carved eye in a flat head.
-  h.compound('wooden_needle', 0.0014, needle('needle', 0.108, 0.0035, 0.010, 0.002, 0.003), { needle: 'wood-pine' }) + h.inHand('wooden_needle', 'shaft') + {
+  h.compound('wooden_needle', 0.0014, needle('needle', 0.108, 0.0035, 0.010, 0.002, 0.003), { needle: 'wood-pine' }) + { title: 'Wooden needle' } + h.inHand('wooden_needle', 'shaft') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A flat wooden shed stick 550 mm long, 50 mm wide and 10 mm thick, its ends tapered to blunt points.
   h.compound('shed_stick', 0.18, [
     h.prism('stick', 'stick', 'y', [[0, -0.275], [0.025, -0.240], [0.025, 0.240], [0, 0.275], [-0.025, 0.240], [-0.025, -0.240]], 0, 0.010),
-  ], { stick: 'wood-oak' }) + h.gripOn('shed_stick', 'stick') + {
+  ], { stick: 'wood-oak' }) + { title: 'Shed stick' } + h.gripOn('shed_stick', 'stick') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood'] } } },
   // A kraft envelope of sewing patterns, 310 mm by 230 mm and 12 mm thick, a sheaf of printed tissue sheets
@@ -133,7 +133,7 @@ local spool(n, x, z, y0) = [
     for i in std.range(0, 4)
   ] + [
     h.box('cut-line', 'print', [0.200, 0.0115, -0.085], [0.202, 0.0125, 0.085]),
-  ], { envelope: 'paper-butcher', label: 'paper-white', print: 'plastic-black', sheet: 'paper-white' }) + h.label('label', '+y') + {
+  ], { envelope: 'paper-butcher', label: 'paper-white', print: 'plastic-black', sheet: 'paper-white' }) + { title: 'Tailoring pattern set' } + h.label('label', '+y') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'documents', keywords: ['sewing'], tags: { material: ['paper'], setting: ['modern'] } } },
   // A sewing case 180 mm by 110 mm and 30 mm deep, opened with its lid lying flat behind: spools of thread, a
@@ -168,7 +168,7 @@ local spool(n, x, z, y0) = [
     handle: 'plastic-black',
     blade: 'steel-stainless',
     pivot: 'steel-grey',
-  }) + {
+  }) + { title: 'Tailor\'s kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['fabric', 'metal'] } } },
   // A raw hide rolled up 260 mm long and 70 mm across while it cures, flesh side out, tied with two cords.
@@ -176,7 +176,7 @@ local spool(n, x, z, y0) = [
     hide: 'skin-rawhide',
     inner: 'leather-tan',
     cord: 'jute',
-  }) + {
+  }) + { title: 'Tanning hide' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
   // A furred pelt rolled up 260 mm long and 76 mm across while it cures, fur side in so the fur shows at the ends
@@ -185,7 +185,7 @@ local spool(n, x, z, y0) = [
     hide: 'skin-rawhide',
     inner: 'fur-brown',
     cord: 'jute',
-  }) + {
+  }) + { title: 'Tanning pelt' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 ]

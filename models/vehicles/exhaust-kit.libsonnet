@@ -145,6 +145,8 @@ local pipePieces(name, p) =
 local pipeFinish(c) = { pipe: c.pipe.finish, tip: c.tip.finish, bracket: c.pipe.bracket };
 local drawn(c, role) = if role == 'cat' then cat(c) else muffler(c);
 
+local pipeLabels = { front_pipe: 'front pipe', mid_pipe: 'middle pipe', tailpipe: 'tailpipe' };
+
 local exhaustRows(name) =
   local e = exhausts[name];
   local c = classOf(name);
@@ -156,17 +158,18 @@ local exhaustRows(name) =
   local renamed(role, pieces) = [piece { id: role + '_' + piece.id } for piece in pieces];
   [
     k.compound(pipeId(name, p.role), p.massKg, [k.moved(piece, minus([0, 0, 0], p.start)) for piece in p.pieces], pipeFinish(c))
+    + { title: e.title + ' ' + pipeLabels[p.role] }
     for p in pipes
   ] + [
     k.compound(fusedId(name), e.massKg,
                std.flattenArrays([renamed(p.role, p.pieces) for p in pipes])
                + std.flattenArrays([renamed(p.role, [k.moved(piece, p.centre) for piece in drawn(c, p.role).pieces]) for p in l.parts]),
-               std.foldl(function(all, p) all + drawn(c, p.role).finish, l.parts, pipeFinish(c))),
+               std.foldl(function(all, p) all + drawn(c, p.role).finish, l.parts, pipeFinish(c))) + { title: e.title },
   ];
 
 local partRows(c) = [
   local d = drawn(c, role);
-  k.compound(c[role].id, c[role].massKg, d.pieces, d.finish)
+  k.compound(c[role].id, c[role].massKg, d.pieces, d.finish) + { title: c[role].title }
   for role in ['cat', 'muffler']
   if std.objectHas(c, role)
 ];

@@ -293,9 +293,9 @@ local voxelOf(e) =
   else {};
 local classRows(name) =
   local c = classes[name];
-  [assembly.row(e.id, e.massKg, drawn(c, e)) + taxonomy.of(e) + voxelOf(e) for e in entries(c)];
+  [assembly.row(e.id, e.title, e.massKg, drawn(c, e)) + taxonomy.of(e) + voxelOf(e) for e in entries(c)];
 local turretRows(name) =
-  assembly.rows(name, coreId(name), turrets[name].massKg, core(name), fittings(name));
+  assembly.rows(name, coreId(name), turrets[name].title, turrets[name].title + ' core', turrets[name].massKg, core(name), fittings(name));
 
 {
   // A class's fitting rows, which one vehicle on the class emits; and a turret's core and fused rows, which its vehicle

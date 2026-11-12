@@ -2,7 +2,7 @@
 // Usage: node tools/build.mjs [--out dir] [--cache dir | --no-cache] [rowId ...], or node tools/build.mjs --shard i/n
 // [--cache dir] to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard). The cache
 // is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; --no-cache generates every model.
-// With no row ids it first holds every model's taxonomy to the vocabulary (tools/check-taxonomy.mjs), then builds every
+// With no row ids it first holds every model's title and taxonomy to their rules (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
 // (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs) and the finish library
 // (tools/manifest.mjs); with ids it builds only those rows, from the roster source or a recipe file, with no pack index,
@@ -16,7 +16,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
-import { modelTaxonomies } from './check-taxonomy.mjs';
+import { modelSources, sourceReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
@@ -24,7 +24,7 @@ import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
 import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
-import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
+import { readVocabulary } from './taxonomy.mjs';
 import { workerPool } from './workerPool.mjs';
 
 const here = import.meta.dirname;
@@ -139,19 +139,19 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
 // manifest over them and the mob rows (tools/mobs.mjs writes the mob files themselves).
 const PRODUCTION_RECIPE_TOOLS = ['gun', 'thing'];
 
-// Each model's taxonomy from its source row, keyed by pack and id; the models built and the models whose sources were
-// read must be the same set, so no model reaches the manifest without its taxonomy having been checked.
-export function withTaxonomy(models, taxonomies) {
+// Each model's title and taxonomy from its source row, keyed by pack and id; the models built and the models whose
+// sources were read must be the same set, so no model reaches the manifest without its title and taxonomy having been checked.
+export function withSources(models, sources) {
   const key = ({ pack, id }) => `${pack}/${id}`;
-  const byModel = new Map(taxonomies.map((entry) => [key(entry), entry.taxonomy]));
+  const byModel = new Map(sources.map((entry) => [key(entry), entry]));
   const built = new Set(models.map(key));
   const unread = models.map(key).filter((model) => !byModel.has(model));
   const unbuilt = [...byModel.keys()].filter((model) => !built.has(model));
   if (unread.length > 0 || unbuilt.length > 0) {
-    throw new Error(`taxonomy sources and built models differ: built without a source row ${unread.join(' ') || '(none)'}; `
+    throw new Error(`model sources and built models differ: built without a source row ${unread.join(' ') || '(none)'}; `
       + `source row not built ${unbuilt.join(' ') || '(none)'}`);
   }
-  return models.map((model) => ({ ...model, taxonomy: byModel.get(key(model)) }));
+  return models.map((model) => ({ ...model, title: byModel.get(key(model)).title, taxonomy: byModel.get(key(model)).taxonomy }));
 }
 
 // The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems).
@@ -226,14 +226,14 @@ async function main() {
   mkdirSync(out, { recursive: true });
   await installJsonnetSources();
   const rosterRows = rosterSource();
-  // A taxonomy or pack dependency problem fails the production build before any model is written.
-  const taxonomies = positionals.length === 0 ? await modelTaxonomies(repo) : [];
+  // A title, taxonomy or pack dependency problem fails the production build before any model is written.
+  const sources = positionals.length === 0 ? await modelSources(repo) : [];
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
-    const { unlisted, problems } = taxonomyReport(taxonomies, vocabulary);
-    for (const { message } of unlisted) console.log(`TAXONOMY note: ${message}`);
-    for (const { message } of problems) console.log(`TAXONOMY ${message}`);
+    const { unlisted, problems } = sourceReport(sources, vocabulary);
+    for (const { message } of unlisted) console.log(`SOURCE note: ${message}`);
+    for (const { message } of problems) console.log(`SOURCE ${message}`);
     if (problems.length > 0) process.exit(1);
   }
   let failed = false;
@@ -254,7 +254,7 @@ async function main() {
     for (const file of recipes.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
-      const models = withTaxonomy([...built.models, ...recipes.models, ...mobs.models], taxonomies);
+      const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
       const placed = exportPlacements({
         placements: readPlacements(repo),
         models,

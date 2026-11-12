@@ -65,6 +65,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
 [
   {
     id: 'player_bust',
+    title: 'Player bust',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
     voxelGrain: bust.voxelGrain,
@@ -101,6 +102,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
   },
   {
     id: 'player_arm',
+    title: 'Player arm',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
     voxelGrain: bust.voxelGrain,
@@ -133,6 +135,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
   },
   {
     id: 'player_leg',
+    title: 'Player leg',
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
     voxelGrain: bust.voxelGrain,

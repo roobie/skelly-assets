@@ -8,6 +8,7 @@ local classes = import 'track-classes.libsonnet';
 {
   // A 14-tonne excavator's: 3.75 m long, its drive sprocket at the rear.
   excavator_track: {
+    title: 'Excavator track',
     class: 'crawler_medium',
     frame: { massKg: 280, x: [-1.145, 1.145], y: [0.25, 0.55], halfWidth: 0.12 },
     wheels: [
@@ -22,6 +23,7 @@ local classes = import 'track-classes.libsonnet';
   // A 20-tonne crawler dozer's: idlers at both ends of the ground run and the drive sprocket raised over the rear one,
   // out of the dirt and clear of the shocks the blade sends through the rollers, so the band runs as a triangle.
   bulldozer_track: {
+    title: 'Bulldozer track',
     class: 'crawler_heavy',
     frame: { massKg: 600, x: [-1.1, 1.1], y: [0.38, 0.56], halfWidth: 0.16 },
     wheels: [
@@ -36,6 +38,7 @@ local classes = import 'track-classes.libsonnet';
   },
   // A 6-tonne trencher's rubber track: 2.5 m long, its drive sprocket at the rear.
   trencher_track: {
+    title: 'Trencher track',
     class: 'rubber_compact',
     frame: { massKg: 30, x: [-0.69, 0.69], y: [0.2, 0.42], halfWidth: 0.085 },
     wheels: [
@@ -51,6 +54,7 @@ local classes = import 'track-classes.libsonnet';
   // return rollers, so the top run spans from the sprocket to the idler. The wheels' spacing is read from side
   // drawings of the vehicle, not published.
   cv9040_track: {
+    title: 'Tracked infantry fighting vehicle track',
     class: 'armoured_medium',
     wheels: [
       { site: 'sprocket', key: 'sprocket', at: [2.62, 0.84] },
@@ -65,6 +69,7 @@ local classes = import 'track-classes.libsonnet';
   // two wheels each and one return roller between them. Its frame stands in for the bogie's girder, painted with the
   // hull. The wheels' spacing is read from side drawings and the published 1.19 m ground contact.
   half_track_track: {
+    title: 'Half-track track',
     class: 'band_light',
     frame: { massKg: 180, x: [-2.2, -0.82], y: [0.38, 0.52], halfWidth: 0.12, finish: 'paint-olive' },
     wheels: [
@@ -82,6 +87,7 @@ local classes = import 'track-classes.libsonnet';
   // are alike in radius and axle height, so the top run is level and each roller, midway between two road wheels, meets
   // it.
   mbt_track: {
+    title: 'Main battle tank track',
     local c = classes[self.class],
     local wheelY = c.roadWheel.radius + c.link.thickness + c.link.pad.height,
     local endAxleY = 0.74,

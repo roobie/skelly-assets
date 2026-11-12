@@ -15,6 +15,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     heavyGun: {
       draw: 'gun',
       id: 'kpvt_heavy_machine_gun',
+      title: 'Heavy machine gun',
       massKg: 49,
       taxonomy: gun,
       receiver: { length: 0.63, height: 0.18, width: 0.16 },
@@ -26,19 +27,20 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     coaxGun: {
       draw: 'coaxGun',
       id: 'pkt_machine_gun',
+      title: 'Coaxial machine gun',
       massKg: 10.5,
       taxonomy: gun,
       receiver: { length: 0.376, height: 0.1, width: 0.08 },
       barrel: { length: 0.722, radius: 0.02 },
     },
     // The gunner's periscopic day sight; its head stands above the roof, glass forward.
-    sight: { draw: 'sight', id: 'turret_day_sight', massKg: 12, length: 0.18, height: 0.15, width: 0.16 },
+    sight: { draw: 'sight', id: 'turret_day_sight', title: 'Turret day sight', massKg: 12, length: 0.18, height: 0.15, width: 0.16 },
     // The hull's own vision periscope, so one salvaged from the hull fits the turret's roof.
-    periscope: { draw: 'periscope', id: 'apc_periscope', massKg: 6, length: 0.22, height: 0.1, width: 0.28 },
+    periscope: { draw: 'periscope', id: 'apc_periscope', title: 'APC periscope', massKg: 6, length: 0.22, height: 0.1, width: 0.28 },
     // A round lid of 7 mm armour on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'turret_hatch', massKg: 15, radius: 0.22, thickness: 0.04, opening: 0.28 },
+    hatch: { draw: 'hatch', id: 'turret_hatch', title: 'Turret hatch', massKg: 15, radius: 0.22, thickness: 0.04, opening: 0.28 },
     // One empty 81 mm smoke-grenade launcher tube on its foot, raised to throw forward over the turret.
-    smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_launcher_81mm', massKg: 3, bore: 0.09, length: 0.24, elevation: 45 },
+    smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_launcher_81mm', title: '81 mm smoke launcher', massKg: 3, bore: 0.09, length: 0.24, elevation: 45 },
   },
   // A two-man autocannon turret: a 40 mm Bofors L/70 with a coaxial 7.62 mm machine gun, as on the CV9040.
   two_man_autocannon: {
@@ -48,6 +50,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     mainGun: {
       draw: 'gun',
       id: 'bofors_40mm_l70_autocannon',
+      title: '40 mm L70 autocannon',
       massKg: 500,
       taxonomy: gun,
       receiver: { length: 1.1, height: 0.42, width: 0.42 },
@@ -58,19 +61,20 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     coaxGun: {
       draw: 'coaxGun',
       id: 'ksp_m39_machine_gun',
+      title: 'Turret machine gun',
       massKg: 14,
       taxonomy: gun,
       receiver: { length: 0.354, height: 0.12, width: 0.08 },
       barrel: { length: 0.61, radius: 0.02 },
     },
     // The gunner's day and thermal sight, and the commander's taller sight, which sees over the gunner's.
-    gunnerSight: { draw: 'sight', id: 'ifv_gunner_sight', massKg: 30, length: 0.3, height: 0.28, width: 0.25 },
-    commanderSight: { draw: 'sight', id: 'ifv_commander_sight', massKg: 35, length: 0.28, height: 0.4, width: 0.28 },
-    periscope: { draw: 'periscope', id: 'ifv_turret_periscope', massKg: 7, length: 0.2, height: 0.12, width: 0.25 },
+    gunnerSight: { draw: 'sight', id: 'ifv_gunner_sight', title: 'Infantry fighting vehicle gunner sight', massKg: 30, length: 0.3, height: 0.28, width: 0.25 },
+    commanderSight: { draw: 'sight', id: 'ifv_commander_sight', title: 'Infantry fighting vehicle commander sight', massKg: 35, length: 0.28, height: 0.4, width: 0.28 },
+    periscope: { draw: 'periscope', id: 'ifv_turret_periscope', title: 'Infantry fighting vehicle turret periscope', massKg: 7, length: 0.2, height: 0.12, width: 0.25 },
     // A crewman's round lid of armour plate on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'ifv_turret_hatch', massKg: 30, radius: 0.3, thickness: 0.05, opening: 0.4 },
+    hatch: { draw: 'hatch', id: 'ifv_turret_hatch', title: 'Infantry fighting vehicle turret hatch', massKg: 30, radius: 0.3, thickness: 0.05, opening: 0.4 },
     // One empty 76 mm Galix grenade launcher tube on its foot, raised to throw forward.
-    smokeLauncher: { draw: 'smokeLauncher', id: 'galix_launcher_76mm', massKg: 2.5, bore: 0.08, length: 0.2, elevation: 45 },
+    smokeLauncher: { draw: 'smokeLauncher', id: 'galix_launcher_76mm', title: '76 mm smoke grenade launcher', massKg: 2.5, bore: 0.08, length: 0.2, elevation: 45 },
   },
   // A main battle tank's three-man turret: a 120 mm smoothbore gun with a coaxial 7.62 mm machine gun. The values are a
   // generic Western tank's, from the published figures of 120 mm tank guns and their fittings; the masses of the sights, hatches
@@ -82,6 +86,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     mainGun: {
       draw: 'gun',
       id: 'smoothbore_120mm_tank_gun',
+      title: '120 mm smoothbore tank gun',
       massKg: 3200,
       taxonomy: gun,
       receiver: { length: 1.2, height: 0.5, width: 0.6 },
@@ -95,6 +100,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     coaxGun: {
       draw: 'coaxGun',
       id: 'coaxial_machine_gun_762',
+      title: '7.62 mm coaxial machine gun',
       massKg: 11,
       taxonomy: gun,
       receiver: { length: 0.5, height: 0.1, width: 0.08 },
@@ -102,14 +108,14 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     },
     // The gunner's stabilised day and thermal sight, a box ahead of the commander, and the commander's panoramic sight,
     // which stands high enough to see over the gunner's and turn on its own.
-    gunnerSight: { draw: 'sight', id: 'mbt_gunner_sight', massKg: 90, length: 0.5, height: 0.3, width: 0.36 },
-    commanderSight: { draw: 'sight', id: 'mbt_commander_sight', massKg: 60, length: 0.3, height: 0.48, width: 0.3 },
-    periscope: { draw: 'periscope', id: 'mbt_turret_periscope', massKg: 8, length: 0.2, height: 0.12, width: 0.25 },
+    gunnerSight: { draw: 'sight', id: 'mbt_gunner_sight', title: 'Main battle tank gunner sight', massKg: 90, length: 0.5, height: 0.3, width: 0.36 },
+    commanderSight: { draw: 'sight', id: 'mbt_commander_sight', title: 'Main battle tank commander sight', massKg: 60, length: 0.3, height: 0.48, width: 0.3 },
+    periscope: { draw: 'periscope', id: 'mbt_turret_periscope', title: 'Main battle tank turret periscope', massKg: 8, length: 0.2, height: 0.12, width: 0.25 },
     // A crewman's round lid of thick armour plate on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'mbt_turret_hatch', massKg: 60, radius: 0.33, thickness: 0.06, opening: 0.5 },
+    hatch: { draw: 'hatch', id: 'mbt_turret_hatch', title: 'Main battle tank turret hatch', massKg: 60, radius: 0.33, thickness: 0.06, opening: 0.5 },
     // One empty 76 mm smoke-grenade discharger tube on its foot, raised to throw forward.
-    smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_discharger_76mm', massKg: 3, bore: 0.09, length: 0.26, elevation: 45 },
+    smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_discharger_76mm', title: '76 mm smoke discharger', massKg: 3, bore: 0.09, length: 0.26, elevation: 45 },
     // The steel basket the crew's kit rides in behind the turret.
-    bustleRack: { draw: 'stowageBasket', id: 'turret_bustle_rack', massKg: 70, depth: 0.6, width: 2.6, height: 0.5, bar: 0.04, slats: 7 },
+    bustleRack: { draw: 'stowageBasket', id: 'turret_bustle_rack', title: 'Turret bustle rack', massKg: 70, depth: 0.6, width: 2.6, height: 0.5, bar: 0.04, slats: 7 },
   },
 }

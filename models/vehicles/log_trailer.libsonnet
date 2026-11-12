@@ -25,26 +25,26 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
       k.turned('air_tank', 'steel', 'x', k.disc(0.11, 1.0, 2.0), [0, 0.82, 0.7]),
     ])
     + h.drawbar(s.front, s.drawBack, s.tip, [s.drawLow, s.drawHigh], 0.2, 0.07),
-    { frame: s.frame, dark: s.dark, steel: 'steel-galvanised', reflector: 'reflective-yellow' }),
+    { frame: s.frame, dark: s.dark, steel: 'steel-galvanised', reflector: 'reflective-yellow' }) + { title: 'Log trailer chassis' },
   // A narrow walkway on the bolsters: the timber bears on the bolsters, with the frame open beneath it.
   k.compound('log_trailer_floor', 160, [
     box('walkway', 'wood', [-4.0, s.deckLow, -0.3], [3.28, s.deck, 0.3]),
-  ], { wood: 'wood-pine' }),
+  ], { wood: 'wood-pine' }) + { title: 'Log trailer floor' },
   k.compound('log_trailer_bolster', 90, [
     box('beam', 'frame', [-0.1, s.frameHigh, -1.2], [0.1, s.deckLow, 1.2]),
-  ] + bothSides([box('cap', 'frame', [-0.1, s.deckLow, 0.6], [0.1, s.deck, 1.2])]), { frame: s.frame }),
+  ] + bothSides([box('cap', 'frame', [-0.1, s.deckLow, 0.6], [0.1, s.deck, 1.2])]), { frame: s.frame }) + { title: 'Log trailer bolster' },
   // Fits at its foot on the bolster top; the pocket grips the bolster end.
   k.compound('log_trailer_stake', 28, [
     box('pocket', 'dark', [-0.08, -0.06, -0.07], [0.08, 0.22, 0.07]),
     box('post', 'dark', [-0.05, 0.22, -0.05], [0.05, s.stakeHeight, 0.05]),
     box('tip', 'frame', [-0.06, s.stakeHeight, -0.06], [0.06, s.stakeHeight + 0.05, 0.06]),
-  ], { dark: s.dark, frame: s.frame }),
+  ], { dark: s.dark, frame: s.frame }) + { title: 'Log trailer stake' },
   k.compound('log_trailer_headboard', 110,
     [box('bar_' + i, 'frame', [3.3, s.frameHigh + 0.38 * i, -1.0], [3.38, s.frameHigh + 0.1 + 0.38 * i, 1.0]) for i in std.range(0, 4)]
     + [box('centre_post', 'frame', [3.28, s.frameHigh, -0.06], [3.4, 2.72, 0.06])]
     + bothSides([box('post', 'frame', [3.28, s.frameHigh, 0.92], [3.4, 2.72, 1.04])]),
-    { frame: s.frame }),
+    { frame: s.frame }) + { title: 'Log trailer headboard' },
   k.compound('log_trailer_mudguard', 12,
     std.flattenArrays([k.arc('arc_' + i, 'dark', s.axles[i], s.hub, 0.46, 0.49, 10, 170, 8, [s.wheelZ - 0.13, s.wheelZ + 0.16]) for i in [0, 1]]),
-    { dark: s.dark }),
+    { dark: s.dark }) + { title: 'Log trailer mudguard' },
 ])
