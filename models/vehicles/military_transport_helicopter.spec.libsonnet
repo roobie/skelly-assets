@@ -4,7 +4,8 @@
   nose: 5.75, floor: 1.3, hub: 4.05, mastFoot: 3.42,
   windscreen: [3.3, 4.6], windscreenArc: 70,
   cockpitDoor: [2.1, 3.3], cockpitArc: 38, cockpitPane: 62,
-  cabinDoor: [-1.1, 1.0], cabinArc: 34, cabinPane: [46, 66], cabinPaneX: [-0.5, 0.4],
+  // The cabin door ends ahead of the engines, whose nacelles reach down past the door's top edge.
+  cabinDoor: [-0.45, 1.0], cabinArc: 34, cabinPane: [46, 66], cabinPaneX: [-0.05, 0.6],
   gunWindow: [1.2, 1.9], gunWindowArc: [50, 72],
   bulkhead: -1.6, tailEnd: -4.4,
   rotorRadius: 8.2,

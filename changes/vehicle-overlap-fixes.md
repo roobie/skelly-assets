@@ -15,4 +15,5 @@ Vehicle parts no longer run through each other where they were misplaced:
 - frames clear their running gear: the light tactical vehicle's crossmembers arch over the prop shafts, the crew pickup's middle crossmember stands above its rear shaft, the trencher's track beams end at the tracks, and the skid steer's engine cover rests on the frame's sponsons;
 - the mobile crane's winch stands ahead of its counterweight, and the combine harvester's reel turns over the cutter bar, clear of the auger;
 - the tanker truck's saddles cradle the barrel's curve instead of stepping up into it, and the front saddle stands clear of the barrel's band;
-- the quad bike's front shocks mount under the fenders instead of through them, and a bus's instrument binnacle stands back from a windscreen raked over the dash.
+- the quad bike's front shocks mount under the fenders instead of through them, and a bus's instrument binnacle stands back from a windscreen raked over the dash;
+- the military transport helicopter's cabin doors end ahead of its engines, and its troop benches shorten with them.
