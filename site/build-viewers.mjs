@@ -1,5 +1,5 @@
 // Builds every viewer site/tools.json lists into its package's dist/, which site/build.mjs then serves.
-// Usage: node site/build-viewers.mjs. Set PAGES_ANALYTICS=1 for the Pages deploy, as the viewers that count visits read it.
+// Usage: node site/build-viewers.mjs.
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { readTools, viewerDir } from './tools.mjs';
