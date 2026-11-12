@@ -16,6 +16,7 @@ Vehicle parts no longer run through each other where they were misplaced:
 - the mobile crane's winch stands ahead of its counterweight, and the combine harvester's reel turns over the cutter bar, clear of the auger;
 - the tanker truck's saddles cradle the barrel's curve instead of stepping up into it, and the front saddle stands clear of the barrel's band;
 - the quad bike's front shocks mount under the fenders instead of through them, and a bus's instrument binnacle stands back from a windscreen raked over the dash;
-- the military transport helicopter's cabin doors end ahead of its engines, and its troop benches shorten with them;
+- the military transport helicopter's engines stand high enough for its full-length cabin doors to pass under them;
+- the medium engines' alternator rides high on the exhaust side, clear of the light 4x4 truck's springs and the half-track's frame rails;
 - cabin fittings clear their doors and walls: the light helicopter's seats sit inboard of the door frames, the news helicopter's rear bench back sits inside its doors, the minivan's third row is a two-seat bench between the arches, the air ambulance's locker stands behind the sliding door's leading edge, and the APC's ammo rack stops under the wall locker;
 - the hybrid saloon carries no starter or alternator, since its motor-generator does both jobs, and its inverter sits on the transaxle clear of the air box.
