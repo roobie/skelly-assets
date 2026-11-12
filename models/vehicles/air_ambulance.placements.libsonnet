@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'air_ambulance.spec.libsonnet';
 {
+  title: 'Air ambulance',
   sites: [
     one('belly', 'air_ambulance_belly'),
     one('cabin_floor', 'air_ambulance_cabin_floor'),

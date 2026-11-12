@@ -92,18 +92,18 @@ local brimCurl(p, sx, r0, r1) =
 [
   // A pair of holiday gloves laid flat side by side, backs up, each 250 mm from fur cuff to fingertip and 92 mm across
   // the knuckles: bright red cotton with a thick roll of white faux fur round each cuff.
-  h.compound('santa_gloves', 0.08, pair(santaOpts, santa, 0.082), { hand: 'cloth-red', cuff: 'cloth-red', fur: 'fur-pale' })
+  h.compound('santa_gloves', 0.08, pair(santaOpts, santa, 0.082), { hand: 'cloth-red', cuff: 'cloth-red', fur: 'fur-pale' }) + { title: 'Santa gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of padded army winter gloves laid flat side by side, backs up, each 300 mm from cuff to fingertip and
   // 100 mm across the knuckles: olive cotton quilted in channels over the back and fingers, with a gauntlet cuff
   // drawn in by a cord and toggle.
-  h.compound('army_winter_gloves', 0.21, pair(armyOpts, army, 0.088), { hand: 'cloth-olive-drab', cuff: 'cloth-olive-drab', quilt: 'webbing-olive-dark', cord: 'plastic-matte-black', toggle: 'plastic-matte-black' })
+  h.compound('army_winter_gloves', 0.21, pair(armyOpts, army, 0.088), { hand: 'cloth-olive-drab', cuff: 'cloth-olive-drab', quilt: 'webbing-olive-dark', cord: 'plastic-matte-black', toggle: 'plastic-matte-black' }) + { title: 'Army winter gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of knitted cotton sleeves laid flat side by side, each 740 mm long, 124 mm wide at the ribbed cuff and
   // tapering to a closed, rounded tip, with knitted bands round them.
-  h.compound('tentacle_sleeves', 0.15, tentacleSleeve('l-', -0.075) + tentacleSleeve('r-', 0.075), { tube: 'cloth-green', cuff: 'cloth-cream', band: 'cloth-cream' })
+  h.compound('tentacle_sleeves', 0.15, tentacleSleeve('l-', -0.075) + tentacleSleeve('r-', 0.075), { tube: 'cloth-green', cuff: 'cloth-cream', band: 'cloth-cream' }) + { title: 'Tentacle sleeves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A ten-gallon hat standing on its brim: 440 mm across the brim, which curls up at the sides, and 190 mm tall to a
@@ -115,7 +115,7 @@ local brimCurl(p, sx, r0, r1) =
     box('buckle', 'buckle', [0.08, 0.016, -0.012], [0.092, 0.03, 0.012]),
     h.turned('lobe-l', 'felt', 'z', [[0, 0], [0, 0.022], [0.03, 0.028], [0.11, 0.026], [0.14, 0.014], [0.14, 0]], [-0.034, 0.15, -0.072]),
     h.turned('lobe-r', 'felt', 'z', [[0, 0], [0, 0.022], [0.03, 0.028], [0.11, 0.026], [0.14, 0.014], [0.14, 0]], [0.034, 0.15, -0.072]),
-  ] + brimCurl('curl-l', -1, 0.208, 0.224) + brimCurl('curl-r', 1, 0.208, 0.224), { felt: 'cloth-brown', band: 'leather-black', buckle: 'metal-silver' })
+  ] + brimCurl('curl-l', -1, 0.208, 0.224) + brimCurl('curl-r', 1, 0.208, 0.224), { felt: 'cloth-brown', band: 'leather-black', buckle: 'metal-silver' }) + { title: 'Ten-gallon hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A cotton bandana folded once corner to corner and laid flat: a triangle 540 mm along its fold and 270 mm deep,
@@ -131,7 +131,7 @@ local brimCurl(p, sx, r0, r1) =
     for j in std.range(0, 4)
     for i in std.range(0, 8)
     if std.abs(-0.18 + i * 0.045 + (j % 2) * 0.022) < 0.23 - (0.03 + j * 0.04)
-  ], { cloth: 'cloth-red', print: 'cloth-bright-white' })
+  ], { cloth: 'cloth-red', print: 'cloth-bright-white' }) + { title: 'Head bandana' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A beret standing on its band: a soft round crown 270 mm across and 60 mm tall, swelling past a narrow leather
@@ -140,6 +140,6 @@ local brimCurl(p, sx, r0, r1) =
     h.turned('band', 'band', 'y', [[0, 0], [0, 0.093], [0.014, 0.093], [0.014, 0]]),
     h.turned('crown', 'cloth', 'y', [[0, 0], [0, 0.11], [0.012, 0.13], [0.024, 0.135], [0.034, 0.128], [0.042, 0.1], [0.046, 0.05], [0.046, 0]], [0.016, 0.012, 0]),
     h.disc('stalk', 'cloth', 0.004, 0.056, 0.066, 0.016),
-  ], { cloth: 'cloth-navy', band: 'leather-black' })
+  ], { cloth: 'cloth-navy', band: 'leather-black' }) + { title: 'Beret' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 ]

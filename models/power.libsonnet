@@ -160,5 +160,5 @@ armour.of('sci-fi', [
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
-  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + { voxelGrain: 0.004 },
+  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + { title: 'Power helmet' } + { voxelGrain: 0.004 },
 ])

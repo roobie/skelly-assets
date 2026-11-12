@@ -4,6 +4,7 @@ local pair = site.pair;
 local s = import 'heavy_cargo_helicopter.spec.libsonnet';
 local id = 'heavy_cargo_helicopter';
 {
+  title: 'Heavy cargo helicopter',
   sites: [
     one('belly', id + '_belly'),
     one('load_floor', id + '_load_floor'),

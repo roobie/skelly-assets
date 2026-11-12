@@ -98,20 +98,20 @@ local pipe(id, slot, length, r, x0, y, z) = [
 [
   // A heavy load-bearing vest laid flat, 540 mm wide with a padded cummerbund each side and 580 mm long, rows of
   // webbing down both front panels, a single-point sling across the chest and two steel magnets on the right side.
-  vest('breachers_load_bearing_vest', 2.2, { w: 0.54, l: 0.58, t: 0.024, rows: 9, harness: false, wings: true, sling: true, magnets: true }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
+  vest('breachers_load_bearing_vest', 2.2, { w: 0.54, l: 0.58, t: 0.024, rows: 9, harness: false, wings: true, sling: true, magnets: true }) + { title: 'Breacher\'s load-bearing vest' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // The same heavy vest with its sling and no magnets.
-  vest('heavy_load_bearing_vest_with_sling', 1.7, { w: 0.54, l: 0.58, t: 0.024, rows: 9, harness: false, wings: true, sling: true, magnets: false }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
+  vest('heavy_load_bearing_vest_with_sling', 1.7, { w: 0.54, l: 0.58, t: 0.024, rows: 9, harness: false, wings: true, sling: true, magnets: false }) + { title: 'Heavy load-bearing vest with sling' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // A light harness laid flat, 440 mm wide and 520 mm long: shoulder straps, a short chest panel with three rows of
   // webbing each side and a webbing belt, with two straps down the back.
-  vest('light_load_bearing_vest', 0.5, { w: 0.44, l: 0.52, t: 0.01, rows: 3, harness: true, wings: false, sling: false, magnets: false }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
+  vest('light_load_bearing_vest', 0.5, { w: 0.44, l: 0.52, t: 0.01, rows: 3, harness: true, wings: false, sling: false, magnets: false }) + { title: 'Light load-bearing vest' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // A load-bearing vest laid flat, 480 mm wide and 540 mm long, with webbing down both front panels.
-  vest('load_bearing_vest', 0.9, { w: 0.48, l: 0.54, t: 0.016, rows: 8, harness: false, wings: false, sling: false, magnets: false }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
+  vest('load_bearing_vest', 0.9, { w: 0.48, l: 0.54, t: 0.016, rows: 8, harness: false, wings: false, sling: false, magnets: false }) + { title: 'Load-bearing vest' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // The same vest with a single-point sling across the chest.
-  vest('load_bearing_vest_with_sling', 1.1, { w: 0.48, l: 0.54, t: 0.016, rows: 8, harness: false, wings: false, sling: true, magnets: false }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
+  vest('load_bearing_vest_with_sling', 1.1, { w: 0.48, l: 0.54, t: 0.016, rows: 8, harness: false, wings: false, sling: true, magnets: false }) + { title: 'Load-bearing vest with sling' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // An open leather bag for javelins lying on its side, 800 mm long, 120 mm across at the sewn-shut base flaring to
   // 200 mm at the rolled mouth, laced up one side, with a shoulder strap laid beside it.
@@ -125,7 +125,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     box('lace-%d' % i, 'lace', [x, rm + r - 0.004, -0.012], [x + 0.008, rm + r + 0.004, 0.012])
     for i in std.range(0, 11)
   ] + floorStrap('strap', length, rm, 0.035),
-  { body: 'leather-brown', hem: 'leather-black', lace: 'skin-rawhide', strap: 'leather-brown' })
+  { body: 'leather-brown', hem: 'leather-black', lace: 'skin-rawhide', strap: 'leather-brown' }) + { title: 'Javelin bag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['back'], material: ['fabric'] } } },
 
   // A small nylon pouch for one pistol magazine, 70 mm wide, 120 mm tall and 28 mm deep, standing with its flap
@@ -136,7 +136,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     box('flap-top', 'body', [-0.037, 0.11, -0.002], [0.037, 0.12, 0.032]),
     box('tab', 'tab', [-0.025, 0.088, 0.032], [0.025, 0.1, 0.035]),
     turned('strap', 'strap', 'y', [[0, 0.051], [0, 0.055], [0.035, 0.055], [0.035, 0.051], [0, 0.051]], [0, 0.03, -0.054]),
-  ], { body: 'cloth-olive-drab', tab: 'plastic-black', strap: 'polymer-black' })
+  ], { body: 'cloth-olive-drab', tab: 'plastic-black', strap: 'polymer-black' }) + { title: 'Ankle magazine pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['legs'], material: ['fabric'] } } },
 
   // A nylon thigh pouch for two magazines, 100 mm wide, 160 mm tall and 35 mm deep, standing with two flaps forward
@@ -154,7 +154,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     box('flap-top', 'body', [-0.05, 0.15, -0.002], [0.05, 0.16, 0.035]),
     turned('strap-low', 'strap', 'y', [[0, 0.081], [0, 0.085], [0.03, 0.085], [0.03, 0.081], [0, 0.081]], [0, 0.015, -0.084]),
     turned('strap-high', 'strap', 'y', [[0, 0.081], [0, 0.085], [0.03, 0.085], [0.03, 0.081], [0, 0.081]], [0, 0.1, -0.084]),
-  ], { body: 'cloth-olive-drab', tab: 'plastic-black', strap: 'polymer-black' })
+  ], { body: 'cloth-olive-drab', tab: 'plastic-black', strap: 'polymer-black' }) + { title: 'Thigh magazine pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['legs'], material: ['fabric'] } } },
 
   // A nylon quiver lying on its side, 520 mm long and 80 mm across, with a stiffened black rim, a drawcord lock and
@@ -169,7 +169,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     box('molle-%d' % i, 'trim', [x, r - 0.012, -r - 0.004], [x + 0.025, r + 0.012, -r + 0.004])
     for i in [0, 1]
     for x in [[-0.15, 0.08][i]]
-  ], { body: 'cloth-olive-drab', trim: 'polymer-black' })
+  ], { body: 'cloth-olive-drab', trim: 'polymer-black' }) + { title: 'Nylon quiver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['plastic'] } } },
 
   // A steel conduit pipe made into a quiver, lying on its side: 500 mm long and 44 mm across with a screwed cap on
@@ -179,7 +179,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     tube('clamp-a', 'clamp', r, r + 0.003, -0.1, -0.088, r + 0.002, 0),
     tube('clamp-b', 'clamp', r, r + 0.003, 0.1, 0.112, r + 0.002, 0),
     box('loop', 'loop', [-0.12, 2 * r + 0.002, -0.015], [0.13, 2 * r + 0.012, 0.015]),
-  ], { pipe: 'steel-grey', cap: 'steel-galvanised', clamp: 'steel-galvanised', loop: 'leather-brown' })
+  ], { pipe: 'steel-grey', cap: 'steel-galvanised', clamp: 'steel-galvanised', loop: 'leather-brown' }) + { title: 'Pipe quiver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery', 'improvised'], tags: { slot: ['back'], material: ['metal'] } } },
 
   // Three 44 mm steel pipes 600 mm long bound into one back quiver with two hose clamps, each capped at its base,
@@ -192,7 +192,7 @@ local pipe(id, slot, length, r, x0, y, z) = [
     tube('clamp-%d' % i, 'clamp', 2.155 * r, 2.155 * r + 0.003, x, x + 0.014, cy, 0)
     for i in [0, 1]
     for x in [[-0.18, 0.16][i]]
-  ] + floorStrap('strap', length, 2.2 * r, 0.035), { pipe: 'steel-grey', cap: 'steel-galvanised', clamp: 'steel-galvanised', strap: 'cloth-olive-drab' })
+  ] + floorStrap('strap', length, 2.2 * r, 0.035), { pipe: 'steel-grey', cap: 'steel-galvanised', clamp: 'steel-galvanised', strap: 'cloth-olive-drab' }) + { title: 'Triple pipe quiver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery', 'improvised'], tags: { slot: ['back'], material: ['metal'] } } },
 
   // A stitched leather belt quiver lying on its side, 480 mm long, 70 mm across at its capped base and 90 mm at the
@@ -203,12 +203,12 @@ local pipe(id, slot, length, r, x0, y, z) = [
     band('rim', 'trim', length, rb, rm, -length / 2, 0.016, 0.004),
     band('base', 'trim', length, rb, rm, length / 2 - 0.02, 0.02, 0.003),
     box('belt-loop', 'trim', [-0.14, 2 * rm - 0.004, -0.022], [-0.08, 2 * rm + 0.006, 0.022]),
-  ], { body: 'leather-brown', trim: 'leather-black' })
+  ], { body: 'leather-brown', trim: 'leather-black' }) + { title: 'Quiver' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['leather'] } } },
 
   // A belt quiver woven from birch bark strips, lying on its side, 480 mm long, 80 mm across at the base and 90 mm
   // at the mouth, with a wooden hoop round the mouth and two rawhide lashings.
-  birchQuiver('birch_bark_quiver', 0.15, 0.48, 0.04, 0.045, false) + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['plant'] } } },
+  birchQuiver('birch_bark_quiver', 0.15, 0.48, 0.04, 0.045, false) + { title: 'Birch bark quiver' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['plant'] } } },
 
   // A large leather back quiver lying on its side, 720 mm long, 110 mm across at the base and 140 mm at the mouth,
   // with steel bands at mouth, middle and base and a shoulder strap laid beside it.
@@ -218,10 +218,10 @@ local pipe(id, slot, length, r, x0, y, z) = [
     band('band-mouth', 'trim', length, rb, rm, -length / 2, 0.02, 0.003),
     band('band-middle', 'trim', length, rb, rm, -0.01, 0.02, 0.003),
     band('band-base', 'trim', length, rb, rm, length / 2 - 0.02, 0.02, 0.003),
-  ] + floorStrap('strap', length, rm, 0.035), { body: 'leather-brown', trim: 'steel-grey', strap: 'leather-black' })
+  ] + floorStrap('strap', length, rm, 0.035), { body: 'leather-brown', trim: 'steel-grey', strap: 'leather-black' }) + { title: 'Large quiver' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['leather'] } } },
 
   // A large back quiver woven from birch bark strips, lying on its side, 720 mm long, 120 mm across at the base and
   // 140 mm at the mouth, with a wooden hoop, rawhide lashings and a rawhide shoulder strap laid beside it.
-  birchQuiver('large_birch_bark_quiver', 0.3, 0.72, 0.06, 0.07, true) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['plant'] } } },
+  birchQuiver('large_birch_bark_quiver', 0.3, 0.72, 0.06, 0.07, true) + { title: 'Large birch bark quiver' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { slot: ['back'], material: ['plant'] } } },
 ]

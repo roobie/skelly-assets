@@ -76,7 +76,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
                w.bar('a_low_far', 'paint', [s.aPost - 0.04, s.waist], [0.5, 1.15], 0.1, [-s.glassOut, -s.glassIn + 0.02]),
                w.bar('a_high_far', 'paint', [0.5, 1.15], [roofFront + 0.02, s.roof + 0.02], 0.1, [-s.glassOut, -s.glassIn + 0.02]),
              ],
-             paintFinish + { lining: 'cloth-rag' }),
+             paintFinish + { lining: 'cloth-rag' }) + { title: 'Crashed hatchback shell' },
   k.compound('crashed_hatchback_crushed_nose', 130,
              w.plate('top', 'y', [s.aPost - 0.03, 1.5], [-s.side, s.side],
                    crushTop,
@@ -106,7 +106,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
                box('lens_shard_near', 'glass', [face(0.7) + 0.05, 0.56, 0.62], [face(0.7) + 0.11, 0.66, 0.76]),
                box('lens_shard_far', 'glass', [face(-0.7) + 0.05, 0.6, -0.72], [face(-0.7) + 0.11, 0.68, -0.6]),
              ],
-             paintFinish + { cast: 'iron-cast', glass: 'glass-grey' }),
+             paintFinish + { cast: 'iron-cast', glass: 'glass-grey' }) + { title: 'Crashed hatchback nose (crushed)' },
   // Crazed white where it still hangs in the frame, and holed where the driver's side gave way.
   k.compound('crashed_hatchback_windscreen', 12,
              w.plate('pane', 'x', [-s.glassIn, s.glassIn], [s.waist - 0.02, s.roof],
@@ -114,18 +114,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
                    function(z, y) w.fbm(z, y, 61) > 0.3 && !(std.pow((z - 0.35) / 0.3, 2) + std.pow((y - 1.06) / 0.14, 2) < 1 + w.fbm(z, y, 62)),
                    function(z, y) if w.fbm(z, y, 63) > 0.56 then 'craze' else 'glass',
                    thick=0.125),
-             { craze: 'plastic-frosted', glass: 'glass-clear' }),
+             { craze: 'plastic-frosted', glass: 'glass-clear' }) + { title: 'Crashed hatchback windscreen' },
   k.compound('crashed_hatchback_tailgate', 18, [
     box('skin', 'paint', [s.rear + 0.055, 0.55, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
     prism('glass', 'glass', [[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + s.dLean, s.roof], [s.tailWaist - 0.01 + s.dLean, s.roof]], [-s.hatchSide + 0.02, s.hatchSide - 0.02]),
     box('handle', 'trim', [s.rear + 0.045, 0.68, -0.12], [s.rear + 0.055, 0.73, 0.12]),
-  ], paintFinish),
+  ], paintFinish) + { title: 'Crashed hatchback tailgate' },
   k.compound('crashed_hatchback_tail_lamp', 1, [
     box('lens', 'lens', [s.rear + 0.0, 0.56, s.hatchSide], [s.rear + 0.12, 0.84, s.skin + 0.03]),
-  ], { lens: 'plastic-red' }),
+  ], { lens: 'plastic-red' }) + { title: 'Crashed hatchback tail lamp' },
   k.compound('crashed_hatchback_rear_bumper', 6, [
     box('bar', 'paint', [s.rear, 0.2, -s.side + 0.03], [s.rear + 0.13, 0.42, s.side - 0.03]),
-  ], paintFinish),
+  ], paintFinish) + { title: 'Crashed hatchback rear bumper' },
   // Wrapped round the pole, so its middle went back with the face and its ends flare forward past the wings.
   k.compound('crashed_hatchback_front_bumper', 7,
              w.plate('bar', 'x', [-s.side, s.side], [0.1, 0.6],
@@ -135,23 +135,23 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
                      y >= low && y < low + 0.17,
                    function(z, y) if w.fbm(z, y, 64) > 0.64 then 'bare' else 'trim',
                    thick=0.09375),
-             paintFinish),
+             paintFinish) + { title: 'Crashed hatchback front bumper' },
   k.compound('crashed_hatchback_flat_wheel', 16, [
     prism('tyre', 'tyre', [[-0.2, -s.axleY], [0.2, -s.axleY], [0.33, -0.14], [0.33, 0.06], [0.22, 0.22], [0.08, 0.3], [-0.08, 0.3], [-0.22, 0.22], [-0.33, 0.06], [-0.33, -0.14]], [-0.105, 0.105]),
     prism('bulge', 'tyre', [[-0.26, -s.axleY], [0.26, -s.axleY], [0.31, -0.16], [-0.31, -0.16]], [-0.13, 0.13]),
     k.turned('rim', 'rim', 'z', k.disc(0.2, -0.0625, 0.12)) + { sides: 24 },
     k.turned('hub', 'dark', 'z', k.disc(0.07, 0.12, 0.14)) + { sides: 12 },
-  ], { tyre: 'rubber-black', rim: 'steel-grey', dark: 'steel-spall-black' }),
+  ], { tyre: 'rubber-black', rim: 'steel-grey', dark: 'steel-spall-black' }) + { title: 'Crashed hatchback wheel (flat)' },
   k.compound('crashed_hatchback_front_seat', 14, [
     box('cushion', 'seat', [-0.24, 0.06, -0.24], [0.26, 0.2, 0.24]),
     box('rails', 'trim', [-0.26, 0, -0.2], [0.26, 0.06, 0.2]),
     w.bar('back', 'seat', [-0.24, 0.16], [-0.36, 0.7], 0.12, [-0.24, 0.24]),
     box('head', 'seat', [-0.42, 0.74, -0.12], [-0.32, 0.88, 0.12]),
-  ], { seat: 'cloth-seat', trim: 'plastic-black' }),
+  ], { seat: 'cloth-seat', trim: 'plastic-black' }) + { title: 'Crashed hatchback front seat' },
   k.compound('crashed_hatchback_rear_bench', 16, [
     box('cushion', 'seat', [-0.28, 0, -0.66], [0.26, 0.2, 0.66]),
     w.bar('back', 'seat', [-0.26, 0.16], [-0.38, 0.62], 0.12, [-0.66, 0.66]),
-  ], { seat: 'cloth-seat' }),
+  ], { seat: 'cloth-seat' }) + { title: 'Crashed hatchback rear bench' },
   // Driven back into the cabin with the engine behind it, so the column rakes high and close to the seat.
   k.compound('crashed_hatchback_dash', 16, [
     box('lower', 'trim', [s.cowl - 0.2, 0.42, -s.skin + 0.05], [s.cowl, s.waist - 0.17, s.skin - 0.05]),
@@ -160,9 +160,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
     w.bar('column', 'steel', [s.cowl - 0.3, s.waist - 0.12], [s.cowl - 0.56, s.waist + 0.08], 0.05, [-0.39, -0.33]),
     k.turned('ring', 'trim', 'x', k.annulus(0.14, 0.17, -0.0156, 0.0156), [s.cowl - 0.57, s.waist + 0.08, -0.36]) + { sides: 16 },
     box('spoke', 'trim', [s.cowl - 0.586, s.waist + 0.06, -0.51], [s.cowl - 0.554, s.waist + 0.1, -0.21]),
-  ], { trim: 'plastic-black', steel: 'steel-grey' }),
+  ], { trim: 'plastic-black', steel: 'steel-grey' }) + { title: 'Crashed hatchback dash' },
   k.compound('crashed_hatchback_engine', 150, [
     box('block', 'block', [-0.25, 0.08, -0.32], [0.25, 0.42, 0.26]),
     box('head', 'block', [-0.22, 0.42, -0.26], [0.22, 0.54, 0.2]),
-  ], { block: 'iron-cast' }),
+  ], { block: 'iron-cast' }) + { title: 'Crashed hatchback engine' },
 ])

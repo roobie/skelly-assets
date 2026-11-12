@@ -35,7 +35,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     for c in std.range(0, 6)
     for x in [-0.048 + c * 0.016]
     for z in [-0.009 + r * 0.018]
-  ]), { rack: 'plastic-white', box: 'plastic-clear', label: 'paper-white', band: 'plastic-blue', cuvette: 'plastic-clear', grip: 'plastic-frosted' }) + h.label('label', '+z') + {
+  ]), { rack: 'plastic-white', box: 'plastic-clear', label: 'paper-white', band: 'plastic-blue', cuvette: 'plastic-clear', grip: 'plastic-frosted' }) + { title: 'Cuvettes' } + h.label('label', '+z') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
   // A pair of electrodes, a copper plate and a steel plate 30 by 60 mm, held 20 mm apart in a black bar, with
@@ -53,13 +53,13 @@ local clamp(id, slot, x, z, s, y=0) = [
   + [
     h.box('bite-a', 'jaw', [0.11 - 0.05, 0.002, -0.034], [0.11 - 0.035, 0.008, -0.026]),
     h.box('bite-b', 'jaw', [0.11 - 0.05, 0.002, 0.026], [0.11 - 0.035, 0.008, 0.034]),
-  ], { bar: 'plastic-black', anode: 'copper', cathode: 'steel-stainless', post: 'brass', 'lead-red': 'plastic-red', 'lead-black': 'plastic-black', 'clamp-red': 'plastic-red', 'clamp-black': 'plastic-black', jaw: 'copper' }) + {
+  ], { bar: 'plastic-black', anode: 'copper', cathode: 'steel-stainless', post: 'brass', 'lead-red': 'plastic-red', 'lead-black': 'plastic-black', 'clamp-red': 'plastic-red', 'clamp-black': 'plastic-black', jaw: 'copper' }) + { title: 'Electrolysis kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
   // An equilateral glass prism 30 mm on a side and 50 mm long, lying on one face.
   h.compound('glass_prism', 0.049, [
     h.prism('prism', 'glass', 'x', [[0, -0.015], [0, 0.015], [0.026, 0]], -0.025, 0.025),
-  ], { glass: 'glass-clear' }) + {
+  ], { glass: 'glass-clear' }) + { title: 'Glass prism' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['modern'] } } },
   // A heavy desk thermometer of solid glass: a column 150 mm tall and 40 by 24 mm on a 70 mm foot, a mercury
@@ -74,13 +74,13 @@ local clamp(id, slot, x, z, s, y=0) = [
   ] + [
     h.box('tick-%d' % k, 'tick', [-0.01, 0.04 + k * 0.01, 0.0125], [if k % 2 == 0 then -0.003 else -0.005, 0.0412 + k * 0.01, 0.0135])
     for k in std.range(0, 9)
-  ], { glass: 'glass-clear', scale: 'paper-white', mercury: 'metal-silver', tick: 'plastic-black' }) + {
+  ], { glass: 'glass-clear', scale: 'paper-white', mercury: 'metal-silver', tick: 'plastic-black' }) + { title: 'Glass thermometer' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['glass'], setting: ['modern'] } } },
   // A plain glass tube 100 mm long and 12 mm across, open at both ends, lying along x.
   h.compound('small_glass_tube', 0.005, [
     h.tube('tube', 'glass', 0.0035, 0.006, -0.05, 0.05, 0.006),
-  ], { glass: 'glass-clear' }) + {
+  ], { glass: 'glass-clear' }) + { title: 'Small glass tube' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['glass'], place: ['laboratory'], setting: ['modern'] } } },
   // A dial hygrometer 46 mm across and 14 mm deep in a white case, standing on a small foot with its dial to
@@ -98,7 +98,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     local a = std.pi * (0.85 - 0.7 * k / 8);
     h.box('tick-%d' % k, 'needle', [0.017 * std.cos(a) - 0.0008, 0.027 + 0.017 * std.sin(a) - 0.0008, 0.007], [0.017 * std.cos(a) + 0.0008, 0.027 + 0.017 * std.sin(a) + 0.0008, 0.0078])
     for k in std.range(0, 8)
-  ], { case: 'plastic-blue', face: 'paper-white', needle: 'plastic-black', 'band-dry': 'plastic-orange', 'band-ok': 'plastic-green', 'band-wet': 'plastic-blue' }) + {
+  ], { case: 'plastic-blue', face: 'paper-white', needle: 'plastic-black', 'band-dry': 'plastic-orange', 'band-ok': 'plastic-green', 'band-wet': 'plastic-blue' }) + { title: 'Hygrometer' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A handheld light meter 140 by 66 mm and 28 mm deep lying face up: a yellow body, a dark face with a
@@ -112,7 +112,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   ] + [
     h.box('button-%d' % k, 'button', [-0.05 + (k % 2) * 0.022, 0.026, -0.016 + std.floor(k / 2) * 0.02], [-0.036 + (k % 2) * 0.022, 0.029, -0.008 + std.floor(k / 2) * 0.02])
     for k in std.range(0, 3)
-  ], { body: 'plastic-yellow', face: 'plastic-charcoal', screen: 'lcd-green', sensor: 'plastic-frosted', button: 'plastic-black' }) + {
+  ], { body: 'plastic-yellow', face: 'plastic-charcoal', screen: 'lcd-green', sensor: 'plastic-frosted', button: 'plastic-black' }) + { title: 'Lux meter' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A round card box of filter paper discs 125 mm across: the base 22 mm deep filled with white discs, the lid
@@ -124,7 +124,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     h.turned('band', 'band', 'y', [[0, 0.064], [0, 0.0645], [0.008, 0.0645], [0.008, 0.064], [0, 0.064]], [0.066, 0.002, 0]),
     h.disc('label', 'label', 0.035, 0.012, 0.0125, 0.066, 0),
     h.box('label-stripe', 'band', [0.04, 0.0125, -0.005], [0.092, 0.013, 0.005]),
-  ], { box: 'paperboard-tan', paper: 'paper-white', band: 'plastic-red', label: 'paper-white' }) + {
+  ], { box: 'paperboard-tan', paper: 'paper-white', band: 'plastic-red', label: 'paper-white' }) + { title: 'Coarse filter paper' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'containers', keywords: ['water-purification'], tags: { material: ['paper'], place: ['laboratory'], setting: ['modern'] } } },
   // A wall hygroscope on a flat walnut board 120 mm wide, 400 mm tall and 20 mm deep, front on +z: a round
@@ -153,7 +153,7 @@ local clamp(id, slot, x, z, s, y=0) = [
   ] + [
     h.box('coil-%d' % k, 'spring', [-0.008, 0.048 + 0.0085 * k, 0.0125], [0.008, 0.052 + 0.0085 * k, 0.017])
     for k in std.range(0, 4)
-  ], { case: 'wood-walnut', brass: 'brass', dial: 'paper-white', needle: 'plastic-black', back: 'paint-cream', hair: 'plastic-black', spring: 'steel-blued' }) + {
+  ], { case: 'wood-walnut', brass: 'brass', dial: 'paper-white', needle: 'plastic-black', back: 'paint-cream', hair: 'plastic-black', spring: 'steel-blued' }) + { title: 'Hygroscope' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'glass'] } } },
   // A glass pyrolysis lamp 460 mm long: a 25 mm pipe with ground joints at both ends and a 100 mm bulb in the
@@ -179,7 +179,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     h.prism('cradle-%d' % i, 'socket', 'x', [[0, -0.03], [0, 0.03], [0.05, 0.018], [0.05, -0.018]], x - 0.01, x + 0.01)
     for i in std.range(0, 1)
     for x in [[-0.15, 0.15][i]]
-  ], { glass: 'glass-clear', joint: 'plastic-frosted', coil: 'copper', socket: 'plastic-white', cable: 'plastic-black', pin: 'brass' }) + {
+  ], { glass: 'glass-clear', joint: 'plastic-frosted', coil: 'copper', socket: 'plastic-white', cable: 'plastic-black', pin: 'brass' }) + { title: 'Ketene lamp' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
   // A tabletop Stirling engine 220 by 120 mm and 150 mm tall on a steel base: a horizontal glass displacer
@@ -213,7 +213,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     local a = std.pi * k / 3;
     h.box('spoke-out-%d' % k, 'wheel', [0.075 + 0.04 * std.cos(a) - 0.004, 0.1 + 0.04 * std.sin(a) - 0.004, 0.031], [0.075 + 0.04 * std.cos(a) + 0.004, 0.1 + 0.04 * std.sin(a) + 0.004, 0.036])
     for k in std.range(0, 5)
-  ], { base: 'paint-charcoal', frame: 'steel-stainless', glass: 'glass-clear', displacer: 'steel-grey', burner: 'glass-clear', wick: 'cord-cotton', brass: 'brass', wheel: 'brass-polished' }) + {
+  ], { base: 'paint-charcoal', frame: 'steel-stainless', glass: 'glass-clear', displacer: 'steel-grey', burner: 'glass-clear', wick: 'cord-cotton', brass: 'brass', wheel: 'brass-polished' }) + { title: 'Stirling engine kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
   // A STEM building case 240 by 150 mm and 50 mm deep, open with its lid hinged up behind: six compartments of
@@ -288,7 +288,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     hub: 'plastic-white',
     print: 'paint-police-blue',
     'print-line': 'paper-white',
-  }) + {
+  }) + { title: 'Makerspace kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A grey storage tub 280 by 190 mm and 80 mm tall with an orange-latched lid, and on it a small two-wheeled
@@ -332,7 +332,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     hub: 'plastic-grey',
     eye: 'steel-stainless',
     wire: 'plastic-black',
-  }) + {
+  }) + { title: 'Robotics kit' } + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A makeshift water electrolyser 1 m tall: a bolted steel tank 600 by 360 mm and 400 mm deep on an angle-iron
@@ -400,7 +400,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     column: 'plastic-clear',
     water: 'water',
     hose: 'plastic-clear-blue',
-  }) + {
+  }) + { title: 'Makeshift electrolyser' } + {
     voxelGrain: 0.008,
   } + { taxonomy: { category: 'machinery', keywords: ['improvised'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A lab cracking reactor taken down and strapped to a 1.2 by 1.0 m pallet: the main reactor column in a
@@ -456,7 +456,7 @@ local clamp(id, slot, x, z, s, y=0) = [
     door: 'paint-cream',
     screen: 'screen-black',
     tag: 'paint-red',
-  }) + {
+  }) + { title: 'Catalytic cracking reactor' } + {
     voxelGrain: 0.02,
   } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

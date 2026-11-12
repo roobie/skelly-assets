@@ -155,15 +155,15 @@ local boots = fit.feet('sabaton_plate', sabaton,
                        { l: 0.35, w: 0.13, s: 0.04, toe: 0.075, instep: 0.115, top: 0.28, shaft: 0.15, laces: 0 }).rows;
 
 armour.of('medieval', [
-  row('armor_plate_worn_body', body),
-  row('armor_plate_worn_upper', upper, 0.008),
-  row('armor_plate_worn_fore', fore),
-  row('legguard_plate_worn_thigh', thigh),
-  row('legguard_plate_worn_shin', shin),
+  row('armor_plate_worn_body', body) + { title: 'Plate body armour' },
+  row('armor_plate_worn_upper', upper, 0.008) + { title: 'Plate upper arm armour' },
+  row('armor_plate_worn_fore', fore) + { title: 'Plate forearm armour' },
+  row('legguard_plate_worn_thigh', thigh) + { title: 'Plate thigh guard' },
+  row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard' },
 ] + [
   local seg = std.split(r.id, '_worn_')[1];
   if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r
   for r in gloves + boots
 ] + [
-  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { voxelGrain: 0.006 },
+  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { title: 'Plate armet' } + { voxelGrain: 0.006 },
 ])

@@ -83,7 +83,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
 [
   // A survivor-forged mild steel ESAPI plate, 300 mm long and 240 mm across with a shooter's cut, bent round a 350 mm
   // radius, its edges bound in nylon and two nylon straps buckled across it.
-  h.compound('mild_steel_front_plate', 2.2, forgedEsapi, { plate: 'steel-grey', edge: 'cloth-olive-drab', buckle: 'plastic-matte-black' }) + h.headEndOnPlusX
+  h.compound('mild_steel_front_plate', 2.2, forgedEsapi, { plate: 'steel-grey', edge: 'cloth-olive-drab', buckle: 'plastic-matte-black' }) + { title: 'Mild steel front plate' } + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A scrap steel ESAPI plate, 300 mm long and 240 mm across, bent in three creases, its corners hacked off and its
@@ -98,7 +98,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
     + [
       box('edge-a', 'rag', [-0.15, 0, -w / 2 - 0.006], [0.12, 0.01, -w / 2 + 0.008]),
       box('edge-b', 'rag-dark', [-0.15, 0, w / 2 - 0.008], [0.12, 0.01, w / 2 + 0.006]),
-    ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' }) + h.headEndOnPlusX
+    ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' }) + { title: 'Scrap front plate' } + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A survivor-forged mild steel ESBI side plate: a hexagon 200 mm long and 150 mm across, 6 mm thick, on a nylon pad
@@ -108,7 +108,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
     hexPlate('plate', 'plate', 0.2, 0.15, 0.005, 0.011),
     box('strap', 'pad', [-0.015, 0.011, -0.082], [0.015, 0.014, 0.082]),
     box('buckle', 'buckle', [-0.018, 0.014, 0.03], [0.018, 0.02, 0.05]),
-  ], { plate: 'steel-grey', pad: 'cloth-olive-drab', buckle: 'plastic-matte-black' })
+  ], { plate: 'steel-grey', pad: 'cloth-olive-drab', buckle: 'plastic-matte-black' }) + { title: 'Mild steel side plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A scrap steel ESBI side plate: a rusted hexagon 200 mm long, 150 mm across and 3 mm thick, rag wrapped at both
@@ -118,7 +118,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
     + [
       box('wrap-%d' % i, if i % 2 == 0 then 'rag' else 'rag-dark', [[-0.075, -0.015, 0.045][i], 0, [-0.05, -0.079, -0.05][i]], [[-0.045, 0.015, 0.075][i], 0.01, [0.05, 0.079, 0.05][i]])
       for i in [0, 1, 2]
-    ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' })
+    ], { plate: 'scrap-rusted', rag: 'cloth-rag', 'rag-dark': 'cloth-rag-shadow' }) + { title: 'Scrap side plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['torso'] } } },
 
   // A commercial hard steel plate, 300 mm long and 250 mm across with a shooter's cut, bent round a 300 mm radius,
@@ -128,7 +128,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
     curvedPlate('plate', function(i) if i == 0 || i == n - 1 then 'edge' else 'plate', w, r, t, -0.15, 0.15, cut, n)
     + plateBand('guard-tail', 'edge', w, r, t, -0.15, -0.14, 0.003, n)
     + plateBand('guard-head', 'edge', w, r, t, 0.14, 0.15, 0.003, n, cut=cut, plateX1=0.15),
-    { plate: 'steel-parkerized', edge: 'rubber-black' }) + h.headEndOnPlusX
+    { plate: 'steel-parkerized', edge: 'rubber-black' }) + { title: 'Steel ballistic plate' } + h.headEndOnPlusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'rubber'], setting: ['modern'], slot: ['torso'] } } },
   // A soft stab panel: a rounded black nylon slab 160 mm long, 120 mm across and 14 mm thick, stepped in at its seam,
   // with a white care label in one corner.
@@ -136,14 +136,14 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
     h.prism('panel', 'cover', 'y', [[-0.06, -0.064], [-0.044, -0.08], [0.044, -0.08], [0.06, -0.064], [0.06, 0.064], [0.044, 0.08], [-0.044, 0.08], [-0.06, 0.064]], 0, 0.01),
     h.prism('top', 'cover', 'y', [[-0.054, -0.06], [-0.04, -0.074], [0.04, -0.074], [0.054, -0.06], [0.054, 0.06], [0.04, 0.074], [-0.04, 0.074], [-0.054, 0.06]], 0.01, 0.014),
     box('label', 'label', [0.04, 0.014, 0.024], [0.064, 0.016, 0.046]),
-  ], { cover: 'cloth-black', label: 'cloth-white' })
+  ], { cover: 'cloth-black', label: 'cloth-white' }) + { title: 'Stab plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A soft armour vest laid flat, front up: a navy carrier 480 mm across and 560 mm from shoulder to hem, 30 mm thick
   // with its aramid panels, black elastic side straps and a flapped pocket on the front for a trauma or stab insert.
   h.compound('soft_armour_vest', 1.6,
     flatVest(0.03) + flatPocket('insert', -0.09, 0.09, 0.02, 0.22, 0.03, 0.006, 0.035),
-    { shell: 'cloth-navy', strap: 'webbing-black', tab: 'plastic-charcoal', pocket: 'cloth-navy', flap: 'webbing-black', stud: 'plastic-matte-black' })
+    { shell: 'cloth-navy', strap: 'webbing-black', tab: 'plastic-charcoal', pocket: 'cloth-navy', flap: 'webbing-black', stud: 'plastic-matte-black' }) + { title: 'Soft armour vest' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A hard armour vest laid flat, front up: an olive drab carrier 480 mm across and 560 mm from shoulder to hem,
@@ -158,7 +158,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       box('buckle-l', 'stud', [-0.3, 0.009, 0.09], [-0.27, 0.016, 0.13]),
       box('buckle-r', 'stud', [0.27, 0.009, 0.09], [0.3, 0.016, 0.13]),
     ],
-    { shell: 'cloth-olive-drab', strap: 'webbing-olive-dark', tab: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', pad: 'webbing-olive-dark', stud: 'plastic-matte-black' })
+    { shell: 'cloth-olive-drab', strap: 'webbing-olive-dark', tab: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', pad: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { title: 'Hard armour vest' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A pair of ballistic shoulder protectors laid side by side: each a padded nylon shield 200 mm long, 170 mm across
@@ -175,7 +175,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       disc('snap-b-%d' % s, 'stud', 0.006, 0.022, 0.026, -0.075, z + 0.04),
     ]
     for s in [-1, 1]
-  ]), { pad: 'nylon-coyote', seam: 'webbing-olive-dark', tab: 'webbing-olive-dark', hook: 'plastic-charcoal', stud: 'plastic-matte-black' }) + h.headEndOnMinusX
+  ]), { pad: 'nylon-coyote', seam: 'webbing-olive-dark', tab: 'webbing-olive-dark', hook: 'plastic-charcoal', stud: 'plastic-matte-black' }) + { title: 'Ballistic shoulder protectors' } + h.headEndOnMinusX
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // An EOD jacket folded: a stiff olive drab bundle 440 mm across, 380 mm deep and 110 mm tall in four stepped
@@ -201,7 +201,7 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       for i in std.range(1, 3)
       for s in [-1, 1]
     ],
-    { cloth: 'cloth-olive-drab', collar: 'cloth-olive-drab', sleeve: 'cloth-olive-drab', stitch: 'webbing-black', cuff: 'webbing-olive-dark', seam: 'webbing-black', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' })
+    { cloth: 'cloth-olive-drab', collar: 'cloth-olive-drab', sleeve: 'cloth-olive-drab', stitch: 'webbing-black', cuff: 'webbing-olive-dark', seam: 'webbing-black', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { title: 'Bomb disposal jacket' }
   + h.headEndOnPlusZ + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A tactical EOD jacket folded: a coyote bundle 420 mm across, 360 mm deep and 100 mm tall with a black zip down
@@ -215,6 +215,6 @@ local flatPocket(id, x0, x1, z0, z1, y, t, flapDepth) = [
       box('zip', 'zip', [-0.008, top, -0.17], [0.008, top + 0.004, 0.18]),
       h.turned('collar', 'cloth', 'x', [[0, 0], [0, 0.022], [0.38, 0.022], [0.38, 0]], [-0.19, top + 0.004, -0.158]),
     ],
-    { cloth: 'nylon-coyote', pocket: 'nylon-coyote', flap: 'webbing-olive-dark', stud: 'plastic-matte-black', zip: 'plastic-matte-black' })
+    { cloth: 'nylon-coyote', pocket: 'nylon-coyote', flap: 'webbing-olive-dark', stud: 'plastic-matte-black', zip: 'plastic-matte-black' }) + { title: 'Light bomb disposal jacket' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 ]

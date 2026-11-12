@@ -87,16 +87,16 @@ local potHelm(id, mass, r, ht, finishes) =
     h.crescent('scale-%d' % i, 'fitting', 0.104, 0.118, a0, a1, 1, 0.012, 0.018)[0]
     for i in std.range(0, 18)
   ],
-             { leather: 'leather-black', fitting: 'brass-polished' })
+             { leather: 'leather-black', fitting: 'brass-polished' }) + { title: 'Pickelhaube' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'metal'], slot: ['head'] } } },
 
   // A soup pot helmet, an iron pot 200 mm across and 130 mm deep upside down on its rim, with a strap through the
   // side handles.
-  potHelm('pot_helmet', 2.6, 0.1, 0.13, { pot: 'iron-cast', rim: 'iron-cast', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
+  potHelm('pot_helmet', 2.6, 0.1, 0.13, { pot: 'iron-cast', rim: 'iron-cast', handle: 'steel-grey', strap: 'leather-brown' }) + { title: 'Pot helmet' } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A canning pot helmet, a blue enamelled steel canner 330 mm across and 260 mm deep upside down on its rim, with a
   // strap through the side handles.
-  potHelm('canning_pot_helmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
+  potHelm('canning_pot_helmet', 2, 0.165, 0.26, { pot: 'paint-drum-blue', rim: 'steel-grey', handle: 'steel-grey', strap: 'leather-brown' }) + { title: 'Canning pot helmet' } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A stock pot great helm, an aluminium stock pot 260 mm across and 290 mm deep upside down on its rim, front on +z:
   // a T cut through the front wall for the eyes, nose and mouth with the stuffed blanket showing through it and
@@ -127,7 +127,7 @@ local potHelm(id, mass, r, ht, finishes) =
     ]
     for s in [-1, 1]
   ]),
-             { pot: 'alu-bare', cut: 'cloth-charcoal', blanket: 'wool-grey', handle: 'steel-grey', cord: 'cord-cotton' })
+             { pot: 'alu-bare', cut: 'cloth-charcoal', blanket: 'wool-grey', handle: 'steel-grey', cord: 'cord-cotton' }) + { title: 'Stockpot helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A tactical full helmet standing on its neck guard, front on +z, 270 mm across and 310 mm tall: a matte black
@@ -160,6 +160,6 @@ local potHelm(id, mass, r, ht, finishes) =
   + wrapBand('rail-r', 'rail', 0.132, 0.008, -132, -84, 8, flatAt(0.16), flatAt(0.18))
   // The neck guard flaring out at the back.
   + h.crescent('neck', 'shell', 0.1, 0.136, 105, 255, 12, 0, 0.03),
-             { shell: 'plastic-charcoal', rail: 'plastic-matte-black', visor: 'lens-smoke', vent: 'plastic-matte-black' })
+             { shell: 'plastic-charcoal', rail: 'plastic-matte-black', visor: 'lens-smoke', vent: 'plastic-matte-black' }) + { title: 'Tactical full helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 ]

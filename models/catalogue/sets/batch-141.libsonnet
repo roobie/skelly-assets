@@ -79,7 +79,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
   ] + [
     arcPanel('stone-%d' % i, 'gem', R, R + 0.002, a(i) - 3.5 * deg, a(i) + 3.5 * deg, 0.004, 0.008, 0, cz)
     for i in std.range(0, 5)
-  ], jewel)
+  ], jewel) + { title: 'Dental grill' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'glass'] } } },
 
   // A rigid bangle 66 mm across and 6 mm deep lying flat, ten small stones set round its top face.
@@ -88,7 +88,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
   ] + [
     stone('stone-%d' % i, 'gem', 0.0025, 0.003, 0.031 * std.sin(i * 36 * deg), 0.006, 0.031 * std.cos(i * 36 * deg))
     for i in std.range(0, 9)
-  ], jewel)
+  ], jewel) + { title: 'Gem bracelet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['arms'] } } },
 
   // A pair of small hoop earrings lying flat side by side, each a 16 mm hoop with a 7 mm stone hanging from it.
@@ -101,7 +101,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     ]
     for i in [0, 1]
     for x in [[-0.012, 0.012][i]]
-  ]), jewel)
+  ]), jewel) + { title: 'Gem earrings' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['head'] } } },
 
   // A 450 mm chain necklace laid in a ring 140 mm across, an 18 mm stone pendant on a bail at its front.
@@ -110,7 +110,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('bail', 'metal', [-0.0015, 0, 0.069], [0.0015, 0.003, 0.075]),
     disc('setting', 'metal', 0.009, 0, 0.003, 0, 0.083),
     stone('stone', 'gem', 0.007, 0.004, 0, 0.003, 0.083),
-  ], jewel)
+  ], jewel) + { title: 'Gem pendant necklace' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['neck'] } } },
 
   // A finger ring 21 mm across and 4 mm wide standing on its edge, a 7 mm stone in a cup setting on top.
@@ -118,7 +118,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     turned('band', 'metal', 'z', [[0, 0.0085], [0, 0.0105], [0.004, 0.0105], [0.004, 0.0085], [0, 0.0085]], [0, 0.0105, -0.002]),
     disc('setting', 'metal', 0.004, 0.0195, 0.023),
     stone('stone', 'gem', 0.0035, 0.004, 0, 0.023, 0),
-  ], jewel)
+  ], jewel) + { title: 'Gem ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['hands'] } } },
 
   // A tiara standing upright with its front on +z: a band 150 mm across curved round the back of the head, rising
@@ -139,7 +139,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     local t = (-60 + i * 15) * deg;
     arcPanel('chip-%d' % i, 'gem', R, R + 0.002, t - 1.5 * deg, t + 1.5 * deg, 0.005, 0.008)
     for i in std.range(0, 8)
-  ], jewel)
+  ], jewel) + { title: 'Gem tiara' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['head'] } } },
 
   // A costume halo: a white plastic headband 150 mm across standing on its tips, two wires rising from it to a
@@ -157,7 +157,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     for x in [[-0.064, 0.064][i]]
   ] + [
     turned('halo', 'halo', 'y', [[0.006 - 0.006 * std.cos(t * 30 * deg), 0.069 + 0.006 * std.sin(t * 30 * deg)] for t in std.range(0, 12)], [0, 0.139, 0]),
-  ], { band: 'plastic-white', wire: 'metal-silver', halo: 'metal-gold' })
+  ], { band: 'plastic-white', wire: 'metal-silver', halo: 'metal-gold' }) + { title: 'Angel halo headband' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic', 'metal'], slot: ['head'] } } },
 
   // A pair of costume wings laid flat, back up, 760 mm from tip to tip and 500 mm deep: layered white feathers on a
@@ -166,7 +166,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('plate', 'strap', [-0.04, 0, -0.12], [0.04, 0.016, 0.02]),
     box('loop-l', 'strap', [-0.035, 0.016, -0.11], [-0.02, 0.022, 0.01]),
     box('loop-r', 'strap', [0.02, 0.016, -0.11], [0.035, 0.022, 0.01]),
-  ], { down: 'fur-pale', feather: 'feather-white', covert: 'feather-white', strap: 'cloth-bright-white' })
+  ], { down: 'fur-pale', feather: 'feather-white', covert: 'feather-white', strap: 'cloth-bright-white' }) + { title: 'Angel wings' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['back'] } } },
 
   // A six-pointed deputy's star 64 mm across, ball-tipped, with a raised round seal and a ring of lettering, lying
@@ -180,7 +180,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     disc('tip-%d' % k, 'metal', 0.0035, 0.002, 0.005, t[0], t[1])
     for k in std.range(0, 5)
     for t in [starTips(6, 0.031)[k]]
-  ], { metal: 'steel-grey', ink: 'plastic-black', pin: 'steel-bright' })
+  ], { metal: 'steel-grey', ink: 'plastic-black', pin: 'steel-bright' }) + { title: 'Deputy badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['metal'], slot: ['torso'] } } },
 
   // A detective's gold shield 60 mm wide and 70 mm tall lying face up, its crown toward -z, clipped in a black leather
@@ -196,7 +196,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('plate', 'rim', [-0.012, 0.007, 0.017], [0.012, 0.009, 0.024]),
     box('pin', 'pin', [-0.012, 0, -0.001], [0.012, 0.002, 0.001]),
   ] + letters('word', 'ink', [0.030], [-0.019], 0.008) + letters('number', 'ink', [0.016], [0.0205], 0.009),
-  { leather: 'leather-black', rim: 'brass-polished', metal: 'metal-gold', enamel: 'plastic-blue', ink: 'bronze', pin: 'steel-bright' })
+  { leather: 'leather-black', rim: 'brass-polished', metal: 'metal-gold', enamel: 'plastic-blue', ink: 'bronze', pin: 'steel-bright' }) + { title: 'Detective badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A plastic name tag 76 by 25 mm lying face up: a blue band over a white face with two lines of print, a clip
@@ -206,7 +206,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('band', 'band', [-0.038, 0.004, -0.0125], [0.038, 0.005, -0.005]),
     box('clip', 'clip', [-0.010, 0, -0.010], [0.010, 0.002, 0.008]),
   ] + letters('name', 'ink', [0.050, 0.034], [0.0, 0.007], 0.004, 0.003),
-  { face: 'plastic-white', band: 'plastic-blue', clip: 'steel-bright', ink: 'plastic-black' })
+  { face: 'plastic-white', band: 'plastic-blue', clip: 'steel-bright', ink: 'plastic-black' }) + { title: 'Doctor\'s name tag' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'] } } },
 
   // A federal agent's gold shield 56 by 70 mm lying face up, an eagle with spread wings on its crown toward -z and
@@ -223,7 +223,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('scales', 'metal', [-0.006, 0.006, -0.004], [0.006, 0.007, -0.002]),
     box('pin', 'pin', [-0.012, 0, -0.001], [0.012, 0.002, 0.001]),
   ] + letters('word', 'ink', [0.034, 0.024], [-0.022, 0.024], 0.004),
-  { metal: 'metal-gold', seal: 'brass-dull', ink: 'plastic-matte-black', pin: 'steel-bright' })
+  { metal: 'metal-gold', seal: 'brass-dull', ink: 'plastic-matte-black', pin: 'steel-bright' }) + { title: 'Federal agent badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A plastic star badge 70 mm across lying face up, five points, a red band of print across it, a pin behind.
@@ -232,7 +232,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('band', 'band', [-0.020, 0.005, -0.004], [0.020, 0.006, 0.006]),
     box('pin', 'pin', [-0.012, 0, -0.001], [0.012, 0.002, 0.001]),
   ] + letters('word', 'ink', [0.030], [0.001], 0.006),
-  { star: 'plastic-yellow', band: 'plastic-red', ink: 'plastic-white', pin: 'steel-bright' })
+  { star: 'plastic-yellow', band: 'plastic-red', ink: 'plastic-white', pin: 'steel-bright' }) + { title: 'Kids\' star badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['plastic'], setting: ['modern'], slot: ['torso'] } } },
 
   // A marshal's five-pointed star inside a ring, 62 mm across, all bright silver, lying face up with a pin behind:
@@ -247,7 +247,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     arcPanel('letter-%d-%d' % [k, j], 'engraving', 0.0265, 0.0285, a - 2 * deg, a + 2 * deg, 0.004, 0.0045)
     for k in std.range(0, 4)
     for j in std.range(0, 4)
-  ], { metal: 'metal-silver', seal: 'mirror-silver', engraving: 'steel-grey', pin: 'steel-bright' })
+  ], { metal: 'metal-silver', seal: 'mirror-silver', engraving: 'steel-grey', pin: 'steel-bright' }) + { title: 'Marshal badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['metal'], slot: ['torso'] } } },
 
   // A tactical team's shield 60 by 70 mm lying face up, crown toward -z: a bright silver rim round a blackened
@@ -266,6 +266,6 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     box('letter-%d' % i, 'ink', [-0.017 + i * 0.009, 0.007, 0.009], [-0.011 + i * 0.009, 0.008, 0.013])
     for i in std.range(0, 3)
   ],
-  { metal: 'metal-silver', field: 'steel-parkerized', emblem: 'metal-gold', ink: 'plastic-black', pin: 'steel-bright' })
+  { metal: 'metal-silver', field: 'steel-parkerized', emblem: 'metal-gold', ink: 'plastic-black', pin: 'steel-bright' }) + { title: 'SWAT badge' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['police'], tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 ]

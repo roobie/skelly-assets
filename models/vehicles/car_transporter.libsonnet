@@ -4,6 +4,7 @@ local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local s = import 'car_transporter.spec.libsonnet';
+local vehicle = import 'car_transporter.placements.libsonnet';
 local finish = { paint: s.paint, deck: 'alu-bare', frame: 'paint-charcoal', steel: 'steel-galvanised', dark: 'plastic-black', reflect: 'reflective-yellow' };
 local thick = s.upperTop - s.upperBottom;
 local trackIn = 0.48;
@@ -14,20 +15,20 @@ local slope(id, a, b, z) = prism(id, 'deck', [[a[0], a[1] - thick], [b[0], b[1] 
 local slopeTail(id, a, b, z) = prism(id, 'deck', [[b[0], b[1] - thick], [a[0], a[1] - thick], [a[0], a[1]], [b[0], b[1]]], z);
 local headAt(f) = [s.upperFront + f * (s.headTip[0] - s.upperFront), s.upperTop + f * (s.headTip[1] - s.upperTop)];
 local tailAt(f) = [s.upperRear + f * (s.tailTip[0] - s.upperRear), s.upperTop + f * (s.tailTip[1] - s.upperTop)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', vehicle.title, s) + [
   k.compound('car_transporter_lower_deck', 2000, [
     box('plate', 'deck', [s.rear, s.lowerBottom, -s.deckSide], [s.lowerFront, s.lowerTop, s.deckSide]),
     box('cross_rear', 'frame', [-5.4, s.railTop, -0.46], [-5.2, s.lowerBottom, 0.46]),
   ] + k.bothSides([
     box('runner', 'frame', [s.rear + 0.1, s.railTop, 0.3], [s.lowerFront, s.lowerBottom, 0.44]),
-  ]), finish),
+  ]), finish) + { title: 'Car transporter lower deck' },
   // Bars stay below the wheel tracks, because the cargo face is this part's highest point.
   k.compound('car_transporter_upper_deck', 1800, k.bothSides([
     box('track', 'deck', [s.upperRear, s.upperBottom, trackIn], [s.upperFront, s.upperTop, s.deckSide]),
   ]) + [
     box('cross_' + i, 'frame', [crossXs[i] - 0.05, s.upperBottom - 0.06, -s.deckSide], [crossXs[i] + 0.05, s.upperBottom + 0.03, s.deckSide])
     for i in std.range(0, std.length(crossXs) - 1)
-  ], finish),
+  ], finish) + { title: 'Car transporter upper deck' },
   k.compound('car_transporter_head_rack', 170, [
     slope('track_near', [s.upperFront, s.upperTop], s.headTip, [trackIn, s.deckSide]),
     slope('track_far', [s.upperFront, s.upperTop], s.headTip, [-s.deckSide, -trackIn]),
@@ -38,13 +39,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporte
     for f in [3, 6]
   ] + k.bothSides([
     k.bar('strut', 'frame', [3.4, s.upperBottom], [headAt(0.65)[0], headAt(0.65)[1] - thick], 0.06, [s.postIn, s.deckSide]),
-  ]), finish),
+  ]), finish) + { title: 'Car transporter head rack' },
   k.compound('car_transporter_tail_slope', 130, [
     slopeTail('track_near', [s.upperRear, s.upperTop], s.tailTip, [trackIn, s.deckSide]),
     slopeTail('track_far', [s.upperRear, s.upperTop], s.tailTip, [-s.deckSide, -trackIn]),
     box('root_bar', 'frame', [s.upperRear - 0.16, s.upperBottom - 0.04, -0.5], [s.upperRear + 0.08, s.upperTop - 0.03, 0.5]),
     box('tip_bar', 'frame', [s.tailTip[0], s.tailTip[1] - 0.16, -0.5], [s.tailTip[0] + 0.14, s.tailTip[1] - 0.02, 0.5]),
-  ], finish),
+  ], finish) + { title: 'Car transporter tail slope' },
   k.compound('car_transporter_deck_posts', 1000, k.bothSides(std.flattenArrays([
     [
       box('post_' + i, 'paint', [postXs[i] - 0.07, s.lowerBottom, s.postIn], [postXs[i] + 0.07, s.upperBottom, s.postOut]),
@@ -59,17 +60,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporte
     box('rail_stand_a', 'paint', [-4.28, s.upperBottom, s.deckSide], [-4.16, s.upperTop + 0.1, s.postOut]),
     box('rail_stand_b', 'paint', [3.38, s.upperBottom, s.deckSide], [3.5, s.upperTop + 0.1, s.postOut]),
     box('deck_edge', 'reflect', [s.rear, s.lowerBottom + 0.01, s.deckSide], [s.lowerFront, s.lowerTop - 0.01, s.postOut]),
-  ]), finish),
+  ]), finish) + { title: 'Car transporter deck posts' },
   k.compound('car_transporter_ramp', 60, [
     box('plate', 'steel', [-5.6, s.lowerBottom, 0.55], [-5.5, s.tailTip[1] - 0.1, 1.1]),
     box('rib_in', 'frame', [-5.64, s.lowerBottom, 0.55], [-5.6, s.tailTip[1] - 0.1, 0.62]),
     box('rib_out', 'frame', [-5.64, s.lowerBottom, 1.03], [-5.6, s.tailTip[1] - 0.1, 1.1]),
-  ], finish),
+  ], finish) + { title: 'Car transporter ramp' },
   k.compound('car_transporter_side_guard', 45, k.bothSides([
     box('rail_low', 'frame', [-1.9, 0.68, s.postOut - 0.05], [2.0, 0.76, s.postOut]),
     box('rail_high', 'frame', [-1.9, 0.92, s.postOut - 0.05], [2.0, 1.0, s.postOut]),
     box('hanger_a', 'frame', [-1.82, 0.68, s.postOut - 0.06], [-1.74, s.lowerBottom, s.postOut - 0.02]),
     box('hanger_b', 'frame', [0.0, 0.68, s.postOut - 0.06], [0.08, s.lowerBottom, s.postOut - 0.02]),
     box('hanger_c', 'frame', [1.82, 0.68, s.postOut - 0.06], [1.9, s.lowerBottom, s.postOut - 0.02]),
-  ]), finish),
+  ]), finish) + { title: 'Car transporter side guard' },
 ])

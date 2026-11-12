@@ -62,7 +62,7 @@ local toothLump(p, x, z, k) = [
   ], {
     wood: 'wood-pine', engine: 'plastic-red', metal: 'steel-grey', tank: 'plastic-white', grip: 'plastic-black',
     tape: 'tape-silver', blade: 'steel-bright', cord: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal', 'wood'], weapon: ['trap', 'blade'] } } },
+  }) + { title: 'Blade trap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal', 'wood'], weapon: ['trap', 'blade'] } } },
 
   // A nailboard 65 cm long and 25 cm wide: three pine boards on two battens, with a grid of nails driven up
   // through it so 4 cm of each point stands clear.
@@ -76,7 +76,7 @@ local toothLump(p, x, z, k) = [
     disc('nail' + i + '-' + j, 'nail', 0.002, 0.04, 0.08, -0.25 + i * 0.1, -0.085 + j * 0.084)
     for i in std.range(0, 5)
     for j in [0, 1, 2]
-  ], { batten: 'wood-oak', board: 'wood-pine', nail: 'steel-bright' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', keywords: ['improvised'], tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
+  ], { batten: 'wood-oak', board: 'wood-pine', nail: 'steel-bright' }) + { title: 'Nail board' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', keywords: ['improvised'], tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
 
   // A tin can 75 mm across and 110 mm tall bound with black tape, a nail through its lid for a striker, and a
   // pull string tied to the pin and coiled at its foot.
@@ -91,7 +91,7 @@ local toothLump(p, x, z, k) = [
     box('string-top', 'cord', [-0.0135, 0.145, 0.006], [-0.0105, 0.148, 0.042]),
     coil('string-coil', 'cord', 0.035, 0.003, 0.03, 0.07),
   ], { can: 'steel-galvanised', tape: 'plastic-black', lid: 'steel-grey', nail: 'steel-bright', cord: 'cord-cotton' })
-  + h.inHand('booby_trap', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap', 'explosive'] } } },
+  + { title: 'Booby trap' } + h.inHand('booby_trap', 'can') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap', 'explosive'] } } },
 
   // A roll of bubble wrap 20 cm wide and 40 mm across, its loose end unrolled 9 cm towards +z to show the
   // bubbles.
@@ -105,7 +105,7 @@ local toothLump(p, x, z, k) = [
   ] + [
     turned('roll-bubble' + i, 'bubble', 'x', [[0, 0], [0, 0.0215], [0.007, 0.0215], [0.007, 0]], [-0.095 + i * 0.012, 0.02, 0])
     for i in std.range(0, 15)
-  ], { film: 'plastic-clear', bubble: 'plastic-frosted' }) + h.inHand('bubble_wrap', 'roll') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { film: 'plastic-clear', bubble: 'plastic-frosted' }) + { title: 'Bubble wrap' } + h.inHand('bubble_wrap', 'roll') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A loose handful of five iron caltrops, each about 35 mm across, scattered over a 10 cm patch with one
   // point of each standing up.
@@ -115,7 +115,7 @@ local toothLump(p, x, z, k) = [
     caltrop('c3', 'iron', -0.038, 0.03, 2.0, 0.02),
     caltrop('c4', 'iron', 0.03, -0.035, 0.7, 0.02),
     caltrop('c5', 'iron', -0.035, -0.03, 1.6, 0.02),
-  ]), { iron: 'iron-dull' }) + h.inHand('caltrops', 'c1-up') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap'] } } },
+  ]), { iron: 'iron-dull' }) + { title: 'Caltrops' } + h.inHand('caltrops', 'c1-up') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], weapon: ['trap'] } } },
 
   // A handful of four glass caltrops: lumps of glue about 5 cm across with broken glass set in them edge out.
   h.compound('glass_caltrops', 0.04, std.flattenArrays([
@@ -123,7 +123,7 @@ local toothLump(p, x, z, k) = [
     glassLump('g2', 0.05, 0.03, 0.9),
     glassLump('g3', -0.045, 0.035, 0.95),
     glassLump('g4', 0.01, -0.05, 0.9),
-  ]), { glue: 'resin-honey', shard: 'glass-clear' }) + h.inHand('glass_caltrops', 'g1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['glass'], weapon: ['trap'] } } },
+  ]), { glue: 'resin-honey', shard: 'glass-clear' }) + { title: 'Glass caltrops' } + h.inHand('glass_caltrops', 'g1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['glass'], weapon: ['trap'] } } },
 
   // A handful of four tooth caltrops: lumps of glue about 5 cm across bristling with long pointed teeth.
   h.compound('tooth_caltrops', 0.03, std.flattenArrays([
@@ -131,7 +131,7 @@ local toothLump(p, x, z, k) = [
     toothLump('t2', 0.05, 0.03, 0.9),
     toothLump('t3', -0.045, 0.035, 0.95),
     toothLump('t4', 0.01, -0.05, 0.9),
-  ]), { glue: 'resin-honey', tooth: 'bone' }) + h.inHand('tooth_caltrops', 't1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['bone'], weapon: ['trap'] } } },
+  ]), { glue: 'resin-honey', tooth: 'bone' }) + { title: 'Tooth caltrops' } + h.inHand('tooth_caltrops', 't1-glue') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['bone'], weapon: ['trap'] } } },
 
   // A pistol crossbow 55 cm long with a 50 cm prod, lashed to a short board, a bolt on the rail and a cord
   // tied to the trigger running back to a tripwire coil. The bow points to +z.
@@ -156,7 +156,7 @@ local toothLump(p, x, z, k) = [
   ], {
     board: 'wood-pine', stock: 'wood-walnut', prod: 'plastic-black', string: 'cord-olive', bolt: 'alu-bare',
     tip: 'steel-grey', cord: 'cord-cotton',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
+  }) + { title: 'Crossbow trap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
 
   // A bounding fragmentation mine: an olive steel can 100 mm across and 120 mm tall with a pressure fuze on
   // top, its three prongs standing up, and a pull ring on the safety pin.
@@ -173,7 +173,7 @@ local toothLump(p, x, z, k) = [
     turned('pin-ring', 'ring', 'z', [[0, 0.008], [0, 0.011], [0.002, 0.011], [0.002, 0.008], [0, 0.008]], [0.028, 0.137, 0]),
     box('pin', 'ring', [0.01, 0.135, -0.001], [0.02, 0.138, 0.001]),
   ], { body: 'paint-olive', band: 'cloth-yellow', fuze: 'steel-grey', ring: 'steel-bright' })
-  + h.inHand('landmine', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], setting: ['modern'], weapon: ['explosive', 'trap'] } } },
+  + { title: 'Landmine' } + h.inHand('landmine', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal'], setting: ['modern'], weapon: ['explosive', 'trap'] } } },
 
   // A small-game snare kit laid out: an 80 cm pole with a wire noose at its tip, two 30 cm pointed stakes, a
   // wooden mallet and a hank of cord.
@@ -186,7 +186,7 @@ local toothLump(p, x, z, k) = [
     turned('mallet-handle', 'handle', 'x', [[0, 0], [0, 0.013], [0.32, 0.013], [0.32, 0]], [-0.3, 0.035, -0.1]),
     turned('mallet-head', 'wood', 'z', [[0, 0], [0, 0.035], [0.12, 0.035], [0.12, 0]], [0.055, 0.035, -0.16]),
     coil('hank', 'cord', 0.04, 0.008, 0.2, 0.12),
-  ], { wood: 'wood-birch', handle: 'wood-oak', wire: 'steel-galvanised', cord: 'cord-cotton' })
+  ], { wood: 'wood-birch', handle: 'wood-oak', wire: 'steel-galvanised', cord: 'cord-cotton' }) + { title: 'Light snare kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'metal'], weapon: ['trap'] } } },
 
   // A double slam-fire pipe shotgun, two steel pipes 45 cm long strapped side by side on a pine board, each
@@ -209,7 +209,7 @@ local toothLump(p, x, z, k) = [
     box('pins', 'pipe', [-0.035, 0.05, -0.268], [0.035, 0.054, -0.264]),
     cord('wire', 'cord', [0.035, -0.266], [0.08, -0.33], 0.003, 0.05),
     coil('wire-coil', 'cord', 0.035, 0.004, 0.1, -0.34),
-  ], { board: 'wood-pine', pipe: 'steel-grey', bore: 'void-black', cap: 'steel-galvanised', rubber: 'rubber-offblack', tape: 'tape-silver', cord: 'cord-cotton' })
+  ], { board: 'wood-pine', pipe: 'steel-grey', bore: 'void-black', cap: 'steel-galvanised', rubber: 'rubber-offblack', tape: 'tape-silver', cord: 'cord-cotton' }) + { title: 'Shotgun trap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['metal', 'wood'], weapon: ['trap', 'shotgun'] } } },
 
   // A tripwire kit: a 70 mm hank of thin cord with a screw eye tied to each end, lying flat.
@@ -222,5 +222,5 @@ local toothLump(p, x, z, k) = [
     turned('screw-a', 'eye', 'x', [[0, 0], [0, 0.0018], [0.028, 0.0018], [0.034, 0]], [0.072, 0.002, 0.033]),
     coil('eye-b', 'eye', 0.006, 0.002, 0.066, -0.038),
     turned('screw-b', 'eye', 'x', [[0, 0], [0, 0.0018], [0.028, 0.0018], [0.034, 0]], [0.072, 0.002, -0.038]),
-  ], { cord: 'cord-cotton', eye: 'brass-polished' }) + h.inHand('tripwire', 'hank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['fabric'], weapon: ['trap'] } } },
+  ], { cord: 'cord-cotton', eye: 'brass-polished' }) + { title: 'Tripwire' } + h.inHand('tripwire', 'hank') + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapons', tags: { material: ['fabric'], weapon: ['trap'] } } },
 ]

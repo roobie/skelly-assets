@@ -6,6 +6,7 @@ local s = import 'cab_over_field_car.spec.libsonnet';
 local id = 'cab_over_field_car';
 local mid(span) = (span[0] + span[1]) / 2;
 {
+  title: 'Cab-over field car',
   // The air box stands ahead of the block under the cab floor, because beside the block the seats and rails fill its
   // place. It takes a site of its own: the kit's `air_box` site promises the kit's layout.
   sites: site.adjust(engine.sites('i6_petrol', [s.engineX, s.engineY, 0], 'assembly'), drop=['air_box'], add=[one('forward_air_box', 'air_box_light', s.airBoxAt)]) + [

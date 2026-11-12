@@ -72,7 +72,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                box('chin-cup', 'pad', [-0.05, 0, 0.05], [0.05, 0.008, 0.08]),
                box('buckle', 'fitting', [-0.07, 0, 0.055], [-0.05, 0.01, 0.075]),
              ],
-             { shell: 'nylon-ranger-green', trim: 'plastic-matte-black', fitting: 'plastic-matte-black', strap: 'webbing-black', patch: 'hook-loop-grey', pad: 'cloth-black' })
+             { shell: 'nylon-ranger-green', trim: 'plastic-matte-black', fitting: 'plastic-matte-black', strap: 'webbing-black', patch: 'hook-loop-grey', pad: 'cloth-black' }) + { title: 'Tactical helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A leather rifle scabbard for the back, lying on its side, 950 mm long, 60 mm wide at the closed muzzle end and
@@ -107,7 +107,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                box('strap-b', 'strap', [0.285, 0, 0.06], [0.315, 0.003, 0.17]),
              ]
              + buckle('buckle', 'buckle', 0.05, 0.155, 0.045, 0.04, 0.003),
-             { body: 'leather-brown', trim: 'leather-black', strap: 'leather-black', buckle: 'brass-dull' })
+             { body: 'leather-brown', trim: 'leather-black', strap: 'leather-black', buckle: 'brass-dull' }) + { title: 'Back holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['back'] } } },
 
   // A wide leather baldric laid flat in a closed loop, 1.6 m round and 70 mm wide, with six pistol holsters
@@ -123,7 +123,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                for x in [-0.11 + 0.11 * i]
              ])
              + buckle('buckle', 'buckle', 0.15 + r, 0, 0.09, 0.06, t),
-             { strap: 'leather-charcoal', body: 'leather-chestnut', trim: 'leather-black', stud: 'brass-dull', buckle: 'brass-dull' })
+             { strap: 'leather-charcoal', body: 'leather-chestnut', trim: 'leather-black', stud: 'brass-dull', buckle: 'brass-dull' }) + { title: 'Baldric holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A white elastic belly band lying in a closed ring, 1.1 m round and 100 mm wide, with a pistol pocket 200 mm
@@ -137,7 +137,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                box('mag-top', 'trim', [0.076, t, r - 0.042], [0.114, t + 0.02, r - 0.036]),
                box('tab', 'patch', [-0.08, t, -r - 0.045], [0.04, t + 0.004, -r + 0.045]),
              ],
-             { band: 'cloth-cream', body: 'cloth-charcoal', pocket: 'cloth-charcoal', trim: 'webbing-black', strap: 'webbing-black', stud: 'plastic-matte-black', patch: 'hook-loop-grey' })
+             { band: 'cloth-cream', body: 'cloth-charcoal', pocket: 'cloth-charcoal', trim: 'webbing-black', strap: 'webbing-black', stud: 'plastic-matte-black', patch: 'hook-loop-grey' }) + { title: 'Belly band holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['waist'] } } },
 
   // A tan elastic thigh band lying in a closed ring, 700 mm round and 90 mm wide, with a small pistol pocket 130 mm
@@ -151,7 +151,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                box('slip', 'pocket', [-0.06, t, -r - 0.035], [-0.02, t + 0.008, -r + 0.035]),
                box('tab', 'patch', [0.01, t, -r - 0.04], [0.09, t + 0.004, -r + 0.04]),
              ],
-             { band: 'cloth-khaki', body: 'cloth-brown', pocket: 'cloth-brown', trim: 'webbing-black', strap: 'cloth-brown', stud: 'plastic-matte-black', patch: 'hook-loop-grey' })
+             { band: 'cloth-khaki', body: 'cloth-brown', pocket: 'cloth-brown', trim: 'webbing-black', strap: 'cloth-brown', stud: 'plastic-matte-black', patch: 'hook-loop-grey' }) + { title: 'Thigh concealment band' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A leather ankle holster lying on its side as a short open cuff, 330 mm round and 70 mm wide, lined with dark fleece
@@ -163,7 +163,7 @@ local buckle(id, slot, x, z, w, d, y) = [
                h.tube('band', 'band', r - t, r, -w / 2, w / 2, r, 0),
              ]
              + holster('holster', [-0.06, -0.022], [1, 0], [0, 1], 0.12, 0.026, 2 * r - 0.004, 0.8),
-             { band: 'leather-tan', lining: 'cloth-charcoal', body: 'leather-brown', trim: 'leather-black', strap: 'leather-black', stud: 'brass-dull' })
+             { band: 'leather-tan', lining: 'cloth-charcoal', body: 'leather-brown', trim: 'leather-black', strap: 'leather-black', stud: 'brass-dull' }) + { title: 'Ankle holster' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['feet'] } } },
 
   // A cotton bow sling laid flat: a canvas shoulder strap 1.6 m round and 40 mm wide in a loop, a padded sleeve
@@ -182,6 +182,6 @@ local buckle(id, slot, x, z, w, d, y) = [
                box('pad', 'pad', [-0.12, t, r - 0.03], [0.12, t + 0.012, r + 0.03]),
              ]
              + buckle('buckle', 'buckle', 0.02, 0, 0.03, 0.035, 0.005),
-             { strap: 'cloth-olive-drab', body: 'cloth-canvas', trim: 'cloth-brown', pad: 'cloth-khaki', buckle: 'steel-grey' })
+             { strap: 'cloth-olive-drab', body: 'cloth-canvas', trim: 'cloth-brown', pad: 'cloth-khaki', buckle: 'steel-grey' }) + { title: 'Bow sling' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', keywords: ['archery'], tags: { material: ['fabric'], slot: ['back'] } } },
 ]

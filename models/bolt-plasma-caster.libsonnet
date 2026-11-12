@@ -32,5 +32,5 @@ local muzzleX = 0.49;
     h.prism('cell-cap', 'trim', 'y', [[-0.058, 0.009], [-0.044, -0.005], [0.044, -0.005], [0.058, 0.009], [0.058, 0.141], [0.044, 0.155], [-0.044, 0.155], [-0.058, 0.141]], 0.01, 0.03),
     box('cell-window-l', 'glow', [0.03, 0.05, -0.0575], [0.12, 0.12, -0.055]),
     box('cell-window-r', 'glow', [0.03, 0.05, 0.055], [0.12, 0.12, 0.0575]),
-  ] + bolt.grip(0.155) + bolt.stock(0.34, 0.05), { glow: 'crystal-glow-blue' }),
+  ] + bolt.grip(0.155) + bolt.stock(0.34, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Bolt plasma caster' },
 ]

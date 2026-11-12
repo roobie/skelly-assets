@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'touring_bike.spec.libsonnet';
 {
+  title: 'Touring bike',
   sites: [
     site.one('frame', 'touring_bike_frame'),
     site.one('engine', 'touring_bike_engine'),

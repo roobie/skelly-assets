@@ -93,7 +93,9 @@ local fender(name, slot, x, hubY, top, thick, z) =
     prism(name + '_aft', slot, [[x - reach, shoulder], [x - flat, top], [x - flat, top + thick], [x - reach - thick, shoulder]], z),
     prism(name + '_fore', slot, [[x + reach, shoulder], [x + reach + thick, shoulder], [x + flat, top + thick], [x + flat, top]], z),
   ];
-local pressings(id, s0) = {
+local pressings(id, title, s0) = {
+  // A compound row of this truck, titled with the truck's title and the part's `label`.
+  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
   local s = spec(s0),
   local conventional = s.bonnet != null,
   local a = s.frontAxle,
@@ -111,7 +113,7 @@ local pressings(id, s0) = {
     box('battery_fore', 'frame', [x + 0.31, y, outer], [x + 0.34, y + 0.3, inner]),
     box('battery_aft', 'frame', [x - 0.34, y, outer], [x - 0.31, y + 0.3, inner]),
   ],
-  local door(suffix, massKg, rear, front, frontTop) = k.compound(id + suffix, massKg, [
+  local door(suffix, label, massKg, rear, front, frontTop) = part(suffix, label, massKg, [
     box('skin', 'paint', [rear, s.floor, s.skin], [front, s.waist, s.side]),
     box('trim', 'trim', [rear + 0.03, s.floor + 0.03, s.skin - 0.03], [front - 0.03, s.waist - 0.03, s.skin]),
     prism('glass', 'glass', [[rear, s.waist], [front, s.waist], [frontTop, s.windowTop], [rear, s.windowTop]], [s.skin, s.skin + 0.012]),
@@ -130,14 +132,14 @@ local pressings(id, s0) = {
       box('well_wall', 'pan', [a - h, 2 * s.r - 0.12, s.railZ + 0.0625], [a + h, s.archTop, s.railZ + 0.09375]),
     ] + archCorners('well', 'pan', a - h, a + h, s.archTop, s.archChamfer, s.railZ, s.skin),
   local rows = [
-    k.compound(id + '_chassis', s.chassisMass, springs + [
+    part('_chassis', 'chassis', s.chassisMass, springs + [
       box('crossmember_' + i, 'frame', [crossmembers[i] - 0.05, s.railBottom + 0.02, -s.railZ], [crossmembers[i] + 0.05, s.railTop - 0.02, s.railZ]) for i in std.range(0, 5)
     ] + batteryBoxPieces + bothSides([
       box('rail', 'frame', [s.rear + 0.06, s.railBottom, s.railZ - 0.08], [s.railFront, s.railTop, s.railZ]),
       box('bracket', 'frame', [s.tankX - 0.2, s.tankY - 0.04, s.railZ], [s.tankX + 0.2, s.tankY, s.side - 0.12]),
       box('bracket_post', 'frame', [s.tankX - 0.04, s.tankY - 0.04, s.railZ], [s.tankX + 0.04, s.railBottom + 0.1, s.railZ + 0.06]),
     ]), { frame: s.framePaint, spring: 'steel-grey' }),
-    k.compound(id + '_cab', s.shellMass, skirts_all + [
+    part('_cab', 'cab', s.shellMass, skirts_all + [
       box('floor', 'pan', [s.cabBack, s.floor - 0.05, -s.side], [s.face - 0.05, s.floor, s.side]),
       box('mat', 'trim', [s.cabBack + 0.06, s.floor, -s.skin], [s.face - 0.1, s.floor + 0.012, s.skin]),
       box('tunnel', 'trim', [s.seatX - 0.2, s.floor, -0.24], [s.face - 0.3, s.floor + 0.42, 0.24]),
@@ -149,14 +151,14 @@ local pressings(id, s0) = {
     ] + (if conventional then [
       box('firewall', 'paint', [s.face - 0.05, s.floor - 0.05, -s.side], [s.face, s.waist, s.side]),
     ] else []), paint + { headliner: 'cloth-rag' }),
-    k.compound(id + '_windscreen', 28, [
+    part('_windscreen', 'windscreen', 28, [
       prism('glass', 'glass', [[s.face - 0.05, s.waist], [s.face - 0.01, s.waist], [roofFront - 0.01, s.roof], [roofFront - 0.05, s.roof]], [-s.glassIn, s.glassIn]),
     ], { glass: 'glass-clear' }),
-    k.compound(id + '_dashboard', 25, [
+    part('_dashboard', 'dashboard', 25, [
       box('lower', 'trim', [s.face - std.min(0.34, s.dashDepth - 0.04), s.floor, -s.skin + 0.04], [s.face - 0.1, s.waist - 0.2, s.skin - 0.04]),
       box('top', 'trim', [s.face - s.dashDepth, s.waist - 0.2, -s.skin + 0.04], [s.face - 0.04, s.waist - 0.04, s.skin - 0.04]),
     ], paint),
-    k.compound(id + '_rear_underrun', 30, [
+    part('_rear_underrun', 'rear underrun', 30, [
       box('bar', 'frame', [s.rear, s.railBottom - 0.24, -s.side + 0.1], [s.rear + 0.1, s.railBottom - 0.12, s.side - 0.1]),
     ] + bothSides([
       box('hanger', 'frame', [s.rear + 0.02, s.railBottom - 0.12, s.railZ - 0.08], [s.rear + 0.1, s.railBottom + 0.02, s.railZ]),
@@ -165,7 +167,7 @@ local pressings(id, s0) = {
     local guardZ = [s.rearInnerZ - s.wheelW / 2 - 0.03, s.rearZ + s.wheelW / 2 + 0.01];
     local guardThick = 0.0625;
     local guardReach = s.guardTop - s.r;
-    k.compound(id + '_mudguard', 9, std.flattenArrays([
+    part('_mudguard', 'mudguard', 9, std.flattenArrays([
       fender('guard_' + i, 'guard', s.rearAxles[i], s.r, s.guardTop, guardThick, guardZ) + [
         box('stay_' + i, 'guard', [s.rearAxles[i] - 0.04, std.min(s.railTop - 0.1, s.guardTop), s.railZ], [s.rearAxles[i] + 0.04, s.guardTop + guardThick, guardZ[0]]),
       ]
@@ -174,28 +176,28 @@ local pressings(id, s0) = {
       box('flap', 'flap', [std.foldl(std.min, s.rearAxles, s.rearAxles[0]) - guardReach - guardThick, 0.25, guardZ[0]], [std.foldl(std.min, s.rearAxles, s.rearAxles[0]) - guardReach, s.r + guardReach * 0.414, guardZ[1]]),
     ], { guard: 'paint-charcoal', flap: 'rubber-black' }),
   ] else []) + (if conventional then [
-    k.compound(id + '_bonnet', 70, [
+    part('_bonnet', 'bonnet', 70, [
       prism('skin', 'paint', [[s.face, s.bonnet.back - 0.2], [s.bonnet.nose, s.bonnet.front - 0.2], [s.bonnet.nose, s.bonnet.front], [s.face, s.bonnet.back]], [-s.bonnet.z, s.bonnet.z]),
       prism('side', 'paint', [[s.face, s.floor], [s.bonnet.nose, s.floor], [s.bonnet.nose, s.bonnet.front], [s.face, s.bonnet.back]], [-s.bonnet.z, s.bonnet.z]),
     ], paint),
     local wingTop = s.archTop + 0.12;
-    k.compound(id + '_wing', 26, archPieces('arch', 'paint', s, wingTop, wingTop + 0.05, s.bonnet.z, s.side) + [
+    part('_wing', 'wing', 26, archPieces('arch', 'paint', s, wingTop, wingTop + 0.05, s.bonnet.z, s.side) + [
       box('well_wall', 'pan', [a - h, 2 * s.r - 0.12, s.bonnet.z], [a + h, wingTop, s.bonnet.z + 0.03125]),
       prism('fore', 'paint', [[a + h, wingTop - s.archChamfer], [s.bonnet.nose, wingTop - 0.26], [s.bonnet.nose, wingTop - 0.21], [a + h, wingTop + 0.05]], [s.bonnet.z, s.side]),
       prism('aft', 'paint', [[s.face, s.low + 0.1], [a - h, wingTop - s.archChamfer], [a - h, wingTop + 0.05], [s.face, s.floor]], [s.bonnet.z, s.side]),
     ], paint),
-    k.compound(id + '_front_panel', 40, [
+    part('_front_panel', 'front panel', 40, [
       box('surround', 'steel', [s.bonnet.nose, s.bumperTop - 0.04, -s.bonnet.z - 0.02], [s.bonnet.nose + 0.04, s.bonnet.front + 0.03, s.bonnet.z + 0.02]),
       box('core', 'trim', [s.bonnet.nose + 0.03, s.bumperTop + 0.02, -s.bonnet.z + 0.05], [s.bonnet.nose + 0.05, s.bonnet.front - 0.03, s.bonnet.z - 0.05]),
     ] + [
       box('bar_' + i, 'steel', [s.bonnet.nose + 0.05, s.bumperTop + 0.1 + i * (s.bonnet.front - s.bumperTop - 0.15) / 6, -s.bonnet.z + 0.05], [s.bonnet.nose + 0.06, s.bumperTop + 0.13 + i * (s.bonnet.front - s.bumperTop - 0.15) / 6, s.bonnet.z - 0.05])
       for i in std.range(0, 5)
     ], paint + { steel: 'steel-stainless' }),
-    k.compound(id + '_front_bumper', 50, [
+    part('_front_bumper', 'front bumper', 50, [
       box('bar', 'bar', [s.bonnet.nose - 0.02, s.bumperLow, -s.side], [s.front, s.bumperTop, s.side]),
     ], { bar: s.bumperPaint }),
   ] else [
-    k.compound(id + '_front_panel', s.frontPanelMass, [
+    part('_front_panel', 'front panel', s.frontPanelMass, [
       box('face', 'paint', [s.face - 0.05, s.bumperTop - 0.02, -s.side], [s.face, s.waist, s.side]),
     ] + (if s.grille then [
       box('grille', 'trim', [s.face, s.floor + 0.02, -s.side + 0.42], [s.face + 0.012, s.waist - 0.2, s.side - 0.42]),
@@ -203,14 +205,14 @@ local pressings(id, s0) = {
       box('slat_' + i, 'paint', [s.face + 0.012, s.floor + 0.08 + i * 0.13, -s.side + 0.46], [s.face + 0.02, s.floor + 0.12 + i * 0.13, s.side - 0.46])
       for i in std.range(0, std.floor((s.waist - s.floor - 0.34) / 0.13))
     ] else []), paint),
-    k.compound(id + '_front_bumper', 40, [
+    part('_front_bumper', 'front bumper', 40, [
       box('bar', 'bar', [s.face - 0.06, s.bumperLow, -s.side], [s.front, s.bumperTop, s.side]),
       box('step', 'trim', [s.front - 0.01, s.bumperLow + 0.3, -0.5], [s.front + 0.005, s.bumperLow + 0.36, 0.5]),
     ], { bar: s.bumperPaint, trim: 'plastic-black' }),
   ]) + (if s.crew != null then [
-    door('_crew_door', 34, s.crew[0], s.crew[1], s.crew[1]),
+    door('_crew_door', 'crew door', 34, s.crew[0], s.crew[1], s.crew[1]),
   ] else []) + [
-    door('_door', 42, s.doorRear, s.doorFront, s.doorFront - leanAt(s.windowTop)),
+    door('_door', 'door', 42, s.doorRear, s.doorFront, s.doorFront - leanAt(s.windowTop)),
   ],
   local skirts_all = bothSides(skirts + [
     prism('a_pillar', 'paint', [[s.doorFront, s.waist], [s.face, s.waist], [roofFront, s.roof], [s.doorFront - s.lean, s.roof]], [s.glassIn, s.side]),
@@ -224,7 +226,7 @@ local pressings(id, s0) = {
   ])),
   pressings: rows,
 }.pressings;
-local rows(id, s0) = k.unborrowed(id, spec(s0), pressings(id, s0));
+local rows(id, title, s0) = k.unborrowed(id, spec(s0), pressings(id, title, s0));
 local items(kit, id, name, s0) =
   local s = spec(s0);
   local parts = [
@@ -294,7 +296,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   + (if s.guard then pair('mudguard', part('_mudguard'), origin, on(['chassis'])) else [])
   + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
   + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
-local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, s0), laid(kit, id, s0));
+local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, '', s0), laid(kit, id, s0));
 // The sites of a truck that its cab and chassis do not lay, so its body can be laid behind another cab.
 local bodySites(kit, sites, id, s0) =
   local own = std.set([site.id for site in fittings(kit, id, s0)]);

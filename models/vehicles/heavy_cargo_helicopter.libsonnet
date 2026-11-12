@@ -37,10 +37,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('heavy_cargo_helicopter_belly', s.shellMass,
              h.loft('nose', 'paint', s.body, x=[5.5, s.nose], arc=[90, 270], sides=32, square=square)
              + h.loft('middle', 'paint', s.body, x=[s.floorRear, 5.5], arc=[90, 270], step=11.5, sides=32, square=square),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter belly' },
   k.compound('heavy_cargo_helicopter_load_floor', 620, [
     box('deck', 'deck', [s.floorRear, s.floorBase, -s.floorHalf], [s.floorFront, s.floorTop, s.floorHalf]),
-  ], { deck: 'steel-grey' }),
+  ], { deck: 'steel-grey' }) + { title: 'Heavy cargo helicopter load floor' },
   k.compound('heavy_cargo_helicopter_fuselage', 1500,
              cabinWall('side_near', [20, 90])
              + cabinWall('side_far', [-90, -20])
@@ -51,27 +51,27 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('screen_sill_near', 'paint', s.windscreen, [s.screenArc, 90])
              + wall('screen_sill_far', 'paint', s.windscreen, [-90, -s.screenArc])
              + h.loft('nose_top', 'paint', s.body, x=[s.windscreen[1], s.nose], arc=h.dome, sides=32, square=square),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter fuselage' },
   k.compound('heavy_cargo_helicopter_tail_section', 700,
              wall('wall', 'paint', [s.tail, s.floorRear], h.dome, step=0.09)
              + h.loft('lintel', 'paint', [
                { x: s.tail + 0.08, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
                { x: s.tail, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
              ], arc=h.dome, step=0.08, sides=32, square=square),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter tail section' },
   k.compound('heavy_cargo_helicopter_cockpit_bulkhead', 70,
              h.loft('plate', 'dark', s.body, x=[s.floorFront - 0.12, s.floorFront - 0.04], arc=h.dome, step=0.08, sides=32, square=square),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter cockpit bulkhead' },
   k.compound('heavy_cargo_helicopter_ramp', 280, [
     k.prism('deck', 'dark', [[s.rampTip, 0], [s.rampTip + 0.1, 0], [s.floorRear, s.floorTop - 0.09], [s.floorRear, s.floorTop]], [-1.45, 1.45]),
     box('hinge_bar', 'dark', [s.floorRear - 0.06, s.floorTop - 0.12, -1.45], [s.floorRear + 0.02, s.floorTop, 1.45]),
   ] + k.bothSides([
     k.bar('side', 'paint', [s.rampTip + 0.02, 0.1], [s.floorRear, s.floorTop + 0.1], 0.1, [1.35, 1.45]),
-  ]), finishes, { hinge_a: ['hinge_bar', [0.5, 0.5, 0.1]], hinge_b: ['hinge_bar', [0.5, 0.5, 0.9]] }),
+  ]), finishes, { hinge_a: ['hinge_bar', [0.5, 0.5, 0.1]], hinge_b: ['hinge_bar', [0.5, 0.5, 0.9]] }) + { title: 'Heavy cargo helicopter ramp' },
   k.compound('heavy_cargo_helicopter_windscreen', 60,
              wall('near', 'glass', s.windscreen, [3, s.screenArc])
              + wall('far', 'glass', s.windscreen, [-s.screenArc, -3]),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter windscreen' },
   k.compound('heavy_cargo_helicopter_crew_door', 40,
              wall('pane', 'glass', paneX, paneArc, step=0.13)
              + wall('lower', 'paint', door, [paneArc[1], 90], step=0.19)
@@ -81,18 +81,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('edge', 'dark', [door[1] - 0.04, door[1]], [s.doorArc, 90], step=0.04)
              + [h.hingeRib('hinge_rib', s.body, door[0] + 0.03, 66, 86, slot='dark', depth=0.05, square=square)],
              finishes,
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }),
+             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Heavy cargo helicopter crew door' },
   k.compound('heavy_cargo_helicopter_cabin_windows', 12,
              std.flattenArrays([
                [box('pane_' + x, 'glass', [x, 2.3, 1.7], [x + 0.5, 2.8, 1.85]), box('frame_' + x, 'dark', [x - 0.04, 2.26, 1.7], [x + 0.54, 2.84, 1.83])]
                for x in windows
              ]),
-             { glass: 'glass-grey', dark: s.trim }),
+             { glass: 'glass-grey', dark: s.trim }) + { title: 'Heavy cargo helicopter cabin windows' },
   k.compound('heavy_cargo_helicopter_sponson', 340,
              [podSlice('tank', [sp.rear + sp.taper, sp.front - sp.taper], sp.outer)]
              + [podSlice('nose_' + i, [sp.front - sp.taper + (7 - i) * sp.taper / 8, sp.front - sp.taper + (8 - i) * sp.taper / 8], taper[i]) for i in std.range(0, 7)]
              + [podSlice('tail_' + i, [sp.rear + i * sp.taper / 8, sp.rear + (i + 1) * sp.taper / 8], taper[i]) for i in std.range(0, 7)],
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter sponson' },
   k.compound('heavy_cargo_helicopter_front_pylon', 260,
              h.loft('fairing', 'paint', [
                { x: 6.62, top: 3.72, bottom: 3.3, half: 0.2, waist: 3.4 },
@@ -100,7 +100,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                { x: 5.3, top: 4.55, bottom: 3.3, half: 0.68, waist: 3.45 },
                { x: 4.4, top: 3.95, bottom: 3.3, half: 0.3, waist: 3.45 },
              ], arc=h.dome, step=0.09),
-             finishes),
+             finishes) + { title: 'Heavy cargo helicopter front pylon' },
   k.compound('heavy_cargo_helicopter_rear_pylon', 520,
              h.loft('fairing', 'paint', [
                { x: -4.1, top: 3.9, bottom: 3.5, half: 0.22, waist: 3.6 },
@@ -112,35 +112,35 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                k.turned('nacelle', 'paint', 'x', k.annulus(e.radius + 0.01, e.radius + 0.08, e.x - e.length / 2, e.x + e.length / 2), [0, e.y, e.z]) + { sides: 16 },
                box('nacelle_foot', 'paint', [e.x - 0.8, 3.55, 0.5], [e.x + 0.8, 3.92, e.z]),
              ]),
-             finishes),
-  h.mainRotor('heavy_cargo_helicopter_front_rotor', 900, s.rotorRadius, blades=3, chord=0.72, droop=0.45, phase=0, hub=0.34, segments=14),
-  h.mainRotor('heavy_cargo_helicopter_rear_rotor', 900, s.rotorRadius, blades=3, chord=0.72, droop=0.45, phase=180, hub=0.34, segments=14),
-  h.mast('heavy_cargo_helicopter_mast', 110, 0.62, radius=0.1),
-  gearbox('heavy_cargo_helicopter_gearbox', 420),
-  h.turbine('heavy_cargo_helicopter_turbine', 300, e.length, e.radius),
+             finishes) + { title: 'Heavy cargo helicopter rear pylon' },
+  h.mainRotor('heavy_cargo_helicopter_front_rotor', 900, s.rotorRadius, blades=3, chord=0.72, droop=0.45, phase=0, hub=0.34, segments=14) + { title: 'Heavy cargo helicopter front rotor' },
+  h.mainRotor('heavy_cargo_helicopter_rear_rotor', 900, s.rotorRadius, blades=3, chord=0.72, droop=0.45, phase=180, hub=0.34, segments=14) + { title: 'Heavy cargo helicopter rear rotor' },
+  h.mast('heavy_cargo_helicopter_mast', 110, 0.62, radius=0.1) + { title: 'Heavy cargo helicopter mast' },
+  gearbox('heavy_cargo_helicopter_gearbox', 420) + { title: 'Heavy cargo helicopter gearbox' },
+  h.turbine('heavy_cargo_helicopter_turbine', 300, e.length, e.radius) + { title: 'Heavy cargo helicopter turbine' },
   k.compound('heavy_cargo_helicopter_fuel_tank', 140, [
     box('tank', 'alu', [-2.4, 0.02, -0.2], [2.4, 0.92, 0.2]),
-  ], { alu: 'alu-bare' }),
-  h.mainGear('heavy_cargo_helicopter_front_gear', 38, s.frontGear.x, s.frontGear.radius, s.frontGear.width, s.frontGear.z, s.frontGear.top, s.frontGear.root),
-  h.mainGear('heavy_cargo_helicopter_rear_gear', 26, s.rearGear.x, s.rearGear.radius, s.rearGear.width, s.rearGear.z, s.rearGear.top, s.rearGear.root),
-  m.wheel('heavy_cargo_helicopter_wheel', 62, s.frontGear.width, 0.22, s.frontGear.radius),
+  ], { alu: 'alu-bare' }) + { title: 'Heavy cargo helicopter fuel tank' },
+  h.mainGear('heavy_cargo_helicopter_front_gear', 38, s.frontGear.x, s.frontGear.radius, s.frontGear.width, s.frontGear.z, s.frontGear.top, s.frontGear.root) + { title: 'Heavy cargo helicopter front gear' },
+  h.mainGear('heavy_cargo_helicopter_rear_gear', 26, s.rearGear.x, s.rearGear.radius, s.rearGear.width, s.rearGear.z, s.rearGear.top, s.rearGear.root) + { title: 'Heavy cargo helicopter rear gear' },
+  m.wheel('heavy_cargo_helicopter_wheel', 62, s.frontGear.width, 0.22, s.frontGear.radius) + { title: 'Heavy cargo helicopter wheel' },
   k.compound('heavy_cargo_helicopter_crew_seat', 24, [
     box('pan', 'dark', [-0.26, 0, -0.26], [0.24, 0.3, 0.26]),
     box('cushion', 'seat', [-0.26, 0.3, -0.25], [0.24, 0.4, 0.25]),
     k.prism('back', 'seat', [[-0.34, 0.34], [-0.24, 0.34], [-0.26, 1.0], [-0.36, 1.0]], [-0.25, 0.25]),
-  ], { dark: s.trim, seat: 'cloth-seat' }),
+  ], { dark: s.trim, seat: 'cloth-seat' }) + { title: 'Heavy cargo helicopter crew seat' },
   k.compound('heavy_cargo_helicopter_console', 24, [
     box('pedestal', 'dark', [-0.2, 0, -0.16], [0.2, 0.42, 0.16]),
     k.prism('panel', 'dark', [[-0.12, 0.42], [0.2, 0.42], [0.1, 0.8], [-0.12, 0.76]], [-0.9, 0.9]),
-  ], { dark: 'plastic-black' }),
+  ], { dark: 'plastic-black' }) + { title: 'Heavy cargo helicopter console' },
   k.compound('heavy_cargo_helicopter_cockpit_floor', 90, [
     box('deck', 'dark', [s.floorFront, s.floorBase, -1.4], [6.85, s.floorTop, 1.4]),
-  ], { dark: s.trim }),
+  ], { dark: s.trim }) + { title: 'Heavy cargo helicopter cockpit floor' },
   k.compound('helicopter_beacon_red', 1, [
     k.turned('lens', 'lens', 'y', k.disc(0.06, 0, 0.1)) + { sides: 8 },
-  ], { lens: 'plastic-red' }),
+  ], { lens: 'plastic-red' }) + { title: 'Helicopter beacon (red)' },
   k.compound('heavy_cargo_helicopter_landing_lamp', 5, [
     box('housing', 'dark', [-0.14, -0.1, -0.14], [0.14, 0.1, 0.14]),
     box('lens', 'lens', [-0.12, -0.13, -0.12], [0.12, -0.1, 0.12]),
-  ], { dark: s.trim, lens: 'plastic-frosted' }),
+  ], { dark: s.trim, lens: 'plastic-frosted' }) + { title: 'Heavy cargo helicopter landing lamp' },
 ])

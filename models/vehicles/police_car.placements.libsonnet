@@ -8,6 +8,7 @@ local s = import 'police_car.spec.libsonnet';
 local k = import 'kit.libsonnet';
 local part(suffix) = k.partId('police_car', s, suffix);
 {
+  title: 'Police car',
   sites: k.painted('police_car', s, (import 'car-body.libsonnet').pressings('police_car', s), [
     site.one('shell', part('_shell')),
     site.one('windscreen', part('_windscreen')),

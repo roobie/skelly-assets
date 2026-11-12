@@ -39,7 +39,7 @@ local spareCarrier = k.compound('spare_wheel_carrier', 38, [
   k.turned('tyre', 'tyre', 'x', [[-0.27, 0.19], [-0.27, 0.34], [-0.245, 0.367], [-0.065, 0.367], [-0.04, 0.34], [-0.04, 0.19], [-0.27, 0.19]]) + { sides: roundSides },
   k.turned('rim', 'steel', 'x', k.disc(0.19, -0.24, -0.04)) + { sides: roundSides },
   k.turned('hub', 'cap', 'x', k.disc(0.08, -0.26, -0.24)) + { sides: 12 },
-], { tyre: 'rubber-black', steel: 'steel-grey', cap: 'paint-charcoal' });
+], { tyre: 'rubber-black', steel: 'steel-grey', cap: 'paint-charcoal' }) + { title: 'Spare wheel carrier' };
 // An engine with its crank along x; `length` is along the crank.
 local inline(id, massKg, length, width, height) = k.compound(id, massKg, [
   box('sump', 'casting', [-length / 2, 0, -width * 0.42], [length / 2, height * 0.2, width * 0.42]),
@@ -74,7 +74,7 @@ local exhaustSideHigh = k.compound('exhaust_side_high', 16, [
   k.turned('pipe', 'steel', 'y', k.disc(0.05, -0.05, 0.94), [0, 0, 0.11]) + { sides: 12 },
   k.turned('silencer', 'steel', 'y', k.disc(0.09, 0.2, 0.7), [0, 0, 0.11]) + { sides: 12 },
   k.turned('lip', 'steel', 'y', k.disc(0.065, 0.9, 0.94), [0, 0, 0.11]) + { sides: 12 },
-], { steel: 'steel-spall-black' });
+], { steel: 'steel-spall-black' }) + { title: 'High side exhaust' };
 // MacPherson strut, near side, about the hub. A beam axle carries both wheels at `track` / 2 from the centre plane.
 local strut(id, massKg) = k.compound(id, massKg, [
   box('lower_arm', 'steel', [-0.14, -0.1, -0.27], [0.14, -0.05, -0.04]),
@@ -109,9 +109,9 @@ local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, ma
 // An axle drawn with its drums, and its twin drawn without them for wheels carrying the kit's brakes at sites of their
 // own (`wheel-kit.libsonnet`, `axle`). The twin is lighter by the kit's drum brake of `class` at each end, so a vehicle
 // braked by those weighs what it does on the drawn drums.
-local withBare(draw, id, massKg, class) = [
-  draw(id, massKg, true),
-  draw(wheelKit.axle(id, 'drum'), massKg - 2 * wheelKit.brakeMass(class, 'drum'), false),
+local withBare(draw, id, title, bareTitle, massKg, class) = [
+  draw(id, massKg, true) + { title: title },
+  draw(wheelKit.axle(id, 'drum'), massKg - 2 * wheelKit.brakeMass(class, 'drum'), false) + { title: bareTitle },
 ];
 local truckDriveAxle = 430;
 local truckSteeredAxle = 350;
@@ -122,7 +122,7 @@ local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
   box('spring_seat', 'steel', [-0.07, 0.475, 0.32], [0.07, 0.5, 0.46]),
   box('king_pin', 'steel', [-0.06, 0.33, 0.87], [0.06, 0.53, 1.0]),
   k.turned('drum', 'steel', 'z', k.disc(0.17, 1.0, 1.12), [0, 0.43, 0]) + { sides: 12 },
-]), { steel: 'steel-grey' });
+]), { steel: 'steel-grey' }) + { title: 'Medium steered axle' };
 // A low floor passes over the beam, so it drops between risers in the wheel wells, and hubs stay `beamAxle`'s `height`
 // above the base.
 local steeredAxleDrop(id, massKg, drums) = k.compound(id, massKg, [
@@ -151,13 +151,13 @@ local bench(id, massKg, width) = k.compound(id, massKg, [
 local benchLow = k.compound('bench_seat_low', 14, [
   box('cushion', 'cloth', [-0.28, 0, -0.5], [0.26, 0.12, 0.5]),
   k.prism('back', 'cloth', [[-0.28, 0.1], [-0.17, 0.1], [-0.27, 0.56], [-0.38, 0.56]], [-0.5, 0.5]),
-], { cloth: 'cloth-seat' });
+], { cloth: 'cloth-seat' }) + { title: 'Low bench seat' };
 // An open machine's seat: a pan on a stem with a low back, far smaller than a road seat.
 local panSeat = k.compound('pan_seat', 9, [
   box('stem', 'frame', [-0.1, 0, -0.1], [0.1, 0.12, 0.1]),
   box('pan', 'cloth', [-0.24, 0.12, -0.22], [0.2, 0.2, 0.22]),
   k.prism('back', 'cloth', [[-0.25, 0.18], [-0.17, 0.18], [-0.23, 0.52], [-0.31, 0.52]], [-0.2, 0.2]),
-], { frame: 'paint-charcoal', cloth: 'rubber-black' }, { hips: ['pan', [0.4, 1, 0.5]] });
+], { frame: 'paint-charcoal', cloth: 'rubber-black' }, { hips: ['pan', [0.4, 1, 0.5]] }) + { title: 'Pan seat' };
 // Fittings don't rotate, so the rake is built in: a ring of short boxes round the origin at the hub, its forward edge high.
 local steeringWheelRaked =
   local radius = 0.18;
@@ -172,13 +172,13 @@ local steeringWheelRaked =
     box('hub', 'hub', [-0.05, -0.03, -0.05], [0.05, 0.03, 0.05]),
     box('spoke', 'hub', [-0.02, -0.012, -radius], [0.02, 0.012, radius]),
     box('stem', 'hub', [-0.02, -0.14, -0.02], [0.02, -0.03, 0.02]),
-  ], { grip: 'polymer-black', hub: 'plastic-black' }, { column: ['stem', [0.5, 0, 0.5]] });
+  ], { grip: 'polymer-black', hub: 'plastic-black' }, { column: ['stem', [0.5, 0, 0.5]] }) + { title: 'Raked steering wheel' };
 local busSeat = k.compound('bus_seat_pair', 22, [
   box('leg', 'frame', [-0.05, 0, -0.02], [0.05, 0.4, 0.02]),
   box('cushion', 'cloth', [-0.2, 0.4, -0.45], [0.22, 0.5, 0.45]),
   k.prism('back', 'cloth', [[-0.2, 0.48], [-0.12, 0.48], [-0.2, 1.0], [-0.28, 1.0]], [-0.45, 0.45]),
   box('rail', 'frame', [-0.3, 1.0, -0.45], [-0.26, 1.04, 0.45]),
-], { frame: 'steel-stainless', cloth: 'cloth-seat' });
+], { frame: 'steel-stainless', cloth: 'cloth-seat' }) + { title: 'Bus seat pair' };
 // `bus_seat_pair`'s frame: the tall back, split headrest and upholstered ends fill a coach's window line.
 local busSeatCoach = k.compound('bus_seat_coach', 34, [
   box('leg', 'frame', [-0.08, 0, -0.03], [0.08, 0.36, 0.03]),
@@ -187,7 +187,7 @@ local busSeatCoach = k.compound('bus_seat_coach', 34, [
 ] + k.bothSides([
   box('headrest', 'head', [-0.4, 1.1, 0.04], [-0.18, 1.3, 0.42]),
   box('end', 'cloth', [-0.24, 0.32, 0.45], [0.2, 0.54, 0.48]),
-]), { frame: 'paint-charcoal', cloth: 'cloth-seat', head: 'cloth-rag' });
+]), { frame: 'paint-charcoal', cloth: 'cloth-seat', head: 'cloth-rag' }) + { title: 'Coach bus seat' };
 // Hard crew seating. A bench lies along x with its back at +z, so a mirrored pair puts both backs to the walls and the
 // crew faces inward; y = 0 is the floor.
 local crewBench = k.compound('crew_bench', 24, [
@@ -202,13 +202,13 @@ local crewBench = k.compound('crew_bench', 24, [
     box('upright_' + i, 'frame', [x - 0.03, 0, 0.24], [x + 0.03, 0.92, 0.28]),
   ]
   for i in [0, 1, 2]
-]), { seat: 'polymer-black', frame: 'steel-parkerized' });
+]), { seat: 'polymer-black', frame: 'steel-parkerized' }) + { title: 'Crew bench' };
 local busSeatSingle = k.compound('bus_seat_single', 12, [
   box('leg', 'frame', [-0.05, 0, -0.02], [0.05, 0.4, 0.02]),
   box('cushion', 'cloth', [-0.2, 0.4, -0.225], [0.22, 0.5, 0.225]),
   k.prism('back', 'cloth', [[-0.2, 0.48], [-0.12, 0.48], [-0.2, 1.0], [-0.28, 1.0]], [-0.225, 0.225]),
   box('rail', 'frame', [-0.3, 1.0, -0.225], [-0.26, 1.04, 0.225]),
-], { frame: 'steel-stainless', cloth: 'cloth-seat' });
+], { frame: 'steel-stainless', cloth: 'cloth-seat' }) + { title: 'Single bus seat' };
 local grabPole(id, massKg, height) = k.compound(id, massKg, [
   k.turned('pole', 'bright', 'y', k.disc(0.025, 0, height)),
   k.turned('foot', 'bright', 'y', k.disc(0.05, 0, 0.03)),
@@ -220,22 +220,22 @@ local exhaustStack = k.compound('exhaust_stack', 35, [
   k.turned('silencer', 'steel', 'y', k.disc(0.12, 0.35, 1.45)) + { sides: 12 },
   k.turned('lip', 'steel', 'y', k.disc(0.085, 2.54, 2.6)) + { sides: 12 },
   box('clamp', 'clamp', [-0.15, 1.5, -0.04], [0, 1.56, 0.04]),
-], { steel: 'steel-stainless', clamp: 'paint-charcoal' });
+], { steel: 'steel-stainless', clamp: 'paint-charcoal' }) + { title: 'Exhaust stack' };
 local exhaustStackSmall = k.compound('exhaust_stack_small', 9, [
   k.turned('pipe', 'steel', 'y', k.disc(0.035, 0, 0.98)),
   k.turned('silencer', 'steel', 'y', k.disc(0.06, 0.1, 0.6)),
   box('cap', 'steel', [-0.05, 0.98, -0.05], [0.07, 1.02, 0.05]),
-], { steel: 'steel-spall-black' });
+], { steel: 'steel-spall-black' }) + { title: 'Small exhaust stack' };
 local roofVent = k.compound('roof_vent', 3, [
   box('frame', 'frame', [-0.26, 0, -0.26], [0.26, 0.04, 0.26]),
   box('lid', 'glass', [-0.22, 0.04, -0.22], [0.22, 0.08, 0.22]),
-], { frame: 'plastic-white', glass: 'plastic-frosted' });
+], { frame: 'plastic-white', glass: 'plastic-frosted' }) + { title: 'Roof vent' };
 // The mount is at the origin and the arm runs out along +z, as `door_mirror` does.
 local doorMirrorLarge = k.compound('door_mirror_large', 4, [
   box('arm', 'trim', [-0.02, 0.2, 0], [0.02, 0.24, 0.16]),
   box('housing', 'trim', [-0.04, 0, 0.14], [0.04, 0.44, 0.34]),
   box('glass', 'mirror', [-0.05, 0.02, 0.16], [-0.04, 0.42, 0.32]),
-], { trim: 'plastic-black', mirror: 'glass-grey' });
+], { trim: 'plastic-black', mirror: 'glass-grey' }) + { title: 'Large door mirror' };
 // A ram's horn. The mount is at the origin on the body, +z out: the arm arches up and out while sweeping forward, then
 // hangs, so the tall head droops below the mount, ahead of it and well clear of the body. A chain of short boxes because
 // a prism cannot follow a curve in all three axes.
@@ -262,20 +262,20 @@ local doorMirrorBus =
     box('drop', 'arm', [sweep - 0.035, top - 0.04, reach - 0.035], [sweep + 0.035, 0.035, reach + 0.035]),
     k.prism('head', 'arm', [[front - lean - 0.1, bottom], [front - lean, bottom], [front, top], [front - 0.1, top]], [reach - 0.11, reach + 0.11]),
     k.prism('glass', 'mirror', [[front - lean - 0.135, bottom + 0.03], [front - lean - 0.1, bottom + 0.03], [front - 0.1, top - 0.03], [front - 0.135, top - 0.03]], [reach - 0.08, reach + 0.08]),
-  ], { arm: 'plastic-black', mirror: 'glass-grey' });
+  ], { arm: 'plastic-black', mirror: 'glass-grey' }) + { title: 'Bus door mirror' };
 // The mount is at the origin and +z points out. Two long arms carry the head clear of a box body wider than the cab.
 local doorMirrorBox = k.compound('door_mirror_box', 5, [
   box('arm_upper', 'trim', [-0.02, 0.4, 0], [0.02, 0.44, 0.48]),
   box('arm_lower', 'trim', [-0.02, 0.06, 0], [0.02, 0.1, 0.48]),
   box('housing', 'trim', [-0.04, 0, 0.46], [0.04, 0.5, 0.66]),
   box('glass', 'mirror', [-0.0725, 0.02, 0.48], [-0.04, 0.48, 0.64]),
-], { trim: 'plastic-black', mirror: 'glass-grey' });
+], { trim: 'plastic-black', mirror: 'glass-grey' }) + { title: 'Box door mirror' };
 // A small round chromed head for an old car, placed as `door_mirror` is: the mount at the origin, +z out.
 local doorMirrorBright = k.compound('door_mirror_bright', 1, [
   box('arm', 'chrome', [-0.02, 0.02, 0], [0.02, 0.06, 0.08]),
   k.turned('head', 'chrome', 'x', k.disc(0.07, -0.03, 0.03), [0, 0.05, 0.13]) + { sides: 12 },
   k.turned('glass', 'mirror', 'x', k.disc(0.055, -0.0625, -0.03), [0, 0.05, 0.13]) + { sides: 12 },
-], { chrome: 'steel-bright', mirror: 'glass-grey' });
+], { chrome: 'steel-bright', mirror: 'glass-grey' }) + { title: 'Bright door mirror' };
 // A round lens in a dark bowl behind two guard bars, its lens toward +x and its base at y = 0. The bars sit near the rim
 // so the lens still reads as round between them.
 local headlampMilitary = k.compound('headlamp_military', 3, [
@@ -285,7 +285,7 @@ local headlampMilitary = k.compound('headlamp_military', 3, [
   box('guard_lower', 'guard', [0.0625, 0.04, -0.13], [0.094, 0.07, 0.13]),
 ] + k.bothSides([
   box('guard_post', 'guard', [0.03, 0.04, 0.11], [0.094, 0.21, 0.135]),
-]), { bowl: 'paint-charcoal', lens: 'plastic-frosted', guard: 'steel-spall-black' });
+]), { bowl: 'paint-charcoal', lens: 'plastic-frosted', guard: 'steel-spall-black' }) + { title: 'Military headlamp' };
 // An old car's chromed bowl on a stalk, its lens toward +x inside a dark ring; y = 0 is the foot of the stalk and the
 // lens stands above it.
 local headlampRound = k.compound('headlamp_round', 2, [
@@ -293,28 +293,28 @@ local headlampRound = k.compound('headlamp_round', 2, [
   k.turned('bowl', 'bowl', 'x', k.disc(0.125, -0.08, 0.03), [0, 0.165, 0]) + { sides: 12 },
   k.turned('ring', 'ring', 'x', k.disc(0.11, 0.03, 0.0625), [0, 0.165, 0]) + { sides: 12 },
   k.turned('lens', 'lens', 'x', k.disc(0.085, 0.0625, 0.094), [0, 0.165, 0]) + { sides: 12 },
-], { bowl: 'steel-stainless', ring: 'plastic-black', lens: 'plastic-frosted' });
+], { bowl: 'steel-stainless', ring: 'plastic-black', lens: 'plastic-frosted' }) + { title: 'Round headlamp' };
 // A machine's lamp on a short bracket, its lens facing forward along x: y = 0 is the bracket's foot.
 local workLamp = k.compound('work_lamp', 1, [
   box('bracket', 'trim', [-0.04, 0, -0.03], [0.04, 0.05, 0.03]),
   box('housing', 'trim', [-0.03, 0.05, -0.05], [0.03, 0.15, 0.05]),
   box('lens', 'lens', [0.03, 0.06, -0.04], [0.0625, 0.14, 0.04]),
-], { trim: 'plastic-black', lens: 'plastic-frosted' });
+], { trim: 'plastic-black', lens: 'plastic-frosted' }) + { title: 'Work lamp' };
 // A blue roof bar: y = 0 is the roof and the bar is centred on the origin.
 local lightBarBlue = k.compound('light_bar_blue', 12, [
   box('bar', 'bar', [-0.125, 0.03125, -0.72], [0.125, 0.1, 0.72]),
 ] + k.bothSides([
   box('foot', 'bar', [-0.075, 0, 0.55], [0.075, 0.03125, 0.65]),
   box('lens', 'lens', [-0.105, 0.1, 0.2], [0.105, 0.2, 0.7]),
-]), { bar: 'plastic-black', lens: 'plastic-blue' });
+]), { bar: 'plastic-black', lens: 'plastic-blue' }) + { title: 'Blue light bar' };
 // A small plate on a skin. `hybrid_badge` lies on a side panel with z = 0 the skin and +z out; `hybrid_badge_rear` lies
 // on a rear face with x = 0 the skin and -x out.
 local hybridBadge = k.compound('hybrid_badge', 0.1, [
   box('plate', 'plate', [-0.11, 0, 0], [0.11, 0.0625, 0.03125]),
-], { plate: 'plastic-green' });
+], { plate: 'plastic-green' }) + { title: 'Hybrid badge' };
 local hybridBadgeRear = k.compound('hybrid_badge_rear', 0.1, [
   box('plate', 'plate', [-0.03125, 0, -0.11], [0, 0.0625, 0.11]),
-], { plate: 'plastic-green' });
+], { plate: 'plastic-green' }) + { title: 'Rear hybrid badge' };
 // A walk-in van's side step. The origin is the tread's rear inner corner, on the skin at the underside of the tread; x
 // runs forward along the door and +z out, so a mirrored pair serves both sides.
 local doorStepWalkIn = k.compound('door_step_walk_in', 12, [
@@ -322,31 +322,31 @@ local doorStepWalkIn = k.compound('door_step_walk_in', 12, [
 ] + [
   box('hanger' + i, 'tread', [0.05 + i * 0.99, 0.04, 0], [0.1 + i * 0.99, 0.12, 0.03])
   for i in [0, 1]
-], { tread: 'steel-galvanised' });
+], { tread: 'steel-galvanised' }) + { title: 'Walk-in door step' };
 // Under a rear door: the origin is the centre of the tread's forward edge on the body's rear face, the tread runs back
 // along -x and y = 0 is its underside.
 local rearStepTread = k.compound('rear_step_tread', 14, [
   box('tread', 'tread', [-0.24, 0, -0.6], [0, 0.05, 0.6]),
 ] + k.bothSides([
   box('bracket', 'tread', [-0.06, 0.05, 0.42], [0, 0.16, 0.48]),
-]), { tread: 'steel-galvanised' });
+]), { tread: 'steel-galvanised' }) + { title: 'Rear step tread' };
 local headlampLarge = k.compound('headlamp_large', 3, [
   box('housing', 'trim', [-0.05, 0, -0.17], [0.03, 0.22, 0.17]),
   box('lens', 'lens', [0.03, 0.02, -0.15], [0.06, 0.2, 0.15]),
-], { trim: 'plastic-black', lens: 'plastic-frosted' });
+], { trim: 'plastic-black', lens: 'plastic-frosted' }) + { title: 'Large headlamp' };
 // A drawbar's tip, forward of the origin on the bar's rear face, so a trailer's towed end faces its tractor.
 local trailerCoupling = k.compound('trailer_coupling', 9, [
   box('neck', 'frame', [0, 0, -0.05], [0.16, 0.1, 0.05]),
   box('head', 'coupling', [0.14, -0.01, -0.07], [0.34, 0.15, 0.07]),
   box('socket', 'frame', [0.2, -0.04, -0.045], [0.3, -0.01, 0.045]),
   box('lever', 'lever', [0.18, 0.15, -0.02], [0.32, 0.18, 0.02]),
-], { frame: 'steel-galvanised', coupling: 'paint-charcoal', lever: 'plastic-black' });
+], { frame: 'steel-galvanised', coupling: 'paint-charcoal', lever: 'plastic-black' }) + { title: 'Trailer coupling' };
 // Tall enough to pass the lowest and the highest drawbar, like a jockey post standing proud above its clamp.
 local trailerLeg = k.compound('trailer_leg', 9, [
   box('foot', 'foot', [-0.1, 0, -0.1], [0.1, 0.04, 0.1]),
   k.turned('tube', 'tube', 'y', k.disc(0.04, 0.04, 0.85)),
   box('handle', 'foot', [-0.14, 0.85, -0.02], [0.14, 0.89, 0.02]),
-], { tube: 'steel-galvanised', foot: 'paint-charcoal' });
+], { tube: 'steel-galvanised', foot: 'paint-charcoal' }) + { title: 'Trailer leg' };
 // y = 0 is the ground under the tyre, so the fitting's `at` stands on the ground below the drawbar and the post rises
 // past it; the blueprint places the post against a drawbar rail.
 local jockeyWheel = k.compound('trailer_jockey_wheel', 8, [
@@ -356,13 +356,13 @@ local jockeyWheel = k.compound('trailer_jockey_wheel', 8, [
   box('handle', 'grip', [-0.1, 0.62, -0.02], [0.1, 0.65, 0.02]),
 ] + k.bothSides([
   box('fork', 'frame', [-0.03, 0.09, 0.03], [0.03, 0.2, 0.06]),
-]), { tyre: 'rubber-black', frame: 'steel-galvanised', grip: 'paint-charcoal' });
+]), { tyre: 'rubber-black', frame: 'steel-galvanised', grip: 'paint-charcoal' }) + { title: 'Trailer jockey wheel' };
 // Holds `car_battery` as `kit.batteryBay` places it, 3 cm above the tray's base.
 local truckBatteryTray = k.compound('truck_battery_tray', 5, [
   box('base', 'steel', [-0.3, 0, -0.22], [0.3, 0.03, 0.22]),
 ] + k.bothSides([
   box('lip', 'steel', [-0.3, 0.03, 0.19], [0.3, 0.09, 0.22]),
-]), { steel: 'steel-grey' }, { seat: ['base', [0.5, 1, 0.5]] });
+]), { steel: 'steel-grey' }, { seat: ['base', [0.5, 1, 0.5]] }) + { title: 'Truck battery tray' };
 // A traction motor lies across the vehicle on its base, its reduction gear built in; the orange lead marks high voltage.
 local tractionMotor(id, massKg, radius, length) = k.compound(id, massKg, [
   k.turned('stator', 'casing', 'z', k.disc(radius, -length / 2, length / 2), [0, radius, 0]) + { sides: 12 },
@@ -400,7 +400,7 @@ local chargePort = k.compound('charge_port', 1.5, [
   box('bezel_rear', 'trim', [-0.1, 0.03, 0], [-0.07, 0.15, 0.0625]),
   box('bezel_front', 'trim', [0.07, 0.03, 0], [0.1, 0.15, 0.0625]),
   box('lamp', 'lamp', [-0.03125, 0.06, 0.03125], [0.03125, 0.12, 0.0625]),
-], { trim: 'plastic-black', lid: 'paint-charcoal', lamp: 'plastic-green' });
+], { trim: 'plastic-black', lid: 'paint-charcoal', lamp: 'plastic-green' }) + { title: 'Charge port' };
 local cabLamp(id, massKg, finish, depth, height, width) = k.compound(id, massKg, [
   box('lens', 'lens', [-depth / 2, 0, -width / 2], [depth / 2, height, width / 2]),
 ], { lens: finish });
@@ -413,13 +413,13 @@ local seatRiser = k.compound('seat_riser', 12, [
   box('base', 'plate', [-0.24, 0, -0.23], [0.24, 0.03, 0.23]),
   box('bellows', 'bellows', [-0.17, 0.03, -0.17], [0.17, 0.17, 0.17]),
   box('top', 'plate', [-0.24, 0.17, -0.23], [0.24, 0.2, 0.23]),
-], { plate: 'steel-grey', bellows: 'rubber-black' });
+], { plate: 'steel-grey', bellows: 'rubber-black' }) + { title: 'Seat riser' };
 // A low-floor bus's driver platform. y = 0 is its top, so it fits at the driver's seat position and reaches down to any
 // floor up to 0.36 below; the long nose carries the gear lever ahead of the seat.
 local seatPlinth = k.compound('seat_plinth', 30, [
   box('block', 'block', [-0.5, -0.36, -0.4], [0.44, -0.02, 0.4]),
   box('mat', 'mat', [-0.5, -0.02, -0.4], [0.44, 0, 0.4]),
-], { block: 'paint-charcoal', mat: 'rubber-black' });
+], { block: 'paint-charcoal', mat: 'rubber-black' }) + { title: 'Seat plinth' };
 // Holds up a `steering_wheel`, which has no stem of its own: the foot is at y = 0, the wheel's hub fits at the top.
 local steeringColumn(id, massKg, height) = k.compound(id, massKg, [
   box('tube', 'tube', [-0.04, 0, -0.03], [0.04, height, 0.03]),
@@ -430,7 +430,7 @@ local instrumentBinnacle = k.compound('instrument_binnacle', 2, [
   k.prism('hood', 'shell', [[-0.16, 0.13], [0.12, 0.13], [0.12, 0.17], [-0.12, 0.17]], [-0.22, 0.22]),
 ] + k.bothSides([
   box('dial', 'dial', [-0.125, 0.03125, 0.0625], [-0.1, 0.09375, 0.1875]),
-]), { shell: 'plastic-black', dial: 'plastic-white' });
+]), { shell: 'plastic-black', dial: 'plastic-white' }) + { title: 'Instrument binnacle' };
 // Lies along x, head at +x, its underside at y = 0.
 local stretcher = k.compound('stretcher', 16, [
   box('leg_fore', 'frame', [0.72, 0, -0.26], [0.78, 0.36, 0.26]),
@@ -438,73 +438,73 @@ local stretcher = k.compound('stretcher', 16, [
   box('bed', 'frame', [-0.9, 0.36, -0.28], [0.9, 0.42, 0.28]),
   box('mattress', 'mattress', [-0.88, 0.42, -0.26], [0.88, 0.5, 0.26]),
   k.prism('backrest', 'mattress', [[0.4, 0.5], [0.88, 0.5], [0.88, 0.62]], [-0.26, 0.26]),
-], { frame: 'steel-stainless', mattress: 'plastic-orange' });
+], { frame: 'steel-stainless', mattress: 'plastic-orange' }) + { title: 'Stretcher' };
 local attendantSeat = k.compound('attendant_seat', 7, [
   box('pan', 'dark', [-0.24, 0, -0.22], [0.22, 0.08, 0.22]),
   box('cushion', 'seat', [-0.24, 0.08, -0.22], [0.22, 0.18, 0.22]),
   k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.82], [-0.33, 0.82]], [-0.22, 0.22]),
-], { dark: 'paint-charcoal', seat: 'cloth-seat' });
+], { dark: 'paint-charcoal', seat: 'cloth-seat' }) + { title: 'Attendant seat' };
 // A helicopter's stick: foot on the cockpit floor, the T grip across z.
 local controlStick = k.compound('control_stick', 2, [
   k.turned('stick', 'dark', 'y', k.disc(0.02, 0, 0.5)) + { sides: 8 },
   box('grip', 'dark', [-0.03, 0.5, -0.24], [0.03, 0.56, 0.24]),
-], { dark: 'plastic-black' });
+], { dark: 'plastic-black' }) + { title: 'Control stick' };
 local towHitch = k.compound('tow_hitch', 18, [
   box('bar', 'steel', [0, 0, -0.45], [0.06, 0.08, 0.45]),
   box('neck', 'steel', [-0.2, 0.02, -0.03], [0, 0.07, 0.03]),
   k.turned('ball', 'steel', 'y', [[0, 0], [0, 0.015], [0.03, 0.025], [0.06, 0.015], [0.07, 0], [0, 0]], [-0.2, 0.07, 0]),
-], { steel: 'paint-charcoal' });
+], { steel: 'paint-charcoal' }) + { title: 'Tow hitch' };
 [
-  wheel('wheel_165_70r13', 12, 0.165, 0.165, 0.281),
-  wheel('wheel_235_75r15', 26, 0.235, 0.19, 0.367),
-  wheel('wheel_225_75r16c', 28, 0.225, 0.203, 0.372),
-  wheel('wheel_8r19_5', 48, 0.21, 0.248, 0.43),
-  farmWheel('wheel_16_9r30', 160, 0.43, 0.381, 0.78, 24),
-  farmWheel('wheel_11_2r24', 55, 0.284, 0.305, 0.57, 18),
-  wheel('wheel_265_75r16', 32, 0.265, 0.203, 0.402),
-  twinWheel('wheel_twin_225_75r16c', 60, 0.225, 0.203, 0.372),
-  m.wheel('wheel_military_22_5', 165, 0.32, 0.286, 0.522, 26, 0.04, 'steel-parkerized'),
-  m.wheel('wheel_military_16', 30, 0.19, 0.203, 0.37, 18, 0.04, 'steel-parkerized'),
+  wheel('wheel_165_70r13', 12, 0.165, 0.165, 0.281) + { title: 'Wheel 165/70R13' },
+  wheel('wheel_235_75r15', 26, 0.235, 0.19, 0.367) + { title: 'Wheel 235/75R15' },
+  wheel('wheel_225_75r16c', 28, 0.225, 0.203, 0.372) + { title: 'Wheel 225/75R16C' },
+  wheel('wheel_8r19_5', 48, 0.21, 0.248, 0.43) + { title: 'Wheel 8R19.5' },
+  farmWheel('wheel_16_9r30', 160, 0.43, 0.381, 0.78, 24) + { title: 'Wheel 16.9R30' },
+  farmWheel('wheel_11_2r24', 55, 0.284, 0.305, 0.57, 18) + { title: 'Wheel 11.2R24' },
+  wheel('wheel_265_75r16', 32, 0.265, 0.203, 0.402) + { title: 'Wheel 265/75R16' },
+  twinWheel('wheel_twin_225_75r16c', 60, 0.225, 0.203, 0.372) + { title: 'Twin wheel 225/75R16C' },
+  m.wheel('wheel_military_22_5', 165, 0.32, 0.286, 0.522, 26, 0.04, 'steel-parkerized') + { title: 'Military wheel 22.5' },
+  m.wheel('wheel_military_16', 30, 0.19, 0.203, 0.37, 18, 0.04, 'steel-parkerized') + { title: 'Military wheel 16' },
   spareCarrier,
-  farmWheel('wheel_6_50r16_ag', 24, 0.165, 0.203, 0.37, 14),
-  wheel('wheel_145r10', 7, 0.145, 0.127, 0.23),
-  inline('engine_i3_small', 85, 0.34, 0.42, 0.52),
-  inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75),
-  inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95),
-  vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6),
-  vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68),
-  vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88),
-  vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95),
-  gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3),
-  gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3),
-  gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42),
-  gearbox('gearbox_heavy', 240, 0.95, 0.52, 0.55),
-  exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted'),
-  exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]),
-  exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]),
-  exhaust('exhaust_military', 9, 1.4, 0.2, [0.4, 0.16], 'steel-spall-black'),
+  farmWheel('wheel_6_50r16_ag', 24, 0.165, 0.203, 0.37, 14) + { title: 'Agricultural wheel 6.50R16' },
+  wheel('wheel_145r10', 7, 0.145, 0.127, 0.23) + { title: 'Wheel 145R10' },
+  inline('engine_i3_small', 85, 0.34, 0.42, 0.52) + { title: 'Small inline-3 engine' },
+  inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75) + { title: 'Inline-6 diesel engine' },
+  inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95) + { title: 'Heavy inline-6 diesel engine' },
+  vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6) + { title: 'V6 petrol engine' },
+  vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68) + { title: 'V8 petrol engine' },
+  vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88) + { title: 'V8 diesel engine' },
+  vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95) + { title: 'V8 turbo diesel engine' },
+  gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3) + { title: 'Transaxle gearbox' },
+  gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3) + { title: 'Inline gearbox' },
+  gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42) + { title: 'Truck gearbox' },
+  gearbox('gearbox_heavy', 240, 0.95, 0.52, 0.55) + { title: 'Heavy gearbox' },
+  exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted') + { title: 'Rusted exhaust' },
+  exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]) + { title: 'Long exhaust' },
+  exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]) + { title: 'Rear-mounted bus exhaust' },
+  exhaust('exhaust_military', 9, 1.4, 0.2, [0.4, 0.16], 'steel-spall-black') + { title: 'Military exhaust' },
   exhaustSideHigh,
-  strut('front_strut', 14),
-  twistBeam('twist_beam', 30, 1.52),
-  beamAxle('beam_axle_light', 75, 1.5, 0.0625, 0.37),
-  beamAxle('beam_axle_van', 110, 1.68, 0.0625, 0.37),
+  strut('front_strut', 14) + { title: 'Front strut' },
+  twistBeam('twist_beam', 30, 1.52) + { title: 'Twist beam' },
+  beamAxle('beam_axle_light', 75, 1.5, 0.0625, 0.37) + { title: 'Light beam axle' },
+  beamAxle('beam_axle_van', 110, 1.68, 0.0625, 0.37) + { title: 'Van beam axle' },
   steeredAxleMedium,
-  trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37),
+  trailerAxle('trailer_axle_light', 40, 1.5, 0.035, 0.37) + { title: 'Light trailer axle' },
   // A De Dion tube carries no differential, so it is drawn as an undriven axle. Its wheels carry the kit's drums, so it
   // is drawn without its own and is lighter by theirs.
-  trailerAxle('de_dion_axle_small', 35 - 2 * wheelKit.brakeMass('light', 'drum'), 1.43, 0.045, 0.3015, drums=false),
-  trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37),
-] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', truckDriveAxle, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', truckSteeredAxle, 'heavy')
+  trailerAxle('de_dion_axle_small', 35 - 2 * wheelKit.brakeMass('light', 'drum'), 1.43, 0.045, 0.3015, drums=false) + { title: 'Small de Dion axle' },
+  trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37) + { title: 'Van trailer axle' },
+] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
 // Axles long enough to reach flotation tyres set out under a 3 m wide truck.
-+ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums), 'beam_axle_wide', 600, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, drums), 'steered_axle_wide', 400, 'heavy')
-+ withBare(steeredAxleDrop, 'steered_axle_drop', 330, 'heavy')
-+ withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 190, 'heavy') + [
-  propShaft('prop_shaft_short', 10, 1.2),
-  propShaft('prop_shaft_long', 22, 2.6),
-  bench('bench_seat_2', 18, 1.0),
-  bench('bench_seat_3', 26, 1.4),
++ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, drums), 'steered_axle_wide', 'Wide steered axle', 'Bare wide steered axle', 400, 'heavy')
++ withBare(steeredAxleDrop, 'steered_axle_drop', 'Drop steered axle', 'Bare drop steered axle', 330, 'heavy')
++ withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 'Truck trailer axle', 'Bare truck trailer axle', 190, 'heavy') + [
+  propShaft('prop_shaft_short', 10, 1.2) + { title: 'Short propeller shaft' },
+  propShaft('prop_shaft_long', 22, 2.6) + { title: 'Long propeller shaft' },
+  bench('bench_seat_2', 18, 1.0) + { title: 'Bench seat 2' },
+  bench('bench_seat_3', 26, 1.4) + { title: 'Bench seat 3' },
   benchLow,
   panSeat,
   steeringWheelRaked,
@@ -512,13 +512,13 @@ local towHitch = k.compound('tow_hitch', 18, [
   busSeatSingle,
   busSeatCoach,
   crewBench,
-  grabPole('grab_pole', 4, 2.3),
-  grabPole('grab_pole_short', 3.5, 1.9),
-  cabLamp('tail_lamp_small', 0.8, 'plastic-red', 0.06, 0.14, 0.18),
-  cabLamp('tail_lamp_tall', 1.2, 'plastic-red', 0.06, 0.48, 0.14),
-  cabLamp('marker_lamp', 0.3, 'plastic-yellow', 0.04, 0.06, 0.12),
-  beacon('beacon_blue', 'plastic-blue'),
-  beacon('beacon_amber', 'plastic-yellow'),
+  grabPole('grab_pole', 4, 2.3) + { title: 'Grab pole' },
+  grabPole('grab_pole_short', 3.5, 1.9) + { title: 'Short grab pole' },
+  cabLamp('tail_lamp_small', 0.8, 'plastic-red', 0.06, 0.14, 0.18) + { title: 'Small tail lamp' },
+  cabLamp('tail_lamp_tall', 1.2, 'plastic-red', 0.06, 0.48, 0.14) + { title: 'Tall tail lamp' },
+  cabLamp('marker_lamp', 0.3, 'plastic-yellow', 0.04, 0.06, 0.12) + { title: 'Marker lamp' },
+  beacon('beacon_blue', 'plastic-blue') + { title: 'Blue beacon' },
+  beacon('beacon_amber', 'plastic-yellow') + { title: 'Amber beacon' },
   towHitch,
   exhaustStack,
   exhaustStackSmall,
@@ -540,25 +540,25 @@ local towHitch = k.compound('tow_hitch', 18, [
   trailerLeg,
   jockeyWheel,
   truckBatteryTray,
-  tractionMotor('traction_motor_light', 25, 0.1, 0.24),
-  tractionMotor('traction_motor_car', 65, 0.15, 0.36),
-  tractionMotor('traction_motor_large', 240, 0.25, 0.6),
-  inverter('inverter_car', 14, 0.36, 0.14, 0.26),
-  inverter('inverter_large', 45, 0.6, 0.24, 0.42),
-  tractionPack('traction_pack_light', 70, 0.52, 0.2, 0.74),
-  tractionPack('traction_pack_small', 160, 1.0, 0.12, 1.0),
-  tractionPack('traction_pack_car', 300, 1.6, 0.11, 1.2),
-  tractionPack('traction_pack_van', 500, 2.4, 0.16, 1.24),
-  tractionPack('hybrid_pack', 45, 0.6, 0.11, 0.6),
-  tractionPackRoof('traction_pack_roof', 2000, 4.2, 0.36, 1.5),
-  tractionPackRoof('traction_pack_roof_small', 500, 2.4, 0.3, 1.24),
+  tractionMotor('traction_motor_light', 25, 0.1, 0.24) + { title: 'Light traction motor' },
+  tractionMotor('traction_motor_car', 65, 0.15, 0.36) + { title: 'Car traction motor' },
+  tractionMotor('traction_motor_large', 240, 0.25, 0.6) + { title: 'Large traction motor' },
+  inverter('inverter_car', 14, 0.36, 0.14, 0.26) + { title: 'Car inverter' },
+  inverter('inverter_large', 45, 0.6, 0.24, 0.42) + { title: 'Large inverter' },
+  tractionPack('traction_pack_light', 70, 0.52, 0.2, 0.74) + { title: 'Light traction pack' },
+  tractionPack('traction_pack_small', 160, 1.0, 0.12, 1.0) + { title: 'Small traction pack' },
+  tractionPack('traction_pack_car', 300, 1.6, 0.11, 1.2) + { title: 'Car traction pack' },
+  tractionPack('traction_pack_van', 500, 2.4, 0.16, 1.24) + { title: 'Van traction pack' },
+  tractionPack('hybrid_pack', 45, 0.6, 0.11, 0.6) + { title: 'Hybrid battery pack' },
+  tractionPackRoof('traction_pack_roof', 2000, 4.2, 0.36, 1.5) + { title: 'Roof traction pack' },
+  tractionPackRoof('traction_pack_roof_small', 500, 2.4, 0.3, 1.24) + { title: 'Small roof traction pack' },
   chargePort,
-  wheel('wheel_225_60r17', 26, 0.225, 0.216, 0.351),
-  wheel('wheel_185r14', 16, 0.185, 0.178, 0.325),
+  wheel('wheel_225_60r17', 26, 0.225, 0.216, 0.351) + { title: 'Wheel 225/60R17' },
+  wheel('wheel_185r14', 16, 0.185, 0.178, 0.325) + { title: 'Wheel 185R14' },
   seatRiser,
   seatPlinth,
-  steeringColumn('steering_column', 3, 0.28),
-  steeringColumn('steering_column_short', 2, 0.15),
+  steeringColumn('steering_column', 3, 0.28) + { title: 'Steering column' },
+  steeringColumn('steering_column_short', 2, 0.15) + { title: 'Short steering column' },
   instrumentBinnacle,
   stretcher,
   attendantSeat,

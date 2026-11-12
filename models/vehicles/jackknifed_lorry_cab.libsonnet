@@ -139,17 +139,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
              + s.box('guard_far', 'frame', [-3.45, 1.18, -1.28], [-1.5, 1.23, -0.62])
              + s.box('guard_far_drop', 'frame', [-1.56, 0.84, -1.28], [-1.5, 1.18, -0.62])
              + field('floor', 'y', [s.sleeperBack, s.cabFront], [-s.side + 0.05, s.side - 0.05], 0.25, 0.25, function(x, z) { slot: s.damage(0.5 + (w.patchNoise(x, z, 71) - 0.5) * 0.6, 'frame'), w: [s.floor - 0.06, s.floor] }),
-             fin + { paintless: 'iron-cast' }),
+             fin + { paintless: 'iron-cast' }) + { title: 'Jackknifed lorry cab chassis' },
   k.compound('jackknifed_lorry_cab_near_side', 280,
-             field('wall', 'z', [s.sleeperBack, s.cabFront], [s.rail[1], 3.75], 0.125, 0.125, wall(1, 73, true)), fin),
+             field('wall', 'z', [s.sleeperBack, s.cabFront], [s.rail[1], 3.75], 0.125, 0.125, wall(1, 73, true)), fin) + { title: 'Jackknifed lorry cab near side' },
   k.compound('jackknifed_lorry_cab_far_side', 340,
-             field('wall', 'z', [s.sleeperBack, s.cabFront], [s.rail[1], 3.75], 0.125, 0.125, wall(-1, 79, false)), fin),
+             field('wall', 'z', [s.sleeperBack, s.cabFront], [s.rail[1], 3.75], 0.125, 0.125, wall(-1, 79, false)), fin) + { title: 'Jackknifed lorry cab far side' },
   k.compound('jackknifed_lorry_cab_roof', 260,
-             field('skin', 'y', [s.sleeperBack, s.cabFront], [-s.side, s.side], 0.125, 0.125, roof), fin),
+             field('skin', 'y', [s.sleeperBack, s.cabFront], [-s.side, s.side], 0.125, 0.125, roof), fin) + { title: 'Jackknifed lorry cab roof' },
   k.compound('jackknifed_lorry_cab_back', 150,
-             field('skin', 'x', [-s.side, s.side], [s.rail[1], s.fairingTop], 0.125, 0.25, backWall), fin),
+             field('skin', 'x', [-s.side, s.side], [s.rail[1], s.fairingTop], 0.125, 0.25, backWall), fin) + { title: 'Jackknifed lorry cab back' },
   k.compound('jackknifed_lorry_cab_windscreen_frame', 70,
-             field('frame', 'x', [-s.side, s.side], [s.rail[1], 2.3], 0.125, 0.0625, windscreen), fin),
+             field('frame', 'x', [-s.side, s.side], [s.rail[1], 2.3], 0.125, 0.0625, windscreen), fin) + { title: 'Jackknifed lorry cab windscreen frame' },
   k.compound('jackknifed_lorry_cab_nose', 1300,
              field('bonnet', 'y', [s.cabFront, s.noseX], [-s.bonnetZ, s.bonnetZ], 0.0625, 0.125, bonnet)
              + field('side_near', 'z', [s.cabFront, s.noseX], [0.7, 2.1], 0.125, 0.125, bonnetSide(1, 83))
@@ -159,16 +159,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
              + field('wing_far', 'y', [s.cabFront, s.noseX], [-s.wingZ, -s.bonnetZ], 0.125, 0.125, wing)
              + field('wing_side_near', 'z', [s.cabFront, s.noseX], [0.4, 1.8], 0.125, 0.125, wingSide(1, 97))
              + field('wing_side_far', 'z', [s.cabFront, s.noseX], [0.4, 1.8], 0.125, 0.125, wingSide(-1, 101)),
-             fin),
+             fin) + { title: 'Jackknifed lorry cab nose' },
   k.compound('jackknifed_lorry_cab_earth', 40,
-             w.field('heap', 'y', [1.0, 4.4], [-2.0, 2.0], 0.125, 0.125, mound), fin),
+             w.field('heap', 'y', [1.0, 4.4], [-2.0, 2.0], 0.125, 0.125, mound), fin) + { title: 'Jackknifed lorry cab earth bank' },
   k.compound('jackknifed_lorry_cab_bumper', 90, [
     // Ripped off one side frame, so its end stands up out of the earth while the rest is under it.
     k.prism('end', 'chrome', w.ccw(w.barProfile([3.32, 0.06], [3.62, 0.86], 0.24)), [0.72, 1.3]),
     k.prism('end_scrape', 'rust', w.ccw(w.barProfile([3.48, 0.38], [3.62, 0.8], 0.1)), [0.9, 1.31]),
     box('middle', 'chrome', [3.55, 0.08, -0.72], [3.75, 0.27, 0.72]),
     k.prism('far', 'chrome', w.ccw(w.barProfile([3.68, 0.06], [3.42, 0.48], 0.2)), [-1.28, -0.72]),
-  ], fin),
+  ], fin) + { title: 'Jackknifed lorry cab bumper' },
   k.compound('jackknifed_lorry_cab_near_door', 55, [
     // Sprung past its stop and hanging from the top hinge.
     { id: 'skin', kind: 'prism', slot: 'paint', axis: 'y', profile: w.ccw(w.barProfile([1.3, 1.92], [2.08, 1.3], 0.07)), start: 0.42, end: 1.22 },
@@ -178,7 +178,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
     { id: 'post_a', kind: 'prism', slot: 'paint', axis: 'y', profile: w.ccw(w.barProfile([1.3, 1.92], [1.36, 1.87], 0.07)), start: 1.22, end: 1.82 },
     { id: 'post_b', kind: 'prism', slot: 'rust', axis: 'y', profile: w.ccw(w.barProfile([2.02, 1.35], [2.08, 1.3], 0.07)), start: 1.22, end: 1.68 },
     { id: 'top', kind: 'prism', slot: 'paint', axis: 'y', profile: w.ccw(w.barProfile([1.3, 1.92], [2.08, 1.3], 0.06)), start: 1.68, end: 1.82 },
-  ], fin),
+  ], fin) + { title: 'Jackknifed lorry cab near door' },
   k.compound('jackknifed_lorry_cab_stacks', 45,
              // The near stack bent over at the fold; the far one came away and lies on the ground.
              s.poly('near_low', 'chrome', w.barProfile([0.44, 1.2], [0.44, 2.75], 0.13), [1.24, 1.36])
@@ -188,25 +188,25 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
                { id: 'far_pipe', kind: 'prism', slot: 'chrome', axis: 'y', profile: w.ccw(w.barProfile([-1.72, -1.0], [-2.02, 1.5], 0.13)), start: 0, end: 0.13 },
                { id: 'far_rust', kind: 'prism', slot: 'rust', axis: 'y', profile: w.ccw(w.barProfile([-1.82, -0.2], [-1.92, 0.65], 0.14)), start: 0, end: 0.14 },
              ],
-             fin),
+             fin) + { title: 'Jackknifed lorry cab exhaust stacks' },
   k.compound('jackknifed_lorry_cab_fuel_tank', 95,
              s.box('case', 'crease', [-1.0, 0.54, 0.62], [0.24, 1.0, 1.18])
              + field('skin', 'z', [-1.0, 0.24], [0.54, 1.0], 0.0625, 0.0625, tank)
              + s.box('strap_a', 'frame', [-0.8, 0.5, 0.6], [-0.74, 1.02, 1.26])
              + s.box('strap_b', 'frame', [-0.02, 0.5, 0.6], [0.04, 1.02, 1.26]),
-             fin),
-  k.compound('jackknifed_lorry_cab_seat_frames', 30, seatFrame('near', 1.05, 0.56) + seatFrame('far', 1.05, -0.56), fin),
+             fin) + { title: 'Jackknifed lorry cab fuel tank' },
+  k.compound('jackknifed_lorry_cab_seat_frames', 30, seatFrame('near', 1.05, 0.56) + seatFrame('far', 1.05, -0.56), fin) + { title: 'Jackknifed lorry cab seat frames' },
   k.compound('jackknifed_lorry_cab_dash', 30,
              s.box('console', 'crease', [1.62, s.floor, -1.0], [1.92, 1.82, 1.0])
              + s.poly('column', 'bare', w.barProfile([1.65, 1.5], [1.4, 1.74], 0.05), [0.53, 0.59])
              + s.poly('wheel', 'crease', w.barProfile([1.26, 1.62], [1.52, 1.88], 0.05), [0.36, 0.76]),
-             fin),
-  rearWheel('jackknifed_lorry_cab_rear_wheel', 125),
+             fin) + { title: 'Jackknifed lorry cab dash' },
+  rearWheel('jackknifed_lorry_cab_rear_wheel', 125) + { title: 'Jackknifed lorry cab rear wheel' },
   k.compound('jackknifed_lorry_cab_loose_wheel', 85, [
     // Torn off the buried axle and lying on its side.
     k.turned('tyre', 'rubber', 'y', k.annulus(s.rimR, s.wheelR + 0.01, 0, 0.26)) + { sides: 24 },
     k.turned('rim', 'bare', 'y', k.disc(s.rimR, 0.03, 0.2)) + { sides: 24 },
     k.turned('hub', 'crease', 'y', k.disc(0.12, 0.2, 0.25)) + { sides: 12 },
-  ], { rubber: 'rubber-black', bare: 'scrap-rusted', crease: 'steel-spall-black' }),
-  k.compound('jackknifed_lorry_cab_jammed_wheel', 85, frontWheelDisc, { rubber: 'rubber-black', bare: 'scrap-rusted', crease: 'steel-spall-black' }),
+  ], { rubber: 'rubber-black', bare: 'scrap-rusted', crease: 'steel-spall-black' }) + { title: 'Jackknifed lorry cab wheel (loose)' },
+  k.compound('jackknifed_lorry_cab_jammed_wheel', 85, frontWheelDisc, { rubber: 'rubber-black', bare: 'scrap-rusted', crease: 'steel-spall-black' }) + { title: 'Jackknifed lorry cab wheel (jammed)' },
 ])

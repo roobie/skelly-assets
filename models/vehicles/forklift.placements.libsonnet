@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'forklift.spec.libsonnet';
 {
+  title: 'Forklift',
   sites: [
     site.one('chassis', 'forklift_chassis'),
     site.one('body', 'forklift_body'),

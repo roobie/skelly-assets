@@ -317,33 +317,33 @@ local mailSuit() =
   // patches and long tattered leather strap ends trailing from every buckle.
   h.compound('ornamental_plate_armour', 25, plateSuit({ lames: 3, boss: true, orn: true, rust: true, tails: 0.12 }), {
     plate: 'iron-dull', rim: 'iron-dull', strap: 'leather-tan', buckle: 'brass-dull', rivet: 'brass-dull', orn: 'brass-dull', rust: 'rust-red',
-  })
+  }) + { title: 'Ornamental plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Leather body armour laid out front up, the same cut as the plate suits: a moulded hardened-leather breast over a
   // flat back, waist lames, cops and tubes for the arms, shaped thigh and shin pieces, all edged in black.
   h.compound('leather_body_armour', 4, plateSuit({ lames: 2 }), {
     plate: 'leather-chestnut', rim: 'leather-black', strap: 'leather-black', buckle: 'brass-dull', rivet: 'brass-dull',
-  })
+  }) + { title: 'Leather body armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Mild steel light plate armour laid out front up: one waist lame and mail under the arms and below the waist.
   h.compound('mild_steel_light_plate_armour', 27, plateSuit({ lames: 1, mail: true }), {
     plate: 'steel-bright', rim: 'steel-bright', strap: 'leather-brown', buckle: 'steel', rivet: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Mild steel light plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Mild steel plate armour laid out front up: two waist lames and mail under the arms and below the waist.
   h.compound('mild_steel_plate_armour', 27, plateSuit({ lames: 2, mail: true }), {
     plate: 'steel-bright', rim: 'steel-bright', strap: 'leather-brown', buckle: 'steel', rivet: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Mild steel plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Mild steel heavy plate armour laid out front up: a riveted plackart doubling the belly, three waist lames and
   // mail under the arms and below the waist.
   h.compound('mild_steel_heavy_plate_armour', 29, plateSuit({ lames: 3, mail: true, plackart: true }), {
     plate: 'steel-bright', rim: 'steel-bright', strap: 'leather-brown', buckle: 'steel', rivet: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Mild steel heavy plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Nomad light plate armour, powered, laid out front up: tempered plate with one waist lame and dark mail, over a
@@ -351,44 +351,44 @@ local mailSuit() =
   h.compound('powered_ventilated_light_plate_armour', 26, plateSuit({ lames: 1, mail: true, nomad: true }), {
     plate: 'steel-heat-tint', rim: 'steel-heat-tint', strap: 'webbing-black', buckle: 'plastic-matte-black', rivet: 'steel', mail: 'steel-mail-dark',
     suit: 'cloth-black', liner: 'aramid-gold', module: 'plastic-charcoal', led: 'lcd-green',
-  })
+  }) + { title: 'Powered ventilated light plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Nomad heavy plate armour, powered: as the light suit with a riveted plackart and three waist lames.
   h.compound('powered_ventilated_heavy_plate_armour', 28, plateSuit({ lames: 3, mail: true, nomad: true, plackart: true }), {
     plate: 'steel-heat-tint', rim: 'steel-heat-tint', strap: 'webbing-black', buckle: 'plastic-matte-black', rivet: 'steel', mail: 'steel-mail-dark',
     suit: 'cloth-black', liner: 'aramid-gold', module: 'plastic-charcoal', led: 'lcd-green',
-  })
+  }) + { title: 'Powered ventilated heavy plate armour' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Sheet metal armour laid out front up, 1200 mm from shoulders to ankles: hammered sheets tied on with straps and
   // belts.
   h.compound('sheet_metal_armour', 27, sheetSuit({}), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Sheet metal armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Heavy sheet metal armour: as the sheet metal suit with a second sheet bolted over the chest.
   h.compound('heavy_sheet_metal_armour', 30, sheetSuit({ heavy: true }), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Heavy sheet metal armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Junkyard plate armour: the sheet metal suit with mail covering the gaps at the shoulders, elbows, hips and knees.
   h.compound('junkyard_plate_armour', 29, sheetSuit({ mail: true }), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Junkyard plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Heavy junkyard plate armour: mail at the gaps and a second sheet bolted over the chest.
   h.compound('heavy_junkyard_plate_armour', 31, sheetSuit({ mail: true, heavy: true }), {
     sheet: 'steel-bright', dent: 'steel-grey', strap: 'leather-brown', buckle: 'steel', bolt: 'steel', mail: 'steel-mail',
-  })
+  }) + { title: 'Heavy junkyard plate armour' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Nomad mail suit, powered, folded on a shelf: 420 mm by 360 mm and 90 mm tall.
   h.compound('powered_ventilated_mail_suit', 10, mailSuit(), {
     cloth: 'cloth-black', mail: 'steel-mail-dark', trim: 'cloth-black', liner: 'aramid-gold', strap: 'webbing-black', module: 'plastic-charcoal', led: 'lcd-green',
-  })
+  }) + { title: 'Powered ventilated mail suit' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['sci-fi'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 ]

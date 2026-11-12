@@ -13,7 +13,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     box('angle-floor', 'alu', [0.008, 0, -0.03], [0.046, 0.0015, -0.018]),
     box('angle-wall', 'alu', [0.008, 0.0015, -0.0195], [0.046, 0.012, -0.018]),
     h.tube('ring', 'alu', 0.0062, 0.0075, -0.006, 0.009, 0.0075, 0.022),
-  ], { alu: 'alu-bare' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { alu: 'alu-bare' }) + { title: 'Scrap aluminium' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A few brass chunks on about 90 by 70 mm: a 25 mm stub of hex bar, a short threaded pipe nipple and a
   // squashed lump of sheet.
@@ -27,7 +27,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     h.tube('nipple-thread', 'brass', 0.0085, 0.0113, 0.0, 0.009, 0.0105, 0.014),
     plate('lump', 'brass', [[-0.03, -0.012], [-0.018, 0.02], [-0.034, 0.03], [-0.04, 0.0]], 0.006),
     plate('lump-fold', 'brass', [[-0.032, -0.006], [-0.022, 0.014], [-0.034, 0.02]], 0.004, 0.006),
-  ], { brass: 'brass' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { brass: 'brass' }) + { title: 'Scrap brass' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A handful of broken cast-iron shards on about 60 by 50 mm, the largest a 35 mm curved piece of a pan rim.
   h.compound('scrap_cast_iron', 0.037, [
@@ -37,14 +37,14 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     plate('shard-a', 'iron', [[0.004, -0.012], [0.018, -0.006], [0.012, 0.01], [0.0, 0.004]], 0.004),
     plate('shard-b', 'iron', [[0.012, 0.014], [0.024, 0.018], [0.02, 0.03], [0.008, 0.026]], 0.003),
     plate('shard-c', 'iron', [[-0.004, 0.012], [0.004, 0.02], [-0.006, 0.026]], 0.005),
-  ], { iron: 'iron-cast' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { iron: 'iron-cast' }) + { title: 'Scrap cast iron' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A chunk of copper bus bar 25 by 10 mm, sheared off at about 75 mm long and bent once at a slant.
   h.compound('scrap_copper', 0.17, [
     box('bar', 'copper', [-0.036, 0, -0.0125], [0.012, 0.01, 0.0125]),
     prism('bend', 'copper', 'z', [[0.012, 0], [0.04, 0.012], [0.036, 0.021], [0.012, 0.01]], -0.0125, 0.0125),
     prism('shear', 'copper', 'z', [[-0.036, 0], [-0.036, 0.01], [-0.04, 0.006]], -0.0125, 0.0125),
-  ], { copper: 'copper' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { copper: 'copper' }) + { title: 'Scrap copper' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // Strips and torn pieces of tin-plate can wall 0.3 mm thick on about 80 by 50 mm, one curled and one
   // still ribbed.
@@ -57,7 +57,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     plate('ribbed', 'tin', [[0.004, -0.038], [0.026, -0.038], [0.026, -0.002], [0.004, -0.002]], 0.0006, 0.0006),
     h.tube('curl', 'tin', 0.009, 0.0096, 0.0, 0.03, 0.0096, 0.008),
     plate('strip', 'tin', [[0.022, 0.006], [0.028, 0.006], [0.022, 0.04], [0.016, 0.04]], 0.0006),
-  ], { tin: 'steel-bright' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { tin: 'steel-bright' }) + { title: 'Scrap tin' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A crudely forged steel spike 280 mm long, 30 mm square at the root and drawn straight to a point, with a
   // 60 by 60 mm mounting plate pierced by two bolt holes.
@@ -70,7 +70,7 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     local w = 0.015 * (1 - i / 9);
     box('shank-%d' % i, 'steel', [-0.13 + i * 0.03, 0.03 - w, -w], [-0.1 + i * 0.03, 0.03 + w, w])
     for i in std.range(0, 8)
-  ], { steel: 'scrap-rusted', hole: 'void-black' })
+  ], { steel: 'scrap-rusted', hole: 'void-black' }) + { title: 'Spike' }
   + h.gripOn('spike', 'shank-2') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A giant insect's stinger 150 mm long, a barbed dark shaft 14 mm thick at the root, still joined by a
@@ -88,6 +88,6 @@ local plate(id, slot, outline, t, y=0) = prism(id, slot, 'y', outline, y, y + t)
     for s in [-1, 1]
   ] + [
     turned('root', 'root', 'x', [[0, 0], [0, 0.011], [0.008, 0.01], [0.008, 0]], [-0.032, 0.022, 0]),
-  ], { flesh: 'flesh-membrane', chitin: 'chitin-black', root: 'chitin-brown' })
+  ], { flesh: 'flesh-membrane', chitin: 'chitin-black', root: 'chitin-brown' }) + { title: 'Bee stinger' }
   + h.gripOn('bee_stinger', 'shaft') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['bone'] } } },
 ]

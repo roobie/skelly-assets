@@ -57,7 +57,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('hinge', 'metal', [0.075, -0.004, -0.026], [0.09, 0.012, 0.026]),
     box('sight-front', 'trim', [0.31, 0.06, -0.003], [0.32, 0.072, 0.003]),
     box('sight-rear', 'trim', [0.08, 0.06, -0.008], [0.09, 0.074, 0.008]),
-  ], { stock: 'plastic-yellow', body: 'plastic-blue', muzzle: 'plastic-orange', trim: 'plastic-black', metal: 'steel' }) + h.gripOn('air_launcher', 'grip') + {
+  ], { stock: 'plastic-yellow', body: 'plastic-blue', muzzle: 'plastic-orange', trim: 'plastic-black', metal: 'steel' }) + { title: 'Toy air launcher' } + h.gripOn('air_launcher', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
@@ -72,7 +72,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     turned('bell', 'horn', 'z', [[0, 0], [0, 0.011], [0.03, 0.016], [0.05, 0.028], [0.058, 0.036], [0.058, 0]], [0, 0.178, 0]),
     turned('mouth', 'mouth', 'z', [[0, 0], [0, 0.03], [0.001, 0.03], [0.001, 0]], [0, 0.178, 0.058]),
     box('stem', 'horn', [-0.008, 0.16, -0.03], [0.008, 0.178, -0.014]),
-  ], { can: 'alu-bare', label: 'paint-white', horn: 'plastic-red', button: 'plastic-black', mouth: 'plastic-charcoal' }) + h.inHand('airhorn', 'can') + {
+  ], { can: 'alu-bare', label: 'paint-white', horn: 'plastic-red', button: 'plastic-black', mouth: 'plastic-charcoal' }) + { title: 'Air horn' } + h.inHand('airhorn', 'can') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
@@ -106,7 +106,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('key-a-wing', 'bell', [-0.03, 0.064, -0.038], [-0.006, 0.076, -0.034]),
     turned('key-b', 'bell', 'z', [[0, 0], [0, 0.003], [0.01, 0.003], [0.01, 0]], [0.018, 0.07, -0.032]),
     box('key-b-wing', 'bell', [0.006, 0.064, -0.038], [0.03, 0.076, -0.034]),
-  ], { case: 'paint-red', bell: 'steel-stainless', dial: 'paint-cream', glass: 'glass-clear', hands: 'plastic-black' }) + h.inHand('wind_up_alarm_clock', 'case') + {
+  ], { case: 'paint-red', bell: 'steel-stainless', dial: 'paint-cream', glass: 'glass-clear', hands: 'plastic-black' }) + { title: 'Wind-up alarm clock' } + h.inHand('wind_up_alarm_clock', 'case') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
@@ -116,7 +116,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     turned('band', 'band', 'y', [[0.18, 0.1035], [0.18, 0.1068], [0.192, 0.1035], [0.192, 0.1005], [0.18, 0.1035]]),
     turned('lid', 'clay', 'y', [[0.285, 0], [0.285, 0.076], [0.292, 0.074], [0.3, 0.05], [0.304, 0.02], [0.304, 0]]),
     urnBody('finial', 'clay', [[0.304, 0.012], [0.312, 0.008], [0.322, 0.013], [0.33, 0.006]]),
-  ], { clay: 'clay-terracotta', band: 'paint-oxblood' }) + h.inHand('clay_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
+  ], { clay: 'clay-terracotta', band: 'paint-oxblood' }) + { title: 'Clay urn' } + h.inHand('clay_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] } } },
 
   // A cut-crystal urn, 30 cm tall: a footed egg-shaped vessel with a domed lid and a faceted knob, frosted
   // bands where the floral pattern is cut.
@@ -131,7 +131,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     local a = std.pi * i / 4;
     dot('flower-%d' % i, 'cut', [0.1 * std.sin(a), 0.155, 0.1 * std.cos(a)], 0.012)
     for i in std.range(0, 7)
-  ], { crystal: 'glass-clear', cut: 'plastic-frosted' }) + h.inHand('crystal_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass'] } } },
+  ], { crystal: 'glass-clear', cut: 'plastic-frosted' }) + { title: 'Crystal urn' } + h.inHand('crystal_urn', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass'] } } },
 
   // A steel cow bell 14 cm long lying on its side, mouth on +z: a four-sided body tapering smoothly from the
   // 11 by 7.6 cm mouth to the crown, a rolled rim, the clapper resting in the mouth and a rubber strap looped
@@ -160,7 +160,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     for i in std.range(0, 7)
   ], {
     bell: 'steel-grey', rim: 'steel-bright', mouth: 'coal-black', strap: 'rubber-black',
-  }) + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['farm'] } } },
+  }) + { title: 'Cow bell' } + h.inHand('cow_bell', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], place: ['farm'] } } },
 
   // A dressage whip, 110 cm long: a rubber-capped handle with a braided grip, a slim tapering black shaft and a
   // short nylon lash at the tip (+x).
@@ -174,7 +174,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
   ] + [
     rod('braid-%d' % i, 'cap', 0.009, 0.03 + 0.024 * i, 0.034 + 0.024 * i, 0)
     for i in std.range(0, 5)
-  ], { cap: 'rubber-black', grip: 'leather-black', shaft: 'lacquer-black', lash: 'nylon-black' }) + h.gripOn('dressage_whip', 'grip') + {
+  ], { cap: 'rubber-black', grip: 'leather-black', shaft: 'lacquer-black', lash: 'nylon-black' }) + { title: 'Dressage whip' } + h.gripOn('dressage_whip', 'grip') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'rubber'] } } },
 
@@ -190,7 +190,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     flat('edge-a', 'edge', [[-0.01, 0.0], [0.02, 0.045], [0.026, 0.04], [0.0, 0.0]], 0.0305, 0.0315),
     flat('edge-b', 'edge', [[-0.01, 0.0], [0.0, 0.0], [0.026, -0.04], [0.02, -0.045]], 0.0305, 0.0315),
     box('hinge', 'collar', [0.175, 0.0, -0.012], [0.188, 0.034, 0.012]),
-  ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + h.gripOn('folding_shovel', 'grip') + {
+  ], { shaft: 'steel-parkerized', grip: 'rubber-black', collar: 'steel-grey', blade: 'paint-olive', edge: 'steel-bright' }) + { title: 'Folding shovel' } + h.gripOn('folding_shovel', 'grip') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -216,7 +216,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
   + etchArc('line-c', 'etch', [0, 0.1, -0.02], 0.072, -90, 0, 88, 12)
   + etchArc('line-d', 'etch', [0, 0.1, -0.02], 0.072, 180, 0, 88, 12), {
     bone: 'bone', hollow: 'coal-black', teeth: 'ceramic-white', etch: 'paint-charcoal',
-  }) + h.inHand('etched_skull', 'cranium') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
+  }) + { title: 'Etched skull' } + h.inHand('etched_skull', 'cranium') + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
 
   // A rolled fur sleeping mat, 50 cm long and 13 cm across the roll, tied with two hide thongs; the ends show the
   // spiral of fur and skin side.
@@ -232,7 +232,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
       for i in std.range(0, 2)
     ]
     for e in [['a', -0.252], ['b', 0.25]]
-  ]), { fur: 'fur-brown', tie: 'skin-rawhide', hide: 'leather-tan' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['leather'], setting: ['prehistoric'] } } },
+  ]), { fur: 'fur-brown', tie: 'skin-rawhide', hide: 'leather-tan' }) + { title: 'Fur sleeping mat' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['camping'], tags: { material: ['leather'], setting: ['prehistoric'] } } },
 
   // A pencil glass cutter, 16 cm long: an aluminium oil-reservoir handle with a rubber band, a brass neck and head
   // with breaking notches, and a steel wheel at the tip (+x).
@@ -245,7 +245,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('notch-a', 'mark', [0.14, -0.0072, -0.0026], [0.143, -0.003, 0.0026]),
     box('notch-b', 'mark', [0.146, -0.0072, -0.0026], [0.149, -0.003, 0.0026]),
     turned('wheel', 'wheel', 'z', [[0, 0], [0, 0.0035], [0.002, 0.0035], [0.002, 0]], [0.157, -0.004, -0.001]),
-  ], { handle: 'alu-bare', band: 'rubber-black', head: 'brass', mark: 'coal-black', wheel: 'steel-bright' }) + h.gripOn('glass_cutter', 'handle') + {
+  ], { handle: 'alu-bare', band: 'rubber-black', head: 'brass', mark: 'coal-black', wheel: 'steel-bright' }) + { title: 'Glass cutter' } + h.gripOn('glass_cutter', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -260,7 +260,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     turned('nozzle', 'plastic', 'x', [[0, 0], [0, 0.009], [0.012, 0.005], [0.012, 0]], [0.21, 0, 0]),
     rod('needle', 'needle', 0.0015, 0.222, 0.242, 0.0),
     box('clip', 'plastic', [0.06, 0.011, -0.004], [0.12, 0.015, 0.004]),
-  ], { barrel: 'alu-bare', plastic: 'plastic-black', shaft: 'steel-bright', needle: 'steel-stainless' }) + h.gripOn('hand_pump', 'barrel') + {
+  ], { barrel: 'alu-bare', plastic: 'plastic-black', shaft: 'steel-bright', needle: 'steel-stainless' }) + { title: 'Hand pump' } + h.gripOn('hand_pump', 'barrel') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
@@ -284,7 +284,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
   ] + [
     box('vent-%d' % i, 'recess', [-0.13 + 0.0, 0.08 + 0.03 * i, -0.0805], [0.13, 0.086 + 0.03 * i, -0.08])
     for i in std.range(0, 4)
-  ], { body: 'paint-cream', recess: 'coal-black', feet: 'plastic-charcoal', knob: 'plastic-black', lamp: 'plastic-orange', grille: 'steel-bright' }) + {
+  ], { body: 'paint-cream', recess: 'coal-black', feet: 'plastic-charcoal', knob: 'plastic-black', lamp: 'plastic-orange', grille: 'steel-bright' }) + { title: 'Large space heater' } + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'electrical', keywords: ['appliance', 'cold-weather'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
@@ -301,7 +301,7 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
     box('grip-low', 'leather', [-0.27, -0.004, -0.018], [-0.25, 0.012, 0.018]),
     box('grip-high', 'leather', [-0.27, 0.068, -0.018], [-0.25, 0.084, 0.018]),
     turned('nozzle', 'nozzle', 'x', [[0, 0], [0, 0.02], [0.03, 0.014], [0.1, 0.006], [0.1, 0]], [0.155, 0.04, 0]),
-  ], { wood: 'wood-oak', leather: 'leather-brown', pleat: 'leather-chestnut', nozzle: 'brass' }) + h.gripOn('leather_bellows', 'handle-high') + {
+  ], { wood: 'wood-oak', leather: 'leather-brown', pleat: 'leather-chestnut', nozzle: 'brass' }) + { title: 'Leather bellows' } + h.gripOn('leather_bellows', 'handle-high') + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', tags: { material: ['leather', 'wood'] } } },
 
@@ -318,5 +318,5 @@ local scaledOutline(outline, k) = [[p[0] * k, p[1] * k] for p in outline];
       flat('pit-%d' % i, if i < 2 then 'char' else 'wood', [[0.068 + 0.08 * i, -0.004], [0.088 + 0.08 * i, -0.004], [0.088 + 0.08 * i, -0.014], [0.068 + 0.08 * i, -0.014]], 0.049, 0.0495),
     ]
     for i in std.range(0, 2)
-  ]), { bark: 'bark', wood: 'wood-pine', char: 'coal-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
+  ]), { bark: 'bark', wood: 'wood-pine', char: 'coal-black' }) + { title: 'Notched stick' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
 ]

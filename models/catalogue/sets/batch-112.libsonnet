@@ -35,7 +35,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
   ] + h.strapLoop('lead-', 'lead', 0.16, 0.035, 0.008, 0.006, 0.033, 0.06, 0.07) + [
     box('lead-tail', 'lead', [0.1, 0.033, 0.03], [0.108, 0.039, 0.16]),
     box('plug', 'plug', [0.096, 0.03, 0.16], [0.112, 0.042, 0.19]),
-  ], { cloth: 'plastic-charcoal', lens: 'screen-black', led: 'lcd-green', lead: 'plastic-matte-black', plug: 'plastic-grey' })
+  ], { cloth: 'plastic-charcoal', lens: 'screen-black', led: 'lcd-green', lead: 'plastic-matte-black', plug: 'plastic-grey' }) + { title: 'Camera cloak' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], setting: ['sci-fi'], slot: ['back'], state: ['folded'] } } },
 
   // A wool poncho folded flat, 320 mm by 240 mm and 36 mm tall in three layers: grey with a red and a cream band
@@ -50,7 +50,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
   ] + [
     box('fringe-%d' % i, 'fringe', [-0.15 + i * 0.02, 0.012 + (i % 2) * 0.004, 0.12], [-0.144 + i * 0.02, 0.036, 0.15])
     for i in std.range(0, 15)
-  ], { cloth: 'wool-grey', 'band-red': 'cloth-red', 'band-cream': 'cloth-cream', neck: 'cloth-black', fringe: 'wool-grey' })
+  ], { cloth: 'wool-grey', 'band-red': 'cloth-red', 'band-cream': 'cloth-cream', neck: 'cloth-black', fringe: 'wool-grey' }) + { title: 'Poncho' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A black plastic bin bag flattened out, 600 mm across and 800 mm long: a notch cut from the middle of its closed
@@ -70,7 +70,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     box('tie-b', 'tie', [0.02, 0.004, 0.39], [0.06, 0.008, 0.45]),
     h.disc('knot', 'tie', 0.014, 0.004, 0.016, 0, 0.45),
     box('crease', 'seam', [-0.3, 0.004, 0.1], [0.3, 0.005, 0.106]),
-  ], { bag: 'plastic-black', seam: 'plastic-charcoal', tie: 'plastic-yellow' })
+  ], { bag: 'plastic-black', seam: 'plastic-charcoal', tie: 'plastic-yellow' }) + { title: 'Bin bag poncho' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['improvised'], tags: { material: ['plastic'], slot: ['torso'] } } },
 
   // A large cotton flag folded into an oblong, 340 mm by 250 mm and 48 mm tall in four layers: six rainbow stripes
@@ -88,7 +88,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     'stripe-3': 'cloth-green',
     'stripe-4': 'cloth-blue',
     'stripe-5': 'plant-purple',
-  })
+  }) + { title: 'Pride flag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'], state: ['folded'] } } },
 
   // A fleece blanket with sleeves folded flat, 320 mm by 260 mm and 40 mm tall in four layers, both sleeves folded
@@ -96,7 +96,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
   h.compound('sleeved_blanket', 0.64, h.foldedGarment(0.32, 0.26, 0.04, 4)
                                + sleeve('l-', -0.16, 0.13, -0.06, 0.08, 0.04, 0.016, 0.035)
                                + sleeve('r-', -0.16, 0.13, 0.04, 0.08, 0.04, 0.016, 0.035),
-             { cloth: 'cloth-blue', sleeve: 'cloth-blue', cuff: 'cloth-navy' })
+             { cloth: 'cloth-blue', sleeve: 'cloth-blue', cuff: 'cloth-navy' }) + { title: 'Sleeved blanket' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A white cotton flag folded into an oblong, 340 mm by 250 mm and 48 mm tall in four layers: a blue shield with a
@@ -111,7 +111,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     local pt(k, r) = [-0.012 - r * std.cos(std.pi * k / 5), r * std.sin(std.pi * k / 5)];
     h.prism('star-point-%d' % i, 'star', 'y', [pt(2 * i - 1, 0.014), pt(2 * i, 0.035), pt(2 * i + 1, 0.014)], 0.0495, 0.051)
     for i in std.range(0, 4)
-  ], { cloth: 'cloth-cream', header: 'cloth-khaki', grommet: 'brass-polished', shield: 'cloth-blue', star: 'cloth-yellow' })
+  ], { cloth: 'cloth-cream', header: 'cloth-khaki', grommet: 'brass-polished', shield: 'cloth-blue', star: 'cloth-yellow' }) + { title: 'State flag' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'], state: ['folded'] } } },
 
   // A full-length black cotton robe folded flat, 320 mm by 240 mm and 32 mm tall in four layers: the front opening
@@ -123,7 +123,7 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     box('collar', 'trim', [-0.06, 0.032, -0.116], [0.06, 0.0335, -0.108]),
   ] + sleeve('l-', -0.16, 0.12, 0.05, 0.08, 0.032, 0.012, 0.025)
   + [box('cuff-trim', 'trim', [0.12 - 0.006, 0.044, 0.008], [0.12, 0.0455, 0.092])],
-             { cloth: 'cloth-black', sleeve: 'cloth-black', cuff: 'cloth-black', trim: 'metal-gold' })
+             { cloth: 'cloth-black', sleeve: 'cloth-black', cuff: 'cloth-black', trim: 'metal-gold' }) + { title: 'Abaya' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A firefighter's turnout coat folded flat, 420 mm by 320 mm and 60 mm tall in three layers of tan shell: two
@@ -145,6 +145,6 @@ local sleeve(p, x0, x1, z, w, y, t=0.014, cuff=0.03) = [
     for z in [-0.1 + i * 0.05]
   ] + sleeve('l-', -0.21, 0.02, -0.04, 0.11, 0.06, 0.02, 0.04)
   + [box('sleeve-band', 'band', [-0.08, 0.08, -0.096], [-0.04, 0.082, 0.016])],
-             { cloth: 'cloth-khaki', sleeve: 'cloth-khaki', cuff: 'cloth-black', flap: 'cloth-khaki', band: 'reflective-yellow', silver: 'mirror-silver', clasp: 'steel-grey' })
+             { cloth: 'cloth-khaki', sleeve: 'cloth-khaki', cuff: 'cloth-black', flap: 'cloth-khaki', band: 'reflective-yellow', silver: 'mirror-silver', clasp: 'steel-grey' }) + { title: 'Turnout coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 ]

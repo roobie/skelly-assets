@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'minivan.spec.libsonnet';
 {
+  title: 'Minivan',
   sites: (import 'car-sites.libsonnet')('minivan', s, {
     over: {
       front_seat_near: { at: [s.cowl - 0.57, s.floor, 0.42] },

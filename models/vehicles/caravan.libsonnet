@@ -39,34 +39,34 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('spring', 'frame', [s.axle - 0.4, s.hub, 0.56], [s.axle + 0.4, s.floorLow - 0.1, 0.62]),
     box('arch_liner', 'frame', [arch[0], s.skirt, 0.7], [arch[1], s.floorLow, 0.74]),
   ]
-  + archChamfers('frame', [0.7, 0.74])) + h.drawbar(s.front + 0.36, 0.6, s.tip, [s.drawLow, s.drawHigh]), { frame: 'paint-charcoal' }),
+  + archChamfers('frame', [0.7, 0.74])) + h.drawbar(s.front + 0.36, 0.6, s.tip, [s.drawLow, s.drawHigh]), { frame: 'paint-charcoal' }) + { title: 'Caravan chassis' },
   k.compound('caravan_floor', 150, [
     box('deck', 'floor', [s.rear, s.floorLow, -s.skin], [s.front, s.floor, s.skin]),
-  ], { floor: 'board-mdf' }),
+  ], { floor: 'board-mdf' }) + { title: 'Caravan floor' },
   k.compound('caravan_wall_door', 125, wallPieces([s.skin, s.side], [s.side, s.side + 0.02], [
     windowOpening(s.smallRear, s.smallWindow),
     [s.doorRear, s.doorFront, s.floor + 0.06, s.doorTop],
     arch,
     windowOpening(s.largeFront, s.largeWindow),
-  ], [[s.rear, s.doorRear], [s.doorFront, s.front]]), finish),
+  ], [[s.rear, s.doorRear], [s.doorFront, s.front]]), finish) + { title: 'Caravan wall door' },
   k.compound('caravan_wall_plain', 130, wallPieces([-s.side, -s.skin], [-s.side - 0.02, -s.side], [
     windowOpening(s.farRear, s.largeWindow),
     arch,
     windowOpening(s.largeFront, s.largeWindow),
-  ], [[s.rear, s.front]]), finish),
+  ], [[s.rear, s.front]]), finish) + { title: 'Caravan wall plain' },
   k.compound('caravan_door', 18, [
     box('stripe', 'stripe', [s.doorRear + 0.02, s.stripeLow, s.side], [s.doorFront - 0.02, s.stripeHigh, s.side + 0.02]),
     box('window', 'glass', [s.doorRear + 0.12, 1.45, s.side - 0.03], [s.doorFront - 0.12, 1.95, s.side - 0.01]),
     box('handle', 'frame', [s.doorRear + 0.06, 1.2, s.side], [s.doorRear + 0.18, 1.24, s.side + 0.03]),
   ] + h.wall('skin', 'paint', [s.doorRear + 0.02, s.doorFront - 0.02], [s.floor + 0.08, s.doorTop - 0.02], [s.skin + 0.01, s.side], [[s.doorRear + 0.12, s.doorFront - 0.12, 1.45, 1.95]]),
-  finish + { frame: 'plastic-charcoal', glass: 'glass-clear' }, { hinge_a: ['skin_pier_1', [1, 0.2, 1]], hinge_b: ['skin_pier_1', [1, 0.8, 1]] }),
-  window('caravan_window_small', 4, s.smallWindow),
-  window('caravan_window_large', 8, s.largeWindow),
+  finish + { frame: 'plastic-charcoal', glass: 'glass-clear' }, { hinge_a: ['skin_pier_1', [1, 0.2, 1]], hinge_b: ['skin_pier_1', [1, 0.8, 1]] }) + { title: 'Caravan door' },
+  window('caravan_window_small', 4, s.smallWindow) + { title: 'Caravan window small' },
+  window('caravan_window_large', 8, s.largeWindow) + { title: 'Caravan window large' },
   // The eaves round in over the walls, so the roof reads as a moulded shell.
   k.compound('caravan_roof', 110, [
     { id: 'shell', kind: 'prism', slot: 'paint', axis: 'x', start: s.rear - 0.02, end: s.front + 0.02,
       profile: [[s.eave, -s.side - 0.02], [s.eave + 0.1, -s.side + 0.06], [s.roof, -s.side + 0.4], [s.roof, s.side - 0.4], [s.eave + 0.1, s.side - 0.06], [s.eave, s.side + 0.02]] },
-  ], { paint: s.paint }),
+  ], { paint: s.paint }) + { title: 'Caravan roof' },
   k.compound('caravan_nose_cap', 60, [
     // Around the front window's opening, so the glass looks into the cabin.
     // The stripe is a slice of the cap, flush with the paint above it, so no edge of it shows from above.
@@ -76,7 +76,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     prism('above', 'paint', [[s.front, 1.97], [s.front + 0.23, 1.97], [s.front + 0.14, 2.14], [s.front, s.eave]], [-s.side, s.side]),
   ] + bothSides([
     prism('cheek', 'paint', [[s.front, 1.4], [s.front + 0.33, 1.4], [s.front + 0.24, 1.95], [s.front + 0.23, 1.97], [s.front, 1.97]], [s.frontGlassHalf, s.side]),
-  ]), finish),
+  ]), finish) + { title: 'Caravan nose cap' },
   k.compound('caravan_tail_cap', 60, [
     // Around the rear window's opening, so the glass looks into the cabin.
     prism('below', 'paint', [[s.rear - 0.1, s.skirt], [s.rear, s.skirt], [s.rear, s.stripeLow], [s.rear - 0.15, s.stripeLow], [s.rear - 0.15, 0.6]], capZ),
@@ -86,19 +86,19 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('bumper', 'frame', [s.rear - 0.2, s.skirt, -s.side + 0.04], [s.rear - 0.1, s.skirt + 0.1, s.side - 0.04]),
   ] + bothSides([
     prism('cheek', 'paint', [[s.rear - 0.15, 1.34], [s.rear, 1.34], [s.rear, 1.92], [s.rear - 0.13, 1.92], [s.rear - 0.15, 1.8]], [s.rearGlassHalf, s.side]),
-  ]), finish + { frame: 'plastic-charcoal' }),
+  ]), finish + { frame: 'plastic-charcoal' }) + { title: 'Caravan tail cap' },
   k.compound('caravan_front_window', 12, [
     prism('glass', 'glass', [[s.front + 0.28, 1.4], [s.front + 0.32, 1.4], [s.front + 0.22, 1.97], [s.front + 0.18, 1.97]], [-s.frontGlassHalf, s.frontGlassHalf]),
-  ], { glass: 'glass-clear' }),
+  ], { glass: 'glass-clear' }) + { title: 'Caravan front window' },
   k.compound('caravan_rear_window', 10, [
     box('glass', 'glass', [s.rear - 0.12, 1.34, -s.rearGlassHalf], [s.rear - 0.09, 1.92, s.rearGlassHalf]),
-  ], { glass: 'glass-clear' }),
+  ], { glass: 'glass-clear' }) + { title: 'Caravan rear window' },
   k.compound('caravan_gas_locker', 30, [
     box('body', 'paint', [s.front + 0.34, s.drawHigh, -0.74], [s.front + 0.72, s.stripeLow, 0.74]),
     box('stripe', 'stripe', [s.front + 0.34, s.stripeLow, -0.74], [s.front + 0.72, s.stripeHigh, 0.74]),
     box('top', 'paint', [s.front + 0.34, s.stripeHigh, -0.74], [s.front + 0.72, 1.16, 0.74]),
     box('lid', 'frame', [s.front + 0.72, s.drawHigh + 0.1, -0.5], [s.front + 0.74, s.stripeLow - 0.02, 0.5]),
-  ], finish + { frame: 'plastic-charcoal' }),
+  ], finish + { frame: 'plastic-charcoal' }) + { title: 'Caravan gas locker' },
   k.compound('caravan_furniture', 200, [
     box('front_lounge', 'wood', [1.0, s.floor, -s.skin + 0.02], [s.front, s.floor + 0.42, s.skin - 0.02]),
     box('rear_bed', 'wood', [s.rear, s.floor, -s.skin + 0.02], [s.doorRear - 0.1, s.floor + 0.42, s.skin - 0.02]),
@@ -106,6 +106,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('kitchen', 'wood', [-0.74, s.floor, -s.skin + 0.02], [0.3, s.floor + 0.86, -0.5]),
     box('cushion', 'cloth', [1.0, s.floor + 0.42, -s.skin + 0.02], [s.front, s.floor + 0.52, s.skin - 0.02]),
     box('bedding', 'cloth', [s.rear, s.floor + 0.42, -s.skin + 0.02], [s.doorRear - 0.1, s.floor + 0.52, s.skin - 0.02]),
-  ], { wood: 'wood-pine', cloth: 'cloth-upholstery' }),
-  h.leg('caravan_steady', 5, s.floorLow - 0.1, 0.07, 'steel-galvanised'),
+  ], { wood: 'wood-pine', cloth: 'cloth-upholstery' }) + { title: 'Caravan furniture' },
+  h.leg('caravan_steady', 5, s.floorLow - 0.1, 0.07, 'steel-galvanised') + { title: 'Caravan steady' },
 ])

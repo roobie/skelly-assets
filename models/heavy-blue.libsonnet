@@ -154,5 +154,5 @@ armour.of(null, [
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
-  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { voxelGrain: 0.006 },
+  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { title: 'Heavy helmet' } + { voxelGrain: 0.006 },
 ])

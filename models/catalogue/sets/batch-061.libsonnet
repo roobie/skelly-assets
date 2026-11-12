@@ -54,7 +54,7 @@ local segment(i, n, r0, r) =
     box('battery', 'battery', [-0.140, 0.020, -0.040], [-0.020, 0.090, 0.040]),
     box('battery-band', 'battery-band', [-0.140, 0.060, -0.041], [-0.020, 0.072, 0.041]),
     box('neck', 'body', [-0.080, 0.100, -0.025], [-0.060, 0.170, 0.025]),
-  ], { blade: 'steel-bright', guard: 'paint-charcoal', body: 'plastic-red', trim: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', battery: 'plastic-black', 'battery-band': 'plastic-red' })
+  ], { blade: 'steel-bright', guard: 'paint-charcoal', body: 'plastic-red', trim: 'plastic-black', handle: 'plastic-black', grip: 'rubber-black', battery: 'plastic-black', 'battery-band': 'plastic-red' }) + { title: 'Cordless cut-off saw' }
   + h.gripOn('cordless_cut_off_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A 125 mm segmented diamond cutting disc for an angle grinder, 2.4 mm thick: a steel core with a 22 mm bore,
@@ -63,7 +63,7 @@ local segment(i, n, r0, r) =
     ring('core', 'core', 'y', 0.011, 0.0575, 0.0018, [0, 0.0003, 0]),
     ring('label', 'label', 'y', 0.011, 0.030, 0.0004, [0, 0.0021, 0]),
   ] + std.flattenArrays([segment(i, 10, 0.055, 0.0625) for i in std.range(0, 9)]),
-  { core: 'steel-grey', segment: 'plastic-charcoal', label: 'plastic-yellow' })
+  { core: 'steel-grey', segment: 'plastic-charcoal', label: 'plastic-yellow' }) + { title: 'Diamond cutting disc' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A petrol cut-off saw 0.80 m long and 0.38 m tall: a 350 mm blade under its guard on a side arm, a two-stroke
@@ -80,7 +80,7 @@ local segment(i, n, r0, r) =
     box('muffler', 'muffler', [0.13, 0.040, -0.020], [0.18, 0.120, 0.060]),
     box('tank', 'body', [-0.33, 0.020, -0.060], [-0.15, 0.110, 0.060]),
     disc('fuel-cap', 'cover', 0.018, 0.110, 0.125, -0.27, 0.0),
-  ], { blade: 'steel-bright', guard: 'plastic-orange', body: 'plastic-orange', cover: 'plastic-white', engine: 'paint-charcoal', muffler: 'steel-grey', handle: 'plastic-black', grip: 'rubber-black' })
+  ], { blade: 'steel-bright', guard: 'plastic-orange', body: 'plastic-orange', cover: 'plastic-white', engine: 'paint-charcoal', muffler: 'steel-grey', handle: 'plastic-black', grip: 'rubber-black' }) + { title: 'Petrol cut-off saw' }
   + h.gripOn('petrol_cut_off_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A carton of adhesive plasters 75 mm wide, 95 mm tall and 28 mm deep standing upright, a blue printed band
@@ -92,7 +92,7 @@ local segment(i, n, r0, r) =
     box('cross-h', 'cross', [-0.008, 0.054, 0.014], [0.008, 0.062, 0.0145]),
     box('strip', 'plaster', [-0.030, 0.018, 0.014], [0.030, 0.036, 0.015]),
     box('pad', 'pad', [-0.009, 0.020, 0.015], [0.009, 0.034, 0.0155]),
-  ], { carton: 'paper-white', print: 'plastic-blue', cross: 'paint-red', plaster: 'paperboard-tan', pad: 'cloth-white' })
+  ], { carton: 'paper-white', print: 'plastic-blue', cross: 'paint-red', plaster: 'paperboard-tan', pad: 'cloth-white' }) + { title: 'Adhesive plasters' }
   + { voxelGrain: 0.002 } + h.inHand('adhesive_bandages', 'carton') + h.label('band', '+z') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A dispenser carton of foil-wrapped alcohol prep pads, 68 mm square and 60 mm tall, one 30 by 65 mm sachet
@@ -103,7 +103,7 @@ local segment(i, n, r0, r) =
     box('slot', 'slot', [-0.022, 0.060, -0.003], [0.022, 0.0605, 0.003]),
     box('sachet', 'sachet', [-0.016, 0.040, -0.0012], [0.016, 0.088, 0.0012]),
     box('sachet-stripe', 'print', [-0.0162, 0.074, -0.0014], [0.0162, 0.080, 0.0014]),
-  ], { carton: 'paper-white', print: 'plastic-blue', slot: 'plastic-black', sachet: 'foil-alu' })
+  ], { carton: 'paper-white', print: 'plastic-blue', slot: 'plastic-black', sachet: 'foil-alu' }) + { title: 'Alcohol wipes' }
   + { voxelGrain: 0.002 } + h.inHand('alcohol_wipes', 'carton') + h.label('band', '+z') + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A white plastic carrier 200 by 135 mm holding six 250 ml amber glass bottles of anaesthetic agent with
@@ -122,7 +122,7 @@ local segment(i, n, r0, r) =
     ]
     for i in [0, 1, 2]
     for j in [0, 1]
-  ]), { tray: 'plastic-white', glass: 'plastic-amber', label: 'paper-white', 'cap-a': 'plastic-yellow', 'cap-b': 'plastic-blue' })
+  ]), { tray: 'plastic-white', glass: 'plastic-amber', label: 'paper-white', 'cap-a': 'plastic-yellow', 'cap-b': 'plastic-blue' }) + { title: 'Anaesthetic kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], place: ['hospital'], setting: ['modern'] } } },
 
   // A strip of torn cloth rolled into a bandage 45 mm wide and 26 mm across, its loose end trailing 30 mm.
@@ -134,7 +134,7 @@ local segment(i, n, r0, r) =
     ring('layer-d', 'layer', 'x', 0.008, 0.009, 0.0005, [0.0225, 0.013, 0]),
     box('tail', 'cloth', [-0.020, 0, 0.004], [0.018, 0.0012, 0.032]),
     box('fray', 'layer', [-0.019, 0, 0.032], [0.015, 0.0010, 0.035]),
-  ], { cloth: 'cloth-rag', layer: 'cloth-rag-shadow' })
+  ], { cloth: 'cloth-rag', layer: 'cloth-rag-shadow' }) + { title: 'Makeshift bandage' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A small heap of five cotton balls, each about 22 mm across, slightly squashed where they rest.
@@ -144,6 +144,6 @@ local segment(i, n, r0, r) =
     h.ball('ball-c', 'cotton', 0.011, 0.000, 0.010, 0.012, 0.9),
     h.ball('ball-d', 'cotton', 0.010, 0.022, 0.009, 0.010, 0.9),
     h.ball('ball-e', 'cotton', 0.010, 0.000, 0.026, -0.001, 0.9),
-  ], { cotton: 'fleece-pale' })
+  ], { cotton: 'fleece-pale' }) + { title: 'Cotton ball' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['fabric'] } } },
 ]

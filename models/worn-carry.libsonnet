@@ -4,6 +4,7 @@ local bust = import 'measures/bust.libsonnet';
 local jacket = import 'measures/jacket.libsonnet';
 local wornFit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local bags = import 'measures/bags.libsonnet';
+local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local mirrored(id, slot, xs, ys, zs) = [
@@ -33,7 +34,10 @@ local grain = 0.004;
 // A sample just below the garment's outward step can fill a cell above it; end the narrow waist on a voxel face.
 local waistTop = std.floor(torso.waist.y[1] / grain) * grain;
 
-// Worn on the player body, over the jacket in the `_jacket` variants.
+// Worn on the player body, over the jacket in the `_jacket` variants. A bag's title is its ground row's, with the
+// variant's own label after it.
+local variantLabel = if overJacket then 'over jacket' else 'worn';
+local titled(id) = worn.groundRow(id).title + ', ' + variantLabel;
 local tag(category, slot, material) = {
   category: category,
   tags: { slot: [slot], material: [material], setting: ['modern'], fit: [if overJacket then 'over-jacket' else 'worn'] },
@@ -137,6 +141,7 @@ local backpack(id, massKg, bottom) =
   local panel = -(torso.chest.hz + fit.packStrap[1] + d.strapWidth / 2);
   {
     id: id + '_worn' + suffix,
+    title: titled(id),
     exportMass: 'parts',
     voxelGrain: grain,
     taxonomy: tag('containers', 'back', 'fabric'),
@@ -157,6 +162,7 @@ local fannyPack =
   local beltOuter = torso.pelvis.hz + fit.belt[1];
   {
     id: 'fanny_pack_worn' + suffix,
+    title: titled('fanny_pack'),
     exportMass: 'parts',
     voxelGrain: grain,
     taxonomy: tag('containers', 'waist', 'fabric'),
@@ -201,12 +207,12 @@ local sling =
   ];
 
 [
-  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'cloth-olive-drab', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')),
-  wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }, tag('armour', 'torso', 'fabric')),
+  wornAtom('utility_vest_worn', 0.9, utilityVest, { body: 'cloth-olive-drab', trim: 'cord-olive' }, tag('clothing', 'torso', 'fabric')) + { title: 'Utility vest body' },
+  wornAtom('stab_vest_worn', 2.5, stabVest, { body: 'paint-police-blue', trim: 'polymer-black' }, tag('armour', 'torso', 'fabric')) + { title: 'Stab vest' },
   backpack('school_backpack', 0.6, 0.15),
   backpack('hiking_backpack', 1.4, 0.06),
   fannyPack,
-  wornAtom('weapon_sling_worn', 0.15, sling, { strap: 'cord-olive', trim: 'steel-grey' }) + {
+  wornAtom('weapon_sling_worn', 0.15, sling, { strap: 'cord-olive', trim: 'steel-grey' }) + { title: 'Worn weapon sling' } + {
     taxonomy: { category: 'weapon-parts', tags: { slot: ['back'], fit: [if overJacket then 'over-jacket' else 'worn'] } },
   },
 ];

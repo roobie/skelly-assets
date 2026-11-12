@@ -28,7 +28,7 @@ local legs(slot, x, z, side, top) = [
   ]) + [
     h.prism('back', 'cloth', 'x', [[0.4, 0.3], [0.4, 0.42], [0.96, 0.45], [0.96, 0.33]], -0.45, 0.45),
     h.prism('back-cushion', 'cushion', 'x', [[0.52, 0.16], [0.52, 0.31], [0.92, 0.33], [0.92, 0.2]], -0.3, 0.3),
-  ], { cloth: 'cloth-shirt-faded', cushion: 'cloth-shirt-faded', piping: 'cloth-rag-shadow', foot: 'wood-walnut' })
+  ], { cloth: 'cloth-shirt-faded', cushion: 'cloth-shirt-faded', piping: 'cloth-rag-shadow', foot: 'wood-walnut' }) + { title: 'Armchair' }
   + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric', 'wood'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A bar stool, 800 mm tall: a padded round leather seat 380 mm across on a steel column, with a round foot
@@ -44,7 +44,7 @@ local legs(slot, x, z, side, top) = [
   ] + [
     disc('pan', 'steel', 0.15, 0.69, 0.71),
     turned('seat', 'seat', 'y', [[0, 0], [0, 0.17], [0.015, 0.19], [0.07, 0.19], [0.09, 0.17], [0.09, 0]], [0, 0.71, 0]),
-  ], { base: 'steel-stainless', steel: 'steel-stainless', seat: 'leather-brown' })
+  ], { base: 'steel-stainless', steel: 'steel-stainless', seat: 'leather-brown' }) + { title: 'Barstool' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'furniture', tags: { material: ['leather', 'metal'], setting: ['modern'] } } },
 
   // A bean bag, 900 mm across and 700 mm tall: a slumped round nylon sack full of foam beads, pressed low in
@@ -54,7 +54,7 @@ local legs(slot, x, z, side, top) = [
     turned('back', 'sack', 'y', [[0, 0], [0, 0.26], [0.2, 0.3], [0.36, 0.27], [0.46, 0.18], [0.5, 0]], [0, 0.2, 0.17]),
     turned('seam', 'seam', 'y', [[0, 0.458], [0, 0.466], [0.02, 0.466], [0.02, 0.458], [0, 0.458]], [0, 0.18, 0]),
     box('loop', 'seam', [-0.06, 0.69, 0.155], [0.06, 0.72, 0.185]),
-  ], { sack: 'cloth-navy', seam: 'plastic-charcoal' })
+  ], { sack: 'cloth-navy', seam: 'plastic-charcoal' }) + { title: 'Beanbag' }
   + { voxelGrain: 0.01 } + { taxonomy: { category: 'furniture', tags: { material: ['fabric'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A stacking school chair, 420 mm wide, 480 mm deep and 800 mm tall: a moulded plywood seat and backrest on a
@@ -72,7 +72,7 @@ local legs(slot, x, z, side, top) = [
     box('seat', 'ply', [-0.215, 0.431, -0.24], [0.215, 0.447, 0.22]),
     box('seat-lip', 'ply', [-0.215, 0.425, -0.245], [0.215, 0.447, -0.235]),
     h.prism('back', 'ply', 'x', [[0.58, 0.19], [0.58, 0.206], [0.79, 0.218], [0.79, 0.202]], -0.188, 0.188),
-  ], { frame: 'steel-grey', cap: 'rubber-black', ply: 'wood-birch' })
+  ], { frame: 'steel-grey', cap: 'rubber-black', ply: 'wood-birch' }) + { title: 'Plywood chair' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'furniture', tags: { material: ['wood', 'metal'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A plain wooden kitchen chair, 440 mm wide, 460 mm deep and 950 mm tall: a solid seat on four square legs with
@@ -94,7 +94,7 @@ local legs(slot, x, z, side, top) = [
     disc('spindle-%d' % i, 'wood', 0.011, 0.62, 0.83, x, 0.19)
     for i in [0, 1, 2]
     for x in [[-0.08, 0, 0.08][i]]
-  ], { wood: 'wood-oak', seat: 'wood-oak' })
+  ], { wood: 'wood-oak', seat: 'wood-oak' }) + { title: 'Wooden chair' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'] } } } + { forward: '-z' },
 
   // A log stool, 300 mm across and 420 mm tall: a short round of trunk in rough bark, its top sawn flat and
@@ -104,7 +104,7 @@ local legs(slot, x, z, side, top) = [
     disc('face', 'face', 0.138, 0.414, 0.42),
     disc('heart', 'heart', 0.04, 0.42, 0.421),
     ring('growth', 'heart', 0.085, 0.09, 0.42, 0.001),
-  ], { bark: 'wood-walnut', face: 'wood-pine', heart: 'wood-oak' })
+  ], { bark: 'wood-walnut', face: 'wood-pine', heart: 'wood-oak' }) + { title: 'Log stool' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'] } } },
 
   // A small four-legged wooden stool, 320 mm square and 450 mm tall: a square seat over a shallow apron, on
@@ -124,7 +124,7 @@ local legs(slot, x, z, side, top) = [
     railZ('stretcher-right', 'wood', 0.009, 0.13, 0.14, -0.115, 0.115),
     h.rod('stretcher-front', 'wood', 0.009, -0.115, 0.115, 0.18) + { origin: [-0.115, 0.18, -0.13] },
     h.rod('stretcher-back', 'wood', 0.009, -0.115, 0.115, 0.18) + { origin: [-0.115, 0.18, 0.13] },
-  ], { wood: 'wood-pine', seat: 'wood-pine' })
+  ], { wood: 'wood-pine', seat: 'wood-pine' }) + { title: 'Wooden stool' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'furniture', tags: { material: ['wood'] } } },
 
   // An aluminium foot locker, 690 mm long, 360 mm deep and 300 mm tall: a ribbed aluminium box under a lid, with
@@ -154,6 +154,6 @@ local legs(slot, x, z, side, top) = [
   ] + [
     box('hasp', 'trim', [-0.02, 0.2, -0.186], [0.02, 0.27, -0.178]),
     box('lock', 'lock', [-0.015, 0.19, -0.2], [0.015, 0.225, -0.186]),
-  ], { shell: 'alu-bare', trim: 'steel', handle: 'plastic-black', lock: 'brass' })
+  ], { shell: 'alu-bare', trim: 'steel', handle: 'plastic-black', lock: 'brass' }) + { title: 'Aluminium foot locker' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } } + { forward: '-z' },
 ]

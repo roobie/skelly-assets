@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'golf_cart.spec.libsonnet';
 {
+  title: 'Golf cart',
   sites: [
     site.one('frame', 'golf_cart_frame'),
     site.one('front_cowl', 'golf_cart_front_cowl'),

@@ -4,6 +4,7 @@ local pair = site.pair;
 local s = import 'technical.spec.libsonnet';
 local wheel = 'wheel_235_75r15';
 {
+  title: 'Technical',
   sites: [
     one('frame', 'technical_frame'),
     one('cab', 'technical_cab'),

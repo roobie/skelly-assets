@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
 {
+  title: 'Airport crash tender',
   sites: t.fittings(site.kit, 'airport_crash_tender', s) + [
     site.one('body', 'airport_crash_tender_body'),
     site.one('cab_stripe', 'airport_crash_tender_cab_stripe'),

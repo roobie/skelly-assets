@@ -181,7 +181,7 @@ local bodysuit =
     metal: 'steel-bright',
     strap: 'webbing-black',
     pocket: 'nylon-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel'] } },
+  }) + { title: 'Tiny gym bag' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'plastic'], place: ['gym'], setting: ['modern'] }, keywords: ['duffel'] } },
 
   // A large polyester duffel 700 mm long and 340 mm by 340 mm across, with a zipped front pocket.
   h.compound('large_duffel_bag', 1.4, duffel({ len: 0.7, ht: 0.34, dp: 0.34, bandX: 0.13, pocket: { w: 0.3, ht: 0.14 } }), {
@@ -192,7 +192,7 @@ local bodysuit =
     metal: 'steel-bright',
     strap: 'webbing-black',
     pocket: 'cloth-charcoal',
-  }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Large duffel bag' } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
 
   // A big nylon duffel 900 mm long and 400 mm by 400 mm across, the plain kit-bag sort.
   h.compound('extra_large_duffel_bag', 1.5, duffel({ len: 0.9, ht: 0.4, dp: 0.4, bandX: 0.16 }), {
@@ -202,7 +202,7 @@ local bodysuit =
     band: 'webbing-olive-dark',
     metal: 'plastic-matte-black',
     strap: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Extra large duffel bag' } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric', 'plastic'], setting: ['modern'] } } },
 
   // A child's backpack 240 mm wide, 300 mm tall and 110 mm deep, with a zipped front pocket and two shoulder straps.
   h.compound('small_backpack', 0.35, backpack({}), {
@@ -211,7 +211,7 @@ local bodysuit =
     zip: 'plastic-matte-black',
     metal: 'plastic-matte-black',
     strap: 'webbing-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Small backpack' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A full-body stretch suit folded to 300 mm by 280 mm and 30 mm tall: a mock neck, a front zip, sleeves folded
   // along the sides, black side stripes and the foot ends folded up over the hem.
@@ -223,7 +223,7 @@ local bodysuit =
     zip: 'steel-bright',
     stripe: 'nylon-black',
     foot: 'cloth-purple',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + { title: 'Stretch bodysuit' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A black leather catsuit folded to 340 mm by 340 mm and 50 mm tall, a ring at the collar and zips running in
   // odd directions over it, one buckled strap round the bundle.
@@ -235,7 +235,7 @@ local bodysuit =
     zip: 'steel-bright',
     metal: 'steel-bright',
     strap: 'leather-charcoal',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + { title: 'Bondage suit' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // A clown suit folded to 380 mm by 360 mm and 70 mm tall: half yellow, half red, polka dots, pompom buttons, a
   // white ruff collar and a big patch pocket.
@@ -249,7 +249,7 @@ local bodysuit =
     ruff: 'cloth-cream',
     ruffle: 'cloth-cream',
     dot: 'cloth-green',
-  }) + h.headEndOnPlusZ + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
+  }) + { title: 'Clown suit' } + h.headEndOnPlusZ + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'arms', 'legs'], state: ['folded'] } } },
 
   // Denim bib overalls folded with the bib turned down over the legs, 380 mm by 460 mm and 55 mm tall: shoulder
   // straps with brass buckles, a bib pocket with a pen slot, side buttons and a hammer loop.
@@ -261,5 +261,5 @@ local bodysuit =
     strap: 'cloth-denim-faded',
     metal: 'brass-dull',
     pocket: 'cloth-denim-faded',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'], state: ['folded'] } } },
+  }) + { title: 'Denim overalls' } + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso', 'legs'], state: ['folded'] } } },
 ]

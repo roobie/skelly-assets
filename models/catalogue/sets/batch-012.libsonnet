@@ -30,7 +30,7 @@ local bail(radius, earY, topY, wire, grip) = [
     turned('tie-b', 'cord', 'x', [[0, 0], [0, 0.015], [0.008, 0.015], [0.008, 0]], [0.135, 0.085, 0]),
     box('tie-end-a', 'cord', [-0.15, 0.03, 0.01], [-0.144, 0.09, 0.016]),
     box('tie-end-b', 'cord', [0.135, 0.04, -0.016], [0.141, 0.085, -0.01]),
-  ], { skin: 'wax-cream', cord: 'cord-olive' })
+  ], { skin: 'wax-cream', cord: 'cord-olive' }) + { title: 'Sealed large stomach' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['flesh'] } } },
 
   // A plastic lunchbox, 210 mm long, 140 mm deep and 100 mm tall with its handle: a blue tub under a
@@ -45,7 +45,7 @@ local bail(radius, earY, topY, wire, grip) = [
     box('handle', 'trim', [-0.05, 0.092, -0.01], [0.05, 0.1, 0.01]),
     box('latch-a', 'trim', [-0.107, 0.04, -0.025], [-0.103, 0.076, 0.025]),
     box('latch-b', 'trim', [0.103, 0.04, -0.025], [0.107, 0.076, 0.025]),
-  ], { shell: 'plastic-blue', trim: 'plastic-white' })
+  ], { shell: 'plastic-blue', trim: 'plastic-white' }) + { title: 'Lunchbox' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A children's craft kit box lying flat, 320 mm long, 230 mm wide and 50 mm deep: a white printed lid
@@ -60,7 +60,7 @@ local bail(radius, earY, topY, wire, grip) = [
     box('part-c', 'green', [0.06, 0.052, -0.08], [0.1, 0.056, 0.02]),
     box('part-d', 'yellow', [-0.08, 0.052, 0, ], [-0.02, 0.056, 0.04]),
     box('part-e', 'red', [0.0, 0.052, -0.01], [0.04, 0.056, 0.04]),
-  ], { board: 'paperboard-tan', lid: 'paint-white', red: 'paint-red', sky: 'plastic-blue', yellow: 'plastic-yellow', green: 'plastic-green' })
+  ], { board: 'paperboard-tan', lid: 'paint-white', red: 'paint-red', sky: 'plastic-blue', yellow: 'plastic-yellow', green: 'plastic-green' }) + { title: 'Craft kit box' }
   + h.label('title', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A 20 pound barbecue propane cylinder, 305 mm across and 460 mm tall: a white steel bottle on a foot
@@ -76,37 +76,37 @@ local bail(radius, earY, topY, wire, grip) = [
     box('relief', 'brass', [-0.05, 0.44, -0.01], [0, 0.458, 0.01]),
     disc('stem', 'brass', 0.008, 0.465, 0.475),
     disc('wheel', 'wheel', 0.04, 0.475, 0.49),
-  ], { paint: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal', brass: 'brass', wheel: 'plastic-black' })
+  ], { paint: 'paint-white', steel: 'steel-grey', dark: 'paint-charcoal', brass: 'brass', wheel: 'plastic-black' }) + { title: 'Medium propane tank' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A sealed meal ration bag lying flat, 260 mm long, 150 mm wide and 40 mm thick: a heavy tan pouch
   // with crimped seals at both ends and a dark printed panel.
-  h.compound('ration_meal_bag', 0.76, ration(0.26, 0.15, 0.04, 0.14), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
+  h.compound('ration_meal_bag', 0.76, ration(0.26, 0.15, 0.04, 0.14), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' }) + { title: 'Ration meal bag' }
   + h.label('print', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An entrée pouch from a meal ration lying flat, 190 mm long, 120 mm wide and 18 mm thick: a tan
   // foil-lined retort pouch with sealed ends and a dark printed panel.
-  h.compound('ration_entree_pouch', 0.24, ration(0.19, 0.12, 0.018, 0.1), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' })
+  h.compound('ration_entree_pouch', 0.24, ration(0.19, 0.12, 0.018, 0.1), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-charcoal' }) + { title: 'Ration entree pouch' }
   + h.label('print', '+y') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A side-dish pouch from a meal ration lying flat, 150 mm long, 90 mm wide and 12 mm thick, tan with
   // sealed ends and an olive printed panel.
-  h.compound('ration_side_pouch', 0.1, ration(0.15, 0.09, 0.012, 0.08), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-olive' })
+  h.compound('ration_side_pouch', 0.1, ration(0.15, 0.09, 0.012, 0.08), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-olive' }) + { title: 'Ration side pouch' }
   + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A dessert pouch from a meal ration lying flat, 120 mm long, 70 mm wide and 8 mm thick, tan with
   // sealed ends and a red printed panel.
-  h.compound('ration_dessert_pouch', 0.05, ration(0.12, 0.07, 0.008, 0.06), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-red' })
+  h.compound('ration_dessert_pouch', 0.05, ration(0.12, 0.07, 0.008, 0.06), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-red' }) + { title: 'Ration dessert pouch' }
   + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve jam packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick, tan
   // with sealed ends and a purple-red printed panel.
-  h.compound('ration_jam_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-oxblood' })
+  h.compound('ration_jam_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paint-oxblood' }) + { title: 'Ration jam packet' }
   + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A single-serve spread packet from a meal ration lying flat, 80 mm long, 45 mm wide and 6 mm thick,
   // tan with sealed ends and a brown printed panel.
-  h.compound('ration_spread_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paperboard-brown' })
+  h.compound('ration_spread_packet', 0.018, ration(0.08, 0.045, 0.006, 0.04), { pouch: 'polymer-fde', crimp: 'polymer-fde', print: 'paperboard-brown' }) + { title: 'Ration spread packet' }
   + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An empty one-gallon plastic paint pail, 170 mm across and 190 mm tall, 210 mm with its handle up:
@@ -115,7 +115,7 @@ local bail(radius, earY, topY, wire, grip) = [
     turned('pail', 'pail', 'y', [[0, 0], [0, 0.078], [0.17, 0.085], [0.17, 0]]),
     turned('rim', 'pail', 'y', [[0, 0], [0, 0.088], [0.016, 0.088], [0.016, 0]], [0, 0.17, 0]),
     turned('label', 'label', 'y', [[0, 0], [0, 0.082], [0.09, 0.086], [0.09, 0]], [0, 0.04, 0]),
-  ] + bail(0.086, 0.165, 0.21, 0.004, 0.06), { pail: 'plastic-white', label: 'plastic-blue', ear: 'plastic-white', bail: 'plastic-black', grip: 'plastic-black' })
+  ] + bail(0.086, 0.165, 0.21, 0.004, 0.06), { pail: 'plastic-white', label: 'plastic-blue', ear: 'plastic-white', bail: 'plastic-black', grip: 'plastic-black' }) + { title: 'Plastic paint pail' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An empty one-gallon steel paint can, 168 mm across and 190 mm tall, 210 mm with its handle up: bare
@@ -126,7 +126,7 @@ local bail(radius, earY, topY, wire, grip) = [
     turned('chime-top', 'steel', 'y', [[0, 0], [0, 0.085], [0.01, 0.085], [0.01, 0]], [0, 0.18, 0]),
     disc('lid', 'lid', 0.07, 0.19, 0.192),
     turned('label', 'label', 'y', [[0, 0], [0, 0.0835], [0.12, 0.0835], [0.12, 0]], [0, 0.03, 0]),
-  ] + bail(0.086, 0.15, 0.21, 0.004, 0.07), { steel: 'steel-grey', lid: 'alu-bare', label: 'paint-red', ear: 'steel-grey', bail: 'steel', grip: 'wood-pine' })
+  ] + bail(0.086, 0.15, 0.21, 0.004, 0.07), { steel: 'steel-grey', lid: 'alu-bare', label: 'paint-red', ear: 'steel-grey', bail: 'steel', grip: 'wood-pine' }) + { title: 'Metal paint can' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A soft fabric pencil case lying on its side, 210 mm long, 90 mm wide and 70 mm tall: a navy pouch
@@ -138,7 +138,7 @@ local bail(radius, earY, topY, wire, grip) = [
     box('zip', 'zip', [-0.1, 0.066, -0.006], [0.1, 0.072, 0.006]),
     box('pull', 'metal', [0.07, 0.072, -0.005], [0.085, 0.076, 0.005]),
     box('pull-tab', 'tab', [0.085, 0.07, -0.006], [0.11, 0.074, 0.006]),
-  ], { cloth: 'paint-police-blue', zip: 'plastic-black', metal: 'steel', tab: 'plastic-red' })
+  ], { cloth: 'paint-police-blue', zip: 'plastic-black', metal: 'steel', tab: 'plastic-red' }) + { title: 'Pencil case' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A 90 mm glass Petri dish with its lid on, 96 mm across and 16 mm tall: a shallow dish under a
@@ -148,7 +148,7 @@ local bail(radius, earY, topY, wire, grip) = [
     turned('lid', 'glass', 'y', [[0, 0.046], [0, 0.048], [0.012, 0.048], [0.012, 0.046]], [0, 0.004, 0]),
     disc('lid-top', 'glass', 0.048, 0.014, 0.016),
     box('patch', 'patch', [0.01, 0.016, -0.012], [0.035, 0.0175, 0.012]),
-  ], { glass: 'glass-clear', patch: 'plastic-frosted' })
+  ], { glass: 'glass-clear', patch: 'plastic-frosted' }) + { title: 'Petri dish' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A seven-day plastic pill organiser, 150 mm long, 32 mm deep and 22 mm tall: a frosted strip of seven
@@ -171,6 +171,6 @@ local bail(radius, earY, topY, wire, grip) = [
     'lid-4': 'plastic-blue',
     'lid-5': 'plastic-pink',
     'lid-6': 'plastic-white',
-  })
+  }) + { title: 'Pillbox' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

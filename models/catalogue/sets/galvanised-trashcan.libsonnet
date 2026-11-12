@@ -185,7 +185,7 @@ local can(damage) =
 [
   // A galvanised steel trash can: a tapered wall with three pairs of pressed ribs, a rolled rim and foot band, a drop
   // handle each side and a domed lid that lifts off.
-  can({}) + { id: 'galvanised_trashcan' },
+  can({}) + { id: 'galvanised_trashcan', title: 'Galvanised trash can' },
   // The same can kicked in: the wall caved in between the lower ribs and folded across the blow, pushed out of round
   // and leaning away from it, its lid knocked askew on the rim.
   can({
@@ -194,6 +194,7 @@ local can(damage) =
     tip: 7,
   }) + {
     id: 'galvanised_trashcan_dented',
+    title: 'Dented galvanised trash can',
     taxonomy+: { tags+: { state: ['crashed'] } },
   },
 ]

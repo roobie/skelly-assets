@@ -5,6 +5,7 @@ local k = import 'kit.libsonnet';
 local retag(part) = if std.startsWith(part, 'saloon_') then k.partId('taxi', s, part[6:]) else part;
 local retagged = [placed + { part: retag(placed.part) } for placed in (import 'saloon.placements.libsonnet').sites];
 {
+  title: 'Taxi',
   sites: k.painted('taxi', s, (import 'car-body.libsonnet').pressings('taxi', s), retagged) + [
     site.one('roof_sign', 'taxi_roof_sign'),
     site.one('side_band', 'taxi_side_band'),

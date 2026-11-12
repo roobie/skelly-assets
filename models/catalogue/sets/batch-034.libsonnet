@@ -26,7 +26,7 @@ local carabiner(prefix, cx, cz, y) =
              h.strapLoop('hank-a', 'cord', 0.4, 0.016, 0.006, 0.006, 0)
              + h.strapLoop('hank-b', 'cord', 0.39, 0.009, 0.006, 0.006, 0.004)
              + std.flattenArrays([carabiner('clip-%d' % i, -0.15 + i * 0.06, 0.02, 0.006) for i in std.range(0, 5)]),
-             { cord: 'nylon-red', clip: 'steel-bright', gate: 'plastic-charcoal' })
+             { cord: 'nylon-red', clip: 'steel-bright', gate: 'plastic-charcoal' }) + { title: 'Storage line' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['fabric', 'metal'] } } },
 
   // A fibrous plant stalk about 550 mm long and 16 mm across at the base, green, jointed every 120 mm, with
@@ -42,7 +42,7 @@ local carabiner(prefix, cx, cz, y) =
   ] + [
     strip('fibre-%d' % i, 'node', [-0.27, (i - 1) * 0.003], [-0.3, (i - 1) * 0.008], 0.002, 0.004 + i * 0.002, 0.006 + i * 0.002)
     for i in std.range(0, 2)
-  ], { stalk: 'leaf-green', node: 'plant-dried', leaf: 'leaf-green' })
+  ], { stalk: 'leaf-green', node: 'plant-dried', leaf: 'leaf-green' }) + { title: 'Fibrous stalk' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A short piece of cotton string 150 mm long and 3 mm across, lying in loose waves with a knot at one end.
@@ -52,7 +52,7 @@ local carabiner(prefix, cx, cz, y) =
     for i in std.range(0, 8)
   ] + [
     h.ball('knot', 'cord', 0.0035, pts[9][0], 0.003, pts[9][1]),
-  ], { cord: 'cord-cotton' })
+  ], { cord: 'cord-cotton' }) + { title: 'Short string' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A laser target practice kit: two toy laser pistols 180 mm long lying in front of two round electronic
@@ -89,7 +89,7 @@ local carabiner(prefix, cx, cz, y) =
     screen: 'lcd-green',
     face: 'plastic-gloss-white',
     ring: 'plastic-red',
-  })
+  }) + { title: 'Laser target kit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A size 7 basketball, 239 mm across, pebbled orange rubber with black seams: two great circles and two
@@ -101,7 +101,7 @@ local carabiner(prefix, cx, cz, y) =
     seam('seam-x', 'seam', r, 0, 'x', c),
     seam('seam-left', 'seam', r, -0.075, 'x', c),
     seam('seam-right', 'seam', r, 0.075, 'x', c),
-  ], { ball: 'foam-orange', seam: 'rubber-offblack' })
+  ], { ball: 'foam-orange', seam: 'rubber-offblack' }) + { title: 'Basketball' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
 
   // A beach volleyball 270 mm across, soft vinyl in bright yellow, blue and white bands.
@@ -109,7 +109,7 @@ local carabiner(prefix, cx, cz, y) =
   h.compound('beach_volleyball', 0.27, [
     zone('band-%d' % i, ['yellow', 'blue', 'white'][i % 3], r, cuts[i], cuts[i + 1], 'x', c)
     for i in std.range(0, 5)
-  ], { yellow: 'rubber-yellow', blue: 'paint-drum-blue', white: 'plastic-gloss-white' })
+  ], { yellow: 'rubber-yellow', blue: 'paint-drum-blue', white: 'plastic-gloss-white' }) + { title: 'Beach volleyball' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
 
   // A bowling ball 216 mm across, glossy red, with three finger holes on its front face.
@@ -120,7 +120,7 @@ local carabiner(prefix, cx, cz, y) =
     local z = std.sqrt(r * r - holes[i][0] * holes[i][0] - (holes[i][1] - r) * (holes[i][1] - r));
     turned('hole-%d' % i, 'hole', 'z', [[0, 0], [0, holes[i][2]], [0.012, holes[i][2]], [0.012, 0]], [holes[i][0], holes[i][1], z - 0.01])
     for i in std.range(0, 2)
-  ], { ball: 'lacquer-red', hole: 'void-black' })
+  ], { ball: 'lacquer-red', hole: 'void-black' }) + { title: 'Bowling ball' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // An American football 290 mm long and 170 mm across, brown leather with white stripes near each end and
@@ -138,6 +138,6 @@ local carabiner(prefix, cx, cz, y) =
   ] + [
     box('lace-%d' % i, 'lace', [-0.04 + i * 0.01 - 0.002, 2 * R - 0.003 - 0.0002 * (i - 4) * (i - 4), -0.012], [-0.04 + i * 0.01 + 0.002, 2 * R + 0.004, 0.012])
     for i in std.range(0, 8)
-  ], { leather: 'leather-chestnut', stripe: 'cloth-cream', lace: 'cloth-cream' })
+  ], { leather: 'leather-chestnut', stripe: 'cloth-cream', lace: 'cloth-cream' }) + { title: 'Football' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather'] } } },
 ]

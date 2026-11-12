@@ -79,19 +79,19 @@ local kettlebell(r, cy) =
 
 [
   // A 10 kg hex dumbbell 290 mm long: rubber-clad hex heads 110 mm across their flats on a chrome handle.
-  h.compound('dumbbell', 10, dumbbell(0.13, 0.016, 0.064, 0.068), { handle: 'steel-bright', knurl: 'steel-hardened', head: 'rubber-black', collar: 'steel-bright' })
+  h.compound('dumbbell', 10, dumbbell(0.13, 0.016, 0.064, 0.068), { handle: 'steel-bright', knurl: 'steel-hardened', head: 'rubber-black', collar: 'steel-bright' }) + { title: 'Dumbbell' }
   + h.inHand('dumbbell', 'handle') + { voxelGrain: 0.004 } + gym('recreation', ['rubber', 'metal'], ['free-weights', 'strength-training']),
 
   // A 25 kg hex dumbbell 350 mm long, its heads 150 mm across their flats.
-  h.compound('heavy_dumbbell', 25, dumbbell(0.135, 0.017, 0.088, 0.096), { handle: 'steel-bright', knurl: 'steel-hardened', head: 'rubber-black', collar: 'steel-bright' })
+  h.compound('heavy_dumbbell', 25, dumbbell(0.135, 0.017, 0.088, 0.096), { handle: 'steel-bright', knurl: 'steel-hardened', head: 'rubber-black', collar: 'steel-bright' }) + { title: 'Heavy dumbbell' }
   + h.inHand('heavy_dumbbell', 'handle') + { voxelGrain: 0.004 } + gym('recreation', ['rubber', 'metal'], ['free-weights', 'strength-training']),
 
   // A 2 kg vinyl-coated dumbbell 210 mm long with round heads 90 mm across, for light toning work.
-  h.compound('light_dumbbell', 2, dumbbell(0.11, 0.015, 0.045, 0.05, hex=false), { handle: 'plastic-blue', knurl: 'plastic-blue', head: 'plastic-blue', collar: 'plastic-blue' })
+  h.compound('light_dumbbell', 2, dumbbell(0.11, 0.015, 0.045, 0.05, hex=false), { handle: 'plastic-blue', knurl: 'plastic-blue', head: 'plastic-blue', collar: 'plastic-blue' }) + { title: 'Light dumbbell' }
   + h.inHand('light_dumbbell', 'handle') + { voxelGrain: 0.004 } + gym('recreation', ['plastic'], ['free-weights', 'fitness']),
 
   // An empty standard 20 kg barbell, 2.2 m long, lying on its collars.
-  h.compound('barbell', 20, barbell(0.035), { shaft: 'steel-bright', knurl: 'steel-hardened', sleeve: 'steel-bright' })
+  h.compound('barbell', 20, barbell(0.035), { shaft: 'steel-bright', knurl: 'steel-hardened', sleeve: 'steel-bright' }) + { title: 'Barbell' }
   + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'weightlifting', 'strength-training']),
 
   // A loaded barbell, 60 kg: the 20 kg bar with a 20 kg bumper plate 450 mm across on each sleeve, held by
@@ -99,27 +99,27 @@ local kettlebell(r, cy) =
   h.compound('loaded_barbell', 60, barbell(0.225) + plate('plate-l', 'x', 0.225, 0.065, [-0.752, 0.225, 0]) + plate('plate-r', 'x', 0.225, 0.065, [0.687, 0.225, 0]) + [
     ring('clip-l', 'clip', 'x', 0.0255, 0.035, 0.018, [-0.775, 0.225, 0]),
     ring('clip-r', 'clip', 'x', 0.0255, 0.035, 0.018, [0.757, 0.225, 0]),
-  ], { shaft: 'steel-bright', knurl: 'steel-hardened', sleeve: 'steel-bright', plate: 'rubber-black', hub: 'steel-bright', clip: 'plastic-red' })
+  ], { shaft: 'steel-bright', knurl: 'steel-hardened', sleeve: 'steel-bright', plate: 'rubber-black', hub: 'steel-bright', clip: 'plastic-red' }) + { title: 'Loaded barbell' }
   + { voxelGrain: 0.004 } + gym('recreation', ['metal', 'rubber'], ['free-weights', 'weightlifting', 'strength-training']),
 
   // A 20 kg rubber bumper plate lying flat, 450 mm across and 65 mm thick, with a steel hub round its bore.
-  h.compound('bumper_plate', 20, plate('plate', 'y', 0.225, 0.065, [0, 0.002, 0]), { plate: 'rubber-black', hub: 'steel-bright' })
+  h.compound('bumper_plate', 20, plate('plate', 'y', 0.225, 0.065, [0, 0.002, 0]), { plate: 'rubber-black', hub: 'steel-bright' }) + { title: 'Bumper plate' }
   + { voxelGrain: 0.004 } + gym('recreation', ['rubber'], ['free-weights', 'weightlifting']),
 
   // A 5 kg cast iron plate lying flat, 230 mm across and 28 mm thick, with a raised rim.
-  h.compound('iron_weight_plate', 5, plate('plate', 'y', 0.115, 0.028, [0, 0.004, 0], rim=true), { plate: 'iron-cast', hub: 'steel-bright' })
+  h.compound('iron_weight_plate', 5, plate('plate', 'y', 0.115, 0.028, [0, 0.004, 0], rim=true), { plate: 'iron-cast', hub: 'steel-bright' }) + { title: 'Iron weight plate' }
   + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'weightlifting']),
 
   // A 16 kg cast iron kettlebell 280 mm tall: a ball 200 mm across on a flat foot under a 35 mm handle.
-  h.compound('kettlebell', 16, kettlebell(0.1, 0.085), { bell: 'iron-cast', handle: 'iron-cast' })
+  h.compound('kettlebell', 16, kettlebell(0.1, 0.085), { bell: 'iron-cast', handle: 'iron-cast' }) + { title: 'Kettlebell' }
   + h.inHand('kettlebell', 'handle-wide-3') + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'strength-training']),
 
   // A 24 kg cast iron kettlebell 315 mm tall.
-  h.compound('heavy_kettlebell', 24, h.scaled(kettlebell(0.1, 0.085), 1.13), { bell: 'iron-cast', handle: 'iron-cast' })
+  h.compound('heavy_kettlebell', 24, h.scaled(kettlebell(0.1, 0.085), 1.13), { bell: 'iron-cast', handle: 'iron-cast' }) + { title: 'Heavy kettlebell' }
   + h.inHand('heavy_kettlebell', 'handle-wide-3') + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'strength-training']),
 
   // An 8 kg kettlebell 225 mm tall, cast iron coated in red vinyl.
-  h.compound('light_kettlebell', 8, h.scaled(kettlebell(0.1, 0.085), 0.8), { bell: 'paint-red', handle: 'paint-red' })
+  h.compound('light_kettlebell', 8, h.scaled(kettlebell(0.1, 0.085), 0.8), { bell: 'paint-red', handle: 'paint-red' }) + { title: 'Light kettlebell' }
   + h.inHand('light_kettlebell', 'handle-wide-3') + { voxelGrain: 0.004 } + gym('recreation', ['metal'], ['free-weights', 'fitness']),
 
   // An adjustable weight bench set flat, 25 kg and 1.25 m long: back and seat pads 440 mm up on a square steel frame,
@@ -140,7 +140,7 @@ local kettlebell(r, cy) =
   ] + pair('cap-front', 'rubber', [0.2, 0, 0.43], [0.27, 0.065, 0.51]) + [
     wheel('wheel-l', 'rubber', 0.04, 0.03, 0.3, 0.04, -0.59),
     wheel('wheel-r', 'rubber', 0.04, 0.03, -0.33, 0.04, -0.59),
-  ], { frame: 'paint-graphite', pin: 'paint-red', pad: 'vinyl-black', rubber: 'rubber-black' })
+  ], { frame: 'paint-graphite', pin: 'paint-red', pad: 'vinyl-black', rubber: 'rubber-black' }) + { title: 'Weight bench' }
   + { voxelGrain: 0.004 } + gym('recreation', ['metal', 'plastic'], ['strength-training']),
 
   // A power rack 2.25 m tall, 120 kg: four 75 mm uprights on a 1.2 by 1.0 m footprint, a pull-up bar across the
@@ -163,7 +163,7 @@ local kettlebell(r, cy) =
   + pair('safety', 'frame', [0.535, 0.72, -0.62], [0.585, 0.77, 0.62])
   + [barZ('horn-%s-%d' % [side[0], i], 'bar', 0.025, -0.5 - up - 0.25, -0.5 - up, side[1], [0.45, 0.95][i]) for side in [['l', 0.56], ['r', -0.56]] for i in [0, 1]]
   + pair('pad', 'rubber', [0.56 - up - 0.005, 0, -0.64], [0.56 + up + 0.005, 0.01, -0.58]) + pair('pad-front', 'rubber', [0.56 - up - 0.005, 0, 0.58], [0.56 + up + 0.005, 0.01, 0.64]),
-  { frame: 'paint-graphite', bar: 'steel-bright', liner: 'uhmw-white', rubber: 'rubber-black' })
+  { frame: 'paint-graphite', bar: 'steel-bright', liner: 'uhmw-white', rubber: 'rubber-black' }) + { title: 'Power rack' }
   + { voxelGrain: 0.01 } + gym('recreation', ['metal'], ['strength-training', 'weightlifting']),
 
   // A motorised treadmill, 95 kg, 1.9 m long: a 500 mm belt between side rails, the motor hood and console at the
@@ -187,7 +187,7 @@ local kettlebell(r, cy) =
     barZ('grip-l', 'step', 0.02, 0.3, 0.5, 0.36, 1.02),
     barZ('grip-r', 'step', 0.02, 0.3, 0.5, -0.36, 1.02),
   ] + pair('foot-rear', 'step', [0.3, 0, -0.9], [0.38, 0.04, -0.82]) + pair('foot-front', 'step', [0.3, 0, 0.82], [0.38, 0.04, 0.9]),
-  { frame: 'paint-graphite', belt: 'rubber-tread', shell: 'plastic-charcoal', screen: 'screen-black', readout: 'lcd-green', key: 'paint-red', step: 'rubber-black' })
+  { frame: 'paint-graphite', belt: 'rubber-tread', shell: 'plastic-charcoal', screen: 'screen-black', readout: 'lcd-green', key: 'paint-red', step: 'rubber-black' }) + { title: 'Treadmill' }
   + { voxelGrain: 0.01 } + gym('recreation', ['plastic', 'metal'], ['cardio', 'fitness']),
 
   // An air rowing machine, 26 kg and 2.4 m long: an aluminium monorail carrying the seat, the fan cage at the front,
@@ -219,11 +219,11 @@ local kettlebell(r, cy) =
   ] + [
     wheel('wheel-l', 'rubber', 0.035, 0.025, 0.2, 0.035, 0.97),
     wheel('wheel-r', 'rubber', 0.035, 0.025, -0.225, 0.035, 0.97),
-  ], { rail: 'alu-bare', frame: 'paint-charcoal', cage: 'mesh-black', shell: 'plastic-charcoal', readout: 'lcd-green', grip: 'rubber-black', strap: 'webbing-black', rubber: 'rubber-black' })
+  ], { rail: 'alu-bare', frame: 'paint-charcoal', cage: 'mesh-black', shell: 'plastic-charcoal', readout: 'lcd-green', grip: 'rubber-black', strap: 'webbing-black', rubber: 'rubber-black' }) + { title: 'Rowing machine' }
   + { voxelGrain: 0.01 } + gym('recreation', ['metal', 'plastic'], ['cardio', 'fitness']),
 
   // An exercise mat laid flat, 1.83 m by 610 mm and 10 mm thick, of closed-cell foam.
-  h.compound('exercise_mat', 1.2, [box('mat', 'mat', [-0.305, 0, -0.915], [0.305, 0.01, 0.915])], { mat: 'foam-eva' })
+  h.compound('exercise_mat', 1.2, [box('mat', 'mat', [-0.305, 0, -0.915], [0.305, 0.01, 0.915])], { mat: 'foam-eva' }) + { title: 'Exercise mat' }
   + { voxelGrain: 0.004 } + gym('recreation', ['rubber'], ['yoga', 'fitness']),
 
   // The exercise mat rolled up and strapped, 610 mm long and 150 mm across.
@@ -231,7 +231,7 @@ local kettlebell(r, cy) =
     ring('roll', 'mat', 'x', 0.02, 0.075, 0.61, [-0.305, 0.075, 0]),
     ring('strap-l', 'strap', 'x', 0.074, 0.079, 0.025, [0.17, 0.075, 0]),
     ring('strap-r', 'strap', 'x', 0.074, 0.079, 0.025, [-0.195, 0.075, 0]),
-  ], { mat: 'foam-eva', strap: 'webbing-black' })
+  ], { mat: 'foam-eva', strap: 'webbing-black' }) + { title: 'Rolled exercise mat' }
   + { voxelGrain: 0.004 } + gym('recreation', ['rubber'], ['yoga', 'fitness']) + { taxonomy+: { tags+: { state: ['folded'] } } },
 
   // A weight plate tree, 30 kg and 1.1 m tall: six storage horns on a square post over crossed feet.
@@ -243,7 +243,7 @@ local kettlebell(r, cy) =
     barZ('horn-%s-%d' % [s[0], i], 'horn', 0.025, s[1], s[2], 0, [0.3, 0.6, 0.9][i])
     for s in [['front', 0.035, 0.26], ['back', -0.26, -0.035]]
     for i in [0, 1, 2]
-  ], { frame: 'paint-graphite', horn: 'steel-bright' })
+  ], { frame: 'paint-graphite', horn: 'steel-bright' }) + { title: 'Plate tree' }
   + { voxelGrain: 0.01 } + gym('recreation', ['metal'], ['free-weights']),
 
   // An empty two-tier dumbbell rack, 45 kg and 1.3 m long: two shelves sloping toward the user on steel end frames.
@@ -258,6 +258,6 @@ local kettlebell(r, cy) =
   + pair('leg-back', 'frame', [0.62, 0, -0.32], [0.68, 0.82, -0.26])
   + pair('foot', 'frame', [0.62, 0, -0.36], [0.68, 0.05, 0.36])
   + pair('end', 'frame', [0.62, 0.36, -0.32], [0.68, 0.42, 0.32])
-  + pair('leg-mid', 'frame', [0.62, 0.42, -0.02], [0.68, 0.76, 0.04]), { frame: 'paint-graphite', liner: 'rubber-black' })
+  + pair('leg-mid', 'frame', [0.62, 0.42, -0.02], [0.68, 0.76, 0.04]), { frame: 'paint-graphite', liner: 'rubber-black' }) + { title: 'Dumbbell rack' }
   + { voxelGrain: 0.01 } + gym('recreation', ['metal'], ['free-weights']),
 ]

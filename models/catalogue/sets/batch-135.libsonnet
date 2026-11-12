@@ -188,7 +188,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + meridian('comb-f', 'steel', kettleBowl, 0, 0.004, 0.142, 0.01, 0.01, 8, 0.042)
              + meridian('comb-b', 'steel', kettleBowl, 180, 0.004, 0.142, 0.01, 0.01, 8, 0.042)
              + rivetRow('rivet', 'rivet', kettleBowl, 0.008, 12, 0.005, 0.042, 15),
-             { steel: 'steel-grey', rivet: 'steel-bright', leather: 'leather-tan' })
+             { steel: 'steel-grey', rivet: 'steel-bright', leather: 'leather-tan' }) + { title: 'Kettle helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // An iron nasal helm, 210 mm across and 240 mm tall with its nose bar: a pointed cone on a darker brow band riveted
@@ -208,7 +208,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + meridian('rib-l', 'band', nasalPath, 90, 0.026, 0.168, 0.014, 0.003, 18, lift)
              + meridian('rib-r', 'band', nasalPath, 270, 0.026, 0.168, 0.014, 0.003, 18, lift)
              + rivetRow('rivet', 'rivet', nasalPath, 0.013, 12, 0.004, lift, 15),
-             { iron: 'steel-grey', band: 'steel-parkerized', rivet: 'steel-bright', leather: 'leather-tan' })
+             { iron: 'steel-grey', band: 'steel-parkerized', rivet: 'steel-bright', leather: 'leather-tan' }) + { title: 'Nasal helm' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A skid lid standing on its chin strap, 200 mm across and 130 mm tall: a low polished steel pudding-basin dome
@@ -225,7 +225,7 @@ local ridingHelmet(id, mass, peak, fin) =
                box('buckle', 'buckle', [0.02, 0, -0.016], [0.046, 0.008, 0.016]),
              ]
              + [rivet('stud-l', 'buckle', skidPath, 90, 0.014, 0.006, lift), rivet('stud-r', 'buckle', skidPath, 270, 0.014, 0.006, lift)],
-             { steel: 'steel-bright', trim: 'plastic-matte-black', strap: 'leather-black', buckle: 'metal-silver' })
+             { steel: 'steel-bright', trim: 'plastic-matte-black', strap: 'leather-black', buckle: 'metal-silver' }) + { title: 'Skid lid' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['modern'], slot: ['head'] } } },
 
   // An olive cotton helmet liner sitting on its flaps, 200 mm across and 175 mm tall: a soft skullcap stitched in
@@ -238,7 +238,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + wallBand('flap-b', 'cloth', linerPath, 0.005, 145, 215, 4, -lift + 0.012, 0.002, lift)
              + std.flattenArrays([meridian('seam-%d' % a, 'seam', linerPath, a, 0, 0.126, 0.005, 0.002, 7, lift) for a in [0, 90, 180, 270]])
              + h.crescent('hem', 'seam', 0.094, 0.1, 0, 360, 16, lift - 0.002, lift + 0.004),
-             { cloth: 'cloth-olive-drab', seam: 'webbing-olive-dark' })
+             { cloth: 'cloth-olive-drab', seam: 'webbing-olive-dark' }) + { title: 'Helmet liner' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
   // An iron kabuto standing on its neck guard, 360 mm across the turnbacks and 360 mm tall to its crest: a low black
   // bowl with raised ribs and a gilt band round its foot, a neck guard of four flaring black plates laced in red
@@ -281,7 +281,7 @@ local ridingHelmet(id, mass, peak, fin) =
                for k in [0, 1]
              ])
              + [h.crescent('throat-lace-%d' % j, 'lace', 0.128, 0.132, -50 + 20 * j - 1.5, -50 + 20 * j + 1.5, 1, 0.002, 0.03)[0] for j in std.range(0, 5)],
-             { iron: 'steel-parkerized', rib: 'steel-grey', gilt: 'brass-polished', lacquer: 'leather-black', lace: 'cloth-crimson', mask: 'leather-red', hair: 'fur-pale', slot: 'plastic-matte-black' })
+             { iron: 'steel-parkerized', rib: 'steel-grey', gilt: 'brass-polished', lacquer: 'leather-black', lace: 'cloth-crimson', mask: 'leather-red', hair: 'fur-pale', slot: 'plastic-matte-black' }) + { title: 'Kabuto' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A steel great helm standing on its rim, 230 mm across and 300 mm tall: a flat-topped drum closed round the head,
@@ -301,28 +301,28 @@ local ridingHelmet(id, mass, peak, fin) =
              + skin('strip', 'brass', greatPath, -4, 4, 0.02, 0.19, 0.004, 0.003, 4)
              + [rivet('hole-%d-%d' % [i, j], 'hole', greatPath, 22 + 9 * i, 0.08 + 0.018 * j, 0.0035) for i in std.range(0, 3) for j in std.range(0, 3)]
              + rivetRow('rivet', 'rivet', greatPath, 0.215, 14, 0.0045, 0, 12),
-             { steel: 'steel-grey', brass: 'brass-dull', rivet: 'steel-bright', hole: 'plastic-matte-black', leather: 'leather-tan', pad: 'cloth-charcoal' })
+             { steel: 'steel-grey', brass: 'brass-dull', rivet: 'steel-bright', hole: 'plastic-matte-black', leather: 'leather-tan', pad: 'cloth-charcoal' }) + { title: 'Great helm' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A sheet metal helmet, 300 mm across its collar and 290 mm tall: a crude riveted bucket with the face cut out, a
   // cotton pad showing round the opening, on a flared bevor collar.
-  sheetHelmet('sheet_metal_helmet', 2.4, false) + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  sheetHelmet('sheet_metal_helmet', 2.4, false) + { title: 'Sheet metal helmet' } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A sheet metal great helm, 300 mm across its collar and 290 mm tall: the riveted bucket closed over the face with a
   // narrow eye slit and rows of breathing holes, on a flared bevor collar.
-  sheetHelmet('sheet_metal_great_helm', 2.6, true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  sheetHelmet('sheet_metal_great_helm', 2.6, true) + { title: 'Sheet metal great helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A full-face motorcycle helmet with its smoked visor down, 290 mm across and 275 mm tall.
-  motorHelmet('motorcycle_helmet', false) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  motorHelmet('motorcycle_helmet', false) + { title: 'Motorcycle helmet' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // The same full-face motorcycle helmet with its visor swung up over the brow, the eye window open.
-  motorHelmet('motorcycle_helmet_visor_up', true) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  motorHelmet('motorcycle_helmet_visor_up', true) + { title: 'Motorcycle helmet with visor raised' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
   // A black velvet-covered riding helmet (charcoal, so the black piping, seams and glossy peak read against it), 220 mm across and 190 mm tall with a 50 mm peak, standing on its harness.
-  ridingHelmet('riding_helmet', 0.49, true, { cover: 'cloth-charcoal', trim: 'leather-black', strap: 'nylon-black', buckle: 'metal-silver', peak: 'leather-patent' }) + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  ridingHelmet('riding_helmet', 0.49, true, { cover: 'cloth-charcoal', trim: 'leather-black', strap: 'nylon-black', buckle: 'metal-silver', peak: 'leather-patent' }) + { title: 'Riding helmet' } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A white jockey skull cap, 220 mm across and 190 mm tall, standing on its harness: the same round shell with no
   // peak, as it is worn under a cloth cap cover.
-  ridingHelmet('jockey_skull_cap', 0.46, false, { cover: 'plastic-white', trim: 'plastic-matte-black', strap: 'nylon-black', buckle: 'metal-silver', peak: 'plastic-white' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
+  ridingHelmet('jockey_skull_cap', 0.46, false, { cover: 'plastic-white', trim: 'plastic-matte-black', strap: 'nylon-black', buckle: 'metal-silver', peak: 'plastic-white' }) + { title: 'Jockey skull cap' } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 
   // A hardened leather helmet sitting on its flaps, 230 mm across and 185 mm tall: a rounded cap of six stitched
   // panels on a thick rolled brow band, a short neck flap at the back and a cheek flap at each side with a lace.
@@ -341,7 +341,7 @@ local ridingHelmet(id, mass, peak, fin) =
              + wallBand('cheek-l', 'leather', larmorPath, 0.006, 70, 112, 4, -lift, 0.002, lift)
              + wallBand('cheek-r', 'leather', larmorPath, 0.006, 248, 290, 4, -lift, 0.002, lift)
              + wallBand('neck', 'leather', larmorPath, 0.006, 140, 220, 6, -lift + 0.008, 0.002, lift),
-             { leather: 'leather-brown', band: 'leather-chestnut', lace: 'skin-rawhide' })
+             { leather: 'leather-brown', band: 'leather-chestnut', lace: 'skin-rawhide' }) + { title: 'Leather helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], slot: ['head'] } } },
 
   // A scrap helmet standing on its rim, 220 mm across and 165 mm tall: a rusty dome patched over with mismatched
@@ -373,7 +373,7 @@ local ridingHelmet(id, mass, peak, fin) =
              ])
              + std.flattenArrays([skin('cord-%d' % k, 'cord', scrapPath, 45 * k + 20 - 1.5, 45 * k + 20 + 1.5, 0.0, 0.134, 0.003, 0.01, 7, lift) for k in std.range(0, 7)])
              + h.crescent('cord-ring', 'cord', scrapPath[0][1] + 0.006, scrapPath[0][1] + 0.011, 0, 360, 20, lift + 0.03, lift + 0.035),
-             { base: 'scrap-rusted', galv: 'steel-galvanised', bright: 'steel-bright', rust: 'rust-red', bolt: 'steel-grey', cord: 'cord-cotton', cloth: 'cloth-rag' })
+             { base: 'scrap-rusted', galv: 'steel-galvanised', bright: 'steel-bright', rust: 'rust-red', bolt: 'steel-grey', cord: 'cord-cotton', cloth: 'cloth-rag' }) + { title: 'Scrap helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // The top of a large wolf skull made into a helmet, lying on its teeth, 340 mm from the back of the braincase to the
@@ -425,6 +425,6 @@ local ridingHelmet(id, mass, peak, fin) =
                sb('strap-drop-r', 'strap', [0.084, 0, -0.026], [0.09, lift + 0.01, -0.01]),
                sb('buckle', 'buckle', [0.13, 0, -0.03], [0.146, 0.008, -0.006]),
              ],
-             { bone: 'bone', dark: 'plastic-matte-black', tooth: 'chalk-white', strap: 'leather-brown', buckle: 'brass-dull' })
+             { bone: 'bone', dark: 'plastic-matte-black', tooth: 'chalk-white', strap: 'leather-brown', buckle: 'brass-dull' }) + { title: 'Wolf skull helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['bone'], slot: ['head'] } } },
 ]

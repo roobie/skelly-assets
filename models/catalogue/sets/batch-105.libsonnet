@@ -74,18 +74,18 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
 [
   // A pair of children's cotton socks laid flat, one across the other, each 150 mm from cuff to heel and 170 mm
   // from heel to toe.
-  h.compound('small_cotton_socks', 0.033, sockPair(0.15, 0.17, 0.064, 0.004), { sock: 'cloth-white', cuff: 'cloth-white', heel: 'felt-grey' })
+  h.compound('small_cotton_socks', 0.033, sockPair(0.15, 0.17, 0.064, 0.004), { sock: 'cloth-white', cuff: 'cloth-white', heel: 'felt-grey' }) + { title: 'Small cotton socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of children's wool socks laid flat, thicker than the cotton pair, 150 mm from cuff to heel and 170 mm from
   // heel to toe.
-  h.compound('small_wool_socks', 0.051, sockPair(0.15, 0.17, 0.068, 0.006), { sock: 'wool-grey', cuff: 'felt-grey', heel: 'cloth-brown' })
+  h.compound('small_wool_socks', 0.051, sockPair(0.15, 0.17, 0.068, 0.006), { sock: 'wool-grey', cuff: 'felt-grey', heel: 'cloth-brown' }) + { title: 'Small wool socks' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['feet'] } } },
 
   // A pair of mild steel splint arm guards laid side by side, open side down, each 300 mm from elbow to wrist and
   // 150 mm across at the elbow: canvas shells with five riveted steel splints, leather binding and two buckled straps.
   // The other steels share this model with their own splint finish.
-  h.compound('hardened_splint_arm_guards', 1.9, splintGuards, splintFinishes('steel-bright'))
+  h.compound('hardened_splint_arm_guards', 1.9, splintGuards, splintFinishes('steel-bright')) + { title: 'Hardened splint arm guards' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A hardened steel brigandine laid flat, front up, 600 mm from the shoulder to the hem and 460 mm across: a canvas
@@ -107,6 +107,6 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
     ]
     for i in [0, 1, 2]
     for z in [[-0.03, 0.08, 0.19][i]]
-  ]), { canvas: 'cloth-canvas', rivet: 'steel-parkerized', edge: 'leather-brown', strap: 'leather-brown', buckle: 'steel' })
+  ]), { canvas: 'cloth-canvas', rivet: 'steel-parkerized', edge: 'leather-brown', strap: 'leather-brown', buckle: 'steel' }) + { title: 'Hardened steel brigandine' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['torso'] } } },
 ]

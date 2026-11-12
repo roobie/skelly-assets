@@ -134,7 +134,7 @@ local mask(id, zipped) =
     box('calf-tie-drop-%d' % i, 'cord', [x - 0.004, 0, 0.17], [x + 0.004, 0.04, 0.178])
     for i in [0, 1]
     for x in [[-0.07, 0.06][i]]
-  ], { cloth: 'cloth-charcoal', waistband: 'cloth-black', seam: 'cloth-black', cord: 'cloth-black' }) + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  ], { cloth: 'cloth-charcoal', waistband: 'cloth-black', seam: 'cloth-black', cord: 'cloth-black' }) + { title: 'Ninja trousers' } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Padded army winter trousers folded thick, 290 mm by 360 mm and 90 mm tall: quilted channels across the seat,
   // belt loops, a bellows cargo pocket and padded knee panels.
@@ -150,11 +150,11 @@ local mask(id, zipped) =
     stud: 'plastic-matte-black',
     knee: 'webbing-olive-dark',
     quilt: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + { title: 'Army winter trousers' } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // White martial arts trousers folded thin, 250 mm by 330 mm and 24 mm tall: a drawcord waist and nothing else.
   folded('martial_arts_trousers', 0.28, { w: 0.25, d: 0.33, ht: 0.024, folds: 2, loops: false }, [],
-         { cloth: 'cloth-bright-white', waistband: 'cloth-cream', seam: 'cloth-cream', cord: 'cloth-cream' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+         { cloth: 'cloth-bright-white', waistband: 'cloth-cream', seam: 'cloth-cream', cord: 'cloth-cream' }) + { title: 'Martial arts trousers' } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // A knit balaclava laid flat on its back, 220 mm across the head and 320 mm from the neck hem at -z to the crown at +z: two
   // layers of knit with a soft raised top, a dark face opening ringed in rib, the ribbed neck tube with its hem turned
@@ -174,7 +174,7 @@ local mask(id, zipped) =
   ] + [
     g.strip('neck-rib-%d' % i, 'rib', [-0.08, -0.112 + 0.01 * i], [0.08, -0.112 + 0.01 * i], 0.013, 0.003, 0.001)
     for i in std.range(0, 3)
-  ], { knit: 'cloth-olive-drab', rib: 'webbing-olive-dark', face: 'screen-black' }) + h.headEndOnPlusZ
+  ], { knit: 'cloth-olive-drab', rib: 'webbing-olive-dark', face: 'screen-black' }) + { title: 'Balaclava' } + h.headEndOnPlusZ
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A cotton bandana folded corner to corner twice and laid flat, 390 mm along the folded edge at +z and 195 mm
@@ -188,13 +188,13 @@ local mask(id, zipped) =
     h.disc('motif-%d' % i, 'print', 0.007, 0.006, 0.007, m[0], m[1])
     for i in std.range(0, 5)
     for m in [[[-0.09, 0.06], [0, 0.06], [0.09, 0.06], [-0.045, 0.015], [0.045, 0.015], [0, -0.03]][i]]
-  ], { cloth: 'cloth-red', print: 'cloth-cream' }) + h.headEndOnPlusZ
+  ], { cloth: 'cloth-red', print: 'cloth-cream' }) + { title: 'Bandana' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 
   // A black leather mask standing upright, 200 mm across and 270 mm tall: zipped eye slits and mouth gaping open at
   // +z, a seam down the nose, and lacing with steel eyelets up the back of the head.
-  mask('bondage_mask', false) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
+  mask('bondage_mask', false) + { title: 'Bondage mask' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
 
   // The same mask with its eye and mouth zips drawn shut, leaving only the nose holes.
-  mask('zipped_bondage_mask', true) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
+  mask('zipped_bondage_mask', true) + { title: 'Zipped bondage mask' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['face'] } } },
 ]

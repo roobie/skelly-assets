@@ -1,6 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
+local vehicle = import 'airport_crash_tender.placements.libsonnet';
 local box = k.box;
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
 local finish = { paint: s.paint, white: 'paint-white', red: 'paint-red', frame: 'paint-charcoal', steel: 'steel-grey', alu: 'alu-bare', dark: 'plastic-black', tank: 'polymer-black', foam: 'plastic-red', pipe: 'steel-stainless' };
@@ -39,7 +40,7 @@ local monitorHead(at, size, reach) = [
 ] + k.bothSides([
   box('cheek', 'paint', [at[0] - 0.12 * size, at[1] + 0.1 * size, 0.16 * size], [at[0] + 0.12 * size, at[1] + 0.38 * size, 0.22 * size]),
 ]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_tender', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_tender', vehicle.title, s) + [
   k.compound('airport_crash_tender_body', s.bodyMass, [
     box('floor', 'frame', [s.bodyRear, s.bodyFloor - 0.05, -s.bodySide], [s.bodyFront, s.bodyFloor, s.bodySide]),
     box('roof', 'paint', [s.bodyRear, s.bodyTop - 0.05, -s.bodySide], [s.bodyFront, s.bodyTop, s.bodySide]),
@@ -64,24 +65,24 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
   ] + [
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'white', [s.bodyRear - 0.006, s.bodyLow + i * 0.3, 0.6], [s.bodyRear, s.bodyLow + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 7)
-  ]), finish),
+  ]), finish) + { title: 'Airport crash tender body' },
   k.compound('airport_crash_tender_cab_stripe', 6, k.bothSides([
     box('band', 'red', [s.cabBack, bandLow, s.side], [s.face, bandTop, s.side + 0.032]),
-  ]), finish),
+  ]), finish) + { title: 'Airport crash tender cab stripe' },
   // 12,500 l of water fill the body between the locker rows; the foam concentrate rides in a smaller tank ahead of it.
   k.compound('airport_crash_tender_water_tank', s.waterTankMass, [
     box('tank', 'tank', [archRear + 0.1, s.bodyFloor, -0.9], [0.6, shutterTop, 0.9]),
-  ], finish),
+  ], finish) + { title: 'Airport crash tender water tank' },
   k.compound('airport_crash_tender_foam_tank', s.foamTankMass, [
     box('tank', 'foam', [0.7, s.bodyFloor, -0.9], [1.8, shutterTop, 0.9]),
-  ], finish),
+  ], finish) + { title: 'Airport crash tender foam tank' },
   // The pump sits in the rear lockers behind the tandem, its suction drawn from the tank ahead.
   k.compound('airport_crash_tender_pump', s.pumpMass, [
     round(k.turned('volute', 'steel', 'z', k.disc(0.32, -0.22, 0.22), [-4.7, s.bodyFloor + 0.42, 0])),
     box('gearcase', 'frame', [-5.2, s.bodyFloor, -0.3], [-4.95, s.bodyFloor + 0.6, 0.3]),
     round(k.turned('suction', 'pipe', 'x', k.disc(0.1, -4.4, archRear + 0.1), [0, s.bodyFloor + 0.42, 0])),
     round(k.turned('riser', 'pipe', 'y', k.disc(0.08, s.bodyFloor + 0.74, shutterTop), [-4.7, 0, 0])),
-  ], finish),
+  ], finish) + { title: 'Airport crash tender pump' },
   k.compound('airport_crash_tender_lockers', s.lockersMass,
     shutter('fore', dividers.mid + postHalf, s.bodyFront - 2 * postHalf, bandTop, shutterTop)
     + shutter('mid', archFront + 0.02, dividers.mid - postHalf, bandTop, shutterTop)
@@ -91,17 +92,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     + [
       box('low_fore_handle', 'dark', [0.9, archTop - 0.2, s.bodySide], [1.4, archTop - 0.16, s.bodySide + 0.032]),
       box('low_aft_handle', 'dark', [-5.1, archTop - 0.2, s.bodySide], [-4.6, archTop - 0.16, s.bodySide + 0.032]),
-    ], finish),
+    ], finish) + { title: 'Airport crash tender lockers' },
   // The water main runs from the body over the cab's back to the roof turret, which turns on it.
   k.compound('airport_crash_tender_roof_turret_mount', s.turretMountMass, [
     round(k.turned('base', 'frame', 'y', k.disc(0.26, 0, 0.06), [s.turretX, turretY, 0])),
     round(k.turned('riser', 'pipe', 'y', k.disc(0.13, 0.06, 0.3), [s.turretX, turretY, 0])),
     round(k.turned('main', 'pipe', 'x', k.disc(0.08, s.bodyFront, s.turretX), [0, turretY + 0.14, 0])),
-  ], finish),
-  k.compound('airport_crash_tender_roof_turret', s.turretMass, monitorHead([s.turretX, turretY + 0.3, 0], 1, 1.3), finish),
+  ], finish) + { title: 'Airport crash tender roof turret mount' },
+  k.compound('airport_crash_tender_roof_turret', s.turretMass, monitorHead([s.turretX, turretY + 0.3, 0], 1, 1.3), finish) + { title: 'Airport crash tender roof turret' },
   k.compound('airport_crash_tender_bumper_turret', s.bumperTurretMass, [
     round(k.turned('base', 'frame', 'y', k.disc(0.12, 0, 0.05), [s.bumperTurretX, bumperTurretY, 0])),
-  ] + monitorHead([s.bumperTurretX, bumperTurretY + 0.05, 0], 0.55, 0.42), finish),
+  ] + monitorHead([s.bumperTurretX, bumperTurretY + 0.05, 0], 0.55, 0.42), finish) + { title: 'Airport crash tender bumper turret' },
   k.compound('airport_crash_tender_roof_rail', s.roofRailMass, [
     box('walkway', 'alu', [s.bodyRear + 0.1, s.bodyTop, -0.4], [s.bodyFront - 0.1, s.bodyTop + 0.03, 0.4]),
   ] + k.bothSides([
@@ -109,7 +110,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
   ] + [
     box('post_' + i, 'alu', [posts[i], s.bodyTop, s.bodySide - 0.1], [posts[i] + 0.05, railY, s.bodySide - 0.05])
     for i in std.range(0, 6)
-  ]), finish),
+  ]), finish) + { title: 'Airport crash tender roof rail' },
   k.compound('airport_crash_tender_rear_ladder', s.ladderMass, [
     box('stile_in', 'alu', [s.bodyRear - 0.12, 0.95, ladderZ[0]], [s.bodyRear - 0.08, railY, ladderZ[0] + 0.04]),
     box('stile_out', 'alu', [s.bodyRear - 0.12, 0.95, ladderZ[1] - 0.04], [s.bodyRear - 0.08, railY, ladderZ[1]]),
@@ -119,5 +120,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
   ] + [
     box('stay_' + i, 'alu', [s.bodyRear - 0.08, stays[i], ladderZ[0]], [s.bodyRear, stays[i] + 0.04, ladderZ[0] + 0.04])
     for i in std.range(0, std.length(stays) - 1)
-  ], finish),
+  ], finish) + { title: 'Airport crash tender rear ladder' },
 ])

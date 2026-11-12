@@ -6,6 +6,7 @@ local tank = import 'fuel-tank-kit.libsonnet';
 local exhaust = import 'exhaust-kit.libsonnet';
 local s = import 'coupe.spec.libsonnet';
 {
+  title: 'Coupe',
   sites: [
     site.one('shell', 'coupe_shell'),
     site.one('windscreen', 'coupe_windscreen'),

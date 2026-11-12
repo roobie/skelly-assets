@@ -14,7 +14,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
   h.compound('drift', 0.93, [
     turned('body', 'body', 'x', [[0, 0], [0, 0.014], [0.006, 0.016], [0.150, 0.016], [0.225, 0.006], [0.235, 0]]),
     turned('head', 'head', 'x', [[0, 0], [0, 0.019], [0.006, 0.018], [0.010, 0.016], [0.010, 0]], [-0.004, 0, 0]),
-  ], { body: 'steel-hardened', head: 'steel-heat-tint' }) + h.gripOn('drift', 'body') + {
+  ], { body: 'steel-hardened', head: 'steel-heat-tint' }) + { title: 'Drift punch' } + h.gripOn('drift', 'body') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
@@ -49,7 +49,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     knob: 'steel-bright',
     switch: 'lacquer-red',
     cord: 'rubber-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  }) + { title: 'Forge' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A propane forge: an insulated steel drum 280 mm across and 340 mm long lying front to back on a welded stand,
   // its mouth on +z lined with fire brick and glowing, a burner tube standing in its top fed by a hose. 0.56 m tall.
@@ -79,7 +79,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     bell: 'brass-dull',
     hose: 'rubber-black',
     stand: 'steel-grey',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  }) + { title: 'Gas forge' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A handled hot cut: a 25 by 40 mm chisel head 150 mm tall on a 300 mm hickory handle, struck on its top and
   // set edge-down on hot stock.
@@ -88,7 +88,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     box('head', 'head', [0.290, -0.065, -0.020], [0.315, 0.050, 0.020]),
     box('face', 'face', [0.287, 0.050, -0.022], [0.318, 0.060, 0.022]),
     prism('edge', 'edge', 'z', [[0.290, -0.065], [0.315, -0.065], [0.3035, -0.095], [0.3015, -0.095]], -0.020, 0.020),
-  ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + h.gripOn('hot_cut', 'handle') + {
+  ], { handle: 'wood-oak', head: 'steel-hardened', face: 'steel-heat-tint', edge: 'steel-bright' }) + { title: 'Hot cut' } + h.gripOn('hot_cut', 'handle') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
@@ -102,14 +102,14 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
   ] + [
     box('col-%d' % i, 'rings', [-0.121 + 0.012 * i, 0.004, -0.123], [-0.119 + 0.012 * i, 0.007, 0.104])
     for i in std.range(0, 20)
-  ], { mail: 'steel-mail', rings: 'steel-mail-dark' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['medieval'] } } },
+  ], { mail: 'steel-mail', rings: 'steel-mail-dark' }) + { title: 'Mild steel mail sheet' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['medieval'] } } },
 
   // A palm-sized patch of leather, 90 by 60 mm, with a handful of sand pressed into its rough side.
   h.compound('sandleather', 0.036, [
     box('leather', 'leather', [-0.045, 0, -0.030], [0.045, 0.004, 0.030]),
     box('sand', 'sand', [-0.040, 0.004, -0.025], [0.038, 0.006, 0.026]),
     h.ball('heap', 'sand', 0.014, 0.010, 0.006, 0.004, 0.25),
-  ], { leather: 'leather-tan', sand: 'brick-buff' }) + h.inHand('sandleather', 'leather') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather', 'stone'] } } },
+  ], { leather: 'leather-tan', sand: 'brick-buff' }) + { title: 'Sandleather' } + h.inHand('sandleather', 'leather') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather', 'stone'] } } },
 
   // Flatjaw blacksmith's tongs 440 mm long, lying open on their side: two flat jaws 100 mm long, a riveted boss and
   // round reins spreading to 60 mm apart at the ends.
@@ -120,7 +120,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     h.disc('rivet', 'rivet', 0.007, 0.018, 0.021, 0.115, 0),
     bar('rein-a', 'rein', 0.125, 0.006, 0.44, 0.030, 0.011, 0.005, 0.015),
     bar('rein-b', 'rein', 0.125, -0.006, 0.44, -0.030, 0.011, 0.005, 0.015),
-  ], { jaw: 'steel-blued', boss: 'steel-blued', rivet: 'steel-bright', rein: 'steel-grey' }) + h.gripOn('metalworking_tongs', 'rein-a') + {
+  ], { jaw: 'steel-blued', boss: 'steel-blued', rivet: 'steel-bright', rein: 'steel-grey' }) + { title: 'Metalworking tongs' } + h.gripOn('metalworking_tongs', 'rein-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
@@ -150,13 +150,13 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     wheel: 'brick-buff',
     iron: 'iron-dull',
     treadle: 'wood-pine',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'], place: ['workshop'] } } },
+  }) + { title: 'Pedal grindstone' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['stone', 'wood'], place: ['workshop'] } } },
 
   // A sheet of sandpaper, 230 by 280 mm, grit side up with one corner folded back to show the paper.
   h.compound('sandpaper', 0.015, [
     box('sheet', 'grit', [-0.115, 0, -0.140], [0.115, 0.002, 0.140]),
     prism('fold', 'paper', 'y', [[0.140, 0.035], [0.140, 0.115], [0.060, 0.115]], 0.002, 0.004),
-  ], { grit: 'rust-red', paper: 'paper-butcher' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { grit: 'rust-red', paper: 'paper-butcher' }) + { title: 'Sandpaper' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A two-handled metal scraper like a small drawknife: a 260 mm hardened blade 30 mm wide with a honed front
   // edge, cranked at each end into a 110 mm turned wooden handle pointing back towards the user.
@@ -169,7 +169,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     turned('ferrule-b', 'ferrule', 'z', [[0, 0], [0, 0.012], [0.012, 0.012], [0.012, 0]], [0.140, 0.014, -0.032]),
     turned('handle-a', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [-0.140, 0.014, -0.142]),
     turned('handle-b', 'handle', 'z', [[0, 0], [0, 0.009], [0.020, 0.013], [0.090, 0.014], [0.110, 0.010], [0.110, 0]], [0.140, 0.014, -0.142]),
-  ], { blade: 'steel-blued', edge: 'steel-bright', ferrule: 'brass-dull', handle: 'wood-walnut' }) + h.gripOn('steel_scraper', 'handle-a') + {
+  ], { blade: 'steel-blued', edge: 'steel-bright', ferrule: 'brass-dull', handle: 'wood-walnut' }) + { title: 'Steel scraper' } + h.gripOn('steel_scraper', 'handle-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
 
@@ -181,7 +181,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     h.ball('lump-b', 'stone', 0.040, 0.12, 0.028, -0.03, 0.7),
     h.ball('lump-c', 'stone', 0.040, 0.02, 0.028, 0.085, 0.7),
     h.ball('lump-d', 'stone', 0.042, -0.02, 0.03, -0.085, 0.7),
-  ], { stone: 'stone-grey', face: 'stone-whet' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone'] } } },
+  ], { stone: 'stone-grey', face: 'stone-whet' }) + { title: 'Polishing stone' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['stone'] } } },
 
   // A swage set: a bottom swage 100 mm long with a 20 mm round groove and a square shank for the anvil's hardy hole,
   // its matching top swage laid groove up on a 250 mm steel rod handle with a ring end, and two round heading dies.
@@ -199,7 +199,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     ring('eye', 'rod', 0.012, 0.020, 0.017, 0.027, 0.07, 0.272),
     ring('die-a', 'die', 0.008, 0.025, 0, 0.022, 0.175, -0.035),
     ring('die-b', 'die', 0.005, 0.022, 0, 0.020, 0.175, 0.030),
-  ], { block: 'steel-grey', groove: 'steel-bright', rod: 'steel-blued', die: 'steel-hardened' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  ], { block: 'steel-grey', groove: 'steel-bright', rod: 'steel-blued', die: 'steel-hardened' }) + { title: 'Swage' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
 
   // Stainless kitchen tongs 300 mm long lying on their side, open: two pressed arms sprung from a looped end, with
   // scalloped heads and rubber grips.
@@ -216,7 +216,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     box('tooth-%s-%d' % [s, i], 'arm', [0.262 + 0.012 * i, 0.002, if s == 'a' then 0.022 else -0.026], [0.268 + 0.012 * i, 0.026, if s == 'a' then 0.026 else -0.022])
     for s in ['a', 'b']
     for i in std.range(0, 2)
-  ], { arm: 'steel-stainless', grip: 'rubber-black' }) + h.gripOn('tongs', 'arm-a') + {
+  ], { arm: 'steel-stainless', grip: 'rubber-black' }) + { title: 'Tongs' } + h.gripOn('tongs', 'arm-a') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['cooking'], tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] } } },
 ]

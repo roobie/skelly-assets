@@ -94,7 +94,7 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     wire: 'rubber-black',
     cuff: 'cloth-navy',
     strap: 'hook-loop-grey',
-  }) + h.inHand('crystal_eye_test_scanner', 'housing') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
+  }) + { title: 'Crystal eye test scanner' } + h.inHand('crystal_eye_test_scanner', 'housing') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
   // A deck of 25 test cards, 88 by 63 mm and 8 mm thick, squared up, with its top card slid a little aside to show a
   // ringed circle printed on its face.
@@ -106,13 +106,13 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     h.turned('circle', 'symbol', 'y', [[0, 0.016], [0, 0.021], [0.0006, 0.021], [0.0006, 0.016], [0, 0.016]], [0.008, 0.0084, -0.0025]),
     box('corner-a', 'symbol', [-0.032, 0.0084, 0.02], [-0.026, 0.009, 0.026]),
     box('corner-b', 'symbol', [0.042, 0.0084, -0.031], [0.048, 0.009, -0.025]),
-  ], { card: 'paper-white', edge: 'paper-white', back: 'cloth-blue', symbol: 'plastic-matte-black' })
+  ], { card: 'paper-white', edge: 'paper-white', back: 'cloth-blue', symbol: 'plastic-matte-black' }) + { title: 'Symbol test cards' }
   + h.inHand('symbol_test_cards', 'deck') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
 
-  h.compound('force_field_generator', 0.29, fieldDevice(false), deviceFinishes)
+  h.compound('force_field_generator', 0.29, fieldDevice(false), deviceFinishes) + { title: 'Force field generator' }
   + h.inHand('force_field_generator', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'] } } },
 
-  h.compound('broken_force_field_generator', 0.29, fieldDevice(true), deviceFinishes)
+  h.compound('broken_force_field_generator', 0.29, fieldDevice(true), deviceFinishes) + { title: 'Broken force field generator' }
   + h.inHand('broken_force_field_generator', 'shell') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['sci-fi'], state: ['broken'] } } },
 
   // A crystal focusing rig 250 mm tall: a round steel foot and post carrying an upright ring 180 mm across, facing +z,
@@ -129,7 +129,7 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     local a = std.pi / 6 + i * std.pi / 3;
     box('clamp-%d' % i, 'clamp', [0.088 * std.cos(a) - 0.007, 0.158 + 0.088 * std.sin(a) - 0.007, -0.012], [0.088 * std.cos(a) + 0.007, 0.158 + 0.088 * std.sin(a) + 0.007, 0.012])
     for i in std.range(0, 5)
-  ], { steel: 'steel-grey', crystal: 'crystal-glow-blue', clamp: 'brass-dull' })
+  ], { steel: 'steel-grey', crystal: 'crystal-glow-blue', clamp: 'brass-dull' }) + { title: 'Crystal focusing ring' }
   + h.inHand('crystal_focusing_ring', 'post') + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 
   // A cluster of five violet crystal columns 150 mm wide on a steel plate, held in a soldered cage of steel straps and
@@ -154,6 +154,6 @@ local deviceFinishes = { alu: 'foil-alu', shell: 'plastic-charcoal', label: 'pla
     box('wire-b', 'wire', [0.028, 0.04, -0.002], [0.032, 0.044, 0.026]),
     box('solder-a', 'solder', [-0.034, 0.048, -0.004], [-0.028, 0.056, 0.004]),
     box('solder-b', 'solder', [0.024, 0.048, -0.004], [0.03, 0.056, 0.004]),
-  ], { steel: 'steel-grey', crystal: 'crystal-glow-violet', band: 'steel-bright', wire: 'bronze', solder: 'metal-silver' })
+  ], { steel: 'steel-grey', crystal: 'crystal-glow-violet', band: 'steel-bright', wire: 'bronze', solder: 'metal-silver' }) + { title: 'Crystal channeling cluster' }
   + h.inHand('crystal_channeling_cluster', 'plate') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], setting: ['sci-fi'] } } },
 ]

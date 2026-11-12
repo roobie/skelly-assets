@@ -3,7 +3,7 @@
 // and straps leave. A strap fits only its own tank's size, so it is a row of each tank's. `length` is along x and
 // `width` along z; a drum's `width` and `height` are its diameter.
 {
-  fuel_tank_car: { class: 'light', massKg: 9, length: 0.42, width: 0.6, height: 0.16, strapKg: 0.5 },
-  fuel_tank_van: { class: 'light', massKg: 14, length: 0.52, width: 0.72, height: 0.24, strapKg: 0.5 },
-  fuel_tank_truck: { class: 'heavy', massKg: 28, length: 0.9, width: 0.52, height: 0.52, strapKg: 2 },
+  fuel_tank_car: { title: 'Car fuel tank', class: 'light', massKg: 9, length: 0.42, width: 0.6, height: 0.16, strapKg: 0.5 },
+  fuel_tank_van: { title: 'Van fuel tank', class: 'light', massKg: 14, length: 0.52, width: 0.72, height: 0.24, strapKg: 0.5 },
+  fuel_tank_truck: { title: 'Truck fuel tank', class: 'heavy', massKg: 28, length: 0.9, width: 0.52, height: 0.52, strapKg: 2 },
 }

@@ -17,7 +17,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     disc('lobe-d', 'tag', 0.0055, 0, 0.002, 0.0135, 0.0055),
     box('name', 'print', [-0.009, 0.002, -0.003], [0.009, 0.0025, 0.003]),
     ring('ring', 'ring', 0.006, 0.008, 0, 0.002, -0.026, 0),
-  ], { tag: 'plastic-red', print: 'paint-white', ring: 'metal-silver' })
+  ], { tag: 'plastic-red', print: 'paint-white', ring: 'metal-silver' }) + { title: 'Pet tag' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A down pillow rolled up for carrying, 400 mm long and 180 mm across, held by two webbing straps; its
@@ -38,7 +38,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     for x in [[-0.11, 0.11][i]]
   ] + [
     box('buckle', 'buckle', [0.1, 0.176, -0.016], [0.122, 0.186, 0.016]),
-  ], { cover: 'cloth-white', shadow: 'cloth-cotton', strap: 'cloth-navy', buckle: 'plastic-black' })
+  ], { cover: 'cloth-white', shadow: 'cloth-cotton', strap: 'cloth-navy', buckle: 'plastic-black' }) + { title: 'Down pillow' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A small loose heap of parts pulled from circuit boards, about 45 mm by 35 mm: banded resistors, a can
@@ -66,7 +66,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     box('diode-a-legs', 'leg', [-0.005, 0.001, 0.0125], [0.011, 0.002, 0.0135]),
     rod('diode-b', 'diode', 0.0015, 0.0, 0.006, 0.0045) + { origin: [-0.004, 0.0045, -0.001] },
     rod('diode-b-band', 'leg', 0.0016, 0.0, 0.001, 0.0045) + { origin: [-0.004, 0.0045, -0.001] },
-  ], { resistor: 'paperboard-tan', band: 'paint-oxblood', leg: 'steel-stainless', can: 'plastic-blue', cantop: 'alu-bare', ceramic: 'paint-crane-yellow', diode: 'plastic-black' })
+  ], { resistor: 'paperboard-tan', band: 'paint-oxblood', leg: 'steel-stainless', can: 'plastic-blue', cantop: 'alu-bare', ceramic: 'paint-crane-yellow', diode: 'plastic-black' }) + { title: 'Electronic scrap' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A kettle heating element: a sheathed steel tube 8 mm thick bent into a flat loop 90 mm across, its two
@@ -80,7 +80,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     rod('pin-a', 'pin', 0.002, -0.026, -0.012, 0.025) + { origin: [-0.026, 0.025, -0.006] },
     rod('pin-b', 'pin', 0.002, -0.026, -0.012, 0.025) + { origin: [-0.026, 0.025, 0.006] },
     rod('insulator', 'insulator', 0.009, -0.016, -0.008, 0.025) + { origin: [-0.016, 0.025, 0] },
-  ], { sheath: 'steel-stainless', flange: 'steel', pin: 'brass', insulator: 'ceramic-white' })
+  ], { sheath: 'steel-stainless', flange: 'steel', pin: 'brass', insulator: 'ceramic-white' }) + { title: 'Heating element' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An evaporator coil from a cooling unit, 500 mm long, 300 mm tall and 60 mm deep: two banks of copper tube
@@ -116,7 +116,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
   ] + [
     rod('stub-in', 'tube', 0.006, -0.29, -0.25, y0) + { origin: [-0.29, y0, zs[0]] },
     rod('stub-out', 'tube', 0.008, -0.29, -0.25, y0 + (rows - 1) * pitch) + { origin: [-0.29, y0 + (rows - 1) * pitch, zs[1]] },
-  ], { tube: 'copper', fin: 'alu-bare', plate: 'steel-galvanised' })
+  ], { tube: 'copper', fin: 'alu-bare', plate: 'steel-galvanised' }) + { title: 'Evaporator coil' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A desk fan 420 mm tall: a round weighted base 220 mm across, a short stem, a motor housing at the back and
@@ -166,7 +166,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     for side in [0, 1]
   ]) + [
     disc('badge', 'hub', 0.02, 0, 0.004) + { axis: 'z', origin: [0, hubY, 0.034] },
-  ], { body: 'plastic-white', switch: 'plastic-grey', hub: 'plastic-blue', blade: 'plastic-clear-blue', guard: 'steel-stainless' })
+  ], { body: 'plastic-white', switch: 'plastic-grey', hub: 'plastic-blue', blade: 'plastic-clear-blue', guard: 'steel-stainless' }) + { title: 'Desk fan' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A portable hard drive, 118 mm by 80 mm and 18 mm thick, its long sides rounded, with a hand-written label on
@@ -184,13 +184,13 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     box('light', 'light', [0.045, 0.018, 0.018], [0.05, 0.019, 0.024]),
     ring('coil', 'cable', 0.018, 0.022, 0, 0.004, 0.085, 0.01),
     box('lead', 'cable', [0.061, 0.0, -0.002], [0.07, 0.004, 0.002]),
-  ], { shell: 'plastic-charcoal', label: 'paper-white', ink: 'paint-police-blue', port: 'alu-bare', light: 'lcd-green', cable: 'plastic-black' })
+  ], { shell: 'plastic-charcoal', label: 'paper-white', ink: 'paint-police-blue', port: 'alu-bare', light: 'lcd-green', cable: 'plastic-black' }) + { title: 'Backup drive' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // An insulating fire brick, 230 mm by 114 mm by 64 mm, lying on its broad face: a plain pale buff block.
   h.compound('fire_brick', 1.2, [
     box('brick', 'brick', [-0.115, 0, -0.057], [0.115, 0.064, 0.057]),
-  ], { brick: 'brick-buff' })
+  ], { brick: 'brick-buff' }) + { title: 'Fire brick' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['ceramic'] } } },
 
   // A round glass fishbowl 260 mm across and 222 mm tall with a flared lip, filled with water over a bed of
@@ -207,13 +207,13 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     h.prism('tail', 'fish', 'z', [[0.02, 0.1], [0.036, 0.088], [0.036, 0.112]], 0.028, 0.032),
     h.prism('fin', 'fish', 'z', [[-0.008, 0.11], [0.006, 0.11], [-0.004, 0.118]], 0.028, 0.032),
     box('eye', 'eye', [-0.016, 0.102, 0.039], [-0.012, 0.106, 0.041]),
-  ], { glass: 'glass-clear', water: 'plastic-clear-blue', gravel: 'stone-grey', fish: 'plastic-orange', eye: 'plastic-black' })
+  ], { glass: 'glass-clear', water: 'plastic-clear-blue', gravel: 'stone-grey', fish: 'plastic-orange', eye: 'plastic-black' }) + { title: 'Fish bowl' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A loose cut gemstone, a round brilliant 10 mm across and 7 mm deep, lying on its table with its point up.
   h.compound('garnet', 0.0009, [
     turned('stone', 'stone', 'y', [[0, 0], [0, 0.003], [0.0016, 0.005], [0.0024, 0.005], [0.007, 0]], [0.001, 0, 0.001]),
-  ], { stone: 'gem-red' })
+  ], { stone: 'gem-red' }) + { title: 'Garnet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
 
   // A pair of dark teardrop lenses from a pair of sunglasses, each 56 mm wide and 47 mm tall and 2 mm thick,
@@ -225,7 +225,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
   h.compound('tinted_lenses', 0.021, [
     h.prism('lens-a', 'lens', 'y', lens(-1), 0, 0.002),
     h.prism('lens-b', 'lens', 'y', lens(1), 0, 0.002),
-  ], { lens: 'glass-grey' })
+  ], { lens: 'glass-grey' }) + { title: 'Tinted lenses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'] } } },
 
   // A sheaf of letter-size ledger forms, 216 mm by 279 mm and 6 mm thick, a little out of square, held at the top
@@ -242,7 +242,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     box('clip-wire-a', 'wire', [-0.018, 0.008, -0.16], [-0.016, 0.01, -0.13]),
     box('clip-wire-b', 'wire', [0.016, 0.008, -0.16], [0.018, 0.01, -0.13]),
     box('clip-wire-c', 'wire', [-0.018, 0.008, -0.162], [0.018, 0.01, -0.16]),
-  ], { paper: 'paper-white', top: 'paint-cream', ink: 'plastic-grey', heading: 'paint-oxblood', clip: 'plastic-black', wire: 'steel-stainless' })
+  ], { paper: 'paper-white', top: 'paint-cream', ink: 'plastic-grey', heading: 'paint-oxblood', clip: 'plastic-black', wire: 'steel-stainless' }) + { title: 'Accounting records' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], place: ['office'], setting: ['modern'] } } },
 
   // A glassy egg from a giant spider, a ball 46 mm across with a short drawn-out tip, shards of hard
@@ -255,6 +255,6 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     local a = k * std.pi / 3, c = std.cos(a), s = std.sin(a), w = 0.003, l = 0.0245;
     h.prism('shard-%d' % k, 'shard', 'y', [[0.001 - c * w, 0.001 + s * w], [0.001 + c * w, 0.001 - s * w], [0.001 + s * l, 0.001 + c * l]], 0.012 + (k % 3) * 0.004, 0.02 + (k % 3) * 0.004)
     for k in std.range(0, 5)
-  ], { shell: 'gem-clear', core: 'crystal-glow-violet', shard: 'crystal-glow-violet' })
+  ], { shell: 'gem-clear', core: 'crystal-glow-violet', shard: 'crystal-glow-violet' }) + { title: 'Glowing spider egg' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['glass'] } } },
 ]

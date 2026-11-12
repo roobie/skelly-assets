@@ -3,6 +3,7 @@ local m = import 'military-kit.libsonnet';
 local s = import 'military_cargo_truck.spec.libsonnet';
 local id = 'military_cargo_truck';
 {
+  title: 'Military cargo truck',
   sites: m.truckFittings(site.kit, s) + [
     site.one('bed_floor', id + '_bed_floor'),
     site.one('bed', id + '_bed'),

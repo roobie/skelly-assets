@@ -90,7 +90,7 @@ local thinKnife(p, x, z, y) = [
     h.disc('rivet-a', 'stud', 0.004, 0.012, 0.014, -0.035, -0.01),
     h.disc('rivet-b', 'stud', 0.004, 0.012, 0.014, -0.035, 0.01),
     h.disc('snap', 'stud', 0.006, 0.008, 0.011, 0.0, 0),
-  ] + h.crescent('ring', 'ring', 0.039, 0.046, 0, 360, 16, 0, 0.008, 0.1, 0), leather { ring: 'steel-grey', body: 'leather-brown' })
+  ] + h.crescent('ring', 'ring', 0.039, 0.046, 0, 360, 16, 0, 0.008, 0.1, 0), leather { ring: 'steel-grey', body: 'leather-brown' }) + { title: 'Axe ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather', 'metal'], slot: ['waist'] } } },
 
   // A black leather longsword scabbard 1.0 m long, 60 mm wide at the mouth, laid flat: a steel locket at the mouth
@@ -106,7 +106,7 @@ local thinKnife(p, x, z, y) = [
       box('slide', 'loop', [-0.44, 0, -0.25], [-0.32, 0.006, -0.19]),
       box('slide-slot', 'mouth', [-0.43, 0.006, -0.228], [-0.33, 0.007, -0.212]),
     ] + buckleFrame('buckle-a', -0.43, 0.022, 0.028, 0.004, 0.004, 0.009, -0.1)
-    + buckleFrame('buckle-b', -0.29, 0.022, 0.028, 0.004, 0.004, 0.009, -0.1), sword)
+    + buckleFrame('buckle-b', -0.29, 0.022, 0.028, 0.004, 0.004, 0.009, -0.1), sword) + { title: 'Baldric' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather', 'metal'], setting: ['medieval'] } } },
 
   // A brown leather knife sheath 180 mm long and 40 mm wide for an ankle, laid flat on its buckled ankle strap, a
@@ -116,7 +116,7 @@ local thinKnife(p, x, z, y) = [
     + [
       box('snap-strap', 'strap', [-0.07, 0.015, -0.022], [-0.05, 0.019, 0.022]),
       h.disc('snap', 'stud', 0.005, 0.019, 0.021, -0.06, 0.012),
-    ], leather)
+    ], leather) + { title: 'Boot sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], setting: ['modern'], slot: ['legs'] } } },
 
   // A birch-bark ankle sheath 180 mm long and 45 mm wide plaited from pale and dark strips, laid flat on a 25 mm
@@ -124,7 +124,7 @@ local thinKnife(p, x, z, y) = [
   h.compound('birch_bark_boot_sheath', 0.03, h.strapLoop('ankle-band', 'strap', 0.04, 0.05, 0.025, 0.003, 0, 0, 0)
     + sheathFlat('sheath', 0.18, 0.045, 0.02, 0.012, 0.07, -0.08, 0.0, 0.025, 0.003)
     + weave('sheath', -0.06, 0.03, 0.045, 0.015)
-    + [h.rod('toggle', 'loop', 0.005, -0.015, 0.025, 0.007) + { origin: [-0.015, 0.007, 0.06] }], bark)
+    + [h.rod('toggle', 'loop', 0.005, -0.015, 0.025, 0.007) + { origin: [-0.015, 0.007, 0.06] }], bark) + { title: 'Birch bark boot sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['plant'], setting: ['prehistoric'], slot: ['legs'] } } },
 
   // A black leather back scabbard 1.05 m long and 60 mm wide at the mouth, laid flat with its 50 mm shoulder strap
@@ -138,7 +138,7 @@ local thinKnife(p, x, z, y) = [
       strapFlat('strap-c', 'strap', [0.05, -0.27], [0.22, -0.03], 0.05, 0.004),
       h.disc('rivet-a', 'stud', 0.005, 0.027, 0.029, -0.45, 0),
       h.disc('rivet-b', 'stud', 0.005, 0.027, 0.029, 0.22, 0),
-    ] + buckleFrame('strap-buckle', -0.06, 0.03, 0.065, 0.006, 0.003, 0.009, -0.255), sword { loop: 'leather-brown' })
+    ] + buckleFrame('strap-buckle', -0.06, 0.03, 0.065, 0.006, 0.003, 0.009, -0.255), sword { loop: 'leather-brown' }) + { title: 'Back scabbard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather', 'metal'], setting: ['medieval'], slot: ['back'] } } },
 
   // A black elastic garter 30 mm wide and 480 mm round laid flat, a moulded black knife sheath 150 mm long sewn
@@ -148,7 +148,7 @@ local thinKnife(p, x, z, y) = [
     + [
       box('snap-strap', 'loop', [-0.05, 0.013, 0.046], [-0.035, 0.016, 0.082]),
       h.disc('snap', 'stud', 0.004, 0.016, 0.018, -0.0425, 0.074),
-    ], nylonKnife { strap: 'cloth-charcoal' })
+    ], nylonKnife { strap: 'cloth-charcoal' }) + { title: 'Garter sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A black elastic garter 30 mm wide and 480 mm round laid flat with two moulded knife sheaths 150 mm long sewn
@@ -161,7 +161,7 @@ local thinKnife(p, x, z, y) = [
       h.disc('stud-left', 'stud', 0.004, 0.016, 0.018, -0.0625, 0.06),
       box('snap-right', 'loop', [-0.05, 0.013, 0.067], [-0.035, 0.016, 0.103]),
       h.disc('stud-right', 'stud', 0.004, 0.016, 0.018, -0.0425, 0.095),
-    ], nylonKnife { strap: 'cloth-charcoal' })
+    ], nylonKnife { strap: 'cloth-charcoal' }) + { title: 'Double garter sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A black nylon thigh panel 200 mm tall and 150 mm wide laid flat, six narrow sleeves sewn across it with a
@@ -180,13 +180,13 @@ local thinKnife(p, x, z, y) = [
         box('sleeve-%d' % i, 'spine', [-0.035, 0.006, -0.06 + i * 0.024], [0.09, 0.01, -0.06 + i * 0.024 + 0.02]),
       ] + thinKnife('knife-%d' % i, -0.035, -0.05 + i * 0.024, 0.007)
       for i in std.range(0, 5)
-    ]), nylonKnife { body: 'nylon-black', spine: 'webbing-black', handle: 'steel-parkerized', ring: 'steel-parkerized', mouth: 'nylon-black' })
+    ]), nylonKnife { body: 'nylon-black', spine: 'webbing-black', handle: 'steel-parkerized', ring: 'steel-parkerized', mouth: 'nylon-black' }) + { title: 'Throwing knife leg sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A brown leather sword scabbard 850 mm long and 50 mm wide at the mouth, laid flat, with a belt frog: a tab
   // with a belt slot strapped round its throat, and a leather tip cap.
   h.compound('scabbard', 0.45, sheathFlat('scab', 0.85, 0.05, 0.028, 0.022, 0.2, -0.4, 0, 0.05)
-    + frog('scab', -0.4, 0.05, 0.022), leather)
+    + frog('scab', -0.4, 0.05, 0.022), leather) + { title: 'Scabbard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], setting: ['medieval'], slot: ['waist'] } } },
 
   // A brown leather knife sheath 250 mm long and 45 mm wide laid flat, a belt loop folded over its back at the
@@ -197,7 +197,7 @@ local thinKnife(p, x, z, y) = [
       box('snap-strap', 'strap', [-0.03, 0.016, -0.025], [-0.01, 0.02, 0.025]),
       h.disc('snap', 'stud', 0.005, 0.02, 0.022, -0.02, 0.014),
     ], leather)
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
+  + { title: 'Sheath' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A birch-bark knife sheath 250 mm long and 50 mm wide plaited from pale and dark strips, laid flat with a bark
   // belt strap 300 mm long trailing from its mouth.
@@ -206,7 +206,7 @@ local thinKnife(p, x, z, y) = [
     + [
       strapFlat('strap', 'strap', [-0.1, 0.0], [-0.32, 0.07], 0.022, 0.003),
       h.rod('toggle', 'loop', 0.005, -0.33, -0.29, 0.006) + { origin: [-0.33, 0.006, 0.075] },
-    ], bark)
+    ], bark) + { title: 'Birch bark sheath' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['plant'], setting: ['prehistoric'], slot: ['waist'] } } },
 
   // A brown leather spear strap laid flat: a torso band 40 mm wide and 1.1 m round, buckled, with a cup for a
@@ -217,6 +217,6 @@ local thinKnife(p, x, z, y) = [
       h.tube('cup', 'body', 0.016, 0.022, -0.27, -0.21, 0.022, -0.08),
       h.disc('cup-end', 'body', 0.022, 0.0, 0.004, -0.27, -0.08) + { axis: 'x', profile: [[0, 0], [0, 0.022], [0.006, 0.022], [0.006, 0]], origin: [-0.276, 0.022, -0.08] },
       h.tube('shaft-loop', 'body', 0.016, 0.021, 0.14, 0.17, 0.021, -0.08),
-    ], leather)
+    ], leather) + { title: 'Spear sling' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather'], slot: ['torso'] } } },
 ]
