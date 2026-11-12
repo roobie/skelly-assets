@@ -30,8 +30,8 @@ const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
-// Worn garments beyond the everyday clothes, chosen for covering parts those leave out: a robe over the legs, boots over
-// the shins. `leather_gloves` is left out because it pokes at rest (118 pokes measured).
+// The other fitted garments, each on a fit the everyday clothes don't exercise: the robe template and the narrow boot.
+// `leather_gloves` is left out until it stops poking at rest (#191).
 const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });

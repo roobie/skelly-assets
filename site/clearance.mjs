@@ -287,7 +287,7 @@ export function coverage(rig, rest) {
 /**
  * The body's surface with what covers it: for each body part { bone, samples }, its sampled surface as above, each
  * sample with `cover`, the index into `rest.pieces` of the piece meant to cover it, or -1. The probe tests the covered
- * samples. With `whole`, each sample also says whether its corners are covered too, which costs three more queries per
+ * samples. With `whole`, each sample also says whether its corners are covered too, which costs a query per corner of each
  * covered sample: the skin check draws the triangles of the whole ones, since a triangle a hem or a cuff crosses would
  * draw its uncovered part as showing, so only a caller that draws or counts them asks.
  */
