@@ -23,7 +23,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     body: 'cloth-canvas',
     cuff: 'cloth-khaki',
     strap: 'cloth-khaki',
-  })
+  }) + { title: 'Cloth quiver' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { material: ['fabric'] } } },
 
   // A cotton quiver 700 mm long and 100 mm across with a flat bag 700 mm by 110 mm strapped along its side for a
@@ -41,7 +41,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     h.tube('band-ring-%d' % i, 'strap', 0.05, 0.053, x, x + 0.025, 0.05, 0)
     for i in [0, 1]
     for x in [[0.12, 0.52][i]]
-  ], { body: 'cloth-olive-drab', cuff: 'webbing-olive-dark', bag: 'cloth-olive-drab', strap: 'webbing-olive-dark' })
+  ], { body: 'cloth-olive-drab', cuff: 'webbing-olive-dark', bag: 'cloth-olive-drab', strap: 'webbing-olive-dark' }) + { title: 'Takedown bow quiver' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['archery'], tags: { material: ['fabric'] } } },
 
   // A nylon radio pouch 80 mm wide, 160 mm tall and 50 mm deep, open-topped with a shock-cord retainer across the
@@ -61,7 +61,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     cord: 'plastic-matte-black',
     fastener: 'plastic-matte-black',
     strap: 'nylon-coyote',
-  })
+  }) + { title: 'Radio pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A nylon sustainment pouch 180 mm wide, 230 mm tall and 100 mm deep with a drawcord collar under a buckled lid,
@@ -76,7 +76,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     collar: 'webbing-olive-dark',
     strap: 'webbing-olive-dark',
     buckle: 'plastic-matte-black',
-  })
+  }) + { title: 'Sustainment pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A round nylon grenade pouch 70 mm across and 115 mm tall, shaped to one grenade, under a domed lid whose tab
@@ -87,7 +87,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     box('lid-tab', 'flap', [-0.012, 0.06, 0.033], [0.012, 0.104, 0.037]),
     h.stud('stud', 'stud', 0, 0.072, 0.037, 0.006),
     box('back-strap', 'strap', [-0.0125, 0.01, -0.038], [0.0125, 0.09, -0.031]),
-  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'webbing-olive-dark', stud: 'plastic-matte-black' })
+  ], { body: 'cloth-olive-drab', flap: 'cloth-olive-drab', strap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { title: 'Tactical grenade pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A nylon pistol holster 230 mm tall, its muzzle end down, 50 mm thick with the grip opening 120 mm deep at the
@@ -122,7 +122,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     mouth: 'void-black',
     strap: 'nylon-coyote',
     buckle: 'plastic-matte-black',
-  })
+  }) + { title: 'Tactical holster' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A nylon shotshell pouch 120 mm wide, 100 mm tall and 60 mm deep with a snapped flap, an elastic loop band across
@@ -139,7 +139,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     strap: 'hook-loop-grey',
     elastic: 'webbing-black',
     stud: 'plastic-matte-black',
-  })
+  }) + { title: 'Tactical shotshell pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A light tactical vest folded in two on the floor, 420 mm by 340 mm and 60 mm deep, its front face up with three
@@ -162,7 +162,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
   ]) + [
     box('shoulder', 'flap', [-0.16, 0.06, -0.17], [-0.12, 0.064, -0.07]),
     box('buckle', 'buckle', [0.21, 0.015, -0.03], [0.222, 0.045, 0.03]),
-  ], { cloth: 'cloth-charcoal', pouch: 'cloth-black', flap: 'hook-loop-grey', buckle: 'plastic-matte-black' })
+  ], { cloth: 'cloth-charcoal', pouch: 'cloth-black', flap: 'hook-loop-grey', buckle: 'plastic-matte-black' }) + { title: 'Tactical vest' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A low-profile nylon tool pouch 140 mm wide, 180 mm tall and 40 mm deep that zips open, with a row of elastic tool
@@ -181,7 +181,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     box('back-strap-%d' % i, 'strap', [x - 0.0125, 0.02, -0.024], [x + 0.0125, 0.17, -0.02])
     for i in [0, 1]
     for x in [[-0.035, 0.035][i]]
-  ], { body: 'nylon-coyote', zip: 'plastic-matte-black', pull: 'plastic-matte-black', strap: 'nylon-coyote', stitch: 'plastic-matte-black' })
+  ], { body: 'nylon-coyote', zip: 'plastic-matte-black', pull: 'plastic-matte-black', strap: 'nylon-coyote', stitch: 'plastic-matte-black' }) + { title: 'Tool pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A nylon magazine pouch 240 mm wide, 190 mm tall and 90 mm deep: three tall cells side by side, each taking two
@@ -210,7 +210,7 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     flap: 'webbing-olive-dark',
     tab: 'plastic-matte-black',
     strap: 'webbing-olive-dark',
-  })
+  }) + { title: 'Triple magazine pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // An oversized home-made ballistic vest lying flat, front up: two stiff panels 600 mm wide, 520 mm long and 50 mm
@@ -235,6 +235,6 @@ local strapAlong(prefix, slot, x0, x1, z0, w) = [
     box('side-tab-%d' % i, 'buckle', [x0, 0.004, -0.06], [x0 + 0.04, 0.008, 0.0])
     for i in [0, 1]
     for x0 in [[-0.4, 0.36][i]]
-  ], { cloth: 'cloth-charcoal', panel: 'cloth-black', strap: 'hook-loop-grey', buckle: 'plastic-matte-black' })
+  ], { cloth: 'cloth-charcoal', panel: 'cloth-black', strap: 'hook-loop-grey', buckle: 'plastic-matte-black' }) + { title: 'Oversized ballistic vest' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

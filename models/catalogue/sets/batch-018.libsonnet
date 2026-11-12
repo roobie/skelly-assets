@@ -58,14 +58,14 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     band('lash-%d' % i, 'cord', 0.083, 0.006, 0.024, x, 0.052)
     for i in [0, 1, 2]
     for x in [[-0.95, 0, 0.95][i]]
-  ], { bark: 'bark', cut: 'wood-pine', cord: 'cord-olive' })
+  ], { bark: 'bark', cut: 'wood-pine', cord: 'cord-olive' }) + { title: 'Long branch bundle' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
 
   // Ten copper water pipes, 600 mm long and 22 mm across, packed three, four and three and tied with cord.
-  pipes('bundle_copper_pipe', 3, 0.6, 0.011, 0.002, 'copper') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  pipes('bundle_copper_pipe', 3, 0.6, 0.011, 0.002, 'copper') + { title: 'Copper pipe bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // Ten steel pipes, 600 mm long and 21 mm across, packed three, four and three and tied with cord.
-  pipes('bundle_pipe', 7.2, 0.6, 0.0105, 0.003, 'steel-grey') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  pipes('bundle_pipe', 7.2, 0.6, 0.0105, 0.003, 'steel-grey') + { title: 'Pipe bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // Ten steel reinforcing bars, 800 mm long and 16 mm across, packed three, four and three and twisted
   // together with tie wire at each end.
@@ -77,7 +77,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     band('wire-%d' % i, 'wire', 0.0325, 0.002, 0.008, x, 0.0218)
     for i in [0, 1]
     for x in [[-0.3, 0.3][i]]
-  ], { bar: 'scrap-rusted', wire: 'steel-grey' })
+  ], { bar: 'scrap-rusted', wire: 'steel-grey' }) + { title: 'Rebar bundle' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // Five wooden javelins, 1.4 m long and 24 mm across with fire-hardened points, laid three under two and
@@ -99,7 +99,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     band('lash-%d' % i, 'cord', 0.037, 0.004, 0.02, x, 0.022)
     for i in [0, 1]
     for x in [[-0.4, 0.3][i]]
-  ], { shaft: 'wood-pine', point: 'wood-walnut', cord: 'cord-olive' })
+  ], { shaft: 'wood-pine', point: 'wood-walnut', cord: 'cord-olive' }) + { title: 'Javelin bundle' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapons', tags: { material: ['wood'], weapon: ['polearm'] } } },
 
   // Ten sawn construction planks, 1220 mm long, 89 mm wide and 38 mm thick, stacked two wide and five high and
@@ -118,23 +118,23 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     ]
     for s in [0, 1]
     for x in [[-0.4, 0.4][s]]
-  ]), { pine: 'wood-pine', birch: 'wood-birch', strap: 'steel-galvanised' })
+  ]), { pine: 'wood-pine', birch: 'wood-birch', strap: 'steel-galvanised' }) + { title: 'Plank bundle' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood', 'metal'] } } },
 
   // Twenty-five cotton sheets folded small, a stack 200 mm by 150 mm and 40 mm tall, tied once each way.
-  patches('bundle_cotton', 0.44, 0.2, 0.15, 10, 0.004, ['cloth-cotton', 'paper-white']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  patches('bundle_cotton', 0.44, 0.2, 0.15, 10, 0.004, ['cloth-cotton', 'paper-white']) + { title: 'Cotton bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A hundred cotton rags folded into a stack 160 mm by 110 mm and 32 mm tall, tied once each way.
-  patches('bundle_rag', 0.21, 0.16, 0.11, 8, 0.004, ['cloth-rag', 'cloth-rag-shadow', 'cloth-shirt-faded']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  patches('bundle_rag', 0.21, 0.16, 0.11, 8, 0.004, ['cloth-rag', 'cloth-rag-shadow', 'cloth-shirt-faded']) + { title: 'Rag bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // Fifty leather patches in a stack 140 mm by 100 mm and 40 mm tall, tied once each way.
-  patches('bundle_leather', 0.46, 0.14, 0.1, 10, 0.004, ['leather-brown', 'skin-rawhide']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  patches('bundle_leather', 0.46, 0.14, 0.1, 10, 0.004, ['leather-brown', 'skin-rawhide']) + { title: 'Leather bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // Fifty synthetic fabric patches in assorted colours, a stack 100 mm by 80 mm and 24 mm tall, tied once each way.
-  patches('bundle_nylon', 0.071, 0.1, 0.08, 6, 0.004, ['cloth-navy', 'cloth-olive-drab', 'plastic-charcoal', 'nylon-red']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  patches('bundle_nylon', 0.071, 0.1, 0.08, 6, 0.004, ['cloth-navy', 'cloth-olive-drab', 'plastic-charcoal', 'nylon-red']) + { title: 'Nylon bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A hundred felt patches in a stack 140 mm by 110 mm and 60 mm tall, tied once each way.
-  patches('bundle_felt', 0.29, 0.14, 0.11, 10, 0.006, ['cloth-pants-grey', 'cloth-canvas']) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  patches('bundle_felt', 0.29, 0.14, 0.11, 10, 0.006, ['cloth-pants-grey', 'cloth-canvas']) + { title: 'Felt bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A brass candlestick, 280 mm tall: a stepped round foot 110 mm across, a turned stem with three knops, a wide
   // drip pan and a deep socket for the candle.
@@ -144,7 +144,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
       [0.088, 0.011], [0.165, 0.009], [0.178, 0.016], [0.19, 0.009], [0.236, 0.01], [0.244, 0.04], [0.25, 0.04],
       [0.254, 0.017], [0.28, 0.017], [0.28, 0.012], [0.258, 0.012], [0.258, 0],
     ]),
-  ], { brass: 'brass' })
+  ], { brass: 'brass' }) + { title: 'Candlestick' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['metal'] } } },
 
   // An empty steel canister, 58 mm across and 110 mm tall, open at the top: olive paint outside, bare steel inside
@@ -156,7 +156,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     turned('rim-top', 'steel', 'y', [[0, 0.0235], [0, 0.031], [0.004, 0.031], [0.004, 0.0235], [0, 0.0235]], [0, 0.106, 0]),
     turned('rim-foot', 'steel', 'y', [[0, 0.02], [0, 0.031], [0.006, 0.031], [0.006, 0.02], [0, 0.02]]),
     disc('floor', 'floor', 0.0235, 0.002, 0.004),
-  ], { steel: 'steel', floor: 'steel-stainless', paint: 'paint-olive', band: 'paint-crane-yellow' })
+  ], { steel: 'steel', floor: 'steel-stainless', paint: 'paint-olive', band: 'paint-crane-yellow' }) + { title: 'Empty canister' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], state: ['empty'] } } },
 
   // A whole cannabis plant pulled up and laid on its side, 600 mm from root to tip: a woody stalk with a small
@@ -197,7 +197,7 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     for i in [0, 1, 2, 3]
     for x in [[0.18, 0.21, 0.24, 0.27][i]]
     for s in [[1, -1, 1, -1][i]]
-  ], { stalk: 'plant-dried', root: 'paperboard-brown', leaf: 'plastic-green', bud: 'paint-olive' })
+  ], { stalk: 'plant-dried', root: 'paperboard-brown', leaf: 'plastic-green', bud: 'paint-olive' }) + { title: 'Cannabis plant' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] }, keywords: ['recreational-drug'] } },
 
   // A shop cash register, 360 mm wide, 360 mm deep and 300 mm tall: a cash drawer in the base with a lock and a
@@ -235,6 +235,6 @@ local patches(id, massKg, l, w, layers, layer, finishes) = h.compound(id, massKg
     total: 'plastic-red',
     paper: 'paper-white',
     screen: 'glass-lens-green',
-  })
+  }) + { title: 'Cash register' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

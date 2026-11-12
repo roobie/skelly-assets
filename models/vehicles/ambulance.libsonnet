@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'ambulance.spec.libsonnet';
 local van = import 'van-body.libsonnet';
+local vehicle = import 'ambulance.placements.libsonnet';
 local tail = van.tail(s);
 local grain = 1 / 32;
 local block = 0.28;
@@ -24,21 +25,21 @@ local checks(tag, x0, x1, z0, z1) = [
   for row in [0, 1]
   if std.max(tail + i * block, x0) < std.min(tail + (i + 1) * block, x1)
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('ambulance', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('ambulance', vehicle.title, s) + [
   // A two-row chequer above the stripe and a green cross between the window and the side door on each wall and on the
   // roof, which tell this box from a parcel van's.
   k.compound('ambulance_markings', 3, checks('far', tail, s.box.slideFront, -s.box.side - grain, -s.box.side)
                                       + checks('near_rear', tail, s.slideRear, s.box.side, s.box.side + grain)
                                       + sidePlus('far_plus', -s.box.glassOut - grain, -s.box.glassOut)
                                       + sidePlus('near_plus', s.box.glassOut, s.box.glassOut + grain)
-                                      + plus('roof_plus', -1.5, 0, 16 * grain, 5 * grain, function(id, x, z) k.box(id, 'cross', [x[0], s.box.roof, z[0]], [x[1], s.box.roof + grain, z[1]])), colours),
+                                      + plus('roof_plus', -1.5, 0, 16 * grain, 5 * grain, function(id, x, z) k.box(id, 'cross', [x[0], s.box.roof, z[0]], [x[1], s.box.roof + grain, z[1]])), colours) + { title: 'Ambulance markings' },
   // On the door, so these move with it.
-  k.compound('ambulance_door_markings', 1, checks('door', s.slideRear, s.box.slideFront, s.box.side, s.box.side + grain), colours),
+  k.compound('ambulance_door_markings', 1, checks('door', s.slideRear, s.box.slideFront, s.box.side, s.box.side + grain), colours) + { title: 'Ambulance door markings' },
   // One rear leaf's cross, below its glass.
-  k.compound('ambulance_rear_markings', 1, plus('plus', 16 * grain, 42 * grain, 8 * grain, 3 * grain, function(id, z, y) k.box(id, 'cross', [tail - grain, y[0], z[0]], [tail, y[1], z[1]])), colours),
+  k.compound('ambulance_rear_markings', 1, plus('plus', 16 * grain, 42 * grain, 8 * grain, 3 * grain, function(id, z, y) k.box(id, 'cross', [tail - grain, y[0], z[0]], [tail, y[1], z[1]])), colours) + { title: 'Ambulance rear markings' },
   k.compound('ambulance_locker', 70, [
     k.box('carcass', 'unit', [-2.6, s.box.floor, -s.box.skin], [-0.9, 1.56, -0.56]),
     k.box('door_seam_low', 'trim', [-2.6, 1.2, -0.56], [-0.9, 1.22, -0.55]),
     k.box('door_seam_mid', 'trim', [-1.76, s.box.floor, -0.56], [-1.74, 1.56, -0.55]),
-  ], { unit: 'plastic-white', trim: 'plastic-grey' }),
+  ], { unit: 'plastic-white', trim: 'plastic-grey' }) + { title: 'Ambulance locker' },
 ])

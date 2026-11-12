@@ -6,6 +6,7 @@ local tank = import 'fuel-tank-kit.libsonnet';
 local exhaust = import 'exhaust-kit.libsonnet';
 local s = import 'estate.spec.libsonnet';
 {
+  title: 'Estate car',
   sites: [
     site.one('shell', 'estate_shell'),
     site.one('windscreen', 'estate_windscreen'),

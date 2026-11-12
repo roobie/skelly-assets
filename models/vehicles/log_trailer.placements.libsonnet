@@ -3,6 +3,7 @@ local s = import 'log_trailer.spec.libsonnet';
 local bolsterIds = std.range(0, std.length(s.bolsters) - 1);
 local axleIds = std.range(0, std.length(s.axles) - 1);
 {
+  title: 'Log trailer',
   sites: [
     site.one('chassis', 'log_trailer_chassis'),
     site.one('floor', 'log_trailer_floor'),

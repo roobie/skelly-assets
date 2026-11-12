@@ -26,23 +26,23 @@ local lobe(id, slot, outline, y0, y1, cx=0, cz=0, lean=[0, 0]) =
   ];
 [
   // A fossil thigh bone about 400 mm long, its shaft about 25 mm across.
-  h.compound('bone_fossil', 0.69, bone(0.4), { bone: 'clay-wet', band: 'stone-whet' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
+  h.compound('bone_fossil', 0.69, bone(0.4), { bone: 'clay-wet', band: 'stone-whet' }) + { title: 'Bone fossil' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
 
   // A cast of a large leg bone about 2 m long, the shaft about 120 mm across, the ends nearer 200 mm.
-  h.compound('large_bone_fossil', 9.7, bone(2), { bone: 'clay-wet', band: 'stone-whet' }) + { voxelGrain: 0.01 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
+  h.compound('large_bone_fossil', 9.7, bone(2), { bone: 'clay-wet', band: 'stone-whet' }) + { title: 'Large bone fossil' } + { voxelGrain: 0.01 } + { taxonomy: { category: 'nature', tags: { material: ['bone'] } } },
 
   // A flat field stone about 350 by 230 mm and 35 mm thick.
   h.compound('field_stone', 3.8,
              lobe('body', 'stone', [[-0.17, -0.04], [-0.12, -0.105], [0.02, -0.115], [0.15, -0.07], [0.175, 0.02], [0.11, 0.1], [-0.03, 0.115], [-0.15, 0.06]], 0, 0.03, 0, 0, [0.01, -0.006])
              + lobe('hump', 'grain', [[-0.08, -0.05], [0.04, -0.06], [0.09, 0.0], [0.04, 0.05], [-0.06, 0.05], [-0.1, 0.0]], 0.018, 0.036, 0.02, -0.01, [0.006, 0.004]),
-             { stone: 'stone-grey', grain: 'stone-whet' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
+             { stone: 'stone-grey', grain: 'stone-whet' }) + { title: 'Field stone' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
 
   // A big lumpy rock about 300 by 230 mm and 180 mm high.
   h.compound('large_rock', 20,
              lobe('body', 'stone', [[-0.15, -0.05], [-0.09, -0.11], [0.04, -0.115], [0.145, -0.04], [0.14, 0.06], [0.06, 0.115], [-0.07, 0.11], [-0.14, 0.05]], 0, 0.15, 0, 0, [0.02, -0.015])
              + lobe('lump', 'stone', [[-0.07, -0.06], [0.04, -0.07], [0.09, 0.0], [0.04, 0.07], [-0.06, 0.06], [-0.09, 0.0]], 0.06, 0.18, -0.04, 0.02, [0.01, 0.01])
              + lobe('spur', 'grain', [[-0.05, -0.04], [0.04, -0.05], [0.07, 0.0], [0.03, 0.05], [-0.05, 0.04]], 0.01, 0.1, 0.1, 0.05, [-0.01, 0.0]),
-             { stone: 'stone-whet', grain: 'stone-grey' }) + { voxelGrain: 0.006 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
+             { stone: 'stone-whet', grain: 'stone-grey' }) + { title: 'Large rock' } + { voxelGrain: 0.006 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
 
   // A foil-wrapped batt of mineral wool about 500 by 300 mm and 20 mm thick, the fibre showing at both cut ends.
   h.compound('rock_wool_bat', 0.23, [
@@ -52,7 +52,7 @@ local lobe(id, slot, outline, y0, y1, cx=0, cz=0, lean=[0, 0]) =
     box('foil-front', 'foil', [-0.245, 0, 0.15], [0.245, 0.02, 0.152]),
     box('foil-back', 'foil', [-0.245, 0, -0.152], [0.245, 0.02, -0.15]),
     box('seam', 'tape', [-0.245, 0.02, -0.02], [0.245, 0.021, 0.02]),
-  ], { fibre: 'paperboard-tan', foil: 'foil-alu', tape: 'tape-silver' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'] } } },
+  ], { fibre: 'paperboard-tan', foil: 'foil-alu', tape: 'tape-silver' }) + { title: 'Rock wool bat' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['stone'] } } },
 
   // A square of heavy canvas 150 mm a side, its edges turned and stitched.
   h.compound('canvas_patch', 0.015, [
@@ -65,5 +65,5 @@ local lobe(id, slot, outline, y0, y1, cx=0, cz=0, lean=[0, 0]) =
     box('stitch-s', 'stitch', [-0.071, 0.004, 0.070], [0.071, 0.006, 0.072]),
     box('stitch-w', 'stitch', [-0.072, 0.004, -0.07], [-0.070, 0.006, 0.07]),
     box('stitch-e', 'stitch', [0.070, 0.004, -0.07], [0.072, 0.006, 0.07]),
-  ], { canvas: 'cloth-canvas', hem: 'cloth-canvas', stitch: 'cord-cotton' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], { canvas: 'cloth-canvas', hem: 'cloth-canvas', stitch: 'cord-cotton' }) + { title: 'Canvas patch' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 ]

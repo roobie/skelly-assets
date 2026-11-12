@@ -28,27 +28,27 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   ] + bothSides([
     box('side_rail', 'frame', [s.rear, s.frameLow, 0.47], [s.front, s.frameHigh, 0.55]),
     box('spring', 'frame', [s.axle - 0.34, s.hub, 0.5], [s.axle + 0.34, s.frameLow, 0.54]),
-  ]) + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameHigh]), finish),
+  ]) + h.drawbar(s.front, 0.5, s.tip, [s.frameLow, s.frameHigh]), finish) + { title: 'Checkpoint barrier trailer chassis' },
   k.compound('checkpoint_barrier_trailer_floor', 50, [
     box('deck', 'wood', [s.rear, s.frameHigh, -s.side + 0.04], [s.front, s.deck, s.side - 0.04]),
-  ], { wood: 'wood-oak' }),
+  ], { wood: 'wood-oak' }) + { title: 'Checkpoint barrier trailer floor' },
   k.compound('checkpoint_barrier_trailer_side', 28, [
     box('skin', 'paint', [s.rear, s.frameHigh, s.side - 0.04], [s.front, s.wall, s.side]),
     box('top_rail', 'paint', [s.rear, s.railLow, s.side - 0.04], [s.front, s.railTop, s.side + 0.02]),
     stake('stake_rear', s.rear, s.rear + 0.06),
     stake('stake_mid', -0.03, 0.03),
     stake('stake_front', s.front - 0.06, s.front),
-  ], finish),
+  ], finish) + { title: 'Checkpoint barrier trailer side' },
   k.compound('checkpoint_barrier_trailer_headboard', 14, [
     box('skin', 'paint', [s.front - 0.04, s.deck, -s.side + 0.04], [s.front, s.railTop, s.side - 0.04]),
-  ], finish),
+  ], finish) + { title: 'Checkpoint barrier trailer headboard' },
   // The tailgate drops about its lower edge.
   k.compound('checkpoint_barrier_trailer_tailgate', 12, [
     box('skin', 'paint', [s.rear, s.deck, -s.side + 0.04], [s.rear + 0.04, s.wall, s.side - 0.04]),
-  ], finish, { hinge_a: ['skin', [0, 0, 0.2]], hinge_b: ['skin', [0, 0, 0.8]] }),
+  ], finish, { hinge_a: ['skin', [0, 0, 0.2]], hinge_b: ['skin', [0, 0, 0.8]] }) + { title: 'Checkpoint barrier trailer tailgate' },
   k.compound('checkpoint_barrier_trailer_mudguard', 4,
-    m.flatGuard('guard', 'dark', [s.axle - 0.3, s.axle + 0.3], 0.66, 0.2, 0.12, [s.side, s.wheelZ + 0.1]), finish),
-  k.compound('checkpoint_barrier_trailer_straps', 2, strap(-0.55, 'rear') + strap(0.55, 'front'), { strap: 'webbing-olive-dark' }),
+    m.flatGuard('guard', 'dark', [s.axle - 0.3, s.axle + 0.3], 0.66, 0.2, 0.12, [s.side, s.wheelZ + 0.1]), finish) + { title: 'Checkpoint barrier trailer mudguard' },
+  k.compound('checkpoint_barrier_trailer_straps', 2, strap(-0.55, 'rear') + strap(0.55, 'front'), { strap: 'webbing-olive-dark' }) + { title: 'Checkpoint barrier trailer straps' },
   // Stands on edge with its origin at the middle of its bottom rail.
   k.compound('checkpoint_barrier_trailer_barrier', 34, [
     box('base_rail', 'steel', [-halfLength, 0, -0.03], [halfLength, 0.08, 0.03]),
@@ -66,5 +66,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
       for i in std.range(0, 4)
     ]
     for b in [0, 1]
-  ]), { steel: 'steel-galvanised', white: 'paint-white', red: 'paint-red' }),
+  ]), { steel: 'steel-galvanised', white: 'paint-white', red: 'paint-red' }) + { title: 'Checkpoint barrier trailer barrier' },
 ])

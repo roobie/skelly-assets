@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'tipper_truck.spec.libsonnet';
 {
+  title: 'Tipper truck',
   sites: (import 'truck-cab.libsonnet').fittings(site.kit, 'tipper_truck', s) + [
     site.one('subframe', 'tipper_truck_subframe'),
     site.one('tub_floor', 'tipper_truck_tub_floor'),

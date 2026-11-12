@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'road_roller.spec.libsonnet';
 {
+  title: 'Road roller',
   sites: [
     site.one('platform', 'road_roller_platform'),
     site.one('front_yoke', 'road_roller_front_yoke'),

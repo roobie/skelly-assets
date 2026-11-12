@@ -35,7 +35,7 @@ local caster(i, x, z) = [
   ] + [
     box('louvre-%d' % k, 'body', [-0.10, 1.97 + k * 0.03, 0.415], [0.34, 1.985 + k * 0.03, 0.43])
     for k in std.range(0, 4)
-  ], { body: 'steel-stainless', door: 'steel-stainless', seal: 'rubber-black', handle: 'steel-grey', grille: 'plastic-black', panel: 'plastic-black', readout: 'plastic-clear-red', caster: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'steel-stainless', door: 'steel-stainless', seal: 'rubber-black', handle: 'steel-grey', grille: 'plastic-black', panel: 'plastic-black', readout: 'plastic-clear-red', caster: 'steel-grey', wheel: 'rubber-black' }) + { title: 'Heavy-duty fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cube minifridge, 0.48 m wide, 0.50 m deep and 0.84 m tall, door on +z and the condenser coil on its back.
   h.compound('minifridge', 25, [
@@ -55,22 +55,22 @@ local caster(i, x, z) = [
   ] + [
     box('vent-slat-%d' % k, 'body', [-0.21 + k * 0.035, 0.03, 0.225], [-0.195 + k * 0.035, 0.07, 0.23])
     for k in std.range(0, 11)
-  ], { body: 'paint-charcoal', door: 'plastic-black', vent: 'plastic-grey', seal: 'rubber-black', handle: 'steel-stainless', coil: 'steel-grey', foot: 'rubber-black' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
+  ], { body: 'paint-charcoal', door: 'plastic-black', vent: 'plastic-grey', seal: 'rubber-black', handle: 'steel-stainless', coil: 'steel-grey', foot: 'rubber-black' }) + { title: 'Mini fridge' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 100-tablet over-the-counter bottle, 44 mm across and 92 mm tall with its push-and-turn cap.
   bottle('acetaminophen', 0.063, 0.022, 0.07, 0.017, 0.02, 0.012,
-         { body: 'plastic-white', label: 'plastic-yellow', cap: 'plastic-red' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
+         { body: 'plastic-white', label: 'plastic-yellow', cap: 'plastic-red' }) + { title: 'Paracetamol tablets' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
   // A pharmacy prescription vial, 33 mm across and 70 mm tall, amber with a white cap.
   bottle('prescription_stimulant', 0.034, 0.016, 0.058, 0.016, 0.0168, 0.011,
          { body: 'fuel-amber', label: 'paper-white', cap: 'plastic-white' },
-         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { title: 'Prescription stimulant' } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A tablet carton, 90 mm wide, 60 mm tall and 22 mm deep, with a coloured band and a tuck flap on top.
   h.item('antifungal', 'carton', 0.04, {
     width: 0.09, height: 0.058, depth: 0.022, lidHeight: 0.002, bandHeight: 0.02, bandInset: 0.0004,
     handleHeight: 0, handleWidth: 0.01, handleDepth: 0.01, handleWall: 0.002,
-  }, { body: 'paper-white', label: 'plastic-green', cap: 'paper-white' }) + inHand('antifungal', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
+  }, { body: 'paper-white', label: 'plastic-green', cap: 'paper-white' }) + { title: 'Antifungal cream' } + inHand('antifungal', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
 
   // A blister card of ten oblong tablets, 100 mm by 45 mm and 6 mm thick at the bubbles, lying flat.
   h.compound('antihistamine', 0.0086, [
@@ -79,12 +79,12 @@ local caster(i, x, z) = [
     box('bubble-%d-%d' % [i, j], 'bubble', [-0.042 + i * 0.018, 0.002, [-0.014, 0.006][j]], [-0.032 + i * 0.018, 0.006, [-0.006, 0.014][j]])
     for i in std.range(0, 4)
     for j in std.range(0, 1)
-  ], { foil: 'alu-bare', bubble: 'plastic-clear-red' }) + inHand('antihistamine', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  ], { foil: 'alu-bare', bubble: 'plastic-clear-red' }) + { title: 'Antihistamine tablets' } + inHand('antihistamine', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A squat wide-mouthed tub of livestock wormer tablets, 64 mm across and 70 mm tall with its lid.
   bottle('antiparasitic', 0.09, 0.032, 0.05, 0.029, 0.031, 0.014,
          { body: 'plastic-white', label: 'paint-olive', cap: 'plastic-green' },
-         { shoulderHeight: 0.003, neckHeight: 0.004 }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+         { shoulderHeight: 0.003, neckHeight: 0.004 }) + { title: 'Antiparasitic tablets' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A shaker canister of wound powder, 42 mm across and 90 mm tall, with a sifter cap pierced on top.
   h.compound('antiseptic_powder', 0.055, [
@@ -94,5 +94,5 @@ local caster(i, x, z) = [
   ] + [
     box('hole-%d' % k, 'hole', [[-0.006, 0.002, -0.002][k], 0.09, [-0.002, -0.002, 0.004][k]], [[-0.004, 0.004, 0][k], 0.092, [0, 0, 0.006][k]])
     for k in std.range(0, 2)
-  ], { body: 'plastic-yellow', label: 'paper-white', cap: 'plastic-white', hole: 'plastic-black' }) + inHand('antiseptic_powder', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-yellow', label: 'paper-white', cap: 'plastic-white', hole: 'plastic-black' }) + { title: 'Antiseptic powder' } + inHand('antiseptic_powder', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

@@ -3,6 +3,7 @@
 local powertrain = import 'powertrain.libsonnet';
 local s = (import 'truck-cab.libsonnet').spec(import 'refuse_truck.spec.libsonnet');
 {
+  title: 'Hybrid refuse truck',
   parent: 'refuse_truck',
   sites(base): powertrain.hybrid(base, {
     over: { exhaust: { part: 'exhaust_stack_small', at: [s.cabBack - 0.1, s.railTop, 0.52] } },

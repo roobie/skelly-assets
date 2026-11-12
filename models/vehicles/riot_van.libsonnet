@@ -2,6 +2,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'riot_van.spec.libsonnet';
 local van = import 'van-body.libsonnet';
+local vehicle = import 'riot_van.placements.libsonnet';
 local box = k.box;
 local tail = van.tail(s);
 local nose = van.nose(s);
@@ -50,16 +51,16 @@ local chequerEnd = tail + 19 * 0.28;
 local nearFace = [s.side, s.side + 1 / 32];
 local farFace = [-s.side - 1 / 32, -s.side];
 local chequerFinish = { yellow: 'reflective-yellow', blue: 'paint-police-blue' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', s) + [
+taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', vehicle.title, s) + [
   k.compound('riot_van_windscreen_grille', 22, [
     screenBar('bar' + i, s.waist + 0.06 + i * 0.16)
     for i in std.range(0, 5)
   ] + [
     screenPost('post' + i, -0.8 + i * 0.32)
     for i in std.range(0, 5)
-  ], finish),
-  k.compound('riot_van_door_grille', 6, grid('door', [s.bFront + 0.03, doorGrilleFront], [s.waist + 0.02, s.windowTop - 0.02], nearOut) + doorWedge, finish),
-  k.compound('riot_van_side_door_grille', 6, grid('door', [s.slideRear + 0.05, -0.05], [s.waist + 0.02, s.windowTop - 0.02], nearOut), finish),
+  ], finish) + { title: 'Riot van windscreen grille' },
+  k.compound('riot_van_door_grille', 6, grid('door', [s.bFront + 0.03, doorGrilleFront], [s.waist + 0.02, s.windowTop - 0.02], nearOut) + doorWedge, finish) + { title: 'Riot van door grille' },
+  k.compound('riot_van_side_door_grille', 6, grid('door', [s.slideRear + 0.05, -0.05], [s.waist + 0.02, s.windowTop - 0.02], nearOut), finish) + { title: 'Riot van side door grille' },
   // The rear leaf's face looks along x, so its bars stand off the door in x rather than z.
   k.compound('riot_van_rear_grille', 5, [
     box('upright' + i, 'steel', [tail - 0.03, s.waist + 0.02, 0.08 + i * 0.17], [tail + 0.01, s.windowTop - 0.02, 0.11 + i * 0.17])
@@ -67,31 +68,31 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', s) 
   ] + [
     box('rail' + i, 'steel', [tail - 0.03, s.waist + 0.02 + i * 0.15, 0.08], [tail + 0.01, s.waist + 0.05 + i * 0.15, s.hatchSide - 0.06])
     for i in std.range(0, 4)
-  ], finish),
+  ], finish) + { title: 'Riot van rear grille' },
   k.compound('riot_van_side_grilles', 28, std.flattenArrays([
     grid('near' + i, s.windows[i], [s.waist + 0.02, s.windowTop - 0.02], nearOut)
     for i in [0, 1, 2]
   ] + [
     grid('far' + i, s.windows[i], [s.waist + 0.02, s.windowTop - 0.02], farOut)
     for i in [0, 1, 2, 3]
-  ] + [quarterGrille('near_quarter', nearOut), quarterGrille('far_quarter', farOut)]), finish),
+  ] + [quarterGrille('near_quarter', nearOut), quarterGrille('far_quarter', farOut)]), finish) + { title: 'Riot van side grilles' },
   k.compound('riot_van_markings', 2, checks('near_rear', tail, s.slideRear, nearFace[0], nearFace[1])
                                      + checks('near_pillar', s.bRear, s.bFront, nearFace[0], nearFace[1])
                                      + checks('near_front', s.cowl, chequerEnd, nearFace[0], nearFace[1])
                                      + checks('far_rear', tail, s.bFront, farFace[0], farFace[1])
-                                     + checks('far_front', s.cowl, chequerEnd, farFace[0], farFace[1]), chequerFinish),
-  k.compound('riot_van_side_door_markings', 1, checks('door', s.slideRear, s.bRear, nearFace[0], nearFace[1]), chequerFinish),
-  k.compound('riot_van_door_markings', 1, checks('door', s.bFront, s.cowl, nearFace[0], nearFace[1]), chequerFinish),
+                                     + checks('far_front', s.cowl, chequerEnd, farFace[0], farFace[1]), chequerFinish) + { title: 'Riot van markings' },
+  k.compound('riot_van_side_door_markings', 1, checks('door', s.slideRear, s.bRear, nearFace[0], nearFace[1]), chequerFinish) + { title: 'Riot van side door markings' },
+  k.compound('riot_van_door_markings', 1, checks('door', s.bFront, s.cowl, nearFace[0], nearFace[1]), chequerFinish) + { title: 'Riot van door markings' },
   k.compound('riot_van_rear_markings', 1, [
     box('check_' + i + '_' + row, if (i + row) % 2 == 0 then 'yellow' else 'blue', [tail - 1 / 32, 0.92 + row * 0.12, 0.005 + i * 0.28], [tail, 0.92 + (row + 1) * 0.12, 0.005 + (i + 1) * 0.28])
     for i in [0, 1, 2]
     for row in [0, 1]
-  ], { yellow: 'reflective-yellow', blue: 'paint-police-blue' }),
+  ], { yellow: 'reflective-yellow', blue: 'paint-police-blue' }) + { title: 'Riot van rear markings' },
   k.compound('riot_van_push_bar', 28, [
     box('cross', 'bar', [s.front + 0.04, 0.5, -0.8], [s.front + 0.09, 0.56, 0.8]),
     box('top', 'bar', [s.front + 0.04, 0.96, -0.7], [s.front + 0.09, 1.02, 0.7]),
   ] + k.bothSides([
     box('upright', 'bar', [s.front + 0.04, 0.3, 0.64], [s.front + 0.09, 1.02, 0.7]),
     box('mount', 'bar', [s.front - 0.06, 0.42, 0.64], [s.front + 0.04, 0.48, 0.7]),
-  ]), { bar: 'steel-grey' }),
+  ]), { bar: 'steel-grey' }) + { title: 'Riot van push bar' },
 ])

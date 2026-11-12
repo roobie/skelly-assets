@@ -28,7 +28,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   ] + bothSides([
     box('pivot_plate', 'frame', [-0.375, 0.25, 0.09], [-0.25, 0.44, 0.125]),
     box('sub_rail', 'frame', [-0.84, 0.625, 0.0625], [-0.19, 0.69, 0.094]),
-  ]), { frame: 'paint-charcoal' }),
+  ]), { frame: 'paint-charcoal' }) + { title: 'Motorbike frame' },
   k.compound('motorbike_fork', 7, [
     box('top_yoke', 'alloy', [0.22, 0.94, -0.094], [0.34, 0.97, 0.094]),
     box('lower_yoke', 'alloy', [0.31, 0.75, -0.094], [0.375, 0.78, 0.094]),
@@ -36,25 +36,25 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   ] + bothSides([
     k.bar('stanchion', 'chrome', [forkX(0.3), 0.3], [forkX(0.97), 0.97], 0.05, [0.0625, 0.094]),
     k.bar('slider', 'alloy', [forkX(0.26), 0.26], [forkX(0.55), 0.55], 0.075, [0.0625, 0.094]),
-  ]), { alloy: 'alu-bare', chrome: 'steel-bright' }),
+  ]), { alloy: 'alu-bare', chrome: 'steel-bright' }) + { title: 'Motorbike fork' },
   k.compound('motorbike_swingarm', 4, [
     box('pivot_tube', 'frame', [-0.31, 0.31, -0.0625], [-0.25, 0.375, 0.0625]),
     k.turned('axle', 'frame', 'z', k.disc(0.025, -0.094, 0.094), [s.rearAxle, s.hub, 0]),
     box('chain_guard', 'guard', [-0.56, 0.27, -0.125], [-0.31, 0.375, -0.094]),
   ] + bothSides([
     k.bar('arm', 'frame', [s.rearAxle - 0.03, s.hub], [-0.266, 0.344], 0.05, [0.0625, 0.094]),
-  ]), { frame: 'paint-charcoal', guard: 'plastic-black' }),
+  ]), { frame: 'paint-charcoal', guard: 'plastic-black' }) + { title: 'Motorbike swingarm' },
   k.compound('motorbike_shock', 1.5, [
     k.bar('rod', 'chrome', [-0.553, 0.31], [-0.647, 0.656], 0.05, [0.094, 0.156]),
     k.bar('spring', 'spring', [-0.575, 0.406], [-0.628, 0.594], 0.08, [0.094, 0.156]),
-  ], { chrome: 'steel-bright', spring: 'paint-charcoal' }),
+  ], { chrome: 'steel-bright', spring: 'paint-charcoal' }) + { title: 'Motorbike shock' },
   k.compound('motorbike_wheel', 9, [
     k.turned('tyre', 'tyre', 'z', [[-0.04, 0.235], [-0.04, 0.28], [-0.03, s.tyre], [0.03, s.tyre], [0.04, 0.28], [0.04, 0.235], [-0.04, 0.235]]) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.annulus(0.205, 0.235, -0.032, 0.032)) + { sides: 24 },
     // Eight fine spokes clump at the vehicle grain, so a dark web carries the few that survive it.
     k.turned('web', 'web', 'z', k.disc(0.21, -0.016, 0.016)) + { sides: 24 },
     k.turned('hub', 'hub', 'z', k.disc(0.07, -0.0625, 0.0625)) + { sides: 12 },
-  ] + spokes, { tyre: 'rubber-black', rim: 'steel-bright', web: 'plastic-black', spoke: 'steel-stainless', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] }),
+  ] + spokes, { tyre: 'rubber-black', rim: 'steel-bright', web: 'plastic-black', spoke: 'steel-stainless', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] }) + { title: 'Motorbike wheel' },
   k.compound('motorbike_engine', 30, [
     box('crankcase', 'casing', [-0.25, 0.1875, -0.125], [0.125, 0.47, 0.125]),
     k.turned('flywheel_cover', 'alloy', 'z', k.disc(0.11, -0.156, -0.125), [-0.14, 0.33, 0]) + { sides: 12 },
@@ -66,7 +66,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     fin(0.536, 0.07),
     fin(0.568, 0.094),
     prism('head', 'casing', [[-0.04, 0.6], [0.11, 0.6], [0.12, 0.64], [-0.03, 0.64]], [-0.06, 0.06]),
-  ], { casing: 'steel-grey', alloy: 'alu-bare', dark: 'paint-charcoal' }),
+  ], { casing: 'steel-grey', alloy: 'alu-bare', dark: 'paint-charcoal' }) + { title: 'Motorbike engine' },
   k.compound('motorbike_exhaust', 5, [
     box('header', 'chrome', [0.156, 0.19, 0.03], [0.22, 0.56, 0.094]),
     box('bend', 'chrome', [0.125, 0.19, 0.094], [0.22, 0.25, 0.22]),
@@ -75,28 +75,28 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     k.turned('tip', 'dark', 'x', k.disc(0.03, -0.875, -0.84), [0, 0.26, 0.22]),
     box('bracket', 'frame', [-0.77, 0.3, 0.094], [-0.74, 0.6875, 0.125]),
     box('bracket_foot', 'frame', [-0.77, 0.28, 0.094], [-0.74, 0.31, 0.19]),
-  ], { chrome: 'steel-bright', dark: 'plastic-black', frame: 'paint-charcoal' }),
+  ], { chrome: 'steel-bright', dark: 'plastic-black', frame: 'paint-charcoal' }) + { title: 'Motorbike exhaust' },
   k.compound('motorbike_footrest', 0.5, [
     box('bar', 'frame', [-0.094, 0.26, 0.125], [0, 0.31, 0.2]),
     box('rubber', 'rubber', [-0.094, 0.26, 0.2], [0, 0.31, 0.31]),
-  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }),
+  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }) + { title: 'Motorbike footrest' },
   k.compound('motorbike_centre_stand', 2.5, [
     box('cross', 'frame', [-0.34, 0.03, -0.094], [-0.28, 0.0625, 0.094]),
   ] + bothSides([
     box('leg', 'frame', [-0.34, 0.03, 0.09], [-0.28, 0.27, 0.125]),
     box('foot', 'frame', [-0.41, 0, 0.0625], [-0.25, 0.03, 0.156]),
-  ]), { frame: 'paint-charcoal' }),
-  k.compound('motorbike_front_mudguard', 1, k.arc('guard', 'chrome', s.frontAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
-  k.compound('motorbike_rear_mudguard', 1.5, k.arc('guard', 'chrome', s.rearAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }),
+  ]), { frame: 'paint-charcoal' }) + { title: 'Motorbike centre stand' },
+  k.compound('motorbike_front_mudguard', 1, k.arc('guard', 'chrome', s.frontAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }) + { title: 'Motorbike front mudguard' },
+  k.compound('motorbike_rear_mudguard', 1.5, k.arc('guard', 'chrome', s.rearAxle, s.hub, 0.315, 0.35, 35, 165, 8, [-0.0625, 0.0625]), { chrome: 'steel-bright' }) + { title: 'Motorbike rear mudguard' },
   k.compound('motorbike_headlamp', 1.5, [
     k.turned('shell', 'chrome', 'x', k.disc(0.094, 0.33, 0.47), [0, 0.86, 0]) + { sides: 16 },
     k.turned('lens', 'lens', 'x', k.disc(0.08, 0.47, 0.5), [0, 0.86, 0]) + { sides: 16 },
     box('speedo', 'dash', [0.344, 0.94, -0.0625], [0.4375, 1.0, 0.0625]),
-  ], { chrome: 'steel-bright', lens: 'plastic-frosted', dash: 'plastic-black' }),
+  ], { chrome: 'steel-bright', lens: 'plastic-frosted', dash: 'plastic-black' }) + { title: 'Motorbike headlamp' },
   k.compound('motorbike_tail_lamp', 0.3, [
     box('stay', 'stay', [-0.86, 0.625, -0.03], [-0.84, 0.66, 0.03]),
     box('lens', 'lens', [-0.9, 0.595, -0.05], [-0.86, 0.66, 0.05]),
-  ], { stay: 'paint-charcoal', lens: 'plastic-red' }),
+  ], { stay: 'paint-charcoal', lens: 'plastic-red' }) + { title: 'Motorbike tail lamp' },
   k.compound('motorbike_handlebar', 2, [
     box('riser', 'alloy', [0.25, 0.97, -0.0625], [0.31, 1.0, 0.0625]),
     box('bar', 'chrome', [0.25, 1.0, -0.25], [0.31, 1.03, 0.25]),
@@ -104,20 +104,20 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('grip', 'rubber', [0.19, 1.0, 0.22], [0.25, 1.03, 0.375]),
     box('mirror_stalk', 'chrome', [0.25, 1.03, 0.156], [0.285, 1.09, 0.19]),
     box('mirror', 'chrome', [0.22, 1.06, 0.156], [0.25, 1.125, 0.25]),
-  ]), { alloy: 'alu-bare', chrome: 'steel-bright', rubber: 'rubber-black' }),
+  ]), { alloy: 'alu-bare', chrome: 'steel-bright', rubber: 'rubber-black' }) + { title: 'Motorbike handlebar' },
   k.compound('motorbike_tank', 4, [
     prism('tank', 'paint', [[0, 0.625], [0.1875, 0.67], [0.2625, 0.734], [0.27, 0.844], [0.234, 0.875], [-0.078, 0.8], [-0.156, 0.734], [-0.17, 0.625]], [-0.156, 0.156]),
     box('cap', 'chrome', [0.094, 0.84, -0.03], [0.156, 0.89, 0.03]),
   ] + bothSides([
     box('badge', 'badge', [0, 0.72, 0.156], [0.156, 0.78, 0.17]),
     box('knee_pad', 'rubber', [-0.125, 0.656, 0.156], [-0.03, 0.75, 0.17]),
-  ]), { paint: s.paint, chrome: 'steel-bright', badge: 'paint-white', rubber: 'rubber-black' }),
+  ]), { paint: s.paint, chrome: 'steel-bright', badge: 'paint-white', rubber: 'rubber-black' }) + { title: 'Motorbike tank' },
   k.compound('motorbike_seat', 3, [
     prism('saddle', 'saddle', [[-0.797, 0.6875], [-0.1875, 0.6875], [-0.194, 0.76], [-0.25, 0.79], [-0.75, 0.77], [-0.797, 0.734]], [-0.125, 0.125]),
     box('pan', 'pan', [-0.78, 0.66, -0.125], [-0.19, 0.6875, 0.125]),
-  ], { saddle: 'vinyl-black', pan: 'plastic-black' }),
+  ], { saddle: 'vinyl-black', pan: 'plastic-black' }) + { title: 'Motorbike seat' },
   k.compound('motorbike_side_cover', 0.5, [
     box('cover', 'paint', [-0.375, 0.47, 0.094], [-0.1875, 0.656, 0.156]),
     box('badge', 'badge', [-0.34, 0.53, 0.156], [-0.22, 0.59, 0.17]),
-  ], { paint: s.paint, badge: 'paint-white' }),
+  ], { paint: s.paint, badge: 'paint-white' }) + { title: 'Motorbike side cover' },
 ])

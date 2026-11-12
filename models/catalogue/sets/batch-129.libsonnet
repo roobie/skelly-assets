@@ -67,7 +67,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
              ]
              + [ring('plait-%d' % i, 'plait', [0.026, 0.02, 0.012][i] - 0.002, 0.005, [0.125, 0.15, 0.178][i], [0.125, 0.15, 0.178][i] + 0.006) for i in [0, 1, 2]]
              + [box('bow', 'band', [0.07, 0.03, 0.06], [0.09, 0.05, 0.08])],
-             { straw: 'straw-wicker', plait: 'straw-wicker', band: 'cloth-brown' })
+             { straw: 'straw-wicker', plait: 'straw-wicker', band: 'cloth-brown' }) + { title: 'Straw hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['head'] } } },
 
   // A tall black silk top hat sitting on its brim, 300 mm across the brim and 165 mm tall: a straight crown that
@@ -79,7 +79,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                ring('brim-roll', 'silk', 0.006, 0.012, 0.137, 0.15),
                ring('band', 'band', 0.012, 0.032, 0.085, 0.091),
              ],
-             { silk: 'satin-black', band: 'cloth-charcoal' })
+             { silk: 'satin-black', band: 'cloth-charcoal' }) + { title: 'Top hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // An oiled black leather three-cornered hat sitting on its brim, 360 mm across and 136 mm tall: a
@@ -108,7 +108,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                h.turned('cockade', 'cockade', 'y', [[0, 0], [0, 0.02], [0.012, 0.022], [0.026, 0.016], [0.034, 0]], [ck[0], low * 0.4, ck[1]]),
                h.disc('button', 'braid', 0.008, low * 0.4 + 0.03, low * 0.4 + 0.038, ck[0], ck[1]),
              ],
-             { leather: 'leather-black', braid: 'metal-gold', cockade: 'cloth-black' })
+             { leather: 'leather-black', braid: 'metal-gold', cockade: 'cloth-black' }) + { title: 'Tricorne' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['head'] } } },
 
   // A plain cotton turban as it is set down already wound, 230 mm across and 144 mm tall: a rounded wound crown
@@ -120,7 +120,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                for side in [1, -1]
                for k in [0, 1]
              ]),
-             { cloth: 'cloth-cream', wrap: 'cloth-white' })
+             { cloth: 'cloth-cream', wrap: 'cloth-white' }) + { title: 'Turban' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['head'] } } },
 
   // A blue costume wizard hat standing on its brim, 380 mm across and 420 mm tall: a tall cone on a wide floppy
@@ -141,7 +141,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
              + sideStar('star-d', 1, 0.01, 0.19, 0.018) + sideStar('star-e', -1, -0.01, 0.23, 0.016) + sideStar('star-f', 1, -0.02, 0.29, 0.012)
              + brimStar('star-g', 0.0, 0.15, 0.02) + brimStar('star-h', 0.138, 0.103, 0.016) + brimStar('star-i', -0.132, 0.11, 0.016)
              + brimStar('star-j', -0.11, -0.132, 0.016),
-             { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' })
+             { cloth: 'cloth-blue', band: 'metal-gold', star: 'metal-gold' }) + { title: 'Wizard hat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A crimson silk skullcap lying crown up, 174 mm across and 56 mm tall: a shallow cap with a short stem at the crown and a bound rim.
@@ -152,7 +152,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                h.disc('stem', 'silk', 0.005, 0.036, 0.052),
                h.disc('stem-knot', 'silk', 0.008, 0.05, 0.056),
              ],
-             { silk: 'cloth-crimson' })
+             { silk: 'cloth-crimson' }) + { title: 'Zucchetto' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['head'] } } },
 
   // Panoramic night-vision goggles as they come off a helmet, 178 mm across, 132 mm deep and 92 mm tall: four
@@ -183,7 +183,7 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                box('dovetail', 'mount', [-0.014, 0.078, -0.03], [0.014, 0.092, 0.0]),
                box('plug', 'trim', [0.024, 0.062, -0.03], [0.04, 0.074, -0.012]),
              ],
-             { body: 'plastic-matte-black', trim: 'plastic-charcoal', rubber: 'rubber-black', lens: 'glass-lens-green', mount: 'alu-anodized-black' })
+             { body: 'plastic-matte-black', trim: 'plastic-charcoal', rubber: 'rubber-black', lens: 'glass-lens-green', mount: 'alu-anodized-black' }) + { title: 'Panoramic night vision goggles' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A pair of helmet ear muffs as they come off a hard hat, 200 mm across and 140 mm tall: two yellow cups standing
@@ -204,6 +204,6 @@ local wizardPath = [[0.006, wizardFoot], [0.006 + wizardHead, wizardFoot - 0.005
                for i in [0, 1]
                for s in [if i == 0 then -1 else 1]
              ]),
-             { cup: 'plastic-yellow', cushion: 'vinyl-black', wire: 'steel-grey', clip: 'plastic-matte-black' })
+             { cup: 'plastic-yellow', cushion: 'vinyl-black', wire: 'steel-grey', clip: 'plastic-matte-black' }) + { title: 'Helmet ear muffs' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['head'] } } },
 ]

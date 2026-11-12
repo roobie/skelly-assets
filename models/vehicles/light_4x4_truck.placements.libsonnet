@@ -5,6 +5,7 @@ local s = t.spec(import 'light_4x4_truck.spec.libsonnet');
 local id = 'light_4x4_truck';
 local shaftRear = s.transferX - 0.2;
 {
+  title: 'Light 4x4 truck',
   // The engine is fitted as an assembly so each accessory is its own salvage, and the transfer case splits the drive:
   // the short shaft back to the rear axle and the front shaft forward under the engine.
   sites: site.adjust(

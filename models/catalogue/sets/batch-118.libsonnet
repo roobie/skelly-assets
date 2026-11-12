@@ -132,7 +132,7 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
     box('print-r', 'print', [0.056, 0.004, 0.002], [0.072, 0.032, 0.004]),
     box('temple-r', 'card', [-0.06, 0.026, -0.002], [0.075, 0.038, 0]),
     box('temple-l', 'card', [-0.075, 0.012, -0.004], [0.06, 0.024, -0.002]),
-  ], { card: 'paper-white', filter: 'mirror-silver', print: 'plastic-orange' })
+  ], { card: 'paper-white', filter: 'mirror-silver', print: 'plastic-orange' }) + { title: 'Eclipse glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['paper'], setting: ['modern'], slot: ['face'] } } },
 
   // A black leather eyepatch lying flat, 60 mm by 50 mm, cupped a little, on a 0.4 m loop of thin cord tied
@@ -145,19 +145,19 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
                box('stitch-r', 'cord', [0.024, 0.002, -0.018], [0.03, 0.004, -0.012]),
              ]
              + h.strapLoop('cord', 'cord', 0.06, 0.04, 0.002, 0.002, 0.002, 0, -0.056, 12),
-             { leather: 'leather-black', cord: 'cloth-black' })
+             { leather: 'leather-black', cord: 'cloth-black' }) + { title: 'Leather eyepatch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['face'] } } },
 
   // Large fit-over sunglasses with the temples folded, 168 mm across and 52 mm tall: a squared black plastic frame
   // deep enough to go over prescription glasses, dark lenses and tinted side shields at each hinge.
   h.compound('fitover_sunglasses', 0.062, spectacles({ a: 0.031, b: 0.021, p: 4, rim: 0.005, gap: 0.016, depth: 0.006, templeW: 0.006, templeH: 0.006, templeLen: 0.14, brow: true, shields: true }),
-             { frame: 'plastic-black', temple: 'plastic-black', lens: 'glass-lens-amber', shield: 'glass-lens-amber' })
+             { frame: 'plastic-black', temple: 'plastic-black', lens: 'glass-lens-amber', shield: 'glass-lens-amber' }) + { title: 'Fitover sunglasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Old-fashioned glass goggles, 136 mm across: two round leather cups 50 mm across with brass rims and thick
   // clear glass, a short brass bridge and a leather headstrap hanging in a loop behind.
   h.compound('glass_goggles', 0.14, cupGoggles(0.019, 0.025, 0.03, 0.016, 0.016),
-             { cup: 'leather-brown', rim: 'brass-polished', lens: 'glass-clear', bridge: 'brass-polished', strap: 'leather-brown' })
+             { cup: 'leather-brown', rim: 'brass-polished', lens: 'glass-clear', bridge: 'brass-polished', strap: 'leather-brown' }) + { title: 'Glass goggles' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'glass'], slot: ['face'] } } },
 
   // Ballistic glasses 148 mm across with the temples open: one smoke-tinted wrap lens under a black brow bar, a
@@ -165,19 +165,19 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
   h.compound('ballistic_glasses', 0.04,
              wrapLens(0.085, 58, 0.044, true, 0.12)
              + wrapBand('strap', 'strap', 0.074, 0.003, 90, 270, 18, -0.085 + 0.085 * std.cos(58 * std.pi / 180) - 0.12, function(ang) 0.036, function(ang) 0.044),
-             { lens: 'screen-black', frame: 'plastic-matte-black', temple: 'plastic-matte-black', strap: 'webbing-black' })
+             { lens: 'screen-black', frame: 'plastic-matte-black', temple: 'plastic-matte-black', strap: 'webbing-black' }) + { title: 'Ballistic glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // Bifocal glasses with the temples folded, 144 mm across: dark red-brown plastic rims round oval lenses, each
   // with a D-shaped reading segment set in its lower half, and nose pads behind the bridge.
   h.compound('bifocal_glasses', 0.025, spectacles({ a: 0.025, b: 0.018, p: 2.4, rim: 0.004, pads: true, bifocal: true }),
-             { frame: 'paint-oxblood', temple: 'paint-oxblood', lens: 'glass-clear', segment: 'plastic-clear', pad: 'plastic-clear' })
+             { frame: 'paint-oxblood', temple: 'paint-oxblood', lens: 'glass-clear', segment: 'plastic-clear', pad: 'plastic-clear' }) + { title: 'Bifocal glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Everyday prescription glasses with the temples folded, 140 mm across and 40 mm tall: matte black rectangular
   // plastic rims round clear lenses.
   h.compound('glasses', 0.024, spectacles({ a: 0.025, b: 0.016, p: 3, rim: 0.004 }),
-             { frame: 'plastic-matte-black', temple: 'plastic-matte-black', lens: 'glass-clear' })
+             { frame: 'plastic-matte-black', temple: 'plastic-matte-black', lens: 'glass-clear' }) + { title: 'Glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // A monocle lying flat: a round lens 32 mm across in a black rim with a small eye on one side, and a thin black
@@ -188,19 +188,19 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
              + h.crescent('eye', 'rim', 0.0025, 0.0045, 0, 360, 8, 0, 0.003, 0.0225, 0)
              + h.crescent('cord', 'cord', 0.039, 0.041, 270, 560, 30, 0, 0.002, 0.0645, 0)
              + h.crescent('tail', 'cord', 0.019, 0.021, 20, 200, 12, 0, 0.002, 0.08, 0.06),
-             { lens: 'glass-clear', rim: 'plastic-black', cord: 'cloth-black' })
+             { lens: 'glass-clear', rim: 'plastic-black', cord: 'cloth-black' }) + { title: 'Monocle' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['glass', 'plastic'], slot: ['face'] } } },
 
   // Half-moon reading glasses with the temples folded, 138 mm across and 20 mm tall: blue plastic rims round
   // lenses with flat tops, so the wearer can look over them, and nose pads behind the bridge.
   h.compound('reading_glasses', 0.018, spectacles({ a: 0.024, b: 0.012, p: 2.2, rim: 0.004, half: true, pads: true, templeH: 0.003, tipDrop: 0.006 }),
-             { frame: 'plastic-blue', temple: 'plastic-blue', lens: 'glass-clear', pad: 'plastic-clear' })
+             { frame: 'plastic-blue', temple: 'plastic-blue', lens: 'glass-clear', pad: 'plastic-clear' }) + { title: 'Reading glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Safety glasses with the temples folded, 148 mm across: one clear plastic wrap lens under a blue brow bar
   // and blue temples.
   h.compound('safety_glasses', 0.027, wrapLens(0.085, 58, 0.044),
-             { lens: 'plastic-clear', frame: 'plastic-blue', temple: 'plastic-blue' })
+             { lens: 'plastic-clear', frame: 'plastic-blue', temple: 'plastic-blue' }) + { title: 'Safety glasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // Ski goggles 172 mm across and 90 mm tall: a broad curved amber-mirrored lens in a white frame with a dark
@@ -217,13 +217,13 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
              + wrapBand('frame-r', 'frame', R - 0.002, 0.008, span - 3, span, 1, cz, lo, hi)
              + wrapBand('foam', 'foam', R - 0.01, 0.012, -span + 1, span - 1, 26, cz, function(ang) lo(ang) - 0.006, function(ang) hi(ang) + 0.006)
              + wrapBand('strap', 'strap', ex, 0.003, 90, 270, 20, ez, function(ang) 0.03, function(ang) 0.07),
-             { lens: 'glass-lens-amber', frame: 'plastic-white', foam: 'plastic-charcoal', strap: 'webbing-black' })
+             { lens: 'glass-lens-amber', frame: 'plastic-white', foam: 'plastic-charcoal', strap: 'webbing-black' }) + { title: 'Ski goggles' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['cold-weather'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // Welding goggles 140 mm across: two round black cups 54 mm across with dark green filter glass in steel rims, vents on the
   // cups, a short bridge and a black elastic strap in a loop behind.
   h.compound('welding_goggles', 0.18, cupGoggles(0.02, 0.027, 0.032, 0.014, 0.018, true),
-             { cup: 'plastic-black', rim: 'steel-grey', lens: 'glass-lens-green', bridge: 'steel-grey', strap: 'webbing-black' })
+             { cup: 'plastic-black', rim: 'steel-grey', lens: 'glass-lens-green', bridge: 'steel-grey', strap: 'webbing-black' }) + { title: 'Welding goggles' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', keywords: ['metalworking', 'safety-gear'], tags: { material: ['metal', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Carved bone snow goggles 156 mm across: a band curved to the face with a narrow slit before each eye, a notch
@@ -250,18 +250,18 @@ local cupGoggles(rIn, rOut, depth, gap, strapW, vents=false) =
                for side in ['l', 'r']
                for s in [if side == 'l' then -1 else 1]
              ],
-             { bone: 'wax-ivory', soot: 'screen-black', tie: 'skin-rawhide' })
+             { bone: 'wax-ivory', soot: 'screen-black', tie: 'skin-rawhide' }) + { title: 'Snow goggles' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['bone'], setting: ['prehistoric'], slot: ['face'] } } },
 
   // Classic sunglasses with the temples folded, 148 mm across and 48 mm tall: a thick black plastic frame with a
   // heavy brow over dark lenses.
   h.compound('sunglasses', 0.034, spectacles({ a: 0.026, b: 0.019, p: 3.2, rim: 0.005, gap: 0.016, depth: 0.006, templeW: 0.005, templeH: 0.005, brow: true }),
-             { frame: 'plastic-black', temple: 'plastic-black', lens: 'screen-black' })
+             { frame: 'plastic-black', temple: 'plastic-black', lens: 'screen-black' }) + { title: 'Sunglasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 
   // Bifocal sunglasses with the temples folded, 144 mm across: brown-red plastic rims round amber-tinted lenses,
   // each with a paler D-shaped reading segment in its lower half.
   h.compound('bifocal_sunglasses', 0.026, spectacles({ a: 0.025, b: 0.018, p: 2.8, rim: 0.004, pads: true, bifocal: true }),
-             { frame: 'paint-oxblood', temple: 'paint-oxblood', lens: 'glass-lens-amber', segment: 'plastic-clear', pad: 'plastic-clear' })
+             { frame: 'paint-oxblood', temple: 'paint-oxblood', lens: 'glass-lens-amber', segment: 'plastic-clear', pad: 'plastic-clear' }) + { title: 'Bifocal sunglasses' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'glass'], setting: ['modern'], slot: ['face'] } } },
 ]

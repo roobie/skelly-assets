@@ -159,7 +159,7 @@ local braFlat(r, depth) =
     patch: 'cloth-khaki',
     stitch: 'cord-cotton',
     tie: 'cloth-cream',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  }) + { title: 'Rag belly wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A fur belly wrap half rolled, 200 mm wide: a thick roll 110 mm across of brown pelts, a 260 mm loose end with
   // ragged pelt edges, and rawhide ties.
@@ -169,7 +169,7 @@ local braFlat(r, depth) =
     patch: 'fur-pale',
     stitch: 'skin-rawhide',
     tie: 'skin-rawhide',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  }) + { title: 'Fur belly wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A leather belly wrap half rolled, 190 mm wide: a roll 90 mm across and a 260 mm loose end of stitched-on
   // leather patches, with thong ties.
@@ -179,7 +179,7 @@ local braFlat(r, depth) =
     patch: 'leather-chestnut',
     stitch: 'cord-cotton',
     tie: 'skin-rawhide',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  }) + { title: 'Leather belly wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A felted wool belly wrap half rolled, 180 mm wide: a roll 80 mm across and a 260 mm loose end of grey felt with
   // brown felt patches stitched on.
@@ -189,7 +189,7 @@ local braFlat(r, depth) =
     patch: 'felt-brown',
     stitch: 'cord-cotton',
     tie: 'felt-brown',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  }) + { title: 'Wool belly wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A cotton rag chest wrap half rolled, 140 mm wide: a roll 70 mm across and a 280 mm loose end of pale rag strips
   // with a darker patch and two tie ends.
@@ -199,7 +199,7 @@ local braFlat(r, depth) =
     patch: 'canvas-grey',
     stitch: 'cord-cotton',
     tie: 'cloth-cream',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
+  }) + { title: 'Rag chest wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'] } } },
 
   // A fur chest wrap half rolled, 160 mm wide: a roll 90 mm across of pale pelt, a 260 mm loose end with ragged
   // edges and a darker patch, and rawhide ties.
@@ -209,7 +209,7 @@ local braFlat(r, depth) =
     patch: 'fur-brown',
     stitch: 'skin-rawhide',
     tie: 'skin-rawhide',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  }) + { title: 'Fur chest wrap' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A fur bikini top laid flat, 450 mm across its thongs: two rounded triangle cups of brown pelt 130 mm across on a
   // rawhide backing, laced across the centre, with thongs round the back and neck.
@@ -218,7 +218,7 @@ local braFlat(r, depth) =
     backing: 'skin-rawhide',
     lace: 'skin-rawhide',
     stitch: 'cord-cotton',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  }) + { title: 'Fur bikini top' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A leather bikini top laid flat, 450 mm across its thongs: two rounded triangle cups of tan leather 130 mm across
   // with stitched edges, laced across the centre, with thongs round the back and neck.
@@ -227,7 +227,7 @@ local braFlat(r, depth) =
     backing: 'leather-chestnut',
     lace: 'leather-chestnut',
     stitch: 'cord-cotton',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
+  }) + { title: 'Leather bikini top' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'] } } },
 
   // A chest binder laid flat, neck at -z, 300 mm across and 360 mm long with its straps: a short stretch tank
   // ending above the waist, wide shoulder straps, a doubled compression panel across the front with its seams
@@ -250,7 +250,7 @@ local braFlat(r, depth) =
     panel: 'latex-pale',
     hem: 'cloth-heather-grey',
     seam: 'cloth-heather-grey',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { slot: ['torso'] } } },
+  }) + { title: 'Chest binder' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { slot: ['torso'] } } },
 
   // Cotton boxer briefs laid flat, waist at -z, 320 mm across and 280 mm long: a fitted seat, close legs, a wide
   // elastic waistband and leg cuffs in light grey, and the front pouch's curved seams.
@@ -265,7 +265,7 @@ local braFlat(r, depth) =
     band: 'cloth-white',
     hem: 'cloth-white',
     seam: 'cloth-heather-grey',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Boxer briefs' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // Cotton boxer shorts laid flat, waist at -z, 380 mm across the legs, split to the crotch, and 300 mm long: loose flared legs, a
   // gathered waistband, a button fly, and a woven check shown as raised stripes.
@@ -293,7 +293,7 @@ local braFlat(r, depth) =
     hem: 'cloth-navy',
     stripe: 'cloth-navy',
     button: 'plastic-gloss-white',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Boxer shorts' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // Cotton boy shorts laid flat, waist at -z, 300 mm across and 190 mm long: short close legs cut straight across,
   // a soft cream waistband, narrow lace trim along each leg, and a small bow at the front.
@@ -307,7 +307,7 @@ local braFlat(r, depth) =
     band: 'cloth-cream',
     hem: 'cloth-purple',
     trim: 'lace-white',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Boy shorts' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A cotton bra laid flat, cups up, 540 mm across its band and 290 mm long with its straps: two moulded cups
   // 130 mm across on an underband, lace along the cup tops, a small bow at the centre, hook and eye tabs and
@@ -318,7 +318,7 @@ local braFlat(r, depth) =
     trim: 'mesh-white',
     strap: 'cloth-cream',
     hook: 'steel-bright',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  }) + { title: 'Bra' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // Cotton briefs laid flat, waist at -z, 320 mm across and 220 mm long: a pouch narrowing to the crotch, elastic
   // leg openings, a contrasting waistband, and a Y-shaped front opening.
@@ -330,7 +330,7 @@ local braFlat(r, depth) =
     band: 'cloth-navy',
     hem: 'cloth-bright-white',
     seam: 'cloth-heather-grey',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
+  }) + { title: 'Briefs' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A cotton camisole laid flat, neck at -z, 360 mm across the hem and 560 mm long with its straps: a light body
   // flaring a little to the hem, a straight neckline edged in lace with a small bow, thin shoulder straps and a
@@ -346,5 +346,5 @@ local braFlat(r, depth) =
     cloth: 'cloth-sage',
     trim: 'mesh-white',
     strap: 'cloth-sage',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
+  }) + { title: 'Camisole' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['underwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 ]

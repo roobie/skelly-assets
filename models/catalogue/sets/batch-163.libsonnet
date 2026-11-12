@@ -69,7 +69,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'nylon-black',
     trim: 'plastic-matte-black',
     webbing: 'nylon-black',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Backpack' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A joke backpack 750 mm wide, 1.15 m tall and 400 mm deep, a daypack blown up to nearly a person's height, with
   // oversized zip pulls and side pockets.
@@ -82,7 +82,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'cloth-blue',
     trim: 'plastic-matte-black',
     webbing: 'cloth-blue',
-  }) + { taxonomy: { category: 'containers', keywords: ['toy'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Giant novelty backpack' } + { taxonomy: { category: 'containers', keywords: ['toy'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A hunting pack 380 mm wide, 720 mm tall and 260 mm deep with a top lid, side pockets, side compression straps,
   // a padded hip belt and two lashing straps under the base for a bedroll or game bag.
@@ -97,7 +97,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'cloth-brown',
     trim: 'plastic-matte-black',
     webbing: 'cloth-brown',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Hunting pack' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A large squared tactical pack 360 mm wide, 600 mm tall and 250 mm deep, its front pocket under four rows of
   // attachment webbing, with compression straps and a hip belt.
@@ -108,7 +108,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'webbing-olive-dark',
     trim: 'plastic-matte-black',
     webbing: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Large tactical backpack' } + { taxonomy: { category: 'containers', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A high-volume leather rucksack 420 mm wide, 820 mm tall and 300 mm deep with a deep lid, side pockets, three
   // rows of compression straps and a hip belt.
@@ -119,7 +119,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     strap: 'leather-black',
     trim: 'brass-dull',
     webbing: 'leather-black',
-  }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['leather'], slot: ['back'] } } },
+  }) + { title: 'High-volume rucksack' } + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['leather'], slot: ['back'] } } },
 
   // A flat nylon wallet pouch 120 mm by 90 mm and 15 mm thick, zipped across its top, sewn on an ankle band 300 mm
   // long and 60 mm wide with a hook-and-loop patch at one end, laid flat.
@@ -129,7 +129,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     box('pouch', 'pouch', [-0.06, 0.003, -0.045], [0.06, 0.018, 0.045]),
     box('zip', 'zip', [-0.055, 0.018, 0.03], [0.055, 0.0195, 0.034]),
     box('pull', 'zip', [0.035, 0.018, 0.034], [0.042, 0.02, 0.046]),
-  ], { band: 'cloth-charcoal', patch: 'hook-loop-grey', pouch: 'nylon-black', zip: 'plastic-matte-black' })
+  ], { band: 'cloth-charcoal', patch: 'hook-loop-grey', pouch: 'nylon-black', zip: 'plastic-matte-black' }) + { title: 'Ankle wallet pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // An armband pouch laid flat: a canvas pouch 120 mm by 90 mm and 35 mm deep with a flap, on a webbing strap
@@ -142,7 +142,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     box('flap-top', 'flap', [-0.062, 0.035, -0.047], [0.062, 0.038, 0.047]),
     box('flap-front', 'flap', [-0.062, 0.012, 0.045], [0.062, 0.038, 0.048]),
     box('flap-patch', 'buckle', [-0.015, 0.016, 0.048], [0.015, 0.03, 0.05]),
-  ], { band: 'webbing-black', buckle: 'plastic-matte-black', pouch: 'cloth-canvas', flap: 'cloth-canvas' })
+  ], { band: 'webbing-black', buckle: 'plastic-matte-black', pouch: 'cloth-canvas', flap: 'cloth-canvas' }) + { title: 'Armband pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // An L-shaped pack frame 500 mm wide and 1 m tall of squared timber with a load shelf 320 mm deep at its foot,
@@ -177,7 +177,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     ]
     for i in [0, 1]
     for x in [[-0.11, 0.11][i]]
-  ]), { frame: 'wood-pine', strap: 'leather-brown', buckle: 'iron-dull' }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['wood', 'leather'], slot: ['back'] } } },
+  ]), { frame: 'wood-pine', strap: 'leather-brown', buckle: 'iron-dull' }) + { title: 'Large frame pack' } + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['wood', 'leather'], slot: ['back'] } } },
 
   // A trapper's pack 460 mm wide, 820 mm tall and 340 mm deep: waxed canvas stretched round a pole frame whose
   // corner posts stand proud, gathered at the top by a drawstring, with canvas shoulder straps behind.
@@ -204,7 +204,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     box('shoulder-%d' % i, 'strap', [x - 0.03, 0.25, -0.2], [x + 0.03, 0.7, -0.178])
     for i in [0, 1]
     for x in [[-0.1, 0.1][i]]
-  ], { cloth: 'canvas-grey', cord: 'cord-cotton', frame: 'wood-oak', strap: 'cloth-canvas' }) + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'], slot: ['back'] } } },
+  ], { cloth: 'canvas-grey', cord: 'cord-cotton', frame: 'wood-oak', strap: 'cloth-canvas' }) + { title: 'Large trapper pack' } + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'], slot: ['back'] } } },
 
   // A bindle lying on the ground: a cotton cloth 250 mm across tied into a bundle on the end of a stick 1 m long,
   // whose other end rests on the floor.
@@ -214,7 +214,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     h.prism('ear-a', 'cloth', 'z', [[0.33, 0.22], [0.36, 0.24], [0.3, 0.29], [0.28, 0.27]], -0.015, 0.015),
     h.prism('ear-b', 'cloth', 'z', [[0.36, 0.24], [0.39, 0.22], [0.44, 0.27], [0.42, 0.29]], -0.015, 0.015),
     h.prism('stick', 'stick', 'z', [[-0.6, 0], [-0.6, 0.024], [0.45, 0.255], [0.45, 0.231]], -0.012, 0.012),
-  ], { cloth: 'cloth-red', stick: 'wood-oak' })
+  ], { cloth: 'cloth-red', stick: 'wood-oak' }) + { title: 'Bindle' }
   + h.gripOn('bindle', 'stick') + { taxonomy: { category: 'containers', tags: { material: ['fabric', 'wood'] } } },
 
   // A leather book strap laid flat: two straps 25 mm wide crossed under a stiff leather carrying handle 120 mm long,
@@ -230,7 +230,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     box('handle-post-a', 'handle', [-0.06, 0.012, -0.012], [-0.045, 0.03, 0.012]),
     box('handle-post-b', 'handle', [0.045, 0.012, -0.012], [0.06, 0.03, 0.012]),
     h.rod('handle-grip', 'handle', 0.01, -0.06, 0.06, 0.035),
-  ], { strap: 'leather-tan', buckle: 'brass-dull', handle: 'leather-brown' })
+  ], { strap: 'leather-tan', buckle: 'brass-dull', handle: 'leather-brown' }) + { title: 'Book strap' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'] } } },
 
   // A wooden box 320 mm wide, 380 mm tall and 200 mm deep made into a pack: plank sides with corner battens, a
@@ -260,7 +260,7 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     ]
     for i in [0, 1]
     for x in [[-0.09, 0.09][i]]
-  ]), { wood: 'wood-pine', batten: 'wood-oak', iron: 'iron-dull', rope: 'jute' }) + { taxonomy: { category: 'containers', tags: { material: ['wood', 'fabric'], slot: ['back'] } } },
+  ]), { wood: 'wood-pine', batten: 'wood-oak', iron: 'iron-dull', rope: 'jute' }) + { title: 'Box backpack' } + { taxonomy: { category: 'containers', tags: { material: ['wood', 'fabric'], slot: ['back'] } } },
 
   // A hard-shell briefcase 460 mm long, 340 mm tall and 110 mm thick standing on its long edge: two shells meeting at
   // a raised seam, a carrying handle on top, two latches and four feet.
@@ -280,6 +280,6 @@ local daypack = { w: 0.3, ht: 0.42, d: 0.15, cinch: [] };
     box('foot-%d' % i, 'handle', [x - 0.012, 0, -0.03], [x + 0.012, 0.006, 0.03])
     for i in [0, 1]
     for x in [[-0.18, 0.18][i]]
-  ], { shell: 'plastic-charcoal', seam: 'steel-grey', handle: 'plastic-black', metal: 'metal-silver' })
+  ], { shell: 'plastic-charcoal', seam: 'steel-grey', handle: 'plastic-black', metal: 'metal-silver' }) + { title: 'Briefcase' }
   + h.gripOn('briefcase', 'handle-grip') + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
 ]

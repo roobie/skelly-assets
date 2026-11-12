@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'city_car.spec.libsonnet';
 {
+  title: 'City car',
   sites: [
     site.one('shell', 'city_car_shell'),
     site.one('windscreen', 'city_car_windscreen'),

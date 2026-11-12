@@ -139,11 +139,11 @@ local leatherSections = [
 
 [
   // A cotton fencing underarm protector laid flat, 400 mm from shoulder to waist and 600 mm from tie to sleeve hem.
-  h.compound('fencing_underarm_protector', 0.18, underarmGuard(), { cloth: 'cloth-bright-white', quilt: 'cloth-cream', binding: 'cloth-cream', strap: 'cloth-cream' })
+  h.compound('fencing_underarm_protector', 0.18, underarmGuard(), { cloth: 'cloth-bright-white', quilt: 'cloth-cream', binding: 'cloth-cream', strap: 'cloth-cream' }) + { title: 'Fencing underarm protector' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A plastic fencing chest protector laid flat, 260 mm tall and 300 mm across, straps reaching 540 mm across.
-  h.compound('plastic_chest_protector', 0.34, cupGuard(), { shell: 'enamel-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
+  h.compound('plastic_chest_protector', 0.34, cupGuard(), { shell: 'enamel-white', strap: 'webbing-black', buckle: 'plastic-matte-black' }) + { title: 'Plastic chest protector' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'fabric'], slot: ['torso'], setting: ['modern'] } } },
 
   // A thick cotton shirt folded on a shelf, 380 mm by 330 mm and 80 mm tall, leather sections sewn over the chest,
@@ -152,18 +152,18 @@ local leatherSections = [
              g.jacket({ w: 0.38, d: 0.33, ht: 0.08, folds: 4, front: 'none', buttons: [], collar: { r: 0.06, wd: 0.016, ht: 0.01, gap: 0 }, sleeves: { kind: 'flat', w: 0.085, t: 0.008 } })
              + patches(leatherSections, 0.08)
              + patches([[-0.1475, -0.08, 0.075, 0.1, 'leather-b'], [0.1475, -0.08, 0.075, 0.1, 'leather-a'], [-0.1475, 0.09, 0.075, 0.09, 'leather-a'], [0.1475, 0.09, 0.075, 0.09, 'leather-b']], 0.088, 'sleeve-patch'),
-             { cloth: 'cloth-khaki', collar: 'cloth-khaki', sleeve: 'cloth-khaki', 'leather-a': 'leather-chestnut', 'leather-b': 'leather-tan', stitch: 'cord-cotton' }) + h.headEndOnPlusZ
+             { cloth: 'cloth-khaki', collar: 'cloth-khaki', sleeve: 'cloth-khaki', 'leather-a': 'leather-chestnut', 'leather-b': 'leather-tan', stitch: 'cord-cotton' }) + { title: 'Leather padded shirt' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['torso'] } } },
 
   // The same shirt with its sleeves cut off, folded on a shelf, 360 mm by 320 mm and 70 mm tall.
   h.compound('leather_padded_sleeveless_shirt', 0.89,
              sleeveless(0.36, 0.32, 0.07) + patches(leatherSections, 0.07)
              + patches([[-0.13, -0.06, 0.07, 0.12, 'leather-b'], [0.13, -0.06, 0.07, 0.12, 'leather-a']], 0.07, 'side-patch'),
-             { cloth: 'cloth-khaki', binding: 'cloth-khaki', 'leather-a': 'leather-chestnut', 'leather-b': 'leather-tan', stitch: 'cord-cotton' }) + h.headEndOnPlusZ
+             { cloth: 'cloth-khaki', binding: 'cloth-khaki', 'leather-a': 'leather-chestnut', 'leather-b': 'leather-tan', stitch: 'cord-cotton' }) + { title: 'Leather padded sleeveless shirt' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'leather'], slot: ['torso'] } } },
 
   // A tyre plate laid flat, 550 mm from the shoulder chunks to the hem and 600 mm across the side tapes.
-  h.compound('tyre_plate', 2.3, tirePlate(), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', tape: 'tape-silver' })
+  h.compound('tyre_plate', 2.3, tirePlate(), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', tape: 'tape-silver' }) + { title: 'Tyre plate' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber', 'fabric'], slot: ['torso'] } } },
 
   // A denim vest folded on a shelf, 340 mm by 280 mm and 40 mm tall, steel plates riveted over both chest panels and
@@ -173,7 +173,7 @@ local leatherSections = [
              + [box('placket', 'seam', [-0.009, 0.04, -0.14], [0.009, 0.042, 0.05])]
              + g.buttons('button', 'button', 0, [-0.11, -0.07, -0.03, 0.01], 0.042, 0.006)
              + plates([[-0.075, -0.035, 0.1, 0.13], [0.075, -0.035, 0.1, 0.13], [-0.075, -0.12, 0.1, 0.035], [0.075, -0.12, 0.1, 0.035]], 0.04),
-             { cloth: 'cloth-denim', binding: 'cloth-denim-faded', seam: 'cloth-denim-faded', button: 'metal-silver', plate: 'steel-bright', rivet: 'steel-grey' }) + h.headEndOnPlusZ
+             { cloth: 'cloth-denim', binding: 'cloth-denim-faded', seam: 'cloth-denim-faded', button: 'metal-silver', plate: 'steel-bright', rivet: 'steel-grey' }) + { title: 'Armoured denim vest' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric', 'metal'], slot: ['torso'] } } },
 
   // A thick leather vest folded on a shelf, 360 mm by 300 mm and 45 mm tall, steel plates riveted in two columns down
@@ -182,6 +182,6 @@ local leatherSections = [
              sleeveless(0.36, 0.3, 0.045)
              + plates([[s * 0.07, -0.1 + i * 0.07, 0.095, 0.06] for s in sides for i in [0, 1, 2]], 0.045)
              + [g.strip('lace-%d' % i, 'lace', [-0.018, -0.13 + i * 0.04], [0.018, -0.11 + i * 0.04], 0.045, 0.005, 0.003) for i in [0, 1, 2, 3]],
-             { cloth: 'leather-black', binding: 'leather-charcoal', plate: 'steel-bright', rivet: 'steel-grey', lace: 'leather-tan' }) + h.headEndOnPlusZ
+             { cloth: 'leather-black', binding: 'leather-charcoal', plate: 'steel-bright', rivet: 'steel-grey', lace: 'leather-tan' }) + { title: 'Armoured leather vest' } + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather', 'metal'], slot: ['torso'] } } },
 ]

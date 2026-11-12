@@ -119,7 +119,7 @@ local rams = {
 local ramZ(r) = [r.z0, r.z0 + r.bore];
 local eye(ram) = ram.bore * 0.45;
 local lug(id, at, ram, z) = m.axleDisc(id, 'frame', at[0], at[1], eye(ram) + 0.05, z, 12);
-local ram(name, r) =
+local ram(name, label, r) =
   local mouth = along(r.base, r.end, 0.55);
   local gland = reach(mouth, r.base, 0.06);
   local rod = r.bore * 0.6;
@@ -131,11 +131,11 @@ local ram(name, r) =
       k.bar('barrel', 'dark', r.base, gland, r.bore, ramZ(r)),
       // The gland collar at the mouth, where the rod leaves the barrel.
       k.bar('gland', 'dark', gland, mouth, r.bore * 1.3, ramZ(r)),
-    ], finish, { base: ['base_eye', centre] }),
+    ], finish, { base: ['base_eye', centre] }) + { title: 'Security walker %s ram barrel' % label },
     k.compound('security_walker_%s_ram_rod' % name, r.massKg[1], [
       k.bar('rod', 'bright', mouth, r.end, rod, rodZ),
       m.axleDisc('end_eye', 'bright', r.end[0], r.end[1], eye(r) * 0.9, ramZ(r), 12),
-    ], finish, { end: ['end_eye', centre] }),
+    ], finish, { end: ['end_eye', centre] }) + { title: 'Security walker %s ram rod' % label },
   ];
 
 // A hose sags from a fitting at `a`, pulled toward `c`, to a fitting at `b`: a quadratic curve in the side view, which
@@ -154,10 +154,11 @@ local hoseRun(id, run) =
   + [m.axleDisc('%s_bend_%d' % [id, i], 'hose', points[i][0], points[i][1], hoseBore / 2, z, 8) for i in std.range(1, steps - 1)]
   + [fitting('fitting_a', run.a, run.fitA), fitting('fitting_b', run.b, run.fitB)];
 local hoses(name, massKg, runs) =
+  local title = 'Security walker %s hoses' % name;
   k.compound('security_walker_%s_hoses' % name, massKg, std.flattenArrays([
     hoseRun('hose_%d' % i, runs[i])
     for i in std.range(0, std.length(runs) - 1)
-  ]), { hose: 'rubber-black', fitting: 'steel-grey' });
+  ]), { hose: 'rubber-black', fitting: 'steel-grey' }) + { title: title };
 local polar(at, degrees, r) = plus(at, [r * std.cos(k.rad(degrees)), r * std.sin(k.rad(degrees))]);
 
 // The foot: three clawed toes forward and a spur behind, splayed in plan round its pivot.
@@ -203,7 +204,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     prism('side', 'paint', hull.profile, [hull.half - hull.plate, hull.half]),
     box('face_side', 'paint', [faceInner, s.window.low, s.window.half], [face, s.window.high, hull.half]),
     lug('hip_ram_lug', rams.hip.base, rams.hip, [hull.half, rams.hip.z0]),
-  ]), { paint: s.paint, frame: s.frame } + stripes),
+  ]), { paint: s.paint, frame: s.frame } + stripes) + { title: 'Security walker hull' },
   // The belly is framed rather than bare: a keel skid and two stringers carry it if it settles on rough ground, ribs
   // tie them across, and service panels between them reach the power pack from below.
   k.compound('security_walker_belly', 240, [
@@ -215,33 +216,33 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     box('stringer', 'frame', [belly.rear, belly.y - 0.09, 0.55], [belly.front, belly.y, 0.65]),
     box('panel', 'paint', [belly.ribs[1] + 0.12, belly.y - 0.03, 0.2], [belly.ribs[2] - 0.12, belly.y, 0.47]),
     k.turned('drain', 'frame', 'y', k.disc(0.05, -0.04, 0), [belly.ribs[0] - 0.3, belly.y, 0.35]) + { sides: 12 },
-  ]), { paint: s.paint, frame: s.frame }),
+  ]), { paint: s.paint, frame: s.frame }) + { title: 'Security walker belly' },
   // Bolted to the flanks behind the hips, so a scavenger lifts one off on its own.
   k.compound('security_walker_flank_armour', 120, [
     box('plate', 'paint', [-1.45, 3.05, hull.half], [-0.6, 4.05, hull.half + 0.05]),
-  ] + zBand('stripe', [hull.half + 0.05, hull.half + 0.08], -1.45, 3.08, 0.85, 0.18), { paint: s.paint } + stripes),
+  ] + zBand('stripe', [hull.half + 0.05, hull.half + 0.08], -1.45, 3.08, 0.85, 0.18), { paint: s.paint } + stripes) + { title: 'Security walker flank armour' },
   k.compound('security_walker_face_guard', 110, [
     box('bar', 'frame', [face, 3.22, -0.94], [face + 0.05, 3.46, 0.94]),
-  ] + xBand('stripe', [face + 0.05, face + 0.08], 3.24, -0.92, 1.84, 0.2), { frame: s.frame } + stripes),
+  ] + xBand('stripe', [face + 0.05, face + 0.08], 3.24, -0.92, 1.84, 0.2), { frame: s.frame } + stripes) + { title: 'Security walker face guard' },
   k.compound('security_walker_sensor_window', 35, [
     box('glass', 'glass', [face - 0.05, s.window.low, -s.window.half], [face - 0.01, s.window.high, s.window.half]),
-  ], { glass: 'lens-smoke' }),
+  ], { glass: 'lens-smoke' }) + { title: 'Security walker sensor window' },
   // The walker sees through a row of sensor heads behind its window, in place of a cab or a face.
   k.compound('security_walker_sensor_array', 60, [
     box('housing', 'dark', [1.2, 3.48, -0.7], [face - 0.07, 3.8, 0.7]),
   ] + [
     k.turned('lens_%d' % i, if i == 2 then 'eye' else 'lens', 'x', k.disc(if i == 2 then 0.1 else 0.07, 0, 0.02), [face - 0.07, 3.64, (i - 2) * 0.26]) + { sides: 16 }
     for i in std.range(0, 4)
-  ], { dark: 'plastic-black', lens: 'cell-glow-teal', eye: 'glass-lens-amber' }),
+  ], { dark: 'plastic-black', lens: 'cell-glow-teal', eye: 'glass-lens-amber' }) + { title: 'Security walker sensor array' },
   k.compound('security_walker_hydraulic_pack', 180, [
     box('tank', 'paint', [0.1, inner[0][1], -0.85], [0.85, 3.3, -0.3]),
     k.turned('pump', 'steel', 'z', k.disc(0.12, 0, 0.3), [0.45, 3.42, -0.75]) + { sides: 16 },
     k.turned('filter', 'steel', 'y', k.disc(0.07, 0, 0.2), [0.25, 3.3, -0.4]) + { sides: 12 },
-  ], { paint: s.frame, steel: 'steel-stainless' }),
+  ], { paint: s.frame, steel: 'steel-stainless' }) + { title: 'Security walker hydraulic pack' },
   // The hip drive turns the thigh; it is the leg's root, bolted to the torso's flank.
   k.compound('security_walker_hip_drive', 300, [
     m.axleDisc('drive', 'frame', s.hip[0], s.hip[1], 0.48, [hull.half, L - thighHalf]),
-  ], { frame: s.frame }, { pivot: ['drive', centre] }),
+  ], { frame: s.frame }, { pivot: ['drive', centre] }) + { title: 'Security walker hip drive' },
   k.compound('security_walker_thigh', 1000, [
     m.axleDisc('hub', 'paint', s.hip[0], s.hip[1], hub, [L - thighHalf, L + thighHalf]),
     m.axleDisc('hip_cap', 'frame', s.hip[0], s.hip[1], 0.24, [L + thighHalf, L + thighHalf + 0.08]),
@@ -252,7 +253,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
   ] + clevisEnd('knee', 'paint', s.knee, s.hip, joints.knee, 0.56), { paint: s.paint, frame: s.frame }, {
     hip: ['hub', centre],
     knee: ['knee_cheek_outer', centre],
-  }),
+  }) + { title: 'Security walker thigh' },
   k.compound('security_walker_shin', 780, [
     body(s.knee, s.ankle, joints.knee.clevis + clear, joints.ankle.clevis + clear, 0.54, shinHalf, 0.44),
     m.axleDisc('ankle_pin', 'frame', s.ankle[0], s.ankle[1], 0.1, [L + joints.ankle.cheek[1], L + joints.ankle.cheek[1] + pin], 12),
@@ -262,7 +263,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
   + clevisEnd('ankle', 'paint', s.ankle, s.knee, joints.ankle, 0.42), { paint: s.paint, frame: s.frame }, {
     knee: ['knee_boss', centre],
     ankle: ['ankle_cheek_outer', centre],
-  }),
+  }) + { title: 'Security walker shin' },
   k.compound('security_walker_tarsus', 380, [
     body(s.ankle, s.foot, joints.ankle.clevis + clear, joints.foot.clevis + clear, 0.42, tarsusHalf, 0.34),
     lug('ankle_ram_lug', rams.ankle.end, rams.ankle, [L + tarsusHalf, rams.ankle.z0]),
@@ -270,7 +271,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
   + tongueEnd('foot', 'paint', s.foot, s.ankle, joints.foot, 0.3), { paint: s.paint, frame: s.frame }, {
     ankle: ['ankle_boss', centre],
     foot: ['foot_boss', centre],
-  }),
+  }) + { title: 'Security walker tarsus' },
   k.compound('security_walker_foot', 560, [
     k.yPrism('sole', 'paint', ccw([[p[1], p[0]] for p in [plan(22.5 + 45 * i, 0.32, 0) for i in std.range(0, 7)]]), [0, 0.22]),
   ] + std.flattenArrays([toe(t) for t in toes]) + std.flattenArrays([
@@ -282,8 +283,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
       { name: 'outer', z: [L + joints.foot.cheek[0], L + joints.foot.cheek[1]] },
       { name: 'inner', z: [L - joints.foot.cheek[1], L - joints.foot.cheek[0]] },
     ]
-  ]), { paint: s.paint, claw: 'steel-gunmetal' }, { pivot: ['cheek_disc_outer', centre] }),
-] + ram('hip', rams.hip) + ram('knee', rams.knee) + ram('ankle', rams.ankle) + [
+  ]), { paint: s.paint, claw: 'steel-gunmetal' }, { pivot: ['cheek_disc_outer', centre] }) + { title: 'Security walker foot' },
+] + ram('hip', 'hip', rams.hip) + ram('knee', 'knee', rams.knee) + ram('ankle', 'ankle', rams.ankle) + [
   // The hip's hoses run in the gap between the flank and the thigh, from the flank behind the hip drive to the thigh.
   hoses('hip', 8, [
     { a: [-0.5, 3.72], c: [-0.9, 2.4], b: along(s.hip, s.knee, 0.6, -0.15), z: 1.09, fitA: hull.half, fitB: L - thighHalf },
@@ -301,7 +302,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
   k.compound('security_walker_pod_mount', 60, [
     box('bracket', 'frame', [-0.1, pod.low, hull.half], [0.5, 4.3, trunnion.z[0]]),
     m.axleDisc('trunnion', 'frame', s.trunnion[0], s.trunnion[1], trunnion.radius, trunnion.z),
-  ], { frame: s.frame }),
+  ], { frame: s.frame }) + { title: 'Security walker pod mount' },
   k.compound('security_walker_weapon_pod', 380, [
     box('housing', 'paint', [pod.rear, pod.low, pod.z[0]], [pod.front, pod.high, pod.z[1]]),
     m.axleDisc('boss', 'frame', s.trunnion[0], s.trunnion[1], trunnion.radius, trunnion.boss),
@@ -315,5 +316,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sc
     box('cradle_%s' % side.name, 'frame', [0.45, 3.65, podMid + side.z[0]], [0.85, pod.low, podMid + side.z[1]])
     for side in [{ name: 'outer', z: [0.09, 0.13] }, { name: 'inner', z: [-0.13, -0.09] }]
   ] + zBand('stripe', [pod.z[1], pod.z[1] + 0.03], pod.rear + 0.05, pod.low + 0.03, 1.35, 0.18),
-    { paint: s.paint, frame: s.frame, bore: 'plastic-black' } + stripes, { trunnion: ['boss', centre] }),
+    { paint: s.paint, frame: s.frame, bore: 'plastic-black' } + stripes, { trunnion: ['boss', centre] }) + { title: 'Security walker weapon pod' },
 ])

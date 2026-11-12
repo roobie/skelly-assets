@@ -7,7 +7,7 @@ const SOURCE_CONTEXT = /Export fixture.*fixture-source/;
 const voxel = { grain: 0.004, detailGrain: 0.002 };
 
 it.each(['fixture-unsupported', 'toString'])('refuses unknown export kind %s at recipe load', (kind) => {
-  expect(() => loadExportRecipe([{ id: 'fixture', kind, source: 'fixture-source', voxel }])).toThrow(
+  expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', kind, source: 'fixture-source', voxel }])).toThrow(
     'unknown export kind',
   );
 });
@@ -18,13 +18,13 @@ it.each([
   { kind: 'attachment' },
   { kind: 'magazine', options: { cartridge: 'fixture-cartridge.json', appearanceProfile: 'fixture' } },
 ])('refuses unresolved $kind sources at recipe load', (selection) => {
-  expect(() => loadExportRecipe([{ id: 'fixture', source: 'fixture-source', voxel, ...selection }])).toThrow(
+  expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }])).toThrow(
     SOURCE_CONTEXT,
   );
 });
 
 it('rejects two rows owning the same output identity before resolving sources', () => {
-  const row = { id: 'fixture', kind: 'design', source: 'fixture-source', voxel };
+  const row = { id: 'fixture', title: 'Fixture', kind: 'design', source: 'fixture-source', voxel };
   expect(() => loadExportRecipe([row, row])).toThrow('duplicate export id');
 });
 
@@ -32,6 +32,7 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
   const [exported] = loadExportRecipe([
     {
       id: 'fixture',
+      title: 'Fixture',
       kind: 'design',
       source: 'models/guns/designs/archetype-ak-akm.json',
       voxel: grains,
@@ -143,7 +144,7 @@ it('refuses a detail grain the gun grain is not a whole multiple of', () => {
 it('rejects options not taken by the selected exporter', () => {
   expect(() =>
     loadExportRecipe([
-      { id: 'fixture', kind: 'design', source: 'fixture-source', voxel, options: { component: 'round' } },
+      { id: 'fixture', title: 'Fixture', kind: 'design', source: 'fixture-source', voxel, options: { component: 'round' } },
     ]),
   ).toThrow('Invalid key');
 });

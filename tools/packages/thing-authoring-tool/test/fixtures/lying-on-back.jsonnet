@@ -5,6 +5,7 @@ local lying(id, head, foot, helper) = h.compound(id, 1, [
   h.box('head', 'body', head[0], head[1]),
   h.box('foot', 'body', foot[0], foot[1]),
 ], finish) + helper + {
+  title: 'Fixture ' + id,
   anchors: {
     head: { part: id, solid: 'head', fraction: [0.5, 0.5, 0.5] },
     foot: { part: id, solid: 'foot', fraction: [0.5, 0.5, 0.5] },

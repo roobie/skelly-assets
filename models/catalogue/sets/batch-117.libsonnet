@@ -63,14 +63,14 @@ local trench(id, mass, w, d, top, folds, finish) =
   trench('faux_fur_trenchcoat', 2.3, 0.42, 0.36, 0.08, 5, {
     cloth: 'fur-brown', collar: 'fur-brown', lapel: 'fur-brown', lining: 'leather-brown', button: 'leather-black',
     belt: 'leather-black', buckle: 'brass-dull', pocket: 'fur-brown', flap: 'fur-brown',
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
+  }) + { title: 'Faux fur trenchcoat' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A brown leather trench coat folded, 400 mm by 340 mm and 60 mm tall: the same cut as the fur one in smooth
   // leather, with a self belt and dark buttons.
   trench('leather_trenchcoat', 2.5, 0.4, 0.34, 0.06, 4, {
     cloth: 'leather-brown', collar: 'leather-brown', lapel: 'leather-brown', lining: 'leather-black', button: 'plastic-charcoal',
     belt: 'leather-brown', buckle: 'steel-grey', pocket: 'leather-brown', flap: 'leather-brown',
-  }) + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
+  }) + { title: 'Leather trenchcoat' } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A black leather steampunk coat folded, 400 mm by 340 mm and 60 mm tall: no pockets, a high stand collar, three
   // buckled straps across the front instead of buttons, brass rivets down the edge and a brass cog pinned to the
@@ -98,7 +98,7 @@ local trench(id, mass, w, d, top, folds, finish) =
        for i in std.range(0, 7)
        for c in [std.cos(i * std.pi / 4)]
        for s in [std.sin(i * std.pi / 4)]],
-    { cloth: 'leather-black', collar: 'leather-black', lapel: 'leather-black', lining: 'plastic-charcoal', belt: 'leather-oxblood', buckle: 'brass-polished' })
+    { cloth: 'leather-black', collar: 'leather-black', lapel: 'leather-black', lining: 'plastic-charcoal', belt: 'leather-oxblood', buckle: 'brass-polished' }) + { title: 'Brass buckled leather coat' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['torso'], state: ['folded'] } } },
 
   // A plain cream cotton tunic folded, 300 mm by 240 mm and 20 mm tall: a slit neck with a drawstring tie at the back.
@@ -112,7 +112,7 @@ local trench(id, mass, w, d, top, folds, finish) =
       box('tie-r', 'tie', [0.003, top + 0.002, -0.07], [0.03, top + 0.005, -0.065]),
       box('hem', 'hem', [-0.15, top, 0.105], [0.15, top + 0.002, 0.115]),
     ],
-    { cloth: 'cloth-cream', neck: 'cloth-khaki', tie: 'cord-cotton', hem: 'cloth-khaki' })
+    { cloth: 'cloth-cream', neck: 'cloth-khaki', tie: 'cord-cotton', hem: 'cloth-khaki' }) + { title: 'Tunic' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A rag tunic folded loosely, 300 mm by 240 mm and 25 mm tall: grey-brown rag cloth with darker patches sewn on
@@ -127,7 +127,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     ]
     + [box('fray-%d' % i, 'cloth', [-0.15 + 0.03 * i, top - 0.012, 0.12], [-0.135 + 0.03 * i, top - 0.004, 0.13 + 0.008 * (i % 3)]) for i in std.range(0, 9)]
     + h.strapLoop('string', 'string', 0.16, 0.025, 0.004, 0.004, top + 0.003, 0, 0.095),
-    { cloth: 'cloth-rag', patch: 'cloth-rag-shadow', string: 'cord-cotton' })
+    { cloth: 'cloth-rag', patch: 'cloth-rag-shadow', string: 'cord-cotton' }) + { title: 'Rag tunic' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A black tuxedo jacket folded with its trousers beneath, 380 mm by 320 mm and 50 mm tall: shiny satin lapels, the
@@ -149,7 +149,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     ]
     + buttons('shirt-stud', 0, -0.11, -0.03, 3, top + 0.002, 0.003)
     + [h.disc('button', 'satin-button', 0.008, top, top + 0.004, 0, 0.065)],
-    { cloth: 'cloth-black', shirt: 'cloth-bright-white', lapel: 'leather-patent', bow: 'leather-patent', button: 'plastic-black', 'satin-button': 'leather-patent' })
+    { cloth: 'cloth-black', shirt: 'cloth-bright-white', lapel: 'leather-patent', bow: 'leather-patent', button: 'plastic-black', 'satin-button': 'leather-patent' }) + { title: 'Tuxedo' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A sleeveless denim vest folded, 300 mm by 240 mm and 25 mm tall: a shirt collar along the back, two buttoned
@@ -167,7 +167,7 @@ local trench(id, mass, w, d, top, folds, finish) =
       box('waistband', 'seam', [-0.15, top, 0.09], [0.15, top + 0.002, 0.096]),
     ]
     + buttons('button', 0, -0.07, 0.105, 5, top + 0.002, 0.006),
-    { cloth: 'cloth-denim', collar: 'cloth-denim', pocket: 'cloth-denim', flap: 'cloth-denim', seam: 'cloth-khaki', button: 'metal-silver' })
+    { cloth: 'cloth-denim', collar: 'cloth-denim', pocket: 'cloth-denim', flap: 'cloth-denim', seam: 'cloth-khaki', button: 'metal-silver' }) + { title: 'Denim vest' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A dark grey waistcoat folded, 280 mm by 220 mm and 15 mm tall: the deep V neck showing the black satin back,
@@ -185,7 +185,7 @@ local trench(id, mass, w, d, top, folds, finish) =
       box('placket', 'welt', [-0.002, top, -0.01], [0.002, top + 0.002, 0.11]),
     ]
     + buttons('button', 0.008, 0.0, 0.1, 5, top, 0.0045),
-    { cloth: 'wool-grey', back: 'cloth-black', welt: 'plastic-charcoal', button: 'plastic-black' })
+    { cloth: 'wool-grey', back: 'cloth-black', welt: 'plastic-charcoal', button: 'plastic-black' }) + { title: 'Waistcoat' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // An olive drab padded army winter jacket folded, 380 mm by 320 mm and 50 mm tall: quilted baffles, the hood
@@ -205,7 +205,7 @@ local trench(id, mass, w, d, top, folds, finish) =
     + pocket('chest-r', 0.04, 0.12, -0.045, 0.03, top + 0.005, 0.004, 0.02)
     + pocket('hip-l', -0.17, -0.06, 0.07, 0.155, top + 0.005, 0.005, 0.025)
     + pocket('hip-r', 0.06, 0.17, 0.07, 0.155, top + 0.005, 0.005, 0.025),
-    { cloth: 'cloth-olive-drab', baffle: 'cloth-olive-drab', hood: 'cloth-olive-drab', rim: 'webbing-olive-dark', zip: 'plastic-matte-black', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', patch: 'hook-loop-grey' })
+    { cloth: 'cloth-olive-drab', baffle: 'cloth-olive-drab', hood: 'cloth-olive-drab', rim: 'webbing-olive-dark', zip: 'plastic-matte-black', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', patch: 'hook-loop-grey' }) + { title: 'Army winter jacket' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather', 'military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A blue cotton summer robe folded flat, 320 mm by 260 mm and 25 mm tall: the white collar band crossing
@@ -220,6 +220,6 @@ local trench(id, mass, w, d, top, folds, finish) =
       box('sash-fold', 'sash', [-0.15, top + 0.01, 0.07], [0.15, top + 0.016, 0.11]),
       box('sash-edge', 'edge', [-0.15, top + 0.016, 0.088], [0.15, top + 0.017, 0.092]),
     ],
-    { cloth: 'cloth-navy', collar: 'cloth-cream', sash: 'cloth-crimson', edge: 'brass-dull' })
+    { cloth: 'cloth-navy', collar: 'cloth-cream', sash: 'cloth-crimson', edge: 'brass-dull' }) + { title: 'Yukata' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 ]

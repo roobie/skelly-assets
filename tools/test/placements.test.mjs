@@ -27,33 +27,33 @@ const vanSites = [
   { id: 'door_far', part: 'fixture_door', at: [0, 0, 0], mirror: true },
 ];
 // The ambulance borrows the van's body from another pack and adds its own light bar and role.
-const ambulance = { forward: '+z', sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
+const ambulance = { title: 'Fixture Ambulance', forward: '+z', sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
 const vehicleRows = { van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'], ambulance: ['fixture_light_bar'] };
 const dependsOn = { 'fixture.rescue': ['fixture.vans'] };
 const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary }).join('\n');
 
 test('sites that name built models, each once, at a point, in reachable packs, assemble without problems', () => {
-  assert.equal(problems({ van: { forward: '+z', sites: vanSites }, ambulance }), '');
+  assert.equal(problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites }, ambulance }), '');
 });
 
 // Each would place nothing, the wrong model or a part nowhere, and only the showcase or a game would notice.
 test('a site that cannot be assembled from the built models is a problem', () => {
-  const broken = (site) => problems({ van: { forward: '+z', sites: [body, site] } });
+  const broken = (site) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: [body, site] } });
   assert.match(broken({ id: 'gone', part: 'fixture_missing', at: [0, 0, 0] }), /not a built model/);
   assert.match(broken({ id: 'twice', part: 'fixture_twice', at: [0, 0, 0] }), /2 packs/);
   assert.match(broken({ ...body }), /two sites of one id/);
   assert.match(broken({ id: 'flat', part: 'fixture_door', at: [0, 0] }), /three finite numbers/);
   assert.match(broken({ id: 'far', part: 'fixture_door', at: [0, 0, 0], mirror: false }), /mirror/);
   assert.match(broken({ id: 'turned', part: 'fixture_door', at: [0, 0, 0], yaw: 1 }), /unknown keys yaw/);
-  assert.match(problems({ van: { forward: '+z', sites: [] } }), /no sites/);
-  assert.match(problems({ van: { forward: '+y', sites: vanSites } }), /forward is not one of/);
+  assert.match(problems({ van: { title: 'Fixture Van', forward: '+z', sites: [] } }), /no sites/);
+  assert.match(problems({ van: { title: 'Fixture Van', forward: '+y', sites: vanSites } }), /forward is not one of/);
 });
 
 // A finish seeds the paint of the part's copy, so one outside the library or on a part with nothing to paint would set
 // nothing, and only a game would notice.
 test('a site finish names a library material on a part that takes paint', () => {
   const paint = Object.keys(MATERIALS)[0];
-  const sites = (site) => problems({ van: { forward: '+z', sites: [body, site] } });
+  const sites = (site) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: [body, site] } });
   assert.equal(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: paint }), '');
   assert.match(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: 'fixture-unknown' }), /not in the finish library/);
   assert.match(sites({ id: 'engine', part: 'fixture_engine', at: [0, 0, 0], finish: paint }), /no paintable slot/);
@@ -75,13 +75,14 @@ test('a vehicle ships in the pack of its own rows, with its body\'s tags and its
     const placed = exportPlacements({ placements: { ambulance: extra }, models, vehicleRows, dependsOn, vocabulary, out });
     assert.deepEqual(placed.vehicles, [{
       id: 'ambulance',
+      title: 'Fixture Ambulance',
       pack: 'fixture.rescue',
       path: 'vehicles/ambulance.placements.json',
       tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency'] },
     }]);
     assert.deepEqual(JSON.parse(readFileSync(join(out, placed.files[0]), 'utf8')), { sites: ambulance.sites });
     const manifest = buildManifest({ models: [], vehicles: placed.vehicles, files: placed.files, credit: () => ({}) });
-    assert.deepEqual(manifest.vehicles.map(({ id, pack, path, tags }) => ({ id, pack, path, tags })), placed.vehicles);
+    assert.deepEqual(manifest.vehicles.map(({ id, title, pack, path, tags }) => ({ id, title, pack, path, tags })), placed.vehicles);
     assert.throws(() => buildManifest({ models: [], vehicles: placed.vehicles, files: [], credit: () => ({}) }), /ambulance/);
   } finally {
     rmSync(out, { recursive: true, force: true });
@@ -103,6 +104,7 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
     const placed = exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, out });
     assert.deepEqual(placed.vehicles.find(({ id }) => id === 'electric_van'), {
       id: 'electric_van',
+      title: 'Fixture Electric Van',
       pack: 'fixture.vans',
       path: 'vehicles/electric_van.placements.json',
       tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency', 'farm'] },

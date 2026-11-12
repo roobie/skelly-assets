@@ -3,6 +3,7 @@ local one = site.one;
 local pair = site.pair;
 local s = import 'abandoned_pickup.spec.libsonnet';
 {
+  title: 'Abandoned pickup',
   sites: [
     one('front_axle', 'abandoned_pickup_axle', [s.frontAxle, s.axleY, 0]),
     one('rear_axle', 'abandoned_pickup_axle', [s.rearAxle, s.axleY, 0]),

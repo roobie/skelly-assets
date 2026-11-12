@@ -71,17 +71,17 @@ local suspenders(t, ends) =
   h.compound('fireman_belt', 0.31, beltU(1.2, 0.05, 0.005, 5, 0.05, 0.07, 0.008) + [
     box('ring-tab', 'keeper', [0.07, 0.005, 0.015], [0.13, 0.009, 0.075]),
     ringZ('ring', 'buckle', 0.026, 0.032, 0.039, 0.051, 0.1, 0.041),
-  ], { strap: 'leather-black', keeper: 'leather-black', buckle: 'steel-grey', hole: 'plastic-matte-black' })
+  ], { strap: 'leather-black', keeper: 'leather-black', buckle: 'steel-grey', hole: 'plastic-matte-black' }) + { title: 'Fireman belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A trouser belt 1.1 m long and 35 mm wide in brown leather, laid in a U, with a steel frame buckle.
   h.compound('leather_belt', 0.12, beltU(1.1, 0.035, 0.004, 5, 0.04, 0.05, 0.005),
-             { strap: 'leather-brown', keeper: 'leather-brown', buckle: 'steel-grey', hole: 'plastic-matte-black' })
+             { strap: 'leather-brown', keeper: 'leather-brown', buckle: 'steel-grey', hole: 'plastic-matte-black' }) + { title: 'Leather belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A broad belt 1.2 m long and 75 mm wide in black leather, laid in a U, with a square brass buckle 100 mm across.
   h.compound('santa_belt', 0.45, beltU(1.2, 0.075, 0.004, 4, 0.08, 0.1, 0.014),
-             { strap: 'leather-black', keeper: 'leather-black', buckle: 'metal-gold', hole: 'plastic-matte-black' })
+             { strap: 'leather-black', keeper: 'leather-black', buckle: 'metal-gold', hole: 'plastic-matte-black' }) + { title: 'Santa belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A police duty belt 1.2 m long and 55 mm wide in black leather, laid in a U, with a twin magazine pouch and a
@@ -100,27 +100,27 @@ local suspenders(t, ends) =
     h.disc('stud-%d' % i, 'ring', 0.004, studs[i][0], studs[i][0] + 0.002, studs[i][1], studs[i][2])
     for i in std.range(0, 3)
     for studs in [[[0.038, -0.105, 0.075], [0.038, -0.055, 0.075], [0.043, 0.075, 0.075], [0.033, 0.015, -0.016]]]
-  ], { strap: 'leather-black', keeper: 'leather-black', buckle: 'steel-grey', hole: 'plastic-matte-black', pouch: 'leather-black', flap: 'polymer-black', ring: 'steel-grey' })
+  ], { strap: 'leather-black', keeper: 'leather-black', buckle: 'steel-grey', hole: 'plastic-matte-black', pouch: 'leather-black', flap: 'polymer-black', ring: 'steel-grey' }) + { title: 'Police belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A martial arts belt 40 mm wide, wrapped twice round a 900 mm waist and tied, its tails 220 mm long. Its colour is
   // its rank; the colours ride on finishes maps.
-  h.compound('judo_belt', 0.15, tiedBelt(0.145, 0.04, 0.22), { cloth: 'cloth-white' })
+  h.compound('judo_belt', 0.15, tiedBelt(0.145, 0.04, 0.22), { cloth: 'cloth-white' }) + { title: 'Judo belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // A broad black gi belt 60 mm wide, tied the same way with tails 240 mm long.
-  h.compound('gi_belt', 0.11, tiedBelt(0.15, 0.06, 0.24), { cloth: 'cloth-black' })
+  h.compound('gi_belt', 0.11, tiedBelt(0.15, 0.06, 0.24), { cloth: 'cloth-black' }) + { title: 'Gi belt' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // Y-back cloth suspenders 35 mm wide, lying flat 460 mm across and 760 mm long, with metal clips at the three ends,
   // slides on the front straps and a leather patch where the straps meet.
   h.compound('suspenders', 0.21, suspenders(0.003, clip),
-             { strap: 'cloth-black', patch: 'leather-black', slide: 'metal-silver', fitting: 'metal-silver' })
+             { strap: 'cloth-black', patch: 'leather-black', slide: 'metal-silver', fitting: 'metal-silver' }) + { title: 'Suspenders' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // The same Y-back suspenders in brown leather with split button tabs at the ends and brass slides.
   h.compound('leather_suspenders', 0.15, suspenders(0.004, tab),
-             { strap: 'leather-brown', patch: 'leather-brown', slide: 'brass', fitting: 'leather-black' })
+             { strap: 'leather-brown', patch: 'leather-brown', slide: 'brass', fitting: 'leather-black' }) + { title: 'Leather suspenders' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso'] } } },
 
   // The leather suspenders with a pistol holster 190 mm long sewn to the left front strap at the stomach, its muzzle
@@ -129,6 +129,6 @@ local suspenders(t, ends) =
     h.prism('holster', 'holster', 'y', [[0.1, -0.16], [0.13, -0.05], [0.29, -0.02], [0.29, -0.11], [0.2, -0.17]], 0.004, 0.034),
     box('holster-strap', 'fitting', [-0.12, 0.034, 0.12], [-0.03, 0.037, 0.14]),
     h.disc('holster-stud', 'slide', 0.005, 0.037, 0.039, -0.04, 0.13),
-  ], { strap: 'leather-brown', patch: 'leather-brown', slide: 'brass', fitting: 'leather-black', holster: 'leather-brown' })
+  ], { strap: 'leather-brown', patch: 'leather-brown', slide: 'brass', fitting: 'leather-black', holster: 'leather-brown' }) + { title: 'Holster suspenders' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['torso'] } } },
 ]

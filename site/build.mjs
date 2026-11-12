@@ -52,8 +52,9 @@ const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files 
   .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
+  .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
+    title,
     category: category ?? null,
     label: label ?? null,
     tags: tags ?? {},
@@ -66,8 +67,9 @@ const models = manifest.models
     volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
+  .map(({ id, title, file, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
+    title,
     file,
     bytes: statSync(join(built, file)).size,
     category,
@@ -129,13 +131,13 @@ const vehiclePhysical = (sites) => {
 
 // Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
 // keywords of its own.
-const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
+const vehicles = manifest.vehicles.map(({ id, title, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
   const placed = placedSites(sites);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed), ...(history ? { history: vehicleStanding(stands[id], placed.map(({ model }) => stands[model])) } : {}) };
+  return { id, title, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed), ...(history ? { history: vehicleStanding(stands[id], placed.map(({ model }) => stands[model])) } : {}) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from

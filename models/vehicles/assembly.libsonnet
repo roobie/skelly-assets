@@ -29,17 +29,17 @@ local merged(core, dressed) = std.foldl(function(all, d)
 
 {
   // The core and fused rows of a part whose whole dressed mass is `massKg`, so the core takes what its accessories
-  // leave.
-  rows(fusedId, coreId, massKg, core, accessories):
+  // leave; `title` is the fused row's and `coreTitle` the core's.
+  rows(fusedId, coreId, title, coreTitle, massKg, core, accessories):
     local dressed = [fitted(a) for a in accessories];
     local accessoryMass = std.sum([a.massKg for a in accessories]);
     assert accessoryMass < massKg : fusedId + "'s accessories outweigh the whole part";
     [
-      k.compound(coreId, massKg - accessoryMass, core.pieces, core.finish),
-      k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), merged(core, dressed)),
+      k.compound(coreId, massKg - accessoryMass, core.pieces, core.finish) + { title: coreTitle },
+      k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), merged(core, dressed)) + { title: title },
     ],
   // An accessory's own row.
-  row(id, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish),
+  row(id, title, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish) + { title: title },
   // Every site the part can take: its core's and each accessory's.
   siteIds(coreSite, accessories): [coreSite] + [a.site for a in accessories],
   // The part's sites, its frame placed at `at`. `detail` picks how much of it is salvageable: 'fused' fits the whole

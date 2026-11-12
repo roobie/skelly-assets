@@ -4,6 +4,7 @@ local pair = site.pair;
 local s = import 'checkpoint_barrier_trailer.spec.libsonnet';
 local id = 'checkpoint_barrier_trailer';
 {
+  title: 'Checkpoint barrier trailer',
   sites: [
     one('chassis', id + '_chassis'),
     one('floor', id + '_floor'),

@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'beach_buggy.spec.libsonnet';
 {
+  title: 'Beach buggy',
   sites: [
     site.one('frame', 'beach_buggy_frame'),
     site.one('tub', 'beach_buggy_tub'),

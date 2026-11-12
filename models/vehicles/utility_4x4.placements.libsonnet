@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'utility_4x4.spec.libsonnet';
 local wheel = 'utility_4x4_wheel';
 {
+  title: 'Utility 4x4',
   sites: [
     site.one('frame', 'utility_4x4_frame'),
     site.one('hull', 'utility_4x4_hull'),

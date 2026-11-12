@@ -2,13 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { FORM, KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
 
-const model = (id, category, tags = {}, keywords = []) => ({ id, category, tags, keywords });
+const model = (id, category, tags = {}, keywords = []) => ({ id, title: `Fixture ${category}`, category, tags, keywords });
 const entries = [
   model('oak_door', 'building', { material: ['wood'], place: ['urban'] }, ['entrance']),
   model('steel_door', 'building', { material: ['steel'], place: ['urban'] }, ['entrance']),
   model('oak_log', 'nature', { material: ['wood'] }),
-  { id: 'jeep', tags: {}, keywords: [], sites: [] },
+  { id: 'jeep', title: 'Fixture jeep', tags: {}, keywords: [], sites: [] },
   model('loose', null),
+  { id: 'x1', title: 'Fixture teapot', category: 'tools', tags: {}, keywords: [] },
 ];
 const ids = (filter) => entries.filter((e) => matches(e, filter)).map((e) => e.id);
 const filterOf = (changes) => ({ ...emptyFilter(), ...changes });
@@ -17,6 +18,10 @@ test('a filter keeps only the models that satisfy every dimension it names', () 
   assert.deepEqual(ids(filterOf({ picks: { material: ['wood'], place: ['urban'] } })), ['oak_door']);
   assert.deepEqual(ids(filterOf({ picks: { [KEYWORD]: ['entrance'], material: ['steel'] } })), ['steel_door']);
   assert.deepEqual(ids(filterOf({ shelf: 'building', q: 'oak' })), ['oak_door']);
+});
+
+test('the search text matches a model by its title, not only its id', () => {
+  assert.deepEqual(ids(filterOf({ q: 'teapot' })), ['x1']);
 });
 
 test('terms picked in one tag facet widen the match, where two keywords narrow it', () => {

@@ -37,7 +37,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
   ], {
     case: 'steel-grey', lid: 'steel-bright', label: 'plastic-white', screw: 'steel-blued', led: 'plastic-red',
     terminal: 'circuit-green', base: 'plastic-black', aerial: 'steel-bright', 'lead-red': 'plastic-red', 'lead-black': 'plastic-black',
-  }) + h.inHand('radio_trigger_module', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Radio trigger module' } + h.inHand('radio_trigger_module', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A toy car's handheld radio transmitter, 160 by 110 mm and 40 mm thick, face up: one steering stick on the left,
   // four coloured buttons on the right, a power switch and a telescopic aerial, half drawn out, behind.
@@ -63,7 +63,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     body: 'plastic-black', face: 'plastic-charcoal', gimbal: 'plastic-grey', stick: 'steel-bright', knob: 'rubber-black',
     'button-red': 'plastic-red', 'button-yellow': 'plastic-yellow', 'button-green': 'plastic-green', 'button-blue': 'plastic-blue',
     switch: 'steel-grey', label: 'plastic-white', base: 'plastic-black', aerial: 'steel-bright',
-  }) + h.inHand('hobby_radio_transmitter', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { title: 'Hobby radio transmitter' } + h.inHand('hobby_radio_transmitter', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A rugged handheld controller for a real vehicle, 200 by 130 mm and 50 mm thick, face up: a screen, two rows of
   // toggle switches, a drive stick, yellow corner bumpers and a stubby rubber aerial out of the back.
@@ -94,7 +94,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
   ], {
     body: 'plastic-grey', face: 'plastic-charcoal', bumper: 'plastic-hivis', bezel: 'plastic-black', screen: 'screen-black',
     lever: 'steel-bright', knob: 'rubber-black', label: 'plastic-white', led: 'plastic-green', aerial: 'rubber-black',
-  }) + h.inHand('vehicle_remote_control', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  }) + { title: 'Vehicle remote control' } + h.inHand('vehicle_remote_control', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A handheld two-way radio standing upright, 58 mm wide, 35 mm deep and 125 mm tall without its 85 mm rubber
   // aerial, front on +z: a speaker grille and small display on the front, a channel knob on top, a push-to-talk
@@ -118,7 +118,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
   ], {
     body: 'plastic-black', battery: 'alu-bare', clip: 'plastic-charcoal', display: 'lcd-green', grille: 'plastic-charcoal',
     ptt: 'rubber-black', aerial: 'rubber-black', knob: 'alu-anodized-black', led: 'plastic-red',
-  }) + h.inHand('two_way_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Two-way radio' } + h.inHand('two_way_radio', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A cone of birch bark rolled from one sheet, 100 mm across the mouth and 100 mm tall, the overlap pinned by a
   // split twig near the rim.
@@ -126,14 +126,14 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     turned('cone', 'bark', 'y', [[0, 0.004], [0, 0.008], [0.1, 0.05], [0.1, 0.046], [0.003, 0.004], [0, 0.004]]),
   ] + coneSeam('seam', 'seam', 0.008, 0.002, 0.05, 0.1, 14, 0.012, 0.002) + [
     rodOn('pin', 'pin', 'z', 0.0018, -0.016, 0.016, [0.05, 0.082, 0]),
-  ], { bark: 'bark-birch', seam: 'bark', pin: 'wood-walnut' }) + h.inHand('birchbark_funnel', 'cone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
+  ], { bark: 'bark-birch', seam: 'bark', pin: 'wood-walnut' }) + { title: 'Birch bark funnel' } + h.inHand('birchbark_funnel', 'cone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['plant'] } } },
 
   // A moulded plastic kitchen funnel, 150 mm across the rim and 142 mm tall with a 22 mm spout and a hanging tab.
   h.compound('funnel', 0.03, [
     turned('funnel', 'plastic', 'y', [[0, 0.008], [0, 0.011], [0.05, 0.011], [0.13, 0.075], [0.142, 0.075], [0.142, 0.071], [0.132, 0.071], [0.052, 0.008], [0, 0.008]]),
     box('tab', 'plastic', [0.072, 0.136, -0.009], [0.092, 0.142, 0.009]),
     ringY('tab-ring', 'plastic', 0.004, 0.011, 0.136, 0.142, 0.092, 0),
-  ], { plastic: 'plastic-orange' }) + h.inHand('funnel', 'funnel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { plastic: 'plastic-orange' }) + { title: 'Funnel' } + h.inHand('funnel', 'funnel') + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A small funnel of stitched leather, 100 mm across the mouth and 110 mm tall, with a rolled rim, a short spout,
   // a stitched side seam and a thong loop for hanging.
@@ -145,7 +145,7 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     for i in std.range(0, 5)
   ] + [
     turned('thong', 'thong', 'z', [[0, 0.008], [0, 0.011], [0.003, 0.011], [0.003, 0.008], [0, 0.008]], [-0.058, 0.106, -0.0015]),
-  ], { leather: 'leather-brown', rim: 'leather-chestnut', seam: 'leather-chestnut', stitch: 'cord-cotton', thong: 'leather-tan' }) + h.inHand('leather_funnel', 'cone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['leather'] } } },
+  ], { leather: 'leather-brown', rim: 'leather-chestnut', seam: 'leather-chestnut', stitch: 'cord-cotton', thong: 'leather-tan' }) + { title: 'Leather funnel' } + h.inHand('leather_funnel', 'cone') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['leather'] } } },
 
   // The top of a 2 L plastic drinks bottle cut off and turned neck down, 100 mm across and 100 mm tall, its cut edge
   // bound with a band of duct tape.
@@ -157,5 +157,5 @@ local coneSeam(prefix, slot, r0, y0, r1, y1, n, w=0.004, t=0.002) = [
     for i in std.range(0, 2)
   ] + [
     ringY('tape', 'tape', 0.047, 0.052, 0.085, 0.1),
-  ], { plastic: 'plastic-clear', tape: 'tape-silver' }) + h.inHand('makeshift_funnel', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['plastic'] } } },
+  ], { plastic: 'plastic-clear', tape: 'tape-silver' }) + { title: 'Makeshift funnel' } + h.inHand('makeshift_funnel', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['plastic'] } } },
 ]

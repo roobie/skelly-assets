@@ -64,7 +64,7 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
   ] + [
     box('fringe-%d' % i, if i % 2 == 0 then 'pattern' else 'fringe', [-0.124 + 0.012 * i, 0.022, 0.13], [-0.118 + 0.012 * i, 0.028, 0.15 + 0.006 * (i % 3)])
     for i in std.range(0, 20)
-  ], { cloth: 'cloth-cream', pattern: 'cloth-black', fringe: 'cloth-cream' })
+  ], { cloth: 'cloth-cream', pattern: 'cloth-black', fringe: 'cloth-cream' }) + { title: 'Keffiyeh' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 
   // A knitted cotton scarf about 1.5 m long folded into a stack, 180 mm across, 240 mm deep and 50 mm tall: ribbed
@@ -73,7 +73,7 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
                                   + knitRibs(0.18, 0.24, 0.046, 0.016)
                                   + knitBands(0.18, 0.24, 0.05)
                                   + tassels(0.18, 0.24, 0.046, 12, 0.035),
-             { cloth: 'cloth-red', rib: 'cloth-red', band: 'cloth-cream', tassel: 'cloth-cream' })
+             { cloth: 'cloth-red', rib: 'cloth-red', band: 'cloth-cream', tassel: 'cloth-cream' }) + { title: 'Knit scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A knitted cotton scarf about 2.5 m long folded into a deeper stack, 200 mm across, 300 mm deep and 76 mm tall:
@@ -82,16 +82,16 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
                                        + knitRibs(0.2, 0.3, 0.072, 0.016)
                                        + knitBands(0.2, 0.3, 0.076)
                                        + tassels(0.2, 0.3, 0.072, 14, 0.04),
-             { cloth: 'wool-grey', rib: 'wool-grey', band: 'cloth-navy', tassel: 'cloth-navy' })
+             { cloth: 'wool-grey', rib: 'wool-grey', band: 'cloth-navy', tassel: 'cloth-navy' }) + { title: 'Long knit scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A light scarf sewn from cotton scraps, folded into a stack 180 mm across, 200 mm deep and 24 mm tall: square
   // patches of red, blue, yellow and green with dark seams between them.
-  h.compound('patchwork_scarf', 0.13, h.foldedGarment(0.18, 0.2, 0.02, 3) + patchwork(0.18, 0.2, 0.02, 4, 4), patchFinishes)
+  h.compound('patchwork_scarf', 0.13, h.foldedGarment(0.18, 0.2, 0.02, 3) + patchwork(0.18, 0.2, 0.02, 4, 4), patchFinishes) + { title: 'Patchwork scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A longer patchwork scarf folded into a stack 220 mm across, 260 mm deep and 34 mm tall: more and smaller patches.
-  h.compound('long_patchwork_scarf', 0.22, h.foldedGarment(0.22, 0.26, 0.03, 5) + patchwork(0.22, 0.26, 0.03, 5, 6), patchFinishes)
+  h.compound('long_patchwork_scarf', 0.22, h.foldedGarment(0.22, 0.26, 0.03, 5) + patchwork(0.22, 0.26, 0.03, 5, 6), patchFinishes) + { title: 'Long patchwork scarf' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A nun's wimple folded flat, 220 mm across, 180 mm deep and 22 mm tall: the white linen headwrap folded in two,
@@ -101,6 +101,6 @@ local patchFinishes = { cloth: 'cloth-cream', 'patch-a': 'cloth-red', 'patch-b':
     h.turned('veil-fold', 'veil', 'x', [[0, 0], [0, 0.005], [0.22, 0.005], [0.22, 0]], [-0.11, 0.015, -0.09]),
     box('veil-hem', 'hem', [-0.11, 0.02, 0.008], [0.11, 0.022, 0.02]),
     box('band', 'band', [-0.11, 0.012, 0.05], [0.11, 0.016, 0.07]),
-  ], { cloth: 'cloth-bright-white', veil: 'cloth-black', hem: 'cloth-charcoal', band: 'cloth-cream' })
+  ], { cloth: 'cloth-bright-white', veil: 'cloth-black', hem: 'cloth-charcoal', band: 'cloth-cream' }) + { title: 'Nun wimple' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'], state: ['folded'] } } },
 ]

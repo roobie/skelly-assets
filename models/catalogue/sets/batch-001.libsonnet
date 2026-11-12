@@ -16,7 +16,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('pump', 'pump', [0.06, 0.92, -0.08], [0.20, 1.08, 0.08]),
     box('pump-head', 'pump', [0.04, 1.08, -0.10], [0.22, 1.10, 0.10]),
     dial('gauge', 'gauge', 0.10, 0.75, 0.19, 0.035, 0.03),
-  ], { frame: 'steel-grey', tank: 'paint-red', motor: 'paint-charcoal', pump: 'alu-bare', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  ], { frame: 'steel-grey', tank: 'paint-red', motor: 'paint-charcoal', pump: 'alu-bare', gauge: 'plastic-white' }) + { title: 'Air compressor' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A small tilting electric arc furnace: a 1.3 m refractory-lined shell under a domed roof, three graphite
   // electrodes rising to 2 m from a mast at the side.
@@ -33,7 +33,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('arm-b', 'arm', [-0.125, 1.68, 0.18], [0.90, 1.76, 0.25]),
     box('arm-c', 'arm', [-0.125, 1.56, -0.25], [0.90, 1.64, -0.18]),
     box('spout', 'lining', [-1.00, 0.85, -0.08], [-0.60, 0.95, 0.08]),
-  ], { frame: 'steel-grey', shell: 'paint-charcoal', lining: 'clay-terracotta', roof: 'steel-grey', electrode: 'stone-grey', arm: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'stone'], setting: ['modern'] }, keywords: ['metalworking'] } },
+  ], { frame: 'steel-grey', shell: 'paint-charcoal', lining: 'clay-terracotta', roof: 'steel-grey', electrode: 'stone-grey', arm: 'copper' }) + { title: 'Arc furnace' } + { taxonomy: { category: 'machinery', tags: { material: ['metal', 'stone'], setting: ['modern'] }, keywords: ['metalworking'] } },
 
   // An upright arcade cabinet, 0.66 m wide, 0.82 m deep and 1.85 m tall, screen and controls facing +z.
   h.compound('arcade_machine', 64, [
@@ -50,7 +50,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ], {
     cabinet: 'paint-police-blue', panel: 'paint-charcoal', screen: 'glass-grey', marquee: 'plastic-yellow',
     door: 'steel-grey', stick: 'plastic-black', button: 'plastic-red',
-  }) + { taxonomy: { category: 'recreation', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
+  }) + { title: 'Arcade machine' } + { taxonomy: { category: 'recreation', tags: { material: ['metal', 'glass'], setting: ['modern'] } } },
 
   // A floor-standing band saw, 2.05 m tall: a cabinet base, two wheel housings joined by a spine, a 0.5 m
   // table and the blade running down the open side.
@@ -63,7 +63,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('blade', 'blade', [-0.31, 1.29, -0.081], [-0.29, 1.60, -0.075]),
     box('guide', 'blade', [-0.33, 1.42, -0.10], [-0.27, 1.60, -0.06]),
     turned('motor', 'motor', 'x', [[0, 0], [0, 0.09], [0.25, 0.09], [0.25, 0]], [0.30, 0.45, 0]),
-  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { base: 'paint-charcoal', housing: 'polymer-od-green', table: 'iron-cast', blade: 'steel-grey', motor: 'paint-charcoal' }) + { title: 'Bandsaw' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A pine box, 0.46 by 0.36 m and 0.3 m deep, its lid leaning back on its hinge, a charger with a meter,
   // a dial and two lamps on its top, and its red and black clip leads hung over the front rim.
@@ -98,7 +98,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ]), {
     box: 'wood-pine', metal: 'steel-grey', charger: 'plastic-black', meter: 'plastic-white', knob: 'plastic-red',
     'lamp-green': 'glass-lens-green', 'lamp-red': 'plastic-red', 'lead-red': 'plastic-red', 'lead-black': 'plastic-black', clip: 'copper',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  }) + { title: 'Battery charging box' } + { taxonomy: { category: 'electrical', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // An armoured radioisotope generator, 0.84 m long: a lead-lined block in steel end caps with cooling fins.
   h.compound('radioisotope_generator', 1200, [
@@ -113,7 +113,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ] + [
     box('warning', 'warning', [-0.08, 0.45, -0.08], [0.08, 0.455, 0.08]),
     turned('terminal', 'terminal', 'x', [[0, 0], [0, 0.02], [0.04, 0.02], [0.04, 0]], [0.42, 0.30, 0]),
-  ], { frame: 'steel-grey', core: 'lead', fin: 'alu-bare', warning: 'plastic-yellow', terminal: 'copper' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['sci-fi'] }, keywords: ['radiation'] } },
+  ], { frame: 'steel-grey', core: 'lead', fin: 'alu-bare', warning: 'plastic-yellow', terminal: 'copper' }) + { title: 'Radioisotope generator' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['sci-fi'] }, keywords: ['radiation'] } },
 
   // A floor drill press, 1.37 m tall: cast base, a 90 mm column, a round table on its arm, the head with
   // a vertical motor behind and three feed handles.
@@ -133,7 +133,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     turned('handle-a', 'steel', 'x', [[0, 0], [0, 0.008], [0.22, 0.008], [0.22, 0.016], [0.25, 0.016], [0.25, 0]], [0.12, 1.15, 0]),
     turned('handle-b', 'steel', 'y', [[0, 0], [0, 0.008], [0.16, 0.008], [0.16, 0.016], [0.19, 0.016], [0.19, 0]], [0.135, 1.16, 0]),
     turned('handle-c', 'steel', 'y', [[0, 0], [0, 0.016], [0.03, 0.016], [0.03, 0.008], [0.19, 0.008], [0.19, 0]], [0.135, 0.95, 0]),
-  ], { base: 'iron-cast', column: 'steel-stainless', head: 'polymer-od-green', motor: 'paint-charcoal', steel: 'steel-grey' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  ], { base: 'iron-cast', column: 'steel-stainless', head: 'polymer-od-green', motor: 'paint-charcoal', steel: 'steel-grey' }) + { title: 'Drill press' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A steel foot locker, 0.92 by 0.5 m and 0.48 m tall, with a charging panel set into its front.
   h.compound('charging_foot_locker', 53, [
@@ -147,7 +147,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('lamp-a', 'lamp', [-0.10, 0.24, 0.25], [-0.08, 0.26, 0.255]),
     box('lamp-b', 'lamp', [-0.06, 0.24, 0.25], [-0.04, 0.26, 0.255]),
     dial('socket', 'trim', 0.08, 0.20, 0.25, 0.025, 0.02),
-  ], { body: 'paint-olive', trim: 'steel-grey', panel: 'plastic-black', lamp: 'glass-lens-green' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'paint-olive', trim: 'steel-grey', panel: 'plastic-black', lamp: 'glass-lens-green' }) + { title: 'Charging foot locker' } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // An electric glass crucible furnace on four legs, 1 m tall: a 0.52 m drum with a lined mouth, a lid,
   // a vent and a control box on its side.
@@ -162,7 +162,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     post('vent', 'frame', 0, 0.98, 0, 0.03, 0.02),
     box('controls', 'controls', [0.25, 0.55, -0.08], [0.36, 0.80, 0.08]),
     turned('knob', 'knob', 'x', [[0, 0], [0, 0.018], [0.02, 0.018], [0.02, 0]], [0.36, 0.72, 0]),
-  ], { frame: 'steel-grey', drum: 'steel-stainless', lining: 'clay-terracotta', controls: 'paint-charcoal', knob: 'plastic-black' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'steel-grey', drum: 'steel-stainless', lining: 'clay-terracotta', controls: 'paint-charcoal', knob: 'plastic-black' }) + { title: 'Glass furnace' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A breathing-air compressor in a 0.63 m roll frame: motor, a finned two-stage pump and a separator bottle.
   h.compound('high_pressure_compressor', 54, [
@@ -180,7 +180,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     turned('bottle', 'bottle', 'y', [[0, 0], [0, 0.03], [0.24, 0.03], [0.27, 0.01], [0.27, 0]], [-0.02, 0.03, -0.15]),
     box('gauge-panel', 'frame', [-0.29, 0.28, 0.195], [-0.06, 0.38, 0.205]),
     dial('gauge', 'gauge', -0.10, 0.33, 0.205, 0.03, 0.025),
-  ], { frame: 'paint-oxblood', motor: 'paint-charcoal', pump: 'alu-bare', bottle: 'steel-grey', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { frame: 'paint-oxblood', motor: 'paint-charcoal', pump: 'alu-bare', bottle: 'steel-grey', gauge: 'plastic-white' }) + { title: 'High-pressure compressor' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A 20 tonne H-frame shop press, 1.58 m tall and 0.84 m wide: channel uprights, a pinned bed with two
   // press plates and a bottle jack hung from the top beam.
@@ -199,7 +199,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     post('ram-foot', 'ram', 0, 0.92, 0, 0.04, 0.03),
     turned('pump-handle', 'ram', 'x', [[0, 0], [0, 0.01], [0.30, 0.01], [0.30, 0]], [0.06, 1.25, 0.04]),
     dial('gauge', 'gauge', 0, 1.50, 0.07, 0.04, 0.02),
-  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['metalworking'] } },
+  ], { frame: 'paint-red', plate: 'steel-grey', jack: 'paint-charcoal', ram: 'steel-stainless', gauge: 'plastic-white' }) + { title: 'Hydraulic press' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['metalworking'] } },
 
   // An industrial 2.2 m long jointer: cast infeed and outfeed tables on a closed stand, the cutterhead in
   // the gap between them, a fence along the back and the bridge guard over the cut.
@@ -214,7 +214,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     box('fence-bracket', 'cutter', [-0.06, 0.82, -0.30], [0.06, 0.90, -0.22]),
     dial('wheel-a', 'cutter', -0.25, 0.50, 0.22, 0.06, 0.03),
     dial('wheel-b', 'cutter', 0.25, 0.50, 0.22, 0.06, 0.03),
-  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { stand: 'paint-cream', table: 'iron-cast', cutter: 'steel-grey', guard: 'paint-red' }) + { title: 'Jointer' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A sliding compound mitre saw on its extension wings, 1.24 m wide: base and turntable, fence, the head
   // on two rails behind, a 254 mm blade under a half guard.
@@ -238,7 +238,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
     prism('guard', 'head', 'x', [[0.25, -0.14], [0.32, -0.12], [0.37, -0.07], [0.39, 0], [0.37, 0.07], [0.32, 0.12], [0.25, 0.14]], -0.03, 0.03),
     turned('blade', 'blade', 'x', [[0, 0], [0, 0.127], [0.004, 0.127], [0.004, 0]], [-0.002, 0.25, 0]),
     box('handle', 'handle', [-0.02, 0.38, 0.10], [0.12, 0.41, 0.20]),
-  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
+  ], { base: 'alu-bare', rail: 'steel-stainless', head: 'plastic-yellow', blade: 'steel-grey', handle: 'plastic-black' }) + { title: 'Mitre saw' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] }, keywords: ['woodworking'] } },
 
   // A free-standing electric convection oven, 0.6 m wide, 0.6 m deep and 0.69 m tall, door facing +z.
   h.compound('oven', 93, [
@@ -261,7 +261,7 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ], {
     foot: 'rubber-black', body: 'paint-white', door: 'paint-charcoal', window: 'glass-grey',
     handle: 'steel-stainless', display: 'glass-lens-green', knob: 'plastic-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
+  }) + { title: 'Oven' } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'glass'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance', 'cooking'] } },
 
   // A home oxygen concentrator on casters, 0.38 m wide and 0.7 m tall, with a flow meter and humidifier
   // bottle on its front and a filter grille at the back.
@@ -277,5 +277,5 @@ local dial(id, slot, x, y, z0, radius, depth) = turned(id, slot, 'z', [[0, 0], [
   ] + [
     turned('caster-%d' % i, 'caster', 'x', [[0, 0], [0, 0.03], [0.025, 0.03], [0, 0]], [[-0.17, 0.145][i % 2], 0.03, [-0.13, 0.13][std.floor(i / 2)]])
     for i in std.range(0, 3)
-  ], { body: 'plastic-white', panel: 'plastic-grey', glass: 'glass-clear', switch: 'plastic-green', caster: 'rubber-black' }) + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
+  ], { body: 'plastic-white', panel: 'plastic-grey', glass: 'glass-clear', switch: 'plastic-green', caster: 'rubber-black' }) + { title: 'Oxygen concentrator' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
 ]

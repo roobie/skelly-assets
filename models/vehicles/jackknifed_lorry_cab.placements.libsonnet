@@ -4,6 +4,7 @@ local pair = site.pair;
 local s = import 'jackknifed_lorry_cab.spec.libsonnet';
 local rearAt(x) = local p = s.at([x, s.hubY]); [p[0], p[1], s.wheelZ];
 {
+  title: 'Jackknifed lorry cab',
   sites: [
     one('chassis', 'jackknifed_lorry_cab_chassis'),
     one('near_side', 'jackknifed_lorry_cab_near_side'),

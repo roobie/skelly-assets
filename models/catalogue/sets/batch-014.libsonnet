@@ -72,7 +72,7 @@ local collapsedDrum(length, width, thick, plate) =
   ] + [
     box('upper-%s' % s.id, 'wall', [-0.3, 0.214, s.z0], [0.3, 0.252, s.z0 + 0.006])
     for s in [{ id: 'front', z0: -0.21 }, { id: 'back', z0: 0.204 }]
-  ], { wall: 'plastic-blue', rim: 'plastic-blue' })
+  ], { wall: 'plastic-blue', rim: 'plastic-blue' }) + { title: 'Laundry basket' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A round plastic kitchen trash can, 400 mm across and 510 mm tall: a grey tapered tub with a moulded foot
@@ -85,7 +85,7 @@ local collapsedDrum(length, width, thick, plate) =
     box('handle-right', 'tub', [0.19, 0.38, -0.05], [0.215, 0.4, 0.05]),
     turned('lid', 'lid', 'y', [[0, 0], [0, 0.203], [0.02, 0.203], [0.04, 0.17], [0.05, 0.1], [0.05, 0]], [0, 0.46, 0]),
     box('flap', 'flap', [-0.08, 0.494, -0.11], [0.08, 0.51, 0.06]),
-  ], { tub: 'plastic-grey', lid: 'plastic-black', flap: 'plastic-black' })
+  ], { tub: 'plastic-grey', lid: 'plastic-black', flap: 'plastic-black' }) + { title: 'Trash can' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A two-wheeled kerbside bin, 580 mm wide, 740 mm deep and 1140 mm tall: a green tapered body on a pair of
@@ -104,7 +104,7 @@ local collapsedDrum(length, width, thick, plate) =
     turned('axle', 'axle', 'x', [[0, 0], [0, 0.015], [0.64, 0.015], [0.64, 0]], [-0.32, 0.1, 0.3]),
     turned('wheel-left', 'wheel', 'x', [[0, 0], [0, 0.1], [0.05, 0.1], [0.05, 0]], [-0.32, 0.1, 0.3]),
     turned('wheel-right', 'wheel', 'x', [[0, 0], [0, 0.1], [0.05, 0.1], [0.05, 0]], [0.27, 0.1, 0.3]),
-  ], { body: 'plastic-green', lid: 'plastic-green', grip: 'plastic-green', axle: 'steel', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
+  ], { body: 'plastic-green', lid: 'plastic-green', grip: 'plastic-green', axle: 'steel', wheel: 'rubber-black' }) + { title: 'Large trash can' } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A large round straw basket, 440 mm across the top and 400 mm tall: woven bands of two straw tones round a
   // tapered body with a thick rolled rim, and a looped handle on each side.
@@ -122,21 +122,21 @@ local collapsedDrum(length, width, thick, plate) =
       box('handle-%s-top' % s.id, 'rim', [s.x0, 0.45, -0.07], [s.x0 + 0.016, 0.47, 0.07]),
     ]
     for s in [{ id: 'left', x0: -0.222 }, { id: 'right', x0: 0.206 }]
-  ]), { straw: 'wax-cream', weave: 'wood-pine', rim: 'wood-pine' })
+  ]), { straw: 'wax-cream', weave: 'wood-pine', rim: 'wood-pine' }) + { title: 'Large wicker basket' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['plant'] } } },
 
   // A US-style 55 gallon collapsible water drum emptied and pressed flat, 1.1 m long over its towing rings, 500 mm
   // wide and 140 mm tall at the valve: a beige rubber body tapering into gathered collars round flat steel end
   // fittings, a water valve on one end, towing rings and side D-rings, and a dark stencilled panel on top.
   h.compound('collapsible_water_drum', 21, collapsedDrum(0.85, 0.5, 0.06, 0.11),
-             { rubber: 'polymer-fde', plate: 'steel-grey', valve: 'brass', ring: 'steel', stencil: 'paint-charcoal' })
+             { rubber: 'polymer-fde', plate: 'steel-grey', valve: 'brass', ring: 'steel', stencil: 'paint-charcoal' }) + { title: 'Collapsible water drum' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] }, keywords: ['camping'] } },
 
   // A 500 gallon collapsible fuel drum emptied and pressed flat, 2.5 m long over its towing rings, 1.1 m wide and
   // 260 mm tall at the valve: a black rubber body tapering into gathered collars round flat steel end fittings, a
   // fuel valve on one end, towing rings and side D-rings, and a yellow stencilled panel on top.
   h.compound('collapsible_fuel_drum', 170, collapsedDrum(1.95, 1.1, 0.1, 0.24),
-             { rubber: 'rubber-black', plate: 'steel-grey', valve: 'steel', ring: 'steel', stencil: 'paint-crane-yellow' }) + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] } } },
+             { rubber: 'rubber-black', plate: 'steel-grey', valve: 'steel', ring: 'steel', stencil: 'paint-crane-yellow' }) + { title: 'Collapsible fuel drum' } + { taxonomy: { category: 'containers', tags: { material: ['rubber', 'metal'], setting: ['modern'], state: ['empty', 'folded'] } } },
 
   // A rugged plastic lab box, 220 mm long, 170 mm deep and 180 mm tall: a grey case under a ribbed lid held by
   // two yellow snap latches at the front and one at each end, with hinges at the back and a folding handle on top.
@@ -157,7 +157,7 @@ local collapsedDrum(length, width, thick, plate) =
   ] + [
     box('latch-%s' % s.id, 'latch', [s.x0, 0.1, -0.018], [s.x0 + 0.01, 0.155, 0.018])
     for s in [{ id: 'left', x0: -0.115 }, { id: 'right', x0: 0.105 }]
-  ], { shell: 'plastic-grey', trim: 'plastic-black', latch: 'plastic-yellow' })
+  ], { shell: 'plastic-grey', trim: 'plastic-black', latch: 'plastic-yellow' }) + { title: 'Small plastic case' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A zipped garment bag lying flat, 1.3 m long with its hanger hook, 600 mm wide and 70 mm thick: a navy bag
@@ -174,6 +174,6 @@ local collapsedDrum(length, width, thick, plate) =
     box('hook-top', 'hook', [0.64, 0.02, -0.005], [0.7, 0.03, 0.005]),
     box('hook-side', 'hook', [0.69, 0.02, -0.005], [0.7, 0.03, 0.05]),
     box('hook-tip', 'hook', [0.665, 0.02, 0.04], [0.69, 0.03, 0.05]),
-  ], { bag: 'cloth-navy', zip: 'plastic-black', hook: 'steel', pocket: 'plastic-clear' })
+  ], { bag: 'cloth-navy', zip: 'plastic-black', hook: 'steel', pocket: 'plastic-clear' }) + { title: 'Garment bag' }
   + { voxelGrain: 0.006 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] }, keywords: ['luggage'] } },
 ]

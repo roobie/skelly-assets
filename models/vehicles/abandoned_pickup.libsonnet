@@ -86,7 +86,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
                box('dash_top', 'dark', [s.cowl - 0.14, 1.08, -s.side + 0.08], [s.cowl, s.waist, s.side - 0.08]),
                w.bar('column', 'steel', [s.cowl - 0.14, 1.06], [s.cowl - 0.45, 1.2], 0.05, [-0.39, -0.33]),
              ],
-             finish),
+             finish) + { title: 'Abandoned pickup cab' },
   // Propped wide open on its stay, the empty bay plain beneath it.
   k.compound('abandoned_pickup_bonnet', 20,
              w.plate('skin', 'x', [-s.hoodHalf + 0.02, s.hoodHalf - 0.02], [hood(s.aPost), hood(s.aPost) + s.hingeRise],
@@ -97,7 +97,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
              + [
                w.bar('stay', 'steel', [s.nose - 0.05, hood(s.nose)], [s.aPost + 0.32, hood(s.aPost) + 0.47], 0.03, [0.42, 0.45]),
              ],
-             finish),
+             finish) + { title: 'Abandoned pickup bonnet' },
   k.compound('abandoned_pickup_door', 26,
              w.plate('skin', 'z', [s.doorRear, s.cowl], [s.sill + 0.03, s.waist],
                    function(x, y) -s.side + 0.0625 - 0.02,
@@ -109,7 +109,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
                box('top_frame', 'rust', [s.doorRear + s.cabLean, s.roof - 0.08, -s.glassOut], [s.cowl - s.aLean, s.roof - 0.04, -s.glassOut + 0.05]),
                box('rear_frame', 'rust', [s.doorRear + 0.04, s.waist, -s.glassOut], [s.doorRear + 0.09, s.roof - 0.04, -s.glassOut + 0.05]),
              ],
-             finish),
+             finish) + { title: 'Abandoned pickup door' },
   k.compound('abandoned_pickup_bed', 170,
              w.plate('near', 'z', [s.rear, s.cabBack], [s.railTop, s.bedTop],
                    function(x, y) s.side,
@@ -144,7 +144,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
                box('front_wall', 'rust', [s.cabBack - 0.05, s.bedFloor, -s.bedInner], [s.cabBack, s.bedTop, s.bedInner]),
                box('tail_sill', 'rust', [s.rear, s.bedFloor - 0.08, -s.bedInner], [s.rear + 0.05, s.bedFloor, s.bedInner]),
              ],
-             finish),
+             finish) + { title: 'Abandoned pickup bed' },
   k.compound('abandoned_pickup_frame', 170,
              k.bothSides([
                box('rail', 'rail', [s.rear + 0.18, s.railLow, s.railZ - 0.03], [s.nose - 0.08, s.railTop, s.railZ + 0.03]),
@@ -153,7 +153,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
                box('cross_' + i, 'rail', [s.rear + 0.3 + i * 1.05, s.railLow + 0.02, -s.railZ], [s.rear + 0.36 + i * 1.05, s.railTop - 0.02, s.railZ])
                for i in std.range(0, 4)
              ],
-             { rail: 'rust-red' }),
+             { rail: 'rust-red' }) + { title: 'Abandoned pickup frame' },
   // Bare axle: hubs without their wheels, leaf springs still up to the frame.
   k.compound('abandoned_pickup_axle', 62,
              k.bothSides([
@@ -166,14 +166,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
                box('tube', 'tube', [-0.05, -0.05, -0.66], [0.05, 0.05, 0.66]),
                k.turned('pumpkin', 'tube', 'x', k.disc(0.13, -0.1, 0.12)) + { sides: 16 },
              ],
-             { tube: 'iron-cast', drum: 'rust-red', dark: 'steel-spall-black' }),
+             { tube: 'iron-cast', drum: 'rust-red', dark: 'steel-spall-black' }) + { title: 'Abandoned pickup axle' },
   // Two courses of concrete block laid crosswise, the top one carrying the axle.
   k.compound('abandoned_pickup_block_stack', 24, [
     box('low', 'block', [-0.2, 0, -0.1], [0.2, 0.175, 0.1]),
     box('high', 'block', [-0.1, 0.175, -0.2], [0.1, 0.33, 0.2]),
     box('hole_a', 'hole', [-0.15, 0.17, -0.06], [-0.11, 0.1755, 0.06]),
     box('packer', 'wood', [-0.12, 0.33, -0.2], [0.12, s.stackTop, 0.2]),
-  ], { block: 'stone-grey', hole: 'steel-spall-black', wood: 'wood-oak' }),
+  ], { block: 'stone-grey', hole: 'steel-spall-black', wood: 'wood-oak' }) + { title: 'Abandoned pickup block stack' },
   // The cushions have rotted away, leaving the spring frame.
   k.compound('abandoned_pickup_bench_frame', 12,
              [
@@ -187,5 +187,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
              ]
              + [box('spring_' + i, 'spring', [-0.2 + i * 0.1, 0.23, -0.64], [-0.17 + i * 0.1, 0.26, 0.64]) for i in std.range(0, 3)]
              + [w.bar('back_spring_' + i, 'spring', [-0.3 - i * 0.03, 0.36 + i * 0.12], [-0.29 - i * 0.03, 0.39 + i * 0.12], 0.03, [-0.64, 0.64]) for i in std.range(0, 2)],
-             { frame: 'steel-parkerized', spring: 'rust-red' }),
+             { frame: 'steel-parkerized', spring: 'rust-red' }) + { title: 'Abandoned pickup bench frame' },
 ])

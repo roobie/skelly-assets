@@ -40,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
     box('crossmember', 'rust', [-2.4, 0.16, -0.5], [-2.3, 0.24, 0.5]),
   ] + k.bothSides([
     box('rail', 'rust', [-2.5, 0.16, 0.42], [2.4, 0.24, 0.5]),
-  ]), { rust: 'scrap-rusted', soot: 'steel-spall-black' }),
+  ]), { rust: 'scrap-rusted', soot: 'steel-spall-black' }) + { title: 'Burnt-out van chassis' },
   k.compound('burnt_out_van_shell', 640,
              wall('near', 1, 3, function(x, y) x > -1.04 && y > s.floor && y < edge(x) - 0.18)
              + wall('far', -1, 11, function(x, y) false)
@@ -69,50 +69,50 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
                box('lamp_socket', 'soot', [2.48, 0.46, 0.5], [2.54, 0.76, 0.9]),
                box('rear_post', 'rust', [s.rear, 0.44, 0.86], [s.rear + 0.08, 1.82, s.skin]),
              ]),
-             finish),
+             finish) + { title: 'Burnt-out van shell' },
   k.compound('burnt_out_van_bonnet', 18,
              // Sprung off its catch: the hinge still holds at the cowl and the front edge has curled.
              w.surface('skin', [1.74, 1.95, 2.15, 2.35, 2.5, 2.62], w.grid(-0.86, 0.86, 10), function(x, z)
                local rise = w.lerpPoints([[1.74, 1.08], [2.35, 1.42], [2.5, 1.46], [2.62, 1.38]], x);
                rise - (if z > 0.3 then 0.1 * (z - 0.3) * (x - 1.74) else 0), 0.05, function(x, z) burn(0.7 + 0.8 * (w.panelNoise(51, x, z) - 0.5))),
-             finish),
+             finish) + { title: 'Burnt-out van bonnet' },
   k.compound('burnt_out_van_cab_door_hanging', 28,
              // Hangs from its top hinge, swung wide; the free corner has dropped to the road.
              w.swung('panel', [1.0, 1.3], [1.92, 0.5], 0.05, function(t) 0.3 * (1 - t) + 0.0, function(t) 1.02 - 0.3 * t, doorRow)
              + w.swung('top_rail', [1.0, 1.3], [1.92, 0.5], 0.05, function(t) 1.62 - 0.32 * t, function(t) 1.7 - 0.32 * t, function(t, y) 'soot')
              + w.swung('rear_bar', [1.84, 0.57], [1.92, 0.5], 0.05, function(t) 0.72, function(t) 1.38, function(t, y) 'soot', 1),
-             finish),
+             finish) + { title: 'Burnt-out van cab door (hanging)' },
   k.compound('burnt_out_van_cab_door', 30,
              w.columnSheet('panel', 'z', [0.1, 1.3], w.constant(s.floor), w.constant(s.waist), w.constant([-s.side, -s.skin]), mottle(61))
              + w.columnSheet('rear_bar', 'z', [0.1, 0.2], w.constant(s.waist), function(x) edge(x) - 0.14, w.constant([-s.side, -s.skin]), mottle(63)),
-             finish),
+             finish) + { title: 'Burnt-out van cab door' },
   k.compound('burnt_out_van_sliding_door', 36,
              // Fell off its runner and lies propped on the sill, in the road beside the opening.
              w.surface('panel', w.grid(-1.3, -0.1, 8), [1.08, 1.32, 1.56, 1.8, 2.04, 2.28, 2.52], function(x, z) 0.3 - (z - 1.08) * 0.2 + 0.02 * (x + 0.7), 0.05, function(x, z) burn(0.5 + 1.0 * (w.panelNoise(71, x, z) - 0.5))),
-             finish),
+             finish) + { title: 'Burnt-out van sliding door' },
   k.compound('burnt_out_van_rear_door', 30,
              w.columnSheet('panel', 'x', [-0.84, 0], w.constant(0.44), function(z) roofY(s.rear, z) - 0.24, w.constant([s.rear, s.rear + 0.05]), mottle(81))
              + [
                box('skin_in', 'soot', [s.rear + 0.05, 0.44, -0.84], [s.rear + 0.07, 1.8, 0]),
              ],
-             finish),
+             finish) + { title: 'Burnt-out van rear door' },
   k.compound('burnt_out_van_rear_door_hanging', 28,
              w.swung('panel', [0.86, s.rear], [1.56, s.rear - 0.56], 0.05, function(t) 0.44 * (1 - t), function(t) 1.8 - 0.36 * t, function(t, y) burn(0.5 + 0.8 * (w.panelNoise(83, t * 1.1, y) - 0.5))),
-             finish),
+             finish) + { title: 'Burnt-out van rear door (hanging)' },
   k.compound('burnt_out_van_bumper', 16, [
     k.xPrism('beam', 'rust', [[0, -0.95], [0.12, -0.95], [0.46, 0.95], [0.34, 0.95]], [2.62, 2.7]),
-  ], { rust: 'scrap-rusted' }),
+  ], { rust: 'scrap-rusted' }) + { title: 'Burnt-out van bumper' },
   k.compound('burnt_out_van_engine', 210, [
     box('block', 'soot', [1.78, 0.3, -0.26], [2.32, 0.8, 0.26]),
     box('head', 'rust', [1.82, 0.8, -0.2], [2.28, 0.92, 0.2]),
     box('manifold', 'rust', [1.86, 0.6, 0.26], [2.24, 0.72, 0.34]),
     box('gearbox', 'soot', [1.3, 0.3, -0.16], [1.78, 0.6, 0.16]),
-  ], { rust: 'scrap-rusted', soot: 'steel-spall-black' }),
+  ], { rust: 'scrap-rusted', soot: 'steel-spall-black' }) + { title: 'Burnt-out van engine' },
   k.compound('burnt_out_van_dash', 14, [
     box('beam', 'soot', [1.3, 0.76, -0.86], [1.42, 0.86, 0.86]),
     box('column', 'scorch', [1.0, 0.86, -0.54], [1.36, 0.92, -0.48]),
     k.turned('wheel_hoop', 'rust', 'x', k.annulus(0.15, 0.18, 0.98, 1.01), [0, 0.98, -0.51]) + { sides: 12 },
-  ], { rust: 'scrap-rusted', soot: 'steel-spall-black', scorch: 'plastic-scorched' }),
+  ], { rust: 'scrap-rusted', soot: 'steel-spall-black', scorch: 'plastic-scorched' }) + { title: 'Burnt-out van dash' },
   k.compound('burnt_out_van_seat_frame', 9, [
     box('rail', 'frame', [-0.22, 0, -0.2], [0.22, 0.04, -0.16]),
     box('rail_b', 'frame', [-0.22, 0, 0.16], [0.22, 0.04, 0.2]),
@@ -125,6 +125,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
     k.prism('back_a', 'frame', [[-0.24, 0.34], [-0.2, 0.34], [-0.34, 0.94], [-0.38, 0.94]], [-0.22, -0.18]),
     k.prism('back_b', 'frame', [[-0.24, 0.34], [-0.2, 0.34], [-0.34, 0.94], [-0.38, 0.94]], [0.18, 0.22]),
     box('back_top', 'frame', [-0.38, 0.94, -0.22], [-0.34, 0.98, 0.22]),
-  ], { frame: 'steel-spall-black', spring: 'scrap-rusted' }),
-  w.rim('burnt_out_van_rim', 16, s.rimRadius, 0.18),
+  ], { frame: 'steel-spall-black', spring: 'scrap-rusted' }) + { title: 'Burnt-out van seat frame' },
+  w.rim('burnt_out_van_rim', 16, s.rimRadius, 0.18) + { title: 'Burnt-out van rim' },
 ])

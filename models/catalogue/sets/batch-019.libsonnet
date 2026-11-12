@@ -72,7 +72,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     for i in std.range(0, 4)
   ] + [
     box('label', 'label', [-0.04, 0.012, -0.08], [0.04, 0.0135, -0.03]),
-  ], { cover: 'cloth-black', label: 'paper-white' })
+  ], { cover: 'cloth-black', label: 'paper-white' }) + { title: 'Ceramic armour' }
   + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic', 'fabric'], setting: ['modern'] } } },
 
   // About 2.4 m of 8 mm steel chain with 40 mm round links, laid flat in four runs joined at the turns.
@@ -82,7 +82,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
                edgeRing('turn-ab', 'link', 'x', linkR0, linkR1, linkT, 0.286, linkY, -0.052),
                edgeRing('turn-bc', 'link', 'x', linkR0, linkR1, linkT, -0.286, linkY, 0),
                edgeRing('turn-cd', 'link', 'x', linkR0, linkR1, linkT, 0.286, linkY, 0.052),
-             ], { link: 'steel-grey' })
+             ], { link: 'steel-grey' }) + { title: 'Chain' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A gold chalice 120 mm tall with an 80 mm cup on a knopped stem and a 70 mm foot.
@@ -92,7 +92,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
       [0.044, 0.012], [0.048, 0.006], [0.056, 0.006], [0.062, 0.016], [0.072, 0.030], [0.090, 0.038], [0.120, 0.040],
       [0.120, 0.037], [0.090, 0.035], [0.074, 0.027], [0.066, 0.012], [0.064, 0],
     ]),
-  ], { gold: 'metal-gold' })
+  ], { gold: 'metal-gold' }) + { title: 'Chalice' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'] } } },
 
   // A handful of six chamomile flowers, heads 20 mm across on stems 30 to 50 mm long.
@@ -103,21 +103,21 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     flower(3, 0.002, -0.004, 0.035),
     flower(4, 0.040, -0.016, 0.060),
     flower(5, 0.024, 0.032, 0.050),
-  ]), { stem: 'plant-dried', petal: 'cloth-white', eye: 'plastic-yellow' })
+  ]), { stem: 'plant-dried', petal: 'cloth-white', eye: 'plastic-yellow' }) + { title: 'Chamomile' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // An 8 inch (204 mm) circular saw blade, 2 mm plate with a 16 mm arbor hole and 24 hooked teeth.
   h.compound('circular_saw_blade', 0.44, [
     washer('plate', 'plate', 0.008, 0.092, 0.002, 0, 0, 0),
     washer('collar', 'collar', 0.008, 0.025, 0.002, 0, 0.002, 0),
-  ] + [tooth(i, 24) for i in std.range(0, 23)], { plate: 'steel-stainless', collar: 'steel-blued', tooth: 'steel-grey' })
+  ] + [tooth(i, 24) for i in std.range(0, 23)], { plate: 'steel-stainless', collar: 'steel-blued', tooth: 'steel-grey' }) + { title: 'Circular saw blade' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
   // A lump of fresh potter's clay about 90 by 70 mm and 45 mm high, squashed where it was set down.
   h.compound('clay_lump', 0.34, [
     turned('mass', 'clay', 'y', [[0, 0], [0, 0.030], [0.008, 0.036], [0.025, 0.035], [0.038, 0.026], [0.045, 0]], [-0.006, 0, 0]),
     turned('bulge', 'clay', 'y', [[0, 0], [0, 0.022], [0.010, 0.026], [0.022, 0.022], [0.030, 0]], [0.018, 0, 0.010]),
     turned('pinch', 'clay', 'y', [[0, 0], [0, 0.016], [0.010, 0.017], [0.020, 0]], [-0.022, 0.018, -0.012]),
-  ], { clay: 'clay-terracotta' })
+  ], { clay: 'clay-terracotta' }) + { title: 'Clay lump' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['ceramic'] } } },
 
   // A terracotta flower pot 155 mm tall and 176 mm across its rolled rim, with a 120 mm base.
@@ -125,7 +125,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     turned('pot', 'clay', 'y', [
       [0, 0], [0, 0.060], [0.125, 0.080], [0.125, 0.088], [0.155, 0.088], [0.155, 0.078], [0.012, 0.052], [0.012, 0],
     ]),
-  ], { clay: 'clay-terracotta' })
+  ], { clay: 'clay-terracotta' }) + { title: 'Clay flower pot' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['ceramic'] }, keywords: ['gardening'] } },
 
   // A wind-up twin-bell alarm clock 110 mm across and 150 mm tall on two feet, its hands stopped at ten past ten.
@@ -144,7 +144,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     box('key', 'bell', [-0.012, cy - 0.014, -0.034], [0.012, cy + 0.014, -0.024]),
     turned('foot-left', 'bell', 'y', [[0, 0.004], [0, 0.009], [0.008, 0.005], [0.024, 0.004], [0.024, 0]], [-0.034, 0, 0]),
     turned('foot-right', 'bell', 'y', [[0, 0.004], [0, 0.009], [0.008, 0.005], [0.024, 0.004], [0.024, 0]], [0.034, 0, 0]),
-  ], { case: 'paint-red', bezel: 'steel-stainless', face: 'paper-white', hand: 'plastic-black', bell: 'steel-stainless' })
+  ], { case: 'paint-red', bezel: 'steel-stainless', face: 'paper-white', hand: 'plastic-black', bell: 'steel-stainless' }) + { title: 'Clock' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A handful of clock parts about 60 mm across: three brass gears, a steel pinion and a balance wheel on their arbors.
@@ -158,7 +158,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     disc('arbor-mid', 'steel', 0.002, 0, 0.010, 0.022, 0.018),
     disc('arbor-small', 'steel', 0.002, 0, 0.008, 0.020, -0.024),
     disc('arbor-balance', 'steel', 0.002, 0, 0.008, -0.026, 0.022),
-  ], { brass: 'brass', steel: 'steel-grey' })
+  ], { brass: 'brass', steel: 'steel-grey' }) + { title: 'Clockworks' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
   // A small kraft paper sack of dry concrete mix, 80 by 50 mm and 96 mm tall, its top rolled down into a roll across
@@ -168,7 +168,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     h.prism('shoulder', 'paper', 'x', [[0.070, -0.025], [0.070, 0.025], [0.080, 0.010], [0.080, -0.010]], -0.040, 0.040),
     turned('roll', 'roll', 'x', [[0, 0], [0, 0.010], [0.082, 0.010], [0.082, 0]], [-0.041, 0.086, 0]),
     box('band', 'print', [-0.0405, 0.028, -0.0255], [0.0405, 0.048, 0.0255]),
-  ], { paper: 'cardboard-corrugated', roll: 'paperboard-tan', print: 'paint-red' })
+  ], { paper: 'cardboard-corrugated', roll: 'paperboard-tan', print: 'paint-red' }) + { title: 'Concrete' }
   + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'] } } },
   // A refrigeration condensing unit on a 400 by 260 mm base: a domed compressor, a fan in its shroud and a finned
   // coil with copper tubes, about 300 mm tall. The two copper lines rise from the compressor and pass over the fan.
@@ -194,7 +194,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   ] + [
     turned('pass-%d' % i, 'tube', 'z', [[0, 0], [0, 0.005], [0.264, 0.005], [0.264, 0]], [0.168 + (i % 2) * 0.020, 0.040 + i * 0.040, -0.132])
     for i in std.range(0, 5)
-  ], { base: 'steel-galvanised', compressor: 'paint-charcoal', cover: 'plastic-black', tube: 'copper', blade: 'plastic-black', fins: 'alu-bare' })
+  ], { base: 'steel-galvanised', compressor: 'paint-charcoal', cover: 'plastic-black', tube: 'copper', blade: 'plastic-black', fins: 'alu-bare' }) + { title: 'Condensing unit' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], setting: ['modern'] } } },
 
   // A cottonwood seed tuft, a loose white puff about 80 mm across with its small brown seed showing.
@@ -205,7 +205,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     ball('puff-c', 'fluff', 0.013, 0.004, 0.013, 0.024),
     ball('puff-d', 'fluff', 0.012, 0.010, 0.036, -0.012),
     ball('seed', 'seed', 0.005, -0.012, 0.030, 0.018),
-  ], { fluff: 'cloth-white', seed: 'bark' })
+  ], { fluff: 'cloth-white', seed: 'bark' }) + { title: 'Cottonwood fluff' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'] } } },
 
   // A home-made heating element: 4 mm steel wire wound into a 34 mm coil 200 mm long, with straight leads at both
@@ -219,7 +219,7 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     h.rod('lead-b', 'wire', 0.002, 0.094, 0.140, 0.004),
     edgeRing('eye-a', 'wire', 'z', 0.003, 0.006, 0.004, -0.146, 0.006, 0),
     edgeRing('eye-b', 'wire', 'z', 0.003, 0.006, 0.004, 0.146, 0.006, 0),
-  ], { wire: 'steel-grey' })
+  ], { wire: 'steel-grey' }) + { title: 'Crude heating element' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['improvised'] } },
 
   // A small mechanical delay fuze 46 mm long: a threaded steel nose, an olive plastic body with a striker lever along
@@ -230,13 +230,13 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
     box('lever', 'steel', [-0.010, 0.012, -0.003], [0.012, 0.016, 0.003]),
     box('pin', 'steel', [0.004, 0.004, 0.006], [0.006, 0.010, 0.012]),
     edgeRing('ring', 'steel', 'x', 0.004, 0.007, 0.002, 0.005, 0.007, 0.019),
-  ], { steel: 'steel-grey', body: 'polymer-od-green' })
+  ], { steel: 'steel-grey', body: 'polymer-od-green' }) + { title: 'Delay fuze' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['metal', 'plastic'], setting: ['modern'], weapon: ['explosive'] } } },
 
   // A round brilliant diamond 10 mm across, about 3.7 carats, standing on its point: the smallest stone that still
   // reads as a diamond at the 2 mm grain.
   h.compound('diamond', 0.00074, [
     turned('stone', 'stone', 'y', [[0, 0], [0.0043, 0.005], [0.0047, 0.005], [0.0065, 0.0028], [0.0065, 0]]),
-  ], { stone: 'gem-clear' })
+  ], { stone: 'gem-clear' }) + { title: 'Diamond' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['stone'] } } },
 ]

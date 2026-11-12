@@ -9,7 +9,9 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local carShape = import 'car-shape.libsonnet';
-local pressings(id, s) = {
+local pressings(id, title, s) = {
+  // A compound row of this car, titled with the car's title and the part's `label`.
+  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
   local shape = carShape(s),
   local lean = shape.tumble,
   local grain = shape.grain,
@@ -75,7 +77,7 @@ local pressings(id, s) = {
   // The rear arch's forward corner rides on the rear door wherever the door reaches over the arch.
   local hasDoorCorner = !twoDoor && s.rearDoor < s.rearDoorArch,
   local rows = [
-    k.compound(id + '_shell', s.shellMass, [
+    part('_shell', 'shell', s.shellMass, [
       box('floor_pan', 'pan', [s.rearFloorFront, 0.2 + lift, -s.skin], [s.cowl, s.floor, s.skin]),
       box('carpet', 'carpet', [s.rearFloorFront, s.floor, -s.skin + 0.04], [s.cowl, s.floor + 0.01, s.skin - 0.04]),
       box('tunnel', 'carpet', [s.rearFloorFront + 0.35, s.floor, -0.12], [s.cowl, 0.45 + lift, 0.12]),
@@ -142,7 +144,7 @@ local pressings(id, s) = {
       + shape.side('d_pillar', 'paint', [[s.tailWaist, s.waist], [s.tailWaist + 0.08, s.waist], [s.tailWaist + 0.08 + s.dLean, s.roof], [s.tailWaist + s.dLean, s.roof]], [s.hatchSide, s.glassOut])
     )), { pan: 'paint-charcoal', paint: s.paint, carpet: 'plastic-black', headliner: 'cloth-rag', trim: 'plastic-black', glass: sideGlass } + (if stripe == null then {} else { stripe: stripe }) + (if roofPaint == null then {} else { roof_paint: roofPaint })),
     // Side doors hinge on their leading edge, with the handle near the trailing one.
-    local door(suffix, massKg, lower, glass) = k.compound(id + suffix, massKg, lower + [
+    local door(suffix, label, massKg, lower, glass) = part(suffix, label, massKg, lower + [
       box('trim', 'trim', [glass[0][0] + 0.02, s.floor + 0.02, s.skin - 0.03], [glass[1][0] - 0.02, s.waist - 0.02, s.skin]),
     ] + shape.side('glass', 'glass', glass, paneZ) + [
       box('handle', 'trim', [glass[0][0] + 0.08, s.waist - 0.11, s.side - 0.01], [glass[0][0] + 0.2, s.waist - 0.08, s.side + 0.002]),
@@ -150,12 +152,12 @@ local pressings(id, s) = {
       hinge_a: ['skin', [1, 0.2, 1]],
       hinge_b: ['skin', [1, 0.8, 1]],
     });
-    door('_front_door', if twoDoor then 34 else 25, [
+    door('_front_door', 'front door', if twoDoor then 34 else 25, [
       box('skin', 'paint', [s.bFront, s.floor, s.skin], [s.cowl, s.waist, s.side]),
     ], [[s.bFront, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [s.bFront, windowTop]]),
-    k.compound(id + '_windscreen', 12, [
+    part('_windscreen', 'windscreen', 12, [
     ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - s.aLean, s.roof], [s.cowl - s.aLean, s.roof]], s.glassIn - 0.02), { glass: 'glass-clear' }),
-    k.compound(id + '_bonnet', 13, [
+    part('_bonnet', 'bonnet', 13, [
       prism('skin', 'paint', [[s.aPost, hood(s.aPost) - bonnetThick], [nose, hood(nose) - bonnetThick], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-s.skin, s.skin]),
     ] + (if std.get(s, 'scoop', false) then [
       prism('scoop', 'paint', [[s.frontAxle - 0.45, hood(s.frontAxle - 0.45)], [s.frontAxle + 0.1, hood(s.frontAxle + 0.1)], [s.frontAxle + 0.1, hood(s.frontAxle + 0.1) + 0.08], [s.frontAxle - 0.45, hood(s.frontAxle - 0.45) + 0.05]], [-0.3, 0.3]),
@@ -164,14 +166,14 @@ local pressings(id, s) = {
       prism('stripe', 'stripe', [[s.aPost, hood(s.aPost) - 0.005], [nose, hood(nose) - 0.005], [nose, hood(nose) + 0.012], [s.aPost, hood(s.aPost) + 0.012]], [0.09, 0.27]),
       prism('stripe_far', 'stripe', [[s.aPost, hood(s.aPost) - 0.005], [nose, hood(nose) - 0.005], [nose, hood(nose) + 0.012], [s.aPost, hood(s.aPost) + 0.012]], [-0.27, -0.09]),
     ]), { paint: s.paint } + (if std.get(s, 'scoop', false) then { trim: 'plastic-black' } else {}) + (if stripe == null then {} else { stripe: stripe })),
-    k.compound(id + '_front_wing', 4, [
+    part('_front_wing', 'front wing', 4, [
       box('rear', 'paint', [s.aPost, s.sill, s.skin], [s.frontAxle - s.arch, hood(s.frontAxle - s.arch), s.side]),
       prism('arch', 'paint', [[s.frontAxle - s.arch, s.archTop], [s.frontAxle + s.arch, s.archTop], [s.frontAxle + s.arch, hood(s.frontAxle + s.arch)], [s.frontAxle - s.arch, hood(s.frontAxle - s.arch)]], [s.skin, s.side]),
       prism('nose', 'paint', [[s.frontAxle + s.arch, 0.35 + lift], [nose, 0.35 + lift], [nose, hood(nose)], [s.frontAxle + s.arch, hood(s.frontAxle + s.arch)]], [s.skin, s.side]),
       shape.aftCorner('corner_aft', 'paint', s.frontAxle, [s.skin, s.side]),
       shape.foreCorner('corner_fore', 'paint', s.frontAxle, [s.skin, s.side]),
     ], { paint: s.paint }),
-    k.compound(id + '_front_bumper', 7, [
+    part('_front_bumper', 'front bumper', 7, [
       box('bar', bumperSlot, [nose - 0.05, bumperLow, -barHalf], [s.front, bumperTop, barHalf]),
     ] + (if blankNose then [
       box('closing', 'paint', [nose - 0.02, grilleLow, -grille], [nose + 0.03, grilleTop, grille]),
@@ -191,21 +193,21 @@ local pressings(id, s) = {
       box('intake', 'trim', [s.front, bumperLow + 0.04, -grille], [s.front + 0.01, bumperLow + 0.14, grille]),
     ]), bumperFinish + (if accent == null then {} else { accent: accent })),
   ] + (if cab then [] else [
-    k.compound(id + '_rear_bumper', 6, [
+    part('_rear_bumper', 'rear bumper', 6, [
       box('bar', bumperSlot, [s.rear - std.get(s, 'rearBarProud', 0), bumperLow, -barHalf], [s.rear + 0.13, bumperTop, barHalf]),
     ], bumperFinish),
-    k.compound(id + '_tail_lamp', 1, [
+    part('_tail_lamp', 'tail lamp', 1, [
       box('lens', 'lens', [s.rear + 0.04, 0.62 + lift, s.hatchSide], [s.rear + 0.11, s.lampTop, s.skin + 0.04]),
     ], { lens: 'plastic-red' }),
   ]) + [
-    k.compound(id + '_dashboard', 15, [
+    part('_dashboard', 'dashboard', 15, [
       box('lower', 'trim', [s.cowl - 0.15, 0.45 + lift, -s.skin + 0.06], [s.cowl, s.waist - 0.17, s.skin - 0.06]),
       box('top', 'trim', [s.cowl - 0.32, s.waist - 0.17, -s.skin + 0.06], [s.cowl, s.waist - 0.05, s.skin - 0.06]),
       box('console', 'trim', [s.cowl - 0.6, s.floor, -0.1], [s.cowl - 0.15, 0.55 + lift, 0.1]),
       box('column', 'trim', [s.cowl - 0.37, s.waist - 0.23, -0.41], [s.cowl - 0.15, s.waist - 0.15, -0.33]),
     ], { trim: 'plastic-black' }),
   ] + (if twoDoor then [] else [
-    k.compound(id + '_rear_door', 21, [
+    part('_rear_door', 'rear door', 21, [
       box('skin', 'paint', [s.rearDoorArch, s.floor, s.skin], [rearDoorFront, s.waist, s.side]),
     ] + (if hasDoorCorner then [
       box('skin_arch', 'paint', [s.rearDoor, s.archTop, s.skin], [s.rearDoorArch, s.waist, s.side]),
@@ -217,13 +219,13 @@ local pressings(id, s) = {
     ], doorFinish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
   ]) + (if cab then [] else if boot then [
     // The lid lifts about its leading edge.
-    k.compound(id + '_boot_lid', 12, [
+    part('_boot_lid', 'boot lid', 12, [
       box('skin', 'paint', [s.rear + 0.04, s.deck - 0.02, -s.glassIn], [s.deckFront, s.deck + 0.02, s.glassIn]),
       box('tail', 'paint', [s.rear + 0.02, 0.62 + lift, -s.hatchSide], [s.rear + 0.06, s.deck - 0.02, s.hatchSide]),
     ] + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), { hinge_a: ['skin', [1, 1, 1]], hinge_b: ['skin', [1, 1, 0]] }),
   ] else [
     // The whole rear opening, glass and all, lifts as one about the roof's rear edge.
-    k.compound(id + '_tailgate', 18, [
+    part('_tailgate', 'tailgate', 18, [
       box('skin', 'paint', [s.rear + 0.05, 0.62 + lift, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),
     ] + shape.across('glass', 'glass', [[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + s.dLean, s.roof], [s.tailWaist - 0.01 + s.dLean, s.roof]], s.hatchSide - 0.02), paint, { hinge_a: [shape.top('glass'), [1, 1, 1]], hinge_b: [shape.top('glass'), [1, 1, 0]] }),
@@ -232,6 +234,7 @@ local pressings(id, s) = {
 }.pressings;
 // `pressings` are every panel the spec presses; `rows` leave out those the car borrows.
 {
-  pressings: pressings,
-  rows(id, s): k.unborrowed(id, s, pressings(id, s)),
+  // Fittings read only a pressing's geometry and paint, so these carry no title.
+  pressings(id, s): pressings(id, '', s),
+  rows(id, title, s): k.unborrowed(id, s, pressings(id, title, s)),
 }

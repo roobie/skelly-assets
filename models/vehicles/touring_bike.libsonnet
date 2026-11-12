@@ -32,7 +32,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('pivot_plate', 'frame', [-0.42, 0.28, 0.1], [-0.26, 0.5, 0.14]),
     box('sub_rail', 'frame', [-1.0, 0.66, 0.07], [-0.28, 0.72, 0.1]),
     k.bar('sub_stay', 'frame', [-0.34, 0.46], [-0.8, 0.68], 0.05, [0.07, 0.1]),
-  ]), { frame: 'paint-charcoal' }),
+  ]), { frame: 'paint-charcoal' }) + { title: 'Touring bike frame' },
   k.compound('touring_bike_fork', 14, [
     box('top_yoke', 'alloy', [forkX(1.06) - 0.06, 1.05, -0.105], [forkX(1.06) + 0.06, 1.08, 0.105]),
     box('lower_yoke', 'alloy', [forkX(0.9) - 0.06, 0.88, -0.105], [forkX(0.9) + 0.06, 0.91, 0.105]),
@@ -40,7 +40,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   ] + bothSides([
     k.bar('stanchion', 'chrome', [forkX(0.5), 0.5], [forkX(1.08), 1.08], 0.055, [0.075, 0.105]),
     k.bar('slider', 'alloy', [forkX(s.hub), s.hub], [forkX(0.6), 0.6], 0.08, [0.075, 0.105]),
-  ]), { alloy: 'alu-bare', chrome: 'steel-bright' }),
+  ]), { alloy: 'alu-bare', chrome: 'steel-bright' }) + { title: 'Touring bike fork' },
   // Shaft drive: the final-drive case on the far side stands in for a chain.
   k.compound('touring_bike_swingarm', 11, [
     box('pivot_tube', 'frame', [-0.4, 0.33, -0.085], [-0.3, 0.42, 0.085]),
@@ -48,16 +48,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     k.turned('final_drive', 'alloy', 'z', k.disc(0.09, -0.13, -0.075), [s.rearAxle, s.hub, 0]) + { sides: 12 },
   ] + bothSides([
     k.bar('arm', 'frame', [s.rearAxle, s.hub], [-0.35, 0.375], 0.07, [0.075, 0.105]),
-  ]), { frame: 'paint-charcoal', alloy: 'alu-bare' }),
+  ]), { frame: 'paint-charcoal', alloy: 'alu-bare' }) + { title: 'Touring bike swingarm' },
   k.compound('touring_bike_shock', 3, [
     k.bar('rod', 'chrome', [-0.38, 0.4], [-0.29, 0.66], 0.05, [-0.03, 0.03]),
-  ], { chrome: 'steel-bright' }),
+  ], { chrome: 'steel-bright' }) + { title: 'Touring bike shock' },
   k.compound('touring_bike_wheel', 14, [
     k.turned('tyre', 'tyre', 'z', [[-0.065, 0.235], [-0.065, 0.28], [-0.05, s.tyre], [0.05, s.tyre], [0.065, 0.28], [0.065, 0.235], [-0.065, 0.235]]) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.annulus(0.205, 0.235, -0.05, 0.05)) + { sides: 24 },
     k.turned('web', 'web', 'z', k.disc(0.21, -0.016, 0.016)) + { sides: 24 },
     k.turned('hub', 'hub', 'z', k.disc(0.07, -0.06, 0.06)) + { sides: 12 },
-  ] + spokes, { tyre: 'rubber-black', rim: 'alu-bare', web: 'plastic-black', spoke: 'alu-bare', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] }),
+  ] + spokes, { tyre: 'rubber-black', rim: 'alu-bare', web: 'plastic-black', spoke: 'alu-bare', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] }) + { title: 'Touring bike wheel' },
   k.compound('touring_bike_engine', 105, [
     box('crankcase', 'casing', [-0.24, 0.24, -0.19], [0.3, 0.5, 0.19]),
     box('gearbox', 'casing', [-0.24, 0.5, -0.12], [-0.06, 0.62, 0.12]),
@@ -65,7 +65,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     prism('head', 'casing', [[0.008, 0.66], [0.348, 0.66], [0.366, 0.72], [0.026, 0.72]], [-0.15, 0.15]),
     k.turned('near_cover', 'alloy', 'z', k.disc(0.12, 0.19, 0.225), [-0.02, 0.37, 0]) + { sides: 16 },
     k.turned('far_cover', 'alloy', 'z', k.disc(0.12, -0.225, -0.19), [-0.02, 0.37, 0]) + { sides: 16 },
-  ] + [fin(i) for i in std.range(0, 4)], { casing: 'steel-grey', alloy: 'alu-bare', dark: 'paint-charcoal' }),
+  ] + [fin(i) for i in std.range(0, 4)], { casing: 'steel-grey', alloy: 'alu-bare', dark: 'paint-charcoal' }) + { title: 'Touring bike engine' },
   k.compound('touring_bike_exhaust', 7, [
     box('header', 'chrome', [0.3, 0.2, 0.08], [0.36, 0.56, 0.16]),
     box('run', 'chrome', [-0.36, 0.17, 0.08], [0.36, 0.23, 0.18]),
@@ -73,41 +73,41 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     k.turned('silencer', 'chrome', 'x', k.disc(0.065, -1.0, -0.52), [0, 0.28, 0.24]) + { sides: 12 },
     k.turned('tip', 'dark', 'x', k.disc(0.03, -1.03, -1.0), [0, 0.28, 0.24]),
     box('bracket', 'frame', [-0.59, 0.33, 0.1], [-0.56, 0.6, 0.19]),
-  ], { chrome: 'steel-bright', dark: 'plastic-black', frame: 'paint-charcoal' }),
+  ], { chrome: 'steel-bright', dark: 'plastic-black', frame: 'paint-charcoal' }) + { title: 'Touring bike exhaust' },
   k.compound('touring_bike_centre_stand', 4, [
     box('cross', 'frame', [-0.3, 0.03, -0.19], [-0.24, 0.06, 0.19]),
   ] + bothSides([
     box('leg', 'frame', [-0.3, 0.03, 0.19], [-0.24, 0.34, 0.22]),
     box('foot', 'frame', [-0.34, 0, 0.16], [-0.2, 0.03, 0.25]),
-  ]), { frame: 'paint-charcoal' }),
+  ]), { frame: 'paint-charcoal' }) + { title: 'Touring bike centre stand' },
   k.compound('touring_bike_footrest', 0.5, [
     box('bar', 'frame', [-0.28, 0.34, 0.19], [-0.2, 0.38, 0.26]),
     box('rubber', 'rubber', [-0.28, 0.34, 0.26], [-0.2, 0.38, 0.34]),
-  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }),
+  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }) + { title: 'Touring bike footrest' },
   k.compound('touring_bike_pillion_footrest', 0.5, [
     box('hanger', 'frame', [-0.46, 0.4, 0.1], [-0.42, 0.52, 0.14]),
     box('bar', 'frame', [-0.5, 0.38, 0.1], [-0.42, 0.42, 0.2]),
     box('rubber', 'rubber', [-0.5, 0.38, 0.2], [-0.42, 0.42, 0.27]),
-  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }),
-  k.compound('touring_bike_front_mudguard', 2, k.arc('guard', 'paint', s.frontAxle, s.hub, 0.33, 0.36, 30, 125, 7, [-0.075, 0.075]), { paint: s.paint }),
-  k.compound('touring_bike_rear_mudguard', 1.5, k.arc('guard', 'paint', s.rearAxle, s.hub, 0.33, 0.36, 40, 170, 8, [-0.075, 0.075]), { paint: s.paint }),
+  ], { frame: 'paint-charcoal', rubber: 'rubber-black' }) + { title: 'Touring bike pillion footrest' },
+  k.compound('touring_bike_front_mudguard', 2, k.arc('guard', 'paint', s.frontAxle, s.hub, 0.33, 0.36, 30, 125, 7, [-0.075, 0.075]), { paint: s.paint }) + { title: 'Touring bike front mudguard' },
+  k.compound('touring_bike_rear_mudguard', 1.5, k.arc('guard', 'paint', s.rearAxle, s.hub, 0.33, 0.36, 40, 170, 8, [-0.075, 0.075]), { paint: s.paint }) + { title: 'Touring bike rear mudguard' },
   k.compound('touring_bike_tail_lamp', 0.3, [
     box('stay', 'stay', [-1.03, 0.64, -0.03], [-1.0, 0.68, 0.03]),
     box('lens', 'lens', [-1.06, 0.6, -0.1], [-1.03, 0.68, 0.1]),
-  ], { stay: 'paint-charcoal', lens: 'plastic-red' }),
+  ], { stay: 'paint-charcoal', lens: 'plastic-red' }) + { title: 'Touring bike tail lamp' },
   k.compound('touring_bike_tank', 8, [
     prism('tank', 'paint', [[-0.06, 0.72], [0.25, 0.78], [0.38, 0.88], [0.4, 0.98], [0.34, 1.03], [0.06, 0.98], [-0.06, 0.86]], [-0.2, 0.2]),
     box('cap', 'chrome', [0.12, 0.99, -0.04], [0.2, 1.02, 0.04]),
-  ], { paint: s.paint, chrome: 'steel-bright' }),
+  ], { paint: s.paint, chrome: 'steel-bright' }) + { title: 'Touring bike tank' },
   // The rider sits in a dip and the pillion on a raised step, both above the pannier lids.
   k.compound('touring_bike_seat', 6, [
     box('pan', 'pan', [-0.95, 0.72, -0.15], [-0.06, 0.74, 0.15]),
     prism('rider', 'saddle', [[-0.62, 0.74], [-0.06, 0.74], [-0.06, 0.8], [-0.1, 0.82], [-0.62, 0.81]], [-0.17, 0.17]),
     prism('pillion', 'saddle', [[-0.95, 0.74], [-0.62, 0.74], [-0.62, 0.89], [-0.91, 0.9], [-0.95, 0.86]], [-0.16, 0.16]),
-  ], { saddle: 'vinyl-black', pan: 'plastic-black' }),
+  ], { saddle: 'vinyl-black', pan: 'plastic-black' }) + { title: 'Touring bike seat' },
   k.compound('touring_bike_side_cover', 0.5, [
     prism('cover', 'paint', [[-0.4, 0.6], [-0.26, 0.5], [-0.08, 0.5], [-0.08, 0.72], [-0.4, 0.72]], [0.1, 0.18]),
-  ], { paint: s.paint }),
+  ], { paint: s.paint }) + { title: 'Touring bike side cover' },
   // Frame-mounted, so the bars and fork turn inside it; the slot between the cheeks leaves the headlamp showing.
   k.compound('touring_bike_fairing', 18, [
     prism('nose', 'paint', [[0.49, 0.96], [0.725, 0.96], [0.72, 1.0], [0.6, 1.14], [0.51, 1.12]], [-0.11, 0.11]),
@@ -116,44 +116,44 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     prism('cheek', 'paint', [[0.42, 0.6], [0.64, 0.66], [0.74, 0.82], [0.72, 1.0], [0.6, 1.14], [0.51, 1.12]], [0.11, 0.33]),
     box('indicator', 'lamp', [0.68, 0.86, 0.33], [0.74, 0.92, 0.36]),
     box('mirror', 'dash', [0.5, 1.06, 0.33], [0.56, 1.16, 0.42]),
-  ]), { paint: s.paint, dash: 'plastic-black', lamp: 'plastic-orange' }),
+  ]), { paint: s.paint, dash: 'plastic-black', lamp: 'plastic-orange' }) + { title: 'Touring bike fairing' },
   k.compound('touring_bike_headlamp', 1.5, [
     box('housing', 'dark', [0.56, 0.8, -0.11], [0.74, 0.96, 0.11]),
     box('lens', 'lens', [0.74, 0.82, -0.09], [0.755, 0.93, 0.09]),
-  ], { dark: 'plastic-black', lens: 'plastic-frosted' }),
+  ], { dark: 'plastic-black', lens: 'plastic-frosted' }) + { title: 'Touring bike headlamp' },
   k.compound('touring_bike_windscreen', 2, [
     prism('screen', 'glass', [[0.6, 1.14], [0.64, 1.14], [0.48, 1.4], [0.44, 1.4]], [-0.24, 0.24]),
-  ], { glass: 'glass-clear' }),
+  ], { glass: 'glass-clear' }) + { title: 'Touring bike windscreen' },
   k.compound('touring_bike_handlebar', 3, [
     box('riser', 'alloy', [0.34, 1.08, -0.06], [0.42, 1.12, 0.06]),
     box('bar', 'chrome', [0.3, 1.12, -0.24], [0.36, 1.15, 0.24]),
   ] + bothSides([
     box('grip', 'rubber', [0.24, 1.12, 0.22], [0.3, 1.15, 0.36]),
-  ]), { alloy: 'alu-bare', chrome: 'steel-bright', rubber: 'rubber-black' }),
+  ]), { alloy: 'alu-bare', chrome: 'steel-bright', rubber: 'rubber-black' }) + { title: 'Touring bike handlebar' },
   k.compound('touring_bike_lower_fairing', 3, [
     prism('panel', 'paint', [[0.16, 0.46], [0.4, 0.46], [0.42, 0.6], [0.42, 0.7], [0.16, 0.76]], [0.21, 0.27]),
     box('standoff', 'dark', [0.2, 0.5, 0.17], [0.3, 0.6, 0.21]),
-  ], { paint: s.paint, dark: 'plastic-black' }),
+  ], { paint: s.paint, dark: 'plastic-black' }) + { title: 'Touring bike lower fairing' },
   // Lids stop below both saddles and the boxes start behind the rider, so the seat stays clear between them.
   k.compound('touring_bike_pannier', 8, [
     prism('body', 'paint', [[-1.06, 0.42], [-1.02, 0.38], [-0.64, 0.38], [-0.6, 0.42], [-0.6, 0.66], [-1.06, 0.66]], [0.17, 0.4]),
     box('lid', 'lid', [-1.07, 0.66, 0.165], [-0.59, 0.72, 0.405]),
     box('latch', 'chrome', [-0.86, 0.63, 0.4], [-0.8, 0.69, 0.415]),
-  ], { paint: s.paint, lid: 'paint-charcoal', chrome: 'steel-bright' }),
+  ], { paint: s.paint, lid: 'paint-charcoal', chrome: 'steel-bright' }) + { title: 'Touring bike pannier' },
   k.compound('touring_bike_pannier_rack', 2, [
     box('rear_stay', 'frame', [-0.98, 0.46, 0.1], [-0.92, 0.69, 0.17]),
     box('front_stay', 'frame', [-0.66, 0.46, 0.1], [-0.6, 0.69, 0.17]),
     box('rail', 'frame', [-1.02, 0.6, 0.1], [-0.6, 0.63, 0.13]),
-  ], { frame: 'paint-charcoal' }),
+  ], { frame: 'paint-charcoal' }) + { title: 'Touring bike pannier rack' },
   k.compound('touring_bike_top_box', 6, [
     prism('body', 'paint', [[-1.28, 0.89], [-1.24, 0.85], [-0.98, 0.85], [-0.98, 1.08], [-1.28, 1.08]], [-0.19, 0.19]),
     box('lid', 'lid', [-1.29, 1.08, -0.195], [-0.97, 1.14, 0.195]),
     box('reflector', 'lamp', [-1.29, 0.93, -0.12], [-1.28, 0.98, 0.12]),
-  ], { paint: s.paint, lid: 'paint-charcoal', lamp: 'plastic-red' }),
+  ], { paint: s.paint, lid: 'paint-charcoal', lamp: 'plastic-red' }) + { title: 'Touring bike top box' },
   k.compound('touring_bike_top_rack', 1.5, [
     box('plate', 'frame', [-1.24, 0.82, -0.16], [-0.96, 0.85, 0.16]),
   ] + bothSides([
     box('post', 'frame', [-1.0, 0.72, 0.06], [-0.96, 0.82, 0.094]),
     k.bar('brace', 'frame', [-1.0, 0.7], [-1.16, 0.83], 0.03, [0.06, 0.094]),
-  ]), { frame: 'paint-charcoal' }),
+  ]), { frame: 'paint-charcoal' }) + { title: 'Touring bike top rack' },
 ])

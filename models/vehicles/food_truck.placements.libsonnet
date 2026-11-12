@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local van = import 'van-body.libsonnet';
 local s = import 'food_truck.spec.libsonnet';
 {
+  title: 'Food truck',
   sites: van.fittings(site.kit, 'food_truck', s) + [
     site.one('counter', 'food_truck_counter'),
     site.one('awning', 'food_truck_awning'),

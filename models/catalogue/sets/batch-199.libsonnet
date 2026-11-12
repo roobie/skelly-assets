@@ -205,51 +205,51 @@ local scaleSuitFinish = suitFinish { hide: 'leather-charcoal' };
 [
   // The oversized pair of batch 198's dragonscale gauntlets, 360 mm from cuff to fingertip, laid flat side by side,
   // backs up: hide gloves scaled over the backs and fingers, with wide flared cuffs.
-  h.compound('oversized_dragonscale_gauntlets', 0.63, scaled(g.glovePair(scaleGlove, 0.085), 1.2), scaleGloveFinish)
+  h.compound('oversized_dragonscale_gauntlets', 0.63, scaled(g.glovePair(scaleGlove, 0.085), 1.2), scaleGloveFinish) + { title: 'Oversized dragonscale gauntlets' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['hands'] } } },
 
   // A pair of black dragonhide gloves laid flat side by side, backs up, 250 mm from cuff to fingertip, with a
   // red-brown knuckle strip and a bone-buttoned wrist strap.
-  h.compound('dragonhide_gloves', 0.27, hideGloves, hideGloveFinish)
+  h.compound('dragonhide_gloves', 0.27, hideGloves, hideGloveFinish) + { title: 'Dragonhide gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['hands'] } } },
 
   // The oversized dragonhide gloves, 300 mm from cuff to fingertip.
-  h.compound('oversized_dragonhide_gloves', 0.46, scaled(hideGloves, 1.2), hideGloveFinish)
+  h.compound('oversized_dragonhide_gloves', 0.46, scaled(hideGloves, 1.2), hideGloveFinish) + { title: 'Oversized dragonhide gloves' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['hands'] } } },
 
   // An open-faced black dragonhide helmet 270 mm tall and 200 mm across the skull, standing upright.
-  h.compound('dragonhide_helmet', 0.92, hideHelmet, hideHelmetFinish)
+  h.compound('dragonhide_helmet', 0.92, hideHelmet, hideHelmetFinish) + { title: 'Dragonhide helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A closed black dragonscale helmet 300 mm tall to its crest and 240 mm across the visor, its visor down.
-  h.compound('dragonscale_helmet', 1.4, scaleHelmet(false), scaleHelmetFinish)
+  h.compound('dragonscale_helmet', 1.4, scaleHelmet(false), scaleHelmetFinish) + { title: 'Dragonscale helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // The same helmet with its visor swung up over the brow, 300 mm tall.
-  h.compound('dragonscale_helmet_visor_up', 1.6, scaleHelmet(true), scaleHelmetFinish)
+  h.compound('dragonscale_helmet_visor_up', 1.6, scaleHelmet(true), scaleHelmetFinish) + { title: 'Dragonscale helmet, visor up' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // The oversized dragonhide helmet, 320 mm tall and 240 mm across the skull.
-  h.compound('oversized_dragonhide_helmet', 1.6, scaled(hideHelmet, 1.2), hideHelmetFinish)
+  h.compound('oversized_dragonhide_helmet', 1.6, scaled(hideHelmet, 1.2), hideHelmetFinish) + { title: 'Oversized dragonhide helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // The oversized dragonscale helmet, 365 mm tall to its crest, visor down.
-  h.compound('oversized_dragonscale_helmet', 2.4, scaled(scaleHelmet(false), 1.2), scaleHelmetFinish)
+  h.compound('oversized_dragonscale_helmet', 2.4, scaled(scaleHelmet(false), 1.2), scaleHelmetFinish) + { title: 'Oversized dragonscale helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // The oversized dragonscale helmet with its visor raised.
-  h.compound('oversized_dragonscale_helmet_visor_up', 1.8, scaled(scaleHelmet(true), 1.2), scaleHelmetFinish)
+  h.compound('oversized_dragonscale_helmet_visor_up', 1.8, scaled(scaleHelmet(true), 1.2), scaleHelmetFinish) + { title: 'Oversized dragonscale helmet with visor raised' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['head'] } } },
 
   // A one-piece black dragonhide suit laid out flat, 1390 mm from collar to ankle and 1020 mm across the sleeves.
-  h.compound('dragonhide_suit', 4.5, suit(false), suitFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
+  h.compound('dragonhide_suit', 4.5, suit(false), suitFinish) + { title: 'Dragonhide suit' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The black dragonscale suit laid out flat, the same cut covered in rows of overlapping scales.
-  h.compound('dragonscale_suit', 6, suit(true), scaleSuitFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
+  h.compound('dragonscale_suit', 6, suit(true), scaleSuitFinish) + { title: 'Dragonscale suit' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The oversized dragonhide suit, 1670 mm from collar to ankle.
-  h.compound('oversized_dragonhide_suit', 6, scaled(suit(false), 1.2), suitFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
+  h.compound('oversized_dragonhide_suit', 6, scaled(suit(false), 1.2), suitFinish) + { title: 'Oversized dragonhide suit' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The oversized dragonscale suit, 1670 mm from collar to ankle.
-  h.compound('oversized_dragonscale_suit', 8, scaled(suit(true), 1.2), scaleSuitFinish) + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
+  h.compound('oversized_dragonscale_suit', 8, scaled(suit(true), 1.2), scaleSuitFinish) + { title: 'Oversized dragonscale suit' } + { taxonomy: { category: 'armour', tags: { material: ['leather'], setting: ['fantasy'], slot: ['torso', 'arms', 'legs'] } } },
 ]

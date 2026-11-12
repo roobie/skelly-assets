@@ -86,7 +86,7 @@ local shell = compound('hatchback_shell', 520, [
   box('boot_side', 'trim', [hb.tailWaist, 0.48, 0.7], [-1.0, hb.waist, hb.skin]),
   prism('c_pillar', 'paint', [[hb.tailWaist, hb.waist], [hb.cWaist, hb.waist], [hb.cWaist + hb.cLean, hb.roof], [hb.tailWaist + hb.dLean, hb.roof]], [hb.glassIn, hb.glassOut]),
   prism('d_pillar', 'paint', [[hb.tailWaist, hb.waist], [hb.tailWaist + 0.08, hb.waist], [hb.tailWaist + 0.08 + hb.dLean, hb.roof], [hb.tailWaist + hb.dLean, hb.roof]], [hb.hatchSide, hb.glassIn]),
-]), { pan: 'paint-charcoal', paint: 'paint-oxblood', carpet: 'plastic-black', headliner: 'cloth-rag', trim: 'plastic-black' });
+]), { pan: 'paint-charcoal', paint: 'paint-oxblood', carpet: 'plastic-black', headliner: 'cloth-rag', trim: 'plastic-black' }) + { title: 'Hatchback shell' };
 
 // Side doors hinge on their leading edge, the handle near the trailing one; the far doors are the near
 // ones reflected. `glass` runs from the trailing edge at the waist, counterclockwise.
@@ -100,11 +100,11 @@ local door(id, massKg, lower, glass) = compound(id, massKg, lower + [
 });
 local frontDoor = door('hatchback_front_door', 24, [
   box('skin', 'paint', [hb.bFront, hb.floor, hb.skin], [hb.cowl, hb.waist, hb.side]),
-], [[hb.bFront, hb.waist], [hb.cowl, hb.waist], [hb.cowl - (doorWindowTop - hb.waist) * hb.aLean / (hb.roof - hb.waist), doorWindowTop], [hb.bFront, doorWindowTop]]);
+], [[hb.bFront, hb.waist], [hb.cowl, hb.waist], [hb.cowl - (doorWindowTop - hb.waist) * hb.aLean / (hb.roof - hb.waist), doorWindowTop], [hb.bFront, doorWindowTop]]) + { title: 'Hatchback front door' };
 local rearDoor = door('hatchback_rear_door', 20, [
   box('skin', 'paint', [hb.rearDoorArch, hb.floor, hb.skin], [hb.bRear, hb.waist, hb.side]),
   box('skin_arch', 'paint', [hb.rearDoor, hb.archTop, hb.skin], [hb.rearDoorArch, hb.waist, hb.side]),
-], [[hb.cWaist, hb.waist], [hb.bRear, hb.waist], [hb.bRear, doorWindowTop], [hb.cWaist + (doorWindowTop - hb.waist) * hb.cLean / (hb.roof - hb.waist), doorWindowTop]]);
+], [[hb.cWaist, hb.waist], [hb.bRear, hb.waist], [hb.bRear, doorWindowTop], [hb.cWaist + (doorWindowTop - hb.waist) * hb.cLean / (hb.roof - hb.waist), doorWindowTop]]) + { title: 'Hatchback rear door' };
 
 // The whole rear opening, glass and all, lifts as one about the roof's rear edge.
 local tailgate = compound('hatchback_tailgate', 16, [
@@ -114,42 +114,42 @@ local tailgate = compound('hatchback_tailgate', 16, [
 ], paintFinish, {
   hinge_a: ['glass', [1, 1, 1]],
   hinge_b: ['glass', [1, 1, 0]],
-});
+}) + { title: 'Hatchback tailgate' };
 
 local windscreen = compound('hatchback_windscreen', 11, [
   prism('glass', 'glass', [[hb.cowl, hb.waist], [hb.cowl + 0.06, hb.waist], [hb.cowl + 0.06 - hb.aLean, hb.roof], [hb.cowl - hb.aLean, hb.roof]], [-(hb.glassIn - 0.02), hb.glassIn - 0.02]),
-], { glass: 'glass-clear' });
+], { glass: 'glass-clear' }) + { title: 'Hatchback windscreen' };
 local bonnet = compound('hatchback_bonnet', 12, [
   prism('skin', 'paint', [[hb.aPost, hb.hood(hb.aPost) - 0.02], [2.0, hb.hood(2.0) - 0.02], [2.0, hb.hood(2.0)], [hb.aPost, hb.hood(hb.aPost)]], [-0.76, 0.76]),
-], { paint: 'paint-oxblood' });
+], { paint: 'paint-oxblood' }) + { title: 'Hatchback bonnet' };
 local frontWing = compound('hatchback_front_wing', 4, [
   box('rear', 'paint', [hb.aPost, hb.floor, hb.skin], [hb.frontAxle - hb.arch, hb.hood(hb.frontAxle - hb.arch), hb.side]),
   prism('arch', 'paint', [[hb.frontAxle - hb.arch, hb.archTop], [hb.frontAxle + hb.arch, hb.archTop], [hb.frontAxle + hb.arch, hb.hood(hb.frontAxle + hb.arch)], [hb.frontAxle - hb.arch, hb.hood(hb.frontAxle - hb.arch)]], [hb.skin, hb.side]),
   prism('nose', 'paint', [[hb.frontAxle + hb.arch, 0.35], [2.0, 0.35], [2.0, hb.hood(2.0)], [hb.frontAxle + hb.arch, hb.hood(hb.frontAxle + hb.arch)]], [hb.skin, hb.side]),
-], { paint: 'paint-oxblood' });
+], { paint: 'paint-oxblood' }) + { title: 'Hatchback front wing' };
 local bumper(id, massKg, x, extra) = compound(id, massKg, [box('bar', 'paint', [x[0], 0.25, -(hb.side - 0.03)], [x[1], 0.55, hb.side - 0.03])] + extra, paintFinish);
 local frontBumper = bumper('hatchback_front_bumper', 6, [1.95, hb.front], [
   box('grille', 'trim', [1.98, 0.58, -0.4], [2.03, 0.78, 0.4]),
   box('intake', 'trim', [hb.front, 0.3, -0.4], [hb.front + 0.01, 0.42, 0.4]),
-]);
-local rearBumper = bumper('hatchback_rear_bumper', 5, [hb.rear, -1.95], []);
+]) + { title: 'Hatchback front bumper' };
+local rearBumper = bumper('hatchback_rear_bumper', 5, [hb.rear, -1.95], []) + { title: 'Hatchback rear bumper' };
 local tailLamp = compound('hatchback_tail_lamp', 1, [
   box('lens', 'lens', [-2.03, 0.62, hb.hatchSide], [-1.96, 0.88, 0.84]),
-], { lens: 'plastic-red' });
+], { lens: 'plastic-red' }) + { title: 'Hatchback tail lamp' };
 
 // Running gear: MacPherson struts in front, a twist beam behind.
 local frontStrut = compound('hatchback_front_strut', 14, [
   box('lower_arm', 'steel', [1.1, 0.2, 0.35], [1.4, 0.26, 0.6]),
   box('knuckle', 'steel', [1.19, 0.26, 0.6], [1.29, 0.38, 0.645]),
   turned('damper', 'spring', 'y', disc(0.035, 0, 0.47), [hb.frontAxle, 0.38, 0.62]),
-], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
+], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] }) + { title: 'Hatchback front strut' };
 local rearAxle = compound('hatchback_rear_axle', 30, [
   box('beam', 'steel', [-1.1, 0.25, -0.56], [-1.02, 0.33, 0.56]),
 ] + bothSides([
   box('trailing_arm', 'steel', [-1.3, 0.27, 0.56], [-0.96, 0.34, 0.6]),
   box('stub', 'steel', [-1.31, 0.28, 0.6], [-1.23, 0.36, 0.645]),
   turned('spring_seat', 'spring', 'y', disc(0.045, 0, 0.04), [-1.22, 0.34, 0.5]),
-]), { steel: 'steel-grey', spring: 'paint-charcoal' });
+]), { steel: 'steel-grey', spring: 'paint-charcoal' }) + { title: 'Hatchback rear axle' };
 
 // The engine bay: a transverse four with its gearbox on the far side, the radiator ahead of it.
 local engine = compound('hatchback_engine', 140, [
@@ -158,21 +158,21 @@ local engine = compound('hatchback_engine', 140, [
   box('head', 'casting', [1.33, 0.72, -0.28], [1.6, 0.8, 0.23]),
   box('cam_cover', 'cover', [1.35, 0.8, -0.26], [1.55, 0.83, 0.21]),
   box('intake', 'casting', [1.24, 0.55, -0.25], [1.3, 0.75, 0.2]),
-], { casting: 'steel-grey', cover: 'paint-charcoal' });
+], { casting: 'steel-grey', cover: 'paint-charcoal' }) + { title: 'Hatchback engine' };
 local gearbox = compound('hatchback_gearbox', 35, [
   box('case', 'casting', [1.22, 0.33, -0.52], [1.5, 0.62, -0.3]),
-], { casting: 'steel-grey' });
+], { casting: 'steel-grey' }) + { title: 'Hatchback gearbox' };
 local radiator = compound('hatchback_radiator', 6, [
   box('core', 'core', [1.86, 0.38, -0.5], [1.92, 0.78, 0.5]),
-], { core: 'paint-charcoal' });
+], { core: 'paint-charcoal' }) + { title: 'Hatchback radiator' };
 local fuelTank = compound('hatchback_fuel_tank', 8, [
   box('tank', 'tank', [-0.92, 0.12, -0.65], [-0.5, 0.2, -0.15]),
-], { tank: 'polymer-black' });
+], { tank: 'polymer-black' }) + { title: 'Hatchback fuel tank' };
 local exhaust = compound('hatchback_exhaust', 12, [
   box('pipe', 'steel', [-1.4, 0.13, 0.05], [1.3, 0.18, 0.11]),
   box('silencer', 'steel', [-1.85, 0.16, -0.3], [-1.4, 0.32, 0.3]),
   box('tailpipe', 'steel', [-2.1, 0.2, 0.2], [-1.85, 0.25, 0.26]),
-], { steel: 'scrap-rusted' });
+], { steel: 'scrap-rusted' }) + { title: 'Hatchback exhaust' };
 
 // The cabin: the driver sits on the near side.
 local dashboard = compound('hatchback_dashboard', 14, [
@@ -180,12 +180,12 @@ local dashboard = compound('hatchback_dashboard', 14, [
   box('top', 'trim', [0.38, 0.8, -0.74], [hb.cowl, 0.92, 0.74]),
   box('console', 'trim', [0.1, hb.floor, -0.1], [0.55, 0.55, 0.1]),
   box('column', 'trim', [0.33, 0.74, 0.33], [0.55, 0.82, 0.41]),
-], { trim: 'plastic-black' });
+], { trim: 'plastic-black' }) + { title: 'Hatchback dashboard' };
 local rearSeat = compound('hatchback_rear_seat', 20, [
   box('base', 'frame', [-0.95, hb.floor, -0.68], [-0.55, 0.44, 0.68]),
   box('cushion', 'cloth', [-1.0, 0.44, -0.68], [-0.52, 0.55, 0.68]),
   prism('back', 'cloth', [[-1.05, 0.53], [-0.95, 0.53], [-1.12, 1.2], [-1.22, 1.2]], [-0.68, 0.68]),
-], { frame: 'steel-grey', cloth: 'cloth-seat' });
+], { frame: 'steel-grey', cloth: 'cloth-seat' }) + { title: 'Hatchback rear seat' };
 
 // Load bodies, authored where they sit on their host and fitted at its origin. Floor edges lie on the 0.1 m
 // inventory cell lattice, so cargo spaces can cover the whole floor.
@@ -193,29 +193,29 @@ local bed = { rear: -2.2, front: -0.1, side: 0.8, floor: 0.85, top: 1.22 };
 local bedFloor = compound('pickup_bed_floor', 45, [
   box('deck', 'deck', [bed.rear, bed.floor - 0.05, -bed.side], [bed.front, bed.floor, bed.side]),
   box('bearers', 'steel', [bed.rear, 0.55, -0.45], [bed.front, bed.floor - 0.05, 0.45]),
-], { deck: 'paint-charcoal', steel: 'steel-grey' });
+], { deck: 'paint-charcoal', steel: 'steel-grey' }) + { title: 'Pickup bed floor' };
 // A 4WD's wheel tub rises through the bed floor's edge, leaving the widest cargo space between the tubs.
 local bedSide = compound('pickup_bed_side', 24, [
   box('panel', 'paint', [bed.rear, 0.62, bed.side], [bed.front, bed.top, bed.side + 0.06]),
   box('wheel_tub', 'paint', [-1.7, 0.55, 0.6], [-0.7, bed.floor + 0.1, bed.side]),
-], { paint: 'paint-terracotta' });
+], { paint: 'paint-terracotta' }) + { title: 'Pickup bed side' };
 local bedFront = compound('pickup_bed_front', 10, [
   box('headboard', 'paint', [bed.front, bed.floor - 0.05, -bed.side - 0.06], [bed.front + 0.06, bed.top, bed.side + 0.06]),
-], { paint: 'paint-terracotta' });
+], { paint: 'paint-terracotta' }) + { title: 'Pickup bed front' };
 local van = { rear: -3.0, front: 1.2, side: 1.0, floor: 1.0, roof: 3.0, skin: 0.06 };
 local vanFloor = compound('box_van_floor', 180, [
   box('deck', 'deck', [van.rear, van.floor - 0.03, -van.side], [van.front, van.floor, van.side]),
   box('subframe', 'steel', [van.rear, 0.72, -0.45], [van.front, van.floor - 0.03, 0.45]),
-], { deck: 'paint-charcoal', steel: 'steel-grey' });
+], { deck: 'paint-charcoal', steel: 'steel-grey' }) + { title: 'Box van floor' };
 local vanSide = compound('box_van_side', 70, [
   box('panel', 'paint', [van.rear, van.floor - 0.1, van.side], [van.front, van.roof, van.side + van.skin]),
-], { paint: 'plastic-white' });
+], { paint: 'plastic-white' }) + { title: 'Box van side' };
 local vanFront = compound('box_van_front', 45, [
   box('panel', 'paint', [van.front, van.floor, -van.side - van.skin], [van.front + van.skin, van.roof, van.side + van.skin]),
-], { paint: 'plastic-white' });
+], { paint: 'plastic-white' }) + { title: 'Box van front' };
 local vanRoof = compound('box_van_roof', 40, [
   box('panel', 'paint', [van.rear, van.roof, -van.side - van.skin], [van.front + van.skin, van.roof + van.skin, van.side + van.skin]),
-], { paint: 'plastic-white' });
+], { paint: 'plastic-white' }) + { title: 'Box van roof' };
 
 // Parts real cars share: each has its own frame, about its mount or centre, so any host can place it.
 local frontSeat = compound('front_seat', 16, [
@@ -225,22 +225,22 @@ local frontSeat = compound('front_seat', 16, [
   box('headrest', 'cloth', [-0.45, 0.9, -0.13], [-0.35, 1.04, 0.13]),
   box('post_near', 'frame', [-0.42, 0.82, 0.05], [-0.38, 0.92, 0.09]),
   box('post_far', 'frame', [-0.42, 0.82, -0.09], [-0.38, 0.92, -0.05]),
-], { frame: 'steel-grey', cloth: 'cloth-seat' }, { hips: ['cushion', [0.4, 1, 0.5]] });
+], { frame: 'steel-grey', cloth: 'cloth-seat' }, { hips: ['cushion', [0.4, 1, 0.5]] }) + { title: 'Front seat' };
 local doorMirror = compound('door_mirror', 1, [
   box('arm', 'housing', [-0.03, 0.02, 0], [0.03, 0.06, 0.06]),
   box('housing', 'housing', [-0.04, 0, 0.06], [0.04, 0.12, 0.2]),
   box('glass', 'glass', [-0.05, 0.01, 0.07], [-0.04, 0.11, 0.19]),
-], { housing: 'polymer-black', glass: 'glass-grey' }, { mount: ['arm', [0.5, 0.5, 0]] });
+], { housing: 'polymer-black', glass: 'glass-grey' }, { mount: ['arm', [0.5, 0.5, 0]] }) + { title: 'Door mirror' };
 local steeringWheel = compound('steering_wheel', 2, [
   turned('rim', 'grip', 'x', annulus(0.17, 0.19, 0, 0.03)),
   turned('hub', 'hub', 'x', disc(0.06, 0, 0.05)),
   box('spoke', 'hub', [0.01, -0.17, -0.02], [0.03, 0, 0.02]),
-], { grip: 'polymer-black', hub: 'plastic-black' }, { column: ['hub', [1, 0.5, 0.5]] });
+], { grip: 'polymer-black', hub: 'plastic-black' }, { column: ['hub', [1, 0.5, 0.5]] }) + { title: 'Steering wheel' };
 local gearLever = compound('gear_lever', 1, [
   box('gaiter', 'gaiter', [-0.05, 0, -0.05], [0.05, 0.03, 0.05]),
   turned('stick', 'stick', 'y', disc(0.008, 0, 0.22)),
   turned('knob', 'knob', 'y', [[0, 0], [0, 0.02], [0.03, 0.025], [0.05, 0.015], [0.055, 0], [0, 0]], [0, 0.2, 0]),
-], { gaiter: 'rubber-black', stick: 'steel-grey', knob: 'polymer-black' });
+], { gaiter: 'rubber-black', stick: 'steel-grey', knob: 'polymer-black' }) + { title: 'Gear lever' };
 
 // The crane truck keeps the 1/32 m grid its look was approved on: pieces are grid points with the rear
 // underrun at x 0, the ground at y 0 and the centre plane at z 32; `ht.at` turns one into metres.
@@ -294,20 +294,20 @@ local hoistFinish = {
 };
 local hpart(id, massKg, pieces, anchors={}) = compound(id, massKg, pieces, hoistFinish, anchors);
 
-local hoistFrameRail = hpart('hoist_frame_rail', 110, [hbox('rail', 'chassis', [4, 13, 46], [188, 17, 50])]);
-local hoistCrossmember = hpart('hoist_crossmember', 15, [box('beam', 'chassis', [0, 0, 0], [4 / 32, 3 / 32, 28 / 32])]);
+local hoistFrameRail = hpart('hoist_frame_rail', 110, [hbox('rail', 'chassis', [4, 13, 46], [188, 17, 50])]) + { title: 'Hoist truck frame rail' };
+local hoistCrossmember = hpart('hoist_crossmember', 15, [box('beam', 'chassis', [0, 0, 0], [4 / 32, 3 / 32, 28 / 32])]) + { title: 'Hoist truck crossmember' };
 local hoistWheel = compound('hoist_wheel', 30, [
   turned('tyre', 'tyre', 'z', annulus(6.5 / 32, 12 / 32, -3.5 / 32, 3.5 / 32)),
   turned('rim', 'rim', 'z', disc(6.5 / 32, -3 / 32, 3 / 32)),
-], { tyre: 'rubber-black', rim: 'steel-grey' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
+], { tyre: 'rubber-black', rim: 'steel-grey' }, { hub: ['rim', [0.5, 0.5, 0.5]] }) + { title: 'Hoist truck wheel' };
 local hoistAxle(id, x) = hpart(id, 140, [
   hbox('beam', 'chassis', [x - 2, 10, 14], [x + 2, 13, 50]),
   hbox('diff', 'chassis', [x - 4, 6, 25], [x + 5, 13, 35]),
   hdisc('hub_near', 'hub', 'z', [x, 12, 0], 4.5, [50, 51]),
   hdisc('hub_far', 'hub', 'z', [x, 12, 0], 4.5, [13, 14]),
 ]);
-local hoistFrontAxle = hoistAxle('hoist_front_axle', 157);
-local hoistRearAxle = hoistAxle('hoist_rear_axle', 48);
+local hoistFrontAxle = hoistAxle('hoist_front_axle', 157) + { title: 'Hoist truck front axle' };
+local hoistRearAxle = hoistAxle('hoist_rear_axle', 48) + { title: 'Hoist truck rear axle' };
 // The alloy top is ringed by the block rather than sunk into it, so no two finishes share a face.
 local hoistEngine = hpart('hoist_engine', 280, [
   hbox('block', 'engine', [140, 17, 22], [168, 26, 42]),
@@ -320,19 +320,19 @@ local hoistEngine = hpart('hoist_engine', 280, [
   hbox('mount_far', 'chassis', [148, 15, 18], [152, 17, 22]),
   hbox('mount_near', 'chassis', [148, 15, 42], [152, 17, 46]),
   hdisc('fan', 'trim', 'x', [0, 23, 32], 5.5, [168, 170]),
-]);
+]) + { title: 'Hoist truck engine' };
 local hoistGearbox = hpart('hoist_gearbox', 70, [
   hbox('case', 'engine', [118, 17, 27], [140, 25, 37]),
   hbox('transfer', 'engine', [126, 12, 28], [136, 17, 36]),
-]);
-local hoistPropShaft = hpart('hoist_prop_shaft', 18, [htube('shaft', 'chassis', [53, 11], [118, 20], 3, [31, 34])]);
-local hoistFuelTank = hpart('hoist_fuel_tank', 55, [hbox('tank', 'tank', [70, 8, 4], [100, 17, 14])]);
+]) + { title: 'Hoist truck gearbox' };
+local hoistPropShaft = hpart('hoist_prop_shaft', 18, [htube('shaft', 'chassis', [53, 11], [118, 20], 3, [31, 34])]) + { title: 'Hoist truck prop shaft' };
+local hoistFuelTank = hpart('hoist_fuel_tank', 55, [hbox('tank', 'tank', [70, 8, 4], [100, 17, 14])]) + { title: 'Hoist truck fuel tank' };
 local hoistExhaust = hpart('hoist_exhaust', 18, [
   hdisc('pipe', 'engine', 'x', [0, 14, 52], 1.6, [104, 128]),
   hbox('silencer', 'engine', [84, 10, 50], [104, 16, 58]),
   hdisc('tailpipe', 'engine', 'x', [0, 12, 54], 1.6, [70, 84]),
-]);
-local hoistRadiator = hpart('hoist_radiator', 15, [hbox('core', 'radiator', [182, 16, 20], [186, 29, 44])]);
+]) + { title: 'Hoist truck exhaust' };
+local hoistRadiator = hpart('hoist_radiator', 15, [hbox('core', 'radiator', [182, 16, 20], [186, 29, 44])]) + { title: 'Hoist truck radiator' };
 
 // The cab tilts over the engine, so its floor carries the cab and sits on four mounts.
 local hoistCabFloor = hpart('hoist_cab_floor', 80, [
@@ -342,7 +342,7 @@ local hoistCabFloor = hpart('hoist_cab_floor', 80, [
   hbox('mount_' + x + '_' + z, 'chassis', [x, 17, z], [x + 4, 30, z + 4])
   for x in [134, 178]
   for z in [14, 46]
-]);
+]) + { title: 'Hoist truck cab floor' };
 // The step below the door follows the front wheel arch in strips, since a compound cannot cut a hole.
 local hoistCabSkirt = hpart('hoist_cab_skirt', 10, [
   hbox('rear', 'paint', [132, 18, 57], [143.5, 30, 61]),
@@ -352,7 +352,7 @@ local hoistCabSkirt = hpart('hoist_cab_skirt', 10, [
   local dx = std.max(0, std.max(x0 - 157, 157 - (x0 + 1.5)));
   hbox('strip_' + i, 'paint', [x0, std.max(18, 12 + std.sqrt(13.5 * 13.5 - dx * dx)), 57], [x0 + 1.5, 30, 61])
   for i in std.range(0, 17)
-] + harc('arch', 'trim', [157, 12], 13.5, 15.5, 0, pi, 8, [61, 62]));
+] + harc('arch', 'trim', [157, 12], 13.5, 15.5, 0, pi, 8, [61, 62])) + { title: 'Hoist truck cab skirt' };
 local hoistCabBack = hpart('hoist_cab_back', 35, [
   hbox('wall_low', 'paint', [132, 32, 3], [135, 48, 61]),
   hbox('wall_high', 'paint', [132, 58, 3], [135, 67, 61]),
@@ -361,20 +361,20 @@ local hoistCabBack = hpart('hoist_cab_back', 35, [
   hbox('glass', 'glass', [132, 48, 14], [135, 58, 50]),
   hbox('pillar_near', 'paint', [135, 32, 57], [138, 67, 61]),
   hbox('pillar_far', 'paint', [135, 32, 3], [138, 67, 7]),
-]);
+]) + { title: 'Hoist truck cab back' };
 local hoistFrontPanel = hpart('hoist_front_panel', 20, [
   hbox('face', 'paint', [185, 32, 7], [188, 46, 57]),
   hbox('corner_near', 'paint', [183, 32, 57], [188, 46, 61]),
   hbox('corner_far', 'paint', [183, 32, 3], [188, 46, 7]),
   hbox('grille', 'grille', [188, 34, 18], [188.5, 42, 46]),
   hbox('badge', 'badge', [188, 43, 28], [188.5, 45, 36]),
-]);
-local hoistAPost = hpart('hoist_a_post', 6, [hbox('post', 'paint', [183, 46, 57], [188, 67, 61])]);
-local hoistWindscreen = hpart('hoist_windscreen', 14, [hbox('glass', 'glass', [186, 46, 7], [187, 67, 57])]);
+]) + { title: 'Hoist truck front panel' };
+local hoistAPost = hpart('hoist_a_post', 6, [hbox('post', 'paint', [183, 46, 57], [188, 67, 61])]) + { title: 'Hoist truck A-post' };
+local hoistWindscreen = hpart('hoist_windscreen', 14, [hbox('glass', 'glass', [186, 46, 7], [187, 67, 57])]) + { title: 'Hoist truck windscreen' };
 local hoistRoof = hpart('hoist_roof', 30, [
   hprism('skin', 'paint', [[132, 67], [188, 67], [185, 70], [132, 70]], [3, 61]),
   hbox('headliner', 'headliner', [135, 66, 8], [183, 67, 56]),
-]);
+]) + { title: 'Hoist truck roof' };
 // The door hinges on its leading edge, against the A-post.
 local hoistDoor = hpart('hoist_door', 30, [
   hbox('skin', 'paint', [138, 32, 57], [183, 46, 61]),
@@ -388,31 +388,31 @@ local hoistDoor = hpart('hoist_door', 30, [
 ], {
   hinge_a: ['skin', [1, 0.2, 1]],
   hinge_b: ['skin', [1, 0.8, 1]],
-});
+}) + { title: 'Hoist truck door' };
 local hoistFrontBumper = hpart('hoist_front_bumper', 20, [
   hbox('bar', 'trim', [188, 18, 3], [191, 26, 61]),
   hbox('bracket_far', 'chassis', [188, 13, 14], [190, 18, 18]),
   hbox('bracket_near', 'chassis', [188, 13, 46], [190, 18, 50]),
   hbox('plate', 'plate', [191, 20, 26], [192, 24, 38]),
-]);
+]) + { title: 'Hoist truck front bumper' };
 local hoistDashboard = hpart('hoist_dashboard', 18, [
   hbox('lower', 'dash', [178, 32, 8], [185, 46, 56]),
   hbox('binnacle', 'dash', [178, 46, 43], [183, 53, 54]),
   hbox('dial', 'dial', [177.5, 49, 44], [178, 52, 53]),
-]);
-local hoistEngineCover = hpart('hoist_engine_cover', 12, [hbox('cover', 'trim', [150, 33, 24], [176, 40, 40])]);
+]) + { title: 'Hoist truck dashboard' };
+local hoistEngineCover = hpart('hoist_engine_cover', 12, [hbox('cover', 'trim', [150, 33, 24], [176, 40, 40])]) + { title: 'Hoist truck engine cover' };
 local hoistBench = hpart('hoist_bench', 30, [
   hbox('cushion', 'seat', [138, 33, 9], [150, 44, 55]),
   hbox('back', 'seat', [135, 44, 9], [138, 62, 55]),
-], { hips: ['cushion', [0.4, 1, 0.5]] });
+], { hips: ['cushion', [0.4, 1, 0.5]] }) + { title: 'Hoist truck bench' };
 
 local hoistDeckFloor = hpart('hoist_deck_floor', 120, [
   hbox('floor', 'load', [4, 28, 3], [110, 30, 61]),
   hbox('bearer_far', 'chassis', [4, 17, 14], [110, 28, 18]),
   hbox('bearer_near', 'chassis', [4, 17, 46], [110, 28, 50]),
-]);
-local hoistHeadboard = hpart('hoist_headboard', 15, [hbox('board', 'paint', [108, 30, 3], [110, 40, 61])]);
-local hoistMudguard = hpart('hoist_mudguard', 4, harc('guard', 'trim', [48, 12], 13.5, 16.5, std.asin(4 / 13.5), pi - std.asin(4 / 13.5), 8, [51, 59]));
+]) + { title: 'Hoist truck deck floor' };
+local hoistHeadboard = hpart('hoist_headboard', 15, [hbox('board', 'paint', [108, 30, 3], [110, 40, 61])]) + { title: 'Hoist truck headboard' };
+local hoistMudguard = hpart('hoist_mudguard', 4, harc('guard', 'trim', [48, 12], 13.5, 16.5, std.asin(4 / 13.5), pi - std.asin(4 / 13.5), 8, [51, 59])) + { title: 'Hoist truck mudguard' };
 local hoistRearUnderrun = hpart('hoist_rear_underrun', 20, [
   hbox('leg_far', 'chassis', [0, 12, 14], [4, 17, 18]),
   hbox('leg_near', 'chassis', [0, 12, 46], [4, 17, 50]),
@@ -420,22 +420,22 @@ local hoistRearUnderrun = hpart('hoist_rear_underrun', 20, [
   hbox('lamp_bracket_far', 'chassis', [0, 17, 6], [2, 18, 18]),
   hbox('lamp_bracket_near', 'chassis', [0, 17, 46], [2, 18, 58]),
   hbox('plate', 'plate', [0, 12, 26], [1, 16, 38]),
-]);
+]) + { title: 'Hoist truck rear underrun' };
 local hoistTailLamp = hpart('hoist_tail_lamp', 1, [
   hbox('indicator', 'amber', [0, 18, 50], [2, 20, 58]),
   hbox('lens', 'tail', [0, 20, 50], [2, 23, 58]),
-]);
+]) + { title: 'Hoist truck tail lamp' };
 
 local hoistCraneBase = hpart('hoist_crane_base', 180, [
   hbox('sill_far', 'crane', [112, 17, 14], [130, 26, 18]),
   hbox('sill_near', 'crane', [112, 17, 46], [130, 26, 50]),
   hbox('plate', 'crane', [112, 26, 14], [130, 30, 50]),
-]);
+]) + { title: 'Hoist truck crane base' };
 local hoistStabiliser = hpart('hoist_stabiliser', 45, [
   hbox('beam', 'crane', [116, 22, 50], [126, 26, 60]),
   hbox('leg', 'crane', [118, 12, 56], [124, 22, 60]),
   hbox('foot', 'trim', [116, 10, 55], [126, 12, 61]),
-]);
+]) + { title: 'Hoist truck stabiliser' };
 local hoistCraneColumn = hpart('hoist_crane_column', 140, [
   hdisc('slew_ring', 'chassis', 'y', [121, 0, 32], 7, [30, 34]),
   hbox('post', 'crane', [117, 34, 28], [125, 56, 36]),
@@ -443,20 +443,20 @@ local hoistCraneColumn = hpart('hoist_crane_column', 140, [
   hbox('cheek_near', 'crane', [116, 52, 36], [126, 64, 39]),
   hdisc('pin_far', 'chrome', 'z', [121, 60, 0], 2, [24, 25]),
   hdisc('pin_near', 'chrome', 'z', [121, 60, 0], 2, [39, 40]),
-]);
-local hoistBoom = hpart('hoist_boom', 90, [htube('boom', 'crane', [122, 60], [68, 52], 6, [28, 36])]);
-local hoistBoomExtension = hpart('hoist_boom_extension', 70, [htube('extension', 'crane', [75, 53], [14, 44], 4.5, [29, 35])]);
-local hoistLuffRam = hpart('hoist_luff_ram', 35, [htube('ram', 'chrome', [116.8, 40], [92, 50.5], 3, [30, 34])]);
+]) + { title: 'Hoist truck crane column' };
+local hoistBoom = hpart('hoist_boom', 90, [htube('boom', 'crane', [122, 60], [68, 52], 6, [28, 36])]) + { title: 'Hoist truck boom' };
+local hoistBoomExtension = hpart('hoist_boom_extension', 70, [htube('extension', 'crane', [75, 53], [14, 44], 4.5, [29, 35])]) + { title: 'Hoist truck boom extension' };
+local hoistLuffRam = hpart('hoist_luff_ram', 35, [htube('ram', 'chrome', [116.8, 40], [92, 50.5], 3, [30, 34])]) + { title: 'Hoist truck luffing ram' };
 local hoistWinch = hpart('hoist_winch', 45, [
   hdisc('drum', 'chassis', 'z', [128, 44, 0], 3.5, [27, 37]),
   hdisc('flange_far', 'crane', 'z', [128, 44, 0], 4.5, [26, 27]),
   hdisc('flange_near', 'crane', 'z', [128, 44, 0], 4.5, [37, 38]),
-]);
+]) + { title: 'Hoist truck winch' };
 local hoistHookBlock = hpart('hoist_hook_block', 15, [
   hbox('block', 'amber', [12, 37, 30], [18, 42, 34]),
   hbox('hook', 'chrome', [14, 34, 31], [16, 37, 33]),
-]);
-local hoistBoomRest = hpart('hoist_boom_rest', 8, [hbox('rest', 'crane', [22, 30, 29], [26, 42, 35])]);
+]) + { title: 'Hoist truck hook block' };
+local hoistBoomRest = hpart('hoist_boom_rest', 8, [hbox('rest', 'crane', [22, 30, 29], [26, 42, 35])]) + { title: 'Hoist truck boom rest' };
 
 local rows = [
   part('car_battery', 'carton', 14, {
@@ -466,17 +466,17 @@ local rows = [
     base: ['body', [0.5, 0, 0.5]],
     // Off the centre plane, so reflecting the battery moves its terminal to the other side.
     terminal_positive: ['lid', [0.8, 1, 0.2]],
-  }, exportMass='parts'),
+  }, exportMass='parts') + { title: 'Car battery' },
   part('car_headlamp', 'block', 1.2, { width: 0.08, height: 0.16, depth: 0.22 }, { body: 'glass-grey' }, {
     mount: ['body', [0, 0.5, 0.15]],
     beam: ['body', [1, 0.5, 0.5]],
-  }, exportMass='parts'),
-  tray('battery_tray', 1.5, 0.28, 0.02, 0.21, exportMass='parts'),
-  tray('pickup_battery_tray', 2.2, 0.32, 0.03, 0.24, exportMass='parts'),
+  }, exportMass='parts') + { title: 'Car headlamp' },
+  tray('battery_tray', 1.5, 0.28, 0.02, 0.21, exportMass='parts') + { title: 'Battery tray' },
+  tray('pickup_battery_tray', 2.2, 0.32, 0.03, 0.24, exportMass='parts') + { title: 'Pickup battery tray' },
   // One inventory cell; a fitting scales it to the cargo space's size. The space weighs next to nothing: its
   // load is its contents.
-  part('cargo_space', 'block', 0.2, { width: 0.1, height: 0.1, depth: 0.1 }, { body: 'plastic-green' }, {}, exportMass='parts'),
-  part('mounting_plate', 'block', 12, { width: 0.5, height: 0.006, depth: 0.5 }, { body: 'steel-grey' }, {}, exportMass='parts'),
+  part('cargo_space', 'block', 0.2, { width: 0.1, height: 0.1, depth: 0.1 }, { body: 'plastic-green' }, {}, exportMass='parts') + { title: 'Cargo space' },
+  part('mounting_plate', 'block', 12, { width: 0.5, height: 0.006, depth: 0.5 }, { body: 'steel-grey' }, {}, exportMass='parts') + { title: 'Mounting plate' },
   bedFloor,
   bedSide,
   bedFront,

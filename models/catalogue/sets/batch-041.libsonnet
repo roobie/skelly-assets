@@ -31,7 +31,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     slab('top', 'body', [[-0.022, -0.01], [0.004, -0.016], [0.014, -0.004], [0.01, 0.01], [-0.008, 0.014], [-0.022, 0.006]], 0.026, 0.032),
     // A dark seam where a mould edge left a ridge.
     slab('ridge', 'edge', [[-0.031, 0.008], [-0.027, 0.006], [-0.004, 0.023], [-0.007, 0.025]], 0.016, 0.019),
-  ], { body: 'resin-honey', edge: 'plastic-amber' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { body: 'resin-honey', edge: 'plastic-amber' }) + { title: 'Epoxy chunk' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A 40 mm filter port: a clear threaded housing 45 mm across the flange and 31 mm tall, with a steel retaining ring
   // round the spigot that meets the mask's valve. Front on +z is the same all round.
@@ -45,7 +45,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     h.turned('flange-grip', 'thread', 'y', [[0, 0.022], [0, 0.0228], [0.004, 0.0228], [0.004, 0.022], [0, 0.022]], [0, 0, 0]),
     // The open bore, painted flush because compound pieces only add.
     h.disc('bore', 'bore', 0.0085, 0.029, 0.031),
-  ], { body: 'plastic-clear', thread: 'plastic-frosted', ring: 'steel-grey', bore: 'paint-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-clear', thread: 'plastic-frosted', ring: 'steel-grey', bore: 'paint-charcoal' }) + { title: '40 mm filter port' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A gas mask's inhalation valve, 35 mm across and 13 mm tall: a black plastic seat with a snap spigot under it and a
   // thin amber rubber flap held down by a centre pin.
@@ -56,7 +56,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     box('spoke-z', 'seat', [-0.0015, 0, -0.014], [0.0015, 0.003, 0.014]),
     h.disc('flap', 'flap', 0.0135, 0.003, 0.005),
     h.disc('pin', 'seat', 0.0035, 0.005, 0.008),
-  ], { seat: 'plastic-matte-black', flap: 'rubber-gum' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
+  ], { seat: 'plastic-matte-black', flap: 'rubber-gum' }) + { title: 'Inhalation valve' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'rubber'], setting: ['modern'] } } },
 
   // A 152 mm square of stretch fabric lying loose, rippled where it was cut from a garment.
   sheetRow('stretch_fabric_patch', 0.0047, 0.152, 0.152, [
@@ -65,7 +65,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     [0.001, 0.007, 0.012, 0.006, 0.001],
     [0.003, 0.002, 0.006, 0.001, 0.004],
     [0.001, 0.004, 0.001, 0.003, 0.001],
-  ], 0.002, { body: 'lycra-blue', fold: 'lycra-blue' }, 0.002) + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], 0.002, { body: 'lycra-blue', fold: 'lycra-blue' }, 0.002) + { title: 'Stretch fabric patch' } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A 152 mm square of woven synthetic fabric with one corner curled up.
   sheetRow('nylon', 0.0023, 0.152, 0.152, [
@@ -73,7 +73,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     [0.002, 0.004, 0.003, 0.002],
     [0.001, 0.003, 0.006, 0.008],
     [0.002, 0.002, 0.01, 0.026],
-  ], 0.002, { body: 'nylon-red', fold: 'nylon-red' }, 0.002) + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], 0.002, { body: 'nylon-red', fold: 'nylon-red' }, 0.002) + { title: 'Nylon' } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A panoramic lens: a polycarbonate strip 170 mm long round its curve, 64 mm tall and 3 mm thick, bowed to wrap a
   // face and standing on its lower edge, convex side to the front, with a dark mounting tab at each end.
@@ -81,7 +81,7 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     local s = std.sin(48 * std.pi / 180), c = std.cos(48 * std.pi / 180);
     box('tab-%s' % side[0], 'mount', [side[1] * 0.1 * s - 0.003, 0.024, -0.1 + 0.1 * c - 0.006], [side[1] * 0.1 * s + 0.003, 0.04, -0.1 + 0.1 * c + 0.002])
     for side in [['left', -1], ['right', 1]]
-  ], { lens: 'plastic-clear', mount: 'paint-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  ], { lens: 'plastic-clear', mount: 'paint-charcoal' }) + { title: 'Panoramic eyepiece' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A grey fragment of a moulded crate wall 75 by 55 mm: a 6 mm plate snapped along two edges, with a stiffening rib
   // and the stub of the corner wall still on it.
@@ -92,14 +92,14 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     slab('wall-break', 'body', [[0.02, -0.0275], [0.03, -0.0275], [0.03, -0.021], [0.02, -0.021]], 0, 0.014),
     box('rib', 'rib', [-0.004, 0.006, -0.021], [0.0, 0.016, 0.022]),
     box('rib-cross', 'rib', [-0.0375, 0.006, 0.002], [0.026, 0.012, 0.006]),
-  ], { body: 'plastic-grey', rib: 'plastic-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { body: 'plastic-grey', rib: 'plastic-grey' }) + { title: 'Plastic chunk' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A large sheet of thin polythene folded into a pad 280 by 220 mm and 24 mm thick, its loose end lying across the
   // top.
   h.compound('plastic_sheet', 0.4, h.foldedGarment(0.28, 0.22, 0.024, 4) + [
     slab('tail', 'tail', [[-0.14, 0.04], [0.14, 0.02], [0.14, 0.11], [-0.14, 0.11]], 0.024, 0.026),
     slab('tail-end', 'tail', [[-0.14, 0.11], [0.14, 0.11], [0.12, 0.15], [-0.1, 0.16]], 0.0, 0.002),
-  ], { cloth: 'plastic-frosted', tail: 'plastic-frosted' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { cloth: 'plastic-frosted', tail: 'plastic-frosted' }) + { title: 'Plastic sheet' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A square cut from a black bin bag, about 300 by 240 mm, lying crumpled.
   sheetRow('small_plastic_sheet', 0.01, 0.3, 0.24, [
@@ -107,14 +107,14 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     [0.008, 0.02, 0.012, 0.024, 0.006],
     [0.003, 0.014, 0.032, 0.016, 0.002],
     [0.002, 0.005, 0.01, 0.004, 0.006],
-  ], 0.002, { body: 'plastic-bag', fold: 'plastic-bag' }, 0.004) + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], 0.002, { body: 'plastic-bag', fold: 'plastic-bag' }, 0.004) + { title: 'Small plastic sheet' } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // An offcut of clear polycarbonate 70 by 50 mm and 12 mm thick, with two sawn edges and one corner snapped off.
   h.compound('polycarbonate_chunk', 0.043, [
     slab('body', 'body', [[-0.035, -0.025], [0.02, -0.025], [0.035, -0.006], [0.035, 0.025], [-0.035, 0.025]], 0, 0.012),
     // The fracture face shows frosted where the sawn faces stay clear.
     slab('break', 'break', [[0.019, -0.026], [0.021, -0.026], [0.036, -0.007], [0.036, -0.005]], 0, 0.012),
-  ], { body: 'plastic-clear', break: 'plastic-frosted' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { body: 'plastic-clear', break: 'plastic-frosted' }) + { title: 'Polycarbonate chunk' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A rigid polycarbonate sheet 1.22 m square and 8 mm thick, still under its frosted protective film, with one
   // corner of the film peeled back.
@@ -123,12 +123,12 @@ local sheetRow(id, massKg, w, d, heights, thickness, finish, grain) =
     slab('film', 'film', [[-0.61, -0.61], [0.61, -0.61], [0.61, 0.43], [0.43, 0.61], [-0.61, 0.61]], 0.008, 0.012),
     // The peeled corner, folded back over the film along the cut line.
     slab('flap', 'film', [[0.43, 0.61], [0.61, 0.43], [0.43, 0.43]], 0.012, 0.016),
-  ], { sheet: 'plastic-clear', film: 'plastic-frosted' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { sheet: 'plastic-clear', film: 'plastic-frosted' }) + { title: 'Rigid plastic sheet' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 
   // A melted and cooled blob of off-white thermoplastic, 64 mm across, with a smaller lobe run off one side.
   h.compound('thermoplastic_resin_chunk', 0.042, [
     h.turned('blob', 'body', 'y', [[0, 0], [0, 0.026], [0.006, 0.028], [0.013, 0.025], [0.019, 0.018], [0.022, 0.009], [0.023, 0]]),
     h.turned('lobe', 'body', 'y', [[0, 0], [0, 0.012], [0.005, 0.012], [0.009, 0.008], [0.011, 0]], [0.026, 0, 0.01]),
     h.turned('drip', 'body', 'y', [[0, 0], [0, 0.006], [0.003, 0.006], [0.005, 0]], [-0.024, 0, -0.018]),
-  ], { body: 'plastic-white' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
+  ], { body: 'plastic-white' }) + { title: 'Thermoplastic resin chunk' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plastic'] } } },
 ]

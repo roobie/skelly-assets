@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'trencher.spec.libsonnet';
 local track = import 'track-kit.libsonnet';
 {
+  title: 'Trencher',
   sites: [
     site.one('chassis', 'trencher_chassis'),
     site.one('hood', 'trencher_hood'),

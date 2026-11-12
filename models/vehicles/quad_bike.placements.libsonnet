@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'quad_bike.spec.libsonnet';
 {
+  title: 'Quad bike',
   sites: [
     site.one('frame', 'quad_bike_frame'),
     site.one('swing_arm', 'quad_bike_swing_arm'),

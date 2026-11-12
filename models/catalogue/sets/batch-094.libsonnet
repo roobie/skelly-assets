@@ -155,16 +155,16 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     box('pouch-flap-front', 'flap', [-0.083, 0.06, 0.035], [0.083, 0.078, 0.04]),
     box('pull', 'binding', [-0.015, 0.078, 0.08], [0.015, 0.081, 0.1]),
   ] + flatRows('wing-left-row', 'strap', -0.26, -0.16, [-0.01, 0.04, 0.09], 0.006)
-  + flatRows('wing-right-row', 'strap', 0.16, 0.26, [-0.01, 0.04, 0.09], 0.006), { cloth: 'nylon-coyote', flap: 'nylon-coyote', strap: 'webbing-olive-dark', binding: 'plastic-matte-black' })
+  + flatRows('wing-right-row', 'strap', 0.16, 0.26, [-0.01, 0.04, 0.09], 0.006), { cloth: 'nylon-coyote', flap: 'nylon-coyote', strap: 'webbing-olive-dark', binding: 'plastic-matte-black' }) + { title: 'Light plate carrier with pouch' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A hardened-steel front plate 250 mm by 300 mm cut by hand, its edges a little crooked, on a nylon pad and
   // strapped on with two webbing straps.
-  steelPlate('forged_steel_front_plate', 2, steelFront, frontPlate(0.256, 0.306), [-0.06, 0.08], 0.128) + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
+  steelPlate('forged_steel_front_plate', 2, steelFront, frontPlate(0.256, 0.306), [-0.06, 0.08], 0.128) + { title: 'Forged steel front plate' } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A hardened-steel side plate 150 mm by 200 mm cut as a long hexagon, on a nylon pad and strapped on with one
   // webbing strap.
-  steelPlate('forged_steel_side_plate', 0.68, steelSide, [[0.0, -0.105], [0.08, -0.058], [0.08, 0.058], [0.0, 0.105], [-0.08, 0.058], [-0.08, -0.058]], [0.0], 0.08) + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
+  steelPlate('forged_steel_side_plate', 0.68, steelSide, [[0.0, -0.105], [0.08, -0.058], [0.08, 0.058], [0.0, 0.105], [-0.08, 0.058], [-0.08, -0.058]], [0.0], 0.08) + { title: 'Forged steel side plate' } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A pair of deltoid plates 210 mm long and 165 mm wide, 22 mm thick and curved to sit over the shoulder, lying side
   // by side in black covers with a white label on each face.
@@ -174,7 +174,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     + [
       onFace('label-left', 'label', deltoid, 0, 0.022, 0.18, [-0.03, 0.03], [0.03, 0.03], 0.016, -0.095),
       onFace('label-right', 'label', deltoid, 0, 0.022, 0.18, [-0.03, 0.03], [0.03, 0.03], 0.016, 0.095),
-    ], { cover: 'plastic-matte-black', label: 'plastic-white' })
+    ], { cover: 'plastic-matte-black', label: 'plastic-white' }) + { title: 'Deltoid plates' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['arms'] } } },
 
   // A ceramic front plate 250 mm by 320 mm and 22 mm thick, cracked across from a strike near its middle, with a
@@ -187,7 +187,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     + crack('crack-d', esapiBroken, [[0.01, -0.01], [0.03, 0.08], [0.045, 0.13]])
     + [
       flat('shard', 'face', [[0.04, 0.17], [0.075, 0.165], [0.095, 0.2], [0.06, 0.215]], 0, 0.016, 0.06, 0.0),
-    ], { backing: 'enamel-white', face: 'ceramic-grey', crack: 'plastic-charcoal' })
+    ], { backing: 'enamel-white', face: 'ceramic-grey', crack: 'plastic-charcoal' }) + { title: 'Cracked ceramic front plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'], state: ['broken'] } } },
 
   // A ceramic side plate 150 mm by 200 mm and 22 mm thick, cracked through with one corner broken away.
@@ -198,7 +198,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     + crack('crack-c', esbiBroken, [[-0.005, 0.0], [0.04, 0.03], [0.06, 0.055]])
     + [
       flat('shard', 'face', [[0.03, 0.11], [0.065, 0.1], [0.08, 0.135], [0.045, 0.14]], 0, 0.016, 0.04, 0.0),
-    ], { backing: 'enamel-white', face: 'ceramic-grey', crack: 'plastic-charcoal' })
+    ], { backing: 'enamel-white', face: 'ceramic-grey', crack: 'plastic-charcoal' }) + { title: 'Cracked ceramic side plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'], state: ['broken'] } } },
 
   // A bomb-suit chest plate 360 mm wide and 460 mm long, 18 mm thick and gently curved, its edge showing its layers:
@@ -212,20 +212,20 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
       foam: 'felt-grey',
       poly: 'enamel-white',
       steel: 'steel-grey',
-    })
+    }) + { title: 'Bomb suit chest plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A ceramic front plate 250 mm by 320 mm and 22 mm thick, curved across, with shooter's cuts at its top corners,
   // a white polyethylene backing and a label on the strike face.
   h.compound('ceramic_front_plate', 2.8, ceramicPlate(esapi, 10) + [
     onFace('label', 'label', esapi, 0, 0.022, 0.5, [-0.05, -0.08], [0.05, -0.08], 0.02),
-  ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' })
+  ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' }) + { title: 'Ceramic front plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'] } } },
 
   // A ceramic side plate 150 mm by 200 mm and 22 mm thick with clipped corners and a label on the strike face.
   h.compound('ceramic_side_plate', 1.1, ceramicPlate(esbi, 6) + [
     onFace('label', 'label', esbi, 0, 0.022, 0.5, [-0.035, -0.05], [0.035, -0.05], 0.016),
-  ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' })
+  ], { backing: 'enamel-white', face: 'ceramic-grey', label: 'plastic-white' }) + { title: 'Ceramic side plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['ceramic'], setting: ['modern'], slot: ['torso'] } } },
 
   // A soft ballistic vest lying flat, front up: a front panel 400 mm wide and 460 mm long over the back panel, with
@@ -251,11 +251,11 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     strap: 'webbing-olive-dark',
     binding: 'plastic-matte-black',
     lettering: 'plastic-yellow',
-  })
+  }) + { title: 'Agency ballistic vest' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'] } } },
 
   // A tempered-steel plate 250 mm by 300 mm and 6.5 mm thick, curved across with shooter's cuts, bare grey steel.
-  h.compound('heavy_steel_plate', 3.2, plate('plate', 'plate', frontPlate(0.25, 0.3), 0, 0.0065, 0.45, 10), { plate: 'steel-grey' })
+  h.compound('heavy_steel_plate', 3.2, plate('plate', 'plate', frontPlate(0.25, 0.3), 0, 0.0065, 0.45, 10), { plate: 'steel-grey' }) + { title: 'Heavy steel plate' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['modern'], slot: ['torso'] } } },
 
   // A ballistic groin protector laid flat: a front flap 240 mm wide tapering over 220 mm and a broader back flap,
@@ -269,7 +269,7 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
       for i in std.range(0, 3)
       for x in [[-0.22, -0.05, 0.04, 0.23][i]]
       for z in [[-0.097, -0.097, -0.112, -0.112][i]]
-    ], { cloth: 'nylon-coyote', strap: 'webbing-olive-dark', stud: 'plastic-matte-black' })
+    ], { cloth: 'nylon-coyote', strap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { title: 'Ballistic groin protector' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'] } } },
 
   // A ballistic collar laid flat in two padded parts 25 mm thick: a front half-ring 300 mm across that wraps the
@@ -282,6 +282,6 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
     + [
       box('tab-front', 'strap', [-0.02, 0, -0.145], [0.02, 0.004, -0.1]),
       box('tab-back', 'strap', [-0.02, 0, -0.005], [0.02, 0.004, 0.045]),
-    ], { cloth: 'nylon-coyote', strap: 'webbing-olive-dark' })
+    ], { cloth: 'nylon-coyote', strap: 'webbing-olive-dark' }) + { title: 'Ballistic collar' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 ]

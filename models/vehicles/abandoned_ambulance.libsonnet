@@ -50,7 +50,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
     box('crossmember', 'rust', [-2.9, 0.24, -0.5], [-2.8, 0.32, 0.5]),
   ] + k.bothSides([
     box('rail', 'rust', [-2.95, 0.24, 0.42], [2.4, 0.42, 0.5]),
-  ]), { rust: 'scrap-rusted' }),
+  ]), { rust: 'scrap-rusted' }) + { title: 'Abandoned ambulance chassis' },
   k.compound('abandoned_ambulance_cab', 600,
              cabWall('near', 1, 3)
              + cabWall('far', -1, 11)
@@ -73,7 +73,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
                box('tub_front_top', 'soot', [s.frontAxle - s.arch, 0.74, 0.74], [s.frontAxle + s.arch, 0.76, s.skin]),
                box('lamp_socket', 'soot', [2.48, 0.56, 0.5], [2.54, 0.86, 0.9]),
              ]),
-             finish),
+             finish) + { title: 'Abandoned ambulance cab' },
   k.compound('abandoned_ambulance_box', 840,
              boxWall('near', 1, 31, function(x, y) window(x, y) || (x > -1.1 && x < -0.12 && y > s.boxSill + 0.04 && y < s.doorTop + 0.04))
              + boxWall('far', -1, 37, window)
@@ -96,50 +96,50 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
              + k.bothSides([
                box('rear_post', 'paint', [s.rear, s.boxFloor, 0.98], [s.rear + 0.08, s.doorTop, s.boxSkin]),
              ]),
-             finish),
+             finish) + { title: 'Abandoned ambulance box' },
   k.compound('abandoned_ambulance_bonnet', 24,
              // Sprung a hand's width off its catch, the near corner pushed down.
              w.surface('skin', w.grid(1.75, 2.62, 6), w.grid(-0.94, 0.94, 12), function(x, z)
                hood(x) + 0.1 * (x - 1.75) - (if z > 0.4 then 0.09 * (z - 0.4) * (x - 1.75) else 0), 0.05, roofSkin(61)),
-             finish),
+             finish) + { title: 'Abandoned ambulance bonnet' },
   k.compound('abandoned_ambulance_bumper', 18, [
     // Off its near mount, the end resting on the road.
     k.xPrism('beam', 'trim', [[0.38, -0.3], [0.52, -0.3], [0.16, 1.0], [0.02, 1.0]], [2.6, 2.74]),
     box('beam_far', 'trim', [2.6, 0.38, -1.0], [2.74, 0.52, -0.3]),
-  ], finish),
+  ], finish) + { title: 'Abandoned ambulance bumper' },
   k.compound('abandoned_ambulance_lamp', 6, [
     box('lens', 'lens', [2.5, 0.62, -0.84], [2.6, 0.82, -0.56]),
-  ], { lens: 'plastic-frosted' }),
+  ], { lens: 'plastic-frosted' }) + { title: 'Abandoned ambulance lamp' },
   k.compound('abandoned_ambulance_mirror', 3, [
     box('arm', 'trim', [1.68, 1.28, 1.0], [1.72, 1.32, 1.1]),
     box('plate', 'trim', [1.68, 0.92, 1.1], [1.72, 1.32, 1.2]),
-  ], finish),
+  ], finish) + { title: 'Abandoned ambulance mirror' },
   k.compound('abandoned_ambulance_engine', 220, [
     box('block', 'soot', [1.78, 0.4, -0.26], [2.32, 0.88, 0.26]),
     box('head', 'rust', [1.82, 0.88, -0.2], [2.28, 0.98, 0.2]),
     box('gearbox', 'soot', [1.3, 0.4, -0.16], [1.78, 0.68, 0.16]),
-  ], finish),
+  ], finish) + { title: 'Abandoned ambulance engine' },
   k.compound('abandoned_ambulance_cab_door', 32,
              w.columnSheet('panel', 'z', [0.16, 1.3], w.constant(s.floor), w.constant(s.waist), w.constant([s.skin, s.side]), skin(71))
              + w.columnSheet('rear_bar', 'z', [0.16, 0.26], w.constant(s.waist), w.constant(s.cabRoof - 0.16), w.constant([s.skin, s.side]), skin(73)),
-             finish),
+             finish) + { title: 'Abandoned ambulance cab door' },
   k.compound('abandoned_ambulance_cab_door_ajar', 32,
              w.swung('panel', [-1.0, 1.3], [-1.42, 0.2], 0.05, w.constant(s.floor - 0.06), w.constant(s.waist - 0.06), function(t, y) skin(77)(t * 3, y), 10)
              + w.swung('top_rail', [-1.0, 1.3], [-1.42, 0.2], 0.05, w.constant(1.9), w.constant(1.98), function(t, y) 'paint', 4)
              + w.swung('rear_bar', [-1.38, 0.3], [-1.42, 0.2], 0.05, w.constant(s.waist - 0.06), w.constant(1.9), function(t, y) 'paint', 1),
-             finish),
+             finish) + { title: 'Abandoned ambulance cab door (ajar)' },
   k.compound('abandoned_ambulance_sliding_door', 46,
              // Left a hand's width open on its runner.
              w.columnSheet('panel', 'z', [-1.24, -0.26], w.constant(s.boxSill + 0.04), w.constant(s.doorTop), w.constant([s.boxSide, s.boxSide + 0.05]), function(x, y)
                if x > -1.14 && x < -0.36 && y > 1.5 && y < 2.1 then null else skin(81)(x, y)),
-             finish),
+             finish) + { title: 'Abandoned ambulance sliding door' },
   k.compound('abandoned_ambulance_rear_door_near', 36,
              // The lower hinge has failed, so the door hangs from the upper one with its corner on the road.
              w.swung('panel', [0.98, s.rear], [1.6, s.rear - 0.7], 0.05, function(t) s.boxFloor * (1 - t), function(t) s.doorTop - 0.62 * t, doorSkin(83, 1.5), 7),
-             finish),
+             finish) + { title: 'Abandoned ambulance rear door (near)' },
   k.compound('abandoned_ambulance_rear_door_far', 36,
              w.swung('panel', [-0.98, s.rear], [-1.24, s.rear - 0.92], 0.05, function(t) s.boxFloor - 0.14 * t, function(t) s.doorTop - 0.14 * t, doorSkin(87, 1.5), 7),
-             finish),
+             finish) + { title: 'Abandoned ambulance rear door (far)' },
   k.compound('abandoned_ambulance_stretcher', 34,
              // Half out of the back: its inner end still on the floor, its folding legs dropped to the road.
              [box('bar_' + i, 'frame', [-3.92 + i * 0.36, 0.72 + i * 0.024, -0.26], [-3.88 + i * 0.36, 0.76 + i * 0.024, 0.26]) for i in std.range(0, 5)]
@@ -154,16 +154,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
                k.prism('pad_' + i, if i == 2 then 'foam' else 'pad', [[-2.9 + i * 0.2, 0.88 + i * 0.013], [-2.7 + i * 0.2, 0.893 + i * 0.013], [-2.7 + i * 0.2, 0.933 + i * 0.013], [-2.9 + i * 0.2, 0.92 + i * 0.013]], [-0.24 + (i % 2) * 0.05, 0.24 - (i % 3) * 0.04])
                for i in std.range(0, 3)
              ],
-             { frame: 'steel-stainless', tyre: 'rubber-black', pad: 'vinyl-black', foam: 'foam-orange' }),
+             { frame: 'steel-stainless', tyre: 'rubber-black', pad: 'vinyl-black', foam: 'foam-orange' }) + { title: 'Abandoned ambulance stretcher' },
   k.compound('abandoned_ambulance_seat', 16, [
     box('base', 'frame', [-0.22, 0, -0.2], [0.22, 0.32, 0.2]),
     box('pad', 'cloth', [-0.24, 0.32, -0.24], [0.24, 0.42, 0.24]),
     k.prism('back', 'cloth', [[-0.24, 0.42], [-0.12, 0.42], [-0.3, 1.0], [-0.42, 1.0]], [-0.24, 0.24]),
-  ], { frame: 'steel-spall-black', cloth: 'cloth-rag' }),
+  ], { frame: 'steel-spall-black', cloth: 'cloth-rag' }) + { title: 'Abandoned ambulance seat' },
   k.compound('abandoned_ambulance_beacon', 3, [
     box('base', 'trim', [-0.1, 0, -0.1], [0.1, 0.04, 0.1]),
     k.turned('dome', 'dome', 'y', [[0.04, 0], [0.04, 0.08], [0.14, 0.05], [0.14, 0], [0.04, 0]]) + { sides: 12 },
-  ], { trim: 'plastic-black', dome: 'plastic-blue' }),
+  ], { trim: 'plastic-black', dome: 'plastic-blue' }) + { title: 'Abandoned ambulance beacon' },
   k.compound('abandoned_ambulance_wheel', 34, [
     // A flat tyre: the rubber slumps out under the rim and sits on the road across a wide patch.
     k.prism('tyre', 'tyre', [[-0.2, -s.hubY], [0.2, -s.hubY], [0.34, -0.1], [0.34, 0.1], [0.22, 0.27], [-0.22, 0.27], [-0.34, 0.1], [-0.34, -0.1]], [-0.11, 0.11]),
@@ -172,5 +172,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
     k.turned('rim_back', 'rim', 'z', k.disc(0.18, -0.12, -0.09)) + { sides: 24 },
     k.turned('hub', 'hub', 'z', k.disc(0.07, 0.12, 0.14)) + { sides: 12 },
     k.turned('hub_back', 'hub', 'z', k.disc(0.07, -0.14, -0.12)) + { sides: 12 },
-  ], { tyre: 'rubber-offblack', rim: 'scrap-rusted', hub: 'steel-grey' }),
+  ], { tyre: 'rubber-offblack', rim: 'scrap-rusted', hub: 'steel-grey' }) + { title: 'Abandoned ambulance wheel' },
 ])

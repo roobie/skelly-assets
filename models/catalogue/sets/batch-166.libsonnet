@@ -64,7 +64,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     for i in std.range(0, 3)
     for x in [if i % 2 == 0 then -0.11 else 0.11]
     for z in [if i < 2 then -0.035 else 0.035]
-  ], { body: 'leather-oxblood', flap: 'leather-oxblood', metal: 'metal-gold' })
+  ], { body: 'leather-oxblood', flap: 'leather-oxblood', metal: 'metal-gold' }) + { title: 'Purse' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // A makeshift rag pouch: a sack of sewn scraps 190 mm across and 230 mm tall, drawn shut with a cord under a
@@ -80,34 +80,34 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('seam', 'cord', [-0.003, 0.012, 0.09], [0.003, 0.05, 0.097]),
   ] + h.strapLoop('strap', 'strap', 0.22, 0.05, 0.03, 0.004, 0, 0, -0.16), {
     cloth: 'cloth-brown', cord: 'cord-cotton', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-cream', strap: 'cloth-khaki',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
+  }) + { title: 'Rag pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A padded canvas rifle case 1.12 m long, 280 mm wide at the butt and 70 mm thick, with one accessory pocket, a
   // carry handle and a shoulder strap.
   rifleCase('soft_rifle_case', 0.56, 1.12, 0.28, 0.06, [-0.3], true, {
     case: 'cloth-olive-drab', trim: 'webbing-olive-dark', pocket: 'cloth-olive-drab', strap: 'webbing-black', metal: 'plastic-matte-black',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  }) + { title: 'Soft rifle case' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A padded canvas case for two rifles, 1.16 m long, 340 mm wide and 100 mm thick, with three accessory pockets
   // in a row and a shoulder strap.
   rifleCase('soft_double_rifle_case', 0.7, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
     case: 'cloth-khaki', trim: 'webbing-black', pocket: 'cloth-khaki', strap: 'webbing-black', metal: 'plastic-matte-black',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  }) + { title: 'Soft double rifle case' } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A leather rifle case 1.12 m long, 280 mm wide and 70 mm thick, with one pocket, a handle and a strap.
   rifleCase('leather_rifle_case', 1.6, 1.12, 0.28, 0.06, [-0.3], true, {
     case: 'leather-tan', trim: 'leather-chestnut', pocket: 'leather-tan', strap: 'leather-chestnut', metal: 'brass-dull',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
+  }) + { title: 'Leather rifle case' } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // A leather case for two rifles, 1.16 m long, 340 mm wide and 100 mm thick, with three pockets and a strap.
   rifleCase('leather_double_rifle_case', 2.1, 1.16, 0.34, 0.09, [-0.36, -0.1, 0.16], false, {
     case: 'leather-chestnut', trim: 'leather-black', pocket: 'leather-chestnut', strap: 'leather-black', metal: 'brass-dull',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
+  }) + { title: 'Leather double rifle case' } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // An extra-long leather rifle case 1.34 m long, 280 mm wide and 70 mm thick, for long-barrelled rifles.
   rifleCase('long_leather_rifle_case', 1.7, 1.34, 0.28, 0.06, [-0.4], true, {
     case: 'leather-oxblood', trim: 'leather-black', pocket: 'leather-oxblood', strap: 'leather-black', metal: 'brass-dull',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
+  }) + { title: 'Long leather rifle case' } + { taxonomy: { category: 'containers', tags: { material: ['leather'], setting: ['modern'] } } },
 
   // About 6 m of 12 mm cotton rope laid in three turns about 460 mm across, tied off with a sliding knot whose
   // tail hangs loose; lying flat on the floor.
@@ -121,7 +121,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
       box('wrap-b', 'rope', [-0.026, 0.0, 0.222], [0.026, 0.03, 0.23]),
       box('tail', 'rope', [0.01, 0, 0.25], [0.022, 0.012, 0.34]),
       box('tail-end', 'knot', [0.008, 0, 0.34], [0.024, 0.016, 0.356]),
-    ], { rope: 'cord-cotton', knot: 'jute' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+    ], { rope: 'cord-cotton', knot: 'jute' }) + { title: 'Rope loop' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A large military rucksack 420 mm wide, 700 mm tall and 300 mm deep, standing, front on +z: a lid over the
   // top, a front pocket with webbing rows, two side pockets, compression straps, and padded shoulder straps
@@ -149,7 +149,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('hip-buckle', 'buckle', [-0.02, 0.05, -0.21], [0.02, 0.09, -0.195]),
   ] + h.webbing('pals', 'webbing', -0.14, 0.14, [0.14, 0.2, 0.26], 0.19), {
     body: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'plastic-matte-black', pad: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { title: 'Rucksack' } + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A slim running pack 240 mm wide, 420 mm tall and 80 mm deep, rounded at the top, with a stretch mesh pocket,
   // reflective strips and a crossing bungee on the front, and wide vest straps behind joined by a chest strap.
@@ -166,7 +166,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('chest-strap', 'trim', [-0.06, 0.28, -0.064], [0.06, 0.295, -0.058]),
     box('chest-clip', 'reflective', [-0.012, 0.276, -0.068], [0.012, 0.3, -0.06]),
     box('bottle-pocket-l', 'mesh', [-0.115, 0.22, -0.068], [-0.06, 0.36, -0.06]),
-  ], { body: 'cloth-blue', mesh: 'mesh-black', trim: 'nylon-black', reflective: 'reflective-yellow' })
+  ], { body: 'cloth-blue', mesh: 'mesh-black', trim: 'nylon-black', reflective: 'reflective-yellow' }) + { title: 'Running pack' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A single-strap sling pack: a teardrop 240 mm wide, 420 mm tall and 120 mm deep, a zipped front pocket and a
@@ -180,7 +180,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('base', 'trim', [-0.1, 0, -0.061], [0.1, 0.012, 0.061]),
   ] + arch('strap', 'strap', 0.0, 0.2, 0.2, 0.235, -45, 90, 9, -0.08, -0.064) + [
     box('strap-buckle', 'buckle', [0.13, 0.04, -0.084], [0.16, 0.07, -0.062]),
-  ], { body: 'nylon-black', pocket: 'cloth-charcoal', trim: 'webbing-black', strap: 'cloth-charcoal', buckle: 'plastic-matte-black' })
+  ], { body: 'nylon-black', pocket: 'cloth-charcoal', trim: 'webbing-black', strap: 'cloth-charcoal', buckle: 'plastic-matte-black' }) + { title: 'Sling pack' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A handmade straw basket 300 mm across at the rim and 190 mm deep, with woven bands, a rolled rim and a
@@ -194,7 +194,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
   ] + arch('bail', 'band', 0, 0.17, 0.135, 0.152, 0, 180, 12, -0.012, 0.012) + [
     box('lash-l', 'straw', [-0.158, 0.15, -0.016], [-0.128, 0.19, 0.016]),
     box('lash-r', 'straw', [0.128, 0.15, -0.016], [0.158, 0.19, 0.016]),
-  ], { straw: 'straw-wicker', band: 'straw-pale' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plant'] } } },
+  ], { straw: 'straw-wicker', band: 'straw-pale' }) + { title: 'Straw basket' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plant'] } } },
 
   // A large hard-shell suitcase 500 mm wide, 800 mm tall with its wheels and 300 mm deep, front on +z: ribbed
   // shells meeting at a zipped seam, four spinner wheels, a retracted pull handle and carry handles on top and
@@ -224,7 +224,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     for i in std.range(0, 3)
     for x in [if i % 2 == 0 then -0.21 else 0.21]
     for z in [if i < 2 then -0.11 else 0.11]
-  ]), { shell: 'plastic-blue', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
+  ]), { shell: 'plastic-blue', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { title: 'Large suitcase' } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A soft fabric suitcase 400 mm wide, 600 mm tall with its wheels and 220 mm deep, front on +z: a zipped front
   // pocket, piped edges, two wheels and feet, a retracted pull handle and a top carry handle.
@@ -250,5 +250,5 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('wheel-guard-r', 'trim', [0.15, 0.0, -0.115], [0.205, 0.07, -0.06]),
     h.turned('wheel-l', 'wheel', 'x', [[0, 0], [0, 0.03], [0.024, 0.03], [0.024, 0]], [-0.212, 0.03, -0.085]),
     h.turned('wheel-r', 'wheel', 'x', [[0, 0], [0, 0.03], [0.024, 0.03], [0.024, 0]], [0.188, 0.03, -0.085]),
-  ], { body: 'cloth-navy', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'] } } },
+  ], { body: 'cloth-navy', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { title: 'Suitcase' } + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

@@ -104,18 +104,18 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
 [
   // A close helm of hardened steel with its visor raised, standing on its gorget edge, 256 mm across, 280 mm front
   // to back and 348 mm tall: the visor lies up over the brow and the face shows open above the bevor.
-  closeHelm('hardened_steel_close_helm_visor_up', 3.5, 'steel-hardened', 'standard', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_close_helm_visor_up', 3.5, 'steel-hardened', 'standard', true) + { title: 'Hardened steel close helm, visor up' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A plain light close helm of hardened steel, visor down, 248 mm across, 280 mm front to back and 332 mm tall.
-  closeHelm('hardened_steel_light_close_helm', 3.1, 'steel-hardened', 'light', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_light_close_helm', 3.1, 'steel-hardened', 'light', false) + { title: 'Hardened steel light close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // The light close helm with its visor raised, 240 mm across, 264 mm front to back and 332 mm tall.
-  closeHelm('hardened_steel_light_close_helm_visor_up', 3.1, 'steel-hardened', 'light', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('hardened_steel_light_close_helm_visor_up', 3.1, 'steel-hardened', 'light', true) + { title: 'Hardened steel light close helm, visor up' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A close helm of high-carbon steel, visor down, 260 mm across, 296 mm front to back and 348 mm tall.
-  closeHelm('high_carbon_steel_close_helm', 3.6, 'steel-blued', 'standard', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_close_helm', 3.6, 'steel-blued', 'standard', false) + { title: 'High-carbon steel close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // A heavy close helm of high-carbon steel, visor down: a tall comb, a brow reinforce and a second gorget lame,
   // 260 mm across, 308 mm front to back and 360 mm tall.
-  closeHelm('high_carbon_steel_heavy_close_helm', 4.6, 'steel-blued', 'heavy', false) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_heavy_close_helm', 4.6, 'steel-blued', 'heavy', false) + { title: 'High-carbon steel heavy close helm' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
   // The heavy close helm with its visor raised, 256 mm across, 292 mm front to back and 360 mm tall.
-  closeHelm('high_carbon_steel_heavy_close_helm_visor_up', 4.4, 'steel-blued', 'heavy', true) + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
+  closeHelm('high_carbon_steel_heavy_close_helm_visor_up', 4.4, 'steel-blued', 'heavy', true) + { title: 'High-carbon steel heavy close helm, visor up' } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A conical nasal helm of hardened steel set level on its nasal bar and leather chin straps, 216 mm across and
   // 248 mm tall: a pointed bowl with a riveted rim band, crossing bands over the crown and a bar down over the nose.
@@ -130,7 +130,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
              + std.flattenArrays([rib('band-%s' % n[0], 'steel', [[p[0], p[1]] for p in nasalPath[1:]], 0.005, 0.02, n[1], n[2]) for n in [['f', 'z', 1], ['b', 'z', -1], ['l', 'x', 1], ['r', 'x', -1]]])
              + [rivet('rivet-%d' % b, 'rivet', 0.108, b, 0.061, 0.006) for b in [15 + 30 * k for k in std.range(0, 11)]]
              + [box('strap-%d' % i, 'leather', [s * 0.093 - 0.002, 0, -0.012], [s * 0.093 + 0.002, 0.06, 0.012]) for i in [0, 1] for s in [[1, -1][i]]],
-             { steel: 'steel-hardened', rivet: 'steel-bright', leather: 'leather-brown' })
+             { steel: 'steel-hardened', rivet: 'steel-bright', leather: 'leather-brown' }) + { title: 'Hardened steel nasal helm' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A fluted turban helmet of hardened steel standing on its ear guards and nasal bar, 232 mm across and 312 mm tall:
@@ -156,7 +156,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
                ]
                for k in std.range(0, 11)
              ]),
-             { steel: 'steel-hardened', rivet: 'steel-bright' })
+             { steel: 'steel-hardened', rivet: 'steel-bright' }) + { title: 'Hardened steel turban helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A crude open-faced helmet hammered from hardened sheet steel, sitting on its rim, 240 mm across and 196 mm tall:
@@ -171,7 +171,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
              + std.flattenArrays([rib('strap-%s' % n[0], 'steel', sheetPath[1:], 0.005, 0.03, n[1], n[2]) for n in [['f', 'z', 1], ['b', 'z', -1], ['l', 'x', 1], ['r', 'x', -1]]])
              + [rivet('rivet-band-%d' % b, 'rivet', 0.114, b, 0.015, 0.008) for b in [20, 70, 110, 160, 200, 250, 290, 340]]
              + [rivet('rivet-strap-%d-%d' % [b, k], 'rivet', radiusAt(sheetPath, [0.06, 0.12][k]) + 0.006, b, [0.06, 0.12][k], 0.008) for b in [0, 90, 180, 270] for k in [0, 1]],
-             { steel: 'steel-hardened', rivet: 'steel-bright', cloth: 'cloth-canvas' })
+             { steel: 'steel-hardened', rivet: 'steel-bright', cloth: 'cloth-canvas' }) + { title: 'Hardened sheet steel helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A flat-topped great helm of hardened sheet steel, the bucket kind, standing on its rim, 244 mm across and 300 mm
@@ -198,7 +198,7 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
              + [rivet('rivet-v-%d' % i, 'rivet', gr + 0.006, 0, 0.04 + 0.05 * i, 0.007) for i in [0, 1, 2]]
              + [rivet('rivet-s-%d' % i, 'rivet', gr + 0.006, 180, 0.04 + 0.05 * i, 0.007) for i in [0, 1, 2, 3, 4]]
              + [rivet('rivet-brow-%d' % b, 'rivet', gr + 0.01, b, 0.216, 0.006) for b in [-50, -25, 25, 50]],
-             { steel: 'steel-hardened', rivet: 'steel-bright', cloth: 'cloth-canvas' })
+             { steel: 'steel-hardened', rivet: 'steel-bright', cloth: 'cloth-canvas' }) + { title: 'Hardened sheet steel great helm' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['head'] } } },
 
   // A traditional firefighter's helmet sitting on its brim, 304 mm front to back, 312 mm across and 196 mm tall: a
@@ -222,6 +222,6 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
                box('holder', 'trim', [-0.014, 0.15, 0.056], [0.014, 0.19, 0.094]),
                box('holder-head', 'trim', [-0.022, 0.175, 0.07], [0.022, 0.195, 0.096]),
              ],
-             { shell: 'plastic-red', trim: 'brass-dull', leather: 'leather-black', plate: 'paint-white' })
+             { shell: 'plastic-red', trim: 'brass-dull', leather: 'leather-black', plate: 'paint-white' }) + { title: 'Firefighter helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
 ]

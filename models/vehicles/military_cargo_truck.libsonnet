@@ -16,7 +16,7 @@ local HOOP_SHOULDER = [[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08,
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [
     box('floor', 'floor', [s.bedRear, s.deckBottom, -s.bedSide], [s.bedFront, s.deckTop, s.bedSide]),
-  ], finish),
+  ], finish) + { title: 'Military cargo truck bed floor' },
   k.compound('military_cargo_truck_bed', s.bedMass, [
     box('headboard', 'paint', [s.bedFront - 0.05, s.deckTop, -s.bedSide], [s.bedFront, rail, s.bedSide]),
     box('rear_sill', 'frame', [s.bedRear, s.deckBottom - 0.04, -s.bedSide], [s.bedRear + 0.04, s.deckBottom, s.bedSide]),
@@ -26,13 +26,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   ] + [
     box('stake_' + i, 'frame', [stakes[i], s.deckTop, s.bedSide], [stakes[i] + 0.05, rail + 0.03, s.bedSide + 0.02])
     for i in std.range(0, 6)
-  ]), finish),
+  ]), finish) + { title: 'Military cargo truck bed' },
   k.compound('military_cargo_truck_tailgate', 60, [
     box('board', 'paint', [s.bedRear - 0.04, s.deckBottom, -s.bedSide + 0.04], [s.bedRear, rail, s.bedSide - 0.04]),
     box('rib', 'frame', [s.bedRear - 0.05, 1.68, -s.bedSide + 0.04], [s.bedRear - 0.04, 1.72, s.bedSide - 0.04]),
   ] + bothSides([
     box('rib_v', 'frame', [s.bedRear - 0.05, s.deckBottom, 0.5], [s.bedRear - 0.04, rail, 0.54]),
-  ]), finish, { hinge_a: ['board', [0, 0, 0.2]], hinge_b: ['board', [0, 0, 0.8]] }),
+  ]), finish, { hinge_a: ['board', [0, 0, 0.2]], hinge_b: ['board', [0, 0, 0.8]] }) + { title: 'Military cargo truck tailgate' },
   k.compound('military_cargo_truck_tilt', s.tiltMass, [
     box('roof', 'canvas', [s.bedRear, peak, -0.8], [s.bedFront, peak + 0.03, 0.8]),
     box('front_upper', 'canvas', [s.bedFront - 0.03, shoulder, -0.8], [s.bedFront, peak, 0.8]),
@@ -55,5 +55,5 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   ]) + [
     box('hoop_roof_' + i, 'strap', [stakes[i], peak + 0.03, -0.8], [stakes[i] + 0.05, peak + 0.04, 0.8])
     for i in std.range(0, 6)
-  ], finish),
+  ], finish) + { title: 'Military cargo truck tilt' },
 ])

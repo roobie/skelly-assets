@@ -28,7 +28,7 @@ local ingot(id, massKg, metal, rune) = h.compound(id, massKg, [
     h.turned('bloom', 'petal', 'x', [[0, 0], [0, 0.005], [0.011, 0.007], [0.011, 0.0055], [0.022, 0.0072], [0.022, 0.0058], [0.034, 0.0068], [0.034, 0]], [0, 0.007, 0]),
     h.turned('lip', 'petal', 'x', [[0, 0.003], [0, 0.0045], [0.004, 0.007], [0.006, 0.007], [0.006, 0.003], [0, 0.003]], [0.034, 0.007, 0]),
     h.turned('pollen', 'pollen', 'x', [[0, 0], [0, 0.0035], [0.008, 0.0025], [0.009, 0]], [0.034, 0.007, 0]),
-  ], { stem: 'leaf-green', petal: 'cloth-bright-white', pollen: 'cloth-yellow' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
+  ], { stem: 'leaf-green', petal: 'cloth-bright-white', pollen: 'cloth-yellow' }) + { title: 'Pale assassin\'s bloom' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
   // A hand-sized sheaf, 110 mm long, lying along x: five dark leaves fanned at one end, a tangle of pale bitter roots
   // at the other, bound in the middle with a twine wrap.
   h.compound('bitterleaf_bundle', 0.015, [
@@ -42,7 +42,7 @@ local ingot(id, massKg, metal, rune) = h.compound(id, massKg, [
     for k in std.range(0, 3)
   ] + [
     h.turned('tie', 'tie', 'x', [[0, 0], [0, 0.0065], [0.008, 0.0065], [0.008, 0]], [-0.018, 0.0035, 0]),
-  ], { leaf: 'plant-purple', stalk: 'plant-dried', root: 'bark-birch', tie: 'jute' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
+  ], { leaf: 'plant-purple', stalk: 'plant-dried', root: 'bark-birch', tie: 'jute' }) + { title: 'Bitterleaf bundle' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
   // A flower head 96 mm across on a stub of stem, lying face up: forty petals set in a golden-angle spiral that wind
   // inward and climb as they go, so each ring repeats the one outside it at a smaller scale, around a glowing heart.
   h.compound('spiral_rose', 0.048, [
@@ -54,11 +54,11 @@ local ingot(id, massKg, metal, rune) = h.compound(id, massKg, [
     h.disc('heart', 'heart', 0.006, 0.02, 0.031),
     h.disc('cup', 'stem', 0.012, 0.004, 0.014),
     h.disc('stem', 'stem', 0.004, 0, 0.006),
-  ], { outer: 'petal-pink', inner: 'plastic-pink', core: 'lycra-red', heart: 'crystal-glow-violet', stem: 'leaf-green' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
+  ], { outer: 'petal-pink', inner: 'plastic-pink', core: 'lycra-red', heart: 'crystal-glow-violet', stem: 'leaf-green' }) + { title: 'Spiral rose' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'nature', tags: { material: ['plant'], setting: ['fantasy'] } } },
   // Blacksmith's ingots, 120 by 70 by 30 mm, of three odd metals.
-  ingot('crimson_metal_ingot', 1.6, 'metal-crimson', 'rust-red') + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
-  ingot('pale_silver_ingot', 0.9, 'mithril', 'mirror-silver') + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
-  ingot('orichalcum_ingot', 1.7, 'orichalcum', 'bronze') + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ingot('crimson_metal_ingot', 1.6, 'metal-crimson', 'rust-red') + { title: 'Crimson metal ingot' } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ingot('pale_silver_ingot', 0.9, 'mithril', 'mirror-silver') + { title: 'Pale silver ingot' } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ingot('orichalcum_ingot', 1.7, 'orichalcum', 'bronze') + { title: 'Orichalcum ingot' } + { taxonomy: { category: 'materials', tags: { material: ['metal'], setting: ['fantasy'] } } },
   // A round-bellied cauldron 360 mm high and 360 mm across the belly, raised on three clawed feet: a dull black body
   // dressed in glossy chitin bands, with a flared lip and a ring handle at each shoulder.
   h.compound('black_chitin_cauldron', 12, [
@@ -78,7 +78,7 @@ local ingot(id, massKg, metal, rune) = h.compound(id, massKg, [
   ] + [
     h.turned('handle-%d' % k, 'chitin', 'z', [[0, 0.022], [0, 0.034], [0.012, 0.034], [0.012, 0.022], [0, 0.022]], [(2 * k - 1) * 0.175, 0.28, -0.006])
     for k in std.range(0, 1)
-  ], { body: 'void-black', chitin: 'chitin-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['bone'], setting: ['fantasy'] } } },
+  ], { body: 'void-black', chitin: 'chitin-black' }) + { title: 'Black chitin cauldron' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['bone'], setting: ['fantasy'] } } },
   // A tall alchemist's stockpot, 300 mm across and 300 mm high under a domed lid with a knob, a loop handle each side
   // and a band of raised runes round its middle.
   h.compound('orichalcum_cauldron', 3.4, [
@@ -103,5 +103,5 @@ local ingot(id, massKg, metal, rune) = h.compound(id, massKg, [
     ]
     for k in [0, 1]
     for sx in [2 * k - 1]
-  ]), { pot: 'orichalcum', rune: 'crystal-glow-blue', handle: 'bronze' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ]), { pot: 'orichalcum', rune: 'crystal-glow-blue', handle: 'bronze' }) + { title: 'Orichalcum cauldron' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

@@ -1,6 +1,7 @@
 local site = import 'site.libsonnet';
 local s = import 'combine_harvester.spec.libsonnet';
 {
+  title: 'Combine harvester',
   sites: [
     site.one('body', 'combine_harvester_body'),
     site.one('cab', 'combine_harvester_cab'),

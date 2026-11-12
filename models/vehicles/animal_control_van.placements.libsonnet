@@ -7,6 +7,7 @@ local cages(tag, y) = std.flattenArrays([
   for i in [0, 1, 2]
 ]);
 {
+  title: 'Animal control van',
   sites: van.fittings(site.kit, 'animal_control_van', s) + [
     site.one('roof_vent', 'roof_vent', [-1.4, b.roof, 0]),
     site.one('beacon', 'beacon_amber', [-0.3, b.roof, 0]),

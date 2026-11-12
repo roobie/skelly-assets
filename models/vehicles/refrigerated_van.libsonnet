@@ -16,10 +16,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, [
     k.turned('fan_hub', 'frame', 'y', k.disc(0.05, 0.012, 0.024), [-0.2, top, 0.36]) + { sides: 8 },
     box('side_louvre_low', 'grille', [-0.48, s.roof + 0.1, 0.72], [0.08, s.roof + 0.13, 0.73]),
     box('side_louvre_high', 'grille', [-0.48, s.roof + 0.19, 0.72], [0.08, s.roof + 0.22, 0.73]),
-  ]), { case: 'plastic-gloss-white', frame: 'steel-grey', grille: 'plastic-black' }),
+  ]), { case: 'plastic-gloss-white', frame: 'steel-grey', grille: 'plastic-black' }) + { title: 'Refrigerated van cooling unit' },
   k.compound('refrigerated_van_lining', 190, [
     box('ceiling', 'lining', [s.rear + 0.16, s.roof - 0.08, -0.84], [-0.04, s.roof - 0.04, 0.84]),
   ] + k.bothSides([
     box('wall', 'lining', [s.rear + 0.16, s.archTop + 0.02, 0.84], [-0.04, s.canton, 0.88]),
-  ]), { lining: 'plastic-gloss-white' }),
+  ]), { lining: 'plastic-gloss-white' }) + { title: 'Refrigerated van lining' },
 ])

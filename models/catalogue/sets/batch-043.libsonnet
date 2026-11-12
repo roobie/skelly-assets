@@ -57,22 +57,22 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
 ], { cloth: finish }) + { voxelGrain: 0.002 };
 [
   // A cured hide rolled up into a tight roll 200 mm long and 28 mm across, tied with cord near each end.
-  roll('cured_hide', 0.098, 0.2, 0.014, 4, 'skin-rawhide', 'beeswax') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  roll('cured_hide', 0.098, 0.2, 0.014, 4, 'skin-rawhide', 'beeswax') + { title: 'Cured hide' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // A cured pelt rolled fur side in, 170 mm long and 60 mm across, tied with cord near each end; tufts of fur show
   // at both ends of the roll.
   roll('cured_pelt', 0.17, 0.17, 0.03, 5, 'skin-rawhide', 'fur-brown', [
     h.ball('tuft-%d' % i, 'fur', 0.006, [-0.088, 0.09][i % 2], 0.03 + [0.012, -0.01, 0.004, -0.016, 0.016, 0][i], [0.008, 0.012, -0.014, 0.002, -0.006, 0.016][i])
     for i in std.range(0, 5)
-  ], { fur: 'fur-brown' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  ], { fur: 'fur-brown' }) + { title: 'Cured pelt' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // A square of blue denim 150 mm across, hemmed with paler stitching round its edge.
   h.compound('denim_patch', 0.012, [flat('cloth', 'cloth', square(0.15), 0, 0.002)]
     + std.flattenArrays(stitches('stitch', 'stitch', 0.15, 0.008, 0.002)),
-    { cloth: 'cloth-denim', stitch: 'cloth-denim-faded' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+    { cloth: 'cloth-denim', stitch: 'cloth-denim-faded' }) + { title: 'Denim patch' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A square of grey felt 150 mm across and about 2 mm thick, with clean cut edges.
-  h.compound('felt_patch', 0.012, [flat('felt', 'felt', square(0.15, 0.002), 0, 0.002)], { felt: 'felt-grey' })
+  h.compound('felt_patch', 0.012, [flat('felt', 'felt', square(0.15, 0.002), 0, 0.002)], { felt: 'felt-grey' }) + { title: 'Felt patch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A square of fur 150 mm across: a tan leather back with shaggy fur 6 mm deep lying over it.
@@ -84,7 +84,7 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
     h.ball('tuft-%d-%d' % [i, j], 'fur', [0.006, 0.008, 0.007, 0.009, 0.0065][(i + 2 * j) % 5], -0.06 + i * 0.02 + (j % 2) * 0.01 + jx, 0.004, -0.06 + j * 0.02 + jz, [0.35, 0.5, 0.4, 0.55][(i + j) % 4])
     for i in std.range(0, 5)
     for j in std.range(0, 6)
-  ], { back: 'leather-tan', fur: 'fur-brown' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  ], { back: 'leather-tan', fur: 'fur-brown' }) + { title: 'Fur' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // A loose wad of stuffing about 65 mm across and 30 mm high: shredded rags, dry grass and tufts of hair heaped
   // in one lumpy mound, with grass stalks poking out of it.
@@ -101,7 +101,7 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
     h.prism('straw-b', 'grass', 'x', [[0.012, 0.034], [0.03, -0.03], [0.032, -0.03], [0.014, 0.034]], -0.004, -0.002),
     h.prism('straw-c', 'grass', 'z', [[0.04, 0.006], [-0.01, 0.034], [-0.01, 0.036], [0.04, 0.008]], 0.012, 0.014),
     box('thread-a', 'rag', [-0.032, 0.022, 0.006], [0.01, 0.024, 0.008]),
-  ], 0.8), { rag: 'cloth-rag', 'rag-shadow': 'cloth-rag-shadow', grass: 'straw-pale', hair: 'fur-brown' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['medieval'] } } },
+  ], 0.8), { rag: 'cloth-rag', 'rag-shadow': 'cloth-rag-shadow', grass: 'straw-pale', hair: 'fur-brown' }) + { title: 'Gambeson batting' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'], setting: ['medieval'] } } },
 
   // A ball of coarse grass yarn 80 mm across, wound in several directions, with a loose end trailing off.
   h.compound('grass_yarn', 0.049, [
@@ -117,7 +117,7 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
   ] + [
     box('end-a', 'wind', [0.03, 0.002, 0.03], [0.07, 0.006, 0.034]),
     box('end-b', 'wind', [0.066, 0.002, 0.034], [0.07, 0.006, 0.06]),
-  ], { yarn: 'straw-rope', wind: 'jute' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plant', 'fabric'] } } },
+  ], { yarn: 'straw-rope', wind: 'jute' }) + { title: 'Grass yarn' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['plant', 'fabric'] } } },
 
   // A square of loosely woven golden Kevlar 150 mm across, its weave showing as raised threads and its raw edges fraying.
   h.compound('aramid_patch', 0.008, [flat('cloth', 'cloth', square(0.15, 0.003), 0, 0.002)] + [
@@ -126,7 +126,7 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
   ] + [
     box('warp-%d' % i, 'weave', [-0.07 + i * 0.0175, 0.003, -0.07], [-0.068 + i * 0.0175, 0.004, 0.07])
     for i in std.range(0, 8)
-  ] + std.flattenArrays(fray('fray', 'cloth', 0.15, 0, 0.002)), { cloth: 'aramid-gold', weave: 'aramid-gold' })
+  ] + std.flattenArrays(fray('fray', 'cloth', 0.15, 0, 0.002)), { cloth: 'aramid-gold', weave: 'aramid-gold' }) + { title: 'Aramid patch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A roughly square piece of brown leather about 150 mm across, its edges cut unevenly from a larger hide.
@@ -134,12 +134,12 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
     flat('leather', 'leather', [
       [-0.074, -0.07], [-0.02, -0.077], [0.05, -0.073], [0.076, -0.066], [0.078, 0.02], [0.07, 0.074], [0.0, 0.078], [-0.07, 0.072], [-0.078, 0.0],
     ], 0, 0.002),
-  ], { leather: 'leather-brown' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
+  ], { leather: 'leather-brown' }) + { title: 'Leather' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['leather'] } } },
 
   // A square of flame-resistant Nomex cloth 150 mm across, hemmed with matching stitching.
   h.compound('fire_resistant_fabric_patch', 0.005, [flat('cloth', 'cloth', square(0.15), 0, 0.002)]
     + std.flattenArrays(stitches('stitch', 'stitch', 0.15, 0.008, 0.002)),
-    { cloth: 'knit-fr', stitch: 'cloth-turnout' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+    { cloth: 'knit-fr', stitch: 'cloth-turnout' }) + { title: 'Fire-resistant fabric patch' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A stiff panel of epoxy-set Kevlar 300 mm by 250 mm and 11 mm thick with rounded corners; the cut edge shows its
   // layers in amber resin.
@@ -151,13 +151,13 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
     flat('layer-%d' % i, 'resin', [[p[0] * 1.004, p[1] * 1.004] for p in outline], y, y + 0.002)
     for i in std.range(0, 1)
     for y in [[0.003, 0.007][i]]
-  ], { plate: 'aramid-gold', resin: 'resin-honey' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'fabric'] } } },
+  ], { plate: 'aramid-gold', resin: 'resin-honey' }) + { title: 'Rigid aramid plate' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['plastic', 'fabric'] } } },
 
   // A small heap of golden Kevlar offcuts, the largest about 40 mm long, lying loosely on each other.
-  scraps('aramid_scraps', 0.00067, 'aramid-gold') + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  scraps('aramid_scraps', 0.00067, 'aramid-gold') + { title: 'Aramid scraps' } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A small heap of Nomex offcuts, the largest about 40 mm long, lying loosely on each other.
-  scraps('fire_resistant_fabric_scraps', 0.00067, 'knit-fr') + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  scraps('fire_resistant_fabric_scraps', 0.00067, 'knit-fr') + { title: 'Fire-resistant fabric scraps' } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A waxed canvas sheet 610 mm by 305 mm laid flat, hemmed all round, with one corner turned back.
   h.compound('canvas_sheet', 0.071, [
@@ -167,7 +167,7 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
     box('hem-s', 'hem', [-0.23, 0.002, 0.144], [0.3, 0.004, 0.15]),
     box('hem-e', 'hem', [0.294, 0.002, -0.144], [0.3, 0.004, 0.144]),
     box('hem-w', 'hem', [-0.3, 0.002, -0.144], [-0.294, 0.004, 0.08]),
-  ], { canvas: 'cloth-canvas', hem: 'canvas-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], { canvas: 'cloth-canvas', hem: 'canvas-grey' }) + { title: 'Canvas sheet' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 
   // A canvas sheet 610 mm by 305 mm laid flat, sewn from six odd panels in three shades with raised seams between them.
   local cols = [-0.305, -0.1, 0.09, 0.305];
@@ -181,5 +181,5 @@ local scraps(id, massKg, finish) = h.compound(id, massKg, [
   ] + [
     box('seam-z-%d' % i, 'seam', [cols[i] + 0.002, 0.002, [0.02, -0.03, 0.04][i] - 0.002], [cols[i + 1] - 0.002, 0.004, [0.02, -0.03, 0.04][i] + 0.002])
     for i in std.range(0, 2)
-  ], { 'panel-0': 'cloth-canvas', 'panel-1': 'canvas-grey', 'panel-2': 'cloth-khaki', seam: 'cord-cotton' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  ], { 'panel-0': 'cloth-canvas', 'panel-1': 'canvas-grey', 'panel-2': 'cloth-khaki', seam: 'cord-cotton' }) + { title: 'Patchwork canvas sheet' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
 ]
