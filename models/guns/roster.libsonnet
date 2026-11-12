@@ -51,6 +51,7 @@
     { id: 'magazine_stanag_30', source: 'stanag-30', calibre: '5.56x45', appearanceProfile: 'ar', weapon: 'rifle' },
     { id: 'magazine_akm_30', source: 'akm-30', calibre: '7.62x39', appearanceProfile: 'ak', weapon: 'rifle' },
     { id: 'magazine_pistol_9', source: 'pistol-9', calibre: '9x19', appearanceProfile: 'pistol', weapon: 'handgun' },
+    { id: 'magazine_bmg_10', source: 'bmg-10', calibre: '50-bmg', appearanceProfile: 'anti-materiel', weapon: 'rifle' },
   ],
   // Every catalogue part exports as its loose part. A part whose id names one of these actions or frames belongs to
   // its weapon class.

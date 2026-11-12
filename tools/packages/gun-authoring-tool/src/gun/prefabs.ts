@@ -29,4 +29,5 @@ export const GUN_PREFABS: PrefabCatalogue = [
     fixedParams: { length: 'L', profile: 'ak-curved', variant: 'ak74' },
   },
   { id: 'akm-30', version: 1, family: 'magazine', fixedParams: { length: 'L', profile: 'ak-curved', variant: 'akm' } },
+  { id: 'bmg-10', version: 1, family: 'heavy-magazine', fixedParams: { length: '10-round' } },
 ];

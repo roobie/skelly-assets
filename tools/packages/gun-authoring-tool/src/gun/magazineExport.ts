@@ -17,9 +17,13 @@ import { inFileFrame } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { magazineRoundColumn, magazineRoundPoses } from './magazineGeometry.ts';
 import { GUN_PALETTE } from './palette.ts';
+import { FAMILIES } from './parts.ts';
+import { GUN_PREFABS, type PrefabCatalogueEntry } from './prefabs.ts';
 
 export interface MagazineExportInput {
   readonly asset: GlbAssetIdentity;
+  /** The registry key of a family that builds the `magazine` role. */
+  readonly family: string;
   readonly params: Readonly<Record<string, string>>;
   readonly cartridge: MetallicCartridge;
   readonly appearance?: AppearanceContext;
@@ -35,10 +39,16 @@ export type MagazineExportResult =
     }
   | { readonly ok: false; readonly error: GlbExportError };
 
+/** The curated prefab a loose magazine exports from: one whose family builds the `magazine` role. */
+export const magazinePrefab = (id: string): PrefabCatalogueEntry | undefined =>
+  GUN_PREFABS.find(
+    (prefab) => prefab.id === id && FAMILIES[prefab.family]?.build(prefab.fixedParams).family === 'magazine',
+  );
+
 /** Exports one generated magazine as a detached model plus its full round-column metadata. */
 export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportResult => {
   calibreSlug(input.cartridge.id);
-  const magazine: PartInstance = { family: 'magazine', params: input.params };
+  const magazine: PartInstance = { family: input.family, params: input.params };
   const assembly: Assembly = {
     name: input.asset.id,
     root: 'magazine',
@@ -46,6 +56,10 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
     connections: [],
   };
   const resolved = resolve(assembly, gunDomain);
+  const def = resolved.defs.get('magazine');
+  if (def?.family !== 'magazine') {
+    throw new Error(`family "${input.family}" does not build a magazine`);
+  }
   const output: GlbExportResult = exportGlb({
     resolved,
     palette: GUN_PALETTE,
@@ -56,11 +70,11 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
   if (!output.ok) {
     return output;
   }
-  const def = resolved.defs.get('magazine');
-  if (!def) {
-    throw new Error('resolved magazine has no part definition');
-  }
-  const { column } = magazineRoundColumn(def.displaySolids ?? def.solids, input.cartridge, input.params, def.solids);
+  // The family's defaults fill the params a prefab leaves out, as they do for the viewer's column.
+  const params = Object.fromEntries(
+    Object.entries(resolved.params.get('magazine') ?? {}).map(([key, param]) => [key, param.value]),
+  );
+  const { column } = magazineRoundColumn(def.displaySolids ?? def.solids, input.cartridge, params, def.solids);
   const fileResolved = inFileFrame(resolved);
   const drawn = drawnGeometry(fileResolved, input.voxel);
   return {

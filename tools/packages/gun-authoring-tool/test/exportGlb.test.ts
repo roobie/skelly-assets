@@ -976,6 +976,15 @@ describe('glb export: deadvox model entry', () => {
     expect(readGlb(bare.glb).json.nodes.map(({ name }) => name)).toContain(bareSlot?.node);
   });
 
+  it('exports the magazine replacement slot for a dedicated family that plays the magazine role', () => {
+    const assembly = design('archetype-anti-materiel');
+    expect(assembly.parts.magazine?.family).not.toBe('magazine');
+    const { glb, modelEntry } = exported(assembly, ASSET, 'anti-materiel');
+    const slot = modelEntry.gun.slots?.magazine;
+    expect(slot).toBeDefined();
+    expect(readGlb(glb).json.nodes.map(({ name }) => name)).toContain(slot?.node);
+  });
+
   it('emits the fixed axis-mapping turn, not one derived from the grip', () => {
     for (const name of ['archetype-ar', 'archetype-pistol', 'archetype-ak', 'archetype-bolt-rifle']) {
       expect(exported(design(name)).modelEntry.grip.turn).toEqual(gripTurn());
