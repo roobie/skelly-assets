@@ -93,7 +93,7 @@ export function mobManifest(rows) {
   const models = [];
   const files = [];
   for (const row of rows) {
-    models.push({ id: row.id, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips, body: row.body });
+    models.push({ id: row.id, title: row.title, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips, body: row.body });
     files.push(outputPath(row.pack, row.glb), outputPath(row.pack, row.body), outputPath(row.pack, row.clips));
   }
   return { models, files };

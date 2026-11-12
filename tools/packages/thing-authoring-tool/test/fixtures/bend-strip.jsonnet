@@ -7,6 +7,7 @@ local identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
   defaultMaterial: 'paint-charcoal',
   items: [{
     id: 'bend_strip',
+    title: 'Fixture strip',
     exportMass: 'parts',
     voxelGrain: 0.05,
     parts: [{

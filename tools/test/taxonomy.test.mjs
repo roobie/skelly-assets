@@ -123,8 +123,8 @@ test('the manifest carries each model\'s category, sorted tags and sorted keywor
   const models = withSources(
     [{ id: 'axe', kind: 'item', pack: 'fixture.a', path: 'axe.glb', nodes: [] }, { id: 'rock', kind: 'item', pack: 'fixture.a', path: 'rock.glb', nodes: [] }],
     [
-      { pack: 'fixture.a', id: 'axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] }, keywords: ['splitting', 'felling'] } },
-      { pack: 'fixture.a', id: 'rock' },
+      { pack: 'fixture.a', id: 'axe', title: 'Fixture Axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] }, keywords: ['splitting', 'felling'] } },
+      { pack: 'fixture.a', id: 'rock', title: 'Fixture Rock' },
     ],
   );
   const { models: entries } = buildManifest({ models, files: ['fixture.a/axe.glb', 'fixture.a/rock.glb'], credit: () => ({ author: 'a', licence: 'l' }) });

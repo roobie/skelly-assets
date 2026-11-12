@@ -82,6 +82,7 @@ test('the showcase lists every model of the manifest at its pack path, ships the
       const file = outputPath(row.pack, row.path);
       const clips = row.clips === undefined ? null : outputPath(row.pack, row.clips);
       assert.equal(listed.get(file)?.clips, clips, `${file} is not listed with its clips`);
+      assert.equal(listed.get(file)?.title, row.title, `${file} is not listed under its authored title`);
     }
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     let sampledDeaths = 0;

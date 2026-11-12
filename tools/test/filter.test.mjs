@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { FORM, KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
 
-const model = (id, category, tags = {}, keywords = []) => ({ id, category, tags, keywords });
+const model = (id, category, tags = {}, keywords = []) => ({ id, title: `Fixture ${category}`, category, tags, keywords });
 const entries = [
   model('oak_door', 'building', { material: ['wood'], place: ['urban'] }, ['entrance']),
   model('steel_door', 'building', { material: ['steel'], place: ['urban'] }, ['entrance']),
   model('oak_log', 'nature', { material: ['wood'] }),
-  { id: 'jeep', tags: {}, keywords: [], sites: [] },
+  { id: 'jeep', title: 'Fixture jeep', tags: {}, keywords: [], sites: [] },
   model('loose', null),
 ];
 const ids = (filter) => entries.filter((e) => matches(e, filter)).map((e) => e.id);

@@ -18,7 +18,7 @@ it('exports one recipe file into its pack output without changing its source roo
       exportMass === 'parts' && parts.length === 1 && parts[0]!.family === 'fuse')!;
     const packId = 'fixture.pack';
     const value = [{
-      id: `${item.id}_fixture_model`, kind: 'item', source: item.id,
+      id: `${item.id}_fixture_model`, title: 'Fixture Model', kind: 'item', source: item.id,
       voxel: { grain: 0.01 }, options: { mass: item.exportMass },
     }];
     mkdirSync(join(root, 'models/recipes'), { recursive: true });
