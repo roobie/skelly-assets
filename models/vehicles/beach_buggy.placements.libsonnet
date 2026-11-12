@@ -12,7 +12,7 @@ local s = import 'beach_buggy.spec.libsonnet';
     site.one('rear_axle', 'beach_buggy_rear_axle'),
     site.one('engine', 'engine_i4_petrol', [-1.12, 0.32, 0]),
     site.one('gearbox', 'gearbox_transaxle', [s.rearAxle + 0.28, 0.3, 0]),
-    site.one('fuel_tank', 'fuel_tank_car', [-0.72, 0.36, 0]),
+    site.one('fuel_tank', 'fuel_tank_car', [-0.67, 0.6, 0]),
     site.one('exhaust', 'beach_buggy_exhaust'),
     site.one('steering_wheel', 'steering_wheel', [0.26, 0.69, -0.26]),
     site.one('gear_lever', 'gear_lever', [0.22, s.floor, 0]),
@@ -25,13 +25,7 @@ local s = import 'beach_buggy.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.45, 0.44])
   + site.batteryBay('battery_tray', [-0.72, 0.3, 0.2]),
   unjudged: [
-    site.unjudged('engine', 'fuel_tank', 0.032,
-      'The alternator_case piece of engine_i4_petrol runs into the body piece of fuel_tank_car.'),
     site.unjudged('frame', 'roll_bar', 0.033,
       'The upper_rail_near piece of beach_buggy_frame runs into the brace_near piece of beach_buggy_roll_bar.'),
-    site.unjudged('gearbox', 'fuel_tank', 0.146,
-      'The case piece of gearbox_transaxle runs into the body piece of fuel_tank_car.'),
-    site.unjudged('rear_axle', 'engine', 0.06,
-      'The beam piece of beach_buggy_rear_axle runs into the alternator_case piece of engine_i4_petrol.'),
   ],
 }
