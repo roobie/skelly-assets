@@ -1,6 +1,8 @@
 import type { KeepOut, PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { triggerBlade } from '../roundedTriggerGuard.ts';
+import { TRIGGER_BLADE } from '../triggerGuards.ts';
 import { box, NEG_Y, X, Y } from './common.ts';
 import { HEAVY_MAGAZINE_DEPTH, HEAVY_MAGAZINE_INSERTION, HEAVY_MAGAZINE_WIDTH } from './heavyMagazine.ts';
 
@@ -112,6 +114,8 @@ export const heavyLower: PartFamily = {
       box('well-wall-right', [WELL_REAR_X, PORT_Y, WELL_HALF_WIDTH], [HEAVY_WELL_FRONT_X, 0, OUTER_HALF_WIDTH]),
       box('well-roof', [WELL_REAR_X, roofY, -WELL_HALF_WIDTH], [HEAVY_WELL_FRONT_X, 0, WELL_HALF_WIDTH]),
       ...triggerGuardSolids(finger),
+      // The blade hangs from the guard's top bar, which closes the finger space from above.
+      triggerBlade(finger.box, TRIGGER_BLADE, finger.box.center[1] + finger.box.half[1]),
     ];
     // The magazine slides down out of the well; nothing but the magazine may stand in its path.
     const magazinePath: KeepOut = {
