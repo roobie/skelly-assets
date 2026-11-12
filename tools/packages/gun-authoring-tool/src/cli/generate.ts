@@ -12,6 +12,7 @@ import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { gunDomain } from '../gun/domain.ts';
 import { TEMPLATES } from '../gun/templates.ts';
+import { generatedAssemblyJson } from './generatedAssemblyJson.ts';
 import { readCartridge } from './readCartridge.ts';
 
 const { values } = parseArgs({
@@ -62,16 +63,7 @@ if (values.valid) {
   }
 }
 
-// Keep the selected finish preset explicit across file boundaries; never encode it in the generated name.
-const json = `${JSON.stringify(
-  {
-    ...assembly,
-    ...(template.variant === undefined ? {} : { calibre: template.variant }),
-    appearance: { appearanceProfile: template.name },
-  },
-  null,
-  2,
-)}\n`;
+const json = generatedAssemblyJson(assembly, template);
 if (values.out) {
   writeFileSync(values.out, json);
 } else {
