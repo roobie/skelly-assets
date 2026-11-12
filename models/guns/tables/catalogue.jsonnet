@@ -197,8 +197,8 @@ local item(id, family, selector, params, massKg, profile) =
       style: 'ak-buttstock', length: 'L', combDegrees: '2', section: 'ak',
     }, 0.4, 'ak') + { title: 'Long AK stock' },
     row('stock-m4-short', 'stock', { style: 'm4', length: 'S' }, 0.3),
-    item('stock_m4_medium', 'stock', ['style', 'length'], { style: 'm4', length: 'M', combDegrees: '2', section: 'ar' }, 0.35, 'ar') + { title: 'Medium M4 stock' },
-    item('stock_m4_long', 'stock', ['style', 'length'], { style: 'm4', length: 'L', combDegrees: '2', section: 'ar' }, 0.4, 'ar') + { title: 'Long M4 stock' },
+    item('stock_m4_medium', 'stock', ['style', 'length'], { style: 'm4', length: 'M', combDegrees: '2', section: 'ar' }, 0.35, 'ar') + { title: 'Medium AR stock' },
+    item('stock_m4_long', 'stock', ['style', 'length'], { style: 'm4', length: 'L', combDegrees: '2', section: 'ar' }, 0.4, 'ar') + { title: 'Long AR stock' },
     row('stock-sporting-short', 'stock', { style: 'sporting', length: 'S' }, 0.35),
     item('stock_sporting_medium', 'stock', ['style', 'length'], {
       style: 'sporting', length: 'M', combDegrees: '2', section: 'sporter',
