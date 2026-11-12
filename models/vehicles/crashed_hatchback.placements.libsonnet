@@ -20,8 +20,10 @@ local s = import 'crashed_hatchback.spec.libsonnet';
   + pair('tail_lamp', 'crashed_hatchback_tail_lamp')
   + pair('front_seat', 'crashed_hatchback_front_seat', [-0.02, s.floor, 0.37])
   + pair('rear_wheel', 'crashed_hatchback_flat_wheel', [s.rearAxle, s.axleY, s.wheelZ]),
-  overlaps: [
-    site.overlap('crushed_nose', 'engine',
-      'The crushed_nose draws its own block block where the engine part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  unjudged: [
+    site.unjudged('crushed_nose', 'engine', 0.25,
+      'The block piece of crashed_hatchback_crushed_nose runs into the crushed_mass piece of crashed_hatchback_engine.'),
+    site.unjudged('shell', 'crushed_nose', 0.06,
+      'The near_45_10 piece of crashed_hatchback_shell runs into the top_0_19 piece of crashed_hatchback_crushed_nose.'),
   ],
 }

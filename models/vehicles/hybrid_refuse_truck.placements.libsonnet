@@ -12,8 +12,10 @@ local s = (import 'truck-cab.libsonnet').spec(import 'refuse_truck.spec.libsonne
     inverter: { part: 'inverter_large', at: [1.03, s.railBottom - 0.24, 0.9] },
     pack: { part: 'traction_pack_van', at: [0.33, s.railBottom - 0.16, 0] },
   }),
-  overlaps: [
-    site.overlap('chassis', 'pack',
-      'A leaf spring on the rail is drawn through the case slung beneath it; the owner decides whether to move the case or shorten the spring.'),
+  unjudged: [
+    site.unjudged('chassis', 'pack', 0.087,
+      'The spring_1 piece of refuse_truck_chassis runs into the case piece of traction_pack_van.'),
+    site.unjudged('gearbox', 'motor', 0.06,
+      'The case piece of gearbox_heavy runs into the lead piece of traction_motor_large.'),
   ],
 }

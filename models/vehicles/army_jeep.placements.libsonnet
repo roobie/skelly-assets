@@ -38,4 +38,8 @@ local s = import 'army_jeep.spec.libsonnet';
   + pair('headlamp', 'headlamp_military', [s.nose + 0.06, 0.595, 0.27])
   + site.batteryBay('battery_tray', [0.72, 0.72, -0.3]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('spare_wheel', 'tow_hitch', 0.05,
+      'The tyre piece of spare_wheel_carrier runs into the neck piece of tow_hitch.'),
+  ],
 }

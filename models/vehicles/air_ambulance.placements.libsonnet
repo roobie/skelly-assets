@@ -36,8 +36,12 @@ local s = import 'air_ambulance.spec.libsonnet';
   + pair('clamshell_door', 'air_ambulance_clamshell_door')
   + pair('seat', 'air_ambulance_seat', [1.28, s.floor, 0.4]),
   tags: { 'vehicle-role': ['emergency'] },
-  overlaps: [
-    site.overlap('engine_cowl', 'main_gearbox',
-      'The main_gearbox is let into the engine_cowl at its mount (pylon runs into case); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  unjudged: [
+    site.unjudged('cabin_rear', 'engine_cowl', 0.055,
+      'The cowl_17 piece of air_ambulance_cabin_rear runs into the roof_16_3 piece of air_ambulance_engine_cowl.'),
+    site.unjudged('engine_cowl', 'main_gearbox', 0.207,
+      'The pylon piece of air_ambulance_engine_cowl runs into the case piece of air_ambulance_main_gearbox.'),
+    site.unjudged('locker', 'sliding_door_far', 0.06,
+      'The carcass piece of air_ambulance_locker runs into the hinge_rib_far piece of air_ambulance_sliding_door.'),
   ],
 }

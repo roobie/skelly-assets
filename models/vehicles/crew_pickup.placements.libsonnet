@@ -39,4 +39,8 @@ local s = import 'crew_pickup.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.97, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.75, -0.44]),
+  unjudged: [
+    site.unjudged('frame', 'rear_prop_shaft', 0.032,
+      'The tube piece of crew_pickup_frame runs into the cross_mid piece of prop_shaft_short.'),
+  ],
 }

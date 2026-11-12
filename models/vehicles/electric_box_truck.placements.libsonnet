@@ -15,8 +15,10 @@ local s = (import 'truck-cab.libsonnet').spec(import 'box_truck.spec.libsonnet')
     port: { part: 'charge_port', at: [s.tankX + 0.15, s.tankY + 0.04, s.side - 0.34 + 0.21] },
     add: [site.one('pack_lower', 'traction_pack_van', [-0.22, s.railBottom - 0.32, 0.1])],
   }),
-  overlaps: [
-    site.overlap('chassis', 'pack',
-      'A leaf spring on the rail is drawn through the case slung beneath it; the owner decides whether to move the case or shorten the spring.'),
+  unjudged: [
+    site.unjudged('chassis', 'pack', 0.087,
+      'The spring_1 piece of box_truck_chassis runs into the case piece of traction_pack_van.'),
+    site.unjudged('pack', 'pack_lower', 0.05,
+      'The case piece of traction_pack_van runs into the lead piece of traction_pack_van.'),
   ],
 }

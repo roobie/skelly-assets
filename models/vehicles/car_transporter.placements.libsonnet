@@ -12,4 +12,14 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
     site.one('side_guard', 'car_transporter_side_guard'),
   ]
   + site.pair('ramp', 'car_transporter_ramp'),
+  unjudged: [
+    site.unjudged('deck_posts', 'upper_deck', 0.058,
+      'The cross_6 piece of car_transporter_deck_posts runs into the post_0_near piece of car_transporter_upper_deck.'),
+    site.unjudged('lower_deck', 'deck_posts', 0.058,
+      'The plate piece of car_transporter_lower_deck runs into the tail_post_near piece of car_transporter_deck_posts.'),
+    site.unjudged('mudguard_far', 'lower_deck', 0.063,
+      'The plate piece of car_transporter_mudguard runs into the guard_1_top_far piece of car_transporter_lower_deck.'),
+    site.unjudged('mudguard_near', 'lower_deck', 0.063,
+      'The plate piece of car_transporter_mudguard runs into the guard_1_top piece of car_transporter_lower_deck.'),
+  ],
 }

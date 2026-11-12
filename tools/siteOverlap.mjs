@@ -3,9 +3,11 @@
 // (models/vehicles/kit.libsonnet, `far` and `moved`), exactly as the showcase and the game place the part. Two pieces
 // overlap when they share more than one voxel grain of depth, so faces that touch or sink a grain into each other are
 // contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other freely.
-// Two things allow an overlap: the seating of either part's role (models/vehicles/seating.libsonnet), which holds for every
-// vehicle, and the vehicle's own placements file, `overlaps` (models/vehicles/site.libsonnet, `overlap`), which a variant
-// shares with its parent. The reason for the rule is in docs/decisions/0014-site-overlap.md.
+// An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which holds for
+// every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
+// correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run. Both are capped
+// at the depth they were written for, and a variant shares its parent's. An entry that no longer applies is reported,
+// so the lists cannot rot. The reason for the rule is in `docs/decisions/0014-site-overlap.md`.
 import { resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { solid } from './pieceSolid.mjs';
@@ -13,8 +15,9 @@ import { solid } from './pieceSolid.mjs';
 const repo = resolve(import.meta.dirname, '..');
 
 // Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
-// the overlaps it allows, and the seating by role: { grain, seating, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps } } }. A site whose part
-// is a roster model has no pieces to compare, so it is left out.
+// the overlaps it allows and has not judged, the fits by role and every site id of the catalogue: { grain, fits,
+// roles, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps, unjudged } } }. A site whose part is
+// a roster model has no pieces to compare, so it is left out.
 export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
   local k = import 'models/vehicles/kit.libsonnet';
@@ -27,12 +30,18 @@ export function readSitePieces(root = repo) {
   ];
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
-    seating: (import 'models/vehicles/seating.libsonnet').seats,
+    fits: (import 'models/vehicles/seating.libsonnet').fits,
+    roles: std.set(std.flattenArrays([
+      [site.id for site in placements[vehicle].sites]
+      for vehicle in std.objectFields(placements)
+      if std.objectHas(placements[vehicle], 'sites')
+    ])),
     vehicles: {
       [vehicle]: {
         parent: std.get(placements[vehicle], 'parent'),
         sites: [site { pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
         overlaps: std.get(placements[vehicle], 'overlaps', []),
+        unjudged: std.get(placements[vehicle], 'unjudged', []),
       }
       for vehicle in std.objectFields(placements)
       if std.objectHas(placements[vehicle], 'sites')
@@ -63,7 +72,7 @@ function sharedDepth(p, q, inside, step) {
 }
 
 // Every pair of sites of one vehicle whose pieces overlap by more than `grain`, as { sites: [a, b], parts: [a, b],
-// pieces: [a, b], depth }, depth being the shared thickness (m) at the deepest point sampled of the first piece pair
+// pieces: [a, b], depth }, depth being the shared thickness (m) at the deepest point sampled of the deepest piece pair
 // found. Pieces are swept along x so only those whose boxes meet are compared.
 export function siteOverlaps(sites, grain) {
   const pieces = sites.flatMap((site, owner) => site.pieces.map((piece) => ({ owner, id: piece.id, ...solid(piece) })))
@@ -72,9 +81,12 @@ export function siteOverlaps(sites, grain) {
   for (let i = 0; i < pieces.length; i++) {
     for (let j = i + 1; j < pieces.length && pieces[j].min[0] < pieces[i].max[0] - grain; j++) {
       const [p, q] = [pieces[i], pieces[j]];
-      if (p.owner === q.owner || found.has(key(p.owner, q.owner))) continue;
-      const depth = sharedDepth(p, q, grain / 2, grain / 2);
-      if (depth > 0) found.set(key(p.owner, q.owner), { owners: [p.owner, q.owner].sort((a, b) => a - b), pieces: [p.id, q.id], depth: 2 * depth });
+      if (p.owner === q.owner) continue;
+      const depth = 2 * sharedDepth(p, q, grain / 2, grain / 2);
+      const pair = key(p.owner, q.owner);
+      if (depth > (found.get(pair)?.depth ?? 0)) {
+        found.set(pair, { owners: [p.owner, q.owner].sort((a, b) => a - b), pieces: [p.id, q.id], depth });
+      }
     }
   }
   return [...found.values()].map(({ owners, pieces: ids, depth }) => ({
@@ -85,28 +97,99 @@ export function siteOverlaps(sites, grain) {
   }));
 }
 
-// A site's role: its id without the side it is on and its number, so every vehicle's wheels share one seating.
+// A site's role: its id without the side it is on and its number, so every vehicle's wheels share one fit.
 export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').replace(/_\d+(?=_|$)/g, '');
 
-const globPattern = (glob) => new RegExp(`^${glob.split('*').map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+const FIT_KEYS = ['depth', 'into', 'seated', 'why'];
+const EPSILON = 1e-9;
 
-// How deep (m) the role seats into its neighbours: the deepest of the seating entries that name it, or 0.
-export function seatDepth(seating, role) {
-  return Math.max(0, ...seating.filter(({ roles }) => roles.some((glob) => globPattern(glob).test(role))).map(({ depth }) => depth));
+// Why the fits cannot be trusted, as messages: a malformed fit, a role no site of the catalogue has, and a pair of
+// roles that two fits cover, whose depths would then disagree.
+export function seatingProblems(fits, roles) {
+  const known = new Set(roles.map(roleOf));
+  const covered = new Map();
+  return fits.flatMap((fit, i) => {
+    const where = `seating fit ${i + 1} (${String(fit?.why).slice(0, 40)})`;
+    const keys = Object.keys(fit ?? {}).sort();
+    const shape = [
+      ...(keys.join() === FIT_KEYS.join() ? [] : [`${where}: has keys ${keys.join(' ')}, not ${FIT_KEYS.join(' ')}`]),
+      ...(fit?.depth > 0 ? [] : [`${where}: needs a depth above 0`]),
+      ...(typeof fit?.why === 'string' && fit.why !== '' ? [] : [`${where}: needs a why`]),
+      ...['seated', 'into']
+        .filter((side) => !Array.isArray(fit?.[side]) || fit[side].length === 0)
+        .map((side) => `${where}: ${side} needs at least one role`),
+    ];
+    if (shape.length > 0) return shape;
+    const unknown = [...fit.seated, ...fit.into].filter((role) => !known.has(role));
+    const clashes = fit.seated.flatMap((a) => fit.into.map((b) => key(a, b))).filter((pair) => {
+      const earlier = covered.get(pair);
+      covered.set(pair, earlier ?? i);
+      return earlier !== undefined && earlier !== i;
+    });
+    return [
+      ...[...new Set(unknown)].map((role) => `${where}: role ${role} is the role of no site`),
+      ...[...new Set(clashes)].map((pair) =>
+        `${where}: ${pair.split('\n').join(' and ')} is also covered by fit ${covered.get(pair) + 1}`),
+    ];
+  });
+}
+
+// How deep (m) the fits let parts of the two roles sink into each other: the deepest fit that names one in `seated`
+// and the other in `into`, or 0.
+export function fitDepth(fits, roleA, roleB) {
+  return Math.max(0, ...fits
+    .filter(({ seated, into }) =>
+      (seated.includes(roleA) && into.includes(roleB)) || (seated.includes(roleB) && into.includes(roleA)))
+    .map(({ depth }) => depth));
 }
 
 const millimetres = (metres) => Math.round(metres * 1e3);
 
-// The overlaps no vehicle allows, as messages naming the vehicle, both parts and their sites.
-export function overlapProblems({ grain, seating, vehicles }) {
-  const seated = ({ sites, depth }) => depth <= Math.max(...sites.map((site) => seatDepth(seating, roleOf(site)))) + 1e-9;
-  return Object.entries(vehicles).flatMap(([vehicle, { parent, sites, overlaps }]) => {
-    const allowed = new Set([...(vehicles[parent]?.overlaps ?? []), ...overlaps].map(({ sites: pair }) => key(...pair)));
-    return siteOverlaps(sites, grain)
-      .filter((overlap) => !seated(overlap) && !allowed.has(key(...overlap.sites)))
-      .map(({ sites: [a, b], parts: [partA, partB], pieces: [pieceA, pieceB], depth }) =>
-        `${vehicle}: ${partA} at ${a} overlaps ${partB} at ${b} by ${millimetres(depth)} mm (${pieceA} in ${pieceB})`);
-  });
+// The report on every vehicle's overlaps, as { problems, notes } messages. A problem is an overlap that no fit,
+// allowance or `unjudged` entry covers, or covers only to a lesser depth, and an entry that is stale: its pair no
+// longer overlaps, a fit already covers it, or it is listed twice. A note is an overlap marked `unjudged`, said again
+// on every run so nothing is silent. Each message names the vehicle, both parts and their sites.
+export function overlapReport({ grain, fits, roles, vehicles }) {
+  const problems = seatingProblems(fits, roles);
+  const notes = [];
+  for (const [vehicle, { parent, sites, overlaps, unjudged }] of Object.entries(vehicles)) {
+    const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
+    const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
+    const entries = [...overlaps, ...unjudged];
+    const inherited = [...(vehicles[parent]?.overlaps ?? []), ...(vehicles[parent]?.unjudged ?? [])];
+    const allowed = new Map([...inherited, ...entries].map((entry) => [key(...entry.sites), entry]));
+    const inheritedPairs = new Set(inherited.map((entry) => key(...entry.sites)));
+    const describe = ({ sites: [a, b], parts: [partA, partB] }) =>
+      `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
+    for (const overlap of found.values()) {
+      const cap = Math.max(roleDepth(overlap), allowed.get(key(...overlap.sites))?.depth ?? 0);
+      const [partA, partB] = overlap.parts;
+      const [a, b] = overlap.sites;
+      const detail = `by ${millimetres(overlap.depth)} mm (${overlap.pieces[0]} in ${overlap.pieces[1]})`;
+      const limit = cap > 0 ? `, more than the ${millimetres(cap)} mm allowed` : '';
+      if (overlap.depth > cap + EPSILON) {
+        problems.push(`${vehicle}: ${partA} at ${a} overlaps ${partB} at ${b} ${detail}${limit}`);
+      }
+    }
+    const seen = new Set();
+    for (const entry of entries) {
+      const pair = key(...entry.sites);
+      const [a, b] = entry.sites;
+      const where = `${vehicle}: allowed overlap of ${a} and ${b}`;
+      const overlap = found.get(pair);
+      if (seen.has(pair) || inheritedPairs.has(pair)) problems.push(`${where} is listed twice`);
+      else if (!overlap) problems.push(`${where} is stale: the parts no longer overlap`);
+      else if (roleDepth(overlap) + EPSILON >= overlap.depth) {
+        problems.push(`${where} is stale: the seating already covers it`);
+      }
+      seen.add(pair);
+      if (overlap && unjudged.includes(entry)) {
+        const depth = millimetres(overlap.depth);
+        notes.push(`${describe(overlap)} overlap by ${depth} mm and are not judged: ${entry.note}`);
+      }
+    }
+  }
+  return { problems, notes };
 }
 
-export const siteOverlapProblems = (root = repo) => overlapProblems(readSitePieces(root));
+export const siteOverlapReport = (root = repo) => overlapReport(readSitePieces(root));

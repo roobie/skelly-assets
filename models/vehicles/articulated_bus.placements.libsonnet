@@ -41,4 +41,18 @@ local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
     site.one('roof_unit', 'city_bus_roof_unit', [3.2, s.fore.roof, 0]),
     site.one('aft_roof_unit', 'city_bus_roof_unit', [-5.6, s.aft.roof, 0]),
   ],
+  unjudged: [
+    site.unjudged('aft_shell', 'aft_end_panel', 0.061,
+      'The near_nose_pillar_0 piece of articulated_bus_aft_shell runs into the panel_near piece of articulated_bus_aft_end_panel.'),
+    site.unjudged('aft_shell', 'aft_engine', 0.08,
+      'The floor_rear_0 piece of articulated_bus_aft_shell runs into the block piece of engine_i6_heavy_diesel.'),
+    site.unjudged('aft_shell', 'aft_fuel_tank', 0.08,
+      'The floor_rear_0 piece of articulated_bus_aft_shell runs into the body piece of fuel_tank_truck.'),
+    site.unjudged('aft_shell', 'aft_gearbox', 0.08,
+      'The floor_rear_0 piece of articulated_bus_aft_shell runs into the case piece of gearbox_heavy.'),
+    site.unjudged('aft_shell', 'aft_radiator', 0.06,
+      'The floor_rear_0 piece of articulated_bus_aft_shell runs into the core piece of radiator_truck.'),
+    site.unjudged('joint', 'bellows', 0.06,
+      'The turntable piece of articulated_bus_joint runs into the near_0 piece of articulated_bus_bellows.'),
+  ],
 }

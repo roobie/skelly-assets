@@ -24,12 +24,14 @@ local s = import 'golf_cart.spec.libsonnet';
   + site.pair('rear_wheel', 'wheel_145r10', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.tail - 0.03, 0.4, 0.32])
   + site.headlamps(s.nose + 0.03, 0.42, 0.3),
-  overlaps: [
-    site.overlap('rear_body', 'inverter',
-      'The rear_body draws its own tail block where the inverter part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
-    site.overlap('rear_body', 'motor',
-      'The rear_body draws its own tail block where the motor part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
-    site.overlap('rear_body', 'pack',
-      'The rear_body draws its own seat_box block where the pack part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  unjudged: [
+    site.unjudged('front_cowl', 'steering_column', 0.032,
+      'The column piece of golf_cart_front_cowl runs into the dash piece of golf_cart_steering_column.'),
+    site.unjudged('rear_body', 'inverter', 0.125,
+      'The tail piece of golf_cart_rear_body runs into the case piece of inverter_car.'),
+    site.unjudged('rear_body', 'motor', 0.116,
+      'The tail piece of golf_cart_rear_body runs into the reducer piece of traction_motor_light.'),
+    site.unjudged('rear_body', 'pack', 0.185,
+      'The seat_box piece of golf_cart_rear_body runs into the case piece of traction_pack_light.'),
   ],
 }

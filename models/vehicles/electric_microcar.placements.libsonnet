@@ -13,8 +13,8 @@ local s = import 'microcar.spec.libsonnet';
     pack: { part: 'traction_pack_small', at: [(s.rearFloorFront + s.cowl) / 2, s.sill, 0] },
     port: { part: 'charge_port', at: [s.rearAxle, s.archTop + 0.05, s.side] },
   }),
-  overlaps: [
-    site.overlap('shell', 'pack',
-      'The shell draws its own floor_pan block where the pack part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  unjudged: [
+    site.unjudged('shell', 'pack', 0.09,
+      'The floor_pan piece of electric_microcar_shell runs into the case piece of traction_pack_small.'),
   ],
 }

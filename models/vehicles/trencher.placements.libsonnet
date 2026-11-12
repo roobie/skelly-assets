@@ -29,8 +29,14 @@ local track = import 'track-kit.libsonnet';
   + site.headlamps(s.hoodFront + 0.02, 1.34, 0.42)
   + site.batteryBay('battery_tray', [0.2, s.deck, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
-  overlaps: [
-    site.overlap('chassis', 'digging_boom',
-      'The digging_boom is let into the chassis at its mount (beam runs into rear_tower); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  unjudged: [
+    site.unjudged('chassis', 'digging_boom', 0.24,
+      'The head_sprocket piece of trencher_chassis runs into the rear_tower piece of trencher_digging_boom.'),
+    site.unjudged('chassis', 'track_far', 0.087,
+      'The sprocket_hub_far piece of trencher_chassis runs into the track_beam_rear_far piece of trencher_track.'),
+    site.unjudged('chassis', 'track_near', 0.087,
+      'The sprocket_hub piece of trencher_chassis runs into the track_beam_rear_near piece of trencher_track.'),
+    site.unjudged('hood', 'engine', 0.308,
+      'The hood piece of trencher_hood runs into the block piece of engine_i4_diesel.'),
   ],
 }

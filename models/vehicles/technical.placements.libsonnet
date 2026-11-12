@@ -41,8 +41,4 @@ local wheel = 'wheel_235_75r15';
   + pair('headlamp', 'car_headlamp', [s.nose + 0.05, 0.78, 0.62])
   + site.batteryBay('battery_tray', [2.0, 0.76, 0.42]),
   tags: { 'vehicle-role': ['military'] },
-  overlaps: [
-    site.overlap('cab', 'gearbox',
-      'The gearbox sits in the floor tunnel, which is drawn as a solid block around it.'),
-  ],
 }

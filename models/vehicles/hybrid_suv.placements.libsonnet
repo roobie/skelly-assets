@@ -14,4 +14,8 @@ local s = import 'suv.spec.libsonnet';
     inverter: { part: 'inverter_car', at: [1.8, 0.85, 0] },
     pack: { part: 'hybrid_pack', at: [-0.4, s.sill, -0.38] },
   }),
+  unjudged: [
+    site.unjudged('shell', 'pack', 0.08,
+      'The floor_pan piece of suv_shell runs into the case piece of hybrid_pack.'),
+  ],
 }

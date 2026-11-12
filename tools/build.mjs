@@ -234,8 +234,9 @@ async function main() {
   if (positionals.length === 0) {
     const report = sourceReport(sources, vocabulary);
     const { unlisted } = report;
-    const problems = [...report.problems, ...vehicleReport(repo)];
-    for (const { message } of unlisted) console.log(`SOURCE note: ${message}`);
+    const vehicles = vehicleReport(repo);
+    const problems = [...report.problems, ...vehicles.problems];
+    for (const { message } of [...unlisted, ...vehicles.unjudged]) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
     if (problems.length > 0) process.exit(1);
   }

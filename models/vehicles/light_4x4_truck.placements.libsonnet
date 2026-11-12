@@ -21,8 +21,14 @@ local shaftRear = s.transferX - 0.2;
       site.one('tailgate', id + '_tailgate'),
     ] + site.pair('dropside', id + '_dropside'),
   ),
-  overlaps: [
-    site.overlap('chassis', 'alternator',
-      'A leaf spring on the rail is drawn through the case slung beneath it; the owner decides whether to move the case or shorten the spring.'),
+  unjudged: [
+    site.unjudged('cab', 'air_box', 0.123,
+      'The box piece of light_4x4_truck_cab runs into the well_aft_near piece of air_box_medium.'),
+    site.unjudged('chassis', 'alternator', 0.084,
+      'The spring_0 piece of light_4x4_truck_chassis runs into the case piece of alternator_medium.'),
+    site.unjudged('engine', 'spare_wheel', 0.093,
+      'The tyre piece of engine_v8_petrol_medium_core runs into the head piece of light_4x4_truck_spare_wheel.'),
+    site.unjudged('fuel_pump', 'spare_wheel', 0.07,
+      'The tyre piece of fuel_pump_medium runs into the body piece of light_4x4_truck_spare_wheel.'),
   ],
 }

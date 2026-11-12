@@ -43,7 +43,13 @@ local wheel = id + '_wheel';
   + site.batteryBay('truck_battery_tray', [1.25, 0.9, -0.5]),
   tags: { 'vehicle-role': ['military'] },
   overlaps: [
-    site.overlap('hull', 'gearbox',
-      'The gearbox sits in the floor tunnel, which is drawn as a solid block around it.'),
+    site.overlap('hull', 'gearbox', 0.34,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
+  unjudged: [
+    site.unjudged('frame', 'front_prop_shaft', 0.034,
+      'The tube piece of light_tactical_vehicle_frame runs into the cross_4 piece of prop_shaft_short.'),
+    site.unjudged('frame', 'rear_prop_shaft', 0.032,
+      'The tube piece of light_tactical_vehicle_frame runs into the cross_2 piece of light_tactical_vehicle_rear_prop_shaft.'),
   ],
 }

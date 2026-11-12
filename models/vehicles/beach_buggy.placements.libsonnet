@@ -24,4 +24,12 @@ local s = import 'beach_buggy.spec.libsonnet';
   + site.pair('headlamp', 'beach_buggy_headlamp')
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.45, 0.44])
   + site.batteryBay('battery_tray', [-0.72, 0.3, 0.2]),
+  unjudged: [
+    site.unjudged('engine', 'fuel_tank', 0.032,
+      'The alternator_case piece of engine_i4_petrol runs into the body piece of fuel_tank_car.'),
+    site.unjudged('gearbox', 'fuel_tank', 0.146,
+      'The body piece of gearbox_transaxle runs into the case piece of fuel_tank_car.'),
+    site.unjudged('rear_axle', 'engine', 0.06,
+      'The beam piece of beach_buggy_rear_axle runs into the alternator_case piece of engine_i4_petrol.'),
+  ],
 }

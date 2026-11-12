@@ -22,4 +22,12 @@ local s = import 'quad_bike.spec.libsonnet';
   + site.pair('rear_wheel', 'quad_bike_wheel', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.0, 0.6, 0.12])
   + site.pair('headlamp', 'quad_bike_headlamp', [1.0, 0.62, 0.11]),
+  unjudged: [
+    site.unjudged('front_fenders', 'front_arm_far', 0.05,
+      'The fender_top_far piece of quad_bike_front_fenders runs into the shock_far piece of quad_bike_front_arm.'),
+    site.unjudged('front_fenders', 'front_arm_near', 0.05,
+      'The fender_top_near piece of quad_bike_front_fenders runs into the shock piece of quad_bike_front_arm.'),
+    site.unjudged('swing_arm', 'rear_fenders', 0.06,
+      'The deck piece of quad_bike_swing_arm runs into the shock_mount piece of quad_bike_rear_fenders.'),
+  ],
 }

@@ -38,12 +38,18 @@ local id = 'heavy_cargo_helicopter';
   + pair('crew_seat', id + '_crew_seat', [6.0, s.floorTop, 0.62])
   + pair('control_stick', 'control_stick', [6.35, s.floorTop, 0.62]),
   tags: { 'vehicle-role': ['military'] },
-  overlaps: [
-    site.overlap('load_floor', 'cockpit_bulkhead',
-      'The cockpit_bulkhead is let into the load_floor at its mount (deck runs into plate_0); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
-    site.overlap('sponson_near', 'fuel_tank_near',
-      'The sponson_near draws its own tank block where the fuel_tank_near part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
-    site.overlap('sponson_far', 'fuel_tank_far',
-      'The sponson_far draws its own tank_far block where the fuel_tank_far part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  unjudged: [
+    site.unjudged('load_floor', 'cockpit_bulkhead', 0.08,
+      'The deck piece of heavy_cargo_helicopter_load_floor runs into the plate_0 piece of heavy_cargo_helicopter_cockpit_bulkhead.'),
+    site.unjudged('rear_gearbox', 'beacon', 0.06,
+      'The case piece of heavy_cargo_helicopter_gearbox runs into the lens piece of helicopter_beacon_red.'),
+    site.unjudged('rear_pylon', 'turbine_far', 0.181,
+      'The case_far piece of heavy_cargo_helicopter_rear_pylon runs into the nacelle_foot_far piece of heavy_cargo_helicopter_turbine.'),
+    site.unjudged('rear_pylon', 'turbine_near', 0.181,
+      'The case piece of heavy_cargo_helicopter_rear_pylon runs into the nacelle_foot_near piece of heavy_cargo_helicopter_turbine.'),
+    site.unjudged('sponson_far', 'fuel_tank_far', 0.4,
+      'The tank_far piece of heavy_cargo_helicopter_sponson runs into the tank_far piece of heavy_cargo_helicopter_fuel_tank.'),
+    site.unjudged('sponson_near', 'fuel_tank_near', 0.4,
+      'The tank piece of heavy_cargo_helicopter_sponson runs into the tank piece of heavy_cargo_helicopter_fuel_tank.'),
   ],
 }

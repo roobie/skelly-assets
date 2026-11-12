@@ -28,4 +28,20 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
   + site.pair('rear_outrigger', 'mobile_crane_outrigger', [s.rearRiggerX, 0, 0])
   + site.pair('cab_beacon', 'beacon_amber', [s.face - s.lean - 0.6, s.roof + 0.15, 0.9]),
   tags: { 'vehicle-role': ['construction'] },
+  unjudged: [
+    site.unjudged('boom_base', 'derrick_ram', 0.034,
+      'The base piece of mobile_crane_boom_base runs into the rod piece of mobile_crane_derrick_ram.'),
+    site.unjudged('counterweight', 'winch', 0.06,
+      'The top piece of mobile_crane_counterweight runs into the rope piece of mobile_crane_winch.'),
+    site.unjudged('deck', 'front_outrigger_far', 0.125,
+      'The runner_far piece of mobile_crane_deck runs into the beam_far piece of mobile_crane_outrigger.'),
+    site.unjudged('deck', 'front_outrigger_near', 0.125,
+      'The runner_near piece of mobile_crane_deck runs into the beam piece of mobile_crane_outrigger.'),
+    site.unjudged('deck', 'rear_outrigger_far', 0.125,
+      'The runner_far piece of mobile_crane_deck runs into the beam_far piece of mobile_crane_outrigger.'),
+    site.unjudged('deck', 'rear_outrigger_near', 0.125,
+      'The runner_near piece of mobile_crane_deck runs into the beam piece of mobile_crane_outrigger.'),
+    site.unjudged('gearbox', 'front_axle_2', 0.052,
+      'The case piece of gearbox_heavy runs into the beam piece of steered_axle_heavy_bare.'),
+  ],
 }

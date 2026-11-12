@@ -27,10 +27,22 @@ local s = import 'road_roller.spec.libsonnet';
   + site.headlamps(2.02, 1.4, 0.46)
   + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
-  overlaps: [
-    site.overlap('platform', 'rear_drum',
-      'The rear_drum is let into the platform at its mount (roll runs into spine); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
-    site.overlap('front_yoke', 'front_drum',
-      'The front_drum is let into the front_yoke at its mount (neck runs into roll); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  unjudged: [
+    site.unjudged('engine_hood', 'engine', 0.271,
+      'The hood piece of road_roller_engine_hood runs into the block piece of engine_i3_small.'),
+    site.unjudged('front_yoke', 'front_drum', 0.151,
+      'The neck piece of road_roller_front_yoke runs into the roll piece of road_roller_drum.'),
+    site.unjudged('platform', 'front_yoke', 0.087,
+      'The console piece of road_roller_platform runs into the neck piece of road_roller_front_yoke.'),
+    site.unjudged('platform', 'fuel_tank', 0.146,
+      'The body piece of road_roller_platform runs into the spine piece of fuel_tank_car.'),
+    site.unjudged('platform', 'rear_drum', 0.176,
+      'The roll piece of road_roller_platform runs into the spine piece of road_roller_drum.'),
+    site.unjudged('platform', 'rear_yoke', 0.05,
+      'The spine piece of road_roller_platform runs into the neck piece of road_roller_rear_yoke.'),
+    site.unjudged('rear_drum', 'fuel_tank', 0.146,
+      'The roll piece of road_roller_drum runs into the body piece of fuel_tank_car.'),
+    site.unjudged('rear_yoke', 'rear_drum', 0.05,
+      'The cheek_near piece of road_roller_rear_yoke runs into the hub_near piece of road_roller_drum.'),
   ],
 }

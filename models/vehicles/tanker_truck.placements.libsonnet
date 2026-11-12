@@ -9,8 +9,14 @@ local s = import 'tanker_truck.spec.libsonnet';
     site.one('ladder', 'tanker_truck_ladder'),
     site.one('valve_gear', 'tanker_truck_valve_gear'),
   ],
-  overlaps: [
-    site.overlap('saddle', 'barrel',
-      'The barrel is let into the saddle at its mount (shell runs into low_0); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  unjudged: [
+    site.unjudged('barrel', 'walkway', 0.05,
+      'The shell piece of tanker_truck_barrel runs into the bearer_0 piece of tanker_truck_walkway.'),
+    site.unjudged('gearbox', 'saddle', 0.05,
+      'The foot_2 piece of gearbox_heavy runs into the case piece of tanker_truck_saddle.'),
+    site.unjudged('saddle', 'barrel', 0.185,
+      'The shell piece of tanker_truck_saddle runs into the high_2 piece of tanker_truck_barrel.'),
+    site.unjudged('saddle', 'valve_gear', 0.066,
+      'The manifold piece of tanker_truck_saddle runs into the low_0 piece of tanker_truck_valve_gear.'),
   ],
 }

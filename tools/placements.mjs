@@ -17,7 +17,7 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title']);
+const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
@@ -83,18 +83,20 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
   return problems;
 }
 
-// Why an allowed overlap (tools/siteOverlap.mjs) cannot be read: it names two sites of the vehicle and says why.
-function allowedOverlapProblems(vehicle, overlaps, sites) {
-  if (!Array.isArray(overlaps)) return [`${vehicle}: overlaps is not a list`];
+// Why the overlaps a vehicle lists (tools/siteOverlap.mjs) cannot be read: each names two different sites of the vehicle,
+// the depth it may reach, and the text (`textKey`) that says why it is correct or what is open about it.
+function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
+  if (!Array.isArray(listed)) return [`${vehicle}: ${listKey} is not a list`];
   const ids = new Set((sites ?? []).map((site) => site?.id));
-  return overlaps.flatMap((allowed) => {
-    const [a, b] = allowed?.sites ?? [];
+  return listed.flatMap((entry) => {
+    const [a, b] = entry?.sites ?? [];
     const where = `${vehicle}/${a}+${b}`;
-    const unknown = Object.keys(allowed ?? {}).filter((key) => key !== 'sites' && key !== 'why');
+    const unknown = Object.keys(entry ?? {}).filter((field) => !['sites', 'depth', textKey].includes(field));
     return [
-      ...(unknown.length > 0 ? [`${where}: unknown keys ${unknown.join(' ')} in an allowed overlap`] : []),
-      ...(allowed?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b ? [] : [`${where}: an allowed overlap names two different sites of the vehicle`]),
-      ...(typeof allowed?.why === 'string' && allowed.why !== '' ? [] : [`${where}: an allowed overlap needs a why`]),
+      ...(unknown.length > 0 ? [`${where}: unknown keys ${unknown.join(' ')} in ${listKey}`] : []),
+      ...(entry?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b ? [] : [`${where}: ${listKey} names two different sites of the vehicle`]),
+      ...(entry?.depth > 0 ? [] : [`${where}: ${listKey} needs a depth above 0`]),
+      ...(typeof entry?.[textKey] === 'string' && entry[textKey] !== '' ? [] : [`${where}: ${listKey} needs a ${textKey}`]),
     ];
   });
 }
@@ -124,7 +126,8 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
     else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel));
-    if (entry?.overlaps !== undefined) problems.push(...allowedOverlapProblems(vehicle, entry.overlaps, entry?.sites));
+    if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
+    if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
   }
   return problems.sort();
 }

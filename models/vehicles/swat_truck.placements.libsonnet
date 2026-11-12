@@ -18,4 +18,8 @@ local s = import 'swat_truck.spec.libsonnet';
   + site.pair('roof_beacon', 'beacon_blue', [-0.55, s.body.top + 0.05, 0.85])
   + site.pair('crew_bench', 'crew_bench', [s.benchX, s.body.floorTop, s.benchZ]),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('radiator', 'exhaust', 0.06,
+      'The pipe piece of radiator_truck runs into the core piece of exhaust_long.'),
+  ],
 }

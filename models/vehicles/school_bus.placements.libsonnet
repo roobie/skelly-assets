@@ -12,4 +12,8 @@ local headerX(y) = bus.layout(s).xf(y) + 0.03;
   + site.pair('warning_amber', 'marker_lamp', [headerX(2.66), 2.7, 0.72])
   + site.pair('warning_red_rear', 'tail_lamp_small', [s.rear - 0.03, 2.56, 0.98])
   + site.pair('warning_amber_rear', 'marker_lamp', [s.rear - 0.02, 2.6, 0.72]),
+  unjudged: [
+    site.unjudged('windscreen', 'instruments', 0.045,
+      'The glass_0 piece of school_bus_windscreen runs into the housing piece of instrument_binnacle.'),
+  ],
 }

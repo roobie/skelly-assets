@@ -1,4 +1,5 @@
 // The city car on a battery: the motor sits where the engine did and the pack lies under the floor pan.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'city_car.spec.libsonnet';
 {
@@ -11,4 +12,8 @@ local s = import 'city_car.spec.libsonnet';
     pack: { part: 'traction_pack_car', at: [(s.rearFloorFront + s.cowl) / 2, s.sill, 0] },
     port: { part: 'charge_port', at: [s.rearAxle + 0.05, 0.72, s.side] },
   }),
+  unjudged: [
+    site.unjudged('shell', 'pack', 0.08,
+      'The case piece of city_car_shell runs into the floor_pan piece of traction_pack_car.'),
+  ],
 }
