@@ -12,9 +12,7 @@ local s = import 'tanker_truck.spec.libsonnet';
   unjudged: [
     site.unjudged('barrel', 'walkway', 0.05,
       'The shell piece of tanker_truck_barrel runs into the bearer_0 piece of tanker_truck_walkway.'),
-    site.unjudged('saddle', 'barrel', 0.185,
-      'The high_2 piece of tanker_truck_saddle runs into the shell piece of tanker_truck_barrel.'),
-    site.unjudged('saddle', 'valve_gear', 0.066,
-      'The low_0 piece of tanker_truck_saddle runs into the manifold piece of tanker_truck_valve_gear.'),
+    site.unjudged('saddle', 'valve_gear', 0.069,
+      'The cradle_0_6 piece of tanker_truck_saddle runs into the manifold piece of tanker_truck_valve_gear.'),
   ],
 }
