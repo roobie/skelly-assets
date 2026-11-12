@@ -3,12 +3,43 @@ local bolt = import 'bolt-gun.libsonnet';
 local box = h.box;
 
 // An oversized bolt carbine, about 0.94 m long and deep for its length: a slab receiver, an armoured barrel shroud
-// nearly as deep as the receiver, a fat barrel ending in a slotted muzzle brake, a deep box magazine of rocket bolts
-// ahead of the grip and the family's skeleton stock. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's
+// nearly as deep as the receiver, a fat barrel ending in a slotted muzzle brake, a straight box magazine of rocket
+// bolts ahead of the grip and the family's skeleton stock. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's
 // muzzle faces +z; the side view shows its profile.
 
 local w = 0.055;  // half the receiver's width
 local barrelY = 0.245;
+
+// The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
+// back stays clear of the trigger guard's front, which ends at x = 0.005.
+local roundLength = 0.11;
+local wall = 0.011;
+local magBack = 0.025;
+local magFront = magBack + roundLength + 2 * wall;
+local magTop = 0.15;  // the receiver's underside
+
+// A bolt seen side on in a window at `z`: a brass body and a pointed accent nose, its base at `x` and its foot at `y`.
+local roundSide(id, x, y, z) = [
+  box(id, 'round', [x, y, z], [x + roundLength - 0.016, y + 0.014, z + 0.0015]),
+  h.prism(id + '-nose', 'accent', 'z', [[x + roundLength - 0.016, y], [x + roundLength - 0.004, y + 0.005], [x + roundLength - 0.004, y + 0.009], [x + roundLength - 0.016, y + 0.014]], z, z + 0.0015),
+];
+
+// A straight box magazine square to the bore, with a metal magwell collar, a bevelled brass base plate and a window
+// in its right side showing the stacked bolts.
+local magazine = [
+  h.prism('magazine', 'body', 'z', [[magBack, 0.012], [magFront, 0.012], [magFront, magTop], [magBack, magTop]], -0.045, 0.045),
+  h.prism('magwell', 'metal', 'z', [
+    [magBack - 0.006, magTop], [magBack - 0.006, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + 0.006, 0.136], [magFront + 0.006, magTop],
+  ], -0.049, 0.049),
+  h.prism('mag-base', 'trim', 'z', [
+    [magBack - 0.004, 0.004], [magBack, 0], [magFront, 0], [magFront + 0.004, 0.004], [magFront + 0.004, 0.014], [magBack - 0.004, 0.014],
+  ], -0.049, 0.049),
+  box('mag-window', 'vent', [magBack + wall, 0.032, 0.045], [magFront - wall, 0.118, 0.0465]),
+] + std.flattenArrays([
+  roundSide('round-%d' % i, magBack + wall + 0.002, 0.038 + i * 0.02, 0.0455)
+  for i in [0, 1, 2, 3]
+]);
+
 [
   bolt.gun('bolt_carbine', 11.5, 'rifle', bolt.receiver(0.17, 0.15, 0.33, w, [0.15, 0.35, 0.038]) + [
     // Barrel shroud, an octagonal slab with vents along both sides and a brass band at its mouth.
@@ -28,11 +59,7 @@ local barrelY = 0.245;
     for i in [0, 1, 2]
   ] + [
     box('bore', 'vent', [0.522, barrelY - 0.017, -0.017], [0.524, barrelY + 0.017, 0.017]),
-    // A deep, raked box magazine with a brass base plate and a window showing the bolts.
-    h.prism('magazine', 'body', 'z', [[0.02, 0.012], [0.14, 0.012], [0.16, 0.15], [0.04, 0.15]], -0.045, 0.045),
-    box('mag-base', 'trim', [0.015, 0, -0.049], [0.145, 0.014, 0.049]),
-    h.prism('mag-window', 'round', 'z', [[0.065, 0.035], [0.11, 0.035], [0.123, 0.13], [0.078, 0.13]], 0.045, 0.047),
-  ] + bolt.grip(0.155) + bolt.stock(0.33, 0.045) + [
+  ] + magazine + bolt.grip(0.155) + bolt.stock(0.33, 0.045) + [
     // Sights: a rear block on the ridge and a front post over the shroud.
     box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, 0.375, 0.02]),
     box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, 0.3755, 0.004]),
