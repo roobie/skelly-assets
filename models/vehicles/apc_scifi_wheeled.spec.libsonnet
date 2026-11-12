@@ -18,6 +18,8 @@ local radius = wheels[wheel].tyre.outer;
   axles: [1.95, -2.0],
   // The air every wheel well keeps round its tyre.
   archGap: 0.07,
+  // How far each bevel on the hull's outer joints cuts back from the edge across each face it joins.
+  chamfer: 0.1,
   body: {
     belly: 0.52,
     top: 2.0,

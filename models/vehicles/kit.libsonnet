@@ -95,6 +95,17 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   beyond: beyond,
   // The cuts bounding a skin `depth` m thick behind a plate, so a hollow hull's armour is a wall, not a solid block.
   skin(cut, depth): [cut, beyond(inset(cut, depth))],
+  // The cut that bevels the edge where two cuts' planes meet, `leg` m back from the edge across each face, so a joint
+  // between plates is a flat chamfer rather than a sharp corner.
+  chamfer(a, b, leg):
+    local unit(n) = [x / std.sqrt(dot(n, n)) for x in n];
+    local na = unit(a.normal);
+    local nb = unit(b.normal);
+    {
+      normal: [na[i] + nb[i] for i in [0, 1, 2]],
+      offset: a.offset / std.sqrt(dot(a.normal, a.normal)) + b.offset / std.sqrt(dot(b.normal, b.normal))
+              - leg * std.sqrt(1 - std.pow(dot(na, nb), 2)),
+    },
   // A prism cut by the planes `plates` lists, each from `plate`: a convex solid whose faces need not lie along an axis.
   clipped(piece, plates):
     assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';

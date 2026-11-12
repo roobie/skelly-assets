@@ -33,11 +33,45 @@ local wellTop = w.radius + reach;
 local fenderTop = wellTop + wall;
 local front = [s.axles[0] - reach, s.axles[0] + reach];
 local rear = [s.axles[1] - reach, s.axles[1] + reach];
-local wellCorners(name, axle) = [
-  slab('%s_corner_%s' % [name, end[0]], [axle - reach, axle + reach], [w.radius, wellTop], [b.core, b.half],
-       [{ normal: [end[1], -1, 0], offset: end[1] * axle - w.radius - reach * std.sqrt(2) }])
+local cornerSpan = reach * (std.sqrt(2) - 1);
+local wellCorners(axle) = [
+  {
+    end: end[0],
+    x: if end[1] > 0 then [axle - reach, axle - cornerSpan] else [axle + cornerSpan, axle + reach],
+    y: [w.radius + cornerSpan, wellTop],
+    cut: { normal: [end[1], -1, 0], offset: end[1] * axle - w.radius - reach * std.sqrt(2) },
+  }
   for end in [['aft', 1], ['fore', -1]]
 ];
+
+// Every outer joint of the hull is bevelled, each bevel a cut across two faces. The main hull's are mirrored onto the
+// far side so pieces spanning the middle take both; each cut bites only near its own edge, so every piece of the main
+// hull takes them all.
+local leg = s.chamfer;
+local face(normal, at) = { normal: normal, offset: at };
+local bevel(a, c) = k.chamfer(a, c, leg);
+local roofFace = face([0, 1, 0], b.top);
+local sideFace = face([0, 0, 1], b.half);
+local tailFace = face([-1, 0, 0], -b.rear);
+local eaves = bevel(roofFace, sideFace);
+local tail = bevel(roofFace, tailFace);
+local glacisSide = bevel(glacis, sideFace);
+local hullEdges = [tail, bevel(roofFace, glacis)]
+  + std.flattenArrays([[c, k.farCut(c)] for c in [eaves, bevel(sideFace, tailFace), glacisSide]]);
+local hull(id, x, y, z, cuts=[]) = slab(id, x, y, z, cuts + hullEdges);
+// The fenders stand above the glacis, so they take bevels of their own: their tops, brows and fronts against their
+// outer sides and the wedges' inner faces, wide enough that a bevel still leaves a wall's thickness behind it.
+local wedgeInside = b.core - leg - wall;
+local fenderTopFace = face([0, 1, 0], fenderTop);
+local fenderFront = face([1, 0, 0], b.fender);
+local fenderEdges = [bevel(a, c) for a in [fenderTopFace, brow, fenderFront] for c in [sideFace, face([0, 0, -1], -wedgeInside)]]
+  + [bevel(fenderTopFace, brow), bevel(brow, fenderFront)];
+// Where the glacis comes down to the fenders' top: aft of it the shoulder stands on a front well's top, so only what
+// lies ahead takes the fender's bevels.
+local shoulderEnd = (glacis.offset - glacis.normal[1] * fenderTop) / glacis.normal[0];
+local fenderRun(id, x, y, cuts=[]) =
+  (if x[0] < shoulderEnd then [hull(id + '_under', [x[0], std.min(x[1], shoulderEnd)], y, [b.core, b.half], cuts)] else [])
+  + (if x[1] > shoulderEnd then [slab(id, [std.max(x[0], shoulderEnd), x[1]], y, [b.core, b.half], cuts + fenderEdges)] else []);
 
 local rearDoor = s.doors.rear;
 local sideDoor = s.doors.side;
@@ -56,41 +90,48 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
   // The hull's shell: its floor and walls, the wheel wells boxed off from the crew space and the solid fenders round
   // them. The crew space runs the core's length and widens to the full width in the bay between the wells.
   part('hull', 'hull', 7000, [
-    slab('floor', [b.rear, b.nose], [b.belly, floorTop], [-b.core, b.core], [noseFoot] + cheeks),
-    slab('rear_lintel', [b.rear, b.rear + wall], [rearDoor.top, b.top], [-rearDoor.half, rearDoor.half]),
-    slab('nose_foot', [b.rear, b.nose], [b.belly, b.top], [-b.core, b.core], [glacis] + cheeks + k.skin(noseFoot, wall)),
+    hull('floor', [b.rear, b.nose], [b.belly, floorTop], [-b.core, b.core], [noseFoot] + cheeks),
+    hull('rear_lintel', [b.rear, b.rear + wall], [rearDoor.top, b.top], [-rearDoor.half, rearDoor.half]),
+    hull('nose_foot', [b.rear, b.nose], [b.belly, b.top], [-b.core, b.core], [glacis] + cheeks + k.skin(noseFoot, wall)),
     box('tow_eye', 'frame', [3.78, 0.78, -0.12], [3.92, 0.88, 0.12]),
     // The far side's bay wall is whole; the near side's frames the side door.
-    slab('bay_wall_far', [rear[1], front[0]], [b.belly, b.top], [-b.half, wall - b.half], [glacis]),
-    slab('bay_wall_aft_near', [rear[1], sideDoor.x[0]], [b.belly, b.top], [b.half - wall, b.half]),
-    slab('bay_wall_fore_near', [sideDoor.x[1], front[0]], [b.belly, b.top], [b.half - wall, b.half], [glacis]),
-    slab('side_lintel_near', [sideDoor.x[0], sideDoor.x[1]], [sideDoor.top, b.top], [b.half - wall, b.half]),
+    hull('bay_wall_far', [rear[1], front[0]], [b.belly, b.top], [-b.half, wall - b.half], [glacis]),
+    hull('bay_wall_aft_near', [rear[1], sideDoor.x[0]], [b.belly, b.top], [b.half - wall, b.half]),
+    hull('bay_wall_fore_near', [sideDoor.x[1], front[0]], [b.belly, b.top], [b.half - wall, b.half], [glacis]),
+    hull('side_lintel_near', [sideDoor.x[0], sideDoor.x[1]], [sideDoor.top, b.top], [b.half - wall, b.half]),
+    // The bevel across the roof's back edge is a skin of its own, as the roof and rear walls are thinner than it is.
+    hull('tail_bevel', [b.rear, b.rear + leg], [b.top - leg, b.top], [-b.half, b.half], k.skin(tail, wall)),
   ] + k.bothSides([
-    slab('bay_floor', [rear[1], front[0]], [b.belly, floorTop], [b.core, b.half]),
-    slab('rear_wall', [b.rear, b.rear + wall], [b.belly, b.top], [rearDoor.half, b.core]),
-    slab('rear_quarter', [b.rear, rear[0]], [b.belly, b.top], [b.core, b.half]),
-    slab('rear_well_top', [rear[0], rear[1]], [wellTop, b.top], [b.core, b.half]),
-    slab('side_wall_aft', [b.rear, rear[1]], [b.belly, b.top], [b.core - wall, b.core]),
-    slab('bay_end_aft', [rear[1], rear[1] + wall], [b.belly, wellTop], [b.core, b.half]),
-    slab('bay_end_fore', [front[0] - wall, front[0]], [b.belly, wellTop], [b.core, b.half]),
-    slab('front_well_top', [front[0], front[1]], [wellTop, fenderTop], [b.core, b.half]),
-    slab('front_shoulder', [front[0], front[1]], [fenderTop, b.top], [b.core, b.half], [glacis]),
-    slab('side_wall_fore', [front[0], b.nose], [b.belly, b.top], [b.core - wall, b.core], [glacis, noseFoot, cheek]),
-    slab('nose_cheek', [front[0], b.nose], [b.belly, b.top], [0, b.core], [glacis, noseFoot] + k.skin(cheek, wall)),
-    slab('fender', [front[1], b.fender], [b.belly, fenderTop], [b.core, b.half], [brow]),
+    hull('bay_floor', [rear[1], front[0]], [b.belly, floorTop], [b.core, b.half]),
+    hull('rear_wall', [b.rear, b.rear + wall], [b.belly, b.top], [rearDoor.half, b.core]),
+    hull('rear_quarter', [b.rear, rear[0]], [b.belly, b.top], [b.core, b.half]),
+    hull('rear_well_top', [rear[0], rear[1]], [wellTop, b.top], [b.core, b.half]),
+    hull('side_wall_aft', [b.rear, rear[1]], [b.belly, b.top], [b.core - wall, b.core]),
+    hull('bay_end_aft', [rear[1], rear[1] + wall], [b.belly, wellTop], [b.core, b.half]),
+    hull('bay_end_fore', [front[0] - wall, front[0]], [b.belly, wellTop], [b.core, b.half]),
+    hull('front_shoulder', [front[0], front[1]], [fenderTop, b.top], [b.core, b.half], [glacis]),
+    hull('side_wall_fore', [front[0], b.nose], [b.belly, b.top], [b.core - wall, b.core], [glacis, noseFoot, cheek]),
+    hull('nose_cheek', [front[0], b.nose], [b.belly, b.top], [0, b.core], [glacis, noseFoot] + k.skin(cheek, wall)),
+    // The bevels along the top's outer edges, over the bay's thin walls, are skins of their own.
+    hull('eave_bevel', [b.rear, glacisFrom], [b.top - leg, b.top], [b.half - leg, b.half], k.skin(eaves, wall)),
+    hull('shoulder_bevel', [glacisFrom, front[0]], [b.belly, b.top], [b.half - leg, b.half], [glacis] + k.skin(glacisSide, wall)),
     // The well's inboard wall rises from the glacis to the fender's top, a wedge closing the well off from the nose.
-    slab('well_wedge', [front[0], b.fender], [b.belly, fenderTop], [b.core - wall, b.core], [k.beyond(k.inset(glacis, wall)), brow]),
-  ] + wellCorners('rear_well', s.axles[1]) + wellCorners('front_well', s.axles[0]))),
+    slab('well_wedge', [front[0], b.fender], [b.belly, fenderTop], [wedgeInside, b.core], [k.beyond(k.inset(glacis, wall)), brow] + fenderEdges),
+  ]
+  + fenderRun('front_well_top', front, [wellTop, fenderTop])
+  + fenderRun('fender', [front[1], b.fender], [b.belly, fenderTop], [brow])
+  + [hull('rear_well_corner_' + c.end, c.x, c.y, [b.core, b.half], [c.cut]) for c in wellCorners(s.axles[1])]
+  + std.flattenArrays([fenderRun('front_well_corner_' + c.end, c.x, c.y, [c.cut]) for c in wellCorners(s.axles[0])]))),
   part('roof', 'roof', 900, [
-    slab('plate', [b.rear, front[0]], [b.top - wall, b.top], [-b.half, b.half], [glacis]),
+    hull('plate', [b.rear, front[0]], [b.top - wall, b.top], [-b.half, b.half], [glacis]),
   ]),
   // The glacis is cut round the driver's slit, so the slit lies in the plate itself.
   part('glacis', 'glacis', 700, [
-    slab('aft', [glacisFrom, sl.x[0]], [b.belly, b.top], [-b.core, b.core], glacisSkin),
-    slab('fore', [sl.x[1], b.nose], [b.belly, b.top], [-b.core, b.core], glacisSkin + [noseFoot] + cheeks),
+    hull('aft', [glacisFrom, sl.x[0]], [b.belly, b.top], [-b.core, b.core], glacisSkin),
+    hull('fore', [sl.x[1], b.nose], [b.belly, b.top], [-b.core, b.core], glacisSkin + [noseFoot] + cheeks),
   ] + k.bothSides([
-    slab('slit_side', [sl.x[0], sl.x[1]], [b.belly, b.top], [sl.half, b.core], glacisSkin),
-    slab('outer', [glacisFrom, front[0]], [b.belly, b.top], [b.core, b.half], glacisSkin),
+    hull('slit_side', [sl.x[0], sl.x[1]], [b.belly, b.top], [sl.half, b.core], glacisSkin),
+    hull('outer', [glacisFrom, front[0]], [b.belly, b.top], [b.core, b.half], glacisSkin),
   ])),
   // The slit's glass, set back from the glacis's face.
   part('vision_block', 'vision block', 15, [
