@@ -3,7 +3,7 @@ type: added
 ---
 Sci-fi wheeled carrier: `apc_scifi_wheeled`, a low, slab-sided armoured hull slung between four large 18.00 R25
 flotation wheels, its long glacis raked down to a wedge nose between square fenders like a bullet's point, every face
-flat. The hull is a hollow shell a crouching player can enter by a big rear ramp door or a side door on the kerb side,
+flat. Its wheel wells are half octagons, and a wedge over the glacis closes each front well off from the nose. The hull is a hollow shell a crouching player can enter by a big rear ramp door or a side door on the kerb side,
 to troop benches along the walls, a driver's seat with controls behind a vision slit in the glacis, a locker and an
 equipment rack. A boxy turret with a single cannon and a launcher pod on each cheek, roof grab rails and a stowage
 pannier complete it, all in flat dark earth paint. Its shell, roof, glacis, doors, seats and fittings are separable

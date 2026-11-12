@@ -15,7 +15,7 @@ local radius = wheels[wheel].tyre.outer;
   grain: 0.02,
   // Flotation tyres nearly as tall as the hull, so it reads as slung between them.
   wheel: { name: wheel, radius: radius, z: 1.36, face: wheels[wheel].rim.face, brake: 'disc' },
-  axles: [2.3, -2.0],
+  axles: [1.95, -2.0],
   // The air every wheel well keeps round its tyre.
   archGap: 0.07,
   body: {
@@ -58,7 +58,7 @@ local radius = wheels[wheel].tyre.outer;
   driver: { x: [0.62, 1.1], half: 0.25, seat: 0.38 },
   // A stowage locker in the near bay's aft corner and an equipment rack in its fore corner.
   locker: { x: [-1.06, -0.72], z: [1.13, 1.49], top: 1.5 },
-  rack: { x: [0.62, 1.36], z: [1.2, 1.49], top: 1.6 },
+  rack: { x: [0.58, 1.0], z: [1.2, 1.49], top: 1.6 },
   // The aisles a crouching soldier walks, as (x, z) waypoints on the floor, each from outside a door to standing in
   // front of a seat. tools/test/apc-scifi-wheeled.test.mjs walks the player's doll along them.
   routes: {
@@ -83,7 +83,7 @@ local radius = wheels[wheel].tyre.outer;
   },
   rails: { z: 1.0, from: -2.8, to: 0.4, posts: [-2.6, -1.1, 0.25], height: 0.12, bar: 0.04 },
   // A stowage pannier on the far side between the arches, where the near side has its door.
-  pannier: { x: [-0.9, 1.2], y: [0.98, 1.45], z: [1.55, 1.72] },
+  pannier: { x: [-0.9, 0.85], y: [0.98, 1.45], z: [1.55, 1.72] },
   hatches: { x: -2.2, z: 0.45 },
   lamps: { y: 0.95, z: 1.3, tailY: 1.35, tailZ: 1.15 },
 }

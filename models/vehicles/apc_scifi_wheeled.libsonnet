@@ -25,13 +25,19 @@ local glacisSkin = k.skin(glacis, wall);
 // The glacis runs forward from the roof's front edge; aft of it the roof covers its skin.
 local glacisFrom = s.plates.glacis[0][0];
 
-// Each wheel well is a square box round its tyre, from the belly up to `wellTop`, outboard of the core.
+// Each wheel well is a box round its tyre, from the belly up to `wellTop`, outboard of the core, its top corners filled
+// at 45 degrees where they touch the air round the tyre, so its outline is half an octagon.
 local w = s.wheel;
 local reach = w.radius + s.archGap;
 local wellTop = w.radius + reach;
 local fenderTop = wellTop + wall;
 local front = [s.axles[0] - reach, s.axles[0] + reach];
 local rear = [s.axles[1] - reach, s.axles[1] + reach];
+local wellCorners(name, axle) = [
+  slab('%s_corner_%s' % [name, end[0]], [axle - reach, axle + reach], [w.radius, wellTop], [b.core, b.half],
+       [{ normal: [end[1], -1, 0], offset: end[1] * axle - w.radius - reach * std.sqrt(2) }])
+  for end in [['aft', 1], ['fore', -1]]
+];
 
 local rearDoor = s.doors.rear;
 local sideDoor = s.doors.side;
@@ -55,9 +61,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     slab('nose_foot', [b.rear, b.nose], [b.belly, b.top], [-b.core, b.core], [glacis] + cheeks + k.skin(noseFoot, wall)),
     box('tow_eye', 'frame', [3.78, 0.78, -0.12], [3.92, 0.88, 0.12]),
     // The far side's bay wall is whole; the near side's frames the side door.
-    slab('bay_wall_far', [rear[1], front[0]], [b.belly, b.top], [-b.half, wall - b.half]),
+    slab('bay_wall_far', [rear[1], front[0]], [b.belly, b.top], [-b.half, wall - b.half], [glacis]),
     slab('bay_wall_aft_near', [rear[1], sideDoor.x[0]], [b.belly, b.top], [b.half - wall, b.half]),
-    slab('bay_wall_fore_near', [sideDoor.x[1], front[0]], [b.belly, b.top], [b.half - wall, b.half]),
+    slab('bay_wall_fore_near', [sideDoor.x[1], front[0]], [b.belly, b.top], [b.half - wall, b.half], [glacis]),
     slab('side_lintel_near', [sideDoor.x[0], sideDoor.x[1]], [sideDoor.top, b.top], [b.half - wall, b.half]),
   ] + k.bothSides([
     slab('bay_floor', [rear[1], front[0]], [b.belly, floorTop], [b.core, b.half]),
@@ -72,7 +78,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     slab('side_wall_fore', [front[0], b.nose], [b.belly, b.top], [b.core - wall, b.core], [glacis, noseFoot, cheek]),
     slab('nose_cheek', [front[0], b.nose], [b.belly, b.top], [0, b.core], [glacis, noseFoot] + k.skin(cheek, wall)),
     slab('fender', [front[1], b.fender], [b.belly, fenderTop], [b.core, b.half], [brow]),
-  ])),
+    // The well's inboard wall rises from the glacis to the fender's top, a wedge closing the well off from the nose.
+    slab('well_wedge', [front[0], b.fender], [b.belly, fenderTop], [b.core - wall, b.core], [k.beyond(k.inset(glacis, wall)), brow]),
+  ] + wellCorners('rear_well', s.axles[1]) + wellCorners('front_well', s.axles[0]))),
   part('roof', 'roof', 900, [
     slab('plate', [b.rear, front[0]], [b.top - wall, b.top], [-b.half, b.half], [glacis]),
   ]),

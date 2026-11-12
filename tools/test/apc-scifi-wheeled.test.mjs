@@ -38,8 +38,8 @@ const shifted = (pieces, by) => pieces.map((p) => {
   return { ...moved, profile: p.profile.map(([a, b]) => [a + by[u], b + by[v]]), start: p.start + by[along], end: p.end + by[along] };
 });
 const lift = (pieces, dy) => shifted(pieces, [0, dy, 0]);
-// The body every wheel turns inside: the hull and the far pannier.
-const body = drawn('hull', 'pannier_far');
+// The body every wheel turns inside: the hull, its glacis and what is fitted on its outside near the wheels.
+const body = drawn('hull', 'glacis', 'pannier_far', 'side_step', 'headlamp_near', 'headlamp_far', 'tail_lamp_near', 'tail_lamp_far');
 const running = sites.filter((s) => /_wheel_(near|far)$|_wheel_(brake_disc|caliper)_/.test(s.id));
 // Wheels are large, so they are sampled coarsely: a meeting at this step means the well's air is gone.
 const AIR = 0.02;
@@ -57,6 +57,41 @@ test('every wheel and brake turns clear of the hull and pannier', () => {
 test('a wheel raised by its well air rubs the well, so the clearance check can fail', () => {
   const wheel = site.front_wheel_near;
   assert.ok(meeting(lift(wheel.pieces, spec.archGap + AIR), body, AIR).touches);
+});
+
+// Rays straight across the hull through the front wells, from the belly to the fender's top, and how many of them meet
+// nothing, so a gap between the glacis and the fender that lets one see through the nose is caught. The wheels are
+// left out, so a tyre behind a gap does not hide it.
+const RAY_STEP = 0.05;
+function sightlinesOverFrontWheels(pieces) {
+  const lid = drawn('hull').filter((p) => p.id.startsWith('front_well_top')).map(solid);
+  const [x0, x1] = [Math.min(...lid.map((p) => p.min[0])), Math.max(...lid.map((p) => p.max[0]))];
+  const top = Math.max(...lid.map((p) => p.max[1]));
+  const solids = pieces.map(solid);
+  const half = spec.body.half;
+  let rays = 0;
+  let clear = 0;
+  for (let x = x0 + RAY_STEP / 2; x < x1; x += RAY_STEP) {
+    for (let y = spec.body.belly + RAY_STEP / 2; y < top; y += RAY_STEP) {
+      const crossing = solids.filter((p) => p.min[0] <= x && x <= p.max[0] && p.min[1] <= y && y <= p.max[1]);
+      let blocked = false;
+      for (let z = -half; z <= half && !blocked; z += spec.grain / 2) blocked = crossing.some((p) => p.distance([x, y, z]) < 0);
+      rays++;
+      if (!blocked) clear++;
+    }
+  }
+  return { rays, clear };
+}
+
+test('no sightline crosses the nose between the front wells', () => {
+  const { rays, clear } = sightlinesOverFrontWheels(drawn('hull', 'glacis'));
+  assert.ok(rays > 0, 'vacuous: no rays through the front wells');
+  assert.equal(clear, 0, `${clear} of ${rays} rays see through the nose`);
+});
+
+test('without the wells\' wedges a sightline crosses the nose, so the see-through check can fail', () => {
+  const open = drawn('hull', 'glacis').filter((p) => !p.id.startsWith('well_wedge'));
+  assert.ok(sightlinesOverFrontWheels(open).clear > 0);
 });
 
 test('each axle stub reaches its brake disc hat and clears the caliper', () => {
