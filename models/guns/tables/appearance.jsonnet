@@ -68,7 +68,7 @@ local familyHex = {
     for optic in std.objectFields(opticLenses)
   },
   // Sides of every round thing drawn as a polygon beside voxel guns: optic bodies, the lenses seated in them, and
-  // cartridges too small to voxelize. One count keeps them one faceted family.
+  // cartridges. One count keeps them one faceted family.
   roundSides: 8,
   gun: {
     familyColors: { [role]: rgb(familyHex[role]) for role in std.objectFields(familyHex) },

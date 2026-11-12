@@ -7,7 +7,8 @@ read_if:
   - you choose which pack's recipe selects a thing
   - you change or judge voxelized export
   - you hide or detach a model's display piece on its own
-  - you give an item, attachment or round its own voxel grain
+  - you give an item or attachment its own voxel grain
+  - you change how cartridges are drawn
 ---
 
 # thing-export
@@ -36,20 +37,21 @@ file writing is separate from browser-safe geometry and preview code; see `src/f
 
 ## Voxelized export
 
-Models export as greedy voxel meshes, except where the thin-feature rule below draws one
-another way. The recipe loader refuses a row that names no voxel class, so no model drifts
-off the lattice by omission. The sampler lives here because this package may not import
-deadvox's mesher; see `src/recipe.ts`, `RowSchema`, `src/voxelize.ts`, `voxelize`, and
-`src/glb.ts`, `voxelPrimitivesFor`.
+Models export as greedy voxel meshes, except cartridges. The recipe loader refuses a row
+that names no voxel class, so no model drifts off the lattice by omission. The sampler
+lives here because this package may not import deadvox's mesher; see `src/recipe.ts`,
+`RowSchema`, `src/voxelize.ts`, `voxelize`, and `src/glb.ts`, `voxelPrimitivesFor`.
 
 A feature thinner than a couple of voxels lands unevenly on the lattice: a whole voxel on
 one side and none on the other. One shared rule says when a feature is too thin for its
 grain, phrased as thickness against grain so every exporter asks it the same way, and each
-caller decides what to draw instead. A cartridge is measured by its rim at its row's grain:
-under the rule it is drawn as a faceted lathe, as no grain fine enough to hold it would sit
-beside the guns, and its data may force voxels with `voxelize`. The span is content; see
-`src/featureFit.ts`, `featureFitsGrain`, and `models/voxel-grains.libsonnet`,
-`featureVoxels`.
+caller decides what to draw instead. The span is content; see `src/featureFit.ts`,
+`featureFitsGrain`, and `models/voxel-grains.libsonnet`, `featureVoxels`.
+
+Cartridges are drawn as faceted lathes with the side count of the other round things beside
+the guns. Their small features land unevenly on any voxel grain, so cartridges start
+smooth, and voxelizing them is revisited if the clash with the voxel guns bothers players.
+See `packages/gun-authoring-tool/src/gun/cartridgeExport.ts`, `makeModelExport`.
 
 Four grains, all content values: a coarse one for vehicles, furniture and the parts made
 to attach to them; a fine one for firearms, their magazines and hand-held items; a middle
@@ -65,10 +67,9 @@ millimetres wide, so the gun grain fills a notch and a post hides behind its nei
 the finest grain gives those parts voxels small enough to keep them.
 
 Each class gives the default grain, and an item may name a finer or coarser one. One grain
-per class cannot fit every item: an attachment mounts beside a finer receiver, and a round
-is smaller than a few item voxels. The item's own definition names it, beside a one-line
-reason, because that definition is where the item's look is authored; a recipe holds no
-list of exceptions. The recipe compiles the resolved grain into each row, so the exporter
+per class cannot fit every item: an attachment mounts beside a finer receiver. The item's
+own definition names it, beside a one-line reason, because that definition is where the
+item's look is authored; a recipe holds no list of exceptions. The recipe compiles the resolved grain into each row, so the exporter
 and the contract tests read one explicit value. The grains are content a modder tunes, in
 `models/voxel-grains.libsonnet`; the rule that picks one stays code. See `tools/jsonnet/lib/voxel-grains.libsonnet`,
 `of`, and its users `tools/packages/thing-authoring-tool/exports/deadvox.jsonnet` and
@@ -114,7 +115,7 @@ https://github.com/roobie/skelly, `packages/deadvox/DESIGN.md`, "Vehicles".
 No solid or stretch of a solid vanishes. Any stretch thinner than the grain, such as a
 whole sheet, a guard's bar or a tube's wall, keeps one voxel of thickness, and a solid that
 no sample line crosses keeps the cells its surface meets, because glass, blades, sheet
-parts and small rounds are thin or small by design and losing them breaks the item; the
+parts and small fittings are thin or small by design and losing them breaks the item; the
 cost is that they draw thicker or blockier than authored. A solid's size says nothing about
 how thin its stretches are, so every solid is sampled along all three axes. Thinness is
 judged on the shape the solids make together: a stretch cut short only where one solid meets

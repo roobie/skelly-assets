@@ -116,8 +116,8 @@ export interface GlbExportInput {
   readonly revolveFacets?: number;
   /**
    * Voxel edge in metres. When set, drawn solids export as voxel meshes instead of smooth ones (see `glb.ts`,
-   * `voxelPrimitivesFor`). Every recipe row names one (see `recipe.ts`, `recipeVoxel`); an exporter leaves it unset
-   * for a model too thin for it (see `featureFit.ts`), and absent, the file holds the authored meshes.
+   * `voxelPrimitivesFor`). Every recipe row names one (see `recipe.ts`, `recipeVoxel`); an exporter may leave it unset
+   * for a model it draws smooth, and absent, the file holds the authored meshes.
    */
   readonly voxelGrain?: number;
   /**

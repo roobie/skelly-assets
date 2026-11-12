@@ -32,7 +32,7 @@ The backup rear opening belongs near the fin tip and must share an unobstructed,
 
 ## Faceted bodies
 
-Cylindrical optic bodies are faceted: every body turned about the optical axis (scope tubes, bells and ring bands) has flat sides, and the lenses seated in it share them, so each lens fills its opening out to the wall's inside flats. A few flat sides are the chosen look for round things beside voxel guns. The side count is part of the shape, not a mesh level of detail, so every drawn level of detail and the collision hull agree on it. One side count in content serves every such body, and the cartridges drawn smooth share it: `models/guns/tables/appearance.jsonnet`, `roundSides`; the shape is `packages/construct/src/shapes/solid.ts`, `RevolvedSolid`. Box-housed sights keep their housings, and dials and turrets stay round, because they are controls on a body, not the body.
+Cylindrical optic bodies are faceted: every body turned about the optical axis (scope tubes, bells and ring bands) has flat sides, and the lenses seated in it share them, so each lens fills its opening out to the wall's inside flats. A few flat sides are the chosen look for round things beside voxel guns. The side count is part of the shape, not a mesh level of detail, so every drawn level of detail and the collision hull agree on it. One side count in content serves every such body, and the cartridges share it: `models/guns/tables/appearance.jsonnet`, `roundSides`; the shape is `packages/construct/src/shapes/solid.ts`, `RevolvedSolid`. Box-housed sights keep their housings, and dials and turrets stay round, because they are controls on a body, not the body.
 
 ## Lens glass
 
