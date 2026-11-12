@@ -8,15 +8,16 @@ local box = h.box;
 // muzzle at +x, the axis `gripOn` names, so the built model's muzzle faces +z; the side view shows its profile.
 
 local w = 0.055;  // half the receiver's width
+local underside = 0.15;  // the receiver's underside, where the magazine seats
 local barrelY = 0.245;
 
 // The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
-// back stays clear of the trigger guard's front, which ends at x = 0.005.
+// back keeps a hand's gap ahead of the trigger guard.
 local roundLength = 0.11;
 local wall = 0.011;
-local magBack = 0.025;
+local magBack = bolt.guardFront + 0.02;
 local magFront = magBack + roundLength + 2 * wall;
-local magTop = 0.15;  // the receiver's underside
+local magTop = underside;
 
 // A bolt seen side on in a window at `z`: a brass body and a pointed accent nose, its base at `x` and its foot at `y`.
 local roundSide(id, x, y, z) = [
@@ -62,12 +63,12 @@ local drumMagazine = [
   h.turned('drum-axle', 'metal', 'x', [[0, 0], [0, 0.02], [0.008, 0.015], [0.008, 0]], [magFront, drumY, 0]) + { sides: 8 },
 ] + [
   local a = 2 * std.pi * i / chambers;
-  h.turned('drum-nose-%d' % i, 'accent', 'x', [[0, 0], [0, 0.011], [0.006, 0.005], [0.006, 0]], [magFront, drumY + 0.044 * std.cos(a), 0.044 * std.sin(a)])
+  h.turned('drum-nose-%d' % i, 'accent', 'x', [[0, 0], [0, 0.011], [0.006, 0.005], [0.006, 0]], [magFront, drumY + 0.044 * std.cos(a), 0.044 * std.sin(a)]) + { sides: 8 }
   for i in std.range(0, chambers - 1)
 ];
 
 local carbine(id, massKg, magazine) =
-  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, 0.15, 0.33, w, [0.15, 0.35, 0.038]) + [
+  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, 0.33, w, { front: 0.15, top: 0.35, halfWidth: 0.038 }) + [
     // Barrel shroud, an octagonal slab with vents along both sides and a brass band at its mouth.
     h.prism('shroud', 'body', 'x', [[0.17, -0.045], [0.17, 0.045], [0.19, 0.062], [0.30, 0.062], [0.32, 0.045], [0.32, -0.045], [0.30, -0.062], [0.19, -0.062]], 0.17, 0.38),
     h.prism('shroud-band', 'trim', 'x', [[0.165, -0.049], [0.165, 0.049], [0.187, 0.067], [0.303, 0.067], [0.325, 0.049], [0.325, -0.049], [0.303, -0.067], [0.187, -0.067]], 0.36, 0.38),

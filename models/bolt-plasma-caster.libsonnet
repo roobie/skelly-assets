@@ -13,7 +13,7 @@ local coreY = 0.25;
 local muzzleX = 0.49;
 [
   // A deeper receiver than the carbine's.
-  bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(0.15, 0.14, 0.35, w, [0.14, 0.37, 0.045]) + [
+  bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(0.15, 0.14, 0.35, w, { front: 0.14, top: 0.37, halfWidth: 0.045 }) + [
     // The coil: a glowing core with three collars round it, then the emitter cup and its lens.
     h.rod('core', 'glow', 0.045, 0.15, 0.47, coreY) + { sides: 16 },
     h.turned('collar-a', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.17, coreY, 0]) + { sides: 8 },

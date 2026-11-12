@@ -16,7 +16,7 @@ local pumpX0 = 0.40;
 local pumpX1 = 0.545;
 [
   // A shorter, taller receiver than the carbine's.
-  bolt.gun('bolt_scattergun', 12.5, 'shotgun', bolt.receiver(0.11, 0.14, 0.34, w, [0.11, 0.36, 0.04]) + [
+  bolt.gun('bolt_scattergun', 12.5, 'shotgun', bolt.receiver(0.11, 0.14, 0.34, w, { front: 0.11, top: 0.36, halfWidth: 0.04 }) + [
     // The breech block the barrel and tube are bolted into.
     h.prism('breech', 'trim', 'x', bolt.bevel(0.17, 0.335, 0.06, 0.012), 0.11, 0.15),
     // One long slim barrel with a dark mouth and a rib, and a magazine tube beneath it ending in a brass cap.
