@@ -425,13 +425,7 @@ local seatPlinth = k.compound('seat_plinth', 30, [
 local steeringColumn(id, massKg, height) = k.compound(id, massKg, [
   box('tube', 'tube', [-0.04, 0, -0.03], [0.04, height, 0.03]),
 ], { tube: 'plastic-black' });
-// Stands on a dash top: the dials face the driver at -x under the hood, centred on z.
-local instrumentBinnacle = k.compound('instrument_binnacle', 2, [
-  box('housing', 'shell', [-0.1, 0, -0.22], [0.12, 0.13, 0.22]),
-  k.prism('hood', 'shell', [[-0.16, 0.13], [0.12, 0.13], [0.12, 0.17], [-0.12, 0.17]], [-0.22, 0.22]),
-] + k.bothSides([
-  box('dial', 'dial', [-0.125, 0.03125, 0.0625], [-0.1, 0.09375, 0.1875]),
-]), { shell: 'plastic-black', dial: 'plastic-white' }) + { title: 'Instrument binnacle' };
+local instrumentBinnacle = (import 'instrument-binnacle.libsonnet').row;
 // Lies along x, head at +x, its underside at y = 0.
 local stretcher = k.compound('stretcher', 16, [
   box('leg_fore', 'frame', [0.72, 0, -0.26], [0.78, 0.36, 0.26]),

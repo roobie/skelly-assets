@@ -19,9 +19,9 @@ local has(s, key) = std.objectHas(s, key);
 // Cut from both top corners of every wheel arch, so its opening has five sides.
 local archChamfer = 0.2;
 local voxel = 0.03125;
-// The instrument binnacle's height and how far its housing reaches ahead of its origin; see shared.libsonnet, instrumentBinnacle.
-local binnacleHeight = 0.17;
-local binnacleNose = 0.12;
+local binnacle = import 'instrument-binnacle.libsonnet';
+// How far the dash stands back from the windscreen raked over it.
+local glassGap = 0.14;
 local rearGlass(s) = [hole for hole in std.get(s, 'rearHoles', []) if !std.get(hole, 'door', false)];
 local dashTop(s) = std.get(s, 'dashTop', s.driver.y + 0.55);
 // A low-floor driver sits on a plinth, raised to see over the dash.
@@ -358,9 +358,9 @@ local pressings(id, title, s) = {
   pressings: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
     part('_dashboard', 'dashboard', 40, [
-      box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - 0.14, dashTop(s), -0.28]),
+      box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - glassGap, dashTop(s), -0.28]),
     ] + (if has(s, 'dashShelfTop') then [
-           box('shelf', 'trim', [face - 0.5, s.floor, -0.28], [xf(s.dashShelfTop) - 0.14, s.dashShelfTop, s.skin]),
+           box('shelf', 'trim', [face - 0.5, s.floor, -0.28], [xf(s.dashShelfTop) - glassGap, s.dashShelfTop, s.skin]),
          ] else []), { trim: 'plastic-black' }),
   ] + (if has(s, 'sign') then [
          local y = s.sign.y;
@@ -447,7 +447,7 @@ local laid(kit, id, s) =
   local d = s.driver;
   local driverBase = if plinthed(s) then 'driver_plinth' else 'shell';
   // The binnacle faces the driver but stands back from a windscreen raked over the dash, as the dashboard does.
-  local instrumentsX = std.min(d.x + 0.64, g.xf(dashTop(s) + binnacleHeight) - 0.14 - binnacleNose);
+  local instrumentsX = std.min(d.x + 0.64, g.xf(dashTop(s) + binnacle.height) - glassGap - binnacle.nose);
   // The shell leads: it is the body a vehicle's placements take their tags from.
   [fitting('shell', part('_shell'), origin)]
   + (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
