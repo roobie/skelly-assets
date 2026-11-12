@@ -2,12 +2,13 @@
 // their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
-// labels (models/taxonomy.json).
-// Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
-// tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
+// labels (models/taxonomy.json). It serves the tool pages site/tools.json lists and links them from the index.
+// Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [outDir]; the tree defaults to built/. --no-tree
+// leaves the tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs).
+// --require-viewers fails on an unbuilt viewer, so a deploy never drops one. No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths.
-import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -19,12 +20,13 @@ import { readMobRows } from '../tools/layout.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
+import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false } } });
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false }, 'require-viewers': { type: 'boolean', default: false } } });
 const out = resolve(root, positionals[0] ?? '_site');
 const built = resolve(values.built);
 const POSES = 'models/poses';
@@ -174,7 +176,7 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
@@ -207,5 +209,17 @@ for (const model of models) if (model.clips && model.body) {
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
 writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies }));
+// A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
+// built without the viewers links nothing it lacks.
+const listed = readTools(root);
+const tools = listed.filter(({ viewer }) => !viewer || existsSync(viewerDist(root, viewer)));
+const unbuilt = listed.filter((tool) => !tools.includes(tool)).map(({ viewer }) => viewer);
+if (values['require-viewers'] && unbuilt.length > 0) throw new Error(`unbuilt viewers (node site/build-viewers.mjs): ${unbuilt.join(' ')}`);
+for (const { page, viewer } of tools) cpSync(page ? join(here, page) : viewerDist(root, viewer), join(out, page ?? viewer), { recursive: true });
+const index = readFileSync(join(out, 'index.html'), 'utf8');
+if (!index.includes(NAV_MARK)) throw new Error(`site/index.html has no ${NAV_MARK} for the tool links`);
+writeFileSync(join(out, 'index.html'), index.replace(NAV_MARK, toolLinks(tools)));
+const unlinked = unlinkedTools(out, tools);
+if (unlinked.length > 0) throw new Error(`the site serves tool pages that site/tools.json does not list: ${unlinked.join(' ')}`);
 writeFileSync(join(out, '.nojekyll'), '');
 console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
