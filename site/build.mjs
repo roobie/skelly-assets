@@ -6,7 +6,8 @@
 // Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [--analytics] [--history file] [outDir]; the tree defaults to built/. --no-tree
 // leaves the tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs).
 // --require-viewers fails on an unbuilt viewer, so a deploy never drops one. --analytics adds the visit counter to every
-// page the site serves, viewers included (site/analytics.mjs), for the Pages deploy only. No dependencies; the page loads
+// page the site serves, viewers included (site/analytics.mjs), for the Pages deploy only; the footer it adds names the
+// version the build renders (site/version.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
 // pack paths. --history names the latest release's model-history.json (tools/model-history.mjs), against which each model
 // shows the release that introduced it, the one that last changed it and whether this build differs; without it the
@@ -26,6 +27,7 @@ import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
+import { readVersion, versionHtml } from './version.mjs';
 import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
@@ -230,6 +232,6 @@ if (!index.includes(NAV_MARK)) throw new Error(`site/index.html has no ${NAV_MAR
 writeFileSync(join(out, 'index.html'), index.replace(NAV_MARK, toolLinks(tools)));
 const unlinked = unlinkedTools(out, tools);
 if (unlinked.length > 0) throw new Error(`the site serves tool pages that site/tools.json does not list: ${unlinked.join(' ')}`);
-if (values.analytics) addAnalytics(out);
+if (values.analytics) addAnalytics(out, versionHtml(readVersion(root)));
 writeFileSync(join(out, '.nojekyll'), '');
 console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
