@@ -63,15 +63,15 @@ test('a merged vehicle still places a part at every former site', () => {
         const { part: own, finish: ownFinish, ...was } = before.get(site.id);
         assert.deepEqual(where, was, `${vehicle}/${site.id}`);
         // A site may paint its part itself; merging leaves that paint alone on a site it does not move.
-        if (part !== own) moved.push({ where: `${vehicle}/${site.id}`, lender: part, own, finish });
+        if (part !== own) moved.push({ where: `${vehicle}/${site.id}`, lender: part, own, finish, ownFinish });
         else assert.equal(finish, ownFinish, `${vehicle}/${site.id}`);
       }
     }
     assert.ok(moved.length > 0, 'no vehicle borrows a pressing, so nothing was merged');
     const lent = bodies(join(repo, VEHICLE_ROWS_SOURCE), new Set(moved.map(({ lender }) => lender)));
     const owned = bodies(join(copy, 'index.libsonnet'), new Set(moved.map(({ own }) => own)));
-    for (const { where, lender, own, finish } of moved) {
-      assert.deepEqual(shown(lent[lender], finish), shown(owned[own]), `${where}: ${lender} in place of ${own}`);
+    for (const { where, lender, own, finish, ownFinish } of moved) {
+      assert.deepEqual(shown(lent[lender], finish), shown(owned[own], ownFinish), `${where}: ${lender} in place of ${own}`);
     }
   });
 });
