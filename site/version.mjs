@@ -1,7 +1,7 @@
 // Which assets version a built site renders, for the footer: from the build's own git state, never written by hand.
 import { execFileSync } from 'node:child_process';
 
-const REPOSITORY = 'https://github.com/roobie/skelly-assets';
+export const REPOSITORY = 'https://github.com/roobie/skelly-assets';
 const SHORT = 7;
 const escape = (text) => text.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
