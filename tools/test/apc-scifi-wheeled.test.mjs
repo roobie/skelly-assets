@@ -39,7 +39,8 @@ const shifted = (pieces, by) => pieces.map((p) => {
 });
 const lift = (pieces, dy) => shifted(pieces, [0, dy, 0]);
 // The body every wheel turns inside: the hull, its glacis and what is fitted on its outside near the wheels.
-const body = drawn('hull', 'glacis', 'pannier_far', 'side_step', 'headlamp_near', 'headlamp_far', 'tail_lamp_near', 'tail_lamp_far');
+const body = drawn('hull', 'glacis', 'pannier_far', 'side_step', 'grab_rail_near', 'grab_rail_far', 'headlamp_near', 'headlamp_far',
+  'tail_lamp_near', 'tail_lamp_far');
 const running = sites.filter((s) => /_wheel_(near|far)$|_wheel_(brake_disc|caliper)_/.test(s.id));
 // Wheels are large, so they are sampled coarsely: a meeting at this step means the well's air is gone.
 const AIR = 0.02;
@@ -111,10 +112,11 @@ test('every fitting rests on the part that carries it', () => {
     ['roof', 'hull'], ['vision_block', 'glacis'], ['ramp', 'hull'], ['side_door', 'hull'],
     ['side_step', 'hull'], ['driver_seat', 'hull'], ['controls', 'hull'], ['locker', 'hull'], ['rack', 'hull'],
     ['bay_bench_far', 'hull'], ['pannier_far', 'hull'], ['weapon_station', 'roof'], ['cannon', 'weapon_station'],
+    ['sights', 'weapon_station'], ['periscopes', 'roof'],
   ];
   for (const side of sides) {
     carried.push([`rear_bench_${side}`, 'hull'], [`launcher_${side}`, 'weapon_station'], [`hatch_${side}`, 'roof'],
-      [`roof_rail_${side}`, 'roof'], [`headlamp_${side}`, 'hull'], [`tail_lamp_${side}`, 'hull']);
+      [`grab_rail_${side}`, 'hull'], [`headlamp_${side}`, 'hull'], [`tail_lamp_${side}`, 'hull']);
   }
   // A gap finer than half the voxel grain closes in the build, so the check samples no finer.
   for (const [fitting, carrier] of carried) assert.ok(meeting(drawn(fitting), drawn(carrier), spec.grain / 2).touches, `${fitting} floats off ${carrier}`);
@@ -127,28 +129,87 @@ test('a vision block moved off the glacis floats, so the cut plates are sampled'
   assert.ok(!meeting(shifted(drawn('vision_block'), [0, 2 * spec.grain + spec.body.wall, 0]), drawn('glacis'), spec.grain / 2).touches);
 });
 
-test('the cannon runs clear of the roof rails and launchers', () => {
-  const roof = drawn('roof_rail_near', 'roof_rail_far', 'launcher_near', 'launcher_far');
-  assert.ok(!meeting(drawn('cannon'), roof, 0.01).touches);
+// The weapon station turns all round on its ring with its cannon at any elevation down to the deck's depression, so
+// everything it carries sweeps a solid of revolution about the ring's axis. It is sampled as the (radius, height) cells
+// its pieces fill, the cannon level and dipped about its trunnion, so every heading is checked at once.
+const turret = spec.turret;
+const SWEEP_STEP = 0.02;
+const turning = ['weapon_station', 'cannon', 'sights', 'launcher_near', 'launcher_far'];
+const dipped = (point, degrees) => {
+  const a = degrees * Math.PI / 180;
+  const [dx, dy] = [point[0] - turret.trunnion, point[1] - turret.gunY];
+  return [turret.trunnion + dx * Math.cos(a) + dy * Math.sin(a), turret.gunY - dx * Math.sin(a) + dy * Math.cos(a), point[2]];
+};
+// The points of each piece's solid, or within half a step of it so a thin plate is not missed, inside `[lo, hi]`.
+function* filling(pieces, lo = [-Infinity, -Infinity, -Infinity], hi = [Infinity, Infinity, Infinity]) {
+  for (const p of pieces.map(solid)) {
+    const from = [0, 1, 2].map((i) => Math.max(p.min[i], lo[i]));
+    const to = [0, 1, 2].map((i) => Math.min(p.max[i], hi[i]));
+    for (let x = from[0]; x <= to[0]; x += SWEEP_STEP) {
+      for (let y = from[1]; y <= to[1]; y += SWEEP_STEP) {
+        for (let z = from[2]; z <= to[2]; z += SWEEP_STEP) if (p.distance([x, y, z]) <= SWEEP_STEP / 2) yield [x, y, z];
+      }
+    }
+  }
+}
+const cell = ([x, y, z]) => [Math.round(Math.hypot(x - turret.x, z) / SWEEP_STEP), Math.round(y / SWEEP_STEP)];
+// The sites whose pieces come within a cell of the turret's sweep.
+function sweptInto(fixedSites) {
+  // The ring is the bearing the station turns on, so it is part of the deck it sits in.
+  const turnsWith = turning.flatMap((id) => site[id].pieces.filter((p) => !(id === 'weapon_station' && p.id === 'ring'))
+    .map((piece) => ({ piece, dips: id === 'cannon' })));
+  const swept = new Set();
+  let [reach, low, high] = [0, Infinity, -Infinity];
+  for (const degrees of [0, turret.deckDepression]) {
+    for (const { piece, dips } of turnsWith) {
+      for (const point of filling([piece])) {
+        const [r, y] = cell(dips ? dipped(point, degrees) : point);
+        swept.add(`${r},${y}`);
+        [reach, low, high] = [Math.max(reach, r), Math.min(low, y), Math.max(high, y)];
+      }
+    }
+  }
+  const radius = (reach + 1) * SWEEP_STEP;
+  const lo = [turret.x - radius, (low - 1) * SWEEP_STEP, -radius];
+  const hi = [turret.x + radius, (high + 1) * SWEEP_STEP, radius];
+  return fixedSites.filter((s) => {
+    for (const point of filling(s.pieces, lo, hi)) {
+      const [r, y] = cell(point);
+      for (let dr = -1; dr <= 1; dr++) for (let dy = -1; dy <= 1; dy++) if (swept.has(`${r + dr},${y + dy}`)) return true;
+    }
+    return false;
+  }).map((s) => s.id);
+}
+const deck = sites.filter((s) => !turning.includes(s.id));
+
+test('the weapon station traverses all round with its cannon dipped over the deck, clear of every fitting', () => {
+  assert.ok(site.periscopes.pieces.length > 0 && site.sights.pieces.length > 0, 'vacuous: no optics');
+  assert.deepEqual(sweptInto(deck), []);
 });
 
-test('each roof rail stands on its posts alone, its bar clear of the roof', () => {
-  const roof = drawn('roof');
+test('periscopes raised to the gun\'s height are swept, so the traverse check can fail', () => {
+  const raised = { ...site.periscopes, pieces: lift(site.periscopes.pieces, turret.gunY - spec.body.top) };
+  assert.deepEqual(sweptInto([raised]), ['periscopes']);
+});
+
+test('each grab rail stands off the hull on its posts alone, its bar clear of the side', () => {
+  const hull = drawn('hull');
   for (const side of sides) {
-    const rail = drawn(`roof_rail_${side}`);
+    const rail = drawn(`grab_rail_${side}`);
     const bar = rail.filter((p) => p.id.startsWith('bar'));
     const posts = rail.filter((p) => p.id.startsWith('post'));
-    assert.ok(!meeting(bar, roof, 0.01).touches, `${side} bar meets the roof`);
+    assert.ok(bar.length > 0 && posts.length > 0, `vacuous: no ${side} rail`);
+    assert.ok(!meeting(bar, hull, 0.01).touches, `${side} bar meets the hull`);
     for (const post of posts) {
-      assert.ok(meeting([post], roof, 0.005).touches, `${side} ${post.id} floats off the roof`);
+      assert.ok(meeting([post], hull, 0.005).touches, `${side} ${post.id} floats off the hull`);
       assert.ok(meeting([post], bar, 0.005).touches, `${side} ${post.id} misses the bar`);
     }
   }
 });
 
-test('a rail bar dropped to the roof meets it, so the rail clearance check can fail', () => {
-  const bar = drawn('roof_rail_near').filter((p) => p.id.startsWith('bar'));
-  assert.ok(meeting(lift(bar, -spec.rails.height), drawn('roof'), 0.01).touches);
+test('a rail bar pushed against the side meets it, so the rail clearance check can fail', () => {
+  const bar = drawn('grab_rail_near').filter((p) => p.id.startsWith('bar'));
+  assert.ok(meeting(shifted(bar, [0, 0, -spec.rails.standoff]), drawn('hull'), 0.01).touches);
 });
 
 // The player's doll crouching, from its own measures: the thighs level, so the hips sit at the shin and foot's height

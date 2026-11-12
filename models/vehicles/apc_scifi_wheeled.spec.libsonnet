@@ -1,8 +1,8 @@
 // A wheeled sci-fi armoured carrier: a low, slab-sided hollow hull slung between four very large wheels, its long
-// glacis raked down to a wedge nose between two square fenders like a bullet's point, every face flat. The troops
-// enter by a big rear ramp door or a side door on the near side, between the arches, and sit on benches along the
-// walls; the driver sits at the front under the glacis and looks out through a slit in it. A boxy remote weapon
-// station stands on the roof.
+// glacis raked down to a wedge nose between two fenders like a bullet's point, every face flat and every outer joint
+// bevelled. The troops enter by a big rear ramp door or a side door on the near side, between the arches, and sit on
+// benches along the walls; the driver sits at the front under the glacis and looks out through a slit in it and through
+// periscopes. A boxy weapon station with armoured sights stands on the roof.
 // Metres in the vehicle frame (+x forward, +y up, +z near).
 local wheels = import 'wheels.libsonnet';
 local wheel = 'wheel_18_00r25';
@@ -81,9 +81,27 @@ local radius = wheels[wheel].tyre.outer;
     inside: [t.x, 2.2, 0],
     gunY: 2.25,
     muzzle: 1.9,
+    // The cannon elevates about an axis across its mantlet at `trunnion`, and dips `deckDepression` degrees over the
+    // hull's deck, which every fitting on the roof stays under, so it can traverse all round.
+    trunnion: t.x + 0.6,
+    deckDepression: 3,
     pod: { x: [t.x - 0.5, t.x + 0.3], y: [2.12, 2.38], z: [0.64, 0.88] },
   },
-  rails: { z: 1.0, from: -2.8, to: 0.4, posts: [-2.6, -1.1, 0.25], height: 0.12, bar: 0.04 },
+  // Armoured optics with dark glass faces. On the turret's roof, about its ring's centre: the gunner's sight box on the
+  // far side of the cannon, its glass forward under a hood, and the commander's panoramic head on a mast on the near
+  // side, high enough to see over the gunner's box. On the roof, periscope blocks round each hatch, `ring` m from its
+  // centre and facing out at `facings` degrees from ahead toward the near side, kept off the turret's side so they stay
+  // out of its sweep; and the driver's, behind the glacis, one ahead and one each side turned out by `turn` degrees.
+  optics: {
+    gunner: { x: [0.1, 0.42], z: [-0.42, -0.18], height: 0.2 },
+    commander: { x: -0.3, z: 0.3, mast: 0.22, head: { half: 0.12, height: 0.18 } },
+    periscope: { depth: 0.1, width: 0.2, height: 0.08 },
+    hatch: { ring: 0.42, facings: [45, 90, 180] },
+    driver: { x: 0.78, z: 0.28, turn: 25 },
+  },
+  // Grab rails along the hull's sides under the eaves, out of the turret's sweep, each from the rear corner to the side
+  // door's aft jamb, its bar `standoff` m off the side on posts at `posts`.
+  rails: { y: 1.75, from: -2.95, to: -0.8, posts: [-2.8, -1.8, -0.9], standoff: 0.08, bar: 0.04 },
   // A stowage pannier on the far side between the arches, where the near side has its door.
   pannier: { x: [-0.9, 0.85], y: [0.98, 1.45], z: [1.55, 1.72] },
   hatches: { x: -2.2, z: 0.45 },

@@ -10,8 +10,8 @@ local floorTop = b.belly + b.wall;
 local bench(id, x, z) = site.pair(id, 'apc_scifi_wheeled_bench', [x, floorTop, z]);
 {
   title: 'Sci-fi wheeled carrier',
-  sites: [one(id) for id in ['hull', 'roof', 'glacis', 'vision_block', 'ramp', 'side_door', 'driver_seat', 'controls', 'locker', 'rack', 'weapon_station', 'cannon']]
-    + pair('roof_rail')
+  sites: [one(id) for id in ['hull', 'roof', 'glacis', 'vision_block', 'ramp', 'side_door', 'driver_seat', 'controls', 'locker', 'rack', 'weapon_station', 'cannon', 'sights', 'periscopes']]
+    + pair('grab_rail')
     + pair('launcher')
     // The near side has the side door between the arches, so the pannier and the bay's bench are fitted on the far side
     // alone.

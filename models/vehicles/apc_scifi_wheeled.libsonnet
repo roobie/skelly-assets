@@ -79,7 +79,28 @@ local sl = s.slit;
 local t = s.turret;
 local ringTop = b.top + t.ring.height;
 local rail = s.rails;
-local railY = b.top + rail.height;
+local o = s.optics;
+local gun = o.gunner;
+local cmd = o.commander;
+local headY = t.top + cmd.mast;
+local scope = o.periscope;
+// A plan block centred at (x, z), `depth` along the way it faces, `facing` degrees from ahead toward the near side,
+// and `width` across it, as a y prism with its corners counter-clockwise in (z, x).
+local block(id, slot, x, z, facing, depth, width, y) =
+  local a = facing * std.pi / 180;
+  local f = [std.cos(a) * depth / 2, std.sin(a) * depth / 2];
+  local w = [-std.sin(a) * width / 2, std.cos(a) * width / 2];
+  k.yPrism(id, slot, [[z + c[0] * f[1] + c[1] * w[1], x + c[0] * f[0] + c[1] * w[0]] for c in [[1, 1], [1, -1], [-1, -1], [-1, 1]]], y);
+local periscope(id, x, z, facing) =
+  local a = facing * std.pi / 180;
+  local out = scope.depth / 2 + 0.005;
+  local glass = [x + std.cos(a) * out, z + std.sin(a) * out];
+  [
+    block(id, 'paint', x, z, facing, scope.depth, scope.width, [b.top, b.top + scope.height]),
+    block(id + '_glass', 'glass', glass[0], glass[1], facing, 0.01, scope.width - 0.04, [b.top + 0.02, b.top + scope.height - 0.02]),
+  ];
+local hatchScopes = o.hatch;
+local driverScopes = o.driver;
 local p = s.pannier;
 local bench = s.bench;
 local d = s.driver;
@@ -219,11 +240,33 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     box('mouth_%d' % i, 'dark', [pod.x[1], pod.y[0] + 0.05, pod.z[0] + 0.03 + i * 0.11], [pod.x[1] + 0.01, pod.y[1] - 0.05, pod.z[0] + 0.10 + i * 0.11])
     for i in [0, 1]
   ]),
-  // Grab rails along the roof's edges, the bar held off the armour by posts.
-  part('roof_rail', 'roof rail', 30, [
-    box('bar', 'trim', [rail.from, railY, rail.z - rail.bar / 2], [rail.to, railY + rail.bar, rail.z + rail.bar / 2]),
+  // The turret's sights, each an armoured box with a dark glass face under a hood.
+  part('sights', 'sights', 45, [
+    box('gunner_box', 'paint', [t.x + gun.x[0], t.top, gun.z[0]], [t.x + gun.x[1], t.top + gun.height, gun.z[1]]),
+    box('gunner_glass', 'glass', [t.x + gun.x[1], t.top + 0.04, gun.z[0] + 0.03], [t.x + gun.x[1] + 0.01, t.top + gun.height - 0.04, gun.z[1] - 0.03]),
+    box('gunner_hood', 'frame', [t.x + gun.x[1], t.top + gun.height - 0.03, gun.z[0]], [t.x + gun.x[1] + 0.06, t.top + gun.height, gun.z[1]]),
+    k.turned('commander_mast', 'frame', 'y', k.disc(0.06, t.top, headY), [t.x + cmd.x, 0, cmd.z]) + { sides: 12 },
+    box('commander_head', 'paint', [t.x + cmd.x - cmd.head.half, headY, cmd.z - cmd.head.half], [t.x + cmd.x + cmd.head.half, headY + cmd.head.height, cmd.z + cmd.head.half]),
+    box('commander_hood', 'frame', [t.x + cmd.x - cmd.head.half - 0.03, headY + cmd.head.height, cmd.z - cmd.head.half - 0.02], [t.x + cmd.x + cmd.head.half + 0.03, headY + cmd.head.height + 0.03, cmd.z + cmd.head.half + 0.02]),
   ] + [
-    box('post_%d' % i, 'trim', [rail.posts[i] - 0.03, b.top, rail.z - 0.03], [rail.posts[i] + 0.03, railY, rail.z + 0.03])
+    box('commander_glass_' + end, 'glass', [face, headY + 0.04, cmd.z - cmd.head.half + 0.03], [face + 0.01, headY + cmd.head.height - 0.03, cmd.z + cmd.head.half - 0.03])
+    for end in ['fore', 'aft'] for face in [t.x + cmd.x + (if end == 'fore' then cmd.head.half else -cmd.head.half - 0.01)]
+  ]),
+  // Periscope blocks on the roof round the hatches and ahead of the driver, each a low armoured housing with its glass
+  // on the face it looks out of.
+  part('periscopes', 'periscopes', 60,
+    periscope('driver', driverScopes.x, 0, 0)
+    + k.bothSides(periscope('driver_side', driverScopes.x, driverScopes.z, driverScopes.turn)
+      + std.flattenArrays([
+        local a = facing * std.pi / 180;
+        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchScopes.ring, s.hatches.z + std.sin(a) * hatchScopes.ring, facing)
+        for facing in hatchScopes.facings
+      ]))),
+  // A grab rail along the hull's near side, the bar held off the armour by posts.
+  part('grab_rail', 'grab rail', 20, [
+    box('bar', 'trim', [rail.from, rail.y - rail.bar / 2, b.half + rail.standoff - rail.bar], [rail.to, rail.y + rail.bar / 2, b.half + rail.standoff]),
+  ] + [
+    box('post_%d' % i, 'trim', [rail.posts[i] - 0.03, rail.y - 0.03, b.half], [rail.posts[i] + 0.03, rail.y + 0.03, b.half + rail.standoff - rail.bar])
     for i in std.range(0, std.length(rail.posts) - 1)
   ]),
   // A stowage pannier between the arches, authored on the near side and fitted on the far.
