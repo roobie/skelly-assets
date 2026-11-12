@@ -66,16 +66,18 @@ test('each axle stub reaches its brake disc hat and clears the caliper', () => {
 });
 
 test('every fitting rests on the part that carries it', () => {
-  const carried = [['canopy', 'hull'], ['visor', 'canopy'], ['weapon_station', 'hull'], ['cannon', 'weapon_station'], ['ramp', 'hull']];
+  const carried = [
+    ['hood', 'hull'], ['visor', 'hood'], ['weapon_station', 'hull'], ['cannon', 'weapon_station'], ['ramp', 'hull'],
+  ];
   for (const side of sides) {
-    carried.push([`pannier_${side}`, `flank_${side}`], [`hatch_${side}`, 'hull'], [`headlamp_${side}`, 'hull'], [`tail_lamp_${side}`, 'hull']);
+    carried.push([`pannier_${side}`, `flank_${side}`], [`launcher_${side}`, 'weapon_station'], [`hatch_${side}`, 'hull'], [`headlamp_${side}`, 'hull'], [`tail_lamp_${side}`, 'hull']);
   }
   // A gap finer than half the voxel grain closes in the build, so the check samples no finer.
   for (const [fitting, carrier] of carried) assert.ok(meeting(drawn(fitting), drawn(carrier), spec.grain / 2).touches, `${fitting} floats off ${carrier}`);
 });
 
-test('the cannon runs clear of the canopy, visor and roof rails', () => {
-  const roof = drawn('canopy', 'visor', 'roof_rail_near', 'roof_rail_far');
+test('the cannon runs clear of the hood, visor, roof rails and launchers', () => {
+  const roof = drawn('hood', 'visor', 'roof_rail_near', 'roof_rail_far', 'launcher_near', 'launcher_far');
   assert.ok(!meeting(drawn('cannon'), roof, 0.01).touches);
 });
 

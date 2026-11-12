@@ -6,67 +6,49 @@ local b = s.body;
 local finish = { paint: s.paint, frame: s.frame, trim: s.trim, dark: 'plastic-black', glass: 'lens-smoke' };
 local part(name, kg, pieces, anchors={}) = k.compound('apc_scifi_wheeled_' + name, kg, pieces, finish, anchors) + { voxelGrain: s.grain };
 
-// A convex outline cut to the side of a line where `keep` is not negative; `keep` is linear in (z, x).
-local clip(poly, keep) =
-  local n = std.length(poly);
-  local cut = std.flattenArrays([
-    local p = poly[i]; local q = poly[(i + 1) % n];
-    local dp = keep(p); local dq = keep(q);
-    (if dp >= 0 then [p] else [])
-    + (if (dp < 0 && dq > 0) || (dp > 0 && dq < 0) then [[p[j] + (q[j] - p[j]) * dp / (dp - dq) for j in [0, 1]]] else [])
-    for i in std.range(0, n - 1)
-  ]);
-  local m = std.length(cut);
-  local cross(a, o, c) = (o[0] - a[0]) * (c[1] - o[1]) - (o[1] - a[1]) * (c[0] - o[0]);
-  // A prism needs a strictly convex profile, so a cut that leaves a point on a straight edge drops it.
-  [cut[i] for i in std.range(0, m - 1) if m >= 3 && cross(cut[(i + m - 1) % m], cut[i], cut[(i + 1) % m]) > 1e-9];
-local clipAll(poly, keeps) = std.foldl(clip, keeps, poly);
-local area(poly) = local n = std.length(poly);
-  if n < 3 then 0 else std.sum([poly[i][0] * poly[(i + 1) % n][1] - poly[(i + 1) % n][0] * poly[i][1] for i in std.range(0, n - 1)]) / 2;
-local slab(id, slot, poly, y) = if area(poly) > 1e-4 then [k.yPrism(id, slot, poly, y)] else [];
-
-local band(i) = b.belly + (b.top - b.belly) * i / b.bands;
-local bands = [
-  local y = [band(i), band(i + 1)];
-  { i: i, y: y, plan: clipAll(s.planAt((y[0] + y[1]) / 2), [function(p) p[1] - b.rearFace]), arch: s.archAt(y[0], y[1]) }
-  for i in std.range(0, b.bands - 1)
-];
-local front = s.axles[0];
-local rear = s.axles[1];
-// Below the arches' crowns the hull is a core between the wheels and a flank either side, cut round each arch.
-local flankCuts(a) = {
-  ahead: [function(p) p[1] - front - a],
-  between: [function(p) p[1] - rear - a, function(p) front - a - p[1]],
-  behind: [function(p) rear - a - p[1]],
-};
-local hull = std.flattenArrays([
-  if l.arch == null then slab('band_%d' % l.i, 'paint', l.plan, l.y)
-  else slab('core_%d' % l.i, 'paint', clipAll(l.plan, [function(p) b.core - p[0], function(p) p[0] + b.core]), l.y)
-  for l in bands
+// Plates authored by their near-side corners, as cuts that keep `inside`, each mirrored onto the far side when it
+// leans across.
+local bothCuts(plates, inside) = std.flattenArrays([
+  local near = k.plate(p[0], p[1], p[2], inside);
+  [near] + (if near.normal[2] != 0 then [near { normal: [near.normal[0], near.normal[1], -near.normal[2]] }] else [])
+  for p in std.objectValues(plates)
 ]);
-local flank = std.flattenArrays([
-  local outside = clip(l.plan, function(p) p[0] - b.core);
-  local cuts = flankCuts(l.arch);
-  std.flattenArrays([slab('%s_%d' % [name, l.i], 'paint', clipAll(outside, cuts[name]), l.y) for name in std.objectFields(cuts)])
-  for l in bands if l.arch != null
-]);
+local hullCuts = bothCuts(s.plates, b.inside);
 
+// The hull's outline in side view, a band over its full height from x0 to x1 whose floor runs from y0 to y1.
+local band(id, x0, y0, x1, y1, z) = k.clipped(k.prism(id, 'paint', [[x0, y0], [x1, y1], [x1, b.top], [x0, b.top]], z), hullCuts);
+// Each arch is the top half of an octagon round its tyre, so its edges stay flat plates like the hull's. The flanks'
+// floor runs along the belly and over each arch; between its corners it is straight, so each stretch is a convex band.
 local w = s.wheel;
+local reach = w.radius + s.archGap;
+local corner = reach * (std.sqrt(2) - 1);
+local floor = [[b.rear, b.belly]] + std.flattenArrays([
+  [[x - reach, b.belly], [x - reach, w.radius + corner], [x - corner, w.radius + reach], [x + corner, w.radius + reach],
+   [x + reach, w.radius + corner], [x + reach, b.belly]]
+  for x in std.sort(s.axles)
+]) + [[b.nose, b.belly]];
+local flank = [
+  band('band_%d' % i, floor[i][0], floor[i][1], floor[i + 1][0], floor[i + 1][1], [b.core, b.half])
+  for i in std.range(0, std.length(floor) - 2)
+  if floor[i + 1][0] > floor[i][0]
+    // A stretch the plates cut away whole, as ahead of the front arch where the cheeks meet the core, is left out.
+    && !k.cutAway([[x, y, z] for x in [floor[i][0], floor[i + 1][0]] for y in [b.belly, b.top] for z in [b.core, b.half]], hullCuts)
+];
+
+local h = s.hood;
+local hoodCuts = bothCuts(h.plates, [(h.x[0] + h.x[1]) / 2, (h.y[0] + h.y[1]) / 2, 0]);
+local visorX(y) = k.plateX(h.plates.front, y, 0);
+local t = s.turret;
+local ringTop = b.top + t.ring.height;
 local rail = s.rails;
 local railY = b.top + rail.height;
-local ws = s.weaponStation;
-local c = s.canopy;
-local canopyY(j) = b.top + c.height * j / c.bands;
-local canopyPlan(j) =
-  local f = std.pow(1 - std.pow((j + 0.5) / c.bands, 2.5), 1 / 2.5);
-  s.outline(c.x, c.half * f, c.front * f, c.back * f, 2.2, 1.6, 8);
-local visorFrom = c.x + c.front * 0.15;
-local inVisor(j) = j >= c.visor[0] && j <= c.visor[1];
 local p = s.pannier;
 local r = s.ramp;
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }, [
-  part('hull', 7800, hull + [
-    box('tow_eye', 'frame', [s.noseAt(0.75) - 0.08, 0.70, -0.10], [s.noseAt(0.75) + 0.06, 0.80, 0.10]),
+  // The core between the wheels runs the hull's whole length and alone makes the nose ahead of the front arches.
+  part('hull', 7800, [
+    band('core', b.rear, b.belly, b.nose, b.belly, [-b.core, b.core]),
+    box('tow_eye', 'frame', [b.nose - 0.05, 1.0, -0.12], [b.nose + 0.08, 1.08, 0.12]),
   ]),
   // Authored on the near side and fitted mirrored on the far.
   part('flank', 900, flank),
@@ -74,30 +56,36 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     box('beam', 'frame', [-0.09, -0.09, -b.core], [0.09, 0.09, b.core]),
     box('differential', 'frame', [-0.24, -0.16, -0.24], [0.24, 0.16, 0.24]),
   ] + k.bothSides([
-    // The stub reaches out of the arch wall to the brake disc's hat, inside the ring and clear of the caliper.
-    k.turned('stub', 'frame', 'z', k.disc(0.11, b.core, w.z)) + { sides: 24 },
+    // The stub reaches out of the arch wall to the face the brake disc's hat bolts to, inside the ring and clear of the
+    // caliper.
+    k.turned('stub', 'frame', 'z', k.disc(0.11, b.core, w.z + w.face)) + { sides: 24 },
   ])),
-  part('canopy', 140, std.flattenArrays([
-    local plan = canopyPlan(j);
-    slab('band_%d' % j, 'paint', if inVisor(j) then clip(plan, function(q) visorFrom - q[1]) else plan, [canopyY(j), canopyY(j + 1)])
-    for j in std.range(0, c.bands - 1)
-  ])),
-  // One curved visor across the canopy's front, rather than flat panes.
-  part('visor', 20, std.flattenArrays([
-    slab('band_%d' % j, 'glass', clip(canopyPlan(j), function(q) q[1] - visorFrom), [canopyY(j), canopyY(j + 1)])
-    for j in std.range(c.visor[0], c.visor[1])
-  ])),
+  part('hood', 140, [
+    k.clipped(k.prism('shell', 'paint', [[h.x[0], h.y[0]], [h.x[1], h.y[0]], [h.x[1], h.y[1]], [h.x[0], h.y[1]]], [-h.half, h.half]), hoodCuts),
+  ]),
+  // One narrow slit across the hood's front, rather than a windscreen.
+  part('visor', 5, [
+    local y = h.visor.y;
+    k.prism('slit', 'glass', [[visorX(y[0]), y[0]], [visorX(y[0]) + h.visor.depth, y[0]], [visorX(y[1]) + h.visor.depth, y[1]], [visorX(y[1]), y[1]]],
+      [-h.visor.half, h.visor.half]),
+  ]),
   part('weapon_station', 380, [
-    k.turned('ring', 'frame', 'y', k.disc(ws.ring, b.top, b.top + 0.07), [ws.x, 0, 0]) + { sides: 32 },
-    k.turned('dome', 'paint', 'y', [[b.top + 0.07, 0], [b.top + 0.07, ws.dome], [b.top + 0.21, ws.dome - 0.02], [b.top + 0.33, ws.dome - 0.09],
-      [b.top + 0.42, ws.dome - 0.22], [b.top + 0.47, ws.dome - 0.38], [b.top + 0.49, 0], [b.top + 0.07, 0]], [ws.x, 0, 0]) + { sides: 24 },
-    box('sight', 'trim', [ws.x - 0.20, b.top + 0.18, -ws.dome - 0.10], [ws.x + 0.16, b.top + 0.36, -ws.dome + 0.12]),
-    box('sight_lens', 'glass', [ws.x + 0.16, b.top + 0.21, -ws.dome - 0.07], [ws.x + 0.18, b.top + 0.33, -ws.dome + 0.03]),
+    k.turned('ring', 'frame', 'y', k.disc(t.ring.radius, b.top, ringTop), [t.x, 0, 0]) + { sides: 32 },
+    k.clipped(k.yPrism('turret', 'paint', [[q[0], t.x + q[1]] for q in t.plan], [ringTop, t.top]), bothCuts(t.plates, t.inside)),
   ]),
   part('cannon', 160, [
-    box('mantlet', 'frame', [ws.x + 0.30, ws.gunY - 0.11, -0.17], [ws.x + 0.62, ws.gunY + 0.11, 0.17]),
-    k.turned('barrel', 'frame', 'x', k.disc(0.05, ws.x + 0.62, ws.muzzle - 0.14), [0, ws.gunY, 0]) + { sides: 16 },
-    k.turned('muzzle', 'dark', 'x', k.disc(0.075, ws.muzzle - 0.14, ws.muzzle), [0, ws.gunY, 0]) + { sides: 16 },
+    box('mantlet', 'frame', [t.x + 0.8, t.gunY - 0.1, -0.15], [t.x + 1.1, t.gunY + 0.1, 0.15]),
+    k.turned('barrel', 'frame', 'x', k.disc(0.05, t.x + 1.1, t.muzzle - 0.14), [0, t.gunY, 0]) + { sides: 16 },
+    k.turned('muzzle', 'dark', 'x', k.disc(0.075, t.muzzle - 0.14, t.muzzle), [0, t.gunY, 0]) + { sides: 16 },
+  ]),
+  // A box of launch tubes on an arm off the turret's near cheek; the tubes' mouths face ahead.
+  local pod = t.pod;
+  part('launcher', 90, [
+    box('arm', 'frame', [pod.x[0] + 0.25, pod.y[0], 0.5], [pod.x[1] - 0.25, pod.y[0] + 0.08, pod.z[0]]),
+    box('pod', 'paint', [pod.x[0], pod.y[0], pod.z[0]], [pod.x[1], pod.y[1], pod.z[1]]),
+  ] + [
+    box('mouth_%d' % i, 'dark', [pod.x[1], pod.y[0] + 0.05, pod.z[0] + 0.03 + i * 0.11], [pod.x[1] + 0.01, pod.y[1] - 0.05, pod.z[0] + 0.10 + i * 0.11])
+    for i in [0, 1]
   ]),
   // Grab rails along the roof's edges, the bar held off the armour by posts.
   part('roof_rail', 30, [
@@ -115,11 +103,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     for i in [0, 1] for x in [p.x[0] + (p.x[1] - p.x[0]) * (0.25 + 0.5 * i)]
   ]),
   part('ramp', 300, [
-    box('plate', 'paint', [b.rearFace - 0.06, r.low, -r.half], [b.rearFace, r.high, r.half]),
-    box('hinge_bar', 'frame', [b.rearFace - 0.10, r.low, -r.half + 0.05], [b.rearFace - 0.04, r.low + 0.06, r.half - 0.05]),
+    box('plate', 'paint', [b.rear - 0.06, r.low, -r.half], [b.rear, r.high, r.half]),
+    box('hinge_bar', 'frame', [b.rear - 0.10, r.low, -r.half + 0.05], [b.rear - 0.04, r.low + 0.06, r.half - 0.05]),
   ] + k.bothSides([
-    box('rib', 'paint', [b.rearFace - 0.10, r.low + 0.10, r.half - 0.20], [b.rearFace - 0.06, r.high - 0.10, r.half - 0.14]),
+    box('rib', 'paint', [b.rear - 0.10, r.low + 0.10, r.half - 0.20], [b.rear - 0.06, r.high - 0.10, r.half - 0.14]),
   ]) + [
-    box('handle', 'trim', [b.rearFace - 0.11, (r.low + r.high) / 2 - 0.03, -0.14], [b.rearFace - 0.06, (r.low + r.high) / 2 + 0.03, 0.14]),
+    box('handle', 'trim', [b.rear - 0.11, (r.low + r.high) / 2 - 0.03, -0.14], [b.rear - 0.06, (r.low + r.high) / 2 + 0.03, 0.14]),
   ], { hinge_a: ['hinge_bar', [0.5, 0.5, 0]], hinge_b: ['hinge_bar', [0.5, 0.5, 1]] }),
 ])
