@@ -3,14 +3,17 @@
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
 // labels (models/taxonomy.json). It serves the tool pages site/tools.json lists and links them from the index.
-// Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [--analytics] [outDir]; the tree defaults to built/. --no-tree
+// Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [--analytics] [--history file] [outDir]; the tree defaults to built/. --no-tree
 // leaves the tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs).
 // --require-viewers fails on an unbuilt viewer, so a deploy never drops one. --analytics adds the visit counter to every
 // page the site serves, viewers included (site/analytics.mjs), for the Pages deploy only. No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
-// pack paths.
+// pack paths. --history names the latest release's model-history.json (tools/model-history.mjs), against which each model
+// shows the release that introduced it, the one that last changed it and whether this build differs; without it the
+// models show no versions.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
@@ -18,6 +21,7 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
+import { hashModels, standing } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
@@ -28,7 +32,7 @@ import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false }, 'require-viewers': { type: 'boolean', default: false }, analytics: { type: 'boolean', default: false } } });
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(root, 'built') }, 'no-tree': { type: 'boolean', default: false }, 'require-viewers': { type: 'boolean', default: false }, analytics: { type: 'boolean', default: false }, history: { type: 'string' } } });
 const out = resolve(root, positionals[0] ?? '_site');
 const built = resolve(values.built);
 const POSES = 'models/poses';
@@ -98,9 +102,12 @@ const apart = (model) => {
   const components = modelComponents(readFileSync(join(built, model.file)));
   return components ? { ...model, components } : model;
 };
+const history = values.history && JSON.parse(readFileSync(values.history, 'utf8'));
+const hashes = history && hashModels(built, manifest);
+const repository = process.env.GITHUB_REPOSITORY ?? 'roobie/skelly-assets';
 const shown = models.map((model) => {
   const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model);
-  return { ...entry, form: formOf(entry) };
+  return { ...entry, form: formOf(entry), ...(history ? { history: standing(history, model.id, hashes[model.id]) ?? null } : {}) };
 });
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
@@ -210,7 +217,7 @@ for (const model of models) if (model.clips && model.body) {
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies }));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `https://github.com/${repository}/releases/tag/` } } : {}) }));
 // A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
 // built without the viewers links nothing it lacks.
 const listed = readTools(root);
