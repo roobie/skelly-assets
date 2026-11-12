@@ -16,4 +16,8 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
   + site.pair('rear_beacon', 'beacon_amber', [s.bodyRear + 0.1, s.bodyRiseRear - 0.12, 0.95])
   + site.pair('high_lamp', 'tail_lamp_tall', [s.hopperRear - 0.01, s.hopperSill + 0.05, 1.2]),
   tags: { 'vehicle-role': ['utility'] },
+  overlaps: [
+    site.overlap('subframe', 'hopper',
+      'The hopper is let into the subframe at its mount (bowl runs into runner_near); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

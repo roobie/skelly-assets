@@ -31,4 +31,12 @@ local track = import 'track-kit.libsonnet';
   + site.pair('boom_ram', 'excavator_boom_ram')
   + site.batteryBay('battery_tray', [-0.05, s.deck, 0.7]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('house', 'fuel_tank',
+      'The house draws its own tool_cover block where the fuel_tank part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('house', 'boom',
+      'The boom is let into the house at its mount (boom_foot runs into foot); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+    site.overlap('boom', 'arm',
+      'The arm is let into the boom at its mount (reach runs into stick); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

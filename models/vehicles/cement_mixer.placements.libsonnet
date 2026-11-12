@@ -16,4 +16,10 @@ local site = import 'site.libsonnet';
       site.one('water_tank', 'cement_mixer_water_tank'),
     ] + site.pair('roller_stand', 'cement_mixer_roller_stand'),
   ),
+  overlaps: [
+    site.overlap('subframe', 'drive',
+      'The drive is let into the subframe at its mount (runner_near runs into foot); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+    site.overlap('drive', 'drum',
+      'The drum is let into the drive at its mount (band_1 runs into pedestal); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

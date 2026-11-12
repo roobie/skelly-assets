@@ -1,5 +1,6 @@
 // The microcar on a battery, as the 2017-2019 electric fortwo: the motor sits ahead of the rear axle where the engine
 // did, and the pack lies under the floor pan.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'microcar.spec.libsonnet';
 {
@@ -12,4 +13,8 @@ local s = import 'microcar.spec.libsonnet';
     pack: { part: 'traction_pack_small', at: [(s.rearFloorFront + s.cowl) / 2, s.sill, 0] },
     port: { part: 'charge_port', at: [s.rearAxle, s.archTop + 0.05, s.side] },
   }),
+  overlaps: [
+    site.overlap('shell', 'pack',
+      'The shell draws its own floor_pan block where the pack part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  ],
 }

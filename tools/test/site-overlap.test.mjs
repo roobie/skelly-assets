@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { overlapProblems, siteOverlapProblems } from '../siteOverlap.mjs';
+import { overlapProblems, roleOf, siteOverlapProblems } from '../siteOverlap.mjs';
 
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
 const site = (id, part, ...pieces) => ({ id, part, pieces });
 const vehicle = (sites, overlaps = [], parent = null) => ({ parent, sites, overlaps });
-const problems = (vehicles) => overlapProblems({ grain: GRAIN, vehicles });
+const problems = (vehicles, seating = []) => overlapProblems({ grain: GRAIN, seating, vehicles });
 const unit = box('block', [0, 0, 0], [1, 1, 1]);
 const shifted = (by) => box('block', [by, 0, 0], [1 + by, 1, 1]);
 
@@ -45,6 +45,27 @@ test('a variant allows its parent\'s overlaps as well as its own', () => {
   const parent = vehicle(sites, [{ sites: ['body', 'lamp'], why: 'seated' }]);
   assert.deepEqual(problems({ van: parent, electric_van: vehicle(sites, [], 'van') }), []);
   assert.equal(problems({ van: vehicle(sites), electric_van: vehicle(sites, [], 'van') }).length, 2);
+});
+
+const lampSites = [site('body', 'van_body', unit), site('lamp_near', 'van_lamp', shifted(0.5))];
+
+test('a role seated at least as deep as the overlap allows it in every vehicle, whichever side seats', () => {
+  const deep = [{ roles: ['lamp'], depth: 0.5 + GRAIN / 2, why: 'seated' }];
+  assert.deepEqual(problems({ van: vehicle(lampSites), truck: vehicle(lampSites) }, deep), []);
+  assert.deepEqual(problems({ van: vehicle([...lampSites].reverse()) }, deep), []);
+});
+
+test('a seating shallower than the overlap does not allow it', () => {
+  assert.equal(problems({ van: vehicle(lampSites) }, [{ roles: ['lamp'], depth: 0.25, why: 'seated' }]).length, 1);
+});
+
+test('a seating names the role without its side or number and may use * as a wildcard', () => {
+  assert.equal(roleOf('wheel_front_near'), 'wheel_front');
+  assert.equal(roleOf('headlamp_3_far'), 'headlamp');
+  assert.equal(roleOf('near_side'), 'near_side');
+  const seating = (roles) => [{ roles, depth: 1, why: 'seated' }];
+  assert.deepEqual(problems({ van: vehicle(lampSites) }, seating(['la*'])), []);
+  assert.equal(problems({ van: vehicle(lampSites) }, seating(['am'])).length, 1);
 });
 
 test('every vehicle of the catalogue keeps its parts at different sites clear of each other or allows the overlap', () => {

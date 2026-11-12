@@ -35,4 +35,14 @@ local s = import 'combine_harvester.spec.libsonnet';
   + site.pair('mirror', 'door_mirror', [s.cabFront, 3.2, s.cabSide + 0.02])
   + site.batteryBay('truck_battery_tray', [-1.0, 1.0, 0.6]),
   tags: { 'vehicle-role': ['farm'] },
+  overlaps: [
+    site.overlap('body', 'engine',
+      'The body draws its own main block where the engine part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('body', 'gearbox',
+      'The body draws its own main block where the gearbox part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('body', 'fuel_tank',
+      'The body draws its own main block where the fuel_tank part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('body', 'feeder',
+      'The feeder is let into the body at its mount (main runs into housing); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

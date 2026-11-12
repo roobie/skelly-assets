@@ -33,4 +33,8 @@ local sideZ = 0;
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.17, 0.62, 0.86])
   + site.pair('rear_indicator', 'marker_lamp', [s.rear - 0.17, 0.78, 0.86])
   + site.pair('marker', 'marker_lamp', [s.front + 0.14, 2.14, 0.95]),
+  overlaps: [
+    site.overlap('chassis', 'nose_cap',
+      'The nose_cap is let into the chassis at its mount (side_rail_near runs into below); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

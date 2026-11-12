@@ -29,4 +29,8 @@ local track = import 'track-kit.libsonnet';
   + site.headlamps(s.hoodFront + 0.02, 1.34, 0.42)
   + site.batteryBay('battery_tray', [0.2, s.deck, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('chassis', 'digging_boom',
+      'The digging_boom is let into the chassis at its mount (beam runs into rear_tower); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

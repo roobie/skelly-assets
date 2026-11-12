@@ -42,4 +42,8 @@ local wheel = id + '_wheel';
   + pair('tail_lamp', 'tail_lamp_small', [s.rear, 0.92, 0.88])
   + site.batteryBay('truck_battery_tray', [1.25, 0.9, -0.5]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('hull', 'gearbox',
+      'The gearbox sits in the floor tunnel, which is drawn as a solid block around it.'),
+  ],
 }

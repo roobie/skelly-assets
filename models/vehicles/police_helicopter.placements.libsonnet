@@ -32,4 +32,8 @@ local s = import 'police_helicopter.spec.libsonnet';
   + pair('rear_door', 'police_helicopter_rear_door')
   + pair('seat', 'police_helicopter_seat', [1.05, s.floor, 0.38]),
   tags: { 'vehicle-role': ['emergency'] },
+  overlaps: [
+    site.overlap('engine_cowl', 'main_gearbox',
+      'The main_gearbox is let into the engine_cowl at its mount (pylon runs into case); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

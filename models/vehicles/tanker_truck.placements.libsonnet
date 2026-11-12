@@ -9,4 +9,8 @@ local s = import 'tanker_truck.spec.libsonnet';
     site.one('ladder', 'tanker_truck_ladder'),
     site.one('valve_gear', 'tanker_truck_valve_gear'),
   ],
+  overlaps: [
+    site.overlap('saddle', 'barrel',
+      'The barrel is let into the saddle at its mount (shell runs into low_0); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

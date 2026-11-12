@@ -3,8 +3,9 @@
 // (models/vehicles/kit.libsonnet, `far` and `moved`), exactly as the showcase and the game place the part. Two pieces
 // overlap when they share more than one voxel grain of depth, so faces that touch or sink a grain into each other are
 // contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other freely.
-// A vehicle allows an overlap in its placements file, `overlaps` (models/vehicles/site.libsonnet, `overlap`), and a
-// variant also allows its parent's. The reason for the rule is in docs/decisions/0014-site-overlap.md.
+// Two things allow an overlap: the seating of either part's role (models/vehicles/seating.libsonnet), which holds for every
+// vehicle, and the vehicle's own placements file, `overlaps` (models/vehicles/site.libsonnet, `overlap`), which a variant
+// shares with its parent. The reason for the rule is in docs/decisions/0014-site-overlap.md.
 import { resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { solid } from './pieceSolid.mjs';
@@ -12,7 +13,7 @@ import { solid } from './pieceSolid.mjs';
 const repo = resolve(import.meta.dirname, '..');
 
 // Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
-// the overlaps it allows: { grain, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps } } }. A site whose part
+// the overlaps it allows, and the seating by role: { grain, seating, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps } } }. A site whose part
 // is a roster model has no pieces to compare, so it is left out.
 export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
@@ -26,6 +27,7 @@ export function readSitePieces(root = repo) {
   ];
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
+    seating: (import 'models/vehicles/seating.libsonnet').seats,
     vehicles: {
       [vehicle]: {
         parent: std.get(placements[vehicle], 'parent'),
@@ -83,14 +85,25 @@ export function siteOverlaps(sites, grain) {
   }));
 }
 
+// A site's role: its id without the side it is on and its number, so every vehicle's wheels share one seating.
+export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').replace(/_\d+(?=_|$)/g, '');
+
+const globPattern = (glob) => new RegExp(`^${glob.split('*').map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+
+// How deep (m) the role seats into its neighbours: the deepest of the seating entries that name it, or 0.
+export function seatDepth(seating, role) {
+  return Math.max(0, ...seating.filter(({ roles }) => roles.some((glob) => globPattern(glob).test(role))).map(({ depth }) => depth));
+}
+
 const millimetres = (metres) => Math.round(metres * 1e3);
 
 // The overlaps no vehicle allows, as messages naming the vehicle, both parts and their sites.
-export function overlapProblems({ grain, vehicles }) {
+export function overlapProblems({ grain, seating, vehicles }) {
+  const seated = ({ sites, depth }) => depth <= Math.max(...sites.map((site) => seatDepth(seating, roleOf(site)))) + 1e-9;
   return Object.entries(vehicles).flatMap(([vehicle, { parent, sites, overlaps }]) => {
     const allowed = new Set([...(vehicles[parent]?.overlaps ?? []), ...overlaps].map(({ sites: pair }) => key(...pair)));
     return siteOverlaps(sites, grain)
-      .filter(({ sites: pair }) => !allowed.has(key(...pair)))
+      .filter((overlap) => !seated(overlap) && !allowed.has(key(...overlap.sites)))
       .map(({ sites: [a, b], parts: [partA, partB], pieces: [pieceA, pieceB], depth }) =>
         `${vehicle}: ${partA} at ${a} overlaps ${partB} at ${b} by ${millimetres(depth)} mm (${pieceA} in ${pieceB})`);
   });

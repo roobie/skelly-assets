@@ -21,4 +21,8 @@ local shaftRear = s.transferX - 0.2;
       site.one('tailgate', id + '_tailgate'),
     ] + site.pair('dropside', id + '_dropside'),
   ),
+  overlaps: [
+    site.overlap('chassis', 'alternator',
+      'A leaf spring on the rail is drawn through the case slung beneath it; the owner decides whether to move the case or shorten the spring.'),
+  ],
 }

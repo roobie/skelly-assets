@@ -25,4 +25,8 @@ local rearAt(x) = local p = s.at([x, s.hubY]); [p[0], p[1], s.wheelZ];
   ]
   + pair('first_axle_wheel', 'jackknifed_lorry_cab_rear_wheel', rearAt(s.rearAxles[0]))
   + pair('last_axle_wheel', 'jackknifed_lorry_cab_rear_wheel', rearAt(s.rearAxles[1])),
+  overlaps: [
+    site.overlap('earth', 'bumper',
+      'The bumper is let into the earth at its mount (heap_6_17 runs into far); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

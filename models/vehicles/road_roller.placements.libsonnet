@@ -27,4 +27,10 @@ local s = import 'road_roller.spec.libsonnet';
   + site.headlamps(2.02, 1.4, 0.46)
   + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('platform', 'rear_drum',
+      'The rear_drum is let into the platform at its mount (roll runs into spine); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+    site.overlap('front_yoke', 'front_drum',
+      'The front_drum is let into the front_yoke at its mount (neck runs into roll); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

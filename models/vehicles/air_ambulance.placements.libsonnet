@@ -36,4 +36,8 @@ local s = import 'air_ambulance.spec.libsonnet';
   + pair('clamshell_door', 'air_ambulance_clamshell_door')
   + pair('seat', 'air_ambulance_seat', [1.28, s.floor, 0.4]),
   tags: { 'vehicle-role': ['emergency'] },
+  overlaps: [
+    site.overlap('engine_cowl', 'main_gearbox',
+      'The main_gearbox is let into the engine_cowl at its mount (pylon runs into case); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

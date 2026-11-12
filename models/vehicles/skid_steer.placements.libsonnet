@@ -27,4 +27,8 @@ local s = import 'skid_steer.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.26, 1.06, 0.38])
   + site.batteryBay('battery_tray', [-0.55, 0.5, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('frame', 'engine_cover',
+      'The engine_cover is let into the frame at its mount (hood runs into sponson_near); not yet judged against a render, so the owner confirms it reads as a joint or fixes it.'),
+  ],
 }

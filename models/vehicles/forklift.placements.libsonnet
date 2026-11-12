@@ -29,4 +29,16 @@ local s = import 'forklift.spec.libsonnet';
   + site.pair('work_lamp', 'work_lamp', [0.69, 1.72, 0.42])
   + site.batteryBay('battery_tray', [-0.4, 0.64, 0.46]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('chassis', 'counterweight',
+      'The chassis draws its own lower block where the counterweight part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('counterweight', 'steer_axle',
+      'The counterweight draws its own lower block where the steer_axle part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('chassis', 'steer_axle',
+      'The chassis draws its own steer_mount block where the steer_axle part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('chassis', 'gearbox',
+      'The chassis draws its own spine block where the gearbox part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('chassis', 'drive_axle',
+      'The chassis draws its own spine block where the drive_axle part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  ],
 }

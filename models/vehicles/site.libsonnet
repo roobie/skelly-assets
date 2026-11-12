@@ -13,6 +13,9 @@ local pair(id, part, at=origin) = [
 // `add` appends sites, so a derived vehicle states only what it changes.
 local adjust(sites, over={}, drop=[], add=[]) =
   [placed + std.get(over, placed.id, {}) for placed in sites if !std.member(drop, placed.id)] + add;
+// Allows the overlap of the parts at two sites of this vehicle, with the reason it is not a defect. Parts seat into each
+// other by role for every vehicle (seating.libsonnet); this is for what only this vehicle does.
+local overlap(a, b, why) = { sites: [a, b], why: why };
 local headlamps(x, y, z) = pair('headlamp', 'car_headlamp', [x, y, z]);
 local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car_battery', [at[0], at[1] + 0.03, at[2]])];
 {
@@ -20,6 +23,7 @@ local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car
   one: one,
   pair: pair,
   adjust: adjust,
+  overlap: overlap,
   headlamps: headlamps,
   batteryBay: batteryBay,
   // A game's vehicle kit that emits sites, for the body kits whose `fittings` take one: the fitting list a game's

@@ -28,4 +28,10 @@ local s = import 'small_tractor.spec.libsonnet';
   + site.headlamps(s.nose, 0.98, 0.2)
   + site.batteryBay('battery_tray', [0.2, 0.92, 0]),
   tags: { 'vehicle-role': ['farm'] },
+  overlaps: [
+    site.overlap('chassis', 'rear_axle',
+      'The chassis draws its own transmission block where the rear_axle part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('chassis', 'gearbox',
+      'The chassis draws its own transmission block where the gearbox part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  ],
 }

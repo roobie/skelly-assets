@@ -24,4 +24,12 @@ local s = import 'golf_cart.spec.libsonnet';
   + site.pair('rear_wheel', 'wheel_145r10', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.tail - 0.03, 0.4, 0.32])
   + site.headlamps(s.nose + 0.03, 0.42, 0.3),
+  overlaps: [
+    site.overlap('rear_body', 'inverter',
+      'The rear_body draws its own tail block where the inverter part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('rear_body', 'motor',
+      'The rear_body draws its own tail block where the motor part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+    site.overlap('rear_body', 'pack',
+      'The rear_body draws its own seat_box block where the pack part is also placed, so that volume is drawn twice; the owner decides which to drop or shrink.'),
+  ],
 }
