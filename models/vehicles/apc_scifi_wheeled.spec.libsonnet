@@ -93,15 +93,15 @@ local radius = wheels[wheel].tyre.outer;
   },
   // Armoured optics with dark glass faces. On the turret's roof, about its ring's centre: the gunner's sight box on the
   // far side of the cannon, its glass forward under a hood, and the commander's panoramic head on a mast on the near
-  // side, high enough to see over the gunner's box. On the roof, periscope blocks round each hatch, `ring` m from its
-  // centre and facing out at `facings` degrees from ahead toward the near side, kept off the turret's side so they stay
-  // out of its sweep; and the driver's, behind the glacis, one ahead and one each side turned out by `turn` degrees.
+  // side, high enough to see over the gunner's box. On the roof, periscope blocks round each hatch, facing out at
+  // `facings` degrees from ahead toward the near side, kept off the turret's side so they stay out of its sweep; and the
+  // driver's, behind the glacis bevel, one ahead and one each side turned out by `turn` degrees.
   optics: {
     gunner: { x: [0.1, 0.42], z: [-0.42, -0.18], height: 0.2 },
     commander: { x: -0.3, z: 0.3, mast: 0.22, head: { half: 0.12, height: 0.18 } },
     periscope: { depth: 0.1, width: 0.2, height: 0.08 },
-    hatch: { ring: 0.42, facings: [45, 90, 180] },
-    driver: { x: 0.78, z: 0.28, turn: 25 },
+    hatch: { facings: [45, 90, 180] },
+    driver: { x: 0.7, z: 0.28, turn: 25 },
   },
   // Grab rails along the hull's sides under the eaves, out of the turret's sweep, each from the rear corner to the side
   // door's aft jamb, its bar `standoff` m off the side on posts at `posts`.

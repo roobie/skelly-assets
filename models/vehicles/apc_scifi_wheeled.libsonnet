@@ -84,8 +84,7 @@ local gun = o.gunner;
 local cmd = o.commander;
 local headY = t.top + cmd.mast;
 local scope = o.periscope;
-// A plan block centred at (x, z), `depth` along the way it faces, `facing` degrees from ahead toward the near side,
-// and `width` across it, as a y prism with its corners counter-clockwise in (z, x).
+// Boxes lie along the axes, so a block turned to face out `facing` degrees is a y prism.
 local block(id, slot, x, z, facing, depth, width, y) =
   local a = facing * std.pi / 180;
   local f = [std.cos(a) * depth / 2, std.sin(a) * depth / 2];
@@ -100,6 +99,10 @@ local periscope(id, x, z, facing) =
     block(id + '_glass', 'glass', glass[0], glass[1], facing, 0.01, scope.width - 0.04, [b.top + 0.02, b.top + scope.height - 0.02]),
   ];
 local hatchScopes = o.hatch;
+// Each hatch periscope stands as far from its hatch's centre as the lid's and its own half-diagonals together, so it
+// clears the lid at any facing.
+local hatchLid = [p for p in std.parseJson([r for r in import 'apc.libsonnet' if r.id == 'apc_hatch'][0].parts[0].params.pieces) if p.id == 'lid'][0];
+local hatchRing = std.sqrt(2) * hatchLid.max[0] + std.sqrt(std.pow(scope.depth, 2) + std.pow(scope.width, 2)) / 2;
 local driverScopes = o.driver;
 local p = s.pannier;
 local bench = s.bench;
@@ -240,7 +243,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     box('mouth_%d' % i, 'dark', [pod.x[1], pod.y[0] + 0.05, pod.z[0] + 0.03 + i * 0.11], [pod.x[1] + 0.01, pod.y[1] - 0.05, pod.z[0] + 0.10 + i * 0.11])
     for i in [0, 1]
   ]),
-  // The turret's sights, each an armoured box with a dark glass face under a hood.
   part('sights', 'sights', 45, [
     box('gunner_box', 'paint', [t.x + gun.x[0], t.top, gun.z[0]], [t.x + gun.x[1], t.top + gun.height, gun.z[1]]),
     box('gunner_glass', 'glass', [t.x + gun.x[1], t.top + 0.04, gun.z[0] + 0.03], [t.x + gun.x[1] + 0.01, t.top + gun.height - 0.04, gun.z[1] - 0.03]),
@@ -252,14 +254,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     box('commander_glass_' + end, 'glass', [face, headY + 0.04, cmd.z - cmd.head.half + 0.03], [face + 0.01, headY + cmd.head.height - 0.03, cmd.z + cmd.head.half - 0.03])
     for end in ['fore', 'aft'] for face in [t.x + cmd.x + (if end == 'fore' then cmd.head.half else -cmd.head.half - 0.01)]
   ]),
-  // Periscope blocks on the roof round the hatches and ahead of the driver, each a low armoured housing with its glass
-  // on the face it looks out of.
   part('periscopes', 'periscopes', 60,
     periscope('driver', driverScopes.x, 0, 0)
     + k.bothSides(periscope('driver_side', driverScopes.x, driverScopes.z, driverScopes.turn)
       + std.flattenArrays([
         local a = facing * std.pi / 180;
-        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchScopes.ring, s.hatches.z + std.sin(a) * hatchScopes.ring, facing)
+        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchRing, s.hatches.z + std.sin(a) * hatchRing, facing)
         for facing in hatchScopes.facings
       ]))),
   // A grab rail along the hull's near side, the bar held off the armour by posts.

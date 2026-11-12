@@ -192,6 +192,18 @@ test('periscopes raised to the gun\'s height are swept, so the traverse check ca
   assert.deepEqual(sweptInto([raised]), ['periscopes']);
 });
 
+test('no roof fitting stands on a hatch lid', () => {
+  const hatches = drawn('hatch_near', 'hatch_far');
+  const roofFittings = drawn('periscopes', 'weapon_station');
+  assert.ok(hatches.length > 0 && roofFittings.length > 0, 'vacuous: no hatches or roof fittings');
+  assert.ok(!meeting(roofFittings, hatches, spec.grain / 2).touches);
+});
+
+test('a hatch slid a periscope\'s depth toward its fore periscope meets it, so the hatch check can fail', () => {
+  const by = spec.optics.periscope.depth;
+  assert.ok(meeting(drawn('periscopes'), shifted(drawn('hatch_near'), [by, 0, by]), spec.grain / 2).touches);
+});
+
 test('each grab rail stands off the hull on its posts alone, its bar clear of the side', () => {
   const hull = drawn('hull');
   for (const side of sides) {
