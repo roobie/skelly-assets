@@ -79,16 +79,14 @@ A part asks for the finest grain by carrying a tag in its definition, so the cho
 with the part's content and the exporter holds no list of part names. See `src/glb.ts`,
 `VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the sight parts carry it.
 
-A class may also give the finest grain to every part too thin for its own grain, by the rule shared with
-cartridges, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
+A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
 Only the gun class asks for it: an item's thin parts, a garment's panels above all, are large, and the finest grain
 would multiply their triangles for little gain. See `src/glb.ts`, `partVoxelGrain` and `isThinPart`, and
 `src/featureFit.ts`, `featureFitsGrain`.
 
-A row that
-names a detail grain must make its own grain a whole multiple of it, because both lattices
-are anchored at the same world origin and the grains then nest: each coarse voxel face
+A row that names a detail grain must make its own grain a whole multiple of it, because
+both lattices are anchored at the same world origin and the grains then nest: each coarse voxel face
 lies on a fine voxel face, so a sight still meets the receiver and the gas tube without
 steps or gaps. The exporter refuses a pair that does not nest, and a row without a detail
 grain has nothing to check; see `src/glb.ts`, `checkNesting`.
