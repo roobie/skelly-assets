@@ -38,6 +38,13 @@ export interface ModelExport<Model extends NeutralModel = NeutralModel> {
   readonly glb: Uint8Array;
   /** The GLB's part node names from the resolved assembly; see `glb.ts`, `partNodeName`. */
   readonly partNodes: readonly string[];
+  /** The model's total mass and drawn volume, for tools that author the mass; see `physical.ts`, `drawnVolumeM3`. */
+  readonly physical?: ModelPhysical;
+}
+export interface ModelPhysical {
+  readonly massKg: number;
+  /** Left out by a tool that weighs its parts but does not measure the voxels it draws, such as the gun tool. */
+  readonly volumeM3?: number;
 }
 export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
   readonly id: string;
