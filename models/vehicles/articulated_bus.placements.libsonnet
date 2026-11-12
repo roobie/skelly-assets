@@ -47,8 +47,4 @@ local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
     site.overlap('joint', 'bellows', 0.06,
       'The pleated side wall of the bellows stands on the rim of the turntable plate, so its post runs into the plate.'),
   ],
-  unjudged: [
-    site.unjudged('aft_rear_axle', 'aft_exhaust', 0.06,
-      'The beam piece of beam_axle_truck_bare runs into the pipe piece of exhaust_long.'),
-  ],
 }

@@ -10,6 +10,14 @@ local fuelTank = import 'fuel-tank-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local gearboxes = import 'gearboxes.libsonnet';
+// How far the gearbox's base rises above the engine's, and the tallest case that rides there with its top under the
+// rail top, where bodies stand on the frame.
+local bellhousingRise = 0.12;
+local tallestCase = 0.42;
+// The exhaust pipe's line under the frame, and its centre outboard of a gearbox case it runs beside.
+local pipeZ = 0.2;
+local pipeBeside = 0.04;
 local defaults = {
   bonnet: null,
   crew: null,
@@ -38,6 +46,10 @@ local defaults = {
   raisedSeat: true,
   seatY: self.floor + (if self.raisedSeat then 0.2 else 0),
   dashDepth: 0.52,
+  // A cab-over's radiator rises through the cab floor under the dash, so the lower dash block stops at it.
+  dashLowerBack:
+    local back = self.face - std.min(0.34, self.dashDepth - 0.04);
+    if self.bonnet == null then std.max(back, self.radiatorX + cooling.front) else back,
   binnacle: self.dashDepth >= 0.45,
   guard: true,
   guardTop: 2 * self.r + 0.06,
@@ -60,9 +72,13 @@ local defaults = {
   batteryZ: self.side - 0.42,
   engineX: self.frontAxle - 0.25,
   engineY: self.railTop - 0.58,
-  gearboxLength: 0.72,
+  gearboxLength: gearboxes[self.gearbox].length,
+  // A taller case sinks so its top stays under the rail top.
+  gearboxY: self.engineY + bellhousingRise - std.max(0, gearboxes[self.gearbox].height - tallestCase),
   exhaustX: self.engineX - 3.6,
   exhaustY: self.railBottom - 0.16,
+  // A taller case reaches down to the pipe's line, so the pipe runs beside it.
+  exhaustZ: if gearboxes[self.gearbox].height > tallestCase then gearboxes[self.gearbox].width / 2 + pipeBeside else pipeZ,
   radiatorX: self.face - 0.28,
   radiatorY: self.bumperLow + 0.02,
   lampX: if self.bonnet != null then self.front else self.face + 0.02,
@@ -155,7 +171,7 @@ local pressings(id, title, s0) = {
       prism('glass', 'glass', [[s.face - 0.05, s.waist], [s.face - 0.01, s.waist], [roofFront - 0.01, s.roof], [roofFront - 0.05, s.roof]], [-s.glassIn, s.glassIn]),
     ], { glass: 'glass-clear' }),
     part('_dashboard', 'dashboard', 25, [
-      box('lower', 'trim', [s.face - std.min(0.34, s.dashDepth - 0.04), s.floor, -s.skin + 0.04], [s.face - 0.1, s.waist - 0.2, s.skin - 0.04]),
+      box('lower', 'trim', [s.dashLowerBack, s.floor, -s.skin + 0.04], [s.face - 0.1, s.waist - 0.2, s.skin - 0.04]),
       box('top', 'trim', [s.face - s.dashDepth, s.waist - 0.2, -s.skin + 0.04], [s.face - 0.04, s.waist - 0.04, s.skin - 0.04]),
     ], paint),
     part('_rear_underrun', 'rear underrun', 30, [
@@ -262,10 +278,10 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('front_bumper', part('_front_bumper'), origin, ['chassis']),
     fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
+    fitting('gearbox', s.gearbox, [gearboxX, s.gearboxY, 0], ['engine']),
   ] + cooling.sites(s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, kit=kit, supportedBy=['chassis'])
   + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, kit=kit, supportedBy=['chassis']) + [
-    fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, 0.2], ['engine', 'chassis']),
+    fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, s.exhaustZ], ['engine', 'chassis']),
     // The driver sits on the far side, away from the kerb, as on the buses.
     fitting('steering_wheel', 'steering_wheel', [s.face - s.dashDepth - 0.03, s.seatY + 0.72, -0.58], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [s.seatX + 0.3, s.floor + 0.42, 0], ['cab']),

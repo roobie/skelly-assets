@@ -9,7 +9,7 @@
   railBottom: 0.82, railTop: 1.0, railZ: 0.5,
   bumperLow: 0.75, bumperTop: 0.95, lampY: 1.2,
   engine: 'engine_v8_petrol_medium', engineX: 1.2, engineY: 0.5, engineLength: 0.8,
-  gearbox: 'gearbox_inline', gearboxLength: 0.62, radiator: 'radiator_van',
+  gearbox: 'gearbox_inline', radiator: 'radiator_van',
   batteryX: -0.55,
   paint: 'paint-green',
   chassisMass: 474, shellMass: 201,

@@ -19,8 +19,4 @@ local s = import 'riot_van.spec.libsonnet';
   + site.pair('door_markings', 'riot_van_door_markings')
   + site.pair('rear_markings', 'riot_van_rear_markings'),
   tags: { 'vehicle-role': ['emergency'] },
-  unjudged: [
-    site.unjudged('exhaust', 'rear_axle', 0.06,
-      'The tailpipe piece of exhaust_long runs into the beam piece of beam_axle_van.'),
-  ],
 }

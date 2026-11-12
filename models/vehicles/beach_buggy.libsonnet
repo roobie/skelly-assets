@@ -53,9 +53,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     k.bar('radius_arm', 'steel', [0.8, 0.27], [s.frontAxle, s.frontHub], 0.05, [0.4, 0.45]),
     k.bar('shock', 'spring', [s.frontAxle, s.frontHub + 0.04], [s.frontAxle - 0.1, 0.54], 0.05, [0.5, 0.55]),
   ]), { steel: 'steel-grey', spring: 'paint-red' }) + { title: 'Beach buggy front axle' },
-  k.compound('beach_buggy_rear_axle', 34, [
-    box('beam', 'steel', [s.rearAxle - 0.04, s.rearHub - 0.04, -s.rearWheelZ + 0.1], [s.rearAxle + 0.04, s.rearHub + 0.04, s.rearWheelZ - 0.1]),
-  ] + bothSides([
+  // Swing half-shafts run out from the engine's flanks, which straddle the axle line, to the hubs.
+  k.compound('beach_buggy_rear_axle', 34, bothSides([
+    box('half_shaft', 'steel', [s.rearAxle - 0.04, s.rearHub - 0.04, 0.4], [s.rearAxle + 0.04, s.rearHub + 0.04, s.rearWheelZ - 0.1]),
     k.bar('swing_arm', 'steel', [-0.76, 0.33], [s.rearAxle, s.rearHub], 0.06, tubeZ),
     k.bar('shock', 'spring', [s.rearAxle - 0.02, s.rearHub + 0.04], [-1.1, 0.6], 0.05, [0.47, 0.52]),
   ]), { steel: 'steel-grey', spring: 'paint-red' }) + { title: 'Beach buggy rear axle' },

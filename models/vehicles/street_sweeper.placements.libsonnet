@@ -16,8 +16,4 @@ local s = t.spec(import 'street_sweeper.spec.libsonnet');
   + site.pair('cab_beacon', 'beacon_amber', [s.face - s.lean - 0.6, s.roof + 0.15, 0.5])
   + site.pair('rear_beacon', 'beacon_amber', [-2.3, s.bodyTop - 0.04, 0.72]),
   tags: { 'vehicle-role': ['utility'] },
-  unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of street_sweeper_dashboard runs into the core piece of radiator_truck.'),
-  ],
 }

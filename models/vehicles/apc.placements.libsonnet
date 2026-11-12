@@ -20,7 +20,7 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
     one('engine', 'engine_v8_turbo_diesel', [1.95, 0.85, 0.47]),
     one('gearbox', 'gearbox_heavy', [0.95, 0.85, 0.47]),
     one('radiator', 'radiator_truck', [2.6, 1.0, 0.47]),
-    one('exhaust', 'exhaust_military', [1.4, 1.85, 0.6]),
+    one('exhaust', 'exhaust_military', [1.1, 1.85, 0.6]),
     one('driver_seat', 'front_seat', [s.driverX, s.floor, s.driverZ]),
     one('steering_wheel', 'steering_wheel', [s.driverX + 0.43, s.floor + 0.52, s.driverZ]),
     one('driver_panel', 'apc_driver_panel'),
@@ -49,12 +49,8 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
   ]
   + site.batteryBay('truck_battery_tray', [-2.75, s.floor + 0.3, 0.5]),
   tags: { 'vehicle-role': ['military'] },
-  unjudged: [
-    site.unjudged('ammo_rack', 'wall_locker_far', 0.06,
-      'The rack piece of apc_ammo_rack runs into the locker_far piece of apc_wall_locker.'),
-    site.unjudged('nose', 'roof', 0.05,
-      'The cheek_near piece of apc_hull_nose runs into the plate piece of apc_hull_roof.'),
-    site.unjudged('radiator', 'exhaust', 0.06,
-      'The core piece of radiator_truck runs into the pipe piece of exhaust_military.'),
+  overlaps: [
+    site.overlap('nose', 'roof', 0.05,
+      'The sloped nose rises to the roof, so the top edge of its cheek runs into the roof plate it meets.'),
   ],
 }

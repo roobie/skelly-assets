@@ -18,10 +18,4 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
     site.overlap('lower_deck', 'deck_posts', 0.058,
       'The tail posts stand in the plate of the lower deck.'),
   ],
-  unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of car_transporter_dashboard runs into the core piece of radiator_truck.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
-  ],
 }

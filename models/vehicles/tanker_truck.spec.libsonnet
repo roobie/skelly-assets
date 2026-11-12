@@ -7,7 +7,7 @@
   // A modern European rigid brakes on air discs.
   wheelBrakes: 'disc',
   railBottom: 0.74, railTop: 0.99,
-  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
+  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   paint: 'paint-white',
   chassisMass: 1200, shellMass: 1580,
   // Barrel

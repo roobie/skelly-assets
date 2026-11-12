@@ -49,8 +49,4 @@ local s = import 'combine_harvester.spec.libsonnet';
     site.overlap('body', 'gearbox', 0.52,
       'The gearbox sits inside the main body block of the combine, which is drawn solid around it.'),
   ],
-  unjudged: [
-    site.unjudged('header', 'reel', 0.05,
-      'The auger_flight_1 piece of combine_harvester_header runs into the bat_4 piece of combine_harvester_reel.'),
-  ],
 }

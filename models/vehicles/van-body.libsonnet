@@ -404,7 +404,7 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
       fitting('prop_shaft', 'prop_shaft_long', [(s.frontAxle - 0.76 + s.rearAxle) / 2, 0.34, 0], ['gearbox', 'rear_axle']),
       fitting('radiator', 'radiator_van', [nose - 0.12, 0.38, 0], ['shell']),
       fitting('fuel_tank', 'fuel_tank_van', [s.rearAxle + 1.0, if isBox then 0.3 else 0.2, -0.58], ['shell']),
-      fitting('exhaust', 'exhaust_long', [s.frontAxle - 3.47, 0.29, 0.3], ['engine', 'shell']),
+      fitting('exhaust', 'exhaust_long', [s.frontAxle - 3.47, 0.19, 0.3], ['engine', 'shell']),
       fitting('rear_axle', 'beam_axle_van', [s.rearAxle, lift, 0], ['shell']),
       fitting('steering_wheel', 'steering_wheel', [s.dash - 0.3, s.waist - 0.05, s.driverZ], ['dashboard']),
       fitting('gear_lever', 'gear_lever', [s.dash - 0.15, s.waist - 0.42, 0], ['dashboard']),

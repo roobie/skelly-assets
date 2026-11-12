@@ -31,10 +31,4 @@ local s = import 'news_helicopter.spec.libsonnet';
   + pair('front_door', 'news_helicopter_front_door')
   + pair('rear_door', 'news_helicopter_rear_door')
   + pair('seat', 'helicopter_seat', [1.0, s.floor, 0.32]),
-  unjudged: [
-    site.unjudged('rear_bench', 'rear_door_far', 0.045,
-      'The back piece of news_helicopter_rear_bench runs into the pane_1_1_far piece of news_helicopter_rear_door.'),
-    site.unjudged('rear_bench', 'rear_door_near', 0.045,
-      'The back piece of news_helicopter_rear_bench runs into the pane_1_1 piece of news_helicopter_rear_door.'),
-  ],
 }

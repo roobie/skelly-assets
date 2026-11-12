@@ -16,8 +16,4 @@ local tail = van.tail(s);
   + site.pair('rear_markings', 'ambulance_rear_markings')
   + site.pair('box_beacon_rear', 'beacon_blue', [tail + 0.25, s.box.roof, 0.75]),
   tags: { 'vehicle-role': ['emergency'] },
-  unjudged: [
-    site.unjudged('exhaust', 'rear_axle', 0.06,
-      'The tailpipe piece of exhaust_long runs into the beam piece of beam_axle_van.'),
-  ],
 }

@@ -13,6 +13,7 @@ local cabFront = -1.7;
 local cabIn = 0.55;
 local cabOut = 1.15;
 local cabRoof = 2.98;
+local winchX = -4.0;
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane', vehicle.title, s) + [
   k.compound('mobile_crane_deck', 3000, [
     box('plate', 'paint', [s.deckRear, s.deckLow, -s.side], [s.deckFront, s.deckTop, s.side]),
@@ -81,11 +82,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
     box('side_a', 'glass', [-2.94, 2.2, cabOut - 0.04], [-2.42, cabRoof - 0.06, cabOut - 0.01]),
     box('side_b', 'glass', [-2.36, 2.2, cabOut - 0.04], [cabFront - 0.06, cabRoof - 0.06, cabOut - 0.01]),
   ], finish) + { title: 'Mobile crane operator glass' },
+  // The winch stands just ahead of the counterweight, its rope clear of the counterweight's top plate.
   k.compound('mobile_crane_winch', 400, [
-    k.turned('drum', 'frame', 'z', k.disc(0.26, -0.32, 0.32), [-4.2, 3.06, 0]) + { sides: 16 },
-    k.turned('rope', 'rope', 'z', k.disc(0.3, -0.24, 0.24), [-4.2, 3.06, 0]) + { sides: 16 },
+    k.turned('drum', 'frame', 'z', k.disc(0.26, -0.32, 0.32), [winchX, 3.06, 0]) + { sides: 16 },
+    k.turned('rope', 'rope', 'z', k.disc(0.3, -0.24, 0.24), [winchX, 3.06, 0]) + { sides: 16 },
   ] + k.bothSides([
-    box('cheek', 'paint', [-4.36, 2.86, 0.32], [-4.04, 3.3, 0.38]),
+    box('cheek', 'paint', [winchX - 0.16, 2.86, 0.32], [winchX + 0.16, 3.3, 0.38]),
   ]), finish) + { title: 'Mobile crane winch' },
   k.compound('mobile_crane_boom_base', 4200, [
     section('base', 'paint', s.boomButt, 1.0, 0.31, 0.36),

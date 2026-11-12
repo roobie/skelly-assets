@@ -1,7 +1,12 @@
 // A four-axle road crane on the tipper's running gear: 12 m long, outriggers stowed, its telescopic boom laid forward along the carrier over the cab.
+local gearboxes = import 'gearboxes.libsonnet';
+// The gap between the gearbox's top and the deck above it.
+local deckGap = 0.02;
 (import 'tipper_truck.spec.libsonnet') + {
   rear: -6.0, front: 6.0, face: 5.92, cabBack: 4.15, doorRear: 4.23,
   frontAxle: 5.0, secondAxle: 3.5, rearAxles: [-2.0, -3.4],
+  // The gearbox rides over the second steered axle's beam, just under the deck.
+  gearboxY: self.deckLow - deckGap - gearboxes[self.gearbox].height,
   tankX: 1.68, batteryX: 1.68,
   chassisMass: 2200, shellMass: 1680,
   deckLow: 1.16, deckTop: 1.36, deckRear: -5.9, deckFront: 4.05,

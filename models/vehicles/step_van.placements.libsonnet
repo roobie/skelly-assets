@@ -8,8 +8,4 @@ local s = import 'step_van.spec.libsonnet';
     site.one('far_door_trim', 'step_van_far_door_trim'),
   ]
   + site.pair('door_step', 'door_step_walk_in', [s.bFront, 0.3, s.side]),
-  unjudged: [
-    site.unjudged('exhaust', 'rear_axle', 0.054,
-      'The silencer piece of exhaust_long runs into the beam piece of beam_axle_van.'),
-  ],
 }

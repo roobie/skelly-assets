@@ -26,12 +26,4 @@ local site = import 'site.libsonnet';
     site.overlap('subframe', 'drive', 0.12,
       'The drive\'s foot is bolted down into the runner of the subframe.'),
   ],
-  unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of tipper_truck_dashboard runs into the core piece of radiator_truck.'),
-    site.unjudged('gearbox', 'drive', 0.09,
-      'The case piece of gearbox_heavy runs into the foot piece of cement_mixer_drive.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
-  ],
 }

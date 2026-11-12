@@ -26,10 +26,4 @@ local s = import 'quad_bike.spec.libsonnet';
     site.overlap('swing_arm', 'rear_fenders', 0.06,
       'The shock mount on top of the swing arm pokes up into the underside of the rear fender deck.'),
   ],
-  unjudged: [
-    site.unjudged('front_fenders', 'front_arm_far', 0.05,
-      'The fender_top_far piece of quad_bike_front_fenders runs into the shock_far piece of quad_bike_front_arm.'),
-    site.unjudged('front_fenders', 'front_arm_near', 0.05,
-      'The fender_top_near piece of quad_bike_front_fenders runs into the shock piece of quad_bike_front_arm.'),
-  ],
 }

@@ -22,8 +22,4 @@ local s = import 'swat_truck.spec.libsonnet';
     site.overlap('body_floor', 'rear_step', 0.05,
       'The rear step\'s hangers are let into the rear apron of the body floor.'),
   ],
-  unjudged: [
-    site.unjudged('radiator', 'exhaust', 0.06,
-      'The core piece of radiator_truck runs into the pipe piece of exhaust_long.'),
-  ],
 }

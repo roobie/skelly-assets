@@ -10,10 +10,7 @@ local s = (import 'truck-cab.libsonnet').spec(import 'refuse_truck.spec.libsonne
     over: { exhaust: { part: 'exhaust_stack_small', at: [s.cabBack - 0.1, s.railTop, 0.52] } },
     motor: { part: 'traction_motor_large', at: [1.89, s.railBottom + 0.02 - 0.25, 0] },
     inverter: { part: 'inverter_large', at: [1.03, s.railBottom - 0.24, 0.9] },
-    pack: { part: 'traction_pack_van', at: [0.33, s.railBottom - 0.16, 0] },
+    // The pack fills the length between the rear springs' front hangers and the motor.
+    pack: { part: 'traction_pack_van', at: [0.4, s.railBottom - 0.16, 0] },
   }),
-  unjudged: [
-    site.unjudged('chassis', 'pack', 0.087,
-      'The spring_1 piece of refuse_truck_chassis runs into the case piece of traction_pack_van.'),
-  ],
 }

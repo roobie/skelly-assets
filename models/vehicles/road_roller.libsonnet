@@ -5,6 +5,11 @@ local s = import 'road_roller.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+// The engine hood is sheet-metal panels round an open bay, so the engine and radiator stand inside it rather than in a solid block.
+local hood = {
+  skin: 0.03,
+  profile: [[-2.02, 1.28], [-0.68, 1.28], [-0.68, s.hoodTop], [-1.84, s.hoodTop], [-2.02, s.hoodTop - 0.16]],
+};
 local yoke(id, x, back) = k.compound(id, 240, [
   box('head', 'paint', [x - 0.42, 1.18, -s.drumHalf - 0.08], [x + 0.42, 1.28, s.drumHalf + 0.08]),
   box('neck', 'paint', [back - 0.02, 0.88, -0.28], [x - 0.3 * std.sign(x), 1.2, 0.28]),
@@ -35,7 +40,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('guard_post_rear', 'dark', [-0.68, s.deck, s.side + 0.06], [-0.64, 1.6, s.side + 0.1]),
   ]), { dark: 'paint-charcoal', mat: 'rubber-black', paint: s.paint }) + { title: 'Road roller platform' },
   k.compound('road_roller_engine_hood', 110, [
-    prism('hood', 'paint', [[-2.02, 1.28], [-0.68, 1.28], [-0.68, s.hoodTop], [-1.84, s.hoodTop], [-2.02, s.hoodTop - 0.16]], [-0.62, 0.62]),
+    prism('side_near', 'paint', hood.profile, [0.62 - hood.skin, 0.62]),
+    prism('side_far', 'paint', hood.profile, [-0.62, -0.62 + hood.skin]),
+    box('top', 'paint', [-1.84, s.hoodTop - hood.skin, -0.62], [-0.68, s.hoodTop, 0.62]),
+    prism('slope', 'paint', [[-2.02, s.hoodTop - 0.16 - hood.skin], [-1.84, s.hoodTop - hood.skin], [-1.84, s.hoodTop], [-2.02, s.hoodTop - 0.16]], [-0.62, 0.62]),
+    box('rear', 'paint', [-2.02, 1.28, -0.62], [-2.02 + hood.skin, s.hoodTop - 0.16, 0.62]),
+    box('front', 'paint', [-0.68 - hood.skin, 1.28, -0.62], [-0.68, s.hoodTop, 0.62]),
     box('rear_panel', 'dark', [-2.04, 1.3, -0.5], [-2.02, s.hoodTop - 0.2, 0.5]),
   ] + bothSides([
     box('vent_a', 'dark', [-1.7, 1.4, 0.62], [-0.9, 1.44, 0.63]),

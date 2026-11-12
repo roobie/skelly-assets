@@ -6,7 +6,8 @@
   light: {
     radiator: 'radiator_car',
     // The front-end drive in (y, z) from the crank's centre on the engine's front face: the belt runs round the crank,
-    // water pump and alternator pulleys, so the class's belt fits every engine of the class.
+    // water pump and alternator pulleys, so the class's belt fits every engine of the class. An alternator is placed
+    // `at` a point, or `high` above the block.
     drive: {
       crank: { at: [0, 0], radius: 0.075 },
       pump: { at: [0.2, 0], radius: 0.05 },
@@ -24,7 +25,9 @@
     drive: {
       crank: { at: [0, 0], radius: 0.09 },
       pump: { at: [0.24, 0], radius: 0.06 },
-      alternator: { at: [0, 0.4], radius: 0.045 },
+      // A light truck's engine sits between frame rails and springs that reach up past the block's side, so its
+      // alternator rides high, level with the block's top beside the head, where `engine-kit.libsonnet` places it.
+      alternator: { high: true, radius: 0.045 },
     },
     alternator: { id: 'alternator_medium', title: 'Medium alternator', massKg: 8, radius: 0.085, length: 0.18 },
     starter: { id: 'starter_motor_medium', title: 'Medium starter motor', massKg: 10, radius: 0.06, length: 0.26 },

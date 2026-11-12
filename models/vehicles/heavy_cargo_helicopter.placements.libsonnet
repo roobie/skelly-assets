@@ -39,17 +39,15 @@ local id = 'heavy_cargo_helicopter';
   + pair('control_stick', 'control_stick', [6.35, s.floorTop, 0.62]),
   tags: { 'vehicle-role': ['military'] },
   overlaps: [
+    site.overlap('cockpit_bulkhead', 'crew_door_far', 0.06,
+      'The crew door hangs on the cockpit bulkhead, so its hinge edge is let into it.'),
+    site.overlap('cockpit_bulkhead', 'crew_door_near', 0.06,
+      'The crew door hangs on the cockpit bulkhead, so its hinge edge is let into it.'),
     site.overlap('sponson_far', 'fuel_tank_far', 0.4,
       'The sponson draws a tank block of its own, and the fuel tank sits inside it.'),
     site.overlap('sponson_near', 'fuel_tank_near', 0.4,
       'The sponson draws a tank block of its own, and the fuel tank sits inside it.'),
     site.overlap('windscreen', 'front_pylon', 0.074,
       'The front pylon fairing runs up into the windscreen frame.'),
-  ],
-  unjudged: [
-    site.unjudged('cockpit_bulkhead', 'crew_door_far', 0.06,
-      'The plate_0 piece of heavy_cargo_helicopter_cockpit_bulkhead runs into the lower_0_0_far piece of heavy_cargo_helicopter_crew_door.'),
-    site.unjudged('cockpit_bulkhead', 'crew_door_near', 0.06,
-      'The plate_0 piece of heavy_cargo_helicopter_cockpit_bulkhead runs into the lower_0_0 piece of heavy_cargo_helicopter_crew_door.'),
   ],
 }

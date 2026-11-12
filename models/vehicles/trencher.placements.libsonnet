@@ -35,10 +35,4 @@ local track = import 'track-kit.libsonnet';
     site.overlap('hood', 'engine', 0.308,
       'The engine sits under the hood, which is drawn as a solid block around it.'),
   ],
-  unjudged: [
-    site.unjudged('chassis', 'track_far', 0.087,
-      'The track_beam_rear_far piece of trencher_chassis runs into the sprocket_hub_far piece of trencher_track.'),
-    site.unjudged('chassis', 'track_near', 0.087,
-      'The track_beam_rear_near piece of trencher_chassis runs into the sprocket_hub piece of trencher_track.'),
-  ],
 }

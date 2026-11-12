@@ -33,8 +33,4 @@ local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
       + [site.one('floodlight', 'security_walker_sleek_floodlight', s.lights.floodlight)]
   ),
   tags: { 'vehicle-role': ['military'] },
-  unjudged: [
-    site.unjudged('carrier', 'radiator', 0.032,
-      'The rear_bulkhead piece of security_walker_sleek_carrier runs into the cooling_fan_hub piece of radiator_truck.'),
-  ],
 }

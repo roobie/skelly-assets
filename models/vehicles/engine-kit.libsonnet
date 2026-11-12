@@ -3,13 +3,33 @@
 // sump's base, centred on x and z.
 local k = import 'kit.libsonnet';
 local assembly = import 'assembly.libsonnet';
-local classes = import 'engine-classes.libsonnet';
 local engines = import 'engines.libsonnet';
 local box = k.box;
 local round(piece) = piece + { sides: 12 };
 // How far a pulley stands out of the engine's front face, and the air box's duct out of its side.
 local pulleyDepth = 0.03;
 local ductLength = 0.06;
+// The core's block top, as a share of its height, and its head's half-width, as a share of its width, which a high
+// alternator sits on and beside.
+local blockTop = 0.72;
+local headHalf = 0.44;
+local crankHeight(e) = e.height * 0.2;
+// Each class with its alternator pulley placed. A high alternator stands level with the block's top, hung from the side
+// of the head of the class's tallest and widest engines, so one belt fits every engine of the class. It is on the
+// exhaust side because the intake manifold stands higher than the block's top.
+local classes =
+  local listed = import 'engine-classes.libsonnet';
+  local high(name, c) =
+    local members = [e for e in std.objectValues(engines) if e.class == name];
+    local r = c.alternator.radius;
+    c + { drive+: { alternator+: { at: [
+      std.foldl(std.max, [e.height * blockTop - crankHeight(e) for e in members], 0) + r,
+      -(std.foldl(std.max, [e.width * headHalf for e in members], 0) + r),
+    ] } } };
+  {
+    [name]: if std.get(listed[name].drive.alternator, 'high', false) then high(name, listed[name]) else listed[name]
+    for name in std.objectFields(listed)
+  };
 
 // Each accessory in its own frame, as its comment says, with the finish of each slot it draws.
 // Lies along x on its axis, centred on its case; the pulley stands forward of the case. Its mounting boss is cast on the
@@ -114,7 +134,6 @@ local accessories = [
 local fusedId(name) = 'engine_' + name;
 local coreId(name) = fusedId(name) + '_core';
 local classOf(name) = classes[engines[name].class];
-local crankHeight(e) = e.height * 0.2;
 // Where each accessory's origin sits in the engine's frame.
 local mounts(name) =
   local e = engines[name];
@@ -135,18 +154,21 @@ local core(name) =
   local w = e.width;
   local h = e.height;
   local pulley(id, at, radius) = round(k.turned(id, 'pulley', 'x', k.disc(radius, l / 2, l / 2 + pulleyDepth), [0, crankHeight(e) + at[0], at[1]]));
-  // The alternator's mounting boss bridges the block's side to the class's alternator, which the belt fixes in place.
+  // The alternator's mounting boss bridges the side of the block, or of the head above it, to the class's alternator,
+  // which the belt fixes in place.
   local alt = mounts(name).alternator;
-  local standOff = alt[2] - c.alternator.radius - w / 2;
+  local side = if alt[1] > h * blockTop then w * headHalf else w / 2;
+  local standOff = std.abs(alt[2]) - c.alternator.radius - side;
   assert standOff >= 0 : name + "'s block reaches into its class's alternator";
+  local z = [std.sign(alt[2]) * side, std.sign(alt[2]) * (side + standOff)];
   local boss = if standOff > 0 then [
-    box('alternator_boss', 'casting', [alt[0] - c.alternator.length * 0.3, alt[1] - 0.02, w / 2], [alt[0] + c.alternator.length * 0.3, alt[1] + 0.02, w / 2 + standOff]),
+    box('alternator_boss', 'casting', [alt[0] - c.alternator.length * 0.3, alt[1] - 0.02, std.min(z[0], z[1])], [alt[0] + c.alternator.length * 0.3, alt[1] + 0.02, std.max(z[0], z[1])]),
   ] else [];
   {
     pieces: [
       box('sump', 'casting', [-l / 2, 0, -w * 0.42], [l / 2, h * 0.2, w * 0.42]),
-      box('block', 'casting', [-l / 2, h * 0.2, -w / 2], [l / 2, h * 0.72, w / 2]),
-      box('head', 'casting', [-l * 0.47, h * 0.72, -w * 0.44], [l * 0.47, h * 0.92, w * 0.44]),
+      box('block', 'casting', [-l / 2, h * 0.2, -w / 2], [l / 2, h * blockTop, w / 2]),
+      box('head', 'casting', [-l * 0.47, h * blockTop, -w * headHalf], [l * 0.47, h * 0.92, w * headHalf]),
       box('cover', 'cover', [-l * 0.43, h * 0.92, -w * 0.36], [l * 0.43, h, w * 0.36]),
       box('intake', 'casting', [-l * 0.38, h * 0.45, w / 2], [l * 0.38, h * 0.82, w * 0.68]),
       box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),

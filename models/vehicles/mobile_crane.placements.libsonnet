@@ -38,14 +38,4 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
     site.overlap('deck', 'rear_outrigger_near', 0.125,
       'The outrigger beam slides inside the deck runner that houses it.'),
   ],
-  unjudged: [
-    site.unjudged('counterweight', 'winch', 0.06,
-      'The top piece of mobile_crane_counterweight runs into the rope piece of mobile_crane_winch.'),
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of mobile_crane_dashboard runs into the core piece of radiator_truck.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
-    site.unjudged('gearbox', 'front_axle_2', 0.052,
-      'The case piece of gearbox_heavy runs into the beam piece of steered_axle_heavy_bare.'),
-  ],
 }

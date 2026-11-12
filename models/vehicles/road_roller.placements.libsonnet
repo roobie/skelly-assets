@@ -13,7 +13,7 @@ local s = import 'road_roller.spec.libsonnet';
     site.one('canopy', 'road_roller_canopy'),
     site.one('engine', 'engine_i3_small', [-1.3, 1.28, 0]),
     site.one('radiator', 'radiator_small', [-1.86, 1.34, 0]),
-    site.one('fuel_tank', 'fuel_tank_car', [-0.9, 0.76, 0]),
+    site.one('fuel_tank', 'fuel_tank_car', [-0.45, 0.76, 0]),
     site.one('exhaust', 'road_roller_exhaust', [-1.1, s.hoodTop, -0.34]),
     site.one('seat', 'front_seat', [-0.1, s.deck + 0.26, 0]),
     site.one('steering_column', 'steering_column_short', [0.37, 1.56, 0]),
@@ -34,11 +34,5 @@ local s = import 'road_roller.spec.libsonnet';
       'The fuel tank sits against the platform spine, which is drawn solid around it.'),
     site.overlap('platform', 'rear_drum', 0.176,
       'The rear drum turns inside the platform spine, which is drawn solid across it.'),
-  ],
-  unjudged: [
-    site.unjudged('engine_hood', 'engine', 0.271,
-      'The hood piece of road_roller_engine_hood runs into the block piece of engine_i3_small.'),
-    site.unjudged('rear_drum', 'fuel_tank', 0.146,
-      'The roll piece of road_roller_drum runs into the body piece of fuel_tank_car.'),
   ],
 }
