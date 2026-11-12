@@ -192,7 +192,7 @@ local oval(a, b, p, n, cx, cy) = [
                                           + [
                                             h.stud('stud', 'stud', 0, 0.052, 0.018),
                                             sbox('loop-panel', 'panel', [-0.045, 0.008, -0.015], [0.045, 0.065, -0.019]),
-                                          ], { body: 'nylon-black', flap: 'cloth-charcoal', strap: 'hook-loop-grey', stud: 'steel-bright', panel: 'hook-loop-grey' }) + { title: 'Counterweight pouch' }
+                                          ], { body: 'nylon-black', flap: 'cloth-charcoal', strap: 'hook-loop-grey', stud: 'steel-bright', panel: 'hook-loop-grey' }) + { title: 'Helmet counterweight pouch' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A thermal night-vision binocular switched on, 130 mm wide, 75 mm tall and 110 mm long: a dark housing with

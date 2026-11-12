@@ -140,7 +140,7 @@ local medal(id, mass) =
                + (if i % 2 == 0 then bat('bat-%d' % i, R + 0.011, 60 * i, 0, 0.002) else drop('drop-%d' % i, R + 0.002, 60 * i, 0, 0.003))
                for i in std.range(0, 5)
              ]),
-             { cord: 'cloth-black', charm: 'plastic-black', drop: 'plastic-red', ring: 'metal-silver' }) + { title: 'Bat anklet' }
+             { cord: 'cloth-black', charm: 'plastic-black', drop: 'plastic-red', ring: 'metal-silver' }) + { title: 'Bat charm anklet' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric', 'plastic'], slot: ['feet'] } } },
 
   // A stretch bracelet of 22 round wooden beads, 8 mm each, lying flat in a ring 68 mm across.

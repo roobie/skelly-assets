@@ -103,7 +103,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     disc('vial', 'glass', 0.006, 0, 0.024),
     disc('rocks', 'rocks', 0.004, 0.002, 0.012),
     disc('cap', 'cap', 0.0068, 0.022, 0.032),
-  ], { glass: 'glass-clear', rocks: 'wax-ivory', cap: 'plastic-red' }) + { title: 'Crack cocaine' } + inHand('crack', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] }, keywords: ['recreational-drug'] } },
+  ], { glass: 'glass-clear', rocks: 'wax-ivory', cap: 'plastic-red' }) + { title: 'Vial of crack' } + inHand('crack', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] }, keywords: ['recreational-drug'] } },
 
   // A 250 ml bottle of orange cough syrup, 62 mm across and 165 mm tall, with a dosing cup over the cap.
   bottle('cough_syrup', 0.35, 0.031, 0.105, 0.014, 0.022, 0.03,

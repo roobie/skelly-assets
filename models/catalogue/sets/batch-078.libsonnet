@@ -45,7 +45,7 @@ local washboard(w, ht) =
     h.box('tuft-%d-%d' % [i, j], 'bristle', [-0.060 + i * 0.012, 0, -0.025 + j * 0.0125], [-0.052 + i * 0.012, 0.010, -0.017 + j * 0.0125])
     for i in std.range(0, 10)
     for j in std.range(0, 3)
-  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + { title: 'Brush' } + h.gripOn('brush', 'ridge') + {
+  ], { block: 'plastic-blue', bristle: 'plastic-white' }) + { title: 'Scrub brush' } + h.gripOn('brush', 'ridge') + {
     voxelGrain: 0.002,
   } + { taxonomy: { category: 'household', keywords: ['cleaning'], tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 150 mm square of blue cotton cloth for patching, hemmed on two sides with one corner turned back.

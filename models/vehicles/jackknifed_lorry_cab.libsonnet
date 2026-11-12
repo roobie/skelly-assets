@@ -161,7 +161,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
              + field('wing_side_far', 'z', [s.cabFront, s.noseX], [0.4, 1.8], 0.125, 0.125, wingSide(-1, 101)),
              fin) + { title: 'Jackknifed lorry cab nose' },
   k.compound('jackknifed_lorry_cab_earth', 40,
-             w.field('heap', 'y', [1.0, 4.4], [-2.0, 2.0], 0.125, 0.125, mound), fin) + { title: 'Jackknifed lorry cab earth bank' },
+             w.field('heap', 'y', [1.0, 4.4], [-2.0, 2.0], 0.125, 0.125, mound), fin) + { title: 'Small earth crater' },
   k.compound('jackknifed_lorry_cab_bumper', 90, [
     // Ripped off one side frame, so its end stands up out of the earth while the rest is under it.
     k.prism('end', 'chrome', w.ccw(w.barProfile([3.32, 0.06], [3.62, 0.86], 0.24)), [0.72, 1.3]),

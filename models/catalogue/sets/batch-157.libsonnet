@@ -250,7 +250,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                box('tab', 'tab', [-0.006, 0.004, 0.034], [0.006, 0.01, 0.044]),
                ring('tab-hole', 'hole', 0.0, 0.0025, 0.01, 0.0105, 0, 0.04),
              ],
-             { guard: 'plastic-clear-blue', tab: 'plastic-blue', hole: 'plastic-charcoal' }) + { title: 'Mouthpiece' }
+             { guard: 'plastic-clear-blue', tab: 'plastic-blue', hole: 'plastic-charcoal' }) + { title: 'Mouthguard' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['martial-arts'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A black bow tie lying flat, 130 mm across the bow and 60 mm tall: two pleated wings either side of a wrapped

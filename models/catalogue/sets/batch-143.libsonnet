@@ -130,7 +130,7 @@ local cartridgeNecklace(id, mass, body) =
                for i in [0, 1]
                for x in [-0.046 + 0.092 * i]
              ]),
-             { cloth: 'cloth-bright-white', seam: 'cloth-heather-grey', button: 'plastic-tortoiseshell' }) + { title: 'Cuffs' }
+             { cloth: 'cloth-bright-white', seam: 'cloth-heather-grey', button: 'plastic-tortoiseshell' }) + { title: 'Wrist cuffs' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['formalwear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // Devil horns: a red plastic headband 150 mm across standing on its ends, with two 45 mm horns that lean outward.

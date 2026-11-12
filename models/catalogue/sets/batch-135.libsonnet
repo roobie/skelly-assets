@@ -225,7 +225,7 @@ local ridingHelmet(id, mass, peak, fin) =
                box('buckle', 'buckle', [0.02, 0, -0.016], [0.046, 0.008, 0.016]),
              ]
              + [rivet('stud-l', 'buckle', skidPath, 90, 0.014, 0.006, lift), rivet('stud-r', 'buckle', skidPath, 270, 0.014, 0.006, lift)],
-             { steel: 'steel-bright', trim: 'plastic-matte-black', strap: 'leather-black', buckle: 'metal-silver' }) + { title: 'Skid lid' }
+             { steel: 'steel-bright', trim: 'plastic-matte-black', strap: 'leather-black', buckle: 'metal-silver' }) + { title: 'Pudding basin helmet' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['modern'], slot: ['head'] } } },
 
   // An olive cotton helmet liner sitting on its flaps, 200 mm across and 175 mm tall: a soft skullcap stitched in

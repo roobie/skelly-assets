@@ -80,7 +80,7 @@ local frets(n, nut, scale, half, y) = [
   ] + [
     rodZ('peg-%d' % i, 'frame', 0.012, -0.075, 0.0, -0.2 + i * 0.08, 0.945)
     for i in std.range(0, 5)
-  ], { bowl: 'metal-gold', skin: 'brass-polished', frame: 'metal-gold', string: 'steel-mirror' }) + { title: 'Golden krar' }
+  ], { bowl: 'metal-gold', skin: 'brass-polished', frame: 'metal-gold', string: 'steel-mirror' }) + { title: 'Golden lyre' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'] } } },
 
   // A soprano ukulele, 580 mm long: a figure-eight body 240 mm long, 165 mm across and 60 mm deep with a pale top, a

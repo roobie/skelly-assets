@@ -166,6 +166,6 @@ local star(id, x, z, y, s=0.009) = [
     box('tie-r', 'tie', [0.028, 0.064, -0.08], [0.04, 0.068, 0.165]),
     box('tie-l-drop', 'tie', [-0.04, 0.02, 0.16], [-0.028, 0.068, 0.165]),
     box('tie-r-drop', 'tie', [0.028, 0.03, 0.16], [0.04, 0.068, 0.165]),
-  ], { cloth: 'cloth-red', collar: 'cloth-red', tie: 'velvet-red' }) + { title: 'Ferraiolo' }
+  ], { cloth: 'cloth-red', collar: 'cloth-red', tie: 'velvet-red' }) + { title: 'Crimson ceremonial cape' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 ]

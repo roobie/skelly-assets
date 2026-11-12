@@ -90,7 +90,7 @@ local thinKnife(p, x, z, y) = [
     h.disc('rivet-a', 'stud', 0.004, 0.012, 0.014, -0.035, -0.01),
     h.disc('rivet-b', 'stud', 0.004, 0.012, 0.014, -0.035, 0.01),
     h.disc('snap', 'stud', 0.006, 0.008, 0.011, 0.0, 0),
-  ] + h.crescent('ring', 'ring', 0.039, 0.046, 0, 360, 16, 0, 0.008, 0.1, 0), leather { ring: 'steel-grey', body: 'leather-brown' }) + { title: 'Axe ring' }
+  ] + h.crescent('ring', 'ring', 0.039, 0.046, 0, 360, 16, 0, 0.008, 0.1, 0), leather { ring: 'steel-grey', body: 'leather-brown' }) + { title: 'Belt axe ring' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['leather', 'metal'], slot: ['waist'] } } },
 
   // A black leather longsword scabbard 1.0 m long, 60 mm wide at the mouth, laid flat: a steel locket at the mouth

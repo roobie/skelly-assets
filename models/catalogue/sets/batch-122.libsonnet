@@ -311,6 +311,6 @@ local jacksonOpts = { w: 0.085, l: 0.095, t: 0.018, ft: 0.015, cuffLen: 0.04, cu
 
   // A pair of thin plastic bags worn as gloves, laid flat side by side, each 170 mm wide and 330 mm long, closed at
   // the fingers and gathered at the wrist under a band of tape.
-  h.compound('bag_gloves', 0.012, bagGlove('l-', -0.095) + bagGlove('r-', 0.095), { bag: 'plastic-bag', tape: 'tape-grey' }) + { title: 'Bag gloves' }
+  h.compound('bag_gloves', 0.012, bagGlove('l-', -0.095) + bagGlove('r-', 0.095), { bag: 'plastic-bag', tape: 'tape-grey' }) + { title: 'Plastic bag gloves' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic'], slot: ['hands'] } } },
 ]
