@@ -4,7 +4,7 @@ import { compileJsonnetFile } from '../../../jsonnet/index.mjs';
 
 const fixture = (name: string) => resolve(import.meta.dirname, 'fixtures', `${name}.jsonnet`);
 const resolved = JSON.parse(compileJsonnetFile(fixture('grain-of'))) as Record<
-  'class' | 'plain' | 'own' | 'fine' | 'gun' | 'named',
+  'class' | 'plain' | 'own' | 'gun' | 'named',
   { grain: number; detailGrain?: number }
 >;
 
@@ -16,10 +16,6 @@ describe('a source definition grain', () => {
   it('replaces the class grain with the one the definition names, keeping detail parts nested', () => {
     expect(resolved.own.grain).toBe(0.004);
     expect(Number.isInteger(resolved.own.grain / resolved.own.detailGrain!)).toBe(true);
-  });
-
-  it('draws a grain that splits the detail lattice evenly as its own detail grain', () => {
-    expect(resolved.fine).toEqual({ grain: 0.001, detailGrain: 0.001 });
   });
 
   it.each(['grain-unnested', 'grain-zero'])('refuses %s', (name) => {

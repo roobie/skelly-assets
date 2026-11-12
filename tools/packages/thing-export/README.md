@@ -72,10 +72,7 @@ names a detail grain must make its own grain a whole multiple of it, because bot
 are anchored at the same world origin and the grains then nest: each coarse voxel face
 lies on a fine voxel face, so a sight still meets the receiver and the gas tube without
 steps or gaps. The exporter refuses a pair that does not nest, and a row without a detail
-grain has nothing to check; see `src/glb.ts`, `checkNesting`. An item small enough to be
-drawn finer than the detail grain, such as a cartridge, must split that grain evenly, so it
-still nests with the shared lattice. Such a row's detail grain is its own grain, because its
-whole body is already finer than a tagged part asks for.
+grain has nothing to check; see `src/glb.ts`, `checkNesting`.
 
 Every part's voxels sit on one lattice shared by the whole model, not on a lattice of the
 part's own. Parts are placed at fractions of a voxel, and voxels from different lattices
