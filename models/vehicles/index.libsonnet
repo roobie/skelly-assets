@@ -93,6 +93,7 @@
   'scooter': import 'models/vehicles/scooter.libsonnet',
   'security_van': import 'models/vehicles/security_van.libsonnet',
   'security_walker': import 'models/vehicles/security_walker.libsonnet',
+  'security_walker_sleek': import 'models/vehicles/security_walker_sleek.libsonnet',
   'semi_tractor': import 'models/vehicles/semi_tractor.libsonnet',
   'semi_trailer': import 'models/vehicles/semi_trailer.libsonnet',
   'shared': import 'models/vehicles/shared.libsonnet',
