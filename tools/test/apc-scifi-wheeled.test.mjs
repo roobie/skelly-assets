@@ -261,16 +261,43 @@ function walk(route, pieces = fixed) {
   return deepest;
 }
 
-test('a crouching player fits through every door and along every aisle to the seats', () => {
-  const routes = Object.entries(spec.routes);
+const routes = Object.entries(spec.routes);
+
+test('every route starts outside straight through its door\'s opening and ends beside its seat', () => {
   assert.ok(routes.length > 0, 'vacuous: no routes');
-  for (const [name, route] of routes) {
-    const deepest = walk(route);
+  const { body, doors } = spec;
+  // Each door's opening as the plan span it lets through, the axis across it and the side of the hull it is on.
+  const openings = {
+    side: { across: 0, span: doors.side.x, along: 1, outside: (v) => v > body.half },
+    rear: { across: 1, span: [-doors.rear.half, doors.rear.half], along: 0, outside: (v) => v < body.rear },
+  };
+  for (const [name, { door, seat, path }] of routes) {
+    const { across, span, along, outside } = openings[door];
+    const [start, next] = path;
+    assert.ok(outside(start[along]), `${name} starts inside the hull`);
+    assert.ok(span[0] < start[across] && start[across] < span[1], `${name} starts beside its door`);
+    assert.equal(next[across], start[across], `${name} turns before it is through its door`);
+    // The doll at the route's end, facing along its last leg, is within one crouched depth of the seat in plan.
+    const end = path.at(-1);
+    const facingX = Math.abs(end[0] - path.at(-2)[0]) > Math.abs(end[1] - path.at(-2)[1]);
+    const half = facingX ? [crouch.depth / 2, crouch.width / 2] : [crouch.width / 2, crouch.depth / 2];
+    const apart = (lo, hi, at, reach) => Math.max(0, lo - (at + reach), at - reach - hi);
+    const gap = Math.min(...site[seat].pieces.map(solid)
+      .map((p) => Math.hypot(apart(p.min[0], p.max[0], end[0], half[0]), apart(p.min[2], p.max[2], end[1], half[1]))));
+    assert.ok(gap <= crouch.depth, `${name} ends ${gap.toFixed(2)} m from ${seat}`);
+  }
+});
+
+test('a crouching player fits through every door and along every aisle to the seats', () => {
+  assert.ok(routes.length > 0, 'vacuous: no routes');
+  for (const [name, { path }] of routes) {
+    const deepest = walk(path);
     assert.ok(deepest <= CROUCH_OVERLAP_ALLOWED, `${name}: the carrier reaches ${deepest.toFixed(2)} m into a crouching player`);
   }
 });
 
-test('a route moved off the side door into the wall is blocked, so the crouch check can fail', () => {
-  const offDoor = spec.routes.sideToBayBench.map(([x, z]) => [x + 1, z]);
+test('a route moved its door\'s width off the side door into the wall is blocked, so the crouch check can fail', () => {
+  const side = spec.doors.side;
+  const offDoor = spec.routes.sideToBayBench.path.map(([x, z]) => [x + side.x[1] - side.x[0], z]);
   assert.ok(walk(offDoor) > CROUCH_OVERLAP_ALLOWED);
 });
