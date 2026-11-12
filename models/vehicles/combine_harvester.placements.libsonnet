@@ -52,7 +52,5 @@ local s = import 'combine_harvester.spec.libsonnet';
       'The rear_hood piece of combine_harvester_body runs into the hood piece of combine_harvester_straw_chopper.'),
     site.unjudged('feeder', 'header', 0.087,
       'The housing piece of combine_harvester_feeder runs into the rear_wall piece of combine_harvester_header.'),
-    site.unjudged('header', 'reel', 0.05,
-      'The auger_flight_1 piece of combine_harvester_header runs into the bat_4 piece of combine_harvester_reel.'),
   ],
 }
