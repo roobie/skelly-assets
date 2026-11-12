@@ -6,7 +6,7 @@
   wheel: 'wheel_295_80r22_5', r: 0.522, wheelW: 0.295,
   wheelBrakes: 'disc', detail: 'assembly',
   railBottom: 0.74, railTop: 0.99,
-  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
+  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   paint: 'paint-oxblood',
   chassisMass: 1600, shellMass: 1480,
   bonnet: { nose: 3.46, back: 2.2, front: 1.98, z: 0.72 },

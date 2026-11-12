@@ -3,6 +3,7 @@
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
+local gearboxes = import 'gearboxes.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
@@ -475,10 +476,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68) + { title: 'V8 petrol engine' },
   vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88) + { title: 'V8 diesel engine' },
   vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95) + { title: 'V8 turbo diesel engine' },
-  gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3) + { title: 'Transaxle gearbox' },
-  gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3) + { title: 'Inline gearbox' },
-  gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42) + { title: 'Truck gearbox' },
-  gearbox('gearbox_heavy', 240, 0.95, 0.52, 0.55) + { title: 'Heavy gearbox' },
   exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted') + { title: 'Rusted exhaust' },
   exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]) + { title: 'Long exhaust' },
   exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]) + { title: 'Rear-mounted bus exhaust' },
@@ -563,5 +560,9 @@ local towHitch = k.compound('tow_hitch', 18, [
   stretcher,
   attendantSeat,
   controlStick,
+] + [
+  local g = gearboxes[id];
+  gearbox(id, g.massKg, g.length, g.width, g.height) + { title: g.title }
+  for id in std.objectFields(gearboxes)
 ] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
   + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows

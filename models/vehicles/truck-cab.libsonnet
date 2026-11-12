@@ -10,6 +10,14 @@ local fuelTank = import 'fuel-tank-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local gearboxes = import 'gearboxes.libsonnet';
+// How far the gearbox's base rises above the engine's, and the tallest case that rides there with its top under the
+// rail top, where bodies stand on the frame.
+local bellhousingRise = 0.12;
+local tallestCase = 0.42;
+// The exhaust pipe's line under the frame, and its centre outboard of a gearbox case it runs beside.
+local pipeZ = 0.2;
+local pipeBeside = 0.04;
 local defaults = {
   bonnet: null,
   crew: null,
@@ -64,13 +72,13 @@ local defaults = {
   batteryZ: self.side - 0.42,
   engineX: self.frontAxle - 0.25,
   engineY: self.railTop - 0.58,
-  gearboxLength: 0.72,
-  // A heavy gearbox's taller case sits lower, so its top stays under the rail top where bodies stand on the frame.
-  gearboxY: self.engineY + (if self.gearbox == 'gearbox_heavy' then -0.01 else 0.12),
+  gearboxLength: gearboxes[self.gearbox].length,
+  // A taller case sinks so its top stays under the rail top.
+  gearboxY: self.engineY + bellhousingRise - std.max(0, gearboxes[self.gearbox].height - tallestCase),
   exhaustX: self.engineX - 3.6,
   exhaustY: self.railBottom - 0.16,
-  // The pipe runs back beside the gearbox, so a heavy gearbox's wider case sets it further out.
-  exhaustZ: if self.gearbox == 'gearbox_heavy' then 0.3 else 0.2,
+  // A taller case reaches down to the pipe's line, so the pipe runs beside it.
+  exhaustZ: if gearboxes[self.gearbox].height > tallestCase then gearboxes[self.gearbox].width / 2 + pipeBeside else pipeZ,
   radiatorX: self.face - 0.28,
   radiatorY: self.bumperLow + 0.02,
   lampX: if self.bonnet != null then self.front else self.face + 0.02,

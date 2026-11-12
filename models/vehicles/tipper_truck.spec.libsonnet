@@ -7,7 +7,7 @@
   // A tipper keeps air drums, which stand up to site work better than discs.
   wheelBrakes: 'drum',
   railBottom: 0.74, railTop: 0.99,
-  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
+  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   paint: 'paint-crane-yellow',
   chassisMass: 1300, shellMass: 1680,
   // Tub
