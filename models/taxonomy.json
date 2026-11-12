@@ -135,6 +135,7 @@
         "handgun": "Pistols and revolvers.",
         "rifle": "Rifles and carbines.",
         "shotgun": "Shotguns and scatterguns.",
+        "cannon": "Vehicle and crew-served guns that fire shells.",
         "energy": "Weapons that fire energy or plasma rather than solid rounds.",
         "blade": "Edged weapons that cut or stab: knives, swords, machetes.",
         "blunt": "Weapons that strike: bats, clubs, maces, pipes.",
