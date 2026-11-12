@@ -60,9 +60,11 @@ test('a merged vehicle still places a part at every former site', () => {
       assert.deepEqual(sites.map(({ id }) => id).sort(), [...before.keys()].sort(), vehicle);
       for (const site of sites) {
         const { part, finish, ...where } = site;
-        const { part: own, ...was } = before.get(site.id);
+        const { part: own, finish: ownFinish, ...was } = before.get(site.id);
         assert.deepEqual(where, was, `${vehicle}/${site.id}`);
+        // A site may paint its part itself; merging leaves that paint alone on a site it does not move.
         if (part !== own) moved.push({ where: `${vehicle}/${site.id}`, lender: part, own, finish });
+        else assert.equal(finish, ownFinish, `${vehicle}/${site.id}`);
       }
     }
     assert.ok(moved.length > 0, 'no vehicle borrows a pressing, so nothing was merged');
