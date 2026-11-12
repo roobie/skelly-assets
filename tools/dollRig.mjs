@@ -126,7 +126,7 @@ export function dollRig(content, doll, dressing) {
 const mirrorX = (positions) => positions.map((x, i) => (i % 3 === 0 ? -x : x));
 const placed = (mesh, { at, mirror }) => {
   const flipped = mirror ? mirrorX(mesh.positions) : mesh.positions;
-  return { positions: flipped.map((x, i) => x + at[i % 3]), indices: mesh.indices };
+  return { positions: flipped.map((x, i) => x + at[i % 3]), indices: mesh.indices, pieces: mesh.pieces };
 };
 const wholeModel = (meshes) => {
   const positions = [], indices = [];
@@ -149,10 +149,10 @@ export function restMeshes(rig, sites, meshesOf) {
     const site = sites[bone.bind.site];
     const mesh = meshesOf(site.model).find(({ part }) => part === bone.bind.part);
     if (!mesh) throw new Error(`rig: ${site.model} has no part ${bone.bind.part} for ${bone.id}`);
-    return { bone: bone.id, mesh: placed(mesh, site) };
+    return { bone: bone.id, part: bone.bind.part, mesh: placed(mesh, site) };
   });
   const pieces = sites.filter((site) => site.part !== undefined)
-    .map((site) => ({ piece: site.model, bone: boneOf(rig, site).id, mesh: placed(wholeModel(meshesOf(site.model)), site) }));
+    .map((site) => ({ piece: site.model, bone: boneOf(rig, site).id, covers: site.covers, mesh: placed(wholeModel(meshesOf(site.model)), site) }));
   return { body, pieces };
 }
 
@@ -175,12 +175,12 @@ export function coverGaps(rig, sites, meshesOf) {
   return sites.filter(({ covers }) => covers).flatMap((site) => {
     const bone = boneOf(rig, site).id;
     const doll = sites[site.bodySite];
-    const pieces = riding(site).map((other) => ({ piece: other.model, bone, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
+    const pieces = riding(site).map((other) => ({ piece: other.model, bone, covers: other.covers, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
     return site.covers.flatMap((name) => {
       const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
       const gap = { piece: site.model, side: site.side, name };
       if (!hidden) return [{ ...gap, open: 'nothing' }];
-      const [{ samples }] = coveredSurface(rig, { body: [{ bone, mesh: placed(hidden, doll) }], pieces });
+      const [{ samples }] = coveredSurface(rig, { body: [{ bone, part: site.part, mesh: placed(hidden, doll) }], pieces });
       const open = samples.filter(({ whole }) => !whole);
       return open.length === 0 ? [] : [{ ...gap, open: open.length, at: open[0].point }];
     });

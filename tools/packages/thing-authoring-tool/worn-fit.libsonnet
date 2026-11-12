@@ -34,6 +34,8 @@ local ring(id, slot, y0, y1, w, d, c, wall) =
 
 // How far out the deltoid cap reaches (the bust's `deltoid`), so a yoke that reaches past it covers the shoulder.
 local deltoidOuter = bust.chestWidth / 2 + bust.shoulderWidth - bust.deltoidInset;
+// Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
+local armInner = deltoidOuter - bust.shoulderWidth / 2 - arm.upperWidth / 2;
 
 // A hood lying down on the upper back, sunk a centimetre into the body shell, its lining showing at the open top.
 // A shallow hood's corners and lining shrink with it, so its outlines stay convex.
@@ -114,6 +116,14 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local chestTop = l.ribs.y[1] + bust.chestHeight;
     local neckline = l.ribs.y[1] + 0.65 * bust.chestHeight;
     local bodyTop = if straps then neckline else l.chest.y[1];
+    // A sleeveless body's sides stand inside the hanging arm, so the arm's skin never lies over them, and stop just
+    // above the armpit; above it only a front and a back panel, clear of the arm, rise to the neckline.
+    local armpit = l.ribs.y[1] + bust.armpit * bust.chestHeight + g;
+    local chest = if straps then l.chest { width: 2 * (armInner - g) } else l.chest;
+    local panel(name, side) =
+      local w = chest.width, d = chest.depth, c = chest.chamfer, inner = arm.upperDepth / 2 + g;
+      local front = [[inner, -w / 2], [d / 2 - c, -w / 2], [d / 2, -w / 2 + c], [d / 2, w / 2 - c], [d / 2 - c, w / 2], [inner, w / 2]];
+      h.prism('panel-' + name, sl.body, 'y', if side > 0 then front else std.reverse([[-p[0], p[1]] for p in front]), armpit, neckline);
     local collar = if straps then 'none' else s.collar;
     local level(id, v, y0, y1) = oct(id, sl.body, y0, y1, v.width, v.depth, v.chamfer);
     local front(y) = (if y < l.waist.y[1] then l.waist else if y < l.ribs.y[1] then l.ribs else l.chest).depth / 2;
@@ -147,8 +157,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local body = [
       level('low', l.waist, hem, l.waist.y[1]),
       level('ribs', l.ribs, l.ribs.y[0] - 0.01, l.ribs.y[1]),
-      level('chest', l.chest, l.chest.y[0] - 0.01, bodyTop),
-    ] + (if straps then strap('l', -1) + strap('r', 1) else [
+      level('chest', chest, l.chest.y[0] - 0.01, if straps then armpit else bodyTop),
+    ] + (if straps then [panel('front', 1), panel('back', -1)] + strap('l', -1) + strap('r', 1) else [
       level('yoke', l.yoke, l.yoke.y[0], l.yoke.y[1]),
     ]) + (if collar == 'none' then [] else [
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
