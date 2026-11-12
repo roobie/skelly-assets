@@ -15,6 +15,9 @@ local high = 4.45;
     bottom: [[0.65, -1.30], [0.96, -0.65], [0.98, 0.65], [0.52, 1.50], [-0.52, 1.50], [-0.98, 0.65], [-0.96, -0.65], [-0.65, -1.30]],
     roof: [[0.48, -1.05], [0.60, -0.55], [0.61, 0.27], [0.37, 0.62], [-0.37, 0.62], [-0.61, 0.27], [-0.60, -0.55], [-0.48, -1.05]],
   },
+  // The base walker's sites this body replaces, and the y the carrier lowers the borrowed ones to.
+  dropped: ['belly', 'face_guard', 'sensor_window', 'sensor_array', 'flank_armour_near', 'flank_armour_far', 'hatch', 'exhaust', 'beacon', 'smoke_launcher_near', 'smoke_launcher_far', 'work_lamp_near', 'work_lamp_far'],
+  lowered: { radiator: 2.85, battery_tray: 3.38, battery: 3.41 },
   weaponLift: 0.35,
   weaponSites: ['pod_mount_near', 'pod_mount_far', 'weapon_pod_near', 'weapon_pod_far', 'pod_gun_near', 'pod_gun_far'],
   ammo: {

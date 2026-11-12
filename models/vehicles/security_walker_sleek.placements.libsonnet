@@ -8,14 +8,14 @@ local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
   sites: site.adjust(base.sites,
     over={
       hull: { id: 'carrier', part: 'security_walker_sleek_carrier' },
-      radiator: { at: lowered('radiator', 2.85) },
-      battery_tray: { at: lowered('battery_tray', 3.38) },
-      battery: { at: lowered('battery', 3.41) },
+    } + {
+      [id]: { at: lowered(id, s.lowered[id]) }
+      for id in std.objectFields(s.lowered)
     } + {
       [id]: { at: [p.at[0], p.at[1] + s.weaponLift, p.at[2]] }
       for id in s.weaponSites for p in base.sites if p.id == id
     },
-    drop=['belly', 'face_guard', 'sensor_window', 'sensor_array', 'flank_armour_near', 'flank_armour_far', 'hatch', 'exhaust', 'beacon', 'smoke_launcher_near', 'smoke_launcher_far', 'work_lamp_near', 'work_lamp_far'],
+    drop=s.dropped,
     add=[
       site.one('hull', 'security_walker_sleek_hull'),
       site.one('rotor', 'security_walker_sleek_rotor'),
