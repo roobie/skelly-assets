@@ -3,11 +3,15 @@ _site/
 tools/.build/
 models/recipes/*.json
 models/finishes.json
+models/guns/cartridges/120x570.json
 models/guns/cartridges/12-gauge-00-buck.json
 models/guns/cartridges/308-winchester.json
 models/guns/cartridges/357-magnum.json
+models/guns/cartridges/40x365r.json
+models/guns/cartridges/50-bmg.json
 models/guns/cartridges/5.56x45.json
 models/guns/cartridges/7.62x39.json
+models/guns/cartridges/7.62x54r.json
 models/guns/cartridges/9x19.json
 models/guns/cartridges/catalogue/bolt.json
 models/guns/designs/archetype-ar-large.json

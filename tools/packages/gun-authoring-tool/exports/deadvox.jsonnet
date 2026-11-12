@@ -20,7 +20,7 @@ local cartridge(row) = [
   {
     id: component + '_' + row.name, kind: 'cartridge', source: 'models/guns/cartridges/' + row.source + '.json',
     voxel: voxel.item, options: { component: component },
-  } + taxonomy('ammunition', row.weapon)
+  } + taxonomy('ammunition', row.weapon, std.get(row, 'keywords', []))
   for component in ['round', 'case']
 ];
 local attachment(row) = {
