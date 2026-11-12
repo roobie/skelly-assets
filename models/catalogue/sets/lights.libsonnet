@@ -1,5 +1,5 @@
-local l = import 'packages/thing-authoring-tool/lights.libsonnet';
-local part = l.part, port = l.port;
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local part = h.part, port = h.port;
 [
   {
     id: 'frag_grenade',
