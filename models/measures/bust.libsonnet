@@ -4,6 +4,8 @@
   waistWidth: 0.3, waistDepth: 0.19, waistHeight: 0.17,
   ribWidth: 0.35, ribDepth: 0.21, ribHeight: 0.12,
   chestWidth: 0.4, chestDepth: 0.22, chestHeight: 0.15,
+  // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers.
+  armpit: 0.4,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
   shoulderWidth: 0.09, shoulderHeight: 0.12, shoulderDepth: 0.12, deltoidInset: 0.012, deltoidDrop: 0.01,
