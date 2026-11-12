@@ -24,6 +24,7 @@ import { localSolidBounds, penetrationWorld, worldBox, worldSolid } from '@skell
 import { meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
 import type { GlbAssetIdentity, Palette } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb, partNodeName, srgbToLinear } from '@skelly/thing-export/glb.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { DESIGNS } from '../src/cli/content.ts';
@@ -756,7 +757,7 @@ describe('glb export: deadvox model entry', () => {
   // Voxels move the drum's hole and the post's top, so the file's line must meet the post the file draws.
   it.each([
     { mode: 'smooth', grains: undefined },
-    { mode: 'voxel', grains: { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain } },
+    { mode: 'voxel', grains: recipeVoxel({ voxel: gunVoxel }) },
   ])(
     'sights the compact SMG through its drum aperture onto the post tip, clear through the hood: $mode',
     ({ grains }) => {
@@ -883,7 +884,7 @@ describe('glb export: deadvox model entry', () => {
 
   // A fitted device comes off in play, so the shot leaves from the host barrel's drawn front, not the device's.
   it('anchors the voxel muzzle on the host barrel, not on a fitted muzzle device', () => {
-    const grains = { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain };
+    const grains = recipeVoxel({ voxel: gunVoxel });
     const result = exportGunGlb(design('archetype-ak-akm'), ASSET, { appearanceProfile: 'ar' }, grains);
     if (!result.ok) {
       throw new Error(`export failed: ${JSON.stringify(result.error)}`);

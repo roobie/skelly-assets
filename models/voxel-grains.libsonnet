@@ -6,13 +6,15 @@
 // it so the lattices nest, which the `vehicle` grain is not, and no vehicle part carries the tag.
 // `featureVoxels` is how many voxels a feature must span at a grain to read as itself; a thinner one lands unevenly on
 // the lattice, a whole voxel on one side and none on the other, so its caller draws it some other way.
+// `detailThinParts` gives the detail grain to every part thinner than `featureVoxels` of the class grain as well; why
+// only the `gun` class sets it is in `tools/packages/thing-export/README.md`, "Voxelized export".
 local detail = 0.002;
 {
   detailGrain: detail,
   featureVoxels: 2,
   classes: {
     vehicle: { grain: 0.03125 },
-    gun: { grain: 0.004, detailGrain: detail },
+    gun: { grain: 0.004, detailGrain: detail, detailThinParts: true },
     item: { grain: 0.01, detailGrain: detail },
   },
 }

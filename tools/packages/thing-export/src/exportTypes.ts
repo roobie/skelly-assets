@@ -125,10 +125,13 @@ export interface GlbExportInput {
    * keeps `voxelGrain`. Must divide `voxelGrain` a whole number of times so the two lattices nest. Needs `voxelGrain`.
    */
   readonly voxelDetailGrain?: number;
+  /** Also gives `voxelDetailGrain` to every part too thin for `voxelGrain`; see `glb.ts`, `partVoxelGrain`. */
+  readonly voxelDetailThinParts?: boolean;
 }
 
 /** A model export's voxel class as the GLB writer takes it. */
-export type VoxelGrains = Required<Pick<GlbExportInput, 'voxelGrain'>> & Pick<GlbExportInput, 'voxelDetailGrain'>;
+export type VoxelGrains = Required<Pick<GlbExportInput, 'voxelGrain'>> &
+  Pick<GlbExportInput, 'voxelDetailGrain' | 'voxelDetailThinParts'>;
 
 export type GlbExportError =
   | { readonly code: 'invalid-skin'; readonly message: string }

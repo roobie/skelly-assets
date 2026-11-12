@@ -1,4 +1,5 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
@@ -47,7 +48,7 @@ describe('the exported support anchor rides the underside the voxelized file dra
       trimmed,
       ASSET,
       { appearanceProfile: 'ar' },
-      { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain, items: itemsKept(trimmed, items) },
+      { ...recipeVoxel({ voxel: gunVoxel }), items: itemsKept(trimmed, items) },
     );
     if (!result.ok) {
       throw new Error(`export failed: ${JSON.stringify(result.error)}`);
