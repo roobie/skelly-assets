@@ -30,7 +30,9 @@ const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
-const wears = [WEAR, ...CLOTHES];
+// The worn garments that fit by shells but sit outside the everyday clothes: a robe over the legs, boots over the shins.
+const OTHER_WORN = ['wizard_robe', 'combat_boots'];
+const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
 
 // A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy and what
@@ -243,8 +245,8 @@ test('through the press check the rifle points ahead and down, its butt pad agai
   }
 });
 
-test('each fitted everyday garment covers the body and leaves none of it poking through at rest', () => {
-  for (const wear of CLOTHES) {
+test('each fitted garment covers the body and leaves none of it poking through at rest', () => {
+  for (const wear of [WEAR, ...CLOTHES, ...OTHER_WORN]) {
     const dressed = restIn(wear);
     const surface = coveredSurface(rig, dressed);
     assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
