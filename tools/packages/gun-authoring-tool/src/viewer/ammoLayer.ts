@@ -1,3 +1,4 @@
+import { MATERIALS } from '@skelly/thing-core/materials';
 import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import {
@@ -6,7 +7,7 @@ import {
   Color,
   Group,
   Mesh,
-  MeshPhysicalMaterial,
+  MeshStandardMaterial,
   PMREMGenerator,
   SRGBColorSpace,
   type Texture,
@@ -15,13 +16,17 @@ import {
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { Cartridge, Shotshell } from '../ammo/cartridge.ts';
 import { roundProfiles } from '../ammo/roundProfile.ts';
-import { shotshellGeometry, shotshellHullColor } from '../gun/shotshellGeometry.ts';
+import { cartridgeFinish, type CartridgeFinish } from '../gun/cartridgeFinish.ts';
+import { shotshellGeometry } from '../gun/shotshellGeometry.ts';
 import { mmToU } from '../gun/units.ts';
 
 const DEFAULT_ROUND_FACETS = 24;
 const ROUND_CREASE_DEGREES = 12;
-export type CaseFinish = 'steel' | 'brass';
-export const caseFinishFromQuery = (value: string | null): CaseFinish => (value === 'steel' ? 'steel' : 'brass');
+/** The cartridge's own finish, with `ammoCase` trying another case material on it when it names one. */
+export const ammoFinishFromQuery = (cartridge: Cartridge, ammoCase: string | null): CartridgeFinish => ({
+  ...cartridgeFinish(cartridge),
+  ...(ammoCase !== null && Object.hasOwn(MATERIALS, ammoCase) ? { case: ammoCase } : {}),
+});
 
 export interface AmmoMeshes {
   readonly loose: Group;
@@ -31,7 +36,7 @@ export interface AmmoMeshes {
   readonly headDiameterUnits: number;
 }
 
-/** Build an image-based environment so polished case and jacket materials stay legible. */
+/** Build an image-based environment so metallic case and jacket materials stay legible. */
 export const ammoEnvironment = (renderer: WebGLRenderer): Texture => {
   const generator = new PMREMGenerator(renderer);
   const { texture } = generator.fromScene(new RoomEnvironment(), 0.04);
@@ -39,30 +44,27 @@ export const ammoEnvironment = (renderer: WebGLRenderer): Texture => {
   return texture;
 };
 
-const finishMaterials = (finish: CaseFinish, env: Texture) => {
-  const lacqueredSteel = finish === 'steel';
-  const casing = new MeshPhysicalMaterial(
-    lacqueredSteel
-      ? {
-          color: new Color(0x3b_45_38),
-          metalness: 0.5,
-          roughness: 0.4,
-          clearcoat: 0.6,
-          clearcoatRoughness: 0.25,
-        }
-      : { color: new Color(0xcd_9f_4f), metalness: 1, roughness: 0.34 },
-  );
-  const jacket = new MeshPhysicalMaterial({ color: new Color(0xc9_80_55), metalness: 1, roughness: 0.3 });
-  const primer = new MeshPhysicalMaterial({
-    color: new Color(lacqueredSteel ? 0x8a_6b_43 : 0xa0_7a_35),
-    metalness: 0.9,
-    roughness: 0.45,
-  });
-  for (const material of [casing, jacket, primer]) {
-    material.envMap = env;
-    material.envMapIntensity = 1;
-  }
-  return { casing, jacket, primer };
+/** One material per slot, drawn as the export draws it, so the viewer shows the cartridge's exported look. */
+const finishMaterials = (finish: CartridgeFinish, env: Texture) => {
+  const bySlot = new Map<string, MeshStandardMaterial>();
+  return (slot: string): MeshStandardMaterial => {
+    const known = bySlot.get(slot);
+    if (known) {
+      return known;
+    }
+    const material = MATERIALS[finish[slot] ?? ''];
+    if (!material) {
+      throw new Error(`cartridge slot ${slot} has no finish material`);
+    }
+    const drawn = new MeshStandardMaterial({
+      color: new Color().setRGB(...material.colour, SRGBColorSpace),
+      metalness: material.finish.metallic,
+      roughness: material.finish.roughness,
+      envMap: env,
+    });
+    bySlot.set(slot, drawn);
+    return drawn;
+  };
 };
 
 const revolvedGeometry = (profile: readonly Vec2[], facets: number): BufferGeometry => {
@@ -81,16 +83,9 @@ const revolvedGeometry = (profile: readonly Vec2[], facets: number): BufferGeome
   return geometry;
 };
 
-const buildShellMeshes = (shell: Shotshell, finish: CaseFinish, env: Texture, facets: number): AmmoMeshes => {
+const buildShellMeshes = (shell: Shotshell, finish: CartridgeFinish, env: Texture, facets: number): AmmoMeshes => {
   const solids = shotshellGeometry(shell);
-  const { casing } = finishMaterials(finish, env);
-  const hull = new MeshPhysicalMaterial({
-    color: new Color().setRGB(...shotshellHullColor(shell), SRGBColorSpace),
-    roughness: 0.65,
-    metalness: 0,
-  });
-  const card = new MeshPhysicalMaterial({ color: 0x45_3b_2b, roughness: 0.9 });
-  const bySlot: Record<string, MeshPhysicalMaterial> = { case: casing, closure: card, hull };
+  const materialFor = finishMaterials(finish, env);
   const groupOf = (parts: typeof solids.round): Group => {
     const group = new Group();
     for (const solid of parts) {
@@ -107,7 +102,7 @@ const buildShellMeshes = (shell: Shotshell, finish: CaseFinish, env: Texture, fa
       geometry.setAttribute('position', new BufferAttribute(data.positions, 3));
       geometry.setAttribute('normal', new BufferAttribute(data.normals, 3));
       geometry.setIndex(new BufferAttribute(data.indices, 1));
-      const mesh = new Mesh(geometry, bySlot[solid.slot ?? 'hull'] ?? hull);
+      const mesh = new Mesh(geometry, materialFor(solid.slot ?? 'hull'));
       mesh.name = solid.id;
       group.add(mesh);
     }
@@ -125,7 +120,7 @@ const buildShellMeshes = (shell: Shotshell, finish: CaseFinish, env: Texture, fa
 /** Build the loose loaded round/shell and fired case in real-size-derived gungen units, axis along +X. */
 export const buildAmmoMeshes = (
   cartridge: Cartridge,
-  finish: CaseFinish,
+  finish: CartridgeFinish,
   env: Texture,
   facets = DEFAULT_ROUND_FACETS,
 ): AmmoMeshes => {
@@ -133,17 +128,17 @@ export const buildAmmoMeshes = (
     return buildShellMeshes(cartridge, finish, env, facets);
   }
   const profiles = roundProfiles(cartridge);
-  const materials = finishMaterials(finish, env);
+  const materialFor = finishMaterials(finish, env);
   const loose = new Group();
   loose.add(
-    new Mesh(revolvedGeometry(profiles.loadedCase, facets), materials.casing),
-    new Mesh(revolvedGeometry(profiles.primer, facets), materials.primer),
-    new Mesh(revolvedGeometry(profiles.bullet, facets), materials.jacket),
+    new Mesh(revolvedGeometry(profiles.loadedCase, facets), materialFor('case')),
+    new Mesh(revolvedGeometry(profiles.primer, facets), materialFor('primer')),
+    new Mesh(revolvedGeometry(profiles.bullet, facets), materialFor('bullet')),
   );
   const fired = new Group();
   fired.add(
-    new Mesh(revolvedGeometry(profiles.firedCase, facets), materials.casing.clone()),
-    new Mesh(revolvedGeometry(profiles.primer, facets), materials.primer.clone()),
+    new Mesh(revolvedGeometry(profiles.firedCase, facets), materialFor('case').clone()),
+    new Mesh(revolvedGeometry(profiles.primer, facets), materialFor('primer').clone()),
   );
   const lengthMm = Math.max(...profiles.bullet.map(([axial]) => axial));
   const caseLengthMm = Math.max(...profiles.loadedCase.map(([axial]) => axial));

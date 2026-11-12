@@ -147,7 +147,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/tools
-      - run: PAGES_ANALYTICS=1 node site/build-viewers.mjs
+      - run: node site/build-viewers.mjs
       - uses: actions/upload-artifact@v7
         with:
           name: viewers
@@ -160,7 +160,10 @@ jobs:
     needs: [build, viewers]
     runs-on: ubuntu-latest
     steps:
+      # The footer names the latest release tag a main build follows, which needs every tag and the history behind them.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/tools
       - uses: actions/download-artifact@v8
         with:
@@ -170,7 +173,7 @@ jobs:
         with:
           name: viewers
           path: tools/packages
-      - run: node site/build.mjs --require-viewers _site
+      - run: node site/build.mjs --require-viewers --analytics _site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

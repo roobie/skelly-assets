@@ -26,6 +26,9 @@ local slots = [['metal', 'steel-parkerized'], ['furniture', 'polymer-black'], ['
 local slotMaterials = { [slot[0]]: slot[1] for slot in slots };
 local roleMaterials = { sight: 'alu-anodized-black', 'tactical-flashlight-mount': 'alu-anodized-black', suppressor: 'steel-stainless' };
 local materials = import 'models/finishes.jsonnet';
+local cartridgeCases = { '7.62x39': 'steel-polymer-coated', '7.62x54r': 'steel-polymer-coated' };
+assert std.all([std.objectHas(materials, name) for name in std.objectValues(cartridgeCases)])
+       : 'cartridgeCases names a material finishes.jsonnet does not define';
 local opticLenses = {
   'mini-reflex': 'glass-lens-amber', 'tube-dot': 'glass-lens-amber', holographic: 'glass-lens-amber',
   'fixed-prism-4x': 'glass-lens-green', 'lpvo-1-6x': 'glass-lens-green', 'hunting-3-9x': 'glass-lens-green',
@@ -99,5 +102,8 @@ local familyHex = {
     fallbackFinishMaterial: 'brass',
   },
   cartridgeFinish: { case: 'brass', bullet: 'copper', primer: 'brass', closure: 'paperboard-brown' },
+  // A cartridge's own case by its id, where it is not the case above. This is how the game shows it; the cartridge's
+  // sourced `materials` record what cases exist, so they neither limit nor choose this.
+  cartridgeCases: cartridgeCases,
   hullMaterials: { red: 'plastic-red', green: 'plastic-green', blue: 'plastic-blue', black: 'plastic-black', white: 'plastic-white', yellow: 'plastic-yellow' },
 }

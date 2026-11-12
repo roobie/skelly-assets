@@ -4,7 +4,8 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local roster = import 'models/guns/roster.libsonnet';
 local title = import 'tools/jsonnet/lib/title.libsonnet';
-local looks = (import 'models/guns/tables/appearance.jsonnet').attachments;
+local appearance = import 'models/guns/tables/appearance.jsonnet';
+local looks = appearance.attachments;
 // What a gun export is, for the model shelves (models/TAXONOMY.md): its category, the weapon class it is or serves, and
 // its search keywords.
 local taxonomy(category, weapon=null, keywords=[]) = {
@@ -24,6 +25,9 @@ local cartridge(row) = [
   } + taxonomy('ammunition', row.weapon, std.get(row, 'keywords', []))
   for component in ['round', 'case']
 ];
+// A case for a cartridge no row exports is a misspelt id, not an unused entry.
+local strayCases = std.setDiff(std.objectFields(appearance.cartridgeCases), std.set([row.source for row in roster.cartridges]));
+assert std.length(strayCases) == 0 : 'cartridge cases with no export row: %s' % [strayCases];
 local attachment(row) = {
   id: std.strReplace(row.source, '-', '_'), kind: 'attachment', source: row.source,
   voxel: voxel.of(voxel.item, std.get(looks, row.source, {})),
