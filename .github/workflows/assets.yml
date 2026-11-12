@@ -160,7 +160,11 @@ jobs:
     needs: [build, viewers]
     runs-on: ubuntu-latest
     steps:
+      # The footer names the latest release tag a main build follows, which needs every tag and the history behind them.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - uses: ./.github/actions/tools
       - uses: actions/download-artifact@v8
         with:

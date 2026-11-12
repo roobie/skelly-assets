@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { addAnalytics, BADGE, checkAnalytics, optsIntoBadge, pagesUnder, withAnalytics } from '../../site/analytics.mjs';
 import { readTools, viewerDir } from '../../site/tools.mjs';
+import { readVersion, versionHtml } from '../../site/version.mjs';
 
 const root = join(import.meta.dirname, '..', '..');
 const SCRIPT = /<script async src="https:\/\/scripts\.simpleanalyticscdn\.com\/latest\.js"><\/script>/g;
@@ -73,4 +74,20 @@ test('the badge keeps the UTM source Simple Analytics was given', () => {
 test('the Pages workflow builds the site with analytics', () => {
   const workflow = readFileSync(join(root, '.github/workflows/assets.yml'), 'utf8');
   assert.match(workflow, /node site\/build\.mjs [^\n]*--analytics/);
+});
+
+test('the footer names the tag on a tag build, and the latest tag plus the commit on any other', () => {
+  const tagBuild = versionHtml(readVersion(root, { GITHUB_REF_TYPE: 'tag', GITHUB_REF_NAME: 'v1.2.3', GITHUB_SHA: 'abcdef0123456789' }));
+  assert.match(tagBuild, /Assets <a href="[^"]*\/releases\/tag\/v1\.2\.3">v1\.2\.3<\/a><\/span>/);
+  assert.doesNotMatch(tagBuild, /abcdef0/);
+  const sha = 'abcdef0123456789';
+  const mainBuild = versionHtml({ tag: 'v1.2.3', sha, branch: 'main' });
+  assert.match(mainBuild, />v1\.2\.3<\/a> \+ main at <a href="[^"]*\/commit\/abcdef0123456789">abcdef0<\/a>/);
+  assert.equal(versionHtml({ sha: undefined, branch: undefined }), '');
+});
+
+test('a page that opts into the badge carries the version in its footer', () => {
+  const html = withAnalytics(DOCUMENT, versionHtml({ tag: 'v1.2.3', sha: 'abcdef0123', branch: 'main' }));
+  assert.match(html, /<footer[^>]*>\s*<span[^>]*>Assets <a [^>]*>v1\.2\.3/);
+  assert.deepEqual(checkAnalytics(html), []);
 });
