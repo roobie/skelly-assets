@@ -1,6 +1,8 @@
-// A wheeled sci-fi armoured carrier: a low, slab-sided hull stepped down from its troop casemate to a front deck,
-// slung between four very large wheels, its nose a short faceted ogive like a bullet's, entered by a rear ramp, with a
-// driver's hood on the deck and a boxy turret on the casemate.
+// A wheeled sci-fi armoured carrier: a low, slab-sided hollow hull slung between four very large wheels, its long
+// glacis raked down to a wedge nose between two square fenders like a bullet's point, every face flat. The troops
+// enter by a big rear ramp door or a side door on the near side, between the arches, and sit on benches along the
+// walls; the driver sits at the front under the glacis and looks out through a slit in it. A boxy remote weapon
+// station stands on the roof.
 // Metres in the vehicle frame (+x forward, +y up, +z near).
 local wheels = import 'wheels.libsonnet';
 local wheel = 'wheel_18_00r25';
@@ -14,64 +16,74 @@ local radius = wheels[wheel].tyre.outer;
   // Flotation tyres nearly as tall as the hull, so it reads as slung between them.
   wheel: { name: wheel, radius: radius, z: 1.36, face: wheels[wheel].rim.face, brake: 'disc' },
   axles: [2.3, -2.0],
-  // The air every arch keeps round its tyre.
+  // The air every wheel well keeps round its tyre.
   archGap: 0.07,
-  // The hull's slabs: everything the plates below do not cut away. The casemate stands on the deck from the rear to
-  // `step`, so the roof steps down ahead of the turret; both stay low over the tyres' tops.
   body: {
     belly: 0.52,
-    deck: 1.76,
     top: 2.0,
-    step: 0.6,
     half: 1.55,
-    nose: 3.85,
     rear: -3.1,
-    // The half-width of the core between the wheels: the arches' inboard wall.
+    nose: 4.0,
+    // The half-width of the hull between the wheels: the wheel wells' inboard wall.
     core: 1.05,
+    // The armour's thickness, so the hull is a shell the crew sits inside.
+    wall: 0.06,
+    // Where the fenders' upright front stands, ahead of the front wells.
+    fender: 3.5,
     // A point inside every plate, so each plate's cut keeps the hull's side of it.
     inside: [0, 1.2, 0],
   },
-  // The hull's chamfers and nose facets, each plate through three (x, y, z) corners. A plate that leans towards the near
-  // side is mirrored onto the far side. The chamfers stay short so flat faces dominate. The nose facets begin ahead of
-  // the front arches and turn harder towards the tip, drawing the plan to a bullet's point, and the nose's top and foot
-  // are chamfered to a square face.
+  // The hull's sloped plates, each through three (x, y, z) corners. The glacis rakes from the roof's front edge to the
+  // nose; the nose foot rakes back to the belly; the nose cheeks narrow the nose in plan and are mirrored onto the far
+  // side; the fender brow slopes each fender's front back to its top.
   plates: {
-    shoulder: [[0, 1.88, 1.55], [1, 1.88, 1.55], [0, 2.0, 1.43]],
-    chine: [[0, 0.7, 1.55], [1, 0.7, 1.55], [0, 0.52, 1.37]],
-    noseFacet1: [[3.2, 0, 1.55], [3.2, 1, 1.55], [3.45, 0, 1.46]],
-    noseFacet2: [[3.45, 0, 1.46], [3.45, 1, 1.46], [3.67, 0, 1.22]],
-    noseFacet3: [[3.67, 0, 1.22], [3.67, 1, 1.22], [3.85, 0, 0.65]],
-    noseTop: [[3.6, 1.76, 0], [3.6, 1.76, 1], [3.85, 1.55, 0]],
-    noseFoot: [[3.85, 0.85, 0], [3.85, 0.85, 1], [3.55, 0.52, 0]],
-    rearDeck: [[-3.1, 1.88, 0], [-3.1, 1.88, 1], [-2.98, 2.0, 0]],
-    rearFloor: [[-3.1, 0.7, 0], [-3.1, 0.7, 1], [-2.92, 0.52, 0]],
-    rearCorner: [[-3.1, 0, 1.4], [-3.1, 1, 1.4], [-2.95, 0, 1.55]],
+    glacis: [[0.9, 2.0, 0], [0.9, 2.0, 1], [4.0, 1.05, 0]],
+    noseFoot: [[4.0, 1.05, 0], [4.0, 1.05, 1], [3.55, 0.52, 0]],
+    noseCheek: [[3.2, 0, 1.05], [3.2, 1, 1.05], [4.0, 0, 0.55]],
+    fenderBrow: [[3.5, 1.4, 0], [3.5, 1.4, 1], [3.22, 1.75, 0]],
   },
-  // The driver's box on the deck, off to the near side of the gun, its visor slit across its sloped front plate.
-  hood: {
-    x: [1.2, 2.5],
-    y: [1.7, 2.15],
-    z: [0.15, 1.05],
-    plates: { front: [[2.5, 1.9, 0], [2.5, 1.9, 1], [2.3, 2.15, 0]] },
-    visor: { y: [2.0, 2.1], z: [0.3, 0.9], depth: 0.015 },
+  // The driver's vision slit across the glacis, at the seated driver's eye line: its fore-and-aft span, half its width
+  // and how far its glass sits below the plate's face.
+  slit: { x: [1.24, 1.44], half: 0.45, recess: 0.03 },
+  // Door openings, each from the floor to `top`: the rear ramp door's half-width, and the side door's span along the
+  // near side between the arches, the kerb side, so troops step out away from traffic.
+  doors: {
+    rear: { half: 0.75, top: 1.9 },
+    side: { x: [-0.65, 0.54], top: 1.9 },
   },
-  // A boxy turret on its ring, its front corners and face cut short, with one cannon and a launcher pod on each cheek.
+  // The troops' benches along the walls, each `length` long from its site, its seat `depth` deep off the wall.
+  bench: { length: 1.8, seat: 0.38, depth: 0.42, back: 0.5 },
+  benches: { rearX: -2.95, bayX: -1.0 },
+  // The driver's seat and controls, centred under the glacis behind the slit.
+  driver: { x: [0.62, 1.1], half: 0.25, seat: 0.38 },
+  // A stowage locker in the near bay's aft corner and an equipment rack in its fore corner.
+  locker: { x: [-1.06, -0.72], z: [1.13, 1.49], top: 1.5 },
+  rack: { x: [0.62, 1.36], z: [1.2, 1.49], top: 1.6 },
+  // The aisles a crouching soldier walks, as (x, z) waypoints on the floor, each from outside a door to standing in
+  // front of a seat. tools/test/apc-scifi-wheeled.test.mjs walks the player's doll along them.
+  routes: {
+    sideToRearBenches: [[-0.05, 2.1], [-0.05, 0], [-2.4, 0]],
+    sideToBayBench: [[-0.05, 2.1], [-0.05, -0.75]],
+    sideToDriver: [[-0.05, 2.1], [-0.05, 0.6], [0.86, 0.6]],
+    rearToRearBenches: [[-3.9, 0], [-1.6, 0]],
+  },
+  // A boxy weapon station on its ring, its front face sloped back, with one cannon and a launcher pod on each cheek.
   turret: {
     local t = self,
     x: -1.0,
-    ring: { radius: 0.55, height: 0.07 },
+    ring: { half: 0.55, height: 0.07 },
     top: 2.4,
     // Its plan as (z, x) corners about its ring's centre, counter-clockwise.
-    plan: [[0.6, 0.45], [0.45, 0.65], [-0.45, 0.65], [-0.6, 0.45], [-0.6, -0.6], [0.6, -0.6]],
-    plates: { front: [[t.x + 0.65, 2.2, 0], [t.x + 0.65, 2.2, 1], [t.x + 0.5, 2.4, 0]] },
+    plan: [[0.6, 0.65], [-0.6, 0.65], [-0.6, -0.6], [0.6, -0.6]],
+    plates: { front: [[t.x + 0.65, 2.2, 0], [t.x + 0.65, 2.2, 1], [t.x + 0.45, 2.4, 0]] },
     inside: [t.x, 2.2, 0],
     gunY: 2.25,
     muzzle: 1.9,
     pod: { x: [t.x - 0.5, t.x + 0.3], y: [2.12, 2.38], z: [0.64, 0.88] },
   },
-  ramp: { low: 0.84, high: 1.68, half: 0.8 },
   rails: { z: 1.0, from: -2.8, to: 0.4, posts: [-2.6, -1.1, 0.25], height: 0.12, bar: 0.04 },
+  // A stowage pannier on the far side between the arches, where the near side has its door.
   pannier: { x: [-0.9, 1.2], y: [0.98, 1.45], z: [1.55, 1.72] },
   hatches: { x: -2.2, z: 0.45 },
-  lamps: { y: 1.0, z: 0.45, tailY: 1.35, tailZ: 1.05 },
+  lamps: { y: 0.95, z: 1.3, tailY: 1.35, tailZ: 1.15 },
 }
