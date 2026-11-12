@@ -1,19 +1,21 @@
 import { Mesh, Texture } from 'three';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
-import { buildAmmoMeshes, caseFinishFromQuery } from '../src/viewer/ammoLayer.ts';
+import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
+import { ammoFinishFromQuery, buildAmmoMeshes } from '../src/viewer/ammoLayer.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 
 const cartridge = loadCartridgeFile('7.62x39.json') as MetallicCartridge;
 
 describe('viewer ammunition orientation', () => {
-  it('defaults the case finish to brass and supports a steel-case selection', () => {
-    expect(caseFinishFromQuery(null)).toBe('brass');
-    expect(caseFinishFromQuery('steel')).toBe('steel');
+  it("draws the cartridge's own finish unless ammoCase names another case material", () => {
+    expect(ammoFinishFromQuery(cartridge, null)).toEqual(cartridgeFinish(cartridge));
+    expect(ammoFinishFromQuery(cartridge, 'no-such-material')).toEqual(cartridgeFinish(cartridge));
+    expect(ammoFinishFromQuery(cartridge, 'lead')).toEqual({ ...cartridgeFinish(cartridge), case: 'lead' });
   });
 
   it('places cartridge length along local +X like exported revolved solids', () => {
-    const ammo = buildAmmoMeshes(cartridge, 'brass', new Texture());
+    const ammo = buildAmmoMeshes(cartridge, cartridgeFinish(cartridge), new Texture());
     const meshes = ammo.loose.children.filter((child): child is Mesh => child instanceof Mesh);
     const bounds = meshes.map((mesh) => {
       mesh.geometry.computeBoundingBox();
