@@ -9,6 +9,7 @@ read_if:
   - bumping the Node version, or why CI and builds pin one exact version
   - opening a PR or cutting a release, and where its change notes and release notes come from
   - citing skelly's source from a doc or a comment
+  - adding a tool page or viewer to the showcase, or why each one is linked from its index
 ---
 
 # skelly-assets
@@ -246,6 +247,13 @@ whole catalogue; see `tools/generation.mjs`, `DEFAULT_CACHE`. More detail is in 
 
 To preview the showcase locally, build the complete tree into `built/`, run `node site/build.mjs` and serve
 `_site/` with any static file server.
+
+The showcase's index links every tool page the site serves, its own pages and the tools' viewers alike, so no tool is
+deployed out of reach. One list names them, `site/tools.json`, and the build fails on a served tool page it does not
+name, so a new tool cannot go unlinked; see `site/tools.mjs`, `unlinkedTools`. A viewer is linked only when its build
+is present (`site/build-viewers.mjs`), so a local preview without the viewers has no dead links; the deploy requires
+them all, so it never drops one quietly. Links are relative, so they hold under the Pages project path and on any
+local server.
 
 ### Node
 
