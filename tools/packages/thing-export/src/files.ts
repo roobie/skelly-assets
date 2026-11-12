@@ -1,8 +1,9 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { modelMassKg } from '@skelly/thing-core/mass';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import type { CachedExport, ExportCache } from './cache.ts';
-import type { ModelExport, RecipeExport } from './recipe.ts';
+import type { ModelExport, ModelPhysical, RecipeExport } from './recipe.ts';
 
 // Serialised in-process: a formatter subprocess per model cost more than generating most models.
 const formattedJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
@@ -17,6 +18,7 @@ export interface WrittenRecipe {
     readonly label?: NeutralModel['label'];
     readonly paintable?: NeutralModel['paintable'];
     readonly covers?: NeutralModel['covers'];
+    readonly physical?: ModelPhysical;
   }[];
   readonly files: readonly string[];
 }
@@ -31,8 +33,28 @@ export interface GeneratedModel extends ModelExport {
 }
 export const generateModel = (row: RecipeExport, cache?: ExportCache): GeneratedModel => {
   const { model, entry } = cache ? cache.export(row) : { model: row.generate() };
-  const { modelEntry, glb, partNodes } = model;
-  return { id: row.id, kind: row.kind, modelEntry, glb, partNodes, ...(entry === undefined ? {} : { entry }) };
+  const { modelEntry, glb, partNodes, physical } = model;
+  return {
+    id: row.id,
+    kind: row.kind,
+    modelEntry,
+    glb,
+    partNodes,
+    ...(physical === undefined ? {} : { physical }),
+    ...(entry === undefined ? {} : { entry }),
+  };
+};
+
+/**
+ * A tool that reports no total weighs its model through its parts' masses, as the sidecar lists them; a model with any
+ * part unweighed stays unweighed rather than showing a mass short of what it weighs.
+ */
+const physicalOf = ({ physical, modelEntry }: GeneratedModel): ModelPhysical | undefined => {
+  if (physical !== undefined) return physical;
+  const parts = Object.values(modelEntry.parts ?? {});
+  return parts.length > 0 && parts.every(({ massKg }) => massKg !== undefined)
+    ? { massKg: modelMassKg({ parts: modelEntry.parts ?? {} }) }
+    : undefined;
 };
 
 /** Writes generated rows in the given order, so the files do not depend on which row finished first. */
@@ -58,15 +80,20 @@ export const writeModelExports = (
     files.push(`${directory}/${modelEntry.id}.model.json`, modelEntry.file);
   }
   return {
-    models: outputs.map(({ id, kind, modelEntry, partNodes }) => ({
-      id,
-      kind,
-      path: modelEntry.file,
-      partNodes,
-      ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
-      ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
-      ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
-    })),
+    models: outputs.map((output) => {
+      const { id, kind, modelEntry, partNodes } = output;
+      const physical = physicalOf(output);
+      return {
+        id,
+        kind,
+        path: modelEntry.file,
+        partNodes,
+        ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
+        ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
+        ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
+        ...(physical === undefined ? {} : { physical }),
+      };
+    }),
     files,
   };
 };
