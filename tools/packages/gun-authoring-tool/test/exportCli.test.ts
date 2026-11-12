@@ -1,20 +1,24 @@
-import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import process from 'node:process';
+import { generate } from '@skelly/construct/assembly/generate.ts';
 import { parseAssemblyJson } from '@skelly/construct/assembly/parseAssembly.ts';
 import { srgbToHex } from '@skelly/thing-export/appearance.ts';
 import { describe, expect, it } from 'vitest';
 import { DESIGNS } from '../src/cli/content.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
+import { generatedAssemblyJson } from '../src/cli/generatedAssemblyJson.ts';
+import { runExport } from '../src/cli/runExport.ts';
+import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { GUN_PALETTE, resolveAppearance } from '../src/gun/palette.ts';
+import { TEMPLATES } from '../src/gun/templates.ts';
 import { readGlb } from './glbReader.ts';
 import { designText } from './helpers.ts';
 
 const fixtureText = (name: string): string =>
   readFileSync(join(import.meta.dirname, '..', 'fixtures', `${name}.json`), 'utf8');
+const SILENT = { log: () => {}, warn: () => {}, error: () => {} };
 const ASSET = { id: 'ar', file: 'assets/models/ar.glb' } as const;
 
 describe('export CLI core', () => {
@@ -75,16 +79,12 @@ describe('export CLI core', () => {
     }
   });
 
-  // One spawn: the appearance field exists only in the generate CLI's output, so the CLI is the unit under test.
+  // The appearance field exists only in the generate CLI's output, so its serializer is the unit under test.
   it('preserves the generated template finish through a bare assembly file export', () => {
-    const template = 'pump-shotgun';
-    const generated = execFileSync(
-      process.execPath,
-      [join(import.meta.dirname, '../src/cli/generate.ts'), '--template', template, '--seed', '0', '--valid'],
-      { cwd: join(import.meta.dirname, '..'), encoding: 'utf8' },
-    );
+    const template = TEMPLATES.find((t) => t.name === 'pump-shotgun')!;
+    const generated = generatedAssemblyJson(generate(template, gunDomain, 0), template);
     const output = JSON.parse(generated) as { appearance?: unknown };
-    expect(output.appearance).toEqual({ appearanceProfile: template });
+    expect(output.appearance).toEqual({ appearanceProfile: template.name });
 
     const exported = exportFileText(generated, ASSET);
     expect(exported.ok).toBe(true);
@@ -98,7 +98,7 @@ describe('export CLI core', () => {
     // the wood by its semantic slot, not incidental primitive ordering.
     const primitive = glb.json.meshes[stock!.mesh!]!.primitives.find((p) => p.extras?.slot === 'furniture');
     expect(primitive).toBeDefined();
-    const appearance = resolveAppearance(GUN_PALETTE, 'stock', 'butt', { archetype: template, slot: 'furniture' });
+    const appearance = resolveAppearance(GUN_PALETTE, 'stock', 'butt', { archetype: template.name, slot: 'furniture' });
     expect(primitive?.extras).toMatchObject({ material: appearance.material, slot: 'furniture' });
     expect(glb.json.materials[primitive!.material]!.name).toBe(
       `#${srgbToHex(appearance.color).toString(16).padStart(6, '0')}`,
@@ -110,20 +110,11 @@ describe('export CLI core', () => {
     const glbDir = join(temp, 'models');
     const entryDir = join(temp, 'entries');
     try {
-      execFileSync(
-        process.execPath,
-        [
-          join(import.meta.dirname, '../src/cli/export.ts'),
-          join(DESIGNS, 'archetype-ar.json'),
-          '--out',
-          glbDir,
-          '--entry-out',
-          entryDir,
-          '--id',
-          'rifle_assault',
-        ],
-        { cwd: join(import.meta.dirname, '..') },
+      const status = runExport(
+        [join(DESIGNS, 'archetype-ar.json'), '--out', glbDir, '--entry-out', entryDir, '--id', 'rifle_assault'],
+        SILENT,
       );
+      expect(status).toBe(0);
       expect(existsSync(join(glbDir, 'rifle_assault.glb'))).toBe(true);
       expect(existsSync(join(glbDir, 'rifle_assault.model.json'))).toBe(false);
       expect(JSON.parse(readFileSync(join(entryDir, 'rifle_assault.model.json'), 'utf8'))).toMatchObject({
@@ -150,20 +141,11 @@ describe('export CLI core', () => {
 
     const temp = mkdtempSync(join(tmpdir(), 'gungen-export-ammo-'));
     try {
-      execFileSync(
-        process.execPath,
-        [
-          join(import.meta.dirname, '../src/cli/export.ts'),
-          join(DESIGNS, 'archetype-ak-akm.json'),
-          '--out',
-          temp,
-          '--id',
-          'ak_test',
-          '--calibre',
-          '7.62x39',
-        ],
-        { cwd: join(import.meta.dirname, '..') },
+      const status = runExport(
+        [join(DESIGNS, 'archetype-ak-akm.json'), '--out', temp, '--id', 'ak_test', '--calibre', '7.62x39'],
+        SILENT,
       );
+      expect(status).toBe(0);
       const entry = JSON.parse(readFileSync(join(temp, 'ak_test.model.json'), 'utf8')) as {
         gun: { calibre: string; slots?: { magazine?: { node: string; at: number[]; turn: number[] } } };
         anchors?: Record<string, number[]>;
