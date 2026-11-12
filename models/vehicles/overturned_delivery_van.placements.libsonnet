@@ -28,10 +28,10 @@ local seatAcross = s.across - s.floor;
   ],
   unjudged: [
     site.unjudged('chassis', 'wheel_front_up', 0.08,
-      'The rim piece of overturned_delivery_van_chassis runs into the drum piece of overturned_delivery_van_wheel.'),
+      'The drum piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
     site.unjudged('chassis', 'wheel_rear_road', 0.059,
-      'The rim piece of overturned_delivery_van_chassis runs into the axle_rear piece of overturned_delivery_van_wheel.'),
+      'The axle_rear piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
     site.unjudged('chassis', 'wheel_rear_up', 0.059,
-      'The rim piece of overturned_delivery_van_chassis runs into the axle_rear piece of overturned_delivery_van_wheel.'),
+      'The axle_rear piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
   ],
 }

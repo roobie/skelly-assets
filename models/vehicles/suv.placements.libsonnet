@@ -41,8 +41,8 @@ local s = import 'suv.spec.libsonnet';
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
   unjudged: [
     site.unjudged('front_axle', 'exhaust', 0.06,
-      'The pipe piece of beam_axle_light runs into the beam piece of exhaust_long.'),
+      'The beam piece of beam_axle_light runs into the pipe piece of exhaust_long.'),
     site.unjudged('rear_axle', 'exhaust', 0.06,
-      'The pipe piece of beam_axle_light runs into the beam piece of exhaust_long.'),
+      'The beam piece of beam_axle_light runs into the pipe piece of exhaust_long.'),
   ],
 }

@@ -37,8 +37,8 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
   unjudged: [
     site.unjudged('rear_bench', 'rear_wheel_far', 0.063,
-      'The tyre_far piece of bench_seat_3 runs into the base piece of wheel_265_75r16.'),
+      'The base piece of bench_seat_3 runs into the tyre_far piece of wheel_265_75r16.'),
     site.unjudged('rear_bench', 'rear_wheel_near', 0.063,
-      'The tyre piece of bench_seat_3 runs into the base piece of wheel_265_75r16.'),
+      'The base piece of bench_seat_3 runs into the tyre piece of wheel_265_75r16.'),
   ],
 }

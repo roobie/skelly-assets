@@ -41,6 +41,6 @@ local s = import 'crew_pickup.spec.libsonnet';
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.75, -0.44]),
   unjudged: [
     site.unjudged('frame', 'rear_prop_shaft', 0.032,
-      'The tube piece of crew_pickup_frame runs into the cross_mid piece of prop_shaft_short.'),
+      'The cross_mid piece of crew_pickup_frame runs into the tube piece of prop_shaft_short.'),
   ],
 }

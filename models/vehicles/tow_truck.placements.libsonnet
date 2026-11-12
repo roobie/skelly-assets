@@ -24,7 +24,7 @@ local s = (import 'truck-cab.libsonnet').spec(import 'tow_truck.spec.libsonnet')
   tags: { 'vehicle-role': ['utility'] },
   unjudged: [
     site.unjudged('boom', 'line', 0.035,
-      'The run_out piece of tow_truck_boom runs into the collar piece of tow_truck_line.'),
+      'The collar piece of tow_truck_boom runs into the run_out piece of tow_truck_line.'),
     site.unjudged('boom_stage', 'sling', 0.06,
       'The sheave piece of tow_truck_boom_stage runs into the fall piece of tow_truck_sling.'),
     site.unjudged('dashboard', 'radiator', 0.06,

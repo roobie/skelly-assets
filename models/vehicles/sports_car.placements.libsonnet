@@ -34,6 +34,6 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
   }),
   unjudged: [
     site.unjudged('engine', 'rear_axle', 0.058,
-      'The beam piece of engine_v6_petrol runs into the sump piece of twist_beam.'),
+      'The sump piece of engine_v6_petrol runs into the beam piece of twist_beam.'),
   ],
 }

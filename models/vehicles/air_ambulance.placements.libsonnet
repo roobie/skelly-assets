@@ -38,9 +38,9 @@ local s = import 'air_ambulance.spec.libsonnet';
   tags: { 'vehicle-role': ['emergency'] },
   unjudged: [
     site.unjudged('belly', 'skids', 0.062,
-      'The cross_1 piece of air_ambulance_belly runs into the keel_17_5 piece of air_ambulance_skids.'),
+      'The keel_17_5 piece of air_ambulance_belly runs into the cross_1 piece of air_ambulance_skids.'),
     site.unjudged('cabin_rear', 'engine_cowl', 0.055,
-      'The cowl_17 piece of air_ambulance_cabin_rear runs into the roof_16_3 piece of air_ambulance_engine_cowl.'),
+      'The roof_16_3 piece of air_ambulance_cabin_rear runs into the cowl_17 piece of air_ambulance_engine_cowl.'),
     site.unjudged('engine_cowl', 'main_gearbox', 0.207,
       'The pylon piece of air_ambulance_engine_cowl runs into the case piece of air_ambulance_main_gearbox.'),
     site.unjudged('locker', 'sliding_door_far', 0.06,

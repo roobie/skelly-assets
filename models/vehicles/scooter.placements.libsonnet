@@ -22,8 +22,8 @@ local s = import 'scooter.spec.libsonnet';
   ],
   unjudged: [
     site.unjudged('frame', 'fork', 0.05,
-      'The stem piece of scooter_frame runs into the head piece of scooter_fork.'),
+      'The head piece of scooter_frame runs into the stem piece of scooter_fork.'),
     site.unjudged('leg_shield', 'fork', 0.05,
-      'The stem piece of scooter_leg_shield runs into the horn_cover piece of scooter_fork.'),
+      'The horn_cover piece of scooter_leg_shield runs into the stem piece of scooter_fork.'),
   ],
 }

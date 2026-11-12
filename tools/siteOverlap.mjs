@@ -80,12 +80,12 @@ export function siteOverlaps(sites, grain) {
   const found = new Map();
   for (let i = 0; i < pieces.length; i++) {
     for (let j = i + 1; j < pieces.length && pieces[j].min[0] < pieces[i].max[0] - grain; j++) {
-      const [p, q] = [pieces[i], pieces[j]];
-      if (p.owner === q.owner) continue;
+      if (pieces[i].owner === pieces[j].owner) continue;
+      const [p, q] = pieces[i].owner < pieces[j].owner ? [pieces[i], pieces[j]] : [pieces[j], pieces[i]];
       const depth = 2 * sharedDepth(p, q, grain / 2, grain / 2);
       const pair = key(p.owner, q.owner);
       if (depth > (found.get(pair)?.depth ?? 0)) {
-        found.set(pair, { owners: [p.owner, q.owner].sort((a, b) => a - b), pieces: [p.id, q.id], depth });
+        found.set(pair, { owners: [p.owner, q.owner], pieces: [p.id, q.id], depth });
       }
     }
   }

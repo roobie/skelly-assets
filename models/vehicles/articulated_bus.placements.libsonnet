@@ -43,7 +43,7 @@ local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
   ],
   unjudged: [
     site.unjudged('aft_rear_axle', 'aft_exhaust', 0.06,
-      'The pipe piece of beam_axle_truck_bare runs into the beam piece of exhaust_long.'),
+      'The beam piece of beam_axle_truck_bare runs into the pipe piece of exhaust_long.'),
     site.unjudged('aft_shell', 'aft_end_panel', 0.061,
       'The near_nose_pillar_0 piece of articulated_bus_aft_shell runs into the panel_near piece of articulated_bus_aft_end_panel.'),
     site.unjudged('aft_shell', 'aft_engine', 0.08,

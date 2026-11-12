@@ -10,6 +10,6 @@ local s = import 'shuttle_bus.spec.libsonnet';
   ],
   unjudged: [
     site.unjudged('rear_axle', 'gearbox', 0.06,
-      'The case piece of beam_axle_truck runs into the diff piece of gearbox_truck.'),
+      'The diff piece of beam_axle_truck runs into the case piece of gearbox_truck.'),
   ],
 }

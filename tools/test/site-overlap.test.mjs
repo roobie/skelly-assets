@@ -41,6 +41,14 @@ test('two sites with several piece pairs overlapping report the deepest pair, ho
   assert.deepEqual(overlap.pieces, ['deep', 'other']);
 });
 
+test('each piece is named with its own part, whichever site the sweep meets first', () => {
+  const early = box('early', [0, 0, 0], [1, 1, 1]);
+  const late = box('late', [0.5, 0, 0], [1.5, 1, 1]);
+  const [overlap] = siteOverlaps([site('a', 'pa', late), site('b', 'pb', early)], GRAIN);
+  assert.deepEqual(overlap.parts, ['pa', 'pb']);
+  assert.deepEqual(overlap.pieces, ['late', 'early']);
+});
+
 test('an allowance is silent whichever way round its sites are named, and covers only the pair it names', () => {
   for (const sites of [['body', 'lamp'], ['lamp', 'body']]) {
     assert.deepEqual(report({ van: vehicle(bodyAndLamp, { overlaps: [allowance(undefined, sites)] }) }).problems, []);

@@ -25,7 +25,7 @@ local s = import 'crashed_military_helicopter.spec.libsonnet';
   tags: { 'vehicle-role': ['military'] },
   unjudged: [
     site.unjudged('cowling', 'engine_far', 0.04,
-      'The case_far piece of crashed_military_helicopter_cowling runs into the far_10_6 piece of crashed_military_helicopter_engine.'),
+      'The far_10_6 piece of crashed_military_helicopter_cowling runs into the case_far piece of crashed_military_helicopter_engine.'),
     site.unjudged('fuselage', 'main_gearbox', 0.044,
       'The cabin_door_side_8_10 piece of crashed_military_helicopter_fuselage runs into the case piece of military_transport_helicopter_main_gearbox.'),
   ],

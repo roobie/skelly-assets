@@ -28,10 +28,10 @@ local s = import 'crashed_light_helicopter.spec.libsonnet';
     site.unjudged('main_gearbox', 'seat_frame_near', 0.05,
       'The mount piece of light_helicopter_main_gearbox runs into the back piece of crashed_light_helicopter_seat_frame.'),
     site.unjudged('rear_fairing', 'main_gearbox', 0.05,
-      'The case piece of crashed_light_helicopter_rear_fairing runs into the bulkhead_0 piece of light_helicopter_main_gearbox.'),
+      'The bulkhead_0 piece of crashed_light_helicopter_rear_fairing runs into the case piece of light_helicopter_main_gearbox.'),
     site.unjudged('rear_fairing', 'mast', 0.055,
-      'The shaft piece of crashed_light_helicopter_rear_fairing runs into the wall_33_7 piece of crashed_light_helicopter_mast.'),
+      'The wall_33_7 piece of crashed_light_helicopter_rear_fairing runs into the shaft piece of crashed_light_helicopter_mast.'),
     site.unjudged('skids', 'door', 0.05,
-      'The frame piece of crashed_light_helicopter_skids runs into the near_front_0_0 piece of crashed_light_helicopter_door.'),
+      'The near_front_0_0 piece of crashed_light_helicopter_skids runs into the frame piece of crashed_light_helicopter_door.'),
   ],
 }

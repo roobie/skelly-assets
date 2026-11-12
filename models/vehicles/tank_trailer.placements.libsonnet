@@ -20,10 +20,10 @@ local s = import 'tank_trailer.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.08, 0.44, 0.68]),
   unjudged: [
     site.unjudged('saddle_0', 'barrel', 0.08,
-      'The shell piece of tank_trailer_saddle runs into the low_near piece of tank_trailer_barrel.'),
+      'The low_near piece of tank_trailer_saddle runs into the shell piece of tank_trailer_barrel.'),
     site.unjudged('saddle_1', 'barrel', 0.08,
-      'The shell piece of tank_trailer_saddle runs into the low_near piece of tank_trailer_barrel.'),
+      'The low_near piece of tank_trailer_saddle runs into the shell piece of tank_trailer_barrel.'),
     site.unjudged('saddle_2', 'barrel', 0.08,
-      'The shell piece of tank_trailer_saddle runs into the low_near piece of tank_trailer_barrel.'),
+      'The low_near piece of tank_trailer_saddle runs into the shell piece of tank_trailer_barrel.'),
   ],
 }

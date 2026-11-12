@@ -36,6 +36,6 @@ local s = import 'burnt_out_bus.spec.libsonnet';
     site.unjudged('floor', 'rear_rim_far', 0.046,
       'The deck_0_9 piece of burnt_out_bus_floor runs into the outer_band_far piece of burnt_out_bus_dual_rim.'),
     site.unjudged('floor', 'rear_rim_near', 0.047,
-      'The outer_band piece of burnt_out_bus_floor runs into the deck_9_13 piece of burnt_out_bus_dual_rim.'),
+      'The deck_9_13 piece of burnt_out_bus_floor runs into the outer_band piece of burnt_out_bus_dual_rim.'),
   ],
 }
