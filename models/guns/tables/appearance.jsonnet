@@ -26,7 +26,7 @@ local slots = [['metal', 'steel-parkerized'], ['furniture', 'polymer-black'], ['
 local slotMaterials = { [slot[0]]: slot[1] for slot in slots };
 local roleMaterials = { sight: 'alu-anodized-black', 'tactical-flashlight-mount': 'alu-anodized-black', suppressor: 'steel-stainless' };
 local materials = import 'models/finishes.jsonnet';
-local cartridgeCases = { '7.62x39': 'steel-polymer-coated', '7.62x54r': 'steel-zinc-plated' };
+local cartridgeCases = { '7.62x39': 'steel-polymer-coated', '7.62x54r': 'steel-polymer-coated' };
 assert std.all([std.objectHas(materials, name) for name in std.objectValues(cartridgeCases)])
        : 'cartridgeCases names a material finishes.jsonnet does not define';
 local opticLenses = {
