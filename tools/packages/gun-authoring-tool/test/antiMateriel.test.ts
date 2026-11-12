@@ -50,7 +50,7 @@ import {
 import { HEAVY_RECEIVER_LENGTH } from '../src/gun/antiMateriel/heavyReceiver.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { EJECTION_PORT_MARGIN_U, FAMILIES, GRIP_MOUNT_PROFILE, TRIGGER_GUARD } from '../src/gun/parts.ts';
-import { variant } from './helpers.ts';
+import { fitAntiMaterielScope, variant } from './helpers.ts';
 
 const family = (key: string): PartFamily => FAMILIES[key]!;
 const solidById = (def: PartDef, id: string): Solid => {
@@ -387,11 +387,15 @@ describe('bipod', () => {
   });
 });
 
-/** The anti-materiel fixture with the handle in one pose and the bipod in one pose (its legs L, as published). */
+/**
+ * The anti-materiel fixture with the handle in one pose and the bipod in one pose (its legs L, as published), and the
+ * largest scope its rail takes, which the handle must clear.
+ */
 const withHandlePose = (pose: 'carry' | 'stowed', bipodPose = 'folded') =>
   variant('archetype-anti-materiel', (draft) => {
     draft.parts.trunnion!.params = { pose };
     draft.parts.bipod!.params!.pose = bipodPose;
+    fitAntiMaterielScope(draft);
   });
 
 describe.each(['carry', 'stowed'] as const)('carry handle, %s pose', (pose) => {

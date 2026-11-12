@@ -650,7 +650,7 @@ export const antiMateriel: Template = {
     { id: 'grip', family: 'grip', params: { length: ['M', 'L'] } },
     { id: 'magazine', family: 'heavy-magazine' },
     { id: 'stock', family: 'recoil-stock', params: { length: ['M', 'L'] } },
-    { id: 'sight', family: 'sight', params: { type: 'high-mag-5-25x' }, chance: 0.9 },
+    { id: 'sight', family: 'sight', params: { type: 'high-mag-5-25x' }, chance: 0 },
     // The handle's three parts come together or not at all, so they are always present (a slot has no way to
     // depend on another slot's chance, and a strut without its trunnion would leave required ports empty).
     // Only the trunnion carries the pose; the strut and bar inherit it.

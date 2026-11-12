@@ -48,7 +48,7 @@ import {
   smg,
 } from '../src/gun/templates.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { loadDesignAssembly, type MutableAssembly, scopedArDesign } from './helpers.ts';
+import { loadDesignAssembly, type MutableAssembly, scopedAntiMaterielDesign, scopedArDesign } from './helpers.ts';
 
 /** A point or direction in the optic's own axes, in the exported file's axes and metres, as the file draws it. */
 const inFile = ([x, y, z]: readonly number[], scale = METRES_PER_UNIT): Vector3 =>
@@ -491,16 +491,14 @@ const opticConnection = (template: Template, type: string) => {
 
 const fitOptic = (template: Template, seed: number, type: string): MutableAssembly => {
   const assembly = structuredClone(generate(template, gunDomain, seed)) as MutableAssembly;
-  if (!assembly.parts.sight) {
-    throw new Error(`${template.name} seed ${seed} did not include a sight`);
-  }
   const connection = opticConnection(template, type);
   const candidates = typeof connection.from === 'string' ? [connection.from] : connection.from;
   const from = candidates.find((candidate) => assembly.parts[candidate.split('.')[0]!]);
   if (!from) {
     throw new Error(`${template.name} seed ${seed} lacks the ${connection.from} mount for ${type}`);
   }
-  assembly.parts.sight.params = { ...assembly.parts.sight.params, type };
+  // A template whose default leaves the optic off still offers it, so a fit adds the sight where none was drawn.
+  assembly.parts.sight = { family: 'sight', ...assembly.parts.sight, params: { ...assembly.parts.sight?.params, type } };
   assembly.connections = assembly.connections.filter(({ to }) => to !== 'sight.base');
   assembly.connections.push({ from, to: 'sight.base', slot: connection.slot });
   return assembly;
@@ -720,8 +718,9 @@ describe('curated optic mounts', () => {
       ['archetype-anti-materiel', ['high-mag-5-25x']],
     ] as const;
     for (const [name, types] of designs) {
-      // The AR ships with irons; its optic goes where a player fits one.
-      const assembly = name === 'archetype-ar' ? scopedArDesign() : loadDesignAssembly(name);
+      // The AR ships with irons and the anti-materiel rifle bare; their optic goes where a player fits one.
+      const scoped = { 'archetype-ar': scopedArDesign, 'archetype-anti-materiel': scopedAntiMaterielDesign } as const;
+      const assembly = name in scoped ? scoped[name as keyof typeof scoped]() : loadDesignAssembly(name);
       for (const type of types) {
         assembly.parts.sight!.params = { type };
         expectContactOnPhysicalRail(assembly, type);
