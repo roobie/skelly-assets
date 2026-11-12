@@ -25,6 +25,14 @@ local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, oute
 local tyreProfile(width, rim, outer, taper) = [[-width / 2, rim], [-width / 2, outer - width * taper], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * taper], [width / 2, rim], [-width / 2, rim]];
 local rad(degrees) = degrees * std.pi / 180;
 local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+// The plane through three (x, y, z) points, as a normal and its offset; which side it faces is left to the caller.
+local planeThrough(a, b, c) =
+  local u = [b[i] - a[i] for i in [0, 1, 2]];
+  local v = [c[i] - a[i] for i in [0, 1, 2]];
+  local n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+  { normal: n, offset: dot(n, a) };
+// A cut reflected across the centre plane, onto the far side.
+local farCut(cut) = cut { normal: [cut.normal[0], cut.normal[1], -cut.normal[2]] };
 // Convex trapezoids around a centre, since a prism must be convex. Angles run counter-clockwise from +x.
 local arc(id, slot, cx, cy, inner, outer, from, to, steps, z) = [
   local a0 = rad(from + (to - from) * i / steps);
@@ -49,7 +57,7 @@ local bar(id, slot, a, b, thick, z, thickB=null) =
   prism(id, slot, [[a[0] - na[0], a[1] - na[1]], [b[0] - nb[0], b[1] - nb[1]], [b[0] + nb[0], b[1] + nb[1]], [a[0] + na[0], a[1] + na[1]]], z);
 local near(piece) = piece + { id: piece.id + '_near' };
 local far(piece) = piece + { id: piece.id + '_far' } + (
-  if std.objectHas(piece, 'clip') then { clip: [c { normal: [c.normal[0], c.normal[1], -c.normal[2]] } for c in piece.clip] } else {}
+  if std.objectHas(piece, 'clip') then { clip: [farCut(c) for c in piece.clip] } else {}
 ) + (
   if piece.kind == 'box' then { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] }
   else if piece.kind == 'prism' && piece.axis == 'z' then { start: -piece.end, end: -piece.start }
@@ -75,15 +83,15 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // The plane through three (x, y, z) points as a cut that keeps the side holding `inside`, so an armour plate is
   // authored by its corners rather than by a normal worked out by hand.
   plate(a, b, c, inside):
-    local u = [b[i] - a[i] for i in [0, 1, 2]];
-    local v = [c[i] - a[i] for i in [0, 1, 2]];
-    local n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
-    local facing = if dot(n, [inside[i] - a[i] for i in [0, 1, 2]]) > 0 then [-x for x in n] else n;
-    { normal: facing, offset: dot(facing, a) },
+    local plane = planeThrough(a, b, c);
+    local side = dot(plane.normal, inside) - plane.offset;
+    assert side != 0 : 'a plate must not pass through the point it keeps';
+    if side > 0 then { normal: [-x for x in plane.normal], offset: -plane.offset } else plane,
+  farCut: farCut,
   // The x where the plane through three (x, y, z) points passes height y at side offset z, for a fitting seated on a plate.
   plateX(points, y, z):
-    local cut = self.plate(points[0], points[1], points[2], points[0]);
-    (cut.offset - cut.normal[1] * y - cut.normal[2] * z) / cut.normal[0],
+    local plane = planeThrough(points[0], points[1], points[2]);
+    (plane.offset - plane.normal[1] * y - plane.normal[2] * z) / plane.normal[0],
   // A prism cut by the planes `plates` lists, each from `plate`: a convex solid whose faces need not lie along an axis.
   clipped(piece, plates):
     assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';
