@@ -25,9 +25,9 @@ export function readVersion(root, env = process.env) {
 }
 
 export function versionHtml({ tag, sha, branch }) {
-  const tagLink = tag && `<a href="${REPOSITORY}/releases/tag/${escape(tag)}">${escape(tag)}</a>`;
+  const tagLink = tag && `<a style="color:inherit" href="${REPOSITORY}/releases/tag/${escape(tag)}">${escape(tag)}</a>`;
   const short = branch && sha?.slice(0, SHORT);
-  const commit = short && `${escape(branch)} at <a href="${REPOSITORY}/commit/${escape(sha)}">${escape(short)}</a>`;
+  const commit = short && `${escape(branch)} at <a style="color:inherit" href="${REPOSITORY}/commit/${escape(sha)}">${escape(short)}</a>`;
   const text = [tagLink, commit].filter(Boolean).join(' + ');
   return text ? `<span style="color:#a4bdc0;font:12px system-ui,sans-serif">Assets ${text}</span>` : '';
 }
