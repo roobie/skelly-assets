@@ -76,17 +76,18 @@ export function subdivided(mesh, pitch = PITCH) {
   return out;
 }
 
-// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal, piece },
-// sampled at its centroid with its outward normal, `piece` the region its triangle is named in, if any. A centroid lies inside one face, so a step off it along that normal leaves
-// the face's plane, where a corner's step along one of its faces could run along a plane another face lies in. A
-// mirrored copy's faces are turned inside out, which its negative volume shows.
+// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal, region },
+// sampled at its centroid with its outward normal, `region` the region its triangle is named in, if any. A centroid lies
+// inside one face, so a step off it along that normal leaves the face's plane, where a corner's step along one of its
+// faces could run along a plane another face lies in. A mirrored copy's faces are turned inside out, which its negative
+// volume shows.
 export function sampledSurface(mesh, pitch = PITCH) {
   const faces = triangles(mesh);
   const outward = faces.reduce((sum, [a, b, c]) => sum + dot(a, cross(b, c)), 0) < 0 ? -1 : 1;
   return faces.flatMap((face, t) => {
     const normal = scale(normalize(cross(sub(face[1], face[0]), sub(face[2], face[0]))), outward);
-    const piece = mesh.pieces?.[t];
-    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal, piece }));
+    const region = mesh.pieces?.[t];
+    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal, region }));
   });
 }
 
@@ -250,7 +251,7 @@ const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = 
  * piece cover what it only sits beside, as a belt bag beside the waist it hangs on. A piece that declares what it
  * `covers` of the part copy it rides passes beneath only that: a tank top that covers the trunk leaves the shoulders
  * bare, though its armholes and straps lie beneath the deltoids and the pectorals.
- * The body part's `part` and a sample's `piece` name what a declaration hides (site/hiding.mjs, `hides`).
+ * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
  */
 export function coverage(rig, rest) {
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
@@ -258,7 +259,7 @@ export function coverage(rig, rest) {
   const parts = new Map(rest.body.map(({ bone, part }) => [bone, part]));
   const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
   const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
-  const beneath = (id, { point, normal, piece: region }) => {
+  const beneath = (id, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
     let hit = { t: Infinity, index: -1 };
