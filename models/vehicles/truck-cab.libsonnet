@@ -65,6 +65,8 @@ local defaults = {
   engineX: self.frontAxle - 0.25,
   engineY: self.railTop - 0.58,
   gearboxLength: 0.72,
+  // A heavy gearbox's taller case sits lower, so its top stays under the rail top where bodies stand on the frame.
+  gearboxY: self.engineY + (if self.gearbox == 'gearbox_heavy' then -0.01 else 0.12),
   exhaustX: self.engineX - 3.6,
   exhaustY: self.railBottom - 0.16,
   // The pipe runs back beside the gearbox, so a heavy gearbox's wider case sets it further out.
@@ -268,7 +270,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('front_bumper', part('_front_bumper'), origin, ['chassis']),
     fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
+    fitting('gearbox', s.gearbox, [gearboxX, s.gearboxY, 0], ['engine']),
   ] + cooling.sites(s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, kit=kit, supportedBy=['chassis'])
   + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, kit=kit, supportedBy=['chassis']) + [
     fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, s.exhaustZ], ['engine', 'chassis']),

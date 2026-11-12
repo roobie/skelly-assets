@@ -2,6 +2,8 @@
 (import 'tipper_truck.spec.libsonnet') + {
   rear: -6.0, front: 6.0, face: 5.92, cabBack: 4.15, doorRear: 4.23,
   frontAxle: 5.0, secondAxle: 3.5, rearAxles: [-2.0, -3.4],
+  // The gearbox rides over the second steered axle's beam, just under the deck.
+  gearboxY: self.deckLow - 0.57,
   tankX: 1.68, batteryX: 1.68,
   chassisMass: 2200, shellMass: 1680,
   deckLow: 1.16, deckTop: 1.36, deckRear: -5.9, deckFront: 4.05,

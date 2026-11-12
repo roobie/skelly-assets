@@ -11,8 +11,6 @@ local s = import 'tipper_truck.spec.libsonnet';
   ]
   + site.pair('tub_side', 'tipper_truck_tub_side'),
   unjudged: [
-    site.unjudged('gearbox', 'tip_ram', 0.09,
-      'The case piece of gearbox_heavy runs into the sleeve piece of tipper_truck_tip_ram.'),
     site.unjudged('subframe', 'tub_floor', 0.08,
       'The runner_near piece of tipper_truck_subframe runs into the sill_0 piece of tipper_truck_tub_floor.'),
   ],
