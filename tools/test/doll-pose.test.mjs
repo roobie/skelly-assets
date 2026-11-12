@@ -15,6 +15,7 @@ import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs'
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { partStrokes, poseJson, pressCheckPoses, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
+import { CLEAN, counted } from './findings.mjs';
 
 // The doll, some garments and the press check's rifle built from the repo's own content, so these check the rig, the
 // fixtures, the probe and the fitted shells against the doll as it is drawn, not against a stand-in.
@@ -86,7 +87,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
   const jacket = { body: rest.body, pieces };
   const surface = coveredSurface(rig, jacket);
   assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), 'the boxes cover the body');
-  assert.deepEqual(clearanceProbe(rig, jacket, surface)(still), { pokes: [], flush: [], sinks: [], seams: [] });
+  assert.deepEqual(counted(clearanceProbe(rig, jacket, surface)(still)), CLEAN);
 });
 
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
