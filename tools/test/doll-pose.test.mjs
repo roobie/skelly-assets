@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -20,8 +20,9 @@ import { manifestTaxonomy } from '../taxonomy.mjs';
 // fixtures, the probe and the fitted shells against the doll as it is drawn, not against a stand-in.
 const repo = resolve(import.meta.dirname, '../..');
 const WEAR = 'leather_jacket';
-// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet).
-const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers'];
+// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet), and the sleeveless top whose
+// armholes stand beside the arm (models/catalogue/worn.libsonnet).
+const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_top'];
 const pressCheck = readPressCheck(repo);
 const sources = await modelTaxonomies(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
@@ -30,13 +31,16 @@ after(() => rmSync(built, { recursive: true, force: true }));
 const wears = [WEAR, ...CLOTHES];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
 
-// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, as the
-// manifest would list them.
+// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy and what
+// they cover, from the model entry the thing export writes beside each (a gun export writes none), as the manifest
+// would list them.
 const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
 const manifest = {
   models: readdirSync(built).flatMap((pack) => readdirSync(join(built, pack, 'assets/models')).map((file) => {
     const id = file.slice(0, -'.glb'.length);
-    return { id, pack, path: `assets/models/${file}`, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
+    const entry = join(built, pack, 'things', `${id}.model.json`);
+    const { covers } = existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')) : {};
+    return { id, pack, path: `assets/models/${file}`, covers, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
   })),
 };
 const dressing = readDressing(repo);
