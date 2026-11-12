@@ -6,6 +6,7 @@ read_if:
   - wondering why site/kinematics.mjs twins mobgen's pose maths in plain JS
   - posing a hand's fingers, holding an item by a grip socket, or sharing a solver with mobgen
   - changing the press check's key frames or why its pose files are generated
+  - timing the press check's key frames, or why a clip's keys can stand unevenly
 ---
 
 # 10. The doll poses on mobgen's bone model with its own small solver
@@ -102,6 +103,11 @@ pad in the shoulder pocket the stance moves, the eyes the head turns. A sequence
 written as key frames in the rifle's own terms (`models/poses/press-check.libsonnet`) and its pose files are generated
 from them (`tools/press-check.mjs`), so a change to the doll's proportions or a frame is a rerun rather than eight
 files of hand-carried coordinates, and a test compares the files with what the tool writes.
+
+Each key frame carries its own timing beside its pose, because a check is not evenly paced: its moves differ in
+length and the look into the port is a pause, so even spacing reads as mechanical. The timing is content, tuned
+without code. The pose page's Seconds scales it rather than replacing it, so a reviewer can slow the check down and
+keep its rhythm. Moves ease from rest to rest, as a practised hand's do, rather than starting and stopping at speed.
 
 ## Out of scope
 

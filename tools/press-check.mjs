@@ -55,6 +55,26 @@ export function poseJson(value, indent = '') {
   return `{\n${Object.entries(value).map(([key, v]) => `${inner}${JSON.stringify(key)}: ${poseJson(v, inner)}`).join(',\n')}\n${indent}}`;
 }
 
+/**
+ * The press check as a clip of its pose files: each key a fixture and the seconds from the start at which the figure
+ * stands in it, the frames in their names' numbered order, a held frame keyed where it arrives and where it leaves.
+ */
+export function pressCheckClip(check) {
+  const names = Object.keys(check.frames).sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+  const keys = [];
+  let at = 0;
+  for (const [k, name] of names.entries()) {
+    const { into, hold = 0 } = check.frames[name];
+    if (k > 0 && !(into > 0)) throw new Error(`press check ${name}: into must be seconds above 0`);
+    if (k === 0 && into !== undefined) throw new Error(`press check ${name}: the first frame has nothing to move in from`);
+    if (!(hold >= 0)) throw new Error(`press check ${name}: hold must be seconds, 0 or more`);
+    at += into ?? 0;
+    keys.push({ fixture: name, at });
+    if (hold > 0) keys.push({ fixture: name, at: (at += hold) });
+  }
+  return { keys, easing: check.easing };
+}
+
 /** The press check's pose files by name, for `rig`, from `check` (`readPressCheck`) and the rifle's part strokes. */
 export function pressCheckPoses(rig, check, strokes) {
   const bone = (id) => rig.bones.find((b) => b.id === id);

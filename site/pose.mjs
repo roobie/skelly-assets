@@ -190,8 +190,12 @@ const spanOf = (clip, walkSpeed) => {
   if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / walkSpeed;
   return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
-// A clip of the rig's frames, its span stated the way its loop needs.
-const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), frames });
+// A clip of the rig's frames, its span stated the way its loop needs, timed by `timing` (`keyPhases` and `easing`) if given.
+const authoredClip = (frames, loop, seconds, timing) => ({
+  kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), ...timing, frames,
+});
+// A clip's own key timing, kept apart from its span, so the span can be changed and the timing scales with it.
+const timingOf = ({ keyPhases, easing }) => ({ ...(keyPhases ? { keyPhases } : {}), ...(easing ? { easing } : {}) });
 
 // ---- headless: a tile of the posed figure ----
 
@@ -612,10 +616,11 @@ async function startPage(data, query) {
 
   // Clip: frames collected here, a sequence of fixtures, a clip file opened or one of the clip actor's clips, scrubbed
   // and played. Collected frames and a sequence's keep what the hands carry at each frame (`carries`, one per frame), so
-  // a held item's place in the hand and its moving parts follow the clip; the others leave the hands as they are.
-  const clip = { frames: [], carries: [], phase: 0, playing: false, actor: null };
+  // a held item's place in the hand and its moving parts follow the clip; the others leave the hands as they are. A
+  // timed clip's Seconds scales its timing; an added frame leaves the frames evenly spaced, as it has no time of its own.
+  const clip = { frames: [], carries: [], timing: {}, phase: 0, playing: false, actor: null };
   const span = () => (clip.actor ? spanOf(clip.actor, rig.clips.walkSpeed) : Number($('clip-seconds').value));
-  const current = () => clip.actor ?? authoredClip(clip.frames, $('clip-loop').checked, span());
+  const current = () => clip.actor ?? authoredClip(clip.frames, $('clip-loop').checked, span(), clip.timing);
   const seek = (phase) => {
     clip.phase = phase;
     $('clip-scrub').value = phase;
@@ -629,9 +634,10 @@ async function startPage(data, query) {
     }
     take(sampleClip(playing, cursor, slerp));
   };
-  const setClip = (frames, { actor = null, carries = null, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
+  const setClip = (frames, { actor = null, carries = null, timing = {}, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
     clip.frames = frames;
     clip.carries = carries;
+    clip.timing = timing;
     clip.actor = actor;
     $('clip-loop').checked = loop;
     $('clip-seconds').value = round(seconds, 3);
@@ -664,9 +670,9 @@ async function startPage(data, query) {
   });
   $('clip-clear').addEventListener('click', () => { stop(); setClip([], { carries: [] }); $('clip-source').value = ''; });
   $('clip-scrub').addEventListener('input', () => seek(Number($('clip-scrub').value)));
-  // An actor clip retimed is collected frames; a sequence retimed keeps its carries.
+  // An actor clip retimed is collected frames; a sequence retimed keeps its carries and its timing, scaled.
   const retimed = () => {
-    if (clip.actor) clip.carries = null;
+    if (clip.actor) [clip.carries, clip.timing] = [null, {}];
     clip.actor = null;
     $('clip-source').value = '';
   };
@@ -675,30 +681,30 @@ async function startPage(data, query) {
   // The clip actor's clips (the rig's `clips`), each frame folded onto the doll's bones.
   const actorClips = clipSet(await fetch(`built/${rig.clips.file}`).then((r) => r.json()));
   const named = Object.entries(actorClips).filter(([, c]) => playable(c) && c.frames.length > 1);
-  const sequences = new Map(Object.entries(rig.sequences).map(([name, fixtures]) => [`sequence ${name}`, { name, fixtures }]));
+  const sequences = new Map(Object.entries(rig.sequences).map(([name, sequence]) => [`sequence ${name}`, { name, ...sequence }]));
   $('clip-source').append(
     new Option('(authored)', ''),
     ...[...sequences].map(([value, { name }]) => new Option(name, value)),
     ...named.map(([name]) => new Option(name, name)),
   );
-  // A sequence's frames and carries, each fixture posed with what it holds in turn; its key frames carry no timing, so
-  // it plays a second from one to the next until retimed.
-  const playSequence = async (fixtures) => {
-    const frames = [], carries = [];
-    for (const name of fixtures) {
-      const { frame, carries: held } = await holdPose(figure, rig, await loadPoseFile(name));
-      frames.push(frame);
-      carries.push(held);
-    }
-    setClip(frames, { carries, seconds: fixtures.length - 1 });
+  // A sequence's frames and carries, each key's fixture posed with what it holds, at the key's own time.
+  const playSequence = async ({ keys, easing }) => {
+    const posed = new Map();
+    for (const { fixture } of keys) if (!posed.has(fixture)) posed.set(fixture, await holdPose(figure, rig, await loadPoseFile(fixture)));
+    const seconds = keys.at(-1).at;
+    setClip(keys.map(({ fixture }) => posed.get(fixture).frame), {
+      carries: keys.map(({ fixture }) => posed.get(fixture).carries),
+      timing: timingOf({ keyPhases: keys.map(({ at }) => at / seconds), easing }),
+      seconds,
+    });
     seek(0);
-    $('clip-report').textContent = `${fixtures.length} key frames from ${fixtures[0]} to ${fixtures.at(-1)}`;
+    $('clip-report').textContent = `${posed.size} key frames from ${keys[0].fixture} to ${keys.at(-1).fixture}`;
   };
   $('clip-source').addEventListener('change', shownError('clip-report', async () => {
     stop();
     $('clip-report').textContent = '';
     const value = $('clip-source').value;
-    if (sequences.has(value)) return playSequence(sequences.get(value).fixtures);
+    if (sequences.has(value)) return playSequence(sequences.get(value));
     const chosen = actorClips[value];
     if (!chosen) return setClip([], { carries: [] });
     const actor = { ...chosen, frames: chosen.frames.map((frame) => rigFrame(rig, frame)) };
@@ -713,7 +719,7 @@ async function startPage(data, query) {
     if (issues.length > 0) throw new Error(`clip does not fit rig ${rig.id}: ${issues.join('; ')}`);
     stop();
     $('clip-source').value = '';
-    setClip(opened.frames, { loop: Boolean(opened.loop), seconds: spanOf(opened, rig.clips.walkSpeed) || Number($('clip-seconds').value) });
+    setClip(opened.frames, { timing: timingOf(opened), loop: Boolean(opened.loop), seconds: spanOf(opened, rig.clips.walkSpeed) || Number($('clip-seconds').value) });
     seek(0);
     $('clip-report').textContent = `opened ${file.name}`;
   }));
