@@ -115,3 +115,14 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
     rmSync(out, { recursive: true, force: true });
   }
 });
+
+// An allowance that names a site the vehicle lacks, or gives no reason, would silence nothing or hide why.
+test('an allowed overlap names two different sites of the vehicle and says why', () => {
+  const allowing = (overlaps) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites, overlaps } });
+  assert.equal(allowing([{ sites: ['door_near', 'door_far'], why: 'the doors are seated in the body' }]), '');
+  assert.match(allowing([{ sites: ['door_near', 'gone'], why: 'x' }]), /two different sites of the vehicle/);
+  assert.match(allowing([{ sites: ['door_near', 'door_near'], why: 'x' }]), /two different sites of the vehicle/);
+  assert.match(allowing([{ sites: ['door_near', 'door_far'] }]), /needs a why/);
+  assert.match(allowing([{ sites: ['door_near', 'door_far'], why: 'x', note: 'y' }]), /unknown keys note/);
+  assert.match(allowing('door_near'), /overlaps is not a list/);
+});

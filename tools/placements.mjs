@@ -17,7 +17,7 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['forward', 'parent', 'sites', 'tags', 'title']);
+const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title']);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
@@ -83,6 +83,22 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
   return problems;
 }
 
+// Why an allowed overlap (tools/siteOverlap.mjs) cannot be read: it names two sites of the vehicle and says why.
+function allowedOverlapProblems(vehicle, overlaps, sites) {
+  if (!Array.isArray(overlaps)) return [`${vehicle}: overlaps is not a list`];
+  const ids = new Set((sites ?? []).map((site) => site?.id));
+  return overlaps.flatMap((allowed) => {
+    const [a, b] = allowed?.sites ?? [];
+    const where = `${vehicle}/${a}+${b}`;
+    const unknown = Object.keys(allowed ?? {}).filter((key) => key !== 'sites' && key !== 'why');
+    return [
+      ...(unknown.length > 0 ? [`${where}: unknown keys ${unknown.join(' ')} in an allowed overlap`] : []),
+      ...(allowed?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b ? [] : [`${where}: an allowed overlap names two different sites of the vehicle`]),
+      ...(typeof allowed?.why === 'string' && allowed.why !== '' ? [] : [`${where}: an allowed overlap needs a why`]),
+    ];
+  });
+}
+
 // Why the vehicles could not be assembled from the built models, as messages. placements: vehicle -> { parent?, sites,
 // tags? };
 // models: the built models, { id, pack, paintable? }; vehicleRows: vehicle -> its own row ids; dependsOn: pack -> the packs it
@@ -108,6 +124,7 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
     else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel));
+    if (entry?.overlaps !== undefined) problems.push(...allowedOverlapProblems(vehicle, entry.overlaps, entry?.sites));
   }
   return problems.sort();
 }

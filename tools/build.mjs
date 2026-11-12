@@ -2,7 +2,8 @@
 // Usage: node tools/build.mjs [--out dir] [--cache dir | --no-cache] [rowId ...], or node tools/build.mjs --shard i/n
 // [--cache dir] to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard). The cache
 // is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; --no-cache generates every model.
-// With no row ids it first holds every model's title and taxonomy to their rules (tools/check-sources.mjs), then builds every
+// With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
+// sites clear of each other (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
 // (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs) and the finish library
 // (tools/manifest.mjs); with ids it builds only those rows, from the roster source or a recipe file, with no pack index,
@@ -16,7 +17,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
-import { modelSources, sourceReport } from './check-sources.mjs';
+import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
@@ -231,7 +232,9 @@ async function main() {
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
   if (positionals.length === 0) {
-    const { unlisted, problems } = sourceReport(sources, vocabulary);
+    const report = sourceReport(sources, vocabulary);
+    const { unlisted } = report;
+    const problems = [...report.problems, ...vehicleReport(repo)];
     for (const { message } of unlisted) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
     if (problems.length > 0) process.exit(1);

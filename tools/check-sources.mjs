@@ -1,5 +1,6 @@
 // Holds every model's taxonomy to the vocabulary (tools/taxonomy.mjs, taxonomyReport) and its title to the title rule
-// (tools/titles.mjs, titleReport), and lists the models without a category, for authors and tagging agents.
+// (tools/titles.mjs, titleReport), every vehicle's parts at different sites clear of each other
+// (tools/siteOverlap.mjs, siteOverlapProblems), and lists the models without a category, for authors and tagging agents.
 // tools/build.mjs runs the same reports before it builds anything.
 // Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...]. It exits 1 when any problem remains in the
 // selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the vocabulary does not list
@@ -12,6 +13,7 @@ import { parseArgs } from 'node:util';
 import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
 import { installJsonnetSources } from './sources.mjs';
+import { siteOverlapProblems } from './siteOverlap.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
 import { titleReport } from './titles.mjs';
 
@@ -40,6 +42,9 @@ export const sourceReport = (models, vocabulary) => {
   return { ...report, problems: [...report.problems, ...titleReport(models)] };
 };
 
+// The vehicles' site overlaps (tools/siteOverlap.mjs) as report problems.
+export const vehicleReport = (root = repo) => siteOverlapProblems(root).map((message) => ({ message }));
+
 function printReport({ untagged, unlisted, problems }) {
   const byPack = Map.groupBy(untagged, ({ pack }) => pack);
   console.log(`untagged: ${untagged.length} model(s) in ${byPack.size} pack(s)`);
@@ -54,6 +59,7 @@ async function main() {
   const { values } = parseArgs({ options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } } });
   const report = sourceReport(await modelSources(repo), readVocabulary(repo));
   const selected = Object.fromEntries(Object.entries(report).map(([key, entries]) => [key, entries.filter(inPacks(values.pack))]));
+  selected.problems.push(...vehicleReport(repo));
   if (values.json) console.log(JSON.stringify(selected, null, 2));
   else printReport(selected);
   return selected.problems.length > 0 ? 1 : 0;
