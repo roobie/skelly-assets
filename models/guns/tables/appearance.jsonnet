@@ -99,5 +99,8 @@ local familyHex = {
     fallbackFinishMaterial: 'brass',
   },
   cartridgeFinish: { case: 'brass', bullet: 'copper', primer: 'brass', closure: 'paperboard-brown' },
+  // A cartridge's own case by its id, where it is not the brass above. This is how the game shows it; the cartridge's
+  // sourced `materials` record what cases exist, so they neither limit nor choose this.
+  cartridgeCases: { '7.62x39': 'steel-polymer-coated', '7.62x54r': 'steel-zinc-plated' },
   hullMaterials: { red: 'plastic-red', green: 'plastic-green', blue: 'plastic-blue', black: 'plastic-black', white: 'plastic-white', yellow: 'plastic-yellow' },
 }

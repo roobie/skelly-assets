@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
-import { loadCartridgeFile } from './ammoHelpers.ts';
+import { loadCartridges, loadCartridgeFile } from './ammoHelpers.ts';
 
 const cartridge: MetallicCartridge = {
   ...(loadCartridgeFile('7.62x39.json') as MetallicCartridge),
@@ -19,7 +19,7 @@ const glbJson = (bytes: Uint8Array): Record<string, unknown> => {
 };
 
 describe('standalone cartridge GLBs', () => {
-  it('routes case, bullet, and primer finish overrides to their GLB materials', () => {
+  it('gives a cartridge naming no case of its own the shared finish, and routes overrides to its GLB materials', () => {
     const result = exportCartridgeModels(cartridge, {
       finish: { case: 'steel', bullet: 'lead', primer: 'brass' },
     });
@@ -56,6 +56,24 @@ describe('standalone cartridge GLBs', () => {
     expect(bulletMaterial.pbrMetallicRoughness.baseColorFactor.slice(0, 3)).toEqual(
       MATERIALS.lead!.colour.map(srgbToLinear),
     );
+  });
+
+  it('draws a cartridge whose look names its own case in that material, on its round and its loose case', () => {
+    const ownCases = Object.entries(GUN_APPEARANCE.cartridgeCases);
+    expect(ownCases.length).toBeGreaterThan(0);
+    const corpus = loadCartridges();
+    for (const [id, material] of ownCases) {
+      const named = corpus.find((entry) => entry.id === id)!;
+      const result = exportCartridgeModels(named);
+      if (!result.ok) {
+        throw new Error(JSON.stringify(result.error));
+      }
+      for (const model of [result.models.round, result.models.case]) {
+        const primitives = (glbJson(model.glb).meshes as { primitives: { extras: Record<string, string> }[] }[])[0]!
+          .primitives;
+        expect(primitives.find(({ extras }) => extras.solid === 'case')?.extras.material, id).toBe(material);
+      }
+    }
   });
 
   it('honours an explicit identity when exporting one cartridge component', () => {

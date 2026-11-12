@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
 import type { Shotshell } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
+import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
 import { shotshellGeometry, shotshellHullColor } from '../src/gun/shotshellGeometry.ts';
 import { buildAmmoMeshes } from '../src/viewer/ammoLayer.ts';
@@ -105,7 +106,7 @@ describe('shotshell cartridge export', () => {
   });
 
   it('keeps viewer loaded and fired geometry aligned with their corresponding GLBs', async () => {
-    const view = buildAmmoMeshes(shell, 'brass', new Texture(), 96);
+    const view = buildAmmoMeshes(shell, cartridgeFinish(shell), new Texture(), 96);
     const models = exported();
     const pairs = [
       [view.loose, models.round, view.lengthUnits],
