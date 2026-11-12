@@ -1,7 +1,7 @@
 import { titleFlaw } from './packages/thing-export/src/title.ts';
 
 // Every model is called by an authored title, never by a name derived from its id. This holds each model's title to that:
-// present and plain, by the rule in thing-export's title.ts. Why titles are authored is in README.md, "Titles".
+// present and plain, by the rule in thing-export's title.ts. Why titles are authored is in `README.md`, "Titles".
 
 // One model's title problems. model: { pack, id, title }.
 export function titleProblems({ pack, id, title }) {

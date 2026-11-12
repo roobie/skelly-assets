@@ -14,6 +14,25 @@ const SUGGESTION_LIMIT = 40; // terms a combobox lists at once; typing narrows t
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
 
 const CLIP_NAMES = { walk: 'Walk', attack: 'Attack', pounce: 'Pounce', idle: 'Idle' };
+// Where a model stands in the releases, each version linking to its release page; history is null for a model no
+// release holds. A vehicle, or a site built without history, has none to show.
+function versionsOf(history) {
+  const link = (version) => Object.assign(document.createElement('a'), { href: release.url + version, textContent: version, target: '_blank', rel: 'noopener' });
+  if (history === null) return ['New since ', link(release.version)];
+  return [
+    'Introduced in ', link(history.introduced),
+    ...(history.updated === history.introduced ? [] : [' · Last changed in ', link(history.updated)]),
+    ...(history.changed ? [' · changed on main since ', link(release.version)] : []),
+  ];
+}
+
+// A fact's value is text or a list of text and nodes.
+const definition = (value) => {
+  const dd = document.createElement('dd');
+  dd.append(...[value].flat());
+  return dd;
+};
+
 const kb = (n) => (n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
 
 // A walk loop states a stride distance, so the viewer walks it at the row's authored walk speed.
@@ -82,6 +101,7 @@ const byId = new Map();
 let shown = []; // what the filter selects, or the landing page's few models
 let visible = 0; // how many of `shown` have a card
 let taxonomy = { categories: {}, facets: {} };
+let release = null; // the latest release the models' history is read against: { version, url }, or null without history
 let filter = emptyFilter();
 let drawn = false; // the grid has been built at least once
 let reshuffle = 0; // landing pages asked for since the page opened
@@ -402,11 +422,12 @@ async function openViewer(model, restored = null) {
     ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
     ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
     ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
+    ...(model.history === undefined ? [] : [['Versions', versionsOf(model.history), 'The releases that introduced the model and last changed it.']]),
   ];
   if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
   $('v-facts').replaceChildren(...facts.flatMap(([k, v, title = '']) => [
     Object.assign(document.createElement('dt'), { textContent: k, title }),
-    Object.assign(document.createElement('dd'), { textContent: v }),
+    definition(v),
   ]));
 
   const mats = loaded.materials.length
@@ -587,8 +608,9 @@ async function main() {
     note.textContent = `The 3D previews need WebGL, which this browser did not provide (${err.message}). The models are still listed and can be downloaded from the repository.`;
     $('grid').before(note);
   }
-  const { taxonomy: vocabulary, models, vehicles } = await fetch('models.json').then((r) => r.json());
+  const { taxonomy: vocabulary, models, vehicles, release: latest = null } = await fetch('models.json').then((r) => r.json());
   taxonomy = vocabulary;
+  release = latest;
   registerModels(models);
   entries = [...vehicles, ...models];
   for (const m of entries) byId.set(m.id, m);

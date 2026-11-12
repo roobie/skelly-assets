@@ -1,8 +1,8 @@
 name: assets
 
 # Builds the complete tree from source twice, holds the builds to each other and to the manifest, then publishes the
-# showcase from the build and a release of one archive per pack: a version's on a v* tag, the rolling edge
-# pre-release on a push to main.
+# showcase from the build and a release of one archive per pack: a version's on a v* tag, with the model history that
+# tag extends, the rolling edge pre-release on a push to main.
 on:
   push:
     branches: [main]
@@ -173,7 +173,18 @@ jobs:
         with:
           name: viewers
           path: tools/packages
-      - run: node site/build.mjs --require-viewers --analytics _site
+      # The latest release's model versions; a release without them leaves the showcase without versions rather than
+      # failing a deploy, so the history can be attached to a release after this lands.
+      - name: Fetch the model history
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node tools/model-history.mjs fetch --optional --out "$RUNNER_TEMP/model-history.json"
+      - name: Build the site
+        run: |
+          history=()
+          if [ -f "$RUNNER_TEMP/model-history.json" ]; then history=(--history "$RUNNER_TEMP/model-history.json"); fi
+          node site/build.mjs --require-viewers --analytics "${history[@]}" _site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
@@ -219,6 +230,10 @@ jobs:
           name: built-1
           path: ${{ runner.temp }}/built
       - run: node tools/pack-release.mjs "$RUNNER_TEMP/built" "$RUNNER_TEMP/release"
+      # The previous release's history, merged with this build's hashes; see tools/model-history.mjs.
+      - name: Write the model history
+        if: github.ref_type == 'tag'
+        run: node tools/model-history.mjs release --tag "$GITHUB_REF_NAME" --built "$RUNNER_TEMP/built" --out "$RUNNER_TEMP/release/model-history.json"
       # The body is the tag's CHANGELOG.md section, written at release prep; see changes/README.md, "A release".
       - name: Publish the version release
         if: github.ref_type == 'tag'
