@@ -135,6 +135,3 @@ export const shotshellHullMaterial = (shell: Shotshell): string => {
   }
   return material;
 };
-
-export const shotshellHullColor = (shell: Shotshell): readonly [number, number, number] =>
-  MATERIALS[shotshellHullMaterial(shell)]!.colour;
