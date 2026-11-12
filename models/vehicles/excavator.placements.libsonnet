@@ -40,8 +40,6 @@ local track = import 'track-kit.libsonnet';
       'The centre piece of excavator_carbody runs into the link_45_shoe piece of excavator_track.'),
     site.unjudged('house', 'boom', 0.282,
       'The boom_foot piece of excavator_house runs into the foot piece of excavator_boom.'),
-    site.unjudged('house', 'counterweight', 0.05,
-      'The deck piece of excavator_house runs into the block piece of excavator_counterweight.'),
     site.unjudged('house', 'engine', 0.375,
       'The hood piece of excavator_house runs into the block piece of engine_i6_diesel.'),
     site.unjudged('house', 'fuel_tank', 0.26,

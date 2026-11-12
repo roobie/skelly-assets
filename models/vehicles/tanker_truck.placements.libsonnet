@@ -20,7 +20,5 @@ local s = import 'tanker_truck.spec.libsonnet';
       'The case piece of gearbox_heavy runs into the foot_2 piece of tanker_truck_saddle.'),
     site.unjudged('saddle', 'barrel', 0.185,
       'The high_2 piece of tanker_truck_saddle runs into the shell piece of tanker_truck_barrel.'),
-    site.unjudged('saddle', 'valve_gear', 0.066,
-      'The low_0 piece of tanker_truck_saddle runs into the manifold piece of tanker_truck_valve_gear.'),
   ],
 }

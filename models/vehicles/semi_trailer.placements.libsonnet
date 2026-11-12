@@ -23,10 +23,4 @@ local axleIds = std.range(0, std.length(s.axles) - 1);
   + site.pair('tail_lamp_inner', 'tail_lamp_small', [s.rear - 0.03, 1.14, 0.75])
   + site.pair('roof_lamp', 'marker_lamp', [s.front + 0.03, s.roof - 0.14, 1.1])
   + std.flattenArrays([site.pair('side_lamp_' + i, 'marker_lamp', [-5.4 + 3.6 * i, 1.31, s.side + 0.06]) for i in std.range(0, 3)]),
-  unjudged: [
-    site.unjudged('chassis', 'side_far', 0.058,
-      'The coupler_plate piece of semi_trailer_chassis runs into the front_post_far piece of semi_trailer_side.'),
-    site.unjudged('chassis', 'side_near', 0.058,
-      'The coupler_plate piece of semi_trailer_chassis runs into the front_post piece of semi_trailer_side.'),
-  ],
 }

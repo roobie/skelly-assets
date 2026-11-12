@@ -29,8 +29,6 @@ local s = import 'golf_cart.spec.libsonnet';
       'The dash piece of golf_cart_front_cowl runs into the column piece of golf_cart_steering_column.'),
     site.unjudged('motor', 'pack', 0.06,
       'The lead piece of traction_motor_light runs into the case piece of traction_pack_light.'),
-    site.unjudged('rear_body', 'charge_port', 0.06,
-      'The seat_box piece of golf_cart_rear_body runs into the socket piece of charge_port.'),
     site.unjudged('rear_body', 'inverter', 0.125,
       'The tail piece of golf_cart_rear_body runs into the case piece of inverter_car.'),
     site.unjudged('rear_body', 'motor', 0.116,

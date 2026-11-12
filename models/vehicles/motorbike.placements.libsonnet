@@ -22,8 +22,4 @@ local s = import 'motorbike.spec.libsonnet';
   + site.pair('footrest', 'motorbike_footrest')
   + site.pair('shock', 'motorbike_shock')
   + site.pair('side_cover', 'motorbike_side_cover'),
-  unjudged: [
-    site.unjudged('frame', 'headlamp', 0.054,
-      'The head piece of motorbike_frame runs into the shell piece of motorbike_headlamp.'),
-  ],
 }

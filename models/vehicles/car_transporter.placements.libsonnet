@@ -21,9 +21,5 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
       'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
     site.unjudged('lower_deck', 'deck_posts', 0.058,
       'The plate piece of car_transporter_lower_deck runs into the tail_post_near piece of car_transporter_deck_posts.'),
-    site.unjudged('mudguard_far', 'lower_deck', 0.063,
-      'The guard_1_top_far piece of car_transporter_mudguard runs into the plate piece of car_transporter_lower_deck.'),
-    site.unjudged('mudguard_near', 'lower_deck', 0.063,
-      'The guard_1_top piece of car_transporter_mudguard runs into the plate piece of car_transporter_lower_deck.'),
   ],
 }

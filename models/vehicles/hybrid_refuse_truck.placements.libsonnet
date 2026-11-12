@@ -15,7 +15,5 @@ local s = (import 'truck-cab.libsonnet').spec(import 'refuse_truck.spec.libsonne
   unjudged: [
     site.unjudged('chassis', 'pack', 0.087,
       'The spring_1 piece of refuse_truck_chassis runs into the case piece of traction_pack_van.'),
-    site.unjudged('gearbox', 'motor', 0.06,
-      'The case piece of gearbox_heavy runs into the lead piece of traction_motor_large.'),
   ],
 }

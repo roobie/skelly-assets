@@ -10,8 +10,4 @@ local s = import 'double_decker.spec.libsonnet';
     inverter: { part: 'inverter_large', at: [-3.4, 0.46, -0.46] },
     pack: { part: 'traction_pack_roof_small', at: [0, s.roof, 0] },
   }),
-  unjudged: [
-    site.unjudged('rear_axle', 'motor', 0.054,
-      'The diff piece of beam_axle_truck_bare runs into the reducer piece of traction_motor_large.'),
-  ],
 }
