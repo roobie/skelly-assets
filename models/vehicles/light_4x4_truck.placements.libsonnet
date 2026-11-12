@@ -21,9 +21,11 @@ local shaftRear = s.transferX - 0.2;
       site.one('tailgate', id + '_tailgate'),
     ] + site.pair('dropside', id + '_dropside'),
   ),
+  overlaps: [
+    site.overlap('cab', 'air_box', 0.123,
+      'The air box sits in the cab well, which is drawn as a solid block around it.'),
+  ],
   unjudged: [
-    site.unjudged('cab', 'air_box', 0.123,
-      'The well_aft_near piece of light_4x4_truck_cab runs into the box piece of air_box_medium.'),
     site.unjudged('chassis', 'alternator', 0.084,
       'The spring_0 piece of light_4x4_truck_chassis runs into the case piece of alternator_medium.'),
     site.unjudged('dashboard', 'radiator', 0.058,

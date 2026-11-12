@@ -23,10 +23,4 @@ local raised = [0, s.engineLift, 0];
   ]
   + site.pair('footrest', 'motorbike_footrest', raised)
   + site.pair('side_panel', 'dirt_bike_side_panel'),
-  unjudged: [
-    site.unjudged('frame', 'swingarm', 0.08,
-      'The pivot_plate piece of dirt_bike_frame runs into the pivot_tube piece of dirt_bike_swingarm.'),
-    site.unjudged('tank', 'seat', 0.05,
-      'The tank piece of dirt_bike_tank runs into the saddle_nose piece of dirt_bike_seat.'),
-  ],
 }

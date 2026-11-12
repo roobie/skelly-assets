@@ -13,10 +13,4 @@ local s = import 'city_bus.spec.libsonnet';
     pack: { part: 'traction_pack_roof', at: [1.0, s.roof, 0] },
     port: { part: 'charge_port', at: [-4.8, 0.62, s.side] },
   }),
-  unjudged: [
-    site.unjudged('shell', 'charge_port', 0.06,
-      'The near_skirt_0 piece of city_bus_shell runs into the socket piece of charge_port.'),
-    site.unjudged('shell', 'motor', 0.06,
-      'The floor_rear_0 piece of city_bus_shell runs into the stator piece of traction_motor_large.'),
-  ],
 }

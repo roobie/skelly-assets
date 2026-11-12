@@ -26,12 +26,12 @@ local seatAcross = s.across - s.floor;
     // Sheared off in the roll, it has rolled clear and fallen flat on the road.
     one('wheel_loose', 'overturned_delivery_van_wheel', [3.3, 0.11, 1.5]),
   ],
-  unjudged: [
-    site.unjudged('chassis', 'wheel_front_up', 0.08,
-      'The drum piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
-    site.unjudged('chassis', 'wheel_rear_road', 0.059,
-      'The axle_rear piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
-    site.unjudged('chassis', 'wheel_rear_up', 0.059,
-      'The axle_rear piece of overturned_delivery_van_chassis runs into the rim piece of overturned_delivery_van_wheel.'),
+  overlaps: [
+    site.overlap('chassis', 'wheel_front_up', 0.08,
+      'The front drum runs up into the rim of the wheel on it.'),
+    site.overlap('chassis', 'wheel_rear_road', 0.059,
+      'The rear axle runs on into the rim of the wheel on it.'),
+    site.overlap('chassis', 'wheel_rear_up', 0.059,
+      'The rear axle runs on into the rim of the wheel on it.'),
   ],
 }

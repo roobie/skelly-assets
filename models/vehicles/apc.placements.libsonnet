@@ -56,7 +56,5 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
       'The cheek_near piece of apc_hull_nose runs into the plate piece of apc_hull_roof.'),
     site.unjudged('radiator', 'exhaust', 0.06,
       'The core piece of radiator_truck runs into the pipe piece of exhaust_military.'),
-    site.unjudged('rear', 'tow_hitch', 0.06,
-      'The sill piece of apc_hull_rear runs into the bar piece of tow_hitch.'),
   ],
 }
