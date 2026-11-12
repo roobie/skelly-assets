@@ -118,10 +118,12 @@ const revolved = (id: string, profile: RevolvedSolid['profile'], slot: string): 
 const metallicSolids = (cartridge: Extract<Cartridge, { kind: 'metallic' }>) => {
   const profiles: RoundProfiles = roundProfiles(cartridge);
   return {
+    // The bullet's seated length lies inside the case, within a voxel of its wall; a later solid takes a shared voxel,
+    // so the case comes after the bullet and the round shows brass to the mouth.
     round: [
+      revolved('bullet', profiles.bullet, 'bullet'),
       revolved('case', profiles.loadedCase, 'case'),
       revolved('primer', profiles.primer, 'primer'),
-      revolved('bullet', profiles.bullet, 'bullet'),
     ],
     case: [revolved('case', profiles.firedCase, 'case'), revolved('primer', profiles.primer, 'primer')],
   };
