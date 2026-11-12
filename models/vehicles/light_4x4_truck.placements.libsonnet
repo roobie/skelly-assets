@@ -26,8 +26,6 @@ local shaftRear = s.transferX - 0.2;
       'The well_aft_near piece of light_4x4_truck_cab runs into the box piece of air_box_medium.'),
     site.unjudged('chassis', 'alternator', 0.084,
       'The spring_0 piece of light_4x4_truck_chassis runs into the case piece of alternator_medium.'),
-    site.unjudged('dashboard', 'radiator', 0.058,
-      'The lower piece of light_4x4_truck_dashboard runs into the core piece of radiator_van.'),
     site.unjudged('engine', 'spare_wheel', 0.093,
       'The head piece of engine_v8_petrol_medium_core runs into the tyre piece of light_4x4_truck_spare_wheel.'),
     site.unjudged('fuel_pump', 'spare_wheel', 0.07,

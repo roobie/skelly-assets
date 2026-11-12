@@ -20,8 +20,4 @@ local s = t.spec(import 'bucket_truck.spec.libsonnet');
   + site.pair('locker', 'bucket_truck_locker')
   + site.pair('jack', 'bucket_truck_jack'),
   tags: { 'vehicle-role': ['utility'] },
-  unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of box_truck_dashboard runs into the core piece of radiator_truck.'),
-  ],
 }

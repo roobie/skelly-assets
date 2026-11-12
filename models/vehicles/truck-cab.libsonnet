@@ -38,6 +38,10 @@ local defaults = {
   raisedSeat: true,
   seatY: self.floor + (if self.raisedSeat then 0.2 else 0),
   dashDepth: 0.52,
+  // A cab-over's radiator rises through the cab floor under the dash, so the lower dash block stops at it.
+  dashLowerBack:
+    local back = self.face - std.min(0.34, self.dashDepth - 0.04);
+    if self.bonnet == null then std.max(back, self.radiatorX + cooling.front) else back,
   binnacle: self.dashDepth >= 0.45,
   guard: true,
   guardTop: 2 * self.r + 0.06,
@@ -157,7 +161,7 @@ local pressings(id, title, s0) = {
       prism('glass', 'glass', [[s.face - 0.05, s.waist], [s.face - 0.01, s.waist], [roofFront - 0.01, s.roof], [roofFront - 0.05, s.roof]], [-s.glassIn, s.glassIn]),
     ], { glass: 'glass-clear' }),
     part('_dashboard', 'dashboard', 25, [
-      box('lower', 'trim', [s.face - std.min(0.34, s.dashDepth - 0.04), s.floor, -s.skin + 0.04], [s.face - 0.1, s.waist - 0.2, s.skin - 0.04]),
+      box('lower', 'trim', [s.dashLowerBack, s.floor, -s.skin + 0.04], [s.face - 0.1, s.waist - 0.2, s.skin - 0.04]),
       box('top', 'trim', [s.face - s.dashDepth, s.waist - 0.2, -s.skin + 0.04], [s.face - 0.04, s.waist - 0.04, s.skin - 0.04]),
     ], paint),
     part('_rear_underrun', 'rear underrun', 30, [

@@ -16,8 +16,4 @@ local site = import 'site.libsonnet';
     ],
   ),
   tags: { 'vehicle-role': ['emergency'] },
-  unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of fire_engine_dashboard runs into the core piece of radiator_truck.'),
-  ],
 }

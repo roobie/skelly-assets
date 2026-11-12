@@ -17,8 +17,6 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
   + site.pair('high_lamp', 'tail_lamp_tall', [s.hopperRear - 0.01, s.hopperSill + 0.05, 1.2]),
   tags: { 'vehicle-role': ['utility'] },
   unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of refuse_truck_dashboard runs into the core piece of radiator_truck.'),
     site.unjudged('mudguard_far', 'hopper', 0.036,
       'The guard_1_aft_far piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
     site.unjudged('mudguard_near', 'hopper', 0.036,

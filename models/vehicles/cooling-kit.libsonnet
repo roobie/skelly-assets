@@ -77,6 +77,8 @@ local fittings(name) =
     assembly.rows(fusedId(name), coreId(name), radiators[name].title, radiators[name].title + ' core', radiators[name].massKg, coreDrawn(radiators[name], classOf(name)), fittings(name))
     for name in std.objectFields(radiators)
   ]),
+  // How far the side tanks reach forward of a radiator's frame, so a part ahead of the radiator can stand clear of it.
+  front: core.half + core.tank,
   // The radiators, by the names `sites` takes.
   names: std.objectFields(radiators),
   // Every site a radiator can take, so a vehicle that loses its engine can drop them all.

@@ -17,8 +17,6 @@ local site = import 'site.libsonnet';
     ] + site.pair('roller_stand', 'cement_mixer_roller_stand'),
   ),
   unjudged: [
-    site.unjudged('dashboard', 'radiator', 0.06,
-      'The lower piece of tipper_truck_dashboard runs into the core piece of radiator_truck.'),
     site.unjudged('drive', 'drum', 0.238,
       'The pedestal piece of cement_mixer_drive runs into the band_0 piece of cement_mixer_drum.'),
     site.unjudged('drum', 'hopper', 0.058,
