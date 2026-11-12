@@ -7,6 +7,99 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.6.0 - 2026-11-12
+
+### Breaking
+
+- The CV9040 shares the main battle tank's armoured hull: its side skirts come off as `cv9040_side_skirt`, and its
+  transmission is `cv9040_transmission`.
+- The player doll's fingers bend at every joint and its thumb has three bones, so a pose can curl a hand round a grip.
+  Gloves follow suit: each glove's single `_worn_fingers` shell is now one shell per finger bone and per thumb bone.
+
+### Upgrading from 0.5.0
+
+- Apply `renames.json`; `cross_drive_transmission` maps to `cv9040_transmission`.
+- Where you dress a figure in a glove's `_worn_fingers` shell, dress it in the glove's per-bone shells instead, as the manifest lists them.
+
+### Added
+
+- Airport crash tender: a 6x6 lime-yellow fire truck with a roof water cannon, a bumper turret, roller-shutter lockers and separable tanks, pump and turrets. It brings a 14.00 R25 flotation wheel (`wheel_385_95r25`), wide driven and steered axles (`beam_axle_wide`, `steered_axle_wide`) and the `paint-lime-yellow` finish.
+- The anti-materiel rifle exports as `rifle_anti_materiel`, a rifle in the firearms pack, without an optic: its receiver rail
+  takes the pack's optics as attachments. It has a magazine slot, and its ten-round `50-bmg` magazine exports loose as
+  `magazine_bmg_10`. The gun tool's anti-materiel template generates rifles chambered in `50-bmg`.
+- For game developers: a new bolt carbine variant, `bolt_carbine_drum`, fed from a rotary drum of rocket bolts in place
+  of the box magazine.
+- For game developers: a new vehicle, `bulldozer`, a 20-tonne crawler dozer in construction yellow with a high-drive
+  track, a ROPS cab, a semi-U blade on push arms and a three-shank ripper. Its blade, push arms, cylinders, ripper,
+  shanks, engine panels, doors and track wheels are parts of their own, and it reuses existing engine, gearbox, radiator,
+  seat and lamp parts.
+- For game developers: smooth rounds and cases for .338 Lapua Magnum, 7.62×54mmR, .50 BMG, the 40 mm Bofors L/70 shell
+  and the 120 mm smoothbore tank shell (`round_`/`case_` plus `338_h_lapua_h_magnum`, `7_d_62x54r`, `50_h_bmg`,
+  `40x365r`, `120x570`). The .308 Winchester round also serves 7.62×51mm, and the anti-materiel rifle chambers .50 BMG. The shells carry
+  the new `cannon` weapon class.
+- For game developers: the improvised and riot armour, wetsuits and swimwear, costumes, underwear, alchemy gear, and a few tools, medicines and supplies carry search keywords in their manifest entries, such as `diving`, `alchemy`, `police` and `cooking`.
+- For game developers: catalogue models in the first 49 batches, such as ovens, propane tanks, medicines, cookware and
+  instruments, carry search keywords, for example `cooking`, `fuel`, `painkiller` and `music`. The showcase's search
+  finds them by those words.
+- For game developers: models carry search keywords. The keyword vocabulary in `models/taxonomy.json` now gives each
+  word its meaning, and zombies, dragons, elementals, insects, the pipe rifle and its parts, scopes and silencers are the
+  first models to carry them.
+- A galvanised steel trash can, `galvanised_trashcan`, with a lid that lifts off, and the same can kicked in,
+  `galvanised_trashcan_dented`: its wall caved in, leaning and its lid knocked askew. Each is a `body` and a `lid` part.
+- For game developers: the recreation pack gains gym equipment, tagged `place: gym`: hex, heavy and light dumbbells,
+  an empty and a loaded standard 20 kg barbell, bumper and cast iron plates, three kettlebells, an adjustable weight bench, a
+  power rack, a treadmill, an air rower, a flat and a rolled exercise mat, a plate tree and a dumbbell rack.
+- `tools/packages/impact-synth` renders an object dropped on a surface to samples from a Jsonnet row, the same samples
+  for the same row, seed and sample rate. The first rows, `brass-on-concrete` and `glass-on-concrete`, are in
+  `models/sounds/impacts.jsonnet`.
+- For game developers: more catalogue models carry search keywords for their use, common name or scene, such as `cooking`, `camping`, `metalworking`, `archery`, `military`, `improvised` and `toy`.
+- For game developers: the catalogue's worn clothing, headwear, jewellery and bag models carry search keywords for the
+  occasion or trade they belong to, such as `cold-weather`, `costume`, `firefighting`, `jewellery`, `luggage`, `military`,
+  `religious` and `safety-gear`.
+- A generic main battle tank, `main_battle_tank`, of about 60 t: its turret, 120 mm gun, sights, hatches, smoke
+  dischargers, bustle basket, tracks, wheels, skirts, V12 engine and transmission each come off as their own part.
+- For game developers: a model's manifest entry can carry a `place` tag, where the thing is typically found (first term
+  `gym`), and `keywords`, extra kebab-case search words. The gym bags are tagged `place: gym`, and the showcase's search
+  finds models by their keywords.
+- The pose page plays the press check as a clip: the doll carries the rifle through its eight key frames, the charging handle drawing and closing as it goes. Frames collected on the page keep what the hands held too, so a clip built across held poses moves the item's parts with it.
+- For game developers: mobgen can generate a new boss-scale mob, `security-walker`, an armoured reverse-knee guard walker with a stomping walk, a servo-twitch idle and a twin-pod fire clip, in a slate, charcoal and warning-yellow finish. It is not yet in the exported mob packs.
+- `security_walker_sleek` joins `skelly.ground-vehicles` as a separate security-walker derivative, with a shallow faceted upper hull, recessed rotary bearing, CV9040 optical fittings and rear cooling module. Each detachable weapon pod carries an ammo cassette and enclosed segmented gun feed. A floodlight and paired guarded headlamps sit on the fixed hull's front, with another headlamp pair on the turret. It reuses the original walker's legs, hydraulics and detachable weapon modules; the original assembly is unchanged. Its authored rotary interface and equipment are static geometry, without runtime articulation, animation, simulated lighting or ammunition transport.
+- For game developers: a new vehicle, `security_walker`, an armoured walker on two reverse-knee legs with clawed feet, a
+  sensor window in place of a cab, a weapon pod on each flank and warning stripes. Each leg's thigh, shin, tarsus, foot,
+  hip drive, ram barrels, ram rods and hoses are parts of their own with `pivot`, joint and ram-eye anchors, so a rig can
+  turn the joints and slide the rams; it reuses existing engine, radiator, fuel tank, battery, gun, hatch and lamp parts.
+- The showcase tells an assembly, which is built from other models or from several components, from an atom, which is one piece. The model panel states it, and a Form filter picks either, kept in the link as `form=`. `models.json` carries it as each entry's `form`, derived from its sites and components rather than tagged.
+- For mod authors: the showcase's viewer shows a model's mass and folds its metadata into a panel that lists its parts
+  with their masses, linking each part that is a model of its own, beside its manifest entry and sidecar.
+- The showcase's model panel shows a model's category, mass and density. The manifest now carries `massKg` and `volumeM3` (the volume of the voxels the model is drawn with) for every catalogue model; a vehicle's panel sums its parts.
+- The showcase's header links its tools: the pose and model look pages and the mob, gun, thing and vehicle viewers.
+
+### Changed
+
+- For game developers: the bolt guns have a new skeleton stock with a raised comb, cheek pads, a brass butt plate and a
+  rubber pad, which makes each gun about 0.1 m longer, and bevelled slabs in place of raw boxes. The bolt carbine's
+  magazine is straight, square to the bore, and deeper fore and aft, because its rocket bolts are longer.
+- 7.62×39mm and 7.62×54mmR rounds and cases now have grey polymer-coated steel cases; other cartridges stay brass. The viewer's brass and copper now use the content's matte finish.
+- The `polymer-fde` finish is a darker, greyer flat dark earth instead of a pale tan, so the anti-materiel rifle's stock
+  and grip and every catalogue item finished in it, such as ration pouches and the tan helmet, look darker.
+- The manifest carries `massKg` for a gun, a gun part and any other model whose tool weighs its parts but gives no total, as the sum of the parts' masses; `volumeM3` stays out for them.
+- For game developers: undead mobs carry the new keyword `undead`: every zombie, which keeps `zombie`, and the
+  death-knight bestiary mob. The `place` facet gains `bathroom`, `farm`, `hospital`, `kitchen`, `laboratory`, `office`
+  and `workshop`, applied to the household objects, tools, machines, appliances and instruments that clearly belong in
+  them.
+- The showcase opens on a handful of models chosen afresh each day instead of drawing all of them, and shows the rest only once a search, a category or a filter selects them, a page at a time. It gains a combobox for keywords and one for each tag facet, and the page keeps its whole state in the URL hash (filter, open model and its view, unfolded details), so any view can be shared as a link.
+- The pose page's press check plays at a shooter's pace, each key frame at its own time with eased moves, about three and a half seconds in all. Seconds scales that timing.
+- For game developers: rounds and spent cases are drawn as faceted lathes with the same side count as optic bodies,
+  instead of voxels. Small features land unevenly on any voxel grain, so cartridges start smooth; voxelizing them is
+  revisited if the clash with the voxel guns bothers players.
+
+### Fixed
+
+- The night vision goggles' and headlamp's straps follow the player bust's hair all round, one strap voxel off it, as a
+  narrower band that sits lower on the goggles and higher on the headlamp; their strap anchors move with them, and the
+  bust's crown hair sits a little further back.
+- A thin gun part, such as the AR charging handle or a revolver trigger, draws at the fine detail grain and no longer zigzags between two voxel layers.
+
 ## 0.5.0 - 2026-11-11
 
 ### Breaking
