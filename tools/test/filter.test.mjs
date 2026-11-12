@@ -90,6 +90,13 @@ test('states with the same filter and reshuffle draw the same grid, whichever mo
   assert.ok(!sameGrid(base, { ...base, reshuffle: 1 }));
 });
 
+test('the order in which dimensions were picked does not make a state a different grid', () => {
+  const picked = (picks) => ({ ...emptyState(), filter: filterOf({ picks }) });
+  const live = picked({ material: ['wood'], [FORM]: ['atom'], [KEYWORD]: ['entrance'] });
+  assert.ok(sameGrid(live, parseState(stateHash(live))));
+  assert.ok(sameGrid(live, picked({ [KEYWORD]: ['entrance'], [FORM]: ['atom'], material: ['wood'] })));
+});
+
 test('the form dimension filters like a tag facet and round-trips through its own hash token', () => {
   const formed = [{ ...model('a', null), form: 'atom' }, { ...model('b', null), form: 'assembly' }, { ...model('c', null, { form: ['atom'] }), form: 'assembly' }];
   const picked = (terms, more = {}) => formed.filter((e) => matches(e, filterOf({ picks: { [FORM]: terms, ...more } }))).map((e) => e.id);

@@ -75,7 +75,11 @@ export function stateHash({ filter, reshuffle, model, view, info }) {
   if (model && info) params.set('info', '1');
   if (filter.q.trim()) params.set('q', filter.q.trim());
   if (filter.shelf !== ALL) params.set('cat', filter.shelf);
-  for (const [dimension, terms] of Object.entries(filter.picks)) {
+  // Dimensions go in a fixed order, not the order the reader picked them, so that the hash a state writes is the one it
+  // parses back to and sameGrid does not mistake a reordering for a different grid.
+  const rank = (dimension) => [KEYWORD, FORM].indexOf(dimension) + 1 || Number.MAX_SAFE_INTEGER;
+  const ordered = Object.entries(filter.picks).sort(([a], [b]) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0));
+  for (const [dimension, terms] of ordered) {
     for (const term of terms) {
       if (dimension === KEYWORD) params.append('kw', term);
       else if (dimension === FORM) params.append('form', term);
