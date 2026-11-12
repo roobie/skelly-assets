@@ -1,6 +1,6 @@
 // model-history.json: for each GLB model id and each vehicle id (its placements file), the release that introduced it,
-// the release that last changed its file and the file's hash, so the showcase can say when a model appeared and moved. Builds are reproducible (the assets workflow
-// holds two builds equal), so a hash differs between releases only when the model really changed. Each release carries
+// the release that last changed its file and the file's hash, so the showcase can say when a model appeared and moved. Builds are
+// reproducible (the assets workflow holds two builds equal), so a hash differs between releases only when the model really changed. Each release carries
 // the cumulative file, built from the previous release's; why the history is not read from git is that a model's id and
 // source move, while its published bytes are what a consumer sees.
 // A model absent from a release leaves the history, so one that returns is new again: a gap in the releases is a gap a
@@ -150,7 +150,8 @@ function releaseCommand({ tag, built, out }) {
     rmSync(dir, { recursive: true, force: true });
     // A silent fresh start would stamp every model as introduced now, and that error could not be undone later.
     if (previous === undefined) {
-      throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>\` and attach it to that release`);
+      const backfill = `node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>`;
+      throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`${backfill}\` and attach it to that release`);
     }
   }
   const manifest = readJson(join(built, MANIFEST));
@@ -192,7 +193,8 @@ function backfillCommand({ out, work }) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const [command, ...rest] = process.argv.slice(2);
   const text = { type: 'string' };
-  const { values } = parseArgs({ args: rest, options: { tag: text, built: text, out: text, work: text, optional: { type: 'boolean', default: false } } });
+  const options = { tag: text, built: text, out: text, work: text, optional: { type: 'boolean', default: false } };
+  const { values } = parseArgs({ args: rest, options });
   const commands = { release: releaseCommand, fetch: fetchCommand, backfill: backfillCommand };
   if (!commands[command] || !values.out) {
     throw new Error('usage: node tools/model-history.mjs release|fetch|backfill --out <file> (see the file header)');
@@ -200,6 +202,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   if (command === 'backfill' && !values.work) {
     throw new Error('backfill needs --work <dir>, where it downloads each release and deletes it again');
   }
-  if (command === 'release' && !(values.tag && values.built)) throw new Error('release needs --tag <v*> and --built <dir>');
+  if (command === 'release' && !(values.tag && values.built)) {
+    throw new Error('release needs --tag <v*> and --built <dir>');
+  }
   commands[command]({ ...values, out: resolve(values.out) });
 }
