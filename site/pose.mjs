@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
-import { clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames.mjs';
+import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -84,7 +84,7 @@ function worldMesh(object) {
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
-// joint, `pieces` lists the worn pieces with the bones they ride, and `clearance()` gives the figure's covered surface
+// joint, `pieces` lists the worn pieces with the bones they ride, `held` the items it has carried (`carry`), and `clearance()` gives the figure's covered surface
 // at rest and the clearance probe over it, made when first asked for, since a figure drawn only to be looked at needs
 // neither. A piece rides the bone of the part copy it is drawn in (its site's part and side); what no bone carries,
 // such as a wearable placed whole, stays where the dressing put it.
@@ -130,7 +130,7 @@ export async function buildFigure(data, wear) {
     }
     return clearance;
   };
-  return { rig, root, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered };
+  return { rig, root, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered, held: new Map() };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
@@ -190,8 +190,6 @@ const spanOf = (clip, walkSpeed) => {
   if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / walkSpeed;
   return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
-// A clip at `phase`, 0 to 1 of its span; a loop's cursor is its phase, a finite clip's its seconds.
-const clipAt = (clip, phase, span) => sampleClip(clip, clip.loop ? phase : phase * span, slerp);
 // A clip of the rig's frames, its span stated the way its loop needs.
 const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), frames });
 
@@ -258,52 +256,115 @@ function partNode(obj, model, part) {
   return found[0];
 }
 
-// Slides the part `part` of `obj` the share `share` of the way along its linear motion, whose ends are in the part's own
-// axes and in the model's unit, which the model's root node states (the gun exporter's `gungen` extras).
-function movePart(obj, model, part, share) {
-  const node = partNode(obj, model, part);
-  const { motion } = node.userData;
-  if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
-  let unit;
-  for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
-  if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
-  const stroke = new THREE.Vector3(...motion.rearmost).sub(new THREE.Vector3(...motion.rest)).multiplyScalar(share * unit);
-  node.position.add(stroke.applyQuaternion(node.quaternion));
+// A copy of a held model at rest, `obj`, and `move(moved)`, which stands each moving part the share `moved` gives it
+// (a pose file's `moved` for the model) of the way along its linear motion and the rest at rest. A motion's ends are in
+// the part's own axes and in the model's unit, which the model's root node states (the gun exporter's `gungen` extras).
+function heldItem(scene, model) {
+  const obj = scene.clone(true);
+  const slides = new Map();
+  const slideOf = (part) => {
+    if (slides.has(part)) return slides.get(part);
+    const found = [];
+    obj.traverse((node) => { if (node.userData.part === part) found.push(node); });
+    if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
+    const [node] = found;
+    const { motion } = node.userData;
+    if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
+    let unit;
+    for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
+    if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
+    const rest = node.position.clone();
+    const stroke = new THREE.Vector3(...motion.rearmost).sub(new THREE.Vector3(...motion.rest)).multiplyScalar(unit).applyQuaternion(node.quaternion);
+    const slide = (share) => node.position.copy(rest).addScaledVector(stroke, share);
+    slides.set(part, slide);
+    return slide;
+  };
+  const move = (moved = {}) => {
+    for (const part of Object.keys(moved)) slideOf(part);
+    for (const [part, slide] of slides) slide(moved[part] ?? 0);
+  };
+  return { obj, move };
 }
 
-// The items a pose file holds, each loaded once at the origin, its parts moved as the file says: its object to carry
-// and its mesh for the grip to close on.
-async function heldItems(file) {
-  const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
-  return new Map(await Promise.all(models.map(async (model) => {
-    const { scene } = await loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] });
-    const obj = scene.clone(true);
-    for (const [part, share] of Object.entries(file.moved?.[model] ?? {})) movePart(obj, model, part, share);
-    obj.updateMatrixWorld(true);
-    return [model, { obj, mesh: worldMesh(obj) }];
-  })));
+// Each held model's scene, loaded once at the origin.
+const heldScenes = new Map();
+function heldScene(model) {
+  if (!heldScenes.has(model)) heldScenes.set(model, loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] }).then(({ scene }) => scene));
+  return heldScenes.get(model);
+}
+
+// The mesh a grip closes on: the model with its parts moved as the pose file says, in the model's own axes.
+async function heldMesh(model, moved) {
+  const { obj, move } = heldItem(await heldScene(model), model);
+  move(moved);
+  obj.updateMatrixWorld(true);
+  return worldMesh(obj);
 }
 
 /**
- * Poses the figure by a pose file and puts what it holds in its hands: the held items are loaded, the grips close on
- * their meshes, and each item is placed where the pose holds it, under the joint of the first hand holding it, so a
- * later frame (a slider, a clip, a ground lift) carries it with that hand. One item held by both hands is placed once.
- * Gives the compile result and `release()`, which takes the items out of the hands again.
+ * Puts the carried items in the figure's hands, taking out what is not carried. A carry is `{ model, hand, at, turn,
+ * moved }`: the item under the joint of `hand`, at `at` and turned by the quaternion `turn` in that joint's axes, its
+ * parts moved by `moved`. Each model is carried once, so the figure keeps one copy of it.
+ */
+async function carry(figure, carries) {
+  for (const { model } of carries) if (!figure.held.has(model)) figure.held.set(model, heldItem(await heldScene(model), model));
+  carryLoaded(figure, carries);
+}
+// `carry`, for items the figure has carried before, at once, so a playing clip moves them on the frame it draws.
+function carryLoaded(figure, carries) {
+  const kept = new Set(carries.map(({ model }) => model));
+  for (const [model, { obj }] of figure.held) if (!kept.has(model)) obj.removeFromParent();
+  for (const { model, hand, at, turn, moved } of carries) {
+    const { obj, move } = figure.held.get(model);
+    figure.bones.get(hand).joint.add(obj);
+    obj.position.fromArray(at);
+    obj.quaternion.fromArray(turn);
+    move(moved);
+  }
+}
+
+// The carries between `a` and `b` at the weight `w` of `b`: the place in the hand and the parts' shares blended when both
+// carry the same models in the same hands; otherwise the nearer one, as a change of grip has no way between.
+function blendCarries(a, b, w) {
+  const same = a.length === b.length && a.every((c, k) => c.model === b[k].model && c.hand === b[k].hand);
+  if (!same) return w < 0.5 ? a : b;
+  const lerp = (x, y) => x + (y - x) * w;
+  return a.map((c, k) => {
+    const d = b[k];
+    const parts = new Set([...Object.keys(c.moved), ...Object.keys(d.moved)]);
+    return {
+      model: c.model,
+      hand: c.hand,
+      at: c.at.map((x, axis) => lerp(x, d.at[axis])),
+      turn: slerp(c.turn, d.turn, w),
+      moved: Object.fromEntries([...parts].map((part) => [part, lerp(c.moved[part] ?? 0, d.moved[part] ?? 0)])),
+    };
+  });
+}
+
+/**
+ * Poses the figure by a pose file and puts what it holds in its hands: the grips close on the held items' meshes, and
+ * each item is carried by the first hand holding it, so a later frame (a slider, a clip, a ground lift) moves it with
+ * that hand. Gives the compile result and the carries.
  */
 async function holdPose(figure, rig, file) {
-  const items = await heldItems(file);
-  const compiled = compilePose(rig, file, { meshOf: (model) => items.get(model).mesh });
+  const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
+  const meshes = new Map(await Promise.all(models.map(async (model) => [model, await heldMesh(model, file.moved?.[model])])));
+  const compiled = compilePose(rig, file, { meshOf: (model) => meshes.get(model) });
   applyFrame(figure, compiled.frame);
-  const placed = new Map(Object.entries(compiled.held).map(([hand, item]) => [JSON.stringify(item), { hand, item }]));
-  const carried = [...placed.values()].map(({ hand, item: { model, r, t } }) => {
-    const obj = items.get(model).obj.clone(true);
-    new THREE.Matrix4().set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1).decompose(obj.position, obj.quaternion, obj.scale);
-    figure.root.add(obj);
-    figure.root.updateMatrixWorld(true);
-    figure.bones.get(hand).joint.attach(obj);
-    return obj;
+  figure.root.updateMatrixWorld(true);
+  const firstHands = new Map();
+  for (const [hand, item] of Object.entries(compiled.held)) if (!firstHands.has(item.model)) firstHands.set(item.model, { hand, item });
+  const carries = [...firstHands.values()].map(({ hand, item: { model, r, t } }) => {
+    const inRoot = new THREE.Matrix4().set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1);
+    const joint = figure.bones.get(hand).joint;
+    const inHand = joint.matrixWorld.clone().invert().multiply(figure.root.matrixWorld).multiply(inRoot);
+    const at = new THREE.Vector3(), turn = new THREE.Quaternion();
+    inHand.decompose(at, turn, new THREE.Vector3());
+    return { model, hand, at: at.toArray(), turn: turn.toArray(), moved: file.moved?.[model] ?? {} };
   });
-  return { ...compiled, carried, release: () => { for (const obj of carried) obj.removeFromParent(); } };
+  await carry(figure, carries);
+  return { ...compiled, carries };
 }
 
 // The figure the last call drew, kept for the next while it asks for the same wear, so a sweep through poses builds
@@ -327,17 +388,17 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   const data = await ready;
   const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
-  const { frame, report, carried, release } = await holdPose(figure, data.rig, file);
+  const { frame, report, carries } = await holdPose(figure, data.rig, file);
   const found = probing ? probe(figure, frame) : null;
   const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
   if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
-  const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carried] };
+  const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carries.map(({ model }) => figure.held.get(model).obj)] };
   const png = views === 'eye' ? drawEyeTile(figure.root, size, figure) : drawTile(figure.root, size, views, closeUp);
   // The marks would draw over the skin check's masks.
   figure.marks.clear();
   const skinFound = skin ? skinCheck(figure.root, size, views) : null;
   // The figure is kept for the next call, which holds what its own pose holds.
-  release();
+  carryLoaded(figure, []);
   return { png, pieces: figure.pieces, report, clearance: found, skin: skinFound, frame };
 }
 
@@ -458,7 +519,7 @@ async function startPage(data, query) {
   const { rig } = data;
   const byId = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const wear = query.get('wear')?.split(',').filter(Boolean) ?? [];
-  const state = { root: [0, 0, 0], angles: identityAngles(rig) };
+  const state = { root: [0, 0, 0], angles: identityAngles(rig), carries: [] };
   const view = viewport($('view'));
   const target = new THREE.Mesh(new THREE.SphereGeometry(0.015), new THREE.MeshBasicMaterial({ color: 0xb5532c, depthTest: false }));
   target.visible = false;
@@ -499,12 +560,10 @@ async function startPage(data, query) {
   };
   // A fixture by name or a pose file object, compiled and taken on with what it holds in place of what the last one held,
   // its report shown and the view framed on it.
-  let holding = { release: () => {} };
   const show = shownError('report', async (pose) => {
     const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose;
-    holding.release();
-    holding = await holdPose(figure, rig, file);
-    const { frame, report } = holding;
+    const { frame, report, carries } = await holdPose(figure, rig, file);
+    state.carries = carries;
     take(frame);
     view.show(figure.root);
     $('report').textContent = describe(report);
@@ -551,17 +610,28 @@ async function startPage(data, query) {
     $('ik-report').textContent = describe({ clamped, residuals: { [end.id]: residual } });
   });
 
-  // Clip: frames collected here, a clip file opened or one of the clip actor's clips, scrubbed and played.
-  const clip = { frames: [], phase: 0, playing: false, actor: null };
+  // Clip: frames collected here, a sequence of fixtures, a clip file opened or one of the clip actor's clips, scrubbed
+  // and played. Collected frames and a sequence's keep what the hands carry at each frame (`carries`, one per frame), so
+  // a held item's place in the hand and its moving parts follow the clip; the others leave the hands as they are.
+  const clip = { frames: [], carries: [], phase: 0, playing: false, actor: null };
   const span = () => (clip.actor ? spanOf(clip.actor, rig.clips.walkSpeed) : Number($('clip-seconds').value));
   const current = () => clip.actor ?? authoredClip(clip.frames, $('clip-loop').checked, span());
   const seek = (phase) => {
     clip.phase = phase;
     $('clip-scrub').value = phase;
-    take(clipAt(current(), phase, span()));
+    const playing = current();
+    // A loop's cursor is its phase, a finite clip's its seconds.
+    const cursor = playing.loop ? phase : phase * span();
+    if (clip.carries) {
+      const { i, j, w } = clipKeys(playing, cursor);
+      state.carries = blendCarries(clip.carries[i], clip.carries[j], w);
+      carryLoaded(figure, state.carries);
+    }
+    take(sampleClip(playing, cursor, slerp));
   };
-  const setClip = (frames, { actor = null, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
+  const setClip = (frames, { actor = null, carries = null, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
     clip.frames = frames;
+    clip.carries = carries;
     clip.actor = actor;
     $('clip-loop').checked = loop;
     $('clip-seconds').value = round(seconds, 3);
@@ -586,26 +656,55 @@ async function startPage(data, query) {
     requestAnimationFrame(step);
   };
   $('clip-play').addEventListener('click', () => (clip.playing ? stop() : play()));
+  // A frame added to an opened clip file carries nothing, as the file's frames do not say what the hands held.
   $('clip-add').addEventListener('click', () => {
-    setClip([...(clip.actor ? [] : clip.frames), frameOf(rig, state)]);
+    const [frames, carries] = clip.actor ? [[], []] : [clip.frames, clip.carries];
+    setClip([...frames, frameOf(rig, state)], { carries: carries && [...carries, state.carries] });
     $('clip-source').value = '';
   });
-  $('clip-clear').addEventListener('click', () => { stop(); setClip([]); $('clip-source').value = ''; });
+  $('clip-clear').addEventListener('click', () => { stop(); setClip([], { carries: [] }); $('clip-source').value = ''; });
   $('clip-scrub').addEventListener('input', () => seek(Number($('clip-scrub').value)));
-  $('clip-seconds').addEventListener('change', () => { clip.actor = null; $('clip-source').value = ''; });
-  $('clip-loop').addEventListener('change', () => { clip.actor = null; $('clip-source').value = ''; });
+  // An actor clip retimed is collected frames; a sequence retimed keeps its carries.
+  const retimed = () => {
+    if (clip.actor) clip.carries = null;
+    clip.actor = null;
+    $('clip-source').value = '';
+  };
+  $('clip-seconds').addEventListener('change', retimed);
+  $('clip-loop').addEventListener('change', retimed);
   // The clip actor's clips (the rig's `clips`), each frame folded onto the doll's bones.
   const actorClips = clipSet(await fetch(`built/${rig.clips.file}`).then((r) => r.json()));
   const named = Object.entries(actorClips).filter(([, c]) => playable(c) && c.frames.length > 1);
-  $('clip-source').append(new Option('(authored)', ''), ...named.map(([name]) => new Option(name, name)));
-  $('clip-source').addEventListener('change', () => {
+  const sequences = new Map(Object.entries(rig.sequences).map(([name, fixtures]) => [`sequence ${name}`, { name, fixtures }]));
+  $('clip-source').append(
+    new Option('(authored)', ''),
+    ...[...sequences].map(([value, { name }]) => new Option(name, value)),
+    ...named.map(([name]) => new Option(name, name)),
+  );
+  // A sequence's frames and carries, each fixture posed with what it holds in turn; its key frames carry no timing, so
+  // it plays a second from one to the next until retimed.
+  const playSequence = async (fixtures) => {
+    const frames = [], carries = [];
+    for (const name of fixtures) {
+      const { frame, carries: held } = await holdPose(figure, rig, await loadPoseFile(name));
+      frames.push(frame);
+      carries.push(held);
+    }
+    setClip(frames, { carries, seconds: fixtures.length - 1 });
+    seek(0);
+    $('clip-report').textContent = `${fixtures.length} key frames from ${fixtures[0]} to ${fixtures.at(-1)}`;
+  };
+  $('clip-source').addEventListener('change', shownError('clip-report', async () => {
     stop();
-    const chosen = actorClips[$('clip-source').value];
-    if (!chosen) return setClip([]);
+    $('clip-report').textContent = '';
+    const value = $('clip-source').value;
+    if (sequences.has(value)) return playSequence(sequences.get(value).fixtures);
+    const chosen = actorClips[value];
+    if (!chosen) return setClip([], { carries: [] });
     const actor = { ...chosen, frames: chosen.frames.map((frame) => rigFrame(rig, frame)) };
     setClip(actor.frames, { actor, loop: Boolean(actor.loop), seconds: spanOf(actor, rig.clips.walkSpeed) });
     seek(0);
-  });
+  }));
   $('clip-open').addEventListener('change', shownError('clip-report', async () => {
     const [file] = $('clip-open').files;
     if (!file) return;
@@ -623,7 +722,7 @@ async function startPage(data, query) {
   $('download-pose').addEventListener('click', () => download('pose.json', readablePose(rig, frameOf(rig, state))));
   $('probe').addEventListener('change', refresh);
 
-  setClip([]);
+  setClip([], { carries: [] });
   const fixture = query.get('pose');
   if (fixture) $('fixture').value = fixture;
   await show(fixture ?? standing(rig));
