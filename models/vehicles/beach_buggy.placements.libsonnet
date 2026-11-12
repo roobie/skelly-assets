@@ -24,8 +24,4 @@ local s = import 'beach_buggy.spec.libsonnet';
   + site.pair('headlamp', 'beach_buggy_headlamp')
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.45, 0.44])
   + site.batteryBay('battery_tray', [-0.72, 0.3, 0.2]),
-  unjudged: [
-    site.unjudged('frame', 'roll_bar', 0.033,
-      'The upper_rail_near piece of beach_buggy_frame runs into the brace_near piece of beach_buggy_roll_bar.'),
-  ],
 }

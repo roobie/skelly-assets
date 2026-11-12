@@ -27,16 +27,8 @@ local s = import 'skid_steer.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.26, 1.06, 0.38])
   + site.batteryBay('battery_tray', [-0.55, 0.5, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
-  unjudged: [
-    site.unjudged('engine_cover', 'engine', 0.176,
-      'The skirt piece of skid_steer_engine_cover runs into the block piece of engine_i4_diesel.'),
-    site.unjudged('frame', 'cage', 0.05,
-      'The sponson_near piece of skid_steer_frame runs into the rear_wall piece of skid_steer_cage.'),
-    site.unjudged('frame', 'chain_case_far', 0.06,
-      'The sponson_far piece of skid_steer_frame runs into the case_far piece of skid_steer_chain_case.'),
-    site.unjudged('frame', 'chain_case_near', 0.06,
-      'The sponson_near piece of skid_steer_frame runs into the case piece of skid_steer_chain_case.'),
-    site.unjudged('frame', 'lift_arms', 0.12,
-      'The tower_near piece of skid_steer_frame runs into the beam_rear_near piece of skid_steer_lift_arms.'),
+  overlaps: [
+    site.overlap('engine_cover', 'engine', 0.176,
+      'The engine sits under the engine cover, which is drawn as a solid block around it.'),
   ],
 }

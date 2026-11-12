@@ -16,12 +16,8 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
   + site.pair('rear_beacon', 'beacon_amber', [s.bodyRear + 0.1, s.bodyRiseRear - 0.12, 0.95])
   + site.pair('high_lamp', 'tail_lamp_tall', [s.hopperRear - 0.01, s.hopperSill + 0.05, 1.2]),
   tags: { 'vehicle-role': ['utility'] },
-  unjudged: [
-    site.unjudged('mudguard_far', 'hopper', 0.036,
-      'The guard_1_aft_far piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
-    site.unjudged('mudguard_near', 'hopper', 0.036,
-      'The guard_1_aft piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
-    site.unjudged('subframe', 'hopper', 0.12,
-      'The runner_near piece of refuse_truck_subframe runs into the bowl piece of refuse_truck_hopper.'),
+  overlaps: [
+    site.overlap('subframe', 'hopper', 0.12,
+      'The hopper bowl is seated on the subframe runner and sunk into it.'),
   ],
 }

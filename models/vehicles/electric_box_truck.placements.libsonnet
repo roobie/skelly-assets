@@ -16,10 +16,8 @@ local s = (import 'truck-cab.libsonnet').spec(import 'box_truck.spec.libsonnet')
     port: { part: 'charge_port', at: [s.tankX + 0.15, s.tankY + 0.04, s.side - 0.34 + 0.21] },
     add: [site.one('pack_lower', 'traction_pack_van', [-0.22, s.railBottom - 0.32, 0.1])],
   }),
-  unjudged: [
-    site.unjudged('inverter', 'charge_port', 0.06,
-      'The case piece of inverter_large runs into the socket piece of charge_port.'),
-    site.unjudged('pack', 'pack_lower', 0.05,
-      'The case piece of traction_pack_van runs into the lead piece of traction_pack_van.'),
+  overlaps: [
+    site.overlap('pack', 'pack_lower', 0.05,
+      'The lead of the lower pack enters the case of the pack above it.'),
   ],
 }

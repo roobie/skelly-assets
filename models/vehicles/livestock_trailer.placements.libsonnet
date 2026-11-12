@@ -22,8 +22,4 @@ local axleIds = std.range(0, std.length(s.axles) - 1);
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.04, s.frameLow, 0.66])
   + site.pair('marker', 'marker_lamp', [s.front + 0.02, s.railLow, 0.7]),
   tags: { 'vehicle-role': ['farm'] },
-  unjudged: [
-    site.unjudged('chassis', 'jockey_wheel', 0.035,
-      'The drawbar_near piece of livestock_trailer_chassis runs into the post piece of trailer_jockey_wheel.'),
-  ],
 }

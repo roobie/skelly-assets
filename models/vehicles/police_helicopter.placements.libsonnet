@@ -32,14 +32,4 @@ local s = import 'police_helicopter.spec.libsonnet';
   + pair('rear_door', 'police_helicopter_rear_door')
   + pair('seat', 'police_helicopter_seat', [1.05, s.floor, 0.38]),
   tags: { 'vehicle-role': ['emergency'] },
-  unjudged: [
-    site.unjudged('belly', 'skids', 0.062,
-      'The keel_22_0 piece of police_helicopter_belly runs into the cross_0 piece of police_helicopter_skids.'),
-    site.unjudged('engine_cowl', 'main_gearbox', 0.157,
-      'The pylon piece of police_helicopter_engine_cowl runs into the case piece of police_helicopter_main_gearbox.'),
-    site.unjudged('rear_fairing', 'skids', 0.062,
-      'The keel_12_0 piece of police_helicopter_rear_fairing runs into the cross_1 piece of police_helicopter_skids.'),
-    site.unjudged('roof', 'main_gearbox', 0.063,
-      'The roof_5_1 piece of police_helicopter_roof runs into the case piece of police_helicopter_main_gearbox.'),
-  ],
 }

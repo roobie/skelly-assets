@@ -20,14 +20,14 @@ local s = import 'crashed_hatchback.spec.libsonnet';
   + pair('tail_lamp', 'crashed_hatchback_tail_lamp')
   + pair('front_seat', 'crashed_hatchback_front_seat', [-0.02, s.floor, 0.37])
   + pair('rear_wheel', 'crashed_hatchback_flat_wheel', [s.rearAxle, s.axleY, s.wheelZ]),
-  unjudged: [
-    site.unjudged('crushed_nose', 'engine', 0.25,
-      'The crushed_mass piece of crashed_hatchback_crushed_nose runs into the block piece of crashed_hatchback_engine.'),
-    site.unjudged('front_bumper', 'front_wheel_far', 0.063,
-      'The bar_2_3 piece of crashed_hatchback_front_bumper runs into the tyre_far piece of crashed_hatchback_flat_wheel.'),
-    site.unjudged('front_bumper', 'front_wheel_near', 0.063,
-      'The bar_24_1 piece of crashed_hatchback_front_bumper runs into the tyre piece of crashed_hatchback_flat_wheel.'),
-    site.unjudged('shell', 'crushed_nose', 0.06,
-      'The near_45_10 piece of crashed_hatchback_shell runs into the top_0_19 piece of crashed_hatchback_crushed_nose.'),
+  overlaps: [
+    site.overlap('crushed_nose', 'engine', 0.25,
+      'The crushed nose is drawn as a solid mass through the engine bay, so the engine block sits inside it.'),
+    site.overlap('front_bumper', 'front_wheel_far', 0.063,
+      'The bar ends of the crumpled bumper are driven into the front of the flat front wheel.'),
+    site.overlap('front_bumper', 'front_wheel_near', 0.063,
+      'The bar ends of the crumpled bumper are driven into the front of the flat front wheel.'),
+    site.overlap('shell', 'crushed_nose', 0.06,
+      'The top plate of the crushed nose folds back over the front edge of the shell.'),
   ],
 }

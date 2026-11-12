@@ -13,8 +13,4 @@ local s = (import 'truck-cab.libsonnet').spec(import 'refuse_truck.spec.libsonne
     // The pack fills the length between the rear springs' front hangers and the motor.
     pack: { part: 'traction_pack_van', at: [0.4, s.railBottom - 0.16, 0] },
   }),
-  unjudged: [
-    site.unjudged('gearbox', 'motor', 0.06,
-      'The case piece of gearbox_heavy runs into the lead piece of traction_motor_large.'),
-  ],
 }

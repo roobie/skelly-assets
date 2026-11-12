@@ -17,10 +17,4 @@ local s = import 'saloon.spec.libsonnet';
     inverter: { part: 'inverter_car', at: [s.frontAxle - 0.05, 0.6, -0.4] },
     pack: { part: 'hybrid_pack', at: [s.rearAxle - 0.5, 0.2, 0] },
   }),
-  unjudged: [
-    site.unjudged('engine', 'motor', 0.059,
-      'The intake piece of engine_i4_petrol_core runs into the stator piece of traction_motor_car.'),
-    site.unjudged('shell', 'charge_port', 0.06,
-      'The quarter_arch_near piece of saloon_shell runs into the socket piece of charge_port.'),
-  ],
 }

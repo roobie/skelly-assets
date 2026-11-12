@@ -9,10 +9,10 @@ local s = import 'tanker_truck.spec.libsonnet';
     site.one('ladder', 'tanker_truck_ladder'),
     site.one('valve_gear', 'tanker_truck_valve_gear'),
   ],
-  unjudged: [
-    site.unjudged('barrel', 'walkway', 0.05,
-      'The shell piece of tanker_truck_barrel runs into the bearer_0 piece of tanker_truck_walkway.'),
-    site.unjudged('saddle', 'valve_gear', 0.069,
-      'The cradle_0_6 piece of tanker_truck_saddle runs into the manifold piece of tanker_truck_valve_gear.'),
+  overlaps: [
+    site.overlap('barrel', 'walkway', 0.05,
+      'The bearers of the walkway are let into the shell of the barrel.'),
+    site.overlap('saddle', 'valve_gear', 0.069,
+      'The manifold pipe of the valve gear runs through a rear cradle plate of the saddle.'),
   ],
 }

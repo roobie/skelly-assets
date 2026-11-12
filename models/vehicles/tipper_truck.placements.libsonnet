@@ -10,8 +10,4 @@ local s = import 'tipper_truck.spec.libsonnet';
     site.one('tip_ram', 'tipper_truck_tip_ram'),
   ]
   + site.pair('tub_side', 'tipper_truck_tub_side'),
-  unjudged: [
-    site.unjudged('subframe', 'tub_floor', 0.08,
-      'The runner_near piece of tipper_truck_subframe runs into the sill_0 piece of tipper_truck_tub_floor.'),
-  ],
 }

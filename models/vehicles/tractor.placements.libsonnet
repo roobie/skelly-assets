@@ -32,10 +32,10 @@ local s = import 'tractor.spec.libsonnet';
   + site.headlamps(s.nose - 0.02, 1.2, 0.3)
   + site.batteryBay('battery_tray', [0.22, 1.1, 0]),
   tags: { 'vehicle-role': ['farm'] },
-  unjudged: [
-    site.unjudged('chassis', 'gearbox', 0.52,
-      'The transmission piece of tractor_chassis runs into the case piece of gearbox_heavy.'),
-    site.unjudged('chassis', 'rear_axle', 0.245,
-      'The transmission piece of tractor_chassis runs into the diff piece of beam_axle_truck.'),
+  overlaps: [
+    site.overlap('chassis', 'gearbox', 0.52,
+      'The gearbox sits in the transmission block of the chassis, which is drawn solid around it.'),
+    site.overlap('chassis', 'rear_axle', 0.245,
+      'The rear axle\'s differential sits in the transmission block of the chassis, which is drawn solid around it.'),
   ],
 }
