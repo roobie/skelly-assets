@@ -17,7 +17,7 @@ import {
 import type { VoxelGrains } from './exportTypes.ts';
 
 const grain = pipe(number(), gtValue(0));
-// Every row names its voxel class: no model exports smooth beside voxel ones, so a row without one is refused.
+// Every row names its voxel class, so no model drifts smooth beside voxel ones by omission; a row lacking one is refused.
 const RowSchema = strictObject({
   id: pipe(string(), regex(/^[a-z][a-z0-9_]*$/)),
   kind: pipe(string(), nonEmpty()),

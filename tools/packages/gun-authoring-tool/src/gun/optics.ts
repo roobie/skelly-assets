@@ -90,7 +90,7 @@ export const LENS_SLOT = 'lens';
 const lensGlass: SolidFinish = { slot: LENS_SLOT };
 
 /** Sides of every round optic body's section, which the lenses seated in it share. */
-const OPTIC_BODY_SIDES: number = appearance.opticBodySides;
+const OPTIC_BODY_SIDES: number = appearance.roundSides;
 
 const prism = (id: string, profile: readonly Vec2[], widthU: number): Solid => {
   const halfWidth = grid(widthU / 2);
