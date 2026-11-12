@@ -39,8 +39,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
     box('lower', 'steel', [s.frontAxle - 0.05, 0.22, 0.12], [s.frontAxle + 0.05, 0.26, s.wheelZ - 0.08]),
     box('inner', 'steel', [0.54, 0.22, 0.1], [s.frontAxle + 0.05, 0.36, 0.14]),
     box('knuckle', 'steel', [s.frontAxle - 0.04, 0.22, s.wheelZ - 0.1], [s.frontAxle + 0.04, 0.38, s.wheelZ - 0.05]),
-    k.bar('shock', 'spring', [s.frontAxle, 0.34], [0.46, 0.74], 0.05, [0.2, 0.25]),
-    box('shock_mount', 'steel', [0.42, 0.7, 0.14], [0.5, 0.74, 0.25]),
+    // The shock's top mount sits under the fender, not through it.
+    k.bar('shock', 'spring', [s.frontAxle, 0.34], [0.48, 0.58], 0.05, [0.2, 0.25]),
+    box('shock_mount', 'steel', [0.43, 0.58, 0.14], [0.51, 0.62, 0.25]),
   ], { steel: 'steel-spall-black', spring: 'paint-red' }) + { title: 'Quad bike front arm' },
   k.compound('quad_bike_swing_arm', 24, [
     box('axle', 'steel', [s.rearAxle - 0.03, s.hub - 0.03, -s.wheelZ + 0.05], [s.rearAxle + 0.03, s.hub + 0.03, s.wheelZ - 0.05]),

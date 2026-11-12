@@ -19,6 +19,9 @@ local has(s, key) = std.objectHas(s, key);
 // Cut from both top corners of every wheel arch, so its opening has five sides.
 local archChamfer = 0.2;
 local voxel = 0.03125;
+// The instrument binnacle's height and how far its housing reaches ahead of its origin; see shared.libsonnet, instrumentBinnacle.
+local binnacleHeight = 0.17;
+local binnacleNose = 0.12;
 local rearGlass(s) = [hole for hole in std.get(s, 'rearHoles', []) if !std.get(hole, 'door', false)];
 local dashTop(s) = std.get(s, 'dashTop', s.driver.y + 0.55);
 // A low-floor driver sits on a plinth, raised to see over the dash.
@@ -443,6 +446,8 @@ local laid(kit, id, s) =
   ]);
   local d = s.driver;
   local driverBase = if plinthed(s) then 'driver_plinth' else 'shell';
+  // The binnacle faces the driver but stands back from a windscreen raked over the dash, as the dashboard does.
+  local instrumentsX = std.min(d.x + 0.64, g.xf(dashTop(s) + binnacleHeight) - 0.14 - binnacleNose);
   // The shell leads: it is the body a vehicle's placements take their tags from.
   [fitting('shell', part('_shell'), origin)]
   + (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
@@ -455,7 +460,7 @@ local laid(kit, id, s) =
     // Rises from inside the dash to the top of the wheel's hub.
     fitting('steering_column', 'steering_column', [d.x + 0.5, d.y + 0.4, -d.z], ['dashboard']),
     fitting('steering_wheel', 'steering_wheel', [d.x + 0.42, d.y + 0.62, -d.z], ['steering_column']),
-    fitting('instruments', 'instrument_binnacle', [d.x + 0.64, dashTop(s), -d.z], ['dashboard']),
+    fitting('instruments', 'instrument_binnacle', [instrumentsX, dashTop(s), -d.z], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [d.x + 0.36, d.y, -d.z + 0.34], [driverBase]),
     fitting('rear_axle', axle('beam_axle_truck'), [s.rearAxle, s.wheelR - 0.52, 0], ['shell']),
     fitting('front_axle', axle(std.get(s, 'frontAxlePart', 'steered_axle_heavy')), [s.frontAxle, s.wheelR - 0.52, 0], ['shell']),
