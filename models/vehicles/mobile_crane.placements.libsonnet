@@ -43,8 +43,6 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
       'The runner_far piece of mobile_crane_deck runs into the beam_far piece of mobile_crane_outrigger.'),
     site.unjudged('deck', 'rear_outrigger_near', 0.125,
       'The runner_near piece of mobile_crane_deck runs into the beam piece of mobile_crane_outrigger.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
     site.unjudged('gearbox', 'front_axle_2', 0.052,
       'The case piece of gearbox_heavy runs into the beam piece of steered_axle_heavy_bare.'),
   ],

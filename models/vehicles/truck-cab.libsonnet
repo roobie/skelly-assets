@@ -63,6 +63,8 @@ local defaults = {
   gearboxLength: 0.72,
   exhaustX: self.engineX - 3.6,
   exhaustY: self.railBottom - 0.16,
+  // The pipe runs back beside the gearbox, so a heavy gearbox's wider case sets it further out.
+  exhaustZ: if self.gearbox == 'gearbox_heavy' then 0.3 else 0.2,
   radiatorX: self.face - 0.28,
   radiatorY: self.bumperLow + 0.02,
   lampX: if self.bonnet != null then self.front else self.face + 0.02,
@@ -265,7 +267,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('gearbox', s.gearbox, [gearboxX, s.engineY + 0.12, 0], ['engine']),
   ] + cooling.sites(s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, kit=kit, supportedBy=['chassis'])
   + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, kit=kit, supportedBy=['chassis']) + [
-    fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, 0.2], ['engine', 'chassis']),
+    fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, s.exhaustZ], ['engine', 'chassis']),
     // The driver sits on the far side, away from the kerb, as on the buses.
     fitting('steering_wheel', 'steering_wheel', [s.face - s.dashDepth - 0.03, s.seatY + 0.72, -0.58], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [s.seatX + 0.3, s.floor + 0.42, 0], ['cab']),

@@ -23,7 +23,5 @@ local s = import 'swat_truck.spec.libsonnet';
       'The rear_apron piece of swat_truck_body_floor runs into the hanger_near piece of swat_truck_rear_step.'),
     site.unjudged('front_bumper', 'ram', 0.087,
       'The bar piece of swat_truck_front_bumper runs into the arm_near piece of swat_truck_ram.'),
-    site.unjudged('radiator', 'exhaust', 0.06,
-      'The core piece of radiator_truck runs into the pipe piece of exhaust_long.'),
   ],
 }

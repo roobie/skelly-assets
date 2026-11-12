@@ -27,8 +27,6 @@ local site = import 'site.libsonnet';
       'The band_2 piece of cement_mixer_drum runs into the tank piece of cement_mixer_water_tank.'),
     site.unjudged('gearbox', 'drive', 0.09,
       'The case piece of gearbox_heavy runs into the foot piece of cement_mixer_drive.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
     site.unjudged('rear_frame', 'drum', 0.058,
       'The head piece of cement_mixer_rear_frame runs into the band_14 piece of cement_mixer_drum.'),
     site.unjudged('subframe', 'drive', 0.12,

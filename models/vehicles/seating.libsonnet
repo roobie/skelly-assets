@@ -82,7 +82,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       'An exhaust starts at the engine and is hung from the body, so it shares a little volume with what it leaves and hangs from.',
       [
       ['catalytic_converter', 'shell', 0.064],
-      ['exhaust', 'chassis', 0.085],
       ['exhaust', 'engine', 0.065],
       ['exhaust', 'frame', 0.085],
       ['exhaust', 'shell', 0.085],

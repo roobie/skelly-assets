@@ -19,8 +19,6 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
   unjudged: [
     site.unjudged('dashboard', 'radiator', 0.06,
       'The lower piece of refuse_truck_dashboard runs into the core piece of radiator_truck.'),
-    site.unjudged('gearbox', 'exhaust', 0.06,
-      'The case piece of gearbox_heavy runs into the pipe piece of exhaust_long.'),
     site.unjudged('mudguard_far', 'hopper', 0.036,
       'The guard_1_aft_far piece of refuse_truck_mudguard runs into the bowl piece of refuse_truck_hopper.'),
     site.unjudged('mudguard_near', 'hopper', 0.036,
