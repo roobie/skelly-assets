@@ -1,7 +1,7 @@
 // Holds every cue into skelly's source to the one form README.md, "Cues into skelly", sets. It checks the form
 // only: resolving a cue needs a skelly checkout, which this repository's checks do not have.
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { lstatSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +41,8 @@ export function cueIssues(text) {
 export function trackedCueIssues(root = ROOT) {
   const files = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' }).split('\0').filter(Boolean);
   return files.flatMap((file) => {
+    // A link's own text is its target's path, and the files it reaches are checked where they are tracked.
+    if (lstatSync(join(root, file)).isSymbolicLink()) return [];
     const text = readFileSync(join(root, file), 'utf8');
     if (text.includes('\0')) return [];
     return cueIssues(text).map((issue) => ({ file, ...issue }));
