@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
-import { keepSites, viewSet } from '../../site/lookOptions.mjs';
+import { landingModels } from '../../site/filter.mjs';
+import { LOOK_LANDING_COUNT, idSuggestions, keepSites, lookedIds, viewSet } from '../../site/lookOptions.mjs';
 import { FORWARD, REVIEW_VIEWS, RIGHT, UNDERSIDE_VIEWS, UP } from '../../site/modelFrame.mjs';
 import { lookDigest, lookIds, lookName, mergeRows, staleIds } from '../look.mjs';
 
@@ -35,6 +36,21 @@ test('a look draws what it is asked, every vehicle or assembly by its flag, and 
   assert.deepEqual(lookIds(manifest, { assemblies: true }), ['fixture_door_assembly']);
   assert.deepEqual(lookIds(manifest), ['fixture_body', 'fixture_door', 'fixture_door_assembly', 'fixture_van']);
   assert.throws(() => lookIds(manifest, { ids: ['fixture_notes'] }), /fixture_notes/);
+});
+
+test('a review page asked nothing draws the first of the landing models, and asked ids draws only those', () => {
+  const entries = Array.from({ length: LOOK_LANDING_COUNT * 2 }, (_, at) => ({ id: `fixture_${at}`, category: `shelf_${at}` }));
+  const landed = lookedIds([], entries, 7);
+  assert.equal(landed.length, LOOK_LANDING_COUNT);
+  assert.deepEqual(landed, landingModels(entries, 7).slice(0, LOOK_LANDING_COUNT).map(({ id }) => id));
+  assert.deepEqual(lookedIds(['fixture_3'], entries, 7), ['fixture_3']);
+});
+
+test('the review page picker offers the ids holding what is typed, leaving out those already picked', () => {
+  const ids = ['oak_door', 'oak_log', 'steel_door'];
+  assert.deepEqual(idSuggestions(ids, 'Oak ', ['oak_log'], 10), ['oak_door']);
+  assert.deepEqual(idSuggestions(ids, 'steel door', [], 10), ['steel_door']);
+  assert.deepEqual(idSuggestions(ids, '', [], 2), ['oak_door', 'oak_log']);
 });
 
 test('a vehicle picture changes digest when any part it places is rebuilt, and has none once a part is gone', () => {
