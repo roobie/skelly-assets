@@ -77,9 +77,16 @@ and the contract tests read one explicit value. The grains are content a modder 
 
 A part asks for the finest grain by carrying a tag in its definition, so the choice sits
 with the part's content and the exporter holds no list of part names. See `src/glb.ts`,
-`VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the sight parts carry it. A row that
-names a detail grain must make its own grain a whole multiple of it, because both lattices
-are anchored at the same world origin and the grains then nest: each coarse voxel face
+`VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the sight parts carry it.
+
+A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
+author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
+Only the gun class asks for it: an item's thin parts, a garment's panels above all, are large, and the finest grain
+would multiply their triangles for little gain. See `src/glb.ts`, `partVoxelGrain` and `isThinPart`, and
+`src/featureFit.ts`, `featureFitsGrain`.
+
+A row that names a detail grain must make its own grain a whole multiple of it, because
+both lattices are anchored at the same world origin and the grains then nest: each coarse voxel face
 lies on a fine voxel face, so a sight still meets the receiver and the gas tube without
 steps or gaps. The exporter refuses a pair that does not nest, and a row without a detail
 grain has nothing to check; see `src/glb.ts`, `checkNesting`.
@@ -120,8 +127,10 @@ cost is that they draw thicker or blockier than authored. A solid's size says no
 how thin its stretches are, so every solid is sampled along all three axes. Thinness is
 judged on the shape the solids make together: a stretch cut short only where one solid meets
 the next, such as a curve facet's corner, keeps its voxel inside that shape, because a voxel
-at its own middle would stick out as a sliver. See `src/voxelize.ts`, `fillSource` and
-`fillAlong`.
+at its own middle would stick out as a sliver. A stretch centred on a lattice plane always
+keeps the voxel on the same side of it, because each sample line computes that middle
+apart, and leaving the tie to rounding zigzags a thin bar between two layers. See
+`src/voxelize.ts`, `fillSource`, `fillAlong` and `cellOf`.
 
 A voxelized model keeps every part that connects to another part connected, because a
 model whose joining parts drop out reads as floating pieces, not as one object. Voxels

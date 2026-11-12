@@ -9,6 +9,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import process from 'node:process';
 import { modelEntryJson } from '@skelly/thing-export/files.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import type { DeadvoxModelFile } from '../gun/exportGlb.ts';
 import gunVoxel from '../gun/gunVoxel.json' with { type: 'json' };
 import { exportFileText } from './exportFile.ts';
@@ -44,7 +45,7 @@ const main = (): number => {
       file: `assets/models/${id}.glb` as DeadvoxModelFile,
     },
     cartridgeResult.cartridge === undefined ? {} : { cartridge: cartridgeResult.cartridge },
-    { voxelGrain: gunVoxel.grain, voxelDetailGrain: gunVoxel.detailGrain },
+    recipeVoxel({ voxel: gunVoxel }),
   );
   if (!result.ok) {
     console.error(`FAIL ${input}: ${result.message}`);

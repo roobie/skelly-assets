@@ -284,6 +284,13 @@ const centresIn = ([from, to]: Span, grain: number): [number, number] => [
 ];
 
 /**
+ * The voxel holding a point on a ray. A point on a lattice plane, to within a seam, takes the voxel above it: each sample
+ * line computes the point apart, so without one side for the tie a thin solid centred on a plane would zigzag between
+ * the two layers either side of it.
+ */
+const cellOf = (at: number, grain: number): number => Math.floor(at / grain + SEAM_VOXELS);
+
+/**
  * Fills the voxels whose centres lie inside the solid along one axis, and says whether it filled any. A span that holds
  * no centre still fills one voxel, so a thin solid keeps one voxel of thickness: the voxel at the span's middle, or,
  * when the span runs on into other sources' spans that hold centres, the one of those centres nearest it. A span cut
@@ -311,7 +318,7 @@ const fillAlong = (
       const [first, last] = centresIn(span, grain);
       if (first > last) {
         const [from, to] = span;
-        const middle = Math.floor((from + to) / 2 / grain);
+        const middle = cellOf((from + to) / 2, grain);
         const whole = sampled.joined.get(column)?.find(([a, b]) => a <= from && to <= b) ?? span;
         const [low, high] = centresIn(whole, grain);
         set(low > high ? middle : Math.min(Math.max(middle, low), high));

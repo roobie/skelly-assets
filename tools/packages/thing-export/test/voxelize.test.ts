@@ -340,6 +340,17 @@ describe('voxelize', () => {
     }
   });
 
+  it('draws a bar thinner than the grain and centred on a lattice plane as one straight layer', () => {
+    // A charging-handle stem: 3.45 mm wide about z = 0 at a 4 mm grain, so its middle lies on the plane between two
+    // layers and the depth each sample line computes rounds to either side of it.
+    const half = 0.15 * 0.0115;
+    const { groups, stats } = voxelize([box([-0.1626, 0.0201, -half], [-0.0345, 0.0224, half])], 0.004);
+    const positions = Array.from([...groups.values()][0]!.positions);
+    const across = positions.filter((_, i) => i % 3 === 2);
+    expect(stats.voxels).toBeGreaterThan(1);
+    expect(Math.max(...across) - Math.min(...across)).toBeCloseTo(0.004, 9);
+  });
+
   it('refuses a grain that is not a positive number', () => {
     expect(() => voxelize([box([0, 0, 0], [1, 1, 1])], 0)).toThrow(POSITIVE);
     expect(() => voxelize([box([0, 0, 0], [1, 1, 1])], Number.NaN)).toThrow(POSITIVE);

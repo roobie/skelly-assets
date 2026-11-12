@@ -136,11 +136,13 @@ export interface GunExportMetadata {
 const voxelGrainsOf = ({
   voxelGrain,
   voxelDetailGrain,
+  voxelDetailThinParts,
 }: {
   [Key in keyof VoxelGrains]-?: VoxelGrains[Key] | undefined;
 }): Partial<VoxelGrains> => ({
   ...(voxelGrain === undefined ? {} : { voxelGrain }),
   ...(voxelDetailGrain === undefined ? {} : { voxelDetailGrain }),
+  ...(voxelDetailThinParts === undefined ? {} : { voxelDetailThinParts }),
 });
 
 interface GunExportOptions extends GunExportMetadata, Partial<VoxelGrains> {
@@ -624,7 +626,7 @@ const drawnApertureSpan = (file: VoxelFile, partId: string, eye: Vec3): readonly
  * drops to the centre of the closed aperture on the line and the width is read across the hole. Returns the eye.
  */
 const openSightGapOrThrow = (file: VoxelFile, resolved: Resolved, partId: string, topEye: Vec3): Vec3 => {
-  const grain = partVoxelGrain(resolved.defs.get(partId)!, file.grains);
+  const grain = partVoxelGrain(resolved.defs.get(partId)!, file.grains, resolved.domain.units.metresPerUnit);
   const notch = drawnWidthAtRow(file, partId, topEye, topEye[FILE_AXES.up] - grain / 2);
   const wide = (width: number) => width >= file.grains.voxelGrain - 1e-6;
   if (wide(notch)) {
@@ -675,7 +677,7 @@ const drawnIronSightLine = (
   if (family === 'front-sight-bead') {
     return { eye: onTop(drawnTopOrThrow(file, sight.id)), direction: sight.direction };
   }
-  const half = partVoxelGrain(resolved.defs.get(sight.id)!, file.grains) / 2;
+  const half = partVoxelGrain(resolved.defs.get(sight.id)!, file.grains, metresPerUnit) / 2;
   const along = sight.eye[bore];
   const top = drawnTopOrThrow(file, sight.id, { [bore]: [along - half, along + half], [side]: leafSpan(resolved, sight) });
   const eye = openSightGapOrThrow(file, resolved, sight.id, onTop(top));
@@ -683,7 +685,7 @@ const drawnIronSightLine = (
   if (post === undefined) {
     return { eye, direction: sight.direction };
   }
-  const grain = partVoxelGrain(resolved.defs.get(post.id)!, file.grains);
+  const grain = partVoxelGrain(resolved.defs.get(post.id)!, file.grains, metresPerUnit);
   // As for a front-sight part's post, twice its width holds its top voxel column wherever the sampler put it.
   const centre = (post.low[side] + post.high[side]) / 2;
   const band = post.high[side] - post.low[side];
@@ -734,16 +736,10 @@ const drawnSupport = (file: VoxelFile, partId: string, support: Vec3): Vec3 => {
   return withCoordinate(support, up, round6(low));
 };
 
-const voxelFileOf = (
-  glb: Uint8Array,
-  {
-    voxelGrain,
-    voxelDetailGrain,
-  }: { readonly voxelGrain?: number | undefined; readonly voxelDetailGrain?: number | undefined },
-): VoxelFile | undefined =>
-  voxelGrain === undefined
-    ? undefined
-    : { glb, grains: { voxelGrain, ...(voxelDetailGrain === undefined ? {} : { voxelDetailGrain }) } };
+const voxelFileOf = (glb: Uint8Array, grains: Partial<VoxelGrains>): VoxelFile | undefined => {
+  const { voxelGrain } = grains;
+  return voxelGrain === undefined ? undefined : { glb, grains: { ...grains, voxelGrain } };
+};
 
 /** The entry's anchors with the muzzle moved onto the drawn front and the support onto the drawn forend underside. */
 const drawnAnchors = (
@@ -931,8 +927,10 @@ export const exportGunGlb = (
     items = {},
     voxelGrain,
     voxelDetailGrain,
+    voxelDetailThinParts,
     ...metadata
   } = options;
+  const grains = voxelGrainsOf({ voxelGrain, voxelDetailGrain, voxelDetailThinParts });
   const message = boltMetadataIssue(assembly, metadata.cartridge);
   if (message) {
     return { ok: false, error: { code: 'structure-issues', issues: [{ rule: 'structure', message, parts: [] }] } };
@@ -956,12 +954,12 @@ export const exportGunGlb = (
     palette: GUN_PALETTE,
     appearance,
     asset,
-    ...voxelGrainsOf({ voxelGrain, voxelDetailGrain }),
+    ...grains,
   });
   if (!result.ok) {
     return result;
   }
-  const voxelFile = voxelFileOf(result.glb, { voxelGrain, voxelDetailGrain });
+  const voxelFile = voxelFileOf(result.glb, grains);
   const handling = buildActionExport(resolved);
   const internalCapacity = integralCapacity(resolved, metadata.cartridge);
   const {
@@ -971,7 +969,7 @@ export const exportGunGlb = (
   const magazine = magazineSlotData(resolved);
   // Datums read off placements are written as the file draws them, so they read the file-frame assembly.
   const fileResolved = inFileFrame(resolved);
-  const drawn = drawnGeometry(fileResolved, voxelGrainsOf({ voxelGrain, voxelDetailGrain }));
+  const drawn = drawnGeometry(fileResolved, grains);
   const replaceableNodes = new Set([
     ...fittedAttachments.map(({ node }) => node),
     ...(magazine ? [magazine.node] : []),
