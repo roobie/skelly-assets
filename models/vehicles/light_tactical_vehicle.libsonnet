@@ -11,7 +11,6 @@ local vehicle = import 'light_tactical_vehicle.placements.libsonnet';
 // A compound row of this vehicle, titled with its title and the part's `label`.
 local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
 local finish = { paint: 'paint-sand', frame: 'steel-parkerized', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear' };
-// A flat-headed wheel opening with straight jambs and two chamfered top corners, the class's mark, where the other 4x4s have round arches.
 // The frame's crossmembers, each arched over the drive line's tunnel so the prop shafts pass under it.
 local crossX = [-2.46, -2.3, -1.5, -0.55, 0.5, 1.2, 2.18];
 local tunnel = 0.26;
@@ -20,6 +19,7 @@ local crossmember(name, x) = [
   box(name + '_near', 'frame', [x - 0.04, s.railLow, tunnel], [x + 0.04, s.railTop, s.railZ]),
   box(name + '_far', 'frame', [x - 0.04, s.railLow, -s.railZ], [x + 0.04, s.railTop, -tunnel]),
 ];
+// A flat-headed wheel opening with straight jambs and two chamfered top corners, the class's mark, where the other 4x4s have round arches.
 local bandWide = 0.05;
 local shoulder = s.archTop - s.archChamfer;
 local crown = s.archBase - s.archChamfer;
