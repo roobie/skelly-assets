@@ -30,12 +30,12 @@ local s = import 'burnt_out_bus.spec.libsonnet';
   ]),
   overlaps: [
     site.overlap('floor', 'front_rim_far', 0.046,
-      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
     site.overlap('floor', 'front_rim_near', 0.044,
-      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
     site.overlap('floor', 'rear_rim_far', 0.046,
-      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
     site.overlap('floor', 'rear_rim_near', 0.047,
-      'The burnt-out floor deck sinks into the rim band of the wheel left under it.'),
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
   ],
 }

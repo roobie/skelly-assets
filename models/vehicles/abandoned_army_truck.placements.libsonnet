@@ -36,6 +36,6 @@ local wheel(id, x) = pair(id, 'abandoned_army_truck_wheel', [x, s.hubY, s.wheelZ
   tags: { 'vehicle-role': ['military'] },
   overlaps: [
     site.overlap('chassis', 'screen_frame', 0.06,
-      'The screen frame has slumped down onto the chassis rail.'),
+      'The skirt of the cab front wall below the floor stands into the chassis rails.'),
   ],
 }

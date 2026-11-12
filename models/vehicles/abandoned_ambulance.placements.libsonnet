@@ -29,12 +29,12 @@ local s = import 'abandoned_ambulance.spec.libsonnet';
   tags: { 'vehicle-role': ['emergency'] },
   overlaps: [
     site.overlap('chassis', 'wheel_front_far', 0.05,
-      'The wheel is left on the front axle the wreck chassis draws, so the axle runs into the tyre.'),
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
     site.overlap('chassis', 'wheel_front_near', 0.05,
-      'The wheel is left on the front axle the wreck chassis draws, so the axle runs into the tyre.'),
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
     site.overlap('chassis', 'wheel_rear_far', 0.05,
-      'The wheel is left on the rear axle the wreck chassis draws, so the axle runs into the tyre.'),
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
     site.overlap('chassis', 'wheel_rear_near', 0.05,
-      'The wheel is left on the rear axle the wreck chassis draws, so the axle runs into the tyre.'),
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
   ],
 }

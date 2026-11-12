@@ -28,10 +28,10 @@ local seatAcross = s.across - s.floor;
   ],
   overlaps: [
     site.overlap('chassis', 'wheel_front_up', 0.08,
-      'The wheel is left on the front drum the wreck chassis draws, so the drum runs into the rim.'),
+      'The front drum runs up into the rim of the wheel on it.'),
     site.overlap('chassis', 'wheel_rear_road', 0.059,
-      'The wheel is left on the rear axle the wreck chassis draws, so the axle runs into the rim.'),
+      'The rear axle runs on into the rim of the wheel on it.'),
     site.overlap('chassis', 'wheel_rear_up', 0.059,
-      'The wheel is left on the rear axle the wreck chassis draws, so the axle runs into the rim.'),
+      'The rear axle runs on into the rim of the wheel on it.'),
   ],
 }

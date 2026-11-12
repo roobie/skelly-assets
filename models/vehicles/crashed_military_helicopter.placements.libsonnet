@@ -25,8 +25,8 @@ local s = import 'crashed_military_helicopter.spec.libsonnet';
   tags: { 'vehicle-role': ['military'] },
   overlaps: [
     site.overlap('cowling', 'engine_far', 0.04,
-      'The cowling has slumped onto the engine case.'),
+      'The front of the far engine reaches past the tapering cowling and into its wall.'),
     site.overlap('fuselage', 'main_gearbox', 0.044,
-      'The gearbox has settled into the cabin door side of the fuselage.'),
+      'The base of the gearbox sits in the roof skin of the fuselage.'),
   ],
 }
