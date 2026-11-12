@@ -13,21 +13,17 @@ const git = (root, ...args) => {
   }
 };
 
-// A tag build renders its tag. Any other build renders a commit, which follows the latest release tag reachable from it,
-// so the build needs the tags and history (the Pages job checks out with full depth). The CI variables name the commit
-// when set; a local build reads its checkout.
+// Pages deploys only from main, so a build is either exactly a release tag or main past its latest release. The latest
+// tag needs the tags and history, which the Pages job checks out in full.
 export function readVersion(root, env = process.env) {
   const sha = env.GITHUB_SHA ?? git(root, 'rev-parse', 'HEAD');
-  const tagBuild = env.GITHUB_REF_TYPE === 'tag';
-  const tag = tagBuild ? env.GITHUB_REF_NAME : git(root, 'describe', '--tags', '--abbrev=0', '--match', 'v*');
-  const branch = env.GITHUB_REF_NAME ?? git(root, 'rev-parse', '--abbrev-ref', 'HEAD');
-  return { tag, sha, branch: tagBuild ? undefined : branch };
+  const exact = git(root, 'describe', '--tags', '--exact-match', '--match', 'v*', 'HEAD');
+  return { tag: exact ?? git(root, 'describe', '--tags', '--abbrev=0', '--match', 'v*'), sha, exact: exact !== undefined };
 }
 
-export function versionHtml({ tag, sha, branch }) {
+export function versionHtml({ tag, sha, exact }) {
   const tagLink = tag && `<a style="color:inherit" href="${REPOSITORY}/releases/tag/${escape(tag)}">${escape(tag)}</a>`;
-  const short = branch && sha?.slice(0, SHORT);
-  const commit = short && `${escape(branch)} at <a style="color:inherit" href="${REPOSITORY}/commit/${escape(sha)}">${escape(short)}</a>`;
+  const commit = !exact && sha && `main at <a style="color:inherit" href="${REPOSITORY}/commit/${escape(sha)}">${escape(sha.slice(0, SHORT))}</a>`;
   const text = [tagLink, commit].filter(Boolean).join(' + ');
-  return text ? `<span style="color:#a4bdc0;font:12px system-ui,sans-serif">Assets ${text}</span>` : '';
+  return text ? `<span style="color:#a4bdc0;font:12px system-ui,sans-serif">${text}</span>` : '';
 }

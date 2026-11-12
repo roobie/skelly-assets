@@ -1,4 +1,4 @@
 ---
 type: added
 ---
-The showcase pages' footer names the version they render: the release tag on a release build, and the latest release tag plus the commit on main, each linked to GitHub.
+The showcase's footer names the version it shows: the latest release tag and the main commit it follows, each linked to GitHub, or just the tag when main sits exactly on a release.
