@@ -9,6 +9,13 @@
 // `tilt` leans the head toward the figure's right. The left hand `hold`s a socket, may `pinch` named rifle points
 // (moved with the charging handle's draw) and, with `close: false`, rests there open instead of gripping.
 // The pose page plays the frames as a clip in their names' numbered order, so a frame's number is its place in the check.
+//
+// A frame's `into` is the seconds the move into it takes from the frame before, and `hold` the seconds it stays before
+// the next move begins. The times are those of a practised hand: a reach of a forearm's length to a small target and a
+// grasp take under half a second, a pull of a few centimetres a fifth, a look that sees and confirms the chamber about
+// two eye fixations, and a spring-driven release a blink. So the check settles at low ready, rolls deliberately to the
+// port, draws the handle briskly, pauses to look, and lets go, shuts the cover and comes back quickly, three and a half
+// seconds in all. Each move eases out of rest and into rest, as a hand moving from one place to the next does.
 // The left hand never takes the rifle in a power grip: it cradles, pinches and pushes with the fingers, so its sockets
 // meet the palm square across the knuckle crease (`crease`), where the fingers' bases carry a handguard, not slanted
 // deep in the palm.
@@ -47,14 +54,17 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
   // slanted across the palm a little less than a handle, since a raked pistol grip already bends the wrist toward the
   // thumb and the full slant would ask it past its limit.
   grip: { hold: { socket: { at: [-0.016, -0.09, -0.164], into: [0.781, 0.188, -0.596], axis: [0, 0.95, 0.3] }, slant: 15 }, hands: 'grip' },
+  easing: 'minimum-jerk',
   frames: {
-    'press-1-fire': ready,
-    'press-2-turned': turned { left: support },
-    'press-3-handle': turned { left: pinch(0) },
-    'press-4-retracted': turned + retracted { left: pinch(1) },
-    'press-5-inspect': turned + retracted { left: pinch(1) },
+    'press-1-fire': ready { hold: 0.3 },
+    'press-2-turned': turned { left: support, into: 0.5 },
+    'press-3-handle': turned { left: pinch(0), into: 0.45 },
+    'press-4-retracted': turned + retracted { left: pinch(1), into: 0.2 },
+    // The pose of the frame before, held while the eyes find the round in the chamber.
+    'press-5-inspect': turned + retracted { left: pinch(1), into: 0.6 },
     // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
     'press-6-released': turned {
+      into: 0.12,
       left: {
         hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.3, -1, 0], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
@@ -63,11 +73,13 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     // The left hand over the receiver's right side, its index pad pushing the port cover up shut; the cover is part of
     // the receiver mesh, so it has no motion.
     'press-7-cover': turned {
+      into: 0.35,
+      hold: 0.1,
       left: {
         hold: crease { socket: { at: [-0.022, 0.039, -0.07], into: [0.5, -0.866, 0], axis: [0, 0, -1] }, pole: [0.5, -0.87, 0], pinch: { index: [-0.026, -0.012, -0.1] } },
         hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
       },
     },
-    'press-8-fire': ready,
+    'press-8-fire': ready { into: 0.5, hold: 0.4 },
   },
 }

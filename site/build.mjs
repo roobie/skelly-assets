@@ -16,7 +16,7 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
-import { readPressCheck } from '../tools/press-check.mjs';
+import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -190,9 +190,9 @@ if (doll) {
   }
   const actor = modelsById.get(rig.clips);
   if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
-  // The press check plays on the page as a clip through its key frames' pose files, in their names' order.
-  const pressCheck = Object.keys(readPressCheck(root).frames).sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
-  const unwritten = pressCheck.filter((name) => !poses.includes(name));
+  // The press check plays on the page as a clip through its key frames' pose files, each at its own time.
+  const pressCheck = pressCheckClip(readPressCheck(root));
+  const unwritten = [...new Set(pressCheck.keys.map(({ fixture }) => fixture))].filter((name) => !poses.includes(name));
   if (unwritten.length > 0) throw new Error(`press check frames with no pose file (node tools/press-check.mjs): ${unwritten.join(', ')}`);
   writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses, sequences: { 'press check': pressCheck } }));
   mkdirSync(join(out, 'poses'));
