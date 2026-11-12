@@ -1,13 +1,16 @@
-// model-history.json: for each GLB model id and each vehicle id (its placements file), the release that introduced it, the release that last changed its file and
-// the file's hash, so the showcase can say when a model appeared and moved. Builds are reproducible (the assets workflow
+// model-history.json: for each GLB model id and each vehicle id (its placements file), the release that introduced it,
+// the release that last changed its file and the file's hash, so the showcase can say when a model appeared and moved. Builds are reproducible (the assets workflow
 // holds two builds equal), so a hash differs between releases only when the model really changed. Each release carries
 // the cumulative file, built from the previous release's; why the history is not read from git is that a model's id and
 // source move, while its published bytes are what a consumer sees.
 // A model absent from a release leaves the history, so one that returns is new again: a gap in the releases is a gap a
 // consumer could have seen, and keeping the old entry would claim a continuity nobody can check.
-// Usage: node tools/model-history.mjs release --tag <v*> --built <dir> --out <file>   merge the previous release's history
-//        node tools/model-history.mjs fetch --out <file> [--optional]   the latest release's history, for the showcase
-//        node tools/model-history.mjs backfill --out <file> --work <dir>   rebuild it by walking every release
+// Usage: node tools/model-history.mjs release --tag <v*> --built <dir> --out <file>
+//          merge the previous release's history
+//        node tools/model-history.mjs fetch --out <file> [--optional]
+//          the latest release's history, for the showcase
+//        node tools/model-history.mjs backfill --out <file> --work <dir>
+//          rebuild it by walking every release
 // The release commands read GitHub through `gh`.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -97,7 +100,8 @@ export function standings(history, hashes, renames = {}) {
   const carried = carry(history, hashes, renames);
   return Object.fromEntries(Object.keys(hashes).map((id) => {
     const entry = carried[id];
-    return [id, entry === undefined ? null : { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
+    if (entry === undefined) return [id, null];
+    return [id, { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
   }));
 }
 
@@ -119,7 +123,8 @@ export function vehicleStanding(own, parts) {
 const gh = (...args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 2 ** 28 });
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 
-const releaseTags = () => JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000')).map(({ tagName }) => tagName);
+const releaseTags = () => JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000'))
+  .map(({ tagName }) => tagName);
 
 function download(tag, dir, ...patterns) {
   mkdirSync(dir, { recursive: true });
@@ -144,7 +149,9 @@ function releaseCommand({ tag, built, out }) {
     previous = publishedHistory(before, dir);
     rmSync(dir, { recursive: true, force: true });
     // A silent fresh start would stamp every model as introduced now, and that error could not be undone later.
-    if (previous === undefined) throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>\` and attach it to that release`);
+    if (previous === undefined) {
+      throw new Error(`${before} has no ${HISTORY_ASSET}; build one with \`node tools/model-history.mjs backfill --out ${HISTORY_ASSET} --work <scratch dir>\` and attach it to that release`);
+    }
   }
   const manifest = readJson(join(built, MANIFEST));
   write(out, mergeHistory({ previous, version: tag, hashes: hashModels(built, manifest), renames: manifest.renames }));
@@ -167,21 +174,32 @@ function backfillCommand({ out, work }) {
   for (const tag of releaseVersions(releaseTags())) {
     const dir = join(work, tag);
     download(tag, dir, MANIFEST, '*.tar.gz');
-    for (const archive of readdirSync(dir).filter((f) => f.endsWith('.tar.gz'))) execFileSync('tar', ['-C', dir, '-xzf', join(dir, archive)]);
+    for (const archive of readdirSync(dir).filter((f) => f.endsWith('.tar.gz'))) {
+      execFileSync('tar', ['-C', dir, '-xzf', join(dir, archive)]);
+    }
     const manifest = readJson(join(dir, MANIFEST));
-    history = mergeHistory({ previous: history, version: tag, hashes: hashModels(dir, manifest), renames: manifest.renames });
+    const hashes = hashModels(dir, manifest);
+    history = mergeHistory({ previous: history, version: tag, hashes, renames: manifest.renames });
     rmSync(dir, { recursive: true, force: true });
-    console.log(`${tag}: ${Object.keys(history.models).length} models, ${Object.values(history.models).filter((m) => m.updated === tag && m.introduced !== tag).length} changed, ${Object.values(history.models).filter((m) => m.introduced === tag).length} new`);
+    const entries = Object.values(history.models);
+    const added = entries.filter((m) => m.introduced === tag).length;
+    const changed = entries.filter((m) => m.updated === tag && m.introduced !== tag).length;
+    console.log(`${tag}: ${entries.length} models, ${changed} changed, ${added} new`);
   }
   write(out, history);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const [command, ...rest] = process.argv.slice(2);
-  const { values } = parseArgs({ args: rest, options: { tag: { type: 'string' }, built: { type: 'string' }, out: { type: 'string' }, work: { type: 'string' }, optional: { type: 'boolean', default: false } } });
+  const text = { type: 'string' };
+  const { values } = parseArgs({ args: rest, options: { tag: text, built: text, out: text, work: text, optional: { type: 'boolean', default: false } } });
   const commands = { release: releaseCommand, fetch: fetchCommand, backfill: backfillCommand };
-  if (!commands[command] || !values.out) throw new Error('usage: node tools/model-history.mjs release|fetch|backfill --out <file> (see the file header)');
-  if (command === 'backfill' && !values.work) throw new Error('backfill needs --work <dir>, where it downloads each release and deletes it again');
+  if (!commands[command] || !values.out) {
+    throw new Error('usage: node tools/model-history.mjs release|fetch|backfill --out <file> (see the file header)');
+  }
+  if (command === 'backfill' && !values.work) {
+    throw new Error('backfill needs --work <dir>, where it downloads each release and deletes it again');
+  }
   if (command === 'release' && !(values.tag && values.built)) throw new Error('release needs --tag <v*> and --built <dir>');
   commands[command]({ ...values, out: resolve(values.out) });
 }

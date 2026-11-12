@@ -22,7 +22,11 @@ const nameOf = (id) => {
 function versionsOf(history) {
   const link = (version) => Object.assign(document.createElement('a'), { href: release.url + version, textContent: version, target: '_blank', rel: 'noopener' });
   if (history === null) return ['New since ', link(release.version)];
-  return ['Introduced in ', link(history.introduced), ' · Last changed in ', link(history.updated), ...(history.changed ? [' · changed since ', link(release.version)] : [])];
+  return [
+    'Introduced in ', link(history.introduced),
+    ...(history.updated === history.introduced ? [] : [' · Last changed in ', link(history.updated)]),
+    ...(history.changed ? [' · changed on main since ', link(release.version)] : []),
+  ];
 }
 
 // A fact's value is text or a list of text and nodes.
