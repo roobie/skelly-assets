@@ -4,7 +4,8 @@
 //
 // The probe takes the doll at rest, as tools/dollRig.mjs, `restMeshes` gives it: `body`, a mesh per bone, and `pieces`,
 // a mesh per worn piece with the bone it rides, all in the rig frame. A mesh is a closed triangle mesh
-// { positions: xyz triples, indices }. It takes bone transforms as site/kinematics.mjs, `boneTransforms` gives them.
+// { positions: xyz triples, indices }, and a body part's mesh may name each triangle's region in `pieces`
+// (site/hiding.mjs). It takes bone transforms as site/kinematics.mjs, `boneTransforms` gives them.
 //
 // A body point is covered when a piece is meant to cover it at rest (`coverage`). A covered point outside every piece in
 // a pose `pokes`, unless it is hidden inside the figure, as where one part meets the next, which no one sees; one on
@@ -12,6 +13,7 @@
 // it was already in there at rest, where pieces meet the next part by design, or it lies in another piece, a `seam`
 // where the garment overlaps itself. The skin check (skin.mjs) draws the same covered surface, so what the probe finds and what a camera sees
 // are told of one surface.
+import { hides } from './hiding.mjs';
 import { add, applyPoint, cross, dot, IDENTITY_M, length, mulMV, normalize, scale, sub, transpose } from './kinematics.mjs';
 
 // Two surfaces closer than this are one: positions are stored as float32 and pass through a few transforms, which moves
@@ -74,16 +76,18 @@ export function subdivided(mesh, pitch = PITCH) {
   return out;
 }
 
-// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal },
-// sampled at its centroid with its outward normal. A centroid lies inside one face, so a step off it along that normal leaves
-// the face's plane, where a corner's step along one of its faces could run along a plane another face lies in. A
-// mirrored copy's faces are turned inside out, which its negative volume shows.
+// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal, region },
+// sampled at its centroid with its outward normal, `region` the region its triangle is named in, if any. A centroid lies
+// inside one face, so a step off it along that normal leaves the face's plane, where a corner's step along one of its
+// faces could run along a plane another face lies in. A mirrored copy's faces are turned inside out, which its negative
+// volume shows.
 export function sampledSurface(mesh, pitch = PITCH) {
   const faces = triangles(mesh);
   const outward = faces.reduce((sum, [a, b, c]) => sum + dot(a, cross(b, c)), 0) < 0 ? -1 : 1;
-  return faces.flatMap((face) => {
+  return faces.flatMap((face, t) => {
     const normal = scale(normalize(cross(sub(face[1], face[0]), sub(face[2], face[0]))), outward);
-    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal }));
+    const region = mesh.pieces?.[t];
+    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal, region }));
   });
 }
 
@@ -244,26 +248,32 @@ const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = 
  *   for its arm passes through the arm.
  * A ray along the bone runs out through the part's end, where it nests into the next piece through that piece's
  * opening: a fingertip's ray meets the cuff its hand reaches into, and the cuff does not cover the fingertip. Nor does a
- * piece cover what it only sits beside, as a belt bag beside the waist it hangs on.
+ * piece cover what it only sits beside, as a belt bag beside the waist it hangs on. A piece that declares what it
+ * `covers` of the part copy it rides passes beneath only that: a tank top that covers the trunk leaves the shoulders
+ * bare, though its armholes and straps lie beneath the deltoids and the pectorals.
+ * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
  */
 export function coverage(rig, rest) {
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
   const bodySolids = new Map(rest.body.map(({ bone, mesh }) => [bone, carried(solidOf(mesh), STILL)]));
+  const parts = new Map(rest.body.map(({ bone, part }) => [bone, part]));
   const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
-  const beneath = (id, point, normal) => {
+  const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
+  const beneath = (id, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
     let hit = { t: Infinity, index: -1 };
     pieceSolids.forEach(({ tree }, index) => {
+      if (declaresBare(rest.pieces[index], id, region)) return;
       const t = firstHit(tree, point, dir, hit.t);
       if (t < hit.t) hit = { t, index };
     });
     if (hit.index < 0) return -1;
     return winding(bodySolids.get(id).tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
   };
-  return (id, { point, normal }) => {
-    const { depth, index } = depthOutside(pieceSolids, point);
-    return depth <= COINCIDENT ? index : beneath(id, point, normal);
+  return (id, sample) => {
+    const { depth, index } = depthOutside(pieceSolids, sample.point);
+    return depth <= COINCIDENT ? index : beneath(id, sample);
   };
 }
 
@@ -277,7 +287,7 @@ export function coveredSurface(rig, rest) {
   const cover = coverage(rig, rest);
   const sampled = (bone, sample) => {
     const index = cover(bone, sample);
-    const whole = index >= 0 && sample.corners.every((point) => cover(bone, { point, normal: sample.normal }) >= 0);
+    const whole = index >= 0 && sample.corners.every((point) => cover(bone, { ...sample, point }) >= 0);
     return { ...sample, cover: index, whole };
   };
   return rest.body.map(({ bone, mesh }) => ({ bone, samples: sampledSurface(mesh).map((sample) => sampled(bone, sample)) }));

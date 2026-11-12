@@ -93,7 +93,7 @@ export function modelMeshes(buffer, keep = () => true) {
   const byName = new Map();
   for (const { part, mesh, toModel } of meshNodes(buffer, gltf)) {
     if (!part) continue;
-    const into = byName.get(part.name) ?? { part: part.name, positions: [], indices: [] };
+    const into = byName.get(part.name) ?? { part: part.name, positions: [], indices: [], pieces: [] };
     byName.set(part.name, into);
     for (const { attributes, indices, mode = TRIANGLES, extras } of mesh.primitives) {
       if (!keep(part.name, extras?.piece, extras?.slot)) continue;
@@ -103,6 +103,7 @@ export function modelMeshes(buffer, keep = () => true) {
       for (let i = 0; i < positions.length; i += 3) into.positions.push(...toModel(positions.slice(i, i + 3)));
       const order = indices === undefined ? Array.from({ length: positions.length / 3 }, (_, i) => i) : glbAccessor(buffer, gltf, indices);
       for (const index of order) into.indices.push(base + index);
+      for (let t = 0; t < order.length / 3; t++) into.pieces.push(extras?.piece);
     }
   }
   return [...byName.values()].filter(({ indices }) => indices.length > 0);
