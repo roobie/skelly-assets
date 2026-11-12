@@ -49,7 +49,7 @@ local bar(id, slot, xa, za, xb, zb, w, y0, y1) =
     knob: 'steel-bright',
     switch: 'lacquer-red',
     cord: 'rubber-black',
-  }) + { title: 'Forge' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
+  }) + { title: 'Electric forge' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A propane forge: an insulated steel drum 280 mm across and 340 mm long lying front to back on a welded stand,
   // its mouth on +z lined with fire brick and glowing, a burner tube standing in its top fed by a hose. 0.56 m tall.

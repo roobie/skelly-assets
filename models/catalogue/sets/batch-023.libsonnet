@@ -87,7 +87,7 @@ local pipLayout = {
   ] + [
     disc('cap-%d' % i, 'capacitor', 0.003, 0.002, 0.012, -0.035 + (i % 3) * 0.008, -0.04 + std.floor(i / 3) * 0.008)
     for i in std.range(0, 5)
-  ], { board: 'circuit-green', socket: 'plastic-gloss-white', lid: 'steel-stainless', contact: 'foil-gold', chip: 'plastic-black', capacitor: 'alu-bare' }) + { title: 'Processor' }
+  ], { board: 'circuit-green', socket: 'plastic-gloss-white', lid: 'steel-stainless', contact: 'foil-gold', chip: 'plastic-black', capacitor: 'alu-bare' }) + { title: 'Processing chip' }
   + h.inHand('processor', 'board') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // A radio repeater module in a grey case 200 mm wide, 80 mm tall and 125 mm deep: a black front panel with
@@ -193,7 +193,7 @@ local pipLayout = {
     turned('screw-%d-%d' % [s, c], 'plate', 'x', [[0, 0], [0, 0.0025], [0.0015, 0.0025], [0.0015, 0]], [s * 0.05 + (if s < 0 then -0.0015 else 0), [0.007, 0.028][c], [-0.024, 0.024][c]])
     for s in [-1, 1]
     for c in [0, 1]
-  ], { case: 'alu-bare', plate: 'steel-stainless', jack: 'brass-polished', antenna: 'rubber-black', lamp: 'gem-green', label: 'paper-white', header: 'plastic-black' }) + { title: 'Receiver' }
+  ], { case: 'alu-bare', plate: 'steel-stainless', jack: 'brass-polished', antenna: 'rubber-black', lamp: 'gem-green', label: 'paper-white', header: 'plastic-black' }) + { title: 'Radio receiver' }
   + h.inHand('receiver', 'case') + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A small refrigerant cylinder, 90 mm across and 220 mm tall: a white steel body on a foot ring with a

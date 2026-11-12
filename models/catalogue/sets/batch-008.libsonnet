@@ -77,7 +77,7 @@ local capsule(id, a, b, length, radius, y0, x, z) = [
     prism('trigger', 'trigger', 'z', [[0.012, 0.158], [0.022, 0.158], [0.026, 0.13], [0.018, 0.13]], -0.006, 0.006),
     rod('tube', 'head', 0.006, -0.025, -0.012, 0.18),
     turned('tape', 'tape', 'y', [[0.05, 0], [0.05, 0.028], [0.08, 0.028], [0.08, 0]]),
-  ], { bottle: 'plastic-frosted', head: 'plastic-white', nozzle: 'plastic-black', trigger: 'plastic-blue', tape: 'tape-grey' }) + { title: 'Skunk neutraliser' } + inHand('skunk_neutralizer', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { bottle: 'plastic-frosted', head: 'plastic-white', nozzle: 'plastic-black', trigger: 'plastic-blue', tape: 'tape-grey' }) + { title: 'Spray bottle of skunk neutraliser' } + inHand('skunk_neutralizer', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A 5 ml white dropper bottle of steroid eye drops, 18 mm across and 62 mm tall, with a narrow paper
   // label and a tall pink cap.

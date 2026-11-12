@@ -107,7 +107,7 @@ local rod(id, slot, radius, x0, x1, y) = turned(id, slot, 'x', [[0, 0], [0, radi
     turned('label', 'label', 'y', [[0.01, 0], [0.01, 0.0123], [0.034, 0.0123], [0.034, 0]]),
     disc('crimp', 'crimp', 0.0075, 0.047, 0.054),
     disc('flip', 'flip', 0.0065, 0.054, 0.057),
-  ], { glass: 'glass-clear', liquid: 'fuel-amber', label: 'paper-white', crimp: 'alu-bare', flip: 'plastic-red' }) + { title: 'Injectable iron' } + inHand('injectable_iron', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
+  ], { glass: 'glass-clear', liquid: 'fuel-amber', label: 'paper-white', crimp: 'alu-bare', flip: 'plastic-red' }) + { title: 'Vial of injectable iron' } + inHand('injectable_iron', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['modern'] } } },
 
   // A foil blister card of fourteen round iodide tablets, 80 mm by 30 mm and lying flat, two rows of seven.
   h.compound('potassium_iodide_tablets', 0.0057, [
