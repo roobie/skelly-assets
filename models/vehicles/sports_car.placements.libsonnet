@@ -7,7 +7,8 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
   sites: (import 'car-sites.libsonnet')('sports_car', s, {
     drop: ['rear_bench'],
     over: {
-      engine: { part: 'engine_v6_petrol', at: [-0.9, 0.3, 0] },
+      // The engine stands just ahead of the twist beam's cross member.
+      engine: { part: 'engine_v6_petrol', at: [-0.83, 0.3, 0] },
       gearbox: { at: [-1.4, 0.3, 0] },
       radiator: { part: 'radiator_small', at: [s.front - 0.32, 0.26, 0] },
       fuel_tank: { at: [s.frontAxle - 0.05, 0.24, 0] },
@@ -32,8 +33,4 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
       site.one('spoiler', 'sports_car_spoiler'),
     ],
   }),
-  unjudged: [
-    site.unjudged('engine', 'rear_axle', 0.058,
-      'The sump piece of engine_v6_petrol runs into the beam piece of twist_beam.'),
-  ],
 }

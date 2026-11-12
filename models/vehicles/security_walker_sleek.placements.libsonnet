@@ -34,8 +34,6 @@ local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
   ),
   tags: { 'vehicle-role': ['military'] },
   unjudged: [
-    site.unjudged('carrier', 'radiator', 0.032,
-      'The rear_bulkhead piece of security_walker_sleek_carrier runs into the cooling_fan_hub piece of radiator_truck.'),
     site.unjudged('carrier', 'terrain_camera_far', 0.06,
       'The belly piece of security_walker_sleek_carrier runs into the housing_far piece of security_walker_sleek_terrain_camera.'),
     site.unjudged('carrier', 'terrain_camera_near', 0.06,

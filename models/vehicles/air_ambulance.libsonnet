@@ -133,7 +133,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   ], { steel: 'steel-grey' }) + { title: 'Air ambulance main gearbox' },
   h.turbine('air_ambulance_turbine', 125, 1.0, 0.2) + { title: 'Air ambulance turbine' },
   k.compound('air_ambulance_fuel_tank', 25, [
-    box('tank', 'alu', [-0.9, 0, -0.5], [0.4, 0.2, 0.5]),
+    // The tank ends ahead of the skids' rear cross tube, which passes under the cabin floor.
+    box('tank', 'alu', [-0.85, 0, -0.5], [0.4, 0.2, 0.5]),
   ], { alu: 'alu-bare' }) + { title: 'Air ambulance fuel tank' },
   h.skids('air_ambulance_skids', 65, [-1.35, 1.75], 1.12, [
     { x: 1.15, top: 0.6, root: 0.55 },

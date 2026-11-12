@@ -45,7 +45,5 @@ local s = import 'air_ambulance.spec.libsonnet';
       'The pylon piece of air_ambulance_engine_cowl runs into the case piece of air_ambulance_main_gearbox.'),
     site.unjudged('locker', 'sliding_door_far', 0.06,
       'The carcass piece of air_ambulance_locker runs into the hinge_rib_far piece of air_ambulance_sliding_door.'),
-    site.unjudged('skids', 'fuel_tank', 0.05,
-      'The cross_1 piece of air_ambulance_skids runs into the tank piece of air_ambulance_fuel_tank.'),
   ],
 }

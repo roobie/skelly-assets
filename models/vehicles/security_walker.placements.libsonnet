@@ -10,7 +10,7 @@ local roof = std.foldl(std.max, [p[1] for p in s.torso.profile], 0);
     site.one('sensor_window', 'security_walker_sensor_window'),
     site.one('sensor_array', 'security_walker_sensor_array'),
     site.one('engine', 'engine_i6_diesel', [-0.6, 2.91, 0]),
-    site.one('radiator', 'radiator_truck', [-1.2525, 3.1, 0]),
+    site.one('radiator', 'radiator_truck', [-1.09, 3.1, 0]),
     site.one('fuel_tank', 'fuel_tank_truck', [0.45, 2.9413, 0.55]),
     site.one('hydraulic_pack', 'security_walker_hydraulic_pack'),
     site.one('hatch', 'turret_hatch', [-0.3, roof, 0]),

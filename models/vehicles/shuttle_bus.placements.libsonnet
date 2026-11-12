@@ -8,8 +8,4 @@ local s = import 'shuttle_bus.spec.libsonnet';
     site.one('luggage_rack', 'shuttle_bus_luggage_rack', [s.rack.x, 0, 0]),
     site.one('roof_unit', 'shuttle_bus_roof_unit'),
   ],
-  unjudged: [
-    site.unjudged('rear_axle', 'gearbox', 0.06,
-      'The diff piece of beam_axle_truck runs into the case piece of gearbox_truck.'),
-  ],
 }
