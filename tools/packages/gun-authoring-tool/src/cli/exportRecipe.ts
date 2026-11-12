@@ -50,7 +50,7 @@ const exporters = {
     const options = parse(strictObject({ component: picklist(['round', 'case']) }), optionsFor(row));
     const cartridge = cartridgeAt(row.source, root);
     return () => {
-      const result = exportCartridgeModel(cartridge, options.component, assetFor(row), { voxel: voxelFor(row) });
+      const result = exportCartridgeModel(cartridge, options.component, assetFor(row));
       if (!result.ok) {
         throw new Error(JSON.stringify(result.error));
       }

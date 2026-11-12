@@ -1,13 +1,7 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
-import type {
-  AppearanceContext,
-  GlbAssetIdentity,
-  GlbExportError,
-  VoxelGrains,
-} from '@skelly/thing-export/exportTypes.ts';
-import { featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
+import type { AppearanceContext, GlbAssetIdentity, GlbExportError } from '@skelly/thing-export/exportTypes.ts';
 import { type CartridgeModelKind, cartridgeModelAsset } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type RoundProfiles, roundProfiles } from '../ammo/roundProfile.ts';
@@ -39,39 +33,16 @@ const EMPTY_PORTS: PartDef['ports'] = [];
 const EMPTY_KEEPOUTS: PartDef['keepOuts'] = [];
 const EMPTY_AXES: PartDef['axes'] = [];
 const MM_DOMAIN: Domain['units'] = { metresPerUnit: 0.001, grid: 0.001, bevel: 0 };
-// The lattice samples a revolved solid's mesh, so a voxelized cartridge is meshed near-round first: its facet edges
-// then sit well inside a voxel and no flat shows through as a stepped side.
-const VOXEL_SAMPLED_FACETS = 96;
 
 interface CartridgeLook {
   readonly appearance?: AppearanceContext | undefined;
-  readonly voxel?: Partial<VoxelGrains>;
 }
-
-/**
- * The thinnest feature that shapes a cartridge's outline, in metres: its rim, which every head has, where an extractor
- * groove is absent from rimmed and shotshell heads.
- */
-export const rimThickness = (cartridge: Cartridge): number => {
-  const { value } = cartridge.kind === 'shotshell' ? cartridge.head.rimThickness : cartridge.case.rim.thickness;
-  if (value === null) {
-    throw new Error(`cartridge ${cartridge.id} has no rim thickness`);
-  }
-  return value * MM_DOMAIN.metresPerUnit;
-};
-
-/**
- * A cartridge whose rim is too thin for its grain is drawn as a faceted lathe, as voxels would lose its rim and step
- * its taper; one whose rim fits keeps the voxel look of the guns around it. Its data may decide either way.
- */
-const voxelized = (cartridge: Cartridge, voxelGrain: number | undefined): boolean =>
-  voxelGrain !== undefined && (cartridge.voxelize ?? featureFitsGrain(rimThickness(cartridge), voxelGrain));
 
 const makeModelExport = (
   cartridge: Cartridge,
   asset: GlbAssetIdentity,
   solids: readonly Solid[],
-  { appearance, voxel }: CartridgeLook,
+  { appearance }: CartridgeLook,
 ): SingleCartridgeExportResult => {
   const family: PartFamily = {
     name: 'cartridge-model',
@@ -105,14 +76,13 @@ const makeModelExport = (
       ...appearance?.finish,
     },
   };
-  const voxels = voxelized(cartridge, voxel?.voxelGrain);
+  // No voxel grain: a cartridge's rim and taper land unevenly on any grain, so it is drawn as a faceted lathe.
   const result = exportGlb({
     resolved,
     palette: AMMO_PALETTE,
-    revolveFacets: voxels ? VOXEL_SAMPLED_FACETS : GUN_APPEARANCE.roundSides,
+    revolveFacets: GUN_APPEARANCE.roundSides,
     asset,
     appearance: effectiveAppearance,
-    ...(voxels ? voxel : {}),
   });
   if (!result.ok) {
     return result;
@@ -142,12 +112,10 @@ const revolved = (id: string, profile: RevolvedSolid['profile'], slot: string): 
 const metallicSolids = (cartridge: Extract<Cartridge, { kind: 'metallic' }>) => {
   const profiles: RoundProfiles = roundProfiles(cartridge);
   return {
-    // The bullet's seated length lies inside the case, within a voxel of its wall; a later solid takes a shared voxel,
-    // so the case comes after the bullet and the round shows brass to the mouth.
     round: [
-      revolved('bullet', profiles.bullet, 'bullet'),
       revolved('case', profiles.loadedCase, 'case'),
       revolved('primer', profiles.primer, 'primer'),
+      revolved('bullet', profiles.bullet, 'bullet'),
     ],
     case: [revolved('case', profiles.firedCase, 'case'), revolved('primer', profiles.primer, 'primer')],
   };

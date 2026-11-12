@@ -1,10 +1,9 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
-import { FEATURE_VOXELS } from '@skelly/thing-export/featureFit.ts';
 import { srgbToLinear } from '@skelly/thing-export/glb.ts';
 import validator from 'gltf-validator';
 import { describe, expect, it } from 'vitest';
-import type { Cartridge, MetallicCartridge } from '../src/ammo/cartridge.ts';
-import { exportCartridgeModel, exportCartridgeModels, rimThickness } from '../src/gun/cartridgeExport.ts';
+import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
+import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 
@@ -109,66 +108,5 @@ describe('standalone cartridge GLBs', () => {
       expect(report.issues.numErrors, name).toBe(0);
       expect(report.issues.numWarnings, name).toBe(0);
     }
-  });
-
-  it.each(['9x19.json', '5.56x45.json'])('draws a seated bullet of %s only past the case mouth', (file) => {
-    // Voxelized at a grain that resolves the seat, where a bullet drawn over the case would show through its wall.
-    const voxelGrain = 0.001;
-    const result = exportCartridgeModel(
-      { ...(loadCartridgeFile(file) as MetallicCartridge), voxelize: true },
-      'round',
-      { id: 'fixture_round', file: 'assets/models/fixture_round.glb' },
-      { voxel: { voxelGrain, voxelDetailGrain: voxelGrain } },
-    );
-    if (!result.ok) {
-      throw new Error(JSON.stringify(result.error));
-    }
-    const gltf = glbJson(result.model.glb) as {
-      meshes: { primitives: { attributes: { POSITION: number }; extras: { slot: string } }[] }[];
-      accessors: { min: number[]; max: number[] }[];
-    };
-    // Each slot's drawn faces along the round's length.
-    const spans = new Map<string, { min: number; max: number }>();
-    for (const { attributes, extras } of gltf.meshes.flatMap(({ primitives }) => primitives)) {
-      const { min, max } = gltf.accessors[attributes.POSITION]!;
-      const span = spans.get(extras.slot);
-      spans.set(extras.slot, {
-        min: Math.min(span?.min ?? min[0]!, min[0]!),
-        max: Math.max(span?.max ?? max[0]!, max[0]!),
-      });
-    }
-    const bullet = spans.get('bullet')!;
-    const brass = spans.get('case')!;
-    expect(Math.min(bullet.max, brass.max) - Math.max(bullet.min, brass.min)).toBeLessThanOrEqual(voxelGrain + 1e-6);
-  });
-});
-
-/** The voxel grain each primitive of a cartridge's round is drawn at; undefined where it is drawn smooth. */
-const drawnGrains = (cartridge: Cartridge, voxelGrain: number): (number | undefined)[] => {
-  const result = exportCartridgeModel(
-    cartridge,
-    'round',
-    { id: 'fixture_round', file: 'assets/models/fixture_round.glb' },
-    { voxel: { voxelGrain } },
-  );
-  if (!result.ok) {
-    throw new Error(JSON.stringify(result.error));
-  }
-  const { meshes } = glbJson(result.model.glb) as { meshes: { primitives: { extras?: { voxelGrain?: number } }[] }[] };
-  return meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.voxelGrain));
-};
-
-describe('a cartridge against its grain', () => {
-  it.each(['9x19.json', '12-gauge-00-buck.json'])('voxelizes %s from a rim of the feature span, not thinner', (file) => {
-    const cartridge = loadCartridgeFile(file);
-    const fits = rimThickness(cartridge) / FEATURE_VOXELS;
-    expect(new Set(drawnGrains(cartridge, fits))).toEqual(new Set([fits]));
-    expect(new Set(drawnGrains(cartridge, fits * 1.01))).toEqual(new Set([undefined]));
-  });
-
-  it('voxelizes a cartridge whose data says so, whatever its rim', () => {
-    const cartridge = { ...loadCartridgeFile('9x19.json'), voxelize: true };
-    const grain = (rimThickness(cartridge) / FEATURE_VOXELS) * 2;
-    expect(new Set(drawnGrains(cartridge, grain))).toEqual(new Set([grain]));
   });
 });
