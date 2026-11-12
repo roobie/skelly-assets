@@ -1,7 +1,7 @@
 {
   "format": 1,
   // A case under 10 mm across needs the fine grain to keep its neck, shoulder and bullet; the item grain draws blocks.
-  "voxelGrain": 0.002,
+  "voxelGrain": 0.001,
   "kind": "metallic",
   "id": "5.56x45",
   "designation": "5.56×45mm NATO",

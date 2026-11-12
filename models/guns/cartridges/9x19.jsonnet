@@ -2,7 +2,7 @@ local cite(locator, verbatim=null) = { source: 'saami', locator: 'printed p. 24,
 local measure(value, locator, verbatim) = { value: value, cite: cite(locator, verbatim) };
 local unknown = { value: null, cite: null, note: 'Not specified by the governing cartridge drawing.' };
 {
-  format: 1, kind: 'metallic', id: '9x19', designation: '9×19 mm Parabellum', voxelGrain: 0.002,
+  format: 1, kind: 'metallic', id: '9x19', designation: '9×19 mm Parabellum', voxelGrain: 0.001,
   aliases: [{ name: '9mm Luger', cite: cite('drawing title', '9mm LUGER') }],
   sources: {
     saami: {
