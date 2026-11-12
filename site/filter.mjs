@@ -6,7 +6,11 @@
 export const ALL = 'All';
 export const UNCATEGORISED = 'Uncategorised';
 export const VEHICLES = 'Vehicles';
-export const KEYWORD = 'keyword'; // the dimension of a model's keywords; every other dimension is a tag facet
+export const KEYWORD = 'keyword'; // the dimension of a model's keywords; every other dimension but FORM is a tag facet
+// The dimension of whether a model is an assembly or an atom (tools/components.mjs, formOf). It is derived, so it is no
+// taxonomy facet; its capital letter keeps it from colliding with a kebab-case facet name, and its own hash token keeps
+// it apart from the `tag` ones.
+export const FORM = 'Form';
 
 // A short landing page keeps the first load to a handful of previews however large the catalogue grows.
 export const LANDING_COUNT = 10;
@@ -14,7 +18,11 @@ export const LANDING_COUNT = 10;
 export const PAGE_SIZE = 48;
 
 export const shelfOf = (entry) => (entry.sites ? VEHICLES : entry.category ?? UNCATEGORISED);
-export const termsOf = (entry, dimension) => (dimension === KEYWORD ? entry.keywords : entry.tags[dimension] ?? []);
+export const termsOf = (entry, dimension) => {
+  if (dimension === KEYWORD) return entry.keywords;
+  if (dimension === FORM) return [entry.form];
+  return entry.tags[dimension] ?? [];
+};
 
 export const emptyFilter = () => ({ q: '', shelf: ALL, picks: {} });
 
@@ -67,8 +75,16 @@ export function stateHash({ filter, reshuffle, model, view, info }) {
   if (model && info) params.set('info', '1');
   if (filter.q.trim()) params.set('q', filter.q.trim());
   if (filter.shelf !== ALL) params.set('cat', filter.shelf);
-  for (const [dimension, terms] of Object.entries(filter.picks)) {
-    for (const term of terms) params.append(dimension === KEYWORD ? 'kw' : 'tag', dimension === KEYWORD ? term : `${dimension}:${term}`);
+  // Dimensions go in a fixed order, not the order the reader picked them, so that the hash a state writes is the one it
+  // parses back to and sameGrid does not mistake a reordering for a different grid.
+  const rank = (dimension) => [KEYWORD, FORM].indexOf(dimension) + 1 || Number.MAX_SAFE_INTEGER;
+  const ordered = Object.entries(filter.picks).sort(([a], [b]) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0));
+  for (const [dimension, terms] of ordered) {
+    for (const term of terms) {
+      if (dimension === KEYWORD) params.append('kw', term);
+      else if (dimension === FORM) params.append('form', term);
+      else params.append('tag', `${dimension}:${term}`);
+    }
   }
   if (reshuffle > 0) params.set('r', String(reshuffle));
   return params.toString().replaceAll('%3A', ':'); // a colon is safe in a hash and reads better in a link
@@ -82,6 +98,7 @@ export function parseState(hash) {
     if (term && !terms.includes(term)) terms.push(term);
   };
   for (const term of params.getAll('kw')) pick(KEYWORD, term);
+  for (const term of params.getAll('form')) pick(FORM, term);
   for (const tag of params.getAll('tag')) {
     const at = tag.indexOf(':');
     if (at > 0) pick(tag.slice(0, at), tag.slice(at + 1));
