@@ -238,14 +238,14 @@ local pair(fn, gap) = fn('l-', -gap, -1) + fn('r-', gap, 1);
   // A pair of knitted wool mittens laid flat, each 240 mm from cuff to tip and 100 mm across: thick grey mitts with a
   // red band across the back and a ribbed cuff.
   h.compound('mittens', 0.13, pair(woolMitten, 0.072), { palm: 'wool-grey', cuff: 'wool-grey', rib: 'cloth-charcoal', band: 'cloth-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of thin flame-resistant knit gloves laid flat, each 240 mm from cuff to fingertip, with ribbed knit cuffs.
   h.compound('flame_resistant_gloves', 0.05, pair(knitGlove, 0.066), { palm: 'knit-fr', finger: 'knit-fr', cuff: 'knit-fr', seam: 'cloth-charcoal' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['firefighting', 'safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 
   // A pair of flame-resistant socks worn as mitts, laid flat, each 380 mm long and 90 mm wide, with finger holes poked
   // through the toe and a slit for the thumb.
   h.compound('flame_resistant_sock_mitts', 0.08, pair(sockMitt, 0.06), { sock: 'knit-fr', heel: 'cloth-charcoal', hole: 'cloth-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['fabric'], setting: ['modern'], slot: ['hands'] } } },
 ]

@@ -69,6 +69,14 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   rad: rad,
   arc: arc,
   bar: bar,
+  // A roller shutter in a locker wall, from `z[0]` to `z[1]`: horizontal slats in alternating `alu` and `steel`, with a
+  // grab bar in `dark` along its foot.
+  shutter(name, x0, x1, y0, y1, z): [
+    box(name + '_bar', 'dark', [x0, y0, z[0]], [x1, y0 + 0.08, z[1]]),
+  ] + [
+    box(name + '_slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [x0, y0 + 0.08 + i * 0.09, z[0]], [x1, std.min(y0 + 0.08 + (i + 1) * 0.09, y1), z[1]])
+    for i in std.range(0, std.ceil((y1 - y0 - 0.08) / 0.09) - 1)
+  ],
   // The x of a fork raked back from its axle at (axle, hub), `rake` m for each metre it rises.
   forkX(axle, hub, rake): function(y) axle - (y - hub) * rake,
   compound(id, massKg, pieces, finish, anchors={}): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors),

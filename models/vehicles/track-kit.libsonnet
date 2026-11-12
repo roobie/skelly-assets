@@ -133,6 +133,8 @@ local trackRows(name) =
   rows: std.flattenArrays([classRows(name) for name in std.objectFields(classes)] + [trackRows(name) for name in std.objectFields(tracks)]),
   // The tracks, by the names `sites` takes.
   names: std.objectFields(tracks),
+  // A track's frame, in its own frame, for what a vehicle mounts on it.
+  frame(name): tracks[name].frame,
   // One track's sites, its frame placed at `at`; `detail` is 'fused' or 'assembly', as `assembly.libsonnet`, `sites`,
   // says. The band's site is `track`, each wheel's is the wheel's site in `tracks.libsonnet`.
   sites(name, at, detail): assembly.sites('track', name, bandId(name), fittings(name), at, detail),

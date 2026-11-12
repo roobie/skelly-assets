@@ -46,15 +46,34 @@ export function ruleAt(g, { x, y }, length) {
   else g.fillRect(0, y, length, 1);
 }
 
-// Draws the object from `direction` into `size` pixels of the tile at (x, y), with the view's name, over `grid` when
-// the view looks from level or above: from below, the grid would lie between the camera and the object.
-export function drawView({ renderer, stage, camera }, g, obj, grid, [name, direction], x, y, size) {
+// Draws the stage from `direction` into `size` pixels of the tile at (x, y), framed on `framed`, with the view's name,
+// over `grid` when the view looks from level or above: from below, the grid would lie between the camera and the object.
+export function drawView({ renderer, stage, camera }, g, framed, grid, [name, direction], x, y, size) {
   renderer.setSize(size, size, false);
-  frame(camera, obj, new THREE.Vector3(), direction);
+  frame(camera, framed, new THREE.Vector3(), direction);
   const gridded = direction.y >= 0;
   if (gridded) stage.add(grid);
   renderer.render(stage, camera);
   if (gridded) stage.remove(grid);
+  g.drawImage(renderer.domElement, x, y);
+  g.fillStyle = '#5b574f';
+  g.fillText(name, x + 6, y + 6);
+}
+
+// Draws the stage as seen from `eye` looking along `forward` into `size` pixels of the tile at (x, y): a first-person
+// view, wide like a game's and framed on nothing, with the view's name.
+const EYE_FOV = 70;
+export function drawEye({ renderer, stage, camera }, g, name, eye, forward, x, y, size) {
+  renderer.setSize(size, size, false);
+  camera.fov = EYE_FOV;
+  camera.near = 0.02;
+  camera.far = 100;
+  camera.up.set(0, 1, 0);
+  camera.position.copy(eye);
+  camera.lookAt(eye.clone().add(forward));
+  camera.updateProjectionMatrix();
+  renderer.render(stage, camera);
+  camera.fov = 30;
   g.drawImage(renderer.domElement, x, y);
   g.fillStyle = '#5b574f';
   g.fillText(name, x + 6, y + 6);

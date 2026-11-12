@@ -100,7 +100,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     lapel: 'cloth-white',
     belt: 'cloth-white',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A light cotton karate uniform folded to 300 mm by 240 mm and 40 mm high in three folds: a narrow lapel crossing
   // left over right, the trousers folded inside and a black belt tied round the bundle.
@@ -111,7 +111,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     lapel: 'cloth-white',
     belt: 'cloth-black',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A thin cotton training jacket alone, without trousers or belt, folded to 280 mm by 220 mm and 24 mm high with
   // a narrow lapel crossing left over right.
@@ -119,7 +119,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     cloth: 'cloth-cream',
     lapel: 'cloth-white',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], setting: ['modern'], slot: ['torso'], state: ['folded'] } } },
 
   // A layered Shinto hunting robe folded to 420 mm by 320 mm and 80 mm high: the wide sleeves folded back over each
   // side of the top, cords threaded through their cuffs ending in tassels, a round collar fastened at one shoulder,
@@ -148,7 +148,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     seam: 'cloth-brown',
     border: 'cloth-yellow',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A cotton robe folded lengthwise to 400 mm by 250 mm and 50 mm high, its pale collar band running down the
   // folded front, and a red sash folded flat across the middle.
@@ -179,7 +179,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     buckle: 'metal-silver',
     buttons: 'cloth-white',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A heavy black leather riding jacket folded to 360 mm by 280 mm and 80 mm high in three folds: wide lapels
   // studded down at the collar, a steel zip running slant from the left shoulder to the right hip, a belt with a
@@ -222,7 +222,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     collar: 'cloth-cream',
     cord: 'plastic-charcoal',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A heavy navy wool coat folded to 360 mm by 280 mm and 80 mm high: broad lapels from the collar, two rows of
   // three dark buttons down the double-breasted front, and slanted flaps over the deep hip pockets.
@@ -296,7 +296,7 @@ local patchwork(w, d, ht, nx, nz, border) =
     lining: 'cloth-shimmer',
     gold: 'metal-gold',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['fantasy'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['fantasy'], slot: ['torso'], state: ['folded'] } } },
 
   // A double-layered outer robe of maroon cotton folded to 340 mm by 260 mm and 40 mm high, its top showing the
   // stitched patches pieced in staggered rows inside a plain border, and a cord loop at one corner for fastening.
@@ -307,5 +307,5 @@ local patchwork(w, d, ht, nx, nz, border) =
     border: 'velvet-red',
     loop: 'cord-cotton',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 ]

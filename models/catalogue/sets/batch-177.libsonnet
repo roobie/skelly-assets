@@ -1,3 +1,4 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local g = import 'packages/thing-authoring-tool/garments.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
@@ -195,7 +196,7 @@ local bibFlaps = [
 ];
 local hoodFace = { y: 0.19, w: 0.068, hh: 0.062 };
 
-[
+taxonomy.inherit({ keywords: ['diving'] }, [
   // Thick neoprene diving gloves lying flat as a pair, backs up, each about 260 mm long and 110 mm across the palm:
   // five-finger gloves 6 mm thick a side, a long flared gauntlet cuff with a bound edge, and a hook-and-loop strap
   // across each wrist.
@@ -276,4 +277,4 @@ local hoodFace = { y: 0.19, w: 0.068, hh: 0.062 };
   h.compound('thin_long_sleeved_wetsuit_top', 0.67, top({ ht: 0.026, sleeves: { kind: 'flat', w: 0.065, t: 0.004 } }),
     { cloth: 'neoprene-black', collar: 'cloth-blue', sleeve: 'neoprene-black', panel: 'canvas-grey', stitch: 'canvas-grey' }) + h.headEndOnPlusZ
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber'], slot: ['torso'], setting: ['modern'], state: ['folded'] } } },
-]
+])

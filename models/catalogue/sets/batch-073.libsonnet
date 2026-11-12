@@ -50,7 +50,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     disc('tube', 'body', 0.016, 0.285, 0.32, 0, 0.02),
     disc('eyepiece', 'knob', 0.013, 0.32, 0.34, 0, 0.02),
   ], { body: 'enamel-white', knob: 'plastic-black', stage: 'plastic-black', glass: 'glass-clear', clip: 'steel-stainless', objective: 'steel-stainless', band: 'paint-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A stereo dissecting microscope 330 mm tall: a flat base 200 mm by 240 mm with a round white stage plate, a
   // steel pillar at the back, a focus block with knobs, and a wide head with two eyepieces angled toward the user.
@@ -74,7 +74,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     for s in ['l', 'r']
     for x in [if s == 'l' then -0.03 else 0.03]
   ]), { body: 'enamel-white', base: 'plastic-charcoal', knob: 'plastic-black', pillar: 'steel-stainless', plate: 'paint-white', clip: 'steel-stainless', glass: 'glass-clear' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A handheld digital multimeter 150 mm by 80 mm and 40 mm thick lying face up in a yellow rubber holster: a
   // display at the top, a rotary range dial, three probe sockets, and red and black probes on their leads.
@@ -146,7 +146,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     box('latch', 'key', [-0.012, 0.075, 0.05], [0.012, 0.092, 0.058]),
     disc('foot-ring', 'rotor', 0.097, 0, 0.006, 0, -0.04),
   ], { body: 'plastic-white', lid: 'plastic-grey', lcd: 'lcd-green', key: 'plastic-grey', 'key-red': 'plastic-red', rotor: 'plastic-charcoal', window: 'plastic-clear' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
   // A melting point apparatus 200 mm square and 150 mm tall: a steel hot plate base with a display and keys on its
   // front, and a dark heating housing on it with three capillary slots in the top and a round magnifier viewport
   // facing the user under a lamp hood.
@@ -171,7 +171,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     disc('capillary', 'glass', 0.0015, 0.15, 0.19, 0.018, -0.021),
     disc('knob', 'key', 0.011, 0.15, 0.162, 0.038, -0.06),
   ], { case: 'plastic-grey', plate: 'steel-stainless', housing: 'paint-charcoal', lcd: 'lcd-green', key: 'plastic-black', 'key-red': 'plastic-red', ring: 'plastic-black', glass: 'glass-clear', slot: 'plastic-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A bench pH meter: a white case 160 mm wide and 140 mm deep with a sloped display face, a stand rod at its
   // side with an arm holding two glass electrodes in a small beaker, and a bottle of buffer solution behind.
@@ -198,7 +198,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     disc('bottle', 'bottle', 0.02, 0, 0.08, 0.055, -0.075),
     disc('bottle-cap', 'cap-blue', 0.01, 0.08, 0.095, 0.055, -0.075),
   ], { case: 'plastic-white', lcd: 'lcd-green', digit: 'plastic-black', key: 'plastic-grey', 'key-red': 'plastic-red', stand: 'plastic-charcoal', rod: 'steel-stainless', glass: 'glass-clear', cap: 'plastic-black', liquid: 'water', bottle: 'plastic-frosted', 'cap-blue': 'plastic-blue' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A benchtop spectrophotometer 300 mm wide, 130 mm tall and 230 mm deep: a white case with a hinged
   // sample-compartment lid on top, and a low front deck holding a screen and keypad, a cuvette standing beside it.
@@ -218,7 +218,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     for i in [0, 1, 2]
     for j in [0, 1]
   ], { case: 'plastic-white', panel: 'plastic-grey', screen: 'plastic-charcoal', lcd: 'screen-black', lid: 'plastic-grey', key: 'plastic-white', 'key-green': 'plastic-green', glass: 'plastic-clear', sample: 'syrup-orange' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A plastic sextant 250 mm across lying on its side: a triangular frame with a graduated arc, a swinging index
   // arm with its mirror, a horizon mirror, two coloured shade glasses, a small telescope and a handle underneath.
@@ -275,7 +275,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     disc('wing-nut', 'steel', 0.004, 0.003, 0.012, 0.008, -0.03),
     box('wing-nut-wings', 'steel', [-0.002, 0.008, -0.032], [0.018, 0.012, -0.028]),
   ], { box: 'cardboard-corrugated', inside: 'paper-butcher', steel: 'steel-bright', boss: 'alu-bare', jaw: 'plastic-red', tape: 'tape-silver' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'paper'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'paper'], place: ['laboratory'], setting: ['modern'] } } },
   // A makeshift nitrogen generator 1.5 m long on a welded angle-steel skid 400 mm wide: an air filter canister at
   // the intake, a tall drying column of salts, a long membrane module on saddles, a pressure gauge and an outlet
   // valve, joined by black hoses.
@@ -366,7 +366,7 @@ local probe(id, slot, x, z0, y=0.006) = [
     h.ball('receiver-fill', 'liquid', 0.032, tower + 0.068, 0.165, 0.06, 0.7),
     box('receiver-clip', 'knob', [tower + 0.055, 0.235, 0.05], [tower + 0.08, 0.245, 0.07]),
   ], { body: 'plastic-grey', panel: 'plastic-charcoal', lcd: 'lcd-green', bath: 'steel-stainless', water: 'water', knob: 'plastic-black', glass: 'glass-clear', liquid: 'syrup-orange', coil: 'plastic-frosted' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A teleport pad 300 mm square and 30 mm thick: an aluminium plate with a raised ring of emitter coils round a
   // glowing core, a solar cell panel in one corner and a tread grid across the stepping face.

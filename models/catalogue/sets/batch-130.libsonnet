@@ -147,7 +147,7 @@ local oval(a, b, p, n, cx, cy) = [
     ]
     for s in [-1, 1]
   ]), { cup: 'plastic-orange', cushion: 'vinyl-black', arm: 'steel-bright', clip: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
 
   // A ballistic jaw guard standing on its lower edge, 230 mm across and 70 mm deep at the chin: a moulded tan
   // shell curving round the lower face from ear to ear, with vent slots over the mouth and a rail adapter at each
@@ -224,7 +224,7 @@ local oval(a, b, p, n, cx, cy) = [
 
   // A clear thermoplastic face shield standing on its lower edge, 400 mm round the curve and 210 mm tall, on a
   // black brow bracket whose arms reach back to the slot clips at each side of a hard hat.
-  faceShield('face_shield', 0.2, 0.15, 75, 0.21, 0.004, false, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
+  faceShield('face_shield', 0.2, 0.15, 75, 0.21, 0.004, false, { visor: 'plastic-clear', bracket: 'plastic-matte-black', clip: 'plastic-matte-black' }) + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['plastic'], setting: ['modern'], slot: ['face'] } } },
 
   // A bomb-disposal blast visor standing on its lower edge, 330 mm round the curve and 200 mm tall: a thick clear
   // shield in a moulded black rim, on a heavy brow bracket with arms to the helmet's rail clips.

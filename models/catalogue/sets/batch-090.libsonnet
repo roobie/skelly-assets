@@ -82,7 +82,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for g in [0, 1]
     for z in [[-0.065, 0.065][g]]
   ]), { wood: 'wood-pine', rag: 'cloth-rag', string: 'cord-olive' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['wood', 'fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['wood', 'fabric'], slot: ['arms'] } } },
 
   // A pair of bronze vambraces lying open side down, each 260 mm long, 80 mm across at the wrist and 100 mm at the
   // elbow, lined with leather that shows at both ends, with two leather straps and bronze buckles.
@@ -113,7 +113,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for g in [0, 1]
     for z in [[-0.065, 0.065][g]]
   ]), { fabric: 'cloth-khaki', cuff: 'cloth-black' }) + h.headEndOnPlusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['safety-gear'], tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // A pair of hard arm guards laid flat: neoprene sleeves 350 mm long, 80 mm wide at the wrist and 110 mm at the
   // top, each with a moulded plastic forearm sheath and elbow cap and two hook-and-loop straps.
@@ -235,7 +235,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for g in [0, 1]
     for z in [[-0.06, 0.06][g]]
   ]), { paper: 'paper-white', edge: 'cloth-cotton', tape: 'tape-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['arms'] } } },
 
   // A pair of scrap arm guards, each two mismatched steel scraps, 140 and 150 mm long and bent round the arm,
   // overlapping on a cotton rag lining, with a smaller patch and three string ties.
@@ -250,7 +250,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for g in [0, 1]
     for z in [[-0.09, 0.09][g]]
   ]), { cloth: 'cloth-rag', rust: 'scrap-rusted', galv: 'steel-galvanised', string: 'cord-olive' }) + h.headEndOnPlusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['arms'] } } },
 
   // A pair of soft neoprene sleeves laid flat, each 380 mm long, 75 mm wide at the wrist and 105 mm at the top,
   // with a grey seam down the side and light grey bound cuffs.
@@ -283,7 +283,7 @@ local sheath(id, slot, x0, x1, w, y, z) =
     for g in [0, 1]
     for z in [[-0.08, 0.08][g]]
   ]), { rubber: 'rubber-black', cord: 'cord-olive' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['arms'] } } },
 
   // One hardened steel arm guard for one arm, a forearm plate, elbow cop and upper-arm plate in a row 600 mm long,
   // with bands of riveted mail across both elbow joints and buckled leather straps.

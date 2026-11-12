@@ -1,26 +1,32 @@
 // The export rows for the gun roster in models/guns/roster.libsonnet. A gun and its magazine take the gun class, so a
-// seated magazine matches the receiver's voxels; cartridges and attachments are items. A cartridge or attachment may
-// name its own grain in its definition in place of its class's.
+// seated magazine matches the receiver's voxels; cartridges and attachments are items. An attachment may name its own
+// grain in its look in place of its class's.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local roster = import 'models/guns/roster.libsonnet';
 local looks = (import 'models/guns/tables/appearance.jsonnet').attachments;
-// What a gun export is, for the model shelves (models/TAXONOMY.md): its category, and the weapon class it is or serves.
-local taxonomy(category, weapon=null) = { taxonomy: { category: category } + (if weapon == null then {} else { tags: { weapon: [weapon] } }) };
+// What a gun export is, for the model shelves (models/TAXONOMY.md): its category, the weapon class it is or serves, and
+// its search keywords.
+local taxonomy(category, weapon=null, keywords=[]) = {
+  taxonomy: { category: category }
+            + (if weapon == null then {} else { tags: { weapon: [weapon] } })
+            + (if std.length(keywords) == 0 then {} else { keywords: keywords }),
+};
 local design(row) = {
   id: row.id, kind: 'design', source: 'models/guns/designs/' + row.design + '.json', voxel: voxel.gun,
-} + taxonomy('weapons', row.weapon);
-// A cartridge exports as its round and its case, both on the grain its definition names.
+} + taxonomy('weapons', row.weapon, std.get(row, 'keywords', []));
+// A cartridge exports as its round and its case. Every row names a voxel class, but the exporter draws cartridges smooth;
+// see packages/gun-authoring-tool/src/gun/cartridgeExport.ts, `makeModelExport`.
 local cartridge(row) = [
   {
     id: component + '_' + row.name, kind: 'cartridge', source: 'models/guns/cartridges/' + row.source + '.json',
-    voxel: voxel.of(voxel.item, row.definition), options: { component: component },
-  } + taxonomy('ammunition', row.weapon)
+    voxel: voxel.item, options: { component: component },
+  } + taxonomy('ammunition', row.weapon, std.get(row, 'keywords', []))
   for component in ['round', 'case']
 ];
 local attachment(row) = {
   id: std.strReplace(row.source, '-', '_'), kind: 'attachment', source: row.source,
   voxel: voxel.of(voxel.item, std.get(looks, row.source, {})),
-} + taxonomy('weapon-parts', std.get(row, 'weapon'));
+} + taxonomy('weapon-parts', std.get(row, 'weapon'), std.get(row, 'keywords', []));
 // A look for an attachment no row exports is a misspelt id, not an unused entry.
 local strays = std.setDiff(std.objectFields(looks), std.set([row.source for row in roster.attachments]));
 assert std.length(strays) == 0 : 'attachment looks with no export row: %s' % [strays];
@@ -29,7 +35,10 @@ local partItems = [entry for entry in (import 'models/guns/tables/catalogue.json
 local partWeapon(id) =
   local classes = [roster.partWeapons[token] for token in std.split(id, '_') if std.objectHas(roster.partWeapons, token)];
   if std.length(classes) == 0 then null else classes[0];
-local part(item) = { id: item.id, kind: 'part', source: item.id, voxel: voxel.gun } + taxonomy('weapon-parts', partWeapon(item.id));
+local partKeywords(id) = std.set(std.flattenArrays([roster.partKeywords[token] for token in std.split(id, '_') if std.objectHas(roster.partKeywords, token)]));
+local part(item) = {
+  id: item.id, kind: 'part', source: item.id, voxel: voxel.gun,
+} + taxonomy('weapon-parts', partWeapon(item.id), partKeywords(item.id));
 local magazine(row) = {
   id: row.id, kind: 'magazine', source: row.source, voxel: voxel.gun,
   options: { cartridge: 'models/guns/cartridges/' + row.calibre + '.json', appearanceProfile: row.appearanceProfile },

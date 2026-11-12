@@ -137,7 +137,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     h.tube('tie-a', 'cord', 0.1, 0.104, -0.1, -0.088, 0.1, 0),
     h.tube('tie-b', 'cord', 0.1, 0.104, 0.088, 0.1, 0.1, 0),
   ], { cloth: 'cloth-cotton', straw: 'plant-dried', cord: 'cord-olive' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric', 'plant'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['fabric', 'plant'] }, keywords: ['improvised'] } },
 
   // A hank of mild steel wire, loose loops about 100 mm across lying in a flat coil, held by three short twists of
   // the same wire.
@@ -178,7 +178,7 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     for i in std.range(0, 4)
   ] + [
     box('handle', 'handle', [-0.2, 0.71, 0.3], [0.2, 0.73, 0.32]),
-  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'steel-grey', door: 'steel-stainless', kick: 'plastic-black', handle: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['kitchen'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A top-loading washing machine 690 mm wide, 700 mm deep and 1.1 m tall to the top of its console, in white
   // enamel: a hinged lid with a dark glass window over the drum, and a raised control console along the back with
@@ -195,13 +195,13 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     disc('dial-b', 'rim', 0.035, 0, 0.025) + { axis: 'z', origin: [0.22, 1.005, -0.236] },
     box('display', 'display', [-0.08, 0.985, -0.236], [0.08, 1.025, -0.232]),
     box('kick', 'trim', [-0.345, 0.02, 0.35], [0.345, 0.1, 0.355]),
-  ], { body: 'enamel-white', foot: 'rubber-black', trim: 'plastic-grey', rim: 'steel-stainless', glass: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  ], { body: 'enamel-white', foot: 'rubber-black', trim: 'plastic-grey', rim: 'steel-stainless', glass: 'plastic-charcoal', display: 'lcd-green' }) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 240 litre water heater 500 mm across and 1.3 m tall to the tops of its pipe stubs.
-  waterHeater('household_water_heater', 65, 0.25, 1.15) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  waterHeater('household_water_heater', 65, 0.25, 1.15) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A 400 litre family-sized water heater 600 mm across and 1.6 m tall to the tops of its pipe stubs.
-  waterHeater('large_water_heater', 100, 0.3, 1.42) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  waterHeater('large_water_heater', 100, 0.3, 1.42) + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A petrol push mower: a red steel deck 520 mm wide and 560 mm long on four 180 mm wheels, an engine with a black
   // shroud, fuel cap and starter pull on top, a side discharge chute, and a steel handle rising 1 m behind it with a
@@ -237,5 +237,5 @@ local waterHeater(id, massKg, r, height) = h.compound(id, massKg, [
     hub: 'plastic-grey',
     handle: 'steel-grey',
     grip: 'rubber-black',
-  }) + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['gardening'] } },
 ]

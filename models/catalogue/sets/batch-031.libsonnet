@@ -1,3 +1,4 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 // A ring lying flat on y from y0 to y0 + t between radii r0 and r1, centred on (x, z): a coiled cable seen from above.
@@ -41,7 +42,7 @@ local arc(prefix, slot, r, t, a0, a1, steps, cx, cy, w) =
   ];
 // A ball standing on its turned axis x from x0, radius r, sampled every 30 degrees.
 local ballX(id, slot, x0, r, y) = h.turned(id, slot, 'x', [[0, 0]] + [[r - r * std.cos(k * std.pi / 6), r * std.sin(k * std.pi / 6)] for k in std.range(1, 5)] + [[2 * r, 0]], [x0, y, 0]);
-[
+taxonomy.inherit({ keywords: ['music'] }, [
   // A coil of red-and-black twin speaker wire about 3 m long, wound 190 mm across and held by a twist tie, with
   // banana plugs on the two loose ends.
   h.compound('speaker_cable', 0.1, [
@@ -211,4 +212,4 @@ local ballX(id, slot, x0, r, y) = h.turned(id, slot, 'x', [[0, 0]] + [[r - r * s
   h.compound('plectrum', 0.0004, [
     h.prism('pick', 'pick', 'y', [[q[1], q[0]] for q in [[0, 0.016], [-0.01, 0.002], [-0.013, -0.006], [-0.009, -0.012], [0, -0.014], [0.009, -0.012], [0.013, -0.006], [0.01, 0.002]]], 0, 0.002),
   ], { pick: 'plastic-red' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'] } } },
-]
+])

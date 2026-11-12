@@ -11,9 +11,20 @@
 // the rig's own; the levelled bones are levelled again after it. Grounding before the reach lets a target be read off
 // the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
 // models/poses/rig.libsonnet.
+//
+// Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
+// its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a
+// file can curl a hand and then open one finger. A held item,
+// `hold: { <hand bone>: { model, at?, turn?, pole?, socket, grip?, pinch?, close? } }`, is placed after the reach: the
+// palm is set on the item's socket, the digits `pinch` names set their pads on its points, and the others then closed
+// on the item by contact, so the grip is read off the item, not drawn by hand.
+// A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
+// end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
+// so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.
 import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
+import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pinchItem } from './fingers.mjs';
 
-const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground']);
+const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold', 'moved']);
 const REACH_KEYS = new Set(['target', 'pole']);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -45,6 +56,16 @@ export function poseIssues(rig, file) {
     if (!isVector(goal.target)) issues.push(`reach.${id}.target is a finite point [x, y, z]`);
     if (goal.pole !== undefined && !isVector(goal.pole)) issues.push(`reach.${id}.pole is a finite direction [x, y, z]`);
   });
+  bonesOf('hands', file.hands, (id, hand) => issues.push(...handIssues(rig, id, hand)));
+  bonesOf('hold', file.hold, (id, hold) => issues.push(...holdIssues(rig, id, hold)));
+  if (file.moved !== undefined) {
+    if (!isObject(file.moved)) issues.push('moved maps held models to their moved parts');
+    else for (const [model, parts] of Object.entries(file.moved)) {
+      if (!Object.values(file.hold ?? {}).some((hold) => hold?.model === model)) issues.push(`moved.${model}: no hand holds ${model}`);
+      if (!isObject(parts)) issues.push(`moved.${model} maps part names to shares 0..1`);
+      else for (const [part, share] of Object.entries(parts)) if (!(Number.isFinite(share) && share >= 0 && share <= 1)) issues.push(`moved.${model}.${part} is a share 0..1`);
+    }
+  }
   if (file.level !== undefined) {
     if (!Array.isArray(file.level)) issues.push('level lists bone ids');
     else for (const id of file.level) if (!bones.has(id)) issues.push(`level: the rig has no bone ${id}`);
@@ -84,15 +105,18 @@ export const groundLift = (rig, pose) => -Math.min(...posedCorners(rig, pose).ma
 
 /**
  * A pose file into a clip frame. Refuses a file with issues (`poseIssues`), naming them all. Returns the frame with the
- * limits that held and the reach distances left, so a caller or a test sees what the file asked that the rig refused.
+ * limits that held, the reach distances left and, per holding hand, how its grip closed and how near its pinch came,
+ * so a caller or a test sees what the file asked that the rig refused; `held` carries each held item's model and world
+ * transform `{ r, t }` for the caller to draw it. A file with a `hold` needs `meshOf(model)`, the item's closed triangle mesh in its own frame.
  */
-export function compilePose(rig, file) {
+export function compilePose(rig, file, { meshOf } = {}) {
   const issues = poseIssues(rig, file);
   if (issues.length > 0) throw new Error(`pose does not fit rig ${rig.id}: ${issues.join('; ')}`);
-  const report = { clamped: [], residuals: {} };
+  const report = { clamped: [], residuals: {}, grips: {} };
   const rotations = {};
+  const asked = Object.assign({}, ...Object.entries(file.hands ?? {}).map(([id, hand]) => handAngles(rig, id, hand)), file.angles ?? {});
   for (const bone of rig.bones) {
-    const angles = file.angles?.[bone.id];
+    const angles = asked[bone.id];
     if (!angles) continue;
     const held = clampJointAngles(bone, angles);
     if (held.some((a, i) => a !== angles[i])) report.clamped.push({ bone: bone.id, asked: angles, held });
@@ -107,12 +131,23 @@ export function compilePose(rig, file) {
     if (!goal) continue;
     ({ pose, residual: report.residuals[bone.id] } = solveTwoBone(rig, pose, bone.reach.chain, goal.target, goal.pole ?? bone.reach.pole, report.clamped));
   }
-  return { frame: encodeFrame(level(pose, report.clamped)), report };
+  const held = {};
+  for (const [id, hold] of Object.entries(file.hold ?? {})) {
+    if (!meshOf) throw new Error(`hold.${id}: compiling a hold needs the held item's mesh`);
+    let item;
+    ({ pose, item, residual: report.residuals[id] } = holdItem(rig, pose, id, hold, report.clamped));
+    let pinched = {};
+    if (hold.pinch) ({ pose, pinched } = pinchItem(rig, pose, id, hold.pinch, item));
+    let closed = {};
+    if (hold.close !== false) ({ pose, closed } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item), { keep: Object.keys(pinched) }));
+    if (hold.close !== false || hold.pinch) report.grips[id] = { ...closed, ...pinched };
+    held[id] = { model: hold.model, ...item };
+  }
+  return { frame: encodeFrame(level(pose, report.clamped)), report, held };
 }
 
-// A pose of matrices as a clip frame of quaternions, and back.
+// A pose of matrices as a clip frame of quaternions; decodeFrame (site/clipFrames.mjs) reads one back.
 export const encodeFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
-export const decodeFrame = (frame) => ({ root: [...frame.root], rotations: Object.fromEntries(Object.entries(frame.rotations).map(([id, q]) => [id, quatToMat3(q)])) });
 
 // A frame's angles per bone, as the page's sliders hold them.
 export const frameAngles = (rig, frame) => Object.fromEntries(rig.bones.filter((bone) => frame.rotations[bone.id]).map((bone) => [bone.id, jointAngles(bone, quatToMat3(frame.rotations[bone.id]))]));

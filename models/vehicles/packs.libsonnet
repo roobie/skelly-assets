@@ -35,7 +35,7 @@ local others = std.flattenArrays(std.objectValues(claimed));
   // The ids of the part rows the pack's vehicles build.
   parts(pack): std.set([row.id for vehicle in $.vehicles(pack) for row in fleet[vehicle]]),
   // A vehicle part's recipe row. It takes the vehicle voxel class, so it matches the vehicle it sits on, unless the
-  // part names the class of what it is, as a fitted gun does (`turret-kit.libsonnet`); it carries baked collision,
+  // item names its own voxel class or grain, as a fitted gun does (`turret-kit.libsonnet`, `voxelOf`); it carries baked collision,
   // because a site places it on the vehicle, and density bounds, so its mass stays one its geometry can carry.
   partRecipe(row): {
     id: row.id,

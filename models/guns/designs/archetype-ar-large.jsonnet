@@ -1,6 +1,6 @@
 local base = import 'archetype-ar-free-float.json';
 base + {
-  calibre: '7.62x51',
+  calibre: '308-winchester',
   assembly: base.assembly + {
     name: 'archetype-ar-large',
     description: 'AR-10 class rifle in 7.62×51 on the large AR frame, with a free-floating rail and a front sight on it.',

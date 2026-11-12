@@ -72,7 +72,7 @@ local spool(n, x, z, y0) = [
     for n in [1, 2]
   ]), { needle: 'wood-birch', knob: 'wood-walnut' }) + h.gripOn('knitting_needles', 'needle-1') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['wood'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['wood'] } } },
   // A standing frame loom 0.68 m wide and 0.82 m tall on two 0.30 m feet: pine posts and beams, a warp of cotton
   // threads, a heddle rod across them and a hand's breadth of striped cloth woven at the bottom.
   h.compound('frame_loom', 3.5, [
@@ -96,22 +96,22 @@ local spool(n, x, z, y0) = [
   // A bone needle 110 mm long and 7 mm thick, filed to a point, with a wide flat head and a drilled eye.
   h.compound('bone_needle', 0.004, needle('needle', 0.100, 0.0035, 0.008, 0.002, 0.003), { needle: 'bone' }) + h.inHand('bone_needle', 'shaft') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['bone'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['bone'], setting: ['prehistoric'] } } },
   // A curved steel suture-style needle: a half circle 50 mm across, 3 mm thick, with a pointed tip and an eye end.
   h.compound('curved_needle', 0.0068, h.crescent('arc', 'needle', 0.0235, 0.0265, -90, 90, 12, 0, 0.003) + [
     h.prism('point', 'needle', 'y', [[0.0, -0.0270], [0.0, -0.0230], [-0.009, -0.0250]], 0, 0.003),
     h.box('eye', 'needle', [0.0225, 0, -0.006], [0.0285, 0.003, 0.0]),
   ], { needle: 'steel-stainless' }) + h.inHand('curved_needle', 'arc-6') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', keywords: ['sewing'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A heavy steel darning needle 100 mm long and 3.6 mm thick with a long eye.
   h.compound('steel_needle', 0.0054, needle('needle', 0.092, 0.0018, 0.008, 0.002, 0.002), { needle: 'steel-stainless' }) + h.inHand('steel_needle', 'shaft') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['metal'] } } },
   // A whittled wooden needle 120 mm long and 7 mm thick, with a narrow carved eye in a flat head.
   h.compound('wooden_needle', 0.0014, needle('needle', 0.108, 0.0035, 0.010, 0.002, 0.003), { needle: 'wood-pine' }) + h.inHand('wooden_needle', 'shaft') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['wood'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['wood'], setting: ['prehistoric'] } } },
   // A flat wooden shed stick 550 mm long, 50 mm wide and 10 mm thick, its ends tapered to blunt points.
   h.compound('shed_stick', 0.18, [
     h.prism('stick', 'stick', 'y', [[0, -0.275], [0.025, -0.240], [0.025, 0.240], [0, 0.275], [-0.025, 0.240], [-0.025, -0.240]], 0, 0.010),
@@ -135,7 +135,7 @@ local spool(n, x, z, y0) = [
     h.box('cut-line', 'print', [0.200, 0.0115, -0.085], [0.202, 0.0125, 0.085]),
   ], { envelope: 'paper-butcher', label: 'paper-white', print: 'plastic-black', sheet: 'paper-white' }) + h.label('label', '+y') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'documents', keywords: ['sewing'], tags: { material: ['paper'], setting: ['modern'] } } },
   // A sewing case 180 mm by 110 mm and 30 mm deep, opened with its lid lying flat behind: spools of thread, a
   // pincushion and an awl in the tray, small shears and a felt strip of needles in the lid.
   h.compound('tailors_kit', 0.11, [
@@ -170,7 +170,7 @@ local spool(n, x, z, y0) = [
     pivot: 'steel-grey',
   }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', tags: { material: ['fabric', 'metal'] } } },
+  } + { taxonomy: { category: 'tools', keywords: ['sewing'], tags: { material: ['fabric', 'metal'] } } },
   // A raw hide rolled up 260 mm long and 70 mm across while it cures, flesh side out, tied with two cords.
   h.compound('tanning_hide', 0.8, roll(0.260, 0.035, 'leather-tan', false), {
     hide: 'skin-rawhide',

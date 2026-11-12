@@ -97,7 +97,7 @@ describe('optic catalog', () => {
   });
 
   it('builds every round body turned about the optical axis, and the lenses in it, with the content side count', () => {
-    const sides = appearance.opticBodySides;
+    const sides = appearance.roundSides;
     const turned = OPTIC_TYPE_IDS.flatMap((id) =>
       getOptic(id).solids.filter((solid) => solid.kind === 'revolved' && solid.axis === 'x'),
     );

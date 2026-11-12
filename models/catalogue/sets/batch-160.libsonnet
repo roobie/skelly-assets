@@ -88,7 +88,7 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
              foldedScarf(0.3, 0.16, 3, 0.016, 0.12, 1)
              + furEnd(0.27, 0.16, 0.016),
              fur)
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A long fur scarf about 2.2 m long and 180 mm wide, folded in six into a soft stack 340 x 180 x 96 mm with one
   // end trailing 400 mm out along the floor and two pompoms on short cords.
@@ -96,5 +96,5 @@ local fur = { cloth: 'fur-brown', rib: 'fur-brown', cord: 'leather-chestnut' };
              foldedScarf(0.34, 0.18, 6, 0.016, 0.4, 1)
              + furEnd(0.57, 0.18, 0.016),
              fur)
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 ]

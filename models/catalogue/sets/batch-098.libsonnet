@@ -72,7 +72,7 @@ local suspenders(t, ends) =
     box('ring-tab', 'keeper', [0.07, 0.005, 0.015], [0.13, 0.009, 0.075]),
     ringZ('ring', 'buckle', 0.026, 0.032, 0.039, 0.051, 0.1, 0.041),
   ], { strap: 'leather-black', keeper: 'leather-black', buckle: 'steel-grey', hole: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['firefighting'], tags: { material: ['leather'], setting: ['modern'], slot: ['waist'] } } },
 
   // A trouser belt 1.1 m long and 35 mm wide in brown leather, laid in a U, with a steel frame buckle.
   h.compound('leather_belt', 0.12, beltU(1.1, 0.035, 0.004, 5, 0.04, 0.05, 0.005),
@@ -82,7 +82,7 @@ local suspenders(t, ends) =
   // A broad belt 1.2 m long and 75 mm wide in black leather, laid in a U, with a square brass buckle 100 mm across.
   h.compound('santa_belt', 0.45, beltU(1.2, 0.075, 0.004, 4, 0.08, 0.1, 0.014),
              { strap: 'leather-black', keeper: 'leather-black', buckle: 'metal-gold', hole: 'plastic-matte-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], slot: ['waist'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['leather'], slot: ['waist'] } } },
 
   // A police duty belt 1.2 m long and 55 mm wide in black leather, laid in a U, with a twin magazine pouch and a
   // handcuff case on the buckle run, a glove pouch and a steel baton ring on the tip run.
@@ -106,11 +106,11 @@ local suspenders(t, ends) =
   // A martial arts belt 40 mm wide, wrapped twice round a 900 mm waist and tied, its tails 220 mm long. Its colour is
   // its rank; the colours ride on finishes maps.
   h.compound('judo_belt', 0.15, tiedBelt(0.145, 0.04, 0.22), { cloth: 'cloth-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // A broad black gi belt 60 mm wide, tied the same way with tails 240 mm long.
   h.compound('gi_belt', 0.11, tiedBelt(0.15, 0.06, 0.24), { cloth: 'cloth-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['waist'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['martial-arts'], tags: { material: ['fabric'], slot: ['waist'] } } },
 
   // Y-back cloth suspenders 35 mm wide, lying flat 460 mm across and 760 mm long, with metal clips at the three ends,
   // slides on the front straps and a leather patch where the straps meet.

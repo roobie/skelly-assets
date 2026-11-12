@@ -20,7 +20,7 @@ import {
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
-import { boundsOfPoints } from '@skelly/construct/shapes/geometry.ts';
+import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { displayBevel, meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
 import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
@@ -33,7 +33,9 @@ import type {
   Palette,
   PartPortId,
   SrgbColor,
+  VoxelGrains,
 } from './exportTypes.ts';
+import { featureFitsGrain } from './featureFit.ts';
 import { partMounts } from './mounts.ts';
 import { matrixOf, prepareSkin, preserveSkinFace, SkinError, skinPoints } from './skin.ts';
 import { voxelize } from './voxelize.ts';
@@ -119,11 +121,37 @@ export const latticeOrigin = (
 /** Part-definition tag that asks a voxelized export for the finer `voxelDetailGrain`. */
 export const VOXEL_DETAIL = 'voxel-detail';
 
-/** The grain a voxelized export samples this part at. */
+/**
+ * Whether the part's drawn solids, taken together, are too thin on some axis to read at the grain. The part is judged
+ * whole, not solid by solid, because a receiver or a stock is built of thin walls and plates that read as one body, while
+ * a part thin all through, such as a charging handle or a trigger, lands on one uneven layer of voxels.
+ */
+const isThinPart = (def: PartDef, grain: number, metresPerUnit: number): boolean => {
+  const low = [Infinity, Infinity, Infinity];
+  const high = [-Infinity, -Infinity, -Infinity];
+  for (const solid of def.displaySolids ?? def.solids) {
+    const [min, max] = localSolidBounds(solid);
+    for (const axis of [0, 1, 2]) {
+      low[axis] = Math.min(low[axis]!, min[axis]!);
+      high[axis] = Math.max(high[axis]!, max[axis]!);
+    }
+  }
+  return [0, 1, 2].some((axis) => !featureFitsGrain((high[axis]! - low[axis]!) * metresPerUnit, grain));
+};
+
+/**
+ * The grain a voxelized export samples this part at: the detail grain for a part tagged `VOXEL_DETAIL`, and, in a
+ * class that asks for it, for a part too thin for the class grain; every other part takes the class grain.
+ */
 export const partVoxelGrain = (
   def: PartDef,
-  { voxelGrain, voxelDetailGrain }: { readonly voxelGrain: number; readonly voxelDetailGrain?: number | undefined },
-): number => (def.tags?.includes(VOXEL_DETAIL) ? (voxelDetailGrain ?? voxelGrain) : voxelGrain);
+  { voxelGrain, voxelDetailGrain, voxelDetailThinParts }: VoxelGrains,
+  metresPerUnit: number,
+): number =>
+  voxelDetailGrain !== undefined &&
+  (def.tags?.includes(VOXEL_DETAIL) || (voxelDetailThinParts && isThinPart(def, voxelGrain, metresPerUnit)))
+    ? voxelDetailGrain
+    : voxelGrain;
 
 /**
  * Every part's lattice is anchored at the world origin, so two grains nest exactly when the coarse one is a whole
@@ -637,7 +665,7 @@ const writeGlb: ExportGlb = (input) => {
         : voxelPrimitivesFor(
             part,
             items,
-            partVoxelGrain(part.def, { voxelGrain: input.voxelGrain, voxelDetailGrain: input.voxelDetailGrain }),
+            partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit),
           );
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);

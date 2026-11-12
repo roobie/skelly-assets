@@ -108,7 +108,7 @@ local chainsaw(engine) =
     flat('blade', 'blade', [[0.01, -0.018], [0.87, -0.018], [0.87, 0.008], [0.01, 0.008]], -0.002, 0.002),
     flat('teeth', 'teeth', [[0.03, -0.024], [0.85, -0.024], [0.85, -0.018], [0.03, -0.018]], -0.0025, 0.0025),
   ], { frame: 'paint-red', grip: 'plastic-black', lever: 'plastic-black', blade: 'steel-bright', teeth: 'steel-grey' })
-  + h.gripOn('bow_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('bow_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // An 18 inch petrol chainsaw 0.82 m long standing on its base: orange powerhead, black handles and a 0.48 m bar.
   h.compound('chainsaw', 7.6, chainsaw(true), {
@@ -178,7 +178,7 @@ local chainsaw(engine) =
     bar('lash-a', 'lashing', [0.482, 0.040], [0.545, 0.040], 0.012, -0.021, 0.021),
     bar('lash-b', 'lashing', [0.488, 0.078], [0.550, 0.078], 0.012, -0.021, 0.021),
   ], { haft: 'wood-oak', stone: 'stone-grey', lashing: 'skin-rawhide' })
-  + h.gripOn('primitive_adze', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
+  + h.gripOn('primitive_adze', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['wood', 'stone'], setting: ['prehistoric'] } } },
 
   // A 560 mm stone axe lying flat: a ground stone celt through a split stick, bound above and below with rawhide.
   h.compound('primitive_axe', 1, haft(0.56, 0.016) + celt('celt', 0.50, -0.045, 0.11, 0.040, 0.070, 0.015) + [
@@ -200,5 +200,5 @@ local chainsaw(engine) =
     h.turned('screw-%d' % i, 'screw', 'y', [[0, 0], [0, 0.0055], [0.026, 0.0055], [0.026, 0]], [0.112, -0.013, [-0.040, 0.0, 0.040][i]])
     for i in [0, 1, 2]
   ], { handle: 'wood-pine', blade: 'steel-bright', teeth: 'steel-grey', screw: 'brass' })
-  + h.gripOn('saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
+  + h.gripOn('saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'], setting: ['modern'] } } },
 ]

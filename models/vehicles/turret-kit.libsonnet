@@ -12,16 +12,22 @@ local steel = 'steel-parkerized';
 
 // Each fitting in its own frame, as its comment says, with the finish of each slot it draws.
 // Lies along x on its bore, the origin on the receiver's front face: the receiver stands back inside the turret and
-// the barrel runs forward through the mask.
+// the barrel runs forward through the mask. A gun may end in a flash hider, and a large gun's barrel may carry a fume
+// extractor, a collar `from` its origin along the barrel.
 local gun(c, g) = {
   local r = g.receiver,
+  local collar(id, radius, from, to) = round(k.turned(id, 'barrel', 'x', k.disc(radius, from, to))),
   pieces: [
     box('receiver', 'steel', [-r.length, -r.height / 2, -r.width / 2], [0, r.height / 2, r.width / 2]),
     box('feed_cover', 'steel', [-r.length * 0.75, r.height / 2, -r.width * 0.4], [-r.length * 0.2, r.height / 2 + 0.03, r.width * 0.4]),
     round(k.turned('buffer', 'steel', 'x', k.disc(r.height * 0.3, -r.length - 0.06, -r.length))),
     round(k.turned('barrel', 'barrel', 'x', k.disc(g.barrel.radius, 0, g.barrel.length))),
-    round(k.turned('flash_hider', 'barrel', 'x', k.disc(g.flashHider.radius, g.barrel.length - g.flashHider.length, g.barrel.length))),
-  ],
+  ] + (if std.objectHas(g, 'flashHider') then [
+         collar('flash_hider', g.flashHider.radius, g.barrel.length - g.flashHider.length, g.barrel.length),
+       ] else [])
+    + (if std.objectHas(g, 'fumeExtractor') then [
+         collar('fume_extractor', g.fumeExtractor.radius, g.fumeExtractor.from, g.fumeExtractor.from + g.fumeExtractor.length),
+       ] else []),
   finish: { steel: steel, barrel: 'steel-spall-black' },
 };
 // Framed as the main gun; its firing solenoid hangs under the receiver.
@@ -75,6 +81,28 @@ local smokeLauncher(c, l) = {
   finish: { paint: c.paint, steel: steel },
 };
 
+// Hangs off the turret's rear face, the origin at the middle of its floor's front edge: a slatted floor and a rail
+// round its top on corner posts, open toward the turret it rests against.
+local stowageBasket(c, b) = {
+  local half = b.width / 2,
+  local t = b.bar,
+  local post(id, x, z) = box(id, 'steel', [x, 0, z], [x + t, b.height, z + t]),
+  pieces: [
+    box('slat_' + i, 'steel', [-b.depth, 0, -half + i * (b.width - t) / (b.slats - 1)], [0, t, -half + i * (b.width - t) / (b.slats - 1) + t])
+    for i in std.range(0, b.slats - 1)
+  ] + [
+    box('floor_rail', 'steel', [-b.depth, 0, -half], [-b.depth + t, t, half]),
+    box('rear_rail', 'steel', [-b.depth, b.height - t, -half], [-b.depth + t, b.height, half]),
+    box('rail_near', 'steel', [-b.depth, b.height - t, half - t], [0, b.height, half]),
+    box('rail_far', 'steel', [-b.depth, b.height - t, -half], [0, b.height, -half + t]),
+    post('post_rear_near', -b.depth, half - t),
+    post('post_rear_far', -b.depth, -half),
+    post('post_front_near', -t, half - t),
+    post('post_front_far', -t, -half),
+  ],
+  finish: { steel: steel },
+};
+
 local drawings = {
   gun: gun,
   coaxGun: coaxGun,
@@ -82,6 +110,7 @@ local drawings = {
   periscope: periscope,
   hatch: hatch,
   smokeLauncher: smokeLauncher,
+  stowageBasket: stowageBasket,
 };
 local guns = ['gun', 'coaxGun'];
 local entries(c) = [c[key] for key in std.objectFields(c) if key != 'paint'];
@@ -255,9 +284,13 @@ local core(name) =
     finish: { paint: t.paint, steel: steel } + (if std.objectHas(t, 'jacket') then { jacket: 'steel-spall-black' } else {}),
   };
 
-// A gun's own row is a firearm, drawn on the gun class as a hand-held one is, since its barrel is thinner than a vehicle
-// voxel; the fused turret draws it on the vehicle class with the rest of the turret.
-local voxelOf(e) = if std.member(guns, e.draw) then { voxelClass: 'gun' } else {};
+// A fitting that names its own `voxelGrain` is drawn on that grain. Otherwise a gun's own row is a firearm, drawn on the
+// gun class as a hand-held one is, since its barrel is thinner than a vehicle voxel; the fused turret draws every
+// fitting on the vehicle class with the rest of the turret.
+local voxelOf(e) =
+  if std.objectHas(e, 'voxelGrain') then { voxelGrain: e.voxelGrain }
+  else if std.member(guns, e.draw) then { voxelClass: 'gun' }
+  else {};
 local classRows(name) =
   local c = classes[name];
   [assembly.row(e.id, e.massKg, drawn(c, e)) + taxonomy.of(e) + voxelOf(e) for e in entries(c)];

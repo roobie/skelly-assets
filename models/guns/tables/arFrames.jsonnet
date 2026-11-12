@@ -52,7 +52,7 @@ local derivation(measure, clearanceUnits, snap, description, multiplier=null) =
     {
       id: 'large',
       rank: 1,
-      cartridge: import 'models/guns/cartridges/7.62x51.json',
+      cartridge: import 'models/guns/cartridges/308-winchester.jsonnet',
       // Traced from BR's reference photo, a Knight's Armament SR-25 E2 with a 20 in barrel (its lower reads "RIFLE
       // 7.62 MM / SR 25 / KNIGHT'S MANUFACTURING CO"), registered on the bore and the receiver's front face. Scale:
       // the 1,195 px rifle at the listing's 43.5 in extended length, 0.9246 mm/px (12.44 px/u); the 1.148 in

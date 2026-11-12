@@ -196,7 +196,7 @@ local grassSkirt(w, len, n) =
     metal: 'cloth-crimson',
     cord: 'cloth-cream',
     trim: 'fur-pale',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Red costume shorts folded once, 360 mm by 260 mm and 28 mm tall: a drawstring waist and narrow white cuffs.
   h.compound('santa_shorts', 0.42, trousers({ w: 0.36, d: 0.26, ht: 0.028, folds: 2, crotch: 0.15, drawstring: true, pockets: false, hemTrim: 0.025 }), {
@@ -207,7 +207,7 @@ local grassSkirt(w, len, n) =
     metal: 'cloth-crimson',
     cord: 'cloth-cream',
     trim: 'cloth-cream',
-  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
+  }) + h.headEndOnPlusZ + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['legs'], state: ['folded'] } } },
 
   // Plain khaki shorts folded once, 360 mm by 280 mm and 28 mm tall: belt loops, zip fly and front pockets.
   h.compound('shorts', 0.4, trousers({ w: 0.36, d: 0.28, ht: 0.028, folds: 2, crotch: 0.16 }), {

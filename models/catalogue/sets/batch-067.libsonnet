@@ -29,7 +29,7 @@ local seat(y, w) = [
     box('lid', 'lid', [-0.15, 0.31, -0.165], [0.15, 0.58, -0.15]),
   ], { body: 'plastic-grey', seat: 'plastic-white', lid: 'plastic-white', leg: 'plastic-grey', bag: 'plastic-black' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['camping'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // The same toilet folded flat, 28 cm square and 4 cm thick: legs folded under the frame, the lid shut over the seat
   // with a carry handle at the front (+z).
@@ -45,7 +45,7 @@ local seat(y, w) = [
     box('handle', 'seat', [-0.05, 0.012, 0.15], [0.05, 0.026, 0.162]),
   ], { body: 'plastic-grey', seat: 'plastic-grey', lid: 'plastic-white', leg: 'plastic-grey' }) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] } } },
+  } + { taxonomy: { category: 'household', keywords: ['camping'], tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] } } },
 
   // A furled stick umbrella 1.01 m long lying along x: a crook handle at -x, a black canopy furled round an aluminium
   // shaft and closed with a strap, and a pointed ferrule at +x.
@@ -125,7 +125,7 @@ local seat(y, w) = [
     for i in std.range(1, 17)
   ], 0.75), { wood: 'wood-walnut', metal: 'steel-stainless', head: 'cloth-cream', bridge: 'wood-birch', board: 'lacquer-black' }) + h.gripOn('banjo', 'neck') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A tom drum 28 cm across and 20 cm deep standing on its bottom head: a red lacquered wood shell, steel hoops
   // top and bottom, eight lugs with tension rods, and a white batter head.
@@ -148,7 +148,7 @@ local seat(y, w) = [
     box('badge', 'badge', [-0.015, 0.09, 0.129], [0.015, 0.11, 0.132]),
   ], { shell: 'lacquer-red', metal: 'steel-stainless', head: 'cloth-cream', badge: 'brass' }) + h.inHand('tom_drum', 'shell') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
 
   // A hand-made drum 28 cm across and 26 cm tall: a carved wooden shell narrowing to a foot, a rawhide head
   // tacked round the rim, and cord lacing from the head down to a cord ring round the waist.
@@ -171,5 +171,5 @@ local seat(y, w) = [
     for i in std.range(0, 11)
   ]), { shell: 'wood-oak', head: 'skin-rawhide', cord: 'jute', tack: 'steel-grey' }) + h.inHand('hide_drum', 'shell') + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
+  } + { taxonomy: { category: 'recreation', keywords: ['music'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 ]

@@ -17,8 +17,11 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 // player's figure poses it about, so the figure matches the player's. `doll` is a part held against the waist, its
 // back on the belly, with the forearms bent forward and in under it; `masses` gives the stand's and the doll's mass.
 local bust = import 'models/measures/bust.libsonnet';
+local band = import 'models/head-band.libsonnet';
+local bustMeasures = bust { hairRing: band.hairRing };
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 local plastic = 'plastic-gloss-white';
 local socket(id, pos, normal=[0, -1, 0], up=[0, 0, 1]) = { id: id, mount: 'assembly-joint', gender: 'female', pos: pos, normal: normal, up: up, required: true };
 local pin(id, normal=[0, 1, 0], up=[0, 0, 1], pos=[0, 0, 0]) = { id: id, mount: 'assembly-joint', gender: 'male', pos: pos, normal: normal, up: up, required: true };
@@ -47,20 +50,29 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     exportMass: 'parts',
     parts: [
       stand,
-      segment('pelvis', 'bust', bust, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
+      segment('pelvis', 'bust', bustMeasures, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
         + [socket('hip-' + s[0], [s[1] * hipX, hipY, 0]) for s in sides]),
-      segment('torso', 'bust', bust, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
+      segment('torso', 'bust', bustMeasures, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
         + [socket('shoulder-' + s[0], [s[1] * shoulderX, shoulderY, 0]) for s in sides]
         + (if doll == null then [] else [socket('doll', [0, bust.pelvisHeight + 0.02, bust.waistDepth / 2], [0, 0, 1], [0, 1, 0])])),
-      segment('neck', 'bust', bust, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
+      segment('neck', 'bust', bustMeasures, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
-      segment('head', 'bust', bust, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
+      segment('head', 'bust', bustMeasures, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
-      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('knuckles', [0, -arm.palmLength, 0]), socket('thumb', [0, -arm.palmLength * arm.thumbRootShare, arm.palmWidth / 2 - arm.thumbInset])]),
-      segment('fingers-' + s[0], 'avatarArm', arm, 'fingers', 0.04, ['skin'], [pin('knuckles')]),
-      segment('thumb-' + s[0], 'avatarArm', arm, 'thumb', 0.01, ['skin'], [pin('thumb')]),
+      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', hand.thumbRoot)]
+        + [socket(hand.fingers[i], hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
+    ] + [
+      segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
+              [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []))
+      for k in std.range(0, hand.thumbBones - 1)
+    ] + [
+      segment(hand.part(hand.fingers[i], k) + '-' + s[0], 'avatarArm', arm { finger: hand.fingers[i], phalanx: k }, 'finger', 0.003, ['skin'],
+              [pin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [socket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []))
+      for i in std.range(0, std.length(hand.fingers) - 1)
+      for k in std.range(0, hand.phalanges - 1)
+    ] + [
       segment('thigh-' + s[0], 'avatarLeg', leg, 'thigh', 1, ['skin'], [pin('hip'), socket('knee', [0, -leg.thighLength, 0])]),
       segment('shin-' + s[0], 'avatarLeg', leg, 'shin', 0.6, ['skin'], [pin('knee'), socket('ankle', [0, leg.shoeHeight - leg.length + leg.thighLength, 0])]),
       segment('foot-' + s[0], 'avatarLeg', leg, 'foot', 0.2, ['skin'], [pin('ankle')]),
@@ -76,8 +88,16 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       { from: 'torso.shoulder-%s' % s[0], to: 'upper-%s.shoulder' % s[0] },
       { from: 'upper-%s.elbow' % s[0], to: 'fore-%s.elbow' % s[0] },
       { from: 'fore-%s.wrist' % s[0], to: 'palm-%s.wrist' % s[0] },
-      { from: 'palm-%s.knuckles' % s[0], to: 'fingers-%s.knuckles' % s[0] },
-      { from: 'palm-%s.thumb' % s[0], to: 'thumb-%s.thumb' % s[0] },
+    ] + [
+      local part = hand.thumbPart(k), above = if k == 0 then 'palm' else hand.thumbPart(k - 1);
+      { from: '%s-%s.%s' % [above, s[0], part], to: '%s-%s.%s' % [part, s[0], part] }
+      for k in std.range(0, hand.thumbBones - 1)
+    ] + [
+      local part = hand.part(hand.fingers[i], k), above = if k == 0 then 'palm' else hand.part(hand.fingers[i], k - 1);
+      { from: '%s-%s.%s' % [above, s[0], part], to: '%s-%s.%s' % [part, s[0], part] }
+      for i in std.range(0, std.length(hand.fingers) - 1)
+      for k in std.range(0, hand.phalanges - 1)
+    ] + [
       { from: 'pelvis.hip-%s' % s[0], to: 'thigh-%s.hip' % s[0] },
       { from: 'thigh-%s.knee' % s[0], to: 'shin-%s.knee' % s[0] },
       { from: 'shin-%s.ankle' % s[0], to: 'foot-%s.ankle' % s[0] },
@@ -155,5 +175,5 @@ local doll(x=0, y=0, z=0, k=1) = h.scaled([
     h.box('stripe', 'stripe', [-0.11, 0.035, -0.17], [0.11, 0.037, -0.15]),
   ], { foam: 'foam-orange', slot: 'plastic-charcoal', stripe: 'plastic-white' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
   // A 320 mm talking doll in a red dress, a speaker grille and press button on its chest.
-  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  h.compound('talking_doll', 0.48, doll(), dollFinish) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['toy'] } },
 ]

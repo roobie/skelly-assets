@@ -112,7 +112,7 @@ export const drawnGeometry = (
   resolved: Resolved,
   options: Partial<VoxelGrains> & { readonly revolveFacets?: number | undefined } = {},
 ): DrawnGeometry => {
-  const { voxelGrain, voxelDetailGrain } = options;
+  const { voxelGrain } = options;
   const unit = resolved.domain.units.metresPerUnit;
   const authoredMeasures = new Map<Solid, SolidMeasure>();
   /** Per list of solids sampled together, each solid's drawn measure, undefined where it draws no voxels. */
@@ -122,7 +122,7 @@ export const drawnGeometry = (
     def: PartDef,
     placed: Transform,
   ): Map<Solid, SolidMeasure | undefined> => {
-    const grain = partVoxelGrain(def, { voxelGrain: voxelGrain!, voxelDetailGrain });
+    const grain = partVoxelGrain(def, { ...options, voxelGrain: voxelGrain! }, unit);
     const sources = siblings.map((solid) => {
       const bevel = solid.display?.mergeGroup === undefined ? displayBevel(solid, resolved.domain.units) : 0;
       const mesh = meshForSolid(solid, bevel, options.revolveFacets);
@@ -221,7 +221,7 @@ export const drawnGeometry = (
     const def = resolved.defs.get(part);
     const placed = resolved.placed.get(part);
     return voxelGrain !== undefined && def && placed && onAxes(placed)
-      ? partVoxelGrain(def, { voxelGrain, voxelDetailGrain })
+      ? partVoxelGrain(def, { ...options, voxelGrain }, unit)
       : undefined;
   };
   return { measure, point, grain };

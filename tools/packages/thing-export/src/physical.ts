@@ -111,3 +111,15 @@ export const assemblyProperties = (parts: ModelParts): { massKg: number; centreO
   ] as Vec3);
   return { massKg, centreOfMass: massKg === 0 ? [0, 0, 0] : scale(moment, 1 / massKg) };
 };
+
+/** The volume, in cubic metres, of the voxels the export draws for every part, so a density reads off the solid model. */
+export const drawnVolumeM3 = (resolved: Resolved, drawn: DrawnGeometry): number => {
+  const cubicMetres = resolved.domain.units.metresPerUnit ** 3;
+  let volume = 0;
+  for (const [id, part] of resolved.defs) {
+    for (const solid of part.solids) {
+      volume += drawn.measure(id, solid).volume * cubicMetres;
+    }
+  }
+  return volume;
+};

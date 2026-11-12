@@ -53,7 +53,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
     cylX('tube', 'tube', 0.008, -0.055, 0.045, 0.02, -0.024),
     cylX('tube-window', 'window', 0.0085, -0.065, -0.055, 0.02, -0.024),
     box('tube-clip', 'handle', [-0.005, 0.012, -0.02], [0.005, 0.03, -0.015]),
-  ], { case: 'plastic-yellow', handle: 'plastic-black', bezel: 'plastic-black', dial: 'paint-cream', needle: 'paint-red', knob: 'plastic-black', grille: 'plastic-charcoal', tube: 'alu-bare', window: 'mesh-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { case: 'plastic-yellow', handle: 'plastic-black', bezel: 'plastic-black', dial: 'paint-cream', needle: 'paint-red', knob: 'plastic-black', grille: 'plastic-charcoal', tube: 'alu-bare', window: 'mesh-black' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['radiation'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A gel electrophoresis tank, 250 mm long, 100 mm tall and 110 mm wide: a clear acrylic box with a frosted gel
   // tray inside, a clear lid, and a red and a black electrode lead plugged in at each end of the lid.
@@ -78,7 +78,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
       box('lead-%s-run' % e.id, e.id, [e.x * 1.06 - 0.0025, 0.115, -0.0025], [e.x * 1.06 + 0.0025, 0.12, 0.06]),
     ]
     for e in [{ id: 'red', x: -0.1 }, { id: 'black', x: 0.1 }]
-  ]), { acrylic: 'plastic-clear', tray: 'plastic-frosted', gel: 'jelly-pale', buffer: 'plastic-clear-blue', lid: 'plastic-clear', red: 'plastic-red', black: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ]), { acrylic: 'plastic-clear', tray: 'plastic-frosted', gel: 'jelly-pale', buffer: 'plastic-clear-blue', lid: 'plastic-clear', red: 'plastic-red', black: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A hand-crank battery charger, 110 mm long, 75 mm tall and 60 mm deep: a heavy orange case holding a geared
   // dynamo, a folding crank on the right end, and on top an adjustable cradle of two sliding jaws holding a cell.
@@ -117,7 +117,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
     h.prism('lid', 'shell', 'x', [at(0, 0), at(lid.len, 0), at(lid.len, -0.006), at(0, -0.006)], -0.161, 0.161),
     h.prism('bezel', 'bezel', 'x', [at(0.004, 0), at(lid.len - 0.002, 0), at(lid.len - 0.002, 0.0015), at(0.004, 0.0015)], -0.157, 0.157),
     h.prism('screen', 'screen', 'x', [at(0.016, 0.0015), at(lid.len - 0.012, 0.0015), at(lid.len - 0.012, 0.0025), at(0.016, 0.0025)], -0.148, 0.148),
-  ], { shell: 'alu-bare', deck: 'plastic-charcoal', keys: 'plastic-black', pad: 'plastic-grey', bezel: 'plastic-black', screen: 'screen-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { shell: 'alu-bare', deck: 'plastic-charcoal', keys: 'plastic-black', pad: 'plastic-grey', bezel: 'plastic-black', screen: 'screen-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A full-size memory card lying face up, 32 mm long, 24 mm wide and 2 mm thick: a black card with one corner
   // clipped, a blue printed label, a white write-protect slider on the left edge and gold contacts at the clipped end.
@@ -128,7 +128,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
   ] + [
     box('contact-%d' % i, 'contact', [-0.0095 + i * 0.0022, 0.001, 0.011], [-0.0083 + i * 0.0022, 0.002, 0.0145])
     for i in std.range(0, 8)
-  ], { card: 'plastic-black', label: 'plastic-blue', lock: 'plastic-white', contact: 'foil-gold' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { card: 'plastic-black', label: 'plastic-blue', lock: 'plastic-white', contact: 'foil-gold' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic'], setting: ['modern'] } } },
   // A methanol fuel cell power unit, 448 mm long, 250 mm tall and 220 mm deep: a grey aluminium case on rubber
   // feet with a folding carry handle, a white fuel cartridge with a blue cap docked in a bay on the front, a vent
   // grille, a small display and a row of output sockets.
@@ -169,7 +169,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
     disc('button', 'face', 0.006, 0.0085, 0.0098, 0, 0.022),
     turned('jack', 'jack', 'z', [[0, 0.0015], [0, 0.003], [0.002, 0.003], [0.002, 0.0015], [0, 0.0015]], [0.01, 0.0045, -0.0465]),
     box('hold-switch', 'jack', [-0.015, 0.003, -0.0465], [-0.008, 0.006, -0.045]),
-  ], { back: 'alu-bare', face: 'plastic-white', bezel: 'plastic-black', screen: 'screen-black', wheel: 'plastic-grey', jack: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { back: 'alu-bare', face: 'plastic-white', bezel: 'plastic-black', screen: 'screen-black', wheel: 'plastic-grey', jack: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['music'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A homemade noise emitter, 120 mm wide, 100 mm tall and 90 mm deep: a car speaker screwed to the front of a
   // grey project box, an amplifier board wired on the open top, a 9 V battery taped to the side and a toggle switch.
@@ -258,7 +258,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
     box('menu-r', 'pad', [0.006, 0.02, 0.032], [0.016, 0.024, 0.036]),
     box('shoulder-l', 'pad', [-0.08, 0.008, -0.044], [-0.05, 0.02, -0.036]),
     box('shoulder-r', 'pad', [0.05, 0.008, -0.044], [0.08, 0.02, -0.036]),
-  ], { body: 'plastic-grey', bezel: 'plastic-black', screen: 'screen-black', pad: 'plastic-black', 'button-a': 'plastic-red', 'button-b': 'plastic-blue', 'button-c': 'plastic-green', 'button-d': 'plastic-yellow' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { body: 'plastic-grey', bezel: 'plastic-black', screen: 'screen-black', pad: 'plastic-black', 'button-a': 'plastic-red', 'button-b': 'plastic-blue', 'button-c': 'plastic-green', 'button-d': 'plastic-yellow' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A portable hard drive lying face up, 120 mm long, 80 mm wide and 15 mm thick: a brushed aluminium top on a
   // black rubber bumper, a blue activity lamp near one end and a cable socket in that end.
@@ -268,7 +268,7 @@ local fins(prefix, slot, x0, x1, y0, y1, z0, z1, n, t) = [
     box('lamp', 'lamp', [0.044, 0.0145, -0.002], [0.05, 0.0155, 0.004]),
     box('socket', 'socket', [0.059, 0.004, -0.008], [0.0605, 0.01, 0.008]),
     box('stripe', 'bumper', [-0.056, 0.0145, 0.026], [0.04, 0.0152, 0.028]),
-  ], { bumper: 'rubber-black', top: 'alu-bare', lamp: 'plastic-clear-blue', socket: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  ], { bumper: 'rubber-black', top: 'alu-bare', lamp: 'plastic-clear-blue', socket: 'plastic-charcoal' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A crude laboratory measuring device, 160 mm long, 110 mm tall and 70 mm deep: a box of laminated white
   // board with a dim screen and a single button on the front, a battery strapped to one end, and on top a spool

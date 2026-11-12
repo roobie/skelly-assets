@@ -60,13 +60,13 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
   // unfolded): navy with two cream stripes across the top fold and a fringe hanging from the front edge.
   h.compound('long_wool_scarf', 0.35, scarf(0.27, 0.18, 0.048, 4, 9, [-0.08, 0.08], 18),
              { cloth: 'cloth-navy', rib: 'cloth-navy', stripe: 'cloth-cream', fringe: 'cloth-navy' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A plain wool scarf folded in a stack, 200 mm by 140 mm and 38 mm tall (about 1.5 m by 200 mm unfolded): grey
   // knit with darker rib lines and a short fringe.
   h.compound('wool_scarf', 0.14, scarf(0.2, 0.14, 0.034, 3, 7, [], 13),
              { cloth: 'wool-grey', rib: 'plastic-charcoal', stripe: 'wool-grey', fringe: 'wool-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'], state: ['folded'] } } },
 
   // A wool prayer shawl folded square, 300 mm by 230 mm and 35 mm tall (about 1.8 m by 1.4 m unfolded): cream wool
   // with black bands near each end, a silver-woven neckband along the back and knotted white fringes hanging from the front corners onto the floor.
@@ -78,7 +78,7 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
     box('atara', 'atara', [-0.11, 0.03, -0.113], [0.11, 0.035, -0.078]),
   ] + tassel('tassel-l', -0.135, 0.115, 0.03) + tassel('tassel-r', 0.135, 0.115, 0.03),
   { cloth: 'cloth-cream', band: 'cloth-black', atara: 'cloth-shimmer', tassel: 'cloth-bright-white' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['religious'], tags: { material: ['fabric'], slot: ['torso'], state: ['folded'] } } },
 
   // A sports throat guard standing on its edge, 132 mm across and 90 mm tall: a padded nylon band 8 mm thick, open at
   // the back where a hook-and-loop tab closes it, with a rounded bib dropping 45 mm lower at the front over the

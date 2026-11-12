@@ -108,7 +108,7 @@ local gasFinishes = {
   // A 108 mm aluminium medical oxygen cylinder 0.36 m tall, its regulator bringing it to 0.42 m.
   h.compound('oxygen_tank', 1.9, gasKit(0.054, 0.36, 1), gasFinishes) + {
     voxelGrain: 0.004,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
   // A pistol-shaped needle-free jet injector 135 mm long, ceramic shell and alloy nozzle, a dose vial on top.
   h.compound('jet_injector', 0.25, [
     h.turned('body', 'body', 'x', [[0, 0], [0, 0.016], [0.11, 0.016], [0.122, 0.01], [0.122, 0]], [-0.06, 0.06, 0]),
@@ -122,7 +122,7 @@ local gasFinishes = {
     h.turned('band', 'band', 'x', [[0, 0], [0, 0.0165], [0.006, 0.0165], [0.006, 0]], [0.03, 0.06, 0]),
   ], { body: 'ceramic-white', nozzle: 'steel-stainless', grip: 'plastic-charcoal', vial: 'plastic-amber', band: 'paint-red' }) + h.gripOn('jet_injector', 'grip') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
   // A surgical scalpel 130 mm long: a flat 90 mm steel handle with a ribbed grip and a curved 40 mm blade.
   h.compound('scalpel', 0.024, [
     h.box('handle', 'handle', [0, -0.0015, -0.0045], [0.09, 0.0015, 0.0045]),
@@ -132,7 +132,7 @@ local gasFinishes = {
     for i in std.range(0, 5)
   ], { handle: 'steel-stainless', rib: 'steel-grey', blade: 'steel-mirror' }) + h.gripOn('scalpel', 'handle') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
   // Trauma shears 145 mm long lying flat: plastic finger loops, angled steel blades with a blunt flat tip.
   h.compound('trauma_shears', 0.039, [
     h.turned('loop-a', 'handle', 'y', [[0, 0.008], [0, 0.013], [0.006, 0.013], [0.006, 0.008], [0, 0.008]], [-0.045, 0, 0.016]),
@@ -145,15 +145,15 @@ local gasFinishes = {
     h.disc('pivot', 'pivot', 0.004, 0.001, 0.008, 0.002, 0),
   ], { handle: 'plastic-blue', blade: 'steel-stainless', pivot: 'steel-grey' }) + h.gripOn('trauma_shears', 'loop-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
   // A small 80 mm oxygen cylinder 0.17 m tall with a folding regulator and mask, 0.22 m overall.
   h.compound('small_oxygen_tank', 0.56, gasKit(0.04, 0.17, 0.75), gasFinishes) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
   // An empty 3 ml syringe, 105 mm long with its plunger drawn back and needle capped.
   h.compound('syringe', 0.0031, h.syringe(0.045, 0.005, 0.5, 0.025), {
     barrel: 'plastic-clear', dose: 'plastic-clear', stopper: 'rubber-black', plunger: 'plastic-white', hub: 'plastic-blue', cap: 'plastic-orange',
-  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], place: ['hospital'], setting: ['modern'] } } },
   // A plastic air thermometer card 150 mm by 35 mm: a glass tube with a red column over a printed scale.
   h.compound('thermometer', 0.018, [
     h.box('card', 'card', [-0.075, 0, -0.0175], [0.075, 0.003, 0.0175]),
@@ -183,7 +183,7 @@ local gasFinishes = {
     h.box('needle-sheath', 'tubing', [0.026, 0.002, 0.026], [0.05, 0.006, 0.028]),
   ], { card: 'paper-white', print: 'plastic-blue', holder: 'plastic-frosted', tube: 'glass-clear', stopper: 'plastic-red', tubing: 'plastic-frosted', wings: 'plastic-green' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], place: ['hospital'], setting: ['modern'] } } },
   // A dosimeter badge sealed in an 80 mm by 60 mm foil pouch with a yellow warning label.
   h.compound('sealed_radiation_badge', 0.014, h.sachet(0.08, 0.06, 0.008) + [
     h.box('label', 'label', [-0.022, 0.0075, -0.02], [0.022, 0.0085, 0.02]),

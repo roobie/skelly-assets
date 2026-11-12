@@ -74,7 +74,7 @@ local scaleGlove = { t: 0.02, cuff: 0.11, flare: 0.07, mail: 'scale', binding: '
   // A circlet 170 mm across and 25 mm tall: a band of dark wood with copper bands round both edges, copper studs
   // and a pointed copper plaque at the brow.
   h.compound('copper_circlet', 0.45, circlet(0.085, 0.025), { band: 'wood-oak', trim: 'copper' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood', 'metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood', 'metal'], slot: ['head'] } } },
 
   // A black dragonhide backpack 360 mm wide, 520 mm tall and 220 mm deep: a squared body under a deep lid, a front
   // pocket scaled with raised scutes, side pockets, a hip belt and bone buckles.

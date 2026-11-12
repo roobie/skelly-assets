@@ -89,7 +89,7 @@ local tentBag(length, r) =
     box('switch', 'switch', [0.016, 0.038, 0.072], [0.040, 0.062, 0.082]),
     box('switch-rocker', 'rocker', [0.019, 0.050, 0.081], [0.037, 0.059, 0.086]),
   ], { body: 'enamel-white', foot: 'rubber-black', panel: 'plastic-charcoal', motor: 'steel-grey', cup: 'rubber-black', well: 'plastic-charcoal', dial: 'plastic-black', mark: 'paint-white', switch: 'plastic-black', rocker: 'plastic-red' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], place: ['laboratory'], setting: ['modern'] } } },
 
   // A storm-glass barometer 500 mm tall: a pear-shaped sealed glass body 200 mm across, half full of
   // water, with a thin spout rising from near its foot to above its shoulder, on a turned oak stand.
@@ -141,25 +141,25 @@ local tentBag(length, r) =
   // hide, tied with rawhide thongs.
   h.compound('shelter_kit', 6.5, shelterBundle(0.9, 0.015, [5, 4, 3], 0.06, [-0.3, 0, 0.3]),
              { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 
   // The same lean-to bundle, damaged: one pole snapped short and a torn flap of hide hanging loose.
   h.compound('damaged_shelter_kit', 6.3, shelterBundle(0.9, 0.015, [5, 4, 3], 0.06, [-0.3, 0, 0.3], true),
              { pole: 'wood-birch', 'pole-dark': 'bark', hide: 'leather-tan', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide', tear: 'coal-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'], setting: ['prehistoric'], state: ['broken'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'], state: ['broken'] } } },
 
   // A large hide shelter packed for hauling, 3 m long: a dozen poles 40 mm thick under a heavy rolled hide.
   h.compound('large_shelter_kit', 35, shelterBundle(3.0, 0.02, [5, 4, 3], 0.08, [-1.1, -0.4, 0.4, 1.1]),
              { pole: 'wood-pine', 'pole-dark': 'bark', hide: 'leather-brown', 'hide-edge': 'skin-rawhide', tie: 'skin-rawhide' })
-  + { voxelGrain: 0.008 } + { taxonomy: { category: 'tools', tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
+  + { voxelGrain: 0.008 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['wood', 'leather'], setting: ['prehistoric'] } } },
 
   // A family tent in its storage bag, 700 mm long and 160 mm across, poles in a side pocket.
   h.compound('large_tent_kit', 2.9, tentBag(0.7, 0.08),
              { bag: 'nylon-ranger-green', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 
   // A one-person tent in its stuff sack, 420 mm long and 100 mm across, poles in a side pocket.
   h.compound('tent_kit', 0.71, tentBag(0.42, 0.05),
              { bag: 'nylon-red', trim: 'webbing-black', cord: 'cord-cotton', toggle: 'plastic-black', pocket: 'nylon-black', zip: 'plastic-black', label: 'paint-white', strap: 'webbing-black', buckle: 'plastic-matte-black' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['fabric'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

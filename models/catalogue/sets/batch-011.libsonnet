@@ -163,7 +163,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
     box('handle', 'plastic', [-0.11, 0.315, -0.016], [0.02, 0.335, 0.016]),
     disc('neck', 'plastic', 0.02, 0.25, 0.3, 0.095, 0),
     disc('cap', 'cap', 0.025, 0.3, 0.33, 0.095, 0),
-  ], { plastic: 'plastic-red', cap: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ], { plastic: 'plastic-red', cap: 'plastic-black' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A 50 litre aluminium beer keg, 400 mm across and 530 mm tall: a ribbed barrel between a skirt below
   // and a chime above with two hand holes, the spear valve in the middle of the top.
@@ -196,5 +196,5 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
     disc('valve', 'valve', 0.02, 1.03, 1.1),
     box('valve-outlet', 'valve', [0.02, 1.06, -0.01], [0.05, 1.08, 0.01]),
     disc('wheel', 'wheel', 0.04, 1.1, 1.115),
-  ] + handHoleRing('collar', 'paint', 0.12, 0.13, 1.07, 1.135, 50, 6), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ] + handHoleRing('collar', 'paint', 0.12, 0.13, 1.07, 1.135, 50, 6), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 ]

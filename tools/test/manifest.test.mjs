@@ -89,6 +89,19 @@ test('the manifest carries what a worn shell covers, so a consumer reads it with
   assert.deepEqual(models[0].covers, ['trunk']);
 });
 
+test('the manifest carries a model\'s mass and drawn volume, and leaves them out where its tool authors none', () => {
+  const { models } = buildManifest({
+    models: [
+      { id: 'fixture_a', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [], massKg: 2, volumeM3: 0.004 },
+      { id: 'fixture_b', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_b.glb', nodes: [] },
+    ],
+    files: ['fixture.a/assets/models/fixture_a.glb', 'fixture.a/assets/models/fixture_b.glb'],
+    credit,
+  });
+  assert.deepEqual([models[0].massKg, models[0].volumeM3], [2, 0.004]);
+  assert.ok(!Object.hasOwn(models[1], 'massKg') && !Object.hasOwn(models[1], 'volumeM3'));
+});
+
 const withRenames = (renames) => buildManifest({
   models: [{ id: 'fixture_a', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [] }],
   files: ['fixture.a/assets/models/fixture_a.glb'],

@@ -103,12 +103,12 @@ local quiltedTube(id, l, r, z, pitch) =
   // A pair of carpet arm guards: per arm a square of carpet rolled round the forearm, 200 mm long and 104 mm across,
   // and a wider one, 220 mm long and 120 mm across, round the upper arm, all held with duct tape, laid side by side.
   h.compound('carpet_armguards', 0.7, carpetArm(-1, true) + carpetArm(1, true), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' }) + h.headEndOnMinusX
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A pair of carpet bracers: a square of carpet rolled round each forearm, 200 mm long and 104 mm across, held with
   // duct tape, laid side by side.
   h.compound('carpet_bracers', 0.3, carpetArm(-1, false) + carpetArm(1, false), { carpet: 'carpet-pile', backing: 'jute', tape: 'tape-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['fabric'], slot: ['arms'] } } },
 
   // A pair of sheet steel arm guards laid side by side: per arm a forearm plate 220 mm long round a 50 mm radius, an
   // upper-arm plate 210 mm long round 60 mm, an elbow cop between them riveted to both, and leather straps.

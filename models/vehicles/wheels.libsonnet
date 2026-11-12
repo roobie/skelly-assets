@@ -26,6 +26,13 @@
     tyre: { id: 'tyre_295_80r22_5', massKg: 58, width: 0.295, outer: 0.522 },
     rim: { id: 'rim_22_5_steel', massKg: 27, radius: 0.286, width: 0.21, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.14, spokes: 8, spokeWidth: 0.08, finish: 'steel-grey' },
   },
+  // A 14.00 R25 flotation tyre on a 25-inch steel disc wheel, as off-road crash tenders and cranes run. Masses are
+  // estimates for the size.
+  wheel_385_95r25: {
+    class: 'heavy',
+    tyre: { id: 'tyre_385_95r25', massKg: 150, width: 0.385, outer: 0.685 },
+    rim: { id: 'rim_25_steel', massKg: 85, radius: 0.3175, width: 0.254, wall: 0.03, face: 0.05, faceThickness: 0.035, hub: 0.16, spokes: 10, spokeWidth: 0.08, finish: 'steel-grey' },
+  },
   // The M3 half-track's 8.25-20 combat tyre on a six-stud steel disc wheel. Masses are estimates for the size.
   wheel_8_25_20: {
     class: 'medium',

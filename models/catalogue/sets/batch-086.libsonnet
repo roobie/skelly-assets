@@ -1,3 +1,4 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 local turned = h.turned;
@@ -25,7 +26,7 @@ local figure = [
   box('eye-l', 'eye', [-0.007, 0.138, 0.01], [-0.003, 0.141, 0.013]),
   box('eye-r', 'eye', [0.003, 0.138, 0.01], [0.007, 0.141, 0.013]),
 ];
-[
+taxonomy.inherit({ keywords: ['toy'] }, [
   // A stuffed toy shark 1.03 m from snout to tail, 0.26 m through the body, lying on its white belly, snout on +z,
   // with a tall back fin, two side fins and an upright tail fin.
   h.compound('shark_plushie', 0.6, [
@@ -111,4 +112,4 @@ local figure = [
     turned('loop', 'string', 'y', [[0, 0.008], [0, 0.0105], [0.002, 0.0105], [0.002, 0.008], [0, 0.008]], [0.049, 0, 0.06]),
   ], { shell: 'plastic-red', string: 'cord-cotton', cap: 'plastic-white' })
   + h.inHand('yoyo', 'halves') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
-]
+])

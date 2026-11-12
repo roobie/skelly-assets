@@ -183,5 +183,5 @@ local buckle(id, slot, x, z, w, d, y) = [
              ]
              + buckle('buckle', 'buckle', 0.02, 0, 0.03, 0.035, 0.005),
              { strap: 'cloth-olive-drab', body: 'cloth-canvas', trim: 'cloth-brown', pad: 'cloth-khaki', buckle: 'steel-grey' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', tags: { material: ['fabric'], slot: ['back'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'weapon-parts', keywords: ['archery'], tags: { material: ['fabric'], slot: ['back'] } } },
 ]

@@ -4,6 +4,7 @@
 // seen from the near side (rear to front along the ground, then back over the top); the other wheels stand on its
 // runs. A machine's track frame is drawn with the band and weighs `frame.massKg`, in its `finish` when it names one;
 // an armoured hull carries its own suspension arms, so its track has none.
+local classes = import 'track-classes.libsonnet';
 {
   // A 14-tonne excavator's: 3.75 m long, its drive sprocket at the rear.
   excavator_track: {
@@ -17,6 +18,21 @@
       for i in std.range(0, 6)
     ],
     loop: ['sprocket', 'idler'],
+  },
+  // A 20-tonne crawler dozer's: idlers at both ends of the ground run and the drive sprocket raised over the rear one,
+  // out of the dirt and clear of the shocks the blade sends through the rollers, so the band runs as a triangle.
+  bulldozer_track: {
+    class: 'crawler_heavy',
+    frame: { massKg: 600, x: [-1.1, 1.1], y: [0.38, 0.56], halfWidth: 0.16 },
+    wheels: [
+      { site: 'sprocket', key: 'sprocket', at: [-0.85, 1.0] },
+      { site: 'idler_rear', key: 'idler', at: [-1.5, 0.49] },
+      { site: 'idler_front', key: 'idler', at: [1.44, 0.49] },
+    ] + [
+      { site: 'roller_' + i, key: 'roller', at: [-0.96 + 0.32 * i, 0.27] }
+      for i in std.range(0, 6)
+    ],
+    loop: ['idler_rear', 'idler_front', 'sprocket'],
   },
   // A 6-tonne trencher's rubber track: 2.5 m long, its drive sprocket at the rear.
   trencher_track: {
@@ -60,5 +76,28 @@
       for i in std.range(0, 3)
     ],
     loop: ['idler', 'road_wheel_0', 'road_wheel_3', 'sprocket'],
+  },
+  // A main battle tank's: seven road wheels a side between a raised drive sprocket at the rear and an idler at the front,
+  // and four return rollers under the top run. The road wheels stand on the band's ground run; the sprocket and idler
+  // are alike in radius and axle height, so the top run is level and each roller, midway between two road wheels, meets
+  // it.
+  mbt_track: {
+    local c = classes[self.class],
+    local wheelY = c.roadWheel.radius + c.link.thickness + c.link.pad.height,
+    local endAxleY = 0.74,
+    local runY = endAxleY + c.sprocket.radius,
+    assert c.sprocket.radius == c.idler.radius : 'a level top run needs a sprocket and idler of one radius',
+    class: 'armoured_heavy',
+    wheels: [
+      { site: 'sprocket', key: 'sprocket', at: [-3.45, endAxleY] },
+      { site: 'idler', key: 'idler', at: [3.2, endAxleY] },
+    ] + [
+      { site: 'road_wheel_' + i, key: 'roadWheel', at: [-2.4 + 0.8 * i, wheelY] }
+      for i in std.range(0, 6)
+    ] + [
+      { site: 'roller_' + i, key: 'roller', at: [[-2.0, -0.4, 0.4, 2.0][i], runY - c.roller.radius] }
+      for i in std.range(0, 3)
+    ],
+    loop: ['sprocket', 'road_wheel_0', 'road_wheel_6', 'idler'],
   },
 }

@@ -329,11 +329,11 @@ local furArmour() =
 
   // Sheet metal armour joined with mail at the shoulders, elbows and knees, with a mail skirt.
   h.compound('hardened_scrap_plate_armour', 27, sheetSuit({ chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // The mail-joined suit with the doubled chest sheet.
   h.compound('heavy_hardened_scrap_plate_armour', 30, sheetSuit({ heavy: true, chain: true }), { sheet: 'steel-hardened', rivet: 'steel-bright', vent: 'screen-black', strap: 'leather-tan', mail: 'steel-mail-dark' })
-  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
+  + { voxelGrain: 0.006 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso', 'arms', 'legs'] } } },
 
   // Boiled leather armour laid out flat, 1200 mm from neck to ankle: a moulded cuirass, shoulder flaps, a strip skirt,
   // and laced arm, thigh and shin guards.

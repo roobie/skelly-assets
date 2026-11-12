@@ -116,8 +116,8 @@ export interface GlbExportInput {
   readonly revolveFacets?: number;
   /**
    * Voxel edge in metres. When set, drawn solids export as voxel meshes instead of smooth ones (see `glb.ts`,
-   * `voxelPrimitivesFor`). Every model export sets it (see `recipe.ts`, `recipeVoxel`); absent, the file holds the
-   * authored smooth meshes, which only geometry checks read.
+   * `voxelPrimitivesFor`). Every recipe row names one (see `recipe.ts`, `recipeVoxel`); an exporter may leave it unset
+   * for a model it draws smooth, and absent, the file holds the authored meshes.
    */
   readonly voxelGrain?: number;
   /**
@@ -125,10 +125,13 @@ export interface GlbExportInput {
    * keeps `voxelGrain`. Must divide `voxelGrain` a whole number of times so the two lattices nest. Needs `voxelGrain`.
    */
   readonly voxelDetailGrain?: number;
+  /** Also gives `voxelDetailGrain` to every part too thin for `voxelGrain`; see `glb.ts`, `partVoxelGrain`. */
+  readonly voxelDetailThinParts?: boolean;
 }
 
 /** A model export's voxel class as the GLB writer takes it. */
-export type VoxelGrains = Required<Pick<GlbExportInput, 'voxelGrain'>> & Pick<GlbExportInput, 'voxelDetailGrain'>;
+export type VoxelGrains = Required<Pick<GlbExportInput, 'voxelGrain'>> &
+  Pick<GlbExportInput, 'voxelDetailGrain' | 'voxelDetailThinParts'>;
 
 export type GlbExportError =
   | { readonly code: 'invalid-skin'; readonly message: string }

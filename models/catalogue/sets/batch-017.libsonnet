@@ -97,7 +97,7 @@ local alderParts =
     knob: 'plastic-black',
     resistor: 'paint-cream',
   })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A fired clay building brick, 190 by 90 mm and 57 mm tall, with a shallow frog pressed into its top
   // face, lying flat.
@@ -164,7 +164,7 @@ local alderParts =
         box('tang', 'spine', [x0 - 0.03, 0.008, spine(0) - 0.03], [x0 - 0.01, 0.06, spine(0) - 0.012]),
         box('tang-lug', 'spine', [x0 - 0.034, 0.05, spine(0) - 0.034], [x0 - 0.006, 0.058, spine(0) - 0.008]),
       ], { spine: 'steel', blade: 'steel-blued', edge: 'steel-stainless' })
-    + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+    + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['farm'] } } },
   ]
 )
 + (
@@ -237,7 +237,7 @@ local alderParts =
     handle: 'leather-brown',
     knob: 'plastic-black',
     foot: 'rubber-black',
-  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { taxonomy: { category: 'electrical', tags: { material: ['metal', 'plastic'], setting: ['modern'] }, keywords: ['music'] } },
 
   // A cardboard archery target box, 600 mm wide, 450 mm tall and 190 mm deep, standing on its long edge:
   // packed tight with cloth, its seams taped, and a painted target of five coloured rings on the front.

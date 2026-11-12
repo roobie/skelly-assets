@@ -160,7 +160,7 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
   // Military field trousers folded, 270 mm by 340 mm and 64 mm tall: a flapped back pocket and a bellows cargo
   // pocket on the thigh.
   folded('army_trousers', 0.85, { w: 0.27, ht: 0.064, pocket: { x: 0.07, z: -0.09, w: 0.1, d: 0.1, flap: 0.03 }, cargo: { x: -0.05, z: 0.06, w: 0.12, d: 0.13 } },
-         { cloth: 'cloth-olive-drab', waistband: 'cloth-olive-drab', loop: 'cloth-olive-drab', button: 'plastic-matte-black', seam: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-olive-drab', waistband: 'cloth-olive-drab', loop: 'cloth-olive-drab', button: 'plastic-matte-black', seam: 'webbing-olive-dark', pocket: 'cloth-olive-drab', flap: 'webbing-olive-dark', stud: 'plastic-matte-black' }) + { taxonomy: { category: 'clothing', keywords: ['military'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Checkered cotton trousers folded, 260 mm by 320 mm and 40 mm tall: a small check of raised grey squares, 16 mm
   // across, on charcoal cloth stands in for the print, which no finish provides.
@@ -200,7 +200,7 @@ local folded(id, mass, o, finish) = h.compound(id, mass, trousers(o), finish) + 
 
   // Insulated ski trousers folded, 270 mm by 340 mm and 60 mm tall: an elastic drawcord waist and padded knees.
   folded('ski_trousers', 0.77, { w: 0.27, d: 0.34, ht: 0.06, folds: 3, loops: false, knee: { z: 0.07, d: 0.12 } },
-         { cloth: 'cloth-navy', waistband: 'nylon-black', seam: 'nylon-black', cord: 'cord-cotton', knee: 'nylon-black' }) + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
+         { cloth: 'cloth-navy', waistband: 'nylon-black', seam: 'nylon-black', cord: 'cord-cotton', knee: 'nylon-black' }) + { taxonomy: { category: 'clothing', keywords: ['cold-weather'], tags: { material: ['fabric'], slot: ['legs'], setting: ['modern'], state: ['folded'] } } },
 
   // Tactical trousers folded, 270 mm by 340 mm and 64 mm tall: reinforced belt loops, flapped back pocket, cargo
   // pocket with a press stud and an articulated knee panel.

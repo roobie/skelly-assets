@@ -142,7 +142,7 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     h.rod('electrode', 'wire', 0.001, 0.03, 0.04, 0.007),
     box('tip', 'wire', [0.038, 0.007, -0.001], [0.04, 0.013, 0.001]),
   ], { button: 'plastic-red', body: 'plastic-black', sleeve: 'alu-bare', wire: 'steel-bright' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] }, keywords: ['fire-starting'] } },
 
   // A twisted-wire bore brush 350 mm long lying along x: a steel finger loop at -x, a long twisted shaft and a cotton
   // brush head 100 mm long with a rounded tip.
@@ -167,5 +167,5 @@ local wireLoop(id, slot, r, t, y) = turned(id, slot, 'y', [[0, r - t], [0, r], [
     ]),
     turned('rim', 'pot', 'y', [[0, 0.084], [0, 0.092], [0.012, 0.092], [0.012, 0.084], [0, 0.084]], [0, 0.138, 0]),
   ], { pot: 'paint-terracotta' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['gardening'] } },
 ]

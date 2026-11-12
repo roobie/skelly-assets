@@ -1,7 +1,8 @@
 // The size classes of a turret's salvageable fittings. Every turret of one class takes the same guns, sights,
-// periscopes, hatches and smoke launchers, so one salvaged from a turret fits any other of its class. A class is one
-// entry here; `turrets.libsonnet` names each turret's class and where it fits each fitting. Metres and kilograms;
-// `draw` names the drawing in `turret-kit.libsonnet`, which says each fitting's frame.
+// periscopes, hatches, smoke launchers and stowage baskets, so one salvaged from a turret fits any other of its class.
+// A class is one entry here; `turrets.libsonnet` names each turret's class and where it fits each fitting. Metres and
+// kilograms; `draw` names the drawing in `turret-kit.libsonnet`, which says each fitting's frame. A gun too long for
+// the `gun` voxel class's lattice names a coarser `voxelGrain` of its own.
 // A fitting's `taxonomy` is its row's own, over the vehicle's (`models/TAXONOMY.md`): a gun lifted off a turret is a
 // whole weapon, not a vehicle part.
 local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } };
@@ -70,5 +71,45 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     hatch: { draw: 'hatch', id: 'ifv_turret_hatch', massKg: 30, radius: 0.3, thickness: 0.05, opening: 0.4 },
     // One empty 76 mm Galix grenade launcher tube on its foot, raised to throw forward.
     smokeLauncher: { draw: 'smokeLauncher', id: 'galix_launcher_76mm', massKg: 2.5, bore: 0.08, length: 0.2, elevation: 45 },
+  },
+  // A main battle tank's three-man turret: a 120 mm smoothbore gun with a coaxial 7.62 mm machine gun. The values are a
+  // generic Western tank's, from the published figures of 120 mm tank guns and their fittings; the masses of the sights, hatches
+  // and basket are estimates.
+  mbt_120mm: {
+    paint: 'paint-olive',
+    // A 120 mm L/44 smoothbore: a 5.28 m barrel, 44 calibres, with its fume extractor about two fifths of the way out.
+    // About 3.2 t with its breech, as published for guns of its kind; the breech is drawn as the receiver.
+    mainGun: {
+      draw: 'gun',
+      id: 'smoothbore_120mm_tank_gun',
+      massKg: 3200,
+      taxonomy: gun,
+      receiver: { length: 1.2, height: 0.5, width: 0.6 },
+      barrel: { length: 5.28, radius: 0.1 },
+      fumeExtractor: { from: 2.0, length: 0.9, radius: 0.16 },
+      // The finest grain whose lattice still spans the gun from its origin (`tools/packages/thing-export/src/voxelize.ts`,
+      // `HALF_RANGE`), three cells of the gun class's so its voxels nest in that lattice.
+      voxelGrain: 0.006,
+    },
+    // A 7.62 mm general-purpose machine gun of about 1.2 m and 11 kg, with a 0.56 m barrel.
+    coaxGun: {
+      draw: 'coaxGun',
+      id: 'coaxial_machine_gun_762',
+      massKg: 11,
+      taxonomy: gun,
+      receiver: { length: 0.5, height: 0.1, width: 0.08 },
+      barrel: { length: 0.56, radius: 0.02 },
+    },
+    // The gunner's stabilised day and thermal sight, a box ahead of the commander, and the commander's panoramic sight,
+    // which stands high enough to see over the gunner's and turn on its own.
+    gunnerSight: { draw: 'sight', id: 'mbt_gunner_sight', massKg: 90, length: 0.5, height: 0.3, width: 0.36 },
+    commanderSight: { draw: 'sight', id: 'mbt_commander_sight', massKg: 60, length: 0.3, height: 0.48, width: 0.3 },
+    periscope: { draw: 'periscope', id: 'mbt_turret_periscope', massKg: 8, length: 0.2, height: 0.12, width: 0.25 },
+    // A crewman's round lid of thick armour plate on its hinge, over a square opening in the roof.
+    hatch: { draw: 'hatch', id: 'mbt_turret_hatch', massKg: 60, radius: 0.33, thickness: 0.06, opening: 0.5 },
+    // One empty 76 mm smoke-grenade discharger tube on its foot, raised to throw forward.
+    smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_discharger_76mm', massKg: 3, bore: 0.09, length: 0.26, elevation: 45 },
+    // The steel basket the crew's kit rides in behind the turret.
+    bustleRack: { draw: 'stowageBasket', id: 'turret_bustle_rack', massKg: 70, depth: 0.6, width: 2.6, height: 0.5, bar: 0.04, slats: 7 },
   },
 }

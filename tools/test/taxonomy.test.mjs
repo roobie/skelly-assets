@@ -16,6 +16,7 @@ const FIXTURE = {
     material: { meaning: 'What it is made of.', terms: { metal: 'Metal.', wood: 'Wood.' } },
     setting: { meaning: 'Its era.', terms: { modern: 'Now.' } },
   },
+  keywords: { 'hand-tool': 'A tool held in the hand.' },
 };
 
 const inTemp = (prefix, work) => {
@@ -53,6 +54,20 @@ test('a category, facet or term outside the vocabulary fails, even in a pack lis
   ]), ['unknown-term bad_category', 'unknown-facet bad_facet', 'malformed bad_key', 'unknown-term bad_term']);
 });
 
+test('a keyword the vocabulary does not list is reported without failing; a malformed keyword fails', () => {
+  const at = (id, keywords) => ({ pack: 'fixture.loose', id, taxonomy: { category: 'tools', keywords } });
+  const report = taxonomyReport([
+    looseUntagged,
+    at('listed', ['hand-tool']),
+    at('unlisted', ['hand-tool', 'claw-hammer']),
+    at('bad_case', ['Claw_Hammer']),
+    at('twice', ['hand-tool', 'hand-tool']),
+    at('not_a_list', 'hand-tool'),
+  ], vocabulary);
+  assert.deepEqual(report.unlisted.map(({ id, keyword }) => [id, keyword]), [['unlisted', 'claw-hammer']]);
+  assert.deepEqual(report.problems.map(({ problem, id }) => [problem, id]), [['malformed', 'bad_case'], ['malformed', 'not_a_list'], ['malformed', 'twice']]);
+});
+
 test('the untagged pack list only shrinks: a fully tagged or vanished listed pack fails', () => {
   assert.deepEqual(problemsOf([]), ['stale-untagged-pack']);
   assert.deepEqual(problemsOf([{ pack: 'fixture.loose', id: 'done', taxonomy: { category: 'tools' } }]), ['stale-untagged-pack']);
@@ -64,6 +79,8 @@ test('the vocabulary is refused when a term is not kebab-case, has no meaning, o
   assert.throws(() => vocabularyOf({ ...FIXTURE, categories: { tools: ' ' } }), /has no meaning/);
   assert.throws(() => vocabularyOf({ ...FIXTURE, facets: { material: { meaning: 'x', terms: { metal: '' } } } }), /has no meaning/);
   assert.throws(() => vocabularyOf({ ...FIXTURE, strict: true }), /unknown key strict/);
+  assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: { 'Hand tool': 'A tool.' } }), /not kebab-case/);
+  assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: { 'hand-tool': '' } }), /keywords term hand-tool has no meaning/);
 });
 
 // [default, own, resolved]: the JavaScript and Jsonnet implementations of the rule must agree on each case.
@@ -77,9 +94,10 @@ const INHERITANCE = [
     { category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } },
   ],
   ['an empty facet clears the inherited terms', { tags: { setting: ['modern'] } }, { tags: { setting: [] } }, { tags: { setting: [] } }],
+  ['a row\'s keywords replace the default\'s', { keywords: ['hand-tool'] }, { keywords: ['claw-hammer'] }, { keywords: ['claw-hammer'], tags: {} }],
 ];
 
-test('a row inherits its default and overrides it by category and by facet', () => {
+test('a row inherits its default and overrides it by category, by keywords and by facet', () => {
   for (const [name, base, own, resolved] of INHERITANCE) assert.deepEqual(inheritTaxonomy(base, own), resolved, name);
 });
 
@@ -101,11 +119,11 @@ local cases = ${JSON.stringify(cases)};
   assert.deepEqual(compiled.innerFirst, { category: 'weapons', tags: { material: ['wood'], setting: ['modern'] } });
 }));
 
-test('the manifest carries each model\'s category and sorted tags, without empty facets', () => {
+test('the manifest carries each model\'s category, sorted tags and sorted keywords, without empty facets', () => {
   const models = withTaxonomy(
     [{ id: 'axe', kind: 'item', pack: 'fixture.a', path: 'axe.glb', nodes: [] }, { id: 'rock', kind: 'item', pack: 'fixture.a', path: 'rock.glb', nodes: [] }],
     [
-      { pack: 'fixture.a', id: 'axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] } } },
+      { pack: 'fixture.a', id: 'axe', taxonomy: { category: 'tools', tags: { setting: [], material: ['wood', 'metal'] }, keywords: ['splitting', 'felling'] } },
       { pack: 'fixture.a', id: 'rock' },
     ],
   );
@@ -113,7 +131,8 @@ test('the manifest carries each model\'s category and sorted tags, without empty
   const byId = new Map(entries.map((entry) => [entry.id, entry]));
   assert.equal(byId.get('axe').category, 'tools');
   assert.deepEqual(byId.get('axe').tags, { material: ['metal', 'wood'] });
-  assert.ok(!Object.hasOwn(byId.get('rock'), 'category') && !Object.hasOwn(byId.get('rock'), 'tags'));
+  assert.deepEqual(byId.get('axe').keywords, ['felling', 'splitting']);
+  assert.ok(['category', 'tags', 'keywords'].every((key) => !Object.hasOwn(byId.get('rock'), key)));
 });
 
 test('a built model whose source row was not read for its taxonomy stops the build', () => {

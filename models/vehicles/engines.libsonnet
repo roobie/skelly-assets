@@ -16,4 +16,7 @@
   // A 14-litre Scania DSI14 V8 diesel of about 550 hp, as in the CV9040. Dealer listings give it 1,450 to 1,600 kg; its
   // measures are estimates for a 90-degree V8 of its size, since Scania publishes none.
   v8_diesel_heavy: { class: 'heavy', massKg: 1450, length: 1.15, width: 0.9, height: 1.0 },
+  // A 27-litre twin-turbocharged V12 diesel of about 1,100 kW, as in a Western main battle tank's powerpack. Its mass
+  // and measures are estimates for a 90-degree V12 of that size, cut to the height a tank's engine bay allows.
+  v12_diesel_tank: { class: 'heavy', massKg: 2500, length: 1.7, width: 1.0, height: 0.95 },
 }

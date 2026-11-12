@@ -7,7 +7,8 @@ import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
 import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
-import { samplePose } from './poseSample.mjs';
+import { decodeFrame, sampleClip } from './clipFrames.mjs';
+import { boneTransforms } from './kinematics.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -220,22 +221,11 @@ export function stillInstance(loaded, model) {
 
 // ---- rigid posing: each vertex follows its body bone (TEXCOORD_1.x) ----
 
-const mul = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
-const quaternionMatrix = ([x, y, z, w]) => [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w), 2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w), 2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)];
-
 const slerp = (a, b, w) => new THREE.Quaternion(...a).slerp(new THREE.Quaternion(...b), w).toArray();
 
 export function pose(scene, body, clip, time) {
   if (!playable(clip)) return;
-  const pose = samplePose(clip, time, slerp), transforms = [], byId = new Map();
-  for (const bone of body.bones) {
-    const r = quaternionMatrix(pose.rotations[bone.id] ?? [0, 0, 0, 1]), h = bone.head;
-    let t = h.map((x, axis) => x - r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * h[c], 0));
-    const parent = byId.get(bone.parent);
-    if (parent) { t = t.map((x, axis) => parent.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * t[c], 0) + parent.t[axis]); transforms.push({ r: mul(parent.r, r), t }); }
-    else { t = t.map((x, axis) => x + pose.root[axis]); transforms.push({ r, t }); }
-    byId.set(bone.id, transforms.at(-1));
-  }
+  const posed = boneTransforms(body.bones, decodeFrame(sampleClip(clip, time, slerp))), transforms = body.bones.map((bone) => posed.get(bone.id));
   scene.traverse((o) => {
     if (!o.isMesh || !o.geometry.userData.rest) return;
     const g = o.geometry, bone = g.attributes.uv1.array, rest = g.userData.rest, restN = g.userData.restNormal, pos = g.attributes.position.array, nor = g.attributes.normal.array;

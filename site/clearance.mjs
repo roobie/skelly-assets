@@ -74,16 +74,16 @@ export function subdivided(mesh, pitch = PITCH) {
   return out;
 }
 
-// A mesh's surface as the probe samples it: its subdivided triangles, each as { corners, point, normal }, sampled at
-// its centroid with its outward normal. A centroid lies inside one face, so a step off it along that normal leaves
+// A mesh's surface as the probe samples it: its triangles subdivided to `pitch`, each as { corners, point, normal },
+// sampled at its centroid with its outward normal. A centroid lies inside one face, so a step off it along that normal leaves
 // the face's plane, where a corner's step along one of its faces could run along a plane another face lies in. A
 // mirrored copy's faces are turned inside out, which its negative volume shows.
-function sampledSurface(mesh) {
+export function sampledSurface(mesh, pitch = PITCH) {
   const faces = triangles(mesh);
   const outward = faces.reduce((sum, [a, b, c]) => sum + dot(a, cross(b, c)), 0) < 0 ? -1 : 1;
   return faces.flatMap((face) => {
     const normal = scale(normalize(cross(sub(face[1], face[0]), sub(face[2], face[0]))), outward);
-    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }).map((corners) => ({ corners, point: centroid(corners), normal }));
+    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal }));
   });
 }
 
@@ -188,11 +188,20 @@ const carried = (tree, { r, t }) => {
   return { tree, local: (p) => mulMV(back, sub(p, t)) };
 };
 
-// How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray.
-function signedDepth({ tree, local }, p) {
+// A mesh carried by a transform; a grip closes on one (site/fingers.mjs).
+export const posedSolid = (mesh, transform) => carried(solidOf(mesh), transform);
+
+/**
+ * How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray. A
+ * grip probes hundreds of points per joint step, so it can name a `reach` past which only the side matters: the
+ * search gives up there, and the depth is ±Infinity.
+ */
+export function signedDepth({ tree, local }, p, reach = Infinity) {
   const q = local(p);
-  const surface = nearest(tree, q, Infinity);
-  return boxDistance(tree.bounds, q) === 0 && winding(tree, q) !== 0 ? -surface : surface;
+  const surface = nearest(tree, q, reach);
+  const inside = boxDistance(tree.bounds, q) === 0 && winding(tree, q) !== 0;
+  if (surface >= reach) return inside ? -Infinity : Infinity;
+  return inside ? -surface : surface;
 }
 
 // Whether `p` lies inside the solid deeper than a coincident face.
@@ -220,7 +229,7 @@ function depthOutside(solids, p) {
 // A step off a face along its normal, past a coincident face: where the step lands tells whether the face is on the
 // figure's outside, where it shows, or on a face inside it, where the shells a part or a piece is built from overlap
 // or one part meets the next.
-const STEP = 2 * COINCIDENT;
+export const STEP = 2 * COINCIDENT;
 
 // Whether `p` lies outside every one of the solids.
 const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = local(p); return boxDistance(tree.bounds, q) > 0 || winding(tree, q) === 0; });
@@ -322,4 +331,14 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
     });
     return findings;
   };
+}
+
+/**
+ * A closed mesh as a gear check reads it: `depth(p)`, how far `p` lies outside it, negative inside, and `reach(p, dir)`,
+ * how far the ray from `p` along the unit vector `dir` runs before it meets the mesh beyond a coincident face, Infinity
+ * when it misses. They answer a gear piece's question, how far a point stands off the surface beneath it.
+ */
+export function meshProbe(mesh) {
+  const solid = carried(solidOf(mesh), STILL);
+  return { depth: (p) => signedDepth(solid, p), reach: (p, dir) => firstHit(solid.tree, p, dir, Infinity) };
 }

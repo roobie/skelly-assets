@@ -253,7 +253,7 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
   h.compound('paper_leg_guards', 0.59, paperGuard('left', -0.09, -1, 0) + paperGuard('right', 0.09, 1, 0.03), {
     paper: 'paper-white',
     tape: 'tape-grey',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['paper'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['paper'], slot: ['legs'] } } },
 
   // A pair of scrap leg guards 580 mm long, mismatched pieces of sheet strung together with cord.
   h.compound('scrap_metal_leg_guards', 2.1, scrapGuard('left', -0.095, -1, 0) + scrapGuard('right', 0.095, 1, 0.03), {
@@ -261,14 +261,14 @@ local pad(id, cx, cz, a, b, y, t, ribs=0, slot='pad') =
     'scrap-b': 'steel-galvanised',
     'scrap-c': 'steel-bright',
     tie: 'cord-cotton',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal', 'fabric'], slot: ['legs'] } } },
 
   // A pair of tyre leg guards 580 mm long, three thick chunks of tread on each strung together with cord.
   h.compound('tyre_leg_guards', 3, tyreGuard('left', -0.1, -1, 0) + tyreGuard('right', 0.1, 1, 0.03), {
     rubber: 'rubber-black',
     tread: 'plastic-charcoal',
     tie: 'cord-cotton',
-  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber', 'fabric'], slot: ['legs'] } } },
+  }) + h.headEndOnMinusX + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber', 'fabric'], slot: ['legs'] } } },
 
   // A pair of mail leggings 780 mm from hip to ankle, laid flat side by side, with hip straps and stirrups.
   h.compound('chainmail_leggings', 6, mailLegging('left', -0.105) + mailLegging('right', 0.105), {

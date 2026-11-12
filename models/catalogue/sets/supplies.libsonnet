@@ -1,7 +1,7 @@
 local item = (import 'packages/thing-authoring-tool/compound.libsonnet').item;
 [
   item('tape_roll', 'ring', 0.030, { outerRadius: 0.04, innerRadius: 0.012, coreRadius: 0.016, height: 0.021 }, { body: 'paint-terracotta', core: 'paperboard-tan' }) + { taxonomy: { category: 'materials' } },
-  item('thread_spool', 'spool', 0.015, { outerRadius: 0.027, coreRadius: 0.018, windingRadius: 0.026, height: 0.05, flangeHeight: 0.008, flangeInset: 0.004, windings: 5, grooveDepth: 0.0015 }, { core: 'paperboard-tan', winding: 'paint-terracotta' }) + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
+  item('thread_spool', 'spool', 0.015, { outerRadius: 0.027, coreRadius: 0.018, windingRadius: 0.026, height: 0.05, flangeHeight: 0.008, flangeInset: 0.004, windings: 5, grooveDepth: 0.0015 }, { core: 'paperboard-tan', winding: 'paint-terracotta' }) + { taxonomy: { category: 'materials', keywords: ['sewing'], tags: { material: ['fabric'] } } },
   item('cord_coil', 'coil', 0.060, { radius: 0.029, tubeRadius: 0.0035, turns: 4, pitch: 0.006 }, { body: 'cord-olive' }) + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
   item('fuse', 'fuse', 0.010, { radius: 0.009, capRadius: 0.011, length: 0.07, capLength: 0.008 }, { body: 'glass-grey', cap: 'steel-grey' }) + { taxonomy: { category: 'electrical' } },
   item('bear_trap', 'bearTrap', 4.500, {

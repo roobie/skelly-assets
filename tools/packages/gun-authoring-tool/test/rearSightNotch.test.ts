@@ -1,5 +1,6 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
@@ -72,11 +73,7 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
       assembly,
       ASSET,
       { appearanceProfile: 'ar' },
-      {
-        voxelGrain: gunVoxel.grain,
-        voxelDetailGrain: gunVoxel.detailGrain,
-        items,
-      },
+      { ...recipeVoxel({ voxel: gunVoxel }), items },
     );
     if (!result.ok) {
       throw new Error(`export failed: ${JSON.stringify(result.error)}`);

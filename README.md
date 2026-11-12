@@ -20,7 +20,9 @@ seeded generator rows, and a build turns both into binary glTF (`.glb`).
 CI builds them and publishes each version as a release, so you can use the assets without building anything.
 
 **Browse them:** <https://roobie.github.io/skelly-assets/>: turn each model around, play the creatures' clips
-and download any of them.
+and download any of them. The page opens on a handful of models rather than drawing thousands of previews at
+once, which is slow to load. Keyword and tag filters narrow the catalogue, and the page keeps its whole state in the
+URL hash, so any view, down to an open model, is a link you can share.
 
 ## Layout
 
@@ -91,7 +93,7 @@ for value until they are derived from our own models. See `tools/test/catalogue-
 For a generated creature, author a row with its content pack in `models/mobs.json` instead of a gun/thing recipe;
 see `tools/layout.mjs`, `readMobRows`, and `tools/mobs.mjs`, `exportMob`.
 
-Every model also needs a category and may carry facet tags, from the vocabulary in `models/taxonomy.json`.
+Every model also needs a category and may carry facet tags and keywords, from the vocabulary in `models/taxonomy.json`.
 The build refuses a model without them in a strict pack. Why, and how to request a term, is in
 `models/TAXONOMY.md`; `node tools/check-taxonomy.mjs` lists what is still untagged.
 
@@ -121,7 +123,10 @@ of thing, an actor family, a site or a scenario, never to a reader; see the sele
 showcase consumes all manifest models, independent of product bundling, and shelves and filters them by the
 category and tags their manifest entries carry; see `site/build.mjs`. It shows each vehicle assembled from its
 placements, because a pile of loose panels does not show what the vehicle is, and can explode it to show the parts
-it is made of.
+it is made of. Its metadata panel lists every field of a model's manifest entry and sidecar, with numbers rounded for
+reading, rather than a chosen set of fields, so the panel shows what a consumer reads without following each format
+change; see `site/app.js`, `showMeta`. Whether a model is an assembly or an atom is derived from its sites and
+components, never tagged, so no curated term can disagree with the model; see `tools/components.mjs`, `formOf`.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
@@ -168,6 +173,14 @@ its own development round; sharing a model does not imply universal fit. `paper_
 outside the shared producer guarantee: they have no producer, and closing that gap requires its own ruling.
 
 For pipeline ownership and authoring entry points, see `tools/README.md`.
+
+## Sounds
+
+Sounds are rows too: `models/sounds/` holds Jsonnet rows that `tools/packages/impact-synth` renders to samples,
+so a consumer ships a few numbers per sound instead of recorded audio. Only sounds the project owns live here, the
+way only models it owns do: a sound that is synthesised or recorded by us carries the same licence as the models,
+and a sampled or downloaded one would bring its own terms and make the licence page as complicated as the
+sound's origin.
 
 ## Using the assets
 

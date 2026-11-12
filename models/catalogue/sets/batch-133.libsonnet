@@ -223,5 +223,5 @@ local sheetPath = [[0, 0.106], [0.06, 0.108], [0.11, 0.1], [0.15, 0.078], [0.18,
                box('holder-head', 'trim', [-0.022, 0.175, 0.07], [0.022, 0.195, 0.096]),
              ],
              { shell: 'plastic-red', trim: 'brass-dull', leather: 'leather-black', plate: 'paint-white' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
 ]

@@ -25,6 +25,6 @@ local cross(side) =
   { body: 'polymer-od-green', seam: 'polymer-od-green', handle: 'polymer-od-green', spout: 'steel-grey', cap: 'paint-charcoal' }) + {
     handling: { part: 'jerry_can', solid: 'handle-b', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     voxelGrain: 0.004,
-    taxonomy: { category: 'containers' },
+    taxonomy: { category: 'containers', keywords: ['fuel'] },
   },
 ]

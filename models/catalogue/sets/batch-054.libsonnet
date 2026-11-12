@@ -45,7 +45,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     box('hole-b', 'hole', [0.018, 0.0065, 0.002], [0.021, 0.0068, 0.004]),
   ], { body: 'plastic-blue', loop: 'plastic-black', plug: 'steel-stainless', tongue: 'plastic-black', hole: 'plastic-black' }) + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'electrical', keywords: ['computer'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // A corded-style wand massager 198 mm long: a 34 mm handle with a switch, a narrow neck and a 46 mm soft head.
   h.compound('vibrator', 0.13, [
@@ -65,7 +65,7 @@ local strip(id, slot, a, b, w, t, y0=0) =
     box('tape', 'tape', [-0.055, 0, 0.004], [-0.02, 0.003, 0.012]),
     strip('wrench', 'metal', [-0.03, -0.012], [0.04, -0.014], 0.005, 0.002),
     strip('wrench-leg', 'metal', [0.0375, -0.0135], [0.04, -0.028], 0.005, 0.002),
-  ], { metal: 'scrap-rusted', tape: 'tape-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
+  ], { metal: 'scrap-rusted', tape: 'tape-grey' }) + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', keywords: ['improvised'], tags: { material: ['metal'] } } },
 
   // Two lengths of thin bent wire: an 80 mm pick with a kinked tip and an L-shaped 60 mm tension wrench.
   h.compound('emergency_lockpick', 0.004, [

@@ -1,12 +1,7 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
-import type {
-  AppearanceContext,
-  GlbAssetIdentity,
-  GlbExportError,
-  VoxelGrains,
-} from '@skelly/thing-export/exportTypes.ts';
+import type { AppearanceContext, GlbAssetIdentity, GlbExportError } from '@skelly/thing-export/exportTypes.ts';
 import { type CartridgeModelKind, cartridgeModelAsset } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type RoundProfiles, roundProfiles } from '../ammo/roundProfile.ts';
@@ -41,14 +36,13 @@ const MM_DOMAIN: Domain['units'] = { metresPerUnit: 0.001, grid: 0.001, bevel: 0
 
 interface CartridgeLook {
   readonly appearance?: AppearanceContext | undefined;
-  readonly voxel?: Partial<VoxelGrains>;
 }
 
 const makeModelExport = (
   cartridge: Cartridge,
   asset: GlbAssetIdentity,
   solids: readonly Solid[],
-  { appearance, voxel }: CartridgeLook,
+  { appearance }: CartridgeLook,
 ): SingleCartridgeExportResult => {
   const family: PartFamily = {
     name: 'cartridge-model',
@@ -82,13 +76,13 @@ const makeModelExport = (
       ...appearance?.finish,
     },
   };
+  // No voxel grain: a cartridge's rim and taper land unevenly on any grain, so it is drawn as a faceted lathe.
   const result = exportGlb({
     resolved,
     palette: AMMO_PALETTE,
-    revolveFacets: 96,
+    revolveFacets: GUN_APPEARANCE.roundSides,
     asset,
     appearance: effectiveAppearance,
-    ...voxel,
   });
   if (!result.ok) {
     return result;

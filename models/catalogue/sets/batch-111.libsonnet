@@ -146,7 +146,7 @@ local hoodedCloak(w, d, ht, folds, fastening) =
     emblem: 'paint-red',
     ties: 'cloth-yellow',
   })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], slot: ['back'], state: ['folded'] } } },
 
   // A heavy cape of metal-fibre cloth folded to 320 mm by 260 mm and 40 mm high, its top split diagonally into a
   // black field and a silver field with a pale full moon at the centre, and a silver chained clasp at the collar.

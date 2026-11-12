@@ -48,7 +48,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     blanket: 'cloth-turnout', fold: 'canvas-grey', case: 'paint-drum-blue', panel: 'paint-charcoal', knob: 'plastic-matte-black',
     mark: 'plastic-gloss-white', socket: 'brass-dull', handle: 'plastic-matte-black', cable: 'rubber-black',
     holder: 'plastic-red', rod: 'steel-heat-tint', clamp: 'copper',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } } },
 
   // A bench wire-drawing machine on a steel base 500 by 240 mm: a die block with a row of tapering holes at -x, a
   // capstan drum 160 mm across at +x turned by a crank on top, and a length of wire running from the die to the drum.
@@ -75,7 +75,7 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     box('crank', 'frame', [0.08, 0.19, -0.012], [0.25, 0.205, 0.012]),
     disc('crank-grip', 'grip', 0.014, 0.205, 0.29, 0.235, 0),
   ], { base: 'paint-charcoal', frame: 'steel-grey', die: 'steel-hardened', hole: 'void-black', drum: 'steel-bright', wire: 'copper', grip: 'wood-oak' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', tags: { material: ['metal'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['metal'], place: ['workshop'] } } },
 
   // A home-made concrete float: a 610 by 120 mm pine board 22 mm thick with a rounded oak grip on two blocks.
   h.compound('wooden_float', 1.1, [
@@ -148,5 +148,5 @@ local adjustable(id, massKg, L) = h.compound(id, massKg, [
     turned('weight-%d' % i, 'weight', 'y', [[0, 0.007], [0, 0.0115], [0.0105, 0.0115], [0.0105, 0.007], [0, 0.007]], [lobe(i).x, 0.0005, lobe(i).z])
     for i in [0, 1, 2]
   ], { body: 'plastic-blue', bearing: 'steel-bright', cap: 'plastic-matte-black', weight: 'steel-mirror' })
-  + h.inHand('fidget_spinner', 'hub') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.inHand('fidget_spinner', 'hub') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', keywords: ['toy'], tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 ]

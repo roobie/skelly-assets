@@ -1,3 +1,4 @@
+local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
@@ -25,7 +26,7 @@ local round = { sides: null };
 // One turn of a copper worm lying on y at height y: a ring of radius R and tube radius r, its section a diamond as the
 // coil family draws it.
 local turn(id, slot, R, r, y) = h.turned(id, slot, 'y', [[0, R], [r, R + r], [2 * r, R], [r, R - r], [0, R]], [0, y, 0]);
-[
+taxonomy.inherit({ keywords: ['alchemy'] }, [
   // A glass alembic on its cucurbit, 310 mm tall: a gourd-shaped boiling flask 145 mm across holding half a litre,
   // its neck luted with clay into the still-head, a domed cap whose beak slopes 290 mm down to the right to carry
   // the distillate away.
@@ -346,4 +347,4 @@ local turn(id, slot, R, r, y) = h.turned(id, slot, 'y', [[0, R], [r, R + r], [2 
     h.disc('spout', 'copper', 0.01, 0.03, 0.07, 0.29, 0),
     box('tap', 'brass', [0.255, 0.06, -0.012], [0.275, 0.085, 0.012]),
   ], { wood: 'wood-oak', water: 'water', iron: 'iron-dull', copper: 'copper', brass: 'brass' }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['medieval'] } } },
-]
+])

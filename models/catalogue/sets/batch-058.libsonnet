@@ -26,7 +26,7 @@ local held(id, solid) = h.gripOn(id, solid);
     flat('shank', 'blade', [[-0.006, -0.010], [0.006, -0.010], [0.010, 0.020], [-0.010, 0.020]], 0.004),
     flat('blade', 'blade', [[-0.010, 0.020], [0.010, 0.020], [0.0225, 0.040], [0.0225, 0.270], [0.012, 0.300], [-0.012, 0.300], [-0.0225, 0.270], [-0.0225, 0.040]], 0.003),
     flat('spine', 'spine', [[-0.004, 0.025], [0.004, 0.025], [0.004, 0.280], [-0.004, 0.280]], 0.005),
-  ], { handle: 'wood-walnut', ferrule: 'brass', blade: 'steel-stainless', spine: 'steel-grey' }) + held('honey_scraper', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'] } } },
+  ], { handle: 'wood-walnut', ferrule: 'brass', blade: 'steel-stainless', spine: 'steel-grey' }) + held('honey_scraper', 'handle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], place: ['farm'] } } },
   // A small folding knife opened out: a 65 mm handle 16 mm wide with a 50 mm clip-point blade, 115 mm overall.
   h.compound('pocket_knife', 0.039, [
     h.box('scales', 'scales', [-0.065, -0.0045, -0.008], [-0.006, 0.0045, 0.008]),

@@ -167,7 +167,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
   ]) + [
     disc('badge', 'hub', 0.02, 0, 0.004) + { axis: 'z', origin: [0, hubY, 0.034] },
   ], { body: 'plastic-white', switch: 'plastic-grey', hub: 'plastic-blue', blade: 'plastic-clear-blue', guard: 'steel-stainless' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['appliance'] } },
 
   // A portable hard drive, 118 mm by 80 mm and 18 mm thick, its long sides rounded, with a hand-written label on
   // top, a status light and a short cable coiled beside it.
@@ -185,7 +185,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     ring('coil', 'cable', 0.018, 0.022, 0, 0.004, 0.085, 0.01),
     box('lead', 'cable', [0.061, 0.0, -0.002], [0.07, 0.004, 0.002]),
   ], { shell: 'plastic-charcoal', label: 'paper-white', ink: 'paint-police-blue', port: 'alu-bare', light: 'lcd-green', cable: 'plastic-black' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['computer'] } },
 
   // An insulating fire brick, 230 mm by 114 mm by 64 mm, lying on its broad face: a plain pale buff block.
   h.compound('fire_brick', 1.2, [
@@ -243,7 +243,7 @@ local hoop(id, slot, r0, r1, z0, z1, x, y) = turned(id, slot, 'z', [[0, r0], [0,
     box('clip-wire-b', 'wire', [0.016, 0.008, -0.16], [0.018, 0.01, -0.13]),
     box('clip-wire-c', 'wire', [-0.018, 0.008, -0.162], [0.018, 0.01, -0.16]),
   ], { paper: 'paper-white', top: 'paint-cream', ink: 'plastic-grey', heading: 'paint-oxblood', clip: 'plastic-black', wire: 'steel-stainless' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], setting: ['modern'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'documents', tags: { material: ['paper'], place: ['office'], setting: ['modern'] } } },
 
   // A glassy egg from a giant spider, a ball 46 mm across with a short drawn-out tip, shards of hard
   // glowing matter crowded at its centre.

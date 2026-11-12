@@ -128,7 +128,7 @@ local medal(id, mass) =
              + [ball('stone-%d' % i, 'stone', 0.0022, [-0.031, -0.018, 0.018, 0.031][i], 0, 0.0045) for i in std.range(0, 3)]
              + [ball('pearl-%d' % i, 'pearl', 0.0025, [-0.0245, 0.0245][i], 0, 0.0045) for i in [0, 1]],
              { clasp: 'metal-silver', bar: 'plastic-black', bow: 'plastic-pink', stone: 'gem-clear', pearl: 'gem-opaque' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['head'] } } },
 
   // A black cord anklet 250 mm round lying flat, with three black bat charms 24 mm across and three red drop charms
   // hung on small rings, all lying outward.
@@ -141,11 +141,11 @@ local medal(id, mass) =
                for i in std.range(0, 5)
              ]),
              { cord: 'cloth-black', charm: 'plastic-black', drop: 'plastic-red', ring: 'metal-silver' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], slot: ['feet'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric', 'plastic'], slot: ['feet'] } } },
 
   // A stretch bracelet of 22 round wooden beads, 8 mm each, lying flat in a ring 68 mm across.
   h.compound('bead_bracelet', 0.0037, beadRing('bead', 'bead', 0.03, 0.004, 22), { bead: 'wood-walnut' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['arms'] } } },
 
   // A pair of beaded earrings lying flat side by side, each 32 mm long: a silver ear wire bent into a hook and three
   // wooden beads strung below it, the middle one larger.
@@ -162,7 +162,7 @@ local medal(id, mass) =
                for x in [if k == 0 then -0.011 else 0.011]
              ]),
              { wire: 'metal-silver', bead: 'wood-walnut' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood', 'metal'], slot: ['head'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood', 'metal'], slot: ['head'] } } },
 
   // A string of 60 wooden beads, 10 mm each, lying flat in a ring 210 mm across, with a larger guru bead and a red
   // cord tassel at +z so it doubles as prayer beads.
@@ -175,7 +175,7 @@ local medal(id, mass) =
                flat('tassel', 'tassel', [[-0.002, R + 0.022], [0.002, R + 0.022], [0.006, R + 0.05], [-0.006, R + 0.05]], 0, 0.004),
              ],
              { bead: 'wood-birch', tassel: 'cloth-red' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['wood'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['neck'] } } },
 
   // A woven cord friendship bracelet lying flat in a ring 66 mm across, its band banded red, yellow and blue, with
   // the tie ends trailing at -z and a few knick-knacks threaded on: wooden letter cubes, a green bead and an orange
@@ -199,7 +199,7 @@ local medal(id, mass) =
              + [local p = onCircle(R, 90); ball('bead-green', 'bead-a', 0.0045, p[0], p[1])]
              + [local p = onCircle(R, 270); ball('bead-orange', 'bead-b', 0.0045, p[0], p[1])],
              { 'thread-a': 'cloth-red', 'thread-b': 'cloth-yellow', 'thread-c': 'cloth-blue', block: 'wood-birch', 'bead-a': 'plastic-green', 'bead-b': 'plastic-orange' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
 
   // A third-place medal 60 mm across, struck in brass with a raised rim and star, on a red neck ribbon with a cream
   // stripe folded short into a V above it.
@@ -218,7 +218,7 @@ local medal(id, mass) =
                for s in [-1, 1]
              ]),
              { band: 'velvet-black', fur: 'velvet-black', inner: 'plastic-pink' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['costume'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // A detached shirt collar standing on its lower edge, 130 mm across and 40 mm tall, front on +z: a white band with
   // its wing tips folded down at the front, a gold stud at the back and a black bow tie 95 mm wide at the throat.
@@ -259,7 +259,7 @@ local medal(id, mass) =
                for x in [if k == 0 then -0.017 else 0.017]
              ]),
              { metal: 'copper' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A copper hairpin 45 mm long lying flat: two slim prongs joined by a rounded bend, one prong crimped in waves so it
   // grips the hair.
@@ -273,7 +273,7 @@ local medal(id, mass) =
                for i in std.range(0, 4)
              ],
              { metal: 'copper' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['head'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['head'] } } },
 
   // A round copper locket 30 mm across and 7 mm thick lying lid up at +z on a fine chain laid in a ring 160 mm across:
   // a rounded case with a raised ring on the lid, a hinge at the side, a bail at the top and dull green spots of
@@ -293,7 +293,7 @@ local medal(id, mass) =
                for c in [[0.006, 40, 0.0025], [0.011, 200, 0.002], [0.004, 280, 0.0018]]
              ],
              { metal: 'copper', patina: 'paint-green' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A copper chain necklace 560 mm long laid in a ring 180 mm across, its links alternately flat and on edge, with a
   // spring-ring clasp and its tab at +z.
@@ -305,7 +305,7 @@ local medal(id, mass) =
                h.box('clasp-tab', 'metal', [-0.003, 0, R - 0.003], [0.003, 0.0025, R + 0.001]),
              ],
              { metal: 'copper' })
-  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['neck'] } } },
+  + h.headEndOnPlusZ + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal'], slot: ['neck'] } } },
 
   // A bracelet of nine cowrie shells, 18 mm each, threaded slit up on a cotton cord and lying flat in a ring 80 mm
   // across, the cord's ends tied off at -z.
@@ -315,5 +315,5 @@ local medal(id, mass) =
              + std.flattenArrays([cowrie('shell-%d' % i, R, 20 + 320 * i / 8, 0) for i in std.range(0, 8)])
              + [h.box('knot', 'cord', [-0.003, 0, -R - 0.004], [0.003, 0.004, -R + 0.002])],
              { cord: 'cord-cotton', shell: 'bone', slit: 'chitin-brown' })
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['bone', 'fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone', 'fabric'], slot: ['arms'] } } },
 ]

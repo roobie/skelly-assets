@@ -1,6 +1,7 @@
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import {
   array,
+  boolean,
   check,
   gtValue,
   type InferOutput,
@@ -17,12 +18,12 @@ import {
 import type { VoxelGrains } from './exportTypes.ts';
 
 const grain = pipe(number(), gtValue(0));
-// Every row names its voxel class: no model exports smooth beside voxel ones, so a row without one is refused.
+// Every row names its voxel class, so no model drifts smooth beside voxel ones by omission; a row lacking one is refused.
 const RowSchema = strictObject({
   id: pipe(string(), regex(/^[a-z][a-z0-9_]*$/)),
   kind: pipe(string(), nonEmpty()),
   source: pipe(string(), nonEmpty()),
-  voxel: strictObject({ grain, detailGrain: optional(grain) }),
+  voxel: strictObject({ grain, detailGrain: optional(grain), detailThinParts: optional(boolean()) }),
   options: optional(unknown()),
   // The model's shelf and facet tags; the repository build holds them to its vocabulary, so export only carries them.
   taxonomy: optional(unknown()),
@@ -38,6 +39,13 @@ export interface ModelExport<Model extends NeutralModel = NeutralModel> {
   readonly glb: Uint8Array;
   /** The GLB's part node names from the resolved assembly; see `glb.ts`, `partNodeName`. */
   readonly partNodes: readonly string[];
+  /** The model's total mass and drawn volume, for tools that author the mass; see `physical.ts`, `drawnVolumeM3`. */
+  readonly physical?: ModelPhysical;
+}
+export interface ModelPhysical {
+  readonly massKg: number;
+  /** Left out by a tool that weighs its parts but does not measure the voxels it draws, such as the gun tool. */
+  readonly volumeM3?: number;
 }
 export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
   readonly id: string;
@@ -52,9 +60,11 @@ export interface RecipeExport<Model extends NeutralModel = NeutralModel> {
 export const displayName = (id: string) => id.charAt(0).toUpperCase() + id.slice(1).replaceAll('_', ' ');
 export const recipeAsset = ({ id }: Pick<RecipeRow, 'id'>) => ({ id, file: `assets/models/${id}.glb` as const });
 export const recipeOptions = (row: RecipeRow) => (row.options === undefined ? {} : row.options);
-export const recipeVoxel = ({ voxel }: RecipeRow): VoxelGrains => ({
+/** A voxel class, as a recipe row or a single-file export names it, in the form the GLB writer takes. */
+export const recipeVoxel = ({ voxel }: Pick<RecipeRow, 'voxel'>): VoxelGrains => ({
   voxelGrain: voxel.grain,
   ...(voxel.detailGrain === undefined ? {} : { voxelDetailGrain: voxel.detailGrain }),
+  ...(voxel.detailThinParts === undefined ? {} : { voxelDetailThinParts: voxel.detailThinParts }),
 });
 const contextual = <T>(row: RecipeRow, work: () => T): T => {
   try {

@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "anti-materiel",
+  "calibre": "50-bmg",
   "assembly": {
     "name": "archetype-anti-materiel",
     "description": "Semi-automatic anti-materiel rifle: perforated box shroud over a recoiling barrel, two-chamber arrowhead muzzle brake, folding bipod, diagonal-strut carry handle on the left, wide recoil-pad stock with a rear monopod, 10-round box magazine.",

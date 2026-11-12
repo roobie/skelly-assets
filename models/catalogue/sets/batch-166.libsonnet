@@ -80,7 +80,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('seam', 'cord', [-0.003, 0.012, 0.09], [0.003, 0.05, 0.097]),
   ] + h.strapLoop('strap', 'strap', 0.22, 0.05, 0.03, 0.004, 0, 0, -0.16), {
     cloth: 'cloth-brown', cord: 'cord-cotton', 'patch-a': 'cloth-khaki', 'patch-b': 'cloth-cream', strap: 'cloth-khaki',
-  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'] } } },
+  }) + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', keywords: ['improvised'], tags: { material: ['fabric'] } } },
 
   // A padded canvas rifle case 1.12 m long, 280 mm wide at the butt and 70 mm thick, with one accessory pocket, a
   // carry handle and a shoulder strap.
@@ -149,7 +149,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('hip-buckle', 'buckle', [-0.02, 0.05, -0.21], [0.02, 0.09, -0.195]),
   ] + h.webbing('pals', 'webbing', -0.14, 0.14, [0.14, 0.2, 0.26], 0.19), {
     body: 'cloth-olive-drab', webbing: 'webbing-olive-dark', buckle: 'plastic-matte-black', pad: 'webbing-olive-dark',
-  }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
+  }) + { taxonomy: { category: 'containers', keywords: ['camping'], tags: { material: ['fabric'], setting: ['modern'], slot: ['back'] } } },
 
   // A slim running pack 240 mm wide, 420 mm tall and 80 mm deep, rounded at the top, with a stretch mesh pocket,
   // reflective strips and a crossing bungee on the front, and wide vest straps behind joined by a chest strap.
@@ -224,7 +224,7 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     for i in std.range(0, 3)
     for x in [if i % 2 == 0 then -0.21 else 0.21]
     for z in [if i < 2 then -0.11 else 0.11]
-  ]), { shell: 'plastic-blue', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
+  ]), { shell: 'plastic-blue', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A soft fabric suitcase 400 mm wide, 600 mm tall with its wheels and 220 mm deep, front on +z: a zipped front
   // pocket, piped edges, two wheels and feet, a retracted pull handle and a top carry handle.
@@ -250,5 +250,5 @@ local rifleCase(id, massKg, L, W, T, pockets, handle, finish) = h.compound(id, m
     box('wheel-guard-r', 'trim', [0.15, 0.0, -0.115], [0.205, 0.07, -0.06]),
     h.turned('wheel-l', 'wheel', 'x', [[0, 0], [0, 0.03], [0.024, 0.03], [0.024, 0]], [-0.212, 0.03, -0.085]),
     h.turned('wheel-r', 'wheel', 'x', [[0, 0], [0, 0.03], [0.024, 0.03], [0.024, 0]], [0.188, 0.03, -0.085]),
-  ], { body: 'cloth-navy', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', tags: { material: ['fabric'], setting: ['modern'] } } },
+  ], { body: 'cloth-navy', trim: 'plastic-matte-black', metal: 'steel-grey', wheel: 'rubber-black' }) + { taxonomy: { category: 'containers', keywords: ['luggage'], tags: { material: ['fabric'], setting: ['modern'] } } },
 ]

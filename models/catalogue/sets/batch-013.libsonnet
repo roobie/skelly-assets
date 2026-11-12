@@ -79,7 +79,7 @@ local carton(id, massKg, picture, finish) =
     box('remote', 'tyre', [0.072, 0.03, 0.044], [0.116, 0.07, 0.048]),
     box('remote-stick', 'window', [0.08, 0.045, 0.048], [0.088, 0.06, 0.052]),
     box('remote-aerial', 'tyre', [0.106, 0.07, 0.044], [0.11, 0.118, 0.048]),
-  ], { carton: 'plastic-yellow', panel: 'plastic-blue', strip: 'paint-white', car: 'plastic-red', window: 'paint-white', tyre: 'plastic-black' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { carton: 'plastic-yellow', panel: 'plastic-blue', strip: 'paint-white', car: 'plastic-red', window: 'paint-white', tyre: 'plastic-black' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A standard shot glass, 48 mm across the rim and 58 mm tall, tapering to a thick heavy base.
   h.compound('shot_glass', 0.071, [
@@ -99,7 +99,7 @@ local carton(id, massKg, picture, finish) =
     disc('valve', 'valve', 0.012, 0.258, 0.284),
     disc('valve-top', 'valve', 0.009, 0.284, 0.3),
   ], { paint: 'plastic-green', band: 'plastic-yellow', valve: 'brass' })
-  + h.inHand('small_propane_tank', 'tank') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  + h.inHand('small_propane_tank', 'tank') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A single-use squeeze tube, 30 mm long and 10 mm across, lying down: a crimped tail, a white body
   // narrowing to a short nozzle and a red cap.
@@ -149,7 +149,7 @@ local carton(id, massKg, picture, finish) =
     box('spoke-a', 'wheel', [-0.044, 0.068, 0.044], [0.012, 0.072, 0.048]),
     box('spoke-b', 'wheel', [-0.018, 0.042, 0.044], [-0.014, 0.098, 0.048]),
     box('crank', 'engine', [-0.016, 0.066, 0.048], [0.02, 0.072, 0.052]),
-  ], { carton: 'plastic-green', panel: 'paint-cream', strip: 'paint-white', skin: 'paint-terracotta', 'shirt-a': 'plastic-orange', 'shirt-b': 'plastic-blue', engine: 'brass', wheel: 'steel-grey' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] } } },
+  ], { carton: 'plastic-green', panel: 'paint-cream', strip: 'paint-white', skin: 'paint-terracotta', 'shirt-a': 'plastic-orange', 'shirt-b': 'plastic-blue', engine: 'brass', wheel: 'steel-grey' }) + { taxonomy: { category: 'recreation', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['toy'] } },
 
   // A cleaned animal stomach lying on its side, 210 mm long and 140 mm across, swollen with water, its neck
   // gathered and tied off with a cord whose ends hang loose.
@@ -234,5 +234,5 @@ local carton(id, massKg, picture, finish) =
     disc('valve', 'valve', 0.03, 1.1, 1.17),
     box('valve-outlet', 'valve', [0.03, 1.13, -0.012], [0.07, 1.15, 0.012]),
     disc('wheel', 'wheel', 0.055, 1.17, 1.185),
-  ] + handHoleRing('collar', 'paint', 0.16, 0.172, 1.12, 1.19, 50, 8), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] } } },
+  ] + handHoleRing('collar', 'paint', 0.16, 0.172, 1.12, 1.19, 50, 8), { paint: 'paint-white', valve: 'brass', wheel: 'plastic-black' }) + { taxonomy: { category: 'containers', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['fuel'] } },
 ]

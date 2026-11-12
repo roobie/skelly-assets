@@ -8,7 +8,7 @@ read_if:
 
 # Cartridge data
 
-Cartridge dimensions determine ammunition identity and physical fit, so retain their source and keep unsupported values unknown rather than filling them from memory. When standards disagree, keep the governing source distinct from alternatives instead of averaging them. Parsing, source checks and cartridge relations live in `tools/packages/gun-authoring-tool/src/ammo/parseCartridge.ts` and `tools/packages/gun-authoring-tool/src/ammo/rules.ts`, `checkRelations`.
+Cartridge dimensions determine ammunition identity and physical fit, so retain their source and keep unsupported values unknown rather than filling them from memory. When standards disagree, keep the governing source distinct from alternatives instead of averaging them. Vehicle-gun shells have no public standard drawing, so a dimension a source draws but does not print may be scaled from that drawing against a dimension it does print; its note says so, keeping it apart from printed values and open to replacement when a drawing is found. Parsing, source checks and cartridge relations live in `tools/packages/gun-authoring-tool/src/ammo/parseCartridge.ts` and `tools/packages/gun-authoring-tool/src/ammo/rules.ts`, `checkRelations`.
 
 Real dimensions are an exception for ammunition, not a change to Gungen's stylized firearm scale; see `tools/packages/gun-authoring-tool/PROJECT.md`, "Scale and ammunition". The JSON/Jsonnet source contract is shared across the repository; see `tools/README.md`, "Model tools".
 

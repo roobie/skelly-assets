@@ -352,11 +352,11 @@ local patches(list, y) = [
 
   // A scrap cuirass laid flat, 400 mm from neck to hem: odd metal pieces tied to each other and a cloth backing.
   h.compound('scrap_cuirass', 3.4, tiedPieces(scrapPieces, 'backing') + scrapStrings(0.0125), { backing: 'cloth-khaki', 'metal-a': 'steel-bright', 'metal-b': 'iron-dull', 'metal-c': 'steel-galvanised', 'metal-d': 'rust-red', string: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['metal'], slot: ['torso'] } } },
 
   // A tyre cuirass laid flat, 400 mm from neck to hem: tread-faced chunks of tyre tied to each other with string.
   h.compound('tyre_cuirass', 4, tiedPieces(tirePieces, 'backing') + scrapStrings(0.026), { backing: 'cloth-khaki', tread: 'rubber-offblack', lug: 'rubber-tread', string: 'cord-cotton' })
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['rubber'], slot: ['torso'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['improvised'], tags: { material: ['rubber'], slot: ['torso'] } } },
 
   // A fencing jacket folded back up on a shelf, 380 mm by 340 mm and 60 mm tall: a stand collar, the zip down the back
   // off to one side, and the strap that passes between the legs draped over the hem.
