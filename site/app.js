@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
-import { ALL, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from './filter.mjs';
+import { ALL, FORM, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from './filter.mjs';
 import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -96,7 +96,8 @@ const labelOf = (term) => term[0].toUpperCase() + term.slice(1).replaceAll('-', 
 const shelfLabel = (key) => ([ALL, UNCATEGORISED, VEHICLES].includes(key) ? key : labelOf(key));
 const shelfTitles = { [VEHICLES]: 'Whole vehicles, assembled from their parts.' };
 const dimensionLabel = (dimension) => (dimension === KEYWORD ? 'Keywords' : labelOf(dimension));
-const dimensionMeaning = (dimension) => (dimension === KEYWORD ? 'Words a model is also known by.' : taxonomy.facets[dimension]?.meaning ?? '');
+const FORM_MEANINGS = { assembly: 'Built from other models, or from several components.', atom: 'One piece.' };
+const dimensionMeaning = (dimension) => (dimension === KEYWORD ? 'Words a model is also known by.' : dimension === FORM ? 'Whether a model is built from others or is one piece.' : taxonomy.facets[dimension]?.meaning ?? '');
 const pickedCount = () => Object.values(filter.picks).reduce((n, terms) => n + terms.length, 0);
 
 function renderShelves() {
@@ -136,7 +137,7 @@ function pickShelf(name) {
 // leave models once the rest of the filter is applied.
 function renderFacets() {
   const facets = [...new Set(entries.flatMap((m) => Object.keys(m.tags)))].sort();
-  $('facets').replaceChildren(...[KEYWORD, ...facets].map((dimension) => {
+  $('facets').replaceChildren(...[KEYWORD, FORM, ...facets].map((dimension) => {
     const combo = makeCombobox({
       label: dimensionLabel(dimension),
       title: dimensionMeaning(dimension),
@@ -144,7 +145,7 @@ function renderFacets() {
       suggest: (text) => suggestions(entries, filter, dimension)
         .filter(({ term }) => !text || term.includes(text.replace(/\s+/g, '-')))
         .slice(0, SUGGESTION_LIMIT)
-        .map(({ term, count }) => ({ value: term, text: labelOf(term), detail: count, title: taxonomy.facets[dimension]?.terms[term] ?? '' })),
+        .map(({ term, count }) => ({ value: term, text: labelOf(term), detail: count, title: (dimension === FORM ? FORM_MEANINGS[term] : taxonomy.facets[dimension]?.terms[term]) ?? '' })),
       onChange: (terms) => {
         if (terms.length) filter.picks[dimension] = terms;
         else delete filter.picks[dimension];
@@ -396,6 +397,7 @@ async function openViewer(model, restored = null) {
   const facts = [
     ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
+    ['Form', labelOf(model.form), FORM_MEANINGS[model.form]],
     ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
     ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
     ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),

@@ -11,7 +11,7 @@ local objectiveOpening = 16 / mmPerU;
 local body(id, profile, thickness=wall) = {
   id: id, kind: 'revolved', axis: 'x', origin: [0, axisY, 0],
   profile: profile + [[p[0], p[1] - thickness] for p in std.reverse(profile)] + [profile[0]],
-  sides: appearance.opticBodySides, slot: 'metal',
+  sides: appearance.roundSides, slot: 'metal',
 };
 local cylinder(id, axis, origin, span, radius, slot='metal', sides=null) = {
   id: id, kind: 'revolved', axis: axis, origin: origin,
@@ -30,8 +30,8 @@ local outline(id, profile, halfWidth, centerZ=0) = {
 };
 local clipped(solid, planes) = solid + { clip: planes, display: { bevel: false } };
 local ringPoint(radius, i) =
-  local angle = (i + 0.5) * 2 * std.pi / appearance.opticBodySides;
-  local scale = radius / std.cos(std.pi / appearance.opticBodySides);
+  local angle = (i + 0.5) * 2 * std.pi / appearance.roundSides;
+  local scale = radius / std.cos(std.pi / appearance.roundSides);
   [axisY + scale * std.cos(angle), scale * std.sin(angle)];
 // The side reference has a raked mouth, not a vertical end on a symmetric cone.
 // Separate convex wall cells retain the octagonal bore while the same plane trims every cell.
@@ -42,7 +42,7 @@ local hood = [
               ringPoint(objectiveOpening, i + 1), ringPoint(objectiveOpening, i)],
     slot: 'metal',
   }, [{ normal: [1, -0.5, 0], offset: 4.5 }])
-  for i in std.range(0, appearance.opticBodySides - 1)
+  for i in std.range(0, appearance.roundSides - 1)
 ];
 local fin = [[-6.125, 3.5], [-4.875, 3.5], [-5.375, 5.25], [-5.875, 5.25]];
 {
@@ -74,9 +74,9 @@ local fin = [[-6.125, 3.5], [-4.875, 3.5], [-5.375, 5.25], [-5.875, 5.25]];
                          [-5.875, 1.125], [-4, 1.125], [-3.875, 1.5], [-2.75, 1.5], [-2.5, 1.25]]),
     outline('rear-rising-cast-roof', [[-2.75, 3.5], [0.75, 3.5], [0.75, 3.75], [-2.75, 4.125]], 1.125),
     outline('housing-keel', [[-2, 1.25], [5.75, 1.25], [3.25, 1.5], [-1.5, 1.75]], 0.625),
-    cylinder('ocular-lens', 'x', [0, axisY, 0], [-6.625, -6.375], 1, 'lens', appearance.opticBodySides),
+    cylinder('ocular-lens', 'x', [0, axisY, 0], [-6.625, -6.375], 1, 'lens', appearance.roundSides),
     // Seated behind the shortest edge of the slanted lip, so the complete glass remains protected.
-    cylinder('objective-lens', 'x', [0, axisY, 0], [4.5, 4.75], objectiveOpening, 'lens', appearance.opticBodySides),
+    cylinder('objective-lens', 'x', [0, axisY, 0], [4.5, 4.75], objectiveOpening, 'lens', appearance.roundSides),
     outline('objective-top-seam', [[3.25, 4.125], [6.625, 4.125], [6.625, 4.375], [3.25, 4.375]], 0.25, backupZ),
     outline('backup-front-post', [[5.75, 4.25], [6.5, 4.25], [6.5, backupY], [5.875, backupY]], 0.25, backupZ),
     // A shared bore-parallel datum keeps the centred post visible through the near-tip opening, above the controls.
@@ -87,7 +87,7 @@ local fin = [[-6.125, 3.5], [-4.875, 3.5], [-5.375, 5.25], [-5.875, 5.25]];
     {
       id: 'backup-rear-aperture', kind: 'revolved', axis: 'x', origin: [0, backupY, backupZ],
       profile: [[-6.125, backupOpening], [-6.125, backupRim], [-5.75, backupRim], [-5.75, backupOpening], [-6.125, backupOpening]],
-      sides: appearance.opticBodySides, slot: 'metal',
+      sides: appearance.roundSides, slot: 'metal',
     },
     cylinder('elevation-stem', 'y', [-1.125, 0, 0], [3.5, 4], 0.75),
     cylinder('elevation-cap', 'y', [-1.125, 0, 0], [4, 4.625], 0.875),

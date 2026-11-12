@@ -125,7 +125,8 @@ category and tags their manifest entries carry; see `site/build.mjs`. It shows e
 placements, because a pile of loose panels does not show what the vehicle is, and can explode it to show the parts
 it is made of. Its metadata panel lists every field of a model's manifest entry and sidecar, with numbers rounded for
 reading, rather than a chosen set of fields, so the panel shows what a consumer reads without following each format
-change; see `site/app.js`, `showMeta`.
+change; see `site/app.js`, `showMeta`. Whether a model is an assembly or an atom is derived from its sites and
+components, never tagged, so no curated term can disagree with the model; see `tools/components.mjs`, `formOf`.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
 `tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through

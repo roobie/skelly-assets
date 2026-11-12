@@ -12,21 +12,14 @@
     { id: 'pistol_service', design: 'service-nine', weapon: 'handgun' },
     { id: 'rifle_pipe', design: 'pipe-rifle', weapon: 'rifle', keywords: ['improvised'] },
   ],
-  // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids;
-  // `definition` is the cartridge itself, which may name its own grain.
+  // A cartridge in models/guns/cartridges/, by file name, exported as its round and its case. `name` ends both ids.
   cartridges: [
-    { name: '5_d_56x45', source: '5.56x45', weapon: 'rifle', definition: import 'models/guns/cartridges/5.56x45.jsonnet' },
-    { name: '7_d_62x39', source: '7.62x39', weapon: 'rifle', definition: import 'models/guns/cartridges/7.62x39.jsonnet' },
-    {
-      name: '12_h_gauge_h_00_h_buck', source: '12-gauge-00-buck', weapon: 'shotgun',
-      definition: import 'models/guns/cartridges/12-gauge-00-buck.jsonnet',
-    },
-    {
-      name: '308_h_winchester', source: '308-winchester', weapon: 'rifle',
-      definition: import 'models/guns/cartridges/308-winchester.jsonnet',
-    },
-    { name: '357_h_magnum', source: '357-magnum', weapon: 'handgun', definition: import 'models/guns/cartridges/357-magnum.jsonnet' },
-    { name: '9x19', source: '9x19', weapon: 'handgun', definition: import 'models/guns/cartridges/9x19.jsonnet' },
+    { name: '5_d_56x45', source: '5.56x45', weapon: 'rifle' },
+    { name: '7_d_62x39', source: '7.62x39', weapon: 'rifle' },
+    { name: '12_h_gauge_h_00_h_buck', source: '12-gauge-00-buck', weapon: 'shotgun' },
+    { name: '308_h_winchester', source: '308-winchester', weapon: 'rifle' },
+    { name: '357_h_magnum', source: '357-magnum', weapon: 'handgun' },
+    { name: '9x19', source: '9x19', weapon: 'handgun' },
   ],
   // An attachment by its source id; its look, if any, is in models/guns/tables/appearance.jsonnet.
   attachments: [
