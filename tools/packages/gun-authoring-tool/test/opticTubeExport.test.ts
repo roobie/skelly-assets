@@ -41,8 +41,8 @@ it('hunting export keeps the full disc-to-lip annulus opaque', async () => {
     new Vector3(...toFileAxes([x * METRES_PER_UNIT, y * METRES_PER_UNIT, z * METRES_PER_UNIT]));
   const eye = inFile([optic.ocularX - optic.eyeReliefU!, optic.opticalAxisY, 0]);
   try {
-    for (let facet = 0; facet < appearance.opticBodySides * 8; facet++) {
-      const angle = (facet * 2 * Math.PI) / (appearance.opticBodySides * 8);
+    for (let facet = 0; facet < appearance.roundSides * 8; facet++) {
+      const angle = (facet * 2 * Math.PI) / (appearance.roundSides * 8);
       for (const fraction of [0.1, 0.5, 0.9]) {
         const radius = discRadius + (lipRadius - discRadius) * fraction;
         const target = inFile([

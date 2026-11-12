@@ -1,6 +1,6 @@
 // The export rows for the gun roster in models/guns/roster.libsonnet. A gun and its magazine take the gun class, so a
-// seated magazine matches the receiver's voxels; cartridges and attachments are items. A cartridge or attachment may
-// name its own grain in its definition in place of its class's.
+// seated magazine matches the receiver's voxels; cartridges and attachments are items. An attachment may name its own
+// grain in its look in place of its class's.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local roster = import 'models/guns/roster.libsonnet';
 local looks = (import 'models/guns/tables/appearance.jsonnet').attachments;
@@ -14,11 +14,12 @@ local taxonomy(category, weapon=null, keywords=[]) = {
 local design(row) = {
   id: row.id, kind: 'design', source: 'models/guns/designs/' + row.design + '.json', voxel: voxel.gun,
 } + taxonomy('weapons', row.weapon, std.get(row, 'keywords', []));
-// A cartridge exports as its round and its case, both on the grain its definition names.
+// A cartridge exports as its round and its case. Every row names a voxel class, but the exporter draws cartridges smooth;
+// see packages/gun-authoring-tool/src/gun/cartridgeExport.ts, `makeModelExport`.
 local cartridge(row) = [
   {
     id: component + '_' + row.name, kind: 'cartridge', source: 'models/guns/cartridges/' + row.source + '.json',
-    voxel: voxel.of(voxel.item, row.definition), options: { component: component },
+    voxel: voxel.item, options: { component: component },
   } + taxonomy('ammunition', row.weapon)
   for component in ['round', 'case']
 ];

@@ -119,12 +119,16 @@ describe('recipe output grain', () => {
   it('has recipe rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
-  it.for(rows)('voxelizes $id on its row grain or detail grain', (row) => {
-    const grains = [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
+  // Cartridges are drawn smooth whatever their row's grain; see `src/gun/cartridgeExport.ts`, `makeModelExport`.
+  it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge', (row) => {
+    const grains =
+      row.kind === 'cartridge'
+        ? [undefined]
+        : [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
     const primitives = readGlb(row.generate().glb).json.meshes.flatMap((mesh) => mesh.primitives);
     expect(primitives.length, `${row.id}: no meshes`).toBeGreaterThan(0);
     for (const { extras } of primitives) {
-      expect(grains, `${row.id}: a mesh is not voxelized on the row's grains`).toContain(
+      expect(grains, `${row.id}: a mesh is not drawn on the row's grains`).toContain(
         (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
       );
     }

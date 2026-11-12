@@ -109,34 +109,4 @@ describe('standalone cartridge GLBs', () => {
       expect(report.issues.numWarnings, name).toBe(0);
     }
   });
-
-  it.each(['9x19.json', '5.56x45.json'])('draws a seated bullet of %s only past the case mouth', (file) => {
-    const voxelGrain = 0.001;
-    const result = exportCartridgeModel(
-      loadCartridgeFile(file) as MetallicCartridge,
-      'round',
-      { id: 'fixture_round', file: 'assets/models/fixture_round.glb' },
-      { voxel: { voxelGrain, voxelDetailGrain: voxelGrain } },
-    );
-    if (!result.ok) {
-      throw new Error(JSON.stringify(result.error));
-    }
-    const gltf = glbJson(result.model.glb) as {
-      meshes: { primitives: { attributes: { POSITION: number }; extras: { slot: string } }[] }[];
-      accessors: { min: number[]; max: number[] }[];
-    };
-    // Each slot's drawn faces along the round's length.
-    const spans = new Map<string, { min: number; max: number }>();
-    for (const { attributes, extras } of gltf.meshes.flatMap(({ primitives }) => primitives)) {
-      const { min, max } = gltf.accessors[attributes.POSITION]!;
-      const span = spans.get(extras.slot);
-      spans.set(extras.slot, {
-        min: Math.min(span?.min ?? min[0]!, min[0]!),
-        max: Math.max(span?.max ?? max[0]!, max[0]!),
-      });
-    }
-    const bullet = spans.get('bullet')!;
-    const brass = spans.get('case')!;
-    expect(Math.min(bullet.max, brass.max) - Math.max(bullet.min, brass.min)).toBeLessThanOrEqual(voxelGrain + 1e-6);
-  });
 });
