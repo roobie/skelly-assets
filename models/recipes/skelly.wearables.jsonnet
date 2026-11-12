@@ -1,4 +1,5 @@
 local catalogue = import 'models/catalogue/packs.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 // The worn shells are no catalogue rows, so the pack names them.
 local shells = [
   'fanny_pack_worn', 'fanny_pack_worn_jacket', 'hiking_backpack_worn', 'hiking_backpack_worn_jacket',
@@ -8,7 +9,9 @@ local shells = [
   'jeans_worn_pelvis', 'jeans_worn_thigh', 'jeans_worn_shin',
   'rubber_boots_worn_foot', 'rubber_boots_worn_shaft', 'sneakers_worn_foot', 'sneakers_worn_shaft',
   'leather_jacket_worn_body', 'leather_jacket_worn_upper', 'leather_jacket_worn_fore',
-  'leather_gloves_worn_palm', 'leather_gloves_worn_fingers', 'leather_gloves_worn_thumb',
+  'leather_gloves_worn_palm',
+] + ['leather_gloves_worn_' + hand.thumbPart(k) for k in std.range(0, hand.thumbBones - 1)]
+  + ['leather_gloves_worn_' + hand.part(finger, k) for finger in hand.fingers for k in std.range(0, hand.phalanges - 1)] + [
   'combat_boots_worn_foot', 'combat_boots_worn_shaft',
   'tank_top_worn_body',
   'wizard_robe_worn_body', 'wizard_robe_worn_pelvis', 'wizard_robe_worn_upper', 'wizard_robe_worn_fore',

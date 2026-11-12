@@ -1,0 +1,36 @@
+{
+  "rig": { "id": "doll", "revision": 8 },
+  "ground": true,
+  "level": ["foot.R", "foot.L"],
+  "angles": {
+    "spine": [4, -15, 0],
+    "thigh.L": [5, 0, 3],
+    "thigh.R": [5, 0, -3],
+    "neck": [33.7746, -6.193, 12],
+    "head": [25.331, -4.6447, 8]
+  },
+  "hands": {
+    "hand.R": "grip",
+    "hand.L": { "curl": 0.1, "thumb": { "across": 0.2, "lift": 0.2, "oppose": 0.4 } }
+  },
+  "hold": {
+    "hand.R": {
+      "model": "rifle_assault",
+      "at": [-0.1655, 1.1468, 0.3806],
+      "turn": [0.1206, 0.05, -0.3794, 0.916],
+      "pole": [-0.853, -0.174, 0.492],
+      "slant": 15,
+      "socket": { "at": [-0.016, -0.09, -0.164], "axis": [0, 0.95, 0.3], "into": [0.781, 0.188, -0.596] }
+    },
+    "hand.L": {
+      "model": "rifle_assault",
+      "at": [-0.1655, 1.1468, 0.3806],
+      "turn": [0.1206, 0.05, -0.3794, 0.916],
+      "pole": [0.3, -1, 0],
+      "socket": { "at": [0.07, 0, -0.07], "into": [-1, 0, 0], "axis": [0, 1, 0] },
+      "grip": 0.95,
+      "slant": 0,
+      "close": false
+    }
+  }
+}

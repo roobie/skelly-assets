@@ -40,6 +40,15 @@ export const UNDERSIDE_VIEWS = [
   ['below', from(0, 0, -1)],
 ];
 
+// The straight tile's views, square to the model's axes, for reading a joint's turn against its frame: a roll about a
+// bone shows end-on, a swing in a plane shows square to that plane, where a three-quarter view mixes them.
+export const STRAIGHT_VIEWS = [
+  ['front', FORWARD],
+  ['left', from(0, -1, 0)],
+  ['right', RIGHT],
+  ['top', UP],
+];
+
 // The fit tile's views, for a garment on the doll: straight on from the front and the side, where a hem, a cuff or an
 // armhole lies edge-on, the front three-quarter, and from above, where a shoulder or a collar meets the body.
 export const FIT_VIEWS = [
@@ -50,4 +59,4 @@ export const FIT_VIEWS = [
 ];
 
 // The view sets a look can draw a tile from, by the name a review asks for.
-export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, fit: FIT_VIEWS };
+export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, straight: STRAIGHT_VIEWS, fit: FIT_VIEWS };

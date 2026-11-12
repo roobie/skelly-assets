@@ -20,7 +20,7 @@ import { FRONT_QUARTER } from './modelFrame.mjs';
 import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
 import { addCoveredSkin, skinCheck } from './skin.mjs';
-import { drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
+import { drawEye, drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
 const ISSUE_COLOUR = { pokes: 0xd0301a, flush: 0xb03ab0, sinks: 0xe0901a };
 const IDENTITY_Q = [0, 0, 0, 1];
@@ -199,19 +199,111 @@ const authoredClip = (frames, loop, seconds) => ({ kind: 'pose', loop, ...(loop 
 
 let drawer;
 
-// Four views of the figure, `size` pixels each, as a PNG data URL.
-function drawTile(obj, size, views) {
+// Four views of the figure, `size` pixels each, as a PNG data URL. A close-up frames on `framed`, a part of the figure,
+// and draws only `shown`, that part and what it holds, so the rest of the figure does not stand between it and the camera.
+function drawTile(obj, size, views, { framed = obj, shown = [obj] } = {}) {
   drawer ??= makeDrawer();
   const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const box = new THREE.Box3().setFromObject(obj);
-  const grid = groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())));
+  const grid = framed === obj ? groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray()))) : new THREE.Group();
   const { tile, g } = startTile(size, 2, 2);
+  const kept = new Set();
+  for (const part of shown) part.traverse((o) => kept.add(o));
+  const hidden = [];
+  obj.traverse((o) => { if (o.isMesh && !kept.has(o)) { o.visible = false; hidden.push(o); } });
   drawer.stage.add(obj);
-  directions.forEach((view, i) => drawView(drawer, g, obj, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size));
+  directions.forEach((view, i) => { drawView(drawer, g, framed, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size); });
   drawer.stage.remove(obj);
+  for (const o of hidden) o.visible = true;
   ruleAt(g, { x: size }, tile.height);
   ruleAt(g, { y: size }, tile.width);
   return tile.toDataURL('image/png');
+}
+
+// The figure's eyes: half the head's height above the head's joint, a little inside its face, looking the way the head
+// faces; the head is not drawn from there, as the camera stands inside it.
+const EYES_INSIDE_FACE = 0.02;
+function eyesOf(figure) {
+  const { bone, joint } = figure.bones.get('head');
+  const { min, max } = bone.bind.box;
+  const eye = joint.localToWorld(new THREE.Vector3(0, (max[1] - min[1]) / 2, max[2] - bone.head[2] - EYES_INSIDE_FACE));
+  const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(joint.getWorldQuaternion(new THREE.Quaternion()));
+  return { eye, forward, head: joint };
+}
+
+// Two views of the figure, `size` pixels each: from its own eyes, as a player sees what the hands do, beside the front
+// three-quarter that shows where it stands.
+function drawEyeTile(obj, size, figure) {
+  drawer ??= makeDrawer();
+  const { eye, forward, head } = eyesOf(figure);
+  const box = new THREE.Box3().setFromObject(obj);
+  const grid = groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())));
+  const { tile, g } = startTile(size, 2, 1);
+  const hidden = [];
+  head.traverse((o) => { if (o.isMesh) { o.visible = false; hidden.push(o); } });
+  drawer.stage.add(obj, grid);
+  drawEye(drawer, g, 'eyes', eye, forward, 0, 0, size);
+  for (const o of hidden) o.visible = true;
+  drawView(drawer, g, obj, grid, ['front ¾', new THREE.Vector3(...FRONT_QUARTER)], size, 0, size);
+  drawer.stage.remove(obj, grid);
+  ruleAt(g, { x: size }, tile.height);
+  return tile.toDataURL('image/png');
+}
+
+// The node of `obj` marked as the part `part`; the model needs exactly one.
+function partNode(obj, model, part) {
+  const found = [];
+  obj.traverse((node) => { if (node.userData.part === part) found.push(node); });
+  if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
+  return found[0];
+}
+
+// Slides the part `part` of `obj` the share `share` of the way along its linear motion, whose ends are in the part's own
+// axes and in the model's unit, which the model's root node states (the gun exporter's `gungen` extras).
+function movePart(obj, model, part, share) {
+  const node = partNode(obj, model, part);
+  const { motion } = node.userData;
+  if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
+  let unit;
+  for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
+  if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
+  const stroke = new THREE.Vector3(...motion.rearmost).sub(new THREE.Vector3(...motion.rest)).multiplyScalar(share * unit);
+  node.position.add(stroke.applyQuaternion(node.quaternion));
+}
+
+// The items a pose file holds, each loaded once at the origin, its parts moved as the file says: its object to carry
+// and its mesh for the grip to close on.
+async function heldItems(file) {
+  const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
+  return new Map(await Promise.all(models.map(async (model) => {
+    const { scene } = await loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] });
+    const obj = scene.clone(true);
+    for (const [part, share] of Object.entries(file.moved?.[model] ?? {})) movePart(obj, model, part, share);
+    obj.updateMatrixWorld(true);
+    return [model, { obj, mesh: worldMesh(obj) }];
+  })));
+}
+
+/**
+ * Poses the figure by a pose file and puts what it holds in its hands: the held items are loaded, the grips close on
+ * their meshes, and each item is placed where the pose holds it, under the joint of the first hand holding it, so a
+ * later frame (a slider, a clip, a ground lift) carries it with that hand. One item held by both hands is placed once.
+ * Gives the compile result and `release()`, which takes the items out of the hands again.
+ */
+async function holdPose(figure, rig, file) {
+  const items = await heldItems(file);
+  const compiled = compilePose(rig, file, { meshOf: (model) => items.get(model).mesh });
+  applyFrame(figure, compiled.frame);
+  const placed = new Map(Object.entries(compiled.held).map(([hand, item]) => [JSON.stringify(item), { hand, item }]));
+  const carried = [...placed.values()].map(({ hand, item: { model, r, t } }) => {
+    const obj = items.get(model).obj.clone(true);
+    new THREE.Matrix4().set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1).decompose(obj.position, obj.quaternion, obj.scale);
+    figure.root.add(obj);
+    figure.root.updateMatrixWorld(true);
+    figure.bones.get(hand).joint.attach(obj);
+    return obj;
+  });
+  return { ...compiled, carried, release: () => { for (const obj of carried) obj.removeFromParent(); } };
 }
 
 // The figure the last call drew, kept for the next while it asks for the same wear, so a sweep through poses builds
@@ -227,20 +319,26 @@ async function keptFigure(data, wear, skin) {
   return kept.figure;
 }
 
-// The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, drawn as a tile, with the
-// pieces that ride its bones, the compile report, the clearance probe's findings and the skin check when asked, and the
-// frame the pose compiled to.
-async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false } = {}) {
+// The doll wearing `wear`, posed by the fixture `pose` names or the pose file object it is, holding what the pose holds,
+// drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, or from its own eyes when
+// `views` is `eye`, with the pieces that ride its bones, the compile report, the clearance probe's findings and the
+// skin check when asked, and the frame the pose compiled to.
+async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false, focus } = {}) {
   const data = await ready;
   const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
-  const { frame, report } = compilePose(data.rig, file);
-  applyFrame(figure, frame);
+  const { frame, report, carried, release } = await holdPose(figure, data.rig, file);
   const found = probing ? probe(figure, frame) : null;
-  const png = drawTile(figure.root, size, views);
+  const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
+  if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
+  const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carried] };
+  const png = views === 'eye' ? drawEyeTile(figure.root, size, figure) : drawTile(figure.root, size, views, closeUp);
   // The marks would draw over the skin check's masks.
   figure.marks.clear();
-  return { png, pieces: figure.pieces, report, clearance: found, skin: skin ? skinCheck(figure.root, size, views) : null, frame };
+  const skinFound = skin ? skinCheck(figure.root, size, views) : null;
+  // The figure is kept for the next call, which holds what its own pose holds.
+  release();
+  return { png, pieces: figure.pieces, report, clearance: found, skin: skinFound, frame };
 }
 
 window.posed = posed;
@@ -399,10 +497,14 @@ async function startPage(data, query) {
     state.angles = anglesOf(rig, frame);
     refresh();
   };
-  // A fixture by name or a pose file object, compiled and taken on, with its report shown and the view framed on it.
+  // A fixture by name or a pose file object, compiled and taken on with what it holds in place of what the last one held,
+  // its report shown and the view framed on it.
+  let holding = { release: () => {} };
   const show = shownError('report', async (pose) => {
     const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose;
-    const { frame, report } = compilePose(rig, file);
+    holding.release();
+    holding = await holdPose(figure, rig, file);
+    const { frame, report } = holding;
     take(frame);
     view.show(figure.root);
     $('report').textContent = describe(report);

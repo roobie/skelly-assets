@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { clearanceProbe } from '../../site/clearance.mjs';
-import { IDENTITY_M, rotZ } from '../../site/kinematics.mjs';
+import { clearanceProbe, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { applyPoint, IDENTITY_M, length, rotAxis, rotZ } from '../../site/kinematics.mjs';
 
 // A closed axis-aligned box of 12 triangles about `centre`.
 const boxMesh = ([w, h, d], centre = [0, 0, 0]) => {
@@ -96,4 +96,36 @@ test('a piece driven into the body inside another piece is a seam, not a sink', 
 test('a probe refuses a pose missing a bone', () => {
   const probe = clearanceProbe(rig, { body, pieces: [sleeve(0.12)] });
   assert.throws(() => probe(new Map([['upper', still.get('upper')]])), /no transform for bone fore/);
+});
+
+test('a solid of many triangles gives every probe its exact signed distance within reach and only its side beyond', () => {
+  // A cube of half-size 1, each face a grid of triangles, turned off the axes so the search over its triangles has
+  // many levels to prune. Its signed distance is known in closed form.
+  const n = 6;
+  const positions = [], indices = [];
+  for (let a = 0; a < 3; a++) for (const side of [-1, 1]) {
+    const base = positions.length / 3;
+    for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) {
+      const corner = [0, 0, 0];
+      corner[a] = side;
+      corner[(a + 1) % 3] = -1 + (2 * i) / n;
+      corner[(a + 2) % 3] = -1 + (2 * j) / n;
+      positions.push(...corner);
+    }
+    const at = (i, j) => base + i * (n + 1) + j;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) indices.push(at(i, j), at(i + 1, j), at(i + 1, j + 1), at(i, j), at(i + 1, j + 1), at(i, j + 1));
+  }
+  const transform = { r: rotAxis([1, 2, 3], 37), t: [0.1, -0.2, 0.05] };
+  const solid = posedSolid({ positions, indices }, transform);
+  const exact = (q) => {
+    const out = q.map((x) => Math.max(Math.abs(x) - 1, 0));
+    return out.some((x) => x > 0) ? length(out) : -Math.min(...q.map((x) => 1 - Math.abs(x)));
+  };
+  const reach = 0.5;
+  const steps = [-1.9, -1.3, -0.7, -0.15, 0.35, 0.9, 1.15, 1.6];
+  for (const x of steps) for (const y of steps) for (const z of steps) {
+    const q = [x, y, z], d = exact(q), depth = signedDepth(solid, applyPoint(transform, q), reach);
+    if (Math.abs(d) <= reach) assert.ok(Math.abs(depth - d) < 1e-9, `${q}: ${depth}, not ${d}`);
+    else assert.equal(depth, d < 0 ? -Infinity : Infinity, `${q}`);
+  }
 });

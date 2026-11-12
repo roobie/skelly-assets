@@ -889,7 +889,10 @@ test('pose interpolation uses shortest-arc spherical quaternion interpolation an
   ] };
   const sample = sampleClip(clip, 0.3);
   assert.deepEqual(sample.rotations.chest, slerpQuat(a, b, 0.3));
-  assert.deepEqual(decodeFrame(sample), { root: sample.root, rotations: { chest: quatToMat3(sample.rotations.chest) } });
+  const decoded = decodeFrame(sample);
+  assert.deepEqual(decoded.root, sample.root);
+  // The shared decode divides by the quaternion's squared length, so it agrees with mobgen's to rounding, not bit for bit.
+  quatToMat3(sample.rotations.chest).forEach((v, i) => assert.ok(Math.abs(decoded.rotations.chest[i] - v) < 1e-12, `entry ${i}`));
   const { boneTransforms } = await import('../packages/mobgen/src/core/pose.ts');
   const bones = [{ id: 'chest', parent: null, head: [0, 0, 0], tail: [0, 1, 0] }];
   const posed = boneTransforms(bones, decodeFrame(sample)).get('chest');

@@ -188,11 +188,20 @@ const carried = (tree, { r, t }) => {
   return { tree, local: (p) => mulMV(back, sub(p, t)) };
 };
 
-// How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray.
-function signedDepth({ tree, local }, p) {
+// A mesh carried by a transform; a grip closes on one (site/fingers.mjs).
+export const posedSolid = (mesh, transform) => carried(solidOf(mesh), transform);
+
+/**
+ * How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray. A
+ * grip probes hundreds of points per joint step, so it can name a `reach` past which only the side matters: the
+ * search gives up there, and the depth is ±Infinity.
+ */
+export function signedDepth({ tree, local }, p, reach = Infinity) {
   const q = local(p);
-  const surface = nearest(tree, q, Infinity);
-  return boxDistance(tree.bounds, q) === 0 && winding(tree, q) !== 0 ? -surface : surface;
+  const surface = nearest(tree, q, reach);
+  const inside = boxDistance(tree.bounds, q) === 0 && winding(tree, q) !== 0;
+  if (surface >= reach) return inside ? -Infinity : Infinity;
+  return inside ? -surface : surface;
 }
 
 // Whether `p` lies inside the solid deeper than a coincident face.
