@@ -1,4 +1,3 @@
-local k = import 'kit.libsonnet';
 local site = import 'site.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local s = import 'apc_scifi_wheeled.spec.libsonnet';
@@ -6,8 +5,6 @@ local one(id, at=site.origin) = site.one(id, 'apc_scifi_wheeled_' + id, at);
 local pair(id) = site.pair(id, 'apc_scifi_wheeled_' + id);
 local w = s.wheel;
 local l = s.lamps;
-// `headlamp_military`'s bowl is centred this far above its origin.
-local lampCentre = 0.125;
 {
   sites: [one(id) for id in ['hull', 'hood', 'visor', 'weapon_station', 'cannon', 'ramp']]
     + pair('flank')
@@ -20,8 +17,7 @@ local lampCentre = 0.125;
       for i in [0, 1] for name in [['front', 'rear'][i]]
     ])
     + [h + { finish: s.paint } for h in site.pair('hatch', 'apc_hatch', [s.hatches.x, s.body.top, s.hatches.z])]
-    // The lamps sit in the lower glacis with their bowls let into it.
-    + site.pair('headlamp', 'headlamp_military', [k.plateX(s.plates.lowerGlacis, l.y + lampCentre, l.z), l.y, l.z])
+    + site.pair('headlamp', 'headlamp_military', [s.body.nose, l.y, l.z])
     + site.pair('tail_lamp', 'tail_lamp_small', [s.body.rear, l.tailY, l.tailZ]),
   tags: { 'vehicle-role': ['military'] },
 }

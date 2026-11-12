@@ -25,13 +25,16 @@ const { spec, own, sites } = data;
 const site = Object.fromEntries(sites.map((s) => [s.id, s]));
 const drawn = (...ids) => ids.flatMap((id) => site[id].pieces);
 const sides = ['near', 'far'];
-// Pieces raised by dy, each kind along the axis its shape stores y on.
-const lift = (pieces, dy) => pieces.map((p) => {
-  if (p.kind === 'box') return { ...p, min: [p.min[0], p.min[1] + dy, p.min[2]], max: [p.max[0], p.max[1] + dy, p.max[2]] };
-  if (p.kind === 'prism' && p.axis === 'y') return { ...p, start: p.start + dy, end: p.end + dy };
-  if (p.kind === 'prism') return { ...p, profile: p.profile.map(([u, v]) => (p.axis === 'z' ? [u, v + dy] : [u + dy, v])) };
-  return { ...p, origin: [p.origin[0], p.origin[1] + dy, p.origin[2]] };
+// Pieces moved by an [x, y, z] offset, each kind along the axes its shape stores, its cut planes with it.
+const shifted = (pieces, by) => pieces.map((p) => {
+  const clip = p.clip?.map(({ normal, offset }) => ({ normal, offset: offset + normal[0] * by[0] + normal[1] * by[1] + normal[2] * by[2] }));
+  const moved = { ...p, ...(clip ? { clip } : {}) };
+  if (p.kind === 'box') return { ...moved, min: p.min.map((v, i) => v + by[i]), max: p.max.map((v, i) => v + by[i]) };
+  if (p.kind === 'turned') return { ...moved, origin: p.origin.map((v, i) => v + by[i]) };
+  const [along, u, v] = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[p.axis];
+  return { ...moved, profile: p.profile.map(([a, b]) => [a + by[u], b + by[v]]), start: p.start + by[along], end: p.end + by[along] };
 });
+const lift = (pieces, dy) => shifted(pieces, [0, dy, 0]);
 // The body every wheel turns inside: the hull, both flanks and both panniers.
 const body = drawn('hull', 'flank_near', 'flank_far', 'pannier_near', 'pannier_far');
 const running = sites.filter((s) => /_wheel_(near|far)$|_wheel_(brake_disc|caliper)_/.test(s.id));
@@ -74,6 +77,10 @@ test('every fitting rests on the part that carries it', () => {
   }
   // A gap finer than half the voxel grain closes in the build, so the check samples no finer.
   for (const [fitting, carrier] of carried) assert.ok(meeting(drawn(fitting), drawn(carrier), spec.grain / 2).touches, `${fitting} floats off ${carrier}`);
+});
+
+test('a visor moved off the sloped hood front floats, so the cut plates are sampled', () => {
+  assert.ok(!meeting(shifted(drawn('visor'), [2 * spec.grain, 0, 0]), drawn('hood'), spec.grain / 2).touches);
 });
 
 test('the cannon runs clear of the hood, visor, roof rails and launchers', () => {

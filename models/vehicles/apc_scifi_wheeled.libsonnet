@@ -10,13 +10,13 @@ local part(name, kg, pieces, anchors={}) = k.compound('apc_scifi_wheeled_' + nam
 // leans across.
 local bothCuts(plates, inside) = std.flattenArrays([
   local near = k.plate(p[0], p[1], p[2], inside);
-  [near] + (if near.normal[2] != 0 then [near { normal: [near.normal[0], near.normal[1], -near.normal[2]] }] else [])
+  [near] + (if near.normal[2] != 0 then [k.farCut(near)] else [])
   for p in std.objectValues(plates)
 ]);
 local hullCuts = bothCuts(s.plates, b.inside);
 
-// The hull's outline in side view, a band over its full height from x0 to x1 whose floor runs from y0 to y1.
-local band(id, x0, y0, x1, y1, z) = k.clipped(k.prism(id, 'paint', [[x0, y0], [x1, y1], [x1, b.top], [x0, b.top]], z), hullCuts);
+// The hull's outline in side view, a band up to the deck from x0 to x1 whose floor runs from y0 to y1.
+local band(id, x0, y0, x1, y1, z) = k.clipped(k.prism(id, 'paint', [[x0, y0], [x1, y1], [x1, b.deck], [x0, b.deck]], z), hullCuts);
 // Each arch is the top half of an octagon round its tyre, so its edges stay flat plates like the hull's. The flanks'
 // floor runs along the belly and over each arch; between its corners it is straight, so each stretch is a convex band.
 local w = s.wheel;
@@ -32,11 +32,11 @@ local flank = [
   for i in std.range(0, std.length(floor) - 2)
   if floor[i + 1][0] > floor[i][0]
     // A stretch the plates cut away whole, as ahead of the front arch where the cheeks meet the core, is left out.
-    && !k.cutAway([[x, y, z] for x in [floor[i][0], floor[i + 1][0]] for y in [b.belly, b.top] for z in [b.core, b.half]], hullCuts)
+    && !k.cutAway([[x, y, z] for x in [floor[i][0], floor[i + 1][0]] for y in [b.belly, b.deck] for z in [b.core, b.half]], hullCuts)
 ];
 
 local h = s.hood;
-local hoodCuts = bothCuts(h.plates, [(h.x[0] + h.x[1]) / 2, (h.y[0] + h.y[1]) / 2, 0]);
+local hoodCuts = bothCuts(h.plates, [(h.x[0] + h.x[1]) / 2, (h.y[0] + h.y[1]) / 2, (h.z[0] + h.z[1]) / 2]);
 local visorX(y) = k.plateX(h.plates.front, y, 0);
 local t = s.turret;
 local ringTop = b.top + t.ring.height;
@@ -45,10 +45,12 @@ local railY = b.top + rail.height;
 local p = s.pannier;
 local r = s.ramp;
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }, [
-  // The core between the wheels runs the hull's whole length and alone makes the nose ahead of the front arches.
+  // The core between the wheels runs the hull's whole length.
   part('hull', 7800, [
     band('core', b.rear, b.belly, b.nose, b.belly, [-b.core, b.core]),
-    box('tow_eye', 'frame', [b.nose - 0.05, 1.0, -0.12], [b.nose + 0.08, 1.08, 0.12]),
+    // The troop casemate over the full width, its front a sheer step down to the deck.
+    k.clipped(k.prism('casemate', 'paint', [[b.rear, b.deck], [b.step, b.deck], [b.step, b.top], [b.rear, b.top]], [-b.half, b.half]), hullCuts),
+    box('tow_eye', 'frame', [b.nose - 0.05, 0.9, -0.12], [b.nose + 0.08, 0.98, 0.12]),
   ]),
   // Authored on the near side and fitted mirrored on the far.
   part('flank', 900, flank),
@@ -61,21 +63,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     k.turned('stub', 'frame', 'z', k.disc(0.11, b.core, w.z + w.face)) + { sides: 24 },
   ])),
   part('hood', 140, [
-    k.clipped(k.prism('shell', 'paint', [[h.x[0], h.y[0]], [h.x[1], h.y[0]], [h.x[1], h.y[1]], [h.x[0], h.y[1]]], [-h.half, h.half]), hoodCuts),
+    k.clipped(k.prism('shell', 'paint', [[h.x[0], h.y[0]], [h.x[1], h.y[0]], [h.x[1], h.y[1]], [h.x[0], h.y[1]]], h.z), hoodCuts),
   ]),
   // One narrow slit across the hood's front, rather than a windscreen.
   part('visor', 5, [
     local y = h.visor.y;
     k.prism('slit', 'glass', [[visorX(y[0]), y[0]], [visorX(y[0]) + h.visor.depth, y[0]], [visorX(y[1]) + h.visor.depth, y[1]], [visorX(y[1]), y[1]]],
-      [-h.visor.half, h.visor.half]),
+      h.visor.z),
   ]),
   part('weapon_station', 380, [
     k.turned('ring', 'frame', 'y', k.disc(t.ring.radius, b.top, ringTop), [t.x, 0, 0]) + { sides: 32 },
     k.clipped(k.yPrism('turret', 'paint', [[q[0], t.x + q[1]] for q in t.plan], [ringTop, t.top]), bothCuts(t.plates, t.inside)),
   ]),
   part('cannon', 160, [
-    box('mantlet', 'frame', [t.x + 0.8, t.gunY - 0.1, -0.15], [t.x + 1.1, t.gunY + 0.1, 0.15]),
-    k.turned('barrel', 'frame', 'x', k.disc(0.05, t.x + 1.1, t.muzzle - 0.14), [0, t.gunY, 0]) + { sides: 16 },
+    box('mantlet', 'frame', [t.x + 0.55, t.gunY - 0.09, -0.14], [t.x + 0.78, t.gunY + 0.09, 0.14]),
+    k.turned('barrel', 'frame', 'x', k.disc(0.05, t.x + 0.78, t.muzzle - 0.14), [0, t.gunY, 0]) + { sides: 16 },
     k.turned('muzzle', 'dark', 'x', k.disc(0.075, t.muzzle - 0.14, t.muzzle), [0, t.gunY, 0]) + { sides: 16 },
   ]),
   // A box of launch tubes on an arm off the turret's near cheek; the tubes' mouths face ahead.
