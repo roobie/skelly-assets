@@ -1,7 +1,7 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
-import { assemblyProperties, modelParts } from '@skelly/thing-export/physical.ts';
+import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
 import { displayName, loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import { buildItem, type Catalogue, type CatalogueSettings, itemPalette, type ToolItem } from './catalogue.ts';
@@ -90,7 +90,7 @@ export const exportItem = (
       ...(item.covers ? { covers: item.covers } : {}),
       ...(label ? { label: { ...label, text: item.label?.text ?? displayName(asset.id) } } : {}),
     },
-    physical: assemblyProperties(parts),
+    physical: { ...assemblyProperties(parts), volumeM3: drawnVolumeM3(report.resolved, drawn) },
   };
 };
 const itemOptions = strictObject({

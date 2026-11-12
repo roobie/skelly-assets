@@ -1,7 +1,8 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, keywords, printed label and the components a model comes apart into (tools/components.mjs), the
-// vehicles the tree places and the assemblies the kits build with the model at each of their sites, the sites that
-// dress each wearable on the doll, and the vocabulary's meanings for the page's labels (models/taxonomy.json).
+// their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
+// (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
+// at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
+// labels (models/taxonomy.json).
 // Usage: node site/build.mjs [--built dir] [--no-tree] [outDir]; the tree defaults to built/. --no-tree leaves the
 // tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs). No dependencies; the page loads
 // three.js from a CDN. The models are the GLB models the tree's manifest.json names (tools/manifest.mjs), at their
@@ -12,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
-import { modelComponents } from '../tools/components.mjs';
+import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
@@ -35,9 +36,13 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
+// Each model's sidecar, keyed by the model file it names.
+const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
+  .filter((f) => f.endsWith('.model.json'))
+  .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers }) => ({
+  .map(({ id, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
     category: category ?? null,
     label: label ?? null,
@@ -47,9 +52,11 @@ const models = manifest.models
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
     covers,
+    massKg,
+    volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, file, category, tags, keywords, label, clips, body, covers }) => ({
+  .map(({ id, file, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
     id,
     file,
     bytes: statSync(join(built, file)).size,
@@ -61,6 +68,8 @@ const models = manifest.models
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
     ...(covers ? { covers } : {}),
+    ...sidecars.get(file),
+    ...(massKg === undefined ? {} : { massKg, volumeM3 }),
   }));
 
 // A site's finish as the browser repaints with it: the manifest's material for that finish, as a game reads it.
@@ -84,7 +93,10 @@ const apart = (model) => {
   const components = modelComponents(readFileSync(join(built, model.file)));
   return components ? { ...model, components } : model;
 };
-const shown = models.map((model) => (wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model)));
+const shown = models.map((model) => {
+  const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model);
+  return { ...entry, form: formOf(entry) };
+});
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
   site,
@@ -94,6 +106,14 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
+// A vehicle weighs its sites' models together and fills the volume of their voxels. A figure comes only when every
+// site's model has it, rather than a total short of what the vehicle holds.
+const vehiclePhysical = (sites) => {
+  const parts = sites.map(({ model }) => modelsById.get(model));
+  const total = (key) => (parts.some((part) => part[key] === undefined) ? {} : { [key]: parts.reduce((sum, part) => sum + part[key], 0) });
+  return { ...total('massKg'), ...total('volumeM3') };
+};
+
 // Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
 // keywords of its own.
 const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
@@ -101,7 +121,8 @@ const vehicles = manifest.vehicles.map(({ id, pack, path, tags }) => {
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placedSites(sites) };
+  const placed = placedSites(sites);
+  return { id, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed) };
 });
 
 // Each assembly the kits build (tools/assemblies.mjs), for the review page to draw on its own. The kits are read from
@@ -152,7 +173,7 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.html', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'hiding.mjs', 'skin.mjs', 'pose.html', 'pose.mjs']) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
