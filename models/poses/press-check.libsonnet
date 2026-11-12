@@ -8,6 +8,7 @@
 // (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the rifle point the eyes turn to and
 // `tilt` leans the head toward the figure's right. The left hand `hold`s a socket, may `pinch` named rifle points
 // (moved with the charging handle's draw) and, with `close: false`, rests there open instead of gripping.
+// The pose page plays the frames as a clip in their names' numbered order, so a frame's number is its place in the check.
 // The left hand never takes the rifle in a power grip: it cradles, pinches and pushes with the fingers, so its sockets
 // meet the palm square across the knuckle crease (`crease`), where the fingers' bases carry a handguard, not slanted
 // deep in the palm.
