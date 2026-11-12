@@ -52,7 +52,7 @@ interface CartridgeLook {
  * The thinnest feature that shapes a cartridge's outline, in metres: its rim, which every head has, where an extractor
  * groove is absent from rimmed and shotshell heads.
  */
-const rimThickness = (cartridge: Cartridge): number => {
+export const rimThickness = (cartridge: Cartridge): number => {
   const { value } = cartridge.kind === 'shotshell' ? cartridge.head.rimThickness : cartridge.case.rim.thickness;
   if (value === null) {
     throw new Error(`cartridge ${cartridge.id} has no rim thickness`);
@@ -61,8 +61,8 @@ const rimThickness = (cartridge: Cartridge): number => {
 };
 
 /**
- * A cartridge whose rim is too thin for its grain is drawn smooth, as voxels would lose its rim and step its taper;
- * a large one keeps the voxel look of the guns around it. Its data may decide either way.
+ * A cartridge whose rim is too thin for its grain is drawn as a faceted lathe, as voxels would lose its rim and step
+ * its taper; one whose rim fits keeps the voxel look of the guns around it. Its data may decide either way.
  */
 const voxelized = (cartridge: Cartridge, voxelGrain: number | undefined): boolean =>
   voxelGrain !== undefined && (cartridge.voxelize ?? featureFitsGrain(rimThickness(cartridge), voxelGrain));

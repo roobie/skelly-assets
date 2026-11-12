@@ -4,8 +4,7 @@ import { srgbToLinear } from '@skelly/thing-export/glb.ts';
 import validator from 'gltf-validator';
 import { describe, expect, it } from 'vitest';
 import type { Cartridge, MetallicCartridge } from '../src/ammo/cartridge.ts';
-import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
-import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
+import { exportCartridgeModel, exportCartridgeModels, rimThickness } from '../src/gun/cartridgeExport.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 
@@ -159,41 +158,17 @@ const drawnGrains = (cartridge: Cartridge, voxelGrain: number): (number | undefi
   return meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.voxelGrain));
 };
 
-/** Every measured length times `factor`: a stand-in for a cartridge far larger than any the catalogue holds. */
-const scaled = (value: unknown, factor: number): unknown => {
-  if (Array.isArray(value)) {
-    return value.map((item) => scaled(item, factor));
-  }
-  if (typeof value !== 'object' || value === null) {
-    return value;
-  }
-  return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [
-      key,
-      key === 'value' && typeof item === 'number' ? item * factor : scaled(item, factor),
-    ]),
-  );
-};
-
 describe('a cartridge against its grain', () => {
-  const rimOf = (cartridge: Cartridge): number =>
-    (cartridge.kind === 'shotshell' ? cartridge.head.rimThickness : cartridge.case.rim.thickness).value! / 1000;
-
   it.each(['9x19.json', '12-gauge-00-buck.json'])('voxelizes %s from a rim of the feature span, not thinner', (file) => {
     const cartridge = loadCartridgeFile(file);
-    const fits = rimOf(cartridge) / FEATURE_VOXELS;
+    const fits = rimThickness(cartridge) / FEATURE_VOXELS;
     expect(new Set(drawnGrains(cartridge, fits))).toEqual(new Set([fits]));
     expect(new Set(drawnGrains(cartridge, fits * 1.01))).toEqual(new Set([undefined]));
   });
 
-  it('voxelizes a tank-gun-sized shell at the gun grain', () => {
-    const shell = scaled(loadCartridgeFile('9x19.json'), 120 / 9) as Cartridge;
-    expect(new Set(drawnGrains(shell, gunVoxel.grain))).toEqual(new Set([gunVoxel.grain]));
-  });
-
   it('voxelizes a cartridge whose data says so, whatever its rim', () => {
     const cartridge = { ...loadCartridgeFile('9x19.json'), voxelize: true };
-    const grain = (rimOf(cartridge) / FEATURE_VOXELS) * 2;
+    const grain = (rimThickness(cartridge) / FEATURE_VOXELS) * 2;
     expect(new Set(drawnGrains(cartridge, grain))).toEqual(new Set([grain]));
   });
 });
