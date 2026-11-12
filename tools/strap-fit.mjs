@@ -3,7 +3,9 @@
 // least gap a strap on its own lattice can leave without touching the hair; where the ring steps, its inner face can
 // stand off a corner of the hair by that voxel's diagonal and no further. So every sample of the strap's inner face
 // must lie outside the head and within that diagonal of it, which fails the build where a head measure, the head's
-// grain or a worn height moves the drawn hair out from under the strap.
+// grain or a worn height moves the drawn hair out from under the strap. The game reads the strap by its anchors, not its
+// faces, so they are held to the game's own test as well (`anchorFindings`): https://github.com/roobie/skelly,
+// `packages/deadvox/test/playerFigure.test.ts`, `expectSnugStrap`.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { COINCIDENT, meshProbe, sampledSurface, STEP } from '../site/clearance.mjs';
@@ -21,15 +23,17 @@ const readBandFit = (root) => JSON.parse(evaluateJsonnet("import 'models/head-ba
 const millimetres = (metres) => `${(metres * 1000).toFixed(1)} mm`;
 const at = (p) => `(${p.map((value) => value.toFixed(3)).join(', ')})`;
 
-// `mesh`, in a gear model's frame, carried into the bust model frame: turned `turn` degrees about y, then lifted `lift`.
-function placed(mesh, turn, lift) {
+// A point in a gear model's frame, carried into the bust model frame: turned `turn` degrees about y, then lifted `lift`.
+function placedPoint([x, y, z], turn, lift) {
   const angle = (turn * Math.PI) / 180;
   const cos = Math.round(Math.cos(angle) * 1e12) / 1e12, sin = Math.round(Math.sin(angle) * 1e12) / 1e12;
+  return [cos * x + sin * z, y + lift, -sin * x + cos * z];
+}
+
+// `mesh`, in a gear model's frame, carried into the bust model frame point by point.
+function placed(mesh, turn, lift) {
   const positions = [];
-  for (let i = 0; i < mesh.positions.length; i += 3) {
-    const [x, y, z] = mesh.positions.slice(i, i + 3);
-    positions.push(cos * x + sin * z, y + lift, -sin * x + cos * z);
-  }
+  for (let i = 0; i < mesh.positions.length; i += 3) positions.push(...placedPoint(mesh.positions.slice(i, i + 3), turn, lift));
   return { positions, indices: mesh.indices };
 }
 
@@ -67,6 +71,32 @@ export function strapFindings({ head, strap, grain, frame, worn, model }) {
   return findings;
 }
 
+/**
+ * The ways a gear model's strap anchors fail the game's reading of a snug strap: looking from each `strap_<side>_inner`
+ * anchor away from its `_outer` anchor, the head must lie no further off than the strap is thick. A strap whose faces
+ * hug the head still fails the game when its anchors name the wrong piece or the wrong face of it. `anchors` and `head`
+ * are as the built tree holds them; the placing is as for `strapFindings`.
+ */
+export function anchorFindings({ head, anchors, frame, worn, model }) {
+  const onHead = meshProbe(head);
+  const turn = frame.turn + worn.turn, lift = frame.height + worn.at;
+  const sides = Object.keys(anchors).flatMap((name) => /^strap_(.+)_inner$/.exec(name)?.slice(1) ?? []);
+  if (sides.length === 0) return [`${model}: no strap anchors`];
+  return sides.flatMap((side) => {
+    const outerAnchor = anchors[`strap_${side}_outer`];
+    if (!outerAnchor) return [`${model}: strap_${side}_inner has no strap_${side}_outer`];
+    const inner = placedPoint(anchors[`strap_${side}_inner`], turn, lift);
+    const outer = placedPoint(outerAnchor, turn, lift);
+    const inward = inner.map((value, k) => value - outer[k]);
+    const thickness = Math.hypot(...inward);
+    const reach = onHead.reach(inner, inward.map((value) => value / thickness));
+    if (reach <= thickness + COINCIDENT) return [];
+    const off = Number.isFinite(reach) ? `lies ${millimetres(reach)} off` : 'is missed';
+    return [`${model}: looking in from its ${side} strap's inner anchor ${at(inner)}, the head ${off}, `
+      + `beyond the strap's ${millimetres(thickness)} thickness`];
+  });
+}
+
 // A gear model's strap as one mesh in its model frame, with the voxel grain its strap is drawn at.
 function strapOf(buffer, model) {
   const meshes = modelMeshes(buffer, (part, piece, slot) => slot === STRAP);
@@ -79,12 +109,17 @@ function strapOf(buffer, model) {
 /** The strap findings of every band-fitted gear model in a built tree, whose manifest is `manifest`. */
 export function treeStrapFindings(built, manifest, root = repo) {
   const { frame, worn } = readBandFit(root);
-  const glbOf = (id) => {
+  const entryOf = (id) => {
     const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
     if (!entry) throw new Error(`the built tree holds no ${id}`);
-    return readFileSync(join(built, entry.pack, entry.path));
+    return entry;
   };
+  const glbOf = (id) => readFileSync(join(built, entryOf(id).pack, entryOf(id).path));
+  const anchorsOf = (id) => JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
-  return Object.entries(worn).flatMap(([model, place]) => strapFindings({ head, ...strapOf(glbOf(model), model), frame, worn: place, model }));
+  return Object.entries(worn).flatMap(([model, place]) => [
+    ...strapFindings({ head, ...strapOf(glbOf(model), model), frame, worn: place, model }),
+    ...anchorFindings({ head, anchors: anchorsOf(model), frame, worn: place, model }),
+  ]);
 }
