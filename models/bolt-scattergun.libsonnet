@@ -1,4 +1,5 @@
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+local bolt = import 'bolt-gun.libsonnet';
 local box = h.box;
 
 // The bolt carbine's trench scattergun: the carbine's grip, guard, trigger and butt kept, a shorter taller receiver, a long
@@ -14,11 +15,8 @@ local muzzleX = 0.98;
 local pumpX0 = 0.40;
 local pumpX1 = 0.545;
 [
-  h.compound('bolt_scattergun', 12.5, [
-    // Receiver, a tall block with a top ridge and a painted band.
-    box('receiver', 'body', [-0.18, 0.14, -w], [0.11, 0.34, w]),
-    box('ridge', 'body', [-0.16, 0.34, -0.04], [0.11, 0.36, 0.04]),
-    box('receiver-band', 'accent', [-0.04, 0.14, -w - 0.003], [0.0, 0.34, w + 0.003]),
+  // A shorter, taller receiver than the carbine's.
+  bolt.gun('bolt_scattergun', 12.5, 'shotgun', bolt.receiver(0.11, 0.14, 0.34, w, [0.11, 0.36, 0.04]) + [
     // The breech block the barrel and tube are bolted into.
     box('breech', 'trim', [0.11, 0.17, -0.06], [0.15, 0.335, 0.06]),
     // One long slim barrel with a dark mouth and a rib, and a magazine tube beneath it ending in a brass cap.
@@ -41,28 +39,9 @@ local pumpX1 = 0.545;
     box('rib-%d' % i, 'vent', [pumpX0 + 0.015 + i * 0.032, tubeY - 0.033, -0.038], [pumpX0 + 0.027 + i * 0.032, tubeY + 0.033, 0.038])
     for i in [0, 1, 2, 3]
   ] + [
-    // Pistol grip, trigger guard and trigger.
-    h.prism('grip', 'grip', 'z', [[-0.13, 0.15], [-0.07, 0.15], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
-    box('guard', 'metal', [-0.075, 0.105, -0.008], [0.005, 0.117, 0.008]),
-    box('guard-front', 'metal', [-0.005, 0.105, -0.008], [0.005, 0.15, 0.008]),
-    box('trigger', 'metal', [-0.045, 0.117, -0.005], [-0.033, 0.148, 0.005]),
-    // A stubby butt with a rubber pad, as the carbine's.
-    h.prism('butt', 'body', 'z', [[-0.18, 0.16], [-0.18, 0.34], [-0.27, 0.335], [-0.30, 0.30], [-0.30, 0.15], [-0.27, 0.135]], -0.05, 0.05),
-    box('butt-pad', 'grip', [-0.32, 0.14, -0.052], [-0.30, 0.31, 0.052]),
-  ] + [
+  ] + bolt.grip(0.15) + bolt.stock(0.34, 0.05) + [
     // Three brass shells held on the right side of the receiver.
     h.turned('shell-%d' % i, 'round', 'z', [[0, 0], [0, 0.014], [0.012, 0.014], [0.014, 0.011], [0.014, 0]], [-0.135 + i * 0.045, 0.205, w])
     for i in [0, 1, 2]
-  ], {
-    body: 'paint-charcoal',
-    accent: 'paint-oxblood',
-    trim: 'brass',
-    metal: 'steel-parkerized',
-    vent: 'rubber-black',
-    grip: 'rubber-black',
-    round: 'brass',
-  }) + h.gripOn('bolt_scattergun', 'grip') + {
-    taxonomy: { category: 'weapons', tags: { weapon: ['shotgun'], setting: ['sci-fi'] } },
-    voxelGrain: 0.004,
-  },
+  ], { round: 'brass' }),
 ]
