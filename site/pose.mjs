@@ -284,14 +284,26 @@ async function heldItems(file) {
   })));
 }
 
-// A held item placed where the compiled pose holds it, under the figure so it is drawn with it.
-function carry(figure, items, { model, r, t }) {
-  const obj = items.get(model).obj.clone(true);
-  obj.matrixAutoUpdate = false;
-  obj.matrix.set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1);
-  figure.root.add(obj);
-  figure.root.updateMatrixWorld(true);
-  return obj;
+/**
+ * Poses the figure by a pose file and puts what it holds in its hands: the held items are loaded, the grips close on
+ * their meshes, and each item is placed where the pose holds it, under the joint of the first hand holding it, so a
+ * later frame (a slider, a clip, a ground lift) carries it with that hand. One item held by both hands is placed once.
+ * Gives the compile result and `release()`, which takes the items out of the hands again.
+ */
+async function holdPose(figure, rig, file) {
+  const items = await heldItems(file);
+  const compiled = compilePose(rig, file, { meshOf: (model) => items.get(model).mesh });
+  applyFrame(figure, compiled.frame);
+  const placed = new Map(Object.entries(compiled.held).map(([hand, item]) => [JSON.stringify(item), { hand, item }]));
+  const carried = [...placed.values()].map(({ hand, item: { model, r, t } }) => {
+    const obj = items.get(model).obj.clone(true);
+    new THREE.Matrix4().set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1).decompose(obj.position, obj.quaternion, obj.scale);
+    figure.root.add(obj);
+    figure.root.updateMatrixWorld(true);
+    figure.bones.get(hand).joint.attach(obj);
+    return obj;
+  });
+  return { ...compiled, carried, release: () => { for (const obj of carried) obj.removeFromParent(); } };
 }
 
 // The figure the last call drew, kept for the next while it asks for the same wear, so a sweep through poses builds
@@ -315,12 +327,7 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   const data = await ready;
   const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
-  const items = await heldItems(file);
-  const { frame, report, held } = compilePose(data.rig, file, { meshOf: (model) => items.get(model).mesh });
-  applyFrame(figure, frame);
-  // One item held by both hands is placed once.
-  const placed = new Map(Object.values(held).map((item) => [JSON.stringify(item), item]));
-  const carried = [...placed.values()].map((item) => carry(figure, items, item));
+  const { frame, report, carried, release } = await holdPose(figure, data.rig, file);
   const found = probing ? probe(figure, frame) : null;
   const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
   if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
@@ -330,7 +337,7 @@ async function posed({ wear = [], pose, size = 384, views = 'review', probe: pro
   figure.marks.clear();
   const skinFound = skin ? skinCheck(figure.root, size, views) : null;
   // The figure is kept for the next call, which holds what its own pose holds.
-  for (const obj of carried) figure.root.remove(obj);
+  release();
   return { png, pieces: figure.pieces, report, clearance: found, skin: skinFound, frame };
 }
 
@@ -490,10 +497,14 @@ async function startPage(data, query) {
     state.angles = anglesOf(rig, frame);
     refresh();
   };
-  // A fixture by name or a pose file object, compiled and taken on, with its report shown and the view framed on it.
+  // A fixture by name or a pose file object, compiled and taken on with what it holds in place of what the last one held,
+  // its report shown and the view framed on it.
+  let holding = { release: () => {} };
   const show = shownError('report', async (pose) => {
     const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose;
-    const { frame, report } = compilePose(rig, file);
+    holding.release();
+    holding = await holdPose(figure, rig, file);
+    const { frame, report } = holding;
     take(frame);
     view.show(figure.root);
     $('report').textContent = describe(report);
