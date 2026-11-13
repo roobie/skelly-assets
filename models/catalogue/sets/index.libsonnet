@@ -224,4 +224,5 @@
   'packages': import 'models/catalogue/sets/packages.libsonnet',
   'shambler-parts': import 'models/catalogue/sets/shambler-parts.libsonnet',
   'supplies': import 'models/catalogue/sets/supplies.libsonnet',
+  'warrior-statue': import 'models/catalogue/sets/warrior-statue.libsonnet',
 }
