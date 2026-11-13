@@ -218,11 +218,15 @@ local pressings(id, title, s) = {
       box('handle', 'trim', [s.cWaist + 0.08, s.waist - 0.11, s.side - 0.01], [s.cWaist + 0.2, s.waist - 0.08, s.side + 0.002]),
     ], doorFinish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
   ]) + (if cab then [] else if boot then [
-    // The lid lifts about its leading edge.
+    // Separate hinge leaves sit under the lid, inboard of the gutter; its full-width skin edge is not a hinge pin.
+    local hingeHalf = s.glassIn * 0.7;
     part('_boot_lid', 'boot lid', 12, [
       box('skin', 'paint', [s.rear + 0.04, s.deck - 0.02, -s.glassIn], [s.deckFront, s.deck + 0.02, s.glassIn]),
       box('tail', 'paint', [s.rear + 0.02, 0.62 + lift, -s.hatchSide], [s.rear + 0.06, s.deck - 0.02, s.hatchSide]),
-    ] + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), { hinge_a: ['skin', [1, 1, 1]], hinge_b: ['skin', [1, 1, 0]] }),
+    ] + bothSides([
+      box('hinge_leaf', 'paint', [s.deckFront - 6 * grain, s.deck - 2 * grain, hingeHalf - grain], [s.deckFront - grain, s.deck, hingeHalf + grain]),
+      k.turned('hinge_pivot', 'paint', 'z', k.disc(grain, -grain, grain), [s.deckFront - grain, s.deck - 2 * grain, hingeHalf]),
+    ]) + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), { hinge_a: ['hinge_pivot_near', [0.5, 0.5, 0.5]], hinge_b: ['hinge_pivot_far', [0.5, 0.5, 0.5]] }),
   ] else [
     // The whole rear opening, glass and all, lifts as one about the roof's rear edge.
     part('_tailgate', 'tailgate', 18, [
