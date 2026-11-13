@@ -4,7 +4,14 @@ import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/constr
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
-import { ModelPointSchema, type NeutralModel, NeutralModelSchema } from '@skelly/thing-core/schema';
+import { hingeSense, piecesCentre, pinAxis, requireNearSide, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
+import {
+  ModelPointSchema,
+  type Motion,
+  type NeutralModel,
+  NeutralModelSchema,
+  OpenAngleSchema,
+} from '@skelly/thing-core/schema';
 import { singlePart } from '@skelly/thing-core/single-part';
 import { drawnGeometry } from '@skelly/thing-export/drawn.ts';
 import type { Palette, VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
@@ -17,6 +24,7 @@ import {
   finite,
   type InferOutput,
   integer,
+  literal,
   minValue,
   nonEmpty,
   number,
@@ -29,6 +37,7 @@ import {
   strictObject,
   string,
   unknown,
+  variant,
 } from 'valibot';
 import { avatarArm, avatarLeg } from './families/avatarLimbs.ts';
 import { bearTrap } from './families/bearTrap.ts';
@@ -37,7 +46,7 @@ import { head, limb, torso } from './families/body.ts';
 import { bust } from './families/bust.ts';
 import { bag, boots, cap } from './families/carried.ts';
 import { coil } from './families/coil.ts';
-import { compound } from './families/compound.ts';
+import { compound, compoundPieces } from './families/compound.ts';
 import { blowtorch, headlamp, pliers, portableRadio, repairKit, webbingSling } from './families/equipment.ts';
 import { drinkCup, foodPortion, stemmedFruit, woundRoll } from './families/food-medical.ts';
 import { fuse } from './families/fuse.ts';
@@ -134,6 +143,23 @@ const ItemSchema = strictObject({
   covers: optional(NeutralModelSchema.entries.covers),
   /** Named datums on solids, exported as the model's anchors. */
   anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
+  /**
+   * How the item moves on whatever carries it, from rest to its authored stop: a hinge turning on pins drawn on a
+   * compound part, toward a direction, or a slide along one. Exported in the model frame; see
+   * `docs/decisions/0015-motion-as-content.md`.
+   */
+  motion: optional(
+    variant('kind', [
+      strictObject({
+        kind: literal('hinge'),
+        part: name,
+        pins: pipe(array(name), nonEmpty()),
+        toward: picklist(TOWARDS),
+        open: OpenAngleSchema,
+      }),
+      strictObject({ kind: literal('slide'), part: name, toward: picklist(TOWARDS), travel: positive }),
+    ]),
+  ),
   /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
   display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
   /**
@@ -322,6 +348,48 @@ const partAppearance = ({ finish, paintable }: ToolPart) => ({ finish, ...(paint
 /** The finish slots any part of the item lets a host repaint, in authored order. */
 const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.parts.flatMap(({ paintable = [] }) => paintable))];
 
+/**
+ * The item's motion in the model frame, from the authored shapes of the pins and pieces of its part rather than their
+ * voxels, so drawing never moves where the part turns. `place` carries a point of a part into the model frame in
+ * metres; the voxel grain is the tolerance the pins are held to.
+ */
+const partMotion = (
+  item: ToolItem,
+  authored: NonNullable<ToolItem['motion']>,
+  voxel: VoxelGrains | undefined,
+  place: (part: string, point: Vec3) => Vec3,
+  metresPerUnit: number,
+): Motion => {
+  const part = item.parts.find(({ id }) => id === authored.part);
+  if (part?.family !== 'compound') {
+    throw new Error(`${item.id}: motion part ${authored.part} is not a compound part of the item`);
+  }
+  if (!voxel) {
+    throw new Error(`${item.id}: a motion is derived against the export's voxel grain`);
+  }
+  const grain = voxel.voxelGrain;
+  const pieces = compoundPieces(part.params);
+  try {
+    const centre = place(part.id, piecesCentre(pieces));
+    requireNearSide(centre, authored.toward, grain);
+    if (authored.kind === 'slide') {
+      return { kind: 'slide', direction: TOWARD[authored.toward], travel: authored.travel * metresPerUnit };
+    }
+    const pins = authored.pins.map((id) => {
+      const pin = pieces.find((piece) => piece.id === id);
+      if (!pin) {
+        throw new Error(`pin ${id} is not a piece of ${part.id}`);
+      }
+      return pin;
+    });
+    const drawnOn = pinAxis(pins, grain / metresPerUnit);
+    const axis = { from: place(part.id, drawnOn.from), to: place(part.id, drawnOn.to) };
+    return { kind: 'hinge', axis, angle: hingeSense(axis, centre, authored.toward, grain) * authored.open };
+  } catch (failure) {
+    throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
+  }
+};
+
 /** Builds an item; with a model export's grains its datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
@@ -380,16 +448,17 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     }
     return drawn.measure(part, solid);
   };
+  const inModel = (part: string, point: Vec3): Vec3 =>
+    scale(applyPoint(report.resolved.placed.get(part)!, point), settings.units.metresPerUnit);
   const datumAt = (datum: Pick<ToolDatum, 'part' | 'solid' | 'fraction'>): Vec3 => {
     const { min, max } = drawnSolid(datum.part, datum.solid);
-    const point = min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3;
-    return scale(applyPoint(report.resolved.placed.get(datum.part)!, point), settings.units.metresPerUnit);
+    return inModel(datum.part, min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3);
   };
   const directionIn = (part: string, direction: Vec3): Vec3 => {
     const turned = applyDir(report.resolved.placed.get(part)!, direction);
     return scale(turned, 1 / Math.hypot(...turned));
   };
-  let handling: Pick<NeutralModel, 'grip' | 'hold' | 'rest' | 'roll' | 'anchors' | 'display'> = {};
+  let handling: Pick<NeutralModel, 'grip' | 'hold' | 'rest' | 'roll' | 'anchors' | 'display' | 'motion'> = {};
   if (item.handling) {
     const datum = item.handling;
     handling = {
@@ -434,6 +503,9 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     const normal = faceAxis(face);
     const fraction = normal.map((value) => (value + 1) / 2) as [number, number, number];
     label = surfaceOn({ part, solid, fraction }, normal, faceAxis(up));
+  }
+  if (item.motion) {
+    handling = { ...handling, motion: partMotion(item, item.motion, voxel, inModel, settings.units.metresPerUnit) };
   }
   return {
     report,

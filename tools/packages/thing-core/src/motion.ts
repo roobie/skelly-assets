@@ -31,7 +31,7 @@ export type AnalyticPiece =
       readonly start: number;
       readonly end: number;
     }
-  | { readonly id: string; readonly kind: 'turned'; readonly axis: Axis; readonly origin?: Vec3; readonly profile: Profile };
+  | { readonly id: string; readonly kind: 'turned'; readonly axis: Axis; readonly origin?: Vec3 | undefined; readonly profile: Profile };
 
 // The axis a prism or turned piece runs along, then the two axes its profile's coordinates lie on.
 type Index = 0 | 1 | 2;
