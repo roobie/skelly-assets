@@ -46,6 +46,17 @@ describe('neutral model envelope', () => {
   });
 });
 
+describe('motion', () => {
+  const slide = (share: number) => ({ kind: 'slide', direction: [0, 0, -1], travel: 0.5, share });
+  const withMotion = (motion: unknown) => safeParse(NeutralModelSchema, { ...model, motion }).success;
+
+  it('holds each stage to a share above 0 and the shares to a sum of 1', () => {
+    expect(withMotion([slide(0.25), slide(0.75)])).toBe(true);
+    expect(withMotion([slide(0), slide(1)])).toBe(false);
+    expect(withMotion([slide(0.25), slide(0.5)])).toBe(false);
+  });
+});
+
 describe('material table', () => {
   it('requires valid appearance and rejects retired density inputs', () => {
     const material = {
