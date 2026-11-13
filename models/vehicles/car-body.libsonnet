@@ -2,7 +2,8 @@
 // stays pressed for its body and fitted at the vehicle origin. `s.boot` gives a fixed rear screen and a boot lid
 // in place of a tailgate; `s.twoDoor` drops the rear doors, so a long front door and a fixed quarter light stand
 // ahead of a solid rear quarter. `s.rearDoorFront` stops the rear door short of the B-pillar, for a stretch section
-// its own vehicle presses between them. `s.sideGlass` tints all but the windscreen. `s.open` leaves a windscreen and its header over a waist-high body, side glass wound down, for a hood its own vehicle presses. `s.cab` ends the body at a back wall at `s.tailWaist`, for a load bed that its
+// its own vehicle presses between them. `s.slidingRearDoor` marks a rear door that slides on a track rather than swinging,
+// so it carries no hinge pins and, having no kind of motion that slides then swings, stays still. `s.sideGlass` tints all but the windscreen. `s.open` leaves a windscreen and its header over a waist-high body, side glass wound down, for a hood its own vehicle presses. `s.cab` ends the body at a back wall at `s.tailWaist`, for a load bed that its
 // own vehicle presses behind it. `s.lift` raises everything the measures do not name, for a tall body.
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -32,6 +33,7 @@ local pressings(id, title, s) = {
   local twoDoor = std.get(s, 'twoDoor', false),
   local boot = std.get(s, 'boot', false),
   local cab = std.get(s, 'cab', false),
+  local slidingRearDoor = std.get(s, 'slidingRearDoor', false),
   local lift = std.get(s, 'lift', 0),
   local grille = std.get(s, 'grilleHalf', 0.42),
   // `s.blankNose` closes the grille in body paint for a car with no radiator to feed; `s.grilleShut` closes that fraction
@@ -218,7 +220,8 @@ local pressings(id, title, s) = {
       box('trim', 'trim', [if std.get(s, 'archLiner', false) then s.rearDoorArch + 0.02 else s.cWaist + 0.02, s.floor + 0.02, s.skin - 0.03], [rearDoorFront - 0.02, s.waist - 0.02, s.skin]),
     ] + shape.side('glass', 'glass', [[s.cWaist, s.waist], [rearDoorFront, s.waist], [rearDoorFront, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist), windowTop]], paneZ) + [
       box('handle', 'trim', [s.cWaist + 0.08, s.waist - 0.11, s.side - 0.01], [s.cWaist + 0.2, s.waist - 0.08, s.side + 0.002]),
-    ] + doorPins(rearDoorFront), doorFinish, motion=k.motion.hinge(doorPins(rearDoorFront), 'out', opens.door)),
+    ] + (if slidingRearDoor then [] else doorPins(rearDoorFront)), doorFinish,
+    motion=if slidingRearDoor then null else k.motion.hinge(doorPins(rearDoorFront), 'out', opens.door)),
   ]) + (if cab then [] else if boot then [
     // Separate hinge leaves sit under the lid, inboard of the gutter; its full-width skin edge is not a hinge pin.
     local hingeHalf = s.glassIn * 0.7;
