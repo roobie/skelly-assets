@@ -187,6 +187,9 @@ const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
 export const shareStages = (stages: readonly StageMove[], hull: readonly Vec3[]): Motion => {
   const distances = stages.map((stage) => stageDistance(stage, hull));
   const total = distances.reduce((sum, distance) => sum + distance, 0);
+  if (!(total > 0)) {
+    throw new Error('the motion moves no point of the part, so it has no clock to share');
+  }
   return stages.map((stage, i) => ({ ...stage, share: distances[i]! / total })) as unknown as Motion;
 };
 
