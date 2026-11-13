@@ -3,7 +3,7 @@
 // in place of a tailgate; `s.twoDoor` drops the rear doors, so a long front door and a fixed quarter light stand
 // ahead of a solid rear quarter. `s.rearDoorFront` stops the rear door short of the B-pillar, for a stretch section
 // its own vehicle presses between them. `s.slidingRearDoor` marks a rear door that slides on a track rather than swinging,
-// so it carries no hinge pins and, having no kind of motion that slides then swings, stays still. `s.sideGlass` tints all but the windscreen. `s.open` leaves a windscreen and its header over a waist-high body, side glass wound down, for a hood its own vehicle presses. `s.cab` ends the body at a back wall at `s.tailWaist`, for a load bed that its
+// so it carries no hinge pins and stays still until the staged door motions of roobie/skelly-assets#201 move it. `s.sideGlass` tints all but the windscreen. `s.open` leaves a windscreen and its header over a waist-high body, side glass wound down, for a hood its own vehicle presses. `s.cab` ends the body at a back wall at `s.tailWaist`, for a load bed that its
 // own vehicle presses behind it. `s.lift` raises everything the measures do not name, for a tall body.
 local k = import 'kit.libsonnet';
 local box = k.box;
