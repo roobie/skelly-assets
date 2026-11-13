@@ -93,7 +93,7 @@ local opens = { door: 65, bonnet: 55, tailgate: 85 };
 // Side doors hinge on pins at the outer corner of their leading edge, the handle near the trailing one; the far
 // doors are the near ones reflected. `glass` runs from the trailing edge at the waist, counterclockwise.
 local door(id, massKg, lower, glass) =
-  local pins = kit.hingePins('hinge', 'trim', 'y', [glass[1][0], hb.floor + 0.2 * (hb.waist - hb.floor), hb.side], [glass[1][0], hb.floor + 0.8 * (hb.waist - hb.floor), hb.side]);
+  local pins = kit.hingePins('hinge', 'y', [glass[1][0], hb.floor + 0.2 * (hb.waist - hb.floor), hb.side], [glass[1][0], hb.floor + 0.8 * (hb.waist - hb.floor), hb.side]);
   compound(id, massKg, lower + [
     box('trim', 'trim', [glass[0][0] + 0.02, hb.floor + 0.02, hb.skin - 0.03], [glass[1][0] - 0.02, hb.waist - 0.02, hb.skin]),
     prism('glass', 'glass', glass, [hb.skin, hb.skin + 0.01]),
@@ -108,7 +108,7 @@ local rearDoor = door('hatchback_rear_door', 20, [
 ], [[hb.cWaist, hb.waist], [hb.bRear, hb.waist], [hb.bRear, doorWindowTop], [hb.cWaist + (doorWindowTop - hb.waist) * hb.cLean / (hb.roof - hb.waist), doorWindowTop]]) + { title: 'Hatchback rear door' };
 
 // The whole rear opening, glass and all, lifts as one about pins at the roof's rear edge.
-local tailgatePins = kit.hingePins('hinge', 'trim', 'z', [hb.roofRear + 0.03, hb.roof, 0.7 * hb.hatchSide], [hb.roofRear + 0.03, hb.roof, -0.7 * hb.hatchSide]);
+local tailgatePins = kit.hingePins('hinge', 'z', [hb.roofRear + 0.03, hb.roof, 0.7 * hb.hatchSide], [hb.roofRear + 0.03, hb.roof, -0.7 * hb.hatchSide]);
 local tailgate = compound('hatchback_tailgate', 16, [
   box('skin', 'paint', [-2.02, 0.62, -hb.hatchSide], [hb.tailWaist, hb.waist, hb.hatchSide]),
   prism('glass', 'glass', [[hb.tailWaist - 0.01, hb.waist], [hb.tailWaist + 0.03, hb.waist], [hb.tailWaist + 0.03 + hb.dLean, hb.roof], [hb.tailWaist - 0.01 + hb.dLean, hb.roof]], [-hb.hatchSide + 0.02, hb.hatchSide - 0.02]),
@@ -119,7 +119,7 @@ local windscreen = compound('hatchback_windscreen', 11, [
   prism('glass', 'glass', [[hb.cowl, hb.waist], [hb.cowl + 0.06, hb.waist], [hb.cowl + 0.06 - hb.aLean, hb.roof], [hb.cowl - hb.aLean, hb.roof]], [-(hb.glassIn - 0.02), hb.glassIn - 0.02]),
 ], { glass: 'glass-clear' }) + { title: 'Hatchback windscreen' };
 // The bonnet hinges at its rear edge, on pins under it inboard of the wings.
-local bonnetPins = kit.hingePins('hinge', 'paint', 'z', [hb.aPost, hb.hood(hb.aPost) - 0.02, 0.7 * hb.glassIn], [hb.aPost, hb.hood(hb.aPost) - 0.02, -0.7 * hb.glassIn]);
+local bonnetPins = kit.hingePins('hinge', 'z', [hb.aPost, hb.hood(hb.aPost) - 0.02, 0.7 * hb.glassIn], [hb.aPost, hb.hood(hb.aPost) - 0.02, -0.7 * hb.glassIn]);
 local bonnet = compound('hatchback_bonnet', 12, [
   prism('skin', 'paint', [[hb.aPost, hb.hood(hb.aPost) - 0.02], [2.0, hb.hood(2.0) - 0.02], [2.0, hb.hood(2.0)], [hb.aPost, hb.hood(hb.aPost)]], [-0.76, 0.76]),
 ] + bonnetPins, { paint: 'paint-oxblood' }, motion=kit.motion.hinge(bonnetPins, 'up', opens.bonnet)) + { title: 'Hatchback bonnet' };
@@ -377,7 +377,7 @@ local hoistRoof = hpart('hoist_roof', 30, [
   hbox('headliner', 'headliner', [135, 66, 8], [183, 67, 56]),
 ]) + { title: 'Hoist truck roof' };
 // The door hinges on pins at the outer corner of its leading edge, against the A-post.
-local hoistDoorPins = kit.hingePins('hinge', 'trim', 'y', ht.at([183, 32 + 0.2 * 14, 61]), ht.at([183, 32 + 0.8 * 14, 61]));
+local hoistDoorPins = kit.hingePins('hinge', 'y', ht.at([183, 32 + 0.2 * 14, 61]), ht.at([183, 32 + 0.8 * 14, 61]));
 local hoistDoor = hpart('hoist_door', 30, [
   hbox('skin', 'paint', [138, 32, 57], [183, 46, 61]),
   hbox('card', 'card', [138, 32, 56], [183, 46, 57]),

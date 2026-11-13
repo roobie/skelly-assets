@@ -78,7 +78,7 @@ local pressings(id, title, s) = {
   local paneZ = [s.skin + 0.01 - 2 * grain, s.skin + 0.01],
   // The rear arch's forward corner rides on the rear door wherever the door reaches over the arch.
   local hasDoorCorner = !twoDoor && s.rearDoor < s.rearDoorArch,
-  local doorPins(front) = k.hingePins('hinge', 'trim', 'y', [front, s.floor + 0.2 * (s.waist - s.floor), s.side], [front, s.floor + 0.8 * (s.waist - s.floor), s.side]),
+  local doorPins(front) = k.hingePins('hinge', 'y', [front, s.floor + 0.2 * (s.waist - s.floor), s.side], [front, s.floor + 0.8 * (s.waist - s.floor), s.side]),
   local rows = [
     part('_shell', 'shell', s.shellMass, [
       box('floor_pan', 'pan', [s.rearFloorFront, 0.2 + lift, -s.skin], [s.cowl, s.floor, s.skin]),
@@ -158,7 +158,7 @@ local pressings(id, title, s) = {
     part('_windscreen', 'windscreen', 12, [
     ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - s.aLean, s.roof], [s.cowl - s.aLean, s.roof]], s.glassIn - 0.02), { glass: 'glass-clear' }),
     // The bonnet hinges at its rear edge, on pins under it inboard of the wings.
-    local bonnetPins = k.hingePins('hinge', 'paint', 'z', [s.aPost, hood(s.aPost) - bonnetThick, 0.7 * s.glassIn], [s.aPost, hood(s.aPost) - bonnetThick, -0.7 * s.glassIn]);
+    local bonnetPins = k.hingePins('hinge', 'z', [s.aPost, hood(s.aPost) - bonnetThick, 0.7 * s.glassIn], [s.aPost, hood(s.aPost) - bonnetThick, -0.7 * s.glassIn]);
     part('_bonnet', 'bonnet', 13, [
       prism('skin', 'paint', [[s.aPost, hood(s.aPost) - bonnetThick], [nose, hood(nose) - bonnetThick], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-s.skin, s.skin]),
     ] + bonnetPins + (if std.get(s, 'scoop', false) then [
@@ -231,7 +231,7 @@ local pressings(id, title, s) = {
     ]) + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), motion=k.motion.hinge(['hinge_pivot_near', 'hinge_pivot_far'], 'up', opens.bootLid)),
   ] else [
     // The whole rear opening, glass and all, lifts as one about pins at the roof's rear edge.
-    local tailgatePins = k.hingePins('hinge', 'trim', 'z', [roofRear + 0.03, s.roof, 0.7 * s.hatchSide], [roofRear + 0.03, s.roof, -0.7 * s.hatchSide]);
+    local tailgatePins = k.hingePins('hinge', 'z', [roofRear + 0.03, s.roof, 0.7 * s.hatchSide], [roofRear + 0.03, s.roof, -0.7 * s.hatchSide]);
     part('_tailgate', 'tailgate', 18, [
       box('skin', 'paint', [s.rear + 0.05, 0.62 + lift, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),

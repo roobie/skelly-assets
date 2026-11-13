@@ -141,9 +141,11 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       { kind: 'slide', toward: toward, travel: travel },
   },
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
-  // turning in its socket keeps the same depth all through the swing. A radius of one grain sinks a pin no deeper
-  // than contact into a neighbour, so pins never trip the overlap check of docs/decisions/0014-site-overlap.md.
-  hingePins(name, slot, axis, a, b, radius=vehicleGrain, length=2 * vehicleGrain):
+  // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a
+  // neighbour's face sinks at most a grain into it, which the overlap check of docs/decisions/0014-site-overlap.md
+  // counts as contact. Pins take the part's `paint` slot unless `slot` names another, so by default they read as part of
+  // the panel they carry rather than as fittings of their own.
+  hingePins(name, axis, a, b, slot='paint', radius=vehicleGrain, length=2 * vehicleGrain):
     local along = { x: 0, y: 1, z: 2 }[axis];
     assert std.all([i == along || a[i] == b[i] for i in [0, 1, 2]]) : name + ' pins must lie on one line along ' + axis;
     assert a[along] != b[along] : name + ' pins must not coincide';
