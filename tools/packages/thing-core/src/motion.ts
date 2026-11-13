@@ -210,9 +210,10 @@ const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
 };
 
 /**
- * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. Each stage runs linearly through its
- * share of the clock once the stages before it have finished. Every stage is given in the part's rest frame and the
- * first carries the rest, so the last stage moves the point first and the first stage moves it last.
+ * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. In time, the first stage runs first:
+ * each runs linearly through its share of the clock once the stages before it have finished. In space, the first
+ * stage is the outermost transform: every stage is given in the part's rest frame and carries the stages after it,
+ * so a point is put through the last stage's transform first and the first stage's last.
  */
 export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => {
   const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
