@@ -148,11 +148,11 @@ local chest(open, locked) =
     exportMass: 'parts',
     voxelGrain: 0.006,
     parts: [
-      h.part('body', 'compound', m.mass.body, { pieces: body }, { wood: 'wood-oak', backing: 'wood-walnut', iron: 'iron-cast', lock: 'brass-dull', shackle: 'steel-grey' }, [
+      h.part('body', 'compound', m.mass.body, { pieces: body }, { wood: 'wood-weathered', backing: 'bark', iron: 'iron-cast', lock: 'brass-dull', shackle: 'steel-grey' }, [
         // Opening turns the lid's front up about the hinge line, a turn about -x.
         h.port('lid', 'female', [0, hinge.y, hinge.z], [0, cosd(open), -sind(open)]),
       ]),
-      h.part('lid', 'compound', m.mass.lid, { pieces: [inLid(p) for p in lid] }, { wood: 'wood-oak', backing: 'wood-walnut', iron: 'iron-cast' }, [
+      h.part('lid', 'compound', m.mass.lid, { pieces: [inLid(p) for p in lid] }, { wood: 'wood-weathered', backing: 'bark', iron: 'iron-cast' }, [
         h.port('body', 'male', [0, 0, 0], [0, -1, 0]),
       ]),
     ],
