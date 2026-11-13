@@ -1,6 +1,6 @@
-import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import { dot, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { describe, expect, it } from 'vitest';
-import { type AnalyticPiece, hingeSense, mirrorMotion, pinAxis, posePoint } from '../src/motion.ts';
+import { type AnalyticPiece, hingeSense, mirrorMotion, pinAxis, posePoint, TOWARD } from '../src/motion.ts';
 import type { Motion } from '../src/schema.ts';
 
 const grain = 0.03125;
@@ -32,7 +32,10 @@ describe('hinge sense', () => {
   const centre: Vec3 = [0, 0.5, -0.5];
 
   it('takes the sense that swings the centre toward the hint', () => {
-    expect(hingeSense(axis, centre, 'out', grain)).toBe(-hingeSense(axis, centre, 'in', grain));
+    for (const toward of ['out', 'in'] as const) {
+      const opened = posePoint({ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30 }, centre);
+      expect(dot(sub(opened, centre), TOWARD[toward]), toward).toBeGreaterThan(0);
+    }
   });
 
   it('fails a hint across the swing, which neither sense moves toward', () => {
@@ -44,12 +47,6 @@ describe('mirrored motion', () => {
   const reflect = ([x, y, z]: Vec3): Vec3 => [-x, y, z];
   const door: Motion = { kind: 'hinge', axis: { from: [-0.9, 0.4, 1], to: [-0.9, 1.2, 1] }, angle: 65 };
   const leaf: Vec3 = [-0.9, 0.8, 0.2];
-
-  it('swings the far twin the opposite way across the centre plane', () => {
-    const opened = posePoint(door, leaf)[0] - leaf[0];
-    const twinOpened = posePoint(mirrorMotion(door), reflect(leaf))[0] - reflect(leaf)[0];
-    expect(opened * twinOpened).toBeLessThan(0);
-  });
 
   it('poses the far twin at its stop where the reflection of the near part lies', () => {
     const twin = posePoint(mirrorMotion(door), reflect(leaf));

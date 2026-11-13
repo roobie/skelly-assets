@@ -25,7 +25,7 @@ const show = () => {
   try {
     const row = rows.find(({ id }) => id === select.value)!;
     const item = catalogue.items.find(({ id }) => id === row.source)!;
-    const { report } = buildItem(item, catalogue, row.voxel);
+    const { report } = buildItem(item, catalogue);
     const { physical } = exportItem(item, catalogue, recipeAsset(row), row.voxel);
     const layers = buildLayers(
       report,
