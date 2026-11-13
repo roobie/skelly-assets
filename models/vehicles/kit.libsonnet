@@ -129,8 +129,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
   // How a part moves, for `compound`'s `motion`: a list of stages run one after another, so motions join with `+`.
   // Each is a hinge turning on its drawn pins, given as pieces or their ids, and opening `open` degrees toward one of
-  // `towards`; or a slide `travel` m toward one. A direction is fixed in the model frame, near being the side fore × up
-  // points to, wherever the part is drawn or placed.
+  // `towards`; or a slide `travel` m toward one. A direction is read in the part's model frame at rest, near being the
+  // side fore × up points to, wherever the part is drawn: a later stage's direction turns with the stages before it,
+  // and a mirrored placement turns near into far.
   motion: {
     hinge(pins, toward, open):
       assert std.isArray(pins) && std.length(pins) > 0 : 'a hinge needs its pins';

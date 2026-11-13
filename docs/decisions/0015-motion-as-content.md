@@ -30,9 +30,10 @@ own.
   turns along its one longest side.
 - **The sense is a hint, the sign is derived.** The row says which way the part opens, as up, down, fore, rear, near
   or far, and the build picks the sign that carries the part's centre that way, failing when neither does clearly. A
-  hand-written sign would be wrong for half the parts drawn the other way round. Each direction is fixed in the model
-  frame, near being the side fore × up points to, so a hint means the same wherever the part is drawn about its own
-  origin; a far twin opens the reflected way because its motion is mirrored, not because its hint is reread.
+  hand-written sign would be wrong for half the parts drawn the other way round. A hint is read in the part's model
+  frame at rest, near being the side fore × up points to, so it means the same wherever the part is drawn about its
+  own origin. A later stage's hint is read before the stages ahead of it move the part, so they turn it with
+  everything else, and a mirrored placement turns near into far because its motion is the reflected one.
 - **The stop is authored.** The open angle or slide travel is a design number in the part's row, or a parameter of
   the template that owns the family, never solved into source and never held by a tool. A part shared across vehicles
   has one stop; a vehicle that needs another uses a variant row.
