@@ -51,6 +51,11 @@ const FinishSchema = pipe(
     /** A tint the surface reflects at grazing angles, such as a coated lens; omitted reflects untinted. */
     sheen: optional(strictObject({ colour: Colour, roughness: Fraction })),
     fabric: optional(FabricSchema),
+    /**
+     * A clear layer over the paint for renderers that can draw one. `metallic` replaces the finish's own under
+     * the coat, because an uncoated finish may fake its gloss with metalness; the finish's own serves the rest.
+     */
+    clearcoat: optional(strictObject({ amount: Fraction, roughness: Fraction, metallic: Fraction })),
   }),
   check(
     ({ fabric, metallic, sheen }) => fabric === undefined || (metallic === 0 && sheen !== undefined),
@@ -64,12 +69,12 @@ export type MaterialDef = InferOutput<typeof MaterialSchema>;
 export type FabricDef = NonNullable<MaterialDef['finish']['fabric']>;
 
 /**
- * How every renderer draws a finish's see-through and sheen, so a model looks the same in each. A see-through
+ * How every renderer draws a finish's see-through, sheen and coat, so a model looks the same in each. A see-through
  * surface writes no depth, because that would hide what lies behind it from later draws.
  */
 export const surfaceOf = (finish: MaterialDef['finish']) => {
   const opacity = finish.opacity ?? 1;
-  return { opacity, transparent: opacity < 1, depthWrite: opacity >= 1, sheen: finish.sheen };
+  return { opacity, transparent: opacity < 1, depthWrite: opacity >= 1, sheen: finish.sheen, clearcoat: finish.clearcoat };
 };
 export const MaterialReferenceSchema = strictObject({
   materialId: pipe(string(), nonEmpty()),
