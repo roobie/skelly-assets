@@ -16,7 +16,7 @@ local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', 
     parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] } + paintable(dimensions, finish)],
     connections: [],
     anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
-  } + (if motion == null then {} else { motion: motion { part: 'body' } });
+  } + (if motion == null then {} else { motion: { part: 'body', stages: motion } });
 local towards = ['up', 'down', 'fore', 'rear', 'in', 'out'];
 local vehicleGrain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
 // A z prism's profile is (x, y), an x prism's (y, z), a y prism's (z, x); a turned profile is (axial, radial) and closes on itself.
@@ -127,18 +127,19 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // The x of a fork raked back from its axle at (axle, hub), `rake` m for each metre it rises.
   forkX(axle, hub, rake): function(y) axle - (y - hub) * rake,
   compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
-  // How a part moves, for `compound`'s `motion`: a hinge turning on its drawn pins, given as pieces or their ids, and
-  // opening `open` degrees toward one of `towards`; or a slide `travel` m toward one.
+  // How a part moves, for `compound`'s `motion`: a list of stages run one after another, so motions join with `+`.
+  // Each is a hinge turning on its drawn pins, given as pieces or their ids, and opening `open` degrees toward one of
+  // `towards`; or a slide `travel` m toward one.
   motion: {
     hinge(pins, toward, open):
       assert std.isArray(pins) && std.length(pins) > 0 : 'a hinge needs its pins';
       assert std.member(towards, toward) : 'a hinge opens toward one of ' + std.join(' ', towards) + ', not ' + toward;
       assert std.isNumber(open) && open > 0 && open <= 180 : 'a hinge opens more than 0 and at most 180 degrees';
-      { kind: 'hinge', pins: [if std.isString(pin) then pin else pin.id for pin in pins], toward: toward, open: open },
+      [{ kind: 'hinge', pins: [if std.isString(pin) then pin else pin.id for pin in pins], toward: toward, open: open }],
     slide(toward, travel):
       assert std.member(towards, toward) : 'a slide moves toward one of ' + std.join(' ', towards) + ', not ' + toward;
       assert std.isNumber(travel) && travel > 0 : 'a slide travels a positive distance';
-      { kind: 'slide', toward: toward, travel: travel },
+      [{ kind: 'slide', toward: toward, travel: travel }],
   },
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
   // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a

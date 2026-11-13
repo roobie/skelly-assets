@@ -3,7 +3,7 @@ read_if:
   - authoring a vehicle part that opens, swings or slides, such as a door, lid, tailgate or bonnet
   - drawing hinge pins, or choosing how far a part opens
   - reading a model's `motion` in a consumer, or placing a mirrored part that moves
-  - adding a kind of motion that one hinge or one slide cannot describe
+  - adding a kind of motion, or a part that moves in several stages
 ---
 
 # 15. A part's motion is content, derived from the pins it is drawn with
@@ -35,11 +35,18 @@ own.
 - **The stop is authored.** The open angle or slide travel is a design number in the part's row, or a parameter of
   the template that owns the family, never solved into source and never held by a tool. A part shared across vehicles
   has one stop; a vehicle that needs another uses a variant row.
-- **Mirroring is not stored.** A far twin is the near part reflected, so its motion is the reflected motion; see
-  `tools/packages/thing-core/src/motion.ts`, `mirrorMotion`. Storing both would let them disagree.
-- **One rigid stage per kind.** A hinge or a slide; a part whose motion has several stages, such as a roller
-  shutter, a plug door or a folding door, stays static until it has a kind of its own, rather than claim a motion
-  it does not have.
+- **Mirroring is not stored.** A far twin is the near part reflected, so its motion is the reflected motion, stage by
+  stage; see `tools/packages/thing-core/src/motion.ts`, `mirrorMotion`. Storing both would let them disagree.
+- **A motion is a sequence of rigid stages.** Each stage is a hinge or a slide, so a plug door is a slide out then a
+  slide along, with no new kind for each mechanism, which would each need its own schema, sense rule, check and
+  reader. Every stage is given in the part's rest frame and the first carries the rest, so a consumer nests one group
+  per stage, the first outermost, and the build never poses pins through earlier stages; see
+  `tools/packages/thing-core/src/motion.ts`, `posePoint`.
+- **The clock is shared by distance.** Stages run one after another on one clock from rest to stop, and the build
+  gives each the share its distance is of the whole, a slide its travel and a hinge the arc its part's furthest rest
+  corner sweeps; see `tools/packages/thing-core/src/motion.ts`, `shareStages`. Equal shares would give a few centimetres
+  of plug-out the same time as a metre of slide. Only the build has the pins and bounds, so it exports the shares and
+  no consumer can derive different ones.
 
 Pivots are not attach points, so a part with a motion has no hinge anchors. A part row has hinge anchors or a motion,
 never both; a row that declares no motion keeps whatever hinge anchors it has.

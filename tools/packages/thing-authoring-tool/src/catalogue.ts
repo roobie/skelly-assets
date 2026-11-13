@@ -4,7 +4,7 @@ import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/constr
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
-import { hingeSense, piecesCentre, pinAxis, requireNearSide, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
+import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, requireNearSide, shareStages, type StageMove, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
 import {
   ModelPointSchema,
   type Motion,
@@ -145,21 +145,28 @@ const ItemSchema = pipe(
     /** Named datums on solids, exported as the model's anchors. */
     anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
     /**
-     * How the item moves on whatever carries it, from rest to its authored stop: a hinge turning on pins drawn on a
-     * compound part, toward a direction, or a slide along one. Exported in the model frame; see
-     * `docs/decisions/0015-motion-as-content.md`.
+     * How a compound part of the item moves on whatever carries it, from rest to its authored stop, in stages run one
+     * after another: a hinge turning on pins drawn on the part, toward a direction, or a slide along one. Exported in
+     * the model frame; see `docs/decisions/0015-motion-as-content.md`.
      */
     motion: optional(
-      variant('kind', [
-        strictObject({
-          kind: literal('hinge'),
-          part: name,
-          pins: pipe(array(name), nonEmpty()),
-          toward: picklist(TOWARDS),
-          open: OpenAngleSchema,
-        }),
-        strictObject({ kind: literal('slide'), part: name, toward: picklist(TOWARDS), travel: positive }),
-      ]),
+      strictObject({
+        part: name,
+        stages: pipe(
+          array(
+            variant('kind', [
+              strictObject({
+                kind: literal('hinge'),
+                pins: pipe(array(name), nonEmpty()),
+                toward: picklist(TOWARDS),
+                open: OpenAngleSchema,
+              }),
+              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive }),
+            ]),
+          ),
+          nonEmpty(),
+        ),
+      }),
     ),
     /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
     display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
@@ -377,13 +384,14 @@ export const itemMotion = (
   const { metresPerUnit } = settings.units;
   const place = (point: Vec3): Vec3 => scale(applyPoint(placed.get(part.id)!, point), metresPerUnit);
   const pieces = compoundPieces(part.params);
-  try {
-    const centre = place(piecesCentre(pieces));
-    requireNearSide(centre, authored.toward, grain);
-    if (authored.kind === 'slide') {
-      return { kind: 'slide', direction: TOWARD[authored.toward], travel: authored.travel * metresPerUnit };
+  const rest = piecesBounds(pieces);
+  const centre = place(centreOf(rest));
+  const stage = (step: (typeof authored.stages)[number]): StageMove => {
+    requireNearSide(centre, step.toward, grain);
+    if (step.kind === 'slide') {
+      return { kind: 'slide', direction: TOWARD[step.toward], travel: step.travel * metresPerUnit };
     }
-    const pins = authored.pins.map((id) => {
+    const pins = step.pins.map((id) => {
       const pin = pieces.find((piece) => piece.id === id);
       if (!pin) {
         throw new Error(`pin ${id} is not a piece of ${part.id}`);
@@ -392,7 +400,10 @@ export const itemMotion = (
     });
     const drawnOn = pinAxis(pins, grain / metresPerUnit);
     const axis = { from: place(drawnOn.from), to: place(drawnOn.to) };
-    return { kind: 'hinge', axis, angle: hingeSense(axis, centre, authored.toward, grain) * authored.open };
+    return { kind: 'hinge', axis, angle: hingeSense(axis, centre, step.toward, grain) * step.open };
+  };
+  try {
+    return shareStages(authored.stages.map(stage), cornersOf(rest).map(place));
   } catch (failure) {
     throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
   }

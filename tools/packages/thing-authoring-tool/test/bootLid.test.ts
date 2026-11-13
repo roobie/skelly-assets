@@ -34,9 +34,11 @@ it('hinges the boot lid on its drawn inboard pivots, lifting its tail', () => {
   const skin = inModel('skin');
   const motion = modelEntry.motion!;
   expect(modelEntry.anchors?.['hinge_a']).toBeUndefined();
-  expect(motion.kind).toBe('hinge');
-  if (motion.kind !== 'hinge') return;
-  for (const [end, pivot] of [[motion.axis.from, inModel('hinge_pivot_near')], [motion.axis.to, inModel('hinge_pivot_far')]] as const) {
+  expect(motion).toHaveLength(1);
+  const hinge = motion[0]!;
+  expect(hinge.kind).toBe('hinge');
+  if (hinge.kind !== 'hinge') return;
+  for (const [end, pivot] of [[hinge.axis.from, inModel('hinge_pivot_near')], [hinge.axis.to, inModel('hinge_pivot_far')]] as const) {
     end.forEach((value, axis) => {
       expect(value).toBeGreaterThanOrEqual(pivot.min[axis]!);
       expect(value).toBeLessThanOrEqual(pivot.max[axis]!);

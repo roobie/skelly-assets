@@ -1,7 +1,7 @@
 // How a part moves on its carrier, derived from the pins it is drawn with so the axis the game plays is the axis a
 // check proves; see docs/decisions/0015-motion-as-content.md.
 import { cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
-import type { HingeAxis, Motion } from './schema.ts';
+import type { HingeAxis, Motion, MotionStage } from './schema.ts';
 
 /**
  * Which way a part opens or slides, in the model frame. Out is the near side, fore × up, where a part a pair of sites
@@ -72,15 +72,20 @@ export const pieceBounds = (piece: AnalyticPiece): Bounds => {
   return boundsOf(lows, highs);
 };
 
-/** The centre of the bounds the pieces fill together, the point a hinge's sense is judged by. */
-export const piecesCentre = (pieces: readonly AnalyticPiece[]): Vec3 => {
+/** The bounds the pieces fill together. */
+export const piecesBounds = (pieces: readonly AnalyticPiece[]): Bounds => {
   const all = pieces.map(pieceBounds);
-  const mid = (axis: number) =>
-    (Math.min(...all.map(({ min }) => min[axis]!)) + Math.max(...all.map(({ max }) => max[axis]!))) / 2;
-  return [mid(0), mid(1), mid(2)];
+  return boundsOf(
+    [0, 1, 2].map((axis) => Math.min(...all.map(({ min }) => min[axis]!))),
+    [0, 1, 2].map((axis) => Math.max(...all.map(({ max }) => max[axis]!))),
+  );
 };
 
-const centreOf = ({ min, max }: Bounds): Vec3 => scale([min[0] + max[0], min[1] + max[1], min[2] + max[2]], 0.5);
+export const centreOf = ({ min, max }: Bounds): Vec3 => scale([min[0] + max[0], min[1] + max[1], min[2] + max[2]], 0.5);
+
+/** The eight corners of `bounds`. */
+export const cornersOf = ({ min, max }: Bounds): Vec3[] =>
+  [0, 1, 2, 3, 4, 5, 6, 7].map((corner) => [0, 1, 2].map((axis) => ((corner >> axis) & 1 ? max : min)[axis]!) as unknown as Vec3);
 
 /** One pin's own line: a turned or prism piece runs along its declared axis, a box along its unique longest side. */
 const ownDirection = (pin: AnalyticPiece, bounds: Bounds, grain: number): Vec3 => {
@@ -166,22 +171,58 @@ const reflect = ([x, y, z]: readonly [number, number, number]): [number, number,
 
 /** The motion of a far-side twin, which consumers place reflected across the model's x = 0 plane. */
 export const mirrorMotion = (motion: Motion): Motion =>
-  motion.kind === 'hinge'
-    ? { kind: 'hinge', axis: { from: reflect(motion.axis.from), to: reflect(motion.axis.to) }, angle: -motion.angle }
-    : { ...motion, direction: reflect(motion.direction) };
+  motion.map((stage) =>
+    stage.kind === 'hinge'
+      ? { ...stage, axis: { from: reflect(stage.axis.from), to: reflect(stage.axis.to) }, angle: -stage.angle }
+      : { ...stage, direction: reflect(stage.direction) },
+  ) as unknown as Motion;
 
-/** Where a point of the part lies once it has moved `fraction` of the way from rest to its stop. */
-export const posePoint = (motion: Motion, point: Vec3, fraction = 1): Vec3 => {
-  if (motion.kind === 'slide') {
-    const step = motion.travel * fraction;
-    return [point[0] + motion.direction[0] * step, point[1] + motion.direction[1] * step, point[2] + motion.direction[2] * step];
+/** A stage as authored, before the build gives it its share of the clock. */
+export type StageMove = { [Kind in MotionStage['kind']]: Omit<Extract<MotionStage, { kind: Kind }>, 'share'> }[MotionStage['kind']];
+
+/** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
+const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
+  if (stage.kind === 'slide') {
+    return stage.travel;
   }
-  const u = normalize(sub(motion.axis.to, motion.axis.from));
-  const r = sub(point, motion.axis.from);
-  const turn = (motion.angle * fraction * Math.PI) / 180;
+  const u = normalize(sub(stage.axis.to, stage.axis.from));
+  const radius = Math.max(...hull.map((point) => length(cross(u, sub(point, stage.axis.from)))));
+  return (Math.abs(stage.angle) * Math.PI * radius) / 180;
+};
+
+/**
+ * The motion that runs `stages` in order, each through the share of the clock its distance is of theirs together, so
+ * the part keeps one pace from rest to stop. `hull` is the corners of the part's rest bounds in the model frame.
+ */
+export const shareStages = (stages: readonly StageMove[], hull: readonly Vec3[]): Motion => {
+  const distances = stages.map((stage) => stageDistance(stage, hull));
+  const total = distances.reduce((sum, distance) => sum + distance, 0);
+  return stages.map((stage, i) => ({ ...stage, share: distances[i]! / total })) as unknown as Motion;
+};
+
+/** Where one stage carries a point once it has moved `fraction` of the way from rest to its stop. */
+const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
+  if (stage.kind === 'slide') {
+    const step = stage.travel * fraction;
+    return [point[0] + stage.direction[0] * step, point[1] + stage.direction[1] * step, point[2] + stage.direction[2] * step];
+  }
+  const u = normalize(sub(stage.axis.to, stage.axis.from));
+  const r = sub(point, stage.axis.from);
+  const turn = (stage.angle * fraction * Math.PI) / 180;
   const [c, s] = [Math.cos(turn), Math.sin(turn)];
   // Rodrigues' rotation of the offset from the axis.
   const across = cross(u, r);
   const kept = dot(u, r) * (1 - c);
-  return [0, 1, 2].map((i) => motion.axis.from[i]! + r[i]! * c + across[i]! * s + u[i]! * kept) as unknown as Vec3;
+  return [0, 1, 2].map((i) => stage.axis.from[i]! + r[i]! * c + across[i]! * s + u[i]! * kept) as unknown as Vec3;
+};
+
+/**
+ * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. Each stage runs linearly through its
+ * share of the clock once the stages before it have finished. Every stage is given in the part's rest frame and the
+ * first carries the rest, so the last stage moves the point first and the first stage moves it last.
+ */
+export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => {
+  const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
+  const fraction = (i: number) => Math.min(1, Math.max(0, (clock - starts[i]!) / motion[i]!.share));
+  return motion.reduceRight((at, stage, i) => poseStage(stage, at, fraction(i)), point);
 };
