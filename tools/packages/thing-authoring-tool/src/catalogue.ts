@@ -114,80 +114,87 @@ const PartSchema = strictObject({
   ),
   ports: array(PortSchema),
 });
-const ItemSchema = strictObject({
-  id: name,
-  /** What the item is called wherever it is listed or printed; authored, never derived from the id. */
-  title: TitleSchema,
-  exportMass: picklist(['parts', 'inventory-atom']),
-  /**
-   * The axis the row puts its front on, or a held thing its working end, when that is not +z: a kit laid out along
-   * another axis names it once, and the build turns the model onto +z. Defaults to the family's, else +z.
-   */
-  forward: optional(picklist(FORWARDS)),
-  skin: optional(SkinSchema),
-  parts: pipe(
-    array(PartSchema),
-    nonEmpty(),
-    check((parts) => new Set(parts.map(({ id }) => id)).size === parts.length, 'duplicate part id'),
-  ),
-  connections: array(strictObject({ from: name, to: name })),
-  handling: optional(
-    strictObject({
-      ...SolidPointSchema,
-      turn: ModelPointSchema,
-      hold: NeutralModelSchema.entries.hold,
-      rest: NeutralModelSchema.entries.rest,
-      roll: NeutralModelSchema.entries.roll,
-    }),
-  ),
-  covers: optional(NeutralModelSchema.entries.covers),
-  /** Named datums on solids, exported as the model's anchors. */
-  anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
-  /**
-   * How the item moves on whatever carries it, from rest to its authored stop: a hinge turning on pins drawn on a
-   * compound part, toward a direction, or a slide along one. Exported in the model frame; see
-   * `docs/decisions/0015-motion-as-content.md`.
-   */
-  motion: optional(
-    variant('kind', [
-      strictObject({
-        kind: literal('hinge'),
-        part: name,
-        pins: pipe(array(name), nonEmpty()),
-        toward: picklist(TOWARDS),
-        open: OpenAngleSchema,
-      }),
-      strictObject({ kind: literal('slide'), part: name, toward: picklist(TOWARDS), travel: positive }),
-    ]),
-  ),
-  /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
-  display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
-  /**
-   * The face of a solid that carries the item's print, and the print's text, which defaults to the model's title.
-   * The part defaults to the item's first, which is a compound's only one; the top defaults to +y on a side
-   * face, and to the back on the top or bottom face, so the text reads from the front.
-   */
-  label: optional(
-    pipe(
-      strictObject({
-        part: optional(name),
-        solid: name,
-        face: picklist(FACES),
-        up: optional(picklist(FACES)),
-        text: optional(name),
-      }),
-      check(({ face, up }) => up === undefined || up[1] !== face[1], 'label up must be across its face'),
+const ItemSchema = pipe(
+  strictObject({
+    id: name,
+    /** What the item is called wherever it is listed or printed; authored, never derived from the id. */
+    title: TitleSchema,
+    exportMass: picklist(['parts', 'inventory-atom']),
+    /**
+     * The axis the row puts its front on, or a held thing its working end, when that is not +z: a kit laid out along
+     * another axis names it once, and the build turns the model onto +z. Defaults to the family's, else +z.
+     */
+    forward: optional(picklist(FORWARDS)),
+    skin: optional(SkinSchema),
+    parts: pipe(
+      array(PartSchema),
+      nonEmpty(),
+      check((parts) => new Set(parts.map(({ id }) => id)).size === parts.length, 'duplicate part id'),
     ),
+    connections: array(strictObject({ from: name, to: name })),
+    handling: optional(
+      strictObject({
+        ...SolidPointSchema,
+        turn: ModelPointSchema,
+        hold: NeutralModelSchema.entries.hold,
+        rest: NeutralModelSchema.entries.rest,
+        roll: NeutralModelSchema.entries.roll,
+      }),
+    ),
+    covers: optional(NeutralModelSchema.entries.covers),
+    /** Named datums on solids, exported as the model's anchors. */
+    anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
+    /**
+     * How the item moves on whatever carries it, from rest to its authored stop: a hinge turning on pins drawn on a
+     * compound part, toward a direction, or a slide along one. Exported in the model frame; see
+     * `docs/decisions/0015-motion-as-content.md`.
+     */
+    motion: optional(
+      variant('kind', [
+        strictObject({
+          kind: literal('hinge'),
+          part: name,
+          pins: pipe(array(name), nonEmpty()),
+          toward: picklist(TOWARDS),
+          open: OpenAngleSchema,
+        }),
+        strictObject({ kind: literal('slide'), part: name, toward: picklist(TOWARDS), travel: positive }),
+      ]),
+    ),
+    /** The screen's centre on a solid, and the way it faces and its top points in that part's frame. */
+    display: optional(strictObject({ ...SolidPointSchema, normal: ModelPointSchema, up: ModelPointSchema })),
+    /**
+     * The face of a solid that carries the item's print, and the print's text, which defaults to the model's title.
+     * The part defaults to the item's first, which is a compound's only one; the top defaults to +y on a side
+     * face, and to the back on the top or bottom face, so the text reads from the front.
+     */
+    label: optional(
+      pipe(
+        strictObject({
+          part: optional(name),
+          solid: name,
+          face: picklist(FACES),
+          up: optional(picklist(FACES)),
+          text: optional(name),
+        }),
+        check(({ face, up }) => up === undefined || up[1] !== face[1], 'label up must be across its face'),
+      ),
+    ),
+    /** The finish slot that glows while lit; its material must be the only one that slot's finish names in the item. */
+    glow: optional(name),
+    /** The item's own voxel grain in metres, in place of its class grain; the export recipe resolves it. */
+    voxelGrain: optional(positive),
+    /** The voxel class the item is drawn on, in place of its recipe's; the export recipe resolves the name. */
+    voxelClass: optional(name),
+    /** The model's shelf and facet tags; the repository build holds them to its vocabulary, so this tool only carries them. */
+    taxonomy: optional(unknown()),
+  }),
+  // Pivots are not attach points: a part that moves turns on its pins, never on hinge anchors.
+  check(
+    ({ motion, anchors = {} }) => !motion || !('hinge_a' in anchors || 'hinge_b' in anchors),
+    'a row with a motion carries no hinge_a or hinge_b anchor',
   ),
-  /** The finish slot that glows while lit; its material must be the only one that slot's finish names in the item. */
-  glow: optional(name),
-  /** The item's own voxel grain in metres, in place of its class grain; the export recipe resolves it. */
-  voxelGrain: optional(positive),
-  /** The voxel class the item is drawn on, in place of its recipe's; the export recipe resolves the name. */
-  voxelClass: optional(name),
-  /** The model's shelf and facet tags; the repository build holds them to its vocabulary, so this tool only carries them. */
-  taxonomy: optional(unknown()),
-});
+);
 const CatalogueSchema = strictObject({
   units: strictObject({ metresPerUnit: positive, grid: positive, bevel: pipe(number(), finite(), minValue(0)) }),
   facets: pipe(positive, integer(), minValue(3)),
@@ -350,27 +357,28 @@ const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.p
 
 /**
  * The item's motion in the model frame, from the authored shapes of the pins and pieces of its part rather than their
- * voxels, so drawing never moves where the part turns. `place` carries a point of a part into the model frame in
- * metres; the voxel grain is the tolerance the pins are held to.
+ * voxels, so drawing never moves where the part turns. `placed` carries each part into the model frame; the export's
+ * voxel grain, in metres, is the tolerance the pins are held to.
  */
-const partMotion = (
+export const itemMotion = (
   item: ToolItem,
-  authored: NonNullable<ToolItem['motion']>,
-  voxel: VoxelGrains | undefined,
-  place: (part: string, point: Vec3) => Vec3,
-  metresPerUnit: number,
-): Motion => {
+  settings: CatalogueSettings,
+  placed: ReturnType<typeof buildItem>['report']['resolved']['placed'],
+  grain: number,
+): Motion | undefined => {
+  const authored = item.motion;
+  if (!authored) {
+    return undefined;
+  }
   const part = item.parts.find(({ id }) => id === authored.part);
   if (part?.family !== 'compound') {
     throw new Error(`${item.id}: motion part ${authored.part} is not a compound part of the item`);
   }
-  if (!voxel) {
-    throw new Error(`${item.id}: a motion is derived against the export's voxel grain`);
-  }
-  const grain = voxel.voxelGrain;
+  const { metresPerUnit } = settings.units;
+  const place = (point: Vec3): Vec3 => scale(applyPoint(placed.get(part.id)!, point), metresPerUnit);
   const pieces = compoundPieces(part.params);
   try {
-    const centre = place(part.id, piecesCentre(pieces));
+    const centre = place(piecesCentre(pieces));
     requireNearSide(centre, authored.toward, grain);
     if (authored.kind === 'slide') {
       return { kind: 'slide', direction: TOWARD[authored.toward], travel: authored.travel * metresPerUnit };
@@ -383,7 +391,7 @@ const partMotion = (
       return pin;
     });
     const drawnOn = pinAxis(pins, grain / metresPerUnit);
-    const axis = { from: place(part.id, drawnOn.from), to: place(part.id, drawnOn.to) };
+    const axis = { from: place(drawnOn.from), to: place(drawnOn.to) };
     return { kind: 'hinge', axis, angle: hingeSense(axis, centre, authored.toward, grain) * authored.open };
   } catch (failure) {
     throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
@@ -448,17 +456,16 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     }
     return drawn.measure(part, solid);
   };
-  const inModel = (part: string, point: Vec3): Vec3 =>
-    scale(applyPoint(report.resolved.placed.get(part)!, point), settings.units.metresPerUnit);
   const datumAt = (datum: Pick<ToolDatum, 'part' | 'solid' | 'fraction'>): Vec3 => {
     const { min, max } = drawnSolid(datum.part, datum.solid);
-    return inModel(datum.part, min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3);
+    const point = min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3;
+    return scale(applyPoint(report.resolved.placed.get(datum.part)!, point), settings.units.metresPerUnit);
   };
   const directionIn = (part: string, direction: Vec3): Vec3 => {
     const turned = applyDir(report.resolved.placed.get(part)!, direction);
     return scale(turned, 1 / Math.hypot(...turned));
   };
-  let handling: Pick<NeutralModel, 'grip' | 'hold' | 'rest' | 'roll' | 'anchors' | 'display' | 'motion'> = {};
+  let handling: Pick<NeutralModel, 'grip' | 'hold' | 'rest' | 'roll' | 'anchors' | 'display'> = {};
   if (item.handling) {
     const datum = item.handling;
     handling = {
@@ -503,9 +510,6 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     const normal = faceAxis(face);
     const fraction = normal.map((value) => (value + 1) / 2) as [number, number, number];
     label = surfaceOn({ part, solid, fraction }, normal, faceAxis(up));
-  }
-  if (item.motion) {
-    handling = { ...handling, motion: partMotion(item, item.motion, voxel, inModel, settings.units.metresPerUnit) };
   }
   return {
     report,

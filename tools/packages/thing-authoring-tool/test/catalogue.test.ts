@@ -380,3 +380,12 @@ it('exports the player bust with joint anchors that seat the limbs symmetrically
   expect(anchors.shoulder_left![0]).toBeCloseTo(-anchors.shoulder_right![0]);
   expect(anchors.hip_left![0]).toBeCloseTo(-anchors.hip_right![0]);
 });
+
+it('refuses a row that carries both a motion and hinge anchors', () => {
+  const input = fixture();
+  const hinge = { part: 'lower', solid: 'body', fraction: [0, 0, 0] };
+  const motion = { kind: 'hinge', part: 'lower', pins: ['pin'], toward: 'up', open: 30 };
+  const item = { ...input.items[0], motion };
+  expect(() => loadCatalogue({ ...input, items: [item] })).not.toThrow();
+  expect(() => loadCatalogue({ ...input, items: [{ ...item, anchors: { hinge_a: hinge } }] })).toThrow(/hinge_a or hinge_b/);
+});
