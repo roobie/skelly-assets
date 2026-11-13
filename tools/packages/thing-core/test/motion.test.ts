@@ -32,7 +32,7 @@ describe('hinge sense', () => {
   const centre: Vec3 = [0, 0.5, -0.5];
 
   it('takes the sense that swings the centre toward the hint', () => {
-    for (const toward of ['out', 'in'] as const) {
+    for (const toward of ['near', 'far'] as const) {
       const opened = posePoint([{ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30, share: 1 }], centre);
       expect(dot(sub(opened, centre), TOWARD[toward]), toward).toBeGreaterThan(0);
     }

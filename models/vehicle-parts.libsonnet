@@ -98,7 +98,7 @@ local door(id, massKg, lower, glass) =
     box('trim', 'trim', [glass[0][0] + 0.02, hb.floor + 0.02, hb.skin - 0.03], [glass[1][0] - 0.02, hb.waist - 0.02, hb.skin]),
     prism('glass', 'glass', glass, [hb.skin, hb.skin + 0.01]),
     box('handle', 'trim', [glass[0][0] + 0.08, 0.86, hb.side], [glass[0][0] + 0.2, 0.89, hb.side + 0.015]),
-  ] + pins, paintFinish, motion=kit.motion.hinge(pins, 'out', opens.door));
+  ] + pins, paintFinish, motion=kit.motion.hinge(pins, 'near', opens.door));
 local frontDoor = door('hatchback_front_door', 24, [
   box('skin', 'paint', [hb.bFront, hb.floor, hb.skin], [hb.cowl, hb.waist, hb.side]),
 ], [[hb.bFront, hb.waist], [hb.cowl, hb.waist], [hb.cowl - (doorWindowTop - hb.waist) * hb.aLean / (hb.roof - hb.waist), doorWindowTop], [hb.bFront, doorWindowTop]]) + { title: 'Hatchback front door' };
@@ -387,7 +387,7 @@ local hoistDoor = hpart('hoist_door', 30, [
   hbox('frame_front', 'trim', [181, 47, 57], [183, 65, 61]),
   hbox('glass', 'glass', [140, 47, 57], [181, 65, 61]),
   hbox('handle', 'chrome', [140, 40, 61], [145, 41, 62]),
-] + hoistDoorPins, motion=kit.motion.hinge(hoistDoorPins, 'out', opens.door)) + { title: 'Hoist truck door' };
+] + hoistDoorPins, motion=kit.motion.hinge(hoistDoorPins, 'near', opens.door)) + { title: 'Hoist truck door' };
 local hoistFrontBumper = hpart('hoist_front_bumper', 20, [
   hbox('bar', 'trim', [188, 18, 3], [191, 26, 61]),
   hbox('bracket_far', 'chassis', [188, 13, 14], [190, 18, 18]),

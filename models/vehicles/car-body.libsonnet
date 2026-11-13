@@ -153,7 +153,7 @@ local pressings(id, title, s) = {
       box('trim', 'trim', [glass[0][0] + 0.02, s.floor + 0.02, s.skin - 0.03], [glass[1][0] - 0.02, s.waist - 0.02, s.skin]),
     ] + shape.side('glass', 'glass', glass, paneZ) + [
       box('handle', 'trim', [glass[0][0] + 0.08, s.waist - 0.11, s.side - 0.01], [glass[0][0] + 0.2, s.waist - 0.08, s.side + 0.002]),
-    ] + doorPins(glass[1][0]), doorFinish, motion=k.motion.hinge(doorPins(glass[1][0]), 'out', opens.door));
+    ] + doorPins(glass[1][0]), doorFinish, motion=k.motion.hinge(doorPins(glass[1][0]), 'near', opens.door));
     door('_front_door', 'front door', if twoDoor then 34 else 25, [
       box('skin', 'paint', [s.bFront, s.floor, s.skin], [s.cowl, s.waist, s.side]),
     ], [[s.bFront, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [s.bFront, windowTop]]),
@@ -221,7 +221,7 @@ local pressings(id, title, s) = {
     ] + shape.side('glass', 'glass', [[s.cWaist, s.waist], [rearDoorFront, s.waist], [rearDoorFront, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist), windowTop]], paneZ) + [
       box('handle', 'trim', [s.cWaist + 0.08, s.waist - 0.11, s.side - 0.01], [s.cWaist + 0.2, s.waist - 0.08, s.side + 0.002]),
     ] + (if slidingRearDoor then [] else doorPins(rearDoorFront)), doorFinish,
-    motion=if slidingRearDoor then null else k.motion.hinge(doorPins(rearDoorFront), 'out', opens.door)),
+    motion=if slidingRearDoor then null else k.motion.hinge(doorPins(rearDoorFront), 'near', opens.door)),
   ]) + (if cab then [] else if boot then [
     // Separate hinge leaves sit under the lid, inboard of the gutter; its full-width skin edge is not a hinge pin.
     local hingeHalf = s.glassIn * 0.7;

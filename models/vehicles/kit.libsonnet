@@ -17,7 +17,7 @@ local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', 
     connections: [],
     anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
   } + (if motion == null then {} else { motion: { part: 'body', stages: motion } });
-local towards = ['up', 'down', 'fore', 'rear', 'in', 'out'];
+local towards = ['up', 'down', 'fore', 'rear', 'near', 'far'];
 local vehicleGrain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
 // A z prism's profile is (x, y), an x prism's (y, z), a y prism's (z, x); a turned profile is (axial, radial) and closes on itself.
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
@@ -129,7 +129,8 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
   // How a part moves, for `compound`'s `motion`: a list of stages run one after another, so motions join with `+`.
   // Each is a hinge turning on its drawn pins, given as pieces or their ids, and opening `open` degrees toward one of
-  // `towards`; or a slide `travel` m toward one.
+  // `towards`; or a slide `travel` m toward one. A direction is fixed in the model frame, near being the side fore × up
+  // points to, wherever the part is drawn or placed.
   motion: {
     hinge(pins, toward, open):
       assert std.isArray(pins) && std.length(pins) > 0 : 'a hinge needs its pins';

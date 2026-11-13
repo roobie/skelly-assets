@@ -4,7 +4,7 @@ import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/constr
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
-import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, requireNearSide, shareStages, type StageMove, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
+import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, type StageMove, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
 import {
   ModelPointSchema,
   type Motion,
@@ -387,7 +387,6 @@ export const itemMotion = (
   const rest = piecesBounds(pieces);
   const centre = place(centreOf(rest));
   const stage = (step: (typeof authored.stages)[number]): StageMove => {
-    requireNearSide(centre, step.toward, grain);
     if (step.kind === 'slide') {
       return { kind: 'slide', direction: TOWARD[step.toward], travel: step.travel * metresPerUnit };
     }

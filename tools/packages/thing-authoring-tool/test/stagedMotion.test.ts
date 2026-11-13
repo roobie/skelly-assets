@@ -15,7 +15,7 @@ it('runs a plug door out then along at one pace, and its far twin as the reflect
     local k = import 'models/vehicles/kit.libsonnet';
     local frame = import 'models/vehicles/frame.libsonnet';
     frame.rows([k.compound('plug_door', 20, [k.box('panel', 'paint', [-0.5, 0, 0.8], [0.5, 1, 0.85])], { paint: 'paint-silver' },
-      motion=k.motion.slide('out', ${plugOut}) + k.motion.slide('rear', ${along})) + { title: 'Plug door' }])
+      motion=k.motion.slide('near', ${plugOut}) + k.motion.slide('rear', ${along})) + { title: 'Plug door' }])
   `, resolve(import.meta.dirname, '../../../..')));
   const loaded = loadCatalogue({ units: { metresPerUnit: 1, grid: 0.001, bevel: 0 }, facets: 12, defaultMaterial: 'paint-silver', items });
   const item = loaded.items[0]!;

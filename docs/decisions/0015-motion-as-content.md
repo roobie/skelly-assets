@@ -28,10 +28,11 @@ own.
   in its socket keeps the same depth all through the swing, and in the part's own paint unless the author names another
   finish, so a pin reads as part of the panel it carries; see `models/vehicles/kit.libsonnet`, `hingePins`. A box pin
   turns along its one longest side.
-- **The sense is a hint, the sign is derived.** The row says which way the part opens, as up, down, fore, rear, in or
-  out, and the build picks the sign that carries the part's centre that way, failing when neither does clearly. A
-  hand-written sign would be wrong for half the parts drawn the other way round. In and out assume the near-side
-  drawing convention, so a part that opens in or out must be drawn on the near side.
+- **The sense is a hint, the sign is derived.** The row says which way the part opens, as up, down, fore, rear, near
+  or far, and the build picks the sign that carries the part's centre that way, failing when neither does clearly. A
+  hand-written sign would be wrong for half the parts drawn the other way round. Each direction is fixed in the model
+  frame, near being the side fore × up points to, so a hint means the same wherever the part is drawn about its own
+  origin; a far twin opens the reflected way because its motion is mirrored, not because its hint is reread.
 - **The stop is authored.** The open angle or slide travel is a design number in the part's row, or a parameter of
   the template that owns the family, never solved into source and never held by a tool. A part shared across vehicles
   has one stop; a vehicle that needs another uses a variant row.

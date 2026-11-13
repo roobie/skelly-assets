@@ -4,16 +4,16 @@ import { cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/co
 import type { HingeAxis, Motion, MotionStage } from './schema.ts';
 
 /**
- * Which way a part opens or slides, in the model frame. Out is the near side, fore × up, where a part a pair of sites
- * shares is drawn; its far twin is the reflection.
+ * Which way a part opens or slides, fixed in the model frame wherever the part is drawn or placed: near is the side
+ * fore × up points to, and far its reflection.
  */
 export const TOWARD = {
   up: [0, 1, 0],
   down: [0, -1, 0],
   fore: [0, 0, 1],
   rear: [0, 0, -1],
-  out: [-1, 0, 0],
-  in: [1, 0, 0],
+  near: [-1, 0, 0],
+  far: [1, 0, 0],
 } as const satisfies Readonly<Record<string, Vec3>>;
 export type Toward = keyof typeof TOWARD;
 export const TOWARDS = Object.keys(TOWARD) as readonly Toward[];
@@ -155,16 +155,6 @@ export const hingeSense = (axis: HingeAxis, centre: Vec3, toward: Toward, grain:
     throw new Error(`neither sense of the hinge carries the part's centre clearly ${toward}`);
   }
   return along > 0 ? 1 : -1;
-};
-
-/**
- * Throws unless a part that opens in or out lies on the near side, where a part a pair of sites shares is drawn, so
- * its far twin's reflection opens the matching way. `centre` in the model frame, `grain` in metres.
- */
-export const requireNearSide = (centre: Vec3, toward: Toward, grain: number) => {
-  if ((toward === 'in' || toward === 'out') && dot(centre, TOWARD.out) <= grain) {
-    throw new Error(`a part that moves ${toward} must be drawn on the near side`);
-  }
 };
 
 const reflect = ([x, y, z]: readonly [number, number, number]): [number, number, number] => [-x, y, z];
