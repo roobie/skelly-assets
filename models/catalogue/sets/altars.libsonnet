@@ -109,7 +109,7 @@ local wayside = {
   mass: 520,
 };
 
-taxonomy.inherit({ category: 'arcana', tags: { material: ['stone'] }, keywords: ['shrine'] }, [
+taxonomy.inherit({ category: 'arcana', tags: { material: ['stone'] }, keywords: ['shrine', 'religious'] }, [
   // A temple altar 2.1 m across its top slab, on a dais of two steps 2.9 by 2.4 m and 1.32 m tall to the slab: a
   // stone table with a roundel on its front, a cloth laid along its top and hanging over the ends, a candlestick at each
   // end and a bowl of embers between them.
