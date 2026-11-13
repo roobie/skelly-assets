@@ -21,11 +21,13 @@ A part row declares its motion beside its anchors, and the build exports it on t
 `tools/packages/thing-core/src/schema.ts`, `MotionSchema`. Consumers play that record and invent no motion of their
 own.
 
-- **The axis is drawn, never written.** A hinge names the pins it turns on, which are visible round pins on the part,
-  and the axis is derived from their authored shape, not their voxels, so voxel snapping changes how a pin looks but
-  never where the part turns. One shared function derives it, so a later check that the swing clears the vehicle proves
-  the axis the game plays; see `tools/packages/thing-core/src/motion.ts`, `pinAxis`. Pins are round so that a pin
-  turning in its socket keeps the same depth all through the swing.
+- **The axis is drawn, never written.** A hinge names the pins it turns on, pieces drawn on the part, and the axis is
+  derived from their authored shape, not their voxels, so voxel snapping changes how a pin looks but never where the
+  part turns. One shared function derives it, so any check that a swing clears the vehicle proves the axis the game
+  plays; see `tools/packages/thing-core/src/motion.ts`, `pinAxis`. The vehicle kit draws pins round, so a pin turning
+  in its socket keeps the same depth all through the swing, and in the part's own paint unless the author names another
+  finish, so a pin reads as part of the panel it carries; see `models/vehicles/kit.libsonnet`, `hingePins`. A box pin
+  turns along its one longest side.
 - **The sense is a hint, the sign is derived.** The row says which way the part opens, as up, down, fore, rear, in or
   out, and the build picks the sign that carries the part's centre that way, failing when neither does clearly. A
   hand-written sign would be wrong for half the parts drawn the other way round. In and out assume the near-side
@@ -40,7 +42,7 @@ own.
   it does not have.
 
 Pivots are not attach points, so a part with a motion has no hinge anchors. A part row has hinge anchors or a motion,
-never both, until every family has moved to motion.
+never both; a row that declares no motion keeps whatever hinge anchors it has.
 
 ## Consequences
 
