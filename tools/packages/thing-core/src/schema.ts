@@ -19,6 +19,7 @@ import {
   strictObject,
   string,
   tuple,
+  variant,
 } from 'valibot';
 
 export const ModelPointSchema = tuple([pipe(number(), finite()), pipe(number(), finite()), pipe(number(), finite())]);
@@ -108,6 +109,37 @@ const surfaceEntries = {
   size: tuple([pipe(number(), finite(), minValue(0)), pipe(number(), finite(), minValue(0))]),
 };
 
+const positive = pipe(
+  number(),
+  finite(),
+  check((value) => value > 0, 'must be positive'),
+);
+
+/** The authored stop of a hinge in degrees: a part opening further than a half turn would pass through its carrier. */
+export const OpenAngleSchema = pipe(positive, maxValue(180));
+
+/**
+ * A part's motion from rest to its design stop, in the model frame and metres. A hinge turns `angle` degrees about the
+ * line `from` → `to`, signed by the right-hand rule; a slide moves `travel` along `direction`. Each kind is one rigid
+ * stage, so a motion of several stages is a new kind. A far-side twin's motion is not stored; see
+ * `src/motion.ts`, `mirrorMotion`.
+ */
+export const MotionSchema = variant('kind', [
+  strictObject({
+    kind: literal('hinge'),
+    axis: pipe(
+      strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
+      check(({ from, to }) => from.some((value, axis) => value !== to[axis]), 'hinge axis needs two distinct points'),
+    ),
+    angle: pipe(
+      number(),
+      finite(),
+      check((angle) => angle !== 0 && Math.abs(angle) <= 180, 'hinge angle must be nonzero, at most a half turn'),
+    ),
+  }),
+  strictObject({ kind: literal('slide'), direction: UnitVectorSchema, travel: positive }),
+]);
+
 export const NeutralModelSchema = strictObject({
   id: Id,
   file: pipe(string(), regex(/^assets\/models\/[a-z0-9_-]+\.glb$/, 'expected "assets/models/<name>.glb"')),
@@ -145,6 +177,8 @@ export const NeutralModelSchema = strictObject({
   /** Degrees about +z, the working end, applied to the model before its grip turn. */
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
+  /** How the part moves on whatever carries it, the same wherever it is placed. */
+  motion: optional(MotionSchema),
   /** The screen of an item that shows something. */
   display: optional(
     pipe(
@@ -177,3 +211,5 @@ type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonl
 export type NeutralModel = DeepReadonly<InferOutput<typeof NeutralModelSchema>>;
 export type ModelParts = NonNullable<NeutralModel['parts']>;
 export type ModelBox = DeepReadonly<InferOutput<typeof ModelBoxSchema>>;
+export type Motion = DeepReadonly<InferOutput<typeof MotionSchema>>;
+export type HingeAxis = Extract<Motion, { kind: 'hinge' }>['axis'];
