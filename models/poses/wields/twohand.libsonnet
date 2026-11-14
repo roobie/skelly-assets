@@ -28,14 +28,14 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
   },
   strikes: {
     overhead: heavy {
-      windup: guard { body+: { spine: [-10, -5, 0] }, weapon: held([0.2, 0.2, 0], -170, 0, 130, [-0.3, 0.49, 0.82], [0.72, 0.36, 0.6]) },
-      hit: guard { body+: { spine: [18, 0, 0] }, weapon: held([0.22, -0.2, 0.42], -7.5, 0, 90, [-0.6, -1, 0], [0.1, -1, 0]) },
-      follow: guard { body+: { spine: [28, 0, 0] }, weapon: held([0.22, -0.4, 0.26], 17.5, 0, 90, [-0.6, -1, 0], [-0.37, -0.93, 0]) },
+      windup: guard { body+: { spine: [-10, -5, 0] }, weapon: held([0.2, 0.2, 0], -170, 0, 110, [-0.3, 0.49, 0.82], [0.72, 0.36, 0.6]) },
+      hit: guard { body+: { spine: [18, 0, 0] }, weapon: held([0.22, -0.2, 0.42], -15, 0, 60, [-0.6, -1, 0], [0.1, -1, 0]) },
+      follow: guard { body+: { spine: [28, 0, 0] }, weapon: held([0.22, -0.4, 0.26], 10, 0, 57.5, [-0.6, -1, 0], [-0.37, -0.93, 0]) },
     },
     side: heavy {
       windup: guard { body+: { spine: [4, -40, 0] }, weapon: held([0.07, -0.08, 0.09], -70, -140, -60, [-0.91, -0.27, 0.31], [0.3, -1, 0]) },
       hit: guard { body+: { spine: [10, 0, 0] }, weapon: held([0.22, -0.15, 0.4], -25, 5, 110) },
-      follow: guard { body+: { spine: [12, 40, 0] }, weapon: held([0.45, -0.07, 0.2], 0, 110, 0, [-0.3, -1, 0], [-0.2, -0.98, 0]) },
+      follow: guard { body+: { spine: [12, 50, 0] }, weapon: held([0.43, -0.06, 0.22], 0, 110, -12, [-0.3, -1, 0], [-0.2, -0.98, 0]) },
     },
     thrust: {
       shares: { windup: 16, strike: 12, follow: 22, recovery: 50 },
