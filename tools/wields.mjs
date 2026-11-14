@@ -14,7 +14,7 @@ import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
-import { lookAt, poseJson, r4 } from './keyFrames.mjs';
+import { lookAt, poseJson, posedAt, r4, standing } from './keyFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
@@ -41,6 +41,17 @@ export function strikePhases(strike) {
   if (Math.abs(total - 100) > 1e-9) throw new Error(`a strike's shares sum to 100, not ${total}`);
   let at = 0;
   return PHASES.map((phase, i) => ({ phase, from: at / 100, to: (at += shares[i]) / 100 }));
+}
+
+/** A strike's timing as its clip carries it, in Sim seconds: its span, its hit and where each phase ends. */
+export function strikeTiming(strike) {
+  const phases = strikePhases(strike);
+  const seconds = (share) => r4([share * strike.seconds])[0];
+  return {
+    durationSimSeconds: seconds(1),
+    hitAtSimSeconds: seconds(phases.find(({ phase }) => phase === 'strike').to),
+    phases: phases.map(({ phase, to }) => ({ phase, endsAtSimSeconds: seconds(to) })),
+  };
 }
 
 // ---- a weapon in the hands ----
@@ -75,7 +86,6 @@ export function gripSocket(weapon, { seat, into }) {
 
 const lerpV = (a, b, w) => a.map((x, i) => x + (b[i] - x) * w);
 const mapValues = (object, f) => Object.fromEntries(Object.entries(object).map(([key, value]) => [key, f(value, key)]));
-const HEADER = { ground: true, level: ['foot.R', 'foot.L'] };
 
 /**
  * The pose file of key frame `key` of class `cls` (`readWields().classes`), for `rig`, the weapon (`heldWeapon`) and its
@@ -86,9 +96,8 @@ const HEADER = { ground: true, level: ['foot.R', 'foot.L'] };
 function poseOf(rig, cls, key, weapon, sockets) {
   const bone = (id) => rig.bones.find((b) => b.id === id);
   const shoulder = (hand) => bone(bone(hand).reach.chain[0]).head;
-  const header = { rig: { id: rig.id, revision: rig.revision }, ...HEADER };
-  const stood = boneTransforms(rig.bones, decodeFrame(compilePose(rig, { ...header, angles: key.body }).frame));
-  const chest = stood.get('spine');
+  const header = standing(rig);
+  const chest = posedAt(rig, key.body).get('spine');
   const inChest = (hand, p) => applyPoint(chest, add(shoulder(hand), p));
   const file = { ...header, angles: { ...key.body, ...lookAt(rig, key.body, cls.look) }, hands: {}, reach: {}, hold: {} };
   if (cls.weapon) {
@@ -200,7 +209,7 @@ const heldSeat = (seat, weapon, lead) => ({
  */
 export function wieldClips(rig, wields, weapons, meshOf) {
   const clips = {}, reports = {};
-  const header = { rig: { id: rig.id, revision: rig.revision }, ...HEADER };
+  const header = standing(rig);
   for (const [name, cls] of Object.entries(wields.classes)) {
     const { weapon, sockets } = weapons[name];
     const compileKey = (key) => {
@@ -244,7 +253,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
     };
     for (const [stance, key] of Object.entries(cls.stances)) {
       const { frame, report } = compileKey(key);
-      clips[clipName(name, 'stance', stance)] = { kind: 'pose', ...held, frames: [frame] };
+      clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
       reports[clipName(name, 'stance', stance)] = [report];
     }
     for (const [strike, spec] of Object.entries(cls.strikes)) {
@@ -259,15 +268,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
         const { from, to } = phases[i];
         return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
       });
-      clips[clip] = {
-        kind: 'pose',
-        loop: false,
-        durationSimSeconds: spec.seconds,
-        hitAtSimSeconds: r4([phases.find(({ phase }) => phase === 'strike').to * spec.seconds])[0],
-        phases: phases.map(({ phase, to }) => ({ phase, endsAtSimSeconds: r4([to * spec.seconds])[0] })),
-        ...held,
-        frames: baked.map(({ frame }) => frame),
-      };
+      clips[clip] = { kind: 'pose', loop: false, ...strikeTiming(spec), ...held, frames: baked.map(({ frame }) => frame) };
       reports[clip] = baked.map(({ report }) => report);
     }
   }
@@ -286,6 +287,15 @@ export function wieldTree(built, manifest, root = repo) {
   const doll = readDoll(built, manifest, dressing);
   const rig = dollRig(readRigContent(root), doll, dressing);
   const wields = readWields(root);
+  const { meshOf, entryOf } = heldItems(built, manifest);
+  return { rig, doll, wields, meshOf, weapons: wieldWeapons(wields, entryOf, meshOf) };
+}
+
+/**
+ * What a hand needs of the models a built tree holds: `meshOf(id)`, the model's parts at rest as one mesh, and
+ * `entryOf(id)`, its things sidecar.
+ */
+export function heldItems(built, manifest) {
   const meshes = treeMeshes(built, manifest);
   const meshOf = (id) => meshes(id).reduce((mesh, part) => {
     const base = mesh.positions.length / 3;
@@ -295,10 +305,27 @@ export function wieldTree(built, manifest, root = repo) {
     const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
     return JSON.parse(readFileSync(join(built, pack, 'things', `${id}.model.json`), 'utf8'));
   };
-  return { rig, doll, wields, meshOf, weapons: wieldWeapons(wields, entryOf, meshOf) };
+  return { meshOf, entryOf };
+}
+
+/**
+ * What the pose reports of baked frames (`wieldClips`) show wrong, one line each: a joint asked past its limit, a reach
+ * short of its target, a digit's pinch off its point. A game plays the frames as they are, so none may stand.
+ */
+export function wieldProblems(reports) {
+  return Object.entries(reports).flatMap(([clip, frames]) => frames.flatMap(({ clamped, residuals, grips = {} }, k) => [
+    ...clamped.map(({ bone }) => `${clip} frame ${k}: ${bone} asks past a limit`),
+    ...Object.entries(residuals).filter(([, left]) => !(left < 1e-6)).map(([id, left]) => `${clip} frame ${k}: ${id} falls ${left} m short`),
+    ...Object.entries(grips).flatMap(([hand, digits]) => Object.entries(digits)
+      .filter(([, { residual }]) => residual > 1e-3).map(([digit, { residual }]) => `${clip} frame ${k}: ${hand} ${digit} pinches ${residual} m off`)),
+  ]));
 }
 
 // Where a release carries the doll's wields, in the pack of the doll's parts.
+// What the rig holds for authoring poses, not for playing clips: the pose page's clips, the eye a look aims, the hand
+// presets a pose file names.
+const AUTHORING = new Set(['clips', 'eye', 'presets']);
+const CLIPS_DOC = 'The doll\'s melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest\'s motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point; a strike\'s frames stand evenly through durationSimSeconds, the first and last in its class\'s guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class\'s clips: the bone of the hand that leads the weapon, and the weapon\'s grip point (at) and its held axes (turn: working end +z, up +y) in that bone\'s frame, so a game seats any weapon of the class by its own grip.';
 const MOTIONS = { id: 'doll_melee', pack: 'skelly.body', path: 'motions/doll.melee.json', rig: 'motions/doll.rig.json' };
 
 /**
@@ -309,11 +336,12 @@ const MOTIONS = { id: 'doll_melee', pack: 'skelly.body', path: 'motions/doll.mel
 export function exportWields(out, manifest, root = repo) {
   const { rig, doll, wields, meshOf, weapons } = wieldTree(out, manifest, root);
   const { clips, reports } = wieldClips(rig, wields, weapons, meshOf);
-  const off = Object.entries(reports).flatMap(([clip, frames]) => frames.flatMap(({ clamped }, k) => (clamped.length ? [`${clip} frame ${k}`] : [])));
-  if (off.length > 0) throw new Error(`wield frames past a limit: ${off.join(', ')}`);
+  const problems = wieldProblems(reports);
+  if (problems.length > 0) throw new Error(`baked wields: ${problems.join('; ')}`);
+  const posing = Object.fromEntries(Object.entries(rig).filter(([key]) => !AUTHORING.has(key)));
   const files = {
-    [MOTIONS.rig]: { ...rig, doll: doll.sites },
-    [MOTIONS.path]: { rig: { id: rig.id, revision: rig.revision }, clips },
+    [MOTIONS.rig]: { ...posing, doll: doll.sites },
+    [MOTIONS.path]: { _doc: CLIPS_DOC, rig: { id: rig.id, revision: rig.revision }, clips },
   };
   return {
     files: Object.entries(files).map(([path, value]) => {
