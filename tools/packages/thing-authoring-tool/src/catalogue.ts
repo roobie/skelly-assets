@@ -1,6 +1,6 @@
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
@@ -161,7 +161,7 @@ const ItemSchema = pipe(
                 toward: picklist(TOWARDS),
                 open: OpenAngleSchema,
               }),
-              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive }),
+              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive, stow: optional(literal(true)) }),
             ]),
           ),
           nonEmpty(),
@@ -364,13 +364,14 @@ const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.p
 
 /**
  * The item's motion in the model frame, from the authored shapes of the pins and pieces of its part rather than their
- * voxels, so drawing never moves where the part turns. `placed` carries each part into the model frame; the export's
- * voxel grain, in metres, is the tolerance the pins are held to.
+ * voxels, so drawing never moves where the part turns. `built` is the item as built, whose placements carry each part
+ * into the model frame and whose drawn voxels fix where a stowing slide's plane lies; the export's voxel grain, in
+ * metres, is the tolerance the pins are held to.
  */
 export const itemMotion = (
   item: ToolItem,
   settings: CatalogueSettings,
-  placed: ReturnType<typeof buildItem>['report']['resolved']['placed'],
+  built: Pick<ReturnType<typeof buildItem>, 'report' | 'drawn'>,
   grain: number,
 ): Motion | undefined => {
   const authored = item.motion;
@@ -382,13 +383,30 @@ export const itemMotion = (
     throw new Error(`${item.id}: motion part ${authored.part} is not a compound part of the item`);
   }
   const { metresPerUnit } = settings.units;
+  const { defs, placed } = built.report.resolved;
   const place = (point: Vec3): Vec3 => scale(applyPoint(placed.get(part.id)!, point), metresPerUnit);
   const pieces = compoundPieces(part.params);
   const rest = piecesBounds(pieces);
   const centre = place(centreOf(rest));
+  const hull = cornersOf(rest).map(place);
+  // The voxels draw a little past the authored faces, and a plane cutting the drawn part would clip it at rest.
+  const drawnHull = (): Vec3[] => {
+    const def = defs.get(part.id)!;
+    const measures = (def.displaySolids ?? def.solids).map((solid) => built.drawn.measure(part.id, solid));
+    return cornersOf({
+      min: [0, 1, 2].map((axis) => Math.min(...measures.map(({ min }) => min[axis]!))) as unknown as Vec3,
+      max: [0, 1, 2].map((axis) => Math.max(...measures.map(({ max }) => max[axis]!))) as unknown as Vec3,
+    }).map(place);
+  };
   const stage = (step: (typeof authored.stages)[number]): StageMove => {
     if (step.kind === 'slide') {
-      return { kind: 'slide', direction: TOWARD[step.toward], travel: step.travel * metresPerUnit };
+      const direction = TOWARD[step.toward];
+      return {
+        kind: 'slide',
+        direction,
+        travel: step.travel * metresPerUnit,
+        ...(step.stow ? { stow: Math.max(...drawnHull().map((corner) => dot(corner, direction))) } : {}),
+      };
     }
     const pins = step.pins.map((id) => {
       const pin = pieces.find((piece) => piece.id === id);
@@ -402,7 +420,7 @@ export const itemMotion = (
     return { kind: 'hinge', axis, angle: hingeSense(axis, centre, step.toward, grain) * step.open };
   };
   try {
-    return shareStages(authored.stages.map(stage), cornersOf(rest).map(place));
+    return shareStages(authored.stages.map(stage), hull);
   } catch (failure) {
     throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
   }

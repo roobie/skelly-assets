@@ -53,3 +53,18 @@ describe('mirrored motion', () => {
     reflect(posePoint(door, leaf)).forEach((value, axis) => expect(twin[axis]).toBeCloseTo(value, 12));
   });
 });
+
+describe('a staged motion', () => {
+  const hinge = { kind: 'hinge', axis: { from: [-0.9, 0, 0.5], to: [-0.9, 1, 0.5] }, angle: 70, share: 0.4 } as const;
+  const slide = { kind: 'slide', direction: [0, 0, -1], travel: 0.8, share: 0.6 } as const;
+  const staged: Motion = [hinge, slide];
+  const leaf: Vec3 = [-0.9, 0.5, -0.4];
+  const expectClose = (actual: Vec3, expected: Vec3) => actual.forEach((value, axis) => expect(value).toBeCloseTo(expected[axis]!, 12));
+
+  it('keeps a stage at rest until the stages before it have finished', () => {
+    const [outer, inner] = [{ ...hinge, share: 1 }, { ...slide, share: 1 }];
+    expectClose(posePoint(staged, leaf, hinge.share / 2), posePoint([outer], leaf, 0.5));
+    expectClose(posePoint(staged, leaf, hinge.share), posePoint([outer], leaf));
+    expectClose(posePoint(staged, leaf, hinge.share + slide.share / 2), posePoint([outer], posePoint([inner], leaf, 0.5)));
+  });
+});
