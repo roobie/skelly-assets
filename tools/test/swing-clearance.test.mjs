@@ -46,6 +46,14 @@ test('a plate that slides through a plate as thin as itself is reported, whereve
   }
 });
 
+test('a plate that a faster part carries through a nearly still one is reported, whichever of the two moves most', () => {
+  const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
+  const slide = (direction, travel) => [{ kind: 'slide', direction, travel, share: 1 }];
+  const [still, fast] = [slide([1, 0, 0], 0.01), slide([-1, 0, 0], 0.3)];
+  const { contacts } = sweepBody({ layers: [still], movers: [{ site: 'plate', shape: plate('a', 0) }], obstacles: [{ site: 'other', shape: plate('b', 0.2), layers: [fast] }], step: GRAIN / 4, tolerance: GRAIN / 4 });
+  assert.ok(contacts.has('other'));
+});
+
 test('the ground stops a lid that opens downward into it', () => {
   const down = flap(1, { toward: 'down', y: 0.2 });
   const result = sweep({ lid: down }, [site('lid', 'lid', down.pieces)]);

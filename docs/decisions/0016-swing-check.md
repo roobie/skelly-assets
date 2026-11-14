@@ -52,15 +52,16 @@ open at once, so twins that clear alone but meet open are caught too. See `tools
 The check runs on every PR, so the cost must stay a fraction of the model build: testing every pose of every piece pair
 does not. The sweep therefore clears most of the clock and the parts without measuring them, and measures only where a
 pair might meet, at a spacing that no part a grain thick can slip through. The spacing is the sample step, a quarter
-grain of travel, because a pair of plates that thin overlaps by more than the contact floor at any such sample. A part
-thinner than that, or a pair whose only overlap is the rest depth it already has, is not reported. How the sweep clears
-and measures is in `tools/swingSweep.mjs`.
+grain of travel, because a pair of plates that thin overlaps by more than the contact floor at at least one sample. A
+part thinner than that may slip through, and a pair whose only overlap is the rest depth it already has is not
+reported. How the sweep clears and measures is in `tools/swingSweep.mjs`, `sweepBody`.
 
 Vehicles are swept on worker threads, one each, and a sweep is cached by the vehicle's inputs and a fingerprint of the
-checker, the shared geometry packages it runs on and the Node version, in the export cache folder, so a PR pays only for the vehicles it changes. The cache key leaves out the
-allowances: a sweep does not depend on them, and applying them on every run means an allowance edit takes effect at
-once and a stale one cannot hide behind a cached result. CI shards the sweeps over the same runners as the models
-(`tools/build.mjs`, `fillCacheShard`) so the final build finds every entry present.
+checker, the shared geometry packages it runs on and the Node version, in the export cache folder, so a PR pays only
+for the vehicles it changes. The cache key leaves out the allowances: a sweep does not depend on them, and applying
+them on every run means an allowance edit takes effect at once and a stale one cannot hide behind a cached result. CI
+shards the sweeps over the same runners as the models (`tools/build.mjs`, `fillCacheShard`) so the final build finds
+every entry present.
 
 The budget is a reason, not a figure: the check may cost a PR what the rest of its build does and no more, and a
 change that makes it cost more is a defect to fix in the sweep and not a reason to run it less.
