@@ -22,6 +22,7 @@ import {
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
 import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { displayBevel, meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
 import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
 import type {
@@ -162,6 +163,39 @@ export const partVoxelGrain = (
     (def.tags?.includes(VOXEL_DETAIL) || (voxelDetailThinParts && isThinPart(def, voxelGrain, metresPerUnit)))
     ? voxelDetailGrain
     : voxelGrain;
+};
+
+/**
+ * A smooth part's drawn boxes that stand on the port it mounts by, reaching `depth` through that port into its host.
+ * The voxel host's face snaps to its grid, so a part seated on the authored face would float by up to half a voxel;
+ * reaching a whole grain in, where the host's voxels hide it, closes that gap whatever the grid.
+ */
+const seatedDef = (def: PartDef, port: PortDef, depth: number): PartDef => {
+  const axis = port.normal.findIndex((component) => Math.abs(component) === 1);
+  if (axis < 0) {
+    return def;
+  }
+  const sign = port.normal[axis]!;
+  const grow = ([x, y, z]: Vec3, by: number): Vec3 => [
+    axis === 0 ? x + by : x,
+    axis === 1 ? y + by : y,
+    axis === 2 ? z + by : z,
+  ];
+  const seat = (solid: Solid): Solid => {
+    if (solid.kind !== 'box') {
+      return solid;
+    }
+    const { center, half } = solid.box;
+    if (Math.abs(center[axis]! + sign * half[axis]! - port.pos[axis]!) > 1e-9) {
+      return solid;
+    }
+    return { ...solid, box: { center: grow(center, (sign * depth) / 2), half: grow(half, depth / 2) } };
+  };
+  return {
+    ...def,
+    solids: def.solids.map(seat),
+    ...(def.displaySolids ? { displaySolids: def.displaySolids.map(seat) } : {}),
+  };
 };
 
 /**
@@ -663,21 +697,29 @@ const writeGlb: ExportGlb = (input) => {
     );
   };
 
+  /** A smooth part of a voxelized file as drawn: seated one class grain into the part it mounts on. */
+  const seatedInHost = (part: PartExport): PartExport => {
+    const mountPort = mounts.get(part.id)?.mount?.interface.slice(part.id.length + 1);
+    const port = part.def.ports.find(({ id }) => id === mountPort);
+    return input.voxelGrain === undefined || port === undefined
+      ? part
+      : { ...part, def: seatedDef(part.def, port, input.voxelGrain / metresPerUnit) };
+  };
+
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: existing glTF node construction; appearance metadata is conditional by contract.
   const addPart = (part: PartExport): void => {
     const drawn = part.def.displaySolids ?? part.def.solids;
-    const items = itemsOf(part);
     const grain =
       input.voxelGrain === undefined
         ? undefined
         : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
     const primitives =
       grain === undefined
-        ? items.flatMap((item) => {
+        ? itemsOf(seatedInHost(part)).flatMap((item) => {
             const primitive = primitiveFor(part, item);
             return primitive ? [primitive] : [];
           })
-        : voxelPrimitivesFor(part, items, grain);
+        : voxelPrimitivesFor(part, itemsOf(part), grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
     const node: Json = { name };

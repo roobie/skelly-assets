@@ -83,7 +83,9 @@ A part may instead keep its authored mesh in a voxelized file, by a tag in its d
 the same way. An aperture sight seen from the eye is read by its round hole, and no grain
 keeps a hole a few millimetres across round, so a sight the player looks through can stay
 smooth beside the voxel gun. Its datums then lie on the authored solids, which is what the
-file draws. See `src/glb.ts`, `SMOOTH`.
+file draws. The voxel part it mounts on snaps its face to the grid, so the boxes it stands
+on reach one grain into that part, where its voxels hide them; seated exactly, the smooth
+part would float by up to half a voxel. See `src/glb.ts`, `SMOOTH` and `seatedDef`.
 
 A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
@@ -106,21 +108,22 @@ any other angle keeps its own. See `src/glb.ts`, `latticeOrigin`, and `src/voxel
 
 A datum lies on the drawn model. Grips and other anchors, a candle's flame, magazine round
 poses, collision boxes and centres of mass all read off the voxels the file draws, or a
-smooth part's authored solids, not off the smooth design of a voxelized part. What the player sees and what the game computes must agree with the
-drawn model, so a flame sits on its wick and a vehicle collides where it is drawn. One rule
-covers every model, with no list of exceptions. Each solid is measured by the voxels it
-fills when it is sampled with the solids it is drawn among on its part's lattice, as the
-file draws it, because a solid's voxels depend on the solids it meets (see the thinness
-rule below): a collision box bounds its voxels, a centre of mass is their centroid, and a
-point keeps its fraction of the smallest solid or part around it, so a point on a face
-lands on the drawn face. See `src/drawn.ts`, `drawnGeometry`.
+smooth part's authored solids, not off the smooth design of a voxelized part. What the
+player sees and what the game computes must agree with the drawn model, so a flame sits on
+its wick and a vehicle collides where it is drawn. A voxelized solid is measured by the
+voxels it fills when it is sampled with the solids it is drawn among on its part's lattice,
+as the file draws it, because a solid's voxels depend on the solids it meets (see the
+thinness rule below): a collision box bounds its voxels, a centre of mass is their
+centroid, and a point keeps its fraction of the smallest solid or part around it, so a
+point on a face lands on the drawn face. A smooth part's solids are measured as authored.
+See `src/drawn.ts`, `drawnGeometry`.
 
 An iron sight line runs between the sight tops the file draws, and the muzzle sits on the
 drawn front of the barrel. The up vector is made perpendicular to that line, since the game
 aligns the model's up to the camera's. An optic keeps its optical axis, which no drawn top
 defines. See `packages/gun-authoring-tool/src/gun/exportGlb.ts`, `sightMetadata` and `drawnMuzzle`.
 
-A part with baked collision also names its grain, so a consumer's own datums can snap to
+A voxelized part with baked collision also names its grain, so a consumer's own datums can snap to
 the same lattice. A cargo space does this to fit the drawn bed it fills; see
 `packages/thing-core/src/schema.ts`, `ModelPartSchema`, and
 https://github.com/roobie/skelly, `packages/deadvox/DESIGN.md`, "Vehicles".
