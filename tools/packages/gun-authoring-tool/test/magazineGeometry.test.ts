@@ -215,6 +215,27 @@ describe('generated magazine round columns', () => {
     expect(() => magazineRoundColumn(tooNarrow, cartridge)).toThrow(NARROW_MAGAZINE_ERROR);
   });
 
+  it.each([
+    ['rising toward the front', -10, -8],
+    ['rising toward the rear', -8, -10],
+  ])('ends a four-point body column at the highest corner of a slanted floor %s', (_slant, rearY, frontY) => {
+    const body: Solid = {
+      id: 'body',
+      kind: 'extruded-polygon',
+      profile: [
+        [-2, rearY],
+        [3, frontY],
+        [3, 0],
+        [-2, 0],
+      ],
+      z: [-1, 1],
+    };
+    const [top, floor] = magazineCenterline([body])!.points;
+    expect(top![0]).toBe(floor![0]);
+    expect(floor![1]).toBeGreaterThanOrEqual(Math.max(rearY, frontY));
+    expect(floor![1]).toBeLessThan(top![1]);
+  });
+
   it('rejects unrecognized magazine geometry', () => {
     expect(() => magazineRoundColumn([], cartridge)).toThrow('no recognized body centreline');
   });
