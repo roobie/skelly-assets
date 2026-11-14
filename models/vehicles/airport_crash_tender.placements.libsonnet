@@ -18,6 +18,7 @@ local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
     site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.crown, 0]),
   ]
   + std.flattenArrays([site.pair('locker_shutter_' + name, 'airport_crash_tender_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
+  + std.flattenArrays([site.pair('locker_stowage_' + name, 'airport_crash_tender_locker_stowage_' + name) for name in std.objectFields(s.stowage)])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 1.3]),
   tags: { 'vehicle-role': ['emergency'] },
 }
