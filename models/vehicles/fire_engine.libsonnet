@@ -2,10 +2,10 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local stow = import 'stowage-kit.libsonnet';
+local slots = import 'models/stowage.libsonnet';
 local box = k.box;
 local s = import 'fire_engine.spec.libsonnet';
 local vehicle = import 'fire_engine.placements.libsonnet';
-local round(piece) = piece + { sides: 16 };
 local finish = { paint: s.paint, white: 'paint-white', reflect: 'reflective-yellow', frame: 'paint-charcoal', steel: 'steel-grey', alu: 'alu-bare', dark: 'plastic-black', tank: 'polymer-black', hose: 'plastic-red', gauge: 'plastic-yellow', chrome: 'steel-stainless' };
 local archChamfer = 0.3;
 local shutterTop = s.bodyTop - 0.1;
@@ -20,60 +20,74 @@ local gaps = [[spanList[i][1], spanList[i + 1][0]] for i in std.range(0, std.len
 local back = s.lockerBack;
 // Stowed kit stands clear of the shutters' inner face, which they slide up past.
 local front = inset - 0.02;
-local stowFinish = stow.finish + { case_a: 'plastic-green', case_b: 'plastic-orange', sheet: 'plastic-blue', axe: 'paint-red', pump: 'paint-red' };
 // Heights above the locker floor.
 local up(h) = s.bodyFloor + h;
+// Each locker's fit-out, the shelves, board and strap its kit stows on, and the slots the kit stows in. The kit is
+// catalogue items a site's load-out names (fire_engine.placements.libsonnet), so a game can loot it or stow more.
+// Slots stay inside `front`, so the shutters clear whatever a slot holds.
+local middle = (back + front) / 2;
+local outOf(z) = [back + 0.005 - z, front - z];
+local cylinders = [-0.36 + i * 0.24 for i in std.range(0, 4)];
+local hoseRolls = [-2.35, -1.95, -1.55];
 local stowage = {
-  fore: std.flattenArrays([stow.cylinder('cylinder_' + i, -0.36 + i * 0.24, s.bodyFloor, back + 0.17, 0.085, 0.6) for i in std.range(0, 4)]) + [
-    stow.strap('cylinder_strap', [-0.46, 0.73], up(0.4), back + 0.255),
-    stow.shelf('shelf_low', lockerSpans.fore, up(0.75), [back, front]),
-    stow.shelf('shelf_high', lockerSpans.fore, up(1.3), [back, front]),
-    box('sheets_a', 'sheet', [-0.45, up(1.3), back + 0.04], [0.1, up(1.55), front - 0.03]),
-    box('sheets_b', 'sheet', [0.17, up(1.3), back + 0.04], [0.72, up(1.51), front - 0.03]),
-  ] + stow.case('first_aid', 'case_a', [-0.45, up(0.75), back + 0.06], [0.05, up(1.07), front - 0.03])
-    + stow.case('camera', 'case_b', [0.12, up(0.75), back + 0.06], [0.72, up(1.0), front - 0.03]),
-  mid: [
-    stow.board('board', [-1.29, -0.62], [up(0.3), up(1.73)], back),
-  ] + stow.hungTool('axe', -1.17, up(0.45), 0.9, [0.2, 0.12], back + 0.03125, 'axe')
-    + stow.hungTool('bar', -0.97, up(0.35), 1.05, [0.12, 0.06], back + 0.03125, haftSlot='steel')
-    + stow.hungTool('sledge', -0.78, up(0.45), 0.8, [0.16, 0.1], back + 0.03125)
-    + stow.case('branches_a', 'case_b', [-1.28, s.bodyFloor, back + 0.06], [-0.98, up(0.25), front - 0.03])
-    + stow.case('branches_b', 'case_b', [-0.92, s.bodyFloor, back + 0.06], [-0.63, up(0.25), front - 0.03]),
-  wheel: std.flattenArrays([
-    stow.hoseRoll('roll_' + row + '_' + i, -2.35 + i * 0.4, up(row * 0.36), [back + 0.16, front], 0.18)
-    for row in [0, 1]
-    for i in [0, 1, 2]
-  ] + [
-    stow.hoseRoll('roll_top_' + i, -2.35 + i * 0.4, up(1.25), [back + 0.16, front], 0.18)
-    for i in [0, 1]
-  ]) + [
-    stow.shelf('shelf_low', lockerSpans.wheel, up(0.77), [back, front]),
-    stow.shelf('shelf_high', lockerSpans.wheel, up(1.25), [back, front]),
-    round(k.turned('standpipe', 'coupling', 'x', k.disc(0.045, -2.0, -1.42), [0, up(0.815), back + 0.12])),
-    box('standpipe_head', 'steel', [-1.48, up(0.77), back + 0.06], [-1.4, up(0.95), back + 0.18]),
-    box('key', 'steel', [-1.75, up(1.25), back + 0.19], [-1.38, up(1.29), back + 0.23]),
-  ] + std.flattenArrays([
-    [
-      round(k.turned('branch_' + i, 'coupling', 'x', k.disc(0.045, -2.5, -2.12), [0, up(0.815), back + 0.12 + i * 0.12])),
-      round(k.turned('branch_' + i + '_grip', 'lid', 'x', k.disc(0.055, -2.36, -2.26), [0, up(0.815), back + 0.12 + i * 0.12])),
-    ]
-    for i in [0, 1]
-  ]),
-  aft: [
-    box('pump_base', 'steel', [-3.7, s.bodyFloor, back + 0.06], [-3.1, up(0.04), front - 0.02]),
-    box('pump_engine', 'engine', [-3.62, up(0.04), back + 0.09], [-3.3, up(0.4), back + 0.26]),
-    box('pump_tank', 'pump', [-3.62, up(0.4), back + 0.09], [-3.3, up(0.53), back + 0.26]),
-    round(k.turned('pump_volute', 'pump', 'z', k.disc(0.12, back + 0.12, back + 0.26), [-3.2, up(0.21), 0])),
-    box('pump_rail', 'steel', [-3.7, up(0.53), back + 0.26], [-3.1, up(0.57), front - 0.02]),
-    box('pump_post_rear', 'steel', [-3.7, up(0.04), back + 0.26], [-3.66, up(0.53), front - 0.02]),
-    box('pump_post_fore', 'steel', [-3.14, up(0.04), back + 0.26], [-3.1, up(0.53), front - 0.02]),
-    stow.shelf('shelf', lockerSpans.aft, up(0.8), [back, front]),
-    round(k.turned('fan_shroud', 'pump', 'z', k.disc(0.24, back + 0.1, back + 0.18), [-3.4, up(1.1), 0])),
-    round(k.turned('fan_guard', 'steel', 'z', k.annulus(0.22, 0.28, back + 0.18, back + 0.24), [-3.4, up(1.1), 0])),
-    round(k.turned('fan_hub', 'engine', 'z', k.disc(0.08, back + 0.18, back + 0.24), [-3.4, up(1.1), 0])),
-    box('fan_foot', 'steel', [-3.65, up(0.8), back + 0.08], [-3.15, up(0.83), back + 0.24]),
-  ] + std.flattenArrays([stow.cone('cone_' + i, -2.8, up(i * 0.08), back + 0.16) for i in [0, 1, 2]])
-    + stow.case('lights', 'case_b', [-3.05, up(0.8), back + 0.06], [-2.62, up(1.15), front - 0.03]),
+  fore: {
+    fitOut: [
+      stow.strap('cylinder_strap', [-0.46, 0.73], up(0.4), back + 0.26),
+      stow.shelf('shelf_low', lockerSpans.fore, up(0.75), [back, front]),
+      stow.shelf('shelf_high', lockerSpans.fore, up(1.3), [back, front]),
+    ],
+    slots: [
+      slots.shelfSlot('cylinder_%d' % i, ['bottle'], [cylinders[i], s.bodyFloor, back + 0.17], 0.22, 0.68, [-0.165, 0.09])
+      for i in std.range(0, 4)
+    ] + [
+      slots.shelfSlot('low_' + slot.id, ['case', 'bottle'], [slot.x, up(0.75), middle], slot.along, 0.5, outOf(middle))
+      for slot in [{ id: 'a', x: -0.25, along: 0.44 }, { id: 'b', x: 0.22, along: 0.44 }, { id: 'c', x: 0.6, along: 0.3 }]
+    ] + [
+      slots.shelfSlot('sheet_%s_%d' % [slot.id, layer], ['sheet'], [slot.x, up(1.3 + layer * 0.075), middle], 0.44, 0.075, outOf(middle))
+      for slot in [{ id: 'a', x: -0.25 }, { id: 'b', x: 0.22 }]
+      for layer in [0, 1, 2]
+    ] + [
+      slots.shelfSlot('high_c', ['case', 'bottle'], [0.6, up(1.3), middle], 0.3, 0.5, outOf(middle)),
+    ],
+  },
+  mid: {
+    fitOut: [stow.board('board', [-1.29, -0.62], [up(0.3), up(1.73)], back)],
+    slots: [
+      slots.boardSlot('hook_' + slot.id, ['hung-tool'], [slot.x, up(1.7), back + 0.03125], slot.along, 1.0, front - back - 0.03125)
+      for slot in [{ id: 'a', x: -1.135, along: 0.32 }, { id: 'b', x: -0.845, along: 0.25 }, { id: 'c', x: -0.69, along: 0.06 }, { id: 'd', x: -0.635, along: 0.04 }]
+    ] + [
+      slots.shelfSlot('floor_' + slot.id, ['bottle', 'case'], [slot.x, s.bodyFloor, back + 0.17], 0.28, 0.6, [-0.12, front - back - 0.17])
+      for slot in [{ id: 'a', x: -1.15 }, { id: 'b', x: -0.85 }]
+    ],
+  },
+  wheel: {
+    fitOut: [
+      stow.shelf('shelf_low', lockerSpans.wheel, up(0.77), [back, front]),
+      stow.shelf('shelf_high', lockerSpans.wheel, up(1.25), [back, front]),
+    ],
+    slots: [
+      slots.shelfSlot('roll_%d_%d' % [layer, i], ['hose-roll'], [hoseRolls[i], up(layer * 0.365), back + 0.2], 0.38, 0.365, [-0.05, 0.1])
+      for layer in [0, 1]
+      for i in [0, 1, 2]
+    ] + [
+      slots.shelfSlot('roll_top_%d' % i, ['hose-roll'], [-2.36 + i * 0.39, up(1.25), back + 0.2], 0.38, 0.365, [-0.05, 0.1])
+      for i in [0, 1]
+    ] + [
+      slots.shelfSlot('bar_back', ['bar'], [-1.75, up(0.77), back + 0.1], 0.72, 0.15, [-0.095, 0.07]),
+      slots.shelfSlot('bar_fore', ['bar'], [-2.32, up(0.77), back + 0.1], 0.4, 0.12, [-0.095, 0.065]),
+      slots.shelfSlot('bar_front', ['bar'], [-2.32, up(0.77), back + 0.24], 0.4, 0.12, [-0.065, front - back - 0.24]),
+      slots.shelfSlot('bar_top', ['bar'], [-1.572, up(1.25), middle], 0.444, 0.15, outOf(middle)),
+    ],
+  },
+  aft: {
+    fitOut: [stow.shelf('shelf', lockerSpans.aft, up(0.8), [back, front])],
+    slots: [
+      slots.shelfSlot('floor_machine', ['machine'], [-3.4, s.bodyFloor, back + 0.17], 0.64, 0.6, [-0.165, front - back - 0.17]),
+      slots.shelfSlot('floor_cone', ['cone'], [-2.82, s.bodyFloor, middle], 0.32, 0.47, outOf(middle)),
+      slots.shelfSlot('shelf_machine', ['machine'], [-3.4, up(0.8), back + 0.17], 0.6, 0.62, [-0.165, front - back - 0.17]),
+      slots.shelfSlot('shelf_case', ['case', 'bottle'], [-2.85, up(0.8), middle], 0.44, 0.5, outOf(middle)),
+    ],
+  },
 };
 local rungs = std.range(0, 12);
 local gantry = [s.bodyRear + 0.6, -1.2, 0.5];
@@ -117,7 +131,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', 
     box('tank', 'tank', [s.archRear + 0.1, s.bodyFloor, -0.82], [s.archFront + 0.5, s.bodyTop - 0.1, 0.82]),
   ], finish) + { title: 'Fire engine water tank' },
 ] + k.lockerShutters('fire_engine_locker_shutter_', s.lockersMass, lockerSpans, s.lockers, shutterLow, shutterTop, [inset, s.bodySide], finish) + [
-  k.compound('fire_engine_locker_stowage_' + name, s.stowage[name].mass, stowage[name], stowFinish) + { title: s.stowage[name].title }
+  k.compound('fire_engine_locker_stowage_' + name, s.stowage[name].mass, stowage[name].fitOut, stow.finish) + { title: s.stowage[name].title }
+  + slots.ports(stowage[name].slots)
   for name in std.objectFields(stowage)
 ] + [
   k.compound('fire_engine_roof_ladder', 95, [

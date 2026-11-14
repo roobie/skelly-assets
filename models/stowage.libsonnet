@@ -26,8 +26,9 @@ local word(name) =
   seat(name, pos, normal, up): { id: 'stow', mount: mount, gender: 'male', standard: word(name), pos: pos, normal: normal, up: up, required: false },
   // The seat of resting kit at `pos`, the middle of its base, its front on `front`.
   resting(name, pos, front=[0, 0, 1]): self.seat(name, pos, [0, -1, 0], front),
-  // A row given its seat, on its first part.
-  stows(seat): { parts: [super.parts[0] + { ports+: [seat] }] + super.parts[1:] },
+  // A row given ports on its first part: an item its seat, a locker part its slots.
+  ports(ports): { parts: [super.parts[0] + { ports+: ports }] + super.parts[1:] },
+  stows(seat): self.ports([seat]),
   // A slot `id` in a locker part: the words it accepts and the envelope, in its frame, its kit must stay inside.
   slot(id, accepts, pos, normal, up, envelope): {
     id: id,
@@ -40,4 +41,13 @@ local word(name) =
     up: up,
     required: false,
   },
+  // A slot on a floor or shelf of a vehicle locker, in the vehicle frame (models/vehicles/frame.libsonnet) on its near
+  // side: at `pos`, the middle of the kit's base, holding kit `along` the vehicle, up to `height` tall and from
+  // `out[0]` to `out[1]` outboard of `pos`.
+  shelfSlot(id, accepts, pos, along, height, out):
+    self.slot(id, accepts, pos, [0, 1, 0], [0, 0, 1], { min: [0, out[0], -along / 2], max: [height, out[1], along / 2] }),
+  // A slot on a near-side locker's back board, in the vehicle frame: at `pos` on the board's face where a tool's
+  // head hangs, holding a tool `along` the vehicle, hanging down `drop` and standing `depth` out of the board.
+  boardSlot(id, accepts, pos, along, drop, depth):
+    self.slot(id, accepts, pos, [0, 0, 1], [0, 1, 0], { min: [0, -drop, -along / 2], max: [depth, 0.01, along / 2] }),
 }
