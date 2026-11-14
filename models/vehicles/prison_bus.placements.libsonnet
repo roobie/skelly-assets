@@ -6,7 +6,6 @@ local g = bus.layout(s);
 local panes = g.panes(deck);
 local doorway = g.doorways[0];
 local leaf = g.leaves[0];
-local fold = g.fold(leaf);
 local bars(j) =
   local twin = site.pair('window_bars_' + j, 'prison_bus_window_bars', [(panes[j][0] + panes[j][1]) / 2, deck.waist, s.side]);
   // The door takes the near side of its bay.
@@ -16,7 +15,7 @@ local bars(j) =
   sites: bus.fittings(site.kit, 'prison_bus', s)
          + std.flattenArrays([bars(j) for j in std.range(0, deck.bays - 1)])
          + [
-           site.one('door_bars_' + panel, 'prison_bus_door_bars', [g.leafX(doorway, leaf) + fold[panel].at, s.doorSill + s.doorKick, s.side - 0.035], rides=leaf.site + '_' + panel + '_0')
+           site.one('door_bars_' + panel, 'prison_bus_door_bars', [g.panelX(doorway, leaf, panel), s.doorSill + s.doorKick, s.side - 0.035], rides=g.panelSite(leaf, panel, 0))
            for panel in ['jamb', 'free']
          ]
          + [

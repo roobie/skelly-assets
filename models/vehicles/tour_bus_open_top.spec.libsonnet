@@ -1,6 +1,7 @@
 // An open-top sightseeing double decker: the double decker's lower deck, stairs and upper floor, cut off at a waist-
 // high bulwark round the upper deck, about 11.5 t at the kerb. Metres in the vehicle frame.
 local dd = import 'double_decker.spec.libsonnet';
+local bus = import 'bus-body.libsonnet';
 local bulwark = 3.3;
 local lean = dd.lean * (bulwark - dd.screens[0][0]) / (dd.roofBase - dd.screens[0][0]);
 local deflectorX = 4.98;
@@ -19,9 +20,11 @@ dd {
   borrow: {
     _front_panel: 'double_decker_front_panel', _rear_panel: 'double_decker_rear_panel',
     _side_window: 'double_decker_side_window',
-    _door_fwd_jamb: 'double_decker_door_fwd_jamb', _door_fwd_free: 'double_decker_door_fwd_free',
-    _door_aft_jamb: 'double_decker_door_aft_jamb', _door_aft_free: 'double_decker_door_aft_free',
     _dashboard: 'double_decker_dashboard', _destination_sign: 'double_decker_destination_sign',
+  } + {
+    [leaf.suffix + '_' + panel]: 'double_decker' + leaf.suffix + '_' + panel
+    for leaf in bus.layout(dd).leaves
+    for panel in ['jamb', 'free']
   },
   rail: { top: 3.78, post: 1.3, posts: 8 },
   // The rake lands the glass's foot on the bulwark's front cap.
