@@ -13,8 +13,13 @@ local bandLow = s.floor - 0.03;
 local bandTop = s.floor + 0.07;
 local shutterLow = bandTop;
 local inset = s.bodySide - 0.04;
-// Each shutter sits in the wall's skin depth.
-local shutter(name, x0, x1, y0, y1) = k.shutter(name, x0, x1, y0, y1, [inset, s.bodySide]);
+// Each locker's span along the body; its shutter sits in the wall's skin depth.
+local lockerSpans = {
+  fore: [-0.5, s.bodyFront - 0.08],
+  mid: [archFront + 0.02, -0.6],
+  wheel: [archRear + 0.02, archFront - 0.02],
+  aft: [s.bodyRear + 0.08, archRear - 0.02],
+};
 local rungs = std.range(0, 12);
 local gantry = [s.bodyRear + 0.6, -1.2, 0.5];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', vehicle.title, s) + [
@@ -37,6 +42,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', 
     box('cap', 'white', [s.bodyRear, s.bodyTop - 0.1, inset], [s.bodyFront, s.bodyTop, s.bodySide]),
     box('post_rear', 'paint', [s.bodyRear, bandTop, inset], [s.bodyRear + 0.08, s.bodyTop - 0.1, s.bodySide]),
     box('post_front', 'paint', [s.bodyFront - 0.08, bandTop, inset], [s.bodyFront, s.bodyTop - 0.1, s.bodySide]),
+    box('low_fore_handle', 'dark', [-0.6, 0.98, s.bodySide], [-0.2, 1.02, s.bodySide + 0.032]),
+    box('low_aft_handle', 'dark', [-3.4, 0.98, s.bodySide], [-3.0, 1.02, s.bodySide + 0.032]),
   ]), finish) + { title: 'Fire engine body' },
   k.compound('fire_engine_cab_stripe', 6, k.bothSides([
     box('band', 'reflect', [s.cabBack, s.floor - 0.03, s.side], [s.face, s.floor + 0.07, s.side + 0.032]),
@@ -44,15 +51,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', 
   k.compound('fire_engine_water_tank', 400, [
     box('tank', 'tank', [archRear + 0.1, s.bodyFloor, -0.82], [archFront + 0.5, s.bodyTop - 0.1, 0.82]),
   ], finish) + { title: 'Fire engine water tank' },
-  k.compound('fire_engine_lockers', 450,
-    shutter('fore', -0.5, s.bodyFront - 0.08, shutterLow, shutterTop)
-    + shutter('mid', archFront + 0.02, -0.6, shutterLow, shutterTop)
-    + shutter('wheel', archRear + 0.02, archFront - 0.02, shutterLow, shutterTop)
-    + shutter('aft', s.bodyRear + 0.08, archRear - 0.02, shutterLow, shutterTop)
-    + [
-      box('low_fore_handle', 'dark', [-0.6, 0.98, s.bodySide], [-0.2, 1.02, s.bodySide + 0.032]),
-      box('low_aft_handle', 'dark', [-3.4, 0.98, s.bodySide], [-3.0, 1.02, s.bodySide + 0.032]),
-    ], finish) + { title: 'Fire engine lockers' },
+] + k.lockerShutters('fire_engine_locker_shutter_', s.lockersMass, lockerSpans, s.lockers, shutterLow, shutterTop, [inset, s.bodySide], finish) + [
   k.compound('fire_engine_roof_ladder', 95, [
     box('rail_near', 'alu', [s.bodyRear + 0.1, s.ladderY, 0.26], [1.7, s.ladderY + 0.07, 0.32]),
     box('rail_far', 'alu', [s.bodyRear + 0.1, s.ladderY, -0.32], [1.7, s.ladderY + 0.07, -0.26]),

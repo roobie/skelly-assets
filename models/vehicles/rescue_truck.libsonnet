@@ -7,7 +7,9 @@ local beams = [-3.3, -2.4, -1.5, -0.6, 0.3];
 local blocks = std.range(0, 11);
 local blockX0 = s.bodyRear + 0.1;
 local blockLength = (s.bodyFront - 0.1 - blockX0) / 12;
-local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - 0.1) / 0.09) - 1);
+local bar = 0.1;
+local pitch = k.slatPitch;
+local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - bar) / pitch) - 1);
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_racking', 2200, [
     box('racking', 'frame', [-3.3, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
@@ -16,18 +18,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('block_' + i, if i % 2 == 0 then 'hivis' else 'blue', [blockX0 + i * blockLength, s.bodyTop - 0.28, s.bodySide], [blockX0 + (i + 1) * blockLength, s.bodyTop - 0.1, s.bodySide + 0.032])
     for i in blocks
   ]), finish) + { title: 'Rescue truck marking' },
-  k.compound('rescue_truck_rear_shutter', 70, [
-    box('bar', 'dark', [s.bodyRear - 0.03, s.shutterLow, -s.shutterSide], [s.bodyRear, s.shutterLow + 0.1, s.shutterSide]),
-    box('head', 'frame', [s.bodyRear - 0.05, s.shutterTop, -s.shutterSide - 0.04], [s.bodyRear, s.shutterTop + 0.1, s.shutterSide + 0.04]),
+  // The curtain rolls up into the head and leaves its bar under it.
+  k.compound('rescue_truck_rear_shutter', 40, [
+    box('bar', 'dark', [s.bodyRear - 0.03, s.shutterLow, -s.shutterSide], [s.bodyRear, s.shutterLow + bar, s.shutterSide]),
   ] + [
-    box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [s.bodyRear - 0.03, s.shutterLow + 0.1 + i * 0.09, -s.shutterSide], [s.bodyRear, std.min(s.shutterLow + 0.1 + (i + 1) * 0.09, s.shutterTop), s.shutterSide])
+    box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [s.bodyRear - 0.03, s.shutterLow + bar + i * pitch, -s.shutterSide], [s.bodyRear, std.min(s.shutterLow + bar + (i + 1) * pitch, s.shutterTop), s.shutterSide])
     for i in slats
+  ], finish, motion=k.motion.slide('up', s.shutterTop - s.shutterLow - bar, stow=true)) + { title: 'Rescue truck rear shutter' },
+  k.compound('rescue_truck_rear_shutter_frame', 30, [
+    box('head', 'frame', [s.bodyRear - 0.05, s.shutterTop, -s.shutterSide - 0.04], [s.bodyRear, s.shutterTop + 0.1, s.shutterSide + 0.04]),
   ] + k.bothSides([
     box('guide', 'frame', [s.bodyRear - 0.05, s.shutterLow, s.shutterSide], [s.bodyRear, s.shutterTop, s.shutterSide + 0.04]),
   ] + [
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'reflect', [s.bodyRear - 0.01, s.bodyFloor + i * 0.3, s.shutterSide + 0.04], [s.bodyRear, s.bodyFloor + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 5)
-  ]), finish) + { title: 'Rescue truck rear shutter' },
+  ]), finish) + { title: 'Rescue truck rear shutter frame' },
   k.compound('rescue_truck_roof_rack', 170, [
     box('beam_' + i, 'frame', [beams[i] - 0.05, s.rackY - 0.05, -s.rackSide], [beams[i] + 0.05, s.rackY, s.rackSide])
     for i in std.range(0, std.length(beams) - 1)

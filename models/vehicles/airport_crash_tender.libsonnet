@@ -15,10 +15,17 @@ local bandLow = s.floor - 0.03;
 local bandTop = s.floor + 0.07;
 local shutterTop = s.bodyTop - 0.1;
 local inset = s.bodySide - 0.04;
-local shutter(name, x0, x1, y0, y1) = k.shutter(name, x0, x1, y0, y1, [inset, s.bodySide]);
 // The posts between lockers: their centres along the body, and their half width.
 local dividers = { mid: 0.96, wheel: -2.4 };
 local postHalf = 0.04;
+// Each locker's span along the body; its shutter sits in the wall's skin depth.
+local lockerSpans = {
+  fore: [dividers.mid + postHalf, s.bodyFront - 2 * postHalf],
+  mid: [archFront + 0.02, dividers.mid - postHalf],
+  wheel_fore: [dividers.wheel + postHalf, archFront - 0.02],
+  wheel_aft: [archRear + 0.02, dividers.wheel - postHalf],
+  aft: [s.bodyRear + 2 * postHalf, archRear - 0.02],
+};
 local post(name, x) = box('post_' + name, 'paint', [x - postHalf, bandTop, inset], [x + postHalf, shutterTop, s.bodySide]);
 // The roof turret stands on the cab's crown, the bumper turret on the bumper's top.
 local turretY = s.crown;
@@ -62,6 +69,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     post('front', s.bodyFront - postHalf),
     post('mid', dividers.mid),
     post('wheel', dividers.wheel),
+    box('low_fore_handle', 'dark', [0.9, archTop - 0.2, s.bodySide], [1.4, archTop - 0.16, s.bodySide + 0.032]),
+    box('low_aft_handle', 'dark', [-5.1, archTop - 0.2, s.bodySide], [-4.6, archTop - 0.16, s.bodySide + 0.032]),
   ] + [
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'white', [s.bodyRear - 0.006, s.bodyLow + i * 0.3, 0.6], [s.bodyRear, s.bodyLow + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 7)
@@ -83,16 +92,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     round(k.turned('suction', 'pipe', 'x', k.disc(0.1, -4.4, archRear + 0.1), [0, s.bodyFloor + 0.42, 0])),
     round(k.turned('riser', 'pipe', 'y', k.disc(0.08, s.bodyFloor + 0.74, shutterTop), [-4.7, 0, 0])),
   ], finish) + { title: 'Airport crash tender pump' },
-  k.compound('airport_crash_tender_lockers', s.lockersMass,
-    shutter('fore', dividers.mid + postHalf, s.bodyFront - 2 * postHalf, bandTop, shutterTop)
-    + shutter('mid', archFront + 0.02, dividers.mid - postHalf, bandTop, shutterTop)
-    + shutter('wheel_fore', dividers.wheel + postHalf, archFront - 0.02, bandTop, shutterTop)
-    + shutter('wheel_aft', archRear + 0.02, dividers.wheel - postHalf, bandTop, shutterTop)
-    + shutter('aft', s.bodyRear + 2 * postHalf, archRear - 0.02, bandTop, shutterTop)
-    + [
-      box('low_fore_handle', 'dark', [0.9, archTop - 0.2, s.bodySide], [1.4, archTop - 0.16, s.bodySide + 0.032]),
-      box('low_aft_handle', 'dark', [-5.1, archTop - 0.2, s.bodySide], [-4.6, archTop - 0.16, s.bodySide + 0.032]),
-    ], finish) + { title: 'Airport crash tender lockers' },
+] + k.lockerShutters('airport_crash_tender_locker_shutter_', s.lockersMass, lockerSpans, s.lockers, bandTop, shutterTop, [inset, s.bodySide], finish) + [
   // The water main runs from the body over the cab's back to the roof turret, which turns on it.
   k.compound('airport_crash_tender_roof_turret_mount', s.turretMountMass, [
     round(k.turned('base', 'frame', 'y', k.disc(0.26, 0, 0.06), [s.turretX, turretY, 0])),

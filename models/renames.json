@@ -1,4 +1,5 @@
 {
+  "airport_crash_tender_lockers": "airport_crash_tender_locker_shutter_fore",
   "ambulance_bonnet": "panel_van_bonnet",
   "ambulance_dashboard": "van_dashboard",
   "ambulance_front_bumper": "panel_van_front_bumper",
@@ -37,6 +38,7 @@
   "cube_van_dashboard": "van_dashboard",
   "cube_van_front_bumper": "panel_van_front_bumper",
   "cube_van_windscreen": "van_windscreen",
+  "fire_engine_lockers": "fire_engine_locker_shutter_fore",
   "food_truck_bonnet": "step_van_bonnet",
   "food_truck_dashboard": "step_van_dashboard",
   "food_truck_front_bumper": "step_van_front_bumper",

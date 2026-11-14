@@ -116,14 +116,31 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   clipped(piece, plates):
     assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';
     piece { clip: plates },
-  // A roller shutter in a locker wall, from `z[0]` to `z[1]`: horizontal slats in alternating `alu` and `steel`, with a
-  // grab bar in `dark` along its foot.
-  shutter(name, x0, x1, y0, y1, z): [
-    box(name + '_bar', 'dark', [x0, y0, z[0]], [x1, y0 + 0.08, z[1]]),
-  ] + [
-    box(name + '_slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [x0, y0 + 0.08 + i * 0.09, z[0]], [x1, std.min(y0 + 0.08 + (i + 1) * 0.09, y1), z[1]])
-    for i in std.range(0, std.ceil((y1 - y0 - 0.08) / 0.09) - 1)
-  ],
+  // A roller shutter in a locker wall, from `z[0]` to `z[1]`, as a part of its own: horizontal slats in alternating
+  // `alu` and `steel` above a grab bar in `dark` along its foot. It rolls up into the drum behind the wall's head and
+  // leaves its bar under the lintel.
+  shutter(id, massKg, x0, x1, y0, y1, z, finish):
+    local bar = 0.08;
+    local pitch = self.slatPitch;
+    self.compound(id, massKg, [
+      box('bar', 'dark', [x0, y0, z[0]], [x1, y0 + bar, z[1]]),
+    ] + [
+      box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [x0, y0 + bar + i * pitch, z[0]], [x1, std.min(y0 + bar + (i + 1) * pitch, y1), z[1]])
+      for i in std.range(0, std.ceil((y1 - y0 - bar) / pitch) - 1)
+    ], finish, motion=self.motion.slide('up', y1 - y0 - bar, stow=true)),
+  // The height of one roller-shutter slat.
+  slatPitch: 0.09,
+  // A locker wall's roller shutters, one `shutter` part each from `y0` to `y1`: `spans` gives each locker its `[x0, x1]`
+  // along the body and `titles` its part's title. Each part weighs its share of `massKg` by its width.
+  lockerShutters(idPrefix, massKg, spans, titles, y0, y1, z, finish):
+    assert std.objectFields(spans) == std.objectFields(titles) : idPrefix + ' lockers need a span and a title each';
+    local width(name) = spans[name][1] - spans[name][0];
+    local total = std.foldl(function(sum, name) sum + width(name), std.objectFields(spans), 0);
+    [
+      self.shutter(idPrefix + name, std.round(massKg * width(name) / total), spans[name][0], spans[name][1], y0, y1, z, finish)
+      + { title: titles[name] }
+      for name in std.objectFields(spans)
+    ],
   // The x of a fork raked back from its axle at (axle, hub), `rake` m for each metre it rises.
   forkX(axle, hub, rake): function(y) axle - (y - hub) * rake,
   compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
