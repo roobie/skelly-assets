@@ -38,6 +38,7 @@ import pistolAction from '../../../../../models/guns/tables/pistolAction.json' w
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
+import { SHROUD_HALF_HEIGHT } from './antiMateriel/barrelShroud.ts';
 import { ANTI_MATERIEL_FAMILIES } from './antiMateriel/index.ts';
 import { arChargingHandle, arChargingHandleSolidsFor, arHandleChannel } from './arChargingHandle.ts';
 import {
@@ -79,6 +80,7 @@ import {
 } from './receiverSection.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
+import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import {
   curvedTriggerBlade,
   openTriggerGuard,
@@ -4028,6 +4030,25 @@ const railRearSight: PartFamily = {
   },
 };
 
+/** A fixed front post on an anti-materiel barrel shroud, its top on the conventional iron sight line. */
+const shroudFrontSight: PartFamily = {
+  name: 'shroud-front-sight',
+  params: {},
+  build(): PartDef {
+    const postTopU = IRON_SIGHT_LINE_U - SHROUD_HALF_HEIGHT;
+    return {
+      family: 'shroud-front-sight',
+      solids: shroudFrontSightSolids(postTopU),
+      ports: [
+        { id: 'base', mount: 'shroud-sight', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
+      ],
+      keepOuts: [],
+      axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
+      tags: [VOXEL_DETAIL],
+    };
+  },
+};
+
 /**
  * An AK gas block collars the barrel at the gas port and reaches back to the gas cylinder's end face: a
  * flat top over the cylinder, then a rake down to the collar's front.
@@ -5694,6 +5715,7 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   'front-sight-bead': muzzleBead,
   'rail-front-sight': railFrontSight,
   'rail-rear-sight': railRearSight,
+  'shroud-front-sight': shroudFrontSight,
   'sporting-rear-sight': sportingRearSight,
   'gas-cylinder': gasCylinder,
   'gas-block': gasBlock,
