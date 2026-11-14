@@ -1,6 +1,6 @@
 // A shallow rotating upper body above the original security walker's fixed leg carrier.
 // All measurements in metres in the vehicle source frame (+x forward, +y up, +z near).
-local base = import 'security_walker.spec.libsonnet';
+local base = import 'mech_walker_vehicle_1.spec.libsonnet';
 local high = 4.45;
 {
   base: base,

@@ -7,6 +7,7 @@ import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
+import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { LOOK_DIR, lookDigest, staleIds } from './look.mjs';
 import { MANIFEST } from './manifest.mjs';
 
@@ -83,7 +84,7 @@ function card(vehicle) {
 
 const families = Map.groupBy(vehicles, (vehicle) => vehicle.review?.family ?? 'Awaiting review');
 const sections = [...families]
-  .sort(([a], [b]) => a.localeCompare(b))
+  .sort(([a], [b]) => compareCodeUnits(a, b))
   .map(([family, members]) => `<section>
   <h2>${escapeHtml(family)} <span>${members.length}</span></h2>
   <div class="grid">${members.map(card).join('\n')}</div>

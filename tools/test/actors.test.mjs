@@ -808,8 +808,20 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
   }
 });
 
-test('leaper pose clips reproduce its live frames at every stored cursor, whole and maimed', async () => {
+// A track clip's baked frames are its live frames at every stored cursor; loops play in place, finite clips keep their
+// travel. Each case is [baked clip, name for messages, live frame at a cursor].
+async function assertTrackClipsMatchLive(cases) {
   const { decodeFrame } = await import('../actorCompose.mjs');
+  for (const [clip, name, frameOf] of cases) for (const [i, frame] of clip.frames.entries()) {
+    const live = frameOf(clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1));
+    const decoded = decodeFrame(frame);
+    const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
+    decoded.root.forEach((value, axis) => assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`));
+    for (const [id, rotation] of Object.entries(pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
+  }
+}
+
+test('leaper pose clips reproduce its live frames at every stored cursor, whole and maimed', async () => {
   const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
   const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
   const { figureFor } = await import('../actorFigure.mjs');
@@ -822,16 +834,37 @@ test('leaper pose clips reproduce its live frames at every stored cursor, whole 
     [clips.standing.walk, 'stalk', {}], [clips.standing.attack, 'rake', {}], [clips.standing.pounce, 'pounce', {}],
     [clips.limping.walk.right, 'limp', { cuts: ['thigh.R'], mirrored: true }], [clips.dragging.walk, 'drag', { cuts: ['thigh.L', 'thigh.R'] }],
   ];
-  for (const [clip, name, cut] of cases) for (const [i, frame] of clip.frames.entries()) {
-    const live = leaperFrame(realized, name, clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1), cut);
-    const decoded = decodeFrame(frame);
-    // Loops play in place; finite clips keep the travel that is part of the move.
-    const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
-    decoded.root.forEach((value, axis) => assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`));
-    for (const [id, rotation] of Object.entries(pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
-    if (name === 'pounce') assert.equal(frame.charge, live.charge);
-  }
+  await assertTrackClipsMatchLive(cases.map(([clip, name, cut]) => [clip, name, (u) => leaperFrame(realized, name, u, cut)]));
+  const pounce = clips.standing.pounce;
+  pounce.frames.forEach((frame, i) => assert.equal(frame.charge, leaperFrame(realized, 'pounce', i / (pounce.frames.length - 1)).charge));
   assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);
+});
+
+test('walker pose clips reproduce its live frames and state the stride and hit its clips author', async () => {
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { walkerClip, walkerFrame } = await import('../packages/mobgen/src/mob/walker/motion.ts');
+  const template = consumableTemplate('security-walker');
+  const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
+  const { clips } = await bakeFixture('security-walker');
+  await assertTrackClipsMatchLive([[clips.standing.idle, 'idle'], [clips.standing.walk, 'stomp'], [clips.standing.attack, 'fire']]
+    .map(([clip, name]) => [clip, name, (u) => walkerFrame(realized, name, u)]));
+  const fire = clips.standing.attack;
+  fire.frames.forEach((frame, i) => assert.equal(frame.charge, walkerFrame(realized, 'fire', i / (fire.frames.length - 1)).charge));
+  assert.equal(clips.standing.walk.strideMetres, walkerClip('stomp').travel.at(-1)[1]);
+  assert.equal(clips.standing.attack.hitAtSimSeconds, walkerClip('fire').hit * walkerClip('fire').seconds);
+});
+
+test('a keyed-rig mob row paces its walk at the speed its walk clip travels', async () => {
+  const { readMobRows } = await import('../layout.mjs');
+  const { leaperClip } = await import('../packages/mobgen/src/mob/leaper/motion.ts');
+  const { walkerClip } = await import('../packages/mobgen/src/mob/walker/motion.ts');
+  const root = new URL('../..', import.meta.url).pathname;
+  for (const [id, clip] of [['leaper', leaperClip('stalk')], ['mech_walker_mob_1', walkerClip('stomp')]]) {
+    const row = readMobRows(root).find((candidate) => candidate.id === id);
+    assert(Math.abs(row.walk_speed - clip.travel.at(-1)[1] / clip.seconds) < 0.01, `${id} walk_speed matches its clip`);
+  }
 });
 
 // Hand-authored motion, independent of generated geometry and content tuning.
