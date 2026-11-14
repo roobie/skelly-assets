@@ -10,7 +10,8 @@
     "./optic-aperture": "./src/opticAperture.ts",
     "./materials": "./src/materials.ts",
     "./mass": "./src/mass.ts",
-    "./single-part": "./src/singlePart.ts"
+    "./single-part": "./src/singlePart.ts",
+    "./motion": "./src/motion.ts"
   },
   "scripts": {
     "pretypecheck": "node ../../sources.mjs",

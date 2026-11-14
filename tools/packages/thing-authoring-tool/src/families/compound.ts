@@ -55,12 +55,15 @@ const Pieces = pipe(
   check((pieces) => new Set(pieces.map(({ id }) => id)).size === pieces.length, 'duplicate piece id'),
 );
 
+/** A compound part's pieces as authored, the analytic shapes a part's motion is derived from. */
+export const compoundPieces = (params: Readonly<Record<string, string>>) => parse(strictObject({ pieces: Pieces }), params).pieces;
+
 /**
  * Convex pieces welded into one part, each with its own slot: a pressing or casting that no single
  * primitive describes. Each piece keeps its own collision box, so the part's collision follows its shape.
  */
 export const compound = (params: Readonly<Record<string, string>>, defaultSides?: number): Solid[] =>
-  parse(strictObject({ pieces: Pieces }), params).pieces.map((piece): Solid => {
+  compoundPieces(params).map((piece): Solid => {
     if (piece.kind === 'box') {
       if (!piece.min.every((low, i) => low < piece.max[i]!)) {
         throw new Error(`Compound box ${piece.id} needs positive size`);
