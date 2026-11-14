@@ -1,7 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
-local stow = import 'stowage-kit.libsonnet';
 local vehicle = import 'airport_crash_tender.placements.libsonnet';
 local box = k.box;
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
@@ -28,6 +27,7 @@ local lockerSpans = {
   aft: [s.bodyRear + 2 * postHalf, archRear - 0.02],
 };
 local post(name, x) = box('post_' + name, 'paint', [x - postHalf, bandTop, inset], [x + postHalf, shutterTop, s.bodySide]);
+local stow = import 'stowage-kit.libsonnet';
 // Between neighbouring lockers a partition runs back to the lockers' back wall.
 local spanList = std.sort(std.objectValues(lockerSpans), function(span) span[0]);
 local gaps = [[spanList[i][1], spanList[i + 1][0]] for i in std.range(0, std.length(spanList) - 2)];
