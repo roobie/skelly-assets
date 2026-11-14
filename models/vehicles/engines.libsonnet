@@ -15,6 +15,9 @@
   v8_petrol: { title: 'V8 petrol engine', class: 'light', layout: 'vee', massKg: 260, length: 0.62, width: 0.72, height: 0.68 },
   // A 3-litre pushrod car six of about 85 kW. Its mass and measures are estimates for a six of its size.
   i6_petrol: { title: 'Inline-6 petrol engine', class: 'light', massKg: 210, length: 0.78, width: 0.44, height: 0.66 },
+  // A light truck's four. Its frame rails reach up past the block's side where a car's low alternator and starter
+  // hang, so it takes a light truck's accessories. Its mass and measures are estimates for a 2.2-litre truck four.
+  i4_petrol_medium: { title: 'Medium inline-4 petrol engine', class: 'medium', massKg: 160, length: 0.5, width: 0.48, height: 0.55 },
   // A 6.3-litre White 160AX side-valve six of 110 kW, as in the M3 half-track. Its mass and measures are estimates for a
   // long-stroke truck six of its size, since no source gives them.
   i6_petrol_large: { title: 'Large inline-6 petrol engine', class: 'medium', massKg: 540, length: 1.0, width: 0.6, height: 0.75 },
