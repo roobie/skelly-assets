@@ -6,7 +6,9 @@ local box = h.box;
 local turned = h.turned;
 local disc = h.disc;
 local prism = h.prism;
-local firefighting(category, material) = { taxonomy: { category: category, keywords: ['firefighting'], tags: { material: material, setting: ['modern'] } } };
+local modern(category, material) = { taxonomy: { category: category, tags: { material: material, setting: ['modern'] } } };
+// Kit that only fire and rescue crews carry; the generic kit they also carry finds its users by category alone.
+local firefighting(category, material) = modern(category, material) + { taxonomy+: { keywords: ['firefighting'] } };
 // The body of a hydraulic rescue tool lying along x from `x0` to `x1` with radius `r`, its axis 100 mm up: a carry
 // handle over it and two hose couplings standing behind the handle.
 local hydraulicBody(x0, x1, r) = [
@@ -78,7 +80,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     turned('cone', 'cone', 'y', [[0, 0], [0, 0.13], [0.42, 0.025], [0.42, 0]], [0, 0.03, 0]),
     turned('band', 'band', 'y', [[0, 0], [0, 0.0875], [0.1, 0.0635], [0.1, 0]], [0, 0.2, 0]),
   ], { cone: 'plastic-orange', band: 'reflective-yellow' }) + { title: 'Traffic cone' }
-  + stow.stows(stow.resting('cone', [0, 0, 0])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'structures', tags: { material: ['plastic'], setting: ['modern'] } } },
+  + stow.stows(stow.resting('cone', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('structures', ['plastic']),
 
   // A portable fire pump 600 mm long in a steel carry frame 570 mm tall: a black engine under a red fuel tank, and a
   // red pump volute on +x with its outlet to the front.
@@ -183,14 +185,14 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     box('end-' + end.id, 'end', [end.x, 0, -0.05], [end.x + 0.01, 0.1, 0.05])
     for end in [{ id: 'aft', x: -0.225 }, { id: 'fore', x: 0.215 }]
   ], { timber: 'wood-pine', end: 'paint-signal-yellow' }) + { title: 'Cribbing block' }
-  + stow.stows(stow.resting('block', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['wood']),
+  + stow.stows(stow.resting('block', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('tools', ['wood']),
 
   // A pine step chock 450 mm long and 200 mm wide, three steps of 80 mm rising toward +x.
   h.compound('step_chock', 5, [
     box('step-%d' % i, 'timber', [-0.225 + i * 0.15, i * 0.08, -0.1], [0.225, (i + 1) * 0.08, 0.1])
     for i in [0, 1, 2]
   ], { timber: 'wood-pine' }) + { title: 'Step chock' }
-  + stow.stows(stow.resting('block', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['wood']),
+  + stow.stows(stow.resting('block', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('tools', ['wood']),
 
   // A rescue rope bag 220 mm across and 400 mm tall: red fabric with a reflective band, a drawn cuff and a carry loop.
   h.compound('rope_bag', 5, [
@@ -199,7 +201,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     disc('cuff', 'cuff', 0.08, 0.34, 0.37),
     box('loop', 'cuff', [-0.015, 0.37, -0.05], [0.015, 0.4, 0.05]),
   ], { bag: 'cloth-red', band: 'reflective-yellow', cuff: 'cloth-black' }) + { title: 'Rope bag' }
-  + stow.stows(stow.resting('bottle', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['fabric']),
+  + stow.stows(stow.resting('bottle', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('tools', ['fabric']),
 
   // A hydraulic power pack 560 mm long and 550 mm tall in a steel carry frame: an orange oil tank with two outlets to
   // the front under a black engine.
@@ -218,7 +220,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     ]
     for side in [{ id: 'back', z: -0.12 }, { id: 'front', z: 0.08 }]
   ]), { frame: 'steel-grey', body: 'plastic-orange', engine: 'plastic-black', coupling: 'steel-stainless' }) + { title: 'Hydraulic power pack' }
-  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.008 } + firefighting('machinery', ['metal', 'plastic']),
+  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.008 } + modern('machinery', ['metal', 'plastic']),
 
   // A hydraulic hose reel on its stand, the reel 440 mm across facing the front: orange twin hose between steel
   // flanges, turned by a crank on its hub.
@@ -231,7 +233,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     turned('hub', 'coupling', 'z', [[0, 0], [0, 0.04], [0.02, 0.04], [0.02, 0]], [0, 0.27, 0.1]),
     box('crank', 'crank', [-0.015, 0.27, 0.12], [0.015, 0.4, 0.135]),
   ], { frame: 'steel-grey', hose: 'plastic-orange', coupling: 'steel-stainless', crank: 'plastic-black' }) + { title: 'Hydraulic hose reel' }
-  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('machinery', ['metal', 'plastic']),
+  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('machinery', ['metal', 'plastic']),
 
   // A slim inverter generator 520 mm long and 440 mm tall: a red case on rubber feet with its control panel and vent
   // on the front and a carry handle along its top.
@@ -245,5 +247,5 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
     for i in [0, 1]
     for j in [0, 1]
   ], { case: 'paint-red', panel: 'plastic-black', foot: 'rubber-black' }) + { title: 'Inverter generator' }
-  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('machinery', ['metal', 'plastic']),
+  + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.004 } + modern('machinery', ['metal', 'plastic']),
 ]
