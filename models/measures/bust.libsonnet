@@ -11,6 +11,8 @@
   shoulderWidth: 0.09, shoulderHeight: 0.12, shoulderDepth: 0.12, deltoidInset: 0.012, deltoidDrop: 0.01,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
   headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
+  // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.
+  eyeLevel: 0.58,
   // How far the hair lies off the skull, and the exponent of the plan superellipse the face, skull and hair share.
   hairThickness: 0.005, facePower: 2.8,
   // How far back the hair's dome sits on the skull, so the crown's hair lies thicker behind than over the brow.

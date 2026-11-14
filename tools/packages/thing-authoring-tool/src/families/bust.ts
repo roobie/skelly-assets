@@ -50,6 +50,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       headHeight: positive,
       headDepth: positive,
       jawHeight: positive,
+      /** How far up the head the eyes lie, as a share of its height. */
+      eyeLevel: positive,
       hairCover: positive,
       hairThickness: positive,
       facePower: positive,
@@ -72,7 +74,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const halfZ = d.headDepth / 2;
   const origin = d.segment === 'head' ? crown + d.neckOverlap : 0;
   const ys = (bottom: number, topY: number): [number, number] => [bottom - origin, topY - origin];
-  const eyeY = crown + d.headHeight * 0.58;
+  const eyeY = crown + d.headHeight * d.eyeLevel;
   const brow = crown + d.jawHeight;
   const deltoidX = d.chestWidth / 2 + d.shoulderWidth / 2 - d.deltoidInset;
   const deltoidY = shoulders - d.shoulderHeight / 2 - d.deltoidDrop;

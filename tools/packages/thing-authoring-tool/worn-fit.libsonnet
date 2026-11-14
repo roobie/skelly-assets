@@ -681,6 +681,30 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // model with its face towards +z, the wearer's front. `base` is how far the model's y = 0 sits above the top of the
   // neck, so a helmet that encloses the head takes a negative one; `fit` stretches it round the skull. The head frame
   // sits higher and turns half round, which the entry cancels so callers need not know it.
+  // The head a rigid head piece seated at `base` encloses, in that seat's frame: the hair's plan half-widths, deeper
+  // by the hair's sweep back, the farthest its plan reaches from the head's axis, which a round shell must clear,
+  // and the heights of the chin, the eyes, the hairline and the hair's top.
+  headroom(base):: {
+    local above(height) = height - bust.neckOverlap - base,
+    halfX: bust.headWidth / 2 + bust.hairThickness,
+    halfZ: bust.headDepth / 2 + bust.hairThickness + bust.hairSweep,
+    local plan(t) = [self.halfX * std.pow(std.cos(t), 2 / bust.facePower), self.halfZ * std.pow(std.sin(t), 2 / bust.facePower)],
+    reach: std.foldl(std.max, [std.sqrt(p[0] * p[0] + p[1] * p[1]) for i in std.range(0, 90) for p in [plan(i * std.pi / 180)]], 0),
+    chin: above(0),
+    eyes: above(bust.headHeight * bust.eyeLevel),
+    brow: above(bust.headHeight - bust.hairCover),
+    top: above(bust.headHeight + bust.hairThickness),
+  },
+  // The base that seats a head piece with height `y` of it over the eyes, such as a visor's slit.
+  eyesAt(y):: self.headroom(0).eyes - y,
+  // A head piece's `brow` anchor, the point of it at height `y` that the showcase seats at the bust's, the hairline on
+  // the hair's plan centre (models/dressing.libsonnet); `headroom(base).brow` seats it as `head(model, base)` does. It
+  // is given as a share of the bounds `min`..`max` of its solid `solid`, which must hold that point; the share is
+  // rounded, so a point on the solid's face does not fall outside it by a float's error.
+  browAnchor(part, solid, min, max, y)::
+    local point = [0, y, -bust.hairSweep];
+    { part: part, solid: solid, fraction: [std.round(1e9 * (point[i] - min[i]) / (max[i] - min[i])) / 1e9 for i in [0, 1, 2]] },
+
   head(model, base, fit=[1, 1, 1]):: {
     rows: [],
     figureModels: [entry(model, 'head', []) + { at: [0, base - bust.headFrameRise, 0], turn: [0, 180, 0], scale: fit }],
