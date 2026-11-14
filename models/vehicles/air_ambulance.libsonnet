@@ -81,14 +81,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + skin('stile_front', 'paint', [s.doorMid - 0.14, s.doorMid - 0.035], [40, 62])
              + skin('mid', 'paint', [s.doorRear + 0.035, s.doorMid - 0.035], [62, 72])
              + skin('lower', 'accent', [s.doorRear + 0.035, s.doorMid - 0.035], [72, 90])
-             + [
-               h.hingeRib('hinge_rib', s.body, s.doorMid - 0.065, s.roofArc + 4, 88),
-               box('handle', 'dark', [s.doorMid - 0.3, 1.34, 0.86], [s.doorMid - 0.14, 1.38, 0.92]),
-             ],
+             + [box('handle', 'dark', [s.doorMid - 0.3, 1.34, 0.86], [s.doorMid - 0.14, 1.38, 0.92])],
              { glass: 'glass-clear', paint: s.paint, frame: s.paint, accent: s.accent, dark: trim },
-             hinges) + { title: 'Air ambulance sliding door' },
+             motion=k.motion.slide('near', s.slidingDoorPlug) + k.motion.slide('rear', s.doorRear - s.floorRear)) + { title: 'Air ambulance sliding door' },
+  // The track reaches out under the plugged door's sill, so the door rolls back on it.
   k.compound('air_ambulance_door_track', 5, [
-    box('sill_track', 'dark', [-1.85, 0.8, 0.84], [s.doorRear, 0.84, 0.92]),
+    box('sill_track', 'dark', [s.floorRear, 0.8, 0.84], [s.doorRear, 0.84, 0.92 + s.slidingDoorPlug]),
   ], { dark: trim }) + { title: 'Air ambulance door track' },
   k.compound('air_ambulance_clamshell_door', 26,
              h.shell('wall', 'paint', s.clamshell, thick=0.06, x=[-2.19, s.tail - 0.0], arc=[3, 177], sides=32)
