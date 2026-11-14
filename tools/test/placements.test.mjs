@@ -141,5 +141,6 @@ test('a rider names another site of its vehicle, and no chain of carriers comes 
   assert.equal(riding(rider('a', 'body'), rider('b', 'a')), '');
   assert.match(riding(rider('a', 'gone')), /a: rides names another site of the vehicle, not gone/);
   assert.match(riding(rider('a', 'a')), /a: rides names another site/);
-  assert.match(riding(rider('a', 'b'), rider('b', 'a')), /a: rides comes back to/);
+  assert.match(riding(rider('a', 'b'), rider('b', 'a')), /a: rides comes back to a/);
+  assert.doesNotMatch(riding(rider('a', 'b'), rider('b', 'c'), rider('c', 'b')), /a: /);
 });

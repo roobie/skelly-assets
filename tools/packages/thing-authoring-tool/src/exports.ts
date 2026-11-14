@@ -44,7 +44,8 @@ export const exportItem = (
     density,
   }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
-  const { report, masses, handling, label, drawn, glow, paintable } = buildItem(item, settings, voxel);
+  const built = buildItem(item, settings, voxel);
+  const { report, masses, handling, label, drawn, glow, paintable } = built;
   if (density) {
     checkDrawnDensity(item, report.resolved, drawn, masses, density);
   }
@@ -78,7 +79,7 @@ export const exportItem = (
   if (collision && item.exportMass !== 'parts') {
     throw new Error(`${item.id}: baked collision travels with exported parts`);
   }
-  const motion = itemMotion(item, settings, report.resolved.placed, voxel.voxelGrain);
+  const motion = itemMotion(item, settings, built, voxel.voxelGrain);
   return {
     glb: out.glb,
     partNodes: out.partNodes,

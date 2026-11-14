@@ -61,10 +61,12 @@ function ridesProblems(vehicle, sites) {
     if (site?.rides === undefined) return [];
     const where = `${vehicle}/${site.id}`;
     if (site.rides === site.id || !carrierOf.has(site.rides)) return [`${where}: rides names another site of the vehicle, not ${site.rides}`];
-    const chain = new Set([site.id]);
+    const chain = [site.id];
     for (let carrier = site.rides; carrier !== undefined; carrier = carrierOf.get(carrier)) {
-      if (chain.has(carrier)) return [`${where}: rides comes back to ${carrier}`];
-      chain.add(carrier);
+      const at = chain.indexOf(carrier);
+      if (at === 0) return [`${where}: rides comes back to ${carrier}`];
+      if (at > 0) return [];
+      chain.push(carrier);
     }
     return [];
   });

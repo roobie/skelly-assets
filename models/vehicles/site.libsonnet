@@ -3,7 +3,7 @@
 local frame = import 'frame.libsonnet';
 local origin = [0, 0, 0];
 // A part that rides another, such as a folding door's free panel on its jamb panel, names the carrier site's id as
-// `rides`: it is posed by the carrier's motion, then by its own.
+// `rides`: its own motion is nested inside its carrier's.
 local one(id, part, at=origin, rides=null) = { id: id, part: part, at: at } + (if rides == null then {} else { rides: rides });
 // A near-side site and its far-side twin, whose part is reflected across its own centre plane before it is placed. A
 // pair that rides names the carrier pair by its id, and each twin rides the carrier on its own side.
