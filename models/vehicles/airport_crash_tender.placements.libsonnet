@@ -1,9 +1,21 @@
 local site = import 'site.libsonnet';
 local t = import 'truck-cab.libsonnet';
+local driveline = import 'driveline.libsonnet';
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
+local id = 'airport_crash_tender';
+local middle(span) = (span[0] + span[1]) / 2;
 {
   title: 'Airport crash tender',
-  sites: t.fittings(site.kit, 'airport_crash_tender', s) + [
+  // The transfer case splits the drive: the rear shaft takes the prop shaft's place and the front shaft runs forward
+  // to the front axle's offset differential.
+  sites: site.adjust(
+    t.fittings(site.kit, id, s),
+    over={ prop_shaft_0: { part: id + '_rear_shaft', at: [middle(s.rearShaft), s.propShaftY, 0] } },
+    add=[
+      site.one('transfer_case', id + '_transfer_case', [s.transferX, s.r, 0]),
+      site.one('front_shaft', id + '_front_shaft', [middle(s.frontShaft), s.r, driveline.axles[s.frontAxlePart].diffZ]),
+    ],
+  ) + [
     site.one('body', 'airport_crash_tender_body'),
     site.one('cab_stripe', 'airport_crash_tender_cab_stripe'),
     site.one('water_tank', 'airport_crash_tender_water_tank'),

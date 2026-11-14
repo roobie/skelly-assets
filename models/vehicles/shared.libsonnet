@@ -487,9 +487,11 @@ local towHitch = k.compound('tow_hitch', 18, [
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37) + { title: 'Van trailer axle' },
 ] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums, 'beam_axle_truck'), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
 + withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, 'steered_axle_heavy', drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
-// Axles long enough to reach flotation tyres set out under a 3 m wide truck.
+// Axles long enough to reach flotation tyres set out under a 3 m wide truck, all driven.
 + withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums, 'beam_axle_wide'), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, 'steered_axle_wide', drums), 'steered_axle_wide', 'Wide steered axle', 'Bare wide steered axle', 400, 'heavy')
++ withBare(function(id, massKg, drums)
+  local axle = driveline.axles.drive_axle_wide;
+  m.driveAxle(id, massKg, 1.24, true, axle.seat.z, drums, axle.seat.y, axle.diffZ), 'drive_axle_wide', 'Wide steered drive axle', 'Bare wide steered drive axle', 700, 'heavy')
 + withBare(steeredAxleDrop, 'steered_axle_drop', 'Drop steered axle', 'Bare drop steered axle', 330, 'heavy')
 + withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 'Truck trailer axle', 'Bare truck trailer axle', 190, 'heavy') + [
   propShaft('prop_shaft_short', 10, 1.2) + { title: 'Short propeller shaft' },
