@@ -3,7 +3,7 @@
 // the lightness per thread, and folds that darken the cloth. The export carries no texture coordinates, so the pattern
 // is laid in the model's own axes, projected along each face's main axis, which on a voxel face is exact. Grain finer
 // than a pixel fades out rather than shimmer, so the cloth reads close up and stays quiet at the game's distance. Why
-// the grain is drawn rather than baked is in docs/decisions/0013-fabric-finishes.md.
+// the grain is drawn rather than baked is in `docs/decisions/0013-fabric-finishes.md`, "Decision".
 const KINDS = ['woven', 'twill', 'knit', 'felt', 'leather', 'rubber'];
 
 const VERTEX_HEAD = /* glsl */ `
@@ -110,6 +110,14 @@ uniform float fabricCrease;
 uniform float fabricFold;
 ${PLANE}
 ${PATTERNS}
+// The narrow side of the patch of surface a pixel covers, at \`p\`: the smaller singular value of p's screen derivatives,
+// its square taken as the determinant over the larger eigenvalue, which does not cancel to noise on a grazing face.
+float fabricNarrowSide(vec3 p) {
+  vec3 dx = dFdx(p), dy = dFdy(p);
+  float xx = dot(dx, dx), yy = dot(dy, dy), xy = dot(dx, dy);
+  float mean = 0.5 * (xx + yy), spread = sqrt(0.25 * (xx - yy) * (xx - yy) + xy * xy);
+  return sqrt(max(xx * yy - xy * xy, 0.0) / max(mean + spread, 1e-30));
+}
 `;
 
 // The steepest a full-relief grain tilts the surface, as the slope of its threads' sides.
@@ -122,16 +130,22 @@ const MOTTLE = 9;
 // How much longer a fold runs down than across, as cloth hangs.
 const DRAPE = 4;
 
-// After the colour is read: the grain's lightness and the folds' darkening on the diffuse colour.
+// A face-on pixel's footprint is √2 times its narrow side, so a mottle faded by the narrow side fades face-on where the
+// grain's footprint would have it.
+const MOTTLE_FADE = FADE.map((cells) => (cells * MOTTLE) / Math.SQRT2);
+
+// After the colour is read: the grain's lightness and the folds' darkening on the diffuse colour. The mottle is one
+// field through the model, faded by the footprint's narrow side, which grows with distance alone, so a stepped
+// surface does not band; see `docs/decisions/0013-fabric-finishes.md`, "Decision".
 const COLOUR = /* glsl */ `
 vec3 fabricPlaneU, fabricPlaneV;
 fabricPlane(vFabricNormal, fabricPlaneU, fabricPlaneV);
 vec2 fabricAt = vec2(dot(vFabricPosition, fabricPlaneU), dot(vFabricPosition, fabricPlaneV)) / fabricGrain;
 float fabricFootprint = length(fwidth(fabricAt));
 float fabricFine = 1.0 - smoothstep(${FADE[0]}, ${FADE[1]}, fabricFootprint);
-float fabricMottleFade = 1.0 - smoothstep(${FADE[0] * MOTTLE}, ${FADE[1] * MOTTLE}, fabricFootprint);
+float fabricMottleFade = 1.0 - smoothstep(${MOTTLE_FADE[0]}, ${MOTTLE_FADE[1]}, fabricNarrowSide(vFabricPosition) / fabricGrain);
 vec2 fabricHere = fabricPattern(fabricAt);
-float fabricMottle = fabricNoise(fabricAt / ${MOTTLE}.0 + 17.0) * 2.0 - 1.0;
+float fabricMottle = fabricNoise3(vFabricPosition / (fabricGrain * ${MOTTLE}.0) + 17.0) * 2.0 - 1.0;
 float fabricFolded = smoothstep(0.3, 0.8, 1.0 - fabricNoise3(vFabricPosition * vec3(1.0, ${1 / DRAPE}, 1.0) / fabricFold));
 float fabricShade = 1.0 + fabricNoiseShare * (fabricHere.y * fabricFine + fabricMottle * fabricMottleFade) - fabricCrease * fabricFolded;
 diffuseColor.rgb *= max(fabricShade, 0.0);
@@ -150,8 +164,9 @@ const NORMAL = /* glsl */ `
 
 const defineOf = (kind) => `FABRIC_${kind.toUpperCase()}`;
 
-// Gives `material` the grain of `fabric`, the extras.fabric of its glTF material. The program is shared by every
-// material of the same kind; each keeps its own numbers.
+// Gives `material` the grain of `fabric`, the extras.fabric of its glTF material, its grain and fold in the units of
+// the mesh's own coordinates: metres in an exported model. The program is shared by every material of the same kind;
+// each keeps its own numbers.
 export function wearFabric(material, fabric) {
   if (!KINDS.includes(fabric.kind)) throw new Error(`${material.name}: no fabric kind ${fabric.kind}; the kinds are ${KINDS.join(', ')}`);
   const uniforms = {

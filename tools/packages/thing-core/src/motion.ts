@@ -1,6 +1,6 @@
 // How a part moves on its carrier, derived from the pins it is drawn with so the axis the game plays is the axis a
 // check proves; see docs/decisions/0015-motion-as-content.md.
-import { cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { add, cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { HingeAxis, Motion, MotionStage } from './schema.ts';
 
 /**
@@ -70,6 +70,23 @@ export const pieceBounds = (piece: AnalyticPiece): Bounds => {
     [lows[i], highs[i]] = [origin[i] - radius, origin[i] + radius];
   }
   return boundsOf(lows, highs);
+};
+
+/** The piece drawn `by` further along each axis of its own frame. */
+export const shiftPiece = (piece: AnalyticPiece, by: Vec3): AnalyticPiece => {
+  if (piece.kind === 'box') {
+    return { ...piece, min: add(piece.min, by), max: add(piece.max, by) };
+  }
+  if (piece.kind === 'turned') {
+    return { ...piece, origin: add(piece.origin ?? [0, 0, 0], by) };
+  }
+  const [along, u, v] = ALONG[piece.axis];
+  return {
+    ...piece,
+    start: piece.start + by[along],
+    end: piece.end + by[along],
+    profile: piece.profile.map(([a, b]) => [a + by[u], b + by[v]] as const),
+  };
 };
 
 /** The bounds the pieces fill together. */
