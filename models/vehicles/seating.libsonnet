@@ -163,7 +163,7 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A door closes into the edge of the shell and of its neighbour, whose frames are drawn to the same line.',
+      'A door closes into the edge of the shell, whose frame is drawn to the same line.',
       [
       ['front_door', 'shell', 0.068],
       ],
