@@ -194,9 +194,9 @@ const heldSeat = (seat, weapon, lead) => ({
  * Every wield baked for a game: stances as one-frame clips, and strikes as clips of frames evenly through their span.
  * Between key frames each joint turns from one key's angles to the next's by its phase's easing, as the pose page blends
  * them, so a swing sweeps an arc and no joint passes its limits. The weapon rides the leading hand; any other hand on it
- * takes it again by its socket in every frame, its elbow swung as far as its wrist needs. A strike carries its phases' ends and its hit in Sim seconds; a weapon
- * class's clips carry the held seat (`heldSeat`). Returns the clips by name and each frame's pose report by clip, for a
- * caller that checks them.
+ * takes it again by its socket in every frame, its elbow swung as far as its wrist needs. A strike carries its phases'
+ * ends and its hit in Sim seconds; a weapon class's clips carry the held seat (`heldSeat`). Returns the clips by name
+ * and each frame's pose report by clip, for a caller that checks them.
  */
 export function wieldClips(rig, wields, weapons, meshOf) {
   const clips = {}, reports = {};
