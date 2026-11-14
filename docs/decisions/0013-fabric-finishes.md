@@ -44,7 +44,10 @@ the renderer's ambient occlusion, which sees the assembled figure.
 
 **Grain finer than a pixel fades out.** At the game's follow distance a thread is a fraction of a pixel and would
 shimmer, so the grain fades by its screen footprint and the slower lightness mottle outlasts it. Up close or in
-first person the threads and pores read; at a distance the cloth keeps only its sheen, roughness and mottle.
+first person the threads and pores read; at a distance the cloth keeps only its sheen, roughness and mottle. The
+mottle is what still shows at a distance, and a voxel garment's stepped surface turns its faces every few voxels, so
+the mottle is one field through the model and fades with distance alone: laid per face, or faded where a step's tread
+lies grazing, it would stripe the steps.
 
 **Garments use fabric finishes.** A garment drawn in a plastic or paint finish stays plastic whatever the renderer
 does, so worn and loose garments name the cloth, leather, felt or rubber they are made of.
