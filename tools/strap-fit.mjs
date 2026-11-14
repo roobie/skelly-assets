@@ -18,10 +18,10 @@ const repo = resolve(import.meta.dirname, '..');
 const BUST = 'player_bust';
 const STRAP = 'strap';
 
-const readBandFit = (root) => JSON.parse(evaluateJsonnet("import 'models/head-band.libsonnet'", root));
+export const readBandFit = (root) => JSON.parse(evaluateJsonnet("import 'models/head-band.libsonnet'", root));
 
-const millimetres = (metres) => `${(metres * 1000).toFixed(1)} mm`;
-const at = (p) => `(${p.map((value) => value.toFixed(3)).join(', ')})`;
+export const millimetres = (metres) => `${(metres * 1000).toFixed(1)} mm`;
+export const at = (p) => `(${p.map((value) => value.toFixed(3)).join(', ')})`;
 
 // A point in a gear model's frame, carried into the bust model frame: turned `turn` degrees about y, then lifted `lift`.
 function placedPoint([x, y, z], turn, lift) {
@@ -31,7 +31,7 @@ function placedPoint([x, y, z], turn, lift) {
 }
 
 // `mesh`, in a gear model's frame, carried into the bust model frame point by point.
-function placed(mesh, turn, lift) {
+export function placed(mesh, turn, lift) {
   const positions = [];
   for (let i = 0; i < mesh.positions.length; i += 3) positions.push(...placedPoint(mesh.positions.slice(i, i + 3), turn, lift));
   return { positions, indices: mesh.indices };
@@ -106,9 +106,11 @@ function strapOf(buffer, model) {
   return { strap: meshes[0], grain: [...grains][0] };
 }
 
-/** The strap findings of every band-fitted gear model in a built tree, whose manifest is `manifest`. */
-export function treeStrapFindings(built, manifest, root = repo) {
-  const { frame, worn } = readBandFit(root);
+/**
+ * A built tree's models, whose manifest is `manifest`: `glbOf(id)` and `anchorsOf(id)` read a model's file and its
+ * anchors, and `head` is the player bust's head as one mesh in the bust model frame.
+ */
+export function builtModels(built, manifest) {
   const entryOf = (id) => {
     const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
     if (!entry) throw new Error(`the built tree holds no ${id}`);
@@ -118,6 +120,13 @@ export function treeStrapFindings(built, manifest, root = repo) {
   const anchorsOf = (id) => JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
+  return { glbOf, anchorsOf, head };
+}
+
+/** The strap findings of every band-fitted gear model in a built tree, whose manifest is `manifest`. */
+export function treeStrapFindings(built, manifest, root = repo) {
+  const { frame, worn } = readBandFit(root);
+  const { glbOf, anchorsOf, head } = builtModels(built, manifest);
   return Object.entries(worn).flatMap(([model, place]) => [
     ...strapFindings({ head, ...strapOf(glbOf(model), model), frame, worn: place, model }),
     ...anchorFindings({ head, anchors: anchorsOf(model), frame, worn: place, model }),
