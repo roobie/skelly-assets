@@ -57,6 +57,37 @@ local vee(id, massKg, length, width, height) = k.compound(id, massKg, [
 ] + k.bothSides([
   box('bank', 'casting', [-length / 2, height * 0.55, width * 0.14], [length / 2, height * 0.9, width / 2]),
 ]), { casting: 'steel-grey', cover: 'paint-charcoal' });
+// A work machine's six reads by what a road engine's bonnet hides: the turbo on its exhaust side, the charge pipe over
+// the head to the intake, the crank damper and the bell housing it bolts to its drive with. It is kept narrow so the
+// accessories stay within a crawler's hood.
+local offHighway(id, massKg, length, width, height) =
+  local l = length;
+  local w = width;
+  local h = height;
+  local crank = h * 0.25;
+  local round(piece) = piece + { sides: 12 };
+  local turbo = { x: -l * 0.05, y: h * 0.86, z: -w * 0.6, radius: 0.09 };
+  local charge = { x: l * 0.3, y: h * 1.0, radius: 0.045 };
+  k.compound(id, massKg, [
+    box('sump', 'casting', [-l / 2, 0, -w * 0.4], [l / 2, h * 0.2, w * 0.4]),
+    box('block', 'casting', [-l / 2, h * 0.2, -w / 2], [l / 2, h * 0.66, w / 2]),
+    box('head', 'casting', [-l * 0.47, h * 0.66, -w * 0.44], [l * 0.47, h * 0.84, w * 0.44]),
+    box('cover', 'cover', [-l * 0.43, h * 0.84, -w * 0.34], [l * 0.43, h * 0.92, w * 0.34]),
+    box('intake', 'casting', [-l * 0.4, h * 0.6, w / 2], [l * 0.32, h * 0.8, w * 0.66]),
+    box('manifold', 'exhaust', [-l * 0.4, h * 0.52, -w * 0.62], [l * 0.4, h * 0.68, -w / 2]),
+    box('turbo_foot', 'exhaust', [turbo.x - 0.06, h * 0.68, turbo.z - 0.05], [turbo.x + 0.06, turbo.y, turbo.z + 0.05]),
+    round(k.turned('turbine', 'exhaust', 'x', k.disc(turbo.radius, -0.1, 0), [turbo.x, turbo.y, turbo.z])),
+    round(k.turned('compressor', 'pipe', 'x', k.disc(turbo.radius * 0.9, 0.02, 0.1), [turbo.x, turbo.y, turbo.z])),
+    round(k.turned('outlet', 'exhaust', 'y', k.disc(0.055, 0, h * 0.24), [turbo.x - 0.05, turbo.y, turbo.z])),
+    round(k.turned('charge_feed', 'pipe', 'x', k.disc(charge.radius, 0.1, charge.x - turbo.x), [turbo.x, turbo.y, turbo.z])),
+    round(k.turned('charge_rise', 'pipe', 'y', k.disc(charge.radius, turbo.y, charge.y), [charge.x, 0, turbo.z])),
+    round(k.turned('charge_cross', 'pipe', 'z', k.disc(charge.radius, turbo.z, w * 0.58), [charge.x, charge.y, 0])),
+    round(k.turned('charge_drop', 'pipe', 'y', k.disc(charge.radius, h * 0.8, charge.y), [charge.x, 0, w * 0.58])),
+    round(k.turned('alternator', 'cover', 'x', k.disc(0.08, -0.1, 0.1), [l * 0.38, h * 0.6, w / 2 + 0.08])),
+    round(k.turned('damper', 'pulley', 'x', k.disc(0.15, l / 2, l / 2 + 0.06), [0, crank, 0])),
+    round(k.turned('fan_pulley', 'pulley', 'x', k.disc(0.1, l / 2, l / 2 + 0.04), [0, h * 0.55, 0])),
+    round(k.turned('bell_housing', 'casting', 'x', k.disc(0.26, -l / 2 - 0.06, -l / 2), [0, crank, 0])),
+  ], { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pipe: 'alu-bare', pulley: 'steel-spall-black' });
 local gearbox(id, massKg, length, width, height) = k.compound(id, massKg, [
   box('case', 'casting', [-length / 2, 0, -width / 2], [length / 2, height, width / 2]),
 ], { casting: 'steel-grey' });
@@ -466,6 +497,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   inline('engine_i3_small', 85, 0.34, 0.42, 0.52) + { title: 'Small inline-3 engine' },
   inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75) + { title: 'Inline-6 diesel engine' },
   inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95) + { title: 'Heavy inline-6 diesel engine' },
+  offHighway('engine_i6_off_highway_diesel', 900, 1.06, 0.68, 0.98) + { title: 'Off-highway inline-6 diesel engine' },
   vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6) + { title: 'V6 petrol engine' },
   vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68) + { title: 'V8 petrol engine' },
   vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88) + { title: 'V8 diesel engine' },

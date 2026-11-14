@@ -14,7 +14,7 @@ local track = import 'track-kit.libsonnet';
     site.one('ripper', 'bulldozer_ripper'),
     site.one('tilt_cylinder', 'bulldozer_tilt_cylinder'),
     site.one('tilt_brace', 'bulldozer_tilt_brace') + { mirror: true },
-    site.one('engine', 'engine_i6_heavy_diesel', [0.82, 0.52, 0]),
+    site.one('engine', 'engine_i6_off_highway_diesel', [0.88, 0.52, 0]),
     site.one('radiator', 'radiator_truck', [1.66, s.frameTop, 0]),
     site.one('transmission', 'gearbox_heavy', [-0.45, 0.42, 0]),
     site.one('exhaust', 'exhaust_stack_small', [1.05, 2.0, -0.25]),
