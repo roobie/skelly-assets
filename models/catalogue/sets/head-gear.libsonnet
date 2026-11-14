@@ -1,6 +1,10 @@
 // Head gear in the worn frame: origin at the centre of deadvox's head region, y up, the face toward +z, the wearer's
 // left at +x. Clearances are measured against the player bust's head (`avatar.libsonnet`, `bust`).
 local band = import 'models/head-band.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+// The riot helmet's origin is the head frame, so it is seated that far above the top of the neck.
+local head = fit.headroom(bust.headFrameRise);
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local turned(id, slot, axis, profile, origin) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
@@ -25,28 +29,28 @@ local arc(id, slot, radii, bearings, step, heights, z0) = [
 
 local h = {
   back: 0,
-  // The bust's crown is a block, so the shell's round plan has to clear the block's corners, not only its sides.
-  inner: 0.14,
-  outer: 0.153,
+  // The padding's room between the hair and the shell.
+  inner: head.reach + 0.01,
+  outer: self.inner + 0.013,
   // The face opening's top edge sits above the eyes.
-  brow: 0.055,
-  // The dome rises from above the crown block's lower edge, so the upright wall, not the curve, passes its corners.
-  domeBase: 0.1,
-  crownInner: 0.085,
-  crownOuter: 0.098,
+  brow: head.eyes + 0.02,
+  // The dome rises from the hairline, where the hair begins to round over.
+  domeBase: head.brow,
+  crownInner: head.top + 0.01 - self.domeBase,
+  crownOuter: self.crownInner + 0.013,
   skirtBottom: -0.03,
   // The face opening's half-width, in degrees either side of the face.
   opening: 70,
   pivotBearing: 100,
   pivotHeight: 0.038,
-  visorInner: 0.162,
-  visorOuter: 0.168,
+  // The visor clears the band it hinges from.
+  visorInner: self.outer + 0.009,
+  visorOuter: self.visorInner + 0.006,
   // The visor reaches below the chin, so a blow from the front meets it rather than the jaw.
   visorBottom: -0.13,
   visorTop: 0.042,
 };
-// A squared dome, a superellipse of exponent four: a round dome low enough to look right would cut the crown's top
-// edges.
+// A squared dome, a superellipse of exponent four: a round dome low enough to look right would cut the hair's crown.
 local dome(steps) =
   local point(r, height, i) = [height * std.sqrt(std.sin(rad(90 * i / steps))), r * std.sqrt(std.cos(rad(90 * i / steps)))];
   // Material lies left of travel: in along the rim, up the inside, then down the outside.
@@ -111,6 +115,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
     }],
     connections: [],
     handling: { part: 'helmet', solid: 'dome', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
+    anchors: { brow: fit.browAnchor('helmet', 'dome', [-h.outer, h.domeBase, h.back - h.outer], [h.outer, h.domeBase + h.crownOuter, h.back + h.outer], head.brow) },
   },
   {
     id: 'night_vision_goggles',
