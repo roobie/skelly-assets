@@ -13,6 +13,7 @@ import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragon
 import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
 import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
 import { leaperClip, leaperFrame } from './packages/mobgen/src/mob/leaper/motion.ts';
+import { walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
 
 /** Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs). */
 export const poseFrame = (pose) => ({
@@ -133,18 +134,17 @@ export function creatureClips(figure, template, row) {
 }
 
 /**
- * The leaper's clips are tracks on its own rig, each grounded on the supports its body keeps. Loops play in
+ * A keyed-rig mob's clips are tracks on its own rig, each grounded on the supports its body keeps. Loops play in
  * place and state their stride, like every walk; finite clips keep their travel, since a pounce's distance is
- * the attack. Bodies that lost hind springs get their own sets, as a legless humanoid gets a crawling one;
- * `limping.walk` is keyed by the side that lost its spring.
+ * the attack. Returns the baker of one named clip, with the cut points already severed.
  */
-export function leaperClips(figure, _template, row) {
+function trackClipBaker(figure, row, mob, clipOf, frameOf) {
   if (!(Number.isInteger(row.walk_frames) && row.walk_frames >= 2 && Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) {
-    throw new RangeError('leaper frame counts must be at least two');
+    throw new RangeError(`${mob} frame counts must be at least two`);
   }
-  const bake = (name, cut = {}) => {
-    const clip = leaperClip(name);
-    const at = (u) => leaperFrame(figure.realized, name, u, cut);
+  return (name, cut = {}) => {
+    const clip = clipOf(name);
+    const at = (u) => frameOf(figure.realized, name, u, cut);
     const inPlace = (u) => { const { pose } = at(u); return { ...pose, root: [pose.root[0], pose.root[1], 0] }; };
     const travel = clip.travel?.at(-1)[1];
     const baked = clip.loop
@@ -160,11 +160,24 @@ export function leaperClips(figure, _template, row) {
     if (clip.charge) baked.frames = baked.frames.map((frame, i) => ({ ...frame, charge: at(cursor(i)).charge }));
     return baked;
   };
+}
+
+/** The leaper's clips. Bodies that lost hind springs get their own sets, as a legless humanoid gets a crawling
+ * one; `limping.walk` is keyed by the side that lost its spring. */
+export function leaperClips(figure, _template, row) {
+  const bake = trackClipBaker(figure, row, 'leaper', leaperClip, leaperFrame);
   return {
     standing: { idle: bake('idle'), walk: bake('stalk'), run: bake('bound'), attack: bake('rake'), pounce: bake('pounce'), flinch: bake('flinch') },
     limping: { walk: { left: bake('limp', { cuts: ['thigh.L'] }), right: bake('limp', { cuts: ['thigh.R'], mirrored: true }) } },
     dragging: { walk: bake('drag', { cuts: ['thigh.L', 'thigh.R'] }) },
   };
+}
+
+/** The walker's clips: a boss that stomps and fires, with no limping or dragging sets because its legs are solved
+ * to the ground rather than lost. */
+export function walkerClips(figure, _template, row) {
+  const bake = trackClipBaker(figure, row, 'walker', walkerClip, walkerFrame);
+  return { standing: { idle: bake('idle'), walk: bake('stomp'), attack: bake('fire') } };
 }
 
 /**

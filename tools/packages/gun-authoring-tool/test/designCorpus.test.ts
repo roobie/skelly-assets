@@ -12,6 +12,7 @@ import { AR_FRAMES_BY_CALIBRE } from '../src/gun/arFrames.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { loadFixtures } from './helpers.ts';
+import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 
 const PUBLISH_CHECK = join(import.meta.dirname, 'fixtures', 'publish-check');
 
@@ -55,7 +56,7 @@ const roundedGeometry = (assembly: Assembly) => {
           .sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]! || a[2]! - b[2]!),
       }));
     })
-    .sort((a, b) => a.partId.localeCompare(b.partId) || a.id.localeCompare(b.id));
+    .sort((a, b) => compareCodeUnits(a.partId, b.partId) || compareCodeUnits(a.id, b.id));
 };
 
 const byName = new Map(loadFixtures().map((fixture) => [fixture.name, fixture]));

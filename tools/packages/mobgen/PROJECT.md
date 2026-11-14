@@ -84,7 +84,8 @@ The security walker is a machine, not an animal, so it is its own plan: every jo
 travel and its parts are plate that must read as built, not grown. A machine that weighs tonnes must plant
 its feet, and keyed legs slide as the body moves, so its legs are solved to ground targets while only the hull,
 head and pods are keyed. It validates at its template grid only: at boss scale it exceeds the far-LOD
-triangle cap other mobs meet, so it carries no far-LOD search. It stays standalone like the leaper and
+triangle cap other mobs meet, so it carries no far-LOD search and its export row keeps full detail, as the
+leaper's does. It stays standalone like the leaper and
 shares only clip plumbing with it. See `src/mob/walker/plan.ts`, `WALKER_TEMPLATE`;
 `src/mob/walker/motion.ts`, `walkerAngles`; and `src/mob/keyframes.ts`, `groundedFrame`.
 
