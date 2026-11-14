@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
-import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames.mjs';
+import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip, slerp } from './clipFrames.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -184,11 +184,6 @@ const readablePose = (rig, frame) => {
     ...(bent(root) ? { root: root.map((x) => round(x, 4)) } : {}),
   };
 };
-
-const slerp = (() => {
-  const qa = new THREE.Quaternion(), qb = new THREE.Quaternion();
-  return (a, b, w) => qa.fromArray(a).slerp(qb.fromArray(b), w).toArray();
-})();
 
 // The seconds a clip plays over once: a walk by its stride at the actor's walk speed, a loop by its period, a finite
 // clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
@@ -638,7 +633,7 @@ async function startPage(data, query) {
       state.carries = blendCarries(clip.carries[i], clip.carries[j], w);
       carryLoaded(figure, state.carries);
     }
-    take(sampleClip(playing, cursor, slerp));
+    take(sampleClip(playing, cursor));
   };
   const setClip = (frames, { actor = null, carries = null, timing = {}, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
     clip.frames = frames;

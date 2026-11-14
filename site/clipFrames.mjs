@@ -1,6 +1,6 @@
 // Clip frames, as a clip stores them: sampling a clip and decoding a frame into matrices. Loaded as is by the browser
 // and by Node, because the browser cannot reach tools/actorCompose.mjs (mobgen TypeScript, Jsonnet source). That
-// module wraps sampleClip with mobgen's slerp and re-exports the rest.
+// module re-exports it. Nothing here imports three.js, so the decode path stays free of the renderer.
 import { quatToMat3 } from './kinematics.mjs';
 
 /** A finite clip carries exactly one span key, named for the clock its caller samples it on; never guess. */
@@ -54,10 +54,34 @@ export function clipKeys(clip, cursor) {
 }
 
 /**
- * Returns a stored frame unchanged at exact frame cursors, including finite endpoints. The caller supplies `slerp`
- * (quaternion a, quaternion b, weight) because the browser interpolates with three.js and Node with mobgen.
+ * The unit quaternion `weight` of the way from `a` to `b` along the shorter arc, as [x, y, z, w]. Nearly parallel
+ * quaternions are lerped and normalised, because the spherical weights divide by a sine that vanishes there.
  */
-export function sampleClip(clip, cursor, slerp) {
+export function slerp(a, b, weight) {
+  let [bx, by, bz, bw] = b;
+  let cos = a[0] * bx + a[1] * by + a[2] * bz + a[3] * bw;
+  if (cos < 0) {
+    cos = -cos;
+    bx = -bx;
+    by = -by;
+    bz = -bz;
+    bw = -bw;
+  }
+  if (cos > 0.9995) {
+    const x = a[0] + (bx - a[0]) * weight, y = a[1] + (by - a[1]) * weight;
+    const z = a[2] + (bz - a[2]) * weight, w = a[3] + (bw - a[3]) * weight;
+    const n = Math.hypot(x, y, z, w) || 1;
+    return [x / n, y / n, z / n, w / n];
+  }
+  const half = Math.acos(cos);
+  const sin = Math.sin(half);
+  const wa = Math.sin((1 - weight) * half) / sin;
+  const wb = Math.sin(weight * half) / sin;
+  return [a[0] * wa + bx * wb, a[1] * wa + by * wb, a[2] * wa + bz * wb, a[3] * wa + bw * wb];
+}
+
+/** Returns a stored frame unchanged at exact frame cursors, including finite endpoints; rotations blend with `slerpRotation`. */
+export function sampleClip(clip, cursor, slerpRotation = slerp) {
   const { i, j, w } = clipKeys(clip, cursor);
   const a = clip.frames[i];
   if (w === 0) return a;
@@ -65,7 +89,7 @@ export function sampleClip(clip, cursor, slerp) {
   const ids = new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)]);
   return {
     root: a.root.map((x, axis) => x + (b.root[axis] - x) * w),
-    rotations: Object.fromEntries([...ids].map((id) => [id, slerp(a.rotations[id] ?? [0, 0, 0, 1], b.rotations[id] ?? [0, 0, 0, 1], w)])),
+    rotations: Object.fromEntries([...ids].map((id) => [id, slerpRotation(a.rotations[id] ?? [0, 0, 0, 1], b.rotations[id] ?? [0, 0, 0, 1], w)])),
   };
 }
 

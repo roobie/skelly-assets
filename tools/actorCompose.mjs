@@ -1,6 +1,5 @@
 // Assets-side twin of the generator-free actor clip reader.
-import { sampleClip as sampleFrames } from '../site/clipFrames.mjs';
-import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, slerpQuat } from './packages/mobgen/src/core/math.ts';
+import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ } from './packages/mobgen/src/core/math.ts';
 import { clampJointAngles, jointAngles, jointRotation } from './packages/mobgen/src/core/joints.ts';
 import { clamp, transpose } from './packages/mobgen/src/core/math.ts';
 import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
@@ -114,6 +113,4 @@ export function applyMotion(base, motion, time, seed) {
   return { root: [...base.root], rotations };
 }
 
-export { clipSpanSeconds, decodeFrame } from '../site/clipFrames.mjs';
-
-export const sampleClip = (clip, cursor) => sampleFrames(clip, cursor, slerpQuat);
+export { clipSpanSeconds, decodeFrame, sampleClip } from '../site/clipFrames.mjs';
