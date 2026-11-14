@@ -48,7 +48,13 @@ import {
   smg,
 } from '../src/gun/templates.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { loadDesignAssembly, type MutableAssembly, scopedAntiMaterielDesign, scopedArDesign } from './helpers.ts';
+import {
+  loadDesignAssembly,
+  type MutableAssembly,
+  removeRearSight,
+  scopedAntiMaterielDesign,
+  scopedArDesign,
+} from './helpers.ts';
 
 /** A point or direction in the optic's own axes, in the exported file's axes and metres, as the file draws it. */
 const inFile = ([x, y, z]: readonly number[], scale = METRES_PER_UNIT): Vector3 =>
@@ -493,8 +499,7 @@ const opticConnection = (template: Template, type: string) => {
 const fitOptic = (template: Template, seed: number, type: string, replacesRearIron = false): MutableAssembly => {
   const assembly = structuredClone(generate(template, gunDomain, seed)) as MutableAssembly;
   if (replacesRearIron) {
-    delete assembly.parts['rear-sight'];
-    assembly.connections = assembly.connections.filter(({ to }) => to !== 'rear-sight.base');
+    removeRearSight(assembly);
   }
   const connection = opticConnection(template, type);
   const candidates = typeof connection.from === 'string' ? [connection.from] : connection.from;
