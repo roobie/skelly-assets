@@ -17,8 +17,8 @@ local id = 'military_cargo_truck';
   ],
   unjudged: [
     site.unjudged('chassis', 'engine', 0.087,
-      'A crossmember runs through the engine\'s sump.'),
+      '`crossmember_6` and `crossmember_7` run through the engine\'s sump.'),
     site.unjudged('chassis', 'gearbox', 0.087,
-      'A crossmember runs through the gearbox case.'),
+      '`crossmember_5` runs through the gearbox case.'),
   ],
 }

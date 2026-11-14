@@ -40,6 +40,6 @@ local wheel(id, x) = pair(id, 'abandoned_army_truck_wheel', [x, s.hubY, s.wheelZ
   ],
   unjudged: [
     site.unjudged('chassis', 'engine', 0.087,
-      'The near rail runs through the engine\'s radiator.'),
+      '`rail_near` and `rail_far` run through the engine\'s radiator, `rail_near` through its down pipe and `cross_5` through its block.'),
   ],
 }

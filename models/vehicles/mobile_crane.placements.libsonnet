@@ -40,6 +40,6 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
   ],
   unjudged: [
     site.unjudged('chassis', 'engine', 0.08,
-      'The heavy I6\'s intake stands in the near rail: the rails sit too close together for it.'),
+      'The heavy I6\'s intake stands in the near rail.'),
   ],
 }
