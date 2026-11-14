@@ -195,7 +195,10 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+// The authoring tools draw the same fabric grain, and its declaration types it from their packages, which resolve only
+// under tools/, so the shader lives there.
+cpSync(join(root, 'tools/fabric.mjs'), join(out, 'fabric.mjs'));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();

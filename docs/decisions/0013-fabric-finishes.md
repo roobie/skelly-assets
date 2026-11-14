@@ -35,8 +35,9 @@ no glTF form; its numbers ride in the material's extras beside `materialId`, for
 **The grain is drawn, not baked.** With no texture coordinates there is nothing to map a baked texture by, and
 adding them to every voxel mesh would multiply the export for a detail most views never resolve. The pattern is
 computed in the model's own axes instead, projected along each face's main axis, which is exact on a voxel face and
-close on a low-poly one. One generic shader builds every kind (`site/fabric.mjs`, `wearFabric`); a finish only
-chooses numbers.
+close on a low-poly one. One generic shader builds every kind (`tools/fabric.mjs`, `wearFabric`); a finish only
+chooses numbers. The showcase and the authoring tools' viewers share it, so an author sees the grain the showcase
+draws.
 
 **Folds are a field, not geometry.** The meshes carry no cavity, so crease darkening comes from a slow noise field
 stretched downward as cloth hangs. It suggests folds without modelling them; true contact shadow in seams belongs to
@@ -55,6 +56,6 @@ does, so worn and loose garments name the cloth, leather, felt or rubber they ar
 ## What a game does
 
 A game that reads finishes by `materialId` already gets the sheen and roughness. To draw the grain it ports
-`site/fabric.mjs`, `wearFabric`, to its own material path, keyed on the finish's `fabric`, and compiles one program
+`tools/fabric.mjs`, `wearFabric`, to its own material path, keyed on the finish's `fabric`, and compiles one program
 variant per kind ahead of first draw. A game that skips this still draws cloth as soft and sheened, only without
 threads.

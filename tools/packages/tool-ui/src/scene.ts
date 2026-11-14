@@ -14,6 +14,7 @@ import { type MaterialDef, surfaceOf } from '@skelly/thing-core/materials';
 import { resolveAppearance, solidColor, srgbToHex } from '@skelly/thing-export/appearance.ts';
 import type { AppearanceContext, Palette } from '@skelly/thing-export/exportTypes.ts';
 import type * as Three from 'three';
+import { wearFabric } from '../../../fabric.mjs';
 
 const FAIL = 0xe5_53_4b;
 const KEEP_OUT = 0x9d_7c_d8;
@@ -127,8 +128,8 @@ const renderedItems = ({
 };
 
 /**
- * A finish-mode surface draws its material's see-through and sheen as deadvox does, so glass reads as glass where
- * it is authored. Diagnostic colouring stays opaque, because it shows roles and failures, not the finish.
+ * A finish-mode surface draws its material's see-through, sheen and fabric grain as deadvox does, so glass reads
+ * as glass and cloth as cloth where it is authored. Diagnostic colouring stays opaque, because it shows roles and failures, not the finish.
  */
 const surfaceMaterial = (
   three: ThreeRuntime,
@@ -146,6 +147,9 @@ const surfaceMaterial = (
   }
   const material = new three.MeshPhysicalMaterial({ ...surface, sheen: 1, sheenRoughness: sheen.roughness });
   material.sheenColor.setRGB(...sheen.colour, three.SRGBColorSpace);
+  if (finish.fabric) {
+    wearFabric(material, finish.fabric);
+  }
   return material;
 };
 
