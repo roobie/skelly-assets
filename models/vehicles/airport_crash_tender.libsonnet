@@ -18,8 +18,7 @@ local inset = s.bodySide - 0.04;
 // The posts between lockers: their centres along the body, and their half width.
 local dividers = { mid: 0.96, wheel: -2.4 };
 local postHalf = 0.04;
-// Each locker's span along the body. Its shutter sits in the wall's skin depth and weighs its share of the lockers' mass
-// by its width.
+// Each locker's span along the body; its shutter sits in the wall's skin depth.
 local lockerSpans = {
   fore: [dividers.mid + postHalf, s.bodyFront - 2 * postHalf],
   mid: [archFront + 0.02, dividers.mid - postHalf],
@@ -27,8 +26,6 @@ local lockerSpans = {
   wheel_aft: [archRear + 0.02, dividers.wheel - postHalf],
   aft: [s.bodyRear + 2 * postHalf, archRear - 0.02],
 };
-local lockerWidth(name) = lockerSpans[name][1] - lockerSpans[name][0];
-local lockersWidth = std.foldl(function(sum, name) sum + lockerWidth(name), s.lockers, 0);
 local post(name, x) = box('post_' + name, 'paint', [x - postHalf, bandTop, inset], [x + postHalf, shutterTop, s.bodySide]);
 // The roof turret stands on the cab's crown, the bumper turret on the bumper's top.
 local turretY = s.crown;
@@ -95,11 +92,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     round(k.turned('suction', 'pipe', 'x', k.disc(0.1, -4.4, archRear + 0.1), [0, s.bodyFloor + 0.42, 0])),
     round(k.turned('riser', 'pipe', 'y', k.disc(0.08, s.bodyFloor + 0.74, shutterTop), [-4.7, 0, 0])),
   ], finish) + { title: 'Airport crash tender pump' },
-] + [
-  k.shutter('airport_crash_tender_locker_shutter_' + name, std.round(s.lockersMass * lockerWidth(name) / lockersWidth), lockerSpans[name][0], lockerSpans[name][1], bandTop, shutterTop, [inset, s.bodySide], finish)
-  + { title: 'Airport crash tender ' + std.strReplace(name, '_', ' ') + ' locker shutter' }
-  for name in s.lockers
-] + [
+] + k.lockerShutters('airport_crash_tender_locker_shutter_', s.lockersMass, lockerSpans, s.lockers, bandTop, shutterTop, [inset, s.bodySide], finish) + [
   // The water main runs from the body over the cab's back to the roof turret, which turns on it.
   k.compound('airport_crash_tender_roof_turret_mount', s.turretMountMass, [
     round(k.turned('base', 'frame', 'y', k.disc(0.26, 0, 0.06), [s.turretX, turretY, 0])),

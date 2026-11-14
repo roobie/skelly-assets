@@ -8,7 +8,8 @@ local blocks = std.range(0, 11);
 local blockX0 = s.bodyRear + 0.1;
 local blockLength = (s.bodyFront - 0.1 - blockX0) / 12;
 local bar = 0.1;
-local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - bar) / 0.09) - 1);
+local pitch = k.slatPitch;
+local slats = std.range(0, std.ceil((s.shutterTop - s.shutterLow - bar) / pitch) - 1);
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_racking', 2200, [
     box('racking', 'frame', [-3.3, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
@@ -21,7 +22,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_rear_shutter', 40, [
     box('bar', 'dark', [s.bodyRear - 0.03, s.shutterLow, -s.shutterSide], [s.bodyRear, s.shutterLow + bar, s.shutterSide]),
   ] + [
-    box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [s.bodyRear - 0.03, s.shutterLow + bar + i * 0.09, -s.shutterSide], [s.bodyRear, std.min(s.shutterLow + bar + (i + 1) * 0.09, s.shutterTop), s.shutterSide])
+    box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [s.bodyRear - 0.03, s.shutterLow + bar + i * pitch, -s.shutterSide], [s.bodyRear, std.min(s.shutterLow + bar + (i + 1) * pitch, s.shutterTop), s.shutterSide])
     for i in slats
   ], finish, motion=k.motion.slide('up', s.shutterTop - s.shutterLow - bar, stow=true)) + { title: 'Rescue truck rear shutter' },
   k.compound('rescue_truck_rear_shutter_frame', 30, [
