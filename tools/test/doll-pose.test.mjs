@@ -14,7 +14,8 @@ import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
-import { partStrokes, poseJson, pressCheckPoses, readPressCheck } from '../press-check.mjs';
+import { poseJson } from '../keyFrames.mjs';
+import { partStrokes, pressCheckPoses, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
