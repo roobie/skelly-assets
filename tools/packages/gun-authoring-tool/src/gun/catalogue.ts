@@ -15,7 +15,7 @@ import {
 } from 'valibot';
 import { TitleSchema } from '@skelly/thing-export/title.ts';
 import content from '../../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { compareCodeUnits } from './compareCodeUnits.ts';
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { gunDomain } from './domain.ts';
 import { GUN_FINISH_SLOTS, GUN_PALETTE } from './palette.ts';
 

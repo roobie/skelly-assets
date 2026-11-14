@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { compareCodeUnits } from '../src/gun/compareCodeUnits.ts';
+import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 import { compareSightCandidates } from '../src/gun/exportGlb.ts';
 
 // ICU collation folds case and skips punctuation, so these ids order differently by locale than by code unit.
@@ -7,7 +7,6 @@ const ids = ['rear_b', 'rearB', 'rear-a', 'Rear', 'rear'];
 
 test('the export order of ids is the code unit order, not the runtime locale order', () => {
   expect([...ids].sort(compareCodeUnits)).toEqual(['Rear', 'rear', 'rear-a', 'rearB', 'rear_b']);
-  expect([...ids].sort(compareCodeUnits)).not.toEqual([...ids].sort((a, b) => a.localeCompare(b)));
 });
 
 test('the sight pick breaks a priority tie by code unit id order', () => {

@@ -42,7 +42,7 @@ import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
-import { compareCodeUnits } from './compareCodeUnits.ts';
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 

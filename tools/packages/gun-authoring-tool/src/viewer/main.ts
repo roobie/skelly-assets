@@ -9,6 +9,7 @@ import { worldBox } from '@skelly/construct/shapes/geometry.ts';
 import { DEFAULT_REVOLVE_FACETS, MAX_REVOLVE_FACETS, MIN_REVOLVE_FACETS } from '@skelly/construct/shapes/revolve.ts';
 import { type CameraState, parseCameraState, serializeCameraState } from '@skelly/tool-ui/camera-state';
 import { createOrbitControls } from '@skelly/tool-ui/orbit';
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import {
   buildPanelModel,
   clearParam,
@@ -86,14 +87,14 @@ const fixtures = Object.entries(
     }
     return parsed.assembly;
   })
-  .sort((a, b) => a.name.localeCompare(b.name));
+  .sort((a, b) => compareCodeUnits(a.name, b.name));
 
 const DESIGN_EXTENSION = /\.json$/;
 const designs = Object.entries(
   import.meta.glob<string>('../../../../../models/guns/designs/*.json', { eager: true, import: 'default', query: '?raw' }),
 )
   .map(([path, text]) => ({ name: path.split('/').at(-1)!.replace(DESIGN_EXTENSION, ''), text }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+  .sort((a, b) => compareCodeUnits(a.name, b.name));
 
 const cartridges = Object.entries(
   import.meta.glob<string>('../../../../../models/guns/cartridges/*.json', { eager: true, import: 'default', query: '?raw' }),
