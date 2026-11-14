@@ -50,11 +50,14 @@ test('an overlap that exists at rest is no contact until the swing sinks deeper 
   assert.ok(contactsOf(sweep({ lid: thick }, [lidAt, deep]), 'lid').some(({ other }) => other === 'seat'));
 });
 
-test('a rider is not tested against its carrier, though it sits inside it', () => {
-  const handle = site('handle', 'handle', [box('grip', [0.4, 0, -0.1], [0.6, 0.2, 0.1])], { rides: 'lid' });
-  const result = sweep({ lid }, [lidSite(), handle]);
-  assert.ok(!contactsOf(result, 'lid').some(({ other }) => other === 'handle'));
-  assert.equal(result.sites.handle, undefined);
+test('a rider is not tested against its carrier, though it stands in the carrier\'s way at rest', () => {
+  const thick = { ...lid, pieces: [box('skin', [0, 0, -0.5], [1, 4 * GRAIN, 0.5]), ...lid.pieces.slice(1)] };
+  const post = box('post', [0.4, 3.5 * GRAIN, -0.1], [0.6, 0.6, 0.1]);
+  const asRider = sweep({ lid: thick }, [site('lid', 'lid', thick.pieces), site('handle', 'handle', [post], { rides: 'lid' })]);
+  assert.deepEqual(contactsOf(asRider, 'lid'), []);
+  assert.equal(asRider.sites.handle, undefined);
+  const asPart = sweep({ lid: thick }, [site('lid', 'lid', thick.pieces), site('handle', 'handle', [post])]);
+  assert.ok(contactsOf(asPart, 'lid').some(({ other }) => other === 'handle'));
 });
 
 test('a rider is carried with its carrier and meets what the carrier alone never would', () => {
