@@ -21,7 +21,8 @@ import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, TO
 import { shardUnits } from './generation.mjs';
 import { codeFingerprint } from './packages/thing-export/src/cache.ts';
 import { key } from './siteOverlap.mjs';
-import { poseAt, shapeOf, stowPlanesOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
+import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
+import { shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
 
 const EPSILON = 1e-9;
@@ -58,21 +59,6 @@ export function resolveMotion({ stages, pieces }, forward, grain) {
   return shareStages(moves, cornersOf(bounds));
 }
 
-// A motion for a part placed at a site: reflected across the centre plane for a far-side twin, as the part itself is,
-// then carried to the site's position.
-export function motionAtSite(motion, { at, mirror }) {
-  const reflect = ([x, y, z]) => [x, y, 0 - z];
-  const shift = (point) => [point[0] + at[0], point[1] + at[1], point[2] + at[2]];
-  return motion.map((stage) => {
-    if (stage.kind === 'slide') {
-      const direction = mirror ? reflect(stage.direction) : stage.direction;
-      return { ...stage, direction, ...(stage.stow === undefined ? {} : { stow: stage.stow + dot(at, direction) }) };
-    }
-    const [from, to] = [stage.axis.from, stage.axis.to].map((point) => shift(mirror ? reflect(point) : point));
-    return { ...stage, axis: { from, to }, angle: mirror ? -stage.angle : stage.angle };
-  });
-}
-
 // How far a body's motion opens, for a message: its degrees or millimetres when it is one stage, else null.
 const extentOf = (layers) => {
   if (layers.length !== 1 || layers[0].length !== 1) return null;
@@ -88,7 +74,7 @@ export function sweepVehicle({ grain, forward, motions, sites }) {
   const motionOf = (site) => {
     if (!motions[site.part]) return null;
     if (!resolved.has(site.part)) resolved.set(site.part, resolveMotion(motions[site.part], forward, grain));
-    return motionAtSite(resolved.get(site.part), site);
+    return motionAtSite(resolved.get(site.part), site, AUTHORED_LATERAL);
   };
   const byId = new Map(sites.map((site) => [site.id, site]));
   const own = new Map(sites.map((site) => [site.id, motionOf(site)]));
@@ -101,7 +87,7 @@ export function sweepVehicle({ grain, forward, motions, sites }) {
   const bodies = anchors.map((anchor) => {
     const carriers = carriersOf(anchor).filter(({ id }) => own.get(id));
     const members = sites.filter((site) => anchorOf(site) === anchor).map(({ id }) => id);
-    return { site: anchor.id, layers: [...carriers].reverse().concat(anchor).map(({ id }) => own.get(id)), members, carriers: carriers.map(({ id }) => id) };
+    return { site: anchor.id, layers: motionLayers(anchor, byId, ({ id }) => own.get(id)), members, carriers: carriers.map(({ id }) => id) };
   });
   const step = grain / 4;
   const result = { sites: {}, open: [] };
@@ -144,7 +130,7 @@ export function sweepTasks({ grain, motions, vehicles }) {
 const HERE = import.meta.dirname;
 // The code a sweep runs, whole folders for the shared packages since naming their modules one by one would miss a new
 // import. A cached sweep is only as good as the code and the runtime that made it.
-const CHECKER_CODE = ['swingClearance.mjs', 'swingSweep.mjs', 'pieceSolid.mjs', 'packages/thing-core/src', 'packages/construct/src/foundation'];
+const CHECKER_CODE = ['swingClearance.mjs', 'swingSweep.mjs', 'pieceSolid.mjs', '../site/motionPose.mjs', 'packages/thing-core/src', 'packages/construct/src/foundation'];
 const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
 
 const taskHash = (task, checker) => createHash('sha256').update(checker).update(JSON.stringify(task)).digest('hex').slice(0, 32);

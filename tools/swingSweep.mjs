@@ -6,68 +6,7 @@
 // where the depth is read for real. The reason for the rule is in `docs/decisions/0016-swing-check.md`.
 import { cornersOf } from './packages/thing-core/src/motion.ts';
 import { solid } from './pieceSolid.mjs';
-
-// A rigid motion as twelve numbers: a row-major 3x3 turn, then the shift.
-const IDENTITY = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
-
-export function apply(m, [x, y, z], out) {
-  out[0] = m[0] * x + m[1] * y + m[2] * z + m[9];
-  out[1] = m[3] * x + m[4] * y + m[5] * z + m[10];
-  out[2] = m[6] * x + m[7] * y + m[8] * z + m[11];
-  return out;
-}
-
-// a after b: the motion that puts a point through b first.
-const compose = (a, b) => [
-  ...[0, 3, 6].flatMap((row) => [0, 1, 2].map((col) => a[row] * b[col] + a[row + 1] * b[col + 3] + a[row + 2] * b[col + 6])),
-  a[0] * b[9] + a[1] * b[10] + a[2] * b[11] + a[9],
-  a[3] * b[9] + a[4] * b[10] + a[5] * b[11] + a[10],
-  a[6] * b[9] + a[7] * b[10] + a[8] * b[11] + a[11],
-];
-
-const invert = (m) => [
-  m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8],
-  -(m[0] * m[9] + m[3] * m[10] + m[6] * m[11]),
-  -(m[1] * m[9] + m[4] * m[10] + m[7] * m[11]),
-  -(m[2] * m[9] + m[5] * m[10] + m[8] * m[11]),
-];
-
-// One stage of a motion once it has run `fraction` of its way.
-function stageMotion(stage, fraction) {
-  if (stage.kind === 'slide') {
-    const step = stage.travel * fraction;
-    return [1, 0, 0, 0, 1, 0, 0, 0, 1, ...stage.direction.map((d) => d * step)];
-  }
-  const { from, to } = stage.axis;
-  const length = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
-  const [ux, uy, uz] = [0, 1, 2].map((i) => (to[i] - from[i]) / length);
-  const turn = (stage.angle * fraction * Math.PI) / 180;
-  const [c, s, t] = [Math.cos(turn), Math.sin(turn), 1 - Math.cos(turn)];
-  const turned = [
-    c + ux * ux * t, ux * uy * t - uz * s, ux * uz * t + uy * s,
-    uy * ux * t + uz * s, c + uy * uy * t, uy * uz * t - ux * s,
-    uz * ux * t - uy * s, uz * uy * t + ux * s, c + uz * uz * t,
-  ];
-  const shift = [0, 1, 2].map((row) => from[row] - (turned[3 * row] * from[0] + turned[3 * row + 1] * from[1] + turned[3 * row + 2] * from[2]));
-  return [...turned, ...shift];
-}
-
-// Where one motion (thing-core `Motion`) has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
-// motion. Stages run in turn through their shares of the clock, and the first is the outermost, as `posePoint`. From
-// stage `first` on, the stages outside it are left out.
-function stagesAt(motion, clock, first = 0) {
-  const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
-  const fraction = (i) => Math.min(1, Math.max(0, (clock - starts[i]) / motion[i].share));
-  let pose = IDENTITY;
-  for (let i = motion.length - 1; i >= first; i--) pose = compose(stageMotion(motion[i], fraction(i)), pose);
-  return pose;
-}
-
-// Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
-// nested inside its carrier's and both run on the one clock. The outermost layer, the first, is the furthest carrier;
-// `first` leaves out its stages before that one.
-export const poseAt = (layers, clock, first = 0) =>
-  layers.reduceRight((inner, motion, i) => compose(stagesAt(motion, clock, i === 0 ? first : 0), inner), IDENTITY);
+import { apply, compose, IDENTITY, invert, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 
 const distanceFromLine = ([px, py, pz], { from, to }) => {
   const d = [0, 1, 2].map((i) => to[i] - from[i]);
@@ -106,13 +45,6 @@ export function paceOf(layers, bounds, first = 0) {
   }
   return total;
 }
-
-// The stow planes of what a body's `layers` move, one for each stowing slide: what the slide and the stages inside it
-// carry past `stow` along its `direction` is hidden, so it neither meets anything nor is met. The plane stays in the
-// frame just outside the slide, so its pose leaves out the layers and stages outside it
-// (docs/decisions/0015-motion-as-content.md).
-export const stowPlanesOf = (layers) => layers.flatMap((motion, k) => motion.flatMap((stage, s) =>
-  stage.kind === 'slide' && stage.stow !== undefined ? [{ layers: layers.slice(k), first: s, direction: stage.direction, stow: stage.stow }] : []));
 
 // The stow planes of one shape over the window of the clock from `start` to `end`: `from` and `to` carry a point of
 // the shape, read in the frame that `frame` carries to the shape's rest, into each plane's frame at the window's ends,

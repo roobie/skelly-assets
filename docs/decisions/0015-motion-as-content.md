@@ -61,6 +61,9 @@ own.
   else. Its stages are in its own rest frame and its own motion is nested inside its carrier's, so it runs on its
   carrier's clock; a sense hint is read in its own rest frame, not where the carrier has carried it. See
   `tools/placements.mjs`, `ridesProblems`.
+- **One pose for the check and the viewer.** The swing check and the showcase's Open view place a part's motion at its
+  site, nest a rider's in its carrier's and pose it through one module, so the pose the check proves clear is the pose
+  the viewer shows; see `site/motionPose.mjs`, `motionLayers`.
 
 Pivots are not attach points, so a part with a motion has no hinge anchors. A part row has hinge anchors or a motion,
 never both; a row that declares no motion keeps whatever hinge anchors it has.
