@@ -38,8 +38,8 @@ instead, its origin at the hairline: a hat stands on its brim in the model frame
 brow whatever the hat's height, where sinking it by a share of its height would set a tall hat over the face and a
 low cap above the head. A piece that encloses the head, a helmet with a visor or a hood, has no brim at the brow, so
 it names its own `brow` anchor, the point of it that meets the hairline, and that anchor goes to the bust's instead of
-its origin; the point is the author's call, which no box measure can make for them. A folded or lying wearable is stood up first, head end
-up and front forward, because the model frame lays every garment flat the same way
+its origin; the point is the author's call, which no box measure can make for them. A folded or lying wearable is
+stood up first, head end up and front forward, because the model frame lays every garment flat the same way
 (`docs/decisions/0002-model-frame.md`, "Decision"). Its pose stays as authored, so an unsettled front or lying pose
 shows as such on the doll too.
 
