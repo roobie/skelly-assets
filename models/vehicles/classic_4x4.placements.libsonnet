@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'classic_4x4.spec.libsonnet';
 {
   title: 'Classic 4x4',
@@ -10,7 +11,7 @@ local s = import 'classic_4x4.spec.libsonnet';
     site.one('front_bumper', 'classic_4x4_front_bumper'),
     site.one('rear_bumper', 'classic_4x4_rear_bumper'),
     site.one('dashboard', 'classic_4x4_dashboard'),
-    site.one('engine', 'engine_v8_petrol', [1.25, 0.49, 0]),
+  ] + engine.sites('v8_petrol', [1.25, 0.49, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_inline', [0.63, 0.45, 0]),
     site.one('front_axle', 'beam_axle_light', [s.frontAxle, s.hub - 0.37, 0]),
     site.one('rear_axle', 'beam_axle_light', [s.rearAxle, s.hub - 0.37, 0]),

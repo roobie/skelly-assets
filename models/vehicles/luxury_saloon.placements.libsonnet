@@ -3,8 +3,8 @@ local s = import 'luxury_saloon.spec.libsonnet';
 {
   title: 'Luxury saloon',
   sites: (import 'car-sites.libsonnet')('luxury_saloon', s, {
+    engine: { name: 'v8_petrol' },
     over: {
-      engine: { part: 'engine_v8_petrol' },
       gearbox: { part: 'gearbox_inline', at: [s.frontAxle - 0.7, 0.26, 0] },
       rear_bench: { at: [-0.75, s.floor, 0] },
     },
