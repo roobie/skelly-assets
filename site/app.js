@@ -1,17 +1,19 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
-// can be exploded to show each part apart from the others, as can a model that comes in components; a wearable can be shown loose or worn on the doll. What it
-// draws, and how, is render.mjs's.
+// can be exploded to show each part apart from the others, as can a model that comes in components, or opened, with
+// every door, lid and shutter at its stop; a wearable can be shown loose or worn on the doll. What it draws, and how, is
+// render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
 import { ALL, FORM, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from './filter.mjs';
-import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, playable, pose, registerModels, setupRenderer, spread, stillInstance, wornEntry } from './render.mjs';
+import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, movers, opens, playable, pose, registerModels, setupRenderer, spread, stillInstance, swing, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
 const SUGGESTION_LIMIT = 40; // terms a combobox lists at once; typing narrows them
 const EXPLODE_EASE = 0.12; // share of the remaining way an exploding part moves each frame
+const OPEN_EASE = 0.12; // the same for the clock of the parts that open
 
 const CLIP_NAMES = { walk: 'Walk', attack: 'Attack', pounce: 'Pounce', idle: 'Idle' };
 // Where a model stands in the releases, each version linking to its release page; history is null for a model no
@@ -273,7 +275,7 @@ function initViewer() {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
-  viewer = { view: null, renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, worn: false };
+  viewer = { view: null, renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, movers: [], swing: 0, opened: false, worn: false };
 
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -291,6 +293,7 @@ function initViewer() {
     const clips = clipSet(v.loaded?.clips);
     if (v.obj && canPose(v.model, v.loaded?.clips, v.loaded?.body) && v.clip) pose(v.obj, v.loaded.body, clips[v.clip], clipTime(clips[v.clip], (ms - v.t0) / 1000, v.model.walkSpeed));
     spreadParts(v);
+    swingParts(v);
     controls.update();
     renderer.render(v.stage, camera);
   });
@@ -325,18 +328,29 @@ function spreadParts(v) {
   spread(v.parts, v.spread);
 }
 
-// Switches a vehicle or a component model between assembled and exploded, keeping the camera's direction and fitting the camera to the
-// view it is switching to.
-function explode(exploded) {
+function swingParts(v) {
+  const goal = v.opened ? 1 : 0;
+  if (v.swing === goal) return;
+  v.swing = Math.abs(goal - v.swing) < 0.001 ? goal : v.swing + (goal - v.swing) * OPEN_EASE;
+  swing(v.movers, v.swing);
+}
+
+// Switches a vehicle or a component model between assembled, exploded and, for a vehicle with parts that open, open,
+// keeping the camera's direction and fitting the camera to the view it is switching to. Open and exploded exclude each
+// other, since a door's pivot inside an exploded spread shows nothing useful.
+function showView(view) {
   const v = viewer;
-  v.exploded = exploded;
-  v.view = exploded ? 'exploded' : null;
+  v.exploded = view === 'exploded';
+  v.opened = view === 'open';
+  v.view = view === 'assembled' ? null : view;
   writeHash();
-  for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'exploded') === exploded));
-  spread(v.parts, exploded ? 1 : 0);
+  for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String(b.dataset.view === view));
+  spread(v.parts, v.exploded ? 1 : 0);
+  swing(v.movers, v.opened ? 1 : 0);
   const direction = v.camera.position.clone().sub(v.controls.target).normalize();
   frame(v.camera, v.obj, v.controls.target, direction);
   spread(v.parts, v.spread);
+  swing(v.movers, v.swing);
   v.controls.update();
 }
 
@@ -403,6 +417,9 @@ async function openViewer(model, restored = null) {
   viewer.parts = comesApart(model) ? explodable(viewer.obj, model) : [];
   viewer.spread = 0;
   viewer.exploded = false;
+  viewer.movers = opens(loaded) ? movers(viewer.obj, loaded) : [];
+  viewer.swing = 0;
+  viewer.opened = false;
   viewer.worn = false;
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
@@ -463,8 +480,11 @@ async function openViewer(model, restored = null) {
     }));
     pick(names.includes(restored?.view) ? restored.view : names[0]);
   }
-  if (comesApart(model)) $('v-clips').replaceChildren(...viewChips([['assembled', 'Assembled'], ['exploded', 'Exploded']], (view) => explode(view === 'exploded')));
-  if (comesApart(model) && restored?.view === 'exploded') explode(true);
+  if (comesApart(model)) {
+    const views = [['assembled', 'Assembled'], ['exploded', 'Exploded'], ...(opens(loaded) ? [['open', 'Open']] : [])];
+    $('v-clips').replaceChildren(...viewChips(views, showView));
+    if (views.some(([view]) => view === restored?.view)) showView(restored.view);
+  }
   if (isWearable(model)) $('v-clips').replaceChildren(...viewChips([['loose', looseName(model)], ['worn', 'Worn']], (view) => wear(view === 'worn')));
   if (isWearable(model) && restored?.view === 'worn') wear(true);
 }

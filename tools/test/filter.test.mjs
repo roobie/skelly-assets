@@ -45,8 +45,10 @@ test('only an empty filter is browsing', () => {
 
 test('the whole page state survives the round trip through the URL hash', () => {
   const filter = filterOf({ q: 'oak door', shelf: 'building', picks: { [KEYWORD]: ['entrance'], material: ['wood', 'steel'], place: ['urban'] } });
-  const state = { filter, reshuffle: 3, model: 'oak_door', view: 'exploded', info: true };
-  assert.deepEqual(parseState(`#${stateHash(state)}`), state);
+  for (const view of ['exploded', 'open']) {
+    const state = { filter, reshuffle: 3, model: 'oak_door', view, info: true };
+    assert.deepEqual(parseState(`#${stateHash(state)}`), state);
+  }
   assert.equal(stateHash(emptyState()), '');
 });
 
