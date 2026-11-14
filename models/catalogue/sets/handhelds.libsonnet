@@ -1,10 +1,11 @@
 local b = import 'packages/thing-authoring-tool/handhelds.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local params = b.params, atom = b.atom, key = b.key, melee = b.melee, datum = b.datum, held = b.held;
 local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } } };
 [
   melee('crowbar', 'crowbar', 1.5, {
     back: 0.4, reach: 0.231, kickBack: 0.438, kickRise: 0.113, clawAt: 0.105, clawDrop: 0.129, thickness: 0.03, depth: 0.03,
-  }, { body: 'steel-grey' }) + { title: 'Crowbar' } + held('crowbar', 'shaft-0', [0.174825174825, 0.5, 0.5]) + {
+  }, { body: 'steel-grey' }) + { title: 'Crowbar' } + held('crowbar', 'shaft-0', [0.174825174825, 0.5, 0.5]) + stow.stows(stow.seat('hung-tool', [0.244, -0.144, 0], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
     taxonomy: { category: 'tools' },
     anchors: {
@@ -25,7 +26,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
   },
   melee('sledgehammer', 'sledgehammer', 4.5, {
     handleBack: 0.84, handleRadius: 0.016, headBottom: 0.005, headTop: 0.062, faceReach: 0.095, headDepth: 0.057,
-  }, { handle: 'wood-walnut', head: 'steel-grey' }) + { title: 'Sledgehammer' } + held('sledgehammer', 'handle', [0.441176470588, 0.5, 0.5]) + {
+  }, { handle: 'wood-walnut', head: 'steel-grey' }) + { title: 'Sledgehammer' } + held('sledgehammer', 'handle', [0.441176470588, 0.5, 0.5]) + stow.stows(stow.seat('hung-tool', [0.064, -0.096, 0], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
     taxonomy: { category: 'tools' },
     anchors: {

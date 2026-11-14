@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local prism = h.prism;
@@ -217,7 +218,7 @@ local driver(id, x0, x1, z, y0, r, handle) = [
     box('latch-b', 'latch', [0.14, 0.11, 0.09], [0.17, 0.16, 0.097]),
     box('hasp', 'latch', [-0.01, 0.12, 0.09], [0.01, 0.155, 0.096]),
     box('foot', 'seam', [-0.205, 0, -0.085], [0.205, 0.006, 0.085]),
-  ], { body: 'paint-red', seam: 'paint-charcoal', handle: 'plastic-matte-black', latch: 'steel-bright' }) + { title: 'Toolbox' }
+  ], { body: 'paint-red', seam: 'paint-charcoal', handle: 'plastic-matte-black', latch: 'steel-bright' }) + { title: 'Toolbox' } + stow.stows(stow.resting('case', [0, 0, 0]))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'], state: ['empty'] } } },
 
   // A tabletop vacuum former 350 mm wide: a base with a perforated platen, a clamp frame riding two columns, a
