@@ -33,8 +33,4 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
       site.one('spoiler', 'sports_car_spoiler', rides='boot_lid'),
     ],
   }),
-  swingUnjudged: [
-    site.swingUnjudged('front_door_far', 'shell', 0.0108, 'glass_6_far meets b_pillar_head_6_far'),
-    site.swingUnjudged('front_door_near', 'shell', 0.0108, 'glass_6 meets b_pillar_head_6_near'),
-  ],
 }

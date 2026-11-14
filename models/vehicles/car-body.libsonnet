@@ -84,6 +84,14 @@ local pressings(id, title, s) = {
   // The rear arch's forward corner rides on the rear door wherever the door reaches over the arch.
   local hasDoorCorner = !twoDoor && s.rearDoor < s.rearDoorArch,
   local doorPins(front) = k.hingePins('hinge', 'y', [front, s.floor + 0.2 * (s.waist - s.floor), s.side], [front, s.floor + 0.8 * (s.waist - s.floor), s.side]),
+  local bHeadOut = s.glassOut + 0.02,
+  // The front door's glass leans in with the tumble, inboard of its hinge pins, so opening first carries its trailing
+  // edge back until it clears the B-pillar head's outer face. The glass ends short by that travel, worst at the top.
+  local frontGlassBack =
+    local reach = s.cowl - s.bFront;
+    local glassDepth = s.side - (paneZ[1] - shape.tumble);
+    local headDepth = s.side - (bHeadOut - shape.tumble);
+    s.bFront + std.max(0, std.sqrt(std.max(0, reach * reach + glassDepth * glassDepth - headDepth * headDepth)) - reach),
   local rows = [
     part('_shell', 'shell', s.shellMass, [
       box('floor_pan', 'pan', [s.rearFloorFront, 0.2 + lift, -s.skin], [s.cowl, s.floor, s.skin]),
@@ -117,7 +125,7 @@ local pressings(id, title, s) = {
       box('a_post', 'paint', [s.cowl, s.floor, s.skin - 0.02], [s.aPost, s.waist, s.side]),
       box('b_pillar', 'paint', [s.bRear, s.floor, s.skin - 0.02], [s.bFront, s.waist, s.glassOut + 0.02]),
     ] + shape.side('a_pillar', 'paint', [[pillarBack, s.waist], [s.aPost, s.waist], [s.aPost - s.aLean, s.roof], [pillarBack - s.aLean, s.roof]], [s.glassIn - 0.02, s.glassOut])
-    + shape.side('b_pillar_head', 'paint', [[s.bRear, s.waist], [s.bFront, s.waist], [s.bFront, if open then windowTop else s.roof - 0.02], [s.bRear, if open then windowTop else s.roof - 0.02]], [s.skin - 0.02, s.glassOut + 0.02])
+    + shape.side('b_pillar_head', 'paint', [[s.bRear, s.waist], [s.bFront, s.waist], [s.bFront, if open then windowTop else s.roof - 0.02], [s.bRear, if open then windowTop else s.roof - 0.02]], [s.skin - 0.02, bHeadOut])
     + (if open then [] else [
       box('cant_rail', 'paint', [roofRear, s.roof - 0.04, roofHalf - 0.01], [roofFront, s.roof + 0.02, s.glassOut - lean]),
     ]) + (if cab then [
@@ -159,7 +167,7 @@ local pressings(id, title, s) = {
     ] + doorPins(glass[1][0]), doorFinish, motion=k.motion.hinge(doorPins(glass[1][0]), 'near', opens.door));
     door('_front_door', 'front door', if twoDoor then 34 else 25, [
       box('skin', 'paint', [s.bFront, s.floor, s.skin], [s.cowl, s.waist, s.side]),
-    ], [[s.bFront, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [s.bFront, windowTop]]),
+    ], [[frontGlassBack, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [frontGlassBack, windowTop]]),
     part('_windscreen', 'windscreen', 12, [
     ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - s.aLean, s.roof], [s.cowl - s.aLean, s.roof]], s.glassIn - 0.02), { glass: 'glass-clear' }),
     // The bonnet hinges on its top rear edge, inboard of the wings: every other point of it then swings forward of the
