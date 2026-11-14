@@ -6,7 +6,7 @@
 //   { rig: { id, revision }, angles: { <bone>: [flex, twist, abduct] }, reach: { <bone>: { target, pole? } },
 //     level: [<bone>], root?: [x, y, z], ground?: true }
 // Angles are degrees held to each bone's limits. `level` bones keep their rest orientation. `ground` lifts the root so
-// the figure, as its angles and levelled bones hold it, stands on y = 0. A reach entry names a reach bone of the rig
+// the figure, as its angles and levelled bones hold it, stands on y = 0, or on the soles of what it wears. A reach entry names a reach bone of the rig
 // and places its joint at `target`, a point in the world the figure stands in, by two-bone IK, bending toward `pole` or
 // the rig's own; the levelled bones are levelled again after it. Grounding before the reach lets a target be read off
 // the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
@@ -103,13 +103,18 @@ export const posedCorners = (rig, pose) => {
 // The root lift that stands the lowest posed corner on y = 0.
 export const groundLift = (rig, pose) => -Math.min(...posedCorners(rig, pose).map((p) => p[1]));
 
+// How far the soles of what a figure wears stand it above the ground: footwear's sole lies under the bare foot, and
+// the thickest sole worn carries the figure. `sites` are the dressed figure's (tools/dress.mjs, `wornSites`).
+export const soleLift = (sites) => Math.max(0, ...sites.map((site) => site.soleLift ?? 0));
+
 /**
  * A pose file into a clip frame. Refuses a file with issues (`poseIssues`), naming them all. Returns the frame with the
  * limits that held, the reach distances left and, per holding hand, how its grip closed and how near its pinch came,
  * so a caller or a test sees what the file asked that the rig refused; `held` carries each held item's model and world
  * transform `{ r, t }` for the caller to draw it. A file with a `hold` needs `meshOf(model)`, the item's closed triangle mesh in its own frame.
+ * A grounded figure stands `soles` above y = 0, the lift of what it wears (`soleLift`).
  */
-export function compilePose(rig, file, { meshOf } = {}) {
+export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
   const issues = poseIssues(rig, file);
   if (issues.length > 0) throw new Error(`pose does not fit rig ${rig.id}: ${issues.join('; ')}`);
   const report = { clamped: [], residuals: {}, grips: {} };
@@ -124,7 +129,7 @@ export function compilePose(rig, file, { meshOf } = {}) {
   }
   const level = (pose, clamped) => (file.level ?? []).reduce((held, id) => levelBone(rig, held, id, clamped), pose);
   let pose = level({ root: file.root ?? [0, 0, 0], rotations }, []);
-  if (file.ground) pose = { ...pose, root: [pose.root[0], pose.root[1] + groundLift(rig, pose), pose.root[2]] };
+  if (file.ground) pose = { ...pose, root: [pose.root[0], pose.root[1] + groundLift(rig, pose) + soles, pose.root[2]] };
   // Parents first, so a reach on a leg is solved before a reach hanging from it would read its result.
   for (const bone of rig.bones) {
     const goal = file.reach?.[bone.id];
@@ -160,10 +165,11 @@ export const poseFileOf = (rig, frame) => ({ rig: { id: rig.id, revision: rig.re
  * world axes, so a bone of both reads its own; a bone that `absorbs` mob bones takes their rotations after its own, as
  * the mob composes them parent to child, and the mob's bones the doll lacks, such as a jaw, are dropped. The doll's
  * part is rigid, so it keeps the combined turn about its own pivot, not the small offset between the mob's pivots.
- * The actor's root moves it from standing at rest, so the doll's is lifted by what stands the doll at rest.
+ * The actor's root moves it from standing at rest, so the doll's is lifted by what stands the doll at rest, on the
+ * `soles` of what it wears (`soleLift`).
  */
-export function rigFrame(rig, actorFrame) {
-  const stand = groundLift(rig, { root: [0, 0, 0], rotations: {} });
+export function rigFrame(rig, actorFrame, soles = 0) {
+  const stand = groundLift(rig, { root: [0, 0, 0], rotations: {} }) + soles;
   const rotations = {};
   for (const bone of rig.bones) {
     const own = [bone.id, ...(bone.absorbs ?? [])].filter((id) => actorFrame.rotations[id]);
