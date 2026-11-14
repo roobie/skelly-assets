@@ -1,17 +1,6 @@
 // Assets-side twin of the generator-free actor clip reader.
-import { sampleClip as sampleFrames } from '../site/clipFrames.mjs';
 import { clampJointAngles, jointAngles, jointRotation } from './packages/mobgen/src/core/joints.ts';
-import {
-  applyPoint,
-  clamp,
-  IDENTITY_M,
-  mulMM,
-  rotX,
-  rotY,
-  rotZ,
-  slerpQuat,
-  transpose,
-} from './packages/mobgen/src/core/math.ts';
+import { applyPoint, clamp, IDENTITY_M, mulMM, rotX, rotY, rotZ, transpose } from './packages/mobgen/src/core/math.ts';
 import { blendPose, boneTransforms } from './packages/mobgen/src/core/pose.ts';
 import { blendArmBase, eulerToMat3 } from './packages/mobgen/src/mob/attack.ts';
 import { GROUND_SMOOTHING, groundOffset } from './packages/mobgen/src/mob/gait.ts';
@@ -155,6 +144,4 @@ export function applyHeadYaw(body, pose, headYaw) {
   return { ...pose, rotations: { ...pose.rotations, [id]: held } };
 }
 
-export { clipSpanSeconds, decodeFrame } from '../site/clipFrames.mjs';
-
-export const sampleClip = (clip, cursor) => sampleFrames(clip, cursor, slerpQuat);
+export { clipSpanSeconds, decodeFrame, sampleClip } from '../site/clipFrames.mjs';
