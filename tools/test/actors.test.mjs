@@ -775,6 +775,7 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
 });
 
 test('creature pose clips reproduce their live posers at every stored cursor', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
   const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
   const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
   const { figureFor } = await import('../actorFigure.mjs');
