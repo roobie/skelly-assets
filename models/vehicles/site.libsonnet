@@ -4,13 +4,20 @@ local frame = import 'frame.libsonnet';
 local origin = [0, 0, 0];
 // A part that rides another, such as a folding door's free panel on its jamb panel, names the carrier site's id as
 // `rides`: its own motion is nested inside its carrier's.
-local one(id, part, at=origin, rides=null) = { id: id, part: part, at: at } + (if rides == null then {} else { rides: rides });
+// A part with stowage slots names its load-out as `stowed`, slot id -> item, and may name the site of the closure that
+// hides it as `behind`; see docs/decisions/0016-stowage-slots.md.
+local one(id, part, at=origin, rides=null, stowed=null, behind=null) = { id: id, part: part, at: at }
+  + (if rides == null then {} else { rides: rides })
+  + (if stowed == null then {} else { stowed: stowed })
+  + (if behind == null then {} else { behind: behind });
 // A near-side site and its far-side twin, whose part is reflected across its own centre plane before it is placed. A
-// pair that rides names the carrier pair by its id, and each twin rides the carrier on its own side.
+// pair that rides or stows behind a closure names the carrier or closure pair by its id, and each twin takes the one
+// on its own side; both twins stow the same load-out.
 // `0 - z` rather than `-z` keeps a centred twin at 0, since -0 does not survive a JSON round trip.
-local pair(id, part, at=origin, rides=null) = [
-  one(id + '_near', part, at, if rides == null then null else rides + '_near'),
-  one(id + '_far', part, [at[0], at[1], 0 - at[2]], if rides == null then null else rides + '_far') + { mirror: true },
+local pair(id, part, at=origin, rides=null, stowed=null, behind=null) = [
+  one(id + side.suffix, part, side.at, if rides == null then null else rides + side.suffix, stowed, if behind == null then null else behind + side.suffix)
+  + side.mirror
+  for side in [{ suffix: '_near', at: at, mirror: {} }, { suffix: '_far', at: [at[0], at[1], 0 - at[2]], mirror: { mirror: true } }]
 ];
 // A vehicle laid out from another's sites: `over` merges fields into a site by id, `drop` removes sites by id and
 // `add` appends sites, so a derived vehicle states only what it changes.

@@ -21,12 +21,14 @@ import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { readMobRows } from '../tools/layout.mjs';
+import { farSlot, readStowage, stowedPose } from '../tools/stowage.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { readWields, wieldSequences } from '../tools/wields.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
+import { MIRRORED_AXIS } from './modelFrame.mjs';
 import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
 import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -117,7 +119,7 @@ const shown = models.map((model) => {
   const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf, anchorsOf }) } : apart(model);
   return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
-const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
+const missingParts = (sites) => sites.flatMap(({ part, stowed }) => [part, ...Object.values(stowed ?? {})]).filter((id) => !modelsById.has(id));
 const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
   site,
   model: part,
@@ -125,6 +127,18 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(mirror ? { mirror } : {}),
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
+
+// The kit a vehicle's load-outs stow, as sites of their own `in` the locker's: each item seated in its slot
+// (tools/stowage.mjs), a far twin's slot turned rather than reflected, since an item is never mirrored.
+const stowedSites = (sites) => {
+  const stowing = sites.filter(({ stowed }) => stowed !== undefined);
+  const stowage = readStowage(built, manifest.models, stowing.flatMap(({ part, stowed }) => [part, ...Object.values(stowed)]));
+  return stowing.flatMap(({ id, part, at, mirror, stowed }) => Object.entries(stowed).map(([slotId, item]) => {
+    const { frame } = stowage.get(part).slots.find((slot) => slot.id === slotId);
+    const { rotation, at: offset } = stowedPose(mirror ? farSlot(frame, MIRRORED_AXIS) : frame, stowage.get(item).seats[0].frame);
+    return { site: `${id}/${slotId}`, in: id, model: item, at: at.map((x, a) => x + offset[a]), turn: mat3ToQuat(rotation) };
+  }));
+};
 
 // A vehicle weighs its sites' models together and fills the volume of their voxels. A figure comes only when every
 // site's model has it, rather than a total short of what the vehicle holds.
@@ -134,14 +148,14 @@ const vehiclePhysical = (sites) => {
   return { ...total('massKg'), ...total('volumeM3') };
 };
 
-// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site; a vehicle has no
-// keywords of its own.
+// Each vehicle the manifest places (tools/placements.mjs), with its tags and the model at each site, its stowed kit
+// among them; a vehicle has no keywords of its own.
 const vehicles = manifest.vehicles.map(({ id, title, pack, path, tags }) => {
   if (modelsById.has(id)) throw new Error(`vehicle ${id} shares its id with a model`);
   const { sites } = JSON.parse(readFileSync(join(built, pack, path), 'utf8'));
   const missing = missingParts(sites);
   if (missing.length > 0) throw new Error(`vehicle ${id} places models the tree does not hold: ${missing.join(' ')}`);
-  const placed = placedSites(sites);
+  const placed = [...placedSites(sites), ...stowedSites(sites)];
   return { id, title, placements: `${pack}/${path}`, tags: tags ?? {}, keywords: [], sites: placed, form: formOf({ sites: placed }), ...vehiclePhysical(placed), ...(history ? { history: vehicleStanding(stands[id], placed.map(({ model }) => stands[model])) } : {}) };
 });
 

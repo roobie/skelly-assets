@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 
 // Costume wigs, a clown nose, crowns, an identity tag, a mouthguard, sleeping bags, a tarpaulin, tefillin and a bow
@@ -314,7 +315,7 @@ local coil(prefix, cx, cz, r0, n, w, t, step) = std.flattenArrays([
                ring('grommet-%d' % i, 'grommet', 0.004, 0.009, 0.063, 0.066, 0.18, -0.1 + 0.1 * i)
                for i in std.range(0, 2)
              ],
-             { cloth: 'plastic-blue', hem: 'cloth-navy', grommet: 'steel-galvanised' }) + { title: 'Tarp' }
+             { cloth: 'plastic-blue', hem: 'cloth-navy', grommet: 'steel-galvanised' }) + { title: 'Tarp' } + stow.stows(stow.resting('sheet', [0, 0, 0]))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'household', tags: { material: ['plastic'], setting: ['modern'], state: ['folded'] } } },
 
   // An arm tefillin as it is put away: a black leather cube 32 mm across on a square base 44 mm across, with a

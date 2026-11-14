@@ -35,12 +35,12 @@
   },
   // The lockers' back wall stands outboard of the water tank and the rescue truck's racking, which fill the middle.
   lockerBack: 0.86,
-  // What each locker stows, a part on each side: its title and mass.
+  // Each locker's fit-out, a part on each side: its title and mass. The kit it holds is its site's load-out.
   stowage: {
-    fore: { title: 'Fire engine breathing apparatus stowage', mass: 140 },
-    mid: { title: 'Fire engine hand tool stowage', mass: 45 },
-    wheel: { title: 'Fire engine hose stowage', mass: 170 },
-    aft: { title: 'Fire engine portable pump stowage', mass: 120 },
+    fore: { title: 'Fire engine breathing apparatus stowage', mass: 25 },
+    mid: { title: 'Fire engine hand tool stowage', mass: 10 },
+    wheel: { title: 'Fire engine hose stowage', mass: 25 },
+    aft: { title: 'Fire engine portable pump stowage', mass: 12 },
   },
   rearWallMass: 120,
 }

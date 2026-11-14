@@ -53,7 +53,7 @@ const key = (a, b) => [a, b].sort().join('\n');
 
 // The deepest point two solids share, as how far inside both it lies (m), or 0 when they share no more than `inside`:
 // a point must lie `inside` deep in both, and the solids are sampled every `step` m through the box they share.
-function sharedDepth(p, q, inside, step) {
+export function sharedDepth(p, q, inside, step) {
   const lo = [0, 1, 2].map((i) => Math.max(p.min[i], q.min[i]) + inside);
   const hi = [0, 1, 2].map((i) => Math.min(p.max[i], q.max[i]) - inside);
   if (lo.some((l, i) => l > hi[i])) return 0;

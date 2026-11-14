@@ -5,9 +5,10 @@ local s = import 'rescue_truck.spec.libsonnet';
   // Racking and roof gear take the place of the fire engine's tank, ladder and pump.
   sites: site.adjust(
     (import 'fire_engine.placements.libsonnet').sites,
-    // Its lockers stow rescue gear, and its back opens on a rear compartment.
+    // Its lockers hold rescue gear built into their parts, so they drop the fire engine's load-outs, and its back opens
+    // on a rear compartment.
     over={
-      ['locker_stowage_' + name + side]: { part: 'rescue_truck_locker_stowage_' + name }
+      ['locker_stowage_' + name + side]: { part: 'rescue_truck_locker_stowage_' + name, stowed:: null }
       for name in std.objectFields(s.stowage)
       for side in ['_near', '_far']
     },

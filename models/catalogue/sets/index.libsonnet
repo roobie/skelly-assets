@@ -210,6 +210,7 @@
   'cans': import 'models/catalogue/sets/cans.libsonnet',
   'clothing-bags': import 'models/catalogue/sets/clothing-bags.libsonnet',
   'equipment': import 'models/catalogue/sets/equipment.libsonnet',
+  'firefighting-kit': import 'models/catalogue/sets/firefighting-kit.libsonnet',
   'flesh-chunks': import 'models/catalogue/sets/flesh-chunks.libsonnet',
   'food-medical': import 'models/catalogue/sets/food-medical.libsonnet',
   'galvanised-trashcan': import 'models/catalogue/sets/galvanised-trashcan.libsonnet',

@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local prism = h.prism;
@@ -32,13 +33,13 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   h.compound('extinguisher', 14, extinguisher(0.085, 0.38, 0.04, 0.009, [0.016, 0.15, 0.09]), {
     body: 'paint-red', foot: 'plastic-black', label: 'paper-white', valve: 'brass', lever: 'steel-grey',
     gauge: 'plastic-white', hose: 'rubber-black', nozzle: 'plastic-black',
-  }) + { title: 'Fire extinguisher' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { title: 'Fire extinguisher' } + stow.stows(stow.resting('bottle', [0, -0.004, 0])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A 2 kg CO2 extinguisher 400 mm tall: a narrow steel cylinder with a valve and a hose to a black discharge horn
   // clipped to the side.
   h.compound('small_fire_extinguisher', 6.5, extinguisher(0.05, 0.3, 0.035, 0.007, [0.03, 0.15, 0.13]), {
     body: 'paint-red', foot: 'plastic-black', label: 'paper-white', valve: 'steel-grey', lever: 'steel-grey',
     gauge: 'plastic-white', hose: 'rubber-black', nozzle: 'plastic-black',
-  }) + { title: 'Small fire extinguisher' } + h.inHand('small_fire_extinguisher', 'body') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['metal'], setting: ['modern'] } } },
+  }) + { title: 'Small fire extinguisher' } + h.inHand('small_fire_extinguisher', 'body') + stow.stows(stow.resting('bottle', [0, -0.004, 0])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A thrown extinguisher 120 mm tall: an 84 mm steel ball of agent with a short neck, a capped plug with a pull ring
   // and a label band round its middle.
   h.compound('throw_extinguisher', 0.4, [
@@ -60,7 +61,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     prism('edge', 'edge', 'y', [[0.11, 0.765], [0.11, 0.91], [0.135, 0.925], [0.135, 0.75]], -0.005, 0.005),
     prism('pick', 'head', 'y', [[-0.03, 0.80], [-0.03, 0.88], [-0.17, 0.842], [-0.17, 0.838]], -0.01, 0.01),
     prism('pick-tip', 'edge', 'y', [[-0.15, 0.835], [-0.15, 0.845], [-0.172, 0.841], [-0.172, 0.839]], -0.006, 0.006),
-  ], { haft: 'wood-oak', head: 'paint-red', edge: 'steel-bright' }) + { title: 'Fire ax' } + h.gripOn('fire_ax', 'grip') + {
+  ], { haft: 'wood-oak', head: 'paint-red', edge: 'steel-bright' }) + { title: 'Fire ax' } + h.gripOn('fire_ax', 'grip') + stow.stows(stow.seat('hung-tool', [0.925, -0.02, -0.018], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['wood', 'metal'], setting: ['modern'] } } },
   // A 760 mm forged Halligan bar lying flat, drawn at 0.9 scale from a 845 mm sketch: a 30 mm shaft with a fork at -x, and at +x an adze blade on +z and a
@@ -77,7 +78,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
   ] + [
     turned('knurl-%d' % i, 'knurl', 'x', [[0, 0], [0, 0.0185], [0.012, 0.0185], [0.012, 0]], [0.1 + i * 0.03, 0, 0])
     for i in std.range(0, 5)
-  ], 0.9), { shaft: 'steel-grey', head: 'steel-grey', edge: 'steel-bright', knurl: 'steel-parkerized' }) + { title: 'Halligan bar' } + h.gripOn('halligan', 'shaft') + {
+  ], 0.9), { shaft: 'steel-grey', head: 'steel-grey', edge: 'steel-bright', knurl: 'steel-parkerized' }) + { title: 'Halligan bar' } + h.gripOn('halligan', 'shaft') + stow.stows(stow.seat('hung-tool', [0.684, -0.02, -0.014], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
   } + { taxonomy: { category: 'tools', keywords: ['firefighting'], tags: { material: ['metal'], setting: ['modern'] } } },
   // A 1.6 m pike pole lying flat: a yellow fibreglass shaft with a rubber butt grip, and a steel head with a straight

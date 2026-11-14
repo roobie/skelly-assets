@@ -1,6 +1,7 @@
 // Holds every model's taxonomy to the vocabulary (tools/taxonomy.mjs, taxonomyReport) and its title to the title rule
 // (tools/titles.mjs, titleReport), every vehicle's parts at different sites clear of each other
-// (tools/siteOverlap.mjs, siteOverlapReport), and lists the models without a category, for authors and tagging agents.
+// (tools/siteOverlap.mjs, siteOverlapReport) and every locker's stowage slots clear of each other and of its fit-out
+// (tools/stowage.mjs, stowageReport), and lists the models without a category, for authors and tagging agents.
 // tools/build.mjs runs the same reports before it builds anything.
 // Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...]. It exits 1 when any problem remains in the
 // selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the vocabulary does not list
@@ -14,6 +15,7 @@ import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { siteOverlapReport } from './siteOverlap.mjs';
+import { stowageReport } from './stowage.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
 import { titleReport } from './titles.mjs';
 
@@ -42,10 +44,14 @@ export const sourceReport = (models, vocabulary) => {
   return { ...report, problems: [...report.problems, ...titleReport(models)] };
 };
 
-// The vehicles' site overlaps (tools/siteOverlap.mjs) as report entries: the problems, and the overlaps nobody has judged.
+// The vehicles' site overlaps (tools/siteOverlap.mjs) and stowage slots (tools/stowage.mjs) as report entries: the
+// problems, and the overlaps nobody has judged.
 export const vehicleReport = (root = repo) => {
   const { problems, notes } = siteOverlapReport(root);
-  return { problems: problems.map((message) => ({ message })), unjudged: notes.map((message) => ({ message })) };
+  return {
+    problems: [...problems, ...stowageReport(root)].map((message) => ({ message })),
+    unjudged: notes.map((message) => ({ message })),
+  };
 };
 
 function printReport({ untagged, unlisted, unjudged, problems }) {

@@ -24,6 +24,13 @@ export interface PortDef {
    * the same standard or neither does, so fit is a property of both parts rather than of whichever side declares it.
    */
   readonly standard?: string;
+  /**
+   * The standards a port that holds whatever is put in it takes, rather than one it shares with its mate: a stowage
+   * slot takes any item whose stowage port declares one of them.
+   */
+  readonly accepts?: readonly string[];
+  /** The space, in this port's frame, that whatever is met at the port must stay inside. */
+  readonly envelope?: { readonly min: Vec3; readonly max: Vec3 };
   readonly pos: Vec3;
   readonly normal: Vec3;
   readonly up: Vec3;

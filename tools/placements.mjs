@@ -8,6 +8,7 @@ import { dirname, join, resolve } from 'node:path';
 import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
+import { loadOutProblems } from './stowage.mjs';
 import { modelProblems } from './taxonomy.mjs';
 import { titleProblems } from './titles.mjs';
 
@@ -17,7 +18,8 @@ const repo = resolve(import.meta.dirname, '..');
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
 const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
-const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides']);
+const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides', 'stowed', 'behind']);
+const NO_STOWAGE = { items: new Map(), moving: new Set() };
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
 
@@ -71,9 +73,20 @@ function ridesProblems(vehicle, sites) {
   });
 }
 
-function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
+// Why a model a site names cannot be placed: it must be one built model, in the vehicle's pack or one the pack depends
+// on.
+function modelPackProblems(where, id, pack, reachable, byModel) {
+  const packs = (byModel.get(id) ?? []).map((model) => model.pack);
+  if (packs.length === 0) return [`${where}: ${id} is not a built model`];
+  if (packs.length > 1) return [`${where}: ${id} is built in ${packs.length} packs, ${packs.join(' ')}`];
+  if (pack !== undefined && !reachable.has(packs[0])) return [`${where}: ${id} is in ${packs[0]}, which ${pack} does not declare a dependency on`];
+  return [];
+}
+
+function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes, stowage) {
   const problems = [];
   const seen = new Set();
+  const partOf = new Map(sites.map((site) => [site?.id, site?.part]));
   const reachable = new Set([pack, ...(dependsOn[pack] ?? [])]);
   for (const site of sites) {
     const where = `${vehicle}/${site?.id}`;
@@ -84,6 +97,10 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
     else seen.add(site.id);
     if (!isPoint(site?.at)) problems.push(`${where}: at is not three finite numbers`);
     if (site?.mirror !== undefined && site.mirror !== true) problems.push(`${where}: mirror is true or absent`);
+    if (site?.behind !== undefined) {
+      if (site.behind === site.id || !partOf.has(site.behind)) problems.push(`${where}: behind names another site of the vehicle, not ${site.behind}`);
+      else if (!stowage.moving.has(partOf.get(site.behind))) problems.push(`${where}: behind names ${site.behind}, whose part has no motion to open it`);
+    }
     const placed = byModel.get(site?.part) ?? [];
     if (site?.finish !== undefined) {
       if (!Object.hasOwn(finishes, site.finish)) problems.push(`${where}: finish ${site.finish} is not in the finish library`);
@@ -91,11 +108,11 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
         problems.push(`${where}: ${site.part} has no paintable slot for finish ${site.finish}`);
       }
     }
-    const packs = placed.map((model) => model.pack);
-    if (packs.length === 0) problems.push(`${where}: ${site?.part} is not a built model`);
-    if (packs.length > 1) problems.push(`${where}: ${site.part} is built in ${packs.length} packs, ${packs.join(' ')}`);
-    if (packs.length === 1 && pack !== undefined && !reachable.has(packs[0])) {
-      problems.push(`${where}: ${site.part} is in ${packs[0]}, which ${pack} does not declare a dependency on`);
+    problems.push(...modelPackProblems(where, site?.part, pack, reachable, byModel));
+    if (site?.stowed !== undefined) {
+      problems.push(...loadOutProblems(where, site, stowage.items));
+      const items = new Set(Object.values(site.stowed ?? {}));
+      for (const item of items) problems.push(...modelPackProblems(`${where} stowed`, item, pack, reachable, byModel));
     }
   }
   return problems;
@@ -125,7 +142,8 @@ function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
 // depends on; vocabulary: tools/taxonomy.mjs, readVocabulary; finishes: the finish library, keyed by finish id, which the
 // caller loads after the Jsonnet twins are current, so this module never reads them at import. A part is named by its model id alone, so the id must
 // name one model, in the vehicle's pack or one it declares a dependency on.
-export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes }) {
+// stowage: what the built models say about stowed kit and closures (tools/stowage.mjs, loadOutStowage).
+export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage = NO_STOWAGE }) {
   const byModel = packsByModel(models);
   const problems = [];
   for (const [vehicle, entry] of Object.entries(placements)) {
@@ -144,7 +162,7 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
       problems.push(...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(({ message }) => message));
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
-    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes), ...ridesProblems(vehicle, entry.sites));
+    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes, stowage), ...ridesProblems(vehicle, entry.sites));
     if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
     if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
   }
@@ -163,8 +181,8 @@ function vehicleTags(body, ...extras) {
 
 // Writes each vehicle's sites under its own pack. models carry their taxonomy, so each vehicle gets its body's tags.
 // Returns the vehicles written, { id, title, pack, path, tags }, and every file as <pack>/<logical path>.
-export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, out }) {
-  const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes });
+export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage, out }) {
+  const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage });
   if (problems.length > 0) throw new Error(`vehicle placements:\n  ${problems.join('\n  ')}`);
   const byModel = packsByModel(models);
   const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { forward, parent, sites: laid, tags, title }]) => {

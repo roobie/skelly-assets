@@ -3,6 +3,8 @@
 export const FORWARD = [0, 0, 1];
 export const UP = [0, 1, 0];
 export const RIGHT = [-1, 0, 0];
+// The axis a mirrored site reflects its model across, so a far-side twin stands on the other side of the vehicle.
+export const MIRRORED_AXIS = RIGHT.findIndex((x) => x !== 0);
 
 const unit = (v) => {
   const length = Math.hypot(...v);
