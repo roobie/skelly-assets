@@ -10,11 +10,21 @@ local round(piece) = piece + { sides: 12 };
 local pulleyDepth = 0.03;
 local ductLength = 0.06;
 local airBoxLid = 0.02;
-// The core's block top, as a share of its height, and its head's half-width, as a share of its width, which a high
-// alternator sits on and beside.
-local blockTop = 0.72;
-local headHalf = 0.44;
+// The core's block top, as a share of its height, and the half-widths of its block and of the head or bank beside its
+// top, as shares of its width, which the starter and a high alternator sit on and beside, by the row's `layout`. An
+// inline's cylinders stand in one row under one head; a vee's stand in two banks over a narrow block, an exhaust
+// manifold down each bank's outer face and the intake ports on their valley faces.
+local layouts = {
+  inline: { blockTop: 0.72, blockHalf: 0.5, headHalf: 0.44 },
+  vee: { blockTop: 0.55, blockHalf: 0.32, headHalf: 0.5 },
+};
+local isVee(e) = std.get(e, 'layout', 'inline') == 'vee';
+local shapeOf(e) = layouts[std.get(e, 'layout', 'inline')];
 local crankHeight(e) = e.height * 0.2;
+// A vee's valley is as wide as its class's air box with the duct, so the box stands in it on the intake, its lid level
+// with the covers, and its duct meets the far bank's valley face: a car's bonnet leaves no room above a vee, nor its
+// wheels beside one.
+local valleyHalf(c) = (c.airBox.width + ductLength) / 2;
 // Each class with its alternator pulley placed. A high alternator stands level with the block's top, hung from the side
 // of the head of the class's tallest and widest engines, so one belt fits every engine of the class. It is on the
 // exhaust side because the intake manifold stands higher than the block's top.
@@ -24,8 +34,8 @@ local classes =
     local members = [e for e in std.objectValues(engines) if e.class == name];
     local r = c.alternator.radius;
     c + { drive+: { alternator+: { at: [
-      std.foldl(std.max, [e.height * blockTop - crankHeight(e) for e in members], 0) + r,
-      -(std.foldl(std.max, [e.width * headHalf for e in members], 0) + r),
+      std.foldl(std.max, [e.height * shapeOf(e).blockTop - crankHeight(e) for e in members], 0) + r,
+      -(std.foldl(std.max, [e.width * shapeOf(e).headHalf for e in members], 0) + r),
     ] } } };
   {
     [name]: if std.get(listed[name].drive.alternator, 'high', false) then high(name, listed[name]) else listed[name]
@@ -54,7 +64,9 @@ local starter(c) = {
   ],
   finish: { motor: 'paint-charcoal', nose: 'steel-grey' },
 };
-// A box on its base with its duct out of the -z side, toward the intake it feeds.
+// A box on its base with its duct out of the -z side, toward what it feeds: at 'side', it stands beside an inline's
+// intake manifold, its duct in to it; at 'valley', in a vee's valley, its duct in to the far bank's intake ports; at
+// 'over', on the valve cover, its duct out toward the turbo on the exhaust side.
 local airBox(c) = {
   local b = c.airBox,
   pieces: [
@@ -135,6 +147,15 @@ local accessories = [
 local fusedId(name) = 'engine_' + name;
 local coreId(name) = fusedId(name) + '_core';
 local classOf(name) = classes[engines[name].class];
+// Where the engine's air box stands: a vee's in its valley, an inline's where its class says.
+local airBoxAt(name) =
+  local e = engines[name];
+  local at = if isVee(e) then 'valley' else classOf(name).airBox.at;
+  assert std.member(['side', 'over'], classOf(name).airBox.at) : engines[name].class + "'s air box stands 'side' or 'over', not " + classOf(name).airBox.at;
+  assert std.member(['side', 'over', 'valley'], at) : name + "'s air box stands 'side', 'over' or 'valley', not " + at;
+  assert at != 'over' || std.objectHas(e, 'turbo') : name + "'s air box over its cover has no turbo to feed";
+  assert (at == 'valley') == isVee(e) : name + "'s air box stands in a valley exactly when it is a vee";
+  at;
 // Where each accessory's origin sits in the engine's frame.
 local mounts(name) =
   local e = engines[name];
@@ -142,11 +163,13 @@ local mounts(name) =
   local crank = crankHeight(e);
   {
     alternator: [e.length / 2 - c.alternator.length / 2, crank + c.drive.alternator.at[0], c.drive.alternator.at[1]],
-    starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width / 2 + c.starter.radius],
+    starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width * shapeOf(e).blockHalf + c.starter.radius],
     // An air box over the cover sits on its rear half, clear of a turbo's charge pipe, which crosses the front half.
-    airBox:
-      if std.get(c.airBox, 'over', false) then [-e.length / 4, e.height, 0]
-      else [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
+    airBox: {
+      over: [-e.length / 4, e.height, 0],
+      valley: [0, e.height - c.airBox.height - airBoxLid, valleyHalf(c) - c.airBox.width / 2],
+      side: [0, e.height * c.airBox.base, e.width * 0.68 + ductLength + c.airBox.width / 2],
+    }[airBoxAt(name)],
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
   };
@@ -174,19 +197,46 @@ local shown(e) =
   local bellHousing(b) = [round(k.turned('bell_housing', 'casting', 'x', k.disc(b.radius, -l / 2 - b.depth, -l / 2), [0, crank, 0]))];
   local drawn = { turbo: turbo, damper: damper, bellHousing: bellHousing };
   std.flattenArrays([drawn[f](e[f]) for f in std.objectFields(drawn) if std.objectHas(e, f)]);
-// The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round, and what
-// the engine shows besides.
+// The block, heads, valve covers, sump and manifolds of each layout.
+local body(e, c) =
+  local l = e.length;
+  local w = e.width;
+  local h = e.height;
+  local shape = shapeOf(e);
+  if !isVee(e) then [
+    box('sump', 'casting', [-l / 2, 0, -w * 0.42], [l / 2, h * 0.2, w * 0.42]),
+    box('block', 'casting', [-l / 2, h * 0.2, -w / 2], [l / 2, h * shape.blockTop, w / 2]),
+    box('head', 'casting', [-l * 0.47, h * shape.blockTop, -w * shape.headHalf], [l * 0.47, h * 0.92, w * shape.headHalf]),
+    box('cover', 'cover', [-l * 0.43, h * 0.92, -w * 0.36], [l * 0.43, h, w * 0.36]),
+    box('intake', 'casting', [-l * 0.38, h * 0.45, w / 2], [l * 0.38, h * 0.82, w * 0.68]),
+    box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
+  ] else
+    local valley = valleyHalf(c);
+    local intakeTop = h - c.airBox.height - airBoxLid;
+    assert intakeTop > h * shape.blockTop : e.title + "'s class's air box stands too tall in its valley for an intake under it";
+    assert valley < w * 0.44 : e.title + "'s valley is wider than its banks' covers";
+    [
+      box('sump', 'casting', [-l / 2, 0, -w * 0.3], [l / 2, h * 0.2, w * 0.3]),
+      box('block', 'casting', [-l / 2, h * 0.2, -w * shape.blockHalf], [l / 2, h * shape.blockTop, w * shape.blockHalf]),
+      box('intake', 'casting', [-l * 0.47, h * shape.blockTop, -valley], [l * 0.47, intakeTop, valley]),
+    ] + k.bothSides([
+      box('bank', 'casting', [-l * 0.47, h * shape.blockTop, valley], [l * 0.47, h * 0.9, w * shape.headHalf]),
+      box('cover', 'cover', [-l * 0.43, h * 0.9, valley], [l * 0.43, h, w * 0.44]),
+      box('exhaust', 'exhaust', [-l * 0.38, h * shape.blockTop, w * shape.headHalf], [l * 0.38, h * 0.7, w * 0.62]),
+    ]);
+// The engine's body with the crank and water pump pulleys the belt runs round, and what the engine shows besides.
 local core(name) =
   local e = engines[name];
   local c = classOf(name);
   local l = e.length;
   local w = e.width;
   local h = e.height;
+  local shape = shapeOf(e);
   local pulley(id, at, radius) = round(k.turned(id, 'pulley', 'x', k.disc(radius, l / 2, l / 2 + pulleyDepth), [0, crankHeight(e) + at[0], at[1]]));
   // The alternator's mounting boss bridges the side of the block, or of the head above it, to the class's alternator,
   // which the belt fixes in place.
   local alt = mounts(name).alternator;
-  local side = if alt[1] > h * blockTop then w * headHalf else w / 2;
+  local side = w * (if alt[1] > h * shape.blockTop then shape.headHalf else shape.blockHalf);
   local standOff = std.abs(alt[2]) - c.alternator.radius - side;
   assert standOff >= 0 : name + "'s block reaches into its class's alternator";
   local z = [std.sign(alt[2]) * side, std.sign(alt[2]) * (side + standOff)];
@@ -194,13 +244,7 @@ local core(name) =
     box('alternator_boss', 'casting', [alt[0] - c.alternator.length * 0.3, alt[1] - 0.02, std.min(z[0], z[1])], [alt[0] + c.alternator.length * 0.3, alt[1] + 0.02, std.max(z[0], z[1])]),
   ] else [];
   {
-    pieces: [
-      box('sump', 'casting', [-l / 2, 0, -w * 0.42], [l / 2, h * 0.2, w * 0.42]),
-      box('block', 'casting', [-l / 2, h * 0.2, -w / 2], [l / 2, h * blockTop, w / 2]),
-      box('head', 'casting', [-l * 0.47, h * blockTop, -w * headHalf], [l * 0.47, h * 0.92, w * headHalf]),
-      box('cover', 'cover', [-l * 0.43, h * 0.92, -w * 0.36], [l * 0.43, h, w * 0.36]),
-      box('intake', 'casting', [-l * 0.38, h * 0.45, w / 2], [l * 0.38, h * 0.82, w * 0.68]),
-      box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
+    pieces: body(e, c) + [
       pulley('crank_pulley', c.drive.crank.at, c.drive.crank.radius),
       pulley('pump_pulley', c.drive.pump.at, c.drive.pump.radius),
     ] + boss + shown(e),
@@ -238,7 +282,8 @@ local fittings(name) =
   siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
   // `assembly.libsonnet`, `sites`, says.
-  sites(name, at, detail): assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),
+  sites(name, at, detail):
+    assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,
   // How far the air box of the engine's class rises from its base to its lid's top.

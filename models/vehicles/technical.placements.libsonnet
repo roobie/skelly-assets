@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local one = site.one;
 local pair = site.pair;
 local s = import 'technical.spec.libsonnet';
@@ -21,7 +22,7 @@ local wheel = 'wheel_235_75r15';
     one('steering_box', 'technical_steering_box'),
     one('front_axle', 'beam_axle_light', [s.frontAxle, s.hub - 0.37, 0]),
     one('rear_axle', 'beam_axle_light', [s.rearAxle, s.hub - 0.37, 0]),
-    one('engine', 'engine_i4_petrol', [1.65, 0.48, 0]),
+  ] + engine.sites('i4_petrol_medium', [1.65, 0.38, 0], 'assembly') + [
     one('gearbox', 'gearbox_inline', [1.1, 0.44, 0]),
     one('prop_shaft', 'prop_shaft_long', [-0.1, 0.4, 0]),
     one('radiator', 'radiator_car', [2.32, 0.6, 0]),

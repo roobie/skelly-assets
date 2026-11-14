@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local one = site.one;
 local pair = site.pair;
 local s = import 'army_jeep.spec.libsonnet';
@@ -15,7 +16,7 @@ local s = import 'army_jeep.spec.libsonnet';
     one('steering_box', 'army_jeep_steering_box'),
     one('front_axle', 'beam_axle_light', [s.frontAxle, 0, 0]),
     one('rear_axle', 'beam_axle_light', [s.rearAxle, 0, 0]),
-    one('engine', 'engine_i4_petrol', [0.66, 0.36, 0]),
+  ] + engine.sites('i4_petrol', [0.66, 0.25, 0], 'assembly') + [
     one('gearbox', 'gearbox_inline', [0.14, 0.38, 0]),
     one('prop_shaft', 'prop_shaft_short', [-0.42, 0.36, 0]),
     one('radiator', 'radiator_small', [1.44, 0.58, 0]),

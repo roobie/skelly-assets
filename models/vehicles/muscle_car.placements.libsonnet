@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'muscle_car.spec.libsonnet';
 {
   title: 'Muscle car',
@@ -10,7 +11,7 @@ local s = import 'muscle_car.spec.libsonnet';
     site.one('front_bumper', 'muscle_car_front_bumper'),
     site.one('rear_bumper', 'muscle_car_rear_bumper'),
     site.one('dashboard', 'muscle_car_dashboard'),
-    site.one('engine', 'engine_v8_petrol', [s.frontAxle - 0.3, 0.22, 0]),
+  ] + engine.sites('v8_petrol', [s.frontAxle - 0.3, 0.22, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_inline', [s.cowl + 0.0, 0.2, 0]),
     site.one('rear_axle', 'beam_axle_light', [s.rearAxle, -0.003, 0]),
     site.one('prop_shaft', 'prop_shaft_short', [-0.38, 0.24, 0]),

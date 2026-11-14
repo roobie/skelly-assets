@@ -6,7 +6,7 @@
   cowl: 0.74, aPost: 0.84, aLean: 0.56,
   bRear: -0.3, bFront: -0.2, rearDoor: -0.98, rearDoorArch: -0.98,
   cWaist: -0.62, cLean: 0.24, tailWaist: -0.6, dLean: 0.2, deck: 0.82, deckFront: -1.3, rearSill: 0.62,
-  hatchSide: 0.65, glassIn: 0.81, glassOut: 0.895, rearFloorFront: -0.5,
+  hatchSide: 0.65, glassIn: 0.81, glassOut: 0.895, rearFloorFront: -0.5, engineBayBack: -1.6,
   hoodBack: 0.82, hoodFall: 0.13, lampTop: 0.74,
   bumperLow: 0.22, bumperTop: 0.46, slamTop: 0.6, towerTop: 0.62, grilleHalf: 0.5, grilleLow: 0.48,
   tumble: 0.25, boot: true, twoDoor: true, archLiner: true, stripe: 'satin-black',

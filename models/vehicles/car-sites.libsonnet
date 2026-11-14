@@ -1,7 +1,9 @@
 // The sites of a car pressed by `car-body.libsonnet`, laid out from its spec, so a car on that body names only what
-// it changes; see `site.libsonnet`, `adjust`, for `o.over`, `o.drop` and `o.add`.
+// it changes; see `site.libsonnet`, `adjust`, for `o.over`, `o.drop` and `o.add`. `o.engine` names the engine-kit
+// engine and where it stands, since `o.over` would move its core and leave its accessories behind.
 local k = import 'kit.libsonnet';
 local body = import 'car-body.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local site = import 'site.libsonnet';
 local one = site.one;
 local pair = site.pair;
@@ -15,6 +17,7 @@ function(id, s, o={})
   local hub = tyres[tyre].hub;
   local wheelZ = s.side - tyres[tyre].width / 2;
   local part(suffix) = k.partId(id, s, suffix);
+  local fitted = { name: 'i4_petrol', at: [s.frontAxle - 0.02, 0.28, 0] } + std.get(o, 'engine', {});
   local sites = [
     one('shell', part('_shell')),
     one('windscreen', part('_windscreen')),
@@ -23,7 +26,7 @@ function(id, s, o={})
     one('front_bumper', part('_front_bumper')),
     one('rear_bumper', part('_rear_bumper')),
     one('dashboard', part('_dashboard')),
-    one('engine', 'engine_i4_petrol', [s.frontAxle - 0.02, 0.28, 0]),
+  ] + engine.sites(fitted.name, fitted.at, 'assembly') + [
     one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.36]),
     one('radiator', 'radiator_car', [s.front - 0.3, 0.32, 0]),
     one('fuel_tank', 'fuel_tank_car', [s.rearAxle + 0.65, s.sill, 0]),

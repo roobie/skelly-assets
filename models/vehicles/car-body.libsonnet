@@ -68,6 +68,9 @@ local pressings(id, title, s) = {
   local floorBack = if boot then s.rear + 0.1 else s.tailWaist,
   // `s.bootFloor` raises the floor behind the seats over an engine under it.
   local bootFloor = std.get(s, 'bootFloor', 0.48 + lift),
+  // `s.engineBayBack` opens the floor behind the seats from its front back to there, over a mid-mounted engine and its
+  // gearbox, which stand taller than the space under a floor.
+  local bootFloorFront = std.get(s, 'engineBayBack', s.rearFloorFront),
   // `s.towerFront` stops the strut towers short of a nose too short for them.
   local towerFront = std.get(s, 'towerFront', s.frontAxle + 0.45),
   // Closes the arch fore and aft, because a look down past the wheel otherwise leaves through the open underside of the wing.
@@ -87,7 +90,7 @@ local pressings(id, title, s) = {
       box('carpet', 'carpet', [s.rearFloorFront, s.floor, -s.skin + 0.04], [s.cowl, s.floor + 0.01, s.skin - 0.04]),
       box('tunnel', 'carpet', [s.rearFloorFront + 0.35, s.floor, -0.12], [s.cowl, 0.45 + lift, 0.12]),
     ] + (if cab then [] else [
-      box('rear_floor', 'pan', [floorBack, bootFloor - 0.1, -s.skin], [s.rearFloorFront, bootFloor, s.skin]),
+      box('rear_floor', 'pan', [floorBack, bootFloor - 0.1, -s.skin], [bootFloorFront, bootFloor, s.skin]),
     ]) + [
       box('bulkhead', 'paint', [s.cowl, s.floor, -s.skin + 0.02], [s.aPost, s.waist - 0.04, s.skin - 0.02]),
       box('slam_panel', 'paint', [nose - 0.05, 0.35 + lift, -slam], [nose, slamTop, slam]),
