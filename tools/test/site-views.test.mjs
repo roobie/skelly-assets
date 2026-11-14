@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
+import { registerHooks } from 'node:module';
 import { test } from 'node:test';
-import * as THREE from 'three';
-import { explodable, movers, siteNode, spread, swing } from '../../site/render.mjs';
+
+// site/ has no packages of its own, since the page takes three from its import map, so the test lends it the tools' copy.
+const lent = (specifier) => specifier === 'three' || specifier.startsWith('three/');
+registerHooks({ resolve: (specifier, context, next) => next(specifier, lent(specifier) ? { ...context, parentURL: import.meta.url } : context) });
+const THREE = await import('three');
+const { explodable, movers, siteNode, spread, swing } = await import('../../site/render.mjs');
 
 const door = [{ kind: 'hinge', axis: { from: [1, 0, 0], to: [1, 1, 0] }, angle: 90, share: 1 }];
 const placed = (name, at) => {
