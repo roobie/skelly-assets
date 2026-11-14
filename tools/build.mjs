@@ -22,6 +22,7 @@ import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRe
 import { readDependencies } from './packs.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
+import { loadOutStowage } from './stowage.mjs';
 import { recipeTools } from './recipeTools.mjs';
 import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
@@ -259,12 +260,14 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
       const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
+      const placements = readPlacements(repo);
       const placed = exportPlacements({
-        placements: readPlacements(repo),
+        placements,
         models,
         vehicleRows: readVehicleRows(repo),
         dependsOn,
         vocabulary,
+        stowage: loadOutStowage(out, models, placements, repo),
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);

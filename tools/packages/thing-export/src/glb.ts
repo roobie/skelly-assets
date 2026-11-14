@@ -255,6 +255,8 @@ const portMetadata = (partId: string, port: PortDef, placed: Transform): ExportP
     gender: port.gender,
     ...(port.size === undefined ? {} : { size: port.size }),
     ...(port.standard === undefined ? {} : { standard: port.standard }),
+    ...(port.accepts === undefined ? {} : { accepts: port.accepts }),
+    ...(port.envelope === undefined ? {} : { envelope: port.envelope }),
     frame: {
       position: frame.t,
       normal: [frame.r[0], frame.r[3], frame.r[6]],

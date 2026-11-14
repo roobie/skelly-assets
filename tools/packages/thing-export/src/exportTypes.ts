@@ -69,6 +69,10 @@ export interface ExportPortMetadata {
   readonly size?: string;
   /** What the interface is built for within its mount type; both sides of a joint declare the same one or neither. */
   readonly standard?: string;
+  /** The standards a port that holds whatever is put in it takes; see `docs/decisions/0016-stowage-slots.md`. */
+  readonly accepts?: readonly string[];
+  /** The space, in the port frame and domain units, that whatever is met at the port must stay inside. */
+  readonly envelope?: { readonly min: Vec3; readonly max: Vec3 };
   readonly frame: PortMatingFrame;
   /** One port node can describe a repeated run of mating positions. */
   readonly slots?: RepeatedPortMetadata;
