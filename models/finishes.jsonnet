@@ -116,6 +116,7 @@ local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
   'skin-rawhide': material([0.72, 0.6, 0.42]) + { finish: { metallic: 0, roughness: 0.5, opacity: 0.9 } },
   'cloth-navy': fabric([0.1, 0.13, 0.26], 'woven'),
   'wood-oak': material([0.48, 0.33, 0.19]),
+  'wood-weathered': material([0.38, 0.36, 0.33]) + { finish: { metallic: 0, roughness: 0.95 } },
   'paint-green': self['paint-oxblood'] + { colour: [0.16, 0.4, 0.2] },
   'paper-butcher': material([0.74, 0.55, 0.48]),
   'straw-wicker': material([0.78, 0.64, 0.38]) + { finish: { metallic: 0, roughness: 0.9 } },

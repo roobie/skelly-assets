@@ -223,5 +223,6 @@
   'notebook': import 'models/catalogue/sets/notebook.libsonnet',
   'packages': import 'models/catalogue/sets/packages.libsonnet',
   'shambler-parts': import 'models/catalogue/sets/shambler-parts.libsonnet',
+  'stash-chest': import 'models/catalogue/sets/stash-chest.libsonnet',
   'supplies': import 'models/catalogue/sets/supplies.libsonnet',
 }
