@@ -1,7 +1,9 @@
 // Bare fists, in an orthodox stance: the left foot and shoulder forward, the right fist by the chin and the left out in
 // front of it, elbows down over the ribs. The jab is the lead hand's straight punch, quick and short; the hook is the
 // rear hand's, thrown round by the trunk turning through, the elbow up level with the fist. Each fist turns palm down
-// as it lands, so its knuckles meet the target.
+// as it lands, so its knuckles meet the target. The target stands ahead of the figure, not of its bladed chest, so the
+// jab's keys sit across the chest's frame to drive the fist straight ahead from the guard, and the hook lands well
+// ahead of its elbow, so the fist leads into the target and the blow is no elbow strike.
 local body = import 'body.libsonnet';
 local legs = body { pelvis: [0, -15, 0], 'thigh.L': [18, 0, 4], 'thigh.R': [-8, 0, -6], 'shin.L': [12, 0, 0], 'shin.R': [14, 0, 0] };
 local fist(at, pole, twist=0) = { at: at, pole: pole, twist: twist };
@@ -25,15 +27,15 @@ local guard = {
       shares: { windup: 20, strike: 25, follow: 17, recovery: 38 },
       seconds: 0.45,
       windup: guard { body+: { spine: [8, -24, 0] }, free+: { 'hand.L': fist([-0.05, 0.08, 0.26], [0.3, -1, 0]) } },
-      hit: guard { body+: { spine: [8, -35, 0] }, free+: { 'hand.L': fist([-0.12, 0.1, 0.5], [0.5, -1, 0], -60) } },
-      follow: guard { body+: { spine: [8, -32, 0] }, free+: { 'hand.L': fist([-0.1, 0.1, 0.42], [0.5, -1, 0], -40) } },
+      hit: guard { body+: { spine: [8, -35, 0] }, free+: { 'hand.L': fist([0.32, 0.12, 0.4], [0.3, -1, 0], -60) } },
+      follow: guard { body+: { spine: [8, -32, 0] }, free+: { 'hand.L': fist([0.2, 0.12, 0.39], [0.3, -1, 0], -40) } },
     },
     hook: {
       shares: { windup: 20, strike: 25, follow: 17, recovery: 38 },
       seconds: 0.6,
       windup: guard { body+: { spine: [8, -32, 0] }, free+: { 'hand.R': fist([0.06, 0.06, 0.24], [-0.6, -1, 0]) } },
-      hit: guard { body+: { spine: [8, 25, 0] }, free+: { 'hand.R': fist([0.3, 0.06, 0.3], [-1, 0.3, 0], -60) } },
-      follow: guard { body+: { spine: [8, 38, 0] }, free+: { 'hand.R': fist([0.38, 0.04, 0.22], [-1, 0.2, 0], -50) } },
+      hit: guard { body+: { spine: [8, 40, 0] }, free+: { 'hand.R': fist([0, 0.1, 0.43], [-1, 0.3, 0], -60) } },
+      follow: guard { body+: { spine: [8, 45, 0] }, free+: { 'hand.R': fist([0.1, 0.09, 0.42], [-1, 0.2, 0], -50) } },
     },
   },
 }

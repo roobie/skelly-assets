@@ -331,6 +331,31 @@ test('a weapon seated by a strike\'s held seat stands where the hit key holds it
   }
 });
 
+test('a bare-handed strike lands its fist ahead of the shoulders, between them and ahead of its own elbow', () => {
+  // The target stands ahead of the figure: a fist landing out to the side misses it, and one level with its elbow lands
+  // an elbow strike.
+  const bare = Object.entries(wields.classes).filter(([, { weapon }]) => !weapon);
+  assert.ok(bare.length > 0);
+  const poses = wieldPoses(rig, { ...wields, classes: Object.fromEntries(bare) }, Object.fromEntries(bare.map(([kind]) => [kind, {}])));
+  for (const [kind, { strikes: all }] of bare) {
+    const guard = poses[`${kind}_stance_guard`];
+    for (const name of Object.keys(all)) {
+      const hit = poses[`${kind}_strike_${name}-hit`];
+      // The striking hand is the one the hit carries farthest from the guard.
+      const [hand] = Object.keys(hit.reach).sort((a, b) =>
+        length(sub(hit.reach[b].target, guard.reach[b].target)) - length(sub(hit.reach[a].target, guard.reach[a].target)));
+      const posed = boneTransforms(rig.bones, decodeFrame(compilePose(rig, hit).frame));
+      const point = (id, end) => { const bone = rig.bones.find((b) => b.id === id); return applyPoint(posed.get(id), bone[end]); };
+      const fist = point(hand, 'tail'), elbow = point(rig.bones.find((b) => b.id === hand).parent, 'head');
+      const shoulders = Object.keys(hit.reach).map((id) => point(rig.bones.find((b) => b.id === id).reach.chain[0], 'head'));
+      const [right, left] = shoulders.map(([x]) => x).sort((a, b) => a - b);
+      assert.ok(shoulders.every(([, , z]) => fist[2] > z), `${kind} ${name}: the fist lands behind a shoulder`);
+      assert.ok(fist[0] > right && fist[0] < left, `${kind} ${name}: the fist lands ${fist[0].toFixed(2)} m across, outside the shoulders`);
+      assert.ok(fist[2] > elbow[2], `${kind} ${name}: the fist lands ${(elbow[2] - fist[2]).toFixed(2)} m behind its elbow`);
+    }
+  }
+});
+
 test('each fitted garment covers the body and leaves none of it poking through at rest', () => {
   for (const wear of wears) {
     const dressed = restIn(wear);
