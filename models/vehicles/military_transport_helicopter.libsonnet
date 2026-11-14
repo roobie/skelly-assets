@@ -5,10 +5,14 @@ local m = import 'machine-kit.libsonnet';
 local s = import 'military_transport_helicopter.spec.libsonnet';
 local box = k.box;
 local finishes = { paint: s.paint, dark: s.trim, glass: 'glass-clear' };
-local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, x=x, arc=arc, step=step, sides=sides);
-local proud = h.proud(s.body, 0.04);
+local skinThick = 0.075;
+local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=skinThick, x=x, arc=arc, step=step, sides=sides);
 local door = s.cabinDoor;
 local doorTravel = door[1] - door[0];
+// The door rail reaches sideways out to the plugged door's inner face, so the door runs on it, but stays low under
+// the engines above.
+local railed = [station + { half: station.half + s.cabinDoorPlug - skinThick, top: station.top + 0.04 } for station in s.body];
+local rail(id, arc) = h.shell(id, 'dark', railed, x=[door[0], door[1] + doorTravel], arc=arc, step=0.9, sides=120);
 local pane = s.cabinPane;
 local paneX = s.cabinPaneX;
 local cockpit = s.cockpitDoor;
@@ -39,8 +43,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('cabin_roof', 'paint', door, [-s.cabinArc, s.cabinArc], step=0.7)
              + wall('cabin_rear', 'paint', [s.bulkhead, door[0]], h.dome, step=0.25)
              + h.loft('bulkhead', 'paint', s.body, x=[s.bulkhead, s.bulkhead + 0.05], arc=h.dome, step=0.05, sides=24)
-             + h.shell('rail_near', 'dark', proud, x=[door[0], door[1] + doorTravel], arc=[s.cabinArc - 3, s.cabinArc], step=0.9, sides=120)
-             + h.shell('rail_far', 'dark', proud, x=[door[0], door[1] + doorTravel], arc=[-s.cabinArc, -s.cabinArc + 3], step=0.9, sides=120),
+             + rail('rail_near', [s.cabinArc - 3, s.cabinArc])
+             + rail('rail_far', [-s.cabinArc, -s.cabinArc + 3]),
              finishes) + { title: 'Military transport helicopter roof' },
   k.compound('military_transport_helicopter_windscreen', 30,
              wall('near', 'glass', s.windscreen, [3, s.windscreenArc])
