@@ -5,9 +5,10 @@
 // With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
 // sites clear of each other (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
-// (tools/placements.mjs) and built/manifest.json with each pack's dependencies (tools/packs.mjs) and the finish library
-// (tools/manifest.mjs); with ids it builds only those rows, from the roster source or a recipe file, with no pack index,
-// placements or manifest, so one model builds without the rest. Each model is written into --out (by default built/)
+// (tools/placements.mjs), the doll's baked wields (tools/wields.mjs, exportWields) and built/manifest.json with each
+// pack's dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
+// rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
+// without the rest. Each model is written into --out (by default built/)
 // at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
 // for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
 // `npm ci` in tools.
@@ -26,6 +27,7 @@ import { recipeTools } from './recipeTools.mjs';
 import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { readVocabulary } from './taxonomy.mjs';
+import { exportWields } from './wields.mjs';
 import { workerPool } from './workerPool.mjs';
 
 const here = import.meta.dirname;
@@ -268,11 +270,14 @@ async function main() {
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);
+      const wields = exportWields(out, { models });
+      for (const file of wields.files) console.log(`built ${file}`);
       const manifest = buildManifest({
         models,
         vehicles: placed.vehicles,
+        motions: wields.motions,
         dependsOn,
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
+        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files, ...wields.files],
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes: await finishLibrary(),

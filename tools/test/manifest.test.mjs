@@ -80,6 +80,15 @@ test('a model whose path is not among the produced files is refused', () => {
   }), /fixture_a/);
 });
 
+test('motions whose rig file the tree does not hold are refused, so a consumer never loads clips it cannot pose', () => {
+  assert.throws(() => buildManifest({
+    models: [],
+    motions: [{ id: 'fixture_moves', pack: 'fixture.a', path: 'motions/fixture.moves.json', rig: 'motions/fixture.rig.json' }],
+    files: ['fixture.a/motions/fixture.moves.json'],
+    credit,
+  }), /fixture_moves/);
+});
+
 test('the manifest carries what a worn shell covers, so a consumer reads it without opening the model entry', () => {
   const { models } = buildManifest({
     models: [{ id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [], covers: ['trunk'] }],
