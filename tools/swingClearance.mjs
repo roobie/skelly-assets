@@ -3,12 +3,14 @@
 // final pose that catches doors meeting each other. Contact is judged relative to rest: a pair counts only when it
 // sinks a quarter grain deeper than it already does closed, so the overlaps the seating fits and the allowances of
 // tools/siteOverlap.mjs already judge are not found again, while a thin lid crossing a thin lip is. A part that rides
-// another (`rides` on its site) moves with it, its own motion if it has one nested inside its carrier's, and is tested
-// against everything but its carriers; a stowing slide is swept like any other, so what it hides is still tested. A contact is allowed by the
-// vehicle's own placements: `swingContact` for one that is intended and says why, `swingUnjudged` for one nobody has
-// judged yet, which every run lists. Both are capped at the depth they were written for, a variant shares its parent's,
-// and an entry that no longer applies fails. The reason for the rules and the cost strategy are in
-// `docs/decisions/0016-swing-check.md`.
+// another (`rides` on its site) moves with it, its own motion if it has one nested inside its carrier's. A rider that
+// does not move is part of its carrier's body and is not tested against it; one that moves is a body of its own, swept
+// against its carrier and against the other riders of that carrier, both moving on the one clock, because a panel that
+// folds onto its carrier meets it only while it moves. A stowing slide is swept like any other, so what it hides is still
+// tested. A contact is allowed by the vehicle's own placements: `swingContact` for one that is intended and says why,
+// `swingUnjudged` for one nobody has judged yet, which every run lists. Both are capped at the depth they were written
+// for, a variant shares its parent's, and an entry that no longer applies fails. The reason for the rules and the cost
+// strategy are in `docs/decisions/0016-swing-check.md`.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
@@ -16,6 +18,7 @@ import { join, resolve } from 'node:path';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, TOWARD } from './packages/thing-core/src/motion.ts';
 import { shardUnits } from './generation.mjs';
+import { codeFingerprint } from './packages/thing-export/src/cache.ts';
 import { key } from './siteOverlap.mjs';
 import { poseAt, shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -93,16 +96,19 @@ export function sweepVehicle({ grain, forward, motions, sites }) {
   });
   const step = grain / 4;
   const result = { sites: {}, open: [] };
+  const bodyOf = new Map(bodies.flatMap((body) => body.members.map((id) => [id, body])));
   for (const body of bodies) {
-    // What rides this body's carriers moves with them, so it is not an obstacle at rest.
-    const excluded = new Set(bodies.filter(({ site }) => body.carriers.includes(site)).flatMap(({ members }) => members));
     const members = new Set(body.members);
     const movers = body.members.flatMap((id) => shapes.get(id).map((shape) => ({ site: id, shape })));
+    // What shares a carrier with this body moves with it on the one clock; what shares none stands at rest.
     const obstacles = [
-      ...sites.filter(({ id }) => !excluded.has(id) && !members.has(id)).flatMap(({ id }) => shapes.get(id).map((shape) => ({ site: id, shape }))),
-      { site: GROUND, shape: ground },
+      ...sites.filter(({ id }) => !members.has(id)).flatMap(({ id }) => {
+        const layers = bodyOf.get(id)?.layers ?? [];
+        return shapes.get(id).map((shape) => ({ site: id, shape, layers: layers[0] === body.layers[0] ? layers : [] }));
+      }),
+      { site: GROUND, shape: ground, layers: [] },
     ];
-    const { clear, contacts } = sweepBody({ layers: body.layers, movers, obstacles, step, tolerance: step, grain });
+    const { clear, contacts } = sweepBody({ layers: body.layers, movers, obstacles, step, tolerance: step });
     result.sites[body.site] = { clear, extent: extentOf(body.layers), contacts: [...contacts].map(([other, contact]) => ({ other, ...contact })) };
   }
   const posed = bodies.map(({ site, layers, members, carriers }) => ({ site, carriers, pose: poseAt(layers, 1), shapes: members.flatMap((id) => shapes.get(id)), members }));
@@ -125,9 +131,10 @@ export function sweepTasks({ grain, motions, vehicles }) {
 }
 
 const HERE = import.meta.dirname;
-const SOURCES = ['swingClearance.mjs', 'swingSweep.mjs', 'pieceSolid.mjs', 'packages/thing-core/src/motion.ts', 'packages/thing-core/src/frame.ts'];
-// The checker's own code, as a fingerprint: a cached sweep is only as good as the code that made it.
-const checkerHash = () => createHash('sha256').update(SOURCES.map((name) => readFileSync(join(HERE, name))).join('\0')).digest('hex');
+// The code a sweep runs, whole folders for the shared packages since naming their modules one by one would miss a new
+// import. A cached sweep is only as good as the code and the runtime that made it.
+const CHECKER_CODE = ['swingClearance.mjs', 'swingSweep.mjs', 'pieceSolid.mjs', 'packages/thing-core/src', 'packages/construct/src/foundation'];
+const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
 
 const taskHash = (task, checker) => createHash('sha256').update(checker).update(JSON.stringify(task)).digest('hex').slice(0, 32);
 const CACHE_FOLDER = 'swing';
@@ -200,6 +207,10 @@ export function foundContacts(result) {
 // The first contact a sweep found, as [other site, contact], or null.
 const firstContact = ({ contacts }) => contacts.reduce((first, contact) => (first === null || contact.at < first.at ? contact : first), null);
 
+// What a vehicle with no moving part is swept as: nothing moves and nothing touches, so the entries and riders it lists
+// are still held to that.
+const NO_SWEEP = { sites: {}, open: [] };
+
 // The report on every vehicle's swings, as { problems, notes, exports }, from the sweeps `swingResults` returned. A
 // problem is a contact that no `swingContact` or `swingUnjudged` entry covers to its depth, and an entry that is stale:
 // nothing touches there any more, or it is listed twice or capped far above what it measures. A note is a contact
@@ -210,8 +221,7 @@ export function swingReport({ grain, vehicles }, results) {
   const notes = [];
   const exports = {};
   for (const [vehicle, { parent, sites, swingContacts, swingUnjudged }] of Object.entries(vehicles)) {
-    const result = results[vehicle];
-    if (!result) continue;
+    const result = results[vehicle] ?? NO_SWEEP;
     const partOf = new Map(sites.map(({ id, part }) => [id, part]));
     partOf.set(GROUND, 'the ground');
     const carrierOf = new Map(sites.filter((site) => site.rides).map(({ id, rides }) => [id, rides]));
@@ -255,6 +265,7 @@ export function swingReport({ grain, vehicles }, results) {
         notes.push(`${vehicle}: ${partOf.get(a)} at ${a} and ${partOf.get(b)} at ${b} touch by ${millimetres(contact.depth)} mm as they open and are not judged: ${entry.note}`);
       }
     }
+    if (!results[vehicle]) continue;
     const moving = Object.entries(result.sites).map(([site, { clear, contacts }]) => {
       const first = firstContact({ contacts });
       return [site, { clear: Math.round(clear * 1e4) / 1e4, ...(first ? { stop: first.other } : {}) }];
