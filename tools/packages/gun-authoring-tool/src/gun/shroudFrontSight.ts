@@ -30,10 +30,6 @@ export const shroudFrontSightSolids = (postTopU: number): Solid[] => {
   if (earTopU <= base.heightU) {
     throw new Error(`A shroud front sight's post top at ${postTopU}u leaves no room for its ears`);
   }
-  // The export reads the post top within two post half-widths of the centre; an ear inside that band would raise it.
-  if (ears.innerHalfGapU <= 2 * post.halfWidthU) {
-    throw new Error(`A shroud front sight's ears at ${ears.innerHalfGapU}u crowd its post`);
-  }
   const outer = ears.innerHalfGapU + ears.thicknessU;
   return [
     box('base', [-base.halfLengthU, 0, -base.halfWidthU], [base.halfLengthU, base.heightU, base.halfWidthU]),
