@@ -5,7 +5,7 @@ local engine = import 'engine-kit.libsonnet';
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
 local id = 'airport_crash_tender';
 local middle(span) = (span[0] + span[1]) / 2;
-local engineName = 'v8_diesel_heavy';
+local engineName = engine.nameOf(s.engine);
 // The air box hangs under the near rail, its duct passing beneath the rail into the intake, because beside the block it
 // would stand in the rail. It takes a site of its own: the kit's `air_box` site promises the kit's layout.
 local engineSites =

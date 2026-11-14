@@ -4,6 +4,7 @@ local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local gearboxes = import 'gearboxes.libsonnet';
+local tractionMotors = import 'traction-motors.libsonnet';
 local driveline = import 'driveline.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
@@ -533,9 +534,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   trailerLeg,
   jockeyWheel,
   truckBatteryTray,
-  tractionMotor('traction_motor_light', 25, 0.1, 0.24) + { title: 'Light traction motor' },
-  tractionMotor('traction_motor_car', 65, 0.15, 0.36) + { title: 'Car traction motor' },
-  tractionMotor('traction_motor_large', 240, 0.25, 0.6) + { title: 'Large traction motor' },
   inverter('inverter_car', 14, 0.36, 0.14, 0.26) + { title: 'Car inverter' },
   inverter('inverter_large', 45, 0.6, 0.24, 0.42) + { title: 'Large inverter' },
   tractionPack('traction_pack_light', 70, 0.52, 0.2, 0.74) + { title: 'Light traction pack' },
@@ -560,5 +558,9 @@ local towHitch = k.compound('tow_hitch', 18, [
   local g = gearboxes[id];
   gearbox(id, g.massKg, g.length, g.width, g.height) + { title: g.title }
   for id in std.objectFields(gearboxes)
+] + [
+  local m = tractionMotors[id];
+  tractionMotor(id, m.massKg, m.radius, m.length) + { title: m.title }
+  for id in std.objectFields(tractionMotors)
 ] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
   + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows

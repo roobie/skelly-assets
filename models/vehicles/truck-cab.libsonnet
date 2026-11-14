@@ -112,6 +112,7 @@ local spec(s) = defaults + s;
 local crossmembers(s) =
   local rear = s.rear + 0.12;
   local last = s.gearboxX - s.gearboxLength / 2 - crossmemberHalf;
+  assert (last - rear) / (crossmemberCount - 2) >= 2 * crossmemberHalf : 'the crossmembers behind the gearbox must not meet';
   [rear + i * (last - rear) / (crossmemberCount - 2) for i in std.range(0, crossmemberCount - 2)] + [s.railFront - crossmemberHalf];
 // The near leaf spring under the rail, from the seat of the axle at `x`, whose frame stands at `axleY`, up to the rail.
 // `front` and `back` stop its hangers short of whatever stands ahead and behind.
