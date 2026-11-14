@@ -40,7 +40,7 @@ export async function mountVehicles(section: HTMLElement): Promise<void> {
   }
   status.textContent = '';
 
-  const solve = async (vehicle: string, site: string) => {
+  const propose = async (vehicle: string, site: string) => {
     proposalBox.textContent = `Solving ${vehicle} ${site}…`;
     const response = await fetch(`./api/solve?${new URLSearchParams({ vehicle, site })}`);
     if (!response.ok) {
@@ -54,6 +54,15 @@ export async function mountVehicles(section: HTMLElement): Promise<void> {
     save.textContent = 'Download proposal';
     save.addEventListener('click', () => downloadJson(proposal, `${vehicle}.${site}.proposal.json`));
     proposalBox.append(document.createElement('br'), save);
+  };
+
+  const solve = async (vehicle: string, site: string, button: HTMLButtonElement) => {
+    button.disabled = true;
+    try {
+      await propose(vehicle, site);
+    } finally {
+      button.disabled = false;
+    }
   };
 
   const rows: HTMLTableRowElement[] = [];
@@ -70,7 +79,7 @@ export async function mountVehicles(section: HTMLElement): Promise<void> {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = 'Solve';
-        button.addEventListener('click', () => void solve(vehicle, site));
+        button.addEventListener('click', () => void solve(vehicle, site, button));
         action.append(button);
       }
       rows.push(row);

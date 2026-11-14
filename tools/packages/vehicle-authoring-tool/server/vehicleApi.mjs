@@ -8,7 +8,8 @@ import { swingReport, swingResults } from '../../../swingClearance.mjs';
 import { workerPool } from '../../../workerPool.mjs';
 
 export function vehicleApi({ root, cache = DEFAULT_CACHE }) {
-  // The first request pays for evaluating every vehicle and sweeping the ones the cache lacks; later ones reuse it.
+  // The first request pays for evaluating every vehicle and sweeping the ones the cache lacks; later ones reuse it until
+  // `invalidate`, which the dev server calls when the models change, so a verdict is never about content since edited.
   let loaded;
   const load = () => {
     loaded ??= (async () => {
@@ -19,6 +20,9 @@ export function vehicleApi({ root, cache = DEFAULT_CACHE }) {
     return loaded;
   };
   return {
+    invalidate() {
+      loaded = undefined;
+    },
     // Every placement vehicle as { sites: { site: verdict } }, vehicles with nothing that moves having no sites.
     async verdicts() {
       const { pieces, report } = await load();

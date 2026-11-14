@@ -54,12 +54,12 @@ export const describeSwing = ({ clear, stop, status, contacts }: SiteVerdict): s
 /** A proposal as the plain words the author reads before hand-merging it. */
 export const describeProposal = (proposal: Proposal): string => {
   const { status, offset, partOffset, stop, part, reachable } = proposal;
-  if (status === 'ok') return 'This site already opens all the way.';
+  if (status === 'ok') return 'Nothing in the vehicle\'s report is against this part.';
   if (status === 'moved' && offset && partOffset) {
-    return `Move every pin of ${part} by (${partOffset.map(metres).join(', ')}) in the part's frame; the same in the vehicle frame is (${offset.map(metres).join(', ')}). Then it opens all the way.`;
+    return `Move every pin of ${part} by (${partOffset.map(metres).join(', ')}) in the part's frame; the same in the vehicle frame is (${offset.map(metres).join(', ')}). Every site of it in this vehicle then clears; other vehicles that place the part were not checked.`;
   }
   if (status === 'shortened' && stop) {
-    return `No pin line within reach clears it (the best opens ${Math.round((reachable ?? 0) * 100)}%). Lower ${part}'s stop to ${stop.value}${stop.unit} of ${stop.total}${stop.unit}.`;
+    return `No pin line within reach clears it (the best opens ${Math.round((reachable ?? 0) * 100)}%). Lower ${part}'s stop to ${stop.value}${stop.unit} of ${stop.total}${stop.unit}; other vehicles that place the part were not checked.`;
   }
   return `Nothing tried clears it (the best opens ${Math.round((reachable ?? proposal.clear) * 100)}%). Reshape the part or the body it meets, or judge the contact with a swingContact.`;
 };

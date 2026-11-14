@@ -1,8 +1,9 @@
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 
 interface VehicleApi {
+  invalidate(): void;
   verdicts(): Promise<unknown>;
   solve(vehicle: string, site: string): Promise<unknown>;
 }
@@ -13,10 +14,15 @@ interface VehicleApi {
 const vehicleEndpoints = (): Plugin => ({
   name: 'vehicle-endpoints',
   apply: 'serve',
-  configureServer({ middlewares }) {
+  configureServer({ middlewares, watcher }) {
     const api: Promise<VehicleApi> = import(pathToFileURL(resolve(import.meta.dirname, 'server/vehicleApi.mjs')).href).then(
       ({ vehicleApi }) => vehicleApi({ root: resolve(import.meta.dirname, '../../..') }),
     );
+    const models = resolve(import.meta.dirname, '../../../models') + sep;
+    watcher.add(models);
+    watcher.on('all', (_event, file) => {
+      if (file.startsWith(models)) void api.then((loaded) => loaded.invalidate());
+    });
     const serve = (path: string, answer: (query: URLSearchParams, api: VehicleApi) => Promise<unknown>) =>
       middlewares.use(path, (request, response) => {
         const query = new URL(request.url ?? '', 'http://localhost').searchParams;
