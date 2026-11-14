@@ -2818,7 +2818,7 @@
     {
       "id": "security-walker",
       "title": "Security walker",
-      "pack": "skelly.bestiary",
+      "pack": "skelly.bestiary.mech",
       "template": "security-walker",
       "lod_divisor": 0,
       "walk_speed": 0.91
