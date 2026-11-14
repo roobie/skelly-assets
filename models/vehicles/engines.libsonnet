@@ -1,7 +1,8 @@
 // The engines built as a fused core with their class's accessories; see `engine-kit.libsonnet`. `massKg` is the whole
 // dressed engine's, so the fused model and the assembly weigh the same and the core takes what the accessories leave.
-// Its crank lies along x; `length` is along the crank. A work machine's hood sides open on what a road engine's bonnet
-// hides, so an engine may show a `turbo` on its exhaust side with the charge pipe over its head, a crank `damper` and
+// Its crank lies along x; `length` is along the crank. An engine is an inline unless its `layout` says 'vee'; see
+// `engine-kit.libsonnet`, `layouts`. A work machine's hood sides open on what a road engine's bonnet hides, so an
+// engine may show a `turbo` on its exhaust side with the charge pipe over its head, a crank `damper` and
 // the `bellHousing` it bolts to its drive with; `engine-kit.libsonnet` draws each one named.
 {
   // A 999 cc three-cylinder petrol of 52 kW, as in the 2014-2019 smart fortwo (Renault H4D). Engine databases give it
@@ -9,6 +10,9 @@
   i3_petrol: { title: 'Inline-3 petrol engine', class: 'light', massKg: 81, length: 0.4, width: 0.44, height: 0.44 },
   i4_petrol: { title: 'Inline-4 petrol engine', class: 'light', massKg: 140, length: 0.46, width: 0.46, height: 0.55 },
   i4_diesel: { title: 'Inline-4 diesel engine', class: 'light', massKg: 185, length: 0.5, width: 0.5, height: 0.62 },
+  // A car's V6 and V8. Their masses and measures are estimates for car vees of their size.
+  v6_petrol: { title: 'V6 petrol engine', class: 'light', layout: 'vee', massKg: 175, length: 0.5, width: 0.62, height: 0.6 },
+  v8_petrol: { title: 'V8 petrol engine', class: 'light', layout: 'vee', massKg: 260, length: 0.62, width: 0.72, height: 0.68 },
   // A 3-litre pushrod car six of about 85 kW. Its mass and measures are estimates for a six of its size.
   i6_petrol: { title: 'Inline-6 petrol engine', class: 'light', massKg: 210, length: 0.78, width: 0.44, height: 0.66 },
   // A 6.3-litre White 160AX side-valve six of 110 kW, as in the M3 half-track. Its mass and measures are estimates for a
