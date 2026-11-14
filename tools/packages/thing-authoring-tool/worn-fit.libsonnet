@@ -633,11 +633,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,
   // laces). The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it, and
   // it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
-  // trousers. A shoe whose top stays below the ankle has no shaft.
+  // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
+  // the foot piece declares the sole as the lift a consumer stands the shod figure on.
   feet(id, finish, b, spec={}, title=null)::
     local s = { layer: 'normal', ease: 0 } + spec;
     local g = layers[s.layer];
-    local ankleY = -leg.shoeHeight;  // The sole's floor, from the ankle.
+    local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
     local z0 = footZ - b.l / 2, zt = footZ + b.l / 2 - b.w / 2, zs = z0 + 0.12;
     local y(v) = ankleY + v;
@@ -657,8 +658,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
     local shaftW = std.max(b.w * 0.92, leg.shinWidth + 2 * (g + s.ease)), shaftD = std.max(0.116, leg.shinDepth + 2 * (g + s.ease));
     // The shaft reaches below the ankle, past the shin's end, so no skin shows over a low vamp.
-    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + b.top - leg.shoeHeight;
-    local rise = top - 0.02 - (ankle + b.s + b.instep - leg.shoeHeight);
+    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + ankleY + b.top;
+    local rise = top - 0.02 - (ankle + ankleY + b.s + b.instep);
     local shaft = [
       oct('shaft', 'upper', base, top - 0.02, shaftW, shaftD, 0.02),
       oct('collar', 'collar', top - 0.02, top, shaftW + 0.008, shaftD + 0.008, 0.022),
@@ -669,9 +670,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       h.box('lace-%d' % i, 'laces', [-b.w * 0.3, yl, shaftD / 2 + 0.006], [b.w * 0.3, yl + 0.004, shaftD / 2 + 0.009])
       for i in std.range(0, b.laces - 1)
     ]);
-    local shafted = b.top > leg.shoeHeight;
+    local shafted = top > ankle;
     // The ankle's cap rises above the vamp, inside the shaft, which rides the shin.
-    fitted([paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, [], ['foot'], title=named(title, 'foot'))]
+    local shod = paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, [], ['foot'], title=named(title, 'foot'));
+    fitted([shod { row+: { soleLift: b.s } }]
            + (if shafted then [paired(id + '_worn_shaft', 'hem', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
       ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),

@@ -2,7 +2,8 @@
 // showcase (site/build.mjs) composes into its worn view, which the review sheets draw too. A site is
 // { model, at, mirror?, turn? }: the model mirrored across its own x = 0 plane, then turned by the quaternion `turn`,
 // then moved by `at`, as site/render.mjs places it. A worn piece's site adds the doll part copy it rides
-// { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs).
+// { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs). Footwear's site carries the
+// lift its sole stands the figure on { soleLift }.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
@@ -145,15 +146,16 @@ const isPieceOf = (id, model) => model.id === `${id}_worn` || (model.id.startsWi
 
 // The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in: `<id>_worn` in the
 // dressing's `piece` part, `<id>_worn_<segment>` in the segment's part, and what it covers of that part, as its model
-// declares. Pieces fitted over other clothing are left out, so the doll wears each item on its own.
+// declares, with the sole lift a foot piece declares. Pieces fitted over other clothing are left out, so the doll wears
+// each item on its own.
 export function wornPieces(id, models, dressing) {
   return models.filter((model) => tagsOf(model, 'fit').includes('worn') && isPieceOf(id, model)).map((model) => {
-    const covers = model.covers ? { covers: model.covers } : {};
-    if (model.id === `${id}_worn`) return { model: model.id, part: dressing.piece, ...covers };
+    const declared = { ...(model.covers ? { covers: model.covers } : {}), ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }) };
+    if (model.id === `${id}_worn`) return { model: model.id, part: dressing.piece, ...declared };
     const segment = model.id.slice(`${id}_worn_`.length);
     const slot = dressing.slots[segment];
     if (!slot) throw new Error(`${model.id}: worn segment ${segment} is not in the dressing's slots`);
-    return { model: model.id, part: slot.part, ...covers };
+    return { model: model.id, part: slot.part, ...declared };
   });
 }
 
@@ -189,8 +191,8 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   if (pieces.length > 0) {
     // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part, and a piece
     // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs).
-    return [...sites, ...pieces.flatMap(({ model: piece, part, covers }) => copiesOf(part).map(({ side, at, mirror, site }) => ({
-      model: piece, part, side, at, ...(mirror ? { mirror } : {}), ...(covers ? { covers, bodySite: site } : {}),
+    return [...sites, ...pieces.flatMap(({ model: piece, part, covers, soleLift }) => copiesOf(part).map(({ side, at, mirror, site }) => ({
+      model: piece, part, side, at, ...(mirror ? { mirror } : {}), ...(covers ? { covers, bodySite: site } : {}), ...(soleLift === undefined ? {} : { soleLift }),
     })))];
   }
   const slots = tagsOf(model, 'slot');
@@ -205,7 +207,9 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   const region = union((place.both ? copies : copies.slice(0, 1)).map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
-  return [...sites, { model: model.id, at: rest(box, region, place), ...(lying ? { turn: STAND } : {}) }];
+  // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).
+  const at = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
+  return [...sites, { model: model.id, at, ...(lying ? { turn: STAND } : {}), ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }) }];
 }
 
 // The doll as the built tree holds it: each doll model's parts from its GLB and anchors from its things sidecar.

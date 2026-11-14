@@ -18,6 +18,7 @@ export interface WrittenRecipe {
     readonly label?: NeutralModel['label'];
     readonly paintable?: NeutralModel['paintable'];
     readonly covers?: NeutralModel['covers'];
+    readonly soleLift?: NeutralModel['soleLift'];
     readonly physical?: ModelPhysical;
   }[];
   readonly files: readonly string[];
@@ -91,6 +92,7 @@ export const writeModelExports = (
         ...(modelEntry.label === undefined ? {} : { label: modelEntry.label }),
         ...(modelEntry.paintable === undefined ? {} : { paintable: modelEntry.paintable }),
         ...(modelEntry.covers === undefined ? {} : { covers: modelEntry.covers }),
+        ...(modelEntry.soleLift === undefined ? {} : { soleLift: modelEntry.soleLift }),
         ...(physical === undefined ? {} : { physical }),
       };
     }),

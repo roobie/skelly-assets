@@ -19,6 +19,7 @@ const dressing = {
     { slot: 'hands', part: 'sleeve', against: [0, 0, 0], sink: 0 },
     { slot: 'head', anchor: 'brow' },
     { slot: 'face', anchor: 'nose' },
+    { slot: 'feet', part: 'sleeve', both: true, against: [0, -1, 0], sink: 1 },
   ],
   slots: { body: { slot: 'torso', part: 'chest' }, cuff: { slot: 'arms', part: 'sleeve' } },
 };
@@ -83,6 +84,15 @@ test('a wearable with no pieces rests against its place\'s part, sunk by its sha
   // torso is listed before hands, so the chest takes it: its front face at the chest's, half of it sunk in.
   close(site.at, [0, 0.3, 0.1]);
   assert.equal(site.turn, undefined);
+});
+
+test('a loose shoe that declares a sole lift stands the bare sole on its deck, that far above the shoe\'s floor', () => {
+  const skates = { ...model('skates', { slot: ['feet'] }), soleLift: 0.04 };
+  const shoe = box([-0.1, 0, -0.1], [0.1, 0.15, 0.1]);
+  const [site] = wornSites(skates, { dressing, doll, models: [skates], boxOf: () => shoe }).slice(doll.sites.length);
+  const bareSole = Math.min(...doll.parts.get('sleeve').map(({ box: part }) => part.min[1]));
+  assert.ok(Math.abs(site.at[1] + shoe.min[1] + skates.soleLift - bareSole) < 1e-9, `the deck stands at ${site.at[1] + shoe.min[1] + skates.soleLift}, the bare sole at ${bareSole}`);
+  assert.equal(site.soleLift, skates.soleLift);
 });
 
 test('a wearable placed by an anchor stands with its origin at the bust anchor, whatever its box', () => {

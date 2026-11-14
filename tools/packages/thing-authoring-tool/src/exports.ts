@@ -91,6 +91,7 @@ export const exportItem = (
       ...(glow ? { emissiveMaterial: glow } : {}),
       ...(paintable.length > 0 ? { paintable } : {}),
       ...(item.covers ? { covers: item.covers } : {}),
+      ...(item.soleLift === undefined ? {} : { soleLift: item.soleLift }),
       ...(label ? { label: { ...label, text: item.label?.text ?? item.title } } : {}),
     },
     physical: { ...assemblyProperties(parts), volumeM3: drawnVolumeM3(report.resolved, drawn) },

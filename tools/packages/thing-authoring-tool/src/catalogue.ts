@@ -142,6 +142,7 @@ const ItemSchema = pipe(
       }),
     ),
     covers: optional(NeutralModelSchema.entries.covers),
+    soleLift: NeutralModelSchema.entries.soleLift,
     /** Named datums on solids, exported as the model's anchors. */
     anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
     /**

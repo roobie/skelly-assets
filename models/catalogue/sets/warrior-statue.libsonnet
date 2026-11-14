@@ -97,6 +97,8 @@ local chestTop = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.ch
 local hipX = bust.pelvisWidth / 4;
 local hipY = bust.pelvisHeight * 0.12;
 local ankleDrop = leg.length - leg.thighLength - leg.shoeHeight;
+// The sabaton's sole lies under the bare foot, so the figure stands that much higher on the plinth.
+local soleLift = [r for r in plate if r.id == 'sabaton_plate_worn_foot'][0].soleLift;
 // The helmet's flange sits this far below the neck's top, so the armet's slit falls at the eyes.
 local helmetDrop = 0.04;
 // Where a flat hand meets what it rests on: the middle of the palm's face, a little to the little finger's side so
@@ -127,7 +129,7 @@ local armTurns = {
 
 // Every part's frame in the world, worked out down the body from the harness.
 local frames =
-  local harness = frame(rot.id, [0, plinthTop + k * (leg.shoeHeight + legDrop - hipY), 0]);
+  local harness = frame(rot.id, [0, plinthTop + k * (leg.shoeHeight + soleLift + legDrop - hipY), 0]);
   local legFrames(name, side) =
     local thigh = frame(legTurn(side), at(harness, [side * hipX, hipY, 0]));
     local greave = frame(legTurn(side), at(thigh, [0, -leg.thighLength, 0]));
@@ -188,7 +190,7 @@ local links =
     for b in std.range(0, hand.phalanges - 1)
   ];
   [
-    ['plinth', 'sabaton-right', at(frames['sabaton-right'], [0, -leg.shoeHeight, 0])],
+    ['plinth', 'sabaton-right', at(frames['sabaton-right'], [0, -leg.shoeHeight - soleLift, 0])],
     ['harness', 'pelvis', frames.pelvis.origin],
     ['harness', 'armet', frames.armet.origin],
     ['palm-right', 'sword', frames.sword.origin],

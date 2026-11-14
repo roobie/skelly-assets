@@ -5,12 +5,12 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { clearanceProbe, COINCIDENT, coveredSurface, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
+import { clearanceProbe, COINCIDENT, coveredSurface, PITCH, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { hides } from '../../site/hiding.mjs';
 import { add, applyPoint, boneTransforms, dot, length, mulMM, mulMV, normalize, quatToMat3, scale, sub } from '../../site/kinematics.mjs';
-import { compilePose, frameAngles } from '../../site/poseFile.mjs';
+import { compilePose, frameAngles, soleLift } from '../../site/poseFile.mjs';
 import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
@@ -40,16 +40,16 @@ const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle, ...weaponIds], { cwd: repo, stdio: 'pipe' });
 
-// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy and what
-// they cover, from the model entry the thing export writes beside each (a gun export writes none), as the manifest
-// would list them.
+// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, what they
+// cover and the lift of their soles, from the model entry the thing export writes beside each (a gun export writes
+// none), as the manifest would list them.
 const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
 const manifest = {
   models: readdirSync(built).flatMap((pack) => readdirSync(join(built, pack, 'assets/models')).map((file) => {
     const id = file.slice(0, -'.glb'.length);
     const entry = join(built, pack, 'things', `${id}.model.json`);
-    const { covers } = existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')) : {};
-    return { id, pack, path: `assets/models/${file}`, covers, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
+    const { covers, soleLift: lift } = existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')) : {};
+    return { id, pack, path: `assets/models/${file}`, covers, soleLift: lift, ...manifestTaxonomy(taxonomies.get(`${pack}/${id}`)) };
   })),
 };
 const dressing = readDressing(repo);
@@ -63,7 +63,8 @@ const anchorsOf = (id) => {
   return existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')).anchors ?? {} : {};
 };
 const meshes = treeMeshes(built, manifest);
-const restIn = (wear) => restMeshes(rig, wornSites(models.find((model) => model.id === wear), { dressing, doll, models, boxOf, anchorsOf }), meshes);
+const sitesIn = (wear) => wornSites(models.find((model) => model.id === wear), { dressing, doll, models, boxOf, anchorsOf });
+const restIn = (wear) => restMeshes(rig, sitesIn(wear), meshes);
 const rest = restIn(WEAR);
 const { meshOf: itemMesh, entryOf: thingOf } = heldItems(built, manifest);
 const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json'))
@@ -363,6 +364,25 @@ test('each fitted garment covers the body and leaves none of it poking through a
     assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
     const { pokes } = restClearance(rig, dressed, surface);
     assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
+  }
+});
+
+test('a grounded shod doll stands its boots on the ground and its bare feet a sole above it', () => {
+  const lowest = ({ positions }) => Math.min(...positions.filter((_, i) => i % 3 === 1));
+  const shod = wears.filter((wear) => shellsOf(wear).some((id) => id.endsWith('_worn_foot')));
+  assert.ok(shod.length > 0, 'no fitted footwear among the worn garments, so nothing was checked');
+  for (const wear of shod) {
+    const lift = soleLift(sitesIn(wear));
+    assert.ok(lift > 0, `${wear} declares no sole lift`);
+    // At rest the grounded pose only moves the root, so the rest meshes stand where it puts them, raised by its root.
+    const { frame: { root: [, raised] } } = compilePose(rig, { rig: { id: rig.id, revision: rig.revision }, ground: true }, { soles: lift });
+    const { body, pieces } = restIn(wear);
+    const feet = pieces.filter(({ piece }) => piece.endsWith('_worn_foot'));
+    const bare = Math.min(...body.map(({ mesh }) => lowest(mesh))) + raised;
+    const soled = Math.min(...feet.map(({ mesh }) => lowest(mesh))) + raised;
+    // Within a sampling pitch, too small to see: a voxelised sole's underside stands off its authored plane.
+    assert.ok(Math.abs(soled) < PITCH, `${wear}: its soles stand ${(soled * 1000).toFixed(1)} mm off the ground`);
+    assert.ok(Math.abs(bare - lift) < PITCH, `${wear}: the bare feet stand ${(bare * 1000).toFixed(1)} mm up, not on its ${(lift * 1000).toFixed(1)} mm soles`);
   }
 });
 

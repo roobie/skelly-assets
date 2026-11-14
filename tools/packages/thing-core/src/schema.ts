@@ -188,6 +188,11 @@ export const NeutralModelSchema = strictObject({
     ),
   ),
   /**
+   * On footwear, how far in metres its sole stands the bare foot above the ground: the sole lies under the foot, so a
+   * consumer stands the figure that wears it that much higher, by the largest lift among what it wears.
+   */
+  soleLift: optional(positive),
+  /**
    * Where the hand holds the model, and the XYZ Euler turn in degrees that carries the file's axes onto the held axes,
    * working end +z and up +y, so a model that faces its working end forward needs none.
    */

@@ -152,7 +152,7 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'trim', ridge: 'rivet' },
 }, 'Plate gauntlets').rows;
 local boots = fit.feet('sabaton_plate', sabaton,
-                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.075, instep: 0.115, top: 0.28, shaft: 0.15, laces: 0 }, title='Plate sabatons').rows;
+                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, title='Plate sabatons').rows;
 
 armour.of('medieval', [
   row('armor_plate_worn_body', body) + { title: 'Plate body armour' },
