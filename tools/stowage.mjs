@@ -7,7 +7,7 @@ import { join, resolve } from 'node:path';
 import { modelBox } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { outputPath } from './layout.mjs';
+import { outputPath, thingEntryFile } from './layout.mjs';
 import { solid } from './pieceSolid.mjs';
 import { sharedDepth } from './siteOverlap.mjs';
 
@@ -224,8 +224,9 @@ export function loadOutStowage(out, models, placements) {
   const packOf = new Map(models.map((model) => [model.id, model.pack]));
   const moving = new Set(
     [...new Set(closures)].filter((id) => {
-      const sidecar = join(out, packOf.get(id) ?? '', 'things', `${id}.model.json`);
-      return packOf.has(id) && existsSync(sidecar) && JSON.parse(readFileSync(sidecar, 'utf8')).motion?.length > 0;
+      if (!packOf.has(id)) return false;
+      const sidecar = join(out, thingEntryFile(packOf.get(id), id));
+      return existsSync(sidecar) && JSON.parse(readFileSync(sidecar, 'utf8')).motion?.length > 0;
     }),
   );
   return { items: readStowage(out, models, ids), moving };

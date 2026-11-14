@@ -6,7 +6,15 @@ import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { sampleClip } from '../../site/clipFrames.mjs';
 import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
-import { declaredPacks, outputPath, readMobRows, readRoster, smoothPack, undeclaredDirectories } from '../layout.mjs';
+import {
+  declaredPacks,
+  outputPath,
+  readMobRows,
+  readRoster,
+  smoothPack,
+  thingEntryFile,
+  undeclaredDirectories,
+} from '../layout.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
@@ -104,7 +112,7 @@ test('the roster builder writes each id at its pack path, with its sidecar and i
       filesUnder(out),
       [
         outputPath(packId, `assets/models/${id}.glb`),
-        outputPath(packId, `things/${id}.model.json`),
+        thingEntryFile(packId, id),
         outputPath(smoothPack(packId), `assets/models/${id}.glb`),
       ].sort(),
     );
@@ -133,7 +141,7 @@ test('every roster wearable the doll seats by an anchor builds with that anchor,
       { cwd: repo, stdio: 'pipe' },
     );
     for (const { id } of seated) {
-      const sidecar = join(out, outputPath(roster.get(id).packId, `things/${id}.model.json`));
+      const sidecar = join(out, thingEntryFile(roster.get(id).packId, id));
       assert.ok(existsSync(sidecar), `${id} builds no sidecar`);
       const { anchor } = placeOf(
         models.find((model) => model.id === id),

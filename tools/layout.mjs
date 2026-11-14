@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, posix, resolve } from 'node:path';
 import { recipePackIds } from './recipes.mjs';
+import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 import { inheritTaxonomy } from './taxonomy.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -25,6 +26,12 @@ export function outputPath(packId, file) {
   }
   return posix.join(packId, file);
 }
+
+// A model's sidecar at its logical path under its pack, in the folder its tool writes sidecars to; it holds what the
+// GLB does not, such as the anchors.
+export const sidecarFile = (packId, directory, id) => outputPath(packId, `${directory}/${id}.model.json`);
+
+export const thingEntryFile = (packId, id) => sidecarFile(packId, SIDECAR_DIRECTORIES.thing, id);
 
 // models/export.json: pack id -> the roster ids it declares.
 export function readRoster(root = repo) {

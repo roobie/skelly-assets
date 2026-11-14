@@ -27,7 +27,7 @@ import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { poseJson } from '../keyFrames.mjs';
-import { outputPath } from '../layout.mjs';
+import { outputPath, thingEntryFile } from '../layout.mjs';
 import { partStrokes, pressCheckPoses, pressCheckSockets, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 import {
@@ -90,7 +90,7 @@ const manifest = {
   models: readdirSync(built).flatMap((pack) =>
     readdirSync(join(built, pack, 'assets/models')).map((file) => {
       const id = file.slice(0, -'.glb'.length);
-      const entry = join(built, pack, 'things', `${id}.model.json`);
+      const entry = join(built, thingEntryFile(pack, id));
       const { covers, soleLift: lift } = existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')) : {};
       return {
         id,
@@ -113,7 +113,7 @@ const boxOf = (id) => {
 };
 const anchorsOf = (id) => {
   const { pack } = models.find((model) => model.id === id);
-  const entry = join(built, pack, 'things', `${id}.model.json`);
+  const entry = join(built, thingEntryFile(pack, id));
   return existsSync(entry) ? (JSON.parse(readFileSync(entry, 'utf8')).anchors ?? {}) : {};
 };
 const meshes = treeMeshes(built, manifest);

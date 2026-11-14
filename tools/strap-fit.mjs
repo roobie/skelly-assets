@@ -12,6 +12,7 @@ import { COINCIDENT, meshProbe, STEP, sampledSurface } from '../site/clearance.m
 import { modelMeshes } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { thingEntryFile } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -152,7 +153,7 @@ export function builtModels(built, manifest, form = 'voxel') {
   };
   const glbOf = (id) => readFileSync(join(built, formFile(entryOf(id), form)));
   const anchorsOf = (id) =>
-    JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
+    JSON.parse(readFileSync(join(built, thingEntryFile(entryOf(id).pack, id)), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
   return { glbOf, anchorsOf, head };

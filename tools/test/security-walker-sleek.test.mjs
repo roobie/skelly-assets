@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import { exportPool, exportRecipes } from '../build.mjs';
 import { DEFAULT_CACHE } from '../generation.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
+import { thingEntryFile } from '../layout.mjs';
 import { solid } from '../pieceSolid.mjs';
 import { meeting } from './pieces.mjs';
 
@@ -211,7 +212,7 @@ async function exportedBoxes() {
     const { models } = await exportRecipes({ out, tools: ['thing'], pool, ids: new Set(sleek.map((p) => p.part)) });
     return Object.fromEntries(
       models.map((m) => {
-        const model = JSON.parse(readFileSync(join(out, m.pack, 'things', `${m.id}.model.json`), 'utf8'));
+        const model = JSON.parse(readFileSync(join(out, thingEntryFile(m.pack, m.id)), 'utf8'));
         return [m.id, model.parts ? Object.values(model.parts).flatMap((p) => p.collision ?? []) : model.collision];
       }),
     );
