@@ -15,8 +15,9 @@ interface Site {
   readonly mirror?: boolean;
 }
 
-// Every vehicle's folding door panels, the sites that place them and the vehicle grain a row without its own is drawn at.
-const { grain, vehicles, rows } = JSON.parse(evaluateJsonnet(`
+// Every vehicle's folding door panels, the sites that place them, the jamb panel sites of each doorway whose two leaves
+// close against each other, and the vehicle grain a row without its own is drawn at.
+const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
   local placements = import 'models/vehicles/placements.libsonnet';
   local frame = import 'models/vehicles/frame.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
@@ -26,9 +27,15 @@ const { grain, vehicles, rows } = JSON.parse(evaluateJsonnet(`
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
     vehicles: { [v]: sites[v] for v in std.objectFields(sites) if std.length(sites[v]) > 0 },
+    doorPairs: { [v]: placements[v].doorPairs for v in std.objectFields(placements) if std.objectHasAll(placements[v], 'doorPairs') },
     rows: frame.rows([row for row in rows if std.member(parts, row.id)]),
   }
-`, resolve(import.meta.dirname, '../../../..'))) as { grain: number; vehicles: Record<string, Site[]>; rows: unknown[] };
+`, resolve(import.meta.dirname, '../../../..'))) as {
+  grain: number;
+  vehicles: Record<string, Site[]>;
+  doorPairs: Record<string, [string, string][]>;
+  rows: unknown[];
+};
 
 const loaded = loadCatalogue({ units: { metresPerUnit: 1, grid: 0.001, bevel: 0 }, facets: 12, defaultMaterial: 'paint-silver', items: rows });
 
@@ -84,45 +91,63 @@ const separation = (a: Outline, b: Outline): number => {
   return best;
 };
 
+// A vehicle's folding leaves, each a panel that rides no other folding panel with every panel that rides it, keyed by
+// that panel's site, and how far apart two of them are at `clock`.
+const leavesOf = (vehicle: string, sites: readonly Site[]) => {
+  for (const site of sites) if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
+  const pose = poser(sites);
+  const carrier = (site: Site) => sites.find(({ id }) => id === site.rides);
+  const leafOf = (site: Site): string => {
+    const below = carrier(site);
+    return below ? leafOf(below) : site.id;
+  };
+  const leaves = new Map<string, Site[]>();
+  for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
+  const outlines = (leaf: string, clock: number): Outline[] =>
+    leaves.get(leaf)!.flatMap((site) =>
+      panels.get(site.part)!.boxes.map(({ min, max }) => ({
+        corners: ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
+          const [px, , pz] = pose(site, [x, min[1], z], clock);
+          return [px, pz] as const;
+        }),
+        low: pose(site, min, clock)[1],
+        high: pose(site, max, clock)[1],
+      })),
+    );
+  const gap = (a: string, b: string, clock: number) => {
+    const theirs = outlines(b, clock);
+    return Math.min(...outlines(a, clock).flatMap((one) => theirs.map((other) => separation(one, other))));
+  };
+  return { ids: [...leaves.keys()], gap };
+};
+
 const CLOCKS = 100;
 
 it('keeps every folding leaf clear of every other leaf of its vehicle at every step of the fold, as the voxels draw them', () => {
   let compared = 0;
   for (const [vehicle, sites] of Object.entries(vehicles)) {
-    for (const site of sites) if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
-    const pose = poser(sites);
-    // A leaf is a panel that rides no other folding panel, with every panel that rides it.
-    const carrier = (site: Site) => sites.find(({ id }) => id === site.rides);
-    const leafOf = (site: Site): string => {
-      const below = carrier(site);
-      return below ? leafOf(below) : site.id;
-    };
-    const leaves = new Map<string, Site[]>();
-    for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
-    const outlines = (leaf: readonly Site[], clock: number): Outline[] =>
-      leaf.flatMap((site) =>
-        panels.get(site.part)!.boxes.map(({ min, max }) => ({
-          corners: ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
-            const [px, , pz] = pose(site, [x, min[1], z], clock);
-            return [px, pz] as const;
-          }),
-          low: pose(site, min, clock)[1],
-          high: pose(site, max, clock)[1],
-        })),
-      );
-    const ids = [...leaves.keys()];
+    const { ids, gap } = leavesOf(vehicle, sites);
     ids.forEach((a, i) =>
       ids.slice(i + 1).forEach((b) => {
         compared += 1;
-        const gaps = Array.from({ length: CLOCKS + 1 }, (_, step) => {
-          const clock = step / CLOCKS;
-          const theirs = outlines(leaves.get(b)!, clock);
-          return { clock, gap: Math.min(...outlines(leaves.get(a)!, clock).flatMap((one) => theirs.map((other) => separation(one, other)))) };
-        });
+        const gaps = Array.from({ length: CLOCKS + 1 }, (_, step) => ({ clock: step / CLOCKS, gap: gap(a, b, step / CLOCKS) }));
         const closest = gaps.reduce((low, next) => (next.gap < low.gap ? next : low));
         expect(closest.gap, `${vehicle}: ${a} and ${b} at clock ${closest.clock}`).toBeGreaterThanOrEqual(-1e-9);
       }),
     );
   }
   expect(compared).toBeGreaterThan(0);
+});
+
+// BR's ceiling on the closed seam between a doorway's two leaves, which reads as a seam rather than a slot.
+const CLOSED_SEAM = 0.03;
+
+it('closes the two leaves of a doorway to a seam no wider than the ruled ceiling', () => {
+  const pairs = Object.entries(doorPairs).flatMap(([vehicle, doorways]) => doorways.map((pair) => ({ vehicle, pair })));
+  expect(pairs.length).toBeGreaterThan(0);
+  for (const { vehicle, pair } of pairs) {
+    const { ids, gap } = leavesOf(vehicle, vehicles[vehicle] ?? []);
+    for (const leaf of pair) expect(ids, `${vehicle}: ${leaf} is a folding leaf`).toContain(leaf);
+    expect(gap(pair[0], pair[1], 0), `${vehicle}: ${pair.join(' and ')} closed`).toBeLessThanOrEqual(CLOSED_SEAM);
+  }
 });

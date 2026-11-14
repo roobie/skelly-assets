@@ -16,12 +16,14 @@ local rename(id) =
   if std.startsWith(id, 'articulated_bus_aft') && !std.member(['_shell', '_rear_bumper', '_rear_panel', '_rear_window'], tail)
   then 'articulated_bus' + tail
   else id;
-local inAft(placed) = placed { id: 'aft_' + placed.id, part: rename(placed.part) }
-                      + (if std.objectHas(placed, 'rides') then { rides: 'aft_' + placed.rides } else {});
+local aft(site) = 'aft_' + site;
+local inAft(placed) = placed { id: aft(placed.id), part: rename(placed.part) }
+                      + (if std.objectHas(placed, 'rides') then { rides: aft(placed.rides) } else {});
 local midAxle(placed) = if placed.id == 'rear_axle' then placed { part: wheelKit.axle('trailer_axle_truck', std.get(s.fore, 'wheelBrakes')) } else placed;
 local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
 {
   title: 'Articulated bus',
+  doorPairs:: bus.doorPairs(s.fore) + [std.map(aft, pair) for pair in bus.doorPairs(s.aft)],
   sites: [
     midAxle(placed)
     for placed in bus.fittings(site.kit, 'articulated_bus', s.fore)

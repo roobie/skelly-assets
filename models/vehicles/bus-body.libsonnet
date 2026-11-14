@@ -522,6 +522,12 @@ local laid(kit, id, s) =
 local fittings(kit, id, s) = k.painted(id, s, pressings(id, '', s), laid(kit, id, s));
 {
   rows: rows, items: items, fittings: fittings, layout: layout,
+  // The jamb panel sites of each doorway's two leaves, which close against each other; none where a doorway has one leaf.
+  doorPairs(s)::
+    local g = layout(s);
+    if std.length(g.leaves) == 2
+    then [[g.panelSite(leaf, 'jamb', d) for leaf in g.leaves] for d in std.range(0, std.length(g.doorways) - 1)]
+    else [],
   // A seat pair's placement at (x, y), for a spec's `seats`.
   seat(x, y, sides, z=0.72):: { part: 'bus_seat_pair', x: x, y: y, z: z, sides: sides },
   // A single seat's placement; singles stand inboard of the front wheelhouses, where a pair would not fit.

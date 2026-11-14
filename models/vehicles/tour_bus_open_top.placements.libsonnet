@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'tour_bus_open_top.spec.libsonnet';
 {
   title: 'Open-top tour bus',
+  doorPairs:: (import 'bus-body.libsonnet').doorPairs(s),
   sites: (import 'bus-body.libsonnet').fittings(site.kit, 'tour_bus_open_top', s) + [
     site.one('upper_floor', 'double_decker_upper_floor'),
     site.one('stairs', 'double_decker_stairs'),
