@@ -5,12 +5,13 @@
   rackingRear: -3.3,
   mastX: 0.78, mastTop: 3.66,
   shutterSide: 0.84, shutterLow: 1.18, shutterTop: 2.82,
-  // Rescue gear in place of the fire engine's hose and pump stowage.
+  // Each locker's fit-out for rescue gear in place of the fire engine's hose and pump stowage: its title and mass. The
+  // kit it holds is its site's load-out.
   stowage: {
-    fore: { title: 'Rescue truck hydraulic tool stowage', mass: 260 },
-    mid: { title: 'Rescue truck lifting bag stowage', mass: 110 },
-    wheel: { title: 'Rescue truck cribbing stowage', mass: 150 },
-    aft: { title: 'Rescue truck generator stowage', mass: 160 },
+    fore: { title: 'Rescue truck hydraulic tool stowage', mass: 20 },
+    mid: { title: 'Rescue truck lifting bag stowage', mass: 8 },
+    wheel: { title: 'Rescue truck cribbing stowage', mass: 20 },
+    aft: { title: 'Rescue truck generator stowage', mass: 15 },
   },
-  rearStowage: { title: 'Rescue truck rear stowage', mass: 120 },
+  rearStowage: { title: 'Rescue truck rear stowage', mass: 25 },
 }

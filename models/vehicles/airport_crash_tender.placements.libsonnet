@@ -6,6 +6,23 @@ local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
 local id = 'airport_crash_tender';
 local middle(span) = (span[0] + span[1]) / 2;
 local engineName = engine.nameOf(s.engine);
+// The kit each locker carries, slot to catalogue item (airport_crash_tender.libsonnet, `stowage`): breathing sets and
+// foam up front, hose and branches mid, hand tools and extinguishers over the wheels and suction hose under the panel.
+local loadOut = {
+  fore: { ['cylinder_%d' % i]: 'breathing_air_cylinder' for i in std.range(0, 4) }
+        + { ['low_drum_%d' % i]: 'foam_concentrate_drum' for i in [0, 1, 2] }
+        + { floor_drum: 'foam_concentrate_drum', low_case: 'toolbox', high_case_0: 'small_plastic_case', high_case_1: 'first_aid_box', high_case_2: 'small_plastic_case' },
+  mid: { ['roll_%d_%d' % [layer, i]]: 'fire_hose_roll' for layer in [0, 1] for i in std.range(0, 3) }
+       + { ['roll_top_%d' % i]: 'fire_hose_roll' for i in std.range(0, 3) }
+       + { ['bar_%s_%s' % [row, column]]: 'branch_nozzle' for row in ['back', 'front'] for column in ['a', 'b'] }
+       + { high_case: 'toolbox' },
+  wheel_fore: { hook_a: 'fire_ax', hook_b: 'halligan', hook_c: 'sledgehammer', hook_d: 'crowbar', floor_case: 'toolbox', floor_machine: 'petrol_cut_off_saw' },
+  wheel_aft: { ['floor_%d' % i]: 'extinguisher' for i in [0, 1, 2] }
+             + { ['low_%d' % i]: 'small_fire_extinguisher' for i in std.range(0, 3) }
+             + { ['sheet_%d_%d' % [i, layer]]: 'tarp' for i in [0, 1, 2] for layer in [0, 1] }
+             + { floor_case: 'toolbox', low_case: 'small_plastic_case' },
+  aft: { suction_back: 'hard_suction_hose', suction_front: 'hard_suction_hose' },
+};
 // The air box hangs under the near rail, its duct passing beneath the rail into the intake, because beside the block it
 // would stand in the rail. It takes a site of its own: the kit's `air_box` site promises the kit's layout.
 local engineSites =
@@ -41,7 +58,10 @@ local engineSites =
     site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.crown, 0]),
   ]
   + std.flattenArrays([site.pair('locker_shutter_' + name, 'airport_crash_tender_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
-  + std.flattenArrays([site.pair('locker_stowage_' + name, 'airport_crash_tender_locker_stowage_' + name) for name in std.objectFields(s.stowage)])
+  + std.flattenArrays([
+    site.pair('locker_stowage_' + name, 'airport_crash_tender_locker_stowage_' + name, stowed=loadOut[name], behind='locker_shutter_' + name)
+    for name in std.objectFields(s.stowage)
+  ])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 1.3]),
   tags: { 'vehicle-role': ['emergency'] },
 }
