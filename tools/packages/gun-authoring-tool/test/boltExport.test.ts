@@ -9,7 +9,7 @@ import { readCartridge } from '../src/cli/readCartridge.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { attachmentCompatibility } from '../src/gun/attachmentCompatibility.ts';
 import { attachmentSlots } from '../src/gun/attachments.ts';
-import { compareCodeUnits } from '../src/gun/compareCodeUnits.ts';
+import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 import { BOLT_EXTRACTION_CLEARANCE_U, boltCartridge, boltStrokeUnits } from '../src/gun/boltCartridge.ts';
 import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
