@@ -23,6 +23,7 @@ import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } 
 import { readMobRows } from '../tools/layout.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
+import { readWields, wieldSequences } from '../tools/wields.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
@@ -208,11 +209,18 @@ if (doll) {
   }
   const actor = modelsById.get(rig.clips);
   if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
-  // The press check plays on the page as a clip through its key frames' pose files, each at its own time.
-  const pressCheck = pressCheckClip(readPressCheck(root));
-  const unwritten = [...new Set(pressCheck.keys.map(({ fixture }) => fixture))].filter((name) => !poses.includes(name));
-  if (unwritten.length > 0) throw new Error(`press check frames with no pose file (node tools/press-check.mjs): ${unwritten.join(', ')}`);
-  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses, sequences: { 'press check': pressCheck } }));
+  // The press check and each strike play on the page as clips through their key frames' pose files, each at its own
+  // time; a generator writes those files, so one missing means it has not been run since its key frames changed.
+  const generated = [
+    { sequences: { 'press check': pressCheckClip(readPressCheck(root)) }, tool: 'tools/press-check.mjs' },
+    { sequences: wieldSequences(readWields(root)), tool: 'tools/wields.mjs' },
+  ];
+  for (const { sequences, tool } of generated) {
+    const unwritten = [...new Set(Object.values(sequences).flatMap(({ keys }) => keys.map(({ fixture }) => fixture)))].filter((name) => !poses.includes(name));
+    if (unwritten.length > 0) throw new Error(`sequence frames with no pose file (node ${tool}): ${unwritten.join(', ')}`);
+  }
+  const sequences = Object.assign({}, ...generated.map(({ sequences }) => sequences));
+  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses, sequences }));
   mkdirSync(join(out, 'poses'));
   for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
 }
