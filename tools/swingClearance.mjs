@@ -17,7 +17,7 @@ import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { dot } from './packages/construct/src/foundation/math.ts';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
-import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, TOWARD } from './packages/thing-core/src/motion.ts';
+import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, shiftPiece, TOWARD } from './packages/thing-core/src/motion.ts';
 import { shardUnits } from './generation.mjs';
 import { codeFingerprint } from './packages/thing-export/src/cache.ts';
 import { key } from './siteOverlap.mjs';
@@ -80,27 +80,27 @@ const extentOf = (layers) => {
   return stage.kind === 'slide' ? { unit: 'mm', total: millimetres(stage.travel) } : { unit: '°', total: Math.round(Math.abs(stage.angle)) };
 };
 
-// A motion with its hinge axes carried by `offset` in the vehicle frame and its whole way scaled to `scale` of its
-// authored stop: the pose a proposed fix would give a site (tools/swingPropose.mjs).
-export function adjustMotion(motion, { offset = [0, 0, 0], scale = 1 }) {
-  const shift = (point) => point.map((value, i) => value + offset[i]);
-  return motion.map((stage) => (stage.kind === 'slide'
-    ? { ...stage, travel: stage.travel * scale }
-    : { ...stage, axis: { from: shift(stage.axis.from), to: shift(stage.axis.to) }, angle: stage.angle * scale }));
+// A part's motion as a proposed fix would give it (tools/swingPropose.mjs): its pins drawn `offset` further in the part's
+// own frame and the motion resolved again from them, so the sense is the one the build would derive, then its whole way
+// scaled to `scale` of the authored stop. A pin line that no longer carries the part clearly toward its hint throws, as
+// the build does.
+export function adjustedMotion(part, { offset, scale = 1 }, forward, grain) {
+  const pins = new Set(part.stages.flatMap((stage) => stage.pins ?? []));
+  const moved = offset ? { ...part, pieces: part.pieces.map((piece) => (pins.has(piece.id) ? shiftPiece(piece, offset) : piece)) } : part;
+  return resolveMotion(moved, forward, grain).map((stage) => (stage.kind === 'slide' ? { ...stage, travel: stage.travel * scale } : { ...stage, angle: stage.angle * scale }));
 }
 
 // One vehicle's sweep: for every moving site, how far it opens before it touches anything and each contact it makes, and
 // the pairs of moving sites that touch with all of them open. It reads only its task, so a worker can run it and a
 // cache can keep it. The task is { grain, forward, motions, sites, adjust?, only? }; a site is { id, part, at, mirror?,
-// rides?, pieces }. `adjust` maps a site id to the `adjustMotion` change to try on it. With `only`, just that site's
+// rides?, pieces }. `adjust` maps a part id to the `adjustedMotion` change to try on it, for every site that places it. With `only`, just that site's
 // body is swept, with no all-open pose, which is what a search over adjustments can afford.
 export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only }) {
   const resolved = new Map();
   const motionOf = (site) => {
     if (!motions[site.part]) return null;
-    if (!resolved.has(site.part)) resolved.set(site.part, resolveMotion(motions[site.part], forward, grain));
-    const placed = motionAtSite(resolved.get(site.part), site);
-    return adjust[site.id] ? adjustMotion(placed, adjust[site.id]) : placed;
+    if (!resolved.has(site.part)) resolved.set(site.part, adjustedMotion(motions[site.part], adjust[site.part] ?? {}, forward, grain));
+    return motionAtSite(resolved.get(site.part), site);
   };
   const byId = new Map(sites.map((site) => [site.id, site]));
   const own = new Map(sites.map((site) => [site.id, motionOf(site)]));
