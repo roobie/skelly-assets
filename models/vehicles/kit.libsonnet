@@ -129,19 +129,21 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
   // How a part moves, for `compound`'s `motion`: a list of stages run one after another, so motions join with `+`.
   // Each is a hinge turning on its drawn pins, given as pieces or their ids, and opening `open` degrees toward one of
-  // `towards`; or a slide `travel` m toward one. A direction is read in the part's model frame at rest, near being the
-  // side fore × up points to, wherever the part is drawn: a later stage's direction turns with the stages before it,
-  // and a mirrored placement turns near into far.
+  // `towards`; or a slide `travel` m toward one, which with `stow` hides whatever it carries past the part's rest
+  // bounds on the side it moves toward, so a curtain rises into its head. A direction is read in the part's model frame
+  // at rest, near being the side fore × up points to, wherever the part is drawn: a later stage's direction turns with
+  // the stages before it, and a mirrored placement turns near into far.
   motion: {
     hinge(pins, toward, open):
       assert std.isArray(pins) && std.length(pins) > 0 : 'a hinge needs its pins';
       assert std.member(towards, toward) : 'a hinge opens toward one of ' + std.join(' ', towards) + ', not ' + toward;
       assert std.isNumber(open) && open > 0 && open <= 180 : 'a hinge opens more than 0 and at most 180 degrees';
       [{ kind: 'hinge', pins: [if std.isString(pin) then pin else pin.id for pin in pins], toward: toward, open: open }],
-    slide(toward, travel):
+    slide(toward, travel, stow=false):
       assert std.member(towards, toward) : 'a slide moves toward one of ' + std.join(' ', towards) + ', not ' + toward;
       assert std.isNumber(travel) && travel > 0 : 'a slide travels a positive distance';
-      [{ kind: 'slide', toward: toward, travel: travel }],
+      assert std.isBoolean(stow) : 'a slide stows or it does not';
+      [{ kind: 'slide', toward: toward, travel: travel } + (if stow then { stow: true } else {})],
   },
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
   // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a

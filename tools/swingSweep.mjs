@@ -52,13 +52,17 @@ function stageMotion(stage, fraction) {
   return [...turned, ...shift];
 }
 
-// Where a motion (thing-core `Motion`) has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
+// Where one motion (thing-core `Motion`) has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
 // motion. Stages run in turn through their shares of the clock, and the first is the outermost, as `posePoint`.
-export function poseAt(motion, clock) {
+function stagesAt(motion, clock) {
   const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
   const fraction = (i) => Math.min(1, Math.max(0, (clock - starts[i]) / motion[i].share));
   return motion.reduceRight((inner, stage, i) => compose(stageMotion(stage, fraction(i)), inner), IDENTITY);
 }
+
+// Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
+// nested inside its carrier's and both run on the one clock. The outermost layer, the first, is the furthest carrier.
+export const poseAt = (layers, clock) => layers.reduceRight((inner, motion) => compose(stagesAt(motion, clock), inner), IDENTITY);
 
 const distanceFromLine = ([px, py, pz], { from, to }) => {
   const d = [0, 1, 2].map((i) => to[i] - from[i]);
@@ -67,20 +71,34 @@ const distanceFromLine = ([px, py, pz], { from, to }) => {
   return Math.hypot(...cross) / Math.hypot(...d);
 };
 
-// How far (m) a motion can carry any point of a part whose rest bounds are `bounds`, for each unit of the clock: no
+// How far (m) one motion can carry any point of a part whose rest bounds are `bounds`, for each unit of the clock: no
 // further than the greatest of its stages' paces, because the stages run one after another. A stage turns what the
-// stages after it have already moved, so its radius counts how far they can carry a point from the part.
-export function paceOf(motion, bounds) {
-  const corners = cornersOf(bounds);
-  let carried = 0;
+// stages after it have already moved, so its radius counts how far they can carry a point from the part. `carried` is
+// how far what moves inside this motion has already carried the point.
+function pacesOf(motion, corners, carried) {
   let pace = 0;
   for (let i = motion.length - 1; i >= 0; i--) {
     const stage = motion[i];
-    const reach = stage.kind === 'slide' ? stage.travel : (Math.abs(stage.angle) * Math.PI / 180) * (Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried);
+    const radius = stage.kind === 'slide' ? 0 : Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried;
+    const reach = stage.kind === 'slide' ? stage.travel : (Math.abs(stage.angle) * Math.PI / 180) * radius;
     pace = Math.max(pace, reach / stage.share);
-    carried += stage.kind === 'slide' ? stage.travel : Math.min(reach, 2 * (Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried));
+    carried += stage.kind === 'slide' ? stage.travel : Math.min(reach, 2 * radius);
   }
-  return pace;
+  return { pace, carried };
+}
+
+// How far (m) a body's `layers` can carry any point of a part whose rest bounds are `bounds`, for each unit of the
+// clock: the paces of its layers add, each counting how far the layers inside it have carried the point.
+export function paceOf(layers, bounds) {
+  const corners = cornersOf(bounds);
+  let carried = 0;
+  let total = 0;
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const inner = pacesOf(layers[i], corners, carried);
+    total += inner.pace;
+    carried = inner.carried;
+  }
+  return total;
 }
 
 // The signed distance of a piece, a box through a faster path than `solid` gives it.
@@ -95,16 +113,16 @@ export const shapeOf = (piece) => {
   return { id: piece.id, min, max, distance: distanceOf(piece) };
 };
 
-// The box that holds a shape's points wherever its motion puts them, found at `SWEPT_CLOCKS` clocks and widened by the
+// The box that holds a shape's points wherever its layers put them, found at `SWEPT_CLOCKS` clocks and widened by the
 // furthest a point can travel between two of them.
 const SWEPT_CLOCKS = 32;
-export function sweptBounds(shape, motion, pace) {
+export function sweptBounds(shape, layers, pace) {
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
   const margin = pace / SWEPT_CLOCKS;
   const out = [0, 0, 0];
   for (let i = 0; i <= SWEPT_CLOCKS; i++) {
-    const pose = poseAt(motion, i / SWEPT_CLOCKS);
+    const pose = poseAt(layers, i / SWEPT_CLOCKS);
     for (const corner of cornersOf(shape)) {
       apply(pose, corner, out);
       for (let axis = 0; axis < 3; axis++) {
@@ -179,17 +197,17 @@ export function deepestShared({ mover, obstacle, from, to, reach, floor, step, p
 export const restDepth = (mover, obstacle, step) =>
   Math.max(0, deepestShared({ mover, obstacle, from: IDENTITY, to: IDENTITY, reach: 0, floor: 0, step }));
 
-// Sweeps the pieces of one moving body (a part and the parts that ride it) from rest to its stop against `obstacles`,
-// the shapes it must clear, each { site, shape }. `movers` are { site, shape }. A pair is in contact once it shares
+// Sweeps the pieces of one moving body (a part and the parts that ride it, moved by its `layers` of motion) from rest
+// to its stop against `obstacles`, the shapes it must clear, each { site, shape }. `movers` are { site, shape }. A pair is in contact once it shares
 // more than `tolerance` beyond the depth it shares at rest, so what the parts allow each other at rest is not a
 // contact. Returns { clear, contacts: Map(obstacle site -> { depth, at, pieces }) }: `clear` the last clock at which
 // no pair was measured in contact (1 when none ever was), each contact the deepest the sweep measured and the clock it
 // first was.
-export function sweepBody({ motion, movers, obstacles, step, tolerance, grain }) {
+export function sweepBody({ layers, movers, obstacles, step, tolerance, grain }) {
   const pairs = [];
   for (const mover of movers) {
-    const pace = paceOf(motion, mover.shape);
-    const bounds = sweptBounds(mover.shape, motion, pace);
+    const pace = paceOf(layers, mover.shape);
+    const bounds = sweptBounds(mover.shape, layers, pace);
     for (const obstacle of obstacles) {
       if (!boundsMeet(bounds, obstacle.shape)) continue;
       const rest = restDepth(mover.shape, obstacle.shape, step);
@@ -202,7 +220,7 @@ export function sweepBody({ motion, movers, obstacles, step, tolerance, grain })
   const unit = Math.min(1, grain / fastest);
   const poses = new Map();
   const poseOf = (c) => {
-    if (!poses.has(c)) poses.set(c, poseAt(motion, c));
+    if (!poses.has(c)) poses.set(c, poseAt(layers, c));
     return poses.get(c);
   };
   const across = (start, end, probe) => pairs.map((pair) => deepestShared({
@@ -250,12 +268,14 @@ export function sweepBody({ motion, movers, obstacles, step, tolerance, grain })
 
 // The pairs of moving bodies that touch once both are at their stops: bodies are { site, pose, shapes, rest }, each
 // shape a part's piece at rest; a pair is in contact when it shares more than `tolerance` beyond what it shares with
-// both at rest. Returns Map(pair key -> { sites, depth, pieces }).
-export function sweepOpenPose({ bodies, step, tolerance, key }) {
+// both at rest, unless the two are `related`, as a rider and the carrier it is hinged to. Returns
+// Map(pair key -> { sites, depth, pieces }).
+export function sweepOpenPose({ bodies, step, tolerance, key, related = () => false }) {
   const found = new Map();
   for (let i = 0; i < bodies.length; i++) {
     for (let j = i + 1; j < bodies.length; j++) {
       const [a, b] = [bodies[i], bodies[j]];
+      if (related(a, b)) continue;
       for (const mover of a.shapes) {
         for (const other of b.shapes) {
           const posedOther = placedShape(other, b.pose);

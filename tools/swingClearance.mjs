@@ -3,7 +3,8 @@
 // final pose that catches doors meeting each other. Contact is judged relative to rest: a pair counts only when it
 // sinks a quarter grain deeper than it already does closed, so the overlaps the seating fits and the allowances of
 // tools/siteOverlap.mjs already judge are not found again, while a thin lid crossing a thin lip is. A part that rides
-// another (`rides` on its site) moves with it and is tested against everything but it. A contact is allowed by the
+// another (`rides` on its site) moves with it, its own motion if it has one nested inside its carrier's, and is tested
+// against everything but its carriers; a stowing slide is swept like any other, so what it hides is still tested. A contact is allowed by the
 // vehicle's own placements: `swingContact` for one that is intended and says why, `swingUnjudged` for one nobody has
 // judged yet, which every run lists. Both are capped at the depth they were written for, a variant shares its parent's,
 // and an entry that no longer applies fails. The reason for the rules and the cost strategy are in
@@ -60,10 +61,10 @@ export function motionAtSite(motion, { at, mirror }) {
   });
 }
 
-// How far a motion opens, for a message: its degrees or millimetres when it is one stage, else null.
-const extentOf = (motion) => {
-  if (motion.length !== 1) return null;
-  const [stage] = motion;
+// How far a body's motion opens, for a message: its degrees or millimetres when it is one stage, else null.
+const extentOf = (layers) => {
+  if (layers.length !== 1 || layers[0].length !== 1) return null;
+  const [[stage]] = layers;
   return stage.kind === 'slide' ? { unit: 'mm', total: millimetres(stage.travel) } : { unit: '°', total: Math.round(Math.abs(stage.angle)) };
 };
 
@@ -73,27 +74,40 @@ const extentOf = (motion) => {
 export function sweepVehicle({ grain, forward, motions, sites }) {
   const resolved = new Map();
   const motionOf = (site) => {
+    if (!motions[site.part]) return null;
     if (!resolved.has(site.part)) resolved.set(site.part, resolveMotion(motions[site.part], forward, grain));
     return motionAtSite(resolved.get(site.part), site);
   };
+  const byId = new Map(sites.map((site) => [site.id, site]));
+  const own = new Map(sites.map((site) => [site.id, motionOf(site)]));
+  // The chain of carriers a site rides, nearest first.
+  const carriersOf = (site) => (site.rides ? [byId.get(site.rides), ...carriersOf(byId.get(site.rides))] : []);
+  // The site whose own motion moves this one: itself, or the nearest carrier that has one.
+  const anchorOf = (site) => [site, ...carriersOf(site)].find(({ id }) => own.get(id)) ?? null;
   const shapes = new Map(sites.map((site) => [site.id, site.pieces.map(shapeOf)]));
-  const carriers = sites.filter((site) => motions[site.part] && !site.rides);
-  const bodyOf = (carrier) => [carrier, ...sites.filter((site) => site.rides === carrier.id)];
-  const bodies = carriers.map((carrier) => ({ site: carrier.id, motion: motionOf(carrier), members: bodyOf(carrier).map(({ id }) => id) }));
+  const anchors = sites.filter((site) => own.get(site.id));
+  const bodies = anchors.map((anchor) => {
+    const carriers = carriersOf(anchor).filter(({ id }) => own.get(id));
+    const members = sites.filter((site) => anchorOf(site) === anchor).map(({ id }) => id);
+    return { site: anchor.id, layers: [...carriers].reverse().concat(anchor).map(({ id }) => own.get(id)), members, carriers: carriers.map(({ id }) => id) };
+  });
   const step = grain / 4;
   const result = { sites: {}, open: [] };
   for (const body of bodies) {
+    // What rides this body's carriers moves with them, so it is not an obstacle at rest.
+    const excluded = new Set(bodies.filter(({ site }) => body.carriers.includes(site)).flatMap(({ members }) => members));
     const members = new Set(body.members);
     const movers = body.members.flatMap((id) => shapes.get(id).map((shape) => ({ site: id, shape })));
     const obstacles = [
-      ...sites.filter(({ id }) => !members.has(id)).flatMap(({ id }) => shapes.get(id).map((shape) => ({ site: id, shape }))),
+      ...sites.filter(({ id }) => !excluded.has(id) && !members.has(id)).flatMap(({ id }) => shapes.get(id).map((shape) => ({ site: id, shape }))),
       { site: GROUND, shape: ground },
     ];
-    const { clear, contacts } = sweepBody({ motion: body.motion, movers, obstacles, step, tolerance: step, grain });
-    result.sites[body.site] = { clear, extent: extentOf(body.motion), contacts: [...contacts].map(([other, contact]) => ({ other, ...contact })) };
+    const { clear, contacts } = sweepBody({ layers: body.layers, movers, obstacles, step, tolerance: step, grain });
+    result.sites[body.site] = { clear, extent: extentOf(body.layers), contacts: [...contacts].map(([other, contact]) => ({ other, ...contact })) };
   }
-  const posed = bodies.map(({ site, motion, members }) => ({ site, pose: poseAt(motion, 1), shapes: members.flatMap((id) => shapes.get(id)), members }));
-  const open = sweepOpenPose({ bodies: posed, step, tolerance: step, key });
+  const posed = bodies.map(({ site, layers, members, carriers }) => ({ site, carriers, pose: poseAt(layers, 1), shapes: members.flatMap((id) => shapes.get(id)), members }));
+  const related = (a, b) => a.carriers.includes(b.site) || b.carriers.includes(a.site);
+  const open = sweepOpenPose({ bodies: posed, step, tolerance: step, key, related });
   result.open = [...open.values()];
   return result;
 }
@@ -120,11 +134,11 @@ const CACHE_FOLDER = 'swing';
 
 // The sweeps of every vehicle with a moving part: from the cache folder when a vehicle's inputs and the checker are as
 // they were, else swept on worker threads, one vehicle each, and kept. Vehicles with the same inputs share one sweep.
-// With `shard`, only that shard of the distinct sweeps is made, so CI can spread a clean build's sweeps over runners
-// like its models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
-export async function swingResults(data, { cache, workers = availableParallelism(), prune = false, shard } = {}) {
+// `checker` is the fingerprint of the code that sweeps, which a test may change. With `shard`, only that shard of the
+// distinct sweeps is made, so CI can spread a clean build's sweeps over runners like its models (tools/build.mjs,
+// fillCacheShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
+export async function swingResults(data, { cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {}) {
   const tasks = sweepTasks(data);
-  const checker = checkerHash();
   const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
   if (folder) mkdirSync(folder, { recursive: true });
   const byHash = new Map();
@@ -200,10 +214,11 @@ export function swingReport({ grain, vehicles }, results) {
     if (!result) continue;
     const partOf = new Map(sites.map(({ id, part }) => [id, part]));
     partOf.set(GROUND, 'the ground');
-    const rides = new Map(sites.filter((site) => site.rides).map(({ id, rides: carrier }) => [id, carrier]));
-    for (const [rider, carrier] of rides) {
-      if (!result.sites[carrier]) problems.push(`${vehicle}: ${rider} rides ${carrier}, which is not a part that moves`);
-      if (result.sites[rider]) problems.push(`${vehicle}: ${rider} rides ${carrier} and also moves on its own`);
+    const carrierOf = new Map(sites.filter((site) => site.rides).map(({ id, rides }) => [id, rides]));
+    for (const [rider, carrier] of carrierOf) {
+      let moves = false;
+      for (let at = rider; at !== undefined; at = carrierOf.get(at)) moves ||= Boolean(result.sites[at]);
+      if (!moves) problems.push(`${vehicle}: ${rider} rides ${carrier}, and neither is a part that moves`);
     }
     const found = foundContacts(result);
     const inherited = [...(vehicles[parent]?.swingContacts ?? []), ...(vehicles[parent]?.swingUnjudged ?? [])];

@@ -24,6 +24,9 @@ Placements belong to the models, beside the rows they place: each vehicle has a 
 the vehicle, and whether it is a mirrored far-side twin. Gameplay stays in the game: supports, service, cargo
 spaces and item names are not placements.
 
+A part that moves with another part, such as the free panel of a folding door, names the carrier's site as `rides`;
+see `docs/decisions/0015-motion-as-content.md`.
+
 Sites carry no rotation, because every part is authored in its vehicle's orientation, and the build turns a
 vehicle's sites by the same turn as its parts; see `docs/decisions/0002-model-frame.md`. A far-side twin is its
 near-side part reflected across the part's own centre plane, so one model serves both sides and the two can never

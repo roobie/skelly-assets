@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -67,6 +67,17 @@ test('a rider is carried with its carrier and meets what the carrier alone never
   const carried = sweep({ lid }, [lidSite(), rider, wall]);
   assert.ok(carried.sites.lid.clear < 1);
   assert.ok(contactsOf(carried, 'lid').some(({ other }) => other === 'wall'));
+});
+
+test('a rider with a motion of its own is swept on its carrier\'s clock and not against the carrier', () => {
+  const tip = flap(1, { open: 90 });
+  const shifted = { ...tip, pieces: [box('skin', [1, 0, -0.5], [2, GRAIN, 0.5]), pin('pin_a', 0.5), pin('pin_b', -0.5)] };
+  shifted.pieces[1].origin[0] = 1;
+  shifted.pieces[2].origin[0] = 1;
+  const result = sweep({ lid, tip: shifted }, [lidSite(), site('tip', 'tip', shifted.pieces, { rides: 'lid' })]);
+  assert.ok(result.sites.tip);
+  assert.ok(![...contactsOf(result, 'tip'), ...contactsOf(result, 'lid')].some(({ other }) => other === 'tip' || other === 'lid'));
+  assert.equal(result.open.length, 0);
 });
 
 test('two lids that clear alone but collide once both are open are caught by the all-open pose', () => {
@@ -164,11 +175,9 @@ test('a vehicle swept once is read from the cache, and a changed input sweeps it
 test('a cached sweep made by other checker code is not reused', async () => {
   const cache = mkdtempSync(join(tmpdir(), 'swing-cache-'));
   try {
-    await swingResults(data(), { cache, workers: 1 });
-    const folder = join(cache, 'swing');
-    for (const name of readdirSync(folder)) writeFileSync(join(folder, `0${name.slice(1)}`), readFileSync(join(folder, name)));
-    for (const name of readdirSync(folder)) if (!name.startsWith('0')) rmSync(join(folder, name));
-    assert.equal((await swingResults(data(), { cache, workers: 1 })).swept, 1);
+    await swingResults(data(), { cache, workers: 1, checker: 'before' });
+    assert.equal((await swingResults(data(), { cache, workers: 1, checker: 'before' })).swept, 0);
+    assert.equal((await swingResults(data(), { cache, workers: 1, checker: 'after' })).swept, 1);
   } finally {
     rmSync(cache, { recursive: true });
   }

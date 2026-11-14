@@ -28,8 +28,12 @@ open at once, so twins that clear alone but meet open are caught. See `tools/swi
   swing check judges what the motion adds. Contact is the depth shared by a point inside both solids, as in the overlap
   check, so a part thinner than a quarter grain on both sides cannot register; the vehicle grain makes such a part
   unbuildable anyway.
-- A part that rides another (`rides` on its site) moves with it as one body and is not tested against it, so a handle
-  or a hinge dressing does not collide with the part it is fixed to.
+- A part that rides another (`rides` on its site) moves with it and is not tested against the carriers it is fixed to,
+  so a handle or a hinge dressing does not collide with the part it is on. A rider with a motion of its own moves
+  nested inside its carrier's on the same clock, as `docs/decisions/0015-motion-as-content.md` fixes, and is swept as
+  a body of its own. What rides a carrier is not an obstacle to the bodies that carrier moves, because it moves with
+  them; a rider's swing against its carrier's other riders is therefore not checked. A stowing slide is swept like
+  any other, so what it hides at its stop is still tested and a shutter into its head needs an entry.
 - The swing sense is read once, by the same derivation the build exports, so the swing proven is the swing played. A
   far-side twin swings reflected, and its angles negate with it.
 - An allowance is a depth cap, as in the overlap check: `swingContact` for a contact that is intended and says why,
