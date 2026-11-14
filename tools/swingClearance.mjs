@@ -1,16 +1,16 @@
 // Proves that the parts of a vehicle that open swing clear of the rest of it. Each site whose part has a motion sweeps
-// from rest to its stop against every other site's pieces and the ground, and every such site opens at once for a
-// final pose that catches doors meeting each other. Contact is judged relative to rest: a pair counts only when it
-// sinks a quarter grain deeper than it already does closed, so the overlaps the seating fits and the allowances of
+// from rest to its stop against every other site's pieces and the ground, and every such site opens at once for a final
+// pose that catches doors meeting each other. Contact is judged relative to rest: a pair counts only when it sinks a
+// quarter grain deeper than it already does closed, so the overlaps the seating fits and the allowances of
 // tools/siteOverlap.mjs already judge are not found again, while a thin lid crossing a thin lip is. A part that rides
 // another (`rides` on its site) moves with it, its own motion if it has one nested inside its carrier's. A rider that
 // does not move is part of its carrier's body and is not tested against it; one that moves is a body of its own, swept
 // against its carrier and against the other riders of that carrier, both moving on the one clock, because a panel that
-// folds onto its carrier meets it only while it moves. What a stowing slide hides is not there to meet anything, so it is
-// left out while it is hidden. A contact is allowed by the vehicle's own placements: `swingContact` for one that is intended and says why,
-// `swingUnjudged` for one nobody has judged yet, which every run lists. Both are capped at the depth they were written
-// for, a variant shares its parent's, and an entry that no longer applies fails. The reason for the rules and the cost
-// strategy are in `docs/decisions/0016-swing-check.md`.
+// folds onto its carrier meets it only while it moves. What a stowing slide hides is not there to meet anything, so it
+// is left out while it is hidden. A contact is allowed by the vehicle's own placements: `swingContact` for one that is
+// intended and says why, `swingUnjudged` for one nobody has judged yet, which every run lists. Both are capped at the
+// depth they were written for, a variant shares its parent's, and an entry that no longer applies fails. The reason for
+// the rules and the cost strategy are in `docs/decisions/0016-swing-check.md`.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';

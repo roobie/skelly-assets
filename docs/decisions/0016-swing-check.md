@@ -43,8 +43,10 @@ open at once, so twins that clear alone but meet open are caught too. See `tools
   part would cap the contacts the shown part makes as well, and one would be needed for every shutter. The plane is
   the leading face of the rest bounds of the solids the check measures, as every other depth here is read off those
   solids rather than the drawn voxels.
-- The swing sense is read once, by the same derivation the build exports, so the swing proven is the swing played. A
-  far-side twin swings reflected, and its angles negate with it.
+- The swing sense is read once, by the same derivation the build exports, so the swing proven is the swing played. The
+  one exception is a stowing slide's plane: the checked one sits at the authored face, while the exported one can sit
+  up to half a grain further out, which falls within the voxel overspill the check ignores. A far-side twin swings
+  reflected, and its angles negate with it.
 - An allowance is a depth cap, as in the overlap check: `swingContact` for a contact that is intended and says why,
   `swingUnjudged` for one nobody has judged, said again on every run. A stale, doubled or loose entry fails the
   build, and a variant inherits its parent's entries without overriding them. See `models/vehicles/site.libsonnet`.
