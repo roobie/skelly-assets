@@ -49,11 +49,9 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['aft_rear_axle', 'aft_shell', 0.055],
       ['axle', 'belly', 0.092],
       ['axle', 'chassis', 0.065],
-      ['front_axle', 'chassis', 0.055],
       ['front_axle', 'frame', 0.085],
       ['front_axle', 'front_pivot', 0.065],
       ['front_axle', 'shell', 0.055],
-      ['rear_axle', 'chassis', 0.065],
       ['rear_axle', 'frame', 0.095],
       ['rear_axle', 'rear_body', 0.065],
       ['rear_axle', 'shell', 0.128],
@@ -92,7 +90,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['engine', 'bonnet', 0.155],
       ['engine', 'cab', 0.067],
-      ['engine', 'chassis', 0.155],
       ['engine', 'frame', 0.125],
       ['engine', 'front_axle', 0.155],
       ['engine', 'front_bumper', 0.068],
@@ -106,7 +103,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['gearbox', 'bonnet', 0.085],
       ['gearbox', 'cab', 0.181],
-      ['gearbox', 'chassis', 0.092],
       ['gearbox', 'frame', 0.065],
       ['gearbox', 'shell', 0.181],
       ['gearbox', 'tub', 0.065],
@@ -269,7 +265,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['hitch', 'chassis', 0.065],
       ['radiator_hose_lower', 'chassis', 0.044],
       ['rear_step', 'chassis', 0.085],
-      ['rear_underrun', 'chassis', 0.085],
       ['resting_leg', 'chassis', 0.04],
       ['starter_motor', 'frame', 0.065],
       ['steering_box', 'frame', 0.085],
@@ -472,10 +467,9 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A hybrid motor\'s stator, lead or reducer runs into the engine intake, gearbox case or axle differential it is coupled to.',
+      'A hybrid motor\'s stator, lead or reducer runs into the engine intake or axle differential it is coupled to.',
       [
       ['motor', 'engine', 0.059],
-      ['motor', 'gearbox', 0.06],
       ['motor', 'rear_axle', 0.054],
       ],
     ),

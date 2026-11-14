@@ -153,6 +153,8 @@
   "shuttle_bus_door_aft": "shuttle_bus_door_aft_jamb",
   "shuttle_bus_door_fwd": "shuttle_bus_door_fwd_jamb",
   "steered_axle_heavy_disc": "steered_axle_heavy_bare",
+  "steered_axle_wide": "drive_axle_wide",
+  "steered_axle_wide_bare": "drive_axle_wide_bare",
   "taxi_bonnet": "saloon_bonnet",
   "taxi_boot_lid": "saloon_boot_lid",
   "taxi_dashboard": "saloon_dashboard",

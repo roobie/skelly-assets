@@ -17,4 +17,8 @@ local s = t.spec(import 'semi_tractor.spec.libsonnet');
     ] + exhaust.sites('exhaust_semi_tractor', [s.sleeperBack - 0.12, 0, 1.0], s.detail, paired=true)
     + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, -(s.side - 0.34)], s.detail, 'fuel_tank_far'),
   ),
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

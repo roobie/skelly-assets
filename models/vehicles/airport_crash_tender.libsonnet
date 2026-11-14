@@ -1,6 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
+local driveline = import 'driveline.libsonnet';
 local vehicle = import 'airport_crash_tender.placements.libsonnet';
 local box = k.box;
 local s = t.spec(import 'airport_crash_tender.spec.libsonnet');
@@ -11,6 +12,8 @@ local archRear = s.rearAxles[1] - s.r - 0.12;
 local archFront = s.rearAxles[0] + s.r + 0.12;
 local archTop = s.bodyFloor - 0.05;
 local archChamfer = 0.3;
+// The wheel well's inner wall stands just outboard of the rail.
+local archInner = s.railZ + 0.04;
 local bandLow = s.floor - 0.03;
 local bandTop = s.floor + 0.07;
 local shutterTop = s.bodyTop - 0.1;
@@ -98,8 +101,17 @@ local railY = s.bodyTop + 0.42;
 local posts = [s.bodyRear + 0.15 + i * (s.bodyFront - s.bodyRear - 0.3) / 6 for i in std.range(0, 6)];
 // The ladder stands inboard of the tail lamps.
 local ladderZ = [0.5, 0.88];
-local stays = [1.6, 3.0];
-local rungs = std.range(0, std.floor((railY - 0.95) / 0.3));
+local ladderFoot = s.bodyLow + 0.03;
+local stays = [s.bodyFloor + 0.15, s.bodyTop - 0.4];
+local rungs = std.range(0, std.floor((railY - ladderFoot) / 0.3));
+// The transfer case splits the drive behind the gearbox: the rear shaft leaves it on the prop shaft's line and the
+// front shaft drops to the front axle's offset differential, on the hubs' line, and runs forward under the engine.
+local frontShaftZ = driveline.axles[s.frontAxlePart].diffZ;
+local rise = s.propShaftY - s.r;
+// A shaft along x spanning `span`, its origin in the middle.
+local shaft(id, massKg, label, span) = k.compound(id, massKg, [
+  k.turned('tube', 'steel', 'x', k.disc(driveline.propShaftRadius, -(span[1] - span[0]) / 2, (span[1] - span[0]) / 2)),
+], finish) + { title: vehicle.title + ' ' + label };
 // A monitor's head: a swivel under a housing between two cheeks, and a barrel ending in a flared nozzle, all about the
 // head's pivot at `at`, scaled by `size` so the roof and bumper turrets share one shape.
 local monitorHead(at, size, reach) = [
@@ -112,6 +124,13 @@ local monitorHead(at, size, reach) = [
   box('cheek', 'paint', [at[0] - 0.12 * size, at[1] + 0.1 * size, 0.16 * size], [at[0] + 0.12 * size, at[1] + 0.38 * size, 0.22 * size]),
 ]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_tender', vehicle.title, s) + [
+  // In its frame the origin is on the hubs' line under the rear output, which stands `rise` above it.
+  k.compound('airport_crash_tender_transfer_case', s.transferCaseMass, [
+    box('case', 'steel', [-s.transferHalf, rise - 0.18, -0.18], [s.transferHalf, rise + 0.06, 0.18]),
+    box('drop', 'steel', [-s.transferHalf, -0.1, frontShaftZ - 0.1], [s.transferHalf, rise - 0.1, -0.1]),
+  ], finish) + { title: vehicle.title + ' transfer case' },
+  shaft('airport_crash_tender_front_shaft', s.frontShaftMass, 'front shaft', s.frontShaft),
+  shaft('airport_crash_tender_rear_shaft', s.rearShaftMass, 'rear shaft', s.rearShaft),
   k.compound('airport_crash_tender_body', s.bodyMass, [
     box('floor', 'frame', [s.bodyRear, s.bodyFloor - 0.05, -s.bodySide], [s.bodyFront, s.bodyFloor, s.bodySide]),
     box('roof', 'paint', [s.bodyRear, s.bodyTop - 0.05, -s.bodySide], [s.bodyFront, s.bodyTop, s.bodySide]),
@@ -124,10 +143,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     box('low_aft', 'paint', [s.bodyRear, s.bodyLow, inset], [archRear, archTop, s.bodySide]),
     box('sill', 'paint', [s.bodyRear, archTop, inset], [s.bodyFront, bandLow, s.bodySide]),
   ] + t.archCorners('arch', 'paint', archRear, archFront, archTop, archChamfer, inset, s.bodySide)
-    + t.archCorners('arch_liner', 'frame', archRear, archFront, archTop, archChamfer, 0.56, inset) + [
-    box('arch_wall', 'frame', [archRear, 2 * s.r - 0.12, 0.56], [archFront, archTop, 0.59125]),
-    box('arch_jamb_aft', 'frame', [archRear, s.bodyLow, 0.56], [archRear + 0.0625, archTop - archChamfer, inset]),
-    box('arch_jamb_fore', 'frame', [archFront - 0.0625, s.bodyLow, 0.56], [archFront, archTop - archChamfer, inset]),
+    + t.archCorners('arch_liner', 'frame', archRear, archFront, archTop, archChamfer, archInner, inset) + [
+    box('arch_wall', 'frame', [archRear, 2 * s.r - 0.12, archInner], [archFront, archTop, archInner + 0.03125]),
+    box('arch_jamb_aft', 'frame', [archRear, s.bodyLow, archInner], [archRear + 0.0625, archTop - archChamfer, inset]),
+    box('arch_jamb_fore', 'frame', [archFront - 0.0625, s.bodyLow, archInner], [archFront, archTop - archChamfer, inset]),
     box('band', 'red', [s.bodyRear, bandLow, inset], [s.bodyFront, bandTop, s.bodySide]),
     box('cap', 'white', [s.bodyRear, s.bodyTop - 0.1, inset], [s.bodyFront, s.bodyTop, s.bodySide]),
     post('rear', s.bodyRear + postHalf),
@@ -137,7 +156,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     box('low_fore_handle', 'dark', [0.9, archTop - 0.2, s.bodySide], [1.4, archTop - 0.16, s.bodySide + 0.032]),
     box('low_aft_handle', 'dark', [-5.1, archTop - 0.2, s.bodySide], [-4.6, archTop - 0.16, s.bodySide + 0.032]),
   ] + [
-    box('chevron_' + i, if i % 2 == 0 then 'red' else 'white', [s.bodyRear - 0.006, s.bodyLow + i * 0.3, 0.6], [s.bodyRear, s.bodyLow + (i + 1) * 0.3, s.bodySide])
+    // The chevrons stand outboard of the rails' ends and the underrun's hangers.
+    box('chevron_' + i, if i % 2 == 0 then 'red' else 'white', [s.bodyRear - 0.006, s.bodyLow + i * 0.3, s.railZ + 0.02], [s.bodyRear, s.bodyLow + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 7)
   ]), finish) + { title: 'Airport crash tender body' },
   k.compound('airport_crash_tender_cab_stripe', 6, k.bothSides([
@@ -180,10 +200,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     for i in std.range(0, 6)
   ]), finish) + { title: 'Airport crash tender roof rail' },
   k.compound('airport_crash_tender_rear_ladder', s.ladderMass, [
-    box('stile_in', 'alu', [s.bodyRear - 0.12, 0.95, ladderZ[0]], [s.bodyRear - 0.08, railY, ladderZ[0] + 0.04]),
-    box('stile_out', 'alu', [s.bodyRear - 0.12, 0.95, ladderZ[1] - 0.04], [s.bodyRear - 0.08, railY, ladderZ[1]]),
+    box('stile_in', 'alu', [s.bodyRear - 0.12, ladderFoot, ladderZ[0]], [s.bodyRear - 0.08, railY, ladderZ[0] + 0.04]),
+    box('stile_out', 'alu', [s.bodyRear - 0.12, ladderFoot, ladderZ[1] - 0.04], [s.bodyRear - 0.08, railY, ladderZ[1]]),
   ] + [
-    box('rung_' + i, 'steel', [s.bodyRear - 0.12, 1.0 + i * 0.3, ladderZ[0] + 0.04], [s.bodyRear - 0.09, 1.03 + i * 0.3, ladderZ[1] - 0.04])
+    box('rung_' + i, 'steel', [s.bodyRear - 0.12, ladderFoot + 0.05 + i * 0.3, ladderZ[0] + 0.04], [s.bodyRear - 0.09, ladderFoot + 0.08 + i * 0.3, ladderZ[1] - 0.04])
     for i in rungs
   ] + [
     box('stay_' + i, 'alu', [s.bodyRear - 0.08, stays[i], ladderZ[0]], [s.bodyRear, stays[i] + 0.04, ladderZ[0] + 0.04])

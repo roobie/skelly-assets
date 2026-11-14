@@ -4,7 +4,7 @@ local k = import 'kit.libsonnet';
 local vehicle = import 'mobile_crane.placements.libsonnet';
 local box = k.box;
 local s = t.spec(import 'mobile_crane.spec.libsonnet');
-local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', hard: 'steel-hardened', dark: 'plastic-black', glass: 'glass-clear', reflect: 'reflective-yellow', red: 'plastic-red', weight: 'iron-cast', rope: 'steel-galvanised', white: 'paint-white' };
+local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', spring: 'steel-grey', hard: 'steel-hardened', dark: 'plastic-black', glass: 'glass-clear', reflect: 'reflective-yellow', red: 'plastic-red', weight: 'iron-cast', rope: 'steel-galvanised', white: 'paint-white' };
 local y = s.boomY;
 local section(id, slot, x0, x1, half, halfZ) = box(id, slot, [x0, y - half, -halfZ], [x1, y + half, halfZ]);
 local slabs = [-5.6, -5.28, -4.96, -4.64];
@@ -22,7 +22,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane',
   ] + k.bothSides([
     box('runner', 'frame', [s.deckRear + 0.1, s.railTop, 0.3], [s.deckFront, s.deckLow, 0.44]),
     box('stripe', 'reflect', [s.deckRear, s.deckTop - 0.06, s.side], [s.deckFront, s.deckTop - 0.01, s.side + 0.032]),
-    box('second_axle_spring', 'steel', [s.secondAxle - 0.62, s.r + 0.04, s.railZ], [s.secondAxle + 0.62, s.railBottom, s.railZ + 0.1]),
+    t.spring('second_axle_spring', s, s.secondAxle, s.frontAxleY, s.frontSeat),
   ]), finish) + { title: 'Mobile crane deck' },
   k.compound('mobile_crane_outrigger', 1000, [
     box('beam', 'frame', [-0.24, 0.95, 0], [0.24, s.deckLow, s.side - 0.02]),

@@ -10,4 +10,8 @@ local s = import 'tipper_truck.spec.libsonnet';
     site.one('tip_ram', 'tipper_truck_tip_ram'),
   ]
   + site.pair('tub_side', 'tipper_truck_tub_side'),
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }
