@@ -29,14 +29,23 @@ local arc(id, slot, radii, bearings, step, heights, z0) = [
 
 local h = {
   back: 0,
+  // The grain the helmet is drawn at. Drawing moves a surface up to half a voxel, so the helmet keeps its room off the
+  // head after half of its voxel and half of the bust's.
+  grain: 0.01,
+  slack: (self.grain + bust.voxelGrain) / 2,
   // The padding's room between the hair and the shell.
-  inner: head.reach + 0.01,
+  room: 0.01 + self.slack,
+  inner: head.reach + self.room,
   outer: self.inner + 0.013,
   // The face opening's top edge sits above the eyes.
   brow: head.eyes + 0.02,
   // The dome rises from the hairline, where the hair begins to round over.
   domeBase: head.brow,
-  crownInner: head.top + 0.01 - self.domeBase,
+  // The dome stands high enough to keep the padding's room over the hair's top and round each of its layers.
+  crownInner: std.foldl(std.max, [
+    (layer.top - self.domeBase) / std.pow(1 - std.pow((layer.reach + self.room) / self.inner, 4), 1 / 4)
+    for layer in head.hair
+  ], head.top + self.room - self.domeBase),
   crownOuter: self.crownInner + 0.013,
   skirtBottom: -0.03,
   // The face opening's half-width, in degrees either side of the face.
@@ -46,6 +55,8 @@ local h = {
   // The visor clears the band it hinges from.
   visorInner: self.outer + 0.009,
   visorOuter: self.visorInner + 0.006,
+  cupTop: head.chin - self.slack,
+  cupBottom: self.cupTop - 0.013,
   // The visor reaches below the chin, so a blow from the front meets it rather than the jaw.
   visorBottom: -0.13,
   visorTop: 0.042,
@@ -64,7 +75,7 @@ local pivot(side) = [
   turned('pivot_knob_%s' % side, 'metal', 'x', disc(0.009, 0.008), [if side == 'left' then h.outer + 0.018 else -(h.outer + 0.018) - 0.008, h.pivotHeight, pivotZ]),
 ];
 local strap(sign) = [
-  box('chin_strap_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * 0.098), -0.115, -0.005], [std.max(sign * 0.088, sign * 0.098), -0.025, 0.015]),
+  box('chin_strap_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * 0.098), h.cupBottom, -0.005], [std.max(sign * 0.088, sign * 0.098), -0.025, 0.015]),
   box('strap_tab_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * (h.inner + 0.005)), -0.035, -0.005], [std.max(sign * 0.088, sign * (h.inner + 0.005)), -0.02, 0.015]),
 ];
 local pieces =
@@ -81,7 +92,7 @@ local pieces =
   + arc('curtain_lower', 'curtain', [h.outer - 0.002, h.outer + 0.012], [h.pivotBearing, 360 - h.pivotBearing], 20, [-0.125, -0.075], h.back)
   + pivot('left') + pivot('right')
   + strap(1) + strap(-1)
-  + [box('chin_cup', 'strap', [-0.098, -0.118, -0.005], [0.098, -0.105, 0.06])];
+  + [box('chin_cup', 'strap', [-0.098, h.cupBottom, -0.005], [0.098, h.cupTop, 0.06])];
 local g = {
   eyeSpacing: 0.076,
   tubeRadius: 0.023,
@@ -104,6 +115,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
     id: 'riot_helmet',
     title: 'Riot helmet',
     exportMass: 'parts',
+    voxelGrain: h.grain,
     taxonomy: { category: 'armour', keywords: ['police'], tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
     parts: [{
       id: 'helmet',
