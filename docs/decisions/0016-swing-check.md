@@ -68,8 +68,9 @@ change that makes it cost more is a defect to fix in the sweep and not a reason 
 
 ## Consequences
 
-The check lands with every contact the catalogue had fixed at its cause, in the shared builders where the cause lay, so
-any `swingUnjudged` entry marks a contact a later change brought.
+A contact is fixed at its cause, in the shared builder where the cause lies, before an entry is considered; an entry
+stays for a contact a judgement keeps or one awaiting judgement, never as the default. The check covers placed
+vehicles only, so an opening part no vehicle places is not swept.
 
 A part is a rigid body, so a motion that bends or scales it is out of scope. A part that moves but is placed with no
 neighbour in its swing has no contact and exports a swing of its whole way.

@@ -1,11 +1,11 @@
 ---
 type: breaking
 ---
-Every car's opening parts now swing clear: bonnets, tailgates and boot lids hinge on their top edges, boot lids are
-narrower to fit inside their opening, the front door glass ends short of the B-pillar, and parts on a door, lid or
-tailgate ride it: the SUV and classic 4x4 spare wheel, the hybrid badges, the sports car spoiler, the SUV and
-electric crossover rear arch flares, now split at the door, and the limousine, luxury saloon and taxi trims, now one
-model per door.
+The opening parts of the cars built from the shared car body now swing clear: their bonnets, tailgates and boot lids
+hinge on their top edges, boot lids are narrower to fit inside their opening, the front door glass ends short of the
+B-pillar, and parts on a door, lid or tailgate ride it: the SUV and classic 4x4 spare wheel, the hybrid badges, the
+sports car spoiler, the SUV and electric crossover rear arch flares, now split at the door, and the limousine, luxury
+saloon and taxi trims, now one model per door.
 
 Upgrade:
 - Place the new rider models where the placements export puts them: `suv_rear_door_flare`,
