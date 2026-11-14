@@ -11,7 +11,8 @@ local k = import 'kit.libsonnet';
 local voxels = import 'models/voxel-grains.libsonnet';
 // A panel is drawn on its own grain, finer than the vehicle's: a pair's leaves, rounded to whole grains, close up to four
 // grains apart past the room their fold needs, and at the vehicle grain that is a slot rather than a seam. The grain
-// lies on the detail lattice every row's own grain must nest in.
+// lies on the detail lattice every row's own grain must nest in, at twice its pitch: that already closes a pair to a seam,
+// and the detail grain itself would draw each panel with eight times the voxels for no seam the eye can tell apart.
 local grain = 2 * voxels.detailGrain;
 local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9;
 {
