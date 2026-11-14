@@ -3,7 +3,7 @@
 // the lightness per thread, and folds that darken the cloth. The export carries no texture coordinates, so the pattern
 // is laid in the model's own axes, projected along each face's main axis, which on a voxel face is exact. Grain finer
 // than a pixel fades out rather than shimmer, so the cloth reads close up and stays quiet at the game's distance. Why
-// the grain is drawn rather than baked is in docs/decisions/0013-fabric-finishes.md.
+// the grain is drawn rather than baked is in `docs/decisions/0013-fabric-finishes.md`, "Decision".
 const KINDS = ['woven', 'twill', 'knit', 'felt', 'leather', 'rubber'];
 
 const VERTEX_HEAD = /* glsl */ `
@@ -110,12 +110,13 @@ uniform float fabricCrease;
 uniform float fabricFold;
 ${PLANE}
 ${PATTERNS}
-// The narrow side of the patch of surface a pixel covers, at \`p\`: the smaller singular value of p's screen derivatives.
+// The narrow side of the patch of surface a pixel covers, at \`p\`: the smaller singular value of p's screen derivatives,
+// its square taken as the determinant over the larger eigenvalue, which does not cancel to noise on a grazing face.
 float fabricNarrowSide(vec3 p) {
   vec3 dx = dFdx(p), dy = dFdy(p);
   float xx = dot(dx, dx), yy = dot(dy, dy), xy = dot(dx, dy);
   float mean = 0.5 * (xx + yy), spread = sqrt(0.25 * (xx - yy) * (xx - yy) + xy * xy);
-  return sqrt(max(mean - spread, 0.0));
+  return sqrt(max(xx * yy - xy * xy, 0.0) / max(mean + spread, 1e-30));
 }
 `;
 
@@ -135,7 +136,7 @@ const MOTTLE_FADE = FADE.map((cells) => (cells * MOTTLE) / Math.SQRT2);
 
 // After the colour is read: the grain's lightness and the folds' darkening on the diffuse colour. The mottle is one
 // field through the model, faded by the footprint's narrow side, which grows with distance alone, so a stepped
-// surface does not band (docs/decisions/0013-fabric-finishes.md).
+// surface does not band; see `docs/decisions/0013-fabric-finishes.md`, "Decision".
 const COLOUR = /* glsl */ `
 vec3 fabricPlaneU, fabricPlaneV;
 fabricPlane(vFabricNormal, fabricPlaneU, fabricPlaneV);
@@ -163,8 +164,9 @@ const NORMAL = /* glsl */ `
 
 const defineOf = (kind) => `FABRIC_${kind.toUpperCase()}`;
 
-// Gives `material` the grain of `fabric`, the extras.fabric of its glTF material. The program is shared by every
-// material of the same kind; each keeps its own numbers.
+// Gives `material` the grain of `fabric`, the extras.fabric of its glTF material, its grain and fold in the units of
+// the mesh's own coordinates: metres in an exported model. The program is shared by every material of the same kind;
+// each keeps its own numbers.
 export function wearFabric(material, fabric) {
   if (!KINDS.includes(fabric.kind)) throw new Error(`${material.name}: no fabric kind ${fabric.kind}; the kinds are ${KINDS.join(', ')}`);
   const uniforms = {
