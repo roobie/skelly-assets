@@ -277,6 +277,12 @@ local fittings(name, airBox={}) =
   ]),
   // The engines, by the names `sites` takes.
   names: std.objectFields(engines),
+  // The name of the engine whose fused part is `part`, as a spec names its engine.
+  nameOf(part):
+    local prefix = fusedId('');
+    local name = std.substr(part, std.length(prefix), std.length(part) - std.length(prefix));
+    assert std.startsWith(part, prefix) && std.objectHas(engines, name) : part + ' is not a fused engine';
+    name,
   // Every site an engine can take, so a vehicle that loses its engine can drop them all.
   siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
@@ -288,4 +294,6 @@ local fittings(name, airBox={}) =
     assembly.sites('engine', fusedId(name), coreId(name), fittings(name, airBox), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,
+  // How far the air box of the engine's class rises from its base to its lid's top.
+  airBoxHeight(name): classOf(name).airBox.height + airBoxLid,
 }

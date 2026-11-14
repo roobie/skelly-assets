@@ -7,18 +7,22 @@ local polar(cx, cy, r, degrees) = [cx + r * std.cos(k.rad(degrees)), cy + r * st
 local axleDisc(id, slot, x, y, radius, z, sides=24) =
   local half = (z[1] - z[0]) / 2;
   k.turned(id, slot, 'z', k.disc(radius, -half, half), [x, y, (z[0] + z[1]) / 2]) + { sides: sides };
+// How high a driven axle's spring seats stand in its frame, bottom and top.
+local driveAxleSeat = [0.6, 0.64];
 {
   axleDisc: axleDisc,
   // A driven axle in `beamAxle`'s frame (`shared.libsonnet`), its housing and drums sized for the drawn steel to carry
   // an all-wheel-drive truck's axle weight; a steered one adds the knuckles its front wheels turn on. Its spring seats
-  // span `seatZ`, under the springs of the chassis it hangs from. Without `drums` it leaves them to wheels that carry
-  // the wheel kit's (`wheel-kit.libsonnet`).
-  driveAxle(id, massKg, halfTrack, steered, seatZ=[halfTrack - 0.36, halfTrack - 0.22], drums=true)::
+  // span `seatZ`, under the springs of the chassis it hangs from, and `seatY` up its frame. Without `drums` it leaves
+  // them to wheels that carry the wheel kit's (`wheel-kit.libsonnet`). Its differential stands at `diffZ`, so a front
+  // axle's shaft can pass beside the engine.
+  driveAxleSeat: driveAxleSeat,
+  driveAxle(id, massKg, halfTrack, steered, seatZ=[halfTrack - 0.36, halfTrack - 0.22], drums=true, seatY=driveAxleSeat, diffZ=0)::
     k.compound(id, massKg, [
       k.turned('beam', 'steel', 'z', k.disc(0.09, -halfTrack, halfTrack), [0, 0.52, 0]) + { sides: 12 },
-      box('diff', 'steel', [-0.2, 0.33, -0.19], [0.2, 0.71, 0.19]),
+      box('diff', 'steel', [-0.2, 0.33, diffZ - 0.19], [0.2, 0.71, diffZ + 0.19]),
     ] + k.bothSides([
-      box('spring_seat', 'steel', [-0.09, 0.6, seatZ[0]], [0.09, 0.64, seatZ[1]]),
+      box('spring_seat', 'steel', [-0.09, seatY[0], seatZ[0]], [0.09, seatY[1], seatZ[1]]),
     ] + (if drums then [
       k.turned('drum', 'steel', 'z', k.disc(0.21, halfTrack - 0.14, halfTrack), [0, 0.52, 0]) + { sides: 12 },
     ] else []) + (if steered then [box('knuckle', 'steel', [-0.12, 0.36, halfTrack - 0.3], [0.12, 0.68, halfTrack - 0.14])] else [])), { steel: 'steel-grey' }),
