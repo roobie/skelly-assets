@@ -9,6 +9,7 @@ import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { boneTransforms } from './kinematics.mjs';
+import { movingSites, poseAt, stowClips } from './motionPose.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -54,7 +55,8 @@ function load(model) {
 
 // Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
 // across its own x = 0 plane when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
-// in site order, so the viewer can move each one apart. What a worn piece's site covers of the doll is not drawn
+// in site order, so the viewer can move each one apart. A site that moves, or rides one that does, sits in a group of its
+// own that carries it from rest to its stop (`swing`). What a worn piece's site covers of the doll is not drawn
 // (hiding.mjs).
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
@@ -63,6 +65,9 @@ function loadSites(entry) {
       const scene = new THREE.Group();
       const materials = new Map();
       let triangles = 0;
+      const motions = new Map(entry.sites.map(({ model }) => [model, modelsById.get(model).motion]).filter(([, motion]) => motion));
+      const moving = movingSites(entry.sites, motions);
+      const carried = new Set(moving.map(({ index }) => index));
       entry.sites.forEach((site, i) => {
         const part = parts[i].scene.clone(true);
         part.name = site.site ?? site.model;
@@ -70,15 +75,57 @@ function loadSites(entry) {
         if (site.turn) part.quaternion.fromArray(site.turn);
         if (site.mirror) part.scale.x = -1;
         if (site.paint) repaint(part, site.paint);
-        scene.add(part);
+        if (carried.has(i)) {
+          const carrier = new THREE.Group();
+          carrier.name = part.name;
+          carrier.matrixAutoUpdate = false;
+          carrier.add(part);
+          scene.add(carrier);
+        } else scene.add(part);
         triangles += parts[i].triangles;
         for (const m of parts[i].materials) materials.set(m.name, m);
       });
       hideCovered(scene.children, entry.sites);
-      return { scene, clips: null, body: null, triangles, materials: [...materials.values()] };
+      return { scene, clips: null, body: null, triangles, materials: [...materials.values()], moving };
     })());
   }
   return cache.get(entry.id);
+}
+
+// Whether a loaded entry has sites that open: a vehicle with a door, a lid or a shutter.
+export const opens = (loaded) => Boolean(loaded.moving?.length);
+
+// The parts of an instance of `loaded` that move: each one's group, its layers, and the materials its stowed share is
+// cut from. Those materials are the instance's own copies, since the clipping would show on every instance sharing them.
+export function movers(obj, loaded) {
+  return loaded.moving.map(({ index, layers }) => {
+    const carrier = obj.children[index];
+    const stows = stowClips(layers, 1).length > 0;
+    const materials = new Set();
+    if (stows) {
+      carrier.traverse((o) => {
+        if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map((m) => ownCopy(m, materials)) : ownCopy(o.material, materials);
+      });
+    }
+    return { carrier, layers, materials: [...materials] };
+  });
+}
+const ownCopy = (material, copies) => {
+  const copy = material.clone();
+  copies.add(copy);
+  return copy;
+};
+
+// Carries every part of `moving` the share `clock` of the way from rest (0) to its stop (1), and hides what a slide has
+// stowed into its carrier.
+export function swing(moving, clock) {
+  for (const { carrier, layers, materials } of moving) {
+    const m = poseAt(layers, clock);
+    carrier.matrix.set(m[0], m[1], m[2], m[9], m[3], m[4], m[5], m[10], m[6], m[7], m[8], m[11], 0, 0, 0, 1);
+    carrier.matrixWorldNeedsUpdate = true;
+    const planes = stowClips(layers, clock).map(({ normal, constant }) => new THREE.Plane(new THREE.Vector3(...normal), constant));
+    for (const material of materials) material.clippingPlanes = planes;
+  }
 }
 
 // A site's finish paints that copy of its part, as a game spawning the vehicle would: only the materials the part marks
@@ -255,6 +302,7 @@ export function setupRenderer(renderer) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.localClippingEnabled = true; // what a slide has stowed is cut away by its material's planes (`swing`)
   renderer.setClearColor(0x000000, 0);
 }
 

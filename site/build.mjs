@@ -120,11 +120,12 @@ const shown = models.map((model) => {
   return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);
-const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
+const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish, rides }) => ({
   site,
   model: part,
   at,
   ...(mirror ? { mirror } : {}),
+  ...(rides ? { rides } : {}),
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
