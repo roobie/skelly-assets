@@ -699,7 +699,10 @@ const writeGlb: ExportGlb = (input) => {
 
   /** A smooth part of a voxelized file as drawn: seated one class grain into the part it mounts on. */
   const seatedInHost = (part: PartExport): PartExport => {
-    const mountPort = mounts.get(part.id)?.mount?.interface.slice(part.id.length + 1);
+    const mountPort =
+      part.id === input.resolved.assembly.root
+        ? input.rootMount
+        : mounts.get(part.id)?.mount?.interface.slice(part.id.length + 1);
     const port = part.def.ports.find(({ id }) => id === mountPort);
     return input.voxelGrain === undefined || port === undefined
       ? part

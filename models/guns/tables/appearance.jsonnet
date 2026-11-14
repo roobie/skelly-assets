@@ -68,6 +68,11 @@ local familyHex = {
     // A 20 mm mount is two item voxels across; the fine grain keeps its clamp and lamp apart.
     'tactical-flashlight-mount': { voxelGrain: 0.002 },
   } + {
+    // A rail iron sight is drawn smooth, seated one grain into its host; the gun class seats it as deep as the gun's
+    // rail voxels reach, as when the gun file draws it fitted.
+    [sight]: { voxelClass: 'gun' }
+    for sight in ['rail-front-sight', 'rail-rear-sight', 'rail-peep-rear-sight']
+  } + {
     // Each optic's default lens coating fills its lens slot; the tint is the glass material's sheen.
     ['optic-' + optic]: { appearance: { finish: { lens: opticLenses[optic] } } }
     for optic in std.objectFields(opticLenses)

@@ -75,7 +75,7 @@ with the part's content and the exporter holds no list of part names. See `src/g
 `VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the optic carries it.
 
 A part too small to voxelize keeps its authored mesh in a voxelized file, by a tag in its
-definition in the same way. Cartridges and iron sights are such parts. Their defining
+definition in the same way. Cartridges and iron sight parts are such parts. Their defining
 features are a few millimetres across, a rim and a taper or a post, a notch and a hole, and
 land unevenly on any grain a gun can afford, while the player reads them up close: a round
 in the hand, a sight picture at the eye. No grain keeps a peep's hole round or a post
@@ -88,7 +88,9 @@ every gun's sights follow it without a per-gun choice. See `src/glb.ts`, `SMOOTH
 A smooth part's datums lie on its authored solids, which is what the file draws. The voxel
 part it mounts on snaps its face to the grid, so the boxes it stands on reach one grain into
 that part, where its voxels hide them; seated exactly, the smooth part would float by up to
-half a voxel. See `src/glb.ts`, `seatedDef`.
+half a voxel. A smooth part exported alone, such as a loose rail sight the game fits to a
+voxel gun, seats the same way through the port it mounts by, so it matches the sight drawn
+fitted. See `src/glb.ts`, `seatedDef`, and `src/exportTypes.ts`, `rootMount`.
 
 A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
@@ -98,7 +100,7 @@ would multiply their triangles for little gain. See `src/glb.ts`, `partVoxelGrai
 
 A row that names a detail grain must make its own grain a whole multiple of it, because
 both lattices are anchored at the same world origin and the grains then nest: each coarse voxel face
-lies on a fine voxel face, so a sight still meets the receiver and the gas tube without
+lies on a fine voxel face, so an optic still meets the receiver and the gas tube without
 steps or gaps. The exporter refuses a pair that does not nest, and a row without a detail
 grain has nothing to check; see `src/glb.ts`, `checkNesting`.
 

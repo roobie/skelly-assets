@@ -127,6 +127,11 @@ export interface GlbExportInput {
   readonly voxelDetailGrain?: number;
   /** Also gives `voxelDetailGrain` to every part too thin for `voxelGrain`; see `glb.ts`, `partVoxelGrain`. */
   readonly voxelDetailThinParts?: boolean;
+  /**
+   * The port by which the root part mounts on a host the file does not hold, such as a loose attachment's base; a
+   * smooth root seats through it as a smooth part seats in a host the file holds (see `glb.ts`, `seatedDef`).
+   */
+  readonly rootMount?: string;
 }
 
 /** A model export's voxel class as the GLB writer takes it. */

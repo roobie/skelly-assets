@@ -1,5 +1,5 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
-import type { Domain, PartDef, PortDef } from '@skelly/construct/assembly/schema.ts';
+import type { Assembly, Domain, PartDef, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { expect, it } from 'vitest';
 import { exportGlb, SMOOTH } from '../src/glb.ts';
 
@@ -38,19 +38,12 @@ const domain: Domain = {
   },
 };
 
-it('seats a smooth part one grain into the voxel host it mounts on, so the host snapping to its grid leaves no gap', () => {
-  const resolved = resolve(
-    {
-      name: 'fixture',
-      root: 'host',
-      parts: { host: { family: 'host' }, block: { family: 'block' } },
-      connections: [{ from: 'host.top', to: 'block.base' }],
-    },
-    domain,
-  );
+/** The lowest drawn point of the block, in its own frame, where its mount port lies at height 0. */
+const blockBottom = (assembly: Assembly, rootMount?: string): number => {
   const result = exportGlb({
-    resolved,
+    resolved: resolve(assembly, domain),
     voxelGrain: GRAIN,
+    ...(rootMount ? { rootMount } : {}),
     asset: { id: 'fixture', file: 'assets/models/fixture.glb' },
     palette: { familyColors: {}, specialColors: {}, fallbackColor: [0.5, 0.5, 0.5], fallbackFinish: { metallic: 0, roughness: 0.5 } },
   });
@@ -61,5 +54,20 @@ it('seats a smooth part one grain into the voxel host it mounts on, so the host 
   const json = JSON.parse(new TextDecoder().decode(result.glb.subarray(20, 20 + view.getUint32(12, true))));
   const block = json.nodes.find((node: { extras?: { part?: string } }) => node.extras?.part === 'block');
   const [primitive] = json.meshes[block.mesh].primitives;
-  expect(json.accessors[primitive.attributes.POSITION].min[1]).toBeCloseTo(-GRAIN, 6);
+  return json.accessors[primitive.attributes.POSITION].min[1];
+};
+
+it('seats a smooth part one grain into the voxel host it mounts on, so the host snapping to its grid leaves no gap', () => {
+  const fitted = blockBottom({
+    name: 'fixture',
+    root: 'host',
+    parts: { host: { family: 'host' }, block: { family: 'block' } },
+    connections: [{ from: 'host.top', to: 'block.base' }],
+  });
+  expect(fitted).toBeCloseTo(-GRAIN, 6);
+});
+
+it('seats a smooth part exported alone one grain through its root mount, as it is seated when drawn fitted', () => {
+  const loose = blockBottom({ name: 'fixture', root: 'block', parts: { block: { family: 'block' } }, connections: [] }, 'base');
+  expect(loose).toBeCloseTo(-GRAIN, 6);
 });
