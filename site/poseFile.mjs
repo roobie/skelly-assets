@@ -6,13 +6,13 @@
 //   { rig: { id, revision }, angles: { <bone>: [flex, twist, abduct] }, reach: { <bone>: { target, pole?, twist? } },
 //     level: [<bone>], root?: [x, y, z], ground?: true }
 // Angles are degrees held to each bone's limits. `level` bones keep their rest orientation. `ground` lifts the root so
-// the figure, as its angles and levelled bones hold it, stands on y = 0, or on the soles of what it wears. A reach entry names a reach bone of the rig
-// and places its joint at `target`, a point in the world the figure stands in, by two-bone IK, bending toward `pole` or
-// the rig's own; the levelled bones are levelled again after it. The reach leaves the middle bone a pure bend, so
-// `twist` then turns it about itself by that many degrees: a forearm, which pronates, rolls the hand without moving the
-// wrist, as a fist turns palm down on a punch. Grounding before the reach lets a target be read off
-// the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
-// models/poses/rig.libsonnet.
+// the figure, as its angles and levelled bones hold it, stands on y = 0, or on the soles of what it wears. A reach
+// entry names a reach bone of the rig and places its joint at `target`, a point in the world the figure stands in, by
+// two-bone IK, bending toward `pole` or the rig's own; the levelled bones are levelled again after it. The reach leaves
+// the middle bone a pure bend, so `twist` then turns it about itself by that many degrees: a forearm, which pronates,
+// rolls the hand without moving the wrist, as a fist turns palm down on a punch. Grounding before the reach lets a
+// target be read off the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file
+// names its rig is in models/poses/rig.libsonnet.
 //
 // Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
 // its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a

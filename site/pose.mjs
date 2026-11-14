@@ -85,11 +85,12 @@ function worldMesh(object) {
 }
 
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
-// joint, `pieces` lists the worn pieces with the bones they ride, `held` the items it has carried (`carry`), and `clearance()` gives the figure's covered surface
-// at rest and the clearance probe over it, made when first asked for, since a figure drawn only to be looked at needs
-// neither, and `soles` how far what it wears stands it above the ground. A piece rides the bone of the part copy it is
-// drawn in (its site's part and side); what no bone carries, such as a wearable placed whole, moves with the root,
-// where the dressing put it on the figure at rest.
+// joint, `pieces` lists the worn pieces with the bones they ride, `held` the items it has carried (`carry`),
+// `clearance()` gives the figure's covered surface at rest and the clearance probe over it, made when first asked for,
+// since a figure drawn only to be looked at needs neither, and `soles` how far what it wears stands it above the
+// ground. A piece rides the bone of the part copy it is drawn in (its site's part and side); what no bone carries, such
+// as a wearable placed whole, stays where the dressing put it on the figure at rest, moved with the root
+// (`applyFrame`).
 export async function buildFigure(data, wear) {
   const { rig } = data;
   const sites = dressedSites(data, wear);
@@ -135,7 +136,9 @@ export async function buildFigure(data, wear) {
   return { rig, root, dressed, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered, held: new Map(), soles: soleLift(sites) };
 }
 
-// Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
+// Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`. What no bone
+// carries follows the root's position only, not its rotation: the root bone turns its joints, and a wearable placed
+// whole has no joint to turn it.
 export function applyFrame(figure, frame) {
   for (const { bone, joint } of figure.bones.values()) {
     joint.quaternion.fromArray(frame.rotations[bone.id] ?? IDENTITY_Q);

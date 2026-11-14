@@ -40,9 +40,9 @@ const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle, ...weaponIds], { cwd: repo, stdio: 'pipe' });
 
-// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, what
-// they cover and the lift of their soles, from the model entry the thing export writes beside each (a gun export writes none), as the manifest
-// would list them.
+// A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy, what they
+// cover and the lift of their soles, from the model entry the thing export writes beside each (a gun export writes
+// none), as the manifest would list them.
 const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${id}`, taxonomy]));
 const manifest = {
   models: readdirSync(built).flatMap((pack) => readdirSync(join(built, pack, 'assets/models')).map((file) => {

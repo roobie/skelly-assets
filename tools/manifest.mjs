@@ -101,11 +101,11 @@ export function mobManifest(rows) {
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-// models: { id, kind, pack, path, title, taxonomy?, nodes?, label?, covers?, soleLift?, clips?, massKg?, volumeM3? }, paths logical under
-// the pack; vehicles: { id, title, pack, path, tags } of each vehicle's placements; motions: { id, pack, path, rig } of
-// each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as <pack>/<logical path>;
-// credit: a repo path -> { author, licence }; renames: retired id -> current id;
-// finishes: finish id -> its glTF material.
+// models: { id, kind, pack, path, title, taxonomy?, nodes?, label?, covers?, soleLift?, clips?, massKg?, volumeM3? },
+// paths logical under the pack; vehicles: { id, title, pack, path, tags } of each vehicle's placements; motions: { id,
+// pack, path, rig } of each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as
+// <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id; finishes:
+// finish id -> its glTF material.
 export function buildManifest({ models, vehicles = [], motions = [], dependsOn = {}, files, credit, renames = {}, finishes = {} }) {
   const packs = {};
   for (const file of [...new Set(files)].sort(byText)) {
