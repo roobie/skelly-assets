@@ -12,7 +12,7 @@ local doorTravel = door[1] - door[0];
 // The door runs on a sill rail at the waist, where the section is widest, so a rail grown sideways by the plug meets the
 // plugged door's inner face square on and stays clear of the engines on the roof.
 local railed = [station + { half: station.half + s.cabinDoorPlug - skinThick } for station in s.body];
-local rail(id, arc) = h.shell(id, 'dark', railed, thick=s.cabinDoorPlug, x=[door[0], door[1] + doorTravel], arc=arc, step=0.9, sides=120);
+local rail(id, arc) = h.shell(id, 'dark', railed, thick=s.cabinDoorPlug - skinThick, x=[door[0], door[1] + doorTravel], arc=arc, step=0.9, sides=120);
 local pane = s.cabinPane;
 local paneX = s.cabinPaneX;
 local cockpit = s.cockpitDoor;
