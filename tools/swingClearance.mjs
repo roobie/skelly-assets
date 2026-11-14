@@ -206,8 +206,8 @@ export async function swingResults(data, { cache, workers = availableParallelism
 }
 
 // Every pair of sites that touch in a vehicle's sweep, as Map(pair key -> { sites, depth, pieces, at?, extent?, sweep }):
-// the deepest the pair reaches whether one opens against the other or both are open, `at` the clock it first touches
-// as one opens, and `sweep` whether that is the case.
+// the deepest the pair reaches whether one opens against the other or both are open, `at` the clock at which the
+// first of its sites, the one whose sweep reaches deepest, touches the other, and `sweep` whether that is the case.
 export function foundContacts(result) {
   const found = new Map();
   for (const [site, { contacts, extent }] of Object.entries(result.sites)) {
@@ -215,7 +215,7 @@ export function foundContacts(result) {
       const pair = key(site, contact.other);
       const seen = found.get(pair);
       if (!seen || contact.depth > seen.depth) {
-        found.set(pair, { sites: [site, contact.other], depth: contact.depth, pieces: contact.pieces, at: Math.min(contact.at, seen?.at ?? 1), extent, sweep: true });
+        found.set(pair, { sites: [site, contact.other], depth: contact.depth, pieces: contact.pieces, at: contact.at, extent, sweep: true });
       }
     }
   }
@@ -262,28 +262,35 @@ export function swingReport({ grain, vehicles }, results) {
     const entries = [...swingContacts, ...swingUnjudged];
     const allowed = new Map([...inherited, ...entries].map((entry) => [key(...entry.sites), entry]));
     const inheritedPairs = new Set(inherited.map((entry) => key(...entry.sites)));
-    // What each moving site touches, and which of it no entry covers. A sweep's contact is its first site's, an all-open
-    // one both sites'.
-    const touches = new Map();
-    const touched = (site, touch) => touches.set(site, [...(touches.get(site) ?? []), touch]);
-    for (const [pair, contact] of found) {
-      const cap = allowed.get(pair)?.depth ?? 0;
+    // A contact as the problem it is when no entry covers it to its depth, else undefined.
+    const problemOf = (contact, cap) => {
+      if (contact.depth <= cap + EPSILON) return undefined;
       const [a, b] = contact.sites;
-      let message;
-      if (contact.depth > cap + EPSILON) {
-        const limit = cap > 0 ? `, more than the ${millimetres(cap)} mm allowed` : '';
-        const depth = `${millimetres(contact.depth)} mm (${contact.pieces[0]} in ${contact.pieces[1]})`;
-        if (contact.sweep) {
-          const opened = contact.extent ? `${Math.round(contact.at * contact.extent.total)}${contact.extent.unit} of ${contact.extent.total}${contact.extent.unit}` : `${Math.round(contact.at * 100)}% of its way`;
-          message = `${vehicle}: ${partOf.get(a)} at ${a} swings into ${partOf.get(b)} at ${b} from ${opened}, reaching ${depth} by its stop${limit}`;
-        } else {
-          message = `${vehicle}: ${partOf.get(a)} at ${a} and ${partOf.get(b)} at ${b} meet with both open by ${depth}${limit}`;
-        }
-        problems.push(message);
-      }
-      for (const [site, other] of contact.sweep ? [[a, b]] : [[a, b], [b, a]]) {
-        touched(site, { other, depth: Math.round(contact.depth * 1e4) / 1e4, at: contact.at, allowed: message === undefined, ...(message ? { message } : {}) });
-      }
+      const limit = cap > 0 ? `, more than the ${millimetres(cap)} mm allowed` : '';
+      const depth = `${millimetres(contact.depth)} mm (${contact.pieces[0]} in ${contact.pieces[1]})`;
+      if (!contact.sweep) return `${vehicle}: ${partOf.get(a)} at ${a} and ${partOf.get(b)} at ${b} meet with both open by ${depth}${limit}`;
+      const opened = contact.extent ? `${Math.round(contact.at * contact.extent.total)}${contact.extent.unit} of ${contact.extent.total}${contact.extent.unit}` : `${Math.round(contact.at * 100)}% of its way`;
+      return `${vehicle}: ${partOf.get(a)} at ${a} swings into ${partOf.get(b)} at ${b} from ${opened}, reaching ${depth} by its stop${limit}`;
+    };
+    const capOf = (sites) => allowed.get(key(...sites))?.depth ?? 0;
+    for (const contact of found.values()) {
+      const message = problemOf(contact, capOf(contact.sites));
+      if (message) problems.push(message);
+    }
+    // What each moving site touches, from its own sweep and from the all-open pose, each judged against its pair's entry.
+    const touches = new Map();
+    const touched = (contact) => {
+      const [site, other] = contact.sites;
+      const message = problemOf(contact, capOf(contact.sites));
+      touches.set(site, [...(touches.get(site) ?? []), { other, depth: Math.round(contact.depth * 1e4) / 1e4, at: contact.at, allowed: message === undefined, ...(message ? { message } : {}) }]);
+    };
+    for (const [site, { contacts, extent }] of Object.entries(result.sites)) {
+      for (const { other, ...contact } of contacts) touched({ ...contact, sites: [site, other], extent, sweep: true });
+    }
+    for (const touch of result.open) {
+      const [a, b] = touch.sites;
+      touched({ ...touch, sweep: false });
+      touched({ ...touch, sites: [b, a], sweep: false });
     }
     const seen = new Set();
     for (const entry of entries) {

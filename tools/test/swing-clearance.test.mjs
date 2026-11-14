@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
+import { key } from '../siteOverlap.mjs';
 import { shapeOf, sweepBody } from '../swingSweep.mjs';
 
 const GRAIN = 0.03125;
@@ -296,4 +297,17 @@ test('a shard sweeps only its share of the vehicles', async () => {
   const second = await swingResults(input, { workers: 1, shard: { index: 2, count: 2 } });
   assert.deepEqual([first.swept, second.swept], [1, 1]);
   assert.deepEqual(Object.keys(first.results).concat(Object.keys(second.results)).sort(), ['van', 'van_b']);
+});
+
+// Two moving sites that each find the other, a shallower and a deeper reach, as `sweepVehicle` would report them.
+test('a contact both moving sites hit is judged for each site on its own depth and clock', () => {
+  const sites = ['a', 'b'].map((id) => site(id, id, []));
+  const reach = (other, depth, at) => ({ clear: at, extent: null, contacts: [{ other, depth, at, pieces: ['x', 'y'] }] });
+  const results = { v: { open: [], sites: { a: reach('b', 0.01, 0.3), b: reach('a', 0.02, 0.5) } } };
+  const vehicle = (swingContacts) => ({ v: { forward: '+x', sites, swingContacts, swingUnjudged: [] } });
+  const covered = swingReport({ grain: GRAIN, vehicles: vehicle([entry(0.015, ['a', 'b'])]) }, results);
+  assert.deepEqual([covered.verdicts.v.a.status, covered.verdicts.v.b.status], ['judged', 'fails']);
+  const bare = swingReport({ grain: GRAIN, vehicles: vehicle([]) }, results);
+  assert.deepEqual([bare.verdicts.v.a.status, bare.verdicts.v.b.status], ['fails', 'fails']);
+  assert.equal(foundContacts(results.v).get(key('a', 'b')).at, 0.5);
 });
