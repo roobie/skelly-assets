@@ -4,7 +4,7 @@
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
-import { boolean, finite, minValue, number, parse, pipe, strictObject } from 'valibot';
+import { finite, minValue, number, parse, pipe, strictObject } from 'valibot';
 import content from '../../../../../models/guns/tables/shroudFrontSight.json' with { type: 'json' };
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
@@ -15,13 +15,11 @@ const P = parse(
     base: strictObject({ halfLengthU: Positive, heightU: Positive, halfWidthU: Positive }),
     post: strictObject({ halfLengthU: Positive, halfWidthU: Positive }),
     ears: strictObject({ halfLengthU: Positive, innerHalfGapU: Positive, thicknessU: Positive, dropU: Positive }),
-    smooth: boolean(),
   }),
   content,
 );
 
 export const SHROUD_FRONT_SIGHT_SETBACK_U = P.setbackU;
-export const SHROUD_FRONT_SIGHT_SMOOTH = P.smooth;
 
 const box = (id: string, min: Vec3, max: Vec3): Solid => ({ id, kind: 'box', box: boxFromMinMax(min, max) });
 

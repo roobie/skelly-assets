@@ -4,7 +4,7 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
-import { boolean, finite, integer, minValue, number, parse, pipe, strictObject } from 'valibot';
+import { finite, integer, minValue, number, parse, pipe, strictObject } from 'valibot';
 import content from '../../../../../models/guns/tables/railPeepRearSight.json' with { type: 'json' };
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
@@ -20,13 +20,11 @@ const P = parse(
       sides: pipe(number(), integer()),
     }),
     eyeReliefU: Positive,
-    smooth: boolean(),
   }),
   content,
 );
 
 export const RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U = P.eyeReliefU;
-export const RAIL_PEEP_REAR_SIGHT_SMOOTH = P.smooth;
 
 const box = (id: string, min: Vec3, max: Vec3): Solid => ({ id, kind: 'box', box: boxFromMinMax(min, max) });
 

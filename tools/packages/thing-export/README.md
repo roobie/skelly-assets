@@ -37,7 +37,7 @@ file writing is separate from browser-safe geometry and preview code; see `src/f
 
 ## Voxelized export
 
-Models export as greedy voxel meshes, except cartridges. The recipe loader refuses a row
+Models export as greedy voxel meshes, except the parts too small to voxelize. The recipe loader refuses a row
 that names no voxel class, so no model drifts off the lattice by omission. The sampler
 lives here because this package may not import deadvox's mesher; see `src/recipe.ts`,
 `RowSchema`, `src/voxelize.ts`, `voxelize`, and `src/glb.ts`, `voxelPrimitivesFor`.
@@ -48,11 +48,6 @@ grain, phrased as thickness against grain so every exporter asks it the same way
 caller decides what to draw instead. The span is content; see `src/featureFit.ts`,
 `featureFitsGrain`, and `models/voxel-grains.libsonnet`, `featureVoxels`.
 
-Cartridges are drawn as faceted lathes with the side count of the other round things beside
-the guns. Their small features land unevenly on any voxel grain, so cartridges start
-smooth, and voxelizing them is revisited if the clash with the voxel guns bothers players.
-See `packages/gun-authoring-tool/src/gun/cartridgeExport.ts`, `makeModelExport`.
-
 Four grains, all content values: a coarse one for vehicles, furniture and the parts made
 to attach to them; a fine one for firearms, their magazines and hand-held items; a middle
 one for every other item or component; and a finest one for fine-detail parts. A vehicle
@@ -62,9 +57,9 @@ at a few millimetres that the item grain cannot hold, and a magazine shares its 
 so a seated magazine matches the receiver's voxels. A hand-held item (a melee weapon, a
 knife, a wrench, a flashlight, a pipe) takes the gun class as well: it is long and thin,
 and at the item grain a bat's taper and a crowbar's hook read as blunt steps. The larger
-files are accepted. A sight notch or post is only a few
-millimetres wide, so the gun grain fills a notch and a post hides behind its neighbours;
-the finest grain gives those parts voxels small enough to keep them.
+files are accepted. A fine-detail part, such as an optic, has features only a few
+millimetres across that the gun grain fills; the finest grain gives it voxels small enough
+to keep them.
 
 Each class gives the default grain, and an item may name a finer or coarser one. One grain
 per class cannot fit every item: an attachment mounts beside a finer receiver. The item's
@@ -77,15 +72,23 @@ and the contract tests read one explicit value. The grains are content a modder 
 
 A part asks for the finest grain by carrying a tag in its definition, so the choice sits
 with the part's content and the exporter holds no list of part names. See `src/glb.ts`,
-`VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the sight parts carry it.
+`VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the optic carries it.
 
-A part may instead keep its authored mesh in a voxelized file, by a tag in its definition in
-the same way. An aperture sight seen from the eye is read by its round hole, and no grain
-keeps a hole a few millimetres across round, so a sight the player looks through can stay
-smooth beside the voxel gun. Its datums then lie on the authored solids, which is what the
-file draws. The voxel part it mounts on snaps its face to the grid, so the boxes it stands
-on reach one grain into that part, where its voxels hide them; seated exactly, the smooth
-part would float by up to half a voxel. See `src/glb.ts`, `SMOOTH` and `seatedDef`.
+A part too small to voxelize keeps its authored mesh in a voxelized file, by a tag in its
+definition in the same way. Cartridges and iron sights are such parts. Their defining
+features are a few millimetres across, a rim and a taper or a post, a notch and a hole, and
+land unevenly on any grain a gun can afford, while the player reads them up close: a round
+in the hand, a sight picture at the eye. No grain keeps a peep's hole round or a post
+centred in it. The clash with the voxel gun beside them is accepted, and voxelizing them is
+revisited if it bothers players. A cartridge is drawn as a faceted lathe with the side
+count of the other round things beside the guns. The rule is keyed by the part's type, so
+every gun's sights follow it without a per-gun choice. See `src/glb.ts`, `SMOOTH`, and
+`packages/gun-authoring-tool/src/gun/tooSmallToVoxelize.ts`, `TOO_SMALL_TO_VOXELIZE`.
+
+A smooth part's datums lie on its authored solids, which is what the file draws. The voxel
+part it mounts on snaps its face to the grid, so the boxes it stands on reach one grain into
+that part, where its voxels hide them; seated exactly, the smooth part would float by up to
+half a voxel. See `src/glb.ts`, `seatedDef`.
 
 A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.

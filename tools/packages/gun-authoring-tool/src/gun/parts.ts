@@ -32,7 +32,7 @@ import {
 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax, clipPolygon, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { SMOOTH, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
@@ -78,14 +78,10 @@ import {
   subtractAxialPockets,
   subtractConvexSection,
 } from './receiverSection.ts';
-import {
-  RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U,
-  RAIL_PEEP_REAR_SIGHT_SMOOTH,
-  railPeepRearSightSolids,
-} from './railPeepRearSight.ts';
+import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
-import { SHROUD_FRONT_SIGHT_SMOOTH, shroudFrontSightSolids } from './shroudFrontSight.ts';
+import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import {
   curvedTriggerBlade,
   openTriggerGuard,
@@ -106,6 +102,7 @@ import {
 } from './sporter.ts';
 import { SPORTER_PROPORTIONS } from './sporterProportions.ts';
 import { taperedStockSolids } from './taperedStock.ts';
+import { TOO_SMALL_TO_VOXELIZE } from './tooSmallToVoxelize.ts';
 import {
   CLOSED_TRIGGER_GUARDS,
   CURVED_TRIGGER_BLADES,
@@ -3914,7 +3911,7 @@ const frontSight: PartFamily = {
       ports: [{ id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: X, up: Y, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -3940,7 +3937,7 @@ const muzzleBead: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, 1.25, 0], dir: X }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -3984,7 +3981,7 @@ const sportingRearSight: PartFamily = {
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       axes: [{ kind: 'sight', origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
       keepOuts: [],
     };
   },
@@ -4013,7 +4010,7 @@ const railFrontSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -4030,13 +4027,10 @@ const railRearSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
-
-/** The voxel tag a sight takes: none where its content keeps it smooth, the detail grain otherwise. */
-const sightTags = (smooth: boolean): string[] => [smooth ? SMOOTH : VOXEL_DETAIL];
 
 /** A fixed peep rear sight on a top rail: one disc with a round hole on the conventional front post's sight line. */
 const railPeepRearSight: PartFamily = {
@@ -4052,7 +4046,7 @@ const railPeepRearSight: PartFamily = {
       axes: [
         { kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U },
       ],
-      tags: sightTags(RAIL_PEEP_REAR_SIGHT_SMOOTH),
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -4071,7 +4065,7 @@ const shroudFrontSight: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
-      tags: sightTags(SHROUD_FRONT_SIGHT_SMOOTH),
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -4179,7 +4173,7 @@ const akRearSight: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };

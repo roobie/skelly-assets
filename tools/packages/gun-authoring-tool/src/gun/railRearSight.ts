@@ -24,9 +24,8 @@ export const RAIL_REAR_SIGHT_EYE_RELIEF_U = P.eyeReliefU;
 const box = (id: string, min: Vec3, max: Vec3): Solid => ({ id, kind: 'box', box: boxFromMinMax(min, max) });
 
 /**
- * The sight's solids with the aperture centred `apertureU` over the rail. The leaf closes over the hole, so its top is
- * solid and the exported sight line drops into the hole rather than resting on the top (see `exportGlb.ts`,
- * `openSightGapOrThrow`).
+ * The sight's solids with the aperture centred `apertureU` over the rail, where the exported sight line runs through
+ * the hole.
  */
 export const railRearSightSolids = (apertureU: number): Solid[] => {
   const { base, tower, aperture } = P;

@@ -11,7 +11,4 @@
   // Guard ears either side of the post. They stop `dropU` short of the post top so the post stands alone in the sight
   // picture rather than reading as one of three.
   ears: { halfLengthU: 0.5, innerHalfGapU: 0.75, thicknessU: 0.25, dropU: 0.5 },
-  // The post is read by its edges against the rear sight's hole, and the voxel grain would shift them onto its grid,
-  // so the sight keeps its authored mesh.
-  smooth: true,
 }

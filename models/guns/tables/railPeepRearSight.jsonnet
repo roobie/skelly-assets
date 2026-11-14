@@ -11,6 +11,4 @@
   disc: { halfThicknessU: 0.25, holeRadiusU: 0.25, outerRadiusU: 0.75, sides: 16 },
   // Where the eye sits behind the hole for the exported sight line.
   eyeReliefU: 4,
-  // The hole is read by its round outline, which no voxel grain keeps, so the sight keeps its authored mesh.
-  smooth: true,
 }

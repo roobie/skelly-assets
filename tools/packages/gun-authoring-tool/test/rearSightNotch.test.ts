@@ -1,5 +1,6 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
+import { SMOOTH } from '@skelly/thing-export/glb.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -24,14 +25,14 @@ const ironOnly = (assembly: Assembly): Assembly => {
   return copy;
 };
 
-/** The parts that carry a rear sight: a sight axis that is neither an optic nor a front sight. */
-const rearSightParts = (assembly: Assembly): string[] =>
+/** The parts that carry a rear sight, a sight axis that is neither an optic nor a front sight, and whether each is smooth. */
+const rearSightParts = (assembly: Assembly): { partId: string; smooth: boolean }[] =>
   [...resolve(assembly, gunDomain).defs.entries()]
     .filter(([id, def]) => {
       const { family } = assembly.parts[id]!;
       return def.axes.some(({ kind }) => kind === 'sight') && family !== 'sight' && !family.includes('front-sight');
     })
-    .map(([id]) => id);
+    .map(([partId, def]) => ({ partId, smooth: def.tags?.includes(SMOOTH) ?? false }));
 
 /**
  * How wide the file's drawn rear sight is open across the sight line: the distance between the drawn faces that bound
@@ -60,7 +61,7 @@ const openWidthAtLine = (triangles: readonly Triangle[], eye: readonly number[],
 
 const rearSights = loadDesigns().flatMap(({ label, assembly, items }) => {
   const iron = ironOnly(assembly);
-  return rearSightParts(iron).map((partId) => ({ label, assembly: iron, items: itemsKept(iron, items), partId }));
+  return rearSightParts(iron).map((part) => ({ label, assembly: iron, items: itemsKept(iron, items), ...part }));
 });
 
 describe('a rear sight keeps its notch or aperture open in the voxelized file', () => {
@@ -68,7 +69,13 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
     expect(rearSights.length).toBeGreaterThan(0);
   });
 
-  it.each(rearSights)('is open at the gun grain on the sight line: $label, $partId', ({ assembly, items, partId }) => {
+  // A smooth sight is drawn as authored, so no grain can close it; its line need only run through the opening.
+  it.each(rearSights)('is open on the sight line, at the gun grain if voxelized: $label, $partId', ({
+    assembly,
+    items,
+    partId,
+    smooth,
+  }) => {
     const result = exportGunGlb(
       assembly,
       ASSET,
@@ -83,6 +90,10 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
     // A quarter grain below the eye is inside the top row of an open notch and inside the hole of a closed aperture.
     const row = eye[1] - gunVoxel.detailGrain / 4;
     const width = openWidthAtLine(partTriangles(read.json, read, partId), eye, row);
-    expect(width).toBeGreaterThanOrEqual(gunVoxel.grain - 1e-6);
+    if (smooth) {
+      expect(width).toBeGreaterThan(0);
+    } else {
+      expect(width).toBeGreaterThanOrEqual(gunVoxel.grain - 1e-6);
+    }
   });
 });

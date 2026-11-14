@@ -6,7 +6,7 @@
   // aperture leaf.
   base: { halfLengthU: 1, heightU: 0.5, halfWidthU: 1 },
   tower: { halfLengthU: 0.25, halfWidthU: 0.5 },
-  // The leaf round the hole; the hole stays wider than one voxel of the gun grain so it draws open.
+  // The leaf round the square hole.
   aperture: { halfThicknessU: 0.125, holeHalfU: 0.25, ringU: 0.25 },
   // Where the eye sits behind the aperture for the exported sight line.
   eyeReliefU: 4,

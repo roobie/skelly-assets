@@ -3,11 +3,12 @@ import { SMOOTH } from '@skelly/thing-export/glb.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
+import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
 import { readGlb } from './glbReader.ts';
 
 const SOURCE_CONTEXT = /Export fixture.*fixture-source/;
-const voxel = { grain: 0.004, detailGrain: 0.002 };
+const voxel = { grain: 0.004, detailGrain: 0.002, detailThinParts: true };
 
 it.each(['fixture-unsupported', 'toString'])('refuses unknown export kind %s at recipe load', (kind) => {
   expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', kind, source: 'fixture-source', voxel }])).toThrow(
@@ -37,7 +38,7 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
       id: 'fixture',
       title: 'Fixture',
       kind: 'design',
-      source: 'models/guns/designs/archetype-ak-akm.json',
+      source: 'models/guns/designs/archetype-ar.json',
       voxel: grains,
     },
   ]);
@@ -96,7 +97,11 @@ it('puts every part turned only by quarter turns, coarse or fine, on the fine la
       continue;
     }
     for (const primitive of json.meshes[node.mesh]!.primitives) {
-      const grain = (primitive.extras as { voxelGrain: number }).voxelGrain;
+      const grain = (primitive.extras as { voxelGrain?: number }).voxelGrain;
+      // A smooth part is drawn as authored, on no lattice.
+      if (grain === undefined) {
+        continue;
+      }
       seen.add(grain);
       for (const coordinate of placedCoordinates(floats(primitive.attributes.POSITION), transform)) {
         for (const step of [grain, voxel.detailGrain]) {
@@ -152,7 +157,8 @@ describe('recipe output grain', () => {
   it('has recipe rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
-  // Cartridges are drawn smooth whatever their row's grain; see `src/gun/cartridgeExport.ts`, `makeModelExport`.
+  // A cartridge is a component too small to voxelize, like a smooth gun part, but outside the gun catalogue; see
+  // `src/gun/tooSmallToVoxelize.ts`, `TOO_SMALL_TO_VOXELIZE`.
   it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge or smooth part', (row) => {
     const grains =
       row.kind === 'cartridge'
@@ -161,8 +167,12 @@ describe('recipe output grain', () => {
     const { glb } = row.generate();
     const { meshes } = readGlb(glb).json;
     expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
+    // A loose part's node is named by the family its part builds, which need not be its catalogue family.
+    const familyOf = (node: string) => (row.kind === 'part' ? PART_CATALOGUE.items.get(row.source)!.family : node);
     const smoothMeshes = new Set(
-      partNodes(glb).flatMap(({ family, mesh }) => (mesh !== undefined && buildsSmooth(family) ? [mesh] : [])),
+      partNodes(glb).flatMap(({ family, mesh }) =>
+        mesh !== undefined && buildsSmooth(familyOf(family)) ? [mesh] : [],
+      ),
     );
     meshes.forEach(({ primitives }, mesh) => {
       const allowed = smoothMeshes.has(mesh) ? [undefined] : grains;
