@@ -10,13 +10,8 @@ local s = import 'luxury_saloon.spec.libsonnet';
     },
     add: [
       site.one('grille', 'luxury_saloon_grille'),
-      site.one('brightwork', 'luxury_saloon_brightwork'),
-    ],
+    ]
+    + site.pair('front_door_brightwork', 'luxury_saloon_front_door_brightwork', rides='front_door')
+    + site.pair('rear_door_brightwork', 'luxury_saloon_rear_door_brightwork', rides='rear_door'),
   }),
-  swingUnjudged: [
-    site.swingUnjudged('front_door_far', 'brightwork', 0.0168, 'skin_far meets front_sill_far'),
-    site.swingUnjudged('front_door_near', 'brightwork', 0.0118, 'trim meets front_sill_near'),
-    site.swingUnjudged('rear_door_far', 'brightwork', 0.0168, 'skin_far meets rear_sill_far'),
-    site.swingUnjudged('rear_door_near', 'brightwork', 0.0118, 'trim meets rear_sill_near'),
-  ],
 }
