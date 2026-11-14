@@ -18,10 +18,11 @@ const vehicleEndpoints = (): Plugin => ({
     const api: Promise<VehicleApi> = import(pathToFileURL(resolve(import.meta.dirname, 'server/vehicleApi.mjs')).href).then(
       ({ vehicleApi }) => vehicleApi({ root: resolve(import.meta.dirname, '../../..') }),
     );
-    const models = resolve(import.meta.dirname, '../../../models') + sep;
-    watcher.add(models);
+    // What the verdicts are evaluated from: the models and the Jsonnet library they import.
+    const watched = ['models', 'tools/jsonnet/lib'].map((folder) => resolve(import.meta.dirname, '../../..', folder) + sep);
+    watcher.add(watched);
     watcher.on('all', (_event, file) => {
-      if (file.startsWith(models)) void api.then((loaded) => loaded.invalidate());
+      if (watched.some((folder) => file.startsWith(folder))) void api.then((loaded) => loaded.invalidate());
     });
     const serve = (path: string, answer: (query: URLSearchParams, api: VehicleApi) => Promise<unknown>) =>
       middlewares.use(path, (request, response) => {
