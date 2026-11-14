@@ -221,11 +221,10 @@ export function stillInstance(loaded, model) {
 
 // ---- rigid posing: each vertex follows its body bone (TEXCOORD_1.x) ----
 
-const slerp = (a, b, w) => new THREE.Quaternion(...a).slerp(new THREE.Quaternion(...b), w).toArray();
 
 export function pose(scene, body, clip, time) {
   if (!playable(clip)) return;
-  const posed = boneTransforms(body.bones, decodeFrame(sampleClip(clip, time, slerp))), transforms = body.bones.map((bone) => posed.get(bone.id));
+  const posed = boneTransforms(body.bones, decodeFrame(sampleClip(clip, time))), transforms = body.bones.map((bone) => posed.get(bone.id));
   scene.traverse((o) => {
     if (!o.isMesh || !o.geometry.userData.rest) return;
     const g = o.geometry, bone = g.attributes.uv1.array, rest = g.userData.rest, restN = g.userData.restNormal, pos = g.attributes.position.array, nor = g.attributes.normal.array;
