@@ -9,6 +9,7 @@ local round(piece) = piece + { sides: 12 };
 // How far a pulley stands out of the engine's front face, and the air box's duct out of its side.
 local pulleyDepth = 0.03;
 local ductLength = 0.06;
+local airBoxLid = 0.02;
 // The core's block top, as a share of its height, and its head's half-width, as a share of its width, which a high
 // alternator sits on and beside.
 local blockTop = 0.72;
@@ -58,7 +59,7 @@ local airBox(c) = {
   local b = c.airBox,
   pieces: [
     box('box', 'shell', [-b.length / 2, 0, -b.width / 2], [b.length / 2, b.height, b.width / 2]),
-    box('lid', 'lid', [-b.length / 2 + 0.02, b.height, -b.width / 2 + 0.02], [b.length / 2 - 0.02, b.height + 0.02, b.width / 2 - 0.02]),
+    box('lid', 'lid', [-b.length / 2 + 0.02, b.height, -b.width / 2 + 0.02], [b.length / 2 - 0.02, b.height + airBoxLid, b.width / 2 - 0.02]),
     box('duct', 'shell', [-0.05, b.height * 0.3, -b.width / 2 - ductLength], [0.05, b.height * 0.7, -b.width / 2]),
   ],
   finish: { shell: 'polymer-black', lid: 'plastic-black' },
@@ -227,6 +228,12 @@ local fittings(name) =
   ]),
   // The engines, by the names `sites` takes.
   names: std.objectFields(engines),
+  // The name of the engine whose fused part is `part`, as a spec names its engine.
+  nameOf(part):
+    local prefix = fusedId('');
+    local name = std.substr(part, std.length(prefix), std.length(part) - std.length(prefix));
+    assert std.startsWith(part, prefix) && std.objectHas(engines, name) : part + ' is not a fused engine';
+    name,
   // Every site an engine can take, so a vehicle that loses its engine can drop them all.
   siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
@@ -234,4 +241,6 @@ local fittings(name) =
   sites(name, at, detail): assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,
+  // How far the air box of the engine's class rises from its base to its lid's top.
+  airBoxHeight(name): classOf(name).airBox.height + airBoxLid,
 }

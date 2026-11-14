@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { add, applyPoint, mat3ToQuat, mulMM, mulMV, quatToMat3, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
+import { compareNumbered } from './codeUnitOrder.mjs';
 import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { glbJson } from './glb.mjs';
@@ -38,7 +39,7 @@ export function partStrokes(glb) {
  * stands in it, the frames in their names' numbered order, a held frame keyed where it arrives and where it leaves.
  */
 export function pressCheckClip(check) {
-  const names = Object.keys(check.frames).sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+  const names = Object.keys(check.frames).sort((a, b) => compareNumbered(a, b));
   const keys = [];
   let at = 0;
   for (const [k, name] of names.entries()) {

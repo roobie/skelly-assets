@@ -7,5 +7,6 @@ local s = import 'step_van.spec.libsonnet';
     site.one('roof_vent', 'roof_vent', [-0.9, s.roof, 0]),
     site.one('far_door_trim', 'step_van_far_door_trim'),
   ]
-  + site.pair('door_step', 'door_step_walk_in', [s.bFront, 0.3, s.side]),
+  + site.pair('door_step', 'door_step_walk_in', [s.bFront, 0.3, s.side])
+  + site.pair('parcel_shelves', 'step_van_parcel_shelves'),
 }

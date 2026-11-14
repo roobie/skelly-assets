@@ -34,4 +34,8 @@ local seatAcross = s.across - s.floor;
     site.overlap('chassis', 'wheel_rear_up', 0.059,
       'The rear axle runs on into the rim of the wheel on it.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.058,
+      'The chassis\'s front axle runs through the engine\'s gearbox.'),
+  ],
 }

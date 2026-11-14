@@ -13,10 +13,14 @@ local wheels = import 'wheels.libsonnet';
 local round(piece) = piece + { sides: 24 };
 
 // Each part in its own frame, as its comment says, with the finish of each slot it draws.
-// The tyre in the wheel's frame, its bead on the rim's barrel.
+// The tyre in the wheel's frame, its bead on the rim's barrel. A tyre with a `tread` stands its lugs that deep proud of
+// its body.
 local tyre(w) = {
   local t = w.tyre,
-  pieces: [round(k.turned('tyre', 'tyre', 'z', k.tyreProfile(t.width, w.rim.radius, t.outer, 0.1)))],
+  local tread = std.get(t, 'tread'),
+  local body = if tread == null then t.outer else t.outer - tread.depth,
+  pieces: [round(k.turned('tyre', 'tyre', 'z', k.tyreProfile(t.width, w.rim.radius, body, 0.1)))]
+          + (if tread == null then [] else k.shoulderLugs(t.width, body - 0.01, t.outer, tread.lugs)),
   finish: { tyre: 'rubber-black' },
 };
 // The rim in the wheel's frame: a barrel the tyre seats on, and spokes from the hub out to it on the face.
