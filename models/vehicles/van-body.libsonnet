@@ -146,8 +146,8 @@ local pressings(id, title, s0) = {
   ] + (if slideFront < bodyFront then [wall('front_lower', [slideFront, bodyFront], [b.sill, b.waist])] + bands('front_lower', [slideFront, bodyFront], b.side) else []))
   + std.map(k.near, upper('upper', tail, s.slideRear, rearWindows) + [
     box('over_door', 'paint', [s.slideRear, b.doorTop, b.glassIn], [bodyFront, b.canton, b.glassOut]),
-    box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug]),
-  ] + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
+  ] + (if s.sideDoorSlides then [box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug])] else [])
+  + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
   + std.map(k.far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
     + bands('wall_mid', [s.slideRear, bodyFront], b.side)
     + upper('upper', tail, bodyFront, b.windows)),
