@@ -1,13 +1,8 @@
 ---
 type: breaking
 ---
-A fire engine's locker kit is loose catalogue items, so a game can loot it or stow more: each
-`fire_engine_locker_stowage_<locker>` part holds only its shelves, board and strap, and offers stowage slots, ports
-of mount `stowage` with the words they accept and the envelope their kit must stay inside. A placements site's new
-`stowed` maps those slots to the items it carries, each item seated by its own `stowage` port, and its new `behind`
-names the shutter that hides it. New items: `breathing_air_cylinder`, `fire_hose_roll`, `standpipe`, `hydrant_key`,
-`branch_nozzle`, `traffic_cone`, `portable_fire_pump` and `ventilation_fan`. `skelly.ground-vehicles` now depends on
-the containers, hand tools, household, machinery, medicine and structures packs.
+A fire engine's locker kit is catalogue items in stowage slots, so a game can loot it or stow more: a placements
+site's new `stowed` names the item in each slot of its part, and its new `behind` names the closure that hides it.
 
 Upgrade:
 - Load the packs `skelly.ground-vehicles` now depends on with it.

@@ -28,7 +28,8 @@ exported on the part's GLB as port nodes as `docs/decisions/0009-component-mount
 A stowable catalogue item declares one male `stowage` port whose `standard` is its word, at the point it rests or
 hangs by. An item fits a slot when its word is one the slot accepts and its bounds, mated, stay inside the envelope.
 The item meets the slot as any port meets its mate: its normal against the slot's, its up along the slot's. Items
-that share a word share the seat convention, so any of them can take another's place.
+that share a word share the seat convention (`models/stowage.libsonnet`, `words`), so any of them can take another's
+place.
 
 A vehicle site of a part with slots names its **load-out**, `stowed`, slot id to item model id: what the vehicle
 holds when it is spawned. After spawn the contents are the game's state; the asset says only what fits where and
@@ -39,11 +40,26 @@ at the reflected point turned half a turn about the vertical. So the turned enve
 which holds when each envelope is centred on its slot along the vehicle's length; the check holds every slot to it.
 
 A stowage site may name `behind`, the site of the closure that hides it, so a consumer can skip drawing kit behind
-a shut door. Kit uses the item's own model; a coarser one waits for a measurement that needs it.
+a shut door; the closure must have a motion, or the kit would be hidden for good. Kit uses the item's own model; a coarser one waits for a measurement that needs it.
 
 The build refuses a slot whose envelope reaches into another's or into the part's fit-out, and a load-out whose
 item does not exist, is in a pack the vehicle's does not depend on, has no word the slot accepts or does not fit;
-see `tools/stowage.mjs`.
+see `tools/stowage.mjs`. The fit allows nothing past the envelope, since a shutter clears only what stays inside.
+
+## Rejected options
+
+- **Baked kit in named groups a game hides:** kit could only ever be taken out, never stowed, and the baked look, the
+  loot item and the table pairing them would be three copies that drift.
+- **Slots and items near, a fused baked load-out far:** two drawings need an equality test, the far one shows a
+  looted locker as full, and far kit is mostly behind its shutter or a few pixels anyway.
+- **A fixed list of item ids per slot:** a new item would need every slot that could hold it edited, where a word and
+  an envelope take any kit that fits, from any pack or mod.
+- **Shelves and boards in the body part:** they belong to the locker the kit stows in, so they stay with its slots
+  and the fit check they face, and a body without lockers keeps no orphan shelves.
+- **A separate coarse stowed model per item:** a second drawing of each item drifts from the first; a coarser one
+  waits for a measurement and, if made, serves every use of the item, not only stowage.
+- **Always drawing stowed kit:** kit behind a shut shutter costs draws and shows nothing; `behind` lets a consumer
+  skip it, and whether it does is the consumer's call.
 
 ## Consequences
 
