@@ -10,6 +10,10 @@
       h1 { font-size: 1.4rem; }
       h2 { font-size: 1rem; margin-top: 2rem; }
       button, select { font: inherit; }
+      nav button[aria-pressed=true] { font-weight: bold; }
+      .verdict-fails { color: #ff8f8f; }
+      .verdict-judged { color: #e6c36a; }
+      .vehicles-proposal { white-space: pre-wrap; }
       #issues:empty::before { content: 'None'; }
       #issues { white-space: pre-wrap; }
       table { border-collapse: collapse; width: 100%; }
@@ -21,8 +25,12 @@
   <body>
     <header>
       <h1>Vehicle authoring</h1>
+      <nav>
+        <button id="show-blueprints" type="button" aria-pressed="true">Blueprints</button>
+        <button id="show-vehicles" type="button" aria-pressed="false">Vehicles</button>
+      </nav>
     </header>
-    <main>
+    <main id="blueprints-view">
       <div class="toolbar">
         <label>Blueprint <select id="blueprint"></select></label>
         <label>Open saved blueprint <input id="open" type="file" accept=".json,application/json" /></label>
@@ -50,6 +58,17 @@
         <h2>Schema issues</h2>
         <pre id="issues"></pre>
       </section>
+    </main>
+    <main id="vehicles-view" hidden>
+      <p class="vehicles-status" role="status"></p>
+      <table>
+        <thead>
+          <tr><th>Vehicle</th><th>Site</th><th>Part</th><th>Swing</th><th>Detail</th><th></th></tr>
+        </thead>
+        <tbody class="vehicles-sites"></tbody>
+      </table>
+      <h2>Proposal</h2>
+      <pre class="vehicles-proposal"></pre>
     </main>
     <script type="module" src="./src/main.ts"></script>
   </body>

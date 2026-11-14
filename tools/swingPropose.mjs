@@ -2,7 +2,7 @@
 // lets it open all the way, else the longest stop it can have where it is. It only proposes. What the author does with
 // it is a hand-merge into the part's pins or `open`, as the vehicle authoring tool's README says of Save, because the
 // pins are drawn by a template that other vehicles share. The reason for the search is in
-// `docs/decisions/0016-swing-check.md`, "Failure and fix".
+// `docs/decisions/0016-swing-check.md`, "A failing site gets a proposal, never an edit".
 import { dot, normalize, sub } from './packages/construct/src/foundation/math.ts';
 import { centreOf, piecesBounds } from './packages/thing-core/src/motion.ts';
 import { motionAtSite, resolveMotion, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
@@ -36,6 +36,10 @@ function candidatesOf(site, axis, grain) {
     .sort((p, q) => Math.hypot(...p) - Math.hypot(...q) || p[0] - q[0])
     .map(([i, j]) => scaled(inboard, i * grain).map((value, k) => value + (down ? down[k] * j * grain : 0)));
 }
+
+// `proposeFix` as a worker pool runs it, which takes one argument: a search sweeps for minutes, which a dev server must
+// not do on its own thread.
+export const proposeTask = ({ pieces, vehicle, site }) => proposeFix(pieces, vehicle, site);
 
 // A proposal for one site of a vehicle, from `readSitePieces`' output: `{ status, clear, offset?, stop?, reachable? }`.
 // `status` is `ok` when the site already opens all the way, `moved` when the hinge line offset (`offset` in the vehicle

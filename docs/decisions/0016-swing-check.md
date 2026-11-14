@@ -5,6 +5,7 @@ read_if:
   - adding a vehicle part that opens, or placing one beside another
   - the swing check is slow, or CI's swing cache misses
   - changing how a part's motion is resolved, or what the placements export says about a swing
+  - a swing needs fixing, or the vehicle authoring tool's Vehicles view or its Solve proposal is in question
 ---
 
 # 16. A vehicle part that opens swings clear of the rest of the vehicle
@@ -71,6 +72,19 @@ every entry present.
 
 The budget is a reason, not a figure: the check may cost a PR what the rest of its build does and no more, and a
 change that makes it cost more is a defect to fix in the sweep and not a reason to run it less.
+
+## A failing site gets a proposal, never an edit
+
+`tools/swingPropose.mjs`, `proposeFix`, searches for the smallest move of a failing hinge line, inboard and down in
+grain steps within a bounded reach, that lets the site open its whole stop, and failing that the longest stop that
+clears. It confirms every candidate with the checker's own sweep, never with a rule of its own, so a proposal and a
+verdict cannot disagree. The vehicle authoring tool's Vehicles view shows each site's verdict from
+`swingReport`'s `verdicts` and calls the proposer through its dev server.
+
+It proposes and writes nothing, because the pins are drawn by a template that other vehicles share: the offset in the
+vehicle frame cannot say which template parameter to change, and a silent edit to shared content would move vehicles
+nobody opened. The author hand-merges it, as with the tool's Save. The verdicts need Jsonnet evaluated in Node, so only
+the dev server shows them; a published tool has no Vehicles view data.
 
 ## Consequences
 
