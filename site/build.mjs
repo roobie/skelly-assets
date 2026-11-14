@@ -28,6 +28,7 @@ import { readWields, wieldSequences } from '../tools/wields.mjs';
 import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
+import { MIRRORED_AXIS } from './modelFrame.mjs';
 import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
 import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -127,17 +128,15 @@ const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
-// The axis a mirrored site reflects its model across (site/render.mjs, loadSites).
-const MIRRORED_AXIS = 0;
-// The kit a vehicle's load-outs stow, as sites of their own: each item seated in its slot (tools/stowage.mjs), a far
-// twin's slot turned rather than reflected, since an item is never mirrored.
+// The kit a vehicle's load-outs stow, as sites of their own `in` the locker's: each item seated in its slot
+// (tools/stowage.mjs), a far twin's slot turned rather than reflected, since an item is never mirrored.
 const stowedSites = (sites) => {
   const stowing = sites.filter(({ stowed }) => stowed !== undefined);
   const stowage = readStowage(built, manifest.models, stowing.flatMap(({ part, stowed }) => [part, ...Object.values(stowed)]));
   return stowing.flatMap(({ id, part, at, mirror, stowed }) => Object.entries(stowed).map(([slotId, item]) => {
     const { frame } = stowage.get(part).slots.find((slot) => slot.id === slotId);
     const { rotation, at: offset } = stowedPose(mirror ? farSlot(frame, MIRRORED_AXIS) : frame, stowage.get(item).seats[0].frame);
-    return { site: `${id}/${slotId}`, model: item, at: at.map((x, a) => x + offset[a]), turn: mat3ToQuat(rotation) };
+    return { site: `${id}/${slotId}`, in: id, model: item, at: at.map((x, a) => x + offset[a]), turn: mat3ToQuat(rotation) };
   }));
 };
 

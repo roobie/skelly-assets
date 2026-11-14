@@ -6,7 +6,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
 import { hideCovered } from './hiding.mjs';
-import { FRONT_QUARTER } from './modelFrame.mjs';
+import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
 import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { boneTransforms } from './kinematics.mjs';
 
@@ -53,7 +53,7 @@ function load(model) {
 }
 
 // Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
-// across its own x = 0 plane when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
+// across its own plane through the origin (modelFrame.mjs, MIRRORED_AXIS) when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
 // in site order, so the viewer can move each one apart. What a worn piece's site covers of the doll is not drawn
 // (hiding.mjs).
 function loadSites(entry) {
@@ -68,7 +68,7 @@ function loadSites(entry) {
         part.name = site.site ?? site.model;
         part.position.fromArray(site.at);
         if (site.turn) part.quaternion.fromArray(site.turn);
-        if (site.mirror) part.scale.x = -1;
+        if (site.mirror) part.scale.setComponent(MIRRORED_AXIS, -1);
         if (site.paint) repaint(part, site.paint);
         scene.add(part);
         triangles += parts[i].triangles;
@@ -120,16 +120,21 @@ function piecesOf(obj, entry) {
 }
 
 // Each piece of an instance of `entry`, where it sits assembled and how far it moves when exploded; see explode.mjs.
+// A site stowed `in` another moves with it, so kit stays in its locker rather than coming apart as a part of its own.
 export function explodable(obj, entry) {
   const pieces = piecesOf(obj, entry);
-  const boxes = pieces.map((piece) => {
-    const box = new THREE.Box3().setFromObject(piece);
-    return { min: box.min.toArray(), max: box.max.toArray() };
-  });
-  return explode(boxes).map((offset, i) => ({
-    part: pieces[i],
-    home: pieces[i].position.clone(),
-    offset: new THREE.Vector3(...offset),
+  const sites = entry.components ? [] : entry.sites ?? [];
+  const index = new Map(sites.map(({ site }, i) => [site, i]));
+  const mover = pieces.map((piece, i) => index.get(sites[i]?.in) ?? i);
+  const boxes = pieces.map(() => new THREE.Box3());
+  pieces.forEach((piece, i) => boxes[mover[i]].expandByObject(piece));
+  const moving = [...new Set(mover)];
+  const offsets = explode(moving.map((i) => ({ min: boxes[i].min.toArray(), max: boxes[i].max.toArray() })));
+  const offsetOf = new Map(moving.map((i, k) => [i, offsets[k]]));
+  return pieces.map((piece, i) => ({
+    part: piece,
+    home: piece.position.clone(),
+    offset: new THREE.Vector3(...offsetOf.get(mover[i])),
   }));
 }
 
