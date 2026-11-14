@@ -240,7 +240,8 @@ local pressings(id, title, s0) = {
       box('upper', 'paint', [s.slideRear, b.waist, b.glassIn], [slideFront, b.doorTop, b.glassOut]),
     ]) + bands('skin', [s.slideRear, slideFront], b.side), finish, doorAnchors) + { title: title + ' side door' },
     if rearShutter then
-      // One curtain across the opening: flat slats in the door's own plane, so the side outline stays solid.
+      // One curtain across the opening: flat slats in the door's own plane, so the side outline stays solid. It rolls up
+      // into the rear header, leaving its bottom slat under the lintel as a roller shutter's bottom bar hangs.
       local slat = 0.1875;
       local groove = grain * 2;
       local count = std.floor((b.doorTop - b.rearSill - groove) / slat);
@@ -268,7 +269,7 @@ local pressings(id, title, s0) = {
       ]) + [
         box('band' + i, 'band' + i, [tail - grain, s.bands[i].y[0], -b.hatchSide], [tail, s.bands[i].y[1], b.hatchSide])
         for i in std.range(0, std.length(s.bands) - 1)
-      ], finish + { rib: 'plastic-grey' }, { hinge_a: ['skin', [0.5, 1, 0.1]], hinge_b: ['skin', [0.5, 1, 0.9]] }) + { title: title + ' rear shutter' }
+      ], finish + { rib: 'plastic-grey' }, motion=k.motion.slide('up', b.doorTop - b.rearSill - slat, stow=true)) + { title: title + ' rear shutter' }
     else
     // One leaf of the pair, hinged on the body's outer edge.
     k.compound(id + '_rear_door', 28, [
