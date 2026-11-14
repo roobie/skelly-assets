@@ -15,7 +15,7 @@ interface Site {
   readonly mirror?: boolean;
 }
 
-// Every vehicle's folding door panels, the sites that place them and the vehicle grain they are drawn at.
+// Every vehicle's folding door panels, the sites that place them and the vehicle grain a row without its own is drawn at.
 const { grain, vehicles, rows } = JSON.parse(evaluateJsonnet(`
   local placements = import 'models/vehicles/placements.libsonnet';
   local frame = import 'models/vehicles/frame.libsonnet';
@@ -35,7 +35,8 @@ const loaded = loadCatalogue({ units: { metresPerUnit: 1, grid: 0.001, bevel: 0 
 // Each panel's motion and the box each of its solids' voxels fill, both in the model frame about the panel's origin.
 const panels = new Map(
   loaded.items.map((item) => {
-    const built = buildItem(item, loaded, { voxelGrain: grain });
+    const voxelGrain = item.voxelGrain ?? grain;
+    const built = buildItem(item, loaded, { voxelGrain });
     const { defs, placed } = built.report.resolved;
     const part = item.parts[0]!.id;
     const place = (point: Vec3) => applyPoint(placed.get(part)!, point);
@@ -45,7 +46,7 @@ const panels = new Map(
       const bound = (pick: typeof Math.min) => a.map((value, axis) => pick(value, b[axis]!)) as unknown as Vec3;
       return { min: bound(Math.min), max: bound(Math.max) };
     });
-    return [item.id, { motion: itemMotion(item, loaded, built, grain)!, boxes, forward: item.forward! }] as const;
+    return [item.id, { motion: itemMotion(item, loaded, built, voxelGrain)!, boxes, forward: item.forward! }] as const;
   }),
 );
 

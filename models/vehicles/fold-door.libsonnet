@@ -9,11 +9,16 @@
 // its origin on their line, a whole number of grains long and as deep as the leaf, which lies about its mid-plane.
 local k = import 'kit.libsonnet';
 local voxels = import 'models/voxel-grains.libsonnet';
-local grain = voxels.classes.vehicle.grain;
+// A panel is drawn on its own grain, finer than the vehicle's: a pair's leaves, rounded to whole grains, close up to four
+// grains apart past the room their fold needs, and at the vehicle grain that is a slot rather than a seam. The grain
+// lies on the detail lattice every row's own grain must nest in.
+local grain = 2 * voxels.detailGrain;
 local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9;
 {
-  // A leaf is as thin as a feature that reads as itself at the grain, so its faces lie on its panels' lattice.
-  thick:: voxels.featureVoxels * grain,
+  grain:: grain,
+  // A leaf is as deep as a bus door's frame. The thinner a leaf, the less its corners swing past the room it folds into,
+  // so the closer a pair can close.
+  thick:: 0.04,
   // The width of a leaf that folds out of `room` along the doorway, `thick` deep. On its way out the free panel's outer
   // corner swings past the leaf's far end by 2 * (hypot(p, thick) - p), p being a panel's width, so a leaf that fills its
   // room would cut into whatever lies past it; the leaf that fits is the widest whose panel's diagonal is at most half

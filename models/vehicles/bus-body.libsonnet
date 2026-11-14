@@ -293,7 +293,7 @@ local pressings(id, title, s) = {
       box('stile_aft', 'door', [aft, 0, -t], [aft + 0.03, h, t]),
       box('stile_fwd', 'door', [fwd - 0.03, 0, -t], [fwd, h, t]),
       box('head', 'door', [aft, h - 0.06, -t], [fwd, h, t]),
-    ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion),
+    ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion) + { voxelGrain: foldDoor.grain },
   local leaves = std.flattenArrays([
     local fold = g.fold(leaf);
     [
