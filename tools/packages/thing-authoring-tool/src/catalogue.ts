@@ -21,6 +21,7 @@ import {
   array,
   boolean,
   check,
+  exactOptional,
   finite,
   type InferOutput,
   integer,
@@ -82,6 +83,14 @@ const PortSchema = strictObject({
   id: name,
   mount: name,
   gender: picklist(['male', 'female']),
+  standard: exactOptional(name),
+  accepts: exactOptional(pipe(array(name), nonEmpty())),
+  envelope: exactOptional(
+    pipe(
+      strictObject({ min: ModelPointSchema, max: ModelPointSchema }),
+      check(({ min, max }) => min.every((value, axis) => value < max[axis]!), 'envelope min must lie below its max'),
+    ),
+  ),
   pos: ModelPointSchema,
   normal: ModelPointSchema,
   up: ModelPointSchema,

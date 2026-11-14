@@ -9,11 +9,12 @@ import { applyDir, compose } from '@skelly/construct/foundation/math.ts';
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
 import { type Obb, worldBox } from '@skelly/construct/shapes/geometry.ts';
 import { displayBevel, meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
-import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { DomainUnits, Solid } from '@skelly/construct/shapes/solid.ts';
 import { type MaterialDef, surfaceOf } from '@skelly/thing-core/materials';
 import { resolveAppearance, solidColor, srgbToHex } from '@skelly/thing-export/appearance.ts';
 import type { AppearanceContext, Palette } from '@skelly/thing-export/exportTypes.ts';
 import type * as Three from 'three';
+import { wearFabric } from '../../../fabric.mjs';
 
 const FAIL = 0xe5_53_4b;
 const KEEP_OUT = 0x9d_7c_d8;
@@ -126,9 +127,18 @@ const renderedItems = ({
   });
 };
 
+/** `finish` with its fabric's lengths in the domain's units, since the grain is laid in the mesh's own coordinates. */
+const finishInUnits = (finish: MaterialDef['finish'], { metresPerUnit }: DomainUnits): MaterialDef['finish'] => {
+  const { fabric } = finish;
+  return fabric
+    ? { ...finish, fabric: { ...fabric, grain: fabric.grain / metresPerUnit, fold: fabric.fold / metresPerUnit } }
+    : finish;
+};
+
 /**
- * A finish-mode surface draws its material's see-through and sheen as deadvox does, so glass reads as glass where
- * it is authored. Diagnostic colouring stays opaque, because it shows roles and failures, not the finish.
+ * A finish-mode surface draws its material's see-through, sheen and fabric grain as deadvox does, so glass reads
+ * as glass and cloth as cloth where it is authored. Diagnostic colouring stays opaque, because it shows roles and
+ * failures, not the finish.
  */
 const surfaceMaterial = (
   three: ThreeRuntime,
@@ -146,6 +156,9 @@ const surfaceMaterial = (
   }
   const material = new three.MeshPhysicalMaterial({ ...surface, sheen: 1, sheenRoughness: sheen.roughness });
   material.sheenColor.setRGB(...sheen.colour, three.SRGBColorSpace);
+  if (finish.fabric) {
+    wearFabric(material, finish.fabric);
+  }
   return material;
 };
 
@@ -219,7 +232,7 @@ export function buildLayers(
       const smooth = s.kind === 'revolved';
       const mesh = new three.Mesh(
         geometry,
-        surfaceMaterial(three, appearance.finish, colorMode === 'finish' && !failing, {
+        surfaceMaterial(three, finishInUnits(appearance.finish, resolved.domain.units), colorMode === 'finish' && !failing, {
           color,
           flatShading: !smooth,
           roughness: appearance.finish.roughness,

@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 // A cylinder standing on y from `y0` to `y1`, centred at (x, z).
@@ -68,7 +69,7 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     box('post-b', 'handle', [0.035, 0.17, -0.01], [0.045, 0.19, 0.01]),
     box('latch-a', 'latch', [-0.095, 0.17, -0.006], [-0.075, 0.176, 0.014]),
     box('latch-b', 'latch', [0.075, 0.17, -0.006], [0.095, 0.176, 0.014]),
-  ], { case: 'plastic-red', seam: 'plastic-grey', cross: 'paint-white', handle: 'plastic-grey', latch: 'plastic-white' }) + { title: 'First aid box' }
+  ], { case: 'plastic-red', seam: 'plastic-grey', cross: 'paint-white', handle: 'plastic-grey', latch: 'plastic-white' }) + { title: 'First aid box' } + stow.stows(stow.resting('case', [0, 0, 0]))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A blue plastic 30 gallon closed-head barrel, 480 mm across and 720 mm tall, with two moulded rolling

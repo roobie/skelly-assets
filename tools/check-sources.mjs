@@ -1,7 +1,8 @@
 // Holds every model's taxonomy to the vocabulary (tools/taxonomy.mjs, taxonomyReport) and its title to the title rule
 // (tools/titles.mjs, titleReport), every vehicle's parts at different sites clear of each other
-// (tools/siteOverlap.mjs, overlapReport) and swing clear of them as they open (tools/swingClearance.mjs, swingReport),
-// and lists the models without a category, for authors and tagging agents.
+// (tools/siteOverlap.mjs, overlapReport), swing clear of them as they open (tools/swingClearance.mjs, swingReport) and
+// every locker's stowage slots clear of each other and of its fit-out (tools/stowage.mjs, stowageReport), and lists the
+// models without a category, for authors and tagging agents.
 // tools/build.mjs runs the same reports before it builds anything.
 // Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...]. It exits 1 when any problem remains in the
 // selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the vocabulary does not list
@@ -15,6 +16,7 @@ import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { overlapReport, readSitePieces } from './siteOverlap.mjs';
+import { stowageReport } from './stowage.mjs';
 import { swingReport, swingResults } from './swingClearance.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
 import { titleReport } from './titles.mjs';
@@ -44,17 +46,18 @@ export const sourceReport = (models, vocabulary) => {
   return { ...report, problems: [...report.problems, ...titleReport(models)] };
 };
 
-// The vehicles' site overlaps (tools/siteOverlap.mjs) and swings (tools/swingClearance.mjs) as report entries: the
-// problems, the contacts nobody has judged, and each moving site's swing for the placements output. The sites are read
-// once for both. `cache` is the export cache folder, whose `swing` folder keeps each vehicle's sweep, and `prune` drops
-// the entries no vehicle uses, as only a run over every vehicle may.
+// The vehicles' site overlaps (tools/siteOverlap.mjs), swings (tools/swingClearance.mjs) and stowage slots
+// (tools/stowage.mjs) as report entries: the problems, the contacts nobody has judged, and each moving site's swing for
+// the placements output. The sites are read once for overlaps and swings. `cache` is the export cache folder, whose
+// `swing` folder keeps each vehicle's sweep, and `prune` drops the entries no vehicle uses, as only a run over every
+// vehicle may.
 export const vehicleReport = async (root = repo, { cache, prune = false } = {}) => {
   const pieces = readSitePieces(root);
   const overlaps = overlapReport(pieces);
   const swings = swingReport(pieces, (await swingResults(pieces, { cache, prune })).results);
   const entries = (messages) => messages.map((message) => ({ message }));
   return {
-    problems: entries([...overlaps.problems, ...swings.problems]),
+    problems: entries([...overlaps.problems, ...swings.problems, ...stowageReport(root)]),
     unjudged: entries([...overlaps.notes, ...swings.notes]),
     swing: swings.exports,
   };

@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local disc = h.disc;
@@ -157,7 +158,7 @@ local collapsedDrum(length, width, thick, plate) =
   ] + [
     box('latch-%s' % s.id, 'latch', [s.x0, 0.1, -0.018], [s.x0 + 0.01, 0.155, 0.018])
     for s in [{ id: 'left', x0: -0.115 }, { id: 'right', x0: 0.105 }]
-  ], { shell: 'plastic-grey', trim: 'plastic-black', latch: 'plastic-yellow' }) + { title: 'Small plastic case' }
+  ], { shell: 'plastic-grey', trim: 'plastic-black', latch: 'plastic-yellow' }) + { title: 'Small plastic case' } + stow.stows(stow.resting('case', [0, -0.004, 0], [0, 0, -1]))
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } } + { forward: '-z' },
 
   // A zipped garment bag lying flat, 1.3 m long with its hanger hook, 600 mm wide and 70 mm thick: a navy bag

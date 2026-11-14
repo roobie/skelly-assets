@@ -3,12 +3,14 @@
 // three.js. A motion is thing-core's `Motion`; a pose is one rigid motion as twelve numbers: a row-major 3x3 turn, then
 // the shift. The reason for the model is in docs/decisions/0015-motion-as-content.md.
 
+import { MIRRORED_AXIS } from './modelFrame.mjs';
+
 export const IDENTITY = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
 
 // The vehicle frame's lateral axis, which a far-side twin is reflected across: the swing check works in the authored
 // frame, the showcase in the glTF model frame.
 export const AUTHORED_LATERAL = 2;
-export const MODEL_LATERAL = 0;
+export const MODEL_LATERAL = MIRRORED_AXIS;
 
 export function apply(m, [x, y, z], out) {
   out[0] = m[0] * x + m[1] * y + m[2] * z + m[9];
