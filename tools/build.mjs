@@ -20,6 +20,8 @@ import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
+import { readSitePieces } from './siteOverlap.mjs';
+import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
@@ -205,6 +207,7 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
     console.log(cacheReport(pool.usage()));
+    await swingResults(readSitePieces(root), { cache, shard });
   } finally {
     await pool.close();
   }

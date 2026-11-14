@@ -14,6 +14,7 @@ import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, TOWARD } from './packages/thing-core/src/motion.ts';
+import { shardUnits } from './generation.mjs';
 import { key } from './siteOverlap.mjs';
 import { poseAt, shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -119,8 +120,9 @@ const CACHE_FOLDER = 'swing';
 
 // The sweeps of every vehicle with a moving part: from the cache folder when a vehicle's inputs and the checker are as
 // they were, else swept on worker threads, one vehicle each, and kept. Vehicles with the same inputs share one sweep.
-// With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
-export async function swingResults(data, { cache, workers = availableParallelism(), prune = false } = {}) {
+// With `shard`, only that shard of the distinct sweeps is made, so CI can spread a clean build's sweeps over runners
+// like its models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
+export async function swingResults(data, { cache, workers = availableParallelism(), prune = false, shard } = {}) {
   const tasks = sweepTasks(data);
   const checker = checkerHash();
   const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
@@ -133,7 +135,8 @@ export async function swingResults(data, { cache, workers = availableParallelism
   const fileOf = (hash) => join(folder, `${hash}.json`);
   const swept = new Map();
   const missing = [];
-  for (const [hash, { task }] of byHash) {
+  const mine = shard === undefined ? [...byHash] : shardUnits([...byHash], shard);
+  for (const [hash, { task }] of mine) {
     if (folder && existsSync(fileOf(hash))) swept.set(hash, JSON.parse(readFileSync(fileOf(hash), 'utf8')));
     else missing.push([hash, task]);
   }
@@ -153,8 +156,8 @@ export async function swingResults(data, { cache, workers = availableParallelism
     for (const name of readdirSync(folder)) if (!byHash.has(name.replace(/\.json$/, ''))) rmSync(join(folder, name));
   }
   const results = {};
-  for (const [hash, { vehicles }] of byHash) for (const vehicle of vehicles) results[vehicle] = swept.get(hash);
-  return { results, reused: byHash.size - missing.length, swept: missing.length };
+  for (const [hash, { vehicles }] of byHash) if (swept.has(hash)) for (const vehicle of vehicles) results[vehicle] = swept.get(hash);
+  return { results, reused: mine.length - missing.length, swept: missing.length };
 }
 
 // Every pair of sites that touch in a vehicle's sweep, as Map(pair key -> { sites, depth, pieces, at?, extent?, sweep }):
