@@ -21,6 +21,8 @@ import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
+import { readSitePieces } from './siteOverlap.mjs';
+import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
@@ -209,6 +211,7 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
     console.log(cacheReport(pool.usage()));
+    await swingResults(readSitePieces(repo), { cache, shard });
   } finally {
     await pool.close();
   }
@@ -235,10 +238,12 @@ async function main() {
   const sources = positionals.length === 0 ? await modelSources(repo) : [];
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
+  let swings = {};
   if (positionals.length === 0) {
     const report = sourceReport(sources, vocabulary);
     const { unlisted } = report;
-    const vehicles = vehicleReport(repo);
+    const vehicles = await vehicleReport(repo, { cache, prune: true });
+    swings = vehicles.swing;
     const problems = [...report.problems, ...vehicles.problems];
     for (const { message } of [...unlisted, ...vehicles.unjudged]) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
@@ -270,6 +275,7 @@ async function main() {
         vehicleRows: readVehicleRows(repo),
         dependsOn,
         vocabulary,
+        swings,
         finishes,
         out,
       });

@@ -8,8 +8,8 @@ local s = import 'saloon.spec.libsonnet';
   sites(base): powertrain.hybrid(base, {
     over: { front_bumper: { part: 'hybrid_saloon_front_bumper' } },
     port: { part: 'charge_port', at: [s.rearAxle - 0.15, s.archTop + 0.05, s.side] },
-    add: site.pair('badge', 'hybrid_badge', [s.cowl - 0.25, s.waist - 0.2, s.side])
-         + [site.one('rear_badge', 'hybrid_badge_rear', [s.rear + 0.02, 0.8, 0.4])],
+    add: site.pair('badge', 'hybrid_badge', [s.cowl - 0.25, s.waist - 0.2, s.side], 'front_door')
+         + [site.one('rear_badge', 'hybrid_badge_rear', [s.rear + 0.02, 0.8, 0.4], 'boot_lid')],
     // The motor-generator starts the engine and charges the battery, so the hybrid carries no starter or alternator.
     drop: ['alternator', 'starter_motor'],
     motor: { part: 'traction_motor_car', at: [s.frontAxle - 0.02, 0.3, 0.38] },

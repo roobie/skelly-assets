@@ -111,6 +111,10 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
     });
     const shipped = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
     assert.deepEqual(shipped.sites.find(({ id }) => id === 'motor').at, [0, 0, 1], 'a site laid out ahead along x ships ahead along +z');
+    assert.equal(shipped.sites.find(({ id }) => id === 'motor').swing, undefined, 'a site that does not move ships no swing');
+    exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, swings: { electric_van: { motor: { clear: 0.5, stop: 'body' } } }, out });
+    const swung = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
+    assert.deepEqual(swung.sites.find(({ id }) => id === 'motor').swing, { clear: 0.5, stop: 'body' });
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -121,7 +125,7 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
 test('a listed overlap names two different sites of the vehicle, its depth cap and its text', () => {
   const entry = (textKey, extra = {}) =>
     ({ sites: ['door_near', 'door_far'], depth: 0.05, [textKey]: 'the doors are seated in the body', ...extra });
-  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note']]) {
+  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note'], ['swingContacts', 'why'], ['swingUnjudged', 'note']]) {
     const listing = (entries) =>
       problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites, [listKey]: entries } });
     assert.equal(listing([entry(textKey)]), '');

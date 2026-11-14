@@ -16,7 +16,7 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
+const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'swingContacts', 'swingUnjudged', 'tags', 'title', 'unjudged']);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
@@ -147,6 +147,8 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
     else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes), ...ridesProblems(vehicle, entry.sites));
     if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
     if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
+    if (entry?.swingContacts !== undefined) problems.push(...listedOverlapProblems(vehicle, 'swingContacts', 'why', entry.swingContacts, [...(entry?.sites ?? []), { id: 'ground' }]));
+    if (entry?.swingUnjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'swingUnjudged', 'note', entry.swingUnjudged, [...(entry?.sites ?? []), { id: 'ground' }]));
   }
   return problems.sort();
 }
@@ -161,14 +163,21 @@ function vehicleTags(body, ...extras) {
   return tags;
 }
 
-// Writes each vehicle's sites under its own pack. models carry their taxonomy, so each vehicle gets its body's tags.
+// Writes each vehicle's sites under its own pack. models carry their taxonomy, so each vehicle gets its body's tags. A
+// site that moves carries its `swing` from `swings`, vehicle -> site -> { clear, stop? } (tools/swingClearance.mjs,
+// swingReport): the part of its way to its stop it opens before it touches anything, as a fraction of its motion's
+// clock, and what it touches there.
 // Returns the vehicles written, { id, title, pack, path, tags }, and every file as <pack>/<logical path>.
-export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, out }) {
+export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, swings = {}, out }) {
   const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes });
   if (problems.length > 0) throw new Error(`vehicle placements:\n  ${problems.join('\n  ')}`);
   const byModel = packsByModel(models);
   const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { forward, parent, sites: laid, tags, title }]) => {
-    const sites = laid.map((site) => ({ ...site, at: toModelFrame(forward, site.at) }));
+    const sites = laid.map((site) => ({
+      ...site,
+      at: toModelFrame(forward, site.at),
+      ...(swings[vehicle]?.[site.id] ? { swing: swings[vehicle][site.id] } : {}),
+    }));
     const { pack } = vehiclePack(vehicle, placements, vehicleRows, byModel);
     const path = placementsPath(vehicle);
     const file = join(out, outputPath(pack, path));

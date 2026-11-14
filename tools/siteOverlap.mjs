@@ -15,9 +15,11 @@ import { solid } from './pieceSolid.mjs';
 const repo = resolve(import.meta.dirname, '..');
 
 // Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
-// the overlaps it allows and has not judged, the fits by role and every drawn site's id: { grain, fits,
-// roles, vehicles: { vehicle: { parent?, sites: [{ id, part, pieces }], overlaps, unjudged } } }. A site whose part is
-// a roster model has no pieces to compare, so it is left out.
+// the overlaps it allows and has not judged, the fits by role and every drawn site's id: { grain, fits, roles, motions,
+// vehicles: { vehicle: { parent?, forward, sites: [{ id, part, pieces, mirror?, at, rides? }], overlaps, unjudged,
+// swingContacts, swingUnjudged } } }. A site whose part is a roster model has no pieces to compare, so it is left out.
+// `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
+// tools/swingClearance.mjs turns into the motion at each site.
 export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
   local k = import 'models/vehicles/kit.libsonnet';
@@ -28,8 +30,10 @@ export function readSitePieces(root = repo) {
     k.moved(if std.objectHas(site, 'mirror') then k.far(piece) else piece, site.at)
     for piece in drawn[site.part]
   ];
+  local moving = [row for row in rows if std.objectHas(row, 'motion')];
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
+    motions: { [row.id]: { stages: row.motion.stages, pieces: drawn[row.id] } for row in moving },
     fits: (import 'models/vehicles/seating.libsonnet').fits,
     roles: std.set(std.flattenArrays([
       [site.id for site in placements[vehicle].sites if std.objectHas(drawn, site.part)]
@@ -39,9 +43,12 @@ export function readSitePieces(root = repo) {
     vehicles: {
       [vehicle]: {
         parent: std.get(placements[vehicle], 'parent'),
+        forward: placements[vehicle].forward,
         sites: [site { pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
         overlaps: std.get(placements[vehicle], 'overlaps', []),
         unjudged: std.get(placements[vehicle], 'unjudged', []),
+        swingContacts: std.get(placements[vehicle], 'swingContacts', []),
+        swingUnjudged: std.get(placements[vehicle], 'swingUnjudged', []),
       }
       for vehicle in std.objectFields(placements)
       if std.objectHas(placements[vehicle], 'sites')
@@ -49,11 +56,11 @@ export function readSitePieces(root = repo) {
   }`, root));
 }
 
-const key = (a, b) => [a, b].sort().join('\n');
+export const key = (a, b) => [a, b].sort().join('\n');
 
 // The deepest point two solids share, as how far inside both it lies (m), or 0 when they share no more than `inside`:
 // a point must lie `inside` deep in both, and the solids are sampled every `step` m through the box they share.
-function sharedDepth(p, q, inside, step) {
+export function sharedDepth(p, q, inside, step) {
   const lo = [0, 1, 2].map((i) => Math.max(p.min[i], q.min[i]) + inside);
   const hi = [0, 1, 2].map((i) => Math.min(p.max[i], q.max[i]) - inside);
   if (lo.some((l, i) => l > hi[i])) return 0;

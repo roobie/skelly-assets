@@ -76,14 +76,22 @@ function(s) {
     ],
   // A moulded lip round the opening, `out` past it and `over` into it, from `low` up.
   flare(id, slot, axle, low, z, out, over, half=0.03):
+    local halves = outer.flareHalves(id, slot, axle, low, z, out, over, half=half);
+    halves.aft + halves.fore,
+  // The lip in two, cut across its top at `shut`, for an arch whose fore edge lies on a door: the `fore` half rides it.
+  flareHalves(id, slot, axle, low, z, out, over, shut=null, half=0.03):
     local x0 = axle - s.arch;
     local x1 = axle + s.arch;
     local top = s.archTop;
-    [
-      k.box(id + '_top', slot, [x0 + c, top - half, z[0]], [x1 - c, top + half, z[1]]),
-      k.prism(id + '_aft_slant', slot, [[x0 - out, top - c], [x0 + over, top - c], [x0 + c, top - half], [x0 + c, top + half]], z),
-      k.prism(id + '_fore_slant', slot, [[x1 - over, top - c], [x1 + out, top - c], [x1 - c, top + half], [x1 - c, top - half]], z),
-      k.box(id + '_back', slot, [x0 - out, low, z[0]], [x0 + over, top - c, z[1]]),
-      k.box(id + '_fore', slot, [x1 - over, low, z[0]], [x1 + out, top - c, z[1]]),
-    ],
+    local cut = if shut == null then x1 - c else std.clamp(shut, x0 + c, x1 - c);
+    {
+      aft: (if cut > x0 + c then [k.box(id + '_top', slot, [x0 + c, top - half, z[0]], [cut, top + half, z[1]])] else []) + [
+        k.prism(id + '_aft_slant', slot, [[x0 - out, top - c], [x0 + over, top - c], [x0 + c, top - half], [x0 + c, top + half]], z),
+        k.box(id + '_back', slot, [x0 - out, low, z[0]], [x0 + over, top - c, z[1]]),
+      ],
+      fore: (if cut < x1 - c then [k.box(id + '_top_fore', slot, [cut, top - half, z[0]], [x1 - c, top + half, z[1]])] else []) + [
+        k.prism(id + '_fore_slant', slot, [[x1 - over, top - c], [x1 + out, top - c], [x1 - c, top + half], [x1 - c, top - half]], z),
+        k.box(id + '_fore', slot, [x1 - over, low, z[0]], [x1 + out, top - c, z[1]]),
+      ],
+    },
 }

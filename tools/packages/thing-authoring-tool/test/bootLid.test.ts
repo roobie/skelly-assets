@@ -7,7 +7,7 @@ import { evaluateJsonnet } from '../../../jsonnet/index.mjs';
 import { buildItem, loadCatalogue } from '../src/catalogue.ts';
 import { exportItem } from '../src/exports.ts';
 
-it('hinges the boot lid on its drawn inboard pivots, lifting its tail', () => {
+it('hinges the boot lid on its top front edge, so it lifts its tail and never swings ahead of the hinge line', () => {
   const items = JSON.parse(evaluateJsonnet(`
     local body = import 'models/vehicles/car-body.libsonnet';
     local frame = import 'models/vehicles/frame.libsonnet';
@@ -38,14 +38,23 @@ it('hinges the boot lid on its drawn inboard pivots, lifting its tail', () => {
   const hinge = motion[0]!;
   expect(hinge.kind).toBe('hinge');
   if (hinge.kind !== 'hinge') return;
-  for (const [end, pivot] of [[hinge.axis.from, inModel('hinge_pivot_near')], [hinge.axis.to, inModel('hinge_pivot_far')]] as const) {
+  for (const [end, pin] of [[hinge.axis.from, inModel('hinge_a')], [hinge.axis.to, inModel('hinge_b')]] as const) {
     end.forEach((value, axis) => {
-      expect(value).toBeGreaterThanOrEqual(pivot.min[axis]!);
-      expect(value).toBeLessThanOrEqual(pivot.max[axis]!);
+      expect(value).toBeGreaterThanOrEqual(pin.min[axis]!);
+      expect(value).toBeLessThanOrEqual(pin.max[axis]!);
     });
-    expect(end[0]).toBeGreaterThan(skin.min[0]!);
-    expect(end[0]).toBeLessThan(skin.max[0]!);
-    expect(end[1]).toBeLessThan(skin.min[1]!);
+    expect(end[1]).toBeCloseTo(skin.max[1]!, 3);
+  }
+  // The lid's length runs along the level axis the hinge does not.
+  const along = Math.abs(hinge.axis.to[0] - hinge.axis.from[0]) > Math.abs(hinge.axis.to[2] - hinge.axis.from[2]) ? 2 : 0;
+  const hingeAt = hinge.axis.from[along];
+  const [toMin, toMax] = [Math.abs(hingeAt - skin.min[along]!), Math.abs(hingeAt - skin.max[along]!)];
+  expect(Math.min(toMin, toMax)).toBeLessThan(0.001);
+  const ahead = toMin < toMax ? -1 : 1;
+  const pick = (bits: number, axis: number) => ((bits >> axis) & 1 ? skin.max : skin.min)[axis]!;
+  const corners: Vec3[] = [0, 1, 2, 3, 4, 5, 6, 7].map((bits) => [pick(bits, 0), pick(bits, 1), pick(bits, 2)]);
+  for (const t of [0.25, 0.5, 0.75, 1]) {
+    for (const corner of corners) expect((posePoint(motion, corner, t)[along] - hingeAt) * ahead).toBeLessThan(0.001);
   }
   const tail: Vec3 = [0, skin.max[1]!, skin.min[2]!];
   expect(posePoint(motion, tail, 0.1)[1]).toBeGreaterThan(tail[1]);

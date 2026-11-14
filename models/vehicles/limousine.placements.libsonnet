@@ -14,8 +14,9 @@ local s = import 'limousine.spec.libsonnet';
     add: [
       site.one('stretch', 'limousine_stretch'),
       site.one('grille', 'luxury_saloon_grille', [0.65, -0.0225, 0]),
-      site.one('brightwork', 'limousine_brightwork'),
       site.one('facing_seat', 'limousine_facing_seat'),
-    ],
+    ]
+    + site.pair('front_door_brightwork', 'limousine_front_door_brightwork', rides='front_door')
+    + site.pair('rear_door_brightwork', 'limousine_rear_door_brightwork', rides='rear_door'),
   }),
 }
