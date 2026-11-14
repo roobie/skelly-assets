@@ -13,6 +13,8 @@ local words = {
   bar: 'long kit lying along the locker, resting',
   cone: 'a traffic cone, resting',
   machine: 'a machine on its own frame or foot, resting',
+  pad: 'a flat pad or bag lying on its face, resting',
+  block: 'a timber block or chock lying on its side, resting',
   // Hung kit seats on the face it hangs against, its normal into the board and its up toward its head; a slot it
   // hangs from faces out of the board, its up vertical.
   'hung-tool': 'a long-handled tool hung head up flat against a board',

@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local disc = h.disc;
@@ -81,7 +82,7 @@ local segment(i, n, r0, r) =
     box('tank', 'body', [-0.33, 0.020, -0.060], [-0.15, 0.110, 0.060]),
     disc('fuel-cap', 'cover', 0.018, 0.110, 0.125, -0.27, 0.0),
   ], { blade: 'steel-bright', guard: 'plastic-orange', body: 'plastic-orange', cover: 'plastic-white', engine: 'paint-charcoal', muffler: 'steel-grey', handle: 'plastic-black', grip: 'rubber-black' }) + { title: 'Petrol cut-off saw' }
-  + h.gripOn('petrol_cut_off_saw', 'grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  + h.gripOn('petrol_cut_off_saw', 'grip') + stow.stows(stow.resting('machine', [0.088, 0, -0.014])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A carton of adhesive plasters 75 mm wide, 95 mm tall and 28 mm deep standing upright, a blue printed band
   // across the top, a red cross and a single plaster pictured on its front.
