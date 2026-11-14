@@ -51,7 +51,8 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
   const [toMin, toMax] = [Math.abs(hingeAt - skin.min[along]!), Math.abs(hingeAt - skin.max[along]!)];
   expect(Math.min(toMin, toMax)).toBeLessThan(0.001);
   const ahead = toMin < toMax ? -1 : 1;
-  const corners: Vec3[] = [0, 1, 2, 3, 4, 5, 6, 7].map((bits) => [0, 1, 2].map((axis) => ((bits >> axis) & 1 ? skin.max : skin.min)[axis]!) as Vec3);
+  const pick = (bits: number, axis: number) => ((bits >> axis) & 1 ? skin.max : skin.min)[axis]!;
+  const corners: Vec3[] = [0, 1, 2, 3, 4, 5, 6, 7].map((bits) => [pick(bits, 0), pick(bits, 1), pick(bits, 2)]);
   for (const t of [0.25, 0.5, 0.75, 1]) {
     for (const corner of corners) expect((posePoint(motion, corner, t)[along] - hingeAt) * ahead).toBeLessThan(0.001);
   }
