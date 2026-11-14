@@ -1,6 +1,6 @@
 local k = import 'kit.libsonnet';
 local s = import 'security_walker_sleek.spec.libsonnet';
-local original = import 'security_walker.libsonnet';
+local original = import 'mech_walker_vehicle_1.libsonnet';
 local vehicle = import 'security_walker_sleek.placements.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local box = k.box;

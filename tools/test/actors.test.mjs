@@ -861,7 +861,7 @@ test('a keyed-rig mob row paces its walk at the speed its walk clip travels', as
   const { leaperClip } = await import('../packages/mobgen/src/mob/leaper/motion.ts');
   const { walkerClip } = await import('../packages/mobgen/src/mob/walker/motion.ts');
   const root = new URL('../..', import.meta.url).pathname;
-  for (const [id, clip] of [['leaper', leaperClip('stalk')], ['security-walker', walkerClip('stomp')]]) {
+  for (const [id, clip] of [['leaper', leaperClip('stalk')], ['mech_walker_mob_1', walkerClip('stomp')]]) {
     const row = readMobRows(root).find((candidate) => candidate.id === id);
     assert(Math.abs(row.walk_speed - clip.travel.at(-1)[1] / clip.seconds) < 0.01, `${id} walk_speed matches its clip`);
   }

@@ -1,7 +1,7 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
-local s = import 'security_walker.spec.libsonnet';
+local s = import 'mech_walker_vehicle_1.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;

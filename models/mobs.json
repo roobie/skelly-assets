@@ -2816,7 +2816,7 @@
       "walk_speed": 0.58
     },
     {
-      "id": "security-walker",
+      "id": "mech_walker_mob_1",
       "title": "Security walker",
       "pack": "skelly.bestiary.mech",
       "template": "security-walker",

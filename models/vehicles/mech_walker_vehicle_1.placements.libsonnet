@@ -1,5 +1,5 @@
 local site = import 'site.libsonnet';
-local s = import 'security_walker.spec.libsonnet';
+local s = import 'mech_walker_vehicle_1.spec.libsonnet';
 local roof = std.foldl(std.max, [p[1] for p in s.torso.profile], 0);
 {
   title: 'Security walker',

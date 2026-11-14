@@ -93,7 +93,7 @@
   'school_bus': import 'models/vehicles/school_bus.libsonnet',
   'scooter': import 'models/vehicles/scooter.libsonnet',
   'security_van': import 'models/vehicles/security_van.libsonnet',
-  'security_walker': import 'models/vehicles/security_walker.libsonnet',
+  'mech_walker_vehicle_1': import 'models/vehicles/mech_walker_vehicle_1.libsonnet',
   'security_walker_sleek': import 'models/vehicles/security_walker_sleek.libsonnet',
   'semi_tractor': import 'models/vehicles/semi_tractor.libsonnet',
   'semi_trailer': import 'models/vehicles/semi_trailer.libsonnet',
