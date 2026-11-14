@@ -49,6 +49,14 @@ test('a site that cannot be assembled from the built models is a problem', () =>
   assert.match(problems({ van: { title: 'Fixture Van', forward: '+y', sites: vanSites } }), /forward is not one of/);
 });
 
+// A rider that names no carrier moves with nothing, and only the swing check would notice.
+test('a site that rides another names a different site of the vehicle', () => {
+  const rider = (rides) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: [body, { id: 'handle', part: 'fixture_door', at: [0, 0, 0], rides }] } });
+  assert.equal(rider('body'), '');
+  assert.match(rider('gone'), /rides names another site/);
+  assert.match(rider('handle'), /rides names another site/);
+});
+
 // A finish seeds the paint of the part's copy, so one outside the library or on a part with nothing to paint would set
 // nothing, and only a game would notice.
 test('a site finish names a library material on a part that takes paint', () => {
@@ -111,6 +119,10 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
     });
     const shipped = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
     assert.deepEqual(shipped.sites.find(({ id }) => id === 'motor').at, [0, 0, 1], 'a site laid out ahead along x ships ahead along +z');
+    assert.equal(shipped.sites.find(({ id }) => id === 'motor').swing, undefined, 'a site that does not move ships no swing');
+    exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, swings: { electric_van: { motor: { clear: 0.5, stop: 'body' } } }, out });
+    const swung = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
+    assert.deepEqual(swung.sites.find(({ id }) => id === 'motor').swing, { clear: 0.5, stop: 'body' });
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -121,7 +133,7 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
 test('a listed overlap names two different sites of the vehicle, its depth cap and its text', () => {
   const entry = (textKey, extra = {}) =>
     ({ sites: ['door_near', 'door_far'], depth: 0.05, [textKey]: 'the doors are seated in the body', ...extra });
-  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note']]) {
+  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note'], ['swingContacts', 'why'], ['swingUnjudged', 'note']]) {
     const listing = (entries) =>
       problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites, [listKey]: entries } });
     assert.equal(listing([entry(textKey)]), '');
