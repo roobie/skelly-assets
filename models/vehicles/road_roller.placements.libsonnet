@@ -1,5 +1,12 @@
 local site = import 'site.libsonnet';
 local s = import 'road_roller.spec.libsonnet';
+local cooling = import 'cooling-kit.libsonnet';
+local plainEngines = import 'plain-engines.libsonnet';
+local engine = { part: 'engine_i3_small', at: [-1.3, 1.28, 0] };
+// A radiator's hoses run back from it, and a site cannot turn its part, so the radiator stands ahead of the engine with
+// its hoses reaching the engine's front face, inside the hood rather than out through its rear.
+local radiator = 'radiator_small';
+local radiatorX = engine.at[0] + plainEngines[engine.part].length / 2 + cooling.reach(radiator);
 {
   title: 'Road roller',
   sites: [
@@ -11,8 +18,8 @@ local s = import 'road_roller.spec.libsonnet';
     site.one('engine_hood', 'road_roller_engine_hood'),
     site.one('water_tank', 'road_roller_water_tank'),
     site.one('canopy', 'road_roller_canopy'),
-    site.one('engine', 'engine_i3_small', [-1.3, 1.28, 0]),
-    site.one('radiator', 'radiator_small', [-1.86, 1.34, 0]),
+    site.one('engine', engine.part, engine.at),
+    site.one('radiator', radiator, [radiatorX, 1.34, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [-0.45, 0.76, 0]),
     site.one('exhaust', 'road_roller_exhaust', [-1.1, s.hoodTop, -0.34]),
     site.one('seat', 'front_seat', [-0.1, s.deck + 0.26, 0]),
