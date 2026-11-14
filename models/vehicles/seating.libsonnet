@@ -269,7 +269,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['hitch', 'chassis', 0.065],
       ['radiator_hose_lower', 'chassis', 0.044],
       ['rear_step', 'chassis', 0.085],
-      ['rear_underrun', 'chassis', 0.085],
       ['resting_leg', 'chassis', 0.04],
       ['starter_motor', 'frame', 0.065],
       ['steering_box', 'frame', 0.085],
@@ -472,10 +471,9 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A hybrid motor\'s stator, lead or reducer runs into the engine intake, gearbox case or axle differential it is coupled to.',
+      'A hybrid motor\'s stator, lead or reducer runs into the engine intake or axle differential it is coupled to.',
       [
       ['motor', 'engine', 0.059],
-      ['motor', 'gearbox', 0.06],
       ['motor', 'rear_axle', 0.054],
       ],
     ),

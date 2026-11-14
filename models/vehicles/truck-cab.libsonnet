@@ -26,6 +26,8 @@ local crossmemberHalf = 0.05;
 // A leaf spring's half length and its width under the rail.
 local springHalf = 0.62;
 local springWidth = 0.1;
+// How far the rear underrun's bar and hangers reach forward from the frame's back end.
+local underrunDepth = 0.1;
 local defaults = {
   bonnet: null,
   crew: null,
@@ -86,6 +88,7 @@ local defaults = {
   engineX: self.frontAxle - 0.25,
   engineY: self.railTop - 0.58,
   gearboxLength: gearboxes[self.gearbox].length,
+  gearboxX: self.engineX - self.engineLength / 2 - self.gearboxLength / 2,
   // A taller case sinks so its top stays under the rail top.
   gearboxY: self.engineY + bellhousingRise - std.max(0, gearboxes[self.gearbox].height - tallestCase),
   exhaustX: self.engineX - 3.6,
@@ -103,13 +106,20 @@ local defaults = {
   wiper: true,
 };
 local spec(s) = defaults + s;
+// The crossmembers' middles along x, back to front. The front one closes the rails' ends ahead of the radiator and
+// engine, which stand between them; the rest spread from the rails' back ends to the gearbox's back, so none passes
+// through the engine or gearbox.
+local crossmembers(s) =
+  local rear = s.rear + 0.12;
+  local last = s.gearboxX - s.gearboxLength / 2 - crossmemberHalf;
+  [rear + i * (last - rear) / (crossmemberCount - 2) for i in std.range(0, crossmemberCount - 2)] + [s.railFront - crossmemberHalf];
 // The near leaf spring under the rail, from the seat of the axle at `x`, whose frame stands at `axleY`, up to the rail.
-// `front` stops its front hanger short of whatever stands ahead.
+// `front` and `back` stop its hangers short of whatever stands ahead and behind.
 local springZ(s) = [s.railZ - springWidth, s.railZ];
-local spring(name, s, x, axleY, seat, front=x + springHalf) =
+local spring(name, s, x, axleY, seat, front=x + springHalf, back=x - springHalf) =
   local z = springZ(s);
   assert seat.z[0] <= z[0] && seat.z[1] >= z[1] : name + "'s axle seat must span it";
-  box(name, 'spring', [x - springHalf, axleY + seat.y[1], z[0]], [std.min(front, x + springHalf), s.railBottom, z[1]]);
+  box(name, 'spring', [std.max(back, x - springHalf), axleY + seat.y[1], z[0]], [std.min(front, x + springHalf), s.railBottom, z[1]]);
 // The two corner wedges that make a wheel opening five-sided: straight jambs, two chamfers and a flat head.
 local archCorners(name, slot, x0, x1, top, c, inner, outer) = [
   prism(name + '_aft', slot, [[x0, top - c], [x0 + c, top], [x0, top]], [inner, outer]),
@@ -140,17 +150,13 @@ local pressings(id, title, s0) = {
   local roofFront = s.face - s.lean,
   local paint = { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear', pan: 'paint-charcoal', cloth: 'cloth-seat', frame: s.framePaint, steel: 'steel-grey' },
   local leanAt(y) = (y - s.waist) * s.lean / (s.roof - s.waist),
-  // The front crossmember closes the rails' ends ahead of the radiator, which stands between them.
-  local crossmemberRear = s.rear + 0.12,
-  local crossmemberFront = s.railFront - crossmemberHalf,
-  assert s.radiatorX + cooling.front <= crossmemberFront - crossmemberHalf : id + "'s radiator must stand behind its front crossmember",
-  local crossmembers = [
-    crossmemberRear + i * (crossmemberFront - crossmemberRear) / (crossmemberCount - 1)
-    for i in std.range(0, crossmemberCount - 1)
-  ],
+  local crossmemberXs = crossmembers(s),
+  local crossmemberFront = crossmemberXs[crossmemberCount - 1] - crossmemberHalf,
+  assert s.radiatorX + cooling.front <= crossmemberFront : id + "'s radiator must stand behind its front crossmember",
+  assert s.engineX + s.engineLength / 2 <= crossmemberFront : id + "'s engine must stand behind its front crossmember",
   local springs =
     [spring('spring_0', s, s.frontAxle, s.frontAxleY, s.frontSeat, s.radiatorX - cooling.back(s.radiator))]
-    + [spring('spring_' + (i + 1), s, s.rearAxles[i], s.rearAxleY, s.rearSeat) for i in std.range(0, std.length(s.rearAxles) - 1)],
+    + [spring('spring_' + (i + 1), s, s.rearAxles[i], s.rearAxleY, s.rearSeat, back=s.rear + underrunDepth) for i in std.range(0, std.length(s.rearAxles) - 1)],
   local batteryBoxPieces = local x = s.batteryX; local y = s.tankY; local inner = -s.batteryZ + 0.26; local outer = -s.batteryZ - 0.26; [
     box('battery_bracket', 'frame', [x - 0.34, y - 0.04, outer], [x + 0.34, y, -s.railZ]),
     box('battery_post', 'frame', [x - 0.04, y - 0.04, -s.railZ - 0.06], [x + 0.04, s.railBottom + 0.1, -s.railZ]),
@@ -179,7 +185,7 @@ local pressings(id, title, s0) = {
     ] + archCorners('well', 'pan', a - h, a + h, s.archTop, s.archChamfer, s.railZ, s.skin),
   local rows = [
     part('_chassis', 'chassis', s.chassisMass, bothSides(springs) + [
-      box('crossmember_' + i, 'frame', [crossmembers[i] - crossmemberHalf, s.propShaftY + driveline.propShaftRadius + shaftClear, -s.railZ], [crossmembers[i] + crossmemberHalf, s.railTop - 0.02, s.railZ])
+      box('crossmember_' + i, 'frame', [crossmemberXs[i] - crossmemberHalf, s.propShaftY + driveline.propShaftRadius + shaftClear, -s.railZ], [crossmemberXs[i] + crossmemberHalf, s.railTop - 0.02, s.railZ])
       for i in std.range(0, crossmemberCount - 1)
     ] + batteryBoxPieces + bothSides([
       box('rail', 'frame', [s.rear + 0.06, s.railBottom, s.railZ - 0.08], [s.railFront, s.railTop, s.railZ]),
@@ -206,9 +212,9 @@ local pressings(id, title, s0) = {
       box('top', 'trim', [s.face - s.dashDepth, s.waist - 0.2, -s.skin + 0.04], [s.face - 0.04, s.waist - 0.04, s.skin - 0.04]),
     ], paint),
     part('_rear_underrun', 'rear underrun', 30, [
-      box('bar', 'frame', [s.rear, s.railBottom - 0.24, -s.side + 0.1], [s.rear + 0.1, s.railBottom - 0.12, s.side - 0.1]),
+      box('bar', 'frame', [s.rear, s.railBottom - 0.24, -s.side + 0.1], [s.rear + underrunDepth, s.railBottom - 0.12, s.side - 0.1]),
     ] + bothSides([
-      box('hanger', 'frame', [s.rear + 0.02, s.railBottom - 0.12, s.railZ - 0.08], [s.rear + 0.1, s.railBottom + 0.02, s.railZ]),
+      box('hanger', 'frame', [s.rear + 0.02, s.railBottom - 0.12, s.railZ - 0.08], [s.rear + underrunDepth, s.railBottom + 0.02, s.railZ]),
     ]), { frame: s.framePaint }),
   ] + (if s.guard then [
     local guardZ = [s.rearInnerZ - s.wheelW / 2 - 0.03, s.rearZ + s.wheelW / 2 + 0.01];
@@ -294,8 +300,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   local wheels(site, at, supportedBy, braked=true) = wheelKit.pair(kit, site, s.wheel, at, if braked then s.wheelBrakes else null, supportedBy);
   local axle(part) = wheelKit.axle(part, s.wheelBrakes);
   local rearN = std.length(s.rearAxles);
-  local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
-  local shaftFrom = gearboxX - s.gearboxLength / 2;
+  local shaftFrom = s.gearboxX - s.gearboxLength / 2;
   local shaftTo = s.rearAxles[0];
   local shaftCount = std.ceil((shaftFrom - shaftTo) / 2.6);
   local shaftStep = (shaftFrom - shaftTo) / shaftCount;
@@ -309,7 +314,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('front_bumper', part('_front_bumper'), origin, ['chassis']),
     fitting('rear_underrun', part('_rear_underrun'), origin, ['chassis']),
     fitting('engine', s.engine, [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', s.gearbox, [gearboxX, s.gearboxY, 0], ['engine']),
+    fitting('gearbox', s.gearbox, [s.gearboxX, s.gearboxY, 0], ['engine']),
   ] + cooling.sites(s.radiator, [s.radiatorX, s.radiatorY, 0], s.detail, kit=kit, supportedBy=['chassis'])
   + fuelTank.sites('fuel_tank_truck', [s.tankX, s.tankY, s.side - 0.34], s.detail, kit=kit, supportedBy=['chassis']) + [
     fitting('exhaust', 'exhaust_long', [s.exhaustX, s.exhaustY, s.exhaustZ], ['engine', 'chassis']),
@@ -351,6 +356,8 @@ local bodySites(kit, sites, id, s0) =
 {
   spec: spec,
   springZ: springZ,
+  crossmembers: crossmembers,
+  crossmemberHalf: crossmemberHalf,
   spring: spring,
   archCorners: archCorners,
   rows: rows,
