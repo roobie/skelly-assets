@@ -33,6 +33,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       chestHeight: positive,
       /** How far up the chest the armpit lies, as a share of its height: the trunk region's top. */
       armpit: positive,
+      /** The lower chest's width as a share of the chest's, so it stays inside the hanging arm and a sleeveless shell can enclose it. */
+      chestLowShare: positive,
       torsoChamfer: positive,
       chestChamfer: positive,
       shoulderWidth: positive,
@@ -179,7 +181,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
         // The chest widens from the ribs over a short step, then carries the plane of the pectorals. Below the armpit
         // it stays inside the hanging arm, so a sleeveless shell can enclose it without passing through the arm.
         oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * d.armpit), {
-          halfX: chestHalfX * 0.94,
+          halfX: chestHalfX * d.chestLowShare,
           halfZ: chestHalfZ - 0.002,
           power: 3.2,
         }),
