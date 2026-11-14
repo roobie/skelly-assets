@@ -17,8 +17,9 @@ local back = s.lockerBack;
 local front = s.bodySide - 0.04 - 0.02;
 local spans = s.lockerSpans;
 // The rear compartment runs from the shutter to the racking, between the lockers' back walls.
-local rackRear = -3.3;
-local bay = { x: [s.bodyRear + 0.02, rackRear], z: back - 0.04 };
+local bay = { x: [s.bodyRear + 0.02, s.rackingRear], z: back - 0.04 };
+// Heights above the locker floor.
+local up(h) = s.bodyFloor + h;
 local stowFinish = stow.finish + { tool: 'plastic-yellow', hydraulic: 'plastic-orange', bag: 'rubber-black', case_a: 'plastic-red', case_b: 'plastic-orange', case_c: 'plastic-yellow', saw: 'plastic-orange', generator: 'paint-red', rope: 'cloth-blue' };
 // A hydraulic tool lying on a shelf: its body, and two jaws tapering from it.
 local jaws(id, x, y, z, length) = [
@@ -29,67 +30,67 @@ local jaws(id, x, y, z, length) = [
 ];
 local stowage = {
   fore: [
-    box('pack', 'tool', [-0.45, s.bodyFloor, 0.92], [0.1, 1.5, front - 0.02]),
-    box('pack_engine', 'engine', [-0.4, 1.5, 0.95], [0.05, 1.68, 1.12]),
-    round(k.turned('reel_flange', 'steel', 'z', k.disc(0.24, 0.93, 0.96), [0.42, 1.45, 0])),
-    round(k.turned('reel_drum', 'hydraulic', 'z', k.disc(0.2, 0.96, 1.15), [0.42, 1.45, 0])),
-    round(k.turned('reel_hub', 'steel', 'z', k.disc(0.06, 1.15, front), [0.42, 1.45, 0])),
-    box('reel_stand', 'steel', [0.24, s.bodyFloor, 0.94], [0.6, 1.21, 1.12]),
-    stow.shelf('shelf_low', spans.fore, 1.9, [back, front]),
-    stow.shelf('shelf_high', spans.fore, 2.45, [back, front]),
-    round(k.turned('ram', 'tool', 'x', k.disc(0.06, -0.45, 0.55), [0, 2.51, 1.0])),
-    round(k.turned('ram_head', 'steel', 'x', k.disc(0.075, 0.55, 0.65), [0, 2.51, 1.0])),
-  ] + jaws('spreader', -0.45, 1.9, [0.95, 1.13], 0.75) + jaws('cutter', 0.35, 1.9, [0.95, 1.13], 0.4),
+    box('pack', 'tool', [-0.45, s.bodyFloor, back + 0.06], [0.1, up(0.35), front - 0.02]),
+    box('pack_engine', 'engine', [-0.4, up(0.35), back + 0.09], [0.05, up(0.53), back + 0.26]),
+    round(k.turned('reel_flange', 'steel', 'z', k.disc(0.24, back + 0.07, back + 0.1), [0.42, up(0.3), 0])),
+    round(k.turned('reel_drum', 'hydraulic', 'z', k.disc(0.2, back + 0.1, back + 0.29), [0.42, up(0.3), 0])),
+    round(k.turned('reel_hub', 'steel', 'z', k.disc(0.06, back + 0.29, front), [0.42, up(0.3), 0])),
+    box('reel_stand', 'steel', [0.24, s.bodyFloor, back + 0.08], [0.6, up(0.06), back + 0.26]),
+    stow.shelf('shelf_low', spans.fore, up(0.75), [back, front]),
+    stow.shelf('shelf_high', spans.fore, up(1.3), [back, front]),
+    round(k.turned('ram', 'tool', 'x', k.disc(0.06, -0.45, 0.55), [0, up(1.36), back + 0.14])),
+    round(k.turned('ram_head', 'steel', 'x', k.disc(0.075, 0.55, 0.65), [0, up(1.36), back + 0.14])),
+  ] + jaws('spreader', -0.45, up(0.75), [back + 0.09, back + 0.27], 0.75) + jaws('cutter', 0.35, up(0.75), [back + 0.09, back + 0.27], 0.4),
   mid: [
-    box('bag_' + i, if i % 2 == 0 then 'bag' else 'tool', [-1.26, s.bodyFloor + i * 0.0625, 0.9], [-0.66, s.bodyFloor + (i + 1) * 0.0625, front - 0.02])
+    box('bag_' + i, if i % 2 == 0 then 'bag' else 'tool', [-1.26, up(i * 0.0625), back + 0.04], [-0.66, up((i + 1) * 0.0625), front - 0.02])
     for i in std.range(0, 4)
   ] + [
-    stow.shelf('shelf', spans.mid, 1.6, [back, front]),
-    stow.strap('bag_strap', [-1.26, -0.66], 1.3, front - 0.02 - 0.03125),
-  ] + stow.case('controller', 'case_c', [-1.26, 1.6, 0.92], [-0.95, 1.85, front - 0.03])
-    + std.flattenArrays([stow.cylinder('air_' + i, -0.82 + i * 0, 1.6, 0.96 + i * 0.14, 0.07, 0.75, 'steel') for i in [0, 1]])
-    + stow.case('hoses', 'case_b', [-1.26, 1.9, 0.92], [-0.95, 2.15, front - 0.03]),
-  wheel: stow.cribbing('crib_low', -2.5, s.bodyFloor, [0.9, front - 0.02], 8, 4)
+    stow.shelf('shelf', spans.mid, up(0.45), [back, front]),
+    stow.strap('bag_strap', [-1.26, -0.66], up(0.15), front - 0.02 - 0.03125),
+  ] + stow.case('controller', 'case_c', [-1.26, up(0.45), back + 0.06], [-0.95, up(0.7), front - 0.03])
+    + std.flattenArrays([stow.cylinder('air_' + i, -0.82, up(0.45), back + 0.1 + i * 0.14, 0.07, 0.75, 'steel') for i in [0, 1]])
+    + stow.case('hoses', 'case_b', [-1.26, up(0.7), back + 0.06], [-0.95, up(0.95), front - 0.03]),
+  wheel: stow.cribbing('crib_low', -2.5, s.bodyFloor, [back + 0.04, front - 0.02], 8, 4)
     + [
-      stow.shelf('shelf_low', spans.wheel, 1.65, [back, front]),
-      stow.shelf('shelf_high', spans.wheel, 2.3, [back, front]),
+      stow.shelf('shelf_low', spans.wheel, up(0.5), [back, front]),
+      stow.shelf('shelf_high', spans.wheel, up(1.15), [back, front]),
     ] + std.flattenArrays([
       [
-        k.prism('chock_' + i, 'timber', [[-2.5 + i * 0.3, 1.65], [-2.25 + i * 0.3, 1.65], [-2.25 + i * 0.3, 1.9], [-2.5 + i * 0.3, 1.72]], [0.92, front - 0.02]),
+        k.prism('chock_' + i, 'timber', [[-2.5 + i * 0.3, up(0.5)], [-2.25 + i * 0.3, up(0.5)], [-2.25 + i * 0.3, up(0.75)], [-2.5 + i * 0.3, up(0.57)]], [back + 0.06, front - 0.02]),
       ]
       for i in [0, 1, 2]
     ]) + [
-      box('strut_' + i, if i == 0 then 'tool' else 'steel', [-2.5, 2.3 + i * 0.1, 0.95 + i * 0.1], [-1.4, 2.38 + i * 0.1, 1.03 + i * 0.1])
+      box('strut_' + i, if i == 0 then 'tool' else 'steel', [-2.5, up(1.15), back + 0.09 + i * 0.1], [-1.4, up(1.23), back + 0.17 + i * 0.1])
       for i in [0, 1]
     ],
   aft: [
-    box('generator_frame', 'steel', [-3.7, s.bodyFloor, 0.92], [-3.05, 1.19, front - 0.02]),
-    box('generator', 'generator', [-3.66, 1.19, 0.94], [-3.09, 1.62, front - 0.04]),
-    box('generator_panel', 'lid', [-3.5, 1.3, front - 0.04], [-3.25, 1.5, front - 0.02]),
-    box('generator_bar', 'steel', [-3.7, 1.62, 1.12], [-3.05, 1.66, front - 0.02]),
-    stow.shelf('shelf', spans.aft, 1.75, [back, front]),
-    stow.board('board', [-3.74, -2.62], [1.75, 2.85], back),
-    box('saw_body', 'saw', [-3.62, 2.0, 0.89], [-3.38, 2.22, 1.04]),
-    box('saw_bar', 'steel', [-3.38, 2.06, 0.94], [-2.95, 2.14, 0.98]),
-    round(k.turned('cutter_disc', 'steel', 'z', k.disc(0.15, 0.95, 0.99), [-3.2, 2.55, 0])),
-    box('cutter_body', 'saw', [-3.62, 2.48, 0.92], [-3.32, 2.66, 1.06]),
-  ] + stow.hungTool('sledge', -2.8, 1.85, 0.85, [0.16, 0.1], back + 0.03125)
-    + stow.case('chains', 'case_a', [-2.95, s.bodyFloor, 0.92], [-2.65, 1.45, front - 0.03]),
+    box('generator_frame', 'steel', [-3.7, s.bodyFloor, back + 0.06], [-3.05, up(0.04), front - 0.02]),
+    box('generator', 'generator', [-3.66, up(0.04), back + 0.08], [-3.09, up(0.47), front - 0.04]),
+    box('generator_panel', 'lid', [-3.5, up(0.15), front - 0.04], [-3.25, up(0.35), front - 0.02]),
+    box('generator_bar', 'steel', [-3.7, up(0.47), back + 0.26], [-3.05, up(0.51), front - 0.02]),
+    stow.shelf('shelf', spans.aft, up(0.6), [back, front]),
+    stow.board('board', [-3.74, -2.62], [up(0.6), up(1.7)], back),
+    box('saw_body', 'saw', [-3.62, up(0.85), back + 0.03], [-3.38, up(1.07), back + 0.18]),
+    box('saw_bar', 'steel', [-3.38, up(0.91), back + 0.08], [-2.95, up(0.99), back + 0.12]),
+    round(k.turned('cutter_disc', 'steel', 'z', k.disc(0.15, back + 0.09, back + 0.13), [-3.2, up(1.4), 0])),
+    box('cutter_body', 'saw', [-3.62, up(1.33), back + 0.06], [-3.32, up(1.51), back + 0.2]),
+  ] + stow.hungTool('sledge', -2.8, up(0.7), 0.85, [0.16, 0.1], back + 0.03125)
+    + stow.case('chains', 'case_a', [-2.95, s.bodyFloor, back + 0.06], [-2.65, up(0.3), front - 0.03]),
 };
 local rearStowage = [
-  stow.shelf('shelf_low', bay.x, 1.75, [-bay.z, bay.z]),
-  stow.shelf('shelf_high', bay.x, 2.35, [-bay.z, bay.z]),
-] + stow.case('kit_a', 'case_b', [-3.8, s.bodyFloor, -0.78], [-3.34, 1.55, -0.05])
-  + stow.case('kit_b', 'case_c', [-3.8, s.bodyFloor, 0.05], [-3.34, 1.45, 0.78])
-  + stow.case('first_aid', 'case_a', [-3.8, 1.75, -0.78], [-3.4, 2.05, -0.3])
-  + stow.case('lights', 'case_c', [-3.8, 1.75, -0.2], [-3.4, 2.1, 0.35])
+  stow.shelf('shelf_low', bay.x, up(0.6), [-bay.z, bay.z]),
+  stow.shelf('shelf_high', bay.x, up(1.2), [-bay.z, bay.z]),
+] + stow.case('kit_a', 'case_b', [-3.8, s.bodyFloor, -0.78], [-3.34, up(0.4), -0.05])
+  + stow.case('kit_b', 'case_c', [-3.8, s.bodyFloor, 0.05], [-3.34, up(0.3), 0.78])
+  + stow.case('first_aid', 'case_a', [-3.8, up(0.6), -0.78], [-3.4, up(0.9), -0.3])
+  + stow.case('lights', 'case_c', [-3.8, up(0.6), -0.2], [-3.4, up(0.95), 0.35])
   + std.flattenArrays([
-    [round(k.turned('rope_' + i, 'rope', 'y', k.disc(0.12, 2.35, 2.75), [-3.6, 0, 0.0 + i * 0.27 - 0.5]))]
+    [round(k.turned('rope_' + i, 'rope', 'y', k.disc(0.12, up(1.2), up(1.6)), [-3.6, 0, i * 0.27 - 0.5]))]
     for i in [0, 1, 2]
-  ]) + std.flattenArrays([stow.cone('cone_' + i, -3.6, 1.75 + i * 0.08, 0.6) for i in [0, 1]]);
+  ]) + std.flattenArrays([stow.cone('cone_' + i, -3.6, up(0.6 + i * 0.08), 0.6) for i in [0, 1]]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_racking', 2200, [
-    box('racking', 'frame', [-3.3, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
+    box('racking', 'frame', [s.rackingRear, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
   ], finish) + { title: 'Rescue truck racking' },
 ] + [
   k.compound('rescue_truck_locker_stowage_' + name, s.stowage[name].mass, stowage[name], stowFinish) + { title: s.stowage[name].title }

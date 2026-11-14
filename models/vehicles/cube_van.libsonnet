@@ -14,7 +14,7 @@ local railYs = [[b.floor + 0.6, b.skin], [b.floor + 1.3, b.glassIn]];
 local track(id, x, y, face) = box(id, 'track', [x[0], y, face - 0.03125], [x[1], y + 0.1, face]);
 local mirrored(piece) = k.far(piece) + { id: piece.id };
 local shelfX = [b.front - 0.55, b.front - 0.08];
-// Folded blankets stacked on the shelf over the cab, in alternating colours so each fold reads.
+// Folded blankets stacked on the shelf high across the box's front wall, in alternating colours so each fold reads.
 local stacks = [-0.7, 0, 0.7];
 local blankets = [
   box('blanket_' + j + '_' + i, if (i + j) % 2 == 0 then 'blanket' else 'blanket_b', [shelfX[0] + 0.05, 2.25 + i * 0.0625, stacks[j] - 0.3], [shelfX[1] - 0.04, 2.25 + (i + 1) * 0.0625, stacks[j] + 0.3])
@@ -32,7 +32,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('cube_van', veh
     k.prism('nose', 'paint', [[0.85, s.cabRoof], [1.0, s.cabRoof + 0.2], [1.0, b.canton], [0.85, b.canton]], [-b.glassOut, b.glassOut]),
     k.prism('nose_top', 'paint', [[0.85, b.canton], [1.0, b.canton], [0.85, b.roof]], [-b.roofSide, b.roofSide]),
   ], { paint: s.paint }) + { title: 'Cube van peak' },
-  // A removal van's kit, kept to the walls and over the cab so the load floor stays free for cargo.
+  // A removal van's kit, kept to the walls and high on the front wall so the load floor stays free for cargo.
   k.compound('cube_van_removal_stowage', 60, [
     track('track_near_' + i, rails.near, railYs[i][0], railYs[i][1])
     for i in [0, 1]

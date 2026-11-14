@@ -9,5 +9,5 @@ Upgrade:
 - Place `fire_engine_rear_wall` wherever you place `fire_engine_body` on a fire engine, but not on a rescue truck,
   whose rear shutter opens where it stood.
 - Place the new stowage parts as the vehicles' placements do: `<vehicle>_locker_stowage_<locker>` on both sides of
-  the fire engine, rescue truck and crash tender, `rescue_truck_rear_stowage`, `cube_van_removal_stowage` and
-  `step_van_parcel_shelves` on both sides.
+  the fire engine, rescue truck and crash tender, and `step_van_parcel_shelves` on both sides of the step van; place
+  `rescue_truck_rear_stowage` and `cube_van_removal_stowage` once each.

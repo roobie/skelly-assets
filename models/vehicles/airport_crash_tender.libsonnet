@@ -69,8 +69,8 @@ local stowage = {
     + stow.hungTool('hook', -1.35, y0 + 0.5, 1.25, [0.06, 0.25], back + 0.03125)
     + stow.case('cutter', 'case_a', [-2.3, y0, back + 0.04], [-1.65, y0 + 0.4, front - 0.03])
     + stow.case('saw', 'case_b', [-1.55, y0, back + 0.04], [-0.9, y0 + 0.35, front - 0.03]),
-  wheel_aft: std.flattenArrays([stow.cylinder('powder_' + i, -3.8 + i * 0.3, y0, 1.2, 0.12, 0.7, 'extinguisher') for i in std.range(0, 3)]) + [
-    stow.strap('powder_strap', [-3.93, -2.83], y0 + 0.45, 1.32),
+  wheel_aft: std.flattenArrays([stow.cylinder('powder_' + i, -3.8 + i * 0.3, y0, 1.2, 0.12, 0.7, 'extinguisher') for i in std.range(0, 2)]) + [
+    stow.strap('powder_strap', [-3.93, -3.07], y0 + 0.45, 1.32),
     stow.shelf('shelf_low', lockerSpans.wheel_aft, y0 + 0.95, [back, front]),
     stow.shelf('shelf_high', lockerSpans.wheel_aft, y0 + 1.5, [back, front]),
   ] + std.flattenArrays([stow.cylinder('co2_' + i, -3.82 + i * 0.24, y0 + 0.95, 1.2, 0.08, 0.45, 'co2') for i in std.range(0, 3)])
