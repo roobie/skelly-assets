@@ -44,8 +44,10 @@ local layout(s) = {
     for door in s.doors
   ],
   arches: [[s.rearAxle - s.arch, s.rearAxle + s.arch]] + (if bonneted then [] else [[s.frontAxle - s.arch, s.frontAxle + s.arch]]),
-  local span = self.doorways[0][1] - self.doorways[0][0],
-  leafWidth: if std.get(s, 'doorLeaves', 2) == 2 then foldDoor.pairWidth(span, self.doorThick) else span,
+  // Every doorway is as wide as the first, so one leaf width fits them all; a pair of leaves each take half the span.
+  local spans = [way[1] - way[0] for way in self.doorways],
+  assert std.all([std.abs(width - spans[0]) < 1e-9 for width in spans]) : 'every doorway of a bus is as wide as the first',
+  leafWidth: foldDoor.fitWidth(if std.get(s, 'doorLeaves', 2) == 2 then spans[0] / 2 else spans[0], self.doorThick),
   doorHeight: s.decks[0].top - s.doorSill,
   doorThick: 0.06,
   // Every leaf of a doorway folds out of it, a pair from the doorway's middle toward its ends, a single leaf toward the
@@ -58,6 +60,9 @@ local layout(s) = {
   fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door'),
   // Where a leaf's centre lies along doorway `way`.
   leafX(way, leaf): (if leaf.jamb > 0 then way[1] else way[0]) - leaf.jamb * self.leafWidth / 2,
+  // The id of one of a leaf's panels, `panel` being 'jamb' or 'free', in doorway `d`, and where it sits along `way`.
+  panelSite(leaf, panel, d): leaf.site + '_' + panel + '_' + d,
+  panelX(way, leaf, panel): self.leafX(way, leaf) + self.fold(leaf)[panel].at,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
   windowLabel(i): if i == 0 then 'side window' else 'upper window',
 };
@@ -447,12 +452,10 @@ local laid(kit, id, s) =
   local doorZ = s.side - 0.035;
   // The free panel rides its jamb panel, so it folds back as the jamb panel turns out.
   local doors = std.flattenArrays([
-    local x = g.leafX(g.doorways[d], leaf);
-    local fold = g.fold(leaf);
-    local jamb = leaf.site + '_jamb_' + d;
+    local jamb = g.panelSite(leaf, 'jamb', d);
     [
-      fitting(jamb, part(leaf.suffix + '_jamb'), [x + fold.jamb.at, s.doorSill, doorZ], ['shell']),
-      fitting(leaf.site + '_free_' + d, part(leaf.suffix + '_free'), [x + fold.free.at, s.doorSill, doorZ], [jamb], rides=jamb),
+      fitting(jamb, part(leaf.suffix + '_jamb'), [g.panelX(g.doorways[d], leaf, 'jamb'), s.doorSill, doorZ], ['shell']),
+      fitting(g.panelSite(leaf, 'free', d), part(leaf.suffix + '_free'), [g.panelX(g.doorways[d], leaf, 'free'), s.doorSill, doorZ], [jamb], rides=jamb),
     ]
     for d in std.range(0, std.length(g.doorways) - 1)
     for leaf in g.leaves
