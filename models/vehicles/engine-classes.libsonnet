@@ -1,8 +1,9 @@
 // The size classes of an engine's salvageable accessories. Every engine of one general size fits the same alternator,
 // starter motor, air box, fuel pump, drive belt and radiator, so a part salvaged from one fits any other of its size,
 // while a truck's are bigger than a car's. A class is one entry here; `engines.libsonnet` names each engine's class.
-// Metres and kilograms; `engine-kit.libsonnet` says each accessory's frame. An air box stands `at` 'side', beside the
-// intake, or 'over', on the valve cover feeding a turbo, as `engine-kit.libsonnet`, `airBox`, draws it.
+// Metres and kilograms; `engine-kit.libsonnet` says each accessory's frame. An inline's air box stands `at` 'side',
+// beside its intake, or 'over', on the valve cover feeding a turbo; a vee's stands in its valley. See
+// `engine-kit.libsonnet`, `airBoxAt`.
 {
   light: {
     radiator: 'radiator_car',
