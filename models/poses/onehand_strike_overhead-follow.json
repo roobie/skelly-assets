@@ -1,0 +1,27 @@
+{
+  "rig": { "id": "doll", "revision": 8 },
+  "ground": true,
+  "level": ["foot.R", "foot.L"],
+  "angles": {
+    "pelvis": [0, 12, 0],
+    "shin.L": [14, 0, 0],
+    "shin.R": [12, 0, 0],
+    "spine": [25, 8, 0],
+    "thigh.L": [-8, 0, 6],
+    "thigh.R": [18, 0, -4],
+    "neck": [-11.3776, -12.1656, 0],
+    "head": [-11.3776, -9.1242, 0],
+    "hand.L": [0, 0, 0]
+  },
+  "hands": { "hand.R": "grip", "hand.L": "fist" },
+  "reach": { "hand.L": { "target": [0.2735, 1.0926, 0.1929], "pole": [0.4, -1, 0], "twist": 0 } },
+  "hold": {
+    "hand.R": {
+      "model": "baseball_bat",
+      "at": [0.1324, 0.7729, 0.5536],
+      "turn": [0.2276, 0.175, 0.143, 0.9472],
+      "pole": [-0.72, -0.24, -0.65],
+      "socket": { "at": [-0.0144, 0, -0.3], "into": [1, 0, 0], "axis": [0, 0, 1] }
+    }
+  }
+}

@@ -76,6 +76,8 @@ local thumbBones = {
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
+  // The eyes, from the head's joint in the head's frame, which a generated frame turns the head to look from.
+  eye: [0, 0.11, 0.08],
   bones: {
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
                     limits: { flex: [-20, 20], twist: [-30, 30], abduct: [-15, 15] } },
