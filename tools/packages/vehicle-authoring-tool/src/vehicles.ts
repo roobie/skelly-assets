@@ -1,3 +1,5 @@
+import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
+
 /** What the dev server's `/api/vehicles` and `/api/solve` answer: the build checker's verdicts and the proposer's fix. */
 export interface SwingContact {
   readonly other: string;
@@ -39,7 +41,7 @@ export const orderedVehicles = ({ vehicles }: VehicleVerdicts): [string, Readonl
   const fails = (sites: Readonly<Record<string, SiteVerdict>>) => Object.values(sites).some(({ status }) => status === 'fails');
   return Object.entries(vehicles)
     .map(([name, { sites }]): [string, Readonly<Record<string, SiteVerdict>>] => [name, sites])
-    .sort(([a, siteA], [b, siteB]) => Number(fails(siteB)) - Number(fails(siteA)) || a.localeCompare(b));
+    .sort(([a, siteA], [b, siteB]) => Number(fails(siteB)) - Number(fails(siteA)) || compareCodeUnits(a, b));
 };
 
 /** One line saying how far a site opens and what stops it, for a verdict. */
