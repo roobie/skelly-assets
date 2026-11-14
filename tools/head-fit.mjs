@@ -31,9 +31,13 @@ export function seatFindings({ head, meshes, frame, worn, model }) {
     + `${millimetres(-deepest.depth)} deep at ${at(deepest.point)}`];
 }
 
-/** The seat findings of every seated shell in a built tree, whose manifest is `manifest`. */
-export function treeSeatFindings(built, manifest, root = repo) {
+/**
+ * The seat findings of every seated shell in a built tree, whose manifest is `manifest`; `seats` is where the game wears
+ * each. An empty table is a finding, so the check never passes having checked nothing.
+ */
+export function treeSeatFindings(built, manifest, root = repo, seats = readSeats(root)) {
+  if (Object.keys(seats).length === 0) return ['models/head-seats.libsonnet seats no shell'];
   const { frame } = readBandFit(root);
   const { glbOf, head } = builtModels(built, manifest);
-  return Object.entries(readSeats(root)).flatMap(([model, worn]) => seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model }));
+  return Object.entries(seats).flatMap(([model, worn]) => seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model }));
 }

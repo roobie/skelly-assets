@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { seatFindings } from '../head-fit.mjs';
+import { seatFindings, treeSeatFindings } from '../head-fit.mjs';
 import { boxes } from './boxes.mjs';
 
 // A box head 40 mm wide and 50 mm deep, standing 40 mm tall up to its top at y = 1, and a box shell of 4 mm walls round
@@ -28,4 +28,8 @@ test('a shell seated into the head is reported, whether too low or turned across
     assert.deepEqual(rest, []);
     assert.match(only, /^shell: \d+ of \d+ points of its surface lie inside the head/);
   }
+});
+
+test('an empty seat table is a finding, not a pass', () => {
+  assert.deepEqual(treeSeatFindings('', { models: [] }, undefined, {}), ['models/head-seats.libsonnet seats no shell']);
 });

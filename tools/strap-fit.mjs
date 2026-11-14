@@ -123,9 +123,13 @@ export function builtModels(built, manifest) {
   return { glbOf, anchorsOf, head };
 }
 
-/** The strap findings of every band-fitted gear model in a built tree, whose manifest is `manifest`. */
-export function treeStrapFindings(built, manifest, root = repo) {
-  const { frame, worn } = readBandFit(root);
+/**
+ * The strap findings of every band-fitted gear model in a built tree, whose manifest is `manifest`; `worn` is where the
+ * game wears each. An empty table is a finding, so the check never passes having checked nothing.
+ */
+export function treeStrapFindings(built, manifest, root = repo, worn = readBandFit(root).worn) {
+  if (Object.keys(worn).length === 0) return ['models/head-band.libsonnet wears no band-fitted model'];
+  const { frame } = readBandFit(root);
   const { glbOf, anchorsOf, head } = builtModels(built, manifest);
   return Object.entries(worn).flatMap(([model, place]) => [
     ...strapFindings({ head, ...strapOf(glbOf(model), model), frame, worn: place, model }),

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorFindings, strapFindings } from '../strap-fit.mjs';
+import { anchorFindings, strapFindings, treeStrapFindings } from '../strap-fit.mjs';
 import { boxes } from './boxes.mjs';
 
 // A box head 40 mm wide and 50 mm deep, and a strap drawn on a 2 mm grain with a two-voxel wall round a plan of the
@@ -59,4 +59,8 @@ test('strap anchors fit where the head lies within the strap thickness inward of
 test('strap anchors naming the outer face as the inner one are reported', () => {
   const swapped = leftAnchors({ inner: -(HALF[0] + GRAIN + WALL), outer: -(HALF[0] + GRAIN) });
   assert.match(anchorsFit(swapped)[0], /^gear: looking in from its left strap's inner anchor .*, the head is missed/);
+});
+
+test('an empty table of band-fitted models is a finding, not a pass', () => {
+  assert.deepEqual(treeStrapFindings('', { models: [] }, undefined, {}), ['models/head-band.libsonnet wears no band-fitted model']);
 });
