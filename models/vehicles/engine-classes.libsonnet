@@ -17,7 +17,9 @@
     },
     alternator: { id: 'alternator_light', title: 'Light alternator', massKg: 6, radius: 0.07, length: 0.15 },
     starter: { id: 'starter_motor_light', title: 'Light starter motor', massKg: 4, radius: 0.045, length: 0.2 },
-    airBox: { id: 'air_box_light', title: 'Light air box', massKg: 2, length: 0.28, height: 0.16, width: 0.2, at: 'side', base: 0.5 },
+    // A compact air cleaner, low beside the block with its duct rising to the intake, as on old utility engines: a
+    // narrow bonnet's side comes down past the intake, so a car's box stands under that side, inboard of the wheel.
+    airBox: { id: 'air_box_light', title: 'Light air box', massKg: 1.5, length: 0.22, height: 0.1, width: 0.16, at: 'side', base: 0.4 },
     fuelPump: { id: 'fuel_pump_light', title: 'Light fuel pump', massKg: 1.5, size: 0.08 },
     driveBelt: { id: 'drive_belt_light', title: 'Light drive belt', massKg: 0.3, width: 0.02, thickness: 0.012 },
   },
