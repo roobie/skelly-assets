@@ -14,7 +14,7 @@ const P = parse(
     setbackU: Positive,
     base: strictObject({ halfLengthU: Positive, heightU: Positive, halfWidthU: Positive }),
     post: strictObject({ halfLengthU: Positive, halfWidthU: Positive }),
-    ears: strictObject({ halfLengthU: Positive, innerHalfGapU: Positive, thicknessU: Positive }),
+    ears: strictObject({ halfLengthU: Positive, innerHalfGapU: Positive, thicknessU: Positive, dropU: Positive }),
   }),
   content,
 );
@@ -26,8 +26,9 @@ const box = (id: string, min: Vec3, max: Vec3): Solid => ({ id, kind: 'box', box
 /** The sight's solids with the post top `postTopU` over the shroud. */
 export const shroudFrontSightSolids = (postTopU: number): Solid[] => {
   const { base, post, ears } = P;
-  if (postTopU <= base.heightU) {
-    throw new Error(`A shroud front sight's post top at ${postTopU}u leaves no room for its post`);
+  const earTopU = postTopU - ears.dropU;
+  if (earTopU <= base.heightU) {
+    throw new Error(`A shroud front sight's post top at ${postTopU}u leaves no room for its ears`);
   }
   // The export reads the post top within two post half-widths of the centre; an ear inside that band would raise it.
   if (ears.innerHalfGapU <= 2 * post.halfWidthU) {
@@ -37,7 +38,7 @@ export const shroudFrontSightSolids = (postTopU: number): Solid[] => {
   return [
     box('base', [-base.halfLengthU, 0, -base.halfWidthU], [base.halfLengthU, base.heightU, base.halfWidthU]),
     box('post', [-post.halfLengthU, base.heightU, -post.halfWidthU], [post.halfLengthU, postTopU, post.halfWidthU]),
-    box('ear-left', [-ears.halfLengthU, base.heightU, -outer], [ears.halfLengthU, postTopU, -ears.innerHalfGapU]),
-    box('ear-right', [-ears.halfLengthU, base.heightU, ears.innerHalfGapU], [ears.halfLengthU, postTopU, outer]),
+    box('ear-left', [-ears.halfLengthU, base.heightU, -outer], [ears.halfLengthU, earTopU, -ears.innerHalfGapU]),
+    box('ear-right', [-ears.halfLengthU, base.heightU, ears.innerHalfGapU], [ears.halfLengthU, earTopU, outer]),
   ];
 };

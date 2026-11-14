@@ -8,8 +8,8 @@
   // The block the post and its guard ears stand on.
   base: { halfLengthU: 1, heightU: 0.5, halfWidthU: 1.25 },
   post: { halfLengthU: 0.25, halfWidthU: 0.125 },
-  // Guard ears either side of the post, as tall as the post so they shield it without crowding the sight picture. The
-  // gap stays wide enough that the exported post top is read off the post alone (see `exportGlb.ts`,
-  // `frontSightPost`).
-  ears: { halfLengthU: 0.5, innerHalfGapU: 0.75, thicknessU: 0.25 },
+  // Guard ears either side of the post. They stop `dropU` short of the post top so the post stands alone in the sight
+  // picture rather than reading as one of three, and the gap stays wide enough that the exported post top is read off
+  // the post alone (see `exportGlb.ts`, `frontSightPost`).
+  ears: { halfLengthU: 0.5, innerHalfGapU: 0.75, thicknessU: 0.25, dropU: 0.5 },
 }
