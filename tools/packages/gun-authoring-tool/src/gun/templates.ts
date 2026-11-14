@@ -650,6 +650,7 @@ export const antiMateriel: Template = {
     { id: 'grip', family: 'grip', params: { length: ['M', 'L'] } },
     { id: 'magazine', family: 'heavy-magazine' },
     { id: 'stock', family: 'recoil-stock', params: { length: ['M', 'L'] } },
+    // Off by default: the scope overlaps the rear sight, and a template cannot make one slot exclude another.
     { id: 'sight', family: 'sight', params: { type: 'high-mag-5-25x' }, chance: 0 },
     // The irons the rifle ships with; a fitted scope takes the rear sight's place on the rail.
     { id: 'front-sight', family: 'shroud-front-sight' },

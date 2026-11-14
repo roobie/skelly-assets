@@ -12,7 +12,7 @@ The dedicated receiver, lower and magazine exist because the shared families are
 
 The rifle ships with iron sights and no optic. A scope is an attachment the player fits to the receiver rail in the rear sight's place, so neither the curated design nor the template's default carries one; the carry handle is still checked clear of the largest scope the rail takes. See `src/gun/templates.ts`, `antiMateriel`, and `test/antiMateriel.test.ts`.
 
-The front post stands on the shroud rather than the barrel because the barrel recoils inside the shroud; a post on it would move against the rear sight every shot. Both sights sit on the shared iron sight line, so the rear sight is the AR's rail rear sight; see `src/gun/parts.ts`, `shroudFrontSight`, and `models/guns/tables/shroudFrontSight.jsonnet`.
+The front post stands on the shroud rather than the barrel because the barrel recoils inside the shroud; a post on it would move against the rear sight every shot; see `src/gun/parts.ts`, `shroudFrontSight`, and `models/guns/tables/shroudFrontSight.jsonnet`. The rear sight is the AR's rail rear sight unchanged because its aperture height assumes a rail at the AR receiver's top, and the heavy receiver's rail sits at that same height; see `src/gun/parts.ts`, `railRearSight`, and `src/gun/antiMateriel/heavyReceiver.ts`.
 
 Shroud perforations are display-only: collision and feasibility use convex solids, and surface holes add no useful fit constraint. If a future rule depends on a hole, it needs collision geometry rather than a visual mark; see `src/gun/antiMateriel/barrelShroud.ts` and `test/antiMateriel.test.ts`.
 
