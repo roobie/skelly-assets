@@ -227,7 +227,8 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
 
   // A pair of old-fashioned roller skates, 270 mm long and 260 mm tall: laced brown leather boots bolted to steel
   // plates, each on two axles with a pair of 56 mm steel wheels and a rubber toe stop.
-  local plate = 0.068;  // The skate boot's underside, on its plate.
+  // The skate boot's underside, on its plate. The boot's heel block lies inside it, so the bare heel stands on it.
+  local plate = 0.068;
   h.compound('roller_skates', 3, std.flattenArrays([
     local cx = s * 0.075, p = if s < 0 then 'l-' else 'r-';
     lift(boot(p, quad, cx) + laces(p, quad, cx, 0.07, 0.18), plate) + [
@@ -241,7 +242,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for k in [0, 1]
     ])
     for s in [-1, 1]
-  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates', soleLift: plate + quad.t }
+  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates', soleLift: plate + quad.t + quad.heel }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'metal'], slot: ['feet'] } } },
 
   // A pair of sheet metal sabatons, 300 mm long and 95 mm tall: three bent plates riveted over the front of each foot,
