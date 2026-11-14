@@ -11,9 +11,7 @@ local s = import 'beach_buggy.spec.libsonnet';
     site.one('dashboard', 'beach_buggy_dashboard'),
     site.one('front_axle', 'beach_buggy_front_axle'),
     site.one('rear_axle', 'beach_buggy_rear_axle'),
-  ]
-  // The engine stands raised over the frame's upper rails, so its air box stands higher than its class's, over a rail.
-  + engine.sites('i4_petrol', [-1.12, 0.38, 0], 'assembly', airBox={ base: 0.5 }) + [
+  ] + engine.sites('i4_petrol', [-1.12, 0.42, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.rearAxle + 0.28, 0.3, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [-0.67, 0.6, 0]),
     site.one('exhaust', 'beach_buggy_exhaust'),

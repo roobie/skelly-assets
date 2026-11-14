@@ -157,15 +157,11 @@ local airBoxAt(name, place=null) =
   assert at != 'over' || std.objectHas(e, 'turbo') : name + "'s air box over its cover has no turbo to feed";
   assert (at == 'valley') == isVee(e) : name + "'s air box stands in a valley exactly when it is a vee";
   at;
-// Where each accessory's origin sits in the engine's frame. `airBox` is what the vehicle names of its air box's stand;
-// see `sites`.
-local mounts(name, airBox={}) =
+// Where each accessory's origin sits in the engine's frame.
+local mounts(name, airBoxPlace=null) =
   local e = engines[name];
   local c = classOf(name);
   local crank = crankHeight(e);
-  local place = airBoxAt(name, std.get(airBox, 'at'));
-  assert std.all([std.member(['at', 'base'], f) for f in std.objectFields(airBox)]) : name + "'s air box takes only 'at' and 'base'";
-  assert !std.objectHas(airBox, 'base') || place == 'side' : name + "'s air box takes a base only at 'side'";
   {
     alternator: [e.length / 2 - c.alternator.length / 2, crank + c.drive.alternator.at[0], c.drive.alternator.at[1]],
     starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width * shapeOf(e).blockHalf + c.starter.radius],
@@ -173,8 +169,8 @@ local mounts(name, airBox={}) =
     airBox: {
       over: [-e.length / 4, e.height, 0],
       valley: [0, e.height - c.airBox.height - airBoxLid, valleyHalf(c) - c.airBox.width / 2],
-      side: [0, e.height * std.get(airBox, 'base', c.airBox.base), e.width * 0.68 + ductLength + c.airBox.width / 2],
-    }[place],
+      side: [0, e.height * c.airBox.base, e.width * 0.68 + ductLength + c.airBox.width / 2],
+    }[airBoxAt(name, airBoxPlace)],
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
   };
@@ -258,10 +254,10 @@ local core(name) =
   };
 
 // The engine's accessories as `assembly.libsonnet` fits them, in the order a vehicle lists their sites.
-local fittings(name, airBox={}) =
+local fittings(name, airBoxPlace=null) =
   local c = classOf(name);
   [
-    { site: a.site, id: c[a.key].id, massKg: c[a.key].massKg, drawn: a.draw(c), at: mounts(name, airBox)[a.key] }
+    { site: a.site, id: c[a.key].id, massKg: c[a.key].massKg, drawn: a.draw(c), at: mounts(name, airBoxPlace)[a.key] }
     for a in accessories
   ];
 
@@ -286,11 +282,10 @@ local fittings(name, airBox={}) =
   // Every site an engine can take, so a vehicle that loses its engine can drop them all.
   siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
-  // `assembly.libsonnet`, `sites`, says. `airBox` names where the air box stands when its class's stand does not
-  // fit the vehicle's bay: `at`, its place (see `airBoxAt`), and `base`, at 'side', the share of the engine's height its
-  // base stands at. Only an assembly takes it, since the fused row draws the class's stand.
-  sites(name, at, detail, airBox={}):
-    assert airBox == {} || detail == 'assembly' : "a fused engine's air box stands where its row draws it";
+  // `assembly.libsonnet`, `sites`, says. `airBox` names where the air box stands when the default place does not fit
+  // the vehicle's bay; see `airBoxAt`. Only an assembly takes it, since the fused row draws the default.
+  sites(name, at, detail, airBox=null):
+    assert airBox == null || detail == 'assembly' : "a fused engine's air box stands where its row draws it";
     assembly.sites('engine', fusedId(name), coreId(name), fittings(name, airBox), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,

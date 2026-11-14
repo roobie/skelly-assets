@@ -467,9 +467,8 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A hybrid motor\'s stator, lead or reducer runs into the engine intake or axle differential it is coupled to.',
+      'A hybrid motor\'s stator, lead or reducer runs into the axle differential it is coupled to.',
       [
-      ['motor', 'engine', 0.059],
       ['motor', 'rear_axle', 0.054],
       ],
     ),
