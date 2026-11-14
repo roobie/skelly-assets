@@ -193,6 +193,16 @@ export const shareStages = (stages: readonly StageMove[], hull: readonly Vec3[])
   return stages.map((stage, i) => ({ ...stage, share: distances[i]! / total })) as unknown as Motion;
 };
 
+/** How far each stage has moved from rest to its stop at `clock`, from 0 to 1: a stage waits for the ones before it. */
+const stageFractions = (motion: Motion, clock: number): number[] => {
+  let start = 0;
+  return motion.map(({ share }) => {
+    const fraction = Math.min(1, Math.max(0, (clock - start) / share));
+    start += share;
+    return fraction;
+  });
+};
+
 /** Where one stage carries a point once it has moved `fraction` of the way from rest to its stop. */
 const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
   if (stage.kind === 'slide') {
@@ -210,13 +220,29 @@ const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
 };
 
 /**
+ * Whether a stowing slide hides a point of the part at `clock`: the point, carried by the stages inside the slide and
+ * then by the slide itself, lies past the slide's `stow` plane, which stays where it is as the slide moves.
+ */
+export const isStowed = (motion: Motion, point: Vec3, clock = 1): boolean => {
+  const fractions = stageFractions(motion, clock);
+  let at = point;
+  for (let i = motion.length - 1; i >= 0; i--) {
+    const stage = motion[i]!;
+    at = poseStage(stage, at, fractions[i]!);
+    if (stage.kind === 'slide' && stage.stow !== undefined && dot(at, stage.direction) > stage.stow) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
  * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. In time, the first stage runs first:
  * each runs linearly through its share of the clock once the stages before it have finished. In space, the first
  * stage is the outermost transform: every stage is given in the part's rest frame and carries the stages after it,
  * so a point is put through the last stage's transform first and the first stage's last.
  */
 export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => {
-  const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
-  const fraction = (i: number) => Math.min(1, Math.max(0, (clock - starts[i]!) / motion[i]!.share));
-  return motion.reduceRight((at, stage, i) => poseStage(stage, at, fraction(i)), point);
+  const fractions = stageFractions(motion, clock);
+  return motion.reduceRight((at, stage, i) => poseStage(stage, at, fractions[i]!), point);
 };

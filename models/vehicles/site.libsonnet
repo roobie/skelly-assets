@@ -2,12 +2,15 @@
 // part pressed for its vehicle is authored where it sits, so it is placed at the origin.
 local frame = import 'frame.libsonnet';
 local origin = [0, 0, 0];
-local one(id, part, at=origin) = { id: id, part: part, at: at };
-// A near-side site and its far-side twin, whose part is reflected across its own centre plane before it is placed.
+// A part that rides another, such as a folding door's free panel on its jamb panel, names the carrier site's id as
+// `rides`: its own motion is nested inside its carrier's.
+local one(id, part, at=origin, rides=null) = { id: id, part: part, at: at } + (if rides == null then {} else { rides: rides });
+// A near-side site and its far-side twin, whose part is reflected across its own centre plane before it is placed. A
+// pair that rides names the carrier pair by its id, and each twin rides the carrier on its own side.
 // `0 - z` rather than `-z` keeps a centred twin at 0, since -0 does not survive a JSON round trip.
-local pair(id, part, at=origin) = [
-  one(id + '_near', part, at),
-  one(id + '_far', part, [at[0], at[1], 0 - at[2]]) + { mirror: true },
+local pair(id, part, at=origin, rides=null) = [
+  one(id + '_near', part, at, if rides == null then null else rides + '_near'),
+  one(id + '_far', part, [at[0], at[1], 0 - at[2]], if rides == null then null else rides + '_far') + { mirror: true },
 ];
 // A vehicle laid out from another's sites: `over` merges fields into a site by id, `drop` removes sites by id and
 // `add` appends sites, so a derived vehicle states only what it changes.
@@ -32,11 +35,12 @@ local batteryBay(tray, at) = [one('battery_tray', tray, at), one('battery', 'car
   batteryBay: batteryBay,
   // A game's vehicle kit that emits sites, for the body kits whose `fittings` take one: the fitting list a game's
   // blueprint is built from then gives the placements too, so the two cannot drift. What holds a part on and how it
-  // is serviced are gameplay, so those arguments are dropped.
+  // is serviced are gameplay, so those arguments are dropped. `rides` is kept: it is the one place a rider names its
+  // carrier, and a game's kit maps it to the support it needs.
   kit: {
     origin: origin,
-    fitting(id, part, at, supportedBy=[], service=null): one(id, part, at),
-    pair(id, part, at, supportedBy=null, service=null): pair(id, part, at),
+    fitting(id, part, at, supportedBy=[], service=null, rides=null): one(id, part, at, rides),
+    pair(id, part, at, supportedBy=null, service=null, rides=null): pair(id, part, at, rides),
     on(shared=[], paired=[]): null,
     headlamps(x, y, z, supportedBy=[]): headlamps(x, y, z),
     batteryBay(tray, at, supportedBy=[]): batteryBay(tray, at),
