@@ -1,5 +1,5 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
+import { array, integer, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
 import { block, dome, oval, ovalCut } from './body.ts';
 import { positive, spheroid } from './shapes.ts';
 
@@ -50,10 +50,16 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       headHeight: positive,
       headDepth: positive,
       jawHeight: positive,
+      /** How far up the head the eyes lie, as a share of its height. */
+      eyeShare: positive,
       hairCover: positive,
       hairThickness: positive,
       facePower: positive,
       hairSweep: positive,
+      hairRise: positive,
+      hairCrownShare: positive,
+      hairCrownBack: positive,
+      hairLayerCount: pipe(positive, integer()),
       hairRing: pipe(
         string(),
         transform((text): unknown => JSON.parse(text)),
@@ -72,7 +78,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const halfZ = d.headDepth / 2;
   const origin = d.segment === 'head' ? crown + d.neckOverlap : 0;
   const ys = (bottom: number, topY: number): [number, number] => [bottom - origin, topY - origin];
-  const eyeY = crown + d.headHeight * 0.58;
+  const eyeY = crown + d.headHeight * d.eyeShare;
   const brow = crown + d.jawHeight;
   const deltoidX = d.chestWidth / 2 + d.shoulderWidth / 2 - d.deltoidInset;
   const deltoidY = shoulders - d.shoulderHeight / 2 - d.deltoidDrop;
@@ -167,7 +173,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   }
   // The head: a skull domed toward the crown, cheeks narrowing to a chin, and hair: a domed mass with a swept fringe
   // that stays within the box the old cap filled, which hats are fitted round.
-  const hairTop = top + 0.006;
+  const hairTop = top + d.hairRise;
   const hairLine = top - d.hairCover;
   const skullFull = { halfX, halfZ, cz: 0 };
   const skull = [
@@ -184,7 +190,7 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const pelt = { halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, power: facePower };
   const hairBack = -halfZ + d.hairCover * 0.9;
   const hair = [
-    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -d.hairSweep }, { halfX: halfX * 0.72, halfZ: halfZ * 0.72, cz: -0.014 }], { slices: 3, power: facePower }),
+    ...dome('hair', 'hair', ys(hairLine, hairTop), [{ halfX: halfX + d.hairThickness, halfZ: halfZ + d.hairThickness, cz: -d.hairSweep }, { halfX: halfX * d.hairCrownShare, halfZ: halfZ * d.hairCrownShare, cz: -d.hairCrownBack }], { slices: d.hairLayerCount, power: facePower }),
     ovalCut('back-hair', 'hair', ys(brow + 0.03, hairLine + 0.01), pelt, { z: [undefined, hairBack] }),
     ovalCut('nape-hair', 'hair', ys(brow - 0.005, brow + 0.035), { ...pelt, halfX: halfX * 0.82 }, { z: [undefined, -halfZ + 0.03] }),
     ovalCut('side-hair-left', 'hair', ys(eyeY + 0.012, hairLine + 0.01), pelt, { x: [halfX - 0.004, undefined], z: [hairBack, 0.025] }),

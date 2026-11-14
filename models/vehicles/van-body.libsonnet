@@ -22,6 +22,8 @@ local cab = {
   frontAxle: 1.77, arch: 0.45, archTop: 0.84, archCorner: 0.24, wheelZ: 0.86, tubIn: 0.72,
   cowl: 1.22, aPost: 1.75, aLean: 0.9, bRear: 0, bFront: 0.1, hoodFall: 0.3, fire: 1.62, dash: 1.12,
   hatchSide: 0.84, rearSill: 0.62, slideRear: -1.04,
+  // The side door plugs out this far before it rolls back, so its inner face clears the rear wall's skin and bands.
+  slidePlug: 0.12, sideDoorSlides: true,
   windows: [], slideGlass: false, rearGlass: false, bulkhead: true, bands: [], bumper: 'plastic-black',
   wheel: 'wheel_225_75r16c', hub: 0.372, engine: 'engine_i4_diesel',
   // The driver sits on the far side, away from the kerb, as on the buses.
@@ -68,6 +70,7 @@ local pressings(id, title, s0) = {
   local nose = noseOf(s),
   local bodyFront = if isBox then s.box.front else s.bRear,
   local slideFront = if isBox then s.box.slideFront else s.bRear,
+  local slideTravel = slideFront - s.slideRear,
   local rise = !isBox && s.cabRoof < s.roof,
   local bumperTop = 0.6,
   local hood(x) = s.waist - (x - s.aPost) * s.hoodFall,
@@ -143,8 +146,8 @@ local pressings(id, title, s0) = {
   ] + (if slideFront < bodyFront then [wall('front_lower', [slideFront, bodyFront], [b.sill, b.waist])] + bands('front_lower', [slideFront, bodyFront], b.side) else []))
   + std.map(k.near, upper('upper', tail, s.slideRear, rearWindows) + [
     box('over_door', 'paint', [s.slideRear, b.doorTop, b.glassIn], [bodyFront, b.canton, b.glassOut]),
-    box('slide_rail', 'pan', [s.slideRear - 0.9, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.side + 0.012]),
-  ] + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
+  ] + (if s.sideDoorSlides then [box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug])] else [])
+  + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
   + std.map(k.far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
     + bands('wall_mid', [s.slideRear, bodyFront], b.side)
     + upper('upper', tail, bodyFront, b.windows)),
@@ -227,7 +230,7 @@ local pressings(id, title, s0) = {
       prism('glass', 'glass', [[s.bFront, s.waist], [s.cowl - 0.04, s.waist]] + (if pillarY(s.cowl - 0.04) > winTop then [[s.cowl - 0.04, winTop]] else [[s.cowl - 0.04, pillarY(s.cowl - 0.04)], [pillarAt(winTop), winTop]]) + [[s.bFront, winTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
       box('handle', 'trim', [s.bFront + 0.05, s.waist - 0.13, s.side], [s.bFront + 0.21, s.waist - 0.09, s.side + 0.015]),
     ] + bands('skin', [s.bFront, s.cowl], s.side), finish, doorAnchors) + { title: title + ' front door' },
-    // Rolls back along the rail on the rear wall; its leading edge is where it seals.
+    // Plugs out, then rolls back along the rail on the rear wall; its leading edge is where it seals.
     k.compound(id + '_side_door', 40, [
       box('skin', 'paint', [s.slideRear, b.sill, b.skin], [slideFront, b.waist, b.side]),
       box('handle', 'trim', [slideFront - 0.2, b.waist - 0.15, b.side], [slideFront - 0.04, b.waist - 0.11, b.side + 0.015]),
@@ -238,9 +241,11 @@ local pressings(id, title, s0) = {
       box('glass', 'glass', [s.slideRear + 0.05, b.waist, b.glassOut - 0.03], [slideFront - 0.05, b.windowTop, b.glassOut - 0.01]),
     ] else [
       box('upper', 'paint', [s.slideRear, b.waist, b.glassIn], [slideFront, b.doorTop, b.glassOut]),
-    ]) + bands('skin', [s.slideRear, slideFront], b.side), finish, doorAnchors) + { title: title + ' side door' },
+    ]) + bands('skin', [s.slideRear, slideFront], b.side), finish, if s.sideDoorSlides then {} else doorAnchors,
+    if s.sideDoorSlides then k.motion.slide('near', s.slidePlug) + k.motion.slide('rear', slideTravel)) + { title: title + ' side door' },
     if rearShutter then
-      // One curtain across the opening: flat slats in the door's own plane, so the side outline stays solid.
+      // One curtain across the opening: flat slats in the door's own plane, so the side outline stays solid. It rolls up
+      // into the rear header, leaving its bottom slat under the lintel as a roller shutter's bottom bar hangs.
       local slat = 0.1875;
       local groove = grain * 2;
       local count = std.floor((b.doorTop - b.rearSill - groove) / slat);
@@ -268,7 +273,7 @@ local pressings(id, title, s0) = {
       ]) + [
         box('band' + i, 'band' + i, [tail - grain, s.bands[i].y[0], -b.hatchSide], [tail, s.bands[i].y[1], b.hatchSide])
         for i in std.range(0, std.length(s.bands) - 1)
-      ], finish + { rib: 'plastic-grey' }, { hinge_a: ['skin', [0.5, 1, 0.1]], hinge_b: ['skin', [0.5, 1, 0.9]] }) + { title: title + ' rear shutter' }
+      ], finish + { rib: 'plastic-grey' }, motion=k.motion.slide('up', b.doorTop - b.rearSill - slat, stow=true)) + { title: title + ' rear shutter' }
     else
     // One leaf of the pair, hinged on the body's outer edge.
     k.compound(id + '_rear_door', 28, [

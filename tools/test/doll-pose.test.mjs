@@ -53,8 +53,13 @@ const doll = readDoll(built, manifest, dressing);
 const rig = dollRig(readRigContent(repo), doll, dressing);
 const models = manifest.models.filter((model) => model.path.endsWith('.glb'));
 const boxOf = (id) => { const entry = models.find((model) => model.id === id); return modelBox(readFileSync(join(built, entry.pack, entry.path))); };
+const anchorsOf = (id) => {
+  const { pack } = models.find((model) => model.id === id);
+  const entry = join(built, pack, 'things', `${id}.model.json`);
+  return existsSync(entry) ? JSON.parse(readFileSync(entry, 'utf8')).anchors ?? {} : {};
+};
 const meshes = treeMeshes(built, manifest);
-const restIn = (wear) => restMeshes(rig, wornSites(models.find((model) => model.id === wear), { dressing, doll, models, boxOf }), meshes);
+const restIn = (wear) => restMeshes(rig, wornSites(models.find((model) => model.id === wear), { dressing, doll, models, boxOf, anchorsOf }), meshes);
 const rest = restIn(WEAR);
 // A held item as one mesh of all its parts at rest.
 const itemMesh = (id) => meshes(id).reduce((mesh, part) => {

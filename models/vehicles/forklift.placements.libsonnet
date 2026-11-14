@@ -38,6 +38,8 @@ local s = import 'forklift.spec.libsonnet';
       'The counterweight is cast into the tail of the chassis.'),
     site.overlap('chassis', 'drive_axle', 0.28,
       'The drive axle\'s differential sits in the spine of the chassis, which is drawn solid around it.'),
+    site.overlap('chassis', 'engine', 0.124,
+      'The engine\'s sump sits in the spine of the chassis, which is drawn solid around it.'),
     site.overlap('chassis', 'gearbox', 0.3,
       'The transaxle sits in the spine of the chassis, which is drawn solid around it.'),
     site.overlap('chassis', 'steer_axle', 0.124,

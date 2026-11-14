@@ -6,7 +6,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
-import { MATERIALS } from './packages/thing-core/src/materials.ts';
 import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
 import { modelProblems } from './taxonomy.mjs';
@@ -72,7 +71,7 @@ function ridesProblems(vehicle, sites) {
   });
 }
 
-function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
+function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
   const problems = [];
   const seen = new Set();
   const reachable = new Set([pack, ...(dependsOn[pack] ?? [])]);
@@ -87,7 +86,7 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
     if (site?.mirror !== undefined && site.mirror !== true) problems.push(`${where}: mirror is true or absent`);
     const placed = byModel.get(site?.part) ?? [];
     if (site?.finish !== undefined) {
-      if (!Object.hasOwn(MATERIALS, site.finish)) problems.push(`${where}: finish ${site.finish} is not in the finish library`);
+      if (!Object.hasOwn(finishes, site.finish)) problems.push(`${where}: finish ${site.finish} is not in the finish library`);
       if (placed.length > 0 && !placed.some(({ paintable }) => paintable?.length > 0)) {
         problems.push(`${where}: ${site.part} has no paintable slot for finish ${site.finish}`);
       }
@@ -123,9 +122,10 @@ function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
 // Why the vehicles could not be assembled from the built models, as messages. placements: vehicle -> { parent?, sites,
 // tags? };
 // models: the built models, { id, pack, paintable? }; vehicleRows: vehicle -> its own row ids; dependsOn: pack -> the packs it
-// depends on; vocabulary: tools/taxonomy.mjs, readVocabulary. A part is named by its model id alone, so the id must
+// depends on; vocabulary: tools/taxonomy.mjs, readVocabulary; finishes: the finish library, keyed by finish id, which the
+// caller loads after the Jsonnet twins are current, so this module never reads them at import. A part is named by its model id alone, so the id must
 // name one model, in the vehicle's pack or one it declares a dependency on.
-export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary }) {
+export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes }) {
   const byModel = packsByModel(models);
   const problems = [];
   for (const [vehicle, entry] of Object.entries(placements)) {
@@ -144,7 +144,7 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
       problems.push(...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(({ message }) => message));
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
-    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel), ...ridesProblems(vehicle, entry.sites));
+    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes), ...ridesProblems(vehicle, entry.sites));
     if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
     if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
     if (entry?.swingContacts !== undefined) problems.push(...listedOverlapProblems(vehicle, 'swingContacts', 'why', entry.swingContacts, [...(entry?.sites ?? []), { id: 'ground' }]));
@@ -168,8 +168,8 @@ function vehicleTags(body, ...extras) {
 // swingReport): the part of its way to its stop it opens before it touches anything, as a fraction of its motion's
 // clock, and what it touches there.
 // Returns the vehicles written, { id, title, pack, path, tags }, and every file as <pack>/<logical path>.
-export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, swings = {}, out }) {
-  const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary });
+export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, swings = {}, out }) {
+  const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes });
   if (problems.length > 0) throw new Error(`vehicle placements:\n  ${problems.join('\n  ')}`);
   const byModel = packsByModel(models);
   const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { forward, parent, sites: laid, tags, title }]) => {

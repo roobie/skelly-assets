@@ -162,7 +162,8 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
   // The same body as a hollow wall `thick` deep, so a cabin can show its seats through glazing.
   shell: shell,
   // The outer skin, thin enough that a cabin's glazing shows the seats behind it.
-  skin(id, slot, stations, x, arc, sides):: shell(id, slot, stations, thick=0.0625, x=x, arc=arc, sides=sides),
+  skinThick:: 0.0625,
+  skin(id, slot, stations, x, arc, sides):: shell(id, slot, stations, thick=self.skinThick, x=x, arc=arc, sides=sides),
   // A canopy frame's bow over the crown at `x`.
   bow(id, stations, x):: shell(id, 'paint', stations, x=[x - 0.035, x + 0.035], arc=[-90, 90], step=0.07),
   // A rib standing on the skin at `x` from arc `high` down to `low`, carrying a door's hinges.

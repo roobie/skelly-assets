@@ -4,6 +4,8 @@ import { join, resolve } from 'node:path';
 import { expect, it } from 'vitest';
 import { catalogue } from '../src/content.ts';
 import { exportThingRecipes } from '../src/cli/export.ts';
+import { exportRecipes } from '../../../build.mjs';
+import { generateRow } from '../../../recipeTools.mjs';
 import { loadThingRecipe, loadThingRecipeFiles } from '../src/exports.ts';
 import { installJsonnetSources } from '../../../sources.mjs';
 import { sweepGroup } from './sweeps.ts';
@@ -26,7 +28,8 @@ it('exports one recipe file into its pack output without changing its source roo
     writeFileSync(join(root, 'models/recipes', `${packId}.json`), JSON.stringify(value));
     const sourceRoot = readdirSync(root, { recursive: true }).sort();
     const { modelEntry, glb } = loadThingRecipe(value, catalogue)[0]!.generate();
-    await exportThingRecipes(root, out);
+    // Generated in this thread: a worker thread's start-up is wall-clock work that a loaded host stretches past the test timeout.
+    await exportRecipes({ root, out, tools: ['thing'], pool: { run: generateRow } });
 
     const base = join(out, packId);
     expect(JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8'))).toEqual([modelEntry]);

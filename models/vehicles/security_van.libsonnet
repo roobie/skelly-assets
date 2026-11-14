@@ -7,7 +7,6 @@ local vehicle = import 'security_van.placements.libsonnet';
 local tail = van.tail(s);
 local plate = [s.glassOut - 0.01, s.side];
 local pillarY(x) = van.pillarY(s, x);
-local strap(id, x, y) = box(id, 'steel', [x[0], y[0], s.box.side], [x[1], y[1], s.box.side + 0.03]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van', vehicle.title, s) + [
   // Plates the cab door's glass down to a small port and blanks the quarter light.
   k.compound('security_van_cab_plate', 45, [
@@ -24,12 +23,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van',
   ] + [
     box('lock_bar', 'steel', [tail - 0.05, s.box.rearSill + 0.03, 0.08], [tail, s.box.doorTop - 0.03, 0.14]),
   ], { steel: 'steel-grey' }) + { title: 'Security van rear door bars' },
-  k.compound('security_van_side_door_bars', 26, [
-    strap('hinge_low', [-0.62, -0.14], [1.2, 1.3]),
-    strap('hinge_mid', [-0.62, -0.14], [1.65, 1.75]),
-    strap('hinge_high', [-0.62, -0.14], [2.1, 2.2]),
-    strap('lock_bar', [-0.9, -0.84], [0.58, s.box.doorTop - 0.04]),
-  ], { steel: 'steel-grey' }) + { title: 'Security van side door bars' },
+  k.compound('security_van_side_door_lock_bar', 11, [
+    box('lock_bar', 'steel', [-0.9, 0.58, s.box.side], [-0.84, s.box.doorTop - 0.04, s.box.side + 0.03]),
+  ], { steel: 'steel-grey' }) + { title: 'Security van side door lock bar' },
   k.compound('security_van_cash_chute', 28, [
     box('frame', 'steel', [-2.5, 1.2, s.box.side], [-2.0, 1.66, s.box.side + 0.02]),
     box('flap', 'dark', [-2.42, 1.42, s.box.side + 0.02], [-2.08, 1.58, s.box.side + 0.03]),

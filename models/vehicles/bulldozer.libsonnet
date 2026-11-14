@@ -25,6 +25,15 @@ local ribs = [-1.2, -0.5, 0, 0.5, 1.2];
 local arm = { pivot: [-0.1, 0.5], end: [blade.back - 0.02, 0.33], z: [1.24, 1.4] };
 local lift = { foot: [1.6, 1.78], pin: [blade.back - 0.04, 1.2], z: [s.hoodSide + 0.04, s.hoodSide + 0.24] };
 local ear = 0.04;
+// One cylinder tilts the blade from a clevis on its push arm to the blade's upper back; the far arm carries a brace in
+// its place, so the blade tips about the brace's end.
+local tilt = { foot: [0.8, 0.7], pin: [blade.back - 0.04, 1.02] };
+local armY(x) = arm.pivot[1] + (x - arm.pivot[0]) * (arm.end[1] - arm.pivot[1]) / (arm.end[0] - arm.pivot[0]);
+local along(share) = [tilt.foot[i] + share * (tilt.pin[i] - tilt.foot[i]) for i in [0, 1]];
+local clevis(name, x, y) = [
+  box(name + '_ear_inner', 'paint', [x[0], y[0], arm.z[0] - ear], [x[1], y[1], arm.z[0]]),
+  box(name + '_ear_outer', 'paint', [x[0], y[0], arm.z[1]], [x[1], y[1], arm.z[1] + ear]),
+];
 local ripper = { beam: [-2.95, -2.65], top: 1.1, mount: [-2.05, -1.9] };
 local shankX = (ripper.beam[0] + ripper.beam[1]) / 2;
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
@@ -97,16 +106,32 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
       box('arm_ear_outer', 'paint', [blade.back - 0.16, 0.18, arm.z[1]], [blade.back, 0.5, arm.z[1] + ear]),
       box('lift_ear_inner', 'paint', [blade.back - 0.08, 0.98, lift.z[0] - ear], [blade.back, 1.26, lift.z[0]]),
       box('lift_ear_outer', 'paint', [blade.back - 0.08, 0.98, lift.z[1]], [blade.back, 1.26, lift.z[1] + ear]),
-    ]), { paint: s.paint, edge: 'steel-grey' }) + { title: 'Bulldozer blade' },
+    ] + clevis('tilt', [blade.back - 0.08, blade.back], [tilt.pin[1] - 0.12, tilt.pin[1] + 0.12])),
+    { paint: s.paint, edge: 'steel-grey' }) + { title: 'Bulldozer blade' },
   k.compound('bulldozer_push_arm', 420, [
     k.bar('arm', 'paint', arm.pivot, arm.end, 0.26, arm.z),
     m.axleDisc('trunnion', 'steel', arm.pivot[0], arm.pivot[1], 0.1, [s.trackZ + track.frame('bulldozer_track').halfWidth, arm.z[0]]),
-  ], { paint: s.paint, steel: 'paint-charcoal' }) + { title: 'Bulldozer push arm' },
+  ] + clevis('tilt', [tilt.foot[0] - 0.08, tilt.foot[0] + 0.08], [armY(tilt.foot[0]), tilt.foot[1] + 0.08]),
+  { paint: s.paint, steel: 'paint-charcoal' }) + { title: 'Bulldozer push arm' },
   k.compound('bulldozer_lift_cylinder', 110, [
     k.bar('barrel', 'dark', lift.foot, [2.1, 1.42], 0.2, lift.z),
     k.bar('rod', 'bright', [2.04, 1.46], lift.pin, 0.08, [lift.z[0] + 0.06, lift.z[1] - 0.06]),
     m.axleDisc('pin', 'bright', lift.pin[0], lift.pin[1], 0.04, lift.z, 12),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Bulldozer lift cylinder' },
+  k.compound('bulldozer_tilt_cylinder', 100, [
+    m.axleDisc('foot_pin', 'bright', tilt.foot[0], tilt.foot[1], 0.04, arm.z, 12),
+    k.bar('barrel', 'dark', tilt.foot, along(0.55), 0.18, arm.z),
+    k.bar('rod', 'bright', along(0.5), tilt.pin, 0.08, [arm.z[0] + 0.04, arm.z[1] - 0.04]),
+    m.axleDisc('pin', 'bright', tilt.pin[0], tilt.pin[1], 0.04, arm.z, 12),
+  ], { dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Bulldozer tilt cylinder' },
+  // A screw in the middle sets the blade's pitch, so the brace is a tube in two halves round a threaded rod.
+  k.compound('bulldozer_tilt_brace', 70, [
+    m.axleDisc('foot_pin', 'bright', tilt.foot[0], tilt.foot[1], 0.04, arm.z, 12),
+    k.bar('tube_rear', 'dark', tilt.foot, along(0.42), 0.12, [arm.z[0] + 0.02, arm.z[1] - 0.02]),
+    k.bar('screw', 'bright', along(0.4), along(0.6), 0.07, [arm.z[0] + 0.045, arm.z[1] - 0.045]),
+    k.bar('tube_front', 'dark', along(0.58), tilt.pin, 0.12, [arm.z[0] + 0.02, arm.z[1] - 0.02]),
+    m.axleDisc('pin', 'bright', tilt.pin[0], tilt.pin[1], 0.04, arm.z, 12),
+  ], { dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Bulldozer tilt brace' },
   k.compound('bulldozer_ripper', 900, [
     box('mount', 'steel', [ripper.mount[0], 0.42, -0.5], [ripper.mount[1], 1.42, 0.5]),
     box('beam', 'paint', [ripper.beam[0], 0.55, -1.1], [ripper.beam[1], ripper.top, 1.1]),

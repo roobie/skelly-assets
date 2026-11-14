@@ -9,6 +9,7 @@ local round(piece) = piece + { sides: 12 };
 // How far a pulley stands out of the engine's front face, and the air box's duct out of its side.
 local pulleyDepth = 0.03;
 local ductLength = 0.06;
+local airBoxLid = 0.02;
 // The core's block top, as a share of its height, and its head's half-width, as a share of its width, which a high
 // alternator sits on and beside.
 local blockTop = 0.72;
@@ -58,7 +59,7 @@ local airBox(c) = {
   local b = c.airBox,
   pieces: [
     box('box', 'shell', [-b.length / 2, 0, -b.width / 2], [b.length / 2, b.height, b.width / 2]),
-    box('lid', 'lid', [-b.length / 2 + 0.02, b.height, -b.width / 2 + 0.02], [b.length / 2 - 0.02, b.height + 0.02, b.width / 2 - 0.02]),
+    box('lid', 'lid', [-b.length / 2 + 0.02, b.height, -b.width / 2 + 0.02], [b.length / 2 - 0.02, b.height + airBoxLid, b.width / 2 - 0.02]),
     box('duct', 'shell', [-0.05, b.height * 0.3, -b.width / 2 - ductLength], [0.05, b.height * 0.7, -b.width / 2]),
   ],
   finish: { shell: 'polymer-black', lid: 'plastic-black' },
@@ -142,11 +143,39 @@ local mounts(name) =
   {
     alternator: [e.length / 2 - c.alternator.length / 2, crank + c.drive.alternator.at[0], c.drive.alternator.at[1]],
     starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width / 2 + c.starter.radius],
-    airBox: [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
+    // An air box over the cover sits on its rear half, clear of a turbo's charge pipe, which crosses the front half.
+    airBox:
+      if std.get(c.airBox, 'over', false) then [-e.length / 4, e.height, 0]
+      else [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
   };
-// The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round.
+// What an engine shows of those `engines.libsonnet` names, on its core. The turbo stands on the exhaust manifold behind
+// the engine's middle; its charge pipe runs forward, over the head and down into the intake.
+local shown(e) =
+  local l = e.length;
+  local w = e.width;
+  local h = e.height;
+  local crank = crankHeight(e);
+  local turbo(t) =
+    local at = { x: -l * 0.05, y: h * 0.86, z: -w * 0.6 };
+    local pipe = { x: l * 0.3, y: h + t.pipe, z: w * 0.58 };
+    [
+      box('turbo_foot', 'exhaust', [at.x - 0.06, h * 0.7, at.z - 0.05], [at.x + 0.06, at.y, at.z + 0.05]),
+      round(k.turned('turbine', 'exhaust', 'x', k.disc(t.radius, -0.1, 0), [at.x, at.y, at.z])),
+      round(k.turned('compressor', 'pipe', 'x', k.disc(t.radius * 0.9, 0, 0.1), [at.x, at.y, at.z])),
+      round(k.turned('outlet', 'exhaust', 'y', k.disc(t.pipe * 1.2, 0, h * 0.24), [at.x - 0.05, at.y, at.z])),
+      round(k.turned('charge_feed', 'pipe', 'x', k.disc(t.pipe, 0.1, pipe.x - at.x), [at.x, at.y, at.z])),
+      round(k.turned('charge_rise', 'pipe', 'y', k.disc(t.pipe, at.y, pipe.y), [pipe.x, 0, at.z])),
+      round(k.turned('charge_cross', 'pipe', 'z', k.disc(t.pipe, at.z, pipe.z), [pipe.x, pipe.y, 0])),
+      round(k.turned('charge_drop', 'pipe', 'y', k.disc(t.pipe, h * 0.8, pipe.y), [pipe.x, 0, pipe.z])),
+    ];
+  local damper(d) = [round(k.turned('damper', 'pulley', 'x', k.disc(d.radius, l / 2 + pulleyDepth, l / 2 + pulleyDepth + d.depth), [0, crank, 0]))];
+  local bellHousing(b) = [round(k.turned('bell_housing', 'casting', 'x', k.disc(b.radius, -l / 2 - b.depth, -l / 2), [0, crank, 0]))];
+  local drawn = { turbo: turbo, damper: damper, bellHousing: bellHousing };
+  std.flattenArrays([drawn[f](e[f]) for f in std.objectFields(drawn) if std.objectHas(e, f)]);
+// The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round, and what
+// the engine shows besides.
 local core(name) =
   local e = engines[name];
   local c = classOf(name);
@@ -174,8 +203,9 @@ local core(name) =
       box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
       pulley('crank_pulley', c.drive.crank.at, c.drive.crank.radius),
       pulley('pump_pulley', c.drive.pump.at, c.drive.pump.radius),
-    ] + boss,
-    finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' },
+    ] + boss + shown(e),
+    finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' }
+      + (if std.objectHas(e, 'turbo') then { pipe: 'alu-bare' } else {}),
   };
 
 // The engine's accessories as `assembly.libsonnet` fits them, in the order a vehicle lists their sites.
@@ -198,6 +228,12 @@ local fittings(name) =
   ]),
   // The engines, by the names `sites` takes.
   names: std.objectFields(engines),
+  // The name of the engine whose fused part is `part`, as a spec names its engine.
+  nameOf(part):
+    local prefix = fusedId('');
+    local name = std.substr(part, std.length(prefix), std.length(part) - std.length(prefix));
+    assert std.startsWith(part, prefix) && std.objectHas(engines, name) : part + ' is not a fused engine';
+    name,
   // Every site an engine can take, so a vehicle that loses its engine can drop them all.
   siteIds: assembly.siteIds('engine', fittings(self.names[0])),
   // A vehicle's engine sites, the engine's frame placed at `at`; `detail` is 'fused' or 'assembly', as
@@ -205,4 +241,6 @@ local fittings(name) =
   sites(name, at, detail): assembly.sites('engine', fusedId(name), coreId(name), fittings(name), at, detail),
   // The radiator of the engine's class.
   radiator(name): classOf(name).radiator,
+  // How far the air box of the engine's class rises from its base to its lid's top.
+  airBoxHeight(name): classOf(name).airBox.height + airBoxLid,
 }

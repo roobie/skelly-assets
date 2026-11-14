@@ -2,6 +2,7 @@ local site = import 'site.libsonnet';
 local s = import 'shuttle_bus.spec.libsonnet';
 {
   title: 'Shuttle bus',
+  doorPairs:: (import 'bus-body.libsonnet').doorPairs(s),
   sites: (import 'bus-body.libsonnet').fittings(site.kit, 'shuttle_bus', s) + [
     site.one('pole_door_fwd', 'grab_pole_short', [2.2, s.floor, 0.45]),
     site.one('pole_door_aft', 'grab_pole_short', [0.85, s.floor, 0.45]),
