@@ -41,7 +41,8 @@ local h = {
   brow: head.eyes + 0.02,
   // The dome rises from the hairline, where the hair begins to round over.
   domeBase: head.brow,
-  // The dome stands high enough to keep the padding's room over the hair's top and round each of its layers.
+  // The dome stands high enough to keep the padding's room over the hair's top and round each of its layers, solving
+  // the power-four profile that `dome` below draws for the height at each layer's reach.
   crownInner: std.foldl(std.max, [
     (layer.top - self.domeBase) / std.pow(1 - std.pow((layer.reach + self.room) / self.inner, 4), 1 / 4)
     for layer in head.hair
