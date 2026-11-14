@@ -89,8 +89,10 @@ export function stowClips(layers, clock) {
 }
 
 // A part's motion for the part placed at a site: reflected across the vehicle's centre plane for a far-side twin, as the
-// part itself is, then carried to the site's position. `lateral` is the index of the axis the reflection flips.
+// part itself is, then carried to the site's position. `lateral` is the index of the axis the reflection flips, and is
+// required: the two frames flip different axes, so a default would mirror one of them wrongly without a word.
 export function motionAtSite(motion, { at, mirror }, lateral) {
+  if (lateral !== AUTHORED_LATERAL && lateral !== MODEL_LATERAL) throw new Error(`motionAtSite: lateral must be AUTHORED_LATERAL or MODEL_LATERAL, not ${lateral}`);
   const reflect = (point) => point.map((value, axis) => (axis === lateral ? 0 - value : value));
   const shift = (point) => [point[0] + at[0], point[1] + at[1], point[2] + at[2]];
   const along = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -115,11 +117,10 @@ export function motionLayers(site, byId, motionOf) {
 }
 
 // The moving sites of a vehicle as the showcase draws it, [{ index, layers }] in site order: a site is { site, model, at,
-// mirror?, rides? } and `motions` maps a model's id to its motion. A site that turns about its own origin is left still,
-// since its motion is not given in that turned frame.
+// mirror?, rides? } and `motions` maps a model's id to its motion.
 export function movingSites(sites, motions) {
   const byId = new Map(sites.map((site) => [site.site, site]));
-  const motionOf = (site) => (motions.get(site.model) && !site.turn ? motionAtSite(motions.get(site.model), { at: site.at, mirror: site.mirror }, MODEL_LATERAL) : null);
+  const motionOf = (site) => (motions.get(site.model) ? motionAtSite(motions.get(site.model), { at: site.at, mirror: site.mirror }, MODEL_LATERAL) : null);
   return sites.flatMap((site, index) => {
     const layers = motionLayers(site, byId, motionOf);
     return layers.length > 0 ? [{ index, layers }] : [];
