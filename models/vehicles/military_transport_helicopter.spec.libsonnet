@@ -5,6 +5,8 @@
   windscreen: [3.3, 4.6], windscreenArc: 70,
   cockpitDoor: [2.1, 3.3], cockpitArc: 38, cockpitPane: 62,
   cabinDoor: [-1.1, 1.0], cabinArc: 34, cabinPane: [46, 66], cabinPaneX: [-0.5, 0.4],
+  // How far the cabin door stands out before it slides, so its head clears the shoulder ahead of it.
+  cabinDoorPlug: 0.15,
   gunWindow: [1.2, 1.9], gunWindowArc: [50, 72],
   bulkhead: -1.6, tailEnd: -4.4,
   rotorRadius: 8.2,

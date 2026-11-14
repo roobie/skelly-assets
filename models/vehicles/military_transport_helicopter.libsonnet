@@ -8,6 +8,7 @@ local finishes = { paint: s.paint, dark: s.trim, glass: 'glass-clear' };
 local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, x=x, arc=arc, step=step, sides=sides);
 local proud = h.proud(s.body, 0.04);
 local door = s.cabinDoor;
+local doorTravel = door[1] - door[0];
 local pane = s.cabinPane;
 local paneX = s.cabinPaneX;
 local cockpit = s.cockpitDoor;
@@ -38,8 +39,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('cabin_roof', 'paint', door, [-s.cabinArc, s.cabinArc], step=0.7)
              + wall('cabin_rear', 'paint', [s.bulkhead, door[0]], h.dome, step=0.25)
              + h.loft('bulkhead', 'paint', s.body, x=[s.bulkhead, s.bulkhead + 0.05], arc=h.dome, step=0.05, sides=24)
-             + h.shell('rail_near', 'dark', proud, x=[door[0], door[1] + 0.6], arc=[s.cabinArc - 3, s.cabinArc], step=0.9, sides=120)
-             + h.shell('rail_far', 'dark', proud, x=[door[0], door[1] + 0.6], arc=[-s.cabinArc, -s.cabinArc + 3], step=0.9, sides=120),
+             + h.shell('rail_near', 'dark', proud, x=[door[0], door[1] + doorTravel], arc=[s.cabinArc - 3, s.cabinArc], step=0.9, sides=120)
+             + h.shell('rail_far', 'dark', proud, x=[door[0], door[1] + doorTravel], arc=[-s.cabinArc, -s.cabinArc + 3], step=0.9, sides=120),
              finishes) + { title: 'Military transport helicopter roof' },
   k.compound('military_transport_helicopter_windscreen', 30,
              wall('near', 'glass', s.windscreen, [3, s.windscreenArc])
@@ -61,10 +62,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('fore', 'paint', [paneX[1], door[1]], pane, step=0.6)
              + wall('aft', 'paint', [door[0], paneX[0]], pane, step=0.6)
              + wall('edge_fore', 'dark', [door[1] - 0.04, door[1]], [s.cabinArc, 90], step=0.04)
-             + wall('edge_aft', 'dark', [door[0], door[0] + 0.04], [s.cabinArc, 90], step=0.04)
-             + [h.hingeRib('hinge_rib', s.body, door[0] + 0.03, 58, 88, slot='dark', depth=0.05)],
+             + wall('edge_aft', 'dark', [door[0], door[0] + 0.04], [s.cabinArc, 90], step=0.04),
              finishes,
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Military transport helicopter cabin door' },
+             // Forward, where the cabin's section runs on unchanged, rather than aft into the narrowing tail.
+             motion=k.motion.slide('near', s.cabinDoorPlug) + k.motion.slide('fore', doorTravel)) + { title: 'Military transport helicopter cabin door' },
   k.compound('military_transport_helicopter_side_window', 6,
              wall('pane', 'glass', gun, gunArc, step=0.7),
              finishes) + { title: 'Military transport helicopter side window' },
