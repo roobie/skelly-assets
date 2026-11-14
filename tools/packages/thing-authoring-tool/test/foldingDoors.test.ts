@@ -23,11 +23,15 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   local folding(site) = std.endsWith(site.part, '_jamb') || std.endsWith(site.part, '_free');
   local sites = { [v]: [site for site in std.get(placements[v], 'sites', []) if folding(site)] for v in std.objectFields(placements) };
+  // A variant keeps its parent's doorways, as it keeps its parent's sites.
+  local pairsOf(v) =
+    if std.objectHasAll(placements[v], 'doorPairs') then placements[v].doorPairs
+    else if std.objectHas(placements[v], 'parent') then pairsOf(placements[v].parent);
   local parts = std.set(std.flattenArrays([[site.part for site in sites[v]] for v in std.objectFields(sites)]));
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
     vehicles: { [v]: sites[v] for v in std.objectFields(sites) if std.length(sites[v]) > 0 },
-    doorPairs: { [v]: placements[v].doorPairs for v in std.objectFields(placements) if std.objectHasAll(placements[v], 'doorPairs') },
+    doorPairs: { [v]: pairsOf(v) for v in std.objectFields(placements) if pairsOf(v) != null },
     rows: frame.rows([row for row in rows if std.member(parts, row.id)]),
   }
 `, resolve(import.meta.dirname, '../../../..'))) as {
@@ -103,7 +107,7 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
   };
   const leaves = new Map<string, Site[]>();
   for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
-  const outlines = (leaf: string, clock: number): Outline[] =>
+  const drawOutlines = (leaf: string, clock: number): Outline[] =>
     leaves.get(leaf)!.flatMap((site) =>
       panels.get(site.part)!.boxes.map(({ min, max }) => ({
         corners: ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
@@ -114,6 +118,12 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
         high: pose(site, max, clock)[1],
       })),
     );
+  const posed = new Map<string, Outline[]>();
+  const outlines = (leaf: string, clock: number): Outline[] => {
+    const key = `${leaf}@${clock}`;
+    if (!posed.has(key)) posed.set(key, drawOutlines(leaf, clock));
+    return posed.get(key)!;
+  };
   const gap = (a: string, b: string, clock: number) => {
     const theirs = outlines(b, clock);
     return Math.min(...outlines(a, clock).flatMap((one) => theirs.map((other) => separation(one, other))));
