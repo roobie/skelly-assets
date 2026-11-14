@@ -141,7 +141,7 @@ local gloves = fit.hands('gloves_power', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
 }, 'Power gauntlets').rows;
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.075, instep: 0.1, top: 0.275, shaft: 0.14, laces: 0 }, title='Power boots').rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots').rows;
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);

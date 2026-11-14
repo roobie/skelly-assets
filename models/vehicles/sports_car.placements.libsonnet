@@ -30,7 +30,7 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
       site.one('firewall', 'sports_car_firewall'),
       site.one('front_skirt', 'sports_car_front_skirt'),
       site.one('side_intake', 'sports_car_side_intake'),
-      site.one('spoiler', 'sports_car_spoiler'),
+      site.one('spoiler', 'sports_car_spoiler', rides='boot_lid'),
     ],
   }),
 }

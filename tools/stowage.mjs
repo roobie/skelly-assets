@@ -1,7 +1,7 @@
 // Stowage slots and the kit stowed in them: a locker part's slots must hold their kit apart and clear of the part's own
 // fit-out, and a site's load-out must name items that a slot accepts and that fit it. A slot is a female port of mount
 // `stowage` with `accepts` and an `envelope` in its frame; an item stows by its one male `stowage` port, its seat, whose
-// `standard` is its word. The why is in docs/decisions/0016-stowage-slots.md.
+// `standard` is its word. The why is in docs/decisions/0017-stowage-slots.md.
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { modelBox } from './dress.mjs';

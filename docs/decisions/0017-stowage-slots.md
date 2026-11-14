@@ -6,7 +6,7 @@ read_if:
   - changing the stowage checks in `tools/stowage.mjs`
 ---
 
-# 16. Stowed kit is catalogue items in slots, not pieces of the locker
+# 17. Stowed kit is catalogue items in slots, not pieces of the locker
 
 ## Context
 

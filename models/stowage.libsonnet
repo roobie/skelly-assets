@@ -1,5 +1,5 @@
 // Stowage: the slots a locker part offers and the seat a stowable item stows by; the why is in
-// docs/decisions/0016-stowage-slots.md. A word names a kind of kit and how it seats, so any item of one word takes
+// docs/decisions/0017-stowage-slots.md. A word names a kind of kit and how it seats, so any item of one word takes
 // another's place in a slot that accepts it.
 local mount = 'stowage';
 // How an item of each word is seated, which every item and slot of the word follows. Resting kit seats at the middle

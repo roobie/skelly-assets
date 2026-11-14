@@ -10,7 +10,8 @@ local s = import 'luxury_saloon.spec.libsonnet';
     },
     add: [
       site.one('grille', 'luxury_saloon_grille'),
-      site.one('brightwork', 'luxury_saloon_brightwork'),
-    ],
+    ]
+    + site.pair('front_door_brightwork', 'luxury_saloon_front_door_brightwork', rides='front_door')
+    + site.pair('rear_door_brightwork', 'luxury_saloon_rear_door_brightwork', rides='rear_door'),
   }),
 }

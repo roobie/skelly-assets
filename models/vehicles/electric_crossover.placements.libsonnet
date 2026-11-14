@@ -24,6 +24,7 @@ local s = import 'electric_crossover.spec.libsonnet';
   + site.pair('rear_door', 'electric_crossover_rear_door')
   + site.pair('tail_lamp', 'electric_crossover_tail_lamp')
   + site.pair('cladding', 'electric_crossover_cladding')
+  + site.pair('rear_door_cladding', 'electric_crossover_rear_door_cladding', rides='rear_door')
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.331, s.side - 0.1175 - 0.05])
   + site.pair('front_wheel', 'wheel_235_75r15', [s.frontAxle, 0.367, s.side - 0.1175])
   + site.pair('rear_wheel', 'wheel_235_75r15', [s.rearAxle, 0.367, s.side - 0.1175])

@@ -20,7 +20,7 @@ local s = import 'suv.spec.libsonnet';
     site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.75, 0]),
     site.one('rear_bench', 'bench_seat_3', [-0.72, s.floor, 0]),
     site.one('roof_rails', 'suv_roof_rails'),
-    site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.15, 0]),
+    site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.15, 0], 'tailgate'),
     site.one('front_axle', 'beam_axle_light', [s.frontAxle, 0.032, 0]),
     site.one('front_prop_shaft', 'prop_shaft_short', [1.05, 0.42, 0]),
     site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.24, 0.5]),
@@ -31,6 +31,7 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('rear_door', 'suv_rear_door')
   + site.pair('tail_lamp', 'suv_tail_lamp')
   + site.pair('arch_flare', 'suv_arch_flare')
+  + site.pair('rear_door_flare', 'suv_rear_door_flare', rides='rear_door')
   + site.pair('side_step', 'suv_side_step')
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.366, s.side - 0.1325 - 0.05])
   + site.pair('front_wheel', 'wheel_265_75r16', [s.frontAxle, 0.402, s.side - 0.1325])

@@ -8,6 +8,7 @@ local retagged = [placed + { part: retag(placed.part) } for placed in (import 's
   title: 'Taxi',
   sites: k.painted('taxi', s, (import 'car-body.libsonnet').pressings('taxi', s), retagged) + [
     site.one('roof_sign', 'taxi_roof_sign'),
-    site.one('side_band', 'taxi_side_band'),
-  ],
+  ]
+  + site.pair('front_door_band', 'taxi_front_door_band', rides='front_door')
+  + site.pair('rear_door_band', 'taxi_rear_door_band', rides='rear_door'),
 }

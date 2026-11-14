@@ -5,7 +5,9 @@ local s = import 'suv.spec.libsonnet';
 local vehicle = import 'suv.placements.libsonnet';
 local hybrid = import 'hybrid_suv.placements.libsonnet';
 local shape = (import 'car-shape.libsonnet')(s);
-local flare(id, axle) = shape.flare(id, 'trim', axle, s.sill, [s.side - 0.01, s.side + 0.03], 0.06, 0.02);
+local flareZ = [s.side - 0.01, s.side + 0.03];
+local frontFlare = shape.flare('front_flare', 'trim', s.frontAxle, s.sill, flareZ, 0.06, 0.02);
+local rearFlare = shape.flareHalves('rear_flare', 'trim', s.rearAxle, s.sill, flareZ, 0.06, 0.02, shut=s.rearDoor);
 local body = (import 'car-body.libsonnet').rows;
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, body('suv', vehicle.title, s) + [
   // The hybrid's nose: this file is what the thing tool indexes for a vehicle derived from this one.
@@ -13,7 +15,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, body('suv', vehicle.titl
   for row in body('hybrid_suv', hybrid.title, s + { grilleShut: 0.45, noseAccent: 'plastic-green' })
   if row.id == 'hybrid_suv_front_bumper'
 ] + [
-  k.compound('suv_arch_flare', 3, flare('front_flare', s.frontAxle) + flare('rear_flare', s.rearAxle), { trim: 'plastic-black' }) + { title: 'SUV arch flare' },
+  k.compound('suv_arch_flare', 3, frontFlare + rearFlare.aft, { trim: 'plastic-black' }) + { title: 'SUV arch flare' },
+  k.compound('suv_rear_door_flare', 0.5, rearFlare.fore, { trim: 'plastic-black' }) + { title: 'SUV rear door flare' },
   k.compound('suv_side_step', 9, [
     box('step', 'steel', [s.rearDoorArch, 0.33, s.side - 0.1], [s.aPost - 0.1, 0.37, s.side + 0.03]),
   ], { steel: 'steel-stainless' }) + { title: 'SUV side step' },
