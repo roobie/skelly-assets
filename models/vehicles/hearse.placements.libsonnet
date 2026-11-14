@@ -17,6 +17,4 @@ local s = import 'hearse.spec.libsonnet';
       site.one('brightwork', 'hearse_brightwork'),
     ],
   }),
-  swingUnjudged: [
-  ],
 }

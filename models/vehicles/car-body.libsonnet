@@ -26,6 +26,7 @@ local pressings(id, title, s) = {
   local noseShut = (std.round(hood(nose) / grain) - 1) * grain,
   local roofRear = s.tailWaist + s.dLean,
   local roofFront = s.aPost - s.aLean,
+  local roofThick = 0.04,
   local open = std.get(s, 'open', false),
   local windowTop = if open then s.waist + 0.06 else s.roof - 0.03,
   local pillarBack = if open then s.cowl - 0.04 else s.cowl - 0.14,
@@ -102,7 +103,7 @@ local pressings(id, title, s) = {
     ] else [
       box('rear_panel', 'paint', [if boot then s.rear + 0.03 else s.rear + 0.02, 0.45 + lift, -s.skin], [floorBack, if boot then 0.62 + lift else rearPanelTop, s.skin]),
     ]) + [
-      box('roof', if roofPaint == null then 'paint' else 'roof_paint', [roofBack, s.roof, -roofHalf], [roofFront, s.roof + 0.04, roofHalf]),
+      box('roof', if roofPaint == null then 'paint' else 'roof_paint', [roofBack, s.roof, -roofHalf], [roofFront, s.roof + roofThick, roofHalf]),
     ] + (if open then [] else [
       box('headliner', 'headliner', [roofRear + 0.1, s.roof - 0.02, -roofHalf + 0.02], [roofFront - 0.1, s.roof, roofHalf - 0.02]),
     ]) + stripes(s.roof + 0.03, roofBack, roofFront) + (if boot && !open then
@@ -234,8 +235,9 @@ local pressings(id, title, s) = {
       k.turned('hinge_pivot', 'paint', 'z', k.disc(grain, -grain, grain), [s.deckFront - grain, s.deck - 2 * grain, hingeHalf]),
     ]) + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), motion=k.motion.hinge(['hinge_pivot_near', 'hinge_pivot_far'], 'up', opens.bootLid)),
   ] else [
-    // The whole rear opening, glass and all, lifts as one about pins at the roof's rear edge.
-    local tailgatePins = k.hingePins('hinge', 'z', [roofRear + 0.03, s.roof, 0.7 * s.hatchSide], [roofRear + 0.03, s.roof, -0.7 * s.hatchSide]);
+    // The whole rear opening, glass and all, lifts as one about pins on the roof's top rear edge: every point of the
+    // gate lies below and behind them, so it swings clear of the roof.
+    local tailgatePins = k.hingePins('hinge', 'z', [roofRear, s.roof + roofThick, 0.7 * s.hatchSide], [roofRear, s.roof + roofThick, -0.7 * s.hatchSide]);
     part('_tailgate', 'tailgate', 18, [
       box('skin', 'paint', [s.rear + 0.05, 0.62 + lift, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),
