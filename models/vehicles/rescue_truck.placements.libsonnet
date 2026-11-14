@@ -8,6 +8,7 @@ local site = import 'site.libsonnet';
     add=[
       site.one('racking', 'rescue_truck_racking'),
       site.one('marking', 'rescue_truck_marking'),
+      site.one('rear_shutter_frame', 'rescue_truck_rear_shutter_frame'),
       site.one('rear_shutter', 'rescue_truck_rear_shutter'),
       site.one('roof_rack', 'rescue_truck_roof_rack'),
       site.one('roof_gear', 'rescue_truck_roof_gear'),
