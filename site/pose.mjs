@@ -17,7 +17,7 @@ import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip } from './clipFrames
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
-import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame } from './poseFile.mjs';
+import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame, soleLift } from './poseFile.mjs';
 import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
 import { addCoveredSkin, skinCheck } from './skin.mjs';
 import { drawEye, drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
@@ -87,8 +87,9 @@ function worldMesh(object) {
 // The dressed doll as a jointed figure: `root` holds the joints, each named by its bone, `bones` maps a bone id to its
 // joint, `pieces` lists the worn pieces with the bones they ride, `held` the items it has carried (`carry`), and `clearance()` gives the figure's covered surface
 // at rest and the clearance probe over it, made when first asked for, since a figure drawn only to be looked at needs
-// neither. A piece rides the bone of the part copy it is drawn in (its site's part and side); what no bone carries,
-// such as a wearable placed whole, stays where the dressing put it.
+// neither, and `soles` how far what it wears stands it above the ground. A piece rides the bone of the part copy it is
+// drawn in (its site's part and side); what no bone carries, such as a wearable placed whole, moves with the root,
+// where the dressing put it on the figure at rest.
 export async function buildFigure(data, wear) {
   const { rig } = data;
   const sites = dressedSites(data, wear);
@@ -131,7 +132,7 @@ export async function buildFigure(data, wear) {
     }
     return clearance;
   };
-  return { rig, root, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered, held: new Map() };
+  return { rig, root, dressed, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered, held: new Map(), soles: soleLift(sites) };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`.
@@ -140,6 +141,7 @@ export function applyFrame(figure, frame) {
     joint.quaternion.fromArray(frame.rotations[bone.id] ?? IDENTITY_Q);
     if (bone.parent === null) joint.position.fromArray(add(bone.head, frame.root));
   }
+  figure.dressed.position.fromArray(frame.root);
   figure.root.updateMatrixWorld(true);
 }
 
@@ -355,7 +357,7 @@ function blendCarries(a, b, w) {
 async function holdPose(figure, rig, file) {
   const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
   const meshes = new Map(await Promise.all(models.map(async (model) => [model, await heldMesh(model, file.moved?.[model])])));
-  const compiled = compilePose(rig, file, { meshOf: (model) => meshes.get(model) });
+  const compiled = compilePose(rig, file, { meshOf: (model) => meshes.get(model), soles: figure.soles });
   applyFrame(figure, compiled.frame);
   figure.root.updateMatrixWorld(true);
   const firstHands = new Map();
@@ -584,7 +586,7 @@ async function startPage(data, query) {
   $('fixture').addEventListener('change', () => show($('fixture').value || standing(rig)));
   for (const id of ROOT) $(id).addEventListener('change', () => { state.root = numbers(ROOT); refresh(); });
   $('ground').addEventListener('click', () => {
-    const { frame } = compilePose(rig, { ...poseFileOf(rig, frameOf(rig, state)), root: [state.root[0], 0, state.root[2]], ground: true });
+    const { frame } = compilePose(rig, { ...poseFileOf(rig, frameOf(rig, state)), root: [state.root[0], 0, state.root[2]], ground: true }, { soles: figure.soles });
     state.root = frame.root;
     refresh();
   });
@@ -708,7 +710,7 @@ async function startPage(data, query) {
     if (sequences.has(value)) return playSequence(sequences.get(value));
     const chosen = actorClips[value];
     if (!chosen) return setClip([], { carries: [] });
-    const actor = { ...chosen, frames: chosen.frames.map((frame) => rigFrame(rig, frame)) };
+    const actor = { ...chosen, frames: chosen.frames.map((frame) => rigFrame(rig, frame, figure.soles)) };
     setClip(actor.frames, { actor, loop: Boolean(actor.loop), seconds: spanOf(actor, rig.clips.walkSpeed) });
     seek(0);
   }));
