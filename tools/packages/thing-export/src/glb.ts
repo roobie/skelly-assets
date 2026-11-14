@@ -122,6 +122,12 @@ export const latticeOrigin = (
 export const VOXEL_DETAIL = 'voxel-detail';
 
 /**
+ * Part-definition tag that keeps the part's authored mesh in a voxelized export. A part the eye reads by its exact
+ * outline, such as an aperture sight seen up close, loses that outline to any grain.
+ */
+export const SMOOTH = 'smooth';
+
+/**
  * Whether the part's drawn solids, taken together, are too thin on some axis to read at the grain. The part is judged
  * whole, not solid by solid, because a receiver or a stock is built of thin walls and plates that read as one body, while
  * a part thin all through, such as a charging handle or a trigger, lands on one uneven layer of voxels.
@@ -140,18 +146,23 @@ const isThinPart = (def: PartDef, grain: number, metresPerUnit: number): boolean
 };
 
 /**
- * The grain a voxelized export samples this part at: the detail grain for a part tagged `VOXEL_DETAIL`, and, in a
- * class that asks for it, for a part too thin for the class grain; every other part takes the class grain.
+ * The grain a voxelized export samples this part at: none for a part tagged `SMOOTH`, the detail grain for a part
+ * tagged `VOXEL_DETAIL`, and, in a class that asks for it, for a part too thin for the class grain; every other part
+ * takes the class grain.
  */
 export const partVoxelGrain = (
   def: PartDef,
   { voxelGrain, voxelDetailGrain, voxelDetailThinParts }: VoxelGrains,
   metresPerUnit: number,
-): number =>
-  voxelDetailGrain !== undefined &&
-  (def.tags?.includes(VOXEL_DETAIL) || (voxelDetailThinParts && isThinPart(def, voxelGrain, metresPerUnit)))
+): number | undefined => {
+  if (def.tags?.includes(SMOOTH)) {
+    return undefined;
+  }
+  return voxelDetailGrain !== undefined &&
+    (def.tags?.includes(VOXEL_DETAIL) || (voxelDetailThinParts && isThinPart(def, voxelGrain, metresPerUnit)))
     ? voxelDetailGrain
     : voxelGrain;
+};
 
 /**
  * Every part's lattice is anchored at the world origin, so two grains nest exactly when the coarse one is a whole
@@ -656,17 +667,17 @@ const writeGlb: ExportGlb = (input) => {
   const addPart = (part: PartExport): void => {
     const drawn = part.def.displaySolids ?? part.def.solids;
     const items = itemsOf(part);
-    const primitives =
+    const grain =
       input.voxelGrain === undefined
+        ? undefined
+        : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
+    const primitives =
+      grain === undefined
         ? items.flatMap((item) => {
             const primitive = primitiveFor(part, item);
             return primitive ? [primitive] : [];
           })
-        : voxelPrimitivesFor(
-            part,
-            items,
-            partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit),
-          );
+        : voxelPrimitivesFor(part, items, grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
     const node: Json = { name };

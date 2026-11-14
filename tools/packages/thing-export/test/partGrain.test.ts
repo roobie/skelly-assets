@@ -3,7 +3,7 @@ import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { FEATURE_VOXELS } from '../src/featureFit.ts';
-import { partVoxelGrain } from '../src/glb.ts';
+import { partVoxelGrain, SMOOTH, VOXEL_DETAIL } from '../src/glb.ts';
 
 const GRAIN = 0.004;
 const DETAIL = 0.002;
@@ -34,5 +34,9 @@ describe('the grain a part is drawn at', () => {
 
   it('keeps a thin part on the class grain in a class that does not ask for it', () => {
     expect(partVoxelGrain(thin, { voxelGrain: GRAIN, voxelDetailGrain: DETAIL }, 1)).toBe(GRAIN);
+  });
+
+  it('gives a smooth part no grain, even where it is also tagged for detail', () => {
+    expect(partVoxelGrain({ ...thin, tags: [SMOOTH, VOXEL_DETAIL] }, REFINED, 1)).toBeUndefined();
   });
 });

@@ -79,6 +79,12 @@ A part asks for the finest grain by carrying a tag in its definition, so the cho
 with the part's content and the exporter holds no list of part names. See `src/glb.ts`,
 `VOXEL_DETAIL`, and `packages/gun-authoring-tool/src/gun/parts.ts`, where the sight parts carry it.
 
+A part may instead keep its authored mesh in a voxelized file, by a tag in its definition in
+the same way. An aperture sight seen from the eye is read by its round hole, and no grain
+keeps a hole a few millimetres across round, so a sight the player looks through can stay
+smooth beside the voxel gun. Its datums then lie on the authored solids, which is what the
+file draws. See `src/glb.ts`, `SMOOTH`.
+
 A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
 Only the gun class asks for it: an item's thin parts, a garment's panels above all, are large, and the finest grain
