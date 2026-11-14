@@ -23,7 +23,7 @@ local s = import 'classic_4x4.spec.libsonnet';
     site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.77, 0]),
     // A two-seat bench fits between the rear wheel arches; a three-seat one would stand on the tyres.
     site.one('rear_bench', 'bench_seat_2', [-1.0, 0.7, 0]),
-    site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.2, 0]),
+    site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.2, 0], 'tailgate'),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.37, 0]),
   ]
   + site.pair('front_wing', 'classic_4x4_front_wing')
@@ -36,7 +36,4 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
-  swingUnjudged: [
-    site.swingUnjudged('tailgate', 'spare_wheel', 0.0349, 'skin meets tyre'),
-  ],
 }
