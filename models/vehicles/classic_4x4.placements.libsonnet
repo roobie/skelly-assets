@@ -37,7 +37,6 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.0118, 'skin meets bulkhead'),
     site.swingUnjudged('tailgate', 'shell', 0.0127, 'glass_1 meets roof'),
     site.swingUnjudged('tailgate', 'spare_wheel', 0.0349, 'skin meets tyre'),
   ],

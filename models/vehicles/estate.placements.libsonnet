@@ -37,7 +37,6 @@ local s = import 'estate.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.0118, 'skin meets bulkhead'),
     site.swingUnjudged('tailgate', 'shell', 0.0138, 'glass_4 meets roof'),
   ],
 }

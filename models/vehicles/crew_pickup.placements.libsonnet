@@ -40,6 +40,5 @@ local s = import 'crew_pickup.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.97, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.75, -0.44]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.0083, 'skin meets a_post_far'),
   ],
 }

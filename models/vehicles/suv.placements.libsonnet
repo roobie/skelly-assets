@@ -40,7 +40,6 @@ local s = import 'suv.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.0083, 'skin meets a_post_far'),
     site.swingUnjudged('rear_door_far', 'arch_flare_far', 0.0199, 'skin_far meets rear_flare_fore_far'),
     site.swingUnjudged('rear_door_near', 'arch_flare_near', 0.0199, 'skin meets rear_flare_fore'),
     site.swingUnjudged('tailgate', 'shell', 0.0115, 'glass_3 meets roof'),

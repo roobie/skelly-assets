@@ -31,7 +31,6 @@ local s = import 'city_car.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.62, 0.5)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.36]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.0083, 'skin meets a_post_far'),
     site.swingUnjudged('tailgate', 'shell', 0.0138, 'glass_3 meets roof'),
   ],
 }

@@ -159,8 +159,9 @@ local pressings(id, title, s) = {
     ], [[s.bFront, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [s.bFront, windowTop]]),
     part('_windscreen', 'windscreen', 12, [
     ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - s.aLean, s.roof], [s.cowl - s.aLean, s.roof]], s.glassIn - 0.02), { glass: 'glass-clear' }),
-    // The bonnet hinges at its rear edge, on pins under it inboard of the wings.
-    local bonnetPins = k.hingePins('hinge', 'z', [s.aPost, hood(s.aPost) - bonnetThick, 0.7 * s.glassIn], [s.aPost, hood(s.aPost) - bonnetThick, -0.7 * s.glassIn]);
+    // The bonnet hinges on its top rear edge, inboard of the wings: every other point of it then swings forward of the
+    // cowl and A-posts as it lifts.
+    local bonnetPins = k.hingePins('hinge', 'z', [s.aPost, hood(s.aPost), 0.7 * s.glassIn], [s.aPost, hood(s.aPost), -0.7 * s.glassIn]);
     part('_bonnet', 'bonnet', 13, [
       prism('skin', 'paint', [[s.aPost, hood(s.aPost) - bonnetThick], [nose, hood(nose) - bonnetThick], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-s.skin, s.skin]),
     ] + bonnetPins + (if std.get(s, 'scoop', false) then [

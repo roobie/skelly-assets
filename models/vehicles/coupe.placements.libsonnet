@@ -36,7 +36,6 @@ local s = import 'coupe.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.56, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
   swingUnjudged: [
-    site.swingUnjudged('bonnet', 'shell', 0.009, 'skin meets a_post_near'),
     site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
   ],
 }
