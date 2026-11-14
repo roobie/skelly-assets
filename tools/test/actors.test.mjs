@@ -834,6 +834,28 @@ test('leaper pose clips reproduce its live frames at every stored cursor, whole 
   assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);
 });
 
+test('walker pose clips reproduce its live frames and state the stride and hit its clips author', async () => {
+  const { decodeFrame } = await import('../actorCompose.mjs');
+  const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
+  const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
+  const { figureFor } = await import('../actorFigure.mjs');
+  const { walkerClip, walkerFrame } = await import('../packages/mobgen/src/mob/walker/motion.ts');
+  const template = consumableTemplate('security-walker');
+  const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
+  const { clips } = await bakeFixture('security-walker');
+  for (const [clip, name] of [[clips.standing.idle, 'idle'], [clips.standing.walk, 'stomp'], [clips.standing.attack, 'fire']]) {
+    for (const [i, frame] of clip.frames.entries()) {
+      const live = walkerFrame(realized, name, clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1));
+      const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
+      const decoded = decodeFrame(frame);
+      decoded.root.forEach((value, axis) => assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`));
+      for (const [id, rotation] of Object.entries(pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
+    }
+  }
+  assert.equal(clips.standing.walk.strideMetres, walkerClip('stomp').travel.at(-1)[1]);
+  assert.equal(clips.standing.attack.hitAtSimSeconds, walkerClip('fire').hit * walkerClip('fire').seconds);
+});
+
 // Hand-authored motion, independent of generated geometry and content tuning.
 const motionFixture = (t) => ({
   root: [t, 2 * t, -t],

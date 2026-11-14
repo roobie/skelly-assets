@@ -2815,6 +2815,14 @@
       "lod_divisor": 0,
       "walk_speed": 0.58
     },
+    {
+      "id": "security-walker",
+      "title": "Security walker",
+      "pack": "skelly.bestiary",
+      "template": "security-walker",
+      "lod_divisor": 0,
+      "walk_speed": 0.91
+    },
     {"type":"shambler","title":"Shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
     {"type":"shambler","title":"Shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
     {"type":"shambler","title":"Shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
