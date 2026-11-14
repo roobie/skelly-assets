@@ -40,7 +40,8 @@ at the reflected point turned half a turn about the vertical. So the turned enve
 which holds when each envelope is centred on its slot along the vehicle's length; the check holds every slot to it.
 
 A stowage site may name `behind`, the site of the closure that hides it, so a consumer can skip drawing kit behind
-a shut door; the closure must have a motion, or the kit would be hidden for good. Kit uses the item's own model; a coarser one waits for a measurement that needs it.
+a shut door; the closure must have a motion, or the kit would be hidden for good. Kit uses the item's own model; a
+coarser one waits for a measurement that needs it.
 
 The build refuses a slot whose envelope reaches into another's or into the part's fit-out, and a load-out whose
 item does not exist, is in a pack the vehicle's does not depend on, has no word the slot accepts or does not fit;

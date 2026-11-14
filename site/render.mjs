@@ -53,9 +53,9 @@ function load(model) {
 }
 
 // Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
-// across its own plane through the origin (modelFrame.mjs, MIRRORED_AXIS) when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
-// in site order, so the viewer can move each one apart. What a worn piece's site covers of the doll is not drawn
-// (hiding.mjs).
+// across its own plane through the origin (modelFrame.mjs, MIRRORED_AXIS) when the site says so, turned by its
+// quaternion `turn`, then moved to `at`. Its parts stay in site order, so the viewer can move each one apart. What a
+// worn piece's site covers of the doll is not drawn (hiding.mjs).
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
     cache.set(entry.id, (async () => {
