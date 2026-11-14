@@ -19,7 +19,7 @@ export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
 const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides', 'stowed', 'behind']);
-const NO_STOWAGE = { items: new Map(), tolerance: 0 };
+const NO_STOWAGE = { items: new Map(), moving: new Set() };
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
 
@@ -86,7 +86,7 @@ function modelPackProblems(where, id, pack, reachable, byModel) {
 function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes, stowage) {
   const problems = [];
   const seen = new Set();
-  const ids = new Set(sites.map((site) => site?.id));
+  const partOf = new Map(sites.map((site) => [site?.id, site?.part]));
   const reachable = new Set([pack, ...(dependsOn[pack] ?? [])]);
   for (const site of sites) {
     const where = `${vehicle}/${site?.id}`;
@@ -97,8 +97,9 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes, stowag
     else seen.add(site.id);
     if (!isPoint(site?.at)) problems.push(`${where}: at is not three finite numbers`);
     if (site?.mirror !== undefined && site.mirror !== true) problems.push(`${where}: mirror is true or absent`);
-    if (site?.behind !== undefined && (site.behind === site.id || !ids.has(site.behind))) {
-      problems.push(`${where}: behind names another site of the vehicle, not ${site.behind}`);
+    if (site?.behind !== undefined) {
+      if (site.behind === site.id || !partOf.has(site.behind)) problems.push(`${where}: behind names another site of the vehicle, not ${site.behind}`);
+      else if (!stowage.moving.has(partOf.get(site.behind))) problems.push(`${where}: behind names ${site.behind}, whose part has no motion to open it`);
     }
     const placed = byModel.get(site?.part) ?? [];
     if (site?.finish !== undefined) {
@@ -109,7 +110,7 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes, stowag
     }
     problems.push(...modelPackProblems(where, site?.part, pack, reachable, byModel));
     if (site?.stowed !== undefined) {
-      problems.push(...loadOutProblems(where, site, stowage.items, stowage.tolerance));
+      problems.push(...loadOutProblems(where, site, stowage.items));
       const items = new Set(Object.values(site.stowed ?? {}));
       for (const item of items) problems.push(...modelPackProblems(`${where} stowed`, item, pack, reachable, byModel));
     }
@@ -141,8 +142,7 @@ function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
 // depends on; vocabulary: tools/taxonomy.mjs, readVocabulary; finishes: the finish library, keyed by finish id, which the
 // caller loads after the Jsonnet twins are current, so this module never reads them at import. A part is named by its model id alone, so the id must
 // name one model, in the vehicle's pack or one it declares a dependency on.
-// stowage: what the built models say about stowed kit (tools/stowage.mjs, readStowage) and how far an item may stand
-// past its envelope.
+// stowage: what the built models say about stowed kit and closures (tools/stowage.mjs, loadOutStowage).
 export function placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage = NO_STOWAGE }) {
   const byModel = packsByModel(models);
   const problems = [];

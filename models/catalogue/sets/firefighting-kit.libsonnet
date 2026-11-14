@@ -40,11 +40,11 @@ local firefighting(category, material) = { taxonomy: { category: category, keywo
   ], { coupling: 'brass', pipe: 'alu-bare', head: 'paint-red' }) + { title: 'Standpipe' }
   + stow.stows(stow.resting('bar', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['metal']),
 
-  // A hydrant key lying flat: a 400 mm steel bar with a T handle 240 mm across at -x and a square socket at +x.
+  // A hydrant key 420 mm long lying flat: a steel bar with a T handle 240 mm across at -x and a square socket at +x.
   h.compound('hydrant_key', 2.5, [
-    box('bar', 'steel', [-0.2, 0, -0.011], [0.18, 0.022, 0.011]),
-    box('handle', 'steel', [-0.222, 0, -0.12], [-0.2, 0.022, 0.12]),
-    box('socket', 'socket', [0.18, 0, -0.018], [0.22, 0.036, 0.018]),
+    box('bar', 'steel', [-0.188, 0, -0.011], [0.172, 0.022, 0.011]),
+    box('handle', 'steel', [-0.21, 0, -0.12], [-0.188, 0.022, 0.12]),
+    box('socket', 'socket', [0.172, 0, -0.018], [0.21, 0.036, 0.018]),
   ], { steel: 'paint-red', socket: 'steel-grey' }) + { title: 'Hydrant key' }
   + stow.stows(stow.resting('bar', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['metal']),
 

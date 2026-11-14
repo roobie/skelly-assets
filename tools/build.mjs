@@ -272,7 +272,7 @@ async function main() {
         vehicleRows: readVehicleRows(repo),
         dependsOn,
         vocabulary,
-        stowage: loadOutStowage(out, models, placements, repo),
+        stowage: loadOutStowage(out, models, placements),
         finishes,
         out,
       });

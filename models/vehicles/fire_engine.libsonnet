@@ -24,7 +24,8 @@ local front = inset - 0.02;
 local up(h) = s.bodyFloor + h;
 // Each locker's fit-out, the shelves, board and strap its kit stows on, and the slots the kit stows in. The kit is
 // catalogue items a site's load-out names (fire_engine.placements.libsonnet), so a game can loot it or stow more.
-// Slots stay inside `front`, so the shutters clear whatever a slot holds.
+// Slots stay inside `front`, and the build keeps each item inside its slot (tools/stowage.mjs, loadOutProblems), so
+// the shutters clear whatever a slot holds.
 local middle = (back + front) / 2;
 local outOf(z) = [back + 0.005 - z, front - z];
 local cylinders = [-0.36 + i * 0.24 for i in std.range(0, 4)];
@@ -76,7 +77,7 @@ local stowage = {
       slots.shelfSlot('bar_back', ['bar'], [-1.75, up(0.77), back + 0.1], 0.72, 0.15, [-0.095, 0.07]),
       slots.shelfSlot('bar_fore', ['bar'], [-2.32, up(0.77), back + 0.1], 0.4, 0.12, [-0.095, 0.065]),
       slots.shelfSlot('bar_front', ['bar'], [-2.32, up(0.77), back + 0.24], 0.4, 0.12, [-0.065, front - back - 0.24]),
-      slots.shelfSlot('bar_top', ['bar'], [-1.572, up(1.25), middle], 0.444, 0.15, outOf(middle)),
+      slots.shelfSlot('bar_top', ['bar'], [-1.564, up(1.25), middle], 0.43, 0.15, outOf(middle)),
     ],
   },
   aft: {
