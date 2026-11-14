@@ -34,7 +34,7 @@ local s = import 'electric_crossover.spec.libsonnet';
   swingUnjudged: [
     site.swingUnjudged('bonnet', 'shell', 0.0093, 'skin meets a_post_near'),
     site.swingUnjudged('rear_door_far', 'cladding_far', 0.0149, 'skin_corner_far meets rear_flare_fore_slant_far'),
-    site.swingUnjudged('rear_door_near', 'cladding_near', 0.0148, 'skin meets rear_flare_fore'),
+    site.swingUnjudged('rear_door_near', 'cladding_near', 0.0149, 'skin meets rear_flare_fore'),
     site.swingUnjudged('tailgate', 'shell', 0.0103, 'glass_4 meets roof'),
   ],
 }

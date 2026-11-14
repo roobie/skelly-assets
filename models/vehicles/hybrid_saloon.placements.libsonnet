@@ -19,7 +19,7 @@ local s = import 'saloon.spec.libsonnet';
   }),
   swingUnjudged: [
     site.swingUnjudged('boot_lid', 'rear_badge', 0.0156, 'tail meets plate'),
-    site.swingUnjudged('front_door_far', 'badge_far', 0.0156, 'skin_far meets plate_far'),
-    site.swingUnjudged('front_door_near', 'badge_near', 0.0156, 'skin meets plate'),
+    site.swingUnjudged('front_door_far', 'badge_far', 0.0157, 'skin_far meets plate_far'),
+    site.swingUnjudged('front_door_near', 'badge_near', 0.0157, 'skin meets plate'),
   ],
 }

@@ -197,37 +197,53 @@ export function deepestShared({ mover, obstacle, from, to, reach, floor, step, p
 export const restDepth = (mover, obstacle, step) =>
   Math.max(0, deepestShared({ mover, obstacle, from: IDENTITY, to: IDENTITY, reach: 0, floor: 0, step }));
 
-// Sweeps the pieces of one moving body (a part and the parts that ride it, moved by its `layers` of motion) from rest
-// to its stop against `obstacles`, the shapes it must clear, each { site, shape }. `movers` are { site, shape }. A pair is in contact once it shares
-// more than `tolerance` beyond the depth it shares at rest, so what the parts allow each other at rest is not a
-// contact. Returns { clear, contacts: Map(obstacle site -> { depth, at, pieces }) }: `clear` the last clock at which
-// no pair was measured in contact (1 when none ever was), each contact the deepest the sweep measured and the clock it
-// first was.
-export function sweepBody({ layers, movers, obstacles, step, tolerance, grain }) {
+// How many leading layers of `layers` are the very motions that lead `other`: what both are carried by.
+const sharedLayers = (layers, other) => {
+  let shared = 0;
+  while (shared < layers.length && layers[shared] === other[shared]) shared++;
+  return shared;
+};
+
+// Sweeps the pieces of one moving body (a part and what rides it, moved by its `layers` of motion) from rest to its stop
+// against `obstacles`, the shapes it must clear. Movers and obstacles are { site, shape }; an obstacle also has the
+// `layers` that move it, none when it stands still. What both are carried by is the same in the layers of each, so it
+// cancels: a pair is swept by the layers beyond them, in the frame of what they share, and a mover that is the carrier of
+// an obstacle is not swept against it, as the obstacle's own sweep is against the mover. A pair is in contact once it
+// shares more than `tolerance` beyond the depth it shares at rest, so what the parts allow each other at rest is not a
+// contact. A window of the clock is measured every `step` of the furthest travel, since a point that travels further than
+// the thinnest part is thick can step across it, and each reading is the depth at the end of its window. Returns
+// { clear, contacts: Map(obstacle site -> { depth, at, pieces }) }: `clear` the last clock at which no pair was measured
+// in contact (1 when none ever was), each contact the deepest the sweep measured and the clock it first was.
+export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
   const pairs = [];
   for (const mover of movers) {
-    const pace = paceOf(layers, mover.shape);
-    const bounds = sweptBounds(mover.shape, layers, pace);
     for (const obstacle of obstacles) {
-      if (!boundsMeet(bounds, obstacle.shape)) continue;
+      const shared = sharedLayers(layers, obstacle.layers ?? []);
+      const [own, other] = [layers.slice(shared), (obstacle.layers ?? []).slice(shared)];
+      if (own.length === 0) continue;
+      const paces = [paceOf(own, mover.shape), other.length > 0 ? paceOf(other, obstacle.shape) : 0];
+      const bounds = sweptBounds(mover.shape, own, paces[0]);
+      if (!boundsMeet(bounds, other.length > 0 ? sweptBounds(obstacle.shape, other, paces[1]) : obstacle.shape)) continue;
       const rest = restDepth(mover.shape, obstacle.shape, step);
-      pairs.push({ mover, obstacle, pace, floor: rest + tolerance });
+      pairs.push({ mover, obstacle, own, other, pace: paces[0] + paces[1], floor: rest + tolerance });
     }
   }
   const contacts = new Map();
-  // A window is measured where it cannot be cleared, one grain of travel at the fastest pace at a time.
-  const fastest = Math.max(...pairs.map(({ pace }) => pace), grain);
-  const unit = Math.min(1, grain / fastest);
+  const unit = Math.min(1, step / Math.max(...pairs.map(({ pace }) => pace), step));
   const poses = new Map();
-  const poseOf = (c) => {
-    if (!poses.has(c)) poses.set(c, poseAt(layers, c));
-    return poses.get(c);
+  const poseOf = (list, c) => {
+    if (list.length === 0) return IDENTITY;
+    if (!poses.has(list)) poses.set(list, new Map());
+    const known = poses.get(list);
+    if (!known.has(c)) known.set(c, poseAt(list, c));
+    return known.get(c);
   };
+  const relativeAt = ({ own, other }, c) => (other.length === 0 ? poseOf(own, c) : compose(invert(poseOf(other, c)), poseOf(own, c)));
   const across = (start, end, probe) => pairs.map((pair) => deepestShared({
     mover: pair.mover.shape,
     obstacle: pair.obstacle.shape,
-    from: poseOf(start),
-    to: poseOf(end),
+    from: relativeAt(pair, start),
+    to: relativeAt(pair, end),
     reach: pair.pace * (end - start),
     floor: pair.floor,
     step,

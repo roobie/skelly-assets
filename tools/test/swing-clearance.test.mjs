@@ -3,7 +3,8 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { foundContacts, sweepTasks, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
+import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
+import { shapeOf, sweepBody } from '../swingSweep.mjs';
 
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
@@ -22,7 +23,7 @@ const reached = (result, a, b) => Math.max(0, ...[...foundContacts(result).value
 const sweep = (motions, sites) => sweepVehicle(task(motions, sites));
 const contactsOf = (result, id) => result.sites[id].contacts;
 
-test('a thin lid swinging across a thin lip is reported, though no sampled pose of it holds a point of the lip', () => {
+test('a thin lid swinging across a thin lip is reported', () => {
   const lip = site('lip', 'lip', [box('edge', [0.5, 0.05, -0.5], [0.5 + GRAIN, 0.8, 0.5])]);
   const result = sweep({ lid }, [lidSite(), lip]);
   assert.ok(contactsOf(result, 'lid').some(({ other }) => other === 'lip'));
@@ -33,6 +34,16 @@ test('a lid that swings through empty air clears all the way', () => {
   const result = sweep({ lid }, [lidSite(), site('far', 'far', [box('block', [5, 0, -0.5], [6, 1, 0.5])])]);
   assert.equal(result.sites.lid.clear, 1);
   assert.deepEqual(contactsOf(result, 'lid'), []);
+});
+
+test('a plate that slides through a plate as thin as itself is reported, wherever the two sit along its way', () => {
+  for (const offset of [0, 0.25, 0.5, 0.75]) {
+    const x = (1 + offset) * GRAIN;
+    const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
+    const layers = [[{ kind: 'slide', direction: [1, 0, 0], travel: 0.2, share: 1 }]];
+    const { contacts } = sweepBody({ layers, movers: [{ site: 'plate', shape: plate('a', 0) }], obstacles: [{ site: 'other', shape: plate('b', x) }], step: GRAIN / 4, tolerance: GRAIN / 4 });
+    assert.ok(contacts.has('other'), `offset ${offset}`);
+  }
 });
 
 test('the ground stops a lid that opens downward into it', () => {
@@ -69,15 +80,49 @@ test('a rider is carried with its carrier and meets what the carrier alone never
   assert.ok(contactsOf(carried, 'lid').some(({ other }) => other === 'wall'));
 });
 
-test('a rider with a motion of its own is swept on its carrier\'s clock and not against the carrier', () => {
-  const tip = flap(1, { open: 90 });
-  const shifted = { ...tip, pieces: [box('skin', [1, 0, -0.5], [2, GRAIN, 0.5]), pin('pin_a', 0.5), pin('pin_b', -0.5)] };
-  shifted.pieces[1].origin[0] = 1;
-  shifted.pieces[2].origin[0] = 1;
-  const result = sweep({ lid, tip: shifted }, [lidSite(), site('tip', 'tip', shifted.pieces, { rides: 'lid' })]);
-  assert.ok(result.sites.tip);
-  assert.ok(![...contactsOf(result, 'tip'), ...contactsOf(result, 'lid')].some(({ other }) => other === 'tip' || other === 'lid'));
-  assert.equal(result.open.length, 0);
+// A piece hinged on the line through `hinge` (x, y) along z, turning `toward` by `open` degrees.
+const hinged = (skin, [x, y], { toward = 'up', open = 90 } = {}) => ({
+  pieces: [skin, { ...pin('pin_a', 0.5, y), origin: [x, y, 0.5] }, { ...pin('pin_b', -0.5, y), origin: [x, y, -0.5] }],
+  stages: [{ kind: 'hinge', pins: ['pin_a', 'pin_b'], open, toward }],
+});
+// A flap one grain thick lying along x from its hinge at x0, `length` long (negative to lie back along -x), on the hinge
+// line at height y0.
+const fold = (x0, length, { y0 = 0, open = 90 } = {}) =>
+  hinged(box('skin', [Math.min(x0, x0 + length), y0, -0.5], [Math.max(x0, x0 + length), y0 + GRAIN, 0.5]), [x0, y0], { open });
+const riderOf = (id, motion, carrier = 'lid') => site(id, id, motion.pieces, { rides: carrier });
+
+test('a rider that moves is swept on its carrier\'s clock, nested in the carrier\'s motion', () => {
+  const tip = fold(1.1, 1);
+  const post = site('post', 'post', [box('post', [-0.6, 1, -0.2], [-0.5, 1.2, 0.2])]);
+  const result = sweep({ lid, tip }, [lidSite(), riderOf('tip', tip), post]);
+  assert.ok(contactsOf(result, 'tip').some(({ other }) => other === 'post'));
+});
+
+test('a rider that moves is swept against its carrier, which it folds onto', () => {
+  const panel = fold(1.1, 1, { y0: GRAIN, open: 180 });
+  const result = sweep({ lid, panel }, [lidSite(), riderOf('panel', panel)]);
+  assert.ok(contactsOf(result, 'panel').some(({ other }) => other === 'lid'));
+  assert.deepEqual(contactsOf(result, 'lid'), []);
+});
+
+test('a rider that moves does not meet its carrier at the rest pose it has left', () => {
+  const cap = fold(0.3, -0.2, { y0: GRAIN, open: 10 });
+  const result = sweep({ lid, cap }, [lidSite(), riderOf('cap', cap)]);
+  assert.deepEqual([...contactsOf(result, 'lid'), ...contactsOf(result, 'cap')], []);
+  assert.equal(result.sites.lid.clear, 1);
+});
+
+test('riders of one carrier are swept against each other as they move together, not against each other\'s rest', () => {
+  // The carrier only tilts. Both riders turn about one line, one lying along x and one standing along y, so each is where
+  // the other started.
+  const tilting = flap(1, { open: 5 });
+  const flat = fold(0.2, 0.5, { y0: 4 * GRAIN });
+  const standing = hinged(box('skin', [0.2 - GRAIN, 4 * GRAIN, -0.5], [0.2, 4 * GRAIN + 0.5, 0.5]), [0.2, 4 * GRAIN], { toward: 'rear' });
+  const together = sweep({ lid: tilting, flat, standing }, [lidSite(), riderOf('flat', flat), riderOf('standing', standing)]);
+  assert.deepEqual([...contactsOf(together, 'flat'), ...contactsOf(together, 'standing')], []);
+  const crossing = fold(0.8, -0.5, { y0: 8 * GRAIN });
+  const crossed = sweep({ lid: tilting, flat, crossing }, [lidSite(), riderOf('flat', flat), riderOf('crossing', crossing)]);
+  assert.ok(reached(crossed, 'flat', 'crossing') > 0);
 });
 
 test('two lids that clear alone but collide once both are open are caught by the all-open pose', () => {
@@ -134,6 +179,16 @@ test('a stale entry fails: one for a pair that no longer touches is reported', a
   const { problems } = await report({ sites: [lidSite(), clear], swingContacts: [entry(0.01)] });
   assert.equal(problems.length, 1);
   assert.match(problems[0], /is stale/);
+});
+
+test('a vehicle where nothing moves any more still fails its allowances and its riders', async () => {
+  const still = site('lid', 'lid', [box('skin', [0, 0, -0.5], [1, GRAIN, 0.5])]);
+  const rider = site('handle', 'handle', [box('grip', [0.4, 0, 0.5], [0.6, GRAIN, 0.7])], { rides: 'lid' });
+  const input = data({ sites: [still, rider, lip], swingContacts: [entry(0.01)] });
+  input.motions = {};
+  const { problems } = swingReport(input, (await swingResults(input, { workers: 1 })).results);
+  assert.match(problems.join('\n'), /allowed swing contact of lid and lip is stale/);
+  assert.match(problems.join('\n'), /handle rides lid, and neither is a part that moves/);
 });
 
 test('an entry capped far above what it measures, or listed twice, is reported', async () => {
