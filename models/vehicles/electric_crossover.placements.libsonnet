@@ -24,6 +24,7 @@ local s = import 'electric_crossover.spec.libsonnet';
   + site.pair('rear_door', 'electric_crossover_rear_door')
   + site.pair('tail_lamp', 'electric_crossover_tail_lamp')
   + site.pair('cladding', 'electric_crossover_cladding')
+  + site.pair('rear_door_cladding', 'electric_crossover_rear_door_cladding', rides='rear_door')
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.331, s.side - 0.1175 - 0.05])
   + site.pair('front_wheel', 'wheel_235_75r15', [s.frontAxle, 0.367, s.side - 0.1175])
   + site.pair('rear_wheel', 'wheel_235_75r15', [s.rearAxle, 0.367, s.side - 0.1175])
@@ -31,8 +32,4 @@ local s = import 'electric_crossover.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.8, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.55, -0.44]),
-  swingUnjudged: [
-    site.swingUnjudged('rear_door_far', 'cladding_far', 0.0149, 'skin_corner_far meets rear_flare_fore_slant_far'),
-    site.swingUnjudged('rear_door_near', 'cladding_near', 0.0149, 'skin meets rear_flare_fore'),
-  ],
 }

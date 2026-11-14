@@ -31,6 +31,7 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('rear_door', 'suv_rear_door')
   + site.pair('tail_lamp', 'suv_tail_lamp')
   + site.pair('arch_flare', 'suv_arch_flare')
+  + site.pair('rear_door_flare', 'suv_rear_door_flare', rides='rear_door')
   + site.pair('side_step', 'suv_side_step')
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.366, s.side - 0.1325 - 0.05])
   + site.pair('front_wheel', 'wheel_265_75r16', [s.frontAxle, 0.402, s.side - 0.1325])
@@ -39,8 +40,4 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
-  swingUnjudged: [
-    site.swingUnjudged('rear_door_far', 'arch_flare_far', 0.0199, 'skin_far meets rear_flare_fore_far'),
-    site.swingUnjudged('rear_door_near', 'arch_flare_near', 0.0199, 'skin meets rear_flare_fore'),
-  ],
 }
