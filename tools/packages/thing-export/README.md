@@ -104,9 +104,9 @@ reading as one body. A part turned by a quarter turn shares the lattice too; one
 any other angle keeps its own. See `src/glb.ts`, `latticeOrigin`, and `src/voxelize.ts`,
 `voxelize`.
 
-A datum lies on the drawn voxels. Grips and other anchors, a candle's flame, magazine round
-poses, collision boxes and centres of mass all read off the voxels the file draws, not off
-the smooth design. What the player sees and what the game computes must agree with the
+A datum lies on the drawn model. Grips and other anchors, a candle's flame, magazine round
+poses, collision boxes and centres of mass all read off the voxels the file draws, or a
+smooth part's authored solids, not off the smooth design of a voxelized part. What the player sees and what the game computes must agree with the
 drawn model, so a flame sits on its wick and a vehicle collides where it is drawn. One rule
 covers every model, with no list of exceptions. Each solid is measured by the voxels it
 fills when it is sampled with the solids it is drawn among on its part's lattice, as the
@@ -115,7 +115,7 @@ rule below): a collision box bounds its voxels, a centre of mass is their centro
 point keeps its fraction of the smallest solid or part around it, so a point on a face
 lands on the drawn face. See `src/drawn.ts`, `drawnGeometry`.
 
-An iron sight line runs between the voxel tops the file draws, and the muzzle sits on the
+An iron sight line runs between the sight tops the file draws, and the muzzle sits on the
 drawn front of the barrel. The up vector is made perpendicular to that line, since the game
 aligns the model's up to the camera's. An optic keeps its optical axis, which no drawn top
 defines. See `packages/gun-authoring-tool/src/gun/exportGlb.ts`, `sightMetadata` and `drawnMuzzle`.
