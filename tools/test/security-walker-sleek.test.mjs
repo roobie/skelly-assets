@@ -11,14 +11,14 @@ import { meeting } from './pieces.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const data = JSON.parse(evaluateJsonnet(`{
-  original: import 'models/vehicles/security_walker.libsonnet',
+  original: import 'models/vehicles/mech_walker_vehicle_1.libsonnet',
   own: import 'models/vehicles/security_walker_sleek.libsonnet',
   optics: (import 'models/vehicles/turret-kit.libsonnet').classRows('two_man_autocannon'),
   guns: (import 'models/vehicles/turret-kit.libsonnet').classRows('one_man_mg'),
   shared: [r for r in (import 'models/vehicles/shared.libsonnet') if r.id=='headlamp_military'],
   cv: (import 'models/vehicles/turret-kit.libsonnet').sites('cv9040_turret',[0,0,0],'assembly'),
   spec: import 'models/vehicles/security_walker_sleek.spec.libsonnet',
-  base: (import 'models/vehicles/security_walker.placements.libsonnet').sites,
+  base: (import 'models/vehicles/mech_walker_vehicle_1.placements.libsonnet').sites,
   sleek: (import 'models/vehicles/security_walker_sleek.placements.libsonnet').sites,
 }`, root));
 const { spec, base, sleek } = data;

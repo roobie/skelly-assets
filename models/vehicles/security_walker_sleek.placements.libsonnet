@@ -1,6 +1,6 @@
 // A separate body-kit derivative, not the schema's powertrain-only `parent` variant.
 local site = import 'site.libsonnet';
-local base = import 'security_walker.placements.libsonnet';
+local base = import 'mech_walker_vehicle_1.placements.libsonnet';
 local s = import 'security_walker_sleek.spec.libsonnet';
 local baseSite(id) = [p for p in base.sites if p.id == id][0];
 local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
