@@ -30,7 +30,7 @@ const vanSites = [
 const ambulance = { title: 'Fixture Ambulance', forward: '+z', sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
 const vehicleRows = { van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'], ambulance: ['fixture_light_bar'] };
 const dependsOn = { 'fixture.rescue': ['fixture.vans'] };
-const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary }).join('\n');
+const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary, finishes: MATERIALS }).join('\n');
 
 test('sites that name built models, each once, at a point, in reachable packs, assemble without problems', () => {
   assert.equal(problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites }, ambulance }), '');
@@ -72,7 +72,7 @@ test('a vehicle ships in the pack of its own rows, with its body\'s tags and its
   const out = mkdtempSync(join(tmpdir(), 'placements-'));
   try {
     const extra = { ...ambulance, tags: { ...ambulance.tags, 'vehicle-body': ['van'] } };
-    const placed = exportPlacements({ placements: { ambulance: extra }, models, vehicleRows, dependsOn, vocabulary, out });
+    const placed = exportPlacements({ placements: { ambulance: extra }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, out });
     assert.deepEqual(placed.vehicles, [{
       id: 'ambulance',
       title: 'Fixture Ambulance',
@@ -101,7 +101,7 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
   assert.match(problems({ van, ambulance: { ...ambulance, parent: 'van' } }), /a variant's rows belong in its parent's file/);
   const out = mkdtempSync(join(tmpdir(), 'placements-'));
   try {
-    const placed = exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, out });
+    const placed = exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, out });
     assert.deepEqual(placed.vehicles.find(({ id }) => id === 'electric_van'), {
       id: 'electric_van',
       title: 'Fixture Electric Van',

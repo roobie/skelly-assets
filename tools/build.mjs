@@ -155,7 +155,9 @@ export function withSources(models, sources) {
   return models.map((model) => ({ ...model, title: byModel.get(key(model)).title, taxonomy: byModel.get(key(model)).taxonomy }));
 }
 
-// The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems).
+// The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems). Loaded
+// only after installJsonnetSources: the library reads the compiled finishes, which a module graph imported earlier would
+// have read before they were regenerated.
 const finishLibrary = async () => {
   const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
   return (await import('./packages/thing-authoring-tool/src/exports.ts')).finishLibrary(catalogue);
@@ -259,12 +261,14 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
       const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
+      const finishes = await finishLibrary();
       const placed = exportPlacements({
         placements: readPlacements(repo),
         models,
         vehicleRows: readVehicleRows(repo),
         dependsOn,
         vocabulary,
+        finishes,
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);
@@ -275,7 +279,7 @@ async function main() {
         files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files],
         credit: readCredits(repo),
         renames: readRenames(repo),
-        finishes: await finishLibrary(),
+        finishes,
       });
       writeFileSync(join(out, MANIFEST), manifestJson(manifest));
       console.log(`built ${MANIFEST}`);
