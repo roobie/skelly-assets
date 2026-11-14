@@ -8,7 +8,7 @@
 // whose voxels ran past its pins would swing past the room its leaf was fitted to, so each panel is drawn from its pins,
 // its origin on their line, a whole number of grains long and as deep as the leaf, which lies about its mid-plane.
 local k = import 'kit.libsonnet';
-local voxels = import '../voxel-grains.libsonnet';
+local voxels = import 'models/voxel-grains.libsonnet';
 local grain = voxels.classes.vehicle.grain;
 local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9;
 {
