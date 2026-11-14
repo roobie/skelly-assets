@@ -21,7 +21,7 @@ pillar, a tailgate into the roof, a door into a flare or the ground. The overlap
 The build and `tools/check-sources.mjs` sweep every site whose part moves through its stages, from rest to its stop,
 against every other site of the vehicle and the ground, and fail when they sink into each other, naming the vehicle,
 the parts, the sites, how far the part had opened and how deep it gets by its stop. They also pose every moving part
-open at once, so twins that clear alone but meet open are caught. See `tools/swingClearance.mjs`, `swingReport`.
+open at once, so twins that clear alone but meet open are caught too. See `tools/swingClearance.mjs`, `swingReport`.
 
 - Contact is relative to rest. A pair that already overlaps at rest, as a lid seated in its frame does, is in contact
   only once it sinks a quarter grain deeper than it does at rest; the seating is the overlap check's business and the
@@ -63,7 +63,7 @@ change that makes it cost more is a defect to fix in the sweep and not a reason 
 
 ## Consequences
 
-Entries land as `swingUnjudged` for every contact the catalogue had when the check arrived, so the build stays green
+Entries landed as `swingUnjudged` for every contact the catalogue had when the check arrived, so the build stays green
 and each one stays visible until fixed or judged.
 
 A part is a rigid body, so a motion that bends or scales it is out of scope. A part that moves but is placed with no
