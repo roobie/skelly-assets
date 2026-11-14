@@ -13,20 +13,13 @@ local wheel(id, massKg, width, rim, outer, sides=roundSides) = k.compound(id, ma
   k.turned('tyre', 'tyre', 'z', tyreProfile(width, rim, outer)) + { sides: sides },
   k.turned('rim', 'rim', 'z', k.disc(rim, -width * 0.35, width * 0.35)) + { sides: sides },
 ], { tyre: 'rubber-black', rim: 'steel-grey' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
-// Farm tyres read by their bar lugs: each is a slab on the tyre's shoulder, alternating sides, and a dark centre breaks up the rim.
-local lugs(width, base, outer, count) = [
-  local a = 2 * std.pi * i / count;
-  local d = 0.045 / outer;
-  local at(r, t) = [r * std.cos(t), r * std.sin(t)];
-  k.prism('lug_' + i, 'tyre', [at(base, a - d), at(outer, a - d), at(outer, a + d), at(base, a + d)], if i % 2 == 0 then [-0.01, width / 2] else [-width / 2, 0.01])
-  for i in std.range(0, count - 1)
-];
+// Farm tyres read by their bar lugs (`kit.libsonnet`, `shoulderLugs`), and a dark centre breaks up the rim.
 local farmWheel(id, massKg, width, rim, outer, count) = k.compound(id, massKg, [
   k.turned('tyre', 'tyre', 'z', tyreProfile(width, rim, outer - 0.04)) + { sides: roundSides },
   k.turned('rim', 'rim', 'z', k.disc(rim, -width * 0.35, width * 0.35)) + { sides: roundSides },
   k.turned('centre', 'centre', 'z', k.disc(rim * 0.62, -width * 0.39, width * 0.39)) + { sides: roundSides },
   k.turned('boss', 'rim', 'z', k.disc(rim * 0.26, -width * 0.44, width * 0.44)) + { sides: 12 },
-] + lugs(width, outer - 0.05, outer, count), { tyre: 'rubber-black', rim: 'steel-grey', centre: 'paint-charcoal' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
+] + k.shoulderLugs(width, outer - 0.05, outer, count), { tyre: 'rubber-black', rim: 'steel-grey', centre: 'paint-charcoal' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
 // Two wheels on one hub, with the origin on the hub between them.
 local twinWheel(id, massKg, width, rim, outer) = k.compound(id, massKg, [
   k.turned('spacer', 'rim', 'z', k.disc(rim * 0.6, -width * 0.2, width * 0.2)) + { sides: roundSides },
