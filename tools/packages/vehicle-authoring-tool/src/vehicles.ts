@@ -31,6 +31,7 @@ export interface Proposal {
   readonly reachable?: number;
   readonly offset?: readonly number[];
   readonly partOffset?: readonly number[];
+  readonly entries?: readonly string[];
   readonly stop?: { readonly value: number; readonly total: number; readonly unit: string };
 }
 
@@ -53,8 +54,7 @@ export const describeSwing = ({ clear, stop, status, contacts }: SiteVerdict): s
   return `opens ${Math.round(clear * 100)}% before ${stop ?? 'a contact'}; touches ${touches}`;
 };
 
-/** A proposal as the plain words the author reads before hand-merging it. */
-export const describeProposal = (proposal: Proposal): string => {
+const describeFix = (proposal: Proposal): string => {
   const { status, offset, partOffset, stop, part, reachable } = proposal;
   if (status === 'ok') return 'Nothing in the vehicle\'s report is against this part.';
   if (status === 'moved' && offset && partOffset) {
@@ -64,4 +64,11 @@ export const describeProposal = (proposal: Proposal): string => {
     return `No pin line within reach clears it (the best opens ${Math.round((reachable ?? 0) * 100)}%). Lower ${part}'s stop to ${stop.value}${stop.unit} of ${stop.total}${stop.unit}; other vehicles that place the part were not checked.`;
   }
   return `Nothing tried clears it (the best opens ${Math.round((reachable ?? proposal.clear) * 100)}%). Reshape the part or the body it meets, or judge the contact with a swingContact.`;
+};
+
+/** A proposal as the plain words the author reads before hand-merging it, with the entries it leaves to drop or judge again. */
+export const describeProposal = (proposal: Proposal): string => {
+  const entries = proposal.entries ?? [];
+  const worn = entries.length > 0 ? ` Then drop or judge again: ${entries.join('; ')}.` : '';
+  return describeFix(proposal) + worn;
 };

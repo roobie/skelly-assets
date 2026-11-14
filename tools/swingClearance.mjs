@@ -242,8 +242,11 @@ const NO_SWEEP = { sites: {}, open: [] };
 // stop it opens before the first contact and what it touches there, for the placements output. `verdicts` is the same
 // per moving site with its `status` (`clear`, `judged` when every contact is allowed, `fails`) and all it touches, each
 // with the problem message when no entry covers it, for a tool that shows them (the vehicle authoring tool).
+// `entryProblems` is the part of `problems` that is an entry gone stale or capped far above its contact, with its
+// vehicle and the entry's sites, for a tool that moves a motion and so wears entries out.
 export function swingReport({ grain, vehicles }, results) {
   const problems = [];
+  const entryProblems = [];
   const notes = [];
   const exports = {};
   const verdicts = {};
@@ -298,11 +301,15 @@ export function swingReport({ grain, vehicles }, results) {
       const [a, b] = entry.sites;
       const where = `${vehicle}: allowed swing contact of ${a} and ${b}`;
       const contact = found.get(pair);
+      const worn = (message) => {
+        problems.push(message);
+        entryProblems.push({ vehicle, sites: entry.sites, message });
+      };
       if (seen.has(pair) || inheritedPairs.has(pair)) problems.push(`${where} is listed twice`);
-      else if (!contact) problems.push(`${where} is stale: nothing touches there any more`);
+      else if (!contact) worn(`${where} is stale: nothing touches there any more`);
       else if (entry.depth - contact.depth > LOOSE * grain) {
         const [capped, measures] = [entry.depth, contact.depth].map(millimetres);
-        problems.push(`${where} is capped at ${capped} mm, far above the ${measures} mm it measures`);
+        worn(`${where} is capped at ${capped} mm, far above the ${measures} mm it measures`);
       }
       seen.add(pair);
       if (contact && swingUnjudged.includes(entry)) {
@@ -321,5 +328,5 @@ export function swingReport({ grain, vehicles }, results) {
       return [site, { part: partOf.get(site), ...swing, status, contacts }];
     }));
   }
-  return { problems, notes, exports, verdicts };
+  return { problems, entryProblems, notes, exports, verdicts };
 }

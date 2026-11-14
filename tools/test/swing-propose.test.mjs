@@ -96,3 +96,25 @@ test('a stop is searched from the first contact nobody allows, so an allowed con
   const fails = (value) => verdictAfter(pieces, { scale: value / proposal.stop.total }).status === 'fails';
   assert.deepEqual([fails(proposal.stop.value), fails(proposal.stop.value + 1)], [false, true]);
 });
+
+test('a shorter stop that leaves a judged stop entry stale is still proposed, with the entry named to drop', () => {
+  // The pad is met only as the lid nears upright, and the block mid-swing, out of reach of any hinge move.
+  const pad = placed('pad', [box('pad', [-0.1, LIFT + 0.25, -0.1], [-0.05, LIFT + 0.35, 0.1])]);
+  const block = placed('block', [box('slab', [0.02, LIFT + 0.2, -0.3], [1, LIFT + 0.34, 0.3])]);
+  const bare = vehicle([lidSite, pad, block]);
+  const padDepth = swingReport(bare, { v: sweepVehicle(sweepTasks(bare).v) }).verdicts.v.lid.contacts.find(({ other }) => other === 'pad').depth;
+  const pieces = vehicle([lidSite, pad, block], { swingContacts: [{ sites: ['lid', 'pad'], depth: padDepth + 0.0005, why: 'a lid stop' }] });
+  const proposal = proposeFix(pieces, 'v', 'lid');
+  assert.equal(proposal.status, 'shortened');
+  assert.equal(proposal.entries.length, 1);
+  assert.match(proposal.entries[0], /lid and pad is stale/);
+});
+
+test('a part that swings into the lid while it is closed does not stop the lid from being proposed a fix', () => {
+  const flap = { ...lid, pieces: lid.pieces.map((piece) => (piece.kind === 'box' ? { ...piece, min: piece.min.map((v, i) => (i === 1 ? v - 0.3 : v)), max: piece.max.map((v, i) => (i === 1 ? v - 0.3 : v)) } : { ...piece, origin: piece.origin.map((v, i) => (i === 1 ? v - 0.3 : v)) })) };
+  const pieces = vehicle([lidSite, lip, placed('flap', flap.pieces)]);
+  pieces.motions = { lid, flap };
+  const { problems } = swingReport(pieces, { v: sweepVehicle(sweepTasks(pieces).v) });
+  assert.ok(problems.some((problem) => problem.includes('flap at flap swings into lid at lid')));
+  assert.equal(proposeFix(pieces, 'v', 'lid').status, 'moved');
+});

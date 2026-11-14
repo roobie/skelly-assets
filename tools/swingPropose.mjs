@@ -44,34 +44,41 @@ function candidatesOf(site, axis, grain) {
 // not do on its own thread.
 export const proposeTask = ({ pieces, vehicle, site }) => proposeFix(pieces, vehicle, site);
 
-const escaped = (name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-// A proposal for one site of a vehicle, from `readSitePieces`' output: `{ status, clear, offset?, stop?, reachable? }`.
-// `status` is `ok` when the vehicle's report has nothing against the site's part, `moved` when the hinge line offset
-// (`offset` in the vehicle frame, metres, for this site; `partOffset` in the part's own frame, as a far-side twin is
-// drawn reflected) clears it, `shortened` when only a shorter `stop` (`{ value, total, unit }`, of the authored one)
-// does, and `none` when nothing tried does. `reachable` is the most of its stop any tried hinge line opens.
+// A proposal for one site of a vehicle, from `readSitePieces`' output: `{ status, clear, offset?, stop?, reachable?,
+// entries? }`. `status` is `ok` when no site of the site's part fails in the vehicle's report, `moved` when the hinge line
+// offset (`offset` in the vehicle frame, metres, for this site; `partOffset` in the part's own frame, as a far-side twin
+// is drawn reflected) makes none fail, `shortened` when only a shorter `stop` (`{ value, total, unit }`, of the authored
+// one) does, and `none` when nothing tried does. `reachable` is the most of its stop any tried hinge line opens.
+// `entries` are the vehicle's entries on the part that the fix leaves stale or capped far above their contact, which the
+// author drops or judges again.
 export function proposeFix(pieces, vehicle, siteId) {
   const { grain, vehicles } = pieces;
   const task = sweepTasks({ ...pieces, vehicles: { [vehicle]: vehicles[vehicle] } })[vehicle];
   const site = task.sites.find(({ id }) => id === siteId);
   const { part } = site;
   const ofPart = task.sites.filter((other) => other.part === part);
+  const ids = new Set(ofPart.map(({ id }) => id));
   const family = Object.fromEntries([vehicle, vehicles[vehicle].parent].filter(Boolean).map((name) => [name, vehicles[name]]));
-  const naming = new RegExp(`(?<![\\w-])(?:${[part, ...ofPart.map(({ id }) => id)].map(escaped).join('|')})(?![\\w-])`);
   const reportOf = (adjust, only) => {
     const result = sweepVehicle({ ...task, adjust: { [part]: adjust }, only: only ? siteId : undefined });
     return swingReport({ grain, vehicles: family }, { [vehicle]: result });
   };
   // A sweep of the site alone is cheap and fails whenever the whole vehicle's does, so it goes first.
   const quickClear = (adjust) => reportOf(adjust, true).verdicts[vehicle][siteId];
-  // Whether a full report has no problem against the part: a swing, a meeting with both open, or a stale or over-capped
-  // entry, which names a site. Problems of the parent, swept by no one here, are not the vehicle's.
-  const clears = ({ problems }) => !problems.some((problem) => problem.startsWith(`${vehicle}: `) && naming.test(problem.slice(vehicle.length + 2)));
-  const holds = (adjust) => clears(reportOf(adjust, false));
+  // What a fix has to clear is a failing verdict at any site of the part: its own swing, or a meeting with both open. A
+  // contact between two other parts, or one that a part's rest pose makes with a part that moves, is not the part's to fix.
+  const failing = (report) => ofPart.some(({ id }) => report.verdicts[vehicle][id]?.status === 'fails');
+  // The entries of this vehicle on the part's sites that a report has gone stale or capped far above their contact.
+  const wornBy = (report) => report.entryProblems.filter((entry) => entry.vehicle === vehicle && entry.sites.some((id) => ids.has(id))).map(({ message }) => message);
   const before = reportOf({}, false);
   const start = before.verdicts[vehicle][siteId];
-  if (clears(before)) return { status: 'ok', clear: start.clear };
+  if (!failing(before)) return { status: 'ok', clear: start.clear };
+  const known = new Set(wornBy(before));
+  // The entries a fix leaves worn that were not already, for the author to drop or judge again.
+  const holds = (adjust) => {
+    const report = reportOf(adjust, false);
+    return failing(report) ? null : { entries: wornBy(report).filter((message) => !known.has(message)) };
+  };
   const [stage, ...rest] = motionAtSite(adjustedMotion(task.motions[part], {}, task.forward, grain), site);
   let reachable = start.clear;
   if (rest.length > 0) return { status: 'none', clear: start.clear, reachable };
@@ -86,20 +93,22 @@ export function proposeFix(pieces, vehicle, siteId) {
       }
       const quick = quickClear(adjust);
       reachable = Math.max(reachable, quick.clear);
-      if (quick.status !== 'fails' && holds(adjust)) {
-        return { status: 'moved', clear: 1, offset: offset.map(rounded), partOffset: adjust.offset.map(rounded), reachable: 1 };
+      const held = quick.status === 'fails' ? null : holds(adjust);
+      if (held) {
+        return { status: 'moved', clear: 1, offset: offset.map(rounded), partOffset: adjust.offset.map(rounded), reachable: 1, ...held };
       }
     }
   }
   const slide = stage.kind === 'slide';
   const total = slide ? Math.round(stage.travel * 1e3) : Math.round(Math.abs(stage.angle));
   // Only a stop short of the first contact nobody allows can help; one short of an allowed contact is already allowed.
-  const failing = ofPart.flatMap(({ id }) => before.verdicts[vehicle][id]?.contacts ?? []).filter(({ allowed, at }) => !allowed && at !== undefined);
-  const first = failing.length > 0 ? Math.min(...failing.map(({ at }) => at)) : 1;
+  const unallowed = ofPart.flatMap(({ id }) => before.verdicts[vehicle][id]?.contacts ?? []).filter(({ allowed, at }) => !allowed && at !== undefined);
+  const first = unallowed.length > 0 ? Math.min(...unallowed.map(({ at }) => at)) : 1;
   for (let stop = Math.min(Math.floor(first * total), total - 1); stop > 0; stop -= 1) {
     const adjust = { scale: stop / total };
-    if (quickClear(adjust).status !== 'fails' && holds(adjust)) {
-      return { status: 'shortened', clear: start.clear, stop: { value: stop, total, unit: slide ? 'mm' : '°' }, reachable };
+    const held = quickClear(adjust).status === 'fails' ? null : holds(adjust);
+    if (held) {
+      return { status: 'shortened', clear: start.clear, stop: { value: stop, total, unit: slide ? 'mm' : '°' }, reachable, ...held };
     }
   }
   return { status: 'none', clear: start.clear, reachable };

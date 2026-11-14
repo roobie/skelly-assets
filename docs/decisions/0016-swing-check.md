@@ -77,11 +77,12 @@ change that makes it cost more is a defect to fix in the sweep and not a reason 
 
 A failing site is more useful with a remedy than with a bare verdict, so the vehicle authoring tool's Vehicles view offers
 one from `tools/swingPropose.mjs`, `proposeFix`. The proposer holds no rule of its own about what clears: it accepts a
-candidate only when the checker's own report for the vehicle has nothing against the site's part. A proposal is therefore
-as good as the checker for the vehicle it was made in, and no better. It changes the part, because the author edits the
-part, so every site of it in that vehicle takes the change. Other vehicles that place the part are not swept, so a
-proposal never claims to clear them; the build tells the author. The view shows each site's verdict from `swingReport`'s
-`verdicts` and calls the proposer through its dev server.
+candidate only when the checker's own report for the vehicle shows no failing site of the part. A proposal is therefore as
+good as the checker for the vehicle it was made in, and no better. It changes the part, because the author edits the part,
+so every site of it in that vehicle takes the change. It answers for the part's own sites only: what a fix cannot change,
+such as another part's swing into this one at rest, is not its to answer for, and an entry the fix wears out is handed
+back for the author to drop or judge again, never a reason to refuse the fix. Other vehicles that place the part are not
+swept, so a proposal never claims to clear them; the build tells the author.
 
 It proposes and writes nothing, because the pins are drawn by a template that other vehicles share: the offset in the
 vehicle frame cannot say which template parameter to change, and a silent edit to shared content would move vehicles
