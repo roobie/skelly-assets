@@ -6,6 +6,11 @@
 // A leaf's outer face is toward +z, the near side, so a mirrored leaf still folds out of its vehicle.
 local k = import 'kit.libsonnet';
 {
+  // The width of each of a pair of leaves that close `span` meeting in its middle, `thick` deep. On its way out a free
+  // panel's outer corner at the meeting edge swings past the leaf's end by 2 * (hypot(p, thick) - p), p being a panel's
+  // width, so the pair leave twice that between them, or their corners cut into each other; the leaf that fits is the
+  // one whose panel's diagonal is a quarter of the span.
+  pairWidth(span, thick):: 2 * std.sqrt(span * span / 16 - thick * thick),
   // A leaf `width` wide, `height` tall and `thick` deep, its jamb at its +x end when `jambSign` is 1 or its -x end when
   // -1, folding its jamb panel `fold` degrees. Each panel is drawn about its own centre and placed `at` along the leaf
   // from the leaf's centre; `pins` are its hinge pins, in the slot `slot` names.

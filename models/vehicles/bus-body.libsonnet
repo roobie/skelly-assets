@@ -44,7 +44,8 @@ local layout(s) = {
     for door in s.doors
   ],
   arches: [[s.rearAxle - s.arch, s.rearAxle + s.arch]] + (if bonneted then [] else [[s.frontAxle - s.arch, s.frontAxle + s.arch]]),
-  leafWidth: (self.doorways[0][1] - self.doorways[0][0]) / std.get(s, 'doorLeaves', 2),
+  local span = self.doorways[0][1] - self.doorways[0][0],
+  leafWidth: if std.get(s, 'doorLeaves', 2) == 2 then foldDoor.pairWidth(span, self.doorThick) else span,
   doorHeight: s.decks[0].top - s.doorSill,
   doorThick: 0.06,
   // Every leaf of a doorway folds out of it, a pair from the doorway's middle toward its ends, a single leaf toward the
