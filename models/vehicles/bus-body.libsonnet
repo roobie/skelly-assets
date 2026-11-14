@@ -3,6 +3,7 @@
 // the same spec, taking its kit as an argument so this folder stays free of Deadvox imports.
 // A door takes the place of one window bay on the near side; the driver sits on the far side, away from the kerb.
 local k = import 'kit.libsonnet';
+local foldDoor = import 'fold-door.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -45,12 +46,23 @@ local layout(s) = {
   arches: [[s.rearAxle - s.arch, s.rearAxle + s.arch]] + (if bonneted then [] else [[s.frontAxle - s.arch, s.frontAxle + s.arch]]),
   leafWidth: (self.doorways[0][1] - self.doorways[0][0]) / std.get(s, 'doorLeaves', 2),
   doorHeight: s.decks[0].top - s.doorSill,
+  doorThick: 0.06,
+  // Every leaf of a doorway folds out of it, a pair from the doorway's middle toward its ends, a single leaf toward the
+  // forward end. Folding in, a leaf would sweep through the floor above its foot or the steps inside a high floor's
+  // doorway. Each leaf names its pressing's `suffix`, its `site` and its `jamb` end of the doorway.
+  leaves: if std.get(s, 'doorLeaves', 2) == 2 then [
+    { suffix: '_door_fwd', site: 'door_fwd', label: 'front door', item: 'door, forward leaf', jamb: 1 },
+    { suffix: '_door_aft', site: 'door_aft', label: 'rear door', item: 'door, rear leaf', jamb: -1 },
+  ] else [{ suffix: '_door', site: 'door', label: 'door', item: 'door', jamb: 1 }],
+  fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door'),
+  // Where a leaf's centre lies along doorway `way`.
+  leafX(way, leaf): (if leaf.jamb > 0 then way[1] else way[0]) - leaf.jamb * self.leafWidth / 2,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
   windowLabel(i): if i == 0 then 'side window' else 'upper window',
 };
 local pressings(id, title, s) = {
   // A compound row of this bus, titled with the bus's title and the part's `label`.
-  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
+  local part(suffix, label, massKg, pieces, finish, anchors={}, motion=null) = k.compound(id + suffix, massKg, pieces, finish, anchors, motion) + { title: title + ' ' + label },
   local g = layout(s),
   local face = g.face,
   local xf = g.xf,
@@ -262,22 +274,26 @@ local pressings(id, title, s) = {
     ] + (if std.get(s, 'paneSash', false) then [
            box('sash', 'frame', [-w / 2, h * 0.5 - 0.025, -0.03], [w / 2, h * 0.5 + 0.025, 0.03]),
          ] else []), { glass: 'glass-clear', frame: 'steel-grey' }),
-  local leafRow(suffix, label, hingeFraction) =
-    local w = g.leafWidth;
+  // A folding leaf's panel, stiled at both ends so the leaf at rest shows its split line between the panels.
+  local panelRow(suffix, label, width, panel) =
     local h = g.doorHeight;
+    local t = g.doorThick / 2;
     local kick = std.get(s, 'doorKick', 0.3);
-    local hingeSign = if hingeFraction > 0.5 then 1 else -1;
-    part(suffix, label, 45 * w * h, [
-      box('kick', 'door', [-w / 2, 0, -0.03], [w / 2, kick, 0.03]),
-      box('glass', 'glass', [-w / 2, kick, -0.015], [w / 2, h, 0.015]),
-      box('stile', 'door', [hingeSign * w / 2 - 0.03, 0, -0.03], [hingeSign * w / 2 + 0.03, h, 0.03]),
-      box('edge', 'door', [-hingeSign * w / 2 - 0.03, 0, -0.03], [-hingeSign * w / 2 + 0.03, h, 0.03]),
-      box('head', 'door', [-w / 2, h - 0.06, -0.03], [w / 2, h, 0.03]),
-    ], { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, {
-      hinge_a: ['stile', [0.5, 0.1, 0.5]],
-      hinge_b: ['stile', [0.5, 0.9, 0.5]],
-    }),
-  local leaves = if std.get(s, 'doorLeaves', 2) == 2 then [leafRow('_door_fwd', 'front door', 1), leafRow('_door_aft', 'rear door', 0)] else [leafRow('_door', 'door', 1)],
+    part(suffix, label, 45 * width * h, [
+      box('kick', 'door', [-width / 2, 0, -t], [width / 2, kick, t]),
+      box('glass', 'glass', [-width / 2, kick, -t / 2], [width / 2, h, t / 2]),
+      box('stile_aft', 'door', [-width / 2, 0, -t], [-width / 2 + 0.03, h, t]),
+      box('stile_fwd', 'door', [width / 2 - 0.03, 0, -t], [width / 2, h, t]),
+      box('head', 'door', [-width / 2, h - 0.06, -t], [width / 2, h, t]),
+    ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion),
+  local leaves = std.flattenArrays([
+    local fold = g.fold(leaf);
+    [
+      panelRow(leaf.suffix + '_jamb', leaf.label + ', jamb panel', fold.width, fold.jamb),
+      panelRow(leaf.suffix + '_free', leaf.label + ', free panel', fold.width, fold.free),
+    ]
+    for leaf in g.leaves
+  ]),
   local bumper(suffix, label, x0, x1, mass) = part(suffix, label, mass, [
     box('bar', 'bar', [x0, std.get(s, 'bumperY', [0.28, 0.6])[0], -(s.side + 0.03125)], [x1, std.get(s, 'bumperY', [0.28, 0.6])[1], s.side + 0.03125]),
   ], { bar: std.get(s, 'bumperFinish', 'plastic-black') }),
@@ -387,10 +403,13 @@ local items(kit, id, name, s) =
     panel('_dashboard', 'dashboard', ['structure']),
   ]
   + (if std.length(s.decks) > 1 then [panel('_upper_window', 'upper window', ['glazing']), panel('_upper_floor', 'upper floor', ['structure'])] else [])
-  + (if std.get(s, 'doorLeaves', 2) == 2 then [
-       panel('_door_fwd', 'door, forward leaf', ['entry', 'glazing', 'protection']),
-       panel('_door_aft', 'door, rear leaf', ['entry', 'glazing', 'protection']),
-     ] else [panel('_door', 'door', ['entry', 'glazing', 'protection'])])
+  + std.flattenArrays([
+    [
+      panel(leaf.suffix + '_jamb', leaf.item + ', jamb panel', ['entry', 'glazing', 'protection']),
+      panel(leaf.suffix + '_free', leaf.item + ', free panel', ['entry', 'glazing', 'protection']),
+    ]
+    for leaf in g.leaves
+  ])
   + (if g.bonneted then [
        panel('_bonnet', 'bonnet', ['protection']),
        panel('_grille', 'grille', ['protection']),
@@ -425,14 +444,17 @@ local laid(kit, id, s) =
     for i in std.range(0, std.length(s.decks) - 1)
   ]);
   local doorZ = s.side - 0.035;
+  // The free panel rides its jamb panel, so it folds back as the jamb panel turns out.
   local doors = std.flattenArrays([
-    local way = g.doorways[d];
-    local w = g.leafWidth;
-    if std.get(s, 'doorLeaves', 2) == 2 then [
-      fitting('door_fwd_' + d, part('_door_fwd'), [way[1] - w / 2, s.doorSill, doorZ], ['shell']),
-      fitting('door_aft_' + d, part('_door_aft'), [way[0] + w / 2, s.doorSill, doorZ], ['shell']),
-    ] else [fitting('door_' + d, part('_door'), [way[1] - w / 2, s.doorSill, doorZ], ['shell'])]
+    local x = g.leafX(g.doorways[d], leaf);
+    local fold = g.fold(leaf);
+    local jamb = leaf.site + '_jamb_' + d;
+    [
+      fitting(jamb, part(leaf.suffix + '_jamb'), [x + fold.jamb.at, s.doorSill, doorZ], ['shell']),
+      fitting(leaf.site + '_free_' + d, part(leaf.suffix + '_free'), [x + fold.free.at, s.doorSill, doorZ], [jamb], rides=jamb),
+    ]
     for d in std.range(0, std.length(g.doorways) - 1)
+    for leaf in g.leaves
   ]);
   local seats = std.flattenArrays([
     local row = s.seats[i];

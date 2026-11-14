@@ -12,7 +12,7 @@ local steps(span) = std.floor(span / b.pitch);
 local offsets(span) = [(i - steps(span) / 2) * b.pitch for i in std.range(0, steps(span))];
 local hole = s.rearHoles[0];
 local g = bus.layout(s);
-local doorW = g.leafWidth;
+local doorW = g.fold(g.leaves[0]).width;
 local doorH = g.doorHeight - s.doorKick;
 local cage = s.bulkhead;
 taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', vehicle.title, s) + [
@@ -24,8 +24,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', v
     box('bar_' + i, 'bar', [offsets(w)[i] - b.width / 2, 0, 0.005], [offsets(w)[i] + b.width / 2, h, b.z])
     for i in std.range(0, std.length(offsets(w)) - 1)
   ], { bar: 'paint-charcoal' }) + { title: 'Prison bus window bars' },
-  // Seated proud of the leaf at its fitting's `at`, the foot of the door's glass.
-  k.compound('prison_bus_door_bars', 6, [
+  // Seated proud of a door panel at its fitting's `at`, the foot of the panel's glass; each panel carries its own.
+  k.compound('prison_bus_door_bars', 3, [
     box('rail_low', 'bar', [-doorW / 2, -0.02, 0.03], [doorW / 2, b.rail, 0.07]),
     box('rail_high', 'bar', [-doorW / 2, doorH - b.rail, 0.03], [doorW / 2, doorH, 0.07]),
   ] + [
