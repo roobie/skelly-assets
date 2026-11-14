@@ -62,5 +62,5 @@ change that makes it cost more is a defect to fix in the sweep and not a reason 
 Entries land as `swingUnjudged` for every contact the catalogue had when the check arrived, so the build stays green
 and each one stays visible until fixed or judged.
 
-A part is a rigid body: a motion that bends or scales a part is out of scope. A part that moves but is placed with no
+A part is a rigid body, so a motion that bends or scales it is out of scope. A part that moves but is placed with no
 neighbour in its swing has no contact and exports a swing of its whole way.
