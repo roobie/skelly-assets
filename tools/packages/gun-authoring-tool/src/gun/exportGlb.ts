@@ -517,12 +517,7 @@ const frontSightPost = (resolved: Resolved) => {
   if (!(id && transform && axis && post)) {
     throw new Error('A rear sight needs a front-sight post to define its aim line');
   }
-  const [low, high] = localSolidBounds(post);
-  return {
-    id,
-    tip: applyPoint(transform, axis.origin),
-    postHalfWidthMetres: ((high[2] - low[2]) / 2) * resolved.domain.units.metresPerUnit,
-  };
+  return { tip: applyPoint(transform, axis.origin) };
 };
 
 /**
@@ -649,13 +644,12 @@ const openSightGapOrThrow = (file: VoxelFile, partId: string, grain: number, top
 
 /**
  * An iron sight's line as the voxelized file draws it, in model metres, because voxels move the tops the player lines
- * up. A rear sight aims from its own top to the front post's top, through its drawn notch; the post is read within
- * twice its own width of the bore plane, which holds its top voxel column wherever the sampler put it and leaves the
- * guard ears out. A bead sets the eye height to its top and keeps its level line. Any other iron datum, such as a
- * revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs between, then
- * drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in front post:
- * then it aims at the post's drawn top, read no higher than one voxel over its authored top so a hood ring above it
- * stays out. A part the file keeps smooth is drawn as authored, so its authored datum stands.
+ * up. A separate sight part is too small to voxelize and is drawn as authored, so its authored datum stands: a rear
+ * sight aims at the front post's authored tip and a bead keeps its level line. A sight built into a voxelized part,
+ * such as a revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs
+ * between, then drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in
+ * front post, which a voxelized part draws too: then it aims at the post's drawn top, read no higher than one voxel
+ * over its authored top so a hood ring above it stays out.
  */
 const drawnIronSightLine = (
   file: VoxelFile,
@@ -666,50 +660,31 @@ const drawnIronSightLine = (
   const { metresPerUnit } = resolved.domain.units;
   const { bore, up, side } = FILE_AXES;
   const grainOf = (partId: string) => partVoxelGrain(resolved.defs.get(partId)!, file.grains, metresPerUnit);
-  const onTop = (top: number) => withCoordinate(sight.eye, up, top);
   const sightGrain = grainOf(sight.id);
-  if (family.includes('rear-sight')) {
-    const front = frontSightPost(resolved);
-    const tip = modelPoint(front.tip, metresPerUnit);
-    const band = 2 * front.postHalfWidthMetres;
-    const eye =
-      sightGrain === undefined
-        ? sight.eye
-        : openSightGapOrThrow(file, sight.id, sightGrain, onTop(drawnTopOrThrow(file, sight.id)));
-    const frontTop =
-      grainOf(front.id) === undefined
-        ? tip[up]
-        : drawnTopOrThrow(file, front.id, { [side]: [tip[side] - band, tip[side] + band] });
-    return { eye, direction: normalize(sub(withCoordinate(tip, up, frontTop), eye)) };
+  if (sightGrain === undefined) {
+    const direction = family.includes('rear-sight')
+      ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
+      : sight.direction;
+    return { eye: sight.eye, direction };
   }
-  if (family === 'front-sight-bead') {
-    return { eye: sightGrain === undefined ? sight.eye : onTop(drawnTopOrThrow(file, sight.id)), direction: sight.direction };
-  }
-  const leavesEye = (grain: number) => {
-    const along = sight.eye[bore];
-    const top = drawnTopOrThrow(file, sight.id, {
-      [bore]: [along - grain / 2, along + grain / 2],
-      [side]: leafSpan(resolved, sight),
-    });
-    return openSightGapOrThrow(file, sight.id, grain, onTop(top));
-  };
-  const eye = sightGrain === undefined ? sight.eye : leavesEye(sightGrain);
+  const top = drawnTopOrThrow(file, sight.id, {
+    [bore]: [sight.eye[bore] - sightGrain / 2, sight.eye[bore] + sightGrain / 2],
+    [side]: leafSpan(resolved, sight),
+  });
+  const eye = openSightGapOrThrow(file, sight.id, sightGrain, withCoordinate(sight.eye, up, top));
   const post = builtInFrontPost(resolved);
   if (post === undefined) {
     return { eye, direction: sight.direction };
   }
-  const postGrain = grainOf(post.id);
-  // As for a front-sight part's post, twice its width holds its top voxel column wherever the sampler put it.
+  const postGrain = grainOf(post.id)!;
+  // Twice the post's width holds its top voxel column wherever the sampler put it.
   const centre = (post.low[side] + post.high[side]) / 2;
   const band = post.high[side] - post.low[side];
-  const postTop =
-    postGrain === undefined
-      ? post.high[up]
-      : drawnTopOrThrow(file, post.id, {
-          [bore]: [post.low[bore], post.high[bore]],
-          [up]: [post.low[up], post.high[up] + postGrain],
-          [side]: [centre - band, centre + band],
-        });
+  const postTop = drawnTopOrThrow(file, post.id, {
+    [bore]: [post.low[bore], post.high[bore]],
+    [up]: [post.low[up], post.high[up] + postGrain],
+    [side]: [centre - band, centre + band],
+  });
   // The eye lines up with the tip's edge on the post's rear face, which faces back along the bore.
   const aim = fileVector({ bore: post.low[bore], up: postTop, side: centre });
   return { eye, direction: normalize(sub(aim, eye)) };

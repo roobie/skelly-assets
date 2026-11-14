@@ -2,8 +2,9 @@
 // furniture and parts made to attach to them and matches deadvox's vehicle voxels; `gun` is for firearms, mounted on a
 // vehicle or not, their magazines and hand-held items, whose small controls and thin shapes are finer detail than
 // `item` holds; `item` is for every other item or component. `detailGrain` is for the parts a design tags as fine
-// detail, such as sights, whose notches and posts the `gun` grain fills; a class's `grain` must be a whole multiple of
-// it so the lattices nest, which the `vehicle` grain is not, and no vehicle part carries the tag.
+// detail, as the optic is, and, in the `gun` class, for thin parts (see `detailThinParts`); iron sights are too small
+// for any grain and stay smooth. A class's `grain` must be a whole multiple of it so the lattices nest, which the `vehicle` grain is not,
+// and no vehicle part carries the tag.
 // `featureVoxels` is how many voxels a feature must span at a grain to read as itself; a thinner one lands unevenly on
 // the lattice, a whole voxel on one side and none on the other, so its caller draws it some other way.
 // `detailThinParts` gives the detail grain to every part thinner than `featureVoxels` of the class grain as well; why
