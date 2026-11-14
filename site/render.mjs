@@ -9,7 +9,7 @@ import { hideCovered } from './hiding.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { boneTransforms } from './kinematics.mjs';
-import { movingSites, poseAt, stowClips } from './motionPose.mjs';
+import { movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -55,9 +55,8 @@ function load(model) {
 
 // Models composed at sites, as a vehicle places its parts or the doll wears a wearable: each site's model mirrored
 // across its own x = 0 plane when the site says so, turned by its quaternion `turn`, then moved to `at`. Its parts stay
-// in site order, so the viewer can move each one apart. A site that moves, or rides one that does, sits in a group of its
-// own that carries it from rest to its stop (`swing`). What a worn piece's site covers of the doll is not drawn
-// (hiding.mjs).
+// in site order, so the viewer can move each one apart. A site that moves, or rides one that does, is posed by a group
+// inside its top node (`siteNode`). What a worn piece's site covers of the doll is not drawn (hiding.mjs).
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
     cache.set(entry.id, (async () => {
@@ -75,13 +74,7 @@ function loadSites(entry) {
         if (site.turn) part.quaternion.fromArray(site.turn);
         if (site.mirror) part.scale.x = -1;
         if (site.paint) repaint(part, site.paint);
-        if (carried.has(i)) {
-          const carrier = new THREE.Group();
-          carrier.name = part.name;
-          carrier.matrixAutoUpdate = false;
-          carrier.add(part);
-          scene.add(carrier);
-        } else scene.add(part);
+        scene.add(siteNode(part, carried.has(i)));
         triangles += parts[i].triangles;
         for (const m of parts[i].materials) materials.set(m.name, m);
       });
@@ -92,17 +85,32 @@ function loadSites(entry) {
   return cache.get(entry.id);
 }
 
+// A site's top node, the one the exploded view moves apart (`spread`). A site that moves has its placed model inside a
+// pose group that carries it from rest to its stop (`swing`), and that group sits inside the top node so each view moves
+// a node of its own: the pose group's matrix is set whole, so a position given to it would be ignored.
+export function siteNode(part, moves) {
+  if (!moves) return part;
+  const pose = new THREE.Group();
+  pose.matrixAutoUpdate = false;
+  pose.add(part);
+  const node = new THREE.Group();
+  node.name = part.name;
+  node.add(pose);
+  return node;
+}
+const poseGroupOf = (node) => node.children[0];
+
 // Whether a loaded entry has sites that open: a vehicle with a door, a lid or a shutter.
 export const opens = (loaded) => Boolean(loaded.moving?.length);
 
-// The parts of an instance of `loaded` that move: each one's group, its layers, and the materials its stowed share is
-// cut from. Those materials are the instance's own copies, since the clipping would show on every instance sharing them.
+// The parts of an instance of `loaded` that move: each one's pose group (`siteNode`), its layers, and the materials its
+// stowed share is cut from. Those materials are the instance's own copies, since the clipping would show on every
+// instance sharing them.
 export function movers(obj, loaded) {
   return loaded.moving.map(({ index, layers }) => {
-    const carrier = obj.children[index];
-    const stows = stowClips(layers, 1).length > 0;
+    const carrier = poseGroupOf(obj.children[index]);
     const materials = new Set();
-    if (stows) {
+    if (stowPlanesOf(layers).length > 0) {
       carrier.traverse((o) => {
         if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map((m) => ownCopy(m, materials)) : ownCopy(o.material, materials);
       });
