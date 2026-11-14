@@ -213,10 +213,13 @@ local body(e, c) =
     box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
   ] else
     local valley = valleyHalf(c);
+    local intakeTop = h - c.airBox.height - airBoxLid;
+    assert intakeTop > h * shape.blockTop : e.title + "'s class's air box stands too tall in its valley for an intake under it";
+    assert valley < w * 0.44 : e.title + "'s valley is wider than its banks' covers";
     [
       box('sump', 'casting', [-l / 2, 0, -w * 0.3], [l / 2, h * 0.2, w * 0.3]),
       box('block', 'casting', [-l / 2, h * 0.2, -w * shape.blockHalf], [l / 2, h * shape.blockTop, w * shape.blockHalf]),
-      box('intake', 'casting', [-l * 0.47, h * shape.blockTop, -valley], [l * 0.47, h - c.airBox.height - airBoxLid, valley]),
+      box('intake', 'casting', [-l * 0.47, h * shape.blockTop, -valley], [l * 0.47, intakeTop, valley]),
     ] + k.bothSides([
       box('bank', 'casting', [-l * 0.47, h * shape.blockTop, valley], [l * 0.47, h * 0.9, w * shape.headHalf]),
       box('cover', 'cover', [-l * 0.43, h * 0.9, valley], [l * 0.43, h, w * 0.44]),

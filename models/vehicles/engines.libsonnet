@@ -34,6 +34,8 @@
     damper: { radius: 0.13, depth: 0.05 },
     bellHousing: { radius: 0.26, depth: 0.06 },
   },
+  // The medium and heavy V8s and the V12 are drawn inline: a vee's narrower block and valley air box change the bays of
+  // the trucks and armour that carry them, which have not been refitted for one.
   v8_petrol_medium: { title: 'Medium V8 petrol engine', class: 'medium', massKg: 262, length: 0.8, width: 0.62, height: 0.72 },
   // A 14-litre Scania DSI14 V8 diesel of about 550 hp, as in the CV9040. Dealer listings give it 1,450 to 1,600 kg; its
   // measures are estimates for a 90-degree V8 of its size, since Scania publishes none.
