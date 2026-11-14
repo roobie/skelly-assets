@@ -7,5 +7,5 @@ V6 and V8 are drawn as vees, with the air box standing in the valley between the
 light truck's four, `engine_i4_petrol_medium`, with medium accessories, in place of `engine_i4_petrol`. The fused
 `engine_v6_petrol` and `engine_v8_petrol` models look different too: the engine kit draws them, with the light
 accessories and the kit's finishes. `air_box_light` is smaller and lighter and stands lower beside the block, so it
-fits under a narrow bonnet; every fused light engine that draws it changes with it. The sports car's floor behind its seats is open over its engine and gearbox, which
-now stand lower in that bay.
+fits under a narrow bonnet; every fused light engine that draws it changes with it. The sports car's floor behind its
+seats is open over its engine and gearbox, which now stand lower in that bay.

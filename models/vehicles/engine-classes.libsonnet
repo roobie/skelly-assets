@@ -66,7 +66,7 @@
     },
     alternator: { id: 'alternator_plant', title: 'Plant alternator', massKg: 12, radius: 0.08, length: 0.2 },
     starter: { id: 'starter_motor_plant', title: 'Plant starter motor', massKg: 14, radius: 0.065, length: 0.28 },
-    airBox: { id: 'air_box_plant', title: 'Plant air box', massKg: 6, length: 0.4, height: 0.16, width: 0.3, at: 'over', base: 0.5 },
+    airBox: { id: 'air_box_plant', title: 'Plant air box', massKg: 6, length: 0.4, height: 0.16, width: 0.3, at: 'over' },
     fuelPump: { id: 'fuel_pump_plant', title: 'Plant fuel pump', massKg: 3, size: 0.1 },
     driveBelt: { id: 'drive_belt_plant', title: 'Plant drive belt', massKg: 0.6, width: 0.025, thickness: 0.015 },
   },
