@@ -3,6 +3,8 @@
   shellMass: 2600, paint: 'paint-crane-yellow',
   bands: [{ finish: 'paint-charcoal', y: [0.88, 1.02] }],
   slideGlass: false, rearShutter: false,
+  // The serving counter and awning stand in the side door's path, so the door does not slide.
+  sideDoorSlides: false,
   windows: [[-2.1, -0.5]],
   borrow: {
     _bonnet: 'step_van_bonnet', _front_wing: 'step_van_front_wing', _front_bumper: 'step_van_front_bumper',
