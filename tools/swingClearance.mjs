@@ -6,8 +6,8 @@
 // another (`rides` on its site) moves with it, its own motion if it has one nested inside its carrier's. A rider that
 // does not move is part of its carrier's body and is not tested against it; one that moves is a body of its own, swept
 // against its carrier and against the other riders of that carrier, both moving on the one clock, because a panel that
-// folds onto its carrier meets it only while it moves. A stowing slide is swept like any other, so what it hides is still
-// tested. A contact is allowed by the vehicle's own placements: `swingContact` for one that is intended and says why,
+// folds onto its carrier meets it only while it moves. What a stowing slide hides is not there to meet anything, so it is
+// left out while it is hidden. A contact is allowed by the vehicle's own placements: `swingContact` for one that is intended and says why,
 // `swingUnjudged` for one nobody has judged yet, which every run lists. Both are capped at the depth they were written
 // for, a variant shares its parent's, and an entry that no longer applies fails. The reason for the rules and the cost
 // strategy are in `docs/decisions/0016-swing-check.md`.
@@ -15,12 +15,13 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
+import { dot } from './packages/construct/src/foundation/math.ts';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, TOWARD } from './packages/thing-core/src/motion.ts';
 import { shardUnits } from './generation.mjs';
 import { codeFingerprint } from './packages/thing-export/src/cache.ts';
 import { key } from './siteOverlap.mjs';
-import { poseAt, shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
+import { poseAt, shapeOf, stowPlanesOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
 
 const EPSILON = 1e-9;
@@ -38,12 +39,17 @@ const fromModelFrame = (forward, [x, y, z]) => {
 };
 
 // A part's motion as authored, with its pins, resolved in the vehicle frame for the part at its own origin: the same
-// derivation the build exports, so the swing proven is the swing played (docs/decisions/0015-motion-as-content.md).
+// derivation the build exports, so the swing proven is the swing played (docs/decisions/0015-motion-as-content.md). A
+// stowing slide's plane is the leading face of the part's rest bounds, as the solids the check measures draw it.
 export function resolveMotion({ stages, pieces }, forward, grain) {
   const bounds = piecesBounds(pieces);
   const centre = toModelFrame(forward, centreOf(bounds));
   const moves = stages.map((stage) => {
-    if (stage.kind === 'slide') return { kind: 'slide', direction: fromModelFrame(forward, TOWARD[stage.toward]), travel: stage.travel };
+    if (stage.kind === 'slide') {
+      const direction = fromModelFrame(forward, TOWARD[stage.toward]);
+      const stow = stage.stow ? { stow: Math.max(...cornersOf(bounds).map((corner) => dot(corner, direction))) } : {};
+      return { kind: 'slide', direction, travel: stage.travel, ...stow };
+    }
     const pins = stage.pins.map((id) => pieces.find((piece) => piece.id === id));
     const axis = pinAxis(pins, grain);
     const sense = hingeSense({ from: toModelFrame(forward, axis.from), to: toModelFrame(forward, axis.to) }, centre, stage.toward, grain);
@@ -58,7 +64,10 @@ export function motionAtSite(motion, { at, mirror }) {
   const reflect = ([x, y, z]) => [x, y, 0 - z];
   const shift = (point) => [point[0] + at[0], point[1] + at[1], point[2] + at[2]];
   return motion.map((stage) => {
-    if (stage.kind === 'slide') return { ...stage, direction: mirror ? reflect(stage.direction) : stage.direction };
+    if (stage.kind === 'slide') {
+      const direction = mirror ? reflect(stage.direction) : stage.direction;
+      return { ...stage, direction, ...(stage.stow === undefined ? {} : { stow: stage.stow + dot(at, direction) }) };
+    }
     const [from, to] = [stage.axis.from, stage.axis.to].map((point) => shift(mirror ? reflect(point) : point));
     return { ...stage, axis: { from, to }, angle: mirror ? -stage.angle : stage.angle };
   });
@@ -111,7 +120,9 @@ export function sweepVehicle({ grain, forward, motions, sites }) {
     const { clear, contacts } = sweepBody({ layers: body.layers, movers, obstacles, step, tolerance: step });
     result.sites[body.site] = { clear, extent: extentOf(body.layers), contacts: [...contacts].map(([other, contact]) => ({ other, ...contact })) };
   }
-  const posed = bodies.map(({ site, layers, members, carriers }) => ({ site, carriers, pose: poseAt(layers, 1), shapes: members.flatMap((id) => shapes.get(id)), members }));
+  const posed = bodies.map(({ site, layers, members, carriers }) => ({
+    site, carriers, pose: poseAt(layers, 1), planes: stowPlanesOf(layers), shapes: members.flatMap((id) => shapes.get(id)), members,
+  }));
   const related = (a, b) => a.carriers.includes(b.site) || b.carriers.includes(a.site);
   const open = sweepOpenPose({ bodies: posed, step, tolerance: step, key, related });
   result.open = [...open.values()];

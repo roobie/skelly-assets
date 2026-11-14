@@ -148,6 +148,30 @@ test('two lids that clear alone but collide once both are open are caught by the
   assert.ok(meeting.depth > 0);
 });
 
+// A curtain one grain thick at x = -0.2, a metre wide and high, that slides up 0.8 m and, with `stow`, hides what
+// passes its top.
+const curtain = ({ stow }) => ({
+  pieces: [box('slats', [-0.2, 0, -0.5], [-0.2 + GRAIN, 1, 0.5])],
+  stages: [{ kind: 'slide', toward: 'up', travel: 0.8, ...(stow ? { stow: true } : {}) }],
+});
+const curtainSite = () => site('shutter', 'shutter', curtain({ stow: true }).pieces);
+
+test('a stowing curtain rises into its head without meeting it, where the same curtain left drawn would', () => {
+  const head = site('head', 'head', [box('cap', [-0.2 - GRAIN, 1, -0.5], [-0.2 + 2 * GRAIN, 1.3, 0.5])]);
+  assert.ok(reached(sweep({ shutter: curtain({ stow: false }) }, [curtainSite(), head]), 'shutter', 'head') > 0);
+  assert.equal(reached(sweep({ shutter: curtain({ stow: true }) }, [curtainSite(), head]), 'shutter', 'head'), 0);
+});
+
+test('the all-open pose leaves out what a curtain has stowed and still meets what it shows', () => {
+  // Two lids lie beside the curtain's way and open up and back over it: the high one through where the stowed curtain
+  // would stand drawn, the low one through the part still shown at its stop.
+  const [high, low] = [flap(0.5, { y: 1.3, open: 120 }), flap(0.5, { y: 0.55, open: 120 })];
+  const sites = [site('high', 'high', high.pieces), site('low', 'low', low.pieces), curtainSite()];
+  const open = (stow) => sweep({ high, low, shutter: curtain({ stow }) }, sites).open.map(({ sites: pair }) => pair.toSorted().join(' '));
+  assert.ok(open(false).includes('high shutter'));
+  assert.deepEqual(open(true), ['low shutter']);
+});
+
 const lip = site('lip', 'lip', [box('edge', [0.5, 0.05, -0.5], [0.5 + GRAIN, 0.8, 0.5])]);
 const data = (overrides = {}) => ({
   grain: GRAIN,

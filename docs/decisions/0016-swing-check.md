@@ -37,8 +37,12 @@ open at once, so twins that clear alone but meet open are caught too. See `tools
   `docs/decisions/0015-motion-as-content.md` fixes, and is a body of its own: it is tested against its carrier,
   because a panel that folds onto its carrier meets it only while it moves, and against the other riders of that
   carrier, each moving on the shared clock. A part that moves with another on the clock is never an obstacle at its
-  rest pose to it. What shares no carrier with a body stands at rest while the body is swept. A stowing slide is swept
-  like any other, so what it hides at its stop is still tested and a shutter into its head needs an entry.
+  rest pose to it. What shares no carrier with a body stands at rest while the body is swept.
+- What a stowing slide hides is not drawn, so it meets nothing while hidden, in the sweep and in the all-open pose: a
+  shutter rolls into its head with no entry, and what it still shows is tested as any part is. An entry for the stowed
+  part would cap the contacts the shown part makes as well, and one would be needed for every shutter. The plane is
+  the leading face of the rest bounds of the solids the check measures, as every other depth here is read off those
+  solids rather than the drawn voxels.
 - The swing sense is read once, by the same derivation the build exports, so the swing proven is the swing played. A
   far-side twin swings reflected, and its angles negate with it.
 - An allowance is a depth cap, as in the overlap check: `swingContact` for a contact that is intended and says why,
