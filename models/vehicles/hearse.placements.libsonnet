@@ -17,4 +17,7 @@ local s = import 'hearse.spec.libsonnet';
       site.one('brightwork', 'hearse_brightwork'),
     ],
   }),
+  swingUnjudged: [
+    site.swingUnjudged('bonnet', 'shell', 0.0083, 'skin meets a_post_far'),
+  ],
 }

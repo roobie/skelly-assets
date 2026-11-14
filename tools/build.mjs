@@ -231,10 +231,12 @@ async function main() {
   const sources = positionals.length === 0 ? await modelSources(repo) : [];
   const vocabulary = readVocabulary(repo);
   const dependsOn = positionals.length === 0 ? readDependencies(declaredPacks(repo), repo) : {};
+  let swings = {};
   if (positionals.length === 0) {
     const report = sourceReport(sources, vocabulary);
     const { unlisted } = report;
-    const vehicles = vehicleReport(repo);
+    const vehicles = await vehicleReport(repo, { cache, prune: true });
+    swings = vehicles.swing;
     const problems = [...report.problems, ...vehicles.problems];
     for (const { message } of [...unlisted, ...vehicles.unjudged]) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
@@ -265,6 +267,7 @@ async function main() {
         vehicleRows: readVehicleRows(repo),
         dependsOn,
         vocabulary,
+        swings,
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);

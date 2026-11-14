@@ -1,0 +1,275 @@
+// The geometry of the swing check (tools/swingClearance.mjs): how deep a moving piece sinks into another solid while it
+// turns or slides, found without testing every sample at every pose. A pose is a rigid motion, so a signed distance
+// that is 1-Lipschitz stays so under it, which lets a cell of an octree over the mover be cleared for a whole stretch
+// of the clock at once: the cell's centre sets how deep any of its points can lie in the mover and, once its furthest
+// possible travel is added, in the other solid. Cells that cannot be cleared are split down to the sample lattice,
+// where the depth is read for real. The reason for the rule is in `docs/decisions/0016-swing-check.md`.
+import { cornersOf } from './packages/thing-core/src/motion.ts';
+import { solid } from './pieceSolid.mjs';
+
+// A rigid motion as twelve numbers: a row-major 3x3 turn, then the shift.
+const IDENTITY = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
+
+export function apply(m, [x, y, z], out) {
+  out[0] = m[0] * x + m[1] * y + m[2] * z + m[9];
+  out[1] = m[3] * x + m[4] * y + m[5] * z + m[10];
+  out[2] = m[6] * x + m[7] * y + m[8] * z + m[11];
+  return out;
+}
+
+// a after b: the motion that puts a point through b first.
+const compose = (a, b) => [
+  ...[0, 3, 6].flatMap((row) => [0, 1, 2].map((col) => a[row] * b[col] + a[row + 1] * b[col + 3] + a[row + 2] * b[col + 6])),
+  a[0] * b[9] + a[1] * b[10] + a[2] * b[11] + a[9],
+  a[3] * b[9] + a[4] * b[10] + a[5] * b[11] + a[10],
+  a[6] * b[9] + a[7] * b[10] + a[8] * b[11] + a[11],
+];
+
+const invert = (m) => [
+  m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8],
+  -(m[0] * m[9] + m[3] * m[10] + m[6] * m[11]),
+  -(m[1] * m[9] + m[4] * m[10] + m[7] * m[11]),
+  -(m[2] * m[9] + m[5] * m[10] + m[8] * m[11]),
+];
+
+// One stage of a motion once it has run `fraction` of its way.
+function stageMotion(stage, fraction) {
+  if (stage.kind === 'slide') {
+    const step = stage.travel * fraction;
+    return [1, 0, 0, 0, 1, 0, 0, 0, 1, ...stage.direction.map((d) => d * step)];
+  }
+  const { from, to } = stage.axis;
+  const length = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
+  const [ux, uy, uz] = [0, 1, 2].map((i) => (to[i] - from[i]) / length);
+  const turn = (stage.angle * fraction * Math.PI) / 180;
+  const [c, s, t] = [Math.cos(turn), Math.sin(turn), 1 - Math.cos(turn)];
+  const turned = [
+    c + ux * ux * t, ux * uy * t - uz * s, ux * uz * t + uy * s,
+    uy * ux * t + uz * s, c + uy * uy * t, uy * uz * t - ux * s,
+    uz * ux * t - uy * s, uz * uy * t + ux * s, c + uz * uz * t,
+  ];
+  const shift = [0, 1, 2].map((row) => from[row] - (turned[3 * row] * from[0] + turned[3 * row + 1] * from[1] + turned[3 * row + 2] * from[2]));
+  return [...turned, ...shift];
+}
+
+// Where a motion (thing-core `Motion`) has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
+// motion. Stages run in turn through their shares of the clock, and the first is the outermost, as `posePoint`.
+export function poseAt(motion, clock) {
+  const starts = motion.map((_, i) => motion.slice(0, i).reduce((sum, { share }) => sum + share, 0));
+  const fraction = (i) => Math.min(1, Math.max(0, (clock - starts[i]) / motion[i].share));
+  return motion.reduceRight((inner, stage, i) => compose(stageMotion(stage, fraction(i)), inner), IDENTITY);
+}
+
+const distanceFromLine = ([px, py, pz], { from, to }) => {
+  const d = [0, 1, 2].map((i) => to[i] - from[i]);
+  const r = [px - from[0], py - from[1], pz - from[2]];
+  const cross = [d[1] * r[2] - d[2] * r[1], d[2] * r[0] - d[0] * r[2], d[0] * r[1] - d[1] * r[0]];
+  return Math.hypot(...cross) / Math.hypot(...d);
+};
+
+// How far (m) a motion can carry any point of a part whose rest bounds are `bounds`, for each unit of the clock: no
+// further than the greatest of its stages' paces, because the stages run one after another. A stage turns what the
+// stages after it have already moved, so its radius counts how far they can carry a point from the part.
+export function paceOf(motion, bounds) {
+  const corners = cornersOf(bounds);
+  let carried = 0;
+  let pace = 0;
+  for (let i = motion.length - 1; i >= 0; i--) {
+    const stage = motion[i];
+    const reach = stage.kind === 'slide' ? stage.travel : (Math.abs(stage.angle) * Math.PI / 180) * (Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried);
+    pace = Math.max(pace, reach / stage.share);
+    carried += stage.kind === 'slide' ? stage.travel : Math.min(reach, 2 * (Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried));
+  }
+  return pace;
+}
+
+// The signed distance of a piece, a box through a faster path than `solid` gives it.
+export function distanceOf(piece) {
+  if (piece.kind !== 'box') return solid(piece).distance;
+  const { min, max } = piece;
+  return (p) => Math.max(min[0] - p[0], p[0] - max[0], min[1] - p[1], p[1] - max[1], min[2] - p[2], p[2] - max[2]);
+}
+
+export const shapeOf = (piece) => {
+  const { min, max } = solid(piece);
+  return { id: piece.id, min, max, distance: distanceOf(piece) };
+};
+
+// The box that holds a shape's points wherever its motion puts them, found at `SWEPT_CLOCKS` clocks and widened by the
+// furthest a point can travel between two of them.
+const SWEPT_CLOCKS = 32;
+export function sweptBounds(shape, motion, pace) {
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  const margin = pace / SWEPT_CLOCKS;
+  const out = [0, 0, 0];
+  for (let i = 0; i <= SWEPT_CLOCKS; i++) {
+    const pose = poseAt(motion, i / SWEPT_CLOCKS);
+    for (const corner of cornersOf(shape)) {
+      apply(pose, corner, out);
+      for (let axis = 0; axis < 3; axis++) {
+        min[axis] = Math.min(min[axis], out[axis] - margin);
+        max[axis] = Math.max(max[axis], out[axis] + margin);
+      }
+    }
+  }
+  return { min, max };
+}
+
+export const boundsMeet = (a, b) => [0, 1, 2].every((i) => a.min[i] < b.max[i] && b.min[i] < a.max[i]);
+
+// `shape` moved by the rigid motion `pose`, as a shape: its box is that of its moved corners.
+export function placedShape(shape, pose) {
+  const inverse = invert(pose);
+  const scratch = [0, 0, 0];
+  const moved = cornersOf(shape).map((corner) => apply(pose, corner, [0, 0, 0]));
+  return {
+    id: shape.id,
+    min: [0, 1, 2].map((i) => Math.min(...moved.map((c) => c[i]))),
+    max: [0, 1, 2].map((i) => Math.max(...moved.map((c) => c[i]))),
+    distance: (p) => shape.distance(apply(inverse, p, scratch)),
+  };
+}
+
+// How deep (m) the points of `mover`, moved from the pose `from` to the pose `to`, lie in both it and `obstacle`: the
+// deepest sample of a lattice `step` m across the mover that is inside both, read at `to`, or -Infinity when no cell
+// that could hold a point deeper than `floor` was found. `reach` is the furthest a point travels between the poses.
+// With `probe` it answers only whether any cell could not be cleared, as `true`, and stops at the first such cell it
+// splits down to `probeCell` lattice cells across.
+export function deepestShared({ mover, obstacle, from, to, reach, floor, step, probe = false, probeCell = 4 }) {
+  const dims = [0, 1, 2].map((i) => Math.max(1, Math.ceil((mover.max[i] - mover.min[i]) / step - 1e-9)));
+  const centre = [0, 0, 0];
+  const world = [0, 0, 0];
+  let deepest = -Infinity;
+  let open = false;
+  const visit = (lo, hi) => {
+    if (open) return;
+    const size = [hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]];
+    for (let i = 0; i < 3; i++) centre[i] = mover.min[i] + (step * (lo[i] + hi[i])) / 2;
+    const radius = (step * Math.hypot(size[0], size[1], size[2])) / 2;
+    const inMover = -mover.distance(centre);
+    if (inMover + radius <= floor) return;
+    apply(from, centre, world);
+    if (-obstacle.distance(world) + radius + reach <= floor) return;
+    if (size[0] === 1 && size[1] === 1 && size[2] === 1) {
+      if (probe) {
+        open = true;
+        return;
+      }
+      apply(to, centre, world);
+      deepest = Math.max(deepest, Math.min(inMover, -obstacle.distance(world)));
+      return;
+    }
+    if (probe && Math.max(...size) <= probeCell) {
+      open = true;
+      return;
+    }
+    const halves = size.map((n, i) => (n === 1 ? [[lo[i], hi[i]]] : [[lo[i], lo[i] + (n >> 1)], [lo[i] + (n >> 1), hi[i]]]));
+    for (const [a, b] of halves[0]) {
+      for (const [c, d] of halves[1]) {
+        for (const [e, f] of halves[2]) visit([a, c, e], [b, d, f]);
+      }
+    }
+  };
+  visit([0, 0, 0], dims);
+  return probe ? open : deepest;
+}
+
+// The depth (m) two shapes share at rest, 0 when they share none.
+export const restDepth = (mover, obstacle, step) =>
+  Math.max(0, deepestShared({ mover, obstacle, from: IDENTITY, to: IDENTITY, reach: 0, floor: 0, step }));
+
+// Sweeps the pieces of one moving body (a part and the parts that ride it) from rest to its stop against `obstacles`,
+// the shapes it must clear, each { site, shape }. `movers` are { site, shape }. A pair is in contact once it shares
+// more than `tolerance` beyond the depth it shares at rest, so what the parts allow each other at rest is not a
+// contact. Returns { clear, contacts: Map(obstacle site -> { depth, at, pieces }) }: `clear` the last clock at which
+// no pair was measured in contact (1 when none ever was), each contact the deepest the sweep measured and the clock it
+// first was.
+export function sweepBody({ motion, movers, obstacles, step, tolerance, grain }) {
+  const pairs = [];
+  for (const mover of movers) {
+    const pace = paceOf(motion, mover.shape);
+    const bounds = sweptBounds(mover.shape, motion, pace);
+    for (const obstacle of obstacles) {
+      if (!boundsMeet(bounds, obstacle.shape)) continue;
+      const rest = restDepth(mover.shape, obstacle.shape, step);
+      pairs.push({ mover, obstacle, pace, floor: rest + tolerance });
+    }
+  }
+  const contacts = new Map();
+  // A window is measured where it cannot be cleared, one grain of travel at the fastest pace at a time.
+  const fastest = Math.max(...pairs.map(({ pace }) => pace), grain);
+  const unit = Math.min(1, grain / fastest);
+  const poses = new Map();
+  const poseOf = (c) => {
+    if (!poses.has(c)) poses.set(c, poseAt(motion, c));
+    return poses.get(c);
+  };
+  const across = (start, end, probe) => pairs.map((pair) => deepestShared({
+    mover: pair.mover.shape,
+    obstacle: pair.obstacle.shape,
+    from: poseOf(start),
+    to: poseOf(end),
+    reach: pair.pace * (end - start),
+    floor: pair.floor,
+    step,
+    probe,
+  }));
+  let clear = 1;
+  let clock = 0;
+  let span = Math.min(1, unit * 8);
+  while (clock < 1 - 1e-12) {
+    span = Math.min(span, 1 - clock);
+    let held = across(clock, clock + span, true).some(Boolean);
+    while (held && span > unit) {
+      span = Math.max(unit, span / 2);
+      held = across(clock, clock + span, true).some(Boolean);
+    }
+    const end = Math.min(1, clock + span);
+    if (!held) {
+      clock = end;
+      span *= 2;
+      continue;
+    }
+    across(clock, end, false).forEach((depth, i) => {
+      const { mover, obstacle, floor } = pairs[i];
+      if (!(depth > floor)) return;
+      const seen = contacts.get(obstacle.site);
+      if (!seen) {
+        if (contacts.size === 0) clear = clock;
+        contacts.set(obstacle.site, { depth, at: end, pieces: [mover.shape.id, obstacle.shape.id] });
+      } else if (depth > seen.depth) {
+        Object.assign(seen, { depth, pieces: [mover.shape.id, obstacle.shape.id] });
+      }
+    });
+    clock = end;
+    span = unit;
+  }
+  return { clear, contacts };
+}
+
+// The pairs of moving bodies that touch once both are at their stops: bodies are { site, pose, shapes, rest }, each
+// shape a part's piece at rest; a pair is in contact when it shares more than `tolerance` beyond what it shares with
+// both at rest. Returns Map(pair key -> { sites, depth, pieces }).
+export function sweepOpenPose({ bodies, step, tolerance, key }) {
+  const found = new Map();
+  for (let i = 0; i < bodies.length; i++) {
+    for (let j = i + 1; j < bodies.length; j++) {
+      const [a, b] = [bodies[i], bodies[j]];
+      for (const mover of a.shapes) {
+        for (const other of b.shapes) {
+          const posedOther = placedShape(other, b.pose);
+          const moved = placedShape(mover, a.pose);
+          if (!boundsMeet(moved, posedOther)) continue;
+          const rest = restDepth(mover, other, step);
+          const depth = deepestShared({ mover, obstacle: posedOther, from: a.pose, to: a.pose, reach: 0, floor: rest + tolerance, step });
+          if (!(depth > rest + tolerance)) continue;
+          const pair = key(a.site, b.site);
+          if (depth > (found.get(pair)?.depth ?? 0)) found.set(pair, { sites: [a.site, b.site], depth, pieces: [mover.id, other.id] });
+        }
+      }
+    }
+  }
+  return found;
+}
+

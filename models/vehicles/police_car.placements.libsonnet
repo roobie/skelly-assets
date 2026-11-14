@@ -42,4 +42,8 @@ local part(suffix) = k.partId('police_car', s, suffix);
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44])),
   tags: { 'vehicle-role': ['emergency'] },
+  swingUnjudged: [
+    site.swingUnjudged('bonnet', 'shell', 0.0118, 'skin meets bulkhead'),
+    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
+  ],
 }

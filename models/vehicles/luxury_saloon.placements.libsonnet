@@ -13,4 +13,12 @@ local s = import 'luxury_saloon.spec.libsonnet';
       site.one('brightwork', 'luxury_saloon_brightwork'),
     ],
   }),
+  swingUnjudged: [
+    site.swingUnjudged('bonnet', 'shell', 0.0118, 'skin meets bulkhead'),
+    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
+    site.swingUnjudged('front_door_far', 'brightwork', 0.0168, 'skin_far meets front_sill_far'),
+    site.swingUnjudged('front_door_near', 'brightwork', 0.0118, 'trim meets front_sill_near'),
+    site.swingUnjudged('rear_door_far', 'brightwork', 0.0168, 'skin_far meets rear_sill_far'),
+    site.swingUnjudged('rear_door_near', 'brightwork', 0.0118, 'trim meets rear_sill_near'),
+  ],
 }

@@ -39,4 +39,11 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
+  swingUnjudged: [
+    site.swingUnjudged('bonnet', 'shell', 0.0083, 'skin meets a_post_far'),
+    site.swingUnjudged('rear_door_far', 'arch_flare_far', 0.0177, 'skin_far meets rear_flare_fore_far'),
+    site.swingUnjudged('rear_door_near', 'arch_flare_near', 0.0182, 'skin meets rear_flare_fore'),
+    site.swingUnjudged('tailgate', 'shell', 0.0115, 'glass_3 meets roof'),
+    site.swingUnjudged('tailgate', 'spare_wheel', 0.0371, 'skin meets tyre'),
+  ],
 }

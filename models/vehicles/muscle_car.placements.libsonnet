@@ -32,4 +32,7 @@ local s = import 'muscle_car.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.68, 0.7)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
+  swingUnjudged: [
+    site.swingUnjudged('boot_lid', 'shell', 0.0157, 'skin meets boot_side_near'),
+  ],
 }

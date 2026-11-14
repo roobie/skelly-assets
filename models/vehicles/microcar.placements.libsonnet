@@ -40,4 +40,8 @@ local rear = { wheel: 'wheel_185_60r15', hub: 0.3015, z: 0.715 };
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.6, 0.5)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.45, -0.26]),
+  swingUnjudged: [
+    site.swingUnjudged('bonnet', 'shell', 0.0118, 'skin meets bulkhead'),
+    site.swingUnjudged('tailgate', 'shell', 0.011, 'glass_3 meets roof'),
+  ],
 }

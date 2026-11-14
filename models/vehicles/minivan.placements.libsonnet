@@ -19,4 +19,7 @@ local s = import 'minivan.spec.libsonnet';
       site.one('door_track', 'minivan_door_track'),
     ],
   }),
+  swingUnjudged: [
+    site.swingUnjudged('tailgate', 'shell', 0.013, 'glass_4 meets roof'),
+  ],
 }

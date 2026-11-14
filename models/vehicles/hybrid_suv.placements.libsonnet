@@ -14,4 +14,9 @@ local s = import 'suv.spec.libsonnet';
     inverter: { part: 'inverter_car', at: [1.8, 0.85, 0] },
     pack: { part: 'hybrid_pack', at: [-0.4, s.sill, -0.38] },
   }),
+  swingUnjudged: [
+    site.swingUnjudged('front_door_far', 'badge_far', 0.0156, 'skin_far meets plate_far'),
+    site.swingUnjudged('front_door_near', 'badge_near', 0.0155, 'skin meets plate'),
+    site.swingUnjudged('tailgate', 'rear_badge', 0.0144, 'skin meets plate'),
+  ],
 }

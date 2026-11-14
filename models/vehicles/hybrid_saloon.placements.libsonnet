@@ -17,4 +17,9 @@ local s = import 'saloon.spec.libsonnet';
     inverter: { part: 'inverter_car', at: [s.frontAxle - 0.05, 0.6, -0.4] },
     pack: { part: 'hybrid_pack', at: [s.rearAxle - 0.5, 0.2, 0] },
   }),
+  swingUnjudged: [
+    site.swingUnjudged('boot_lid', 'rear_badge', 0.0156, 'tail meets plate'),
+    site.swingUnjudged('front_door_far', 'badge_far', 0.0156, 'skin_far meets plate_far'),
+    site.swingUnjudged('front_door_near', 'badge_near', 0.0156, 'skin meets plate'),
+  ],
 }
