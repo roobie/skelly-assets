@@ -1,5 +1,12 @@
 local site = import 'site.libsonnet';
 local s = import 'road_roller.spec.libsonnet';
+local cooling = import 'cooling-kit.libsonnet';
+local plainEngines = import 'plain-engines.libsonnet';
+local engine = { part: 'engine_i3_small', at: [-1.3, 1.28, 0] };
+// A radiator's hoses run back from it, and a site cannot turn its part, so the radiator stands ahead of the engine with
+// its hoses reaching the engine's front face, inside the hood rather than out through its rear.
+local radiator = 'radiator_small';
+local radiatorX = engine.at[0] + plainEngines[engine.part].length / 2 + cooling.reach(radiator);
 {
   title: 'Road roller',
   sites: [
@@ -11,9 +18,9 @@ local s = import 'road_roller.spec.libsonnet';
     site.one('engine_hood', 'road_roller_engine_hood'),
     site.one('water_tank', 'road_roller_water_tank'),
     site.one('canopy', 'road_roller_canopy'),
-    site.one('engine', 'engine_i3_small', [-1.3, 1.28, 0]),
-    site.one('radiator', 'radiator_small', [-1.86, 1.34, 0]),
-    site.one('fuel_tank', 'fuel_tank_car', [-0.9, 0.76, 0]),
+    site.one('engine', engine.part, engine.at),
+    site.one('radiator', radiator, [radiatorX, 1.34, 0]),
+    site.one('fuel_tank', 'fuel_tank_car', [-0.45, 0.76, 0]),
     site.one('exhaust', 'road_roller_exhaust', [-1.1, s.hoodTop, -0.34]),
     site.one('seat', 'front_seat', [-0.1, s.deck + 0.26, 0]),
     site.one('steering_column', 'steering_column_short', [0.37, 1.56, 0]),
@@ -27,4 +34,12 @@ local s = import 'road_roller.spec.libsonnet';
   + site.headlamps(2.02, 1.4, 0.46)
   + site.batteryBay('battery_tray', [-1.08, 1.28, 0.42]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('front_yoke', 'front_drum', 0.151,
+      'The front drum turns inside the yoke neck, which is drawn solid across it.'),
+    site.overlap('platform', 'fuel_tank', 0.146,
+      'The fuel tank sits against the platform spine, which is drawn solid around it.'),
+    site.overlap('platform', 'rear_drum', 0.176,
+      'The rear drum turns inside the platform spine, which is drawn solid across it.'),
+  ],
 }

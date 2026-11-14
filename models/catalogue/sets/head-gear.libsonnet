@@ -1,6 +1,10 @@
 // Head gear in the worn frame: origin at the centre of deadvox's head region, y up, the face toward +z, the wearer's
 // left at +x. Clearances are measured against the player bust's head (`avatar.libsonnet`, `bust`).
 local band = import 'models/head-band.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+// The riot helmet's origin is the head frame, so it is seated that far above the top of the neck.
+local head = fit.headroom(bust.headFrameRise);
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local turned(id, slot, axis, profile, origin) = { id: id, kind: 'turned', slot: slot, axis: axis, profile: profile, origin: origin };
@@ -25,28 +29,40 @@ local arc(id, slot, radii, bearings, step, heights, z0) = [
 
 local h = {
   back: 0,
-  // The bust's crown is a block, so the shell's round plan has to clear the block's corners, not only its sides.
-  inner: 0.14,
-  outer: 0.153,
+  // The grain the helmet is drawn at. Drawing moves a surface up to half a voxel, so the helmet keeps its room off the
+  // head after half of its voxel and half of the bust's.
+  grain: 0.01,
+  slack: (self.grain + bust.voxelGrain) / 2,
+  // The padding's room between the hair and the shell.
+  room: 0.01 + self.slack,
+  inner: head.reach + self.room,
+  outer: self.inner + 0.013,
   // The face opening's top edge sits above the eyes.
-  brow: 0.055,
-  // The dome rises from above the crown block's lower edge, so the upright wall, not the curve, passes its corners.
-  domeBase: 0.1,
-  crownInner: 0.085,
-  crownOuter: 0.098,
+  brow: head.eyes + 0.02,
+  // The dome rises from the hairline, where the hair begins to round over.
+  domeBase: head.brow,
+  // The dome stands high enough to keep the padding's room over the hair's top and round each of its layers, solving
+  // the power-four profile that `dome` below draws for the height at each layer's reach.
+  crownInner: std.foldl(std.max, [
+    (layer.top - self.domeBase) / std.pow(1 - std.pow((layer.reach + self.room) / self.inner, 4), 1 / 4)
+    for layer in head.hair
+  ], head.top + self.room - self.domeBase),
+  crownOuter: self.crownInner + 0.013,
   skirtBottom: -0.03,
   // The face opening's half-width, in degrees either side of the face.
   opening: 70,
   pivotBearing: 100,
   pivotHeight: 0.038,
-  visorInner: 0.162,
-  visorOuter: 0.168,
+  // The visor clears the band it hinges from.
+  visorInner: self.outer + 0.009,
+  visorOuter: self.visorInner + 0.006,
+  cupTop: head.chin - self.slack,
+  cupBottom: self.cupTop - 0.013,
   // The visor reaches below the chin, so a blow from the front meets it rather than the jaw.
   visorBottom: -0.13,
   visorTop: 0.042,
 };
-// A squared dome, a superellipse of exponent four: a round dome low enough to look right would cut the crown's top
-// edges.
+// A squared dome, a superellipse of exponent four: a round dome low enough to look right would cut the hair's crown.
 local dome(steps) =
   local point(r, height, i) = [height * std.sqrt(std.sin(rad(90 * i / steps))), r * std.sqrt(std.cos(rad(90 * i / steps)))];
   // Material lies left of travel: in along the rim, up the inside, then down the outside.
@@ -60,7 +76,7 @@ local pivot(side) = [
   turned('pivot_knob_%s' % side, 'metal', 'x', disc(0.009, 0.008), [if side == 'left' then h.outer + 0.018 else -(h.outer + 0.018) - 0.008, h.pivotHeight, pivotZ]),
 ];
 local strap(sign) = [
-  box('chin_strap_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * 0.098), -0.115, -0.005], [std.max(sign * 0.088, sign * 0.098), -0.025, 0.015]),
+  box('chin_strap_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * 0.098), h.cupBottom, -0.005], [std.max(sign * 0.088, sign * 0.098), -0.025, 0.015]),
   box('strap_tab_%d' % (if sign > 0 then 1 else 2), 'strap', [std.min(sign * 0.088, sign * (h.inner + 0.005)), -0.035, -0.005], [std.max(sign * 0.088, sign * (h.inner + 0.005)), -0.02, 0.015]),
 ];
 local pieces =
@@ -77,7 +93,7 @@ local pieces =
   + arc('curtain_lower', 'curtain', [h.outer - 0.002, h.outer + 0.012], [h.pivotBearing, 360 - h.pivotBearing], 20, [-0.125, -0.075], h.back)
   + pivot('left') + pivot('right')
   + strap(1) + strap(-1)
-  + [box('chin_cup', 'strap', [-0.098, -0.118, -0.005], [0.098, -0.105, 0.06])];
+  + [box('chin_cup', 'strap', [-0.098, h.cupBottom, -0.005], [0.098, h.cupTop, 0.06])];
 local g = {
   eyeSpacing: 0.076,
   tubeRadius: 0.023,
@@ -100,6 +116,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
     id: 'riot_helmet',
     title: 'Riot helmet',
     exportMass: 'parts',
+    voxelGrain: h.grain,
     taxonomy: { category: 'armour', keywords: ['police'], tags: { slot: ['head', 'face'], material: ['plastic'], setting: ['modern'] } },
     parts: [{
       id: 'helmet',
@@ -111,6 +128,7 @@ local goggleAnchor(solid, fraction) = { part: 'goggles', solid: solid, fraction:
     }],
     connections: [],
     handling: { part: 'helmet', solid: 'dome', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
+    anchors: { brow: fit.browAnchor('helmet', 'dome', [-h.outer, h.domeBase, h.back - h.outer], [h.outer, h.domeBase + h.crownOuter, h.back + h.outer], head.brow) },
   },
   {
     id: 'night_vision_goggles',

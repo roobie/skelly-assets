@@ -1,3 +1,4 @@
+local site = import 'site.libsonnet';
 local s = import 'minibus.spec.libsonnet';
 {
   title: 'Electric minibus',

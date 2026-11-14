@@ -23,7 +23,8 @@ local s = import 'air_ambulance.spec.libsonnet';
     one('console', 'air_ambulance_console', [2.02, 0.92, 0]),
     one('cyclic', 'control_stick', [1.6, s.floor, 0]),
     one('stretcher', 'stretcher', [-0.7, s.floor, -0.36]),
-    one('locker', 'air_ambulance_locker', [0.72, s.floor, -0.36]),
+    // The locker stands at the stretcher's head, behind the far sliding door's leading edge.
+    one('locker', 'air_ambulance_locker', [0.42, s.floor, -0.36]),
     one('attendant_seat', 'attendant_seat', [0.3, s.floor, 0.42]),
     one('tail_beacon', 'air_ambulance_beacon', [-6.98, 3.25, 0]),
     one('cowl_beacon', 'air_ambulance_beacon', [-1.5, 2.9, 0]),

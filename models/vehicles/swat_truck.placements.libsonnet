@@ -18,4 +18,8 @@ local s = import 'swat_truck.spec.libsonnet';
   + site.pair('roof_beacon', 'beacon_blue', [-0.55, s.body.top + 0.05, 0.85])
   + site.pair('crew_bench', 'crew_bench', [s.benchX, s.body.floorTop, s.benchZ]),
   tags: { 'vehicle-role': ['emergency'] },
+  overlaps: [
+    site.overlap('body_floor', 'rear_step', 0.05,
+      'The rear step\'s hangers are let into the rear apron of the body floor.'),
+  ],
 }

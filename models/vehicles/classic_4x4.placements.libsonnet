@@ -21,7 +21,8 @@ local s = import 'classic_4x4.spec.libsonnet';
     site.one('exhaust', 'exhaust_car', [s.rear + 0.42, 0.27, 0.42]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
     site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.77, 0]),
-    site.one('rear_bench', 'bench_seat_3', [-1.0, 0.7, 0]),
+    // A two-seat bench fits between the rear wheel arches; a three-seat one would stand on the tyres.
+    site.one('rear_bench', 'bench_seat_2', [-1.0, 0.7, 0]),
     site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.2, 0]),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.37, 0]),
   ]

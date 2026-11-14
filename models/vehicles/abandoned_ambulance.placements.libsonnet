@@ -27,4 +27,14 @@ local s = import 'abandoned_ambulance.spec.libsonnet';
   + pair('wheel_front', 'abandoned_ambulance_wheel', [s.frontAxle, s.hubY, s.wheelZ])
   + pair('wheel_rear', 'abandoned_ambulance_wheel', [s.rearAxle, s.hubY, s.wheelZ]),
   tags: { 'vehicle-role': ['emergency'] },
+  overlaps: [
+    site.overlap('chassis', 'wheel_front_far', 0.05,
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
+    site.overlap('chassis', 'wheel_front_near', 0.05,
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
+    site.overlap('chassis', 'wheel_rear_far', 0.05,
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
+    site.overlap('chassis', 'wheel_rear_near', 0.05,
+      'The axle runs on into the inner sidewall of the tyre of the wheel on it.'),
+  ],
 }

@@ -1,4 +1,5 @@
 // The double decker with a motor on its rear axle and a pack on the roof, because its low floor leaves no room beneath.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'double_decker.spec.libsonnet';
 {

@@ -12,7 +12,7 @@ local s = import 'beach_buggy.spec.libsonnet';
     site.one('rear_axle', 'beach_buggy_rear_axle'),
     site.one('engine', 'engine_i4_petrol', [-1.12, 0.32, 0]),
     site.one('gearbox', 'gearbox_transaxle', [s.rearAxle + 0.28, 0.3, 0]),
-    site.one('fuel_tank', 'fuel_tank_car', [-0.72, 0.36, 0]),
+    site.one('fuel_tank', 'fuel_tank_car', [-0.67, 0.6, 0]),
     site.one('exhaust', 'beach_buggy_exhaust'),
     site.one('steering_wheel', 'steering_wheel', [0.26, 0.69, -0.26]),
     site.one('gear_lever', 'gear_lever', [0.22, s.floor, 0]),

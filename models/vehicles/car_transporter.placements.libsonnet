@@ -12,4 +12,14 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
     site.one('side_guard', 'car_transporter_side_guard'),
   ]
   + site.pair('ramp', 'car_transporter_ramp'),
+  overlaps: [
+    site.overlap('deck_posts', 'upper_deck', 0.058,
+      'The deck posts are let into the cross members of the upper deck.'),
+    site.overlap('lower_deck', 'deck_posts', 0.058,
+      'The tail posts stand in the plate of the lower deck.'),
+  ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

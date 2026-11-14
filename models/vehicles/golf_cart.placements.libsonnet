@@ -24,4 +24,16 @@ local s = import 'golf_cart.spec.libsonnet';
   + site.pair('rear_wheel', 'wheel_145r10', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [s.tail - 0.03, 0.4, 0.32])
   + site.headlamps(s.nose + 0.03, 0.42, 0.3),
+  overlaps: [
+    site.overlap('front_cowl', 'steering_column', 0.032,
+      'The steering column goes through the dash of the front cowl.'),
+    site.overlap('motor', 'pack', 0.06,
+      'The motor\'s lead enters the case of the battery pack.'),
+    site.overlap('rear_body', 'inverter', 0.125,
+      'The inverter sits in the tail of the rear body, which is drawn as a solid block around it.'),
+    site.overlap('rear_body', 'motor', 0.116,
+      'The motor sits in the tail of the rear body, which is drawn as a solid block around it.'),
+    site.overlap('rear_body', 'pack', 0.185,
+      'The battery pack sits under the seat box, which the rear body draws as a solid block around it.'),
+  ],
 }

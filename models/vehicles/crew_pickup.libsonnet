@@ -11,7 +11,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libson
     box('tall_rear', 'steel', [s.bedRear + 0.1, 0.58, 0.44], [s.bedFront, s.bedFloorTop - 0.06, 0.48]),
   ]) + [
     box('cross_rear', 'steel', [s.bedRear + 0.05, 0.42, -0.42], [s.bedRear + 0.13, 0.58, 0.42]),
-    box('cross_mid', 'steel', [-1.0, 0.42, -0.42], [-0.92, 0.58, 0.42]),
+    // The middle crossmember clears the rear prop shaft running under it.
+    box('cross_mid', 'steel', [-1.0, 0.46, -0.42], [-0.92, 0.58, 0.42]),
     box('cross_front', 'steel', [s.frontAxle + 0.4, 0.42, -0.42], [s.frontAxle + 0.5, 0.58, 0.42]),
   ], { steel: 'paint-charcoal' }) + { title: 'Crew-cab pickup frame' },
   k.compound('crew_pickup_bed_floor', 45, [

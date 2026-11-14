@@ -5,13 +5,16 @@
   windscreen: [3.3, 4.6], windscreenArc: 70,
   cockpitDoor: [2.1, 3.3], cockpitArc: 38, cockpitPane: 62,
   cabinDoor: [-1.1, 1.0], cabinArc: 34, cabinPane: [46, 66], cabinPaneX: [-0.5, 0.4],
+  // How far the cabin door stands out before it slides, so its head clears the shoulder ahead of it.
+  cabinDoorPlug: 0.15,
   gunWindow: [1.2, 1.9], gunWindowArc: [50, 72],
   bulkhead: -1.6, tailEnd: -4.4,
   rotorRadius: 8.2,
   tailRotor: { x: -8.9, y: 3.75, z: 0.24, radius: 1.35 },
   mainGear: { x: 2.6, radius: 0.4375, width: 0.24, z: 1.45, top: 0.85, root: 0.9 },
   tailGear: { x: -3.9, radius: 0.3, width: 0.16, top: 1.7, rake: 0.25, brace: { x: -3.05, y: 1.35 } },
-  engine: { x: -1.3, y: 3.0, z: 0.85, length: 1.6, radius: 0.34 },
+  // The engines stand high enough on the roof shoulders for the cabin door's top edge to plug out beneath their nacelles.
+  engine: { x: -1.3, y: 3.13, z: 0.85, length: 1.6, radius: 0.34 },
   body: [
     { x: 5.75, top: 1.62, bottom: 1.2, half: 0.1, waist: 1.3 },
     { x: 5.55, top: 1.85, bottom: 0.95, half: 0.5, waist: 1.3 },

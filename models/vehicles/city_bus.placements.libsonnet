@@ -3,6 +3,7 @@ local s = import 'city_bus.spec.libsonnet';
 local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.floor, z]);
 {
   title: 'City bus',
+  doorPairs:: (import 'bus-body.libsonnet').doorPairs(s),
   sites: (import 'bus-body.libsonnet').fittings(site.kit, 'city_bus', s) + [
     pole('pole_front', 3.9, 0.3),
     pole('pole_door_fwd', 1.6, 0.3),

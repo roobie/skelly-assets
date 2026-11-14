@@ -1,5 +1,6 @@
 // The microcar on a battery, as the 2017-2019 electric fortwo: the motor sits ahead of the rear axle where the engine
 // did, and the pack lies under the floor pan.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'microcar.spec.libsonnet';
 {

@@ -1,3 +1,4 @@
+local site = import 'site.libsonnet';
 local s = import 'panel_van.spec.libsonnet';
 {
   title: 'Electric panel van',

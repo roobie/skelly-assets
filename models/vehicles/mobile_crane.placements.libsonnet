@@ -28,4 +28,18 @@ local s = t.spec(import 'mobile_crane.spec.libsonnet');
   + site.pair('rear_outrigger', 'mobile_crane_outrigger', [s.rearRiggerX, 0, 0])
   + site.pair('cab_beacon', 'beacon_amber', [s.face - s.lean - 0.6, s.roof + 0.15, 0.9]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('deck', 'front_outrigger_far', 0.125,
+      'The outrigger beam slides inside the deck runner that houses it.'),
+    site.overlap('deck', 'front_outrigger_near', 0.125,
+      'The outrigger beam slides inside the deck runner that houses it.'),
+    site.overlap('deck', 'rear_outrigger_far', 0.125,
+      'The outrigger beam slides inside the deck runner that houses it.'),
+    site.overlap('deck', 'rear_outrigger_near', 0.125,
+      'The outrigger beam slides inside the deck runner that houses it.'),
+  ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

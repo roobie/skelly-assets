@@ -87,10 +87,16 @@ test('a wearable with no pieces rests against its place\'s part, sunk by its sha
 
 test('a wearable placed by an anchor stands with its origin at the bust anchor, whatever its box', () => {
   const hat = model('hat', { slot: ['head'] });
-  const [site] = wornSites(hat, { dressing, doll, models: [hat], boxOf: () => box([-0.2, 0, -0.2], [0.2, 0.9, 0.2]) }).slice(doll.sites.length);
+  const [site] = wornSites(hat, { dressing, doll, models: [hat], boxOf: () => box([-0.2, 0, -0.2], [0.2, 0.9, 0.2]), anchorsOf: () => ({}) }).slice(doll.sites.length);
   close(site.at, [0, 0.8, 0.05]);
   const mask = model('mask', { slot: ['face'] });
-  assert.throws(() => wornSites(mask, { dressing, doll, models: [mask], boxOf: () => box([0, 0, 0], [1, 1, 1]) }), /nose/);
+  assert.throws(() => wornSites(mask, { dressing, doll, models: [mask], boxOf: () => box([0, 0, 0], [1, 1, 1]), anchorsOf: () => ({}) }), /nose/);
+});
+
+test('a wearable with its own anchor of the place\'s name stands with that anchor at the bust anchor', () => {
+  const helm = model('helm', { slot: ['head'] });
+  const [site] = wornSites(helm, { dressing, doll, models: [helm], boxOf: () => box([-0.2, 0, -0.2], [0.2, 0.3, 0.2]), anchorsOf: () => ({ brow: [0, 0.15, 0.01] }) }).slice(doll.sites.length);
+  close(site.at, [0, 0.65, 0.04]);
 });
 
 test('a place on both sides spans both copies of its part', () => {

@@ -16,8 +16,8 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['forward', 'parent', 'sites', 'tags', 'title']);
-const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish']);
+const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
+const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
 
@@ -52,6 +52,25 @@ function parentProblems(vehicle, parent, placements, vehicleRows) {
   return problems;
 }
 
+// Why the carriers the sites name cannot pose their riders: each is another site of the vehicle, and no chain of
+// carriers comes back to its rider.
+function ridesProblems(vehicle, sites) {
+  const carrierOf = new Map(sites.map((site) => [site?.id, site?.rides]));
+  return sites.flatMap((site) => {
+    if (site?.rides === undefined) return [];
+    const where = `${vehicle}/${site.id}`;
+    if (site.rides === site.id || !carrierOf.has(site.rides)) return [`${where}: rides names another site of the vehicle, not ${site.rides}`];
+    const chain = [site.id];
+    for (let carrier = site.rides; carrier !== undefined; carrier = carrierOf.get(carrier)) {
+      const at = chain.indexOf(carrier);
+      if (at === 0) return [`${where}: rides comes back to ${carrier}`];
+      if (at > 0) return [];
+      chain.push(carrier);
+    }
+    return [];
+  });
+}
+
 function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
   const problems = [];
   const seen = new Set();
@@ -82,6 +101,24 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes) {
   return problems;
 }
 
+// Why the overlaps a vehicle lists (tools/siteOverlap.mjs) cannot be read: each names two different sites of the vehicle,
+// the depth it may reach, and the text (`textKey`) that says why it is correct or what is open about it.
+function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
+  if (!Array.isArray(listed)) return [`${vehicle}: ${listKey} is not a list`];
+  const ids = new Set((sites ?? []).map((site) => site?.id));
+  return listed.flatMap((entry) => {
+    const [a, b] = entry?.sites ?? [];
+    const where = `${vehicle}/${a}+${b}`;
+    const unknown = Object.keys(entry ?? {}).filter((field) => !['sites', 'depth', textKey].includes(field));
+    return [
+      ...(unknown.length > 0 ? [`${where}: unknown keys ${unknown.join(' ')} in ${listKey}`] : []),
+      ...(entry?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b ? [] : [`${where}: ${listKey} names two different sites of the vehicle`]),
+      ...(entry?.depth > 0 ? [] : [`${where}: ${listKey} needs a depth above 0`]),
+      ...(typeof entry?.[textKey] === 'string' && entry[textKey] !== '' ? [] : [`${where}: ${listKey} needs a ${textKey}`]),
+    ];
+  });
+}
+
 // Why the vehicles could not be assembled from the built models, as messages. placements: vehicle -> { parent?, sites,
 // tags? };
 // models: the built models, { id, pack, paintable? }; vehicleRows: vehicle -> its own row ids; dependsOn: pack -> the packs it
@@ -107,7 +144,9 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
       problems.push(...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(({ message }) => message));
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
-    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes));
+    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes), ...ridesProblems(vehicle, entry.sites));
+    if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
+    if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
   }
   return problems.sort();
 }

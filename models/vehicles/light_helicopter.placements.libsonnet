@@ -24,5 +24,5 @@ local s = import 'light_helicopter.spec.libsonnet';
     one('landing_lamp', 'light_helicopter_landing_lamp', [2.05, 0.9, 0]),
   ]
   + pair('door', 'light_helicopter_door')
-  + pair('seat', 'helicopter_seat', [0.64, s.floor, 0.3]),
+  + pair('seat', 'helicopter_seat', [0.64, s.floor, 0.25]),
 }

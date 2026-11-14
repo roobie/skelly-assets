@@ -23,7 +23,8 @@ local s = import 'muscle_car.spec.libsonnet';
   + site.pair('front_wing', 'muscle_car_front_wing')
   + site.pair('front_door', 'muscle_car_front_door')
   + site.pair('tail_lamp', 'muscle_car_tail_lamp')
-  + site.pair('exhaust', 'exhaust_small', [s.rear + 0.46, 0.2, 0.5])
+  // The cat cans run under the floor pan beneath the rear bench, their tops at the pan's underside.
+  + site.pair('exhaust', 'exhaust_small', [s.rear + 0.46, s.floor - 0.18, 0.5])
   + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.331, s.side - 0.12 - 0.05])
   + site.pair('front_wheel', 'wheel_235_75r15', [s.frontAxle, 0.367, s.side - 0.12])
   + site.pair('rear_wheel', 'wheel_235_75r15', [s.rearAxle, 0.367, s.side - 0.12])

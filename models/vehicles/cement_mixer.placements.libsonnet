@@ -16,4 +16,18 @@ local site = import 'site.libsonnet';
       site.one('water_tank', 'cement_mixer_water_tank'),
     ] + site.pair('roller_stand', 'cement_mixer_roller_stand'),
   ),
+  overlaps: [
+    site.overlap('drive', 'drum', 0.238,
+      'The drum\'s head band turns on the drive pedestal, which is drawn up into it.'),
+    site.overlap('drum', 'hopper', 0.058,
+      'The rear ring of the drum rises into the foot of the front wall of the hopper.'),
+    site.overlap('drum', 'water_tank', 0.035,
+      'The top end of the upright water tank runs into a ring of the drum beside it.'),
+    site.overlap('subframe', 'drive', 0.12,
+      'The drive\'s foot is bolted down into the runner of the subframe.'),
+  ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

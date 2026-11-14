@@ -126,7 +126,7 @@ export async function buildFigure(data, wear) {
   let clearance;
   const covered = () => {
     if (!clearance) {
-      const surface = coveredSurface(rig, rest);
+      const surface = coveredSurface(rig, rest, { whole: true });
       clearance = { surface, probe: clearanceProbe(rig, rest, surface) };
     }
     return clearance;

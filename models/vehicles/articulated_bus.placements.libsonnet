@@ -16,11 +16,14 @@ local rename(id) =
   if std.startsWith(id, 'articulated_bus_aft') && !std.member(['_shell', '_rear_bumper', '_rear_panel', '_rear_window'], tail)
   then 'articulated_bus' + tail
   else id;
-local inAft(placed) = placed { id: 'aft_' + placed.id, part: rename(placed.part) };
+local aft(site) = 'aft_' + site;
+local inAft(placed) = placed { id: aft(placed.id), part: rename(placed.part) }
+                      + (if std.objectHas(placed, 'rides') then { rides: aft(placed.rides) } else {});
 local midAxle(placed) = if placed.id == 'rear_axle' then placed { part: wheelKit.axle('trailer_axle_truck', std.get(s.fore, 'wheelBrakes')) } else placed;
 local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
 {
   title: 'Articulated bus',
+  doorPairs:: bus.doorPairs(s.fore) + [std.map(aft, pair) for pair in bus.doorPairs(s.aft)],
   sites: [
     midAxle(placed)
     for placed in bus.fittings(site.kit, 'articulated_bus', s.fore)
@@ -40,5 +43,11 @@ local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.fore.floor, z]);
     site.one('aft_pole_door', 'grab_pole', [-3.2, s.aft.floor, 0.3]),
     site.one('roof_unit', 'city_bus_roof_unit', [3.2, s.fore.roof, 0]),
     site.one('aft_roof_unit', 'city_bus_roof_unit', [-5.6, s.aft.roof, 0]),
+  ],
+  overlaps: [
+    site.overlap('aft_shell', 'aft_end_panel', 0.061,
+      'The nose pillar of the aft shell is let into the end panel it closes against.'),
+    site.overlap('joint', 'bellows', 0.06,
+      'The pleated side wall of the bellows stands on the rim of the turntable plate, so its post runs into the plate.'),
   ],
 }

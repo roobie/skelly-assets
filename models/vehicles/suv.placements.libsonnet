@@ -23,7 +23,7 @@ local s = import 'suv.spec.libsonnet';
     site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.15, 0]),
     site.one('front_axle', 'beam_axle_light', [s.frontAxle, 0.032, 0]),
     site.one('front_prop_shaft', 'prop_shaft_short', [1.05, 0.42, 0]),
-    site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.34, 0.5]),
+    site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.24, 0.5]),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.35, 0]),
   ]
   + site.pair('front_wing', 'suv_front_wing')

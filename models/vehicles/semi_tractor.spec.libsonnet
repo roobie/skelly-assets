@@ -1,12 +1,12 @@
 // A three-axle bonneted road tractor: 7.3 m long, 2.5 m wide, with a sleeper cab, roof fairing, twin stacks and a bare fifth wheel.
 {
-  tailLampZ: 0.5, rear: -3.65, front: 3.62, side: 1.24, face: 1.72, cabBack: 0.38, doorRear: 0.46,
+  tailLampZ: 0.5, rear: -3.71, front: 3.62, side: 1.24, face: 1.72, cabBack: 0.38, doorRear: 0.46,
   floor: 1.22, waist: 2.22, roof: 2.96, lean: 0.22,
   frontAxle: 2.72, rearAxles: [-1.85, -3.1],
   wheel: 'wheel_295_80r22_5', r: 0.522, wheelW: 0.295,
   wheelBrakes: 'disc', detail: 'assembly',
   railBottom: 0.74, railTop: 0.99,
-  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', gearboxLength: 0.95, radiator: 'radiator_truck',
+  engine: 'engine_i6_heavy_diesel', engineLength: 1.12, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   paint: 'paint-oxblood',
   chassisMass: 1600, shellMass: 1480,
   bonnet: { nose: 3.46, back: 2.2, front: 1.98, z: 0.72 },

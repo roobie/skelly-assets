@@ -19,8 +19,9 @@
   // Where a wearable with no worn pieces sits, by the first of its slots listed here: on the doll part `part` (every
   // side's copy with `both`, the first side's otherwise), centred across `against`, the direction from the
   // part it rests against, and sunk into the part by `sink`, a share of its own depth along that direction. No
-  // direction centres it on the part. A place with `anchor` instead puts the model's origin at that bust anchor: a hat
-  // stands on its brim at y = 0, and the brim sits at the brow whatever the hat's height.
+  // direction centres it on the part. A place with `anchor` instead puts the model's own anchor of that name at the
+  // bust's, or its origin if it has none: a hat stands on its brim at y = 0, and the brim sits at the brow whatever the
+  // hat's height.
   places: [
     { slot: 'torso', part: 'torso', against: [0, 0, 1], sink: 0.5 },
     { slot: 'legs', part: 'thigh', both: true, against: [0, 0, 1], sink: 0.5 },

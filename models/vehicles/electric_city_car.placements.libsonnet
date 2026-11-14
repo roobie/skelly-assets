@@ -1,4 +1,5 @@
 // The city car on a battery: the motor sits where the engine did and the pack lies under the floor pan.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'city_car.spec.libsonnet';
 {

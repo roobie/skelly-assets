@@ -22,4 +22,8 @@ local s = import 'quad_bike.spec.libsonnet';
   + site.pair('rear_wheel', 'quad_bike_wheel', [s.rearAxle, s.hub, s.wheelZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.0, 0.6, 0.12])
   + site.pair('headlamp', 'quad_bike_headlamp', [1.0, 0.62, 0.11]),
+  overlaps: [
+    site.overlap('swing_arm', 'rear_fenders', 0.06,
+      'The shock mount on top of the swing arm pokes up into the underside of the rear fender deck.'),
+  ],
 }

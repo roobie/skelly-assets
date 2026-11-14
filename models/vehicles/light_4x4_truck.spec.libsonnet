@@ -7,9 +7,12 @@
   frontAxlePart: 'light_4x4_truck_front_axle', rearAxlePart: 'light_4x4_truck_axle',
   wheel: 'light_4x4_truck_wheel', r: 0.535, wheelW: 0.31,
   railBottom: 0.82, railTop: 1.0, railZ: 0.5,
+  // Its own drive axles' seats, straight under the springs.
+  frontSeat: { y: (import 'machine-kit.libsonnet').driveAxleSeat, z: (import 'truck-cab.libsonnet').springZ($) },
+  rearSeat: self.frontSeat,
   bumperLow: 0.75, bumperTop: 0.95, lampY: 1.2,
   engine: 'engine_v8_petrol_medium', engineX: 1.2, engineY: 0.5, engineLength: 0.8,
-  gearbox: 'gearbox_inline', gearboxLength: 0.62, radiator: 'radiator_van',
+  gearbox: 'gearbox_inline', radiator: 'radiator_van',
   batteryX: -0.55,
   paint: 'paint-green',
   chassisMass: 474, shellMass: 201,

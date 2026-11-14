@@ -27,8 +27,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('rear_tower_foot', 'dark', [-1.42, 0.5, -0.22], [-1.05, s.deck, 0.22]),
     box('dozer_arm', 'dark', [1.25, 0.34, -0.14], [1.62, 0.5, 0.14]),
   ] + bothSides([
-    box('track_beam_front', 'dark', [0.7, 0.3, 0.5], [1.0, 0.5, s.trackZ]),
-    box('track_beam_rear', 'dark', [-0.9, 0.3, 0.5], [-0.6, 0.5, s.trackZ]),
+    // The beams end at the track's inner face, where the track frame and the sprocket and idler hubs bolt on.
+    box('track_beam_front', 'dark', [0.7, 0.3, 0.5], [1.0, 0.5, s.trackZ - 0.1]),
+    box('track_beam_rear', 'dark', [-0.9, 0.3, 0.5], [-0.6, 0.5, s.trackZ - 0.1]),
   ]), { dark: 'paint-charcoal' }) + { title: 'Trencher chassis' },
   k.compound('trencher_hood', 95, [
     prism('hood', 'paint', [[s.hoodBack, s.deck], [s.hoodFront, s.deck], [s.hoodFront, s.hoodTop - 0.16], [s.hoodFront - 0.18, s.hoodTop], [s.hoodBack, s.hoodTop]], [-0.56, 0.56]),

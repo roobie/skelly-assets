@@ -6,13 +6,19 @@ local paintable(dimensions, finish) =
   local pieces = std.get(dimensions, 'pieces', []);
   if std.objectHas(finish, 'paint') && std.any([std.get(p, 'slot') == 'paint' && !std.objectHas(p, 'material') for p in pieces])
   then { paintable: ['paint'] } else {};
-local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts') = {
-  id: id,
-  exportMass: exportMass,
-  parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] } + paintable(dimensions, finish)],
-  connections: [],
-  anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
-};
+// A part that moves turns on its drawn pins, so it carries no hinge anchors; docs/decisions/0015-motion-as-content.md.
+local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', motion=null) =
+  assert motion == null || !std.objectHas(anchors, 'hinge_a') && !std.objectHas(anchors, 'hinge_b')
+         : id + ' has a motion, so its pins replace its hinge anchors';
+  {
+    id: id,
+    exportMass: exportMass,
+    parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] } + paintable(dimensions, finish)],
+    connections: [],
+    anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
+  } + (if motion == null then {} else { motion: { part: 'body', stages: motion } });
+local towards = ['up', 'down', 'fore', 'rear', 'near', 'far'];
+local vehicleGrain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
 // A z prism's profile is (x, y), an x prism's (y, z), a y prism's (z, x); a turned profile is (axial, radial) and closes on itself.
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local prism(id, slot, profile, z) = { id: id, kind: 'prism', slot: slot, axis: 'z', profile: profile, start: z[0], end: z[1] };
@@ -23,6 +29,15 @@ local disc(radius, from, to) = [[from, 0], [from, radius], [to, radius], [to, 0]
 local annulus(inner, outer, from, to) = [[from, inner], [from, outer], [to, outer], [to, inner], [from, inner]];
 // A tyre's turned section, its shoulders rounded off by `taper` of its width.
 local tyreProfile(width, rim, outer, taper) = [[-width / 2, rim], [-width / 2, outer - width * taper], [-width * 0.42, outer], [width * 0.42, outer], [width / 2, outer - width * taper], [width / 2, rim], [-width / 2, rim]];
+// An off-road tyre's bar lugs about z, from its body at `base` out to `outer`: each a slab on one shoulder, alternating
+// sides, crossing the crown a little so the tread reads as one.
+local shoulderLugs(width, base, outer, count) = [
+  local a = 2 * std.pi * i / count;
+  local d = 0.045 / outer;
+  local at(r, t) = [r * std.cos(t), r * std.sin(t)];
+  prism('lug_' + i, 'tyre', [at(base, a - d), at(outer, a - d), at(outer, a + d), at(base, a + d)], if i % 2 == 0 then [-0.01, width / 2] else [-width / 2, 0.01])
+  for i in std.range(0, count - 1)
+];
 local rad(degrees) = degrees * std.pi / 180;
 local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 local beyond(cut) = { normal: [-x for x in cut.normal], offset: -cut.offset };
@@ -79,6 +94,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   disc: disc,
   annulus: annulus,
   tyreProfile: tyreProfile,
+  shoulderLugs: shoulderLugs,
   rad: rad,
   arc: arc,
   bar: bar,
@@ -110,17 +126,62 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   clipped(piece, plates):
     assert piece.kind == 'prism' : piece.id + ' is not a prism, so it cannot be cut';
     piece { clip: plates },
-  // A roller shutter in a locker wall, from `z[0]` to `z[1]`: horizontal slats in alternating `alu` and `steel`, with a
-  // grab bar in `dark` along its foot.
-  shutter(name, x0, x1, y0, y1, z): [
-    box(name + '_bar', 'dark', [x0, y0, z[0]], [x1, y0 + 0.08, z[1]]),
-  ] + [
-    box(name + '_slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [x0, y0 + 0.08 + i * 0.09, z[0]], [x1, std.min(y0 + 0.08 + (i + 1) * 0.09, y1), z[1]])
-    for i in std.range(0, std.ceil((y1 - y0 - 0.08) / 0.09) - 1)
-  ],
+  // A roller shutter in a locker wall, from `z[0]` to `z[1]`, as a part of its own: horizontal slats in alternating
+  // `alu` and `steel` above a grab bar in `dark` along its foot. It rolls up into the drum behind the wall's head and
+  // leaves its bar under the lintel.
+  shutter(id, massKg, x0, x1, y0, y1, z, finish):
+    local bar = 0.08;
+    local pitch = self.slatPitch;
+    self.compound(id, massKg, [
+      box('bar', 'dark', [x0, y0, z[0]], [x1, y0 + bar, z[1]]),
+    ] + [
+      box('slat_' + i, if i % 2 == 0 then 'alu' else 'steel', [x0, y0 + bar + i * pitch, z[0]], [x1, std.min(y0 + bar + (i + 1) * pitch, y1), z[1]])
+      for i in std.range(0, std.ceil((y1 - y0 - bar) / pitch) - 1)
+    ], finish, motion=self.motion.slide('up', y1 - y0 - bar, stow=true)),
+  // The height of one roller-shutter slat.
+  slatPitch: 0.09,
+  // A locker wall's roller shutters, one `shutter` part each from `y0` to `y1`: `spans` gives each locker its `[x0, x1]`
+  // along the body and `titles` its part's title. Each part weighs its share of `massKg` by its width.
+  lockerShutters(idPrefix, massKg, spans, titles, y0, y1, z, finish):
+    assert std.objectFields(spans) == std.objectFields(titles) : idPrefix + ' lockers need a span and a title each';
+    local width(name) = spans[name][1] - spans[name][0];
+    local total = std.foldl(function(sum, name) sum + width(name), std.objectFields(spans), 0);
+    [
+      self.shutter(idPrefix + name, std.round(massKg * width(name) / total), spans[name][0], spans[name][1], y0, y1, z, finish)
+      + { title: titles[name] }
+      for name in std.objectFields(spans)
+    ],
   // The x of a fork raked back from its axle at (axle, hub), `rake` m for each metre it rises.
   forkX(axle, hub, rake): function(y) axle - (y - hub) * rake,
-  compound(id, massKg, pieces, finish, anchors={}): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors),
+  compound(id, massKg, pieces, finish, anchors={}, motion=null): part(id, 'compound', massKg, { pieces: pieces }, finish, anchors, motion=motion),
+  // How a part moves, for `compound`'s `motion`: a list of stages run one after another, so motions join with `+`.
+  // Each is a hinge turning on its drawn pins, given as pieces or their ids, and opening `open` degrees toward one of
+  // `towards`; or a slide `travel` m toward one, which with `stow` hides whatever it carries past the part's rest
+  // bounds on the side it moves toward, so a curtain rises into its head. A direction is read in the part's model frame
+  // at rest, near being the side fore × up points to, wherever the part is drawn: a later stage's direction turns with
+  // the stages before it, and a mirrored placement turns near into far.
+  motion: {
+    hinge(pins, toward, open):
+      assert std.isArray(pins) && std.length(pins) > 0 : 'a hinge needs its pins';
+      assert std.member(towards, toward) : 'a hinge opens toward one of ' + std.join(' ', towards) + ', not ' + toward;
+      assert std.isNumber(open) && open > 0 && open <= 180 : 'a hinge opens more than 0 and at most 180 degrees';
+      [{ kind: 'hinge', pins: [if std.isString(pin) then pin else pin.id for pin in pins], toward: toward, open: open }],
+    slide(toward, travel, stow=false):
+      assert std.member(towards, toward) : 'a slide moves toward one of ' + std.join(' ', towards) + ', not ' + toward;
+      assert std.isNumber(travel) && travel > 0 : 'a slide travels a positive distance';
+      assert std.isBoolean(stow) : 'a slide stows or it does not';
+      [{ kind: 'slide', toward: toward, travel: travel } + (if stow then { stow: true } else {})],
+  },
+  // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
+  // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a
+  // neighbour's face sinks at most a grain into it, which the overlap check of docs/decisions/0014-site-overlap.md
+  // counts as contact. Pins take the part's `paint` slot unless `slot` names another, so by default they read as part of
+  // the panel they carry rather than as fittings of their own.
+  hingePins(name, axis, a, b, slot='paint', radius=vehicleGrain, length=2 * vehicleGrain):
+    local along = { x: 0, y: 1, z: 2 }[axis];
+    assert std.all([i == along || a[i] == b[i] for i in [0, 1, 2]]) : name + ' pins must lie on one line along ' + axis;
+    assert a[along] != b[along] : name + ' pins must not coincide';
+    [turned(name + '_' + end[0], slot, axis, disc(radius, -length / 2, length / 2), end[1]) for end in [['a', a], ['b', b]]],
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,
   far: far,

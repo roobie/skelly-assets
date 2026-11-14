@@ -22,4 +22,12 @@ local s = import 'crashed_light_helicopter.spec.libsonnet';
     one('console', 'light_helicopter_console', [1.08, s.floor, 0]),
   ]
   + pair('seat_frame', 'crashed_light_helicopter_seat_frame', [0.5, s.floor, 0.3]),
+  overlaps: [
+    site.overlap('main_gearbox', 'seat_frame_far', 0.05,
+      'The tall seat back reaches up into the mount plate of the gearbox.'),
+    site.overlap('main_gearbox', 'seat_frame_near', 0.05,
+      'The tall seat back reaches up into the mount plate of the gearbox.'),
+    site.overlap('skids', 'door', 0.05,
+      'The door lies flat on the ground and the splayed skid lies across it.'),
+  ],
 }

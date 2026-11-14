@@ -4,6 +4,8 @@ local van = import 'van-body.libsonnet';
 van.cab + van.loadFloor + {
   rear: -2.7, rearAxle: -1.9, panLow: 0.42,
   slideRear: -0.8, rearGlass: true,
+  // The serving counter stands in the side door's path, so the door does not slide.
+  sideDoorSlides: false,
   shellMass: 850, paint: 'paint-white',
   bands: [{ finish: 'plastic-pink', y: [0.88, 1.03] }],
   box: {

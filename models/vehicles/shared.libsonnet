@@ -3,6 +3,10 @@
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
+local gearboxes = import 'gearboxes.libsonnet';
+local tractionMotors = import 'traction-motors.libsonnet';
+local driveline = import 'driveline.libsonnet';
+local plainEngines = import 'plain-engines.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
@@ -11,20 +15,13 @@ local wheel(id, massKg, width, rim, outer, sides=roundSides) = k.compound(id, ma
   k.turned('tyre', 'tyre', 'z', tyreProfile(width, rim, outer)) + { sides: sides },
   k.turned('rim', 'rim', 'z', k.disc(rim, -width * 0.35, width * 0.35)) + { sides: sides },
 ], { tyre: 'rubber-black', rim: 'steel-grey' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
-// Farm tyres read by their bar lugs: each is a slab on the tyre's shoulder, alternating sides, and a dark centre breaks up the rim.
-local lugs(width, base, outer, count) = [
-  local a = 2 * std.pi * i / count;
-  local d = 0.045 / outer;
-  local at(r, t) = [r * std.cos(t), r * std.sin(t)];
-  k.prism('lug_' + i, 'tyre', [at(base, a - d), at(outer, a - d), at(outer, a + d), at(base, a + d)], if i % 2 == 0 then [-0.01, width / 2] else [-width / 2, 0.01])
-  for i in std.range(0, count - 1)
-];
+// Farm tyres read by their bar lugs (`kit.libsonnet`, `shoulderLugs`), and a dark centre breaks up the rim.
 local farmWheel(id, massKg, width, rim, outer, count) = k.compound(id, massKg, [
   k.turned('tyre', 'tyre', 'z', tyreProfile(width, rim, outer - 0.04)) + { sides: roundSides },
   k.turned('rim', 'rim', 'z', k.disc(rim, -width * 0.35, width * 0.35)) + { sides: roundSides },
   k.turned('centre', 'centre', 'z', k.disc(rim * 0.62, -width * 0.39, width * 0.39)) + { sides: roundSides },
   k.turned('boss', 'rim', 'z', k.disc(rim * 0.26, -width * 0.44, width * 0.44)) + { sides: 12 },
-] + lugs(width, outer - 0.05, outer, count), { tyre: 'rubber-black', rim: 'steel-grey', centre: 'paint-charcoal' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
+] + k.shoulderLugs(width, outer - 0.05, outer, count), { tyre: 'rubber-black', rim: 'steel-grey', centre: 'paint-charcoal' }, { hub: ['rim', [0.5, 0.5, 0.5]] });
 // Two wheels on one hub, with the origin on the hub between them.
 local twinWheel(id, massKg, width, rim, outer) = k.compound(id, massKg, [
   k.turned('spacer', 'rim', 'z', k.disc(rim * 0.6, -width * 0.2, width * 0.2)) + { sides: roundSides },
@@ -81,11 +78,17 @@ local strut(id, massKg) = k.compound(id, massKg, [
   box('knuckle', 'steel', [-0.05, -0.06, -0.05], [0.05, 0.06, 0]),
   k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.47), [0, 0.06, -0.02]),
 ], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
-local beamAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, massKg, [
+// An axle's spring seat (`driveline.libsonnet`, `axles`), resting on its beam's top at `beamTop`.
+local springSeat(id, beamTop, halfLength) =
+  local seat = driveline.axles[id].seat;
+  assert seat.y[0] <= beamTop && seat.y[1] > beamTop : id + "'s spring seats must rest on its beam";
+  box('spring_seat', 'steel', [-halfLength, seat.y[0], seat.z[0]], [halfLength, seat.y[1], seat.z[1]]);
+// `seats` names the `driveline.libsonnet` axle whose seats it carries, which a bare twin shares.
+local beamAxle(id, massKg, track, radius, height, drums=true, seats=id) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]) + { sides: 12 },
   box('diff', 'steel', [-0.14, height - 0.13, -0.13], [0.14, height + 0.13, 0.13]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.09, height + radius - 0.01, track / 2 - 0.36], [0.09, height + radius + 0.04, track / 2 - 0.22]),
+  springSeat(seats, height + radius, 0.09),
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.4, -0.06, 0.06), [0, height, track / 2 - 0.1]) + { sides: 12 },
 ] else [])), { steel: 'steel-grey' });
@@ -98,10 +101,10 @@ local trailerAxle(id, massKg, track, radius, height, drums=true) = k.compound(id
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.2, -0.05, 0.05), [0, height, track / 2 - 0.1]),
 ] else [])), { steel: 'steel-grey' });
 // A steered I-beam for 295 wheels, in `beamAxle`'s frame: the king pins stand at the beam's ends.
-local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, massKg, [
+local steeredAxle(id, massKg, halfTrack, height, seats, drums=true) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, height - 0.06, -halfTrack], [0.06, height + 0.06, halfTrack]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.09, height + 0.06, 0.42], [0.09, height + 0.1, 0.56]),
+  springSeat(seats, height + 0.06, 0.09),
   box('king_pin', 'steel', [-0.08, height - 0.12, halfTrack - 0.1], [0.08, height + 0.12, halfTrack + 0.05]),
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(0.2, halfTrack + 0.05, halfTrack + 0.18), [0, height, 0]) + { sides: 12 },
@@ -119,7 +122,7 @@ local truckSteeredAxle = 350;
 local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
   box('beam', 'steel', [-0.045, 0.385, -0.95], [0.045, 0.475, 0.95]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.07, 0.475, 0.32], [0.07, 0.5, 0.46]),
+  springSeat('steered_axle_medium', 0.475, 0.07),
   box('king_pin', 'steel', [-0.06, 0.33, 0.87], [0.06, 0.53, 1.0]),
   k.turned('drum', 'steel', 'z', k.disc(0.17, 1.0, 1.12), [0, 0.43, 0]) + { sides: 12 },
 ]), { steel: 'steel-grey' }) + { title: 'Medium steered axle' };
@@ -139,7 +142,7 @@ local twistBeam(id, massKg, track) = k.compound(id, massKg, [
   box('stub', 'steel', [-0.04, 0.28, track / 2 - 0.1], [0.04, 0.36, track / 2 - 0.03]),
 ]), { steel: 'steel-grey' });
 local propShaft(id, massKg, length) = k.compound(id, massKg, [
-  k.turned('tube', 'steel', 'x', k.disc(0.04, -length / 2, length / 2)),
+  k.turned('tube', 'steel', 'x', k.disc(driveline.propShaftRadius, -length / 2, length / 2)),
 ], { steel: 'steel-grey' });
 // A seat for two or three, its back at -x.
 local bench(id, massKg, width) = k.compound(id, massKg, [
@@ -424,13 +427,7 @@ local seatPlinth = k.compound('seat_plinth', 30, [
 local steeringColumn(id, massKg, height) = k.compound(id, massKg, [
   box('tube', 'tube', [-0.04, 0, -0.03], [0.04, height, 0.03]),
 ], { tube: 'plastic-black' });
-// Stands on a dash top: the dials face the driver at -x under the hood, centred on z.
-local instrumentBinnacle = k.compound('instrument_binnacle', 2, [
-  box('housing', 'shell', [-0.1, 0, -0.22], [0.12, 0.13, 0.22]),
-  k.prism('hood', 'shell', [[-0.16, 0.13], [0.12, 0.13], [0.12, 0.17], [-0.12, 0.17]], [-0.22, 0.22]),
-] + k.bothSides([
-  box('dial', 'dial', [-0.125, 0.03125, 0.0625], [-0.1, 0.09375, 0.1875]),
-]), { shell: 'plastic-black', dial: 'plastic-white' }) + { title: 'Instrument binnacle' };
+local instrumentBinnacle = (import 'instrument-binnacle.libsonnet').row;
 // Lies along x, head at +x, its underside at y = 0.
 local stretcher = k.compound('stretcher', 16, [
   box('leg_fore', 'frame', [0.72, 0, -0.26], [0.78, 0.36, 0.26]),
@@ -468,17 +465,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   spareCarrier,
   farmWheel('wheel_6_50r16_ag', 24, 0.165, 0.203, 0.37, 14) + { title: 'Agricultural wheel 6.50R16' },
   wheel('wheel_145r10', 7, 0.145, 0.127, 0.23) + { title: 'Wheel 145R10' },
-  inline('engine_i3_small', 85, 0.34, 0.42, 0.52) + { title: 'Small inline-3 engine' },
-  inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75) + { title: 'Inline-6 diesel engine' },
-  inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95) + { title: 'Heavy inline-6 diesel engine' },
-  vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6) + { title: 'V6 petrol engine' },
-  vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68) + { title: 'V8 petrol engine' },
-  vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88) + { title: 'V8 diesel engine' },
-  vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95) + { title: 'V8 turbo diesel engine' },
-  gearbox('gearbox_transaxle', 35, 0.3, 0.4, 0.3) + { title: 'Transaxle gearbox' },
-  gearbox('gearbox_inline', 48, 0.62, 0.28, 0.3) + { title: 'Inline gearbox' },
-  gearbox('gearbox_truck', 110, 0.72, 0.42, 0.42) + { title: 'Truck gearbox' },
-  gearbox('gearbox_heavy', 240, 0.95, 0.52, 0.55) + { title: 'Heavy gearbox' },
   exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted') + { title: 'Rusted exhaust' },
   exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]) + { title: 'Long exhaust' },
   exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]) + { title: 'Rear-mounted bus exhaust' },
@@ -494,11 +480,13 @@ local towHitch = k.compound('tow_hitch', 18, [
   // is drawn without its own and is lighter by theirs.
   trailerAxle('de_dion_axle_small', 35 - 2 * wheelKit.brakeMass('light', 'drum'), 1.43, 0.045, 0.3015, drums=false) + { title: 'Small de Dion axle' },
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37) + { title: 'Van trailer axle' },
-] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
-// Axles long enough to reach flotation tyres set out under a 3 m wide truck.
-+ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, drums), 'steered_axle_wide', 'Wide steered axle', 'Bare wide steered axle', 400, 'heavy')
+] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums, 'beam_axle_truck'), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, 'steered_axle_heavy', drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
+// Axles long enough to reach flotation tyres set out under a 3 m wide truck, all driven.
++ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums, 'beam_axle_wide'), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
++ withBare(function(id, massKg, drums)
+  local axle = driveline.axles.drive_axle_wide;
+  m.driveAxle(id, massKg, 1.24, true, axle.seat.z, drums, axle.seat.y, axle.diffZ), 'drive_axle_wide', 'Wide steered drive axle', 'Bare wide steered drive axle', 700, 'heavy')
 + withBare(steeredAxleDrop, 'steered_axle_drop', 'Drop steered axle', 'Bare drop steered axle', 330, 'heavy')
 + withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 'Truck trailer axle', 'Bare truck trailer axle', 190, 'heavy') + [
   propShaft('prop_shaft_short', 10, 1.2) + { title: 'Short propeller shaft' },
@@ -540,9 +528,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   trailerLeg,
   jockeyWheel,
   truckBatteryTray,
-  tractionMotor('traction_motor_light', 25, 0.1, 0.24) + { title: 'Light traction motor' },
-  tractionMotor('traction_motor_car', 65, 0.15, 0.36) + { title: 'Car traction motor' },
-  tractionMotor('traction_motor_large', 240, 0.25, 0.6) + { title: 'Large traction motor' },
   inverter('inverter_car', 14, 0.36, 0.14, 0.26) + { title: 'Car inverter' },
   inverter('inverter_large', 45, 0.6, 0.24, 0.42) + { title: 'Large inverter' },
   tractionPack('traction_pack_light', 70, 0.52, 0.2, 0.74) + { title: 'Light traction pack' },
@@ -563,5 +548,17 @@ local towHitch = k.compound('tow_hitch', 18, [
   stretcher,
   attendantSeat,
   controlStick,
+] + [
+  local g = gearboxes[id];
+  gearbox(id, g.massKg, g.length, g.width, g.height) + { title: g.title }
+  for id in std.objectFields(gearboxes)
+] + [
+  local m = tractionMotors[id];
+  tractionMotor(id, m.massKg, m.radius, m.length) + { title: m.title }
+  for id in std.objectFields(tractionMotors)
+] + [
+  local e = plainEngines[id];
+  { inline: inline, vee: vee }[e.layout](id, e.massKg, e.length, e.width, e.height) + { title: e.title }
+  for id in std.objectFields(plainEngines)
 ] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
   + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows

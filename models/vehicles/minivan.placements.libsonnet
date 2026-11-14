@@ -14,7 +14,8 @@ local s = import 'minivan.spec.libsonnet';
       battery: { at: [s.aPost + 0.25, 0.59, -0.44] },
     },
     add: [
-      site.one('third_row', 'bench_seat_3', [-1.5, 0.56, 0]),
+      // A two-seat third row fits between the rear wheel arches; a three-seat one would stand on their liners.
+      site.one('third_row', 'bench_seat_2', [-1.5, 0.56, 0]),
       site.one('door_track', 'minivan_door_track'),
     ],
   }),

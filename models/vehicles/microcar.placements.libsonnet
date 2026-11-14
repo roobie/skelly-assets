@@ -19,8 +19,10 @@ local rear = { wheel: 'wheel_185_60r15', hub: 0.3015, z: 0.715 };
     site.one('front_bumper', 'microcar_front_bumper'),
     site.one('rear_bumper', 'microcar_rear_bumper'),
     site.one('dashboard', 'microcar_dashboard'),
-  ] + engine.sites('i3_petrol', [-0.81, 0.36, 0], 'assembly') + [
-    site.one('gearbox', 'gearbox_transaxle', [-0.75, 0.25, -0.41]),
+  ]
+  // The engine and gearbox sit off centre, towards the far side, so the air box clears the near arch liner.
+  + engine.sites('i3_petrol', [-0.81, 0.36, -0.05], 'assembly') + [
+    site.one('gearbox', 'gearbox_transaxle', [-0.75, 0.25, -0.46]),
   ] + cooling.sites(engine.radiator('i3_petrol'), [s.front - 0.18, 0.22, 0], 'assembly')
   + tank.sites('fuel_tank_car', [-0.2, s.sill, 0.15], 'assembly')
   + exhaust.sites('exhaust_microcar', [s.rear + 0.3, 0.17, 0], 'assembly') + [

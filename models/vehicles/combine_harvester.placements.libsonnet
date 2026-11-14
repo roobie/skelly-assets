@@ -35,4 +35,18 @@ local s = import 'combine_harvester.spec.libsonnet';
   + site.pair('mirror', 'door_mirror', [s.cabFront, 3.2, s.cabSide + 0.02])
   + site.batteryBay('truck_battery_tray', [-1.0, 1.0, 0.6]),
   tags: { 'vehicle-role': ['farm'] },
+  overlaps: [
+    site.overlap('body', 'engine', 0.494,
+      'The engine sits inside the main body block of the combine, which is drawn solid around it.'),
+    site.overlap('body', 'exhaust', 0.12,
+      'The exhaust silencer sits inside the main body block of the combine, which is drawn solid around it.'),
+    site.overlap('body', 'feeder', 0.252,
+      'The feeder housing is hinged into the front face of the body.'),
+    site.overlap('body', 'front_axle', 0.124,
+      'The front axle tube runs through the front beam of the body, which is drawn solid around it.'),
+    site.overlap('body', 'fuel_tank', 0.26,
+      'The fuel tank sits inside the main body block of the combine, which is drawn solid around it.'),
+    site.overlap('body', 'gearbox', 0.52,
+      'The gearbox sits inside the main body block of the combine, which is drawn solid around it.'),
+  ],
 }

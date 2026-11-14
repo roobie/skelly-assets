@@ -77,7 +77,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_rear_bench', 12, [
     box('pan', 'dark', [-0.24, 0, -0.56], [0.22, 0.08, 0.56]),
     box('cushion', 'seat', [-0.24, 0.08, -0.56], [0.22, 0.18, 0.56]),
-    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.56, 0.56]),
+    // The back is narrower than the cushion, inside the doors where the cabin's sides curve in towards the roof.
+    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.47, 0.47]),
   ], { dark: trim, seat: 'cloth-seat' }) + { title: 'News helicopter rear bench' },
   k.compound('news_helicopter_console', 8, [
     box('pedestal', 'dark', [-0.12, 0, -0.14], [0.12, 0.34, 0.14]),

@@ -36,4 +36,8 @@ local wheel = 'utility_4x4_wheel';
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 0.92, 0.9])
   + site.batteryBay('battery_tray', [1.9, 0.92, 0.42]),
   tags: { 'vehicle-body': ['armoured'] },
+  overlaps: [
+    site.overlap('hull', 'gearbox', 0.18,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
 }

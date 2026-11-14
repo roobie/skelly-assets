@@ -25,7 +25,8 @@ local wheel = id + '_wheel';
     one('rear_prop_shaft', id + '_rear_prop_shaft', [-0.87, 0.54, 0]),
     one('front_prop_shaft', 'prop_shaft_short', [1.02, 0.55, 0.2]),
     one('radiator', 'radiator_van', [2.02, 0.62, 0]),
-    one('fuel_tank', 'fuel_tank_car', [-2.3, 0.62, 0]),
+    // The bed leaves no room above the rails behind the axle, so the tank hangs below them.
+    one('fuel_tank', 'fuel_tank_car', [-2.27, 0.36, 0]),
     one('exhaust', 'exhaust_military', [-1.4, 0.52, 0.3]),
     one('steering_wheel', 'steering_wheel', [0.5, 1.32, -s.seatZ]),
     one('gear_lever', 'gear_lever', [0.3, 1.0, 0]),
@@ -42,4 +43,8 @@ local wheel = id + '_wheel';
   + pair('tail_lamp', 'tail_lamp_small', [s.rear, 0.92, 0.88])
   + site.batteryBay('truck_battery_tray', [1.25, 0.9, -0.5]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('hull', 'gearbox', 0.34,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
 }

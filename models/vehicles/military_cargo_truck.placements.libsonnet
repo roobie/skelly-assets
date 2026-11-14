@@ -11,4 +11,14 @@ local id = 'military_cargo_truck';
     site.one('tilt', id + '_tilt'),
   ],
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('cab', 'gearbox', 0.27,
+      'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
+  ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.087,
+      '`crossmember_6` and `crossmember_7` run through the engine\'s sump.'),
+    site.unjudged('chassis', 'gearbox', 0.087,
+      '`crossmember_5` runs through the gearbox case.'),
+  ],
 }

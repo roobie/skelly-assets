@@ -1,5 +1,6 @@
 // The city bus on a battery: the motor drives the prop shaft from the old gearbox bay and the pack rides on the roof,
 // because a low floor leaves no room beneath it. The engine hatch goes with the engine.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'city_bus.spec.libsonnet';
 {

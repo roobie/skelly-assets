@@ -34,4 +34,12 @@ local wheel(id, x) = pair(id, 'abandoned_army_truck_wheel', [x, s.hubY, s.wheelZ
   + wheel('middle_wheel', s.rearAxles[0])
   + wheel('rear_wheel', s.rearAxles[1]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('chassis', 'screen_frame', 0.06,
+      'The skirt of the cab front wall below the floor stands into the chassis rails.'),
+  ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.087,
+      '`rail_near` and `rail_far` run through the engine\'s radiator, `rail_near` through its down pipe and `cross_5` through its block.'),
+  ],
 }

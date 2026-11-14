@@ -3,6 +3,7 @@
 // the same spec, taking its kit as an argument so this folder stays free of Deadvox imports.
 // A door takes the place of one window bay on the near side; the driver sits on the far side, away from the kerb.
 local k = import 'kit.libsonnet';
+local foldDoor = import 'fold-door.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -19,6 +20,9 @@ local has(s, key) = std.objectHas(s, key);
 // Cut from both top corners of every wheel arch, so its opening has five sides.
 local archChamfer = 0.2;
 local voxel = 0.03125;
+local binnacle = import 'instrument-binnacle.libsonnet';
+// How far the dash stands back from the windscreen raked over it.
+local glassGap = 0.14;
 local rearGlass(s) = [hole for hole in std.get(s, 'rearHoles', []) if !std.get(hole, 'door', false)];
 local dashTop(s) = std.get(s, 'dashTop', s.driver.y + 0.55);
 // A low-floor driver sits on a plinth, raised to see over the dash.
@@ -40,14 +44,31 @@ local layout(s) = {
     for door in s.doors
   ],
   arches: [[s.rearAxle - s.arch, s.rearAxle + s.arch]] + (if bonneted then [] else [[s.frontAxle - s.arch, s.frontAxle + s.arch]]),
-  leafWidth: (self.doorways[0][1] - self.doorways[0][0]) / std.get(s, 'doorLeaves', 2),
+  // Every doorway is as wide as the first, so one leaf width fits them all; a pair of leaves each take half the span.
+  local spans = [way[1] - way[0] for way in self.doorways],
+  assert std.all([std.abs(width - spans[0]) < 1e-9 for width in spans]) : 'every doorway of a bus is as wide as the first',
+  leafWidth: foldDoor.fitWidth(if std.get(s, 'doorLeaves', 2) == 2 then spans[0] / 2 else spans[0], self.doorThick),
   doorHeight: s.decks[0].top - s.doorSill,
+  doorThick: foldDoor.thick,
+  // Every leaf of a doorway folds out of it, a pair from the doorway's middle toward its ends, a single leaf toward the
+  // forward end. Folding in, a leaf would sweep through the floor above its foot or the steps inside a high floor's
+  // doorway. Each leaf names its pressing's `suffix`, its `site` and its `jamb` end of the doorway.
+  leaves: if std.get(s, 'doorLeaves', 2) == 2 then [
+    { suffix: '_door_fwd', site: 'door_fwd', label: 'front door', item: 'door, forward leaf', jamb: 1 },
+    { suffix: '_door_aft', site: 'door_aft', label: 'rear door', item: 'door, rear leaf', jamb: -1 },
+  ] else [{ suffix: '_door', site: 'door', label: 'door', item: 'door', jamb: 1 }],
+  fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door'),
+  // Where a leaf's centre lies along doorway `way`.
+  leafX(way, leaf): (if leaf.jamb > 0 then way[1] else way[0]) - leaf.jamb * self.leafWidth / 2,
+  // The id of one of a leaf's panels, `panel` being 'jamb' or 'free', in doorway `d`, and where its origin sits along `way`.
+  panelSite(leaf, panel, d): leaf.site + '_' + panel + '_' + d,
+  panelX(way, leaf, panel): self.leafX(way, leaf) + self.fold(leaf)[panel].at,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
   windowLabel(i): if i == 0 then 'side window' else 'upper window',
 };
 local pressings(id, title, s) = {
   // A compound row of this bus, titled with the bus's title and the part's `label`.
-  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
+  local part(suffix, label, massKg, pieces, finish, anchors={}, motion=null) = k.compound(id + suffix, massKg, pieces, finish, anchors, motion) + { title: title + ' ' + label },
   local g = layout(s),
   local face = g.face,
   local xf = g.xf,
@@ -259,22 +280,28 @@ local pressings(id, title, s) = {
     ] + (if std.get(s, 'paneSash', false) then [
            box('sash', 'frame', [-w / 2, h * 0.5 - 0.025, -0.03], [w / 2, h * 0.5 + 0.025, 0.03]),
          ] else []), { glass: 'glass-clear', frame: 'steel-grey' }),
-  local leafRow(suffix, label, hingeFraction) =
-    local w = g.leafWidth;
+  // A folding leaf's panel, stiled at both ends so the leaf at rest shows its split line between the panels.
+  local panelRow(suffix, label, span, panel) =
     local h = g.doorHeight;
+    local t = g.doorThick / 2;
     local kick = std.get(s, 'doorKick', 0.3);
-    local hingeSign = if hingeFraction > 0.5 then 1 else -1;
-    part(suffix, label, 45 * w * h, [
-      box('kick', 'door', [-w / 2, 0, -0.03], [w / 2, kick, 0.03]),
-      box('glass', 'glass', [-w / 2, kick, -0.015], [w / 2, h, 0.015]),
-      box('stile', 'door', [hingeSign * w / 2 - 0.03, 0, -0.03], [hingeSign * w / 2 + 0.03, h, 0.03]),
-      box('edge', 'door', [-hingeSign * w / 2 - 0.03, 0, -0.03], [-hingeSign * w / 2 + 0.03, h, 0.03]),
-      box('head', 'door', [-w / 2, h - 0.06, -0.03], [w / 2, h, 0.03]),
-    ], { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, {
-      hinge_a: ['stile', [0.5, 0.1, 0.5]],
-      hinge_b: ['stile', [0.5, 0.9, 0.5]],
-    }),
-  local leaves = if std.get(s, 'doorLeaves', 2) == 2 then [leafRow('_door_fwd', 'front door', 1), leafRow('_door_aft', 'rear door', 0)] else [leafRow('_door', 'door', 1)],
+    local aft = span[0];
+    local fwd = span[1];
+    part(suffix, label, 45 * (fwd - aft) * h, [
+      box('kick', 'door', [aft, 0, -t], [fwd, kick, t]),
+      box('glass', 'glass', [aft, kick, -t / 2], [fwd, h, t / 2]),
+      box('stile_aft', 'door', [aft, 0, -t], [aft + 0.03, h, t]),
+      box('stile_fwd', 'door', [fwd - 0.03, 0, -t], [fwd, h, t]),
+      box('head', 'door', [aft, h - 0.06, -t], [fwd, h, t]),
+    ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion) + { voxelGrain: foldDoor.grain },
+  local leaves = std.flattenArrays([
+    local fold = g.fold(leaf);
+    [
+      panelRow(leaf.suffix + '_jamb', leaf.label + ', jamb panel', fold.span, fold.jamb),
+      panelRow(leaf.suffix + '_free', leaf.label + ', free panel', fold.span, fold.free),
+    ]
+    for leaf in g.leaves
+  ]),
   local bumper(suffix, label, x0, x1, mass) = part(suffix, label, mass, [
     box('bar', 'bar', [x0, std.get(s, 'bumperY', [0.28, 0.6])[0], -(s.side + 0.03125)], [x1, std.get(s, 'bumperY', [0.28, 0.6])[1], s.side + 0.03125]),
   ], { bar: std.get(s, 'bumperFinish', 'plastic-black') }),
@@ -355,9 +382,9 @@ local pressings(id, title, s) = {
   pressings: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
     part('_dashboard', 'dashboard', 40, [
-      box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - 0.14, dashTop(s), -0.28]),
+      box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - glassGap, dashTop(s), -0.28]),
     ] + (if has(s, 'dashShelfTop') then [
-           box('shelf', 'trim', [face - 0.5, s.floor, -0.28], [xf(s.dashShelfTop) - 0.14, s.dashShelfTop, s.skin]),
+           box('shelf', 'trim', [face - 0.5, s.floor, -0.28], [xf(s.dashShelfTop) - glassGap, s.dashShelfTop, s.skin]),
          ] else []), { trim: 'plastic-black' }),
   ] + (if has(s, 'sign') then [
          local y = s.sign.y;
@@ -384,10 +411,13 @@ local items(kit, id, name, s) =
     panel('_dashboard', 'dashboard', ['structure']),
   ]
   + (if std.length(s.decks) > 1 then [panel('_upper_window', 'upper window', ['glazing']), panel('_upper_floor', 'upper floor', ['structure'])] else [])
-  + (if std.get(s, 'doorLeaves', 2) == 2 then [
-       panel('_door_fwd', 'door, forward leaf', ['entry', 'glazing', 'protection']),
-       panel('_door_aft', 'door, rear leaf', ['entry', 'glazing', 'protection']),
-     ] else [panel('_door', 'door', ['entry', 'glazing', 'protection'])])
+  + std.flattenArrays([
+    [
+      panel(leaf.suffix + '_jamb', leaf.item + ', jamb panel', ['entry', 'glazing', 'protection']),
+      panel(leaf.suffix + '_free', leaf.item + ', free panel', ['entry', 'glazing', 'protection']),
+    ]
+    for leaf in g.leaves
+  ])
   + (if g.bonneted then [
        panel('_bonnet', 'bonnet', ['protection']),
        panel('_grille', 'grille', ['protection']),
@@ -422,14 +452,15 @@ local laid(kit, id, s) =
     for i in std.range(0, std.length(s.decks) - 1)
   ]);
   local doorZ = s.side - 0.035;
+  // The free panel rides its jamb panel, so it folds back as the jamb panel turns out.
   local doors = std.flattenArrays([
-    local way = g.doorways[d];
-    local w = g.leafWidth;
-    if std.get(s, 'doorLeaves', 2) == 2 then [
-      fitting('door_fwd_' + d, part('_door_fwd'), [way[1] - w / 2, s.doorSill, doorZ], ['shell']),
-      fitting('door_aft_' + d, part('_door_aft'), [way[0] + w / 2, s.doorSill, doorZ], ['shell']),
-    ] else [fitting('door_' + d, part('_door'), [way[1] - w / 2, s.doorSill, doorZ], ['shell'])]
+    local jamb = g.panelSite(leaf, 'jamb', d);
+    [
+      fitting(jamb, part(leaf.suffix + '_jamb'), [g.panelX(g.doorways[d], leaf, 'jamb'), s.doorSill, doorZ], ['shell']),
+      fitting(g.panelSite(leaf, 'free', d), part(leaf.suffix + '_free'), [g.panelX(g.doorways[d], leaf, 'free'), s.doorSill, doorZ], [jamb], rides=jamb),
+    ]
     for d in std.range(0, std.length(g.doorways) - 1)
+    for leaf in g.leaves
   ]);
   local seats = std.flattenArrays([
     local row = s.seats[i];
@@ -443,6 +474,8 @@ local laid(kit, id, s) =
   ]);
   local d = s.driver;
   local driverBase = if plinthed(s) then 'driver_plinth' else 'shell';
+  // The binnacle faces the driver but stands back from a windscreen raked over the dash, as the dashboard does.
+  local instrumentsX = std.min(d.x + 0.64, g.xf(dashTop(s) + binnacle.height) - glassGap - binnacle.nose);
   // The shell leads: it is the body a vehicle's placements take their tags from.
   [fitting('shell', part('_shell'), origin)]
   + (if plinthed(s) then [fitting('driver_plinth', 'seat_plinth', [d.x, d.y, -d.z], ['shell'])] else [])
@@ -455,7 +488,7 @@ local laid(kit, id, s) =
     // Rises from inside the dash to the top of the wheel's hub.
     fitting('steering_column', 'steering_column', [d.x + 0.5, d.y + 0.4, -d.z], ['dashboard']),
     fitting('steering_wheel', 'steering_wheel', [d.x + 0.42, d.y + 0.62, -d.z], ['steering_column']),
-    fitting('instruments', 'instrument_binnacle', [d.x + 0.64, dashTop(s), -d.z], ['dashboard']),
+    fitting('instruments', 'instrument_binnacle', [instrumentsX, dashTop(s), -d.z], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [d.x + 0.36, d.y, -d.z + 0.34], [driverBase]),
     fitting('rear_axle', axle('beam_axle_truck'), [s.rearAxle, s.wheelR - 0.52, 0], ['shell']),
     fitting('front_axle', axle(std.get(s, 'frontAxlePart', 'steered_axle_heavy')), [s.frontAxle, s.wheelR - 0.52, 0], ['shell']),
@@ -489,6 +522,12 @@ local laid(kit, id, s) =
 local fittings(kit, id, s) = k.painted(id, s, pressings(id, '', s), laid(kit, id, s));
 {
   rows: rows, items: items, fittings: fittings, layout: layout,
+  // The jamb panel sites of each doorway's two leaves, which close against each other; none where a doorway has one leaf.
+  doorPairs(s)::
+    local g = layout(s);
+    if std.length(g.leaves) == 2
+    then [[g.panelSite(leaf, 'jamb', d) for leaf in g.leaves] for d in std.range(0, std.length(g.doorways) - 1)]
+    else [],
   // A seat pair's placement at (x, y), for a spec's `seats`.
   seat(x, y, sides, z=0.72):: { part: 'bus_seat_pair', x: x, y: y, z: z, sides: sides },
   // A single seat's placement; singles stand inboard of the front wheelhouses, where a pair would not fit.

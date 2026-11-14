@@ -31,4 +31,18 @@ local track = import 'track-kit.libsonnet';
   + site.pair('boom_ram', 'excavator_boom_ram')
   + site.batteryBay('battery_tray', [-0.05, s.deck, 0.7]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('boom', 'arm', 0.191,
+      'The arm\'s stick is pinned inside the reach of the boom.'),
+    site.overlap('carbody', 'track_far', 0.06,
+      'The centre of the carbody is drawn out over the link shoes of the track.'),
+    site.overlap('carbody', 'track_near', 0.06,
+      'The centre of the carbody is drawn out over the link shoes of the track.'),
+    site.overlap('house', 'boom', 0.282,
+      'The boom foot is pinned inside the house it swings on.'),
+    site.overlap('house', 'engine', 0.375,
+      'The engine sits under the house hood, which is drawn as a solid block around it.'),
+    site.overlap('house', 'fuel_tank', 0.26,
+      'The fuel tank sits under the house tool cover, which is drawn as a solid block around it.'),
+  ],
 }

@@ -1,4 +1,5 @@
 // The saloon on a battery: the motor sits between the front wheels and the pack lies under the floor pan.
+local site = import 'site.libsonnet';
 local powertrain = import 'powertrain.libsonnet';
 local s = import 'saloon.spec.libsonnet';
 {

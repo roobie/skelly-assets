@@ -27,4 +27,8 @@ local s = import 'skid_steer.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.26, 1.06, 0.38])
   + site.batteryBay('battery_tray', [-0.55, 0.5, 0.3]),
   tags: { 'vehicle-role': ['construction'] },
+  overlaps: [
+    site.overlap('engine_cover', 'engine', 0.176,
+      'The engine sits under the engine cover, which is drawn as a solid block around it.'),
+  ],
 }

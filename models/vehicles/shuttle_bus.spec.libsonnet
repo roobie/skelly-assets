@@ -33,8 +33,8 @@ local single(x, sides) = bus.single(x, sides, z=0.58);
   ],
   rack: { x: 1.65, half: 0.42, z: [0.6, 1.1], y: [1.04, 2.2], shelves: 3 },
   power: {
-    engine: 'engine_i4_diesel', engineAt: [-3.05, 0.3, 0],
-    gearbox: 'gearbox_truck', gearboxAt: [-2.44, 0.36, 0],
+    engine: 'engine_i4_diesel', engineAt: [-3.12, 0.3, 0],
+    gearbox: 'gearbox_truck', gearboxAt: [-2.51, 0.36, 0],
     shafts: [],
     radiator: 'radiator_van', radiatorAt: [-3.72, 0.32, 0],
     tank: 'fuel_tank_van', tankAt: [-3.0, 0.32, 0.72],

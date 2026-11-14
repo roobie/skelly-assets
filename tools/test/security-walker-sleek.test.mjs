@@ -6,7 +6,8 @@ import { test } from 'node:test';
 import { exportPool, exportRecipes } from '../build.mjs';
 import { DEFAULT_CACHE } from '../generation.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
-import { meeting, solid } from './pieces.mjs';
+import { solid } from '../pieceSolid.mjs';
+import { meeting } from './pieces.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const data = JSON.parse(evaluateJsonnet(`{

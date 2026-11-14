@@ -106,8 +106,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('upper_rail', 'steel', [-2.6, 2.2, 0.98], [-0.3, 2.24, 1.1]),
   ], { steel: 'steel-grey' }) + { title: 'APC rifle rack' },
   k.compound('apc_ammo_rack', 60, [
-    box('rack', 'steel', [0.0, s.floor, -0.86], [0.8, 1.45, -0.5]),
-    box('door', 'paint', [0.05, 0.9, -0.5], [0.75, 1.4, -0.48]),
+    // The rack stops under the far wall locker's floor.
+    box('rack', 'steel', [0.0, s.floor, -0.86], [0.8, 1.3, -0.5]),
+    box('door', 'paint', [0.05, 0.9, -0.5], [0.75, 1.25, -0.48]),
   ], paint + { steel: 'steel-grey' }) + { title: 'APC ammo rack' },
   k.compound('apc_driver_panel', 25, [
     box('panel', 'dash', [2.15, 1.3, -1.0], [2.3, 1.55, -0.2]),

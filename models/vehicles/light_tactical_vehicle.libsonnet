@@ -11,6 +11,14 @@ local vehicle = import 'light_tactical_vehicle.placements.libsonnet';
 // A compound row of this vehicle, titled with its title and the part's `label`.
 local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
 local finish = { paint: 'paint-sand', frame: 'steel-parkerized', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear' };
+// The frame's crossmembers, each arched over the drive line's tunnel so the prop shafts pass under it.
+local crossX = [-2.46, -2.3, -1.5, -0.55, 0.5, 1.2, 2.18];
+local tunnel = 0.26;
+local crossmember(name, x) = [
+  box(name, 'frame', [x - 0.04, s.railTop - 0.03, -tunnel], [x + 0.04, s.railTop, tunnel]),
+  box(name + '_near', 'frame', [x - 0.04, s.railLow, tunnel], [x + 0.04, s.railTop, s.railZ]),
+  box(name + '_far', 'frame', [x - 0.04, s.railLow, -s.railZ], [x + 0.04, s.railTop, -tunnel]),
+];
 // A flat-headed wheel opening with straight jambs and two chamfered top corners, the class's mark, where the other 4x4s have round arches.
 local bandWide = 0.05;
 local shoulder = s.archTop - s.archChamfer;
@@ -73,8 +81,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   ]), { steel: 'steel-grey' }),
   part('_rear_prop_shaft', 'rear prop shaft', 18, [k.turned('tube', 'steel', 'x', k.disc(0.04, -1.08, 1.08))], { steel: 'steel-grey' }),
   part('_frame', 'frame', s.frameMass, [
-    box('cross_' + i, 'frame', [[-2.46, -2.3, -1.5, -0.55, 0.5, 1.2, 2.18][i] - 0.04, s.railLow, -s.railZ], [[-2.46, -2.3, -1.5, -0.55, 0.5, 1.2, 2.18][i] + 0.04, s.railTop, s.railZ])
-    for i in std.range(0, 6)
+    piece
+    for i in std.range(0, std.length(crossX) - 1)
+    for piece in crossmember('cross_' + i, crossX[i])
   ] + [
     box('bearer_aft', 'frame', [-2.12, s.railTop, -s.railZ], [-2.06, s.bedUnder, s.railZ]),
     box('bearer_fore', 'frame', [-1.5, s.railTop, -s.railZ], [-1.44, s.bedUnder, s.railZ]),

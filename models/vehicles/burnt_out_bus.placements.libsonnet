@@ -28,4 +28,14 @@ local s = import 'burnt_out_bus.spec.libsonnet';
     pair('seat_' + i, 'burnt_out_bus_seat_frame', [s.seats[i].x, s.seats[i].y, 0.72])
     for i in std.range(0, std.length(s.seats) - 1)
   ]),
+  overlaps: [
+    site.overlap('floor', 'front_rim_far', 0.046,
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
+    site.overlap('floor', 'front_rim_near', 0.044,
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
+    site.overlap('floor', 'rear_rim_far', 0.046,
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
+    site.overlap('floor', 'rear_rim_near', 0.047,
+      'The side strip of the floor lies across the outer band of the bare rim under it.'),
+  ],
 }

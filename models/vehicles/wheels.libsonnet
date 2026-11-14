@@ -30,12 +30,12 @@
     tyre: { id: 'tyre_295_80r22_5', title: 'Tyre 295/80R22.5', massKg: 58, width: 0.295, outer: 0.522 },
     rim: { id: 'rim_22_5_steel', title: '22.5-inch steel rim', massKg: 27, radius: 0.286, width: 0.21, wall: 0.025, face: 0.04, faceThickness: 0.03, hub: 0.14, spokes: 8, spokeWidth: 0.08, finish: 'steel-grey' },
   },
-  // A 14.00 R25 flotation tyre on a 25-inch steel disc wheel, as off-road crash tenders and cranes run. Masses are
-  // estimates for the size.
+  // A 14.00 R25 flotation tyre on a 25-inch steel disc wheel, as off-road crash tenders run, with a lugged tread for
+  // soft ground off the runway. Masses are estimates for the size.
   wheel_385_95r25: {
     title: 'Wheel 385/95R25',
     class: 'heavy',
-    tyre: { id: 'tyre_385_95r25', title: 'Tyre 385/95R25', massKg: 150, width: 0.385, outer: 0.685 },
+    tyre: { id: 'tyre_385_95r25', title: 'Tyre 385/95R25', massKg: 150, width: 0.385, outer: 0.685, tread: { lugs: 24, depth: 0.035 } },
     rim: { id: 'rim_25_steel', title: '25-inch steel rim', massKg: 85, radius: 0.3175, width: 0.254, wall: 0.03, face: 0.05, faceThickness: 0.035, hub: 0.16, spokes: 10, spokeWidth: 0.08, finish: 'steel-grey' },
   },
   // An 18.00 R25 flotation tyre on a wide 25-inch steel disc wheel, as heavy cranes and container handlers run. Masses

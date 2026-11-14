@@ -21,7 +21,8 @@ local s = import 'army_jeep.spec.libsonnet';
     one('radiator', 'radiator_small', [1.44, 0.58, 0]),
     one('fuel_tank', 'fuel_tank_car', [-1.42, 0.35, 0]),
     one('exhaust', 'exhaust_military', [s.rearAxle - 0.34, 0.44, 0.42]),
-    one('spare_wheel', 'spare_wheel_carrier', [s.rear, 0.76, 0]),
+    // The spare rides high enough on the tail for the tow hitch's neck and ball to pass under it.
+    one('spare_wheel', 'spare_wheel_carrier', [s.rear, 0.93, 0]),
     one('tow_hitch', 'tow_hitch', [s.rear, 0.42, 0]),
     one('steering_wheel', 'steering_wheel', [0.08, 0.98, -0.3]),
     one('gear_lever', 'gear_lever', [0.02, s.floor + 0.1, 0]),

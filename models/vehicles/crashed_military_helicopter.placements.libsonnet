@@ -23,4 +23,10 @@ local s = import 'crashed_military_helicopter.spec.libsonnet';
   + pair('engine', 'crashed_military_helicopter_engine', [-0.75, s.enginesY, s.enginesZ])
   + pair('seat_frame', 'crashed_military_helicopter_seat_frame', [2.15, s.deck + 0.18, 0.55]),
   tags: { 'vehicle-role': ['military'] },
+  overlaps: [
+    site.overlap('cowling', 'engine_far', 0.04,
+      'The front of the far engine reaches past the tapering cowling and into its wall.'),
+    site.overlap('fuselage', 'main_gearbox', 0.044,
+      'The base of the gearbox sits in the roof skin of the fuselage.'),
+  ],
 }

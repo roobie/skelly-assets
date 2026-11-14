@@ -5,6 +5,7 @@ local s = t.spec(import 'fire_engine.spec.libsonnet');
   title: 'Fire engine',
   sites: t.fittings(site.kit, 'fire_engine', s) + [
     site.one('body', 'fire_engine_body'),
+    site.one('rear_wall', 'fire_engine_rear_wall'),
     site.one('cab_stripe', 'fire_engine_cab_stripe'),
     site.one('water_tank', 'fire_engine_water_tank'),
     site.one('gantry', 'fire_engine_gantry'),
@@ -14,8 +15,13 @@ local s = t.spec(import 'fire_engine.spec.libsonnet');
     site.one('rear_step', 'fire_engine_rear_step'),
     site.one('crew_bench', 'bench_seat_3', [1.32, s.floor, 0]),
   ]
-  + site.pair('lockers', 'fire_engine_lockers')
+  + std.flattenArrays([site.pair('locker_shutter_' + name, 'fire_engine_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
+  + std.flattenArrays([site.pair('locker_stowage_' + name, 'fire_engine_locker_stowage_' + name) for name in std.objectFields(s.stowage)])
   + site.pair('cab_beacon', 'beacon_blue', [s.face - s.lean - 0.45, s.roof + 0.11, 0.9])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 0.95]),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

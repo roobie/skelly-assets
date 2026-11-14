@@ -16,4 +16,8 @@ local s = import 'abandoned_pickup.spec.libsonnet';
   ]
   + pair('front_stack', 'abandoned_pickup_block_stack', [s.frontAxle, 0, s.stackZ])
   + pair('rear_stack', 'abandoned_pickup_block_stack', [s.rearAxle, 0, s.stackZ]),
+  overlaps: [
+    site.overlap('cab', 'door', 0.063,
+      'The door skin is drawn closed over the sill box of the cab.'),
+  ],
 }

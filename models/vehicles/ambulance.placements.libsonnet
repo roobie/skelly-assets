@@ -11,7 +11,7 @@ local tail = van.tail(s);
     site.one('light_bar', 'light_bar_blue', [0.3, s.roof, 0]),
     site.one('rear_step', 'rear_step_tread', [s.rear + 0.12, 0.6, 0]),
     site.one('markings', 'ambulance_markings'),
-    site.one('door_markings', 'ambulance_door_markings'),
+    site.one('door_markings', 'ambulance_door_markings', rides='side_door'),
   ]
   + site.pair('rear_markings', 'ambulance_rear_markings')
   + site.pair('box_beacon_rear', 'beacon_blue', [tail + 0.25, s.box.roof, 0.75]),

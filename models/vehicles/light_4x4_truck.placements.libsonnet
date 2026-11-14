@@ -16,9 +16,14 @@ local shaftRear = s.transferX - 0.2;
       site.one('transfer_case', id + '_transfer_case', [s.transferX, s.transferY, 0]),
       site.one('front_shaft', id + '_front_shaft', [(s.transferX + 0.2 + s.frontAxle - 0.2) / 2, s.shaftY, 0]),
       site.one('fuel_tank_far', 'fuel_tank_truck', [s.tankX, s.tankY, -(s.side - 0.34)]),
-      site.one('spare_wheel', id + '_spare_wheel', [s.cabBack - 0.01, s.railTop + s.r + 0.02, 0]),
+      // The engine's head rises behind the cab, so the spare hangs on the cab's back wall above it, level with the floor.
+      site.one('spare_wheel', id + '_spare_wheel', [s.cabBack - 0.01, s.floor + s.r, 0]),
       site.one('platform', id + '_platform'),
       site.one('tailgate', id + '_tailgate'),
     ] + site.pair('dropside', id + '_dropside'),
   ),
+  overlaps: [
+    site.overlap('cab', 'air_box', 0.123,
+      'The air box sits in the cab well, which is drawn as a solid block around it.'),
+  ],
 }

@@ -1,21 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorFindings, strapFindings } from '../strap-fit.mjs';
-
-// Closed axis-aligned boxes of 12 outward-wound triangles each, as one mesh.
-const boxes = (...spans) => {
-  const positions = [], indices = [];
-  for (const [min, max] of spans) {
-    const base = positions.length / 3;
-    for (const z of [min[2], max[2]]) for (const y of [min[1], max[1]]) for (const x of [min[0], max[0]]) positions.push(x, y, z);
-    indices.push(...[
-      0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6,
-      0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7,
-      0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5,
-    ].map((i) => base + i));
-  }
-  return { positions, indices };
-};
+import { anchorFindings, strapFindings, treeStrapFindings } from '../strap-fit.mjs';
+import { boxes } from './boxes.mjs';
 
 // A box head 40 mm wide and 50 mm deep, and a strap drawn on a 2 mm grain with a two-voxel wall round a plan of the
 // same size, its inner faces standing `gap` off that plan on each side, centred `shift` along z in the gear frame.
@@ -73,4 +59,8 @@ test('strap anchors fit where the head lies within the strap thickness inward of
 test('strap anchors naming the outer face as the inner one are reported', () => {
   const swapped = leftAnchors({ inner: -(HALF[0] + GRAIN + WALL), outer: -(HALF[0] + GRAIN) });
   assert.match(anchorsFit(swapped)[0], /^gear: looking in from its left strap's inner anchor .*, the head is missed/);
+});
+
+test('an empty table of band-fitted models is a finding, not a pass', () => {
+  assert.deepEqual(treeStrapFindings('', { models: [] }, undefined, {}), ['models/head-band.libsonnet wears no band-fitted model']);
 });

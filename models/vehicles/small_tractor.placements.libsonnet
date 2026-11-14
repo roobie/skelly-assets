@@ -28,4 +28,10 @@ local s = import 'small_tractor.spec.libsonnet';
   + site.headlamps(s.nose, 0.98, 0.2)
   + site.batteryBay('battery_tray', [0.2, 0.92, 0]),
   tags: { 'vehicle-role': ['farm'] },
+  overlaps: [
+    site.overlap('chassis', 'gearbox', 0.28,
+      'The gearbox sits in the transmission block of the chassis, which is drawn solid around it.'),
+    site.overlap('chassis', 'rear_axle', 0.245,
+      'The rear axle\'s differential sits in the transmission block of the chassis, which is drawn solid around it.'),
+  ],
 }

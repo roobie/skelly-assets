@@ -20,4 +20,8 @@ local s = import 'scooter.spec.libsonnet';
     site.one('centre_stand', 'motorbike_centre_stand', [0.125, 0, 0]),
     site.one('tail_lamp', 'tail_lamp_small', [-0.89, 0.53, 0]),
   ],
+  overlaps: [
+    site.overlap('leg_shield', 'fork', 0.05,
+      'The horn cover of the leg shield is drawn solid around the top of the fork stem it covers.'),
+  ],
 }

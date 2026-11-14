@@ -19,6 +19,7 @@ import {
   strictObject,
   string,
   tuple,
+  variant,
 } from 'valibot';
 
 export const ModelPointSchema = tuple([pipe(number(), finite()), pipe(number(), finite()), pipe(number(), finite())]);
@@ -108,6 +109,59 @@ const surfaceEntries = {
   size: tuple([pipe(number(), finite(), minValue(0)), pipe(number(), finite(), minValue(0))]),
 };
 
+const positive = pipe(
+  number(),
+  finite(),
+  check((value) => value > 0, 'must be positive'),
+);
+
+/** The authored stop of a hinge in degrees: a part opening further than a half turn would pass through its carrier. */
+export const OpenAngleSchema = pipe(positive, maxValue(180));
+
+/** A stage's part of its motion's clock, from 0 to 1, which it runs through linearly. */
+const ShareSchema = pipe(
+  number(),
+  finite(),
+  check((share) => share > 0 && share <= 1, 'stage share must be above 0 and at most 1'),
+);
+
+/**
+ * A part's motion from rest to its design stop, in the model frame and metres: rigid stages run one after another,
+ * each through its `share` of the clock. A hinge turns `angle` degrees about the line `from` → `to`, signed by the
+ * right-hand rule; a slide moves `travel` along `direction`, and a stowing slide hides what it carries past `stow`, an
+ * offset along its direction in the frame just outside it; see `src/motion.ts`, `isStowed`. Every stage is given in the part's rest frame, and the
+ * first carries the rest; see `src/motion.ts`, `posePoint`. A far-side twin's motion is not stored; see
+ * `src/motion.ts`, `mirrorMotion`.
+ */
+export const MotionSchema = pipe(
+  array(
+    variant('kind', [
+      strictObject({
+        kind: literal('hinge'),
+        axis: pipe(
+          strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
+          check(({ from, to }) => from.some((value, axis) => value !== to[axis]), 'hinge axis needs two distinct points'),
+        ),
+        angle: pipe(
+          number(),
+          finite(),
+          check((angle) => angle !== 0 && Math.abs(angle) <= 180, 'hinge angle must be nonzero, at most a half turn'),
+        ),
+        share: ShareSchema,
+      }),
+      strictObject({
+        kind: literal('slide'),
+        direction: UnitVectorSchema,
+        travel: positive,
+        stow: optional(pipe(number(), finite())),
+        share: ShareSchema,
+      }),
+    ]),
+  ),
+  nonEmpty(),
+  check((stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9, 'stage shares must sum to 1'),
+);
+
 export const NeutralModelSchema = strictObject({
   id: Id,
   file: pipe(string(), regex(/^assets\/models\/[a-z0-9_-]+\.glb$/, 'expected "assets/models/<name>.glb"')),
@@ -145,6 +199,8 @@ export const NeutralModelSchema = strictObject({
   /** Degrees about +z, the working end, applied to the model before its grip turn. */
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
+  /** How the part moves on whatever carries it, the same wherever it is placed. */
+  motion: optional(MotionSchema),
   /** The screen of an item that shows something. */
   display: optional(
     pipe(
@@ -177,3 +233,6 @@ type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonl
 export type NeutralModel = DeepReadonly<InferOutput<typeof NeutralModelSchema>>;
 export type ModelParts = NonNullable<NeutralModel['parts']>;
 export type ModelBox = DeepReadonly<InferOutput<typeof ModelBoxSchema>>;
+export type Motion = DeepReadonly<InferOutput<typeof MotionSchema>>;
+export type MotionStage = Motion[number];
+export type HingeAxis = Extract<MotionStage, { kind: 'hinge' }>['axis'];
