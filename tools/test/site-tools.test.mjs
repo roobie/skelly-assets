@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -19,4 +19,13 @@ test('a served tool page or viewer that no link names is reported, and a linked 
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
+});
+
+test('every module a site page imports from its own folder is one the build ships', () => {
+  const site = join(import.meta.dirname, '../../site');
+  const shipped = readFileSync(join(site, 'build.mjs'), 'utf8');
+  const pages = readdirSync(site).filter((f) => /\.m?js$/.test(f) && !f.startsWith('build'));
+  const imported = new Set(pages.flatMap((f) => [...readFileSync(join(site, f), 'utf8').matchAll(/from '\.\/([\w-]+\.mjs)'/g)].map(([, module]) => module)));
+  assert.ok(imported.size > 0);
+  for (const module of imported) assert.ok(shipped.includes(`'${module}'`), `${module} is imported by a site page but not copied by site/build.mjs`);
 });
