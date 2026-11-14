@@ -5,6 +5,7 @@
   "license": "EUPL-1.2",
   "type": "module",
   "scripts": {
+    "predev": "node ../../sources.mjs",
     "dev": "vite",
     "prebuild": "node ../../sources.mjs",
     "build": "tsc && vite build",

@@ -18,6 +18,7 @@ import {
   type Vec3,
 } from './editor.ts';
 import type { VehicleBlueprintInput } from './export.ts';
+import { mountVehicles } from './vehiclesView.ts';
 
 const select = document.querySelector<HTMLSelectElement>('#blueprint')!;
 const table = document.querySelector<HTMLTableSectionElement>('#fittings')!;
@@ -307,3 +308,22 @@ download.addEventListener('click', () => {
     message.textContent = error instanceof Error ? error.message : String(error);
   }
 });
+
+const views = {
+  blueprints: { button: document.querySelector<HTMLButtonElement>('#show-blueprints')!, section: document.querySelector<HTMLElement>('#blueprints-view')! },
+  vehicles: { button: document.querySelector<HTMLButtonElement>('#show-vehicles')!, section: document.querySelector<HTMLElement>('#vehicles-view')! },
+};
+let vehiclesMounted = false;
+const showView = (name: keyof typeof views) => {
+  for (const [key, { button, section }] of Object.entries(views)) {
+    section.hidden = key !== name;
+    button.setAttribute('aria-pressed', String(key === name));
+  }
+  if (name === 'vehicles' && !vehiclesMounted) {
+    vehiclesMounted = true;
+    void mountVehicles(views.vehicles.section);
+  }
+};
+for (const [name, { button }] of Object.entries(views)) {
+  button.addEventListener('click', () => showView(name as keyof typeof views));
+}
