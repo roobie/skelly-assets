@@ -17,9 +17,9 @@
   railBottom: 1.15, railTop: 1.45, railZ: 0.72,
   engine: 'engine_v8_diesel_heavy', engineLength: 1.15, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   // The V8 stands too tall to sit under the cab floor over the front axle, so it sits behind the front wheel wells,
-  // under the cab's back and the body's front, with its gearbox between the same two crossmembers and the front shaft
-  // passing under its block. The radiator ahead drops to stay under the cab floor, the exhaust passes under the rear
-  // axles, and the fuel tank and battery hang behind the engine.
+  // under the cab's back and the body's front, with the front shaft passing under its block. The radiator ahead drops
+  // to stay under the cab floor, the exhaust passes under the rear axles, and the fuel tank and battery hang behind the
+  // engine.
   engineX: 2.35, engineY: 0.53, radiatorY: 0.63, exhaustY: 0.41, tankX: 1.35,
   // The transfer case's middle and half length, and the span of each shaft it drives: the front one to the face of the
   // front axle's differential, the rear one back to the first rear axle.
