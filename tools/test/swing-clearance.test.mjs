@@ -154,10 +154,15 @@ const curtain = ({ stow }) => ({
   pieces: [box('slats', [-0.2, 0, -0.5], [-0.2 + GRAIN, 1, 0.5])],
   stages: [{ kind: 'slide', toward: 'up', travel: 0.8, ...(stow ? { stow: true } : {}) }],
 });
-const curtainSite = () => site('shutter', 'shutter', curtain({ stow: true }).pieces);
+// The curtain's part is drawn at the origin, and the vehicle places it, and what stands around it, a way up from there:
+// its stow plane is the part's, carried by the same `at`.
+const AT = [0, 0.25, 0];
+const moved = (piece) => ({ ...piece, ...(piece.min && { min: piece.min.map((value, axis) => value + AT[axis]), max: piece.max.map((value, axis) => value + AT[axis]) }), ...(piece.origin && { origin: piece.origin.map((value, axis) => value + AT[axis]) }) });
+const placed = (id, pieces) => site(id, id, pieces.map(moved), { at: AT });
+const curtainSite = () => placed('shutter', curtain({ stow: true }).pieces);
 
 test('a stowing curtain rises into its head without meeting it, where the same curtain left drawn would', () => {
-  const head = site('head', 'head', [box('cap', [-0.2 - GRAIN, 1, -0.5], [-0.2 + 2 * GRAIN, 1.3, 0.5])]);
+  const head = placed('head', [box('cap', [-0.2 - GRAIN, 1, -0.5], [-0.2 + 2 * GRAIN, 1.3, 0.5])]);
   assert.ok(reached(sweep({ shutter: curtain({ stow: false }) }, [curtainSite(), head]), 'shutter', 'head') > 0);
   assert.equal(reached(sweep({ shutter: curtain({ stow: true }) }, [curtainSite(), head]), 'shutter', 'head'), 0);
 });
@@ -166,7 +171,7 @@ test('the all-open pose leaves out what a curtain has stowed and still meets wha
   // Two lids lie beside the curtain's way and open up and back over it: the high one through where the stowed curtain
   // would stand drawn, the low one through the part still shown at its stop.
   const [high, low] = [flap(0.5, { y: 1.3, open: 120 }), flap(0.5, { y: 0.55, open: 120 })];
-  const sites = [site('high', 'high', high.pieces), site('low', 'low', low.pieces), curtainSite()];
+  const sites = [placed('high', high.pieces), placed('low', low.pieces), curtainSite()];
   const open = (stow) => sweep({ high, low, shutter: curtain({ stow }) }, sites).open.map(({ sites: pair }) => pair.toSorted().join(' '));
   assert.ok(open(false).includes('high shutter'));
   assert.deepEqual(open(true), ['low shutter']);
