@@ -207,7 +207,7 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
     console.log(cacheReport(pool.usage()));
-    await swingResults(readSitePieces(root), { cache, shard });
+    await swingResults(readSitePieces(repo), { cache, shard });
   } finally {
     await pool.close();
   }
