@@ -1,6 +1,9 @@
 local site = import 'site.libsonnet';
 local s = import 'bulldozer.spec.libsonnet';
 local track = import 'track-kit.libsonnet';
+local cooling = import 'cooling-kit.libsonnet';
+local engine = import 'engine-kit.libsonnet';
+local engineName = 'i6_off_highway_diesel';
 {
   title: 'Bulldozer',
   sites: [
@@ -12,8 +15,13 @@ local track = import 'track-kit.libsonnet';
     site.one('windscreen', 'bulldozer_windscreen'),
     site.one('blade', 'bulldozer_blade'),
     site.one('ripper', 'bulldozer_ripper'),
-    site.one('engine', 'engine_i6_heavy_diesel', [0.82, 0.52, 0]),
-    site.one('radiator', 'radiator_truck', [1.66, s.frameTop, 0]),
+    site.one('tilt_cylinder', 'bulldozer_tilt_cylinder'),
+    site.one('tilt_brace', 'bulldozer_tilt_brace') + { mirror: true },
+  ]
+  // The engine and radiator are fitted as assemblies so each accessory is its own salvage. The engine stands high
+  // enough that its starter and alternator clear the frame rails beside its sump.
+  + engine.sites(engineName, [0.9, 0.82, 0], 'assembly')
+  + cooling.sites(engine.radiator(engineName), [1.66, s.frameTop, 0], 'assembly') + [
     site.one('transmission', 'gearbox_heavy', [-0.45, 0.42, 0]),
     site.one('exhaust', 'exhaust_stack_small', [1.05, 2.0, -0.25]),
     site.one('seat_riser', 'seat_riser', [-0.75, s.deck + 0.05, 0]),

@@ -76,8 +76,8 @@ local times(v, s) = [x * s for x in v];
 local frame(turn, origin) = { turn: turn, origin: origin };
 local at(f, p) = add(f.origin, rot.apply(f.turn, times(p, k)));
 
-// The doll's measures cut k times larger: every length scales, shares and powers do not.
-local isShare(field) = std.endsWith(field, 'Share') || std.endsWith(field, 'Shares') || std.endsWith(field, 'Power') || field == 'armpit';
+// The doll's measures cut k times larger: every length scales, shares, powers and counts do not.
+local isShare(field) = std.endsWith(field, 'Share') || std.endsWith(field, 'Shares') || std.endsWith(field, 'Power') || std.endsWith(field, 'Count') || field == 'armpit';
 local scaledMeasures(m) = {
   [f]: local v = m[f];
     if std.type(v) == 'number' && !isShare(f) then v * k

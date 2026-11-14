@@ -11,6 +11,11 @@ local core = [
   station + { top: station.top - 0.05, bottom: station.bottom + 0.05, half: std.max(station.half - 0.05, 0.03) }
   for station in s.body
 ];
+// The sliding door rolls back until its rear edge reaches the cabin's rear end, where the clamshell doors swing.
+local slideTravel = s.doorRear - s.tail;
+// The door runs on a sill track at the waist, grown sideways by the plug so it meets the plugged door's inner face, along
+// the door's whole path.
+local tracked = [station + { half: station.half + s.slidingDoorPlug - h.skinThick } for station in s.body];
 local hinges = { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] };
 local proudCowl = h.proud(s.cowl, 0.035);
 // A green cross on a white field in the lower band behind the sliding door, below the rear window. Skin tiles follow the
@@ -81,15 +86,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + skin('stile_front', 'paint', [s.doorMid - 0.14, s.doorMid - 0.035], [40, 62])
              + skin('mid', 'paint', [s.doorRear + 0.035, s.doorMid - 0.035], [62, 72])
              + skin('lower', 'accent', [s.doorRear + 0.035, s.doorMid - 0.035], [72, 90])
-             + [
-               h.hingeRib('hinge_rib', s.body, s.doorMid - 0.065, s.roofArc + 4, 88),
-               box('handle', 'dark', [s.doorMid - 0.3, 1.34, 0.86], [s.doorMid - 0.14, 1.38, 0.92]),
-             ],
+             + [box('handle', 'dark', [s.doorMid - 0.3, 1.34, 0.86], [s.doorMid - 0.14, 1.38, 0.92])],
              { glass: 'glass-clear', paint: s.paint, frame: s.paint, accent: s.accent, dark: trim },
-             hinges) + { title: 'Air ambulance sliding door' },
-  k.compound('air_ambulance_door_track', 5, [
-    box('sill_track', 'dark', [-1.85, 0.8, 0.84], [s.doorRear, 0.84, 0.92]),
-  ], { dark: trim }) + { title: 'Air ambulance door track' },
+             motion=k.motion.slide('near', s.slidingDoorPlug) + k.motion.slide('rear', slideTravel)) + { title: 'Air ambulance sliding door' },
+  k.compound('air_ambulance_door_track', 5,
+             h.shell('sill_track', 'dark', tracked, thick=s.slidingDoorPlug - h.skinThick, x=[s.doorRear - slideTravel, s.doorMid], arc=[90, 95], sides=120),
+             { dark: trim }) + { title: 'Air ambulance door track' },
   k.compound('air_ambulance_clamshell_door', 26,
              h.shell('wall', 'paint', s.clamshell, thick=0.06, x=[-2.19, s.tail - 0.0], arc=[3, 177], sides=32)
              + h.loft('plate', 'paint', s.clamshell, x=[-2.25, -2.19], arc=[3, 177], step=0.06, sides=32)

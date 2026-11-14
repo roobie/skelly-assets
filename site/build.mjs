@@ -100,6 +100,10 @@ const wearables = new Set(models.filter((model) => isWearable(model, models)));
 const dressing = readDressing(root);
 const doll = wearables.size > 0 ? readDoll(built, manifest, dressing) : undefined;
 const boxOf = (id) => modelBox(readFileSync(join(built, modelsById.get(id).file)));
+const anchorsOf = (id) => {
+  const { sidecar } = modelsById.get(id);
+  return sidecar ? JSON.parse(readFileSync(join(built, sidecar), 'utf8')).anchors ?? {} : {};
+};
 // A wearable shows itself worn beside its loose views, and any other model that comes apart shows its components apart.
 const apart = (model) => {
   const components = modelComponents(readFileSync(join(built, model.file)));
@@ -109,7 +113,7 @@ const history = values.history && JSON.parse(readFileSync(values.history, 'utf8'
 // Each model and vehicle against the release, through the renames since, by the code that writes the next release's history.
 const stands = history && standings(history, hashModels(built, manifest), manifest.renames);
 const shown = models.map((model) => {
-  const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf }) } : apart(model);
+  const entry = wearables.has(model) ? { ...model, worn: wornSites(model, { dressing, doll, models, boxOf, anchorsOf }) } : apart(model);
   return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
 const missingParts = (sites) => sites.filter(({ part }) => !modelsById.has(part)).map(({ part }) => part);

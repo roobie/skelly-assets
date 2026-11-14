@@ -1,4 +1,5 @@
 {
+  "airport_crash_tender_lockers": "airport_crash_tender_locker_shutter_fore",
   "ambulance_bonnet": "panel_van_bonnet",
   "ambulance_dashboard": "van_dashboard",
   "ambulance_front_bumper": "panel_van_front_bumper",
@@ -44,6 +45,7 @@
   "cube_van_windscreen": "van_windscreen",
   "double_decker_door_aft": "double_decker_door_aft_jamb",
   "double_decker_door_fwd": "double_decker_door_fwd_jamb",
+  "fire_engine_lockers": "fire_engine_locker_shutter_fore",
   "food_truck_bonnet": "step_van_bonnet",
   "food_truck_dashboard": "step_van_dashboard",
   "food_truck_front_bumper": "step_van_front_bumper",
@@ -145,6 +147,7 @@
   "school_bus_door": "school_bus_door_jamb",
   "security_van_bonnet": "panel_van_bonnet",
   "security_van_dashboard": "van_dashboard",
+  "security_van_side_door_bars": "security_van_side_door_lock_bar",
   "security_van_windscreen": "van_windscreen",
   "semi_tractor_stack": "exhaust_semi_tractor",
   "shuttle_bus_door_aft": "shuttle_bus_door_aft_jamb",

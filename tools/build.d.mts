@@ -17,4 +17,6 @@ export function exportRecipes(options: {
   root?: string;
   out?: string;
   tools: readonly RecipeToolName[];
+  /** Generates each row; the default is a pool of worker threads. */
+  pool?: { run(input: { tool: RecipeToolName; task: unknown }): Promise<unknown> };
 }): Promise<{ models: RecipeModel[]; files: string[] }>;

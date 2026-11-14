@@ -5,9 +5,14 @@ local m = import 'machine-kit.libsonnet';
 local s = import 'military_transport_helicopter.spec.libsonnet';
 local box = k.box;
 local finishes = { paint: s.paint, dark: s.trim, glass: 'glass-clear' };
-local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, x=x, arc=arc, step=step, sides=sides);
-local proud = h.proud(s.body, 0.04);
+local skinThick = 0.075;
+local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=skinThick, x=x, arc=arc, step=step, sides=sides);
 local door = s.cabinDoor;
+local doorTravel = door[1] - door[0];
+// The door runs on a sill rail at the waist, where the section is widest, so a rail grown sideways by the plug meets the
+// plugged door's inner face square on and stays clear of the engines on the roof.
+local railed = [station + { half: station.half + s.cabinDoorPlug - skinThick } for station in s.body];
+local rail(id, arc) = h.shell(id, 'dark', railed, thick=s.cabinDoorPlug - skinThick, x=[door[0], door[1] + doorTravel], arc=arc, step=0.9, sides=120);
 local pane = s.cabinPane;
 local paneX = s.cabinPaneX;
 local cockpit = s.cockpitDoor;
@@ -18,7 +23,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('military_transport_helicopter_belly', s.shellMass,
              h.loft('nose', 'paint', s.body, x=[3.3, s.nose], arc=[90, 270], sides=24)
              + h.loft('middle', 'paint', s.body, x=[s.bulkhead, 2.6], arc=[90, 270], step=4.2, sides=24)
-             + h.loft('shoulder', 'paint', s.body, x=[2.6, 3.3], arc=[90, 270], step=0.125, sides=24),
+             + h.loft('shoulder', 'paint', s.body, x=[2.6, 3.3], arc=[90, 270], step=0.125, sides=24)
+             + rail('rail_near', [90, 93])
+             + rail('rail_far', [267, 270]),
              finishes) + { title: 'Military transport helicopter belly' },
   k.compound('military_transport_helicopter_tail_cone', 160,
              wall('wall', 'paint', [s.tailEnd, s.bulkhead], [-180, 180], sides=24)
@@ -37,9 +44,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('gun_sill_far', 'paint', gun, [-90, -gunArc[1]], step=0.7)
              + wall('cabin_roof', 'paint', door, [-s.cabinArc, s.cabinArc], step=0.7)
              + wall('cabin_rear', 'paint', [s.bulkhead, door[0]], h.dome, step=0.25)
-             + h.loft('bulkhead', 'paint', s.body, x=[s.bulkhead, s.bulkhead + 0.05], arc=h.dome, step=0.05, sides=24)
-             + h.shell('rail_near', 'dark', proud, x=[door[0], door[1] + 0.6], arc=[s.cabinArc - 3, s.cabinArc], step=0.9, sides=120)
-             + h.shell('rail_far', 'dark', proud, x=[door[0], door[1] + 0.6], arc=[-s.cabinArc, -s.cabinArc + 3], step=0.9, sides=120),
+             + h.loft('bulkhead', 'paint', s.body, x=[s.bulkhead, s.bulkhead + 0.05], arc=h.dome, step=0.05, sides=24),
              finishes) + { title: 'Military transport helicopter roof' },
   k.compound('military_transport_helicopter_windscreen', 30,
              wall('near', 'glass', s.windscreen, [3, s.windscreenArc])
@@ -61,10 +66,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('fore', 'paint', [paneX[1], door[1]], pane, step=0.6)
              + wall('aft', 'paint', [door[0], paneX[0]], pane, step=0.6)
              + wall('edge_fore', 'dark', [door[1] - 0.04, door[1]], [s.cabinArc, 90], step=0.04)
-             + wall('edge_aft', 'dark', [door[0], door[0] + 0.04], [s.cabinArc, 90], step=0.04)
-             + [h.hingeRib('hinge_rib', s.body, door[0] + 0.03, 58, 88, slot='dark', depth=0.05)],
+             + wall('edge_aft', 'dark', [door[0], door[0] + 0.04], [s.cabinArc, 90], step=0.04),
              finishes,
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Military transport helicopter cabin door' },
+             // Forward, where the cabin's section runs on unchanged, rather than aft into the narrowing tail.
+             motion=k.motion.slide('near', s.cabinDoorPlug) + k.motion.slide('fore', doorTravel)) + { title: 'Military transport helicopter cabin door' },
   k.compound('military_transport_helicopter_side_window', 6,
              wall('pane', 'glass', gun, gunArc, step=0.7),
              finishes) + { title: 'Military transport helicopter side window' },

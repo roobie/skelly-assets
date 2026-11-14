@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local box = h.box;
 local rad(deg) = deg * std.pi / 180;
 // A box from two opposite corners given in any order, for pieces mirrored across x.
@@ -101,36 +102,36 @@ local closeHelm(id, mass, comb, lames, reinforce, raised) =
   + { voxelGrain: 0.004 };
 
 [
-  // A padded tank crew helmet standing on its ear flaps, front on +z, 220 mm across and 200 mm tall: a soft canvas
-  // cap with three thick padded rolls running front to back over the crown, a padded brow roll round the front and
-  // sides, ear flaps with headset earpieces, a chin strap and the headset lead with its plug at the back.
-  local y0 = 0.07, a = 0.095, ht = 0.13, R = (a * a + ht * ht) / (2 * ht), c = ht - R;
+  // A padded tank crew helmet standing on its ear flaps, front on +z: a soft canvas cap with three thick padded rolls
+  // running front to back over the crown, a padded brow roll round the front and sides, ear flaps with headset
+  // earpieces, a chin strap and the headset lead dropping from its socket at the nape. It is worn with the cap's rim
+  // at the hairline, its round plan an underlayer clear of the hair's farthest reach.
+  local y0 = 0.07, a = fit.headroom(0).reach + fit.layers.under, ht = 0.13, R = (a * a + ht * ht) / (2 * ht), c = ht - R;
   h.compound('tank_crew_helmet', 0.59, [
     h.turned('cap', 'cap', 'y', [[0, 0], [0, a]] + [[(y), std.sqrt(R * R - (y - c) * (y - c))] for y in [0.03, 0.06, 0.09, 0.11, 0.122]] + [[ht, 0]], [0, y0, 0]),
   ]
   // The back of the cap reaching down over the nape.
-  + h.crescent('nape', 'cap', 0.088, 0.097, 120, 240, 8, y0 - 0.05, y0 + 0.01)
+  + h.crescent('nape', 'cap', a - 0.007, a + 0.002, 120, 240, 8, y0 - 0.05, y0 + 0.01)
   + std.flattenArrays([
     arcX('pad-%d' % i, 'pad', std.sqrt(R * R - cx * cx) - 0.004, std.sqrt(R * R - cx * cx) + 0.02, -100, 100, 14, 0.028, y0 + c, cx)
     for i in [0, 1, 2]
     for cx in [[-0.042, 0, 0.042][i]]
   ])
-  + wrapBand('brow', 'pad', 0.112, 0.02, -100, 100, 20, flatAt(y0 - 0.002), flatAt(y0 + 0.026))
+  + wrapBand('brow', 'pad', a + 0.017, 0.02, -100, 100, 20, flatAt(y0 - 0.002), flatAt(y0 + 0.026))
   + std.flattenArrays([
     [
-      sbox('flap-%d' % (s + 1), 'cap', [s * 0.09, 0, -0.045], [s * 0.1, y0 + 0.01, 0.045]),
-      h.turned('earpiece-%d' % (s + 1), 'earpiece', 'x', [[0, 0], [0, 0.032], [s * 0.012, 0.03], [s * 0.018, 0.02], [s * 0.02, 0]], [s * 0.1, 0.045, 0]),
-      sbox('strap-%d' % (s + 1), 'strap', [s * 0.1, 0, 0.03], [s * 0.104, 0.03, 0.045]),
+      sbox('flap-%d' % (s + 1), 'cap', [s * (a - 0.005), 0, -0.045], [s * (a + 0.005), y0 + 0.01, 0.045]),
+      h.turned('earpiece-%d' % (s + 1), 'earpiece', 'x', [[0, 0], [0, 0.032], [s * 0.012, 0.03], [s * 0.018, 0.02], [s * 0.02, 0]], [s * (a + 0.005), 0.045, 0]),
+      sbox('strap-%d' % (s + 1), 'strap', [s * (a + 0.005), 0, 0.03], [s * (a + 0.009), 0.03, 0.045]),
     ]
     for s in [-1, 1]
   ])
   + [
-    box('buckle', 'buckle', [0.1, 0.006, 0.026], [0.107, 0.02, 0.048]),
-    h.disc('lead-socket', 'earpiece', 0.008, y0 - 0.05, y0 - 0.03, 0, -0.098),
-    box('lead', 'lead', [-0.004, 0, -0.2], [0.004, 0.008, -0.095]),
-    box('lead-drop', 'lead', [-0.004, 0, -0.103], [0.004, y0 - 0.045, -0.095]),
-    h.turned('plug', 'earpiece', 'z', [[0, 0], [0, 0.009], [0.03, 0.009], [0.035, 0.005], [0.035, 0]], [0, 0.009, -0.235]),
+    box('buckle', 'buckle', [a + 0.005, 0.006, 0.026], [a + 0.012, 0.02, 0.048]),
+    h.disc('lead-socket', 'earpiece', 0.008, y0 - 0.05, y0 - 0.03, 0, -(a + 0.003)),
+    box('lead-drop', 'lead', [-0.004, 0, -(a + 0.008)], [0.004, y0 - 0.045, -a]),
   ], { cap: 'cloth-olive-drab', pad: 'webbing-olive-dark', earpiece: 'plastic-matte-black', strap: 'leather-brown', buckle: 'steel-bright', lead: 'rubber-black' }) + { title: 'Tank crew helmet' }
+  + { anchors: { brow: fit.browAnchor('tank_crew_helmet', 'cap', [-a, y0, -a], [a, y0 + ht, a], y0) } }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['military'], tags: { material: ['fabric'], setting: ['modern'], slot: ['head'] } } },
 
   // Mild steel heavy close helm, 310 mm tall: a tall comb, three gorget lames and a riveted plate over the bevor.
