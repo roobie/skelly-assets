@@ -1,18 +1,18 @@
-// What the generators of key-frame pose files share (tools/press-check.mjs, tools/wields.mjs): the figure posed by
-// its angles and stood on the ground, so a frame's points are read off the figure as the pose file will stand it, the
+// What the generators of key-frame pose files share (tools/press-check.mjs, tools/wields.mjs): how a pose file stands
+// the figure and the figure so stood, so a frame's points are read off the figure as the pose file will stand it, the
 // head turned to look at a point, and the layout pose files are written in.
-import { add, applyPoint, boneTransforms, jointRotation, sub } from '../site/kinematics.mjs';
-import { groundLift } from '../site/poseFile.mjs';
+import { decodeFrame } from '../site/clipFrames.mjs';
+import { add, applyPoint, boneTransforms, sub } from '../site/kinematics.mjs';
+import { compilePose } from '../site/poseFile.mjs';
 
 const DEG = Math.PI / 180;
 export const r4 = (v) => v.map((x) => Math.round(x * 1e4) / 1e4 || 0);
 
-/** The rig posed by `angles` and stood on the ground: the world transform of each bone by id. */
-export function posedAt(rig, angles) {
-  const bone = (id) => rig.bones.find((b) => b.id === id);
-  const rotations = Object.fromEntries(Object.entries(angles).map(([id, a]) => [id, jointRotation(bone(id), a)]));
-  return boneTransforms(rig.bones, { root: [0, groundLift(rig, { root: [0, 0, 0], rotations }), 0], rotations });
-}
+/** The head of a generated pose file for `rig`: the figure stood on the ground on level feet. */
+export const standing = (rig) => ({ rig: { id: rig.id, revision: rig.revision }, ground: true, level: ['foot.R', 'foot.L'] });
+
+/** The rig posed by `angles` and stood as `standing` stands it: the world transform of each bone by id. */
+export const posedAt = (rig, angles) => boneTransforms(rig.bones, decodeFrame(compilePose(rig, { ...standing(rig), angles }).frame));
 
 // One axis of a look shared between two joints in proportion to how far each turns that way.
 const share = (angle, [lowA, highA], [lowB, highB]) => {

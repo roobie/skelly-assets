@@ -64,7 +64,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-6-released': turned {
       into: 0.12,
       left: {
-        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.3, -1, 0], close: false },
+        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, 0], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },

@@ -10,7 +10,7 @@ import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { lookAt, poseJson, posedAt, r4 } from './keyFrames.mjs';
+import { lookAt, poseJson, posedAt, r4, standing } from './keyFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
@@ -69,9 +69,7 @@ export function pressCheckPoses(rig, check, strokes) {
     const rifle = placed(carry);
     const held = { model: check.rifle, at: r4(rifle.at), turn: r4(mat3ToQuat(rifle.turn)) };
     const file = {
-      rig: { id: rig.id, revision: rig.revision },
-      ground: true,
-      level: ['foot.R', 'foot.L'],
+      ...standing(rig),
       angles: { ...check.stance, ...lookAt(rig, check.stance, inWorld(rifle, look), tilt) },
       hands: { 'hand.R': check.grip.hands, 'hand.L': left.hands },
       hold: { 'hand.R': { ...held, pole: gripPole, ...check.grip.hold } },
