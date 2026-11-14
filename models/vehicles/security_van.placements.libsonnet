@@ -4,7 +4,7 @@ local s = import 'security_van.spec.libsonnet';
 {
   title: 'Security van',
   sites: van.fittings(site.kit, 'security_van', s) + [
-    site.one('side_door_bars', 'security_van_side_door_bars', rides='side_door'),
+    site.one('side_door_lock_bar', 'security_van_side_door_lock_bar', rides='side_door'),
     site.one('cash_chute', 'security_van_cash_chute'),
     site.one('roof_hatch', 'security_van_roof_hatch'),
   ]
