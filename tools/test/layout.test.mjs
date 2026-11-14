@@ -175,7 +175,7 @@ test("the showcase lists every model of the manifest at its pack path, ships the
     });
     writeFileSync(join(built, MANIFEST), manifestJson(manifest));
     execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, out], { cwd: repo, stdio: 'pipe' });
-    const { models } = JSON.parse(readFileSync(join(out, 'models.json'), 'utf8'));
+    const { models, taxonomy } = JSON.parse(readFileSync(join(out, 'models.json'), 'utf8'));
     const listed = new Map(models.map((model) => [model.file, model]));
     assert.ok(manifest.models.length > 0);
     for (const row of manifest.models) {
@@ -187,6 +187,8 @@ test("the showcase lists every model of the manifest at its pack path, ships the
       assert.equal(listed.get(file)?.smooth?.file, smooth, `${file} is not listed with its smooth copy`);
     }
     assert.ok(models.some((model) => model.smooth) && models.some((model) => !model.smooth));
+    for (const model of models)
+      assert.ok(taxonomy.dimensions.form.terms[model.form], `${model.id} has a form with no meaning`);
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     let sampledDeaths = 0;
     for (const model of models) {

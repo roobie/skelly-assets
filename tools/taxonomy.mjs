@@ -33,7 +33,7 @@ function termTable(table, where) {
 // models/taxonomy.json, read strictly: a key the reader does not know is an error, never skipped.
 export function readVocabulary(root = repo) {
   const value = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-  const known = new Set(['_doc', 'untaggedPacks', 'categories', 'facets', 'keywords']);
+  const known = new Set(['_doc', 'untaggedPacks', 'categories', 'facets', 'dimensions', 'keywords']);
   for (const key of Object.keys(value)) if (!known.has(key)) throw new Error(`${VOCABULARY}: unknown key ${key}`);
   const untaggedPacks = value.untaggedPacks ?? [];
   if (!Array.isArray(untaggedPacks) || untaggedPacks.some((pack) => typeof pack !== 'string')) {
@@ -55,10 +55,27 @@ export function readVocabulary(root = repo) {
       return [facet, { meaning: entry.meaning, terms: termTable(entry.terms, `facet ${facet}`) }];
     }),
   );
+  const { keyword, form, ...otherDimensions } = value.dimensions ?? {};
+  if (Object.keys(otherDimensions).length > 0 || !isObject(keyword) || !isObject(form)) {
+    throw new Error(`${VOCABULARY}: dimensions must hold exactly the keyword and form dimensions`);
+  }
+  for (const [name, entry, keys] of [
+    ['keyword', keyword, ['meaning']],
+    ['form', form, ['meaning', 'terms']],
+  ]) {
+    if (typeof entry.meaning !== 'string' || entry.meaning.trim() === '')
+      throw new Error(`${VOCABULARY}: dimension ${name} has no meaning`);
+    if (Object.keys(entry).some((key) => !keys.includes(key)))
+      throw new Error(`${VOCABULARY}: dimension ${name} must hold only ${keys.join(' and ')}`);
+  }
   return {
     untaggedPacks: new Set(untaggedPacks),
     categories: termTable(value.categories, 'categories'),
     facets,
+    dimensions: {
+      keyword: { meaning: keyword.meaning },
+      form: { meaning: form.meaning, terms: termTable(form.terms, 'dimension form') },
+    },
     keywords: termTable(value.keywords, 'keywords'),
   };
 }

@@ -1,5 +1,5 @@
 {
-  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, any tags, terms grouped by facet, and any keywords. Every category, facet term and keyword carries its one-line meaning. Why tags are semi-closed and keywords open by review, and how a term is requested and added, is in models/TAXONOMY.md.",
+  "_doc": "The model taxonomy's vocabulary: each model has one category, its shelf, any tags, terms grouped by facet, and any keywords. Every category, facet term and keyword carries its one-line meaning. dimensions holds the meanings of the showcase's keyword and form filters, which no model tags. Why tags are semi-closed and keywords open by review, and how a term is requested and added, is in models/TAXONOMY.md.",
   "categories": {
     "ammunition": "Cartridges, rounds, shells, spent cases and the boxes and cans made to hold them.",
     "arcana": "Magical and occult objects: wands, rune tablets, charms, ritual gear.",
@@ -144,6 +144,16 @@
         "shield": "Shields carried to block blows.",
         "explosive": "Grenades, charges and other explosives.",
         "trap": "Traps set to catch or wound."
+      }
+    }
+  },
+  "dimensions": {
+    "keyword": { "meaning": "Words a model is also known by." },
+    "form": {
+      "meaning": "Whether a model is built from others or is one piece.",
+      "terms": {
+        "assembly": "Built from other models, or from several components.",
+        "atom": "One piece."
       }
     }
   },
