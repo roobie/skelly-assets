@@ -20,4 +20,8 @@ local s = t.spec(import 'refuse_truck.spec.libsonnet');
     site.overlap('subframe', 'hopper', 0.12,
       'The hopper bowl is seated on the subframe runner and sunk into it.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

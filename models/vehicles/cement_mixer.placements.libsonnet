@@ -26,4 +26,8 @@ local site = import 'site.libsonnet';
     site.overlap('subframe', 'drive', 0.12,
       'The drive\'s foot is bolted down into the runner of the subframe.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail.'),
+  ],
 }

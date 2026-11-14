@@ -13,7 +13,7 @@
   floor: 1.0, waist: 1.66, roof: 2.15, lean: 0.2,
   // The front wheel's arch stops short of the firewall, which the kit's wing needs.
   archHalf: 0.5,
-  engineX: self.face + 0.58, radiatorX: self.bonnet.nose - 0.2, radiatorY: 0.4,
+  engineX: self.face + 0.58, radiatorY: 0.4,
   // The bonnet leaves a short cab, so the dash is shallow, the seat sits on the floor and back toward the cab's rear wall.
   dashDepth: 0.3, raisedSeat: false, seatX: self.doorRear + 0.32,
 }

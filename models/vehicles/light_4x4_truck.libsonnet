@@ -31,8 +31,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.tit
     k.turned('tyre', 'tyre', 'x', k.tyreProfile(tyreWidth, rim, tyreBody, 0.08), [-spareFace - tyreWidth / 2, 0, 0]) + { sides: 24 },
     k.turned('rim', 'rim', 'x', k.disc(rim, -tyreWidth * 0.36, tyreWidth * 0.36), [-spareFace - tyreWidth / 2, 0, 0]) + { sides: 24 },
   ], { tyre: 'rubber-black', rim: s.paint, frame: s.framePaint }),
-  mk.driveAxle(id + '_front_axle', s.frontAxleMass, s.frontZ - 0.03, true, [s.railZ - 0.1, s.railZ]) + { title: vehicle.title + ' front axle' },
-  mk.driveAxle(id + '_axle', s.axleMass, s.rearZ - 0.03, false, [s.railZ - 0.1, s.railZ]) + { title: vehicle.title + ' rear axle' },
+  mk.driveAxle(id + '_front_axle', s.frontAxleMass, s.frontZ - 0.03, true, s.frontSeat.z) + { title: vehicle.title + ' front axle' },
+  mk.driveAxle(id + '_axle', s.axleMass, s.rearZ - 0.03, false, s.rearSeat.z) + { title: vehicle.title + ' rear axle' },
   part('_transfer_case', 'transfer case', s.transferCaseMass, [
     box('case', 'casting', [-0.2, 0, -0.18], [0.2, 0.36, 0.18]),
   ], { casting: 'steel-grey' }),
