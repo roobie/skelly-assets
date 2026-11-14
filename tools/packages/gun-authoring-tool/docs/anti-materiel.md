@@ -10,7 +10,9 @@ The M82 is a proportion reference, not manufacturing geometry; the tool's modell
 
 The dedicated receiver, lower and magazine exist because the shared families are sized for smaller rifle cartridges. They keep the common receiver, lower and magazine roles so shared feed and geometry rules, the gun's magazine slot and the loose magazine export still apply; see `src/gun/antiMateriel/heavyReceiver.ts`; `src/gun/antiMateriel/heavyLower.ts`; `src/gun/antiMateriel/heavyMagazine.ts`; and `src/gun/antiMateriel/rules.ts`.
 
-The rifle ships without an optic. A scope is an attachment the player fits to the receiver rail, so neither the curated design nor the template's default carries one; the carry handle is still checked clear of the largest scope the rail takes. See `src/gun/templates.ts`, `antiMateriel`, and `test/antiMateriel.test.ts`.
+The rifle ships with iron sights and no optic. A scope is an attachment the player fits to the receiver rail in the rear sight's place, so neither the curated design nor the template's default carries one; the carry handle is still checked clear of the largest scope the rail takes. See `src/gun/templates.ts`, `antiMateriel`, and `test/antiMateriel.test.ts`.
+
+The front post stands on the shroud rather than the barrel because the barrel recoils inside the shroud; a post on it would move against the rear sight every shot. Both sights sit on the shared iron sight line, so the rear sight is the AR's rail rear sight; see `src/gun/parts.ts`, `shroudFrontSight`, and `models/guns/tables/shroudFrontSight.jsonnet`.
 
 Shroud perforations are display-only: collision and feasibility use convex solids, and surface holes add no useful fit constraint. If a future rule depends on a hole, it needs collision geometry rather than a visual mark; see `src/gun/antiMateriel/barrelShroud.ts` and `test/antiMateriel.test.ts`.
 

@@ -150,9 +150,9 @@ describe('front-sight families', () => {
     expect(frontAxis[1]).toBeCloseTo(receiverRailWorld[1] + 1, 8);
   });
 
-  it("lines the clamped AR's rail rear aperture up with its front post top", () => {
-    const front = fixedSight('archetype-ar', 'front-sight');
-    const rear = fixedSight('archetype-ar', 'rear-sight');
+  it.each(['archetype-ar', 'archetype-anti-materiel'])("lines %s's rail rear aperture up with its front post top", (design) => {
+    const front = fixedSight(design, 'front-sight');
+    const rear = fixedSight(design, 'rear-sight');
     const axisWorld = ({ sight, placed }: ReturnType<typeof fixedSight>) =>
       applyPoint(placed, sight.axes.find(({ kind }) => kind === 'sight')!.origin);
     const post = front.sight.solids.find(({ id }) => id === 'post');

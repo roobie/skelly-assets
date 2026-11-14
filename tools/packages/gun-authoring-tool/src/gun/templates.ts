@@ -637,7 +637,7 @@ export const pumpShotgun: Template = {
 export const antiMateriel: Template = {
   name: 'anti-materiel',
   description:
-    'Semi-automatic anti-materiel rifle: perforated box shroud, two-chamber arrowhead muzzle brake, folding bipod, strut-mounted carry handle, recoil-pad stock with optional monopod.',
+    'Semi-automatic anti-materiel rifle: perforated box shroud, two-chamber arrowhead muzzle brake, iron sights, folding bipod, strut-mounted carry handle, recoil-pad stock with optional monopod.',
   variant: GENERATED_ANTI_MATERIEL_CALIBRE,
   root: 'receiver',
   slots: [
@@ -651,6 +651,9 @@ export const antiMateriel: Template = {
     { id: 'magazine', family: 'heavy-magazine' },
     { id: 'stock', family: 'recoil-stock', params: { length: ['M', 'L'] } },
     { id: 'sight', family: 'sight', params: { type: 'high-mag-5-25x' }, chance: 0 },
+    // The irons the rifle ships with; a fitted scope takes the rear sight's place on the rail.
+    { id: 'front-sight', family: 'shroud-front-sight' },
+    { id: 'rear-sight', family: 'rail-rear-sight' },
     // The handle's three parts come together or not at all, so they are always present (a slot has no way to
     // depend on another slot's chance, and a strut without its trunnion would leave required ports empty).
     // Only the trunnion carries the pose; the strut and bar inherit it.
@@ -672,6 +675,8 @@ export const antiMateriel: Template = {
     // The sight sits on the receiver rail (slots x = -14, -12). The carry handle's trunnion bolts to the shroud's left
     // wall, and its strut and bar stand to the left, clear of a full-size scope mounted where the sight is.
     { from: 'receiver.rail', to: 'sight.base', slot: [4, 5] },
+    { from: 'receiver.rail', slot: 0, to: 'rear-sight.base' },
+    { from: 'shroud.front-sight', to: 'front-sight.base' },
     { from: 'shroud.trunnion', to: 'trunnion.base' },
     { from: 'trunnion.strut', to: 'strut.base' },
     { from: 'strut.top', to: 'bar.base' },
