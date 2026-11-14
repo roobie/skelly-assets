@@ -44,8 +44,6 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
   rifle: 'rifle_assault',
   // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
   stance: { spine: [4, -15, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
-  // The eyes from the head's joint, in the head's frame.
-  eye: [0, 0.11, 0.08],
   // The butt pad's middle, pressed into the pocket: a point in the torso's frame, from the right shoulder joint.
   butt: [0, -0.02, -0.38],
   pocket: [0.06, -0.11, 0.04],
@@ -66,7 +64,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-6-released': turned {
       into: 0.12,
       left: {
-        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.3, -1, 0], close: false },
+        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, 0], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },

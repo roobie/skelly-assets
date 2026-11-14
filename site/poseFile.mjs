@@ -3,12 +3,14 @@
 // a pose one way.
 //
 // A pose file:
-//   { rig: { id, revision }, angles: { <bone>: [flex, twist, abduct] }, reach: { <bone>: { target, pole? } },
+//   { rig: { id, revision }, angles: { <bone>: [flex, twist, abduct] }, reach: { <bone>: { target, pole?, twist? } },
 //     level: [<bone>], root?: [x, y, z], ground?: true }
 // Angles are degrees held to each bone's limits. `level` bones keep their rest orientation. `ground` lifts the root so
 // the figure, as its angles and levelled bones hold it, stands on y = 0, or on the soles of what it wears. A reach entry names a reach bone of the rig
 // and places its joint at `target`, a point in the world the figure stands in, by two-bone IK, bending toward `pole` or
-// the rig's own; the levelled bones are levelled again after it. Grounding before the reach lets a target be read off
+// the rig's own; the levelled bones are levelled again after it. The reach leaves the middle bone a pure bend, so
+// `twist` then turns it about itself by that many degrees: a forearm, which pronates, rolls the hand without moving the
+// wrist, as a fist turns palm down on a punch. Grounding before the reach lets a target be read off
 // the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file names its rig is in
 // models/poses/rig.libsonnet.
 //
@@ -25,7 +27,7 @@ import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotatio
 import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pinchItem } from './fingers.mjs';
 
 const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold', 'moved']);
-const REACH_KEYS = new Set(['target', 'pole']);
+const REACH_KEYS = new Set(['target', 'pole', 'twist']);
 const isVector = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 
@@ -55,6 +57,7 @@ export function poseIssues(rig, file) {
     for (const key of Object.keys(goal)) if (!REACH_KEYS.has(key)) issues.push(`reach.${id}: unknown key ${key}`);
     if (!isVector(goal.target)) issues.push(`reach.${id}.target is a finite point [x, y, z]`);
     if (goal.pole !== undefined && !isVector(goal.pole)) issues.push(`reach.${id}.pole is a finite direction [x, y, z]`);
+    if (goal.twist !== undefined && !Number.isFinite(goal.twist)) issues.push(`reach.${id}.twist is finite degrees`);
   });
   bonesOf('hands', file.hands, (id, hand) => issues.push(...handIssues(rig, id, hand)));
   bonesOf('hold', file.hold, (id, hold) => issues.push(...holdIssues(rig, id, hold)));
@@ -107,6 +110,16 @@ export const groundLift = (rig, pose) => -Math.min(...posedCorners(rig, pose).ma
 // the thickest sole worn carries the figure. `sites` are the dressed figure's (tools/dress.mjs, `wornSites`).
 export const soleLift = (sites) => Math.max(0, ...sites.map((site) => site.soleLift ?? 0));
 
+// The pose with bone `id` turned `twist` degrees about itself, held to its limits.
+const twisted = (rig, pose, id, twist, clamped) => {
+  const bone = rig.bones.find((b) => b.id === id);
+  const [flex, , abduct] = jointAngles(bone, pose.rotations[id] ?? IDENTITY_M);
+  const asked = [flex, twist, abduct];
+  const held = clampJointAngles(bone, asked);
+  if (held[1] !== twist) clamped.push({ bone: id, asked, held });
+  return { ...pose, rotations: { ...pose.rotations, [id]: jointRotation(bone, held) } };
+};
+
 /**
  * A pose file into a clip frame. Refuses a file with issues (`poseIssues`), naming them all. Returns the frame with the
  * limits that held, the reach distances left and, per holding hand, how its grip closed and how near its pinch came,
@@ -135,6 +148,7 @@ export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
     const goal = file.reach?.[bone.id];
     if (!goal) continue;
     ({ pose, residual: report.residuals[bone.id] } = solveTwoBone(rig, pose, bone.reach.chain, goal.target, goal.pole ?? bone.reach.pole, report.clamped));
+    if (goal.twist !== undefined) pose = twisted(rig, pose, bone.reach.chain[1], goal.twist, report.clamped);
   }
   const held = {};
   for (const [id, hold] of Object.entries(file.hold ?? {})) {

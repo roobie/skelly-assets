@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { decodeFrame } from '../../site/clipFrames.mjs';
-import { add, applyPoint, boneTransforms, frameAbout, length, mat3ToQuat, mulMM, rotX, rotY, sub } from '../../site/kinematics.mjs';
+import { add, applyPoint, boneTransforms, frameAbout, jointAngles, length, mat3ToQuat, mulMM, quatToMat3, rotX, rotY, sub } from '../../site/kinematics.mjs';
 import { clipIssues, compilePose, groundLift, poseFileOf, poseIssues, rigFrame } from '../../site/poseFile.mjs';
 
 // A rig in tools/dollRig.mjs, `dollRig`'s shape: a pelvis standing a metre up, a spine that absorbs a mob's chest, and
@@ -67,6 +67,18 @@ test('ground stands the posed figure on y = 0 before the reach, so a target is r
   assert.ok(report.residuals.hand < 1e-9, `residual ${report.residuals.hand}`);
   near(applyPoint(transformsOf(frame).get('fore'), rig.bones[3].tail), target);
   assert.equal(frame.root[1], stood.root[1]);
+});
+
+test('a reach twist rolls the middle bone about itself without moving the joint it reaches', () => {
+  const rolling = { ...rig, bones: rig.bones.map((b) => (b.id === 'fore' ? { ...b, pronates: true, limits: { ...b.limits, twist: [-90, 60] } } : b)) };
+  const target = [0.35, 1.0, 0.25];
+  const wrist = (frame) => applyPoint(boneTransforms(rolling.bones, decodeFrame(frame)).get('fore'), rig.bones[3].tail);
+  const { frame, report } = compilePose(rolling, { rig: ours, reach: { hand: { target, twist: -70 } } });
+  assert.deepEqual(report.clamped, []);
+  near(wrist(frame), target);
+  assert.ok(Math.abs(jointAngles(rolling.bones[3], quatToMat3(frame.rotations.fore))[1] + 70) < 1e-9);
+  const past = compilePose(rolling, { rig: ours, reach: { hand: { target, twist: 80 } } });
+  assert.deepEqual(past.report.clamped.map(({ bone, held }) => [bone, held[1]]), [['fore', 60]]);
 });
 
 test('a levelled bone is levelled again after the reach moves its parents', () => {
