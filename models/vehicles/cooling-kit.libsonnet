@@ -79,6 +79,10 @@ local fittings(name) =
   ]),
   // How far the side tanks reach forward of a radiator's frame, so a part ahead of the radiator can stand clear of it.
   front: core.half + core.tank,
+  // How far a radiator's fan and hoses reach back of its frame, so a part behind the radiator can stand clear of them.
+  back(name):
+    local c = classOf(name);
+    core.half + std.max(c.fan.depth, core.tank + c.hose.length),
   // The radiators, by the names `sites` takes.
   names: std.objectFields(radiators),
   // Every site a radiator can take, so a vehicle that loses its engine can drop them all.

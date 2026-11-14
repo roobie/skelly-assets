@@ -149,7 +149,7 @@ local pressings(id, title, s0) = {
     for i in std.range(0, crossmemberCount - 1)
   ],
   local springs =
-    [spring('spring_0', s, s.frontAxle, s.frontAxleY, s.frontSeat, s.radiatorX - cooling.front)]
+    [spring('spring_0', s, s.frontAxle, s.frontAxleY, s.frontSeat, s.radiatorX - cooling.back(s.radiator))]
     + [spring('spring_' + (i + 1), s, s.rearAxles[i], s.rearAxleY, s.rearSeat) for i in std.range(0, std.length(s.rearAxles) - 1)],
   local batteryBoxPieces = local x = s.batteryX; local y = s.tankY; local inner = -s.batteryZ + 0.26; local outer = -s.batteryZ - 0.26; [
     box('battery_bracket', 'frame', [x - 0.34, y - 0.04, outer], [x + 0.34, y, -s.railZ]),
@@ -178,7 +178,7 @@ local pressings(id, title, s0) = {
       box('well_wall', 'pan', [a - h, 2 * s.r - 0.12, s.railZ + 0.0625], [a + h, s.archTop, s.railZ + 0.09375]),
     ] + archCorners('well', 'pan', a - h, a + h, s.archTop, s.archChamfer, s.railZ, s.skin),
   local rows = [
-    part('_chassis', 'chassis', s.chassisMass, springs + [
+    part('_chassis', 'chassis', s.chassisMass, bothSides(springs) + [
       box('crossmember_' + i, 'frame', [crossmembers[i] - crossmemberHalf, s.propShaftY + driveline.propShaftRadius + shaftClear, -s.railZ], [crossmembers[i] + crossmemberHalf, s.railTop - 0.02, s.railZ])
       for i in std.range(0, crossmemberCount - 1)
     ] + batteryBoxPieces + bothSides([
