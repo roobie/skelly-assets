@@ -1,8 +1,9 @@
-// The press check: the doll carries the assault rifle at low ready, rolls it to look into the ejection port, draws and
-// releases the charging handle and comes back to low ready, as key frames tools/press-check.mjs writes as pose files
-// (models/poses/press-*.json). The stock stays in the right shoulder throughout and the bore points straight ahead,
-// parallel to the figure's centre line and tipped down, so the muzzle never sweeps across the body; the rifle rolls
-// about its own bore to show the port, as a shooter rolls it rather than turning it away.
+// The press check: the doll holds the assault rifle at unsighted fire, rolls it to look into the ejection port, draws
+// the charging handle just far enough to see brass in the chamber, releases it and comes back to unsighted fire, as
+// key frames tools/press-check.mjs writes as pose files (models/poses/press-*.json). The stock stays in the right
+// shoulder throughout and the bore points straight ahead, parallel to the figure's centre line, level at fire and
+// tipped down while rolled, so the muzzle never sweeps across the body; the rifle rolls about its own bore to show the
+// port, as a shooter rolls it rather than turning it away.
 //
 // Points and sockets are in the rifle's frame (its bore along +z, the port side -x). A frame's `carry` turns the rifle
 // (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the rifle point the eyes turn to and
@@ -13,9 +14,10 @@
 // A frame's `into` is the seconds the move into it takes from the frame before, and `hold` the seconds it stays before
 // the next move begins. The times are those of a practised hand: a reach of a forearm's length to a small target and a
 // grasp take under half a second, a pull of a few centimetres a fifth, a look that sees and confirms the chamber about
-// two eye fixations, and a spring-driven release a blink. So the check settles at low ready, rolls deliberately to the
-// port, draws the handle briskly, pauses to look, and lets go, shuts the cover and comes back quickly, three and a half
-// seconds in all. Each move eases out of rest and into rest, as a hand moving from one place to the next does.
+// two eye fixations, and a spring-driven release a blink. So the check settles at unsighted fire, rolls deliberately
+// to the port, draws the handle briskly, pauses to look, and lets go, shuts the cover and comes back quickly, three
+// and a half seconds in all. Each move eases out of rest and into rest, as a hand moving from one place to the next
+// does.
 // The left hand never takes the rifle in a power grip: it cradles, pinches and pushes with the fingers, so its sockets
 // meet the palm square across the knuckle crease (`crease`), where the fingers' bases carry a handguard, not slanted
 // deep in the palm.
@@ -34,12 +36,16 @@ local pinch(drawn) = {
   hands: 'pinch',
   drawn: drawn,
 };
-// Low ready: the bore tipped down ahead, the right elbow out and a little down. Turned: rolled to bring the port up
-// toward the eyes, the right elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the
-// rifle.
-local ready = { carry: { pitch: 15, yaw: 0, roll: 0 }, gripPole: [-0.94, 0.342, 0], look: [0, 0, 3], left: support };
+// Unsighted fire: the bore level ahead with the stock in the shoulder, the eyes over the rifle rather than on its
+// sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit; the
+// check starts and ends where a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right
+// elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the rifle.
+local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-1, 0, 0], look: [0, 0, 3], left: support };
 local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: [-0.03, 0.005, -0.1], tilt: 20 };
-local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
+// A press check draws the carrier only far enough to show the case head in the chamber, a short pull, not the full
+// stroke a rack takes, so the round stays in the chamber.
+local pull = 0.3;
+local retracted = { moved: { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
   rifle: 'rifle_assault',
   // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
@@ -59,9 +65,9 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-1-fire': ready { hold: 0.3 },
     'press-2-turned': turned { left: support, into: 0.5 },
     'press-3-handle': turned { left: pinch(0), into: 0.45 },
-    'press-4-retracted': turned + retracted { left: pinch(1), into: 0.2 },
+    'press-4-retracted': turned + retracted { left: pinch(pull), into: 0.2 },
     // The pose of the frame before, held while the eyes find the round in the chamber.
-    'press-5-inspect': turned + retracted { left: pinch(1), into: 0.6 },
+    'press-5-inspect': turned + retracted { left: pinch(pull), into: 0.6 },
     // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
     'press-6-released': turned {
       into: 0.12,
