@@ -12,7 +12,9 @@ local steps(span) = std.floor(span / b.pitch);
 local offsets(span) = [(i - steps(span) / 2) * b.pitch for i in std.range(0, steps(span))];
 local hole = s.rearHoles[0];
 local g = bus.layout(s);
-local doorW = g.fold(g.leaves[0]).width;
+local doorSpan = g.fold(g.leaves[0]).span;
+local doorW = doorSpan[1] - doorSpan[0];
+local doorMid = (doorSpan[0] + doorSpan[1]) / 2;
 local doorH = g.doorHeight - s.doorKick;
 local cage = s.bulkhead;
 taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', vehicle.title, s) + [
@@ -24,12 +26,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', v
     box('bar_' + i, 'bar', [offsets(w)[i] - b.width / 2, 0, 0.005], [offsets(w)[i] + b.width / 2, h, b.z])
     for i in std.range(0, std.length(offsets(w)) - 1)
   ], { bar: 'paint-charcoal' }) + { title: 'Prison bus window bars' },
-  // Seated proud of a door panel at its fitting's `at`, the foot of the panel's glass; each panel carries its own.
+  // Seated proud of a door panel, across its span from its fitting's `at` at the foot of the panel's glass; each panel
+  // carries its own.
   k.compound('prison_bus_door_bars', 3, [
-    box('rail_low', 'bar', [-doorW / 2, -0.02, 0.03], [doorW / 2, b.rail, 0.07]),
-    box('rail_high', 'bar', [-doorW / 2, doorH - b.rail, 0.03], [doorW / 2, doorH, 0.07]),
+    box('rail_low', 'bar', [doorSpan[0], -0.02, 0.03], [doorSpan[1], b.rail, 0.07]),
+    box('rail_high', 'bar', [doorSpan[0], doorH - b.rail, 0.03], [doorSpan[1], doorH, 0.07]),
   ] + [
-    box('bar_' + i, 'bar', [offsets(doorW)[i] - b.width / 2, 0, 0.035], [offsets(doorW)[i] + b.width / 2, doorH, 0.07])
+    box('bar_' + i, 'bar', [doorMid + offsets(doorW)[i] - b.width / 2, 0, 0.035], [doorMid + offsets(doorW)[i] + b.width / 2, doorH, 0.07])
     for i in std.range(0, std.length(offsets(doorW)) - 1)
   ], { bar: 'paint-charcoal' }) + { title: 'Prison bus door bars' },
   // Solid to the seated prisoners' shoulders and barred above, between the door's bay and the first seat row.

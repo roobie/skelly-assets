@@ -49,7 +49,7 @@ local layout(s) = {
   assert std.all([std.abs(width - spans[0]) < 1e-9 for width in spans]) : 'every doorway of a bus is as wide as the first',
   leafWidth: foldDoor.fitWidth(if std.get(s, 'doorLeaves', 2) == 2 then spans[0] / 2 else spans[0], self.doorThick),
   doorHeight: s.decks[0].top - s.doorSill,
-  doorThick: 0.06,
+  doorThick: foldDoor.thick,
   // Every leaf of a doorway folds out of it, a pair from the doorway's middle toward its ends, a single leaf toward the
   // forward end. Folding in, a leaf would sweep through the floor above its foot or the steps inside a high floor's
   // doorway. Each leaf names its pressing's `suffix`, its `site` and its `jamb` end of the doorway.
@@ -60,7 +60,7 @@ local layout(s) = {
   fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door'),
   // Where a leaf's centre lies along doorway `way`.
   leafX(way, leaf): (if leaf.jamb > 0 then way[1] else way[0]) - leaf.jamb * self.leafWidth / 2,
-  // The id of one of a leaf's panels, `panel` being 'jamb' or 'free', in doorway `d`, and where it sits along `way`.
+  // The id of one of a leaf's panels, `panel` being 'jamb' or 'free', in doorway `d`, and where its origin sits along `way`.
   panelSite(leaf, panel, d): leaf.site + '_' + panel + '_' + d,
   panelX(way, leaf, panel): self.leafX(way, leaf) + self.fold(leaf)[panel].at,
   windowSuffix(i): if i == 0 then '_side_window' else '_upper_window',
@@ -281,22 +281,24 @@ local pressings(id, title, s) = {
            box('sash', 'frame', [-w / 2, h * 0.5 - 0.025, -0.03], [w / 2, h * 0.5 + 0.025, 0.03]),
          ] else []), { glass: 'glass-clear', frame: 'steel-grey' }),
   // A folding leaf's panel, stiled at both ends so the leaf at rest shows its split line between the panels.
-  local panelRow(suffix, label, width, panel) =
+  local panelRow(suffix, label, span, panel) =
     local h = g.doorHeight;
     local t = g.doorThick / 2;
     local kick = std.get(s, 'doorKick', 0.3);
-    part(suffix, label, 45 * width * h, [
-      box('kick', 'door', [-width / 2, 0, -t], [width / 2, kick, t]),
-      box('glass', 'glass', [-width / 2, kick, -t / 2], [width / 2, h, t / 2]),
-      box('stile_aft', 'door', [-width / 2, 0, -t], [-width / 2 + 0.03, h, t]),
-      box('stile_fwd', 'door', [width / 2 - 0.03, 0, -t], [width / 2, h, t]),
-      box('head', 'door', [-width / 2, h - 0.06, -t], [width / 2, h, t]),
+    local aft = span[0];
+    local fwd = span[1];
+    part(suffix, label, 45 * (fwd - aft) * h, [
+      box('kick', 'door', [aft, 0, -t], [fwd, kick, t]),
+      box('glass', 'glass', [aft, kick, -t / 2], [fwd, h, t / 2]),
+      box('stile_aft', 'door', [aft, 0, -t], [aft + 0.03, h, t]),
+      box('stile_fwd', 'door', [fwd - 0.03, 0, -t], [fwd, h, t]),
+      box('head', 'door', [aft, h - 0.06, -t], [fwd, h, t]),
     ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion),
   local leaves = std.flattenArrays([
     local fold = g.fold(leaf);
     [
-      panelRow(leaf.suffix + '_jamb', leaf.label + ', jamb panel', fold.width, fold.jamb),
-      panelRow(leaf.suffix + '_free', leaf.label + ', free panel', fold.width, fold.free),
+      panelRow(leaf.suffix + '_jamb', leaf.label + ', jamb panel', fold.span, fold.jamb),
+      panelRow(leaf.suffix + '_free', leaf.label + ', free panel', fold.span, fold.free),
     ]
     for leaf in g.leaves
   ]),
