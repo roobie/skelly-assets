@@ -17,9 +17,10 @@ import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { poseJson } from '../keyFrames.mjs';
 import { partStrokes, pressCheckPoses, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
+import { PHASES, readWields, wieldClips, wieldPoses, wieldWeapons } from '../wields.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
-// The doll, some garments and the press check's rifle built from the repo's own content, so these check the rig, the
+// The doll, some garments, the press check's rifle and the wields' weapons built from the repo's own content, so these check the rig, the
 // fixtures, the probe and the fitted shells against the doll as it is drawn, not against a stand-in.
 const repo = resolve(import.meta.dirname, '../..');
 const WEAR = 'leather_jacket';
@@ -27,6 +28,8 @@ const WEAR = 'leather_jacket';
 // armholes stand beside the arm (models/catalogue/worn.libsonnet).
 const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_top'];
 const pressCheck = readPressCheck(repo);
+const wields = readWields(repo);
+const weaponIds = [...new Set(Object.values(wields.classes).flatMap(({ weapon }) => (weapon ? [weapon.model] : [])))];
 const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
@@ -35,7 +38,7 @@ after(() => rmSync(built, { recursive: true, force: true }));
 // `leather_gloves` is left out until it stops poking at rest (#191).
 const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
-execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle], { cwd: repo, stdio: 'pipe' });
+execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle, ...weaponIds], { cwd: repo, stdio: 'pipe' });
 
 // A build of named ids writes no manifest, so the models it built are listed here with their source taxonomy and what
 // they cover, from the model entry the thing export writes beside each (a gun export writes none), as the manifest
@@ -249,6 +252,75 @@ test('through the press check the rifle points ahead and down, its butt pad agai
     const chest = posedSolid(torso, boneTransforms(rig.bones, decodeFrame(frame)).get('spine'));
     const gap = signedDepth(chest, add(mulMV(r, pressCheck.butt), at), 0.1);
     assert.ok(Math.abs(gap) < 0.01, `${name}: the butt pad stands ${(gap * 1000).toFixed(0)} mm off the chest`);
+  }
+});
+
+const thingOf = (id) => {
+  const { pack } = models.find((model) => model.id === id);
+  return JSON.parse(readFileSync(join(built, pack, 'things', `${id}.model.json`), 'utf8'));
+};
+const weapons = wieldWeapons(wields, thingOf, itemMesh);
+let baked;
+const bakedWields = () => (baked ??= wieldClips(rig, wields, weapons, itemMesh));
+const strikes = () => Object.entries(bakedWields().clips).filter(([, clip]) => clip.phases);
+
+test('the wields\' pose files are what their tool writes from their key frames', () => {
+  const poses = wieldPoses(rig, wields, weapons);
+  assert.ok(Object.keys(poses).length > 0);
+  for (const [name, file] of Object.entries(poses)) {
+    assert.equal(readFileSync(join(repo, 'models/poses', `${name}.json`), 'utf8'), `${poseJson(file)}\n`, `${name}: run tools/wields.mjs`);
+  }
+});
+
+test('every strike passes through each phase in order, end to end, and lands its hit where the strike phase ends', () => {
+  assert.ok(strikes().length > 0);
+  for (const [name, clip] of strikes()) {
+    assert.deepEqual(clip.phases.map(({ phase }) => phase), PHASES, name);
+    const ends = clip.phases.map(({ endsAtSimSeconds }) => endsAtSimSeconds);
+    assert.ok(ends.every((end, i) => end > (ends[i - 1] ?? 0)), `${name}: phases end at [${ends}]`);
+    assert.equal(ends.at(-1), clip.durationSimSeconds, `${name}: the last phase ends with the clip`);
+    assert.equal(clip.hitAtSimSeconds, clip.phases.find(({ phase }) => phase === 'strike').endsAtSimSeconds, name);
+  }
+});
+
+test('every strike starts and ends in its class\'s guard', () => {
+  const { clips } = bakedWields();
+  for (const [name, clip] of strikes()) {
+    const guard = clips[name.replace(/_strike_.*/, '_stance_guard')].frames[0];
+    for (const frame of [clip.frames[0], clip.frames.at(-1)]) {
+      assert.ok(frame.root.every((x, axis) => Math.abs(x - guard.root[axis]) < 1e-6), `${name}: stands where the guard does`);
+      for (const [id, q] of Object.entries(guard.rotations)) {
+        const turn = Math.abs(q.reduce((sum, x, i) => sum + x * frame.rotations[id][i], 0));
+        assert.ok(turn > 1 - 1e-9, `${name}: ${id} turns as in the guard`);
+      }
+    }
+  }
+});
+
+test('every baked wield frame stays within its limits, each hand on its weapon\'s grip', () => {
+  for (const [name, reports] of Object.entries(bakedWields().reports)) {
+    reports.forEach(({ clamped, residuals, grips }, k) => {
+      assert.deepEqual(clamped, [], `${name} frame ${k} asks past a limit`);
+      for (const [id, left] of Object.entries(residuals)) assert.ok(left < 1e-6, `${name} frame ${k}: ${id} falls ${left} m short`);
+      for (const [hand, digits] of Object.entries(grips)) {
+        for (const [digit, { residual }] of Object.entries(digits)) assert.ok(!(residual > 1e-3), `${name} frame ${k}: ${hand} ${digit} pinches ${residual} m off`);
+      }
+    });
+  }
+});
+
+test('a weapon seated in the hand by a strike\'s held seat lands its striking end ahead of the chest at the hit', () => {
+  const armed = strikes().filter(([, clip]) => clip.held);
+  assert.ok(armed.length > 0);
+  for (const [name, clip] of armed) {
+    const cls = wields.classes[name.split('_strike_')[0]];
+    const { grip, anchors } = thingOf(cls.weapon.model);
+    const { held } = weapons[name.split('_strike_')[0]].weapon;
+    const k = Math.round(clip.hitAtSimSeconds / clip.durationSimSeconds * (clip.frames.length - 1));
+    const posed = boneTransforms(rig.bones, decodeFrame(clip.frames[k]));
+    const hand = posed.get(clip.held.bone), chest = posed.get('spine');
+    const end = add(hand.t, mulMV(hand.r, add(clip.held.at, mulMV(quatToMat3(clip.held.turn), mulMV(held, sub(anchors.strike, grip.at))))));
+    assert.ok(end[2] > chest.t[2] + 0.3, `${name}: the striking end stands ${(end[2] - chest.t[2]).toFixed(2)} m ahead of the chest`);
   }
 });
 
