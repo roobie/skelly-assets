@@ -3,7 +3,7 @@
 local k = import 'kit.libsonnet';
 local box = k.box;
 {
-  // The materials a fit-out draws unless a vehicle's finish names its own.
+  // The materials a fit-out, or kit still drawn into a part, uses unless a vehicle's finish names its own.
   finish: {
     shelf: 'alu-bare',
     board: 'alu-bare',

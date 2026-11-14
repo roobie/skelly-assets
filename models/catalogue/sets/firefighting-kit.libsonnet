@@ -111,7 +111,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
   ], { frame: 'steel-grey', motor: 'plastic-black', shroud: 'paint-red' }) + { title: 'Ventilation fan' }
   + stow.stows(stow.resting('machine', [0, 0, 0])) + { voxelGrain: 0.008 } + firefighting('machinery', ['metal']),
 
-  // A 25 litre drum of foam concentrate 260 mm across and 420 mm tall, a blue plastic drum with a rolling hoop and two
+  // A 20 litre drum of foam concentrate 260 mm across and 420 mm tall, a blue plastic drum with a rolling hoop and two
   // bungs in its head.
   h.compound('foam_concentrate_drum', 28, h.drum(0.13, 0.42, 1), { body: 'plastic-blue', chime: 'plastic-blue', bung: 'plastic-black' })
   + { title: 'Foam concentrate drum' }
@@ -129,7 +129,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
   ], { hose: 'rubber-black', coupling: 'alu-bare' }) + { title: 'Hard suction hose' }
   + stow.stows(stow.resting('bar', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['rubber', 'metal']),
 
-  // A hydraulic spreader 840 mm long lying on its side: its body at -x and two steel arms closing to ribbed tips at +x.
+  // A hydraulic spreader 800 mm long lying on its side: its body at -x and two steel arms closing to ribbed tips at +x.
   h.compound('hydraulic_spreader', 20, hydraulicBody(-0.4, -0.02, 0.07) + [
     box('head', 'body', [-0.02, 0, -0.05], [0.08, 0.2, 0.05]),
     prism('arm-upper', 'steel', 'z', [[0.08, 0.12], [0.4, 0.104], [0.4, 0.112], [0.08, 0.2]], -0.03, 0.03),
@@ -146,7 +146,7 @@ local hydraulicFinish = { body: 'plastic-yellow', grip: 'plastic-black', couplin
   ], hydraulicFinish) + { title: 'Hydraulic cutter' }
   + stow.stows(stow.resting('bar', [0, 0, 0])) + { voxelGrain: 0.004 } + firefighting('tools', ['metal', 'plastic']),
 
-  // A telescopic rescue ram 1.02 m long lying on its side: its body, the chrome rod out of its +x end and a toothed
+  // A telescopic rescue ram 0.97 m long lying on its side: its body, the chrome rod out of its +x end and a toothed
   // claw on each end.
   h.compound('rescue_ram', 18, hydraulicBody(-0.45, 0.25, 0.06) + [
     turned('rod', 'rod', 'x', [[0, 0], [0, 0.035], [0.17, 0.035], [0.17, 0]], [0.25, 0.1, 0]),
