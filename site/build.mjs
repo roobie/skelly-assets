@@ -52,7 +52,7 @@ const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files 
   .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
+  .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
     category: category ?? null,
@@ -63,11 +63,12 @@ const models = manifest.models
     clips: clips === undefined ? null : `${pack}/${clips}`,
     body: body === undefined ? null : `${pack}/${body}`,
     covers,
+    soleLift,
     massKg,
     volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, title, file, category, tags, keywords, label, clips, body, covers, massKg, volumeM3 }) => ({
+  .map(({ id, title, file, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
     file,
@@ -80,6 +81,7 @@ const models = manifest.models
     body,
     ...(clips ? { walkSpeed: walkSpeedOf(clips) } : {}),
     ...(covers ? { covers } : {}),
+    ...(soleLift === undefined ? {} : { soleLift }),
     ...sidecars.get(file),
     ...(massKg === undefined ? {} : { massKg, volumeM3 }),
   }));

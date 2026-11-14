@@ -128,8 +128,8 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   for (const [at, { packId, name }] of selected.entries()) {
     const tool = tools[name];
     const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: ids === undefined && tool.index });
-    models.push(...written.models.map(({ id, kind, path, partNodes, label, paintable, covers, physical }) => ({
-      id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers, massKg: physical?.massKg, volumeM3: physical?.volumeM3,
+    models.push(...written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
+      id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers, soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3,
     })));
     files.push(...written.files.map((file) => outputPath(packId, file)));
   }
@@ -185,7 +185,7 @@ async function buildRoster(thing, rows, ids, out, roster, pool) {
     writeFileSync(join(out, file), glb);
     console.log(`built ${file}`);
     const row = roster.get(id);
-    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label, paintable: modelEntry.paintable, covers: modelEntry.covers, massKg: physical?.massKg, volumeM3: physical?.volumeM3 });
+    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label, paintable: modelEntry.paintable, covers: modelEntry.covers, soleLift: modelEntry.soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3 });
   }
   return { failed, models };
 }
