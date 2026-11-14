@@ -677,23 +677,37 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),
     },
 
-  // Rigid goods (hats, helmets, goggles): the ground model itself, worn on the head and scaled to fit. Author the
-  // model with its face towards +z, the wearer's front. `base` is how far the model's y = 0 sits above the top of the
-  // neck, so a helmet that encloses the head takes a negative one; `fit` stretches it round the skull. The head frame
-  // sits higher and turns half round, which the entry cancels so callers need not know it.
   // The head a rigid head piece seated at `base` encloses, in that seat's frame: the hair's plan half-widths, deeper
-  // by the hair's sweep back, the farthest its plan reaches from the head's axis, which a round shell must clear,
-  // and the heights of the chin, the eyes, the hairline and the hair's top.
+  // by the hair's sweep back, the farthest its plan reaches from the head's axis, which a round shell must clear; the
+  // heights of the chin, the eyes, the hairline and the hair's top; and the hair dome's layers, each with its top and
+  // its plan's reach, which a shell closing over the crown must clear. The layers follow the bust's dome
+  // (`src/families/body.ts`, `dome`): each takes the section at its own top, shrunk on a quarter ellipse.
   headroom(base):: {
     local above(height) = height - bust.neckOverlap - base,
-    halfX: bust.headWidth / 2 + bust.hairThickness,
-    halfZ: bust.headDepth / 2 + bust.hairThickness + bust.hairSweep,
-    local plan(t) = [self.halfX * std.pow(std.cos(t), 2 / bust.facePower), self.halfZ * std.pow(std.sin(t), 2 / bust.facePower)],
-    reach: std.foldl(std.max, [std.sqrt(p[0] * p[0] + p[1] * p[1]) for i in std.range(0, 90) for p in [plan(i * std.pi / 180)]], 0),
+    local reach(halfX, halfZ, cz) = std.foldl(std.max, [
+      std.sqrt(std.pow(halfX * c, 2) + std.pow(halfZ * s + cz, 2))
+      for i in std.range(0, 360)
+      for t in [i * std.pi / 180]
+      for c in [std.sign(std.cos(t)) * std.pow(std.abs(std.cos(t)), 2 / bust.facePower)]
+      for s in [std.sign(std.sin(t)) * std.pow(std.abs(std.sin(t)), 2 / bust.facePower)]
+    ], 0),
+    halfX: foot.halfX,
+    halfZ: foot.halfZ + bust.hairSweep,
+    reach: reach(self.halfX, self.halfZ, 0),
     chin: above(0),
-    eyes: above(bust.headHeight * bust.eyeLevel),
+    eyes: above(bust.headHeight * bust.eyeShare),
     brow: above(bust.headHeight - bust.hairCover),
-    top: above(bust.headHeight + bust.hairThickness),
+    top: above(bust.headHeight + bust.hairRise),
+    local foot = { halfX: bust.headWidth / 2 + bust.hairThickness, halfZ: bust.headDepth / 2 + bust.hairThickness, cz: -bust.hairSweep },
+    local crown = { halfX: bust.headWidth / 2 * bust.hairCrownShare, halfZ: bust.headDepth / 2 * bust.hairCrownShare, cz: -bust.hairCrownBack },
+    local brow = self.brow, local top = self.top,
+    hair: [
+      local t = (i + 1) / bust.hairLayerCount;
+      local share = 1 - std.sqrt(1 - t * t);
+      local section(key) = foot[key] + (crown[key] - foot[key]) * share;
+      { top: brow + (top - brow) * t, reach: reach(section('halfX'), section('halfZ'), section('cz')) }
+      for i in std.range(0, bust.hairLayerCount - 1)
+    ],
   },
   // The base that seats a head piece with height `y` of it over the eyes, such as a visor's slit.
   eyesAt(y):: self.headroom(0).eyes - y,
@@ -705,6 +719,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local point = [0, y, -bust.hairSweep];
     { part: part, solid: solid, fraction: [std.round(1e9 * (point[i] - min[i]) / (max[i] - min[i])) / 1e9 for i in [0, 1, 2]] },
 
+  // Rigid goods (hats, helmets, goggles): the ground model itself, worn on the head and scaled to fit. Author the
+  // model with its face towards +z, the wearer's front. `base` is how far the model's y = 0 sits above the top of the
+  // neck, so a helmet that encloses the head takes a negative one; `fit` stretches it round the skull. The head frame
+  // sits higher and turns half round, which the entry cancels so callers need not know it.
   head(model, base, fit=[1, 1, 1]):: {
     rows: [],
     figureModels: [entry(model, 'head', []) + { at: [0, base - bust.headFrameRise, 0], turn: [0, 180, 0], scale: fit }],
