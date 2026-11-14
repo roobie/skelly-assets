@@ -90,7 +90,7 @@ local extinguisher(r, ht, valveHt, hoseR, nozzle) =
     turned('spike', 'head', 'x', [[0, 0], [0, 0.012], [0.06, 0.002], [0.06, 0]], [1.54, 0, 0]),
     prism('hook-arm', 'head', 'y', [[0.012, 1.565], [0.064, 1.53], [0.058, 1.514], [0.012, 1.545]], -0.006, 0.006),
     prism('hook-tip', 'head', 'y', [[0.056, 1.534], [0.072, 1.525], [0.072, 1.48], [0.058, 1.494]], -0.006, 0.006),
-  ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + { title: 'Pike pole' } + h.gripOn('pike_pole', 'grip') + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
+  ], { shaft: 'plastic-yellow', grip: 'rubber-black', head: 'steel-grey' }) + { title: 'Pike pole' } + h.gripOn('pike_pole', 'grip') + stow.stows(stow.resting('bar', [0.8, -0.02, 0])) + { taxonomy: { category: 'weapons', tags: { material: ['plastic', 'metal'], setting: ['modern'], weapon: ['polearm'] } } },
   // A two-litre bottle trap 330 mm long lying on x: the bottle's top cut off and pushed back into it neck first as
   // a funnel at +x, tied in with cord, a cord loop on top and a few drain holes.
   h.compound('fish_trap', 0.05, [

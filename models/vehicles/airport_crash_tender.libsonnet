@@ -46,6 +46,7 @@ local stowFinish = stow.finish + { board: 'paint-charcoal', gauge: 'plastic-whit
 // more. Slots stay inside `front`, and the build keeps each item inside its slot (tools/stowage.mjs, loadOutProblems),
 // so the shutters clear whatever a slot holds.
 local middle = (back + front) / 2;
+local spanMiddle(span) = (span[0] + span[1]) / 2;
 local outOf(z) = [back + 0.005 - z, front - z];
 local cylinders = [1.15 + i * 0.24 for i in std.range(0, 4)];
 local hoseRolls = [-0.57 + i * 0.4 for i in std.range(0, 3)];
@@ -88,13 +89,15 @@ local stowage = {
       for column in [{ id: 'a', x: -0.5 }, { id: 'b', x: -0.05 }]
     ] + [
       slots.shelfSlot('high_case', ['case', 'bottle'], [0.55, up(1.32), middle], 0.6, 0.5, outOf(middle)),
+      // Only this locker's floor is long enough for a pike pole, laid in front of the hose rolls.
+      slots.shelfSlot('pole', ['bar'], [spanMiddle(lockerSpans.mid), s.bodyFloor, back + 0.36], 1.62, 0.08, [-0.05, front - back - 0.36]),
     ],
   },
   wheel_fore: {
     fitOut: [stow.board('board', [-2.33, -1.3], [up(0.5), up(1.8)], back)],
     slots: [
       slots.boardSlot('hook_' + slot.id, ['hung-tool'], [slot.x, up(1.77), back + 0.03125], slot.along, 1.0, front - back - 0.03125)
-      for slot in [{ id: 'a', x: -2.15, along: 0.32 }, { id: 'b', x: -1.8, along: 0.25 }, { id: 'c', x: -1.55, along: 0.06 }, { id: 'd', x: -1.4, along: 0.04 }]
+      for slot in [{ id: 'a', x: -2.15, along: 0.32 }, { id: 'b', x: -1.8, along: 0.25 }, { id: 'c', x: -1.55, along: 0.06 }]
     ] + [
       slots.shelfSlot('floor_case', ['case', 'bottle'], [-1.95, s.bodyFloor, back + 0.17], 0.44, 0.6, [-0.12, front - back - 0.17]),
       slots.shelfSlot('floor_machine', ['machine'], [-1.25, s.bodyFloor, back + 0.17], 0.86, 0.45, [-0.12, front - back - 0.17]),
@@ -135,7 +138,7 @@ local stowage = {
       for i in [0, 1, 2]
     ],
     slots: [
-      slots.shelfSlot('suction_' + row.id, ['bar'], [(lockerSpans.aft[0] + lockerSpans.aft[1]) / 2, s.bodyFloor, row.z], 1.32, 0.15, [-0.075, 0.075])
+      slots.shelfSlot('suction_' + row.id, ['bar'], [spanMiddle(lockerSpans.aft), s.bodyFloor, row.z], 1.32, 0.15, [-0.075, 0.075])
       for row in [{ id: 'back', z: back + 0.11 }, { id: 'front', z: back + 0.3 }]
     ],
   },

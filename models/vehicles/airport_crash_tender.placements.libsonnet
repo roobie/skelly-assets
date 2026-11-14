@@ -7,7 +7,7 @@ local id = 'airport_crash_tender';
 local middle(span) = (span[0] + span[1]) / 2;
 local engineName = engine.nameOf(s.engine);
 // The kit each locker carries, slot to catalogue item (airport_crash_tender.libsonnet, `stowage`): breathing sets and
-// foam up front, hose and branches mid, hand tools and extinguishers over the wheels and suction hose under the panel.
+// foam up front, hose, branches and a pike pole mid, hand tools and extinguishers over the wheels and suction hose under the panel.
 local loadOut = {
   fore: { ['cylinder_%d' % i]: 'breathing_air_cylinder' for i in std.range(0, 4) }
         + { ['low_drum_%d' % i]: 'foam_concentrate_drum' for i in [0, 1, 2] }
@@ -15,8 +15,8 @@ local loadOut = {
   mid: { ['roll_%d_%d' % [layer, i]]: 'fire_hose_roll' for layer in [0, 1] for i in std.range(0, 3) }
        + { ['roll_top_%d' % i]: 'fire_hose_roll' for i in std.range(0, 3) }
        + { ['bar_%s_%s' % [row, column]]: 'branch_nozzle' for row in ['back', 'front'] for column in ['a', 'b'] }
-       + { high_case: 'toolbox' },
-  wheel_fore: { hook_a: 'fire_ax', hook_b: 'halligan', hook_c: 'sledgehammer', hook_d: 'crowbar', floor_case: 'toolbox', floor_machine: 'petrol_cut_off_saw' },
+       + { high_case: 'toolbox', pole: 'pike_pole' },
+  wheel_fore: { hook_a: 'fire_ax', hook_b: 'halligan', hook_c: 'sledgehammer', floor_case: 'toolbox', floor_machine: 'petrol_cut_off_saw' },
   wheel_aft: { ['floor_%d' % i]: 'extinguisher' for i in [0, 1, 2] }
              + { ['low_%d' % i]: 'small_fire_extinguisher' for i in std.range(0, 3) }
              + { ['sheet_%d_%d' % [i, layer]]: 'tarp' for i in [0, 1, 2] for layer in [0, 1] }
