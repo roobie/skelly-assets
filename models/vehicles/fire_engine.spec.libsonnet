@@ -15,4 +15,12 @@
   guard: false,
   // Locker body
   bodyRear: -3.85, bodyFront: 0.85, bodyLow: 0.72, bodyFloor: 1.15, bodyTop: 3.0, bodySide: 1.24, ladderY: 3.26,
+  // The roller-shutter lockers along each side and their shutters' titles: each shutter is a part that opens on its own.
+  lockers: {
+    fore: 'Fire engine fore locker shutter',
+    mid: 'Fire engine mid locker shutter',
+    wheel: 'Fire engine wheel locker shutter',
+    aft: 'Fire engine aft locker shutter',
+  },
+  lockersMass: 450,
 }

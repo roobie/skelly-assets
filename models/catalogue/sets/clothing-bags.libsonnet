@@ -2,6 +2,8 @@ local b = import 'packages/thing-authoring-tool/clothing-bags.libsonnet';
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local atom = b.atom, garment = b.garment;
 local bags = import 'models/measures/bags.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local hair = fit.headroom(0);
 local worn(slot, material) = { category: 'clothing', tags: { slot: slot, material: material, setting: ['modern'] } };
 // The garment models lie folded flat.
 local folded(slot, material) = worn(slot, material) + { tags+: { state: ['folded'] } };
@@ -27,9 +29,9 @@ local bag(slot) = { category: 'containers', tags: { slot: slot, material: ['fabr
   atom('fanny_pack', 'bag', 0.200, bags.fanny_pack, bags.finish.fanny_pack, taxonomy=bag(['waist'])) + { title: 'Fanny pack' },
   atom('school_backpack', 'bag', 0.600, bags.school_backpack, bags.finish.school_backpack, 'handle', bag(['back'])) + { title: 'School backpack' },
   atom('hiking_backpack', 'bag', 1.400, bags.hiking_backpack, bags.finish.hiking_backpack, 'handle', bag(['back']) + { keywords: ['camping'] }) + { title: 'Hiking backpack' },
-  // A fitted chamfered crown clears the bust's square hair corners without an oversized circular cap.
+  // The crown stands a garment's layer off the hair's plan, its corners cut clear of the hair's rounded ones.
   atom('baseball_cap', 'cap', 0.080, {
-    width: 0.204, depth: 0.244, height: 0.08, chamfer: 0.04,
+    width: 2 * (hair.halfX + fit.layers.normal), depth: 2 * (hair.halfZ + fit.layers.normal), height: 0.08, chamfer: 0.04,
     brimDepth: 0.09, brimWidth: 0.19, brimThickness: 0.01, brimHeight: 0.014,
   }, { body: 'cloth-blue', trim: 'cloth-charcoal' }) + { title: 'Baseball cap' } + {
     voxelGrain: 0.004,

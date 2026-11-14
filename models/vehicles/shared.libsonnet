@@ -6,6 +6,7 @@ local wheelKit = import 'wheel-kit.libsonnet';
 local gearboxes = import 'gearboxes.libsonnet';
 local tractionMotors = import 'traction-motors.libsonnet';
 local driveline = import 'driveline.libsonnet';
+local plainEngines = import 'plain-engines.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
@@ -464,13 +465,6 @@ local towHitch = k.compound('tow_hitch', 18, [
   spareCarrier,
   farmWheel('wheel_6_50r16_ag', 24, 0.165, 0.203, 0.37, 14) + { title: 'Agricultural wheel 6.50R16' },
   wheel('wheel_145r10', 7, 0.145, 0.127, 0.23) + { title: 'Wheel 145R10' },
-  inline('engine_i3_small', 85, 0.34, 0.42, 0.52) + { title: 'Small inline-3 engine' },
-  inline('engine_i6_diesel', 588, 0.86, 0.56, 0.75) + { title: 'Inline-6 diesel engine' },
-  inline('engine_i6_heavy_diesel', 1250, 1.12, 0.72, 0.95) + { title: 'Heavy inline-6 diesel engine' },
-  vee('engine_v6_petrol', 175, 0.5, 0.62, 0.6) + { title: 'V6 petrol engine' },
-  vee('engine_v8_petrol', 260, 0.62, 0.72, 0.68) + { title: 'V8 petrol engine' },
-  vee('engine_v8_diesel', 1075, 1.0, 1.0, 0.88) + { title: 'V8 diesel engine' },
-  vee('engine_v8_turbo_diesel', 860, 1.16, 0.9, 0.95) + { title: 'V8 turbo diesel engine' },
   exhaust('exhaust_rusted', 12, 2.2, 0.25, [0.42, 0.42], 'scrap-rusted', 'scrap-rusted') + { title: 'Rusted exhaust' },
   exhaust('exhaust_long', 22, 3.6, 0.3, [0.56, 0.36]) + { title: 'Long exhaust' },
   exhaust('exhaust_bus_rear', 15, 0.62, 0.55, [0.5, 0.28]) + { title: 'Rear-mounted bus exhaust' },
@@ -562,5 +556,9 @@ local towHitch = k.compound('tow_hitch', 18, [
   local m = tractionMotors[id];
   tractionMotor(id, m.massKg, m.radius, m.length) + { title: m.title }
   for id in std.objectFields(tractionMotors)
+] + [
+  local e = plainEngines[id];
+  { inline: inline, vee: vee }[e.layout](id, e.massKg, e.length, e.width, e.height) + { title: e.title }
+  for id in std.objectFields(plainEngines)
 ] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
   + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows

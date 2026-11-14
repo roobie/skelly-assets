@@ -40,7 +40,7 @@ local engineSites =
     site.one('crew_bench', 'bench_seat_3', [3.35, s.floor, 0]),
     site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.crown, 0]),
   ]
-  + site.pair('lockers', 'airport_crash_tender_lockers')
+  + std.flattenArrays([site.pair('locker_shutter_' + name, 'airport_crash_tender_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 1.3]),
   tags: { 'vehicle-role': ['emergency'] },
 }

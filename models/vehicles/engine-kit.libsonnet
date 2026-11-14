@@ -143,11 +143,39 @@ local mounts(name) =
   {
     alternator: [e.length / 2 - c.alternator.length / 2, crank + c.drive.alternator.at[0], c.drive.alternator.at[1]],
     starter: [-e.length / 2 + 0.04 + c.starter.length / 2, crank + c.starter.radius, e.width / 2 + c.starter.radius],
-    airBox: [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
+    // An air box over the cover sits on its rear half, clear of a turbo's charge pipe, which crosses the front half.
+    airBox:
+      if std.get(c.airBox, 'over', false) then [-e.length / 4, e.height, 0]
+      else [0, e.height * 0.5, e.width * 0.68 + ductLength + c.airBox.width / 2],
     fuelPump: [-e.length * 0.47, e.height * 0.82, e.width * 0.15],
     driveBelt: [e.length / 2, crank, 0],
   };
-// The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round.
+// What an engine shows of those `engines.libsonnet` names, on its core. The turbo stands on the exhaust manifold behind
+// the engine's middle; its charge pipe runs forward, over the head and down into the intake.
+local shown(e) =
+  local l = e.length;
+  local w = e.width;
+  local h = e.height;
+  local crank = crankHeight(e);
+  local turbo(t) =
+    local at = { x: -l * 0.05, y: h * 0.86, z: -w * 0.6 };
+    local pipe = { x: l * 0.3, y: h + t.pipe, z: w * 0.58 };
+    [
+      box('turbo_foot', 'exhaust', [at.x - 0.06, h * 0.7, at.z - 0.05], [at.x + 0.06, at.y, at.z + 0.05]),
+      round(k.turned('turbine', 'exhaust', 'x', k.disc(t.radius, -0.1, 0), [at.x, at.y, at.z])),
+      round(k.turned('compressor', 'pipe', 'x', k.disc(t.radius * 0.9, 0, 0.1), [at.x, at.y, at.z])),
+      round(k.turned('outlet', 'exhaust', 'y', k.disc(t.pipe * 1.2, 0, h * 0.24), [at.x - 0.05, at.y, at.z])),
+      round(k.turned('charge_feed', 'pipe', 'x', k.disc(t.pipe, 0.1, pipe.x - at.x), [at.x, at.y, at.z])),
+      round(k.turned('charge_rise', 'pipe', 'y', k.disc(t.pipe, at.y, pipe.y), [pipe.x, 0, at.z])),
+      round(k.turned('charge_cross', 'pipe', 'z', k.disc(t.pipe, at.z, pipe.z), [pipe.x, pipe.y, 0])),
+      round(k.turned('charge_drop', 'pipe', 'y', k.disc(t.pipe, h * 0.8, pipe.y), [pipe.x, 0, pipe.z])),
+    ];
+  local damper(d) = [round(k.turned('damper', 'pulley', 'x', k.disc(d.radius, l / 2 + pulleyDepth, l / 2 + pulleyDepth + d.depth), [0, crank, 0]))];
+  local bellHousing(b) = [round(k.turned('bell_housing', 'casting', 'x', k.disc(b.radius, -l / 2 - b.depth, -l / 2), [0, crank, 0]))];
+  local drawn = { turbo: turbo, damper: damper, bellHousing: bellHousing };
+  std.flattenArrays([drawn[f](e[f]) for f in std.objectFields(drawn) if std.objectHas(e, f)]);
+// The block, head, valve cover, sump and manifolds, with the crank and water pump pulleys the belt runs round, and what
+// the engine shows besides.
 local core(name) =
   local e = engines[name];
   local c = classOf(name);
@@ -175,8 +203,9 @@ local core(name) =
       box('exhaust', 'exhaust', [-l * 0.38, h * 0.55, -w * 0.62], [l * 0.38, h * 0.7, -w / 2]),
       pulley('crank_pulley', c.drive.crank.at, c.drive.crank.radius),
       pulley('pump_pulley', c.drive.pump.at, c.drive.pump.radius),
-    ] + boss,
-    finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' },
+    ] + boss + shown(e),
+    finish: { casting: 'steel-grey', cover: 'paint-charcoal', exhaust: 'steel-heat-tint', pulley: 'steel-spall-black' }
+      + (if std.objectHas(e, 'turbo') then { pipe: 'alu-bare' } else {}),
   };
 
 // The engine's accessories as `assembly.libsonnet` fits them, in the order a vehicle lists their sites.

@@ -83,6 +83,8 @@ local fittings(name) =
   back(name):
     local c = classOf(name);
     core.half + std.max(c.fan.depth, core.tank + c.hose.length),
+  // How far a radiator's hoses reach back from its frame, so the engine they feed can stand at their ends.
+  reach(name): core.half + core.tank + classOf(name).hose.length,
   // The radiators, by the names `sites` takes.
   names: std.objectFields(radiators),
   // Every site a radiator can take, so a vehicle that loses its engine can drop them all.
