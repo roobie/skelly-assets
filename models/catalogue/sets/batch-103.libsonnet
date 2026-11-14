@@ -184,13 +184,14 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
 
   // A pair of inline skates, 290 mm long and 340 mm tall: a hard plastic shell boot with a padded liner showing at
   // the cuff and two buckles, on a metal frame carrying four 76 mm wheels in a line.
+  local deck = 0.1;  // The skate boot's underside, on its frame.
   h.compound('inline_skates', 2.9, std.flattenArrays([
     local cx = s * 0.07, p = if s < 0 then 'l-' else 'r-';
     lift(boot(p, skate, cx) + [
       box(p + 'buckle-cuff', 'buckle', [cx - 0.02, 0.2, shaftZ(skate) + skate.rz + 0.004], [cx + 0.02, 0.215, shaftZ(skate) + skate.rz + 0.01]),
       box(p + 'strap-instep', 'strap', [cx - skate.w * 0.47, 0.06, 0.0], [cx + skate.w * 0.47, 0.105, 0.022]),
       box(p + 'buckle-instep', 'buckle', [cx - 0.015, 0.1, 0.004], [cx + 0.015, 0.108, 0.02]),
-    ], 0.1) + [
+    ], deck) + [
       box(p + 'rail-l', 'frame', [cx - 0.017, 0.045, -0.15], [cx - 0.011, 0.1, 0.15]),
       box(p + 'rail-r', 'frame', [cx + 0.011, 0.045, -0.15], [cx + 0.017, 0.1, 0.15]),
       box(p + 'mount-heel', 'frame', [cx - 0.017, 0.09, -0.13], [cx + 0.017, 0.1, -0.08]),
@@ -200,7 +201,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for i in std.range(0, 3)
     ])
     for s in [-1, 1]
-  ]), { sole: 'plastic-charcoal', upper: 'plastic-charcoal', shell: 'plastic-black', shaft: 'cloth-black', collar: 'plastic-black', lining: 'paint-charcoal', strap: 'plastic-black', buckle: 'alu-bare', frame: 'alu-bare', wheel: 'plastic-clear-blue', hub: 'plastic-white' }) + { title: 'Inline skates' }
+  ]), { sole: 'plastic-charcoal', upper: 'plastic-charcoal', shell: 'plastic-black', shaft: 'cloth-black', collar: 'plastic-black', lining: 'paint-charcoal', strap: 'plastic-black', buckle: 'alu-bare', frame: 'alu-bare', wheel: 'plastic-clear-blue', hub: 'plastic-white' }) + { title: 'Inline skates', soleLift: deck + skate.t }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of sneakers with a wheel tucked into each heel, 280 mm long and 90 mm tall: black uppers with white laces
@@ -210,24 +211,26 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       h.turned(p + 'wheel-cap', 'hub', 'z', [[0, 0], [0, 0.015], [0.004, 0.015], [0.004, 0]], [cx, 0.016, -0.149]),
       box(p + 'stripe', 'stripe', [cx - sneaker.w * 0.5, 0.034, -0.08], [cx + sneaker.w * 0.5, 0.044, 0.06]),
     ]
-  ), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', hub: 'plastic-grey', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers' }
+  ), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', hub: 'plastic-grey', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers', soleLift: sneaker.t }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same sneakers with the heel wheels pushed out, each a 40 mm wheel standing below the sole so the toes lift.
+  local tilt = 0.012;  // The sole's rise off the floor over the wheels.
   h.compound('heel_wheel_sneakers_wheels_out', 1.5, std.flattenArrays([
     local cx = s * (sneaker.w / 2 + 0.015) * 1.06, p = if s < 0 then 'l-' else 'r-';
     lift(boot(p, sneaker, cx) + instepLaces(p, sneaker, cx, 4) + [
       box(p + 'stripe', 'stripe', [cx - sneaker.w * 0.5, 0.034, -0.08], [cx + sneaker.w * 0.5, 0.044, 0.06]),
-    ], 0.012) + wheel(p + 'wheel', cx, -0.1, 0.02, 0.022)
+    ], tilt) + wheel(p + 'wheel', cx, -0.1, 0.02, 0.022)
     for s in [-1, 1]
-  ]), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', wheel: 'plastic-grey', hub: 'steel', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers, wheels out' }
+  ]), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', wheel: 'plastic-grey', hub: 'steel', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers, wheels out', soleLift: tilt + sneaker.t }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of old-fashioned roller skates, 270 mm long and 260 mm tall: laced brown leather boots bolted to steel
   // plates, each on two axles with a pair of 56 mm steel wheels and a rubber toe stop.
+  local plate = 0.068;  // The skate boot's underside, on its plate.
   h.compound('roller_skates', 3, std.flattenArrays([
     local cx = s * 0.075, p = if s < 0 then 'l-' else 'r-';
-    lift(boot(p, quad, cx) + laces(p, quad, cx, 0.07, 0.18), 0.068) + [
+    lift(boot(p, quad, cx) + laces(p, quad, cx, 0.07, 0.18), plate) + [
       box(p + 'plate', 'frame', [cx - 0.03, 0.058, -0.12], [cx + 0.03, 0.068, 0.12]),
       box(p + 'truck-back', 'frame', [cx - 0.02, 0.04, -0.1], [cx + 0.02, 0.058, -0.07]),
       box(p + 'truck-front', 'frame', [cx - 0.02, 0.04, 0.07], [cx + 0.02, 0.058, 0.1]),
@@ -238,7 +241,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for k in [0, 1]
     ])
     for s in [-1, 1]
-  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates' }
+  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates', soleLift: plate + quad.t }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'metal'], slot: ['feet'] } } },
 
   // A pair of sheet metal sabatons, 300 mm long and 95 mm tall: three bent plates riveted over the front of each foot,
