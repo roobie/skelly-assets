@@ -28,7 +28,7 @@ import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
 import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
-import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
+import { NAV_MARK, readTools, SITE_FILES, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
@@ -199,7 +199,7 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'fabric.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'motionPose.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
+for (const f of SITE_FILES) cpSync(join(here, f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();

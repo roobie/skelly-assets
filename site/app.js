@@ -1,7 +1,8 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
-// can be exploded to show each part apart from the others, as can a model that comes in components, or opened, with every door, lid and shutter at its stop; a wearable can be shown loose or worn on the doll. What it
-// draws, and how, is render.mjs's.
+// can be exploded to show each part apart from the others, as can a model that comes in components, or opened, with
+// every door, lid and shutter at its stop; a wearable can be shown loose or worn on the doll. What it draws, and how, is
+// render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
