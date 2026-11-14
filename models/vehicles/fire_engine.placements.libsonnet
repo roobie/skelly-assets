@@ -14,7 +14,7 @@ local s = t.spec(import 'fire_engine.spec.libsonnet');
     site.one('rear_step', 'fire_engine_rear_step'),
     site.one('crew_bench', 'bench_seat_3', [1.32, s.floor, 0]),
   ]
-  + site.pair('lockers', 'fire_engine_lockers')
+  + std.flattenArrays([site.pair('locker_shutter_' + name, 'fire_engine_locker_shutter_' + name) for name in s.lockers])
   + site.pair('cab_beacon', 'beacon_blue', [s.face - s.lean - 0.45, s.roof + 0.11, 0.9])
   + site.pair('rear_beacon', 'beacon_blue', [s.bodyRear + 0.2, s.bodyTop, 0.95]),
   tags: { 'vehicle-role': ['emergency'] },

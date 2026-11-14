@@ -23,6 +23,8 @@
   guard: false,
   // Locker body
   bodyRear: -5.52, bodyFront: 2.82, bodyLow: 0.92, bodyFloor: 1.45, bodyTop: 3.4, bodySide: 1.5,
+  // The roller-shutter lockers along each side, each shutter a part that opens on its own.
+  lockers: ['fore', 'mid', 'wheel_fore', 'wheel_aft', 'aft'],
   // Roof turret on the cab roof and bumper turret on the front bumper, both aimed straight ahead.
   turretX: 3.62, bumperTurretX: 5.48,
   bodyMass: 5600, waterTankMass: 1600, foamTankMass: 260, pumpMass: 720, lockersMass: 520,
