@@ -90,7 +90,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['engine', 'bonnet', 0.155],
       ['engine', 'cab', 0.067],
-      ['engine', 'chassis', 0.09],
       ['engine', 'frame', 0.125],
       ['engine', 'front_axle', 0.155],
       ['engine', 'front_bumper', 0.068],
@@ -104,7 +103,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['gearbox', 'bonnet', 0.085],
       ['gearbox', 'cab', 0.181],
-      ['gearbox', 'chassis', 0.092],
       ['gearbox', 'frame', 0.065],
       ['gearbox', 'shell', 0.181],
       ['gearbox', 'tub', 0.065],

@@ -18,4 +18,8 @@ local s = t.spec(import 'car_transporter.spec.libsonnet');
     site.overlap('lower_deck', 'deck_posts', 0.058,
       'The tail posts stand in the plate of the lower deck.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail: the rails sit too close together for it.'),
+  ],
 }

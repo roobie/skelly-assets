@@ -16,4 +16,8 @@ local site = import 'site.libsonnet';
     ],
   ),
   tags: { 'vehicle-role': ['emergency'] },
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.08,
+      'The heavy I6\'s intake stands in the near rail: the rails sit too close together for it.'),
+  ],
 }

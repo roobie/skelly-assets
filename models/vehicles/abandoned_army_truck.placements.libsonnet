@@ -38,4 +38,8 @@ local wheel(id, x) = pair(id, 'abandoned_army_truck_wheel', [x, s.hubY, s.wheelZ
     site.overlap('chassis', 'screen_frame', 0.06,
       'The skirt of the cab front wall below the floor stands into the chassis rails.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.087,
+      'The near rail runs through the engine\'s radiator.'),
+  ],
 }

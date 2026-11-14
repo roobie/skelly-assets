@@ -15,4 +15,10 @@ local id = 'military_cargo_truck';
     site.overlap('cab', 'gearbox', 0.27,
       'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
   ],
+  unjudged: [
+    site.unjudged('chassis', 'engine', 0.087,
+      'A crossmember runs through the engine\'s sump.'),
+    site.unjudged('chassis', 'gearbox', 0.087,
+      'A crossmember runs through the gearbox case.'),
+  ],
 }
