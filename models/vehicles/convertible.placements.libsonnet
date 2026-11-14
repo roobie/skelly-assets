@@ -16,8 +16,4 @@ local s = import 'convertible.spec.libsonnet';
     },
     add: [site.one('folded_hood', 'convertible_folded_hood')],
   }),
-  swingUnjudged: [
-    site.swingUnjudged('boot_lid', 'folded_hood', 0.0127, 'skin meets tonneau'),
-    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
-  ],
 }

@@ -11,7 +11,6 @@ local retagged = [placed + { part: retag(placed.part) } for placed in (import 's
     site.one('side_band', 'taxi_side_band'),
   ],
   swingUnjudged: [
-    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
     site.swingUnjudged('front_door_far', 'side_band', 0.025, 'skin_far meets front_6_far'),
     site.swingUnjudged('front_door_near', 'side_band', 0.025, 'skin meets front_3_near'),
     site.swingUnjudged('rear_door_far', 'side_band', 0.025, 'skin_far meets rear_3_far'),

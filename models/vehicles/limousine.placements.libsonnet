@@ -19,7 +19,6 @@ local s = import 'limousine.spec.libsonnet';
     ],
   }),
   swingUnjudged: [
-    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
     site.swingUnjudged('front_door_far', 'brightwork', 0.0118, 'glass_0_far meets front_belt_far'),
     site.swingUnjudged('front_door_near', 'brightwork', 0.0118, 'glass_0 meets front_belt_near'),
     site.swingUnjudged('rear_door_far', 'brightwork', 0.0118, 'glass_0_far meets rear_belt_far'),

@@ -67,6 +67,8 @@ local pressings(id, title, s) = {
   local doorFinish = paint + { paint: doorPaint },
   local rearPanelTop = s.rearSill,
   local floorBack = if boot then s.rear + 0.1 else s.tailWaist,
+  // The inner face of the load bay's side trim, which the boot lid closes between.
+  local loadSide = s.glassIn - 0.04,
   // `s.bootFloor` raises the floor behind the seats over an engine under it.
   local bootFloor = std.get(s, 'bootFloor', 0.48 + lift),
   // `s.towerFront` stops the strut towers short of a nose too short for them.
@@ -127,13 +129,13 @@ local pressings(id, title, s) = {
       // The lamp's corner, closed round the lens, so the tail reads square from the side and from above.
       box('tail_over', 'paint', [s.rear + 0.04, s.lampTop, s.hatchSide], [if boot then s.rear + 0.1 else std.max(s.rear + 0.1, std.min(s.tailWaist, s.rear + 0.2)), if boot then s.deck - 0.03 else tailTop, s.side]),
     ] + (if boot then [
-      box('tail_over_edge', 'paint', [s.rear + 0.04, s.deck - 0.03, s.glassIn], [s.rear + 0.1, s.deck, s.side]),
+      box('tail_over_edge', 'paint', [s.rear + 0.04, s.deck - 0.03, loadSide], [s.rear + 0.1, s.deck, s.side]),
     ] else []) + [
       box('tail_out', 'paint', [s.rear + 0.04, 0.62 + lift, s.skin + 0.04], [s.rear + 0.1, s.lampTop, s.side]),
       box('tail_under', 'paint', [s.rear + 0.04, bumperTop, s.hatchSide], [s.rear + 0.1, 0.62 + lift, s.side]),
       box('quarter_arch', 'paint', [s.rearAxle - s.arch, s.archTop, s.skin], [s.rearDoor, s.waist, s.side]),
       shape.aftCorner('quarter_corner_aft', 'paint', s.rearAxle, [s.skin, s.side]),
-      box('boot_side', 'trim', [floorBack, bootFloor, s.glassIn - 0.04], [s.rearFloorFront, s.waist, s.skin]),
+      box('boot_side', 'trim', [floorBack, bootFloor, loadSide], [s.rearFloorFront, s.waist, s.skin]),
     ]) + (if !cab && !hasDoorCorner then [
       shape.foreCorner('quarter_corner_fore', 'paint', s.rearAxle, [s.skin, s.side]),
     ] else []) + (if std.get(s, 'archLiner', false) then archLiner('front', s.frontAxle) + (if cab then [] else archLiner('rear', s.rearAxle)) else []) + (if twoDoor then [
@@ -141,7 +143,7 @@ local pressings(id, title, s) = {
     ] + shape.side('quarter_light', 'glass', [[s.cWaist, s.waist], [s.bRear, s.waist], [s.bRear, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist), windowTop]], paneZ) else []) + (if cab then [] else if boot then (if open then [] else
       shape.side('c_pillar', 'paint', [[s.deckFront, s.waist], [s.cWaist, s.waist], [s.cWaist + s.cLean, s.roof], [roofRear, s.roof]], [s.glassIn, s.glassOut])
     ) + [
-      box('deck_side', 'paint', [s.rear + 0.1, s.deck - 0.08, s.glassIn], [s.deckFront, s.deck, s.side]),
+      box('deck_side', 'paint', [s.rear + 0.1, s.deck - 0.08, loadSide], [s.deckFront, s.deck, s.side]),
     ] else
       shape.side('c_pillar', 'paint', [[s.cWaist - s.cWidth, s.waist], [s.cWaist, s.waist], [s.cWaist + s.cLean, s.roof], [s.cWaist - s.cWidth + s.cLean, s.roof]], [s.glassIn, s.glassOut])
       + (if s.cWaist - s.cWidth > s.tailWaist + 0.08 then
@@ -225,15 +227,14 @@ local pressings(id, title, s) = {
     ] + (if slidingRearDoor then [] else doorPins(rearDoorFront)), doorFinish,
     motion=if slidingRearDoor then null else k.motion.hinge(doorPins(rearDoorFront), 'near', opens.door)),
   ]) + (if cab then [] else if boot then [
-    // Separate hinge leaves sit under the lid, inboard of the gutter; its full-width skin edge is not a hinge pin.
-    local hingeHalf = s.glassIn * 0.7;
+    // The lid hinges on its top front edge, inboard of the gutters: every other point of it then rises behind the rear
+    // screen and inside the load bay's sides.
+    local lidTop = s.deck + 0.02;
+    local bootLidPins = k.hingePins('hinge', 'z', [s.deckFront, lidTop, 0.7 * loadSide], [s.deckFront, lidTop, -0.7 * loadSide]);
     part('_boot_lid', 'boot lid', 12, [
-      box('skin', 'paint', [s.rear + 0.04, s.deck - 0.02, -s.glassIn], [s.deckFront, s.deck + 0.02, s.glassIn]),
+      box('skin', 'paint', [s.rear + 0.04, s.deck - 0.02, -loadSide], [s.deckFront, lidTop, loadSide]),
       box('tail', 'paint', [s.rear + 0.02, 0.62 + lift, -s.hatchSide], [s.rear + 0.06, s.deck - 0.02, s.hatchSide]),
-    ] + bothSides([
-      box('hinge_leaf', 'paint', [s.deckFront - 6 * grain, s.deck - 2 * grain, hingeHalf - grain], [s.deckFront - grain, s.deck, hingeHalf + grain]),
-      k.turned('hinge_pivot', 'paint', 'z', k.disc(grain, -grain, grain), [s.deckFront - grain, s.deck - 2 * grain, hingeHalf]),
-    ]) + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), motion=k.motion.hinge(['hinge_pivot_near', 'hinge_pivot_far'], 'up', opens.bootLid)),
+    ] + bootLidPins + (if stripe == null then [] else stripes(s.deck + 0.01, s.rear + 0.04, s.deckFront)), paint + (if stripe == null then {} else { stripe: stripe }), motion=k.motion.hinge(bootLidPins, 'up', opens.bootLid)),
   ] else [
     // The whole rear opening, glass and all, lifts as one about pins on the roof's top rear edge: every point of the
     // gate lies below and behind them, so it swings clear of the roof.

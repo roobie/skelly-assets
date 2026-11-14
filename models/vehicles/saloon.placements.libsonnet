@@ -36,7 +36,4 @@ local s = import 'saloon.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.66, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
-  swingUnjudged: [
-    site.swingUnjudged('boot_lid', 'shell', 0.0196, 'skin meets boot_side_far'),
-  ],
 }
