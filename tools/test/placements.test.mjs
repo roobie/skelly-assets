@@ -133,3 +133,13 @@ test('a listed overlap names two different sites of the vehicle, its depth cap a
     assert.match(listing('door_near'), new RegExp(`${listKey} is not a list`));
   }
 });
+
+// A rider is posed by its carrier, so a carrier that is not a site, or that comes back to the rider, would pose it by nothing.
+test('a rider names another site of its vehicle, and no chain of carriers comes back to it', () => {
+  const riding = (...riders) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: [body, ...riders] } });
+  const rider = (id, rides) => ({ id, part: 'fixture_door', at: [0, 0, 0], rides });
+  assert.equal(riding(rider('a', 'body'), rider('b', 'a')), '');
+  assert.match(riding(rider('a', 'gone')), /a: rides names another site of the vehicle, not gone/);
+  assert.match(riding(rider('a', 'a')), /a: rides names another site/);
+  assert.match(riding(rider('a', 'b'), rider('b', 'a')), /a: rides comes back to/);
+});

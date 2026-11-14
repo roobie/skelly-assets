@@ -3,7 +3,7 @@ read_if:
   - authoring a vehicle part that opens, swings or slides, such as a door, lid, tailgate or bonnet
   - drawing hinge pins, or choosing how far a part opens
   - reading a model's `motion` in a consumer, or placing a mirrored part that moves
-  - adding a kind of motion, or a part that moves in several stages
+  - adding a kind of motion, or a part that moves in several stages, stows into its carrier or rides another part
 ---
 
 # 15. A part's motion is content, derived from the pins it is drawn with
@@ -49,6 +49,17 @@ own.
   corner sweeps; see `tools/packages/thing-core/src/motion.ts`, `shareStages`. Equal shares would give a few centimetres
   of plug-out the same time as a metre of slide. Only the build has the pins and bounds, so it exports the shares and
   no consumer can derive different ones.
+
+- **A slide may stow.** A shutter rises into its head, so what it carries past the leading face of the part's rest
+  bounds is hidden, not drawn through the head. The build exports that face as one offset along the slide's own
+  direction, never a separate plane normal, which would always equal the direction and could disagree with it; the
+  plane stays where it is while the slide moves, and a mirrored twin keeps the same offset along its reflected
+  direction. See `tools/packages/thing-core/src/motion.ts`, `isStowed`.
+- **A rider names its carrier once.** A part that moves with another and then on its own, such as the free panel of a
+  folding door, is a site that `rides` the carrier's site, so the carrier is stated in the placements and nowhere
+  else. Its stages are in its own rest frame and sit inside all of its carrier's, so a rider's pose is the carrier's
+  pose and then its own, and it runs on its carrier's clock; a sense hint is read in its own rest frame, not where the
+  carrier has carried it. See `tools/placements.mjs`, `ridesProblems`.
 
 Pivots are not attach points, so a part with a motion has no hinge anchors. A part row has hinge anchors or a motion,
 never both; a row that declares no motion keeps whatever hinge anchors it has.

@@ -18,7 +18,7 @@ const repo = resolve(import.meta.dirname, '..');
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
 const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'tags', 'title', 'unjudged']);
-const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish']);
+const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
 
@@ -51,6 +51,23 @@ function parentProblems(vehicle, parent, placements, vehicleRows) {
   if (placements[parent]?.parent !== undefined) problems.push(`${vehicle}: parent ${parent} is itself a variant`);
   if (Object.hasOwn(vehicleRows, vehicle)) problems.push(`${vehicle}: a variant's rows belong in its parent's file`);
   return problems;
+}
+
+// Why the carriers the sites name cannot pose their riders: each is another site of the vehicle, and no chain of
+// carriers comes back to its rider.
+function ridesProblems(vehicle, sites) {
+  const carrierOf = new Map(sites.map((site) => [site?.id, site?.rides]));
+  return sites.flatMap((site) => {
+    if (site?.rides === undefined) return [];
+    const where = `${vehicle}/${site.id}`;
+    if (site.rides === site.id || !carrierOf.has(site.rides)) return [`${where}: rides names another site of the vehicle, not ${site.rides}`];
+    const chain = new Set([site.id]);
+    for (let carrier = site.rides; carrier !== undefined; carrier = carrierOf.get(carrier)) {
+      if (chain.has(carrier)) return [`${where}: rides comes back to ${carrier}`];
+      chain.add(carrier);
+    }
+    return [];
+  });
 }
 
 function siteProblems(vehicle, sites, pack, dependsOn, byModel) {
@@ -125,7 +142,7 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
       problems.push(...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(({ message }) => message));
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
-    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel));
+    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel), ...ridesProblems(vehicle, entry.sites));
     if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
     if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
   }

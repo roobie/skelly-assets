@@ -1,6 +1,6 @@
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { applyDir, applyPoint, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
@@ -161,7 +161,7 @@ const ItemSchema = pipe(
                 toward: picklist(TOWARDS),
                 open: OpenAngleSchema,
               }),
-              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive }),
+              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive, stow: optional(literal(true)) }),
             ]),
           ),
           nonEmpty(),
@@ -386,9 +386,16 @@ export const itemMotion = (
   const pieces = compoundPieces(part.params);
   const rest = piecesBounds(pieces);
   const centre = place(centreOf(rest));
+  const hull = cornersOf(rest).map(place);
   const stage = (step: (typeof authored.stages)[number]): StageMove => {
     if (step.kind === 'slide') {
-      return { kind: 'slide', direction: TOWARD[step.toward], travel: step.travel * metresPerUnit };
+      const direction = TOWARD[step.toward];
+      return {
+        kind: 'slide',
+        direction,
+        travel: step.travel * metresPerUnit,
+        ...(step.stow ? { stow: Math.max(...hull.map((corner) => dot(corner, direction))) } : {}),
+      };
     }
     const pins = step.pins.map((id) => {
       const pin = pieces.find((piece) => piece.id === id);
@@ -402,7 +409,7 @@ export const itemMotion = (
     return { kind: 'hinge', axis, angle: hingeSense(axis, centre, step.toward, grain) * step.open };
   };
   try {
-    return shareStages(authored.stages.map(stage), cornersOf(rest).map(place));
+    return shareStages(authored.stages.map(stage), hull);
   } catch (failure) {
     throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
   }

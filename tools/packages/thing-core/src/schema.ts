@@ -128,7 +128,8 @@ const ShareSchema = pipe(
 /**
  * A part's motion from rest to its design stop, in the model frame and metres: rigid stages run one after another,
  * each through its `share` of the clock. A hinge turns `angle` degrees about the line `from` → `to`, signed by the
- * right-hand rule; a slide moves `travel` along `direction`. Every stage is given in the part's rest frame, and the
+ * right-hand rule; a slide moves `travel` along `direction`, and a stowing slide hides what it carries past `stow`, an
+ * offset along its direction in the frame just outside it; see `src/motion.ts`, `isStowed`. Every stage is given in the part's rest frame, and the
  * first carries the rest; see `src/motion.ts`, `posePoint`. A far-side twin's motion is not stored; see
  * `src/motion.ts`, `mirrorMotion`.
  */
@@ -148,7 +149,7 @@ export const MotionSchema = pipe(
         ),
         share: ShareSchema,
       }),
-      strictObject({ kind: literal('slide'), direction: UnitVectorSchema, travel: positive, share: ShareSchema }),
+      strictObject({ kind: literal('slide'), direction: UnitVectorSchema, travel: positive, stow: optional(pipe(number(), finite())), share: ShareSchema }),
     ]),
   ),
   nonEmpty(),

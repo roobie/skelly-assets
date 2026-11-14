@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
-import { mirrorMotion, posePoint } from '@skelly/thing-core/motion';
+import { isStowed, mirrorMotion, posePoint } from '@skelly/thing-core/motion';
 import type { Motion } from '@skelly/thing-core/schema';
 import { expect, it } from 'vitest';
 import { evaluateJsonnet } from '../../../jsonnet/index.mjs';
@@ -47,4 +47,18 @@ it('slides a hinged panel in its rest frame and swings the slid panel about the 
   const motion = panelMotion("k.hingePins('hinge', 'y', [0, 0.2, 0.85], [0, 0.8, 0.85])", "k.motion.hinge(pins, 'near', 90) + k.motion.slide('rear', 0.5)");
   // The panel's rear corner slides 0.5 m rearward to 1.5 m behind the hinge, and the quarter turn swings that toward near.
   expectPoses(motion, [-0.85, 0.5, -1], [[1, [-0.85 - 1.5, 0.5, 0]]]);
+});
+
+it('shows nothing of a stowing slide beyond the rest bounds at any clock, on the near part or its far twin', () => {
+  const [low, high, travel] = [0, 1, 0.4];
+  const motion = panelMotion('[]', `k.motion.slide('up', ${travel}, stow=true)`);
+  const rest = [...Array(5).keys()].flatMap((i) => [...Array(5).keys()].map((j): Vec3 => [-1 + i / 4, low + (j / 4) * (high - low), 0.8 + 0.05 * (i / 4)]));
+  const clocks = [0, 0.25, 0.5, 0.75, 1];
+  for (const twin of [motion, mirrorMotion(motion)]) {
+    const shown = clocks.map((clock) => rest.filter((point) => !isStowed(twin, point, clock)).map((point) => posePoint(twin, point, clock)));
+    shown.flat().forEach(([, y]) => expect(y).toBeLessThanOrEqual(high + 1e-9));
+    // The stow is not vacuous: nothing is hidden at rest, and the head hides the top of the curtain once it has risen.
+    expect(shown[0]).toHaveLength(rest.length);
+    expect(shown.at(-1)!.length).toBeLessThan(rest.length);
+  }
 });
