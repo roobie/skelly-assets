@@ -91,8 +91,8 @@ export const slotOf = ({ id, accepts, envelope, pos, normal, up }) => ({ id, acc
 const envelopeBox = (slot) => boxOf(corners(slot.envelope).map((p) => outOf(frameOf(slot.frame), p)));
 
 // Why a part's slots cannot hold kit apart and clear of its fit-out, as messages. The part is given in the vehicle
-// frame, `length` being the axis along the vehicle; boxes and pieces may share up to `grain` as contact, as sites do
-// (tools/siteOverlap.mjs).
+// frame, `length` being the axis along the vehicle. An envelope may touch another or a piece but not reach into it,
+// since kit filling it would then stand in the other's; pieces are sampled `grain` apart for their depth.
 export function slotProblems({ id, slots, pieces }, grain, length = 0) {
   const problems = [];
   const seen = new Set();
@@ -121,7 +121,7 @@ export function slotProblems({ id, slots, pieces }, grain, length = 0) {
   for (let i = 0; i < sound.length; i++) {
     for (let j = i + 1; j < sound.length; j++) {
       const [a, b] = [sound[i].box, sound[j].box];
-      if (AXES.every((k) => Math.min(a.max[k], b.max[k]) - Math.max(a.min[k], b.min[k]) > grain)) {
+      if (AXES.every((k) => Math.min(a.max[k], b.max[k]) - Math.max(a.min[k], b.min[k]) > EPSILON)) {
         problems.push(`${id}: the envelopes of ${sound[i].id} and ${sound[j].id} overlap`);
       }
     }
@@ -129,8 +129,8 @@ export function slotProblems({ id, slots, pieces }, grain, length = 0) {
   for (const { id: slot, box } of sound) {
     const envelope = solid({ kind: 'box', ...box });
     for (const piece of pieces) {
-      const depth = 2 * sharedDepth(envelope, solid(piece), grain / 2, grain / 2);
-      if (depth > 0) problems.push(`${id}.${slot}: its envelope reaches ${Math.round(depth * 1e3)} mm into ${piece.id}`);
+      const depth = 2 * sharedDepth(envelope, solid(piece), EPSILON, grain / 2);
+      if (depth > 2 * EPSILON) problems.push(`${id}.${slot}: its envelope reaches ${Math.round(depth * 1e3)} mm into ${piece.id}`);
     }
   }
   return problems;
