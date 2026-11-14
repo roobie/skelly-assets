@@ -5,10 +5,10 @@ local s = import 'riot_van.spec.libsonnet';
   title: 'Riot van',
   sites: van.fittings(site.kit, 'riot_van', s) + [
     site.one('windscreen_grille', 'riot_van_windscreen_grille'),
-    site.one('side_door_grille', 'riot_van_side_door_grille'),
+    site.one('side_door_grille', 'riot_van_side_door_grille', rides='side_door'),
     site.one('side_grilles', 'riot_van_side_grilles'),
     site.one('markings', 'riot_van_markings'),
-    site.one('side_door_markings', 'riot_van_side_door_markings'),
+    site.one('side_door_markings', 'riot_van_side_door_markings', rides='side_door'),
     site.one('light_bar', 'light_bar_blue', [-0.325, s.roof, 0]),
     site.one('push_bar', 'riot_van_push_bar'),
     site.one('crew_bench', 'bench_seat_3', [-0.9, s.floor, 0]),
