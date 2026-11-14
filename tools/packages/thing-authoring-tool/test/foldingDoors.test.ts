@@ -139,10 +139,10 @@ it('keeps every folding leaf clear of every other leaf of its vehicle at every s
   expect(compared).toBeGreaterThan(0);
 });
 
-// BR's ceiling on the closed seam between a doorway's two leaves, which reads as a seam rather than a slot.
+// The widest closed seam between a doorway's two leaves that still reads as a seam rather than a slot.
 const CLOSED_SEAM = 0.03;
 
-it('closes the two leaves of a doorway to a seam no wider than the ruled ceiling', () => {
+it('closes the two leaves of a doorway to a seam, not a slot', () => {
   const pairs = Object.entries(doorPairs).flatMap(([vehicle, doorways]) => doorways.map((pair) => ({ vehicle, pair })));
   expect(pairs.length).toBeGreaterThan(0);
   for (const { vehicle, pair } of pairs) {
