@@ -4,6 +4,7 @@ local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
 local gearboxes = import 'gearboxes.libsonnet';
+local driveline = import 'driveline.libsonnet';
 local box = k.box;
 local tyreProfile(width, rim, outer) = k.tyreProfile(width, rim, outer, 0.1);
 // A turned row's eight default flats read as an octagon at the vehicle grain, so wheels take more.
@@ -82,11 +83,17 @@ local strut(id, massKg) = k.compound(id, massKg, [
   box('knuckle', 'steel', [-0.05, -0.06, -0.05], [0.05, 0.06, 0]),
   k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.47), [0, 0.06, -0.02]),
 ], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
-local beamAxle(id, massKg, track, radius, height, drums=true) = k.compound(id, massKg, [
+// An axle's spring seat (`driveline.libsonnet`, `axles`), resting on its beam's top at `beamTop`.
+local springSeat(id, beamTop, halfLength) =
+  local seat = driveline.axles[id].seat;
+  assert seat.y[0] <= beamTop && seat.y[1] > beamTop : id + "'s spring seats must rest on its beam";
+  box('spring_seat', 'steel', [-halfLength, seat.y[0], seat.z[0]], [halfLength, seat.y[1], seat.z[1]]);
+// `seats` names the `driveline.libsonnet` axle whose seats it carries, which a bare twin shares.
+local beamAxle(id, massKg, track, radius, height, drums=true, seats=id) = k.compound(id, massKg, [
   k.turned('beam', 'steel', 'z', k.disc(radius, -track / 2, track / 2), [0, height, 0]) + { sides: 12 },
   box('diff', 'steel', [-0.14, height - 0.13, -0.13], [0.14, height + 0.13, 0.13]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.09, height + radius - 0.01, track / 2 - 0.36], [0.09, height + radius + 0.04, track / 2 - 0.22]),
+  springSeat(seats, height + radius, 0.09),
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.4, -0.06, 0.06), [0, height, track / 2 - 0.1]) + { sides: 12 },
 ] else [])), { steel: 'steel-grey' });
@@ -99,10 +106,10 @@ local trailerAxle(id, massKg, track, radius, height, drums=true) = k.compound(id
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.2, -0.05, 0.05), [0, height, track / 2 - 0.1]),
 ] else [])), { steel: 'steel-grey' });
 // A steered I-beam for 295 wheels, in `beamAxle`'s frame: the king pins stand at the beam's ends.
-local steeredAxle(id, massKg, halfTrack, height, drums=true) = k.compound(id, massKg, [
+local steeredAxle(id, massKg, halfTrack, height, seats, drums=true) = k.compound(id, massKg, [
   box('beam', 'steel', [-0.06, height - 0.06, -halfTrack], [0.06, height + 0.06, halfTrack]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.09, height + 0.06, 0.42], [0.09, height + 0.1, 0.56]),
+  springSeat(seats, height + 0.06, 0.09),
   box('king_pin', 'steel', [-0.08, height - 0.12, halfTrack - 0.1], [0.08, height + 0.12, halfTrack + 0.05]),
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(0.2, halfTrack + 0.05, halfTrack + 0.18), [0, height, 0]) + { sides: 12 },
@@ -120,7 +127,7 @@ local truckSteeredAxle = 350;
 local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
   box('beam', 'steel', [-0.045, 0.385, -0.95], [0.045, 0.475, 0.95]),
 ] + k.bothSides([
-  box('spring_seat', 'steel', [-0.07, 0.475, 0.32], [0.07, 0.5, 0.46]),
+  springSeat('steered_axle_medium', 0.475, 0.07),
   box('king_pin', 'steel', [-0.06, 0.33, 0.87], [0.06, 0.53, 1.0]),
   k.turned('drum', 'steel', 'z', k.disc(0.17, 1.0, 1.12), [0, 0.43, 0]) + { sides: 12 },
 ]), { steel: 'steel-grey' }) + { title: 'Medium steered axle' };
@@ -140,7 +147,7 @@ local twistBeam(id, massKg, track) = k.compound(id, massKg, [
   box('stub', 'steel', [-0.04, 0.28, track / 2 - 0.1], [0.04, 0.36, track / 2 - 0.03]),
 ]), { steel: 'steel-grey' });
 local propShaft(id, massKg, length) = k.compound(id, massKg, [
-  k.turned('tube', 'steel', 'x', k.disc(0.04, -length / 2, length / 2)),
+  k.turned('tube', 'steel', 'x', k.disc(driveline.propShaftRadius, -length / 2, length / 2)),
 ], { steel: 'steel-grey' });
 // A seat for two or three, its back at -x.
 local bench(id, massKg, width) = k.compound(id, massKg, [
@@ -485,11 +492,11 @@ local towHitch = k.compound('tow_hitch', 18, [
   // is drawn without its own and is lighter by theirs.
   trailerAxle('de_dion_axle_small', 35 - 2 * wheelKit.brakeMass('light', 'drum'), 1.43, 0.045, 0.3015, drums=false) + { title: 'Small de Dion axle' },
   trailerAxle('trailer_axle_van', 65, 1.68, 0.045, 0.37) + { title: 'Van trailer axle' },
-] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
+] + withBare(function(id, massKg, drums) beamAxle(id, massKg, 1.86, 0.07, 0.52, drums, 'beam_axle_truck'), 'beam_axle_truck', 'Truck beam axle', 'Bare truck beam axle', truckDriveAxle, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 0.95, 0.52, 'steered_axle_heavy', drums), 'steered_axle_heavy', 'Heavy steered axle', 'Bare heavy steered axle', truckSteeredAxle, 'heavy')
 // Axles long enough to reach flotation tyres set out under a 3 m wide truck.
-+ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
-+ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, drums), 'steered_axle_wide', 'Wide steered axle', 'Bare wide steered axle', 400, 'heavy')
++ withBare(function(id, massKg, drums) beamAxle(id, massKg, 2.5, 0.1, 0.52, drums, 'beam_axle_wide'), 'beam_axle_wide', 'Wide beam axle', 'Bare wide beam axle', 600, 'heavy')
++ withBare(function(id, massKg, drums) steeredAxle(id, massKg, 1.17, 0.52, 'steered_axle_wide', drums), 'steered_axle_wide', 'Wide steered axle', 'Bare wide steered axle', 400, 'heavy')
 + withBare(steeredAxleDrop, 'steered_axle_drop', 'Drop steered axle', 'Bare drop steered axle', 330, 'heavy')
 + withBare(function(id, massKg, drums) trailerAxle(id, massKg, 1.86, 0.065, 0.52, drums), 'trailer_axle_truck', 'Truck trailer axle', 'Bare truck trailer axle', 190, 'heavy') + [
   propShaft('prop_shaft_short', 10, 1.2) + { title: 'Short propeller shaft' },

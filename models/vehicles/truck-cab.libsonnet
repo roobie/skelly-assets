@@ -11,6 +11,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local gearboxes = import 'gearboxes.libsonnet';
+local driveline = import 'driveline.libsonnet';
 // How far the gearbox's base rises above the engine's, and the tallest case that rides there with its top under the
 // rail top, where bodies stand on the frame.
 local bellhousingRise = 0.12;
@@ -18,6 +19,13 @@ local tallestCase = 0.42;
 // The exhaust pipe's line under the frame, and its centre outboard of a gearbox case it runs beside.
 local pipeZ = 0.2;
 local pipeBeside = 0.04;
+// How far a crossmember's foot stands clear above the prop shafts that run under it.
+local shaftClear = 0.02;
+local crossmemberCount = 6;
+local crossmemberHalf = 0.05;
+// A leaf spring's half length and its width under the rail.
+local springHalf = 0.62;
+local springWidth = 0.1;
 local defaults = {
   bonnet: null,
   crew: null,
@@ -63,6 +71,11 @@ local defaults = {
   frontAxleY: self.r - 0.52,
   rearAxlePart: 'beam_axle_truck',
   rearAxleY: self.r - 0.52,
+  // The spring seats each axle's springs stand on, as `driveline.libsonnet`, `axles`, gives them; a truck that draws
+  // its own axles gives their seats.
+  frontSeat: driveline.axles[self.frontAxlePart].seat,
+  rearSeat: driveline.axles[self.rearAxlePart].seat,
+  propShaftY: self.railBottom + 0.02,
   // A light truck runs single rear wheels where a heavier one runs twins.
   twinRear: true,
   grille: true,
@@ -79,7 +92,8 @@ local defaults = {
   exhaustY: self.railBottom - 0.16,
   // A taller case reaches down to the pipe's line, so the pipe runs beside it.
   exhaustZ: if gearboxes[self.gearbox].height > tallestCase then gearboxes[self.gearbox].width / 2 + pipeBeside else pipeZ,
-  radiatorX: self.face - 0.28,
+  // A bonnet's radiator stands as far forward as the front crossmember lets it.
+  radiatorX: if self.bonnet != null then self.railFront - 2 * crossmemberHalf - cooling.front else self.face - 0.28,
   radiatorY: self.bumperLow + 0.02,
   lampX: if self.bonnet != null then self.front else self.face + 0.02,
   lampY: if self.bonnet != null then self.bumperLow + 0.1 else self.bumperTop + 0.03,
@@ -89,6 +103,13 @@ local defaults = {
   wiper: true,
 };
 local spec(s) = defaults + s;
+// The near leaf spring under the rail, from the seat of the axle at `x`, whose frame stands at `axleY`, up to the rail.
+// `front` stops its front hanger short of whatever stands ahead.
+local springZ(s) = [s.railZ - springWidth, s.railZ];
+local spring(name, s, x, axleY, seat, front=x + springHalf) =
+  local z = springZ(s);
+  assert seat.z[0] <= z[0] && seat.z[1] >= z[1] : name + "'s axle seat must span it";
+  box(name, 'spring', [x - springHalf, axleY + seat.y[1], z[0]], [std.min(front, x + springHalf), s.railBottom, z[1]]);
 // The two corner wedges that make a wheel opening five-sided: straight jambs, two chamfers and a flat head.
 local archCorners(name, slot, x0, x1, top, c, inner, outer) = [
   prism(name + '_aft', slot, [[x0, top - c], [x0 + c, top], [x0, top]], [inner, outer]),
@@ -119,8 +140,17 @@ local pressings(id, title, s0) = {
   local roofFront = s.face - s.lean,
   local paint = { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear', pan: 'paint-charcoal', cloth: 'cloth-seat', frame: s.framePaint, steel: 'steel-grey' },
   local leanAt(y) = (y - s.waist) * s.lean / (s.roof - s.waist),
-  local crossmembers = [s.rear + 0.12 + i * (s.railFront - s.rear - 0.24) / 5 for i in std.range(0, 5)],
-  local springs = [box('spring_' + i, 'spring', [([s.frontAxle] + s.rearAxles)[i] - 0.62, s.r + 0.04, s.railZ - 0.1], [([s.frontAxle] + s.rearAxles)[i] + 0.62, s.railBottom, s.railZ]) for i in std.range(0, std.length(s.rearAxles))],
+  // The front crossmember closes the rails' ends ahead of the radiator, which stands between them.
+  local crossmemberRear = s.rear + 0.12,
+  local crossmemberFront = s.railFront - crossmemberHalf,
+  assert s.radiatorX + cooling.front <= crossmemberFront - crossmemberHalf : id + "'s radiator must stand behind its front crossmember",
+  local crossmembers = [
+    crossmemberRear + i * (crossmemberFront - crossmemberRear) / (crossmemberCount - 1)
+    for i in std.range(0, crossmemberCount - 1)
+  ],
+  local springs =
+    [spring('spring_0', s, s.frontAxle, s.frontAxleY, s.frontSeat, s.radiatorX - cooling.front)]
+    + [spring('spring_' + (i + 1), s, s.rearAxles[i], s.rearAxleY, s.rearSeat) for i in std.range(0, std.length(s.rearAxles) - 1)],
   local batteryBoxPieces = local x = s.batteryX; local y = s.tankY; local inner = -s.batteryZ + 0.26; local outer = -s.batteryZ - 0.26; [
     box('battery_bracket', 'frame', [x - 0.34, y - 0.04, outer], [x + 0.34, y, -s.railZ]),
     box('battery_post', 'frame', [x - 0.04, y - 0.04, -s.railZ - 0.06], [x + 0.04, s.railBottom + 0.1, -s.railZ]),
@@ -149,7 +179,8 @@ local pressings(id, title, s0) = {
     ] + archCorners('well', 'pan', a - h, a + h, s.archTop, s.archChamfer, s.railZ, s.skin),
   local rows = [
     part('_chassis', 'chassis', s.chassisMass, springs + [
-      box('crossmember_' + i, 'frame', [crossmembers[i] - 0.05, s.railBottom + 0.02, -s.railZ], [crossmembers[i] + 0.05, s.railTop - 0.02, s.railZ]) for i in std.range(0, 5)
+      box('crossmember_' + i, 'frame', [crossmembers[i] - crossmemberHalf, s.propShaftY + driveline.propShaftRadius + shaftClear, -s.railZ], [crossmembers[i] + crossmemberHalf, s.railTop - 0.02, s.railZ])
+      for i in std.range(0, crossmemberCount - 1)
     ] + batteryBoxPieces + bothSides([
       box('rail', 'frame', [s.rear + 0.06, s.railBottom, s.railZ - 0.08], [s.railFront, s.railTop, s.railZ]),
       box('bracket', 'frame', [s.tankX - 0.2, s.tankY - 0.04, s.railZ], [s.tankX + 0.2, s.tankY, s.side - 0.12]),
@@ -290,7 +321,7 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
     fitting('rear_axle_' + i, axle(s.rearAxlePart), [s.rearAxles[i], s.rearAxleY, 0], ['chassis'])
     for i in std.range(0, rearN - 1)
   ] + [
-    fitting('prop_shaft_' + i, 'prop_shaft_long', [shaftFrom - shaftStep * (i + 0.5), s.railBottom + 0.02, 0], ['chassis'])
+    fitting('prop_shaft_' + i, 'prop_shaft_long', [shaftFrom - shaftStep * (i + 0.5), s.propShaftY, 0], ['chassis'])
     for i in std.range(0, shaftCount - 1)
   ] + (if rearN > 1 then [
     fitting('inter_axle_shaft', 'prop_shaft_short', [(s.rearAxles[0] + s.rearAxles[1]) / 2, s.r + 0.1, 0], ['rear_axle_0', 'rear_axle_1']),
@@ -319,6 +350,8 @@ local bodySites(kit, sites, id, s0) =
   [site for site in sites if !std.setMember(site.id, own)];
 {
   spec: spec,
+  springZ: springZ,
+  spring: spring,
   archCorners: archCorners,
   rows: rows,
   items: items,

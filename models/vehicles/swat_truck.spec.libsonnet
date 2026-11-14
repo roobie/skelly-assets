@@ -10,7 +10,7 @@
   paint: 'paint-police-blue',
   chassisMass: 900, shellMass: 1150,
   bonnet: { nose: 2.6, back: 1.68, front: 1.52, z: 0.62 },
-  engineX: 1.75, engineY: 0.5, radiatorX: 2.42, radiatorY: 0.55,
+  engineX: 1.75, engineY: 0.5, radiatorY: 0.55,
   bumperLow: 0.48, bumperTop: 0.84, tankX: -0.45, batteryX: -0.45, exhaustX: -1.35, exhaustY: 0.56,
   lampX: 2.66, lampY: 0.9, lampZ: 0.9,
   guard: false,

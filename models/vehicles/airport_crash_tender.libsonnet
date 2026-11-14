@@ -11,6 +11,8 @@ local archRear = s.rearAxles[1] - s.r - 0.12;
 local archFront = s.rearAxles[0] + s.r + 0.12;
 local archTop = s.bodyFloor - 0.05;
 local archChamfer = 0.3;
+// The wheel well's inner wall stands just outboard of the rail.
+local archInner = s.railZ + 0.04;
 local bandLow = s.floor - 0.03;
 local bandTop = s.floor + 0.07;
 local shutterTop = s.bodyTop - 0.1;
@@ -52,10 +54,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     box('low_aft', 'paint', [s.bodyRear, s.bodyLow, inset], [archRear, archTop, s.bodySide]),
     box('sill', 'paint', [s.bodyRear, archTop, inset], [s.bodyFront, bandLow, s.bodySide]),
   ] + t.archCorners('arch', 'paint', archRear, archFront, archTop, archChamfer, inset, s.bodySide)
-    + t.archCorners('arch_liner', 'frame', archRear, archFront, archTop, archChamfer, 0.56, inset) + [
-    box('arch_wall', 'frame', [archRear, 2 * s.r - 0.12, 0.56], [archFront, archTop, 0.59125]),
-    box('arch_jamb_aft', 'frame', [archRear, s.bodyLow, 0.56], [archRear + 0.0625, archTop - archChamfer, inset]),
-    box('arch_jamb_fore', 'frame', [archFront - 0.0625, s.bodyLow, 0.56], [archFront, archTop - archChamfer, inset]),
+    + t.archCorners('arch_liner', 'frame', archRear, archFront, archTop, archChamfer, archInner, inset) + [
+    box('arch_wall', 'frame', [archRear, 2 * s.r - 0.12, archInner], [archFront, archTop, archInner + 0.03125]),
+    box('arch_jamb_aft', 'frame', [archRear, s.bodyLow, archInner], [archRear + 0.0625, archTop - archChamfer, inset]),
+    box('arch_jamb_fore', 'frame', [archFront - 0.0625, s.bodyLow, archInner], [archFront, archTop - archChamfer, inset]),
     box('band', 'red', [s.bodyRear, bandLow, inset], [s.bodyFront, bandTop, s.bodySide]),
     box('cap', 'white', [s.bodyRear, s.bodyTop - 0.1, inset], [s.bodyFront, s.bodyTop, s.bodySide]),
     post('rear', s.bodyRear + postHalf),

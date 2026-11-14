@@ -11,8 +11,9 @@
   wheelBrakes: 'disc',
   twinRear: false,
   frontAxlePart: 'steered_axle_wide', rearAxlePart: 'beam_axle_wide',
-  // The rails stand far enough apart for the V8's block and heads to sit between them.
-  railBottom: 1.0, railTop: 1.3, railZ: 0.55,
+  // The rails stand far enough apart for the V8's block, intake and exhaust manifolds to sit between them, over the
+  // wide axles' spring seats.
+  railBottom: 1.0, railTop: 1.3, railZ: 0.72,
   engine: 'engine_v8_diesel_heavy', engineLength: 1.15, gearbox: 'gearbox_heavy', radiator: 'radiator_truck',
   // The V8 stands too tall to sit under the cab floor over the front axle, so it sits low behind the front wheel wells,
   // under the cab's back and the body's front, with its gearbox between the same two crossmembers. The radiator ahead
