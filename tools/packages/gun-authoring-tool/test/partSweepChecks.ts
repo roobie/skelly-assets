@@ -30,6 +30,7 @@ export const definePartChecks = (family: PartFamily, cases: Record<string, strin
       'front-sight',
       'rail-front-sight',
       'rail-rear-sight',
+      'rail-peep-rear-sight',
       'shroud-front-sight',
       'ak-rear-sight',
       'sporting-rear-sight',

@@ -91,6 +91,7 @@ export const ATTACHMENT_IDS = [
   ...OPTIC_TYPE_IDS.map((id) => `optic-${id}`),
   'rail-front-sight',
   'rail-rear-sight',
+  'rail-peep-rear-sight',
   'real-suppressor',
   'improvised-suppressor',
   'ak-slant-compensator',
@@ -286,7 +287,7 @@ const opticMetadata = (
 };
 
 const railIronSightMetadata = (
-  id: 'rail-front-sight' | 'rail-rear-sight',
+  id: 'rail-front-sight' | 'rail-rear-sight' | 'rail-peep-rear-sight',
   metresPerUnit: number,
   part?: PartDef,
 ): AttachmentCoreMetadata => {
@@ -387,6 +388,7 @@ export const attachmentMetadata = (
         return opticMetadata(params, metresPerUnit, part);
       case 'rail-front-sight':
       case 'rail-rear-sight':
+      case 'rail-peep-rear-sight':
         return railIronSightMetadata(family, metresPerUnit, part);
       case 'suppressor':
         return suppressorMetadata(params, part);

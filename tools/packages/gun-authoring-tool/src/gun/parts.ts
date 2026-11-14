@@ -32,7 +32,7 @@ import {
 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax, clipPolygon, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import { SMOOTH, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
@@ -78,9 +78,14 @@ import {
   subtractAxialPockets,
   subtractConvexSection,
 } from './receiverSection.ts';
+import {
+  RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U,
+  RAIL_PEEP_REAR_SIGHT_SMOOTH,
+  railPeepRearSightSolids,
+} from './railPeepRearSight.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
-import { shroudFrontSightSolids } from './shroudFrontSight.ts';
+import { SHROUD_FRONT_SIGHT_SMOOTH, shroudFrontSightSolids } from './shroudFrontSight.ts';
 import {
   curvedTriggerBlade,
   openTriggerGuard,
@@ -4030,6 +4035,28 @@ const railRearSight: PartFamily = {
   },
 };
 
+/** The voxel tag a sight takes: none where its content keeps it smooth, the detail grain otherwise. */
+const sightTags = (smooth: boolean): string[] => [smooth ? SMOOTH : VOXEL_DETAIL];
+
+/** A fixed peep rear sight on a top rail: one disc with a round hole on the conventional front post's sight line. */
+const railPeepRearSight: PartFamily = {
+  name: 'rail-peep-rear-sight',
+  params: {},
+  build(): PartDef {
+    const apertureU = IRON_SIGHT_LINE_U - RECEIVER_SECTION.ar.faces.top.y;
+    return {
+      family: 'rail-peep-rear-sight',
+      solids: railPeepRearSightSolids(apertureU),
+      ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
+      keepOuts: [],
+      axes: [
+        { kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U },
+      ],
+      tags: sightTags(RAIL_PEEP_REAR_SIGHT_SMOOTH),
+    };
+  },
+};
+
 /** A fixed front post on an anti-materiel barrel shroud, its top on the conventional iron sight line. */
 const shroudFrontSight: PartFamily = {
   name: 'shroud-front-sight',
@@ -4044,7 +4071,7 @@ const shroudFrontSight: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: sightTags(SHROUD_FRONT_SIGHT_SMOOTH),
     };
   },
 };
@@ -5715,6 +5742,7 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   'front-sight-bead': muzzleBead,
   'rail-front-sight': railFrontSight,
   'rail-rear-sight': railRearSight,
+  'rail-peep-rear-sight': railPeepRearSight,
   'shroud-front-sight': shroudFrontSight,
   'sporting-rear-sight': sportingRearSight,
   'gas-cylinder': gasCylinder,

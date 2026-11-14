@@ -654,7 +654,7 @@ export const antiMateriel: Template = {
     { id: 'sight', family: 'sight', params: { type: 'high-mag-5-25x' }, chance: 0 },
     // The irons the rifle ships with; a fitted scope takes the rear sight's place on the rail.
     { id: 'front-sight', family: 'shroud-front-sight' },
-    { id: 'rear-sight', family: 'rail-rear-sight' },
+    { id: 'rear-sight', family: 'rail-peep-rear-sight' },
     // The handle's three parts come together or not at all, so they are always present (a slot has no way to
     // depend on another slot's chance, and a strut without its trunnion would leave required ports empty).
     // Only the trunnion carries the pose; the strut and bar inherit it.

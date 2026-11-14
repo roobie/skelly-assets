@@ -14,7 +14,7 @@
     "magazine": { "family": "heavy-magazine" },
     "stock": { "family": "recoil-stock", "params": { "length": "L" } },
     "front-sight": { "family": "shroud-front-sight" },
-    "rear-sight": { "family": "rail-rear-sight" },
+    "rear-sight": { "family": "rail-peep-rear-sight" },
     "trunnion": { "family": "handle-trunnion", "params": { "pose": "stowed" } },
     "strut": { "family": "handle-strut" },
     "bar": { "family": "handle-bar" },

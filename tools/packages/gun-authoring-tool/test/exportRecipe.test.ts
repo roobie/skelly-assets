@@ -1,6 +1,8 @@
+import { SMOOTH } from '@skelly/thing-export/glb.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
+import { FAMILIES } from '../src/gun/parts.ts';
 import { readGlb } from './glbReader.ts';
 
 const SOURCE_CONTEXT = /Export fixture.*fixture-source/;
@@ -58,6 +60,23 @@ const placedCoordinates = (positions: ArrayLike<number>, transform: Matrix4): nu
     new Vector3(positions[3 * i]!, positions[3 * i + 1]!, positions[3 * i + 2]!).applyMatrix4(transform).toArray(),
   ).flat();
 
+/** Whether a family's part keeps its authored mesh in a voxelized export. */
+const buildsSmooth = (name: string): boolean => {
+  const family = FAMILIES[name];
+  if (family === undefined) {
+    return false;
+  }
+  const params = Object.fromEntries(Object.entries(family.params).map(([param, spec]) => [param, spec.default]));
+  return family.build(params).tags?.includes(SMOOTH) ?? false;
+};
+
+/** The family of each exported part node, with whether the node carries a mesh. */
+const partNodes = (glb: Uint8Array) =>
+  readGlb(glb).json.nodes.flatMap((node) => {
+    const family = (node.extras as { family?: string } | undefined)?.family;
+    return family === undefined ? [] : [{ family, mesh: node.mesh }];
+  });
+
 it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
   const { json, floats } = readGlb(designExport(voxel).glb);
   const seen = new Set<number>();
@@ -101,11 +120,13 @@ describe('recipe iron sight lattice', () => {
     // can be mid-row, so the half lattice holds both.
     'puts $id iron sight eye on a drawn top or aperture centre, on its fine half lattice',
     (row, context) => {
-      // A gun that ships without sights, its optic left for the player to fit, has no eye to check.
+      const exported = row.generate();
       const { sight } = (
-        row.generate().modelEntry as unknown as { gun: { sight?: { kind: string; eye: readonly number[] } } }
+        exported.modelEntry as unknown as { gun: { sight?: { kind: string; eye: readonly number[] } } }
       ).gun;
-      if (sight?.kind !== 'iron') {
+      // A gun that ships without sights, its optic left for the player to fit, has no eye to check; a smooth sight's
+      // eye is authored, off any lattice.
+      if (sight?.kind !== 'iron' || partNodes(exported.glb).some(({ family }) => buildsSmooth(family))) {
         context.skip();
         return;
       }
@@ -122,18 +143,25 @@ describe('recipe output grain', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
   // Cartridges are drawn smooth whatever their row's grain; see `src/gun/cartridgeExport.ts`, `makeModelExport`.
-  it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge', (row) => {
+  it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge or smooth part', (row) => {
     const grains =
       row.kind === 'cartridge'
         ? [undefined]
         : [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
-    const primitives = readGlb(row.generate().glb).json.meshes.flatMap((mesh) => mesh.primitives);
-    expect(primitives.length, `${row.id}: no meshes`).toBeGreaterThan(0);
-    for (const { extras } of primitives) {
-      expect(grains, `${row.id}: a mesh is not drawn on the row's grains`).toContain(
-        (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
-      );
-    }
+    const { glb } = row.generate();
+    const { meshes } = readGlb(glb).json;
+    expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
+    const smoothMeshes = new Set(
+      partNodes(glb).flatMap(({ family, mesh }) => (mesh !== undefined && buildsSmooth(family) ? [mesh] : [])),
+    );
+    meshes.forEach(({ primitives }, mesh) => {
+      const allowed = smoothMeshes.has(mesh) ? [undefined] : grains;
+      for (const { extras } of primitives) {
+        expect(allowed, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
+          (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
+        );
+      }
+    });
   });
 });
 
