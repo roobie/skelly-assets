@@ -55,7 +55,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.tit
   local dropsidePins = k.hingePins('hinge', 'x', [s.deckRear + grain, s.deckBottom, s.deckSide + 0.04 + grain], [s.deckFront - 0.05 - grain, s.deckBottom, s.deckSide + 0.04 + grain], 'frame');
   // The board's inner face lifts off the deck's edge and the headboard as it drops, so it stands a millimetre outside
   // them: well under half a grain, so no cell between them empties.
-  local boardIn = s.deckSide + 0.001;
+  local boardIn = s.deckSide + k.swingGap;
   part('_dropside', 'dropside', s.dropsideMass, [
     box('board', 'boards', [s.deckRear, s.deckBottom, boardIn], [s.deckFront - 0.05, s.boardTop, s.deckSide + 0.04]),
     box('rub', 'frame', [s.deckRear, s.boardTop - 0.04, s.deckSide + 0.04], [s.deckFront - 0.05, s.boardTop, s.deckSide + 0.05]),
@@ -64,7 +64,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.tit
   local gate = s.deckSide + 0.04;
   // The dropsides' ends slide across the board's front face as they drop, so it stands a millimetre behind the deck:
   // well under half a grain, so no cell between them empties.
-  local gateFront = s.deckRear - 0.001;
+  local gateFront = s.deckRear - k.swingGap;
   local tailgatePins = k.hingePins('hinge', 'z', [s.deckRear - 0.04 - grain, s.deckBottom, gate - grain], [s.deckRear - 0.04 - grain, s.deckBottom, -gate + grain], 'frame');
   part('_tailgate', 'tailgate', s.tailgateMass, [
     box('board', 'boards', [s.deckRear - 0.04, s.deckBottom, -gate], [gateFront, s.boardTop, gate]),

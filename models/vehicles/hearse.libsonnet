@@ -37,17 +37,17 @@ local glassHalf = 0.26;
 // pillar above. The pins therefore stand a millimetre behind the rake at the lowest step, where every point of the tail
 // at or above a step lies forward of them and only sinks or falls back as it lifts. That is behind the shell roof's rear
 // edge, so they hang from a brow on the coach roof, and arms carry the tail's head back to them.
-local pinX = rake(shape.bandFoot(1)) - 0.001;
+local pinX = rake(shape.bandFoot(1)) - k.swingGap;
 // The coach roof's foot, on top of the shell roof.
 local brow = s.roof + 0.04;
-local pinY = brow - k.grain - 0.001;
+local pinY = brow - k.grain - k.swingGap;
 local pinZ = 0.7 * s.hatchSide;
 // The tail's sides and foot slide past the shell's tail corners and over its rear panel as it lifts, and its skin's top
 // reaches under the lowest pillar band, so they stand a millimetre off them: well under half a grain, so no cell between
 // them empties.
-local tailHalf = s.hatchSide - 0.001;
-local tailFoot = s.rearSill + 0.001;
-local skinTop = s.waist - 0.001;
+local tailHalf = s.hatchSide - k.swingGap;
+local tailFoot = s.rearSill + k.swingGap;
+local skinTop = s.waist - k.swingGap;
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet').rows('hearse', vehicle.title, s)) + [
   // The narrow rear glass, in a blind tail.
   local tailgatePins = k.hingePins('hinge', 'z', [pinX, pinY, pinZ], [pinX, pinY, -pinZ], 'bright');
@@ -57,14 +57,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
   ] + tailPanel('foot', 'paint', s.waist, glassLow, s.hatchSide - 0.02)
   // The head drops away from the roof's underside as the gate lifts, so it stands a millimetre below it: well under half
   // a grain, so no cell between them empties.
-  + tailPanel('head', 'paint', glassHigh, s.roof - 0.001, s.hatchSide - 0.02)
+  + tailPanel('head', 'paint', glassHigh, s.roof - k.swingGap, s.hatchSide - 0.02)
   + [prism('glass', 'glass', tailProfile(glassLow, glassHigh), [-glassHalf, glassHalf])]
   + k.bothSides(
     // Each band of the blind reaches under the pillar band above it, so it stops a millimetre short of that band's foot.
-    shape.band('blind', 'paint', tailProfile(glassLow, glassHigh), function(inset) [glassHalf + 0.03, s.hatchSide - 0.02 - inset], gap=0.001)
+    shape.band('blind', 'paint', tailProfile(glassLow, glassHigh), function(inset) [glassHalf + 0.03, s.hatchSide - 0.02 - inset], gap=k.swingGap)
     + [
       prism('frame', 'bright', tailProfile(glassLow, glassHigh), [glassHalf, glassHalf + 0.03]),
-      box('hinge_arm', 'bright', [pinX, glassHigh, pinZ - k.grain / 2], [rake(glassHigh) + 0.01, s.roof - 0.001, pinZ + k.grain / 2]),
+      box('hinge_arm', 'bright', [pinX, glassHigh, pinZ - k.grain / 2], [rake(glassHigh) + 0.01, s.roof - k.swingGap, pinZ + k.grain / 2]),
     ]
   ) + tailgatePins, { paint: s.paint, glass: 'glass-clear', bright: 'steel-bright' }, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Hearse tailgate' },
   // The raised blind rear body: a roof that steps up behind the cab, solid quarters over the shell's glass and the bars across them.

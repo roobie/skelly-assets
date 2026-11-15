@@ -17,7 +17,7 @@ local tailgatePins = k.hingePins('hinge', 'z', [s.bedRear - 0.04 - grain, s.deck
 // The board's front face slides up the deck's and the side boards' rear ends as it drops, so it stands a millimetre
 // behind them: well under half a grain, so no cell between them empties. No point of the board ever swings forward of
 // that face, so the tilt's rear flaps hang inside it, down over its top, and never meet it.
-local gateFront = s.bedRear - 0.001;
+local gateFront = s.bedRear - k.swingGap;
 local HOOP_SHOULDER =[[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [

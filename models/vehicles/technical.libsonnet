@@ -6,11 +6,8 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local grain = k.grain;
-// How far a hinged part stands off a neighbour it swings away from or slides across: well under half a grain, so no
-// cell between them empties.
-local swingGap = 0.001;
 // The pins stand that gap clear of the valance below them as they turn.
-local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain - swingGap, s.deckBottom, s.panelIn - grain], [s.rear - grain - swingGap, s.deckBottom, -s.panelIn + grain]);
+local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain - k.swingGap, s.deckBottom, s.panelIn - grain], [s.rear - grain - k.swingGap, s.deckBottom, -s.panelIn + grain]);
 local finish = { paint: 'paint-olive', cream: 'paint-cream', rust: 'scrap-rusted', rustred: 'rust-red', frame: 'steel-grey', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear', floor: 'wood-pine', steel: 'steel-parkerized' };
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_frame', s.frameMass, [
@@ -122,13 +119,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('headboard', 'paint', [s.bedFront - 0.04, s.deckTop, -s.side], [s.bedFront, s.bedTop, s.side]),
     // The panel under the tailgate, down to the bumper, stays on the bed, so the gate hinges at the deck and drops level
     // with it.
-    box('valance', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.deckBottom - swingGap, s.panelIn]),
+    box('valance', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.deckBottom - k.swingGap, s.panelIn]),
     // The foot of the rust patch, left on the valance when the gate drops; it stops short of the pins at the gate's ends.
-    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, s.deckBottom - swingGap, 0.2]),
+    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, s.deckBottom - k.swingGap, 0.2]),
   ], finish) + { title: 'Technical bed' },
   k.compound('technical_tailgate', 18, [
     // Its front face slides up the deck's and the bed sides' rear ends as it drops, so it stands that gap behind them.
-    box('gate', 'paint', [s.rear, s.deckBottom, -s.panelIn], [s.rear + 0.04 - swingGap, s.bedTop, s.panelIn]),
+    box('gate', 'paint', [s.rear, s.deckBottom, -s.panelIn], [s.rear + 0.04 - k.swingGap, s.bedTop, s.panelIn]),
     box('rust', 'rust', [s.rear - 0.01, s.deckBottom, -0.5], [s.rear, 1.0, 0.2]),
     box('catch', 'dark', [s.rear - 0.02, s.bedTop - 0.08, 0.76], [s.rear, s.bedTop - 0.04, 0.84]),
   ] + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Technical tailgate' },

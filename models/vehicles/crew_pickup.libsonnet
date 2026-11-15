@@ -8,7 +8,7 @@ local finish = { paint: s.paint, trim: 'plastic-black' };
 local grain = k.grain;
 // The gate's ends slide past the rear posts' faces as it drops, so they stand off them by a millimetre: well under half
 // a grain, so no cell between them empties.
-local gateHalf = s.tailgateHalf - 0.001;
+local gateHalf = s.tailgateHalf - k.swingGap;
 local gateFoot = s.bedFloorTop - 0.03;
 local tailgatePins = k.hingePins('hinge', 'z', [s.bedRear - 0.05 - grain, gateFoot, gateHalf - grain], [s.bedRear - 0.05 - grain, gateFoot, -gateHalf + grain]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('crew_pickup', vehicle.title, s) + [
