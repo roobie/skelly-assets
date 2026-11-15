@@ -13,6 +13,8 @@ local words = {
   bar: 'long kit lying along the locker, resting',
   cone: 'a traffic cone, resting',
   machine: 'a machine on its own frame or foot, resting',
+  pad: 'a flat pad or bag lying on its face, resting',
+  block: 'a timber block or chock lying on its side, resting',
   // Hung kit seats on the face it hangs against, its normal into the board and its up toward its head; a slot it
   // hangs from faces out of the board, its up vertical.
   'hung-tool': 'a long-handled tool hung head up flat against a board',
@@ -46,6 +48,10 @@ local word(name) =
   // `out[0]` to `out[1]` outboard of `pos`.
   shelfSlot(id, accepts, pos, along, height, out):
     self.slot(id, accepts, pos, [0, 1, 0], [0, 0, 1], { min: [0, out[0], -along / 2], max: [height, out[1], along / 2] }),
+  // A slot on a floor or shelf of a load space that opens at the back, in the vehicle frame: at `pos`, the middle of
+  // the kit's base, its kit facing the back door, `depth` deep along the vehicle, `across` wide and up to `height` tall.
+  baySlot(id, accepts, pos, across, height, depth):
+    self.slot(id, accepts, pos, [0, 1, 0], [-1, 0, 0], { min: [0, -depth / 2, -across / 2], max: [height, depth / 2, across / 2] }),
   // A slot on a near-side locker's back board, in the vehicle frame: at `pos` on the board's face where a tool's
   // head hangs, holding a tool `along` the vehicle, hanging down `drop` and standing `depth` out of the board.
   boardSlot(id, accepts, pos, along, drop, depth):

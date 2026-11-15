@@ -13,6 +13,7 @@
         "skelly.household",
         "skelly.machinery",
         "skelly.medicine",
+        "skelly.melee",
         "skelly.structures"
       ]
     },
