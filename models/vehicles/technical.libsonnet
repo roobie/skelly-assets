@@ -45,7 +45,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('back_rust', 'rust', [s.cabBack - 0.01, 0.7, -0.5], [s.cabBack, 0.98, -0.18]),
   ], finish) + { title: 'Technical cab' },
   // The door hangs on pins at its front edge's outer face and opens outboard. Its trailing edge stands off the rear
-  // post by its tail gap, closed by the cab's jamb; the quarter light ahead of the pins is the windows' own.
+  // post by its tail gap, closed by the cab's jamb. The quarter light straddles the pins' line, so its part ahead of
+  // them would swing inboard into the windscreen; it is the windows' own.
   local tail = s.doorRear + k.doorTailGap(s.doorFront - s.doorRear, s.skin + k.grain - s.skinIn);
   local top = s.roof - 0.06 - k.swingGap;
   local pin(f) = [s.doorFront, s.floor + f * (s.waist - s.floor), s.skin + k.grain];
