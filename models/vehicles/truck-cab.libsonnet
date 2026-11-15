@@ -279,9 +279,7 @@ local pressings(id, title, s0) = {
   ] else []) + [
     door('_door', 'door', 42, s.doorRear, s.doorFront, s.doorFront - leanAt(s.windowTop)),
   ],
-  // A lip inside the post behind a door's trailing edge, so the gap the door needs to swing clear of the post is not a
-  // slot through the cab.
-  local jamb(name, rear) = box(name, 'paint', [rear - 0.02, s.floor, s.skin - 0.03], [rear + 0.02, s.windowTop, s.skin - k.swingGap]),
+  local jamb(name, rear) = k.doorJamb(name, rear, [s.floor, s.windowTop], s.skin),
   local skirts_all = bothSides(skirts + [
     prism('a_pillar', 'paint', [[s.doorFront, s.waist], [s.face, s.waist], [roofFront, s.roof], [s.doorFront - s.lean, s.roof]], [s.glassIn, s.side]),
     box('corner', 'paint', [s.doorFront, s.floor, s.skin], [s.face - 0.05, s.waist, s.side]),

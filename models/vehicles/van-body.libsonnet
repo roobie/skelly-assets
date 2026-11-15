@@ -150,7 +150,8 @@ local pressings(id, title, s0) = {
   ] + (if slideFront < bodyFront then [wall('front_lower', [slideFront, bodyFront], [b.sill, b.waist])] + bands('front_lower', [slideFront, bodyFront], b.side) else []))
   + std.map(k.near, upper('upper', tail, s.slideRear, rearWindows) + [
     box('over_door', 'paint', [s.slideRear, b.doorTop, b.glassIn], [bodyFront, b.canton, b.glassOut]),
-  ] + (if s.sideDoorSlides then [box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug])] else [])
+  ] + (if s.sideDoorSlides then [box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug])]
+       else [k.doorJamb('side_door_jamb', s.slideRear, [b.sill, b.doorTop], std.min(b.skin, b.glassIn))])
   + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
   + std.map(k.far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
     + bands('wall_mid', [s.slideRear, bodyFront], b.side)
@@ -242,12 +243,15 @@ local pressings(id, title, s0) = {
       box('handle', 'trim', [s.bFront + 0.05, s.waist - 0.13, s.side], [s.bFront + 0.21, s.waist - 0.09, s.side + 0.015]),
     ] + bands('skin', [s.bFront + k.doorTailGap(s.cowl - s.bFront, grain), s.cowl - k.pinEdgeGap], s.side) + frontDoorPins, finish, motion=k.motion.hinge(frontDoorPins, 'near', opens.door)) + { title: title + ' front door' },
     // Plugs out, then rolls back along the rail on the rear wall; its leading edge is where it seals. A body without the
-    // rail hangs it on that edge instead, its pins on the outer face as the front door's are.
+    // rail hangs it on that edge instead, its pins on the outer face as the front door's are. Only the hung door stands
+    // its edges off the frame, as the front door does: the sliding one moves out of the frame before it moves along it.
     local sideDoorPins = if s.sideDoorSlides then [] else k.hingePins('hinge', 'y', [slideFront, b.sill + 0.2 * (b.waist - b.sill), b.side + grain], [slideFront, b.sill + 0.8 * (b.waist - b.sill), b.side + grain]);
-    local sideDoorRear = s.slideRear + k.doorTailGap(slideFront - s.slideRear, b.side + grain - b.glassIn);
-    local sideDoorTop = b.doorTop - k.swingGap;
+    local sideGap = if s.sideDoorSlides then 0 else k.swingGap;
+    local sideDoorRear = if s.sideDoorSlides then s.slideRear else s.slideRear + k.doorTailGap(slideFront - s.slideRear, b.side + grain - b.glassIn);
+    local sideDoorTop = b.doorTop - sideGap;
+    local sideBands = if s.sideDoorSlides then [s.slideRear, slideFront] else [s.slideRear + k.doorTailGap(slideFront - s.slideRear, grain), slideFront - k.pinEdgeGap];
     k.compound(id + '_side_door', 40, [
-      box('skin', 'paint', [sideDoorRear, b.sill + k.swingGap, b.skin + k.swingGap], [slideFront, b.waist, b.side]),
+      box('skin', 'paint', [sideDoorRear, b.sill + sideGap, b.skin + sideGap], [slideFront, b.waist, b.side]),
       box('handle', 'trim', [slideFront - 0.2, b.waist - 0.15, b.side], [slideFront - 0.04, b.waist - 0.11, b.side + 0.015]),
     ] + (if s.slideGlass then [
       box('top', 'paint', [sideDoorRear, b.windowTop, b.glassIn], [slideFront, sideDoorTop, b.glassOut]),
@@ -256,7 +260,7 @@ local pressings(id, title, s0) = {
       box('glass', 'glass', [s.slideRear + 0.05, b.waist, b.glassOut - 0.03], [slideFront - 0.05, b.windowTop, b.glassOut - 0.01]),
     ] else [
       box('upper', 'paint', [sideDoorRear, b.waist, b.glassIn], [slideFront, sideDoorTop, b.glassOut]),
-    ]) + bands('skin', [s.slideRear + k.doorTailGap(slideFront - s.slideRear, grain), slideFront - k.swingGap], b.side) + sideDoorPins, finish,
+    ]) + bands('skin', sideBands, b.side) + sideDoorPins, finish,
     motion=if s.sideDoorSlides then k.motion.slide('near', s.slidePlug) + k.motion.slide('rear', slideTravel) else k.motion.hinge(sideDoorPins, 'near', opens.door)) + { title: title + ' side door' },
     if rearShutter then
       // One curtain across the opening: flat slats in the door's own plane, so the side outline stays solid. It rolls up

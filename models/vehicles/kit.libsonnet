@@ -198,6 +198,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // circles that axis, so it passes the neighbour's corner on a diagonal, where the swing check, measuring along each
   // axis, reads only cos 45° of the distance; √2 swing gaps keep it a full swing gap clear there.
   pinEdgeGap: std.sqrt(2) * self.swingGap,
+  // A lip inside the post behind a side-hung door's trailing edge, over heights `y` and a swing gap inside the face
+  // `face` the door closes against, so the gap the door needs to swing clear of the post is not a slot through the body.
+  doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - 0.03], [rear + 0.02, y[1], face - self.swingGap]),
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
