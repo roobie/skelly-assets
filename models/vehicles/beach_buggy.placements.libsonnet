@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'beach_buggy.spec.libsonnet';
 {
   title: 'Beach buggy',
@@ -10,7 +11,7 @@ local s = import 'beach_buggy.spec.libsonnet';
     site.one('dashboard', 'beach_buggy_dashboard'),
     site.one('front_axle', 'beach_buggy_front_axle'),
     site.one('rear_axle', 'beach_buggy_rear_axle'),
-    site.one('engine', 'engine_i4_petrol', [-1.12, 0.32, 0]),
+  ] + engine.sites('i4_petrol', [-1.12, 0.42, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.rearAxle + 0.28, 0.3, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [-0.67, 0.6, 0]),
     site.one('exhaust', 'beach_buggy_exhaust'),

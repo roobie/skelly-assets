@@ -5,11 +5,12 @@ local wheel(x, z) = { part: 'sports_car_wheel', at: [x, s.hubHeight, z] };
 {
   title: 'Sports car',
   sites: (import 'car-sites.libsonnet')('sports_car', s, {
+    // The engine stands in the open bay just ahead of the twist beam's cross member, as low as the rear screen over its
+    // covers needs, and the transaxle behind it stands level with its crank.
+    engine: { name: 'v6_petrol', at: [-0.83, 0.2, 0] },
     drop: ['rear_bench'],
     over: {
-      // The engine stands just ahead of the twist beam's cross member.
-      engine: { part: 'engine_v6_petrol', at: [-0.83, 0.3, 0] },
-      gearbox: { at: [-1.4, 0.3, 0] },
+      gearbox: { at: [-1.4, 0.17, 0] },
       radiator: { part: 'radiator_small', at: [s.front - 0.32, 0.26, 0] },
       fuel_tank: { at: [s.frontAxle - 0.05, 0.24, 0] },
       exhaust: { at: [s.rear + 0.46, 0.13, 0.42] },

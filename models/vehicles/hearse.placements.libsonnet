@@ -3,9 +3,9 @@ local s = import 'hearse.spec.libsonnet';
 {
   title: 'Hearse',
   sites: (import 'car-sites.libsonnet')('hearse', s, {
+    engine: { name: 'v6_petrol' },
     drop: ['rear_bench'],
     over: {
-      engine: { part: 'engine_v6_petrol' },
       fuel_tank: { at: [s.rearAxle + 0.75, s.sill, 0] },
     },
     add: [

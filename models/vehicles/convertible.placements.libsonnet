@@ -3,8 +3,8 @@ local s = import 'convertible.spec.libsonnet';
 {
   title: 'Convertible',
   sites: (import 'car-sites.libsonnet')('convertible', s, {
+    engine: { at: [s.frontAxle - 0.02, 0.2, 0] },
     over: {
-      engine: { at: [s.frontAxle - 0.02, 0.2, 0] },
       rear_bench: { part: 'bench_seat_3', at: [-0.6, s.floor, 0] },
       // The cat can runs under the floor pan beneath the rear bench, its top at the pan's underside.
       exhaust: { at: [s.rear + 0.46, s.floor - 0.18, 0.42] },

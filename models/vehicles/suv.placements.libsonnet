@@ -1,4 +1,5 @@
 local site = import 'site.libsonnet';
+local engine = import 'engine-kit.libsonnet';
 local s = import 'suv.spec.libsonnet';
 {
   title: 'SUV',
@@ -10,7 +11,7 @@ local s = import 'suv.spec.libsonnet';
     site.one('front_bumper', 'suv_front_bumper'),
     site.one('rear_bumper', 'suv_rear_bumper'),
     site.one('dashboard', 'suv_dashboard'),
-    site.one('engine', 'engine_v6_petrol', [1.35, 0.45, 0]),
+  ] + engine.sites('v6_petrol', [1.35, 0.45, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_inline', [0.79, 0.42, 0]),
     site.one('rear_axle', 'beam_axle_light', [s.rearAxle, 0.032, 0]),
     site.one('prop_shaft', 'prop_shaft_short', [-0.48, 0.42, 0]),
