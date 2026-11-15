@@ -171,10 +171,6 @@ local trailingEdge(stations, x, arc, pin, band, thick=0.075, sides=16, square=2.
   };
 
 local point(stations, x, degrees, square=2.4) = outlinePoint(sectionOf(ordered(stations), x), degrees, square);
-local hingeRib(id, stations, x, high, low, slot='frame', depth=0.06, square=2.4) =
-  local bottom = point(stations, x, low, square);
-  local top = point(stations, x, high, square);
-  k.box(id, slot, [x - 0.03, bottom[0], top[1] - depth], [x + 0.03, top[0], top[1]]);
 local edgeAxis(stations, x, square=2.4) = [x, point(stations, x, 90, square)[1] + k.grain];
 local edgePins(stations, x, slot='paint', low=86, high=70, square=2.4) =
   local z = edgeAxis(stations, x, square)[1];
@@ -273,7 +269,6 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
                motion=k.motion.hinge(pins, 'near', opens)),
   // The lip the post behind `door` draws to meet the door's trailing edge.
   doorPost(id, stations, rear, front, roofArc):: frontHinged(stations, rear, front, [roofArc + seam, waist(stations, [rear, front])]).post(id, 'paint'),
-  hingeRib: hingeRib,
   seam: seam,
   waist: waist,
   leadGap: leadGap,
