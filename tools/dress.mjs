@@ -162,6 +162,14 @@ export function wornPieces(id, models, dressing) {
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
 export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => tagsOf(other, 'fit').includes('worn') && isPieceOf(model.id, other)));
 
+// The place in the dressing's `places` that a wearable with no pieces sits at: the first that one of its slots names.
+export function placeOf(model, dressing) {
+  const slots = tagsOf(model, 'slot');
+  const place = dressing.places.find(({ slot }) => slots.includes(slot));
+  if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
+  return place;
+}
+
 // The quarter turn about x that stands a model lying on its back, head end at -z, up with its front at +z.
 const STAND = [Math.SQRT1_2, 0, 0, Math.SQRT1_2];
 
@@ -195,9 +203,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
       model: piece, part, side, at, ...(mirror ? { mirror } : {}), ...(covers ? { covers, bodySite: site } : {}), ...(soleLift === undefined ? {} : { soleLift }),
     })))];
   }
-  const slots = tagsOf(model, 'slot');
-  const place = dressing.places.find(({ slot }) => slots.includes(slot));
-  if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
+  const place = placeOf(model, dressing);
   if (place.anchor) {
     const at = anchors[place.anchor];
     if (!at) throw new Error(`${model.id}: the doll has no anchor ${place.anchor} to place it at`);

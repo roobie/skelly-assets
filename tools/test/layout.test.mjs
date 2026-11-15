@@ -6,9 +6,12 @@ import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { declaredPacks, outputPath, readMobRows, readRoster, undeclaredDirectories } from '../layout.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
+import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
+import { installJsonnetSources } from '../sources.mjs';
 import { sampleClip } from '../../site/clipFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
+await installJsonnetSources();
 const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile()).map((entry) => relative(directory, join(entry.parentPath, entry.name))).sort();
 
@@ -59,6 +62,26 @@ test('the roster builder writes each id at its pack path, with its sidecar, and 
   try {
     execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', out, id], { cwd: repo, stdio: 'pipe' });
     assert.deepEqual(filesUnder(out), [outputPath(packId, `assets/models/${id}.glb`), outputPath(packId, `things/${id}.model.json`)].sort());
+  } finally { rmSync(out, { recursive: true, force: true }); }
+});
+
+test('every roster wearable the doll seats by an anchor builds with that anchor, so it is not seated by its origin', () => {
+  const dressing = readDressing(repo);
+  const roster = new Map(readRoster().map((row) => [row.id, row]));
+  const rows = JSON.parse(readFileSync(join(repo, 'tools/packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
+  const models = rows.filter(({ id }) => roster.has(id)).map(({ id, taxonomy }) => ({ id, tags: taxonomy.tags }));
+  const seated = models.filter((model) => isWearable(model, models) && wornPieces(model.id, models, dressing).length === 0
+    && placeOf(model, dressing).anchor !== undefined);
+  assert.ok(seated.length > 0);
+  const out = mkdtempSync(join(tmpdir(), 'roster-'));
+  try {
+    execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', out, ...seated.map(({ id }) => id)], { cwd: repo, stdio: 'pipe' });
+    for (const { id } of seated) {
+      const sidecar = join(out, outputPath(roster.get(id).packId, `things/${id}.model.json`));
+      assert.ok(existsSync(sidecar), `${id} builds no sidecar`);
+      const { anchor } = placeOf(models.find((model) => model.id === id), dressing);
+      assert.ok(JSON.parse(readFileSync(sidecar, 'utf8')).anchors?.[anchor], `${id} has no ${anchor} anchor`);
+    }
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
 
