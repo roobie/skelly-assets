@@ -318,6 +318,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // The hole under a hatch's lid of `lidRadius` centred at (x, z), for `holed`. The lid laps it by two grains all round,
   // so its twelve-sided edge still covers the hole wherever the voxel lattice falls.
   hatchHole(x, z, lidRadius): { x: x, z: z, radius: lidRadius - 2 * vehicleGrain },
+  // The hole inside a turret ring on the centre line at `x`, for `holed`: as wide as the ring's bore, so the ring stands
+  // on the plate round it.
+  ringHole(x, inner): { x: x, z: 0, radius: inner },
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,
   far: far,

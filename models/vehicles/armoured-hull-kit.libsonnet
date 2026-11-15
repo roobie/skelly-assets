@@ -70,7 +70,7 @@ local tailLampDepth = 0.06;
 // past the roof into the upper glacis's top, so the glacis is cut by the same holes.
 local rows(s, title, roofHatches=[]) =
   local a = s.armour;
-  local holes = [k.hatchHole(s.hatchX, s.driverZ, driverHatch.radius), { x: s.turretX, z: 0, radius: s.ring.inner }]
+  local holes = [k.hatchHole(s.hatchX, s.driverZ, driverHatch.radius), k.ringHole(s.turretX, s.ring.inner)]
                 + roofHatches;
   local n = nose(s);
   local paint = { paint: s.paint };

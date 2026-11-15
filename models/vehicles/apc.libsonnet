@@ -19,7 +19,7 @@ local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1
 local rampPins = k.hingePins('ramp_pin', 'z', [s.rear - 0.22, 0.81, -s.rampPinZ], [s.rear - 0.22, 0.81, s.rampPinZ], 'steel');
 local hatch = k.hatch(s.hatch.radius, s.hatch.thickness, s.hatch.open);
 // The roof is open under the hatches and inside the turret ring, so the open turret hatch looks down into the hull.
-local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), { x: s.turretX, z: 0, radius: s.ring.inner }]
+local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), k.ringHole(s.turretX, s.ring.inner)]
                   + [k.hatchHole(s.squadHatch.x, z, s.hatch.radius) for z in [s.squadHatch.z, -s.squadHatch.z]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 1660, [
