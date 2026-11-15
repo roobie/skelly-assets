@@ -9,6 +9,8 @@ local bothSides = k.bothSides;
 local finish = { paint: s.paint, frame: 'steel-parkerized', dark: 'paint-charcoal' };
 local stake(id, x0, x1) = box(id, 'paint', [x0, s.frameHigh, s.side - 0.04], [x1, s.railTop, s.side + 0.02]);
 local halfLength = s.barrierLength / 2;
+local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain, s.deck, 0.7 * s.side], [s.rear - grain, s.deck, -0.7 * s.side], 'dark');
 local boards = [[0.08, 0.28], [0.34, 0.56]];
 local strap(x, n) = [
   box('over_' + n, 'strap', [x - 0.03, s.railTop, -s.side - 0.035], [x + 0.03, s.railTop + 0.02, s.side + 0.035]),
@@ -45,7 +47,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   // The tailgate drops about its lower edge.
   k.compound('checkpoint_barrier_trailer_tailgate', 12, [
     box('skin', 'paint', [s.rear, s.deck, -s.side + 0.04], [s.rear + 0.04, s.wall, s.side - 0.04]),
-  ], finish, { hinge_a: ['skin', [0, 0, 0.2]], hinge_b: ['skin', [0, 0, 0.8]] }) + { title: 'Checkpoint barrier trailer tailgate' },
+  ] + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Checkpoint barrier trailer tailgate' },
   k.compound('checkpoint_barrier_trailer_mudguard', 4,
     m.flatGuard('guard', 'dark', [s.axle - 0.3, s.axle + 0.3], 0.66, 0.2, 0.12, [s.side, s.wheelZ + 0.1]), finish) + { title: 'Checkpoint barrier trailer mudguard' },
   k.compound('checkpoint_barrier_trailer_straps', 2, strap(-0.55, 'rear') + strap(0.55, 'front'), { strap: 'webbing-olive-dark' }) + { title: 'Checkpoint barrier trailer straps' },
