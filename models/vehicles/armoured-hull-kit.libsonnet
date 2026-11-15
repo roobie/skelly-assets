@@ -154,8 +154,10 @@ local rows(s, title, roofHatches=[]) =
     // far corner, as a tank's does, since the gun and the turret's front stand over it and leave a raised lid no room:
     // the lid then turns only behind and outboard of the post, away from the periscopes ahead of it. The handle stands
     // near the post, so the arc it sweeps stays ahead of the turret's overhang, where only the flat lid passes under
-    // the turret, which stands on the ring: the lid is thinner than the ring is high by `headroom`.
+    // the turret, which stands on the ring: the lid is thinner than the ring is high by `headroom`, which still clears the
+    // turret once the hatch stands its `k.swingGap` off the roof.
     local h = driverHatch;
+    assert h.headroom > k.swingGap : s.id + "'s driver's hatch, standing off the roof, meets the turret";
     local edge = h.radius;
     local post = edge - h.post;
     local thickness = s.ring.height - h.headroom;
@@ -194,7 +196,8 @@ local sites(s) =
   + engine.sites(s.engine, [s.engineX, floor, s.engineZ], 'assembly') + [
     one('radiator', engine.radiator(s.engine), [s.radiatorX, floor, s.radiatorZ]),
     one('transmission', s.id + '_transmission', [sprocket.at[0], sprocket.at[1], 0]),
-    one('driver_hatch', s.id + '_driver_hatch', [s.hatchX, s.roofTop, s.driverZ]),
+    // The driver's hatch swings level, so it stands `k.swingGap` off the roof rather than sliding on it.
+    one('driver_hatch', s.id + '_driver_hatch', [s.hatchX, s.roofTop + k.swingGap, s.driverZ]),
     one('driver_seat', 'front_seat', [s.driverX, floor, s.driverZ]),
     one('ammo_rack', s.id + '_ammo_rack'),
   ] + [
