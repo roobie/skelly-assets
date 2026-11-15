@@ -8,14 +8,17 @@ local tail = van.tail(s);
 local plate = [s.glassOut - 0.01, s.side];
 local pillarY(x) = van.pillarY(s, x);
 taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van', vehicle.title, s) + [
-  // Plates the cab door's glass down to a small port and blanks the quarter light.
-  k.compound('security_van_cab_plate', 45, [
+  // Plates the cab door's glass down to a small port; it rides the door.
+  k.compound('security_van_cab_plate', 40, [
     box('below_port', 'plate', [s.bFront, s.waist, plate[0]], [s.cowl - 0.04, 1.56, plate[1]]),
     box('above_port', 'plate', [s.bFront, 1.8, plate[0]], [s.cowl - 0.04, s.windowTop, plate[1]]),
     box('behind_port', 'plate', [s.bFront, 1.56, plate[0]], [0.68, 1.8, plate[1]]),
     k.prism('forward_of_port', 'plate', [[1.0, 1.56], [s.cowl - 0.04, 1.56], [s.cowl - 0.04, pillarY(s.cowl - 0.04)], [van.pillarAt(s, s.windowTop), s.windowTop], [1.0, s.windowTop]], plate),
-    k.prism('quarter', 'plate', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist], [s.cowl, pillarY(s.cowl)]], plate),
   ], { plate: s.paint }) + { title: 'Security van cab plate' },
+  // Blanks the quarter light, which stays shut when the door opens.
+  k.compound('security_van_quarter_plate', 5, [
+    k.prism('quarter', 'plate', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist], [s.cowl, pillarY(s.cowl)]], plate),
+  ], { plate: s.paint }) + { title: 'Security van quarter plate' },
   // One rear leaf's hinge straps and locking bar.
   k.compound('security_van_rear_door_bars', 34, [
     box('hinge_' + i, 'steel', [tail - 0.03, [1.1, 1.55, 2.0][i], 0.2], [tail, [1.1, 1.55, 2.0][i] + 0.1, s.box.hatchSide])

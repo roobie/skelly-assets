@@ -30,7 +30,7 @@ import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
 import { MIRRORED_AXIS } from './modelFrame.mjs';
 import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
-import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
+import { NAV_MARK, readTools, SITE_FILES, TOOLS_FILES, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
@@ -49,10 +49,13 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
-// Each model's sidecar, keyed by the model file it names.
+// Each model's sidecar, keyed by the model file it names, with the motion the sidecar declares for a part that moves.
 const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
   .filter((f) => f.endsWith('.model.json'))
-  .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
+  .map((f) => {
+    const { file, motion } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
+    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...(motion ? { motion } : {}) }];
+  })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
   .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
@@ -122,11 +125,12 @@ const shown = models.map((model) => {
   return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
 const missingParts = (sites) => sites.flatMap(({ part, stowed }) => [part, ...Object.values(stowed ?? {})]).filter((id) => !modelsById.has(id));
-const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
+const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish, rides }) => ({
   site,
   model: part,
   at,
   ...(mirror ? { mirror } : {}),
+  ...(rides ? { rides } : {}),
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
@@ -209,10 +213,8 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
-// The authoring tools draw the same fabric grain, and its declaration types it from their packages, which resolve only
-// under tools/, so the shader lives there.
-cpSync(join(root, 'tools/fabric.mjs'), join(out, 'fabric.mjs'));
+for (const f of SITE_FILES) cpSync(join(here, f), join(out, f));
+for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
