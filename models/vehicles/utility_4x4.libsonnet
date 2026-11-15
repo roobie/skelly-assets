@@ -35,10 +35,10 @@ local door(id, x0, x1, screenFront, windowFront, face) =
     box('leaf_' + i, 'dark', [x1 - 0.05, pinY[i] - 0.04, s.skin], [x1, pinY[i] + 0.04, pinZ])
     for i in [0, 1]
   ] + pins, finish, motion=k.motion.hinge(pins, 'near', 65));
-// The lip a `door` from `rear` closes its trailing edge against: below the waist inside the skin, above it inside the
+// The lips a `door` from `rear` closes its trailing edge against: below the waist inside the skin, above it inside the
 // frame's deepest lean, so the door's tail gap is not a slot through the body at any height. One block above the waist
 // rather than a lean band per step, because each band's top corner meets the band above it on the door.
-local doorJamb(name, rear) = [
+local doorJambs(name, rear) = [
   k.doorJamb(name, rear, [s.floor, s.waist - k.swingGap], s.skinIn),
   k.doorJamb(name + '_head', rear, [s.waist, s.roof - 0.06], s.skinIn - lean),
 ];
@@ -81,8 +81,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     + shape.side('rear_post_head', 'paint', rect(s.cabBack, s.cabBack + 0.08, s.waist, s.roof), [s.skinIn, s.skin])
     + shape.side('centre_post_head', 'paint', rect(-0.06, -0.02, s.waist, s.roof), [s.skinIn, s.skin])
     + shape.side('a_post', 'paint', rect(s.cabFront - 0.06, s.cabFront + 0.02, s.waist, s.roof), [s.skinIn, s.skin])
-    + doorJamb('rear_door_jamb', s.cabBack + 0.08)
-    + doorJamb('front_door_jamb', -0.02)
+    + doorJambs('rear_door_jamb', s.cabBack + 0.08)
+    + doorJambs('front_door_jamb', -0.02)
   ) + [
     box('floor', 'trim', [s.cabBack, s.floor - 0.04, -s.skinIn], [s.hoodBack, s.floor, s.skinIn]),
     box('tunnel', 'trim', [s.cabBack + 0.1, s.floor, -0.22], [s.hoodBack, s.floor + 0.26, 0.22]),

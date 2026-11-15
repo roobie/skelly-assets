@@ -90,7 +90,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     m.cabDoorJamb('door_jamb', [doorRear, doorFront], doorY, s.cabSide),
     box('console', 'trim', [-0.55, s.deck + 0.05, 0.3], [-0.3, s.deck + 0.55, 0.45]),
   ]), { paint: s.paint, floor: 'rubber-black', trim: 'plastic-black', glass: 'glass-clear' }) + { title: 'Bulldozer cab' },
-  m.cabDoor('bulldozer_cab_door', 45, [doorRear, doorFront], doorY, s.cabSide, s.paint, 'near') +{ title: 'Bulldozer cab door' },
+  m.cabDoor('bulldozer_cab_door', 45, [doorRear, doorFront], doorY, s.cabSide, s.paint, 'near') + { title: 'Bulldozer cab door' },
   k.compound('bulldozer_windscreen', 22, [
     box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.45, -s.cabSide + post], [s.cabFront - 0.015, s.cabRoof, s.cabSide - post]),
   ], { glass: 'glass-clear' }) + { title: 'Bulldozer windscreen' },
