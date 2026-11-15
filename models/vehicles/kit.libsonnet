@@ -172,6 +172,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       assert std.isBoolean(stow) : 'a slide stows or it does not';
       [{ kind: 'slide', toward: toward, travel: travel } + (if stow then { stow: true } else {})],
   },
+  grain: vehicleGrain,
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
   // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a
   // neighbour's face sinks at most a grain into it, which the overlap check of docs/decisions/0014-site-overlap.md
