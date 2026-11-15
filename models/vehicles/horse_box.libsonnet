@@ -19,6 +19,7 @@ local finish = { paint: s.paint, frame: s.frame };
 local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
 // At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
 local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
+local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.doorLow + 0.42, s.side + grain], [s.doorFront - 0.02, s.doorTop - 0.3, s.side + grain], 'frame');
 local topDoorPins = k.hingePins('hinge', 'y', [s.rear - 0.06, s.eave - 0.06, s.side], [s.rear - 0.06, s.rampTop + 0.07, s.side], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_chassis', 340, [
@@ -46,7 +47,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('handle', 'frame', [s.doorRear + 0.05, 1.2, s.side], [s.doorRear + 0.17, 1.24, s.side + 0.03]),
     box('strap_low', 'frame', [s.doorFront - 0.3, s.doorLow + 0.4, s.side], [s.doorFront - 0.02, s.doorLow + 0.44, s.side + 0.02]),
     box('strap_high', 'frame', [s.doorFront - 0.3, s.doorTop - 0.32, s.side], [s.doorFront - 0.02, s.doorTop - 0.28, s.side + 0.02]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Horse box door' },
+  ] + doorPins, finish, motion=k.motion.hinge(doorPins, 'near', s.doorOpen)) + { title: 'Horse box door' },
   // Fitted at its lower rear corner, high on the wall where a horse's head does not reach it.
   k.compound('horse_box_vent', 3, [
     box('plate', 'frame', [0, 0, s.side - 0.02], [s.ventWidth, ventHeight, s.side + 0.02]),

@@ -5,6 +5,8 @@
   hub: 0.325, wheelZ: 0.92, axles: [-0.62, 0.11], tip: 3.3,
   // Degrees from closed, so the lowered ramp's lip rests on the ground.
   rampOpen: 111,
+  // Degrees, so the side door stands square to the wall.
+  doorOpen: 90,
   // Degrees, so the top doors fold flat into the rear plane, clear of the walls.
   topDoorOpen: 180,
   rampTop: 1.95,ventLow: 1.96875, ventWidth: 0.5625, rearVent: -1.3, midVent: -0.2,
