@@ -7,6 +7,9 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 local door = s.cabRear + 0.55;
 local bats = 6;
+local doorHeight(share) = s.cabFloor + 0.04 + share * (s.cabRoof - 0.08 - s.cabFloor - 0.04);
+local doorPins = k.hingePins('hinge', 'y', [door + 0.01, doorHeight(0.1), s.cabSide + k.grain],
+                             [door + 0.01, doorHeight(0.9), s.cabSide + k.grain]);
 local polar(r, degrees) = [s.reel[0] + r * std.cos(degrees * std.pi / 180), s.reel[1] + r * std.sin(degrees * std.pi / 180)];
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('combine_harvester_body', s.shellMass, [
@@ -58,10 +61,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('frame_head', 'paint', [door + 0.01, s.cabRoof - 0.14, s.cabSide - 0.04], [s.cabFront - 0.06, s.cabRoof - 0.08, s.cabSide]),
     box('stile', 'paint', [door + 0.01, s.shoulderCab - 0.2, s.cabSide - 0.04], [door + 0.05, s.cabRoof - 0.14, s.cabSide]),
     box('stile_front', 'paint', [s.cabFront - 0.1, s.shoulderCab - 0.2, s.cabSide - 0.04], [s.cabFront - 0.06, s.cabRoof - 0.14, s.cabSide]),
-  ], { paint: s.paint, glass: 'glass-clear' }, {
-    hinge_a: ['stile', [0, 0.1, 1]],
-    hinge_b: ['stile', [0, 0.9, 1]],
-  }) + { title: 'Combine harvester cab door' },
+  ] + doorPins, { paint: s.paint, glass: 'glass-clear' }, motion=k.motion.hinge(doorPins, 'near', s.doorOpens))
+  + { title: 'Combine harvester cab door' },
   k.compound('combine_harvester_windscreen', 30, [
     box('glass', 'glass', [s.cabFront - 0.02, s.cabFloor + 0.1, -s.cabSide + 0.06], [s.cabFront + 0.02, s.cabRoof - 0.11, s.cabSide - 0.06]),
   ], { glass: 'glass-clear' }) + { title: 'Combine harvester windscreen' },
