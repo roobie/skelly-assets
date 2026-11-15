@@ -223,7 +223,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['body_front', 'body_side', 0.065],
       ['box_floor', 'box_front', 0.055],
       ['breast_bar', 'partition', 0.065],
-      ['cockpit_bulkhead', 'fuselage', 0.065],
       ['cockpit_bulkhead', 'load_floor', 0.08],
       ['dash', 'shell', 0.068],
       ['floor', 'near_side', 0.065],
