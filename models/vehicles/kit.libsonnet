@@ -297,7 +297,8 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // A round hatch: a lid `radius` m across and `thickness` thick, its origin under the lid's centre, on a hinge at its
   // rear. Its pins stand at the hinge's top rear corner, so the whole lid lies ahead of and below them and never dips
   // under the roof as it swings up `open` degrees. Its `reach` is how far it stands from the lid's axis in plan, at a
-  // pin's outer corner, so a fitting that far off clears it at any facing.
+  // pin's outer corner. A lid opened past upright leans back beyond that, but only above the pins' axis, `pinHeight`
+  // over the roof, so a fitting `reach` off and no taller than `pinHeight` clears it at any facing.
   hatch(radius, thickness, open):
     local back = -radius - 0.04;
     local top = thickness + 0.03;
@@ -313,6 +314,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       ] + pins,
       motion: motion,
       reach: std.sqrt(std.pow(back - vehicleGrain, 2) + std.pow(pinZ + vehicleGrain, 2)),
+      pinHeight: top,
     },
   hatchLid(radius, thickness): turned('lid', 'paint', 'y', disc(radius, 0, thickness)) + { sides: 12 },
   // The hole under a hatch's lid of `lidRadius` centred at (x, z), for `holed`. The lid laps it by two grains all round,

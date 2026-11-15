@@ -109,10 +109,11 @@ local periscope(id, x, z, facing) =
   ];
 local hatchScopes = o.hatch;
 // The roof hatches are the APC's. Each hatch periscope stands as far from its hatch's centre as the hatch's reach and
-// its own half-diagonal together, so it clears the hatch at any facing.
+// its own half-diagonal together, and stands no taller than the hatch's pins, so it clears the hatch at any facing.
 local hatchHoles = [k.hatchHole(s.hatches.x, z, apcHatch.radius) for z in [s.hatches.z, -s.hatches.z]];
-local hatchRing = k.hatch(apcHatch.radius, apcHatch.thickness, apcHatch.open).reach
-                  + std.sqrt(std.pow(scope.depth, 2) + std.pow(scope.width, 2)) / 2;
+local roofHatch = k.hatch(apcHatch.radius, apcHatch.thickness, apcHatch.open);
+assert scope.height <= roofHatch.pinHeight : "a hatch periscope stands taller than its hatch's pins, so the open lid's lean can meet it";
+local hatchRing = roofHatch.reach + std.sqrt(std.pow(scope.depth, 2) + std.pow(scope.width, 2)) / 2;
 local driverScopes = o.driver;
 local p = s.pannier;
 local bench = s.bench;
