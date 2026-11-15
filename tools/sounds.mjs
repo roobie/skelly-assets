@@ -12,8 +12,8 @@ import { installJsonnetSources } from './sources.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
-// Every baked file's rate, which a live render of the same row and seed uses to give the same samples. 48 kHz is what
-// browsers and Godot mix at, so no player resamples.
+// Every baked file's rate, which a render of the row and seed needs to give the file's samples again. 48 kHz is the
+// rate browsers and game engines commonly mix at, so a player seldom resamples.
 export const SOUND_SAMPLE_RATE = 48000;
 // Vorbis quality: enough that a contact click, a few milliseconds of broadband noise, keeps its edge.
 const QUALITY = 6;

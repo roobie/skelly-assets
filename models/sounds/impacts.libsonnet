@@ -173,7 +173,7 @@ local concreteBase = {
     },
   },
 
-  // The takes a build bakes of every row, and a live render picks among.
+  // The takes a build bakes of every row, which a game picks among.
   seeds: [1, 2, 3, 4],
 
   // One row per [object, surface] pair, keyed `<object>_on_<surface>`.
