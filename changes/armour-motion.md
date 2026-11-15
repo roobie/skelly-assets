@@ -6,9 +6,11 @@ anchors, so the showcase's Open view swings them and a game plays the swing the 
 until their lips rest on the ground. The APC hatch and the turret hatches, which had no hinge before, open too. The
 CV9040's and the main battle tank's driver's hatches are rows of their own that swing aside level, as a tank's does,
 since the gun and the turret's front leave a raised lid no room, their lids a little thinner than the turret ring is
-high so the turret clears them; the APC's tow hitch sits lower, under the sill, so the lowered ramp clears it. The
-hull's frame facing each door's free edge stands a few millimetres off it, so the door's inner corner clears it as
-the door starts to swing, and the sci-fi APC's side doorway is 1 cm longer.
+high so the turret clears them, and their hinge pins stand in the post behind the periscopes. The APC's tow hitch sits
+lower, under the sill, so the lowered ramp clears it. The frames facing a door's free edge stand a few millimetres off
+it, so the door's inner corner clears them as it starts to swing: the half-track's bay sides at the cab doors and its
+rear jamb, the CV9040's rear post and sponson end, and the sci-fi APC's rear lintel, tail bevel and side jamb. The
+sci-fi APC's side doorway is 1 cm longer.
 
 Upgrade:
 - Open `apc_ramp`, `apc_hatch`, `apc_scifi_wheeled_ramp`, `apc_scifi_wheeled_side_door`, `cv9040_rear_door`,
