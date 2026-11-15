@@ -43,27 +43,44 @@ local well(name, c) = [
 ] + rim(name + '_well', 'trim', c, 0.04, [s.wellIn, s.panelIn]);
 // A door turns on pins at its leaves' outer fore corners, so no part of it reaches past the axis into the body ahead.
 local leafOut = s.lowerSkin + 0.0625;
-// Where, at depth `z`, the circle crosses on which a door hinged at `hingeX` swings the corner it closes against `post`
-// with. The door's rear edge stays inside that circle at its inboard face, and the post's face reaches out to it at the
-// door's outer face, so the door swings clear of the post and no voxel column is left empty between them.
-local swingArc(hingeX, post, z) = hingeX - std.sqrt(std.pow(hingeX - post, 2) - std.pow(leafOut - z, 2));
-local frontPost = swingArc(s.cabFront, s.bPost + 0.02, s.lowerSkin);
-local rearPost = swingArc(s.bPost - 0.02, s.cabBack + 0.1, s.lowerSkin);
-local door(suffix, label, post, x1, topFront, winA, winB, hingeX) =
-  local x0 = swingArc(hingeX, post, s.upperIn);
-  local pins = k.hingePins('hinge', 'y', [hingeX, s.waist - 0.16, leafOut], [hingeX, s.floor + 0.16, leafOut], 'dark');
+// Each door's hinge line and the latch edge it closes on; their distance is the radius its rear edge swings on.
+local frontDoor = { hinge: s.cabFront, latch: s.bPost + 0.02 };
+local rearDoor = { hinge: s.bPost - 0.02, latch: s.cabBack + 0.1 };
+// How far inside its swing circle a door's rear edge stays, and so how near the post it ever comes.
+local doorClearance = 0.001;
+// The shut line between a door and the post behind it follows the swing circle's chord across the door's depth. The
+// door's rear edge stands the clearance inside the chord and the post's face lies on the parallel tangent, so every
+// point of the door stays inside the circle and every point of the post outside it. The seam this leaves is narrower
+// than a voxel, yet the door's lower skin is one voxel deep, so a cell centre inside the seam would leave a see-through
+// column: the fill still rests on these sizes keeping every cell centre out of it.
+local shutLine(edge) =
+  local radius = edge.hinge - edge.latch;
+  local arc(z) = edge.hinge - std.sqrt(std.pow(radius, 2) - std.pow(leafOut - z, 2));
+  local slope = (arc(s.lowerSkin) - arc(s.upperIn)) / (s.lowerSkin - s.upperIn);
+  {
+    door(z):: arc(s.lowerSkin) + slope * (z - s.lowerSkin) + doorClearance,
+    post(z):: edge.hinge - slope * (leafOut - z) - radius * std.sqrt(1 + slope * slope),
+  };
+// A piece between a rear and a fore face, each giving its x at a depth, so either may slope across the depths `z`.
+local strip(id, slot, rear, fore, y, z) = k.yPrism(id, slot, [[z[0], rear(z[0])], [z[1], rear(z[1])], [z[1], fore(z[1])], [z[0], fore(z[0])]], y);
+local at(x) = function(z) x;
+local door(suffix, label, edge, topFront, winA, winB) =
+  local shut = shutLine(edge).door;
+  local hinge = at(edge.hinge);
+  local x0 = shut(s.upperIn);
+  local pins = k.hingePins('hinge', 'y', [edge.hinge, s.waist - 0.16, leafOut], [edge.hinge, s.floor + 0.16, leafOut], 'dark');
   part(suffix, label, 48, [
-    box('skin', 'paint', [x0, s.floor, s.lowerIn], [x1, s.waist, s.lowerSkin]),
-    box('waist', 'paint', [x0, s.waist - 0.04, s.upperIn], [x1, s.waist, s.lowerSkin]),
-    box('plate', 'paint', [x0 + 0.07, s.floor + 0.07, s.lowerSkin], [x1 - 0.07, s.waist - 0.12, s.lowerSkin + 0.03125]),
-    box('window_sill', 'paint', [x0, s.waist, s.upperIn], [topFront, s.waist + 0.12, s.upperSkin]),
-    box('window_head', 'paint', [x0, s.roof - 0.12, s.upperIn], [topFront, s.roof - 0.04, s.upperSkin]),
-    box('stile_rear', 'paint', [x0, s.waist + 0.12, s.upperIn], [winA, s.roof - 0.12, s.upperSkin]),
+    strip('skin', 'paint', shut, hinge, [s.floor, s.waist], [s.lowerIn, s.lowerSkin]),
+    strip('waist', 'paint', shut, hinge, [s.waist - 0.04, s.waist], [s.upperIn, s.lowerSkin]),
+    box('plate', 'paint', [x0 + 0.07, s.floor + 0.07, s.lowerSkin], [edge.hinge - 0.07, s.waist - 0.12, s.lowerSkin + 0.03125]),
+    strip('window_sill', 'paint', shut, at(topFront), [s.waist, s.waist + 0.12], [s.upperIn, s.upperSkin]),
+    strip('window_head', 'paint', shut, at(topFront), [s.roof - 0.12, s.roof - 0.04], [s.upperIn, s.upperSkin]),
+    strip('stile_rear', 'paint', shut, at(winA), [s.waist + 0.12, s.roof - 0.12], [s.upperIn, s.upperSkin]),
     box('stile_front', 'paint', [winB, s.waist + 0.12, s.upperIn], [topFront, s.roof - 0.12, s.upperSkin]),
     box('glass', 'glass', [winA, s.waist + 0.12, s.upperIn + 0.005], [winB, s.roof - 0.12, s.upperSkin - 0.005]),
     box('handle', 'dark', [x0 + 0.1, s.waist - 0.22, s.lowerSkin + 0.03125], [x0 + 0.26, s.waist - 0.16, s.lowerSkin + 0.0625]),
-    box('hinge_top', 'dark', [hingeX - 0.1, s.waist - 0.2, s.lowerSkin], [hingeX, s.waist - 0.12, leafOut]),
-    box('hinge_low', 'dark', [hingeX - 0.1, s.floor + 0.12, s.lowerSkin], [hingeX, s.floor + 0.2, leafOut]),
+    box('hinge_top', 'dark', [edge.hinge - 0.1, s.waist - 0.2, s.lowerSkin], [edge.hinge, s.waist - 0.12, leafOut]),
+    box('hinge_low', 'dark', [edge.hinge - 0.1, s.floor + 0.12, s.lowerSkin], [edge.hinge, s.floor + 0.2, leafOut]),
   ] + pins, finish, motion=k.motion.hinge(pins, 'near', s.doorOpens));
 local lugCount = 20;
 local lugs = [
@@ -114,10 +131,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
       prism('bed_wall', 'trim', [[s.bedRear, s.bedUnder], [s.cabBack, s.bedUnder], [s.cabBack, 1.29], [s.bedRear, 1.13]], [s.bedZ, s.wellIn]),
       box('tail_corner', 'paint', [s.rear, s.railTop + 0.1, s.bedZ], [s.rear + 0.04, 1.13, s.panel]),
       box('sill', 'dark', [s.rearAxle + s.archBase, 0.5, 0.88], [s.frontAxle - s.archBase, s.floor, 1.0]),
-      box('c_post', 'paint', [s.cabBack, s.floor, s.lowerIn], [rearPost, s.waist, s.lowerSkin]),
-      box('c_post_upper', 'paint', [s.cabBack, s.waist, s.upperIn], [rearPost, s.roof, s.upperSkin]),
-      box('b_post', 'paint', [s.bPost - 0.02, s.floor, s.lowerIn], [frontPost, s.waist, s.lowerSkin]),
-      box('b_post_upper', 'paint', [s.bPost - 0.02, s.waist, s.upperIn], [frontPost, s.roof, s.upperSkin]),
+      strip('c_post', 'paint', at(s.cabBack), shutLine(rearDoor).post, [s.floor, s.waist], [s.lowerIn, s.lowerSkin]),
+      strip('c_post_upper', 'paint', at(s.cabBack), shutLine(rearDoor).post, [s.waist, s.roof], [s.upperIn, s.upperSkin]),
+      strip('b_post', 'paint', at(s.bPost - 0.02), shutLine(frontDoor).post, [s.floor, s.waist], [s.lowerIn, s.lowerSkin]),
+      strip('b_post_upper', 'paint', at(s.bPost - 0.02), shutLine(frontDoor).post, [s.waist, s.roof], [s.upperIn, s.upperSkin]),
       prism('a_post', 'paint', [[s.topFront, s.waist], [s.cabFront + 0.01, s.waist], [s.cabFront - 0.06, s.roof], [s.topFront, s.roof]], [0.86, s.upperSkin]),
       box('cant_rail', 'paint', [s.cabBack, s.roof - 0.04, s.upperIn], [s.topFront, s.roof, s.upperSkin]),
       box('back_side', 'paint', [s.cabBack, s.waist, 0.68], [s.cabBack + 0.04, s.roof, s.upperSkin]),
@@ -177,8 +194,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('stay_outer', 'frame', [s.nose, 0.98, 0.94], [s.front - 0.05, 1.02, 0.98]),
     box('tow_eye', 'dark', [s.front, 0.62, 0.7], [s.front + 0.03125, 0.72, 0.76]),
   ]), finish),
-  door('_front_door', 'front door', s.bPost + 0.02, s.cabFront, s.topFront, s.bPost + 0.12, 0.56, s.cabFront),
-  door('_rear_door', 'rear door', s.cabBack + 0.1, s.bPost - 0.02, s.bPost - 0.02, s.cabBack + 0.26, s.bPost - 0.24, s.bPost - 0.02),
+  door('_front_door', 'front door', frontDoor, s.topFront, s.bPost + 0.12, 0.56),
+  door('_rear_door', 'rear door', rearDoor, rearDoor.hinge, s.cabBack + 0.26, s.bPost - 0.24),
   part('_windscreen', 'windscreen', 26, [
     prism('pane_' + side.n, 'glass', [[s.cabFront - 0.03, s.waist], [s.cabFront, s.waist], [s.cabFront - 0.06, rakeTop], [s.cabFront - 0.09, rakeTop]], side.z)
     for side in [{ n: 'near', z: [0.04, 0.86] }, { n: 'far', z: [-0.86, -0.04] }]
