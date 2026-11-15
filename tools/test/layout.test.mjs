@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
-import { declaredPacks, outputPath, readMobRows, readRoster, rosterFile, undeclaredDirectories } from '../layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster, undeclaredDirectories } from '../layout.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
 import { sampleClip } from '../../site/clipFrames.mjs';
 
@@ -28,7 +28,7 @@ test('every pack a recipe file, a roster pack or a mob row names is declared, an
   const root = fixtureRoot();
   try {
     assert.deepEqual(declaredPacks(root), new Set(['fixture.recipe', 'fixture.roster', 'fixture.mobs']));
-    assert.deepEqual(readRoster(root), [{ packId: 'fixture.roster', id: 'fixture_gun', file: 'fixture.roster/assets/models/fixture_gun.glb' }]);
+    assert.deepEqual(readRoster(root), [{ packId: 'fixture.roster', id: 'fixture_gun' }]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -53,12 +53,12 @@ test('every mob row names a pack and actor output paths', () => {
   }
 });
 
-test('the roster builder writes each id at its pack path and nowhere else', () => {
+test('the roster builder writes each id at its pack path, with its sidecar, and nowhere else', () => {
   const [{ packId, id }] = readRoster();
   const out = mkdtempSync(join(tmpdir(), 'roster-'));
   try {
     execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', out, id], { cwd: repo, stdio: 'pipe' });
-    assert.deepEqual(filesUnder(out), [rosterFile(packId, id)]);
+    assert.deepEqual(filesUnder(out), [outputPath(packId, `assets/models/${id}.glb`), outputPath(packId, `things/${id}.model.json`)].sort());
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
 

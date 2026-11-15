@@ -9,11 +9,11 @@
 // pack's dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
 // rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
 // without the rest. Each model is written into --out (by default built/)
-// at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
-// for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
+// at its pack's path (tools/layout.mjs, outputPath), with its sidecar; a roster-source id outside the roster is written
+// flat, as its GLB alone, for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
 // `npm ci` in tools.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -116,7 +116,6 @@ const withTasks = (tools, units) => Promise.all(units.map(async (unit) => ({ ...
 export async function exportRecipes({ root = repo, out = join(repo, 'built'), tools: names, pool, ids }) {
   await installJsonnetSources();
   const tools = await recipeTools();
-  const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
   const units = await withTasks(tools, recipeUnits(root, tools, names));
   const selected = ids === undefined ? units : units
     .map((unit) => ({ ...unit, tasks: unit.tasks.filter((_, at) => ids.has(unit.rows[at].id)) }))
@@ -131,14 +130,25 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   const models = [];
   const files = [];
   for (const [at, { packId, name }] of selected.entries()) {
-    const tool = tools[name];
-    const written = writeModelExports(generated[at], resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: ids === undefined && tool.index });
-    models.push(...written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
-      id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers, soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3,
-    })));
-    files.push(...written.files.map((file) => outputPath(packId, file)));
+    const written = await writePack(out, packId, tools[name], generated[at], { index: ids === undefined });
+    models.push(...written.models);
+    files.push(...written.files);
   }
   return { models, files };
+}
+
+// Writes one pack's generated models into out/<packId>/ in its tool's layout, each GLB with its sidecar, and with
+// `index` the pack's index if the tool keeps one. Returns each model written, with its pack, and every file written as
+// <packId>/<logical path>.
+async function writePack(out, packId, tool, generated, { index }) {
+  const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
+  const written = writeModelExports(generated, resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: index && tool.index });
+  return {
+    models: written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
+      id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers, soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3,
+    })),
+    files: written.files.map((file) => outputPath(packId, file)),
+  };
 }
 
 // The production entry: the roster through TAT's catalogue, the tools that write recipe files into built/, and the
@@ -171,12 +181,15 @@ const finishLibrary = async () => {
 // The roster's source rows: TAT's catalogue export, which the roster selects from.
 const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
 
-async function buildRoster(thing, rows, ids, out, roster, pool) {
+// Builds the ids of the roster's source rows into out, each roster id into its pack as the thing tool writes a recipe's
+// (writePack), and an id outside the roster flat; with `index`, a complete build's, each pack's index too. A row that
+// fails is reported and left out, so every other row still builds.
+async function buildRoster(thing, rows, ids, out, roster, pool, { index }) {
   let failed = false;
-  const models = [];
   const tasks = await thing.tasks(rows);
   const wanted = rows.flatMap((row, at) => (ids.includes(row.id) ? [{ id: row.id, task: tasks[at] }] : []));
   const results = await Promise.allSettled(wanted.map(({ task }) => pool.run({ tool: 'thing', task })));
+  const packs = new Map();
   for (const [at, { id }] of wanted.entries()) {
     const result = results[at];
     if (result.status === 'rejected') {
@@ -184,15 +197,22 @@ async function buildRoster(thing, rows, ids, out, roster, pool) {
       failed = true;
       continue;
     }
-    const { kind, glb, partNodes, modelEntry, physical } = result.value;
-    const file = roster.get(id)?.file ?? `${id}.glb`;
-    mkdirSync(dirname(join(out, file)), { recursive: true });
-    writeFileSync(join(out, file), glb);
-    console.log(`built ${file}`);
     const row = roster.get(id);
-    if (row) models.push({ id, kind, pack: row.packId, path: file.slice(row.packId.length + 1), nodes: partNodes, label: modelEntry.label, paintable: modelEntry.paintable, covers: modelEntry.covers, soleLift: modelEntry.soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3 });
+    if (row) packs.set(row.packId, [...(packs.get(row.packId) ?? []), result.value]);
+    else {
+      writeFileSync(join(out, `${id}.glb`), result.value.glb);
+      console.log(`built ${id}.glb`);
+    }
   }
-  return { failed, models };
+  const models = [];
+  const files = [];
+  for (const [packId, generated] of packs) {
+    const written = await writePack(out, packId, thing, generated, { index });
+    models.push(...written.models);
+    files.push(...written.files);
+  }
+  for (const file of files) console.log(`built ${file}`);
+  return { failed, models, files };
 }
 
 // Generates one shard of the production build's cacheable rows into the cache and writes no tree. CI spreads a clean
@@ -254,7 +274,7 @@ async function main() {
   const pool = exportPool(cache);
   try {
     const [built, recipes] = await Promise.all([
-      buildRoster((await recipeTools()).thing, rosterRows, ids, out, roster, pool),
+      buildRoster((await recipeTools()).thing, rosterRows, ids, out, roster, pool, { index: positionals.length === 0 }),
       exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool, ids: positionals.length > 0 ? new Set(positionals) : undefined }),
     ]);
     failed = built.failed;
@@ -290,7 +310,7 @@ async function main() {
         vehicles: placed.vehicles,
         motions: wields.motions,
         dependsOn,
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files, ...wields.files],
+        files: [...built.files, ...recipes.files, ...mobs.files, ...placed.files, ...wields.files],
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes,
