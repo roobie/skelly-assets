@@ -9,7 +9,8 @@ local skinThick = 0.075;
 local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=skinThick, x=x, arc=arc, step=step, sides=sides);
 local door = s.cabinDoor;
 local doorTravel = door[1] - door[0];
-// The door stands a swing gap off the walls fore and aft and above and below it, which it plugs out along.
+// The door stands a swing gap off the walls fore and aft, the kit's seam below the roof and the waist gap above
+// the belly, and it plugs out clear of all of them.
 local doorX = [door[0] + k.swingGap, door[1] - k.swingGap];
 local doorArc = [s.cabinArc + h.seam, h.waist(s.body, door)];
 // The door runs on a sill rail at the waist, where the section is widest, so a rail grown sideways by the plug lies
