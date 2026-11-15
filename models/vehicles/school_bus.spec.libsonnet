@@ -15,7 +15,7 @@ local benchOverWell(x) = bench(x) { y: 1.15, riser: 0.38 };
   bonnet: { cowl: 3.75, cowlY: 1.72, noseY: 1.5, flankY: 0.72, halfWidth: 0.88 },
   lean: 0.2, screens: [[1.72, 2.62]], screenPost: true, pillar: 0.1,
   doors: [{ bay: 0 }], doorLeaves: 1, doorSill: 0.5, doorKick: 0.42, doorSteps: 2, doorFinish: 'paint-signal-yellow',
-  rearHoles: [{ y: [1.0, 2.42], z: 0.5, door: true }],
+  rearHoles: [{ y: [1.0, 2.42], z: 0.5, door: true }], rearDoorOpens: 90,
   rearFlank: { y: [1.8, 2.36], z: [0.62, 1.06] },
   stripes: [
     { y: [1.08, 1.14], slot: 'rail' },
