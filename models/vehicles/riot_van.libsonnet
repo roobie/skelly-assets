@@ -21,11 +21,11 @@ local farOut = [-s.side - 0.015, -s.glassOut + 0.01];
 local pillarAt(y) = van.pillarAt(s, y);
 local pillarY(x) = van.pillarY(s, x);
 local doorGrilleFront = 1.08;
-local doorGlassFront = s.cowl - 0.04;
+local doorGlassFront = van.frontDoorWindowFrontAt(s, s.waist);
 local doorRails = steps(s.waist + 0.02, s.windowTop - 0.05, 4);
 // The door glass ahead of the square grille narrows under the raked pillar.
 local doorWedge = [
-  box('wedge_rail' + i, 'steel', [doorGrilleFront, doorRails[i], nearOut[0]], [std.min(doorGlassFront, pillarAt(doorRails[i] + 0.03)), doorRails[i] + 0.03, nearOut[1]])
+  box('wedge_rail' + i, 'steel', [doorGrilleFront, doorRails[i], nearOut[0]], [van.frontDoorWindowFrontAt(s, doorRails[i] + 0.03), doorRails[i] + 0.03, nearOut[1]])
   for i in std.range(0, 4)
 ] + [
   box('wedge_upright', 'steel', [doorGlassFront - 0.03, s.waist + 0.02, nearOut[0]], [doorGlassFront, pillarY(doorGlassFront) - 0.04, nearOut[1]]),
