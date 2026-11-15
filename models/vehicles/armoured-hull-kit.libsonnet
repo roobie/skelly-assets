@@ -57,7 +57,7 @@ local turretAt(s) = [s.turretX, s.roofTop + s.ring.height, 0];
 // aside in degrees, so the lid lies clear beside its opening, and its lid's headroom under the turret, a real
 // clearance rather than a graze.
 local driverHatch = { massKg: 25, half: 0.3, post: 0.06, postTop: 0.12, open: 90, headroom: k.grain / 4 };
-// Far enough ahead of the driver's hatch that the periscopes clear its lid.
+// Far enough ahead of the driver's hatch that the periscopes clear its lid and hinge pins.
 local periscopeAhead = 0.42;
 local periscopeReach = 0.12;
 // `headlamp_military`'s bowl reaches this far behind its origin, where the glacis under it is highest, and
@@ -153,7 +153,11 @@ local rows(s, title) =
     local h = driverHatch;
     local post = h.half - h.post;
     local thickness = s.ring.height - h.headroom;
-    local pins = k.hingePins('hinge_pin', 'y', [h.half, k.grain, -h.half], [h.half, h.postTop - k.grain, -h.half], 'steel');
+    // The pins stand in the post, a pin's radius behind the lid's front edge, so they reach no further forward than
+    // the lid does.
+    local pinRadius = k.grain;
+    local pinX = h.half - pinRadius;
+    local pins = k.hingePins('hinge_pin', 'y', [pinX, k.grain, -h.half], [pinX, h.postTop - k.grain, -h.half], 'steel', pinRadius);
     k.compound(s.id + '_driver_hatch', h.massKg, [
       box('lid', 'paint', [-h.half, 0, -h.half], [h.half, thickness, h.half]),
       box('post', 'steel', [post, 0, -h.half], [h.half, h.postTop, -post]),
