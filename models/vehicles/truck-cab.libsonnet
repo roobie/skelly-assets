@@ -387,7 +387,7 @@ local stripe(id, title, s0, slot, y, massKg, finish) =
       for i in std.range(0, std.length(fixed) - 1)
     ]), finish) + { title: title + ' cab stripe' },
   ] + [
-    local x = [d[3][0] + k.doorTailGap(length(d[3]), k.grain), d[3][1] - k.swingGap];
+    local x = [d[3][0] + k.doorTailGap(length(d[3]), k.grain), d[3][1] - k.pinEdgeGap];
     k.compound(id + d[0], perMetre * length(x), [band('band', x, s.side + k.swingGap)], finish) + { title: title + ' ' + d[1] }
     for d in doors
   ];

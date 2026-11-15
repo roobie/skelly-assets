@@ -194,6 +194,10 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // edge whose inner face lies `depth` inside them. Its inner corner swings back across the post as it opens, at most
   // by how much further that corner lies from the pins than the edge's length.
   doorTailGap(length, depth): std.sqrt(length * length + depth * depth) - length + self.swingGap,
+  // How far a hinged part's edge at its pins stands off a neighbour whose corner lies on the pin axis. The edge's corner
+  // circles that axis, so it passes the neighbour's corner on a diagonal, where the swing check, measuring along each
+  // axis, reads only cos 45° of the distance; √2 swing gaps keep it a full swing gap clear there.
+  pinEdgeGap: std.sqrt(2) * self.swingGap,
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
