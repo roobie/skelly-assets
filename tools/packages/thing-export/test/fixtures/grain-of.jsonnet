@@ -1,7 +1,7 @@
 // A fixture class resolved for a definition that names no grain, for one that names its own and for one that names the
 // class of what it is.
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
-local class = { grain: 0.008, detailGrain: 0.002 };
+local class = { grain: 0.008, detailGrain: 0.002, detailThinParts: true };
 {
   class: class,
   plain: voxel.of(class, { id: 'plain' }),
