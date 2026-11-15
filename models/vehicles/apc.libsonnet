@@ -17,7 +17,9 @@ local axle(id, massKg, finish) = k.compound(id, massKg, [
 local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1.32 + i * 0.16, 2.46, 1.08]);
 // Each opening part turns about its outer corner on the hinge side, so it swings out of the hull's way at every angle.
 local rampPins = k.hingePins('ramp_pin', 'z', [s.rear - 0.22, 0.81, -s.rampPinZ], [s.rear - 0.22, 0.81, s.rampPinZ], 'steel');
-local hatchPins = k.hingePins('hinge_pin', 'z', [-0.3, 0.05, -0.26], [-0.3, 0.05, 0.26], 'steel');
+local hatch = k.hatch(s.hatch.radius, s.hatch.thickness, s.hatch.open);
+local hatchHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius)]
+                   + [k.hatchHole(s.squadHatch.x, z, s.hatch.radius) for z in [s.squadHatch.z, -s.squadHatch.z]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 1660, [
     k.xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
@@ -40,9 +42,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     prism('cheek', 'paint', [[2.81, s.belly], [3.0, s.belly], [s.nose, 0.97], [s.nose, 1.47], [2.56, s.roofTop], [2.5, s.roofTop], [2.5, 1.19]], [1.19, 1.25]),
     box('tow_eye', 'steel', [s.nose, 0.9, 0.62], [s.nose + 0.08, 1.1, 0.72]),
   ]), paint + { steel: 'steel-parkerized' }) + { title: 'APC hull nose' },
-  k.compound('apc_hull_roof', 790, [
-    box('plate', 'paint', [s.rear, s.roof, -s.sideTop], [2.56, s.roofTop, s.sideTop]),
-  ], paint) + { title: 'APC hull roof' },
+  k.compound('apc_hull_roof', 790,
+             k.holed(box('plate', 'paint', [s.rear, s.roof, -s.sideTop], [2.56, s.roofTop, s.sideTop]), hatchHoles),
+             paint) + { title: 'APC hull roof' },
   k.compound('apc_hull_rear', 175, [
     box('sill', 'paint', [s.rear - 0.14, s.belly, -s.wall], [s.rear, 0.81, s.wall]),
     box('header', 'paint', [s.rear - 0.14, 2.19, -s.sideTop], [s.rear, s.roofTop, s.sideTop]),
@@ -86,11 +88,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     k.turned('lid', 'paint', 'y', k.disc(0.3, 0.14, 0.2)) + { sides: 12 },
     box('hinge', 'steel', [-0.3, 0.14, -0.1], [-0.24, 0.2, 0.1]),
   ], paint + { steel: 'steel-parkerized' }) + { title: 'APC cupola' },
-  k.compound('apc_hatch', 25, [
-    box('lid', 'paint', [-0.3, 0, -0.3], [0.3, 0.05, 0.3]),
-    box('hinge', 'steel', [-0.3, 0.05, -0.26], [-0.25, 0.08, 0.26]),
-    box('handle', 'steel', [0.12, 0.05, -0.1], [0.18, 0.09, 0.1]),
-  ] + hatchPins, paint + { steel: 'steel-parkerized' }, motion=k.motion.hinge(hatchPins, 'up', s.hatchOpen)) + { title: 'APC hatch' },
+  k.compound('apc_hatch', 25, hatch.pieces, paint + { steel: 'steel-parkerized' }, motion=hatch.motion) + { title: 'APC hatch' },
   k.compound('apc_engine_deck', 180, [
     box('frame', 'paint', [1.15, s.roofTop, 0.05], [2.48, 2.44, 1.15]),
     box('exhaust_cowl', 'paint', [0.86, s.roofTop, 0.8], [1.15, 2.53, 1.12]),

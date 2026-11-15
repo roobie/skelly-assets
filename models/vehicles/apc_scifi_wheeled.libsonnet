@@ -2,6 +2,7 @@ local k = import 'kit.libsonnet';
 local s = import 'apc_scifi_wheeled.spec.libsonnet';
 local vehicle = import 'apc_scifi_wheeled.placements.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local apcHatch = (import 'apc.spec.libsonnet').hatch;
 local box = k.box;
 local b = s.body;
 local finish = { paint: s.paint, frame: s.frame, trim: s.trim, dark: 'plastic-black', glass: 'lens-smoke', cushion: 'cloth-seat' };
@@ -107,10 +108,8 @@ local periscope(id, x, z, facing) =
     block(id + '_glass', 'glass', glass[0], glass[1], facing, 0.01, scope.width - 0.04, [b.top + 0.02, b.top + scope.height - 0.02]),
   ];
 local hatchScopes = o.hatch;
-// Each hatch periscope stands as far from its hatch's centre as the lid's and its own half-diagonals together, so it
-// clears the lid at any facing.
-local hatchLid = [p for p in std.parseJson([r for r in import 'apc.libsonnet' if r.id == 'apc_hatch'][0].parts[0].params.pieces) if p.id == 'lid'][0];
-local hatchRing = std.sqrt(2) * hatchLid.max[0] + std.sqrt(std.pow(scope.depth, 2) + std.pow(scope.width, 2)) / 2;
+// The roof hatches are the APC's.
+local hatchHoles = [k.hatchHole(s.hatches.x, z, apcHatch.radius) for z in [s.hatches.z, -s.hatches.z]];
 local driverScopes = o.driver;
 local p = s.pannier;
 local bench = s.bench;
@@ -154,9 +153,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
   + fenderRun('fender', [front[1], b.fender], [b.belly, fenderTop], [brow])
   + [hull('rear_well_corner_' + c.end, c.x, c.y, [b.core, b.half], [c.cut]) for c in wellCorners(s.axles[1])]
   + std.flattenArrays([fenderRun('front_well_corner_' + c.end, c.x, c.y, [c.cut]) for c in wellCorners(s.axles[0])]))),
-  part('roof', 'roof', 900, [
-    hull('plate', [b.rear, front[0]], [b.top - wall, b.top], [-b.half, b.half], [glacis]),
-  ]),
+  part('roof', 'roof', 900, k.holed(hull('plate', [b.rear, front[0]], [b.top - wall, b.top], [-b.half, b.half], [glacis]), hatchHoles)),
   // The glacis is cut round the driver's slit, so the slit lies in the plate itself.
   part('glacis', 'glacis', 700, [
     hull('aft', [glacisFrom, sl.x[0]], [b.belly, b.top], [-b.core, b.core], glacisSkin),
@@ -267,7 +264,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     + k.bothSides(periscope('driver_side', driverScopes.x, driverScopes.z, driverScopes.turn)
       + std.flattenArrays([
         local a = facing * std.pi / 180;
-        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchRing, s.hatches.z + std.sin(a) * hatchRing, facing)
+        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchScopes.ring, s.hatches.z + std.sin(a) * hatchScopes.ring, facing)
         for facing in hatchScopes.facings
       ]))),
   // A grab rail along the hull's near side, the bar held off the armour by posts.

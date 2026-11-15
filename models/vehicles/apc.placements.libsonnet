@@ -37,7 +37,7 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
     for i in std.range(0, 4)
   ])
   + pair('stowage_bin', 'apc_stowage_bin')
-  + pair('squad_hatch', 'apc_hatch', [-2.2, s.roofTop, 0.72])
+  + pair('squad_hatch', 'apc_hatch', [s.squadHatch.x, s.roofTop, s.squadHatch.z])
   + pair('periscope_rear', 'apc_periscope', [-0.95, s.roofTop, 1.05])
   + pair('bench', 'apc_bench')
   + pair('wall_locker', 'apc_wall_locker')
