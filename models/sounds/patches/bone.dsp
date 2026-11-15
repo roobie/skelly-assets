@@ -6,7 +6,8 @@ import("sfx.lib");
 pitch = hslider("pitch [scale:log]", 900, 250, 3000, 1);
 // Bends the bar's partials apart or together, from a tight knock to a split, cracked one.
 spread = hslider("spread", 1, 0.85, 1.15, 0.01);
-ring = hslider("ring [scale:log]", 0.12, 0.02, 0.5, 0.001);
+// Below about 60 ms the modes die inside the contact and only a tick is left.
+ring = hslider("ring [scale:log]", 0.12, 0.06, 0.5, 0.001);
 hardness = hslider("hardness [scale:log]", 4000, 800, 14000, 1);
 hollow = hslider("hollow", 0.5, 0.1, 0.9, 0.01);
 
