@@ -1,7 +1,7 @@
 // Where each solid is drawn, so the datums an export writes (grips, anchors, round poses, collision boxes, centres of
 // mass) read off the voxels the player sees rather than off the authored solids those voxels approximate.
 
-import type { PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import {
   add,
   applyPoint,
@@ -106,7 +106,8 @@ const unionOf = (boxes: readonly (readonly [Vec3, Vec3])[]): [Vec3, Vec3] => [
 /**
  * Reads datums off the drawn voxels of `resolved` at the export's grains: each solid is sampled on its part's lattice
  * together with the solids it is drawn among, as `glb.ts` samples them for the file, and measured by the voxels it
- * fills there. Without a grain the file holds the authored meshes, so datums stay on the authored solids.
+ * fills there. Without a grain, for the file or the part, the file holds the authored meshes, so datums stay on the
+ * authored solids.
  */
 export const drawnGeometry = (
   resolved: Resolved,
@@ -119,10 +120,9 @@ export const drawnGeometry = (
   const measured = new Map<readonly Solid[], Map<Solid, SolidMeasure | undefined>>();
   const drawnMeasures = (
     siblings: readonly Solid[],
-    def: PartDef,
+    grain: number,
     placed: Transform,
   ): Map<Solid, SolidMeasure | undefined> => {
-    const grain = partVoxelGrain(def, { ...options, voxelGrain: voxelGrain! }, unit);
     const sources = siblings.map((solid) => {
       const bevel = solid.display?.mergeGroup === undefined ? displayBevel(solid, resolved.domain.units) : 0;
       const mesh = meshForSolid(solid, bevel, options.revolveFacets);
@@ -151,7 +151,8 @@ export const drawnGeometry = (
     if (!(def && placed)) {
       throw new Error(`No placed part ${partId} to read a datum from`);
     }
-    if (voxelGrain === undefined) {
+    const grain = voxelGrain === undefined ? undefined : partVoxelGrain(def, { ...options, voxelGrain }, unit);
+    if (grain === undefined) {
       const authored = authoredMeasures.get(solid) ?? authoredMeasure(solid);
       authoredMeasures.set(solid, authored);
       return authored;
@@ -161,7 +162,7 @@ export const drawnGeometry = (
     const siblings = [def.displaySolids ?? def.solids, def.solids].find((list) => list.includes(solid)) ?? [solid];
     let measures = measured.get(siblings);
     if (!measures) {
-      measures = drawnMeasures(siblings, def, placed);
+      measures = drawnMeasures(siblings, grain, placed);
       measured.set(siblings, measures);
     }
     const found = measures.get(solid);

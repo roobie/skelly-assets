@@ -517,12 +517,7 @@ const frontSightPost = (resolved: Resolved) => {
   if (!(id && transform && axis && post)) {
     throw new Error('A rear sight needs a front-sight post to define its aim line');
   }
-  const [low, high] = localSolidBounds(post);
-  return {
-    id,
-    tip: applyPoint(transform, axis.origin),
-    postHalfWidthMetres: ((high[2] - low[2]) / 2) * resolved.domain.units.metresPerUnit,
-  };
+  return { tip: applyPoint(transform, axis.origin) };
 };
 
 /**
@@ -623,10 +618,10 @@ const drawnApertureSpan = (file: VoxelFile, partId: string, eye: Vec3): readonly
  * A rear sight is aimed through its notch or its closed aperture, so the voxels must leave it open: at least one voxel
  * of the gun grain wide. A gap one voxel wide or narrower of its own grain can fill, and the player would line up the
  * top of a solid block. An open notch is read at the drawn top; where the top row is solid across the line, the eye
- * drops to the centre of the closed aperture on the line and the width is read across the hole. Returns the eye.
+ * drops to the centre of the closed aperture on the line and the width is read across the hole. `grain` is the part's
+ * own. Returns the eye.
  */
-const openSightGapOrThrow = (file: VoxelFile, resolved: Resolved, partId: string, topEye: Vec3): Vec3 => {
-  const grain = partVoxelGrain(resolved.defs.get(partId)!, file.grains, resolved.domain.units.metresPerUnit);
+const openSightGapOrThrow = (file: VoxelFile, partId: string, grain: number, topEye: Vec3): Vec3 => {
   const notch = drawnWidthAtRow(file, partId, topEye, topEye[FILE_AXES.up] - grain / 2);
   const wide = (width: number) => width >= file.grains.voxelGrain - 1e-6;
   if (wide(notch)) {
@@ -649,13 +644,12 @@ const openSightGapOrThrow = (file: VoxelFile, resolved: Resolved, partId: string
 
 /**
  * An iron sight's line as the voxelized file draws it, in model metres, because voxels move the tops the player lines
- * up. A rear sight aims from its own top to the front post's top, through its drawn notch; the post is read within
- * twice its own width of the bore plane, which holds its top voxel column wherever the sampler put it and leaves the
- * guard ears out. A bead sets the eye height to its top and keeps its level line. Any other iron datum, such as a
- * revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs between, then
- * drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in front post:
- * then it aims at the post's drawn top, read no higher than one voxel over its authored top so a hood ring above it
- * stays out.
+ * up. A separate sight part is too small to voxelize and is drawn as authored, so its authored datum stands: a rear
+ * sight aims at the front post's authored tip and a bead keeps its level line. A sight built into a voxelized part,
+ * such as a revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs
+ * between, then drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in
+ * front post, which a voxelized part draws too: then it aims at the post's drawn top, read no higher than one voxel
+ * over its authored top so a hood ring above it stays out.
  */
 const drawnIronSightLine = (
   file: VoxelFile,
@@ -665,33 +659,30 @@ const drawnIronSightLine = (
   const { family } = resolved.assembly.parts[sight.id]!;
   const { metresPerUnit } = resolved.domain.units;
   const { bore, up, side } = FILE_AXES;
-  const onTop = (top: number) => withCoordinate(sight.eye, up, top);
-  if (family.includes('rear-sight')) {
-    const front = frontSightPost(resolved);
-    const tip = modelPoint(front.tip, metresPerUnit);
-    const band = 2 * front.postHalfWidthMetres;
-    const eye = openSightGapOrThrow(file, resolved, sight.id, onTop(drawnTopOrThrow(file, sight.id)));
-    const frontTop = drawnTopOrThrow(file, front.id, { [side]: [tip[side] - band, tip[side] + band] });
-    return { eye, direction: normalize(sub(withCoordinate(tip, up, frontTop), eye)) };
+  const grainOf = (partId: string) => partVoxelGrain(resolved.defs.get(partId)!, file.grains, metresPerUnit);
+  const sightGrain = grainOf(sight.id);
+  if (sightGrain === undefined) {
+    const direction = family.includes('rear-sight')
+      ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
+      : sight.direction;
+    return { eye: sight.eye, direction };
   }
-  if (family === 'front-sight-bead') {
-    return { eye: onTop(drawnTopOrThrow(file, sight.id)), direction: sight.direction };
-  }
-  const half = partVoxelGrain(resolved.defs.get(sight.id)!, file.grains, metresPerUnit) / 2;
-  const along = sight.eye[bore];
-  const top = drawnTopOrThrow(file, sight.id, { [bore]: [along - half, along + half], [side]: leafSpan(resolved, sight) });
-  const eye = openSightGapOrThrow(file, resolved, sight.id, onTop(top));
+  const top = drawnTopOrThrow(file, sight.id, {
+    [bore]: [sight.eye[bore] - sightGrain / 2, sight.eye[bore] + sightGrain / 2],
+    [side]: leafSpan(resolved, sight),
+  });
+  const eye = openSightGapOrThrow(file, sight.id, sightGrain, withCoordinate(sight.eye, up, top));
   const post = builtInFrontPost(resolved);
   if (post === undefined) {
     return { eye, direction: sight.direction };
   }
-  const grain = partVoxelGrain(resolved.defs.get(post.id)!, file.grains, metresPerUnit);
-  // As for a front-sight part's post, twice its width holds its top voxel column wherever the sampler put it.
+  const postGrain = grainOf(post.id)!;
+  // Twice the post's width holds its top voxel column wherever the sampler put it.
   const centre = (post.low[side] + post.high[side]) / 2;
   const band = post.high[side] - post.low[side];
   const postTop = drawnTopOrThrow(file, post.id, {
     [bore]: [post.low[bore], post.high[bore]],
-    [up]: [post.low[up], post.high[up] + grain],
+    [up]: [post.low[up], post.high[up] + postGrain],
     [side]: [centre - band, centre + band],
   });
   // The eye lines up with the tip's edge on the post's rear face, which faces back along the bore.

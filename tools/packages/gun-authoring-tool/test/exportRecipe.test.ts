@@ -1,10 +1,17 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type { PartDef } from '@skelly/construct/assembly/schema.ts';
+import { SMOOTH } from '@skelly/thing-export/glb.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
+import { REPO_ROOT } from '../src/cli/content.ts';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
+import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
+import { FAMILIES } from '../src/gun/parts.ts';
 import { readGlb } from './glbReader.ts';
 
 const SOURCE_CONTEXT = /Export fixture.*fixture-source/;
-const voxel = { grain: 0.004, detailGrain: 0.002 };
+const voxel = { grain: 0.004, detailGrain: 0.002, detailThinParts: true };
 
 it.each(['fixture-unsupported', 'toString'])('refuses unknown export kind %s at recipe load', (kind) => {
   expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', kind, source: 'fixture-source', voxel }])).toThrow(
@@ -34,7 +41,7 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
       id: 'fixture',
       title: 'Fixture',
       kind: 'design',
-      source: 'models/guns/designs/archetype-ak-akm.json',
+      source: 'models/guns/designs/archetype-ar.json',
       voxel: grains,
     },
   ]);
@@ -58,6 +65,39 @@ const placedCoordinates = (positions: ArrayLike<number>, transform: Matrix4): nu
     new Vector3(positions[3 * i]!, positions[3 * i + 1]!, positions[3 * i + 2]!).applyMatrix4(transform).toArray(),
   ).flat();
 
+/** A gun family's part built with its default params, or none for a family outside the gun catalogue. */
+const defaultPart = (name: string): PartDef | undefined => {
+  const family = FAMILIES[name];
+  return family?.build(Object.fromEntries(Object.entries(family.params).map(([param, spec]) => [param, spec.default])));
+};
+
+/** Whether a family's part keeps its authored mesh in a voxelized export. */
+const buildsSmooth = (name: string): boolean => defaultPart(name)?.tags?.includes(SMOOTH) ?? false;
+
+/** The family of each exported part node, with its mesh. */
+const partNodes = (glb: Uint8Array) =>
+  readGlb(glb).json.nodes.flatMap((node) => {
+    const family = (node.extras as { family?: string } | undefined)?.family;
+    return family === undefined ? [] : [{ family, mesh: node.mesh }];
+  });
+
+/** The family of each part a design names, through the catalogue for a catalogue item. */
+const designFamilies = (source: string): string[] => {
+  const { assembly } = JSON.parse(readFileSync(resolve(REPO_ROOT, source), 'utf8')) as {
+    assembly: { parts: Record<string, { family?: string; item?: string }> };
+  };
+  return Object.values(assembly.parts).map(({ family, item }) => family ?? PART_CATALOGUE.items.get(item!)!.family);
+};
+
+/**
+ * Whether a design's eye is on a sight part that keeps its authored mesh: a separate iron sight part, which the export
+ * picks over a sight built into another part.
+ */
+const eyeOnSmoothSight = (source: string): boolean =>
+  designFamilies(source).some(
+    (family) => buildsSmooth(family) && defaultPart(family)!.axes.some(({ kind }) => kind === 'sight'),
+  );
+
 it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
   const { json, floats } = readGlb(designExport(voxel).glb);
   const seen = new Set<number>();
@@ -67,7 +107,11 @@ it('puts every part turned only by quarter turns, coarse or fine, on the fine la
       continue;
     }
     for (const primitive of json.meshes[node.mesh]!.primitives) {
-      const grain = (primitive.extras as { voxelGrain: number }).voxelGrain;
+      const grain = (primitive.extras as { voxelGrain?: number }).voxelGrain;
+      // A smooth part is drawn as authored, on no lattice.
+      if (grain === undefined) {
+        continue;
+      }
       seen.add(grain);
       for (const coordinate of placedCoordinates(floats(primitive.attributes.POSITION), transform)) {
         for (const step of [grain, voxel.detailGrain]) {
@@ -101,11 +145,13 @@ describe('recipe iron sight lattice', () => {
     // can be mid-row, so the half lattice holds both.
     'puts $id iron sight eye on a drawn top or aperture centre, on its fine half lattice',
     (row, context) => {
-      // A gun that ships without sights, its optic left for the player to fit, has no eye to check.
+      const exported = row.generate();
       const { sight } = (
-        row.generate().modelEntry as unknown as { gun: { sight?: { kind: string; eye: readonly number[] } } }
+        exported.modelEntry as unknown as { gun: { sight?: { kind: string; eye: readonly number[] } } }
       ).gun;
-      if (sight?.kind !== 'iron') {
+      // A gun that ships without sights, its optic left for the player to fit, has no eye to check; a smooth sight's
+      // eye is authored, off any lattice.
+      if (sight?.kind !== 'iron' || eyeOnSmoothSight(row.source)) {
         context.skip();
         return;
       }
@@ -121,19 +167,62 @@ describe('recipe output grain', () => {
   it('has recipe rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
-  // Cartridges are drawn smooth whatever their row's grain; see `src/gun/cartridgeExport.ts`, `makeModelExport`.
-  it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge', (row) => {
+  // A cartridge is a component too small to voxelize, like a smooth gun part, but outside the gun catalogue; see
+  // `src/gun/tooSmallToVoxelize.ts`, `TOO_SMALL_TO_VOXELIZE`.
+  it.for(rows)('draws $id on its row grain or detail grain, or smooth if a cartridge or smooth part', (row) => {
     const grains =
       row.kind === 'cartridge'
         ? [undefined]
         : [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
-    const primitives = readGlb(row.generate().glb).json.meshes.flatMap((mesh) => mesh.primitives);
-    expect(primitives.length, `${row.id}: no meshes`).toBeGreaterThan(0);
-    for (const { extras } of primitives) {
-      expect(grains, `${row.id}: a mesh is not drawn on the row's grains`).toContain(
-        (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
-      );
-    }
+    const { glb } = row.generate();
+    const { meshes } = readGlb(glb).json;
+    expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
+    // A loose part's node is named by the family its part builds, which need not be its catalogue family.
+    const familyOf = (node: string) => (row.kind === 'part' ? PART_CATALOGUE.items.get(row.source)!.family : node);
+    const smoothMeshes = new Set(
+      partNodes(glb).flatMap(({ family, mesh }) =>
+        mesh !== undefined && buildsSmooth(familyOf(family)) ? [mesh] : [],
+      ),
+    );
+    meshes.forEach(({ primitives }, mesh) => {
+      const allowed = smoothMeshes.has(mesh) ? [undefined] : grains;
+      for (const { extras } of primitives) {
+        expect(allowed, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
+          (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
+        );
+      }
+    });
+  });
+});
+
+describe('loose smooth attachment seat', () => {
+  const rows = loadExportRecipe().filter(({ kind, source }) => kind === 'attachment' && buildsSmooth(source));
+  it('has smooth attachment rows to check', () => {
+    expect(rows.length).toBeGreaterThan(0);
+  });
+  // The game fits a loose attachment by its mount frame at the gun's slot, where the gun's voxel rail top lies within
+  // half a voxel of the port; reaching one grain through the port keeps it on the rail.
+  it.for(rows)('reaches one row grain through the mount port of $id', (row) => {
+    const { glb, modelEntry } = row.generate() as unknown as {
+      glb: Uint8Array;
+      modelEntry: { gun: { attachment: { mountFrame: { normal: readonly number[] } } } };
+    };
+    const { normal } = modelEntry.gun.attachment.mountFrame;
+    const { json } = readGlb(glb);
+    const reach = Math.max(
+      ...json.nodes.flatMap((node) =>
+        node.mesh === undefined
+          ? []
+          : json.meshes[node.mesh]!.primitives.map(({ attributes }) => {
+              const { min, max } = json.accessors[attributes.POSITION!] as { min: number[]; max: number[] };
+              const at = node.translation ?? [0, 0, 0];
+              return Math.max(
+                ...[min, max].map((corner) => corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0)),
+              );
+            }),
+      ),
+    );
+    expect(reach).toBeCloseTo(row.voxel.voxelGrain, 9);
   });
 });
 

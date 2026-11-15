@@ -11,7 +11,8 @@ local roles = {
   'tactical-flashlight-mount': ['metal', 0.65], foregrip: ['furniture', 0.82],
   frame: ['metal', 0.78], slide: ['metal', 1], cylinder: ['metal', 0.8],
   'front-sight': ['metal', 0.6], 'front-sight-bead': ['metal', 0.6], 'rail-front-sight': ['metal', 0.62],
-  'sporting-rear-sight': ['metal', 0.62], 'rail-rear-sight': ['metal', 0.62],
+  'sporting-rear-sight': ['metal', 0.62], 'rail-rear-sight': ['metal', 0.62], 'rail-peep-rear-sight': ['metal', 0.62],
+  'shroud-front-sight': ['metal', 0.6],
   'gas-block': ['metal', 0.55], 'gas-cylinder': ['metal', 0.7],
   'revolver-frame': ['metal', 1], 'revolver-cylinder': ['metal', 0.8], 'revolver-crane': ['metal', 0.8],
   'revolver-ejector': ['metal', 0.8], 'revolver-hammer': ['metal', 1], 'revolver-trigger': ['metal', 1],
@@ -45,6 +46,7 @@ local familyHex = {
   'revolver-crane': '4a5566', 'revolver-ejector': '4a5566', 'revolver-hammer': '8d939c', 'revolver-trigger': '8d939c',
   'revolver-barrel': '5d636b', 'revolver-grip': '7d604c', 'front-sight': '363d47', 'front-sight-bead': '363d47',
   'rail-front-sight': '363d47', 'sporting-rear-sight': '363d47', 'rail-rear-sight': '363d47',
+  'rail-peep-rear-sight': '363d47', 'shroud-front-sight': '363d47',
   'gas-block': '2f3238', 'gas-cylinder': '545a63',
   'muzzle-brake': '3b4149', 'barrel-shroud': '7a8088', bipod: '4a4f55', 'carry-handle': '5a6068', monopod: '4a4f55',
 };
@@ -65,6 +67,11 @@ local familyHex = {
     'improvised-suppressor': { appearance: { finish: { metal: 'alu-anodized-black' } }, voxelGrain: 0.004 },
     // A 20 mm mount is two item voxels across; the fine grain keeps its clamp and lamp apart.
     'tactical-flashlight-mount': { voxelGrain: 0.002 },
+  } + {
+    // A rail iron sight is drawn smooth, seated one grain into its host; the gun class seats it as deep as the gun's
+    // rail voxels reach, as when the gun file draws it fitted.
+    [sight]: { voxelClass: 'gun' }
+    for sight in ['rail-front-sight', 'rail-rear-sight', 'rail-peep-rear-sight']
   } + {
     // Each optic's default lens coating fills its lens slot; the tint is the glass material's sheen.
     ['optic-' + optic]: { appearance: { finish: { lens: opticLenses[optic] } } }

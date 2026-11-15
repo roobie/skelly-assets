@@ -48,7 +48,13 @@ import {
   smg,
 } from '../src/gun/templates.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { loadDesignAssembly, type MutableAssembly, scopedAntiMaterielDesign, scopedArDesign } from './helpers.ts';
+import {
+  loadDesignAssembly,
+  type MutableAssembly,
+  removeRearSight,
+  scopedAntiMaterielDesign,
+  scopedArDesign,
+} from './helpers.ts';
 
 /** A point or direction in the optic's own axes, in the exported file's axes and metres, as the file draws it. */
 const inFile = ([x, y, z]: readonly number[], scale = METRES_PER_UNIT): Vector3 =>
@@ -489,8 +495,12 @@ const opticConnection = (template: Template, type: string) => {
   return { ...connection, slot };
 };
 
-const fitOptic = (template: Template, seed: number, type: string): MutableAssembly => {
+/** `replacesRearIron`: the optic needs the rail the rear iron sits on, so a player takes the iron off to fit it. */
+const fitOptic = (template: Template, seed: number, type: string, replacesRearIron = false): MutableAssembly => {
   const assembly = structuredClone(generate(template, gunDomain, seed)) as MutableAssembly;
+  if (replacesRearIron) {
+    removeRearSight(assembly);
+  }
   const connection = opticConnection(template, type);
   const candidates = typeof connection.from === 'string' ? [connection.from] : connection.from;
   const from = candidates.find((candidate) => assembly.parts[candidate.split('.')[0]!]);
@@ -626,7 +636,7 @@ const expectContactOnPhysicalRail = (assembly: MutableAssembly, opticId: string,
 
 const FIT_CASES = [
   { template: battleRifle, seed: 0, types: OPTIC_TYPE_IDS.slice(0, 6) },
-  { template: antiMateriel, seed: 0, types: ['high-mag-5-25x'] },
+  { template: antiMateriel, seed: 0, types: ['high-mag-5-25x'], replacesRearIron: true },
   { template: ar, seed: 0, types: OPTIC_TYPE_IDS.slice(0, 5) },
   { template: pistol, seed: 0, types: ['mini-reflex'] },
   { template: smg, seed: 0, types: OPTIC_TYPE_IDS.slice(0, 3) },
@@ -643,9 +653,10 @@ const FIT_CASES = [
 describe('template optics can be attached, validated, and removed', () => {
   it.each(FIT_CASES)(
     '$template.name keeps one gun valid with every compatible optic type',
-    ({ template, seed, types }) => {
+    (fitCase) => {
+      const { template, seed, types } = fitCase;
       for (const type of types) {
-        const assembly = fitOptic(template, seed, type);
+        const assembly = fitOptic(template, seed, type, 'replacesRearIron' in fitCase && fitCase.replacesRearIron);
         expectContactOnPhysicalRail(assembly, type);
         expect(validate(assembly, gunDomain).issues, `${template.name} with ${type}`).toEqual([]);
       }

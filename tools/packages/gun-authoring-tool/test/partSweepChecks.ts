@@ -26,7 +26,15 @@ export const definePartChecks = (family: PartFamily, cases: Record<string, strin
   if (family.name === 'forend' || family.name === 'ar-charging-handle') {
     gridStep = GRID / 5;
   } else if (
-    ['front-sight', 'rail-front-sight', 'rail-rear-sight', 'ak-rear-sight', 'sporting-rear-sight'].includes(family.name)
+    [
+      'front-sight',
+      'rail-front-sight',
+      'rail-rear-sight',
+      'rail-peep-rear-sight',
+      'shroud-front-sight',
+      'ak-rear-sight',
+      'sporting-rear-sight',
+    ].includes(family.name)
   ) {
     gridStep = GRID / 4;
   } else if (['frame', 'slide', 'sight'].includes(family.name)) {
