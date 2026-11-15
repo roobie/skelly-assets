@@ -38,8 +38,8 @@ local merged(core, dressed) = std.foldl(function(all, d)
       k.compound(coreId, massKg - accessoryMass, core.pieces, core.finish) + { title: coreTitle },
       k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), merged(core, dressed)) + { title: title },
     ],
-  // An accessory's own row.
-  row(id, title, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish) + { title: title },
+  // An accessory's own row, which moves as its drawing does; fused into its part, it stays put.
+  row(id, title, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish, motion=std.get(drawn, 'motion')) + { title: title },
   // Every site the part can take: its core's and each accessory's.
   siteIds(coreSite, accessories): [coreSite] + [a.site for a in accessories],
   // The part's sites, its frame placed at `at`. `detail` picks how much of it is salvageable: 'fused' fits the whole

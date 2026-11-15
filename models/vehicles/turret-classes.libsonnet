@@ -5,7 +5,8 @@
 // the `gun` voxel class's lattice names a coarser `voxelGrain` of its own.
 // A fitting's `taxonomy` is its row's own, over the vehicle's (`models/TAXONOMY.md`): a gun lifted off a turret is a
 // whole weapon, not a vehicle part.
-local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } };
+// A hatch's `open` is in degrees from closed, so the raised lid leans back past upright and stays open.
+local gun ={ category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } };
 {
   // A one-man machine-gun turret: a 14.5 mm heavy machine gun with a coaxial 7.62 mm machine gun.
   one_man_mg: {
@@ -38,7 +39,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     // The hull's own vision periscope, so one salvaged from the hull fits the turret's roof.
     periscope: { draw: 'periscope', id: 'apc_periscope', title: 'APC periscope', massKg: 6, length: 0.22, height: 0.1, width: 0.28 },
     // A round lid of 7 mm armour on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'turret_hatch', title: 'Turret hatch', massKg: 15, radius: 0.22, thickness: 0.04, opening: 0.28 },
+    hatch: { draw: 'hatch', id: 'turret_hatch', title: 'Turret hatch', massKg: 15, radius: 0.22, thickness: 0.04, opening: 0.28, open: 105 },
     // One empty 81 mm smoke-grenade launcher tube on its foot, raised to throw forward over the turret.
     smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_launcher_81mm', title: '81 mm smoke launcher', massKg: 3, bore: 0.09, length: 0.24, elevation: 45 },
   },
@@ -72,7 +73,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     commanderSight: { draw: 'sight', id: 'ifv_commander_sight', title: 'Infantry fighting vehicle commander sight', massKg: 35, length: 0.28, height: 0.4, width: 0.28 },
     periscope: { draw: 'periscope', id: 'ifv_turret_periscope', title: 'Infantry fighting vehicle turret periscope', massKg: 7, length: 0.2, height: 0.12, width: 0.25 },
     // A crewman's round lid of armour plate on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'ifv_turret_hatch', title: 'Infantry fighting vehicle turret hatch', massKg: 30, radius: 0.3, thickness: 0.05, opening: 0.4 },
+    hatch: { draw: 'hatch', id: 'ifv_turret_hatch', title: 'Infantry fighting vehicle turret hatch', massKg: 30, radius: 0.3, thickness: 0.05, opening: 0.4, open: 105 },
     // One empty 76 mm Galix grenade launcher tube on its foot, raised to throw forward.
     smokeLauncher: { draw: 'smokeLauncher', id: 'galix_launcher_76mm', title: '76 mm smoke grenade launcher', massKg: 2.5, bore: 0.08, length: 0.2, elevation: 45 },
   },
@@ -112,7 +113,7 @@ local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['moder
     commanderSight: { draw: 'sight', id: 'mbt_commander_sight', title: 'Main battle tank commander sight', massKg: 60, length: 0.3, height: 0.48, width: 0.3 },
     periscope: { draw: 'periscope', id: 'mbt_turret_periscope', title: 'Main battle tank turret periscope', massKg: 8, length: 0.2, height: 0.12, width: 0.25 },
     // A crewman's round lid of thick armour plate on its hinge, over a square opening in the roof.
-    hatch: { draw: 'hatch', id: 'mbt_turret_hatch', title: 'Main battle tank turret hatch', massKg: 60, radius: 0.33, thickness: 0.06, opening: 0.5 },
+    hatch: { draw: 'hatch', id: 'mbt_turret_hatch', title: 'Main battle tank turret hatch', massKg: 60, radius: 0.33, thickness: 0.06, opening: 0.5, open: 105 },
     // One empty 76 mm smoke-grenade discharger tube on its foot, raised to throw forward.
     smokeLauncher: { draw: 'smokeLauncher', id: 'smoke_discharger_76mm', title: '76 mm smoke discharger', massKg: 3, bore: 0.09, length: 0.26, elevation: 45 },
     // The steel basket the crew's kit rides in behind the turret.
