@@ -8,7 +8,13 @@ const PACKAGES = 'tools/packages';
 // Where site/build.mjs writes the tool links into the index's header.
 export const NAV_MARK = '<!-- tools -->';
 
-export const viewerDir = (root, viewer) => join(root, PACKAGES, viewer);
+// The showcase's own files in site/, which site/build.mjs copies to the served site: its pages and every module they load.
+export const SITE_FILES = ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'motionPose.mjs', 'skin.mjs', 'pose.mjs'];
+// Modules the site ships from tools/ beside its own. The authoring tools draw the same fabric grain, and its
+// declaration types it from their packages, which resolve only under tools/, so the shader lives there.
+export const TOOLS_FILES = ['fabric.mjs'];
+
+export const viewerDir =(root, viewer) => join(root, PACKAGES, viewer);
 export const viewerDist = (root, viewer) => join(viewerDir(root, viewer), 'dist');
 
 // Every tool, each held to naming a page of the showcase or a tool package, so a misspelt entry fails rather than
