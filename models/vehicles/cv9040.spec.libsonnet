@@ -26,6 +26,8 @@
   towEye: { length: 0.08, height: 0.12, width: 0.1, z: 0.5 },
   headlamp: { x: 2.5, z: 1.25 },
   tailLamp: { y: 1.45, z: 1.3 },
+  // Degrees, so the troop door stands well clear of the doorway.
+  rearDoorOpen: 110,
   battery: { x: -0.75, z: 0.5 },
   paint: 'paint-olive',
 }

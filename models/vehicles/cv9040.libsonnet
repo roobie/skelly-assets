@@ -27,14 +27,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicl
     box('post', 'paint', [s.rear, s.belly, 0.5], [plate, s.shelf, s.wall]),
     box('sponson_end', 'paint', [s.rear, s.shelf, 0.5], [plate, s.roofTop, s.side]),
   ]), paint) + { title: 'Tracked infantry fighting vehicle hull rear' },
-  // The troop door, hinged on its near edge.
+  // The troop door, hinged on its near edge: its pins stand at the hinge straps' outer corner, so it swings clear of
+  // the rear plate.
+  local doorPins = k.hingePins('hinge_pin', 'y', [s.rear - 0.06, 0.8, 0.5], [s.rear - 0.06, 1.35, 0.5], 'steel');
   k.compound('cv9040_rear_door', 300, [
     box('plate', 'paint', [s.rear - 0.02, 0.65, -0.5], [s.rear + 0.06, 1.5, 0.5]),
     box('handle', 'steel', [s.rear - 0.06, 1.05, -0.4], [s.rear - 0.02, 1.1, -0.25]),
   ] + [
     box('hinge_' + i, 'steel', [s.rear - 0.06, 0.75 + i * 0.55, 0.42], [s.rear - 0.02, 0.85 + i * 0.55, 0.5])
     for i in [0, 1]
-  ], paint + { steel: steel }, { hinge_a: ['hinge_0', [0.5, 0.5, 1]], hinge_b: ['hinge_1', [0.5, 0.5, 1]] }) + { title: 'Tracked infantry fighting vehicle rear door' },
+  ] + doorPins, paint + { steel: steel }, motion=k.motion.hinge(doorPins, 'rear', s.rearDoorOpen)) + { title: 'Tracked infantry fighting vehicle rear door' },
   // A folding troop seat against the near wall, facing in: the origin is on the floor under the seat's back.
   k.compound('cv9040_troop_seat', 15, [
     box('cushion', 'cloth', [-0.22, 0.4, -0.42], [0.22, 0.48, -0.04]),
