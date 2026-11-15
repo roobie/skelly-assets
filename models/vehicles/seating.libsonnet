@@ -331,7 +331,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['canopy', 'canopy_frame', 0.065],
       ['canopy', 'rear_fairing', 0.055],
       ['canopy', 'seat_frame', 0.055],
-      ['canopy_frame', 'door', 0.04],
       ['canopy_frame', 'rear_fairing', 0.067],
       ],
     ),
