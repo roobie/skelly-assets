@@ -35,9 +35,19 @@ local cab = {
   driverZ: -0.5,
 };
 local tailOf(s) = s.rear + 0.08;
+// The bonnet's top face at x; its skin is `bonnetDepth` thick below that.
+local hoodOf(s, x) = s.waist - (x - s.aPost) * s.hoodFall;
+local bonnetDepth = 0.03;
+// The headlamps' height on a cab whose bonnet clears them, and their housing's (`headlamp_large`).
+local headlampTop = 0.96;
+local headlampHeight = 0.22;
+// Half the width of `tail_lamp_tall`, which a van stands beside its rear doors.
+local tailLampHalfWidth = 0.07;
 // The inner face of a body's side wall, the deeper of the lower panel's and the glass line's: what a jamb lies behind.
 local wallInOf(b) = std.min(b.skin, b.glassIn);
 local noseOf(s) = s.front - 0.08;
+// Lowered under a bonnet whose front edge comes down on them, so the bonnet shuts and lifts clear of them.
+local headlampTopOf(s) = std.min(headlampTop, hoodOf(s, noseOf(s)) - bonnetDepth - k.swingGap);
 // The rear edge of the A pillar at height y, and the height where it crosses x.
 local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
 local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
@@ -86,7 +96,7 @@ local pressings(id, title, s0) = {
   local slideTravel = slideFront - s.slideRear,
   local rise = !isBox && s.cabRoof < s.roof,
   local bumperTop = 0.6,
-  local hood(x) = s.waist - (x - s.aPost) * s.hoodFall,
+  local hood(x) = hoodOf(s, x),
   local roofFront = s.aPost - s.aLean,
   local pillarAt(y) = pillarAtOf(s, y),
   local pillarY(x) = pillarYOf(s, x),
@@ -203,7 +213,7 @@ local pressings(id, title, s0) = {
     box('firewall_low', 'paint', [s.fire - 0.05, s.floor, -s.tubIn], [s.fire, s.archTop, s.tubIn]),
     box('firewall', 'paint', [s.fire - 0.05, s.archTop, -s.skin], [s.fire, s.waist, s.skin]),
     box('scuttle', 'paint', [s.fire, s.waist - 0.03, -s.skin], [s.aPost, s.waist, s.skin]),
-    box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, hood(nose) - 0.03, s.side - 0.1]),
+    box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, hood(nose) - bonnetDepth - k.swingGap, s.side - 0.1]),
     box('front_tub_floor', 'pan', [s.frontAxle - s.arch, s.sill, -s.tubIn], [s.frontAxle + s.arch, 0.5, s.tubIn]),
     box('front_apron', 'pan', [s.frontAxle + s.arch, s.sill, -s.side + 0.1], [nose - 0.04, 0.6, s.side - 0.1]),
   ] + (if s.bulkhead then [k.xPrism('bulkhead', 'lining', cabEnd, [s.bRear - 0.04, s.bRear])] else [])
@@ -236,15 +246,17 @@ local pressings(id, title, s0) = {
     windscreen(id, title, s),
     // Hinged at the foot of the screen, a grain over its top face, so its rear edge swings forward off the scuttle and
     // the glass. The more upright the screen, the nearer its face comes to the pins, so an upright one moves them
-    // forward until they clear the glass by a swing gap.
+    // forward until they clear the glass by a swing gap. Its rear edge stands a swing gap ahead of the scuttle and the
+    // A pillars' feet, which it would otherwise meet edge to edge when shut.
     local bonnetSide = s.side - 0.1 - k.swingGap;
+    local bonnetRear = s.aPost + k.swingGap;
     local pinY = hood(s.aPost) + grain;
     local lean = screenLeanOf(s);
     local glassAhead = s.aPost - (screenFootOf(s) - lean * (pinY - s.waist));
     local pinX = s.aPost + std.max(0, (grain + k.swingGap) * std.sqrt(1 + lean * lean) - glassAhead);
     local bonnetPins = k.hingePins('hinge', 'z', [pinX, pinY, 0.7 * bonnetSide], [pinX, pinY, -0.7 * bonnetSide]);
     k.compound(id + '_bonnet', 20, [
-      prism('skin', 'paint', [[s.aPost, hood(s.aPost) - 0.03], [nose, hood(nose) - 0.03], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-bonnetSide, bonnetSide]),
+      prism('skin', 'paint', [[bonnetRear, hood(bonnetRear) - bonnetDepth], [nose, hood(nose) - bonnetDepth], [nose, hood(nose)], [bonnetRear, hood(bonnetRear)]], [-bonnetSide, bonnetSide]),
     ] + bonnetPins, { paint: s.paint }, motion=k.motion.hinge(bonnetPins, 'up', opens.bonnet)) + { title: title + ' bonnet' },
     k.compound(id + '_front_wing', 8, [
       box('rear', 'paint', [s.cowl, s.sill, s.side - 0.1], [s.frontAxle - s.arch, s.waist, s.side]),
@@ -261,7 +273,7 @@ local pressings(id, title, s0) = {
       box('grille', 'trim', [nose, 0.66, -0.48], [nose + 0.03, 0.92, 0.48]),
       box('grille_bar', 'bumper', [nose + 0.03, 0.78, -0.48], [nose + 0.04, 0.82, 0.48]),
     ] + k.bothSides([
-      box('lamp_bezel', 'trim', [nose, 0.74, 0.5], [nose + 0.015, 0.95, 0.86]),
+      box('lamp_bezel', 'trim', [nose, headlampTopOf(s) - headlampHeight, 0.5], [nose + 0.015, headlampTopOf(s) - 0.01, 0.86]),
     ]) + [
       box('intake', 'trim', [s.front, 0.34, -0.5], [s.front + 0.01, 0.46, 0.5]),
     ], finish + { bumper: s.bumper }) + { title: title + ' front bumper' },
@@ -272,15 +284,20 @@ local pressings(id, title, s0) = {
     // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the door's outer
     // face, its bands included, so no part of it swings forward into the wing as it opens.
     local frontDoorPins = k.hingePins('hinge', 'y', [s.cowl, s.sill + 0.2 * (s.waist - s.sill), s.side + grain], [s.cowl, s.sill + 0.8 * (s.waist - s.sill), s.side + grain]);
+    // Every edge stands a swing gap off what it closes against: the wing and the quarter glass ahead, the dashboard
+    // inboard. Against the leaning A pillar the gap is measured square to it, so it is wider along x.
     local doorRear = frontDoorRearOf(s);
+    local doorFront = s.cowl - k.swingGap;
     local glassTop = winTop - k.swingGap;
+    local pillarGap = k.swingGap * std.sqrt(1 + std.pow(screenLeanOf(s), 2));
+    local stileRear = doorFront - 0.04;
     k.compound(id + '_front_door', 32, [
-      box('skin', 'paint', [doorRear, s.sill + k.swingGap, s.skin + k.swingGap], [s.cowl, s.waist, s.side]),
-      box('trim', 'trim', [s.bFront + 0.02, std.max(s.sill, s.floor) + 0.02, s.skin - 0.03], [s.cowl - 0.02, s.waist - 0.02, s.skin]),
-      box('stile', 'paint', [s.cowl - 0.04, s.waist, s.glassIn], [s.cowl, std.min(pillarY(s.cowl), winTop) - k.swingGap, s.glassOut]),
-      prism('glass', 'glass', [[doorRear, s.waist], [s.cowl - 0.04, s.waist]] + (if pillarY(s.cowl - 0.04) > glassTop then [[s.cowl - 0.04, glassTop]] else [[s.cowl - 0.04, pillarY(s.cowl - 0.04 + k.swingGap)], [pillarAt(glassTop) - k.swingGap, glassTop]]) + [[doorRear, glassTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
+      box('skin', 'paint', [doorRear, s.sill + k.swingGap, s.skin + k.swingGap], [doorFront, s.waist, s.side]),
+      box('trim', 'trim', [s.bFront + 0.02, std.max(s.sill, s.floor) + 0.02, s.skin - 0.03 + k.swingGap], [s.cowl - 0.02, s.waist - 0.02, s.skin]),
+      box('stile', 'paint', [stileRear, s.waist, s.glassIn], [doorFront, std.min(pillarY(doorFront + pillarGap), glassTop), s.glassOut]),
+      prism('glass', 'glass', [[doorRear, s.waist], [stileRear, s.waist]] + (if pillarY(stileRear + pillarGap) > glassTop then [[stileRear, glassTop]] else [[stileRear, pillarY(stileRear + pillarGap)], [pillarAt(glassTop) - pillarGap, glassTop]]) + [[doorRear, glassTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
       box('handle', 'trim', [s.bFront + 0.05, s.waist - 0.13, s.side], [s.bFront + 0.21, s.waist - 0.09, s.side + 0.015]),
-    ] + bands('skin', [s.bFront + k.doorTailGap(s.cowl - s.bFront, grain), s.cowl - k.swingGap], s.side) + frontDoorPins, finish, motion=k.motion.hinge(frontDoorPins, 'near', opens.door)) + { title: title + ' front door' },
+    ] + bands('skin', [s.bFront + k.doorTailGap(s.cowl - s.bFront, grain), doorFront], s.side) + frontDoorPins, finish, motion=k.motion.hinge(frontDoorPins, 'near', opens.door)) + { title: title + ' front door' },
     // Plugs out, then rolls back along the rail on the rear wall; its leading edge is where it seals. A body without the
     // rail hangs it on that edge instead, its pins on the outer face as the front door's are. Only the hung door stands
     // its edges off the frame, as the front door does: the sliding one moves out of the frame before it moves along it.
@@ -335,21 +352,22 @@ local pressings(id, title, s0) = {
       ], finish + { rib: 'plastic-grey' }, motion=k.motion.slide('up', b.doorTop - b.rearSill - slat, stow=true)) + { title: title + ' rear shutter' }
     else
     // One leaf of the pair, hinged on the body's outer edge, its pins on the leaf's rear face, bands included, so no
-    // part of it swings out into the rear post.
+    // part of it swings out into the rear post. Its outer edge stands a swing gap inside the post it closes against.
     local rearDoorPins = k.hingePins('hinge', 'y', [tail - grain, b.rearSill + 0.2 * (b.waist - b.rearSill), b.hatchSide], [tail - grain, b.rearSill + 0.8 * (b.waist - b.rearSill), b.hatchSide]);
     local doorTop = b.doorTop - k.swingGap;
+    local doorSide = b.hatchSide - k.swingGap;
     k.compound(id + '_rear_door', 28, [
-      box('skin', 'paint', [tail, b.rearSill + k.swingGap, 0.005], [tail + 0.05, b.waist, b.hatchSide]),
+      box('skin', 'paint', [tail, b.rearSill + k.swingGap, 0.005], [tail + 0.05, b.waist, doorSide]),
       box('handle', 'trim', [tail - 0.015, b.waist - 0.2, 0.05], [tail, b.waist - 0.08, 0.1]),
     ] + (if s.rearGlass then [
-      box('top', 'paint', [tail, b.windowTop, 0.005], [tail + 0.05, doorTop, b.hatchSide]),
+      box('top', 'paint', [tail, b.windowTop, 0.005], [tail + 0.05, doorTop, doorSide]),
       box('stile_in', 'paint', [tail, windowSill, 0.005], [tail + 0.05, b.windowTop, 0.08]),
-      box('stile_out', 'paint', [tail, windowSill, b.hatchSide - 0.08], [tail + 0.05, b.windowTop, b.hatchSide]),
+      box('stile_out', 'paint', [tail, windowSill, b.hatchSide - 0.08], [tail + 0.05, b.windowTop, doorSide]),
       box('glass', 'glass', [tail + 0.015, windowSill, 0.08], [tail + 0.035, b.windowTop, b.hatchSide - 0.08]),
-    ] + (if windowSill > b.waist then [box('below_sill', 'paint', [tail, b.waist, 0.005], [tail + 0.05, windowSill, b.hatchSide])] else []) else [
-      box('upper', 'paint', [tail, b.waist, 0.005], [tail + 0.05, doorTop, b.hatchSide]),
+    ] + (if windowSill > b.waist then [box('below_sill', 'paint', [tail, b.waist, 0.005], [tail + 0.05, windowSill, doorSide])] else []) else [
+      box('upper', 'paint', [tail, b.waist, 0.005], [tail + 0.05, doorTop, doorSide]),
     ]) + [
-      box('band' + i, 'band' + i, [tail - grain, s.bands[i].y[0], 0.005], [tail, s.bands[i].y[1], b.hatchSide - k.swingGap])
+      box('band' + i, 'band' + i, [tail - grain, s.bands[i].y[0], 0.005], [tail, s.bands[i].y[1], doorSide])
       for i in std.range(0, std.length(s.bands) - 1)
       if s.bands[i].y[0] >= b.rearSill
     ] + rearDoorPins, finish, motion=k.motion.hinge(rearDoorPins, 'rear', opens.rearDoor)) + { title: title + ' rear door' },
@@ -460,6 +478,11 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
     local lift = hub - cab.hub;
     // On a riser, so a van's driver sits up over the bonnet; a box's cab wall stands further forward.
     local seatX = std.get(s, 'frontSeatX', if isBox then 0.5 else 0.45);
+    local rearShutter = std.get(s, 'rearShutter', false);
+    local hatchSide = if isBox then s.box.hatchSide else s.hatchSide;
+    // A tail lamp stands outboard of the rear doors' hinge pins, which reach a grain past the doors' edge, so the pins
+    // turn clear of its lens; a shutter has no pins.
+    local tailLampIn = hatchSide + (if rearShutter then 0.01 else grain + k.swingGap);
     [
       fitting('shell', part('_shell'), origin),
       fitting('windscreen', part('_windscreen'), origin, ['shell']),
@@ -482,8 +505,8 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
     + (if std.objectHas(s, 'floorPart') then [fitting(s.floorPart.fitting, part(s.floorPart.suffix), origin, [rearBody])] else [])
     + pair('front_wing', part('_front_wing'), origin, on(['shell']))
     + pair('front_door', part('_front_door'), origin, on(['shell']))
-    + (if std.get(s, 'rearShutter', false) then [fitting('rear_door', part('_rear_door'), origin, [rearBody])] else pair('rear_door', part('_rear_door'), origin, on([rearBody])))
-    + pair('tail_lamp', 'tail_lamp_tall', [tail - 0.03, 0.72, (if isBox then s.box.hatchSide else s.hatchSide) + 0.08], on([rearBody]))
+    + (if rearShutter then [fitting('rear_door', part('_rear_door'), origin, [rearBody])] else pair('rear_door', part('_rear_door'), origin, on([rearBody])))
+    + pair('tail_lamp', 'tail_lamp_tall', [tail - 0.03, 0.72, tailLampIn + tailLampHalfWidth], on([rearBody]))
     + pair('front_strut', 'front_strut', [s.frontAxle, 0.33 + lift, 0.8], on(['shell']))
     + pair('front_wheel', s.wheel, [s.frontAxle, hub, s.wheelZ], on(paired=['front_strut']))
     + pair('rear_wheel', std.get(s, 'rearWheel', s.wheel), [s.rearAxle, hub, std.get(s, 'rearWheelZ', s.wheelZ)], on(['rear_axle']))
@@ -491,7 +514,7 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
     + pair('front_seat', 'front_seat', [seatX, s.floor + 0.2, 0.5], on(paired=['seat_riser']))
     + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, std.min((if isBox then s.box.side else s.side) - 0.13, s.glassOut - 0.02)], on(['shell']))
     + pair('indicator', 'marker_lamp', [nose + 0.02, 0.6, 0.72], on(['front_bumper']))
-    + pair('headlamp', 'headlamp_large', [nose, 0.74, 0.68], on(['front_bumper']))
+    + pair('headlamp', 'headlamp_large', [nose, headlampTopOf(s) - headlampHeight, 0.68], on(['front_bumper']))
     + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell'])
   )),
 }
