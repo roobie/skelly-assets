@@ -1,6 +1,5 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
-local apcHatch = (import 'apc.spec.libsonnet').hatch;
 local hull = import 'armoured-hull-kit.libsonnet';
 local s = import 'cv9040.spec.libsonnet';
 local vehicle = import 'cv9040.placements.libsonnet';
@@ -17,9 +16,9 @@ local door = { half: 0.5, face: s.rear + 0.06, pinX: s.rear - 0.06 };
 local doorPins = k.hingePins('hinge_pin', 'y', [door.pinX, 0.8, door.half], [door.pinX, 1.35, door.half], 'steel');
 local doorFar = door.half + k.swingStandOff(2 * door.half, door.face - door.pinX);
 local trackOuter = s.trackZ + trackClasses[tracks[s.track].class].link.width / 2;
-// The troop hatches are the APC's.
-local troopHatches = [k.hatchHole(s.troopHatch.x, z, apcHatch.radius) for z in [s.troopHatch.z, -s.troopHatch.z]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title, troopHatches) + [
+local troop = s.troopHatch;
+local troopHatch = k.panelHatch(troop.length, troop.width, troop.thickness, troop.open);
+taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title, [k.panelHatchHole(troop.x, 0, troop.length, troop.width)]) + [
   // The near side's skirt outside the track's top run, hung from the sponson's edge above the track.
   k.compound('cv9040_side_skirt', 250, [
     box('hanger', 'paint', [-2.95, s.shelf, s.side], [2.2, hull.shelfTop(s), trackOuter]),
@@ -43,6 +42,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicl
     box('hinge_' + i, 'steel', [door.pinX, 0.75 + i * 0.55, 0.42], [s.rear - 0.02, 0.85 + i * 0.55, door.half])
     for i in [0, 1]
   ] + doorPins, paint + { steel: steel }, motion=k.motion.hinge(doorPins, 'rear', s.rearDoorOpen)) + { title: 'Tracked infantry fighting vehicle rear door' },
+  k.compound('cv9040_troop_hatch', troop.massKg, troopHatch.pieces, paint + { steel: steel }, motion=troopHatch.motion)
+  + { title: 'Tracked infantry fighting vehicle troop hatch' },
   // A folding troop seat against the near wall, facing in: the origin is on the floor under the seat's back.
   k.compound('cv9040_troop_seat', 15, [
     box('cushion', 'cloth', [-0.22, 0.4, -0.42], [0.22, 0.48, -0.04]),

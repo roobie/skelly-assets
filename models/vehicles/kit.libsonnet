@@ -241,16 +241,19 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     local gap = std.sqrt(reach * reach + depth * depth) - reach + 0.002;
     assert gap < grain / 2 : 'a ' + gap + ' m stand-off would open a slot at a ' + grain + ' m grain';
     gap,
-  // A level plate, a box or a y or z prism, with a round hole straight down through it at each of `holes`, an
-  // { x, z, radius } whose outline is a `sides`-gon. A prism must be convex, so the plate is cut into strips along x
-  // round a square cell about each hole, and each cell into sectors of the ring between the hole and the cell's edge.
-  // A hole may reach past the plate's edge, so a hole across a joint is cut by each plate it crosses, and a plate no
-  // hole reaches is left whole.
+  // A level plate, a box or a y or z prism, with a hole straight down through it at each of `holes`: a round one, an
+  // { x, z, radius } whose outline is a `sides`-gon, or a rectangular one, an { x: [from, to], z: [from, to] }. A prism
+  // must be convex, so the plate is cut into strips along x round a rectangular cell about each hole, and a round
+  // hole's cell into sectors of the ring between the hole and the cell's edge. A hole may reach past the plate's edge,
+  // so a hole across a joint is cut by each plate it crosses, and a plate no hole reaches is left whole.
   holed(piece, holes, sides=16):
     local slab = slabOf(piece);
     local zs = [p[0] for p in slab.outline];
     local xs = [p[1] for p in slab.outline];
-    local cell(h) = { hole: h, z: [h.z - h.radius, h.z + h.radius], x: [h.x - h.radius, h.x + h.radius] };
+    local round(h) = std.objectHas(h, 'radius');
+    local cell(h) =
+      if round(h) then { hole: h, z: [h.z - h.radius, h.z + h.radius], x: [h.x - h.radius, h.x + h.radius] }
+      else { hole: h, z: h.z, x: h.x };
     local reaches(c) = c.z[1] > std.foldl(std.min, zs, zs[0]) && c.z[0] < std.foldl(std.max, zs, zs[0])
                        && c.x[1] > std.foldl(std.min, xs, xs[0]) && c.x[0] < std.foldl(std.max, xs, xs[0]);
     local cells = std.sort([cell(h) for h in holes if reaches(cell(h))], function(c) c.z[0]);
@@ -284,7 +287,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
         [[-mid[0], -mid[1]], through([-mid[0], -mid[1]]) - h.radius * std.cos(std.pi / sides)],
       ]);
     local plans = std.flattenArrays([strip(i) for i in std.range(0, std.length(edges) - 2)])
-                  + [sector(c, i) for c in cells for i in std.range(0, sides - 1)];
+                  + [sector(c, i) for c in cells if round(c.hole) for i in std.range(0, sides - 1)];
     // A cut that keeps all of a piece is left off it, and a piece a cut leaves nothing of is dropped.
     local drawn(n, plan) =
       local corners = [[p[1], y, p[0]] for p in plan for y in slab.y];
@@ -294,32 +297,43 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       else [yPrism(piece.id + '_' + n, piece.slot, plan, slab.y) + (if cuts == [] then {} else { clip: cuts })];
     if cells == [] then [piece]
     else std.flattenArrays([drawn(n, plans[n]) for n in std.range(0, std.length(plans) - 1) if plans[n] != []]),
-  // A round hatch: a lid `radius` m across and `thickness` thick, its origin under the lid's centre, on a hinge at its
-  // rear. Its pins stand at the hinge's top rear corner, so the whole lid lies ahead of and below them and never dips
-  // under the roof as it swings up `open` degrees. Its `reach` is how far it stands from the lid's axis in plan, at a
-  // pin's outer corner. A lid opened past upright leans back beyond that, but only above the pins' axis, `pinHeight`
+  // A hatch: a `lid` `thickness` thick, its origin under the lid's centre, reaching `rear` m back from it, on a hinge
+  // at its rear whose pins stand `pinZ` either side of the centre line. The pins stand at the hinge's top rear corner,
+  // so the whole lid lies ahead of and below them and never dips under the roof as it swings up `open` degrees. Its
+  // `reach` is how far it stands from the lid's axis in plan, at a pin's outer corner or the lid's own `corner` reach,
+  // whichever is further. A lid opened past upright leans back beyond that, but only above the pins' axis, `pinHeight`
   // over the roof, so a fitting `reach` off and no taller than `pinHeight` clears it at any facing.
-  hatch(radius, thickness, open):
-    local back = -radius - 0.04;
+  hingedLid(lid, rear, corner, thickness, open, pinZ):
+    local back = -rear - 0.04;
     local top = thickness + 0.03;
-    local pinZ = 0.1;
     local pins = self.hingePins('hinge_pin', 'z', [back, top, -pinZ], [back, top, pinZ], 'steel');
-    local lid = self.hatchLid(radius, thickness);
     local motion = self.motion.hinge(pins, 'up', open);
     {
       pieces: [
         lid,
-        box('hinge', 'steel', [back, 0, -pinZ], [-radius + 0.02, top, pinZ]),
-        box('handle', 'steel', [radius * 0.3, thickness, -0.06], [radius * 0.3 + 0.03, thickness + 0.03, 0.06]),
+        box('hinge', 'steel', [back, 0, -pinZ], [-rear + 0.02, top, pinZ]),
+        box('handle', 'steel', [rear * 0.3, thickness, -0.06], [rear * 0.3 + 0.03, thickness + 0.03, 0.06]),
       ] + pins,
       motion: motion,
-      reach: std.sqrt(std.pow(back - vehicleGrain, 2) + std.pow(pinZ + vehicleGrain, 2)),
+      reach: std.max(corner, std.sqrt(std.pow(back - vehicleGrain, 2) + std.pow(pinZ + vehicleGrain, 2))),
       pinHeight: top,
     },
+  // A round hatch, its lid `radius` m across.
+  hatch(radius, thickness, open): self.hingedLid(self.hatchLid(radius, thickness), radius, radius, thickness, open, 0.1),
   hatchLid(radius, thickness): turned('lid', 'paint', 'y', disc(radius, 0, thickness)) + { sides: 12 },
   // The hole under a hatch's lid of `lidRadius` centred at (x, z), for `holed`. The lid laps it by two grains all round,
   // so its twelve-sided edge still covers the hole wherever the voxel lattice falls.
   hatchHole(x, z, lidRadius): { x: x, z: z, radius: lidRadius - 2 * vehicleGrain },
+  // A rectangular hatch, its lid `length` m along x and `width` m across, hinged along its rear edge with a pin at each
+  // end of the hinge, a grain inside the lid's sides, so a wide lid hangs on its whole width.
+  panelHatch(length, width, thickness, open):
+    local lid = box('lid', 'paint', [-length / 2, 0, -width / 2], [length / 2, thickness, width / 2]);
+    self.hingedLid(lid, length / 2, std.sqrt(length * length + width * width) / 2, thickness, open, width / 2 - vehicleGrain),
+  // The hole under a `panelHatch`'s lid centred at (x, z), for `holed`. The lid laps it by two grains all round, as a
+  // round lid does, so its edge covers the hole wherever the lid's own lattice falls against the plate's.
+  panelHatchHole(x, z, length, width):
+    local lap = 2 * vehicleGrain;
+    { x: [x - length / 2 + lap, x + length / 2 - lap], z: [z - width / 2 + lap, z + width / 2 - lap] },
   // The hole inside a turret ring on the centre line at `x`, for `holed`: as wide as the ring's bore, so the ring stands
   // on the plate round it.
   ringHole(x, inner): { x: x, z: 0, radius: inner },
