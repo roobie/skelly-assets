@@ -140,8 +140,8 @@ local pressings(id, title, s0) = {
   // Each hatch opening as [x0, x1, y0, y1] on the near side; a far-side wall piece cuts the same span.
   local hatches = std.get(b, 'hatches', { size: [0, 0], corners: [] }),
   local openings = [[c[0], c[0] + hatches.size[0], c[1], c[1] + hatches.size[1]] for c in hatches.corners],
-  // A side-wall box with the openings it crosses cut out: split into strips at their sills and heads, and each strip
-  // into the spans between the openings that cross it.
+  // The wall is cut into whole boxes around each opening, rather than overlaid with a hatch, so a closed hatch stands
+  // in an empty frame and an open one leaves a real hole into the box.
   local pierced(piece) =
     local inWall = piece.kind == 'box' && (piece.min[2] >= wallIn || piece.max[2] <= -wallIn);
     local lo = piece.min;
@@ -288,17 +288,18 @@ local pressings(id, title, s0) = {
     local sideGap = if s.sideDoorSlides then 0 else k.swingGap;
     local sideDoorRear = if s.sideDoorSlides then s.slideRear else s.slideRear + k.doorTailGap(slideFront - s.slideRear, b.side + grain - b.glassIn);
     local sideDoorTop = b.doorTop - sideGap;
-    local sideBands = if s.sideDoorSlides then [s.slideRear, slideFront] else [s.slideRear + k.doorTailGap(slideFront - s.slideRear, grain), slideFront - k.swingGap];
+    local sideDoorFront = slideFront - (if s.sideDoorSlides then 0 else k.doorLeadGap);
+    local sideBands = if s.sideDoorSlides then [s.slideRear, slideFront] else [s.slideRear + k.doorTailGap(slideFront - s.slideRear, grain), sideDoorFront];
     k.compound(id + '_side_door', 40, [
-      box('skin', 'paint', [sideDoorRear, b.sill + sideGap, b.skin + sideGap], [slideFront, b.waist, b.side]),
+      box('skin', 'paint', [sideDoorRear, b.sill + sideGap, b.skin + sideGap], [sideDoorFront, b.waist, b.side]),
       box('handle', 'trim', [slideFront - 0.2, b.waist - 0.15, b.side], [slideFront - 0.04, b.waist - 0.11, b.side + 0.015]),
     ] + (if s.slideGlass then [
-      box('top', 'paint', [sideDoorRear, b.windowTop, b.glassIn], [slideFront, sideDoorTop, b.glassOut]),
+      box('top', 'paint', [sideDoorRear, b.windowTop, b.glassIn], [sideDoorFront, sideDoorTop, b.glassOut]),
       box('stile_rear', 'paint', [sideDoorRear, b.waist, b.glassIn], [s.slideRear + 0.05, b.windowTop, b.glassOut]),
-      box('stile_front', 'paint', [slideFront - 0.05, b.waist, b.glassIn], [slideFront, b.windowTop, b.glassOut]),
-      box('glass', 'glass', [s.slideRear + 0.05, b.waist, b.glassOut - 0.03], [slideFront - 0.05, b.windowTop, b.glassOut - 0.01]),
+      box('stile_front', 'paint', [sideDoorFront - 0.05, b.waist, b.glassIn], [sideDoorFront, b.windowTop, b.glassOut]),
+      box('glass', 'glass', [s.slideRear + 0.05, b.waist, b.glassOut - 0.03], [sideDoorFront - 0.05, b.windowTop, b.glassOut - 0.01]),
     ] else [
-      box('upper', 'paint', [sideDoorRear, b.waist, b.glassIn], [slideFront, sideDoorTop, b.glassOut]),
+      box('upper', 'paint', [sideDoorRear, b.waist, b.glassIn], [sideDoorFront, sideDoorTop, b.glassOut]),
     ]) + bands('skin', sideBands, b.side) + sideDoorPins, finish,
     motion=if s.sideDoorSlides then k.motion.slide('near', s.slidePlug) + k.motion.slide('rear', slideTravel) else k.motion.hinge(sideDoorPins, 'near', opens.door)) + { title: title + ' side door' },
     if rearShutter then

@@ -13,6 +13,7 @@ van.cab + van.loadFloor + {
     front: 0, slideFront: -0.12, mass: 1000,
     side: 1.1, skin: 1.04, glassOut: 1.1, glassIn: 1.02, roofSide: 0.98,
     sill: 0.5, floor: 0.88, panLow: 0.6, rearSill: 0.82, hatchSide: 0.94,
+    // The waist runs between the two tiers of cage hatches, so each hatch opening lies within one wall panel.
     waist: 1.6, windowTop: 2.0, doorTop: 2.25, canton: 2.42, roof: 2.52,
     windows: [],
     columns: [-2.8, -2.14, -1.48], width: 0.62, cageIn: 0.2, cageHeight: 0.68,

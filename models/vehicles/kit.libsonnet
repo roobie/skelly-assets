@@ -203,6 +203,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   // edge whose inner face lies `depth` inside them. Its inner corner swings back across the post as it opens, at most
   // by how much further that corner lies from the pins than the edge's length.
   doorTailGap(length, depth): std.sqrt(length * length + depth * depth) - length + self.swingGap,
+  // How far a side-hung door's leading edge stands off the frame ahead of it. A corner level with the pins' axis turns
+  // past the frame's corner, nearest to it halfway through a right angle, where the edge's gap shows shrunk by root two.
+  doorLeadGap: std.sqrt(2) * self.swingGap,
   // A lip inside the post behind a side-hung door's trailing edge, over heights `y` and a swing gap inside the face
   // `face` the door closes against, so the gap the door needs to swing clear of the post is not a slot through the body.
   doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - self.jambDepth], [rear + 0.02, y[1], face - self.swingGap]),
