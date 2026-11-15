@@ -859,9 +859,36 @@ describe('glb export: deadvox model entry', () => {
     const leafTop = applyPoint(out.resolved.placed.get(rearId)!, [0, leaf.box.center[1] + leaf.box.half[1], 0]);
     expect(eye[1]).toBeCloseTo(leafTop[1], 7);
     expect(postTip[1]).toBeCloseTo(leafTop[1], 7);
-    expect(post.box.half[2] * 2).toBeLessThan(notchWidth);
     expect(notchWidth).toBeLessThan(leafWidth / 2);
     expect(leafWidth).toBeGreaterThan(leafHeight);
+  });
+
+  it('shows light at least as wide as the AK front post either side of it from the farthest eye', () => {
+    const out = exported(design('archetype-ak'));
+    const partOf = (family: string) => {
+      const id = Object.entries(out.resolved.assembly.parts).find(([, part]) => part.family === family)![0];
+      return { def: out.resolved.defs.get(id)!, placed: out.resolved.placed.get(id)! };
+    };
+    const rear = partOf('ak-rear-sight');
+    const front = partOf('front-sight');
+    const boxOf = ({ def }: typeof rear, id: string) => {
+      const found = def.solids.find((solid) => solid.id === id);
+      if (found?.kind !== 'box') {
+        throw new Error(`${id} needs box dimensions`);
+      }
+      return found.box;
+    };
+    const leftLeaf = boxOf(rear, 'leaf-left');
+    const notchHalf = -(leftLeaf.center[2] + leftLeaf.half[2]);
+    const postHalf = boxOf(front, 'post').half[2];
+    const notch = applyPoint(rear.placed, rear.def.axes.find(({ kind }) => kind === 'sight')!.origin);
+    const postTip = applyPoint(front.placed, front.def.axes.find(({ kind }) => kind === 'sight')!.origin);
+    const sightRadius = Math.hypot(...sub(postTip, notch));
+    // The post fills the most of the notch from the far end of the eye range.
+    const eyeBehind = out.modelEntry.gun.sight!.eyeDistanceRangeMetres![1] / S;
+    const postAngle = postHalf / (eyeBehind + sightRadius);
+    // Each bar of light is the notch's half angle less the post's, and must be at least the post's whole angle.
+    expect(notchHalf / eyeBehind - postAngle).toBeGreaterThanOrEqual(2 * postAngle);
   });
   it('emits selected anchors in metres when the design has them', () => {
     const out = exported(design('archetype-ar'));

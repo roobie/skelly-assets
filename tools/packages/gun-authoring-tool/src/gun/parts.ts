@@ -113,6 +113,7 @@ import {
 import { inchesToMm, mmToU } from './units.ts';
 
 const SIGHT_GRAIN = GRID / 4;
+const AK_POST_HALF_WIDTH = SIGHT_GRAIN;
 const sportingStockParams = SPORTER_PROPORTIONS.stock;
 const sportingFrontSightParams = SPORTER_PROPORTIONS.frontSight;
 
@@ -3863,7 +3864,7 @@ const frontSight: PartFamily = {
     const radius = BARREL_RADIUS[cls(params, 'bore')];
     const ak = params.style === 'ak';
     const postHalf = GRID;
-    const postHalfZ = ak ? SIGHT_GRAIN : GRID / 2;
+    const postHalfZ = ak ? AK_POST_HALF_WIDTH : GRID / 2;
     let conventionalPostTop = params.style === 'sporting' ? RECEIVER_FRONT_HALF_HEIGHT + 1 : IRON_SIGHT_LINE_U;
     if (params.section === 'sporter') {
       conventionalPostTop = SPORTER_PROPORTIONS.frontSight.sightLineU;
@@ -3942,9 +3943,14 @@ const muzzleBead: PartFamily = {
   },
 };
 
+const OPEN_NOTCH_LEAF_HALF_WIDTH = 1.125;
+// Three AK post widths: the post's share of the notch only shrinks as the eye nears, so this leaves a bar of light at
+// least as wide as the post either side of it from any eye distance, whatever the sight radius.
+const OPEN_NOTCH_HALF_WIDTH = 3 * AK_POST_HALF_WIDTH;
+
 const openNotchLeafSolids = (topU: number): Solid[] => [
-  solid('leaf-left', [-SIGHT_GRAIN, 0, -1.125], [SIGHT_GRAIN, topU, -0.125]),
-  solid('leaf-right', [-SIGHT_GRAIN, 0, 0.125], [SIGHT_GRAIN, topU, 1.125]),
+  solid('leaf-left', [-SIGHT_GRAIN, 0, -OPEN_NOTCH_LEAF_HALF_WIDTH], [SIGHT_GRAIN, topU, -OPEN_NOTCH_HALF_WIDTH]),
+  solid('leaf-right', [-SIGHT_GRAIN, 0, OPEN_NOTCH_HALF_WIDTH], [SIGHT_GRAIN, topU, OPEN_NOTCH_LEAF_HALF_WIDTH]),
 ];
 
 const sportingRearSight: PartFamily = {
