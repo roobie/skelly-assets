@@ -1,0 +1,18 @@
+// Shared by every patch, so a one-shot means the same strike and the same envelope everywhere.
+import("stdfaust.lib");
+
+// A patch is struck once, at the first sample, so an offline render needs no gate timing from the host.
+strike = 1 - 1';
+
+seconds = ba.time / ma.SR;
+
+clamp01(x) = max(0, min(1, x));
+
+// Exponential, so the fall is the time to -60 dB and the sound ends in silence within rise + fall.
+riseFall(rise, fall) = clamp01(seconds / max(rise, 1 / ma.SR)) * exp(-6.9078 * max(seconds - rise, 0) / fall);
+
+// Above this a resonator aliases or turns unstable, whatever a slider asks for.
+audible(f) = min(f, 0.45 * ma.SR);
+
+// A short filtered noise burst: the contact of a hit, softer as `hardness` falls.
+contact(hardness) = no.noise * riseFall(0.0002, 0.004) : fi.lowpass(2, hardness);
