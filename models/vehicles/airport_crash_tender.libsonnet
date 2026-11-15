@@ -209,9 +209,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_
     box('chevron_' + i, if i % 2 == 0 then 'red' else 'white', [s.bodyRear - 0.006, s.bodyLow + i * 0.3, s.railZ + 0.02], [s.bodyRear, s.bodyLow + (i + 1) * 0.3, s.bodySide])
     for i in std.range(0, 7)
   ]), finish) + { title: 'Airport crash tender body' },
-  k.compound('airport_crash_tender_cab_stripe', 6, k.bothSides([
-    box('band', 'red', [s.cabBack, bandLow, s.side], [s.face, bandTop, s.side + 0.032]),
-  ]), finish) + { title: 'Airport crash tender cab stripe' },
+] + t.stripe('airport_crash_tender', 'Airport crash tender', s, 'red', [bandLow, bandTop], 6, finish) + [
   // 12,500 l of water fill the body between the locker rows; the foam concentrate rides in a smaller tank ahead of it.
   k.compound('airport_crash_tender_water_tank', s.waterTankMass, [
     box('tank', 'tank', [archRear + 0.1, s.bodyFloor, -0.9], [0.6, shutterTop, 0.9]),

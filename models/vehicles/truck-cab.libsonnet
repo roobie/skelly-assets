@@ -28,6 +28,8 @@ local springHalf = 0.62;
 local springWidth = 0.1;
 // How far the rear underrun's bar and hangers reach forward from the frame's back end.
 local underrunDepth = 0.1;
+// How far a cab door opens, in degrees: the stop its swing is checked against.
+local doorOpens = 65;
 local defaults = {
   bonnet: null,
   crew: null,
@@ -106,6 +108,8 @@ local defaults = {
   wiper: true,
 };
 local spec(s) = defaults + s;
+// Where a cab door from `rear` to `front` starts, clear of the post behind it as it swings.
+local doorTail(s, rear, front) = rear + k.doorTailGap(front - rear, s.side + k.grain - s.skin);
 // The crossmembers' middles along x, back to front. The front one closes the rails' ends ahead of the radiator and
 // engine, which stand between them; the rest spread from the rails' back ends to the gearbox's back, so none passes
 // through the engine or gearbox.
@@ -143,7 +147,7 @@ local fender(name, slot, x, hubY, top, thick, z) =
   ];
 local pressings(id, title, s0) = {
   // A compound row of this truck, titled with the truck's title and the part's `label`.
-  local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: title + ' ' + label },
+  local part(suffix, label, massKg, pieces, finish, motion=null) = k.compound(id + suffix, massKg, pieces, finish, motion=motion) + { title: title + ' ' + label },
   local s = spec(s0),
   local conventional = s.bonnet != null,
   local a = s.frontAxle,
@@ -166,12 +170,19 @@ local pressings(id, title, s0) = {
     box('battery_fore', 'frame', [x + 0.31, y, outer], [x + 0.34, y + 0.3, inner]),
     box('battery_aft', 'frame', [x - 0.34, y, outer], [x - 0.31, y + 0.3, inner]),
   ],
-  local door(suffix, label, massKg, rear, front, frontTop) = part(suffix, label, massKg, [
-    box('skin', 'paint', [rear, s.floor, s.skin], [front, s.waist, s.side]),
-    box('trim', 'trim', [rear + 0.03, s.floor + 0.03, s.skin - 0.03], [front - 0.03, s.waist - 0.03, s.skin]),
-    prism('glass', 'glass', [[rear, s.waist], [front, s.waist], [frontTop, s.windowTop], [rear, s.windowTop]], [s.skin, s.skin + 0.012]),
-    box('handle', 'trim', [rear + 0.08, s.waist - 0.14, s.side], [rear + 0.24, s.waist - 0.09, s.side + 0.02]),
-  ], paint, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }),
+  // A door hinges on its leading edge, its pins standing on its outer face so no part of it swings forward into the
+  // pillar ahead.
+  local door(suffix, label, massKg, rear, front, frontTop) =
+    local pin(f) = [front, s.floor + f * (s.waist - s.floor), s.side + k.grain];
+    local pins = k.hingePins('hinge', 'y', pin(0.2), pin(0.8));
+    local tail = doorTail(s, rear, front);
+    local glassTop = s.windowTop - k.swingGap;
+    part(suffix, label, massKg, [
+      box('skin', 'paint', [tail, s.floor + k.swingGap, s.skin + k.swingGap], [front, s.waist, s.side]),
+      box('trim', 'trim', [rear + 0.03, s.floor + 0.03, s.skin - 0.03], [front - 0.03, s.waist - 0.03, s.skin]),
+      prism('glass', 'glass', [[tail, s.waist], [front, s.waist], [frontTop, glassTop], [tail, glassTop]], [s.skin, s.skin + 0.012]),
+      box('handle', 'trim', [rear + 0.08, s.waist - 0.14, s.side], [rear + 0.24, s.waist - 0.09, s.side + 0.02]),
+    ] + pins, paint, k.motion.hinge(pins, 'near', doorOpens)),
   local skirts =
     if conventional then [
       box('skirt', 'paint', [s.cabBack, s.low, s.skin], [s.face, s.floor, s.side]),
@@ -268,15 +279,21 @@ local pressings(id, title, s0) = {
   ] else []) + [
     door('_door', 'door', 42, s.doorRear, s.doorFront, s.doorFront - leanAt(s.windowTop)),
   ],
+  // A lip inside the post behind a door's trailing edge, so the gap the door needs to swing clear of the post is not a
+  // slot through the cab.
+  local jamb(name, rear) = box(name, 'paint', [rear - 0.02, s.floor, s.skin - 0.03], [rear + 0.02, s.windowTop, s.skin - k.swingGap]),
   local skirts_all = bothSides(skirts + [
     prism('a_pillar', 'paint', [[s.doorFront, s.waist], [s.face, s.waist], [roofFront, s.roof], [s.doorFront - s.lean, s.roof]], [s.glassIn, s.side]),
     box('corner', 'paint', [s.doorFront, s.floor, s.skin], [s.face - 0.05, s.waist, s.side]),
     box('cant_rail', 'paint', [s.cabBack, s.windowTop, s.glassIn - 0.04], [roofFront, s.roof + 0.01, s.side]),
   ] + (if s.crew == null then [
     box('b_pillar', 'paint', [s.cabBack, s.floor, s.skin], [s.doorRear, s.windowTop, s.side]),
+    jamb('b_pillar_jamb', s.doorRear),
   ] else [
     box('centre_pillar', 'paint', [s.crew[1], s.floor, s.skin], [s.doorRear, s.windowTop, s.side]),
+    jamb('centre_pillar_jamb', s.doorRear),
     box('crew_rear', 'paint', [s.cabBack, s.floor, s.skin], [s.crew[0], s.windowTop, s.side]),
+    jamb('crew_rear_jamb', s.crew[0]),
   ])),
   pressings: rows,
 }.pressings;
@@ -350,6 +367,34 @@ local laid(kit, id, s0) = local s = spec(s0); local fitting = kit.fitting; local
   + (if s.bonnet != null then [fitting('bonnet', part('_bonnet'), origin, ['chassis'])] + pair('wing', part('_wing'), origin, on(['chassis'])) else [])
   + (if s.crew != null then pair('crew_door', part('_crew_door'), origin, on(['cab'])) else []);
 local fittings(kit, id, s0) = k.painted(id, spec(s0), pressings(id, '', s0), laid(kit, id, s0));
+// A strip along both cab sides from `y[0]` to `y[1]`, standing a grain proud of the skin and so no further out than the
+// door pins. The cab's part holds its lengths between the doors; each door's length is a part of its own that rides
+// that door, so the strip opens with it, standing off the skirt below the door that it swings out across.
+// `stripeSites` places them.
+local stripeDoors(s) = [['_door_stripe', 'door stripe', 'door', [s.doorRear, s.doorFront]]]
+  + (if s.crew != null then [['_crew_door_stripe', 'crew door stripe', 'crew_door', s.crew]] else []);
+local stripe(id, title, s0, slot, y, massKg, finish) =
+  local s = spec(s0);
+  local doors = stripeDoors(s);
+  local edges = [s.cabBack] + std.sort(std.flattenArrays([d[3] for d in doors])) + [s.face];
+  local fixed = [[edges[2 * i], edges[2 * i + 1]] for i in std.range(0, std.length(edges) / 2 - 1)];
+  local length(x) = x[1] - x[0];
+  local perMetre = massKg / (2 * (s.face - s.cabBack));
+  local band(name, x, inner) = box(name, slot, [x[0], y[0], inner], [x[1], y[1], s.side + k.grain]);
+  [
+    k.compound(id + '_cab_stripe', 2 * perMetre * std.foldl(function(sum, x) sum + length(x), fixed, 0), bothSides([
+      band('band_' + i, fixed[i], s.side)
+      for i in std.range(0, std.length(fixed) - 1)
+    ]), finish) + { title: title + ' cab stripe' },
+  ] + [
+    local x = [d[3][0] + k.doorTailGap(length(d[3]), k.grain), d[3][1] - k.swingGap];
+    k.compound(id + d[0], perMetre * length(x), [band('band', x, s.side + k.swingGap)], finish) + { title: title + ' ' + d[1] }
+    for d in doors
+  ];
+local stripeSites(site, id, s0) = [site.one('cab_stripe', id + '_cab_stripe')] + std.flattenArrays([
+  site.pair(std.lstripChars(d[0], '_'), id + d[0], rides=d[2])
+  for d in stripeDoors(spec(s0))
+]);
 // The sites of a truck that its cab and chassis do not lay, so its body can be laid behind another cab.
 local bodySites(kit, sites, id, s0) =
   local own = std.set([site.id for site in fittings(kit, id, s0)]);
@@ -365,4 +410,7 @@ local bodySites(kit, sites, id, s0) =
   items: items,
   fittings: fittings,
   bodySites: bodySites,
+  doorTail(s0, rear, front): doorTail(spec(s0), rear, front),
+  stripe: stripe,
+  stripeSites: stripeSites,
 }

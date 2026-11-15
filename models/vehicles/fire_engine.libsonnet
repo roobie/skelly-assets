@@ -125,9 +125,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', 
   k.compound('fire_engine_rear_wall', s.rearWallMass, [
     box('wall', 'paint', [s.bodyRear, s.bodyFloor, 0.04 - back], [s.bodyRear + 0.05, s.bodyTop - 0.05, back - 0.04]),
   ], finish) + { title: 'Fire engine rear wall' },
-  k.compound('fire_engine_cab_stripe', 6, k.bothSides([
-    box('band', 'reflect', [s.cabBack, s.floor - 0.03, s.side], [s.face, s.floor + 0.07, s.side + 0.032]),
-  ]), finish) + { title: 'Fire engine cab stripe' },
+] + t.stripe('fire_engine', 'Fire engine', s, 'reflect', [s.floor - 0.03, s.floor + 0.07], 6, finish) + [
   k.compound('fire_engine_water_tank', 400, [
     box('tank', 'tank', [s.archRear + 0.1, s.bodyFloor, -0.82], [s.archFront + 0.5, s.bodyTop - 0.1, 0.82]),
   ], finish) + { title: 'Fire engine water tank' },
