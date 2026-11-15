@@ -16,6 +16,9 @@ local wall(z, railZ, openings) =
   ]
   + (if std.length(openings) > 0 then [box('rub_rail_front', 'frame', [s.doorFront, s.rubRail - 0.03, railZ[0]], [s.front, s.rubRail + 0.03, railZ[1]])] else []);
 local finish = { paint: s.paint, frame: s.frame };
+local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+// At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
+local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_chassis', 340, [
     box('rear_rail', 'frame', [s.rear - 0.08, s.frameLow, -s.side], [s.rear + 0.06, s.frameHigh, s.side]),
@@ -68,9 +71,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_ramp', 90, [
     box('skin', 'paint', [s.rear - 0.05, s.frameHigh, -s.side], [s.rear, s.rampTop, s.side]),
     box('catch', 'frame', [s.rear - 0.08, s.rampTop - 0.14, -0.3], [s.rear - 0.05, s.rampTop - 0.08, 0.3]),
-  ] + [box('batten_' + i, 'frame', [s.rear - 0.07, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear - 0.05, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 6)]
-  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])]),
-  finish, { hinge_a: ['skin', [0.5, 0, 0.1]], hinge_b: ['skin', [0.5, 0, 0.9]] }) + { title: 'Horse box ramp' },
+  ] + [box('batten_' + i, 'frame', [s.rear, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear + 0.02, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 6)]
+  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])])
+  + rampPins,
+  finish, motion=k.motion.hinge(rampPins, 'rear', s.rampOpen)) + { title: 'Horse box ramp' },
   // The upper doors close above the ramp and meet on the centre line.
   k.compound('horse_box_top_door', 14, [
     box('skin', 'paint', [s.rear - 0.04, s.rampTop, 0.01], [s.rear, s.eave, s.side]),
