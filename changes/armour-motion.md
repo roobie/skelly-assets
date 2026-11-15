@@ -5,8 +5,10 @@ The armoured vehicles' ramps, doors and hatches now export a hinge motion on dra
 anchors, so the showcase's Open view swings them and a game plays the swing the build proved clear; the ramps lower
 until their lips rest on the ground. The APC hatch and the turret hatches, which had no hinge before, open too. The
 CV9040's and the main battle tank's driver's hatches are rows of their own that swing aside level, as a tank's does,
-since the gun and the turret's front leave a raised lid no room; the APC's tow hitch sits lower, under the sill, so
-the lowered ramp clears it.
+since the gun and the turret's front leave a raised lid no room, their lids a little thinner than the turret ring is
+high so the turret clears them; the APC's tow hitch sits lower, under the sill, so the lowered ramp clears it. The
+hull's frame facing each door's free edge stands a few millimetres off it, so the door's inner corner clears it as
+the door starts to swing, and the sci-fi APC's side doorway is 1 cm longer.
 
 Upgrade:
 - Open `apc_ramp`, `apc_hatch`, `apc_scifi_wheeled_ramp`, `apc_scifi_wheeled_side_door`, `cv9040_rear_door`,
