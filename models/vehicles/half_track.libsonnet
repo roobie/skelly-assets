@@ -14,9 +14,12 @@ local back = s.rear + s.plate;
 // The vision slits across the windscreen armour, one before each seat.
 local slit = { y: [1.72, 1.77], z: [0.3, 0.7] };
 local louvres = 6;
-// Each opening part turns about the outer corner of its hinge straps, so it swings out of the body's way.
+// Each opening part turns about the outer corner of its hinge straps, so it swings out of the body's way, and the
+// body's frame facing a door's free edge stands off it.
 local armourPins = k.hingePins('hinge_pin', 'z', [s.cowl + s.plate + 0.03, s.scuttleTop, -0.75], [s.cowl + s.plate + 0.03, s.scuttleTop, 0.75], 'steel');
-local cabDoorPins = k.hingePins('hinge_pin', 'y', [s.cabDoor[1], 1.09, s.side + 0.03], [s.cabDoor[1], 1.49, s.side + 0.03], 'steel');
+local cabPinZ = s.side + 0.03;
+local cabDoorPins = k.hingePins('hinge_pin', 'y', [s.cabDoor[1], 1.09, cabPinZ], [s.cabDoor[1], 1.49, cabPinZ], 'steel');
+local bayEnd = s.cabDoor[0] - k.swingStandOff(s.cabDoor[1] - s.cabDoor[0], cabPinZ - inner);
 local rearPinX = s.rear - 0.03;
 local rearDoorPins = k.hingePins('hinge_pin', 'y', [rearPinX, 1.09, s.rearDoorZ], [rearPinX, 1.49, s.rearDoorZ], 'steel');
 local rearDoorGap = k.swingStandOff(2 * s.rearDoorZ, back - rearPinX);
@@ -29,7 +32,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('rear_sill', 'paint', [s.rear, 0.64, -s.side], [back, s.floor - 0.02, s.side]),
     box('rear_header', 'paint', [s.rear, s.doorTop, -s.side], [back, s.bayTop, s.side]),
   ] + bothSides([
-    box('bay_side', 'paint', [back, s.sideBottom, inner], [s.cabDoor[0], s.bayTop, s.side]),
+    box('bay_side', 'paint', [back, s.sideBottom, inner], [bayEnd, s.bayTop, s.side]),
     box('door_sill', 'paint', [s.cabDoor[0], s.sideBottom, inner], [s.cabDoor[1], s.floor + 0.02, s.side]),
     box('cab_post', 'paint', [s.cabDoor[1], s.sideBottom, inner], [s.cowl, s.doorTop, s.side]),
   ]) + [
