@@ -5,8 +5,8 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local box = k.box;
 local b = s.body;
 local finish = { paint: s.paint, frame: s.frame, trim: s.trim, dark: 'plastic-black', glass: 'lens-smoke', cushion: 'cloth-seat' };
-local part(name, label, kg, pieces, anchors={}) =
-  k.compound('apc_scifi_wheeled_' + name, kg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label, voxelGrain: s.grain };
+local part(name, label, kg, pieces, motion=null) =
+  k.compound('apc_scifi_wheeled_' + name, kg, pieces, finish, motion=motion) + { title: vehicle.title + ' ' + label, voxelGrain: s.grain };
 
 // A block of the hull from x[0] to x[1], y[0] to y[1] and z[0] to z[1], cut by `cuts` where a sloped plate bounds it.
 local slab(id, x, y, z, cuts=[], slot='paint') =
@@ -75,6 +75,9 @@ local fenderRun(id, x, y, cuts=[]) =
 
 local rearDoor = s.doors.rear;
 local sideDoor = s.doors.side;
+// Each door turns about its hinge bar's outer corner, so it swings out of the hull's way at every angle.
+local rampPins = k.hingePins('hinge_pin', 'z', [b.rear - 0.06, b.belly + b.wall, -rearDoor.half + 0.1], [b.rear - 0.06, b.belly + b.wall, rearDoor.half - 0.1], 'frame');
+local sideDoorPins = k.hingePins('hinge_pin', 'y', [sideDoor.x[1], b.belly + b.wall + 0.2, b.half + 0.04], [sideDoor.x[1], sideDoor.top - 0.2, b.half + 0.04], 'frame');
 local sl = s.slit;
 local t = s.turret;
 local ringTop = b.top + t.ring.height;
@@ -173,14 +176,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     box('handle', 'trim', [b.rear - 0.05, 1.2, -0.14], [b.rear, 1.26, 0.14]),
   ] + k.bothSides([
     box('rib', 'paint', [b.rear - 0.04, floorTop + 0.12, rearDoor.half - 0.22], [b.rear, rearDoor.top - 0.1, rearDoor.half - 0.15]),
-  ]), { hinge_a: ['hinge_bar', [0.5, 0.5, 0]], hinge_b: ['hinge_bar', [0.5, 0.5, 1]] }),
+  ]) + rampPins, k.motion.hinge(rampPins, 'rear', rearDoor.open)),
   // Hinged on its front edge, so it opens against the flow of a column on the move.
   part('side_door', 'side door', 250, [
     box('plate', 'paint', [sideDoor.x[0], floorTop, b.half - wall], [sideDoor.x[1], sideDoor.top, b.half]),
     box('hinge_bar', 'frame', [sideDoor.x[1] - 0.06, floorTop + 0.1, b.half], [sideDoor.x[1], sideDoor.top - 0.1, b.half + 0.04]),
     box('handle', 'trim', [sideDoor.x[0] + 0.08, 1.15, b.half], [sideDoor.x[0] + 0.14, 1.32, b.half + 0.05]),
     box('rib', 'paint', [sideDoor.x[0] + 0.2, 1.0, b.half], [sideDoor.x[1] - 0.2, 1.06, b.half + 0.03]),
-  ], { hinge_a: ['hinge_bar', [0.5, 0, 0.5]], hinge_b: ['hinge_bar', [0.5, 1, 0.5]] }),
+  ] + sideDoorPins, k.motion.hinge(sideDoorPins, 'near', sideDoor.open)),
   // A troops' bench, its back against the wall at z = 0 and its seat inboard toward -z, standing on the floor at
   // y = 0, with stowage bins under the seat.
   part('bench', 'troop bench', 40, [

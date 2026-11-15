@@ -48,10 +48,11 @@ local radius = wheels[wheel].tyre.outer;
   // and how far its glass sits below the plate's face.
   slit: { x: [1.24, 1.44], half: 0.45, recess: 0.03 },
   // Door openings, each from the floor to `top`: the rear ramp door's half-width, and the side door's span along the
-  // near side between the arches, the kerb side, so troops step out away from traffic.
+  // near side between the arches, the kerb side, so troops step out away from traffic. Each door's `open` is in degrees
+  // from closed: the lowered ramp's lip rests on the ground, and the side door stands square, short of the front arch.
   doors: {
-    rear: { half: 0.75, top: 1.9 },
-    side: { x: [-0.65, 0.54], top: 1.9 },
+    rear: { half: 0.75, top: 1.9, open: 118.6 },
+    side: { x: [-0.65, 0.54], top: 1.9, open: 90 },
   },
   // The troops' benches along the walls, each `length` long from its site, its seat `depth` deep off the wall.
   bench: { length: 1.8, seat: 0.38, depth: 0.42, back: 0.5 },
