@@ -14,6 +14,8 @@ local core = [
   for station in s.body
 ];
 local proudCowl = h.proud(s.cowl, 0.035);
+// The rear bow stands ahead of the rear fairing it closes.
+local rearBow = s.doorRear + 0.035;
 taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.doorRear, s.noseCap], arc=[90, 270])
@@ -36,10 +38,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              h.shell('roof', 'paint', s.body, x=[s.doorRear, s.doorFront + 0.035], arc=[-s.roofArc, s.roofArc])
              + h.bow('front_bow', s.body, s.doorFront)
              + h.bow('mid_bow', s.body, s.doorMid)
-             + h.bow('rear_bow', s.body, s.doorRear + 0.035),
+             + h.bow('rear_bow', s.body, rearBow)
+             + h.doorPost('mid_lip', s.body, s.doorMid, s.doorFront, s.roofArc)
+             + h.doorPost('rear_lip', s.body, rearBow, s.doorMid, s.roofArc),
              { paint: s.paint }) + { title: 'News helicopter roof' },
-  h.door('news_helicopter_front_door', 15, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint) + { title: 'News helicopter front door' },
-  h.door('news_helicopter_rear_door', 14, s.body, s.doorRear, s.doorMid, s.roofArc, s.paint) + { title: 'News helicopter rear door' },
+  h.door('news_helicopter_front_door', 15, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint, s.doorOpens) + { title: 'News helicopter front door' },
+  h.door('news_helicopter_rear_door', 14, s.body, rearBow, s.doorMid, s.roofArc, s.paint, s.doorOpens) + { title: 'News helicopter rear door' },
   k.compound('news_helicopter_engine_cowl', 22,
              h.loft('cowl', 'paint', s.cowl)
              + h.shell('intake_near', 'dark', proudCowl, thick=0.05, x=[-0.8, -0.42], arc=[50, 110], sides=24)
