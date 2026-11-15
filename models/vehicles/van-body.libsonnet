@@ -224,8 +224,8 @@ local pressings(id, title, s0) = {
       box('bar', 'bumper', [s.rear, 0.42, -(b.side - 0.03)], [tail + 0.08, 0.6, b.side - 0.03]),
     ], { bumper: s.bumper }) + { title: title + ' rear bumper' },
     dashboard(id, title, s),
-    // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the face of the
-    // door's bands, so no part of it swings forward into the wing as it opens.
+    // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the door's outer
+    // face, its bands included, so no part of it swings forward into the wing as it opens.
     local frontDoorPins = k.hingePins('hinge', 'y', [s.cowl, s.sill + 0.2 * (s.waist - s.sill), s.side + grain], [s.cowl, s.sill + 0.8 * (s.waist - s.sill), s.side + grain]);
     k.compound(id + '_front_door', 32, [
       box('skin', 'paint', [s.bFront, s.sill, s.skin], [s.cowl, s.waist, s.side]),
