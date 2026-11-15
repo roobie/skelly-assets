@@ -1,6 +1,6 @@
 ---
 read_if:
-  - building models or adding source-backed per-pack export recipes
+  - building models or sounds, or adding source-backed per-pack export recipes
   - understanding package origin and the boundary between tools and game consumers
   - reviewing how models or assembled vehicles look, as pictures, contact sheets or a vehicle gallery
   - changing how a vehicle, a kit assembly or a model built of components comes apart in an exploded view
@@ -10,8 +10,8 @@ read_if:
 
 Build sources into `built/` to inspect them; commit only the sources, because CI builds, checks and releases the
 output so consumers need no authoring environment. Use `build_models.sh` for roster and recipe exports, and
-`build_mobs.sh` for generated actors. For the entry points and selection rules, see `build.mjs`, `main`, and
-`mobs.mjs`, `main`.
+`build_mobs.sh` for generated actors. For the entry points and selection rules, see `build.mjs`, `main`,
+`mobs.mjs`, `main`, and `sounds.mjs`, `main`.
 
 The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
@@ -116,8 +116,8 @@ one report covers the roster, the recipes and the mob sheet alike, and the expor
 report holds each vehicle's parts at different sites clear of each other; see `siteOverlap.mjs`, `siteOverlaps`, and
 `../docs/decisions/0014-site-overlap.md`.
 
-Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest` and
-`readCredits`, for model identity, actor companions and attribution. `check-built.mjs` holds a fresh build to the
+Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildManifest`, `mobManifest`,
+`soundManifest` and `readCredits`, for model identity, actor companions, sound takes and attribution. `check-built.mjs` holds a fresh build to the
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
