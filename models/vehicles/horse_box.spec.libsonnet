@@ -9,7 +9,7 @@
   doorOpen: 90,
   // Degrees, so the top doors fold flat into the rear plane, clear of the walls.
   topDoorOpen: 180,
-  rampTop: 1.95,ventLow: 1.96875, ventWidth: 0.5625, rearVent: -1.3, midVent: -0.2,
+  rampTop: 1.95, ventLow: 1.96875, ventWidth: 0.5625, rearVent: -1.3, midVent: -0.2,
   doorRear: 0.6, doorFront: 1.2, doorLow: 0.55, doorTop: 2.2,
   noseFace: 1.84, noseRake: 2.26,
   paint: 'paint-oxblood', frame: 'paint-charcoal',
