@@ -5,6 +5,12 @@ local s = import 'crew_pickup.spec.libsonnet';
 local vehicle = import 'crew_pickup.placements.libsonnet';
 local shape = (import 'car-shape.libsonnet')(s);
 local finish = { paint: s.paint, trim: 'plastic-black' };
+local grain = k.grain;
+// The gate's ends slide past the rear posts' faces as it drops, so they stand off them by a millimetre: well under half
+// a grain, so no cell between them empties.
+local gateHalf = s.tailgateHalf - 0.001;
+local gateFoot = s.bedFloorTop - 0.03;
+local tailgatePins = k.hingePins('hinge', 'z', [s.bedRear - 0.05 - grain, gateFoot, gateHalf - grain], [s.bedRear - 0.05 - grain, gateFoot, -gateHalf + grain]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('crew_pickup', vehicle.title, s) + [
   k.compound('crew_pickup_frame', 260, k.bothSides([
     box('rail', 'steel', [s.bedRear + 0.05, 0.42, 0.42], [s.frontAxle + 0.5, 0.58, 0.5]),
@@ -32,9 +38,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libson
     shape.foreCorner('corner_fore', 'paint', s.rearAxle, [s.bedInner, s.side]),
   ] + shape.liner('liner', 'trim', s.rearAxle, s.bedSideBottom, [s.tubInner, s.bedInner], [s.tubInner, s.tubInner + 0.04]), finish) + { title: 'Crew-cab pickup bed side' },
   k.compound('crew_pickup_bed_tailgate', 24, [
-    box('skin', 'paint', [s.bedRear - 0.05, s.bedFloorTop - 0.03, -s.tailgateHalf], [s.bedRear - 0.01, s.bedSideTop, s.tailgateHalf]),
+    box('skin', 'paint', [s.bedRear - 0.05, gateFoot, -gateHalf], [s.bedRear - 0.01, s.bedSideTop, gateHalf]),
     box('handle', 'trim', [s.bedRear - 0.06, s.bedSideTop - 0.12, -0.12], [s.bedRear - 0.05, s.bedSideTop - 0.07, 0.12]),
-  ], finish, { hinge_a: ['skin', [0, 0, 1]], hinge_b: ['skin', [0, 0, 0]] }) + { title: 'Crew-cab pickup bed tailgate' },
+  ] + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Crew-cab pickup bed tailgate' },
   k.compound('crew_pickup_rear_bumper', 16, [
     box('bar', 'steel', [s.bedRear - 0.12, 0.5, -s.side + 0.02], [s.bedRear, 0.72, s.side - 0.02]),
   ], { steel: 'steel-bright' }) + { title: 'Crew-cab pickup rear bumper' },
