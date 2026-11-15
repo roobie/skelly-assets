@@ -136,8 +136,10 @@ local concreteBase = {
         contactGain: 1.1,
         hardness: 1,
         tick: { shortMs: 2, longMs: 4, highPassHz: 4500, gain: 0.6 },
-        // The plate's own ring: a clang well above the slab's thud, with an inharmonic overtone.
-        body: { lowHz: 1400, highHz: 3600, overtone: 2.76, ms: 90, gain: 0.35 },
+        // The plate's own ring, with an inharmonic overtone. A plate rings at its own modes whatever strikes it, so its
+        // pitch hardly moves: a ring that drops in pitch as the hits soften, and wanders from tick to tick of a roll,
+        // is how bubbles sound, and makes the case seem to hold a liquid.
+        body: { lowHz: 2350, highHz: 2450, overtone: 2.76, ms: 45, gain: 0.35 },
       },
       drop: { restitution: 0.7 },
     },
