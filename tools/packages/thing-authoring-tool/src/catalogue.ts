@@ -111,6 +111,12 @@ const PartSchema = strictObject({
   massKg: positive,
   finish: record(name, material),
   /**
+   * The catalogue item this part is, when it is one in its own right, as a doll held in a mannequin's arms is the doll.
+   * A part id is a local name, so nothing but this declaration says which item a part is; the build refuses an id no
+   * model has (`tools/partItems.mjs`).
+   */
+  item: optional(name),
+  /**
    * The finish slots a vehicle fitting's finish repaints on this part's copy. Glass, tyres and chrome are never
    * listed, so a repaint leaves them as authored.
    */

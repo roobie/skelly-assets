@@ -35,6 +35,11 @@ as a vehicle (`site/explode.mjs`, `explode`), so a review judges the components 
 `tools/components.mjs`, `modelComponents`. A skinned model and a wearable are not taken apart: a skin binds its parts
 to bones, and a wearable is shown worn (`docs/decisions/0008-dressing.md`).
 
+A part id is a local name, so which catalogue item a part is cannot be read off its id: a revolver's hammer part is
+not the Hammer tool. A part that is an item in its own right says so with `item` on the part in the model source,
+which the sidecar carries and the showcase links to that item's page; the build refuses an item no model has
+(`tools/partItems.mjs`, `danglingPartItems`).
+
 ## Consequences
 
 Every construct model with more than one part, not only a gun, now comes apart on the showcase and the sheets. A

@@ -20,6 +20,7 @@ import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
+import { danglingPartItems } from './partItems.mjs';
 import { readDependencies } from './packs.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
@@ -285,12 +286,15 @@ async function main() {
       for (const file of placed.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models });
       for (const file of wields.files) console.log(`built ${file}`);
+      const files = [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files, ...wields.files];
+      const dangling = danglingPartItems({ files, out, models });
+      if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
         vehicles: placed.vehicles,
         motions: wields.motions,
         dependsOn,
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files, ...wields.files],
+        files,
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes,
