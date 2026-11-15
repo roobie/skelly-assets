@@ -31,7 +31,8 @@ local six = (import 'engines.libsonnet').i6_petrol;
   grille: { low: 0.98, high: 1.33, half: 0.28, slots: 4, frame: 0.03125 },
   lampZ: 0.7, headlampY: 1.08, indicatorY: 1.27, blackoutAt: [1.49, 0.63],
   bumper: { low: 0.84, high: 0.95, gussetZ: 0.38, gussetDrop: 0.25 },
-  // The tail lamps stand outboard of the rear door's hinge line, clear of its swing.
+  // The far tail lamp stands outboard of the rear door's hinge line, clear of its swing; the near one stands beyond the
+  // door's latch edge, which swings away from it.
   rearBumperY: [0.76, 0.89], tailLampY: 0.89, tailLampZ: 0.79, flapZ: [0.565, 0.955], flapLow: 0.36,
 
   // Underneath. The half shafts run above the hubs in drop boxes, so the differentials stand well off the ground.
