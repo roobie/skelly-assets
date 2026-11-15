@@ -8,6 +8,8 @@ local box = k.box;
 local prism = k.prism;
 // Whole grains, because a thinner strip rounds to nothing on some walls and to a grain on others, and speckles.
 local grain = 1 / 32;
+// How far a hinged door opens, in degrees: the stop a van's swing is checked against.
+local opensDoor = 65;
 // The closed wheel tub behind an arch cut: its inner wall and its roof follow the panel's five-sided opening, from
 // `inner` out to the panel at `outer`.
 local archLiner(tag, x0, x1, low, top, corner, inner, outer) = [
@@ -222,14 +224,16 @@ local pressings(id, title, s0) = {
       box('bar', 'bumper', [s.rear, 0.42, -(b.side - 0.03)], [tail + 0.08, 0.6, b.side - 0.03]),
     ], { bumper: s.bumper }) + { title: title + ' rear bumper' },
     dashboard(id, title, s),
-    // Side doors hinge on their leading edge, with the handle near the trailing one.
+    // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the face of the
+    // door's bands, so no part of it swings forward into the wing as it opens.
+    local frontDoorPins = k.hingePins('hinge', 'y', [s.cowl, s.sill + 0.2 * (s.waist - s.sill), s.side + grain], [s.cowl, s.sill + 0.8 * (s.waist - s.sill), s.side + grain]);
     k.compound(id + '_front_door', 32, [
       box('skin', 'paint', [s.bFront, s.sill, s.skin], [s.cowl, s.waist, s.side]),
       box('trim', 'trim', [s.bFront + 0.02, s.sill + 0.02, s.skin - 0.03], [s.cowl - 0.02, s.waist - 0.02, s.skin]),
       box('stile', 'paint', [s.cowl - 0.04, s.waist, s.glassIn], [s.cowl, std.min(pillarY(s.cowl), winTop), s.glassOut]),
       prism('glass', 'glass', [[s.bFront, s.waist], [s.cowl - 0.04, s.waist]] + (if pillarY(s.cowl - 0.04) > winTop then [[s.cowl - 0.04, winTop]] else [[s.cowl - 0.04, pillarY(s.cowl - 0.04)], [pillarAt(winTop), winTop]]) + [[s.bFront, winTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
       box('handle', 'trim', [s.bFront + 0.05, s.waist - 0.13, s.side], [s.bFront + 0.21, s.waist - 0.09, s.side + 0.015]),
-    ] + bands('skin', [s.bFront, s.cowl], s.side), finish, doorAnchors) + { title: title + ' front door' },
+    ] + bands('skin', [s.bFront, s.cowl], s.side) + frontDoorPins, finish, motion=k.motion.hinge(frontDoorPins, 'near', opensDoor)) + { title: title + ' front door' },
     // Plugs out, then rolls back along the rail on the rear wall; its leading edge is where it seals.
     k.compound(id + '_side_door', 40, [
       box('skin', 'paint', [s.slideRear, b.sill, b.skin], [slideFront, b.waist, b.side]),

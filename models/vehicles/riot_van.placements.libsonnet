@@ -14,9 +14,9 @@ local s = import 'riot_van.spec.libsonnet';
     site.one('crew_bench', 'bench_seat_3', [-0.9, s.floor, 0]),
     site.one('rear_bench', 'bench_seat_3', [-2.5, s.floor, 0]),
   ]
-  + site.pair('door_grille', 'riot_van_door_grille')
+  + site.pair('door_grille', 'riot_van_door_grille', rides='front_door')
   + site.pair('rear_grille', 'riot_van_rear_grille')
-  + site.pair('door_markings', 'riot_van_door_markings')
+  + site.pair('door_markings', 'riot_van_door_markings', rides='front_door')
   + site.pair('rear_markings', 'riot_van_rear_markings'),
   tags: { 'vehicle-role': ['emergency'] },
 }

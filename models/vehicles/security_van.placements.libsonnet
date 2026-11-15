@@ -8,6 +8,7 @@ local s = import 'security_van.spec.libsonnet';
     site.one('cash_chute', 'security_van_cash_chute'),
     site.one('roof_hatch', 'security_van_roof_hatch'),
   ]
-  + site.pair('cab_plate', 'security_van_cab_plate')
+  + site.pair('cab_plate', 'security_van_cab_plate', rides='front_door')
+  + site.pair('quarter_plate', 'security_van_quarter_plate')
   + site.pair('rear_door_bars', 'security_van_rear_door_bars'),
 }

@@ -8,8 +8,8 @@
 // `docs/decisions/0016-swing-check.md`, "A failing site gets a proposal, never an edit".
 import { dot, normalize, sub } from './packages/construct/src/foundation/math.ts';
 import { centreOf, piecesBounds } from './packages/thing-core/src/motion.ts';
-import { AUTHORED_LATERAL } from '../site/motionPose.mjs';
-import { adjustedMotion, motionAtSite, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
+import { AUTHORED_LATERAL, motionAtSite } from '../site/motionPose.mjs';
+import { adjustedMotion, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
 
 const WINDOW = 4; // grains the hinge line may move each way
 const DOWN = [0, -1, 0];
