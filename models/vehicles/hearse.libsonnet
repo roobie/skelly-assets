@@ -32,21 +32,45 @@ local tailPanel(id, slot, low, high, half) = shape.across(id, slot, tailProfile(
 local glassLow = s.waist + 0.06;
 local glassHigh = s.roof - 0.06;
 local glassHalf = 0.26;
+// A real hearse opens by the whole tail, so it lifts on pins at its head. The tail's sides step in a voxel at each band
+// of the shell's tumble, beside pillars that step with them, so a point at a step's top that rose would cross into the
+// pillar above. The pins therefore stand a millimetre behind the rake at the lowest step, where every point of the tail
+// at or above a step lies forward of them and only sinks or falls back as it lifts. That is behind the shell roof's rear
+// edge, so they hang from a brow on the coach roof, and arms carry the tail's head back to them.
+local pinX = rake(shape.bandFoot(1)) - 0.001;
+// The coach roof's foot, on top of the shell roof.
+local brow = s.roof + 0.04;
+local pinY = brow - k.grain - 0.001;
+local pinZ = 0.7 * s.hatchSide;
+// The tail's sides and foot slide past the shell's tail corners and over its rear panel as it lifts, and its skin's top
+// reaches under the lowest pillar band, so they stand a millimetre off them: well under half a grain, so no cell between
+// them empties.
+local tailHalf = s.hatchSide - 0.001;
+local tailFoot = s.rearSill + 0.001;
+local skinTop = s.waist - 0.001;
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet').rows('hearse', vehicle.title, s)) + [
-  // The narrow rear glass, in a blind tail: a real hearse opens by the whole tail, so the hinge stays at its head.
+  // The narrow rear glass, in a blind tail.
+  local tailgatePins = k.hingePins('hinge', 'z', [pinX, pinY, pinZ], [pinX, pinY, -pinZ], 'bright');
   k.compound('hearse_tailgate', 22, [
-    box('skin', 'paint', [s.rear + 0.05, 0.62, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
+    box('skin', 'paint', [s.rear + 0.05, tailFoot, -tailHalf], [s.tailWaist, skinTop, tailHalf]),
     box('handle', 'bright', [s.rear + 0.03, s.rearSill + 0.13, -0.16], [s.rear + 0.05, s.rearSill + 0.18, 0.16]),
   ] + tailPanel('foot', 'paint', s.waist, glassLow, s.hatchSide - 0.02)
-  + tailPanel('head', 'paint', glassHigh, s.roof, s.hatchSide - 0.02)
+  // The head drops away from the roof's underside as the gate lifts, so it stands a millimetre below it: well under half
+  // a grain, so no cell between them empties.
+  + tailPanel('head', 'paint', glassHigh, s.roof - 0.001, s.hatchSide - 0.02)
   + [prism('glass', 'glass', tailProfile(glassLow, glassHigh), [-glassHalf, glassHalf])]
   + k.bothSides(
-    shape.band('blind', 'paint', tailProfile(glassLow, glassHigh), function(inset) [glassHalf + 0.03, s.hatchSide - 0.02 - inset])
-    + [prism('frame', 'bright', tailProfile(glassLow, glassHigh), [glassHalf, glassHalf + 0.03])]
-  ), { paint: s.paint, glass: 'glass-clear', bright: 'steel-bright' }, { hinge_a: [shape.top('head'), [1, 1, 1]], hinge_b: [shape.top('head'), [1, 1, 0]] }) + { title: 'Hearse tailgate' },
+    // Each band of the blind reaches under the pillar band above it, so it stops a millimetre short of that band's foot.
+    shape.band('blind', 'paint', tailProfile(glassLow, glassHigh), function(inset) [glassHalf + 0.03, s.hatchSide - 0.02 - inset], gap=0.001)
+    + [
+      prism('frame', 'bright', tailProfile(glassLow, glassHigh), [glassHalf, glassHalf + 0.03]),
+      box('hinge_arm', 'bright', [pinX, glassHigh, pinZ - k.grain / 2], [rake(glassHigh) + 0.01, s.roof - 0.001, pinZ + k.grain / 2]),
+    ]
+  ) + tailgatePins, { paint: s.paint, glass: 'glass-clear', bright: 'steel-bright' }, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Hearse tailgate' },
   // The raised blind rear body: a roof that steps up behind the cab, solid quarters over the shell's glass and the bars across them.
   k.compound('hearse_coach', 90, [
     prism('roof', 'cover', [[rake(s.roof + 0.04), s.roof + 0.04], [0.14, s.roof + 0.04], [-0.26, coachTop], [rake(coachTop), coachTop]], [lean - panelOut, panelOut - lean]),
+    box('brow', 'cover', [pinX - k.grain - 0.01, brow, lean - panelOut], [rake(brow) + 0.01, brow + 0.04, panelOut - lean]),
   ] + k.bothSides(
     shape.side('quarter', 'cover', [[rake(s.waist) + 0.08, s.waist], [s.cWaist, s.waist], [s.cWaist, windowTop], [rake(windowTop) + 0.08, windowTop]], [panelIn, panelOut])
     + shape.side('cantle', 'cover', [[rake(windowTop), windowTop], [s.bRear, windowTop], [s.bRear, s.roof + 0.04], [rake(s.roof + 0.04), s.roof + 0.04]], [panelIn, panelOut])
