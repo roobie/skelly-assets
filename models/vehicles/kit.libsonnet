@@ -296,20 +296,23 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     else std.flattenArrays([drawn(n, plans[n]) for n in std.range(0, std.length(plans) - 1) if plans[n] != []]),
   // A round hatch: a lid `radius` m across and `thickness` thick, its origin under the lid's centre, on a hinge at its
   // rear. Its pins stand at the hinge's top rear corner, so the whole lid lies ahead of and below them and never dips
-  // under the roof as it swings up `open` degrees.
+  // under the roof as it swings up `open` degrees. Its `reach` is how far it stands from the lid's axis in plan, at a
+  // pin's outer corner, so a fitting that far off clears it at any facing.
   hatch(radius, thickness, open):
     local back = -radius - 0.04;
     local top = thickness + 0.03;
-    local pins = self.hingePins('hinge_pin', 'z', [back, top, -0.1], [back, top, 0.1], 'steel');
+    local pinZ = 0.1;
+    local pins = self.hingePins('hinge_pin', 'z', [back, top, -pinZ], [back, top, pinZ], 'steel');
     local lid = self.hatchLid(radius, thickness);
     local motion = self.motion.hinge(pins, 'up', open);
     {
       pieces: [
         lid,
-        box('hinge', 'steel', [back, 0, -0.1], [-radius + 0.02, top, 0.1]),
+        box('hinge', 'steel', [back, 0, -pinZ], [-radius + 0.02, top, pinZ]),
         box('handle', 'steel', [radius * 0.3, thickness, -0.06], [radius * 0.3 + 0.03, thickness + 0.03, 0.06]),
       ] + pins,
       motion: motion,
+      reach: std.sqrt(std.pow(back - vehicleGrain, 2) + std.pow(pinZ + vehicleGrain, 2)),
     },
   hatchLid(radius, thickness): turned('lid', 'paint', 'y', disc(radius, 0, thickness)) + { sides: 12 },
   // The hole under a hatch's lid of `lidRadius` centred at (x, z), for `holed`. The lid laps it by two grains all round,

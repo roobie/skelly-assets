@@ -108,8 +108,11 @@ local periscope(id, x, z, facing) =
     block(id + '_glass', 'glass', glass[0], glass[1], facing, 0.01, scope.width - 0.04, [b.top + 0.02, b.top + scope.height - 0.02]),
   ];
 local hatchScopes = o.hatch;
-// The roof hatches are the APC's.
+// The roof hatches are the APC's. Each hatch periscope stands as far from its hatch's centre as the hatch's reach and
+// its own half-diagonal together, so it clears the hatch at any facing.
 local hatchHoles = [k.hatchHole(s.hatches.x, z, apcHatch.radius) for z in [s.hatches.z, -s.hatches.z]];
+local hatchRing = k.hatch(apcHatch.radius, apcHatch.thickness, apcHatch.open).reach
+                  + std.sqrt(std.pow(scope.depth, 2) + std.pow(scope.width, 2)) / 2;
 local driverScopes = o.driver;
 local p = s.pannier;
 local bench = s.bench;
@@ -264,7 +267,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
     + k.bothSides(periscope('driver_side', driverScopes.x, driverScopes.z, driverScopes.turn)
       + std.flattenArrays([
         local a = facing * std.pi / 180;
-        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchScopes.ring, s.hatches.z + std.sin(a) * hatchScopes.ring, facing)
+        periscope('hatch_%d' % facing, s.hatches.x + std.cos(a) * hatchRing, s.hatches.z + std.sin(a) * hatchRing, facing)
         for facing in hatchScopes.facings
       ]))),
   // A grab rail along the hull's near side, the bar held off the armour by posts.
