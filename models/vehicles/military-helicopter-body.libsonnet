@@ -8,6 +8,8 @@ local box = k.box;
 local fitted = 'military_transport_helicopter';
 local skinThick = 0.075;
 local cockpitFrame = 0.07;
+// Where the engine cowling reaches its full section over the cabin.
+local cowlHold = -1.9;
 // A spec without cockpit doors has no side window either: the cabin door moves up behind the cockpit, its own pane
 // takes the window's place and the flank between it and the windscreen is whole.
 local doored(s) =
@@ -39,8 +41,14 @@ local runsOn(s) = s.sectionEnd < s.bulkhead;
     local gun = s.gunWindow;
     local gunArc = s.gunWindowArc;
     local e = s.engine;
-    local tail = s.tailRotor.x;
+    local tail =
+      assert -s.tailRotor.x - s.tailRotor.radius - s.rotorRadius >= s.tailRotorClearance - 1e-9 : 'the tail rotor disc stands clear of the main rotor disc';
+      s.tailRotor.x;
     local cowled = { top: 3.22, bottom: 2.5, half: 0.72, waist: 2.6 };
+    local cowlTaper =
+      assert s.sectionEnd <= s.bulkhead : 'the tail cone starts at or aft of the cabin bulkhead';
+      assert s.sectionEnd - 1.4 < cowlHold : 'the cowling tapers aft of where it holds its section';
+      s.sectionEnd - 1.4;
     [
       k.compound(id + '_belly', s.shellMass,
                  h.loft('nose', 'paint', s.body, x=[3.3, s.nose], arc=[90, 270], sides=24)
@@ -108,11 +116,11 @@ local runsOn(s) = s.sectionEnd < s.bulkhead;
                  h.loft('hump', 'paint', [
                    { x: 1.75, top: 2.9, bottom: 2.5, half: 0.2, waist: 2.6 },
                    { x: 1.0, top: 3.25, bottom: 2.5, half: 0.75, waist: 2.6 },
-                   { x: -1.9 } + cowled,
+                   { x: cowlHold } + cowled,
                  ]
                  // The cowling holds its section over the cabin's full section and tapers only where the tail does.
                  + (if runsOn(s) then [{ x: s.sectionEnd - 0.3 } + cowled] else [])
-                 + [{ x: s.sectionEnd - 1.4, top: 2.8, bottom: 2.45, half: 0.22, waist: 2.5 }], arc=h.dome, step=0.125)
+                 + [{ x: cowlTaper, top: 2.8, bottom: 2.45, half: 0.22, waist: 2.5 }], arc=h.dome, step=0.125)
                  + k.bothSides([
                    k.turned('nacelle', 'paint', 'x', k.annulus(e.radius + 0.01, e.radius + 0.08, e.x - e.length / 2, e.x + e.length / 2), [0, e.y, e.z]) + { sides: 16 },
                  ]),
@@ -133,7 +141,6 @@ local runsOn(s) = s.sectionEnd < s.bulkhead;
         box('back', 'seat', [door[0], 0.36, 0.02], [door[1], 1.05, 0.1]),
       ], { dark: s.trim, seat: 'cloth-seat' }) + { title: title + ' troop bench' },
     ],
-  // Where the hull's parts and the shared fittings sit.
   sites(id, s)::
     local one = site.one;
     local pair = site.pair;

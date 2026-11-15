@@ -10,11 +10,14 @@
   cabinDoorPlug: 0.15,
   gunWindow: [1.2, 1.9], gunWindowArc: [50, 72],
   // The full section runs on aft of the cabin for the cabin door to slide its whole length clear of the doorway. The
-  // tail hangs off its end, so a hull whose section ends sooner is that much shorter.
+  // tail cone hangs off its end, so a hull whose section ends sooner is that much shorter.
   sectionEnd: -3.3,
   bulkhead: -1.6, tailEnd: self.sectionEnd - 2.8,
   rotorRadius: 8.2,
-  tailRotor: { x: $.sectionEnd - 7.3, y: 3.75, z: 0.24, radius: 1.35 },
+  // The tail rotor stands off the main rotor's tips rather than off the hull, so the blades of the two discs never
+  // meet however short the hull is; a shorter hull gets a longer boom.
+  tailRotorClearance: 1.05,
+  tailRotor: { x: -($.rotorRadius + self.radius + $.tailRotorClearance), y: 3.75, z: 0.24, radius: 1.35 },
   mainGear: { x: 2.6, radius: 0.4375, width: 0.24, z: 1.45, top: 0.85, root: 0.9 },
   tailGear: { x: $.sectionEnd - 2.3, radius: 0.3, width: 0.16, top: 1.7, rake: 0.25, brace: { x: $.sectionEnd - 1.45, y: 1.35 } },
   engine: { x: -1.3, y: 3.13, z: 0.85, length: 1.6, radius: 0.34 },
