@@ -98,6 +98,7 @@
   'semi_tractor': import 'models/vehicles/semi_tractor.libsonnet',
   'semi_trailer': import 'models/vehicles/semi_trailer.libsonnet',
   'shared': import 'models/vehicles/shared.libsonnet',
+  'short_military_transport_helicopter': import 'models/vehicles/short_military_transport_helicopter.libsonnet',
   'shuttle_bus': import 'models/vehicles/shuttle_bus.libsonnet',
   'skid_steer': import 'models/vehicles/skid_steer.libsonnet',
   'small_tractor': import 'models/vehicles/small_tractor.libsonnet',
