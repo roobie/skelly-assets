@@ -9,8 +9,11 @@ local shoulder = 1.68;
 local sideGlass = 0.61;
 local doorRear = door + 0.02;
 local doorSill = s.deck + 0.03;
-// Below the shoulder the door ends on an arc round the rear hub, just outside the fender, and the cab's skirt fills the
-// arc. Opening carries every point of the door forward, away from the hub, so the door never meets the fender or tyre.
+local doorInner = s.cabSide - 0.04;
+// Below the shoulder the door ends on an arc round the rear hub, outside the fender by more than the door's brief
+// rearward drift near the start of its swing, so it clears the fender and tyre. The hinge lies outboard of the door, so
+// opening only ever moves the door outboard: the cab's floor and the skirt that fills the arc stop at the door's inner
+// face, where the door never reaches.
 local doorArc = s.fenderOuter + 0.04;
 local arcY(x) = s.rearHub + std.sqrt(doorArc * doorArc - (x - s.rearAxle) * (x - s.rearAxle));
 local arcFoot = s.rearAxle + std.sqrt(doorArc * doorArc - (doorSill - s.rearHub) * (doorSill - s.rearHub));
@@ -45,7 +48,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     + k.arc('lip', 'paint', s.rearAxle, s.rearHub, s.fenderInner - 0.12, s.fenderOuter, 22, 168, 9, [s.rearZ + 0.26, s.rearZ + 0.3]),
     { paint: s.paint }) + { title: 'Tractor fender' },
   k.compound('tractor_cab', 300, [
-    box('floor', 'floor', [s.cabRear, s.deck, -s.cabSide], [s.cabFront, s.deck + 0.05, s.cabSide]),
+    box('floor', 'floor', [s.cabRear, s.deck, -doorInner], [s.cabFront, s.deck + 0.05, doorInner]),
     box('scuttle', 'paint', [s.cabFront - 0.04, s.deck, -s.cabSide + 0.03], [s.bonnetBack, shoulder, s.cabSide - 0.03]),
     box('dash', 'trim', [s.cabFront - 0.3, shoulder - 0.08, -s.cabSide + 0.05], [s.cabFront - 0.04, shoulder, s.cabSide - 0.05]),
     box('column', 'trim', [s.cabFront - 0.34, 1.15, -0.07], [s.cabFront - 0.04, shoulder - 0.08, 0.07]),
@@ -67,16 +70,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('sill', 'trim', [door, s.deck - 0.03, s.cabSide - 0.08], [s.cabFront, doorSill, s.cabSide + 0.02]),
   ] + [
     prism('skirt_%d' % i, 'paint', [[arcX(i), doorSill], [arcX(i + 1), doorSill]] + (if i + 1 < arcSteps then [arcPoint(i + 1)] else []) + [arcPoint(i)],
-          [s.cabSide - 0.04, s.cabSide])
+          [doorInner - 0.04, doorInner])
     for i in std.range(0, arcSteps - 1)
   ]), { paint: s.paint, trim: 'paint-charcoal', floor: 'rubber-black', liner: 'cloth-rag', glass: 'glass-clear' }) + { title: 'Tractor cab' },
   k.compound('tractor_cab_door', 30, [
-    box('skin', 'paint', [arcFoot, doorSill, s.cabSide - 0.04], [s.cabFront - 0.04, shoulder, s.cabSide]),
-    box('top', 'paint', [doorRear, s.roof - 0.13, s.cabSide - 0.04], [s.cabFront - 0.04, s.roof - 0.08, s.cabSide]),
+    box('skin', 'paint', [arcFoot, doorSill, doorInner], [s.cabFront - 0.04, shoulder, s.cabSide]),
+    box('top', 'paint', [doorRear, s.roof - 0.13, doorInner], [s.cabFront - 0.04, s.roof - 0.08, s.cabSide]),
     box('glass', 'glass', [doorRear, shoulder, sideGlass], [s.cabFront - 0.04, s.roof - 0.13, sideGlass + 0.02]),
     box('handle', 'trim', [door + 0.25, shoulder - 0.1, s.cabSide], [door + 0.39, shoulder - 0.06, s.cabSide + 0.02]),
   ] + [
-    prism('skin_%d' % i, 'paint', [arcPoint(i), arcPoint(i + 1), [arcX(i + 1), shoulder], [arcX(i), shoulder]], [s.cabSide - 0.04, s.cabSide])
+    prism('skin_%d' % i, 'paint', [arcPoint(i), arcPoint(i + 1), [arcX(i + 1), shoulder], [arcX(i), shoulder]], [doorInner, s.cabSide])
     for i in std.range(0, arcSteps - 1)
   ] + doorPins, { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' },
   motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: 'Tractor cab door' },
