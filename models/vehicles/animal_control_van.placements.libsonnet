@@ -15,6 +15,6 @@ local cages(tag, y) = std.flattenArrays([
   + cages('cage_low', b.floor)
   + cages('cage_high', b.floor + b.cageHeight)
   + site.pair('hatches', 'animal_control_van_hatches')
-  + site.pair('rear_hatches', 'animal_control_van_rear_hatches'),
+  + site.pair('rear_hatches', 'animal_control_van_rear_hatches', rides='rear_door'),
   tags: { 'vehicle-role': ['utility'] },
 }

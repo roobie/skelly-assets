@@ -10,5 +10,5 @@ local s = import 'security_van.spec.libsonnet';
   ]
   + site.pair('cab_plate', 'security_van_cab_plate', rides='front_door')
   + site.pair('quarter_plate', 'security_van_quarter_plate')
-  + site.pair('rear_door_bars', 'security_van_rear_door_bars'),
+  + site.pair('rear_door_bars', 'security_van_rear_door_bars', rides='rear_door'),
 }
