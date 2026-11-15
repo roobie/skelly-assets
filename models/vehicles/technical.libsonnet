@@ -5,6 +5,12 @@ local s = import 'technical.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local grain = k.grain;
+// How far a hinged part stands off a neighbour it swings away from or slides across: well under half a grain, so no
+// cell between them empties.
+local swingGap = 0.001;
+// The pins stand that gap clear of the valance below them as they turn.
+local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain - swingGap, s.deckBottom, s.panelIn - grain], [s.rear - grain - swingGap, s.deckBottom, -s.panelIn + grain]);
 local finish = { paint: 'paint-olive', cream: 'paint-cream', rust: 'scrap-rusted', rustred: 'rust-red', frame: 'steel-grey', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear', floor: 'wood-pine', steel: 'steel-parkerized' };
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_frame', s.frameMass, [
@@ -91,7 +97,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_bed_floor', 50, [
     box('floor', 'floor', [s.rear + 0.04, s.deckBottom, -s.panelIn], [s.bedFront, s.deckTop, s.panelIn]),
   ], finish) + { title: 'Technical bed floor' },
-  k.compound('technical_bed', 110, bothSides(
+  k.compound('technical_bed', 118, bothSides(
     m.arched('side', 'paint', [s.rear + 0.04, s.bedFront], [s.sill, s.bedTop], [s.panelIn, s.side], [{ x: s.rearAxle, y: s.hub, r: s.archR }])
     + [
       box('rail_cap', 'trim', [s.rear + 0.04, s.bedTop, s.panelIn - 0.04], [s.bedFront, s.bedTop + 0.03, s.side + 0.01]),
@@ -105,12 +111,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     ]
   ) + [
     box('headboard', 'paint', [s.bedFront - 0.04, s.deckTop, -s.side], [s.bedFront, s.bedTop, s.side]),
+    // The panel under the tailgate, down to the bumper, stays on the bed, so the gate hinges at the deck and drops level
+    // with it.
+    box('valance', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.deckBottom - swingGap, s.panelIn]),
+    // The foot of the rust patch, left on the valance when the gate drops; it stops short of the pins at the gate's ends.
+    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, s.deckBottom - swingGap, 0.2]),
   ], finish) + { title: 'Technical bed' },
-  k.compound('technical_tailgate', 26, [
-    box('gate', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.bedTop, s.panelIn]),
-    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, 1.0, 0.2]),
+  k.compound('technical_tailgate', 18, [
+    // Its front face slides up the deck's and the bed sides' rear ends as it drops, so it stands that gap behind them.
+    box('gate', 'paint', [s.rear, s.deckBottom, -s.panelIn], [s.rear + 0.04 - swingGap, s.bedTop, s.panelIn]),
+    box('rust', 'rust', [s.rear - 0.01, s.deckBottom, -0.5], [s.rear, 1.0, 0.2]),
     box('catch', 'dark', [s.rear - 0.02, s.bedTop - 0.08, 0.76], [s.rear, s.bedTop - 0.04, 0.84]),
-  ], finish) + { title: 'Technical tailgate' },
+  ] + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Technical tailgate' },
   k.compound('technical_roll_hoop', 34, [
     box('top', 'rust', [s.bedFront - 0.12, 1.8, -0.72], [s.bedFront - 0.06, 1.86, 0.72]),
     box('foot_bar', 'rust', [s.bedFront - 0.14, s.deckTop, -0.72], [s.bedFront - 0.04, s.deckTop + 0.03, 0.72]),
