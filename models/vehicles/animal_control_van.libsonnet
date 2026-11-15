@@ -29,7 +29,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('animal_control
   local pins = k.hingePins('hinge', 'y', [hatchLength, 0.2 * hatchHeight, b.side + k.grain], [hatchLength, 0.8 * hatchHeight, b.side + k.grain]);
   local rear = k.doorTailGap(hatchLength, b.side + k.grain - wallIn);
   k.compound('animal_control_van_hatch', 6, [
-    box('skin', 'paint', [rear, k.swingGap, wallIn + k.swingGap], [hatchLength - k.doorLeadGap, hatchHeight - k.swingGap, b.side]),
+    box('skin', 'paint', [rear, k.swingGap, wallIn + k.swingGap], [hatchLength - k.swingGap, hatchHeight - k.swingGap, b.side]),
     box('vent', 'dark', [0.1, 0.06, b.side], [hatchLength - 0.06, hatchHeight - 0.06, b.side + 0.012]),
     box('vent_head', 'steel', [0.1, hatchHeight - 0.1, b.side + 0.012], [hatchLength - 0.06, hatchHeight - 0.06, b.side + 0.03]),
     box('vent_foot', 'steel', [0.1, 0.06, b.side + 0.012], [hatchLength - 0.06, 0.1, b.side + 0.03]),

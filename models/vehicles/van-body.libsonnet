@@ -288,7 +288,7 @@ local pressings(id, title, s0) = {
     local sideGap = if s.sideDoorSlides then 0 else k.swingGap;
     local sideDoorRear = if s.sideDoorSlides then s.slideRear else s.slideRear + k.doorTailGap(slideFront - s.slideRear, b.side + grain - b.glassIn);
     local sideDoorTop = b.doorTop - sideGap;
-    local sideDoorFront = slideFront - (if s.sideDoorSlides then 0 else k.doorLeadGap);
+    local sideDoorFront = slideFront - sideGap;
     local sideBands = if s.sideDoorSlides then [s.slideRear, slideFront] else [s.slideRear + k.doorTailGap(slideFront - s.slideRear, grain), sideDoorFront];
     k.compound(id + '_side_door', 40, [
       box('skin', 'paint', [sideDoorRear, b.sill + sideGap, b.skin + sideGap], [sideDoorFront, b.waist, b.side]),
