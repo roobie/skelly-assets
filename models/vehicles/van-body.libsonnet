@@ -38,7 +38,7 @@ local tailOf(s) = s.rear + 0.08;
 // The bonnet's top face at x; its skin is `bonnetDepth` thick below that.
 local hoodOf(s, x) = s.waist - (x - s.aPost) * s.hoodFall;
 local bonnetDepth = 0.03;
-// The headlamps' height on a cab whose bonnet clears them, and their housing's (`headlamp_large`).
+// The headlamps' top, and their housing's height (`headlamp_large`).
 local headlampTop = 0.96;
 local headlampHeight = 0.22;
 // Half the width of `tail_lamp_tall`, which a van stands beside its rear doors.
@@ -46,8 +46,10 @@ local tailLampHalfWidth = 0.07;
 // The inner face of a body's side wall, the deeper of the lower panel's and the glass line's: what a jamb lies behind.
 local wallInOf(b) = std.min(b.skin, b.glassIn);
 local noseOf(s) = s.front - 0.08;
-// Lowered under a bonnet whose front edge comes down on them, so the bonnet shuts and lifts clear of them.
-local headlampTopOf(s) = std.min(headlampTop, hoodOf(s, noseOf(s)) - bonnetDepth - k.swingGap);
+// The lowest the bonnet's underside comes: it is thinned where the headlamps would reach into it, so it shuts and lifts
+// a swing gap clear of them. Lowering the lamps instead would open a see-through slit under the bonnet at the voxel grain.
+local bonnetFloor = headlampTop + k.swingGap;
+local bonnetNoseUnderOf(s) = std.max(hoodOf(s, noseOf(s)) - bonnetDepth, bonnetFloor);
 // The rear edge of the A pillar at height y, and the height where it crosses x.
 local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
 local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
@@ -213,7 +215,7 @@ local pressings(id, title, s0) = {
     box('firewall_low', 'paint', [s.fire - 0.05, s.floor, -s.tubIn], [s.fire, s.archTop, s.tubIn]),
     box('firewall', 'paint', [s.fire - 0.05, s.archTop, -s.skin], [s.fire, s.waist, s.skin]),
     box('scuttle', 'paint', [s.fire, s.waist - 0.03, -s.skin], [s.aPost, s.waist, s.skin]),
-    box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, hood(nose) - bonnetDepth - k.swingGap, s.side - 0.1]),
+    box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, bonnetNoseUnderOf(s) - k.swingGap, s.side - 0.1]),
     box('front_tub_floor', 'pan', [s.frontAxle - s.arch, s.sill, -s.tubIn], [s.frontAxle + s.arch, 0.5, s.tubIn]),
     box('front_apron', 'pan', [s.frontAxle + s.arch, s.sill, -s.side + 0.1], [nose - 0.04, 0.6, s.side - 0.1]),
   ] + (if s.bulkhead then [k.xPrism('bulkhead', 'lining', cabEnd, [s.bRear - 0.04, s.bRear])] else [])
@@ -255,8 +257,13 @@ local pressings(id, title, s0) = {
     local glassAhead = s.aPost - (screenFootOf(s) - lean * (pinY - s.waist));
     local pinX = s.aPost + std.max(0, (grain + k.swingGap) * std.sqrt(1 + lean * lean) - glassAhead);
     local bonnetPins = k.hingePins('hinge', 'z', [pinX, pinY, 0.7 * bonnetSide], [pinX, pinY, -0.7 * bonnetSide]);
+    // Full depth behind where its underside comes down to the floor, so the thinning costs no voxels there.
+    local floorX = s.aPost + (s.waist - bonnetDepth - bonnetFloor) / s.hoodFall;
+    local underside = [[bonnetRear, hood(bonnetRear) - bonnetDepth]]
+      + (if hood(nose) - bonnetDepth < bonnetFloor then [[floorX, bonnetFloor]] else [])
+      + [[nose, bonnetNoseUnderOf(s)]];
     k.compound(id + '_bonnet', 20, [
-      prism('skin', 'paint', [[bonnetRear, hood(bonnetRear) - bonnetDepth], [nose, hood(nose) - bonnetDepth], [nose, hood(nose)], [bonnetRear, hood(bonnetRear)]], [-bonnetSide, bonnetSide]),
+      prism('skin', 'paint', underside + [[nose, hood(nose)], [bonnetRear, hood(bonnetRear)]], [-bonnetSide, bonnetSide]),
     ] + bonnetPins, { paint: s.paint }, motion=k.motion.hinge(bonnetPins, 'up', opens.bonnet)) + { title: title + ' bonnet' },
     k.compound(id + '_front_wing', 8, [
       box('rear', 'paint', [s.cowl, s.sill, s.side - 0.1], [s.frontAxle - s.arch, s.waist, s.side]),
@@ -273,7 +280,7 @@ local pressings(id, title, s0) = {
       box('grille', 'trim', [nose, 0.66, -0.48], [nose + 0.03, 0.92, 0.48]),
       box('grille_bar', 'bumper', [nose + 0.03, 0.78, -0.48], [nose + 0.04, 0.82, 0.48]),
     ] + k.bothSides([
-      box('lamp_bezel', 'trim', [nose, headlampTopOf(s) - headlampHeight, 0.5], [nose + 0.015, headlampTopOf(s) - 0.01, 0.86]),
+      box('lamp_bezel', 'trim', [nose, headlampTop - headlampHeight, 0.5], [nose + 0.015, headlampTop - 0.01, 0.86]),
     ]) + [
       box('intake', 'trim', [s.front, 0.34, -0.5], [s.front + 0.01, 0.46, 0.5]),
     ], finish + { bumper: s.bumper }) + { title: title + ' front bumper' },
@@ -514,7 +521,7 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
     + pair('front_seat', 'front_seat', [seatX, s.floor + 0.2, 0.5], on(paired=['seat_riser']))
     + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, std.min((if isBox then s.box.side else s.side) - 0.13, s.glassOut - 0.02)], on(['shell']))
     + pair('indicator', 'marker_lamp', [nose + 0.02, 0.6, 0.72], on(['front_bumper']))
-    + pair('headlamp', 'headlamp_large', [nose, headlampTopOf(s) - headlampHeight, 0.68], on(['front_bumper']))
+    + pair('headlamp', 'headlamp_large', [nose, headlampTop - headlampHeight, 0.68], on(['front_bumper']))
     + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell'])
   )),
 }
