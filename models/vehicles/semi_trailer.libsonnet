@@ -5,6 +5,9 @@ local box = k.box;
 local bothSides = k.bothSides;
 local axleIds = std.range(0, std.length(s.axles) - 1);
 local crossIds = std.range(0, 11);
+local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+// A grain behind the rear post's face, so the pins stand on it rather than sink into it.
+local rearDoorPins = k.hingePins('hinge', 'y', [s.rear - 0.02 - grain, s.floor + 0.29, s.side - 0.08], [s.rear - 0.02 - grain, s.floor + 2.39, s.side - 0.08], 'trim');
 local suspension(i) = local x = s.axles[i]; [
   box('trailing_arm_' + i, 'frame', [x - 0.1, s.hub - 0.04, 0.42], [x + 0.55, s.hub + 0.04, 0.5]),
   box('hanger_' + i, 'frame', [x + 0.45, s.hub - 0.1, 0.4], [x + 0.57, s.frameLow, 0.52]),
@@ -56,9 +59,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('lock_bar_outer', 'trim', [s.rear - 0.07, s.floor + 0.03, 0.8], [s.rear - 0.03, s.roof - 0.21, 0.85]),
     box('handle_inner', 'frame', [s.rear - 0.08, 2.0, 0.12], [s.rear - 0.04, 2.05, 0.25]),
     box('handle_outer', 'frame', [s.rear - 0.08, 2.0, 0.8], [s.rear - 0.04, 2.05, 0.93]),
-  ] + [box('hinge_' + i, 'trim', [s.rear - 0.05, s.floor + 0.25 + 0.7 * i, s.side - 0.2], [s.rear - 0.02, s.floor + 0.33 + 0.7 * i, s.side - 0.08]) for i in std.range(0, 3)],
+  ] + [box('hinge_' + i, 'trim', [s.rear - 0.05, s.floor + 0.25 + 0.7 * i, s.side - 0.2], [s.rear - 0.02, s.floor + 0.33 + 0.7 * i, s.side - 0.08]) for i in std.range(0, 3)]
+  + rearDoorPins,
   { paint: s.paint, band: s.band, trim: s.trim, frame: s.frame },
-  { hinge_a: ['skin', [0.5, 0.1, 1]], hinge_b: ['skin', [0.5, 0.9, 1]] }) + { title: 'Semi trailer rear door' },
+  motion=k.motion.hinge(rearDoorPins, 'rear', s.rearDoorOpen)) + { title: 'Semi trailer rear door' },
   k.compound('semi_trailer_kingpin', 60, [
     box('plate', 'steel', [s.kingpin - 0.6, s.frameLow - 0.06, -0.6], [s.kingpin + 0.6, s.frameLow - 0.02, 0.6]),
     k.turned('pin', 'steel', 'y', k.disc(0.055, s.frameLow - 0.24, s.frameLow - 0.06), [s.kingpin, 0, 0]),
