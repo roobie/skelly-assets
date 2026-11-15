@@ -58,6 +58,19 @@ local frontDoorRearOf(s) = s.bFront + k.doorTailGap(s.cowl - s.bFront, s.side + 
 // The windscreen's outer face meets the waist here and leans back by this much per metre of height.
 local screenFootOf(s) = s.aPost - 0.02;
 local screenLeanOf(s) = s.aLean / (s.cabRoof - s.waist);
+// The front door's leading edge stands a swing gap behind the cowl, and its window starts behind the stile there.
+local frontDoorFrontOf(s) = s.cowl - k.swingGap;
+local frontDoorStileRearOf(s) = frontDoorFrontOf(s) - 0.04;
+// Against the leaning A pillar the gap is measured square to it, so it is wider along x.
+local frontDoorPillarGapOf(s) = k.swingGap * std.sqrt(1 + std.pow(screenLeanOf(s), 2));
+// The front edge of the front door's window at height y, and its outline from y0 up to y1. Whatever rides the door over
+// its window keeps to this edge, so it swings clear of the A pillar as the glass does.
+local frontDoorWindowFrontAtOf(s, y) = std.min(frontDoorStileRearOf(s), pillarAtOf(s, y) - frontDoorPillarGapOf(s));
+local frontDoorWindowFrontOf(s, y0, y1) =
+  local bend = pillarYOf(s, frontDoorStileRearOf(s) + frontDoorPillarGapOf(s));
+  [[frontDoorWindowFrontAtOf(s, y0), y0]]
+  + (if bend > y0 && bend < y1 then [[frontDoorStileRearOf(s), bend]] else [])
+  + [[frontDoorWindowFrontAtOf(s, y1), y1]];
 local windscreen(id, title, s) =
   local pillarAt(y) = pillarAtOf(s, y);
   local pillarY(x) = pillarYOf(s, x);
@@ -291,18 +304,16 @@ local pressings(id, title, s0) = {
     // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the door's outer
     // face, its bands included, so no part of it swings forward into the wing as it opens.
     local frontDoorPins = k.hingePins('hinge', 'y', [s.cowl, s.sill + 0.2 * (s.waist - s.sill), s.side + grain], [s.cowl, s.sill + 0.8 * (s.waist - s.sill), s.side + grain]);
-    // Every edge stands a swing gap off what it closes against: the wing and the quarter glass ahead, the dashboard
-    // inboard. Against the leaning A pillar the gap is measured square to it, so it is wider along x.
+    // Every edge stands a swing gap off what it closes against: the wing, the A pillar and the quarter glass ahead, the
+    // dashboard inboard.
     local doorRear = frontDoorRearOf(s);
-    local doorFront = s.cowl - k.swingGap;
+    local doorFront = frontDoorFrontOf(s);
     local glassTop = winTop - k.swingGap;
-    local pillarGap = k.swingGap * std.sqrt(1 + std.pow(screenLeanOf(s), 2));
-    local stileRear = doorFront - 0.04;
     k.compound(id + '_front_door', 32, [
       box('skin', 'paint', [doorRear, s.sill + k.swingGap, s.skin + k.swingGap], [doorFront, s.waist, s.side]),
       box('trim', 'trim', [s.bFront + 0.02, std.max(s.sill, s.floor) + 0.02, s.skin - 0.03 + k.swingGap], [s.cowl - 0.02, s.waist - 0.02, s.skin]),
-      box('stile', 'paint', [stileRear, s.waist, s.glassIn], [doorFront, std.min(pillarY(doorFront + pillarGap), glassTop), s.glassOut]),
-      prism('glass', 'glass', [[doorRear, s.waist], [stileRear, s.waist]] + (if pillarY(stileRear + pillarGap) > glassTop then [[stileRear, glassTop]] else [[stileRear, pillarY(stileRear + pillarGap)], [pillarAt(glassTop) - pillarGap, glassTop]]) + [[doorRear, glassTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
+      box('stile', 'paint', [frontDoorStileRearOf(s), s.waist, s.glassIn], [doorFront, std.min(pillarY(doorFront + frontDoorPillarGapOf(s)), glassTop), s.glassOut]),
+      prism('glass', 'glass', [[doorRear, s.waist]] + frontDoorWindowFrontOf(s, s.waist, glassTop) + [[doorRear, glassTop]], [s.glassOut - 0.03, s.glassOut - 0.01]),
       box('handle', 'trim', [s.bFront + 0.05, s.waist - 0.13, s.side], [s.bFront + 0.21, s.waist - 0.09, s.side + 0.015]),
     ] + bands('skin', [s.bFront + k.doorTailGap(s.cowl - s.bFront, grain), doorFront], s.side) + frontDoorPins, finish, motion=k.motion.hinge(frontDoorPins, 'near', opens.door)) + { title: title + ' front door' },
     // Plugs out, then rolls back along the rail on the rear wall; its leading edge is where it seals. A body without the
@@ -412,6 +423,8 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
   pillarAt: pillarAtOf,
   pillarY: pillarYOf,
   frontDoorRear: frontDoorRearOf,
+  frontDoorWindowFrontAt: frontDoorWindowFrontAtOf,
+  frontDoorWindowFront: frontDoorWindowFrontOf,
   // The rows `panel_van` emits for every van whose cab pressings equal them.
   cabRows: cabRows,
   // Deadvox's items for `rows`, built with Deadvox's vehicle kit as `kit`; `cabItems` are those for `cabRows`.

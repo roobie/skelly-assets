@@ -13,10 +13,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van',
   local plateRear = van.frontDoorRear(s);
   local plateTop = s.windowTop - k.swingGap;
   k.compound('security_van_cab_plate', 40, [
-    box('below_port', 'plate', [plateRear, s.waist, plate[0]], [s.cowl - 0.04, 1.56, plate[1]]),
-    box('above_port', 'plate', [plateRear, 1.8, plate[0]], [s.cowl - 0.04, plateTop, plate[1]]),
+    box('below_port', 'plate', [plateRear, s.waist, plate[0]], [1.0, 1.56, plate[1]]),
+    box('above_port', 'plate', [plateRear, 1.8, plate[0]], [1.0, plateTop, plate[1]]),
     box('behind_port', 'plate', [plateRear, 1.56, plate[0]], [0.68, 1.8, plate[1]]),
-    k.prism('forward_of_port', 'plate', [[1.0, 1.56], [s.cowl - 0.04, 1.56], [s.cowl - 0.04, pillarY(s.cowl - 0.04 + k.swingGap)], [van.pillarAt(s, plateTop) - k.swingGap, plateTop], [1.0, plateTop]], plate),
+    k.prism('forward_of_port', 'plate', [[1.0, s.waist]] + van.frontDoorWindowFront(s, s.waist, plateTop) + [[1.0, plateTop]], plate),
   ], { plate: s.paint }) + { title: 'Security van cab plate' },
   // Blanks the quarter light, which stays shut when the door opens.
   k.compound('security_van_quarter_plate', 5, [
