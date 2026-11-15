@@ -3,9 +3,9 @@ type: breaking
 ---
 The vans' rear doors and hinged side doors, and the trucks' cab doors, crew doors and box rear doors, export a hinge
 motion on drawn round pins in place of their hinge anchors, and the vans' bonnets open, so the showcase's Open view
-swings them as a game will. None touches the body as it opens: each edge stands a 1 mm swing gap off the sill, roof
-and pillar it swings past, and each trailing edge stands off the post behind it by a tail gap wide enough for its
-inner corner to circle the pins clear. A lip inside the post behind each hinged cab door and van side door keeps that
+swings them as a game will. None touches the body as it opens: each edge stands a swing gap off the sill and roof it
+slides across, and each trailing edge stands off the post behind it by a tail gap wide enough for its inner corner to
+circle the pins clear. A lip inside the post behind each hinged cab door and van side door keeps that
 gap from showing through the body. The rear doors open square to the body, and kit on an opening part rides it.
 
 Upgrade:

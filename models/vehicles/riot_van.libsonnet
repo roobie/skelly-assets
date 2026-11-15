@@ -84,8 +84,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', veh
                                      + checks('far_rear', tail, s.bFront, farFace[0], farFace[1])
                                      + checks('far_front', s.cowl, chequerEnd, farFace[0], farFace[1]), chequerFinish) + { title: 'Riot van markings' },
   k.compound('riot_van_side_door_markings', 1, checks('door', s.slideRear, s.bRear, nearFace[0], nearFace[1]), chequerFinish) + { title: 'Riot van side door markings' },
-  k.compound('riot_van_door_markings', 1, checks('door', van.frontDoorRear(s), s.cowl - k.pinEdgeGap, nearFace[0] + k.swingGap, nearFace[1]), chequerFinish) + { title: 'Riot van door markings' },
-  local rearCheck = (s.hatchSide - k.pinEdgeGap - 0.005) / 3;
+  k.compound('riot_van_door_markings', 1, checks('door', van.frontDoorRear(s), s.cowl - k.swingGap, nearFace[0] + k.swingGap, nearFace[1]), chequerFinish) + { title: 'Riot van door markings' },
+  local rearCheck = (s.hatchSide - k.swingGap - 0.005) / 3;
   k.compound('riot_van_rear_markings', 1, [
     box('check_' + i + '_' + row, if (i + row) % 2 == 0 then 'yellow' else 'blue', [tail - k.grain, 0.92 + row * 0.12, 0.005 + i * rearCheck], [tail, 0.92 + (row + 1) * 0.12, 0.005 + (i + 1) * rearCheck])
     for i in [0, 1, 2]
