@@ -77,6 +77,7 @@ export function declaredPacks(root = repo) {
     ...recipePackIds(root),
     ...readRoster(root).map((row) => row.packId),
     ...readMobRows(root).map((row) => row.pack),
+    ...soundPackIds(root),
   ]);
 }
 

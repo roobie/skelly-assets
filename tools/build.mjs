@@ -5,8 +5,9 @@
 // With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
 // sites clear of each other (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
-// (tools/placements.mjs), the doll's baked wields (tools/wields.mjs, exportWields) and built/manifest.json with each
-// pack's dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
+// (tools/placements.mjs), the doll's baked wields (tools/wields.mjs, exportWields) and built/manifest.json over them,
+// the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files), with each pack's
+// dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
 // rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
 // without the rest. Each model is written into --out (by default built/)
 // at its pack's path (tools/layout.mjs, rosterFile, outputPath); a roster-source id outside the roster is written flat,
@@ -17,14 +18,15 @@ import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { declaredPacks, outputPath, readMobRows, readRoster } from './layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
-import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames } from './manifest.mjs';
+import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
+import { SOUND_SAMPLE_RATE } from './sounds.mjs';
 import { loadOutStowage } from './stowage.mjs';
 import { recipeTools } from './recipeTools.mjs';
 import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
@@ -142,7 +144,7 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
 }
 
 // The production entry: the roster through TAT's catalogue, the tools that write recipe files into built/, and the
-// manifest over them and the mob rows (tools/mobs.mjs writes the mob files themselves).
+// manifest over them, the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files).
 const PRODUCTION_RECIPE_TOOLS = ['gun', 'thing'];
 
 // Each model's title and taxonomy from its source row, keyed by pack and id; the models built and the models whose
@@ -268,6 +270,7 @@ async function main() {
     for (const file of recipes.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
+      const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
       const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
@@ -289,8 +292,9 @@ async function main() {
         models,
         vehicles: placed.vehicles,
         motions: wields.motions,
+        sounds: sounds.sounds,
         dependsOn,
-        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...placed.files, ...wields.files],
+        files: [...built.models.map(({ pack, path }) => outputPath(pack, path)), ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files],
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes,
