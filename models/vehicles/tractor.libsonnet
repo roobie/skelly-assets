@@ -69,7 +69,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     prism('skirt_%d' % i, 'paint', [[arcX(i), doorSill], [arcX(i + 1), doorSill]] + (if i + 1 < arcSteps then [arcPoint(i + 1)] else []) + [arcPoint(i)],
           [s.cabSide - 0.04, s.cabSide])
     for i in std.range(0, arcSteps - 1)
-  ]),{ paint: s.paint, trim: 'paint-charcoal', floor: 'rubber-black', liner: 'cloth-rag', glass: 'glass-clear' }) + { title: 'Tractor cab' },
+  ]), { paint: s.paint, trim: 'paint-charcoal', floor: 'rubber-black', liner: 'cloth-rag', glass: 'glass-clear' }) + { title: 'Tractor cab' },
   k.compound('tractor_cab_door', 30, [
     box('skin', 'paint', [arcFoot, doorSill, s.cabSide - 0.04], [s.cabFront - 0.04, shoulder, s.cabSide]),
     box('top', 'paint', [doorRear, s.roof - 0.13, s.cabSide - 0.04], [s.cabFront - 0.04, s.roof - 0.08, s.cabSide]),
