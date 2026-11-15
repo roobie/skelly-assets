@@ -1,5 +1,6 @@
 // The trooper armour set: fitted worn shells (template and measures in tools/packages) with a ground model each, in an
-// olive field livery.
+// olive field livery. Each item keeps its figure models beside its rows, as models/catalogue/worn.libsonnet's do, so a
+// consumer can read where the game wears it.
 local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
@@ -51,4 +52,4 @@ local set = {
                                                     { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, title='Trooper boots')),
   legguard_trooper: suit('legguard_trooper', 'Trooper leg guards', 6.5, fit.trooperLegs('legguard_trooper', livery, title='Trooper leg guards')),
 };
-armour.of(null, std.flattenArrays([set[k].rows for k in std.objectFields(set)]))
+{ [k]: set[k] + { rows: armour.of(null, set[k].rows) } for k in std.objectFields(set) }
