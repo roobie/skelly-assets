@@ -54,6 +54,8 @@ local truckSpec(s) = truckDefaults + s;
 // Where the transfer case hangs, and the front shaft that runs from its front face to the front axle's differential.
 local transferX(s) = s.cabBack - 0.25;
 local frontShaft(s) = { from: transferX(s) + 0.24, to: s.frontAxle - 0.16, y: 0.6 };
+// Where the gearbox's middle stands, behind the engine.
+local gearboxX(s) = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
 
 local id = 'military_truck';
 local title = 'Military truck';
@@ -61,7 +63,7 @@ local truckRows(s0) = {
   local s = truckSpec(s0),
   local finish = { paint: s.paint, trim: 'paint-charcoal', glass: 'glass-clear', dark: 'steel-spall-black', frame: s.frame, liner: 'cloth-olive-drab', spring: 'steel-grey' },
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2,
-  local cross = [s.rear + 0.1 + i * (s.nose - s.rear - 0.3) / 7 for i in std.range(0, 7)],
+  local cross = k.crossmemberXs(s.rear + 0.1, gearboxX(s) - s.gearboxLength / 2, s.nose, 8, 0.05),
   local bearers = [s.bedRear + 0.1 + i * (s.bedFront - s.bedRear - 0.2) / 6 for i in std.range(0, 6)],
   // The winch hangs under the rails' front ends, its drum behind the bumper and its worm gearbox behind the drum.
   local winchX = s.nose - 0.04,
@@ -216,8 +218,7 @@ local truckFittings(kit, s0) =
   local on = kit.on;
   local origin = kit.origin;
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2;
-  local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
-  local shaftFrom = gearboxX - s.gearboxLength / 2;
+  local shaftFrom = gearboxX(s) - s.gearboxLength / 2;
   local front = frontShaft(s);
   [
     fitting('chassis', id + '_chassis', origin),
@@ -232,7 +233,7 @@ local truckFittings(kit, s0) =
     fitting('rear_axle_0', id + '_axle', [s.rearAxles[0], s.r - 0.52, 0], ['chassis']),
     fitting('rear_axle_1', id + '_axle', [s.rearAxles[1], s.r - 0.52, 0], ['chassis']),
     fitting('engine', 'engine_v8_diesel', [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', 'gearbox_heavy', [gearboxX, s.engineY - 0.08, 0], ['engine']),
+    fitting('gearbox', 'gearbox_heavy', [gearboxX(s), s.engineY - 0.08, 0], ['engine']),
     fitting('transfer_case', id + '_transfer_case', [transferX(s), s.railBottom - 0.5, 0], ['chassis']),
     fitting('front_shaft', id + '_front_shaft', [(front.from + front.to) / 2, front.y, 0], ['transfer_case', 'front_axle']),
     fitting('winch', id + '_winch', origin, ['chassis']),
