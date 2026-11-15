@@ -9,7 +9,7 @@ local bothSides = k.bothSides;
 local id = 'light_tactical_vehicle';
 local vehicle = import 'light_tactical_vehicle.placements.libsonnet';
 // A compound row of this vehicle, titled with its title and the part's `label`.
-local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
+local part(suffix, label, massKg, pieces, finish, anchors={}, motion=null) = k.compound(id + suffix, massKg, pieces, finish, anchors, motion) + { title: vehicle.title + ' ' + label };
 local finish = { paint: 'paint-sand', frame: 'steel-parkerized', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear' };
 // The frame's crossmembers, each arched over the drive line's tunnel so the prop shafts pass under it.
 local crossX = [-2.46, -2.3, -1.5, -0.55, 0.5, 1.2, 2.18];
@@ -54,7 +54,7 @@ local door(suffix, label, x0, x1, topFront, winA, winB, hingeX) =
     box('handle', 'dark', [x0 + 0.1, s.waist - 0.22, s.lowerSkin + 0.03125], [x0 + 0.26, s.waist - 0.16, s.lowerSkin + 0.0625]),
     box('hinge_top', 'dark', [hingeX - 0.1, s.waist - 0.2, s.lowerSkin], [hingeX, s.waist - 0.12, s.lowerSkin + 0.0625]),
     box('hinge_low', 'dark', [hingeX - 0.1, s.floor + 0.12, s.lowerSkin], [hingeX, s.floor + 0.2, s.lowerSkin + 0.0625]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] });
+  ], finish, motion=k.motion.hinge(['hinge_top', 'hinge_low'], 'near', s.doorOpens));
 local lugCount = 20;
 local lugs = [
   local a = 2 * std.pi * i / lugCount;

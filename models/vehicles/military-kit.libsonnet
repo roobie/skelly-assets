@@ -49,6 +49,7 @@ local truckDefaults = {
   frame: 'steel-parkerized',
   gearboxLength: 0.95,
   engineLength: 1.0,
+  doorOpens: 65,
 };
 local truckSpec(s) = truckDefaults + s;
 // Where the transfer case hangs, and the front shaft that runs from its front face to the front axle's differential.
@@ -118,7 +119,7 @@ local truckRows(s0) = {
       box('handle', 'trim', [s.doorRear + 0.08, s.waist - 0.12, s.side], [s.doorRear + 0.22, s.waist - 0.08, s.side + 0.02]),
       box('hinge_top', 'trim', [s.doorFront - 0.03, s.waist - 0.14, s.side], [s.doorFront + 0.04, s.waist - 0.08, s.side + 0.015]),
       box('hinge_low', 'trim', [s.doorFront - 0.03, s.floor + 0.12, s.side], [s.doorFront + 0.04, s.floor + 0.18, s.side + 0.015]),
-    ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: title + ' door' },
+    ], finish, motion=k.motion.hinge(['hinge_top', 'hinge_low'], 'near', s.doorOpens)) + { title: title + ' door' },
     k.compound(id + '_windscreen', 26, [
       box('glass_' + side.n, 'glass', [s.cabFront - 0.04, s.waist, side.a], [s.cabFront - 0.01, s.roof - 0.02, side.b])
       for side in [{ n: 'near', a: 0.04, b: s.skin }, { n: 'far', a: -s.skin, b: -0.04 }]

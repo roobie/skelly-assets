@@ -17,6 +17,8 @@ local leanAt(y) = s.lean * (y - s.waist) / (s.roof - s.waist);
 local windowTop = s.roof - 0.05;
 local screenBars = [-1.0 + 0.2 * i for i in std.range(0, 10)];
 local doorBars = [s.doorRear + 0.1 + 0.2 * i for i in std.range(0, 4)];
+local rearDoorPin(share) = [s.rear, b.floorTop + share * (b.top - b.floorTop), b.side - b.wall];
+local rearDoorPins = k.hingePins('hinge', 'y', rearDoorPin(0.2), rearDoorPin(0.8), 'plate');
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.libsonnet').rows('swat_truck', vehicle.title, s) + [
   k.compound('swat_truck_body_floor', 520, [
     box('deck', 'deck', [s.rear, b.floorLow, -wallZ[0]], [b.front, b.floorTop, wallZ[0]]),
@@ -55,7 +57,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.lib
     box('outer_pier', 'armour', [s.rear, b.doorWindow.y[0], b.doorWindow.z[1]], [s.rear + b.wall, b.doorWindow.y[1], b.side - b.wall]),
     box('window', 'glass', [s.rear + 0.015, b.doorWindow.y[0], b.doorWindow.z[0]], [s.rear + 0.045, b.doorWindow.y[1], b.doorWindow.z[1]]),
     box('handle', 'plate', [s.rear - 0.02, 1.42, 0.2], [s.rear, 1.48, 0.5]),
-  ], finish, { hinge_a: ['low', [0, 0.1, 1]], hinge_b: ['high', [0, 0.9, 1]] }) + { title: 'SWAT truck rear door' },
+  ] + rearDoorPins, finish, motion=k.motion.hinge(rearDoorPins, 'rear', b.doorOpens)) + { title: 'SWAT truck rear door' },
   k.compound('swat_truck_rear_step', 40, [
     box('tread', 'plate', [s.rear - 0.3, b.stepY[0], -0.9], [s.rear + 0.04, b.stepY[1], 0.9]),
   ] + k.bothSides([

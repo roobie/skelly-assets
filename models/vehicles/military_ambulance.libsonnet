@@ -41,7 +41,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
     box('hinge_low', 'dark', [back - 0.05, 1.68, s.boxSide - 0.24], [back - 0.03, 1.74, s.boxSide - 0.16]),
     box('handle', 'dark', [back - 0.08, 2.0, 0.07], [back - 0.04, 2.32, 0.11]),
     box('handle_foot_top', 'dark', [back - 0.08, 2.28, 0.03], [back - 0.04, 2.32, 0.07]),
-  ], finish, { hinge_a: ['skin', [0.5, 0.2, 1]], hinge_b: ['skin', [0.5, 0.8, 1]] }) + { title: 'Military ambulance rear door' },
+  ], finish, motion=k.motion.hinge(['hinge_top', 'hinge_low'], 'rear', s.rearDoorOpens)) + { title: 'Military ambulance rear door' },
   k.compound('military_ambulance_rear_step', 24, [
     box('tread_top', 'frame', [back - 0.3, s.deckBottom - 0.2, -0.6], [back - 0.04, s.deckBottom - 0.16, 0.6]),
     box('tread_low', 'frame', [back - 0.42, 0.72, -0.6], [back - 0.16, 0.76, 0.6]),
