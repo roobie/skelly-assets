@@ -6,7 +6,7 @@
 // A fitting's `taxonomy` is its row's own, over the vehicle's (`models/TAXONOMY.md`): a gun lifted off a turret is a
 // whole weapon, not a vehicle part.
 // A hatch's `open` is in degrees from closed, so the raised lid leans back past upright and stays open.
-local gun ={ category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } };
+local gun = { category: 'weapons', tags: { material: ['metal'], setting: ['modern'] } };
 {
   // A one-man machine-gun turret: a 14.5 mm heavy machine gun with a coaxial 7.62 mm machine gun.
   one_man_mg: {

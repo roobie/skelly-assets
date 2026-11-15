@@ -3,8 +3,9 @@
 // pieces and weigh the same, so a vehicle or a mod picks the detail without changing what it is; see
 // `docs/decisions/0004-assemblies.md`.
 //
-// A drawing is { pieces, finish }. An accessory is { site, id, massKg, drawn, at }: the site it is fitted at, its row,
-// and where its own frame's origin sits in the part's frame. One row may be fitted at several sites.
+// A drawing is { pieces, finish } and, for one that opens, its `motion`. An accessory is { site, id, massKg, drawn,
+// at }: the site it is fitted at, its row, and where its own frame's origin sits in the part's frame. One row may be
+// fitted at several sites.
 local k = import 'kit.libsonnet';
 local site = import 'site.libsonnet';
 local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
