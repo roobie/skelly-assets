@@ -42,11 +42,15 @@ local well(name, c) = [
   box(name + '_liner', 'trim', [c - s.archBase - 0.04, s.panelLow, s.bedZ], [c + s.archBase + 0.04, s.archTop + 0.04, s.wellIn]),
 ] + rim(name + '_well', 'trim', c, 0.04, [s.wellIn, s.panelIn]);
 // A door turns on pins at its leaves' outer fore corners, so no part of it reaches past the axis into the body ahead.
-// Its rear edge stands off the `post` behind it by as far as its inboard corner swings back on the way out: that corner
-// lies no farther from the axis than the post's face does.
+local leafOut = s.lowerSkin + 0.0625;
+// Where, at depth `z`, the circle crosses on which a door hinged at `hingeX` swings the corner it closes against `post`
+// with. The door's rear edge stays inside that circle at its inboard face, and the post's face reaches out to it at the
+// door's outer face, so the door swings clear of the post and no voxel column is left empty between them.
+local swingArc(hingeX, post, z) = hingeX - std.sqrt(std.pow(hingeX - post, 2) - std.pow(leafOut - z, 2));
+local frontPost = swingArc(s.cabFront, s.bPost + 0.02, s.lowerSkin);
+local rearPost = swingArc(s.bPost - 0.02, s.cabBack + 0.1, s.lowerSkin);
 local door(suffix, label, post, x1, topFront, winA, winB, hingeX) =
-  local leafOut = s.lowerSkin + 0.0625;
-  local x0 = hingeX - std.sqrt(std.pow(hingeX - post, 2) - std.pow(leafOut - s.upperIn, 2));
+  local x0 = swingArc(hingeX, post, s.upperIn);
   local pins = k.hingePins('hinge', 'y', [hingeX, s.waist - 0.16, leafOut], [hingeX, s.floor + 0.16, leafOut], 'dark');
   part(suffix, label, 48, [
     box('skin', 'paint', [x0, s.floor, s.lowerIn], [x1, s.waist, s.lowerSkin]),
@@ -110,10 +114,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
       prism('bed_wall', 'trim', [[s.bedRear, s.bedUnder], [s.cabBack, s.bedUnder], [s.cabBack, 1.29], [s.bedRear, 1.13]], [s.bedZ, s.wellIn]),
       box('tail_corner', 'paint', [s.rear, s.railTop + 0.1, s.bedZ], [s.rear + 0.04, 1.13, s.panel]),
       box('sill', 'dark', [s.rearAxle + s.archBase, 0.5, 0.88], [s.frontAxle - s.archBase, s.floor, 1.0]),
-      box('c_post', 'paint', [s.cabBack, s.floor, s.lowerIn], [s.cabBack + 0.1, s.waist, s.lowerSkin]),
-      box('c_post_upper', 'paint', [s.cabBack, s.waist, s.upperIn], [s.cabBack + 0.1, s.roof, s.upperSkin]),
-      box('b_post', 'paint', [s.bPost - 0.02, s.floor, s.lowerIn], [s.bPost + 0.02, s.waist, s.lowerSkin]),
-      box('b_post_upper', 'paint', [s.bPost - 0.02, s.waist, s.upperIn], [s.bPost + 0.02, s.roof, s.upperSkin]),
+      box('c_post', 'paint', [s.cabBack, s.floor, s.lowerIn], [rearPost, s.waist, s.lowerSkin]),
+      box('c_post_upper', 'paint', [s.cabBack, s.waist, s.upperIn], [rearPost, s.roof, s.upperSkin]),
+      box('b_post', 'paint', [s.bPost - 0.02, s.floor, s.lowerIn], [frontPost, s.waist, s.lowerSkin]),
+      box('b_post_upper', 'paint', [s.bPost - 0.02, s.waist, s.upperIn], [frontPost, s.roof, s.upperSkin]),
       prism('a_post', 'paint', [[s.topFront, s.waist], [s.cabFront + 0.01, s.waist], [s.cabFront - 0.06, s.roof], [s.topFront, s.roof]], [0.86, s.upperSkin]),
       box('cant_rail', 'paint', [s.cabBack, s.roof - 0.04, s.upperIn], [s.topFront, s.roof, s.upperSkin]),
       box('back_side', 'paint', [s.cabBack, s.waist, 0.68], [s.cabBack + 0.04, s.roof, s.upperSkin]),
