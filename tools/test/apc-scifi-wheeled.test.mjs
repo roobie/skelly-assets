@@ -200,9 +200,10 @@ test('no roof fitting stands on a hatch lid', () => {
   assert.ok(!meeting(roofFittings, hatches, spec.grain / 2).touches);
 });
 
-test('a hatch slid a periscope\'s depth toward its fore periscope meets it, so the hatch check can fail', () => {
+// The hatch reaches furthest at its hinge, so the periscope behind it is the one it would meet first.
+test('a hatch slid a periscope\'s depth toward its aft periscope meets it, so the hatch check can fail', () => {
   const by = spec.optics.periscope.depth;
-  assert.ok(meeting(drawn('periscopes'), shifted(drawn('hatch_near'), [by, 0, by]), spec.grain / 2).touches);
+  assert.ok(meeting(drawn('periscopes'), shifted(drawn('hatch_near'), [-by, 0, 0]), spec.grain / 2).touches);
 });
 
 test('each grab rail stands off the hull on its posts alone, its bar clear of the side', () => {
