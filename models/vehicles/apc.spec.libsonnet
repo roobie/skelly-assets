@@ -8,6 +8,7 @@
   axles: [2.25, 1.0625, -0.9375, -2.125],
   hub: 0.522, wheelZ: 1.15,
   turretX: 0.25, driverX: 1.55, driverZ: -0.6,
+  ring: { inner: 0.6, outer: 0.85, height: 0.1 },
   platePitch: 1.156, plateFirst: -2.7,
   // How far the ramp's pins stand off the centre line.
   rampPinZ: 0.5,

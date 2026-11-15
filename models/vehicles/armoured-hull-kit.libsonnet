@@ -65,11 +65,13 @@ local periscopeReach = 0.12;
 local headlampBack = 0.06;
 local tailLampDepth = 0.06;
 
-// The roof is open under the driver's hatch and under the vehicle's `roofHatches`, from `k.hatchHole`. A hole may reach
-// forward past the roof into the upper glacis's top, so the glacis is cut by the same holes.
+// The roof is open under the driver's hatch, under the vehicle's `roofHatches`, from `k.hatchHole`, and inside the
+// turret ring, so an open turret hatch looks down into the hull rather than onto its roof. A hole may reach forward
+// past the roof into the upper glacis's top, so the glacis is cut by the same holes.
 local rows(s, title, roofHatches=[]) =
   local a = s.armour;
-  local holes = [k.hatchHole(s.hatchX, s.driverZ, driverHatch.radius)] + roofHatches;
+  local holes = [k.hatchHole(s.hatchX, s.driverZ, driverHatch.radius), { x: s.turretX, z: 0, radius: s.ring.inner }]
+                + roofHatches;
   local n = nose(s);
   local paint = { paint: s.paint };
   local upperAtX(x) = meet(n.upperInner, vertical(x));
