@@ -72,6 +72,55 @@ local bar(id, slot, a, b, thick, z, thickB=null) =
   local na = across(a, b, thick / 2);
   local nb = across(a, b, (if thickB == null then thick else thickB) / 2);
   prism(id, slot, [[a[0] - na[0], a[1] - na[1]], [b[0] - nb[0], b[1] - nb[1]], [b[0] + nb[0], b[1] + nb[1]], [a[0] + na[0], a[1] + na[1]]], z);
+// A convex polygon without repeated or collinear corners, which a prism's profile must not have; empty when no area is left.
+local tidy(polygon) =
+  local n = std.length(polygon);
+  local apart(p, q) = std.abs(p[0] - q[0]) + std.abs(p[1] - q[1]) > 1e-9;
+  local distinct = [polygon[i] for i in std.range(0, n - 1) if apart(polygon[i], polygon[(i + 1) % n])];
+  local m = std.length(distinct);
+  local turns(a, b, c) = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]) > 1e-12;
+  local corners = [distinct[i] for i in std.range(0, m - 1) if turns(distinct[(i + m - 1) % m], distinct[i], distinct[(i + 1) % m])];
+  if std.length(corners) < 3 then [] else corners;
+// A convex polygon cut to the side of a line where dot(normal, point) <= offset.
+local keep(polygon, normal, offset) =
+  local n = std.length(polygon);
+  local side(p) = offset - normal[0] * p[0] - normal[1] * p[1];
+  tidy(std.flattenArrays([
+    local p = polygon[i];
+    local q = polygon[(i + 1) % n];
+    local a = side(p);
+    local b = side(q);
+    (if a >= 0 then [p] else [])
+    + (if a * b < 0 then [[p[0] + (q[0] - p[0]) * a / (a - b), p[1] + (q[1] - p[1]) * a / (a - b)]] else [])
+    for i in std.range(0, n - 1)
+  ]));
+local keepAll(polygon, lines) = std.foldl(function(p, l) keep(p, l[0], l[1]), lines, polygon);
+// A level plate as a y prism's plan, (z, x) points counter-clockwise, its heights and the cuts bounding it, so a box or
+// a z prism can be redrawn as y prisms: a z prism's sides become cuts, each facing out of its counter-clockwise profile.
+local slabOf(piece) =
+  if piece.kind == 'box' then {
+    outline: [[piece.min[2], piece.min[0]], [piece.max[2], piece.min[0]], [piece.max[2], piece.max[0]], [piece.min[2], piece.max[0]]],
+    y: [piece.min[1], piece.max[1]],
+    cuts: [],
+  }
+  else if piece.kind == 'prism' && piece.axis == 'y' then { outline: piece.profile, y: [piece.start, piece.end], cuts: std.get(piece, 'clip', []) }
+  else if piece.kind == 'prism' && piece.axis == 'z' then
+    local p = piece.profile;
+    local n = std.length(p);
+    local xs = [q[0] for q in p];
+    local x = [std.foldl(std.min, xs, xs[0]), std.foldl(std.max, xs, xs[0])];
+    local ys = [q[1] for q in p];
+    {
+      outline: [[piece.start, x[0]], [piece.end, x[0]], [piece.end, x[1]], [piece.start, x[1]]],
+      y: [std.foldl(std.min, ys, ys[0]), std.foldl(std.max, ys, ys[0])],
+      cuts: [
+        local a = p[i];
+        local d = [p[(i + 1) % n][0] - a[0], p[(i + 1) % n][1] - a[1]];
+        { normal: [d[1], -d[0], 0], offset: d[1] * a[0] - d[0] * a[1] }
+        for i in std.range(0, n - 1)
+      ] + std.get(piece, 'clip', []),
+    }
+  else error piece.id + ' is not a box, a y prism or a z prism, so it cannot be holed';
 local near(piece) = piece + { id: piece.id + '_near' };
 local far(piece) = piece + { id: piece.id + '_far' } + (
   if std.objectHas(piece, 'clip') then { clip: [farCut(c) for c in piece.clip] } else {}
@@ -192,6 +241,80 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     local gap = std.sqrt(reach * reach + depth * depth) - reach + 0.002;
     assert gap < grain / 2 : 'a ' + gap + ' m stand-off would open a slot at a ' + grain + ' m grain';
     gap,
+  // A level plate, a box or a y or z prism, with a round hole straight down through it at each of `holes`, an
+  // { x, z, radius } whose outline is a `sides`-gon. A prism must be convex, so the plate is cut into strips along x
+  // round a square cell about each hole, and each cell into sectors of the ring between the hole and the cell's edge.
+  // A hole may reach past the plate's edge, so a hole across a joint is cut by each plate it crosses, and a plate no
+  // hole reaches is left whole.
+  holed(piece, holes, sides=16):
+    local slab = slabOf(piece);
+    local zs = [p[0] for p in slab.outline];
+    local xs = [p[1] for p in slab.outline];
+    local cell(h) = { hole: h, z: [h.z - h.radius, h.z + h.radius], x: [h.x - h.radius, h.x + h.radius] };
+    local reaches(c) = c.z[1] > std.foldl(std.min, zs, zs[0]) && c.z[0] < std.foldl(std.max, zs, zs[0])
+                       && c.x[1] > std.foldl(std.min, xs, xs[0]) && c.x[0] < std.foldl(std.max, xs, xs[0]);
+    local cells = std.sort([cell(h) for h in holes if reaches(cell(h))], function(c) c.z[0]);
+    // The strips between successive cell edges along x; an end strip's open side is null.
+    local edges = [null] + std.set(std.flattenArrays([c.x for c in cells])) + [null];
+    local strip(i) =
+      local lo = edges[i];
+      local hi = edges[i + 1];
+      local across = [c for c in cells if lo != null && hi != null && c.x[0] <= lo && c.x[1] >= hi];
+      local gaps = [null] + std.flattenArrays([c.z for c in across]) + [null];
+      assert std.all([gaps[j] <= gaps[j + 1] for j in std.range(1, std.length(gaps) - 3)]) : piece.id + "'s holes overlap";
+      [
+        keepAll(slab.outline, (if lo == null then [] else [[[0, -1], -lo]]) + (if hi == null then [] else [[[0, 1], hi]])
+                              + (if gaps[2 * j] == null then [] else [[[-1, 0], -gaps[2 * j]]])
+                              + (if gaps[2 * j + 1] == null then [] else [[[1, 0], gaps[2 * j + 1]]]))
+        for j in std.range(0, std.length(across))
+      ];
+    // The part of a hole's cell between two rays from its centre, outside the hole's edge between them.
+    local sector(c, i) =
+      local h = c.hole;
+      local at(j) = [std.cos(2 * std.pi * j / sides), std.sin(2 * std.pi * j / sides)];
+      local a = at(i);
+      local b = at(i + 1);
+      local mid = at(i + 0.5);
+      local centre = [h.z, h.x];
+      local through(n) = n[0] * centre[0] + n[1] * centre[1];
+      keepAll(slab.outline, [
+        [[-1, 0], -c.z[0]], [[1, 0], c.z[1]], [[0, -1], -c.x[0]], [[0, 1], c.x[1]],
+        [[a[1], -a[0]], through([a[1], -a[0]])],
+        [[-b[1], b[0]], through([-b[1], b[0]])],
+        [[-mid[0], -mid[1]], through([-mid[0], -mid[1]]) - h.radius * std.cos(std.pi / sides)],
+      ]);
+    local plans = std.flattenArrays([strip(i) for i in std.range(0, std.length(edges) - 2)])
+                  + [sector(c, i) for c in cells for i in std.range(0, sides - 1)];
+    // A cut that keeps all of a piece is left off it, and a piece a cut leaves nothing of is dropped.
+    local drawn(n, plan) =
+      local corners = [[p[1], y, p[0]] for p in plan for y in slab.y];
+      local over(cut) = [dot(cut.normal, q) - cut.offset for q in corners];
+      local cuts = [cut for cut in slab.cuts if std.any([v > 1e-9 for v in over(cut)])];
+      if std.any([std.all([v >= -1e-9 for v in over(cut)]) for cut in cuts]) then []
+      else [yPrism(piece.id + '_' + n, piece.slot, plan, slab.y) + (if cuts == [] then {} else { clip: cuts })];
+    if cells == [] then [piece]
+    else std.flattenArrays([drawn(n, plans[n]) for n in std.range(0, std.length(plans) - 1) if plans[n] != []]),
+  // A round hatch: a lid `radius` m across and `thickness` thick, its origin under the lid's centre, on a hinge at its
+  // rear. Its pins stand at the hinge's top rear corner, so the whole lid lies ahead of and below them and never dips
+  // under the roof as it swings up `open` degrees.
+  hatch(radius, thickness, open):
+    local back = -radius - 0.04;
+    local top = thickness + 0.03;
+    local pins = self.hingePins('hinge_pin', 'z', [back, top, -0.1], [back, top, 0.1], 'steel');
+    local lid = self.hatchLid(radius, thickness);
+    local motion = self.motion.hinge(pins, 'up', open);
+    {
+      pieces: [
+        lid,
+        box('hinge', 'steel', [back, 0, -0.1], [-radius + 0.02, top, 0.1]),
+        box('handle', 'steel', [radius * 0.3, thickness, -0.06], [radius * 0.3 + 0.03, thickness + 0.03, 0.06]),
+      ] + pins,
+      motion: motion,
+    },
+  hatchLid(radius, thickness): turned('lid', 'paint', 'y', disc(radius, 0, thickness)) + { sides: 12 },
+  // The hole under a hatch's lid of `lidRadius` centred at (x, z), for `holed`. The lid laps it by two grains all round,
+  // so its twelve-sided edge still covers the hole wherever the voxel lattice falls.
+  hatchHole(x, z, lidRadius): { x: x, z: z, radius: lidRadius - 2 * vehicleGrain },
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,
   far: far,
