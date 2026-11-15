@@ -4,5 +4,6 @@
   nose: 1.9, deck: 1.1, cabRear: -1.35, cabFront: -0.1, cabSide: 0.63, roof: 2.55,
   bonnetBack: 0.02, bonnetTop: 1.62, bonnetSide: 0.44, bonnetSkirt: 0.88,
   fenderInner: 0.86, fenderOuter: 0.9,
+  doorOpens: 65,
   shellMass: 1790, paint: 'paint-green',
 }

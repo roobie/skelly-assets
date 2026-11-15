@@ -7,6 +7,19 @@ local bothSides = k.bothSides;
 local door = s.cabFront - 0.75;
 local shoulder = 1.68;
 local sideGlass = 0.61;
+local doorRear = door + 0.02;
+local doorSill = s.deck + 0.03;
+// Below the shoulder the door ends on an arc round the rear hub, just outside the fender, and the cab's skirt fills the
+// arc. Opening carries every point of the door forward, away from the hub, so the door never meets the fender or tyre.
+local doorArc = s.fenderOuter + 0.04;
+local arcY(x) = s.rearHub + std.sqrt(doorArc * doorArc - (x - s.rearAxle) * (x - s.rearAxle));
+local arcFoot = s.rearAxle + std.sqrt(doorArc * doorArc - (doorSill - s.rearHub) * (doorSill - s.rearHub));
+local arcSteps = 6;
+local arcX(i) = doorRear + (arcFoot - doorRear) * i / arcSteps;
+local arcPoint(i) = [arcX(i), arcY(arcX(i))];
+assert arcY(doorRear) < shoulder : 'the door arc must leave the door skin below the shoulder';
+local doorPins = k.hingePins('hinge', 'y', [s.cabFront - 0.04, (doorSill + shoulder) / 2, s.cabSide + k.grain],
+                             [s.cabFront - 0.04, s.roof - 0.115, s.cabSide + k.grain]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('tractor_chassis', s.shellMass, [
     box('front_bolster', 'cast', [1.55, 0.52, -0.34], [s.nose, 0.86, 0.34]),
@@ -51,17 +64,22 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('side_glass', 'glass', [s.cabRear + 0.08, shoulder, sideGlass], [door - 0.05, s.roof - 0.08, sideGlass + 0.02]),
     box('step_hanger', 'trim', [-0.34, 0.66, s.cabSide - 0.05], [-0.3, s.deck, s.cabSide]),
     box('step', 'trim', [-0.38, 0.62, s.cabSide - 0.08], [-0.08, 0.68, s.cabSide + 0.12]),
-    box('sill', 'trim', [door, s.deck - 0.03, s.cabSide - 0.08], [s.cabFront, s.deck + 0.03, s.cabSide + 0.02]),
-  ]), { paint: s.paint, trim: 'paint-charcoal', floor: 'rubber-black', liner: 'cloth-rag', glass: 'glass-clear' }) + { title: 'Tractor cab' },
+    box('sill', 'trim', [door, s.deck - 0.03, s.cabSide - 0.08], [s.cabFront, doorSill, s.cabSide + 0.02]),
+  ] + [
+    prism('skirt_%d' % i, 'paint', [[arcX(i), doorSill], [arcX(i + 1), doorSill]] + (if i + 1 < arcSteps then [arcPoint(i + 1)] else []) + [arcPoint(i)],
+          [s.cabSide - 0.04, s.cabSide])
+    for i in std.range(0, arcSteps - 1)
+  ]),{ paint: s.paint, trim: 'paint-charcoal', floor: 'rubber-black', liner: 'cloth-rag', glass: 'glass-clear' }) + { title: 'Tractor cab' },
   k.compound('tractor_cab_door', 30, [
-    box('skin', 'paint', [door + 0.02, s.deck + 0.03, s.cabSide - 0.04], [s.cabFront - 0.04, shoulder, s.cabSide]),
-    box('top', 'paint', [door + 0.02, s.roof - 0.13, s.cabSide - 0.04], [s.cabFront - 0.04, s.roof - 0.08, s.cabSide]),
-    box('glass', 'glass', [door + 0.02, shoulder, sideGlass], [s.cabFront - 0.04, s.roof - 0.13, sideGlass + 0.02]),
-    box('handle', 'trim', [door + 0.06, shoulder - 0.1, s.cabSide], [door + 0.2, shoulder - 0.06, s.cabSide + 0.02]),
-  ], { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' }, {
-    hinge_a: ['skin', [1, 0.2, 1]],
-    hinge_b: ['skin', [1, 0.8, 1]],
-  }) + { title: 'Tractor cab door' },
+    box('skin', 'paint', [arcFoot, doorSill, s.cabSide - 0.04], [s.cabFront - 0.04, shoulder, s.cabSide]),
+    box('top', 'paint', [doorRear, s.roof - 0.13, s.cabSide - 0.04], [s.cabFront - 0.04, s.roof - 0.08, s.cabSide]),
+    box('glass', 'glass', [doorRear, shoulder, sideGlass], [s.cabFront - 0.04, s.roof - 0.13, sideGlass + 0.02]),
+    box('handle', 'trim', [door + 0.25, shoulder - 0.1, s.cabSide], [door + 0.39, shoulder - 0.06, s.cabSide + 0.02]),
+  ] + [
+    prism('skin_%d' % i, 'paint', [arcPoint(i), arcPoint(i + 1), [arcX(i + 1), shoulder], [arcX(i), shoulder]], [s.cabSide - 0.04, s.cabSide])
+    for i in std.range(0, arcSteps - 1)
+  ] + doorPins, { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' },
+  motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: 'Tractor cab door' },
   k.compound('tractor_windscreen', 14, [
     box('glass', 'glass', [s.cabFront - 0.02, shoulder, -s.cabSide + 0.07], [s.cabFront + 0.01, s.roof - 0.1, s.cabSide - 0.07]),
   ], { glass: 'glass-clear' }) + { title: 'Tractor windscreen' },
