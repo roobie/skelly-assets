@@ -14,6 +14,10 @@ local back = s.rear + s.plate;
 // The vision slits across the windscreen armour, one before each seat.
 local slit = { y: [1.72, 1.77], z: [0.3, 0.7] };
 local louvres = 6;
+// Each opening part turns about the outer corner of its hinge straps, so it swings out of the body's way at every angle.
+local armourPins = k.hingePins('hinge_pin', 'z', [s.cowl + s.plate + 0.03, s.scuttleTop, -0.75], [s.cowl + s.plate + 0.03, s.scuttleTop, 0.75], 'steel');
+local cabDoorPins = k.hingePins('hinge_pin', 'y', [s.cabDoor[1], 1.09, s.side + 0.03], [s.cabDoor[1], 1.49, s.side + 0.03], 'steel');
+local rearDoorPins = k.hingePins('hinge_pin', 'y', [s.rear - 0.03, 1.09, s.rearDoorZ], [s.rear - 0.03, 1.49, s.rearDoorZ], 'steel');
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   // The armoured body round the cab and the open troop bay: its side plates, the rear plate round the door, the
   // scuttle under the windscreen and the floor. The cab's sides stop at the doors' height, the bay's run higher.
@@ -61,21 +65,21 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('hinge_1', 'steel', [s.cowl + s.plate, s.scuttleTop, 0.7], [s.cowl + s.plate + 0.03, s.scuttleTop + 0.05, 0.8]),
   ] + bothSides([
     box('slit_end', 'paint', [s.cowl, slit.y[0], slit.z[1]], [s.cowl + s.plate, slit.y[1], inner]),
-  ]), finish, { hinge_a: ['hinge_0', [0.5, 0.5, 0.5]], hinge_b: ['hinge_1', [0.5, 0.5, 0.5]] }) + { title: 'Half-track windscreen armour' },
+  ]) + armourPins, finish, motion=k.motion.hinge(armourPins, 'fore', s.armourFolds)) + { title: 'Half-track windscreen armour' },
   // The near cab door, hinged at its front edge.
   k.compound('half_track_cab_door', 25, [
     box('plate', 'paint', [s.cabDoor[0], s.floor + 0.02, inner], [s.cabDoor[1], s.doorTop, s.side]),
     box('handle', 'dark', [s.cabDoor[0] + 0.08, 1.4, s.side], [s.cabDoor[0] + 0.2, 1.44, s.side + 0.03]),
     box('hinge_0', 'steel', [s.cabDoor[1] - 0.04, 1.05, s.side], [s.cabDoor[1], 1.13, s.side + 0.03]),
     box('hinge_1', 'steel', [s.cabDoor[1] - 0.04, 1.45, s.side], [s.cabDoor[1], 1.53, s.side + 0.03]),
-  ], finish, { hinge_a: ['hinge_0', [1, 0.5, 1]], hinge_b: ['hinge_1', [1, 0.5, 1]] }) + { title: 'Half-track cab door' },
+  ] + cabDoorPins, finish, motion=k.motion.hinge(cabDoorPins, 'near', s.cabDoorOpen)) + { title: 'Half-track cab door' },
   // The troop bay's door, hinged on its near edge.
   k.compound('half_track_rear_door', 25, [
     box('plate', 'paint', [s.rear, s.floor - 0.02, -s.rearDoorZ], [back, s.doorTop, s.rearDoorZ]),
     box('handle', 'dark', [s.rear - 0.03, 1.25, -0.24], [s.rear, 1.29, -0.12]),
     box('hinge_0', 'steel', [s.rear - 0.03, 1.05, s.rearDoorZ - 0.06], [s.rear, 1.13, s.rearDoorZ]),
     box('hinge_1', 'steel', [s.rear - 0.03, 1.45, s.rearDoorZ - 0.06], [s.rear, 1.53, s.rearDoorZ]),
-  ], finish, { hinge_a: ['hinge_0', [0, 0.5, 1]], hinge_b: ['hinge_1', [0, 0.5, 1]] }) + { title: 'Half-track rear door' },
+  ] + rearDoorPins, finish, motion=k.motion.hinge(rearDoorPins, 'rear', s.rearDoorOpen)) + { title: 'Half-track rear door' },
   // The near front fender over the steered wheel, sloping down at the front and back to the cab's sill.
   k.compound('half_track_front_fender', 30, m.flatGuard('guard', 'paint', [1.2, 2.42], s.fenderTop, 0.2, 0.16, s.fenderZ), finish) + { title: 'Half-track front fender' },
   // The front bumper across the frame horns, with the brackets the unditching roller turns in.
