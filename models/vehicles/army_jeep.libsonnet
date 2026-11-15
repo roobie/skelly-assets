@@ -5,6 +5,30 @@ local s = import 'army_jeep.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+// How near the swinging side rail ever comes to the tub and the seat it swings past.
+local clearance = 0.001;
+local cushionTop = 0.18;
+local fillet = 0.12;
+// The side rail stands in the tub's skin between the cut-out's corner fillets. It turns on pins inboard of its fore
+// post's inner fore corner, so it swings in clear of the tub, and its aft post stops above the front seat's cushion,
+// which it swings over.
+local railIn = s.side - 0.03;
+local railFore = s.cutFront - fillet;
+local railAft = s.cutRear + fillet;
+local railPivot = railIn - k.grain;
+local railPins = k.hingePins('hinge', 'y', [railFore, s.cut + 0.06, railPivot], [railFore, s.waist - 0.04, railPivot]);
+local railFoot = s.floor + cushionTop + clearance;
+// Its top bar spans the cut-out level with the rear lip. Swinging in never carries its fore end forward, and its aft end
+// stands where its outer corner's swing circle passes the clearance inside the lip.
+local topFore = s.cutFront - clearance;
+local topAft = railFore - std.sqrt(std.pow(railFore - s.cutRear - clearance, 2) - std.pow(s.side - railPivot, 2));
+// A brace under the top bar's aft end closes the cut-out's corner above the rear fillet. Swinging in, its outer face
+// drifts aft until it has left the skin, by no more than at the aft post's reach from the pins, so its underside stands
+// that drift up the fillet's slope plus the clearance off it.
+local slope = (s.waist - s.cut) / fillet;
+local braceDrift = (s.side - railPivot) * (s.side - railIn) / (railFore - railAft);
+local braceLift = clearance * std.sqrt(1 + slope * slope) + braceDrift * slope;
+local braceFoot = s.cutRear + fillet - (railFoot - braceLift - s.cut) / slope;
 local finish = { paint: s.paint, trim: 'paint-charcoal', frame: 'steel-parkerized', dark: 'steel-spall-black', glass: 'glass-clear', tan: 'cloth-canvas', strap: 'webbing-olive-dark', seat: 'cloth-olive-drab', spring: 'steel-grey' };
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('army_jeep_frame', s.frameMass, [
@@ -22,8 +46,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('side_rear', 'paint', [s.rear, 0.5, s.side - 0.03], [s.cutRear, s.waist, s.side]),
     box('side_low', 'paint', [s.cutRear, 0.5, s.side - 0.03], [s.cutFront, s.cut, s.side]),
     box('side_fore', 'paint', [s.cutFront, 0.5, s.side - 0.03], [s.cowl, s.waist, s.side]),
-    prism('cut_rear', 'paint', [[s.cutRear, s.cut], [s.cutRear + 0.12, s.cut], [s.cutRear, s.waist]], [s.side - 0.03, s.side]),
-    prism('cut_fore', 'paint', [[s.cutFront - 0.12, s.cut], [s.cutFront, s.cut], [s.cutFront, s.waist]], [s.side - 0.03, s.side]),
+    prism('cut_rear', 'paint', [[s.cutRear, s.cut], [s.cutRear + fillet, s.cut], [s.cutRear, s.waist]], [railIn, s.side]),
+    prism('cut_fore', 'paint', [[s.cutFront - fillet, s.cut], [s.cutFront, s.cut], [s.cutFront, s.waist]], [railIn, s.side]),
     box('lip_rear', 'paint', [s.rear, s.waist, s.side - 0.05], [s.cutRear, s.waist + 0.03, s.side + 0.01]),
     box('bead', 'trim', [s.rear, 0.5, s.side], [s.cowl, 0.53, s.side + 0.01]),
   ]) + [
@@ -74,15 +98,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   ], finish) + { title: 'Army 4x4 dashboard' },
   k.compound('army_jeep_seat', 7, [
     box('base', 'frame', [-0.2, 0, -0.2], [0.18, 0.08, 0.2]),
-    box('cushion', 'seat', [-0.24, 0.08, -0.25], [0.22, 0.18, 0.25]),
+    box('cushion', 'seat', [-0.24, 0.08, -0.25], [0.22, cushionTop, 0.25]),
     prism('back', 'seat', [[-0.27, 0.16], [-0.18, 0.16], [-0.22, 0.56], [-0.31, 0.56]], [-0.25, 0.25]),
   ], finish, { hips: ['cushion', [0.4, 1, 0.5]] }) + { title: 'Army 4x4 seat' },
-  // The open tub's cut-out is its way in: a hinged rail across it, wider than the player.
+  // The open tub's cut-out is its way in: a rail across it, wider than the player, that swings in on its fore post.
   k.compound('army_jeep_side_rail', 5, [
-    box('top', 'paint', [s.cutRear + 0.02, s.waist + 0.02, s.side - 0.02], [s.cutFront + 0.02, s.waist + 0.05, s.side + 0.01]),
-    box('fore', 'paint', [s.cutFront - 0.02, s.cut, s.side - 0.02], [s.cutFront + 0.02, s.waist + 0.02, s.side + 0.01]),
-    box('aft', 'paint', [s.cutRear + 0.02, s.cut, s.side - 0.02], [s.cutRear + 0.06, s.waist + 0.02, s.side + 0.01]),
-  ], finish, { hinge_a: ['fore', [0.5, 0.1, 0.5]], hinge_b: ['fore', [0.5, 0.9, 0.5]] }) + { title: 'Army 4x4 side rail' },
+    box('top', 'paint', [topAft, s.waist + 0.02, railIn], [topFore, s.waist + 0.05, s.side]),
+    box('fore', 'paint', [railFore - 0.04, s.cut + clearance, railIn], [railFore, s.waist + 0.02, s.side]),
+    box('aft', 'paint', [railAft, railFoot, railIn], [railAft + 0.04, s.waist + 0.02, s.side]),
+    prism('brace', 'paint', [[railAft, railFoot], [railAft, s.waist + 0.02], [topAft, s.waist + 0.02], [topAft, s.cut + (s.cutRear + fillet - topAft) * slope + braceLift], [braceFoot, railFoot]], [railIn, s.side]),
+  ] + railPins, finish, motion=k.motion.hinge(railPins, 'far', s.sideRailOpens)) + { title: 'Army 4x4 side rail' },
   k.compound('army_jeep_steering_box', 7, [
     box('box', 'dark', [0.72, 0.52, -0.42], [0.86, 0.62, -0.34]),
     box('drag_link', 'frame', [0.8, 0.46, -0.43], [1.0, 0.49, -0.4]),
