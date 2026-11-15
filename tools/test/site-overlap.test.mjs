@@ -30,8 +30,11 @@ test('faces that touch, or sink less than a grain into each other, are contact a
 
 test('a piece passing right through a thin panel reads as deep as it passes, not as thin as the panel', () => {
   const floor = box('floor', [-1, -1, 0.4], [2, 2, 0.4 + 2 * GRAIN]);
-  const [overlap] = siteOverlaps([site('floor', 'van_floor', floor), site('engine', 'van_engine', unit)], GRAIN);
-  assert.ok(Math.abs(overlap.depth - (0.4 + 2 * GRAIN)) < GRAIN / 8, `depth ${overlap.depth}`);
+  const rod = { id: 'rod', kind: 'turned', axis: 'z', origin: [0.5, 0.5, 0], profile: [[0, 0], [0, 0.1], [1, 0.1], [1, 0]] };
+  for (const engine of [unit, rod]) {
+    const [overlap] = siteOverlaps([site('floor', 'van_floor', floor), site('engine', 'van_engine', engine)], GRAIN);
+    assert.ok(Math.abs(overlap.depth - (0.4 + 2 * GRAIN)) < GRAIN / 8, `${engine.kind} depth ${overlap.depth}`);
+  }
 });
 
 test('pieces of one site may overlap each other', () => {
