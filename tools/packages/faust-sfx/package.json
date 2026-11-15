@@ -1,0 +1,16 @@
+{
+  "name": "@skelly/faust-sfx",
+  "version": "0.0.0",
+  "private": true,
+  "license": "EUPL-1.2",
+  "type": "module",
+  "exports": {
+    "./batch": "./src/batch.ts",
+    "./explore": "./src/explore.ts",
+    "./faust": "./src/faust.ts",
+    "./shape": "./src/shape.ts"
+  },
+  "dependencies": {
+    "@grame/faustwasm": "0.19.6"
+  }
+}
