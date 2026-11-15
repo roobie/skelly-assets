@@ -79,16 +79,6 @@ local modes(hzs, mss, gains) = [
 local hz = [3100, 5400, 7900, 10600, 13200];
 local gains = [1, 0.8, 0.6, 0.42, 0.28];
 
-// What a surface is, and how it changes the drop: `drop` and `motion` patch the shared ones, since a soft ground
-// takes a bounce and a roll that a hard one gives back.
-local concreteBase = {
-  id: 'concrete',
-  decayScale: 1,
-  contactGain: 1,
-  hardness: 1,
-  tick: { shortMs: 3, longMs: 5, highPassHz: 3200, gain: 0.55 },
-};
-
 {
   objects: {
     // A 9 mm brass case.
@@ -106,27 +96,22 @@ local concreteBase = {
       head: { lowHz: 1100, highHz: 1900, overtone: 0, ms: 35, gain: 0.9 },
       modes: modes(hz, [440, 400, 360, 300, 250], gains),
     },
-
-    // A vial of hard glass: decay falls roughly as 1/f, every mode is one pure sine, and nearly all energy sits
-    // above 2.5 kHz.
-    glass_vial: {
-      id: 'glass_vial',
-      contactGain: 1,
-      ringGain: 1,
-      hardness: 1,
-      split: null,
-      spin: null,
-      doubleStrike: null,
-      head: null,
-      modes: modes(hz, [250, 180, 120, 80, 50], gains),
-    },
   },
 
+  // What a surface is, and how it changes the drop: `drop` and `motion` patch the shared ones, since a soft ground
+  // takes a bounce and a roll that a hard one gives back.
   surfaces: {
     // The slab under a metal case also thuds.
-    concrete: { surface: concreteBase { body: { lowHz: 600, highHz: 1900, overtone: 0, ms: 12, gain: 0.5 } } },
-    // The glass vial was approved by ear on a slab without that thud.
-    concrete_without_thud: { surface: concreteBase { body: null } },
+    concrete: {
+      surface: {
+        id: 'concrete',
+        decayScale: 1,
+        contactGain: 1,
+        hardness: 1,
+        tick: { shortMs: 3, longMs: 5, highPassHz: 3200, gain: 0.55 },
+        body: { lowHz: 600, highHz: 1900, overtone: 0, ms: 12, gain: 0.5 },
+      },
+    },
 
     // A steel plate is as hard as the slab, rings back and gives more of the bounce back.
     metal: {

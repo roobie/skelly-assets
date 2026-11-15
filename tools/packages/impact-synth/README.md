@@ -30,6 +30,5 @@ samples. See `src/synth.ts`, `renderImpact`.
 A row's `object` is what falls and its `surface` is what it lands on, each named by its id. The landing surface picks
 the sound, so a pack has one row per object and surface. A row's `seeds` are its takes: a build bakes each to its
 own file (`tools/sounds.mjs`, `bakeSounds`), and a game picks among them so repeated landings do not sound
-identical. Each ring mode is a pitch, a time to fall 60 dB and a level. Glass reads as glass because its decay falls
-roughly as 1/f, every mode is one pure sine and nearly all energy sits above 2.5 kHz; brass adds beating pairs, spin
-and a second strike that glass lacks.
+identical. Each ring mode is a pitch, a time to fall 60 dB and a level; a thin case adds beating pairs, spin and a
+second strike from its other end.

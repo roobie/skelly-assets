@@ -61,7 +61,7 @@ export const soundPackIds = (root = repo) => readdirSync(join(root, SOUNDS)).fil
 export const readSoundPacks = (root = repo) => Object.fromEntries(soundPackIds(root)
   .map((pack) => [pack, JSON.parse(readFileSync(join(root, SOUNDS, `${pack}.json`), 'utf8'))]));
 
-// Every sound row with the files it is baked to under its pack: the row itself as data, for a consumer that renders it,
+// Every sound row with the files it is baked to under its pack: the row itself as data, so a tool can render it again,
 // and one audio file per seed.
 export const readSoundRows = (root = repo) => Object.entries(readSoundPacks(root)).flatMap(([pack, rows]) => Object.entries(rows)
   .map(([id, row]) => ({
