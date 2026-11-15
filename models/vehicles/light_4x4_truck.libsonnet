@@ -7,7 +7,7 @@ local box = k.box;
 local id = 'light_4x4_truck';
 local vehicle = import 'light_4x4_truck.placements.libsonnet';
 // A compound row of this vehicle, titled with its title and the part's `label`.
-local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
+local part(suffix, label, massKg, pieces, finish, motion=null) = k.compound(id + suffix, massKg, pieces, finish, motion=motion) + { title: vehicle.title + ' ' + label };
 local finish = { boards: s.paint, floor: 'wood-pine', frame: s.framePaint, steel: 'steel-grey' };
 local sills = [s.deckRear + 0.1 + i * (s.deckFront - s.deckRear - 0.26) / 5 for i in std.range(0, 5)];
 // Steel straps binding a board's planks, evenly along it: `along` spans the board, `face` is the strap's thickness off it.
@@ -22,6 +22,7 @@ local tyreWidth = s.wheelW;
 local tyreBody = s.r - 0.035;
 local rim = 0.2286;
 local spareFace = 0.04;
+local grain = k.grain;
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.title, s) + [
   mk.wheel(id + '_wheel', s.wheelMass, tyreWidth, rim, s.r, 22, 0.035, s.paint) + { title: vehicle.title + ' wheel' },
   // Carried upright behind the cab and seen end on, so it turns about x: the mount face is x = 0 on the wheel's axis
@@ -51,14 +52,22 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.tit
     box('runner', 'frame', [s.deckRear + 0.04, s.railTop, s.railZ - 0.12], [s.deckFront, s.deckBottom - 0.0625, s.railZ]),
   ]), finish),
   // A side board hinged along its foot, so it drops outward to load from the side.
+  local dropsidePins = k.hingePins('hinge', 'x', [s.deckRear + grain, s.deckBottom, s.deckSide + 0.04 + grain], [s.deckFront - 0.05 - grain, s.deckBottom, s.deckSide + 0.04 + grain], 'frame');
+  // The board's inner face lifts off the deck's edge and the headboard as it drops, so it stands a millimetre outside
+  // them: well under half a grain, so no cell between them empties.
+  local boardIn = s.deckSide + 0.001;
   part('_dropside', 'dropside', s.dropsideMass, [
-    box('board', 'boards', [s.deckRear, s.deckBottom, s.deckSide], [s.deckFront - 0.05, s.boardTop, s.deckSide + 0.04]),
+    box('board', 'boards', [s.deckRear, s.deckBottom, boardIn], [s.deckFront - 0.05, s.boardTop, s.deckSide + 0.04]),
     box('rub', 'frame', [s.deckRear, s.boardTop - 0.04, s.deckSide + 0.04], [s.deckFront - 0.05, s.boardTop, s.deckSide + 0.05]),
-  ] + straps('strap', 4, [s.deckRear, s.deckFront - 0.05], [s.deckSide + 0.04, s.deckSide + 0.05], true),
-  finish, { hinge_a: ['board', [0.2, 0, 1]], hinge_b: ['board', [0.8, 0, 1]] }),
+  ] + straps('strap', 4, [s.deckRear, s.deckFront - 0.05], [s.deckSide + 0.04, s.deckSide + 0.05], true) + dropsidePins,
+  finish, k.motion.hinge(dropsidePins, 'near', s.boardOpen)),
   local gate = s.deckSide + 0.04;
+  // The dropsides' ends slide across the board's front face as they drop, so it stands a millimetre behind the deck:
+  // well under half a grain, so no cell between them empties.
+  local gateFront = s.deckRear - 0.001;
+  local tailgatePins = k.hingePins('hinge', 'z', [s.deckRear - 0.04 - grain, s.deckBottom, gate - grain], [s.deckRear - 0.04 - grain, s.deckBottom, -gate + grain], 'frame');
   part('_tailgate', 'tailgate', s.tailgateMass, [
-    box('board', 'boards', [s.deckRear - 0.04, s.deckBottom, -gate], [s.deckRear, s.boardTop, gate]),
+    box('board', 'boards', [s.deckRear - 0.04, s.deckBottom, -gate], [gateFront, s.boardTop, gate]),
     box('rub', 'frame', [s.deckRear - 0.05, s.boardTop - 0.04, -gate], [s.deckRear - 0.04, s.boardTop, gate]),
-  ] + straps('strap', 4, [-gate, gate], [s.deckRear - 0.05, s.deckRear - 0.04], false), finish, { hinge_a: ['board', [0, 0, 0.2]], hinge_b: ['board', [0, 0, 0.8]] }),
+  ] + straps('strap', 4, [-gate, gate], [s.deckRear - 0.05, s.deckRear - 0.04], false) + tailgatePins, finish, k.motion.hinge(tailgatePins, 'rear', s.boardOpen)),
 ])
