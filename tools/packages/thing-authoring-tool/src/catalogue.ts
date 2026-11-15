@@ -6,6 +6,7 @@ import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing
 import { MATERIALS } from '@skelly/thing-core/materials';
 import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, type StageMove, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
 import {
+  ModelPartSchema,
   ModelPointSchema,
   type Motion,
   type NeutralModel,
@@ -115,7 +116,7 @@ const PartSchema = strictObject({
    * A part id is a local name, so nothing but this declaration says which item a part is; the build refuses an id no
    * model has (`tools/partItems.mjs`).
    */
-  item: optional(name),
+  item: ModelPartSchema.entries.item,
   /**
    * The finish slots a vehicle fitting's finish repaints on this part's copy. Glass, tyres and chrome are never
    * listed, so a repaint leaves them as authored.

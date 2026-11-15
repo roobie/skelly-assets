@@ -4,6 +4,7 @@ read_if:
   - changing what a GLB records on its part or port nodes
   - adding a mount type, a size class or a standard to the parts a component meets its neighbour by
   - wondering why a component hangs from one neighbour and not another
+  - linking a part of a model to the catalogue item it is
 ---
 
 # 9. Components meet at named mount sites
