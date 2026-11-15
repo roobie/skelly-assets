@@ -5,7 +5,7 @@ local s = import 'utility_trailer.spec.libsonnet';
 local box = k.box;
 local bothSides = k.bothSides;
 local finish = { paint: s.paint, frame: 'paint-charcoal' };
-local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local grain = k.grain;
 local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain, s.deck, 0.7 * s.side], [s.rear - grain, s.deck, -0.7 * s.side], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('utility_trailer_chassis', 165, [

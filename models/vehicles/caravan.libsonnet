@@ -21,7 +21,7 @@ local wallPieces(z, stripeZ, openings, stripeSpans) =
   ];
 local finish = { paint: s.paint, stripe: s.stripe };
 local capZ = [-s.side - 0.02, s.side + 0.02];
-local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local grain = k.grain;
 local doorHeight = s.doorTop - s.floor;
 // Below the stripe and high on the door, so no pin pokes into the wall's stripe ahead of it.
 local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.floor + 0.1 * doorHeight, s.side + grain], [s.doorFront - 0.02, s.floor + 0.9 * doorHeight, s.side + grain], 'frame');

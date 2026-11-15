@@ -7,7 +7,7 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 local finish = { paint: s.paint, slat: s.slat, frame: s.frame };
 local posts = [-1.9, -1.0, -0.1, 0.8, 1.64];
-local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local grain = k.grain;
 // At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
 local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [

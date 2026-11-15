@@ -16,7 +16,7 @@ local wall(z, railZ, openings) =
   ]
   + (if std.length(openings) > 0 then [box('rub_rail_front', 'frame', [s.doorFront, s.rubRail - 0.03, railZ[0]], [s.front, s.rubRail + 0.03, railZ[1]])] else []);
 local finish = { paint: s.paint, frame: s.frame };
-local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local grain = k.grain;
 // At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
 local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
 local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.doorLow + 0.42, s.side + grain], [s.doorFront - 0.02, s.doorTop - 0.3, s.side + grain], 'frame');

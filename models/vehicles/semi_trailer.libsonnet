@@ -5,7 +5,7 @@ local box = k.box;
 local bothSides = k.bothSides;
 local axleIds = std.range(0, std.length(s.axles) - 1);
 local crossIds = std.range(0, 11);
-local grain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
+local grain = k.grain;
 // A grain behind the rear post's face, so the pins stand on it rather than sink into it.
 local rearDoorPins = k.hingePins('hinge', 'y', [s.rear - 0.02 - grain, s.floor + 0.29, s.side - 0.08], [s.rear - 0.02 - grain, s.floor + 2.39, s.side - 0.08], 'trim');
 local suspension(i) = local x = s.axles[i]; [
