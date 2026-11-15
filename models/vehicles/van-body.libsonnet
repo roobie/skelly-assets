@@ -10,7 +10,8 @@ local prism = k.prism;
 local grain = 1 / 32;
 // How far each hinged panel opens, in degrees: the stop a van's swing is checked against. A rear leaf opens square to
 // the body, so the opening it shares with its twin is clear to load through.
-local opens = { door: 65, rearDoor: 90, bonnet: 55 };// The closed wheel tub behind an arch cut: its inner wall and its roof follow the panel's five-sided opening, from
+local opens = { door: 65, rearDoor: 90, bonnet: 55 };
+// The closed wheel tub behind an arch cut: its inner wall and its roof follow the panel's five-sided opening, from
 // `inner` out to the panel at `outer`.
 local archLiner(tag, x0, x1, low, top, corner, inner, outer) = [
   prism(tag + '_side', 'pan', [[x0, low], [x1, low], [x1, top - corner], [x1 - corner, top], [x0 + corner, top], [x0, top - corner]], [inner, inner + 0.02]),
@@ -38,14 +39,14 @@ local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - 
 local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / s.aLean;
 // Where the front door starts, clear of the B pillar as it swings.
 local frontDoorRearOf(s) = s.bFront + k.doorTailGap(s.cowl - s.bFront, s.side + grain - s.skin);
-local windscreen(id, title, s) =
 // The windscreen's outer face meets the waist here and leans back by this much per metre of height.
 local screenFootOf(s) = s.aPost - 0.02;
 local screenLeanOf(s) = s.aLean / (s.cabRoof - s.waist);
+local windscreen(id, title, s) =
   local pillarAt(y) = pillarAtOf(s, y);
   local pillarY(x) = pillarYOf(s, x);
-  k.compound(id + '_windscreen', 18, [
   local foot = screenFootOf(s);
+  k.compound(id + '_windscreen', 18, [
     // Stops inside the header: glass level with the roof blends over it as dashes.
     local screenTop = s.cabRoof - 0.05;
     local topLean = screenLeanOf(s) * (screenTop - s.waist);
