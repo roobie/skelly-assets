@@ -37,7 +37,7 @@ local wheel = 'wheel_235_75r15';
   + pair('rear_wheel', wheel, [s.rearAxle, s.hub, s.wheelZ])
   + pair('door', 'technical_door')
   + pair('wing', 'technical_wing')
-  + pair('mirror', 'door_mirror', [0.62, s.waist + 0.12, s.skin])
+  + pair('mirror', 'door_mirror', [0.62, s.waist + 0.12, s.skin], rides='door')
   + pair('tail_lamp', 'tail_lamp_small', [s.rear - 0.02, 1.0, 0.76])
   + pair('headlamp', 'car_headlamp', [s.nose + 0.05, 0.78, 0.62])
   + site.batteryBay('battery_tray', [2.0, 0.76, 0.42]),

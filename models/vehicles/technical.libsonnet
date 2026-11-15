@@ -27,8 +27,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('corner', 'paint', [s.doorFront, s.floor, s.skinIn], [s.cowl, s.waist, s.skin]),
     prism('a_post', 'paint', [[0.9, s.waist], [s.cowl + 0.02, s.waist], [0.72, s.roof], [0.62, s.roof]], [s.skinIn, s.skin]),
     box('cant_rail', 'paint', [s.cabBack, s.roof - 0.06, s.skinIn], [0.72, s.roof, s.skin]),
-    box('sill_rust', 'rust', [0.02, s.sill - 0.005, s.skin], [0.6, s.floor + 0.04, s.skin + 0.01]),
+    box('sill_rust', 'rust', [0.02, s.sill - 0.005, s.skin], [0.6, s.floor, s.skin + 0.01]),
     box('corner_rust', 'rust', [s.doorFront + 0.04, s.floor + 0.02, s.skin], [s.cowl - 0.02, s.floor + 0.14, s.skin + 0.01]),
+    k.doorJamb('door_jamb', s.doorRear, [s.floor, s.roof - 0.06], s.skinIn),
   ]) + [
     box('floor', 'trim', [s.cabBack, s.floor - 0.03, -s.skinIn], [s.cowl, s.floor, s.skinIn]),
     box('tunnel', 'trim', [0.1, s.floor, -0.18], [s.cowl, s.floor + 0.18, 0.18]),
@@ -43,20 +44,28 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     prism('header', 'paint', [[0.62, s.roof - 0.06], [0.74, s.roof - 0.06], [0.74, s.roof], [0.62, s.roof]], [-s.skin, s.skin]),
     box('back_rust', 'rust', [s.cabBack - 0.01, 0.7, -0.5], [s.cabBack, 0.98, -0.18]),
   ], finish) + { title: 'Technical cab' },
+  // The door hangs on pins at its front edge's outer face and opens outboard. Its trailing edge stands off the rear
+  // post by its tail gap, closed by the cab's jamb. The quarter light straddles the pins' line, so its part ahead of
+  // them would swing inboard into the windscreen; it is the windows' own.
+  local tail = s.doorRear + k.doorTailGap(s.doorFront - s.doorRear, s.skin + k.grain - s.skinIn);
+  local top = s.roof - 0.06 - k.swingGap;
+  local pin(f) = [s.doorFront, s.floor + f * (s.waist - s.floor), s.skin + k.grain];
+  local pins = k.hingePins('hinge', 'y', pin(0.2), pin(0.8));
   k.compound('technical_door', 32, [
-    box('skin', 'paint', [s.doorRear, s.floor, s.skinIn], [s.doorFront, s.waist, s.skin]),
-    box('stile', 'paint', [s.doorRear, s.waist, s.skinIn], [s.doorRear + 0.06, s.roof - 0.06, s.skin]),
-    box('head', 'paint', [s.doorRear, s.roof - 0.12, s.skinIn], [s.windowFront, s.roof - 0.06, s.skin]),
+    box('skin', 'paint', [tail, s.floor + k.swingGap, s.skinIn], [s.doorFront, s.waist, s.skin]),
+    box('stile', 'paint', [tail, s.waist, s.skinIn], [s.doorRear + 0.06, top, s.skin]),
+    box('head', 'paint', [tail, s.roof - 0.12, s.skinIn], [s.windowFront, top, s.skin]),
     box('glass', 'glass', [s.doorRear + 0.06, s.waist, s.skinIn + 0.01], [s.windowFront, s.roof - 0.12, s.skin - 0.01]),
-    prism('quarter', 'glass', [[s.windowFront, s.waist], [0.92, s.waist], [0.68, s.roof - 0.06], [s.windowFront, s.roof - 0.06]], [s.skinIn + 0.01, s.skin - 0.01]),
     box('handle', 'dark', [s.doorRear + 0.08, s.waist - 0.1, s.skin], [s.doorRear + 0.22, s.waist - 0.06, s.skin + 0.02]),
     box('rust_low', 'rust', [s.doorRear + 0.1, s.floor + 0.02, s.skin], [s.doorFront - 0.24, s.floor + 0.14, s.skin + 0.01]),
     box('rust_patch', 'rustred', [0.32, 0.86, s.skin], [0.56, 1.02, s.skin + 0.01]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Technical door' },
+  ] + pins, finish, motion=k.motion.hinge(pins, 'near', 65)) + { title: 'Technical door' },
   k.compound('technical_windows', 22, [
     prism('windscreen', 'glass', [[0.93, s.waist], [0.97, s.waist], [0.7, s.roof - 0.04], [0.66, s.roof - 0.04]], [-s.skinIn, s.skinIn]),
     box('back_glass', 'glass', [s.cabBack + 0.01, s.waist, -0.58], [s.cabBack + 0.03, s.roof - 0.1, 0.58]),
-  ], finish) + { title: 'Technical windows' },
+  ] + bothSides([
+    prism('quarter', 'glass', [[s.windowFront, s.waist], [0.92, s.waist], [0.68, s.roof - 0.06], [s.windowFront, s.roof - 0.06]], [s.skinIn + 0.01, s.skin - 0.01]),
+  ]), finish) + { title: 'Technical windows' },
   k.compound('technical_dashboard', 11, [
     box('panel', 'trim', [s.cowl - 0.3, s.floor + 0.42, -s.skinIn], [s.cowl - 0.04, s.waist - 0.02, s.skinIn]),
     box('column', 'dark', [s.cowl - 0.33, s.floor + 0.66, -0.4], [s.cowl - 0.3, s.floor + 0.7, -0.36]),
