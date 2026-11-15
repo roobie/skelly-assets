@@ -55,10 +55,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('lower', 'paint', cockpit, [s.cockpitPane, 90])
              + wall('top', 'paint', cockpit, [s.cockpitArc, s.cockpitArc + 4], sides=120)
              + wall('front', 'paint', [cockpit[1] - 0.07, cockpit[1]], [s.cockpitArc, s.cockpitPane], step=0.07)
-             + wall('rear', 'paint', [cockpit[0], cockpit[0] + 0.12], [s.cockpitArc, s.cockpitPane], step=0.12)
-             + [h.hingeRib('hinge_rib', s.body, cockpit[1] - 0.03, s.cockpitPane, 88, slot='dark', depth=0.05)],
-             finishes,
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Military transport helicopter cockpit door' },
+             + wall('rear', 'paint', [cockpit[0], cockpit[0] + 0.12], [s.cockpitArc, s.cockpitPane], step=0.12),
+             // Static: the cabin door slides forward over it, so it could open only while the cabin door stays shut.
+             finishes) + { title: 'Military transport helicopter cockpit door' },
   k.compound('military_transport_helicopter_cabin_door', 65,
              wall('pane', 'glass', paneX, pane, step=0.45)
              + wall('lower', 'paint', door, [pane[1], 90], step=0.7)

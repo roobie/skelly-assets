@@ -183,10 +183,29 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     assert std.all([i == along || a[i] == b[i] for i in [0, 1, 2]]) : name + ' pins must lie on one line along ' + axis;
     assert a[along] != b[along] : name + ' pins must not coincide';
     [turned(name + '_' + end[0], slot, axis, disc(radius, -length / 2, length / 2), end[1]) for end in [['a', a], ['b', b]]],
+  // How far the frame facing a hinged part's free edge stands back from it, for an edge `reach` from the hinge axis
+  // along the part and an axis `depth` outboard of the part's inner face. The free inner corner swings on a circle
+  // sqrt(reach² + depth²) from the axis, wider than the frame's edge `reach` away, so a flush frame would be cut early
+  // in the swing; the frame stands off that circle by 2 mm, a real clearance rather than a graze. The gap stays under
+  // half a `grain`, so off a free edge drawn on a cell boundary it takes no cell centre and the frame shows no slot.
+  swingStandOff(reach, depth, grain=vehicleGrain):
+    local gap = std.sqrt(reach * reach + depth * depth) - reach + 0.002;
+    assert gap < grain / 2 : 'a ' + gap + ' m stand-off would open a slot at a ' + grain + ' m grain';
+    gap,
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,
   far: far,
   bothSides(pieces): std.map(near, pieces) + std.map(far, pieces),
+  // How far a hinged part's face stands off a neighbour it slides across as it swings: enough that the two never
+  // touch, and well under a grain, so it opens no empty cell.
+  swingGap: 0.001,
+  // How far a side-hung door's trailing edge stands off the post behind it, for a door `length` from its pins to that
+  // edge whose inner face lies `depth` inside them. Its inner corner swings back across the post as it opens, at most
+  // by how much further that corner lies from the pins than the edge's length.
+  doorTailGap(length, depth): std.sqrt(length * length + depth * depth) - length + self.swingGap,
+  // A lip inside the post behind a side-hung door's trailing edge, over heights `y` and a swing gap inside the face
+  // `face` the door closes against, so the gap the door needs to swing clear of the post is not a slot through the body.
+  doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - 0.03], [rear + 0.02, y[1], face - self.swingGap]),
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];

@@ -1,5 +1,6 @@
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
+local t = import 'truck-cab.libsonnet';
 local s = import 'swat_truck.spec.libsonnet';
 local vehicle = import 'swat_truck.placements.libsonnet';
 local box = k.box;
@@ -73,11 +74,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.lib
     k.prism('bar_' + i, 'steel', [[s.face + 0.01, s.waist], [s.face + 0.05, s.waist], [s.face - leanAt(windowTop) + 0.05, windowTop], [s.face - leanAt(windowTop) + 0.01, windowTop]], [screenBars[i] - 0.03, screenBars[i] + 0.03])
     for i in std.range(0, std.length(screenBars) - 1)
   ], finish) + { title: 'SWAT truck windscreen guard' },
+  // It rides the door, so it starts where the door does and stands off the pillar behind that it swings out across.
+  local guardRear = t.doorTail(s, s.doorRear, s.doorFront);
+  local guardIn = s.side + k.swingGap;
   k.compound('swat_truck_door_guard', 10, [
-    box('rail_low', 'steel', [s.doorRear, s.waist - 0.03, s.side], [s.doorFront, s.waist + 0.03, s.side + 0.04]),
-    box('rail_high', 'steel', [s.doorRear, windowTop - 0.03, s.side], [s.doorFront - leanAt(windowTop), windowTop + 0.03, s.side + 0.04]),
+    box('rail_low', 'steel', [guardRear, s.waist - 0.03, guardIn], [s.doorFront, s.waist + 0.03, s.side + 0.04]),
+    box('rail_high', 'steel', [guardRear, windowTop - 0.03, guardIn], [s.doorFront - leanAt(windowTop), windowTop + 0.03, s.side + 0.04]),
   ] + [
-    box('bar_' + i, 'steel', [doorBars[i] - 0.03, s.waist, s.side], [doorBars[i] + 0.03, windowTop, s.side + 0.04])
+    box('bar_' + i, 'steel', [doorBars[i] - 0.03, s.waist, guardIn], [doorBars[i] + 0.03, windowTop, s.side + 0.04])
     for i in std.range(0, std.length(doorBars) - 1)
   ], finish) + { title: 'SWAT truck door guard' },
   k.compound('swat_truck_ram', 240, [

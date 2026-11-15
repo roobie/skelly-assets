@@ -9,8 +9,27 @@ local finishes = { paint: s.paint, dark: s.trim, glass: 'glass-clear' };
 local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=0.0875, x=x, arc=arc, step=step, sides=sides, square=square);
 // A wall step this long reaches past the constant cabin into the tapers, which would thicken it inward, so its stations stop at the cabin.
 local cabin = [s.body[4] + { x: s.floorRear }, s.body[4] + { x: 5.5 }];
-local cabinWall(id, arc, sides=32) = h.shell(id, 'paint', cabin, thick=0.0875, x=[s.floorRear, s.door[0]], arc=arc, step=10.9, sides=sides, square=square);
+local plate = [s.floorFront - 0.12, s.floorFront - 0.04];
+// The cabin's walls end inside the bulkhead plate, which closes the side between them and the crew door's hinge.
+local cabinWall(id, arc, sides=32) = h.shell(id, 'paint', cabin, thick=0.0875, x=[s.floorRear, (plate[0] + plate[1]) / 2], arc=arc, step=10.9, sides=sides, square=square);
 local door = s.door;
+local doorHinge = door[0] + h.leadGap;
+local doorPins = h.edgePins(s.body, doorHinge, 'dark', square=square);
+local doorWaist = h.waist(s.body, door, square);
+local doorEdge = h.trailingEdge(s.body, door[1], [s.doorArc + h.seam, doorWaist], h.edgeAxis(s.body, doorHinge, square), 0.04, thick=0.0875, sides=32, square=square);
+// The ramp is laid out lowered, its lip on the ground, and drawn raised shut about the floor's rear edge, so opening
+// lowers it back onto the ground.
+local rampHinge = [s.floorRear, s.floorTop];
+local raised(p) =
+  local a = k.rad(s.rampOpens);
+  local u = p[0] - rampHinge[0];
+  local v = p[1] - rampHinge[1];
+  [rampHinge[0] + u * std.cos(a) + v * std.sin(a), rampHinge[1] - u * std.sin(a) + v * std.cos(a)];
+// Narrow enough that the ramp swings inside the tail flanks, which curve in toward the tail.
+local rampHalf = 1.43;
+local rampPins = k.hingePins('hinge', 'z', rampHinge + [-rampHalf - k.grain], rampHinge + [rampHalf + k.grain], 'dark');
+// The deck stops short of the knuckle and pins, which turn about its rear edge.
+local deckRear = s.floorRear + k.grain + 0.002;
 local paneArc = s.doorPane;
 local paneX = s.doorPaneX;
 local e = s.engine;
@@ -39,7 +58,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + h.loft('middle', 'paint', s.body, x=[s.floorRear, 5.5], arc=[90, 270], step=11.5, sides=32, square=square),
              finishes) + { title: 'Heavy cargo helicopter belly' },
   k.compound('heavy_cargo_helicopter_load_floor', 620, [
-    box('deck', 'deck', [s.floorRear, s.floorBase, -s.floorHalf], [s.floorFront, s.floorTop, s.floorHalf]),
+    box('deck', 'deck', [deckRear, s.floorBase, -s.floorHalf], [s.floorFront, s.floorTop, s.floorHalf]),
   ], { deck: 'steel-grey' }) + { title: 'Heavy cargo helicopter load floor' },
   k.compound('heavy_cargo_helicopter_fuselage', 1500,
              cabinWall('side_near', [20, 90])
@@ -47,6 +66,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + cabinWall('roof', [-20, 20], sides=48)
              + wall('door_roof', 'paint', door, [-s.doorArc, s.doorArc], step=0.19)
              + wall('cockpit_wall', 'paint', [door[1], s.windscreen[0]], h.dome, step=0.14)
+             + doorEdge.post('door_lip', 'paint')
              + wall('screen_post', 'paint', s.windscreen, [-3, 3], sides=120)
              + wall('screen_sill_near', 'paint', s.windscreen, [s.screenArc, 90])
              + wall('screen_sill_far', 'paint', s.windscreen, [-90, -s.screenArc])
@@ -54,34 +74,38 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              finishes) + { title: 'Heavy cargo helicopter fuselage' },
   k.compound('heavy_cargo_helicopter_tail_section', 700,
              wall('wall', 'paint', [s.tail, s.floorRear], h.dome, step=0.09)
+             // The flanks below the waist close the side under the shut ramp; they end while still outboard of the
+             // ramp's sides, which swing down between them.
+             + wall('flank_near', 'paint', [s.tail, s.floorRear], [90, 120], step=0.09)
+             + wall('flank_far', 'paint', [s.tail, s.floorRear], [-120, -90], step=0.09)
              + h.loft('lintel', 'paint', [
                { x: s.tail + 0.08, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
                { x: s.tail, top: 3.78, bottom: 3.0, half: 1.62, waist: 3.0 },
              ], arc=h.dome, step=0.08, sides=32, square=square),
              finishes) + { title: 'Heavy cargo helicopter tail section' },
   k.compound('heavy_cargo_helicopter_cockpit_bulkhead', 70,
-             h.loft('plate', 'dark', s.body, x=[s.floorFront - 0.12, s.floorFront - 0.04], arc=h.dome, step=0.08, sides=32, square=square),
+             h.loft('plate', 'dark', s.body, x=plate, arc=h.dome, step=0.08, sides=32, square=square),
              finishes) + { title: 'Heavy cargo helicopter cockpit bulkhead' },
   k.compound('heavy_cargo_helicopter_ramp', 280, [
-    k.prism('deck', 'dark', [[s.rampTip, 0], [s.rampTip + 0.1, 0], [s.floorRear, s.floorTop - 0.09], [s.floorRear, s.floorTop]], [-1.45, 1.45]),
-    box('hinge_bar', 'dark', [s.floorRear - 0.06, s.floorTop - 0.12, -1.45], [s.floorRear + 0.02, s.floorTop, 1.45]),
+    k.prism('deck', 'dark', std.map(raised, [[s.rampTip, 0], [s.rampTip + 0.1, 0], [s.floorRear, s.floorTop - 0.09], [s.floorRear, s.floorTop]]), [-rampHalf, rampHalf]),
+    // Round about the pins' axis, so it closes the seam at the floor's rear edge in every pose of the swing.
+    k.turned('knuckle', 'dark', 'z', k.disc(k.grain, -rampHalf, rampHalf), rampHinge + [0]),
   ] + k.bothSides([
-    k.bar('side', 'paint', [s.rampTip + 0.02, 0.1], [s.floorRear, s.floorTop + 0.1], 0.1, [1.35, 1.45]),
-  ]), finishes, { hinge_a: ['hinge_bar', [0.5, 0.5, 0.1]], hinge_b: ['hinge_bar', [0.5, 0.5, 0.9]] }) + { title: 'Heavy cargo helicopter ramp' },
+    k.bar('side', 'paint', raised([s.rampTip + 0.02, 0.1]), raised([s.floorRear, s.floorTop + 0.1]), 0.1, [rampHalf - 0.1, rampHalf]),
+  ]) + rampPins, finishes, motion=k.motion.hinge(rampPins, 'down', s.rampOpens)) + { title: 'Heavy cargo helicopter ramp' },
   k.compound('heavy_cargo_helicopter_windscreen', 60,
              wall('near', 'glass', s.windscreen, [3, s.screenArc])
              + wall('far', 'glass', s.windscreen, [-s.screenArc, -3]),
              finishes) + { title: 'Heavy cargo helicopter windscreen' },
   k.compound('heavy_cargo_helicopter_crew_door', 40,
-             wall('pane', 'glass', paneX, paneArc, step=0.13)
-             + wall('lower', 'paint', door, [paneArc[1], 90], step=0.19)
-             + wall('upper', 'paint', door, [s.doorArc, paneArc[0]], step=0.19)
-             + wall('fore', 'paint', [paneX[1], door[1]], paneArc, step=0.15)
-             + wall('aft', 'paint', [door[0], paneX[0]], paneArc, step=0.15)
-             + wall('edge', 'dark', [door[1] - 0.04, door[1]], [s.doorArc, 90], step=0.04)
-             + [h.hingeRib('hinge_rib', s.body, door[0] + 0.03, 66, 86, slot='dark', depth=0.05, square=square)],
+             wall('pane', 'glass', [paneX[0], doorEdge.end], paneArc, step=0.13)
+             + wall('lower', 'paint', [doorHinge, doorEdge.end], [paneArc[1], doorWaist], step=0.19)
+             + wall('upper', 'paint', [doorHinge, doorEdge.end], [s.doorArc + h.seam, paneArc[0]], step=0.19)
+             + wall('aft', 'paint', [doorHinge, paneX[0]], paneArc, step=0.15)
+             + doorEdge.door('edge', 'dark')
+             + doorPins,
              finishes,
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Heavy cargo helicopter crew door' },
+             motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: 'Heavy cargo helicopter crew door' },
   k.compound('heavy_cargo_helicopter_cabin_windows', 12,
              std.flattenArrays([
                [box('pane_' + x, 'glass', [x, 2.3, 1.7], [x + 0.5, 2.8, 1.85]), box('frame_' + x, 'dark', [x - 0.04, 2.26, 1.7], [x + 0.54, 2.84, 1.83])]

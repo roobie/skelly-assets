@@ -58,14 +58,19 @@ local periscope(c, p) = {
   ],
   finish: { steel: steel, glass: 'glass-grey' },
 };
-// Lies on the roof, the origin under the lid's centre, hinged at its rear.
+// Lies on the roof, the origin under the lid's centre, hinged at its rear. Its pins stand at the hinge's top rear
+// corner, so the whole lid lies ahead of and below them and never dips under the roof as it swings.
 local hatch(c, h) = {
+  local back = -h.radius - 0.04,
+  local top = h.thickness + 0.03,
+  local pins = k.hingePins('hinge_pin', 'z', [back, top, -0.1], [back, top, 0.1], 'steel'),
   pieces: [
     round(k.turned('lid', 'paint', 'y', k.disc(h.radius, 0, h.thickness))),
-    box('hinge', 'steel', [-h.radius - 0.04, 0, -0.1], [-h.radius + 0.02, h.thickness + 0.03, 0.1]),
+    box('hinge', 'steel', [back, 0, -0.1], [-h.radius + 0.02, top, 0.1]),
     box('handle', 'steel', [h.radius * 0.3, h.thickness, -0.06], [h.radius * 0.3 + 0.03, h.thickness + 0.03, 0.06]),
-  ],
+  ] + pins,
   finish: { paint: c.paint, steel: steel },
+  motion: k.motion.hinge(pins, 'up', h.open),
 };
 // Stands on its foot, the origin under the foot's centre, the tube raised forward by its elevation; the tube's lower
 // rear edge rests on the foot.

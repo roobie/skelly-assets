@@ -53,7 +53,11 @@ local innerWall(s) = s.wall - s.armour.lowerWall;
 local sprocketOf(s) = [w for w in tracks[s.track].wheels if w.key == 'sprocket'][0];
 // The turret's frame stands on the ring.
 local turretAt(s) = [s.turretX, s.roofTop + s.ring.height, 0];
-// As the APC's: far enough ahead of the driver's hatch that the periscopes clear its lid.
+// The driver's hatch: its lid's half-width as the APC's hatch, its hinge post's side and height, how far it swings
+// aside in degrees, so the lid lies clear beside its opening, and its lid's headroom under the turret, a real
+// clearance rather than a graze.
+local driverHatch = { massKg: 25, half: 0.3, post: 0.06, postTop: 0.12, open: 90, headroom: k.grain / 4 };
+// Far enough ahead of the driver's hatch that the periscopes clear its lid and hinge pins.
 local periscopeAhead = 0.42;
 local periscopeReach = 0.12;
 // `headlamp_military`'s bowl reaches this far behind its origin, where the glacis under it is highest, and
@@ -141,6 +145,24 @@ local rows(s, title) =
       box('rack', 'steel', [r.x[0], floorTop(s), r.z[0]], [r.x[1], r.top, r.z[1]]),
       box('door', 'paint', [r.x[0] + 0.05, floorTop(s) + 0.1, r.z[1]], [r.x[1] - 0.05, r.top - 0.05, r.z[1] + 0.03]),
     ], paint + { steel: 'steel-grey' }) + { title: title + ' ammo rack' },
+    // The driver's hatch, its origin under the lid's centre on the roof. It swings aside level on a post at its front
+    // far corner, as a tank's does, since the gun and the turret's front stand over it and leave a raised lid no room:
+    // the lid then turns only behind and outboard of the post, away from the periscopes ahead of it. The handle stands
+    // near the post, so the arc it sweeps stays ahead of the turret's overhang, where only the flat lid passes under
+    // the turret, which stands on the ring: the lid is thinner than the ring is high by `headroom`.
+    local h = driverHatch;
+    local post = h.half - h.post;
+    local thickness = s.ring.height - h.headroom;
+    // The pins stand in the post, a pin's radius behind the lid's front edge, so they reach no further forward than
+    // the lid does.
+    local pinRadius = k.grain;
+    local pinX = h.half - pinRadius;
+    local pins = k.hingePins('hinge_pin', 'y', [pinX, k.grain, -h.half], [pinX, h.postTop - k.grain, -h.half], 'steel', pinRadius);
+    k.compound(s.id + '_driver_hatch', h.massKg, [
+      box('lid', 'paint', [-h.half, 0, -h.half], [h.half, thickness, h.half]),
+      box('post', 'steel', [post, 0, -h.half], [h.half, h.postTop, -post]),
+      box('handle', 'steel', [post - 0.12, thickness, -h.half + 0.1], [post - 0.06, thickness + 0.04, 0]),
+    ] + pins, paint + { steel: steel }, motion=k.motion.hinge(pins, 'far', h.open)) + { title: title + ' driver hatch' },
     // A cross-drive automatic gearbox and steering unit standing on the floor, its output shafts on the drive sprockets'
     // axis out to the hull's walls, where the final drives take them on: the origin is on that axis, so the sprockets'
     // axle places it, and the case's middle stands `offset` along x from it, clear of the glacis.
@@ -165,7 +187,7 @@ local sites(s) =
   + engine.sites(s.engine, [s.engineX, floor, s.engineZ], 'assembly') + [
     one('radiator', engine.radiator(s.engine), [s.radiatorX, floor, s.radiatorZ]),
     one('transmission', s.id + '_transmission', [sprocket.at[0], sprocket.at[1], 0]),
-    one('driver_hatch', 'apc_hatch', [s.hatchX, s.roofTop, s.driverZ]),
+    one('driver_hatch', s.id + '_driver_hatch', [s.hatchX, s.roofTop, s.driverZ]),
     one('driver_seat', 'front_seat', [s.driverX, floor, s.driverZ]),
     one('ammo_rack', s.id + '_ammo_rack'),
   ] + [

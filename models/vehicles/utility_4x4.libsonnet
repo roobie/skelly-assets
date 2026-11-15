@@ -9,21 +9,39 @@ local shape = (import 'car-shape.libsonnet')(s);
 local lean = shape.tumble;
 local rect(x0, x1, y0, y1) = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
 local finish = { paint: 'paint-olive', plate: 'paint-olive', frame: 'steel-parkerized', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear' };
-local door(id, x0, x1, screenFront, windowFront) =
+// A side door from `x0` back to `x1` at its front, where it hangs on pins a voxel outside `face`, the outer face of the
+// body ahead, carried on leaves off its skin, and opens outboard. Its trailing edge stands off the post behind by the
+// tail gap its leaning top band needs, which the hull's jamb closes below the waist.
+local door(id, x0, x1, screenFront, windowFront, face) =
+  local pinZ = face + k.grain;
+  local tail = x0 + k.doorTailGap(x1 - x0, pinZ - (s.skinIn - lean));
+  local top = s.roof - 0.06 - k.swingGap;
+  local pinY = [s.floor + f * (s.waist - s.floor) for f in [0.2, 0.8]];
+  local pins = k.hingePins('hinge', 'y', [x1, pinY[0], pinZ], [x1, pinY[1], pinZ], 'dark');
   local bolts = [[x0 + 0.1, 0.76], [x0 + 0.1, 1.16], [x1 - 0.1, 0.76], [x1 - 0.1, 1.16]];
   k.compound(id, 110, [
-    box('skin', 'paint', [x0, s.floor, s.skinIn], [x1, s.waist, s.skin]),
+    box('skin', 'paint', [tail, s.floor + k.swingGap, s.skinIn], [x1, s.waist, s.skin]),
     box('plate', 'plate', [x0 + 0.05, s.floor + 0.08, s.skin], [x1 - 0.05, s.waist - 0.06, s.skin + 0.02]),
     box('handle', 'dark', [x0 + 0.08, s.waist - 0.2, s.skin + 0.02], [x0 + 0.24, s.waist - 0.14, s.skin + 0.04]),
-  ] + shape.side('window_sill', 'paint', rect(x0, screenFront, s.waist, s.waist + 0.08), [s.skinIn, s.skin])
-  + shape.side('stile_rear', 'paint', rect(x0, x0 + 0.08, s.waist + 0.08, s.roof - 0.06), [s.skinIn, s.skin])
-  + shape.side('stile_front', 'paint', rect(windowFront, screenFront, s.waist + 0.08, s.roof - 0.06), [s.skinIn, s.skin])
-  + shape.side('head', 'paint', rect(x0, screenFront, s.roof - 0.14, s.roof - 0.06), [s.skinIn, s.skin])
+  ] + shape.side('window_sill', 'paint', rect(tail, screenFront, s.waist, s.waist + 0.08), [s.skinIn, s.skin])
+  + shape.side('stile_rear', 'paint', rect(tail, x0 + 0.08, s.waist + 0.08, top), [s.skinIn, s.skin])
+  + shape.side('stile_front', 'paint', rect(windowFront, screenFront, s.waist + 0.08, top), [s.skinIn, s.skin])
+  + shape.side('head', 'paint', rect(tail, screenFront, s.roof - 0.14, top), [s.skinIn, s.skin])
   + shape.side('glass', 'glass', rect(x0 + 0.08, windowFront, s.waist + 0.08, s.roof - 0.14), [s.skinIn + 0.01, s.skin - 0.01])
   + [
     box('bolt_' + i, 'dark', [bolts[i][0] - 0.02, bolts[i][1] - 0.02, s.skin + 0.02], [bolts[i][0] + 0.02, bolts[i][1] + 0.02, s.skin + 0.03])
     for i in std.range(0, 3)
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] });
+  ] + [
+    box('leaf_' + i, 'dark', [x1 - 0.05, pinY[i] - 0.04, s.skin], [x1, pinY[i] + 0.04, pinZ])
+    for i in [0, 1]
+  ] + pins, finish, motion=k.motion.hinge(pins, 'near', 65));
+// The lips a `door` from `rear` closes its trailing edge against: below the waist inside the skin, above it inside the
+// frame's deepest lean, so the door's tail gap is not a slot through the body at any height. One block above the waist
+// rather than a lean band per step, because each band's top corner meets the band above it on the door.
+local doorJambs(name, rear) = [
+  k.doorJamb(name, rear, [s.floor, s.waist - k.swingGap], s.skinIn),
+  k.doorJamb(name + '_head', rear, [s.waist, s.roof - 0.06], s.skinIn - lean),
+];
 local tyre = [[-0.15, 0.22], [-0.15, 0.42], [-0.126, s.hub], [0.126, s.hub], [0.15, 0.42], [0.15, 0.22], [-0.15, 0.22]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('utility_4x4_wheel', 45, [
@@ -63,6 +81,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     + shape.side('rear_post_head', 'paint', rect(s.cabBack, s.cabBack + 0.08, s.waist, s.roof), [s.skinIn, s.skin])
     + shape.side('centre_post_head', 'paint', rect(-0.06, -0.02, s.waist, s.roof), [s.skinIn, s.skin])
     + shape.side('a_post', 'paint', rect(s.cabFront - 0.06, s.cabFront + 0.02, s.waist, s.roof), [s.skinIn, s.skin])
+    + doorJambs('rear_door_jamb', s.cabBack + 0.08)
+    + doorJambs('front_door_jamb', -0.02)
   ) + [
     box('floor', 'trim', [s.cabBack, s.floor - 0.04, -s.skinIn], [s.hoodBack, s.floor, s.skinIn]),
     box('tunnel', 'trim', [s.cabBack + 0.1, s.floor, -0.22], [s.hoodBack, s.floor + 0.26, 0.22]),
@@ -70,7 +90,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('roof', 'paint', [s.cabBack - 0.03, s.roof, lean - s.skin - 0.02], [s.cabFront + 0.06, s.roof + 0.06, s.skin + 0.02 - lean]),
     box('roof_rib_a', 'paint', [s.cabBack + 0.14, s.roof + 0.06, lean - s.skin + 0.04], [s.cabBack + 0.2, s.roof + 0.08, s.skin - 0.04 - lean]),
     box('roof_rib_b', 'paint', [s.cabFront - 0.2, s.roof + 0.06, lean - s.skin + 0.04], [s.cabFront - 0.14, s.roof + 0.08, s.skin - 0.04 - lean]),
-    box('scuttle', 'paint', [s.cabFront + 0.02, s.floor, -s.skin], [s.hoodBack, s.waist, s.skin]),
+    box('scuttle', 'paint', [s.cabFront + 0.02, s.floor, -s.skinIn], [s.hoodBack, s.waist, s.skinIn]),
     box('windscreen_post', 'paint', [s.cabFront - 0.06, s.waist, -0.04], [s.cabFront + 0.02, s.roof - 0.08, 0.04]),
     prism('rear_deck', 'paint', [[s.rear, s.rearPanelTop], [s.cabBack, s.waist], [s.cabBack, s.waist + 0.04], [s.rear, s.rearPanelTop + 0.04]], [-s.side, s.side]),
     box('rear_wall', 'paint', [s.rear, s.sill, -s.side], [s.rear + 0.04, s.rearPanelTop, s.side]),
@@ -97,8 +117,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('stay', 'frame', [s.nose + 0.02, 1.0, 0.7], [s.frontBumper - 0.05, 1.04, 0.74]),
     box('tow_eye', 'dark', [s.frontBumper, 0.6, 0.86], [s.frontBumper + 0.04, 0.68, 0.92]),
   ]), finish) + { title: 'Utility 4x4 guard' },
-  door('utility_4x4_front_door', -0.02, s.hoodBack, s.cabFront - 0.06, s.cabFront - 0.14) + { title: 'Utility 4x4 front door' },
-  door('utility_4x4_rear_door', s.cabBack + 0.08, -0.06, -0.06, -0.14) + { title: 'Utility 4x4 rear door' },
+  door('utility_4x4_front_door', -0.02, s.hoodBack, s.cabFront - 0.06, s.cabFront - 0.14, s.side) + { title: 'Utility 4x4 front door' },
+  door('utility_4x4_rear_door', s.cabBack + 0.08, -0.06, -0.06, -0.14, s.skin) + { title: 'Utility 4x4 rear door' },
   k.compound('utility_4x4_windscreen', 30, [
   ] + bothSides(shape.band('glass', 'glass', rect(s.cabFront - 0.03, s.cabFront, s.waist, s.roof - 0.08), function(inset) [0.04, s.skinIn - inset])), finish) + { title: 'Utility 4x4 windscreen' },
   k.compound('utility_4x4_dashboard', 16, [
