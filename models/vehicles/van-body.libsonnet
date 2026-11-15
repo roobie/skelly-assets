@@ -2,7 +2,9 @@
 // `cab` holds the cab's measures, which every van here shares, so a sibling states only its body.
 // `s.box` puts a separate, wider box on the cab in place of the welded body. `s.bands` paints strips along the sides.
 // `s.rearShutter` makes the rear opening one roll-up door. `s.rearWheel`, `s.rearWheelZ` and `s.rearTubIn` stand wider
-// rear wheels under a box; `windowSill` raises a body's glass above its waist.
+// rear wheels under a box; `windowSill` raises a body's glass above its waist. `s.box.hatches` cuts openings of one
+// `size` through both of a box's side walls, at each of its rear lower `corners`, for side-hung hatches the vehicle
+// draws itself: each gets the lip a hung door's trailing edge needs behind it.
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -33,6 +35,8 @@ local cab = {
   driverZ: -0.5,
 };
 local tailOf(s) = s.rear + 0.08;
+// The inner face of a body's side wall, the deeper of the lower panel's and the glass line's: what a jamb lies behind.
+local wallInOf(b) = std.min(b.skin, b.glassIn);
 local noseOf(s) = s.front - 0.08;
 // The rear edge of the A pillar at height y, and the height where it crosses x.
 local pillarAtOf(s, y) = s.aPost - 0.1 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
@@ -132,8 +136,32 @@ local pressings(id, title, s0) = {
   ]),
   // A floor's 2 cm rounds to one vertex grain, so a pan closer than two grains would meet its top face and z-fight.
   local panTop = b.floor - 0.04,
+  local wallIn = wallInOf(b),
+  // Each hatch opening as [x0, x1, y0, y1] on the near side; a far-side wall piece cuts the same span.
+  local hatches = std.get(b, 'hatches', { size: [0, 0], corners: [] }),
+  local openings = [[c[0], c[0] + hatches.size[0], c[1], c[1] + hatches.size[1]] for c in hatches.corners],
+  // A side-wall box with the openings it crosses cut out: split into strips at their sills and heads, and each strip
+  // into the spans between the openings that cross it.
+  local pierced(piece) =
+    local inWall = piece.kind == 'box' && (piece.min[2] >= wallIn || piece.max[2] <= -wallIn);
+    local lo = piece.min;
+    local hi = piece.max;
+    local crossing = [o for o in openings if inWall && o[0] < hi[0] && o[1] > lo[0] && o[2] < hi[1] && o[3] > lo[1]];
+    if std.length(crossing) == 0 then [piece]
+    else
+      local ys = std.set([lo[1], hi[1]] + [std.clamp(y, lo[1], hi[1]) for o in crossing for y in [o[2], o[3]]]);
+      std.flattenArrays([
+        local spans = std.sort([o for o in crossing if o[2] <= ys[i] && o[3] >= ys[i + 1]], function(o) o[0]);
+        local xs = [lo[0]] + std.flattenArrays([[std.max(o[0], lo[0]), std.min(o[1], hi[0])] for o in spans]) + [hi[0]];
+        [
+          piece { id: piece.id + '_' + i + '_' + j, min: [xs[2 * j], ys[i], lo[2]], max: [xs[2 * j + 1], ys[i + 1], hi[2]] }
+          for j in std.range(0, std.length(xs) / 2 - 1)
+          if xs[2 * j + 1] > xs[2 * j]
+        ]
+        for i in std.range(0, std.length(ys) - 2)
+      ]),
   // Everything behind the cab: walls, floor, roof and rear frame, shared by a welded body and a separate box.
-  local bodyPieces = [
+  local bodyPieces = std.flatMap(pierced, [
     box('pan_front', 'pan', [s.rearAxle + s.arch, b.panLow, -b.skin], [bodyFront, panTop, b.skin]),
     box('pan_axle', 'pan', [s.rearAxle - s.arch, b.panLow, -rearTubIn], [s.rearAxle + s.arch, panTop, rearTubIn]),
     box('pan_rear', 'pan', [tail + 0.06, b.panLow, -b.skin], [s.rearAxle - s.arch, panTop, b.skin]),
@@ -156,11 +184,12 @@ local pressings(id, title, s0) = {
   + std.map(k.near, upper('upper', tail, s.slideRear, rearWindows) + [
     box('over_door', 'paint', [s.slideRear, b.doorTop, b.glassIn], [bodyFront, b.canton, b.glassOut]),
   ] + (if s.sideDoorSlides then [box('slide_rail', 'pan', [s.slideRear - slideTravel, b.waist - 0.04, b.side], [s.slideRear, b.waist - 0.01, b.skin + s.slidePlug])]
-       else [k.doorJamb('side_door_jamb', s.slideRear, [b.sill, b.doorTop], std.min(b.skin, b.glassIn))])
+       else [k.doorJamb('side_door_jamb', s.slideRear, [b.sill, b.doorTop], wallIn)])
   + (if slideFront < bodyFront then [box('front_upper', 'paint', [slideFront, b.waist, b.glassIn], [bodyFront, b.doorTop, b.glassOut])] else []))
   + std.map(k.far, [wall('wall_mid', [s.slideRear, bodyFront], [b.sill, b.waist])]
     + bands('wall_mid', [s.slideRear, bodyFront], b.side)
-    + upper('upper', tail, bodyFront, b.windows)),
+    + upper('upper', tail, bodyFront, b.windows)))
+  + k.bothSides([k.doorJamb('hatch_jamb' + i, openings[i][0], [openings[i][2], openings[i][3]], wallIn) for i in std.range(0, std.length(openings) - 1)]),
   // Closes the cab's rear without passing the chamfered roof edge.
   local cabEnd = [[s.floor, -s.skin], [s.canton, -s.skin], [s.roof - 0.05, -s.roofSide], [s.roof - 0.05, s.roofSide], [s.canton, s.skin], [s.floor, s.skin]],
   // The cab: floor, firewall, pillars, roof over the seats, and the front arches' tubs.
@@ -353,6 +382,7 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
   rows: rows,
   tail: tailOf,
   nose: noseOf,
+  wallIn: wallInOf,
   pillarAt: pillarAtOf,
   pillarY: pillarYOf,
   frontDoorRear: frontDoorRearOf,
