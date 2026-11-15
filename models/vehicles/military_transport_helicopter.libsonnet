@@ -9,13 +9,22 @@ local skinThick = 0.075;
 local wall(id, slot, x, arc, step=0.125, sides=32) = h.shell(id, slot, s.body, thick=skinThick, x=x, arc=arc, step=step, sides=sides);
 local door = s.cabinDoor;
 local doorTravel = door[1] - door[0];
-// The door runs on a sill rail at the waist, where the section is widest, so a rail grown sideways by the plug meets the
-// plugged door's inner face square on and stays clear of the engines on the roof.
+// The door stands a swing gap off the walls fore and aft, the kit's seam below the roof and the waist gap above
+// the belly, and it plugs out clear of all of them.
+local doorX = [door[0] + k.swingGap, door[1] - k.swingGap];
+local doorArc = [s.cabinArc + h.seam, h.waist(s.body, door)];
+// The door runs on a sill rail at the waist, where the section is widest, so a rail grown sideways by the plug lies
+// under the plugged door's inner face and stays clear of the engines on the roof.
 local railed = [station + { half: station.half + s.cabinDoorPlug - skinThick } for station in s.body];
-local rail(id, arc) = h.shell(id, 'dark', railed, thick=s.cabinDoorPlug - skinThick, x=[door[0], door[1] + doorTravel], arc=arc, step=0.9, sides=120);
+local rail(id, arc) = h.shell(id, 'dark', railed, thick=s.cabinDoorPlug - skinThick, x=[door[0] - doorTravel, door[1]], arc=arc, step=0.9, sides=120);
 local pane = s.cabinPane;
 local paneX = s.cabinPaneX;
 local cockpit = s.cockpitDoor;
+// The roof narrows toward the nose so steeply that its slices step most of the kit's seam over the door's head.
+local cockpitHead = s.cockpitArc + 0.5;
+local cockpitDoor = h.frontHinged(s.body, cockpit[0], cockpit[1], [cockpitHead, h.waist(s.body, cockpit)], bow=0, thick=skinThick);
+local cockpitPins = cockpitDoor.pins('dark');
+local cockpitFrame = 0.07;
 local gun = s.gunWindow;
 local gunArc = s.gunWindowArc;
 local e = s.engine;
@@ -28,7 +37,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + rail('rail_far', [267, 270]),
              finishes) + { title: 'Military transport helicopter belly' },
   k.compound('military_transport_helicopter_tail_cone', 160,
-             wall('wall', 'paint', [s.tailEnd, s.bulkhead], [-180, 180], sides=24)
+             // Split where the full section ends, so no slice of the wall spans both the full section and the taper.
+             wall('wall', 'paint', [s.tailEnd, s.sectionEnd], [-180, 180], sides=24)
+             + wall('stowage', 'paint', [s.sectionEnd, s.bulkhead], [-180, 180], sides=24)
              + h.loft('cap', 'paint', s.body, x=[s.tailEnd, s.tailEnd + 0.06], step=0.06, sides=24),
              finishes) + { title: 'Military transport helicopter tail cone' },
   k.compound('military_transport_helicopter_roof', 260,
@@ -37,6 +48,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('screen_sill_near', 'paint', s.windscreen, [s.windscreenArc, 90])
              + wall('screen_sill_far', 'paint', s.windscreen, [-90, -s.windscreenArc])
              + wall('cockpit_roof', 'paint', cockpit, [-s.cockpitArc, s.cockpitArc])
+             + cockpitDoor.post('cockpit_lip', 'paint')
              + wall('pillar_front', 'paint', [gun[1], cockpit[0]], h.dome, step=0.2)
              + wall('pillar_rear', 'paint', [door[1], gun[0]], h.dome, step=0.2)
              + wall('gun_roof', 'paint', gun, [-gunArc[0], gunArc[0]], step=0.7)
@@ -51,24 +63,25 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + wall('far', 'glass', s.windscreen, [-s.windscreenArc, -3]),
              finishes) + { title: 'Military transport helicopter windscreen' },
   k.compound('military_transport_helicopter_cockpit_door', 28,
-             wall('pane', 'glass', [cockpit[0] + 0.12, cockpit[1] - 0.07], [s.cockpitArc + 4, s.cockpitPane])
-             + wall('lower', 'paint', cockpit, [s.cockpitPane, 90])
-             + wall('top', 'paint', cockpit, [s.cockpitArc, s.cockpitArc + 4], sides=120)
-             + wall('front', 'paint', [cockpit[1] - 0.07, cockpit[1]], [s.cockpitArc, s.cockpitPane], step=0.07)
-             + wall('rear', 'paint', [cockpit[0], cockpit[0] + 0.12], [s.cockpitArc, s.cockpitPane], step=0.12),
-             // Static: the cabin door slides forward over it, so it could open only while the cabin door stays shut.
-             finishes) + { title: 'Military transport helicopter cockpit door' },
+             wall('pane', 'glass', [cockpitDoor.end, cockpitDoor.rest[1] - cockpitFrame], [s.cockpitArc + 4, s.cockpitPane])
+             + wall('lower', 'paint', cockpitDoor.rest, [s.cockpitPane, h.waist(s.body, cockpit)])
+             + wall('top', 'paint', cockpitDoor.rest, [cockpitHead, s.cockpitArc + 4], sides=120)
+             + wall('front', 'paint', [cockpitDoor.rest[1] - cockpitFrame, cockpitDoor.rest[1]], [s.cockpitArc + 4, s.cockpitPane], step=cockpitFrame)
+             + cockpitDoor.door('trail', 'paint')
+             + cockpitPins,
+             finishes,
+             motion=k.motion.hinge(cockpitPins, 'near', s.cockpitDoorOpens)) + { title: 'Military transport helicopter cockpit door' },
   k.compound('military_transport_helicopter_cabin_door', 65,
              wall('pane', 'glass', paneX, pane, step=0.45)
-             + wall('lower', 'paint', door, [pane[1], 90], step=0.7)
-             + wall('upper', 'paint', door, [s.cabinArc, pane[0]], step=0.7)
-             + wall('fore', 'paint', [paneX[1], door[1]], pane, step=0.6)
-             + wall('aft', 'paint', [door[0], paneX[0]], pane, step=0.6)
-             + wall('edge_fore', 'dark', [door[1] - 0.04, door[1]], [s.cabinArc, 90], step=0.04)
-             + wall('edge_aft', 'dark', [door[0], door[0] + 0.04], [s.cabinArc, 90], step=0.04),
+             + wall('lower', 'paint', doorX, [pane[1], doorArc[1]], step=0.7)
+             + wall('upper', 'paint', doorX, [doorArc[0], pane[0]], step=0.7)
+             + wall('fore', 'paint', [paneX[1], doorX[1]], pane, step=0.6)
+             + wall('aft', 'paint', [doorX[0], paneX[0]], pane, step=0.6)
+             + wall('edge_fore', 'dark', [doorX[1] - 0.04, doorX[1]], doorArc, step=0.04)
+             + wall('edge_aft', 'dark', [doorX[0], doorX[0] + 0.04], doorArc, step=0.04),
              finishes,
-             // Forward, where the cabin's section runs on unchanged, rather than aft into the narrowing tail.
-             motion=k.motion.slide('near', s.cabinDoorPlug) + k.motion.slide('fore', doorTravel)) + { title: 'Military transport helicopter cabin door' },
+             // Aft, as on aircraft of its class, so it leaves the cockpit door free to swing.
+             motion=k.motion.slide('near', s.cabinDoorPlug) + k.motion.slide('rear', doorTravel)) + { title: 'Military transport helicopter cabin door' },
   k.compound('military_transport_helicopter_side_window', 6,
              wall('pane', 'glass', gun, gunArc, step=0.7),
              finishes) + { title: 'Military transport helicopter side window' },
@@ -77,20 +90,22 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
                { x: 1.75, top: 2.9, bottom: 2.5, half: 0.2, waist: 2.6 },
                { x: 1.0, top: 3.25, bottom: 2.5, half: 0.75, waist: 2.6 },
                { x: -1.9, top: 3.22, bottom: 2.5, half: 0.72, waist: 2.6 },
-               { x: -3.0, top: 2.8, bottom: 2.45, half: 0.22, waist: 2.5 },
+               // The cowling holds its section over the cabin's full section and tapers only where the tail does.
+               { x: -3.6, top: 3.22, bottom: 2.5, half: 0.72, waist: 2.6 },
+               { x: -4.7, top: 2.8, bottom: 2.45, half: 0.22, waist: 2.5 },
              ], arc=h.dome, step=0.125)
              + k.bothSides([
                k.turned('nacelle', 'paint', 'x', k.annulus(e.radius + 0.01, e.radius + 0.08, e.x - e.length / 2, e.x + e.length / 2), [0, e.y, e.z]) + { sides: 16 },
              ]),
              finishes) + { title: 'Military transport helicopter engine cowling' },
   k.compound('military_transport_helicopter_tail_boom', 240,
-             h.boom('boom', 'paint', { x: s.tailEnd + 0.2, y: 2.27, r: 0.31 }, { x: -8.7, y: 2.85, r: 0.15 })
+             h.boom('boom', 'paint', { x: s.tailEnd + 0.2, y: 2.27, r: 0.31 }, { x: -10.4, y: 2.85, r: 0.15 })
              + [box('tail_gearbox', 'dark', [s.tailRotor.x - 0.12, s.tailRotor.y - 0.12, -0.1], [s.tailRotor.x + 0.12, s.tailRotor.y + 0.12, 0.1])],
              finishes) + { title: 'Military transport helicopter tail boom' },
   k.compound('military_transport_helicopter_tail_surfaces', 60, [
-    h.fin('fin', 'paint', [[-7.95, 2.72], [-8.85, 2.72], [-9.35, 4.35], [-8.9, 4.4]], half=0.06),
-    h.fin('ventral', 'paint', [[-7.95, 2.8], [-8.5, 2.8], [-8.62, 2.34], [-8.32, 2.34]], half=0.05),
-    box('stabiliser', 'paint', [-7.55, 2.62, -1.7], [-6.95, 2.69, 1.7]),
+    h.fin('fin', 'paint', [[-9.65, 2.72], [-10.55, 2.72], [-11.05, 4.35], [-10.6, 4.4]], half=0.06),
+    h.fin('ventral', 'paint', [[-9.65, 2.8], [-10.2, 2.8], [-10.32, 2.34], [-10.02, 2.34]], half=0.05),
+    box('stabiliser', 'paint', [-9.25, 2.62, -1.7], [-8.65, 2.69, 1.7]),
   ], finishes) + { title: 'Military transport helicopter tail surfaces' },
   h.tailRotor('military_transport_helicopter_tail_rotor', 60, s.tailRotor.radius, blades=4, chord=0.22, shaft=s.tailRotor.z, phase=15) + { title: 'Military transport helicopter tail rotor' },
   h.mainRotor('military_transport_helicopter_main_rotor', 450, s.rotorRadius, blades=4, chord=0.52, droop=0.4, phase=20, hub=0.28, segments=14) + { title: 'Military transport helicopter main rotor' },
