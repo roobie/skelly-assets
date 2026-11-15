@@ -39,13 +39,17 @@ local pillarYOf(s, x) = s.waist + (s.aPost - 0.1 - x) * (s.cabRoof - s.waist) / 
 // Where the front door starts, clear of the B pillar as it swings.
 local frontDoorRearOf(s) = s.bFront + k.doorTailGap(s.cowl - s.bFront, s.side + grain - s.skin);
 local windscreen(id, title, s) =
+// The windscreen's outer face meets the waist here and leans back by this much per metre of height.
+local screenFootOf(s) = s.aPost - 0.02;
+local screenLeanOf(s) = s.aLean / (s.cabRoof - s.waist);
   local pillarAt(y) = pillarAtOf(s, y);
   local pillarY(x) = pillarYOf(s, x);
   k.compound(id + '_windscreen', 18, [
+  local foot = screenFootOf(s);
     // Stops inside the header: glass level with the roof blends over it as dashes.
     local screenTop = s.cabRoof - 0.05;
-    local topLean = s.aLean * (screenTop - s.waist) / (s.cabRoof - s.waist);
-    prism('glass', 'glass', [[s.aPost - 0.07, s.waist], [s.aPost - 0.02, s.waist], [s.aPost - 0.02 - topLean, screenTop], [s.aPost - 0.07 - topLean, screenTop]], [-s.glassIn, s.glassIn]),
+    local topLean = screenLeanOf(s) * (screenTop - s.waist);
+    prism('glass', 'glass', [[foot - 0.05, s.waist], [foot, s.waist], [foot - topLean, screenTop], [foot - 0.05 - topLean, screenTop]], [-s.glassIn, s.glassIn]),
   ] + k.bothSides([
     prism('quarter', 'glass', [[s.cowl, s.waist], [s.aPost - 0.1, s.waist]] + (if pillarY(s.cowl) > s.windowTop then [[pillarAt(s.windowTop), s.windowTop], [s.cowl, s.windowTop]] else [[s.cowl, pillarY(s.cowl)]]), [s.glassOut - 0.03, s.glassOut - 0.01]),
   ]), { glass: 'glass-clear' }) + { title: title + ' windscreen' };
@@ -201,9 +205,14 @@ local pressings(id, title, s0) = {
     k.compound(id + '_shell', s.shellMass, cabPieces + (if isBox then [] else bodyPieces), finish) + { title: title + ' shell' },
     windscreen(id, title, s),
     // Hinged at the foot of the screen, a grain over its top face, so its rear edge swings forward off the scuttle and
-    // the glass.
+    // the glass. The more upright the screen, the nearer its face comes to the pins, so an upright one moves them
+    // forward until they clear the glass by a swing gap.
     local bonnetSide = s.side - 0.1 - k.swingGap;
-    local bonnetPins = k.hingePins('hinge', 'z', [s.aPost, hood(s.aPost) + grain, 0.7 * bonnetSide], [s.aPost, hood(s.aPost) + grain, -0.7 * bonnetSide]);
+    local pinY = hood(s.aPost) + grain;
+    local lean = screenLeanOf(s);
+    local glassAhead = s.aPost - (screenFootOf(s) - lean * (pinY - s.waist));
+    local pinX = s.aPost + std.max(0, (grain + k.swingGap) * std.sqrt(1 + lean * lean) - glassAhead);
+    local bonnetPins = k.hingePins('hinge', 'z', [pinX, pinY, 0.7 * bonnetSide], [pinX, pinY, -0.7 * bonnetSide]);
     k.compound(id + '_bonnet', 20, [
       prism('skin', 'paint', [[s.aPost, hood(s.aPost) - 0.03], [nose, hood(nose) - 0.03], [nose, hood(nose)], [s.aPost, hood(s.aPost)]], [-bonnetSide, bonnetSide]),
     ] + bonnetPins, { paint: s.paint }, motion=k.motion.hinge(bonnetPins, 'up', opens.bonnet)) + { title: title + ' bonnet' },
