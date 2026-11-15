@@ -183,6 +183,15 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     assert std.all([i == along || a[i] == b[i] for i in [0, 1, 2]]) : name + ' pins must lie on one line along ' + axis;
     assert a[along] != b[along] : name + ' pins must not coincide';
     [turned(name + '_' + end[0], slot, axis, disc(radius, -length / 2, length / 2), end[1]) for end in [['a', a], ['b', b]]],
+  // How far the frame facing a hinged part's free edge stands back from it, for an edge `reach` from the hinge axis
+  // along the part and an axis `depth` outboard of the part's inner face. The free inner corner swings on a circle
+  // sqrt(reach² + depth²) from the axis, wider than the frame's edge `reach` away, so a flush frame would be cut early
+  // in the swing; the frame stands off that circle by 2 mm, a real clearance rather than a graze. The gap stays under
+  // half a `grain`, so off a free edge drawn on a cell boundary it takes no cell centre and the frame shows no slot.
+  swingStandOff(reach, depth, grain=vehicleGrain):
+    local gap = std.sqrt(reach * reach + depth * depth) - reach + 0.002;
+    assert gap < grain / 2 : 'a ' + gap + ' m stand-off would open a slot at a ' + grain + ' m grain';
+    gap,
   // A welded part carries both sides: each near-side piece and its reflection across the centre plane.
   near: near,
   far: far,

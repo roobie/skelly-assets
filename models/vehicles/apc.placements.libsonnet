@@ -26,7 +26,8 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
     one('driver_panel', 'apc_driver_panel'),
     one('rifle_rack', 'apc_rifle_rack'),
     one('ammo_rack', 'apc_ammo_rack'),
-    one('tow_hitch', 'tow_hitch', [s.rear - 0.125, 0.68, 0]),
+    // Under the sill, low enough that the lowered ramp clears its ball.
+    one('tow_hitch', 'tow_hitch', [s.rear - 0.125, s.belly - 0.08, 0]),
   ]
   + [one('axle_' + i, axlePart(i), [s.axles[i], s.hub, 0]) for i in std.range(0, 3)]
   + std.flattenArrays([pair('wheel_' + i, 'wheel_military_22_5', [s.axles[i], s.hub, s.wheelZ]) for i in std.range(0, 3)])
