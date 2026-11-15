@@ -110,12 +110,9 @@ local shell(id, slot, stations, thick=0.075, x=null, arc=[-180, 180], step=0.062
     ]
     for i in std.range(0, std.length(all) - 1)
   ]));
-// A door's trailing edge, the wall strip from the post at `x` toward the door's upright pins at `pin` ([x, z]) over
-// `arc`, and the lip the post draws to meet it. As the door swings out, a point of it at depth b inboard of the pins and
-// a m from them along the body first closes on the post behind, so an edge cut square across would dig in. The edge
-// leans toward the pins by more than b / a at every depth, so every point of it moves off the post. Deeper points need
-// more lean, so the edge rakes forward as the wall curves in toward the roof. The door's edge stands `gap` m ahead of the
-// post's, and `band` m of frame remains behind the door's rest at the waist, where the edge meets the skin at `x`.
+// A door's trailing edge and the lip the post draws to meet it. As the door swings out, a point at depth b inboard of
+// its pins and a m from them first closes on the post, so an edge cut square across would dig in; leaning the edge
+// toward the pins by more than b / a at every depth moves every point of it off the post.
 local trailingEdge(stations, x, arc, pin, band, thick=0.075, sides=16, square=2.4, gap=0.002) =
   local toward = if pin[0] > x then 1 else -1;
   local reach = toward * (pin[0] - x);
@@ -160,12 +157,13 @@ local trailingEdge(stations, x, arc, pin, band, thick=0.075, sides=16, square=2.
                    + [{ normal: [-toward, 0, -f.lean], offset: -(f.at + gap) } for f in facets];
   {
     door(id, slot):: [k.clipped(prism(id, facet, slot), doorSide) for facet in facets],
-    // A facet where the edge leaves the skin at the post needs no lip.
-    post(id, slot):: [
+    // A facet where the edge leaves the skin at the post needs no lip. The post's part is drawn once for both sides,
+    // and the far door is the near one mirrored, so the lip is too.
+    post(id, slot):: k.bothSides([
       k.clipped(prism(id, facet, slot), [{ normal: [toward, 0, facet.lean], offset: facet.at }])
       for facet in facets
       if facet.lip > 0.001
-    ],
+    ]),
     // Where the rest of the door begins, past the strip.
     end:: x + toward * width,
   };
