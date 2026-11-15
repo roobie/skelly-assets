@@ -3,9 +3,9 @@
 // `depth` metres, in either direction and for every vehicle, because of the fit's reason `why`. A role is a site id
 // without its `_near` / `_far` side and its number, so `wheel_front_near` and `wheel_front_far` are both
 // `wheel_front`, and a role is named exactly, not by a pattern. Two parts at different sites overlap only when they
-// share more than one voxel grain of depth (`tools/siteOverlap.mjs`), and a pair covers an overlap no deeper than its
-// depth. A pair that no vehicle overlaps on, that is far deeper than any vehicle's overlap, that names a role no
-// drawn site has, or that two fits list is reported. The reasons for the rule are in
+// sink more than one voxel grain into each other (`tools/siteOverlap.mjs`), and a pair covers an overlap no deeper
+// than its depth. A pair that no vehicle overlaps on, that is far deeper than any vehicle's overlap, that names a role
+// no drawn site has, or that two fits list is reported. The reasons for the rule are in
 // `docs/decisions/0014-site-overlap.md`.
 local fit(why, pairs) = { why: why, pairs: pairs };
 {

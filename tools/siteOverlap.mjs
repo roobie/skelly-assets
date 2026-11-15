@@ -1,10 +1,10 @@
 // Finds parts placed at different sites of one vehicle that occupy the same space. A part is authored as pieces in its
 // vehicle's frame; a site moves them by its position, and a far-side twin first reflects them across the centre plane
 // (models/vehicles/kit.libsonnet, `far` and `moved`), exactly as the showcase and the game place the part. Two pieces
-// overlap when they share more than one voxel grain of depth, so faces that touch or sink a grain into each other are
-// contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other freely.
-// An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which holds for
-// every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
+// overlap when they sink more than one voxel grain into each other, so faces that touch or sink a grain into each other
+// are contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other
+// freely. An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which
+// holds for every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
 // correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run. Both are capped
 // at the depth they were written for, and a variant shares its parent's. An entry that no longer applies is reported,
 // so the lists cannot rot. The reason for the rule is in `docs/decisions/0014-site-overlap.md`.
@@ -78,9 +78,98 @@ export function sharedDepth(p, q, inside, step) {
   return deepest > inside ? deepest : 0;
 }
 
+const REFINE = 12; // halvings that place a boundary between two march steps
+
+// The spans (m along `axis`) where a solid lies on the line through `point` parallel to `axis`, as [enter, leave]
+// pairs, read only from `from` to `to`. The march steps by the solid's distance, which never oversteps a boundary, and
+// at least `least`.
+function spans({ box, min, max, distance }, point, axis, [from, to], least) {
+  const [start, end] = [Math.max(min[axis], from), Math.min(max[axis], to)];
+  if (box) {
+    const through = [0, 1, 2].every((i) => i === axis || (min[i] <= point[i] && point[i] <= max[i]));
+    return through && start < end ? [[start, end]] : [];
+  }
+  const inside = (t) => distance(point.with(axis, t)) < 0;
+  const boundary = (outer, inner) => {
+    let [a, b] = [outer, inner];
+    for (let i = 0; i < REFINE; i++) {
+      const mid = (a + b) / 2;
+      if (inside(mid) === inside(b)) b = mid;
+      else a = mid;
+    }
+    return b;
+  };
+  const found = [];
+  let [t, previous, within, enter] = [start, start, false, 0];
+  while (t <= end) {
+    const d = distance(point.with(axis, t));
+    if (d < 0 !== within) {
+      if (within) found.push([enter, boundary(t, previous)]);
+      else enter = boundary(previous, t);
+      within = !within;
+    }
+    [previous, t] = [t, t + Math.max(Math.abs(d), least)];
+  }
+  if (within) found.push([enter, end]);
+  return found;
+}
+
+// How far (m) q must move along `axis`, one way or the other, to share no point with p, or null when no line sampled
+// every `step` m through the boxes' shared face finds them sharing one. A shift is barred while, on some line, a span
+// of q moved by it meets a span of p, so a piece passing right through a panel must move clear of the whole panel. A
+// move of `beyond` or more is not told apart from `beyond`, so the spans are read only where a shorter move reaches.
+function shiftClear(p, q, axis, step, beyond) {
+  const across = [0, 1, 2].filter((i) => i !== axis);
+  const lines = across.map((i) => {
+    const [lo, hi] = [Math.max(p.min[i], q.min[i]), Math.min(p.max[i], q.max[i])];
+    const n = Math.max(1, Math.ceil((hi - lo) / step));
+    return Array.from({ length: n }, (_, k) => lo + ((k + 0.5) * (hi - lo)) / n);
+  });
+  const barred = [];
+  for (const u of lines[0]) {
+    for (const v of lines[1]) {
+      const point = [0, 0, 0].with(across[0], u).with(across[1], v);
+      const onQ = spans(q, point, axis, [p.min[axis] - beyond, p.max[axis] + beyond], step / 2);
+      if (onQ.length === 0) continue;
+      const onP = spans(p, point, axis, [q.min[axis] - beyond, q.max[axis] + beyond], step / 2);
+      for (const [a0, a1] of onP) for (const [b0, b1] of onQ) barred.push([a0 - b1, a1 - b0]);
+    }
+  }
+  const clear = (shifts) => {
+    let reach = 0;
+    for (const [lo, hi] of shifts.sort((a, b) => a[0] - b[0])) {
+      if (lo >= reach) break;
+      reach = Math.max(reach, hi);
+    }
+    return reach;
+  };
+  const forward = clear(barred.filter(([, hi]) => hi > 0));
+  if (forward === 0) return null;
+  return Math.min(beyond, forward, clear(barred.filter(([lo]) => lo < 0).map(([lo, hi]) => [-hi, -lo])));
+}
+
+// How deep (m) two solids sink into each other, as the shortest move along an axis that parts them, or 0 when they
+// part with a move of `grain` or less. A piece through a thin panel thus reads as deep as it passes, not as thin as
+// the panel. Moves are sampled on lines every `step` m.
+export function penetration(p, q, grain, step) {
+  // A move that parts the boxes parts the solids, so no axis needs a longer one, and boxes that part with a grain's
+  // move hold no deeper overlap. The axis whose boxes part soonest is read first, as the likeliest shortest.
+  const boxesPart = (i) => Math.min(p.max[i] - q.min[i], q.max[i] - p.min[i]);
+  const axes = [0, 1, 2].sort((a, b) => boxesPart(a) - boxesPart(b));
+  if (boxesPart(axes[0]) <= grain) return 0;
+  let [depth, sharing] = [boxesPart(axes[0]), false];
+  for (const axis of axes) {
+    const move = shiftClear(p, q, axis, step, Math.min(depth, boxesPart(axis)));
+    if (move === null) continue;
+    [depth, sharing] = [Math.min(depth, move), true];
+    if (depth <= grain) return 0;
+  }
+  return sharing ? depth : 0;
+}
+
 // Every pair of sites of one vehicle whose pieces overlap by more than `grain`, as { sites: [a, b], parts: [a, b],
-// pieces: [a, b], depth }, depth being the shared thickness (m) at the deepest point sampled of the deepest piece pair
-// found. Pieces are swept along x so only those whose boxes meet are compared.
+// pieces: [a, b], depth }, depth being the penetration (m) of the deepest piece pair found. Pieces are swept along x
+// so only those whose boxes meet are compared.
 export function siteOverlaps(sites, grain) {
   const pieces = sites.flatMap((site, owner) => site.pieces.map((piece) => ({ owner, id: piece.id, ...solid(piece) })))
     .sort((a, b) => a.min[0] - b.min[0]);
@@ -89,7 +178,7 @@ export function siteOverlaps(sites, grain) {
     for (let j = i + 1; j < pieces.length && pieces[j].min[0] < pieces[i].max[0] - grain; j++) {
       if (pieces[i].owner === pieces[j].owner) continue;
       const [p, q] = pieces[i].owner < pieces[j].owner ? [pieces[i], pieces[j]] : [pieces[j], pieces[i]];
-      const depth = 2 * sharedDepth(p, q, grain / 2, grain / 2);
+      const depth = penetration(p, q, grain, grain);
       const pair = key(p.owner, q.owner);
       if (depth > (found.get(pair)?.depth ?? 0)) {
         found.set(pair, { owners: [p.owner, q.owner], pieces: [p.id, q.id], depth });
