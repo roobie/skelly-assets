@@ -205,7 +205,9 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   doorTailGap(length, depth): std.sqrt(length * length + depth * depth) - length + self.swingGap,
   // A lip inside the post behind a side-hung door's trailing edge, over heights `y` and a swing gap inside the face
   // `face` the door closes against, so the gap the door needs to swing clear of the post is not a slot through the body.
-  doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - 0.03], [rear + 0.02, y[1], face - self.swingGap]),
+  doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - self.jambDepth], [rear + 0.02, y[1], face - self.swingGap]),
+  // How far a `doorJamb` reaches in from the face, so whatever stands inside the opening can stop short of it.
+  jambDepth: 0.03,
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
