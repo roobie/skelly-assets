@@ -395,7 +395,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['sling', 'boom_stage', 0.06],
       ['straw_chopper', 'body', 0.06],
       ['swingarm', 'frame', 0.08],
-      ['tow_hitch', 'rear', 0.06],
       ],
     ),
     fit(
