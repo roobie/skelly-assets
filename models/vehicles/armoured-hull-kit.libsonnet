@@ -53,10 +53,10 @@ local innerWall(s) = s.wall - s.armour.lowerWall;
 local sprocketOf(s) = [w for w in tracks[s.track].wheels if w.key == 'sprocket'][0];
 // The turret's frame stands on the ring.
 local turretAt(s) = [s.turretX, s.roofTop + s.ring.height, 0];
-// The driver's hatch: its lid's half-width as the APC's hatch, its hinge post's side and height, how far it swings
-// aside in degrees, so the lid lies clear beside its opening, and its lid's headroom under the turret, a real
-// clearance rather than a graze.
-local driverHatch = { massKg: 25, half: 0.3, post: 0.06, postTop: 0.12, open: 90, headroom: k.grain / 4 };
+// The driver's hatch: its round lid's radius as the APC's hatch, the side of the square arm that carries the lid out to
+// its hinge post, the post's side and height, how far it swings aside in degrees, so the lid lies clear beside its
+// opening, and its lid's headroom under the turret, a real clearance rather than a graze.
+local driverHatch = { massKg: 25, radius: 0.3, arm: 0.18, post: 0.06, postTop: 0.12, open: 90, headroom: k.grain / 4 };
 // Far enough ahead of the driver's hatch that the periscopes clear its lid and hinge pins.
 local periscopeAhead = 0.42;
 local periscopeReach = 0.12;
@@ -65,8 +65,13 @@ local periscopeReach = 0.12;
 local headlampBack = 0.06;
 local tailLampDepth = 0.06;
 
-local rows(s, title) =
+// The roof is open under the driver's hatch, under the vehicle's `roofHatches`, from `k.hatchHole`, and inside the
+// turret ring, so an open turret hatch looks down into the hull rather than onto its roof. A hole may reach forward
+// past the roof into the upper glacis's top, so the glacis is cut by the same holes.
+local rows(s, title, roofHatches=[]) =
   local a = s.armour;
+  local holes = [k.hatchHole(s.hatchX, s.driverZ, driverHatch.radius), k.ringHole(s.turretX, s.ring.inner)]
+                + roofHatches;
   local n = nose(s);
   local paint = { paint: s.paint };
   local upperAtX(x) = meet(n.upperInner, vertical(x));
@@ -103,8 +108,8 @@ local rows(s, title) =
     // cheeks between the plates; and its towing eyes, hung under the lower glacis.
     k.compound(s.id + '_hull_nose', s.massKg.nose, [
       prism('lower_glacis', 'paint', [n.foot, n.tip, n.mitre, meet(n.lowerInner, vertical(s.lowerGlacisX))], [-s.wall, s.wall]),
-      prism('upper_glacis', 'paint', [n.tip, n.top, upperAtY(s.roofTop), n.mitre], [-s.wall, s.wall]),
-    ] + k.bothSides([
+    ] + k.holed(prism('upper_glacis', 'paint', [n.tip, n.top, upperAtY(s.roofTop), n.mitre], [-s.wall, s.wall]), holes)
+    + k.bothSides([
       prism('glacis_wing', 'paint', [meet(n.upperOuter, level(s.shelf)), n.top, upperAtY(s.roofTop), upperAtY(s.shelf)], [s.wall, s.side]),
       prism('cheek', 'paint', [meet(n.lowerInner, vertical(s.lowerGlacisX)), n.mitre, upperAtX(s.lowerGlacisX)], [innerWall(s), s.wall]),
       local e = s.towEye;
@@ -112,10 +117,10 @@ local rows(s, title) =
       local y = meet(n.lowerOuter, vertical(x - e.length))[1];
       box('tow_eye', 'steel', [x - e.length, y - e.height, e.z], [x, y, e.z + e.width]),
     ]), paint + { steel: steel }) + { title: title + ' hull nose' },
-    // The roof, its front edge bevelled to the upper glacis's inner face.
-    k.compound(s.id + '_hull_roof', s.massKg.roof, [
-      k.prism('plate', 'paint', [[back(s), s.roof], upperAtY(s.roof), upperAtY(s.roofTop), [back(s), s.roofTop]], [-s.side, s.side]),
-    ], paint) + { title: title + ' hull roof' },
+    // The roof, its front edge bevelled to the upper glacis's inner face and open under the hatches.
+    k.compound(s.id + '_hull_roof', s.massKg.roof, k.holed(
+      k.prism('plate', 'paint', [[back(s), s.roof], upperAtY(s.roof), upperAtY(s.roofTop), [back(s), s.roofTop]], [-s.side, s.side]), holes
+    ), paint) + { title: title + ' hull roof' },
     k.compound(s.id + '_turret_ring', s.ring.massKg, [
       k.turned('ring', 'steel', 'y', k.annulus(s.ring.inner, s.ring.outer, 0, s.ring.height)) + { sides: s.ring.sides },
     ], { steel: steel }) + { title: title + ' turret ring' },
@@ -149,19 +154,23 @@ local rows(s, title) =
     // far corner, as a tank's does, since the gun and the turret's front stand over it and leave a raised lid no room:
     // the lid then turns only behind and outboard of the post, away from the periscopes ahead of it. The handle stands
     // near the post, so the arc it sweeps stays ahead of the turret's overhang, where only the flat lid passes under
-    // the turret, which stands on the ring: the lid is thinner than the ring is high by `headroom`.
+    // the turret, which stands on the ring: the lid is thinner than the ring is high by `headroom`, which still clears the
+    // turret once the hatch stands its `k.swingGap` off the roof.
     local h = driverHatch;
-    local post = h.half - h.post;
+    assert h.headroom > k.swingGap : s.id + "'s driver's hatch, standing off the roof, meets the turret";
+    local edge = h.radius;
+    local post = edge - h.post;
     local thickness = s.ring.height - h.headroom;
-    // The pins stand in the post, a pin's radius behind the lid's front edge, so they reach no further forward than
+    // The pins stand in the post, a pin's radius behind the arm's front edge, so they reach no further forward than
     // the lid does.
     local pinRadius = k.grain;
-    local pinX = h.half - pinRadius;
-    local pins = k.hingePins('hinge_pin', 'y', [pinX, k.grain, -h.half], [pinX, h.postTop - k.grain, -h.half], 'steel', pinRadius);
+    local pinX = edge - pinRadius;
+    local pins = k.hingePins('hinge_pin', 'y', [pinX, k.grain, -edge], [pinX, h.postTop - k.grain, -edge], 'steel', pinRadius);
     k.compound(s.id + '_driver_hatch', h.massKg, [
-      box('lid', 'paint', [-h.half, 0, -h.half], [h.half, thickness, h.half]),
-      box('post', 'steel', [post, 0, -h.half], [h.half, h.postTop, -post]),
-      box('handle', 'steel', [post - 0.12, thickness, -h.half + 0.1], [post - 0.06, thickness + 0.04, 0]),
+      k.hatchLid(h.radius, thickness),
+      box('arm', 'paint', [edge - h.arm, 0, -edge], [edge, thickness, -edge + h.arm]),
+      box('post', 'steel', [post, 0, -edge], [edge, h.postTop, -post]),
+      box('handle', 'steel', [post - 0.12, thickness, -edge + 0.1], [post - 0.06, thickness + 0.04, 0]),
     ] + pins, paint + { steel: steel }, motion=k.motion.hinge(pins, 'far', h.open)) + { title: title + ' driver hatch' },
     // A cross-drive automatic gearbox and steering unit standing on the floor, its output shafts on the drive sprockets'
     // axis out to the hull's walls, where the final drives take them on: the origin is on that axis, so the sprockets'
@@ -187,7 +196,8 @@ local sites(s) =
   + engine.sites(s.engine, [s.engineX, floor, s.engineZ], 'assembly') + [
     one('radiator', engine.radiator(s.engine), [s.radiatorX, floor, s.radiatorZ]),
     one('transmission', s.id + '_transmission', [sprocket.at[0], sprocket.at[1], 0]),
-    one('driver_hatch', s.id + '_driver_hatch', [s.hatchX, s.roofTop, s.driverZ]),
+    // The driver's hatch swings level, so it stands `k.swingGap` off the roof rather than sliding on it.
+    one('driver_hatch', s.id + '_driver_hatch', [s.hatchX, s.roofTop + k.swingGap, s.driverZ]),
     one('driver_seat', 'front_seat', [s.driverX, floor, s.driverZ]),
     one('ammo_rack', s.id + '_ammo_rack'),
   ] + [

@@ -10,6 +10,6 @@ local s = import 'cv9040.spec.libsonnet';
   ]
   + pair('side_skirt', 'cv9040_side_skirt')
   + std.flattenArrays([pair('troop_seat_' + i, 'cv9040_troop_seat', [-2.8 + 0.5 * i, hull.floorTop(s), hull.innerWall(s)]) for i in std.range(0, 3)])
-  + pair('troop_hatch', 'apc_hatch', [-2.4, s.roofTop, 0.7]),
+  + pair('troop_hatch', 'apc_hatch', [s.troopHatch.x, s.roofTop, s.troopHatch.z]),
   tags: { 'vehicle-role': ['military'] },
 }
