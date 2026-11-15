@@ -75,9 +75,14 @@ local fenderRun(id, x, y, cuts=[]) =
 
 local rearDoor = s.doors.rear;
 local sideDoor = s.doors.side;
-// Each door turns about its hinge bar's outer corner, so it swings out of the hull's way at every angle.
-local rampPins = k.hingePins('hinge_pin', 'z', [b.rear - 0.06, b.belly + b.wall, -rearDoor.half + 0.1], [b.rear - 0.06, b.belly + b.wall, rearDoor.half - 0.1], 'frame');
-local sideDoorPins = k.hingePins('hinge_pin', 'y', [sideDoor.x[1], b.belly + b.wall + 0.2, b.half + 0.04], [sideDoor.x[1], sideDoor.top - 0.2, b.half + 0.04], 'frame');
+// Each door turns about its hinge bar's outer corner, so it swings out of the hull's way, and the hull's frame facing
+// its free edge stands off it.
+local rampPinX = b.rear - 0.06;
+local rampPins = k.hingePins('hinge_pin', 'z', [rampPinX, floorTop, -rearDoor.half + 0.1], [rampPinX, floorTop, rearDoor.half - 0.1], 'frame');
+local lintelFoot = rearDoor.top + k.swingStandOff(rearDoor.top - floorTop, b.rear + wall - rampPinX, s.grain);
+local sideDoorPinZ = b.half + 0.04;
+local sideDoorPins = k.hingePins('hinge_pin', 'y', [sideDoor.x[1], floorTop + 0.2, sideDoorPinZ], [sideDoor.x[1], sideDoor.top - 0.2, sideDoorPinZ], 'frame');
+local sideJamb = sideDoor.x[0] - k.swingStandOff(sideDoor.x[1] - sideDoor.x[0], sideDoorPinZ - (b.half - wall), s.grain);
 local sl = s.slit;
 local t = s.turret;
 local ringTop = b.top + t.ring.height;
@@ -118,16 +123,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }
   // them. The crew space runs the core's length and widens to the full width in the bay between the wells.
   part('hull', 'hull', 7000, [
     hull('floor', [b.rear, b.nose], [b.belly, floorTop], [-b.core, b.core], [noseFoot] + cheeks),
-    hull('rear_lintel', [b.rear, b.rear + wall], [rearDoor.top, b.top], [-rearDoor.half, rearDoor.half]),
+    hull('rear_lintel', [b.rear, b.rear + wall], [lintelFoot, b.top], [-rearDoor.half, rearDoor.half]),
     hull('nose_foot', [b.rear, b.nose], [b.belly, b.top], [-b.core, b.core], [glacis] + cheeks + k.skin(noseFoot, wall)),
     box('tow_eye', 'frame', [3.78, 0.78, -0.12], [3.92, 0.88, 0.12]),
     // The far side's bay wall is whole; the near side's frames the side door.
     hull('bay_wall_far', [rear[1], front[0]], [b.belly, b.top], [-b.half, wall - b.half], [glacis]),
-    hull('bay_wall_aft_near', [rear[1], sideDoor.x[0]], [b.belly, b.top], [b.half - wall, b.half]),
+    hull('bay_wall_aft_near', [rear[1], sideJamb], [b.belly, b.top], [b.half - wall, b.half]),
     hull('bay_wall_fore_near', [sideDoor.x[1], front[0]], [b.belly, b.top], [b.half - wall, b.half], [glacis]),
-    hull('side_lintel_near', [sideDoor.x[0], sideDoor.x[1]], [sideDoor.top, b.top], [b.half - wall, b.half]),
+    hull('side_lintel_near', [sideJamb, sideDoor.x[1]], [sideDoor.top, b.top], [b.half - wall, b.half]),
     // The bevel across the roof's back edge is a skin of its own, as the roof and rear walls are thinner than it is.
-    hull('tail_bevel', [b.rear, b.rear + leg], [b.top - leg, b.top], [-b.half, b.half], k.skin(tail, wall)),
+    hull('tail_bevel', [b.rear, b.rear + leg], [std.max(b.top - leg, lintelFoot), b.top], [-b.half, b.half], k.skin(tail, wall)),
   ] + k.bothSides([
     hull('bay_floor', [rear[1], front[0]], [b.belly, floorTop], [b.core, b.half]),
     hull('rear_wall', [b.rear, b.rear + wall], [b.belly, b.top], [rearDoor.half, b.core]),

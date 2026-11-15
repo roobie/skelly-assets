@@ -14,10 +14,12 @@ local back = s.rear + s.plate;
 // The vision slits across the windscreen armour, one before each seat.
 local slit = { y: [1.72, 1.77], z: [0.3, 0.7] };
 local louvres = 6;
-// Each opening part turns about the outer corner of its hinge straps, so it swings out of the body's way at every angle.
+// Each opening part turns about the outer corner of its hinge straps, so it swings out of the body's way.
 local armourPins = k.hingePins('hinge_pin', 'z', [s.cowl + s.plate + 0.03, s.scuttleTop, -0.75], [s.cowl + s.plate + 0.03, s.scuttleTop, 0.75], 'steel');
 local cabDoorPins = k.hingePins('hinge_pin', 'y', [s.cabDoor[1], 1.09, s.side + 0.03], [s.cabDoor[1], 1.49, s.side + 0.03], 'steel');
-local rearDoorPins = k.hingePins('hinge_pin', 'y', [s.rear - 0.03, 1.09, s.rearDoorZ], [s.rear - 0.03, 1.49, s.rearDoorZ], 'steel');
+local rearPinX = s.rear - 0.03;
+local rearDoorPins = k.hingePins('hinge_pin', 'y', [rearPinX, 1.09, s.rearDoorZ], [rearPinX, 1.49, s.rearDoorZ], 'steel');
+local rearDoorGap = k.swingStandOff(2 * s.rearDoorZ, back - rearPinX);
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   // The armoured body round the cab and the open troop bay: its side plates, the rear plate round the door, the
   // scuttle under the windscreen and the floor. The cab's sides stop at the doors' height, the bay's run higher.
@@ -30,8 +32,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('bay_side', 'paint', [back, s.sideBottom, inner], [s.cabDoor[0], s.bayTop, s.side]),
     box('door_sill', 'paint', [s.cabDoor[0], s.sideBottom, inner], [s.cabDoor[1], s.floor + 0.02, s.side]),
     box('cab_post', 'paint', [s.cabDoor[1], s.sideBottom, inner], [s.cowl, s.doorTop, s.side]),
-    box('rear_jamb', 'paint', [s.rear, s.floor - 0.02, s.rearDoorZ], [back, s.doorTop, s.side]),
-  ]), finish) + { title: 'Half-track hull' },
+  ]) + [
+    box('rear_jamb_near', 'paint', [s.rear, s.floor - 0.02, s.rearDoorZ], [back, s.doorTop, s.side]),
+    box('rear_jamb_far', 'paint', [s.rear, s.floor - 0.02, -s.side], [back, s.doorTop, -s.rearDoorZ - rearDoorGap]),
+  ], finish) + { title: 'Half-track hull' },
   k.compound('half_track_hood', 190, [
     prism('top', 'paint', [[s.cowl + s.plate, s.hoodBack - s.plate], [s.nose - 0.05, s.hoodFront - s.plate], [s.nose - 0.05, s.hoodFront], [s.cowl + s.plate, s.hoodBack]], [-s.hoodZ, s.hoodZ]),
   ] + bothSides([

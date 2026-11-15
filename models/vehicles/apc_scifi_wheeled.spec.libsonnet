@@ -50,9 +50,10 @@ local radius = wheels[wheel].tyre.outer;
   // Door openings, each from the floor to `top`: the rear ramp door's half-width, and the side door's span along the
   // near side between the arches, the kerb side, so troops step out away from traffic. Each door's `open` is in degrees
   // from closed: the lowered ramp's lip rests on the ground, and the side door stands square, short of the front arch.
+  // The doors' free edges lie on cell boundaries, so the gap the hull stands off them holds no cell centre.
   doors: {
     rear: { half: 0.75, top: 1.9, open: 118.6 },
-    side: { x: [-0.65, 0.54], top: 1.9, open: 90 },
+    side: { x: [-0.66, 0.54], top: 1.9, open: 90 },
   },
   // The troops' benches along the walls, each `length` long from its site, its seat `depth` deep off the wall.
   bench: { length: 1.8, seat: 0.38, depth: 0.42, back: 0.5 },
