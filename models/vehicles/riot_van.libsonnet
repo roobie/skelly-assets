@@ -38,7 +38,9 @@ local quarterGrille(tag, z) = [
 ];
 local rakeX(y) = s.aPost - 0.02 - (y - s.waist) * s.aLean / (s.cabRoof - s.waist);
 local screenBar(id, y) = box(id, 'steel', [rakeX(y) - 0.02, y, -s.glassIn], [rakeX(y) + 0.05, y + 0.04, s.glassIn]);
-local screenPost(id, z) = k.prism(id, 'steel', [[rakeX(s.waist), s.waist], [rakeX(s.waist) + 0.05, s.waist], [rakeX(s.cabRoof - 0.1) + 0.05, s.cabRoof - 0.1], [rakeX(s.cabRoof - 0.1), s.cabRoof - 0.1]], [z - 0.02, z + 0.02]);
+// The posts stand off the bonnet's rear edge, which sweeps up under their feet as the bonnet opens.
+local postFoot = s.waist + 0.01;
+local screenPost(id, z) = k.prism(id, 'steel', [[rakeX(postFoot), postFoot], [rakeX(postFoot) + 0.05, postFoot], [rakeX(s.cabRoof - 0.1) + 0.05, s.cabRoof - 0.1], [rakeX(s.cabRoof - 0.1), s.cabRoof - 0.1]], [z - 0.02, z + 0.02]);
 // Chequer blocks the height of two strips, running from the tail to ahead of the front arch where the bonnet still
 // stands above them. Each wall's blocks are cut to its span, so the doors carry their own and the pattern moves with them.
 local checks(tag, x0, x1, z0, z1) = [
@@ -82,9 +84,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', veh
                                      + checks('far_rear', tail, s.bFront, farFace[0], farFace[1])
                                      + checks('far_front', s.cowl, chequerEnd, farFace[0], farFace[1]), chequerFinish) + { title: 'Riot van markings' },
   k.compound('riot_van_side_door_markings', 1, checks('door', s.slideRear, s.bRear, nearFace[0], nearFace[1]), chequerFinish) + { title: 'Riot van side door markings' },
-  k.compound('riot_van_door_markings', 1, checks('door', s.bFront, s.cowl, nearFace[0], nearFace[1]), chequerFinish) + { title: 'Riot van door markings' },
+  k.compound('riot_van_door_markings', 1, checks('door', van.frontDoorRear(s), s.cowl - k.swingGap, nearFace[0] + k.swingGap, nearFace[1]), chequerFinish) + { title: 'Riot van door markings' },
+  local rearCheck = (s.hatchSide - k.swingGap - 0.005) / 3;
   k.compound('riot_van_rear_markings', 1, [
-    box('check_' + i + '_' + row, if (i + row) % 2 == 0 then 'yellow' else 'blue', [tail - 1 / 32, 0.92 + row * 0.12, 0.005 + i * 0.28], [tail, 0.92 + (row + 1) * 0.12, 0.005 + (i + 1) * 0.28])
+    box('check_' + i + '_' + row, if (i + row) % 2 == 0 then 'yellow' else 'blue', [tail - k.grain, 0.92 + row * 0.12, 0.005 + i * rearCheck], [tail, 0.92 + (row + 1) * 0.12, 0.005 + (i + 1) * rearCheck])
     for i in [0, 1, 2]
     for row in [0, 1]
   ], { yellow: 'reflective-yellow', blue: 'paint-police-blue' }) + { title: 'Riot van rear markings' },
