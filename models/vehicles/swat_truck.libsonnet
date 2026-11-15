@@ -49,17 +49,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.lib
     box('roof', 'armour', [s.rear, b.top, -b.side], [b.front, b.top + 0.05, b.side]),
     box('hatch', 'plate', [-2.2, b.top + 0.05, -0.42], [-1.4, b.top + 0.1, 0.42]),
   ], finish) + { title: 'SWAT truck body roof' },
-  // One leaf of the pair, hinged on the body's outer edge behind its rear face, so it swings clear of the side wall.
-  local rearDoorPin(f) = [s.rear - k.grain, b.floorTop + f * (b.top - b.floorTop), b.side - b.wall];
-  local rearDoorPins = k.hingePins('hinge', 'y', rearDoorPin(0.1), rearDoorPin(0.9), 'plate');
   k.compound('swat_truck_rear_door', 150, [
-    box('low', 'armour', [s.rear, b.floorTop + k.swingGap, 0.01], [s.rear + b.wall, b.doorWindow.y[0], b.side - b.wall]),
-    box('high', 'armour', [s.rear, b.doorWindow.y[1], 0.01], [s.rear + b.wall, b.top - k.swingGap, b.side - b.wall]),
+    box('low', 'armour', [s.rear, b.floorTop, 0.01], [s.rear + b.wall, b.doorWindow.y[0], b.side - b.wall]),
+    box('high', 'armour', [s.rear, b.doorWindow.y[1], 0.01], [s.rear + b.wall, b.top, b.side - b.wall]),
     box('inner_pier', 'armour', [s.rear, b.doorWindow.y[0], 0.01], [s.rear + b.wall, b.doorWindow.y[1], b.doorWindow.z[0]]),
     box('outer_pier', 'armour', [s.rear, b.doorWindow.y[0], b.doorWindow.z[1]], [s.rear + b.wall, b.doorWindow.y[1], b.side - b.wall]),
     box('window', 'glass', [s.rear + 0.015, b.doorWindow.y[0], b.doorWindow.z[0]], [s.rear + 0.045, b.doorWindow.y[1], b.doorWindow.z[1]]),
     box('handle', 'plate', [s.rear - 0.02, 1.42, 0.2], [s.rear, 1.48, 0.5]),
-  ] + rearDoorPins, finish, motion=k.motion.hinge(rearDoorPins, 'rear', 90)) + { title: 'SWAT truck rear door' },
+  ], finish, { hinge_a: ['low', [0, 0.1, 1]], hinge_b: ['high', [0, 0.9, 1]] }) + { title: 'SWAT truck rear door' },
   k.compound('swat_truck_rear_step', 40, [
     box('tread', 'plate', [s.rear - 0.3, b.stepY[0], -0.9], [s.rear + 0.04, b.stepY[1], 0.9]),
   ] + k.bothSides([

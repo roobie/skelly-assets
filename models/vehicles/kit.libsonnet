@@ -172,7 +172,6 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       assert std.isBoolean(stow) : 'a slide stows or it does not';
       [{ kind: 'slide', toward: toward, travel: travel } + (if stow then { stow: true } else {})],
   },
-  // The vehicle voxel grain, so a pin can sit one grain clear of the skin it hangs.
   grain: vehicleGrain,
   // How far a hinged part's face stands off a neighbour it slides across as it swings: enough that the two never
   // touch, and well under a grain, so it opens no empty cell.
