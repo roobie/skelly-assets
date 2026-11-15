@@ -37,14 +37,17 @@ function(s) {
   local lineY(i) = s.waist + rise * i / steps,
   local insetOf(i) = outer.tumble * (i + 1) / steps,
   inset(y): insetOf(std.max(0, std.min(steps - 1, std.floor((y - s.waist) / rise * steps)))),
+  // The height band `i` starts at, where a leaning piece steps in by one voxel.
+  bandFoot(i): lineY(i),
   // The topmost band's id, for an anchor at the head of a leaning piece.
   top(id): id + '_' + (steps - 1),
   // The part of `profile` in each band; `range` gives its z span from that band's lean. The lowest band keeps whatever
-  // lies below the waist and the highest whatever lies above the roof.
-  band(id, slot, profile, range):
+  // lies below the waist and the highest whatever lies above the roof. `gap` stops each band short of the next one's
+  // foot, so a moving piece clears the stepped piece that overhangs it there.
+  band(id, slot, profile, range, gap=0):
     local slice(i) =
       local low = if i == 0 then profile else clipY(profile, lineY(i), true);
-      tidy(if i == steps - 1 then low else clipY(low, lineY(i + 1), false));
+      tidy(if i == steps - 1 then low else clipY(low, lineY(i + 1) - gap, false));
     [
       k.prism(id + '_' + i, slot, slice(i), range(insetOf(i)))
       for i in std.range(0, steps - 1)

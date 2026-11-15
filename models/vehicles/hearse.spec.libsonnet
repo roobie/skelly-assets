@@ -10,4 +10,6 @@
   hoodBack: 0.98, hoodFall: 0.1, lampTop: 0.94, towerTop: 0.8, bumperLow: 0.36, bumperTop: 0.5,
   tumble: 0.09375, twoDoor: true, archLiner: true, bumperPaint: 'steel-bright',
   shellMass: 1500, paint: 'satin-black',
+  // Degrees, so the lifted tail stands just short of level, as the shell's tailgates do.
+  tailgateOpen: 85,
 }

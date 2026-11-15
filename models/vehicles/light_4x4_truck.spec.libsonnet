@@ -20,6 +20,8 @@
   // Platform
   deckRear: -2.86, deckFront: 0.52, deckBottom: 1.21875, deckTop: 1.28125, deckSide: 1.12, boardTop: 1.78125,
   platformMass: 300, dropsideMass: 55, tailgateMass: 50,
+  // Degrees, so a dropped side or tailgate lies level with the deck.
+  boardOpen: 90,
   // Running gear under the platform
   transferX: -0.15, transferY: 0.38, shaftY: 0.45,
 }
