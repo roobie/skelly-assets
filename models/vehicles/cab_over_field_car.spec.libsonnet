@@ -31,7 +31,8 @@ local six = (import 'engines.libsonnet').i6_petrol;
   grille: { low: 0.98, high: 1.33, half: 0.28, slots: 4, frame: 0.03125 },
   lampZ: 0.7, headlampY: 1.08, indicatorY: 1.27, blackoutAt: [1.49, 0.63],
   bumper: { low: 0.84, high: 0.95, gussetZ: 0.38, gussetDrop: 0.25 },
-  rearBumperY: [0.76, 0.89], tailLampY: 0.89, flapZ: [0.565, 0.955], flapLow: 0.36,
+  // The tail lamps stand outboard of the rear door's hinge line, clear of its swing.
+  rearBumperY: [0.76, 0.89], tailLampY: 0.89, tailLampZ: 0.79, flapZ: [0.565, 0.955], flapLow: 0.36,
 
   // Underneath. The half shafts run above the hubs in drop boxes, so the differentials stand well off the ground.
   shaftHigh: 0.59, diffLow: 0.39, diffHigh: 0.75, diffHalf: 0.12, portalZ: [0.54, 0.625],
@@ -61,6 +62,7 @@ local six = (import 'engines.libsonnet').i6_petrol;
 
   dashboard: { back: 1.6, top: 1.6, half: 0.86 },
   hinges: { cab: [0.98, 1.36], side: [1.07, 1.36], rear: [1.0, 1.42] },
+  opens: { door: 65, rearDoor: 90 },
 
   mass: {
     hull: 640, frame: 230, axle: 170, wheel: 58, spare: 68, transfer: 45, frontShaft: 12, rearShaft: 5, downpipe: 3,

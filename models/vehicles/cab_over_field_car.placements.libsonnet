@@ -19,7 +19,7 @@ local mid(span) = (span[0] + span[1]) / 2;
     one('dashboard', id + '_dashboard'),
     one('engine_cover', id + '_engine_cover'),
     one('rear_door', id + '_rear_door'),
-    one('spare_wheel', id + '_spare_wheel', [s.rear, s.spareY, 0]),
+    one('spare_wheel', id + '_spare_wheel', [s.rear, s.spareY, 0], 'rear_door'),
     one('jerry_can', id + '_jerry_can', [s.rear, 1.15, 0.72]),
     one('blackout_lamp', id + '_blackout_lamp', [s.cowl + (s.head - s.cowl) * (s.blackoutAt[0] - s.belt) / (s.drip - s.belt), s.blackoutAt[0], s.blackoutAt[1]]),
     one('front_axle', id + '_axle', [s.frontAxle, 0, 0]),
@@ -46,7 +46,7 @@ local mid(span) = (span[0] + span[1]) / 2;
   + pair('indicator', 'marker_lamp', [s.nose + 0.02, s.indicatorY, s.lampZ])
   + pair('wiper', id + '_wiper')
   + pair('door_mirror', id + '_door_mirror', [1.93, 1.46, s.side])
-  + pair('tail_lamp', id + '_tail_lamp', [s.rear - 0.06, s.tailLampY, 0.72])
+  + pair('tail_lamp', id + '_tail_lamp', [s.rear - 0.06, s.tailLampY, s.tailLampZ])
   + site.batteryBay('battery_tray', [1.42, s.cabFloor, 0]),
   tags: { 'vehicle-body': ['car'], 'vehicle-role': ['military'] },
 }
