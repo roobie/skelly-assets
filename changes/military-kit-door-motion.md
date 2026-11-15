@@ -3,8 +3,10 @@ type: breaking
 ---
 The doors of the military trucks, the military ambulance, the light tactical vehicle, the cab-over 4x4 and the SWAT
 truck's rear doors now export a hinge motion in place of their hinge anchors, so the showcase's Open view swings them
-and a game plays the swing the build proved clear. The cab-over 4x4's doors turn on knuckles at the tips of their
-straps, its tail lamps are narrower and sit further outboard, clear of the rear door, and its spare wheel rides the
+and a game plays the swing the build proved clear. Each door turns on round pins at the outer end of its hinge leaves,
+and the military trucks' and the light tactical vehicle's doors stand off the post behind them by as far as their
+inboard edge swings back, so no part of a door swings into the body. The military trucks' A-posts reach back to the
+door, whose window frame no longer wraps forward past its hinge. The cab-over 4x4's tail lamps are narrower and sit further outboard, clear of the rear door, and its spare wheel rides the
 rear door.
 
 Upgrade:

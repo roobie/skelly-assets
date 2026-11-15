@@ -41,7 +41,13 @@ local flare(name, c) = rim(name + '_flare', 'paint', c, bandWide, [s.panel, s.fl
 local well(name, c) = [
   box(name + '_liner', 'trim', [c - s.archBase - 0.04, s.panelLow, s.bedZ], [c + s.archBase + 0.04, s.archTop + 0.04, s.wellIn]),
 ] + rim(name + '_well', 'trim', c, 0.04, [s.wellIn, s.panelIn]);
-local door(suffix, label, x0, x1, topFront, winA, winB, hingeX) =
+// A door turns on pins at its leaves' outer fore corners, so no part of it reaches past the axis into the body ahead.
+// Its rear edge stands off the `post` behind it by as far as its inboard corner swings back on the way out: that corner
+// lies no farther from the axis than the post's face does.
+local door(suffix, label, post, x1, topFront, winA, winB, hingeX) =
+  local leafOut = s.lowerSkin + 0.0625;
+  local x0 = hingeX - std.sqrt(std.pow(hingeX - post, 2) - std.pow(leafOut - s.upperIn, 2));
+  local pins = k.hingePins('hinge', 'y', [hingeX, s.waist - 0.16, leafOut], [hingeX, s.floor + 0.16, leafOut], 'dark');
   part(suffix, label, 48, [
     box('skin', 'paint', [x0, s.floor, s.lowerIn], [x1, s.waist, s.lowerSkin]),
     box('waist', 'paint', [x0, s.waist - 0.04, s.upperIn], [x1, s.waist, s.lowerSkin]),
@@ -52,9 +58,9 @@ local door(suffix, label, x0, x1, topFront, winA, winB, hingeX) =
     box('stile_front', 'paint', [winB, s.waist + 0.12, s.upperIn], [topFront, s.roof - 0.12, s.upperSkin]),
     box('glass', 'glass', [winA, s.waist + 0.12, s.upperIn + 0.005], [winB, s.roof - 0.12, s.upperSkin - 0.005]),
     box('handle', 'dark', [x0 + 0.1, s.waist - 0.22, s.lowerSkin + 0.03125], [x0 + 0.26, s.waist - 0.16, s.lowerSkin + 0.0625]),
-    box('hinge_top', 'dark', [hingeX - 0.1, s.waist - 0.2, s.lowerSkin], [hingeX, s.waist - 0.12, s.lowerSkin + 0.0625]),
-    box('hinge_low', 'dark', [hingeX - 0.1, s.floor + 0.12, s.lowerSkin], [hingeX, s.floor + 0.2, s.lowerSkin + 0.0625]),
-  ], finish, motion=k.motion.hinge(['hinge_top', 'hinge_low'], 'near', s.doorOpens));
+    box('hinge_top', 'dark', [hingeX - 0.1, s.waist - 0.2, s.lowerSkin], [hingeX, s.waist - 0.12, leafOut]),
+    box('hinge_low', 'dark', [hingeX - 0.1, s.floor + 0.12, s.lowerSkin], [hingeX, s.floor + 0.2, leafOut]),
+  ] + pins, finish, motion=k.motion.hinge(pins, 'near', s.doorOpens));
 local lugCount = 20;
 local lugs = [
   local a = 2 * std.pi * i / lugCount;
