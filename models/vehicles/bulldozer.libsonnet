@@ -9,6 +9,7 @@ local bothSides = k.bothSides;
 local skin = 0.04;
 local doorRear = -1.0;
 local doorFront = -0.25;
+local doorY = [s.deck + 0.05, s.belt, s.cabRoof - 0.06, s.cabRoof];
 local post = 0.12;
 // The moldboard curls forward round a centre ahead of the blade, `sweep` degrees above and below it, its cutting edge
 // on the ground.
@@ -86,9 +87,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('rear_quarter_glass', 'glass', [s.cabRear + post, s.belt, s.cabSide - 0.03], [doorRear, s.cabRoof, s.cabSide - 0.01]),
     box('front_quarter', 'paint', [doorFront, s.deck, s.cabSide - 0.04], [s.cabFront - post, s.belt, s.cabSide]),
     box('front_quarter_glass', 'glass', [doorFront, s.belt, s.cabSide - 0.03], [s.cabFront - post, s.cabRoof, s.cabSide - 0.01]),
+    m.cabDoorJamb('door_jamb', [doorRear, doorFront], doorY, s.cabSide),
     box('console', 'trim', [-0.55, s.deck + 0.05, 0.3], [-0.3, s.deck + 0.55, 0.45]),
   ]), { paint: s.paint, floor: 'rubber-black', trim: 'plastic-black', glass: 'glass-clear' }) + { title: 'Bulldozer cab' },
-  m.cabDoor('bulldozer_cab_door', 45, [doorRear, doorFront], [s.deck + 0.05, s.belt, s.cabRoof - 0.06, s.cabRoof], s.cabSide, s.paint) + { title: 'Bulldozer cab door' },
+  m.cabDoor('bulldozer_cab_door', 45, [doorRear, doorFront], doorY, s.cabSide, s.paint, 'near') +{ title: 'Bulldozer cab door' },
   k.compound('bulldozer_windscreen', 22, [
     box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.45, -s.cabSide + post], [s.cabFront - 0.015, s.cabRoof, s.cabSide - post]),
   ], { glass: 'glass-clear' }) + { title: 'Bulldozer windscreen' },

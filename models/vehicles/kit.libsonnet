@@ -172,6 +172,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
       assert std.isBoolean(stow) : 'a slide stows or it does not';
       [{ kind: 'slide', toward: toward, travel: travel } + (if stow then { stow: true } else {})],
   },
+  grain: vehicleGrain,
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
   // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a
   // neighbour's face sinks at most a grain into it, which the overlap check of docs/decisions/0014-site-overlap.md
@@ -186,6 +187,16 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   near: near,
   far: far,
   bothSides(pieces): std.map(near, pieces) + std.map(far, pieces),
+  // How far a hinged part's face stands off a neighbour it slides across as it swings: enough that the two never
+  // touch, and well under a grain, so it opens no empty cell.
+  swingGap: 0.001,
+  // How far a side-hung door's trailing edge stands off the post behind it, for a door `length` from its pins to that
+  // edge whose inner face lies `depth` inside them. Its inner corner swings back across the post as it opens, at most
+  // by how much further that corner lies from the pins than the edge's length.
+  doorTailGap(length, depth): std.sqrt(length * length + depth * depth) - length + self.swingGap,
+  // A lip inside the post behind a side-hung door's trailing edge, over heights `y` and a swing gap inside the face
+  // `face` the door closes against, so the gap the door needs to swing clear of the post is not a slot through the body.
+  doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - 0.03], [rear + 0.02, y[1], face - self.swingGap]),
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
