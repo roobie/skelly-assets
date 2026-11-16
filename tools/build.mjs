@@ -21,7 +21,7 @@ import { parseArgs } from 'node:util';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
-import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows, smoothPack } from './layout.mjs';
 import {
   buildManifest,
   MANIFEST,
@@ -36,6 +36,7 @@ import { danglingPartItems } from './partItems.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
+import { restPokeCheck, restPokeResults, treeModels } from './restPoke.mjs';
 import { readSeveredParts } from './severedParts.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
 import { SOUND_SAMPLE_RATE } from './sounds.mjs';
@@ -126,6 +127,20 @@ function recipeUnits(root, tools, names) {
 const withTasks = (tools, units) =>
   Promise.all(units.map(async (unit) => ({ ...unit, tasks: await tools[unit.name].tasks(unit.rows) })));
 
+// The units' models as tools/restPoke.mjs reads them, generated through the pool, so a shard checks garments with no tree.
+const generatedModels = (units, pool) => {
+  const runs = new Map(
+    units.flatMap(({ name, rows, tasks }) => rows.map((row, at) => [row.id, { tool: name, task: tasks[at] }])),
+  );
+  return {
+    models: units.flatMap(({ rows }) => rows.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags }))),
+    modelOf: async (id) => {
+      const { glb, modelEntry } = await pool.run(runs.get(id));
+      return { glb, entry: modelEntry };
+    },
+  };
+};
+
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
 // its pack, kind, GLB path under the pack, part node names and label, and every file written as <packId>/<logical path>.
@@ -161,13 +176,16 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   return { models, files };
 }
 
-// Writes one pack's generated models into out/<packId>/ in its tool's layout, each GLB with its sidecar, and with
-// `index` the pack's index if the tool keeps one. Returns each model written, with its pack, and every file written as
-// <packId>/<logical path>.
+// Writes one pack's generated models into out/<packId>/ in its tool's layout, each GLB with its sidecar, and its smooth
+// copy at the same path in out/<packId>.smooth/, and with `index` the pack's index if the tool keeps one. Returns each
+// model written, with its pack and its smooth copy's, and every file written as <packId>/<logical path>.
 async function writePack(out, packId, tool, generated, { index }) {
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
-  const written = writeModelExports(generated, resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, {
+  const base = (pack) => resolve(out, outputPath(pack, tool.directory), '..');
+  const smooth = smoothPack(packId);
+  const written = writeModelExports(generated, base(packId), tool.directory, {
     index: index && tool.index,
+    smoothBase: base(smooth),
   });
   return {
     models: written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
@@ -175,6 +193,7 @@ async function writePack(out, packId, tool, generated, { index }) {
       kind,
       pack: packId,
       path,
+      smooth: { pack: smooth, path },
       nodes: partNodes,
       label,
       paintable,
@@ -183,7 +202,10 @@ async function writePack(out, packId, tool, generated, { index }) {
       massKg: physical?.massKg,
       volumeM3: physical?.volumeM3,
     })),
-    files: written.files.map((file) => outputPath(packId, file)),
+    files: [
+      ...written.files.map((file) => outputPath(packId, file)),
+      ...written.smoothFiles.map((file) => outputPath(smooth, file)),
+    ],
   };
 }
 
@@ -254,7 +276,8 @@ async function buildRoster(thing, rows, ids, out, roster, pool, { index }) {
     if (row) packs.set(row.packId, [...(packs.get(row.packId) ?? []), result.value]);
     else {
       writeFileSync(join(out, `${id}.glb`), result.value.glb);
-      console.log(`built ${id}.glb`);
+      writeFileSync(join(out, `${id}.smooth.glb`), result.value.smoothGlb);
+      console.log(`built ${id}.glb and ${id}.smooth.glb`);
     }
   }
   const models = [];
@@ -288,6 +311,7 @@ export async function fillCacheShard({ root = repo, shard, cache, sitePieces }) 
   const pool = exportPool(cache);
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
+    await restPokeResults(generatedModels(units, pool), { root, cache, shard });
     console.log(cacheReport(pool.usage()));
     await swingResults(sitePieces ?? readSitePieces(root), { cache, shard });
   } finally {
@@ -360,6 +384,10 @@ async function main() {
         dressing,
         await readDollParts(dressing),
       );
+      const rest = await restPokeCheck(treeModels(out, models), { cache, prune: true });
+      for (const message of rest.notes) console.log(`REST note: ${message}`);
+      for (const message of rest.problems) console.log(`REST ${message}`);
+      if (rest.problems.length > 0) failed = true;
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({

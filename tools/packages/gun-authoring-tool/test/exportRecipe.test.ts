@@ -2,11 +2,13 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
 import { SMOOTH } from '@skelly/thing-export/glb.ts';
+import type { ModelExport } from '@skelly/thing-export/recipe.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { REPO_ROOT } from '../src/cli/content.ts';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
 import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
+import type { DeadvoxModelEntry } from '../src/gun/exportGlb.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
 import { readGlb } from './glbReader.ts';
 
@@ -167,6 +169,13 @@ describe('recipe iron sight lattice', () => {
 
 describe('recipe output grain', () => {
   const rows = loadExportRecipe();
+  // Each row is generated once for every check on it, since a gun takes seconds to write.
+  const generated = new Map<string, ModelExport<DeadvoxModelEntry>>();
+  const generatedOf = (row: (typeof rows)[number]) => {
+    const model = generated.get(row.id) ?? row.generate();
+    generated.set(row.id, model);
+    return model;
+  };
   it('has recipe rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
@@ -177,7 +186,7 @@ describe('recipe output grain', () => {
       row.kind === 'cartridge'
         ? [undefined]
         : [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
-    const { glb } = row.generate();
+    const { glb } = generatedOf(row);
     const { meshes } = readGlb(glb).json;
     expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
     // A loose part's node is named by the family its part builds, which need not be its catalogue family.
@@ -195,6 +204,15 @@ describe('recipe output grain', () => {
         );
       }
     });
+  });
+  it.for(rows)('ships a smooth copy of $id with the same part nodes and no voxel grain', (row) => {
+    const { glb, smoothGlb } = generatedOf(row);
+    expect(partNodes(smoothGlb).map(({ family }) => family)).toEqual(partNodes(glb).map(({ family }) => family));
+    const primitives = readGlb(smoothGlb).json.meshes.flatMap(({ primitives }) => primitives);
+    expect(primitives.length, `${row.id}: no smooth primitives`).toBeGreaterThan(0);
+    expect(
+      primitives.some(({ extras }) => (extras as { voxelGrain?: number } | undefined)?.voxelGrain !== undefined),
+    ).toBe(false);
   });
 });
 

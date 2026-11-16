@@ -45,20 +45,24 @@ export function previousTag(tags, tag) {
   return earlier.at(-1);
 }
 
-const sha256 = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
+// One file's hash is its bytes' alone, so a model that has only that file keeps the hash an earlier release gave it. A
+// GLB states its own length, so files run end to end hash apart however their bytes are shared out.
+const sha256 = (files) =>
+  files.reduce((hash, file) => hash.update(readFileSync(file)), createHash('sha256')).digest('hex');
 
 /**
- * id -> sha256 of the file a built tree's manifest names: a model's GLB, or a vehicle's placements file, which is what
- * a vehicle is made of beside the models at its sites.
+ * id -> sha256 of the files a built tree's manifest names: a model's GLB and its smooth copy, so a change to either is
+ * an update, or a vehicle's placements file, which is what a vehicle is made of beside the models at its sites.
  */
 export function hashModels(built, manifest) {
   const hashes = {};
-  const add = (id, pack, path) => {
+  const add = (id, files) => {
     if (Object.hasOwn(hashes, id)) throw new Error(`${id} names more than one file to hash`);
-    hashes[id] = sha256(join(built, pack, path));
+    hashes[id] = sha256(files.map(({ pack, path }) => join(built, pack, path)));
   };
-  for (const { id, pack, path } of manifest.models) if (path.endsWith('.glb')) add(id, pack, path);
-  for (const { id, pack, path } of manifest.vehicles ?? []) add(id, pack, path);
+  for (const { id, pack, path, smooth } of manifest.models)
+    if (path.endsWith('.glb')) add(id, [{ pack, path }, ...(smooth ? [smooth] : [])]);
+  for (const { id, pack, path } of manifest.vehicles ?? []) add(id, [{ pack, path }]);
   return hashes;
 }
 

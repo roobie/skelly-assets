@@ -8,7 +8,7 @@ import { attachmentInstanceForId, attachmentMetadata, attachmentMountPort } from
 import { gunDomain } from './domain.ts';
 import { inFileFrame } from './exportFrame.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import { exportGunModels } from './glbWriter.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { FAMILIES } from './parts.ts';
 
@@ -16,6 +16,7 @@ export type AttachmentExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: DeadvoxModelEntry;
     }
@@ -62,13 +63,21 @@ export const exportAttachmentGlb = (
   const rootMount = attachmentMountPort(part, metadata.mount)!.id;
   const fileResolved = inFileFrame(resolved);
   const drawn = drawnGeometry(fileResolved, voxel);
-  const result = exportGlb({ resolved, palette: GUN_PALETTE, asset, rootMount, ...voxel, drawnVoxels: drawn.voxels });
+  const result = exportGunModels({
+    resolved,
+    palette: GUN_PALETTE,
+    asset,
+    rootMount,
+    ...voxel,
+    drawnVoxels: drawn.voxels,
+  });
   if (!result.ok) {
     return result;
   }
   return {
     ok: true,
     glb: result.glb,
+    smoothGlb: result.smoothGlb,
     partNodes: result.partNodes,
     modelEntry: {
       id: asset.id,

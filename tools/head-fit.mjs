@@ -10,7 +10,7 @@ import { at, builtModels, millimetres, placed, readBandFit } from './strap-fit.m
 
 const repo = resolve(import.meta.dirname, '..');
 
-const readSeats = (root) => JSON.parse(evaluateJsonnet("import 'models/head-seats.libsonnet'", root));
+export const readSeats = (root) => JSON.parse(evaluateJsonnet("import 'models/head-seats.libsonnet'", root));
 
 /**
  * The ways a shell fails to clear `head`, a closed mesh in the bust model frame. `meshes` are the shell's closed
