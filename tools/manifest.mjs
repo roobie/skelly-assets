@@ -129,7 +129,8 @@ export function buildManifest({ models, vehicles = [], motions = [], sounds = []
   for (const file of [...new Set(files)].sort(byText)) {
     const [pack, ...rest] = file.split('/');
     outputPath(pack, rest.join('/'));
-    (packs[pack] ??= { dependsOn: Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : [], files: [] }).files.push(rest.join('/'));
+    packs[pack] ??= { dependsOn: Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : [], files: [] };
+    packs[pack].files.push(rest.join('/'));
   }
   for (const [pack, { dependsOn: targets }] of Object.entries(packs)) {
     for (const target of targets) if (!Object.hasOwn(packs, target)) throw new Error(`${pack}: depends on ${target}, which the tree does not hold`);
