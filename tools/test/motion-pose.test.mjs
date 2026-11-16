@@ -72,3 +72,10 @@ test('a part that rides a moving carrier follows it, nested inside the carrier, 
 test('a vehicle whose models do not move has no site that moves, so nothing offers to open it', () => {
   assert.deepEqual(movingSites(sites, new Map()), []);
 });
+
+test('sites that name no site, as the doll wears a piece, ride nothing, so each moves by its own motion alone', () => {
+  const worn = [{ model: 'shell', at: [0, 0, 0] }, { model: 'panel', at: [1, 0, 0] }, { model: 'pane', at: [2, 0, 0] }];
+  const found = movingSites(worn, motions);
+  assert.deepEqual(found.map(({ index }) => index), [1]);
+  assert.equal(found[0].layers.length, 1);
+});
