@@ -131,6 +131,7 @@ local shaftAdd(r) =
 // Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline.
 local slit = { min: [-0.085, 0.178, 0.112], max: [0.085, 0.192, 0.122] };
 local skull = { radius: 0.135, y0: 0.03, y1: 0.27 };
+local helmetBase = fit.eyesAt((slit.min[1] + slit.max[1]) / 2);
 local helmet = [
   round(h.disc('flange', 'trim', 0.15, 0, 0.034)),
   round(h.disc('shell', 'plate', skull.radius, skull.y0, skull.y1)),
@@ -153,27 +154,33 @@ local helmet = [
 local gloves = fit.hands('gauntlet_plate', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.04, hem: 0.02, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'trim', ridge: 'rivet' },
-}, 'Plate gauntlets').rows;
+}, 'Plate gauntlets');
 local boots = fit.feet('sabaton_plate', sabaton,
-                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons').rows;
+                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
 
-// The breastplate encloses the trunk and the greave the shin, so each hides that skin; the shoulders stay drawn under
-// the pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates leave a joint's cap bare.
-armour.of('medieval', [
-  row('armor_plate_worn_body', body) + { title: 'Plate body armour', covers: ['trunk'] },
-  row('armor_plate_worn_upper', upper, 0.008) + { title: 'Plate upper arm armour' },
-  row('armor_plate_worn_fore', fore) + { title: 'Plate forearm armour' },
-  row('legguard_plate_worn_thigh', thigh) + { title: 'Plate thigh guard' },
-  row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard', covers: ['shin'] },
-] + [
-  local seg = std.split(r.id, '_worn_')[1];
-  if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r
-  for r in gloves + boots
-] + [
-  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + {
-    title: 'Plate armet',
-    voxelGrain: 0.006,
-    anchors: { brow: fit.browAnchor('helmet_plate_armet', 'shell', [-skull.radius, skull.y0, -skull.radius], [skull.radius, skull.y1, skull.radius],
-                                    fit.headroom(fit.eyesAt((slit.min[1] + slit.max[1]) / 2)).brow) },
+// Each item whole, its rows with any figure models a fitted template gives, as models/trooper.libsonnet's are. The
+// breastplate encloses the trunk and the greave the shin, so each hides that skin; the shoulders stay drawn under the
+// pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates leave a joint's cap bare.
+local fitted(r) = local seg = std.split(r.id, '_worn_')[1]; if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r;
+local set = {
+  armor_plate: { rows: [
+    row('armor_plate_worn_body', body) + { title: 'Plate body armour', covers: ['trunk'] },
+    row('armor_plate_worn_upper', upper, 0.008) + { title: 'Plate upper arm armour' },
+    row('armor_plate_worn_fore', fore) + { title: 'Plate forearm armour' },
+  ] },
+  legguard_plate: { rows: [
+    row('legguard_plate_worn_thigh', thigh) + { title: 'Plate thigh guard' },
+    row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard', covers: ['shin'] },
+  ] },
+  gauntlet_plate: gloves + { rows: [fitted(r) for r in gloves.rows] },
+  sabaton_plate: boots + { rows: [fitted(r) for r in boots.rows] },
+  helmet_plate_armet: fit.head('helmet_plate_armet', helmetBase) + {
+    rows: [h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + {
+      title: 'Plate armet',
+      voxelGrain: 0.006,
+      anchors: { brow: fit.browAnchor('helmet_plate_armet', 'shell', [-skull.radius, skull.y0, -skull.radius], [skull.radius, skull.y1, skull.radius],
+                                      fit.headroom(helmetBase).brow) },
+    }],
   },
-])
+};
+{ [k]: set[k] + { rows: armour.of('medieval', set[k].rows) } for k in std.objectFields(set) }

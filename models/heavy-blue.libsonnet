@@ -103,24 +103,25 @@ local shinAdd = [
   oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.012, sw + 0.06, sd + 0.06, leg.shinChamfer / 2 + 0.02),
 ];
 
-// The helm: wider and deeper than the trooper's, with cheek guards, ear discs, a tall crest and a heavy brow. Its brow
-// anchor is the point of its shell that a seat with the visor over the eyes puts at the hairline.
-local visor = { min: [-0.115, 0.155, 0.145], max: [0.115, 0.19, 0.162] };
-local shell = { min: [-0.145, 0.035, -0.155], max: [0.145, 0.27, 0.155] };
+// The helm: wider and deeper than the trooper's, a moulded shell sloping in to a chamfered, domed crown under a tall
+// crest, a skirt flared out over the nape, cheek guards, ear discs and a heavy peaked brow. Its brow anchor is the point
+// of its shell that a seat with the visor over the eyes puts at the hairline.
+local visor = { min: [-0.085, 0.155, 0.145], max: [0.085, 0.19, 0.162] };
+local shell = { min: [-0.145, 0.035, -0.155], max: [0.145, 0.3, 0.155] };
+local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
 local helmet = [
-  h.box('skirt', 'trim', [-0.16, 0, -0.17], [0.16, 0.04, 0.17]),
-  h.box('shell', 'plate', shell.min, shell.max),
-  h.box('cap', 'plate', [-0.135, 0.265, -0.145], [0.135, 0.29, 0.145]),
-  round(h.dome('crown', 'plate', 0.135, 0.075, 0.014, 'y', [0, 0.285, 0])),
-  h.box('crest', 'insignia', [-0.016, 0.29, -0.14], [0.016, 0.375, 0.14]),
-  h.box('brow', 'trim', [-0.15, 0.19, 0.14], [0.15, 0.222, 0.18]),
+  h.taperedBlock('skirt', 'trim', [-0.158, 0, -0.185], [0.158, 0.04, 0.17], 0.05, [0.012, 0.012, 0.03], 0),
+  h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.035, [0.022, 0.012, 0.022], 0.05),
+  round(h.dome('crown', 'plate', 0.07, 0.03, 0.012, 'y', [0, 0.295, -0.005])),
+  h.prism('crest', 'insignia', 'x', [[0.27, 0.125], [0.335, 0.08], [0.35, -0.07], [0.27, -0.12]], -0.016, 0.016),
+  h.prism('brow', 'trim', 'x', [[0.186, 0.138], [0.19, 0.172], [0.21, 0.184], [0.226, 0.145]], -0.08, 0.08),
   h.box('visor', 'lens', visor.min, visor.max),
   h.prism('faceplate', 'plate', 'x', [[0.04, 0.15], [0.17, 0.15], [0.145, 0.19], [0.06, 0.196]], -0.085, 0.085),
 ] + [
   h.box('grille-%d' % i, 'grille', [-0.055, 0.07 + i * 0.022, 0.185], [0.055, 0.081 + i * 0.022, 0.2])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'plate', [[-0.172, 0.145][i], 0.05, -0.04], [[-0.145, 0.172][i], 0.2, 0.14])
+  h.box('cheek-%d' % i, 'plate', [[-0.172, 0.125][i], 0.05, -0.04], [[-0.125, 0.172][i], 0.2, 0.14])
   for i in [0, 1]
 ] + [
   round(h.rod('ear-%d' % i, 'trim', 0.055, [-0.2, 0.17][i], [-0.17, 0.2][i], 0.13))
@@ -132,14 +133,14 @@ local helmet = [
   round(h.rod('filter', 'trim', 0.03, 0.2, 0.26, 0.08)) + { origin: [-0.235, 0.08, 0.09] },
 ];
 
-local body = fit.trooper('armor_heavy', livery, title='Heavy body armour').rows;
-local legs = fit.trooperLegs('legguard_heavy', livery, title='Heavy leg guards').rows;
+local body = fit.trooper('armor_heavy', livery, title='Heavy body armour');
+local legs = fit.trooperLegs('legguard_heavy', livery, title='Heavy leg guards');
 local gloves = fit.hands('gloves_heavy', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.07, hem: 0.02, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}, 'Heavy gauntlets').rows;
+}, 'Heavy gauntlets');
 local boots = fit.feet('boots_heavy', bootFinish,
-                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Heavy boots').rows;
+                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Heavy boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03);
@@ -153,14 +154,15 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-armour.of(null, [
-  local seg = std.split(r.id, '_worn_')[1];
-  if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
-  for r in body + gloves + legs + boots
-] + [
-  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
-    title: 'Heavy helmet',
-    voxelGrain: 0.006,
-    anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(fit.eyesAt((visor.min[1] + visor.max[1]) / 2)).brow) },
+// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+local worn = { armor_heavy: body, legguard_heavy: legs, gloves_heavy: gloves, boots_heavy: boots };
+local heavy(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
+{ [k]: worn[k] + { rows: armour.of(null, [heavy(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
+  helmet_heavy: fit.head('helmet_heavy', helmetBase) + {
+    rows: armour.of(null, [h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
+      title: 'Heavy helmet',
+      voxelGrain: 0.006,
+      anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+    }]),
   },
-])
+}

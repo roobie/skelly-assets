@@ -11,27 +11,26 @@ local gauntlet = livery + { hand: 'leather-black' };
 local trooperBoot = { upper: 'leather-black', toe: 'paint-olive', sole: 'rubber-tread', collar: 'paint-crane-yellow', laces: 'webbing-olive-dark' };
 // A worn template's own ground shells as the item's ground model.
 local suit(id, title, massKg, worn) = worn + { rows: [h.compound(id, massKg, worn.ground, worn.rows[0].parts[0].finish) + { title: title, voxelGrain: 0.004 }] + worn.rows };
-// The trooper helm, base at the neck and face towards +z, the wearer's front: a flared neck guard, a deep shell under
-// a domed crown with a yellow crest, an amber visor slit under a brow bar, a wedge faceplate with grille slats and a
-// filter canister on the left cheek. It is seated with the visor slit over the eyes, and its brow anchor is the point of
-// its shell that seat puts at the hairline.
-local visor = { min: [-0.095, 0.155, 0.125], max: [0.095, 0.19, 0.142] };
-local shell = { min: [-0.12, 0.03, -0.135], max: [0.12, 0.27, 0.135] };
+// The trooper helm, base at the neck and face towards +z, the wearer's front: a skirt flared out over the nape, a
+// moulded shell sloping in to a chamfered crown with a low dome and a yellow crest, an amber visor slit under a peaked
+// brow, a wedge faceplate with grille slats and a filter canister on the left cheek. It is seated with the visor slit
+// over the eyes, and its brow anchor is the point of its shell that seat puts at the hairline.
+local visor = { min: [-0.07, 0.155, 0.12], max: [0.07, 0.19, 0.138] };
+local shell = { min: [-0.12, 0.03, -0.135], max: [0.12, 0.295, 0.135] };
 local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
 local helmet = [
-  h.box('skirt', 'trim', [-0.135, 0, -0.15], [0.135, 0.035, 0.15]),
-  h.box('shell', 'plate', shell.min, shell.max),
-  h.box('cap', 'plate', [-0.11, 0.265, -0.125], [0.11, 0.285, 0.125]),
-  h.dome('crown', 'plate', 0.11, 0.06, 0.012, 'y', [0, 0.28, 0]),
-  h.box('crest', 'insignia', [-0.012, 0.28, -0.125], [0.012, 0.35, 0.125]),
-  h.box('brow', 'trim', [-0.125, 0.19, 0.12], [0.125, 0.215, 0.152]),
+  h.taperedBlock('skirt', 'trim', [-0.132, 0, -0.165], [0.132, 0.035, 0.15], 0.05, [0.012, 0.012, 0.03], 0),
+  h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, [0.02, 0.01, 0.02], 0.042),
+  h.dome('crown', 'plate', 0.06, 0.025, 0.01, 'y', [0, 0.29, -0.005]),
+  h.prism('crest', 'insignia', 'x', [[0.27, 0.105], [0.325, 0.065], [0.335, -0.055], [0.27, -0.1]], -0.012, 0.012),
+  h.prism('brow', 'trim', 'x', [[0.188, 0.118], [0.19, 0.146], [0.206, 0.156], [0.218, 0.124]], -0.075, 0.075),
   h.box('visor', 'lens', visor.min, visor.max),
   h.prism('faceplate', 'plate', 'x', [[0.04, 0.13], [0.155, 0.13], [0.135, 0.168], [0.06, 0.174]], -0.065, 0.065),
 ] + [
   h.box('grille-%d' % i, 'grille', [-0.045, 0.07 + i * 0.02, 0.165], [0.045, 0.08 + i * 0.02, 0.181])
   for i in [0, 1, 2]
 ] + [
-  h.box('bolt-%d' % i, 'rivet', [[-0.13, 0.12][i], 0.12, 0.02], [[-0.12, 0.13][i], 0.14, 0.04])
+  h.box('bolt-%d' % i, 'rivet', [[-0.125, 0.11][i], 0.12, 0.02], [[-0.11, 0.125][i], 0.14, 0.04])
   for i in [0, 1]
 ] + [
   h.rod('filter', 'trim', 0.026, 0.115, 0.165, 0.08) + { origin: [-0.165, 0.08, 0.07] },
