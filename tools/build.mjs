@@ -294,8 +294,9 @@ async function buildRoster(thing, rows, ids, out, roster, pool, { index }) {
 // Generates one shard of the production build's cacheable rows into the cache and writes no tree. CI spreads a clean
 // build's generation over runners this way, then builds the tree from their merged caches, where every cacheable row
 // is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
-// which serialises back to the same text.
-export async function fillCacheShard({ root = repo, shard, cache }) {
+// which serialises back to the same text. `sitePieces` are the vehicle sites whose swings the shard sweeps, by default
+// the root's (readSitePieces), so a fixture root can name a fleet of its own.
+export async function fillCacheShard({ root = repo, shard, cache, sitePieces }) {
   await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
@@ -312,7 +313,7 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
     await restPokeResults(generatedModels(units, pool), { root, cache, shard });
     console.log(cacheReport(pool.usage()));
-    await swingResults(readSitePieces(repo), { cache, shard });
+    await swingResults(sitePieces ?? readSitePieces(root), { cache, shard });
   } finally {
     await pool.close();
   }
