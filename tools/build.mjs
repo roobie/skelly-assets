@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
-import { readAnchorParts, readDressing, wornOnParts } from './dress.mjs';
+import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
 import { readDependencies } from './packs.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
@@ -174,8 +174,8 @@ export function withSources(models, sources) {
 }
 
 // Each model with the doll part it sits on, if it is worn (tools/dress.mjs, `wornOnParts`), read from its taxonomy.
-export function withWornOn(models, dressing, anchorParts) {
-  const wornOn = wornOnParts(models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })), dressing, anchorParts);
+export function withWornOn(models, dressing, dollParts) {
+  const wornOn = wornOnParts(models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })), dressing, dollParts);
   return models.map((model) => (wornOn.has(model.id) ? { ...model, wornOn: wornOn.get(model.id) } : model));
 }
 
@@ -299,7 +299,7 @@ async function main() {
       const mobs = mobManifest(readMobRows(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
       const dressing = readDressing(repo);
-      const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readAnchorParts(dressing));
+      const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({
