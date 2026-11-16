@@ -14,7 +14,9 @@ output so consumers need no authoring environment. Use `build_models.sh` for ros
 `build_mobs.sh` for generated actors. For the entry points and selection rules, see `build.mjs`, `main`,
 `mobs.mjs`, `main`, and `sounds.mjs`, `main`.
 
-The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Install the locked dependencies with `npm ci` in `tools/`;
+The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Every package's
+`tsconfig.json` extends `tsconfig.base.json` and adds only what is its own, so a strict check is turned on once for
+every package instead of drifting between copies. Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
 of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the item
