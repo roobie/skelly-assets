@@ -1,7 +1,7 @@
 // Where each solid is drawn, so the datums an export writes (grips, anchors, round poses, collision boxes, centres of
 // mass) read off the voxels the player sees rather than off the authored solids those voxels approximate.
 
-import type { Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
 import {
   add,
   applyPoint,
@@ -116,6 +116,14 @@ export const drawnGeometry = (
   const { voxelGrain } = options;
   const unit = resolved.domain.units.metresPerUnit;
   const authoredMeasures = new Map<Solid, SolidMeasure>();
+  // Judging a part's grain bounds all its solids, and every solid of the part is measured, so it is judged once.
+  const partGrains = new Map<string, number | undefined>();
+  const partGrain = (partId: string, def: PartDef, grain: number): number | undefined => {
+    if (!partGrains.has(partId)) {
+      partGrains.set(partId, partVoxelGrain(def, { ...options, voxelGrain: grain }, unit));
+    }
+    return partGrains.get(partId);
+  };
   /** Per list of solids sampled together, each solid's drawn measure, undefined where it draws no voxels. */
   const measured = new Map<readonly Solid[], Map<Solid, SolidMeasure | undefined>>();
   const drawnMeasures = (
@@ -151,7 +159,7 @@ export const drawnGeometry = (
     if (!(def && placed)) {
       throw new Error(`No placed part ${partId} to read a datum from`);
     }
-    const grain = voxelGrain === undefined ? undefined : partVoxelGrain(def, { ...options, voxelGrain }, unit);
+    const grain = voxelGrain === undefined ? undefined : partGrain(partId, def, voxelGrain);
     if (grain === undefined) {
       const authored = authoredMeasures.get(solid) ?? authoredMeasure(solid);
       authoredMeasures.set(solid, authored);
@@ -221,9 +229,7 @@ export const drawnGeometry = (
   const grain = (part: string): number | undefined => {
     const def = resolved.defs.get(part);
     const placed = resolved.placed.get(part);
-    return voxelGrain !== undefined && def && placed && onAxes(placed)
-      ? partVoxelGrain(def, { ...options, voxelGrain }, unit)
-      : undefined;
+    return voxelGrain !== undefined && def && placed && onAxes(placed) ? partGrain(part, def, voxelGrain) : undefined;
   };
   return { measure, point, grain };
 };
