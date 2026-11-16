@@ -28,7 +28,7 @@ local s = import 'tractor.spec.libsonnet';
   + site.pair('front_wheel', 'wheel_6_50r16_ag', [s.frontAxle, s.frontHub, s.frontZ])
   + site.pair('rear_wheel', 'wheel_16_9r30', [s.rearAxle, s.rearHub, s.rearZ])
   + site.pair('tail_lamp', 'tail_lamp_small', [-1.98, 1.1, 0.9])
-  + site.pair('mirror', 'door_mirror', [s.cabFront - 0.02, 2.2, s.cabSide])
+  + site.pair('mirror', 'door_mirror', [s.cabFront + 0.01, 2.2, s.cabSide])
   + site.headlamps(s.nose - 0.02, 1.2, 0.3)
   + site.batteryBay('battery_tray', [0.22, 1.1, 0]),
   tags: { 'vehicle-role': ['farm'] },

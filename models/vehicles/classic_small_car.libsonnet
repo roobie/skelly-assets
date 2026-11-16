@@ -12,12 +12,28 @@ local roofSlice(id, low, high, half) = prism(id, 'paint', [[aft(low), low], [for
 local top = s.windowTop;
 local paint = { paint: s.paint, trim: 'plastic-black', glass: 'glass-clear' };
 local wing(id, x, from, to) = k.arc(id, 'paint', x, s.hub, 0.31, 0.35, from, to, 9, [0.56, s.side]);
+// How near a swinging part ever comes to the body it swings past.
+local clearance = 0.001;
+// Each door turns on pins just outboard of its skin's fore edge, one clearance clear of the cowl's rear corner. Its rear
+// edge stands where the inner corner's swing circle passes the clearance inside the B-pillar's nearest corner.
+local doorPivot = s.body + k.grain + clearance;
+local doorInner = s.body - 0.03;
+local doorBack = s.doorFront - std.sqrt(std.pow(std.sqrt(std.pow(s.doorFront - s.doorRear, 2) + std.pow(doorPivot - s.body, 2)) - clearance, 2) - std.pow(doorPivot - doorInner, 2));
+local doorPins = k.hingePins('hinge', 'y', [s.doorFront, 0.5, doorPivot], [s.doorFront, s.waist - 0.1, doorPivot]);
+// The boot lid's top and underside run up the tail to the deck below the rear screen. The lid stops a pin's width and a
+// clearance aft of the rear panel's foot, so its pins turn clear of the panel and of the fixed deck ahead of them.
+local lidTop(x) = 0.75 + (x + 1.84) * (s.waist + 0.03 - 0.75) / 0.52;
+local lidUnder(x) = 0.72 + (x + 1.82) * (s.waist - 0.72) / 0.5;
+local deckRear = aft(s.waist);
+local lidFront = deckRear - k.grain - clearance;
+local lidPins = k.hingePins('hinge', 'z', [lidFront, lidTop(lidFront) + k.grain, -0.35], [lidFront, lidTop(lidFront) + k.grain, 0.35]);
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('classic_small_car_shell', s.shellMass, [
     box('floor_pan', 'pan', [-1.3, 0.2, -s.body], [0.95, s.floor, s.body]),
     box('bulkhead', 'paint', [0.85, s.floor, -s.body], [0.95, s.waist, s.body]),
     box('rear_wall', 'trim', [-1.3, s.floor, -s.body], [-1.25, s.waist, s.body]),
     prism('tail', 'paint', [[-1.86, 0.42], [-1.3, 0.3], [-1.3, s.waist], [-1.82, 0.72]], [-s.body, s.body]),
+    prism('deck', 'paint', [[deckRear, lidUnder(deckRear)], [-1.32, s.waist], [-1.32, s.waist + 0.03], [deckRear, lidTop(deckRear)]], [-0.5, 0.5]),
     box('nose_pan', 'pan', [0.95, 0.3, -0.5], [1.72, 0.34, 0.5]),
     box('nose_panel', 'paint', [1.66, 0.34, -0.5], [1.72, 0.54, 0.5]),
     roofSlice('roof_edge', top, 1.32, 0.56),
@@ -42,10 +58,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     prism('glass', 'glass', [[0.85, s.waist], [0.89, s.waist], [fore(top) + 0.03, top], [fore(top) - 0.01, top]], [-0.5, 0.5]),
   ], { glass: 'glass-clear' }) + { title: 'Classic small car windscreen' },
   k.compound('classic_small_car_door', 22, [
-    box('skin', 'paint', [s.doorRear, s.floor, s.body - 0.03], [s.doorFront, s.waist, s.body]),
-    prism('glass', 'glass', [[s.doorRear, s.waist], [s.doorFront, s.waist], [fore(top) - 0.06, top], [s.doorRear, top]], [s.body - 0.02, s.body - 0.01]),
+    box('skin', 'paint', [doorBack, s.floor + clearance, doorInner], [s.doorFront, s.waist, s.body]),
+    prism('glass', 'glass', [[doorBack, s.waist], [s.doorFront, s.waist], [fore(top) - 0.06, top], [doorBack, top]], [s.body - 0.02, s.body - 0.01]),
     box('handle', 'bright', [s.doorRear + 0.05, s.waist - 0.11, s.body - 0.01], [s.doorRear + 0.15, s.waist - 0.08, s.body + 0.015]),
-  ], paint + { bright: 'steel-bright' }, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Classic small car door' },
+  ] + doorPins, paint + { bright: 'steel-bright' }, motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: 'Classic small car door' },
   k.compound('classic_small_car_bonnet', 11, [
     prism('top', 'paint', [[0.92, 0.95], [1.6, 0.82], [1.6, 0.86], [0.92, 0.99]], [-0.5, 0.5]),
     prism('nose', 'paint', [[1.6, 0.82], [1.72, 0.54], [1.76, 0.56], [1.6, 0.86]], [-0.5, 0.5]),
@@ -58,8 +74,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('mesh', 'dark', [1.76, 0.45, -0.17], [1.78, 0.69, 0.17]),
   ], { bright: 'steel-bright', dark: 'plastic-black' }) + { title: 'Classic small car grille' },
   k.compound('classic_small_car_boot_lid', 10, [
-    prism('lid', 'paint', [[-1.82, 0.72], [-1.32, s.waist], [-1.32, s.waist + 0.03], [-1.84, 0.75]], [-0.5, 0.5]),
-  ], { paint: s.paint }, { hinge_a: ['lid', [1, 1, 1]], hinge_b: ['lid', [1, 1, 0]] }) + { title: 'Classic small car boot lid' },
+    prism('lid', 'paint', [[-1.82, 0.72], [lidFront, lidUnder(lidFront)], [lidFront, lidTop(lidFront)], [-1.84, 0.75]], [-0.5, 0.5]),
+  ] + lidPins, { paint: s.paint }, motion=k.motion.hinge(lidPins, 'up', s.bootOpens)) + { title: 'Classic small car boot lid' },
   k.compound('classic_small_car_front_bumper', 6, [
     box('bar', 'bright', [1.78, 0.36, -0.68], [1.82, 0.45, 0.68]),
   ] + bothSides([
