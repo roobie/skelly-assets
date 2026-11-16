@@ -199,15 +199,6 @@ export function wornOnParts(models, dressing, anchorParts) {
   return wornOn;
 }
 
-// The doll part each bust anchor lies on, from the bust's catalogue row, since the built sidecar keeps only the points.
-// Import only after installJsonnetSources, as the catalogue reads the compiled rows.
-export async function readAnchorParts(dressing) {
-  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
-  const bust = catalogue.items.find(({ id }) => id === dressing.doll.bust);
-  if (!bust) throw new Error(`doll: the catalogue has no ${dressing.doll.bust}`);
-  return Object.fromEntries(Object.entries(bust.anchors ?? {}).map(([name, { part }]) => [name, part]));
-}
-
 function placedOn(model, dressing, anchorParts) {
   const place = placeOf(model, dressing);
   if (place.anchor === undefined) return { part: place.part, ...(place.both ? { both: true } : {}) };
@@ -216,12 +207,13 @@ function placedOn(model, dressing, anchorParts) {
   return { part, anchor: place.anchor };
 }
 
-// The place in the dressing's `places` that a wearable with no pieces sits at: the first that one of its slots names.
-export function placeOf(model, dressing) {
-  const slots = tagsOf(model, 'slot');
-  const place = dressing.places.find(({ slot }) => slots.includes(slot));
-  if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
-  return place;
+// The doll part each bust anchor lies on, from the bust's catalogue row, since the built sidecar keeps only the points.
+// Import only after installJsonnetSources, as the catalogue reads the compiled rows.
+export async function readAnchorParts(dressing) {
+  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
+  const bust = catalogue.items.find(({ id }) => id === dressing.doll.bust);
+  if (!bust) throw new Error(`doll: the catalogue has no ${dressing.doll.bust}`);
+  return Object.fromEntries(Object.entries(bust.anchors ?? {}).map(([name, { part }]) => [name, part]));
 }
 
 // The quarter turn about x that stands a model lying on its back, head end at -z, up with its front at +z.
