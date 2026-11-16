@@ -21,12 +21,15 @@ if (!values.out) {
 }
 
 const settings = readSettings(PATCHES);
-const { log } = await exploreBatch(await readPatches(PATCHES), settings, {
+const { sounds, log } = await exploreBatch(await readPatches(PATCHES), settings, {
   out: values.out,
   firstSeed: Number(values.seed),
   count: values.count === undefined ? settings.count : Number(values.count),
   only: values.patch,
 });
-for (const { file, peakDbfs, rmsDbfs, finite } of log) {
-  console.log(`${file.padEnd(20)} peak ${peakDbfs.toFixed(1)} dBFS  rms ${rmsDbfs.toFixed(1)} dBFS${finite ? '' : '  NON-FINITE'}`);
+for (const [index, { file, peakDbfs, rmsDbfs, finite }] of log.entries()) {
+  const seconds = sounds[index]?.seconds ?? 0;
+  console.log(
+    `${file.padEnd(20)} ${seconds.toFixed(2)} s  peak ${peakDbfs.toFixed(1)} dBFS  rms ${rmsDbfs.toFixed(1)} dBFS${finite ? '' : '  NON-FINITE'}`,
+  );
 }

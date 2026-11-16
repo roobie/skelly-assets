@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { before, test } from 'node:test';
 import { renderSound, readPatches, readSettings } from '../packages/faust-sfx/src/batch.ts';
 import { drawValues } from '../packages/faust-sfx/src/explore.ts';
+import { renderPatch } from '../packages/faust-sfx/src/faust.ts';
 
 const PATCHES = join(import.meta.dirname, '..', '..', 'models', 'sounds', 'patches');
 const settings = readSettings(PATCHES);
@@ -34,5 +35,18 @@ test('drawn values stay within each slider range and on its step, and change wit
       }
     }
     assert.notDeepEqual(drawValues(patch.sliders, 1), drawValues(patch.sliders, 2), patch.name);
+  }
+});
+
+test('every patch takes its noise from its noise seed, so two seeds never share one noise', async () => {
+  for (const patch of patches.values()) {
+    const noise = patch.sliders.filter((slider) => slider.noise);
+    assert.equal(noise.length, 1, `${patch.name} declares one noise seed`);
+    const [{ address, min, max }] = noise;
+    const values = drawValues(patch.sliders, 7);
+    const low = await renderPatch(patch, { ...values, [address]: min }, settings.sampleRate);
+    const high = await renderPatch(patch, { ...values, [address]: max }, settings.sampleRate);
+    assert.notDeepEqual(high, low, patch.name);
+    assert.notEqual(drawValues(patch.sliders, 1)[address], drawValues(patch.sliders, 2)[address], patch.name);
   }
 });
