@@ -40,4 +40,14 @@ local rear = { wheel: 'wheel_185_60r15', hub: 0.3015, z: 0.715 };
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.6, 0.5)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.45, -0.26]),
+  unjudged: [
+    site.unjudged('engine', 'exhaust_front_pipe', 0.049,
+      'The exhaust\'s front pipe runs through the engine block instead of leaving its manifold.'),
+    site.unjudged('gearbox', 'rear_wheel_far', 0.039,
+      'The gearbox case runs into the far rear tyre.'),
+    site.unjudged('rear_bumper', 'rear_wheel_far', 0.038,
+      'The rear bumper\'s bar runs into the rear tyres.'),
+    site.unjudged('rear_bumper', 'rear_wheel_near', 0.038,
+      'The rear bumper\'s bar runs into the rear tyres.'),
+  ],
 }

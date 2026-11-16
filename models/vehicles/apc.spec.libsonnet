@@ -8,6 +8,15 @@
   axles: [2.25, 1.0625, -0.9375, -2.125],
   hub: 0.522, wheelZ: 1.15,
   turretX: 0.25, driverX: 1.55, driverZ: -0.6,
+  ring: { inner: 0.6, outer: 0.85, height: 0.1 },
   platePitch: 1.156, plateFirst: -2.7,
+  // How far the ramp's pins stand off the centre line.
+  rampPinZ: 0.5,
+  // Degrees from closed, so the lowered ramp's lip rests on the ground.
+  rampOpen: 127,
+  // The roof hatches' round lids, and their `open` in degrees, so a raised lid leans back past upright and stays open.
+  // The squad's hatches are a pair, the near one at `squadHatch`.
+  hatch: { radius: 0.3, thickness: 0.05, open: 105 },
+  squadHatch: { x: -2.2, z: 0.72 },
   paint: 'paint-olive',
 }

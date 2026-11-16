@@ -15,6 +15,12 @@ local axle(id, massKg, finish) = k.compound(id, massKg, [
   k.turned('hub', 'hub', 'z', k.disc(0.15, 0.9, 1.02)),
 ]), { steel: 'steel-parkerized', hub: 'steel-grey' } + finish);
 local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1.32 + i * 0.16, 2.46, 1.08]);
+// Each opening part turns about its outer corner on the hinge side, so it swings out of the hull's way at every angle.
+local rampPins = k.hingePins('ramp_pin', 'z', [s.rear - 0.22, 0.81, -s.rampPinZ], [s.rear - 0.22, 0.81, s.rampPinZ], 'steel');
+local hatch = k.hatch(s.hatch.radius, s.hatch.thickness, s.hatch.open);
+// The roof is open under the hatches and inside the turret ring, so the open turret hatch looks down into the hull.
+local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), k.ringHole(s.turretX, s.ring.inner)]
+                  + [k.hatchHole(s.squadHatch.x, z, s.hatch.radius) for z in [s.squadHatch.z, -s.squadHatch.z]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 1660, [
     k.xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
@@ -37,15 +43,17 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     prism('cheek', 'paint', [[2.81, s.belly], [3.0, s.belly], [s.nose, 0.97], [s.nose, 1.47], [2.56, s.roofTop], [2.5, s.roofTop], [2.5, 1.19]], [1.19, 1.25]),
     box('tow_eye', 'steel', [s.nose, 0.9, 0.62], [s.nose + 0.08, 1.1, 0.72]),
   ]), paint + { steel: 'steel-parkerized' }) + { title: 'APC hull nose' },
-  k.compound('apc_hull_roof', 790, [
-    box('plate', 'paint', [s.rear, s.roof, -s.sideTop], [2.56, s.roofTop, s.sideTop]),
-  ], paint) + { title: 'APC hull roof' },
+  k.compound('apc_hull_roof', 790,
+             k.holed(box('plate', 'paint', [s.rear, s.roof, -s.sideTop], [2.56, s.roofTop, s.sideTop]), roofHoles),
+             paint) + { title: 'APC hull roof' },
   k.compound('apc_hull_rear', 175, [
     box('sill', 'paint', [s.rear - 0.14, s.belly, -s.wall], [s.rear, 0.81, s.wall]),
     box('header', 'paint', [s.rear - 0.14, 2.19, -s.sideTop], [s.rear, s.roofTop, s.sideTop]),
   ] + bothSides([
     box('post', 'paint', [s.rear - 0.14, 0.81, 0.625], [s.rear, 2.19, 1.25]),
     box('bumper', 'steel', [s.rear - 0.19, 0.72, 0.65], [s.rear - 0.125, 0.81, 1.2]),
+    // Under the ramp's pins, reaching out from the sill.
+    box('ramp_bracket', 'steel', [s.rear - 0.22, 0.75, s.rampPinZ - 0.04], [s.rear - 0.14, 0.81, s.rampPinZ + 0.04]),
   ]), paint + { steel: 'steel-parkerized' }) + { title: 'APC hull rear' },
   k.compound('apc_ramp', 120, [
     box('plate', 'paint', [s.rear - 0.19, 0.81, -0.62], [s.rear - 0.125, 2.19, 0.62]),
@@ -53,7 +61,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('rib_high', 'paint', [s.rear - 0.23, 1.75, -0.5], [s.rear - 0.19, 1.81, 0.5]),
     box('hinge_bar', 'steel', [s.rear - 0.22, 0.81, -0.6], [s.rear - 0.15, 0.87, 0.6]),
     box('handle', 'steel', [s.rear - 0.26, 1.42, -0.12], [s.rear - 0.19, 1.47, 0.12]),
-  ], paint + { steel: 'steel-parkerized' }, { hinge_a: ['hinge_bar', [0.5, 0.5, 0]], hinge_b: ['hinge_bar', [0.5, 0.5, 1]] }) + { title: 'APC ramp' },
+  ] + rampPins, paint + { steel: 'steel-parkerized' }, motion=k.motion.hinge(rampPins, 'rear', s.rampOpen)) + { title: 'APC ramp' },
   // Hangs on a rear post beside the ramp, outside the troop cabin: the origin is on the post's rear face, +x into the hull.
   k.compound('apc_fuel_tank', 70, [
     box('tank', 'paint', [-0.24, 0, -0.26], [0, 0.78, 0.26]),
@@ -74,18 +82,14 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
     box('hasp', 'steel', [0.04, 0.95, s.side], [0.1, 1.12, s.side + 0.03]),
   ], paint + { steel: 'steel-parkerized' }) + { title: 'APC stowage bin' },
   k.compound('apc_turret_ring', 150, [
-    k.turned('ring', 'steel', 'y', k.annulus(0.6, 0.85, 0, 0.1)) + { sides: 24 },
+    k.turned('ring', 'steel', 'y', k.annulus(s.ring.inner, s.ring.outer, 0, s.ring.height)) + { sides: 24 },
   ], { steel: 'steel-parkerized' }) + { title: 'APC turret ring' },
   k.compound('apc_cupola', 45, [
     k.turned('ring', 'paint', 'y', k.disc(0.36, 0, 0.14)) + { sides: 12 },
     k.turned('lid', 'paint', 'y', k.disc(0.3, 0.14, 0.2)) + { sides: 12 },
     box('hinge', 'steel', [-0.3, 0.14, -0.1], [-0.24, 0.2, 0.1]),
   ], paint + { steel: 'steel-parkerized' }) + { title: 'APC cupola' },
-  k.compound('apc_hatch', 25, [
-    box('lid', 'paint', [-0.3, 0, -0.3], [0.3, 0.05, 0.3]),
-    box('hinge', 'steel', [-0.3, 0.05, -0.26], [-0.25, 0.08, 0.26]),
-    box('handle', 'steel', [0.12, 0.05, -0.1], [0.18, 0.09, 0.1]),
-  ], paint + { steel: 'steel-parkerized' }) + { title: 'APC hatch' },
+  k.compound('apc_hatch', 25, hatch.pieces, paint + { steel: 'steel-parkerized' }, motion=hatch.motion) + { title: 'APC hatch' },
   k.compound('apc_engine_deck', 180, [
     box('frame', 'paint', [1.15, s.roofTop, 0.05], [2.48, 2.44, 1.15]),
     box('exhaust_cowl', 'paint', [0.86, s.roofTop, 0.8], [1.15, 2.53, 1.12]),

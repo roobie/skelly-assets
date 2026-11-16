@@ -5,8 +5,8 @@ import { fitDepth, overlapReport, roleOf, seatingProblems, siteOverlaps } from '
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
 const site = (id, part, ...pieces) => ({ id, part, pieces });
-const vehicle = (sites, { overlaps = [], unjudged = [], parent = null } = {}) =>
-  ({ parent, sites, overlaps, unjudged });
+const vehicle = (sites, { overlaps = [], unjudged = [], ledger = [], parent = null } = {}) =>
+  ({ parent, sites, overlaps, unjudged, ledger });
 const fit = (...pairs) => ({ why: 'seated', pairs });
 const report = (vehicles, fits = [], roles = []) => overlapReport({ grain: GRAIN, fits, roles, vehicles });
 const unit = box('block', [0, 0, 0], [1, 1, 1]);
@@ -25,6 +25,15 @@ test('faces that touch, or sink less than a grain into each other, are contact a
   for (const by of [1, 1 - GRAIN / 2]) {
     const sites = [site('body', 'van_body', unit), site('lamp', 'van_lamp', shifted(by))];
     assert.deepEqual(report({ van: vehicle(sites) }).problems, [], `shifted by ${by}`);
+  }
+});
+
+test('a piece passing right through a thin panel reads as deep as it passes, not as thin as the panel', () => {
+  const floor = box('floor', [-1, -1, 0.4], [2, 2, 0.4 + 2 * GRAIN]);
+  const rod = { id: 'rod', kind: 'turned', axis: 'z', origin: [0.5, 0.5, 0], profile: [[0, 0], [0, 0.1], [1, 0.1], [1, 0]] };
+  for (const engine of [unit, rod]) {
+    const [overlap] = siteOverlaps([site('floor', 'van_floor', floor), site('engine', 'van_engine', engine)], GRAIN);
+    assert.ok(Math.abs(overlap.depth - (0.4 + 2 * GRAIN)) < GRAIN / 8, `${engine.kind} depth ${overlap.depth}`);
   }
 });
 
@@ -102,6 +111,19 @@ test('an unjudged entry is capped and goes stale like an allowance', () => {
   assert.match(report({ van: vehicle(apart, { unjudged: [entry(1)] }) }).problems.join(), /stale/);
 });
 
+test('a family-listed overlap may stand over a shallower allowance, and goes stale once that allowance covers it', () => {
+  const row = { sites: ['body', 'lamp'], depth: 0.5 + GRAIN / 2, note: 'family not judged' };
+  const over = report({ van: vehicle(bodyAndLamp, { overlaps: [allowance(0.25)], ledger: [row] }) });
+  assert.deepEqual(over.problems, []);
+  assert.match(over.notes.join('\n'), /not judged: family not judged/);
+  const covered = report({ van: vehicle(bodyAndLamp, { overlaps: [allowance()], ledger: [row] }) });
+  const stale = /family-listed overlap of body and lamp is stale: the seating or the vehicle/;
+  assert.match(covered.problems.join('\n'), stale);
+  const variant = vehicle(bodyAndLamp, { parent: 'van', ledger: [row] });
+  const inherited = report({ van: vehicle(bodyAndLamp, { ledger: [row] }), electric_van: variant });
+  assert.match(inherited.problems.join('\n'), /electric_van: family-listed overlap of body and lamp is listed twice/);
+});
+
 const lamps = [site('body', 'van_body', unit), site('lamp_near', 'van_lamp', shifted(0.5))];
 
 test('a pair allows its roles to sink into each other up to its depth in either orientation, in every vehicle', () => {
@@ -129,6 +151,17 @@ test('a pair names whole roles: a prefix or a pattern of a role seats nothing', 
   assert.equal(fitDepth([fit(['la*', 'body', 1])], 'lamp', 'body'), 0);
   assert.equal(fitDepth([fit(['lamp', 'body', 1])], 'lamp_extra', 'body'), 0);
   assert.equal(fitDepth([fit(['lamp', 'body', 0.4])], 'body', 'lamp'), 0.4);
+});
+
+test('a pair whose deeper overlaps are unjudged is noted, not failed, until they are judged', () => {
+  const roles = ['body', 'lamp_near'];
+  const shallow = [fit(['lamp', 'body', 0.25])];
+  const entry = (kind) => ({ sites: ['body', 'lamp_near'], depth: 0.5 + GRAIN / 2, [kind]: 'n' });
+  const pending = report({ van: vehicle(lamps, { unjudged: [entry('note')] }) }, shallow, roles);
+  assert.deepEqual(pending.problems, []);
+  assert.match(pending.notes.join('\n'), /pair lamp and body is dead.*until its unjudged overlaps are judged/);
+  const judged = report({ van: vehicle(lamps, { overlaps: [entry('why')] }) }, shallow, roles);
+  assert.match(judged.problems.join('\n'), /pair lamp and body is dead/);
 });
 
 test('a pair no vehicle overlaps on is reported unused', () => {

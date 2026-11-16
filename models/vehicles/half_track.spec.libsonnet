@@ -11,5 +11,11 @@
   screenTop: 2.0, scuttleTop: 1.52,
   rail: { x: [-3.0, 2.64], y: [0.68, 0.9], z: [0.36, 0.44] },
   pedestalX: -0.45,
+  // Degrees from raised, so the folded windscreen armour lies on the hood.
+  armourFolds: 95,
+  // Degrees, so the cab door stands open past square, short of the front fender.
+  cabDoorOpen: 100,
+  // Degrees, so the troop door swings back toward the rear plate, short of the tail lamp.
+  rearDoorOpen: 150,
   paint: 'paint-olive',
 }

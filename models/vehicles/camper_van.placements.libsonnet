@@ -3,6 +3,7 @@ local van = import 'van-body.libsonnet';
 local s = import 'camper_van.spec.libsonnet';
 {
   title: 'Camper van',
+  overlaps: van.engineSeat,
   sites: van.fittings(site.kit, 'camper_van', s) + [
     site.one('pop_top', 'camper_van_pop_top'),
     site.one('kitchen', 'camper_van_kitchen'),

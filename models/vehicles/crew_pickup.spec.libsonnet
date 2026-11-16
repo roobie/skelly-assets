@@ -10,4 +10,6 @@
   tumble: 0.125, lift: 0.25, grilleHalf: 0.6, bumperPaint: 'steel-bright', cab: true, archLiner: true,
   shellMass: 620, paint: 'paint-white',
   bedFloorTop: 0.8125, bedFront: -0.92, bedRear: -2.6, bedSideTop: 1.28, bedSideBottom: 0.55, bedInner: 0.88, tailgateHalf: 0.76, tubInner: 0.66,
+  // Degrees, so the dropped tailgate lies level with the bed floor.
+  tailgateOpen: 90,
 }

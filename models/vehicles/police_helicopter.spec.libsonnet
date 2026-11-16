@@ -2,6 +2,7 @@
 // over the rotor, 3.4 m tall, about 1170 kg empty. The mast stands at x = 0 and the skids rest on y = 0. Metres in the vehicle frame.
 {
   nose: 2.45, noseCap: 2.38, doorFront: 1.6, doorMid: 0.65, doorRear: -0.35, tail: -2.6, roofArc: 34,
+  doorOpens: 90,
   bandTop: 92, bandMid: 114, bandLow: 136, checkEnd: -1.15, check: 0.36,
   rotorRadius: 5.35, hub: 3.35, mastFoot: 2.5,
   tailRotor: { x: -6.15, y: 1.92, z: 0.18, radius: 0.93 },

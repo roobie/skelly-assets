@@ -9,11 +9,14 @@ local plate = [s.glassOut - 0.01, s.side];
 local pillarY(x) = van.pillarY(s, x);
 taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van', vehicle.title, s) + [
   // Plates the cab door's glass down to a small port; it rides the door.
+  // It keeps to the door's own outline, so it swings clear of the pillars and rail around it as the glass does.
+  local plateRear = van.frontDoorRear(s);
+  local plateTop = s.windowTop - k.swingGap;
   k.compound('security_van_cab_plate', 40, [
-    box('below_port', 'plate', [s.bFront, s.waist, plate[0]], [s.cowl - 0.04, 1.56, plate[1]]),
-    box('above_port', 'plate', [s.bFront, 1.8, plate[0]], [s.cowl - 0.04, s.windowTop, plate[1]]),
-    box('behind_port', 'plate', [s.bFront, 1.56, plate[0]], [0.68, 1.8, plate[1]]),
-    k.prism('forward_of_port', 'plate', [[1.0, 1.56], [s.cowl - 0.04, 1.56], [s.cowl - 0.04, pillarY(s.cowl - 0.04)], [van.pillarAt(s, s.windowTop), s.windowTop], [1.0, s.windowTop]], plate),
+    box('below_port', 'plate', [plateRear, s.waist, plate[0]], [1.0, 1.56, plate[1]]),
+    box('above_port', 'plate', [plateRear, 1.8, plate[0]], [1.0, plateTop, plate[1]]),
+    box('behind_port', 'plate', [plateRear, 1.56, plate[0]], [0.68, 1.8, plate[1]]),
+    k.prism('forward_of_port', 'plate', [[1.0, s.waist]] + van.frontDoorWindowFront(s, s.waist, plateTop) + [[1.0, plateTop]], plate),
   ], { plate: s.paint }) + { title: 'Security van cab plate' },
   // Blanks the quarter light, which stays shut when the door opens.
   k.compound('security_van_quarter_plate', 5, [
@@ -21,7 +24,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van',
   ], { plate: s.paint }) + { title: 'Security van quarter plate' },
   // One rear leaf's hinge straps and locking bar.
   k.compound('security_van_rear_door_bars', 34, [
-    box('hinge_' + i, 'steel', [tail - 0.03, [1.1, 1.55, 2.0][i], 0.2], [tail, [1.1, 1.55, 2.0][i] + 0.1, s.box.hatchSide])
+    box('hinge_' + i, 'steel', [tail - 0.03, [1.1, 1.55, 2.0][i], 0.2], [tail, [1.1, 1.55, 2.0][i] + 0.1, s.box.hatchSide - k.swingGap])
     for i in [0, 1, 2]
   ] + [
     box('lock_bar', 'steel', [tail - 0.05, s.box.rearSill + 0.03, 0.08], [tail, s.box.doorTop - 0.03, 0.14]),

@@ -12,7 +12,13 @@ local peak = 2.96;
 local outer = s.bedSide + 0.04;
 local SHOULDER = [[peak - 0.03, 0.8], [peak + 0.03, 0.8], [shoulder + 0.05, outer], [shoulder, outer]];
 local CORNER = [[shoulder, 0.8], [peak, 0.8], [shoulder, outer]];
-local HOOP_SHOULDER = [[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
+local grain = k.grain;
+local tailgatePins = k.hingePins('hinge', 'z', [s.bedRear - 0.04 - grain, s.deckBottom, s.bedSide - 0.04 - grain], [s.bedRear - 0.04 - grain, s.deckBottom, -s.bedSide + 0.04 + grain], 'frame');
+// The board's front face slides up the deck's and the side boards' rear ends as it drops, so it stands a millimetre
+// behind them: well under half a grain, so no cell between them empties. No point of the board ever swings forward of
+// that face, so the tilt's rear flaps hang inside it, down over its top, and never meet it.
+local gateFront = s.bedRear - k.swingGap;
+local HOOP_SHOULDER =[[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [
     box('floor', 'floor', [s.bedRear, s.deckBottom, -s.bedSide], [s.bedFront, s.deckTop, s.bedSide]),
@@ -28,11 +34,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
     for i in std.range(0, 6)
   ]), finish) + { title: 'Military cargo truck bed' },
   k.compound('military_cargo_truck_tailgate', 60, [
-    box('board', 'paint', [s.bedRear - 0.04, s.deckBottom, -s.bedSide + 0.04], [s.bedRear, rail, s.bedSide - 0.04]),
+    box('board', 'paint', [s.bedRear - 0.04, s.deckBottom, -s.bedSide + 0.04], [gateFront, rail, s.bedSide - 0.04]),
     box('rib', 'frame', [s.bedRear - 0.05, 1.68, -s.bedSide + 0.04], [s.bedRear - 0.04, 1.72, s.bedSide - 0.04]),
   ] + bothSides([
     box('rib_v', 'frame', [s.bedRear - 0.05, s.deckBottom, 0.5], [s.bedRear - 0.04, rail, 0.54]),
-  ]), finish, { hinge_a: ['board', [0, 0, 0.2]], hinge_b: ['board', [0, 0, 0.8]] }) + { title: 'Military cargo truck tailgate' },
+  ]) + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Military cargo truck tailgate' },
   k.compound('military_cargo_truck_tilt', s.tiltMass, [
     box('roof', 'canvas', [s.bedRear, peak, -0.8], [s.bedFront, peak + 0.03, 0.8]),
     box('front_upper', 'canvas', [s.bedFront - 0.03, shoulder, -0.8], [s.bedFront, peak, 0.8]),
@@ -44,7 +50,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
     k.xPrism('front_corner', 'canvas', CORNER, [s.bedFront - 0.03, s.bedFront]),
     k.xPrism('rear_corner', 'canvas', CORNER, [s.bedRear - 0.01, s.bedRear + 0.02]),
     box('side', 'canvas', [s.bedRear, rail - 0.1, s.bedSide + 0.01], [s.bedFront, shoulder, s.bedSide + 0.04]),
-    box('rear_flap', 'canvas', [s.bedRear - 0.02, rail - 0.05, 0.62], [s.bedRear + 0.03, shoulder, s.bedSide + 0.04]),
+    box('rear_flap', 'canvas', [s.bedRear, rail - 0.05, 0.62], [s.bedRear + 0.03, shoulder, s.bedSide + 0.04]),
     box('tie', 'rope', [s.bedRear - 0.03, 2.22, 0.6], [s.bedRear + 0.03, 2.26, s.bedSide + 0.05]),
   ] + [
     box('hoop_' + i, 'strap', [stakes[i] + 0.0, rail - 0.1, s.bedSide + 0.04], [stakes[i] + 0.05, shoulder + 0.08, s.bedSide + 0.05])
