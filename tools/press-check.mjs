@@ -12,6 +12,7 @@ import { readDoll, readDressing } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
+import { graspOf, handSocket, heldItems, heldWeapon } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
@@ -63,8 +64,15 @@ export function pressCheckClip(check) {
   return { keys, easing: check.easing };
 }
 
-/** The press check's pose files by name, for `rig`, from `check` (`readPressCheck`) and the rifle's part strokes. */
-export function pressCheckPoses(rig, check, strokes) {
+/** The rifle's sockets the press check names (`check.sockets`), on the rifle as `heldWeapon` gives it. */
+export const pressCheckSockets = (check, rifle) =>
+  Object.fromEntries(Object.entries(check.sockets).map(([name, hand]) => [name, handSocket(rifle, hand)]));
+
+/**
+ * The press check's pose files by name, for `rig`, from `check` (`readPressCheck`), the rifle's part strokes and its
+ * sockets (`pressCheckSockets`); a frame's hold naming a socket takes that one.
+ */
+export function pressCheckPoses(rig, check, strokes, sockets) {
   const bone = (id) => rig.bones.find((b) => b.id === id);
   const pocket = applyPoint(posedAt(rig, check.stance).get('spine'), add(bone('upperArm.R').head, check.pocket));
 
@@ -81,10 +89,11 @@ export function pressCheckPoses(rig, check, strokes) {
     const file = {
       ...standing(rig),
       angles: { ...check.stance, ...lookAt(rig, check.stance, inWorld(rifle, look), tilt) },
-      hands: { 'hand.R': check.grip.hands, 'hand.L': left.hands },
-      hold: { 'hand.R': { ...held, pole: gripPole, ...check.grip.hold } },
+      hands: { 'hand.R': check.sockets.grip.hands, 'hand.L': left.hands },
+      hold: { 'hand.R': { ...held, pole: gripPole, socket: sockets.grip, ...graspOf(check.sockets.grip) } },
     };
-    const { socket, grip, slant, beneath, pole, pinch, close } = left.hold;
+    const { grip, slant, beneath, pole, pinch, close } = left.hold;
+    const socket = typeof left.hold.socket === 'string' ? sockets[left.hold.socket] : left.hold.socket;
     const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
     const drawn = (p) =>
       add(
@@ -118,7 +127,9 @@ if (import.meta.main) {
   const rig = dollRig(readRigContent(repo), readDoll(built, manifest, dressing), dressing);
   const check = readPressCheck(repo);
   const rifle = manifest.models.find((model) => model.id === check.rifle && model.path.endsWith('.glb'));
-  const poses = pressCheckPoses(rig, check, partStrokes(readFileSync(join(built, rifle.pack, rifle.path))));
+  const { meshOf, entryOf } = heldItems(built, manifest);
+  const sockets = pressCheckSockets(check, heldWeapon(entryOf(check.rifle), meshOf(check.rifle)));
+  const poses = pressCheckPoses(rig, check, partStrokes(readFileSync(join(built, rifle.pack, rifle.path))), sockets);
   for (const [name, file] of Object.entries(poses))
     writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} press-check poses -> ${POSES}`);

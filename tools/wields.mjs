@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { posedSolid, signedDepth } from '../site/clearance.mjs';
+import { COINCIDENT, posedSolid, runAlong, signedDepth } from '../site/clearance.mjs';
 import { decodeFrame, easingOf } from '../site/clipFrames.mjs';
 import {
   add,
@@ -87,14 +87,17 @@ export function strikeTiming(strike) {
 const fromEulerXyz = ([x, y, z]) => [rotX(x), rotY(y), rotZ(z)].reduce(mulMM);
 
 /**
- * What the wields need of a held model, from its sidecar (`grip`, `roll`) and its mesh: the turn `held` that
- * carries its file's axes onto the held axes (working end +z, up +y), the grip point `at` in its file, and its solid.
+ * What the wields need of a held model, from its sidecar (`grip`, `roll`, `anchors`) and its mesh: the turn `held`
+ * that carries its file's axes onto the held axes (working end +z, up +y), the grip point `at` in its file, its named
+ * points in its file (`anchors`, the grip point among them as `grip`), and its solid.
  */
 export function heldWeapon(entry, mesh) {
   const held = mulMM(fromEulerXyz(entry.grip?.turn ?? [0, 0, 0]), rotZ(entry.roll ?? 0));
+  const at = entry.grip?.at ?? [0, 0, 0];
   return {
     held,
-    at: entry.grip?.at ?? [0, 0, 0],
+    at,
+    anchors: { ...entry.anchors, grip: at },
     solid: posedSolid(mesh, { r: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [0, 0, 0] }),
   };
 }
@@ -114,6 +117,41 @@ export function gripSocket(weapon, { seat, into }) {
   return { at: r4(sub(centre, scale(across, radius))), into: r4(across), axis: r4(axis) };
 }
 
+// How far a socket may lie from its anchor's point along `into`, past which the anchor is not on that part of the
+// weapon.
+const PRESS_REACH = 0.03;
+
+/**
+ * The socket a hand closes on at a named point of the weapon, in its file: the anchor `from` (`heldWeapon`'s
+ * `anchors`), moved by `offset` (held axes, metres), pressed along `into` (held axes, from the palm into the weapon)
+ * onto the weapon's surface, so a reshaped weapon carries the palm with it. `axis` is the way the thumb points.
+ */
+export function anchorSocket(weapon, { from, offset = [0, 0, 0], into, axis }) {
+  const toFile = transpose(weapon.held);
+  const anchor = weapon.anchors[from];
+  if (!anchor) throw new Error(`the weapon has no ${from} anchor`);
+  const start = add(anchor, mulMV(toFile, offset));
+  const inward = mulMV(toFile, normalize(into));
+  const depth = signedDepth(weapon.solid, start);
+  // Out to the surface from inside, in to it from outside; a point already on it stays.
+  const run =
+    Math.abs(depth) < COINCIDENT
+      ? 0
+      : depth > 0
+        ? runAlong(weapon.solid, start, inward)
+        : -runAlong(weapon.solid, start, scale(inward, -1));
+  if (!(Math.abs(run) <= PRESS_REACH)) throw new Error(`the socket from ${from} lies off the weapon along its into`);
+  return { at: r4(add(start, scale(inward, run))), into: r4(mulMV(toFile, into)), axis: r4(mulMV(toFile, axis)) };
+}
+
+/** A hand's socket on the weapon: from a named point (`anchorSocket`) when it names one, else a seat along the handle. */
+export const handSocket = (weapon, hand) => (hand.from ? anchorSocket : gripSocket)(weapon, hand);
+
+// What of a hand's spec its hold passes to the pose file: how deep the item seats in the palm and how it slants across.
+const GRASP = ['grip', 'slant'];
+export const graspOf = (hand) =>
+  Object.fromEntries(GRASP.filter((key) => hand[key] !== undefined).map((key) => [key, hand[key]]));
+
 // ---- key frames ----
 
 const lerpV = (a, b, w) => a.map((x, i) => x + (b[i] - x) * w);
@@ -121,7 +159,7 @@ const mapValues = (object, f) => Object.fromEntries(Object.entries(object).map((
 
 /**
  * The pose file of key frame `key` of class `cls` (`readWields().classes`), for `rig`, the weapon (`heldWeapon`) and its
- * hands' sockets (`gripSocket`) given when the class wields one. Points are read off the figure as its body angles
+ * hands' sockets (`handSocket`) given when the class wields one. Points are read off the figure as its body angles
  * stand it, from the shoulder of the hand they belong to (a grip point from the class's leading hand's), in the chest's
  * frame, so a twisting chest carries the hands round with it.
  */
@@ -142,14 +180,15 @@ function poseOf(rig, cls, key, weapon, sockets) {
     const { pitch, yaw, roll } = key.weapon.aim;
     const r = [chest.r, rotY(yaw), rotX(pitch), rotZ(roll), weapon.held].reduce(mulMM);
     const at = sub(inChest(cls.weapon.lead, key.weapon.at), mulMV(r, weapon.at));
-    for (const [hand, { hands }] of Object.entries(cls.weapon.hands)) {
-      file.hands[hand] = hands;
+    for (const [hand, spec] of Object.entries(cls.weapon.hands)) {
+      file.hands[hand] = spec.hands;
       file.hold[hand] = {
         model: cls.weapon.model,
         at: r4(at),
         turn: r4(mat3ToQuat(r)),
         pole: key.weapon.poles[hand],
         socket: sockets[hand],
+        ...graspOf(spec),
       };
     }
   }
@@ -164,14 +203,14 @@ function poseOf(rig, cls, key, weapon, sockets) {
 }
 
 /**
- * What the wields need of the built tree: each class's weapon (`heldWeapon`) and its hands' sockets (`gripSocket`),
+ * What the wields need of the built tree: each class's weapon (`heldWeapon`) and its hands' sockets (`handSocket`),
  * by class. `entryOf(model)` gives a held model's things sidecar and `meshOf(model)` its closed mesh.
  */
 export function wieldWeapons(wields, entryOf, meshOf) {
   return mapValues(wields.classes, (cls) => {
     if (!cls.weapon) return {};
     const weapon = heldWeapon(entryOf(cls.weapon.model), meshOf(cls.weapon.model));
-    return { weapon, sockets: mapValues(cls.weapon.hands, (hand) => gripSocket(weapon, hand)) };
+    return { weapon, sockets: mapValues(cls.weapon.hands, (hand) => handSocket(weapon, hand)) };
   });
 }
 
@@ -321,6 +360,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
                     turn: mat3ToQuat(item.r),
                     pole: mulMV(rotAxis(normalize(reach), swing), pole),
                     socket: sockets[id],
+                    ...graspOf(cls.weapon.hands[id]),
                   },
                 ];
               }),

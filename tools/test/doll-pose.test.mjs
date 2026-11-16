@@ -35,10 +35,11 @@ import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { poseJson } from '../keyFrames.mjs';
-import { partStrokes, pressCheckPoses, readPressCheck } from '../press-check.mjs';
+import { partStrokes, pressCheckPoses, pressCheckSockets, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 import {
   heldItems,
+  heldWeapon,
   readWields,
   strikePhases,
   strikeTiming,
@@ -360,6 +361,7 @@ const pressPoses = pressCheckPoses(
   rig,
   pressCheck,
   partStrokes(readFileSync(join(built, rifleEntry.pack, rifleEntry.path))),
+  pressCheckSockets(pressCheck, heldWeapon(thingOf(pressCheck.rifle), itemMesh(pressCheck.rifle))),
 );
 
 test("the press check's pose files are what its tool writes from its key frames", () => {
