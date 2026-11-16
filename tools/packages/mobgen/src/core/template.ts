@@ -11,6 +11,17 @@ export type ParamSpec =
   | { readonly min: number; readonly max: number }
   | { readonly choices: readonly number[] };
 
+/** Whether the spec could have given the value. */
+export const specAllows = (spec: ParamSpec, value: number): boolean => {
+  if (typeof spec === 'number') {
+    return value === spec;
+  }
+  if ('choices' in spec) {
+    return spec.choices.includes(value);
+  }
+  return value >= spec.min && value <= spec.max;
+};
+
 export type BodyPlan = string;
 type SupportBones = readonly string[] | 'ground-contacts';
 

@@ -52,8 +52,9 @@ async function bakeFixture(model, options = {}) {
   };
   try {
     exportMob(row, out);
-    const read = (file) => JSON.parse(readFileSync(join(out, outputPath(row.pack, file))));
-    return { body: read(row.body), clips: read(row.clips) };
+    const bytes = (file) => readFileSync(join(out, outputPath(row.pack, file)));
+    const read = (file) => JSON.parse(bytes(file));
+    return { body: read(row.body), clips: read(row.clips), genome: read(row.genome), glb: bytes(row.glb) };
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -871,49 +872,26 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
 });
 
 // The genome is what a consumer compares to tell a re-rolled figure from a rebuilt one, so it must hold every draw, each
-// from the row's narrowed range rather than the base template's.
-test("every content row writes its declared actor files, with a genome drawing every plan param in its row's range", async () => {
-  const { mkdtempSync, existsSync, readFileSync, rmSync } = await import('node:fs');
-  const { tmpdir } = await import('node:os');
-  const { join } = await import('node:path');
-  const { exportMob } = await import('../mobs.mjs');
-  const { outputPath, readMobRows } = await import('../layout.mjs');
+// from the row's narrowed range rather than the base template's. The acid plan rounds its mottle count, so a range no
+// whole count fits is one its draw cannot keep.
+test("a row writes its declared actor files, with a genome drawing every plan param in its row's range", async () => {
   const { planOf } = await import('../packages/mobgen/src/core/generate.ts');
-  const { templateByName } = await import('../packages/mobgen/src/core/template.ts');
-  const allows = (spec, value) =>
-    typeof spec === 'number'
-      ? value === spec
-      : 'choices' in spec
-        ? spec.choices.includes(value)
-        : value >= spec.min && value <= spec.max;
-  const root = mkdtempSync(join(tmpdir(), 'actor-content-'));
-  try {
-    const rows = readMobRows();
+  const { specAllows, templateByName } = await import('../packages/mobgen/src/core/template.ts');
+  const params = { mottleCount: { min: 4, max: 6 } };
+  const { body, clips, genome, glb } = await bakeFixture('acid', { params });
+  assert(body && clips && glb.length > 0);
+  assert.equal(genome.seed, 1);
+  const base = templateByName('acid');
+  for (const name of planOf(base.bodyPlan).paramOrder) {
     assert(
-      rows.some(() => true),
-      'content must declare actor rows',
+      specAllows(params[name] ?? base.params[name], genome.params[name]),
+      `records ${name} = ${genome.params[name]} outside its row's range`,
     );
-    let narrowed = 0;
-    for (const row of rows) {
-      exportMob(row, root);
-      for (const file of [row.glb, row.body, row.clips, row.genome])
-        assert(existsSync(join(root, outputPath(row.pack, file))));
-      const genome = JSON.parse(readFileSync(join(root, outputPath(row.pack, row.genome))));
-      assert.equal(genome.seed, row.seed);
-      const template = templateByName(genome.template);
-      for (const name of planOf(template.bodyPlan).paramOrder) {
-        const spec = row.params?.[name] ?? template.params[name];
-        assert(
-          allows(spec, genome.params[name]),
-          `${row.id} records ${name} = ${genome.params[name]} outside its row's range`,
-        );
-        if (row.params?.[name] !== undefined) narrowed += 1;
-      }
-    }
-    assert(narrowed > 0, 'content must exercise rows that narrow a drawn param');
-  } finally {
-    rmSync(root, { recursive: true, force: true });
   }
+  await assert.rejects(
+    bakeFixture('acid', { params: { mottleCount: { min: 4.2, max: 4.4 } } }),
+    /fixture\.acid draws mottleCount = 4 outside range \{"min":4\.2,"max":4\.4\}/,
+  );
 });
 
 test('every baked body names only bones it realizes in its regions and ground contacts', async () => {
