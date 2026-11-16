@@ -743,7 +743,10 @@ const voxelFileOf = (glb: Uint8Array, grains: Partial<VoxelGrains>): VoxelFile |
 const drawnAnchors = (
   anchors: GunDeadvoxModelEntry['anchors'],
   file: VoxelFile | undefined,
-  { supportPart, hostParts }: { readonly supportPart: string | undefined; readonly hostParts: ReadonlySet<string> },
+  {
+    sourceParts: { support: supportPart } = {},
+    hostParts,
+  }: { readonly sourceParts: SelectedAnchors['sourceParts']; readonly hostParts: ReadonlySet<string> },
 ) =>
   file && anchors
     ? {
@@ -1008,7 +1011,7 @@ export const exportGunGlb = (
     modelEntry: {
       ...modelEntry,
       ...drawnAnchors(modelEntry.anchors, voxelFile, {
-        supportPart: anchors.supportPart,
+        sourceParts: anchors.sourceParts,
         hostParts: hostPartIds(resolved, replaceableNodes),
       }),
       gun: {
