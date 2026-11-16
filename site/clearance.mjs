@@ -248,46 +248,80 @@ export const STEP = 2 * COINCIDENT;
 // Whether `p` lies outside every one of the solids.
 const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = local(p); return boxDistance(tree.bounds, q) > 0 || winding(tree, q) === 0; });
 
+// The bones whose parts a piece riding each bone is meant to cover: its own, and the next part up and down the limb across
+// its joints, where a cuff, a collar or a hem reaches over the joint. A part further off only meets the piece by
+// lying against it, as a hanging hand against a thigh guard, which is a clip of the garment into the body, not skin the
+// garment fails to cover.
+function reachOf(bones) {
+  const reach = new Map(bones.map(({ id }) => [id, new Set([id])]));
+  for (const { id, parent } of bones) {
+    if (parent === undefined || parent === null) continue;
+    reach.get(id).add(parent);
+    reach.get(parent)?.add(id);
+  }
+  return reach;
+}
+
+// How far the ray from `p` along `dir` runs before it passes nearest the line through `head` along the unit `axis`:
+// beneath a point, a piece that wraps the part lies between the skin and the bone, so what the ray meets past it lies
+// beneath the far side of the part.
+function toAxis(p, dir, { head, axis }) {
+  const across = sub(dir, scale(axis, dot(dir, axis)));
+  const offset = sub(p, head);
+  const off = sub(offset, scale(axis, dot(offset, axis)));
+  return -dot(off, across) / dot(across, across);
+}
+
 /**
  * Which piece is meant to cover a body point at rest: `cover(bone, { point, normal })`, the point with its face's
- * outward normal, gives the index into `rest.pieces` of the piece meant to cover it, or -1 when none is. A piece
- * covers the points
+ * outward normal, gives the index into `rest.pieces` of the piece meant to cover it, or -1 when none is. Only a piece
+ * riding the point's bone or a bone across one of its joints (`rig.bones`' `parent`) is meant to cover it, and it covers
+ * the points
  * - it encloses at rest, flush included;
- * - it passes beneath: a ray from the point straight into its body part, across the part's bone, meets the piece while
- *   still inside that part, as a jacket's yoke passes through a deltoid that stands proud of it, or a sleeve too narrow
- *   for its arm passes through the arm.
+ * - it passes beneath: a ray from the point straight into its body part, across the part's bone, meets the piece before
+ *   the ray passes the bone and while still inside that part, as a jacket's yoke passes through a deltoid that stands
+ *   proud of it, or a sleeve too narrow for its arm passes through the arm.
  * A ray along the bone runs out through the part's end, where it nests into the next piece through that piece's
  * opening: a fingertip's ray meets the cuff its hand reaches into, and the cuff does not cover the fingertip. Nor does a
- * piece cover what it only sits beside, as a belt bag beside the waist it hangs on. A piece that declares what it
- * `covers` of the part copy it rides passes beneath only that: a tank top that covers the trunk leaves the shoulders
- * bare, though its armholes and straps lie beneath the deltoids and the pectorals.
+ * piece cover what it only sits beside, as a belt bag beside the waist it hangs on, or what lies beneath the part's far
+ * side, as a sole beneath the shin guard's rim at the ankle. A piece that declares what it `covers` of the part copy it
+ * rides passes beneath only that: a tank top that covers the trunk leaves the shoulders bare, though its armholes and
+ * straps lie beneath the deltoids and the pectorals.
  * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
  */
 export function coverage(rig, rest) {
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
   const bodySolids = new Map(rest.body.map(({ bone, mesh }) => [bone, carried(solidOf(mesh), STILL)]));
   const parts = new Map(rest.body.map(({ bone, part }) => [bone, part]));
-  const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
-  // A body point is covered inside a piece, or beneath it where a ray into its own part meets the piece inside that
-  // part, so a part whose box misses every piece's box, a coincident face's width wide, has nothing covered.
-  const reached = new Set([...bodySolids].filter(([, { tree }]) => pieceSolids.some((piece) => boxesMeet(tree.bounds, piece.tree.bounds, COINCIDENT))).map(([bone]) => bone));
+  const bones = new Map(rig.bones.map(({ id, head, tail }) => [id, { head, axis: normalize(sub(tail, head)) }]));
+  const reach = reachOf(rig.bones);
+  // The pieces meant to cover each part, which a part whose box misses all of theirs, a coincident face's width wide,
+  // has none of.
+  const meant = new Map(
+    [...bodySolids].map(([id, { tree }]) => [
+      id,
+      rest.pieces.flatMap(({ bone }, index) => (reach.get(bone)?.has(id) && boxesMeet(tree.bounds, pieceSolids[index].tree.bounds, COINCIDENT) ? [index] : [])),
+    ]),
+  );
   const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
-  const beneath = (id, { point, normal, region }) => {
-    if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
+  const beneath = (id, indices, { point, normal, region }) => {
+    const bone = bones.get(id);
+    if (Math.abs(dot(normal, bone.axis)) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
-    let hit = { t: Infinity, index: -1 };
-    pieceSolids.forEach(({ tree }, index) => {
-      if (declaresBare(rest.pieces[index], id, region)) return;
-      const t = firstHit(tree, point, dir, hit.t);
+    let hit = { t: toAxis(point, dir, bone), index: -1 };
+    for (const index of indices) {
+      if (declaresBare(rest.pieces[index], id, region)) continue;
+      const t = firstHit(pieceSolids[index].tree, point, dir, hit.t);
       if (t < hit.t) hit = { t, index };
-    });
+    }
     if (hit.index < 0) return -1;
     return winding(bodySolids.get(id).tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
   };
   return (id, sample) => {
-    if (!reached.has(id)) return -1;
-    const { depth, index } = depthOutside(pieceSolids, sample.point);
-    return depth <= COINCIDENT ? index : beneath(id, sample);
+    const indices = meant.get(id) ?? [];
+    if (indices.length === 0) return -1;
+    const { depth, index } = depthOutside(indices.map((i) => pieceSolids[i]), sample.point);
+    return depth <= COINCIDENT ? indices[index] : beneath(id, indices, sample);
   };
 }
 
