@@ -32,12 +32,19 @@ than a review pixel. Neither is a fit allowance, so neither should grow to quiet
 
 **What a piece covers is what it encloses or passes beneath.** A body point is meant to be covered when a piece
 encloses it at rest, or when a ray from it into its part, across the bone, meets the piece still inside the part, as a
-jacket's yoke passes through a deltoid standing proud of it. Coverage by span along the bone was tried and dropped:
-it gave a belt bag the whole small of the back to cover. A ray along the bone is not used, because it leaves through
-the part's end into the next piece's opening and would make a cuff cover the fingertips. A piece that declares what
-it covers of the part copy it rides (`docs/decisions/0012-hidden-body.md`, "Decision") passes beneath only that, so a
-tank top's armholes and straps, which lie beneath the deltoids and pectorals it leaves bare, do not make bare skin
-count as covered. What a piece encloses it still covers, declared or not, because enclosure needs no guess at intent.
+jacket's yoke passes through a deltoid standing proud of it. Only a piece riding the part's bone or a bone across one
+of its joints is meant to cover it, and the ray stops halfway through the part. Without that tie a gauntlet's cuff
+resting against the thigh made the whole thigh its cover, and without that stop a shin guard's rim sunk into the foot
+made the sole on the ground its cover, each poking by the width of the limb: what a piece meets of a limb it does not
+ride is a clip, not skin it fails to cover, and what a ray meets past the part's middle lies beneath its far side.
+The stop is the part's own middle, not its bone, because a bone can sit far off it: the foot's runs at the ankle,
+and a rim below that line is still on the foot's top. Coverage by span
+along the bone was tried and dropped: it gave a belt bag the whole small of the back to cover. A ray along the bone is
+not used, because it leaves through the part's end into the next piece's opening and would make a cuff cover the
+fingertips. A piece that declares what it covers of the part copy it rides (`docs/decisions/0012-hidden-body.md`,
+"Decision") passes beneath only that, so a tank top's armholes and straps, which lie beneath the deltoids and
+pectorals it leaves bare, do not make bare skin count as covered. What a piece encloses of a part it is meant to cover
+it still covers, declared or not, because enclosure needs no guess at intent.
 
 **A camera check beside the probe.** The probe says where and how far; whether it shows depends on the view. The skin
 check (`site/skin.mjs`, `skinCheck`) draws the covered surface in a colour of its own over the figure from the review

@@ -77,14 +77,15 @@ local palmAdd = [
   h.box('knuckle-bar', 'trim', [-palmX - 0.04, -arm.palmLength - 0.01, -palmZ - 0.016], [-palmX - 0.02, -arm.palmLength + 0.02, palmZ + 0.016]),
 ];
 
-// Thigh: a thick cuisse with a big front plate. Bulk goes front and back, as the legs stand close together.
+// Thigh: a thick cuisse with a big front plate. Bulk goes front and back, as the legs stand close together and the
+// hand hangs beside them.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
 local thighAdd = [
-  oct('cuisse', 'plate', -leg.thighLength + 0.02, -0.04, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
+  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, -0.04, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
   h.box('cuisse-plate', 'plate', [-tw * 0.45, -leg.thighLength + 0.06, (td + 0.07) / 2 - 0.004], [tw * 0.45, -0.075, (td + 0.07) / 2 + 0.02]),
-  oct('cuisse-rim', 'insignia', -0.07, -0.04, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
+  fit.besideHand('cuisse-rim', 'insignia', -0.07, -0.04, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
 ] + [
-  oct('strap-%d' % i, 'strap', y, y + 0.03, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03)
+  fit.besideHand('strap-%d' % i, 'strap', y, y + 0.03, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03)
   for i in [0, 1]
   for y in [[-0.18, -0.32][i]]
 ];
