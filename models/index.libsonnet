@@ -5,7 +5,7 @@ local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 (import 'bolt-carbine.libsonnet')
 + (import 'bolt-scattergun.libsonnet')
 + (import 'bolt-plasma-caster.libsonnet')
-+ (import 'trooper.libsonnet')
++ std.flattenArrays([set.rows for set in std.objectValues(import 'trooper.libsonnet')])
 + (import 'heavy-blue.libsonnet')
 + (import 'plate.libsonnet')
 + (import 'power.libsonnet')

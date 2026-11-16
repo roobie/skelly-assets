@@ -27,8 +27,6 @@ local seatAcross = s.across - s.floor;
     one('wheel_loose', 'overturned_delivery_van_wheel', [3.3, 0.11, 1.5]),
   ],
   overlaps: [
-    site.overlap('chassis', 'engine', 0.071,
-      'The roll tore the engine from its mounts and drove its gearbox down through the floor pan onto the front axle.'),
     site.overlap('chassis', 'wheel_front_up', 0.08,
       'The front drum runs up into the rim of the wheel on it.'),
     site.overlap('chassis', 'wheel_rear_road', 0.091,
@@ -37,7 +35,7 @@ local seatAcross = s.across - s.floor;
       'The rear axle runs on into the rim of the wheel on it.'),
     site.overlap('shell', 'bumper', 0.041,
       'The roll bent the bumper back into the wing.'),
-    site.overlap('shell', 'engine', 0.161,
+    site.overlap('shell', 'engine', 0.101,
       'The roll tore the engine from its mounts and drove its gearbox down through the floor pan onto the front axle.'),
     site.overlap('shell', 'shelving', 0.081,
       'The roll tore the shelving from its fixings and threw it against the wheel tub.'),

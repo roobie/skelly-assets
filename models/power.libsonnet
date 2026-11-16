@@ -20,7 +20,7 @@ local bootFinish = { upper: 'steel-gunmetal', toe: 'paint-graphite', sole: 'rubb
 
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
+  fit.refit(row, [p for p in pieces if !drop(p.id)] + add, grain);
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
 local round(piece) = piece + { sides: 12 };
@@ -116,12 +116,15 @@ local shinAdd = [
 ] + piston('shin-piston', 0, -(sd + 0.04) / 2 - 0.02, -shinLength + 0.03, -0.09);
 
 // The helm: an angular shell with a swept crown, a glowing visor slit, vents, light strips on the cheeks and a rear fin.
+// Its brow anchor is the point of its shell that a seat with the visor slit over the eyes puts at the hairline.
+local visor = { min: [-0.1, 0.155, 0.135], max: [0.1, 0.185, 0.15] };
+local shell = { min: [-0.125, 0.03, -0.14], max: [0.125, 0.25, 0.14] };
 local helmet = [
   h.box('skirt', 'trim', [-0.135, 0, -0.15], [0.135, 0.035, 0.15]),
-  h.box('shell', 'plate', [-0.125, 0.03, -0.14], [0.125, 0.25, 0.14]),
+  h.box('shell', 'plate', shell.min, shell.max),
   h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115),
   h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.13, 0.13),
-  h.box('visor', 'glow', [-0.1, 0.155, 0.135], [0.1, 0.185, 0.15]),
+  h.box('visor', 'glow', visor.min, visor.max),
   h.prism('jaw', 'plate', 'x', [[0.035, 0.12], [0.15, 0.13], [0.15, 0.175], [0.05, 0.17]], -0.075, 0.075),
   h.prism('fin', 'trim', 'x', [[0.28, -0.12], [0.34, -0.1], [0.37, -0.14], [0.27, -0.14]], -0.012, 0.012),
 ] + [
@@ -142,7 +145,7 @@ local gloves = fit.hands('gloves_power', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
 }, 'Power gauntlets').rows;
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots').rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, { covers: ['foot'] }, title='Power boots').rows;
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);
@@ -161,5 +164,9 @@ armour.of('sci-fi', [
   if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
   for r in body + gloves + legs + boots
 ] + [
-  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + { title: 'Power helmet' } + { voxelGrain: 0.004 },
+  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
+    title: 'Power helmet',
+    voxelGrain: 0.004,
+    anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(fit.eyesAt((visor.min[1] + visor.max[1]) / 2)).brow) },
+  },
 ])

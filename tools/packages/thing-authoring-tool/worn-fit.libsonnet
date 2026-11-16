@@ -75,6 +75,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 {
   layers: layers,
   oct: oct,
+  // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
+  // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
+  // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
+  refit(r, pieces, grain=0.004):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
+                                  + { [k]: r[k] for k in ['title', 'covers', 'soleLift'] if std.objectHas(r, k) },
 
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them; the yoke reaches past the
@@ -468,9 +473,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ] + [
       oct('vambrace-rim', 'insignia', -arm.foreLength + 0.012, -arm.foreLength + 0.028, fw + 0.024, fd + 0.022, 0.022),
     ];
-    // The vambrace stops short of the wrist.
+    // The vambrace stops short of the wrist. The body encloses the trunk but not the deltoid caps: the pauldrons over
+    // them ride the upper arm, a different part copy, so the shoulders stay drawn.
     fitted([
-      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso'], title=named(title, 'body')),
+      shell(id + '_worn_body', 'clothing_body', body, finish, ['trunk'], ['torso'], title=named(title, 'body')),
       paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper'], title=named(title, 'upper arm')),
       paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore'], title=named(title, 'forearm')),
     ]) + { ground: h.lifted(body, -(beltY - 0.13)) },
@@ -635,9 +641,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // laces). The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it, and
   // it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
-  // the foot piece declares the sole as the lift a consumer stands the shod figure on.
+  // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
+  // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
+  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee.
   feet(id, finish, b, spec={}, title=null)::
-    local s = { layer: 'normal', ease: 0 } + spec;
+    local s = { layer: 'normal', ease: 0, covers: [] } + spec;
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
@@ -672,8 +680,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, b.laces - 1)
     ]);
     local shafted = top > ankle;
-    // The ankle's cap rises above the vamp, inside the shaft, which rides the shin.
-    local shod = paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, [], ['foot'], title=named(title, 'foot'));
+    local shod = paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, s.covers, ['foot'], title=named(title, 'foot'));
     fitted([shod { row+: { soleLift: b.s } }]
            + (if shafted then [paired(id + '_worn_shaft', 'hem', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.

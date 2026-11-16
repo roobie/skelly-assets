@@ -1,6 +1,6 @@
 // Usage: node tools/mobs.mjs [--out dir] [--cache dir | --no-cache] [mobId ...], or node tools/mobs.mjs --shard i/n
 // [--cache dir] to only fill the cache with one shard of the mob rows. With no ids it builds every models/mobs.json row.
-// Every row is baked as an actor pose: GLB, body and clips files live at their logical paths under the row's pack. The
+// Every row is baked as an actor pose: GLB, body, clips and genome files live at their logical paths under the row's pack. The
 // cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -53,14 +53,15 @@ const bakeMob = (row) => {
     const issues = realize(generate(template, row.seed)).report.issues;
     throw new Error(`seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`);
   }
-  const realized = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor).realized : found.realized;
-  return bakeActor(row, template, { ...found, realized });
+  // A coarser row bakes the genome it realized, so its recorded genome names the voxel size its figure was built at.
+  const { genome, realized } = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor) : found;
+  return bakeActor(row, template, { ...found, genome, realized });
 };
 
 // A mob's files are fixed by its resolved row and the code that bakes it: mobgen with the data it imports, and the
 // actor modules here. Every module of this folder counts, since naming them one by one would miss a new one, and an
 // edit to another costs only a rebake of the mobs.
-const MOB_FILES = ['body', 'clips', 'glb'];
+const MOB_FILES = ['body', 'clips', 'genome', 'glb'];
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
   return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));

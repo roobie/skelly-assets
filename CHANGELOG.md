@@ -7,6 +7,26 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.9.0 - 2026-11-16
+
+### Added
+
+- Every mob ships `actors/<id>.genome.json` beside its body, named by its manifest entry's `genome`: every value the generator drew for it. Compare two releases' genomes to tell a re-rolled mob from one rebuilt from the same draws.
+- Every model in the `skelly.armour` and `skelly.bolt-guns` packs now ships its `things/<id>.model.json` sidecar and each
+  pack a `things/index.json`, as the other thing packs do. `helmet_trooper`, `helmet_heavy`, `helmet_power` and
+  `helmet_plate_armet` carry a `brow` anchor, the point that meets the hairline when the visor or slit is over the eyes.
+
+### Changed
+
+- Small catalogue items (keys, food, pill bottles and the like) draw at the 2 mm grain, so their shapes read; beans and soup draw a spilled serving rather than a thin disc. Pill bottles and opened tins weigh what they draw, and every non-vehicle catalogue row has facet tags.
+- `tower_shield` and `kite_shield` are shields rather than recut oven doors: a curved oak tower shield with an iron rim,
+  bands and boss, 11 kg, and a hide-faced kite shield bound in rawhide with a small boss, 2.9 kg. Both lie face up with
+  their top toward -z.
+
+### Fixed
+
+- Cars' struts stand inboard of the tyres and end under the bonnet, SUVs lose struts that doubled their beam front axle, exhausts hang under the floor pan and the saloon, coupe, estate and police car fuel tanks sit level under the rear bench.
+
 ## 0.8.0 - 2026-11-16
 
 ### Breaking

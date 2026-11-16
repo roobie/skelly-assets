@@ -39,8 +39,4 @@ local rearLoadOut = {
     ],
   ),
   tags: { 'vehicle-role': ['emergency'] },
-  unjudged: [
-    site.unjudged('chassis', 'engine', 0.08,
-      'The heavy I6\'s intake stands in the near rail.'),
-  ],
 }

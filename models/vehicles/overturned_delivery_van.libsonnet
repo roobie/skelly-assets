@@ -10,6 +10,8 @@ local finish = {
 };
 local hood(x) = s.waist - (x - 1.75) * 0.3;
 local roofFront = 0.85;
+// The axles' beams, bottom and top, upright.
+local axleY = [0.31, 0.41];
 // The roof took the first blow of the roll, so it has come down over the cab.
 local roofTop(x) = s.roof - 0.16 * std.max(0, 1 - std.abs(x - 0.5) / 1.3);
 local archBottom(axle, x) =
@@ -54,8 +56,8 @@ local tub(tag, axle) = [
 ];
 taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   k.compound('overturned_delivery_van_chassis', 300, lying([
-    box('axle_front', 'rust', [s.frontAxle - 0.05, 0.31, -0.84], [s.frontAxle + 0.05, 0.41, 0.84]),
-    box('axle_rear', 'rust', [s.rearAxle - 0.05, 0.31, -0.84], [s.rearAxle + 0.05, 0.41, 0.84]),
+    box('axle_front', 'rust', [s.frontAxle - 0.05, axleY[0], -0.84], [s.frontAxle + 0.05, axleY[1], 0.84]),
+    box('axle_rear', 'rust', [s.rearAxle - 0.05, axleY[0], -0.84], [s.rearAxle + 0.05, axleY[1], 0.84]),
     box('diff', 'rust', [s.rearAxle - 0.17, 0.2, -0.17], [s.rearAxle + 0.17, 0.42, 0.17]),
     box('prop', 'steel', [s.rearAxle + 0.17, 0.27, -0.04], [1.0, 0.35, 0.04]),
     box('prop_joint', 'rust', [-0.3, 0.25, -0.07], [-0.2, 0.37, 0.07]),
@@ -113,7 +115,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   k.compound('overturned_delivery_van_engine', 240, lying([
     box('block', 'soot', [1.8, 0.5, -0.26], [2.34, 0.98, 0.26]),
     box('sump', 'rust', [1.86, 0.3, -0.2], [2.3, 0.5, 0.2]),
-    box('gearbox', 'soot', [1.2, 0.34, -0.14], [1.8, 0.64, 0.14]),
+    // It reaches back over the front axle, so it stands on the axle's top.
+    box('gearbox', 'soot', [1.2, axleY[1], -0.14], [1.8, axleY[1] + 0.3, 0.14]),
   ]), finish) + { title: 'Overturned delivery van engine' },
   k.compound('overturned_delivery_van_cab_door_sprung', 34, lying(
     // Sprung on its hinges by the roll, it now stands up off the top of the wreck.

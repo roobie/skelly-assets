@@ -5,6 +5,8 @@ local s = import 'utility_trailer.spec.libsonnet';
 local box = k.box;
 local bothSides = k.bothSides;
 local finish = { paint: s.paint, frame: 'paint-charcoal' };
+local grain = k.grain;
+local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain, s.deck, 0.7 * s.side], [s.rear - grain, s.deck, -0.7 * s.side], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('utility_trailer_chassis', 165, [
     box('front_rail', 'frame', [s.front - 0.04, s.frameLow, -0.55], [s.front, s.frameHigh, 0.55]),
@@ -34,6 +36,6 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('skin', 'paint', [s.rear, s.deck, -s.side + 0.04], [s.rear + 0.04, s.wall, s.side - 0.04]),
     box('top_rail', 'paint', [s.rear - 0.01, s.wall - 0.04, -s.side + 0.04], [s.rear + 0.05, s.wall, s.side - 0.04]),
     box('stripe', 'frame', [s.rear - 0.01, s.deck + 0.14, -0.3], [s.rear, s.deck + 0.2, 0.3]),
-  ], { paint: s.paint, frame: 'paint-charcoal' }, { hinge_a: ['skin', [0, 0, 0.2]], hinge_b: ['skin', [0, 0, 0.8]] }) + { title: 'Utility trailer tailgate' },
+  ] + tailgatePins, { paint: s.paint, frame: 'paint-charcoal' }, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Utility trailer tailgate' },
   h.mudguard('utility_trailer_mudguard', 3, s.axle, s.hub, 0.31, 0.34, [s.side, s.wheelZ + 0.11], s.paint) + { title: 'Utility trailer mudguard' },
 ])

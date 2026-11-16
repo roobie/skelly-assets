@@ -1,5 +1,6 @@
 // The trooper armour set: fitted worn shells (template and measures in tools/packages) with a ground model each, in an
-// olive field livery.
+// olive field livery. Each item keeps its figure models beside its rows, as models/catalogue/worn.libsonnet's do, so a
+// consumer can read where the game wears it.
 local armour = import 'armour.libsonnet';
 local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
@@ -12,12 +13,14 @@ local trooperBoot = { upper: 'leather-black', toe: 'paint-olive', sole: 'rubber-
 local suit(id, title, massKg, worn) = worn + { rows: [h.compound(id, massKg, worn.ground, worn.rows[0].parts[0].finish) + { title: title, voxelGrain: 0.004 }] + worn.rows };
 // The trooper helm, base at the neck and face towards +z, the wearer's front: a flared neck guard, a deep shell under
 // a domed crown with a yellow crest, an amber visor slit under a brow bar, a wedge faceplate with grille slats and a
-// filter canister on the left cheek. It is seated with the visor slit over the eyes.
+// filter canister on the left cheek. It is seated with the visor slit over the eyes, and its brow anchor is the point of
+// its shell that seat puts at the hairline.
 local visor = { min: [-0.095, 0.155, 0.125], max: [0.095, 0.19, 0.142] };
+local shell = { min: [-0.12, 0.03, -0.135], max: [0.12, 0.27, 0.135] };
 local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
 local helmet = [
   h.box('skirt', 'trim', [-0.135, 0, -0.15], [0.135, 0.035, 0.15]),
-  h.box('shell', 'plate', [-0.12, 0.03, -0.135], [0.12, 0.27, 0.135]),
+  h.box('shell', 'plate', shell.min, shell.max),
   h.box('cap', 'plate', [-0.11, 0.265, -0.125], [0.11, 0.285, 0.125]),
   h.dome('crown', 'plate', 0.11, 0.06, 0.012, 'y', [0, 0.28, 0]),
   h.box('crest', 'insignia', [-0.012, 0.28, -0.125], [0.012, 0.35, 0.125]),
@@ -36,14 +39,18 @@ local helmet = [
 local set = {
   armor_trooper: suit('armor_trooper', 'Trooper body armour', 16.0, fit.trooper('armor_trooper', livery, title='Trooper body armour')),
   helmet_trooper: fit.head('helmet_trooper', helmetBase) + {
-    rows: [h.compound('helmet_trooper', 2.8, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + { title: 'Trooper helmet' } + { voxelGrain: 0.004 }],
+    rows: [h.compound('helmet_trooper', 2.8, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
+      title: 'Trooper helmet',
+      voxelGrain: 0.004,
+      anchors: { brow: fit.browAnchor('helmet_trooper', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+    }],
   },
   gloves_trooper: suit('gloves_trooper', 'Trooper gauntlets', 1.2, fit.hands('gloves_trooper', gauntlet, {
     layer: 'normal', cuff: 0.13, flare: 0.03, hem: 0.016, backRidges: 4,
     slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
   }, 'Trooper gauntlets')),
   boots_trooper: suit('boots_trooper', 'Trooper boots', 2.6, fit.feet('boots_trooper', trooperBoot,
-                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, title='Trooper boots')),
+                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, { covers: ['sole'] }, title='Trooper boots')),
   legguard_trooper: suit('legguard_trooper', 'Trooper leg guards', 6.5, fit.trooperLegs('legguard_trooper', livery, title='Trooper leg guards')),
 };
-armour.of(null, std.flattenArrays([set[k].rows for k in std.objectFields(set)]))
+{ [k]: set[k] + { rows: armour.of(null, set[k].rows) } for k in std.objectFields(set) }
