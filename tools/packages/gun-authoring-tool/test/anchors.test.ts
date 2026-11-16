@@ -4,6 +4,7 @@ import { type AnchorFrame, resolveAnchors } from '@skelly/construct/assembly/anc
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
 import { applyDir, applyPoint, cross, dot, length, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { DESIGNS } from '../src/cli/content.ts';
@@ -297,6 +298,48 @@ describe('anchor data', () => {
     }
     for (const a of ARCHETYPES) {
       expect(selected(a).others.muzzle, a.name).toBeDefined();
+    }
+  });
+
+  const STOCKS = new Set(['stock', 'recoil-stock']);
+
+  it('puts the butt on every stocked gun at the middle of its stock’s rear face', () => {
+    const stocked = loadCorpus().filter(({ assembly }) =>
+      Object.values(assembly.parts).some(({ family }) => STOCKS.has(family)),
+    );
+    expect(stocked.map(({ label }) => label)).toEqual(
+      expect.arrayContaining([
+        'design archetype-ar.json',
+        'design pipe-rifle.json',
+        'design archetype-pump-shotgun.json',
+      ]),
+    );
+    for (const { label, assembly } of stocked) {
+      const resolved = resolve(assembly, gunDomain);
+      const [stockId] = Object.entries(assembly.parts).find(([, { family }]) => STOCKS.has(family))!;
+      const placed = resolved.placed.get(stockId)!;
+      const corners = resolved.defs
+        .get(stockId)!
+        .solids.map(localSolidBounds)
+        .map(([min, max]) => [applyPoint(placed, min), applyPoint(placed, max)] as const);
+      const rear = Math.min(...corners.map(([min]) => min[0]));
+      const rearSolids = corners.filter(([min]) => min[0] - rear < EPS);
+      const { butt } = selected(assembly).others;
+      expect(selected(assembly).sourceParts?.butt, label).toBe(stockId);
+      expect(butt!.position[0], label).toBeCloseTo(rear, 6);
+      const low = Math.min(...rearSolids.map(([min]) => min[1]));
+      const high = Math.max(...rearSolids.map(([, max]) => max[1]));
+      expect(butt!.position[1], label).toBeCloseTo((low + high) / 2, 6);
+    }
+  });
+
+  it('gives a gun without a stock no butt', () => {
+    const handguns = loadCorpus().filter(({ label }) =>
+      ['archetype-pistol', 'archetype-revolver', 'service-nine'].some((name) => label.includes(name)),
+    );
+    expect(handguns.length).toBeGreaterThan(0);
+    for (const { label, assembly } of handguns) {
+      expect(selected(assembly).others.butt, label).toBeUndefined();
     }
   });
 });

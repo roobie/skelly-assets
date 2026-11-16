@@ -16,13 +16,16 @@
 // two eye fixations, and a spring-driven release a blink. So the check settles at low ready, rolls deliberately to the
 // port, draws the handle briskly, pauses to look, and lets go, shuts the cover and comes back quickly, three and a half
 // seconds in all. Each move eases out of rest and into rest, as a hand moving from one place to the next does.
+// The hands meet the rifle as every held rifle_assault does (models/poses/guns/sockets.libsonnet): a frame's left hand
+// holding `socket: 'support'` takes that row's support socket.
+local sockets = (import 'guns/sockets.libsonnet').rifle_assault;
 // The left hand never takes the rifle in a power grip: it cradles, pinches and pushes with the fingers, so its sockets
 // meet the palm square across the knuckle crease (`crease`), where the fingers' bases carry a handguard, not slanted
 // deep in the palm.
-local crease = { grip: 0.95, slant: 0 };
-// The handguard's underside, palm up, the thumb along the bore. `beneath` keeps it below the bore however the rifle
-// rolls, as a supporting hand stays under the handguard while the other hand rolls the rifle.
-local support = { hold: crease { socket: { at: [0.013, -0.0225, 0.1], into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0.766] }, beneath: true, pole: [0, -1, 0] }, hands: 'support' };
+local crease = { grip: sockets.support.grip, slant: sockets.support.slant };
+// `beneath` keeps the support hand below the bore however the rifle rolls, as a supporting hand stays under the
+// handguard while the other hand rolls the rifle.
+local support = { hold: crease { socket: 'support', beneath: true, pole: [0, -1, 0] }, hands: sockets.support.hands };
 // The thumb pad on the rear face of the T's left wing and the index pad on the latch's front face, the palm beside and
 // behind the T; the other fingers close on the rifle by contact.
 local pinch(drawn) = {
@@ -34,24 +37,23 @@ local pinch(drawn) = {
   hands: 'pinch',
   drawn: drawn,
 };
-// Low ready: the bore tipped down ahead, the right elbow out and a little down. Turned: rolled to bring the port up
+// Low ready: the bore tipped down ahead, the right elbow out to the side. Turned: rolled to bring the port up
 // toward the eyes, the right elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the
 // rifle.
-local ready = { carry: { pitch: 15, yaw: 0, roll: 0 }, gripPole: [-0.94, 0.342, 0], look: [0, 0, 3], left: support };
+local ready = { carry: { pitch: 15, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, 0], look: [0, 0, 3], left: support };
 local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: [-0.03, 0.005, -0.1], tilt: 20 };
 local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
 {
   rifle: 'rifle_assault',
   // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
   stance: { spine: [4, -15, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
-  // The butt pad's middle, pressed into the pocket: a point in the torso's frame, from the right shoulder joint.
+  // The butt pad's middle and the pocket it stands in: a point in the torso's frame, from the right shoulder joint. The
+  // pocket is ahead of the shoulder joint, on the flat of the chest just inside the arm, so the stock bears on the chest
+  // by its inner edge however the rifle rolls, rather than lying along the slope where the chest turns toward the arm.
   butt: [0, -0.02, -0.38],
-  pocket: [0.06, -0.11, 0.04],
-  // The right palm on the pistol grip in a power grip, so the thumb closes down the grip's left side rather than
-  // lying where the hand at rest leaves it, across the grip's back; each frame gives the elbow's pole. The grip is
-  // slanted across the palm a little less than a handle, since a raked pistol grip already bends the wrist toward the
-  // thumb and the full slant would ask it past its limit.
-  grip: { hold: { socket: { at: [-0.016, -0.09, -0.164], into: [0.781, 0.188, -0.596], axis: [0, 0.95, 0.3] }, slant: 15 }, hands: 'grip' },
+  pocket: [0.03, -0.11, 0.07],
+  // The right palm on the pistol grip, each frame giving the elbow's pole.
+  sockets: sockets,
   easing: 'minimum-jerk',
   frames: {
     'press-1-fire': ready { hold: 0.3 },
@@ -64,7 +66,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-6-released': turned {
       into: 0.12,
       left: {
-        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, 0], close: false },
+        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },

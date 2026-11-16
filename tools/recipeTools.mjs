@@ -9,6 +9,9 @@ import { join } from 'node:path';
 
 const here = import.meta.dirname;
 
+/** The folder under a pack each tool writes its model sidecars to, by tool. */
+export const SIDECAR_DIRECTORIES = { gun: 'gungen', thing: 'things' };
+
 let loaded;
 export const recipeTools = () => (loaded ??= loadRecipeTools());
 const loadRecipeTools = async () => {
@@ -22,7 +25,7 @@ const loadRecipeTools = async () => {
         return rows;
       },
       exportOf: (row) => gun.loadExportRecipe([row])[0],
-      directory: 'gungen',
+      directory: SIDECAR_DIRECTORIES.gun,
       index: false,
       code: [
         'package-lock.json',
@@ -40,7 +43,7 @@ const loadRecipeTools = async () => {
       tasks: async (rows) =>
         thing.thingTasks(rows, (await import('./packages/thing-authoring-tool/src/content.ts')).catalogue),
       exportOf: ({ row, catalogue }) => thing.loadThingRecipe([row], catalogue)[0],
-      directory: 'things',
+      directory: SIDECAR_DIRECTORIES.thing,
       index: true,
       code: [
         'package-lock.json',

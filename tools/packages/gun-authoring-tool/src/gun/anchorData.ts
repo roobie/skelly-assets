@@ -4,6 +4,7 @@
 import type { AnchorFrame } from '@skelly/construct/assembly/anchors.ts';
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
 import { add, extrusionPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
 import type { GunAnchorDeclarations, GunPartAnchors } from './anchors.ts';
 import { localEjectionPoint } from './ejection.ts';
@@ -111,6 +112,18 @@ const undersideSupport = (part: PartDef, along: number): GunPartAnchors => {
   return {};
 };
 
+/**
+ * Middle of a stock's rear face, where the shoulder takes it: the height and width centre of the solids reaching the
+ * stock's rearmost point, at that point. A raked pad steps forward from its heel, so the export moves it onto the
+ * drawn face.
+ */
+const rearFaceButt = (part: PartDef): GunPartAnchors => {
+  const bounds = part.solids.map(localSolidBounds);
+  const rear = Math.min(...bounds.map(([min]) => min[0]));
+  const [min, max] = boundsOfPoints(bounds.filter(([low]) => low[0] - rear < 1e-6).flat());
+  return { butt: frameAt([rear, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2]) };
+};
+
 export const GUN_ANCHORS: GunAnchorDeclarations = {
   // Separate grip: local frame is the grip's own, so its lean comes from the mounting port.
   grip: {
@@ -137,7 +150,7 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
       return { ...hold, ...(magazine ? { magwell: frameAt(magazine.pos) } : {}) };
     },
   },
-  // Only a firing-grip stock has a hold. An authored palm datum is independent
+  // Every stock has a butt; only a firing-grip stock has a hold. An authored palm datum is independent
   // of the stock's lowest silhouette vertex; ordinary wrists use their interior.
   stock: {
     holdRank: 'firing-grip-stock',
@@ -146,9 +159,13 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
       const grip = gripSolid ?? findSolid(part, 'wrist');
       const palm = part.axes.find((a) => a.kind === 'firing-grip');
       const position = palm?.origin ?? (grip && (gripSolid ? gripHoldPoint(grip) : interiorPoint(grip)));
-      return position && part.tags?.includes(FIRING_GRIP) ? { hold: frameAt(position) } : {};
+      return {
+        ...rearFaceButt(part),
+        ...(position && part.tags?.includes(FIRING_GRIP) ? { hold: frameAt(position) } : {}),
+      };
     },
   },
+  'recoil-stock': { anchors: (_params, part) => rearFaceButt(part) },
   handguard: {
     anchors: (params, part) =>
       params.section === 'sporter' && params.style !== 'plank'
