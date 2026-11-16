@@ -4,6 +4,6 @@
   rear: -1.9, front: 1.82, side: 0.78, body: 0.585, floor: 0.3, bootFloor: 0.46, waist: 0.88, roof: 1.44, windowTop: 1.22,
   rearAxle: -1.15, frontAxle: 1.15, hub: 0.281, wheelZ: 0.68,
   archX: -0.3, archHalf: 1.2,
-  doorRear: -0.25, doorFront: 0.8,
+  doorRear: -0.25, doorFront: 0.8, doorOpens: 70, bootOpens: 80,
   shellMass: 420, paint: 'paint-green',
 }

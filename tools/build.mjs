@@ -271,7 +271,10 @@ async function main() {
     const problems = [...report.problems, ...vehicles.problems];
     for (const { message } of [...unlisted, ...vehicles.unjudged]) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
-    if (problems.length > 0) process.exit(1);
+    if (problems.length > 0) {
+      process.exitCode = 1;
+      return;
+    }
   }
   let failed = false;
   const pool = exportPool(cache);
@@ -340,7 +343,8 @@ async function main() {
   } finally {
     await pool.close();
   }
-  process.exit(failed ? 1 : 0);
+  // Not process.exit: on a pipe stdout writes asynchronously, and exiting drops the report lines still queued.
+  process.exitCode = failed ? 1 : 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
