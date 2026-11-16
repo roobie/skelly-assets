@@ -103,24 +103,25 @@ local shinAdd = [
   oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.012, sw + 0.06, sd + 0.06, leg.shinChamfer / 2 + 0.02),
 ];
 
-// The helm: wider and deeper than the trooper's, with cheek guards, ear discs, a tall crest and a heavy brow. Its brow
-// anchor is the point of its shell that a seat with the visor over the eyes puts at the hairline.
-local visor = { min: [-0.115, 0.155, 0.145], max: [0.115, 0.19, 0.162] };
-local shell = { min: [-0.145, 0.035, -0.155], max: [0.145, 0.27, 0.155] };
+// The helm: wider and deeper than the trooper's, a moulded shell sloping in to a chamfered, domed crown under a tall
+// crest, a skirt flared out over the nape, cheek guards, ear discs and a heavy peaked brow. Its brow anchor is the point
+// of its shell that a seat with the visor over the eyes puts at the hairline.
+local visor = { min: [-0.085, 0.155, 0.145], max: [0.085, 0.19, 0.162] };
+local shell = { min: [-0.145, 0.035, -0.155], max: [0.145, 0.3, 0.155] };
+local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
 local helmet = [
-  h.box('skirt', 'trim', [-0.16, 0, -0.17], [0.16, 0.04, 0.17]),
-  h.box('shell', 'plate', shell.min, shell.max),
-  h.box('cap', 'plate', [-0.135, 0.265, -0.145], [0.135, 0.29, 0.145]),
-  round(h.dome('crown', 'plate', 0.135, 0.075, 0.014, 'y', [0, 0.285, 0])),
-  h.box('crest', 'insignia', [-0.016, 0.29, -0.14], [0.016, 0.375, 0.14]),
-  h.box('brow', 'trim', [-0.15, 0.19, 0.14], [0.15, 0.222, 0.18]),
+  h.taperedBlock('skirt', 'trim', [-0.158, 0, -0.185], [0.158, 0.04, 0.17], 0.05, [0.012, 0.012, 0.03], 0),
+  h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.035, [0.022, 0.012, 0.022], 0.05),
+  round(h.dome('crown', 'plate', 0.07, 0.03, 0.012, 'y', [0, 0.295, -0.005])),
+  h.prism('crest', 'insignia', 'x', [[0.27, 0.125], [0.335, 0.08], [0.35, -0.07], [0.27, -0.12]], -0.016, 0.016),
+  h.prism('brow', 'trim', 'x', [[0.186, 0.138], [0.19, 0.172], [0.21, 0.184], [0.226, 0.145]], -0.08, 0.08),
   h.box('visor', 'lens', visor.min, visor.max),
   h.prism('faceplate', 'plate', 'x', [[0.04, 0.15], [0.17, 0.15], [0.145, 0.19], [0.06, 0.196]], -0.085, 0.085),
 ] + [
   h.box('grille-%d' % i, 'grille', [-0.055, 0.07 + i * 0.022, 0.185], [0.055, 0.081 + i * 0.022, 0.2])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'plate', [[-0.172, 0.145][i], 0.05, -0.04], [[-0.145, 0.172][i], 0.2, 0.14])
+  h.box('cheek-%d' % i, 'plate', [[-0.172, 0.125][i], 0.05, -0.04], [[-0.125, 0.172][i], 0.2, 0.14])
   for i in [0, 1]
 ] + [
   round(h.rod('ear-%d' % i, 'trim', 0.055, [-0.2, 0.17][i], [-0.17, 0.2][i], 0.13))

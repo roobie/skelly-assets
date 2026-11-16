@@ -115,15 +115,26 @@ local shinAdd = [
   oct('greave-rim', 'glow', -shinLength - leg.ankleOverlap, -shinLength + 0.01, sw + 0.05, sd + 0.05, leg.shinChamfer / 2 + 0.02),
 ] + piston('shin-piston', 0, -(sd + 0.04) / 2 - 0.02, -shinLength + 0.03, -0.09);
 
-// The helm: an angular shell with a swept crown, a glowing visor slit, vents, light strips on the cheeks and a rear fin.
-// Its brow anchor is the point of its shell that a seat with the visor slit over the eyes puts at the hairline.
-local visor = { min: [-0.1, 0.155, 0.135], max: [0.1, 0.185, 0.15] };
+// The helm: an angular shell sloping in to a swept crown chamfered along its sides, a skirt flared out over the nape, a
+// glowing visor slit under a peaked brow, vents, light strips on the cheeks and a rear fin. Its brow anchor is the point
+// of its shell that a seat with the visor slit over the eyes puts at the hairline.
+local visor = { min: [-0.08, 0.155, 0.135], max: [0.08, 0.185, 0.15] };
 local shell = { min: [-0.125, 0.03, -0.14], max: [0.125, 0.25, 0.14] };
+local taper = [0.015, 0.008, 0.015];
+local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
+// The crown stands on the shell's sloped-in top, and its sides are cut at 45 degrees from there up to its ridge.
+local crownCut = [
+  { normal: [1, 1, 0], offset: shell.max[0] - taper[0] + shell.max[1] },
+  { normal: [-1, 1, 0], offset: shell.max[0] - taper[0] + shell.max[1] },
+  { normal: [0, 0, 1], offset: shell.max[2] - taper[1] },
+  { normal: [0, 0, -1], offset: -shell.min[2] - taper[2] },
+];
 local helmet = [
-  h.box('skirt', 'trim', [-0.135, 0, -0.15], [0.135, 0.035, 0.15]),
-  h.box('shell', 'plate', shell.min, shell.max),
-  h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115),
-  h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.13, 0.13),
+  h.taperedBlock('skirt', 'trim', [-0.135, 0, -0.165], [0.135, 0.035, 0.15], 0.04, [0.01, 0.01, 0.025], 0),
+  h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, taper, 0),
+  h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115)
+  + { clip: crownCut },
+  h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.075, 0.075),
   h.box('visor', 'glow', visor.min, visor.max),
   h.prism('jaw', 'plate', 'x', [[0.035, 0.12], [0.15, 0.13], [0.15, 0.175], [0.05, 0.17]], -0.075, 0.075),
   h.prism('fin', 'trim', 'x', [[0.28, -0.12], [0.34, -0.1], [0.37, -0.14], [0.27, -0.14]], -0.012, 0.012),
@@ -131,7 +142,7 @@ local helmet = [
   h.box('vent-%d' % i, 'strap', [-0.04, 0.07 + i * 0.022, 0.17], [0.04, 0.081 + i * 0.022, 0.18])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'trim', [[-0.14, 0.125][i], 0.06, -0.06], [[-0.125, 0.14][i], 0.2, 0.12])
+  h.box('cheek-%d' % i, 'trim', [[-0.14, 0.11][i], 0.06, -0.06], [[-0.11, 0.14][i], 0.2, 0.12])
   for i in [0, 1]
 ] + [
   h.box('cheek-light-%d' % i, 'glow', [[-0.146, 0.14][i], 0.1, 0.0], [[-0.14, 0.146][i], 0.16, 0.1])
