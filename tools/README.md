@@ -5,6 +5,7 @@ read_if:
   - reviewing how models or assembled vehicles look, as pictures, contact sheets or a vehicle gallery
   - changing how a vehicle, a kit assembly or a model built of components comes apart in an exploded view
   - choosing which unreviewed rows to review first
+  - adding a tools package, or changing a package's TypeScript compiler options
 ---
 
 # Model tools
