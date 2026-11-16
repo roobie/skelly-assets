@@ -219,7 +219,7 @@ for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
   // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
-  // names the clip actor's plain clips and its walk speed, which paces its walk.
+  // names the clip actor's plain clips and its walk speed, which paces its walk; `motions`, the clips baked for the doll.
   const rig = dollRig(readRigContent(root), doll, dressing);
   // A worn piece hides what it declares it covers, so a declaration it does not enclose would open the body to view.
   // Every declaring item is dressed, shown or not, since a consumer hides by the declaration wherever it wears it.
@@ -243,7 +243,8 @@ if (doll) {
     if (unwritten.length > 0) throw new Error(`sequence frames with no pose file (node ${tool}): ${unwritten.join(', ')}`);
   }
   const sequences = Object.assign({}, ...generated.map(({ sequences }) => sequences));
-  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses, sequences }));
+  const motions = manifest.motions.map(({ id, pack, path }) => ({ id, file: outputPath(pack, path) }));
+  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, motions, doll: doll.sites, poses, sequences }));
   mkdirSync(join(out, 'poses'));
   for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
 }

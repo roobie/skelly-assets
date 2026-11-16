@@ -190,10 +190,10 @@ const slerp = (() => {
   return (a, b, w) => qa.fromArray(a).slerp(qb.fromArray(b), w).toArray();
 })();
 
-// The seconds a clip plays over once: a walk by its stride at the actor's walk speed, a loop by its period, a finite
-// clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
+// The seconds a clip plays over once: a walk by its stride at the pace it was drawn for, or else the actor's walk speed,
+// a loop by its period, a finite clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
 const spanOf = (clip, walkSpeed) => {
-  if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / walkSpeed;
+  if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / (clip.speedMetresPerSecond ?? walkSpeed);
   return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
 // A clip of the rig's frames, its span stated the way its loop needs, timed by `timing` (`keyPhases` and `easing`) if given.
@@ -620,10 +620,11 @@ async function startPage(data, query) {
     $('ik-report').textContent = describe({ clamped, residuals: { [end.id]: residual } });
   });
 
-  // Clip: frames collected here, a sequence of fixtures, a clip file opened or one of the clip actor's clips, scrubbed
-  // and played. Collected frames and a sequence's keep what the hands carry at each frame (`carries`, one per frame), so
-  // a held item's place in the hand and its moving parts follow the clip; the others leave the hands as they are. A
-  // timed clip's Seconds scales its timing; an added frame leaves the frames evenly spaced, as it has no time of its own.
+  // Clip: frames collected here, a sequence of fixtures, a clip file opened, one of the clip actor's clips or one baked
+  // for the doll (the rig's `motions`), scrubbed and played. Collected frames and a sequence's keep what the hands carry
+  // at each frame (`carries`, one per frame), so a held item's place in the hand and its moving parts follow the clip;
+  // the others leave the hands as they are. A timed clip's Seconds scales its timing; an added frame leaves the frames
+  // evenly spaced, as it has no time of its own.
   const clip = { frames: [], carries: [], timing: {}, phase: 0, playing: false, actor: null };
   const span = () => (clip.actor ? spanOf(clip.actor, rig.clips.walkSpeed) : Number($('clip-seconds').value));
   const current = () => clip.actor ?? authoredClip(clip.frames, $('clip-loop').checked, span(), clip.timing);
@@ -688,10 +689,16 @@ async function startPage(data, query) {
   const actorClips = clipSet(await fetch(`built/${rig.clips.file}`).then((r) => r.json()));
   const named = Object.entries(actorClips).filter(([, c]) => playable(c) && c.frames.length > 1);
   const sequences = new Map(Object.entries(rig.sequences).map(([name, sequence]) => [`sequence ${name}`, { name, ...sequence }]));
+  // The doll's baked clips stand it barefoot, so the page stands them on what it wears; an idle's live motion is left out.
+  const baked = new Map((await Promise.all(rig.motions.map(async ({ id, file }) => {
+    const { clips } = await fetch(`built/${file}`).then((r) => r.json());
+    return Object.entries(clips).filter(([, c]) => playable(c)).map(([name, c]) => [`motion ${id} ${name}`, { id, name, clip: c }]);
+  }))).flat());
   $('clip-source').append(
     new Option('(authored)', ''),
     ...[...sequences].map(([value, { name }]) => new Option(name, value)),
     ...named.map(([name]) => new Option(name, name)),
+    ...[...baked].map(([value, { id, name }]) => new Option(`${name} (${id})`, value)),
   );
   // A sequence's frames and carries, each key's fixture posed with what it holds, at the key's own time.
   const playSequence = async ({ keys, easing }) => {
@@ -711,9 +718,11 @@ async function startPage(data, query) {
     $('clip-report').textContent = '';
     const value = $('clip-source').value;
     if (sequences.has(value)) return playSequence(sequences.get(value));
-    const chosen = actorClips[value];
+    const lifted = ({ root: [x, y, z], rotations }) => ({ root: [x, y + figure.soles, z], rotations });
+    const chosen = baked.has(value) ? baked.get(value).clip : actorClips[value];
     if (!chosen) return setClip([], { carries: [] });
-    const actor = { ...chosen, frames: chosen.frames.map((frame) => rigFrame(rig, frame, figure.soles)) };
+    const frames = chosen.frames.map((frame) => (baked.has(value) ? lifted(frame) : rigFrame(rig, frame, figure.soles)));
+    const actor = { ...chosen, frames };
     setClip(actor.frames, { actor, loop: Boolean(actor.loop), seconds: spanOf(actor, rig.clips.walkSpeed) });
     seek(0);
   }));
