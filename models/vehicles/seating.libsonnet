@@ -367,8 +367,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['bucket_ram', 'arm', 0.125],
       ['bucket_ram', 'bucket', 0.071],
       ['lift_ram', 'digging_boom', 0.085],
-      ['tilt_ram', 'bucket', 0.041],
-      ['tilt_ram', 'lift_arms', 0.068],
       ],
     ),
     fit(
