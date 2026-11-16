@@ -28,6 +28,7 @@ import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
+import { restPokeCheck, restPokeResults, treeModels } from './restPoke.mjs';
 import { readSeveredParts } from './severedParts.mjs';
 import { SOUND_SAMPLE_RATE } from './sounds.mjs';
 import { loadOutStowage } from './stowage.mjs';
@@ -111,6 +112,18 @@ function recipeUnits(root, tools, names) {
 
 // Each unit with its tool's tasks, one per row, which loads (and so checks) every unit's rows.
 const withTasks = (tools, units) => Promise.all(units.map(async (unit) => ({ ...unit, tasks: await tools[unit.name].tasks(unit.rows) })));
+
+// The units' models as tools/restPoke.mjs reads them, generated through the pool, so a shard checks garments with no tree.
+const generatedModels = (units, pool) => {
+  const runs = new Map(units.flatMap(({ name, rows, tasks }) => rows.map((row, at) => [row.id, { tool: name, task: tasks[at] }])));
+  return {
+    models: units.flatMap(({ rows }) => rows.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags }))),
+    modelOf: async (id) => {
+      const { glb, modelEntry } = await pool.run(runs.get(id));
+      return { glb, entry: modelEntry };
+    },
+  };
+};
 
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
@@ -242,6 +255,7 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   const pool = exportPool(cache);
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
+    await restPokeResults(generatedModels(units, pool), { root, cache, shard });
     console.log(cacheReport(pool.usage()));
     await swingResults(readSitePieces(repo), { cache, shard });
   } finally {
@@ -305,6 +319,10 @@ async function main() {
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
       const dressing = readDressing(repo);
       const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
+      const rest = await restPokeCheck(treeModels(out, models), { cache, prune: true });
+      for (const message of rest.notes) console.log(`REST note: ${message}`);
+      for (const message of rest.problems) console.log(`REST ${message}`);
+      if (rest.problems.length > 0) failed = true;
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({

@@ -195,6 +195,9 @@ export const coveringItems = (models) => [...new Set(models.flatMap((model) => {
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
 export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
 
+// The wearables drawn as worn pieces, by the pieces' ids, whether or not the models hold the wearable itself.
+export const fittedGarments = (models) => [...new Set(models.flatMap((model) => pieceOf(model)?.garment ?? []))];
+
 // The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
 export function placeOf(model, dressing) {
   const slots = tagsOf(model, 'slot');
