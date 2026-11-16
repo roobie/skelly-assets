@@ -107,9 +107,11 @@ local pressings(id, title, s) = {
     local aft = s.rearAxle - s.arch;
     local fore = s.rearAxle + s.arch;
     local over = std.max(low, s.archTop + 0.0625);
-    if to <= aft || from >= fore then [box(id, slot, [from, low, z[0]], [to, high, z[1]])]
-    else (if aft > from then [box(id + '_aft', slot, [from, low, z[0]], [aft, high, z[1]])] else [])
-      + (if to > fore then [box(id + '_fore', slot, [fore, low, z[0]], [to, high, z[1]])] else [])
+    // An arch's edge can meet the box's end to within rounding, which would leave a sliver with no width.
+    local beyond(a, b) = a - b > 1e-6;
+    if !beyond(to, aft) || !beyond(fore, from) then [box(id, slot, [from, low, z[0]], [to, high, z[1]])]
+    else (if beyond(aft, from) then [box(id + '_aft', slot, [from, low, z[0]], [aft, high, z[1]])] else [])
+      + (if beyond(to, fore) then [box(id + '_fore', slot, [fore, low, z[0]], [to, high, z[1]])] else [])
       + (if high > over then [box(id + '_over', slot, [std.max(aft, from), over, z[0]], [std.min(fore, to), high, z[1]])] else []),
   // The floor behind the seats, whole between the wells and cut round the rear arch outside them.
   local rearFloor(low, high) =
