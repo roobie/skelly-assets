@@ -5,15 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import {
-  COINCIDENT,
-  clearanceProbe,
-  coveredSurface,
-  PITCH,
-  posedSolid,
-  restClearance,
-  signedDepth,
-} from '../../site/clearance.mjs';
+import { COINCIDENT, coveredSurface, PITCH, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { hides } from '../../site/hiding.mjs';
@@ -129,7 +121,6 @@ const { meshOf: itemMesh, entryOf: thingOf } = heldItems(built, manifest);
 const fixtures = readdirSync(join(repo, 'models/poses'))
   .filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
-const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
@@ -168,7 +159,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
     surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)),
     'the boxes cover the body',
   );
-  assert.deepEqual(counted(clearanceProbe(rig, jacket, surface)(still)), CLEAN);
+  assert.deepEqual(counted(restClearance(rig, jacket, surface)), CLEAN);
 });
 
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
@@ -199,7 +190,7 @@ test('upper sleeves narrowed inside their arms let the upper arms poke through',
     pieces.some((piece, i) => piece !== rest.pieces[i]),
     'the jacket has upper sleeves to narrow',
   );
-  const { pokes } = clearanceProbe(rig, { ...rest, pieces })(still);
+  const { pokes } = restClearance(rig, { ...rest, pieces });
   assert.ok(
     pokes.some(({ bone }) => bone.startsWith('upperArm.')),
     'an upper arm shows through',
@@ -410,6 +401,18 @@ const baking = process.env.ASSETS_SWEEPS
 let baked;
 const bakedWields = () => (baked ??= wieldClips(rig, baking, weapons, itemMesh));
 const strikes = () => Object.entries(bakedWields().clips).filter(([, clip]) => clip.phases);
+// The weapon of class `kind` as a clip's held seat stands it on the leading hand in `posed`: its file carried into the
+// root frame, turned to its held axes, then by the seat's turn.
+const seatedWeapon = (clip, kind, posed) => {
+  const { grip } = thingOf(wields.classes[kind].weapon.model);
+  const { held } = weapons[kind].weapon;
+  const hand = posed.get(clip.held.bone),
+    turn = quatToMat3(clip.held.turn);
+  return {
+    r: [hand.r, turn, held].reduce(mulMM),
+    t: add(hand.t, mulMV(hand.r, sub(clip.held.at, mulMV(mulMM(turn, held), grip.at)))),
+  };
+};
 
 test("the wields' pose files are what their tool writes from their key frames", () => {
   const poses = wieldPoses(rig, wields, weapons);
@@ -479,15 +482,11 @@ test("a weapon seated by a strike's held seat stands where the hit key holds it,
   const poses = wieldPoses(rig, baking, weapons);
   for (const [name, clip] of armed) {
     const kind = name.split('_strike_')[0];
-    const { grip, anchors } = thingOf(wields.classes[kind].weapon.model);
-    const { held } = weapons[kind].weapon;
+    const { anchors } = thingOf(wields.classes[kind].weapon.model);
     const { frame, held: holding } = compilePose(rig, poses[`${name}-hit`], { meshOf: itemMesh });
     const posed = boneTransforms(rig.bones, decodeFrame(frame));
-    const hand = posed.get(clip.held.bone),
-      chest = posed.get('spine');
-    // The weapon's file carried into the root frame by the seat: turned to its held axes, then by the seat's turn.
-    const r = [hand.r, quatToMat3(clip.held.turn), held].reduce(mulMM);
-    const t = add(hand.t, mulMV(hand.r, sub(clip.held.at, mulMV(mulMM(quatToMat3(clip.held.turn), held), grip.at))));
+    const chest = posed.get('spine');
+    const { r, t } = seatedWeapon(clip, kind, posed);
     const item = holding[clip.held.bone];
     assert.ok(
       length(sub(t, item.t)) < 1e-3,
@@ -501,6 +500,37 @@ test("a weapon seated by a strike's held seat stands where the hit key holds it,
     assert.ok(
       end[2] > chest.t[2] + 0.3,
       `${name}: the striking end stands ${(end[2] - chest.t[2]).toFixed(2)} m ahead of the chest`,
+    );
+  }
+});
+
+test("every baked strike's hit falls within a frame of where its striking end reaches farthest ahead", () => {
+  // A game lands the blow and the target's flinch at the hit, and the target stands ahead of the figure, so the weapon's
+  // striking end, or a bare hand's fist, meets it where it reaches farthest ahead. A bare strike's striking hand is the
+  // one that reaches farthest.
+  assert.ok(strikes().length > 0);
+  for (const [name, clip] of strikes()) {
+    const kind = name.split('_strike_')[0];
+    const posed = clip.frames.map((frame) => boneTransforms(rig.bones, decodeFrame(frame)));
+    const tracks = clip.held
+      ? [
+          posed.map((p) =>
+            applyPoint(seatedWeapon(clip, kind, p), thingOf(wields.classes[kind].weapon.model).anchors.strike),
+          ),
+        ]
+      : Object.keys(wields.classes[kind].free).map((hand) =>
+          posed.map((p) => applyPoint(p.get(hand), rig.bones.find((b) => b.id === hand).tail)),
+        );
+    // Each track's farthest reach ahead and the frame it comes in; the striking track is the one reaching farthest.
+    const reaches = tracks.map((track) =>
+      track.reduce((best, [, , z], k) => (z > best.z ? { z, k } : best), { z: -Infinity, k: 0 }),
+    );
+    const { k } = reaches.reduce((best, reach) => (reach.z > best.z ? reach : best));
+    const step = clip.durationSimSeconds / (clip.frames.length - 1);
+    const contact = k * step;
+    assert.ok(
+      Math.abs(contact - clip.hitAtSimSeconds) <= step + 1e-9,
+      `${name}: the striking end reaches farthest ahead at ${contact.toFixed(3)} s, the hit lands at ${clip.hitAtSimSeconds} s`,
     );
   }
 });
