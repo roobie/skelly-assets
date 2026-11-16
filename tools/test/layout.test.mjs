@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
-import { declaredPacks, outputPath, readMobRows, readRoster, undeclaredDirectories } from '../layout.mjs';
+import { declaredPacks, outputPath, readMobRows, readRoster, smoothPack, undeclaredDirectories } from '../layout.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits } from '../manifest.mjs';
 import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
 import { installJsonnetSources } from '../sources.mjs';
@@ -29,11 +29,21 @@ function fixtureRoot() {
   return root;
 }
 
-test('every pack a recipe file, a roster pack, a mob row or a sound file names is declared, and nothing else', () => {
+test('every pack a recipe file, a roster pack, a mob row or a sound file names is declared, with each model pack\'s smooth copy, and nothing else', () => {
   const root = fixtureRoot();
   try {
-    assert.deepEqual(declaredPacks(root), new Set(['fixture.recipe', 'fixture.roster', 'fixture.mobs', 'fixture.sounds']));
+    assert.deepEqual(declaredPacks(root), new Set([
+      'fixture.recipe', 'fixture.roster', 'fixture.mobs', 'fixture.sounds', 'fixture.recipe.smooth', 'fixture.roster.smooth',
+    ]));
     assert.deepEqual(readRoster(root), [{ packId: 'fixture.roster', id: 'fixture_gun' }]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('a source naming a pack as a smooth copy is refused, so no smooth pack is two packs', () => {
+  const root = fixtureRoot();
+  try {
+    writeFileSync(join(root, 'models/export.json'), JSON.stringify({ 'fixture.roster.smooth': ['fixture_gun'] }));
+    assert.throws(() => declaredPacks(root), /smooth pack's name: fixture\.roster\.smooth/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -58,12 +68,16 @@ test('every mob row names a pack and actor output paths', () => {
   }
 });
 
-test('the roster builder writes each id at its pack path, with its sidecar, and nowhere else', () => {
+test('the roster builder writes each id at its pack path, with its sidecar and its smooth copy, and nowhere else', () => {
   const [{ packId, id }] = readRoster();
   const out = mkdtempSync(join(tmpdir(), 'roster-'));
   try {
     execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', out, id], { cwd: repo, stdio: 'pipe' });
-    assert.deepEqual(filesUnder(out), [outputPath(packId, `assets/models/${id}.glb`), outputPath(packId, `things/${id}.model.json`)].sort());
+    assert.deepEqual(filesUnder(out), [
+      outputPath(packId, `assets/models/${id}.glb`),
+      outputPath(packId, `things/${id}.model.json`),
+      outputPath(smoothPack(packId), `assets/models/${id}.glb`),
+    ].sort());
   } finally { rmSync(out, { recursive: true, force: true }); }
 });
 

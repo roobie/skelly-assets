@@ -70,13 +70,23 @@ export const readSoundRows = (root = repo) => Object.entries(readSoundPacks(root
     variants: row.seeds.map((seed) => ({ seed, path: `sounds/${id}/${seed}.ogg` })),
   })));
 
+// A model pack's smooth copy ships as a pack of its own beside it, so a consumer that draws only voxels never loads it;
+// the why is in docs/decisions/0019-smooth-copy.md.
+const SMOOTH = '.smooth';
+export const smoothPack = (packId) => `${packId}${SMOOTH}`;
+// The pack a smooth pack is the copy of, or undefined for a pack that is not one.
+export const smoothedPack = (packId) => (packId.endsWith(SMOOTH) ? packId.slice(0, -SMOOTH.length) : undefined);
+
 export function declaredPacks(root = repo) {
-  return new Set([
-    ...recipePackIds(root),
-    ...readRoster(root).map((row) => row.packId),
+  const models = new Set([...recipePackIds(root), ...readRoster(root).map((row) => row.packId)]);
+  const declared = new Set([
+    ...models,
     ...readMobRows(root).map((row) => row.pack),
     ...soundPackIds(root),
   ]);
+  const named = [...declared].filter((pack) => smoothedPack(pack) !== undefined);
+  if (named.length > 0) throw new Error(`a source declares a smooth pack's name: ${named.sort().join(' ')}`);
+  return new Set([...declared, ...[...models].map(smoothPack)]);
 }
 
 // Every directory directly under built/ must be a declared pack; flat files are not directories.

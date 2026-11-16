@@ -2,6 +2,7 @@
 // dependsOn is in docs/decisions/0001-vehicle-placements.md.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { smoothedPack } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 export const PACKS = 'models/packs.json';
@@ -33,7 +34,8 @@ export function dependencyProblems(dependsOn, declared) {
   return problems.sort();
 }
 
-// pack -> the packs it depends on, sorted, read strictly and held to the declared packs.
+// pack -> the packs it depends on, sorted, read strictly and held to the declared packs. A smooth pack's one dependency
+// is the pack it is the copy of, whose sidecars its models are weighed and fitted by, so models/packs.json never names it.
 export function readDependencies(declared, root = repo) {
   const value = JSON.parse(readFileSync(join(root, PACKS), 'utf8'));
   for (const key of Object.keys(value)) if (key !== '_doc' && key !== 'packs') throw new Error(`${PACKS}: unknown key ${key}`);
@@ -42,10 +44,12 @@ export function readDependencies(declared, root = repo) {
   for (const [pack, entry] of Object.entries(value.packs)) {
     const unknown = isObject(entry) ? Object.keys(entry).filter((key) => !PACK_KEYS.has(key)) : [];
     if (!isObject(entry) || unknown.length > 0) throw new Error(`${PACKS}: ${pack} holds only ${[...PACK_KEYS].join(' ')}`);
+    if (smoothedPack(pack) !== undefined) throw new Error(`${PACKS}: ${pack} is a smooth pack, which depends only on ${smoothedPack(pack)}`);
     const targets = entry.dependsOn ?? [];
     if (!Array.isArray(targets) || targets.some((target) => typeof target !== 'string')) throw new Error(`${PACKS}: ${pack} dependsOn must list pack ids`);
     dependsOn[pack] = [...targets].sort();
   }
+  for (const pack of declared) if (smoothedPack(pack) !== undefined) dependsOn[pack] = [smoothedPack(pack)];
   const problems = dependencyProblems(dependsOn, declared);
   if (problems.length > 0) throw new Error(`${PACKS}:\n  ${problems.join('\n  ')}`);
   return dependsOn;
