@@ -4,6 +4,7 @@ read_if:
   - understanding package origin and the boundary between tools and game consumers
   - reviewing how models or assembled vehicles look, as pictures, contact sheets or a vehicle gallery
   - changing how a vehicle, a kit assembly or a model built of components comes apart in an exploded view
+  - choosing which unreviewed rows to review first
 ---
 
 # Model tools
@@ -195,3 +196,6 @@ Drawing needs a headless browser and takes seconds per model, so it runs on dema
 comes first. Its tests cover only its logic: which entries a look draws, which way its views look, how an assembly is
 laid out and comes apart and when a picture is stale. The browser is Playwright's Chromium, which the gun tool's browser
 tests already use.
+
+Which rows to draw first comes from the review probes, which rank the rows nobody has reviewed by the defects reviews
+keep finding. See `review-probe.mjs` and `../docs/decisions/0018-review-probes.md`.
