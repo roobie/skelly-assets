@@ -5,11 +5,9 @@ import { makeOwnedTempDirectory } from './testTemp.ts';
 
 // Vitest CLI sets this before loading Vite config and allocating its root tmpDir.
 // Ordinary Vite/browser commands must retain their caller's temp directory.
-// biome-ignore lint/style/noProcessEnv: Vitest's documented runner marker.
 if (process.env.VITEST === 'true') {
   const cache = resolve('node_modules/.cache/vitest-tmp');
   const run = makeOwnedTempDirectory(cache);
-  // biome-ignore lint/style/noProcessEnv: keep both Vitest root and project caches off RAM-backed temp storage.
   process.env.TMPDIR = run;
   process.once('exit', () => rmSync(run, { recursive: true, force: true }));
 }

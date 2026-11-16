@@ -63,6 +63,7 @@ import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './eject
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
 import type { MuzzleBore } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
+import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import { gunPort } from './portData.ts';
 import {
   PUMP_ACTION_TRAVEL_U,
@@ -70,6 +71,8 @@ import {
   PUMP_LOADING_PORT_X,
   PUMP_SHELL_LOADED_LENGTH_U,
 } from './pumpShell.ts';
+import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
+import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import {
   buildReceiverSection,
   type ReceiverSectionSpec,
@@ -78,10 +81,7 @@ import {
   subtractAxialPockets,
   subtractConvexSection,
 } from './receiverSection.ts';
-import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
-import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
-import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import {
   curvedTriggerBlade,
   openTriggerGuard,
@@ -90,8 +90,8 @@ import {
   triggerBlade,
 } from './roundedTriggerGuard.ts';
 import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIONS } from './shotgunProportions.ts';
+import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
-import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import {
   cutSporterAction,
   sporterActionDetails,

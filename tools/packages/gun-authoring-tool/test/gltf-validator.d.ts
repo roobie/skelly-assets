@@ -16,6 +16,5 @@ declare module 'gltf-validator' {
   const validator: {
     validateBytes: (data: Uint8Array, options?: { uri?: string; maxIssues?: number }) => Promise<ValidationReport>;
   };
-  // biome-ignore lint/style/noDefaultExport: mirrors the package's CommonJS default export
   export default validator;
 }

@@ -3,8 +3,8 @@ import {
   blueprintIssues,
   checkedExport,
   createMirroredPair,
-  loadSavedBlueprint,
   type Fitting,
+  loadSavedBlueprint,
   pairChoicesFromForm,
   removeFitting,
   renameFitting,
@@ -166,11 +166,13 @@ const show = () => {
   const blueprint = edited!;
   table.replaceChildren(...blueprint.fittings.map(row));
   issues.textContent = blueprintIssues(blueprint).join('\n');
-  parts.replaceChildren(...[...new Set(blueprint.fittings.map(({ part }) => part))].map((part) => {
-    const option = document.createElement('option');
-    option.value = part;
-    return option;
-  }));
+  parts.replaceChildren(
+    ...[...new Set(blueprint.fittings.map(({ part }) => part))].map((part) => {
+      const option = document.createElement('option');
+      option.value = part;
+      return option;
+    }),
+  );
 };
 
 const labelled = (text: string, control: HTMLElement): HTMLLabelElement => {
@@ -261,9 +263,7 @@ const start = () => {
   show();
 };
 
-const initial = requestedBlueprint
-  ? blueprints.find(({ file }) => file === requestedBlueprint)
-  : blueprints[0];
+const initial = requestedBlueprint ? blueprints.find(({ file }) => file === requestedBlueprint) : blueprints[0];
 save.disabled = true;
 download.disabled = true;
 if (initial) {
@@ -310,8 +310,14 @@ download.addEventListener('click', () => {
 });
 
 const views = {
-  blueprints: { button: document.querySelector<HTMLButtonElement>('#show-blueprints')!, section: document.querySelector<HTMLElement>('#blueprints-view')! },
-  vehicles: { button: document.querySelector<HTMLButtonElement>('#show-vehicles')!, section: document.querySelector<HTMLElement>('#vehicles-view')! },
+  blueprints: {
+    button: document.querySelector<HTMLButtonElement>('#show-blueprints')!,
+    section: document.querySelector<HTMLElement>('#blueprints-view')!,
+  },
+  vehicles: {
+    button: document.querySelector<HTMLButtonElement>('#show-vehicles')!,
+    section: document.querySelector<HTMLElement>('#vehicles-view')!,
+  },
 };
 let vehiclesMounted = false;
 const showView = (name: keyof typeof views) => {

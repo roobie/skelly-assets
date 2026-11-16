@@ -9,15 +9,18 @@ const repo = resolve(import.meta.dirname, '../..');
 
 test('a covers name is the part its piece is drawn on or a region the dressing cuts that part into', () => {
   const dressing = { piece: 'chest', slots: { cuff: { part: 'sleeve' } }, regions: { chest: ['belly'] } };
-  const problems = coversProblems([
-    { id: 'coat_worn', covers: ['belly'] },
-    { id: 'coat_worn_cuff', covers: ['sleeve'] },
-    { id: 'vest_worn', covers: ['chest', 'sleeve'] },
-    { id: 'mitt_worn_cuff', covers: ['belly'] },
-    { id: 'coat_worn_tail', covers: ['tail'] },
-    { id: 'coat', covers: ['chest'] },
-    { id: 'scarf_worn' },
-  ], dressing);
+  const problems = coversProblems(
+    [
+      { id: 'coat_worn', covers: ['belly'] },
+      { id: 'coat_worn_cuff', covers: ['sleeve'] },
+      { id: 'vest_worn', covers: ['chest', 'sleeve'] },
+      { id: 'mitt_worn_cuff', covers: ['belly'] },
+      { id: 'coat_worn_tail', covers: ['tail'] },
+      { id: 'coat', covers: ['chest'] },
+      { id: 'scarf_worn' },
+    ],
+    dressing,
+  );
   assert.equal(problems.length, 4);
   assert.match(problems[0], /vest_worn covers sleeve/);
   assert.match(problems[1], /mitt_worn_cuff covers belly/);
@@ -30,10 +33,13 @@ await installJsonnetSources();
 const { items } = JSON.parse(readFileSync(resolve(repo, 'tools/packages/thing-authoring-tool/items.json'), 'utf8'));
 
 test('every worn shell names in covers only its doll part or the regions the dressing cuts it into', () => {
-  assert.ok(items.some(({ covers }) => covers), 'no item declares what it covers, so nothing was checked');
+  assert.ok(
+    items.some(({ covers }) => covers),
+    'no item declares what it covers, so nothing was checked',
+  );
   assert.deepEqual(coversProblems(items, readDressing(repo)), []);
 });
 
-test('the combat boots\' foot piece declares the sole below the ankle, which a consumer hides while they are worn', () => {
+test("the combat boots' foot piece declares the sole below the ankle, which a consumer hides while they are worn", () => {
   assert.deepEqual(items.find(({ id }) => id === 'combat_boots_worn_foot')?.covers, ['sole']);
 });

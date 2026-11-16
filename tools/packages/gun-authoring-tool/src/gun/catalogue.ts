@@ -1,4 +1,5 @@
 import type { Domain } from '@skelly/construct/assembly/schema.ts';
+import { TitleSchema } from '@skelly/thing-export/title.ts';
 import {
   array,
   finite,
@@ -13,7 +14,6 @@ import {
   strictObject,
   string,
 } from 'valibot';
-import { TitleSchema } from '@skelly/thing-export/title.ts';
 import content from '../../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { gunDomain } from './domain.ts';

@@ -5,8 +5,8 @@ import { distanceWorld, obbPolyhedron, penetrationWorld, worldSolid } from '@ske
 import { meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
 import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
 import { expect, it } from 'vitest';
-import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { boltCartridge } from '../src/gun/boltCartridge.ts';
 import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';

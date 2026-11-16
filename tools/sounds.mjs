@@ -4,8 +4,8 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
-import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
 import { outputPath, readSoundRows, SOUNDS } from './layout.mjs';
 import { encodeOgg } from './ogg.mjs';
 import { installJsonnetSources } from './sources.mjs';
@@ -38,7 +38,15 @@ export async function bakeSounds(out, ids) {
     writeOut(out, pack, data, `${JSON.stringify(row, null, 2)}\n`);
     files.push(outputPath(pack, data));
     for (const { seed, path } of variants) {
-      writeOut(out, pack, path, await encodeOgg(renderImpact(row, seed, SOUND_SAMPLE_RATE), { sampleRate: SOUND_SAMPLE_RATE, quality: QUALITY }));
+      writeOut(
+        out,
+        pack,
+        path,
+        await encodeOgg(renderImpact(row, seed, SOUND_SAMPLE_RATE), {
+          sampleRate: SOUND_SAMPLE_RATE,
+          quality: QUALITY,
+        }),
+      );
       files.push(outputPath(pack, path));
     }
   }
@@ -46,7 +54,10 @@ export async function bakeSounds(out, ids) {
 }
 
 async function main() {
-  const { values, positionals } = parseArgs({ allowPositionals: true, options: { out: { type: 'string', default: join(repo, 'built') } } });
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: { out: { type: 'string', default: join(repo, 'built') } },
+  });
   const files = await bakeSounds(resolve(values.out), positionals.length > 0 ? positionals : undefined);
   for (const file of files) console.log(`built ${file}`);
 }

@@ -1,8 +1,8 @@
 // A fixed aperture rear sight on a top rail, built from its content table. See
 // `models/guns/tables/railRearSight.jsonnet` for what each measure is.
 
-import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { finite, minValue, number, parse, pipe, strictObject } from 'valibot';
 import content from '../../../../../models/guns/tables/railRearSight.json' with { type: 'json' };
@@ -42,7 +42,11 @@ export const railRearSightSolids = (apertureU: number): Solid[] => {
   const [back, front] = [-aperture.halfThicknessU, aperture.halfThicknessU];
   return [
     box('base', [-base.halfLengthU, 0, -base.halfWidthU], [base.halfLengthU, base.heightU, base.halfWidthU]),
-    box('tower', [-tower.halfLengthU, base.heightU, -tower.halfWidthU], [tower.halfLengthU, towerTop, tower.halfWidthU]),
+    box(
+      'tower',
+      [-tower.halfLengthU, base.heightU, -tower.halfWidthU],
+      [tower.halfLengthU, towerTop, tower.halfWidthU],
+    ),
     {
       id: 'frame',
       kind: 'revolved',

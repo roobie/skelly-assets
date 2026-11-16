@@ -13,8 +13,9 @@
 //        node tools/model-history.mjs backfill --out <file> --work <dir>
 //          rebuild it by walking every release
 // The release commands read GitHub through `gh`.
-import { createHash } from 'node:crypto';
+
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -68,11 +69,14 @@ function carry(previous, hashes, renames) {
     const current = renames[id] ?? id;
     if (!Object.hasOwn(hashes, current)) continue;
     const kept = carried[current];
-    carried[current] = kept === undefined ? entry : {
-      introduced: [kept.introduced, entry.introduced].sort(compareVersions)[0],
-      updated: [kept.updated, entry.updated].sort(compareVersions).at(-1),
-      sha256: null,
-    };
+    carried[current] =
+      kept === undefined
+        ? entry
+        : {
+            introduced: [kept.introduced, entry.introduced].sort(compareVersions)[0],
+            updated: [kept.updated, entry.updated].sort(compareVersions).at(-1),
+            sha256: null,
+          };
   }
   return carried;
 }
@@ -99,11 +103,13 @@ export function mergeHistory({ previous, version, hashes, renames = {} }) {
  */
 export function standings(history, hashes, renames = {}) {
   const carried = carry(history, hashes, renames);
-  return Object.fromEntries(Object.keys(hashes).map((id) => {
-    const entry = carried[id];
-    if (entry === undefined) return [id, null];
-    return [id, { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
-  }));
+  return Object.fromEntries(
+    Object.keys(hashes).map((id) => {
+      const entry = carried[id];
+      if (entry === undefined) return [id, null];
+      return [id, { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
+    }),
+  );
 }
 
 /**
@@ -124,8 +130,8 @@ export function vehicleStanding(own, parts) {
 const gh = (...args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 2 ** 28 });
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 
-const releaseTags = () => JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000'))
-  .map(({ tagName }) => tagName);
+const releaseTags = () =>
+  JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000')).map(({ tagName }) => tagName);
 
 function download(tag, dir, ...patterns) {
   mkdirSync(dir, { recursive: true });

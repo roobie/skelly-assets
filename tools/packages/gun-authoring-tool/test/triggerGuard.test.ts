@@ -23,7 +23,6 @@ import { triggerGuard } from '../src/gun/rules.ts';
 import { TRIGGER_GUARDS } from '../src/gun/triggerGuards.ts';
 import { designText, loadCorpus, loadFixture } from './helpers.ts';
 
-
 /** The part has trigger blades, and each one lies in its finger space. */
 const hasPlacedTrigger = (def: PartDef): boolean => {
   const finger = worldSolid(IDENTITY, {
@@ -49,9 +48,7 @@ const lowerBuilds = () => [
 
 describe('traced AR large lower and grip', () => {
   const report = () => {
-    const loaded = loadGunDesign(
-      designText('archetype-ar-large'),
-    );
+    const loaded = loadGunDesign(designText('archetype-ar-large'));
     if (!loaded.ok) {
       throw new Error(loaded.error.message);
     }

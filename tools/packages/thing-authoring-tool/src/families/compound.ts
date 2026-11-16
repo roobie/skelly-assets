@@ -5,8 +5,8 @@ import {
   finite,
   minLength,
   nonEmpty,
-  number,
   nullable,
+  number,
   optional,
   parse,
   picklist,
@@ -56,7 +56,8 @@ const Pieces = pipe(
 );
 
 /** A compound part's pieces as authored, the analytic shapes a part's motion is derived from. */
-export const compoundPieces = (params: Readonly<Record<string, string>>) => parse(strictObject({ pieces: Pieces }), params).pieces;
+export const compoundPieces = (params: Readonly<Record<string, string>>) =>
+  parse(strictObject({ pieces: Pieces }), params).pieces;
 
 /**
  * Convex pieces welded into one part, each with its own slot: a pressing or casting that no single

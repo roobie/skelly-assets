@@ -26,7 +26,6 @@ const label = (r: Resolved, part: string): string => {
 export const portCompat: Rule = {
   id: 'port-compat',
   title: 'Ports are compatible',
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
   check(r) {
     const issues: Issue[] = [];
     const used = new Map<string, number>();
@@ -90,7 +89,6 @@ export const portCompat: Rule = {
 const axisAlignment: Rule = {
   id: 'axis-alignment',
   title: 'Axes line up with the main axis',
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
   check(r) {
     const issues: Issue[] = [];
     for (const [part, t] of r.placed) {

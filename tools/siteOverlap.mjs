@@ -25,7 +25,9 @@ const repo = resolve(import.meta.dirname, '..');
 // `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
 // tools/swingClearance.mjs turns into the motion at each site.
 export function readSitePieces(root = repo) {
-  return JSON.parse(evaluateJsonnet(`
+  return JSON.parse(
+    evaluateJsonnet(
+      `
   local k = import 'models/vehicles/kit.libsonnet';
   local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
   local placements = import 'models/vehicles/placements.libsonnet';
@@ -61,7 +63,10 @@ export function readSitePieces(root = repo) {
       for vehicle in std.objectFields(placements)
       if std.objectHas(placements[vehicle], 'sites')
     },
-  }`, root));
+  }`,
+      root,
+    ),
+  );
 }
 
 export const key = (a, b) => [a, b].sort().join('\n');
@@ -180,8 +185,10 @@ export function penetration(p, q, grain, step) {
 // found. A site's part is drawn on its `grain`, or on the vehicle's `grain` when it names none, and moves are sampled
 // every vehicle grain. Pieces are swept along x so only those whose boxes meet are compared.
 export function siteOverlaps(sites, grain) {
-  const pieces = sites.flatMap((site, owner) =>
-    site.pieces.map((piece) => ({ owner, id: piece.id, grain: site.grain ?? grain, ...solid(piece) })))
+  const pieces = sites
+    .flatMap((site, owner) =>
+      site.pieces.map((piece) => ({ owner, id: piece.id, grain: site.grain ?? grain, ...solid(piece) })),
+    )
     .sort((a, b) => a.min[0] - b.min[0]);
   const found = new Map();
   for (let i = 0; i < pieces.length; i++) {
@@ -247,7 +254,10 @@ export function seatingProblems(fits, roles) {
 // either orientation, or 0.
 export function fitDepth(fits, roleA, roleB) {
   const pair = key(roleA, roleB);
-  const depths = fits.flatMap(({ pairs }) => pairs).filter(([a, b]) => key(a, b) === pair).map(([, , depth]) => depth);
+  const depths = fits
+    .flatMap(({ pairs }) => pairs)
+    .filter(([a, b]) => key(a, b) === pair)
+    .map(([, , depth]) => depth);
   return Math.max(0, ...depths);
 }
 
@@ -271,8 +281,7 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
     const allowed = byPair([...from('overlaps'), ...from('unjudged'), ...overlaps, ...unjudged]);
     const listed = byPair([...from('ledger'), ...ledger]);
     const notJudged = new Set([...from('unjudged'), ...unjudged]);
-    const describe = ({ sites: [a, b], parts: [partA, partB] }) =>
-      `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
+    const describe = ({ sites: [a, b], parts: [partA, partB] }) => `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
     for (const overlap of found.values()) {
       const pair = key(...overlap.sites);
       const rolePair = key(...overlap.sites.map(roleOf));
@@ -311,13 +320,23 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
         }
       }
     };
-    audit([...overlaps, ...unjudged], [...from('overlaps'), ...from('unjudged')], roleDepth, 'allowed overlap', 'the seating');
+    audit(
+      [...overlaps, ...unjudged],
+      [...from('overlaps'), ...from('unjudged')],
+      roleDepth,
+      'allowed overlap',
+      'the seating',
+    );
     const judged = (overlap) => Math.max(roleDepth(overlap), allowed.get(key(...overlap.sites))?.depth ?? 0);
     audit(ledger, from('ledger'), judged, 'family-listed overlap', 'the seating or the vehicle');
   }
   const use = seatingUse(fits, grain, measured);
   problems.push(...use.filter(({ pair }) => !pending.has(pair)).map(({ message }) => message));
-  notes.push(...use.filter(({ pair }) => pending.has(pair)).map(({ message }) => `${message}, until its unjudged overlaps are judged`));
+  notes.push(
+    ...use
+      .filter(({ pair }) => pending.has(pair))
+      .map(({ message }) => `${message}, until its unjudged overlaps are judged`),
+  );
   return { problems, notes };
 }
 
@@ -328,19 +347,21 @@ const byPair = (entries) => new Map(entries.map((entry) => [key(...entry.sites),
 // { pair, message }, keyed by the pair's roles: while an overlap deeper than the pair is marked `unjudged`, the pair
 // may yet be refitted to it, so the report notes it rather than fails.
 function seatingUse(fits, grain, measured) {
-  return fits.flatMap(({ pairs }, i) => pairs.flatMap(([seated, into, depth]) => {
-    const pair = key(seated, into);
-    const depths = measured.get(pair);
-    const covered = Math.max(0, ...(depths ?? []).filter((found) => found <= depth + EPSILON));
-    const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
-    const found = (message) => [{ pair, message: `${where} ${message}` }];
-    if (!depths) return found('is unused: no vehicle overlaps on it');
-    if (covered === 0) return found(`is dead: every overlap on it is deeper than ${millimetres(depth)} mm`);
-    if (depth - covered > LOOSE * grain) {
-      return found(`is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`);
-    }
-    return [];
-  }));
+  return fits.flatMap(({ pairs }, i) =>
+    pairs.flatMap(([seated, into, depth]) => {
+      const pair = key(seated, into);
+      const depths = measured.get(pair);
+      const covered = Math.max(0, ...(depths ?? []).filter((found) => found <= depth + EPSILON));
+      const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
+      const found = (message) => [{ pair, message: `${where} ${message}` }];
+      if (!depths) return found('is unused: no vehicle overlaps on it');
+      if (covered === 0) return found(`is dead: every overlap on it is deeper than ${millimetres(depth)} mm`);
+      if (depth - covered > LOOSE * grain) {
+        return found(`is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`);
+      }
+      return [];
+    }),
+  );
 }
 
 export const siteOverlapReport = (root = repo) => overlapReport(readSitePieces(root));

@@ -45,7 +45,12 @@ const blockBottom = (assembly: Assembly, rootMount?: string): number => {
     voxelGrain: GRAIN,
     ...(rootMount ? { rootMount } : {}),
     asset: { id: 'fixture', file: 'assets/models/fixture.glb' },
-    palette: { familyColors: {}, specialColors: {}, fallbackColor: [0.5, 0.5, 0.5], fallbackFinish: { metallic: 0, roughness: 0.5 } },
+    palette: {
+      familyColors: {},
+      specialColors: {},
+      fallbackColor: [0.5, 0.5, 0.5],
+      fallbackFinish: { metallic: 0, roughness: 0.5 },
+    },
   });
   if (!result.ok) {
     throw new Error(JSON.stringify(result.error));
@@ -68,6 +73,9 @@ it('seats a smooth part one grain into the voxel host it mounts on, so the host 
 });
 
 it('seats a smooth part exported alone one grain through its root mount, as it is seated when drawn fitted', () => {
-  const loose = blockBottom({ name: 'fixture', root: 'block', parts: { block: { family: 'block' } }, connections: [] }, 'base');
+  const loose = blockBottom(
+    { name: 'fixture', root: 'block', parts: { block: { family: 'block' } }, connections: [] },
+    'base',
+  );
   expect(loose).toBeCloseTo(-GRAIN, 6);
 });

@@ -160,7 +160,6 @@ const twiceArea = (profile: Profile): number =>
     return sum + point[0] * next[1] - next[0] * point[1];
   }, 0);
 const ccw = (profile: Profile): Profile => (twiceArea(profile) >= 0 ? profile : [...profile].reverse());
-// biome-ignore lint/complexity/useMaxParams: Keep this local prism constructor aligned with its positional geometry rows.
 const polySolid = (
   id: string,
   profile: Profile,

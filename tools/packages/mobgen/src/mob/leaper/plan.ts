@@ -7,19 +7,7 @@ import content from '../../../../../../models/mobs/leaper/leaper.json' with { ty
 import type { Body, BodyRegion, Bone, Feature, Material } from '../../core/body.ts';
 import { registerBodyPlan, sampleParams } from '../../core/generate.ts';
 import { frameAbout } from '../../core/joints.ts';
-import {
-  add,
-  clamp,
-  dot,
-  length,
-  lerp3,
-  mulMV,
-  normalize,
-  rotX,
-  scale,
-  sub,
-  type Vec3,
-} from '../../core/math.ts';
+import { add, clamp, dot, length, lerp3, mulMV, normalize, rotX, scale, sub, type Vec3 } from '../../core/math.ts';
 import type { Shape } from '../../core/sdf.ts';
 import { type Genome, registerTemplate, type Template } from '../../core/template.ts';
 import { gridScaledBudgets } from '../budgets.ts';

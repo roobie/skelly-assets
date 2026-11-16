@@ -8,10 +8,12 @@ const SIDECAR = /\.model\.json$/;
 // One line for each part whose declared item is no model of the tree, given every file written as <pack>/<logical path>.
 export function danglingPartItems({ files, out, models }) {
   const ids = new Set(models.map(({ id }) => id));
-  return files.filter((file) => SIDECAR.test(file)).flatMap((file) => {
-    const { id, parts = {} } = JSON.parse(readFileSync(join(out, file), 'utf8'));
-    return Object.entries(parts)
-      .filter(([, { item }]) => item !== undefined && !ids.has(item))
-      .map(([part, { item }]) => `${id}: part ${part} is item ${item}, which the tree does not build`);
-  });
+  return files
+    .filter((file) => SIDECAR.test(file))
+    .flatMap((file) => {
+      const { id, parts = {} } = JSON.parse(readFileSync(join(out, file), 'utf8'));
+      return Object.entries(parts)
+        .filter(([, { item }]) => item !== undefined && !ids.has(item))
+        .map(([part, { item }]) => `${id}: part ${part} is item ${item}, which the tree does not build`);
+    });
 }

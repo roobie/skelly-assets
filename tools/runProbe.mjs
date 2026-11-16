@@ -33,13 +33,15 @@ const joined = (boxes, slack) => boxes.slice(1).every((box, n) => meet(box, boxe
 // by side, are not one path; neither is reported. `grain` is the slack within which two pieces touch and two steps
 // are the same.
 export function stairRuns(pieces, grain) {
-  return runsOf(pieces).filter(({ kind }) => kind === 'box' || kind === 'turned').flatMap(({ prefix, slot, pieces: list }) => {
-    const boxes = list.map(solid);
-    const steps = boxes.slice(1).map((box, n) => middle(box).map((x, a) => x - middle(boxes[n])[a]));
-    const slanted = steps[0].filter((d) => Math.abs(d) > grain / 2).length >= 2;
-    const even = steps.every((step) => step.every((d, a) => Math.abs(d - steps[0][a]) <= grain / 2));
-    return slanted && even && joined(boxes, grain / 2) ? [{ prefix, slot, pieces: list.length }] : [];
-  });
+  return runsOf(pieces)
+    .filter(({ kind }) => kind === 'box' || kind === 'turned')
+    .flatMap(({ prefix, slot, pieces: list }) => {
+      const boxes = list.map(solid);
+      const steps = boxes.slice(1).map((box, n) => middle(box).map((x, a) => x - middle(boxes[n])[a]));
+      const slanted = steps[0].filter((d) => Math.abs(d) > grain / 2).length >= 2;
+      const even = steps.every((step) => step.every((d, a) => Math.abs(d - steps[0][a]) <= grain / 2));
+      return slanted && even && joined(boxes, grain / 2) ? [{ prefix, slot, pieces: list.length }] : [];
+    });
 }
 
 // The least width of a convex polygon: the least, over its edges, of how far its corners reach from that edge's line.
@@ -64,14 +66,18 @@ const ONE_GRAIN_SLACK = 0.05;
 // next: a wire bent through short straight runs, which the voxel sampling turns into a jagged line of single cells rather than the curve it
 // follows. A prism whose section keeps the model's axes is a plain bar and is not reported.
 export function thinRuns(pieces, grain) {
-  return runsOf(pieces).filter(({ kind }) => kind === 'prism').flatMap(({ prefix, slot, pieces: list }) => {
-    const thin = list.filter(({ profile, start, end }) => {
-      const slanted = profile.some(([ax, ay], i) => {
-        const [bx, by] = profile[(i + 1) % profile.length];
-        return ax !== bx && ay !== by;
+  return runsOf(pieces)
+    .filter(({ kind }) => kind === 'prism')
+    .flatMap(({ prefix, slot, pieces: list }) => {
+      const thin = list.filter(({ profile, start, end }) => {
+        const slanted = profile.some(([ax, ay], i) => {
+          const [bx, by] = profile[(i + 1) % profile.length];
+          return ax !== bx && ay !== by;
+        });
+        return slanted && Math.min(polygonWidth(profile), end - start) < grain * (1 - ONE_GRAIN_SLACK);
       });
-      return slanted && Math.min(polygonWidth(profile), end - start) < grain * (1 - ONE_GRAIN_SLACK);
+      return thin.length >= 3 && joined(list.map(solid), grain / 2)
+        ? [{ prefix, slot, pieces: list.length, thin: thin.length }]
+        : [];
     });
-    return thin.length >= 3 && joined(list.map(solid), grain / 2) ? [{ prefix, slot, pieces: list.length, thin: thin.length }] : [];
-  });
 }

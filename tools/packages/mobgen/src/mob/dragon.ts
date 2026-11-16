@@ -14,9 +14,9 @@ import { IDENTITY_M, lerp3, type Mat3, mulMM, rotX, rotY, rotZ, scale, sub, type
 import type { Pose } from '../core/pose.ts';
 import { type Genome, type Template, templateByName } from '../core/template.ts';
 import { heightHeadBudgets } from './budgets.ts';
-import { stanceLegAngles } from './quadruped.ts';
 import { resolveMaterials } from './materials.ts';
 import { partFeatures } from './parts.ts';
+import { stanceLegAngles } from './quadruped.ts';
 
 /** Params sampled in this fixed order (see core/generate.ts's sampleParams). */
 const DRAGON_PARAM_ORDER = [
@@ -59,7 +59,12 @@ const SHAPE = {
   clawLength: 0.14,
   clawRadius: 0.04,
   footBlend: 0.2, // the foot's smooth-min blend as a fraction of the body's, so it does not swell below the ground
-  pelvis: { head: [0, 1.3, 0.3] as P, tail: [0, 1.6, 0.12] as P, center: [0, 1.48, 0.22] as P, radii: [0.42, 0.4, 0.46] as P },
+  pelvis: {
+    head: [0, 1.3, 0.3] as P,
+    tail: [0, 1.6, 0.12] as P,
+    center: [0, 1.48, 0.22] as P,
+    radii: [0.42, 0.4, 0.46] as P,
+  },
   spine: { tail: [0, 2.05, -0.02] as P, center: [0, 1.85, 0.08] as P, radii: [0.46, 0.42, 0.46] as P },
   chest: { tail: [0, 2.5, -0.14] as P, center: [0, 2.2, -0.06] as P, radii: [0.52, 0.52, 0.48] as P },
   /** Neck joints from the chest to the base of the head, and the radius at each: rises, leans back, then sweeps forward. */
@@ -95,7 +100,12 @@ const SHAPE = {
   wing: {
     shoulder: [0.3, 2.45, 0.22] as P,
     wrist: [0.95, 3.45, 0.4] as P,
-    tips: [[1.55, 3.85, 0.5], [1.75, 3.35, 0.6], [1.45, 2.75, 0.6], [0.35, 2.3, 0.36]] as readonly P[],
+    tips: [
+      [1.55, 3.85, 0.5],
+      [1.75, 3.35, 0.6],
+      [1.45, 2.75, 0.6],
+      [0.35, 2.3, 0.36],
+    ] as readonly P[],
     fanBone: 1, // the finger tip that ends the fan's bone
     armRadii: [0.09, 0.06] as const,
     sparRadii: [0.045, 0.03] as const,
@@ -120,7 +130,13 @@ const SHAPE = {
     ribSpacing: 0.24,
     ribHalf: 0.125, // half thickness of a rib along the body
     depth: 0.34, // how deep into the body the stripe paints
-    width: [[3.2, 0.24], [2.7, 0.34], [2.2, 0.5], [1.7, 0.44], [1.3, 0.3]] as readonly (readonly [number, number])[],
+    width: [
+      [3.2, 0.24],
+      [2.7, 0.34],
+      [2.2, 0.5],
+      [1.7, 0.44],
+      [1.3, 0.3],
+    ] as readonly (readonly [number, number])[],
   },
   blend: 0.03, // smooth-min radius of the body's parts, as a fraction of the height
   speckleScale: 0.14, // m per noise cell of the spots and flecks
@@ -160,10 +176,14 @@ const dragonLayout = (p: DragonParams): DragonLayout => {
   bone('pelvis', null, at(SHAPE.pelvis.head), at(SHAPE.pelvis.tail));
   bone('spine', 'pelvis', at(SHAPE.pelvis.tail), at(SHAPE.spine.tail));
   bone('chest', 'spine', at(SHAPE.spine.tail), at(SHAPE.chest.tail));
-  SHAPE.neck.slice(0, -1).forEach((j, i) => bone(`neck.${i}`, i === 0 ? 'chest' : `neck.${i - 1}`, at(j.at), at(SHAPE.neck[i + 1]!.at)));
+  SHAPE.neck
+    .slice(0, -1)
+    .forEach((j, i) => bone(`neck.${i}`, i === 0 ? 'chest' : `neck.${i - 1}`, at(j.at), at(SHAPE.neck[i + 1]!.at)));
   bone('head', `neck.${SHAPE.neck.length - 2}`, at(SHAPE.neck.at(-1)!.at), at(SHAPE.head.snoutTail));
   bone('jaw', 'head', at(SHAPE.head.jaw.hinge), at(SHAPE.head.jaw.tip));
-  SHAPE.tail.slice(0, -1).forEach((j, i) => bone(`tail.${i}`, i === 0 ? 'pelvis' : `tail.${i - 1}`, at(j.at), at(SHAPE.tail[i + 1]!.at)));
+  SHAPE.tail
+    .slice(0, -1)
+    .forEach((j, i) => bone(`tail.${i}`, i === 0 ? 'pelvis' : `tail.${i - 1}`, at(j.at), at(SHAPE.tail[i + 1]!.at)));
   const layout: DragonLayout = { p, s, r: s * p.bulk, at, mir, bones };
   for (const side of SIDES) {
     bone(`thigh.${side}`, 'pelvis', mir(SHAPE.hip, side), mir(SHAPE.knee, side));
@@ -172,8 +192,18 @@ const dragonLayout = (p: DragonParams): DragonLayout => {
     bone(`arm.${side}`, 'chest', mir(SHAPE.shoulder, side), mir(SHAPE.elbow, side));
     bone(`forearm.${side}`, `arm.${side}`, mir(SHAPE.elbow, side), mir(SHAPE.wrist, side));
     bone(`hand.${side}`, `forearm.${side}`, mir(SHAPE.wrist, side), mir(SHAPE.handTip, side));
-    bone(`wingArm.${side}`, 'chest', wingPoint(layout, SHAPE.wing.shoulder, side), wingPoint(layout, SHAPE.wing.wrist, side));
-    bone(`wingFan.${side}`, `wingArm.${side}`, wingPoint(layout, SHAPE.wing.wrist, side), wingPoint(layout, SHAPE.wing.tips[SHAPE.wing.fanBone]!, side));
+    bone(
+      `wingArm.${side}`,
+      'chest',
+      wingPoint(layout, SHAPE.wing.shoulder, side),
+      wingPoint(layout, SHAPE.wing.wrist, side),
+    );
+    bone(
+      `wingFan.${side}`,
+      `wingArm.${side}`,
+      wingPoint(layout, SHAPE.wing.wrist, side),
+      wingPoint(layout, SHAPE.wing.tips[SHAPE.wing.fanBone]!, side),
+    );
   }
   return layout;
 };
@@ -225,7 +255,11 @@ const buildFlesh = (l: DragonLayout): Feature[] => {
   const f: Feature[] = [];
   const big = (v: P): Vec3 => [v[0] * r, v[1] * r, v[2] * r];
   // torso
-  for (const [bone, e] of [['pelvis', SHAPE.pelvis], ['spine', SHAPE.spine], ['chest', SHAPE.chest]] as const) {
+  for (const [bone, e] of [
+    ['pelvis', SHAPE.pelvis],
+    ['spine', SHAPE.spine],
+    ['chest', SHAPE.chest],
+  ] as const) {
     f.push(ellipsoid(bone, at(e.center), big(e.radii), 'body', blend));
   }
   // neck
@@ -241,44 +275,154 @@ const buildFlesh = (l: DragonLayout): Feature[] => {
   };
   const H = SHAPE.head;
   f.push(ellipsoid('head', headAt(H.skull.center), scale(H.skull.radii as Vec3, s * hs), 'body', blend));
-  f.push(capsule('head', headAt(H.snout.a), headAt(H.snout.b), H.snout.radii[0] * s * hs, H.snout.radii[1] * s * hs, 'body', blend));
-  f.push(capsule('jaw', headAt(H.jaw.hinge), headAt(H.jaw.tip), H.jaw.radii[0] * s * hs, H.jaw.radii[1] * s * hs, 'body', blend));
+  f.push(
+    capsule(
+      'head',
+      headAt(H.snout.a),
+      headAt(H.snout.b),
+      H.snout.radii[0] * s * hs,
+      H.snout.radii[1] * s * hs,
+      'body',
+      blend,
+    ),
+  );
+  f.push(
+    capsule(
+      'jaw',
+      headAt(H.jaw.hinge),
+      headAt(H.jaw.tip),
+      H.jaw.radii[0] * s * hs,
+      H.jaw.radii[1] * s * hs,
+      'body',
+      blend,
+    ),
+  );
   for (const side of SIDES) {
     const sx = sideSign(side);
     for (const h of H.horns) {
       const from = headAt([h.from[0] * sx, h.from[1], h.from[2]]);
       const dir = sub(headAt([h.to[0] * sx, h.to[1], h.to[2]]), from);
-      f.push(capsule('head', from, [from[0] + dir[0] * p.hornLength, from[1] + dir[1] * p.hornLength, from[2] + dir[2] * p.hornLength], h.radii[0] * s * hs, h.radii[1] * s * hs, 'horn', blend * 0.5));
+      f.push(
+        capsule(
+          'head',
+          from,
+          [from[0] + dir[0] * p.hornLength, from[1] + dir[1] * p.hornLength, from[2] + dir[2] * p.hornLength],
+          h.radii[0] * s * hs,
+          h.radii[1] * s * hs,
+          'horn',
+          blend * 0.5,
+        ),
+      );
     }
     f.push({
       bone: 'head',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: headAt([H.eye.at[0] * sx, H.eye.at[1], H.eye.at[2]]), radii: scale(H.eye.radii as Vec3, s * hs) },
+      shape: {
+        kind: 'ellipsoid',
+        center: headAt([H.eye.at[0] * sx, H.eye.at[1], H.eye.at[2]]),
+        radii: scale(H.eye.radii as Vec3, s * hs),
+      },
       material: 'eye',
     });
   }
   // hind legs and feet
   for (const side of SIDES) {
-    f.push(capsule(`thigh.${side}`, mir(SHAPE.hip, side), mir(SHAPE.knee, side), SHAPE.thighRadii[0] * r, SHAPE.thighRadii[1] * r, 'body', blend));
-    f.push(capsule(`shin.${side}`, mir(SHAPE.knee, side), mir(SHAPE.hock, side), SHAPE.shinRadii[0] * r, SHAPE.shinRadii[1] * r, 'body', blend));
-    f.push(capsule(`foot.${side}`, mir(SHAPE.hock, side), mir(SHAPE.ball, side), SHAPE.footRadii[0] * r, SHAPE.footRadii[1] * r, 'body', blend * SHAPE.footBlend));
-    f.push(capsule(`foot.${side}`, mir(SHAPE.ball, side), mir(SHAPE.toe, side), SHAPE.footRadii[1] * r, SHAPE.footRadii[2] * r, 'body', blend * SHAPE.footBlend));
+    f.push(
+      capsule(
+        `thigh.${side}`,
+        mir(SHAPE.hip, side),
+        mir(SHAPE.knee, side),
+        SHAPE.thighRadii[0] * r,
+        SHAPE.thighRadii[1] * r,
+        'body',
+        blend,
+      ),
+    );
+    f.push(
+      capsule(
+        `shin.${side}`,
+        mir(SHAPE.knee, side),
+        mir(SHAPE.hock, side),
+        SHAPE.shinRadii[0] * r,
+        SHAPE.shinRadii[1] * r,
+        'body',
+        blend,
+      ),
+    );
+    f.push(
+      capsule(
+        `foot.${side}`,
+        mir(SHAPE.hock, side),
+        mir(SHAPE.ball, side),
+        SHAPE.footRadii[0] * r,
+        SHAPE.footRadii[1] * r,
+        'body',
+        blend * SHAPE.footBlend,
+      ),
+    );
+    f.push(
+      capsule(
+        `foot.${side}`,
+        mir(SHAPE.ball, side),
+        mir(SHAPE.toe, side),
+        SHAPE.footRadii[1] * r,
+        SHAPE.footRadii[2] * r,
+        'body',
+        blend * SHAPE.footBlend,
+      ),
+    );
     const toe = mir(SHAPE.toe, side);
     for (const dx of SHAPE.talons) {
       const root: Vec3 = [toe[0] + dx * r, toe[1], toe[2]];
-      f.push(capsule(`foot.${side}`, root, [root[0], root[1] - 0.02 * s, root[2] - SHAPE.clawLength * s], SHAPE.clawRadius * s, SHAPE.clawRadius * s * 0.6, 'horn', blend * SHAPE.footBlend));
+      f.push(
+        capsule(
+          `foot.${side}`,
+          root,
+          [root[0], root[1] - 0.02 * s, root[2] - SHAPE.clawLength * s],
+          SHAPE.clawRadius * s,
+          SHAPE.clawRadius * s * 0.6,
+          'horn',
+          blend * SHAPE.footBlend,
+        ),
+      );
     }
   }
   // forelimbs
   for (const side of SIDES) {
     const a = SHAPE.armRadii;
-    f.push(capsule(`arm.${side}`, mir(SHAPE.shoulder, side), mir(SHAPE.elbow, side), a[0] * r, a[1] * r, 'body', blend));
-    f.push(capsule(`forearm.${side}`, mir(SHAPE.elbow, side), mir(SHAPE.wrist, side), a[1] * r, a[2] * r, 'body', blend));
+    f.push(
+      capsule(`arm.${side}`, mir(SHAPE.shoulder, side), mir(SHAPE.elbow, side), a[0] * r, a[1] * r, 'body', blend),
+    );
+    f.push(
+      capsule(`forearm.${side}`, mir(SHAPE.elbow, side), mir(SHAPE.wrist, side), a[1] * r, a[2] * r, 'body', blend),
+    );
     const wrist = mir(SHAPE.wrist, side);
-    f.push(ellipsoid(`hand.${side}`, lerp3(mir(SHAPE.wrist, side), mir(SHAPE.handTip, side), 0.5), big(SHAPE.palm), 'body', blend));
+    f.push(
+      ellipsoid(
+        `hand.${side}`,
+        lerp3(mir(SHAPE.wrist, side), mir(SHAPE.handTip, side), 0.5),
+        big(SHAPE.palm),
+        'body',
+        blend,
+      ),
+    );
     for (const dx of SHAPE.talons) {
-      const tip: Vec3 = [wrist[0] + dx * r * SHAPE.talonSpread, wrist[1] + SHAPE.talonReach[1] * s, wrist[2] + SHAPE.talonReach[2] * s];
-      f.push(capsule(`hand.${side}`, [wrist[0] + dx * r, wrist[1], wrist[2]], tip, SHAPE.talonRadii[0] * s, SHAPE.talonRadii[1] * s, 'horn', blend * 0.5));
+      const tip: Vec3 = [
+        wrist[0] + dx * r * SHAPE.talonSpread,
+        wrist[1] + SHAPE.talonReach[1] * s,
+        wrist[2] + SHAPE.talonReach[2] * s,
+      ];
+      f.push(
+        capsule(
+          `hand.${side}`,
+          [wrist[0] + dx * r, wrist[1], wrist[2]],
+          tip,
+          SHAPE.talonRadii[0] * s,
+          SHAPE.talonRadii[1] * s,
+          'horn',
+          blend * 0.5,
+        ),
+      );
     }
   }
   // wings
@@ -289,7 +433,8 @@ const buildFlesh = (l: DragonLayout): Feature[] => {
     f.push(capsule(`wingArm.${side}`, shoulder, wrist, W.armRadii[0] * r, W.armRadii[1] * r, 'wingBone', blend));
     const tips = W.tips.map((t) => wingPoint(l, t, side));
     tips.forEach((tip, i) => {
-      if (i < tips.length - 1) f.push(capsule(`wingFan.${side}`, wrist, tip, W.sparRadii[0] * r, W.sparRadii[1] * r, 'wingBone', blend * 0.5));
+      if (i < tips.length - 1)
+        f.push(capsule(`wingFan.${side}`, wrist, tip, W.sparRadii[0] * r, W.sparRadii[1] * r, 'wingBone', blend * 0.5));
     });
     const half = W.membrane * s;
     for (let i = 0; i + 1 < tips.length; i++) {
@@ -326,12 +471,31 @@ const buildMarkings = (l: DragonLayout): Feature[] => {
       onto: ['body'],
     });
   }
-  const everything = { kind: 'box', center: [0, p.height / 2, 0], half: [p.height, p.height, p.height], round: 0 } as const;
+  const everything = {
+    kind: 'box',
+    center: [0, p.height / 2, 0],
+    half: [p.height, p.height, p.height],
+    round: 0,
+  } as const;
   if (p.spots > 0) {
-    f.push({ bone: 'chest', op: 'paint', shape: everything, material: 'spot', onto: ['body'], noise: { scale: SHAPE.speckleScale * s, threshold: p.spots } });
+    f.push({
+      bone: 'chest',
+      op: 'paint',
+      shape: everything,
+      material: 'spot',
+      onto: ['body'],
+      noise: { scale: SHAPE.speckleScale * s, threshold: p.spots },
+    });
   }
   if (p.spark > 0) {
-    f.push({ bone: 'chest', op: 'paint', shape: everything, material: 'spark', onto: ['body', 'spot'], noise: { scale: SHAPE.sparkScale * s, threshold: p.spark } });
+    f.push({
+      bone: 'chest',
+      op: 'paint',
+      shape: everything,
+      material: 'spark',
+      onto: ['body', 'spot'],
+      noise: { scale: SHAPE.sparkScale * s, threshold: p.spark },
+    });
   }
   return f;
 };
@@ -340,7 +504,11 @@ const buildDragon = (genome: Genome): Body => {
   const p = genome.params as DragonParams;
   const layout = dragonLayout(p);
   const template = templateByName(genome.template);
-  const features = [...buildFlesh(layout), ...buildMarkings(layout), ...partFeatures(template.parts ?? [], layout.bones)];
+  const features = [
+    ...buildFlesh(layout),
+    ...buildMarkings(layout),
+    ...partFeatures(template.parts ?? [], layout.bones),
+  ];
   return { bones: layout.bones, features, materials: resolveMaterials(template, p) };
 };
 
@@ -379,16 +547,32 @@ export const DRAGON_MOTION = {
 } as const;
 
 /** The channels of a pose, degrees unless noted. Absent is 0. */
-export type DragonChannels = Readonly<Partial<Record<
-  | 'rise' // m
-  | 'shift' // m, sideways
-  | 'lunge' // m, forward is negative z
-  | 'spineX' | 'chestX' | 'neckX' | 'headX' | 'jawX' | 'neckY' | 'headY' | 'rollZ'
-  | 'armX' | 'armZ' | 'forearmX' | 'handX'
-  | 'wingZ' | 'fanZ'
-  | 'tailX' | 'tailY',
-  number
->>>;
+export type DragonChannels = Readonly<
+  Partial<
+    Record<
+      | 'rise' // m
+      | 'shift' // m, sideways
+      | 'lunge' // m, forward is negative z
+      | 'spineX'
+      | 'chestX'
+      | 'neckX'
+      | 'headX'
+      | 'jawX'
+      | 'neckY'
+      | 'headY'
+      | 'rollZ'
+      | 'armX'
+      | 'armZ'
+      | 'forearmX'
+      | 'handX'
+      | 'wingZ'
+      | 'fanZ'
+      | 'tailX'
+      | 'tailY',
+      number
+    >
+  >
+>;
 
 /** The sway travelling down the neck and the tail: degrees amplitude and the phase in radians. */
 interface Wave {
@@ -426,11 +610,15 @@ const dragonPose = (realized: Realized, _p: DragonParams, m: DragonMotion): Pose
     const lag = m.neckWave ? m.neckWave.amp * Math.sin(m.neckWave.phase - (nn - i) * DRAGON_MOTION.neckLagRad) : 0;
     set(`neck.${i}`, matOf([(c.neckX ?? 0) / nn, (c.neckY ?? 0) / nn + lag, 0], 1));
   }
-  set('head', matOf([c.headX ?? 0, (c.headY ?? 0) + (m.neckWave ? m.neckWave.amp * 0.5 * Math.sin(m.neckWave.phase) : 0), 0], 1));
+  set(
+    'head',
+    matOf([c.headX ?? 0, (c.headY ?? 0) + (m.neckWave ? m.neckWave.amp * 0.5 * Math.sin(m.neckWave.phase) : 0), 0], 1),
+  );
   set('jaw', matOf([c.jawX ?? 0, 0, 0], 1));
   for (let i = 0; i < tn; i++) {
     const lag = m.tailWave ? m.tailWave.amp * Math.sin(m.tailWave.phase - i * DRAGON_MOTION.tailLagRad) : 0;
-    const lift = (c.tailX ?? 0) / tn + (m.tailWave ? lag * DRAGON_MOTION.tailLiftShare * Math.cos(m.tailWave.phase) : 0);
+    const lift =
+      (c.tailX ?? 0) / tn + (m.tailWave ? lag * DRAGON_MOTION.tailLiftShare * Math.cos(m.tailWave.phase) : 0);
     set(`tail.${i}`, matOf([lift, (c.tailY ?? 0) / tn + lag, 0], 1));
   }
   for (const side of SIDES) {
@@ -463,7 +651,8 @@ const restChannels = () => ({
 });
 
 /** The idle: the reared stance, wings folded in, the tail curled to one side. */
-export const dragonIdlePose = (realized: Realized, p: DragonParams): Pose => dragonPose(realized, p, { ch: restChannels() });
+export const dragonIdlePose = (realized: Realized, p: DragonParams): Pose =>
+  dragonPose(realized, p, { ch: restChannels() });
 
 /** The hip-to-hock segments of the left leg in the (y, z) plane: the thigh and the shin. */
 const legSegments = (realized: Realized) => {
@@ -500,7 +689,9 @@ export const dragonStompPose = (realized: Realized, p: DragonParams, progress: n
     const q = (((progress + (side === 'L' ? 0 : 0.5)) % 1) + 1) % 1;
     const stance = q < M.stanceShare;
     const half = stride / 2;
-    const offset = stance ? -half + (stride * q) / M.stanceShare : half - stride * smooth((q - M.stanceShare) / (1 - M.stanceShare));
+    const offset = stance
+      ? -half + (stride * q) / M.stanceShare
+      : half - stride * smooth((q - M.stanceShare) / (1 - M.stanceShare));
     const lift = stance ? 0 : p.liftRatio * reach * Math.sin(Math.PI * ((q - M.stanceShare) / (1 - M.stanceShare)));
     const { swingDeg, foldDeg } = stanceLegAngles(u, v, u[0] + v[0] - rise + lift, u[1] + v[1] + offset);
     legs[side] = { swing: swingDeg, fold: foldDeg };
@@ -548,17 +739,61 @@ export const DRAGON_LUNGE = {
     { t: 0, ch: {} },
     {
       t: 0.3,
-      ch: { spineX: 10, chestX: 8, neckX: 30, headX: 14, jawX: -42, wingZ: -22, fanZ: -18, armX: -20, forearmX: -25, tailX: 14, tailY: -20, rise: 0.04, lunge: 0.14 },
+      ch: {
+        spineX: 10,
+        chestX: 8,
+        neckX: 30,
+        headX: 14,
+        jawX: -42,
+        wingZ: -22,
+        fanZ: -18,
+        armX: -20,
+        forearmX: -25,
+        tailX: 14,
+        tailY: -20,
+        rise: 0.04,
+        lunge: 0.14,
+      },
       swipe: -30,
     },
     {
       t: 0.5,
-      ch: { spineX: -16, chestX: -14, neckX: -48, headX: -22, jawX: -50, neckY: 8, wingZ: -10, fanZ: -10, armX: 22, forearmX: -14, tailX: -10, tailY: 30, rise: -0.1, lunge: -0.5 },
+      ch: {
+        spineX: -16,
+        chestX: -14,
+        neckX: -48,
+        headX: -22,
+        jawX: -50,
+        neckY: 8,
+        wingZ: -10,
+        fanZ: -10,
+        armX: 22,
+        forearmX: -14,
+        tailX: -10,
+        tailY: 30,
+        rise: -0.1,
+        lunge: -0.5,
+      },
       swipe: 44,
     },
     {
       t: 0.62,
-      ch: { spineX: -14, chestX: -12, neckX: -42, headX: -16, jawX: 0, neckY: 6, wingZ: -8, fanZ: -8, armX: 18, forearmX: -12, tailX: -6, tailY: 20, rise: -0.08, lunge: -0.42 },
+      ch: {
+        spineX: -14,
+        chestX: -12,
+        neckX: -42,
+        headX: -16,
+        jawX: 0,
+        neckY: 6,
+        wingZ: -8,
+        fanZ: -8,
+        armX: 18,
+        forearmX: -12,
+        tailX: -6,
+        tailY: 20,
+        rise: -0.08,
+        lunge: -0.42,
+      },
       swipe: 30,
     },
     { t: 1, ch: {} },

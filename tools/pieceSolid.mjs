@@ -7,7 +7,7 @@ function outline(polygon, [u, v]) {
   for (let i = 0; i < polygon.length; i++) {
     const [ax, ay] = polygon[i];
     const [bx, by] = polygon[(i + 1) % polygon.length];
-    if ((ay > v) !== (by > v) && u < ax + ((v - ay) / (by - ay)) * (bx - ax)) inside = !inside;
+    if (ay > v !== by > v && u < ax + ((v - ay) / (by - ay)) * (bx - ax)) inside = !inside;
     const dx = bx - ax;
     const dy = by - ay;
     const t = dx || dy ? Math.max(0, Math.min(1, ((u - ax) * dx + (v - ay) * dy) / (dx * dx + dy * dy))) : 0;
@@ -29,14 +29,39 @@ export function solid(piece) {
   const max = [];
   if (piece.kind === 'prism') {
     [min[axis], max[axis]] = [piece.start, piece.end];
-    for (const [i, c] of [[u, 0], [v, 1]]) [min[i], max[i]] = [Math.min(...piece.profile.map((p) => p[c])), Math.max(...piece.profile.map((p) => p[c]))];
+    for (const [i, c] of [
+      [u, 0],
+      [v, 1],
+    ])
+      [min[i], max[i]] = [Math.min(...piece.profile.map((p) => p[c])), Math.max(...piece.profile.map((p) => p[c]))];
     // A cut plane's signed distance, so a piece cut to sloped plates is sampled as the shape it draws.
-    const cuts = (piece.clip ?? []).map(({ normal, offset }) => (p) => (normal[0] * p[0] + normal[1] * p[1] + normal[2] * p[2] - offset) / Math.hypot(...normal));
-    return { min, max, distance: (p) => Math.max(outline(piece.profile, [p[u], p[v]]), piece.start - p[axis], p[axis] - piece.end, ...cuts.map((cut) => cut(p))) };
+    const cuts = (piece.clip ?? []).map(
+      ({ normal, offset }) =>
+        (p) =>
+          (normal[0] * p[0] + normal[1] * p[1] + normal[2] * p[2] - offset) / Math.hypot(...normal),
+    );
+    return {
+      min,
+      max,
+      distance: (p) =>
+        Math.max(
+          outline(piece.profile, [p[u], p[v]]),
+          piece.start - p[axis],
+          p[axis] - piece.end,
+          ...cuts.map((cut) => cut(p)),
+        ),
+    };
   }
   const o = piece.origin;
   const radius = Math.max(...piece.profile.map((p) => p[1]));
-  [min[axis], max[axis]] = [o[axis] + Math.min(...piece.profile.map((p) => p[0])), o[axis] + Math.max(...piece.profile.map((p) => p[0]))];
+  [min[axis], max[axis]] = [
+    o[axis] + Math.min(...piece.profile.map((p) => p[0])),
+    o[axis] + Math.max(...piece.profile.map((p) => p[0])),
+  ];
   for (const i of [u, v]) [min[i], max[i]] = [o[i] - radius, o[i] + radius];
-  return { min, max, distance: (p) => outline(piece.profile, [p[axis] - o[axis], Math.hypot(p[u] - o[u], p[v] - o[v])]) };
+  return {
+    min,
+    max,
+    distance: (p) => outline(piece.profile, [p[axis] - o[axis], Math.hypot(p[u] - o[u], p[v] - o[v])]),
+  };
 }

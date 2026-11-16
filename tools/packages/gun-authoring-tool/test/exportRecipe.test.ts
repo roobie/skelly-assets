@@ -25,9 +25,9 @@ it.each([
   { kind: 'attachment' },
   { kind: 'magazine', options: { cartridge: 'fixture-cartridge.json', appearanceProfile: 'fixture' } },
 ])('refuses unresolved $kind sources at recipe load', (selection) => {
-  expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }])).toThrow(
-    SOURCE_CONTEXT,
-  );
+  expect(() =>
+    loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }]),
+  ).toThrow(SOURCE_CONTEXT);
 });
 
 it('rejects two rows owning the same output identity before resolving sources', () => {
@@ -220,7 +220,9 @@ describe('loose smooth attachment seat', () => {
               const { min, max } = json.accessors[attributes.POSITION!] as { min: number[]; max: number[] };
               const at = node.translation ?? [0, 0, 0];
               return Math.max(
-                ...[min, max].map((corner) => corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0)),
+                ...[min, max].map((corner) =>
+                  corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0),
+                ),
               );
             }),
       ),
@@ -236,7 +238,14 @@ it('refuses a detail grain the gun grain is not a whole multiple of', () => {
 it('rejects options not taken by the selected exporter', () => {
   expect(() =>
     loadExportRecipe([
-      { id: 'fixture', title: 'Fixture', kind: 'design', source: 'fixture-source', voxel, options: { component: 'round' } },
+      {
+        id: 'fixture',
+        title: 'Fixture',
+        kind: 'design',
+        source: 'fixture-source',
+        voxel,
+        options: { component: 'round' },
+      },
     ]),
   ).toThrow('Invalid key');
 });

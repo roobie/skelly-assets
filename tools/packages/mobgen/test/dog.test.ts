@@ -5,11 +5,10 @@ import { describe, expect, it } from 'vitest';
 import { generate, realize } from '../src/core/generate.ts';
 import { applyPoint } from '../src/core/math.ts';
 import { boneTransforms } from '../src/core/pose.ts';
+import { consumableTemplate, registerTemplate } from '../src/core/template.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../src/core/voxelBounds.ts';
 import { crowdTextureLayout, isSeveredInMask, packSeveredMask } from '../src/mob/crowd.ts';
 import { severedBoneSet } from '../src/mob/dismember.ts';
-import { dogTemplate } from '../src/mob/quadrupedTemplate.ts';
-import { consumableTemplate, registerTemplate } from '../src/core/template.ts';
 import {
   quadrupedGaitPose,
   quadrupedHitPose,
@@ -17,6 +16,7 @@ import {
   quadrupedPose,
   quadrupedStrideLength,
 } from '../src/mob/quadruped.ts';
+import { dogTemplate } from '../src/mob/quadrupedTemplate.ts';
 import { HIT_FLINCH } from '../src/mob/reactions.ts';
 import { TEMPLATES } from '../src/mob/templates.ts';
 import { sweepGroup } from './sweeps.ts';

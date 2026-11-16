@@ -38,7 +38,9 @@ test('every surface an item exports names the material its finish chose', () => 
 });
 
 test('a fixture recipe with an undefined surface material fails appearance resolution', () => {
-  withFixture({ surface: 'no-such-material' }, (row) => assert.throws(() => row.generate(), /Unknown palette material no-such-material/));
+  withFixture({ surface: 'no-such-material' }, (row) =>
+    assert.throws(() => row.generate(), /Unknown palette material no-such-material/),
+  );
 });
 
 test('editing a material an item names misses that item in the export cache', () => {

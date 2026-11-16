@@ -1,6 +1,5 @@
 import {
   array,
-  boolean as vBoolean,
   check,
   type GenericSchema,
   type InferOutput,
@@ -16,6 +15,7 @@ import {
   strictObject,
   string,
   tuple,
+  boolean as vBoolean,
 } from 'valibot';
 import { OpticApertureSchema } from './opticAperture.ts';
 import { ReticleSchema } from './reticle.ts';

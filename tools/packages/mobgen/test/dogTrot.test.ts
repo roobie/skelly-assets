@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { generate, realize } from '../src/core/generate.ts';
 import { applyPoint } from '../src/core/math.ts';
 import { boneTransforms } from '../src/core/pose.ts';
-import { dogTemplate } from '../src/mob/quadrupedTemplate.ts';
 import { quadrupedGaitPose, quadrupedStrideLength } from '../src/mob/quadruped.ts';
+import { dogTemplate } from '../src/mob/quadrupedTemplate.ts';
 
 const dog = realize(generate(dogTemplate, 7));
 
