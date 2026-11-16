@@ -8,12 +8,17 @@ import { buildItem, loadCatalogue } from '../src/catalogue.ts';
 import { exportItem } from '../src/exports.ts';
 
 it('hinges the boot lid on its top front edge, so it lifts its tail and never swings ahead of the hinge line', () => {
-  const items = JSON.parse(evaluateJsonnet(`
+  const items = JSON.parse(
+    evaluateJsonnet(
+      `
     local body = import 'models/vehicles/car-body.libsonnet';
     local frame = import 'models/vehicles/frame.libsonnet';
     local spec = import 'models/vehicles/saloon.spec.libsonnet';
     frame.rows([row for row in body.rows('fixture', 'Fixture', spec) if row.id == 'fixture_boot_lid'])
-  `, resolve(import.meta.dirname, '../../../..')));
+  `,
+      resolve(import.meta.dirname, '../../../..'),
+    ),
+  );
   const loaded = loadCatalogue({
     units: { metresPerUnit: 1, grid: 0.001, bevel: 0 },
     facets: 12,
@@ -29,7 +34,10 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
   const inModel = (id: string) => {
     const { min, max } = built.drawn.measure('body', solids.find((solid) => solid.id === id)!);
     const [a, b] = [toModelFrame(item.forward!, min as Vec3), toModelFrame(item.forward!, max as Vec3)];
-    return { min: a.map((value, axis) => Math.min(value, b[axis]!)), max: a.map((value, axis) => Math.max(value, b[axis]!)) };
+    return {
+      min: a.map((value, axis) => Math.min(value, b[axis]!)),
+      max: a.map((value, axis) => Math.max(value, b[axis]!)),
+    };
   };
   const skin = inModel('skin');
   const motion = modelEntry.motion!;
@@ -38,7 +46,10 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
   const hinge = motion[0]!;
   expect(hinge.kind).toBe('hinge');
   if (hinge.kind !== 'hinge') return;
-  for (const [end, pin] of [[hinge.axis.from, inModel('hinge_a')], [hinge.axis.to, inModel('hinge_b')]] as const) {
+  for (const [end, pin] of [
+    [hinge.axis.from, inModel('hinge_a')],
+    [hinge.axis.to, inModel('hinge_b')],
+  ] as const) {
     end.forEach((value, axis) => {
       expect(value).toBeGreaterThanOrEqual(pin.min[axis]!);
       expect(value).toBeLessThanOrEqual(pin.max[axis]!);
@@ -46,7 +57,8 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
     expect(end[1]).toBeCloseTo(skin.max[1]!, 3);
   }
   // The lid's length runs along the level axis the hinge does not.
-  const along = Math.abs(hinge.axis.to[0] - hinge.axis.from[0]) > Math.abs(hinge.axis.to[2] - hinge.axis.from[2]) ? 2 : 0;
+  const along =
+    Math.abs(hinge.axis.to[0] - hinge.axis.from[0]) > Math.abs(hinge.axis.to[2] - hinge.axis.from[2]) ? 2 : 0;
   const hingeAt = hinge.axis.from[along];
   const [toMin, toMax] = [Math.abs(hingeAt - skin.min[along]!), Math.abs(hingeAt - skin.max[along]!)];
   expect(Math.min(toMin, toMax)).toBeLessThan(0.001);

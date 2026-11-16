@@ -58,14 +58,17 @@ function main() {
   try {
     if (temporary) buildAll(temporary, { cache: undefined });
     const trees = temporary ? [temporary] : values.fresh.map((tree) => resolve(tree));
-    for (const tree of trees) if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
+    for (const tree of trees)
+      if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
     const differences = freshDifferences(trees);
     if (differences.length) {
       console.error(differences.join('\n'));
       return 1;
     }
-    console.log(`check-built: ${trees.length} fresh tree(s) agree byte for byte and hold exactly the files the manifest `
-      + 'names; every directory is a declared pack and every declared pack has a model or sound');
+    console.log(
+      `check-built: ${trees.length} fresh tree(s) agree byte for byte and hold exactly the files the manifest ` +
+        'names; every directory is a declared pack and every declared pack has a model or sound',
+    );
     return 0;
   } finally {
     if (temporary) rmSync(temporary, { recursive: true, force: true });

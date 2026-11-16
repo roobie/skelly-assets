@@ -8,18 +8,35 @@ import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { posedSolid, signedDepth } from '../site/clearance.mjs';
 import { decodeFrame, easingOf } from '../site/clipFrames.mjs';
-import { add, applyPoint, boneTransforms, clampJointAngles, mat3ToQuat, mulMM, mulMV, normalize, rotAxis, rotX, rotY, rotZ, scale, sub, transpose } from '../site/kinematics.mjs';
+import {
+  add,
+  applyPoint,
+  boneTransforms,
+  clampJointAngles,
+  mat3ToQuat,
+  mulMM,
+  mulMV,
+  normalize,
+  rotAxis,
+  rotX,
+  rotY,
+  rotZ,
+  scale,
+  sub,
+  transpose,
+} from '../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../site/poseFile.mjs';
 import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
-import { lookAt, poseJson, posedAt, r4, standing } from './keyFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
 
-export const readWields = (root = repo) => JSON.parse(evaluateJsonnet(`import '${POSES}/wields/wields.libsonnet'`, root));
+export const readWields = (root = repo) =>
+  JSON.parse(evaluateJsonnet(`import '${POSES}/wields/wields.libsonnet'`, root));
 
 /** A strike's phases in the order it passes through them; the hit lands where `strike` ends. */
 export const PHASES = ['windup', 'strike', 'follow', 'recovery'];
@@ -36,7 +53,8 @@ const keyName = (clip, key) => `${clip}-${key}`;
  */
 export function strikePhases(strike) {
   const shares = PHASES.map((phase) => strike.shares?.[phase]);
-  if (!shares.every((share) => share > 0)) throw new Error(`a strike gives each of ${PHASES.join(', ')} a positive share`);
+  if (!shares.every((share) => share > 0))
+    throw new Error(`a strike gives each of ${PHASES.join(', ')} a positive share`);
   const total = shares.reduce((sum, share) => sum + share, 0);
   if (Math.abs(total - 100) > 1e-9) throw new Error(`a strike's shares sum to 100, not ${total}`);
   let from = 0;
@@ -69,7 +87,11 @@ const fromEulerXyz = ([x, y, z]) => [rotX(x), rotY(y), rotZ(z)].reduce(mulMM);
  */
 export function heldWeapon(entry, mesh) {
   const held = mulMM(fromEulerXyz(entry.grip?.turn ?? [0, 0, 0]), rotZ(entry.roll ?? 0));
-  return { held, at: entry.grip?.at ?? [0, 0, 0], solid: posedSolid(mesh, { r: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [0, 0, 0] }) };
+  return {
+    held,
+    at: entry.grip?.at ?? [0, 0, 0],
+    solid: posedSolid(mesh, { r: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [0, 0, 0] }),
+  };
 }
 
 /**
@@ -104,14 +126,26 @@ function poseOf(rig, cls, key, weapon, sockets) {
   const header = standing(rig);
   const chest = posedAt(rig, key.body).get('spine');
   const inChest = (hand, p) => applyPoint(chest, add(shoulder(hand), p));
-  const file = { ...header, angles: { ...key.body, ...lookAt(rig, key.body, cls.look) }, hands: {}, reach: {}, hold: {} };
+  const file = {
+    ...header,
+    angles: { ...key.body, ...lookAt(rig, key.body, cls.look) },
+    hands: {},
+    reach: {},
+    hold: {},
+  };
   if (cls.weapon) {
     const { pitch, yaw, roll } = key.weapon.aim;
     const r = [chest.r, rotY(yaw), rotX(pitch), rotZ(roll), weapon.held].reduce(mulMM);
     const at = sub(inChest(cls.weapon.lead, key.weapon.at), mulMV(r, weapon.at));
     for (const [hand, { hands }] of Object.entries(cls.weapon.hands)) {
       file.hands[hand] = hands;
-      file.hold[hand] = { model: cls.weapon.model, at: r4(at), turn: r4(mat3ToQuat(r)), pole: key.weapon.poles[hand], socket: sockets[hand] };
+      file.hold[hand] = {
+        model: cls.weapon.model,
+        at: r4(at),
+        turn: r4(mat3ToQuat(r)),
+        pole: key.weapon.poles[hand],
+        socket: sockets[hand],
+      };
     }
   }
   for (const [hand, { hands }] of Object.entries(cls.free ?? {})) {
@@ -141,9 +175,11 @@ export function wieldPoses(rig, wields, weapons) {
   const poses = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
     const { weapon, sockets } = weapons[name];
-    for (const [stance, key] of Object.entries(cls.stances)) poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
+    for (const [stance, key] of Object.entries(cls.stances))
+      poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
     for (const [strike, spec] of Object.entries(cls.strikes)) {
-      for (const key of Object.values(ENDS)) poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
+      for (const key of Object.values(ENDS))
+        poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
     }
   }
   return poses;
@@ -161,7 +197,13 @@ export function wieldSequences(wields) {
       const guard = clipName(name, 'stance', 'guard');
       const phases = strikePhases(spec);
       sequences[clip] = {
-        keys: [{ fixture: guard, at: 0 }, ...phases.map(({ phase, to }) => ({ fixture: ENDS[phase] ? keyName(clip, ENDS[phase]) : guard, at: to * spec.seconds }))],
+        keys: [
+          { fixture: guard, at: 0 },
+          ...phases.map(({ phase, to }) => ({
+            fixture: ENDS[phase] ? keyName(clip, ENDS[phase]) : guard,
+            at: to * spec.seconds,
+          })),
+        ],
         easing: easings(wields, spec),
       };
     }
@@ -173,7 +215,8 @@ export function wieldSequences(wields) {
 const SWINGS = [0, ...Array.from({ length: 6 }, (_, i) => 10 * (i + 1)).flatMap((swing) => [swing, -swing])];
 
 // The first bone of the chain that reaches a hand.
-const shoulderOf = (rig, hand) => rig.bones.find((bone) => bone.id === rig.bones.find((b) => b.id === hand).reach.chain[0]);
+const shoulderOf = (rig, hand) =>
+  rig.bones.find((bone) => bone.id === rig.bones.find((b) => b.id === hand).reach.chain[0]);
 
 // The bones that move a hand to a hold: its arm from the shoulder down, the digits too. Parents come first in the rig.
 const armBones = (rig, hand) => {
@@ -213,7 +256,8 @@ const heldSeat = (seat, weapon, lead) => ({
  * and each frame's pose report by clip, for a caller that checks them.
  */
 export function wieldClips(rig, wields, weapons, meshOf) {
-  const clips = {}, reports = {};
+  const clips = {},
+    reports = {};
   const header = standing(rig);
   for (const [name, cls] of Object.entries(wields.classes)) {
     const { weapon, sockets } = weapons[name];
@@ -221,8 +265,19 @@ export function wieldClips(rig, wields, weapons, meshOf) {
       const file = poseOf(rig, cls, key, weapon, sockets);
       const { frame, report, held } = compilePose(rig, file, { meshOf });
       // Read back within the limits the frame was posed to, past rounding, so a blend of two keys stays inside them.
-      const angles = mapValues(frameAngles(rig, frame), (turn, id) => clampJointAngles(rig.bones.find((bone) => bone.id === id), turn));
-      return { frame, report, angles, poles: mapValues(file.hold ?? {}, ({ pole }) => pole), item: held[cls.weapon?.lead] };
+      const angles = mapValues(frameAngles(rig, frame), (turn, id) =>
+        clampJointAngles(
+          rig.bones.find((bone) => bone.id === id),
+          turn,
+        ),
+      );
+      return {
+        frame,
+        report,
+        angles,
+        poles: mapValues(file.hold ?? {}, ({ pole }) => pole),
+        item: held[cls.weapon?.lead],
+      };
     };
     const guard = compileKey(cls.stances.guard);
     const seat = cls.weapon && seatOn(rig, guard.frame, guard.item, cls.weapon.lead);
@@ -232,22 +287,49 @@ export function wieldClips(rig, wields, weapons, meshOf) {
     // The frame `w` of the way from compiled key `a` to `b`.
     const between = (a, b, w) => {
       const ids = [...new Set([...Object.keys(a.angles), ...Object.keys(b.angles)])].filter((id) => !regripped.has(id));
-      const angles = Object.fromEntries(ids.map((id) => [id, lerpV(a.angles[id] ?? [0, 0, 0], b.angles[id] ?? [0, 0, 0], w)]));
+      const angles = Object.fromEntries(
+        ids.map((id) => [id, lerpV(a.angles[id] ?? [0, 0, 0], b.angles[id] ?? [0, 0, 0], w)]),
+      );
       const posed = compilePose(rig, { ...header, angles });
       if (others.length === 0) return posed;
       const stood = boneTransforms(rig.bones, decodeFrame(posed.frame));
       const hand = stood.get(cls.weapon.lead);
       const item = { r: mulMM(hand.r, seat.r), t: add(mulMV(hand.r, seat.t), hand.t) };
       const hands = Object.fromEntries(others.map((id) => [id, cls.weapon.hands[id].hands]));
-      const gripped = (swing) => compilePose(rig, { ...header, angles, hands, hold: Object.fromEntries(others.map((id) => {
-        const shoulder = shoulderOf(rig, id);
-        const reach = sub(applyPoint(item, sockets[id].at), applyPoint(stood.get(shoulder.id), shoulder.head));
-        const pole = normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w));
-        return [id, { model: cls.weapon.model, at: item.t, turn: mat3ToQuat(item.r), pole: mulMV(rotAxis(normalize(reach), swing), pole), socket: sockets[id] }];
-      })) }, { meshOf });
+      const gripped = (swing) =>
+        compilePose(
+          rig,
+          {
+            ...header,
+            angles,
+            hands,
+            hold: Object.fromEntries(
+              others.map((id) => {
+                const shoulder = shoulderOf(rig, id);
+                const reach = sub(applyPoint(item, sockets[id].at), applyPoint(stood.get(shoulder.id), shoulder.head));
+                const pole = normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w));
+                return [
+                  id,
+                  {
+                    model: cls.weapon.model,
+                    at: item.t,
+                    turn: mat3ToQuat(item.r),
+                    pole: mulMV(rotAxis(normalize(reach), swing), pole),
+                    socket: sockets[id],
+                  },
+                ];
+              }),
+            ),
+          },
+          { meshOf },
+        );
       // The keys' poles hold the wrist within its limits at the keys, not always between them: there the elbow swings
       // about the line from shoulder to grip, the least it must, until the wrist takes the haft within them.
-      const bent = ({ report }) => report.clamped.reduce((sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0), 0);
+      const bent = ({ report }) =>
+        report.clamped.reduce(
+          (sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0),
+          0,
+        );
       let best;
       for (const swing of SWINGS) {
         const compiled = gripped(swing);
@@ -273,7 +355,13 @@ export function wieldClips(rig, wields, weapons, meshOf) {
         const { from, to } = phases[i];
         return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
       });
-      clips[clip] = { kind: 'pose', loop: false, ...strikeTiming(spec), ...held, frames: baked.map(({ frame }) => frame) };
+      clips[clip] = {
+        kind: 'pose',
+        loop: false,
+        ...strikeTiming(spec),
+        ...held,
+        frames: baked.map(({ frame }) => frame),
+      };
       reports[clip] = baked.map(({ report }) => report);
     }
   }
@@ -302,10 +390,17 @@ export function wieldTree(built, manifest, root = repo) {
  */
 export function heldItems(built, manifest) {
   const meshes = treeMeshes(built, manifest);
-  const meshOf = (id) => meshes(id).reduce((mesh, part) => {
-    const base = mesh.positions.length / 3;
-    return { positions: [...mesh.positions, ...part.positions], indices: [...mesh.indices, ...part.indices.map((i) => base + i)] };
-  }, { positions: [], indices: [] });
+  const meshOf = (id) =>
+    meshes(id).reduce(
+      (mesh, part) => {
+        const base = mesh.positions.length / 3;
+        return {
+          positions: [...mesh.positions, ...part.positions],
+          indices: [...mesh.indices, ...part.indices.map((i) => base + i)],
+        };
+      },
+      { positions: [], indices: [] },
+    );
   const entryOf = (id) => {
     const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
     return JSON.parse(readFileSync(join(built, pack, 'things', `${id}.model.json`), 'utf8'));
@@ -318,20 +413,33 @@ export function heldItems(built, manifest) {
  * short of its target, a digit's pinch off its point. A game plays the frames as they are, so none may stand.
  */
 export function wieldProblems(reports) {
-  return Object.entries(reports).flatMap(([clip, frames]) => frames.flatMap(({ clamped, residuals, grips = {} }, k) => [
-    ...clamped.map(({ bone }) => `${clip} frame ${k}: ${bone} asks past a limit`),
-    ...Object.entries(residuals).filter(([, left]) => !(left < 1e-6)).map(([id, left]) => `${clip} frame ${k}: ${id} falls ${left} m short`),
-    ...Object.entries(grips).flatMap(([hand, digits]) => Object.entries(digits)
-      .filter(([, { residual }]) => residual > 1e-3).map(([digit, { residual }]) => `${clip} frame ${k}: ${hand} ${digit} pinches ${residual} m off`)),
-  ]));
+  return Object.entries(reports).flatMap(([clip, frames]) =>
+    frames.flatMap(({ clamped, residuals, grips = {} }, k) => [
+      ...clamped.map(({ bone }) => `${clip} frame ${k}: ${bone} asks past a limit`),
+      ...Object.entries(residuals)
+        .filter(([, left]) => !(left < 1e-6))
+        .map(([id, left]) => `${clip} frame ${k}: ${id} falls ${left} m short`),
+      ...Object.entries(grips).flatMap(([hand, digits]) =>
+        Object.entries(digits)
+          .filter(([, { residual }]) => residual > 1e-3)
+          .map(([digit, { residual }]) => `${clip} frame ${k}: ${hand} ${digit} pinches ${residual} m off`),
+      ),
+    ]),
+  );
 }
 
 // Where a release carries the doll's wields, in the pack of the doll's parts.
 // What the rig holds for authoring poses, not for playing clips: the pose page's clips, the eye a look aims, the hand
 // presets a pose file names.
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
-const CLIPS_DOC = 'The doll\'s melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest\'s motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest\'s models) to the root\'s height; a strike\'s frames stand evenly through durationSimSeconds, the first and last in its class\'s guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class\'s clips: the bone of the hand that leads the weapon, and the weapon\'s grip point (at) and its held axes (turn: working end +z, up +y) in that bone\'s frame, so a game seats any weapon of the class by its own grip.';
-const MOTIONS = { id: 'doll_melee', pack: 'skelly.body', path: 'motions/doll.melee.json', rig: 'motions/doll.rig.json' };
+const CLIPS_DOC =
+  "The doll's melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
+const MOTIONS = {
+  id: 'doll_melee',
+  pack: 'skelly.body',
+  path: 'motions/doll.melee.json',
+  rig: 'motions/doll.rig.json',
+};
 
 /**
  * Writes the doll's rig and its baked wields into the built tree `out`, whose models `manifest` lists, for a game to
@@ -363,6 +471,7 @@ if (import.meta.main) {
   const { values } = parseArgs({ options: { built: { type: 'string', default: join(repo, 'built') } } });
   const { rig, wields, weapons } = readWieldTree(resolve(values.built));
   const poses = wieldPoses(rig, wields, weapons);
-  for (const [name, file] of Object.entries(poses)) writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
+  for (const [name, file] of Object.entries(poses))
+    writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} wield poses -> ${POSES}`);
 }

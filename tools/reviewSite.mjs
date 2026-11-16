@@ -8,12 +8,21 @@ import { extname, join, resolve, sep } from 'node:path';
 import process from 'node:process';
 
 const repo = resolve(import.meta.dirname, '..');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary' };
+const TYPES = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.glb': 'model/gltf-binary',
+};
 const isFile = (path) => existsSync(path) && statSync(path).isFile();
 
 // Builds the showcase from the tree at `built` into `site`, leaving the tree's unchanged files to the server.
 export function buildSite(built, site) {
-  execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, '--no-tree', site], { stdio: ['ignore', 'ignore', 'inherit'] });
+  execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, '--no-tree', site], {
+    stdio: ['ignore', 'ignore', 'inherit'],
+  });
 }
 
 // Serves `site` on a free local port; a path under built/ the site does not hold is read from the tree at `built`.
@@ -53,8 +62,10 @@ export async function openPage(browser, origin, file, api, { viewport } = {}) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${origin}/${file}`);
-  await page.waitForFunction((name) => typeof window[name] === 'function', api, { timeout: 30_000 }).catch(() => {
-    throw new Error(`${file} did not start: ${errors.join('; ') || 'no error reported'}`);
-  });
+  await page
+    .waitForFunction((name) => typeof window[name] === 'function', api, { timeout: 30_000 })
+    .catch(() => {
+      throw new Error(`${file} did not start: ${errors.join('; ') || 'no error reported'}`);
+    });
   return { page, errors };
 }

@@ -59,7 +59,12 @@ export const ovalProfile = (halfU: number, halfV: number, { power = 2.6, sides =
   });
 
 /** An upright rounded slab: `slab` with a superellipse footprint. */
-export const oval = (id: string, slot: string, [bottom, top]: readonly [number, number], { halfX, halfZ, cx = 0, cz = 0, power, sides }: Oval): ExtrudedPolygonSolid => ({
+export const oval = (
+  id: string,
+  slot: string,
+  [bottom, top]: readonly [number, number],
+  { halfX, halfZ, cx = 0, cz = 0, power, sides }: Oval,
+): ExtrudedPolygonSolid => ({
   id,
   kind: 'extruded-polygon',
   axis: 'y',
@@ -83,7 +88,9 @@ const cutProfile = (profile: readonly Vec2[], coordinate: 0 | 1, limit: number, 
     return inside(q) ? [crossing(p, q)] : [];
   });
   // A vertex on the cut line is its own crossing, which would repeat it.
-  return cut.filter((p, i) => Math.hypot(p[0] - cut[(i + 1) % cut.length]![0], p[1] - cut[(i + 1) % cut.length]![1]) > 1e-9);
+  return cut.filter(
+    (p, i) => Math.hypot(p[0] - cut[(i + 1) % cut.length]![0], p[1] - cut[(i + 1) % cut.length]![1]) > 1e-9,
+  );
 };
 /**
  * An oval slab cut square to the ranges `x` and `z` it is given, so a hair mass can end at a hairline or a parting
@@ -105,7 +112,11 @@ export const ovalCut = (
   ];
   return {
     ...whole,
-    profile: limits.reduce<readonly Vec2[]>((profile, [coordinate, limit, keep]) => (limit === undefined ? profile : cutProfile(profile, coordinate, limit, keep)), whole.profile),
+    profile: limits.reduce<readonly Vec2[]>(
+      (profile, [coordinate, limit, keep]) =>
+        limit === undefined ? profile : cutProfile(profile, coordinate, limit, keep),
+      whole.profile,
+    ),
   };
 };
 type Section = Pick<Oval, 'halfX' | 'halfZ' | 'cz'>;
@@ -123,7 +134,11 @@ export const taper = (
   slot: string,
   [bottom, top]: Range,
   [from, to]: readonly [Section, Section],
-  { slices = 3, power, curve = (t: number) => t }: { slices?: number; power?: number; curve?: (t: number) => number } = {},
+  {
+    slices = 3,
+    power,
+    curve = (t: number) => t,
+  }: { slices?: number; power?: number; curve?: (t: number) => number } = {},
 ): ExtrudedPolygonSolid[] => {
   const start = { cz: 0, ...from };
   const end = { cz: 0, ...to };
@@ -136,8 +151,13 @@ export const taper = (
   });
 };
 /** A dome: a taper whose sections shrink on a quarter ellipse, full at the bottom and `to` at the top. */
-export const dome = (id: string, slot: string, range: Range, sections: readonly [Section, Section], options: { slices?: number; power?: number } = {}) =>
-  taper(id, slot, range, sections, { ...options, curve: (t) => 1 - Math.sqrt(Math.max(0, 1 - t * t)) });
+export const dome = (
+  id: string,
+  slot: string,
+  range: Range,
+  sections: readonly [Section, Section],
+  options: { slices?: number; power?: number } = {},
+) => taper(id, slot, range, sections, { ...options, curve: (t) => 1 - Math.sqrt(Math.max(0, 1 - t * t)) });
 export const block = (
   id: string,
   slot: string,

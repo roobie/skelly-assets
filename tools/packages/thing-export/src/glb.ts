@@ -323,7 +323,9 @@ const SHEEN = 'KHR_materials_sheen';
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
   const extras = {
-    ...(material === undefined ? {} : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
+    ...(material === undefined
+      ? {}
+      : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
     ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
   };
   return {
@@ -379,7 +381,10 @@ interface PartExport {
 }
 
 const sameAppearance = (a: ReturnType<typeof resolveAppearance>, b: ReturnType<typeof resolveAppearance>): boolean =>
-  a.material === b.material && a.slot === b.slot && a.paintable === b.paintable && a.color.every((channel, index) => channel === b.color[index]);
+  a.material === b.material &&
+  a.slot === b.slot &&
+  a.paintable === b.paintable &&
+  a.color.every((channel, index) => channel === b.color[index]);
 
 /** Splits a merge group whose solids differ in finish or piece, because one primitive carries one of each. */
 const splitMixed = (
@@ -833,7 +838,11 @@ const writeGlb: ExportGlb = (input) => {
       : {}),
   };
 
-  return { ok: true, glb: glbFile(json, bin.bytes()), partNodes: parts.map(({ id, family }) => partNodeName(id, family)) };
+  return {
+    ok: true,
+    glb: glbFile(json, bin.bytes()),
+    partNodes: parts.map(({ id, family }) => partNodeName(id, family)),
+  };
 };
 
 export const exportGlb: ExportGlb = (input) => {

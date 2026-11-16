@@ -31,7 +31,6 @@ import { acidTemplate } from '../mob/acidTemplate.ts';
 import { ATTACK_CLIPS, type AttackClip, attackClipById, attackClipFor, attackPose } from '../mob/attack.ts';
 import { crawlGaitPose, crawlHitPose, crawlPose } from '../mob/crawl.ts';
 import { severableParts, severedBoneSet } from '../mob/dismember.ts';
-import { dogTemplate } from '../mob/quadrupedTemplate.ts';
 import { fusedMassManifest } from '../mob/fusedMass.ts';
 import { VIEWER_TEMPLATES } from '../mob/fusedMassTemplate.ts';
 import {
@@ -49,13 +48,14 @@ import type { HumanoidParams } from '../mob/humanoid.ts';
 import { type IdleStance, idlePose } from '../mob/idle.ts';
 import { leaperClip, leaperFrame, locomotionFor } from '../mob/leaper/motion.ts';
 import { LEAPER_TEMPLATE } from '../mob/leaper/plan.ts';
-import { walkerClip, walkerFrame } from '../mob/walker/motion.ts';
-import { WALKER_TEMPLATE } from '../mob/walker/plan.ts';
 import { LOOK_AT_REST, type LookAtState, lookAtPose } from '../mob/lookAt.ts';
 import { LOOK_AT_PROFILES, type LookAtProfile } from '../mob/lookAtProfiles.ts';
 import { QUADRUPED_SEVERABLE_PARTS, quadrupedGaitPose, quadrupedHitPose, quadrupedPose } from '../mob/quadruped.ts';
+import { dogTemplate } from '../mob/quadrupedTemplate.ts';
 import { flinchPose, HIT_FLINCH } from '../mob/reactions.ts';
 import { skeletonTemplate } from '../mob/skeletonTemplate.ts';
+import { walkerClip, walkerFrame } from '../mob/walker/motion.ts';
+import { WALKER_TEMPLATE } from '../mob/walker/plan.ts';
 import { type Actor, buildActor, buildShambler, disposeActor } from './scene.ts';
 
 // Comparison-only bodies are explicit viewer opt-ins rather than consumer entries.

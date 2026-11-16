@@ -45,11 +45,7 @@ it('hunting export keeps the full disc-to-lip annulus opaque', async () => {
       const angle = (facet * 2 * Math.PI) / (appearance.roundSides * 8);
       for (const fraction of [0.1, 0.5, 0.9]) {
         const radius = discRadius + (lipRadius - discRadius) * fraction;
-        const target = inFile([
-          optic.ocularX,
-          optic.opticalAxisY + radius * Math.cos(angle),
-          radius * Math.sin(angle),
-        ]);
+        const target = inFile([optic.ocularX, optic.opticalAxisY + radius * Math.cos(angle), radius * Math.sin(angle)]);
         const ray = new Raycaster(eye, target.sub(eye).normalize());
         expect(ray.intersectObjects(metal).length, `opaque tube at facet ${facet} radius ${fraction}`).toBeGreaterThan(
           0,

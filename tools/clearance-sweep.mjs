@@ -31,7 +31,10 @@ const { values, positionals } = parseArgs({
 const built = resolve(values.built);
 const out = resolve(values.out);
 const size = Number(values.size);
-const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json')).map((name) => basename(name, '.json')).sort();
+const fixtures = readdirSync(join(repo, 'models/poses'))
+  .filter((name) => name.endsWith('.json'))
+  .map((name) => basename(name, '.json'))
+  .sort();
 const poses = positionals.length > 0 ? positionals : fixtures;
 
 // The site is built aside, so the output folder holds only the report and the pictures.
@@ -46,7 +49,9 @@ const rig = readSite('rig.json');
 const wearables = readSite('models.json').models.filter((model) => model.worn);
 const rides = ({ worn }) => worn.slice(rig.doll.length).some((site) => site.part);
 const asked = values.wear.split(',').filter(Boolean);
-for (const id of asked) if (!wearables.some((model) => model.id === id)) throw new Error(`clearance-sweep: ${id} is no wearable of the built tree`);
+for (const id of asked)
+  if (!wearables.some((model) => model.id === id))
+    throw new Error(`clearance-sweep: ${id} is no wearable of the built tree`);
 const chosen = wearables.filter((model) => asked.length === 0 || asked.includes(model.id));
 const swept = chosen.filter(rides).map(({ id }) => id);
 const placedWhole = chosen.filter((model) => !rides(model)).map(({ id }) => id);
@@ -54,17 +59,18 @@ const placedWhole = chosen.filter((model) => !rides(model)).map(({ id }) => id);
 const millimetres = (metres) => Math.round(metres * 1e4) / 10;
 const at = (point) => point.map(millimetres);
 // Findings of one kind grouped by what they share, each group with its count and its deepest point.
-const grouped = (findings, keys) => Object.values(Object.groupBy(findings, (finding) => keys.map((key) => finding[key]).join('|')))
-  .map((group) => {
-    const worst = group.reduce((a, b) => ((b.depth ?? 0) > (a.depth ?? 0) ? b : a));
-    return {
-      ...Object.fromEntries(keys.map((key) => [key, worst[key]])),
-      count: group.length,
-      ...(worst.depth === undefined ? {} : { worstMm: millimetres(worst.depth) }),
-      atMm: at(worst.point),
-    };
-  })
-  .sort((a, b) => (b.worstMm ?? 0) - (a.worstMm ?? 0) || b.count - a.count);
+const grouped = (findings, keys) =>
+  Object.values(Object.groupBy(findings, (finding) => keys.map((key) => finding[key]).join('|')))
+    .map((group) => {
+      const worst = group.reduce((a, b) => ((b.depth ?? 0) > (a.depth ?? 0) ? b : a));
+      return {
+        ...Object.fromEntries(keys.map((key) => [key, worst[key]])),
+        count: group.length,
+        ...(worst.depth === undefined ? {} : { worstMm: millimetres(worst.depth) }),
+        atMm: at(worst.point),
+      };
+    })
+    .sort((a, b) => (b.worstMm ?? 0) - (a.worstMm ?? 0) || b.count - a.count);
 const worstOf = (groups) => Math.max(0, ...groups.map(({ worstMm }) => worstMm));
 
 const writePng = (path, dataUrl) => writeFileSync(path, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
@@ -79,7 +85,14 @@ try {
   for (const wear of swept) {
     for (const pose of poses) {
       try {
-        const { png, pieces, clearance, skin } = await page.evaluate((request) => window.posed(request), { wear: [wear], pose, size, views: values.views, probe: true, skin: true });
+        const { png, pieces, clearance, skin } = await page.evaluate((request) => window.posed(request), {
+          wear: [wear],
+          pose,
+          size,
+          views: values.views,
+          probe: true,
+          skin: true,
+        });
         const result = {
           wear,
           pose,
@@ -97,7 +110,9 @@ try {
           writePng(join(out, result.images[1]), skin.png);
         }
         results.push(result);
-        console.log(`${wear} ${pose}: ${result.showingPx} px showing, ${clearance.pokes.length} pokes (worst ${worstOf(result.pokes)} mm), ${clearance.flush.length} flush, ${clearance.sinks.length} sinks (worst ${worstOf(result.sinks)} mm), ${result.seams} seams`);
+        console.log(
+          `${wear} ${pose}: ${result.showingPx} px showing, ${clearance.pokes.length} pokes (worst ${worstOf(result.pokes)} mm), ${clearance.flush.length} flush, ${clearance.sinks.length} sinks (worst ${worstOf(result.sinks)} mm), ${result.seams} seams`,
+        );
       } catch (error) {
         failed++;
         console.log(`FAILED ${wear} ${pose}: ${error.message.split('\n')[0]}`);
@@ -110,19 +125,33 @@ try {
 }
 
 const ranked = results.toSorted((a, b) => b.showingPx - a.showingPx || worstOf(b.pokes) - worstOf(a.pokes));
-writeFileSync(join(out, 'report.json'), `${JSON.stringify({
-  coincidentMetres: COINCIDENT,
-  pitchMetres: PITCH,
-  views: values.views,
-  size,
-  poses,
-  ranked,
-  placedWhole,
-}, null, 1)}\n`);
+writeFileSync(
+  join(out, 'report.json'),
+  `${JSON.stringify(
+    {
+      coincidentMetres: COINCIDENT,
+      pitchMetres: PITCH,
+      views: values.views,
+      size,
+      poses,
+      ranked,
+      placedWhole,
+    },
+    null,
+    1,
+  )}\n`,
+);
 console.log('\nranked by covered skin showing:');
 for (const { wear, pose, showingPx, pokes, flush } of ranked) {
-  const where = pokes.slice(0, 3).map(({ bone, piece, worstMm }) => `${bone} out of ${piece} ${worstMm} mm`).join(', ');
-  console.log(`  ${showingPx} px  ${wear} ${pose}${where ? `: ${where}` : ''}${flush.length ? `; flush on ${flush.map(({ bone }) => bone).join(', ')}` : ''}`);
+  const where = pokes
+    .slice(0, 3)
+    .map(({ bone, piece, worstMm }) => `${bone} out of ${piece} ${worstMm} mm`)
+    .join(', ');
+  console.log(
+    `  ${showingPx} px  ${wear} ${pose}${where ? `: ${where}` : ''}${flush.length ? `; flush on ${flush.map(({ bone }) => bone).join(', ')}` : ''}`,
+  );
 }
-console.log(`${results.length} swept, ${placedWhole.length} placed whole and not probed${failed ? `, ${failed} failed` : ''} -> ${out}`);
+console.log(
+  `${results.length} swept, ${placedWhole.length} placed whole and not probed${failed ? `, ${failed} failed` : ''} -> ${out}`,
+);
 if (failed > 0) process.exitCode = 1;

@@ -4,7 +4,14 @@ import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
 import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
-import { buildItem, type Catalogue, type CatalogueSettings, itemMotion, itemPalette, type ToolItem } from './catalogue.ts';
+import {
+  buildItem,
+  type Catalogue,
+  type CatalogueSettings,
+  itemMotion,
+  itemPalette,
+  type ToolItem,
+} from './catalogue.ts';
 import { checkDrawnDensity, type DensityBounds, DensityBoundsSchema } from './density.ts';
 import { authoredSkin } from './skin.ts';
 
@@ -32,17 +39,15 @@ const checkGlow = (id: string, glow: string, glb: Uint8Array) => {
  * The finish library a vehicle site names its paint from, as the glTF material each finish gives a paintable surface
  * of a catalogue part, so a consumer repaints a copy with what an export in that finish would carry.
  */
-export const finishLibrary = (settings: Pick<CatalogueSettings, 'defaultMaterial'>) => paintMaterials(itemPalette(settings));
+export const finishLibrary = (settings: Pick<CatalogueSettings, 'defaultMaterial'>) =>
+  paintMaterials(itemPalette(settings));
 
 export const exportItem = (
   item: ToolItem,
   settings: CatalogueSettings,
   asset: ReturnType<typeof recipeAsset>,
   voxel: VoxelGrains,
-  {
-    collision = false,
-    density,
-  }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
+  { collision = false, density }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
   const built = buildItem(item, settings, voxel);
   const { report, masses, handling, label, drawn, glow, paintable } = built;

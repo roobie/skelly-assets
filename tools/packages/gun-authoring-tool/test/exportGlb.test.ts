@@ -669,16 +669,20 @@ describe('glb export: deadvox model entry', () => {
   });
 
   // Sight solids count too, so a gun that draws sights without a sight axis cannot pass as sightless.
-  it.each(loadCorpus())('exports sight metadata exactly when sight parts exist: $label', ({ label, assembly, items }) => {
-    const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' }, { items });
-    if (!result.ok) {
-      throw new Error(`${label}: export failed: ${JSON.stringify(result.error)}`);
-    }
-    const sighted = [...resolve(assembly, gunDomain).defs.values()].some(
-      ({ axes, solids }) => axes.some(({ kind }) => kind === 'sight') || solids.some(({ id }) => id.includes('sight')),
-    );
-    expect(result.modelEntry.gun.sight !== undefined).toBe(sighted);
-  });
+  it.each(loadCorpus())(
+    'exports sight metadata exactly when sight parts exist: $label',
+    ({ label, assembly, items }) => {
+      const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' }, { items });
+      if (!result.ok) {
+        throw new Error(`${label}: export failed: ${JSON.stringify(result.error)}`);
+      }
+      const sighted = [...resolve(assembly, gunDomain).defs.values()].some(
+        ({ axes, solids }) =>
+          axes.some(({ kind }) => kind === 'sight') || solids.some(({ id }) => id.includes('sight')),
+      );
+      expect(result.modelEntry.gun.sight !== undefined).toBe(sighted);
+    },
+  );
 
   it('exports optic ocular diameter and eye relief with the sight line', () => {
     const optic = exported(design('archetype-battle-rifle'));

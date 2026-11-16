@@ -1,5 +1,5 @@
 import { Id, Name, vehicleBlueprintSchema } from '@skelly/thing-core/schema';
-import { finite, integer, maxValue, minValue, number, pipe, safeParse, check } from 'valibot';
+import { check, finite, integer, maxValue, minValue, number, pipe, safeParse } from 'valibot';
 import {
   blueprintRow,
   exportVehicleBlueprint,
@@ -230,7 +230,11 @@ export const loadSavedBlueprint = (text: string): VehicleBlueprintInput => JSON.
 const schema = vehicleBlueprintSchema({
   id: Id,
   name: Name,
-  positiveSimSeconds: pipe(number(), finite(), check((value) => value > 0, 'must be more than 0')),
+  positiveSimSeconds: pipe(
+    number(),
+    finite(),
+    check((value) => value > 0, 'must be more than 0'),
+  ),
   qualityLevel: pipe(number(), integer(), minValue(1), maxValue(5)),
   cells: pipe(number(), integer(), minValue(1, 'must be at least 1')),
 });
@@ -238,9 +242,10 @@ const schema = vehicleBlueprintSchema({
 /** Schema issues only; part metadata and placement belong to consumer admission. */
 export const blueprintIssues = (blueprint: VehicleBlueprintInput): string[] => {
   const result = safeParse(schema, blueprintRow(blueprint));
-  return result.issues?.map(({ path, message }) =>
-    `${path?.map(({ key }) => String(key)).join('.') ?? ''}: ${message}`,
-  ) ?? [];
+  return (
+    result.issues?.map(({ path, message }) => `${path?.map(({ key }) => String(key)).join('.') ?? ''}: ${message}`) ??
+    []
+  );
 };
 
 /** Export is refused while the blueprint has schema issues. */

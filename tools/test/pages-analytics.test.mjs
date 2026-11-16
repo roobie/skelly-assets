@@ -4,12 +4,21 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSyn
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { addAnalytics, FOOTER, VERSION_MARK, checkAnalytics, optsIntoFooter, pagesUnder, withAnalytics } from '../../site/analytics.mjs';
+import {
+  addAnalytics,
+  checkAnalytics,
+  FOOTER,
+  optsIntoFooter,
+  pagesUnder,
+  VERSION_MARK,
+  withAnalytics,
+} from '../../site/analytics.mjs';
 import { readTools, viewerDir } from '../../site/tools.mjs';
 import { readVersion, versionHtml } from '../../site/version.mjs';
 
 // Git exports its repository bindings to hooks, and a fixture repository run inside one would rewrite the pushing one.
-const gitEnvironment = () => Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')));
+const gitEnvironment = () =>
+  Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')));
 const root = join(import.meta.dirname, '..', '..');
 const SCRIPT = /<script async src="https:\/\/scripts\.simpleanalyticscdn\.com\/latest\.js"><\/script>/g;
 const count = (html, needle) => html.split(needle).length - 1;
@@ -23,7 +32,9 @@ const sourcePages = () => [
   ...readTools(root).flatMap(({ page, viewer }) => {
     if (page) return [{ path: join(root, 'site', page), viewer: false }];
     const dir = viewerDir(root, viewer);
-    return readdirSync(dir).filter((name) => name.endsWith('.html')).map((name) => ({ path: join(dir, name), viewer: true }));
+    return readdirSync(dir)
+      .filter((name) => name.endsWith('.html'))
+      .map((name) => ({ path: join(dir, name), viewer: true }));
   }),
 ];
 
@@ -31,7 +42,8 @@ test('every page of the assembled site, nested viewer pages included, carries th
   const out = mkdtempSync(join(tmpdir(), 'pages-analytics-'));
   try {
     mkdirSync(join(out, 'viewer', 'deep'), { recursive: true });
-    for (const page of ['index.html', 'viewer/index.html', 'viewer/deep/stress.html']) writeFileSync(join(out, page), TOOL);
+    for (const page of ['index.html', 'viewer/index.html', 'viewer/deep/stress.html'])
+      writeFileSync(join(out, page), TOOL);
     addAnalytics(out);
     addAnalytics(out);
     assert.equal(pagesUnder(out).length, 3);
@@ -65,9 +77,17 @@ test('each source page gets the script, the document pages get the footer, and t
     assert.deepEqual(checkAnalytics(built), [], path);
     assert.equal(built.match(SCRIPT)?.length, 1, path);
     assert.equal(count(built, FOOTER), optsIntoFooter(source) ? 1 : 0, path);
-    if (viewer) assert.equal(optsIntoFooter(source), false, `${path}: a viewer's bottom-anchored panels would sit under a footer`);
+    if (viewer)
+      assert.equal(
+        optsIntoFooter(source),
+        false,
+        `${path}: a viewer's bottom-anchored panels would sit under a footer`,
+      );
   }
-  assert.ok(optsIntoFooter(readFileSync(join(root, 'site/index.html'), 'utf8')), 'the showcase index is a document page');
+  assert.ok(
+    optsIntoFooter(readFileSync(join(root, 'site/index.html'), 'utf8')),
+    'the showcase index is a document page',
+  );
 });
 
 test('the footer keeps the UTM source Simple Analytics was given', () => {
@@ -91,7 +111,11 @@ test('the footer links the tag alone on a tagged commit, and the latest tag plus
 
 test('readVersion tells a build at a release tag from one past it', () => {
   const repo = mkdtempSync(join(tmpdir(), 'pages-version-'));
-  const run = (...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@example.test', ...args], { env: gitEnvironment(), stdio: 'ignore' });
+  const run = (...args) =>
+    execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@example.test', ...args], {
+      env: gitEnvironment(),
+      stdio: 'ignore',
+    });
   try {
     run('init', '-q');
     run('commit', '-q', '--allow-empty', '-m', 'one');

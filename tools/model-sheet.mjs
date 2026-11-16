@@ -68,7 +68,10 @@ try {
   for (const id of ids) {
     const digest = lookDigest(built, manifest, id);
     try {
-      const { png, ...facts } = await page.evaluate(([entry, pixels, asked]) => window.look(entry, pixels, asked), [id, size, options]);
+      const { png, ...facts } = await page.evaluate(
+        ([entry, pixels, asked]) => window.look(entry, pixels, asked),
+        [id, size, options],
+      );
       writeAtomic(join(out, 'tiles', `${id}.png`), Buffer.from(png.slice(png.indexOf(',') + 1), 'base64'));
       drawn.push({ id, look, ...facts, digest });
     } catch (error) {
@@ -87,9 +90,10 @@ const known = new Set(lookIds(manifest));
 const rows = mergeRows(existsSync(sheetPath) ? JSON.parse(readFileSync(sheetPath, 'utf8')) : [], drawn, known, look);
 writeAtomic(sheetPath, `${JSON.stringify(rows, null, 1)}\n`);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-const figure = (r) => r.error
-  ? `<figure data-id="${esc(r.id)}"><figcaption><b>${esc(r.id)}</b><div class=err>${esc(r.error)}</div></figcaption></figure>`
-  : `<figure data-id="${esc(r.id)}"${r.beside ? ' class=wide' : ''}><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, four views${r.beside ? ` and ${r.beside}` : ''}"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
+const figure = (r) =>
+  r.error
+    ? `<figure data-id="${esc(r.id)}"><figcaption><b>${esc(r.id)}</b><div class=err>${esc(r.error)}</div></figcaption></figure>`
+    : `<figure data-id="${esc(r.id)}"${r.beside ? ' class=wide' : ''}><img loading=lazy src="tiles/${esc(r.id)}.png" alt="${esc(r.id)}, four views${r.beside ? ` and ${r.beside}` : ''}"><figcaption><b>${esc(r.id)}</b><br>${r.sizeM.join(' × ')} m · ${r.triangles} tris · ${r.parts} ${r.parts === 1 ? 'part' : 'parts'} · grid ${esc(r.grid)}<br>${esc(r.materials.join(', '))}</figcaption></figure>`;
 const html = `<!doctype html><meta charset="utf-8"><title>Model sheet</title>
 <style>body{font:13px system-ui;background:#f4f2ee;margin:16px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 figure{margin:0;background:#fff;border:1px solid #ccc;padding:6px}figure.wide{grid-column:span 2}img{width:100%}figcaption b{font-family:monospace}.err{color:#b00}
@@ -99,6 +103,8 @@ ${rows.map(figure).join('\n')}
 </main><script>q.oninput=()=>{for(const f of document.querySelectorAll('figure'))f.hidden=!f.dataset.id.includes(q.value)}</script>`;
 writeFileSync(join(out, 'index.html'), html);
 const failed = drawn.filter((r) => r.error);
-console.log(`${drawn.length - failed.length}/${drawn.length} drawn in ${((performance.now() - started) / 1000).toFixed(1)} s -> ${join(out, 'index.html')}`);
+console.log(
+  `${drawn.length - failed.length}/${drawn.length} drawn in ${((performance.now() - started) / 1000).toFixed(1)} s -> ${join(out, 'index.html')}`,
+);
 for (const r of failed) console.log(`FAILED ${r.id}: ${r.error}`);
 if (failed.length > 0) process.exitCode = 1;

@@ -23,9 +23,9 @@ import {
   dogIdlePose,
   groundDogPose,
   QUADRUPED_HIT_PEAK_FRACTION,
+  type QuadrupedStance,
   quadrupedGaitPose,
   quadrupedHitPose,
-  type QuadrupedStance,
   quadrupedStrideLength,
 } from './quadruped.ts';
 import { HIT_FLINCH } from './reactions.ts';
@@ -39,7 +39,12 @@ interface DeathKey {
 
 export interface CritterMotion {
   readonly tail: readonly string[];
-  readonly tailSway: { readonly walkDeg: number; readonly idleDeg: number; readonly lagRad: number; readonly walkLiftDeg: number };
+  readonly tailSway: {
+    readonly walkDeg: number;
+    readonly idleDeg: number;
+    readonly lagRad: number;
+    readonly walkLiftDeg: number;
+  };
   readonly pounceShoulderMetres: number;
   readonly death: { readonly durationRealSeconds: number; readonly keys: readonly DeathKey[] };
 }
@@ -145,7 +150,11 @@ const critterLayout = (p: CritterParams): CritterLayout => {
       const outPaw = s * p.legSplay * shape.out[1] * h;
       legs[`${leg.upper}.${side}`] = {
         upper: [x0, root[1] - 0.05 * h, root[2]],
-        knee: [x0 + outKnee, (shape.knee[0] + (shape.sprawlKnee - shape.knee[0]) * p.legSplay) * h, root[2] + shape.knee[1] * h],
+        knee: [
+          x0 + outKnee,
+          (shape.knee[0] + (shape.sprawlKnee - shape.knee[0]) * p.legSplay) * h,
+          root[2] + shape.knee[1] * h,
+        ],
         ankle: [x0 + outPaw, shape.ankle[0] * h, root[2] + shape.ankle[1] * h],
         toe: [x0 + outPaw, shape.toe[0] * h, root[2] + shape.toe[1] * h],
       };
@@ -162,7 +171,9 @@ const buildBones = (l: CritterLayout): Body['bones'] => {
     { id: 'head', parent: 'neck', head: l.neckTop, tail: l.snout },
     { id: 'jaw', parent: 'head', head: l.jawHinge, tail: l.jawTip },
   ];
-  CRITTER_TAIL.forEach((id, k) => bones.push({ id, parent: k === 0 ? 'pelvis' : CRITTER_TAIL[k - 1]!, head: l.tail[k]!, tail: l.tail[k + 1]! }));
+  CRITTER_TAIL.forEach((id, k) =>
+    bones.push({ id, parent: k === 0 ? 'pelvis' : CRITTER_TAIL[k - 1]!, head: l.tail[k]!, tail: l.tail[k + 1]! }),
+  );
   for (const leg of LEGS) {
     for (const side of SIDES) {
       const j = l.legs[`${leg.upper}.${side}`]!;
@@ -194,7 +205,13 @@ const capsule = (bone: string, a: Vec3, b: Vec3, ra: number, rb: number, materia
   material,
 });
 
-const paint = (bone: string, center: Vec3, radii: Vec3, material: string, onto: readonly string[] = ['skin']): Feature => ({
+const paint = (
+  bone: string,
+  center: Vec3,
+  radii: Vec3,
+  material: string,
+  onto: readonly string[] = ['skin'],
+): Feature => ({
   bone,
   op: 'paint',
   shape: { kind: 'ellipsoid', center, radii },
@@ -226,21 +243,42 @@ const buildHead = (l: CritterLayout, p: CritterParams): Feature[] => {
     capsule('jaw', l.jawHinge, l.jawTip, 0.1 * hs, 0.045 * hs),
     paint('head', l.snout, [0.1 * hs, 0.1 * hs, 0.08 * hs], 'nose'),
     // The jaw's core, so an open mouth's carve shows a dark gullet while the closed jaw's surface stays hide.
-    { bone: 'jaw', op: 'paint', shape: { kind: 'capsule', a: l.jawHinge, b: l.jawTip, ra: 0.07 * hs, rb: 0.03 * hs }, material: 'mouth', onto: ['skin'] },
+    {
+      bone: 'jaw',
+      op: 'paint',
+      shape: { kind: 'capsule', a: l.jawHinge, b: l.jawTip, ra: 0.07 * hs, rb: 0.03 * hs },
+      material: 'mouth',
+      onto: ['skin'],
+    },
   ];
   for (const side of SIDES) {
     const s = sideSign(side);
-    features.push(paint('head', add(skull, [s * 0.15 * hs, 0.05 * hs, -0.12 * hs]), [0.1 * hs, 0.1 * hs, 0.08 * hs], 'eye'));
+    features.push(
+      paint('head', add(skull, [s * 0.15 * hs, 0.05 * hs, -0.12 * hs]), [0.1 * hs, 0.1 * hs, 0.08 * hs], 'eye'),
+    );
     if (p.earSize > 0) {
       const e = p.earSize * hs;
-      features.push(ellipsoid('head', add(skull, [s * 0.15 * hs, 0.17 * hs + 0.08 * e, 0.06 * hs]), [0.11 * e, 0.1 * e, 0.03 * e], 'ear'));
+      features.push(
+        ellipsoid(
+          'head',
+          add(skull, [s * 0.15 * hs, 0.17 * hs + 0.08 * e, 0.06 * hs]),
+          [0.11 * e, 0.1 * e, 0.03 * e],
+          'ear',
+        ),
+      );
     }
   }
   if (p.jawOpen > 0.02) {
     features.push({
       bone: 'jaw',
       op: 'carve',
-      shape: { kind: 'capsule', a: add(l.jawHinge, [0, 0.06 * hs, 0]), b: add(l.jawTip, [0, 0.03 * hs, 0]), ra: 0.06 * hs, rb: 0.03 * hs },
+      shape: {
+        kind: 'capsule',
+        a: add(l.jawHinge, [0, 0.06 * hs, 0]),
+        b: add(l.jawTip, [0, 0.03 * hs, 0]),
+        ra: 0.06 * hs,
+        rb: 0.03 * hs,
+      },
       material: 'skin',
     });
   }
@@ -316,12 +354,17 @@ const buildCritter = (genome: Genome): Body => {
 };
 
 registerBodyPlan('critter', {
-  sample: (rng, template: Template) => ({ params: sampleParams(rng, template.params, CRITTER_PARAM_ORDER), wounds: [] }),
+  sample: (rng, template: Template) => ({
+    params: sampleParams(rng, template.params, CRITTER_PARAM_ORDER),
+    wounds: [],
+  }),
   build: (genome) => buildCritter(genome),
   paramOrder: CRITTER_PARAM_ORDER,
   woundBones: [],
   budgets: heightHeadBudgets,
-  limbBones: SIDES.flatMap((side) => ['foreUpper', 'foreLower', 'hindUpper', 'hindLower'].map((segment) => `${segment}.${side}`)),
+  limbBones: SIDES.flatMap((side) =>
+    ['foreUpper', 'foreLower', 'hindUpper', 'hindLower'].map((segment) => `${segment}.${side}`),
+  ),
 });
 
 // ---- Poses: the quadruped rig, with the tail's sway, a size-true pounce and a fall onto the side ----
@@ -337,7 +380,10 @@ export const critterStance = (params: Genome['params']): QuadrupedStance => {
 const withTailWave = (realized: Realized, pose: Pose, phase: number, amplitudeDeg: number): Pose => {
   const rotations: Record<string, Mat3> = { ...pose.rotations };
   CRITTER_TAIL.forEach((id, k) => {
-    rotations[id] = mulMM(rotations[id] ?? IDENTITY_M, rotY(amplitudeDeg * Math.sin(phase - k * MOTION.tailSway.lagRad)));
+    rotations[id] = mulMM(
+      rotations[id] ?? IDENTITY_M,
+      rotY(amplitudeDeg * Math.sin(phase - k * MOTION.tailSway.lagRad)),
+    );
   });
   return groundDogPose(realized, { ...pose, rotations });
 };
@@ -347,13 +393,17 @@ const shoulderHeight = (realized: Realized): number => realized.body.bones.find(
 export const critterIdlePose = (realized: Realized, stance: QuadrupedStance): Pose =>
   withTailWave(realized, dogIdlePose(realized, stance), Math.PI / 2, MOTION.tailSway.idleDeg);
 
-export const critterStrideLength = (realized: Realized, stance: QuadrupedStance): number => quadrupedStrideLength(realized, stance);
+export const critterStrideLength = (realized: Realized, stance: QuadrupedStance): number =>
+  quadrupedStrideLength(realized, stance);
 
 /** The quadruped's diagonal trot, the tail swinging once a stride and lifting a little off the ground so it never props the body. */
 export const critterGaitPose = (realized: Realized, distance: number, speed: number, stance: QuadrupedStance): Pose => {
   const phase = (2 * Math.PI * distance) / critterStrideLength(realized, stance);
   const pose = quadrupedGaitPose(realized, distance, speed, stance);
-  const lifted = { ...pose.rotations, tail: mulMM(pose.rotations.tail ?? IDENTITY_M, rotX(-MOTION.tailSway.walkLiftDeg)) };
+  const lifted = {
+    ...pose.rotations,
+    tail: mulMM(pose.rotations.tail ?? IDENTITY_M, rotX(-MOTION.tailSway.walkLiftDeg)),
+  };
   return withTailWave(realized, { ...pose, rotations: lifted }, phase, MOTION.tailSway.walkDeg);
 };
 
@@ -363,9 +413,13 @@ export const critterAttackPose = (realized: Realized, base: Pose, time: number):
   dogAttackPose(realized, base, time, { reach: shoulderHeight(realized) / MOTION.pounceShoulderMetres });
 
 /** The quadruped's brace and recoil, over the idle pose; its duration and peak, as clips state them. */
-export const CRITTER_FLINCH = { duration: HIT_FLINCH.duration, peakTime: HIT_FLINCH.duration * QUADRUPED_HIT_PEAK_FRACTION } as const;
+export const CRITTER_FLINCH = {
+  duration: HIT_FLINCH.duration,
+  peakTime: HIT_FLINCH.duration * QUADRUPED_HIT_PEAK_FRACTION,
+} as const;
 
-export const critterHitPose = (realized: Realized, base: Pose, time: number): Pose => quadrupedHitPose(realized, base, time);
+export const critterHitPose = (realized: Realized, base: Pose, time: number): Pose =>
+  quadrupedHitPose(realized, base, time);
 
 export const CRITTER_DEATH_SECONDS = MOTION.death.durationRealSeconds;
 
@@ -376,7 +430,11 @@ export type FallSide = Side;
  * part of the body now lies lowest; from the last key on it holds the settled corpse. */
 export const critterDeathPose = (realized: Realized, base: Pose, time: number, side: FallSide): Pose => {
   const keys = MOTION.death.keys;
-  const at = (value: (key: DeathKey) => number): number => scalar(keys.map((key) => [key.t, value(key)] as const), time);
+  const at = (value: (key: DeathKey) => number): number =>
+    scalar(
+      keys.map((key) => [key.t, value(key)] as const),
+      time,
+    );
   // The keys fall onto the left side; the right side's fall is their mirror, the same bend on the other side's bones.
   const named = (bone: string): string => (side === 'L' ? bone : otherSide(bone));
   const bones = new Set(keys.flatMap((key) => Object.keys(key.rotations)));

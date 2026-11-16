@@ -26,7 +26,9 @@ const CATALOGUE = join(repo, 'models/catalogue/sets', INDEX);
 // The run findings of one catalogue row's compound pieces. A row drawn smooth has no lattice to break a thin wire, so
 // only its staircases are looked for, at the finest grain any row is drawn at.
 export function rowRunFindings(row) {
-  const pieces = row.parts.filter(({ family }) => family === 'compound').flatMap(({ params }) => JSON.parse(params.pieces));
+  const pieces = row.parts
+    .filter(({ family }) => family === 'compound')
+    .flatMap(({ params }) => JSON.parse(params.pieces));
   return [
     ...stairRuns(pieces, row.voxelGrain ?? SMOOTH_GRAIN).map((run) => ({ probe: 'stair', ...run })),
     ...(row.voxelGrain === undefined ? [] : thinRuns(pieces, row.voxelGrain).map((run) => ({ probe: 'thin', ...run }))),
@@ -57,7 +59,11 @@ export function rankedQueue(found) {
 
 // The row ids a verdicts file marks reviewed, under their current ids: a review of a row since renamed counts for it.
 export function reviewedIds(text, renames) {
-  const ids = text.split('\n').filter((line) => line.trim()).map((line) => JSON.parse(line).id).filter(Boolean);
+  const ids = text
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line).id)
+    .filter(Boolean);
   return new Set(ids.map((id) => renames[id] ?? id));
 }
 
@@ -72,28 +78,36 @@ async function main() {
       workers: { type: 'string' },
     },
   });
-  if (!values.reviewed || !values.out) throw new Error('usage: review-probe.mjs --reviewed <verdicts.jsonl> --out <dir> [id ...]');
+  if (!values.reviewed || !values.out)
+    throw new Error('usage: review-probe.mjs --reviewed <verdicts.jsonl> --out <dir> [id ...]');
   const built = resolve(values.built);
   const manifest = JSON.parse(readFileSync(join(built, MANIFEST), 'utf8'));
   const listed = values.renames ? JSON.parse(readFileSync(values.renames, 'utf8')) : [];
   const renames = { ...manifest.renames, ...Object.fromEntries(listed.map(({ id, newId }) => [id, newId])) };
   const reviewed = reviewedIds(readFileSync(values.reviewed, 'utf8'), renames);
-  const rows = Object.values(JSON.parse(compileJsonnetFile(CATALOGUE))).flat()
+  const rows = Object.values(JSON.parse(compileJsonnetFile(CATALOGUE)))
+    .flat()
     .filter(({ id }) => (positionals.length > 0 ? positionals.includes(id) : !reviewed.has(id)));
   const models = new Map(manifest.models.map(({ id, pack, path }) => [id, join(built, pack, path)]));
 
-  const pool = workerPool(new URL('./shapeProbe.mjs', import.meta.url), 'modelFindings', ...(values.workers ? [Number(values.workers)] : []));
+  const pool = workerPool(
+    new URL('./shapeProbe.mjs', import.meta.url),
+    'modelFindings',
+    ...(values.workers ? [Number(values.workers)] : []),
+  );
   const found = {};
   const failed = {};
   try {
-    await Promise.all(rows.map(async (row) => {
-      try {
-        const shapes = models.has(row.id) ? await pool.run(models.get(row.id)) : [];
-        found[row.id] = [...shapes, ...rowRunFindings(row)];
-      } catch (error) {
-        failed[row.id] = error.message;
-      }
-    }));
+    await Promise.all(
+      rows.map(async (row) => {
+        try {
+          const shapes = models.has(row.id) ? await pool.run(models.get(row.id)) : [];
+          found[row.id] = [...shapes, ...rowRunFindings(row)];
+        } catch (error) {
+          failed[row.id] = error.message;
+        }
+      }),
+    );
   } finally {
     await pool.close();
   }

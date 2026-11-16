@@ -3,13 +3,26 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
 import { key } from '../siteOverlap.mjs';
+import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
 import { shapeOf, sweepBody } from '../swingSweep.mjs';
 
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
-const pin = (id, z, y = 0) => ({ id, kind: 'turned', slot: 'paint', axis: 'z', origin: [0, y, z], profile: [[-GRAIN, 0], [-GRAIN, GRAIN], [GRAIN, GRAIN], [GRAIN, 0], [-GRAIN, 0]] });
+const pin = (id, z, y = 0) => ({
+  id,
+  kind: 'turned',
+  slot: 'paint',
+  axis: 'z',
+  origin: [0, y, z],
+  profile: [
+    [-GRAIN, 0],
+    [-GRAIN, GRAIN],
+    [GRAIN, GRAIN],
+    [GRAIN, 0],
+    [-GRAIN, 0],
+  ],
+});
 // A flat flap hinged along its x = 0 edge, which opens up by `open` degrees. It reaches `length` along x.
 const flap = (length, { open = 90, toward = 'up', y = 0 } = {}) => ({
   pieces: [box('skin', [0, y, -0.5], [length, y + GRAIN, 0.5]), pin('pin_a', 0.5, y), pin('pin_b', -0.5, y)],
@@ -20,7 +33,13 @@ const task = (motions, sites) => ({ grain: GRAIN, forward: '+x', motions, sites 
 const lid = flap(1);
 const lidSite = (extra) => site('lid', 'lid', lid.pieces, extra);
 // The deepest reported contact of the pair, 0 when none.
-const reached = (result, a, b) => Math.max(0, ...[...foundContacts(result).values()].filter(({ sites }) => sites.includes(a) && sites.includes(b)).map(({ depth }) => depth));
+const reached = (result, a, b) =>
+  Math.max(
+    0,
+    ...[...foundContacts(result).values()]
+      .filter(({ sites }) => sites.includes(a) && sites.includes(b))
+      .map(({ depth }) => depth),
+  );
 const sweep = (motions, sites) => sweepVehicle(task(motions, sites));
 const contactsOf = (result, id) => result.sites[id].contacts;
 
@@ -42,7 +61,13 @@ test('a plate that slides through a plate as thin as itself is reported, whereve
     const x = (1 + offset) * GRAIN;
     const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
     const layers = [[{ kind: 'slide', direction: [1, 0, 0], travel: 0.2, share: 1 }]];
-    const { contacts } = sweepBody({ layers, movers: [{ site: 'plate', shape: plate('a', 0) }], obstacles: [{ site: 'other', shape: plate('b', x) }], step: GRAIN / 4, tolerance: GRAIN / 4 });
+    const { contacts } = sweepBody({
+      layers,
+      movers: [{ site: 'plate', shape: plate('a', 0) }],
+      obstacles: [{ site: 'other', shape: plate('b', x) }],
+      step: GRAIN / 4,
+      tolerance: GRAIN / 4,
+    });
     assert.ok(contacts.has('other'), `offset ${offset}`);
   }
 });
@@ -51,7 +76,13 @@ test('a plate that a faster part carries through a nearly still one is reported,
   const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
   const slide = (direction, travel) => [{ kind: 'slide', direction, travel, share: 1 }];
   const [still, fast] = [slide([1, 0, 0], 0.01), slide([-1, 0, 0], 0.3)];
-  const { contacts } = sweepBody({ layers: [still], movers: [{ site: 'plate', shape: plate('a', 0) }], obstacles: [{ site: 'other', shape: plate('b', 0.2), layers: [fast] }], step: GRAIN / 4, tolerance: GRAIN / 4 });
+  const { contacts } = sweepBody({
+    layers: [still],
+    movers: [{ site: 'plate', shape: plate('a', 0) }],
+    obstacles: [{ site: 'other', shape: plate('b', 0.2), layers: [fast] }],
+    step: GRAIN / 4,
+    tolerance: GRAIN / 4,
+  });
   assert.ok(contacts.has('other'));
 });
 
@@ -70,10 +101,13 @@ test('an overlap that exists at rest is no contact until the swing sinks deeper 
   assert.ok(contactsOf(sweep({ lid: thick }, [lidAt, deep]), 'lid').some(({ other }) => other === 'seat'));
 });
 
-test('a rider is not tested against its carrier, though it stands in the carrier\'s way at rest', () => {
+test("a rider is not tested against its carrier, though it stands in the carrier's way at rest", () => {
   const thick = { ...lid, pieces: [box('skin', [0, 0, -0.5], [1, 4 * GRAIN, 0.5]), ...lid.pieces.slice(1)] };
   const post = box('post', [0.4, 3.5 * GRAIN, -0.1], [0.6, 0.6, 0.1]);
-  const asRider = sweep({ lid: thick }, [site('lid', 'lid', thick.pieces), site('handle', 'handle', [post], { rides: 'lid' })]);
+  const asRider = sweep({ lid: thick }, [
+    site('lid', 'lid', thick.pieces),
+    site('handle', 'handle', [post], { rides: 'lid' }),
+  ]);
   assert.deepEqual(contactsOf(asRider, 'lid'), []);
   assert.equal(asRider.sites.handle, undefined);
   const asPart = sweep({ lid: thick }, [site('lid', 'lid', thick.pieces), site('handle', 'handle', [post])]);
@@ -97,10 +131,12 @@ const hinged = (skin, [x, y], { toward = 'up', open = 90 } = {}) => ({
 // A flap one grain thick lying along x from its hinge at x0, `length` long (negative to lie back along -x), on the hinge
 // line at height y0.
 const fold = (x0, length, { y0 = 0, open = 90 } = {}) =>
-  hinged(box('skin', [Math.min(x0, x0 + length), y0, -0.5], [Math.max(x0, x0 + length), y0 + GRAIN, 0.5]), [x0, y0], { open });
+  hinged(box('skin', [Math.min(x0, x0 + length), y0, -0.5], [Math.max(x0, x0 + length), y0 + GRAIN, 0.5]), [x0, y0], {
+    open,
+  });
 const riderOf = (id, motion, carrier = 'lid') => site(id, id, motion.pieces, { rides: carrier });
 
-test('a rider that moves is swept on its carrier\'s clock, nested in the carrier\'s motion', () => {
+test("a rider that moves is swept on its carrier's clock, nested in the carrier's motion", () => {
   const tip = fold(1.1, 1);
   const post = site('post', 'post', [box('post', [-0.6, 1, -0.2], [-0.5, 1.2, 0.2])]);
   const result = sweep({ lid, tip }, [lidSite(), riderOf('tip', tip), post]);
@@ -121,22 +157,35 @@ test('a rider that moves does not meet its carrier at the rest pose it has left'
   assert.equal(result.sites.lid.clear, 1);
 });
 
-test('riders of one carrier are swept against each other as they move together, not against each other\'s rest', () => {
+test("riders of one carrier are swept against each other as they move together, not against each other's rest", () => {
   // The carrier only tilts. Both riders turn about one line, one lying along x and one standing along y, so each is where
   // the other started.
   const tilting = flap(1, { open: 5 });
   const flat = fold(0.2, 0.5, { y0: 4 * GRAIN });
-  const standing = hinged(box('skin', [0.2 - GRAIN, 4 * GRAIN, -0.5], [0.2, 4 * GRAIN + 0.5, 0.5]), [0.2, 4 * GRAIN], { toward: 'rear' });
-  const together = sweep({ lid: tilting, flat, standing }, [lidSite(), riderOf('flat', flat), riderOf('standing', standing)]);
+  const standing = hinged(box('skin', [0.2 - GRAIN, 4 * GRAIN, -0.5], [0.2, 4 * GRAIN + 0.5, 0.5]), [0.2, 4 * GRAIN], {
+    toward: 'rear',
+  });
+  const together = sweep({ lid: tilting, flat, standing }, [
+    lidSite(),
+    riderOf('flat', flat),
+    riderOf('standing', standing),
+  ]);
   assert.deepEqual([...contactsOf(together, 'flat'), ...contactsOf(together, 'standing')], []);
   const crossing = fold(0.8, -0.5, { y0: 8 * GRAIN });
-  const crossed = sweep({ lid: tilting, flat, crossing }, [lidSite(), riderOf('flat', flat), riderOf('crossing', crossing)]);
+  const crossed = sweep({ lid: tilting, flat, crossing }, [
+    lidSite(),
+    riderOf('flat', flat),
+    riderOf('crossing', crossing),
+  ]);
   assert.ok(reached(crossed, 'flat', 'crossing') > 0);
 });
 
 test('two lids that clear alone but collide once both are open are caught by the all-open pose', () => {
   const low = flap(1, { open: 20 });
-  const high = { ...flap(1, { open: 18, toward: 'down' }), pieces: [box('skin', [0.2, 0.4, -0.5], [1.2, 0.4 + GRAIN, 0.5]), pin('pin_a', 0.5, 0.4), pin('pin_b', -0.5, 0.4)] };
+  const high = {
+    ...flap(1, { open: 18, toward: 'down' }),
+    pieces: [box('skin', [0.2, 0.4, -0.5], [1.2, 0.4 + GRAIN, 0.5]), pin('pin_a', 0.5, 0.4), pin('pin_b', -0.5, 0.4)],
+  };
   high.pieces[1].origin[0] = 1.2;
   high.pieces[2].origin[0] = 1.2;
   const sites = [site('low', 'low', low.pieces), site('high', 'high', high.pieces)];
@@ -158,7 +207,14 @@ const curtain = ({ stow }) => ({
 // The curtain's part is drawn at the origin, and the vehicle places it, and what stands around it, a way up from there:
 // its stow plane is the part's, carried by the same `at`.
 const AT = [0, 0.25, 0];
-const moved = (piece) => ({ ...piece, ...(piece.min && { min: piece.min.map((value, axis) => value + AT[axis]), max: piece.max.map((value, axis) => value + AT[axis]) }), ...(piece.origin && { origin: piece.origin.map((value, axis) => value + AT[axis]) }) });
+const moved = (piece) => ({
+  ...piece,
+  ...(piece.min && {
+    min: piece.min.map((value, axis) => value + AT[axis]),
+    max: piece.max.map((value, axis) => value + AT[axis]),
+  }),
+  ...(piece.origin && { origin: piece.origin.map((value, axis) => value + AT[axis]) }),
+});
 const placed = (id, pieces) => site(id, id, pieces.map(moved), { at: AT });
 const curtainSite = () => placed('shutter', curtain({ stow: true }).pieces);
 
@@ -173,7 +229,8 @@ test('the all-open pose leaves out what a curtain has stowed and still meets wha
   // would stand drawn, the low one through the part still shown at its stop.
   const [high, low] = [flap(0.5, { y: 1.3, open: 120 }), flap(0.5, { y: 0.55, open: 120 })];
   const sites = [placed('high', high.pieces), placed('low', low.pieces), curtainSite()];
-  const open = (stow) => sweep({ high, low, shutter: curtain({ stow }) }, sites).open.map(({ sites: pair }) => pair.toSorted().join(' '));
+  const open = (stow) =>
+    sweep({ high, low, shutter: curtain({ stow }) }, sites).open.map(({ sites: pair }) => pair.toSorted().join(' '));
   assert.ok(open(false).includes('high shutter'));
   assert.deepEqual(open(true), ['low shutter']);
 });
@@ -182,7 +239,9 @@ const lip = site('lip', 'lip', [box('edge', [0.5, 0.05, -0.5], [0.5 + GRAIN, 0.8
 const data = (overrides = {}) => ({
   grain: GRAIN,
   motions: { lid },
-  vehicles: { van: { parent: null, forward: '+x', sites: [lidSite(), lip], swingContacts: [], swingUnjudged: [], ...overrides } },
+  vehicles: {
+    van: { parent: null, forward: '+x', sites: [lidSite(), lip], swingContacts: [], swingUnjudged: [], ...overrides },
+  },
 });
 const entry = (depth, sites = ['lid', 'lip']) => ({ sites, depth, why: 'seated', note: 'by design' });
 const report = async (vehicle, options = {}) => {
@@ -237,14 +296,17 @@ test('an entry capped far above what it measures, or listed twice, is reported',
   assert.match(twice.problems.join('\n'), /listed twice/);
 });
 
-test('a variant allows its parent\'s entries, and listing one again is reported', async () => {
+test("a variant allows its parent's entries, and listing one again is reported", async () => {
   const depth = await measured();
   const input = data({ swingContacts: [entry(depth)] });
   input.vehicles.van_electric = { ...input.vehicles.van, parent: 'van', swingContacts: [] };
   const { problems } = swingReport(input, (await swingResults(input, { workers: 1 })).results);
   assert.deepEqual(problems, []);
   input.vehicles.van_electric.swingContacts = [entry(depth)];
-  assert.match(swingReport(input, (await swingResults(input, { workers: 1 })).results).problems.join('\n'), /listed twice/);
+  assert.match(
+    swingReport(input, (await swingResults(input, { workers: 1 })).results).problems.join('\n'),
+    /listed twice/,
+  );
 });
 
 test('each moving site is exported with the part of its way it opens clear', async () => {
@@ -258,7 +320,9 @@ test('a vehicle swept once is read from the cache, and a changed input sweeps it
   try {
     assert.equal((await swingResults(data(), { cache, workers: 1 })).swept, 1);
     assert.equal((await swingResults(data(), { cache, workers: 1 })).swept, 0);
-    const moved = data({ sites: [lidSite(), site('lip', 'lip', [box('edge', [0.6, 0.05, -0.5], [0.6 + GRAIN, 0.8, 0.5])])] });
+    const moved = data({
+      sites: [lidSite(), site('lip', 'lip', [box('edge', [0.6, 0.05, -0.5], [0.6 + GRAIN, 0.8, 0.5])])],
+    });
     assert.equal((await swingResults(moved, { cache, workers: 1 })).swept, 1);
   } finally {
     rmSync(cache, { recursive: true });
@@ -292,7 +356,10 @@ test('an allowance change takes effect on a cached sweep, because the allowances
 
 test('a shard sweeps only its share of the vehicles', async () => {
   const input = data();
-  input.vehicles.van_b = { ...input.vehicles.van, sites: [lidSite(), site('lip', 'lip', [box('edge', [0.6, 0.05, -0.5], [0.6 + GRAIN, 0.8, 0.5])])] };
+  input.vehicles.van_b = {
+    ...input.vehicles.van,
+    sites: [lidSite(), site('lip', 'lip', [box('edge', [0.6, 0.05, -0.5], [0.6 + GRAIN, 0.8, 0.5])])],
+  };
   const first = await swingResults(input, { workers: 1, shard: { index: 1, count: 2 } });
   const second = await swingResults(input, { workers: 1, shard: { index: 2, count: 2 } });
   assert.deepEqual([first.swept, second.swept], [1, 1]);
@@ -302,7 +369,11 @@ test('a shard sweeps only its share of the vehicles', async () => {
 // Two moving sites that each find the other, a shallower and a deeper reach, as `sweepVehicle` would report them.
 test('a contact both moving sites hit is judged for each site on its own depth and clock', () => {
   const sites = ['a', 'b'].map((id) => site(id, id, []));
-  const reach = (other, depth, at) => ({ clear: at, extent: null, contacts: [{ other, depth, at, pieces: ['x', 'y'] }] });
+  const reach = (other, depth, at) => ({
+    clear: at,
+    extent: null,
+    contacts: [{ other, depth, at, pieces: ['x', 'y'] }],
+  });
   const results = { v: { open: [], sites: { a: reach('b', 0.01, 0.3), b: reach('a', 0.02, 0.5) } } };
   const vehicle = (swingContacts) => ({ v: { forward: '+x', sites, swingContacts, swingUnjudged: [] } });
   const covered = swingReport({ grain: GRAIN, vehicles: vehicle([entry(0.015, ['a', 'b'])]) }, results);

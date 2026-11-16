@@ -9,9 +9,19 @@ const pin = (id: string, at: Vec3): AnalyticPiece => ({
   kind: 'turned',
   axis: 'y',
   origin: at,
-  profile: [[-grain, 0], [-grain, grain], [grain, grain], [grain, 0]],
+  profile: [
+    [-grain, 0],
+    [-grain, grain],
+    [grain, grain],
+    [grain, 0],
+  ],
 });
-const box = (id: string, half: Vec3): AnalyticPiece => ({ id, kind: 'box', min: half.map((h) => -h) as unknown as Vec3, max: half });
+const box = (id: string, half: Vec3): AnalyticPiece => ({
+  id,
+  kind: 'box',
+  min: half.map((h) => -h) as unknown as Vec3,
+  max: half,
+});
 
 describe('pin axis', () => {
   it('fails pins that do not lie on the line through the end pins', () => {
@@ -33,7 +43,10 @@ describe('hinge sense', () => {
 
   it('takes the sense that swings the centre toward the hint', () => {
     for (const toward of ['near', 'far'] as const) {
-      const opened = posePoint([{ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30, share: 1 }], centre);
+      const opened = posePoint(
+        [{ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30, share: 1 }],
+        centre,
+      );
       expect(dot(sub(opened, centre), TOWARD[toward]), toward).toBeGreaterThan(0);
     }
   });
@@ -59,12 +72,19 @@ describe('a staged motion', () => {
   const slide = { kind: 'slide', direction: [0, 0, -1], travel: 0.8, share: 0.6 } as const;
   const staged: Motion = [hinge, slide];
   const leaf: Vec3 = [-0.9, 0.5, -0.4];
-  const expectClose = (actual: Vec3, expected: Vec3) => actual.forEach((value, axis) => expect(value).toBeCloseTo(expected[axis]!, 12));
+  const expectClose = (actual: Vec3, expected: Vec3) =>
+    actual.forEach((value, axis) => expect(value).toBeCloseTo(expected[axis]!, 12));
 
   it('keeps a stage at rest until the stages before it have finished', () => {
-    const [outer, inner] = [{ ...hinge, share: 1 }, { ...slide, share: 1 }];
+    const [outer, inner] = [
+      { ...hinge, share: 1 },
+      { ...slide, share: 1 },
+    ];
     expectClose(posePoint(staged, leaf, hinge.share / 2), posePoint([outer], leaf, 0.5));
     expectClose(posePoint(staged, leaf, hinge.share), posePoint([outer], leaf));
-    expectClose(posePoint(staged, leaf, hinge.share + slide.share / 2), posePoint([outer], posePoint([inner], leaf, 0.5)));
+    expectClose(
+      posePoint(staged, leaf, hinge.share + slide.share / 2),
+      posePoint([outer], posePoint([inner], leaf, 0.5)),
+    );
   });
 });

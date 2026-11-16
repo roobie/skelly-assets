@@ -9,7 +9,9 @@ const repo = resolve(import.meta.dirname, '../..');
 // Each wheel fitted at one near-side spot with each kind of brake its class offers, each part moved to where its site
 // puts it; the wheel's tyre and rim rows in the wheel's frame at that spot; and a drum brake's backing plate, shoes and
 // wheel cylinder rows where its shoe assembly sits.
-const fittings = JSON.parse(evaluateJsonnet(`
+const fittings = JSON.parse(
+  evaluateJsonnet(
+    `
   local kit = import 'models/vehicles/kit.libsonnet';
   local site = import 'models/vehicles/site.libsonnet';
   local wheel = import 'models/vehicles/wheel-kit.libsonnet';
@@ -39,18 +41,28 @@ const fittings = JSON.parse(evaluateJsonnet(`
       },
     }
     for name in std.objectFields(wheels)
-  }`, repo));
+  }`,
+    repo,
+  ),
+);
 
 const wheels = Object.entries(fittings);
 // Each kind of brake's parts at their sites, and the parts a game yields from them.
 const kinds = {
   disc: { sites: ['wheel_brake_disc', 'wheel_caliper'] },
-  drum: { sites: ['wheel_brake_drum', 'wheel_brake_shoes'], salvage: { wheel_brake_shoes: ['plate', 'shoes', 'cylinder'] } },
+  drum: {
+    sites: ['wheel_brake_drum', 'wheel_brake_shoes'],
+    salvage: { wheel_brake_shoes: ['plate', 'shoes', 'cylinder'] },
+  },
 };
 
 // A game turns the wheel's site, so the tyre must be drawn by the model at that site and the brake by models elsewhere.
 test("a wheel's site carries the whole wheel and its brake sits at sites of its own", () => {
-  for (const kind of Object.keys(kinds)) assert.ok(wheels.some(([, { brakes }]) => kind in brakes), kind);
+  for (const kind of Object.keys(kinds))
+    assert.ok(
+      wheels.some(([, { brakes }]) => kind in brakes),
+      kind,
+    );
   for (const [name, { unbraked, brakes }] of wheels) {
     assert.ok(Object.keys(brakes).length > 0, `${name} offers no brake`);
     assert.deepEqual(unbraked, ['wheel'], name);
@@ -65,7 +77,8 @@ test('a fused part weighs and looks the same as the rows a game yields from it',
   for (const [name, { tyre, rim, brakes }] of wheels) {
     const yields = [[brakes[Object.keys(brakes)[0]].sites.wheel, [tyre, rim]]];
     for (const [kind, { sites, salvage }] of Object.entries(brakes)) {
-      for (const [site, parts] of Object.entries(kinds[kind].salvage ?? {})) yields.push([sites[site], parts.map((p) => salvage[p])]);
+      for (const [site, parts] of Object.entries(kinds[kind].salvage ?? {}))
+        yields.push([sites[site], parts.map((p) => salvage[p])]);
     }
     for (const [whole, parts] of yields) {
       const mass = parts.reduce((sum, p) => sum + p.mass, 0);
@@ -80,8 +93,16 @@ test('a fused part weighs and looks the same as the rows a game yields from it',
 // wheel cylinder on the plate inside it.
 const STEP = 0.004;
 const rests = {
-  disc: (s) => [[s.wheel_brake_disc, 'rim'], [s.wheel_caliper, s.wheel_brake_disc]],
-  drum: (s, salvage) => [[s.wheel_brake_drum, 'rim'], [salvage.plate, s.wheel_brake_drum], [salvage.shoes, salvage.plate], [salvage.cylinder, salvage.plate]],
+  disc: (s) => [
+    [s.wheel_brake_disc, 'rim'],
+    [s.wheel_caliper, s.wheel_brake_disc],
+  ],
+  drum: (s, salvage) => [
+    [s.wheel_brake_drum, 'rim'],
+    [salvage.plate, s.wheel_brake_drum],
+    [salvage.shoes, salvage.plate],
+    [salvage.cylinder, salvage.plate],
+  ],
 };
 
 test('every part of a wheel and its brake rests on another and cuts into none', () => {
@@ -90,7 +111,10 @@ test('every part of a wheel and its brake rests on another and cuts into none', 
       const named = (p) => (p === 'rim' ? rim : p);
       const pairs = [[tyre, rim], ...rests[kind](sites, salvage).map(([a, b]) => [a, named(b)])];
       for (const [part, base] of pairs) {
-        assert.ok(meeting(part.pieces, base.pieces, STEP).touches, `${name} ${kind}: ${part.part} floats clear of ${base.part}`);
+        assert.ok(
+          meeting(part.pieces, base.pieces, STEP).touches,
+          `${name} ${kind}: ${part.part} floats clear of ${base.part}`,
+        );
       }
       const all = [tyre, rim, ...new Set(pairs.flat())].filter((p, i, list) => list.indexOf(p) === i);
       for (const [i, a] of all.entries()) {

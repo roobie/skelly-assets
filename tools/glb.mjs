@@ -19,6 +19,7 @@ export function glbAccessor(buffer, gltf, index) {
   const { size, read } = READ[componentType];
   const stride = viewSpec.byteStride ?? components * size;
   const out = new Array(count * components);
-  for (let i = 0; i < count; i++) for (let c = 0; c < components; c++) out[i * components + c] = read(view, i * stride + c * size);
+  for (let i = 0; i < count; i++)
+    for (let c = 0; c < components; c++) out[i * components + c] = read(view, i * stride + c * size);
   return out;
 }

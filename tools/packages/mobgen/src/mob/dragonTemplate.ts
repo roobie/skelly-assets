@@ -21,7 +21,8 @@ export const dragonTemplate: Template = {
     eye: { color: [1, 0.9, 0.2], emissive: 1.4 },
     bone: { color: [0.92, 0.9, 0.78], emissive: 0 }, // the plan declares none, but the voxelizer wants exposed bone to have a material
   },
-  description: 'A winged biped dragon reared on digitigrade hind legs: a long S-curved neck, a horned head with a hinged jaw, clawed forelimbs, membrane wings and a thick tail.',
+  description:
+    'A winged biped dragon reared on digitigrade hind legs: a long S-curved neck, a horned head with a hinged jaw, clawed forelimbs, membrane wings and a thick tail.',
   bodyPlan: 'dragon',
   voxelSize: 0.5 / 12,
   bodyMassKg: 900,

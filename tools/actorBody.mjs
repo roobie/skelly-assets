@@ -1,11 +1,11 @@
-import { planOf } from './packages/mobgen/src/core/generate.ts';
 import { realizedRegionBones } from './actorFigure.mjs';
+import { planOf } from './packages/mobgen/src/core/generate.ts';
+import { hullCentersByBone } from './packages/mobgen/src/core/voxelBounds.ts';
+import { attackClipFor } from './packages/mobgen/src/mob/attack.ts';
+import { GROUND_CONTACT_BONES } from './packages/mobgen/src/mob/crawl.ts';
 import { burstBones } from './packages/mobgen/src/mob/dismember.ts';
 import { footRestExtents } from './packages/mobgen/src/mob/gait.ts';
-import { GROUND_CONTACT_BONES } from './packages/mobgen/src/mob/crawl.ts';
-import { attackClipFor } from './packages/mobgen/src/mob/attack.ts';
-import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
-import { hullCentersByBone } from './packages/mobgen/src/core/voxelBounds.ts';
+import { flinchClipFor, HIT_FLINCH } from './packages/mobgen/src/mob/reactions.ts';
 
 // All owned cells serve mass/reach; hull candidates serve only ground fitting.
 export const bodyGeometry = (figure, template) => {
@@ -13,7 +13,10 @@ export const bodyGeometry = (figure, template) => {
   return {
     voxelSize: figure.realized.voxels.size,
     bones: figure.realized.body.bones.map(({ id, parent, head, tail, frame, limits, disposition }) => ({
-      id, parent, head, tail,
+      id,
+      parent,
+      head,
+      tail,
       ...(frame === undefined ? {} : { frame }),
       ...(limits === undefined ? {} : { limits }),
       ...(disposition === undefined ? {} : { disposition }),
@@ -44,9 +47,13 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
   const boneIds = new Set(bones.map((bone) => bone.id));
   const regions = figure.regions ?? realizedRegionBones(planOf(template.bodyPlan).regionBones, boneIds);
   return {
-    type, model, seed, bodyPlan: template.bodyPlan,
+    type,
+    model,
+    seed,
+    bodyPlan: template.bodyPlan,
     ...(template.legCut === undefined ? {} : { legCut: template.legCut }),
-    scale, height: maxY - minY,
+    scale,
+    height: maxY - minY,
     ...bodyGeometry(figure, template),
     anchors: anchors ?? {},
     ...(regions === undefined ? {} : { regions, boxes: figure.boxes, severableParts: figure.severableParts }),
@@ -54,25 +61,44 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
     ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES.filter((id) => boneIds.has(id)) } : {}),
     ...(lookAt === undefined ? {} : { lookAt }),
-    ...(fused ? {
-      manifest: figure.manifest, bounds: figure.bounds, originOffset: figure.originOffset,
-      coreInteriorPoint: figure.coreInteriorPoint, restStrikeOrigin: figure.restStrikeOrigin,
-      cells: {
-        size: figure.realized.voxels.size, origin: figure.realized.voxels.origin, dims: figure.realized.voxels.dims,
-        filled: Array.from(figure.realized.voxels.owner).flatMap((owner, index) => owner ? [[index, owner]] : []),
-      },
-    } : {}),
-    animation: fused ? {
-      flinch: { peakAtSimSeconds: peak.t, durationSimSeconds: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] },
-    } : acid ? {
-      attackPeakAtSimSeconds: template.animation.attackPeak,
-      attackDurationSimSeconds: template.animation.attackDuration,
-      hitDurationSimSeconds: template.animation.hitDuration,
-      deathDurationRealSeconds: template.animation.deathDuration,
-    } : humanoid ? {
-      attackPeakAtSimSeconds: attack.hitTime,
-      attackDurationSimSeconds: attack.duration,
-      hitDurationSimSeconds: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
-    } : {}, 
+    ...(fused
+      ? {
+          manifest: figure.manifest,
+          bounds: figure.bounds,
+          originOffset: figure.originOffset,
+          coreInteriorPoint: figure.coreInteriorPoint,
+          restStrikeOrigin: figure.restStrikeOrigin,
+          cells: {
+            size: figure.realized.voxels.size,
+            origin: figure.realized.voxels.origin,
+            dims: figure.realized.voxels.dims,
+            filled: Array.from(figure.realized.voxels.owner).flatMap((owner, index) => (owner ? [[index, owner]] : [])),
+          },
+        }
+      : {}),
+    animation: fused
+      ? {
+          flinch: {
+            peakAtSimSeconds: peak.t,
+            durationSimSeconds: HIT_FLINCH.duration,
+            pitch: peak.rotations.chest[0],
+            roll: peak.rotations.chest[2],
+          },
+        }
+      : acid
+        ? {
+            attackPeakAtSimSeconds: template.animation.attackPeak,
+            attackDurationSimSeconds: template.animation.attackDuration,
+            hitDurationSimSeconds: template.animation.hitDuration,
+            deathDurationRealSeconds: template.animation.deathDuration,
+          }
+        : humanoid
+          ? {
+              attackPeakAtSimSeconds: attack.hitTime,
+              attackDurationSimSeconds: attack.duration,
+              hitDurationSimSeconds:
+                template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
+            }
+          : {},
   };
 }

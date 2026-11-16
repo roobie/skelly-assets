@@ -5,8 +5,8 @@ import type { GlbAssetIdentity, GlbExportError, VoxelGrains } from '@skelly/thin
 import { modelParts } from '@skelly/thing-export/physical.ts';
 import { PART_CATALOGUE, type PartCatalogue } from '../gun/catalogue.ts';
 import { gunDomain } from '../gun/domain.ts';
-import type { DeadvoxModelEntry, DeadvoxModelFile } from '../gun/exportGlb.ts';
 import { inFileFrame } from '../gun/exportFrame.ts';
+import type { DeadvoxModelEntry, DeadvoxModelFile } from '../gun/exportGlb.ts';
 import { exportGunGeometry } from '../gun/glbWriter.ts';
 import { GUN_PALETTE } from '../gun/palette.ts';
 

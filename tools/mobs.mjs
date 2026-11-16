@@ -5,10 +5,10 @@
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
-import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
+import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
 import { outputPath, readMobRows } from './layout.mjs';
-import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
 import { installJsonnetSources } from './sources.mjs';
 
 const here = import.meta.dirname;
@@ -31,18 +31,36 @@ await import(src('mob/skeletonTemplate.ts'));
 await import(src('mob/leaper/plan.ts'));
 await import(src('mob/walker/plan.ts'));
 
-const hex = (colour) => (typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour);
+const hex = (colour) =>
+  typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour;
 
 // The row's template with its narrowed parameters, palette, parts and validity budgets, registered per row.
 function deriveTemplate(base, row) {
   const materials = { ...base.materials };
-  for (const [name, material] of Object.entries(row.materials ?? {})) materials[name] = { emissive: 0, ...material, color: hex(material.color) };
-  const materialHsl = Object.fromEntries(Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))));
+  for (const [name, material] of Object.entries(row.materials ?? {}))
+    materials[name] = { emissive: 0, ...material, color: hex(material.color) };
+  const materialHsl = Object.fromEntries(
+    Object.entries(base.materialHsl ?? {}).filter(([name]) => !(name in (row.materials ?? {}))),
+  );
   const own = { ...base.budgets, ...row.budgets };
   const room = row.budget_headroom ?? 1;
   const widen = (range) => ({ ...range, max: Math.ceil(range.max * room) });
-  const budgets = { ...own, totalVoxels: widen(own.totalVoxels), groups: Object.fromEntries(Object.entries(own.groups).map(([name, range]) => [name, widen(range)])) };
-  const derived = { ...base, budgets, name: `mob:${row.id}`, attackClip: row.attack_clip ?? base.attackClip, materials, materialHsl, params: { ...base.params, ...row.params }, budgetParams: base.budgetParams ?? base.params, parts: row.parts ?? [] };
+  const budgets = {
+    ...own,
+    totalVoxels: widen(own.totalVoxels),
+    groups: Object.fromEntries(Object.entries(own.groups).map(([name, range]) => [name, widen(range)])),
+  };
+  const derived = {
+    ...base,
+    budgets,
+    name: `mob:${row.id}`,
+    attackClip: row.attack_clip ?? base.attackClip,
+    materials,
+    materialHsl,
+    params: { ...base.params, ...row.params },
+    budgetParams: base.budgetParams ?? base.params,
+    parts: row.parts ?? [],
+  };
   registerTemplate(derived);
   return derived;
 }
@@ -52,7 +70,9 @@ const bakeMob = (row) => {
   const found = generateValid(template, row.seed, { maxAttempts: 1 });
   if (!found) {
     const issues = realize(generate(template, row.seed)).report.issues;
-    throw new Error(`seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`);
+    throw new Error(
+      `seed ${row.seed} does not make a valid ${row.template}: ${issues.map((issue) => JSON.stringify(issue)).join('; ')}`,
+    );
   }
   // A coarser row bakes the genome it realized, so its recorded genome names the voxel size its figure was built at.
   const { genome, realized } = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor) : found;
@@ -65,7 +85,14 @@ const bakeMob = (row) => {
 const MOB_FILES = ['body', 'clips', 'genome', 'glb'];
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
-  return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));
+  return entryStore(
+    join(cache, 'mob'),
+    codeFingerprint(
+      here,
+      ['package-lock.json', 'packages/mobgen/src', ...tools],
+      ['packages/mobgen/src', '../models/mobs'],
+    ),
+  );
 };
 
 // Bakes the row, or takes its files from the store, and writes each where its row field places it; returns the store
@@ -109,7 +136,11 @@ function main() {
   let reused = 0;
   for (const id of wanted) {
     try {
-      const entry = exportMob(rows.find((row) => row.id === id), out, store);
+      const entry = exportMob(
+        rows.find((row) => row.id === id),
+        out,
+        store,
+      );
       if (entry) used.add(entry.key);
       if (entry?.reused) reused += 1;
     } catch (error) {

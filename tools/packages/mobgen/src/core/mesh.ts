@@ -38,7 +38,14 @@ interface Builder {
   indices: number[];
 }
 
-const newBuilder = (): Builder => ({ positions: [], normals: [], colors: [], neighbourBone: [], cellIndex: [], indices: [] });
+const newBuilder = (): Builder => ({
+  positions: [],
+  normals: [],
+  colors: [],
+  neighbourBone: [],
+  cellIndex: [],
+  indices: [],
+});
 
 interface Quad {
   readonly corners: readonly [Point, Point, Point, Point];
@@ -120,7 +127,13 @@ const markVisited = (visited: Uint8Array, dimU: number, rect: Rect): void => {
 /** Greedy rectangle merge over a 2D mask of encoded merge keys (0 = not exposed; see encodeMaskValue) —
  * `emit` gets the raw key back, un-decremented, so a caller packing more than just colour into it (the
  * neighbour bone, so a cut's edge never merges across differently-owned neighbours) can decode it itself. */
-const greedyMerge = (dimU: number, dimV: number, mask: Int32Array, perCell: boolean, emit: (rect: Rect, value: number) => void): void => {
+const greedyMerge = (
+  dimU: number,
+  dimV: number,
+  mask: Int32Array,
+  perCell: boolean,
+  emit: (rect: Rect, value: number) => void,
+): void => {
   const g: Mask2D = { mask, visited: new Uint8Array(dimU * dimV), dimU, dimV };
   for (let v = 0; v < dimV; v++) {
     for (let u = 0; u < dimU; ) {
@@ -271,8 +284,14 @@ const meshX = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [positive ? 1 : -1, 0, 0], reversed: !positive, color, neighbourBone,
-        cellIndex: cellIndex(voxels.dims, i, j0, k0) });
+      emitQuad(b, {
+        corners,
+        normal: [positive ? 1 : -1, 0, 0],
+        reversed: !positive,
+        color,
+        neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i, j0, k0),
+      });
     });
   }
 };
@@ -318,8 +337,14 @@ const meshY = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [0, positive ? 1 : -1, 0], reversed: !positive, color, neighbourBone,
-        cellIndex: cellIndex(voxels.dims, i0, j, k0) });
+      emitQuad(b, {
+        corners,
+        normal: [0, positive ? 1 : -1, 0],
+        reversed: !positive,
+        color,
+        neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i0, j, k0),
+      });
     });
   }
 };
@@ -365,13 +390,25 @@ const meshZ = (voxels: Voxels, pass: AxisPass, b: Builder): void => {
       ];
       const color = decodeColor(value, neighbourSlots);
       const neighbourBone = decodeNeighbourBone(value, neighbourSlots);
-      emitQuad(b, { corners, normal: [0, 0, positive ? 1 : -1], reversed: !positive, color, neighbourBone,
-        cellIndex: cellIndex(voxels.dims, i0, j0, k) });
+      emitQuad(b, {
+        corners,
+        normal: [0, 0, positive ? 1 : -1],
+        reversed: !positive,
+        color,
+        neighbourBone,
+        cellIndex: cellIndex(voxels.dims, i0, j0, k),
+      });
     });
   }
 };
 
-const meshOneBone = (voxels: Voxels, boneIndex: number, bounds: Bounds, neighbourSlots: number, perCell: boolean): BoneMesh => {
+const meshOneBone = (
+  voxels: Voxels,
+  boneIndex: number,
+  bounds: Bounds,
+  neighbourSlots: number,
+  perCell: boolean,
+): BoneMesh => {
   const b = newBuilder();
   for (const positive of [true, false]) {
     const pass: AxisPass = { boneIndex, bounds, positive, neighbourSlots, perCell };
@@ -391,7 +428,11 @@ const meshOneBone = (voxels: Voxels, boneIndex: number, bounds: Bounds, neighbou
 };
 
 /** Meshes every bone that owns at least one voxel; bones with none are left out. */
-export const meshBones = (voxels: Voxels, boneCount: number, options: { readonly perCell?: boolean } = {}): Map<number, BoneMesh> => {
+export const meshBones = (
+  voxels: Voxels,
+  boneCount: number,
+  options: { readonly perCell?: boolean } = {},
+): Map<number, BoneMesh> => {
   const bounds = boneBounds(voxels, boneCount);
   const neighbourSlots = boneCount + 1; // 0 = empty, else ownerBoneIndex + 1 — see encodeMaskValue
   const out = new Map<number, BoneMesh>();

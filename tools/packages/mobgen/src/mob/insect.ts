@@ -88,11 +88,27 @@ export const INSECT_LAYOUT = {
   /** Skeleton spans along z. */
   thorax: { headZ: -0.2, tailZ: -1.0 },
   abdomen: { headZ: -0.2, tailZ: 1.9 },
-  head: { headZ: -1.0, tailZ: -1.62, headY: 0.68, tailY: 0.58, centreZ: -1.3, centreY: 0.62, radii: [0.46, 0.34, 0.46] as Vec3 },
+  head: {
+    headZ: -1.0,
+    tailZ: -1.62,
+    headY: 0.68,
+    tailY: 0.58,
+    centreZ: -1.3,
+    centreY: 0.62,
+    radii: [0.46, 0.34, 0.46] as Vec3,
+  },
   eye: { x: 0.33, y: 0.8, z: -1.45, radius: 0.17 },
   mandible: { hingeX: 0.14, hingeY: 0.46, hingeZ: -1.55, tipX: 0.08, tipY: 0.4, tipZ: -1.9, radius: 0.07 },
   /** Antenna: base on the head, the bend and the tip, offsets from the base (times antennaLength), radii. */
-  antenna: { baseX: 0.17, baseY: 0.75, baseZ: -1.5, midOffset: [0.3, 1.0, -0.9] as Vec3, tipOffset: [0.7, 0.8, -1.3] as Vec3, ra: 0.07, rb: 0.05 },
+  antenna: {
+    baseX: 0.17,
+    baseY: 0.75,
+    baseZ: -1.5,
+    midOffset: [0.3, 1.0, -0.9] as Vec3,
+    tipOffset: [0.7, 0.8, -1.3] as Vec3,
+    ra: 0.07,
+    rb: 0.05,
+  },
   /** Legs: per pair the hip z and the knee and ankle offsets in z from it; x offsets are shared (times legSpread past the hip). */
   legs: {
     hipX: 0.8,
@@ -138,10 +154,12 @@ interface InsectLayout {
 
 const v = (h: number, x: number, y: number, z: number): Vec3 => [x * h, y * h, z * h];
 
-const hangsFromThorax = (leg: LegBones, p: InsectParams): boolean => leg.parent === 'thorax' || (leg.pair === 'H' && p.hindLegsOnThorax > 0);
+const hangsFromThorax = (leg: LegBones, p: InsectParams): boolean =>
+  leg.parent === 'thorax' || (leg.pair === 'H' && p.hindLegsOnThorax > 0);
 const legParent = (leg: LegBones, p: InsectParams): string => (hangsFromThorax(leg, p) ? 'thorax' : leg.parent);
 /** The pronotum's back end z (times `height`). */
-const pronotumBack = (p: InsectParams): number => INSECT_LAYOUT.pronotum.z + INSECT_LAYOUT.pronotum.halfLength * p.thoraxLength;
+const pronotumBack = (p: InsectParams): number =>
+  INSECT_LAYOUT.pronotum.z + INSECT_LAYOUT.pronotum.halfLength * p.thoraxLength;
 /** A pair's hip z (times `height`): the hind pair follows the abdomen's length, or the thorax's back end when it hangs from there. */
 const legHipZ = (pair: (typeof LEG_PAIRS)[number], p: InsectParams): number =>
   pair.key !== 'H' ? pair.hipZ : p.hindLegsOnThorax > 0 ? pronotumBack(p) - 0.15 : pair.hipZ * p.bodyLength;
@@ -153,8 +171,18 @@ const buildBones = (p: InsectParams): Body['bones'] => {
   const up = p.thoraxRaise;
   const bones: Body['bones'][number][] = [
     { id: 'thorax', parent: null, head: v(h, 0, L.shellY, L.thorax.headZ), tail: v(h, 0, L.shellY, L.thorax.tailZ) },
-    { id: 'abdomen', parent: 'thorax', head: v(h, 0, L.shellY, L.abdomen.headZ), tail: v(h, 0, L.shellY, L.abdomen.tailZ * bl + p.waist) },
-    { id: 'head', parent: 'thorax', head: v(h, 0, L.head.headY + up, L.head.headZ), tail: v(h, 0, L.head.tailY + up, L.head.tailZ) },
+    {
+      id: 'abdomen',
+      parent: 'thorax',
+      head: v(h, 0, L.shellY, L.abdomen.headZ),
+      tail: v(h, 0, L.shellY, L.abdomen.tailZ * bl + p.waist),
+    },
+    {
+      id: 'head',
+      parent: 'thorax',
+      head: v(h, 0, L.head.headY + up, L.head.headZ),
+      tail: v(h, 0, L.head.tailY + up, L.head.tailZ),
+    },
   ];
   for (const side of SIDES) {
     const sign = sideSign(side);
@@ -228,15 +256,39 @@ const buildFlesh = (layout: InsectLayout): Feature[] => {
   const hs = p.headScale;
   const half = L.shellHalfWidth * g;
   const features: Feature[] = [
-    ellipsoid('thorax', v(h, 0, L.shellY + p.thoraxRaise, L.pronotum.z), v(h, half * L.pronotum.halfWidthRatio, L.shellHalfThickness, L.pronotum.halfLength * p.thoraxLength), 'shell'),
-    ellipsoid('abdomen', v(h, 0, L.shellY + 0.02 - p.abdomenDrop, L.wings.z * bl + p.waist), v(h, half * p.abdomenSize, L.shellHalfThickness * p.abdomenSize, L.wings.halfLength * bl), 'shell'),
-    ellipsoid('head', v(h, 0, L.head.centreY + p.thoraxRaise, L.head.centreZ), v(h, L.head.radii[0] * hs, L.head.radii[1] * hs, L.head.radii[2] * hs), 'head'),
+    ellipsoid(
+      'thorax',
+      v(h, 0, L.shellY + p.thoraxRaise, L.pronotum.z),
+      v(h, half * L.pronotum.halfWidthRatio, L.shellHalfThickness, L.pronotum.halfLength * p.thoraxLength),
+      'shell',
+    ),
+    ellipsoid(
+      'abdomen',
+      v(h, 0, L.shellY + 0.02 - p.abdomenDrop, L.wings.z * bl + p.waist),
+      v(h, half * p.abdomenSize, L.shellHalfThickness * p.abdomenSize, L.wings.halfLength * bl),
+      'shell',
+    ),
+    ellipsoid(
+      'head',
+      v(h, 0, L.head.centreY + p.thoraxRaise, L.head.centreZ),
+      v(h, L.head.radii[0] * hs, L.head.radii[1] * hs, L.head.radii[2] * hs),
+      'head',
+    ),
   ];
   if (p.waist > 0) {
     // The stalk between the thorax's back and the abdomen's front, so the abdomen hangs from a narrow waist.
     const S = WAIST_STALK;
     const front = L.wings.z * bl + p.waist - L.wings.halfLength * bl;
-    features.push(capsule('abdomen', v(h, 0, L.shellY + p.thoraxRaise, pronotumBack(p) - S.overlap), v(h, 0, L.shellY - p.abdomenDrop, front + S.overlap), S.radius * h, S.radius * h, 'dark'));
+    features.push(
+      capsule(
+        'abdomen',
+        v(h, 0, L.shellY + p.thoraxRaise, pronotumBack(p) - S.overlap),
+        v(h, 0, L.shellY - p.abdomenDrop, front + S.overlap),
+        S.radius * h,
+        S.radius * h,
+        'dark',
+      ),
+    );
   }
   for (const side of SIDES) {
     const sign = sideSign(side);
@@ -253,7 +305,11 @@ const buildFlesh = (layout: InsectLayout): Feature[] => {
     features.push({
       bone: 'head',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, sign * L.eye.x * hs, L.eye.y + p.thoraxRaise, L.eye.z), radii: [L.eye.radius * h * hs, L.eye.radius * h * hs, L.eye.radius * h * hs] },
+      shape: {
+        kind: 'ellipsoid',
+        center: v(h, sign * L.eye.x * hs, L.eye.y + p.thoraxRaise, L.eye.z),
+        radii: [L.eye.radius * h * hs, L.eye.radius * h * hs, L.eye.radius * h * hs],
+      },
       material: 'eye',
     });
   }
@@ -284,21 +340,34 @@ const buildMarkings = (layout: InsectLayout): Feature[] => {
     {
       bone: 'abdomen',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, 0, abdomenTopY + 0.12, wingsZ), radii: v(h, half * p.abdomenSize * 0.62, 0.3, L.wings.halfLength * p.bodyLength * 0.75) },
+      shape: {
+        kind: 'ellipsoid',
+        center: v(h, 0, abdomenTopY + 0.12, wingsZ),
+        radii: v(h, half * p.abdomenSize * 0.62, 0.3, L.wings.halfLength * p.bodyLength * 0.75),
+      },
       material: 'sheen',
       onto: ['shell'],
     },
     {
       bone: 'abdomen',
       op: 'paint',
-      shape: { kind: 'box', center: v(h, 0, abdomenTopY, wingsZ), half: v(h, 0.045, 0.3, L.wings.halfLength * p.bodyLength), round: 0 },
+      shape: {
+        kind: 'box',
+        center: v(h, 0, abdomenTopY, wingsZ),
+        half: v(h, 0.045, 0.3, L.wings.halfLength * p.bodyLength),
+        round: 0,
+      },
       material: 'dark',
       onto: ['shell', 'sheen'],
     },
     {
       bone: 'thorax',
       op: 'paint',
-      shape: { kind: 'ellipsoid', center: v(h, 0, topY + p.thoraxRaise + 0.1, L.pronotum.z), radii: v(h, half * 0.5, 0.28, L.pronotum.halfLength * p.thoraxLength * 0.7) },
+      shape: {
+        kind: 'ellipsoid',
+        center: v(h, 0, topY + p.thoraxRaise + 0.1, L.pronotum.z),
+        radii: v(h, half * 0.5, 0.28, L.pronotum.halfLength * p.thoraxLength * 0.7),
+      },
       material: 'sheen',
       onto: ['shell'],
     },
@@ -404,7 +473,12 @@ export const insectStrideLength = (realized: Realized): number =>
 
 /** An alternating-tripod walk driven by ground distance: one tripod plants and slides back while the other lifts and reaches forward, then they swap.
  * The feelers sway against each other and the body rocks a little with each step. */
-export const insectGaitPose = (realized: Realized, distance: number, speed: number, stance: { readonly mandibleOpen?: number } = {}): Pose => {
+export const insectGaitPose = (
+  realized: Realized,
+  distance: number,
+  speed: number,
+  stance: { readonly mandibleOpen?: number } = {},
+): Pose => {
   const base = insectPose(realized, stance);
   if (speed <= 0 || !Number.isFinite(distance)) {
     return base;
@@ -429,11 +503,19 @@ export const insectGaitPose = (realized: Realized, distance: number, speed: numb
     rotations[leg.femur] = legSwing(realized, leg, offset, lift);
   }
   const wave = Math.sin(2 * Math.PI * 2 * phase);
-  addRotation(rotations, 'thorax', mulMM(rotZ(G.rollDeg * Math.sin(2 * Math.PI * 2 * phase)), rotX(G.pitchDeg * Math.cos(2 * Math.PI * 2 * phase))));
+  addRotation(
+    rotations,
+    'thorax',
+    mulMM(rotZ(G.rollDeg * Math.sin(2 * Math.PI * 2 * phase)), rotX(G.pitchDeg * Math.cos(2 * Math.PI * 2 * phase))),
+  );
   for (const side of SIDES) {
     const sign = sideSign(side);
     addRotation(rotations, `antennaBase.${side}`, rotY(sign * G.antennaSwayDeg * wave));
-    addRotation(rotations, `antennaTip.${side}`, rotY(sign * G.antennaTipSwayDeg * Math.sin(2 * Math.PI * 2 * phase - 1.2)));
+    addRotation(
+      rotations,
+      `antennaTip.${side}`,
+      rotY(sign * G.antennaTipSwayDeg * Math.sin(2 * Math.PI * 2 * phase - 1.2)),
+    );
   }
   const chatter = G.mandibleChatterDeg * (0.5 + 0.5 * Math.sin(2 * Math.PI * 4 * phase));
   addRotation(rotations, 'mandible.L', rotY(chatter));
@@ -450,7 +532,11 @@ export const insectIdlePose = (realized: Realized, time = 0): Pose => {
   for (const side of SIDES) {
     const sign = sideSign(side);
     const own = time * 2.3 + (side === 'L' ? 0 : 2.1);
-    addRotation(rotations, `antennaBase.${side}`, mulMM(rotY(sign * I.antennaYawDeg * flick(own)), rotX(I.antennaRiseDeg * flick(own))));
+    addRotation(
+      rotations,
+      `antennaBase.${side}`,
+      mulMM(rotY(sign * I.antennaYawDeg * flick(own)), rotX(I.antennaRiseDeg * flick(own))),
+    );
     addRotation(rotations, `antennaTip.${side}`, rotY(sign * I.antennaTipYawDeg * flick(own - 0.6)));
   }
   const jaw = I.mandibleDeg * (0.5 + 0.5 * Math.sin(time * 5));

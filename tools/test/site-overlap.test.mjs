@@ -5,8 +5,13 @@ import { fitDepth, overlapReport, roleOf, seatingProblems, siteOverlaps } from '
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
 const site = (id, part, ...pieces) => ({ id, part, pieces });
-const vehicle = (sites, { overlaps = [], unjudged = [], ledger = [], parent = null } = {}) =>
-  ({ parent, sites, overlaps, unjudged, ledger });
+const vehicle = (sites, { overlaps = [], unjudged = [], ledger = [], parent = null } = {}) => ({
+  parent,
+  sites,
+  overlaps,
+  unjudged,
+  ledger,
+});
 const fit = (...pairs) => ({ why: 'seated', pairs });
 const report = (vehicles, fits = [], roles = []) => overlapReport({ grain: GRAIN, fits, roles, vehicles });
 const unit = box('block', [0, 0, 0], [1, 1, 1]);
@@ -38,7 +43,18 @@ test('a part drawn on a finer grain is contact only within the finer of the two 
 
 test('a piece passing right through a thin panel reads as deep as it passes, not as thin as the panel', () => {
   const floor = box('floor', [-1, -1, 0.4], [2, 2, 0.4 + 2 * GRAIN]);
-  const rod = { id: 'rod', kind: 'turned', axis: 'z', origin: [0.5, 0.5, 0], profile: [[0, 0], [0, 0.1], [1, 0.1], [1, 0]] };
+  const rod = {
+    id: 'rod',
+    kind: 'turned',
+    axis: 'z',
+    origin: [0.5, 0.5, 0],
+    profile: [
+      [0, 0],
+      [0, 0.1],
+      [1, 0.1],
+      [1, 0],
+    ],
+  };
   for (const engine of [unit, rod]) {
     const [overlap] = siteOverlaps([site('floor', 'van_floor', floor), site('engine', 'van_engine', engine)], GRAIN);
     assert.ok(Math.abs(overlap.depth - (0.4 + 2 * GRAIN)) < GRAIN / 8, `${engine.kind} depth ${overlap.depth}`);
@@ -67,7 +83,10 @@ test('each piece is named with its own part, whichever site the sweep meets firs
 });
 
 test('an allowance is silent whichever way round its sites are named, and covers only the pair it names', () => {
-  for (const sites of [['body', 'lamp'], ['lamp', 'body']]) {
+  for (const sites of [
+    ['body', 'lamp'],
+    ['lamp', 'body'],
+  ]) {
     assert.deepEqual(report({ van: vehicle(bodyAndLamp, { overlaps: [allowance(undefined, sites)] }) }).problems, []);
   }
   const withMirror = [...bodyAndLamp, site('mirror', 'van_mirror', shifted(-0.5))];
@@ -82,7 +101,7 @@ test('an allowance is a depth cap: an overlap deeper than it was written for is 
   assert.match(problems[0], /more than the 250 mm allowed/);
 });
 
-test('a variant allows its parent\'s entries as well as its own, and listing one again is reported', () => {
+test("a variant allows its parent's entries as well as its own, and listing one again is reported", () => {
   const parent = vehicle(bodyAndLamp, { overlaps: [allowance()] });
   assert.deepEqual(report({ van: parent, electric_van: vehicle(bodyAndLamp, { parent: 'van' }) }).problems, []);
   const bare = report({ van: vehicle(bodyAndLamp), electric_van: vehicle(bodyAndLamp, { parent: 'van' }) });

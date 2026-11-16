@@ -15,12 +15,18 @@ export const MANIFEST = 'manifest.json';
 export const RENAMES = 'models/renames.json';
 
 // REUSE's path globs: `**` crosses directories, `*` and `?` do not.
-const globPattern = (glob) => new RegExp(`^${glob.split(/(\*\*|\*|\?)/).map((piece) => {
-  if (piece === '**') return '.*';
-  if (piece === '*') return '[^/]*';
-  if (piece === '?') return '[^/]';
-  return piece.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-}).join('')}$`);
+const globPattern = (glob) =>
+  new RegExp(
+    `^${glob
+      .split(/(\*\*|\*|\?)/)
+      .map((piece) => {
+        if (piece === '**') return '.*';
+        if (piece === '*') return '[^/]*';
+        if (piece === '?') return '[^/]';
+        return piece.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+      })
+      .join('')}$`,
+  );
 
 const STRING = /^"((?:[^"\\]|\\.)*)"$/;
 const unquote = (text, where) => {
@@ -30,34 +36,43 @@ const unquote = (text, where) => {
 };
 const stringList = (text, where) => {
   if (!text.startsWith('[') || !text.endsWith(']')) throw new Error(`REUSE.toml ${where}: expected a list of strings`);
-  return text.slice(1, -1).split(',').map((item) => item.trim()).filter(Boolean).map((item) => unquote(item, where));
+  return text
+    .slice(1, -1)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => unquote(item, where));
 };
 
 // The annotations of REUSE.toml, read strictly: a line the reader does not know is an error, never skipped.
 export function readAnnotations(root = repo) {
   const annotations = [];
   let current;
-  readFileSync(join(root, 'REUSE.toml'), 'utf8').split('\n').forEach((raw, index) => {
-    const line = raw.trim();
-    const where = `line ${index + 1}`;
-    if (line === '' || line.startsWith('#')) return;
-    if (line === '[[annotations]]') {
-      current = {};
-      annotations.push(current);
-      return;
-    }
-    const match = /^([A-Za-z][A-Za-z0-9_-]*)\s*=\s*(.+)$/.exec(line);
-    if (!match) throw new Error(`REUSE.toml ${where}: unknown line ${line}`);
-    const [, key, value] = match;
-    if (current === undefined) {
-      if (key !== 'version' || value !== '1') throw new Error(`REUSE.toml ${where}: only version = 1 precedes the annotations`);
-      return;
-    }
-    if (Object.hasOwn(current, key)) throw new Error(`REUSE.toml ${where}: ${key} given twice`);
-    if (key === 'path') current.path = value.startsWith('[') ? stringList(value, where) : [unquote(value, where)];
-    else if (key === 'SPDX-FileCopyrightText' || key === 'SPDX-License-Identifier') current[key] = unquote(value, where);
-    else throw new Error(`REUSE.toml ${where}: unknown key ${key}`);
-  });
+  readFileSync(join(root, 'REUSE.toml'), 'utf8')
+    .split('\n')
+    .forEach((raw, index) => {
+      const line = raw.trim();
+      const where = `line ${index + 1}`;
+      if (line === '' || line.startsWith('#')) return;
+      if (line === '[[annotations]]') {
+        current = {};
+        annotations.push(current);
+        return;
+      }
+      const match = /^([A-Za-z][A-Za-z0-9_-]*)\s*=\s*(.+)$/.exec(line);
+      if (!match) throw new Error(`REUSE.toml ${where}: unknown line ${line}`);
+      const [, key, value] = match;
+      if (current === undefined) {
+        if (key !== 'version' || value !== '1')
+          throw new Error(`REUSE.toml ${where}: only version = 1 precedes the annotations`);
+        return;
+      }
+      if (Object.hasOwn(current, key)) throw new Error(`REUSE.toml ${where}: ${key} given twice`);
+      if (key === 'path') current.path = value.startsWith('[') ? stringList(value, where) : [unquote(value, where)];
+      else if (key === 'SPDX-FileCopyrightText' || key === 'SPDX-License-Identifier')
+        current[key] = unquote(value, where);
+      else throw new Error(`REUSE.toml ${where}: unknown key ${key}`);
+    });
   for (const annotation of annotations) {
     for (const key of ['path', 'SPDX-FileCopyrightText', 'SPDX-License-Identifier']) {
       if (!Object.hasOwn(annotation, key)) throw new Error(`REUSE.toml: an annotation has no ${key}`);
@@ -94,7 +109,16 @@ export function mobManifest(rows) {
   const models = [];
   const files = [];
   for (const row of rows) {
-    models.push({ id: row.id, title: row.title, kind: 'mob', pack: row.pack, path: row.glb, clips: row.clips, body: row.body, genome: row.genome });
+    models.push({
+      id: row.id,
+      title: row.title,
+      kind: 'mob',
+      pack: row.pack,
+      path: row.glb,
+      clips: row.clips,
+      body: row.body,
+      genome: row.genome,
+    });
     files.push(...[row.glb, row.body, row.clips, row.genome].map((path) => outputPath(row.pack, path)));
   }
   return { models, files };
@@ -102,8 +126,19 @@ export function mobManifest(rows) {
 
 // Every sound row is its row as data and one audio file per seed, all baked at the one sample rate.
 export function soundManifest(rows, sampleRate) {
-  const sounds = rows.map(({ id, pack, row, data, variants }) => ({ id, pack, object: row.object.id, surface: row.surface.id, sampleRate, row: data, variants }));
-  const files = rows.flatMap(({ pack, data, variants }) => [outputPath(pack, data), ...variants.map(({ path }) => outputPath(pack, path))]);
+  const sounds = rows.map(({ id, pack, row, data, variants }) => ({
+    id,
+    pack,
+    object: row.object.id,
+    surface: row.surface.id,
+    sampleRate,
+    row: data,
+    variants,
+  }));
+  const files = rows.flatMap(({ pack, data, variants }) => [
+    outputPath(pack, data),
+    ...variants.map(({ path }) => outputPath(pack, path)),
+  ]);
   return { sounds, files };
 }
 
@@ -115,7 +150,17 @@ const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 // pack, path, rig } of each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as
 // <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id; finishes:
 // finish id -> its glTF material; sounds: as soundManifest gives them.
-export function buildManifest({ models, vehicles = [], motions = [], sounds = [], dependsOn = {}, files, credit, renames = {}, finishes = {} }) {
+export function buildManifest({
+  models,
+  vehicles = [],
+  motions = [],
+  sounds = [],
+  dependsOn = {},
+  files,
+  credit,
+  renames = {},
+  finishes = {},
+}) {
   const packs = {};
   for (const file of [...new Set(files)].sort(byText)) {
     const [pack, ...rest] = file.split('/');
@@ -124,62 +169,79 @@ export function buildManifest({ models, vehicles = [], motions = [], sounds = []
     packs[pack].files.push(rest.join('/'));
   }
   for (const [pack, { dependsOn: targets }] of Object.entries(packs)) {
-    for (const target of targets) if (!Object.hasOwn(packs, target)) throw new Error(`${pack}: depends on ${target}, which the tree does not hold`);
+    for (const target of targets)
+      if (!Object.hasOwn(packs, target)) throw new Error(`${pack}: depends on ${target}, which the tree does not hold`);
   }
   const known = new Set(files);
   const ids = new Set();
-  const entries = [...models].sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id)).map((model) => {
-    const file = outputPath(model.pack, model.path);
-    if (!known.has(file)) throw new Error(`${model.id}: ${file} is not a produced file`);
-    for (const role of ['clips', 'body', 'genome']) {
-      if (model[role] !== undefined && !known.has(outputPath(model.pack, model[role]))) throw new Error(`${model.id}: its ${role} is not a produced file`);
-    }
-    const key = `${model.pack}/${model.id}`;
-    if (ids.has(key)) throw new Error(`${model.id}: two models of one id in ${model.pack}`);
-    ids.add(key);
-    return {
-      id: model.id,
-      title: model.title,
-      kind: model.kind,
-      pack: model.pack,
-      path: model.path,
-      ...manifestTaxonomy(model.taxonomy),
-      ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
-      ...(model.label === undefined ? {} : { label: model.label }),
-      ...(model.wornOn === undefined ? {} : { wornOn: { ...model.wornOn } }),
-      ...(model.covers === undefined ? {} : { covers: [...model.covers] }),
-      ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
-      ...(model.massKg === undefined ? {} : { massKg: model.massKg, ...(model.volumeM3 === undefined ? {} : { volumeM3: model.volumeM3 }) }),
-      ...(model.clips === undefined ? {} : { clips: model.clips }),
-      ...(model.body === undefined ? {} : { body: model.body }),
-      ...(model.genome === undefined ? {} : { genome: model.genome }),
-      credits: credit(`built/${file}`),
-    };
-  });
+  const entries = [...models]
+    .sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id))
+    .map((model) => {
+      const file = outputPath(model.pack, model.path);
+      if (!known.has(file)) throw new Error(`${model.id}: ${file} is not a produced file`);
+      for (const role of ['clips', 'body', 'genome']) {
+        if (model[role] !== undefined && !known.has(outputPath(model.pack, model[role])))
+          throw new Error(`${model.id}: its ${role} is not a produced file`);
+      }
+      const key = `${model.pack}/${model.id}`;
+      if (ids.has(key)) throw new Error(`${model.id}: two models of one id in ${model.pack}`);
+      ids.add(key);
+      return {
+        id: model.id,
+        title: model.title,
+        kind: model.kind,
+        pack: model.pack,
+        path: model.path,
+        ...manifestTaxonomy(model.taxonomy),
+        ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
+        ...(model.label === undefined ? {} : { label: model.label }),
+        ...(model.wornOn === undefined ? {} : { wornOn: { ...model.wornOn } }),
+        ...(model.covers === undefined ? {} : { covers: [...model.covers] }),
+        ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
+        ...(model.massKg === undefined
+          ? {}
+          : { massKg: model.massKg, ...(model.volumeM3 === undefined ? {} : { volumeM3: model.volumeM3 }) }),
+        ...(model.clips === undefined ? {} : { clips: model.clips }),
+        ...(model.body === undefined ? {} : { body: model.body }),
+        ...(model.genome === undefined ? {} : { genome: model.genome }),
+        credits: credit(`built/${file}`),
+      };
+    });
   const vehicleIds = new Set();
-  const vehicleEntries = [...vehicles].sort((a, b) => byText(a.id, b.id)).map(({ id, title, pack, path, tags }) => {
-    const file = outputPath(pack, path);
-    if (!known.has(file)) throw new Error(`vehicle ${id}: ${file} is not a produced file`);
-    if (vehicleIds.has(id)) throw new Error(`vehicle ${id}: placed twice`);
-    vehicleIds.add(id);
-    return { id, title, pack, path, ...manifestTaxonomy({ tags }), credits: credit(`built/${file}`) };
-  });
-  const motionEntries = [...motions].sort((a, b) => byText(a.id, b.id)).map(({ id, pack, path, rig }) => {
-    for (const file of [path, rig]) if (!known.has(outputPath(pack, file))) throw new Error(`motions ${id}: ${outputPath(pack, file)} is not a produced file`);
-    return { id, pack, path, rig };
-  });
+  const vehicleEntries = [...vehicles]
+    .sort((a, b) => byText(a.id, b.id))
+    .map(({ id, title, pack, path, tags }) => {
+      const file = outputPath(pack, path);
+      if (!known.has(file)) throw new Error(`vehicle ${id}: ${file} is not a produced file`);
+      if (vehicleIds.has(id)) throw new Error(`vehicle ${id}: placed twice`);
+      vehicleIds.add(id);
+      return { id, title, pack, path, ...manifestTaxonomy({ tags }), credits: credit(`built/${file}`) };
+    });
+  const motionEntries = [...motions]
+    .sort((a, b) => byText(a.id, b.id))
+    .map(({ id, pack, path, rig }) => {
+      for (const file of [path, rig])
+        if (!known.has(outputPath(pack, file)))
+          throw new Error(`motions ${id}: ${outputPath(pack, file)} is not a produced file`);
+      return { id, pack, path, rig };
+    });
   const soundIds = new Set();
-  const soundEntries = [...sounds].sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id)).map((sound) => {
-    const paths = [sound.row, ...sound.variants.map(({ path }) => path)];
-    for (const path of paths) if (!known.has(outputPath(sound.pack, path))) throw new Error(`sound ${sound.id}: ${outputPath(sound.pack, path)} is not a produced file`);
-    if (soundIds.has(`${sound.pack}/${sound.id}`)) throw new Error(`sound ${sound.id}: two sounds of one id in ${sound.pack}`);
-    soundIds.add(`${sound.pack}/${sound.id}`);
-    return { ...sound, credits: credit(`built/${outputPath(sound.pack, sound.row)}`) };
-  });
+  const soundEntries = [...sounds]
+    .sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id))
+    .map((sound) => {
+      const paths = [sound.row, ...sound.variants.map(({ path }) => path)];
+      for (const path of paths)
+        if (!known.has(outputPath(sound.pack, path)))
+          throw new Error(`sound ${sound.id}: ${outputPath(sound.pack, path)} is not a produced file`);
+      if (soundIds.has(`${sound.pack}/${sound.id}`))
+        throw new Error(`sound ${sound.id}: two sounds of one id in ${sound.pack}`);
+      soundIds.add(`${sound.pack}/${sound.id}`);
+      return { ...sound, credits: credit(`built/${outputPath(sound.pack, sound.row)}`) };
+    });
   const stale = renameProblems(renames, models);
   if (stale.length) throw new Error(`${RENAMES}: ${stale.join('; ')}`);
   return {
-    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model\'s authored mass, the sum of its parts\'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. genome: on a mob, its genome file, every value the generator drew for it after its row narrowed the template, so two releases\' bodies of one id can be told re-rolled from rebuilt. wornOn: on a worn piece and on a wearable with no worn pieces, the doll part it sits on, which a bone of the motions\' rig binds (bones[].bind.part, with its side and its site in the rig\'s doll), so a consumer seats it on that bone. A worn piece is drawn in the part\'s frame, in every copy of the part, the left one mirrored; a piece fitted over other clothing, <item>_worn_<layer> such as a vest over a jacket, sits where its <item>_worn twin does, one layer out. A wearable with no worn pieces sits whole on one copy of the part, which side names where the doll has two (the bind.side of that copy\'s bone), or across both copies with both: true; with anchor, its own anchor of that name, or its origin if it has none, goes to the anchor of that name on the doll\'s bust, the model at the rig\'s first doll site, an anchor that lies on the part. covers: on a worn shell, what of the doll a consumer stops drawing while it is worn, so skin under the shell never shows through: the doll part it is drawn on, or regions of that part, each drawn on the doll\'s copy of the part as the GLB primitives whose extras.piece names it. The torso is cut into trunk and shoulders and the foot into ankle and sole; models/dressing.libsonnet, regions, holds the cut. A consumer hides what every shell it wears declares, on the copy each shell is fitted to. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle\'s title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body\'s tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips\' frames turn and the site of each model on them. sounds: each sound row, the object and surface it is the sound of, so a consumer picks it by the surface an object lands on, its row as data, which the impact synth renders to the same samples at the same sample rate, and one Ogg Vorbis file per seed, a take of it baked at that rate. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.',
+    _doc: "Every model the built tree holds, every vehicle's placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model's shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model's authored mass, the sum of its parts'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. genome: on a mob, its genome file, every value the generator drew for it after its row narrowed the template, so two releases' bodies of one id can be told re-rolled from rebuilt. wornOn: on a worn piece and on a wearable with no worn pieces, the doll part it sits on, which a bone of the motions' rig binds (bones[].bind.part, with its side and its site in the rig's doll), so a consumer seats it on that bone. A worn piece is drawn in the part's frame, in every copy of the part, the left one mirrored; a piece fitted over other clothing, <item>_worn_<layer> such as a vest over a jacket, sits where its <item>_worn twin does, one layer out. A wearable with no worn pieces sits whole on one copy of the part, which side names where the doll has two (the bind.side of that copy's bone), or across both copies with both: true; with anchor, its own anchor of that name, or its origin if it has none, goes to the anchor of that name on the doll's bust, the model at the rig's first doll site, an anchor that lies on the part. covers: on a worn shell, what of the doll a consumer stops drawing while it is worn, so skin under the shell never shows through: the doll part it is drawn on, or regions of that part, each drawn on the doll's copy of the part as the GLB primitives whose extras.piece names it. The torso is cut into trunk and shoulders and the foot into ankle and sole; models/dressing.libsonnet, regions, holds the cut. A consumer hides what every shell it wears declares, on the copy each shell is fitted to. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle's title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body's tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips' frames turn and the site of each model on them. sounds: each sound row, the object and surface it is the sound of, so a consumer picks it by the surface an object lands on, its row as data, which the impact synth renders to the same samples at the same sample rate, and one Ogg Vorbis file per seed, a take of it baked at that rate. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.",
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
     vehicles: vehicleEntries,
@@ -196,7 +258,9 @@ export const manifestJson = (manifest) => `${JSON.stringify(manifest, null, 2)}\
 export function manifestFiles(manifest) {
   return new Set([
     `built/${MANIFEST}`,
-    ...Object.entries(manifest.packs).flatMap(([pack, { files }]) => files.map((file) => `built/${outputPath(pack, file)}`)),
+    ...Object.entries(manifest.packs).flatMap(([pack, { files }]) =>
+      files.map((file) => `built/${outputPath(pack, file)}`),
+    ),
   ]);
 }
 
@@ -208,10 +272,14 @@ export function treeDifferences({ files, manifest, declared }) {
   const named = manifestFiles(manifest);
   const modelled = new Set([...manifest.models, ...manifest.sounds].map((entry) => entry.pack));
   return [
-    ...files.filter((file) => file.split('/').length === 2 && file !== `built/${MANIFEST}`).map((file) => `flat under built/: ${file}`),
+    ...files
+      .filter((file) => file.split('/').length === 2 && file !== `built/${MANIFEST}`)
+      .map((file) => `flat under built/: ${file}`),
     ...files.filter((file) => !named.has(file)).map((file) => `produced, not in the manifest: ${file}`),
     ...[...named].filter((file) => !produced.has(file)).map((file) => `in the manifest, not produced: ${file}`),
     ...undeclaredDirectories(files, declared).map((directory) => `undeclared directory: ${directory}`),
-    ...[...declared].filter((pack) => !modelled.has(pack)).map((pack) => `declared pack without a model or sound: ${pack}`),
+    ...[...declared]
+      .filter((pack) => !modelled.has(pack))
+      .map((pack) => `declared pack without a model or sound: ${pack}`),
   ].sort(byText);
 }

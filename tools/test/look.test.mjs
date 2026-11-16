@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { landingModels } from '../../site/filter.mjs';
-import { LOOK_LANDING_COUNT, idSuggestions, keepSites, lookedIds, viewSet } from '../../site/lookOptions.mjs';
+import { idSuggestions, keepSites, LOOK_LANDING_COUNT, lookedIds, viewSet } from '../../site/lookOptions.mjs';
 import { FORWARD, REVIEW_VIEWS, RIGHT, UNDERSIDE_VIEWS, UP } from '../../site/modelFrame.mjs';
 import { lookDigest, lookIds, lookName, mergeRows, staleIds } from '../look.mjs';
 
@@ -16,7 +16,15 @@ const manifest = {
     { id: 'fixture_notes', pack: 'fixture.vans', path: 'models/fixture_notes.json' },
   ],
   vehicles: [{ id: 'fixture_van', pack: 'fixture.vans', path: 'vehicles/fixture_van.placements.json' }],
-  assemblies: [{ id: 'fixture_door_assembly', sites: [{ site: 'door', model: 'fixture_door', at: [0, 0, 0] }, { site: 'trim', model: 'fixture_body', at: [0.1, 0, 0] }] }],
+  assemblies: [
+    {
+      id: 'fixture_door_assembly',
+      sites: [
+        { site: 'door', model: 'fixture_door', at: [0, 0, 0] },
+        { site: 'trim', model: 'fixture_body', at: [0.1, 0, 0] },
+      ],
+    },
+  ],
 };
 
 function builtTree() {
@@ -25,7 +33,10 @@ function builtTree() {
   mkdirSync(join(built, 'fixture.vans/vehicles'), { recursive: true });
   writeFileSync(join(built, 'fixture.vans/models/fixture_body.glb'), 'body');
   writeFileSync(join(built, 'fixture.vans/models/fixture_door.glb'), 'door');
-  const sites = [{ id: 'body', part: 'fixture_body', at: [0, 0, 0] }, { id: 'door_far', part: 'fixture_door', at: [1, 0, 0], mirror: true }];
+  const sites = [
+    { id: 'body', part: 'fixture_body', at: [0, 0, 0] },
+    { id: 'door_far', part: 'fixture_door', at: [1, 0, 0], mirror: true },
+  ];
   writeFileSync(join(built, 'fixture.vans/vehicles/fixture_van.placements.json'), JSON.stringify({ sites }));
   return built;
 }
@@ -39,10 +50,18 @@ test('a look draws what it is asked, every vehicle or assembly by its flag, and 
 });
 
 test('a review page asked nothing draws the first of the landing models, and asked ids draws only those', () => {
-  const entries = Array.from({ length: LOOK_LANDING_COUNT * 2 }, (_, at) => ({ id: `fixture_${at}`, category: `shelf_${at}` }));
+  const entries = Array.from({ length: LOOK_LANDING_COUNT * 2 }, (_, at) => ({
+    id: `fixture_${at}`,
+    category: `shelf_${at}`,
+  }));
   const landed = lookedIds([], entries, 7);
   assert.equal(landed.length, LOOK_LANDING_COUNT);
-  assert.deepEqual(landed, landingModels(entries, 7).slice(0, LOOK_LANDING_COUNT).map(({ id }) => id));
+  assert.deepEqual(
+    landed,
+    landingModels(entries, 7)
+      .slice(0, LOOK_LANDING_COUNT)
+      .map(({ id }) => id),
+  );
   assert.deepEqual(lookedIds(['fixture_3'], entries, 7), ['fixture_3']);
 });
 
@@ -86,7 +105,15 @@ test('an assembly picture changes digest when one of its parts is rebuilt or mov
 test('a wearable picture changes digest when the doll it is worn on is rebuilt or it moves on the doll', () => {
   const built = builtTree();
   try {
-    const worn = { ...manifest, worn: { fixture_door: [{ model: 'fixture_body', at: [0, 0, 0] }, { model: 'fixture_door', at: [0, 1, 0] }] } };
+    const worn = {
+      ...manifest,
+      worn: {
+        fixture_door: [
+          { model: 'fixture_body', at: [0, 0, 0] },
+          { model: 'fixture_door', at: [0, 1, 0] },
+        ],
+      },
+    };
     const before = lookDigest(built, worn, 'fixture_door');
     assert.notEqual(before, lookDigest(built, manifest, 'fixture_door'));
     const moved = structuredClone(worn);
@@ -111,20 +138,39 @@ test('a printed label steers the picture, so relabelling a model changes its dig
 });
 
 test('a redrawn row replaces its earlier one, the rest of the batch stays and a removed entry leaves', () => {
-  const previous = [{ id: 'a', digest: 'old' }, { id: 'b', digest: 'b' }, { id: 'gone', digest: 'x' }];
-  assert.deepEqual(mergeRows(previous, [{ id: 'a', digest: 'new' }], new Set(['a', 'b'])), [{ id: 'a', digest: 'new' }, { id: 'b', digest: 'b' }]);
+  const previous = [
+    { id: 'a', digest: 'old' },
+    { id: 'b', digest: 'b' },
+    { id: 'gone', digest: 'x' },
+  ];
+  assert.deepEqual(mergeRows(previous, [{ id: 'a', digest: 'new' }], new Set(['a', 'b'])), [
+    { id: 'a', digest: 'new' },
+    { id: 'b', digest: 'b' },
+  ]);
 });
 
 test('a sheet shows one look, so a look with other options drops the rows drawn before it', () => {
   const underside = lookName({ views: 'underside' });
-  const previous = [{ id: 'a', digest: '1' }, { id: 'b', digest: '1', look: underside }];
-  assert.deepEqual(mergeRows(previous, [{ id: 'c', look: underside }], new Set(['a', 'b', 'c']), underside).map(({ id }) => id), ['b', 'c']);
+  const previous = [
+    { id: 'a', digest: '1' },
+    { id: 'b', digest: '1', look: underside },
+  ];
+  assert.deepEqual(
+    mergeRows(previous, [{ id: 'c', look: underside }], new Set(['a', 'b', 'c']), underside).map(({ id }) => id),
+    ['b', 'c'],
+  );
 });
 
 test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {
-  const van = { id: 'fixture_van', sites: [{ site: 'body' }, { site: 'exhaust_front_pipe' }, { site: 'muffler' }, { site: 'door_far' }] };
+  const van = {
+    id: 'fixture_van',
+    sites: [{ site: 'body' }, { site: 'exhaust_front_pipe' }, { site: 'muffler' }, { site: 'door_far' }],
+  };
   const kept = keepSites(van, ['exhaust_', 'muffler']);
-  assert.deepEqual(kept.sites.map(({ site }) => site), ['exhaust_front_pipe', 'muffler']);
+  assert.deepEqual(
+    kept.sites.map(({ site }) => site),
+    ['exhaust_front_pipe', 'muffler'],
+  );
   assert.notEqual(kept.id, van.id);
   assert.equal(keepSites(van), van);
   assert.throws(() => keepSites(van, ['radiator']), /radiator/);
@@ -142,14 +188,23 @@ test('the underside views look up from below at both ends, and the rear from str
 });
 
 test('a render is stale when its model changed or left the tree, never when it failed to draw', () => {
-  const rows = [{ id: 'same', digest: '1' }, { id: 'changed', digest: '1' }, { id: 'gone', digest: '1' }, { id: 'failed', error: 'no' }];
+  const rows = [
+    { id: 'same', digest: '1' },
+    { id: 'changed', digest: '1' },
+    { id: 'gone', digest: '1' },
+    { id: 'failed', error: 'no' },
+  ];
   const now = { same: '1', changed: '2', failed: '1' };
-  assert.deepEqual(staleIds(rows, (id) => now[id]), ['changed', 'gone']);
+  assert.deepEqual(
+    staleIds(rows, (id) => now[id]),
+    ['changed', 'gone'],
+  );
 });
 
 // The review page must draw with the very three.js the showcase draws with, or a review would judge another renderer.
 test('the review page loads the same three.js as the showcase', () => {
-  const importMap = (page) => JSON.parse(/<script type="importmap">([\s\S]*?)<\/script>/.exec(readFileSync(join(repo, 'site', page), 'utf8'))[1]);
+  const importMap = (page) =>
+    JSON.parse(/<script type="importmap">([\s\S]*?)<\/script>/.exec(readFileSync(join(repo, 'site', page), 'utf8'))[1]);
   assert.deepEqual(importMap('look.html'), importMap('index.html'));
 });
 
@@ -159,7 +214,13 @@ test('the review page draws the front from +z, the rear from behind and the side
   const dot = (a, b) => a.reduce((sum, x, i) => sum + x * b[i], 0);
   const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const view = Object.fromEntries(REVIEW_VIEWS);
-  assert.deepEqual([FORWARD, UP], [[0, 0, 1], [0, 1, 0]]);
+  assert.deepEqual(
+    [FORWARD, UP],
+    [
+      [0, 0, 1],
+      [0, 1, 0],
+    ],
+  );
   assert.deepEqual(cross(FORWARD, UP), RIGHT);
   assert.ok(dot(view['front ¾'], FORWARD) > 0);
   assert.ok(dot(view['rear ¾'], FORWARD) < 0);

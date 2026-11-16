@@ -22,7 +22,13 @@ type Realized = ReturnType<typeof realizedFor>;
 const stanceFor = (seed: number) => critterStance(generate(critterTemplate, seed).params);
 
 const lowestSurface = (realized: Realized, pose: Pose): number =>
-  Math.min(...posedVoxelSurfaceBoundsForBones(realized, pose, realized.body.bones.map((bone) => bone.id)).values());
+  Math.min(
+    ...posedVoxelSurfaceBoundsForBones(
+      realized,
+      pose,
+      realized.body.bones.map((bone) => bone.id),
+    ).values(),
+  );
 
 /** Every bone's head where a pose puts it in the world. */
 const bonePoints = (realized: Realized, pose: Pose): number[] => {
@@ -79,7 +85,9 @@ describe('critter', () => {
     bonePoints(realized, rest).forEach((value, k) => expect(start[k]).toBeCloseTo(value, 9));
     const dead = critterDeathPose(realized, rest, CRITTER_DEATH_SECONDS, side);
     const other = side === 'L' ? 'R' : 'L';
-    expect(sideHeight(realized, dead, other)).toBeGreaterThan(sideHeight(realized, dead, side) + 0.3 * generate(critterTemplate, 7).params.height!);
+    expect(sideHeight(realized, dead, other)).toBeGreaterThan(
+      sideHeight(realized, dead, side) + 0.3 * generate(critterTemplate, 7).params.height!,
+    );
     expect(Math.abs(lowestSurface(realized, dead))).toBeLessThanOrEqual(realized.voxels.size);
   });
 });

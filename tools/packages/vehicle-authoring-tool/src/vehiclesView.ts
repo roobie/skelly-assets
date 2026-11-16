@@ -35,7 +35,8 @@ export async function mountVehicles(section: HTMLElement): Promise<void> {
     if (!response.ok) throw new Error(await response.text());
     verdicts = (await response.json()) as VehicleVerdicts;
   } catch {
-    status.textContent = 'Vehicle verdicts come from the local dev server (npm run dev in this package); a published tool has none.';
+    status.textContent =
+      'Vehicle verdicts come from the local dev server (npm run dev in this package); a published tool has none.';
     return;
   }
   status.textContent = '';

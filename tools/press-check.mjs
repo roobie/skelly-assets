@@ -11,12 +11,13 @@ import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { lookAt, poseJson, posedAt, r4, standing } from './keyFrames.mjs';
+import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
 
-export const readPressCheck = (root = repo) => JSON.parse(evaluateJsonnet(`import '${POSES}/press-check.libsonnet'`, root));
+export const readPressCheck = (root = repo) =>
+  JSON.parse(evaluateJsonnet(`import '${POSES}/press-check.libsonnet'`, root));
 
 /** How far each moving part of a GLB slides at the far end of its linear motion, in metres in the model's frame. */
 export function partStrokes(glb) {
@@ -27,7 +28,11 @@ export function partStrokes(glb) {
     const node = gltf.nodes[index];
     const own = node.rotation ? mulMM(turn, quatToMat3(node.rotation)) : turn;
     const motion = node.extras?.motion;
-    if (motion?.kind === 'linear') strokes[node.name.split(':')[0]] = mulMV(own, sub(motion.rearmost, motion.rest).map((x) => x * unit));
+    if (motion?.kind === 'linear')
+      strokes[node.name.split(':')[0]] = mulMV(
+        own,
+        sub(motion.rearmost, motion.rest).map((x) => x * unit),
+      );
     for (const child of node.children ?? []) walk(child, own);
   };
   for (const index of gltf.scenes[gltf.scene ?? 0].nodes) walk(index, [1, 0, 0, 0, 1, 0, 0, 0, 1]);
@@ -45,7 +50,8 @@ export function pressCheckClip(check) {
   for (const [k, name] of names.entries()) {
     const { into, hold = 0 } = check.frames[name];
     if (k > 0 && !(into > 0)) throw new Error(`press check ${name}: into must be seconds above 0`);
-    if (k === 0 && into !== undefined) throw new Error(`press check ${name}: the first frame has nothing to move in from`);
+    if (k === 0 && into !== undefined)
+      throw new Error(`press check ${name}: the first frame has nothing to move in from`);
     if (!(hold >= 0)) throw new Error(`press check ${name}: hold must be seconds, 0 or more`);
     at += into ?? 0;
     keys.push({ fixture: name, at });
@@ -80,11 +86,19 @@ export function pressCheckPoses(rig, check, strokes) {
     };
     const { socket, grip, slant, beneath, pole, pinch, close } = left.hold;
     const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
-    const drawn = (p) => add(p, strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)));
+    const drawn = (p) =>
+      add(
+        p,
+        strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)),
+      );
     file.hold['hand.L'] = {
       ...held,
       pole,
-      socket: { at: r4(drawn(mulMV(unroll, socket.at))), into: r4(mulMV(unroll, socket.into)), axis: r4(mulMV(unroll, socket.axis)) },
+      socket: {
+        at: r4(drawn(mulMV(unroll, socket.at))),
+        into: r4(mulMV(unroll, socket.into)),
+        axis: r4(mulMV(unroll, socket.axis)),
+      },
       ...(grip !== undefined ? { grip } : {}),
       ...(slant !== undefined ? { slant } : {}),
       ...(pinch ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(drawn(p))])) } : {}),
@@ -105,6 +119,7 @@ if (import.meta.main) {
   const check = readPressCheck(repo);
   const rifle = manifest.models.find((model) => model.id === check.rifle && model.path.endsWith('.glb'));
   const poses = pressCheckPoses(rig, check, partStrokes(readFileSync(join(built, rifle.pack, rifle.path))));
-  for (const [name, file] of Object.entries(poses)) writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
+  for (const [name, file] of Object.entries(poses))
+    writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} press-check poses -> ${POSES}`);
 }

@@ -1,6 +1,14 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { applyDir, applyPoint, eulerXyzDegrees, length, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  applyDir,
+  applyPoint,
+  eulerXyzDegrees,
+  length,
+  normalize,
+  sub,
+  type Vec3,
+} from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ModelParts, NeutralModel } from '@skelly/thing-core/schema';
 import { type DrawnGeometry, drawnGeometry } from '@skelly/thing-export/drawn.ts';
@@ -13,6 +21,7 @@ import type {
 } from '@skelly/thing-export/exportTypes.ts';
 import { partNodeName, partVoxelGrain } from '@skelly/thing-export/glb.ts';
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
@@ -42,7 +51,6 @@ import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
-import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
@@ -748,8 +756,10 @@ const drawnAnchors = (
     : {};
 
 /** The sight an export describes: the lowest priority, then the first id. */
-export const compareSightCandidates = (a: { priority: number; id: string }, b: { priority: number; id: string }): number =>
-  a.priority - b.priority || compareCodeUnits(a.id, b.id);
+export const compareSightCandidates = (
+  a: { priority: number; id: string },
+  b: { priority: number; id: string },
+): number => a.priority - b.priority || compareCodeUnits(a.id, b.id);
 
 const sightMetadata = (resolved: Resolved, voxel?: VoxelFile): GunModelFields['sight'] => {
   const candidates = [...resolved.defs.entries()].flatMap(([id, part]) => {

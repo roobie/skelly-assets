@@ -42,21 +42,41 @@ const size = Number(values.size);
 const UI_VIEWPORT = { width: 1400, height: 900 };
 
 // A fixture by name, or a pose file read here so the page need not reach outside the site.
-const poses = positionals.map((given) => (given.endsWith('.json')
-  ? { name: basename(given, '.json'), pose: JSON.parse(readFileSync(resolve(given), 'utf8')) }
-  : { name: given, pose: given }));
+const poses = positionals.map((given) =>
+  given.endsWith('.json')
+    ? { name: basename(given, '.json'), pose: JSON.parse(readFileSync(resolve(given), 'utf8')) }
+    : { name: given, pose: given },
+);
 const fileName = (prefix, name) => `${prefix}${name}${wear.length > 0 ? `-${wear.join('+')}` : ''}.png`;
 const writePng = (path, dataUrl) => writeFileSync(path, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
 
 const list = (angles) => angles.map((a) => a.toFixed(1)).join('/');
-const countBy = (items, key) => Object.entries(Object.groupBy(items, (item) => item[key])).map(([id, some]) => `${id} ${some.length}`).join(', ');
-const describe = ({ report, clearance, skin }) => [
-  report.clamped.length === 0 ? 'no limits held' : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
-  ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
-  ...Object.entries(report.grips ?? {}).map(([id, grip]) => `${id} grip: ${Object.entries(grip).map(([digit, { touched, residual }]) => `${digit} ${residual !== undefined ? `pinches ${(residual * 1000).toFixed(1)} mm off` : touched ? 'touches' : 'closed free'}`).join(', ')}`),
-  ...(clearance ? [`clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.flush.length} flush (${countBy(clearance.flush, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')}) ${clearance.seams.length} seams`] : []),
-  ...(skin ? [`skin showing ${skin.views.map(({ name, showing }) => `${name} ${showing} px`).join(', ')}`] : []),
-].join('; ');
+const countBy = (items, key) =>
+  Object.entries(Object.groupBy(items, (item) => item[key]))
+    .map(([id, some]) => `${id} ${some.length}`)
+    .join(', ');
+const describe = ({ report, clearance, skin }) =>
+  [
+    report.clamped.length === 0
+      ? 'no limits held'
+      : `held ${report.clamped.map(({ bone, asked, held }) => `${bone} ${list(asked)}->${list(held)}`).join(', ')}`,
+    ...Object.entries(report.residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(3)} mm`),
+    ...Object.entries(report.grips ?? {}).map(
+      ([id, grip]) =>
+        `${id} grip: ${Object.entries(grip)
+          .map(
+            ([digit, { touched, residual }]) =>
+              `${digit} ${residual !== undefined ? `pinches ${(residual * 1000).toFixed(1)} mm off` : touched ? 'touches' : 'closed free'}`,
+          )
+          .join(', ')}`,
+    ),
+    ...(clearance
+      ? [
+          `clearance ${clearance.pokes.length} pokes (${countBy(clearance.pokes, 'bone')}) ${clearance.flush.length} flush (${countBy(clearance.flush, 'bone')}) ${clearance.sinks.length} sinks (${countBy(clearance.sinks, 'piece')}) ${clearance.seams.length} seams`,
+        ]
+      : []),
+    ...(skin ? [`skin showing ${skin.views.map(({ name, showing }) => `${name} ${showing} px`).join(', ')}`] : []),
+  ].join('; ');
 
 const site = join(out, 'site');
 buildSite(built, site);
@@ -68,7 +88,15 @@ try {
   const { page } = await openPage(browser, server.origin, 'pose.html', 'posed');
   for (const { name, pose } of poses) {
     try {
-      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), { wear, pose, size, views: values.views, probe: values.probe, skin: values.skin, focus: values.focus });
+      const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), {
+        wear,
+        pose,
+        size,
+        views: values.views,
+        probe: values.probe,
+        skin: values.skin,
+        focus: values.focus,
+      });
       writePng(join(out, fileName('', name)), png);
       if (facts.skin) writePng(join(out, fileName('skin-', name)), facts.skin.png);
       console.log(`${name}: ${describe(facts)}`);
@@ -82,7 +110,9 @@ try {
       const query = new URLSearchParams({ wear: wear.join(',') });
       if (typeof pose === 'string') query.set('pose', pose);
       try {
-        const { page: ui } = await openPage(browser, server.origin, `pose.html?${query}`, 'showPose', { viewport: UI_VIEWPORT });
+        const { page: ui } = await openPage(browser, server.origin, `pose.html?${query}`, 'showPose', {
+          viewport: UI_VIEWPORT,
+        });
         await ui.evaluate((asked) => window.showPose(asked), pose);
         await ui.screenshot({ path: join(out, fileName('ui-', name)) });
         await ui.close();

@@ -5,9 +5,9 @@
 // docs/decisions/0001-vehicle-placements.md and docs/decisions/0003-vehicle-paint.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { compileJsonnetFile, evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath } from './layout.mjs';
+import { FORWARDS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import { loadOutProblems } from './stowage.mjs';
 import { modelProblems } from './taxonomy.mjs';
 import { titleProblems } from './titles.mjs';
@@ -17,7 +17,17 @@ const repo = resolve(import.meta.dirname, '..');
 // own rows.
 export const PLACEMENTS_SOURCE = 'models/vehicles/placements.libsonnet';
 export const VEHICLE_ROWS_SOURCE = 'models/vehicles/index.libsonnet';
-const VEHICLE_KEYS = new Set(['forward', 'overlaps', 'parent', 'sites', 'swingContacts', 'swingUnjudged', 'tags', 'title', 'unjudged']);
+const VEHICLE_KEYS = new Set([
+  'forward',
+  'overlaps',
+  'parent',
+  'sites',
+  'swingContacts',
+  'swingUnjudged',
+  'tags',
+  'title',
+  'unjudged',
+]);
 const SITE_KEYS = new Set(['id', 'part', 'at', 'mirror', 'finish', 'rides', 'stowed', 'behind']);
 
 export const placementsPath = (vehicle) => `vehicles/${vehicle}.placements.json`;
@@ -28,7 +38,12 @@ export const readPlacements = (root = repo) => JSON.parse(compileJsonnetFile(PLA
 // vehicle -> the ids of the rows its own file authors, from the vehicles' row index. Only the ids are evaluated:
 // manifesting the whole rows costs minutes and sits on the full build's path.
 export const readVehicleRows = (root = repo) =>
-  JSON.parse(evaluateJsonnet(`std.mapWithKey(function(vehicle, rows) [row.id for row in rows], import '${VEHICLE_ROWS_SOURCE}')`, root));
+  JSON.parse(
+    evaluateJsonnet(
+      `std.mapWithKey(function(vehicle, rows) [row.id for row in rows], import '${VEHICLE_ROWS_SOURCE}')`,
+      root,
+    ),
+  );
 
 const isPoint = (at) => Array.isArray(at) && at.length === 3 && at.every(Number.isFinite);
 const packsByModel = (models) => Map.groupBy(models, ({ id }) => id);
@@ -37,7 +52,9 @@ const packsByModel = (models) => Map.groupBy(models, ({ id }) => id);
 // decides where it ships. A variant is built by its parent's file, so it ships in its parent's pack.
 function vehiclePack(vehicle, placements, vehicleRows, byModel) {
   const owner = placements[vehicle]?.parent ?? vehicle;
-  const packs = [...new Set((vehicleRows[owner] ?? []).flatMap((id) => (byModel.get(id) ?? []).map(({ pack }) => pack)))].sort();
+  const packs = [
+    ...new Set((vehicleRows[owner] ?? []).flatMap((id) => (byModel.get(id) ?? []).map(({ pack }) => pack))),
+  ].sort();
   if (packs.length === 1) return { pack: packs[0] };
   if (packs.length === 0) return { problem: `${vehicle}: no row of ${owner}'s file is built, so it has no pack` };
   return { problem: `${vehicle}: ${owner}'s rows are built in ${packs.length} packs, ${packs.join(' ')}` };
@@ -60,7 +77,8 @@ function ridesProblems(vehicle, sites) {
   return sites.flatMap((site) => {
     if (site?.rides === undefined) return [];
     const where = `${vehicle}/${site.id}`;
-    if (site.rides === site.id || !carrierOf.has(site.rides)) return [`${where}: rides names another site of the vehicle, not ${site.rides}`];
+    if (site.rides === site.id || !carrierOf.has(site.rides))
+      return [`${where}: rides names another site of the vehicle, not ${site.rides}`];
     const chain = [site.id];
     for (let carrier = site.rides; carrier !== undefined; carrier = carrierOf.get(carrier)) {
       const at = chain.indexOf(carrier);
@@ -78,7 +96,8 @@ function modelPackProblems(where, id, pack, reachable, byModel) {
   const packs = (byModel.get(id) ?? []).map((model) => model.pack);
   if (packs.length === 0) return [`${where}: ${id} is not a built model`];
   if (packs.length > 1) return [`${where}: ${id} is built in ${packs.length} packs, ${packs.join(' ')}`];
-  if (pack !== undefined && !reachable.has(packs[0])) return [`${where}: ${id} is in ${packs[0]}, which ${pack} does not declare a dependency on`];
+  if (pack !== undefined && !reachable.has(packs[0]))
+    return [`${where}: ${id} is in ${packs[0]}, which ${pack} does not declare a dependency on`];
   return [];
 }
 
@@ -97,12 +116,15 @@ function siteProblems(vehicle, sites, pack, dependsOn, byModel, finishes, stowag
     if (!isPoint(site?.at)) problems.push(`${where}: at is not three finite numbers`);
     if (site?.mirror !== undefined && site.mirror !== true) problems.push(`${where}: mirror is true or absent`);
     if (site?.behind !== undefined) {
-      if (site.behind === site.id || !partOf.has(site.behind)) problems.push(`${where}: behind names another site of the vehicle, not ${site.behind}`);
-      else if (!stowage.moving.has(partOf.get(site.behind))) problems.push(`${where}: behind names ${site.behind}, whose part has no motion to open it`);
+      if (site.behind === site.id || !partOf.has(site.behind))
+        problems.push(`${where}: behind names another site of the vehicle, not ${site.behind}`);
+      else if (!stowage.moving.has(partOf.get(site.behind)))
+        problems.push(`${where}: behind names ${site.behind}, whose part has no motion to open it`);
     }
     const placed = byModel.get(site?.part) ?? [];
     if (site?.finish !== undefined) {
-      if (!Object.hasOwn(finishes, site.finish)) problems.push(`${where}: finish ${site.finish} is not in the finish library`);
+      if (!Object.hasOwn(finishes, site.finish))
+        problems.push(`${where}: finish ${site.finish} is not in the finish library`);
       if (placed.length > 0 && !placed.some(({ paintable }) => paintable?.length > 0)) {
         problems.push(`${where}: ${site.part} has no paintable slot for finish ${site.finish}`);
       }
@@ -128,9 +150,13 @@ function listedOverlapProblems(vehicle, listKey, textKey, listed, sites) {
     const unknown = Object.keys(entry ?? {}).filter((field) => !['sites', 'depth', textKey].includes(field));
     return [
       ...(unknown.length > 0 ? [`${where}: unknown keys ${unknown.join(' ')} in ${listKey}`] : []),
-      ...(entry?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b ? [] : [`${where}: ${listKey} names two different sites of the vehicle`]),
+      ...(entry?.sites?.length === 2 && ids.has(a) && ids.has(b) && a !== b
+        ? []
+        : [`${where}: ${listKey} names two different sites of the vehicle`]),
       ...(entry?.depth > 0 ? [] : [`${where}: ${listKey} needs a depth above 0`]),
-      ...(typeof entry?.[textKey] === 'string' && entry[textKey] !== '' ? [] : [`${where}: ${listKey} needs a ${textKey}`]),
+      ...(typeof entry?.[textKey] === 'string' && entry[textKey] !== ''
+        ? []
+        : [`${where}: ${listKey} needs a ${textKey}`]),
     ];
   });
 }
@@ -148,7 +174,9 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
   for (const [vehicle, entry] of Object.entries(placements)) {
     const unknown = Object.keys(entry ?? {}).filter((key) => !VEHICLE_KEYS.has(key));
     if (unknown.length > 0) problems.push(`${vehicle}: unknown keys ${unknown.join(' ')}`);
-    problems.push(...titleProblems({ pack: 'vehicles', id: vehicle, title: entry?.title }).map(({ message }) => message));
+    problems.push(
+      ...titleProblems({ pack: 'vehicles', id: vehicle, title: entry?.title }).map(({ message }) => message),
+    );
     if (!FORWARDS.includes(entry?.forward)) problems.push(`${vehicle}: forward is not one of ${FORWARDS.join(' ')}`);
     if (entry?.parent !== undefined) {
       const parentProblem = parentProblems(vehicle, entry.parent, placements, vehicleRows);
@@ -158,14 +186,36 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
     const { pack, problem } = vehiclePack(vehicle, placements, vehicleRows, byModel);
     if (problem) problems.push(problem);
     if (entry?.tags !== undefined) {
-      problems.push(...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(({ message }) => message));
+      problems.push(
+        ...modelProblems({ pack: pack ?? '?', id: vehicle, taxonomy: { tags: entry.tags } }, vocabulary).map(
+          ({ message }) => message,
+        ),
+      );
     }
     if (!Array.isArray(entry?.sites) || entry.sites.length === 0) problems.push(`${vehicle}: no sites`);
-    else problems.push(...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes, stowage), ...ridesProblems(vehicle, entry.sites));
-    if (entry?.overlaps !== undefined) problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
-    if (entry?.unjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
-    if (entry?.swingContacts !== undefined) problems.push(...listedOverlapProblems(vehicle, 'swingContacts', 'why', entry.swingContacts, [...(entry?.sites ?? []), { id: 'ground' }]));
-    if (entry?.swingUnjudged !== undefined) problems.push(...listedOverlapProblems(vehicle, 'swingUnjudged', 'note', entry.swingUnjudged, [...(entry?.sites ?? []), { id: 'ground' }]));
+    else
+      problems.push(
+        ...siteProblems(vehicle, entry.sites, pack, dependsOn, byModel, finishes, stowage),
+        ...ridesProblems(vehicle, entry.sites),
+      );
+    if (entry?.overlaps !== undefined)
+      problems.push(...listedOverlapProblems(vehicle, 'overlaps', 'why', entry.overlaps, entry?.sites));
+    if (entry?.unjudged !== undefined)
+      problems.push(...listedOverlapProblems(vehicle, 'unjudged', 'note', entry.unjudged, entry?.sites));
+    if (entry?.swingContacts !== undefined)
+      problems.push(
+        ...listedOverlapProblems(vehicle, 'swingContacts', 'why', entry.swingContacts, [
+          ...(entry?.sites ?? []),
+          { id: 'ground' },
+        ]),
+      );
+    if (entry?.swingUnjudged !== undefined)
+      problems.push(
+        ...listedOverlapProblems(vehicle, 'swingUnjudged', 'note', entry.swingUnjudged, [
+          ...(entry?.sites ?? []),
+          { id: 'ground' },
+        ]),
+      );
   }
   return problems.sort();
 }
@@ -175,7 +225,8 @@ export function placementProblems({ placements, models, vehicleRows, dependsOn, 
 function vehicleTags(body, ...extras) {
   const tags = { ...body };
   for (const extra of extras) {
-    for (const [facet, terms] of Object.entries(extra ?? {})) tags[facet] = [...new Set([...(tags[facet] ?? []), ...terms])];
+    for (const [facet, terms] of Object.entries(extra ?? {}))
+      tags[facet] = [...new Set([...(tags[facet] ?? []), ...terms])];
   }
   return tags;
 }
@@ -185,23 +236,35 @@ function vehicleTags(body, ...extras) {
 // swingReport): the part of its way to its stop it opens before it touches anything, as a fraction of its motion's
 // clock, and what it touches there.
 // Returns the vehicles written, { id, title, pack, path, tags }, and every file as <pack>/<logical path>.
-export function exportPlacements({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage, swings = {}, out }) {
+export function exportPlacements({
+  placements,
+  models,
+  vehicleRows,
+  dependsOn,
+  vocabulary,
+  finishes,
+  stowage,
+  swings = {},
+  out,
+}) {
   const problems = placementProblems({ placements, models, vehicleRows, dependsOn, vocabulary, finishes, stowage });
   if (problems.length > 0) throw new Error(`vehicle placements:\n  ${problems.join('\n  ')}`);
   const byModel = packsByModel(models);
-  const vehicles = Object.entries(placements).sort(([a], [b]) => (a < b ? -1 : 1)).map(([vehicle, { forward, parent, sites: laid, tags, title }]) => {
-    const sites = laid.map((site) => ({
-      ...site,
-      at: toModelFrame(forward, site.at),
-      ...(swings[vehicle]?.[site.id] ? { swing: swings[vehicle][site.id] } : {}),
-    }));
-    const { pack } = vehiclePack(vehicle, placements, vehicleRows, byModel);
-    const path = placementsPath(vehicle);
-    const file = join(out, outputPath(pack, path));
-    mkdirSync(dirname(file), { recursive: true });
-    writeFileSync(file, `${JSON.stringify({ sites }, null, 2)}\n`);
-    const [body] = byModel.get(sites[0].part);
-    return { id: vehicle, title, pack, path, tags: vehicleTags(body.taxonomy?.tags, placements[parent]?.tags, tags) };
-  });
+  const vehicles = Object.entries(placements)
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([vehicle, { forward, parent, sites: laid, tags, title }]) => {
+      const sites = laid.map((site) => ({
+        ...site,
+        at: toModelFrame(forward, site.at),
+        ...(swings[vehicle]?.[site.id] ? { swing: swings[vehicle][site.id] } : {}),
+      }));
+      const { pack } = vehiclePack(vehicle, placements, vehicleRows, byModel);
+      const path = placementsPath(vehicle);
+      const file = join(out, outputPath(pack, path));
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(file, `${JSON.stringify({ sites }, null, 2)}\n`);
+      const [body] = byModel.get(sites[0].part);
+      return { id: vehicle, title, pack, path, tags: vehicleTags(body.taxonomy?.tags, placements[parent]?.tags, tags) };
+    });
   return { vehicles, files: vehicles.map(({ pack, path }) => outputPath(pack, path)) };
 }

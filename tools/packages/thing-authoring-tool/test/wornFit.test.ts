@@ -10,7 +10,10 @@ const direction = new Vector3(1, 0.31, 0.17).normalize();
 const inset = 0.001;
 
 const shell = async (id: string) => {
-  const row = loadThingRecipe(recipes.filter((entry) => entry.id === id), catalogue)[0];
+  const row = loadThingRecipe(
+    recipes.filter((entry) => entry.id === id),
+    catalogue,
+  )[0];
   expect(row).toBeDefined();
   const { glb } = row!.generate();
   const { scene } = await new GLTFLoader().parseAsync(Uint8Array.from(glb).buffer, '');
@@ -20,7 +23,8 @@ const shell = async (id: string) => {
     if (!(node instanceof Mesh)) return;
     const position = node.geometry.getAttribute('position');
     const index = node.geometry.getIndex()!;
-    const vertex = (i: number) => new Vector3().fromBufferAttribute(position, index.getX(i)).applyMatrix4(node.matrixWorld);
+    const vertex = (i: number) =>
+      new Vector3().fromBufferAttribute(position, index.getX(i)).applyMatrix4(node.matrixWorld);
     for (let i = 0; i < index.count; i += 3) triangles.push([vertex(i), vertex(i + 1), vertex(i + 2)]);
   });
   expect(triangles.length).toBeGreaterThan(0);

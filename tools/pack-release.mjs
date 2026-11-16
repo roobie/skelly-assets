@@ -17,17 +17,29 @@ export const RENAMES_ASSET = 'renames.json';
 export const FINISHES_ASSET = 'finishes.json';
 
 // Fixes every per-entry field the filesystem would otherwise leak into the archive.
-const TAR_NORMALIZE = ['--sort=name', '--format=gnu', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '--mode=u=rwX,go=rX'];
+const TAR_NORMALIZE = [
+  '--sort=name',
+  '--format=gnu',
+  '--mtime=@0',
+  '--owner=0',
+  '--group=0',
+  '--numeric-owner',
+  '--mode=u=rwX,go=rX',
+];
 
 export function packRelease(tree, out) {
   const entries = readdirSync(tree, { withFileTypes: true });
   const strays = entries.filter((entry) => !entry.isDirectory() && entry.name !== MANIFEST).map((entry) => entry.name);
-  if (strays.length) throw new Error(`only pack directories and ${MANIFEST} belong in a release, found: ${strays.join(' ')}`);
+  if (strays.length)
+    throw new Error(`only pack directories and ${MANIFEST} belong in a release, found: ${strays.join(' ')}`);
   const { renames, finishes } = JSON.parse(readFileSync(join(tree, MANIFEST), 'utf8'));
   if (renames === undefined) throw new Error(`${MANIFEST} has no renames to release as ${RENAMES_ASSET}`);
   if (finishes === undefined) throw new Error(`${MANIFEST} has no finishes to release as ${FINISHES_ASSET}`);
   mkdirSync(out, { recursive: true });
-  const packs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const packs = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
   for (const pack of packs) {
     const tar = execFileSync('tar', ['-C', tree, ...TAR_NORMALIZE, '-cf', '-', pack], { maxBuffer: 2 ** 31 - 1 });
     // Node's gzip header carries no name and a zero time, as `gzip -n` writes.

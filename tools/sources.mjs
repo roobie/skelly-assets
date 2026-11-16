@@ -2,7 +2,17 @@
 // Await installJsonnetSources before importing package code, or run this module directly to refresh the twins (with
 // --digest, to print the digest of their inputs instead).
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
@@ -16,7 +26,8 @@ const repositoryRoot = resolve(here, '..');
 let sourcesInstalled = false;
 
 export const jsonnetFiles = (directory) => {
-  if (directory === undefined) return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(join(repositoryRoot, 'models'))];
+  if (directory === undefined)
+    return [...jsonnetFiles(join(here, 'packages')), ...jsonnetFiles(join(repositoryRoot, 'models'))];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
@@ -41,12 +52,15 @@ const TEXT_BLOCK_IMPORT = /\bimport(?:str|bin)?\s*\|\|\|/;
 const importScanner = (searchPaths) => {
   const direct = new Map();
   const resolveImport = (importer, path) =>
-    (isAbsolute(path) ? [path] : [join(dirname(importer), path), ...searchPaths.map((folder) => join(folder, path))])
-      .find((candidate) => existsSync(candidate));
+    (isAbsolute(path)
+      ? [path]
+      : [join(dirname(importer), path), ...searchPaths.map((folder) => join(folder, path))]
+    ).find((candidate) => existsSync(candidate));
   const importsOf = (file) => {
     if (!direct.has(file)) {
       const text = /\.(jsonnet|libsonnet)$/.test(file) ? readFileSync(file, 'utf8') : '';
-      if (TEXT_BLOCK_IMPORT.test(text)) throw new Error(`${file}: an import of a text block cannot be traced; import a string literal`);
+      if (TEXT_BLOCK_IMPORT.test(text))
+        throw new Error(`${file}: an import of a text block cannot be traced; import a string literal`);
       const found = [...text.matchAll(IMPORT)].map((match) => resolveImport(file, match[2])).filter(Boolean);
       direct.set(file, [...new Set(found.map((path) => resolve(path)))]);
     }
@@ -135,10 +149,13 @@ const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
 const compileFragments = (rows, { root, store }) =>
-  forEachConcurrently(rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))), async ({ path, key }) => {
-    const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
-    replaceFile(storeEntry(store, 'rows', key), fragment);
-  });
+  forEachConcurrently(
+    rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))),
+    async ({ path, key }) => {
+      const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
+      replaceFile(storeEntry(store, 'rows', key), fragment);
+    },
+  );
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
 // fragments and the twins' compile skips evaluating every row file again.
@@ -173,12 +190,25 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
     mkdirSync(options.store, { recursive: true });
     await compileFragments(needed, options);
     const compiled = withOverlay(needed, options, (overlay) =>
-      compileJsonnetFiles(unstored.map(({ path }) => path), compileRoot(root), { overlay }));
+      compileJsonnetFiles(
+        unstored.map(({ path }) => path),
+        compileRoot(root),
+        { overlay },
+      ),
+    );
     for (const [at, { key }] of unstored.entries()) replaceFile(storeEntry(options.store, 'twins', key), compiled[at]);
   }
   for (const { path, key } of stale) replaceFile(twinOf(path), readFileSync(storeEntry(options.store, 'twins', key)));
-  pruneStore(options.store, 'rows', rows.map(({ key }) => key));
-  pruneStore(options.store, 'twins', twins.map(({ key }) => key));
+  pruneStore(
+    options.store,
+    'rows',
+    rows.map(({ key }) => key),
+  );
+  pruneStore(
+    options.store,
+    'twins',
+    twins.map(({ key }) => key),
+  );
   replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
 }
 
@@ -186,7 +216,10 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
 // jsonnet/runtime.json, an input.
 export const compilerCode = () => [
   fileURLToPath(import.meta.url),
-  ...readdirSync(join(here, 'jsonnet')).filter((name) => /\.(mjs|libsonnet)$/.test(name)).sort().map((name) => join(here, 'jsonnet', name)),
+  ...readdirSync(join(here, 'jsonnet'))
+    .filter((name) => /\.(mjs|libsonnet)$/.test(name))
+    .sort()
+    .map((name) => join(here, 'jsonnet', name)),
 ];
 
 const installOptions = () => ({
