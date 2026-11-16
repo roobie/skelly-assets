@@ -7,6 +7,12 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.12.0 - 2026-11-16
+
+### Added
+
+- `tools/actorCompose.mjs` composes an actor's head yaw, `applyHeadYaw`, and its walk's cross-fade into the idle at low speed, `walkToIdle`, as a game plays them.
+
 ## 0.11.0 - 2026-11-16
 
 ### Added
