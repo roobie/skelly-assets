@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
+import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
 import { danglingPartItems } from './partItems.mjs';
 import { readDependencies } from './packs.mjs';
@@ -173,6 +174,12 @@ export function withSources(models, sources) {
   return models.map((model) => ({ ...model, title: byModel.get(key(model)).title, taxonomy: byModel.get(key(model)).taxonomy }));
 }
 
+// Each model with the doll part it sits on, if it is worn (tools/dress.mjs, `wornOnParts`), read from its taxonomy.
+export function withWornOn(models, dressing, dollParts) {
+  const wornOn = wornOnParts(models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })), dressing, dollParts);
+  return models.map((model) => (wornOn.has(model.id) ? { ...model, wornOn: wornOn.get(model.id) } : model));
+}
+
 // The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems). Loaded
 // only after installJsonnetSources: the library reads the compiled finishes, which a module graph imported earlier would
 // have read before they were regenerated.
@@ -295,7 +302,8 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
-      const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
+      const dressing = readDressing(repo);
+      const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({

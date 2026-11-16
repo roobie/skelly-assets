@@ -35,6 +35,6 @@ local bag(slot) = { category: 'containers', tags: { slot: slot, material: ['fabr
     brimDepth: 0.09, brimWidth: 0.19, brimThickness: 0.01, brimHeight: 0.014,
   }, { body: 'cloth-blue', trim: 'cloth-charcoal' }) + { title: 'Baseball cap' } + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'clothing', tags: { slot: ['head'], fit: ['worn'], setting: ['modern'] } },
+    taxonomy: { category: 'clothing', tags: { slot: ['head'], setting: ['modern'] } },
   },
 ]

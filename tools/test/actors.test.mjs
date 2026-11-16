@@ -800,7 +800,8 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
   const { insectIdlePose, insectAttackPose, insectGaitPose, insectStrideLength, INSECT_LUNGE } = await import('../packages/mobgen/src/mob/insect.ts');
   const { floaterIdlePose, floaterCastPose, floaterDriftPose, FLOATER_CAST } = await import('../packages/mobgen/src/mob/floater.ts');
   const { dragonIdlePose, dragonAttackPose, dragonStompPose, DRAGON_LUNGE } = await import('../packages/mobgen/src/mob/dragon.ts');
-  await Promise.all(['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts'].map((file) => import(`../packages/mobgen/src/mob/${file}`)));
+  const critter = await import('../packages/mobgen/src/mob/critter.ts');
+  await Promise.all(['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts', 'critterTemplate.ts'].map((file) => import(`../packages/mobgen/src/mob/${file}`)));
   const close = (actual, expected) => {
     actual.root.forEach((value, axis) => assert(Math.abs(value - expected.root[axis]) < 1e-12));
     for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) (actual.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]).forEach((value, axis) => assert(Math.abs(value - (expected.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1])[axis]) < 1e-12));
@@ -810,6 +811,14 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
     insect: (figure, row) => { const s = { mandibleOpen: figure.genome.params.mandibleOpen }; const stride = insectStrideLength(figure.realized); return { idle: () => insectIdlePose(figure.realized, 0.9), walk: (u) => insectGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => insectAttackPose(figure.realized, insectIdlePose(figure.realized, 0), t), duration: INSECT_LUNGE.duration }; },
     floater: (figure) => ({ idle: () => floaterIdlePose(figure.realized, figure.genome.params), walk: (u) => floaterDriftPose(figure.realized, figure.genome.params, u), attack: (t) => floaterCastPose(figure.realized, figure.genome.params, t), duration: FLOATER_CAST.duration }),
     dragon: (figure) => ({ idle: () => dragonIdlePose(figure.realized, figure.genome.params), walk: (u) => dragonStompPose(figure.realized, figure.genome.params, u), attack: (t) => dragonAttackPose(figure.realized, figure.genome.params, t), duration: DRAGON_LUNGE.duration }),
+    critter: (figure, row) => {
+      const s = critter.critterStance(figure.genome.params), rest = critter.critterIdlePose(figure.realized, s), stride = critter.critterStrideLength(figure.realized, s);
+      const fall = (side) => [(t) => critter.critterDeathPose(figure.realized, rest, t, side), critter.CRITTER_DEATH_SECONDS];
+      return {
+        idle: () => rest, walk: (u) => critter.critterGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => critter.critterAttackPose(figure.realized, rest, t), duration: critter.CRITTER_POUNCE.duration,
+        reactions: { flinch: [(t) => critter.critterHitPose(figure.realized, rest, t), critter.CRITTER_FLINCH.duration], 'death.left': fall('L'), 'death.right': fall('R') },
+      };
+    },
   };
   for (const model of Object.keys(plans)) {
     const row = { walk_speed: 0.8, walk_frames: 8, attack_frames: 9 };
@@ -822,6 +831,12 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
       const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
       close(decodeFrame(frame), swapFrame(at(cursor)));
     }
+    // Reactions are finite clips sampled endpoint to endpoint over their own span.
+    for (const [path, [at, duration]] of Object.entries(live.reactions ?? {})) {
+      const clip = path.split('.').reduce((set, key) => set[key], standing);
+      for (const [i, frame] of clip.frames.entries()) close(decodeFrame(frame), swapFrame(at(duration * i / (clip.frames.length - 1))));
+    }
+    if (model === 'critter') assert.deepEqual(Object.keys(standing.death).sort(), ['left', 'right']);
   }
 });
 
