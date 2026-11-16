@@ -27,13 +27,17 @@ import { modelSources } from '../check-sources.mjs';
 import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
 import { modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { poseJson } from '../keyFrames.mjs';
-import { partStrokes, pressCheckPoses, readPressCheck } from '../press-check.mjs';
+import { outputPath } from '../layout.mjs';
+import { partStrokes, pressCheckPoses, pressCheckSockets, readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
 import {
+  exportWields,
   heldItems,
+  heldWeapon,
   readWields,
   strikePhases,
   strikeTiming,
+  WIELD_SETS,
   wieldClips,
   wieldPoses,
   wieldProblems,
@@ -51,6 +55,8 @@ const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_
 const pressCheck = readPressCheck(repo);
 const wields = readWields(repo);
 const weaponIds = [...new Set(Object.values(wields.classes).flatMap(({ weapon }) => (weapon ? [weapon.model] : [])))];
+const guns = readWields(repo, WIELD_SETS.guns.file);
+const gunIds = Object.values(guns.classes).map(({ weapon }) => weapon.model);
 const sources = await modelSources(repo);
 const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_worn_`)).map(({ id }) => id);
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
@@ -71,6 +77,7 @@ execFileSync(
     ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]),
     pressCheck.rifle,
     ...weaponIds,
+    ...gunIds,
   ],
   { cwd: repo, stdio: 'pipe' },
 );
@@ -346,11 +353,38 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
   }
 });
 
+// A held gun stands clear of the body but for the hands that close on it: no point of its mesh deeper inside any other
+// part than a garment's thickness would hide (SINK), and some point within a finger's breadth of the torso or the
+// firing arm (TOUCH), so a shouldered stock bears on the body rather than floating before it.
+const SINK = 0.005,
+  TOUCH = 0.01;
+const holding = new Set();
+for (const { id, parent } of rig.bones) if (id.startsWith('hand.') || holding.has(parent)) holding.add(id);
+const unheld = rest.body.filter(({ bone }) => !holding.has(bone));
+// How deep the held mesh `positions`, placed in the world by `place`, stands inside each unheld part of the posed body.
+const sinking = (posed, positions, place) => {
+  const points = [];
+  for (let i = 0; i < positions.length; i += 3) points.push(place(positions.slice(i, i + 3)));
+  return unheld.map(({ bone, mesh }) => {
+    const solid = posedSolid(mesh, posed.get(bone));
+    return { bone, depth: Math.max(...points.map((p) => -signedDepth(solid, p, 0.1))) };
+  });
+};
+const assertBorne = (name, depths) => {
+  for (const { bone, depth } of depths)
+    assert.ok(depth <= SINK, `${name}: the gun stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
+  const touch = Math.max(
+    ...depths.filter(({ bone }) => ['spine', 'upperArm.R'].includes(bone)).map(({ depth }) => depth),
+  );
+  assert.ok(touch >= -TOUCH, `${name}: the gun stands ${(-touch * 1000).toFixed(0)} mm off the shoulder`);
+};
+
 const rifleEntry = models.find((model) => model.id === pressCheck.rifle);
 const pressPoses = pressCheckPoses(
   rig,
   pressCheck,
   partStrokes(readFileSync(join(built, rifleEntry.pack, rifleEntry.path))),
+  pressCheckSockets(pressCheck, heldWeapon(thingOf(pressCheck.rifle), itemMesh(pressCheck.rifle))),
 );
 
 test("the press check's pose files are what its tool writes from its key frames", () => {
@@ -364,21 +398,22 @@ test("the press check's pose files are what its tool writes from its key frames"
   }
 });
 
-test('through the press check the rifle points ahead and down, its butt pad against the body', () => {
-  const torso = rest.body.find((part) => part.bone === 'spine').mesh;
+test('through the press check the rifle points ahead and down, its stock borne in the shoulder', () => {
+  const { positions } = itemMesh(pressCheck.rifle);
   for (const [name, file] of Object.entries(pressPoses)) {
-    const { model, at, turn } = file.hold['hand.R'];
+    const { model, turn } = file.hold['hand.R'];
     assert.equal(model, pressCheck.rifle);
-    const r = quatToMat3(turn),
-      bore = mulMV(r, [0, 0, 1]);
+    const bore = mulMV(quatToMat3(turn), [0, 0, 1]);
     const heading = (Math.atan2(bore[0], bore[2]) * 180) / Math.PI,
       tip = (-Math.asin(bore[1]) * 180) / Math.PI;
     assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
     assert.ok(tip > 0 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
-    const { frame } = compilePose(rig, file, { meshOf: itemMesh });
-    const chest = posedSolid(torso, boneTransforms(rig.bones, decodeFrame(frame)).get('spine'));
-    const gap = signedDepth(chest, add(mulMV(r, pressCheck.butt), at), 0.1);
-    assert.ok(Math.abs(gap) < 0.01, `${name}: the butt pad stands ${(gap * 1000).toFixed(0)} mm off the chest`);
+    const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
+    const item = held['hand.R'];
+    assertBorne(
+      name,
+      sinking(boneTransforms(rig.bones, decodeFrame(frame)), positions, (p) => applyPoint(item, p)),
+    );
   }
 });
 
@@ -580,6 +615,104 @@ test('a bare-handed strike lands its fist ahead of the shoulders, between them a
       );
     }
   }
+});
+
+const gunWeapons = wieldWeapons(guns, thingOf, itemMesh);
+const gunPoses = wieldPoses(rig, guns, gunWeapons);
+let gunBake;
+const bakedGuns = () => (gunBake ??= wieldClips(rig, guns, gunWeapons, itemMesh));
+const DEG = 180 / Math.PI;
+// A gun stance's pose file compiled: the figure posed round the gun, and the gun's points where the pose holds it.
+const gunStance = (name) => {
+  const family = name.split('_stance_')[0];
+  const { frame, held } = compilePose(rig, gunPoses[name], { meshOf: itemMesh });
+  const item = held[guns.classes[family].weapon.lead];
+  return {
+    family,
+    item,
+    weapon: gunWeapons[family].weapon,
+    posed: boneTransforms(rig.bones, decodeFrame(frame)),
+    at: (p) => applyPoint(item, p),
+  };
+};
+const stancesOf = (stance) => Object.keys(gunPoses).filter((name) => name.endsWith(`_stance_${stance}`));
+
+test("the gun clips' pose files are what their tool writes from their key frames", () => {
+  assert.deepEqual(
+    Object.keys(gunPoses).sort(),
+    gunIds.flatMap((id) => [`${id}_stance_guard`, `${id}_stance_idle`]).sort(),
+  );
+  for (const [name, file] of Object.entries(gunPoses)) {
+    assert.equal(
+      readFileSync(join(repo, 'models/poses', `${name}.json`), 'utf8'),
+      `${poseJson(file)}\n`,
+      `${name}: run tools/wields.mjs`,
+    );
+  }
+});
+
+test('every baked gun frame stays within its limits, each palm on its socket', () => {
+  assert.deepEqual(wieldProblems(bakedGuns().reports), []);
+});
+
+test("a gun seated by its clip's held seat stands where the clip's key holds it", () => {
+  for (const [name, clip] of Object.entries(bakedGuns().clips)) {
+    const { weapon, item } = gunStance(name);
+    const hand = boneTransforms(rig.bones, decodeFrame(clip.frames[0])).get(clip.held.bone);
+    // The gun's file carried into the root frame by the seat: turned to its held axes, then by the seat's turn.
+    const seat = mulMM(quatToMat3(clip.held.turn), weapon.held);
+    const r = mulMM(hand.r, seat);
+    const t = add(hand.t, mulMV(hand.r, sub(clip.held.at, mulMV(seat, weapon.at))));
+    const off = length(sub(t, item.t));
+    assert.ok(off < 1e-3, `${name}: the seat puts the gun ${(off * 1000).toFixed(2)} mm from its key's`);
+    const cos = (r.reduce((sum, x, i) => sum + x * item.r[i], 0) - 1) / 2;
+    const turn = Math.acos(Math.min(1, cos)) * DEG;
+    assert.ok(turn < 0.1, `${name}: the seat turns the gun ${turn.toFixed(2)}° off its key's`);
+  }
+});
+
+test('at guard the bore points level and straight ahead', () => {
+  assert.ok(stancesOf('guard').length > 0);
+  for (const name of stancesOf('guard')) {
+    const bore = mulMV(gunStance(name).item.r, [0, 0, 1]);
+    const heading = Math.atan2(bore[0], bore[2]) * DEG,
+      tip = -Math.asin(bore[1]) * DEG;
+    assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
+    assert.ok(Math.abs(tip) <= 0.5, `${name}: the bore tips ${tip.toFixed(2)}°`);
+  }
+});
+
+test('at idle the muzzle points down ahead of the toes', () => {
+  assert.ok(stancesOf('idle').length > 0);
+  for (const name of stancesOf('idle')) {
+    const { weapon, posed, at } = gunStance(name);
+    const muzzle = at(weapon.anchors.muzzle),
+      grip = at(weapon.at);
+    assert.ok(muzzle[1] < grip[1], `${name}: the muzzle stands ${(muzzle[1] - grip[1]).toFixed(2)} m above the grip`);
+    const toes = Math.max(
+      ...['foot.L', 'foot.R'].map((id) => applyPoint(posed.get(id), rig.bones.find((b) => b.id === id).tail)[2]),
+    );
+    assert.ok(muzzle[2] > toes, `${name}: the muzzle stands ${(toes - muzzle[2]).toFixed(2)} m behind the toes`);
+  }
+});
+
+test('in every stance the stock is borne in the shoulder, no part of the gun sunk into the body', () => {
+  assert.ok(Object.keys(gunPoses).length > 0);
+  for (const name of Object.keys(gunPoses)) {
+    const { family, posed, at } = gunStance(name);
+    assertBorne(name, sinking(posed, itemMesh(family).positions, at));
+  }
+});
+
+test("the export lists the gun clips' motions entry, a clip with its held seat for every gun and stance", () => {
+  // The export reads the doll and the guns from the tree it writes into, so it writes into this test's own.
+  const { files, motions } = exportWields(built, manifest, repo, { guns: WIELD_SETS.guns });
+  const { pack, path } = WIELD_SETS.guns.motions;
+  assert.deepEqual(motions, [WIELD_SETS.guns.motions]);
+  assert.ok(files.includes(outputPath(pack, path)));
+  const { clips } = JSON.parse(readFileSync(join(built, outputPath(pack, path)), 'utf8'));
+  for (const id of gunIds)
+    for (const stance of ['idle', 'guard']) assert.ok(clips[`${id}_stance_${stance}`]?.held, `${id}_stance_${stance}`);
 });
 
 test('a grounded shod doll stands its boots on the ground and its bare feet a sole above it', () => {
