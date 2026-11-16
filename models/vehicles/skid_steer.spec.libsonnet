@@ -2,6 +2,6 @@
 {
   frontAxle: 0.55, rearAxle: -0.55, hub: 0.402, wheelZ: 0.72,
   floor: 0.6, cageRear: -0.36, cageFront: 0.62, cageSide: 0.48, roof: 2.0,
-  tailDoor: -1.3, tailDoorOpens: 90,
+  doorSill: 0.92, doorOpens: 90, tailDoor: -1.3, tailDoorOpens: 90,
   shellMass: 1100, paint: 'paint-terracotta',
 }
