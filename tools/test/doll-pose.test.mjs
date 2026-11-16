@@ -373,7 +373,9 @@ const sinking = (posed, positions, place) => {
 const assertBorne = (name, depths) => {
   for (const { bone, depth } of depths)
     assert.ok(depth <= SINK, `${name}: the gun stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
-  const touch = Math.max(...depths.filter(({ bone }) => ['spine', 'upperArm.R'].includes(bone)).map(({ depth }) => depth));
+  const touch = Math.max(
+    ...depths.filter(({ bone }) => ['spine', 'upperArm.R'].includes(bone)).map(({ depth }) => depth),
+  );
   assert.ok(touch >= -TOUCH, `${name}: the gun stands ${(-touch * 1000).toFixed(0)} mm off the shoulder`);
 };
 
@@ -408,7 +410,10 @@ test('through the press check the rifle points ahead and down, its stock borne i
     assert.ok(tip > 0 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
     const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
     const item = held['hand.R'];
-    assertBorne(name, sinking(boneTransforms(rig.bones, decodeFrame(frame)), positions, (p) => applyPoint(item, p)));
+    assertBorne(
+      name,
+      sinking(boneTransforms(rig.bones, decodeFrame(frame)), positions, (p) => applyPoint(item, p)),
+    );
   }
 });
 
