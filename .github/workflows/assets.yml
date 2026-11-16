@@ -140,7 +140,7 @@ jobs:
           pattern: built-*
           path: ${{ runner.temp }}/fresh
       - run: node tools/check-built.mjs --fresh "$RUNNER_TEMP/fresh/built-1" --fresh "$RUNNER_TEMP/fresh/built-2"
-      # A report only; see docs/decisions/0019-smooth-copy.md.
+      # A report only; see docs/decisions/0020-smooth-copy.md.
       - run: node tools/smooth-fit.mjs --built "$RUNNER_TEMP/fresh/built-1"
 
   # The viewers need no built tree, so they build while the models do.

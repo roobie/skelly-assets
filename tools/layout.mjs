@@ -71,7 +71,7 @@ export const readSoundRows = (root = repo) => Object.entries(readSoundPacks(root
   })));
 
 // A model pack's smooth copy ships as a pack of its own beside it, so a consumer that draws only voxels never loads it;
-// the why is in docs/decisions/0019-smooth-copy.md.
+// the why is in docs/decisions/0020-smooth-copy.md.
 const SMOOTH = '.smooth';
 export const smoothPack = (packId) => `${packId}${SMOOTH}`;
 // The pack a smooth pack is the copy of, or undefined for a pack that is not one.

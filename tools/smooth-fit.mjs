@@ -1,4 +1,4 @@
-// Report how each model's smooth copy (docs/decisions/0019-smooth-copy.md) fares under the fit checks its voxel file is
+// Report how each model's smooth copy (docs/decisions/0020-smooth-copy.md) fares under the fit checks its voxel file is
 // held to: the head-gear straps (tools/strap-fit.mjs), the rigid head shells (tools/head-fit.mjs) and the worn pieces'
 // covers (tools/dollRig.mjs, `coverGaps`), each drawn smooth on the smooth doll but placed by the voxel build's
 // datums, as a consumer drawing smooth places them, and whether every smooth file reads as its voxel file's twin. The

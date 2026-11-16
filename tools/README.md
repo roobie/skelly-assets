@@ -126,7 +126,7 @@ manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produ
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
 rather than assumed to. The smooth copies are held to the same fit checks only as a report, since those checks were
-tuned to the voxel lattice; see `smooth-fit.mjs` and `../docs/decisions/0019-smooth-copy.md`. A build reuses
+tuned to the voxel lattice; see `smooth-fit.mjs` and `../docs/decisions/0020-smooth-copy.md`. A build reuses
 every export whose code and inputs are unchanged, so its cost follows what changed rather than the size of the
 catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
 content an export reads, not a dependency graph, so a kit or library edit rebuilds exactly the models whose compiled

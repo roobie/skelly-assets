@@ -6,7 +6,7 @@ read_if:
   - deciding whether a smooth fit finding should fail the build
 ---
 
-# 19. Every model ships a smooth copy beside its voxel file, sharing its sidecar
+# 20. Every model ships a smooth copy beside its voxel file, sharing its sidecar
 
 ## Context
 

@@ -45,7 +45,7 @@ A product-named home makes sharing require another product's name. Group one coh
 a modern carbine does not belong with sci-fi bolt guns, nor ordinary clothing with powered armour. Keep these
 families separate even when the same tool builds them. Pack declarations and path boundaries are cued by
 `tools/layout.mjs`, `declaredPacks` and `outputPath`. A model pack's smooth copy is its own pack beside it, so a
-product that draws voxels never loads it and one that draws smooth loads both; see `docs/decisions/0019-smooth-copy.md`.
+product that draws voxels never loads it and one that draws smooth loads both; see `docs/decisions/0020-smooth-copy.md`.
 
 For a new gun or thing, select its source in `models/recipes/<packId>.jsonnet`, choosing the pack by content,
 not by which game requested it. Keep one recipe file per pack, with owning tool selected by each row's kind;
