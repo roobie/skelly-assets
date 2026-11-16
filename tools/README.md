@@ -106,8 +106,8 @@ are owned by `packages/thing-export/src/files.ts`, `writeRecipeExports`; pack co
 `packages/thing-authoring-tool/src/cli/export.ts`, `exportThingRecipes`.
 
 Generated actors are a separate source family, not another recipe partition. A mob row selects a registered
-template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and `exportMob`. The GLB, body and pose
-clips form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`. Use this
+template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and `exportMob`. The GLB, body, pose
+clips and genome form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`. Use this
 same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
 
 The taxonomy is checked before anything is built, from the source rows rather than from the export tools, so
