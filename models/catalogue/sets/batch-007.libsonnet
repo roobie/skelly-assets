@@ -90,7 +90,7 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
   // other white.
   h.compound('red_capsule', 0.0012, h.capsule(0.026, 0.0055)('capsule', 0, 0, 0),
              { 'capsule-a': 'plastic-clear-red', 'capsule-b': 'plastic-white' }) + { title: 'Red capsule' }
-  + inHand('red_capsule', 'capsule-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: {  } } },
+  + inHand('red_capsule', 'capsule-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A carton of sleeping tablets, 45 mm wide, 85 mm tall and 18 mm deep, standing, dark blue with a white
   // band and a yellow moon on the face.

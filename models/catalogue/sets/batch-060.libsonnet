@@ -34,7 +34,7 @@ local torchBody(id, slot, stations) = turned(id, slot, 'x', [[stations[0][0], 0]
   h.compound('small_candle', 0.014, [
     turned('wax', 'wax', 'y', [[0, 0], [0, 0.0065], [0.135, 0.0058], [0.145, 0.004], [0.148, 0]]),
     disc('wick', 'wick', 0.0008, 0.146, 0.152),
-  ], { wax: 'wax-ivory', wick: 'cloth-charred' }) + { title: 'Small candle' } + h.inHand('small_candle', 'wax') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['plant'] } } },
+  ], { wax: 'wax-ivory', wick: 'cloth-charred' }) + { title: 'Small candle' } + h.inHand('small_candle', 'wax') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', tags: { material: ['wax'] } } },
 
   // A pocket diving torch, 10 cm long and 25 mm across: a knurled aluminium tube, a sealed tail cap and a
   // rubber-ringed head round the lens at +x.
