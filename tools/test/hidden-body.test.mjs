@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as THREE from 'three';
 import { hideCovered } from '../../site/hiding.mjs';
-import { coverGaps } from '../dollRig.mjs';
+import { coverGaps, coverMargins } from '../dollRig.mjs';
 
 // A closed axis-aligned box of 12 triangles from `min` to `max`, in tenths of a metre, so the probe's sampling at its
 // pitch stays quick.
@@ -69,6 +69,17 @@ test('only the pieces riding the hidden part copy cover it, since only they move
 
 test('a name that hides nothing of the part copy is refused', () => {
   assert.deepEqual(gaps(worn('coat', ['hood'])), [['coat', 'hood', 'string']]);
+});
+
+test('a declaration\'s margin is the least depth its pieces enclose the hidden surface by, negative where skin shows', () => {
+  const margin = (...pieces) => coverMargins(rig, [doll, ...pieces], meshesOf).map(({ name, margin: m, open }) => [name, +m.toFixed(4), open]);
+  // The coat stands 2 mm off the shoulders' faces, the tank 1 mm off the trunk's sides, and the crop's hem 1 cm above
+  // the trunk's foot.
+  assert.deepEqual(margin(worn('coat', ['torso'])), [['torso', 0.002, 0]]);
+  assert.deepEqual(margin(worn('tank', ['trunk'])), [['trunk', 0.001, 0]]);
+  const [crop] = margin(worn('crop', ['trunk']));
+  assert.equal(crop[1], -0.01);
+  assert.ok(crop[2] > 0);
 });
 
 test('a drawer hides the covered regions of the part copy a piece is drawn on, and nothing else', () => {
