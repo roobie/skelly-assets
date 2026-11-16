@@ -13,5 +13,7 @@ export function readSoundRows(root?: string): {
   data: string;
   variants: { seed: number; path: string }[];
 }[];
+export function smoothPack(packId: string): string;
+export function smoothedPack(packId: string): string | undefined;
 export function declaredPacks(root?: string): Set<string>;
 export function undeclaredDirectories(paths: string[], declared: Set<string>): string[];
